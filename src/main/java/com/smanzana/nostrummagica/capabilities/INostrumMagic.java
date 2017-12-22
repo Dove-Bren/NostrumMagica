@@ -2,9 +2,12 @@ package com.smanzana.nostrummagica.capabilities;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.smanzana.nostrummagica.Lore.ILoreTagged;
 import com.smanzana.nostrummagica.Lore.Lore;
+import com.smanzana.nostrummagica.spells.EAlteration;
+import com.smanzana.nostrummagica.spells.EMagicElement;
 
 public interface INostrumMagic {
 
@@ -38,7 +41,7 @@ public interface INostrumMagic {
 	public void setMaxMana(int max);
 	
 	// Familiars
-	public IFamiliar getFamiliars(); // TODO add interface
+	public List<IFamiliar> getFamiliars(); // TODO add interface
 	public void addFamiliar(IFamiliar familiar); // TODO here, too
 	
 	// Binding
@@ -79,7 +82,7 @@ public interface INostrumMagic {
 			);
 	
 	public Map<String, Integer> serializeLoreLevels();
-	public List<String> serializeSpellHistory();
+	public Set<String> serializeSpellHistory();
 	public Map<EMagicElement, Boolean> serializeElements();
 	public Map<EAlteration, Boolean> serializeAlterations();
 	public void deserializeLore(String key, Integer level);

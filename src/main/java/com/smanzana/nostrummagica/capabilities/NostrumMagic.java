@@ -11,6 +11,8 @@ import java.util.Set;
 import com.smanzana.nostrummagica.Lore.ILoreTagged;
 import com.smanzana.nostrummagica.Lore.Lore;
 import com.smanzana.nostrummagica.Lore.LoreCache;
+import com.smanzana.nostrummagica.spells.EAlteration;
+import com.smanzana.nostrummagica.spells.EMagicElement;
 
 /**
  * Default implementation of the INostrumMagic interface
@@ -295,6 +297,73 @@ public class NostrumMagic implements INostrumMagic {
 	public Map<EAlteration, Boolean> getAlterations() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void addShape(SpellShape shape) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void addTrigger(SpellTrigger trigger) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void unlockElement(EMagicElement element) {
+		elements.put(element, Boolean.TRUE);
+	}
+
+	@Override
+	public void unlockAlteration(EAlteration alteration) {
+		alterations.put(alteration, Boolean.TRUE);
+	}
+
+	@Override
+	public void deserialize(boolean unlocked, int level, float xp, int skillpoints, int control, int tech, int finesse,
+			int mana, int maxmana) {
+		this.unlocked = unlocked;
+		this.level = level;
+		this.xp = xp;
+		this.maxxp = LevelCurves.maxXP(this.level);
+		this.skillPoints = skillpoints;
+		this.control = control;
+		this.tech = tech;
+		this.finesse = finesse;
+		this.mana = mana;
+		this.maxMana = maxmana;
+	}
+
+	@Override
+	public Map<String, Integer> serializeLoreLevels() {
+		return this.loreLevels;
+	}
+
+	@Override
+	public Set<String> serializeSpellHistory() {
+		return this.spellCRCs;
+	}
+
+	@Override
+	public Map<EMagicElement, Boolean> serializeElements() {
+		return this.elements;
+	}
+
+	@Override
+	public Map<EAlteration, Boolean> serializeAlterations() {
+		return this.alterations;
+	}
+
+	@Override
+	public void deserializeLore(String key, Integer level) {
+		this.loreLevels.put(key, level);
+	}
+
+	@Override
+	public void deserializeSpells(String crc) {
+		this.spellCRCs.add(crc);
 	}
 	
 }
