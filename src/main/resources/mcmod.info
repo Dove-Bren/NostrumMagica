@@ -1,0 +1,16 @@
+[
+{
+  "modid": "nostrummagica",
+  "name": "Nostrum Magica",
+  "description": "Immersive & Complex Spellcrafting",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Skyler Manzanares"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
