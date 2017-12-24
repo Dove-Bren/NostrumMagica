@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.spells.components.triggers;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
@@ -31,7 +31,7 @@ public abstract class InstantTrigger extends SpellTrigger {
 		}
 		
 		@Override
-		public void init(EntityLiving caster) {
+		public void init(EntityLivingBase caster) {
 			// We are instant! Whoo!
 			TriggerData data = getTargetData(this.getState(), world, pos, pitch, yaw);
 			this.trigger(data);

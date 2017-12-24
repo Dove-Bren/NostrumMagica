@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -33,7 +33,7 @@ public abstract class SpellShape {
 	 * @param world
 	 * @param pos
 	 */
-	public void perform(SpellAction action, SpellPartParam param, EntityLiving target, World world, BlockPos pos) {
+	public void perform(SpellAction action, SpellPartParam param, EntityLivingBase target, World world, BlockPos pos) {
 		
 		if (target != null && (world == null || pos == null)) {
 			world = target.worldObj;
@@ -41,7 +41,7 @@ public abstract class SpellShape {
 			pos = new BlockPos(vec.xCoord, vec.yCoord, vec.zCoord);
 		}
 		
-		for (EntityLiving ent : getTargets(param, target, world, pos))
+		for (EntityLivingBase ent : getTargets(param, target, world, pos))
 			action.apply(ent);
 	}
 	
@@ -54,7 +54,7 @@ public abstract class SpellShape {
 	 * @param pos
 	 * @return
 	 */
-	protected abstract List<EntityLiving> getTargets(SpellPartParam param, EntityLiving target, World world, BlockPos pos);
+	protected abstract List<EntityLivingBase> getTargets(SpellPartParam param, EntityLivingBase target, World world, BlockPos pos);
 	
 	
 }

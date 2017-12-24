@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
@@ -45,13 +46,13 @@ public class TouchTrigger extends InstantTrigger {
 		if (trace == null)
 			return null;
 		
-		List<EntityLiving> others = Lists.newArrayList(state.getSelf());
+		List<EntityLivingBase> others = Lists.newArrayList(state.getSelf());
 		if (trace.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
 			// Cast is safe from 'onlyLiving' option in trace
-			return new TriggerData(Lists.newArrayList((EntityLiving) trace.entityHit), others, null);
+			return new TriggerData(Lists.newArrayList((EntityLiving) trace.entityHit), others, world, null);
 		} else if (trace.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
 			Vec3 vec = trace.hitVec;
-			return new TriggerData(null, others,
+			return new TriggerData(null, others, world,
 					Lists.newArrayList(new BlockPos(Math.round(vec.xCoord), Math.round(vec.yCoord), Math.round(vec.zCoord))));
 		} else {
 			return null;

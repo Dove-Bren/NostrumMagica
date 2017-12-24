@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
@@ -34,12 +34,12 @@ public class Spell {
 	
 	public class SpellState {
 		private int index;
-		private EntityLiving caster;
-		private EntityLiving self;
-		private EntityLiving other;
+		private EntityLivingBase caster;
+		private EntityLivingBase self;
+		private EntityLivingBase other;
 		private SpellTrigger.SpellTriggerInstance triggerInstance;
 		
-		public SpellState(EntityLiving caster) {
+		public SpellState(EntityLivingBase caster) {
 			index = -1;
 			this.caster = this.self = this.other = caster;
 		}
@@ -49,21 +49,21 @@ public class Spell {
 		 * Indicates the current trigger has been done and the spell
 		 * should move forward
 		 */
-		public void trigger(List<EntityLiving> targets, List<EntityLiving> other, World world, List<BlockPos> locations) {
+		public void trigger(List<EntityLivingBase> targets, List<EntityLivingBase> other, World world, List<BlockPos> locations) {
 			
 			//for each target/other pair (if more than one), break into multiple spellstates
 			// persist index++ and set self/other, then start doing shapes or next trigger
 			
 			SpellPart next;
 			
-			List<EntityLiving> targs = targets;
+			List<EntityLivingBase> targs = targets;
 			
 			while ((next = parts.get(++index)) != null && !next.isTrigger()) {
 				// it's a shape. Do it idk
 				SpellShape shape = next.getShape();
-				SpellAction action;
+				SpellAction action = solveAction(caster, next.getAlteration(),
+						next.getElement(), next.getElementCount());
 				SpellPartParam param = next.getParam();
-				
 				
 				if (param.flip) {
 					// use other instead of self
@@ -73,7 +73,7 @@ public class Spell {
 				}
 				
 				if (targs != null && !targs.isEmpty()) {
-					for (EntityLiving targ : targs) {
+					for (EntityLivingBase targ : targs) {
 						shape.perform(action, param, targ, null, null);
 					}
 				} else {
@@ -101,7 +101,7 @@ public class Spell {
 						spawnTrigger(next.getTrigger(), targs.get(0), null, null);
 					} else {
 						index--; // Make splits have same trigger as we're performing now
-						for (EntityLiving targ : targs) {
+						for (EntityLivingBase targ : targs) {
 							SpellState sub = split(targ, this.getSelf());
 							sub.trigger(Lists.newArrayList(targ), Lists.newArrayList(targ),
 									world, null);
@@ -124,7 +124,7 @@ public class Spell {
 			}
 		}
 		
-		private void spawnTrigger(SpellTrigger trigger, EntityLiving targ, World world, BlockPos targpos) {
+		private void spawnTrigger(SpellTrigger trigger, EntityLivingBase targ, World world, BlockPos targpos) {
 			// instantiate trigger in world
 			Vec3 pos;
 			if (world == null)
@@ -140,7 +140,7 @@ public class Spell {
 			this.triggerInstance.init(caster);
 		}
 		
-		private SpellState split(EntityLiving self, EntityLiving other) {
+		private SpellState split(EntityLivingBase self, EntityLivingBase other) {
 			SpellState spawn = new SpellState(caster);
 			spawn.index = this.index;
 			spawn.self = self;
@@ -149,20 +149,20 @@ public class Spell {
 			return spawn;
 		}
 
-		public EntityLiving getSelf() {
+		public EntityLivingBase getSelf() {
 			return self;
 		}
 
-		public EntityLiving getOther() {
+		public EntityLivingBase getOther() {
 			return other;
 		}
 
-		public EntityLiving getCaster() {
+		public EntityLivingBase getCaster() {
 			return caster;
 		}
 	}
 	
-	private static class SpellPart {
+	public static class SpellPart {
 		private SpellTrigger trigger;
 		private SpellShape shape;
 		private EAlteration alteration;
@@ -216,9 +216,24 @@ public class Spell {
 	private String name;
 	private List<SpellPart> parts;
 	
+	// TODO some cool effects and stuff
+	
 	public Spell(String name) {
 		this.name = name;
 		this.parts = new LinkedList<>();
+	}
+	
+	public void addPart(SpellPart part) {
+		this.parts.add(part);
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public void cast(EntityLivingBase caster) {
+		SpellState state = new SpellState(caster);
+		state.trigger(Lists.newArrayList(caster), null, null, null);
 	}
 	
 	public String crc() {
@@ -234,7 +249,7 @@ public class Spell {
 	}
 	
 	
-	public static final SpellAction solveAction(EntityLiving caster, EAlteration alteration,
+	public static final SpellAction solveAction(EntityLivingBase caster, EAlteration alteration,
 			EMagicElement element, int elementCount) {
 		
 		// Could do a registry with hooks here, if wanted it to be extensible
@@ -266,7 +281,7 @@ public class Spell {
 		}
 	}
 	
-	private static final SpellAction solveAlter(EntityLiving caster, EMagicElement element,
+	private static final SpellAction solveAlter(EntityLivingBase caster, EMagicElement element,
 			int elementCount) {
 		switch (element) {
 		case PHYSICAL:
@@ -288,7 +303,7 @@ public class Spell {
 		return null;
 	}
 	
-	private static final SpellAction solveInflict(EntityLiving caster, EMagicElement element,
+	private static final SpellAction solveInflict(EntityLivingBase caster, EMagicElement element,
 			int elementCount) {
 		int duration = 20 * 15 * elementCount;
 		int amp = elementCount - 1;
@@ -312,7 +327,7 @@ public class Spell {
 		return null;
 	}
 	
-	private static final SpellAction solveResist(EntityLiving caster, EMagicElement element,
+	private static final SpellAction solveResist(EntityLivingBase caster, EMagicElement element,
 			int elementCount) {
 		int duration = 20 * 15 * elementCount;
 		int amp = elementCount - 1;
@@ -336,7 +351,7 @@ public class Spell {
 		return null;
 	}
 	
-	private static final SpellAction solveSupport(EntityLiving caster, EMagicElement element,
+	private static final SpellAction solveSupport(EntityLivingBase caster, EMagicElement element,
 			int elementCount) {
 		int duration = 20 * 15 * elementCount;
 		int amp = elementCount - 1;
@@ -360,7 +375,7 @@ public class Spell {
 		return null;
 	}
 	
-	private static final SpellAction solveGrowth(EntityLiving caster, EMagicElement element,
+	private static final SpellAction solveGrowth(EntityLivingBase caster, EMagicElement element,
 			int elementCount) {
 		int duration = 20 * 15 * elementCount;
 		int amp = elementCount - 1;
@@ -384,7 +399,7 @@ public class Spell {
 		return null;
 	}
 	
-	private static final SpellAction solveEnchant(EntityLiving caster, EMagicElement element,
+	private static final SpellAction solveEnchant(EntityLivingBase caster, EMagicElement element,
 			int elementCount) {
 		int duration = 20 * 15 * elementCount;
 		int amp = elementCount - 1;
@@ -408,7 +423,7 @@ public class Spell {
 		return null;
 	}
 	
-	private static final SpellAction solveConjure(EntityLiving caster, EMagicElement element,
+	private static final SpellAction solveConjure(EntityLivingBase caster, EMagicElement element,
 			int elementCount) {
 		int duration = 20 * 15 * elementCount;
 		int amp = elementCount - 1;
@@ -432,7 +447,7 @@ public class Spell {
 		return null;
 	}
 	
-	private static final SpellAction solveSummon(EntityLiving caster, EMagicElement element,
+	private static final SpellAction solveSummon(EntityLivingBase caster, EMagicElement element,
 			int elementCount) {
 		int duration = 20 * 15 * elementCount;
 		int amp = elementCount - 1;

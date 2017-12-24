@@ -6,7 +6,7 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
@@ -27,7 +27,7 @@ public class SingleShape extends SpellShape {
 	}
 
 	@Override
-	protected List<EntityLiving> getTargets(SpellPartParam param, EntityLiving target, World world, BlockPos pos) {
+	protected List<EntityLivingBase> getTargets(SpellPartParam param, EntityLivingBase target, World world, BlockPos pos) {
 		return Lists.newArrayList(target);
 	}
 

@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
@@ -30,8 +30,8 @@ public class AoEShape extends SpellShape {
 	}
 
 	@Override
-	protected List<EntityLiving> getTargets(SpellPartParam param, EntityLiving target, World world, BlockPos pos) {
-		List<EntityLiving> ret = new LinkedList<>();
+	protected List<EntityLivingBase> getTargets(SpellPartParam param, EntityLivingBase target, World world, BlockPos pos) {
+		List<EntityLivingBase> ret = new LinkedList<>();
 		
 		double radius = (double) param.level;
 		
@@ -42,9 +42,9 @@ public class AoEShape extends SpellShape {
 							pos.getX() + radius,
 							pos.getY() + radius,
 							pos.getZ() + radius))) {
-			if (entity instanceof EntityLiving)
+			if (entity instanceof EntityLivingBase)
 				if (Math.abs(entity.getPositionVector().distanceTo(new Vec3(pos.getX(), pos.getY(), pos.getZ()))) <= radius)
-					ret.add((EntityLiving) entity);
+					ret.add((EntityLivingBase) entity);
 		}
 		
 		return ret;

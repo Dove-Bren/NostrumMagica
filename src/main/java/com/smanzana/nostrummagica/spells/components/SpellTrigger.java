@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -32,7 +32,7 @@ public abstract class SpellTrigger {
 		// TODO implementation figured out when to call trigger.
 		
 		protected void trigger(TriggerData data) {
-			state.trigger(data.targets, data.others, data.pos);
+			state.trigger(data.targets, data.others, data.world, data.pos);
 		}
 		
 		protected SpellState getState() {
@@ -43,15 +43,16 @@ public abstract class SpellTrigger {
 		 * Called after trigger stuff is set up in owning spell.
 		 * @param caster
 		 */
-		public abstract void init(EntityLiving caster);
+		public abstract void init(EntityLivingBase caster);
 	}
 	
 	protected static class TriggerData {
-		public List<EntityLiving> targets;
-		public List<EntityLiving> others;
+		public List<EntityLivingBase> targets;
+		public List<EntityLivingBase> others;
+		public World world;
 		public List<BlockPos> pos;
 		
-		public TriggerData(List<EntityLiving> targets, List<EntityLiving> others, List<BlockPos> pos) {
+		public TriggerData(List<EntityLivingBase> targets, List<EntityLivingBase> others, World world, List<BlockPos> pos) {
 			this.targets = targets;
 			this.others = others;
 			this.pos = pos;

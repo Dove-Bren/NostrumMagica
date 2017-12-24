@@ -12,7 +12,6 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.entity.monster.EntityEnderman;
@@ -440,15 +439,15 @@ public class SpellAction {
 		
 	}
 	
-	private EntityLiving source;
+	private EntityLivingBase source;
 	private List<SpellEffect> effects;
 	
-	public SpellAction(EntityLiving source) {
+	public SpellAction(EntityLivingBase source) {
 		this.source = source;
 		effects = new LinkedList<>();
 	}
 	
-	public void apply(EntityLiving entity) {
+	public void apply(EntityLivingBase entity) {
 		for (SpellEffect e : effects) {
 			e.apply(source, entity);
 		}

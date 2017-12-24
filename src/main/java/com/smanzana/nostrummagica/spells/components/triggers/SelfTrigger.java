@@ -24,7 +24,7 @@ public class SelfTrigger extends InstantTrigger {
 	
 	@Override
 	protected TriggerData getTargetData(SpellState state, World world, Vec3 pos, float pitch, float yaw) {
-		return new TriggerData(Lists.newArrayList(state.getSelf()), null, null);
+		return new TriggerData(Lists.newArrayList(state.getSelf()), null, world, null);
 	}
 	
 }
