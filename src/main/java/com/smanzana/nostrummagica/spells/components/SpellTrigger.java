@@ -1,6 +1,8 @@
 package com.smanzana.nostrummagica.spells.components;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 
@@ -16,6 +18,16 @@ import net.minecraft.world.World;
  *
  */
 public abstract class SpellTrigger {
+	
+	private static Map<String, SpellTrigger> registry = new HashMap<>();
+	
+	public static void register(SpellTrigger shape) {
+		registry.put(shape.getTriggerKey(), shape);
+	}
+	
+	public static SpellTrigger get(String name) {
+		return registry.get(name);
+	}
 
 	/**
 	 * Instantiated spell trigger in the world
@@ -87,4 +99,9 @@ public abstract class SpellTrigger {
 	 */
 	protected abstract TriggerData getTargetData(SpellState state, World world, Vec3 pos, float pitch, float yaw);
 	
+	/**
+	 * 
+	 * @return
+	 */
+	public abstract int getManaCost();
 }

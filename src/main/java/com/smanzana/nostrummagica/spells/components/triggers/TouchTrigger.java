@@ -59,4 +59,9 @@ public class TouchTrigger extends InstantTrigger {
 		}
 	}
 	
+	@Override
+	public int getManaCost() {
+		return 20;
+	}
+	
 }

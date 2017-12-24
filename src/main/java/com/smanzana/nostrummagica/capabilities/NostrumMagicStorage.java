@@ -4,6 +4,8 @@ import java.util.Map;
 
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -27,7 +29,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	private static final String NBT_MAXMANA = "maxmana";
 	
 	//private static final String NBT_FAMILIARS = "familiars";
-	private static final String NBT_BINDING = "binding"; // TODO binding interface
+	//private static final String NBT_BINDING = "binding"; // TODO binding interface
 	
 	private static final String NBT_LORELEVELS = "lore";
 	private static final String NBT_SPELLCRCS = "spellcrcs"; // spells we've done's CRCs
@@ -115,8 +117,8 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		
 		// LORE
 		NBTTagCompound compound = tag.getCompoundTag(NBT_LORELEVELS);
-		for (String key : tag.getKeySet()) {
-			Integer level = tag.getInteger(key);
+		for (String key : compound.getKeySet()) {
+			Integer level = compound.getInteger(key);
 			instance.deserializeLore(key, level);
 		}
 		
@@ -128,8 +130,8 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		
 		// ELEMENTS
 		compound = tag.getCompoundTag(NBT_ELEMENTS);
-		for (String key : tag.getKeySet()) {
-			Boolean val = tag.getBoolean(key);
+		for (String key : compound.getKeySet()) {
+			Boolean val = compound.getBoolean(key);
 			if (val != null && val) {
 				EMagicElement elem = EMagicElement.valueOf(key);
 				instance.unlockElement(elem);
@@ -147,14 +149,14 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		list = tag.getTagList(NBT_TRIGGERS, NBT.TAG_STRING);
 		for (int i = 0; i < list.tagCount(); i++) {
 			SpellTrigger trigger = SpellTrigger.get(list.getStringTagAt(i));
-			instance.addShape(trigger);
+			instance.addTrigger(trigger);
 		}
 		
 		// ALTERATIONS
 
 		compound = tag.getCompoundTag(NBT_ALTERATIONS);
-		for (String key : tag.getKeySet()) {
-			Boolean val = tag.getBoolean(key);
+		for (String key : compound.getKeySet()) {
+			Boolean val = compound.getBoolean(key);
 			if (val != null && val) {
 				EAlteration elem = EAlteration.valueOf(key);
 				instance.unlockAlteration(elem);

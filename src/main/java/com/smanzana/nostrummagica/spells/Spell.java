@@ -215,16 +215,19 @@ public class Spell {
 
 	private String name;
 	private List<SpellPart> parts;
+	private int manaCost;
 	
 	// TODO some cool effects and stuff
 	
 	public Spell(String name) {
 		this.name = name;
 		this.parts = new LinkedList<>();
+		manaCost = -1; // un-calculated value
 	}
 	
 	public void addPart(SpellPart part) {
 		this.parts.add(part);
+		manaCost = -1;
 	}
 	
 	public String getName() {
@@ -246,6 +249,31 @@ public class Spell {
 		}
 		
 		return s;
+	}
+	
+	public int getManaCost() {
+		if (manaCost != -1)
+			return manaCost;
+		
+		// Triggers can report their  cost
+		// Alterations are in enum
+		// Shapes cost 15
+		// First elem is free. Extra costs 30 ea
+		manaCost = 0;
+		
+		for (SpellPart part : parts) {
+			if (part.isTrigger())
+				manaCost += part.getTrigger().getManaCost();
+			else {
+				manaCost += 15;
+				if (part.getElementCount() > 1)
+					manaCost += (30 * (part.getElementCount() - 1));
+				if (part.getAlteration() != null)
+					manaCost += part.getAlteration().getCost();
+			}
+		}
+		
+		return manaCost;
 	}
 	
 	

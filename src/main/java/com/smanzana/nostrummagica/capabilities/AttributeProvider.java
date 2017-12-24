@@ -18,6 +18,7 @@ public class AttributeProvider implements ICapabilitySerializable<NBTBase> {
 		return capability == CAPABILITY;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
 		if (capability == CAPABILITY)

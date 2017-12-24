@@ -1,6 +1,8 @@
 package com.smanzana.nostrummagica.spells.components;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 
@@ -15,6 +17,16 @@ import net.minecraft.world.World;
  *
  */
 public abstract class SpellShape {
+	
+	private static Map<String, SpellShape> registry = new HashMap<>();
+	
+	public static void register(SpellShape shape) {
+		registry.put(shape.getShapeKey(), shape);
+	}
+	
+	public static SpellShape get(String name) {
+		return registry.get(name);
+	}
 	
 	private String key;
 	

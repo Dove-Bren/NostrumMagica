@@ -27,4 +27,9 @@ public class SelfTrigger extends InstantTrigger {
 		return new TriggerData(Lists.newArrayList(state.getSelf()), null, world, null);
 	}
 	
+	@Override
+	public int getManaCost() {
+		return 10;
+	}
+	
 }

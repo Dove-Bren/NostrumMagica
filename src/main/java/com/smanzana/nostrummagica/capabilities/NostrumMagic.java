@@ -13,6 +13,9 @@ import com.smanzana.nostrummagica.Lore.Lore;
 import com.smanzana.nostrummagica.Lore.LoreCache;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 /**
  * Default implementation of the INostrumMagic interface
@@ -48,7 +51,7 @@ public class NostrumMagic implements INostrumMagic {
 	private int mana;
 	private int maxMana;
 	
-	private List<IFamiliar> familiars;
+	//private List<IFamiliar> familiars;
 	private boolean binding; // TODO binding interface
 	
 	private Map<String, Integer> loreLevels;
@@ -60,7 +63,7 @@ public class NostrumMagic implements INostrumMagic {
 	
 	public NostrumMagic() {
 		unlocked = false;
-		familiars = new LinkedList<>();
+		//familiars = new LinkedList<>();
 		loreLevels = new HashMap<>();
 		spellCRCs = new HashSet<>();
 		elements = new EnumMap<>(EMagicElement.class);
@@ -196,15 +199,15 @@ public class NostrumMagic implements INostrumMagic {
 			this.mana = maxMana;
 	}
 
-	@Override
-	public List<IFamiliar> getFamiliars() {
-		return familiars;
-	}
-
-	@Override
-	public void addFamiliar(IFamiliar familiar) {
-		familiars.add(familiar);
-	}
+//	@Override
+//	public List<IFamiliar> getFamiliars() {
+//		return familiars;
+//	}
+//
+//	@Override
+//	public void addFamiliar(IFamiliar familiar) {
+//		familiars.add(familiar);
+//	}
 
 	@Override
 	public boolean isBinding() {
@@ -270,15 +273,20 @@ public class NostrumMagic implements INostrumMagic {
 
 	@Override
 	public boolean wasSpellDone(Spell spell) {
-		String CRC = spell.getCRC();
+		String CRC = spell.crc();
 		
 		return !spellCRCs.add(CRC);
 	}
 
 	@Override
 	public List<SpellShape> getShapes() {
-		// TODO Auto-generated method stub
-		return null;
+		List<SpellShape> ret = new LinkedList<>();
+		
+		for (String name : shapes) {
+			// TODO lookup
+		}
+		
+		return ret;
 	}
 
 	@Override
@@ -289,14 +297,12 @@ public class NostrumMagic implements INostrumMagic {
 
 	@Override
 	public Map<EMagicElement, Boolean> getElements() {
-		// TODO Auto-generated method stub
-		return null;
+		return elements;
 	}
 
 	@Override
 	public Map<EAlteration, Boolean> getAlterations() {
-		// TODO Auto-generated method stub
-		return null;
+		return alterations;
 	}
 
 	@Override

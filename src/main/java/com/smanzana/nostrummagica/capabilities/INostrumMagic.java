@@ -8,6 +8,9 @@ import com.smanzana.nostrummagica.Lore.ILoreTagged;
 import com.smanzana.nostrummagica.Lore.Lore;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 public interface INostrumMagic {
 
@@ -41,8 +44,8 @@ public interface INostrumMagic {
 	public void setMaxMana(int max);
 	
 	// Familiars
-	public List<IFamiliar> getFamiliars(); // TODO add interface
-	public void addFamiliar(IFamiliar familiar); // TODO here, too
+//	public List<IFamiliar> getFamiliars(); // TODO add interface
+//	public void addFamiliar(IFamiliar familiar); // TODO here, too
 	
 	// Binding
 	public boolean isBinding();
