@@ -1,13 +1,16 @@
 package com.smanzana.nostrummagica.spells;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.potion.Potion;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -213,9 +216,244 @@ public class Spell {
 	private String name;
 	private List<SpellPart> parts;
 	
+	public Spell(String name) {
+		this.name = name;
+		this.parts = new LinkedList<>();
+	}
 	
 	public String crc() {
+		String s = "";
+		for (SpellPart part : parts) {
+			if (part.isTrigger())
+				s += part.getTrigger().getTriggerKey();
+			else
+				s += part.getShape().getShapeKey();
+		}
 		
+		return s;
+	}
+	
+	
+	public static final SpellAction solveAction(EntityLiving caster, EAlteration alteration,
+			EMagicElement element, int elementCount) {
+		
+		// Could do a registry with hooks here, if wanted it to be extensible
+		
+		if (alteration == null) {
+			// Damage spell
+			return new SpellAction(caster).damage(element, 5.0f * elementCount);
+		}
+		
+		switch (alteration) {
+		case ALTER:
+			return solveAlter(caster, element, elementCount);
+		case CONJURE:
+			return solveConjure(caster, element, elementCount);
+		case ENCHANT:
+			return solveEnchant(caster, element, elementCount);
+		case GROWTH:
+			return solveGrowth(caster, element, elementCount);
+		case INFLICT:
+			return solveInflict(caster, element, elementCount);
+		case RESIST:
+			return solveResist(caster, element, elementCount);
+		case SUMMON:
+			return solveSummon(caster, element, elementCount);
+		case SUPPORT:
+			return solveSupport(caster, element, elementCount);
+		default:
+			return null;
+		}
+	}
+	
+	private static final SpellAction solveAlter(EntityLiving caster, EMagicElement element,
+			int elementCount) {
+		switch (element) {
+		case PHYSICAL:
+			return new SpellAction(caster).transmute(elementCount);
+		case EARTH:
+			break;
+		case ENDER:
+			break;
+		case FIRE:
+			break;
+		case ICE:
+			break;
+		case LIGHTNING:
+			break;
+		case WIND:
+			break;
+		}
+		
+		return null;
+	}
+	
+	private static final SpellAction solveInflict(EntityLiving caster, EMagicElement element,
+			int elementCount) {
+		int duration = 20 * 15 * elementCount;
+		int amp = elementCount - 1;
+		switch (element) {
+		case PHYSICAL:
+			return new SpellAction(caster).status(Potion.weakness, duration, amp);
+		case EARTH:
+			return new SpellAction(caster).status(RootedPotion.instance(), duration, amp);
+		case ENDER:
+			return new SpellAction(caster).status(Potion.blindness, duration, amp);
+		case FIRE:
+			return new SpellAction(caster).burn(duration);
+		case ICE:
+			break; // TODO
+		case LIGHTNING:
+			break;
+		case WIND:
+			break;
+		}
+		
+		return null;
+	}
+	
+	private static final SpellAction solveResist(EntityLiving caster, EMagicElement element,
+			int elementCount) {
+		int duration = 20 * 15 * elementCount;
+		int amp = elementCount - 1;
+		switch (element) {
+		case PHYSICAL:
+			return new SpellAction(caster).status(Potion.resistance, duration, amp);
+		case EARTH:
+			break;
+		case ENDER:
+			break;
+		case FIRE:
+			break;
+		case ICE:
+			break; // TODO
+		case LIGHTNING:
+			break;
+		case WIND:
+			break;
+		}
+		
+		return null;
+	}
+	
+	private static final SpellAction solveSupport(EntityLiving caster, EMagicElement element,
+			int elementCount) {
+		int duration = 20 * 15 * elementCount;
+		int amp = elementCount - 1;
+		switch (element) {
+		case PHYSICAL:
+			return new SpellAction(caster).status(Potion.absorption, duration * 5, amp);
+		case EARTH:
+			break;
+		case ENDER:
+			break;
+		case FIRE:
+			break;
+		case ICE:
+			break; // TODO
+		case LIGHTNING:
+			break;
+		case WIND:
+			break;
+		}
+		
+		return null;
+	}
+	
+	private static final SpellAction solveGrowth(EntityLiving caster, EMagicElement element,
+			int elementCount) {
+		int duration = 20 * 15 * elementCount;
+		int amp = elementCount - 1;
+		switch (element) {
+		case PHYSICAL:
+			return new SpellAction(caster).status(Potion.saturation, 1, 4 * elementCount);
+		case EARTH:
+			break;
+		case ENDER:
+			break;
+		case FIRE:
+			break;
+		case ICE:
+			break; // TODO
+		case LIGHTNING:
+			break;
+		case WIND:
+			break;
+		}
+		
+		return null;
+	}
+	
+	private static final SpellAction solveEnchant(EntityLiving caster, EMagicElement element,
+			int elementCount) {
+		int duration = 20 * 15 * elementCount;
+		int amp = elementCount - 1;
+		switch (element) {
+		case PHYSICAL:
+			break;
+		case EARTH:
+			break;
+		case ENDER:
+			break;
+		case FIRE:
+			break;
+		case ICE:
+			break; // TODO
+		case LIGHTNING:
+			break;
+		case WIND:
+			break;
+		}
+		
+		return null;
+	}
+	
+	private static final SpellAction solveConjure(EntityLiving caster, EMagicElement element,
+			int elementCount) {
+		int duration = 20 * 15 * elementCount;
+		int amp = elementCount - 1;
+		switch (element) {
+		case PHYSICAL:
+			break;
+		case EARTH:
+			break;
+		case ENDER:
+			break;
+		case FIRE:
+			break;
+		case ICE:
+			break; // TODO
+		case LIGHTNING:
+			break;
+		case WIND:
+			break;
+		}
+		
+		return null;
+	}
+	
+	private static final SpellAction solveSummon(EntityLiving caster, EMagicElement element,
+			int elementCount) {
+		int duration = 20 * 15 * elementCount;
+		int amp = elementCount - 1;
+		switch (element) {
+		case PHYSICAL:
+			break;
+		case EARTH:
+			break;
+		case ENDER:
+			break;
+		case FIRE:
+			break;
+		case ICE:
+			break; // TODO
+		case LIGHTNING:
+			break;
+		case WIND:
+			break;
+		}
+		
+		return null;
 	}
 	
 	
