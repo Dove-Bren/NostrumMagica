@@ -1,0 +1,18 @@
+item.spellTome.name=Spell Tome
+
+tile.skylander_armory_whetstone_block.name=Whetstone Block
+tile.skylander_armory_pedestal.name=Pedestal
+tile.skylander_armory_brazier_block.name=Brazier
+tile.skylander_armory_forge_block.name=Forge
+tile.skylander_armory_forge_anvil.name=Smith's Anvil
+tile.skylander_armory_forge_trough.name=Trough
+tile.skylander_armory_cutting_table_block.name=Cutting Table
+
+tile.copper_ore.name=Copper Ore
+
+entity.armorer_stand.name=Armorer's Stand
+
+itemGroup.skylander_armory=Skylander Armory
+
+text.smith_level=Smith Level:
+text.smith_level.name=nope it has name:

@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.proxy;
 
+import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
@@ -7,6 +8,8 @@ import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
+
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class CommonProxy {
 
@@ -23,6 +26,7 @@ public class CommonProxy {
     	registerShapes();
     	registerTriggers();
     	registerPotions();
+    	registerItems();
 	}
 	
 	public void postinit() {
@@ -41,6 +45,10 @@ public class CommonProxy {
     
     private void registerPotions() {
     	RootedPotion.instance();
+    }
+    
+    private void registerItems() {
+    	GameRegistry.registerItem(SpellTome.instance(), SpellTome.id);
     }
 	
 }

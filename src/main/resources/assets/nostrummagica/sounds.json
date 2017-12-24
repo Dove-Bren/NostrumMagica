@@ -1,0 +1,11 @@
+{
+    "item.metal.cool":
+    {
+        "category": "neutral",
+        "sounds":
+        [
+            "item/metal/cool1",
+            "item/metal/cool2"
+        ]
+    }
+}

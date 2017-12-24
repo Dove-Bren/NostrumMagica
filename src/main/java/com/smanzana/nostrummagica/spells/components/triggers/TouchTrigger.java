@@ -49,7 +49,7 @@ public class TouchTrigger extends InstantTrigger {
 		List<EntityLivingBase> others = Lists.newArrayList(state.getSelf());
 		if (trace.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
 			// Cast is safe from 'onlyLiving' option in trace
-			return new TriggerData(Lists.newArrayList((EntityLiving) trace.entityHit), others, world, null);
+			return new TriggerData(Lists.newArrayList((EntityLivingBase) trace.entityHit), others, world, null);
 		} else if (trace.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
 			Vec3 vec = trace.hitVec;
 			return new TriggerData(null, others, world,

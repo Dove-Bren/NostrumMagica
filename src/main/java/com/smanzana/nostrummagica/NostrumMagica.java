@@ -5,17 +5,21 @@ import org.apache.logging.log4j.Logger;
 
 import com.smanzana.nostrummagica.capabilities.AttributeProvider;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.listeners.PlayerListener;
 import com.smanzana.nostrummagica.proxy.CommonProxy;
 
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
-import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Mod(modid = NostrumMagica.MODID, version = NostrumMagica.VERSION)
 public class NostrumMagica
@@ -26,19 +30,29 @@ public class NostrumMagica
     @SidedProxy(clientSide="com.smanzana.nostrummagica.proxy.ClientProxy", serverSide="com.smanzana.nostrummagica.proxy.CommonProxy")
     public static CommonProxy proxy;
     
+    public static CreativeTabs creativeTab;
     public static Logger logger = LogManager.getLogger(MODID);
     public static PlayerListener playerListener;
     
     @EventHandler
     public void init(FMLInitializationEvent event) {
-		// some example code
-        System.out.println("DIRT BLOCK >> "+Blocks.dirt.getUnlocalizedName());
         proxy.init();
     }
     
     @EventHandler
     public void preinit(FMLPreInitializationEvent event) {
     	playerListener = new PlayerListener();
+    	
+    	NostrumMagica.creativeTab = new CreativeTabs(MODID){
+	    	@Override
+	        @SideOnly(Side.CLIENT)
+	        public Item getTabIconItem(){
+	            //return WhetstoneBlock.block.item;
+	    		return SpellTome.instance();
+	        }
+	    };
+	    SpellTome.instance().setCreativeTab(NostrumMagica.creativeTab);
+    	
     	proxy.preinit();
     }
     
