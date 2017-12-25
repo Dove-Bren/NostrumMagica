@@ -12,6 +12,8 @@ import com.smanzana.nostrummagica.proxy.CommonProxy;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
+import net.minecraft.potion.Potion;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -70,5 +72,12 @@ public class NostrumMagica
      */
     public static INostrumMagic getMagicWrapper(Entity e) {
     	return e.getCapability(AttributeProvider.CAPABILITY, null);
+    }
+    
+    private static int potionID = 65;
+    public static void registerPotion(Potion potion, ResourceLocation loc) {
+    	while (Potion.getPotionById(potionID) != null)
+    		potionID++;
+    	Potion.REGISTRY.register(potionID, loc, potion);
     }
 }

@@ -11,7 +11,7 @@ import net.minecraft.util.ResourceLocation;
 public class RootedPotion extends Potion {
 
 	private static final ResourceLocation Resource = new ResourceLocation(
-			NostrumMagica.MODID, "potions/rooted");
+			NostrumMagica.MODID, "potions-rooted");
 	
 	private static RootedPotion instance;
 	public static RootedPotion instance() {
@@ -22,18 +22,20 @@ public class RootedPotion extends Potion {
 	}
 	
 	private RootedPotion() {
-		super(Resource, false, (new Color(100, 60, 25)).getRGB());
+		super(false, (new Color(100, 60, 25)).getRGB());
+		
+		NostrumMagica.registerPotion(this, Resource);
 	}
 	
 	public boolean isReady(int duration, int amp) {
-		return true; // Every tick
+		return duration > 0; // Every tick
 	}
 
 	@Override
 	public void performEffect(EntityLivingBase entity, int amp)
     {
-        if (entity.ridingEntity != null) {
-        	entity.dismountEntity(entity.ridingEntity);
+        if (entity.isRiding()) {
+        	entity.dismountRidingEntity();
         }
         
         if (entity.motionY > 0) {

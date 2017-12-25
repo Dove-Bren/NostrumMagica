@@ -15,8 +15,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.entity.projectile.EntityThrowable;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
@@ -70,10 +70,10 @@ public class PlayerListener {
 		public World world;
 		
 		// Proximity based
-		public Vec3 position;
+		public Vec3d position;
 		public double proximity;
 		
-		public ProximityInfo(World world, Vec3 position, double proximity) {
+		public ProximityInfo(World world, Vec3d position, double proximity) {
 			this.world = world;
 			this.position = position;
 			this.proximity = proximity;
@@ -178,7 +178,7 @@ public class PlayerListener {
 	 * @param range negative just won't work. :)
 	 */
 	public void registerProximity(IMagicListener listener, 
-			World world, Vec3 pos, double range) {
+			World world, Vec3d pos, double range) {
 		proximityInfos.put(listener,
 				new ProximityInfo(world, pos, range));
 	}
@@ -252,7 +252,7 @@ public class PlayerListener {
 	@SubscribeEvent
 	public void onLivingUpdate(LivingUpdateEvent event) {
 		
-		EntityLivingBase ent = event.entityLiving; // convenience
+		EntityLivingBase ent = event.getEntityLiving(); // convenience
 		if ((ent.lastTickPosX - ent.posX) >= 0.01f
 				|| (ent.lastTickPosY - ent.posY >= 0.01f)
 				|| (ent.lastTickPosZ - ent.posZ >= 0.01f)) {
@@ -372,17 +372,17 @@ public class PlayerListener {
 	}
 	
 	public void onHeal(LivingHealEvent event) {
-		onHealth(event.entityLiving);
+		onHealth(event.getEntityLiving());
 	}
 	
 	public void onDamage(LivingHurtEvent event) {
-		if (event.source.getSourceOfDamage() != null) {
+		if (event.getSource().getSourceOfDamage() != null) {
 			EntityLivingBase source = null;
 			
 			// Projectiles can be from no entity
-			if (event.source.isProjectile()) {
+			if (event.getSource().isProjectile()) {
 				
-				Entity proj = event.source.getSourceOfDamage();
+				Entity proj = event.getSource().getSourceOfDamage();
 				Entity shooter;
 				if (proj instanceof EntityArrow) {
 					shooter = ((EntityArrow) proj).shootingEntity;
@@ -393,8 +393,8 @@ public class PlayerListener {
 				} else if (proj instanceof EntityThrowable) {
 					source = ((EntityThrowable) proj).getThrower();
 				}
-			} else if (event.source.getSourceOfDamage() instanceof EntityLivingBase) {
-				source = (EntityLivingBase) event.source.getSourceOfDamage();
+			} else if (event.getSource().getSourceOfDamage() instanceof EntityLivingBase) {
+				source = (EntityLivingBase) event.getSource().getSourceOfDamage();
 			}
 			
 			if (source != null) {
@@ -404,7 +404,7 @@ public class PlayerListener {
 					if (entry.getValue() == null)
 						continue;
 					
-					if (entry.getValue().entity.getPersistentID() != event.entityLiving.getPersistentID())
+					if (entry.getValue().entity.getPersistentID() != event.getEntityLiving().getPersistentID())
 						continue;
 					
 					if (entry.getKey().onEvent(Event.DAMAGED, source))
@@ -413,7 +413,7 @@ public class PlayerListener {
 			}
 		}
 		
-		onHealth(event.entityLiving);
+		onHealth(event.getEntityLiving());
 	}
 	
 	public void onTick(ServerTickEvent event) {

@@ -23,11 +23,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class SpellAction {
@@ -89,7 +90,7 @@ public class SpellAction {
 		
 		@Override
 		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
-			entity.addPotionEffect(new PotionEffect(effect.getId(), duration, amp));
+			entity.addPotionEffect(new PotionEffect(effect, duration, amp));
 		}
 		
 		@Override
@@ -144,7 +145,7 @@ public class SpellAction {
 					for (int i = 0; i < number; i++) {
 						// is ids[i] == index? If so, remove
 						if (ids[i] == index) {
-							entity.removePotionEffect(effect.getPotionID());
+							entity.removePotionEffect(effect.getPotion());
 							break;
 						}
 					}
@@ -169,11 +170,11 @@ public class SpellAction {
 		
 		@Override
 		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
-			Vec3 dest;
-			Vec3 direction = entity.getLookVec().normalize();
-			Vec3 source = entity.getPositionVector();
+			Vec3d dest;
+			Vec3d direction = entity.getLookVec().normalize();
+			Vec3d source = entity.getPositionVector();
 			BlockPos bpos;
-			Vec3 translation = new Vec3(direction.xCoord * dist,
+			Vec3d translation = new Vec3d(direction.xCoord * dist,
 					direction.yCoord * dist,
 					direction.zCoord * dist);
 			
@@ -184,12 +185,12 @@ public class SpellAction {
 			dest = source.add(translation);
 			bpos = new BlockPos(dest.xCoord, dest.yCoord, dest.zCoord);
 			if (entity.worldObj.isAirBlock(bpos)
-					|| entity.worldObj.getBlockState(bpos).getBlock().getMaterial().isLiquid()) {
+					|| entity.worldObj.getBlockState(bpos).getMaterial().isLiquid()) {
 				// Whoo! Looks like we can teleport there!
 			} else {
 				int i = 4; // Attempt raytrace from (20% * i * pathlength)
 				dest = null;
-				Vec3 from;
+				Vec3d from;
 				double curDist;
 				while (i >= 0) {
 					if (i == 0) {
@@ -197,13 +198,13 @@ public class SpellAction {
 						from = source;
 					} else {
 						curDist = dist * (.2 * i);
-						from = new Vec3(translation.xCoord * curDist,
+						from = new Vec3d(translation.xCoord * curDist,
 								translation.yCoord * curDist,
 								translation.zCoord * curDist);
 						from = source.add(from);
 					}
 					
-					MovingObjectPosition mop = entity.worldObj.rayTraceBlocks(from, translation, false);
+					RayTraceResult mop = entity.worldObj.rayTraceBlocks(from, translation, false);
 					if (mop != null && mop.hitVec.distanceTo(from) > 0.5) {
 						// We got one
 						dest = mop.hitVec;
@@ -237,9 +238,9 @@ public class SpellAction {
 		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
 			float magnitude = 2f * (float) amp;
 			
-			Vec3 center = entity.getPositionVector();
+			Vec3d center = entity.getPositionVector();
 			for (Entity e : entity.worldObj.getEntitiesWithinAABBExcludingEntity(entity, 
-					AxisAlignedBB.fromBounds(entity.posX - range, entity.posY - range, entity.posZ - range, entity.posX + range, entity.posY + range, entity.posZ + range)
+					new AxisAlignedBB(entity.posX - range, entity.posY - range, entity.posZ - range, entity.posX + range, entity.posY + range, entity.posZ + range)
 					)) {
 				double dist = e.getPositionVector().distanceTo(center); 
 				if (dist <= range) {
@@ -247,9 +248,9 @@ public class SpellAction {
 					// If push, straight magnitude
 					// If pull, cap magnitude so that it doesn't fly past player
 					
-					Vec3 force;
-					Vec3 direction = center.subtract(e.getPositionVector()).normalize();
-					force = new Vec3(
+					Vec3d force;
+					Vec3d direction = center.subtract(e.getPositionVector()).normalize();
+					force = new Vec3d(
 							direction.xCoord * magnitude,
 							direction.yCoord * magnitude,
 							direction.zCoord * magnitude
@@ -260,7 +261,7 @@ public class SpellAction {
 						double mod = force.lengthVector();
 						if (mod > dist * .2) {
 							mod = mod / (dist * .2);
-							force = new Vec3(
+							force = new Vec3d(
 									force.xCoord * mod,
 									force.yCoord * mod,
 									force.zCoord * mod
@@ -283,75 +284,75 @@ public class SpellAction {
 	private static class TransmuteEffect implements SpellEffect {
 		
 		private static final Set<Item> items = Sets.newHashSet(
-				Items.beef,
-				Items.apple,
-				Items.potato,
-				Items.iron_helmet,
-				Items.ender_pearl,
-				Items.carrot,
-				Items.bread,
-				Items.compass,
-				Items.brick,
-				Items.bone,
-				Items.emerald,
-				Items.coal,
-				Items.egg,
-				Items.gold_ingot,
-				Items.redstone,
-				Items.book,
-				Items.quartz,
-				Items.chainmail_chestplate,
-				Items.nether_wart,
-				Items.iron_ingot,
-				Items.diamond_axe,
-				Items.diamond_pickaxe,
-				Items.melon_seeds,
-				Items.reeds,
-				Items.prismarine_crystals,
-				Items.brewing_stand,
-				Items.ender_eye,
-				Items.diamond,
-				Items.chainmail_boots,
-				Items.wooden_sword,
-				Items.glowstone_dust,
-				Items.clay_ball,
-				Items.clock,
-				Items.comparator,
-				Items.cookie,
-				Items.experience_bottle,
-				Items.feather,
-				Items.spider_eye,
-				Items.string);
+				Items.BEEF,
+				Items.APPLE,
+				Items.POTATO,
+				Items.IRON_HELMET,
+				Items.ENDER_PEARL,
+				Items.CARROT,
+				Items.BREAD,
+				Items.COMPASS,
+				Items.BRICK,
+				Items.BONE,
+				Items.EMERALD,
+				Items.COAL,
+				Items.EGG,
+				Items.GOLD_INGOT,
+				Items.REDSTONE,
+				Items.BOOK,
+				Items.QUARTZ,
+				Items.CHAINMAIL_CHESTPLATE,
+				Items.NETHER_WART,
+				Items.IRON_INGOT,
+				Items.DIAMOND_AXE,
+				Items.DIAMOND_PICKAXE,
+				Items.MELON_SEEDS,
+				Items.REEDS,
+				Items.PRISMARINE_CRYSTALS,
+				Items.BREWING_STAND,
+				Items.ENDER_EYE,
+				Items.DIAMOND,
+				Items.CHAINMAIL_BOOTS,
+				Items.WOODEN_SWORD,
+				Items.GLOWSTONE_DUST,
+				Items.CLAY_BALL,
+				Items.CLOCK,
+				Items.COMPARATOR,
+				Items.COOKIE,
+				Items.EXPERIENCE_BOTTLE,
+				Items.FEATHER,
+				Items.SPIDER_EYE,
+				Items.STRING);
 		
 		private static final Set<Block> blocks = Sets.newHashSet(
-				Blocks.bookshelf,
-				Blocks.cactus,
-				Blocks.coal_ore,
-				Blocks.end_stone,
-				Blocks.dirt,
-				Blocks.ice,
-				Blocks.noteblock,
-				Blocks.netherrack,
-				Blocks.sand,
-				Blocks.iron_bars,
-				Blocks.dropper,
-				Blocks.mossy_cobblestone,
-				Blocks.stone,
-				Blocks.netherrack,
-				Blocks.log,
-				Blocks.pumpkin,
-				Blocks.quartz_ore,
-				Blocks.planks,
-				Blocks.quartz_stairs,
-				Blocks.oak_fence,
-				Blocks.redstone_ore,
-				Blocks.lapis_ore,
-				Blocks.acacia_fence,
-				Blocks.crafting_table,
-				Blocks.gold_ore,
-				Blocks.gravel,
-				Blocks.hardened_clay,
-				Blocks.iron_ore
+				Blocks.BOOKSHELF,
+				Blocks.CACTUS,
+				Blocks.COAL_ORE,
+				Blocks.END_STONE,
+				Blocks.DIRT,
+				Blocks.ICE,
+				Blocks.NOTEBLOCK,
+				Blocks.NETHERRACK,
+				Blocks.SAND,
+				Blocks.IRON_BARS,
+				Blocks.DROPPER,
+				Blocks.MOSSY_COBBLESTONE,
+				Blocks.STONE,
+				Blocks.NETHERRACK,
+				Blocks.LOG,
+				Blocks.PUMPKIN,
+				Blocks.QUARTZ_ORE,
+				Blocks.PLANKS,
+				Blocks.QUARTZ_STAIRS,
+				Blocks.OAK_FENCE,
+				Blocks.REDSTONE_ORE,
+				Blocks.LAPIS_ORE,
+				Blocks.ACACIA_FENCE,
+				Blocks.CRAFTING_TABLE,
+				Blocks.GOLD_ORE,
+				Blocks.GRAVEL,
+				Blocks.HARDENED_CLAY,
+				Blocks.IRON_ORE
 				);
 		
 		private int level;
@@ -362,10 +363,15 @@ public class SpellAction {
 		
 		@Override
 		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
-			Item item = entity.getHeldItem().getItem();
+			ItemStack inhand = entity.getHeldItemMainhand();
+			if (inhand == null)
+				inhand = entity.getHeldItemOffhand();
 			
-			if (item == null)
+			
+			if (inhand == null)
 				return;
+			
+			Item item = inhand.getItem();
 			
 			if (!items.contains(item))
 				return;
@@ -385,11 +391,11 @@ public class SpellAction {
 			
 			ItemStack stack = new ItemStack(next, 1);
 			if (entity instanceof EntityPlayer) {
-				entity.getHeldItem().splitStack(1);
+				inhand.splitStack(1);
 				((EntityPlayer) entity).inventory.addItemStackToInventory(stack);
 			} else {
 				// EntityLiving has held item in slot 0
-				entity.setCurrentItemOrArmor(0, stack);
+				entity.setHeldItem(EnumHand.MAIN_HAND, stack);
 			}
 		}
 		
@@ -433,7 +439,7 @@ public class SpellAction {
 		public void apply(World world, BlockPos block) {
 			block.add(0, 1, 0);
 			if (world.isAirBlock(block)) {
-				world.setBlockState(block, Blocks.fire.getDefaultState());
+				world.setBlockState(block, Blocks.FIRE.getDefaultState());
 			}
 		}
 		

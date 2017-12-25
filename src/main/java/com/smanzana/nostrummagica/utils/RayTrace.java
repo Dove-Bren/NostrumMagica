@@ -7,24 +7,24 @@ import com.google.common.base.Predicates;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EntitySelectors;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class RayTrace {
 	
-	public static Vec3 directionFromAngles(float pitch, float yaw) {
+	public static Vec3d directionFromAngles(float pitch, float yaw) {
 		float f = MathHelper.cos(-yaw * 0.017453292F - (float)Math.PI);
         float f1 = MathHelper.sin(-yaw * 0.017453292F - (float)Math.PI);
         float f2 = -MathHelper.cos(-pitch * 0.017453292F);
         float f3 = MathHelper.sin(-pitch * 0.017453292F);
-        return new Vec3((double)(f1 * f2), (double)f3, (double)(f * f2));
+        return new Vec3d((double)(f1 * f2), (double)f3, (double)(f * f2));
 	}
 	
-	public static MovingObjectPosition raytrace(World world, Vec3 fromPos, float pitch,
+	public static RayTraceResult raytrace(World world, Vec3d fromPos, float pitch,
 			float yaw, float maxDistance, boolean onlyLiving) {
 		if (world == null || fromPos == null)
 			return null;
@@ -32,9 +32,9 @@ public class RayTrace {
 		return raytrace(world, fromPos, directionFromAngles(pitch, yaw), maxDistance, onlyLiving);
 	}
 	
-	public static MovingObjectPosition raytrace(World world, Vec3 fromPos,
-			Vec3 direction, float maxDistance, boolean onlyLiving) {
-		Vec3 toPos;
+	public static RayTraceResult raytrace(World world, Vec3d fromPos,
+			Vec3d direction, float maxDistance, boolean onlyLiving) {
+		Vec3d toPos;
 		
 		if (world == null || fromPos == null || direction == null)
 			return null;
@@ -42,26 +42,26 @@ public class RayTrace {
 		double x = direction.xCoord * maxDistance;
 		double y = direction.xCoord * maxDistance;
 		double z = direction.xCoord * maxDistance;
-		toPos = new Vec3(fromPos.xCoord + x, fromPos.yCoord + z, fromPos.zCoord + y);
+		toPos = new Vec3d(fromPos.xCoord + x, fromPos.yCoord + z, fromPos.zCoord + y);
 		
 		
 		return raytrace(world, fromPos, toPos, onlyLiving);
 	}
 
-	public static MovingObjectPosition raytrace(World world, Vec3 fromPos, Vec3 toPos,
+	public static RayTraceResult raytrace(World world, Vec3d fromPos, Vec3d toPos,
 			boolean onlyLiving) {
 		
         if (world == null || fromPos == null || toPos == null) {
         	return null;
         }
         
-        MovingObjectPosition trace;
+        RayTraceResult trace;
         
         // First, raytrace against blocks.
         // First we hit also will help us lower the range of our raytrace
         trace = world.rayTraceBlocks(fromPos, toPos, false, true, false);
         
-        if (trace != null && trace.typeOfHit != MovingObjectPosition.MovingObjectType.MISS) {
+        if (trace != null && trace.typeOfHit != RayTraceResult.Type.MISS) {
         	// limit toPos to position of block hit
         	toPos = trace.hitVec;
         }
@@ -70,11 +70,11 @@ public class RayTrace {
         // d0 is total range
         // d1 is range to block selected
 
-        // vec3 is from pos
+        // Vec3d is from pos
         // vec31 is direction
         // vec32 is toPos
         List<Entity> list = world.getEntitiesInAABBexcluding(null,
-        		AxisAlignedBB.fromBounds(fromPos.xCoord, fromPos.yCoord, fromPos.zCoord, toPos.xCoord, toPos.yCoord, toPos.zCoord),
+        		new AxisAlignedBB(fromPos.xCoord, fromPos.yCoord, fromPos.zCoord, toPos.xCoord, toPos.yCoord, toPos.zCoord),
         		Predicates.and(EntitySelectors.NOT_SPECTATING, new Predicate<Entity>()
         {
             public boolean apply(Entity p_apply_1_)
@@ -94,7 +94,7 @@ public class RayTrace {
             
             float f1 = entity1.getCollisionBorderSize();
             AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().expand((double)f1, (double)f1, (double)f1);
-            MovingObjectPosition movingobjectposition = axisalignedbb.calculateIntercept(fromPos, toPos);
+            RayTraceResult movingobjectposition = axisalignedbb.calculateIntercept(fromPos, toPos);
 
             if (axisalignedbb.isVecInside(fromPos))
             {
@@ -119,7 +119,7 @@ public class RayTrace {
         // If we hit a block, trace is that MOP
         // If we hit an entity between that block, though, we want that
         if (curEntity != null) {
-        	trace = new MovingObjectPosition(curEntity);
+        	trace = new RayTraceResult(curEntity);
         }
         
         return trace;

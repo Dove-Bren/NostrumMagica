@@ -7,8 +7,8 @@ import java.util.Map;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 /**
@@ -87,7 +87,7 @@ public abstract class SpellTrigger {
 	 * @param targetPos
 	 * @return
 	 */
-	public abstract SpellTriggerInstance instance(SpellState state, World world, Vec3 pos, float pitch, float yaw);
+	public abstract SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw);
 	
 	/**
 	 * 
@@ -97,7 +97,7 @@ public abstract class SpellTrigger {
 	 * @param yaw
 	 * @return
 	 */
-	protected abstract TriggerData getTargetData(SpellState state, World world, Vec3 pos, float pitch, float yaw);
+	protected abstract TriggerData getTargetData(SpellState state, World world, Vec3d pos, float pitch, float yaw);
 	
 	/**
 	 * 

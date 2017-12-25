@@ -8,9 +8,9 @@ import com.smanzana.nostrummagica.spells.components.SpellShape;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class AoEShape extends SpellShape {
@@ -36,14 +36,14 @@ public class AoEShape extends SpellShape {
 		double radius = (double) param.level;
 		
 		for (Entity entity : world.getEntitiesWithinAABBExcludingEntity(null, 
-				AxisAlignedBB.fromBounds(pos.getX() - radius,
+				new AxisAlignedBB(pos.getX() - radius,
 							pos.getY() - radius,
 							pos.getZ() - radius,
 							pos.getX() + radius,
 							pos.getY() + radius,
 							pos.getZ() + radius))) {
 			if (entity instanceof EntityLivingBase)
-				if (Math.abs(entity.getPositionVector().distanceTo(new Vec3(pos.getX(), pos.getY(), pos.getZ()))) <= radius)
+				if (Math.abs(entity.getPositionVector().distanceTo(new Vec3d(pos.getX(), pos.getY(), pos.getZ()))) <= radius)
 					ret.add((EntityLivingBase) entity);
 		}
 		

@@ -11,8 +11,8 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 /**
@@ -22,7 +22,7 @@ import net.minecraft.world.World;
  */
 public class Spell {
 	
-	public class SpellPartParam {
+	public static class SpellPartParam {
 		 public float level;
 		 public boolean flip;
 		 
@@ -54,11 +54,11 @@ public class Spell {
 			//for each target/other pair (if more than one), break into multiple spellstates
 			// persist index++ and set self/other, then start doing shapes or next trigger
 			
-			SpellPart next;
+			SpellPart next = null;
 			
 			List<EntityLivingBase> targs = targets;
 			
-			while ((next = parts.get(++index)) != null && !next.isTrigger()) {
+			while ((next = (++index < parts.size() ? parts.get(index) : null)) != null && !next.isTrigger()) {
 				// it's a shape. Do it idk
 				SpellShape shape = next.getShape();
 				SpellAction action = solveAction(caster, next.getAlteration(),
@@ -126,11 +126,11 @@ public class Spell {
 		
 		private void spawnTrigger(SpellTrigger trigger, EntityLivingBase targ, World world, BlockPos targpos) {
 			// instantiate trigger in world
-			Vec3 pos;
+			Vec3d pos;
 			if (world == null)
 				world = targ.worldObj;
 			if (targ == null)
-				pos = new Vec3(targpos.getX(), targpos.getY(), targpos.getZ());
+				pos = new Vec3d(targpos.getX(), targpos.getY(), targpos.getZ());
 			else
 				pos = targ.getPositionVector();
 			
@@ -337,11 +337,11 @@ public class Spell {
 		int amp = elementCount - 1;
 		switch (element) {
 		case PHYSICAL:
-			return new SpellAction(caster).status(Potion.weakness, duration, amp);
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("weakness"), duration, amp);
 		case EARTH:
 			return new SpellAction(caster).status(RootedPotion.instance(), duration, amp);
 		case ENDER:
-			return new SpellAction(caster).status(Potion.blindness, duration, amp);
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("blindness"), duration, amp);
 		case FIRE:
 			return new SpellAction(caster).burn(duration);
 		case ICE:
@@ -361,7 +361,7 @@ public class Spell {
 		int amp = elementCount - 1;
 		switch (element) {
 		case PHYSICAL:
-			return new SpellAction(caster).status(Potion.resistance, duration, amp);
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("resistance"), duration, amp);
 		case EARTH:
 			break;
 		case ENDER:
@@ -385,7 +385,7 @@ public class Spell {
 		int amp = elementCount - 1;
 		switch (element) {
 		case PHYSICAL:
-			return new SpellAction(caster).status(Potion.absorption, duration * 5, amp);
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("absorption"), duration * 5, amp);
 		case EARTH:
 			break;
 		case ENDER:
@@ -409,7 +409,7 @@ public class Spell {
 		int amp = elementCount - 1;
 		switch (element) {
 		case PHYSICAL:
-			return new SpellAction(caster).status(Potion.saturation, 1, 4 * elementCount);
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("saturation"), 1, 4 * elementCount);
 		case EARTH:
 			break;
 		case ENDER:

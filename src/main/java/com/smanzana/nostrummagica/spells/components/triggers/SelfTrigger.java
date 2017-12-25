@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.spells.components.triggers;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class SelfTrigger extends InstantTrigger {
@@ -23,7 +23,7 @@ public class SelfTrigger extends InstantTrigger {
 	}
 	
 	@Override
-	protected TriggerData getTargetData(SpellState state, World world, Vec3 pos, float pitch, float yaw) {
+	protected TriggerData getTargetData(SpellState state, World world, Vec3d pos, float pitch, float yaw) {
 		return new TriggerData(Lists.newArrayList(state.getSelf()), null, world, null);
 	}
 	

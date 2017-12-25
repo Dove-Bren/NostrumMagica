@@ -12,7 +12,7 @@ tile.copper_ore.name=Copper Ore
 
 entity.armorer_stand.name=Armorer's Stand
 
-itemGroup.skylander_armory=Skylander Armory
+itemGroup.nostrummagica=Nostrum Magica
 
 text.smith_level=Smith Level:
 text.smith_level.name=nope it has name:

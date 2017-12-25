@@ -6,11 +6,10 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 /**
@@ -39,19 +38,19 @@ public class TouchTrigger extends InstantTrigger {
 	
 	@Override
 	protected TriggerData getTargetData(SpellState state, World world,
-				Vec3 pos, float pitch, float yaw) {
+				Vec3d pos, float pitch, float yaw) {
 		
-		MovingObjectPosition trace = RayTrace.raytrace(world, pos, pitch, yaw, TOUCH_RANGE, true);
+		RayTraceResult trace = RayTrace.raytrace(world, pos, pitch, yaw, TOUCH_RANGE, true);
 		
 		if (trace == null)
 			return null;
 		
 		List<EntityLivingBase> others = Lists.newArrayList(state.getSelf());
-		if (trace.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
+		if (trace.typeOfHit == RayTraceResult.Type.ENTITY) {
 			// Cast is safe from 'onlyLiving' option in trace
 			return new TriggerData(Lists.newArrayList((EntityLivingBase) trace.entityHit), others, world, null);
-		} else if (trace.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-			Vec3 vec = trace.hitVec;
+		} else if (trace.typeOfHit == RayTraceResult.Type.BLOCK) {
+			Vec3d vec = trace.hitVec;
 			return new TriggerData(null, others, world,
 					Lists.newArrayList(new BlockPos(Math.round(vec.xCoord), Math.round(vec.yCoord), Math.round(vec.zCoord))));
 		} else {
