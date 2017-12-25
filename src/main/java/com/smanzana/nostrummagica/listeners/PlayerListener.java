@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.entity.projectile.EntityThrowable;
@@ -23,6 +24,7 @@ import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 
 /**
@@ -440,5 +442,12 @@ public class PlayerListener {
 				if (entry.getKey().onEvent(Event.TIME, null))
 					it.remove();
 		}
+	}
+	
+	public void onConnect(PlayerLoggedInEvent event) {
+		if (event.player.worldObj.isRemote)
+			return;
+		
+		NostrumMagica.proxy.syncPlayer((EntityPlayerMP) event.player);
 	}
 }

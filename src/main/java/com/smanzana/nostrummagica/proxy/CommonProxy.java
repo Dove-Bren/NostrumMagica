@@ -1,6 +1,12 @@
 package com.smanzana.nostrummagica.proxy;
 
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.capabilities.NostrumMagic;
+import com.smanzana.nostrummagica.capabilities.NostrumMagicStorage;
 import com.smanzana.nostrummagica.items.SpellTome;
+import com.smanzana.nostrummagica.network.NetworkHandler;
+import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
 import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
@@ -9,17 +15,15 @@ import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class CommonProxy {
 
-	
-	
-	
-	
-	
 	public void preinit() {
-
+		CapabilityManager.INSTANCE.register(INostrumMagic.class, new NostrumMagicStorage(), NostrumMagic.class);
+		NetworkHandler.getInstance();
 	}
 	
 	public void init() {
@@ -48,7 +52,14 @@ public class CommonProxy {
     }
     
     private void registerItems() {
-    	GameRegistry.registerItem(SpellTome.instance(), SpellTome.id);
+    	SpellTome.instance().setRegistryName(NostrumMagica.MODID, SpellTome.id);
+    	GameRegistry.register(SpellTome.instance());
+    }
+    
+    public void syncPlayer(EntityPlayerMP player) {
+    	NetworkHandler.getSyncChannel().sendTo(
+    			new StatSyncMessage(NostrumMagica.getMagicWrapper(player)),
+    			player);
     }
 	
 }
