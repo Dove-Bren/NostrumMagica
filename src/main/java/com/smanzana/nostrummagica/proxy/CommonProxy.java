@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -57,9 +58,14 @@ public class CommonProxy {
     }
     
     public void syncPlayer(EntityPlayerMP player) {
+    	System.out.println("Sending sync to client");
     	NetworkHandler.getSyncChannel().sendTo(
     			new StatSyncMessage(NostrumMagica.getMagicWrapper(player)),
     			player);
     }
+
+	public EntityPlayer getPlayer() {
+		return null; // Doesn't mean anything on the server
+	}
 	
 }

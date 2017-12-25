@@ -4,7 +4,6 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.capabilities.Capability;
@@ -27,8 +26,9 @@ public class StatSyncMessage implements IMessage {
 		public IMessage onMessage(StatSyncMessage message, MessageContext ctx) {
 			//update local attributes
 			
+			System.out.println("Debug: Net stuff sync message received");
 			NostrumMagica.logger.info("Debug: Recieved sync message from server");
-			EntityPlayer sp = Minecraft.getMinecraft().thePlayer;
+			EntityPlayer sp = NostrumMagica.proxy.getPlayer();
 			INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
 			
 			if (att == null) {

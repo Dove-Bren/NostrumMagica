@@ -372,11 +372,13 @@ public class PlayerListener {
 			}
 		}
 	}
-	
+
+	@SubscribeEvent
 	public void onHeal(LivingHealEvent event) {
 		onHealth(event.getEntityLiving());
 	}
-	
+
+	@SubscribeEvent
 	public void onDamage(LivingHurtEvent event) {
 		if (event.getSource().getSourceOfDamage() != null) {
 			EntityLivingBase source = null;
@@ -418,6 +420,7 @@ public class PlayerListener {
 		onHealth(event.getEntityLiving());
 	}
 	
+	@SubscribeEvent
 	public void onTick(ServerTickEvent event) {
 		tickCount++;
 		
@@ -444,9 +447,12 @@ public class PlayerListener {
 		}
 	}
 	
+	@SubscribeEvent
 	public void onConnect(PlayerLoggedInEvent event) {
+		System.out.println("connect");
 		if (event.player.worldObj.isRemote)
 			return;
+		System.out.println("Sync");
 		
 		NostrumMagica.proxy.syncPlayer((EntityPlayerMP) event.player);
 	}

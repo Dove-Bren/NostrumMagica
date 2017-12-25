@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.items.SpellTome;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.MinecraftForge;
@@ -46,8 +47,6 @@ public class ClientProxy extends CommonProxy {
 	
 	@SubscribeEvent
 	public void onKey(KeyInputEvent event) {
-		System.out.print(".");
-		
 		if (bindingCast.isPressed()) {
 			
 		}
@@ -58,4 +57,8 @@ public class ClientProxy extends CommonProxy {
 		; // do nothing; we're a client
 	}
 	
+	@Override
+	public EntityPlayer getPlayer() {
+		return Minecraft.getMinecraft().thePlayer;
+	}
 }
