@@ -90,4 +90,6 @@ public interface INostrumMagic {
 	public Map<EAlteration, Boolean> serializeAlterations();
 	public void deserializeLore(String key, Integer level);
 	public void deserializeSpells(String crc);
+	// Copy fields out of
+	public void copy(INostrumMagic cap);
 }

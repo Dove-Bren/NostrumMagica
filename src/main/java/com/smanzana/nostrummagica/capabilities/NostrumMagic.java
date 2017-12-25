@@ -57,8 +57,8 @@ public class NostrumMagic implements INostrumMagic {
 	private Map<String, Integer> loreLevels;
 	private Set<String> spellCRCs; // spells we've done's CRCs
 	private Map<EMagicElement, Boolean> elements;
-	private List<String> shapes; // list of shape keys
-	private List<String> triggers; // list of trigger keys
+	private List<SpellShape> shapes; // list of shape keys
+	private List<SpellTrigger> triggers; // list of trigger keys
 	private Map<EAlteration, Boolean> alterations;
 	
 	public NostrumMagic() {
@@ -280,19 +280,12 @@ public class NostrumMagic implements INostrumMagic {
 
 	@Override
 	public List<SpellShape> getShapes() {
-		List<SpellShape> ret = new LinkedList<>();
-		
-		for (String name : shapes) {
-			// TODO lookup
-		}
-		
-		return ret;
+		return shapes;
 	}
 
 	@Override
 	public List<SpellTrigger> getTriggers() {
-		// TODO Auto-generated method stub
-		return null;
+		return triggers;
 	}
 
 	@Override
@@ -307,14 +300,12 @@ public class NostrumMagic implements INostrumMagic {
 
 	@Override
 	public void addShape(SpellShape shape) {
-		// TODO Auto-generated method stub
-		
+		shapes.add(shape);
 	}
 
 	@Override
 	public void addTrigger(SpellTrigger trigger) {
-		// TODO Auto-generated method stub
-		
+		triggers.add(trigger);
 	}
 
 	@Override
@@ -370,6 +361,20 @@ public class NostrumMagic implements INostrumMagic {
 	@Override
 	public void deserializeSpells(String crc) {
 		this.spellCRCs.add(crc);
+	}
+
+	@Override
+	public void copy(INostrumMagic cap) {
+		this.deserialize(cap.isUnlocked(), cap.getLevel(), cap.getXP(),
+				cap.getSkillPoints(), cap.getControl(), cap.getTech(),
+				cap.getFinesse(), cap.getMana(), cap.getMaxMana());
+		
+		this.loreLevels = cap.serializeLoreLevels();
+		this.spellCRCs = cap.serializeSpellHistory();
+		this.elements = cap.serializeElements();
+		this.alterations = cap.serializeAlterations();
+		this.shapes = cap.getShapes();
+		this.triggers = cap.getTriggers();
 	}
 	
 }

@@ -49,7 +49,6 @@ public class NostrumMagica
 	    	@Override
 	        @SideOnly(Side.CLIENT)
 	        public Item getTabIconItem(){
-	            //return WhetstoneBlock.block.item;
 	    		return SpellTome.instance();
 	        }
 	    };
