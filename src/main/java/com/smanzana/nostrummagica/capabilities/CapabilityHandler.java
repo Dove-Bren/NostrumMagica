@@ -20,11 +20,15 @@ public class CapabilityHandler {
 	
 	@SubscribeEvent
 	public void attachCapability(AttachCapabilitiesEvent<Entity> event) {
+		
 		//if player. Or not. Should get config going. For now, if it's a player make it?
 		//also need to catch death, etc
 		if (event.getObject() instanceof EntityPlayer) {
 			//attach that shizz
+			System.out.println("Attaching magic to player");
 			event.addCapability(CAPABILITY_LOC, new AttributeProvider());
+			
+			NostrumMagica.proxy.applyOverride();
 		}
 	}
 	

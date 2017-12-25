@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.proxy;
 import org.lwjgl.input.Keyboard;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
@@ -80,5 +81,34 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public EntityPlayer getPlayer() {
 		return Minecraft.getMinecraft().thePlayer;
+	}
+	
+	private INostrumMagic overrides = null;
+	@Override
+	public void receiveStatOverrides(INostrumMagic override) {
+		// If we can look up stats, apply them.
+		// Otherwise, stash them for loading when we apply attributes
+		INostrumMagic existing = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer);
+		if (existing != null) {
+			// Stash them
+			existing.copy(override);
+		} else {
+			// apply them
+			overrides = override;
+		}
+	}
+	
+	@Override
+	public void applyOverride() {
+		if (overrides == null)
+			return;
+		
+		INostrumMagic existing = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer);
+		existing.copy(overrides);
+	}
+	
+	@Override
+	public boolean isServer() {
+		return false;
 	}
 }

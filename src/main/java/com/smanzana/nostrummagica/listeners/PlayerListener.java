@@ -8,14 +8,23 @@ import java.util.Map.Entry;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.items.SpellTome;
+import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.Spell.SpellPart;
+import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
+import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
+import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.entity.projectile.EntityThrowable;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -23,6 +32,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.player.UseHoeEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
@@ -455,5 +465,55 @@ public class PlayerListener {
 		System.out.println("Sync");
 		
 		NostrumMagica.proxy.syncPlayer((EntityPlayerMP) event.player);
+	}
+	
+//	@SubscribeEvent
+//	public void onItemPickup(EntityItemPickupEvent event) {
+//		System.out.println("Item pickup");
+//		if (!event.getEntityPlayer().worldObj.isRemote)
+//			return;
+//		
+//		System.out.println("not remote");
+//		
+//		if (event.getItem().getEntityItem().getItem() instanceof SpellTome) {
+//			System.out.println("spelltome");
+//			SpellTome.onPickup(event.getItem().getEntityItem());
+//		}
+//	}
+	
+	// TESTING
+	@SubscribeEvent
+	public void onTest(UseHoeEvent e) {
+		if (e.getWorld().isRemote)
+			return;
+		
+		// Create spell on server side.
+		// Spawn tome with that spell in it
+		Spell spell = new Spell("Bash");
+		spell.addPart(new SpellPart(
+				SelfTrigger.instance(),
+				new SpellPartParam(0, false)
+				));
+		spell.addPart(new SpellPart(
+				SingleShape.instance(),
+				EMagicElement.WIND,
+				1,
+				null,
+				new SpellPartParam(0, false)
+				));
+		
+		ItemStack tome = new ItemStack(SpellTome.instance(), 1);
+		
+		SpellTome.addSpell(tome, spell);
+		
+		BlockPos pos = e.getPos().add(0, 1, 0);
+		e.getWorld().spawnEntityInWorld(new EntityItem(
+				e.getWorld(),
+				pos.getX() + .5f,
+				(float) pos.getY(),
+				pos.getZ() + .5f,
+				tome
+				));
+		
 	}
 }

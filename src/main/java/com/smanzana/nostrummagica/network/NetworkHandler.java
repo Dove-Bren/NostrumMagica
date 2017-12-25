@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.network;
 
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
+import com.smanzana.nostrummagica.network.messages.ClientCastReplyMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
@@ -15,7 +16,7 @@ public class NetworkHandler {
 	
 	private static int discriminator = 10;
 	
-	private static final String CHANNEL_SYNC_NAME = "nostrummagica_syncchannel";
+	private static final String CHANNEL_SYNC_NAME = "nostrum_channel";
 	
 	
 	public static SimpleNetworkWrapper getSyncChannel() {
@@ -38,8 +39,9 @@ public class NetworkHandler {
 		
 		syncChannel.registerMessage(StatSyncMessage.Handler.class, StatSyncMessage.class, discriminator++, Side.CLIENT);
 		syncChannel.registerMessage(ClientCastMessage.Handler.class, ClientCastMessage.class, discriminator++, Side.SERVER);
+		syncChannel.registerMessage(ClientCastReplyMessage.Handler.class, ClientCastReplyMessage.class, discriminator++, Side.CLIENT);
 		syncChannel.registerMessage(SpellRequestMessage.Handler.class, SpellRequestMessage.class, discriminator++, Side.SERVER);
-		syncChannel.registerMessage(SpellRequestReplyMessage.Handler.class, SpellRequestReplyMessage.class, discriminator++, Side.SERVER);
+		syncChannel.registerMessage(SpellRequestReplyMessage.Handler.class, SpellRequestReplyMessage.class, discriminator++, Side.CLIENT);
 	}
 	
 }

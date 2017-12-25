@@ -25,9 +25,12 @@ public class SpellRequestMessage implements IMessage {
 		@Override
 		public SpellRequestReplyMessage onMessage(SpellRequestMessage message, MessageContext ctx) {
 			// What spells?
+			System.out.println("Request for some spells...");
 			int ids[] = message.tag.getIntArray(NBT_IDS);
 			if (ids == null)
 				return null;
+			
+			System.out.println("requesting " + ids.length + " spells");
 			
 			List<Spell> spells = new LinkedList<>();
 			Spell spell;
@@ -35,12 +38,16 @@ public class SpellRequestMessage implements IMessage {
 				spell = NostrumMagica.spellRegistry.lookup(id);
 				if (spell != null)
 					spells.add(spell);
+				else
+					System.out.println("Couldn't match spell for id " + id);
 			}
 			
 			if (spells.isEmpty()) {
+				System.out.println("Failed to find any spells at all!");
 				return null;
 			}
 
+			System.out.println("Sending reply");
 			return new SpellRequestReplyMessage(spells);
 		}
 		

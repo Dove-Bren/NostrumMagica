@@ -94,6 +94,9 @@ public class NostrumMagica
      * that the config includes all the mobs you won't to be tagged.
      */
     public static INostrumMagic getMagicWrapper(Entity e) {
+    	if (e == null)
+    		return null;
+    	
     	return e.getCapability(AttributeProvider.CAPABILITY, null);
     }
     

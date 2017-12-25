@@ -25,16 +25,18 @@ public class SpellRequestReplyMessage implements IMessage {
 
 		@Override
 		public IMessage onMessage(SpellRequestReplyMessage message, MessageContext ctx) {
-			
+			System.out.println("Got spell definitions from server");
 			// What spells?
 			NBTTagList list = message.tag.getTagList(NBT_SPELLS, NBT.TAG_COMPOUND);
 			if (list == null)
 				return null;
+			System.out.println("Yup, we have a list");
 			
 			for (int i = 0; i < list.tagCount(); i++) {
 				NBTTagCompound nbt = list.getCompoundTagAt(i);
 				int id = nbt.getInteger(NBT_ID);
 				nbt = nbt.getCompoundTag(NBT_SPELL);
+				System.out.println("Parsing spell... ");
 				Spell spell = Spell.fromNBT(nbt);
 				
 				if (spell != null)

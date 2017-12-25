@@ -603,7 +603,8 @@ public class Spell {
 			return null;
 		
 		String name = nbt.getString(NBT_SPELL_NAME); 
-		Spell spell = new Spell(name);
+		Spell spell = new Spell();
+		spell.name = name;
 		
 		NBTTagList list = nbt.getTagList(NBT_LIST, NBT.TAG_COMPOUND);
 		NBTTagCompound tag;

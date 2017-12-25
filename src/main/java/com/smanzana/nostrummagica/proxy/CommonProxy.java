@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.proxy;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagicStorage;
@@ -21,9 +22,12 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class CommonProxy {
+	
+	public CapabilityHandler capabilityHandler;
 
 	public void preinit() {
 		CapabilityManager.INSTANCE.register(INostrumMagic.class, new NostrumMagicStorage(), NostrumMagic.class);
+		capabilityHandler = new CapabilityHandler();
 		NetworkHandler.getInstance();
 	}
 	
@@ -68,4 +72,15 @@ public class CommonProxy {
 		return null; // Doesn't mean anything on the server
 	}
 	
+	public void receiveStatOverrides(INostrumMagic override) {
+		return; // Server side doesn't do anything
+	}
+	
+	public void applyOverride() {
+		; // do nothing
+	}
+
+	public boolean isServer() {
+		return true;
+	}
 }
