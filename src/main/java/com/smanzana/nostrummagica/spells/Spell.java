@@ -4,16 +4,20 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants.NBT;
 
 /**
  * Collection of triggers and shapes.
@@ -499,6 +503,106 @@ public class Spell {
 		return null;
 	}
 	
+	private static final String NBT_SPELL_NAME = "name";
+	private static final String NBT_LIST = "parts";
 	
+	// Parts
+	private static final String NBT_KEY = "key";
+	private static final String NBT_PARAM_LEVEL = "level";
+	private static final String NBT_PARAM_FLIP = "flip";
+	private static final String NBT_ELEMENT = "element";
+	private static final String NBT_ALTERATION = "alteration";
+	private static final String NBT_COUNT = "count";
+	
+	public NBTTagCompound toNBT() {
+		NBTTagList list = new NBTTagList();
+		
+		NBTTagCompound compound;
+		for (SpellPart part : parts) {
+			compound = new NBTTagCompound();
+			if (part.isTrigger()) {
+				compound.setString(NBT_KEY, part.getTrigger().getTriggerKey());
+			} else {
+				compound.setString(NBT_KEY, part.getShape().getShapeKey());
+				compound.setString(NBT_ELEMENT, part.getElement().name());
+				compound.setInteger(NBT_COUNT, part.getElementCount());
+				if (part.getAlteration() != null)
+					compound.setString(NBT_ALTERATION, part.getAlteration().name());
+			}
+			
+			compound.setFloat(NBT_PARAM_LEVEL, part.getParam().level);
+			compound.setBoolean(NBT_PARAM_FLIP, part.getParam().flip);
+			
+			list.appendTag(compound);
+		}
+		
+		compound = new NBTTagCompound();
+		compound.setString(NBT_SPELL_NAME, name);
+		compound.setTag(NBT_LIST, list);
+		return compound;
+	}
+	
+	public static Spell fromNBT(NBTTagCompound nbt) {
+		if (nbt == null)
+			return null;
+		
+		String name = nbt.getString(NBT_SPELL_NAME); 
+		Spell spell = new Spell(name);
+		
+		NBTTagList list = nbt.getTagList(NBT_LIST, NBT.TAG_COMPOUND);
+		NBTTagCompound tag;
+		String key;
+		EMagicElement element;
+		EAlteration alteration;
+		int count;
+		SpellPartParam param;
+		
+		for (int i = 0; i < list.tagCount(); i++) {
+			tag = list.getCompoundTagAt(i);
+			key = tag.getString(NBT_KEY);
+			if (key == null || key.isEmpty())
+				continue;
+			
+			param = new SpellPartParam(
+					tag.getFloat(NBT_PARAM_LEVEL),
+					tag.getBoolean(NBT_PARAM_FLIP)
+					);
+			
+			if (tag.hasKey(NBT_ELEMENT, NBT.TAG_STRING)) {
+				SpellShape shape = SpellShape.get(key);
+				
+				if (shape == null)
+					continue;
+				
+				count = tag.getInteger(NBT_COUNT);
+				try {
+					element = EMagicElement.valueOf(tag.getString(NBT_ELEMENT));
+				} catch (Exception e) {
+					NostrumMagica.logger.error("Could not parse element " + tag.getString(NBT_ELEMENT));
+					element = EMagicElement.PHYSICAL;
+				}
+				
+				alteration = null;
+				if (tag.hasKey(NBT_ALTERATION, NBT.TAG_STRING))
+				try {
+					alteration = EAlteration.valueOf(tag.getString(NBT_ALTERATION));
+				} catch (Exception e) {
+					NostrumMagica.logger.error("Could not parse alteration " + tag.getString(tag.getString(NBT_ALTERATION)));
+					alteration = null;
+				}
+				
+				spell.addPart(new SpellPart(shape, element, count, alteration, param));
+				
+			} else {
+				SpellTrigger trigger = SpellTrigger.get(key);
+				if (trigger == null)
+					continue;
+				
+				spell.addPart(new SpellPart(trigger, param));
+			}
+		}
+		
+		return spell;
+	}
 	
 }
