@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.network.messages;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.spells.Spell;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,37 +15,55 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 /**
- * Client player's attribtes are being refreshed from server
+ * Client has cast a spell
  * @author Skyler
  *
  */
 public class ClientCastMessage implements IMessage {
 
-	public static class Handler implements IMessageHandler<ClientCastMessage, IMessage> {
+	public static class Handler implements IMessageHandler<ClientCastMessage, ClientCastReplyMessage> {
 
 		@Override
-		public IMessage onMessage(ClientCastMessage message, MessageContext ctx) {
-			//update local attributes
+		public ClientCastReplyMessage onMessage(ClientCastMessage message, MessageContext ctx) {
+			// Figure out what spell they have
+			// cast it if they can
 			
-			System.out.println("Debug: Net stuff sync message received");
-			NostrumMagica.logger.info("Debug: Recieved sync message from server");
-			EntityPlayer sp = NostrumMagica.proxy.getPlayer();
-			INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
+			EntityPlayer sp = ctx.getServerHandler().playerEntity;
 			
-			if (att == null) {
-				NostrumMagica.logger.warn("Server is pushing into DnDAttributes, but they don't exist on our player!");
+			// What spell?
+			Spell spell = NostrumMagica.spellRegistry.lookup(
+					message.tag.getInteger(NBT_ID)
+					);
+			
+			if (spell == null) {
+				NostrumMagica.logger.warn("Could not find matching spell from client cast request");
 				return null;
 			}
 			
-			INostrumMagic cap = CAPABILITY.getDefaultInstance();
-			CAPABILITY.getStorage().readNBT(CAPABILITY, cap, null, message.tag);
-			att.copy(cap);
+			INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
+			
+			if (att == null) {
+				NostrumMagica.logger.warn("Could not look up player magic wrapper");
+				return null;
+			}
+			
+			// Cast it!
+			int cost = spell.getManaCost();
+			if (att.getMana() < cost)
+				return new ClientCastReplyMessage(false, att.getMana());
+			
+			att.addMana(-cost);
+			boolean seen = att.wasSpellDone(spell);
+			spell.cast(sp);
+			
+			att.addXP(spell.getXP(seen));
 
-			return null;
+			return new ClientCastReplyMessage(true, att.getMana());
 		}
 		
 	}
-	
+
+	private static final String NBT_ID = "id";
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
@@ -54,8 +73,14 @@ public class ClientCastMessage implements IMessage {
 		tag = new NBTTagCompound();
 	}
 	
-	public ClientCastMessage(INostrumMagic stats) {
-		tag = (NBTTagCompound) CAPABILITY.getStorage().writeNBT(CAPABILITY, stats, null);
+	public ClientCastMessage(Spell spell) {
+		this(spell.getRegistryID());
+	}
+	
+	public ClientCastMessage(int id) {
+		tag = new NBTTagCompound();
+		
+		tag.setInteger(NBT_ID, id);
 	}
 
 	@Override

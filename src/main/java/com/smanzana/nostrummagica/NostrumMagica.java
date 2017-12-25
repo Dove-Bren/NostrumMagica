@@ -105,16 +105,48 @@ public class NostrumMagica
     }
     
     public static Spell getCurrentSpell(EntityPlayer player) {
+    	List<Spell> spells = getSpells(player);
+    	if (spells == null || spells.isEmpty())
+    		return null;
     	
+    	return spells.get(0);
     }
     
     public static List<Spell> getSpells(EntityPlayer entity) {
     	if (entity == null)
     		return null;
     	
+    	// We just return the spells from the first tome.
+    	// We look in mainhand first, then offhand, then just down
+    	// hotbar.
+    	ItemStack tome = null;
     	
+    	if (entity.getHeldItemMainhand() != null &&
+    			entity.getHeldItemMainhand().getItem() instanceof SpellTome) {
+    		tome = entity.getHeldItemMainhand();
+    	} else if (entity.getHeldItemOffhand() != null &&
+    			entity.getHeldItemOffhand().getItem() instanceof SpellTome) {
+    		tome = entity.getHeldItemOffhand();
+    	} else {
+    		// hotbar is items 0-8
+    		int count = 0;
+    		for (ItemStack stack : entity.inventory.mainInventory) {
+        		if (stack != null && stack.getItem() instanceof SpellTome) {
+        			tome = stack;
+        			break;
+        		}
+        		
+        		count++;
+        		if (count > 8)
+        			break; // Just want first 9
+        	}
+    	}
     	
-    	for (ItemStack stack : entity.inventory.mainInventory)
+    	if (tome == null)
+    		return null;
+    	
+    	return SpellTome.getSpells(tome);
+    	
     }
     
     private void loadSpellRegistry(File file) {

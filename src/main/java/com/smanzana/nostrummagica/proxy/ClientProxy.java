@@ -4,6 +4,9 @@ import org.lwjgl.input.Keyboard;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.SpellTome;
+import com.smanzana.nostrummagica.network.NetworkHandler;
+import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
+import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -48,7 +51,24 @@ public class ClientProxy extends CommonProxy {
 	@SubscribeEvent
 	public void onKey(KeyInputEvent event) {
 		if (bindingCast.isPressed()) {
+			Spell spell = NostrumMagica.getCurrentSpell(Minecraft.getMinecraft().thePlayer);
+			if (spell == null)
+				return;
 			
+			// Do mana check here (it's also done on server)
+			// to stop redundant checks and get mana looking good
+			// on client side immediately
+			int mana = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer).getMana();
+			int cost = spell.getManaCost();
+			
+			if (mana < cost)
+				return;
+			
+			NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer)
+				.addMana(-cost);
+			
+			NetworkHandler.getSyncChannel().sendToServer(
+	    			new ClientCastMessage(spell));
 		}
 	}
 	

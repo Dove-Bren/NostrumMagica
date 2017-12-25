@@ -43,11 +43,31 @@ public class SpellRegistry {
 		return id;
 	}
 	
+	/**
+	 * Registers a new spell, generating a new ID and returning it.
+	 * The constructor of a spell already does this. So don't call it.
+	 * @param spell
+	 * @return
+	 */
 	public int register(Spell spell) {
 		int id = newID();
 		registry.put(id, spell);
 		
 		return id;
+	}
+	
+	/**
+	 * Used to inject overrides from the server after the client has
+	 * requested information about spells
+	 * @param id
+	 * @param spell
+	 */
+	public void override(int id, Spell spell) {
+		registry.put(id, spell);
+	}
+	
+	public Spell lookup(int id) {
+		return registry.get(id);
 	}
 	
 	public void loadFromNBT(NBTTagCompound nbt) {

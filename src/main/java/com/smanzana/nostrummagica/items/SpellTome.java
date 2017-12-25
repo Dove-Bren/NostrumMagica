@@ -3,6 +3,9 @@ package com.smanzana.nostrummagica.items;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.network.NetworkHandler;
+import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.Spell.SpellPart;
@@ -61,30 +64,90 @@ public class SpellTome extends Item {
 		return super.onItemRightClick(itemStackIn, worldIn, playerIn, hand);
     }
 	
-	public static List<Spell> getSpells(ItemStack itemStack, boolean ignoreEquipped) {
+	/**
+	 * Retrieves a list of spells stored in the spell tome.
+	 * The active 'currently selected' spell is always first in the list.
+	 * @param itemStack
+	 * @return
+	 */
+	public static List<Spell> getSpells(ItemStack itemStack) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+			return null;
+		
 		NBTTagCompound nbt = itemStack.getTagCompound();
 		
 		List<Spell> list = new LinkedList<>();
 		if (nbt == null)
 			return list;
 		
-		NBTTagList tags = nbt.getTagList(NBT_SPELLS, NBT.TAG_COMPOUND);
+		NBTTagList tags = nbt.getTagList(NBT_SPELLS, NBT.TAG_INT);
 		
-		if (tags.tagCount() == 0)
+		if (tags == null || tags.tagCount() == 0)
 			return list;
 		
 		int index = nbt.getInteger(NBT_INDEX);
 		if (tags.tagCount() < index)
 			index = 0;
 		
-		String name = tags.getStringTagAt(index);
+		int id = tags.getIntAt(index);
+		Spell spell = NostrumMagica.spellRegistry.lookup(id);
 		
+		if (spell != null)
+			list.add(spell);
 		
 		for (int i = 0; i < tags.tagCount(); i++) {
+			if (i == index)
+				continue;
 			
+			id = tags.getIntAt(i);
+			spell = NostrumMagica.spellRegistry.lookup(id);
+			if (spell != null)
+				list.add(spell);
 		}
 		
+		return list;
+	}
+	
+	/**
+	 * Call on client side when a tome is picked up to scan the tome
+	 * and make sure we have all the spells we need.
+	 * If called from server, will crash.
+	 * @param tome
+	 */
+	public static void onPickup(ItemStack tome) {
+		if (tome == null || !(tome.getItem() instanceof SpellTome))
+			return;
 		
+		NBTTagCompound nbt = tome.getTagCompound();
 		
+		if (nbt == null)
+			return;
+		
+		NBTTagList tags = nbt.getTagList(NBT_SPELLS, NBT.TAG_INT);
+		
+		if (tags == null || tags.tagCount() == 0)
+			return;
+		
+		int id;
+		int requests[] = new int[tags.tagCount()];
+		int requestcount = 0;
+		for (int i = 0; i < tags.tagCount(); i++) {
+			id = tags.getIntAt(i);
+			if (NostrumMagica.spellRegistry.lookup(id) == null) {
+				// Create a temporary spell
+				// Request spell from server
+				requests[requestcount++] = id;
+				getTemp(id);
+			}
+		}
+		
+		if (requestcount > 0) {
+			NetworkHandler.getSyncChannel().sendToServer(
+	    			new SpellRequestMessage(requests));
+		}
+	}
+	
+	private static Spell getTemp(int id) {
+		return Spell.CreateInternal("Loading...", id);
 	}
 }

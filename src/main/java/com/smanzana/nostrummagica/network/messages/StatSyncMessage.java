@@ -32,7 +32,7 @@ public class StatSyncMessage implements IMessage {
 			INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
 			
 			if (att == null) {
-				NostrumMagica.logger.warn("Server is pushing into DnDAttributes, but they don't exist on our player!");
+				NostrumMagica.logger.warn("Server is pushing into Magic Attributes, but they don't exist on our player!");
 				return null;
 			}
 			

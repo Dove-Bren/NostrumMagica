@@ -1,5 +1,8 @@
 package com.smanzana.nostrummagica.network;
 
+import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
+import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
+import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
 
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -34,6 +37,9 @@ public class NetworkHandler {
 		syncChannel = NetworkRegistry.INSTANCE.newSimpleChannel(CHANNEL_SYNC_NAME);
 		
 		syncChannel.registerMessage(StatSyncMessage.Handler.class, StatSyncMessage.class, discriminator++, Side.CLIENT);
+		syncChannel.registerMessage(ClientCastMessage.Handler.class, ClientCastMessage.class, discriminator++, Side.SERVER);
+		syncChannel.registerMessage(SpellRequestMessage.Handler.class, SpellRequestMessage.class, discriminator++, Side.SERVER);
+		syncChannel.registerMessage(SpellRequestReplyMessage.Handler.class, SpellRequestReplyMessage.class, discriminator++, Side.SERVER);
 	}
 	
 }

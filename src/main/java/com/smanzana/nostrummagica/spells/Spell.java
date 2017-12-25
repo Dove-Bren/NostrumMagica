@@ -218,15 +218,36 @@ public class Spell {
 	}
 
 	private String name;
+	private int registryID;
 	private List<SpellPart> parts;
 	private int manaCost;
 	
 	// TODO some cool effects and stuff
 	
-	public Spell(String name) {
-		this.name = name;
+	private Spell() {
 		this.parts = new LinkedList<>();
 		manaCost = -1; // un-calculated value
+		name = "";
+	}
+	
+	/**
+	 * Creates a new spell and registers it in the registry.
+	 * @param name
+	 */
+	public Spell(String name) {
+		this();
+		this.name = name;
+		
+		registryID = NostrumMagica.spellRegistry.register(this);
+	}
+	
+	public static Spell CreateInternal(String name, int id) {
+		Spell s = new Spell();
+		s.name = name;
+		s.registryID = id;
+		
+		NostrumMagica.spellRegistry.override(id, s);
+		return s;
 	}
 	
 	public void addPart(SpellPart part) {
@@ -236,6 +257,10 @@ public class Spell {
 	
 	public String getName() {
 		return name;
+	}
+	
+	public int getRegistryID() {
+		return registryID;
 	}
 	
 	public void cast(EntityLivingBase caster) {
@@ -263,23 +288,54 @@ public class Spell {
 		// Alterations are in enum
 		// Shapes cost 15
 		// First elem is free. Extra costs 30 ea
-		manaCost = 0;
+		// Rolling multiplier makes it more expensive for one long spell vs many small
+		// (rate of 1.2x)
+		float cost = 0f;
+		float multiplier = 1f;
 		
 		for (SpellPart part : parts) {
 			if (part.isTrigger())
-				manaCost += part.getTrigger().getManaCost();
+				cost += multiplier * (float) part.getTrigger().getManaCost();
 			else {
-				manaCost += 15;
+				cost += multiplier * 15f;
 				if (part.getElementCount() > 1)
-					manaCost += (30 * (part.getElementCount() - 1));
+					cost += multiplier * (float) (30 * (part.getElementCount() - 1));
 				if (part.getAlteration() != null)
-					manaCost += part.getAlteration().getCost();
+					cost += multiplier * (float) part.getAlteration().getCost();
 			}
+			multiplier *= 1.2;
 		}
 		
+		manaCost = (int) Math.ceil(cost);
 		return manaCost;
 	}
 	
+	// seen is if they've seen it before or not
+	public float getXP(boolean seen) {
+		// Triggers add some
+		// Shapes add some
+		// More elements mean more xp
+		// Alterations give some
+		// 300% first time you use it
+		
+		float total = 0f;
+		
+		for (SpellPart part : parts) {
+			if (part.isTrigger())
+				total += 5f;
+			else {
+				total += 2f;
+				if (part.getElementCount() > 1)
+					total += (float) (Math.pow(3, part.getElementCount() - 1));
+				if (part.getAlteration() != null)
+					total += 10f;
+			}
+		}
+		
+		if (!seen)
+			total *= 3f;
+		return total;
+	}
 	
 	public static final SpellAction solveAction(EntityLivingBase caster, EAlteration alteration,
 			EMagicElement element, int elementCount) {
