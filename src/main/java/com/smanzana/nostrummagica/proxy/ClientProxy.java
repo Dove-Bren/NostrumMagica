@@ -85,6 +85,7 @@ public class ClientProxy extends CommonProxy {
 								player.posX + offsetx, player.posY, player.posZ + offsetz,
 								0, -.5, 0);
 				}
+				overlayRenderer.startManaWiggle(2);
 				return;
 			}
 			

@@ -1,11 +1,11 @@
 package com.smanzana.nostrummagica.client.overlay;
 
-import org.lwjgl.opengl.GL11;
-
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 
+import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.ResourceLocation;
@@ -23,8 +23,12 @@ public class OverlayRenderer extends Gui {
 	private static final int GUI_BAR_HEIGHT = 62;
 	private static final int GUI_BAR_OFFSETX = 96;
 	
+	private int wiggleIndex; // set to multiples of 12 for each wiggle
+	private static final int wiggleOffsets[] = {0, 1, 1, 2, 1, 1, 0, -1, -1, -2, -1, -1};
+	
 	public OverlayRenderer() {
 		MinecraftForge.EVENT_BUS.register(this);
+		wiggleIndex = 0;
 	}
 	
 	@SubscribeEvent
@@ -35,14 +39,22 @@ public class OverlayRenderer extends Gui {
 		if (event.getType() != ElementType.ALL)
 			return;
 		
+		EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
 		
 		ScaledResolution scaledRes = event.getResolution();
 		
 		int hudXAnchor = scaledRes.getScaledWidth() / 2 + 91;
 		int hudYAnchor = scaledRes.getScaledHeight() - 49;
 		
+		if (player.isInsideOfMaterial(Material.WATER)) {
+			hudYAnchor -= 10;
+		}
 		
-		INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer);
+		int wiggleOffset = 0;
+		if (wiggleIndex > 0)
+			wiggleOffset = OverlayRenderer.wiggleOffsets[wiggleIndex-- % 12];
+		
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null || !attr.isUnlocked())
 			return;
 		
@@ -63,23 +75,27 @@ public class OverlayRenderer extends Gui {
 //				Gui.drawModalRectWithCustomSizedTexture(hudXAnchor - (9 * i), hudYAnchor,
 //						64, 0, 16, 16, 256, 256);
 				// Draw a single partle orb
-				this.drawTexturedModalRect(hudXAnchor - (8 * (i + 1)), hudYAnchor,
-						36, 16, 9, 9);
+				this.drawTexturedModalRect(hudXAnchor - (8 * (i + 1)) + wiggleOffset,
+						hudYAnchor,	36, 16, 9, 9);
 			}
 			
 			if (pieces != 0) {
 				// Draw a single partle orb
-				this.drawTexturedModalRect(hudXAnchor - (8 * (i + 1)), hudYAnchor,
-						9 * pieces, 16, 9, 9);
+				this.drawTexturedModalRect(hudXAnchor - (8 * (i + 1)) + wiggleOffset,
+						hudYAnchor, 9 * pieces, 16, 9, 9);
 				i++;
 			}
 			
 			for (; i < 10; i++) {
-				this.drawTexturedModalRect(hudXAnchor - (8 * (i + 1)), hudYAnchor,
-						0, 16, 9, 9);
+				this.drawTexturedModalRect(hudXAnchor - (8 * (i + 1)) + wiggleOffset,
+						hudYAnchor,	0, 16, 9, 9);
 			}
 		}
 		
+	}
+	
+	public void startManaWiggle(int wiggleCount) {
+		this.wiggleIndex = 12 * wiggleCount;
 	}
 	
 }
