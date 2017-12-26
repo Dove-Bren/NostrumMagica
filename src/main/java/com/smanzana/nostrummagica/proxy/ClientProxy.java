@@ -4,6 +4,7 @@ import org.lwjgl.input.Keyboard;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
@@ -25,6 +26,7 @@ import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 public class ClientProxy extends CommonProxy {
 	
 	private KeyBinding bindingCast;
+	private OverlayRenderer overlayRenderer;
 
 	public ClientProxy() {
 		MinecraftForge.EVENT_BUS.register(this);
@@ -43,6 +45,11 @@ public class ClientProxy extends CommonProxy {
 		super.init();
 		
 		registerModel(SpellTome.instance(), 0, SpellTome.id);
+	}
+	
+	@Override
+	public void postinit() {
+		this.overlayRenderer = new OverlayRenderer();
 	}
 	
 	private static void registerModel(Item item, int meta, String modelName) {
