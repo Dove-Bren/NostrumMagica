@@ -101,10 +101,11 @@ public class NostrumMagica
     }
     
     private static int potionID = 65;
-    public static void registerPotion(Potion potion, ResourceLocation loc) {
+    public static int registerPotion(Potion potion, ResourceLocation loc) {
     	while (Potion.getPotionById(potionID) != null)
     		potionID++;
     	Potion.REGISTRY.register(potionID, loc, potion);
+    	return potionID;
     }
     
     public static Spell getCurrentSpell(EntityPlayer player) {

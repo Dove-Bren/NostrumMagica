@@ -27,8 +27,6 @@ public class CapabilityHandler {
 			//attach that shizz
 			System.out.println("Attaching magic to player");
 			event.addCapability(CAPABILITY_LOC, new AttributeProvider());
-			
-			NostrumMagica.proxy.applyOverride();
 		}
 	}
 	

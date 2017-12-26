@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.SpellTome;
+import com.smanzana.nostrummagica.network.NetworkHandler;
+import com.smanzana.nostrummagica.network.messages.ManaMessage;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.Spell.SpellPart;
@@ -18,6 +20,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.EntityTracker;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -28,11 +31,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.UseHoeEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
@@ -434,6 +439,15 @@ public class PlayerListener {
 	public void onTick(ServerTickEvent event) {
 		tickCount++;
 		
+		// Regain mana
+		if (tickCount % 10 == 0) {
+			for (World world : FMLCommonHandler.instance().getMinecraftServerInstance().worldServers) {
+				for (EntityPlayer player : world.playerEntities) {
+					regenMana(player);
+				}
+			}
+		}
+		
 		Iterator<Entry<IMagicListener, TimeInfo>> it = timeInfos.entrySet().iterator();
 		while (it.hasNext()) {
 			Entry<IMagicListener, TimeInfo> entry = it.next();
@@ -455,6 +469,21 @@ public class PlayerListener {
 				if (entry.getKey().onEvent(Event.TIME, null))
 					it.remove();
 		}
+	}
+	
+	private void regenMana(EntityPlayer player) {
+		// Called 2 times a second
+		INostrumMagic stats = NostrumMagica.getMagicWrapper(player);
+		
+		// TODO add regen speed upgrades?
+		int mana = 1;
+		stats.addMana(mana);
+		EntityTracker tracker = ((WorldServer) player.worldObj).getEntityTracker();
+		if (tracker == null)
+			return;
+		
+		tracker.sendToTrackingAndSelf(player, NetworkHandler.getSyncChannel()
+				.getPacketFrom(new ManaMessage(player, stats.getMana())));
 	}
 	
 	@SubscribeEvent

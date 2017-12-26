@@ -54,6 +54,7 @@ public class ClientProxy extends CommonProxy {
 	@SubscribeEvent
 	public void onKey(KeyInputEvent event) {
 		if (bindingCast.isPressed()) {
+			
 			Spell spell = NostrumMagica.getCurrentSpell(Minecraft.getMinecraft().thePlayer);
 			if (spell == null)
 				return;
@@ -63,6 +64,8 @@ public class ClientProxy extends CommonProxy {
 			// on client side immediately
 			int mana = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer).getMana();
 			int cost = spell.getManaCost();
+			
+			Minecraft.getMinecraft().thePlayer.sendChatMessage("Mana: " + mana);
 			
 			if (mana < cost) {
 				EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
@@ -118,6 +121,8 @@ public class ClientProxy extends CommonProxy {
 		
 		INostrumMagic existing = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer);
 		existing.copy(overrides);
+		
+		overrides = null;
 	}
 	
 	@Override
