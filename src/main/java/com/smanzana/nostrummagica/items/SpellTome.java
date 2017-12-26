@@ -5,6 +5,10 @@ import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.gui.GuiBook;
+import com.smanzana.nostrummagica.client.gui.book.BookScreen;
+import com.smanzana.nostrummagica.client.gui.book.IBookPage;
+import com.smanzana.nostrummagica.client.gui.book.PlainTextPage;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -19,8 +23,10 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class SpellTome extends Item {
+public class SpellTome extends Item implements GuiBook {
 
 	private static final String NBT_SPELLS = "nostrum_spells";
 	private static final String NBT_INDEX = "spell_index";
@@ -68,6 +74,8 @@ public class SpellTome extends Item {
 		}
 		
 		// END TESTING -------------------
+		
+		NostrumMagica.proxy.openBook(playerIn, this);
 		
 		return super.onItemRightClick(itemStackIn, worldIn, playerIn, hand);
     }
@@ -189,5 +197,17 @@ public class SpellTome extends Item {
 	
 	private static Spell getTemp(int id) {
 		return Spell.CreateInternal("Loading...", id);
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public BookScreen getScreen() {
+		List<IBookPage> pages = new LinkedList<>();
+		
+		pages.add(new PlainTextPage("This page has some text on it. Does it work?"));
+		pages.add(new PlainTextPage("2"));
+		pages.add(new PlainTextPage("3"));
+		
+		return new BookScreen(pages);
 	}
 }

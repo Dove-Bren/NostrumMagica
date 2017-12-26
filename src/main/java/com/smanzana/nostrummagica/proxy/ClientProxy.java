@@ -4,6 +4,7 @@ import org.lwjgl.input.Keyboard;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
@@ -143,5 +144,10 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public boolean isServer() {
 		return false;
+	}
+	
+	@Override
+	public void openBook(EntityPlayer player, GuiBook book) {
+		Minecraft.getMinecraft().displayGuiScreen(book.getScreen());
 	}
 }

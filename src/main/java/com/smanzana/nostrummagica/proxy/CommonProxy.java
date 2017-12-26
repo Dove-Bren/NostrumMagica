@@ -5,6 +5,7 @@ import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagicStorage;
+import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
@@ -87,5 +88,9 @@ public class CommonProxy {
 
 	public boolean isServer() {
 		return true;
+	}
+	
+	public void openBook(EntityPlayer player, GuiBook book) {
+		; // Server does nothing
 	}
 }
