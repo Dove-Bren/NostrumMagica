@@ -58,11 +58,6 @@ public class NostrumMagica
     @EventHandler
     public void preinit(FMLPreInitializationEvent event) {
     	playerListener = new PlayerListener();
-    	spellRegistry = new SpellRegistry();
-    	
-    	spellRegistryFile = new File(event.getSuggestedConfigurationFile().getParentFile(),
-    			"spells.dat");
-    	loadSpellRegistry(spellRegistryFile);
     	
     	NostrumMagica.creativeTab = new CreativeTabs(MODID){
 	    	@Override
@@ -74,6 +69,15 @@ public class NostrumMagica
 	    SpellTome.instance().setCreativeTab(NostrumMagica.creativeTab);
     	
     	proxy.preinit();
+    	
+    	spellRegistry = new SpellRegistry();
+    	
+    	System.out.println("Suggested: " + event.getSuggestedConfigurationFile().getAbsolutePath());
+    	File dir = new File(event.getSuggestedConfigurationFile().getParentFile(), "NostrumMagica");
+    	if (!dir.exists())
+    		dir.mkdirs();
+    	spellRegistryFile = new File(dir, "spells.dat"); 
+    	loadSpellRegistry(spellRegistryFile);
     }
     
     @EventHandler

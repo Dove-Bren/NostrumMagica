@@ -30,11 +30,12 @@ public class CommonProxy {
 		CapabilityManager.INSTANCE.register(INostrumMagic.class, new NostrumMagicStorage(), NostrumMagic.class);
 		capabilityHandler = new CapabilityHandler();
 		NetworkHandler.getInstance();
+		
+    	registerShapes();
+    	registerTriggers();
 	}
 	
 	public void init() {
-    	registerShapes();
-    	registerTriggers();
     	registerPotions();
     	registerItems();
 	}

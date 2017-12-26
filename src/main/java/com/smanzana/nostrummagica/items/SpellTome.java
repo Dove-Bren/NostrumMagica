@@ -93,29 +93,24 @@ public class SpellTome extends Item {
 	}
 	
 	private static int[] getSpellIDs(ItemStack itemStack) {
-		System.out.println(" > getting ids");
 		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
 			return null;
-		System.out.println(" > is tome");
 		
 		NBTTagCompound nbt = itemStack.getTagCompound();
 		
 		if (nbt == null)
 			return null;
-		System.out.println(" > has nbt");
 		
 		NBTTagList tags = nbt.getTagList(NBT_SPELLS, NBT.TAG_INT);
 		
 		if (tags == null || tags.tagCount() == 0)
 			return null;
-		System.out.println(" > has spell id list");
 		
 		int ids[] = new int[tags.tagCount()];
 		
 		for (int i = 0; i < tags.tagCount(); i++) {
 			ids[i] = tags.getIntAt(i);
 		}
-		System.out.println(" > found " + tags.tagCount() + " ids");
 
 		return ids;
 	}
@@ -169,7 +164,6 @@ public class SpellTome extends Item {
 	 * @param tome
 	 */
 	private static void sniffIDs(int ids[]) {
-		System.out.println("scan");
 		
 		int id;
 		int requests[] = new int[ids.length];

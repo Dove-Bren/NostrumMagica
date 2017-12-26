@@ -14,7 +14,9 @@ import net.minecraft.nbt.NBTTagCompound;
 /**
  * Tags spells with IDs so that looking them up from the tome is easier.
  * Spells are written out server-side on exit and loaded back up on startup.
- * They are added upon creation to the registry as they made.
+ * They are added upon creation to the registry as they made.<br />
+ * The spell registry is initialized in preinit. Do not attempt to use it until
+ * at least init
  * @author Skyler
  *
  */

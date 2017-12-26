@@ -43,7 +43,7 @@ public class OverlayRenderer extends Gui {
 		
 		ScaledResolution scaledRes = event.getResolution();
 		
-		int hudXAnchor = scaledRes.getScaledWidth() / 2 + 91;
+		int hudXAnchor = scaledRes.getScaledWidth() / 2 + 89;
 		int hudYAnchor = scaledRes.getScaledHeight() - 49;
 		
 		if (player.isInsideOfMaterial(Material.WATER)) {

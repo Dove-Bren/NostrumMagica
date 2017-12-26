@@ -99,7 +99,10 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public void syncPlayer(EntityPlayerMP player) {
-		; // do nothing; we're a client
+		if (player.worldObj.isRemote)
+			return;
+		
+		super.syncPlayer(player);
 	}
 	
 	@Override
@@ -128,6 +131,10 @@ public class ClientProxy extends CommonProxy {
 			return;
 		
 		INostrumMagic existing = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer);
+		
+		if (existing == null)
+			return; // Mana got here before we attached
+		
 		existing.copy(overrides);
 		
 		overrides = null;
