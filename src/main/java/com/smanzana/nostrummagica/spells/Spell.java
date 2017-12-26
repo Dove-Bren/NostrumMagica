@@ -669,5 +669,108 @@ public class Spell {
 		
 		return spell;
 	}
+
+	private EMagicElement primaryCache = null;
+	public EMagicElement getPrimaryElement() {
+		if (primaryCache == null) {
+			primaryCache = EMagicElement.PHYSICAL;
+			
+			for (SpellPart part : parts) {
+				if (!part.isTrigger()) {
+					primaryCache = part.element;
+					break;
+				}
+			}
+		}
+		return primaryCache;
+	}
+
+	private String descriptionCache = null;
+	/**
+	 * Run through all parts and come up with some sort of descriptiion
+	 * of the spell
+	 * @return
+	 */
+	public String getDescription() {
+		if (descriptionCache == null) {
+			descriptionCache = "A";
+			
+			int triggers = 0;
+			int shapes = 0;
+			boolean beneficial = false;
+			boolean damage = false;
+			boolean restorative = false;
+			boolean status = false;
+			boolean highPotency = false;
+			boolean enchant = false;
+			boolean summon = false;
+			
+			for (SpellPart part : parts) {
+				if (part.isTrigger()) {
+					triggers++;
+				} else {
+					shapes++;
+					if (part.getElementCount() > 2)
+						highPotency = true;
+					if (part.alteration == null)
+						damage = true;
+					if (part.alteration == EAlteration.INFLICT
+							|| part.alteration == EAlteration.RESIST
+							|| part.alteration == EAlteration.SUPPORT)
+						status = true;
+					if (part.alteration == EAlteration.RESIST
+							|| part.alteration == EAlteration.SUPPORT
+							|| part.alteration == EAlteration.GROWTH
+							|| part.alteration == EAlteration.ENCHANT)
+						beneficial = true;
+					if (part.alteration == EAlteration.SUMMON)
+						summon = true;
+					if (part.alteration == EAlteration.ENCHANT)
+						enchant = true;
+					if (part.alteration == EAlteration.GROWTH)
+						restorative = true;
+				}
+			}
+			
+			if (highPotency)
+				descriptionCache += " high-potency";
+			if (triggers > 3)
+				descriptionCache += " complex";
+			if (shapes > 5)
+				descriptionCache += " invocation";
+			else
+				descriptionCache += " spell";
+			
+			descriptionCache += " that";
+			if (summon) {
+				descriptionCache += " summons a creature.";
+			} else if (beneficial) {
+				descriptionCache += " provides aid";
+				if (enchant) {
+					descriptionCache += " by providing an offensive enchantment.";
+				} else if (restorative) {
+					descriptionCache += " through restorative magics.";
+				} else if (status) {
+					descriptionCache += " in the form of magical augments.";
+				} else if (damage) {
+					descriptionCache += " as well as harms.";
+				} else {
+					// This cast can't be hit currently.
+					descriptionCache += ".";
+				}
+			} else {
+				if (status) {
+					descriptionCache += " debilitates the target.";
+				} else if (damage) {
+					descriptionCache += " deals damage to the enemy.";
+				} else {
+					descriptionCache += " performs some sort of alteration.";
+				}
+			}
+			
+		}
+		
+		return descriptionCache;
+	}
 	
 }

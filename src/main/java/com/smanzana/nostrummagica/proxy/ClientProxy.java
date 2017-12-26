@@ -147,7 +147,7 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public void openBook(EntityPlayer player, GuiBook book) {
-		Minecraft.getMinecraft().displayGuiScreen(book.getScreen());
+	public void openBook(EntityPlayer player, GuiBook book, Object userdata) {
+		Minecraft.getMinecraft().displayGuiScreen(book.getScreen(userdata));
 	}
 }

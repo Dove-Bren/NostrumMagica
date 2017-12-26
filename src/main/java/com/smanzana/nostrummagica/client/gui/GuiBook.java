@@ -8,6 +8,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public interface GuiBook {
 
 	@SideOnly(Side.CLIENT)
-	public BookScreen getScreen();
+	public BookScreen getScreen(Object userdata);
 	
 }

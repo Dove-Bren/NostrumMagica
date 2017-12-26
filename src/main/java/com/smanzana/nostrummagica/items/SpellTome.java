@@ -7,8 +7,9 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.gui.book.BookScreen;
+import com.smanzana.nostrummagica.client.gui.book.HSplitPage;
 import com.smanzana.nostrummagica.client.gui.book.IBookPage;
-import com.smanzana.nostrummagica.client.gui.book.PlainTextPage;
+import com.smanzana.nostrummagica.client.gui.book.SpellPreviewPage;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -75,7 +76,7 @@ public class SpellTome extends Item implements GuiBook {
 		
 		// END TESTING -------------------
 		
-		NostrumMagica.proxy.openBook(playerIn, this);
+		NostrumMagica.proxy.openBook(playerIn, this, itemStackIn);
 		
 		return super.onItemRightClick(itemStackIn, worldIn, playerIn, hand);
     }
@@ -201,12 +202,37 @@ public class SpellTome extends Item implements GuiBook {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public BookScreen getScreen() {
+	public BookScreen getScreen(Object userdata) {
+		if (userdata == null || !(userdata instanceof ItemStack))
+			return null;
+		
+		if (!(((ItemStack) userdata).getItem() instanceof SpellTome)) {
+			return null;
+		}
+		
+		ItemStack stack = (ItemStack) userdata;
+		
 		List<IBookPage> pages = new LinkedList<>();
 		
-		pages.add(new PlainTextPage("This page has some text on it. Does it work?"));
-		pages.add(new PlainTextPage("2"));
-		pages.add(new PlainTextPage("3"));
+		// height 40
+		// width 110
+		boolean top = true;
+		SpellPreviewPage page = null;
+		for (Spell spell : getSpells((stack))) {
+			if (top) {
+				page = new SpellPreviewPage(spell);
+			} else {
+				HSplitPage hp = new HSplitPage(page, new SpellPreviewPage(spell));
+				pages.add(hp);
+			}
+			
+			top = !top;
+		}
+		if (!top) {
+			// Last one is partial page and didn't get finished.
+			HSplitPage hp = new HSplitPage(page, null);
+			pages.add(hp);
+		}
 		
 		return new BookScreen(pages);
 	}

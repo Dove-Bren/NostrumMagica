@@ -90,7 +90,7 @@ public class CommonProxy {
 		return true;
 	}
 	
-	public void openBook(EntityPlayer player, GuiBook book) {
+	public void openBook(EntityPlayer player, GuiBook book, Object userdata) {
 		; // Server does nothing
 	}
 }

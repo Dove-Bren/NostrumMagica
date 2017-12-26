@@ -51,8 +51,10 @@ public class HSplitPage implements IBookPage {
 		
 		top.draw(parent, fonter, xoffset, yoffset, width, subheight);
 		
-		yoffset += (subheight + divideSize); //offset a subheight + divide length down
-		bottom.draw(parent, fonter, xoffset, yoffset, width, subheight);
+		if (bottom != null) {
+			yoffset += (subheight + divideSize); //offset a subheight + divide length down
+			bottom.draw(parent, fonter, xoffset, yoffset, width, subheight);
+		}
 	}
 
 	@Override
@@ -63,7 +65,7 @@ public class HSplitPage implements IBookPage {
 		//find out of in top of bottom
 		if (mouseY < subheight) {
 			top.overlay(parent, fonter, mouseX, mouseY, trueX, trueY);
-		} else if (mouseY > subheight + divideSize) {
+		} else if (bottom != null && mouseY > subheight + divideSize) {
 			bottom.overlay(parent, fonter, mouseX, mouseY - (subheight + divideSize), trueX, trueY);
 		}
 	}
