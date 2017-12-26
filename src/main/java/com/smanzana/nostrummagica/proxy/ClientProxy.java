@@ -10,11 +10,13 @@ import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -62,8 +64,19 @@ public class ClientProxy extends CommonProxy {
 			int mana = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer).getMana();
 			int cost = spell.getManaCost();
 			
-			if (mana < cost)
+			if (mana < cost) {
+				EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+				player.sendChatMessage("Not enough mana");
+				for (int i = 0; i < 15; i++) {
+					double offsetx = Math.cos(i * (2 * Math.PI / 15)) * 1.0;
+					double offsetz = Math.sin(i * (2 * Math.PI / 15)) * 1.0;
+					player.worldObj
+						.spawnParticle(EnumParticleTypes.SMOKE_LARGE,
+								player.posX + offsetx, player.posY, player.posZ + offsetz,
+								0, -.5, 0);
+				}
 				return;
+			}
 			
 			NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer)
 				.addMana(-cost);

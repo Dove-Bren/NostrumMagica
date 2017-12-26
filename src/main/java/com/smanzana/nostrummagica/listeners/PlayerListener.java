@@ -485,6 +485,12 @@ public class PlayerListener {
 	// TESTING
 	@SubscribeEvent
 	public void onTest(UseHoeEvent e) {
+		
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(e.getEntityPlayer());
+		if (attr != null) {
+			attr.unlock();
+		}
+		
 		if (e.getWorld().isRemote)
 			return;
 		
@@ -515,6 +521,5 @@ public class PlayerListener {
 				pos.getZ() + .5f,
 				tome
 				));
-		
 	}
 }
