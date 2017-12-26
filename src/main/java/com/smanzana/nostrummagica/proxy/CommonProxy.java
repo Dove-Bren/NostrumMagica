@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.capabilities.NostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagicStorage;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
+import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
 import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
@@ -65,6 +66,9 @@ public class CommonProxy {
     	System.out.println("Sending sync to client");
     	NetworkHandler.getSyncChannel().sendTo(
     			new StatSyncMessage(NostrumMagica.getMagicWrapper(player)),
+    			player);
+    	NetworkHandler.getSyncChannel().sendTo(
+    			new SpellRequestReplyMessage(NostrumMagica.spellRegistry.getAllSpells(), true),
     			player);
     }
 

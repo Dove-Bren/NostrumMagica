@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -55,11 +56,13 @@ public class SpellTome extends Item {
 			NostrumMagica.logger.info("No stored spell!");
 		} else {
 			Spell spell = spells.get(0);
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
 			NostrumMagica.logger.info("");
 			NostrumMagica.logger.info("");
 			NostrumMagica.logger.info("Spell Name: " + spell.getName());
 			NostrumMagica.logger.info("Cost: " + spell.getManaCost());
 			NostrumMagica.logger.info("Id: " + spell.getRegistryID());
+			NostrumMagica.logger.info("Mana: " + attr.getMana() + "/" + attr.getMaxMana());
 			NostrumMagica.logger.info("");
 			NostrumMagica.logger.info("");
 		}

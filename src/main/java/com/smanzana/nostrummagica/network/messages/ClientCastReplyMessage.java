@@ -4,7 +4,6 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -27,7 +26,7 @@ public class ClientCastReplyMessage implements IMessage {
 		public IMessage onMessage(ClientCastReplyMessage message, MessageContext ctx) {
 
 			INostrumMagic att = NostrumMagica.getMagicWrapper(
-					Minecraft.getMinecraft().thePlayer);
+					NostrumMagica.proxy.getPlayer());
 			// Regardless of success, server has synced mana with us.j
 			int mana = message.tag.getInteger(NBT_MANA);
 			

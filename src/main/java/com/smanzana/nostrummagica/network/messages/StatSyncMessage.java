@@ -28,18 +28,13 @@ public class StatSyncMessage implements IMessage {
 			
 			System.out.println("Debug: Net stuff sync message received");
 			NostrumMagica.logger.info("Debug: Recieved sync message from server");
-			EntityPlayer sp = NostrumMagica.proxy.getPlayer();
-			INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
 			
-			if (att == null) {
-				NostrumMagica.logger.warn("Server is pushing into Magic Attributes, but they don't exist on our player!");
-				return null;
-			}
+			INostrumMagic override = CAPABILITY.getDefaultInstance();
+			CAPABILITY.getStorage().readNBT(CAPABILITY, override, null, message.tag);
+			NostrumMagica.proxy.receiveStatOverrides(override);
 			
-			INostrumMagic cap = CAPABILITY.getDefaultInstance();
-			CAPABILITY.getStorage().readNBT(CAPABILITY, cap, null, message.tag);
-			att.copy(cap);
-
+			System.out.println("end handling sync");
+			
 			return null;
 		}
 		

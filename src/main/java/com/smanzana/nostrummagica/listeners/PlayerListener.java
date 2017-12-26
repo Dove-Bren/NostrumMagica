@@ -460,8 +460,9 @@ public class PlayerListener {
 	@SubscribeEvent
 	public void onConnect(PlayerLoggedInEvent event) {
 		System.out.println("connect");
-		if (event.player.worldObj.isRemote)
+		if (event.player.worldObj.isRemote) {
 			return;
+		}
 		System.out.println("Sync");
 		
 		NostrumMagica.proxy.syncPlayer((EntityPlayerMP) event.player);

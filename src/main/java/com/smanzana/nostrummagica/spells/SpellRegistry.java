@@ -1,12 +1,13 @@
 package com.smanzana.nostrummagica.spells;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import com.smanzana.nostrummagica.NostrumMagica;
-
 import java.util.Random;
+
+import com.google.common.collect.Lists;
+import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -82,7 +83,7 @@ public class SpellRegistry {
 			}
 			
 			registry.put(id,
-					Spell.fromNBT(nbt.getCompoundTag(key)));
+					Spell.fromNBT(nbt.getCompoundTag(key), id));
 		}
 	}
 	
@@ -94,6 +95,14 @@ public class SpellRegistry {
 		}
 		
 		return nbt;
+	}
+
+	public List<Spell> getAllSpells() {
+		return Lists.newArrayList(registry.values());
+	}
+
+	public void clear() {
+		registry.clear();
 	}
 	
 	

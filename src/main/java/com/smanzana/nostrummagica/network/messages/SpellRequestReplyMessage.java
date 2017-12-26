@@ -32,12 +32,18 @@ public class SpellRequestReplyMessage implements IMessage {
 				return null;
 			System.out.println("Yup, we have a list");
 			
+			boolean clean = message.tag.getBoolean(NBT_CLEAN);
+			if (clean) {
+				System.out.println("Cleaning registry");
+				NostrumMagica.spellRegistry.clear();
+			}
+			
 			for (int i = 0; i < list.tagCount(); i++) {
 				NBTTagCompound nbt = list.getCompoundTagAt(i);
 				int id = nbt.getInteger(NBT_ID);
 				nbt = nbt.getCompoundTag(NBT_SPELL);
 				System.out.println("Parsing spell... ");
-				Spell spell = Spell.fromNBT(nbt);
+				Spell spell = Spell.fromNBT(nbt, id);
 				
 				if (spell != null)
 					NostrumMagica.spellRegistry.override(id, spell);
@@ -50,7 +56,8 @@ public class SpellRequestReplyMessage implements IMessage {
 
 	private static final String NBT_SPELLS = "spells";
 	private static final String NBT_SPELL = "spell";
-	private static final String NBT_ID = "id"; 
+	private static final String NBT_ID = "id";
+	private static final String NBT_CLEAN = "clean";
 	protected NBTTagCompound tag;
 	
 	public SpellRequestReplyMessage() {
@@ -58,6 +65,10 @@ public class SpellRequestReplyMessage implements IMessage {
 	}
 	
 	public SpellRequestReplyMessage(List<Spell> spells) {
+		this(spells, false);
+	}
+	
+	public SpellRequestReplyMessage(List<Spell> spells, boolean clean) {
 		tag = new NBTTagCompound();
 		
 		NBTTagList list = new NBTTagList();
@@ -69,6 +80,7 @@ public class SpellRequestReplyMessage implements IMessage {
 		}
 		
 		tag.setTag(NBT_SPELLS, list);
+		tag.setBoolean(NBT_CLEAN, clean);
 	}
 
 	@Override

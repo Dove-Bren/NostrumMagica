@@ -36,7 +36,7 @@ public class NostrumMagic implements INostrumMagic {
 		}
 		
 		public static int maxMana(int level) {
-			return (int) (manaBase * Math.pow(manaGrowth, level));
+			return (int) (manaBase * Math.pow(manaGrowth, level - 1));
 		}
 	}
 	
@@ -365,6 +365,7 @@ public class NostrumMagic implements INostrumMagic {
 
 	@Override
 	public void copy(INostrumMagic cap) {
+		System.out.println("Overriding stats from" + this.mana + " to " + cap.getMana() + " mana");
 		this.deserialize(cap.isUnlocked(), cap.getLevel(), cap.getXP(),
 				cap.getSkillPoints(), cap.getControl(), cap.getTech(),
 				cap.getFinesse(), cap.getMana(), cap.getMaxMana());

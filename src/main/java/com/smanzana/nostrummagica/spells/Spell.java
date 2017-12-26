@@ -598,13 +598,21 @@ public class Spell {
 		return compound;
 	}
 	
-	public static Spell fromNBT(NBTTagCompound nbt) {
+	/**
+	 * Deserializes a spell from NBT.
+	 * Does not register it in the registry
+	 * @param nbt
+	 * @param id
+	 * @return
+	 */
+	public static Spell fromNBT(NBTTagCompound nbt, int id) {
 		if (nbt == null)
 			return null;
 		
 		String name = nbt.getString(NBT_SPELL_NAME); 
 		Spell spell = new Spell();
 		spell.name = name;
+		spell.registryID = id;
 		
 		NBTTagList list = nbt.getTagList(NBT_LIST, NBT.TAG_COMPOUND);
 		NBTTagCompound tag;
