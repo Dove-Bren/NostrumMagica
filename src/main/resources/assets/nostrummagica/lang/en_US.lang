@@ -22,3 +22,11 @@ key.nostrummagica.desc=Nostrum Magica
 
 text.smith_level=Smith Level:
 text.smith_level.name=nope it has name:
+
+death.attack.magic.PHYSICAL=%1$s was killed by %2$s using physical energies
+death.attack.magic.WIND=%1$s was sliced to pieces by %2$s's wind magic
+death.attack.magic.EARTH=%1$s was crushed by %2$s's earth magic
+death.attack.magic.LIGHTNING=%1$s was electrocuted by %2$s
+death.attack.magic.ICE=%1$s was frozen by %2$s
+death.attack.magic.FIRE=%1$s was burnt to a crisp by %2$s
+death.attack.magic.ENDER=%1$s was slain by %s$2's Ender energies

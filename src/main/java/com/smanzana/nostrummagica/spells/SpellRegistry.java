@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.spells;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,10 +24,12 @@ import net.minecraft.nbt.NBTTagCompound;
 public class SpellRegistry {
 
 	private Map<Integer, Spell> registry;
+	private List<Integer> transients;
 	private static final Random rand = new Random();
 	
 	public SpellRegistry() {
 		registry = new HashMap<>();
+		transients = new LinkedList<>();
 	}
 	
 	private int newID() {
@@ -56,6 +59,20 @@ public class SpellRegistry {
 		int id = newID();
 		registry.put(id, spell);
 		
+		return id;
+	}
+	
+	/**
+	 * Registers a spell like normal, except marks it transient.
+	 * This means it will not be saved out to disk when the server is saved.
+	 * This is meant to be used for spells used by AI, etc that are constructed
+	 * each time the server starts up
+	 * @param spell
+	 * @return
+	 */
+	public int registerTransient(Spell spell) {
+		int id = register(spell);
+		transients.add(id);
 		return id;
 	}
 	
@@ -93,7 +110,8 @@ public class SpellRegistry {
 		NBTTagCompound nbt = new NBTTagCompound();
 		
 		for (Entry<Integer, Spell> entry : registry.entrySet()) {
-			nbt.setTag(entry.getKey() + "", entry.getValue().toNBT());
+			if (transients.isEmpty() || !transients.contains(entry.getKey()))
+				nbt.setTag(entry.getKey() + "", entry.getValue().toNBT());
 		}
 		
 		return nbt;

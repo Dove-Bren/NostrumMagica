@@ -26,14 +26,34 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 
 public class SpellAction {
+	
+	private static class MagicDamageSource extends EntityDamageSource {
+		
+		private EMagicElement element;
+		
+		public MagicDamageSource(Entity source, EMagicElement element) {
+			super("mob", source);
+			this.element = element;
+		}
+		
+		@Override
+		public ITextComponent getDeathMessage(EntityLivingBase entityLivingBaseIn) {
+			
+	        String untranslated = "death.attack.magic." + element.name();
+	        return new TextComponentTranslation(untranslated, new Object[] {entityLivingBaseIn, this.damageSourceEntity});
+	    }
+	};
 
 	private static interface SpellEffect {
 		public void apply(EntityLivingBase caster, EntityLivingBase entity);
@@ -52,7 +72,7 @@ public class SpellAction {
 		@Override
 		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
 			float fin = calcDamage(entity, amount, element);
-			entity.attackEntityFrom(DamageSource.causeMobDamage(source), fin);
+			entity.attackEntityFrom(new MagicDamageSource(source, element), fin);
 		}
 		
 		@Override

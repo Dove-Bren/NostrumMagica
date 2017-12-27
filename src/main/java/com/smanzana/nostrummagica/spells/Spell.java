@@ -257,10 +257,17 @@ public class Spell {
 	 * @param name
 	 */
 	public Spell(String name) {
+		this(name, false);
+	}
+	
+	public Spell(String name, boolean trans) {
 		this();
 		this.name = name;
 		
-		registryID = NostrumMagica.spellRegistry.register(this);
+		if (trans)
+			registryID = NostrumMagica.spellRegistry.registerTransient(this);
+		else
+			registryID = NostrumMagica.spellRegistry.register(this);
 	}
 	
 	public static Spell CreateInternal(String name, int id) {
