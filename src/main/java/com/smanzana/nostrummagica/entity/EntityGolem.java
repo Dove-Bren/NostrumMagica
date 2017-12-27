@@ -19,6 +19,7 @@ import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -247,7 +248,6 @@ public abstract class EntityGolem extends EntityTameable {
 
     public boolean shouldAttackEntity(EntityLivingBase target, EntityLivingBase owner)
     {
-    	System.out.print("c");
         return target != owner;
     }
 
@@ -261,6 +261,12 @@ public abstract class EntityGolem extends EntityTameable {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public boolean writeToNBTOptional(NBTTagCompound compound)
+    {
+		return false;
+    }
 
 	public abstract String getTextureKey();
 	

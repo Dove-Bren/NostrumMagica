@@ -10,9 +10,9 @@ tile.skylander_armory_cutting_table_block.name=Cutting Table
 
 tile.copper_ore.name=Copper Ore
 
-entity.physical_golem.name=Metal Golem
+entity.nostrummagica.physical_golem.name=Metal Golem
 
-entity.spell_projectile.name=Spell Projectile
+entity.nostrummagica.spell_projectile.name=Spell Projectile
 
 itemGroup.nostrummagica=Nostrum Magica
 

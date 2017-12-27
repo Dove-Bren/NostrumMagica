@@ -86,19 +86,16 @@ public class EntitySpellProjectile extends EntityFireball {
 		if (worldObj.isRemote)
 			return;
 		
-		if (result.typeOfHit == RayTraceResult.Type.BLOCK) {
+		if (result.typeOfHit == RayTraceResult.Type.MISS) {
+			; // Do nothing
+		} else if (result.typeOfHit == RayTraceResult.Type.BLOCK) {
 			trigger.onProjectileHit(new BlockPos(result.hitVec));
-			System.out.println("BLOCK");
 			this.setDead();
 		} else if (result.typeOfHit == RayTraceResult.Type.ENTITY) {
 			if (result.entityHit != this.shootingEntity || this.ticksExisted > 20) {
 				trigger.onProjectileHit(result.entityHit);
-				System.out.println("ENTITY");
 				this.setDead();
 			}
-		} else {
-			; // Shouldn't happen?
-			System.out.println("Assumption broken: entity spell proj got miss hit");
 		}
 	}
 	

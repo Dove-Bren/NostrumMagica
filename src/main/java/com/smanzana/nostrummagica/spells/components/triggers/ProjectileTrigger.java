@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -41,12 +42,21 @@ public class ProjectileTrigger extends SpellTrigger {
 		
 		@Override
 		public void init(EntityLivingBase caster) {
-			// We are instant! Whoo!
+			// Do a little more work of getting a good vector for things
+			// that aren't players
+			Vec3d dir;
+			if (caster instanceof EntityLiving && ((EntityLiving) caster).getAttackTarget() != null) {
+				EntityLiving ent = (EntityLiving) caster  ;
+				dir = ent.getAttackTarget().getPositionVector().addVector(0.0, ent.height / 2.0, 0.0)
+						.subtract(caster.getPositionEyes(1.0f));
+			} else {
+				dir = ProjectileTrigger.getVectorForRotation(pitch, yaw);
+			}
 			EntitySpellProjectile projectile = new EntitySpellProjectile(this,
 					getState().getSelf(),
 					world,
 					pos.xCoord, pos.yCoord, pos.zCoord,
-					ProjectileTrigger.getVectorForRotation(pitch, yaw),
+					dir,
 					5.0f, PROJECTILE_RANGE);
 			
 			world.spawnEntityInWorld(projectile);

@@ -36,12 +36,12 @@ public class ModelGolem extends ModelBase {
 		body1 = new ModelRenderer(this, 0, 0);
 		body1.addBox(-6, -3, -2, 16, 6, 10);
 		body1.setTextureSize(textureWidth, textureHeight);
-		body1.setRotationPoint(centerX, 17.0f, centerZ); // 24
+		body1.setRotationPoint(centerX, 26.0f, centerZ); // 24
 		
 		body2 = new ModelRenderer(this, 0, 0);
 		body2.addBox(-4, -4, -6, 10, 8, 8);
 		body2.setTextureSize(textureWidth, textureHeight);
-		body2.setRotationPoint(centerX, 26.0f, centerZ); // 14
+		body2.setRotationPoint(centerX, 17.0f, centerZ); // 14
 		
 		body3 = new ModelRenderer(this, 0, 0);
 		body3.addBox(-6, -2, -4, 8, 4, 8);
@@ -77,7 +77,7 @@ public class ModelGolem extends ModelBase {
 		if (((EntityGolem) entityIn).getAttackTarget() != null)
 			speedup = 2.0f;
 		
-		body1.rotateAngleY = ticks * rate1 * speedup;
+		body1.rotateAngleY = ticks * -rate1 * speedup;
 		body2.rotateAngleY = ticks * rate2 * speedup;
 		body3.rotateAngleY = ticks * rate3 * speedup;
 	}

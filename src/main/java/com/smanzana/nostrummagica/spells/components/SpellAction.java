@@ -93,6 +93,10 @@ public class SpellAction {
 		@Override
 		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
 			entity.addPotionEffect(new PotionEffect(effect, duration, amp));
+			
+			if (effect.isBadEffect()) {
+				entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
+			}
 		}
 		
 		@Override
