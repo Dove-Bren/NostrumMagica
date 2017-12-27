@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ManaMessage;
+import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.Spell.SpellPart;
@@ -497,20 +498,6 @@ public class PlayerListener {
 		NostrumMagica.proxy.syncPlayer((EntityPlayerMP) event.player);
 	}
 	
-//	@SubscribeEvent
-//	public void onItemPickup(EntityItemPickupEvent event) {
-//		System.out.println("Item pickup");
-//		if (!event.getEntityPlayer().worldObj.isRemote)
-//			return;
-//		
-//		System.out.println("not remote");
-//		
-//		if (event.getItem().getEntityItem().getItem() instanceof SpellTome) {
-//			System.out.println("spelltome");
-//			SpellTome.onPickup(event.getItem().getEntityItem());
-//		}
-//	}
-	
 	// TESTING
 	@SubscribeEvent
 	public void onTest(UseHoeEvent e) {
@@ -523,9 +510,11 @@ public class PlayerListener {
 		if (e.getWorld().isRemote)
 			return;
 		
+		ItemStack tome = new ItemStack(SpellTome.instance(), 1);
+		
 		// Create spell on server side.
 		// Spawn tome with that spell in it
-		Spell spell = new Spell("Bash");
+		Spell spell = new Spell("Wind Cutter");
 		spell.addPart(new SpellPart(
 				SelfTrigger.instance(),
 				new SpellPartParam(0, false)
@@ -537,9 +526,34 @@ public class PlayerListener {
 				null,
 				new SpellPartParam(0, false)
 				));
+		SpellTome.addSpell(tome, spell);
 		
-		ItemStack tome = new ItemStack(SpellTome.instance(), 1);
+		spell = new Spell("Roots");
+		spell.addPart(new SpellPart(
+				SelfTrigger.instance(),
+				new SpellPartParam(0, false)
+				));
+		spell.addPart(new SpellPart(
+				SingleShape.instance(),
+				EMagicElement.EARTH,
+				1,
+				EAlteration.INFLICT,
+				new SpellPartParam(0, false)
+				));
+		SpellTome.addSpell(tome, spell);
 		
+		spell = new Spell("Transmute");
+		spell.addPart(new SpellPart(
+				SelfTrigger.instance(),
+				new SpellPartParam(0, false)
+				));
+		spell.addPart(new SpellPart(
+				SingleShape.instance(),
+				EMagicElement.PHYSICAL,
+				1,
+				EAlteration.ALTER,
+				new SpellPartParam(0, false)
+				));
 		SpellTome.addSpell(tome, spell);
 		
 		BlockPos pos = e.getPos().add(0, 1, 0);

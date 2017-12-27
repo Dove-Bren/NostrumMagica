@@ -18,7 +18,9 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -27,6 +29,7 @@ import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 public class ClientProxy extends CommonProxy {
 	
 	private KeyBinding bindingCast;
+	private KeyBinding bindingScroll;
 	private OverlayRenderer overlayRenderer;
 
 	public ClientProxy() {
@@ -39,6 +42,8 @@ public class ClientProxy extends CommonProxy {
 		
 		bindingCast = new KeyBinding("key.cast.desc", Keyboard.KEY_LCONTROL, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingCast);
+		bindingScroll = new KeyBinding("key.spellscroll.desc", Keyboard.KEY_LSHIFT, "key.nostrummagica.desc");
+		ClientRegistry.registerKeyBinding(bindingScroll);
 	}
 	
 	@Override
@@ -60,6 +65,21 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@SubscribeEvent
+	public void onMouse(MouseEvent event) {
+		int wheel = event.getDwheel();
+		if (wheel != 0) {
+			ItemStack tome = NostrumMagica.getCurrentTome(Minecraft.getMinecraft().thePlayer);
+			if (tome != null) {
+				if (bindingScroll.isKeyDown()) {
+					wheel = (wheel > 0 ? 1 : -1);
+					SpellTome.incrementIndex(tome, wheel);
+					event.setCanceled(true);
+				}
+			}
+		}
+	}
+	
+	@SubscribeEvent
 	public void onKey(KeyInputEvent event) {
 		if (bindingCast.isPressed()) {
 			
@@ -73,25 +93,24 @@ public class ClientProxy extends CommonProxy {
 			int mana = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer).getMana();
 			int cost = spell.getManaCost();
 			
-			Minecraft.getMinecraft().thePlayer.sendChatMessage("Mana: " + mana);
-			
-			if (mana < cost) {
-				EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
-				player.sendChatMessage("Not enough mana");
-				for (int i = 0; i < 15; i++) {
-					double offsetx = Math.cos(i * (2 * Math.PI / 15)) * 1.0;
-					double offsetz = Math.sin(i * (2 * Math.PI / 15)) * 1.0;
-					player.worldObj
-						.spawnParticle(EnumParticleTypes.SMOKE_LARGE,
-								player.posX + offsetx, player.posY, player.posZ + offsetz,
-								0, -.5, 0);
+			if (!Minecraft.getMinecraft().thePlayer.isCreative()) {
+				if (mana < cost) {
+					EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+					for (int i = 0; i < 15; i++) {
+						double offsetx = Math.cos(i * (2 * Math.PI / 15)) * 1.0;
+						double offsetz = Math.sin(i * (2 * Math.PI / 15)) * 1.0;
+						player.worldObj
+							.spawnParticle(EnumParticleTypes.SMOKE_LARGE,
+									player.posX + offsetx, player.posY, player.posZ + offsetz,
+									0, -.5, 0);
+					}
+					overlayRenderer.startManaWiggle(2);
+					return;
 				}
-				overlayRenderer.startManaWiggle(2);
-				return;
+				
+				NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer)
+					.addMana(-cost);
 			}
-			
-			NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer)
-				.addMana(-cost);
 			
 			NetworkHandler.getSyncChannel().sendToServer(
 	    			new ClientCastMessage(spell));

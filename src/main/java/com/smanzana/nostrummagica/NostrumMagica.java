@@ -112,19 +112,7 @@ public class NostrumMagica
     	return potionID;
     }
     
-    public static Spell getCurrentSpell(EntityPlayer player) {
-    	List<Spell> spells = getSpells(player);
-    	if (spells == null || spells.isEmpty())
-    		return null;
-    	
-    	return spells.get(0);
-    }
-    
-    public static List<Spell> getSpells(EntityPlayer entity) {
-    	if (entity == null)
-    		return null;
-    	
-    	// We just return the spells from the first tome.
+    public static ItemStack getCurrentTome(EntityPlayer entity) {
     	// We look in mainhand first, then offhand, then just down
     	// hotbar.
     	ItemStack tome = null;
@@ -149,6 +137,24 @@ public class NostrumMagica
         			break; // Just want first 9
         	}
     	}
+    	
+    	return tome;
+    }
+    
+    public static Spell getCurrentSpell(EntityPlayer player) {
+    	List<Spell> spells = getSpells(player);
+    	if (spells == null || spells.isEmpty())
+    		return null;
+    	
+    	return spells.get(0);
+    }
+    
+    public static List<Spell> getSpells(EntityPlayer entity) {
+    	if (entity == null)
+    		return null;
+    	
+    	// We just return the spells from the curernt tome.
+    	ItemStack tome = getCurrentTome(entity);
     	
     	if (tome == null)
     		return null;

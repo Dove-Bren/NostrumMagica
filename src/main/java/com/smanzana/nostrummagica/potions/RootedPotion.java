@@ -41,6 +41,8 @@ public class RootedPotion extends Potion {
         if (entity.motionY > 0) {
         	entity.motionY = 0;
         }
+        entity.motionX = 0.0;
+        entity.motionZ = 0.0;
     }
 	
 }

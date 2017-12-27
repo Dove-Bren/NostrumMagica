@@ -283,120 +283,173 @@ public class SpellAction {
 	
 	private static class TransmuteEffect implements SpellEffect {
 		
-		private static final Set<Item> items = Sets.newHashSet(
-				Items.BEEF,
-				Items.APPLE,
-				Items.POTATO,
-				Items.IRON_HELMET,
-				Items.ENDER_PEARL,
-				Items.CARROT,
-				Items.BREAD,
-				Items.COMPASS,
-				Items.BRICK,
-				Items.BONE,
-				Items.EMERALD,
-				Items.COAL,
-				Items.EGG,
-				Items.GOLD_INGOT,
-				Items.REDSTONE,
-				Items.BOOK,
-				Items.QUARTZ,
-				Items.CHAINMAIL_CHESTPLATE,
-				Items.NETHER_WART,
-				Items.IRON_INGOT,
-				Items.DIAMOND_AXE,
-				Items.DIAMOND_PICKAXE,
-				Items.MELON_SEEDS,
-				Items.REEDS,
-				Items.PRISMARINE_CRYSTALS,
-				Items.BREWING_STAND,
-				Items.ENDER_EYE,
-				Items.DIAMOND,
-				Items.CHAINMAIL_BOOTS,
-				Items.WOODEN_SWORD,
-				Items.GLOWSTONE_DUST,
-				Items.CLAY_BALL,
-				Items.CLOCK,
-				Items.COMPARATOR,
-				Items.COOKIE,
-				Items.EXPERIENCE_BOTTLE,
-				Items.FEATHER,
-				Items.SPIDER_EYE,
-				Items.STRING);
+		private static Set<Item> items;
 		
-		private static final Set<Block> blocks = Sets.newHashSet(
-				Blocks.BOOKSHELF,
-				Blocks.CACTUS,
-				Blocks.COAL_ORE,
-				Blocks.END_STONE,
-				Blocks.DIRT,
-				Blocks.ICE,
-				Blocks.NOTEBLOCK,
-				Blocks.NETHERRACK,
-				Blocks.SAND,
-				Blocks.IRON_BARS,
-				Blocks.DROPPER,
-				Blocks.MOSSY_COBBLESTONE,
-				Blocks.STONE,
-				Blocks.NETHERRACK,
-				Blocks.LOG,
-				Blocks.PUMPKIN,
-				Blocks.QUARTZ_ORE,
-				Blocks.PLANKS,
-				Blocks.QUARTZ_STAIRS,
-				Blocks.OAK_FENCE,
-				Blocks.REDSTONE_ORE,
-				Blocks.LAPIS_ORE,
-				Blocks.ACACIA_FENCE,
-				Blocks.CRAFTING_TABLE,
-				Blocks.GOLD_ORE,
-				Blocks.GRAVEL,
-				Blocks.HARDENED_CLAY,
-				Blocks.IRON_ORE
-				);
+		private static Set<Block> blocks;
+		
+		private static boolean initted = false;
+		private static final void init() {
+			if (initted)
+				return;
+			
+			initted = true;
+			
+			items = Sets.newLinkedHashSet();
+			items.add(Items.BEEF);
+			items.add(Items.APPLE);
+			items.add(Items.POTATO);
+			items.add(Items.IRON_HELMET);
+			items.add(Items.ENDER_PEARL);
+			items.add(Items.CARROT);
+			items.add(Items.BREAD);
+			items.add(Items.COMPASS);
+			items.add(Items.BRICK);
+			items.add(Items.BONE);
+			items.add(Items.EMERALD);
+			items.add(Items.COAL);
+			items.add(Items.EGG);
+			items.add(Items.GOLD_INGOT);
+			items.add(Items.REDSTONE);
+			items.add(Items.BOOK);
+			items.add(Items.QUARTZ);
+			items.add(Items.CHAINMAIL_CHESTPLATE);
+			items.add(Items.NETHER_WART);
+			items.add(Items.IRON_INGOT);
+			items.add(Items.DIAMOND_AXE);
+			items.add(Items.DIAMOND_PICKAXE);
+			items.add(Items.MELON_SEEDS);
+			items.add(Items.REEDS);
+			items.add(Items.PRISMARINE_CRYSTALS);
+			items.add(Items.BREWING_STAND);
+			items.add(Items.ENDER_EYE);
+			items.add(Items.DIAMOND);
+			items.add(Items.CHAINMAIL_BOOTS);
+			items.add(Items.WOODEN_SWORD);
+			items.add(Items.GLOWSTONE_DUST);
+			items.add(Items.CLAY_BALL);
+			items.add(Items.CLOCK);
+			items.add(Items.COMPARATOR);
+			items.add(Items.COOKIE);
+			items.add(Items.EXPERIENCE_BOTTLE);
+			items.add(Items.FEATHER);
+			items.add(Items.SPIDER_EYE);
+			items.add(Items.STRING);
+			
+			blocks = Sets.newLinkedHashSet();
+					
+			blocks.add(Blocks.BOOKSHELF);
+			blocks.add(Blocks.CACTUS);
+			blocks.add(Blocks.COAL_ORE);
+			blocks.add(Blocks.END_STONE);
+			blocks.add(Blocks.DIRT);
+			blocks.add(Blocks.ICE);
+			blocks.add(Blocks.NOTEBLOCK);
+			blocks.add(Blocks.NETHERRACK);
+			blocks.add(Blocks.SAND);
+			blocks.add(Blocks.IRON_BARS);
+			blocks.add(Blocks.DROPPER);
+			blocks.add(Blocks.MOSSY_COBBLESTONE);
+			blocks.add(Blocks.STONE);
+			blocks.add(Blocks.NETHERRACK);
+			blocks.add(Blocks.LOG);
+			blocks.add(Blocks.PUMPKIN);
+			blocks.add(Blocks.QUARTZ_ORE);
+			blocks.add(Blocks.PLANKS);
+			blocks.add(Blocks.QUARTZ_STAIRS);
+			blocks.add(Blocks.OAK_FENCE);
+			blocks.add(Blocks.REDSTONE_ORE);
+			blocks.add(Blocks.LAPIS_ORE);
+			blocks.add(Blocks.ACACIA_FENCE);
+			blocks.add(Blocks.CRAFTING_TABLE);
+			blocks.add(Blocks.GOLD_ORE);
+			blocks.add(Blocks.GRAVEL);
+			blocks.add(Blocks.HARDENED_CLAY);
+			blocks.add(Blocks.IRON_ORE);
+		}
 		
 		private int level;
 		
 		public TransmuteEffect(int level) {
 			this.level = level;
+			
+			TransmuteEffect.init();
 		}
 		
 		@Override
 		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
 			ItemStack inhand = entity.getHeldItemMainhand();
-			if (inhand == null)
+			boolean offhand = false;
+			if (inhand == null) {
 				inhand = entity.getHeldItemOffhand();
-			
+				offhand = true;
+			}
 			
 			if (inhand == null)
 				return;
 			
 			Item item = inhand.getItem();
-			
-			if (!items.contains(item))
-				return;
-			
-			Iterator<Item> it = items.iterator();
-			Item next = it.next();
-			while (next != item)
-				next = it.next();
-			
-			// Now calculate offset
-			int hop = 4 - (level > 3 ? 3 : level);
-			for (int i = 0; i < hop; i++) {
-				next = it.next();
-				if (!it.hasNext())
-					it = items.iterator();
+			ItemStack stack = null;
+			if (items.contains(item)) {
+				Iterator<Item> it = items.iterator();
+				Item next = it.next();
+				while (next != item)
+					next = it.next();
+				
+				// Now calculate offset
+				int hop = 4 - (level > 3 ? 3 : level);
+				for (int i = 0; i < hop; i++) {
+					if (!it.hasNext())
+						it = items.iterator();
+					next = it.next();
+				}
+				stack = new ItemStack(next, 1);
+			} else {
+				// Try to go through blocks and see if it's in there
+				Iterator<Block> it = blocks.iterator();
+				Block next = it.next();
+				while (Item.getItemFromBlock(next) != item) {
+					if (!it.hasNext()) {
+						next = null;
+						break;
+					}
+					next = it.next();
+				}
+				
+				if (next != null) {
+					// Now calculate offset
+					int hop = 4 - (level > 3 ? 3 : level);
+					for (int i = 0; i < hop; i++) {
+						if (!it.hasNext())
+							it = blocks.iterator();
+						next = it.next();
+					}
+					stack = new ItemStack(Item.getItemFromBlock(next), 1);
+				}
 			}
 			
-			ItemStack stack = new ItemStack(next, 1);
+			if (stack == null)
+				return;
+			
 			if (entity instanceof EntityPlayer) {
-				inhand.splitStack(1);
-				((EntityPlayer) entity).inventory.addItemStackToInventory(stack);
+				EntityPlayer p = (EntityPlayer) entity;
+				if (inhand.stackSize == 1) {
+					if (offhand) {
+						p.inventory.removeStackFromSlot(40);
+					} else {
+						p.inventory.removeStackFromSlot(p.inventory.currentItem);
+					}
+					((EntityPlayer) entity).inventory.addItemStackToInventory(stack);
+				} else {
+					inhand.splitStack(1);
+					((EntityPlayer) entity).inventory.addItemStackToInventory(stack);
+				}
+				
+				
 			} else {
 				// EntityLiving has held item in slot 0
 				entity.setHeldItem(EnumHand.MAIN_HAND, stack);
 			}
+			
 		}
 		
 		@Override

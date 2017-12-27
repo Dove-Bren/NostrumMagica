@@ -76,7 +76,8 @@ public class SpellTome extends Item implements GuiBook {
 		
 		// END TESTING -------------------
 		
-		NostrumMagica.proxy.openBook(playerIn, this, itemStackIn);
+		if (worldIn.isRemote)
+			NostrumMagica.proxy.openBook(playerIn, this, itemStackIn);
 		
 		return super.onItemRightClick(itemStackIn, worldIn, playerIn, hand);
     }
@@ -124,6 +125,41 @@ public class SpellTome extends Item implements GuiBook {
 		return ids;
 	}
 	
+	private static int getIndex(ItemStack itemStack) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+			return 0;
+
+		NBTTagCompound nbt = itemStack.getTagCompound();
+		
+		return nbt.getInteger(NBT_INDEX);
+	}
+	
+	public static void incrementIndex(ItemStack itemStack, int amount) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+			return;
+
+		NBTTagCompound nbt = itemStack.getTagCompound();
+		
+		int index = nbt.getInteger(NBT_INDEX);
+		
+		int indices[] = getSpellIDs(itemStack);
+		index = Math.max(0, Math.min(index + amount, indices.length - 1));
+		
+		nbt.setInteger(NBT_INDEX, index);
+	}
+	
+	public static void setIndex(ItemStack itemStack, int index) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+			return;
+
+		int indices[] = getSpellIDs(itemStack);
+		index = Math.max(0, Math.min(index, indices.length - 1));
+		
+		NBTTagCompound nbt = itemStack.getTagCompound();
+		
+		nbt.setInteger(NBT_INDEX, index);
+	}
+	
 	/**
 	 * Retrieves a list of spells stored in the spell tome.
 	 * The active 'currently selected' spell is always first in the list.
@@ -143,9 +179,7 @@ public class SpellTome extends Item implements GuiBook {
 			sniffIDs(ids);
 		}
 		
-		NBTTagCompound nbt = itemStack.getTagCompound();
-		
-		int index = nbt.getInteger(NBT_INDEX);
+		int index = getIndex(itemStack);
 		if (ids.length < index)
 			index = 0;
 		

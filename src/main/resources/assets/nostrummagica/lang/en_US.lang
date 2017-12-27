@@ -15,6 +15,7 @@ entity.armorer_stand.name=Armorer's Stand
 itemGroup.nostrummagica=Nostrum Magica
 
 key.cast.desc=Cast Spell
+key.magicscroll.sec=Scroll Spells (+ MouseWheel)
 key.nostrummagica.desc=Nostrum Magica
 
 text.smith_level=Smith Level:

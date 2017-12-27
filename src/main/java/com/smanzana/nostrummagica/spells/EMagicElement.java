@@ -3,9 +3,9 @@ package com.smanzana.nostrummagica.spells;
 public enum EMagicElement {
 
 	PHYSICAL("Physical", 0xFF223344),
+	LIGHTNING("Lightining", 0xFFA5A530),
 	FIRE("Fire", 0xFFC21C00),
 	EARTH("Earth", 0xFF60350D),
-	LIGHTNING("Lightining", 0xFFA5A530),
 	ICE("Ice", 0xFF3294A3),
 	WIND("Wind", 0xFF36A035),
 	ENDER("Ender", 0xFF41117F);

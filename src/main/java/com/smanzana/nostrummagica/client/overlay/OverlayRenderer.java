@@ -2,10 +2,12 @@ package com.smanzana.nostrummagica.client.overlay;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.ResourceLocation;
@@ -63,6 +65,7 @@ public class OverlayRenderer extends Gui {
 		float ratio = (float) mana / (float) maxMana;
 		
 		// Orbs
+		if (!Minecraft.getMinecraft().thePlayer.isCreative())
 		{
 			int parts = Math.round(40 * ratio);
 			int whole = parts / 4;
@@ -90,6 +93,14 @@ public class OverlayRenderer extends Gui {
 				this.drawTexturedModalRect(hudXAnchor - (8 * (i + 1)) + wiggleOffset,
 						hudYAnchor,	0, 16, 9, 9);
 			}
+		}
+		
+		
+		// Spell name
+		Spell current = NostrumMagica.getCurrentSpell(Minecraft.getMinecraft().thePlayer);
+		if (current != null) {
+			FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
+			fonter.drawString(current.getName(), 5, scaledRes.getScaledHeight() - (fonter.FONT_HEIGHT + 5), 0xFF000000);
 		}
 		
 	}

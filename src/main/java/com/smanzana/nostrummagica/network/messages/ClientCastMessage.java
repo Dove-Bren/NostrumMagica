@@ -48,11 +48,14 @@ public class ClientCastMessage implements IMessage {
 			}
 			
 			// Cast it!
-			int cost = spell.getManaCost();
-			if (att.getMana() < cost)
-				return new ClientCastReplyMessage(false, att.getMana());
+			if (!sp.isCreative()) {
+				int cost = spell.getManaCost();
+				if (att.getMana() < cost)
+					return new ClientCastReplyMessage(false, att.getMana());
+				
+				att.addMana(-cost);
+			}
 			
-			att.addMana(-cost);
 			boolean seen = att.wasSpellDone(spell);
 			spell.cast(sp);
 			
