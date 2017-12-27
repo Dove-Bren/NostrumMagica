@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.capabilities.NostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagicStorage;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
+import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
@@ -17,6 +18,7 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 
@@ -46,6 +48,13 @@ public class CommonProxy {
     			1,
     			false
     			);
+    	EntityRegistry.registerModEntity(EntitySpellProjectile.class, "spell_projectile",
+    			entityID++,
+    			NostrumMagica.instance,
+    			64,
+    			1,
+    			true
+    			);
 	}
 	
 	public void init() {
@@ -66,6 +75,7 @@ public class CommonProxy {
     	SpellTrigger.register(SelfTrigger.instance());
     	SpellTrigger.register(TouchTrigger.instance());
     	SpellTrigger.register(AITargetTrigger.instance());
+    	SpellTrigger.register(ProjectileTrigger.instance());
     }
     
     private void registerPotions() {

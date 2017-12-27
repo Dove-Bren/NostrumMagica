@@ -53,8 +53,11 @@ public abstract class SpellShape {
 			pos = new BlockPos(vec.xCoord, vec.yCoord, vec.zCoord);
 		}
 		
-		for (EntityLivingBase ent : getTargets(param, target, world, pos))
-			action.apply(ent);
+		System.out.println("Shape perform " + (target == null ? " with no entity!" : " :)"));
+		for (EntityLivingBase ent : getTargets(param, target, world, pos)) {
+			if (ent != null)
+				action.apply(ent);
+		}
 	}
 	
 	/**

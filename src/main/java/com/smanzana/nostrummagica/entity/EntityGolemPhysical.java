@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.Spell.SpellPart;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -21,7 +22,7 @@ public class EntityGolemPhysical extends EntityGolem {
 		if (spellRanged == null) {
 			spellRanged = new Spell("Massive Blow");
 			//spellRanged.addPart(new SpellPart()); should be projectile
-			spellRanged.addPart(new SpellPart(AITargetTrigger.instance()));
+			spellRanged.addPart(new SpellPart(ProjectileTrigger.instance()));
 			spellRanged.addPart(new SpellPart(SingleShape.instance(),
 					EMagicElement.PHYSICAL,
 					1,

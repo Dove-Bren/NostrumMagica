@@ -17,6 +17,7 @@ import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.Spell.SpellPart;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
+import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 
 import net.minecraft.entity.Entity;
@@ -516,7 +517,7 @@ public class PlayerListener {
 		// Spawn tome with that spell in it
 		Spell spell = new Spell("Wind Cutter");
 		spell.addPart(new SpellPart(
-				SelfTrigger.instance(),
+				ProjectileTrigger.instance(),
 				new SpellPartParam(0, false)
 				));
 		spell.addPart(new SpellPart(

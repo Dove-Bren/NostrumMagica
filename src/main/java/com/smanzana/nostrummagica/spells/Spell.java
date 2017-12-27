@@ -76,9 +76,6 @@ public class Spell {
 					targs = targets;
 				}
 				
-				if (targs.isEmpty())
-					System.out.println("No targets");
-				
 				if (targs != null && !targs.isEmpty()) {
 					for (EntityLivingBase targ : targs) {
 						shape.perform(action, param, targ, null, null);
@@ -94,6 +91,7 @@ public class Spell {
 			// next is either null or a trigger
 			if (next == null) {
 				// end of spell
+				finish();
 			} else {
 				// If we have more than one target/pos we hit, split here so each
 				// can proceed at their own pace
@@ -105,7 +103,7 @@ public class Spell {
 					if (targs.size() == 1) {
 						// don't need to split
 						// Also base case after a split happens
-						spawnTrigger(next.getTrigger(), targs.get(0), null, null);
+						spawnTrigger(next.getTrigger(), targs.get(0), null, null, next.getParam());
 					} else {
 						index--; // Make splits have same trigger as we're performing now
 						for (EntityLivingBase targ : targs) {
@@ -117,7 +115,7 @@ public class Spell {
 				} else {
 					if (locations.size() == 1) {
 						// Base case here, too. Instantiate trigger!!!!
-						spawnTrigger(next.getTrigger(), null, world, locations.get(0));
+						spawnTrigger(next.getTrigger(), null, world, locations.get(0), next.getParam());
 					} else {
 						index--; // Make splits have same trigger as we're performing now
 						for (BlockPos targ : locations) {
@@ -131,7 +129,7 @@ public class Spell {
 			}
 		}
 		
-		private void spawnTrigger(SpellTrigger trigger, EntityLivingBase targ, World world, BlockPos targpos) {
+		private void spawnTrigger(SpellTrigger trigger, EntityLivingBase targ, World world, BlockPos targpos, SpellPartParam param) {
 			// instantiate trigger in world
 			Vec3d pos;
 			if (world == null)
@@ -143,7 +141,8 @@ public class Spell {
 			
 			this.triggerInstance = trigger.instance(this, world, pos,
 					(targ == null ? -90.0f : targ.rotationPitch),
-					(targ == null ? 0.0f : targ.rotationYaw));
+					(targ == null ? 0.0f : targ.rotationYaw),
+					param);
 			this.triggerInstance.init(caster);
 		}
 		
@@ -166,6 +165,17 @@ public class Spell {
 
 		public EntityLivingBase getCaster() {
 			return caster;
+		}
+
+		/**
+		 * Called when triggers fail to be triggered and have failed.
+		 */
+		public void triggerFail() {
+			finish();
+		}
+		
+		private void finish() {
+			; // Nothing I can think of right now, but maybe in the future...
 		}
 	}
 	

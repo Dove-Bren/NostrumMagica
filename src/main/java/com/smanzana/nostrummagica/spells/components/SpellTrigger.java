@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 
 import net.minecraft.entity.EntityLivingBase;
@@ -87,17 +88,7 @@ public abstract class SpellTrigger {
 	 * @param targetPos
 	 * @return
 	 */
-	public abstract SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw);
-	
-	/**
-	 * 
-	 * @param caster
-	 * @param pos
-	 * @param pitch
-	 * @param yaw
-	 * @return
-	 */
-	protected abstract TriggerData getTargetData(SpellState state, World world, Vec3d pos, float pitch, float yaw);
+	public abstract SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw, SpellPartParam params);
 	
 	/**
 	 * 

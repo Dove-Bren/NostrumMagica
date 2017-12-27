@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.spells.components.triggers;
 
+import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
@@ -43,8 +44,18 @@ public abstract class InstantTrigger extends SpellTrigger {
 	}
 	
 	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw) {
+	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw, SpellPartParam params) {
 		return new InstantTriggerInstance(state, world, pos, pitch, yaw);
 	}
+	
+	/**
+	 * 
+	 * @param caster
+	 * @param pos
+	 * @param pitch
+	 * @param yaw
+	 * @return
+	 */
+	protected abstract TriggerData getTargetData(SpellState state, World world, Vec3d pos, float pitch, float yaw);
 	
 }
