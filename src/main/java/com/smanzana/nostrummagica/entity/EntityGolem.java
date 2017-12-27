@@ -36,11 +36,20 @@ public abstract class EntityGolem extends EntityTameable {
 	protected boolean isRange;
 	protected boolean hasBuff;
 	
+	private GolemTask gTask;
+	
     protected EntityGolem(World worldIn, boolean melee, boolean range, boolean buff)
     {
         super(worldIn);
         this.setSize(0.8F, 1.6F);
         this.setTamed(true);
+        
+        this.isMelee = melee;
+        this.isRange = range;
+        this.hasBuff = buff;
+        
+        if (!worldIn.isRemote)
+        	gTask.initStance(isMelee, isRange, hasBuff);
     }
     
     /**
@@ -66,7 +75,8 @@ public abstract class EntityGolem extends EntityTameable {
     {
         this.tasks.addTask(1, new EntityAISwimming(this));
         //this.tasks.addTask(3, new EntityAIAttackMelee(this, 1.0D, true));
-        this.tasks.addTask(2, new GolemTask(this, isMelee, isRange, hasBuff));
+        gTask = new GolemTask(this);
+        this.tasks.addTask(2, gTask);
         this.tasks.addTask(3, new EntityAIFollowOwner(this, 1.0D, 10.0F, 2.0F));
         this.tasks.addTask(4, new EntityAIWander(this, 1.0D));
         this.tasks.addTask(5, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
@@ -213,11 +223,6 @@ public abstract class EntityGolem extends EntityTameable {
         return flag;
     }
 
-    public void setTamed(boolean tamed)
-    {
-        ; // We can't be tamed
-    }
-
     public boolean processInteract(EntityPlayer player, EnumHand hand, @Nullable ItemStack stack)
     {
         return false;
@@ -242,6 +247,7 @@ public abstract class EntityGolem extends EntityTameable {
 
     public boolean shouldAttackEntity(EntityLivingBase target, EntityLivingBase owner)
     {
+    	System.out.print("c");
         return target != owner;
     }
 

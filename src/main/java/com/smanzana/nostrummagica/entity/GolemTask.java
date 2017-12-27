@@ -24,16 +24,19 @@ public class GolemTask extends EntityAIBase {
 	private boolean strafeClockwise;
 	private boolean strafeBack;
 	
-	public GolemTask(EntityGolem golem, boolean melee, boolean range, boolean aux) {
+	public GolemTask(EntityGolem golem) {
 		this.golem = golem;
-		this.melee = melee;
-		this.range = range;
-		this.aux = aux;
-		
+	
 		meleeCooldown = 0;
 		rangeCooldown = 0;
 		auxCooldown = 0;
 		this.setMutexBits(3);
+	}
+	
+	public void initStance(boolean melee, boolean range, boolean aux) {
+		this.melee = melee;
+		this.range = range;
+		this.aux = aux;
 	}
 	
 	@Override
@@ -104,11 +107,15 @@ public class GolemTask extends EntityAIBase {
 			auxCooldown--;
 		
 		// If dist > some, return false;
-		if (golem.getOwner() == null)
+		if (golem.getOwner() == null) {
+			System.out.print("o");
 			return false;
+		}
 		
-		if (!melee && !range && !aux)
+		if (!melee && !range && !aux) {
+			System.out.print("X");
 			return false;
+		}
 		
 		System.out.print(".");
 		EntityLivingBase owner = golem.getOwner();
@@ -127,6 +134,7 @@ public class GolemTask extends EntityAIBase {
 		EntityLivingBase target = golem.getAttackTarget();
 
 		boolean done = false;
+		boolean again = true;
 		
 		// First, we try to move.
 		
@@ -142,14 +150,8 @@ public class GolemTask extends EntityAIBase {
 			pathTo(owner);
 				
 			done = true;
+			again = false;
 		}
-		
-		double distTarget = target.getPositionVector().distanceTo(golem.getPositionVector());
-		
-		if (distTarget < 1)
-			inMelee = true;
-		if (distTarget < RANGE_SQR)
-			inRange = true;
 		
 		// Does not check done so we can do even when target is dead
 		if (aux && auxCooldown <= 0 && golem.ticksExisted > 100) {
@@ -166,23 +168,38 @@ public class GolemTask extends EntityAIBase {
 				done = true;
 			}
 		}
-		
-		if (!done && !inMelee && range && inRange && rangeCooldown <= 0) {
-			// Can we do a ranged attack?
-			if (golem.canEntityBeSeen(target)) {
-				golem.doRangeTask(target);
-				rangeCooldown = 20 * 3 * (1 + GolemTask.rand.nextInt(3));
+
+		if (target != null && !target.isDead) {
+			double distTarget = target.getPositionVector().distanceTo(golem.getPositionVector());
+			
+			if (distTarget < 1.0) {
+				inMelee = true;
+				System.out.print("m");
+			}
+			if (distTarget < RANGE_SQR) {
+				inRange = true;
+				System.out.print("u");
+			}
+			
+			if (!done && !inMelee && range && inRange && rangeCooldown <= 0) {
+				// Can we do a ranged attack?
+				System.out.print("r");
+				if (golem.canEntityBeSeen(target)) {
+					System.out.print("R");
+					golem.doRangeTask(target);
+					rangeCooldown = 20 * 3 * (1 + GolemTask.rand.nextInt(3));
+					done = true;
+				}
+			}
+			
+			if (!done && melee && inMelee && meleeCooldown <= 0) {
+				golem.doMeleeTask(target);
+				meleeCooldown = 20 * 1;
 				done = true;
 			}
 		}
 		
-		if (!done && melee && inMelee && meleeCooldown <= 0) {
-			golem.doMeleeTask(golem);
-			meleeCooldown = 20 * 1;
-			done = true;
-		}
-		
-		return true;
+		return again;
 	}
 	
 	private boolean pathTo(EntityLivingBase target) {
@@ -197,6 +214,9 @@ public class GolemTask extends EntityAIBase {
 		boolean success = false;
 		if (melee) {
 			success = (null != golem.getNavigator().getPathToEntityLiving(target));
+			if (success) {
+				golem.getNavigator().tryMoveToEntityLiving(target, 1.0);
+			}
 		} else if (range) {
 			
 			double dist = golem.getDistanceSq(target.posX, target.getEntityBoundingBox().minY, target.posZ);

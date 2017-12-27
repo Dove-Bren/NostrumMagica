@@ -28,8 +28,8 @@ public class EntityGolemPhysical extends EntityGolem {
 					null));
 			
 			spellDebuff = new Spell("Corrupt Offense");
-			spellRanged.addPart(new SpellPart(AITargetTrigger.instance()));
-			spellRanged.addPart(new SpellPart(SingleShape.instance(),
+			spellDebuff.addPart(new SpellPart(AITargetTrigger.instance()));
+			spellDebuff.addPart(new SpellPart(SingleShape.instance(),
 					EMagicElement.PHYSICAL,
 					1,
 					EAlteration.INFLICT));
@@ -42,7 +42,7 @@ public class EntityGolemPhysical extends EntityGolem {
 
 	@Override
 	public void doMeleeTask(EntityLivingBase target) {
-		target.attackEntityAsMob(this);
+		this.attackEntityAsMob(target);
 	}
 
 	@Override
@@ -79,6 +79,7 @@ public class EntityGolemPhysical extends EntityGolem {
         this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(16.0D);
 
         this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(6.0D);
+        this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(8.0D);
 	}
 
 	@Override

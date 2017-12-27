@@ -76,6 +76,9 @@ public class Spell {
 					targs = targets;
 				}
 				
+				if (targs.isEmpty())
+					System.out.println("No targets");
+				
 				if (targs != null && !targs.isEmpty()) {
 					for (EntityLivingBase targ : targs) {
 						shape.perform(action, param, targ, null, null);
@@ -273,6 +276,7 @@ public class Spell {
 	}
 	
 	public void cast(EntityLivingBase caster) {
+		System.out.println("Casting " + this.name);
 		SpellState state = new SpellState(caster);
 		state.trigger(Lists.newArrayList(caster), null, null, null);
 	}
