@@ -179,6 +179,10 @@ public class Spell {
 			this.param = param;
 		}
 		
+		public SpellPart(SpellTrigger trigger) {
+			this(trigger, new SpellPartParam(0, false));
+		}
+		
 		public SpellPart(SpellShape shape, EMagicElement element, int count, EAlteration alt,
 				SpellPartParam param) {
 			this.shape = shape;
@@ -186,6 +190,11 @@ public class Spell {
 			this.elementCount = count;
 			this.alteration = alt;
 			this.param = param;
+		}
+		
+		public SpellPart(SpellShape shape, EMagicElement element, int count,
+				EAlteration alteration) {
+			this(shape, element, count, alteration, new SpellPartParam(0, false));
 		}
 		
 		public boolean isTrigger() {
@@ -541,7 +550,7 @@ public class Spell {
 		int amp = elementCount - 1;
 		switch (element) {
 		case PHYSICAL:
-			break;
+			return new SpellAction(caster).summon(element, elementCount);
 		case EARTH:
 			break;
 		case ENDER:

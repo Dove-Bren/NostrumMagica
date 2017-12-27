@@ -556,6 +556,20 @@ public class PlayerListener {
 				));
 		SpellTome.addSpell(tome, spell);
 		
+		spell = new Spell("Summon Mess");
+		spell.addPart(new SpellPart(
+				SelfTrigger.instance(),
+				new SpellPartParam(0, false)
+				));
+		spell.addPart(new SpellPart(
+				SingleShape.instance(),
+				EMagicElement.PHYSICAL,
+				1,
+				EAlteration.SUMMON,
+				new SpellPartParam(0, false)
+				));
+		SpellTome.addSpell(tome, spell);
+		
 		BlockPos pos = e.getPos().add(0, 1, 0);
 		e.getWorld().spawnEntityInWorld(new EntityItem(
 				e.getWorld(),

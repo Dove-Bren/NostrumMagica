@@ -8,6 +8,8 @@ import java.util.Random;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
+import com.smanzana.nostrummagica.entity.EntityGolem;
+import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.block.Block;
@@ -35,7 +37,7 @@ public class SpellAction {
 
 	private static interface SpellEffect {
 		public void apply(EntityLivingBase caster, EntityLivingBase entity);
-		public void apply(World world, BlockPos block);
+		public void apply(EntityLivingBase caster, World world, BlockPos block);
 	}
 	
 	private class DamageEffect implements SpellEffect {
@@ -54,7 +56,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(World world, BlockPos pos) {
+		public void apply(EntityLivingBase caster, World world, BlockPos pos) {
 			; // Do nothing
 		}
 	}
@@ -72,7 +74,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(World world, BlockPos pos) {
+		public void apply(EntityLivingBase caster, World world, BlockPos pos) {
 			; // Do nothing
 		}
 	}
@@ -94,7 +96,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(World world, BlockPos pos) {
+		public void apply(EntityLivingBase caster, World world, BlockPos pos) {
 			; // Do nothing
 		}
 	}
@@ -156,7 +158,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(World world, BlockPos pos) {
+		public void apply(EntityLivingBase caster, World world, BlockPos pos) {
 			; // Do nothing
 		}
 	}
@@ -220,7 +222,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(World world, BlockPos pos) {
+		public void apply(EntityLivingBase caster, World world, BlockPos pos) {
 			; // Do nothing
 		}
 	}
@@ -276,8 +278,8 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(World world, BlockPos pos) {
-			; // Do nothing
+		public void apply(EntityLivingBase caster, World world, BlockPos pos) {
+			; // Do nothing // TODO could push from the cell!
 		}
 	}
 	
@@ -453,7 +455,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(World world, BlockPos pos) {
+		public void apply(EntityLivingBase caster, World world, BlockPos pos) {
 			Block block = world.getBlockState(pos).getBlock();
 			if (!blocks.contains(block))
 				return;
@@ -489,13 +491,84 @@ public class SpellAction {
 		}
 
 		@Override
-		public void apply(World world, BlockPos block) {
+		public void apply(EntityLivingBase caster, World world, BlockPos block) {
 			block.add(0, 1, 0);
 			if (world.isAirBlock(block)) {
 				world.setBlockState(block, Blocks.FIRE.getDefaultState());
 			}
 		}
 		
+	}
+	
+	private static class SummonEffect implements SpellEffect {
+		private EMagicElement element;
+		private int power;
+		
+		public SummonEffect(EMagicElement element, int power) {
+			this.element = element;
+			this.power = power;
+			
+			if (this.element == null)
+				this.element = EMagicElement.PHYSICAL;
+		}
+
+		@Override
+		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
+			// Pick a place to spawn it and then defer to location one
+			World world = caster.getEntityWorld();
+			BlockPos center = caster.getPosition();
+			BlockPos pos;
+			do {
+				pos = center.add(1, 1, 0);
+				if (world.isAirBlock(pos))
+					break;
+				
+				pos = center.add(-1, 1, 0);
+				if (world.isAirBlock(pos))
+					break;
+				
+				pos = center.add(0, 1, -1);
+				if (world.isAirBlock(pos))
+					break;
+				
+				pos = center.add(0, 1, 1);
+				if (world.isAirBlock(pos))
+					break;
+				
+				pos = center;
+			} while (false);
+			
+			apply(caster, world, pos);
+		}
+
+		@Override
+		public void apply(EntityLivingBase caster, World world, BlockPos block) {
+			for (int i = 0; i < power; i++) {
+				EntityGolem golem = spawnGolem(world);
+				golem.setPosition(block.getX() + .5, block.getY(), block.getZ() + .5);
+				world.spawnEntityInWorld(golem);
+				golem.setOwnerId(caster.getPersistentID());
+			}
+			
+		}
+		
+		private EntityGolem spawnGolem(World world) {
+			EntityGolem golem;
+			
+			switch (element) {
+			case EARTH:
+			case ENDER:
+			case FIRE:
+			case ICE:
+			case LIGHTNING:
+			case WIND:
+			default:
+			case PHYSICAL:
+				golem = new EntityGolemPhysical(world);
+			}
+			
+			return golem;
+		}
 	}
 	
 	private EntityLivingBase source;
@@ -514,7 +587,7 @@ public class SpellAction {
 	
 	public void apply(World world, BlockPos pos) {
 		for (SpellEffect e : effects) {
-			e.apply(world, pos);
+			e.apply(source, world, pos);
 		}
 	}
 	
@@ -604,6 +677,11 @@ public class SpellAction {
 	
 	public SpellAction burn(int durationTicks) {
 		effects.add(new BurnEffect(durationTicks));
+		return this;
+	}
+	
+	public SpellAction summon(EMagicElement element, int power) {
+		effects.add(new SummonEffect(element, power));
 		return this;
 	}
 }

@@ -1,9 +1,15 @@
 package com.smanzana.nostrummagica.entity;
 
+import com.smanzana.nostrummagica.spells.EAlteration;
+import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.Spell.SpellPart;
+import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
+import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.potion.Potion;
 import net.minecraft.world.World;
 
 public class EntityGolemPhysical extends EntityGolem {
@@ -14,14 +20,24 @@ public class EntityGolemPhysical extends EntityGolem {
 	private static void init() {
 		if (spellRanged == null) {
 			spellRanged = new Spell("Massive Blow");
-			//spellRanged.addPart(new SpellPart());
+			//spellRanged.addPart(new SpellPart()); should be projectile
+			spellRanged.addPart(new SpellPart(AITargetTrigger.instance()));
+			spellRanged.addPart(new SpellPart(SingleShape.instance(),
+					EMagicElement.PHYSICAL,
+					1,
+					null));
 			
 			spellDebuff = new Spell("Corrupt Offense");
+			spellRanged.addPart(new SpellPart(AITargetTrigger.instance()));
+			spellRanged.addPart(new SpellPart(SingleShape.instance(),
+					EMagicElement.PHYSICAL,
+					1,
+					EAlteration.INFLICT));
 		}
 	}
 
-	protected EntityGolemPhysical(World worldIn) {
-		super(worldIn, true, true, true);
+	public EntityGolemPhysical(World worldIn) {
+		super(worldIn, true, true, false);
 	}
 
 	@Override
@@ -32,19 +48,23 @@ public class EntityGolemPhysical extends EntityGolem {
 	@Override
 	public void doRangeTask(EntityLivingBase target) {
 		EntityGolemPhysical.init();
-		EntityLivingBase targ = this.getAttackTarget();
-		this.setAttackTarget(target);
-		spellRanged.cast(this);
-		this.setAttackTarget(targ);
+		
+		// Either do debuff or damage
+		if (target.getActivePotionEffect(Potion.getPotionFromResourceLocation("weakness")) == null) {
+			EntityLivingBase targ = this.getAttackTarget();
+			if (targ != target)
+				this.setAttackTarget(target);
+			spellDebuff.cast(this);
+			if (targ != target)
+				this.setAttackTarget(targ);
+		} else {
+			spellRanged.cast(this);
+		}
 	}
 
 	@Override
 	public void doBuffTask(EntityLivingBase target) {
-		EntityGolemPhysical.init();
-		EntityLivingBase targ = this.getAttackTarget();
-		this.setAttackTarget(target);
-		spellDebuff.cast(this);
-		this.setAttackTarget(targ);
+		; // shouldn't happen
 	}
 
 	@Override
@@ -54,12 +74,16 @@ public class EntityGolemPhysical extends EntityGolem {
 
 	@Override
 	public void initGolemAttributes() {
-        super.applyEntityAttributes();
         this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.23D);
 
         this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(16.0D);
 
-        this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(6.0D);
+        this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(6.0D);
+	}
+
+	@Override
+	public String getTextureKey() {
+		return "physical";
 	}
 
 }

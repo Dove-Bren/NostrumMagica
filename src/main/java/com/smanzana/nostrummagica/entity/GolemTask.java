@@ -33,10 +33,30 @@ public class GolemTask extends EntityAIBase {
 		meleeCooldown = 0;
 		rangeCooldown = 0;
 		auxCooldown = 0;
+		this.setMutexBits(3);
 	}
 	
 	@Override
 	public boolean shouldExecute() {
+		if (golem.isDead)
+			return false;
+		
+		if (golem.getAttackTarget() == null)
+			return false;
+		
+		EntityLivingBase owner = golem.getOwner();
+		if (owner == null)
+			return false;
+		
+		double distOwner = 0;
+		if (owner.dimension == golem.dimension) {
+			distOwner = owner.getDistanceSqToEntity(golem);
+		}
+		
+		if (distOwner > 900.0) {
+			// Too far. Don't engage
+			return false;
+		}
 		return true;
 	}
 
@@ -90,6 +110,7 @@ public class GolemTask extends EntityAIBase {
 		if (!melee && !range && !aux)
 			return false;
 		
+		System.out.print(".");
 		EntityLivingBase owner = golem.getOwner();
 		double distOwner = 0;
 		if (owner.dimension == golem.dimension) {
@@ -104,26 +125,31 @@ public class GolemTask extends EntityAIBase {
 		boolean inMelee = false;
 		boolean inRange = false;
 		EntityLivingBase target = golem.getAttackTarget();
-		double distTarget = target.getPositionVector().distanceTo(golem.getPositionVector());
-		
-		if (distTarget < 1)
-			inMelee = true;
-		if (distTarget < RANGE_SQR)
-			inRange = true;
 
 		boolean done = false;
 		
 		// First, we try to move.
 		
 		// Else don't execute task
-		if (!target.isDead) {
-			if (!pathTo(target))
+		if (target != null && !target.isDead) {
+			System.out.print(",");
+			if (!pathTo(target)) {
+				System.out.print("x");
 				return false;
+			}
 		} else {
+			System.out.print("|");
 			pathTo(owner);
 				
 			done = true;
 		}
+		
+		double distTarget = target.getPositionVector().distanceTo(golem.getPositionVector());
+		
+		if (distTarget < 1)
+			inMelee = true;
+		if (distTarget < RANGE_SQR)
+			inRange = true;
 		
 		// Does not check done so we can do even when target is dead
 		if (aux && auxCooldown <= 0 && golem.ticksExisted > 100) {
@@ -160,6 +186,9 @@ public class GolemTask extends EntityAIBase {
 	}
 	
 	private boolean pathTo(EntityLivingBase target) {
+		if (!golem.getNavigator().noPath())
+			return true;
+		
 		// If we're melee and !inMelee, move
 		// Else if we're range and inMelee, move
 		// Else if we're range and !inRange, move

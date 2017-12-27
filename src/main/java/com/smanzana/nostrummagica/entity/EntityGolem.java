@@ -39,7 +39,8 @@ public abstract class EntityGolem extends EntityTameable {
     protected EntityGolem(World worldIn, boolean melee, boolean range, boolean buff)
     {
         super(worldIn);
-        this.setSize(0.8F, 1.4F);
+        this.setSize(0.8F, 1.6F);
+        this.setTamed(true);
     }
     
     /**
@@ -65,10 +66,10 @@ public abstract class EntityGolem extends EntityTameable {
     {
         this.tasks.addTask(1, new EntityAISwimming(this));
         //this.tasks.addTask(3, new EntityAIAttackMelee(this, 1.0D, true));
-        this.tasks.addTask(3, new GolemTask(this, isMelee, isRange, hasBuff));
-        this.tasks.addTask(4, new EntityAIFollowOwner(this, 1.0D, 10.0F, 2.0F));
-        this.tasks.addTask(5, new EntityAIWander(this, 1.0D));
-        this.tasks.addTask(6, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
+        this.tasks.addTask(2, new GolemTask(this, isMelee, isRange, hasBuff));
+        this.tasks.addTask(3, new EntityAIFollowOwner(this, 1.0D, 10.0F, 2.0F));
+        this.tasks.addTask(4, new EntityAIWander(this, 1.0D));
+        this.tasks.addTask(5, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
         this.targetTasks.addTask(1, new EntityAIOwnerHurtByTarget(this));
         this.targetTasks.addTask(2, new EntityAIOwnerHurtTarget(this));
         this.targetTasks.addTask(3, new EntityAIHurtByTarget(this, true, new Class[0]));
@@ -80,9 +81,9 @@ public abstract class EntityGolem extends EntityTameable {
     protected void applyEntityAttributes()
     {
         super.applyEntityAttributes();
-        this.initGolemAttributes();
-
         this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(2.0D);
+        
+        this.initGolemAttributes();
     }
 
     protected void updateAITasks()
@@ -254,5 +255,7 @@ public abstract class EntityGolem extends EntityTameable {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	public abstract String getTextureKey();
 	
 }

@@ -42,6 +42,7 @@ public class NostrumMagica
     
     @SidedProxy(clientSide="com.smanzana.nostrummagica.proxy.ClientProxy", serverSide="com.smanzana.nostrummagica.proxy.CommonProxy")
     public static CommonProxy proxy;
+    public static NostrumMagica instance;
     
     public static CreativeTabs creativeTab;
     public static Logger logger = LogManager.getLogger(MODID);
@@ -57,6 +58,7 @@ public class NostrumMagica
     
     @EventHandler
     public void preinit(FMLPreInitializationEvent event) {
+    	instance = this;
     	playerListener = new PlayerListener();
     	
     	NostrumMagica.creativeTab = new CreativeTabs(MODID){
@@ -105,6 +107,7 @@ public class NostrumMagica
     }
     
     private static int potionID = 65;
+	
     public static int registerPotion(Potion potion, ResourceLocation loc) {
     	while (Potion.getPotionById(potionID) != null)
     		potionID++;
