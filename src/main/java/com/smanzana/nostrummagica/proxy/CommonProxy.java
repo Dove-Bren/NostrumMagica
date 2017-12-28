@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.capabilities.NostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagicStorage;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.entity.EntityGolemEarth;
+import com.smanzana.nostrummagica.entity.EntityGolemEnder;
 import com.smanzana.nostrummagica.entity.EntityGolemFire;
 import com.smanzana.nostrummagica.entity.EntityGolemIce;
 import com.smanzana.nostrummagica.entity.EntityGolemLightning;
@@ -95,6 +96,13 @@ public class CommonProxy {
     			false
     			);
     	EntityRegistry.registerModEntity(EntityGolemWind.class, "wind_golem",
+    			entityID++,
+    			NostrumMagica.instance,
+    			64,
+    			1,
+    			false
+    			);
+    	EntityRegistry.registerModEntity(EntityGolemEnder.class, "ender_golem",
     			entityID++,
     			NostrumMagica.instance,
     			64,

@@ -10,6 +10,7 @@ import java.util.Set;
 import com.google.common.collect.Sets;
 import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.EntityGolemEarth;
+import com.smanzana.nostrummagica.entity.EntityGolemEnder;
 import com.smanzana.nostrummagica.entity.EntityGolemFire;
 import com.smanzana.nostrummagica.entity.EntityGolemIce;
 import com.smanzana.nostrummagica.entity.EntityGolemLightning;
@@ -336,7 +337,7 @@ public class SpellAction {
 						// Cap force's magnitude at .2 dist
 						double mod = force.lengthVector();
 						if (mod > dist * .2) {
-							mod = mod / (dist * .2);
+							mod = (dist * .2) / mod;
 							force = new Vec3d(
 									force.xCoord * mod,
 									force.yCoord * mod,
@@ -675,6 +676,8 @@ public class SpellAction {
 				golem = new EntityGolemEarth(world);
 				break;
 			case ENDER:
+				golem = new EntityGolemEnder(world);
+				break;
 			case FIRE:
 				golem = new EntityGolemFire(world);
 				break;

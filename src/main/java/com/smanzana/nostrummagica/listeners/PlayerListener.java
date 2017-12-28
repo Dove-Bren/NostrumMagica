@@ -642,6 +642,20 @@ public class PlayerListener {
 				));
 		SpellTome.addSpell(tome, spell);
 		
+		spell = new Spell("Summon Ender");
+		spell.addPart(new SpellPart(
+				ProjectileTrigger.instance(),
+				new SpellPartParam(0, false)
+				));
+		spell.addPart(new SpellPart(
+				SingleShape.instance(),
+				EMagicElement.ENDER,
+				1,
+				EAlteration.SUMMON,
+				new SpellPartParam(0, false)
+				));
+		SpellTome.addSpell(tome, spell);
+		
 		spell = new Spell("Raze");
 		spell.addPart(new SpellPart(
 				ProjectileTrigger.instance(),

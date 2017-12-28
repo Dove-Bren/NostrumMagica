@@ -465,7 +465,7 @@ public class Spell {
 		case EARTH:
 			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("strength"), duration, amp);
 		case ENDER:
-			break;
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("invisibility"), duration, amp);
 		case FIRE:
 			break;
 		case ICE:
