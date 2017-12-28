@@ -50,4 +50,31 @@ public class AoEShape extends SpellShape {
 		return ret;
 	}
 
+	@Override
+	protected List<BlockPos> getTargetLocations(SpellPartParam param, EntityLivingBase target, World world,
+			BlockPos pos) {
+		List<BlockPos> list = new LinkedList<>();
+		
+		int radius = Math.abs((int) param.level);
+		
+		if (radius == 0) {
+			list.add(pos);
+		} else {
+			for (int i = -radius; i <= radius; i++) {
+				// x loop. I is offset of x
+				int innerRadius = Math.abs(i) - radius;
+				// 0 means just that cell. Otherwise, +- n
+				if (innerRadius == 0) {
+					list.add(pos.add(i, 0, 0));
+				} else {
+					for (int j = -innerRadius; j <= innerRadius; j++) {
+						list.add(pos.add(i, 0, j));
+					}
+				}
+			}
+		}
+		
+		return list;
+	}
+
 }

@@ -557,7 +557,7 @@ public class PlayerListener {
 				));
 		SpellTome.addSpell(tome, spell);
 		
-		spell = new Spell("Summon Mess");
+		spell = new Spell("Summon Physical");
 		spell.addPart(new SpellPart(
 				SelfTrigger.instance(),
 				new SpellPartParam(0, false)
@@ -565,6 +565,20 @@ public class PlayerListener {
 		spell.addPart(new SpellPart(
 				SingleShape.instance(),
 				EMagicElement.PHYSICAL,
+				1,
+				EAlteration.SUMMON,
+				new SpellPartParam(0, false)
+				));
+		SpellTome.addSpell(tome, spell);
+		
+		spell = new Spell("Summon Zapper");
+		spell.addPart(new SpellPart(
+				ProjectileTrigger.instance(),
+				new SpellPartParam(0, false)
+				));
+		spell.addPart(new SpellPart(
+				SingleShape.instance(),
+				EMagicElement.LIGHTNING,
 				1,
 				EAlteration.SUMMON,
 				new SpellPartParam(0, false)

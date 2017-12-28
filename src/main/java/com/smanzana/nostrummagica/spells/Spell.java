@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.potions.MagicResistPotion;
 import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
@@ -461,7 +462,7 @@ public class Spell {
 		case ICE:
 			break; // TODO
 		case LIGHTNING:
-			break;
+			return new SpellAction(caster).status(MagicResistPotion.instance(), duration, amp);
 		case WIND:
 			break;
 		}
@@ -557,7 +558,7 @@ public class Spell {
 		case ICE:
 			break; // TODO
 		case LIGHTNING:
-			break;
+			return new SpellAction(caster).lightning();
 		case WIND:
 			break;
 		}
@@ -567,26 +568,7 @@ public class Spell {
 	
 	private static final SpellAction solveSummon(EntityLivingBase caster, EMagicElement element,
 			int elementCount) {
-		int duration = 20 * 15 * elementCount;
-		int amp = elementCount - 1;
-		switch (element) {
-		case PHYSICAL:
-			return new SpellAction(caster).summon(element, elementCount);
-		case EARTH:
-			break;
-		case ENDER:
-			break;
-		case FIRE:
-			break;
-		case ICE:
-			break; // TODO
-		case LIGHTNING:
-			break;
-		case WIND:
-			break;
-		}
-		
-		return null;
+		return new SpellAction(caster).summon(element, elementCount);
 	}
 	
 	private static final String NBT_SPELL_NAME = "name";

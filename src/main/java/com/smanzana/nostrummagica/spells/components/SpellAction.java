@@ -9,13 +9,16 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 import com.smanzana.nostrummagica.entity.EntityGolem;
+import com.smanzana.nostrummagica.entity.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
+import com.smanzana.nostrummagica.potions.MagicResistPotion;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.boss.EntityDragon;
+import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.monster.EntityEndermite;
 import net.minecraft.entity.player.EntityPlayer;
@@ -524,6 +527,28 @@ public class SpellAction {
 		
 	}
 	
+	private static class LightningEffect implements SpellEffect {
+		
+		public LightningEffect() {
+			
+		}
+		
+		@Override
+		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
+			entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
+			entity.hurtResistantTime = 0;
+			apply(caster, entity.worldObj, entity.getPosition());
+		}
+
+		@Override
+		public void apply(EntityLivingBase caster, World world, BlockPos block) {
+			world.addWeatherEffect(
+					new EntityLightningBolt(world, block.getX() + 0.5, block.getY(), block.getZ() + 0.5, false)
+					);
+		}
+		
+	}
+	
 	private static class SummonEffect implements SpellEffect {
 		private EMagicElement element;
 		private int power;
@@ -585,10 +610,13 @@ public class SpellAction {
 			case FIRE:
 			case ICE:
 			case LIGHTNING:
+				golem = new EntityGolemLightning(world);
+				break;
 			case WIND:
 			default:
 			case PHYSICAL:
 				golem = new EntityGolemPhysical(world);
+				break;
 			}
 			
 			return golem;
@@ -633,6 +661,11 @@ public class SpellAction {
 		boolean light = false;
 		if (target.height < 1.5f || target instanceof EntityEnderman)
 			light = true;
+		
+		PotionEffect resEffect = target.getActivePotionEffect(MagicResistPotion.instance());
+		if (resEffect != null) {
+			base *= Math.pow(.3, resEffect.getAmplifier() + 1);
+		}
 			
 		switch (element) {
 		case ENDER:
@@ -706,6 +739,11 @@ public class SpellAction {
 	
 	public SpellAction summon(EMagicElement element, int power) {
 		effects.add(new SummonEffect(element, power));
+		return this;
+	}
+	
+	public SpellAction lightning() {
+		effects.add(new LightningEffect());
 		return this;
 	}
 }

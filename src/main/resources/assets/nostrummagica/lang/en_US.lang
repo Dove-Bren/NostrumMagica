@@ -11,7 +11,7 @@ tile.skylander_armory_cutting_table_block.name=Cutting Table
 tile.copper_ore.name=Copper Ore
 
 entity.nostrummagica.physical_golem.name=Metal Golem
-
+entity.nostrummagica.lightning_golem.name=Lightining Golem
 entity.nostrummagica.spell_projectile.name=Spell Projectile
 
 itemGroup.nostrummagica=Nostrum Magica
@@ -19,9 +19,6 @@ itemGroup.nostrummagica=Nostrum Magica
 key.cast.desc=Cast Spell
 key.magicscroll.sec=Scroll Spells (+ MouseWheel)
 key.nostrummagica.desc=Nostrum Magica
-
-text.smith_level=Smith Level:
-text.smith_level.name=nope it has name:
 
 death.attack.magic.PHYSICAL=%1$s was killed by %2$s using physical energies
 death.attack.magic.WIND=%1$s was sliced to pieces by %2$s's wind magic

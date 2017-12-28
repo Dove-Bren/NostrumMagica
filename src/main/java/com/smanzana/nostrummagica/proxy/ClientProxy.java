@@ -86,7 +86,7 @@ public class ClientProxy extends CommonProxy {
 			ItemStack tome = NostrumMagica.getCurrentTome(Minecraft.getMinecraft().thePlayer);
 			if (tome != null) {
 				if (bindingScroll.isKeyDown()) {
-					wheel = (wheel > 0 ? 1 : -1);
+					wheel = (wheel > 0 ? -1 : 1);
 					SpellTome.incrementIndex(tome, wheel);
 					event.setCanceled(true);
 				}

@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagicStorage;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
+import com.smanzana.nostrummagica.entity.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
 import com.smanzana.nostrummagica.items.SpellTome;
@@ -41,6 +42,13 @@ public class CommonProxy {
     	registerTriggers();
     	
     	int entityID = 0;
+    	EntityRegistry.registerModEntity(EntitySpellProjectile.class, "spell_projectile",
+    			entityID++,
+    			NostrumMagica.instance,
+    			64,
+    			1,
+    			true
+    			);
     	EntityRegistry.registerModEntity(EntityGolemPhysical.class, "physical_golem",
     			entityID++,
     			NostrumMagica.instance,
@@ -48,12 +56,12 @@ public class CommonProxy {
     			1,
     			false
     			);
-    	EntityRegistry.registerModEntity(EntitySpellProjectile.class, "spell_projectile",
+    	EntityRegistry.registerModEntity(EntityGolemLightning.class, "lightning_golem",
     			entityID++,
     			NostrumMagica.instance,
     			64,
     			1,
-    			true
+    			false
     			);
 	}
 	

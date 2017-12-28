@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.entity;
 
 import java.util.Random;
 
+import com.smanzana.nostrummagica.NostrumMagica;
+
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;
 
@@ -152,15 +154,34 @@ public class GolemTask extends EntityAIBase {
 		if (aux && auxCooldown <= 0 && golem.ticksExisted > 100) {
 			// Can do aux skill if not in melee
 			if (!inMelee) {
-				// Figure out who to do it to. First think of ourselves
-				if (golem.shouldDoBuff(golem)) {
-					golem.doBuffTask(golem);
-				} else if (distOwner < 15) {
-					golem.doBuffTask(owner);
+				// Figure out who to do it to.
+				// Usually do ourselves, but have a chance to aid master first
+				EntityLivingBase first = golem;
+				EntityLivingBase second = owner;
+				if (NostrumMagica.rand.nextFloat() < .2f) {
+					first = owner;
+					second = golem;
+				}
+				boolean should = golem.shouldDoBuff(first);
+				if (should && first == owner) {
+					should = distOwner <= RANGE_SQR;
 				}
 				
-				auxCooldown = 20 * 5 * (1 + GolemTask.rand.nextInt(3));
-				done = true;
+				if (should) {
+					golem.doBuffTask(first);
+				} else {
+					should = golem.shouldDoBuff(second);
+					if (should && second == owner)
+						should = distOwner <= RANGE_SQR;
+					
+					if (should)
+						golem.doBuffTask(second);
+				}
+				
+				if (should) {
+					auxCooldown = 20 * 5 * (1 + GolemTask.rand.nextInt(3));
+					done = true;
+				}
 			}
 		}
 
@@ -222,15 +243,17 @@ public class GolemTask extends EntityAIBase {
 			}
 		} else if (range) {
 			
+			success = true;
 			double dist = golem.getDistanceSq(target.posX, target.getEntityBoundingBox().minY, target.posZ);
 
-            if (dist <= RANGE_SQR)
+            if (dist <= RANGE_SQR - 125.0 && golem.canEntityBeSeen(target))
             {
             	golem.getNavigator().clearPathEntity();
                 ++this.strafeTime;
             }
             else
             {
+                this.strafeTime = -1;
             	if (updateCooldown > 0)
             		updateCooldown--;
             	
@@ -239,7 +262,6 @@ public class GolemTask extends EntityAIBase {
             	
             	golem.getNavigator().clearPathEntity();
             	golem.getNavigator().tryMoveToEntityLiving(target, 1.0);
-                this.strafeTime = -1;
                 this.updateCooldown = 5;
             }
 

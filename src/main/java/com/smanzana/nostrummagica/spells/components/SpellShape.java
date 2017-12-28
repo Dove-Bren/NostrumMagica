@@ -53,10 +53,18 @@ public abstract class SpellShape {
 			pos = new BlockPos(vec.xCoord, vec.yCoord, vec.zCoord);
 		}
 		
-		System.out.println("Shape perform " + (target == null ? " with no entity!" : " :)"));
-		for (EntityLivingBase ent : getTargets(param, target, world, pos)) {
+		List<EntityLivingBase> entTargets = getTargets(param, target, world, pos);
+		if (entTargets != null && !entTargets.isEmpty())
+		for (EntityLivingBase ent : entTargets) {
 			if (ent != null)
 				action.apply(ent);
+		}
+		
+		List<BlockPos> blockTargets = getTargetLocations(param, target, world, pos);
+		if (blockTargets != null && !blockTargets.isEmpty())
+		for (BlockPos bp : blockTargets) {
+			if (bp != null)
+				action.apply(world, bp);
 		}
 	}
 	
@@ -70,6 +78,18 @@ public abstract class SpellShape {
 	 * @return
 	 */
 	protected abstract List<EntityLivingBase> getTargets(SpellPartParam param, EntityLivingBase target, World world, BlockPos pos);
+	
+	/**
+	 * Returns all blockPOS that are affected when using this shape.
+	 * This is called in addition to getTargets (which returns entities).
+	 * Target may be null. Work positions should not be.
+	 * @param param
+	 * @param target
+	 * @param world
+	 * @param pos
+	 * @return
+	 */
+	protected abstract List<BlockPos> getTargetLocations(SpellPartParam param, EntityLivingBase target, World world, BlockPos pos);
 	
 	
 }

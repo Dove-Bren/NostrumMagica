@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,6 +40,7 @@ public class NostrumMagica
 {
     public static final String MODID = "nostrummagica";
     public static final String VERSION = "1.0";
+	public static final Random rand = new Random();
     
     @SidedProxy(clientSide="com.smanzana.nostrummagica.proxy.ClientProxy", serverSide="com.smanzana.nostrummagica.proxy.CommonProxy")
     public static CommonProxy proxy;

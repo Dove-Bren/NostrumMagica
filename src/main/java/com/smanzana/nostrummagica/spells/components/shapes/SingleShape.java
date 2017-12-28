@@ -28,7 +28,19 @@ public class SingleShape extends SpellShape {
 
 	@Override
 	protected List<EntityLivingBase> getTargets(SpellPartParam param, EntityLivingBase target, World world, BlockPos pos) {
-		return Lists.newArrayList(target);
+		if (target != null)
+			return Lists.newArrayList(target);
+		
+		return null;
+	}
+
+	@Override
+	protected List<BlockPos> getTargetLocations(SpellPartParam param, EntityLivingBase target, World world,
+			BlockPos pos) {
+		if (target != null)
+			return null;
+		
+		return Lists.newArrayList(pos);
 	}
 
 }
