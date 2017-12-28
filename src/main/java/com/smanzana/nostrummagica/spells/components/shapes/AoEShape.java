@@ -62,7 +62,7 @@ public class AoEShape extends SpellShape {
 		} else {
 			for (int i = -radius; i <= radius; i++) {
 				// x loop. I is offset of x
-				int innerRadius = Math.abs(i) - radius;
+				int innerRadius = radius - Math.abs(i);
 				// 0 means just that cell. Otherwise, +- n
 				if (innerRadius == 0) {
 					list.add(pos.add(i, 0, 0));

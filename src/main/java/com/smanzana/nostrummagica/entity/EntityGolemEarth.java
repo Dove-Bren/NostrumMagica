@@ -1,0 +1,102 @@
+package com.smanzana.nostrummagica.entity;
+
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
+import com.smanzana.nostrummagica.spells.EAlteration;
+import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.Spell.SpellPart;
+import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
+import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
+
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.potion.Potion;
+import net.minecraft.world.World;
+
+public class EntityGolemEarth extends EntityGolem {
+	
+	private static Spell spellBuff1;
+	private static Spell spellBuff2;
+	
+	private static void init() {
+		if (spellBuff1 == null) {
+			spellBuff1 = new Spell("Earthern Shield", true);
+			spellBuff1.addPart(new SpellPart(AITargetTrigger.instance()));
+			spellBuff1.addPart(new SpellPart(SingleShape.instance(),
+					EMagicElement.EARTH,
+					1,
+					EAlteration.SUPPORT));
+			
+			spellBuff2 = new Spell("Impact Enchantment", true);
+			spellBuff2.addPart(new SpellPart(AITargetTrigger.instance()));
+			spellBuff2.addPart(new SpellPart(SingleShape.instance(),
+					EMagicElement.EARTH,
+					1,
+					EAlteration.RESIST));
+		}
+	}
+
+	public EntityGolemEarth(World worldIn) {
+		super(worldIn, true, false, true);
+	}
+
+	@Override
+	public void doMeleeTask(EntityLivingBase target) {
+		this.attackEntityAsMob(target);
+	}
+
+	@Override
+	public void doRangeTask(EntityLivingBase target) {
+		; // shoudln't happen
+	}
+
+	@Override
+	public void doBuffTask(EntityLivingBase target) {
+		EntityGolemEarth.init();
+		
+		EntityLivingBase targ = this.getAttackTarget();
+		if (targ != target)
+			this.setAttackTarget(target);
+		
+		boolean canStrength = target.getActivePotionEffect(Potion.getPotionFromResourceLocation("strength")) == null;
+		boolean canShield = target.getActivePotionEffect(PhysicalShieldPotion.instance()) == null;
+		
+		Spell spell;
+		if (canStrength && canShield) {
+			if (NostrumMagica.rand.nextBoolean())
+				spell = spellBuff1;
+			else
+				spell = spellBuff2;
+		} else if (canStrength)
+			spell = spellBuff2;
+		else
+			spell = spellBuff1;	
+		
+		spell.cast(this);
+		
+		if (targ != target)
+			this.setAttackTarget(targ);
+	}
+
+	@Override
+	public boolean shouldDoBuff(EntityLivingBase target) {
+		return target.getActivePotionEffect(Potion.getPotionFromResourceLocation("strength")) == null
+				|| target.getActivePotionEffect(PhysicalShieldPotion.instance()) == null;
+	}
+
+	@Override
+	public void initGolemAttributes() {
+        this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.20D);
+
+        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20.0D);
+
+        this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(8.0D);
+        this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(12.0D);
+	}
+
+	@Override
+	public String getTextureKey() {
+		return "earth";
+	}
+}

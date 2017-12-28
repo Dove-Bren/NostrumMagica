@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagicStorage;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
+import com.smanzana.nostrummagica.entity.EntityGolemFire;
 import com.smanzana.nostrummagica.entity.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
@@ -13,6 +14,9 @@ import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
+import com.smanzana.nostrummagica.potions.MagicResistPotion;
+import com.smanzana.nostrummagica.potions.MagicShieldPotion;
+import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
 import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
@@ -63,6 +67,13 @@ public class CommonProxy {
     			1,
     			false
     			);
+    	EntityRegistry.registerModEntity(EntityGolemFire.class, "fire_golem",
+    			entityID++,
+    			NostrumMagica.instance,
+    			64,
+    			1,
+    			false
+    			);
 	}
 	
 	public void init() {
@@ -88,6 +99,9 @@ public class CommonProxy {
     
     private void registerPotions() {
     	RootedPotion.instance();
+    	MagicResistPotion.instance();
+    	PhysicalShieldPotion.instance();
+    	MagicShieldPotion.instance();
     }
     
     private void registerItems() {

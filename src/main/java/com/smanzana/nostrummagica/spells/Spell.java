@@ -6,6 +6,8 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.potions.MagicResistPotion;
+import com.smanzana.nostrummagica.potions.MagicShieldPotion;
+import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
 import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
@@ -353,13 +355,13 @@ public class Spell {
 		
 		for (SpellPart part : parts) {
 			if (part.isTrigger())
-				total += 5f;
-			else {
 				total += 2f;
+			else {
+				total += 1f;
 				if (part.getElementCount() > 1)
-					total += (float) (Math.pow(3, part.getElementCount() - 1));
+					total += (float) (Math.pow(2, part.getElementCount() - 1));
 				if (part.getAlteration() != null)
-					total += 10f;
+					total += 5f;
 			}
 		}
 		
@@ -478,15 +480,15 @@ public class Spell {
 		case PHYSICAL:
 			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("absorption"), duration * 5, amp);
 		case EARTH:
-			break;
+			return new SpellAction(caster).status(PhysicalShieldPotion.instance(), duration, amp);
 		case ENDER:
 			break;
 		case FIRE:
-			break;
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("fire_resistance"), duration, amp);
 		case ICE:
-			break; // TODO
+			return new SpellAction(caster).status(MagicShieldPotion.instance(), duration, amp);
 		case LIGHTNING:
-			break;
+			break; // TODO
 		case WIND:
 			break;
 		}
@@ -506,7 +508,7 @@ public class Spell {
 		case ENDER:
 			break;
 		case FIRE:
-			break;
+			return new SpellAction(caster).burnArmor(elementCount);
 		case ICE:
 			break; // TODO
 		case LIGHTNING:
@@ -554,7 +556,7 @@ public class Spell {
 		case ENDER:
 			break;
 		case FIRE:
-			break;
+			return new SpellAction(caster).burn(0);
 		case ICE:
 			break; // TODO
 		case LIGHTNING:
@@ -783,6 +785,24 @@ public class Spell {
 		}
 		
 		return descriptionCache;
+	}
+
+	public boolean isEmpty() {
+		if (parts.isEmpty())
+			return true;
+		
+		boolean trig = false;
+		for (SpellPart part : parts) {
+			if (part.isTrigger()) {
+				trig = true;
+				continue;
+			}
+				
+			 if (!part.isTrigger() && trig)
+				 return false;
+		}
+		
+		return true;
 	}
 	
 }

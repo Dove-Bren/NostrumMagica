@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import com.smanzana.nostrummagica.capabilities.AttributeProvider;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.SpellTome;
+import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
 import com.smanzana.nostrummagica.listeners.PlayerListener;
 import com.smanzana.nostrummagica.proxy.CommonProxy;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -49,6 +50,7 @@ public class NostrumMagica
     public static CreativeTabs creativeTab;
     public static Logger logger = LogManager.getLogger(MODID);
     public static PlayerListener playerListener;
+    public static MagicEffectProxy magicEffectProxy;
     
     public static SpellRegistry spellRegistry;
     private File spellRegistryFile; 
@@ -62,6 +64,7 @@ public class NostrumMagica
     public void preinit(FMLPreInitializationEvent event) {
     	instance = this;
     	playerListener = new PlayerListener();
+    	magicEffectProxy = new MagicEffectProxy();
     	
     	NostrumMagica.creativeTab = new CreativeTabs(MODID){
 	    	@Override

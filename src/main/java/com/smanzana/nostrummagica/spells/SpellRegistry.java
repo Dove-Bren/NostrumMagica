@@ -111,7 +111,8 @@ public class SpellRegistry {
 		
 		for (Entry<Integer, Spell> entry : registry.entrySet()) {
 			if (transients.isEmpty() || !transients.contains(entry.getKey()))
-				nbt.setTag(entry.getKey() + "", entry.getValue().toNBT());
+				if (!entry.getValue().isEmpty())
+					nbt.setTag(entry.getKey() + "", entry.getValue().toNBT());
 		}
 		
 		return nbt;

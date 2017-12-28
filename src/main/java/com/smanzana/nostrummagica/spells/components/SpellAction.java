@@ -9,9 +9,11 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 import com.smanzana.nostrummagica.entity.EntityGolem;
+import com.smanzana.nostrummagica.entity.EntityGolemFire;
 import com.smanzana.nostrummagica.entity.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
 import com.smanzana.nostrummagica.potions.MagicResistPotion;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.block.Block;
@@ -41,7 +43,7 @@ import net.minecraft.world.World;
 
 public class SpellAction {
 	
-	private static class MagicDamageSource extends EntityDamageSource {
+	public static class MagicDamageSource extends EntityDamageSource {
 		
 		private EMagicElement element;
 		
@@ -54,8 +56,12 @@ public class SpellAction {
 		public ITextComponent getDeathMessage(EntityLivingBase entityLivingBaseIn) {
 			
 	        String untranslated = "death.attack.magic." + element.name();
-	        return new TextComponentTranslation(untranslated, new Object[] {entityLivingBaseIn, this.damageSourceEntity});
+	        return new TextComponentTranslation(untranslated, new Object[] {entityLivingBaseIn.getDisplayName(), this.damageSourceEntity.getDisplayName()});
 	    }
+
+		public EMagicElement getElement() {
+			return element;
+		}
 	};
 
 	private static interface SpellEffect {
@@ -514,12 +520,16 @@ public class SpellAction {
 		
 		@Override
 		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
+			if (duration == 0)
+				return; // Nope
+			
 			entity.setFire((int) Math.ceil((float) duration / 20.0f));
 		}
 
 		@Override
 		public void apply(EntityLivingBase caster, World world, BlockPos block) {
-			block.add(0, 1, 0);
+			if (!world.isAirBlock(block))
+				block.add(0, 1, 0);
 			if (world.isAirBlock(block)) {
 				world.setBlockState(block, Blocks.FIRE.getDefaultState());
 			}
@@ -608,6 +618,8 @@ public class SpellAction {
 			case EARTH:
 			case ENDER:
 			case FIRE:
+				golem = new EntityGolemFire(world);
+				break;
 			case ICE:
 			case LIGHTNING:
 				golem = new EntityGolemLightning(world);
@@ -621,6 +633,47 @@ public class SpellAction {
 			
 			return golem;
 		}
+	}
+	
+	private static class BurnArmorEffect implements SpellEffect {
+		
+		private int level;
+		
+		public BurnArmorEffect(int level) {
+			this.level = level;
+		}
+		
+		@Override
+		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
+			int amount = 20 * level;
+			if (level > 2)
+				amount *= 2;
+			
+			int count = 0;
+			for (ItemStack equip : entity.getArmorInventoryList()) {
+				if (equip == null)
+					continue;
+				
+				count++;
+			}
+			if (count != 0) {
+				for (ItemStack equip : entity.getArmorInventoryList()) {
+					if (equip == null)
+						continue;
+					equip.damageItem(amount/count, entity);
+				}
+			}
+			
+			NostrumMagicaSounds.MELT_METAL.play(entity);
+			entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
+			entity.hurtResistantTime = 0;
+		}
+
+		@Override
+		public void apply(EntityLivingBase caster, World world, BlockPos block) {
+			;
+		}
+		
 	}
 	
 	private EntityLivingBase source;
@@ -744,6 +797,11 @@ public class SpellAction {
 	
 	public SpellAction lightning() {
 		effects.add(new LightningEffect());
+		return this;
+	}
+	
+	public SpellAction burnArmor(int power) {
+		effects.add(new BurnArmorEffect(power));
 		return this;
 	}
 }

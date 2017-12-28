@@ -1,7 +1,6 @@
 package com.smanzana.nostrummagica.entity;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.potions.MagicResistPotion;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -14,45 +13,52 @@ import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.item.ItemStack;
+import net.minecraft.potion.Potion;
 import net.minecraft.world.World;
 
-public class EntityGolemLightning extends EntityGolem {
-	
-	private static final AttributeModifier MOVEMENT_STORM_MODIFIER
-		= new AttributeModifier("lightning_storm_boost", .2, 1);
+public class EntityGolemFire extends EntityGolem {
 	
 	private static Spell spellRanged1;
 	private static Spell spellRanged2;
+	private static Spell spellRanged3;
 	private static Spell spellBuff;
 	
 	private static void init() {
 		if (spellRanged1 == null) {
-			spellRanged1 = new Spell("Lightning Strike", true);
-			spellRanged1.addPart(new SpellPart(AITargetTrigger.instance()));
+			spellRanged1 = new Spell("Fireball", true);
+			spellRanged1.addPart(new SpellPart(ProjectileTrigger.instance()));
 			spellRanged1.addPart(new SpellPart(SingleShape.instance(),
-					EMagicElement.LIGHTNING,
+					EMagicElement.FIRE,
 					1,
-					EAlteration.CONJURE));
+					null));
 			
-			spellRanged2 = new Spell("Spark", true);
+			spellRanged2 = new Spell("Blaze", true);
 			spellRanged2.addPart(new SpellPart(ProjectileTrigger.instance()));
 			spellRanged2.addPart(new SpellPart(AoEShape.instance(),
-					EMagicElement.LIGHTNING,
+					EMagicElement.FIRE,
 					1,
-					null,
+					EAlteration.CONJURE,
+					new SpellPartParam(2, false)));
+			
+			spellRanged3 = new Spell("Melt Armor", true);
+			spellRanged3.addPart(new SpellPart(ProjectileTrigger.instance()));
+			spellRanged3.addPart(new SpellPart(SingleShape.instance(),
+					EMagicElement.FIRE,
+					1,
+					EAlteration.GROWTH,
 					new SpellPartParam(1, false)));
 			
-			spellBuff = new Spell("Magic Ward", true);
+			spellBuff = new Spell("Fire Shield", true);
 			spellBuff.addPart(new SpellPart(AITargetTrigger.instance()));
 			spellBuff.addPart(new SpellPart(SingleShape.instance(),
-					EMagicElement.LIGHTNING,
+					EMagicElement.FIRE,
 					1,
-					EAlteration.RESIST));
+					EAlteration.SUPPORT));
 		}
 	}
 
-	public EntityGolemLightning(World worldIn) {
+	public EntityGolemFire(World worldIn) {
 		super(worldIn, false, true, true);
 	}
 
@@ -63,17 +69,28 @@ public class EntityGolemLightning extends EntityGolem {
 
 	@Override
 	public void doRangeTask(EntityLivingBase target) {
-		EntityGolemLightning.init();
+		EntityGolemFire.init();
 		
 		// Pick a spell to do
 		EntityLivingBase targ = this.getAttackTarget();
 		if (targ != target)
 			this.setAttackTarget(target);
 		
-		if (NostrumMagica.rand.nextFloat() <= 0.3f) {
-			spellRanged1.cast(this);
-		} else {
+		boolean canBurnArmor = false;
+		for (ItemStack item : target.getArmorInventoryList()) {
+			if (item == null)
+				continue;
+			
+			canBurnArmor = true;
+			break;
+		}
+		
+		if (canBurnArmor && NostrumMagica.rand.nextFloat() <= 0.2f) {
+			spellRanged3.cast(this);
+		}else if (NostrumMagica.rand.nextFloat() < 0.3f) {
 			spellRanged2.cast(this);
+		} else {
+			spellRanged1.cast(this);
 		}
 		
 		if (targ != target)
@@ -82,7 +99,7 @@ public class EntityGolemLightning extends EntityGolem {
 
 	@Override
 	public void doBuffTask(EntityLivingBase target) {
-		EntityGolemLightning.init();
+		EntityGolemFire.init();
 		
 		EntityLivingBase targ = this.getAttackTarget();
 		if (targ != target)
@@ -96,42 +113,21 @@ public class EntityGolemLightning extends EntityGolem {
 
 	@Override
 	public boolean shouldDoBuff(EntityLivingBase target) {
-		return target.getActivePotionEffect(MagicResistPotion.instance()) == null;
+		return target.getActivePotionEffect(Potion.getPotionFromResourceLocation("fire_resistance")) == null;
 	}
 
 	@Override
 	public void initGolemAttributes() {
-        this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.25D);
+        this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.22D);
 
-        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(14.0D);
+        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(18.0D);
 
-        this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(2.0D);
+        this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(6.0D);
         this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(6.0D);
 	}
 
 	@Override
 	public String getTextureKey() {
-		return "lightning";
+		return "fire";
 	}
-	
-	private boolean activeAttribMod = false;
-	@Override
-	public void onUpdate() {
-		if (worldObj.isRainingAt(this.getPosition())) {
-			if (!activeAttribMod) {
-				this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED)
-					.applyModifier(MOVEMENT_STORM_MODIFIER);
-				activeAttribMod = true;
-			}
-		} else {
-			if (activeAttribMod) {
-				this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED)
-					.removeModifier(MOVEMENT_STORM_MODIFIER);
-				activeAttribMod = false;
-			}
-		}
-		
-		super.onUpdate();
-	}
-
 }
