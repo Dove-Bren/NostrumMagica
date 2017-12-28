@@ -628,6 +628,20 @@ public class PlayerListener {
 				));
 		SpellTome.addSpell(tome, spell);
 		
+		spell = new Spell("Summon Wind");
+		spell.addPart(new SpellPart(
+				ProjectileTrigger.instance(),
+				new SpellPartParam(0, false)
+				));
+		spell.addPart(new SpellPart(
+				SingleShape.instance(),
+				EMagicElement.WIND,
+				1,
+				EAlteration.SUMMON,
+				new SpellPartParam(0, false)
+				));
+		SpellTome.addSpell(tome, spell);
+		
 		spell = new Spell("Raze");
 		spell.addPart(new SpellPart(
 				ProjectileTrigger.instance(),
@@ -708,6 +722,34 @@ public class PlayerListener {
 				EMagicElement.ICE,
 				1,
 				EAlteration.INFLICT,
+				new SpellPartParam(0, false)
+				));
+		SpellTome.addSpell(tome, spell);
+		
+		spell = new Spell("Push");
+		spell.addPart(new SpellPart(
+				SelfTrigger.instance(),
+				new SpellPartParam(0, false)
+				));
+		spell.addPart(new SpellPart(
+				SingleShape.instance(),
+				EMagicElement.WIND,
+				1,
+				EAlteration.RESIST,
+				new SpellPartParam(0, false)
+				));
+		SpellTome.addSpell(tome, spell);
+		
+		spell = new Spell("Pull");
+		spell.addPart(new SpellPart(
+				SelfTrigger.instance(),
+				new SpellPartParam(0, false)
+				));
+		spell.addPart(new SpellPart(
+				SingleShape.instance(),
+				EMagicElement.LIGHTNING,
+				1,
+				EAlteration.SUPPORT,
 				new SpellPartParam(0, false)
 				));
 		SpellTome.addSpell(tome, spell);

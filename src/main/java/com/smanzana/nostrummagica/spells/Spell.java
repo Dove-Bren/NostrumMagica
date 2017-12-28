@@ -473,7 +473,7 @@ public class Spell {
 		case LIGHTNING:
 			return new SpellAction(caster).status(MagicResistPotion.instance(), duration, amp);
 		case WIND:
-			break;
+			return new SpellAction(caster).push(5f + (2 * amp), elementCount);
 		}
 		
 		return null;
@@ -489,15 +489,15 @@ public class Spell {
 		case EARTH:
 			return new SpellAction(caster).status(PhysicalShieldPotion.instance(), duration, amp);
 		case ENDER:
-			break;
+			break; // TODO
 		case FIRE:
 			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("fire_resistance"), duration, amp);
 		case ICE:
 			return new SpellAction(caster).status(MagicShieldPotion.instance(), duration, amp);
 		case LIGHTNING:
-			break; // TODO
+			return new SpellAction(caster).pull(5 * elementCount, elementCount);
 		case WIND:
-			break;
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("speed"), duration, amp);
 		}
 		
 		return null;

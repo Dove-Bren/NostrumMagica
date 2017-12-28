@@ -136,6 +136,8 @@ public class GolemTask extends EntityAIBase {
 		boolean done = false;
 		boolean again = true;
 		
+		boolean ownerCritical = owner.getHealth() < (owner.getMaxHealth() * .35f);
+		
 		// First, we try to move.
 		
 		// Else don't execute task
@@ -153,12 +155,15 @@ public class GolemTask extends EntityAIBase {
 		// Does not check done so we can do even when target is dead
 		if (aux && auxCooldown <= 0 && golem.ticksExisted > 100) {
 			// Can do aux skill if not in melee
-			if (!inMelee) {
+			if (!inMelee || ownerCritical) {
 				// Figure out who to do it to.
 				// Usually do ourselves, but have a chance to aid master first
 				EntityLivingBase first = golem;
 				EntityLivingBase second = owner;
-				if (NostrumMagica.rand.nextFloat() < .2f) {
+				if (ownerCritical) {
+					first = owner;
+					second = golem;
+				} else if(NostrumMagica.rand.nextFloat() < .2f) {
 					first = owner;
 					second = golem;
 				}
@@ -236,9 +241,6 @@ public class GolemTask extends EntityAIBase {
 			success = golem.getNavigator().tryMoveToEntityLiving(target, 1.0);
 			if (success) {
 				updateCooldown = 5;
-				
-				// TODO testing
-				golem.posY += .5;
 			}
 		} else if (range) {
 			

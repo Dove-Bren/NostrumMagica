@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.entity.EntityGolemFire;
 import com.smanzana.nostrummagica.entity.EntityGolemIce;
 import com.smanzana.nostrummagica.entity.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
+import com.smanzana.nostrummagica.entity.EntityGolemWind;
 import com.smanzana.nostrummagica.potions.MagicResistPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -324,7 +325,7 @@ public class SpellAction {
 					// If pull, cap magnitude so that it doesn't fly past player
 					
 					Vec3d force;
-					Vec3d direction = center.subtract(e.getPositionVector()).normalize();
+					Vec3d direction = e.getPositionVector().subtract(center).normalize();
 					force = new Vec3d(
 							direction.xCoord * magnitude,
 							direction.yCoord * magnitude,
@@ -684,6 +685,8 @@ public class SpellAction {
 				golem = new EntityGolemLightning(world);
 				break;
 			case WIND:
+				golem = new EntityGolemWind(world);
+				break;
 			default:
 			case PHYSICAL:
 				golem = new EntityGolemPhysical(world);
@@ -835,7 +838,7 @@ public class SpellAction {
 	}
 	
 	public SpellAction pull(float radius, int level) {
-		effects.add(new PushEffect(radius, level));
+		effects.add(new PushEffect(radius, -level));
 		return this;
 	}
 	

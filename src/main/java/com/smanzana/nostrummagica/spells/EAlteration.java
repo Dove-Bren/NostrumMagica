@@ -13,7 +13,7 @@ public enum EAlteration {
 	ENCHANT("Enchant", 40),
 	CONJURE("Conjure", 30),
 	SUMMON("Summon", 50),
-	ALTER("Alter", 30);
+	ALTER("Alter", 40);
 	
 	private ResourceLocation glyph;
 	private String name;
