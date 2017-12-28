@@ -15,7 +15,6 @@ import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -154,8 +153,8 @@ public class SpellTome extends Item implements GuiBook {
 		
 		nbt.setInteger(NBT_INDEX, index);
 		
-		if (initial != index)
-			NostrumMagicaSounds.UI_TICK.play(Minecraft.getMinecraft().thePlayer);
+		if (initial != index && !NostrumMagica.proxy.isServer())
+			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
 	}
 	
 	public static void setIndex(ItemStack itemStack, int index) {
