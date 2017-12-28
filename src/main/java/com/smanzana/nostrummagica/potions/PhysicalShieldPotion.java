@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.potions;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
@@ -38,6 +39,8 @@ public class PhysicalShieldPotion extends Potion {
 		//NostrumMagica.specialEffectProxy
 		int armor = 4 * (int) Math.pow(2, amplifier);
 		NostrumMagica.magicEffectProxy.apply(SpecialEffect.SHIELD_PHYSICAL, (double) armor, entity);
+		
+		NostrumMagicaSounds.SHIELD_APPLY.play(entity);
 		
 		super.applyAttributesModifiersToEntity(entity, attributeMap, amplifier);
 	}

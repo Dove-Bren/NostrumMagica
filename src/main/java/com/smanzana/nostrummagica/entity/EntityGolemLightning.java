@@ -114,20 +114,19 @@ public class EntityGolemLightning extends EntityGolem {
 		return "lightning";
 	}
 	
-	private boolean activeAttribMod = false;
 	@Override
 	public void onUpdate() {
 		if (worldObj.isRainingAt(this.getPosition())) {
-			if (!activeAttribMod) {
+			if (!this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED)
+					.hasModifier(MOVEMENT_STORM_MODIFIER)) {
 				this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED)
 					.applyModifier(MOVEMENT_STORM_MODIFIER);
-				activeAttribMod = true;
 			}
 		} else {
-			if (activeAttribMod) {
+			if (this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED)
+					.hasModifier(MOVEMENT_STORM_MODIFIER)) {
 				this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED)
 					.removeModifier(MOVEMENT_STORM_MODIFIER);
-				activeAttribMod = false;
 			}
 		}
 		

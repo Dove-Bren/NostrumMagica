@@ -12,6 +12,8 @@ import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
+import net.minecraft.entity.EntityLivingBase;
+
 public interface INostrumMagic {
 
 	// Unlock
@@ -92,4 +94,5 @@ public interface INostrumMagic {
 	public void deserializeSpells(String crc);
 	// Copy fields out of
 	public void copy(INostrumMagic cap);
+	public void provideEntity(EntityLivingBase entity);
 }

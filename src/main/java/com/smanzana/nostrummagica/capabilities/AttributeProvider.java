@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.capabilities;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
@@ -12,7 +14,12 @@ public class AttributeProvider implements ICapabilitySerializable<NBTBase> {
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
 	private INostrumMagic instance = CAPABILITY.getDefaultInstance();
+	private Entity entity;
 	
+	public AttributeProvider(Entity object) {
+		this.entity = object;
+	}
+
 	@Override
 	public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
 		return capability == CAPABILITY;
@@ -21,8 +28,11 @@ public class AttributeProvider implements ICapabilitySerializable<NBTBase> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-		if (capability == CAPABILITY)
+		if (capability == CAPABILITY) {
+			if (entity instanceof EntityLivingBase)
+				this.instance.provideEntity((EntityLivingBase) entity);
 			return (T) this.instance;
+		}
 		
 		return null;
 	}

@@ -32,15 +32,23 @@ public enum NostrumMagicaSounds {
 	CAST_CONTINUE("spell.cast.continue", SoundCategory.AMBIENT),
 	CAST_FAIL("spell.cast.fail", SoundCategory.AMBIENT),
 	LEVELUP("player.levelup", SoundCategory.AMBIENT),
-	UI_TICK("ui.tick", SoundCategory.AMBIENT),
+	UI_TICK("ui.tick", SoundCategory.AMBIENT, .4f),
 	AMBIENT_WOOSH("ambient.woosh", SoundCategory.AMBIENT);
 	
 	private ResourceLocation resource;
 	private SoundCategory category;
+	private SoundEvent event;
+	private float volume;
 	
 	private NostrumMagicaSounds(String suffix, SoundCategory category) {
+		this(suffix, category, 1.0f);
+	}
+	
+	private NostrumMagicaSounds(String suffix, SoundCategory category, float volume) {
 		this.resource = new ResourceLocation(NostrumMagica.MODID, suffix);
 		this.category = category;
+		this.event = new SoundEvent(resource);
+		this.volume = volume;
 	}
 	
 	public ResourceLocation getLocation() {
@@ -57,18 +65,22 @@ public enum NostrumMagicaSounds {
 	
 	public void play(World world, double x, double y, double z) {
 		world.playSound(x, y, z,
-				SoundEvent.REGISTRY.getObject(NostrumMagicaSounds.MELT_METAL.getLocation()),
-				category, 1.0f, 0.8f + (NostrumMagica.rand.nextFloat() * 0.4f), false);
+				event, category,
+				volume, 0.8f + (NostrumMagica.rand.nextFloat() * 0.4f), false);
+		System.out.println("Played sound " + this.name());
 	}
 	
 	public static void registerSounds() {
 		int idOffset = SoundEvent.REGISTRY.getKeys().size();
 		
 		for (NostrumMagicaSounds sound : values()) {
-			SoundEvent event = new SoundEvent(sound.resource);
-			SoundEvent.REGISTRY.register(idOffset++, sound.resource, event);
+			SoundEvent.REGISTRY.register(idOffset++, sound.resource, sound.event);
 		}
 		
+	}
+
+	public SoundEvent getEvent() {
+		return event;
 	}
 	
 }

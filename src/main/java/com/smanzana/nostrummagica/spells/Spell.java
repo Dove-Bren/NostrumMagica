@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.potions.MagicResistPotion;
 import com.smanzana.nostrummagica.potions.MagicShieldPotion;
 import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
 import com.smanzana.nostrummagica.potions.RootedPotion;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
@@ -101,6 +102,10 @@ public class Spell {
 				
 				// targs is correct (targets or others) based on last spell shape (or
 				// just targets if no previous shape)
+				
+				if (index > 0) {
+					NostrumMagicaSounds.CAST_CONTINUE.play(self);
+				}
 				
 				if (targs != null && !targs.isEmpty()) {
 					if (targs.size() == 1) {
@@ -296,9 +301,10 @@ public class Spell {
 	}
 	
 	public void cast(EntityLivingBase caster) {
-		System.out.println("Casting " + this.name);
 		SpellState state = new SpellState(caster);
 		state.trigger(Lists.newArrayList(caster), null, null, null);
+		
+		NostrumMagicaSounds.CAST_LAUNCH.play(caster);
 	}
 	
 	public String crc() {
@@ -456,7 +462,7 @@ public class Spell {
 		case PHYSICAL:
 			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("resistance"), duration, amp);
 		case EARTH:
-			break;
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("strength"), duration, amp);
 		case ENDER:
 			break;
 		case FIRE:

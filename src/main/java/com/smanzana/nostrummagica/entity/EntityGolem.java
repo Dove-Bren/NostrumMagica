@@ -2,6 +2,9 @@ package com.smanzana.nostrummagica.entity;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
@@ -38,6 +41,7 @@ public abstract class EntityGolem extends EntityTameable {
 	protected boolean hasBuff;
 	
 	private GolemTask gTask;
+	private int idleCooldown;
 	
     protected EntityGolem(World worldIn, boolean melee, boolean range, boolean buff)
     {
@@ -51,6 +55,8 @@ public abstract class EntityGolem extends EntityTameable {
         
         if (!worldIn.isRemote)
         	gTask.initStance(isMelee, isRange, hasBuff);
+        
+        idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
     }
     
     /**
@@ -113,36 +119,14 @@ public abstract class EntityGolem extends EntityTameable {
         this.playSound(SoundEvents.ENTITY_WOLF_STEP, 0.15F, 1.0F);
     }
 
-//    /**
-//     * (abstract) Protected helper method to write subclass entity data to NBT.
-//     */
-//    public void writeEntityToNBT(NBTTagCompound compound)
-//    {
-//        super.writeEntityToNBT(compound);
-//    }
-
-//    /**
-//     * (abstract) Protected helper method to read subclass entity data from NBT.
-//     */
-//    public void readEntityFromNBT(NBTTagCompound compound)
-//    {
-//        super.readEntityFromNBT(compound);
-//        this.setAngry(compound.getBoolean("Angry"));
-//
-//        if (compound.hasKey("CollarColor", 99))
-//        {
-//            this.setCollarColor(EnumDyeColor.byDyeDamage(compound.getByte("CollarColor")));
-//        }
-//    }
-
     protected SoundEvent getHurtSound()
     {
-        return SoundEvents.ENTITY_WOLF_HURT;
+        return NostrumMagicaSounds.GOLEM_HURT.getEvent();
     }
 
     protected SoundEvent getDeathSound()
     {
-        return SoundEvents.ENTITY_WOLF_DEATH;
+    	return NostrumMagicaSounds.GOLEM_HURT.getEvent();
     }
 
     /**
@@ -153,64 +137,10 @@ public abstract class EntityGolem extends EntityTameable {
         return 0.4F;
     }
 
-//    @Nullable
-//    protected ResourceLocation getLootTable()
-//    {
-//        return LootTableList.ENTITIES_WOLF;
-//    }
-//
-//    /**
-//     * Called frequently so the entity can update its state every tick as required. For example, zombies and skeletons
-//     * use this to react to sunlight and start to burn.
-//     */
-//    public void onLivingUpdate()
-//    {
-//        super.onLivingUpdate();
-//    }
-
-//    /**
-//     * Called to update the entity's position/logic.
-//     */
-//    public void onUpdate()
-//    {
-//        super.onUpdate();
-//    }
-
     public float getEyeHeight()
     {
         return this.height * 0.8F;
     }
-
-//    /**
-//     * The speed it takes to move the entityliving's rotationPitch through the faceEntity method. This is only currently
-//     * use in wolves.
-//     */
-//    public int getVerticalFaceSpeed()
-//    {
-//        return this.isSitting() ? 20 : super.getVerticalFaceSpeed();
-//    }
-
-//    /**
-//     * Called when the entity is attacked.
-//     */
-//    public boolean attackEntityFrom(DamageSource source, float amount)
-//    {
-//        if (this.isEntityInvulnerable(source))
-//        {
-//            return false;
-//        }
-//        else
-//        {
-//            Entity entity = source.getEntity();
-//
-//            if (entity != null && !(entity instanceof EntityPlayer) && !(entity instanceof EntityArrow))
-//            {
-//                amount = (amount + 1.0F) / 2.0F;
-//            }
-//
-//            return super.attackEntityFrom(source, amount);
-//        }
-//    }
 
     public boolean attackEntityAsMob(Entity entityIn)
     {
@@ -269,5 +199,19 @@ public abstract class EntityGolem extends EntityTameable {
     }
 
 	public abstract String getTextureKey();
+	
+	@Override
+	public void onUpdate() {
+		super.onUpdate();
+		
+		if (idleCooldown > 0) {
+			idleCooldown--;
+			if (idleCooldown == 0) {
+				if (this.getAttackTarget() == null)
+					NostrumMagicaSounds.GOLEM_IDLE.play(this);
+				idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10); 
+			}
+		}
+	}
 	
 }

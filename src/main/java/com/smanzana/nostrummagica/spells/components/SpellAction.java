@@ -9,6 +9,7 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 import com.smanzana.nostrummagica.entity.EntityGolem;
+import com.smanzana.nostrummagica.entity.EntityGolemEarth;
 import com.smanzana.nostrummagica.entity.EntityGolemFire;
 import com.smanzana.nostrummagica.entity.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
@@ -82,6 +83,36 @@ public class SpellAction {
 		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
 			float fin = calcDamage(entity, amount, element);
 			entity.attackEntityFrom(new MagicDamageSource(source, element), fin);
+			
+			NostrumMagicaSounds sound;
+			switch (element) {
+			case EARTH:
+				sound = NostrumMagicaSounds.DAMAGE_EARTH;
+				break;
+			case ENDER:
+				sound = NostrumMagicaSounds.DAMAGE_ENDER;
+				break;
+			case FIRE:
+				sound = NostrumMagicaSounds.DAMAGE_FIRE;
+				break;
+			case ICE:
+				sound = NostrumMagicaSounds.DAMAGE_ICE;
+				break;
+			case LIGHTNING:
+				sound = NostrumMagicaSounds.DAMAGE_LIGHTNING;
+				break;
+			case PHYSICAL:
+			default:
+				sound = NostrumMagicaSounds.DAMAGE_PHYSICAL;
+				break;
+			case WIND:
+				sound = NostrumMagicaSounds.DAMAGE_WIND;
+				break;
+			
+			}
+			
+			sound.play(entity);
+			
 		}
 		
 		@Override
@@ -100,6 +131,8 @@ public class SpellAction {
 		@Override
 		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
 			entity.heal(amount);
+			
+			NostrumMagicaSounds.STATUS_BUFF2.play(entity);
 		}
 		
 		@Override
@@ -125,6 +158,9 @@ public class SpellAction {
 			
 			if (effect.isBadEffect()) {
 				entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
+				NostrumMagicaSounds.STATUS_DEBUFF2.play(entity);
+			} else {
+				NostrumMagicaSounds.STATUS_BUFF1.play(entity);
 			}
 		}
 		
@@ -143,6 +179,7 @@ public class SpellAction {
 		
 		@Override
 		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
+			NostrumMagicaSounds.STATUS_BUFF1.play(entity);
 			Collection<PotionEffect> effects = entity.getActivePotionEffects();
 			Random rand = new Random();
 			if (number == -1 || effects.size() < number)
@@ -205,6 +242,7 @@ public class SpellAction {
 		
 		@Override
 		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
+			NostrumMagicaSounds.STATUS_BUFF1.play(entity);
 			Vec3d dest;
 			Vec3d direction = entity.getLookVec().normalize();
 			Vec3d source = entity.getPositionVector();
@@ -271,6 +309,7 @@ public class SpellAction {
 		
 		@Override
 		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
+			NostrumMagicaSounds.DAMAGE_WIND.play(entity);
 			float magnitude = 2f * (float) amp;
 			
 			Vec3d center = entity.getPositionVector();
@@ -462,8 +501,12 @@ public class SpellAction {
 				}
 			}
 			
-			if (stack == null)
+			if (stack == null) {
+				NostrumMagicaSounds.CAST_FAIL.play(entity);
 				return;
+			} else {
+				NostrumMagicaSounds.CAST_CONTINUE.play(entity);
+			}
 			
 			if (entity instanceof EntityPlayer) {
 				EntityPlayer p = (EntityPlayer) entity;
@@ -490,8 +533,12 @@ public class SpellAction {
 		@Override
 		public void apply(EntityLivingBase caster, World world, BlockPos pos) {
 			Block block = world.getBlockState(pos).getBlock();
-			if (!blocks.contains(block))
+			if (!blocks.contains(block)) {
+				NostrumMagicaSounds.CAST_FAIL.play(world, pos.getX() + .5, pos.getY(), pos.getZ() + .5);
 				return;
+			} else {
+				NostrumMagicaSounds.CAST_CONTINUE.play(world, pos.getX() + .5, pos.getY(), pos.getZ() + .5);
+			}
 			
 			Iterator<Block> it = blocks.iterator();
 			Block next = it.next();
@@ -523,6 +570,8 @@ public class SpellAction {
 			if (duration == 0)
 				return; // Nope
 			
+			NostrumMagicaSounds.DAMAGE_FIRE.play(entity);
+			
 			entity.setFire((int) Math.ceil((float) duration / 20.0f));
 		}
 
@@ -532,6 +581,8 @@ public class SpellAction {
 				block.add(0, 1, 0);
 			if (world.isAirBlock(block)) {
 				world.setBlockState(block, Blocks.FIRE.getDefaultState());
+				NostrumMagicaSounds.DAMAGE_FIRE.play(world,
+						block.getX() + .5, block.getY(), block.getZ() + .5);
 			}
 		}
 		
@@ -609,6 +660,9 @@ public class SpellAction {
 				golem.setOwnerId(caster.getPersistentID());
 			}
 			
+			NostrumMagicaSounds.CAST_CONTINUE.play(world,
+					block.getX() + .5, block.getY(), block.getZ() + .5);
+			
 		}
 		
 		private EntityGolem spawnGolem(World world) {
@@ -616,6 +670,8 @@ public class SpellAction {
 			
 			switch (element) {
 			case EARTH:
+				golem = new EntityGolemEarth(world);
+				break;
 			case ENDER:
 			case FIRE:
 				golem = new EntityGolemFire(world);

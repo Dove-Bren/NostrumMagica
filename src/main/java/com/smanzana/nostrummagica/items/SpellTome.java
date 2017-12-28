@@ -12,8 +12,10 @@ import com.smanzana.nostrummagica.client.gui.book.IBookPage;
 import com.smanzana.nostrummagica.client.gui.book.SpellPreviewPage;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -141,11 +143,15 @@ public class SpellTome extends Item implements GuiBook {
 		NBTTagCompound nbt = itemStack.getTagCompound();
 		
 		int index = nbt.getInteger(NBT_INDEX);
+		int initial = index;
 		
 		int indices[] = getSpellIDs(itemStack);
 		index = Math.max(0, Math.min(index + amount, indices.length - 1));
 		
 		nbt.setInteger(NBT_INDEX, index);
+		
+		if (initial != index)
+			NostrumMagicaSounds.UI_TICK.play(Minecraft.getMinecraft().thePlayer);
 	}
 	
 	public static void setIndex(ItemStack itemStack, int index) {

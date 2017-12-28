@@ -11,11 +11,14 @@ import java.util.Set;
 import com.smanzana.nostrummagica.Lore.ILoreTagged;
 import com.smanzana.nostrummagica.Lore.Lore;
 import com.smanzana.nostrummagica.Lore.LoreCache;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+
+import net.minecraft.entity.EntityLivingBase;
 
 /**
  * Default implementation of the INostrumMagic interface
@@ -61,6 +64,8 @@ public class NostrumMagic implements INostrumMagic {
 	private List<SpellTrigger> triggers; // list of trigger keys
 	private Map<EAlteration, Boolean> alterations;
 	
+	private EntityLivingBase entity;
+	
 	public NostrumMagic() {
 		unlocked = false;
 		//familiars = new LinkedList<>();
@@ -89,6 +94,8 @@ public class NostrumMagic implements INostrumMagic {
 			maxxp = LevelCurves.maxXP(1);
 			skillPoints = control = tech = finesse = 0;
 			binding = false;
+			
+			NostrumMagicaSounds.LEVELUP.play(entity);
 		}
 	}
 	
@@ -99,6 +106,8 @@ public class NostrumMagic implements INostrumMagic {
 		this.addSkillPoint();
 		level++;
 		
+		if (entity != null)
+			NostrumMagicaSounds.LEVELUP.play(entity);
 		// TODO cool effects bruh
 	}
 
@@ -376,6 +385,11 @@ public class NostrumMagic implements INostrumMagic {
 		this.alterations = cap.serializeAlterations();
 		this.shapes = cap.getShapes();
 		this.triggers = cap.getTriggers();
+	}
+	
+	@Override
+	public void provideEntity(EntityLivingBase entity) {
+		this.entity = entity;
 	}
 	
 }

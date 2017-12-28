@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.entity.renderer.RenderGolem;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.client.Minecraft;
@@ -83,6 +84,9 @@ public class ClientProxy extends CommonProxy {
 	public void onMouse(MouseEvent event) {
 		int wheel = event.getDwheel();
 		if (wheel != 0) {
+			if (!NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer)
+					.isUnlocked())
+				return;
 			ItemStack tome = NostrumMagica.getCurrentTome(Minecraft.getMinecraft().thePlayer);
 			if (tome != null) {
 				if (bindingScroll.isKeyDown()) {
@@ -118,6 +122,8 @@ public class ClientProxy extends CommonProxy {
 							.spawnParticle(EnumParticleTypes.SMOKE_LARGE,
 									player.posX + offsetx, player.posY, player.posZ + offsetz,
 									0, -.5, 0);
+						
+						NostrumMagicaSounds.CAST_FAIL.play(player);
 					}
 					overlayRenderer.startManaWiggle(2);
 					return;
