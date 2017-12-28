@@ -8,6 +8,8 @@ import java.util.Random;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.EntityGolemEarth;
 import com.smanzana.nostrummagica.entity.EntityGolemEnder;
@@ -16,6 +18,7 @@ import com.smanzana.nostrummagica.entity.EntityGolemIce;
 import com.smanzana.nostrummagica.entity.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.EntityGolemWind;
+import com.smanzana.nostrummagica.potions.MagicBoostPotion;
 import com.smanzana.nostrummagica.potions.MagicResistPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -27,6 +30,7 @@ import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.monster.EntityEndermite;
+import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -136,6 +140,61 @@ public class SpellAction {
 			entity.heal(amount);
 			
 			NostrumMagicaSounds.STATUS_BUFF2.play(entity);
+		}
+		
+		@Override
+		public void apply(EntityLivingBase caster, World world, BlockPos pos) {
+			; // Do nothing
+		}
+	}
+	
+	private class HealFoodEffect implements SpellEffect {
+		private int amount;
+		
+		public HealFoodEffect(int amount) {
+			this.amount = amount;
+		}
+		
+		@Override
+		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
+			if (entity instanceof EntityPlayer) {
+				EntityPlayer player = (EntityPlayer) entity;
+				player.getFoodStats().addStats(amount, 2);
+				NostrumMagicaSounds.STATUS_BUFF2.play(entity);
+			} else if (entity instanceof EntityAnimal && caster != null && 
+					caster instanceof EntityPlayer) {
+				((EntityAnimal) entity)
+					.setInLove((EntityPlayer) caster);
+				NostrumMagicaSounds.STATUS_BUFF2.play(entity);
+			} else {
+				NostrumMagicaSounds.CAST_FAIL.play(entity);
+			}
+			
+		}
+		
+		@Override
+		public void apply(EntityLivingBase caster, World world, BlockPos pos) {
+			; // Do nothing
+		}
+	}
+	
+	private class HealManaEffect implements SpellEffect {
+		private int amount;
+		
+		public HealManaEffect(int amount) {
+			this.amount = amount;
+		}
+		
+		@Override
+		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
+			INostrumMagic magic = NostrumMagica.getMagicWrapper(entity);
+			if (magic == null) {
+				NostrumMagicaSounds.CAST_FAIL.play(entity);
+			} else {
+				magic.addMana(amount);
+				NostrumMagicaSounds.STATUS_BUFF2.play(entity);
+			}
+				
 		}
 		
 		@Override
@@ -700,6 +759,65 @@ public class SpellAction {
 		}
 	}
 	
+	private static class SwapEffect implements SpellEffect {
+		
+		public SwapEffect() {
+			
+		}
+		
+		@Override
+		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
+			if (caster == null || entity == null)
+				return;
+			
+			Vec3d pos = caster.getPositionVector();
+			float pitch = caster.rotationPitch;
+			float yaw = caster.rotationYawHead;
+			
+			caster.setPositionAndRotation(
+					entity.posX, entity.posY, entity.posZ,
+					entity.rotationPitch, entity.rotationYawHead
+					);
+			
+			entity.setPositionAndRotation(pos.xCoord, pos.yCoord, pos.zCoord, yaw, pitch);
+		}
+		
+		@Override
+		public void apply(EntityLivingBase caster, World world, BlockPos pos) {
+			; // Doesn't mean anything
+		}
+	}
+	
+	private static class PropelEffect implements SpellEffect {
+		
+		int level;
+		
+		public PropelEffect(int level) {
+			this.level = level;
+		}
+		
+		@Override
+		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
+
+			Vec3d force = entity.getLookVec().normalize();
+			float scale = 3f * level;
+			
+			force = new Vec3d(force.xCoord * scale, force.yCoord * scale, force.zCoord * scale);
+			
+			entity.motionX += force.xCoord;
+			entity.motionY += force.yCoord;
+			entity.motionZ += force.zCoord;
+			
+			NostrumMagicaSounds.DAMAGE_WIND.play(entity);
+			
+		}
+		
+		@Override
+		public void apply(EntityLivingBase caster, World world, BlockPos pos) {
+			; // Doesn't mean anything
+		}
+	}
+	
 	private static class BurnArmorEffect implements SpellEffect {
 		
 		private int level;
@@ -780,9 +898,14 @@ public class SpellAction {
 		if (target.height < 1.5f || target instanceof EntityEnderman)
 			light = true;
 		
+		PotionEffect boostEffect = target.getActivePotionEffect(MagicBoostPotion.instance());
+		if (boostEffect != null) {
+			base *= Math.pow(1.5, boostEffect.getAmplifier() + 1);
+		}
+		
 		PotionEffect resEffect = target.getActivePotionEffect(MagicResistPotion.instance());
 		if (resEffect != null) {
-			base *= Math.pow(.3, resEffect.getAmplifier() + 1);
+			base *= Math.pow(.5, resEffect.getAmplifier() + 1);
 		}
 			
 		switch (element) {
@@ -867,6 +990,26 @@ public class SpellAction {
 	
 	public SpellAction burnArmor(int power) {
 		effects.add(new BurnArmorEffect(power));
+		return this;
+	}
+	
+	public SpellAction healFood(int level) {
+		effects.add(new HealFoodEffect(4 * level));
+		return this;
+	}
+	
+	public SpellAction healMana(int level) {
+		effects.add(new HealManaEffect(20 * level));
+		return this;
+	}
+	
+	public SpellAction swap() {
+		effects.add(new SwapEffect());
+		return this;
+	}
+	
+	public SpellAction propel(int level) {
+		effects.add(new PropelEffect(level));
 		return this;
 	}
 }

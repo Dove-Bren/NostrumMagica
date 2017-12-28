@@ -19,6 +19,7 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
 import com.smanzana.nostrummagica.potions.FrostbitePotion;
+import com.smanzana.nostrummagica.potions.MagicBoostPotion;
 import com.smanzana.nostrummagica.potions.MagicResistPotion;
 import com.smanzana.nostrummagica.potions.MagicShieldPotion;
 import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
@@ -138,6 +139,7 @@ public class CommonProxy {
     	PhysicalShieldPotion.instance();
     	MagicShieldPotion.instance();
     	FrostbitePotion.instance();
+    	MagicBoostPotion.instance();
     }
     
     private void registerItems() {

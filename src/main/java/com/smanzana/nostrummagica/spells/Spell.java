@@ -6,6 +6,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.potions.FrostbitePotion;
+import com.smanzana.nostrummagica.potions.MagicBoostPotion;
 import com.smanzana.nostrummagica.potions.MagicResistPotion;
 import com.smanzana.nostrummagica.potions.MagicShieldPotion;
 import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
@@ -447,9 +448,9 @@ public class Spell {
 		case ICE:
 			return new SpellAction(caster).status(FrostbitePotion.instance(), duration, amp);
 		case LIGHTNING:
-			break;
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("slowness"), (int) (duration * .7), 5);
 		case WIND:
-			break;
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("poison"), duration, amp);
 		}
 		
 		return null;
@@ -467,9 +468,9 @@ public class Spell {
 		case ENDER:
 			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("invisibility"), duration, amp);
 		case FIRE:
-			break;
+			return new SpellAction(caster).status(MagicBoostPotion.instance(), duration, amp);
 		case ICE:
-			break; // TODO
+			return new SpellAction(caster).dispel(elementCount * (int) (Math.pow(3, elementCount - 1)));
 		case LIGHTNING:
 			return new SpellAction(caster).status(MagicResistPotion.instance(), duration, amp);
 		case WIND:
@@ -489,7 +490,7 @@ public class Spell {
 		case EARTH:
 			return new SpellAction(caster).status(PhysicalShieldPotion.instance(), duration, amp);
 		case ENDER:
-			break; // TODO
+			return new SpellAction(caster).blink(15.0f * elementCount);
 		case FIRE:
 			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("fire_resistance"), duration, amp);
 		case ICE:
@@ -511,17 +512,17 @@ public class Spell {
 		case PHYSICAL:
 			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("saturation"), 1, 4 * elementCount);
 		case EARTH:
-			break;
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("regeneration"), duration, amp);
 		case ENDER:
-			break;
+			return new SpellAction(caster).swap();
 		case FIRE:
 			return new SpellAction(caster).burnArmor(elementCount);
 		case ICE:
-			break; // TODO
+			return new SpellAction(caster).heal((float) Math.pow(4f, elementCount));
 		case LIGHTNING:
-			break;
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("jump_boost"), duration, amp);
 		case WIND:
-			break;
+			return new SpellAction(caster).propel(elementCount);
 		}
 		
 		return null;
