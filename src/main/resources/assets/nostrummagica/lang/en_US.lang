@@ -12,6 +12,11 @@ tile.copper_ore.name=Copper Ore
 
 entity.nostrummagica.physical_golem.name=Metal Golem
 entity.nostrummagica.lightning_golem.name=Lightining Golem
+entity.nostrummagica.fire_golem.name=Fire Golem
+entity.nostrummagica.earth_golem.name=Earth Golem
+entity.nostrummagica.ice_golem.name=Ice Golem
+entity.nostrummagica.wind_golem.name=Wind Golem
+entity.nostrummagica.ender_golem.name=End Golem
 entity.nostrummagica.spell_projectile.name=Spell Projectile
 
 itemGroup.nostrummagica=Nostrum Magica

@@ -1,11 +1,206 @@
 {
-    "item.metal.cool":
+    "spell.melt_metal":
+    {
+        "sounds":
+        [
+            "spell/melt_metal"
+        ]
+    },
+    
+    "spell.shield.break":
+    {
+        "sounds":
+        [
+            "spell/shield_break"
+        ]
+    },
+    
+    "spell.shield.absorb":
+    {
+        "sounds":
+        [
+            "spell/shield_absorb"
+        ]
+    },
+    
+    "mob.golem.hurt":
+    {
+        "sounds":
+        [
+            "entity/golem/hurt1",
+            "entity/golem/hurt2",
+            "entity/golem/hurt3"
+        ]
+    },
+    
+    "mob.golem.idle":
+    {
+        "sounds":
+        [
+            "entity/golem/idle1",
+            "entity/golem/idle2",
+            "entity/golem/idle3"
+        ]
+    },
+    
+    "spell.damage.fire":
+    {
+        "sounds":
+        [
+            "spell/damage_fire1",
+            "spell/damage_fire2"
+        ]
+    },
+    
+    "spell.damage.physical":
+    {
+        "sounds":
+        [
+            "spell/damage_physical1",
+            "spell/damage_physical2"
+        ]
+    },
+    
+    "spell.damage.ice":
+    {
+        "sounds":
+        [
+            "spell/damage_ice1",
+            "spell/damage_ice2"
+        ]
+    },
+    
+    "spell.damage.lightning":
+    {
+        "sounds":
+        [
+            "spell/damage_lightning1",
+            "spell/damage_lightning2"
+        ]
+    },
+    
+    "spell.damage.earth":
+    {
+        "sounds":
+        [
+            "spell/damage_earth1",
+            "spell/damage_earth2"
+        ]
+    },
+    
+    "spell.damage.wind":
+    {
+        "sounds":
+        [
+            "spell/damage_wind1",
+            "spell/damage_wind2"
+        ]
+    },
+    
+    "spell.damage.ender":
+    {
+        "sounds":
+        [
+            "spell/damage_ender1",
+            "spell/damage_ender2"
+        ]
+    },
+    
+    "spell.buff1":
+    {
+        "sounds":
+        [
+            "spell/buff1"
+        ]
+    },
+    
+    "spell.buff2":
+    {
+        "sounds":
+        [
+            "spell/buff2"
+        ]
+    },
+    
+    "spell.debuff1":
+    {
+        "sounds":
+        [
+            "spell/debuff1"
+        ]
+    },
+    
+    "spell.debuff2":
+    {
+        "sounds":
+        [
+            "spell/debuff2"
+        ]
+    },
+    
+    "spell.shield.cast":
+    {
+        "sounds":
+        [
+            "spell/shield_cast"
+        ]
+    },
+    
+    "spell.cast.launch":
+    {
+        "sounds":
+        [
+            "spell/cast"
+        ]
+    },
+    
+    "spell.cast.continue":
+    {
+        "sounds":
+        [
+            "spell/continue"
+        ]
+    },
+    
+    "spell.cast.fail":
+    {
+        "sounds":
+        [
+            "spell/fail"
+        ]
+    },
+    
+    "player.levelup":
+    {
+        "sounds":
+        [
+            "ambient/levelup"
+        ]
+    },
+    
+    "ui.tick":
+    {
+        "sounds":
+        [
+            "ui/tick"
+        ]
+    },
+    
+    "ambient.woosh":
     {
         "category": "neutral",
         "sounds":
         [
-            "item/metal/cool1",
-            "item/metal/cool2"
+            "ambient/woosh"
+        ]
+    },
+    
+    "ambient.whirl":
+    {
+        "sounds":
+        [
+            "ambient.whirl"
         ]
     }
+    
 }
