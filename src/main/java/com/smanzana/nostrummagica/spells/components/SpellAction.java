@@ -11,6 +11,7 @@ import com.google.common.collect.Sets;
 import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.EntityGolemEarth;
 import com.smanzana.nostrummagica.entity.EntityGolemFire;
+import com.smanzana.nostrummagica.entity.EntityGolemIce;
 import com.smanzana.nostrummagica.entity.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
 import com.smanzana.nostrummagica.potions.MagicResistPotion;
@@ -677,6 +678,8 @@ public class SpellAction {
 				golem = new EntityGolemFire(world);
 				break;
 			case ICE:
+				golem = new EntityGolemIce(world);
+				break;
 			case LIGHTNING:
 				golem = new EntityGolemLightning(world);
 				break;

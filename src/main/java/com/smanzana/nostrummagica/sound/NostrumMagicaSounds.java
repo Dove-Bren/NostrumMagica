@@ -76,7 +76,6 @@ public enum NostrumMagicaSounds {
 		world.playSound(player, x, y, z,
 				event, category,
 				volume, 0.8f + (NostrumMagica.rand.nextFloat() * 0.4f));
-		System.out.println("Played sound " + this.name());
 	}
 	
 	public static void registerSounds() {

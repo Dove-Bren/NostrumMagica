@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.potions.FrostbitePotion;
 import com.smanzana.nostrummagica.potions.MagicResistPotion;
 import com.smanzana.nostrummagica.potions.MagicShieldPotion;
 import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
@@ -444,7 +445,7 @@ public class Spell {
 		case FIRE:
 			return new SpellAction(caster).burn(duration);
 		case ICE:
-			break; // TODO
+			return new SpellAction(caster).status(FrostbitePotion.instance(), duration, amp);
 		case LIGHTNING:
 			break;
 		case WIND:

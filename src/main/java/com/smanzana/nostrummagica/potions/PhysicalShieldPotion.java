@@ -4,10 +4,14 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
 import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class PhysicalShieldPotion extends Potion {
 
@@ -24,7 +28,9 @@ public class PhysicalShieldPotion extends Potion {
 	
 	private PhysicalShieldPotion() {
 		super(false, 0xFF80805D);
-		
+
+		this.setBeneficial();
+		this.setPotionName("potion.shieldphysical.name");
 		NostrumMagica.registerPotion(this, Resource);
 	}
 	
@@ -50,4 +56,16 @@ public class PhysicalShieldPotion extends Potion {
 		NostrumMagica.magicEffectProxy.remove(SpecialEffect.SHIELD_PHYSICAL, entityLivingBaseIn);
 		super.removeAttributesModifiersFromEntity(entityLivingBaseIn, attributeMapIn, amplifier);
     }
+	
+	@SideOnly(Side.CLIENT)
+	@Override
+    public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
+		PotionIcon.PHYSICALSHIELD.draw(mc, x + 6, y + 7);
+	}
+	
+	@SideOnly(Side.CLIENT)
+	@Override
+    public void renderHUDEffect(int x, int y, PotionEffect effect, net.minecraft.client.Minecraft mc, float alpha) {
+		PotionIcon.PHYSICALSHIELD.draw(mc, x + 3, y + 3);
+	}
 }

@@ -614,6 +614,20 @@ public class PlayerListener {
 				));
 		SpellTome.addSpell(tome, spell);
 		
+		spell = new Spell("Summon Ice");
+		spell.addPart(new SpellPart(
+				ProjectileTrigger.instance(),
+				new SpellPartParam(0, false)
+				));
+		spell.addPart(new SpellPart(
+				SingleShape.instance(),
+				EMagicElement.ICE,
+				1,
+				EAlteration.SUMMON,
+				new SpellPartParam(0, false)
+				));
+		SpellTome.addSpell(tome, spell);
+		
 		spell = new Spell("Raze");
 		spell.addPart(new SpellPart(
 				ProjectileTrigger.instance(),
@@ -680,6 +694,20 @@ public class PlayerListener {
 				EMagicElement.EARTH,
 				1,
 				EAlteration.SUPPORT,
+				new SpellPartParam(0, false)
+				));
+		SpellTome.addSpell(tome, spell);
+		
+		spell = new Spell("Frostbite");
+		spell.addPart(new SpellPart(
+				SelfTrigger.instance(),
+				new SpellPartParam(0, false)
+				));
+		spell.addPart(new SpellPart(
+				SingleShape.instance(),
+				EMagicElement.ICE,
+				1,
+				EAlteration.INFLICT,
 				new SpellPartParam(0, false)
 				));
 		SpellTome.addSpell(tome, spell);

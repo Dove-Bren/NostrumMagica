@@ -1,5 +1,11 @@
 item.spellTome.name=Spell Tome
 
+potion.frostbite.name=Frostbite
+potion.shieldphysical.name=Physical Ward
+potion.shieldmagic.name=Magic Ward
+potion.rooted.name=Rooted
+potion.magicresist.name=Magic Resist
+
 tile.skylander_armory_whetstone_block.name=Whetstone Block
 tile.skylander_armory_pedestal.name=Pedestal
 tile.skylander_armory_brazier_block.name=Brazier

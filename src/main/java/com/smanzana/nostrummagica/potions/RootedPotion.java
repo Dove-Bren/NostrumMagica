@@ -4,9 +4,13 @@ import java.awt.Color;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class RootedPotion extends Potion {
 
@@ -22,8 +26,9 @@ public class RootedPotion extends Potion {
 	}
 	
 	private RootedPotion() {
-		super(false, (new Color(100, 60, 25)).getRGB());
-		
+		super(true, (new Color(100, 60, 25)).getRGB());
+
+		this.setPotionName("potion.rooted.name");
 		NostrumMagica.registerPotion(this, Resource);
 	}
 	
@@ -44,5 +49,17 @@ public class RootedPotion extends Potion {
         entity.motionX = 0.0;
         entity.motionZ = 0.0;
     }
+	
+	@SideOnly(Side.CLIENT)
+	@Override
+    public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
+		PotionIcon.ROOTED.draw(mc, x + 6, y + 7);
+	}
+	
+	@SideOnly(Side.CLIENT)
+	@Override
+    public void renderHUDEffect(int x, int y, PotionEffect effect, net.minecraft.client.Minecraft mc, float alpha) {
+		PotionIcon.ROOTED.draw(mc, x + 3, y + 3);
+	}
 	
 }
