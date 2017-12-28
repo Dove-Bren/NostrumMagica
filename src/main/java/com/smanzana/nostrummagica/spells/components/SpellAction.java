@@ -432,9 +432,9 @@ public class SpellAction {
 			blocks.add(Blocks.PLANKS);
 			blocks.add(Blocks.QUARTZ_STAIRS);
 			blocks.add(Blocks.OAK_FENCE);
+			blocks.add(Blocks.ACACIA_FENCE);
 			blocks.add(Blocks.REDSTONE_ORE);
 			blocks.add(Blocks.LAPIS_ORE);
-			blocks.add(Blocks.ACACIA_FENCE);
 			blocks.add(Blocks.CRAFTING_TABLE);
 			blocks.add(Blocks.GOLD_ORE);
 			blocks.add(Blocks.GRAVEL);

@@ -235,7 +235,6 @@ public class GolemTask extends EntityAIBase {
         	golem.getNavigator().clearPathEntity();
 			success = golem.getNavigator().tryMoveToEntityLiving(target, 1.0);
 			if (success) {
-				System.out.print("recalc ");
 				updateCooldown = 5;
 				
 				// TODO testing
