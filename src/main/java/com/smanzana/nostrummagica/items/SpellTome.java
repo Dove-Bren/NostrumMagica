@@ -140,6 +140,10 @@ public class SpellTome extends Item implements GuiBook {
 		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
 			return;
 
+		// TODO as soon as you get a refresh from the server, you lose your index:
+		// The server's version didn't have its index incremented.
+		// Should we send a packet each time...? D:
+		
 		NBTTagCompound nbt = itemStack.getTagCompound();
 		
 		int index = nbt.getInteger(NBT_INDEX);
