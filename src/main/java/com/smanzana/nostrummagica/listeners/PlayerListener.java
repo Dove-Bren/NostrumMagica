@@ -681,44 +681,44 @@ public class PlayerListener {
 				));
 		SpellTome.addSpell(tome, spell);
 		
-		spell = new Spell("Enchant Fire");
+		spell = new Spell("Magic Wall I");
 		spell.addPart(new SpellPart(
-				SelfTrigger.instance(),
-				new SpellPartParam(0, false)
-				));
-		spell.addPart(new SpellPart(
-				SingleShape.instance(),
-				EMagicElement.FIRE,
-				1,
-				EAlteration.ENCHANT,
-				new SpellPartParam(0, false)
-				));
-		SpellTome.addSpell(tome, spell);
-		
-		spell = new Spell("Enchant Fire II");
-		spell.addPart(new SpellPart(
-				SelfTrigger.instance(),
-				new SpellPartParam(0, false)
-				));
-		spell.addPart(new SpellPart(
-				SingleShape.instance(),
-				EMagicElement.FIRE,
-				2,
-				EAlteration.ENCHANT,
-				new SpellPartParam(0, false)
-				));
-		SpellTome.addSpell(tome, spell);
-		
-		spell = new Spell("Enchant Wind");
-		spell.addPart(new SpellPart(
-				SelfTrigger.instance(),
+				ProjectileTrigger.instance(),
 				new SpellPartParam(0, false)
 				));
 		spell.addPart(new SpellPart(
 				SingleShape.instance(),
 				EMagicElement.WIND,
 				1,
-				EAlteration.ENCHANT,
+				EAlteration.CONJURE,
+				new SpellPartParam(0, false)
+				));
+		SpellTome.addSpell(tome, spell);
+		
+		spell = new Spell("Magic Wall II");
+		spell.addPart(new SpellPart(
+				ProjectileTrigger.instance(),
+				new SpellPartParam(0, false)
+				));
+		spell.addPart(new SpellPart(
+				SingleShape.instance(),
+				EMagicElement.WIND,
+				2,
+				EAlteration.CONJURE,
+				new SpellPartParam(0, false)
+				));
+		SpellTome.addSpell(tome, spell);
+		
+		spell = new Spell("Magic Wall III");
+		spell.addPart(new SpellPart(
+				ProjectileTrigger.instance(),
+				new SpellPartParam(0, false)
+				));
+		spell.addPart(new SpellPart(
+				SingleShape.instance(),
+				EMagicElement.WIND,
+				3,
+				EAlteration.CONJURE,
 				new SpellPartParam(0, false)
 				));
 		SpellTome.addSpell(tome, spell);

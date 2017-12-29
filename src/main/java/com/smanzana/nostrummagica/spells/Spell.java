@@ -552,7 +552,7 @@ public class Spell {
 		case LIGHTNING:
 			return new SpellAction(caster).lightning();
 		case WIND:
-			break;
+			return new SpellAction(caster).wall(elementCount);
 		}
 		
 		return null;

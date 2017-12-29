@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.proxy;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagic;
@@ -40,6 +41,8 @@ import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -119,6 +122,7 @@ public class CommonProxy {
 	public void init() {
     	registerPotions();
     	registerItems();
+    	registerBlocks();
 	}
 	
 	public void postinit() {
@@ -154,6 +158,14 @@ public class CommonProxy {
     	MagicArmorBase.init();
     	EnchantedWeapon.registerWeapons();
     	EnchantedArmor.registerArmors();
+    }
+    
+    private void registerBlocks() {
+    	GameRegistry.register(MagicWall.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, MagicWall.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(MagicWall.instance())).setRegistryName(MagicWall.ID)
+    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(MagicWall.ID));
     }
     
     public void syncPlayer(EntityPlayerMP player) {

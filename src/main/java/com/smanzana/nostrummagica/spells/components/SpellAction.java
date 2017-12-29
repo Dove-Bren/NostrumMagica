@@ -9,6 +9,7 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.EntityGolemEarth;
@@ -42,6 +43,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
@@ -1004,6 +1006,33 @@ public class SpellAction {
 		
 	}
 	
+	private static class GrowEffect implements SpellEffect {
+		
+		private int count;
+		
+		public GrowEffect(int count) {
+			this.count = count;
+		}
+
+		@Override
+		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
+			if (entity instanceof EntityAnimal) {
+				EntityAnimal animal = (EntityAnimal) entity;
+				animal.addGrowth(count * 5);
+				NostrumMagicaSounds.STATUS_BUFF2.play(entity);
+			}
+		}
+
+		@Override
+		public void apply(EntityLivingBase caster, World world, BlockPos block) {
+			ItemStack junk = new ItemStack(Items.DYE, 10);
+			for (int i = 0; i < count; i++)
+				ItemDye.applyBonemeal(junk, world, block);
+			
+			NostrumMagicaSounds.STATUS_BUFF2.play(world, block.getX(), block.getY(), block.getZ());
+		}
+	}
+	
 	private static class BurnArmorEffect implements SpellEffect {
 		
 		private int level;
@@ -1042,6 +1071,35 @@ public class SpellAction {
 		@Override
 		public void apply(EntityLivingBase caster, World world, BlockPos block) {
 			;
+		}
+		
+	}
+	
+	private static class WallEffect implements SpellEffect {
+		
+		private int level;
+		
+		public WallEffect(int level) {
+			this.level = level;
+		}
+
+		@Override
+		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
+			apply(caster, entity.worldObj, entity.getPosition().add(0, 1, 0));
+		}
+
+		@Override
+		public void apply(EntityLivingBase caster, World world, BlockPos block) {
+			if (!world.isAirBlock(block))
+				block = block.add(0, 1, 0);
+			
+			if (!world.isAirBlock(block)) {
+				NostrumMagicaSounds.CAST_FAIL.play(world, block.getX(), block.getY(), block.getZ());
+			} else {
+				NostrumMagicaSounds.DAMAGE_WIND.play(world, block.getX(), block.getY(), block.getZ());
+				world.setBlockState(block, MagicWall.instance().getState(level));
+			}
+				
 		}
 		
 	}
@@ -1207,6 +1265,21 @@ public class SpellAction {
 	
 	public SpellAction enchant(EMagicElement element, int level) {
 		effects.add(new EnchantEffect(element, level));
+		return this;
+	}
+	
+	public SpellAction grow(int level) {
+		effects.add(new GrowEffect((int) Math.pow(2, level - 1)));
+		return this;
+	}
+	
+	public SpellAction wall(int level) {
+//		Do different things in the block based on level.
+//		Spawn three different types of it.
+//		1) just regular block
+//		2) Only players can go through it
+//		3) Only the caster can go through it
+		effects.add(new WallEffect(level));
 		return this;
 	}
 }
