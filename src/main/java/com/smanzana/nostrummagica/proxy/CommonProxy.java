@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.proxy;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.CursedIce;
 import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -166,6 +167,12 @@ public class CommonProxy {
     	GameRegistry.register(
     			(new ItemBlock(MagicWall.instance())).setRegistryName(MagicWall.ID)
     		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(MagicWall.ID));
+
+    	GameRegistry.register(CursedIce.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, CursedIce.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(CursedIce.instance())).setRegistryName(CursedIce.ID)
+    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(CursedIce.ID));
     }
     
     public void syncPlayer(EntityPlayerMP player) {

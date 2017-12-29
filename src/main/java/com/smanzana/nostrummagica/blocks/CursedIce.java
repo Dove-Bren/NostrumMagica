@@ -1,13 +1,16 @@
 package com.smanzana.nostrummagica.blocks;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import javax.annotation.Nullable;
-
+import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.potions.FrostbitePotion;
+import com.smanzana.nostrummagica.potions.MagicResistPotion;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockIce;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -15,14 +18,14 @@ import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
@@ -30,33 +33,30 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class MagicWall extends Block {
+public class CursedIce extends Block {
 
-	public static final String ID = "magic_wall";
-	private static final PropertyInteger DECAY = PropertyInteger.create("decay", 0, 3);
+	public static final String ID = "cursed_ice";
 	private static final PropertyInteger LEVEL = PropertyInteger.create("level", 0, 2);
 	
-	private static MagicWall instance = null;
-	public static MagicWall instance() {
+	private static CursedIce instance = null;
+	public static CursedIce instance() {
 		if (instance == null)
-			instance = new MagicWall();
+			instance = new CursedIce();
 		
 		return instance;
 	}
 	
 	
-	public MagicWall() {
-		super(Material.PLANTS, MapColor.EMERALD);
+	public CursedIce() {
+		super(Material.ICE, MapColor.ICE);
 		this.setUnlocalizedName(ID);
-		this.setHardness(0.01f);
-		this.setResistance(1.0f);
+		this.setHardness(3.0f);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setSoundType(SoundType.GLASS);
-		this.setLightOpacity(2);
+		this.setLightOpacity(14);
 		this.setTickRandomly(true);
 		
-		this.setDefaultState(this.blockState.getBaseState().withProperty(DECAY, 0)
-				.withProperty(LEVEL, 0));
+		this.setDefaultState(this.blockState.getBaseState().withProperty(LEVEL, 0));
 	}
 	
 	@Override
@@ -81,7 +81,7 @@ public class MagicWall extends Block {
 	
 	@Override
 	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, DECAY, LEVEL);
+		return new BlockStateContainer(this, LEVEL);
 	}
 	
 	/**
@@ -90,14 +90,12 @@ public class MagicWall extends Block {
 	 * @return
 	 */
 	public IBlockState getState(int level) {
-		return getDefaultState().withProperty(DECAY, 0)
-				.withProperty(LEVEL, Math.max(Math.min(2, level - 1), 0));
+		return getDefaultState().withProperty(LEVEL, Math.max(Math.min(2, level - 1), 0));
 	}
 	
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
-		return getDefaultState().withProperty(DECAY, meta & 0x3)
-				.withProperty(LEVEL, Math.min(2, (meta >> 2) & 0x3));
+		return getDefaultState().withProperty(LEVEL, Math.min(2, meta & 0x3));
 	}
 	
 	@Override
@@ -107,17 +105,12 @@ public class MagicWall extends Block {
 	
 	@Override
 	public int getMetaFromState(IBlockState state) {
-		return (state.getValue(LEVEL) << 2) | (state.getValue(DECAY));
+		return (state.getValue(LEVEL));
 	}
 	
 	@Override
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
 		return new ItemStack(Item.getItemFromBlock(this), 1, 0);
-	}
-	
-	@Override
-	public boolean canSilkHarvest(World world, BlockPos pos, IBlockState state, EntityPlayer player) {
-		return false;
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -137,38 +130,54 @@ public class MagicWall extends Block {
         Block block = iblockstate.getBlock();
         
         return !(block == Blocks.GLASS || block == Blocks.STAINED_GLASS
-        		|| block == instance());
+        		|| block == Blocks.ICE || block == instance());
 	}
 	
 	@Override
 	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
-		if (NostrumMagica.rand.nextFloat() <= 0.5f) {
-			int decay = state.getValue(DECAY) + 1;
-			if (decay >= 4) {
-				worldIn.setBlockToAir(pos);
-			} else {
-				worldIn.setBlockState(pos, state.withProperty(DECAY, decay));
+		int level = state.getValue(LEVEL);
+		
+		if (NostrumMagica.rand.nextFloat() <= 0.2f * (float) level) {
+			List<BlockPos> targets = Lists.newArrayList(pos.add(1, 0, 0),
+									pos.add(0, 0, 1),
+									pos.add(-1, 0, 0),
+									pos.add(0, 0, -1),
+									pos.add(0, 1, 0),
+									pos.add(0, -1, 0));
+			Collections.shuffle(targets);
+			
+			for (BlockPos target : targets)
+			if (!worldIn.isAirBlock(target)) {
+				IBlockState bs = worldIn.getBlockState(target);
+				Block b = bs.getBlock();
+				if (!(b instanceof BlockIce) && !(b instanceof CursedIce)) {
+					if (bs.getBlockHardness(worldIn, target) >= 0.0f &&
+							bs.getBlockHardness(worldIn, target) <= Math.pow(2.0f, level)) {
+						worldIn.setBlockState(target, Blocks.ICE.getDefaultState());
+						return;
+					}
+					
+				} else if (b instanceof BlockIce) {
+					// It's ice. Convert to cursed ice
+					worldIn.setBlockState(target, getDefaultState());
+					return;
+				}
 			}
 		}
     }
 	
-	@Override
-	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
-		return false;
-    }
-	
-	@SuppressWarnings("deprecation")
-	@Override
-    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn) {
-        
-		int level = state.getValue(LEVEL);
+	public void onEntityWalk(World worldIn, BlockPos pos, Entity entityIn) {
+		int amp = 0;
+		if (worldIn.getBlockState(pos).getValue(LEVEL) == 2)
+			amp = 1;
 		
-		if (level <= 0
-				|| (level >= 2 && !(entityIn instanceof EntityPlayer))
-				|| (level == 1 && !(entityIn instanceof EntityItem))) {
-			super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn);
+		if (entityIn instanceof EntityLivingBase && ((EntityLivingBase) entityIn).getActivePotionEffect(MagicResistPotion.instance()) == null) {
+			EntityLivingBase living = (EntityLivingBase) entityIn;
+			living.addPotionEffect(new PotionEffect(FrostbitePotion.instance(),
+					20, amp));
 		}
 		
+		super.onEntityWalk(worldIn, pos, entityIn);
     }
 
 }

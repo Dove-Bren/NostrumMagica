@@ -536,19 +536,17 @@ public class Spell {
 	
 	private static final SpellAction solveConjure(EntityLivingBase caster, EMagicElement element,
 			int elementCount) {
-		int duration = 20 * 15 * elementCount;
-		int amp = elementCount - 1;
 		switch (element) {
 		case PHYSICAL:
-			break;
+			return new SpellAction(caster).grow(elementCount);
 		case EARTH:
-			break;
+			return new SpellAction(caster).geoblock(elementCount);
 		case ENDER:
-			break;
+			return new SpellAction(caster).phase(elementCount);
 		case FIRE:
 			return new SpellAction(caster).burn(0);
 		case ICE:
-			break; // TODO
+			return new SpellAction(caster).cursedIce(elementCount);
 		case LIGHTNING:
 			return new SpellAction(caster).lightning();
 		case WIND:

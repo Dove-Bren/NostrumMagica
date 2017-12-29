@@ -57,6 +57,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeHell;
 
 public class SpellAction {
 	
@@ -388,7 +389,8 @@ public class SpellAction {
 		@Override
 		public void apply(EntityLivingBase caster, World world, BlockPos pos) {
 
-			float magnitude = .35f * ((float) amp + 1.0f);
+			// We abs the amp here, but check it belwo for pull and negate vector
+			float magnitude = .35f * (Math.abs(amp) + 1.0f);
 			Vec3d center = new Vec3d(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
 			NostrumMagicaSounds.DAMAGE_WIND.play(world, center.xCoord, center.yCoord, center.zCoord);
 			
@@ -409,17 +411,25 @@ public class SpellAction {
 							direction.zCoord * magnitude
 							);
 					if (amp < 0) {
+						System.out.println("pull");
 						// pull
 						// Cap force's magnitude at .2 dist
 						double mod = force.lengthVector();
 						if (mod > dist * .2) {
+							System.out.println("length (" + mod + ") too big");
 							mod = (dist * .4) / mod;
+							System.out.println("adjusted to " + mod);
 							force = new Vec3d(
 									force.xCoord * mod,
 									force.yCoord * mod,
 									force.zCoord * mod
 									);
 						}
+
+						force = new Vec3d(
+								force.xCoord * -1.0,
+								force.yCoord * -1.0,
+								force.zCoord * -1.0);
 					}
 					
 					e.addVelocity(force.xCoord, force.yCoord, force.zCoord);
@@ -894,9 +904,9 @@ public class SpellAction {
 					entity = new EntityEndermite(world);
 				}
 				
-				entity.posX = x + (NostrumMagica.rand.nextFloat() - .5);
-				entity.posY = y;
-				entity.posZ = z + (NostrumMagica.rand.nextFloat() - .5);
+				entity.setPosition(x + (NostrumMagica.rand.nextFloat() - .5),
+									y,
+									z + (NostrumMagica.rand.nextFloat() - .5));
 				
 				world.spawnEntityInWorld(entity);
 			}
@@ -1025,6 +1035,8 @@ public class SpellAction {
 
 		@Override
 		public void apply(EntityLivingBase caster, World world, BlockPos block) {
+			if (world.isAirBlock(block))
+				block = block.add(0, -1, 0);
 			ItemStack junk = new ItemStack(Items.DYE, 10);
 			for (int i = 0; i < count; i++)
 				ItemDye.applyBonemeal(junk, world, block);
@@ -1103,6 +1115,122 @@ public class SpellAction {
 		}
 		
 	}
+
+	private static class CursedIce implements SpellEffect {
+		
+		private int level;
+		
+		public CursedIce(int level) {
+			this.level = level;
+		}
+
+		@Override
+		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
+			apply(caster, entity.worldObj, entity.getPosition().add(0, 1, 0));
+		}
+
+		@Override
+		public void apply(EntityLivingBase caster, World world, BlockPos block) {
+			
+			world.setBlockState(block, com.smanzana.nostrummagica.blocks.CursedIce.instance().getState(level));
+			NostrumMagicaSounds.DAMAGE_ICE.play(world, block.getX(), block.getY(), block.getZ());
+			
+		}
+	}
+	
+	private static class GeoBlock implements SpellEffect {
+		
+		private int level;
+		
+		public GeoBlock(int level) {
+			this.level = level;
+		}
+
+		@Override
+		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
+			apply(caster, entity.worldObj, entity.getPosition().add(0, -1, 0));
+		}
+
+		@Override
+		public void apply(EntityLivingBase caster, World world, BlockPos block) {
+			
+			Block result;
+			float temp = world.getBiome(block).getFloatTemperature(block);
+			// < 0 exists for icy places
+			// .1 to .2 has somethign to do with snow
+			// desert is 2.0
+			// Plains are just below 1
+			if (world.getBiome(block) instanceof BiomeHell) {
+				if (level == 1)
+					result = Blocks.NETHERRACK;
+				else if (level == 2)
+					result = Blocks.LAVA;
+				else
+					if (NostrumMagica.rand.nextFloat() < 0.3f)
+						result = Blocks.QUARTZ_ORE;
+					else
+						result = Blocks.GLOWSTONE;
+			} else if (temp < 0f) {
+				if (level == 1)
+					result = Blocks.SNOW;
+				else if (level == 2)
+					result = Blocks.ICE;
+				else {
+					if (NostrumMagica.rand.nextFloat() < 0.3f)
+						result = Blocks.LAPIS_ORE;
+					else
+						result = Blocks.PACKED_ICE;
+				}
+			} else if (temp < 0.5f) {
+				if (level == 1)
+					result = Blocks.GRAVEL;
+				else if (level == 2)
+					result = Blocks.CLAY;
+				else
+					if (NostrumMagica.rand.nextFloat() < 0.3f)
+						result = Blocks.GOLD_ORE;
+					else
+						result = Blocks.PRISMARINE;
+			} else if (temp < 1.5f) {
+				if (level == 1)
+					result = Blocks.STONE;
+				else if (level == 2)
+					result = Blocks.MOSSY_COBBLESTONE;
+				else
+					if (NostrumMagica.rand.nextFloat() < 0.3f)
+						result = Blocks.IRON_ORE;
+					else
+						result = Blocks.COAL_ORE;
+			} else if (temp < 2.5f) {
+				if (level == 1)
+					result = Blocks.DIRT;
+				else if (level == 2)
+					if (NostrumMagica.rand.nextFloat() < 0.3f)
+						result = Blocks.REDSTONE_ORE;
+					else
+						result = Blocks.OBSIDIAN;
+				else
+					if (NostrumMagica.rand.nextFloat() < 0.3f)
+						result = Blocks.IRON_ORE;
+					else
+						result = Blocks.COAL_ORE;
+			} else {
+				if (level == 1)
+					result = Blocks.NETHERRACK;
+				else if (level == 2)
+					result = Blocks.LAVA;
+				else
+					if (NostrumMagica.rand.nextFloat() < 0.3f)
+						result = Blocks.QUARTZ_ORE;
+					else
+						result = Blocks.GLOWSTONE;
+			}
+			
+			world.setBlockState(block, result.getDefaultState());
+			NostrumMagicaSounds.DAMAGE_FIRE.play(world, block.getX(), block.getY(), block.getZ());
+			
+		}
+	}
 	
 	private EntityLivingBase source;
 	private List<SpellEffect> effects;
@@ -1113,14 +1241,39 @@ public class SpellAction {
 	}
 	
 	public void apply(EntityLivingBase entity) {
+		if (entity.worldObj.isRemote)
+			return;
+		
+		final EntityLivingBase ent = entity;
 		for (SpellEffect e : effects) {
-			e.apply(source, entity);
+			final SpellEffect effect = e;
+			entity.getServer().addScheduledTask(new Runnable() {
+
+				@Override
+				public void run() {
+					effect.apply(source, ent);
+				}
+				
+			});
 		}
 	}
 	
 	public void apply(World world, BlockPos pos) {
+		if (world.isRemote)
+			return;
+		
+		final World w = world;
+		final BlockPos b = pos;
 		for (SpellEffect e : effects) {
-			e.apply(source, world, pos);
+			final SpellEffect effect = e;
+			world.getMinecraftServer().addScheduledTask(new Runnable() {
+
+				@Override
+				public void run() {
+					effect.apply(source, w, b);
+				}
+				
+			});
 		}
 	}
 	
@@ -1280,6 +1433,16 @@ public class SpellAction {
 //		2) Only players can go through it
 //		3) Only the caster can go through it
 		effects.add(new WallEffect(level));
+		return this;
+	}
+	
+	public SpellAction geoblock(int level) {
+		effects.add(new GeoBlock(level));
+		return this;
+	}
+	
+	public SpellAction cursedIce(int level) {
+		effects.add(new CursedIce(level));
 		return this;
 	}
 }

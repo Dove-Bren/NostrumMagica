@@ -1,0 +1,7 @@
+{
+    "variants": {
+        "level=0": { "model": "nostrummagica:cursed_ice" },
+        "level=1": { "model": "nostrummagica:cursed_ice" },
+        "level=2": { "model": "nostrummagica:cursed_ice" }
+    }
+}

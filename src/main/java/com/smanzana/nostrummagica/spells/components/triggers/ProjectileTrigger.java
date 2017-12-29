@@ -44,7 +44,7 @@ public class ProjectileTrigger extends SpellTrigger {
 		public void init(EntityLivingBase caster) {
 			// Do a little more work of getting a good vector for things
 			// that aren't players
-			Vec3d dir;
+			final Vec3d dir;
 			if (caster instanceof EntityLiving && ((EntityLiving) caster).getAttackTarget() != null) {
 				EntityLiving ent = (EntityLiving) caster  ;
 				dir = ent.getAttackTarget().getPositionVector().addVector(0.0, ent.height / 2.0, 0.0)
@@ -52,14 +52,25 @@ public class ProjectileTrigger extends SpellTrigger {
 			} else {
 				dir = ProjectileTrigger.getVectorForRotation(pitch, yaw);
 			}
-			EntitySpellProjectile projectile = new EntitySpellProjectile(this,
-					getState().getSelf(),
-					world,
-					pos.xCoord, pos.yCoord, pos.zCoord,
-					dir,
-					5.0f, PROJECTILE_RANGE);
 			
-			world.spawnEntityInWorld(projectile);
+			final ProjectileTriggerInstance self = this;
+			
+			caster.getServer().addScheduledTask(new Runnable() {
+
+				@Override
+				public void run() {
+					EntitySpellProjectile projectile = new EntitySpellProjectile(self,
+							getState().getSelf(),
+							world,
+							pos.xCoord, pos.yCoord, pos.zCoord,
+							dir,
+							5.0f, PROJECTILE_RANGE);
+					
+					world.spawnEntityInWorld(projectile);
+			
+				}
+			
+			});
 		}
 		
 		public void onProjectileHit(BlockPos pos) {
