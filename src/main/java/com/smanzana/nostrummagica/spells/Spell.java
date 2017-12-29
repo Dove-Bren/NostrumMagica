@@ -425,8 +425,9 @@ public class Spell {
 			break;
 		case LIGHTNING:
 			break;
-		case WIND:
-			break;
+//		case WIND:
+//			break;
+			// TODO haha I caused a warning so you don't forget
 		}
 		
 		return null;
@@ -530,26 +531,7 @@ public class Spell {
 	
 	private static final SpellAction solveEnchant(EntityLivingBase caster, EMagicElement element,
 			int elementCount) {
-		int duration = 20 * 15 * elementCount;
-		int amp = elementCount - 1;
-		switch (element) {
-		case PHYSICAL:
-			break;
-		case EARTH:
-			break;
-		case ENDER:
-			break;
-		case FIRE:
-			break;
-		case ICE:
-			break; // TODO
-		case LIGHTNING:
-			break;
-		case WIND:
-			break;
-		}
-		
-		return null;
+		return new SpellAction(caster).enchant(element, elementCount);
 	}
 	
 	private static final SpellAction solveConjure(EntityLivingBase caster, EMagicElement element,

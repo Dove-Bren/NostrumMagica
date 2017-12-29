@@ -9,6 +9,10 @@ import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
 import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.renderer.ModelGolem;
 import com.smanzana.nostrummagica.entity.renderer.RenderGolem;
+import com.smanzana.nostrummagica.items.EnchantedArmor;
+import com.smanzana.nostrummagica.items.EnchantedWeapon;
+import com.smanzana.nostrummagica.items.MagicArmorBase;
+import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
@@ -67,6 +71,18 @@ public class ClientProxy extends CommonProxy {
 		super.init();
 		
 		registerModel(SpellTome.instance(), 0, SpellTome.id);
+		for (EnchantedWeapon weapon : EnchantedWeapon.getAll()) {
+			registerModel(weapon, 0, weapon.getModelID());
+		}
+		for (EnchantedArmor armor : EnchantedArmor.getAll()) {
+			registerModel(armor, 0, armor.getModelID());
+		}
+		
+		registerModel(MagicSwordBase.instance(), 0, MagicSwordBase.instance().getModelID());
+		registerModel(MagicArmorBase.helm, 0, MagicArmorBase.helm.getModelID());
+		registerModel(MagicArmorBase.chest, 0, MagicArmorBase.chest.getModelID());
+		registerModel(MagicArmorBase.legs, 0, MagicArmorBase.legs.getModelID());
+		registerModel(MagicArmorBase.feet, 0, MagicArmorBase.feet.getModelID());
 	}
 	
 	@Override

@@ -18,6 +18,10 @@ import com.smanzana.nostrummagica.entity.EntityGolemIce;
 import com.smanzana.nostrummagica.entity.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.EntityGolemWind;
+import com.smanzana.nostrummagica.items.EnchantedArmor;
+import com.smanzana.nostrummagica.items.EnchantedWeapon;
+import com.smanzana.nostrummagica.items.MagicArmorBase;
+import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.potions.MagicBoostPotion;
 import com.smanzana.nostrummagica.potions.MagicResistPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -25,15 +29,18 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.entity.effect.EntityLightningBolt;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.monster.EntityEndermite;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
@@ -89,6 +96,7 @@ public class SpellAction {
 		@Override
 		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
 			float fin = calcDamage(entity, amount, element);
+			source.setLastAttacker(entity);
 			entity.attackEntityFrom(new MagicDamageSource(source, element), fin);
 			
 			NostrumMagicaSounds sound;
@@ -219,6 +227,7 @@ public class SpellAction {
 			entity.addPotionEffect(new PotionEffect(effect, duration, amp));
 			
 			if (effect.isBadEffect()) {
+				caster.setLastAttacker(entity);
 				entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
 				NostrumMagicaSounds.STATUS_DEBUFF2.play(entity);
 			} else {
@@ -634,6 +643,10 @@ public class SpellAction {
 			
 			NostrumMagicaSounds.DAMAGE_FIRE.play(entity);
 			
+			caster.setLastAttacker(entity);
+			entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
+			entity.hurtResistantTime = 0;
+			
 			entity.setFire((int) Math.ceil((float) duration / 20.0f));
 		}
 
@@ -818,6 +831,178 @@ public class SpellAction {
 		}
 	}
 	
+	private static class PhaseEffect implements SpellEffect {
+		
+		private int level;
+		
+		public PhaseEffect(int level) {
+			this.level = level;
+		}
+		
+		@Override
+		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
+			if (caster != entity && entity instanceof EntityLiving) {
+				// Make sure they want to attack you if you do it
+				entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
+				entity.hurtResistantTime = 0;
+			}
+			
+			NostrumMagicaSounds.DAMAGE_ENDER.play(entity);
+			
+			for (int i = 0; i < 20; i++) {
+			
+				// Find a random place to teleport
+				double radius = 32.0 * level;
+		        double x = entity.posX + (NostrumMagica.rand.nextDouble() - 0.5D) * radius;
+		        double y = entity.posY + (double)(NostrumMagica.rand.nextInt((int) radius) - (int) radius / 2.0);
+		        double z = entity.posZ + (NostrumMagica.rand.nextDouble() - 0.5D) * radius;
+	
+			    // Try to teleport
+		        if (entity.attemptTeleport(x, y, z))
+		        	break;
+			}
+			
+		}
+
+		@Override
+		public void apply(EntityLivingBase caster, World world, BlockPos block) {
+			// Summon an entity
+			if (!world.isAirBlock(block))
+				block.add(0, 1, 0);
+			
+			int count = 1;
+			for (int i = 1; i < level; i++)
+				if (NostrumMagica.rand.nextBoolean())
+					count++;
+			
+			double x = block.getX() + .5,
+					y = block.getY() + .1,
+					z = block.getZ() + .5;
+			
+			for (int i = 0; i < count; i++) {
+				Entity entity;
+				if (NostrumMagica.rand.nextFloat() <= .1f) {
+					entity = new EntityItem(world,
+							x, y, z,
+							new ItemStack(Items.ENDER_PEARL));
+				} else if (NostrumMagica.rand.nextFloat() <= .3) {
+					entity = new EntityEnderman(world);
+				} else {
+					entity = new EntityEndermite(world);
+				}
+				
+				entity.posX = x + (NostrumMagica.rand.nextFloat() - .5);
+				entity.posY = y;
+				entity.posZ = z + (NostrumMagica.rand.nextFloat() - .5);
+				
+				world.spawnEntityInWorld(entity);
+			}
+			
+			NostrumMagicaSounds.DAMAGE_ENDER.play(world, block.getX(), block.getY(), block.getZ());
+		}
+		
+	}
+	
+	private static class EnchantEffect implements SpellEffect {
+		
+		private int level;
+		private EMagicElement element;
+		
+		public EnchantEffect(EMagicElement element, int level) {
+			this.level = level;
+			this.element = element;
+		}
+		
+		@Override
+		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
+			
+			ItemStack inhand = entity.getHeldItemMainhand();
+			boolean offhand = false;
+			if (inhand == null) {
+				inhand = entity.getHeldItemOffhand();
+				offhand = true;
+			}
+			
+			if (inhand == null)
+				return;
+			
+			Item item = inhand.getItem();
+			if (item instanceof MagicSwordBase) {
+				
+				Item weapon = EnchantedWeapon.get(element, level);
+				if (weapon == null) {
+					NostrumMagicaSounds.CAST_FAIL.play(entity);
+					return;
+				}
+				
+				ItemStack stack = new ItemStack(weapon);
+				
+				if (entity instanceof EntityPlayer) {
+					EntityPlayer p = (EntityPlayer) entity;
+					if (inhand.stackSize == 1) {
+						if (offhand) {
+							p.inventory.removeStackFromSlot(40);
+						} else {
+							p.inventory.removeStackFromSlot(p.inventory.currentItem);
+						}
+						((EntityPlayer) entity).inventory.addItemStackToInventory(stack);
+					} else {
+						inhand.splitStack(1);
+						((EntityPlayer) entity).inventory.addItemStackToInventory(stack);
+					}
+					
+					
+				} else {
+					// EntityLiving has held item in slot 0
+					entity.setHeldItem(EnumHand.MAIN_HAND, stack);
+				}
+				NostrumMagicaSounds.CAST_CONTINUE.play(entity);	
+			} if (item instanceof MagicArmorBase) {
+				EntityEquipmentSlot slot = ((MagicArmorBase) item).getEquipmentSlot();
+				
+				Item armor = EnchantedArmor.get(element, slot, level);
+				if (armor == null) {
+					NostrumMagicaSounds.CAST_FAIL.play(entity);
+					return;
+				}
+				
+				ItemStack stack = new ItemStack(armor);
+				
+				
+				if (entity instanceof EntityPlayer) {
+					EntityPlayer p = (EntityPlayer) entity;
+					if (inhand.stackSize == 1) {
+						if (offhand) {
+							p.inventory.removeStackFromSlot(40);
+						} else {
+							p.inventory.removeStackFromSlot(p.inventory.currentItem);
+						}
+						((EntityPlayer) entity).inventory.addItemStackToInventory(stack);
+					} else {
+						inhand.splitStack(1);
+						((EntityPlayer) entity).inventory.addItemStackToInventory(stack);
+					}
+					
+					
+				} else {
+					// EntityLiving has held item in slot 0
+					entity.setHeldItem(EnumHand.MAIN_HAND, stack);
+				}
+				NostrumMagicaSounds.CAST_CONTINUE.play(entity);
+				
+			} else {
+				NostrumMagicaSounds.CAST_FAIL.play(entity);
+			}
+			
+		}
+
+		@Override
+		public void apply(EntityLivingBase caster, World world, BlockPos block) {
+			;
+		}
+		
+	}
+	
 	private static class BurnArmorEffect implements SpellEffect {
 		
 		private int level;
@@ -848,6 +1033,7 @@ public class SpellAction {
 			}
 			
 			NostrumMagicaSounds.MELT_METAL.play(entity);
+			caster.setLastAttacker(entity);
 			entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
 			entity.hurtResistantTime = 0;
 		}
@@ -1010,6 +1196,16 @@ public class SpellAction {
 	
 	public SpellAction propel(int level) {
 		effects.add(new PropelEffect(level));
+		return this;
+	}
+	
+	public SpellAction phase(int level) {
+		effects.add(new PhaseEffect(level));
+		return this;
+	}
+	
+	public SpellAction enchant(EMagicElement element, int level) {
+		effects.add(new EnchantEffect(element, level));
 		return this;
 	}
 }

@@ -14,6 +14,10 @@ import com.smanzana.nostrummagica.entity.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.EntityGolemWind;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
+import com.smanzana.nostrummagica.items.EnchantedArmor;
+import com.smanzana.nostrummagica.items.EnchantedWeapon;
+import com.smanzana.nostrummagica.items.MagicArmorBase;
+import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
@@ -145,6 +149,11 @@ public class CommonProxy {
     private void registerItems() {
     	SpellTome.instance().setRegistryName(NostrumMagica.MODID, SpellTome.id);
     	GameRegistry.register(SpellTome.instance());
+    	
+    	MagicSwordBase.init();
+    	MagicArmorBase.init();
+    	EnchantedWeapon.registerWeapons();
+    	EnchantedArmor.registerArmors();
     }
     
     public void syncPlayer(EntityPlayerMP player) {

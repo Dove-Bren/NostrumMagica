@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.items.EnchantedEquipment;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ManaMessage;
@@ -16,7 +17,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.Spell.SpellPart;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
-import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
+import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
@@ -31,11 +32,13 @@ import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -395,6 +398,56 @@ public class PlayerListener {
 	public void onHeal(LivingHealEvent event) {
 		onHealth(event.getEntityLiving());
 	}
+	
+	@SubscribeEvent
+	public void onAttack(LivingAttackEvent event) {
+		if (event.isCanceled())
+			return;
+		
+		if (event.getAmount() > 0f && event.getSource() instanceof EntityDamageSource) {
+			Entity source = ((EntityDamageSource) event.getSource()).getSourceOfDamage();
+			
+			if (source instanceof EntityArrow) {
+				source = ((EntityArrow) source).shootingEntity;
+			} else if (source instanceof EntityFireball) {
+				source = ((EntityFireball) source).shootingEntity;
+			} else if (source instanceof EntityThrowable) {
+				source = ((EntityThrowable) source).getThrower();
+			}
+			
+			if (source instanceof EntityLivingBase) {
+
+				EntityLivingBase livingTarget = event.getEntityLiving();
+				EntityLivingBase livingSource = (EntityLivingBase) source;
+				
+				// Defense
+				for (ItemStack stack : livingTarget.getEquipmentAndArmor()) {
+					if (stack == null || !(stack.getItem() instanceof EnchantedEquipment))
+						continue;
+					
+					EnchantedEquipment ench = (EnchantedEquipment) stack.getItem();
+					if (ench.shouldTrigger(false)) {
+						SpellAction action = ench.getTriggerAction(livingTarget, false);
+						if (action != null)
+							action.apply(livingSource);
+					}
+				}
+		
+				// Offense
+				for (ItemStack stack : livingSource.getEquipmentAndArmor()) {
+					if (stack == null || !(stack.getItem() instanceof EnchantedEquipment))
+						continue;
+					
+					EnchantedEquipment ench = (EnchantedEquipment) stack.getItem();
+					if (ench.shouldTrigger(true)) {
+						SpellAction action = ench.getTriggerAction(livingSource, true);
+						if (action != null)
+							action.apply(livingTarget);
+					}
+				}
+			}
+		}
+	}
 
 	@SubscribeEvent
 	public void onDamage(LivingHurtEvent event) {
@@ -530,20 +583,6 @@ public class PlayerListener {
 				));
 		SpellTome.addSpell(tome, spell);
 		
-		spell = new Spell("Roots");
-		spell.addPart(new SpellPart(
-				SelfTrigger.instance(),
-				new SpellPartParam(0, false)
-				));
-		spell.addPart(new SpellPart(
-				SingleShape.instance(),
-				EMagicElement.EARTH,
-				1,
-				EAlteration.INFLICT,
-				new SpellPartParam(0, false)
-				));
-		SpellTome.addSpell(tome, spell);
-		
 		spell = new Spell("Transmute");
 		spell.addPart(new SpellPart(
 				SelfTrigger.instance(),
@@ -558,20 +597,6 @@ public class PlayerListener {
 				));
 		SpellTome.addSpell(tome, spell);
 		
-		spell = new Spell("Summon Physical");
-		spell.addPart(new SpellPart(
-				SelfTrigger.instance(),
-				new SpellPartParam(0, false)
-				));
-		spell.addPart(new SpellPart(
-				SingleShape.instance(),
-				EMagicElement.PHYSICAL,
-				1,
-				EAlteration.SUMMON,
-				new SpellPartParam(0, false)
-				));
-		SpellTome.addSpell(tome, spell);
-		
 		spell = new Spell("Summon Zapper");
 		spell.addPart(new SpellPart(
 				ProjectileTrigger.instance(),
@@ -580,48 +605,6 @@ public class PlayerListener {
 		spell.addPart(new SpellPart(
 				SingleShape.instance(),
 				EMagicElement.LIGHTNING,
-				1,
-				EAlteration.SUMMON,
-				new SpellPartParam(0, false)
-				));
-		SpellTome.addSpell(tome, spell);
-		
-		spell = new Spell("Summon Fire");
-		spell.addPart(new SpellPart(
-				ProjectileTrigger.instance(),
-				new SpellPartParam(0, false)
-				));
-		spell.addPart(new SpellPart(
-				SingleShape.instance(),
-				EMagicElement.FIRE,
-				1,
-				EAlteration.SUMMON,
-				new SpellPartParam(0, false)
-				));
-		SpellTome.addSpell(tome, spell);
-		
-		spell = new Spell("Summon Earth");
-		spell.addPart(new SpellPart(
-				ProjectileTrigger.instance(),
-				new SpellPartParam(0, false)
-				));
-		spell.addPart(new SpellPart(
-				SingleShape.instance(),
-				EMagicElement.EARTH,
-				1,
-				EAlteration.SUMMON,
-				new SpellPartParam(0, false)
-				));
-		SpellTome.addSpell(tome, spell);
-		
-		spell = new Spell("Summon Ice");
-		spell.addPart(new SpellPart(
-				ProjectileTrigger.instance(),
-				new SpellPartParam(0, false)
-				));
-		spell.addPart(new SpellPart(
-				SingleShape.instance(),
-				EMagicElement.ICE,
 				1,
 				EAlteration.SUMMON,
 				new SpellPartParam(0, false)
@@ -656,48 +639,6 @@ public class PlayerListener {
 				));
 		SpellTome.addSpell(tome, spell);
 		
-		spell = new Spell("Raze");
-		spell.addPart(new SpellPart(
-				ProjectileTrigger.instance(),
-				new SpellPartParam(0, false)
-				));
-		spell.addPart(new SpellPart(
-				AoEShape.instance(),
-				EMagicElement.FIRE,
-				1,
-				EAlteration.CONJURE,
-				new SpellPartParam(2, false)
-				));
-		SpellTome.addSpell(tome, spell);
-		
-		spell = new Spell("Pain");
-		spell.addPart(new SpellPart(
-				SelfTrigger.instance(),
-				new SpellPartParam(0, false)
-				));
-		spell.addPart(new SpellPart(
-				SingleShape.instance(),
-				EMagicElement.FIRE,
-				1,
-				null,
-				new SpellPartParam(0, false)
-				));
-		SpellTome.addSpell(tome, spell);
-		
-		spell = new Spell("Harm");
-		spell.addPart(new SpellPart(
-				SelfTrigger.instance(),
-				new SpellPartParam(0, false)
-				));
-		spell.addPart(new SpellPart(
-				SingleShape.instance(),
-				EMagicElement.PHYSICAL,
-				1,
-				null,
-				new SpellPartParam(0, false)
-				));
-		SpellTome.addSpell(tome, spell);
-		
 		spell = new Spell("Magic Shield");
 		spell.addPart(new SpellPart(
 				SelfTrigger.instance(),
@@ -726,34 +667,6 @@ public class PlayerListener {
 				));
 		SpellTome.addSpell(tome, spell);
 		
-		spell = new Spell("Frostbite");
-		spell.addPart(new SpellPart(
-				SelfTrigger.instance(),
-				new SpellPartParam(0, false)
-				));
-		spell.addPart(new SpellPart(
-				SingleShape.instance(),
-				EMagicElement.ICE,
-				1,
-				EAlteration.INFLICT,
-				new SpellPartParam(0, false)
-				));
-		SpellTome.addSpell(tome, spell);
-		
-		spell = new Spell("Push");
-		spell.addPart(new SpellPart(
-				SelfTrigger.instance(),
-				new SpellPartParam(0, false)
-				));
-		spell.addPart(new SpellPart(
-				SingleShape.instance(),
-				EMagicElement.WIND,
-				1,
-				EAlteration.RESIST,
-				new SpellPartParam(0, false)
-				));
-		SpellTome.addSpell(tome, spell);
-		
 		spell = new Spell("Pull");
 		spell.addPart(new SpellPart(
 				SelfTrigger.instance(),
@@ -764,6 +677,48 @@ public class PlayerListener {
 				EMagicElement.LIGHTNING,
 				1,
 				EAlteration.SUPPORT,
+				new SpellPartParam(0, false)
+				));
+		SpellTome.addSpell(tome, spell);
+		
+		spell = new Spell("Enchant Fire");
+		spell.addPart(new SpellPart(
+				SelfTrigger.instance(),
+				new SpellPartParam(0, false)
+				));
+		spell.addPart(new SpellPart(
+				SingleShape.instance(),
+				EMagicElement.FIRE,
+				1,
+				EAlteration.ENCHANT,
+				new SpellPartParam(0, false)
+				));
+		SpellTome.addSpell(tome, spell);
+		
+		spell = new Spell("Enchant Fire II");
+		spell.addPart(new SpellPart(
+				SelfTrigger.instance(),
+				new SpellPartParam(0, false)
+				));
+		spell.addPart(new SpellPart(
+				SingleShape.instance(),
+				EMagicElement.FIRE,
+				2,
+				EAlteration.ENCHANT,
+				new SpellPartParam(0, false)
+				));
+		SpellTome.addSpell(tome, spell);
+		
+		spell = new Spell("Enchant Wind");
+		spell.addPart(new SpellPart(
+				SelfTrigger.instance(),
+				new SpellPartParam(0, false)
+				));
+		spell.addPart(new SpellPart(
+				SingleShape.instance(),
+				EMagicElement.WIND,
+				1,
+				EAlteration.ENCHANT,
 				new SpellPartParam(0, false)
 				));
 		SpellTome.addSpell(tome, spell);
