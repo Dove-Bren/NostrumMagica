@@ -29,12 +29,21 @@ public class ClientCastReplyMessage implements IMessage {
 					NostrumMagica.proxy.getPlayer());
 			// Regardless of success, server has synced mana with us.j
 			int mana = message.tag.getInteger(NBT_MANA);
+			float xp = message.tag.getFloat(NBT_XP);
+			boolean success = message.tag.getBoolean(NBT_STATUS);
 			
 			att.setMana(mana);
 			
+			if (success) {
+				// On success, server sends XP that was added
+				att.addXP(xp);
+			} else {
+				
+			}
+			
 			// Success or nah?
 			
-			// TODO care
+
 			return null;
 		}
 		
@@ -42,6 +51,7 @@ public class ClientCastReplyMessage implements IMessage {
 
 	private static final String NBT_STATUS = "status";
 	private static final String NBT_MANA = "mana";
+	private static final String NBT_XP = "xp";
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
@@ -51,10 +61,11 @@ public class ClientCastReplyMessage implements IMessage {
 		tag = new NBTTagCompound();
 	}
 	
-	public ClientCastReplyMessage(boolean success, int mana) {
+	public ClientCastReplyMessage(boolean success, int mana, float xp) {
 		tag = new NBTTagCompound();
 		
 		tag.setInteger(NBT_MANA, mana);
+		tag.setFloat(NBT_XP, xp);
 		tag.setBoolean(NBT_STATUS, success);
 	}
 

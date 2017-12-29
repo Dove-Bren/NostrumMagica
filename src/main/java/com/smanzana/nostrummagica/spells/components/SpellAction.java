@@ -380,12 +380,18 @@ public class SpellAction {
 		
 		@Override
 		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
-			NostrumMagicaSounds.DAMAGE_WIND.play(entity);
-			float magnitude = 2f * (float) amp;
+			apply(caster, entity.worldObj, entity.getPosition());
+		}
+		
+		@Override
+		public void apply(EntityLivingBase caster, World world, BlockPos pos) {
+
+			float magnitude = .35f * ((float) amp + 1.0f);
+			Vec3d center = new Vec3d(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
+			NostrumMagicaSounds.DAMAGE_WIND.play(world, center.xCoord, center.yCoord, center.zCoord);
 			
-			Vec3d center = entity.getPositionVector();
-			for (Entity e : entity.worldObj.getEntitiesWithinAABBExcludingEntity(entity, 
-					new AxisAlignedBB(entity.posX - range, entity.posY - range, entity.posZ - range, entity.posX + range, entity.posY + range, entity.posZ + range)
+			for (Entity e : world.getEntitiesWithinAABBExcludingEntity(null, 
+					new AxisAlignedBB(center.xCoord - range, center.yCoord - range, center.zCoord - range, center.xCoord + range, center.yCoord + range, center.zCoord + range)
 					)) {
 				double dist = e.getPositionVector().distanceTo(center); 
 				if (dist <= range) {
@@ -394,7 +400,7 @@ public class SpellAction {
 					// If pull, cap magnitude so that it doesn't fly past player
 					
 					Vec3d force;
-					Vec3d direction = e.getPositionVector().subtract(center).normalize();
+					Vec3d direction = e.getPositionVector().addVector(0, e.getEyeHeight(), 0).subtract(center).normalize();
 					force = new Vec3d(
 							direction.xCoord * magnitude,
 							direction.yCoord * magnitude,
@@ -405,7 +411,7 @@ public class SpellAction {
 						// Cap force's magnitude at .2 dist
 						double mod = force.lengthVector();
 						if (mod > dist * .2) {
-							mod = (dist * .2) / mod;
+							mod = (dist * .4) / mod;
 							force = new Vec3d(
 									force.xCoord * mod,
 									force.yCoord * mod,
@@ -418,11 +424,6 @@ public class SpellAction {
 				}
 			}
 			
-		}
-		
-		@Override
-		public void apply(EntityLivingBase caster, World world, BlockPos pos) {
-			; // Do nothing // TODO could push from the cell!
 		}
 	}
 	

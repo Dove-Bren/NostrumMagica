@@ -82,8 +82,7 @@ public interface INostrumMagic {
 			int control,
 			int tech,
 			int finesse,
-			int mana,
-			int maxmana
+			int mana
 			);
 	
 	public Map<String, Integer> serializeLoreLevels();

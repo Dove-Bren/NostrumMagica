@@ -26,7 +26,6 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	private static final String NBT_TECH = "tech";
 	private static final String NBT_FINESSE = "finesse";
 	private static final String NBT_MANA = "mana";
-	private static final String NBT_MAXMANA = "maxmana";
 	
 	//private static final String NBT_FAMILIARS = "familiars";
 	//private static final String NBT_BINDING = "binding"; // TODO binding interface
@@ -50,7 +49,6 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		nbt.setInteger(NBT_TECH, instance.getTech());
 		nbt.setInteger(NBT_FINESSE, instance.getFinesse());
 		nbt.setInteger(NBT_MANA, instance.getMana());
-		nbt.setInteger(NBT_MAXMANA, instance.getMaxMana());
 		
 		NBTTagCompound compound = new NBTTagCompound();
 		{
@@ -112,8 +110,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			tag.getInteger(NBT_CONTROL),
 			tag.getInteger(NBT_TECH),
 			tag.getInteger(NBT_FINESSE),
-			tag.getInteger(NBT_MANA),
-			tag.getInteger(NBT_MAXMANA));
+			tag.getInteger(NBT_MANA));
 		
 		// LORE
 		NBTTagCompound compound = tag.getCompoundTag(NBT_LORELEVELS);

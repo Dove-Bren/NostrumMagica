@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.potions.RootedPotion;
@@ -17,13 +18,16 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.ISpecialArmor;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class EnchantedArmor extends ItemArmor implements EnchantedEquipment {
+public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISpecialArmor {
 
 	private static Map<EMagicElement, Map<EntityEquipmentSlot, Map<Integer, EnchantedArmor>>> items;
 	
@@ -49,6 +53,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment {
 	}
 	
 	public static boolean isArmorElement(EMagicElement element) {
+		
 		switch (element) {
 		case EARTH:
 		case ENDER:
@@ -64,7 +69,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment {
 	}
 	
 	// Vanilla UUIDS. can get out of sync. :(
-	private static final UUID[] ARMOR_MODIFIERS = new UUID[] {UUID.fromString("845DB27C-C624-495F-8C9F-6020A9A58B6B"), UUID.fromString("D8499B04-0E66-4726-AB29-64469D734E0D"), UUID.fromString("9F3D476D-C118-4544-8365-64846904B48E"), UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150")};
+	//private static final UUID[] ARMOR_MODIFIERS = new UUID[] {UUID.fromString("845DB27C-C624-495F-8C9F-6020A9A58B6B"), UUID.fromString("D8499B04-0E66-4726-AB29-64469D734E0D"), UUID.fromString("9F3D476D-C118-4544-8365-64846904B48E"), UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150")};
+	private static final UUID[] ARMOR_MODIFIERS = new UUID[] {UUID.fromString("922AB274-1111-56FE-19AE-365AA9758B8B"), UUID.fromString("D1459204-0E61-4716-A129-61666D432E0D"), UUID.fromString("1F7D236D-1118-6524-3375-34814505B28E"), UUID.fromString("2A632266-F4E1-2E67-7836-64FD783B7A50")};
 	
 	private static int calcArmor(EntityEquipmentSlot slot, EMagicElement element, int level) {
 		
@@ -107,7 +113,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment {
 		}
 		
 		if (base != 0)
-			base += Math.pow(2, level);
+			base += level - 1;
 		
 		return (int) ((float) base * mod);
 	}
@@ -132,7 +138,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment {
 	
 	@Override
     public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
-        Multimap<String, AttributeModifier> multimap = super.getItemAttributeModifiers(equipmentSlot);
+        Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();	
 
         if (equipmentSlot == this.armorType)
         {
@@ -255,6 +261,22 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment {
 	
 	public String getModelID() {
 		return modelID;
+	}
+
+	@Override
+	public ArmorProperties getProperties(EntityLivingBase player, ItemStack armor, DamageSource source, double damage,
+			int slot) {
+		return new ArmorProperties(1, 1.0, this.armor);
+	}
+
+	@Override
+	public int getArmorDisplay(EntityPlayer player, ItemStack armor, int slot) {
+		return this.armor;
+	}
+
+	@Override
+	public void damageArmor(EntityLivingBase entity, ItemStack stack, DamageSource source, int damage, int slot) {
+		stack.damageItem(damage, entity);
 	}
 	
 }

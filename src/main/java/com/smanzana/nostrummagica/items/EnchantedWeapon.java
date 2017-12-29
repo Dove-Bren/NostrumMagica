@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.potions.FrostbitePotion;
@@ -15,10 +16,16 @@ import com.smanzana.nostrummagica.spells.components.SpellAction;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
@@ -101,7 +108,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 	
 	@Override
 	public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
-        Multimap<String, AttributeModifier> multimap = super.getItemAttributeModifiers(equipmentSlot);
+        Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
 
         if (equipmentSlot == EntityEquipmentSlot.MAINHAND)
         {
@@ -130,8 +137,9 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 		case PHYSICAL:
 			break;
 		case WIND:
-			if (NostrumMagica.rand.nextFloat() < 0.35f * level)
-				action = new SpellAction(user).propel(1);
+			// now just does on right click
+//			if (NostrumMagica.rand.nextFloat() < 0.35f * level)
+//				action = new SpellAction(user).push(5f, level);
 			break;
 		case LIGHTNING:
 			if (NostrumMagica.rand.nextFloat() < 0.1f * level)
@@ -176,5 +184,18 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 	public String getModelID() {
 		return modelID;
 	}
+	
+	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
+    {
+		if (element == EMagicElement.WIND) {
+			SpellAction fly = new SpellAction(playerIn);
+			fly.push(5.0f, level);
+			fly.apply(worldIn, pos);
+			stack.damageItem(3, playerIn);
+			return EnumActionResult.SUCCESS;
+		}
+
+        return EnumActionResult.PASS;
+    }
 	
 }

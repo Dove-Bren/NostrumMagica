@@ -29,7 +29,7 @@ public class NostrumMagic implements INostrumMagic {
 	
 	public static class LevelCurves {
 		
-		private static final float xpGrowth = 2.5f;
+		private static final float xpGrowth = 1.65f;
 		private static final float xpBase = 100.0f;
 		private static final float manaGrowth = 1.2f;
 		private static final float manaBase = 100.0f;
@@ -329,7 +329,7 @@ public class NostrumMagic implements INostrumMagic {
 
 	@Override
 	public void deserialize(boolean unlocked, int level, float xp, int skillpoints, int control, int tech, int finesse,
-			int mana, int maxmana) {
+			int mana) {
 		this.unlocked = unlocked;
 		this.level = level;
 		this.xp = xp;
@@ -339,7 +339,7 @@ public class NostrumMagic implements INostrumMagic {
 		this.tech = tech;
 		this.finesse = finesse;
 		this.mana = mana;
-		this.maxMana = maxmana;
+		this.maxMana = LevelCurves.maxMana(this.level);
 	}
 
 	@Override
@@ -377,7 +377,7 @@ public class NostrumMagic implements INostrumMagic {
 		System.out.println("Overriding stats from" + this.mana + " to " + cap.getMana() + " mana");
 		this.deserialize(cap.isUnlocked(), cap.getLevel(), cap.getXP(),
 				cap.getSkillPoints(), cap.getControl(), cap.getTech(),
-				cap.getFinesse(), cap.getMana(), cap.getMaxMana());
+				cap.getFinesse(), cap.getMana());
 		
 		this.loreLevels = cap.serializeLoreLevels();
 		this.spellCRCs = cap.serializeSpellHistory();
