@@ -33,9 +33,9 @@ public class SpellPreviewPage implements IBookPage {
 		
 		elementIcon.draw(parent, fonter, xoffset + 4, icony, 24, 24);
 		fonter.drawString(spell.getName(), xoffset + 32, yoffset + 2, spell.getPrimaryElement().getColor());
-		yoffset += fonter.FONT_HEIGHT + 5;
+		yoffset += fonter.FONT_HEIGHT + 3;
 		fonter.drawString("Mana: " + spell.getManaCost(), xoffset + 32, yoffset, 0xFF354AA8);
-		yoffset += fonter.FONT_HEIGHT + 5;
+		yoffset += fonter.FONT_HEIGHT + 3;
 		fonter.drawSplitString(spell.getDescription(), xoffset + 32,
 				yoffset, Math.max(32, width - 32), 0xFF000000);
 		

@@ -416,18 +416,12 @@ public class Spell {
 		case PHYSICAL:
 			return new SpellAction(caster).transmute(elementCount);
 		case EARTH:
-			break;
 		case ENDER:
-			break;
 		case FIRE:
-			break;
 		case ICE:
-			break;
 		case LIGHTNING:
-			break;
-//		case WIND:
-//			break;
-			// TODO haha I caused a warning so you don't forget
+		case WIND:
+			return new SpellAction(caster).infuse(element, elementCount);
 		}
 		
 		return null;

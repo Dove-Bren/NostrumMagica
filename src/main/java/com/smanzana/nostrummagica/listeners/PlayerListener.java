@@ -656,6 +656,34 @@ public class PlayerListener {
 				));
 		SpellTome.addSpell(tome, spell);
 		
+		spell = new Spell("Alter Fire I");
+		spell.addPart(new SpellPart(
+				SelfTrigger.instance(),
+				new SpellPartParam(0, false)
+				));
+		spell.addPart(new SpellPart(
+				SingleShape.instance(),
+				EMagicElement.FIRE,
+				1,
+				EAlteration.ALTER,
+				new SpellPartParam(0, false)
+				));
+		SpellTome.addSpell(tome, spell);
+		
+		spell = new Spell("Alter Ice 3");
+		spell.addPart(new SpellPart(
+				SelfTrigger.instance(),
+				new SpellPartParam(0, false)
+				));
+		spell.addPart(new SpellPart(
+				SingleShape.instance(),
+				EMagicElement.ICE,
+				3,
+				EAlteration.ALTER,
+				new SpellPartParam(0, false)
+				));
+		SpellTome.addSpell(tome, spell);
+		
 		spell = new Spell("Summon Zapper");
 		spell.addPart(new SpellPart(
 				ProjectileTrigger.instance(),

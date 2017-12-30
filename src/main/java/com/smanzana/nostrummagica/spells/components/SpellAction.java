@@ -21,6 +21,7 @@ import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.EntityGolemWind;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
+import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.potions.MagicBoostPotion;
@@ -970,7 +971,7 @@ public class SpellAction {
 					entity.setHeldItem(EnumHand.MAIN_HAND, stack);
 				}
 				NostrumMagicaSounds.CAST_CONTINUE.play(entity);	
-			} if (item instanceof MagicArmorBase) {
+			} else if (item instanceof MagicArmorBase) {
 				EntityEquipmentSlot slot = ((MagicArmorBase) item).getEquipmentSlot();
 				
 				Item armor = EnchantedArmor.get(element, slot, level);
@@ -1232,6 +1233,66 @@ public class SpellAction {
 		}
 	}
 	
+	private static class InfuseEffect implements SpellEffect {
+		
+		private int level;
+		private EMagicElement element;
+		
+		public InfuseEffect(EMagicElement element, int level) {
+			this.level = level;
+			this.element = element;
+		}
+
+		@Override
+		public void apply(EntityLivingBase caster, EntityLivingBase entity) {
+			ItemStack inhand = entity.getHeldItemMainhand();
+			boolean offhand = false;
+			if (inhand == null) {
+				inhand = entity.getHeldItemOffhand();
+				offhand = true;
+			}
+			
+			if (inhand == null)
+				return;
+			
+			Item item = inhand.getItem();
+			if (item instanceof InfusedGemItem && inhand.getMetadata() == 0) {
+				
+				int count = (int) Math.pow(2, level - 1);
+				ItemStack stack = InfusedGemItem.instance().getGem(element, count);
+				
+				if (entity instanceof EntityPlayer) {
+					EntityPlayer p = (EntityPlayer) entity;
+					if (inhand.stackSize == 1) {
+						if (offhand) {
+							p.inventory.removeStackFromSlot(40);
+						} else {
+							p.inventory.removeStackFromSlot(p.inventory.currentItem);
+						}
+						((EntityPlayer) entity).inventory.addItemStackToInventory(stack);
+					} else {
+						inhand.splitStack(1);
+						((EntityPlayer) entity).inventory.addItemStackToInventory(stack);
+					}
+					
+					
+				} else {
+					// EntityLiving has held item in slot 0
+					entity.setHeldItem(EnumHand.MAIN_HAND, stack);
+				}
+				NostrumMagicaSounds.CAST_CONTINUE.play(entity);	
+			} else {
+				NostrumMagicaSounds.CAST_FAIL.play(entity);
+			}
+		}
+
+		@Override
+		public void apply(EntityLivingBase caster, World world, BlockPos block) {
+			; // No effect
+		}
+		
+	}
+	
 	private EntityLivingBase source;
 	private List<SpellEffect> effects;
 	
@@ -1443,6 +1504,11 @@ public class SpellAction {
 	
 	public SpellAction cursedIce(int level) {
 		effects.add(new CursedIce(level));
+		return this;
+	}
+	
+	public SpellAction infuse(EMagicElement element, int level) {
+		effects.add(new InfuseEffect(element, level));
 		return this;
 	}
 }

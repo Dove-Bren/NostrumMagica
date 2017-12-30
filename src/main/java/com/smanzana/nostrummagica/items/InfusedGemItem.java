@@ -47,6 +47,21 @@ public class InfusedGemItem extends Item {
 	}
 	
 	/**
+	 * Returns an itemstack containing the gem type specefied.
+	 * If element is null, returns a basic gem.
+	 * @param element
+	 * @param count
+	 * @return
+	 */
+	public ItemStack getGem(EMagicElement element, int count) {
+		int meta = 0;
+		if (element != null && element != EMagicElement.PHYSICAL)
+			meta = element.ordinal() + 1;
+		
+		return new ItemStack(this, count, meta);
+	}
+	
+	/**
      * returns a list of items with the same ID, but different meta (eg: dye returns 16 items)
      */
     @SideOnly(Side.CLIENT)
