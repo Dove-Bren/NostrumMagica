@@ -13,6 +13,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.EnumPlantType;
 
 public class MandrakeRoot extends BlockCrops {
 
@@ -69,14 +70,22 @@ public class MandrakeRoot extends BlockCrops {
     }
     
     @Override
-    public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state)
-    {
+    public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state) {
         return getCrops(1);
     }
 
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
-    {
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
         return AABB[((Integer)state.getValue(this.getAgeProperty())).intValue()];
     }
+    
+	@Override
+	public EnumPlantType getPlantType(net.minecraft.world.IBlockAccess world, BlockPos pos) {
+		return EnumPlantType.Crop;
+	}
+
+	@Override
+	public IBlockState getPlant(IBlockAccess world, BlockPos pos) {
+		return getDefaultState();
+	}
 	
 }
