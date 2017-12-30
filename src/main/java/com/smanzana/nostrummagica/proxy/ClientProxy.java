@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.entity.renderer.ModelGolem;
 import com.smanzana.nostrummagica.entity.renderer.RenderGolem;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
+import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.ReagentItem;
@@ -23,6 +24,7 @@ import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.client.Minecraft;
@@ -81,6 +83,19 @@ public class ClientProxy extends CommonProxy {
 		}
 		ModelBakery.registerItemVariants(ReagentItem.instance(), variants);
 		
+		variants = new ResourceLocation[EMagicElement.values().length];
+		i = 0;
+		for (EMagicElement type : EMagicElement.values()) {
+			if (type == EMagicElement.PHYSICAL)
+				continue;
+			variants[i++] = new ResourceLocation(NostrumMagica.MODID,
+					"gem_" + InfusedGemItem.instance().getNameFromMeta(InfusedGemItem.instance()
+							.getMetaFromElement(type)));
+		}
+		variants[i++] = new ResourceLocation(NostrumMagica.MODID,
+				"gem_basic");
+		ModelBakery.registerItemVariants(InfusedGemItem.instance(), variants);
+		
 	}
 	
 	@Override
@@ -104,6 +119,18 @@ public class ClientProxy extends CommonProxy {
 		for (ReagentItem.ReagentType type : ReagentItem.ReagentType.values()) {
 			registerModel(ReagentItem.instance(), type.getMeta(),
 					ReagentItem.instance().getNameFromMeta(type.getMeta()));
+		}
+		
+		InfusedGemItem gem = InfusedGemItem.instance();
+		
+		registerModel(gem, 0, "gem_basic");
+		
+		for (EMagicElement type : EMagicElement.values()) {
+			if (type == EMagicElement.PHYSICAL)
+				continue;
+			int meta = gem.getMetaFromElement(type);
+			registerModel(gem, meta,
+					"gem_" + gem.getNameFromMeta(meta));
 		}
 		
 		registerModel(new ItemBlock(NostrumMagicaFlower.instance()), 

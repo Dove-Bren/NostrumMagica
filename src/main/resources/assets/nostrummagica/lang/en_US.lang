@@ -15,6 +15,14 @@ item.nostrum_reagent.spider_silk.name=Spider Silk
 item.nostrum_reagent.mani_dust.name=Mani Dust
 item.nostrum_reagent.crystabloom.name=Crystabloom
 
+item.nostrum_gem.basic.name=Void Gem
+item.nostrum_gem.lightning.name=Lightning Gem
+item.nostrum_gem.fire.name=Fire Gem
+item.nostrum_gem.earth.name=Earth Gem
+item.nostrum_gem.ice.name=Ice Gem
+item.nostrum_gem.wind.name=Wind Gem
+item.nostrum_gem.ender.name=Ender Gem
+
 item.magic_wall.name=Magic Wall
 item.mani_ore.name=Mani Ore
 

@@ -22,6 +22,7 @@ import com.smanzana.nostrummagica.entity.EntityGolemWind;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
+import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.ReagentItem;
@@ -170,6 +171,8 @@ public class CommonProxy {
     	
     	ReagentItem.instance().setRegistryName(NostrumMagica.MODID, ReagentItem.ID);
     	GameRegistry.register(ReagentItem.instance());
+    	InfusedGemItem.instance().setRegistryName(NostrumMagica.MODID, InfusedGemItem.ID);
+    	GameRegistry.register(InfusedGemItem.instance());
     }
     
     private void registerBlocks() {
