@@ -1,0 +1,6 @@
+{
+    "parent": "block/cross",
+    "textures": {
+        "cross": "nostrummagica:blocks/midnight_iris"
+    }
+}

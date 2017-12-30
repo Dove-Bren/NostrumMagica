@@ -1,0 +1,6 @@
+{
+    "variants": {
+        "type=midnight_iris": { "model": "nostrummagica:midnight_iris" },
+        "type=crystabloom": { "model": "nostrummagica:crystabloom" }
+    }
+}

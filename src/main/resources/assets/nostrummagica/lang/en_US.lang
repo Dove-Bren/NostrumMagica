@@ -6,6 +6,15 @@ item.magicchestbase.name=Ethereal Chestplate
 item.magicleggingsbase.name=Ethereal Leggings
 item.magicfeetbase.name=Ethereal Boots
 
+item.nostrum_reagent_black_pearl.name=Black Pearl
+item.nostrum_reagent_mandrake_root.name=Mandrake Root
+item.nostrum_reagent_grave_dust.name=Grave Dust
+item.nostrum_reagent_sky_ash.name=Sky Ash
+item.nostrum_reagent_ginseng.name=Ginseng
+item.nostrum_reagent_spider_silk.name=Spider Silk
+item.nostrum_reagent_mani_dust.name=Mani Dust
+item.nostrum_reagent_crystabloom.name=Crystabloom
+
 item.magic_wall.name=Magic Wall
 
 item.sword_lightning1.name=Lightning Knife

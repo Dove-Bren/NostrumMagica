@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.proxy;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.CursedIce;
 import com.smanzana.nostrummagica.blocks.MagicWall;
+import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagic;
@@ -20,6 +21,7 @@ import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
+import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
@@ -159,6 +161,9 @@ public class CommonProxy {
     	MagicArmorBase.init();
     	EnchantedWeapon.registerWeapons();
     	EnchantedArmor.registerArmors();
+    	
+    	ReagentItem.instance().setRegistryName(NostrumMagica.MODID, ReagentItem.ID);
+    	GameRegistry.register(ReagentItem.instance());
     }
     
     private void registerBlocks() {
@@ -173,6 +178,8 @@ public class CommonProxy {
     	GameRegistry.register(
     			(new ItemBlock(CursedIce.instance())).setRegistryName(CursedIce.ID)
     		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(CursedIce.ID));
+    	
+    	NostrumMagicaFlower.init();
     }
     
     public void syncPlayer(EntityPlayerMP player) {

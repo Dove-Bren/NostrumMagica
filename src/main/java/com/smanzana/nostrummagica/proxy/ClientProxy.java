@@ -3,6 +3,9 @@ package com.smanzana.nostrummagica.proxy;
 import org.lwjgl.input.Keyboard;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.CursedIce;
+import com.smanzana.nostrummagica.blocks.MagicWall;
+import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
@@ -13,6 +16,8 @@ import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
+import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
@@ -21,6 +26,7 @@ import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -28,8 +34,10 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -64,6 +72,14 @@ public class ClientProxy extends CommonProxy {
 			}
 		});
 		
+		ResourceLocation variants[] = new ResourceLocation[ReagentType.values().length];
+		int i = 0;
+		for (ReagentType type : ReagentType.values()) {
+			variants[i++] = new ResourceLocation(NostrumMagica.MODID,
+					ReagentItem.instance().getNameFromMeta(type.getMeta()));
+		}
+		ModelBakery.registerItemVariants(ReagentItem.instance(), variants);
+		
 	}
 	
 	@Override
@@ -83,6 +99,27 @@ public class ClientProxy extends CommonProxy {
 		registerModel(MagicArmorBase.chest, 0, MagicArmorBase.chest.getModelID());
 		registerModel(MagicArmorBase.legs, 0, MagicArmorBase.legs.getModelID());
 		registerModel(MagicArmorBase.feet, 0, MagicArmorBase.feet.getModelID());
+		
+		for (ReagentItem.ReagentType type : ReagentItem.ReagentType.values()) {
+			registerModel(ReagentItem.instance(), type.getMeta(),
+					ReagentItem.instance().getNameFromMeta(type.getMeta()));
+		}
+		
+		registerModel(new ItemBlock(NostrumMagicaFlower.instance()), 
+				NostrumMagicaFlower.Type.CRYSTABLOOM.getMeta(),
+				NostrumMagicaFlower.Type.CRYSTABLOOM.getName()
+				);
+		registerModel(new ItemBlock(NostrumMagicaFlower.instance()), 
+				NostrumMagicaFlower.Type.MIDNIGHT_IRIS.getMeta(),
+				NostrumMagicaFlower.Type.MIDNIGHT_IRIS.getName()
+				);
+		
+		registerModel(Item.getItemFromBlock(MagicWall.instance()),
+				0,
+				MagicWall.ID);
+		registerModel(Item.getItemFromBlock(CursedIce.instance()),
+				0,
+				CursedIce.ID);
 	}
 	
 	@Override
