@@ -110,6 +110,11 @@ public class ReagentItem extends Item {
     	return ret;
     }
     
+    public ItemStack getReagent(ReagentType type, int count) {
+    	int meta = type.getMeta();
+    	return new ItemStack(this, count, meta);
+    }
+    
     @Override
     public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {

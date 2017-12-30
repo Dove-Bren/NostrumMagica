@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.EnchantedEquipment;
 import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
@@ -502,7 +503,7 @@ public class PlayerListener {
 		if (event.isCanceled())
 			return;
 		
-		if (NostrumMagica.rand.nextFloat() <= 0.4f)
+		if (NostrumMagica.rand.nextFloat() <= 0.2f)
 		if (event.getState().getMaterial() == Material.LEAVES) {
 			EntityItem entity = new EntityItem(event.getWorld(),
 					event.getPos().getX() + 0.5,
@@ -525,7 +526,7 @@ public class PlayerListener {
 	public void onMobDrop(LivingDropsEvent event) {
 		if (event.getEntityLiving().isEntityUndead()) {
 			for (int i = 0; i <= event.getLootingLevel(); i++) {
-				if (NostrumMagica.rand.nextFloat() <= 0.2f) {
+				if (NostrumMagica.rand.nextFloat() <= 0.3f) {
 					EntityItem entity = new EntityItem(event.getEntity().worldObj,
 							event.getEntity().posX,
 							event.getEntity().posY,
@@ -538,7 +539,7 @@ public class PlayerListener {
 		}
 		if (event.getEntityLiving() instanceof EntitySpider) {
 			for (int i = 0; i <= event.getLootingLevel(); i++) {
-				if (NostrumMagica.rand.nextFloat() <= 0.2f) {
+				if (NostrumMagica.rand.nextFloat() <= 0.4f) {
 					EntityItem entity = new EntityItem(event.getEntity().worldObj,
 							event.getEntity().posX,
 							event.getEntity().posY,
@@ -852,6 +853,9 @@ public class PlayerListener {
 				));
 		SpellTome.addSpell(tome, spell);
 		
+		ItemStack scroll = new ItemStack(SpellScroll.instance(), 1);
+		SpellScroll.setSpell(scroll, spell);
+		
 		BlockPos pos = e.getPos().add(0, 1, 0);
 		e.getWorld().spawnEntityInWorld(new EntityItem(
 				e.getWorld(),
@@ -859,6 +863,13 @@ public class PlayerListener {
 				(float) pos.getY(),
 				pos.getZ() + .5f,
 				tome
+				));
+		e.getWorld().spawnEntityInWorld(new EntityItem(
+				e.getWorld(),
+				pos.getX() + .5f,
+				(float) pos.getY(),
+				pos.getZ() + .5f,
+				scroll
 				));
 	}
 }

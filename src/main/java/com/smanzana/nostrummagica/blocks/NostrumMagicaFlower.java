@@ -174,7 +174,7 @@ public class NostrumMagicaFlower extends BlockBush {
 	
 	@Override
 	public int getMetaFromState(IBlockState state) {
-		return state.getValue(TYPE).getKey();
+		return state.getValue(TYPE).getMeta();
 	}
 	
 	@Override

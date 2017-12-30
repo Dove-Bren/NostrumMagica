@@ -20,12 +20,14 @@ import com.smanzana.nostrummagica.entity.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.EntityGolemWind;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
+import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
@@ -45,6 +47,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
+import com.smanzana.nostrummagica.world.NostrumFlowerGenerator;
 import com.smanzana.nostrummagica.world.NostrumOreGenerator;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -133,6 +136,7 @@ public class CommonProxy {
     	registerBlocks();
     	
     	GameRegistry.registerWorldGenerator(new NostrumOreGenerator(), 0);
+    	GameRegistry.registerWorldGenerator(new NostrumFlowerGenerator(), 0);
 	}
 	
 	public void postinit() {
@@ -164,6 +168,13 @@ public class CommonProxy {
     	SpellTome.instance().setRegistryName(NostrumMagica.MODID, SpellTome.id);
     	GameRegistry.register(SpellTome.instance());
     	
+    	BlankScroll.instance().setRegistryName(NostrumMagica.MODID, BlankScroll.id);
+    	GameRegistry.register(BlankScroll.instance());
+    	BlankScroll.init();
+    	
+    	SpellScroll.instance().setRegistryName(NostrumMagica.MODID, SpellScroll.id);
+    	GameRegistry.register(SpellScroll.instance());
+    	
     	MagicSwordBase.init();
     	MagicArmorBase.init();
     	EnchantedWeapon.registerWeapons();
@@ -173,6 +184,7 @@ public class CommonProxy {
     	GameRegistry.register(ReagentItem.instance());
     	InfusedGemItem.instance().setRegistryName(NostrumMagica.MODID, InfusedGemItem.ID);
     	GameRegistry.register(InfusedGemItem.instance());
+    	InfusedGemItem.init();
     }
     
     private void registerBlocks() {

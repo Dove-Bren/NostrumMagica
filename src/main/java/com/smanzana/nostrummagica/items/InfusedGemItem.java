@@ -3,11 +3,14 @@ package com.smanzana.nostrummagica.items;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -26,6 +29,13 @@ public class InfusedGemItem extends Item {
 			instance = new InfusedGemItem();
 		
 		return instance;
+	}
+	
+	public static void init() {
+		GameRegistry.addRecipe(new ItemStack(instance), " G ", "GEG", "BGB",
+				'G', ReagentItem.instance().getReagent(ReagentType.GRAVE_DUST, 1),
+				'E', Items.ENDER_PEARL,
+				'B', ReagentItem.instance().getReagent(ReagentType.BLACK_PEARL, 1));
 	}
 	
 	public InfusedGemItem() {
