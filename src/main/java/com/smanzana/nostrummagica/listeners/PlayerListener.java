@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.EnchantedEquipment;
+import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ManaMessage;
@@ -22,10 +24,12 @@ import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EntityTracker;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.monster.EntitySpider;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityArrow;
@@ -39,10 +43,12 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.UseHoeEvent;
+import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
@@ -489,6 +495,59 @@ public class PlayerListener {
 		}
 		
 		onHealth(event.getEntityLiving());
+	}
+	
+	@SubscribeEvent
+	public void onBlockBreak(BreakEvent event) {
+		if (event.isCanceled())
+			return;
+		
+		if (NostrumMagica.rand.nextFloat() <= 0.4f)
+		if (event.getState().getMaterial() == Material.LEAVES) {
+			EntityItem entity = new EntityItem(event.getWorld(),
+					event.getPos().getX() + 0.5,
+					event.getPos().getY() + 0.5,
+					event.getPos().getZ() + 0.5,
+					new ItemStack(ReagentItem.instance(), 1, ReagentType.SKY_ASH.getMeta()));
+			event.getWorld().spawnEntityInWorld(entity);
+		}
+		if (event.getState().getMaterial() == Material.WEB) {
+			EntityItem entity = new EntityItem(event.getWorld(),
+					event.getPos().getX() + 0.5,
+					event.getPos().getY() + 0.5,
+					event.getPos().getZ() + 0.5,
+					new ItemStack(ReagentItem.instance(), 1, ReagentType.SPIDER_SILK.getMeta()));
+			event.getWorld().spawnEntityInWorld(entity);
+		}
+	}
+	
+	@SubscribeEvent
+	public void onMobDrop(LivingDropsEvent event) {
+		if (event.getEntityLiving().isEntityUndead()) {
+			for (int i = 0; i <= event.getLootingLevel(); i++) {
+				if (NostrumMagica.rand.nextFloat() <= 0.2f) {
+					EntityItem entity = new EntityItem(event.getEntity().worldObj,
+							event.getEntity().posX,
+							event.getEntity().posY,
+							event.getEntity().posZ,
+							new ItemStack(ReagentItem.instance(), 1, ReagentType.GRAVE_DUST.getMeta()));
+					event.getDrops().add(entity);
+				}
+			}
+				
+		}
+		if (event.getEntityLiving() instanceof EntitySpider) {
+			for (int i = 0; i <= event.getLootingLevel(); i++) {
+				if (NostrumMagica.rand.nextFloat() <= 0.2f) {
+					EntityItem entity = new EntityItem(event.getEntity().worldObj,
+							event.getEntity().posX,
+							event.getEntity().posY,
+							event.getEntity().posZ,
+							new ItemStack(ReagentItem.instance(), 1, ReagentType.SPIDER_SILK.getMeta()));
+					event.getDrops().add(entity);
+				}
+			}
+		}
 	}
 	
 	@SubscribeEvent
