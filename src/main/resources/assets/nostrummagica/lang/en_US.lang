@@ -86,6 +86,9 @@ potion.magicresist.name=Magic Resist
 
 tile.magic_wall.name=Magic Wall
 tile.mani_ore.name=Mani Ore
+tile.cursed_ice.name=Cursed Ice
+tile.mandrake_crop.name=Mandrake
+tile.ginseng_crop.name=Ginseng
 
 entity.nostrummagica.physical_golem.name=Metal Golem
 entity.nostrummagica.lightning_golem.name=Lightining Golem

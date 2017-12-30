@@ -1,9 +1,10 @@
 package com.smanzana.nostrummagica.proxy;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.CropGinseng;
+import com.smanzana.nostrummagica.blocks.CropMandrakeRoot;
 import com.smanzana.nostrummagica.blocks.CursedIce;
 import com.smanzana.nostrummagica.blocks.MagicWall;
-import com.smanzana.nostrummagica.blocks.MandrakeRoot;
 import com.smanzana.nostrummagica.blocks.ManiOre;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
@@ -192,11 +193,11 @@ public class CommonProxy {
     	
     	NostrumMagicaFlower.init();
     	
-    	GameRegistry.register(MandrakeRoot.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, MandrakeRoot.ID));
-//    	GameRegistry.register(
-//    			(new ItemBlock(MandrakeRoot.instance())).setRegistryName(MandrakeRoot.ID)
-//    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(MandrakeRoot.ID));
+    	GameRegistry.register(CropMandrakeRoot.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, CropMandrakeRoot.ID));
+    	
+    	GameRegistry.register(CropGinseng.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, CropGinseng.ID));
     }
     
     public void syncPlayer(EntityPlayerMP player) {

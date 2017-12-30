@@ -1,0 +1,7 @@
+{
+    "parent": "block/crop",
+    "textures": {
+        "crop": "nostrummagica:blocks/ginseng_stage_0"
+    }
+}
+

@@ -15,21 +15,21 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.EnumPlantType;
 
-public class MandrakeRoot extends BlockCrops {
+public class CropMandrakeRoot extends BlockCrops {
 
 	private static final AxisAlignedBB[] AABB = new AxisAlignedBB[] {new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.125D, 1.0D), new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.1875D, 1.0D), new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.25D, 1.0D), new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.3125D, 1.0D), new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.375D, 1.0D), new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.4375D, 1.0D), new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.5D, 1.0D), new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.5625D, 1.0D)};
 
 	public static String ID = "mandrake_crop";
 	
-	private static MandrakeRoot instance = null;
-	public static MandrakeRoot instance() {
+	private static CropMandrakeRoot instance = null;
+	public static CropMandrakeRoot instance() {
 			if (instance == null)
-				instance = new MandrakeRoot();
+				instance = new CropMandrakeRoot();
 			
 			return instance;
 	}
 	
-	public MandrakeRoot() {
+	public CropMandrakeRoot() {
 		
 	}
 	

@@ -3,7 +3,8 @@ package com.smanzana.nostrummagica.items;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.MandrakeRoot;
+import com.smanzana.nostrummagica.blocks.CropGinseng;
+import com.smanzana.nostrummagica.blocks.CropMandrakeRoot;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -116,8 +117,19 @@ public class ReagentItem extends Item {
     	
     	if (type == ReagentType.MANDRAKE_ROOT) {
 	    	IBlockState state = worldIn.getBlockState(pos);
-	        if (facing == EnumFacing.UP && playerIn.canPlayerEdit(pos.offset(facing), facing, stack) && state.getBlock().canSustainPlant(state, worldIn, pos, EnumFacing.UP, MandrakeRoot.instance()) && worldIn.isAirBlock(pos.up())) {
-	        	worldIn.setBlockState(pos.up(), MandrakeRoot.instance().getDefaultState());
+	        if (facing == EnumFacing.UP && playerIn.canPlayerEdit(pos.offset(facing), facing, stack) && state.getBlock().canSustainPlant(state, worldIn, pos, EnumFacing.UP, CropMandrakeRoot.instance()) && worldIn.isAirBlock(pos.up())) {
+	        	worldIn.setBlockState(pos.up(), CropMandrakeRoot.instance().getDefaultState());
+	            --stack.stackSize;
+	            return EnumActionResult.SUCCESS;
+	        } else {
+	        	return EnumActionResult.FAIL;
+	        }
+    	}
+    	
+    	if (type == ReagentType.GINSENG) {
+	    	IBlockState state = worldIn.getBlockState(pos);
+	        if (facing == EnumFacing.UP && playerIn.canPlayerEdit(pos.offset(facing), facing, stack) && state.getBlock().canSustainPlant(state, worldIn, pos, EnumFacing.UP, CropGinseng.instance()) && worldIn.isAirBlock(pos.up())) {
+	        	worldIn.setBlockState(pos.up(), CropGinseng.instance().getDefaultState());
 	            --stack.stackSize;
 	            return EnumActionResult.SUCCESS;
 	        } else {
