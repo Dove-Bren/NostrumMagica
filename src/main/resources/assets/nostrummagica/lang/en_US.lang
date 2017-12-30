@@ -6,16 +6,17 @@ item.magicchestbase.name=Ethereal Chestplate
 item.magicleggingsbase.name=Ethereal Leggings
 item.magicfeetbase.name=Ethereal Boots
 
-item.nostrum_reagent_black_pearl.name=Black Pearl
-item.nostrum_reagent_mandrake_root.name=Mandrake Root
-item.nostrum_reagent_grave_dust.name=Grave Dust
-item.nostrum_reagent_sky_ash.name=Sky Ash
-item.nostrum_reagent_ginseng.name=Ginseng
-item.nostrum_reagent_spider_silk.name=Spider Silk
-item.nostrum_reagent_mani_dust.name=Mani Dust
-item.nostrum_reagent_crystabloom.name=Crystabloom
+item.nostrum_reagent.black_pearl.name=Black Pearl
+item.nostrum_reagent.mandrake_root.name=Mandrake Root
+item.nostrum_reagent.grave_dust.name=Grave Dust
+item.nostrum_reagent.sky_ash.name=Sky Ash
+item.nostrum_reagent.ginseng.name=Ginseng
+item.nostrum_reagent.spider_silk.name=Spider Silk
+item.nostrum_reagent.mani_dust.name=Mani Dust
+item.nostrum_reagent.crystabloom.name=Crystabloom
 
 item.magic_wall.name=Magic Wall
+item.mani_ore.name=Mani Ore
 
 item.sword_lightning1.name=Lightning Knife
 item.sword_lightning2.name=Thunder Dagger
@@ -84,15 +85,7 @@ potion.rooted.name=Rooted
 potion.magicresist.name=Magic Resist
 
 tile.magic_wall.name=Magic Wall
-tile.skylander_armory_whetstone_block.name=Whetstone Block
-tile.skylander_armory_pedestal.name=Pedestal
-tile.skylander_armory_brazier_block.name=Brazier
-tile.skylander_armory_forge_block.name=Forge
-tile.skylander_armory_forge_anvil.name=Smith's Anvil
-tile.skylander_armory_forge_trough.name=Trough
-tile.skylander_armory_cutting_table_block.name=Cutting Table
-
-tile.copper_ore.name=Copper Ore
+tile.mani_ore.name=Mani Ore
 
 entity.nostrummagica.physical_golem.name=Metal Golem
 entity.nostrummagica.lightning_golem.name=Lightining Golem

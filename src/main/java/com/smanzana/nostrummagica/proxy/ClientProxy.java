@@ -5,6 +5,7 @@ import org.lwjgl.input.Keyboard;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.CursedIce;
 import com.smanzana.nostrummagica.blocks.MagicWall;
+import com.smanzana.nostrummagica.blocks.ManiOre;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
@@ -120,6 +121,9 @@ public class ClientProxy extends CommonProxy {
 		registerModel(Item.getItemFromBlock(CursedIce.instance()),
 				0,
 				CursedIce.ID);
+		registerModel(Item.getItemFromBlock(ManiOre.instance()),
+				0,
+				ManiOre.ID);
 	}
 	
 	@Override

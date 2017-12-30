@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.proxy;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.CursedIce;
 import com.smanzana.nostrummagica.blocks.MagicWall;
+import com.smanzana.nostrummagica.blocks.ManiOre;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -41,6 +42,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
+import com.smanzana.nostrummagica.world.NostrumOreGenerator;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -126,6 +128,8 @@ public class CommonProxy {
     	registerPotions();
     	registerItems();
     	registerBlocks();
+    	
+    	GameRegistry.registerWorldGenerator(new NostrumOreGenerator(), 0);
 	}
 	
 	public void postinit() {
@@ -178,6 +182,12 @@ public class CommonProxy {
     	GameRegistry.register(
     			(new ItemBlock(CursedIce.instance())).setRegistryName(CursedIce.ID)
     		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(CursedIce.ID));
+    	
+    	GameRegistry.register(ManiOre.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, ManiOre.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(ManiOre.instance())).setRegistryName(ManiOre.ID)
+    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(ManiOre.ID));
     	
     	NostrumMagicaFlower.init();
     }
