@@ -75,15 +75,15 @@ public class BeamTrigger extends InstantTrigger {
 	
 	@Override
 	public int getManaCost() {
-		return 20;
+		return 35;
 	}
 
 	@Override
 	public List<ItemStack> getReagents() {
 		List<ItemStack> list = new ArrayList<>(2);
 		
-		list.add(ReagentItem.instance().getReagent(ReagentType.GRAVE_DUST, 1));
-		list.add(ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1));
+		list.add(ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1));
+		list.add(ReagentItem.instance().getReagent(ReagentType.CRYSTABLOOM, 1));
 		
 		return list;
 	}

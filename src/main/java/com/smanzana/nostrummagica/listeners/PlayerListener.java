@@ -25,6 +25,7 @@ import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.BeamTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.DelayTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
@@ -823,8 +824,8 @@ public class PlayerListener {
 		
 		spell = new Spell("Magic Shield");
 		spell.addPart(new SpellPart(
-				SelfTrigger.instance(),
-				new SpellPartParam(0, false)
+				DelayTrigger.instance(),
+				new SpellPartParam(3f, false)
 				));
 		spell.addPart(new SpellPart(
 				SingleShape.instance(),
