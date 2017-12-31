@@ -18,30 +18,45 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public class DelayTrigger extends SpellTrigger {
+public class ProximityTrigger extends SpellTrigger {
 	
-	public class DelayTriggerInstance extends SpellTrigger.SpellTriggerInstance implements IMagicListener {
+	public class ProximityTriggerInstance extends SpellTrigger.SpellTriggerInstance implements IMagicListener {
 
-		private int delayTicks;
+		private World world;
+		private Vec3d pos;
+		private boolean set;
+		private float range;
 		
-		public DelayTriggerInstance(SpellState state, int delayTicks) {
+		public ProximityTriggerInstance(SpellState state, World world,
+				Vec3d pos, float range) {
 			super(state);
-			this.delayTicks = delayTicks;
+			this.world = world;
+			this.set = false;
+			this.pos = pos;
+			this.range = range;
 		}
 		
 		@Override
 		public void init(EntityLivingBase caster) {
 			// We are instant! Whoo!
-			NostrumMagica.playerListener.registerTimer(this, delayTicks, 0);
+			NostrumMagica.playerListener.registerTimer(this, 20, 0);
 			
 		}
 
 		@Override
 		public boolean onEvent(Event type, EntityLivingBase entity) {
-			// We only registered for time, so don't bother checking
+			// We first wait 20 ticks to allow people to move around.
+			if (!set) {
+				set = true;
+				NostrumMagica.playerListener.registerProximity(this, world, pos, range);
+				// TODO start rendering some sick effect
+				return true;
+			}
 			
+			
+			// Else we've already been set. Just BOOM
 			TriggerData data = new TriggerData(
-					Lists.newArrayList(this.getState().getSelf()),
+					Lists.newArrayList(entity),
 					Lists.newArrayList(this.getState().getSelf()),
 					null,
 					null
@@ -52,16 +67,16 @@ public class DelayTrigger extends SpellTrigger {
 	}
 
 	private static final String TRIGGER_KEY = "trigger_delay";
-	private static DelayTrigger instance = null;
+	private static ProximityTrigger instance = null;
 	
-	public static DelayTrigger instance() {
+	public static ProximityTrigger instance() {
 		if (instance == null)
-			instance = new DelayTrigger();
+			instance = new ProximityTrigger();
 		
 		return instance;
 	}
 	
-	private DelayTrigger() {
+	private ProximityTrigger() {
 		super(TRIGGER_KEY);
 	}
 	
@@ -83,7 +98,7 @@ public class DelayTrigger extends SpellTrigger {
 	@Override
 	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw,
 			SpellPartParam params) {
-		return new DelayTriggerInstance(state, (int) (params.level * 20));
+		return new ProximityTriggerInstance(state, world, pos, params.level);
 	}
 	
 }

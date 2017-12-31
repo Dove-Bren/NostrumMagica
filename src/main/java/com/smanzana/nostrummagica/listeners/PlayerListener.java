@@ -27,6 +27,7 @@ import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.BeamTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.DelayTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.ProximityTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 
@@ -290,9 +291,9 @@ public class PlayerListener {
 	public void onLivingUpdate(LivingUpdateEvent event) {
 		
 		EntityLivingBase ent = event.getEntityLiving(); // convenience
-		if ((ent.lastTickPosX - ent.posX) >= 0.01f
-				|| (ent.lastTickPosY - ent.posY >= 0.01f)
-				|| (ent.lastTickPosZ - ent.posZ >= 0.01f)) {
+		if (Math.abs(ent.motionX) >= 0.01f
+				|| Math.abs(ent.motionY) >= 0.01f
+				|| Math.abs(ent.motionZ) >= 0.01f) {
 			// Moved
 			Iterator<Entry<IMagicListener, ProximityInfo>> it = proximityInfos.entrySet().iterator();
 			while (it.hasNext()) {
@@ -304,9 +305,10 @@ public class PlayerListener {
 					continue;
 				
 				double dist = Math.abs(ent.getPositionVector().subtract(entry.getValue().position).lengthVector());
-				if (dist <= entry.getValue().proximity)
+				if (dist <= entry.getValue().proximity) {
 					if (entry.getKey().onEvent(Event.PROXIMITY, ent))
 						it.remove();
+				}
 					
 			}
 			
@@ -838,8 +840,8 @@ public class PlayerListener {
 		
 		spell = new Spell("Physical Shield");
 		spell.addPart(new SpellPart(
-				SelfTrigger.instance(),
-				new SpellPartParam(0, false)
+				ProximityTrigger.instance(),
+				new SpellPartParam(2.0f, false)
 				));
 		spell.addPart(new SpellPart(
 				SingleShape.instance(),
