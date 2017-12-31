@@ -1,8 +1,10 @@
 package com.smanzana.nostrummagica.spells.components.shapes;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
@@ -37,14 +39,17 @@ public class ChainShape extends SpellShape {
 	protected List<EntityLivingBase> getTargets(SpellPartParam param, EntityLivingBase target, World world, BlockPos pos) {
 		List<EntityLivingBase> ret = new LinkedList<>();
 		
-		double radius = 4.0;
+		double radius = 6.0;
 		if (world == null)
 			world = target.worldObj;
 		
-		int arc = Math.min(2, (int) param.level);
+		int arc = Math.max(2, (int) param.level);
+		
+		Set<Entity> seen = new HashSet<>();
 		
 		while (target != null && arc > 0) {
 			ret.add(target);
+			seen.add(target);
 			pos = target.getPosition();
 			target = null;
 
@@ -58,7 +63,8 @@ public class ChainShape extends SpellShape {
 								pos.getY() + radius,
 								pos.getZ() + radius))) {
 				if (entity instanceof EntityLivingBase)
-					if (Math.abs(entity.getPositionVector().distanceTo(new Vec3d(pos.getX(), pos.getY(), pos.getZ()))) <= radius) {
+					if (Math.abs(entity.getPositionVector().distanceTo(new Vec3d(pos.getX(), pos.getY(), pos.getZ()))) <= radius
+							&& !seen.contains(entity)) {
 						target = (EntityLivingBase) entity;
 						break;
 					}
