@@ -49,6 +49,9 @@ import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.BeamTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.DelayTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.FoodTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.HealthTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.ManaTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProximityTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
@@ -170,6 +173,9 @@ public class CommonProxy {
     	SpellTrigger.register(BeamTrigger.instance());
     	SpellTrigger.register(DelayTrigger.instance());
     	SpellTrigger.register(ProximityTrigger.instance());
+    	SpellTrigger.register(HealthTrigger.instance());
+    	SpellTrigger.register(FoodTrigger.instance());
+    	SpellTrigger.register(ManaTrigger.instance());
     }
     
     private void registerPotions() {

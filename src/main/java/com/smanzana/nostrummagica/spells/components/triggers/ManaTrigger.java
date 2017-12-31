@@ -18,45 +18,34 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public class ProximityTrigger extends SpellTrigger {
+public class ManaTrigger extends SpellTrigger {
 	
-	public class ProximityTriggerInstance extends SpellTrigger.SpellTriggerInstance implements IMagicListener {
+	public class ManaTriggerInstance extends SpellTrigger.SpellTriggerInstance implements IMagicListener {
 
-		private World world;
-		private Vec3d pos;
-		private boolean set;
-		private float range;
+		private float amount;
+		private boolean onHigh;
+		private EntityLivingBase entity;
 		
-		public ProximityTriggerInstance(SpellState state, World world,
-				Vec3d pos, float range) {
+		public ManaTriggerInstance(SpellState state, EntityLivingBase entity, float amount, boolean higher) {
 			super(state);
-			this.world = world;
-			this.set = false;
-			this.pos = pos;
-			this.range = range;
+			this.amount = amount;
+			this.onHigh = higher;
+			this.entity = entity;
 		}
 		
 		@Override
 		public void init(EntityLivingBase caster) {
 			// We are instant! Whoo!
-			NostrumMagica.playerListener.registerTimer(this, 20, 0);
+			NostrumMagica.playerListener.registerMana(this, entity, amount, onHigh);
 			
 		}
 
 		@Override
 		public boolean onEvent(Event type, EntityLivingBase entity) {
-			// We first wait 20 ticks to allow people to move around.
-			if (!set) {
-				set = true;
-				NostrumMagica.playerListener.registerProximity(this, world, pos, range);
-				// TODO start rendering some sick effect
-				return true;
-			}
+			// We only registered for time, so don't bother checking
 			
-			
-			// Else we've already been set. Just BOOM
 			TriggerData data = new TriggerData(
-					Lists.newArrayList(entity),
+					Lists.newArrayList(this.getState().getSelf()),
 					Lists.newArrayList(this.getState().getSelf()),
 					null,
 					null
@@ -66,31 +55,31 @@ public class ProximityTrigger extends SpellTrigger {
 		}
 	}
 
-	private static final String TRIGGER_KEY = "trigger_proximity";
-	private static ProximityTrigger instance = null;
+	private static final String TRIGGER_KEY = "trigger_mana";
+	private static ManaTrigger instance = null;
 	
-	public static ProximityTrigger instance() {
+	public static ManaTrigger instance() {
 		if (instance == null)
-			instance = new ProximityTrigger();
+			instance = new ManaTrigger();
 		
 		return instance;
 	}
 	
-	private ProximityTrigger() {
+	private ManaTrigger() {
 		super(TRIGGER_KEY);
 	}
 	
 	@Override
 	public int getManaCost() {
-		return 30;
+		return 20;
 	}
 
 	@Override
 	public List<ItemStack> getReagents() {
 		List<ItemStack> list = new ArrayList<>(2);
 		
-		list.add(ReagentItem.instance().getReagent(ReagentType.CRYSTABLOOM, 1));
-		list.add(ReagentItem.instance().getReagent(ReagentType.BLACK_PEARL, 1));
+		list.add(ReagentItem.instance().getReagent(ReagentType.GRAVE_DUST, 1));
+		list.add(ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1));
 		
 		return list;
 	}
@@ -98,7 +87,7 @@ public class ProximityTrigger extends SpellTrigger {
 	@Override
 	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw,
 			SpellPartParam params) {
-		return new ProximityTriggerInstance(state, world, pos, params.level);
+		return new ManaTriggerInstance(state, state.getCaster(), params.level, params.flip);
 	}
 	
 }

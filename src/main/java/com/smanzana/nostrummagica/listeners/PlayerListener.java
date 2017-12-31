@@ -25,9 +25,9 @@ import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.BeamTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.DelayTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.HealthTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.ManaTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.ProximityTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 
@@ -369,7 +369,7 @@ public class PlayerListener {
 				if (entry.getValue().entity.getPersistentID() != ent.getPersistentID())
 					continue;
 				
-				float level = attr.getMana() / attr.getMaxMana();
+				float level = (float) attr.getMana() / (float) attr.getMaxMana();
 				float thresh = entry.getValue().threshold;
 				
 				if (entry.getValue().higher) {
@@ -826,8 +826,8 @@ public class PlayerListener {
 		
 		spell = new Spell("Magic Shield");
 		spell.addPart(new SpellPart(
-				DelayTrigger.instance(),
-				new SpellPartParam(3f, false)
+				ManaTrigger.instance(),
+				new SpellPartParam(0.5f, false)
 				));
 		spell.addPart(new SpellPart(
 				SingleShape.instance(),
@@ -840,8 +840,8 @@ public class PlayerListener {
 		
 		spell = new Spell("Physical Shield");
 		spell.addPart(new SpellPart(
-				ProximityTrigger.instance(),
-				new SpellPartParam(2.0f, false)
+				HealthTrigger.instance(),
+				new SpellPartParam(0.5f, false)
 				));
 		spell.addPart(new SpellPart(
 				SingleShape.instance(),
