@@ -26,6 +26,7 @@ import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 
+import net.minecraft.block.BlockBush;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -505,13 +506,13 @@ public class PlayerListener {
 		if (event.isCanceled())
 			return;
 		
-		if (NostrumMagica.rand.nextFloat() <= 0.2f)
-		if (event.getState().getMaterial() == Material.LEAVES) {
+		if (event.getState().getMaterial() == Material.LEAVES
+				&& NostrumMagica.rand.nextFloat() <= 0.2f) {
 			EntityItem entity = new EntityItem(event.getWorld(),
 					event.getPos().getX() + 0.5,
 					event.getPos().getY() + 0.5,
 					event.getPos().getZ() + 0.5,
-					new ItemStack(ReagentItem.instance(), 1, ReagentType.SKY_ASH.getMeta()));
+					ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1));
 			event.getWorld().spawnEntityInWorld(entity);
 		}
 		if (event.getState().getMaterial() == Material.WEB) {
@@ -519,7 +520,27 @@ public class PlayerListener {
 					event.getPos().getX() + 0.5,
 					event.getPos().getY() + 0.5,
 					event.getPos().getZ() + 0.5,
-					new ItemStack(ReagentItem.instance(), 1, ReagentType.SPIDER_SILK.getMeta()));
+					ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1));
+			event.getWorld().spawnEntityInWorld(entity);
+		}
+		
+		if (event.getState().getBlock() instanceof BlockBush
+				&& NostrumMagica.rand.nextFloat() <= 0.05f) {
+			EntityItem entity = new EntityItem(event.getWorld(),
+					event.getPos().getX() + 0.5,
+					event.getPos().getY() + 0.5,
+					event.getPos().getZ() + 0.5,
+					ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1));
+			event.getWorld().spawnEntityInWorld(entity);
+		}
+		
+		if (event.getState().getBlock() instanceof BlockBush
+				&& NostrumMagica.rand.nextFloat() <= 0.05f) {
+			EntityItem entity = new EntityItem(event.getWorld(),
+					event.getPos().getX() + 0.5,
+					event.getPos().getY() + 0.5,
+					event.getPos().getZ() + 0.5,
+					ReagentItem.instance().getReagent(ReagentType.GINSENG, 1));
 			event.getWorld().spawnEntityInWorld(entity);
 		}
 	}

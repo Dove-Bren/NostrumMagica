@@ -56,6 +56,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
@@ -145,7 +146,10 @@ public class CommonProxy {
 	}
 	
 	public void postinit() {
-		
+		for (Biome biome : Biome.REGISTRY) {
+			biome.addFlower(NostrumMagicaFlower.instance().getState(NostrumMagicaFlower.Type.MIDNIGHT_IRIS), 8);
+			biome.addFlower(NostrumMagicaFlower.instance().getState(NostrumMagicaFlower.Type.CRYSTABLOOM), 7);
+		}
 	}
     
     private void registerShapes() {
@@ -193,6 +197,7 @@ public class CommonProxy {
     	
     	ReagentBag.instance().setRegistryName(NostrumMagica.MODID, ReagentBag.id);
     	GameRegistry.register(ReagentBag.instance());
+    	ReagentBag.init();
     }
     
     private void registerBlocks() {

@@ -166,6 +166,8 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void postinit() {
 		this.overlayRenderer = new OverlayRenderer();
+		
+		super.postinit();
 	}
 	
 	private static void registerModel(Item item, int meta, String modelName) {
