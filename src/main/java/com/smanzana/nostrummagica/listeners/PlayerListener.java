@@ -25,6 +25,7 @@ import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.BeamTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.DamagedTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.HealthTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ManaTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
@@ -784,7 +785,7 @@ public class PlayerListener {
 		
 		spell = new Spell("Summon Zapper");
 		spell.addPart(new SpellPart(
-				ProjectileTrigger.instance(),
+				DamagedTrigger.instance(),
 				new SpellPartParam(0, false)
 				));
 		spell.addPart(new SpellPart(
