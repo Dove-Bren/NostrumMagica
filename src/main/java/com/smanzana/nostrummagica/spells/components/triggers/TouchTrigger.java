@@ -38,7 +38,7 @@ public class TouchTrigger extends InstantTrigger {
 		super(TRIGGER_KEY);
 	}
 
-	private static final float TOUCH_RANGE = 1.5f;
+	private static final float TOUCH_RANGE = 3.0f;
 	
 	@Override
 	protected TriggerData getTargetData(SpellState state, World world,
@@ -46,19 +46,21 @@ public class TouchTrigger extends InstantTrigger {
 		
 		RayTraceResult trace = RayTrace.raytrace(world, pos, pitch, yaw, TOUCH_RANGE, true);
 		
-		if (trace == null)
-			return null;
+		if (trace == null) {
+			return new TriggerData(null, null, null, null);
+		}
 		
 		List<EntityLivingBase> others = Lists.newArrayList(state.getSelf());
-		if (trace.typeOfHit == RayTraceResult.Type.ENTITY) {
+		if (trace.typeOfHit == RayTraceResult.Type.ENTITY && trace.entityHit != null) {
 			// Cast is safe from 'onlyLiving' option in trace
+			System.out.println("entity");
 			return new TriggerData(Lists.newArrayList((EntityLivingBase) trace.entityHit), others, world, null);
 		} else if (trace.typeOfHit == RayTraceResult.Type.BLOCK) {
 			Vec3d vec = trace.hitVec;
 			return new TriggerData(null, others, world,
 					Lists.newArrayList(new BlockPos(Math.round(vec.xCoord), Math.round(vec.yCoord), Math.round(vec.zCoord))));
 		} else {
-			return null;
+			return new TriggerData(null, null, null, null);
 		}
 	}
 	

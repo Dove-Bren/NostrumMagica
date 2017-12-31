@@ -25,6 +25,7 @@ import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.material.Material;
@@ -701,6 +702,20 @@ public class PlayerListener {
 				SingleShape.instance(),
 				EMagicElement.WIND,
 				1,
+				null,
+				new SpellPartParam(0, false)
+				));
+		SpellTome.addSpell(tome, spell);
+		
+		spell = new Spell("Wind Palm");
+		spell.addPart(new SpellPart(
+				TouchTrigger.instance(),
+				new SpellPartParam(0, false)
+				));
+		spell.addPart(new SpellPart(
+				SingleShape.instance(),
+				EMagicElement.WIND,
+				3,
 				null,
 				new SpellPartParam(0, false)
 				));

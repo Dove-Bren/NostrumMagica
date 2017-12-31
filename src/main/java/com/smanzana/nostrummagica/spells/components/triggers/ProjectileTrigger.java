@@ -130,7 +130,7 @@ public class ProjectileTrigger extends SpellTrigger {
 			atMax = params.flip;
 		
 		// Add direction
-		pos = new Vec3d(pos.xCoord, pos.yCoord + state.getSelf().getEyeHeight(), pos.zCoord);
+		pos = new Vec3d(pos.xCoord, pos.yCoord, pos.zCoord);
 		return new ProjectileTriggerInstance(state, world, pos, pitch, yaw, atMax);
 	}
 

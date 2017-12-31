@@ -91,11 +91,14 @@ public class Spell {
 					for (EntityLivingBase targ : targs) {
 						shape.perform(action, param, targ, null, null);
 					}
-				} else {
+				} else if (locations != null && !locations.isEmpty()) {
 					// use locations
 					for (BlockPos pos : locations) {
 						shape.perform(action, param, null, world, pos);
 					}
+				} else {
+					; // Drop it on the floor\
+					next = null;
 				}
 			}
 			
@@ -152,7 +155,7 @@ public class Spell {
 			if (targ == null)
 				pos = new Vec3d(targpos.getX(), targpos.getY(), targpos.getZ());
 			else
-				pos = targ.getPositionVector();
+				pos = targ.getPositionVector().addVector(0, targ.getEyeHeight(), 0);
 			
 			this.triggerInstance = trigger.instance(this, world, pos,
 					(targ == null ? -90.0f : targ.rotationPitch),

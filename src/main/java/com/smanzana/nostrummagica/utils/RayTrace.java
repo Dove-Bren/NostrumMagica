@@ -21,6 +21,7 @@ public class RayTrace {
         float f1 = MathHelper.sin(-yaw * 0.017453292F - (float)Math.PI);
         float f2 = -MathHelper.cos(-pitch * 0.017453292F);
         float f3 = MathHelper.sin(-pitch * 0.017453292F);
+        
         return new Vec3d((double)(f1 * f2), (double)f3, (double)(f * f2));
 	}
 	
@@ -40,9 +41,9 @@ public class RayTrace {
 			return null;
 		
 		double x = direction.xCoord * maxDistance;
-		double y = direction.xCoord * maxDistance;
-		double z = direction.xCoord * maxDistance;
-		toPos = new Vec3d(fromPos.xCoord + x, fromPos.yCoord + z, fromPos.zCoord + y);
+		double y = direction.yCoord * maxDistance;
+		double z = direction.zCoord * maxDistance;
+		toPos = new Vec3d(fromPos.xCoord + x, fromPos.yCoord + y, fromPos.zCoord + z);
 		
 		
 		return raytrace(world, fromPos, toPos, onlyLiving);

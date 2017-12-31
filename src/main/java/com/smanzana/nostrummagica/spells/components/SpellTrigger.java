@@ -70,6 +70,7 @@ public abstract class SpellTrigger {
 			this.targets = targets;
 			this.others = others;
 			this.pos = pos;
+			this.world = world;
 		}
 	}
 	
