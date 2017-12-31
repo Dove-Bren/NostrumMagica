@@ -1,7 +1,12 @@
 package com.smanzana.nostrummagica.spells.components.triggers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
+import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
@@ -9,6 +14,7 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -129,13 +135,22 @@ public class ProjectileTrigger extends SpellTrigger {
 	}
 
 	// Copied from vanilla entity class
-	public static final Vec3d getVectorForRotation(float pitch, float yaw)
-    {
+	public static final Vec3d getVectorForRotation(float pitch, float yaw) {
         float f = MathHelper.cos(-yaw * 0.017453292F - (float)Math.PI);
         float f1 = MathHelper.sin(-yaw * 0.017453292F - (float)Math.PI);
         float f2 = -MathHelper.cos(-pitch * 0.017453292F);
         float f3 = MathHelper.sin(-pitch * 0.017453292F);
         return new Vec3d((double)(f1 * f2), (double)f3, (double)(f * f2));
     }
+
+	@Override
+	public List<ItemStack> getReagents() {
+		List<ItemStack> list = new ArrayList<>(2);
+		
+		list.add(ReagentItem.instance().getReagent(ReagentType.BLACK_PEARL, 1));
+		list.add(ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1));
+		
+		return list;
+	}
 	
 }

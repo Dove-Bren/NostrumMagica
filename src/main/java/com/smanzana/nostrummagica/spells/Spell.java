@@ -1,10 +1,14 @@
 package com.smanzana.nostrummagica.spells;
 
+import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.potions.FrostbitePotion;
 import com.smanzana.nostrummagica.potions.MagicBoostPotion;
 import com.smanzana.nostrummagica.potions.MagicResistPotion;
@@ -17,6 +21,7 @@ import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.potion.Potion;
@@ -349,6 +354,43 @@ public class Spell {
 		
 		manaCost = (int) Math.ceil(cost);
 		return manaCost;
+	}
+	
+	public Map<ReagentType, Integer> getRequiredReagents() {
+		Map<ReagentType, Integer> costs = new EnumMap<ReagentType, Integer>(ReagentType.class);
+		
+		for (ReagentType type : ReagentType.values())
+			costs.put(type, 0);
+		
+		ReagentType type;
+		for (SpellPart part : parts) {
+			if (part.isTrigger()) {
+				for (ItemStack req : part.getTrigger().getReagents()) {
+					type = ReagentItem.findType(req);
+					int count = costs.get(type);
+					count += req.stackSize;
+					costs.put(type, count);
+				}
+			} else {
+				for (ItemStack req : part.getShape().getReagents()) {
+					type = ReagentItem.findType(req);
+					int count = costs.get(type);
+					count += req.stackSize;
+					costs.put(type, count);
+				}
+				if (part.getAlteration() != null) {
+					for (ItemStack req : part.getAlteration().getReagents()) {
+						type = ReagentItem.findType(req);
+						int count = costs.get(type);
+						count += req.stackSize;
+						costs.put(type, count);
+					}
+				}
+			}
+				
+		}
+		
+		return costs;
 	}
 	
 	// seen is if they've seen it before or not

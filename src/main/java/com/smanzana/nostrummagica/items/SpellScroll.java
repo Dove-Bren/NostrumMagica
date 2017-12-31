@@ -40,8 +40,6 @@ public class SpellScroll extends Item {
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
 		
-		if (worldIn.isRemote) {
-		
 			if (!itemStackIn.hasTagCompound())
 				return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
 			
@@ -58,7 +56,8 @@ public class SpellScroll extends Item {
 			if (!playerIn.isCreative()) {
 				itemStackIn.stackSize--;
 			}
-			
+
+		if (worldIn.isRemote) {
 			NetworkHandler.getSyncChannel().sendToServer(
 	    			new ClientCastMessage(spell));
 		}

@@ -1,27 +1,35 @@
 package com.smanzana.nostrummagica.spells;
 
-import com.smanzana.nostrummagica.NostrumMagica;
+import java.util.List;
 
+import com.google.common.collect.Lists;
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 public enum EAlteration {
 
-	INFLICT("Inflict", 10),
-	RESIST("Resist", 30),
-	SUPPORT("Support", 15),
-	GROWTH("Growth", 25),
-	ENCHANT("Enchant", 40),
-	CONJURE("Conjure", 30),
-	SUMMON("Summon", 50),
-	ALTER("Alter", 40);
+	INFLICT("Inflict", 10, ReagentType.GRAVE_DUST),
+	RESIST("Resist", 30, ReagentType.CRYSTABLOOM),
+	SUPPORT("Support", 15, ReagentType.GINSENG),
+	GROWTH("Growth", 25, ReagentType.SKY_ASH),
+	ENCHANT("Enchant", 40, ReagentType.BLACK_PEARL),
+	CONJURE("Conjure", 30, ReagentType.MANDRAKE_ROOT),
+	SUMMON("Summon", 50, ReagentType.MANI_DUST),
+	ALTER("Alter", 40, ReagentType.SPIDER_SILK);
 	
 	private ResourceLocation glyph;
 	private String name;
 	private int cost;
+	private ReagentType reagent;
 	
-	private EAlteration(String base, int cost) {
+	private EAlteration(String base, int cost, ReagentType reagent) {
 		this.name = base;
 		this.glyph = new ResourceLocation(NostrumMagica.MODID, base.toLowerCase());
+		this.reagent = reagent;
 	}
 
 	public ResourceLocation getGlyph() {
@@ -34,6 +42,15 @@ public enum EAlteration {
 	
 	public int getCost() {
 		return cost;
+	}
+	
+	/**
+	 * Return a list of reagents required.
+	 * Both type and count of the itemstacks will be respected.
+	 * @return
+	 */
+	public List<ItemStack> getReagents() {
+		return Lists.newArrayList(ReagentItem.instance().getReagent(reagent, 1));
 	}
 	
 }

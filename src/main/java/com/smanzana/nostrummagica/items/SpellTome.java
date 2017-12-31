@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.gui.book.BookScreen;
 import com.smanzana.nostrummagica.client.gui.book.HSplitPage;
@@ -55,27 +54,6 @@ public class SpellTome extends Item implements GuiBook {
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
         // TODO display GUI with stats?
-		
-		// TESTING DELETE ME -------------
-		
-		// print info about spell stored
-		List<Spell> spells = getSpells(itemStackIn);
-		if (spells == null || spells.isEmpty()) {
-			NostrumMagica.logger.info("No stored spell!");
-		} else {
-			Spell spell = spells.get(0);
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
-			NostrumMagica.logger.info("");
-			NostrumMagica.logger.info("");
-			NostrumMagica.logger.info("Spell Name: " + spell.getName());
-			NostrumMagica.logger.info("Cost: " + spell.getManaCost());
-			NostrumMagica.logger.info("Id: " + spell.getRegistryID());
-			NostrumMagica.logger.info("Mana: " + attr.getMana() + "/" + attr.getMaxMana());
-			NostrumMagica.logger.info("");
-			NostrumMagica.logger.info("");
-		}
-		
-		// END TESTING -------------------
 		
 		if (worldIn.isRemote)
 			NostrumMagica.proxy.openBook(playerIn, this, itemStackIn);

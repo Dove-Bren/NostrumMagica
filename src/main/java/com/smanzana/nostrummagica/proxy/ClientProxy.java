@@ -1,5 +1,8 @@
 package com.smanzana.nostrummagica.proxy;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.lwjgl.input.Keyboard;
 
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -44,6 +47,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -203,8 +207,9 @@ public class ClientProxy extends CommonProxy {
 			int cost = spell.getManaCost();
 			
 			if (!Minecraft.getMinecraft().thePlayer.isCreative()) {
+				EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
 				if (mana < cost) {
-					EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+					
 					for (int i = 0; i < 15; i++) {
 						double offsetx = Math.cos(i * (2 * Math.PI / 15)) * 1.0;
 						double offsetz = Math.sin(i * (2 * Math.PI / 15)) * 1.0;
@@ -217,6 +222,20 @@ public class ClientProxy extends CommonProxy {
 					}
 					overlayRenderer.startManaWiggle(2);
 					return;
+				}
+				
+				Map<ReagentType, Integer> reagents = spell.getRequiredReagents();
+				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
+					int count = NostrumMagica.getReagentCount(player, row.getKey());
+					if (count < row.getValue()) {
+						player.addChatMessage(new TextComponentString("Not enough "
+								+ row.getKey().prettyName()));
+						return;
+					}
+				}
+				// actually deduct
+				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
+					NostrumMagica.removeReagents(player, row.getKey(), row.getValue());
 				}
 				
 				NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer)

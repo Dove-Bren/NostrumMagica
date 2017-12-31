@@ -1,7 +1,11 @@
 package com.smanzana.nostrummagica.network.messages;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import io.netty.buffer.ByteBuf;
@@ -52,6 +56,18 @@ public class ClientCastMessage implements IMessage {
 				int cost = spell.getManaCost();
 				if (att.getMana() < cost)
 					return new ClientCastReplyMessage(false, att.getMana(), 0.0f);
+				
+				Map<ReagentType, Integer> reagents = spell.getRequiredReagents();
+				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
+					int count = NostrumMagica.getReagentCount(sp, row.getKey());
+					if (count < row.getValue()) {
+						return new ClientCastReplyMessage(false, att.getMana(), 0);
+					}
+				}
+				// actually deduct
+				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
+					NostrumMagica.removeReagents(sp, row.getKey(), row.getValue());
+				}
 				
 				att.addMana(-cost);
 			}

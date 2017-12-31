@@ -7,6 +7,7 @@ import java.util.Map;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -90,6 +91,13 @@ public abstract class SpellShape {
 	 * @return
 	 */
 	protected abstract List<BlockPos> getTargetLocations(SpellPartParam param, EntityLivingBase target, World world, BlockPos pos);
+	
+	/**
+	 * Return a list of reagents required.
+	 * Both type and count of the itemstacks will be respected.
+	 * @return
+	 */
+	public abstract List<ItemStack> getReagents();
 	
 	
 }

@@ -5,6 +5,7 @@ import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.Item;
@@ -15,11 +16,12 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ReagentBag extends Item {
 
 	private static final String NBT_VACUUM = "vacuum";
-	private static final String NBT_ITEMS = "";
+	private static final String NBT_ITEMS = "items";
 	private static ReagentBag instance = null;
 	
 	public static final int SLOTS = 9;
@@ -29,6 +31,13 @@ public class ReagentBag extends Item {
 			instance = new ReagentBag();
 		
 		return instance;
+	}
+	
+	public static void init() {
+		GameRegistry.addRecipe(new ItemStack(instance), "GLG", "LRL", "LLL",
+				'L', Items.LEATHER,
+				'G', Items.GOLD_INGOT,
+				'R', ReagentItem.instance());
 	}
 	
 	public static final String id = "reagent_bag";
@@ -80,6 +89,105 @@ public class ReagentBag extends Item {
 			nbt.setTag(NBT_ITEMS, items);
 			bag.setTagCompound(nbt);
 		}
+	}
+
+	// returns what it couldn't fit
+	public static ItemStack addItem(ItemStack bag, ItemStack inputItem) {
+		if (inputItem == null)
+			return inputItem;
+		
+		ItemStack existing[] = getItems(bag);
+		if (existing == null)
+			return inputItem;
+		
+		int remaining = inputItem.stackSize;
+		int original = remaining;
+		for (int i = 0; i < SLOTS; i++) {
+			ItemStack item = existing[i];
+			if (item == null)
+				continue;
+			
+			if (item.getMetadata() == inputItem.getMetadata()) {
+				remaining -= 64 - item.stackSize;
+				if (remaining >= 0)
+					item.stackSize = 64;
+				else
+					item.stackSize = 64 + remaining;
+				
+				if (remaining <= 0)
+					break;
+			}
+		}
+		
+		if (remaining > 0) {
+			// Could'nt fit into existing stacks. Just use first empty one
+			for (int i = 0; i < SLOTS; i++) {
+				if (existing[i] == null) {
+					existing[i] = inputItem.copy();
+					remaining -= 64;
+					if (remaining >= 0)
+						existing[i].stackSize = 64;
+					else
+						existing[i].stackSize = 64 + remaining;
+					
+					if (remaining <= 0)
+						break;
+				}
+			}
+		}
+		
+		if (original != remaining) {
+			for (int i = 0; i < SLOTS; i++) {
+				setItem(bag, existing[i], i);
+			}
+		}
+		
+		if (remaining > 0) {
+			inputItem.stackSize = remaining;
+			return inputItem;
+		}
+		
+		return null;
+	}
+	
+	// removes as much as we can and returns waht we couldn't.
+	public static int removeCount(ItemStack bag, ReagentType type, int total) {
+		if (bag == null)
+			return total;
+		
+		ItemStack existing[] = getItems(bag);
+		if (existing == null)
+			return total;
+		
+		int remaining = total;
+		int original = remaining;
+		
+		for (int i = 0; i < SLOTS; i++) {
+			ItemStack item = existing[i];
+			if (item == null)
+				continue;
+			
+			if (ReagentItem.instance().getTypeFromMeta(item.getMetadata())
+					== type) {
+				if (item.stackSize > remaining) {
+					item.stackSize -= remaining;
+					remaining = 0;
+					break;
+				} else {
+					remaining -= item.stackSize;
+					existing[i] = null;
+				}
+			}
+		}
+		
+		if (remaining != original) {
+			for (int i = 0; i < SLOTS; i++) {
+				setItem(bag, existing[i], i);
+			}
+		}
+		
+		return remaining;
+		
 	}
 	
 	public static ItemStack getItem(ItemStack bag, int pos) {

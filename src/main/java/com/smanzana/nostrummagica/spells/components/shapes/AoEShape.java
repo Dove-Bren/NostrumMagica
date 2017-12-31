@@ -1,13 +1,17 @@
 package com.smanzana.nostrummagica.spells.components.shapes;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -73,6 +77,16 @@ public class AoEShape extends SpellShape {
 				}
 			}
 		}
+		
+		return list;
+	}
+
+	@Override
+	public List<ItemStack> getReagents() {
+		List<ItemStack> list = new ArrayList<>(2);
+		
+		list.add(ReagentItem.instance().getReagent(ReagentType.BLACK_PEARL, 1));
+		list.add(ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1));
 		
 		return list;
 	}

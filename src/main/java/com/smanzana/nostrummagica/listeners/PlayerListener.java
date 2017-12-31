@@ -9,9 +9,10 @@ import java.util.Map.Entry;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.EnchantedEquipment;
+import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
-import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ManaMessage;
@@ -48,6 +49,7 @@ import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.UseHoeEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -546,6 +548,46 @@ public class PlayerListener {
 							event.getEntity().posZ,
 							new ItemStack(ReagentItem.instance(), 1, ReagentType.SPIDER_SILK.getMeta()));
 					event.getDrops().add(entity);
+				}
+			}
+		}
+	}
+	
+	@SubscribeEvent
+	public void onPickup(EntityItemPickupEvent e) {
+		if (e.isCanceled())
+			return;
+		
+		if (!(e.getEntityLiving() instanceof EntityPlayer))
+			return; // It SAYS EntityItemPickup, so just in case...
+		
+		EntityPlayer player = e.getEntityPlayer();
+		ItemStack addedItem = e.getItem().getEntityItem();
+		
+		if (e.getItem().getEntityItem().getItem() instanceof ReagentItem) {
+			for (ItemStack item : player.inventory.offHandInventory) {
+				// Silly but prefer offhand
+				if (item != null && item.getItem() instanceof ReagentBag) {
+					if (ReagentBag.isVacuumEnabled(item)) {
+						addedItem = ReagentBag.addItem(item, addedItem);
+						if (addedItem == null) {
+							e.setCanceled(true);
+							e.getItem().setDead();
+							return;
+						}
+					}
+				}
+			}
+			for (ItemStack item : player.inventory.mainInventory) {
+				if (item != null && item.getItem() instanceof ReagentBag) {
+					if (ReagentBag.isVacuumEnabled(item)) {
+						addedItem = ReagentBag.addItem(item, addedItem);
+						if (addedItem == null) {
+							e.setCanceled(true);
+							e.getItem().setDead();
+							return;
+						}
+					}
 				}
 			}
 		}

@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -95,4 +96,11 @@ public abstract class SpellTrigger {
 	 * @return
 	 */
 	public abstract int getManaCost();
+	
+	/**
+	 * Return a list of reagents required.
+	 * Both type and count of the itemstacks will be respected.
+	 * @return
+	 */
+	public abstract List<ItemStack> getReagents();
 }

@@ -10,6 +10,9 @@ import org.apache.logging.log4j.Logger;
 
 import com.smanzana.nostrummagica.capabilities.AttributeProvider;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.items.ReagentBag;
+import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
 import com.smanzana.nostrummagica.listeners.PlayerListener;
@@ -156,6 +159,67 @@ public class NostrumMagica
     	
     	return spells.get(0);
     }
+    
+    public static int getReagentCount(EntityPlayer player, ReagentType type) {
+    	int count = 0;
+    	for (ItemStack item : player.inventory.mainInventory) {
+    		if (item != null && item.getItem() instanceof ReagentBag) {
+    			count += ReagentBag.getReagentCount(item, type);
+    		}
+    	}
+    	for (ItemStack item : player.inventory.offHandInventory) {
+    		if (item != null && item.getItem() instanceof ReagentBag) {
+    			count += ReagentBag.getReagentCount(item, type);
+    		}
+    	}
+    	for (ItemStack item : player.inventory.mainInventory) {
+    		if (item != null && item.getItem() instanceof ReagentItem
+    				&& ReagentItem.findType(item) == type) {
+    			count += item.stackSize;
+    		}
+    	}
+    	for (ItemStack item : player.inventory.offHandInventory) {
+    		if (item != null && item.getItem() instanceof ReagentBag
+    				&& ReagentItem.findType(item) == type) {
+    			count += item.stackSize;
+    		}
+    	}
+    	
+    	return count;
+    }
+    
+    public static boolean removeReagents(EntityPlayer player, ReagentType type, int count) {
+    	if (getReagentCount(player, type) < count)
+    		return false;
+    	
+		for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
+			ItemStack item = player.inventory.getStackInSlot(i);
+			if (item == null)
+				continue;
+			
+			if (item.getItem() instanceof ReagentBag) {
+				count = ReagentBag.removeCount(item, type, count);
+			} else if (item.getItem() instanceof ReagentItem) {
+				if (ReagentItem.instance().getTypeFromMeta(item.getMetadata())
+					== type) {
+					if (item.stackSize > count) {
+						item.stackSize -= count;
+						count = 0;
+						break;
+					} else {
+						count -= item.stackSize;
+						player.inventory.setInventorySlotContents(i, null);
+					}
+				}
+			}
+			
+			if (count == 0)
+				break;
+		}
+		
+		return count == 0;
+    }
+    
     
     public static List<Spell> getSpells(EntityPlayer entity) {
     	if (entity == null)

@@ -47,6 +47,23 @@ public class ReagentItem extends Item {
 		public int getMeta() {
 			return meta;
 		}
+
+		public String prettyName() {
+			String name = this.name();
+			String out = "";
+			int pos = name.indexOf('_');
+			while (pos != -1) {
+				out += name.substring(0, 1)
+						+ name.substring(1, pos).toLowerCase();
+				name = name.substring(0, pos);
+				pos = name.indexOf('_');
+			}
+			
+			out += name.substring(0, 1)
+					+ name.substring(1).toLowerCase();
+			
+			return out;
+		}
 	}
 	
 	public static final String ID = "nostrum_reagent";
@@ -87,6 +104,18 @@ public class ReagentItem extends Item {
     		subItems.add(new ItemStack(itemIn, 1, type.getMeta()));
     	}
 	}
+    
+    public static ReagentType findType(ItemStack reagent) {
+    	if (reagent == null || !(reagent.getItem() instanceof ReagentItem))
+    		return null;
+    	
+    	for (ReagentType type : ReagentType.values()) {
+    		if (type == instance.getTypeFromMeta(reagent.getMetadata()))
+    			return type;
+    	}
+    	
+    	return null;
+    }
     
     public String getNameFromMeta(int meta) {
     	String suffix = "unknown";
