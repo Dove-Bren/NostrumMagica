@@ -1,6 +1,7 @@
 item.spellTome.name=Spell Tome
 item.spell_scroll.name=Empty Spell Scroll
 item.blank_scroll.name=Blank Scroll
+item.reagent_bag.name=Reagent Bag
 
 item.magicswordbase.name=Ethereal Sword
 item.magichelmbase.name=Ethereal Helm

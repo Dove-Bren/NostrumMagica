@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.network;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
 import com.smanzana.nostrummagica.network.messages.ClientCastReplyMessage;
 import com.smanzana.nostrummagica.network.messages.ManaMessage;
+import com.smanzana.nostrummagica.network.messages.ReagentBagToggleMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
@@ -44,6 +45,7 @@ public class NetworkHandler {
 		syncChannel.registerMessage(SpellRequestMessage.Handler.class, SpellRequestMessage.class, discriminator++, Side.SERVER);
 		syncChannel.registerMessage(SpellRequestReplyMessage.Handler.class, SpellRequestReplyMessage.class, discriminator++, Side.CLIENT);
 		syncChannel.registerMessage(ManaMessage.Handler.class, ManaMessage.class, discriminator++, Side.CLIENT);
+		syncChannel.registerMessage(ReagentBagToggleMessage.Handler.class, ReagentBagToggleMessage.class, discriminator++, Side.SERVER);
 	}
 	
 }

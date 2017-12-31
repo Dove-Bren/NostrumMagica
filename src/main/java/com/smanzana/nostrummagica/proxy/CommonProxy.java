@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagicStorage;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
+import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.entity.EntityGolemEarth;
 import com.smanzana.nostrummagica.entity.EntityGolemEnder;
 import com.smanzana.nostrummagica.entity.EntityGolemFire;
@@ -26,6 +27,7 @@ import com.smanzana.nostrummagica.items.EnchantedWeapon;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
+import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
@@ -55,6 +57,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
@@ -137,6 +140,8 @@ public class CommonProxy {
     	
     	GameRegistry.registerWorldGenerator(new NostrumOreGenerator(), 0);
     	GameRegistry.registerWorldGenerator(new NostrumFlowerGenerator(), 0);
+    	
+    	NetworkRegistry.INSTANCE.registerGuiHandler(NostrumMagica.instance, new NostrumGui());
 	}
 	
 	public void postinit() {
@@ -185,6 +190,9 @@ public class CommonProxy {
     	InfusedGemItem.instance().setRegistryName(NostrumMagica.MODID, InfusedGemItem.ID);
     	GameRegistry.register(InfusedGemItem.instance());
     	InfusedGemItem.init();
+    	
+    	ReagentBag.instance().setRegistryName(NostrumMagica.MODID, ReagentBag.id);
+    	GameRegistry.register(ReagentBag.instance());
     }
     
     private void registerBlocks() {
