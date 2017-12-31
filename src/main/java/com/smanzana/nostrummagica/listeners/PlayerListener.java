@@ -1,10 +1,10 @@
 package com.smanzana.nostrummagica.listeners;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -181,13 +181,13 @@ public class PlayerListener {
 	private Map<IMagicListener, ManaInfo> manaInfos;
 	
 	public PlayerListener() {
-		timeInfos = new HashMap<>();
-		proximityInfos = new HashMap<>();
-		positionInfos = new HashMap<>();
-		damagedInfos = new HashMap<>();
-		healthInfos = new HashMap<>();
-		foodInfos = new HashMap<>();
-		manaInfos = new HashMap<>();
+		timeInfos = new ConcurrentHashMap<>();
+		proximityInfos = new ConcurrentHashMap<>();
+		positionInfos = new ConcurrentHashMap<>();
+		damagedInfos = new ConcurrentHashMap<>();
+		healthInfos = new ConcurrentHashMap<>();
+		foodInfos = new ConcurrentHashMap<>();
+		manaInfos = new ConcurrentHashMap<>();
 		
 		MinecraftForge.EVENT_BUS.register(this);
 		tickCount = 0;

@@ -29,6 +29,7 @@ import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
+import com.smanzana.nostrummagica.network.messages.SpellTomeIncrementMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -187,7 +188,11 @@ public class ClientProxy extends CommonProxy {
 			if (tome != null) {
 				if (bindingScroll.isKeyDown()) {
 					wheel = (wheel > 0 ? -1 : 1);
-					SpellTome.incrementIndex(tome, wheel);
+					int index = SpellTome.incrementIndex(tome, wheel);
+					if (index != -1) {
+						NetworkHandler.getSyncChannel()
+							.sendToServer(new SpellTomeIncrementMessage(index));
+					}
 					event.setCanceled(true);
 				}
 			}

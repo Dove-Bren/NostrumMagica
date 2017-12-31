@@ -113,9 +113,10 @@ public class SpellTome extends Item implements GuiBook {
 		return nbt.getInteger(NBT_INDEX);
 	}
 	
-	public static void incrementIndex(ItemStack itemStack, int amount) {
+	// Returns resultant index, or -1 on no change
+	public static int incrementIndex(ItemStack itemStack, int amount) {
 		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
-			return;
+			return -1;
 
 		// TODO as soon as you get a refresh from the server, you lose your index:
 		// The server's version didn't have its index incremented.
@@ -131,8 +132,12 @@ public class SpellTome extends Item implements GuiBook {
 		
 		nbt.setInteger(NBT_INDEX, index);
 		
-		if (initial != index && !NostrumMagica.proxy.isServer())
+		if (initial != index && !NostrumMagica.proxy.isServer()) {
 			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
+			return index;
+		} else
+			return -1;
+		
 	}
 	
 	public static void setIndex(ItemStack itemStack, int index) {
