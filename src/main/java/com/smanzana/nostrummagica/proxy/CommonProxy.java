@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.blocks.CursedIce;
 import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.blocks.ManiOre;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
+import com.smanzana.nostrummagica.blocks.SpellTable;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagic;
@@ -30,6 +31,7 @@ import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SpellScroll;
+import com.smanzana.nostrummagica.items.SpellTableItem;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
@@ -200,6 +202,10 @@ public class CommonProxy {
     	SpellScroll.instance().setRegistryName(NostrumMagica.MODID, SpellScroll.id);
     	GameRegistry.register(SpellScroll.instance());
     	
+    	SpellTableItem.instance().setRegistryName(NostrumMagica.MODID, SpellTableItem.ID);
+    	GameRegistry.register(SpellTableItem.instance());
+    	SpellTableItem.init();
+    	
     	MagicSwordBase.init();
     	MagicArmorBase.init();
     	EnchantedWeapon.registerWeapons();
@@ -234,6 +240,12 @@ public class CommonProxy {
     	GameRegistry.register(
     			(new ItemBlock(ManiOre.instance())).setRegistryName(ManiOre.ID)
     		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(ManiOre.ID));
+    	
+    	GameRegistry.register(SpellTable.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, SpellTable.ID));
+//    	GameRegistry.register(
+//    			(new ItemBlock(SpellTable.instance())).setRegistryName(SpellTable.ID)
+//    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(SpellTable.ID));
     	
     	NostrumMagicaFlower.init();
     	

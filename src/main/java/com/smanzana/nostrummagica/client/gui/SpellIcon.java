@@ -8,6 +8,21 @@ import org.lwjgl.opengl.GL11;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
+import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
+import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
+import com.smanzana.nostrummagica.spells.components.triggers.BeamTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.DamagedTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.DelayTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.FoodTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.HealthTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.InstantTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.ManaTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.ProximityTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -47,8 +62,12 @@ public class SpellIcon {
 			NostrumMagica.MODID, "textures/gui/icons.png");
 	private static int uWidthElement = 32;
 	private static int uWidthAlteration = 32;
+	private static int uWidthTrigger = 32;
+	private static int uWidthShape = 32;
 	private static int vOffsetAlteration = 64;
 	private static int vOffsetElement = 96;
+	private static int vOffsetTrigger = 160;
+	private static int vOffsetShape = 224; 
 	
 	private int offsetU;
 	private int offsetV;
@@ -79,6 +98,60 @@ public class SpellIcon {
 		offsetU = uWidthAlteration * ord;
 		width = uWidthAlteration;
 		height = 32;
+	}
+	
+	public SpellIcon(SpellTrigger trigger) {
+		int u = 0;
+		int v = 0;
+		if (trigger instanceof TouchTrigger) {
+			; // actually is 0 0
+		} else if (trigger instanceof ProximityTrigger) {
+			u = 1;
+		} else if (trigger instanceof ProjectileTrigger) {
+			u = 2;
+		} else if (trigger instanceof BeamTrigger) {
+			u = 3;
+		} else if (trigger instanceof DelayTrigger) {
+			u = 4;
+		}
+		//else if (trigger instanceof Trigger) {
+			
+		//}
+		else if (trigger instanceof HealthTrigger) {
+			u = 6;
+		} else if (trigger instanceof ManaTrigger) {
+			u = 7;
+		} else if (trigger instanceof FoodTrigger) {
+			u = 0;
+			v = 1;
+		} else if (trigger instanceof InstantTrigger) {
+			v = 1;
+			u = 1;
+		} else if (trigger instanceof DamagedTrigger) {
+			u = 2;
+			v = 1;
+		}
+		
+		offsetV = vOffsetTrigger + (uWidthTrigger * v);
+		offsetU = uWidthTrigger * u;
+		width = uWidthTrigger;
+		height = uWidthTrigger;
+	}
+	
+	public SpellIcon(SpellShape shape) {
+		int u = 0;
+		if (shape instanceof SingleShape) {
+			; // actually is 0 0
+		} else if (shape instanceof AoEShape) {
+			u = 1;
+		} else if (shape instanceof ChainShape) {
+			u = 2;
+		}
+		
+		offsetV = vOffsetShape;
+		offsetU = uWidthShape * u;
+		width = uWidthShape;
+		height = uWidthShape;
 	}
 	
 	public void draw(Gui parent, FontRenderer fonter, int xOffset, int yOffset, int width, int height) {
