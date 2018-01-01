@@ -20,7 +20,9 @@ public class MagicSwordBase extends ItemSword {
 		 * In the future, something cool.
 		 * For now, just a wooden sword </3
 		 */
-		GameRegistry.addRecipe(new ItemStack(instance), "   ", " S ", "   ", 'S', Items.WOODEN_SWORD);
+		GameRegistry.addRecipe(new ItemStack(instance), " C ", " C ", " S ",
+				'S', Items.IRON_SWORD, 
+				'C', InfusedGemItem.instance().getGem(null, 1));
 	}
 	
 	private static MagicSwordBase instance = null;

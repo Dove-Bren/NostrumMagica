@@ -34,14 +34,18 @@ public class MagicArmorBase extends ItemArmor {
 		/*
 		 * For now, just leather stuff. In the future, something cooler!
 		 */
-		GameRegistry.addShapedRecipe(new ItemStack(helm), "   ", " X ", "   ",
-				'X', Items.LEATHER_HELMET);
-		GameRegistry.addShapedRecipe(new ItemStack(chest), "   ", " X ", "   ",
-				'X', Items.LEATHER_CHESTPLATE);
-		GameRegistry.addShapedRecipe(new ItemStack(legs), "   ", " X ", "   ",
-				'X', Items.LEATHER_LEGGINGS);
-		GameRegistry.addShapedRecipe(new ItemStack(feet), "   ", " X ", "   ",
-				'X', Items.LEATHER_BOOTS);
+		GameRegistry.addShapedRecipe(new ItemStack(helm), "CCC", "C C", " D ",
+				'C', InfusedGemItem.instance().getGem(null, 1),
+				'D', Items.IRON_HELMET);
+		GameRegistry.addShapedRecipe(new ItemStack(chest), "CDC", "CCC", "CCC",
+				'C', InfusedGemItem.instance().getGem(null, 1),
+				'D', Items.IRON_CHESTPLATE);
+		GameRegistry.addShapedRecipe(new ItemStack(legs), "CCC", "CDC", "C C",
+				'C', InfusedGemItem.instance().getGem(null, 1),
+				'D', Items.IRON_LEGGINGS);
+		GameRegistry.addShapedRecipe(new ItemStack(feet), " D ", "C C", "C C",
+				'C', InfusedGemItem.instance().getGem(null, 1),
+				'D', Items.IRON_BOOTS);
 	}
 	
 	private String id;
