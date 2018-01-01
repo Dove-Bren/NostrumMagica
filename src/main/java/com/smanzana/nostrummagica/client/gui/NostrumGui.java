@@ -1,13 +1,14 @@
 package com.smanzana.nostrummagica.client.gui;
 
+import com.smanzana.nostrummagica.blocks.SpellTable.SpellTableEntity;
 import com.smanzana.nostrummagica.client.gui.container.ReagentBagGui;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
 import com.smanzana.nostrummagica.items.ReagentBag;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 
@@ -15,14 +16,6 @@ public class NostrumGui implements IGuiHandler {
 
 	public static final int reagentBagID = 0;
 	public static final int spellTableID = 1;
-	
-	private IInventory test;
-	private IInventory testInv() {
-		if (test == null)
-			test = new InventoryBasic("test inv", false, 10);
-		
-		return test;
-	}
 	
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
@@ -37,10 +30,12 @@ public class NostrumGui implements IGuiHandler {
 //		} else 
 		
 		if (ID == spellTableID) {
-			// TODO get spell table pointed at, etc etc
-			return new SpellCreationGui.SpellCreationContainer(
-					player.inventory,
-					testInv()); // should be tile inventory
+			TileEntity ent = world.getTileEntity(new BlockPos(x, y, z));
+			if (ent != null && ent instanceof SpellTableEntity) {
+				return new SpellCreationGui.SpellCreationContainer(
+						player.inventory,
+						(SpellTableEntity) ent); // should be tile inventory
+			}
 		}
 		
 		
@@ -72,10 +67,12 @@ public class NostrumGui implements IGuiHandler {
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		
 		if (ID == spellTableID) {
-			// TODO get spell table pointed at, etc etc
-			return new SpellCreationGui.SpellGui(new SpellCreationGui.SpellCreationContainer(
-					player.inventory,
-					testInv())); // should be tile inventory
+			TileEntity ent = world.getTileEntity(new BlockPos(x, y, z));
+			if (ent != null && ent instanceof SpellTableEntity) {
+				return new SpellCreationGui.SpellGui(new SpellCreationGui.SpellCreationContainer(
+						player.inventory,
+						(SpellTableEntity) ent)); // should be tile inventory
+			}
 		}
 		
 		// Item based

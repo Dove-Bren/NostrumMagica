@@ -243,6 +243,7 @@ public class CommonProxy {
     	
     	GameRegistry.register(SpellTable.instance(),
     			new ResourceLocation(NostrumMagica.MODID, SpellTable.ID));
+    	SpellTable.init();
 //    	GameRegistry.register(
 //    			(new ItemBlock(SpellTable.instance())).setRegistryName(SpellTable.ID)
 //    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(SpellTable.ID));
