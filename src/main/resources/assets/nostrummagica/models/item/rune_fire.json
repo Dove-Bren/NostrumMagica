@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/rune_self"
+        "layer0": "nostrummagica:items/rune_fire"
     }
 }

@@ -113,10 +113,10 @@ public class ClientProxy extends CommonProxy {
 		
 		List<ResourceLocation> list = new LinkedList<>();
 		for (EMagicElement type : EMagicElement.values()) {
-    		list.add(new ResourceLocation(NostrumMagica.MODID, "rune_" + type.name()));
+    		list.add(new ResourceLocation(NostrumMagica.MODID, "rune_" + type.name().toLowerCase()));
     	}
     	for (EAlteration type : EAlteration.values()) {
-    		list.add(new ResourceLocation(NostrumMagica.MODID, "rune_" + type.name()));
+    		list.add(new ResourceLocation(NostrumMagica.MODID, "rune_" + type.name().toLowerCase()));
     	}
     	for (SpellShape type : SpellShape.getAllShapes()) {
     		list.add(new ResourceLocation(NostrumMagica.MODID, "rune_" + type.getShapeKey()));

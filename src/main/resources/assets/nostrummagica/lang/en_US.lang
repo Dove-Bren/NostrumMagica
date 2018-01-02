@@ -26,6 +26,36 @@ item.nostrum_gem.ice.name=Ice Gem
 item.nostrum_gem.wind.name=Wind Gem
 item.nostrum_gem.ender.name=Ender Gem
 
+item.nostrum_rune.physical.name=Physical Rune
+item.nostrum_rune.lightning.name=Lightning Rune
+item.nostrum_rune.fire.name=Fire Rune
+item.nostrum_rune.earth.name=Earth Rune
+item.nostrum_rune.ice.name=Ice Rune
+item.nostrum_rune.wind.name=Wind Rune
+item.nostrum_rune.ender.name=Ender Rune
+item.nostrum_rune.inflict.name=Inflict Rune
+item.nostrum_rune.resist.name=Resist Rune
+item.nostrum_rune.support.name=Support Rune
+item.nostrum_rune.growth.name=Growth Rune
+item.nostrum_rune.enchant.name=Enchant Rune
+item.nostrum_rune.conjure.name=Conjure Rune
+item.nostrum_rune.summon.name=Summon Rune
+item.nostrum_rune.alter.name=Alter Rune
+item.nostrum_rune.shape_aoe.name=AoE Rune
+item.nostrum_rune.shape_chain.name=Chain Rune
+item.nostrum_rune.shape_single.name=Single Rune
+item.nostrum_rune.trigger_proximity.name=Proximity Rune
+item.nostrum_rune.trigger_hit.name=Hit Rune
+item.nostrum_rune.trigger_health.name=Health Rune
+item.nostrum_rune.trigger_self.name=Self Rune
+item.nostrum_rune.trigger_touch.name=Touch Rune
+item.nostrum_rune.trigger_food.name=Food Rune
+item.nostrum_rune.trigger_projectile.name=Projectile Rune
+item.nostrum_rune.trigger_beam.name=Beam Rune
+item.nostrum_rune.trigger_ai.name=AI Rune
+item.nostrum_rune.trigger_delay.name=Delay Rune
+item.nostrum_rune.mana.name=Mana Rune
+
 item.magic_wall.name=Magic Wall
 item.mani_ore.name=Mani Ore
 

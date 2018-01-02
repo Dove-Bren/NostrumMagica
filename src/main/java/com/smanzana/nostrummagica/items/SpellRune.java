@@ -55,6 +55,8 @@ public class SpellRune extends Item {
 				suffix = getPieceName(stack);
 				if (suffix == null || suffix.trim().isEmpty())
 					suffix = "blank";
+				else
+					suffix = suffix.toLowerCase();
 			}
 			
 			return new ModelResourceLocation(

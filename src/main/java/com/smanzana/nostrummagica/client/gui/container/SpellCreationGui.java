@@ -91,13 +91,6 @@ public class SpellCreationGui {
 					return (stack == null
 							|| stack.getItem() instanceof BlankScroll);
 				}
-				
-				@Override
-				public void putStack(ItemStack stack) {
-					System.out.println("Putting stack in slot: "
-							+ (stack == null ? "null" : stack.getItem()));
-					super.putStack(stack);
-				}
 			});
 			
 			RuneSlot prev = null, cur;
@@ -465,6 +458,9 @@ public class SpellCreationGui {
 			// OR previous slot is not null (not the first trigger-only slot)
 			// OR it's a trigger rune
 			// all ANDed with does the previous slot have a rune?
+			if (!container.isValid)
+				return false;
+			
 			if (prev != null &&
 					!prev.getHasStack())
 				return false;
@@ -475,7 +471,7 @@ public class SpellCreationGui {
 			if (!(stack.getItem() instanceof SpellRune))
 				return false;
 			
-			return (prev != null || stack.getItem() instanceof SpellRune);
+			return (prev != null || SpellRune.isTrigger(stack));
 		}
 		
 		@Override
