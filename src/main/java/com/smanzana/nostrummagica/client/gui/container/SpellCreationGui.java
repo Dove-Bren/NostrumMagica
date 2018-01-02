@@ -13,8 +13,11 @@ import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.Spell.SpellPart;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -189,19 +192,86 @@ public class SpellCreationGui {
 			if (spellErrorStrings == null)
 				spellErrorStrings = new LinkedList<>();
 			
-			spellErrorStrings.clear();
-			
-			spellErrorStrings.add("First line");
-			spellErrorStrings.add("Second string");
-			// set spellErrorStrings appropriately
-			
-			// set lastManaCost too
+			Spell spell = craftSpell("junk");
+			if (spell == null)
+				spellValid = false;
 		}
 		
 		public Spell makeSpell(String name) {
-			// TODO
-			// clear out inventory, too
-			return null;
+			// Don't cache from validate... just in case...
+			Spell spell = craftSpell(name);
+			
+			if (spell == null)
+				return null;
+			
+			this.inventory.clear();
+			return spell;
+		}
+		
+		private Spell craftSpell(String name) {
+			boolean fail = false;
+			spellErrorStrings.clear();
+			if (name.trim().isEmpty()) {
+				spellErrorStrings.add("Must have a name");
+				fail = true;
+			}
+			
+			if (!isValid) {
+				spellErrorStrings.add("Missing blank scroll");
+				return null; // fatal
+			}
+			
+			ItemStack stack;
+			
+			stack = inventory.getStackInSlot(1);
+			if (stack == null || !SpellRune.isTrigger(stack)) {
+				spellErrorStrings.add("Spell must begin with a trigger");
+				return null;
+			}
+			
+			boolean flag = false;
+			for (int i = 2; i < inventory.getSizeInventory(); i++) {
+				stack = inventory.getStackInSlot(i);
+				if (stack == null) {
+					break;
+				}
+				if (SpellRune.isShape(stack)) {
+					flag = true;
+					break;
+				}
+			}
+			
+			if (!flag) {
+				spellErrorStrings.add("Must have at least one spell shape");
+				return null;
+			}
+			
+			Spell spell = new Spell(name);
+			SpellPart part;
+			for (int i = 1; i < inventory.getSizeInventory(); i++) {
+				stack = inventory.getStackInSlot(i);
+				if (stack == null) {
+					break;
+				}
+				
+				part = SpellRune.getPart(stack);
+				if (part == null) {
+					spellErrorStrings.add("Unfinished spell part in slot " + i);
+					if (SpellRune.isShape(stack))
+						spellErrorStrings.add(" -> Spell parts must have an element");
+					else
+						spellErrorStrings.add(" -> This trigger has been corrupted");
+					return null;
+				} else {
+					spell.addPart(part);
+				}
+			}
+			
+			this.lastManaCost = spell.getManaCost();
+			
+			if (fail)
+				return null;
+			return spell;
 		}
 		
 		public void setScroll(ItemStack item) {
@@ -319,6 +389,11 @@ public class SpellCreationGui {
 						 && mouseY > verticalMargin + NAME_VOFFSET && mouseY <= verticalMargin + NAME_VOFFSET + NAME_HEIGHT) {
 					Gui.drawRect(NAME_HOFFSET, NAME_VOFFSET, NAME_HOFFSET + NAME_WIDTH, NAME_VOFFSET + NAME_HEIGHT, 0x40000000);
 				}
+				
+				if (mouseX >= horizontalMargin && mouseX <= horizontalMargin + SUBMIT_WIDTH && 
+						mouseY >= verticalMargin && mouseY <= verticalMargin + SUBMIT_HEIGHT) {
+					Gui.drawRect(SUBMIT_HOFFSET, SUBMIT_VOFFSET, SUBMIT_HOFFSET + SUBMIT_WIDTH, SUBMIT_VOFFSET + SUBMIT_HEIGHT, 0x40000000);
+				}
 			}
 			
 		}
@@ -362,9 +437,13 @@ public class SpellCreationGui {
 							if (container.spellValid) {
 								// whoo make spell
 								Spell spell = container.makeSpell(name.toString());
-								ItemStack scroll = new ItemStack(SpellScroll.instance(), 1);
-								SpellScroll.setSpell(scroll, spell);
-								container.setScroll(scroll);
+								if (spell != null) {
+									ItemStack scroll = new ItemStack(SpellScroll.instance(), 1);
+									SpellScroll.setSpell(scroll, spell);
+									container.setScroll(scroll);
+									this.name.delete(0, name.length() - 1);
+									NostrumMagicaSounds.AMBIENT_WOOSH.play(Minecraft.getMinecraft().thePlayer);
+								}
 							} else {
 								// Don't
 							}
@@ -471,7 +550,11 @@ public class SpellCreationGui {
 			if (!(stack.getItem() instanceof SpellRune))
 				return false;
 			
-			return (prev != null || SpellRune.isTrigger(stack));
+			boolean trigger = SpellRune.isTrigger(stack);
+			if (!trigger && !SpellRune.isShape(stack))
+				return false;
+			
+			return (prev != null || trigger);
 		}
 		
 		@Override
@@ -498,6 +581,8 @@ public class SpellCreationGui {
 				next.putStack(null);
 				next.onPickupFromSlot(playerIn, this.getStack());
 			}
+
+			container.validate();
 			
 			super.onPickupFromSlot(playerIn, stack);
 		}
