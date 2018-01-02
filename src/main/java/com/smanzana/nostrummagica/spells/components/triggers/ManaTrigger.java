@@ -89,5 +89,10 @@ public class ManaTrigger extends SpellTrigger {
 			SpellPartParam params) {
 		return new ManaTriggerInstance(state, state.getCaster(), params.level, params.flip);
 	}
+
+	@Override
+	public String getDisplayName() {
+		return "Mana Level";
+	}
 	
 }

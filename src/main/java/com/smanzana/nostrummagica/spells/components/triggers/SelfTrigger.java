@@ -47,5 +47,10 @@ public class SelfTrigger extends InstantTrigger {
 		
 		return list;
 	}
+
+	@Override
+	public String getDisplayName() {
+		return "Self";
+	}
 	
 }

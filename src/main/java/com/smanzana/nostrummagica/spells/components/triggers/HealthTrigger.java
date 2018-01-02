@@ -89,5 +89,10 @@ public class HealthTrigger extends SpellTrigger {
 			SpellPartParam params) {
 		return new HealthTriggerInstance(state, state.getCaster(), params.level, params.flip);
 	}
+
+	@Override
+	public String getDisplayName() {
+		return "Health Level";
+	}
 	
 }

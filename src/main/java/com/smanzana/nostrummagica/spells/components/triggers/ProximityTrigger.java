@@ -100,5 +100,10 @@ public class ProximityTrigger extends SpellTrigger {
 			SpellPartParam params) {
 		return new ProximityTriggerInstance(state, world, pos, params.level);
 	}
+
+	@Override
+	public String getDisplayName() {
+		return "Proximity";
+	}
 	
 }

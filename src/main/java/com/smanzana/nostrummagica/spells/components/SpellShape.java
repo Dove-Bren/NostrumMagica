@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.spells.components;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,14 @@ public abstract class SpellShape {
 		return registry.get(name);
 	}
 	
+	public static Collection<String> getAllNames() {
+		return registry.keySet();
+	}
+	
+	public static Collection<SpellShape> getAllShapes() {
+		return registry.values();
+	}
+	
 	private String key;
 	
 	public SpellShape(String key) {
@@ -38,6 +47,8 @@ public abstract class SpellShape {
 	public String getShapeKey() {
 		return key;
 	}
+	
+	public abstract String getDisplayName();
 	
 	/**
 	 * 

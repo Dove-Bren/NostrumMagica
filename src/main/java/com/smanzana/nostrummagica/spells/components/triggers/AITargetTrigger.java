@@ -54,5 +54,10 @@ public class AITargetTrigger extends InstantTrigger {
 		
 		return list;
 	}
+
+	@Override
+	public String getDisplayName() {
+		return "AI";
+	}
 	
 }

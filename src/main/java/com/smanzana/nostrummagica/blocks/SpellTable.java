@@ -6,8 +6,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
-import com.smanzana.nostrummagica.items.BlankScroll;
-import com.smanzana.nostrummagica.items.SpellScroll;
+import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellTableItem;
 
 import net.minecraft.block.BlockHorizontal;
@@ -134,12 +133,10 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 
 		@Override
 		public void openInventory(EntityPlayer player) {
-			// TODO Auto-generated method stub
 		}
 
 		@Override
 		public void closeInventory(EntityPlayer player) {
-			// TODO Auto-generated method stub
 		}
 
 		@Override
@@ -150,12 +147,14 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 			if (stack == null)
 				return true;
 			
+			if (!(stack.getItem() instanceof SpellRune))
+				return false;
+			
 			if (index == 0) {
-				return stack.getItem() instanceof BlankScroll;
+				return SpellRune.isTrigger(stack);
 			}
 			
-			return stack.getItem() instanceof BlankScroll
-					|| stack.getItem() instanceof SpellScroll; // should be rune
+			return true;
 		}
 
 		@Override
@@ -309,6 +308,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 		BlockPos master = getMaster(state, pos);
 		TileEntity ent = world.getTileEntity(master);
 		if (!world.isRemote && ent != null) {
+			System.out.println("checking...");
 			SpellTableEntity table = (SpellTableEntity) ent;
 			for (int i = 0; i < table.getSizeInventory(); i++) {
 				System.out.println("checking...");

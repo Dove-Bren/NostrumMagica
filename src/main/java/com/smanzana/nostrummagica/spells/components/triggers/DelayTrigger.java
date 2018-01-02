@@ -85,5 +85,10 @@ public class DelayTrigger extends SpellTrigger {
 			SpellPartParam params) {
 		return new DelayTriggerInstance(state, (int) (params.level * 20));
 	}
+
+	@Override
+	public String getDisplayName() {
+		return "Delay";
+	}
 	
 }

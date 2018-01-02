@@ -10,6 +10,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.BlankScroll;
+import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -66,10 +67,7 @@ public class SpellCreationGui {
 	private static final int STATUS_DISP_HOFFSET = 4;
 	private static final int STATUS_DISP_VOFFSET = 4;
 	
-	// 40, 68
-	
-	// private static final int MANA_DISPLAY_HOFFSET etc
-	// TODO
+	private static final int MANA_VOFFSET = 103;
 	
 	public static class SpellCreationContainer extends Container {
 		
@@ -78,6 +76,7 @@ public class SpellCreationGui {
 		protected boolean isValid; // has an acceptable scroll
 		protected boolean spellValid; // grammer checks out
 		protected List<String> spellErrorStrings; // Updated on validate(); what's wrong?
+		protected int lastManaCost;
 		
 		public SpellCreationContainer(IInventory playerInv, IInventory tableInventory) {
 			this.inventory = tableInventory;
@@ -105,7 +104,7 @@ public class SpellCreationGui {
 			for (int i = 0; i < Math.min(GRAMMAR_SLOT_MAXX * 2, inventory.getSizeInventory() - 1); i++) {
 				int x = ( (i % GRAMMAR_SLOT_MAXX) * GRAMMAR_SLOT_HDIST + GRAMMAR_SLOT_HOFFSET);
 				int y = ( (i / GRAMMAR_SLOT_MAXX) * GRAMMAR_SLOT_VDIST + GRAMMAR_SLOT_VOFFSET);
-				cur = new RuneSlot(prev, inventory, i + 1, x, y);
+				cur = new RuneSlot(this, prev, inventory, i + 1, x, y);
 				if (prev != null)
 					prev.setNext(cur);
 				prev = cur;
@@ -202,6 +201,8 @@ public class SpellCreationGui {
 			spellErrorStrings.add("First line");
 			spellErrorStrings.add("Second string");
 			// set spellErrorStrings appropriately
+			
+			// set lastManaCost too
 		}
 		
 		public Spell makeSpell(String name) {
@@ -275,7 +276,6 @@ public class SpellCreationGui {
 						horizontalMargin + NAME_HOFFSET + 2,
 						verticalMargin + NAME_VOFFSET + 2, 
 						0xFF000000);
-				GL11.glPopMatrix();
 				if (nameSelectedPos != -1 && ++counter > 30) {
 					
 					x = horizontalMargin + NAME_HOFFSET + 2;
@@ -290,6 +290,15 @@ public class SpellCreationGui {
 					if (counter > 60)
 						counter = 0;
 				}
+				
+				if (container.spellValid) {
+					String str = "Spell Cost: " + container.lastManaCost;
+					x = this.width / 2;
+					x -= mc.fontRendererObj.getStringWidth(str) / 2;
+					mc.fontRendererObj.drawString(str, x, verticalMargin + MANA_VOFFSET, 0xFFD3D3D3);
+				}
+				
+				GL11.glPopMatrix();
 				
 			}
 			
@@ -437,10 +446,12 @@ public class SpellCreationGui {
 
 		private RuneSlot prev;
 		private RuneSlot next;
+		private SpellCreationContainer container;
 		
-		public RuneSlot(RuneSlot prev, IInventory inventoryIn, int index, int xPosition, int yPosition) {
+		public RuneSlot(SpellCreationContainer container, RuneSlot prev, IInventory inventoryIn, int index, int xPosition, int yPosition) {
 			super(inventoryIn, index, xPosition, yPosition);
 			this.prev = prev;
+			this.container = container;
 		}
 		
 		public void setNext(RuneSlot next) {
@@ -461,12 +472,10 @@ public class SpellCreationGui {
 			if (stack == null)
 				return true;
 			
-			if (!(stack.getItem() instanceof BlankScroll)
-					&& !(stack.getItem() instanceof SpellScroll))
+			if (!(stack.getItem() instanceof SpellRune))
 				return false;
 			
-			return (prev != null || stack.getItem() instanceof BlankScroll);
-			// TODO should be runes
+			return (prev != null || stack.getItem() instanceof SpellRune);
 		}
 		
 		@Override
@@ -474,6 +483,13 @@ public class SpellCreationGui {
 		public boolean canBeHovered() {
 			return (prev == null ||
 					prev.getHasStack());
+		}
+		
+		@Override
+		public void putStack(@Nullable ItemStack stack) {
+			super.putStack(stack);
+			
+			container.validate();
 		}
 		
 		@Override

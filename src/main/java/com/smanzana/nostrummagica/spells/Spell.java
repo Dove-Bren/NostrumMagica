@@ -255,6 +255,10 @@ public class Spell {
 		public SpellPartParam getParam() {
 			return param;
 		}
+		
+		public void setParam(SpellPartParam param) {
+			this.param = param;
+		}
 	}
 
 	private String name;

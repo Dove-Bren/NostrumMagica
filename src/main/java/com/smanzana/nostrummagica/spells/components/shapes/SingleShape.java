@@ -57,4 +57,9 @@ public class SingleShape extends SpellShape {
 		return list;
 	}
 
+	@Override
+	public String getDisplayName() {
+		return "Single";
+	}
+
 }

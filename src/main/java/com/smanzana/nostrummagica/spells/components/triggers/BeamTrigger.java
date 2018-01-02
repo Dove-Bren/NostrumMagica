@@ -87,5 +87,10 @@ public class BeamTrigger extends InstantTrigger {
 		
 		return list;
 	}
+
+	@Override
+	public String getDisplayName() {
+		return "Beam";
+	}
 	
 }

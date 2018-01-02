@@ -92,5 +92,10 @@ public class FoodTrigger extends SpellTrigger {
 			SpellPartParam params) {
 		return new FoodTriggerInstance(state, state.getCaster(), (int) params.level, params.flip);
 	}
+
+	@Override
+	public String getDisplayName() {
+		return "Food Level";
+	}
 	
 }

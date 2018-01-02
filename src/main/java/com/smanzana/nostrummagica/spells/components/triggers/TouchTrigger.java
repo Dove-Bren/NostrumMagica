@@ -78,5 +78,10 @@ public class TouchTrigger extends InstantTrigger {
 		
 		return list;
 	}
+
+	@Override
+	public String getDisplayName() {
+		return "Touch";
+	}
 	
 }

@@ -91,4 +91,9 @@ public class AoEShape extends SpellShape {
 		return list;
 	}
 
+	@Override
+	public String getDisplayName() {
+		return "Area of Effect";
+	}
+
 }

@@ -30,6 +30,7 @@ import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTableItem;
 import com.smanzana.nostrummagica.items.SpellTome;
@@ -216,6 +217,9 @@ public class CommonProxy {
     	InfusedGemItem.instance().setRegistryName(NostrumMagica.MODID, InfusedGemItem.ID);
     	GameRegistry.register(InfusedGemItem.instance());
     	InfusedGemItem.init();
+    	SpellRune.instance().setRegistryName(NostrumMagica.MODID, SpellRune.ID);
+    	GameRegistry.register(SpellRune.instance());
+    	SpellRune.init();
     	
     	ReagentBag.instance().setRegistryName(NostrumMagica.MODID, ReagentBag.id);
     	GameRegistry.register(ReagentBag.instance());

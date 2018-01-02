@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.spells.components;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,12 +24,16 @@ public abstract class SpellTrigger {
 	
 	private static Map<String, SpellTrigger> registry = new HashMap<>();
 	
-	public static void register(SpellTrigger shape) {
-		registry.put(shape.getTriggerKey(), shape);
+	public static void register(SpellTrigger trigger) {
+		registry.put(trigger.getTriggerKey(), trigger);
 	}
 	
 	public static SpellTrigger get(String name) {
 		return registry.get(name);
+	}
+	
+	public static Collection<SpellTrigger> getAllTriggers() {
+		return registry.values();
 	}
 
 	/**
@@ -83,6 +88,8 @@ public abstract class SpellTrigger {
 	public String getTriggerKey() {
 		return key;
 	}
+	
+	public abstract String getDisplayName();
 	
 	/**
 	 * Construct a SpellTriggerInstance for this trigger for the given state.

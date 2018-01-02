@@ -94,4 +94,9 @@ public class ChainShape extends SpellShape {
 		return list;
 	}
 
+	@Override
+	public String getDisplayName() {
+		return "Chain";
+	}
+
 }

@@ -152,5 +152,10 @@ public class ProjectileTrigger extends SpellTrigger {
 		
 		return list;
 	}
+
+	@Override
+	public String getDisplayName() {
+		return "Projectile";
+	}
 	
 }

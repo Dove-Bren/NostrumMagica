@@ -85,5 +85,10 @@ public class DamagedTrigger extends SpellTrigger {
 			SpellPartParam params) {
 		return new DamagedTriggerInstance(state, state.getSelf());
 	}
+
+	@Override
+	public String getDisplayName() {
+		return "On Damage";
+	}
 	
 }

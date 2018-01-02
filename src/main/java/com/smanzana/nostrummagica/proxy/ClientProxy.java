@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.proxy;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -24,6 +26,7 @@ import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTableItem;
@@ -32,8 +35,11 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
 import com.smanzana.nostrummagica.network.messages.SpellTomeIncrementMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -105,6 +111,23 @@ public class ClientProxy extends CommonProxy {
 				"gem_basic");
 		ModelBakery.registerItemVariants(InfusedGemItem.instance(), variants);
 		
+		List<ResourceLocation> list = new LinkedList<>();
+		for (EMagicElement type : EMagicElement.values()) {
+    		list.add(new ResourceLocation(NostrumMagica.MODID, "rune_" + type.name()));
+    	}
+    	for (EAlteration type : EAlteration.values()) {
+    		list.add(new ResourceLocation(NostrumMagica.MODID, "rune_" + type.name()));
+    	}
+    	for (SpellShape type : SpellShape.getAllShapes()) {
+    		list.add(new ResourceLocation(NostrumMagica.MODID, "rune_" + type.getShapeKey()));
+    	}
+    	for (SpellTrigger type : SpellTrigger.getAllTriggers()) {
+    		list.add(new ResourceLocation(NostrumMagica.MODID, "rune_" + type.getTriggerKey()));
+    	}
+    	
+    	variants = list.toArray(new ResourceLocation[0]);
+    	ModelBakery.registerItemVariants(SpellRune.instance(), variants);
+		
 	}
 	
 	@Override
@@ -144,6 +167,9 @@ public class ClientProxy extends CommonProxy {
 			registerModel(gem, meta,
 					"gem_" + gem.getNameFromMeta(meta));
 		}
+		
+		Minecraft.getMinecraft().getRenderItem().getItemModelMesher()
+			.register(SpellRune.instance(), new SpellRune.ModelMesher());
 		
 		registerModel(new ItemBlock(NostrumMagicaFlower.instance()), 
 				NostrumMagicaFlower.Type.CRYSTABLOOM.getMeta(),
