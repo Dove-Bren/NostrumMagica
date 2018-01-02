@@ -23,6 +23,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
@@ -32,6 +33,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -40,6 +42,8 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 	
 	public static class SpellTableEntity extends TileEntity implements IInventory {
 
+		private static final String NBT_INV = "inventory";
+		
 		/**
 		 * Inventory:
 		 *   0 - Spell scroll slot
@@ -175,6 +179,48 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 				removeStackFromSlot(i);
 		}
 		
+		@Override
+		public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+			nbt = super.writeToNBT(nbt);
+			NBTTagCompound compound = new NBTTagCompound();
+			
+			for (int i = 0; i < getSizeInventory(); i++) {
+				if (getStackInSlot(i) == null)
+					continue;
+				
+				NBTTagCompound tag = new NBTTagCompound();
+				compound.setTag(i + "", getStackInSlot(i).writeToNBT(tag));
+			}
+			
+			if (nbt == null)
+				nbt = new NBTTagCompound();
+			
+			nbt.setTag(NBT_INV, compound);
+			return nbt;
+		}
+		
+		@Override
+		public void readFromNBT(NBTTagCompound nbt) {
+			super.readFromNBT(nbt);
+			
+			if (nbt == null || !nbt.hasKey(NBT_INV, NBT.TAG_COMPOUND))
+				return;
+			
+			NBTTagCompound items = nbt.getCompoundTag(NBT_INV);
+			for (String key : items.getKeySet()) {
+				int id;
+				try {
+					id = Integer.parseInt(key);
+				} catch (NumberFormatException e) {
+					NostrumMagica.logger.error("Failed reading SpellTable inventory slot: " + key);
+					continue;
+				}
+				
+				ItemStack stack = ItemStack.loadItemStackFromNBT(items.getCompoundTag(key));
+				this.setInventorySlotContents(id, stack);
+			}
+		}
+		
 	}
 
 	private static final PropertyBool MASTER = PropertyBool.create("master");
@@ -260,10 +306,34 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 		if (state == null)
 			return;
 		
+		BlockPos master = getMaster(state, pos);
+		TileEntity ent = world.getTileEntity(master);
+		if (!world.isRemote && ent != null) {
+			SpellTableEntity table = (SpellTableEntity) ent;
+			for (int i = 0; i < table.getSizeInventory(); i++) {
+				System.out.println("checking...");
+				if (table.getStackInSlot(i) != null) {
+					EntityItem item = new EntityItem(
+							world, master.getX() + .5, master.getY() + .5, master.getZ() + .5,
+							table.removeStackFromSlot(i));
+					world.spawnEntityInWorld(item);
+				}
+			}
+		} else {
+			System.out.println("else!!!!!!!");
+		}
+		
 		world.setBlockToAir(getPaired(state, pos));
 	}
 	
 	private BlockPos getPaired(IBlockState state, BlockPos pos) {
+		return pos.offset(state.getValue(FACING));
+	}
+	
+	private BlockPos getMaster(IBlockState state, BlockPos pos) {
+		if (state.getValue(MASTER))
+			return pos;
+		
 		return pos.offset(state.getValue(FACING));
 	}
 	
@@ -296,7 +366,11 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		return new SpellTableEntity();
+		IBlockState state = this.getStateFromMeta(meta);
+		if (state.getValue(MASTER))
+			return new SpellTableEntity();
+		
+		return null;
 	}
 	
 	@Override
@@ -309,6 +383,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 		
 		SpellTableEntity table = (SpellTableEntity) ent;
 		for (int i = 0; i < table.getSizeInventory(); i++) {
+			System.out.println("checking...");
 			if (table.getStackInSlot(i) != null) {
 				EntityItem item = new EntityItem(
 						world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,

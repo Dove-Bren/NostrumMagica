@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.lwjgl.opengl.GL11;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.SpellScroll;
@@ -45,7 +47,7 @@ public class SpellCreationGui {
 	private static final int NAME_HOFFSET  = 47;
 	private static final int NAME_VOFFSET = 18;
 	private static final int NAME_WIDTH = 116;
-	private static final int NAME_HEIGHT = 7;
+	private static final int NAME_HEIGHT = 12;
 	private static final int SUBMIT_HOFFSET = 172;
 	private static final int SUBMIT_VOFFSET = 16;
 	private static final int SUBMIT_WIDTH = 18;
@@ -59,8 +61,10 @@ public class SpellCreationGui {
 	
 	private static final int STATUS_WIDTH = 10;
 	private static final int STATUS_HEIGHT = 10;
-	private static final int STATUS_HOFFSET = 3;
-	private static final int STATUS_VOFFSET = 3;
+	private static final int STATUS_HOFFSET = 10;
+	private static final int STATUS_VOFFSET = 203;
+	private static final int STATUS_DISP_HOFFSET = 4;
+	private static final int STATUS_DISP_VOFFSET = 4;
 	
 	// 40, 68
 	
@@ -190,7 +194,13 @@ public class SpellCreationGui {
 		}
 		
 		public void validate() {
+			if (spellErrorStrings == null)
+				spellErrorStrings = new LinkedList<>();
 			
+			spellErrorStrings.clear();
+			
+			spellErrorStrings.add("First line");
+			spellErrorStrings.add("Second string");
 			// set spellErrorStrings appropriately
 		}
 		
@@ -215,6 +225,7 @@ public class SpellCreationGui {
 		private SpellCreationContainer container;
 		private int nameSelectedPos; // -1 for no selection
 		private StringBuffer name;
+		private int counter;
 		
 		public SpellGui(SpellCreationContainer container) {
 			super(container);
@@ -223,6 +234,7 @@ public class SpellCreationGui {
 			this.ySize = GUI_HEIGHT;
 			this.nameSelectedPos = -1;
 			this.name = new StringBuffer(NAME_MAX + 1);
+			counter = 0;
 		}
 		
 		@Override
@@ -244,11 +256,10 @@ public class SpellCreationGui {
 						MESSAGE_WIDTH, MESSAGE_HEIGHT,
 						256, 256);
 			} else {
-				mc.fontRendererObj.drawString(name.toString(), 
-						horizontalMargin + NAME_HOFFSET + 5,
-						verticalMargin + NAME_VOFFSET + 3, 
-						0xFF000000);
 				
+				GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+				x = horizontalMargin + STATUS_DISP_HOFFSET;
+				y = verticalMargin + STATUS_DISP_VOFFSET;
 				int u = STATUS_HOFFSET;
 				int v = STATUS_VOFFSET;
 				if (!container.spellValid) {
@@ -258,6 +269,28 @@ public class SpellCreationGui {
 				Gui.drawModalRectWithCustomSizedTexture(x, y, u, v,
 						STATUS_WIDTH, STATUS_HEIGHT,
 						256, 256);
+				
+				GL11.glPushMatrix();
+				mc.fontRendererObj.drawString(name.toString(), 
+						horizontalMargin + NAME_HOFFSET + 2,
+						verticalMargin + NAME_VOFFSET + 2, 
+						0xFF000000);
+				GL11.glPopMatrix();
+				if (nameSelectedPos != -1 && ++counter > 30) {
+					
+					x = horizontalMargin + NAME_HOFFSET + 2;
+					for (int i = 0; i < nameSelectedPos; i++) {
+						x += mc.fontRendererObj.getCharWidth(name.charAt(i));
+					}
+					
+					Gui.drawRect(x, verticalMargin + NAME_VOFFSET + 1,
+							x + 1, verticalMargin + NAME_VOFFSET + 3 + mc.fontRendererObj.FONT_HEIGHT,
+							0xFF000000);
+					
+					if (counter > 60)
+						counter = 0;
+				}
+				
 			}
 			
 		}
@@ -265,18 +298,27 @@ public class SpellCreationGui {
 		@Override
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 			
-			if (container.isValid && !container.spellValid) {
+			if (container.isValid) {
 				int horizontalMargin = (width - xSize) / 2;
 				int verticalMargin = (height - ySize) / 2;
 				
-				if (mouseX > horizontalMargin + STATUS_HOFFSET && mouseX <= horizontalMargin + STATUS_HOFFSET + STATUS_WIDTH
-					 && mouseY > verticalMargin + STATUS_VOFFSET && mouseY <= verticalMargin + STATUS_VOFFSET + STATUS_HEIGHT) {
-					GlStateManager.color(1.0F,  1.0F, 1.0F, 1.0F);
+				if (!container.spellValid) {
 					
-					this.drawHoveringText(container.spellErrorStrings, mouseX, mouseY);
+					if (mouseX > horizontalMargin + STATUS_DISP_HOFFSET && mouseX <= horizontalMargin + STATUS_DISP_HOFFSET + STATUS_WIDTH
+						 && mouseY > verticalMargin + STATUS_DISP_VOFFSET && mouseY <= verticalMargin + STATUS_DISP_VOFFSET + STATUS_HEIGHT) {
+						GlStateManager.color(1.0F,  1.0F, 1.0F, 1.0F);
+						
+						this.drawHoveringText(container.spellErrorStrings,
+								mouseX - horizontalMargin, mouseY - verticalMargin);
+					}
 				}
 				
+				if (mouseX > horizontalMargin + NAME_HOFFSET && mouseX <= horizontalMargin + NAME_HOFFSET + NAME_WIDTH
+						 && mouseY > verticalMargin + NAME_VOFFSET && mouseY <= verticalMargin + NAME_VOFFSET + NAME_HEIGHT) {
+					Gui.drawRect(NAME_HOFFSET, NAME_VOFFSET, NAME_HOFFSET + NAME_WIDTH, NAME_VOFFSET + NAME_HEIGHT, 0x40000000);
+				}
 			}
+			
 		}
 			
 		@Override
@@ -292,7 +334,7 @@ public class SpellCreationGui {
 					mouseY >= top && mouseY <= top + NAME_HEIGHT) {
 						// clicked in name field
 						if (nameSelectedPos == -1) {
-							nameSelectedPos = name.length() - 1;
+							nameSelectedPos = name.length();
 						} else {
 							int offset = mouseX - left;
 							offset -= 5; // offset of drawn text
@@ -301,8 +343,9 @@ public class SpellCreationGui {
 								offset -= mc.fontRendererObj.getCharWidth(name.charAt(index));
 								index++;
 							}
-							nameSelectedPos = index;
+							nameSelectedPos = index + 1;
 						}
+						counter = 0;
 						return;
 				}
 				// implicit else
@@ -336,19 +379,36 @@ public class SpellCreationGui {
 				this.mc.thePlayer.closeScreen();
 			}
 
-			if (nameSelectedPos != -1) {
-				System.out.println("Trying to type into name...");
-				System.out.println("Current: [" + name.toString() + "], key: " + typedChar);
-				if (nameSelectedPos == name.length()) {
-					if (keyCode == 14 || name.length() < NAME_MAX) {
-						// if backspace or we dont have too many
+			if (nameSelectedPos != -1 && isValidKey(keyCode)) {
+				if (keyCode == 203) {
+					nameSelectedPos = Math.max(0, nameSelectedPos--);
+				} else if (keyCode == 205) {
+					nameSelectedPos = Math.min(name.length(), ++nameSelectedPos);
+				} else if (keyCode == 199) {
+					nameSelectedPos = 0;
+				} else if (keyCode == 207) {
+					nameSelectedPos = name.length();
+				} else if (nameSelectedPos == name.length()) {
+					if (keyCode == 14) {
+						if (name.length() != 0) {
+							name.deleteCharAt(name.length() - 1);
+							nameSelectedPos--;
+						}
+						
+					} else if(name.length() < NAME_MAX) {
+						// if we dont have too many
 						name.append(typedChar);
+						nameSelectedPos++;
 					}
 				} else {
 					// Typed into the middle of the string
-					if (keyCode == 14 || name.length() < NAME_MAX) {
+					if (keyCode == 14) {
+						name.deleteCharAt(nameSelectedPos);
+						nameSelectedPos--;
+					} else if (name.length() < NAME_MAX) {
 						// if backspace or we dont have too many
 						name.insert(nameSelectedPos, typedChar);
+						nameSelectedPos++;
 					}
 				}
 					
@@ -356,6 +416,21 @@ public class SpellCreationGui {
 				super.keyTyped(typedChar, keyCode);
 			}
 		}
+	}
+	
+	private static boolean isValidKey(int keyCode) {
+		// utility function for me <3
+		return keyCode == 14 // backspace
+				|| (keyCode >= 2 && keyCode <= 11) // numbers
+				|| (keyCode >= 16 && keyCode <= 27) // qwerty row
+				|| (keyCode >= 30 && keyCode <= 39) // asdf row (+ colon)
+				|| (keyCode >= 44 && keyCode <= 53) // zxcv row
+				|| keyCode == 57 // space
+				|| keyCode == 203 // left arrow
+				|| keyCode == 205 // right arrow
+				|| keyCode == 199 // home
+				|| keyCode == 207; // end
+			
 	}
 	
 	private static class RuneSlot extends Slot {

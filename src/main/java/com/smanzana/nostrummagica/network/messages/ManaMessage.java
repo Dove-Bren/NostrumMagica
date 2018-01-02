@@ -40,6 +40,12 @@ public class ManaMessage implements IMessage {
 			int mana = message.tag.getInteger(NBT_MANA);
 			
 			EntityPlayer player = NostrumMagica.proxy.getPlayer();
+			
+			if (player == null) {
+				// Haven't finished loading. Just drop it
+				return null;
+			}
+			
 			player = player.worldObj.getPlayerEntityByUUID(id);
 			
 			if (player == null) {
