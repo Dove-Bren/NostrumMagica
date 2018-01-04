@@ -34,7 +34,8 @@ public class NostrumGui implements IGuiHandler {
 			if (ent != null && ent instanceof SpellTableEntity) {
 				return new SpellCreationGui.SpellCreationContainer(
 						player.inventory,
-						(SpellTableEntity) ent); // should be tile inventory
+						(SpellTableEntity) ent,
+						new BlockPos(x, y, z)); // should be tile inventory
 			}
 		}
 		
@@ -71,7 +72,8 @@ public class NostrumGui implements IGuiHandler {
 			if (ent != null && ent instanceof SpellTableEntity) {
 				return new SpellCreationGui.SpellGui(new SpellCreationGui.SpellCreationContainer(
 						player.inventory,
-						(SpellTableEntity) ent)); // should be tile inventory
+						(SpellTableEntity) ent,
+						new BlockPos(x, y, z))); // should be tile inventory
 			}
 		}
 		

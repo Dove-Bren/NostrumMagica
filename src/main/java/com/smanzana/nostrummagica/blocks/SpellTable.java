@@ -1,13 +1,18 @@
 package com.smanzana.nostrummagica.blocks;
 
+import java.util.LinkedList;
 import java.util.Random;
 
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
+import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
+import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.SpellRune;
+import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTableItem;
+import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.ITileEntityProvider;
@@ -217,6 +222,23 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 				
 				ItemStack stack = ItemStack.loadItemStackFromNBT(items.getCompoundTag(key));
 				this.setInventorySlotContents(id, stack);
+			}
+		}
+		
+		public void craft(String name) {
+			ItemStack stack = this.getStackInSlot(0);
+			if (stack == null || !(stack.getItem() instanceof BlankScroll)) {
+				return;
+			}
+			
+			Spell spell = SpellCreationGui.SpellCreationContainer.craftSpell(
+					name, this, new LinkedList<String>(), true);
+			
+			if (spell != null) {
+				ItemStack scroll = new ItemStack(SpellScroll.instance(), 1);
+				SpellScroll.setSpell(scroll, spell);
+				this.clear();
+				this.setInventorySlotContents(0, scroll);
 			}
 		}
 		

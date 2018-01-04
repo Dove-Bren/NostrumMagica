@@ -4,6 +4,7 @@ import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
 import com.smanzana.nostrummagica.network.messages.ClientCastReplyMessage;
 import com.smanzana.nostrummagica.network.messages.ManaMessage;
 import com.smanzana.nostrummagica.network.messages.ReagentBagToggleMessage;
+import com.smanzana.nostrummagica.network.messages.SpellCraftMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
 import com.smanzana.nostrummagica.network.messages.SpellTomeIncrementMessage;
@@ -48,6 +49,7 @@ public class NetworkHandler {
 		syncChannel.registerMessage(ManaMessage.Handler.class, ManaMessage.class, discriminator++, Side.CLIENT);
 		syncChannel.registerMessage(ReagentBagToggleMessage.Handler.class, ReagentBagToggleMessage.class, discriminator++, Side.SERVER);
 		syncChannel.registerMessage(SpellTomeIncrementMessage.Handler.class, SpellTomeIncrementMessage.class, discriminator++, Side.SERVER);
+		syncChannel.registerMessage(SpellCraftMessage.Handler.class, SpellCraftMessage.class, discriminator++, Side.SERVER);
 	}
 	
 }
