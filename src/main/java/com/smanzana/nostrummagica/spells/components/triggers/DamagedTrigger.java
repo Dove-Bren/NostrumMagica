@@ -42,7 +42,7 @@ public class DamagedTrigger extends SpellTrigger {
 			
 			TriggerData data = new TriggerData(
 					Lists.newArrayList(this.getState().getSelf()),
-					Lists.newArrayList(this.getState().getSelf()),
+					Lists.newArrayList(entity),
 					null,
 					null
 					);

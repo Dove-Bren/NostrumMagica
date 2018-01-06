@@ -54,8 +54,9 @@ public class ReagentItem extends Item {
 			int pos = name.indexOf('_');
 			while (pos != -1) {
 				out += name.substring(0, 1)
-						+ name.substring(1, pos).toLowerCase();
-				name = name.substring(0, pos);
+						+ name.substring(1, pos).toLowerCase()
+						+ " ";
+				name = name.substring(pos + 1);
 				pos = name.indexOf('_');
 			}
 			

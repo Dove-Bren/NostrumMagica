@@ -2,6 +2,7 @@ item.spellTome.name=Spell Tome
 item.spell_scroll.name=Empty Spell Scroll
 item.blank_scroll.name=Blank Scroll
 item.reagent_bag.name=Reagent Bag
+item.spell_table.name=Spell Table
 
 item.magicswordbase.name=Ethereal Sword
 item.magichelmbase.name=Ethereal Helm
@@ -48,13 +49,14 @@ item.nostrum_rune.trigger_proximity.name=Proximity Rune
 item.nostrum_rune.trigger_hit.name=Hit Rune
 item.nostrum_rune.trigger_health.name=Health Rune
 item.nostrum_rune.trigger_self.name=Self Rune
+item.nostrum_rune.trigger_other.name=Other Rune
 item.nostrum_rune.trigger_touch.name=Touch Rune
 item.nostrum_rune.trigger_food.name=Food Rune
 item.nostrum_rune.trigger_projectile.name=Projectile Rune
 item.nostrum_rune.trigger_beam.name=Beam Rune
 item.nostrum_rune.trigger_ai.name=AI Rune
 item.nostrum_rune.trigger_delay.name=Delay Rune
-item.nostrum_rune.mana.name=Mana Rune
+item.nostrum_rune.trigger_mana.name=Mana Rune
 
 item.magic_wall.name=Magic Wall
 item.mani_ore.name=Mani Ore
@@ -130,6 +132,7 @@ tile.mani_ore.name=Mani Ore
 tile.cursed_ice.name=Cursed Ice
 tile.mandrake_crop.name=Mandrake
 tile.ginseng_crop.name=Ginseng
+tile.spell_table.name=Spell Table
 
 entity.nostrummagica.physical_golem.name=Metal Golem
 entity.nostrummagica.lightning_golem.name=Lightining Golem

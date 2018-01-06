@@ -3,13 +3,17 @@ package com.smanzana.nostrummagica.client.gui.container;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.SpellTable.SpellTableEntity;
 import com.smanzana.nostrummagica.items.BlankScroll;
+import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
@@ -37,11 +41,13 @@ public class SpellCreationGui {
 	private static final ResourceLocation TEXT = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/container/spell_create.png");
 	
 	private static final int GUI_WIDTH = 202;
-	private static final int GUI_HEIGHT = 203;
+	private static final int GUI_HEIGHT = 218;
 	private static final int PLAYER_INV_HOFFSET = 23;
-	private static final int PLAYER_INV_VOFFSET = 122;
+	private static final int PLAYER_INV_VOFFSET = 138;
 	private static final int SLOT_MAIN_HOFFSET = 23;
 	private static final int SLOT_MAIN_VOFFSET = 14;
+	
+	//23, 136
 	
 	private static final int GRAMMAR_SLOT_HOFFSET = 16;
 	private static final int GRAMMAR_SLOT_VOFFSET = 42;
@@ -61,17 +67,20 @@ public class SpellCreationGui {
 	private static final int MESSAGE_WIDTH = 144;
 	private static final int MESSAGE_HEIGHT = 37;
 	private static final int MESSAGE_VALID_HOFFSET = 30;
-	private static final int MESSAGE_VALID_VOFFSET = 203;
+	private static final int MESSAGE_VALID_VOFFSET = 219;
 	private static final int MESSAGE_DISPLAY_VOFFSET = 38;
 	
 	private static final int STATUS_WIDTH = 10;
 	private static final int STATUS_HEIGHT = 10;
 	private static final int STATUS_HOFFSET = 10;
-	private static final int STATUS_VOFFSET = 203;
+	private static final int STATUS_VOFFSET = 219;
 	private static final int STATUS_DISP_HOFFSET = 4;
 	private static final int STATUS_DISP_VOFFSET = 4;
 	
-	private static final int MANA_VOFFSET = 103;
+	private static final int REAGENT_BAG_HOFFSET = 23;
+	private static final int REAGENT_BAG_VOFFSET = 112;
+	
+	private static final int MANA_VOFFSET = 99;
 	
 	public static class SpellCreationContainer extends Container {
 		
@@ -80,21 +89,20 @@ public class SpellCreationGui {
 		
 		// Actual container variables as well as a couple for keeping track
 		// of crafting state
-		protected IInventory inventory;
+		protected SpellTableEntity inventory;
 		protected boolean isValid; // has an acceptable scroll
 		protected boolean spellValid; // grammer checks out
 		protected List<String> spellErrorStrings; // Updated on validate(); what's wrong?
+		protected List<String> reagentStrings; // Updated on validate; what reagents will be used. Only filled if successful
 		protected StringBuffer name;
 		protected int lastManaCost;
 		
-		public SpellCreationContainer(IInventory playerInv, IInventory tableInventory, BlockPos pos) {
+		public SpellCreationContainer(IInventory playerInv, SpellTableEntity tableInventory, BlockPos pos) {
 			this.inventory = tableInventory;
 			this.pos = pos;
 			
 			spellErrorStrings = new LinkedList<>();
 			this.name = new StringBuffer(NAME_MAX + 1);
-			
-			//this.mySlot = 0;
 			
 			this.addSlotToContainer(new Slot(inventory, 0, SLOT_MAIN_HOFFSET, SLOT_MAIN_VOFFSET) {
 				@Override
@@ -102,10 +110,24 @@ public class SpellCreationGui {
 					return (stack == null
 							|| stack.getItem() instanceof BlankScroll);
 				}
+				
+				@Override
+				public void putStack(@Nullable ItemStack stack) {
+					super.putStack(stack);
+					
+					validate();
+				}
+				
+				@Override
+				public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack) {
+					validate();
+					
+					super.onPickupFromSlot(playerIn, stack);
+				}
 			});
 			
 			RuneSlot prev = null, cur;
-			for (int i = 0; i < Math.min(GRAMMAR_SLOT_MAXX * 2, inventory.getSizeInventory() - 1); i++) {
+			for (int i = 0; i < Math.min(GRAMMAR_SLOT_MAXX * 2, inventory.getRuneSlotCount()); i++) {
 				int x = ( (i % GRAMMAR_SLOT_MAXX) * GRAMMAR_SLOT_HDIST + GRAMMAR_SLOT_HOFFSET);
 				int y = ( (i / GRAMMAR_SLOT_MAXX) * GRAMMAR_SLOT_VDIST + GRAMMAR_SLOT_VOFFSET);
 				cur = new RuneSlot(this, prev, inventory, i + 1, x, y);
@@ -113,6 +135,32 @@ public class SpellCreationGui {
 					prev.setNext(cur);
 				prev = cur;
 				this.addSlotToContainer(prev);
+			}
+			
+			// Create reagent bag slots
+			for (int i = 0; i < inventory.getReagentSlotCount(); i++) {
+				int x = (i * 18) + REAGENT_BAG_HOFFSET;
+				int y = REAGENT_BAG_VOFFSET;
+				this.addSlotToContainer(new Slot(inventory, i + inventory.getReagentSlotIndex(), x, y) {
+					@Override
+					public int getSlotStackLimit() {
+						return 64;
+					}
+					
+					@Override
+					public void putStack(@Nullable ItemStack stack) {
+						super.putStack(stack);
+						
+						validate();
+					}
+					
+					@Override
+					public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack) {
+						validate();
+						
+						super.onPickupFromSlot(playerIn, stack);
+					}
+				});
 			}
 			
 			// Construct player inventory
@@ -197,12 +245,14 @@ public class SpellCreationGui {
 		}
 		
 		public void validate() {
-			validate("junk");
+			validate(name.toString());
 		}
 		
 		public void validate(String name) {
 			if (spellErrorStrings == null)
 				spellErrorStrings = new LinkedList<>();
+			if (reagentStrings == null)
+				reagentStrings = new LinkedList<>();
 			
 			Spell spell = makeSpell(name);
 			spellValid = (spell != null);
@@ -214,21 +264,24 @@ public class SpellCreationGui {
 		
 		public Spell makeSpell(String name, boolean clear) {
 			// Don't cache from validate... just in case...
-			Spell spell = craftSpell(name, this.inventory, this.spellErrorStrings, isValid);
+			Spell spell = craftSpell(name, this.inventory, this.spellErrorStrings, this.reagentStrings, isValid, clear);
 			
 			if (spell == null)
 				return null;
 			
 			if (clear)
-				this.inventory.clear();
+				this.inventory.clearBoard();
 			
 			this.lastManaCost = spell.getManaCost();
 			return spell;
 		}
 		
-		public static Spell craftSpell(String name, IInventory inventory, List<String> spellErrorStrings, boolean isValid) {
+		public static Spell craftSpell(String name, SpellTableEntity inventory,
+				List<String> spellErrorStrings, List<String> reagentStrings,
+				boolean isValid, boolean deductReagents) {
 			boolean fail = false;
 			spellErrorStrings.clear();
+			reagentStrings.clear();
 			if (name.trim().isEmpty()) {
 				spellErrorStrings.add("Must have a name");
 				fail = true;
@@ -285,8 +338,47 @@ public class SpellCreationGui {
 				}
 			}
 			
+			Map<ReagentType, Integer> reagents = spell.getRequiredReagents();
+			for (ReagentType type : reagents.keySet()) {
+				if (type == null)
+					continue;
+				Integer count = reagents.get(type);
+				if (count == null)
+					continue;
+				
+				int left = takeReagent(inventory, type, count, false);
+				if (left != 0) {
+					spellErrorStrings.add("Need " + left + " more " + type.prettyName());
+					fail = true;
+				} else {
+					reagentStrings.add(count + " " + type.prettyName());
+				}
+				
+			}
+			
 			if (fail)
 				return null;
+			
+			// Actual deduct reagents
+			if (deductReagents) {
+				System.out.println("Deducting reagents");
+				for (ReagentType type : reagents.keySet()) {
+					if (type == null)
+						continue;
+					Integer count = reagents.get(type);
+					if (count == null)
+						continue;
+					
+					int left = takeReagent(inventory, type, count, true);
+					if (left != 0) {
+						System.out.println("Couldn't take all " + type.name());
+						spellErrorStrings.add("Need " + left + " more " + type.prettyName());
+						return null;
+					}
+					
+				}
+			}
+			
 			return spell;
 		}
 		
@@ -295,6 +387,37 @@ public class SpellCreationGui {
 			isValid = false;
 		}
 
+	}
+	
+	// if take, actually removes. Otherwise, just checks
+	// returns amount needed still. 0 means all that were needed are there
+	private static int takeReagent(SpellTableEntity inventory, ReagentType type, int count, boolean take) {
+		for (int i = inventory.getReagentSlotIndex(); i < inventory.getReagentSlotIndex() + inventory.getReagentSlotCount(); i++) {
+			ItemStack stack = inventory.getStackInSlot(i);
+			if (stack == null)
+				continue;
+			
+			if (ReagentItem.findType(stack) == type) {
+				if (stack.stackSize > count) {
+					if (take)
+						System.out.println("Found more than enough " + type.name());
+					if (take)
+						inventory.decrStackSize(i, count);
+					count = 0;
+				} else {
+					if (take)
+						System.out.println("Eating whole stack of " + type.name());
+					count -= stack.stackSize;
+					if (take)
+						inventory.setInventorySlotContents(i, null);
+				}
+				
+				if (count == 0)
+					break;
+			}
+		}
+		
+		return count;
 	}
 	
 	private static final int NAME_MAX = 20;
@@ -407,6 +530,8 @@ public class SpellCreationGui {
 				if (mouseX >= horizontalMargin + SUBMIT_HOFFSET && mouseX <= horizontalMargin + SUBMIT_HOFFSET + SUBMIT_WIDTH && 
 						mouseY >= verticalMargin + SUBMIT_VOFFSET && mouseY <= verticalMargin + SUBMIT_VOFFSET + SUBMIT_HEIGHT) {
 					Gui.drawRect(SUBMIT_HOFFSET, SUBMIT_VOFFSET, SUBMIT_HOFFSET + SUBMIT_WIDTH, SUBMIT_VOFFSET + SUBMIT_HEIGHT, 0x40000000);
+					this.drawHoveringText(container.reagentStrings,
+							mouseX - horizontalMargin, mouseY - verticalMargin);
 				}
 			}
 			
@@ -514,7 +639,8 @@ public class SpellCreationGui {
 						nameSelectedPos++;
 					}
 				}
-					
+				
+				container.validate();
 			} else {
 				super.keyTyped(typedChar, keyCode);
 			}

@@ -182,7 +182,8 @@ public class SpellRune extends Item {
 					if (element != null && shapeElem != null && shapeElem != element) {
 						return null; // multiple elements
 					}
-					element = shapeElem;
+					if (shapeElem != null)
+						element = shapeElem;
 					EAlteration alt = SpellRune.getPieceShapeAlteration(stack);
 					if (alt != null && alteration != null) {
 						// Can't have two alterations
@@ -207,7 +208,6 @@ public class SpellRune extends Item {
 					if (c + count > 3)
 						return null;
 					count += c;
-					
 				} else if (SpellRune.isAlteration(stack)) {
 					EAlteration alt = SpellRune.getAlteration(stack);
 					if (alt == null)

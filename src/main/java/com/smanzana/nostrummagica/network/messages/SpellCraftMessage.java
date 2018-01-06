@@ -57,7 +57,6 @@ public class SpellCraftMessage implements IMessage {
 			
 			return null;
 		}
-		
 	}
 
 	private static final String NBT_POS_X = "x";

@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.blocks;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -9,6 +10,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
 import com.smanzana.nostrummagica.items.BlankScroll;
+import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTableItem;
@@ -51,7 +53,8 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 		/**
 		 * Inventory:
 		 *   0 - Spell scroll slot
-		 *   1-9 - Rune Slots
+		 *   1-16 - Rune Slots
+		 *   17-25 - Reagent slots
 		 */
 		
 		private String displayName;
@@ -71,10 +74,34 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 		public boolean hasCustomName() {
 			return false;
 		}
+		
+		public int getRuneSlotIndex() {
+			return 1;
+		}
+		
+		public int getRuneSlotCount() {
+			return 16;
+		}
+		
+		public int getScrollSlotIndex() {
+			return 0;
+		}
+		
+		public int getReagentSlotIndex() {
+			return 17;
+		}
+		
+		public int getReagentSlotCount() {
+			return 9;
+		}
+		
+		public ItemStack[] getReagentSlots() {
+			return Arrays.copyOfRange(slots, getReagentSlotIndex(), getReagentSlotIndex() + getReagentSlotCount() - 1);
+		}
 
 		@Override
 		public int getSizeInventory() {
-			return 10;
+			return 26;
 		}
 
 		@Override
@@ -87,17 +114,21 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 
 		@Override
 		public ItemStack decrStackSize(int index, int count) {
+			System.out.println("Decr " + index + " by " + count);
 			if (index < 0 || index >= getSizeInventory() || slots[index] == null)
 				return null;
+			System.out.println("non-null");
 			
 			ItemStack stack;
 			if (slots[index].stackSize <= count) {
 				stack = slots[index];
 				slots[index] = null;
+				System.out.println("now null");
 			} else {
 				stack = slots[index].copy();
 				stack.stackSize = count;
 				slots[index].stackSize -= count;
+				System.out.println("still some left");
 			}
 			
 			this.markDirty();
@@ -128,7 +159,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 
 		@Override
 		public int getInventoryStackLimit() {
-			return 1;
+			return 64;
 		}
 
 		@Override
@@ -152,14 +183,25 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 			if (stack == null)
 				return true;
 			
-			if (!(stack.getItem() instanceof SpellRune))
-				return false;
-			
 			if (index == 0) {
-				return SpellRune.isTrigger(stack);
+				return stack.getItem() instanceof BlankScroll;
 			}
 			
-			return true;
+			if (index < getReagentSlotIndex()) {
+			
+				if (!(stack.getItem() instanceof SpellRune))
+					return false;
+				
+				if (index == 1) {
+					return SpellRune.isTrigger(stack);
+				}
+
+				return true;
+			}
+			
+			// Reagent bag
+			return stack.getItem() instanceof ReagentItem;
+			
 		}
 
 		@Override
@@ -181,6 +223,12 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 		public void clear() {
 			for (int i = 0; i < getSizeInventory(); i++)
 				removeStackFromSlot(i);
+		}
+		
+		public void clearBoard() {
+			for (int i = 0; i < getReagentSlotIndex(); i++) {
+				removeStackFromSlot(i);
+			}
 		}
 		
 		@Override
@@ -232,12 +280,12 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 			}
 			
 			Spell spell = SpellCreationGui.SpellCreationContainer.craftSpell(
-					name, this, new LinkedList<String>(), true);
+					name, this, new LinkedList<String>(), new LinkedList<String>(), true, true);
 			
 			if (spell != null) {
 				ItemStack scroll = new ItemStack(SpellScroll.instance(), 1);
 				SpellScroll.setSpell(scroll, spell);
-				this.clear();
+				this.clearBoard();
 				this.setInventorySlotContents(0, scroll);
 			}
 		}

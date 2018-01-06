@@ -64,14 +64,16 @@ public class Spell {
 		 * Indicates the current trigger has been done and the spell
 		 * should move forward
 		 */
-		public void trigger(List<EntityLivingBase> targets, List<EntityLivingBase> other, World world, List<BlockPos> locations) {
+		public void trigger(List<EntityLivingBase> targets, List<EntityLivingBase> others, World world, List<BlockPos> locations) {
 			
 			//for each target/other pair (if more than one), break into multiple spellstates
 			// persist index++ and set self/other, then start doing shapes or next trigger
 			
 			SpellPart next = null;
+			if (others == null)
+				others = new LinkedList<>();
 			
-			List<EntityLivingBase> targs = targets;
+			//List<EntityLivingBase> targs = targets;
 			
 			while ((next = (++index < parts.size() ? parts.get(index) : null)) != null && !next.isTrigger()) {
 				// it's a shape. Do it idk
@@ -80,15 +82,15 @@ public class Spell {
 						next.getElement(), next.getElementCount());
 				SpellPartParam param = next.getParam();
 				
-				if (param.flip) {
-					// use other instead of self
-					targs = other;
-				} else {
-					targs = targets;
-				}
+//				if (param.flip) {
+//					// use other instead of self
+//					targs = other;
+//				} else {
+//					targs = targets;
+//				}
 				
-				if (targs != null && !targs.isEmpty()) {
-					for (EntityLivingBase targ : targs) {
+				if (targets != null && !targets.isEmpty()) {
+					for (EntityLivingBase targ : targets) {
 						shape.perform(action, param, targ, null, null);
 					}
 				} else if (locations != null && !locations.isEmpty()) {
@@ -117,16 +119,29 @@ public class Spell {
 					NostrumMagicaSounds.CAST_CONTINUE.play(self);
 				}
 				
-				if (targs != null && !targs.isEmpty()) {
-					if (targs.size() == 1) {
+				if (targets != null && !targets.isEmpty()) {
+					if (targets.size() == 1) {
 						// don't need to split
 						// Also base case after a split happens
-						spawnTrigger(next.getTrigger(), targs.get(0), null, null, next.getParam());
+						
+						// Adjust self, other like if we split
+						if (others.size() > 0)
+							this.other = others.get(0);
+						else
+							this.other = this.self;
+						this.self = targets.get(0);
+						spawnTrigger(next.getTrigger(), this.self, null, null, next.getParam());
 					} else {
 						index--; // Make splits have same trigger as we're performing now
-						for (EntityLivingBase targ : targs) {
-							SpellState sub = split(targ, this.getSelf());
-							sub.trigger(Lists.newArrayList(targ), Lists.newArrayList(targ),
+						for (int i = 0; i < targets.size(); i++) {
+							EntityLivingBase targ = targets.get(i);
+							EntityLivingBase other;
+							if (others.size() >= i)
+								other = others.get(i);
+							else
+								other = this.self;
+							SpellState sub = split();//(targ, other);
+							sub.trigger(Lists.newArrayList(targ), Lists.newArrayList(other),
 									world, null);
 						}
 					}
@@ -137,7 +152,7 @@ public class Spell {
 					} else {
 						index--; // Make splits have same trigger as we're performing now
 						for (BlockPos targ : locations) {
-							SpellState sub = split(this.getSelf(), this.getSelf());
+							SpellState sub = split();
 							sub.trigger(null, null,
 									world, Lists.newArrayList(targ));
 						}
@@ -164,11 +179,11 @@ public class Spell {
 			this.triggerInstance.init(caster);
 		}
 		
-		private SpellState split(EntityLivingBase self, EntityLivingBase other) {
+		private SpellState split() {
 			SpellState spawn = new SpellState(caster);
 			spawn.index = this.index;
-			spawn.self = self;
-			spawn.other = other;
+//			spawn.self = self;
+//			spawn.other = other;
 			
 			return spawn;
 		}
