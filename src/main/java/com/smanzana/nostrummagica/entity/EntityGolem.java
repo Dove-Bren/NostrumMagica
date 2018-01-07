@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.entity;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.lore.ILoreTagged;
+import com.smanzana.nostrummagica.lore.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.block.Block;
@@ -32,7 +34,7 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public abstract class EntityGolem extends EntityTameable {
+public abstract class EntityGolem extends EntityTameable implements ILoreTagged {
 
 	private static final DataParameter<Float> DATA_HEALTH_ID = EntityDataManager.<Float>createKey(EntityGolem.class, DataSerializers.FLOAT);
 
@@ -212,6 +214,27 @@ public abstract class EntityGolem extends EntityTameable {
 				idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10); 
 			}
 		}
+	}
+	
+	@Override
+	public String getLoreKey() {
+		return "nostrum__golem";
+	}
+
+	@Override
+	public String getLoreDisplayName() {
+		return "Golems";
+	}
+	
+	@Override
+	public Lore getBasicLore() {
+		return new Lore().add("By infusing stones with an element, a spark of life is born.", "These golems seem to be bound to their casters by an invisible bond.");
+				
+	}
+	
+	@Override
+	public Lore getDeepLore() {
+		return new Lore().add("By infusing stones with an element, a spark of life is born.", "Golems take after the element they are infused with. Golems can have melee attacks, ranged spells, or even buffs they might share with their caster.");
 	}
 	
 }

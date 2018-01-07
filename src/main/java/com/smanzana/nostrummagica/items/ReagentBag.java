@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.items;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.lore.ILoreTagged;
+import com.smanzana.nostrummagica.lore.Lore;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -18,7 +20,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class ReagentBag extends Item {
+public class ReagentBag extends Item implements ILoreTagged {
 
 	private static final String NBT_VACUUM = "vacuum";
 	private static final String NBT_ITEMS = "items";
@@ -409,5 +411,24 @@ public class ReagentBag extends Item {
 		
 		
 	}
-	
+
+	@Override
+	public String getLoreKey() {
+		return "nostrum_reagent_bag";
+	}
+
+	@Override
+	public String getLoreDisplayName() {
+		return "Reagent Bag";
+	}
+
+	@Override
+	public Lore getBasicLore() {
+		return new Lore().add("Reagent bags provide extra storage for reagents.");
+	}
+
+	@Override
+	public Lore getDeepLore() {
+		return new Lore().add("Reagent bags provide extra storage for reagents.", "The bag can be configured to automatically take reagents when they are picked up.", "Reagent bags are searched when casting spells that take reagents.");
+	}
 }

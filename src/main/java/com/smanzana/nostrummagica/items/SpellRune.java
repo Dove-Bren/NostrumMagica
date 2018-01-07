@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.items;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.lore.ILoreTagged;
+import com.smanzana.nostrummagica.lore.Lore;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell.SpellPart;
@@ -31,7 +33,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class SpellRune extends Item {
+public class SpellRune extends Item implements ILoreTagged {
 	
 	@SideOnly(Side.CLIENT)
 	public static class ModelMesher implements ItemMeshDefinition {
@@ -621,6 +623,26 @@ public class SpellRune extends Item {
     		NostrumMagica.logger.error("Failed to get alteration from rune");
     		return null;
     	}
+	}
+	
+	@Override
+	public String getLoreKey() {
+		return "nostrum_spell_rune";
+	}
+
+	@Override
+	public String getLoreDisplayName() {
+		return "Spell Runes";
+	}
+
+	@Override
+	public Lore getBasicLore() {
+		return new Lore().add("Runes are used to make new spells.", "There are four types of runes: Triggers, Shapes, Elements, and Alterations.", "Triggers define the stages of the spell and when to advance.", "Shapes determine who is affected.", "Elements are added to shapes to give the effect an element.", "Alterations morph the effect of the spell.", "Every element and alteration combination is different.");
+	}
+
+	@Override
+	public Lore getDeepLore() {
+		return new Lore().add("Runes are used to make new spells.", "There are four types of runes: Triggers, Shapes, Elements, and Alterations.", "Triggers define the stages of the spell and when to advance.", "Shapes determine who is affected.", "Elements are added to shapes to give the effect an element.", "Alterations morph the effect of the spell.", "Every element and alteration combination is different.", "After gaining mastery of an element, trigger, shape, or alteration, you can create runes any time you want.");
 	}
 	
 }

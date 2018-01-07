@@ -1,6 +1,8 @@
 package com.smanzana.nostrummagica.items;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.lore.ILoreTagged;
+import com.smanzana.nostrummagica.lore.Lore;
 
 import net.minecraft.init.Items;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -9,7 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class MagicArmorBase extends ItemArmor {
+public class MagicArmorBase extends ItemArmor implements ILoreTagged {
 
 	public static MagicArmorBase helm;
 	public static MagicArmorBase chest;
@@ -60,6 +62,27 @@ public class MagicArmorBase extends ItemArmor {
 	
 	public String getModelID() {
 		return id;
+	}
+	
+	@Override
+	public String getLoreKey() {
+		return "nostrum_magic_armor";
+	}
+
+	@Override
+	public String getLoreDisplayName() {
+		return "Magic Armor";
+	}
+	
+	@Override
+	public Lore getBasicLore() {
+		return new Lore().add("Wrapping iron armor with Void Crystals makes ethereal armor.", "The armor is incredibly fragile and not effective by itself.");
+				
+	}
+	
+	@Override
+	public Lore getDeepLore() {
+		return new Lore().add("Wrapping iron armor with Void Crystals makes ethereal armor.", "The armor is incredibly fragile and shouldn't be used by itself.", "It can be enchanted to carry an element and provide unique effects.");
 	}
 
 }

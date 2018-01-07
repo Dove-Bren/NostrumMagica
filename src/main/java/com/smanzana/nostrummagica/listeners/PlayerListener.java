@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
+import com.smanzana.nostrummagica.lore.ILoreTagged;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ManaMessage;
 import com.smanzana.nostrummagica.spells.EAlteration;
@@ -46,6 +47,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
@@ -508,6 +510,15 @@ public class PlayerListener {
 		if (event.isCanceled())
 			return;
 		
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(event.getPlayer());
+		
+		if (attr != null && attr.isUnlocked()) {
+			if (event.getState().getBlock() instanceof ILoreTagged)
+				attr.giveBasicLore((ILoreTagged) event.getState().getBlock());
+			else if (null != ILoreTagged.getPreset(event.getState().getBlock()))
+				attr.giveBasicLore(ILoreTagged.getPreset(event.getState().getBlock()));
+		}
+		
 		if (event.getState().getMaterial() == Material.LEAVES
 				&& NostrumMagica.rand.nextFloat() <= 0.2f) {
 			EntityItem entity = new EntityItem(event.getWorld(),
@@ -544,6 +555,25 @@ public class PlayerListener {
 					event.getPos().getZ() + 0.5,
 					ReagentItem.instance().getReagent(ReagentType.GINSENG, 1));
 			event.getWorld().spawnEntityInWorld(entity);
+		}
+	}
+	
+	@SubscribeEvent
+	public void onDeath(LivingDeathEvent event) {
+		if (event.isCanceled())
+			return;
+
+		if (event.getSource() != null && event.getSource().getSourceOfDamage() != null && event.getSource().getSourceOfDamage() instanceof EntityPlayer) {
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(event.getSource().getEntity());
+			
+			if (attr != null && attr.isUnlocked()) {
+				if (event.getEntityLiving() instanceof ILoreTagged) {
+					attr.giveBasicLore((ILoreTagged) event.getEntityLiving());
+				} else if (null != ILoreTagged.getPreset(event.getEntityLiving())) {
+					attr.giveBasicLore(ILoreTagged.getPreset(event.getEntityLiving()));
+				}
+			}
+			
 		}
 	}
 	
@@ -586,6 +616,12 @@ public class PlayerListener {
 		
 		EntityPlayer player = e.getEntityPlayer();
 		ItemStack addedItem = e.getItem().getEntityItem();
+		
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		
+		if (addedItem.getItem() instanceof ILoreTagged && attr != null && attr.isUnlocked()) {
+			attr.giveBasicLore((ILoreTagged) addedItem.getItem());
+		}
 		
 		if (e.getItem().getEntityItem().getItem() instanceof ReagentItem) {
 			for (ItemStack item : player.inventory.offHandInventory) {
@@ -669,11 +705,9 @@ public class PlayerListener {
 	
 	@SubscribeEvent
 	public void onConnect(PlayerLoggedInEvent event) {
-		System.out.println("connect");
 		if (event.player.worldObj.isRemote) {
 			return;
 		}
-		System.out.println("Sync");
 		
 		NostrumMagica.proxy.syncPlayer((EntityPlayerMP) event.player);
 	}

@@ -1,6 +1,8 @@
 package com.smanzana.nostrummagica.items;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.lore.ILoreTagged;
+import com.smanzana.nostrummagica.lore.Lore;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -16,7 +18,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class SpellScroll extends Item {
+public class SpellScroll extends Item implements ILoreTagged {
 
 	private static final String NBT_SPELL = "nostrum_spell";
 	private static SpellScroll instance = null;
@@ -79,5 +81,25 @@ public class SpellScroll extends Item {
 		itemStack.setTagCompound(nbt);
 		itemStack.setStackDisplayName(spell.getName());
 		itemStack.addEnchantment(Enchantment.getEnchantmentByLocation("power"), 1);
+	}
+
+	@Override
+	public String getLoreKey() {
+		return "nostrum_spell_scroll";
+	}
+
+	@Override
+	public String getLoreDisplayName() {
+		return "Spell Scrolls";
+	}
+
+	@Override
+	public Lore getBasicLore() {
+		return new Lore().add("Spell scrolls are created from blank scrolls, spell runes, and reagents.", "Using a spell scroll will cast the spell on it.");
+	}
+
+	@Override
+	public Lore getDeepLore() {
+		return new Lore().add("Spell scrolls are created from blank scrolls, spell runes, and reagents.", "Using a spell scroll will cast the spell on it.", "Scrolls can be bound to Spell Tomes so that they can be cast over and over at the cost of reagents.");
 	}
 }

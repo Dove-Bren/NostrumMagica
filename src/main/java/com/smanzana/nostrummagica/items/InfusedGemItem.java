@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.lore.ILoreTagged;
+import com.smanzana.nostrummagica.lore.Lore;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.creativetab.CreativeTabs;
@@ -19,7 +21,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * @author Skyler
  *
  */
-public class InfusedGemItem extends Item {
+public class InfusedGemItem extends Item implements ILoreTagged {
 
 	public static final String ID = "nostrum_gem";
 	
@@ -32,7 +34,8 @@ public class InfusedGemItem extends Item {
 	}
 	
 	public static void init() {
-		GameRegistry.addRecipe(new ItemStack(instance), " G ", "GEG", "BGB",
+		GameRegistry.addRecipe(new ItemStack(instance), " G ", "DED", "BGB",
+				'D', ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1),
 				'G', ReagentItem.instance().getReagent(ReagentType.GRAVE_DUST, 1),
 				'E', Items.ENDER_PEARL,
 				'B', ReagentItem.instance().getReagent(ReagentType.BLACK_PEARL, 1));
@@ -110,4 +113,25 @@ public class InfusedGemItem extends Item {
     	
     	return ret;
     }
+    
+    @Override
+	public String getLoreKey() {
+		return "nostrum_infused_gem";
+	}
+
+	@Override
+	public String getLoreDisplayName() {
+		return "Infused Gems";
+	}
+	
+	@Override
+	public Lore getBasicLore() {
+		return new Lore().add("By combining magical reagents with an enderpearl, you can create a Void Gem.", "The gem lacks any elemental affinity and otherwise seems useless.");
+				
+	}
+	
+	@Override
+	public Lore getDeepLore() {
+		return new Lore().add("By combining magical reagents with an enderpearl, you can create a Void Gem.", "Void gems alone are not very useful.", "In order to use them, they must be inbued with the power of an element.", "Perhaps an Alter rune would do the trick...");
+	}
 }

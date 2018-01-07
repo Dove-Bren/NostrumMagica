@@ -5,10 +5,13 @@ import java.util.List;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.CropGinseng;
 import com.smanzana.nostrummagica.blocks.CropMandrakeRoot;
+import com.smanzana.nostrummagica.lore.ILoreTagged;
+import com.smanzana.nostrummagica.lore.Lore;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
@@ -16,10 +19,11 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ReagentItem extends Item {
+public class ReagentItem extends Item implements ILoreTagged {
 
 	public static enum ReagentType {
 		// Do not rearrange.
@@ -173,5 +177,30 @@ public class ReagentItem extends Item {
     	}
     	
     	return EnumActionResult.PASS;
+	}
+
+	public static void init() {
+		GameRegistry.addShapelessRecipe(instance.getReagent(ReagentType.SPIDER_SILK, 1),
+				Items.STRING, Items.STRING, Items.SUGAR);
+	}
+
+	@Override
+	public String getLoreKey() {
+		return "nostrum_reagent_item";
+	}
+
+	@Override
+	public String getLoreDisplayName() {
+		return "Magical Reagents";
+	}
+
+	@Override
+	public Lore getBasicLore() {
+		return new Lore().add("Reagents are used to create and cast spells, as well as in other magical recipes.", "Reagents can be found all over the world, such as in trees, undead enemies, or hidden in the grass.");
+	}
+
+	@Override
+	public Lore getDeepLore() {
+		return new Lore().add("Reagents are used to create and cast spells, as well as in other magical recipes.", "Reagents can be found all over the world, such as in trees, undead enemies, or hidden in the grass.", "Reagents can be stored in Reagent Bags or in the Spell Table.");
 	}
 }

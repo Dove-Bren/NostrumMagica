@@ -220,6 +220,7 @@ public class CommonProxy {
     	
     	ReagentItem.instance().setRegistryName(NostrumMagica.MODID, ReagentItem.ID);
     	GameRegistry.register(ReagentItem.instance());
+    	ReagentItem.init();
     	InfusedGemItem.instance().setRegistryName(NostrumMagica.MODID, InfusedGemItem.ID);
     	GameRegistry.register(InfusedGemItem.instance());
     	InfusedGemItem.init();

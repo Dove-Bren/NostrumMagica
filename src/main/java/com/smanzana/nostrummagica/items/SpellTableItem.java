@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.items;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.SpellTable;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.lore.ILoreTagged;
+import com.smanzana.nostrummagica.lore.Lore;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
@@ -20,7 +22,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class SpellTableItem extends Item {
+public class SpellTableItem extends Item implements ILoreTagged {
 
 	public static void init() {
 		GameRegistry.addRecipe(new ItemStack(instance), "CBD", "PPP", "L L",
@@ -110,5 +112,25 @@ public class SpellTableItem extends Item {
 				return EnumActionResult.FAIL;
 			}
 		}
+	}
+
+	@Override
+	public String getLoreKey() {
+		return "nostrum_spell_table";
+	}
+
+	@Override
+	public String getLoreDisplayName() {
+		return "Spell Table";
+	}
+
+	@Override
+	public Lore getBasicLore() {
+		return new Lore().add("Spell Tables are used to create spells.", "Combine spell runes, blank scrolls, and reagents to create Spell Scrolls.", "Spells must begin with a trigger. After that, any triggers or shapes afterwards can be used.");
+	}
+
+	@Override
+	public Lore getDeepLore() {
+		return new Lore().add("Spell Tables are used to create spells.", "Combine spell runes, blank scrolls, and reagents to create Spell Scrolls.", "Spells must begin with a trigger. After that, any triggers or shapes afterwards can be used.", "Reagents must be slotted into the table in order to be used.");
 	}
 }

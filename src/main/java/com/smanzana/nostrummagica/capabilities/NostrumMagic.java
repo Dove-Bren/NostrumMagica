@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.smanzana.nostrummagica.Lore.ILoreTagged;
-import com.smanzana.nostrummagica.Lore.Lore;
-import com.smanzana.nostrummagica.Lore.LoreCache;
+import com.smanzana.nostrummagica.lore.ILoreTagged;
+import com.smanzana.nostrummagica.lore.Lore;
+import com.smanzana.nostrummagica.lore.LoreCache;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -263,6 +263,11 @@ public class NostrumMagic implements INostrumMagic {
 			return; // Already has some lore
 		
 		String key = tagged.getLoreKey();
+		Integer val = loreLevels.get(key);
+		
+		if (val == 2)
+			return; // Already have full
+		
 		loreLevels.put(key, 1);
 	}
 

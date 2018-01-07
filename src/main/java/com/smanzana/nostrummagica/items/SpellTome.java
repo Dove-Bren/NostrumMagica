@@ -9,6 +9,8 @@ import com.smanzana.nostrummagica.client.gui.book.BookScreen;
 import com.smanzana.nostrummagica.client.gui.book.HSplitPage;
 import com.smanzana.nostrummagica.client.gui.book.IBookPage;
 import com.smanzana.nostrummagica.client.gui.book.SpellPreviewPage;
+import com.smanzana.nostrummagica.lore.ILoreTagged;
+import com.smanzana.nostrummagica.lore.Lore;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -27,7 +29,7 @@ import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class SpellTome extends Item implements GuiBook {
+public class SpellTome extends Item implements GuiBook, ILoreTagged {
 
 	private static final String NBT_SPELLS = "nostrum_spells";
 	private static final String NBT_INDEX = "spell_index";
@@ -261,5 +263,25 @@ public class SpellTome extends Item implements GuiBook {
 		}
 		
 		return new BookScreen(pages);
+	}
+
+	@Override
+	public String getLoreKey() {
+		return "nostrum_spell_tome";
+	}
+
+	@Override
+	public String getLoreDisplayName() {
+		return "Spell Tomes";
+	}
+
+	@Override
+	public Lore getBasicLore() {
+		return new Lore().add("Spell tomes carry spells to be cast over and over again.", "Casting spells from a spell tome requires reagents and mana.");
+	}
+
+	@Override
+	public Lore getDeepLore() {
+		return new Lore().add("Spell tomes carry spells to be cast over and over again.", "Casting spells from a spell tome requires reagents and mana.", "Spells must be bound into a Spell Tome in order be to used.", "Bind scrolls into the tome through the Ritual of Binding.");
 	}
 }
