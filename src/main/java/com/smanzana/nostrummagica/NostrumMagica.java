@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.smanzana.nostrummagica.capabilities.AttributeProvider;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
@@ -29,6 +30,7 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -39,7 +41,7 @@ import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-@Mod(modid = NostrumMagica.MODID, version = NostrumMagica.VERSION)
+@Mod(modid = NostrumMagica.MODID, version = NostrumMagica.VERSION, guiFactory = "com.smanzana.nostrummagica.config.ConfigGuiFactory")
 public class NostrumMagica
 {
     public static final String MODID = "nostrummagica";
@@ -88,6 +90,8 @@ public class NostrumMagica
     		dir.mkdirs();
     	spellRegistryFile = new File(dir, "spells.dat"); 
     	loadSpellRegistry(spellRegistryFile);
+    	
+    	new ModConfig(new Configuration(event.getSuggestedConfigurationFile()));
     }
     
     @EventHandler

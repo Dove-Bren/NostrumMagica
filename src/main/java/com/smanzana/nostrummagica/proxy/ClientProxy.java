@@ -26,8 +26,8 @@ import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
-import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTableItem;
 import com.smanzana.nostrummagica.items.SpellTome;
@@ -55,6 +55,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -280,7 +281,7 @@ public class ClientProxy extends CommonProxy {
 			}
 			
 			NetworkHandler.getSyncChannel().sendToServer(
-	    			new ClientCastMessage(spell));
+	    			new ClientCastMessage(spell, false));
 		}
 	}
 	
@@ -335,5 +336,15 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void openBook(EntityPlayer player, GuiBook book, Object userdata) {
 		Minecraft.getMinecraft().displayGuiScreen(book.getScreen(userdata));
+	}
+	
+	@Override
+	public void sendServerConfig(EntityPlayerMP player) {
+		; //do nothing on client side
+	}
+	
+	@Override
+	public void sendSpellDebug(EntityPlayer player, ITextComponent comp) {
+		; 
 	}
 }

@@ -44,6 +44,8 @@ public class ClientCastMessage implements IMessage {
 				return null;
 			}
 			
+			boolean isScroll = message.tag.getBoolean(NBT_SCROLL);
+			
 			INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
 			
 			if (att == null) {
@@ -52,7 +54,7 @@ public class ClientCastMessage implements IMessage {
 			}
 			
 			// Cast it!
-			if (!sp.isCreative()) {
+			if (!sp.isCreative() && !isScroll) {
 				int cost = spell.getManaCost();
 				if (att.getMana() < cost)
 					return new ClientCastReplyMessage(false, att.getMana(), 0.0f);
@@ -85,6 +87,7 @@ public class ClientCastMessage implements IMessage {
 	}
 
 	private static final String NBT_ID = "id";
+	private static final String NBT_SCROLL = "isscroll";
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
@@ -94,14 +97,15 @@ public class ClientCastMessage implements IMessage {
 		tag = new NBTTagCompound();
 	}
 	
-	public ClientCastMessage(Spell spell) {
-		this(spell.getRegistryID());
+	public ClientCastMessage(Spell spell, boolean scroll) {
+		this(spell.getRegistryID(), scroll);
 	}
 	
-	public ClientCastMessage(int id) {
+	public ClientCastMessage(int id, boolean scroll) {
 		tag = new NBTTagCompound();
 		
 		tag.setInteger(NBT_ID, id);
+		tag.setBoolean(NBT_SCROLL, scroll);
 	}
 
 	@Override

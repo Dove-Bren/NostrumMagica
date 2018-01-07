@@ -400,13 +400,9 @@ public class SpellCreationGui {
 			if (ReagentItem.findType(stack) == type) {
 				if (stack.stackSize > count) {
 					if (take)
-						System.out.println("Found more than enough " + type.name());
-					if (take)
 						inventory.decrStackSize(i, count);
 					count = 0;
 				} else {
-					if (take)
-						System.out.println("Eating whole stack of " + type.name());
 					count -= stack.stackSize;
 					if (take)
 						inventory.setInventorySlotContents(i, null);

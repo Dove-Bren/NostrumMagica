@@ -146,7 +146,7 @@ entity.nostrummagica.spell_projectile.name=Spell Projectile
 itemGroup.nostrummagica=Nostrum Magica
 
 key.cast.desc=Cast Spell
-key.magicscroll.sec=Scroll Spells (+ MouseWheel)
+key.spellscroll.sec=Scroll Spells (+ MouseWheel)
 key.nostrummagica.desc=Nostrum Magica
 
 death.attack.magic.PHYSICAL=%1$s was killed by %2$s using physical energies

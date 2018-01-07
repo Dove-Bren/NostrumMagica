@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.potions.FrostbitePotion;
@@ -21,12 +22,19 @@ import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.event.HoverEvent;
+import net.minecraft.util.text.event.HoverEvent.Action;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
@@ -65,7 +73,6 @@ public class Spell {
 		 * should move forward
 		 */
 		public void trigger(List<EntityLivingBase> targets, List<EntityLivingBase> others, World world, List<BlockPos> locations) {
-			
 			//for each target/other pair (if more than one), break into multiple spellstates
 			// persist index++ and set self/other, then start doing shapes or next trigger
 			
@@ -73,7 +80,54 @@ public class Spell {
 			if (others == null)
 				others = new LinkedList<>();
 			
-			//List<EntityLivingBase> targs = targets;
+			if (ModConfig.config.spellDebug() && this.caster instanceof EntityPlayer) {
+				ITextComponent comp = new TextComponentString(name +  "> "),
+						sib;
+				
+				// Get current trigger
+				if (index != -1) {
+					SpellPart part = parts.get(index);
+					comp.appendText("[" + part.getTrigger().getDisplayName() + "]" );
+				}
+				
+				if (targets != null && targets.size() > 0) {
+					String buf = "";
+					for (EntityLivingBase ent : targets) {
+						buf += ent.getName() + " ";
+					}
+					comp.appendText("on " + targets.size() + " entities");
+					comp.setStyle((new Style()).setColor(TextFormatting.AQUA)
+							.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, 
+									new TextComponentString(buf))));
+
+					sib = new TextComponentString(" (others)");
+					Style style = new Style();
+					style.setColor(TextFormatting.DARK_AQUA);
+					buf = "";
+					if (others != null && others.size() > 0) {
+						for (EntityLivingBase ent : others)
+							buf += ent.getName() + " ";
+					} else {
+						buf += this.getSelf().getName();
+					}
+					style.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, new TextComponentString(buf)));
+					sib.setStyle(style);
+					
+					comp.appendSibling(sib);
+				} else {
+					comp.appendText("on " + locations.size() + " location(s)");
+					String buf = "";
+					for (BlockPos pos : locations) {
+						buf += "(" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") ";
+					}
+					
+					comp.setStyle(new Style().setColor(TextFormatting.DARK_GREEN).setHoverEvent(
+							new HoverEvent(Action.SHOW_TEXT, new TextComponentString(buf))));
+				}
+				
+				//caster.addChatMessage(comp);
+				NostrumMagica.proxy.sendSpellDebug((EntityPlayer) this.caster, comp);
+			}
 			
 			while ((next = (++index < parts.size() ? parts.get(index) : null)) != null && !next.isTrigger()) {
 				// it's a shape. Do it idk

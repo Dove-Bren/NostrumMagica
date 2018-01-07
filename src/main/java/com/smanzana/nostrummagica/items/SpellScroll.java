@@ -39,27 +39,26 @@ public class SpellScroll extends Item {
 	
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+		if (!itemStackIn.hasTagCompound())
+			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
 		
-			if (!itemStackIn.hasTagCompound())
-				return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
-			
-			NBTTagCompound nbt = itemStackIn.getTagCompound();
-			
-			if (!nbt.hasKey(NBT_SPELL, NBT.TAG_INT))
-				return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
-			
-			int id = nbt.getInteger(NBT_SPELL);
-			Spell spell = NostrumMagica.spellRegistry.lookup(id);
-			if (spell == null)
-				return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
-			
-			if (!playerIn.isCreative()) {
-				itemStackIn.stackSize--;
-			}
+		NBTTagCompound nbt = itemStackIn.getTagCompound();
+		
+		if (!nbt.hasKey(NBT_SPELL, NBT.TAG_INT))
+			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
+		
+		int id = nbt.getInteger(NBT_SPELL);
+		Spell spell = NostrumMagica.spellRegistry.lookup(id);
+		if (spell == null)
+			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
+		
+		if (!playerIn.isCreative()) {
+			itemStackIn.stackSize--;
+		}
 
 		if (worldIn.isRemote) {
 			NetworkHandler.getSyncChannel().sendToServer(
-	    			new ClientCastMessage(spell));
+	    			new ClientCastMessage(spell, true));
 		}
 		
 		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);

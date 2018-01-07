@@ -490,8 +490,9 @@ public class PlayerListener {
 					if (entry.getValue() == null)
 						continue;
 					
-					if (entry.getValue().entity.getPersistentID() != event.getEntityLiving().getPersistentID())
+					if (entry.getValue().entity.getPersistentID() != event.getEntityLiving().getPersistentID()) {
 						continue;
+					}
 					
 					if (entry.getKey().onEvent(Event.DAMAGED, source))
 						it.remove();

@@ -114,21 +114,17 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 
 		@Override
 		public ItemStack decrStackSize(int index, int count) {
-			System.out.println("Decr " + index + " by " + count);
 			if (index < 0 || index >= getSizeInventory() || slots[index] == null)
 				return null;
-			System.out.println("non-null");
 			
 			ItemStack stack;
 			if (slots[index].stackSize <= count) {
 				stack = slots[index];
 				slots[index] = null;
-				System.out.println("now null");
 			} else {
 				stack = slots[index].copy();
 				stack.stackSize = count;
 				slots[index].stackSize -= count;
-				System.out.println("still some left");
 			}
 			
 			this.markDirty();
@@ -283,6 +279,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 					name, this, new LinkedList<String>(), new LinkedList<String>(), true, true);
 			
 			if (spell != null) {
+				NostrumMagica.spellRegistry.register(spell);
 				ItemStack scroll = new ItemStack(SpellScroll.instance(), 1);
 				SpellScroll.setSpell(scroll, spell);
 				this.clearBoard();
@@ -378,10 +375,8 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 		BlockPos master = getMaster(state, pos);
 		TileEntity ent = world.getTileEntity(master);
 		if (!world.isRemote && ent != null) {
-			System.out.println("checking...");
 			SpellTableEntity table = (SpellTableEntity) ent;
 			for (int i = 0; i < table.getSizeInventory(); i++) {
-				System.out.println("checking...");
 				if (table.getStackInSlot(i) != null) {
 					EntityItem item = new EntityItem(
 							world, master.getX() + .5, master.getY() + .5, master.getZ() + .5,
@@ -389,8 +384,6 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 					world.spawnEntityInWorld(item);
 				}
 			}
-		} else {
-			System.out.println("else!!!!!!!");
 		}
 		
 		world.setBlockToAir(getPaired(state, pos));
@@ -453,7 +446,6 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 		
 		SpellTableEntity table = (SpellTableEntity) ent;
 		for (int i = 0; i < table.getSizeInventory(); i++) {
-			System.out.println("checking...");
 			if (table.getStackInSlot(i) != null) {
 				EntityItem item = new EntityItem(
 						world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
