@@ -30,6 +30,7 @@ import com.smanzana.nostrummagica.items.EnchantedWeapon;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
+import com.smanzana.nostrummagica.items.NostrumGuide;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SpellRune;
@@ -201,6 +202,9 @@ public class CommonProxy {
     private void registerItems() {
     	SpellTome.instance().setRegistryName(NostrumMagica.MODID, SpellTome.id);
     	GameRegistry.register(SpellTome.instance());
+    	
+    	NostrumGuide.instance().setRegistryName(NostrumMagica.MODID, NostrumGuide.id);
+    	GameRegistry.register(NostrumGuide.instance());
     	
     	BlankScroll.instance().setRegistryName(NostrumMagica.MODID, BlankScroll.id);
     	GameRegistry.register(BlankScroll.instance());

@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.client.gui.book;
 
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import net.minecraft.client.gui.FontRenderer;
 
 public class LinedTextPage implements IBookPage {
@@ -10,6 +12,10 @@ public class LinedTextPage implements IBookPage {
 	
 	public LinedTextPage(List<String> text) {
 		this.text = text;
+	}
+	
+	public LinedTextPage(String ... text) {
+		this.text = Lists.newArrayList(text);
 	}
 
 	@Override

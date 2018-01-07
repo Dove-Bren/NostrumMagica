@@ -1,63 +1,75 @@
-package com.smanzana.nostrummagica.lore;
+package com.smanzana.nostrummagica.loretag;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
+import com.smanzana.nostrummagica.items.BlankScroll;
+import com.smanzana.nostrummagica.items.InfusedGemItem;
+import com.smanzana.nostrummagica.items.MagicArmorBase;
+import com.smanzana.nostrummagica.items.MagicSwordBase;
+import com.smanzana.nostrummagica.items.ReagentBag;
+import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.SpellRune;
+import com.smanzana.nostrummagica.items.SpellScroll;
+import com.smanzana.nostrummagica.items.SpellTableItem;
+import com.smanzana.nostrummagica.items.SpellTome;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 
 /**
- * Something tagged with lore.
- * Lore has two stages: basic and deep. Basic knowledge is
- * obtained by collecting the item, killing the entity, or mining the block.
- * Deep knowledge is obtained doing the same thing except with a mage's journal.
- * Deep knowledge trumps basic. Someone can skip basic.
- * <p>
- * There are exactly three events that give lore:
- * <ol>
- * <li>Collecting an item</li>
- * <li>Breaking a block</li>
- * <li>Killing an entity</li>
- * </ol>
- * As such, only Items, Blocks, and LivingEntities marked with ILoreTagged matter.
- * </p>
- * To use, tag your LivingEntity, Item, or Block with ILoreTagged and implement it. The rest
- * is handled.
+ * Provides lookup from key to ILoreTagged to support offlining and onlining
+ * of earned lore
  * @author Skyler
  *
  */
-public interface ILoreTagged {
+public class LoreRegistry {
 
-	/**
-	 * Return a unique string used to persist knowledge.
-	 * Best prefix with your modid or something. This is not shown to
-	 * the player.
-	 * <br />
-	 * This is used as a key when looking up Lore objects. If your entity/block/item
-	 * actually represents multiple, have each type return a unique key (and
-	 * unique lore and display names). Voila!
-	 * @return
-	 */
-	public String getLoreKey();
+	private static LoreRegistry instance = null;
+	public static LoreRegistry instance() {
+		if (instance == null)
+			instance = new LoreRegistry();
+		
+		return instance;
+	}
 	
-	/**
-	 * Return the name of this lore-tagged object. <b>This should be translated already.</b>
-	 * @return
-	 */
-	public String getLoreDisplayName();
+	private Map<String, ILoreTagged> lore;
 	
-	/**
-	 * Return the basic Lore associated with this object.
-	 * @return
-	 */
-	public Lore getBasicLore();
+	private LoreRegistry() {
+		lore = new HashMap<>();
+		
+		init();
+	}
 	
-	/**
-	 * Return the deep lore associated with this object.
-	 * Basic is not displayed after deep is obtained. Be sure to include
-	 * relevant information from basic in deep if you want players to remember it!
-	 * @return
-	 */
-	public Lore getDeepLore();
-
+	public void register(ILoreTagged tagged) {
+		lore.put(tagged.getLoreKey(), tagged);
+	}
+	
+	public ILoreTagged lookup(String key) {
+		return lore.get(key);
+	}
+	
+	private void init() {
+		// All of the compile-time known lore elements are here.
+		register(ReagentItem.instance());
+		register(SpellTome.instance());
+		register(SpellScroll.instance());
+		register(SpellRune.instance());
+		register(ReagentBag.instance());
+		register(MagicSwordBase.instance());
+		register(MagicArmorBase.helm);
+		register(BlankScroll.instance());
+		register(SpellTableItem.instance());
+		register(InfusedGemItem.instance());
+		register(new EntityGolemPhysical(null));
+		
+		for (Preset preset : Preset.values()) {
+			register(preset);
+		}
+	}
+	
 	public static ILoreTagged getPreset(EntityLivingBase entityLiving) {
 		if (entityLiving == null)
 			return null;

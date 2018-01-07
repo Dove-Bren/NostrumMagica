@@ -3,6 +3,7 @@ item.spell_scroll.name=Empty Spell Scroll
 item.blank_scroll.name=Blank Scroll
 item.reagent_bag.name=Reagent Bag
 item.spell_table.name=Spell Table
+item.nostrum_guide.name=Nostrum Magica Guide
 
 item.magicswordbase.name=Ethereal Sword
 item.magichelmbase.name=Ethereal Helm

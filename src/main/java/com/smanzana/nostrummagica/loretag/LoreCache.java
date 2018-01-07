@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.lore;
+package com.smanzana.nostrummagica.loretag;
 
 import java.util.HashMap;
 import java.util.Map;

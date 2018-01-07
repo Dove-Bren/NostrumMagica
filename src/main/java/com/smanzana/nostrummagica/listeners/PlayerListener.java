@@ -13,9 +13,10 @@ import com.smanzana.nostrummagica.items.EnchantedEquipment;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
-import com.smanzana.nostrummagica.lore.ILoreTagged;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ManaMessage;
 import com.smanzana.nostrummagica.spells.EAlteration;
@@ -515,8 +516,8 @@ public class PlayerListener {
 		if (attr != null && attr.isUnlocked()) {
 			if (event.getState().getBlock() instanceof ILoreTagged)
 				attr.giveBasicLore((ILoreTagged) event.getState().getBlock());
-			else if (null != ILoreTagged.getPreset(event.getState().getBlock()))
-				attr.giveBasicLore(ILoreTagged.getPreset(event.getState().getBlock()));
+			else if (null != LoreRegistry.getPreset(event.getState().getBlock()))
+				attr.giveBasicLore(LoreRegistry.getPreset(event.getState().getBlock()));
 		}
 		
 		if (event.getState().getMaterial() == Material.LEAVES
@@ -569,8 +570,8 @@ public class PlayerListener {
 			if (attr != null && attr.isUnlocked()) {
 				if (event.getEntityLiving() instanceof ILoreTagged) {
 					attr.giveBasicLore((ILoreTagged) event.getEntityLiving());
-				} else if (null != ILoreTagged.getPreset(event.getEntityLiving())) {
-					attr.giveBasicLore(ILoreTagged.getPreset(event.getEntityLiving()));
+				} else if (null != LoreRegistry.getPreset(event.getEntityLiving())) {
+					attr.giveBasicLore(LoreRegistry.getPreset(event.getEntityLiving()));
 				}
 			}
 			
