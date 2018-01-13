@@ -205,6 +205,7 @@ public class CommonProxy {
     	
     	NostrumGuide.instance().setRegistryName(NostrumMagica.MODID, NostrumGuide.id);
     	GameRegistry.register(NostrumGuide.instance());
+    	NostrumGuide.init();
     	
     	BlankScroll.instance().setRegistryName(NostrumMagica.MODID, BlankScroll.id);
     	GameRegistry.register(BlankScroll.instance());

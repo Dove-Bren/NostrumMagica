@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.client.gui.book;
 
+import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.lwjgl.opengl.GL11;
@@ -7,6 +9,7 @@ import org.lwjgl.opengl.GL11;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -53,9 +56,44 @@ public class BookScreen extends GuiScreen {
 	private NextPageButton nextButton;
 	
 	public BookScreen(List<IBookPage> pages) {
+		this(pages, true);
+	}
+	
+	public BookScreen(List<IBookPage> pages, boolean tableOfContents){
 		this.pages = pages;
 		this.currentPage = 0;
 		this.maxPage = (pages.size() - 1) / 2;
+		
+		if (tableOfContents) {
+			LinkedList<String> titles = new LinkedList<>();
+			LinkedList<Integer> nums = new LinkedList<>();
+			int index = 1;
+			int pos = 0;
+			for (IBookPage page : pages) {
+				if (page instanceof TitlePage) {
+					TitlePage t = (TitlePage) page;
+					if (t.shouldIndex()) {
+						titles.add(t.getTitle());
+						nums.add(index);
+					} else {
+						if (titles.isEmpty()) {
+							// only encountered titles that aren't indexed
+							pos++;
+						}
+					}
+				}
+				index++;
+			}
+			
+			if (!titles.isEmpty()) {
+				TableOfContentsPage contents = new TableOfContentsPage(
+						titles.toArray(new String[0]),
+						nums.toArray(new Integer[0]),
+						true
+						);
+				pages.add(pos, contents);
+			}
+		}
 	}
 
 	@Override
@@ -148,6 +186,44 @@ public class BookScreen extends GuiScreen {
 		GlStateManager.enableBlend();
 	}
 	
+	public void requestPageChange(int newIndex) {
+		// index is page index. Not book index.
+		currentPage = newIndex / 2; // Now it's book index
+	}
+	
+	@Override
+	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+		
+		// going to be checked twice, but oh well. Check our buttons
+		if (backButton.mousePressed(Minecraft.getMinecraft(), mouseX, mouseY)
+				|| nextButton.mousePressed(Minecraft.getMinecraft(), mouseX, mouseY)) {
+			;
+		} else {
+			int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
+			int topOffset = (this.height - TEXT_HEIGHT) / 2;
+			
+			if (mouseX > (leftOffset + PAGE_HOFFSET) && mouseX < (leftOffset + TEXT_WIDTH) - PAGE_HOFFSET
+					&& mouseY > topOffset + PAGE_VOFFSET && mouseY < (topOffset + TEXT_HEIGHT) + PAGE_VOFFSET) {
+				//in bounds. Now figure out which it is
+				IBookPage page;
+				if (mouseX < (width/2) - PAGE_HOFFSET) {
+					page = pages.get(currentPage * 2);
+					if (page instanceof IClickableBookPage) {
+						((IClickableBookPage) page).onClick(this, mouseX - (leftOffset + PAGE_HOFFSET), mouseY - (topOffset + PAGE_VOFFSET), mouseButton);
+					}
+				} else if (pages.size() > (currentPage * 2) + 1 && mouseX > (width / 2) + PAGE_HOFFSET) {
+					page = pages.get((currentPage * 2) + 1);
+					if (page instanceof IClickableBookPage) {
+						((IClickableBookPage) page).onClick(this, mouseX - (leftOffset + PAGE_HOFFSET + PAGE_WIDTH + PAGE_DISTANCE), mouseY - (topOffset + PAGE_VOFFSET), mouseButton);
+					}
+				}
+			}
+		}
+		
+		
+		super.mouseClicked(mouseX, mouseY, mouseButton);
+	}
+	
 	/**
 	 * Taken from Jabelar's block gui tutorial
 	 * http://jabelarminecraft.blogspot.com/p/minecraft-modding-block-with-simple-gui.html
@@ -204,5 +280,66 @@ public class BookScreen extends GuiScreen {
             }
         }
     }
+	
+	private static class TableOfContentsPage implements IClickableBookPage {
+
+		private boolean title;
+		private String[] pages;
+		private Integer[] indices;
+		
+		private int widthCache;
+		private int xCache;
+		private int yCache;
+		
+		public TableOfContentsPage(String[] pages, Integer[] indices, boolean title) {
+			this.title = title;
+			this.pages = pages;
+			this.indices = indices;
+		}
+		
+		@Override
+		public void draw(BookScreen parent, FontRenderer fonter, int xoffset, int yoffset, int width, int height) {
+			widthCache = width;
+			xCache = xoffset;
+			
+			if (title) {
+				int x = xoffset + (width / 2);
+				x -= fonter.getStringWidth("Table Of Contents") / 2;
+				fonter.drawStringWithShadow("Table Of Contents", x, yoffset + 5, 0xFF404040);
+				yoffset += 10 + (fonter.FONT_HEIGHT);
+			}
+			
+			yCache = yoffset;
+			
+			for (int i = 0; i < pages.length; i++) {
+				fonter.drawString(pages[i], xoffset, yoffset, 0xFF400070);
+				yoffset += fonter.FONT_HEIGHT + 2;
+			}
+		}
+
+		@Override
+		public void overlay(BookScreen parent, FontRenderer fonter, int mouseX, int mouseY, int trueX, int trueY) {
+			if (title) {
+				mouseY -= fonter.FONT_HEIGHT + 10;
+			}
+			int index = mouseY / (fonter.FONT_HEIGHT + 2);
+			if (index < pages.length && index >= 0)
+				Gui.drawRect(xCache, yCache + (index * (fonter.FONT_HEIGHT + 2)) - 1, xCache + widthCache, yCache + (index * (fonter.FONT_HEIGHT + 2) + fonter.FONT_HEIGHT) - 1, 0x30000000);
+		}
+
+		@Override
+		public boolean onClick(BookScreen parent, int mouseX, int mouseY, int button) {
+			if (button == 0) {
+				int index = mouseY / (parent.fontRendererObj.FONT_HEIGHT + 2);
+				if (index < pages.length) {
+					parent.requestPageChange(indices[index]);
+					return true;
+				}
+			}
+			
+			return false;
+		}
+		
+	}
 	
 }
