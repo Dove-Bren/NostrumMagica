@@ -5,7 +5,25 @@
     },
     "variants": {
         "mob": {
-            "zombie": {
+            "golem_earth": {
+                
+            },
+            "golem_fire": {
+                
+            },
+            "golem_ice": {
+                
+            },
+            "golem_lightning": {
+                
+            },
+            "golem_physical": {
+                
+            },
+            "golem_ender": {
+                
+            },
+            "golem_wind": {
                 
             }
         }

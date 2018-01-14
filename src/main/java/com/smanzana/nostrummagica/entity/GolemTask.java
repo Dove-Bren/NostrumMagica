@@ -52,7 +52,7 @@ public class GolemTask extends EntityAIBase {
 		
 		EntityLivingBase owner = golem.getOwner();
 		if (owner == null)
-			return false;
+			return true;
 		
 		double distOwner = 0;
 		if (owner.dimension == golem.dimension) {
@@ -110,15 +110,17 @@ public class GolemTask extends EntityAIBase {
 			auxCooldown--;
 		
 		// If dist > some, return false;
-		if (golem.getOwner() == null) {
-			return false;
-		}
+//		if (golem.getOwner() == null) {
+//			return false;
+//		}
 		
 		if (!melee && !range && !aux) {
 			return false;
 		}
 		
 		EntityLivingBase owner = golem.getOwner();
+		if (owner == null)
+			owner = golem;
 		double distOwner = 0;
 		if (owner.dimension == golem.dimension) {
 			distOwner = owner.getDistanceSqToEntity(golem);

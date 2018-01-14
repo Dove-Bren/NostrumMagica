@@ -3,8 +3,15 @@ package com.smanzana.nostrummagica.blocks;
 import java.util.Random;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.entity.EntityGolemEarth;
+import com.smanzana.nostrummagica.entity.EntityGolemEnder;
+import com.smanzana.nostrummagica.entity.EntityGolemFire;
+import com.smanzana.nostrummagica.entity.EntityGolemIce;
+import com.smanzana.nostrummagica.entity.EntityGolemLightning;
+import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
+import com.smanzana.nostrummagica.entity.EntityGolemWind;
 
-import net.minecraft.block.BlockContainer;
+import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
@@ -12,13 +19,9 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.IStringSerializable;
@@ -29,11 +32,17 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class NostrumSingleSpawner extends BlockContainer implements ITileEntityProvider {
+public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 	
 	public static enum Type implements IStringSerializable {
 		// Do not change order. Ordinals are used
-		ZOMBIE;
+		GOLEM_EARTH,
+		GOLEM_ENDER,
+		GOLEM_FIRE,
+		GOLEM_ICE,
+		GOLEM_LIGHTNING,
+		GOLEM_PHYSICAL,
+		GOLEM_WIND;
 
 		@Override
 		public String getName() {
@@ -72,7 +81,7 @@ public class NostrumSingleSpawner extends BlockContainer implements ITileEntityP
 		this.setSoundType(SoundType.STONE);
 		this.setHarvestLevel("pickaxe", 4);
 		
-		this.setDefaultState(this.blockState.getBaseState().withProperty(MOB, Type.ZOMBIE));
+		this.setDefaultState(this.blockState.getBaseState().withProperty(MOB, Type.GOLEM_PHYSICAL));
 	}
 	
 	@Override
@@ -150,26 +159,42 @@ public class NostrumSingleSpawner extends BlockContainer implements ITileEntityP
 	
 	private void spawn(World world, BlockPos pos, IBlockState state, Random rand) {
 		Type type = state.getValue(MOB);
-		EntityLivingBase entity = getEntity(type, world, pos);
+		EntityLiving entity = getEntity(type, world, pos);
 		
+		entity.enablePersistence();
 		entity.setPosition(pos.getX() + 0.5, pos.getY(), pos.getZ() + .5);
+		
 		world.spawnEntityInWorld(entity);
 		
 	}
 	
-	private static EntityLivingBase getEntity(Type type, World world, BlockPos pos) {
+	private static EntityLiving getEntity(Type type, World world, BlockPos pos) {
 		if (type == null)
 			return null;
 		
-		EntityLivingBase entity = null;
+		EntityLiving entity = null;
 		
 		switch (type) {
-		case ZOMBIE:
-			entity = new EntityZombie(world);
-			entity.setItemStackToSlot(EntityEquipmentSlot.HEAD, 
-					new ItemStack(Items.DIAMOND_HELMET));
+		case GOLEM_EARTH:
+			entity = new EntityGolemEarth(world);
 			break;
-		default:
+		case GOLEM_ENDER:
+			entity = new EntityGolemEnder(world);
+			break;
+		case GOLEM_FIRE:
+			entity = new EntityGolemFire(world);
+			break;
+		case GOLEM_ICE:
+			entity = new EntityGolemIce(world);
+			break;
+		case GOLEM_LIGHTNING:
+			entity = new EntityGolemLightning(world);
+			break;
+		case GOLEM_PHYSICAL:
+			entity = new EntityGolemPhysical(world);
+			break;
+		case GOLEM_WIND:
+			entity = new EntityGolemWind(world);
 			break;
 		}
 		
@@ -188,6 +213,7 @@ public class NostrumSingleSpawner extends BlockContainer implements ITileEntityP
         world.removeTileEntity(pos);
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int eventID, int eventParam) {
 		super.eventReceived(state, worldIn, pos, eventID, eventParam);
