@@ -39,6 +39,6 @@ public interface IDungeonRoom {
 	
 	public boolean hasTraps();
 	
-	public void spawn(World world, BlockPos start, EnumFacing direction);
+	public void spawn(NostrumDungeon dungeon, World world, BlockPos start, EnumFacing direction);
 	
 }

@@ -20,6 +20,7 @@ import com.smanzana.nostrummagica.listeners.PlayerListener;
 import com.smanzana.nostrummagica.proxy.CommonProxy;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.SpellRegistry;
+import com.smanzana.nostrummagica.world.dungeon.NostrumLootHandler;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
@@ -63,6 +64,7 @@ public class NostrumMagica
     @EventHandler
     public void init(FMLInitializationEvent event) {
         proxy.init();
+        new NostrumLootHandler();
     }
     
     @EventHandler
