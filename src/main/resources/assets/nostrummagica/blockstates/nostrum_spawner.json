@@ -1,0 +1,13 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "model": "nostrummagica:spawner"
+    },
+    "variants": {
+        "mob": {
+            "zombie": {
+                
+            }
+        }
+    }
+}

@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.blocks.CursedIce;
 import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.blocks.ManiOre;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
+import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.blocks.SpellTable;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -271,6 +272,12 @@ public class CommonProxy {
     	
     	GameRegistry.register(CropGinseng.instance(),
     			new ResourceLocation(NostrumMagica.MODID, CropGinseng.ID));
+    	
+    	GameRegistry.register(NostrumSingleSpawner.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, NostrumSingleSpawner.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(NostrumSingleSpawner.instance())).setRegistryName(NostrumSingleSpawner.ID)
+    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(NostrumSingleSpawner.ID));
     }
     
     public void syncPlayer(EntityPlayerMP player) {

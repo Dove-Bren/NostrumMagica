@@ -11,6 +11,7 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
+import net.minecraft.util.math.BlockPos;
 
 public class ManiOre extends Block {
 
@@ -51,5 +52,10 @@ public class ManiOre extends Block {
 	@Override
 	public int damageDropped(IBlockState state) {
 		return ReagentItem.ReagentType.MANI_DUST.getMeta();
+	}
+	
+	@Override
+	public int getExpDrop(IBlockState state, net.minecraft.world.IBlockAccess world, BlockPos pos, int fortune) {
+		return RANDOM.nextInt(3);
 	}
 }

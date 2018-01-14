@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.blocks.CursedIce;
 import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.blocks.ManiOre;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
+import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
@@ -186,6 +187,9 @@ public class ClientProxy extends CommonProxy {
 		registerModel(Item.getItemFromBlock(MagicWall.instance()),
 				0,
 				MagicWall.ID);
+		registerModel(Item.getItemFromBlock(NostrumSingleSpawner.instance()),
+				0,
+				NostrumSingleSpawner.ID);
 		registerModel(Item.getItemFromBlock(CursedIce.instance()),
 				0,
 				CursedIce.ID);
