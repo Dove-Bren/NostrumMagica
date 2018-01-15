@@ -86,7 +86,6 @@ public class NostrumMagica
     	
     	spellRegistry = new SpellRegistry();
     	
-    	System.out.println("Suggested: " + event.getSuggestedConfigurationFile().getAbsolutePath());
     	File dir = new File(event.getSuggestedConfigurationFile().getParentFile(), "NostrumMagica");
     	if (!dir.exists())
     		dir.mkdirs();

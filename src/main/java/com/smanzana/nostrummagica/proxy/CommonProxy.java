@@ -69,6 +69,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 import com.smanzana.nostrummagica.world.NostrumFlowerGenerator;
 import com.smanzana.nostrummagica.world.NostrumOreGenerator;
+import com.smanzana.nostrummagica.world.NostrumShrineGenerator;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -160,6 +161,7 @@ public class CommonProxy {
     	
     	GameRegistry.registerWorldGenerator(new NostrumOreGenerator(), 0);
     	GameRegistry.registerWorldGenerator(new NostrumFlowerGenerator(), 0);
+    	GameRegistry.registerWorldGenerator(new NostrumShrineGenerator(), 0);
     	
     	NetworkRegistry.INSTANCE.registerGuiHandler(NostrumMagica.instance, new NostrumGui());
 	}

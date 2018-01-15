@@ -71,6 +71,18 @@ public class ShrineRoom extends StaticRoom {
 				"X         X",
 				"X         X",
 				"XXXXXXXXXXX",
+				// Layer 5
+				"XXXXXXXXXXX",
+				"X 	X      X",
+				"X  XXXX   X",
+				"X         X",
+				"X         X",
+				"X         X",
+				"X         X",
+				"X         X",
+				"X         X",
+				"X         X",
+				"XXXXXXXXXXX",
 				// Ceil
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",
@@ -116,5 +128,4 @@ public class ShrineRoom extends StaticRoom {
 	public boolean hasTraps() {
 		return false;
 	}
-	
 }

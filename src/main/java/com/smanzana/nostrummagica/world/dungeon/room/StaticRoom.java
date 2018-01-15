@@ -1,7 +1,9 @@
 package com.smanzana.nostrummagica.world.dungeon.room;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
@@ -11,6 +13,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 
 /**
  * Room with all known blocks and bounds at compile-time.
@@ -119,17 +122,26 @@ public abstract class StaticRoom implements IDungeonRoom {
 	
 	@Override
 	public void spawn(NostrumDungeon dungeon, World world, DungeonExitPoint start) {
+		Set<Chunk> chunks = new HashSet<>();
 		for (int i = locMinX; i <= locMaxX; i++)
 		for (int j = locMinY; j <= locMaxY; j++)
 		for (int k = locMinZ; k <= locMaxZ; k++) {
+
 			BlockPos pos = new BlockPos(i + start.getPos().getX(),
 					j + start.getPos().getY(),
 					k + start.getPos().getZ());
+			
+			if (!chunks.contains(world.getChunkFromBlockCoords(pos))) {
+				// Side effect: generates chunks if they haven't been. >:)
+				chunks.add(world.getChunkFromBlockCoords(pos));
+			}
+			
 			if (blocks[i-locMinX][j-locMinY][k-locMinZ] == null) {
 				world.setBlockToAir(pos);
 			} else {
 				blocks[i-locMinX][j-locMinY][k-locMinZ].set(world, pos);
 			}
+			
 		}
 	}
 	
