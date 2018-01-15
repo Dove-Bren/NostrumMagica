@@ -1012,6 +1012,6 @@ public class PlayerListener {
 		
 		pos.add(0, 5, 0);
 		ShrineRoom room = new ShrineRoom();
-		room.spawn(null, e.getWorld(), new NostrumDungeon.DungeonExitPoint(pos, EnumFacing.NORTH));
+		room.spawn(null, e.getWorld(), new NostrumDungeon.DungeonExitPoint(pos, EnumFacing.WEST));
 	}
 }

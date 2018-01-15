@@ -123,13 +123,39 @@ public abstract class StaticRoom implements IDungeonRoom {
 	@Override
 	public void spawn(NostrumDungeon dungeon, World world, DungeonExitPoint start) {
 		Set<Chunk> chunks = new HashSet<>();
+		
+		// Get inversions based on rotation
+		int modZ = 1;
+		boolean swap = false;
+		switch (start.getFacing()) {
+		case EAST:
+			swap = true;
+			break;
+		case SOUTH:
+			modZ = -1;
+			break;
+		case NORTH: // -z
+		default:
+			break;
+		case WEST: // -x
+			modZ = -1;
+			swap = true;
+			break;
+		}
+		
 		for (int i = locMinX; i <= locMaxX; i++)
 		for (int j = locMinY; j <= locMaxY; j++)
 		for (int k = locMinZ; k <= locMaxZ; k++) {
+			int x = i, z = (k * modZ);
+			if (swap) {
+				int t = x;
+				x = z;
+				z = t;
+			}
 
-			BlockPos pos = new BlockPos(i + start.getPos().getX(),
+			BlockPos pos = new BlockPos(x + start.getPos().getX(),
 					j + start.getPos().getY(),
-					k + start.getPos().getZ());
+					z + start.getPos().getZ());
 			
 			if (!chunks.contains(world.getChunkFromBlockCoords(pos))) {
 				// Side effect: generates chunks if they haven't been. >:)

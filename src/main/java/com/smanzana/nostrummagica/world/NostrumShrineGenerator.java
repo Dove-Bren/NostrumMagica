@@ -30,7 +30,7 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 	    {
 	        room.spawn(null, worldIn,
 	        		new NostrumDungeon.DungeonExitPoint(position, 
-	        				EnumFacing.random(rand)
+	        				EnumFacing.HORIZONTALS[rand.nextInt(4)]
 	        				));
 
 	        return true;
@@ -38,7 +38,7 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 	}
 	
 	private static enum DungeonGen {
-		DUNG1(new WorldGenNostrumShrine(new ShrineRoom()), 30, 80);
+		DUNG1(new WorldGenNostrumShrine(new ShrineRoom()), 130, 180);
 		
 		private WorldGenerator gen;
 		private int minY;

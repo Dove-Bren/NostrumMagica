@@ -6,6 +6,8 @@ import java.util.List;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
+import net.minecraft.init.Blocks;
+
 public class ShrineRoom extends StaticRoom {
 	
 	public ShrineRoom() {
@@ -86,17 +88,19 @@ public class ShrineRoom extends StaticRoom {
 				// Ceil
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",
-				"XXXXXXXXXXX",
-				"XXXXXXXXXXX",
-				"XXXXXXXXXXX",
-				"XXXXXXXXXXX",
+				"XXXXXDXXXXX",
+				"XXXXXTXXXXX",
+				"XXXXXTXXXXX",
+				"XXXXXTXXXXX",
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",
 				'X', DungeonBlock.instance(),
-				' ', null);
+				' ', null,
+				'D', Blocks.REDSTONE_BLOCK,
+				'T', Blocks.COAL_BLOCK);
 	}
 
 	@Override
