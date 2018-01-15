@@ -9,6 +9,7 @@ import org.lwjgl.input.Keyboard;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.CursedIce;
+import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.blocks.ManiOre;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
@@ -199,6 +200,15 @@ public class ClientProxy extends CommonProxy {
 		registerModel(SpellTableItem.instance(),
 				0,
 				SpellTableItem.ID);
+		
+		registerModel(new ItemBlock(DungeonBlock.instance()), 
+				DungeonBlock.Type.DARK.ordinal(),
+				DungeonBlock.Type.DARK.getName()
+				);
+		registerModel(new ItemBlock(DungeonBlock.instance()), 
+				DungeonBlock.Type.LIGHT.ordinal(),
+				DungeonBlock.Type.LIGHT.getName()
+				);
 	}
 	
 	@Override

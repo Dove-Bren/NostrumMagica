@@ -51,7 +51,6 @@ public final class NostrumLootHandler {
 			case "stronghold_corridor":
 			case "end_city_treasure":
 			case "village_blacksmith":
-				System.out.println("Injecting in to " + file);
 				evt.getTable().addPool(getInjectPool(file));
 				break;
 			default: break;

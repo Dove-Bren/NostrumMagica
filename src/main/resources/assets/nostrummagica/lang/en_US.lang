@@ -135,6 +135,7 @@ tile.mandrake_crop.name=Mandrake
 tile.ginseng_crop.name=Ginseng
 tile.spell_table.name=Spell Table
 tile.nostrum_spawner.name=Nostrum Spawner
+tile.dungeon_block.name=Dungeon Wall
 
 entity.nostrummagica.physical_golem.name=Metal Golem
 entity.nostrummagica.lightning_golem.name=Lightining Golem

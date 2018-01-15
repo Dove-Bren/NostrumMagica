@@ -4,6 +4,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.CropGinseng;
 import com.smanzana.nostrummagica.blocks.CropMandrakeRoot;
 import com.smanzana.nostrummagica.blocks.CursedIce;
+import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.blocks.ManiOre;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
@@ -261,9 +262,6 @@ public class CommonProxy {
     	GameRegistry.register(SpellTable.instance(),
     			new ResourceLocation(NostrumMagica.MODID, SpellTable.ID));
     	SpellTable.init();
-//    	GameRegistry.register(
-//    			(new ItemBlock(SpellTable.instance())).setRegistryName(SpellTable.ID)
-//    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(SpellTable.ID));
     	
     	NostrumMagicaFlower.init();
     	
@@ -278,6 +276,12 @@ public class CommonProxy {
     	GameRegistry.register(
     			(new ItemBlock(NostrumSingleSpawner.instance())).setRegistryName(NostrumSingleSpawner.ID)
     		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(NostrumSingleSpawner.ID));
+    	
+    	GameRegistry.register(DungeonBlock.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, DungeonBlock.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(DungeonBlock.instance())).setRegistryName(DungeonBlock.ID)
+    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(DungeonBlock.ID));
     }
     
     public void syncPlayer(EntityPlayerMP player) {

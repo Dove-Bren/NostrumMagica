@@ -1,9 +1,10 @@
-package com.smanzana.nostrummagica.world.dungeon;
+package com.smanzana.nostrummagica.world.dungeon.room;
 
 import java.util.List;
 
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
+import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
+import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
+
 import net.minecraft.world.World;
 
 public interface IDungeonRoom {
@@ -13,18 +14,22 @@ public interface IDungeonRoom {
 	 * given direction. This should check all affected blocks and make sure that
 	 * no unbreakable blocks, etc are overlapped
 	 * @param world
-	 * @param start
-	 * @param direction
 	 * @return
 	 */
-	public boolean canSpawnAt(World world, BlockPos start, EnumFacing direction);
+	public boolean canSpawnAt(World world, DungeonExitPoint start);
+	
+	/**
+	 * Return the number of exits this room has
+	 * @return
+	 */
+	public int getNumExits();
 	
 	/**
 	 * Return a list of exists that would be generated if the room was
 	 * placed at the given position and facing
 	 * @return
 	 */
-	public List<BlockPos> getExits(BlockPos start, EnumFacing direction);
+	public List<DungeonExitPoint> getExits(DungeonExitPoint start);
 	
 	/**
 	 * Returns the difficulty of the given room, which is used when figuring outa
@@ -39,6 +44,6 @@ public interface IDungeonRoom {
 	
 	public boolean hasTraps();
 	
-	public void spawn(NostrumDungeon dungeon, World world, BlockPos start, EnumFacing direction);
+	public void spawn(NostrumDungeon dungeon, World world, DungeonExitPoint start);
 	
 }
