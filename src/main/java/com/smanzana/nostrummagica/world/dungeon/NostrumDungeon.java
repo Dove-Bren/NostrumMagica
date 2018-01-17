@@ -40,9 +40,15 @@ public class NostrumDungeon {
 	private IDungeonRoom starting;
 	protected NostrumDungeon self;
 	
+	// Cached subsets 
+	private List<IDungeonRoom> endPoints;
+	private List<IDungeonRoom> contPoints;
+	
 	public NostrumDungeon(IDungeonRoom starting, IDungeonRoom ending) {
 		self = this;
 		rooms = new LinkedList<>();
+		endPoints = new LinkedList<>();
+		contPoints = new LinkedList<>();
 		this.ending = ending;
 		this.starting = starting;
 		
@@ -52,19 +58,40 @@ public class NostrumDungeon {
 	
 	public NostrumDungeon add(IDungeonRoom room) {
 		rooms.add(room);
+		
+		// invalidate cache
+		endPoints.clear();
+		contPoints.clear();
 		return this;
 	}
 	
 	public void spawn(World world, DungeonExitPoint start) {
 		starting.spawn(this, world, start);
+		
+		// Calculate caches
+		if (endPoints.isEmpty()) {
+			for (IDungeonRoom room : rooms) {
+				if (room.getNumExits() == 0)
+					endPoints.add(room);
+				else
+					contPoints.add(room);
+			}
+		}
+		
 		// Select a subpath to have the ending
 		int index = rand.nextInt(starting.getNumExits());
+		IDungeonRoom inEnd;
 		
 		for (DungeonExitPoint exit : starting.getExits(start)) {
+			inEnd = null;
+			if (index == 0) {
+				inEnd = ending; 
+			}
 			Path path = new Path(2,//rand.nextInt(10) + 1,
-					index-- == 0 ? ending : null);
+					inEnd);
 			path.spawn(world, exit);
-			
+
+			index -= 1;
 		}
 	}
 	
@@ -88,7 +115,7 @@ public class NostrumDungeon {
 			 * 1) Base case. Remaining == 0? 
 			 *   If we have a set ending, use that.
 			 *   Otherwise, If we can find one with no doors, use that. Else use random one
-			 * 3) Get random room with >0 doors. call spawn at it's end with remaining - 1;
+			 * 2) Get random room with >0 doors. call spawn at it's end with remaining - 1;
 			 */
 			if (remaining == 0) {
 				if (ending != null) {
@@ -96,45 +123,39 @@ public class NostrumDungeon {
 					return;
 				}
 				
-				List<IDungeonRoom> singles = new LinkedList<>();
 				IDungeonRoom selected = null;
-				for (IDungeonRoom room : rooms) {
-					if (room.getNumExits() == 0)
-						singles.add(room);
-				}
 				
-				if (singles.size() == 0) {
+				if (endPoints.size() == 0) {
 					selected = rooms.get(rand.nextInt(rooms.size()));
 				} else {
-					selected = singles.get(rand.nextInt(singles.size()));
+					selected = endPoints.get(rand.nextInt(endPoints.size()));
 				}
 				
 				selected.spawn(self, world, entry);
 				return;
 			} else {
-				List<IDungeonRoom> list = new LinkedList<>();
 				IDungeonRoom selected = null;
-				for (IDungeonRoom room : rooms) {
-					if (room.getNumExits() > 0) {
-						list.add(room);
-					}
-				}
 				
-				if (list.isEmpty()) {
+				if (contPoints.isEmpty()) {
 					selected = rooms.get(rand.nextInt(rooms.size()));
 				} else {
-					selected = list.get(rand.nextInt(list.size()));
+					selected = contPoints.get(rand.nextInt(contPoints.size()));
 				}
 				
 				selected.spawn(self, world, entry);
 				
 				// Select a subpath to have the ending
 				int index = rand.nextInt(selected.getNumExits());
+				IDungeonRoom inEnd;
 				
 				for (DungeonExitPoint exit : selected.getExits(entry)) {
-					Path path = new Path(remaining - 1,
-							index-- == 0 ? ending : null);
+					inEnd = null;
+					if (index == 0) {
+						inEnd = ending; 
+					}
+					Path path = new Path(remaining - 1, inEnd);
 					path.spawn(world, exit);
+					index -= 1;
 				}
 			}
 		}

@@ -117,17 +117,17 @@ public class StartRoom extends StaticRoom {
 		
 		BlockPos pos;
 		
-//		pos = new BlockPos(0, 0, -5);
-//		list.add(NostrumDungeon.asRotated(start, pos, EnumFacing.SOUTH));
+		pos = new BlockPos(0, 0, -5);
+		list.add(NostrumDungeon.asRotated(start, pos, EnumFacing.SOUTH));
 		
-//		pos = new BlockPos(0, 0, 5);
-//		list.add(NostrumDungeon.asRotated(start, pos, EnumFacing.NORTH));
-//		
+		pos = new BlockPos(0, 0, 5);
+		list.add(NostrumDungeon.asRotated(start, pos, EnumFacing.NORTH));
+		
 		pos = new BlockPos(-5, 0, 0);
 		list.add(NostrumDungeon.asRotated(start, pos, EnumFacing.EAST));
-//		
-//		pos = new BlockPos(5, 0, 0);
-//		list.add(NostrumDungeon.asRotated(start, pos, EnumFacing.WEST));
+		
+		pos = new BlockPos(5, 0, 0);
+		list.add(NostrumDungeon.asRotated(start, pos, EnumFacing.WEST));
 		
 		return list;
 	}
