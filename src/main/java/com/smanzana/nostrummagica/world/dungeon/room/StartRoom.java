@@ -3,15 +3,19 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.smanzana.nostrummagica.blocks.DungeonBlock;
+import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.init.Blocks;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 
-public class ShrineRoom extends StaticRoom {
+public class StartRoom extends StaticRoom {
 	
-	public ShrineRoom() {
-		// end up providing the type of shrine!
-		super(-5, -1, 0, 5, 5, 10,
+	public StartRoom() {
+		// End up passing in height to surface?
+		super(-5, -1, -5, 5, 5, 5,
 				// Floor
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",
@@ -26,44 +30,43 @@ public class ShrineRoom extends StaticRoom {
 				"XXXXXXXXXXX",
 				// Layer 1
 				"XXXXX XXXXX",
-				"X 	X      X",
-				"X  XXXX   X",
+				"XBB     BBX",
+				"XB       BX",
 				"X         X",
 				"X         X",
-				"X         X",
-				"X     XXXXX",
-				"X         X",
+				"           ",
 				"X         X",
 				"X         X",
-				"XXXXXXXXXXX",
+				"XB       BX",
+				"XBB     BBX",
+				"XXXXX XXXXX",
 				// Layer 2
 				"XXXXX XXXXX",
-				"X 	X      X",
-				"X  XXXX   X",
+				"XBB      BX",
 				"X         X",
 				"X         X",
 				"X         X",
-				"X     XXXXX",
+				"           ",
 				"X         X",
 				"X         X",
-				"X         X",
-				"XXXXXXXXXXX",
+				"XB       BX",
+				"XB      BBX",
+				"XXXXX XXXXX",
 				// Layer 3
 				"XXXXXXXXXXX",
-				"X 	X      X",
-				"X  XXXX   X",
+				"XB	       X",
 				"X         X",
 				"X         X",
 				"X         X",
-				"X     XXXXX",
 				"X         X",
 				"X         X",
 				"X         X",
+				"XB        X",
+				"X       BBX",
 				"XXXXXXXXXXX",
 				// Layer 4
 				"XXXXXXXXXXX",
-				"X 	X      X",
-				"X  XXXX   X",
+				"X 	       X",
 				"X         X",
 				"X         X",
 				"X         X",
@@ -71,45 +74,62 @@ public class ShrineRoom extends StaticRoom {
 				"X         X",
 				"X         X",
 				"X         X",
+				"X        BX",
 				"XXXXXXXXXXX",
 				// Layer 5
 				"XXXXXXXXXXX",
-				"X 	X      X",
-				"X  XXXX   X",
+				"X 	       X",
+				"X         X",
+				"X  G   G  X",
 				"X         X",
 				"X         X",
 				"X         X",
-				"X         X",
-				"X         X",
+				"X  G   G  X",
 				"X         X",
 				"X         X",
 				"XXXXXXXXXXX",
 				// Ceil
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",
-				"XXXXXDXXXXX",
-				"XXXXXTXXXXX",
-				"XXXXXTXXXXX",
-				"XXXXXTXXXXX",
+				"XXXXXXXXXXX",
+				"XXXXXXXXXXX",
+				"XXXX   XXXX",
+				"XXXX   XXXX",
+				"XXXX   XXXX",
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",
-				"XXXXXXXXXXX",
-				'X', Blocks.GOLD_BLOCK,//DungeonBlock.instance(),
+				'X', DungeonBlock.instance(),
 				' ', null,
-				'D', Blocks.REDSTONE_BLOCK,
-				'T', Blocks.COAL_BLOCK);
+				'G', Blocks.GLOWSTONE,
+				'B', Blocks.BOOKSHELF);
 	}
 
 	@Override
 	public int getNumExits() {
-		return 0;
+		return 4;
 	}
 
 	@Override
 	public List<DungeonExitPoint> getExits(DungeonExitPoint start) {
-		return new LinkedList<>();
+		List<DungeonExitPoint> list = new LinkedList<>();
+		
+		BlockPos pos;
+		
+//		pos = new BlockPos(0, 0, -5);
+//		list.add(NostrumDungeon.asRotated(start, pos, EnumFacing.SOUTH));
+		
+//		pos = new BlockPos(0, 0, 5);
+//		list.add(NostrumDungeon.asRotated(start, pos, EnumFacing.NORTH));
+//		
+		pos = new BlockPos(-5, 0, 0);
+		list.add(NostrumDungeon.asRotated(start, pos, EnumFacing.EAST));
+//		
+//		pos = new BlockPos(5, 0, 0);
+//		list.add(NostrumDungeon.asRotated(start, pos, EnumFacing.WEST));
+		
+		return list;
 	}
 
 	@Override

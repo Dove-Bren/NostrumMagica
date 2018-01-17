@@ -5,7 +5,10 @@ import java.util.List;
 import java.util.Random;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.world.dungeon.room.HallwayRoom;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoom;
+import com.smanzana.nostrummagica.world.dungeon.room.ShrineRoom;
+import com.smanzana.nostrummagica.world.dungeon.room.StartRoom;
 
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -37,7 +40,7 @@ public class NostrumDungeon {
 	private IDungeonRoom starting;
 	protected NostrumDungeon self;
 	
-	public NostrumDungeon(IDungeonRoom ending, IDungeonRoom starting) {
+	public NostrumDungeon(IDungeonRoom starting, IDungeonRoom ending) {
 		self = this;
 		rooms = new LinkedList<>();
 		this.ending = ending;
@@ -58,9 +61,10 @@ public class NostrumDungeon {
 		int index = rand.nextInt(starting.getNumExits());
 		
 		for (DungeonExitPoint exit : starting.getExits(start)) {
-			Path path = new Path(rand.nextInt(10) + 1,
+			Path path = new Path(2,//rand.nextInt(10) + 1,
 					index-- == 0 ? ending : null);
 			path.spawn(world, exit);
+			
 		}
 	}
 	
@@ -136,4 +140,71 @@ public class NostrumDungeon {
 		}
 	}
 	
+	public static NostrumDungeon temp = new NostrumDungeon(
+			new StartRoom(),
+			new ShrineRoom()
+			).add(new HallwayRoom());
+	
+	public static DungeonExitPoint asRotated(DungeonExitPoint start, BlockPos offset, EnumFacing facing) {
+		System.out.println("Start: " + start.pos.toString() + " w/ " + start.facing.name());
+		System.out.println("offset: " + offset.toString() + " w/ " + facing.name());
+		int modX = 1;
+		int modZ = 1;
+		boolean swap = false;
+		switch (start.getFacing()) {
+		case EAST:
+			swap = true;
+			modX = -1;
+			break;
+		case SOUTH:
+			modX = -1;
+			modZ = -1;
+			break;
+		case NORTH: // -z
+		default:
+			break;
+		case WEST: // -x
+			swap = true;
+			modZ = -1;
+			break;
+		}
+		
+
+		BlockPos pos = start.getPos();
+		int x = offset.getX();
+		int z = offset.getZ();
+		if (swap) {
+			int t = x;
+			x = z;
+			z = t;
+		}
+		x *= modX;
+		z *= modZ;
+		
+		pos = new BlockPos(pos.getX() + x, pos.getY() + offset.getY(), pos.getZ() + z);
+		
+		int rot;
+		EnumFacing out = start.facing;
+		switch (facing) {
+		case NORTH:
+		default:
+			rot = 0;
+			break;
+		case EAST:
+			rot = 1;
+			break;
+		case SOUTH:
+			rot = 2;
+			break;
+		case WEST:
+			rot = 3;
+			break;
+		}
+		
+		while (rot-- > 0)
+			out = out.rotateY();
+			
+		System.out.println("out: " + pos.toString() + " w/ " + out.name());
+		return new DungeonExitPoint(pos, out);
+	}
 }

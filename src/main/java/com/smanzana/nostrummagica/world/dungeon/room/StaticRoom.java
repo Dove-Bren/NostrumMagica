@@ -125,33 +125,38 @@ public abstract class StaticRoom implements IDungeonRoom {
 		Set<Chunk> chunks = new HashSet<>();
 		
 		// Get inversions based on rotation
+		int modX = 1;
 		int modZ = 1;
 		boolean swap = false;
 		switch (start.getFacing()) {
 		case EAST:
 			swap = true;
+			modX = -1;
 			break;
 		case SOUTH:
+			modX = -1;
 			modZ = -1;
 			break;
 		case NORTH: // -z
 		default:
 			break;
 		case WEST: // -x
-			modZ = -1;
 			swap = true;
+			modZ = -1;
 			break;
 		}
 		
 		for (int i = locMinX; i <= locMaxX; i++)
 		for (int j = locMinY; j <= locMaxY; j++)
 		for (int k = locMinZ; k <= locMaxZ; k++) {
-			int x = i, z = (k * modZ);
+			int x = i, z = k;
 			if (swap) {
 				int t = x;
 				x = z;
 				z = t;
 			}
+			x *= modX;
+			z *= modZ;
 
 			BlockPos pos = new BlockPos(x + start.getPos().getX(),
 					j + start.getPos().getY(),
