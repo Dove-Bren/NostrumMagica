@@ -278,6 +278,7 @@ public class CommonProxy {
     	GameRegistry.register(
     			(new ItemBlock(NostrumSingleSpawner.instance())).setRegistryName(NostrumSingleSpawner.ID)
     		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(NostrumSingleSpawner.ID));
+    	NostrumSingleSpawner.init();
     	
     	GameRegistry.register(DungeonBlock.instance(),
     			new ResourceLocation(NostrumMagica.MODID, DungeonBlock.ID));

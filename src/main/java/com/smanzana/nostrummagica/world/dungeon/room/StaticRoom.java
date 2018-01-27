@@ -2,15 +2,23 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.command.CommandTestConfig;
+import com.smanzana.nostrummagica.world.dungeon.LootUtil;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockHorizontal;
+import net.minecraft.block.BlockLadder;
+import net.minecraft.block.BlockStairs;
+import net.minecraft.block.BlockTorch;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -22,18 +30,72 @@ import net.minecraft.world.chunk.Chunk;
  */
 public abstract class StaticRoom implements IDungeonRoom {
 	
-	private static class BlockState {
-		public int meta;
+	protected static class BlockState {
 		public Block block;
+		public int meta;
+		private IBlockState actualState;
 		
-		public BlockState(int meta, Block block) {
+		public BlockState(Block block, int meta) {
 			this.meta = meta;
 			this.block = block;
 		}
 		
+		public BlockState(Block block, IBlockState actual) {
+			this.block = block;
+			this.actualState = actual;
+		}
+		
 		@SuppressWarnings("deprecation")
-		public void set(World world, BlockPos pos) {
-			world.setBlockState(pos, block.getStateFromMeta(meta));
+		public void set(World world, BlockPos pos, EnumFacing rotation) {
+			IBlockState state;
+			if (actualState != null) {
+				state = actualState;
+			} else {
+				state = block.getStateFromMeta(meta);
+			}
+			
+			if (block instanceof BlockHorizontal) {
+				EnumFacing cur = state.getValue(BlockHorizontal.FACING);
+				cur = rotate(cur, rotation);
+				state = state.withProperty(BlockHorizontal.FACING, cur);
+			} else if (block instanceof BlockTorch) {
+				EnumFacing cur = state.getValue(BlockTorch.FACING);
+				cur = rotate(cur, rotation);
+				state = state.withProperty(BlockTorch.FACING, cur);
+			} else if (block instanceof BlockLadder) {
+				EnumFacing cur = state.getValue(BlockLadder.FACING);
+				cur = rotate(cur, rotation);
+				state = state.withProperty(BlockLadder.FACING, cur);
+			} else if (block instanceof BlockStairs) {
+				EnumFacing cur = state.getValue(BlockStairs.FACING);
+				cur = rotate(cur, rotation);
+				state = state.withProperty(BlockStairs.FACING, cur);
+			}
+			world.setBlockState(pos, state);
+		}
+		
+		private static EnumFacing rotate(EnumFacing in, EnumFacing rotation) {
+			int count;
+			switch (rotation) {
+			case NORTH:
+			default:
+				count = 0;
+				break;
+			case EAST:
+				count = 1;
+				break;
+			case SOUTH:
+				count = 2;
+				break;
+			case WEST:
+				count = 3;
+				break;
+			}
+			
+			while (count-- > 0)
+				in = in.rotateY();
+			
+			return in;
 		}
 	}
 
@@ -162,17 +224,25 @@ public abstract class StaticRoom implements IDungeonRoom {
 					j + start.getPos().getY(),
 					z + start.getPos().getZ());
 			
-			if (!chunks.contains(world.getChunkFromBlockCoords(pos))) {
-				// Side effect: generates chunks if they haven't been. >:)
-				chunks.add(world.getChunkFromBlockCoords(pos));
+			if (CommandTestConfig.level != 1) {
+				if (!chunks.contains(world.getChunkFromBlockCoords(pos))) {
+					// Side effect: generates chunks if they haven't been. >:)
+					chunks.add(world.getChunkFromBlockCoords(pos));
+				}
 			}
 			
 			if (blocks[i-locMinX][j-locMinY][k-locMinZ] == null) {
 				world.setBlockToAir(pos);
 			} else {
-				blocks[i-locMinX][j-locMinY][k-locMinZ].set(world, pos);
+				blocks[i-locMinX][j-locMinY][k-locMinZ].set(world, pos, start.getFacing());
 			}
 			
+		}
+		
+		List<DungeonExitPoint> loots = this.getTreasureLocations(start);
+		if (loots != null && !loots.isEmpty())
+		for (NostrumDungeon.DungeonExitPoint lootSpot : this.getTreasureLocations(start)) {
+			LootUtil.generateLoot(world, lootSpot.getPos(), lootSpot.getFacing());
 		}
 	}
 	
@@ -195,16 +265,18 @@ public abstract class StaticRoom implements IDungeonRoom {
 			} else {
 				// last has character. This should be Block or Blockstate
 				if (o instanceof Block) {
-					states.put(last, new BlockState(0, (Block) o));
+					states.put(last, new BlockState((Block) o, 0));
 				} else if (o instanceof IBlockState) {
 					IBlockState s = (IBlockState) o;
 					states.put(last, new BlockState(
-							s.getBlock().getMetaFromState(s),
-							s.getBlock()
+							s.getBlock(),
+							s.getBlock().getMetaFromState(s)
 							));
 				} else if (o == null) {
 					states.put(last, null);
-				} else {
+				} else if (o instanceof BlockState) {
+					states.put(last, (BlockState) o);
+				}else {
 					NostrumMagica.logger.warn("Found non compatible definition for type [" + last + "]");
 				}
 				

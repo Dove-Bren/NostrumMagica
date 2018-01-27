@@ -25,7 +25,10 @@ public class ModConfig {
 
 	public static enum Key {
 		//MANA_DISPLAY(),
-		SPELL_DEBUG(Category.SPELL, "spell_debug", false, false, "Print targetting debug information for spells? (Requires config on server set to true as well)");
+		SPELL_DEBUG(Category.SPELL, "spell_debug", false, false, "Print targetting debug information for spells? (Requires config on server set to true as well)"),
+		
+		
+		INNER_DEBUG(Category.TEST, "inner_debug", 0, false, "Testing debug dont use omg blow everyhing up dont do it omg zomb");
 		
 		
 //		DEPTH_S(Category.TEST, "depth_s", new Float(0.1f), false, "south depth"),
@@ -159,6 +162,34 @@ public class ModConfig {
 				return tag.getInteger(key);
 			else
 				return tag.getString(key);
+		}
+		
+		public Object getFromString(String val) {
+			if (val == null)
+				return null;
+			
+			Object out = null;
+			if (def instanceof Float) {
+				try {
+					out = Float.parseFloat(val);
+				} catch (NumberFormatException e) {
+					return null;
+				}
+			} else if (def instanceof Boolean) {
+				out = Boolean.parseBoolean(val);
+			}
+			else if (def instanceof Integer) {
+				try {
+					out = Integer.parseInt(val);
+				} catch (NumberFormatException e) {
+					return null;
+				}
+			}
+			else {
+				out = val;
+			}
+			
+			return out;
 		}
 		
 		public static Collection<Key> getCategoryKeys(Category category) {
@@ -339,11 +370,14 @@ public class ModConfig {
 			return getIntValue(key, ignoreLocal);
 		else
 			return getStringValue(key, ignoreLocal);
-	}
-	
+	}	
 	
 	public boolean spellDebug() {
 		return getBooleanValue(Key.SPELL_DEBUG, false);
+	}
+	
+	public int getInnerDebug() {
+		return getIntValue(Key.INNER_DEBUG, false);
 	}
 	
 }

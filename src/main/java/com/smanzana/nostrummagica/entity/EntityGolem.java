@@ -10,10 +10,13 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIFollowOwner;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
+import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAIOwnerHurtByTarget;
 import net.minecraft.entity.ai.EntityAIOwnerHurtTarget;
 import net.minecraft.entity.ai.EntityAISwimming;
@@ -24,7 +27,6 @@ import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -92,6 +94,7 @@ public abstract class EntityGolem extends EntityTameable implements ILoreTagged 
         this.targetTasks.addTask(1, new EntityAIOwnerHurtByTarget(this));
         this.targetTasks.addTask(2, new EntityAIOwnerHurtTarget(this));
         this.targetTasks.addTask(3, new EntityAIHurtByTarget(this, true, new Class[0]));
+        this.targetTasks.addTask(1, new GolemAIFindEntityNearestPlayer(this));
     }
     
     public abstract void initGolemAttributes();
@@ -194,11 +197,11 @@ public abstract class EntityGolem extends EntityTameable implements ILoreTagged 
 		return null;
 	}
 	
-	@Override
-	public boolean writeToNBTOptional(NBTTagCompound compound)
-    {
-		return false;
-    }
+//	@Override
+//	public boolean writeToNBTOptional(NBTTagCompound compound)
+//    {
+//		return false;
+//    }
 
 	public abstract String getTextureKey();
 	
@@ -235,6 +238,27 @@ public abstract class EntityGolem extends EntityTameable implements ILoreTagged 
 	@Override
 	public Lore getDeepLore() {
 		return new Lore().add("By infusing stones with an element, a spark of life is born.", "Golems take after the element they are infused with. Golems can have melee attacks, ranged spells, or even buffs they might share with their caster.");
+	}
+	
+	private static class GolemAIFindEntityNearestPlayer extends EntityAINearestAttackableTarget<EntityPlayer> {
+
+		protected EntityLiving rood; // parent doesn't expose
+		
+		public GolemAIFindEntityNearestPlayer(EntityCreature entityLivingIn) {
+			super(entityLivingIn, EntityPlayer.class, true);
+			this.rood = entityLivingIn;
+		}
+		
+		@Override
+		public boolean shouldExecute() {
+			if (rood instanceof EntityTameable) {
+				if (((EntityTameable) rood).getOwner() != null)
+					return false;
+			}
+			
+			return super.shouldExecute();
+		}
+		
 	}
 	
 }

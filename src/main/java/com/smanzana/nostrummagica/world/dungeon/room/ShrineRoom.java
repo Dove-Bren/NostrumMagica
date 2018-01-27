@@ -118,11 +118,6 @@ public class ShrineRoom extends StaticRoom {
 	}
 
 	@Override
-	public boolean hasPuzzle() {
-		return false;
-	}
-
-	@Override
 	public boolean hasEnemies() {
 		return false;
 	}
@@ -130,5 +125,26 @@ public class ShrineRoom extends StaticRoom {
 	@Override
 	public boolean hasTraps() {
 		return false;
+	}
+
+	@Override
+	public boolean supportsDoor() {
+		return false;
+	}
+
+	@Override
+	public boolean supportsKey() {
+		return false;
+	}
+
+	@Override
+	public DungeonExitPoint getKeyLocation(DungeonExitPoint start) {
+		return null;
+	}
+
+	@Override
+	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -38,7 +38,16 @@ public interface IDungeonRoom {
 	 */
 	public int getDifficulty();
 	
-	public boolean hasPuzzle();
+	//public boolean hasPuzzle();
+	
+	public boolean supportsDoor();
+	
+	public boolean supportsKey();
+	
+	// If supportsKey returns false, expected to return null
+	public DungeonExitPoint getKeyLocation(DungeonExitPoint start);
+	
+	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start);
 	
 	public boolean hasEnemies();
 	

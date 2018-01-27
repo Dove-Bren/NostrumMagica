@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.block.BlockChest;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -33,6 +34,25 @@ public final class LootUtil {
 		
 		TileEntityChest chest = (TileEntityChest) world.getTileEntity(pos);
 		chest.setLootTable(new ResourceLocation(loottable), rand.nextLong());
+	}
+	
+	/**
+	 * Sets a block to be a chest with the given loot inside of it.
+	 * loot should be an array exactly 27 long. Less is ok but more is ignored
+	 * @param world
+	 * @param pos
+	 * @param facing
+	 * @param loot
+	 */
+	public static final void createLoot(World world, BlockPos pos, EnumFacing facing,
+			ItemStack[] loot) {
+		world.setBlockState(pos, Blocks.CHEST.getDefaultState().withProperty(BlockChest.FACING, facing));
+		
+		TileEntityChest chest = (TileEntityChest) world.getTileEntity(pos);
+		int len = Math.min(27, loot.length);
+		for (int i = 0; i < len; i++) {
+			chest.setInventorySlotContents(i, loot[i]);
+		}
 	}
 	
 }

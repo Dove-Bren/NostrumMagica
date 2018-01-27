@@ -147,7 +147,6 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		super.updateTick(worldIn, pos, state, rand);
 		
 		for (EntityPlayer player : worldIn.playerEntities) {
-			System.out.print(".");
 			if (player.getDistanceSq(pos) < SPAWN_DIST_SQ) {
 				this.spawn(worldIn, pos, state, rand);
 				
@@ -222,9 +221,13 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 	}
 
 	
-	private static class SingleSpawnerTE extends TileEntity implements ITickable {
+	public static class SingleSpawnerTE extends TileEntity implements ITickable {
 		
 		private int life;
+		
+		public SingleSpawnerTE() {
+			life = 0;
+		}
 		
 		@Override
 		public void update() {

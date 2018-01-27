@@ -7,12 +7,14 @@ import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
+import net.minecraft.block.BlockTorch;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
-public class HallwayRoom extends StaticRoom {
+public class RoomHallway extends StaticRoom {
 	
-	public HallwayRoom() {
+	public RoomHallway() {
 		// end up providing the type of shrine!
 		super(-2, -1, 0, 2, 3, 10,
 				// Floor
@@ -28,24 +30,24 @@ public class HallwayRoom extends StaticRoom {
 				"XXXXX",
 				"XXXXX",
 				// Layer 1
-				"XX XX",
-				"X   X",
-				"X   X",
-				"X   X",
-				"X   X",
-				"X   X",
-				"X   X",
-				"X   X",
-				"X   X",
-				"X   X",
-				"XX XX",
+				"XXCXX",
+				"X C X",
+				"X C X",
+				"X C X",
+				"X C X",
+				"X C X",
+				"X C X",
+				"X C X",
+				"X C X",
+				"X C X",
+				"XXCXX",
 				// Layer 2
 				"XX XX",
 				"X   X",
 				"X   X",
 				"X   X",
 				"X   X",
-				"X   X",
+				"XE WX",
 				"X   X",
 				"X   X",
 				"X   X",
@@ -76,6 +78,9 @@ public class HallwayRoom extends StaticRoom {
 				"XXXXX",
 				"XXXXX",
 				'X', DungeonBlock.instance(),
+				'W', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.WEST)),
+				'E', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.EAST)),
+				'C', new BlockState(Blocks.CARPET, 14),
 				' ', null);
 	}
 
@@ -101,11 +106,6 @@ public class HallwayRoom extends StaticRoom {
 	}
 
 	@Override
-	public boolean hasPuzzle() {
-		return false;
-	}
-
-	@Override
 	public boolean hasEnemies() {
 		return false;
 	}
@@ -113,5 +113,25 @@ public class HallwayRoom extends StaticRoom {
 	@Override
 	public boolean hasTraps() {
 		return false;
+	}
+
+	@Override
+	public boolean supportsDoor() {
+		return false;
+	}
+
+	@Override
+	public boolean supportsKey() {
+		return false;
+	}
+
+	@Override
+	public DungeonExitPoint getKeyLocation(DungeonExitPoint start) {
+		return null;
+	}
+
+	@Override
+	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start) {
+		return new LinkedList<>();
 	}
 }

@@ -28,7 +28,6 @@ import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
-import com.smanzana.nostrummagica.world.dungeon.room.ShrineRoom;
 
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.material.Material;
@@ -1013,7 +1012,6 @@ public class PlayerListener {
 		pos.add(0, 5, 0);
 		
 		NostrumDungeon.temp.spawn(e.getWorld(), new NostrumDungeon.DungeonExitPoint(pos, EnumFacing.NORTH));
-		NostrumDungeon.temp.spawn(e.getWorld(), new NostrumDungeon.DungeonExitPoint(pos.add(0, 20, 0), EnumFacing.WEST));
 		//(new ShrineRoom()).spawn(null, e.getWorld(), new NostrumDungeon.DungeonExitPoint(pos, EnumFacing.fromAngle(e.getEntityPlayer().rotationYaw)));
 	}
 }
