@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.client.gui;
 
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
@@ -37,6 +38,8 @@ public class SpellIcon {
 
 	private static Map<EMagicElement, SpellIcon> elementCache = new EnumMap<>(EMagicElement.class);
 	private static Map<EAlteration, SpellIcon> alterationCache = new EnumMap<>(EAlteration.class);
+	private static Map<String, SpellIcon> shapeCache = new HashMap<>();
+	private static Map<String, SpellIcon> triggerCache = new HashMap<>(); 
 	
 	public static SpellIcon get(EMagicElement element) {
 		SpellIcon icon = elementCache.get(element);
@@ -58,6 +61,30 @@ public class SpellIcon {
 		return icon;
 	}
 	
+	public static SpellIcon get(SpellShape shape) {
+		String name = shape.getShapeKey();
+		SpellIcon icon = shapeCache.get(name);
+		
+		if (icon == null) {
+			icon = new SpellIcon(shape);
+			shapeCache.put(shape.getShapeKey(), icon);
+		}
+		
+		return icon;
+	}
+	
+	public static SpellIcon get(SpellTrigger trigger) {
+		String name = trigger.getTriggerKey();
+		SpellIcon icon = triggerCache.get(name);
+		
+		if (icon == null) {
+			icon = new SpellIcon(trigger);
+			triggerCache.put(trigger.getTriggerKey(), icon);
+		}
+		
+		return icon;
+	}
+	
 	private static ResourceLocation iconSheet = new ResourceLocation(
 			NostrumMagica.MODID, "textures/gui/icons.png");
 	private static int uWidthElement = 32;
@@ -73,6 +100,7 @@ public class SpellIcon {
 	private int offsetV;
 	private int width;
 	private int height;
+	private ResourceLocation model;
 	
 	private SpellIcon(EMagicElement element) {
 		int ord;
@@ -85,6 +113,9 @@ public class SpellIcon {
 		offsetU = uWidthElement * ord;
 		width = uWidthElement;
 		height = 32;
+		
+		model = new ResourceLocation(NostrumMagica.MODID,
+				"textures/models/symbol/element_" + element.name().toLowerCase() + ".png");
 	}
 	
 	private SpellIcon(EAlteration alteration) {
@@ -98,6 +129,9 @@ public class SpellIcon {
 		offsetU = uWidthAlteration * ord;
 		width = uWidthAlteration;
 		height = 32;
+		
+		model = new ResourceLocation(NostrumMagica.MODID,
+				"models/symbol/alteration_" + alteration.name().toLowerCase());
 	}
 	
 	public SpellIcon(SpellTrigger trigger) {
@@ -136,6 +170,9 @@ public class SpellIcon {
 		offsetU = uWidthTrigger * u;
 		width = uWidthTrigger;
 		height = uWidthTrigger;
+		
+		model = new ResourceLocation(NostrumMagica.MODID,
+				"models/symbol/trigger_" + trigger.getDisplayName().toLowerCase());
 	}
 	
 	public SpellIcon(SpellShape shape) {
@@ -152,6 +189,11 @@ public class SpellIcon {
 		offsetU = uWidthShape * u;
 		width = uWidthShape;
 		height = uWidthShape;
+		
+
+		
+		model = new ResourceLocation(NostrumMagica.MODID,
+				"models/symbol/shape_" + shape.getDisplayName().toLowerCase());
 	}
 	
 	public void draw(Gui parent, FontRenderer fonter, int xOffset, int yOffset, int width, int height) {
@@ -172,6 +214,10 @@ public class SpellIcon {
 				this.width, this.height);
 		
 		GL11.glPopMatrix();
+	}
+	
+	public ResourceLocation getModelLocation() {
+		return model;
 	}
 	
 }

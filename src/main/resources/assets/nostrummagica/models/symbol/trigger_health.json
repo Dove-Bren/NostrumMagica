@@ -1,0 +1,13 @@
+{
+	"parent": "builtin/generated",
+	"textures": {
+		"layer0": "trigger_health.png"
+	},
+	"display": {
+		"ground": {
+			"rotation": [ 0, 0, 0 ],
+			"translation": [ 0, 0, 0 ],
+			"scale": [ 3.0, 3.0, 3.0 ]
+		}
+	}
+}

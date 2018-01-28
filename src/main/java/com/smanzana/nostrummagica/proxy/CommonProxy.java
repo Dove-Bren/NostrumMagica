@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.blocks.ManiOre;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.blocks.SpellTable;
+import com.smanzana.nostrummagica.blocks.SymbolBlock;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagic;
@@ -285,6 +286,13 @@ public class CommonProxy {
     	GameRegistry.register(
     			(new ItemBlock(DungeonBlock.instance())).setRegistryName(DungeonBlock.ID)
     		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(DungeonBlock.ID));
+    	
+    	GameRegistry.register(SymbolBlock.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, SymbolBlock.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(SymbolBlock.instance())).setRegistryName(SymbolBlock.ID)
+    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(SymbolBlock.ID));
+    	SymbolBlock.init();
     }
     
     public void syncPlayer(EntityPlayerMP player) {

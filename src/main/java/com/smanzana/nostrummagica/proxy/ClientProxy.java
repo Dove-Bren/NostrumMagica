@@ -17,6 +17,7 @@ import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
+import com.smanzana.nostrummagica.client.render.TileEntitySymbolRenderer;
 import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.renderer.ModelGolem;
 import com.smanzana.nostrummagica.entity.renderer.RenderGolem;
@@ -131,7 +132,8 @@ public class ClientProxy extends CommonProxy {
     	
     	variants = list.toArray(new ResourceLocation[0]);
     	ModelBakery.registerItemVariants(SpellRune.instance(), variants);
-		
+    	
+    	TileEntitySymbolRenderer.init();
 	}
 	
 	@Override
