@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
+import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
@@ -11,10 +12,13 @@ import net.minecraft.block.BlockStairs;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class StartRoom extends StaticRoom {
 	
-	public StartRoom() {
+	private SpellComponentWrapper component;
+	
+	public StartRoom(SpellComponentWrapper component) {
 		// End up passing in height to surface?
 		super(-5, -1, -5, 5, 5, 5,
 				// Floor
@@ -110,6 +114,12 @@ public class StartRoom extends StaticRoom {
 				'R', new BlockState(Blocks.STONE_BRICK_STAIRS, Blocks.STONE_BRICK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.EAST).withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.BOTTOM).withProperty(BlockStairs.SHAPE, BlockStairs.EnumShape.STRAIGHT)),
 				'D', new BlockState(Blocks.STONE_BRICK_STAIRS, Blocks.STONE_BRICK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.SOUTH).withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.BOTTOM).withProperty(BlockStairs.SHAPE, BlockStairs.EnumShape.STRAIGHT)),
 				'L', new BlockState(Blocks.STONE_BRICK_STAIRS, Blocks.STONE_BRICK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.WEST).withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.BOTTOM).withProperty(BlockStairs.SHAPE, BlockStairs.EnumShape.STRAIGHT)));
+		
+		this.component = component;
+	}
+	
+	public void setComponent(SpellComponentWrapper component) {
+		this.component = component;
 	}
 
 	@Override
@@ -176,5 +186,14 @@ public class StartRoom extends StaticRoom {
 		list.add(NostrumDungeon.asRotated(start, pos, EnumFacing.SOUTH));
 		
 		return list;
+	}
+	
+	@Override
+	public void spawn(NostrumDungeon dungeon, World world, DungeonExitPoint start) {
+		super.spawn(dungeon, world, start);
+		
+		RoomExtendedStaircase stairs = new RoomExtendedStaircase(component, false);
+		DungeonExitPoint adj = new DungeonExitPoint(start.getPos().add(0, 6, 0), start.getFacing());
+		stairs.spawn(dungeon, world, adj);
 	}
 }

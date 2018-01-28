@@ -30,7 +30,7 @@ public class TileEntitySymbolRenderer extends TileEntitySpecialRenderer<SymbolTi
 		
 		// Get the model from the tile entity
 		ResourceLocation textLoc = te.getSymbolModel();
-		float rot = 2.0f * (te.getWorld().getTotalWorldTime() + partialTicks);
+		float rot = 2.0f * (Minecraft.getSystemTime() / 50 + partialTicks);
 		float scale = te.getScale();
 		VertexBuffer wr = Tessellator.getInstance().getBuffer();
 		
@@ -58,10 +58,10 @@ public class TileEntitySymbolRenderer extends TileEntitySpecialRenderer<SymbolTi
 		wr.pos(max, 1.0, 0.0).tex(0.0, 0.0).normal(0, 0, -1).endVertex();
 		
 		// -z
-		wr.pos(min, 0.0, 0.0).tex(0.0, 1.0).normal(0, 0, 1).endVertex();
-        wr.pos(max, 0.0, 0.0).tex(1.0, 1.0).normal(0, 0, 1).endVertex();
-        wr.pos(max, 1.0, 0.0).tex(1.0, 0.0).normal(0, 0, 1).endVertex();
-        wr.pos(min, 1.0, 0.0).tex(0.0, 0.0).normal(0, 0, 1).endVertex();
+		wr.pos(min, 0.0, 0.0).tex(1.0, 1.0).normal(0, 0, 1).endVertex();
+        wr.pos(max, 0.0, 0.0).tex(0.0, 1.0).normal(0, 0, 1).endVertex();
+        wr.pos(max, 1.0, 0.0).tex(0.0, 0.0).normal(0, 0, 1).endVertex();
+        wr.pos(min, 1.0, 0.0).tex(1.0, 0.0).normal(0, 0, 1).endVertex();
         
     	// -x
     	wr.pos(0.0, 0.0, min).tex(0.0, 1.0).normal(-1, 0, 0).endVertex();
@@ -70,10 +70,10 @@ public class TileEntitySymbolRenderer extends TileEntitySpecialRenderer<SymbolTi
     	wr.pos(0.0, 1.0, min).tex(0.0, 0.0).normal(-1, 0, 0).endVertex();
 		
 		// +x
-		wr.pos(0.0, 0.0, max).tex(0.0, 1.0).normal(1, 0, 0).endVertex();
-        wr.pos(0.0, 0.0, min).tex(1.0, 1.0).normal(1, 0, 0).endVertex();
-        wr.pos(0.0, 1.0, min).tex(1.0, 0.0).normal(1, 0, 0).endVertex();
-        wr.pos(0.0, 1.0, max).tex(0.0, 0.0).normal(1, 0, 0).endVertex();
+		wr.pos(0.0, 0.0, max).tex(1.0, 1.0).normal(1, 0, 0).endVertex();
+        wr.pos(0.0, 0.0, min).tex(0.0, 1.0).normal(1, 0, 0).endVertex();
+        wr.pos(0.0, 1.0, min).tex(0.0, 0.0).normal(1, 0, 0).endVertex();
+        wr.pos(0.0, 1.0, max).tex(1.0, 0.0).normal(1, 0, 0).endVertex();
 		
 		//wr.finishDrawing();
 		Tessellator.getInstance().draw();

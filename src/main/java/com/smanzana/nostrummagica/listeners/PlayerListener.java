@@ -27,7 +27,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
+import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.material.Material;
@@ -43,7 +43,6 @@ import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EntityDamageSource;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -752,19 +751,19 @@ public class PlayerListener {
 //				));
 //		SpellTome.addSpell(tome, spell);
 //		
-//		spell = new Spell("Wind Palm");
-//		spell.addPart(new SpellPart(
-//				TouchTrigger.instance(),
-//				new SpellPartParam(0, false)
-//				));
-//		spell.addPart(new SpellPart(
-//				SingleShape.instance(),
-//				EMagicElement.WIND,
-//				3,
-//				null,
-//				new SpellPartParam(0, false)
-//				));
-//		SpellTome.addSpell(tome, spell);
+		spell = new Spell("Wind Palm");
+		spell.addPart(new SpellPart(
+				TouchTrigger.instance(),
+				new SpellPartParam(0, false)
+				));
+		spell.addPart(new SpellPart(
+				SingleShape.instance(),
+				EMagicElement.WIND,
+				3,
+				null,
+				new SpellPartParam(0, false)
+				));
+		SpellTome.addSpell(tome, spell);
 //		
 //		spell = new Spell("Wind Beam Chain");
 //		spell.addPart(new SpellPart(
@@ -1011,7 +1010,7 @@ public class PlayerListener {
 		
 		pos.add(0, 5, 0);
 		
-		NostrumDungeon.temp.spawn(e.getWorld(), new NostrumDungeon.DungeonExitPoint(pos, EnumFacing.NORTH));
+		//NostrumDungeon.temp.spawn(e.getWorld(), new NostrumDungeon.DungeonExitPoint(pos, EnumFacing.NORTH));
 		//(new ShrineRoom()).spawn(null, e.getWorld(), new NostrumDungeon.DungeonExitPoint(pos, EnumFacing.fromAngle(e.getEntityPlayer().rotationYaw)));
 	}
 }

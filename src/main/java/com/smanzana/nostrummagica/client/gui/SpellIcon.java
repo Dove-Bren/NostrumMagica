@@ -172,7 +172,7 @@ public class SpellIcon {
 		height = uWidthTrigger;
 		
 		model = new ResourceLocation(NostrumMagica.MODID,
-				"textures/models/symbol/trigger_" + trigger.getDisplayName().toLowerCase() + ".png");
+				"textures/models/symbol/" + trigger.getTriggerKey().toLowerCase() + ".png");
 	}
 	
 	public SpellIcon(SpellShape shape) {
@@ -193,7 +193,7 @@ public class SpellIcon {
 
 		
 		model = new ResourceLocation(NostrumMagica.MODID,
-				"textures/models/symbol/shape_" + shape.getDisplayName().toLowerCase() + ".png");
+				"textures/models/symbol/" + shape.getShapeKey().toLowerCase() + ".png");
 	}
 	
 	public void draw(Gui parent, FontRenderer fonter, int xOffset, int yOffset, int width, int height) {

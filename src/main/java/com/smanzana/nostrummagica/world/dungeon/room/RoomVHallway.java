@@ -27,7 +27,7 @@ public class RoomVHallway extends StaticRoom {
 				"XXXXXX",
 				// Layer 1
 				"XXXXXX",
-				"XM   X",
+				"X M  X",
 				"X    X",
 				"XU   X",
 				"XCCCCX",

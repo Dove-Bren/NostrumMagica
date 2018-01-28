@@ -7,20 +7,7 @@ import java.util.Random;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.spells.EAlteration;
-import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoom;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomChallenge1;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomEnd1;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomEnd2;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomExtendedStaircase;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomHallway;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomJail1;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomLongHallway;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomTee1;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomVHallway;
-import com.smanzana.nostrummagica.world.dungeon.room.ShrineRoom;
-import com.smanzana.nostrummagica.world.dungeon.room.StartRoom;
 
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -53,7 +40,6 @@ public class NostrumDungeon {
 	private IDungeonRoom ending;
 	private IDungeonRoom starting;
 	protected NostrumDungeon self;
-	private SpellComponentWrapper component;
 	
 	// Cached subsets 
 	private List<IDungeonRoom> endRooms;
@@ -65,7 +51,7 @@ public class NostrumDungeon {
 //	private List<Path> doorPoints;
 //	private List<Path> keyPoints; // Potential keys, that is
 	
-	public NostrumDungeon(SpellComponentWrapper component, IDungeonRoom starting, IDungeonRoom ending) {
+	public NostrumDungeon(IDungeonRoom starting, IDungeonRoom ending) {
 		self = this;
 		rooms = new LinkedList<>();
 		endRooms = new LinkedList<>();
@@ -74,7 +60,6 @@ public class NostrumDungeon {
 		doorRooms = new LinkedList<>();
 		this.ending = ending;
 		this.starting = starting;
-		this.component = component;
 		
 		if (starting.getNumExits() <= 0)
 			NostrumMagica.logger.warn("Dungeon created with 0-exit starting. This will not work.");
@@ -147,11 +132,6 @@ public class NostrumDungeon {
 			index -= 1;
 			key -= 1;
 		}
-		
-		// testing starting
-		RoomExtendedStaircase stairs = new RoomExtendedStaircase(component, false);
-		DungeonExitPoint adj = new DungeonExitPoint(start.pos.add(0, 6, 0), start.facing);
-		stairs.spawn(this, world, adj);
 	}
 	
 	private class Path {
@@ -339,24 +319,6 @@ public class NostrumDungeon {
 					loot);
 		}
 	}
-	
-	public static NostrumDungeon temp = new NostrumDungeon(
-			new SpellComponentWrapper(EAlteration.GROWTH),
-			new StartRoom(),
-			new ShrineRoom()
-			).add(new RoomHallway())
-			 .add(new RoomHallway())
-			 .add(new RoomLongHallway())
-			 .add(new RoomEnd1(true, false))
-			 .add(new RoomEnd1(false, false))
-			 .add(new RoomEnd1(false, false))
-			 .add(new RoomEnd1(false, true))
-			 .add(new RoomEnd2(false))
-			 .add(new RoomEnd2(true))
-			 .add(new RoomVHallway())
-			 .add(new RoomTee1())
-			 .add(new RoomJail1())
-			 .add(new RoomChallenge1());
 	
 	public static DungeonExitPoint asRotated(DungeonExitPoint start, BlockPos offset, EnumFacing facing) {
 		int modX = 1;
