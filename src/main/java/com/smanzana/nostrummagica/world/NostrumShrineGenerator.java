@@ -4,14 +4,13 @@ import java.util.Collection;
 import java.util.Random;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
-import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
-import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
+import com.smanzana.nostrummagica.world.dungeon.NostrumShrineDungeon;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomChallenge1;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomEnd1;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomEnd2;
@@ -33,73 +32,61 @@ import net.minecraftforge.fml.common.IWorldGenerator;
 
 public class NostrumShrineGenerator implements IWorldGenerator {
 	
-	private static class ShapeComponent extends SpellComponentWrapper {
-		
-		public ShapeComponent() {
-			super(SingleShape.instance());
-		}
-		
+	private static class ShapeComponent implements NostrumShrineDungeon.ComponentGenerator {
+
 		@Override
-		public SpellShape getShape() {
+		public SpellComponentWrapper getRandom() {
 			Collection<SpellShape> shapes = SpellShape.getAllShapes();
 			int pos = NostrumMagica.rand.nextInt(shapes.size());
 			for (SpellShape shape : shapes) {
 				if (pos == 0)
-					return shape;
+					return new SpellComponentWrapper(shape);
 				pos--;
 			}
 			
 			// Error condition. Oh well.
-			return shapes.iterator().next();
+			return new SpellComponentWrapper(shapes.iterator().next());
 		}
+		
 	}
 	
-	private static class TriggerComponent extends SpellComponentWrapper {
-		
-		public TriggerComponent() {
-			super(SelfTrigger.instance());
-		}
+	private static class TriggerComponent implements NostrumShrineDungeon.ComponentGenerator {
 		
 		@Override
-		public SpellTrigger getTrigger() {
+		public SpellComponentWrapper getRandom() {
 			Collection<SpellTrigger> triggers = SpellTrigger.getAllTriggers();
-			int pos = NostrumMagica.rand.nextInt(triggers.size());
+			// AI trigger should be skipped.
+			int pos = NostrumMagica.rand.nextInt(triggers.size() - 1);
 			for (SpellTrigger trigger : triggers) {
+				if (trigger == AITargetTrigger.instance())
+					continue;
 				if (pos == 0)
-					return trigger;
+					return new SpellComponentWrapper(trigger);
 				pos--;
 			}
 			
 			// Error condition. Oh well.
-			return triggers.iterator().next();
+			return new SpellComponentWrapper(triggers.iterator().next());
 		}
 	}
 	
-	private static class ElementComponent extends SpellComponentWrapper {
-		
-		public ElementComponent() {
-			super(EMagicElement.PHYSICAL);
-		}
+	private static class ElementComponent implements NostrumShrineDungeon.ComponentGenerator {
 		
 		@Override
-		public EMagicElement getElement() {
-			return EMagicElement.values()[
-			       NostrumMagica.rand.nextInt(EMagicElement.values().length)];
+		public SpellComponentWrapper getRandom() {
+			return new SpellComponentWrapper(EMagicElement.values()[
+			       NostrumMagica.rand.nextInt(EMagicElement.values().length)]);
 		}
 	}
 	
-	private static class AlterationComponent extends SpellComponentWrapper {
-		
-		public AlterationComponent() {
-			super(EAlteration.INFLICT);
-		}
-		
-		@Override
-		public EAlteration getAlteration() {
-			return EAlteration.values()[
-			       NostrumMagica.rand.nextInt(EAlteration.values().length)];
-		}
-	}
+//	private static class AlterationComponent implements NostrumShrineDungeon.ComponentGenerator {
+//		
+//		@Override
+//		public SpellComponentWrapper getRandom() {
+//			return new SpellComponentWrapper(EAlteration.values()[
+//			       NostrumMagica.rand.nextInt(EAlteration.values().length)]);
+//		}
+//	}
 
 	private static class WorldGenNostrumShrine extends WorldGenerator {
 		
@@ -116,15 +103,16 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 	        		new NostrumDungeon.DungeonExitPoint(position, 
 	        				EnumFacing.HORIZONTALS[rand.nextInt(4)]
 	        				));
-
+	        
 	        return true;
 	    }
 	}
 	
 	private static enum DungeonGen {
-		SHAPE(new WorldGenNostrumShrine(new NostrumDungeon(
+		SHAPE(new WorldGenNostrumShrine(new NostrumShrineDungeon(
 				// Shape dungeon
-				new StartRoom(new ShapeComponent()),
+				new ShapeComponent(),
+				new StartRoom(),
 				new ShrineRoom()
 				).add(new RoomHallway())
 				 .add(new RoomHallway())
@@ -139,9 +127,10 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 				 .add(new RoomTee1())
 				 .add(new RoomJail1())
 				 .add(new RoomChallenge1())), 20, 50),
-		TRIGGER(new WorldGenNostrumShrine(new NostrumDungeon(
+		TRIGGER(new WorldGenNostrumShrine(new NostrumShrineDungeon(
 				// Trigger dungeon
-				new StartRoom(new TriggerComponent()),
+				new TriggerComponent(),
+				new StartRoom(),
 				new ShrineRoom()
 				).add(new RoomHallway())
 				 .add(new RoomHallway())
@@ -156,9 +145,10 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 				 .add(new RoomTee1())
 				 .add(new RoomJail1())
 				 .add(new RoomChallenge1())), 30, 50),
-		ELEMENT(new WorldGenNostrumShrine(new NostrumDungeon(
+		ELEMENT(new WorldGenNostrumShrine(new NostrumShrineDungeon(
 				// Trigger dungeon
-				new StartRoom(new ElementComponent()),
+				new ElementComponent(),
+				new StartRoom(),
 				new ShrineRoom()
 				).add(new RoomHallway())
 				 .add(new RoomHallway())
@@ -203,7 +193,7 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 				}
 			}
 			
-			return random.nextInt(8000) == 0;
+			return random.nextInt(6000) == 0;
 		}
 	}
 	

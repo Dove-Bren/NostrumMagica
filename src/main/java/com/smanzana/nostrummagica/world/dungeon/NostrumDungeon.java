@@ -37,8 +37,8 @@ public class NostrumDungeon {
 
 	private static Random rand = new Random();
 	private List<IDungeonRoom> rooms;
-	private IDungeonRoom ending;
-	private IDungeonRoom starting;
+	protected IDungeonRoom ending;
+	protected IDungeonRoom starting;
 	protected NostrumDungeon self;
 	
 	// Cached subsets 

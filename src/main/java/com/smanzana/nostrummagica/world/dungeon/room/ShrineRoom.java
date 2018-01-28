@@ -3,11 +3,14 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.init.Blocks;
 
-public class ShrineRoom extends StaticRoom {
+public class ShrineRoom extends StaticRoom implements ISpellComponentRoom {
+	
+	private SpellComponentWrapper component;
 	
 	public ShrineRoom() {
 		// end up providing the type of shrine!
@@ -146,5 +149,10 @@ public class ShrineRoom extends StaticRoom {
 	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void setComponent(SpellComponentWrapper component) {
+		this.component = component;
 	}
 }

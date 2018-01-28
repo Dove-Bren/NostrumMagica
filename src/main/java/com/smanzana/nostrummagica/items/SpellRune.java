@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell.SpellPart;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
+import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
@@ -643,6 +644,24 @@ public class SpellRune extends Item implements ILoreTagged {
 	@Override
 	public Lore getDeepLore() {
 		return new Lore().add("Runes are used to make new spells.", "There are four types of runes: Triggers, Shapes, Elements, and Alterations.", "Triggers define the stages of the spell and when to advance.", "Shapes determine who is affected.", "Elements are added to shapes to give the effect an element.", "Alterations morph the effect of the spell.", "Every element and alteration combination is different.", "After gaining mastery of an element, trigger, shape, or alteration, you can create runes any time you want.");
+	}
+	
+	public static SpellComponentWrapper toComponentWrapper(ItemStack rune) {
+		if (rune == null || !(rune.getItem() instanceof SpellRune))
+			return null;
+		
+		if (isElement(rune)) {
+			return new SpellComponentWrapper(getElement(rune));
+		}
+		if (isAlteration(rune)) {
+			return new SpellComponentWrapper(getAlteration(rune));
+		}
+		
+		SpellPart part = getPart(rune);
+		if (part.isTrigger())
+			return new SpellComponentWrapper(part.getTrigger());
+		else
+			return new SpellComponentWrapper(part.getShape());
 	}
 	
 }

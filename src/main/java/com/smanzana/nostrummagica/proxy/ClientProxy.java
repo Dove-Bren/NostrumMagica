@@ -30,6 +30,7 @@ import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.NostrumGuide;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.SeekerIdol;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
@@ -145,6 +146,7 @@ public class ClientProxy extends CommonProxy {
 		registerModel(SpellScroll.instance(), 0, SpellScroll.id);
 		registerModel(BlankScroll.instance(), 0, BlankScroll.id);
 		registerModel(ReagentBag.instance(), 0, ReagentBag.id);
+		registerModel(SeekerIdol.instance(), 0, SeekerIdol.id);
 		for (EnchantedWeapon weapon : EnchantedWeapon.getAll()) {
 			registerModel(weapon, 0, weapon.getModelID());
 		}

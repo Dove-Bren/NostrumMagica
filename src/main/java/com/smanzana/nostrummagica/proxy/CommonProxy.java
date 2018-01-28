@@ -36,6 +36,7 @@ import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.NostrumGuide;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.SeekerIdol;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTableItem;
@@ -241,6 +242,10 @@ public class CommonProxy {
     	ReagentBag.instance().setRegistryName(NostrumMagica.MODID, ReagentBag.id);
     	GameRegistry.register(ReagentBag.instance());
     	ReagentBag.init();
+    	
+    	SeekerIdol.instance().setRegistryName(NostrumMagica.MODID, SeekerIdol.id);
+    	GameRegistry.register(SeekerIdol.instance());
+    	SeekerIdol.init();
     }
     
     private void registerBlocks() {

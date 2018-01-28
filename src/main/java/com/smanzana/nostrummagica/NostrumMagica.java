@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.items.SeekerIdol;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
 import com.smanzana.nostrummagica.listeners.PlayerListener;
@@ -62,6 +63,7 @@ public class NostrumMagica
     
     public static SpellRegistry spellRegistry;
     private File spellRegistryFile; 
+    private File seekerRegistryFile;
     
     @EventHandler
     public void init(FMLInitializationEvent event) {
@@ -93,6 +95,8 @@ public class NostrumMagica
     		dir.mkdirs();
     	spellRegistryFile = new File(dir, "spells.dat"); 
     	loadSpellRegistry(spellRegistryFile);
+    	seekerRegistryFile = new File(dir, "dungloc.dat"); 
+    	loadSeekerRegistry(spellRegistryFile);
     	
     	new ModConfig(new Configuration(event.getSuggestedConfigurationFile()));
     }
@@ -105,11 +109,13 @@ public class NostrumMagica
     @EventHandler
     public void shutdown(FMLServerStoppingEvent event) {
     	saveSpellRegistry(spellRegistryFile);
+    	saveSeekerRegistry(seekerRegistryFile);
     }
     
     @EventHandler
     public void startup(FMLServerStartingEvent event) {
     	event.registerServerCommand(new CommandTestConfig());
+    	//loadSeekerRegistry(seekerRegistryFile);
     }
     
     /**
@@ -295,6 +301,62 @@ public class NostrumMagica
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 				logger.error("Failed to write backup file. Spell changes have been lost.");
+			}
+    	}
+    }
+    
+    
+    
+    
+    
+    private void loadSeekerRegistry(File file) {
+    	if (file == null)
+    		return;
+    	
+    	if (!file.exists())
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				logger.error("Could not create empty file where eventually we'll save "
+						+ "dungeon locs to. This is very bad!");
+				e.printStackTrace();
+				return;
+			}
+    	
+    	if (file.length() == 0)
+    		return;
+    	
+    	NBTTagCompound nbt;
+    	try {
+			nbt = CompressedStreamTools.read(file);
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error("Could not read in dungeon locations data file");
+			return;
+		}
+    	
+    	SeekerIdol.readRegistryFromNBT(nbt);
+    }
+    
+    private void saveSeekerRegistry(File file) {
+    	if (file == null)
+    		return;
+    	
+    	NBTTagCompound nbt = SeekerIdol.saveRegistryToNBT();
+    	try {
+    		CompressedStreamTools.safeWrite(nbt, file);
+    	} catch (IOException e) {
+    		e.printStackTrace();
+    		logger.error("Failed to save dungeon location dictionary! Attempting to write "
+    				+ "to temp file instead");
+    		try {
+				File backup = File.createTempFile("nostrummagica", "dungeonlocations");
+				CompressedStreamTools.write(nbt, backup);
+				logger.info("\r\n\r\nSuccessfully backed up to " + backup.getAbsolutePath());
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				logger.error("Failed to write backup file. Dungeon locations for seeking have been lost.");
 			}
     	}
     }

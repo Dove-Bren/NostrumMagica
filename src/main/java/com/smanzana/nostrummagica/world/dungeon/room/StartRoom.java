@@ -14,11 +14,11 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class StartRoom extends StaticRoom {
+public class StartRoom extends StaticRoom implements ISpellComponentRoom {
 	
 	private SpellComponentWrapper component;
 	
-	public StartRoom(SpellComponentWrapper component) {
+	public StartRoom() {
 		// End up passing in height to surface?
 		super(-5, -1, -5, 5, 5, 5,
 				// Floor
@@ -114,10 +114,9 @@ public class StartRoom extends StaticRoom {
 				'R', new BlockState(Blocks.STONE_BRICK_STAIRS, Blocks.STONE_BRICK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.EAST).withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.BOTTOM).withProperty(BlockStairs.SHAPE, BlockStairs.EnumShape.STRAIGHT)),
 				'D', new BlockState(Blocks.STONE_BRICK_STAIRS, Blocks.STONE_BRICK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.SOUTH).withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.BOTTOM).withProperty(BlockStairs.SHAPE, BlockStairs.EnumShape.STRAIGHT)),
 				'L', new BlockState(Blocks.STONE_BRICK_STAIRS, Blocks.STONE_BRICK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.WEST).withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.BOTTOM).withProperty(BlockStairs.SHAPE, BlockStairs.EnumShape.STRAIGHT)));
-		
-		this.component = component;
 	}
 	
+	@Override
 	public void setComponent(SpellComponentWrapper component) {
 		this.component = component;
 	}

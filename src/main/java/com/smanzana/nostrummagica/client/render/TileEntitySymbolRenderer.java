@@ -41,6 +41,7 @@ public class TileEntitySymbolRenderer extends TileEntitySpecialRenderer<SymbolTi
 		
 		GlStateManager.scale(scale, scale, scale);
 		GlStateManager.enableBlend();
+		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GlStateManager.disableLighting();
 		GlStateManager.enableAlpha();
 		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
