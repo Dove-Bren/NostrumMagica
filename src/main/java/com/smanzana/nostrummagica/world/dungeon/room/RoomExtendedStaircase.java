@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
@@ -20,9 +21,9 @@ public class RoomExtendedStaircase implements IDungeonRoom {
 	private RoomEntryStairs stairs;
 	private RoomEntryShrine shrine;
 	
-	public RoomExtendedStaircase(boolean dark) {
+	public RoomExtendedStaircase(SpellComponentWrapper component, boolean dark) {
 		stairs = new RoomEntryStairs(dark);
-		shrine = new RoomEntryShrine(dark);
+		shrine = new RoomEntryShrine(component, dark);
 	}
 	
 	@Override

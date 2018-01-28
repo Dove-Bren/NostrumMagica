@@ -8,7 +8,6 @@ import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
-import com.smanzana.nostrummagica.world.dungeon.room.StaticRoom.BlockState;
 
 import net.minecraft.block.BlockLadder;
 import net.minecraft.block.BlockTorch;

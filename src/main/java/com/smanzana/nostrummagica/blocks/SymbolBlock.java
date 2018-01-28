@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
@@ -17,10 +18,11 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -98,7 +100,9 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
 
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		return new SymbolTileEntity();
+		SymbolTileEntity ent = new SymbolTileEntity(5.0f);
+		
+		return ent;
 	}
 	
 	@Override
@@ -115,26 +119,54 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
         return tileentity == null ? false : tileentity.receiveClientEvent(eventID, eventParam);
 	}
 	
-	public static class SymbolTileEntity extends TileEntity implements ITickable {
+	public void setInWorld(World world, BlockPos pos, SpellComponentWrapper component) {
+		world.setBlockState(pos, this.getDefaultState());
+		SymbolTileEntity te = (SymbolTileEntity) world.getTileEntity(pos);
+		te.setComponent(component);
+	}
+	
+	public static class SymbolTileEntity extends TileEntity {
 		
-		private int alive;
 		private EMagicElement element;
 		private EAlteration alteration;
 		private SpellTrigger trigger;
 		private SpellShape shape;
 		private SpellIcon icon;
+		private float scale;
 		
 		public SymbolTileEntity() {
-			alive = 0;
 			setElement(EMagicElement.PHYSICAL);
+			this.scale = 1.0f;
+		}
+		
+		public SymbolTileEntity(float scale) {
+			this();
+			this.scale = scale;
+		}
+		
+		public float getScale() {
+			return scale;
 		}
 		
 		@Override
 		public double getMaxRenderDistanceSquared() {
-			return 4096.0;
+			return 8192.0;
 		}
 		
-		public void setElement(EMagicElement element) {
+		public void setComponent(SpellComponentWrapper wrapper) {
+			if (wrapper.isElement())
+				setElement(wrapper.getElement());
+			else if (wrapper.isAlteration())
+				setAlteration(wrapper.getAlteration());
+			else if (wrapper.isShape())
+				setShape(wrapper.getShape());
+			else
+				setTrigger(wrapper.getTrigger());
+			
+			dirty();
+		}
+		
+		private void setElement(EMagicElement element) {
 			this.element = element;
 			this.alteration = null;
 			this.trigger = null;
@@ -142,7 +174,7 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
 			icon = SpellIcon.get(element);
 		}
 		
-		public void setAlteration(EAlteration alteration) {
+		private void setAlteration(EAlteration alteration) {
 			this.element = null;
 			this.alteration = alteration;
 			this.trigger = null;
@@ -150,7 +182,7 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
 			icon = SpellIcon.get(alteration);
 		}
 		
-		public void setTrigger(SpellTrigger trigger) {
+		private void setTrigger(SpellTrigger trigger) {
 			this.element = null;
 			this.alteration = null;
 			this.trigger = trigger;
@@ -158,7 +190,7 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
 			icon = SpellIcon.get(trigger);
 		}
 		
-		public void setShape(SpellShape shape) {
+		private void setShape(SpellShape shape) {
 			this.element = null;
 			this.alteration = null;
 			this.trigger = null;
@@ -166,21 +198,13 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
 			icon = SpellIcon.get(shape);
 		}
 		
-		@Override
-		public void update() {
-			alive++;
-		}
-		
 		public ResourceLocation getSymbolModel() {
 			return icon.getModelLocation();
 		}
 		
-		public float getRotation() {
-			return ((float) alive) / (20.0f * 30.0f);
-		}
-		
 		private static final String NBT_TYPE = "type";
 		private static final String NBT_KEY = "key";
+		private static final String NBT_SCALE = "scale";
 		
 		@Override
 		public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
@@ -199,6 +223,8 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
 				nbt.setString(NBT_TYPE, "trigger");
 				nbt.setString(NBT_KEY, trigger.getTriggerKey());
 			}
+			
+			nbt.setFloat(NBT_SCALE, scale);
 			
 			return nbt;
 		}
@@ -250,6 +276,32 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
 				break;
 			}
 			
+			this.scale = nbt.getFloat(NBT_SCALE);
+			if (Math.abs(scale) < 0.01)
+				this.scale = 5.0f;
+		}
+		
+		@Override
+		public SPacketUpdateTileEntity getUpdatePacket() {
+			return new SPacketUpdateTileEntity(this.pos, 3, this.getUpdateTag());
+		}
+
+		@Override
+		public NBTTagCompound getUpdateTag() {
+			return this.writeToNBT(new NBTTagCompound());
+		}
+		
+		@Override
+		public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+			super.onDataPacket(net, pkt);
+			handleUpdateTag(pkt.getNbtCompound());
+		}
+		
+		private void dirty() {
+			worldObj.markBlockRangeForRenderUpdate(pos, pos);
+			worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 3);
+			worldObj.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
+			markDirty();
 		}
 		
 	}
