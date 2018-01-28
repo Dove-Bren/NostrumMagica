@@ -96,7 +96,7 @@ public class NostrumMagica
     	spellRegistryFile = new File(dir, "spells.dat"); 
     	loadSpellRegistry(spellRegistryFile);
     	seekerRegistryFile = new File(dir, "dungloc.dat"); 
-    	loadSeekerRegistry(spellRegistryFile);
+    	//loadSeekerRegistry(spellRegistryFile);
     	
     	new ModConfig(new Configuration(event.getSuggestedConfigurationFile()));
     }
@@ -115,7 +115,7 @@ public class NostrumMagica
     @EventHandler
     public void startup(FMLServerStartingEvent event) {
     	event.registerServerCommand(new CommandTestConfig());
-    	//loadSeekerRegistry(seekerRegistryFile);
+    	loadSeekerRegistry(seekerRegistryFile);
     }
     
     /**

@@ -21,7 +21,7 @@ import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
@@ -37,6 +37,7 @@ import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.oredict.OreDictionary;
 
 public class SeekerIdol extends Item implements ILoreTagged {
 
@@ -45,7 +46,7 @@ public class SeekerIdol extends Item implements ILoreTagged {
 	private static SeekerIdol instance = null;
 	
 	// SpellComponentWrapper's equals and hash overriden so it can be used as a key
-	private static Map<SpellComponentWrapper, List<BlockPos>> knownDungeons = new HashMap<>();
+	private static Map<String, Map<SpellComponentWrapper, List<BlockPos>>> knownDungeons = new HashMap<>();
 	
 	public static SeekerIdol instance() {
 		if (instance == null)
@@ -61,14 +62,18 @@ public class SeekerIdol extends Item implements ILoreTagged {
 	public static NBTTagCompound saveRegistryToNBT() {
 		NBTTagCompound base = new NBTTagCompound();
 		
-		for (Entry<SpellComponentWrapper, List<BlockPos>> row : knownDungeons.entrySet()) {
-			NBTTagList list = new NBTTagList();
-			
-			for (BlockPos pos : row.getValue()) {
-				list.appendTag(new NBTTagString(pos.getX() + " " + pos.getY() + " " + pos.getZ()));
+		for (Entry<String, Map<SpellComponentWrapper, List<BlockPos>>> worldMap : knownDungeons.entrySet()) {
+			NBTTagCompound nbt = new NBTTagCompound();
+			for (Entry<SpellComponentWrapper, List<BlockPos>> row : worldMap.getValue().entrySet()) {
+				NBTTagList list = new NBTTagList();
+				
+				for (BlockPos pos : row.getValue()) {
+					list.appendTag(new NBTTagString(pos.getX() + " " + pos.getY() + " " + pos.getZ()));
+				}
+				
+				nbt.setTag(row.getKey().getKeyString(), list);
 			}
-			
-			base.setTag(row.getKey().getKeyString(), list);
+			base.setTag(worldMap.getKey(), nbt);
 		}
 		
 		return base;
@@ -76,39 +81,54 @@ public class SeekerIdol extends Item implements ILoreTagged {
 	
 	public static void readRegistryFromNBT(NBTTagCompound nbt) {
 		knownDungeons.clear();
-		for (String key : nbt.getKeySet()) {
-			SpellComponentWrapper comp = SpellComponentWrapper.fromKeyString(key);
-			List<BlockPos> list = new LinkedList<>();
-			NBTTagList tags = nbt.getTagList(key, NBT.TAG_STRING);
-			for (int i = 0; i < tags.tagCount(); i++) {
-				String serial = tags.getStringTagAt(i);
-				int x = 0, y = 0, z = 0;
-				try {
-					int pos = serial.indexOf(' ');
-					x = Integer.parseInt(serial.substring(0, pos));
-					serial = serial.substring(pos + 1);
-					pos = serial.indexOf(' ');
-					y = Integer.parseInt(serial.substring(0, pos));
-					z = Integer.parseInt(serial.substring(pos + 1));
-				} catch (Exception e) {
-					NostrumMagica.logger.warn("Could not reparse dungeon location");
-					continue;
+		for (String worldid : nbt.getKeySet()) {
+			Map<SpellComponentWrapper, List<BlockPos>> worldMap = new HashMap<>();
+			for (String key : nbt.getCompoundTag(worldid).getKeySet()) {
+				SpellComponentWrapper comp = SpellComponentWrapper.fromKeyString(key);
+				List<BlockPos> list = new LinkedList<>();
+				NBTTagList tags = nbt.getCompoundTag(worldid).getTagList(key, NBT.TAG_STRING);
+				for (int i = 0; i < tags.tagCount(); i++) {
+					String serial = tags.getStringTagAt(i);
+					int x = 0, y = 0, z = 0;
+					try {
+						int pos = serial.indexOf(' ');
+						x = Integer.parseInt(serial.substring(0, pos));
+						serial = serial.substring(pos + 1);
+						pos = serial.indexOf(' ');
+						y = Integer.parseInt(serial.substring(0, pos));
+						z = Integer.parseInt(serial.substring(pos + 1));
+					} catch (Exception e) {
+						NostrumMagica.logger.warn("Could not reparse dungeon location");
+						continue;
+					}
+					BlockPos pos = new BlockPos(x, y, z);
+					list.add(pos);
 				}
 				
-				BlockPos pos = new BlockPos(x, y, z);
-				list.add(pos);
+				worldMap.put(comp, list);
 			}
-			
-			knownDungeons.put(comp, list);
+			knownDungeons.put(worldid, worldMap);
 		}
 	}
 	
-	public static void addDungeon(SpellComponentWrapper component, BlockPos center) {
-		if (!knownDungeons.containsKey(component)) {
-			knownDungeons.put(component, new LinkedList<BlockPos>());
+	private static final String GetWorldID(World world) {
+		String id = world.getWorldInfo().getWorldName()
+				+ "_" + world.getSeed();
+		return id;
+	}
+	
+	public static void addDungeon(World world, SpellComponentWrapper component, BlockPos center) {
+		String id = GetWorldID(world);
+		
+		if (!knownDungeons.containsKey(id)) {
+			knownDungeons.put(id, new HashMap<SpellComponentWrapper, List<BlockPos>>());
 		}
 		
-		knownDungeons.get(component).add(center);
+		if (!knownDungeons.get(id).containsKey(component)){
+			knownDungeons.get(id).put(component, new LinkedList<BlockPos>());
+		}
+		
+		knownDungeons.get(id).get(component).add(center);
 	}
 	
 	public static final String id = "seeker_idol";
@@ -127,7 +147,7 @@ public class SeekerIdol extends Item implements ILoreTagged {
 		
 		NBTTagCompound nbt = itemStackIn.getTagCompound();
 		
-		if (nbt == null || !nbt.hasKey(NBT_TYPE, NBT.TAG_STRING) || nbt.hasKey(NBT_KEY, NBT.TAG_STRING))
+		if (nbt == null || !nbt.hasKey(NBT_TYPE, NBT.TAG_STRING) || !nbt.hasKey(NBT_KEY, NBT.TAG_STRING))
 			return new SpellComponentWrapper(EMagicElement.PHYSICAL);
 		
 		String type = nbt.getString(NBT_TYPE).toLowerCase();
@@ -187,7 +207,8 @@ public class SeekerIdol extends Item implements ILoreTagged {
 		if (dir == null) {
 			playerIn.addChatComponentMessage(new TextComponentString("Could not find a shrine of that type! Explore the world more."));
 		} else {
-			playerIn.addVelocity(dir.xCoord * 2, 0, dir.zCoord * 2);
+			playerIn.addVelocity(dir.xCoord * 1, 0, dir.zCoord * 1);
+			playerIn.velocityChanged = true;
 			itemStackIn.damageItem(1, playerIn);
 		}
 		
@@ -199,12 +220,15 @@ public class SeekerIdol extends Item implements ILoreTagged {
 		BlockPos targ = null;
 		double min = Double.MAX_VALUE;
 		BlockPos from = new BlockPos(pos);
+		String worldID = GetWorldID(world);
 		
-		if (!knownDungeons.containsKey(component)) {
+		if (!knownDungeons.containsKey(worldID)) {
 			return null;
 		}
+		if (!knownDungeons.get(worldID).containsKey(component))
+			return null;
 		
-		for (BlockPos bp : knownDungeons.get(component)) {
+		for (BlockPos bp : knownDungeons.get(worldID).get(component)) {
 			if (targ == null) {
 				targ = bp;
 				min = bp.distanceSq(from);
@@ -239,7 +263,10 @@ public class SeekerIdol extends Item implements ILoreTagged {
 		String key = "";
 		if (component.isElement()) {
 			type = "element";
-			key = component.getElement().getName();
+			key = component.getElement().name();
+		} else if (component.isAlteration()) {
+			type = "alteration";
+			key = component.getAlteration().name();
 		} else if (component.isShape()) {
 			type = "shape";
 			key = component.getShape().getShapeKey();
@@ -305,62 +332,33 @@ public class SeekerIdol extends Item implements ILoreTagged {
 		return stack;
 	}
 	
-	private static class IdolRecipe implements IRecipe {
+	private static class IdolRecipe extends ShapedRecipes {
 
-		@Override
-		public boolean matches(InventoryCrafting inv, World worldIn) {
-			if (inv.getSizeInventory() < 9)
-				return false;
-			
-			for (int i = 0; i < 9; i++) {
-				if (inv.getStackInSlot(i) == null)
-					return false;
-			}
-			
-			Item stone = Item.getItemFromBlock(Blocks.STONE);
-			if (!(inv.getStackInSlot(0).getItem() == stone &&
-					inv.getStackInSlot(2).getItem() == stone &&
-					inv.getStackInSlot(3).getItem() == stone &&
-					inv.getStackInSlot(5).getItem() == stone &&
-					inv.getStackInSlot(6).getItem() == stone &&
-					inv.getStackInSlot(8).getItem() == stone
-					))
-				return false;
-			
-			if ((inv.getStackInSlot(1).getItem() instanceof ReagentItem))
-				return false;
-			
-			if (inv.getStackInSlot(7).getItem() != Items.GOLD_INGOT)
-				return false;
-			
-			return (inv.getStackInSlot(5).getItem() instanceof SpellRune);
+		//public ShapedRecipes(int width, int height, ItemStack[] p_i1917_3_, ItemStack output)
+		public IdolRecipe() {
+			super(3, 3, new ItemStack[] {
+				new ItemStack(Blocks.COBBLESTONE),
+				new ItemStack(ReagentItem.instance(), 1, OreDictionary.WILDCARD_VALUE),
+				new ItemStack(Blocks.COBBLESTONE),
+				new ItemStack(Blocks.COBBLESTONE),
+				new ItemStack(SpellRune.instance(), 1, OreDictionary.WILDCARD_VALUE),
+				new ItemStack(Blocks.COBBLESTONE),
+				new ItemStack(Blocks.COBBLESTONE),
+				new ItemStack(Items.GOLD_INGOT),
+				new ItemStack(Blocks.COBBLESTONE),	
+			}, SeekerIdol.getItemStack(new SpellComponentWrapper(EMagicElement.PHYSICAL)));
 		}
-
+		
 		@Override
 		public ItemStack getCraftingResult(InventoryCrafting inv) {
 			// Just care about the rune in the center
-			ItemStack rune = inv.getStackInSlot(5);
+			ItemStack rune = inv.getStackInSlot(4);
 			SpellComponentWrapper comp = SpellRune.toComponentWrapper(rune);
-			if (comp == null)
+			if (comp == null) {
 				return null;
+			}
 			
 			return SeekerIdol.getItemStack(comp);
 		}
-
-		@Override
-		public int getRecipeSize() {
-			return 4;
-		}
-
-		@Override
-		public ItemStack getRecipeOutput() {
-			return SpellRune.getRune(EMagicElement.FIRE, 1);
-		}
-
-		@Override
-		public ItemStack[] getRemainingItems(InventoryCrafting inv) {
-			return new ItemStack[inv.getSizeInventory()];
-		}
-		
 	}
 }

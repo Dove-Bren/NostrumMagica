@@ -26,7 +26,7 @@ public class NostrumShrineDungeon extends NostrumDungeon {
 		((ISpellComponentRoom) this.starting).setComponent(comp);
 		((ISpellComponentRoom) this.ending).setComponent(comp);
 		
-        SeekerIdol.addDungeon(comp, start.getPos());
+        SeekerIdol.addDungeon(world, comp, start.getPos());
 		
 		super.spawn(world, start);
 	}
