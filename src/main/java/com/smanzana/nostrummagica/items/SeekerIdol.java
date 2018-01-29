@@ -38,6 +38,8 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.oredict.RecipeSorter;
+import net.minecraftforge.oredict.RecipeSorter.Category;
 
 public class SeekerIdol extends Item implements ILoreTagged {
 
@@ -347,6 +349,9 @@ public class SeekerIdol extends Item implements ILoreTagged {
 				new ItemStack(Items.GOLD_INGOT),
 				new ItemStack(Blocks.COBBLESTONE),	
 			}, SeekerIdol.getItemStack(new SpellComponentWrapper(EMagicElement.PHYSICAL)));
+			
+			RecipeSorter.register(NostrumMagica.MODID + ":IdolRecipe",
+					this.getClass(), Category.SHAPED, "after:minecraft:shaped");
 		}
 		
 		@Override
