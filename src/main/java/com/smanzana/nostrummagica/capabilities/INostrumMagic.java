@@ -68,8 +68,10 @@ public interface INostrumMagic {
 	public void addShape(SpellShape shape);
 	public List<SpellTrigger> getTriggers();
 	public void addTrigger(SpellTrigger trigger);
-	public Map<EMagicElement, Boolean> getElements();
-	public void unlockElement(EMagicElement element);
+	public Map<EMagicElement, Boolean> getKnownElements();
+	public void learnElement(EMagicElement element);
+	public Map<EMagicElement, Boolean> getMasteredElements();
+	public void masterElement(EMagicElement element);
 	public Map<EAlteration, Boolean> getAlterations();
 	public void unlockAlteration(EAlteration alteration);
 	
@@ -87,7 +89,8 @@ public interface INostrumMagic {
 	
 	public Map<String, Integer> serializeLoreLevels();
 	public Set<String> serializeSpellHistory();
-	public Map<EMagicElement, Boolean> serializeElements();
+	public Map<EMagicElement, Boolean> serializeKnownElements();
+	public Map<EMagicElement, Boolean> serializeMasteredElements();
 	public Map<EAlteration, Boolean> serializeAlterations();
 	public void deserializeLore(String key, Integer level);
 	public void deserializeSpells(String crc);

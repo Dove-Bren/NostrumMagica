@@ -3,13 +3,23 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.smanzana.nostrummagica.blocks.DungeonBlock;
+import com.smanzana.nostrummagica.blocks.ShrineBlock;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
+import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
+import net.minecraft.block.BlockStairs;
+import net.minecraft.block.BlockTorch;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class ShrineRoom extends StaticRoom implements ISpellComponentRoom {
-	
+
+	private static final int blockXOffset = 0;
+	private static final int blockZOffset = 8;
 	private SpellComponentWrapper component;
 	
 	public ShrineRoom() {
@@ -28,45 +38,45 @@ public class ShrineRoom extends StaticRoom implements ISpellComponentRoom {
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",
 				// Layer 1
-				"XXXXX XXXXX",
-				"X 	X      X",
-				"X  XXXX   X",
-				"X         X",
-				"X         X",
-				"X         X",
-				"X     XXXXX",
-				"X         X",
-				"X         X",
-				"X         X",
+				"XXXXXCXXXXX",
+				"X 	  C    X",
+				"X    C    X",
+				"X    C    X",
+				"X    C    X",
+				"X   CCC   X",
+				"X   DDD   X",
+				"XQQQQQQQQQX",
+				"XQQQQQQQQQX",
+				"XQQQQQQQQQX",
 				"XXXXXXXXXXX",
 				// Layer 2
 				"XXXXX XXXXX",
-				"X 	X      X",
-				"X  XXXX   X",
+				"X 	S   S  X",
 				"X         X",
 				"X         X",
 				"X         X",
-				"X     XXXXX",
+				"XE       WX",
 				"X         X",
 				"X         X",
+				"X    0    X",
 				"X         X",
 				"XXXXXXXXXXX",
 				// Layer 3
 				"XXXXXXXXXXX",
-				"X 	X      X",
-				"X  XXXX   X",
+				"X 	       X",
 				"X         X",
 				"X         X",
 				"X         X",
-				"X     XXXXX",
 				"X         X",
 				"X         X",
 				"X         X",
+				"X         X",
+				"X  N   N  X",
 				"XXXXXXXXXXX",
 				// Layer 4
 				"XXXXXXXXXXX",
-				"X 	X      X",
-				"X  XXXX   X",
+				"X 	       X",
+				"X         X",
 				"X         X",
 				"X         X",
 				"X         X",
@@ -77,8 +87,8 @@ public class ShrineRoom extends StaticRoom implements ISpellComponentRoom {
 				"XXXXXXXXXXX",
 				// Layer 5
 				"XXXXXXXXXXX",
-				"X 	X      X",
-				"X  XXXX   X",
+				"X 	       X",
+				"X         X",
 				"X         X",
 				"X         X",
 				"X         X",
@@ -90,19 +100,23 @@ public class ShrineRoom extends StaticRoom implements ISpellComponentRoom {
 				// Ceil
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",
-				"XXXXXDXXXXX",
-				"XXXXXTXXXXX",
-				"XXXXXTXXXXX",
-				"XXXXXTXXXXX",
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",
-				'X', Blocks.GOLD_BLOCK,//DungeonBlock.instance(),
+				"XXXXXXXXXXX",
+				"XXXXXXXXXXX",
+				"XXXXXXXXXXX",
+				"XXXXXXXXXXX",
+				'X', DungeonBlock.instance(),
+				'Q', Blocks.QUARTZ_BLOCK,
+				'W', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.WEST)),
+				'E', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.EAST)),
+				'S', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.SOUTH)),
+				'N', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.NORTH)),
 				' ', null,
-				'D', Blocks.REDSTONE_BLOCK,
-				'T', Blocks.COAL_BLOCK);
+				'D', new BlockState(Blocks.STONE_BRICK_STAIRS, Blocks.STONE_BRICK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.SOUTH).withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.BOTTOM).withProperty(BlockStairs.SHAPE, BlockStairs.EnumShape.STRAIGHT)));
 	}
 
 	@Override
@@ -154,5 +168,13 @@ public class ShrineRoom extends StaticRoom implements ISpellComponentRoom {
 	@Override
 	public void setComponent(SpellComponentWrapper component) {
 		this.component = component;
+	}
+	
+	@Override
+	public void spawn(NostrumDungeon dungeon, World world, DungeonExitPoint start) {
+		super.spawn(dungeon, world, start);
+		
+		BlockPos pos = NostrumDungeon.asRotated(start, new BlockPos(blockXOffset, 1, blockZOffset), EnumFacing.NORTH).getPos();
+		ShrineBlock.instance().setInWorld(world, pos, component);
 	}
 }

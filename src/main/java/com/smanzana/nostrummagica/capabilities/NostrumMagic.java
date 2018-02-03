@@ -19,6 +19,8 @@ import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.text.TextComponentString;
 
 /**
  * Default implementation of the INostrumMagic interface
@@ -59,7 +61,8 @@ public class NostrumMagic implements INostrumMagic {
 	
 	private Map<String, Integer> loreLevels;
 	private Set<String> spellCRCs; // spells we've done's CRCs
-	private Map<EMagicElement, Boolean> elements;
+	private Map<EMagicElement, Boolean> knownElements;
+	private Map<EMagicElement, Boolean> masteredElements;
 	private List<SpellShape> shapes; // list of shape keys
 	private List<SpellTrigger> triggers; // list of trigger keys
 	private Map<EAlteration, Boolean> alterations;
@@ -71,7 +74,8 @@ public class NostrumMagic implements INostrumMagic {
 		//familiars = new LinkedList<>();
 		loreLevels = new HashMap<>();
 		spellCRCs = new HashSet<>();
-		elements = new EnumMap<>(EMagicElement.class);
+		knownElements = new EnumMap<>(EMagicElement.class);
+		masteredElements = new EnumMap<>(EMagicElement.class);
 		shapes = new LinkedList<>();
 		triggers = new LinkedList<>();
 		alterations = new EnumMap<>(EAlteration.class);
@@ -303,8 +307,13 @@ public class NostrumMagic implements INostrumMagic {
 	}
 
 	@Override
-	public Map<EMagicElement, Boolean> getElements() {
-		return elements;
+	public Map<EMagicElement, Boolean> getKnownElements() {
+		return knownElements;
+	}
+
+	@Override
+	public Map<EMagicElement, Boolean> getMasteredElements() {
+		return masteredElements;
 	}
 
 	@Override
@@ -315,21 +324,73 @@ public class NostrumMagic implements INostrumMagic {
 	@Override
 	public void addShape(SpellShape shape) {
 		shapes.add(shape);
+		
+		doUnlockCheck();
 	}
 
 	@Override
 	public void addTrigger(SpellTrigger trigger) {
 		triggers.add(trigger);
+		
+		doUnlockCheck();
 	}
 
 	@Override
-	public void unlockElement(EMagicElement element) {
-		elements.put(element, Boolean.TRUE);
+	public void learnElement(EMagicElement element) {
+		Boolean old = knownElements.put(element, Boolean.TRUE);
+		if (old == null || !old) {
+			// Learned for the first time
+			// TODO effect
+			if (this.entity != null && !this.entity.worldObj.isRemote
+					&& this.entity instanceof EntityPlayer) {
+				EntityPlayer player = (EntityPlayer) this.entity;
+				player.addChatComponentMessage(new TextComponentString("The forces of "
+						+ element.getName() + " have been unlocked!"));
+			}
+
+			doUnlockCheck();
+		}
+	}
+
+	@Override
+	public void masterElement(EMagicElement element) {
+		Boolean known = knownElements.get(element);
+		if (known == null || !known)
+			learnElement(element);
+		
+		masteredElements.put(element, Boolean.TRUE);
 	}
 
 	@Override
 	public void unlockAlteration(EAlteration alteration) {
 		alterations.put(alteration, Boolean.TRUE);
+		doUnlockCheck();
+	}
+	
+	private void doUnlockCheck() {
+		if (this.unlocked)
+			return;
+		
+		// Unlock (ritual of discovery) if at least one shape and trigger
+		// and all elements have been 'discovered'.
+		
+		if (shapes.isEmpty() || triggers.isEmpty())
+			return;
+		
+		for (EMagicElement e : EMagicElement.values()) {
+			if (knownElements.get(e) == null
+					|| !knownElements.get(e))
+				return;
+		}
+		
+		// TODO effects
+		if (this.entity != null && !this.entity.worldObj.isRemote
+				&& this.entity instanceof EntityPlayer) {
+			EntityPlayer player = (EntityPlayer) this.entity;
+			player.addChatComponentMessage(new TextComponentString(
+					"Magic Unlocked"));
+		}
+		
 	}
 
 	@Override
@@ -358,8 +419,13 @@ public class NostrumMagic implements INostrumMagic {
 	}
 
 	@Override
-	public Map<EMagicElement, Boolean> serializeElements() {
-		return this.elements;
+	public Map<EMagicElement, Boolean> serializeKnownElements() {
+		return this.knownElements;
+	}
+
+	@Override
+	public Map<EMagicElement, Boolean> serializeMasteredElements() {
+		return this.masteredElements;
 	}
 
 	@Override
@@ -386,7 +452,8 @@ public class NostrumMagic implements INostrumMagic {
 		
 		this.loreLevels = cap.serializeLoreLevels();
 		this.spellCRCs = cap.serializeSpellHistory();
-		this.elements = cap.serializeElements();
+		this.knownElements = cap.serializeKnownElements();
+		this.masteredElements = cap.serializeMasteredElements();
 		this.alterations = cap.serializeAlterations();
 		this.shapes = cap.getShapes();
 		this.triggers = cap.getTriggers();

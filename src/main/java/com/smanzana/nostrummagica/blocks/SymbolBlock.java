@@ -166,6 +166,19 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
 			dirty();
 		}
 		
+		public SpellComponentWrapper getComponent() {
+			if (element != null)
+				return new SpellComponentWrapper(element);
+			if (alteration != null)
+				return new SpellComponentWrapper(alteration);
+			if (trigger != null)
+				return new SpellComponentWrapper(trigger);
+			if (shape != null)
+				return new SpellComponentWrapper(shape);
+			
+			return null;
+		}
+		
 		private void setElement(EMagicElement element) {
 			this.element = element;
 			this.alteration = null;

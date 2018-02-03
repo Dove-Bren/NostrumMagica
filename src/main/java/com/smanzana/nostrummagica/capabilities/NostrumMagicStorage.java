@@ -32,7 +32,8 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	
 	private static final String NBT_LORELEVELS = "lore";
 	private static final String NBT_SPELLCRCS = "spellcrcs"; // spells we've done's CRCs
-	private static final String NBT_ELEMENTS = "elements";
+	private static final String NBT_KNOWN_ELEMENTS = "known_elements";
+	private static final String NBT_MASTERED_ELEMENTS = "mastered_elements";
 	private static final String NBT_SHAPES = "shapes"; // list of shape keys
 	private static final String NBT_TRIGGERS = "triggers"; // list of trigger keys
 	private static final String NBT_ALTERATIONS = "alterations";
@@ -67,12 +68,21 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		
 		compound = new NBTTagCompound();
 		{
-			Map<EMagicElement, Boolean> map = instance.serializeElements();
+			Map<EMagicElement, Boolean> map = instance.serializeKnownElements();
 			for (EMagicElement key : map.keySet()) {
 				compound.setBoolean(key.name(), map.get(key));
 			}
 		}
-		nbt.setTag(NBT_ELEMENTS, compound);
+		nbt.setTag(NBT_KNOWN_ELEMENTS, compound);
+		
+		compound = new NBTTagCompound();
+		{
+			Map<EMagicElement, Boolean> map = instance.serializeMasteredElements();
+			for (EMagicElement key : map.keySet()) {
+				compound.setBoolean(key.name(), map.get(key));
+			}
+		}
+		nbt.setTag(NBT_MASTERED_ELEMENTS, compound);
 		
 		list = new NBTTagList();
 		for (SpellShape shape : instance.getShapes()) {
@@ -125,13 +135,23 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			instance.deserializeSpells(list.getStringTagAt(i));
 		}
 		
-		// ELEMENTS
-		compound = tag.getCompoundTag(NBT_ELEMENTS);
+		// KNOWNELEMENTS
+		compound = tag.getCompoundTag(NBT_KNOWN_ELEMENTS);
 		for (String key : compound.getKeySet()) {
 			Boolean val = compound.getBoolean(key);
 			if (val != null && val) {
 				EMagicElement elem = EMagicElement.valueOf(key);
-				instance.unlockElement(elem);
+				instance.learnElement(elem);
+			}
+		}
+		
+		// ELEMENTS
+		compound = tag.getCompoundTag(NBT_MASTERED_ELEMENTS);
+		for (String key : compound.getKeySet()) {
+			Boolean val = compound.getBoolean(key);
+			if (val != null && val) {
+				EMagicElement elem = EMagicElement.valueOf(key);
+				instance.masterElement(elem);
 			}
 		}
 		
