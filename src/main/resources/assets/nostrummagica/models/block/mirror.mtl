@@ -1,0 +1,20 @@
+# Blender MTL File: 'mirror.blend'
+# Material Count: 3
+
+newmtl Material.001
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+d 1.000000
+map_Kd nostrummagica:blocks/stone_generic1
+
+newmtl Material.002
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+d 1.000000
+map_Kd nostrummagica:blocks/mirror
+
+newmtl Material.003
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+d 1.000000
+map_Kd nostrummagica:blocks/ceramic_generic

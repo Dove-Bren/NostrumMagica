@@ -137,7 +137,7 @@ public class CursedIce extends Block {
 	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
 		int level = state.getValue(LEVEL);
 		
-		if (NostrumMagica.rand.nextFloat() <= 0.2f * (float) level) {
+		if (NostrumMagica.rand.nextFloat() <= 0.2f * (float) (level + 1)) {
 			List<BlockPos> targets = Lists.newArrayList(pos.add(1, 0, 0),
 									pos.add(0, 0, 1),
 									pos.add(-1, 0, 0),

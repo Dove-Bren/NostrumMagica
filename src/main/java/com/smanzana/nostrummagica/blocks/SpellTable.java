@@ -312,7 +312,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 		this.setResistance(15.0f);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setSoundType(SoundType.WOOD);
-		this.setHarvestLevel("axe", 3);
+		this.setHarvestLevel("axe", 1);
 		
 		this.setDefaultState(this.blockState.getBaseState().withProperty(MASTER, true)
 				.withProperty(FACING, EnumFacing.NORTH));

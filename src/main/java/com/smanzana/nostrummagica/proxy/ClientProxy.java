@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.blocks.ManiOre;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
+import com.smanzana.nostrummagica.blocks.NostrumMirrorBlock;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
@@ -63,6 +64,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.client.event.MouseEvent;
+import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
@@ -135,6 +137,8 @@ public class ClientProxy extends CommonProxy {
     	ModelBakery.registerItemVariants(SpellRune.instance(), variants);
     	
     	TileEntitySymbolRenderer.init();
+    	
+    	OBJLoader.INSTANCE.addDomain(NostrumMagica.MODID);
 	}
 	
 	@Override
@@ -213,6 +217,10 @@ public class ClientProxy extends CommonProxy {
 				DungeonBlock.Type.LIGHT.ordinal(),
 				DungeonBlock.Type.LIGHT.getName()
 				);
+		
+		registerModel(new ItemBlock(NostrumMirrorBlock.instance()),
+				0,
+				NostrumMirrorBlock.ID);
 	}
 	
 	@Override

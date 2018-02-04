@@ -36,7 +36,7 @@ public class TileEntitySymbolRenderer extends TileEntitySpecialRenderer<SymbolTi
 		
 		Minecraft.getMinecraft().getTextureManager().bindTexture(textLoc);
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(x + .5, y + .5, z + .5);
+		GlStateManager.translate(x + .5, y + 1.25, z + .5);
 		GlStateManager.rotate(rot, 0, 10, 0);
 		
 		GlStateManager.scale(scale, scale, scale);

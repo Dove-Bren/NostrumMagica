@@ -28,7 +28,6 @@ import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -199,7 +198,7 @@ public class SpellIcon {
 	public void draw(Gui parent, FontRenderer fonter, int xOffset, int yOffset, int width, int height) {
 		GL11.glPushMatrix();
 
-		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+		//GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 		float scaleU = (float) width / (float) this.width;
 		float scaleV = (float) height / (float) this.height;
 		
