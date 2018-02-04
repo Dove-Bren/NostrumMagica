@@ -1,6 +1,9 @@
 package com.smanzana.nostrummagica.world;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -36,6 +39,11 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 
 		@Override
 		public SpellComponentWrapper getRandom() {
+			if (!queuedWrappers.isEmpty()) {
+				if (queuedWrappers.get(0).isShape())
+					return queuedWrappers.remove(0);
+			}
+			
 			Collection<SpellShape> shapes = SpellShape.getAllShapes();
 			int pos = NostrumMagica.rand.nextInt(shapes.size());
 			for (SpellShape shape : shapes) {
@@ -54,6 +62,11 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 		
 		@Override
 		public SpellComponentWrapper getRandom() {
+			if (!queuedWrappers.isEmpty()) {
+				if (queuedWrappers.get(0).isTrigger())
+					return queuedWrappers.remove(0);
+			}
+			
 			Collection<SpellTrigger> triggers = SpellTrigger.getAllTriggers();
 			// AI trigger should be skipped.
 			int pos = NostrumMagica.rand.nextInt(triggers.size() - 1);
@@ -74,6 +87,11 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 		
 		@Override
 		public SpellComponentWrapper getRandom() {
+			if (!queuedWrappers.isEmpty()) {
+				if (queuedWrappers.get(0).isElement())
+					return queuedWrappers.remove(0);
+			}
+			
 			return new SpellComponentWrapper(EMagicElement.values()[
 			       NostrumMagica.rand.nextInt(EMagicElement.values().length)]);
 		}
@@ -193,20 +211,58 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 				}
 			}
 			
-			return random.nextInt(6000) == 0;
+			int count = 1;
+			if (this == ELEMENT)
+				count = EMagicElement.values().length;
+			else if (this == SHAPE)
+				count = SpellShape.getAllShapes().size();
+			else if (this == TRIGGER)
+				count = SpellTrigger.getAllTriggers().size();
+			
+			return random.nextInt(7000) < count;
 		}
 	}
+	
+	// Some items can queue a certain type of shrine to be spawned next.
+	// This list is the queue
+	// We don't persist it, though :shrug:
+	private static List<SpellComponentWrapper> queuedWrappers = new LinkedList<>();
+	private static int forceTimer = -1;
 	
 	public NostrumShrineGenerator() {
 		
 	}
+	
+	public static void enqueueShrineRequest(SpellComponentWrapper type) {
+		queuedWrappers.add(type);
+	}
+	
+	public static void forceSpawn(int chunks) {
+		forceTimer = Math.max(0, chunks);
+	}
+	
+	private List<DungeonGen> list;
 	
 	@Override
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
 		if (world.provider.getDimension() != 0)
 			return;
 		
-		for (DungeonGen gen : DungeonGen.values()) {
+		if (list == null) {
+			list = new LinkedList<DungeonGen>();
+			for (DungeonGen gen : DungeonGen.values())
+				list.add(gen);
+		}
+		Collections.shuffle(list);
+		
+		if (forceTimer == 0) {
+			DungeonGen gen = list.get(0);
+			runGenerator(gen.getGenerator(), world, random, chunkX, chunkZ,
+					gen.getMinY(), gen.getMaxY());
+			return;
+		}
+		
+		for (DungeonGen gen : list) {
 			if (gen.chanceSpawn(random, world, chunkX, chunkZ)) {
 				runGenerator(gen.getGenerator(), world, random, chunkX, chunkZ,
 					gen.getMinY(), gen.getMaxY());

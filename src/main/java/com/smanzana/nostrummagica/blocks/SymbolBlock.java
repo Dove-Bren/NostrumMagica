@@ -225,10 +225,10 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
 			
 			if (element != null) {
 				nbt.setString(NBT_TYPE, "element");
-				nbt.setString(NBT_KEY, element.getName());
+				nbt.setString(NBT_KEY, element.name());
 			} else if (alteration != null) {
 				nbt.setString(NBT_TYPE, "alteration");
-				nbt.setString(NBT_KEY, alteration.getName());
+				nbt.setString(NBT_KEY, alteration.name());
 			} else if (shape != null) {
 				nbt.setString(NBT_TYPE, "shape");
 				nbt.setString(NBT_KEY, shape.getShapeKey());

@@ -33,6 +33,7 @@ import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SeekerIdol;
+import com.smanzana.nostrummagica.items.ShrineSeekingGem;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTableItem;
@@ -151,6 +152,7 @@ public class ClientProxy extends CommonProxy {
 		registerModel(BlankScroll.instance(), 0, BlankScroll.id);
 		registerModel(ReagentBag.instance(), 0, ReagentBag.id);
 		registerModel(SeekerIdol.instance(), 0, SeekerIdol.id);
+		registerModel(ShrineSeekingGem.instance(), 0, ShrineSeekingGem.id);
 		for (EnchantedWeapon weapon : EnchantedWeapon.getAll()) {
 			registerModel(weapon, 0, weapon.getModelID());
 		}

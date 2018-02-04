@@ -63,6 +63,21 @@ public class NostrumMirrorBlock extends Block {
 	}
 	
 	@Override
+	public boolean isVisuallyOpaque() {
+		return false;
+	}
+	
+	@Override
+	public boolean isOpaqueCube(IBlockState state) {
+		return false;
+	}
+	
+	@Override
+	public boolean isFullCube(IBlockState state) {
+        return false;
+    }
+	
+	@Override
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		
 		playerIn.openGui(NostrumMagica.instance,
@@ -139,12 +154,46 @@ public class NostrumMirrorBlock extends Block {
 			// TEXT DRAWING
 			if (unlocked) {
 				// DRAW STATS
+				int y = 2;
+				int len;
+				int colorKey = 0xFF0ACE00;
+				int colorVal = 0xFFE4E5D5;
+				String str;
+				
+				str = "Level " + attr.getLevel();
+				len = fontRendererObj.getStringWidth(str);
+				this.fontRendererObj.drawString(str, (this.width - len) / 2, topOffset + TEXT_BOTTOM_VOFFSET, 0xFFFFFFFF, true);
+				y += fontRendererObj.FONT_HEIGHT + 10;
+				
+				//leftOffset + TEXT_BOTTOM_HOFFSET, y + topOffset + TEXT_BOTTOM_VOFFSET, colorKey
+				Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET - 2, topOffset + TEXT_BOTTOM_VOFFSET + y - 2, leftOffset + TEXT_BOTTOM_HOFFSET + 50 + 2, topOffset + TEXT_BOTTOM_VOFFSET + y + 2 + this.fontRendererObj.FONT_HEIGHT, 0xD0000000);
+				str = "Control: ";
+				len = fontRendererObj.getStringWidth(str);
+				this.fontRendererObj.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET, y + topOffset + TEXT_BOTTOM_VOFFSET, colorKey);
+				this.fontRendererObj.drawString("" + attr.getControl(), leftOffset + len + TEXT_BOTTOM_HOFFSET, y + topOffset + TEXT_BOTTOM_VOFFSET, colorVal);
+				y += fontRendererObj.FONT_HEIGHT + 10;
+				
+				Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET - 2, topOffset + TEXT_BOTTOM_VOFFSET + y - 2, leftOffset + TEXT_BOTTOM_HOFFSET + 50 + 2, topOffset + TEXT_BOTTOM_VOFFSET + y + 2 + this.fontRendererObj.FONT_HEIGHT, 0xD0000000);
+				str = "Technique: ";
+				len = fontRendererObj.getStringWidth(str);
+				this.fontRendererObj.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET, y + topOffset + (TEXT_BOTTOM_VOFFSET / 2), colorKey);
+				this.fontRendererObj.drawString("" + attr.getTech(), leftOffset + len + TEXT_BOTTOM_HOFFSET, y + topOffset + TEXT_BOTTOM_VOFFSET, colorVal);
+				y += fontRendererObj.FONT_HEIGHT + 10;
+				
+				Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET - 2, topOffset + TEXT_BOTTOM_VOFFSET + y - 2, leftOffset + TEXT_BOTTOM_HOFFSET + 50 + 2, topOffset + TEXT_BOTTOM_VOFFSET + y + 2 + this.fontRendererObj.FONT_HEIGHT, 0xD0000000);
+				str = "Finess: ";
+				len = fontRendererObj.getStringWidth(str);
+				this.fontRendererObj.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET, y + topOffset + (TEXT_BOTTOM_VOFFSET / 2), colorKey);
+				this.fontRendererObj.drawString("" + attr.getFinesse(), leftOffset + len + TEXT_BOTTOM_HOFFSET, y + topOffset + TEXT_BOTTOM_VOFFSET, colorVal);
+				//y += fontRendererObj.FONT_HEIGHT + 10;
+				
 			} else if (attr != null) {
 				// DRAW ICONS
 				Map<EMagicElement, Boolean> map = attr.getKnownElements();
 				Boolean val;
 				int x = 0;
 				for (EMagicElement element : EMagicElement.values()) {
+					Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET + x - 2, topOffset + TEXT_BOTTOM_VOFFSET - 2, leftOffset + TEXT_BOTTOM_HOFFSET + x + 18, topOffset + TEXT_BOTTOM_VOFFSET + 18, 0xD0000000);
 					val = map.get(element);
 					if (val == null || !val)
 						GlStateManager.color(.1f, .1f, .1f, .9f);
