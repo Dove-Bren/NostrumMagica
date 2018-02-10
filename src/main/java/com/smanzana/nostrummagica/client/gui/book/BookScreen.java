@@ -329,6 +329,9 @@ public class BookScreen extends GuiScreen {
 
 		@Override
 		public boolean onClick(BookScreen parent, int mouseX, int mouseY, int button) {
+			if (title) {
+				mouseY -= parent.fontRendererObj.FONT_HEIGHT + 10;
+			}
 			if (button == 0) {
 				int index = mouseY / (parent.fontRendererObj.FONT_HEIGHT + 2);
 				if (index < pages.length) {

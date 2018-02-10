@@ -32,7 +32,7 @@ public class TitlePage implements IBookPage {
 				int w = fonter.getStringWidth(this.text);
 				hoffset = w/2; 
 			}
-			fonter.drawStringWithShadow(text, xoffset + ( (width / 2) - hoffset ), yoffset + 20, 0xFF404040);
+			fonter.drawStringWithShadow(text, xoffset + ( (width / 2) - hoffset ), yoffset + 20, 0xFF40F040);
 		} else {
 			image.draw(parent, fonter, xoffset, yoffset, width, height);
 		}

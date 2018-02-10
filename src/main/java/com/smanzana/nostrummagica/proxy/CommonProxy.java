@@ -35,6 +35,7 @@ import com.smanzana.nostrummagica.items.EnchantedWeapon;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
+import com.smanzana.nostrummagica.items.MirrorItem;
 import com.smanzana.nostrummagica.items.NostrumGuide;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
@@ -227,6 +228,10 @@ public class CommonProxy {
     	GameRegistry.register(SpellTableItem.instance());
     	SpellTableItem.init();
     	
+    	MirrorItem.instance().setRegistryName(NostrumMagica.MODID, MirrorItem.ID);
+    	GameRegistry.register(MirrorItem.instance());
+    	MirrorItem.init();
+    	
     	MagicSwordBase.init();
     	MagicArmorBase.init();
     	EnchantedWeapon.registerWeapons();
@@ -308,9 +313,6 @@ public class CommonProxy {
     	
     	GameRegistry.register(NostrumMirrorBlock.instance(),
     			new ResourceLocation(NostrumMagica.MODID, NostrumMirrorBlock.ID));
-    	GameRegistry.register(
-    			(new ItemBlock(NostrumMirrorBlock.instance())).setRegistryName(NostrumMirrorBlock.ID)
-    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(NostrumMirrorBlock.ID));
     }
     
     public void syncPlayer(EntityPlayerMP player) {

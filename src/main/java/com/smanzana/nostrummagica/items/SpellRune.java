@@ -117,7 +117,7 @@ public class SpellRune extends Item implements ILoreTagged {
 					if (alt != null && alteration == null)
 						alteration = alt;
 					int shapeCount = SpellRune.getPieceElementCount(stack);
-					if (count + shapeCount > 3)
+					if (count + shapeCount > 4)
 						return false;
 					count += shapeCount;
 				} else if (SpellRune.isElement(stack)) {
@@ -133,7 +133,7 @@ public class SpellRune extends Item implements ILoreTagged {
 					element = elem;
 					
 					int c = SpellRune.getPieceElementCount(stack);
-					if (c + count > 3)
+					if (c + count > 4)
 						return false;
 					count += c;
 				} else if (SpellRune.isAlteration(stack)) {
@@ -196,7 +196,7 @@ public class SpellRune extends Item implements ILoreTagged {
 						alteration = alt;
 					
 					int shapeCount = SpellRune.getPieceElementCount(stack);
-					if (count + shapeCount > 3)
+					if (count + shapeCount > 4)
 						return null;
 					count += shapeCount;
 				} else if (SpellRune.isElement(stack)) {
@@ -208,7 +208,7 @@ public class SpellRune extends Item implements ILoreTagged {
 					
 					element = elem;
 					int c = SpellRune.getPieceElementCount(stack);
-					if (c + count > 3)
+					if (c + count > 4)
 						return null;
 					count += c;
 				} else if (SpellRune.isAlteration(stack)) {
@@ -228,10 +228,21 @@ public class SpellRune extends Item implements ILoreTagged {
 					SpellRune.setPieceShapeElement(rune, element);
 				if (alteration != null)
 					SpellRune.setPieceShapeAlteration(rune, alteration);
-				SpellRune.setPieceElementCount(rune, count);
+				
+				// 1 => 1
+				// 2 => 2
+				// 3 => 2
+				// 4 => 3
+				// log2(count) + 1
+				// log2(count) = log(count) / log(2)
+				int elemcount = 1 + (int) (Math.log(count) / Math.log(2));
+				
+				SpellRune.setPieceElementCount(rune, elemcount);
 				return rune;
 			} else if (element != null) {
-				ItemStack rune = SpellRune.getRune(element, count);
+				int elemcount = 1 + (int) (Math.log(count) / Math.log(2));
+				
+				ItemStack rune = SpellRune.getRune(element, elemcount);
 				return rune;
 			} else {
 				ItemStack rune = SpellRune.getRune(alteration);

@@ -213,13 +213,14 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 			
 			int count = 1;
 			if (this == ELEMENT)
-				count = EMagicElement.values().length;
+				count = 4;
 			else if (this == SHAPE)
-				count = SpellShape.getAllShapes().size();
+				count = 1;
 			else if (this == TRIGGER)
-				count = SpellTrigger.getAllTriggers().size();
+				count = 4;
 			
-			return random.nextInt(7000) < count;
+			
+			return random.nextInt(9000) < count;
 		}
 	}
 	
@@ -259,8 +260,12 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 			DungeonGen gen = list.get(0);
 			runGenerator(gen.getGenerator(), world, random, chunkX, chunkZ,
 					gen.getMinY(), gen.getMaxY());
+			forceTimer = -1;
 			return;
 		}
+		
+		if (forceTimer > 0)
+			forceTimer--;
 		
 		for (DungeonGen gen : list) {
 			if (gen.chanceSpawn(random, world, chunkX, chunkZ)) {
