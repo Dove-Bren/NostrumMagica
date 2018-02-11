@@ -2,7 +2,7 @@
     "parent": "block/thin_block",
     "textures": {
         "all": "nostrummagica:blocks/chalk_block",
-        "particle": "#all"
+        "particle": "nostrummagica:blocks/chalk_block"
     },
     "elements": [
         {

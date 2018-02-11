@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import org.lwjgl.input.Keyboard;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.CursedIce;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.blocks.MagicWall;
@@ -18,6 +19,7 @@ import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
+import com.smanzana.nostrummagica.client.render.TileEntityCandleRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntitySymbolRenderer;
 import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.renderer.ModelGolem;
@@ -105,7 +107,7 @@ public class ClientProxy extends CommonProxy {
 		int i = 0;
 		for (ReagentType type : ReagentType.values()) {
 			variants[i++] = new ResourceLocation(NostrumMagica.MODID,
-					ReagentItem.instance().getNameFromMeta(type.getMeta()));
+					ReagentItem.getNameFromMeta(type.getMeta()));
 		}
 		ModelBakery.registerItemVariants(ReagentItem.instance(), variants);
 		
@@ -140,6 +142,7 @@ public class ClientProxy extends CommonProxy {
     	ModelBakery.registerItemVariants(SpellRune.instance(), variants);
     	
     	TileEntitySymbolRenderer.init();
+    	TileEntityCandleRenderer.init();
     	
     	OBJLoader.INSTANCE.addDomain(NostrumMagica.MODID);
 	}
@@ -170,7 +173,7 @@ public class ClientProxy extends CommonProxy {
 		
 		for (ReagentItem.ReagentType type : ReagentItem.ReagentType.values()) {
 			registerModel(ReagentItem.instance(), type.getMeta(),
-					ReagentItem.instance().getNameFromMeta(type.getMeta()));
+					ReagentItem.getNameFromMeta(type.getMeta()));
 		}
 		
 		InfusedGemItem gem = InfusedGemItem.instance();
@@ -206,6 +209,9 @@ public class ClientProxy extends CommonProxy {
 		registerModel(Item.getItemFromBlock(CursedIce.instance()),
 				0,
 				CursedIce.ID);
+		registerModel(Item.getItemFromBlock(Candle.instance()),
+				0,
+				Candle.ID);
 		registerModel(Item.getItemFromBlock(ManiOre.instance()),
 				0,
 				ManiOre.ID);

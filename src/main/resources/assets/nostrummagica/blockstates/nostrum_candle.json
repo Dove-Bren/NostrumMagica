@@ -1,0 +1,6 @@
+{
+    "variants": {
+        "lit=true": { "model": "nostrummagica:candle_lit" },
+        "lit=false": { "model": "nostrummagica:candle" }
+    }
+}

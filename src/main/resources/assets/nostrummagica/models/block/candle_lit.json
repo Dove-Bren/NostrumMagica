@@ -1,0 +1,57 @@
+{
+    "textures": {
+        "side": "nostrummagica:blocks/candle",
+        "particle": "nostrummagica:blocks/candle",
+        "fire": "nostrummagica:blocks/candle_fire"
+    },
+    "elements": [
+        {   "from": [ 7, 0, 2 ],
+            "to": [ 7, 8, 14 ],
+            "faces": {
+                "west": { "uv": [ 0, 0, 16, 16 ], "texture": "#side" },
+                "east": { "uv": [ 0, 0, 16, 16 ], "texture": "#side" }
+            }
+        },
+        {   "from": [ 9, 0, 2 ],
+            "to": [ 9, 8, 14 ],
+            "faces": {
+                "west": { "uv": [ 0, 0, 16, 16 ], "texture": "#side" },
+                "east": { "uv": [ 0, 0, 16, 16 ], "texture": "#side" }
+            }
+        },
+        {   "from": [ 2, 0, 7 ],
+            "to": [ 14, 8, 7 ],
+            "faces": {
+                "north": { "uv": [ 0, 0, 16, 16 ], "texture": "#side" },
+                "south": { "uv": [ 0, 0, 16, 16 ], "texture": "#side" }
+            }
+        },
+        {   "from": [ 2, 0, 9 ],
+            "to": [ 14, 8, 9 ],
+            "faces": {
+                "north": { "uv": [ 0, 0, 16, 16 ], "texture": "#side" },
+                "south": { "uv": [ 0, 0, 16, 16 ], "texture": "#side" }
+            }
+        },
+        {   "from": [ 7, 8, 8 ],
+            "to": [ 9, 10, 8 ],
+            "faces": {
+                "north": { "uv": [ 0, 0, 16, 16 ], "texture": "#fire" },
+                "south": { "uv": [ 0, 0, 16, 16 ], "texture": "#fire" }
+            }
+        },
+        {   "from": [ 8, 8, 7 ],
+            "to": [ 8, 10, 9 ],
+            "faces": {
+                "north": { "uv": [ 0, 0, 16, 16 ], "texture": "#fire" },
+                "south": { "uv": [ 0, 0, 16, 16 ], "texture": "#fire" }
+            }
+        },
+        {   "from": [ 7, 5, 7 ],
+            "to": [ 9, 5, 9 ],
+            "faces": {
+                "up": { "uv": [ 7, 7, 9, 9 ], "texture": "#side" }
+            }
+        }
+    ]
+}

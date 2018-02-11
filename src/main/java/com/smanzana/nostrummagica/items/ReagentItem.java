@@ -17,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -25,7 +26,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ReagentItem extends Item implements ILoreTagged {
 
-	public static enum ReagentType {
+	public static enum ReagentType implements IStringSerializable {
 		// Do not rearrange.
 		MANDRAKE_ROOT("mandrake_root"),
 		SPIDER_SILK("spider_silk"),
@@ -68,6 +69,16 @@ public class ReagentItem extends Item implements ILoreTagged {
 					+ name.substring(1).toLowerCase();
 			
 			return out;
+		}
+
+		@Override
+		public String getName() {
+			return name().toLowerCase();
+		}
+		
+		@Override
+		public String toString() {
+			return getName();
 		}
 	}
 	
@@ -115,14 +126,14 @@ public class ReagentItem extends Item implements ILoreTagged {
     		return null;
     	
     	for (ReagentType type : ReagentType.values()) {
-    		if (type == instance.getTypeFromMeta(reagent.getMetadata()))
+    		if (type == getTypeFromMeta(reagent.getMetadata()))
     			return type;
     	}
     	
     	return null;
     }
     
-    public String getNameFromMeta(int meta) {
+    public static String getNameFromMeta(int meta) {
     	String suffix = "unknown";
 		
     	ReagentType type = getTypeFromMeta(meta);
@@ -132,7 +143,7 @@ public class ReagentItem extends Item implements ILoreTagged {
 		return suffix;
     }
     
-    public ReagentType getTypeFromMeta(int meta) {
+    public static ReagentType getTypeFromMeta(int meta) {
     	ReagentType ret = null;
     	for (ReagentType type : ReagentType.values()) {
 			if (type.getMeta() == meta) {

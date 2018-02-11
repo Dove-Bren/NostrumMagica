@@ -142,6 +142,7 @@ tile.nostrum_spawner.name=Nostrum Spawner
 tile.dungeon_block.name=Dungeon Wall
 tile.mirror_block.name=Magic Mirror
 tile.nostrum_chalk_block.name=Chalk
+tile.nostrum_candle.name=Candle
 
 entity.nostrummagica.physical_golem.name=Metal Golem
 entity.nostrummagica.lightning_golem.name=Lightining Golem
