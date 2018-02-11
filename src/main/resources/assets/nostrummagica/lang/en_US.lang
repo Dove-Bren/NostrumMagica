@@ -8,6 +8,7 @@ item.seeker_idol.name=Seeker Idol
 item.seeking_gem.name=Seeking Gem
 item.mirror_item.name=Magic Mirror
 item.nostrum_chalk.name=Chalk
+item.altar_item.name=Altar
 
 item.magicswordbase.name=Ethereal Sword
 item.magichelmbase.name=Ethereal Helm
@@ -143,6 +144,7 @@ tile.dungeon_block.name=Dungeon Wall
 tile.mirror_block.name=Magic Mirror
 tile.nostrum_chalk_block.name=Chalk
 tile.nostrum_candle.name=Candle
+tile.altar_block.name=Altar
 
 entity.nostrummagica.physical_golem.name=Metal Golem
 entity.nostrummagica.lightning_golem.name=Lightining Golem

@@ -19,11 +19,13 @@ import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
+import com.smanzana.nostrummagica.client.render.TileEntityAltarRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityCandleRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntitySymbolRenderer;
 import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.renderer.ModelGolem;
 import com.smanzana.nostrummagica.entity.renderer.RenderGolem;
+import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
@@ -143,6 +145,7 @@ public class ClientProxy extends CommonProxy {
     	
     	TileEntitySymbolRenderer.init();
     	TileEntityCandleRenderer.init();
+    	TileEntityAltarRenderer.init();
     	
     	OBJLoader.INSTANCE.addDomain(NostrumMagica.MODID);
 	}
@@ -238,6 +241,10 @@ public class ClientProxy extends CommonProxy {
 		registerModel(ChalkItem.instance(),
 				0,
 				ChalkItem.ID);
+		
+		registerModel(AltarItem.instance(),
+				0,
+				AltarItem.ID);
 	}
 	
 	@Override

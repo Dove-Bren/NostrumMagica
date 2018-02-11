@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.proxy;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.AltarBlock;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.ChalkBlock;
 import com.smanzana.nostrummagica.blocks.CropGinseng;
@@ -31,6 +32,7 @@ import com.smanzana.nostrummagica.entity.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.EntityGolemWind;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
+import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
@@ -265,6 +267,10 @@ public class CommonProxy {
     	ChalkItem.instance().setRegistryName(NostrumMagica.MODID, ChalkItem.ID);
     	GameRegistry.register(ChalkItem.instance());
     	ChalkItem.init();
+    	
+    	AltarItem.instance().setRegistryName(NostrumMagica.MODID, AltarItem.ID);
+    	GameRegistry.register(AltarItem.instance());
+    	AltarItem.init();
     }
     
     private void registerBlocks() {
@@ -323,6 +329,10 @@ public class CommonProxy {
     	
     	GameRegistry.register(ChalkBlock.instance(),
     			new ResourceLocation(NostrumMagica.MODID, ChalkBlock.ID));
+    	
+    	GameRegistry.register(AltarBlock.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, AltarBlock.ID));
+    	AltarBlock.init();
     	
     	GameRegistry.register(Candle.instance(),
     			new ResourceLocation(NostrumMagica.MODID, Candle.ID));

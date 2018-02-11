@@ -219,9 +219,16 @@ public class Candle extends Block implements ITileEntityProvider {
 		
 		// it's lit
 		if (heldItem == null) {
-			// putting it out
-			extinguish(worldIn, pos, state);
-			return true;
+			// only if mainhand or mainhand is null. Otherwise if offhand is
+			// empty, will still put out. Dumb!
+			
+			if (hand == EnumHand.MAIN_HAND || (playerIn.getHeldItemMainhand() == null)) {
+				// putting it out
+				extinguish(worldIn, pos, state);
+				return true;
+			}
+			
+			return false;
 		}
 
 		if (!(heldItem.getItem() instanceof ReagentItem))
