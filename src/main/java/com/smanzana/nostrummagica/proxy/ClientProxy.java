@@ -23,6 +23,7 @@ import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.renderer.ModelGolem;
 import com.smanzana.nostrummagica.entity.renderer.RenderGolem;
 import com.smanzana.nostrummagica.items.BlankScroll;
+import com.smanzana.nostrummagica.items.ChalkItem;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
@@ -227,6 +228,10 @@ public class ClientProxy extends CommonProxy {
 		registerModel(new ItemBlock(NostrumMirrorBlock.instance()),
 				0,
 				NostrumMirrorBlock.ID);
+		
+		registerModel(ChalkItem.instance(),
+				0,
+				ChalkItem.ID);
 	}
 	
 	@Override

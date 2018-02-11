@@ -150,8 +150,7 @@ public class ReagentItem extends Item implements ILoreTagged {
     }
     
     @Override
-    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
-    {
+    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
     	ReagentType type = getTypeFromMeta(stack.getMetadata());
     	
     	if (type == ReagentType.MANDRAKE_ROOT) {
