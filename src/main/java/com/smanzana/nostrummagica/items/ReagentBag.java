@@ -62,7 +62,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 			if (!(item.getItem() instanceof ReagentItem))
 				continue;
 			
-			if (ReagentItem.instance().getTypeFromMeta(item.getMetadata())
+			if (ReagentItem.getTypeFromMeta(item.getMetadata())
 					== type)
 				count += item.stackSize;
 		}
@@ -169,7 +169,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 			if (item == null)
 				continue;
 			
-			if (ReagentItem.instance().getTypeFromMeta(item.getMetadata())
+			if (ReagentItem.getTypeFromMeta(item.getMetadata())
 					== type) {
 				if (item.stackSize > remaining) {
 					item.stackSize -= remaining;

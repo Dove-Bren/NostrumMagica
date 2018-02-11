@@ -218,7 +218,7 @@ public class NostrumMagica
 			if (item.getItem() instanceof ReagentBag) {
 				count = ReagentBag.removeCount(item, type, count);
 			} else if (item.getItem() instanceof ReagentItem) {
-				if (ReagentItem.instance().getTypeFromMeta(item.getMetadata())
+				if (ReagentItem.getTypeFromMeta(item.getMetadata())
 					== type) {
 					if (item.stackSize > count) {
 						item.stackSize -= count;
