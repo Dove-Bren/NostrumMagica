@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.capabilities.AttributeProvider;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.command.CommandTestConfig;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
@@ -23,6 +24,7 @@ import com.smanzana.nostrummagica.proxy.CommonProxy;
 import com.smanzana.nostrummagica.rituals.OutcomeSpawnItem;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
+import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.SpellRegistry;
 import com.smanzana.nostrummagica.world.dungeon.NostrumLootHandler;
@@ -30,6 +32,7 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumLootHandler;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -47,6 +50,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.oredict.OreDictionary;
 
 @Mod(modid = NostrumMagica.MODID, version = NostrumMagica.VERSION, guiFactory = "com.smanzana.nostrummagica.config.ConfigGuiFactory")
 public class NostrumMagica
@@ -100,6 +104,20 @@ public class NostrumMagica
     				ReagentType.GRAVE_DUST,
     				new OutcomeSpawnItem(ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 2)));
     		
+    		RitualRegistry.instance().addRitual(recipe);
+    		
+    		recipe = RitualRecipe.createTier2(null,
+    				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST},
+    				ReagentItem.instance().getReagent(ReagentType.BLACK_PEARL, 1),
+    				new OutcomeSpawnItem(InfusedGemItem.instance().getGem(EMagicElement.LIGHTNING, 1)));
+    		RitualRegistry.instance().addRitual(recipe);
+    		
+    		ItemStack anyReagent = new ItemStack(ReagentItem.instance(), 1, OreDictionary.WILDCARD_VALUE);
+    		recipe = RitualRecipe.createTier3(EMagicElement.LIGHTNING,
+    				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST},
+    				new ItemStack(Items.ENDER_PEARL),
+    				new ItemStack[] {anyReagent, anyReagent, anyReagent, anyReagent},
+    				new OutcomeSpawnItem(InfusedGemItem.instance().getGem(EMagicElement.WIND, 1)));
     		RitualRegistry.instance().addRitual(recipe);
     	}
     	

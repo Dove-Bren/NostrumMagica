@@ -150,8 +150,8 @@ public class InfusedGemItem extends Item implements ILoreTagged {
 	
 	@Override
 	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		if (worldIn.isRemote)
-			return EnumActionResult.PASS;
+		//if (worldIn.isRemote)
+			//return EnumActionResult.SUCCESS;
 		
 		IBlockState state = worldIn.getBlockState(pos);
 		if (state.getBlock() == null)
@@ -164,17 +164,19 @@ public class InfusedGemItem extends Item implements ILoreTagged {
 			if (!(te instanceof CandleTileEntity))
 				return EnumActionResult.PASS;
 			
- 			RitualRegistry.attemptRitual(worldIn, pos, playerIn, element);
-
-			stack.stackSize--;
+ 			if (RitualRegistry.attemptRitual(worldIn, pos, playerIn, element)) {
+ 				stack.stackSize--;
+ 			}
+ 			
 			return EnumActionResult.SUCCESS;
 		} else if (state.getBlock() instanceof AltarBlock) {
 			if (!(te instanceof AltarTileEntity))
 				return EnumActionResult.PASS;
 			
-			RitualRegistry.attemptRitual(worldIn, pos, playerIn, element);
+			if (RitualRegistry.attemptRitual(worldIn, pos, playerIn, element)) {
+				stack.stackSize--;
+			}
 			
-			stack.stackSize--;
 			return EnumActionResult.SUCCESS;
 		}
 		

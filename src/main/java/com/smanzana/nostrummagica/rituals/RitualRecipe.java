@@ -18,6 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.oredict.OreDictionary;
 
 public class RitualRecipe {
 	
@@ -122,42 +123,45 @@ public class RitualRecipe {
 			ItemStack stack = altar.getItem();
 			if (stack == null)
 				return false;
-			if (!ItemStack.areItemsEqual(stack, centerItem)) {
+			if (!OreDictionary.itemMatches(centerItem, stack, false)) {
 				return false;
 			}
-			List<ItemStack> items = new ArrayList<>(4);
 			TileEntity te;
-			for (int x = -1; x <= -1; x++) {
-				int diff = 1 - Math.abs(x);
-				for (int z = diff; z <= diff; z++) {
-					te = world.getTileEntity(center.add(x, 0, z));
-					if (te == null || !(te instanceof AltarTileEntity))
-						return false;
-					altar = (AltarTileEntity) te;
-					if (altar.getItem() != null)
-						items.add(altar.getItem());
-				}
-			}
 			
-			for (ItemStack req : extraItems) {
-				if (req == null)
-					continue;
-				
-				Iterator<ItemStack> it = items.iterator();
-				boolean found = false;
-				while (it.hasNext()) {
-					ItemStack next = it.next();
-					if (ItemStack.areItemsEqual(next, req)) {
-						it.remove();
-						found = true;
-						break;
+			if (tier == 2) {
+				List<ItemStack> items = new ArrayList<>(4);
+				for (int x = -4; x <= 4; x+=4) {
+					int diff = 4 - Math.abs(x);
+					for (int z = -diff; z <= diff; z+=8) {
+						te = world.getTileEntity(center.add(x, 0, z));
+						if (te == null || !(te instanceof AltarTileEntity))
+							return false;
+						altar = (AltarTileEntity) te;
+						if (altar.getItem() != null)
+							items.add(altar.getItem());
 					}
 				}
-				if (!found)
-					return false;
+				
+				for (ItemStack req : extraItems) {
+					if (req == null)
+						continue;
+					
+					Iterator<ItemStack> it = items.iterator();
+					boolean found = false;
+					while (it.hasNext()) {
+						ItemStack next = it.next();
+						if (OreDictionary.itemMatches(req, next, false)) {
+							it.remove();
+							found = true;
+							break;
+						}
+					}
+					if (!found)
+						return false;
+				}
+				if (items.size() > 0)
+					return false; // More items on altars than in recipe
 			}
-			if (items.size() > 0)
-				return false; // More items on altars than in recipe
 			
 			// get all candles. Must be a candle in all the spots.
 			// then try to match reagent types with required ones
@@ -221,9 +225,9 @@ public class RitualRecipe {
 			}
 			// Clear off altars also
 			TileEntity te;
-			for (int x = -1; x <= -1; x++) {
-				int diff = 1 - Math.abs(x);
-				for (int z = diff; z <= diff; z++) {
+			for (int x = -4; x <= 4; x+=4) {
+				int diff = 4 - Math.abs(x);
+				for (int z = -diff; z <= diff; z+=8) {
 					te = world.getTileEntity(center.add(x, 0, z));
 					if (te == null || !(te instanceof AltarTileEntity))
 						continue; // oh well, too late now!
