@@ -60,6 +60,7 @@ import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -398,5 +399,10 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void sendSpellDebug(EntityPlayer player, ITextComponent comp) {
 		; 
+	}
+	
+	@Override
+	public String getTranslation(String key) {
+		return I18n.format(key, new Object[0]).trim();
 	}
 }

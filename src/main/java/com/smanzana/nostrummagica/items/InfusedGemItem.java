@@ -3,15 +3,28 @@ package com.smanzana.nostrummagica.items;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.AltarBlock;
+import com.smanzana.nostrummagica.blocks.AltarBlock.AltarTileEntity;
+import com.smanzana.nostrummagica.blocks.Candle;
+import com.smanzana.nostrummagica.blocks.Candle.CandleTileEntity;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -133,5 +146,38 @@ public class InfusedGemItem extends Item implements ILoreTagged {
 	@Override
 	public Lore getDeepLore() {
 		return new Lore().add("By combining magical reagents with an enderpearl, you can create a Void Gem.", "Void gems alone are not very useful.", "In order to use them, they must be inbued with the power of an element.", "Perhaps an Alter rune would do the trick...");
+	}
+	
+	@Override
+	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		if (worldIn.isRemote)
+			return EnumActionResult.PASS;
+		
+		IBlockState state = worldIn.getBlockState(pos);
+		if (state.getBlock() == null)
+			return EnumActionResult.PASS;
+		
+		EMagicElement element = getTypeFromMeta(stack.getMetadata());
+		
+		TileEntity te = worldIn.getTileEntity(pos);
+		if (state.getBlock() instanceof Candle) {
+			if (!(te instanceof CandleTileEntity))
+				return EnumActionResult.PASS;
+			
+ 			RitualRegistry.attemptRitual(worldIn, pos, playerIn, element);
+
+			stack.stackSize--;
+			return EnumActionResult.SUCCESS;
+		} else if (state.getBlock() instanceof AltarBlock) {
+			if (!(te instanceof AltarTileEntity))
+				return EnumActionResult.PASS;
+			
+			RitualRegistry.attemptRitual(worldIn, pos, playerIn, element);
+			
+			stack.stackSize--;
+			return EnumActionResult.SUCCESS;
+		}
+		
+        return EnumActionResult.PASS;
 	}
 }

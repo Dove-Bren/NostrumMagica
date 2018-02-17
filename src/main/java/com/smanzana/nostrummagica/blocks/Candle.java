@@ -150,7 +150,7 @@ public class Candle extends Block implements ITileEntityProvider {
     	world.setBlockState(pos, state.withProperty(LIT, true));
     }
     
-    private void extinguish(World world, BlockPos pos, IBlockState state) {
+    public static void extinguish(World world, BlockPos pos, IBlockState state) {
     	if (world.getTileEntity(pos) != null)
     		world.removeTileEntity(pos);
     	

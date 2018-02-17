@@ -379,4 +379,8 @@ public class CommonProxy {
 	public void sendSpellDebug(EntityPlayer player, ITextComponent comp) {
 		NetworkHandler.getSyncChannel().sendTo(new SpellDebugMessage(comp), (EntityPlayerMP) player);
 	}
+	
+	public String getTranslation(String key) {
+		return key; // This is the server, silly!
+	}
 }

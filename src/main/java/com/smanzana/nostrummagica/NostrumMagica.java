@@ -20,6 +20,9 @@ import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
 import com.smanzana.nostrummagica.listeners.PlayerListener;
 import com.smanzana.nostrummagica.proxy.CommonProxy;
+import com.smanzana.nostrummagica.rituals.OutcomeSpawnItem;
+import com.smanzana.nostrummagica.rituals.RitualRecipe;
+import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.SpellRegistry;
 import com.smanzana.nostrummagica.world.dungeon.NostrumLootHandler;
@@ -89,6 +92,16 @@ public class NostrumMagica
     	proxy.preinit();
     	
     	spellRegistry = new SpellRegistry();
+    	RitualRegistry.instance();
+    	
+    	{
+    		// TEST CODE
+    		RitualRecipe recipe = RitualRecipe.createTier1(null,
+    				ReagentType.GRAVE_DUST,
+    				new OutcomeSpawnItem(ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 2)));
+    		
+    		RitualRegistry.instance().addRitual(recipe);
+    	}
     	
     	File dir = new File(event.getSuggestedConfigurationFile().getParentFile(), "NostrumMagica");
     	if (!dir.exists())

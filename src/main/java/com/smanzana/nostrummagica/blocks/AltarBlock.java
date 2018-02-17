@@ -152,6 +152,7 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 		
 		public void setItem(ItemStack stack) {
 			this.stack = stack;
+			dirty();
 		}
 		
 		private static final String NBT_ITEM = "item";
@@ -194,6 +195,13 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 		public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
 			super.onDataPacket(net, pkt);
 			handleUpdateTag(pkt.getNbtCompound());
+		}
+		
+		private void dirty() {
+			worldObj.markBlockRangeForRenderUpdate(pos, pos);
+			worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 3);
+			worldObj.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
+			markDirty();
 		}
 		
 	}
