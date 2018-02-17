@@ -21,9 +21,11 @@ import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
 import com.smanzana.nostrummagica.listeners.PlayerListener;
 import com.smanzana.nostrummagica.proxy.CommonProxy;
-import com.smanzana.nostrummagica.rituals.OutcomeSpawnItem;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
+import com.smanzana.nostrummagica.rituals.outcomes.OutcomeEnchantItem;
+import com.smanzana.nostrummagica.rituals.outcomes.OutcomePotionEffect;
+import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.SpellRegistry;
@@ -32,6 +34,7 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumLootHandler;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -102,14 +105,14 @@ public class NostrumMagica
     		// TEST CODE
     		RitualRecipe recipe = RitualRecipe.createTier1(null,
     				ReagentType.GRAVE_DUST,
-    				new OutcomeSpawnItem(ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 2)));
+    				new OutcomePotionEffect(Potion.getPotionFromResourceLocation("luck"), 0, 20 * 20));
     		
     		RitualRegistry.instance().addRitual(recipe);
     		
     		recipe = RitualRecipe.createTier2(null,
-    				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST},
+    				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.CRYSTABLOOM},
     				ReagentItem.instance().getReagent(ReagentType.BLACK_PEARL, 1),
-    				new OutcomeSpawnItem(InfusedGemItem.instance().getGem(EMagicElement.LIGHTNING, 1)));
+    				new OutcomeEnchantItem(Enchantments.INFINITY, 1));
     		RitualRegistry.instance().addRitual(recipe);
     		
     		ItemStack anyReagent = new ItemStack(ReagentItem.instance(), 1, OreDictionary.WILDCARD_VALUE);

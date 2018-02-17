@@ -1,7 +1,7 @@
-package com.smanzana.nostrummagica.rituals;
+package com.smanzana.nostrummagica.rituals.outcomes;
 
 import com.smanzana.nostrummagica.blocks.AltarBlock.AltarTileEntity;
-import com.smanzana.nostrummagica.rituals.RitualRecipe.IRitualOutcome;
+import com.smanzana.nostrummagica.rituals.RitualRecipe;
 
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;

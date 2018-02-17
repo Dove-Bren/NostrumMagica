@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.Candle.CandleTileEntity;
 import com.smanzana.nostrummagica.blocks.ChalkBlock;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.rituals.outcomes.IRitualOutcome;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.block.state.IBlockState;
@@ -21,12 +22,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
 
 public class RitualRecipe {
-	
-	public static interface IRitualOutcome {
-		
-		public void perform(World world, EntityPlayer player, BlockPos center, RitualRecipe recipe);
-		
-	}
 	
 	private static final int CHALK_XS[][] = new int[][] {
 		new int[]{-1, 0, 1, -1, 1, -1, 0, 1},
