@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.math.BlockPos;
 
 public interface INostrumMagic {
 
@@ -74,6 +75,11 @@ public interface INostrumMagic {
 	public void masterElement(EMagicElement element);
 	public Map<EAlteration, Boolean> getAlterations();
 	public void unlockAlteration(EAlteration alteration);
+	
+	// Mark/recall
+	public void setMarkLocation(int dimension, BlockPos location);
+	public BlockPos getMarkLocation();
+	public int getMarkDimension();
 	
 	// Serialization/Deserialization. Do not call.
 	public void deserialize(

@@ -12,6 +12,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -37,6 +38,9 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	private static final String NBT_SHAPES = "shapes"; // list of shape keys
 	private static final String NBT_TRIGGERS = "triggers"; // list of trigger keys
 	private static final String NBT_ALTERATIONS = "alterations";
+	
+	private static final String NBT_MARK_DIMENSION = "mark_dim";
+	private static final String NBT_MARK_POS = "mark_pos";
 	
 	@Override
 	public NBTBase writeNBT(Capability<INostrumMagic> capability, INostrumMagic instance, EnumFacing side) {
@@ -106,6 +110,16 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			}
 		}
 		nbt.setTag(NBT_ALTERATIONS, compound);
+		
+		BlockPos markPos = instance.getMarkLocation();
+		if (markPos != null) {
+			NBTTagCompound posTag = new NBTTagCompound();
+			posTag.setInteger("x", markPos.getX());
+			posTag.setInteger("y", markPos.getY());
+			posTag.setInteger("z", markPos.getZ());
+			nbt.setInteger(NBT_MARK_DIMENSION, instance.getMarkDimension());
+			nbt.setTag(NBT_MARK_POS, posTag);
+		}
 		
 		return nbt;
 	}
@@ -178,6 +192,19 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 				EAlteration elem = EAlteration.valueOf(key);
 				instance.unlockAlteration(elem);
 			}
+		}
+		
+		// Mark Location
+		if (tag.hasKey(NBT_MARK_POS, NBT.TAG_COMPOUND)) {
+			NBTTagCompound posTag = tag.getCompoundTag(NBT_MARK_POS);
+			BlockPos location = new BlockPos(
+					posTag.getInteger("x"),
+					posTag.getInteger("y"),
+					posTag.getInteger("z")
+					);
+			int dimension = tag.getInteger(NBT_MARK_DIMENSION);
+			
+			instance.setMarkLocation(dimension, location);
 		}
 	}
 

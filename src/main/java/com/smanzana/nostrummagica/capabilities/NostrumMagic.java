@@ -20,6 +20,7 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 
 /**
@@ -66,6 +67,8 @@ public class NostrumMagic implements INostrumMagic {
 	private List<SpellShape> shapes; // list of shape keys
 	private List<SpellTrigger> triggers; // list of trigger keys
 	private Map<EAlteration, Boolean> alterations;
+	private BlockPos markLocation;
+	private int markDimension;
 	
 	private EntityLivingBase entity;
 	
@@ -457,11 +460,29 @@ public class NostrumMagic implements INostrumMagic {
 		this.alterations = cap.serializeAlterations();
 		this.shapes = cap.getShapes();
 		this.triggers = cap.getTriggers();
+		this.markLocation = cap.getMarkLocation();
+		this.markDimension = cap.getMarkDimension();
 	}
 	
 	@Override
 	public void provideEntity(EntityLivingBase entity) {
 		this.entity = entity;
+	}
+
+	@Override
+	public BlockPos getMarkLocation() {
+		return markLocation;
+	}
+	
+	@Override
+	public int getMarkDimension() {
+		return markDimension;
+	}
+	
+	@Override
+	public void setMarkLocation(int dimension, BlockPos pos) {
+		this.markDimension = dimension;
+		this.markLocation = pos;
 	}
 	
 }

@@ -33,13 +33,13 @@ public class CapabilityHandler {
 	
 	@SubscribeEvent
 	public void onClone(PlayerEvent.Clone event) {
-		if (event.isWasDeath()) {
+		//if (event.isWasDeath()) {
 			INostrumMagic cap = NostrumMagica.getMagicWrapper(event.getOriginal());
 			event.getEntityPlayer().getCapability(AttributeProvider.CAPABILITY, null)
 				.copy(cap);
 			
 			if (!event.getEntityPlayer().worldObj.isRemote)
 				NostrumMagica.proxy.syncPlayer((EntityPlayerMP) event.getEntityPlayer());
-		}
+		//}
 	}
 }
