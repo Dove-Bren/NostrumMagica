@@ -171,3 +171,9 @@ death.attack.magic.ENDER=%1$s was slain by %s$2's Ender energies
 
 info.recall.fail=A mark location must be set first'
 info.recall.baddimension=Your mark location is in a different dimension
+
+ritual.buff.luck.name=Ritual of Luck
+
+ritual.enchant.infinity.name=Infinity Infusion
+
+ritual.mark.name=Ritual of Marking

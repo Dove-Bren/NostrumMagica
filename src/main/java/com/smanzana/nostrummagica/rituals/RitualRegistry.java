@@ -82,4 +82,8 @@ public class RitualRegistry {
 		
 		return false;
 	}
+
+	public List<RitualRecipe> getRegisteredRituals() {
+		return knownRituals;
+	}
 }

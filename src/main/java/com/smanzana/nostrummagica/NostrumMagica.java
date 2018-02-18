@@ -27,7 +27,6 @@ import com.smanzana.nostrummagica.rituals.outcomes.OutcomeEnchantItem;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeMark;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomePotionEffect;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeRecall;
-import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.SpellRegistry;
@@ -105,35 +104,29 @@ public class NostrumMagica
     	
     	{
     		// TEST CODE
-    		RitualRecipe recipe = RitualRecipe.createTier1(null,
+    		RitualRecipe recipe;
+    		
+    		recipe = RitualRecipe.createTier1("ritual.buff.luck.name", null,
     				ReagentType.GRAVE_DUST,
     				new OutcomePotionEffect(Potion.getPotionFromResourceLocation("luck"), 0, 20 * 20));
     		
     		RitualRegistry.instance().addRitual(recipe);
     		
-    		recipe = RitualRecipe.createTier2(null,
+    		recipe = RitualRecipe.createTier2("ritual.enchant.infinity.name", null,
     				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.CRYSTABLOOM},
     				new ItemStack(Items.BOW),
     				new OutcomeEnchantItem(Enchantments.INFINITY, 1));
     		RitualRegistry.instance().addRitual(recipe);
     		
-    		ItemStack anyReagent = new ItemStack(ReagentItem.instance(), 1, OreDictionary.WILDCARD_VALUE);
-    		recipe = RitualRecipe.createTier3(EMagicElement.LIGHTNING,
-    				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST},
-    				new ItemStack(Items.ENDER_PEARL),
-    				new ItemStack[] {anyReagent, anyReagent, anyReagent, anyReagent},
-    				new OutcomeSpawnItem(InfusedGemItem.instance().getGem(EMagicElement.WIND, 1)));
-    		RitualRegistry.instance().addRitual(recipe);
-    		
     		ItemStack enderpearl = new ItemStack(Items.ENDER_PEARL);
-    		recipe = RitualRecipe.createTier3(EMagicElement.WIND,
+    		recipe = RitualRecipe.createTier3("ritual.mark.name", EMagicElement.WIND,
     				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.CRYSTABLOOM},
     				InfusedGemItem.instance().getGem(EMagicElement.EARTH, 1),
     				new ItemStack[] {enderpearl, enderpearl, new ItemStack(Items.COMPASS), new ItemStack(Items.MAP, 1, OreDictionary.WILDCARD_VALUE)},
     				new OutcomeMark());
     		RitualRegistry.instance().addRitual(recipe);
     		
-    		recipe = RitualRecipe.createTier1(EMagicElement.LIGHTNING,
+    		recipe = RitualRecipe.createTier1("ritual.recall.name", EMagicElement.LIGHTNING,
     				ReagentType.SKY_ASH,
     				new OutcomeRecall());
     		RitualRegistry.instance().addRitual(recipe);

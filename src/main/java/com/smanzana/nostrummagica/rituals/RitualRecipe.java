@@ -40,10 +40,13 @@ public class RitualRecipe {
 	private ItemStack centerItem;
 	private ItemStack extraItems[];
 	private IRitualOutcome hook;
+	private String titleKey;
 	
-	public static RitualRecipe createTier1(EMagicElement element,
-			ReagentType reagent, IRitualOutcome outcome) {
-		RitualRecipe recipe = new RitualRecipe(element, 0);
+	public static RitualRecipe createTier1(String titleKey,
+			EMagicElement element,
+			ReagentType reagent,
+			IRitualOutcome outcome) {
+		RitualRecipe recipe = new RitualRecipe(titleKey, element, 0);
 		
 		recipe.types[0] = reagent;
 		recipe.hook = outcome;
@@ -51,9 +54,9 @@ public class RitualRecipe {
 		return recipe;
 	}
 	
-	public static RitualRecipe createTier2(EMagicElement element,
+	public static RitualRecipe createTier2(String titleKey, EMagicElement element,
 			ReagentType[] reagents, ItemStack center, IRitualOutcome outcome) {
-		RitualRecipe recipe = new RitualRecipe(element, 1);
+		RitualRecipe recipe = new RitualRecipe(titleKey, element, 1);
 		
 		for (int i = 0; i < 4 && i < reagents.length; i++) {
 			recipe.types[i] = reagents[i];
@@ -65,9 +68,9 @@ public class RitualRecipe {
 		return recipe;
 	}
 	
-	public static RitualRecipe createTier3(EMagicElement element,
+	public static RitualRecipe createTier3(String titleKey,EMagicElement element,
 			ReagentType[] reagents, ItemStack center, ItemStack extras[], IRitualOutcome outcome) {
-		RitualRecipe recipe = new RitualRecipe(element, 2);
+		RitualRecipe recipe = new RitualRecipe(titleKey, element, 2);
 		
 		for (int i = 0; i < 4 && i < reagents.length; i++) {
 			recipe.types[i] = reagents[i];
@@ -83,9 +86,10 @@ public class RitualRecipe {
 		return recipe;
 	}
 	
-	private RitualRecipe(EMagicElement element, int tier) {
+	private RitualRecipe(String nameKey, EMagicElement element, int tier) {
 		this.tier = tier;
 		this.element = element;
+		this.titleKey = nameKey;
 		if (tier == 0)
 			this.types = new ReagentType[1];
 		else
@@ -253,6 +257,10 @@ public class RitualRecipe {
 
 	public ItemStack[] getExtraItems() {
 		return extraItems;
+	}
+	
+	public String getTitleKey() {
+		return titleKey;
 	}
 	
 }

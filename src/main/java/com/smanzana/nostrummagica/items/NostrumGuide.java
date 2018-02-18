@@ -10,7 +10,10 @@ import com.smanzana.nostrummagica.client.gui.book.HSplitPage;
 import com.smanzana.nostrummagica.client.gui.book.IBookPage;
 import com.smanzana.nostrummagica.client.gui.book.ImagePage;
 import com.smanzana.nostrummagica.client.gui.book.PlainTextPage;
+import com.smanzana.nostrummagica.client.gui.book.RitualRecipePage;
 import com.smanzana.nostrummagica.client.gui.book.TitlePage;
+import com.smanzana.nostrummagica.rituals.RitualRecipe;
+import com.smanzana.nostrummagica.rituals.RitualRegistry;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -118,8 +121,11 @@ public class NostrumGuide extends Item implements GuiBook {
 		
 		pages.add(new PlainTextPage(""));
 		
+		for (RitualRecipe ritual : RitualRegistry.instance().getRegisteredRituals()) {
+			pages.add(new RitualRecipePage(ritual));
+		}
 		
-		
+		pages.add(new PlainTextPage(""));
 		return new BookScreen(pages);
 	}
 }

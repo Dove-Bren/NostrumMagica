@@ -116,6 +116,9 @@ public class BookScreen extends GuiScreen {
 	
 	@Override
 	public void drawScreen(int parWidth, int parHeight, float p_73863_3_) {
+
+		super.drawScreen(parWidth, parHeight, p_73863_3_);
+		
 		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 		Minecraft.getMinecraft().getTextureManager().bindTexture(background);
 		
@@ -147,7 +150,6 @@ public class BookScreen extends GuiScreen {
 			}
 		}
 		
-		super.drawScreen(parWidth, parHeight, p_73863_3_);
 	}
 	
 	@Override
