@@ -35,6 +35,7 @@ import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.MirrorItem;
 import com.smanzana.nostrummagica.items.NostrumGuide;
+import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
@@ -44,6 +45,7 @@ import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTableItem;
 import com.smanzana.nostrummagica.items.SpellTome;
+import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
 import com.smanzana.nostrummagica.network.messages.SpellTomeIncrementMessage;
@@ -143,6 +145,14 @@ public class ClientProxy extends CommonProxy {
     	
     	variants = list.toArray(new ResourceLocation[0]);
     	ModelBakery.registerItemVariants(SpellRune.instance(), variants);
+    	
+    	list = new LinkedList<>();
+    	for (ResourceType type : ResourceType.values()) {
+    		list.add(new ResourceLocation(NostrumMagica.MODID, type.getUnlocalizedKey()));
+    	}
+    	
+    	variants = list.toArray(new ResourceLocation[0]);
+    	ModelBakery.registerItemVariants(NostrumResourceItem.instance(), variants);
     	
     	TileEntitySymbolRenderer.init();
     	TileEntityCandleRenderer.init();
@@ -246,6 +256,12 @@ public class ClientProxy extends CommonProxy {
 		registerModel(AltarItem.instance(),
 				0,
 				AltarItem.ID);
+		
+		for (ResourceType type : ResourceType.values()) {
+			registerModel(NostrumResourceItem.instance(),
+					NostrumResourceItem.getMetaFromType(type),
+					type.getUnlocalizedKey());
+		}
 	}
 	
 	@Override

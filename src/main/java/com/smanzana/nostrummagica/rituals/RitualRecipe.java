@@ -211,6 +211,9 @@ public class RitualRecipe {
 	
 	public void perform(World world, EntityPlayer player, BlockPos center) {
 		
+		if (world.isRemote)
+			return;
+		
 		// Do cleanup of altars and candles, etc
 		if (tier == 0) {
 			// candle in center. extinguish

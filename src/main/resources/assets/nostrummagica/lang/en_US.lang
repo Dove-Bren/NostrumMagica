@@ -64,6 +64,17 @@ item.nostrum_rune.trigger_ai.name=AI Rune
 item.nostrum_rune.trigger_delay.name=Delay Rune
 item.nostrum_rune.trigger_mana.name=Mana Rune
 
+item.crystal_small.name=Mani Crystal
+item.crystal_medium.name=Kani Crystal
+item.crystal_large.name=Vani Crystal
+item.slab_fierce.name=Fierce Slab
+item.slab_kind.name=Kind Slab
+item.slab_balanced.name=Balanced Slab
+item.pendant_left.name=Paliv Pendant Fragment
+item.pendant_right.name=Cerci Pendant Fragment
+item.pendant_whole.name=Thano Pendant
+item.token.name=Magic Token
+
 item.magic_wall.name=Magic Wall
 item.mani_ore.name=Mani Ore
 
@@ -158,7 +169,7 @@ entity.nostrummagica.spell_projectile.name=Spell Projectile
 itemGroup.nostrummagica=Nostrum Magica
 
 key.cast.desc=Cast Spell
-key.spellscroll.sec=Scroll Spells (+ MouseWheel)
+key.spellscroll.desc=Scroll Spells (+ MouseWheel)
 key.nostrummagica.desc=Nostrum Magica
 
 death.attack.magic.PHYSICAL=%1$s was killed by %2$s using physical energies
@@ -177,3 +188,7 @@ ritual.buff.luck.name=Ritual of Luck
 ritual.enchant.infinity.name=Infinity Infusion
 
 ritual.mark.name=Ritual of Marking
+ritual.recall.name=Ritual of Recall
+
+ritual.kani.name=Kani Infusion
+ritual.vani.name=Vani Infusion

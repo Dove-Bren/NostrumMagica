@@ -117,8 +117,6 @@ public class BookScreen extends GuiScreen {
 	@Override
 	public void drawScreen(int parWidth, int parHeight, float p_73863_3_) {
 
-		super.drawScreen(parWidth, parHeight, p_73863_3_);
-		
 		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 		Minecraft.getMinecraft().getTextureManager().bindTexture(background);
 		
@@ -136,6 +134,9 @@ public class BookScreen extends GuiScreen {
 		if (pages.size() > (currentPage * 2) + 1)
 			pages.get((currentPage * 2) + 1).draw(this, fontRendererObj, leftOffset + PAGE_HOFFSET + PAGE_WIDTH + PAGE_DISTANCE, topOffset + PAGE_VOFFSET,
 					PAGE_WIDTH, PAGE_HEIGHT);
+		
+		// Do buttons and other parent stuff
+		super.drawScreen(parWidth, parHeight, p_73863_3_);
 		
 		//now do overlays
 		if (parWidth > (leftOffset + PAGE_HOFFSET) && parWidth < (leftOffset + TEXT_WIDTH) - PAGE_HOFFSET

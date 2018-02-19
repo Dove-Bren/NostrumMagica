@@ -1,8 +1,10 @@
 package com.smanzana.nostrummagica.client.gui.book;
 
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -84,7 +86,7 @@ public class RitualRecipePage implements IBookPage {
 		
 		// Flavor Gem
 		item = getGemItem(recipe.getElement());
-		mc.getRenderItem().renderItemIntoGUI(item, centerx, yoffset + 36);
+		mc.getRenderItem().renderItemIntoGUI(item, centerx - 8, yoffset + 18);
 		
 		if (tier == 0) {
 			// reagent on candle in center
@@ -168,13 +170,13 @@ public class RitualRecipePage implements IBookPage {
 		
 		int tier = recipe.getTier();
 		if (tier == 0) {
-			list.add(" " + recipe.getTypes()[0].prettyName());
+			list.add(recipe.getTypes()[0].prettyName());
 		} else {
-			list.add(" " + recipe.getCenterItem().getDisplayName() + " (center)");
+			list.add(recipe.getCenterItem().getDisplayName() + " (center)");
 			for (ReagentType type : recipe.getTypes()) {
 				if (type == null)
 					continue;
-				list.add(" " + type.prettyName() + " (candle)");
+				list.add(type.prettyName() + " (candle)");
 			}
 			
 			if (tier == 2)
@@ -182,7 +184,7 @@ public class RitualRecipePage implements IBookPage {
 				if (extra == null)
 					continue;
 				
-				list.add(" " + extra.getDisplayName());
+				list.add(extra.getDisplayName());
 			}
 		}
 		
@@ -190,7 +192,7 @@ public class RitualRecipePage implements IBookPage {
 		
 	}
 	
-	private EnumMap<EMagicElement, ItemStack> gems = new EnumMap<>(EMagicElement.class);
+	private Map<EMagicElement, ItemStack> gems = new HashMap<>();
 	private ItemStack getGemItem(EMagicElement element) {
 		if (gems.get(element) == null) {
 			gems.put(element, InfusedGemItem.instance().getGem(element, 1));

@@ -174,11 +174,15 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 		public void readFromNBT(NBTTagCompound nbt) {
 			super.readFromNBT(nbt);
 			
-			if (nbt == null || !nbt.hasKey(NBT_ITEM, NBT.TAG_COMPOUND))
+			if (nbt == null)
 				return;
-			
-			NBTTagCompound tag = nbt.getCompoundTag(NBT_ITEM);
-			stack = ItemStack.loadItemStackFromNBT(tag);
+				
+			if (!nbt.hasKey(NBT_ITEM, NBT.TAG_COMPOUND)) {
+				stack = null;
+			} else {
+				NBTTagCompound tag = nbt.getCompoundTag(NBT_ITEM);
+				stack = ItemStack.loadItemStackFromNBT(tag);
+			}
 		}
 		
 		@Override
