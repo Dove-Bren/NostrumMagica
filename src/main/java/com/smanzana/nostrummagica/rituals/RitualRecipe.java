@@ -77,7 +77,7 @@ public class RitualRecipe {
 		}
 		recipe.centerItem = center;
 		
-		for (int i = 0; i < 4 && i < reagents.length; i++) {
+		for (int i = 0; i < 4 && i < extras.length; i++) {
 			recipe.extraItems[i] = extras[i];
 		}
 

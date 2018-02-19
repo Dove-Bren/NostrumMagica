@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.items;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -159,7 +160,7 @@ public class ShrineSeekingGem extends Item implements ILoreTagged {
 				new ItemStack(SpellRune.instance(), 1, OreDictionary.WILDCARD_VALUE),
 				ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1),
 				new ItemStack(Items.GOLD_INGOT),
-				new ItemStack(Items.DIAMOND),
+				NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1),
 				new ItemStack(Items.GOLD_INGOT),	
 			}, ShrineSeekingGem.getItemstack(new SpellComponentWrapper(EMagicElement.PHYSICAL)));
 			

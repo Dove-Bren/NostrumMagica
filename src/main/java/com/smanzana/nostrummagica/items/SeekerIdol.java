@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spells.EAlteration;
@@ -340,7 +341,7 @@ public class SeekerIdol extends Item implements ILoreTagged {
 		public IdolRecipe() {
 			super(3, 3, new ItemStack[] {
 				new ItemStack(Blocks.COBBLESTONE),
-				new ItemStack(ReagentItem.instance(), 1, OreDictionary.WILDCARD_VALUE),
+				NostrumResourceItem.getItem(ResourceType.TOKEN, 1),
 				new ItemStack(Blocks.COBBLESTONE),
 				new ItemStack(Blocks.COBBLESTONE),
 				new ItemStack(SpellRune.instance(), 1, OreDictionary.WILDCARD_VALUE),
