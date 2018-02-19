@@ -6,9 +6,11 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
+import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -49,9 +51,6 @@ public class RitualRecipePage implements IBookPage {
 		this.heightCache = height;
 		Minecraft mc = Minecraft.getMinecraft();
 		
-		int curFloatY = (int) (0 * Math.sin(6.28 * (float) ((float) (Minecraft.getSystemTime() % 1500) / 1500f)));
-		float curAlpha = .5f + .5f * ((Minecraft.getSystemTime() % 5000) / 5000f);
-		
 		mc.getTextureManager().bindTexture(TEXTURE);
 		GlStateManager.pushMatrix();
 		
@@ -81,13 +80,16 @@ public class RitualRecipePage implements IBookPage {
 		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 		Gui.drawModalRectWithCustomSizedTexture(x, y, TEXT_HOFFSET * tier, 0, effWidth, effHeight, TEXT_WIDTH, TEXT_HEIGHT);
 
-		GlStateManager.color(1f, 1f , 1f, curAlpha);
-		
 		ItemStack item;
+		
+		// Flavor Gem
+		item = getGemItem(recipe.getElement());
+		mc.getRenderItem().renderItemIntoGUI(item, centerx, yoffset + 36);
+		
 		if (tier == 0) {
 			// reagent on candle in center
 			item = getReagentItem(recipe.getTypes()[0]);
-			mc.getRenderItem().renderItemIntoGUI(item, centerx - 8, centery + curFloatY - 8);
+			mc.getRenderItem().renderItemIntoGUI(item, centerx - 8, centery - 8);
 		} else {
 			// reagents in 4 candles around. Item in center altar
 			int count = 0;
@@ -98,7 +100,7 @@ public class RitualRecipePage implements IBookPage {
 					break;
 				
 				x = centerx + (i * CANDLE_HOFFSET);
-				y = centery + (j * CANDLE_VOFFSET) + curFloatY;
+				y = centery + (j * CANDLE_VOFFSET);
 				
 				item = getReagentItem(type);
 				mc.getRenderItem().renderItemIntoGUI(item, x - 8, y - 8);
@@ -107,7 +109,7 @@ public class RitualRecipePage implements IBookPage {
 			// Has center item
 			item = recipe.getCenterItem();
 			if (item != null) {
-				mc.getRenderItem().renderItemIntoGUI(item, centerx - 8, centery + curFloatY - 8);
+				mc.getRenderItem().renderItemIntoGUI(item, centerx - 8, centery - 8);
 			}
 			
 			if (tier == 2) {
@@ -121,7 +123,7 @@ public class RitualRecipePage implements IBookPage {
 							break;
 						
 						x = centerx + (i * ALTAR_OFFSET);
-						y = centery + (j * ALTAR_OFFSET) + curFloatY;
+						y = centery + (j * ALTAR_OFFSET);
 						
 						mc.getRenderItem().renderItemIntoGUI(item, x - 8, y - 8);
 					}
@@ -188,4 +190,12 @@ public class RitualRecipePage implements IBookPage {
 		
 	}
 	
+	private EnumMap<EMagicElement, ItemStack> gems = new EnumMap<>(EMagicElement.class);
+	private ItemStack getGemItem(EMagicElement element) {
+		if (gems.get(element) == null) {
+			gems.put(element, InfusedGemItem.instance().getGem(element, 1));
+		}
+		
+		return gems.get(element);
+	}
 }

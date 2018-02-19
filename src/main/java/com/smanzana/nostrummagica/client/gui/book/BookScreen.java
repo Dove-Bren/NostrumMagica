@@ -108,7 +108,7 @@ public class BookScreen extends GuiScreen {
 		this.buttonList.add(nextButton);
 	}
 	
-	@Override
+	@Override	
 	public void updateScreen() {
 		backButton.visible = currentPage > 0;
 		nextButton.visible = currentPage < maxPage;
