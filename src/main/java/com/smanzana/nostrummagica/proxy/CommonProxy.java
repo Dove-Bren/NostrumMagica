@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.blocks.ManiOre;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.blocks.NostrumMirrorBlock;
+import com.smanzana.nostrummagica.blocks.NostrumObelisk;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.blocks.ShrineBlock;
 import com.smanzana.nostrummagica.blocks.SpellTable;
@@ -345,6 +346,10 @@ public class CommonProxy {
     			(new ItemBlock(Candle.instance())).setRegistryName(Candle.ID)
     		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(Candle.ID));
     	Candle.init();
+    	
+    	GameRegistry.register(NostrumObelisk.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, NostrumObelisk.ID));
+    	NostrumObelisk.init();
     }
     
     public void syncPlayer(EntityPlayerMP player) {

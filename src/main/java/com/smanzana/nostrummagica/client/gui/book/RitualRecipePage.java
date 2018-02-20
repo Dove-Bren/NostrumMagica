@@ -99,7 +99,7 @@ public class RitualRecipePage implements IBookPage {
 			for (int j = -1; j <= 1; j+=2) {
 				ReagentType type = recipe.getTypes()[count++];
 				if (type == null)
-					break;
+					continue;
 				
 				x = centerx + (i * CANDLE_HOFFSET);
 				y = centery + (j * CANDLE_VOFFSET);
@@ -122,7 +122,7 @@ public class RitualRecipePage implements IBookPage {
 					for (int j = -diff; j <= diff; j+=2) {
 						item = recipe.getExtraItems()[count++];
 						if (item == null)
-							break;
+							continue;
 						
 						x = centerx + (i * ALTAR_OFFSET);
 						y = centery + (j * ALTAR_OFFSET);

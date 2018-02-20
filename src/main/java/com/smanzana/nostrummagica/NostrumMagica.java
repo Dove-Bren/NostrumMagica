@@ -25,6 +25,7 @@ import com.smanzana.nostrummagica.listeners.PlayerListener;
 import com.smanzana.nostrummagica.proxy.CommonProxy;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
+import com.smanzana.nostrummagica.rituals.outcomes.OutcomeCreateObelisk;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeEnchantItem;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeMark;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomePotionEffect;
@@ -461,6 +462,15 @@ public class NostrumMagica
 					new ItemStack(Items.GOLD_INGOT),
 					new ItemStack[] {NostrumResourceItem.getItem(ResourceType.PENDANT_LEFT, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), NostrumResourceItem.getItem(ResourceType.PENDANT_RIGHT, 1)},
 					new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.PENDANT_WHOLE, 1)))
+				);
+		
+		// Obelisk -- tier 3. Vani crystal. Balanced slab, 2 eyes of ender, compass.
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("ritual.create_obelisk.name", EMagicElement.ENDER,
+					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.SKY_ASH, ReagentType.MANDRAKE_ROOT, ReagentType.GINSENG},
+					NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
+					new ItemStack[] {NostrumResourceItem.getItem(ResourceType.SLAB_BALANCED, 1), new ItemStack(Items.ENDER_EYE), new ItemStack(Items.ENDER_EYE), new ItemStack(Items.COMPASS)},
+					new OutcomeCreateObelisk())
 				);
 		
 //		RitualRegistry.instance().addRitual(
