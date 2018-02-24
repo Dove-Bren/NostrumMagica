@@ -12,9 +12,11 @@ import com.smanzana.nostrummagica.capabilities.AttributeProvider;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.command.CommandTestConfig;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
+import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
@@ -25,6 +27,7 @@ import com.smanzana.nostrummagica.listeners.PlayerListener;
 import com.smanzana.nostrummagica.proxy.CommonProxy;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
+import com.smanzana.nostrummagica.rituals.outcomes.OutcomeConstructGeotoken;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeCreateObelisk;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeEnchantItem;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeMark;
@@ -471,6 +474,15 @@ public class NostrumMagica
 					NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
 					new ItemStack[] {NostrumResourceItem.getItem(ResourceType.SLAB_BALANCED, 1), new ItemStack(Items.ENDER_EYE), new ItemStack(Items.ENDER_EYE), new ItemStack(Items.COMPASS)},
 					new OutcomeCreateObelisk())
+				);
+		
+		// GeoToken -- tier 3. Geogem center. Magic Token, earth crystal, blank scroll, diamond
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("ritual.geotoken.name", EMagicElement.EARTH,
+					new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.GINSENG, ReagentType.MANDRAKE_ROOT, ReagentType.GRAVE_DUST},
+					new ItemStack(PositionCrystal.instance()),
+					new ItemStack[] {new ItemStack(Items.DIAMOND), NostrumResourceItem.getItem(ResourceType.TOKEN, 1), InfusedGemItem.instance().getGem(EMagicElement.EARTH, 1), new ItemStack(BlankScroll.instance())},
+					new OutcomeConstructGeotoken())
 				);
 		
 //		RitualRegistry.instance().addRitual(

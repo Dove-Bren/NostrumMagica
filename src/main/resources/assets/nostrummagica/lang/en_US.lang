@@ -9,6 +9,8 @@ item.seeking_gem.name=Seeking Gem
 item.mirror_item.name=Magic Mirror
 item.nostrum_chalk.name=Chalk
 item.altar_item.name=Altar
+item.nostrum_pos_crystal.name=Geogem
+item.nostrum_pos_token.name=Geotoken
 
 item.magicswordbase.name=Ethereal Sword
 item.magichelmbase.name=Ethereal Helm
@@ -198,3 +200,4 @@ ritual.kind_infusion.name=Kindness Imbuement
 ritual.balanced_infusion.name=Ritual of Balance
 ritual.thano_infusion.name=Thano Infusion
 ritual.create_obelisk.name=Construct Obelisk
+ritual.geotoken.name=Construct Geotoken

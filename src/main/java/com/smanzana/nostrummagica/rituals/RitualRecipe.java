@@ -214,6 +214,9 @@ public class RitualRecipe {
 		if (world.isRemote)
 			return;
 		
+		ItemStack centerItem = null;
+		ItemStack otherItems[] = null;
+		
 		// Do cleanup of altars and candles, etc
 		if (tier == 0) {
 			// candle in center. extinguish
@@ -227,19 +230,30 @@ public class RitualRecipe {
 			}
 			// Clear off altars also
 			TileEntity te;
-			for (int x = -4; x <= 4; x+=4) {
-				int diff = 4 - Math.abs(x);
-				for (int z = -diff; z <= diff; z+=8) {
-					te = world.getTileEntity(center.add(x, 0, z));
-					if (te == null || !(te instanceof AltarTileEntity))
-						continue; // oh well, too late now!
-					((AltarTileEntity) te).setItem(null);
+			te = world.getTileEntity(center);
+			if (te != null && te instanceof AltarTileEntity) {
+				centerItem = ((AltarTileEntity) te).getItem();
+				((AltarTileEntity) te).setItem(null);
+			}
+			
+			if (tier == 2) {
+				otherItems = new ItemStack[4];
+				int i = 0;
+				for (int x = -4; x <= 4; x+=4) {
+					int diff = 4 - Math.abs(x);
+					for (int z = -diff; z <= diff; z+=8) {
+						te = world.getTileEntity(center.add(x, 0, z));
+						if (te == null || !(te instanceof AltarTileEntity))
+							continue; // oh well, too late now!
+						otherItems[i++] = ((AltarTileEntity) te).getItem();
+						((AltarTileEntity) te).setItem(null);
+					}
 				}
 			}
 		}
 
 		if (hook != null)
-			hook.perform(world, player, center, this);
+			hook.perform(world, player, centerItem, otherItems, center, this);
 	}
 
 	public EMagicElement getElement() {

@@ -11,14 +11,14 @@ import net.minecraft.world.World;
 
 public class OutcomeSpawnItem implements IRitualOutcome {
 
-	private ItemStack stack;
+	protected ItemStack stack;
 	
 	public OutcomeSpawnItem(ItemStack stack) {
 		this.stack = stack;
 	}
 	
 	@Override
-	public void perform(World world, EntityPlayer player, BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, EntityPlayer player, ItemStack centerItem, ItemStack otherItems[], BlockPos center, RitualRecipe recipe) {
 		// If there's an altar, we'll place item in altar
 		// Otherwise, we'll place it on the ground
 		if (recipe.getTier() == 0) {

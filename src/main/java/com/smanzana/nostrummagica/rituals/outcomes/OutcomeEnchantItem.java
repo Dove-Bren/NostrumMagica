@@ -20,7 +20,7 @@ public class OutcomeEnchantItem implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, EntityPlayer player, BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, EntityPlayer player, ItemStack centerItem, ItemStack otherItems[], BlockPos center, RitualRecipe recipe) {
 		// If there's an altar, we'll enchant the item there
 		// Otherwise enchant the item the player has
 		if (recipe.getTier() == 0) {

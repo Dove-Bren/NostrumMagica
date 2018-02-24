@@ -68,6 +68,10 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 		
 		private boolean isDestructing;
 		
+		public NostrumObeliskEntity() {
+			this(false);
+		}
+		
 		public NostrumObeliskEntity(boolean master) {
 			this.master = master;
 			targets = new LinkedList<>();

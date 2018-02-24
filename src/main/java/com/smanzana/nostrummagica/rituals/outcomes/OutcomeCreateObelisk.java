@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.rituals.RitualRecipe;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -20,7 +21,7 @@ public class OutcomeCreateObelisk implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, EntityPlayer player, BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, EntityPlayer player, ItemStack centerItem, ItemStack otherItems[], BlockPos center, RitualRecipe recipe) {
 		// All logic contained in obelisk class
 		if (!NostrumObelisk.spawnObelisk(world, center.add(0, -1, 0))) {
 			if (world.isRemote)

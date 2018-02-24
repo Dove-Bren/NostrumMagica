@@ -1,7 +1,6 @@
 package com.smanzana.nostrummagica.rituals.outcomes;
 
-import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -9,20 +8,18 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class OutcomeMark implements IRitualOutcome {
+public class OutcomeConstructGeotoken extends OutcomeSpawnItem {
 
-	public OutcomeMark() {
-		;
+	public OutcomeConstructGeotoken() {
+		super(null);
 	}
 	
 	@Override
 	public void perform(World world, EntityPlayer player, ItemStack centerItem, ItemStack otherItems[], BlockPos center, RitualRecipe recipe) {
-		// Set player's mark location to their current location
-		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-		if (attr == null)
-			return;
+		// set up stack and then call super to spawn it
+		this.stack = PositionToken.constructFrom(centerItem);
 		
-		attr.setMarkLocation(player.dimension, player.getPosition());
+		super.perform(world, player, centerItem, otherItems, center, recipe);
 	}
 
 	

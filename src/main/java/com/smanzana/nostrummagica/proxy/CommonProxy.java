@@ -44,6 +44,8 @@ import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.MirrorItem;
 import com.smanzana.nostrummagica.items.NostrumGuide;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
+import com.smanzana.nostrummagica.items.PositionCrystal;
+import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SeekerIdol;
@@ -277,6 +279,14 @@ public class CommonProxy {
     	AltarItem.instance().setRegistryName(NostrumMagica.MODID, AltarItem.ID);
     	GameRegistry.register(AltarItem.instance());
     	AltarItem.init();
+    	
+    	PositionCrystal.instance().setRegistryName(NostrumMagica.MODID, PositionCrystal.ID);
+    	GameRegistry.register(PositionCrystal.instance());
+    	PositionCrystal.init();
+    	
+    	PositionToken.instance().setRegistryName(NostrumMagica.MODID, PositionToken.ID);
+    	GameRegistry.register(PositionToken.instance());
+    	PositionToken.init();
     }
     
     private void registerBlocks() {

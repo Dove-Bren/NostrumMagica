@@ -36,6 +36,9 @@ import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.MirrorItem;
 import com.smanzana.nostrummagica.items.NostrumGuide;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
+import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
+import com.smanzana.nostrummagica.items.PositionCrystal;
+import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
@@ -45,7 +48,6 @@ import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTableItem;
 import com.smanzana.nostrummagica.items.SpellTome;
-import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
 import com.smanzana.nostrummagica.network.messages.SpellTomeIncrementMessage;
@@ -262,6 +264,14 @@ public class ClientProxy extends CommonProxy {
 					NostrumResourceItem.getMetaFromType(type),
 					type.getUnlocalizedKey());
 		}
+		
+		registerModel(PositionCrystal.instance(),
+				0,
+				PositionCrystal.ID);
+		
+		registerModel(PositionToken.instance(),
+				0,
+				PositionToken.ID);
 	}
 	
 	@Override
