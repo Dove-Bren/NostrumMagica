@@ -157,6 +157,10 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 				}
 			}
 		}
+		
+		public boolean isMaster() {
+			return this.master;
+		}
 	}
 
 	private static final PropertyBool MASTER = PropertyBool.create("master");
@@ -206,7 +210,7 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
-		return state.getValue(TILE) && !state.getValue(MASTER);
+		return !state.getValue(TILE) || state.getValue(MASTER);
 	}
 	
 	@Override
