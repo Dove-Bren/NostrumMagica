@@ -22,6 +22,13 @@ public class OutcomeConstructGeotoken extends OutcomeSpawnItem {
 		super.perform(world, player, centerItem, otherItems, center, recipe);
 	}
 
-	
+	private static ItemStack RES = null;
+	@Override
+	public ItemStack getResult() {
+		if (RES == null)
+			RES = new ItemStack(PositionToken.instance());
+		
+		return RES;
+	}
 	
 }

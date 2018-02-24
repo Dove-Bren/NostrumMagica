@@ -47,7 +47,4 @@ public class OutcomeEnchantItem implements IRitualOutcome {
 			altar.setItem(item);
 		}
 	}
-
-	
-	
 }

@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.client.gui.book;
 
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -12,6 +13,7 @@ import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
+import com.smanzana.nostrummagica.rituals.outcomes.IItemRitualOutcome;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.client.Minecraft;
@@ -28,6 +30,8 @@ public class RitualRecipePage implements IBookPage {
 	private static final int TEXT_WIDTH = 256;
 	private static final int TEXT_HEIGHT = 128;
 	private static final int TEXT_HOFFSET = 64;
+	private static final int TEXT_TABLET_VOFFSET = 64;
+	private static final int TEXT_TABLET_WIDTH = 18;
 	private static final int COMPONENT_WIDTH[] = new int[] {51, 54, 80};
 	private static final int COMPONENT_HEIGHT[] = new int[] {52, 54, 83};
 	private static final int CANDLE_HOFFSET = 19;
@@ -36,6 +40,7 @@ public class RitualRecipePage implements IBookPage {
 	
 	private RitualRecipe recipe;
 	private List<String> tooltip;
+	private List<String> description;
 	
 	private int widthCache;
 	private int heightCache;
@@ -45,6 +50,7 @@ public class RitualRecipePage implements IBookPage {
 	public RitualRecipePage(RitualRecipe recipe) {
 		this.recipe = recipe;
 		tooltip = makeTooltip(recipe);
+		description = makeDescription(recipe);
 	}
 	
 	@Override
@@ -132,8 +138,23 @@ public class RitualRecipePage implements IBookPage {
 				}
 			}
 		}
+
+		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+		if (recipe.getOutcome() != null) {
+			mc.getTextureManager().bindTexture(TEXTURE);
+			x = centerx - (TEXT_TABLET_WIDTH / 2);
+			y = (yoffset + height) - (10 + (TEXT_TABLET_WIDTH / 2));
+			if (recipe.getOutcome() instanceof IItemRitualOutcome) {
+				Gui.drawModalRectWithCustomSizedTexture(x, y, TEXT_TABLET_WIDTH, TEXT_TABLET_VOFFSET, TEXT_TABLET_WIDTH, TEXT_TABLET_WIDTH, TEXT_WIDTH, TEXT_HEIGHT);
+				
+				item = ((IItemRitualOutcome) recipe.getOutcome()).getResult();
+				mc.getRenderItem().renderItemIntoGUI(item, x + 1, y + 1);
+			} else {
+				Gui.drawModalRectWithCustomSizedTexture(x, y, 0, TEXT_TABLET_VOFFSET, TEXT_TABLET_WIDTH, TEXT_TABLET_WIDTH, TEXT_WIDTH, TEXT_HEIGHT);
+			}
+		}
 		
-		String name = I18n.format(recipe.getTitleKey(), new Object[0]);
+		String name = I18n.format("ritual." + recipe.getTitleKey() + ".name", new Object[0]);
 		int len = fonter.getStringWidth(name);
 		fonter.drawString(name, centerx - (len / 2), yoffset + 5, 0xFF000000);
 		GlStateManager.popMatrix();
@@ -147,9 +168,27 @@ public class RitualRecipePage implements IBookPage {
 			int x = centerx - (effWidth / 2);
 			int y = centery - (effHeight / 2) + 10;
 			
-			if (mouseX > x && mouseX < x + effWidth)
-			if (mouseY > y && mouseY < y + effHeight)
+			if (mouseX > x && mouseX < x + effWidth
+			&&  mouseY > y && mouseY < y + effHeight) {
 				parent.renderTooltip(tooltip, trueX, trueY);
+				return;
+			}
+			
+			if (recipe.getOutcome() != null) {
+				x = centerx - (TEXT_TABLET_WIDTH / 2);
+				y = heightCache - (10 + (TEXT_TABLET_WIDTH / 2));
+				if (mouseX > x && mouseX < x + TEXT_TABLET_WIDTH
+				&&  mouseY > y && mouseY < y + TEXT_TABLET_WIDTH) {
+					if (recipe.getOutcome() instanceof IItemRitualOutcome) {
+						// Item tooltip
+						parent.renderTooltip(((IItemRitualOutcome) recipe.getOutcome()).getResult(),
+								trueX, trueY);
+					} else {
+						// Text tooltip
+						parent.renderTooltip(description, trueX, trueY);
+					}
+				}
+			}
 		}
 	}
 	
@@ -162,7 +201,7 @@ public class RitualRecipePage implements IBookPage {
 		return reagentCache.get(type);
 	}
 	
-	private List<String> makeTooltip(RitualRecipe recipe) {
+	private static List<String> makeTooltip(RitualRecipe recipe) {
 		if (recipe == null)
 			return Lists.newArrayList("Invalid Recipe!");
 		
@@ -190,6 +229,11 @@ public class RitualRecipePage implements IBookPage {
 		
 		return list;
 		
+	}
+	
+	private static List<String> makeDescription(RitualRecipe recipe) {
+		return Arrays.asList(I18n.format("ritual." + recipe.getTitleKey() + ".desc", new Object[0])
+				.split("\\|"));
 	}
 	
 	private Map<EMagicElement, ItemStack> gems = new HashMap<>();

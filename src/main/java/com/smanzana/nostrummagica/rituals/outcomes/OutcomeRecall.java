@@ -37,7 +37,4 @@ public class OutcomeRecall implements IRitualOutcome {
 			player.addChatMessage(new TextComponentTranslation("info.recall.baddimension", new Object[0]));
 		}
 	}
-
-	
-	
 }

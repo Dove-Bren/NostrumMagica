@@ -186,18 +186,31 @@ info.recall.fail=A mark location must be set first'
 info.recall.baddimension=Your mark location is in a different dimension
 
 ritual.buff.luck.name=Ritual of Luck
+ritual.buff.luck.desc=Gives the Luck I|effect for 20 seconds
 
 ritual.enchant.infinity.name=Infinity Infusion
+ritual.enchant.infinity.desc=Enchant with Infinity
 
 ritual.mark.name=Ritual of Marking
+ritual.mark.desc=Mark a location to be|recalled to later.|You can only have|one marked location at|a time.
 ritual.recall.name=Ritual of Recall
+ritual.recall.desc=Teleport to your mark|location. Mark locations with|the Ritual of Marking.|You cannot recall to|a mark location in|a another dimension.
 
 ritual.kani.name=Kani Infusion
+ritual.kani.desc=Promotes a Mani Crystal to a Kani Crystal
 ritual.vani.name=Vani Infusion
+ritual.vani.desc=Promotes a Kani Crystal to a Vani Crystal
 ritual.magic_token.name=Barr's Enchantment
+ritual.magic_token.desc=Creates a Magic Token
 ritual.fierce_infusion.name=Fierce Imbuement
+ritual.fierce_infusion.desc=Creates a Fierce Slab
 ritual.kind_infusion.name=Kindness Imbuement
+ritualkind_infusiondesc=Creates a Kindness Slab
 ritual.balanced_infusion.name=Ritual of Balance
+ritual.balanced_infusion.desc=Combines Kindness of Ferocity into a Balanced Slab
 ritual.thano_infusion.name=Thano Infusion
+ritual.thano_infusion.desc=Fuses two broken halves of a Thano Pendant
 ritual.create_obelisk.name=Construct Obelisk
+ritual.create_obelisk.desc=Creates an Obelisk at|the center of the ritual
 ritual.geotoken.name=Construct Geotoken
+ritual.geotoken.desc=Solidifes a Geogem into a Geotoken

@@ -381,34 +381,34 @@ public class NostrumMagica
     private void registerDefaultRituals() {
 		RitualRecipe recipe;
 		
-		recipe = RitualRecipe.createTier1("ritual.buff.luck.name", null,
+		recipe = RitualRecipe.createTier1("buff.luck", null,
 				ReagentType.GRAVE_DUST,
 				new OutcomePotionEffect(Potion.getPotionFromResourceLocation("luck"), 0, 20 * 20));
 		
 		RitualRegistry.instance().addRitual(recipe);
 		
-		recipe = RitualRecipe.createTier2("ritual.enchant.infinity.name", null,
+		recipe = RitualRecipe.createTier2("enchant.infinity", null,
 				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.CRYSTABLOOM},
 				new ItemStack(Items.BOW),
 				new OutcomeEnchantItem(Enchantments.INFINITY, 1));
 		RitualRegistry.instance().addRitual(recipe);
 		
 		ItemStack enderpearl = new ItemStack(Items.ENDER_PEARL);
-		recipe = RitualRecipe.createTier3("ritual.mark.name", EMagicElement.WIND,
+		recipe = RitualRecipe.createTier3("mark", EMagicElement.WIND,
 				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.CRYSTABLOOM},
 				InfusedGemItem.instance().getGem(EMagicElement.EARTH, 1),
 				new ItemStack[] {enderpearl, new ItemStack(Items.COMPASS), new ItemStack(Items.MAP, 1, OreDictionary.WILDCARD_VALUE), enderpearl},
 				new OutcomeMark());
 		RitualRegistry.instance().addRitual(recipe);
 		
-		recipe = RitualRecipe.createTier1("ritual.recall.name", EMagicElement.LIGHTNING,
+		recipe = RitualRecipe.createTier1("recall", EMagicElement.LIGHTNING,
 				ReagentType.SKY_ASH,
 				new OutcomeRecall());
 		RitualRegistry.instance().addRitual(recipe);
 		
 		// medium crystal -- tier 2. Small crystal, reagents, basic crystal
 		RitualRegistry.instance().addRitual(
-				RitualRecipe.createTier2("ritual.kani.name", null,
+				RitualRecipe.createTier2("kani", null,
 					new ReagentType[] {ReagentType.MANDRAKE_ROOT, ReagentType.MANI_DUST, ReagentType.GINSENG, ReagentType.GRAVE_DUST},
 					NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1),
 					new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1)))
@@ -417,7 +417,7 @@ public class NostrumMagica
 		// large crystal -- tier 3. Medium crystal, 4 medium crystals, reagents, basic crystal
 		ItemStack crystal = NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1);
 		RitualRegistry.instance().addRitual(
-				RitualRecipe.createTier3("ritual.vani.name", null,
+				RitualRecipe.createTier3("vani", null,
 					new ReagentType[] {ReagentType.MANDRAKE_ROOT, ReagentType.MANI_DUST, ReagentType.BLACK_PEARL, ReagentType.CRYSTABLOOM},
 					crystal,
 					new ItemStack[] {crystal, crystal, crystal, crystal},
@@ -426,14 +426,14 @@ public class NostrumMagica
 		
 		// magic token -- tier 1. Mani dust.
 		RitualRegistry.instance().addRitual(
-				RitualRecipe.createTier1("ritual.magic_token.name", null,
+				RitualRecipe.createTier1("magic_token", null,
 					ReagentType.MANI_DUST,
 					new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.TOKEN, 1)))
 				);
 		
 		// fierce slab -- tier 3. Kani crystal. Fire + Wind gems
 		RitualRegistry.instance().addRitual(
-				RitualRecipe.createTier3("ritual.fierce_infusion.name", EMagicElement.LIGHTNING,
+				RitualRecipe.createTier3("fierce_infusion", EMagicElement.LIGHTNING,
 					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANDRAKE_ROOT, ReagentType.SPIDER_SILK},
 					crystal,
 					new ItemStack[] {InfusedGemItem.instance().getGem(EMagicElement.FIRE, 1), null, null, InfusedGemItem.instance().getGem(EMagicElement.WIND, 1)},
@@ -442,7 +442,7 @@ public class NostrumMagica
 		
 		// kind slab -- tier 3. Kani crystal. Ice + Earth gems
 		RitualRegistry.instance().addRitual(
-				RitualRecipe.createTier3("ritual.kind_infusion.name", EMagicElement.ENDER,
+				RitualRecipe.createTier3("kind_infusion", EMagicElement.ENDER,
 					new ReagentType[] {ReagentType.CRYSTABLOOM, ReagentType.GINSENG, ReagentType.MANI_DUST, ReagentType.SKY_ASH},
 					crystal,
 					new ItemStack[] {InfusedGemItem.instance().getGem(EMagicElement.ICE, 1), null, null, InfusedGemItem.instance().getGem(EMagicElement.EARTH, 1)},
@@ -451,7 +451,7 @@ public class NostrumMagica
 		
 		// balanced slab -- tier 3. Vani crystal. Fierce and Kind slabs, + ender and lightning gems
 		RitualRegistry.instance().addRitual(
-				RitualRecipe.createTier3("ritual.balanced_infusion.name", null,
+				RitualRecipe.createTier3("balanced_infusion", null,
 					new ReagentType[] {ReagentType.GINSENG, ReagentType.CRYSTABLOOM, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK},
 					NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
 					new ItemStack[] {NostrumResourceItem.getItem(ResourceType.SLAB_KIND, 1), InfusedGemItem.instance().getGem(EMagicElement.ENDER, 1), InfusedGemItem.instance().getGem(EMagicElement.LIGHTNING, 1), NostrumResourceItem.getItem(ResourceType.SLAB_FIERCE, 1)},
@@ -460,7 +460,7 @@ public class NostrumMagica
 		
 		// Thano Pendant -- tier 3. gold ingot. Paliv + Cerci fragments + 2 mani crystals.
 		RitualRegistry.instance().addRitual(
-				RitualRecipe.createTier3("ritual.thano_infusion.name", EMagicElement.ICE,
+				RitualRecipe.createTier3("thano_infusion", EMagicElement.ICE,
 					new ReagentType[] {ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.MANDRAKE_ROOT, ReagentType.SPIDER_SILK},
 					new ItemStack(Items.GOLD_INGOT),
 					new ItemStack[] {NostrumResourceItem.getItem(ResourceType.PENDANT_LEFT, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), NostrumResourceItem.getItem(ResourceType.PENDANT_RIGHT, 1)},
@@ -469,7 +469,7 @@ public class NostrumMagica
 		
 		// Obelisk -- tier 3. Vani crystal. Balanced slab, 2 eyes of ender, compass.
 		RitualRegistry.instance().addRitual(
-				RitualRecipe.createTier3("ritual.create_obelisk.name", EMagicElement.ENDER,
+				RitualRecipe.createTier3("create_obelisk", EMagicElement.ENDER,
 					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.SKY_ASH, ReagentType.MANDRAKE_ROOT, ReagentType.GINSENG},
 					NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
 					new ItemStack[] {NostrumResourceItem.getItem(ResourceType.SLAB_BALANCED, 1), new ItemStack(Items.ENDER_EYE), new ItemStack(Items.ENDER_EYE), new ItemStack(Items.COMPASS)},
@@ -478,7 +478,7 @@ public class NostrumMagica
 		
 		// GeoToken -- tier 3. Geogem center. Magic Token, earth crystal, blank scroll, diamond
 		RitualRegistry.instance().addRitual(
-				RitualRecipe.createTier3("ritual.geotoken.name", EMagicElement.EARTH,
+				RitualRecipe.createTier3("geotoken", EMagicElement.EARTH,
 					new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.GINSENG, ReagentType.MANDRAKE_ROOT, ReagentType.GRAVE_DUST},
 					new ItemStack(PositionCrystal.instance()),
 					new ItemStack[] {new ItemStack(Items.DIAMOND), NostrumResourceItem.getItem(ResourceType.TOKEN, 1), InfusedGemItem.instance().getGem(EMagicElement.EARTH, 1), new ItemStack(BlankScroll.instance())},

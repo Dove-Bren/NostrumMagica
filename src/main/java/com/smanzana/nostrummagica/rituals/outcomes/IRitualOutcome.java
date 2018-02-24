@@ -9,6 +9,14 @@ import net.minecraft.world.World;
 
 public interface IRitualOutcome {
 
+	/**
+	 * Actually perform the ritual and spawn outcomes, etc.
+	 * @param world
+	 * @param player
+	 * @param centerItem
+	 * @param otherItems
+	 * @param center
+	 * @param recipe
+	 */
 	public void perform(World world, EntityPlayer player, ItemStack centerItem, ItemStack otherItems[], BlockPos center, RitualRecipe recipe);
-	
 }

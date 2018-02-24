@@ -9,7 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class OutcomeSpawnItem implements IRitualOutcome {
+public class OutcomeSpawnItem implements IItemRitualOutcome {
 
 	protected ItemStack stack;
 	
@@ -33,6 +33,8 @@ public class OutcomeSpawnItem implements IRitualOutcome {
 		}
 	}
 
-	
-	
+	@Override
+	public ItemStack getResult() {
+		return stack;
+	}
 }

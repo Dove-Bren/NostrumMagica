@@ -22,7 +22,4 @@ public class OutcomePotionEffect implements IRitualOutcome {
 		// Apply effect to the player
 		player.addPotionEffect(effect);
 	}
-
-	
-	
 }

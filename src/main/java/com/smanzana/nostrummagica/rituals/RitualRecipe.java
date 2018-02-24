@@ -276,6 +276,10 @@ public class RitualRecipe {
 		return extraItems;
 	}
 	
+	public IRitualOutcome getOutcome() {
+		return this.hook;
+	}
+	
 	public String getTitleKey() {
 		return titleKey;
 	}
