@@ -184,6 +184,10 @@ death.attack.magic.ENDER=%1$s was slain by %s$2's Ender energies
 
 info.recall.fail=A mark location must be set first'
 info.recall.baddimension=Your mark location is in a different dimension
+info.obelisk.none=Add the location of other obelisks using a Geotoken to add teleporation destinations
+info.obelisk.nomagic=The workings of the strange stone are lost to you. Perhaps if you knew more about magic...
+info.obelisk.noroom=There is not enough room to teleport
+info.obelisk.dne=The other obelisk has been destroyed
 
 ritual.buff.luck.name=Ritual of Luck
 ritual.buff.luck.desc=Gives the Luck I|effect for 20 seconds

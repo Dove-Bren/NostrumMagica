@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.client.gui;
 
 import com.smanzana.nostrummagica.blocks.NostrumMirrorBlock;
+import com.smanzana.nostrummagica.blocks.NostrumObelisk.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.blocks.SpellTable.SpellTableEntity;
 import com.smanzana.nostrummagica.client.gui.container.ReagentBagGui;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
@@ -18,6 +19,7 @@ public class NostrumGui implements IGuiHandler {
 	public static final int reagentBagID = 0;
 	public static final int spellTableID = 1;
 	public static final int mirrorID = 2;
+	public static final int obeliskID = 3;
 	
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
@@ -46,6 +48,9 @@ public class NostrumGui implements IGuiHandler {
 			return null;
 		}
 		
+		if (ID == obeliskID) {
+			return null;
+		}
 		
 		// Item based
 		int pos = player.inventory.currentItem + 27;
@@ -86,6 +91,13 @@ public class NostrumGui implements IGuiHandler {
 		
 		if (ID == mirrorID) {
 			return new NostrumMirrorBlock.MirrorGui(player);
+		}
+		
+		if (ID == obeliskID) {
+			TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
+			if (te != null && te instanceof NostrumObeliskEntity) {
+				return new ObeliskScreen((NostrumObeliskEntity) te);
+			}
 		}
 		
 		// Item based

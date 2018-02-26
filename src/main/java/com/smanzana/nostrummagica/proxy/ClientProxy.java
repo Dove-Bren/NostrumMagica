@@ -21,7 +21,6 @@ import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityAltarRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityCandleRenderer;
-import com.smanzana.nostrummagica.client.render.TileEntityObeliskRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntitySymbolRenderer;
 import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.renderer.ModelGolem;
@@ -51,6 +50,7 @@ import com.smanzana.nostrummagica.items.SpellTableItem;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
+import com.smanzana.nostrummagica.network.messages.ObeliskTeleportationRequestMessage;
 import com.smanzana.nostrummagica.network.messages.SpellTomeIncrementMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
@@ -74,6 +74,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.client.event.MouseEvent;
@@ -160,7 +161,6 @@ public class ClientProxy extends CommonProxy {
     	TileEntitySymbolRenderer.init();
     	TileEntityCandleRenderer.init();
     	TileEntityAltarRenderer.init();
-    	TileEntityObeliskRenderer.init();
     	
     	OBJLoader.INSTANCE.addDomain(NostrumMagica.MODID);
 	}
@@ -432,5 +432,13 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public String getTranslation(String key) {
 		return I18n.format(key, new Object[0]).trim();
+	}
+	
+	@Override
+	public void requestObeliskTransportation(BlockPos origin, BlockPos target) {
+		// Send a request to the server
+		NetworkHandler.getSyncChannel().sendToServer(
+				new ObeliskTeleportationRequestMessage(origin, target)
+				);
 	}
 }

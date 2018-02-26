@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.smanzana.nostrummagica.capabilities.AttributeProvider;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.command.CommandSpawnObelisk;
 import com.smanzana.nostrummagica.command.CommandTestConfig;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.items.BlankScroll;
@@ -136,6 +137,7 @@ public class NostrumMagica
     @EventHandler
     public void startup(FMLServerStartingEvent event) {
     	event.registerServerCommand(new CommandTestConfig());
+    	event.registerServerCommand(new CommandSpawnObelisk());
     	loadSeekerRegistry(seekerRegistryFile);
     }
     

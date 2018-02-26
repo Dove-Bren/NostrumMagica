@@ -1,9 +1,15 @@
 package com.smanzana.nostrummagica.items;
 
+import com.smanzana.nostrummagica.blocks.NostrumObelisk;
+import com.smanzana.nostrummagica.blocks.NostrumObelisk.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
@@ -80,5 +86,33 @@ public class PositionToken extends PositionCrystal {
 				getBlockPosition(centerItem));
 		
 		return ret;
+	}
+	
+	@Override
+	public boolean onEntityItemUpdate(EntityItem entityItem) {
+		if (entityItem.worldObj.isRemote)
+			return false;
+			
+		// check if item is above an obelisk. If so, add this target (if we have one) to it
+		if (getBlockPosition(entityItem.getEntityItem()) != null) {
+			BlockPos pos = entityItem.getPosition().add(0, -1, 0);
+			IBlockState state = entityItem.worldObj.getBlockState(pos);
+			if (state != null && state.getBlock() instanceof NostrumObelisk && NostrumObelisk.blockIsMaster(state)) {
+				TileEntity ent = entityItem.worldObj.getTileEntity(pos);
+				if (ent != null && ent instanceof NostrumObeliskEntity) {
+					((NostrumObeliskEntity) ent).addTarget(getBlockPosition(entityItem.getEntityItem()));
+					NostrumMagicaSounds.AMBIENT_WOOSH.play(
+							entityItem.worldObj,
+							pos.getX(),
+							pos.getY(),
+							pos.getZ()
+							);
+					entityItem.setDead();
+					return true;
+				}
+			}
+		}
+		
+		return false;
 	}
 }

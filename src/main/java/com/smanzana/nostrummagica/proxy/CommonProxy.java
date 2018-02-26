@@ -90,6 +90,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -402,5 +403,9 @@ public class CommonProxy {
 	
 	public String getTranslation(String key) {
 		return key; // This is the server, silly!
+	}
+	
+	public void requestObeliskTransportation(BlockPos origin, BlockPos target) {
+		; // server does nothing
 	}
 }

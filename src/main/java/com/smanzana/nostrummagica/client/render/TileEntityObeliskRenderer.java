@@ -72,7 +72,7 @@ public class TileEntityObeliskRenderer extends TileEntitySpecialRenderer<Nostrum
 		GlStateManager.rotate(rotY, 0, 1f, 0);
 		GlStateManager.rotate(rotX, 1f, 0, 0);
 		
-		GlStateManager.disableLighting();
+		//GlStateManager.disableLighting();
 		//GlStateManager.enableAlpha();
 		//GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 		RenderHelper.disableStandardItemLighting();
@@ -84,7 +84,7 @@ public class TileEntityObeliskRenderer extends TileEntitySpecialRenderer<Nostrum
         // Translate back to local view coordinates so that we can do the acual rendering here
         GlStateManager.translate(-te.getPos().getX(), -te.getPos().getY(), -te.getPos().getZ());
 
-        int li = getWorld().getCombinedLight(te.getPos(), 15728640);
+        int li = 0xF0;
         int i1 = li % 65536;
         int j1 = li / 65536;
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) i1, (float) j1);
@@ -98,6 +98,9 @@ public class TileEntityObeliskRenderer extends TileEntitySpecialRenderer<Nostrum
                 Tessellator.getInstance().getBuffer(),
                 false);
         tessellator.draw();
+        
+//        Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer().renderModelBrightness(
+//        		model, world.getBlockState(te.getPos()), li, true);
 
         RenderHelper.enableStandardItemLighting();
         GlStateManager.popMatrix();

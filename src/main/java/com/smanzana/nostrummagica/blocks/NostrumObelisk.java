@@ -8,6 +8,8 @@ import java.util.Random;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.gui.NostrumGui;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
@@ -22,12 +24,15 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -114,10 +119,11 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 			if (list != null && list.tagCount() > 0) {
 				this.targets = new ArrayList<>(list.tagCount());
 				for (int i = 0; i < list.tagCount(); i++) {
+					NBTTagCompound tag = list.getCompoundTagAt(i);
 					targets.add(new BlockPos(
-							nbt.getInteger(NBT_POS_X),
-							nbt.getInteger(NBT_POS_Y),
-							nbt.getInteger(NBT_POS_Z)
+							tag.getInteger(NBT_POS_X),
+							tag.getInteger(NBT_POS_Y),
+							tag.getInteger(NBT_POS_Z)
 							));
 				}
 			}
@@ -160,6 +166,38 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 		
 		public boolean isMaster() {
 			return this.master;
+		}
+		
+		public void addTarget(BlockPos pos) {
+			targets.add(pos);
+			dirty();
+		}
+		
+		public List<BlockPos> getTargets() {
+			return targets;
+		}
+		
+		@Override
+		public SPacketUpdateTileEntity getUpdatePacket() {
+			return new SPacketUpdateTileEntity(this.pos, 3, this.getUpdateTag());
+		}
+
+		@Override
+		public NBTTagCompound getUpdateTag() {
+			return this.writeToNBT(new NBTTagCompound());
+		}
+		
+		@Override
+		public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+			super.onDataPacket(net, pkt);
+			handleUpdateTag(pkt.getNbtCompound());
+		}
+		
+		private void dirty() {
+			worldObj.markBlockRangeForRenderUpdate(pos, pos);
+			worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 3);
+			worldObj.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
+			markDirty();
 		}
 	}
 
@@ -299,6 +337,10 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 		return BlockRenderLayer.SOLID;
 	}
 	
+	public static boolean blockIsMaster(IBlockState state) {
+		return state.getValue(TILE) && state.getValue(MASTER);
+	}
+	
 	public IBlockState getMasterState() {
 		return this.getDefaultState().withProperty(MASTER, true)
 				.withProperty(TILE, true);
@@ -350,11 +392,17 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 			return false;
 		}
 		
-//		playerIn.openGui(NostrumMagica.instance,
-//				NostrumGui.ObeliskID, worldIn,
-//				pos.getX(), pos.getY(), pos.getZ());
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
+		if (attr == null || !attr.isUnlocked()) {
+			if (worldIn.isRemote) {
+				playerIn.addChatComponentMessage(new TextComponentTranslation("info.obelisk.nomagic"));
+			}
+			return false;
+		}
 		
-		System.out.println("Obelisk activated");
+		playerIn.openGui(NostrumMagica.instance,
+				NostrumGui.obeliskID, worldIn,
+				pos.getX(), pos.getY(), pos.getZ());
 		
 		return true;
 	}
@@ -397,6 +445,38 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 				world.setBlockState(pos, instance().getDefaultState());
 			}
 		}
+	}
+
+	public static boolean isValidTarget(World world, BlockPos from, BlockPos to) {
+		IBlockState state = world.getBlockState(from);
+		if (state == null
+				|| !(state.getBlock() instanceof NostrumObelisk)
+				|| !blockIsMaster(state))
+			return false;
+		
+		TileEntity te = world.getTileEntity(from);
+		if (te == null || !(te instanceof NostrumObeliskEntity))
+			return false;
+		
+		NostrumObeliskEntity ent = (NostrumObeliskEntity) te;
+		if (ent.targets == null || ent.targets.isEmpty())
+			return false;
+		
+		// Load it?
+		state = world.getBlockState(to);
+		if (state == null
+				|| !(state.getBlock() instanceof NostrumObelisk)
+				|| !blockIsMaster(state))
+			return false;
+		
+		for (BlockPos targ : ent.targets) {
+			if (targ.getX() == to.getX()
+					&& targ.getY() == to.getY()
+					&& targ.getZ() == to.getZ())
+				return true;
+		}
+		
+		return false;
 	}
 	
 }

@@ -27,6 +27,7 @@ public class ModConfig {
 		//MANA_DISPLAY(),
 		SPELL_DEBUG(Category.SPELL, "spell_debug", false, false, "Print targetting debug information for spells? (Requires config on server set to true as well)"),
 		
+		OBELISK_LIST(Category.DISPLAY, "obelisk_list", false, false, "Display known teleportation points in the obelisk as a list"),
 		
 		INNER_DEBUG(Category.TEST, "inner_debug", 0, false, "Testing debug dont use omg blow everyhing up dont do it omg zomb");
 		
@@ -378,6 +379,10 @@ public class ModConfig {
 	
 	public int getInnerDebug() {
 		return getIntValue(Key.INNER_DEBUG, false);
+	}
+	
+	public boolean getObeliskList() {
+		return getBooleanValue(Key.OBELISK_LIST, false);
 	}
 	
 }
