@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.blocks.NostrumObelisk.NostrumObeliskEntity.Cor
 import com.smanzana.nostrummagica.blocks.NostrumObelisk.NostrumObeliskEntity.NostrumObeliskTarget;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
+import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.world.NostrumChunkLoader;
 
 import net.minecraft.block.Block;
@@ -566,7 +567,7 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 		}
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
-		if (attr == null || !attr.isUnlocked()) {
+		if (!ModConfig.config.obeliskReqMagic() && (attr == null || !attr.isUnlocked())) {
 			if (worldIn.isRemote) {
 				playerIn.addChatComponentMessage(new TextComponentTranslation("info.obelisk.nomagic"));
 			}

@@ -29,7 +29,9 @@ public class ModConfig {
 		
 		OBELISK_LIST(Category.DISPLAY, "obelisk_list", false, false, "Display known teleportation points in the obelisk as a list"),
 		
-		INNER_DEBUG(Category.TEST, "inner_debug", 0, false, "Testing debug dont use omg blow everyhing up dont do it omg zomb");
+		INNER_DEBUG(Category.TEST, "inner_debug", 0, false, "Testing debug dont use omg blow everyhing up dont do it omg zomb"),
+		
+		OBELISK_REQ_MAGIC(Category.SERVER, "obelisk_req_magic", true, true, "Magic must be unlocked before obelisks can be used or teleported to.");
 		
 		
 //		DEPTH_S(Category.TEST, "depth_s", new Float(0.1f), false, "south depth"),
@@ -383,6 +385,10 @@ public class ModConfig {
 	
 	public boolean getObeliskList() {
 		return getBooleanValue(Key.OBELISK_LIST, false);
+	}
+	
+	public boolean obeliskReqMagic() {
+		return getBooleanValue(Key.OBELISK_REQ_MAGIC, true);
 	}
 	
 }

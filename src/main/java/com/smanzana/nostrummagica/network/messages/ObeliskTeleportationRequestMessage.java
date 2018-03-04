@@ -1,7 +1,5 @@
 package com.smanzana.nostrummagica.network.messages;
 
-import java.util.Random;
-
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumObelisk;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -48,61 +46,11 @@ public class ObeliskTeleportationRequestMessage implements IMessage {
 			
 			EntityPlayer sp = ctx.getServerHandler().playerEntity;
 			
-			INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
-			
-			if (att == null || !att.isUnlocked()) {
-				// drop it on the floor
-				return null;
-			}
-			
-			// Verify other obelisk
-			IBlockState state = sp.worldObj.getBlockState(to);
-			if (state == null || !(state.getBlock() instanceof NostrumObelisk)
-					|| !NostrumObelisk.blockIsMaster(state)) {
-				sp.addChatComponentMessage(new TextComponentTranslation("info.obelisk.dne"));
-				return null;
-			}
-			
-			// If we were given from, make sure that's valid too
-			if (from != null) {
-				state = sp.worldObj.getBlockState(from);
-				if (state == null || !(state.getBlock() instanceof NostrumObelisk)
-						|| !NostrumObelisk.blockIsMaster(state)
-						|| !NostrumObelisk.isValidTarget(sp.worldObj, from, to)) {
-					NostrumMagica.logger.error("Something went wrong! Source obelisk does not seem to exist or have the provided target obelisk...");
-					sp.addChatComponentMessage(new TextComponentTranslation("info.obelisk.dne"));
-					return null;
-				}
-			}
-			
-			if (sp.attemptTeleport(to.getX() + .5, to.getY() + 1, to.getZ() + .5)) {
-				if (from != null)
-					doEffects(sp.worldObj, from);
-					
-				doEffects(sp.worldObj, to);
-			} else {
-				sp.addChatComponentMessage(new TextComponentTranslation("info.obelisk.noroom"));
-			}
+			serverDoRequest(sp.worldObj, sp, from, to);
 			
 			return null;
 		}
 		
-		private void doEffects(World world, BlockPos pos) {
-			double x = pos.getX() + .5;
-			double y = pos.getY() + 1.4;
-			double z = pos.getZ() + .5;
-			NostrumMagicaSounds.DAMAGE_ENDER.play(world, x, y, z);
-			((WorldServer) world).spawnParticle(EnumParticleTypes.DRAGON_BREATH,
-					x,
-					y,
-					z,
-					50,
-					.3,
-					.5,
-					.3,
-					.2,
-					new int[0]);
-		}
 	}
 
 	private static final String NBT_FROM = "from";
@@ -139,4 +87,61 @@ public class ObeliskTeleportationRequestMessage implements IMessage {
 		ByteBufUtils.writeTag(buf, tag);
 	}
 
+	public static boolean serverDoRequest(World world, EntityPlayer player, BlockPos from, BlockPos to) {
+		INostrumMagic att = NostrumMagica.getMagicWrapper(player);
+		
+		if (att == null || !att.isUnlocked()) {
+			// drop it on the floor
+			return false;
+		}
+		
+		// Verify other obelisk
+		IBlockState state = world.getBlockState(to);
+		if (state == null || !(state.getBlock() instanceof NostrumObelisk)
+				|| !NostrumObelisk.blockIsMaster(state)) {
+			player.addChatComponentMessage(new TextComponentTranslation("info.obelisk.dne"));
+			return false;
+		}
+		
+		// If we were given from, make sure that's valid too
+		if (from != null) {
+			state = world.getBlockState(from);
+			if (state == null || !(state.getBlock() instanceof NostrumObelisk)
+					|| !NostrumObelisk.blockIsMaster(state)
+					|| !NostrumObelisk.isValidTarget(world, from, to)) {
+				NostrumMagica.logger.error("Something went wrong! Source obelisk does not seem to exist or have the provided target obelisk...");
+				player.addChatComponentMessage(new TextComponentTranslation("info.obelisk.dne"));
+				return false;
+			}
+		}
+		
+		if (player.attemptTeleport(to.getX() + .5, to.getY() + 1, to.getZ() + .5)) {
+			if (from != null)
+				doEffects(world, from);
+				
+			doEffects(world, to);
+		} else {
+			player.addChatComponentMessage(new TextComponentTranslation("info.obelisk.noroom"));
+		}
+		
+		return true;
+	}
+	
+	private static void doEffects(World world, BlockPos pos) {
+		double x = pos.getX() + .5;
+		double y = pos.getY() + 1.4;
+		double z = pos.getZ() + .5;
+		NostrumMagicaSounds.DAMAGE_ENDER.play(world, x, y, z);
+		((WorldServer) world).spawnParticle(EnumParticleTypes.DRAGON_BREATH,
+				x,
+				y,
+				z,
+				50,
+				.3,
+				.5,
+				.3,
+				.2,
+				new int[0]);
+	}
+	
 }

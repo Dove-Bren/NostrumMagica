@@ -35,6 +35,7 @@ import com.smanzana.nostrummagica.rituals.outcomes.OutcomeMark;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomePotionEffect;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeRecall;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
+import com.smanzana.nostrummagica.rituals.outcomes.OutcomeTeleportObelisk;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.SpellRegistry;
@@ -488,6 +489,14 @@ public class NostrumMagica
 					new ItemStack(PositionCrystal.instance()),
 					new ItemStack[] {new ItemStack(Items.DIAMOND), NostrumResourceItem.getItem(ResourceType.TOKEN, 1), InfusedGemItem.instance().getGem(EMagicElement.EARTH, 1), new ItemStack(BlankScroll.instance())},
 					new OutcomeConstructGeotoken())
+				);
+		
+		// Tele to obelisk -- tier 2. Position gem, reagents
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier2("teleport_obelisk", EMagicElement.ENDER,
+					new ReagentType[] {ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK},
+					new ItemStack(PositionCrystal.instance()),
+					new OutcomeTeleportObelisk())
 				);
 		
 //		RitualRegistry.instance().addRitual(
