@@ -89,6 +89,7 @@ public class NostrumFlowerGenerator implements IWorldGenerator {
 			return;
 		
 		for (FlowerGen gen : FlowerGen.values())
+			if (random.nextBoolean() && random.nextBoolean())
 			runGenerator(gen.getGenerator(), world, random, chunkX, chunkZ,
 					gen.getMinY(), gen.getMaxY(),
 					gen.getMinTemp(), gen.getMaxTemp());

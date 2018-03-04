@@ -162,33 +162,43 @@ public class RitualRecipePage implements IBookPage {
 
 	@Override
 	public void overlay(BookScreen parent, FontRenderer fonter, int mouseX, int mouseY, int trueX, int trueY) {
+
+		int centerx = widthCache / 2;
+		int centery = heightCache / 2;
+		int x = centerx - (effWidth / 2);
+		int y = centery - (effHeight / 2) + 10;
+		
 		if (tooltip != null) {
-			int centerx = widthCache / 2;
-			int centery = heightCache / 2;
-			int x = centerx - (effWidth / 2);
-			int y = centery - (effHeight / 2) + 10;
 			
 			if (mouseX > x && mouseX < x + effWidth
 			&&  mouseY > y && mouseY < y + effHeight) {
 				parent.renderTooltip(tooltip, trueX, trueY);
 				return;
 			}
-			
-			if (recipe.getOutcome() != null) {
-				x = centerx - (TEXT_TABLET_WIDTH / 2);
-				y = heightCache - (10 + (TEXT_TABLET_WIDTH / 2));
-				if (mouseX > x && mouseX < x + TEXT_TABLET_WIDTH
-				&&  mouseY > y && mouseY < y + TEXT_TABLET_WIDTH) {
-					if (recipe.getOutcome() instanceof IItemRitualOutcome) {
-						// Item tooltip
-						parent.renderTooltip(((IItemRitualOutcome) recipe.getOutcome()).getResult(),
-								trueX, trueY);
-					} else {
-						// Text tooltip
-						parent.renderTooltip(description, trueX, trueY);
-					}
+		}
+		
+		if (recipe.getOutcome() != null) {
+			x = centerx - (TEXT_TABLET_WIDTH / 2);
+			y = heightCache - (10 + (TEXT_TABLET_WIDTH / 2));
+			if (mouseX > x && mouseX < x + TEXT_TABLET_WIDTH
+			&&  mouseY > y && mouseY < y + TEXT_TABLET_WIDTH) {
+				if (recipe.getOutcome() instanceof IItemRitualOutcome) {
+					// Item tooltip
+					parent.renderTooltip(((IItemRitualOutcome) recipe.getOutcome()).getResult(),
+							trueX, trueY);
+				} else {
+					// Text tooltip
+					parent.renderTooltip(description, trueX, trueY);
 				}
+				return;
 			}
+		}
+		
+		x = centerx - 8; // regular item size is 16x16
+		y = 18;
+		if (mouseX > x && mouseX < x + 16
+		&&  mouseY > y && mouseY < y + 16) {
+			parent.renderTooltip(getGemItem(recipe.getElement()), trueX, trueY);
 		}
 	}
 	
