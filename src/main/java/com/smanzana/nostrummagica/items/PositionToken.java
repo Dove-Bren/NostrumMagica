@@ -94,13 +94,21 @@ public class PositionToken extends PositionCrystal {
 			return false;
 			
 		// check if item is above an obelisk. If so, add this target (if we have one) to it
-		if (getBlockPosition(entityItem.getEntityItem()) != null) {
+		BlockPos storedPos = getBlockPosition(entityItem.getEntityItem());
+		if (storedPos != null) {
 			BlockPos pos = entityItem.getPosition().add(0, -1, 0);
+			if (pos.equals(storedPos))
+				return false;
+			
 			IBlockState state = entityItem.worldObj.getBlockState(pos);
 			if (state != null && state.getBlock() instanceof NostrumObelisk && NostrumObelisk.blockIsMaster(state)) {
 				TileEntity ent = entityItem.worldObj.getTileEntity(pos);
 				if (ent != null && ent instanceof NostrumObeliskEntity) {
-					((NostrumObeliskEntity) ent).addTarget(getBlockPosition(entityItem.getEntityItem()));
+					if (entityItem.getEntityItem().hasDisplayName()) {
+						((NostrumObeliskEntity) ent).addTarget(storedPos, entityItem.getEntityItem().getDisplayName());
+					} else {
+						((NostrumObeliskEntity) ent).addTarget(storedPos);
+					}
 					NostrumMagicaSounds.AMBIENT_WOOSH.play(
 							entityItem.worldObj,
 							pos.getX(),

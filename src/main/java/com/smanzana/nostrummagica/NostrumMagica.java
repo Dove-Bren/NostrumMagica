@@ -38,6 +38,7 @@ import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.SpellRegistry;
+import com.smanzana.nostrummagica.world.NostrumChunkLoader;
 import com.smanzana.nostrummagica.world.dungeon.NostrumLootHandler;
 
 import net.minecraft.creativetab.CreativeTabs;
@@ -121,6 +122,8 @@ public class NostrumMagica
     	//loadSeekerRegistry(spellRegistryFile);
     	
     	new ModConfig(new Configuration(event.getSuggestedConfigurationFile()));
+    	
+    	NostrumChunkLoader.instance();
     }
     
     @EventHandler

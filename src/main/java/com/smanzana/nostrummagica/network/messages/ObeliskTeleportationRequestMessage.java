@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.network.messages;
 
+import java.util.Random;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumObelisk;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -10,8 +12,11 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -72,10 +77,9 @@ public class ObeliskTeleportationRequestMessage implements IMessage {
 			
 			if (sp.attemptTeleport(to.getX() + .5, to.getY() + 1, to.getZ() + .5)) {
 				if (from != null)
-					NostrumMagicaSounds.DAMAGE_ENDER.play(sp.worldObj,
-							from.getX(), from.getY(), from.getZ());
-				NostrumMagicaSounds.DAMAGE_ENDER.play(sp.worldObj,
-						to.getX(), to.getY(), to.getZ());
+					doEffects(sp.worldObj, from);
+					
+				doEffects(sp.worldObj, to);
 			} else {
 				sp.addChatComponentMessage(new TextComponentTranslation("info.obelisk.noroom"));
 			}
@@ -83,6 +87,22 @@ public class ObeliskTeleportationRequestMessage implements IMessage {
 			return null;
 		}
 		
+		private void doEffects(World world, BlockPos pos) {
+			double x = pos.getX() + .5;
+			double y = pos.getY() + 1.4;
+			double z = pos.getZ() + .5;
+			NostrumMagicaSounds.DAMAGE_ENDER.play(world, x, y, z);
+			((WorldServer) world).spawnParticle(EnumParticleTypes.DRAGON_BREATH,
+					x,
+					y,
+					z,
+					50,
+					.3,
+					.5,
+					.3,
+					.2,
+					new int[0]);
+		}
 	}
 
 	private static final String NBT_FROM = "from";

@@ -21,6 +21,7 @@ import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityAltarRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityCandleRenderer;
+import com.smanzana.nostrummagica.client.render.TileEntityObeliskRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntitySymbolRenderer;
 import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.renderer.ModelGolem;
@@ -161,6 +162,7 @@ public class ClientProxy extends CommonProxy {
     	TileEntitySymbolRenderer.init();
     	TileEntityCandleRenderer.init();
     	TileEntityAltarRenderer.init();
+    	TileEntityObeliskRenderer.init();
     	
     	OBJLoader.INSTANCE.addDomain(NostrumMagica.MODID);
 	}

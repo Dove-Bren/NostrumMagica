@@ -8,8 +8,8 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.NostrumObelisk;
 import com.smanzana.nostrummagica.blocks.NostrumObelisk.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.blocks.NostrumObelisk.NostrumObeliskEntity.NostrumObeliskTarget;
 import com.smanzana.nostrummagica.config.ModConfig;
 
 import net.minecraft.client.Minecraft;
@@ -82,10 +82,6 @@ public class ObeliskScreen extends GuiScreen {
 		button.yPosition = getScaled(button.pos.getZ()) - yOffset;
 	}
 	
-	private String getTitleString(BlockPos pos) {
-		return "(" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ")";
-	}
-	
 	@Override
 	public void initGui() {
 		if (tileEntity.getTargets().isEmpty())
@@ -99,14 +95,18 @@ public class ObeliskScreen extends GuiScreen {
 		this.centralButton = new DestinationButton(id++, 0, 0, tileEntity.getPos(), true, false, "", true);
 		
 		int listY = 0;
-		for (BlockPos pos : tileEntity.getTargets()) {
-			boolean valid = NostrumObelisk.isValidTarget(tileEntity.getWorld(), tileEntity.getPos(), pos);
+		for (NostrumObeliskTarget target: tileEntity.getTargets()) {
+			//boolean valid = NostrumObelisk.isValidTarget(tileEntity.getWorld(), tileEntity.getPos(), pos);
+			boolean valid = true; // Would be cool, but need some communication
+			// between the server and client to get a list of actual valid ones,
+			// since the client doesn't have those chunks loaded and returns
+			// null or air blocks when fetching blockstates
 			
 			if (drawList) {
 				listButtons.add(
-						new DestinationButton(id++, 10, 50 + (listY++ * 20), pos, false, true, getTitleString(pos), valid));
+						new DestinationButton(id++, 10, 50 + (listY++ * 20), target.getPos(), false, true, target.getTitle(), valid));
 			}
-			DestinationButton button = new DestinationButton(id++, 0, 0, pos, false, false, getTitleString(pos), valid);
+			DestinationButton button = new DestinationButton(id++, 0, 0, target.getPos(), false, false, target.getTitle(), valid);
 			floatingButtons.add(button);
 		}
 		
@@ -283,7 +283,7 @@ public class ObeliskScreen extends GuiScreen {
               BlockPos pos, boolean isCenter, boolean isListed, String title,
               boolean isValid)
         {
-            super(parButtonId, parPosX, parPosY, 23, 13, "");
+            super(parButtonId, parPosX, parPosY, 13, 13, "");
             this.pos = pos;
             this.isListed = isListed;
             this.title = title;
