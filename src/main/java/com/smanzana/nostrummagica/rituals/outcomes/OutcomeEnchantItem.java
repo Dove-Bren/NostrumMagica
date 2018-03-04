@@ -23,28 +23,26 @@ public class OutcomeEnchantItem implements IRitualOutcome {
 	public void perform(World world, EntityPlayer player, ItemStack centerItem, ItemStack otherItems[], BlockPos center, RitualRecipe recipe) {
 		// If there's an altar, we'll enchant the item there
 		// Otherwise enchant the item the player has
-		if (recipe.getTier() == 0) {
+		AltarTileEntity altar = (AltarTileEntity) world.getTileEntity(center);
+		if (recipe.getTier() == 0 || centerItem == null) {
 			// enchant item on player
 			ItemStack item = player.getHeldItemMainhand();
 			if (item == null)
 				return;
 			
-			if (!enchantment.canApply(item))
+			if (!enchantment.canApply(item)) {
 				return;
+			}
 			
 			item.addEnchantment(enchantment, level);
 		} else {
-			AltarTileEntity altar = (AltarTileEntity) world.getTileEntity(center);
-			
-			ItemStack item = altar.getItem();
-			if (item == null)
+			if (!enchantment.canApply(centerItem)) {
+				altar.setItem(centerItem);
 				return;
+			}
 			
-			if (!enchantment.canApply(item))
-				return;
-			
-			item.addEnchantment(enchantment, level);
-			altar.setItem(item);
+			centerItem.addEnchantment(enchantment, level);
+			altar.setItem(centerItem);
 		}
 	}
 }
