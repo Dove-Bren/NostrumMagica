@@ -57,14 +57,16 @@ public class Spell {
 	
 	public class SpellState {
 		private int index;
+		private float efficiency;
 		private EntityLivingBase caster;
 		private EntityLivingBase self;
 		private EntityLivingBase other;
 		private SpellTrigger.SpellTriggerInstance triggerInstance;
 		
-		public SpellState(EntityLivingBase caster) {
+		public SpellState(EntityLivingBase caster, float efficiency) {
 			index = -1;
 			this.caster = this.self = this.other = caster;
+			this.efficiency = efficiency;
 		}
 		
 		/**
@@ -114,7 +116,7 @@ public class Spell {
 					sib.setStyle(style);
 					
 					comp.appendSibling(sib);
-				} else {
+				} else if (locations != null && !locations.isEmpty()) {
 					comp.appendText("on " + locations.size() + " location(s)");
 					String buf = "";
 					for (BlockPos pos : locations) {
@@ -145,12 +147,12 @@ public class Spell {
 				
 				if (targets != null && !targets.isEmpty()) {
 					for (EntityLivingBase targ : targets) {
-						shape.perform(action, param, targ, null, null);
+						shape.perform(action, param, targ, null, null, this.efficiency);
 					}
 				} else if (locations != null && !locations.isEmpty()) {
 					// use locations
 					for (BlockPos pos : locations) {
-						shape.perform(action, param, null, world, pos);
+						shape.perform(action, param, null, world, pos, this.efficiency);
 					}
 				} else {
 					; // Drop it on the floor\
@@ -234,7 +236,7 @@ public class Spell {
 		}
 		
 		private SpellState split() {
-			SpellState spawn = new SpellState(caster);
+			SpellState spawn = new SpellState(caster, this.efficiency);
 			spawn.index = this.index;
 //			spawn.self = self;
 //			spawn.other = other;
@@ -383,8 +385,8 @@ public class Spell {
 		return registryID;
 	}
 	
-	public void cast(EntityLivingBase caster) {
-		SpellState state = new SpellState(caster);
+	public void cast(EntityLivingBase caster, float efficiency) {
+		SpellState state = new SpellState(caster, efficiency);
 		state.trigger(Lists.newArrayList(caster), null, null, null);
 		
 		NostrumMagicaSounds.CAST_LAUNCH.play(caster);

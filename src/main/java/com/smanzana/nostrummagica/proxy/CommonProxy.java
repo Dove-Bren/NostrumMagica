@@ -54,6 +54,7 @@ import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTableItem;
 import com.smanzana.nostrummagica.items.SpellTome;
+import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellDebugMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
@@ -288,6 +289,9 @@ public class CommonProxy {
     	PositionToken.instance().setRegistryName(NostrumMagica.MODID, PositionToken.ID);
     	GameRegistry.register(PositionToken.instance());
     	PositionToken.init();
+    	
+    	SpellTomePage.instance().setRegistryName(NostrumMagica.MODID, SpellTomePage.id);
+    	GameRegistry.register(SpellTomePage.instance());
     }
     
     private void registerBlocks() {

@@ -73,7 +73,7 @@ public class EntityGolemEarth extends EntityGolem {
 		else
 			spell = spellBuff1;	
 		
-		spell.cast(this);
+		spell.cast(this, 1.0f);
 		
 		if (targ != target)
 			this.setAttackTarget(targ);

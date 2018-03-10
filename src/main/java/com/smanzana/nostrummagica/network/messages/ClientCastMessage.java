@@ -1,15 +1,20 @@
 package com.smanzana.nostrummagica.network.messages;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.items.SpellTome;
+import com.smanzana.nostrummagica.items.SpellTome.EnhancementWrapper;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -54,12 +59,39 @@ public class ClientCastMessage implements IMessage {
 			}
 			
 			// Cast it!
+			boolean seen = att.wasSpellDone(spell);
+			float xp = spell.getXP(seen);
+			int cost = spell.getManaCost();
+			SpellCastSummary summary = new SpellCastSummary(cost, xp);
+			
+			if (!isScroll) {
+				// Find the tome this was cast from, if any
+				ItemStack tome = sp.getHeldItemMainhand();
+				if (tome == null || !(tome.getItem() instanceof SpellTome))
+					tome = sp.getHeldItemOffhand();
+				
+				if (tome != null && tome.getItem() instanceof SpellTome) {
+					// Casting from a tome.
+					List<EnhancementWrapper> enhancements = SpellTome.getEnhancements(tome);
+					if (enhancements != null && !enhancements.isEmpty())
+					for (EnhancementWrapper enhance : enhancements) {
+						enhance.getEnhancement().onCast(
+								enhance.getLevel(), summary, sp, att);
+					}
+				}
+			}
+			
+			cost = summary.getFinalCost();
+			xp = summary.getFinalXP();
+			
 			if (!sp.isCreative() && !isScroll) {
-				int cost = spell.getManaCost();
+				// Take mana and reagents
+				
 				if (att.getMana() < cost)
 					return new ClientCastReplyMessage(false, att.getMana(), 0.0f);
 				
 				Map<ReagentType, Integer> reagents = spell.getRequiredReagents();
+				applyReagentRate(reagents, summary.getReagentCost());
 				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
 					int count = NostrumMagica.getReagentCount(sp, row.getKey());
 					if (count < row.getValue()) {
@@ -74,14 +106,31 @@ public class ClientCastMessage implements IMessage {
 				att.addMana(-cost);
 			}
 			
-			boolean seen = att.wasSpellDone(spell);
-			spell.cast(sp);
-			
-			float xp = spell.getXP(seen);
-			
+			spell.cast(sp, summary.getEfficiency());
 			att.addXP(xp);
 
 			return new ClientCastReplyMessage(true, att.getMana(), xp);
+		}
+
+		private void applyReagentRate(Map<ReagentType, Integer> reagents, float reagentCost) {
+			// Take the total reagent cost rate and scale up/down the number of reagents needed
+			int whole = (int) reagentCost;
+			float frac = reagentCost - (int) reagentCost;
+			for (ReagentType type : reagents.keySet()) {
+				// rate 1 just means whatever cost is there * 1
+				// rate .5 means 50% chance to avoid each one. So if 10
+				// are required, each rolls with 50% chance of still being needed.
+				// rate 1.5 means 100% of the requirements + a roll for each with
+				// 50% chance of adding another.
+				int def = reagents.get(type);
+				int cost = (def * whole);
+				for (; def > 0; def--) {
+					if (NostrumMagica.rand.nextFloat() < frac)
+						cost++;
+				}
+				
+				reagents.put(type, cost);
+			}
 		}
 		
 	}

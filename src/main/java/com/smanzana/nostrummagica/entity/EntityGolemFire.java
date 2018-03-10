@@ -86,11 +86,11 @@ public class EntityGolemFire extends EntityGolem {
 		}
 		
 		if (canBurnArmor && NostrumMagica.rand.nextFloat() <= 0.2f) {
-			spellRanged3.cast(this);
+			spellRanged3.cast(this, 1.0f);
 		}else if (NostrumMagica.rand.nextFloat() < 0.3f) {
-			spellRanged2.cast(this);
+			spellRanged2.cast(this, 1.0f);
 		} else {
-			spellRanged1.cast(this);
+			spellRanged1.cast(this, 1.0f);
 		}
 		
 		if (targ != target)
@@ -105,7 +105,7 @@ public class EntityGolemFire extends EntityGolem {
 		if (targ != target)
 			this.setAttackTarget(target);
 		
-		spellBuff.cast(this);
+		spellBuff.cast(this, 1.0f);
 		
 		if (targ != target)
 			this.setAttackTarget(targ);

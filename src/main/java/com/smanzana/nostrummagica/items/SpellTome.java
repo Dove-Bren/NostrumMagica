@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.gui.book.BookScreen;
 import com.smanzana.nostrummagica.client.gui.book.HSplitPage;
@@ -15,7 +16,10 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
+import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -30,9 +34,30 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class SpellTome extends Item implements GuiBook, ILoreTagged {
+	
+	public static final class EnhancementWrapper {
+		protected SpellTomeEnhancement enhancement;
+		protected int level;
+		
+		public EnhancementWrapper(SpellTomeEnhancement enhancement, int level) {
+			this.enhancement = enhancement;
+			this.level = level;
+		}
+
+		public SpellTomeEnhancement getEnhancement() {
+			return enhancement;
+		}
+
+		public int getLevel() {
+			return level;
+		}
+	}
 
 	private static final String NBT_SPELLS = "nostrum_spells";
 	private static final String NBT_INDEX = "spell_index";
+	private static final String NBT_ENHANCEMENTS = "tome_enhancements";
+	private static final String NBT_ENHANCEMENT_KEY = "enhancement_key";
+	private static final String NBT_ENHANCEMENT_LEVEL = "enhancement_level";
 	private static SpellTome instance = null;
 	
 	public static SpellTome instance() {
@@ -283,5 +308,103 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 	@Override
 	public Lore getDeepLore() {
 		return new Lore().add("Spell tomes carry spells to be cast over and over again.", "Casting spells from a spell tome requires reagents and mana.", "Spells must be bound into a Spell Tome in order be to used.", "Bind scrolls into the tome through the Ritual of Binding.");
+	}
+	
+	public static List<EnhancementWrapper> getEnhancements(ItemStack stack) {
+		if (stack == null || !(stack.getItem() instanceof SpellTome))
+			return null;
+		
+		return readEnhancements(stack.getTagCompound());
+	}
+	
+	public static void addEnhancement(ItemStack stack, EnhancementWrapper enhancement) {
+		List<EnhancementWrapper> enhances = getEnhancements(stack);
+		if (enhances == null)
+			enhances = new LinkedList<>();
+		
+		enhances.add(enhancement);
+		NBTTagCompound tag = stack.getTagCompound();
+		if (tag == null)
+			tag = new NBTTagCompound();
+		writeEnhancements(enhances, tag);
+		stack.setTagCompound(tag);
+	}
+	
+	public static void applyEnhancements(ItemStack stack, SpellCastSummary summary, EntityLiving caster) {
+		List<EnhancementWrapper> list = getEnhancements(stack);
+		if (list == null)
+			return;
+		
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+		if (attr == null)
+			return;
+		
+		for (EnhancementWrapper wrapper : list) {
+			wrapper.enhancement.onCast(wrapper.level,
+					summary, caster, attr);
+		}
+	}
+	
+	public static ItemStack createTome(ItemStack pages[]) {
+		ItemStack stack = new ItemStack(instance());
+		List<EnhancementWrapper> enhancements = new LinkedList<>();
+		
+		int len = (pages == null ? 0 : pages.length);
+		for (int i = 0; i < len; i++) {
+			if (pages[i] == null || !(pages[i].getItem() instanceof SpellTomePage))
+				continue;
+			
+			enhancements.add(new EnhancementWrapper(SpellTomePage.getEnhancement(pages[i]),
+					SpellTomePage.getLevel(pages[i])));
+		}
+		
+		if (!enhancements.isEmpty()) {
+			NBTTagCompound tag = stack.getTagCompound();
+			if (tag == null)
+				tag = new NBTTagCompound();
+			
+			writeEnhancements(enhancements, tag);
+				
+			stack.setTagCompound(tag);
+			
+		}
+			
+		return stack;
+	}
+	
+	private static void writeEnhancements(List<EnhancementWrapper> enhancements, NBTTagCompound nbt) {
+		if (enhancements == null || enhancements.isEmpty())
+			return;
+		
+		NBTTagList list = new NBTTagList();
+		for (EnhancementWrapper enhance : enhancements) {
+			NBTTagCompound tag = new NBTTagCompound();
+			tag.setString(NBT_ENHANCEMENT_KEY, enhance.enhancement.getTitleKey());
+			tag.setInteger(NBT_ENHANCEMENT_LEVEL, enhance.level);
+			list.appendTag(tag);
+		}
+		
+		nbt.setTag(NBT_ENHANCEMENTS, list);
+	}
+	
+	private static List<EnhancementWrapper> readEnhancements(NBTTagCompound nbt) {
+		List<EnhancementWrapper> list = new LinkedList<>();
+		
+		if (nbt != null && nbt.hasKey(NBT_ENHANCEMENTS, NBT.TAG_LIST)) {
+			NBTTagList tags = nbt.getTagList(NBT_ENHANCEMENTS, NBT.TAG_COMPOUND);
+			for (int i = 0; i < tags.tagCount(); i++) {
+				NBTTagCompound tag = tags.getCompoundTagAt(i);
+				String key = tag.getString(NBT_ENHANCEMENT_KEY);
+				SpellTomeEnhancement enhance = SpellTomeEnhancement.lookupEnhancement(key);
+				if (enhance == null) {
+					NostrumMagica.logger.error("Could not find enhancement to match key " + key);
+					continue;
+				}
+				
+				list.add(new EnhancementWrapper(enhance, tag.getInteger(NBT_ENHANCEMENT_LEVEL)));
+			}
+		}
+		
+		return list;
 	}
 }

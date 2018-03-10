@@ -190,7 +190,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 		if (element == EMagicElement.WIND) {
 			SpellAction fly = new SpellAction(playerIn);
 			fly.push(5.0f, level);
-			fly.apply(worldIn, pos);
+			fly.apply(worldIn, pos, 1.0f);
 			stack.damageItem(3, playerIn);
 			return EnumActionResult.SUCCESS;
 		}

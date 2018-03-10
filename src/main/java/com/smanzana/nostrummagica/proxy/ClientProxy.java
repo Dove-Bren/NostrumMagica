@@ -49,6 +49,7 @@ import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTableItem;
 import com.smanzana.nostrummagica.items.SpellTome;
+import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
 import com.smanzana.nostrummagica.network.messages.ObeliskTeleportationRequestMessage;
@@ -276,6 +277,10 @@ public class ClientProxy extends CommonProxy {
 		registerModel(PositionToken.instance(),
 				0,
 				PositionToken.ID);
+		
+		registerModel(SpellTomePage.instance(),
+				0,
+				SpellTomePage.id);
 	}
 	
 	@Override

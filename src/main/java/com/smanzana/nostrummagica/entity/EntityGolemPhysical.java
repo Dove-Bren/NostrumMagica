@@ -55,11 +55,11 @@ public class EntityGolemPhysical extends EntityGolem {
 			EntityLivingBase targ = this.getAttackTarget();
 			if (targ != target)
 				this.setAttackTarget(target);
-			spellDebuff.cast(this);
+			spellDebuff.cast(this, 1.0f);
 			if (targ != target)
 				this.setAttackTarget(targ);
 		} else {
-			spellRanged.cast(this);
+			spellRanged.cast(this, 1.0f);
 		}
 	}
 

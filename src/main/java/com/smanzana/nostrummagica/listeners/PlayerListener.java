@@ -444,7 +444,7 @@ public class PlayerListener {
 					if (ench.shouldTrigger(false)) {
 						SpellAction action = ench.getTriggerAction(livingTarget, false);
 						if (action != null)
-							action.apply(livingSource);
+							action.apply(livingSource, 1.0f);
 					}
 				}
 		
@@ -457,7 +457,7 @@ public class PlayerListener {
 					if (ench.shouldTrigger(true)) {
 						SpellAction action = ench.getTriggerAction(livingSource, true);
 						if (action != null)
-							action.apply(livingTarget);
+							action.apply(livingTarget, 1.0f);
 					}
 				}
 			}

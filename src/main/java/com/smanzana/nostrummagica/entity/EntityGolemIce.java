@@ -52,7 +52,7 @@ public class EntityGolemIce extends EntityGolem {
 		if (targ != target)
 			this.setAttackTarget(target);
 		
-		spellRange.cast(this);
+		spellRange.cast(this, 1.0f);
 		
 		if (targ != target)
 			this.setAttackTarget(targ);
@@ -66,7 +66,7 @@ public class EntityGolemIce extends EntityGolem {
 		if (targ != target)
 			this.setAttackTarget(target);
 		
-		spellBuff.cast(this);
+		spellBuff.cast(this, 1.0f);
 		
 		if (targ != target)
 			this.setAttackTarget(targ);

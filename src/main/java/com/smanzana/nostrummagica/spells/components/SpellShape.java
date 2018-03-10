@@ -57,7 +57,12 @@ public abstract class SpellShape {
 	 * @param world
 	 * @param pos
 	 */
-	public void perform(SpellAction action, SpellPartParam param, EntityLivingBase target, World world, BlockPos pos) {
+	public void perform(SpellAction action,
+						SpellPartParam param,
+						EntityLivingBase target,
+						World world,
+						BlockPos pos,
+						float efficiency) {
 		
 		if (target != null && (world == null || pos == null)) {
 			world = target.worldObj;
@@ -69,14 +74,14 @@ public abstract class SpellShape {
 		if (entTargets != null && !entTargets.isEmpty())
 		for (EntityLivingBase ent : entTargets) {
 			if (ent != null)
-				action.apply(ent);
+				action.apply(ent, efficiency);
 		}
 		
 		List<BlockPos> blockTargets = getTargetLocations(param, target, world, pos);
 		if (blockTargets != null && !blockTargets.isEmpty())
 		for (BlockPos bp : blockTargets) {
 			if (bp != null)
-				action.apply(world, bp);
+				action.apply(world, bp, efficiency);
 		}
 	}
 	

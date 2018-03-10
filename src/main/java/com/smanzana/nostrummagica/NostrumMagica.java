@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.smanzana.nostrummagica.capabilities.AttributeProvider;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.command.CommandEnhanceTome;
 import com.smanzana.nostrummagica.command.CommandSpawnObelisk;
 import com.smanzana.nostrummagica.command.CommandTestConfig;
 import com.smanzana.nostrummagica.config.ModConfig;
@@ -23,6 +24,7 @@ import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SeekerIdol;
 import com.smanzana.nostrummagica.items.SpellTome;
+import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
 import com.smanzana.nostrummagica.listeners.PlayerListener;
 import com.smanzana.nostrummagica.proxy.CommonProxy;
@@ -39,6 +41,7 @@ import com.smanzana.nostrummagica.rituals.outcomes.OutcomeTeleportObelisk;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.SpellRegistry;
+import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 import com.smanzana.nostrummagica.world.NostrumChunkLoader;
 import com.smanzana.nostrummagica.world.dungeon.NostrumLootHandler;
 
@@ -78,6 +81,7 @@ public class NostrumMagica
     public static NostrumMagica instance;
     
     public static CreativeTabs creativeTab;
+    public static CreativeTabs enhancementTab;
     public static Logger logger = LogManager.getLogger(MODID);
     public static PlayerListener playerListener;
     public static MagicEffectProxy magicEffectProxy;
@@ -106,6 +110,14 @@ public class NostrumMagica
 	        }
 	    };
 	    SpellTome.instance().setCreativeTab(NostrumMagica.creativeTab);
+	    NostrumMagica.enhancementTab = new CreativeTabs(MODID) {
+	    	@Override
+	    	@SideOnly(Side.CLIENT)
+	    	public Item getTabIconItem() {
+	    		return SpellTomePage.instance();
+	    	}
+	    };
+	    SpellTomePage.instance().setCreativeTab(NostrumMagica.enhancementTab);
     	
     	proxy.preinit();
     	
@@ -125,6 +137,8 @@ public class NostrumMagica
     	new ModConfig(new Configuration(event.getSuggestedConfigurationFile()));
     	
     	NostrumChunkLoader.instance();
+    	
+    	SpellTomeEnhancement.initDefaultEnhancements();
     }
     
     @EventHandler
@@ -142,6 +156,7 @@ public class NostrumMagica
     public void startup(FMLServerStartingEvent event) {
     	event.registerServerCommand(new CommandTestConfig());
     	event.registerServerCommand(new CommandSpawnObelisk());
+    	event.registerServerCommand(new CommandEnhanceTome());
     	loadSeekerRegistry(seekerRegistryFile);
     }
     

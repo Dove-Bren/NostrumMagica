@@ -49,7 +49,7 @@ public class EntityGolemWind extends EntityGolem {
 		if (this.getHealth() < 8f)
 			level = .4f;
 		if (NostrumMagica.rand.nextFloat() < level) {
-			spellPush.cast(this);
+			spellPush.cast(this, 1.0f);
 		} else {
 			this.attackEntityAsMob(target);
 		}
@@ -68,7 +68,7 @@ public class EntityGolemWind extends EntityGolem {
 		if (targ != target)
 			this.setAttackTarget(target);
 		
-		spellBuff.cast(this);
+		spellBuff.cast(this, 1.0f);
 		
 		if (targ != target)
 			this.setAttackTarget(targ);

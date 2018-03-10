@@ -65,9 +65,9 @@ public class EntityGolemEnder extends EntityGolem {
 			this.setAttackTarget(target);
 		
 		if (NostrumMagica.rand.nextBoolean()) {
-			spellDebuff.cast(this);
+			spellDebuff.cast(this, 1.0f);
 		} else {
-			spellRange.cast(this);
+			spellRange.cast(this, 1.0f);
 		}
 		
 		if (targ != target)
@@ -82,7 +82,7 @@ public class EntityGolemEnder extends EntityGolem {
 		if (targ != target)
 			this.setAttackTarget(target);
 		
-		spellBuff.cast(this);
+		spellBuff.cast(this, 1.0f);
 		
 		if (targ != target)
 			this.setAttackTarget(targ);
