@@ -49,6 +49,7 @@ import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTableItem;
 import com.smanzana.nostrummagica.items.SpellTome;
+import com.smanzana.nostrummagica.items.SpellTome.EnhancementWrapper;
 import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
@@ -60,9 +61,9 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.Render;
@@ -320,57 +321,79 @@ public class ClientProxy extends CommonProxy {
 	
 	@SubscribeEvent
 	public void onKey(KeyInputEvent event) {
-		if (bindingCast.isPressed()) {
-			
-			Spell spell = NostrumMagica.getCurrentSpell(Minecraft.getMinecraft().thePlayer);
-			if (spell == null)
-				return;
-			
-			// Do mana check here (it's also done on server)
-			// to stop redundant checks and get mana looking good
-			// on client side immediately
-			int mana = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer).getMana();
-			int cost = spell.getManaCost();
-			
-			if (!Minecraft.getMinecraft().thePlayer.isCreative()) {
-				EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
-				if (mana < cost) {
+		if (bindingCast.isPressed())
+			doCast();
+	}
+	
+	private void doCast() {
+		
+		Spell spell = NostrumMagica.getCurrentSpell(Minecraft.getMinecraft().thePlayer);
+		if (spell == null)
+			return;
+		
+		// Do mana check here (it's also done on server)
+		// to stop redundant checks and get mana looking good
+		// on client side immediately
+		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		INostrumMagic att = NostrumMagica.getMagicWrapper(player);
+		int mana = att.getMana();
+		int cost = spell.getManaCost();
+		SpellCastSummary summary = new SpellCastSummary(cost, 0);
+		
+		// Find the tome this was cast from, if any
+		ItemStack tome = player.getHeldItemMainhand();
+		if (tome == null || !(tome.getItem() instanceof SpellTome))
+			tome = player.getHeldItemOffhand();
+		
+		if (tome != null && tome.getItem() instanceof SpellTome) {
+			// Casting from a tome.
+			List<EnhancementWrapper> enhancements = SpellTome.getEnhancements(tome);
+			if (enhancements != null && !enhancements.isEmpty())
+			for (EnhancementWrapper enhance : enhancements) {
+				enhance.getEnhancement().onCast(
+						enhance.getLevel(), summary, player, att);
+			}
+		}
+		
+		cost = summary.getFinalCost();
+		
+		if (!Minecraft.getMinecraft().thePlayer.isCreative()) {
+			if (mana < cost) {
+				
+				for (int i = 0; i < 15; i++) {
+					double offsetx = Math.cos(i * (2 * Math.PI / 15)) * 1.0;
+					double offsetz = Math.sin(i * (2 * Math.PI / 15)) * 1.0;
+					player.worldObj
+						.spawnParticle(EnumParticleTypes.SMOKE_LARGE,
+								player.posX + offsetx, player.posY, player.posZ + offsetz,
+								0, -.5, 0);
 					
-					for (int i = 0; i < 15; i++) {
-						double offsetx = Math.cos(i * (2 * Math.PI / 15)) * 1.0;
-						double offsetz = Math.sin(i * (2 * Math.PI / 15)) * 1.0;
-						player.worldObj
-							.spawnParticle(EnumParticleTypes.SMOKE_LARGE,
-									player.posX + offsetx, player.posY, player.posZ + offsetz,
-									0, -.5, 0);
-						
-						NostrumMagicaSounds.CAST_FAIL.play(player);
-					}
-					overlayRenderer.startManaWiggle(2);
-					return;
+					NostrumMagicaSounds.CAST_FAIL.play(player);
 				}
-				
-				Map<ReagentType, Integer> reagents = spell.getRequiredReagents();
-				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
-					int count = NostrumMagica.getReagentCount(player, row.getKey());
-					if (count < row.getValue()) {
-						player.addChatMessage(new TextComponentString("Not enough "
-								+ row.getKey().prettyName()));
-						return;
-					}
-				}
-				// actually deduct
-				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
-					NostrumMagica.removeReagents(player, row.getKey(), row.getValue());
-				}
-				
-				NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer)
-					.addMana(-cost);
+				overlayRenderer.startManaWiggle(2);
+				return;
 			}
 			
-			NetworkHandler.getSyncChannel().sendToServer(
-	    			new ClientCastMessage(spell, false));
+			Map<ReagentType, Integer> reagents = spell.getRequiredReagents();
+			for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
+				int count = NostrumMagica.getReagentCount(player, row.getKey());
+				if (count < row.getValue()) {
+					player.addChatMessage(new TextComponentString("Not enough "
+							+ row.getKey().prettyName()));
+					return;
+				}
+			}
+			// actually deduct
+			for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
+				NostrumMagica.removeReagents(player, row.getKey(), row.getValue());
+			}
+			
+			NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer)
+				.addMana(-cost);
 		}
+		
+		NetworkHandler.getSyncChannel().sendToServer(
+    			new ClientCastMessage(spell, false));
 	}
 	
 	@Override

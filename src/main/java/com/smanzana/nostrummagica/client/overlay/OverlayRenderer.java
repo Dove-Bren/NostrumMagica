@@ -11,6 +11,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
@@ -112,11 +113,18 @@ public class OverlayRenderer extends Gui {
 			if (ModConfig.config.displayManaBar()) {
 				int hudXAnchor = scaledRes.getScaledWidth() - (10 + GUI_BAR_WIDTH);
 				int hudYAnchor = 10 + (GUI_BAR_HEIGHT);
-				int displayHeight = (int) ((float) GUI_BAR_HEIGHT * ((float) attr.getMana() / (float) attr.getMaxMana()));
+				int displayHeight = (int) ((float) GUI_BAR_HEIGHT * Math.max(0f, Math.min(1f, (float) attr.getMana() / (float) attr.getMaxMana())));
 				
+				GlStateManager.enableBlend();
 				Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_ICONS);
 				this.drawTexturedModalRect(hudXAnchor, hudYAnchor - displayHeight, GUI_BAR_OFFSETX + GUI_BAR_WIDTH, (GUI_BAR_HEIGHT - displayHeight), GUI_BAR_WIDTH, displayHeight);
 				this.drawTexturedModalRect(hudXAnchor, hudYAnchor - GUI_BAR_HEIGHT, GUI_BAR_OFFSETX, 0, GUI_BAR_WIDTH, GUI_BAR_HEIGHT);
+				
+				if (ModConfig.config.displayXPBar()) {
+					displayHeight = (int) ((float) GUI_BAR_HEIGHT * Math.min(1f, Math.max(0f, attr.getXP() / attr.getMaxXP())));
+					this.drawTexturedModalRect(hudXAnchor, hudYAnchor - displayHeight, GUI_BAR_OFFSETX + GUI_BAR_WIDTH + GUI_BAR_WIDTH, (GUI_BAR_HEIGHT - displayHeight), GUI_BAR_WIDTH, displayHeight);
+				}
+				GlStateManager.disableBlend();
 				
 				if (ModConfig.config.displayManaText()) {
 					FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
@@ -143,10 +151,14 @@ public class OverlayRenderer extends Gui {
 		// Spell name
 		Spell current = NostrumMagica.getCurrentSpell(Minecraft.getMinecraft().thePlayer);
 		if (current != null) {
-			int mult = (false) ? 2 : 1;
+			boolean xp = ModConfig.config.displayXPText();
+			int mult = (xp) ? 2 : 1;
 			FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
 			Gui.drawRect(0, scaledRes.getScaledHeight() - (fonter.FONT_HEIGHT * mult + 9), 70, scaledRes.getScaledHeight(), 0x50606060);
 			fonter.drawString(current.getName(), 5, scaledRes.getScaledHeight() - (fonter.FONT_HEIGHT + 3), 0xFF000000);
+			if (xp)
+				fonter.drawString(String.format("%.02f%%", 100f * attr.getXP() / attr.getMaxXP()),
+						5, scaledRes.getScaledHeight() - (fonter.FONT_HEIGHT * 2 + 6), 0xFF000000);
 		}
 		
 	}

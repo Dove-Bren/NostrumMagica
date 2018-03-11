@@ -18,7 +18,7 @@ public class EnhancementLowerManaCost extends SpellTomeEnhancement {
 
 	@Override
 	public int getMaxLevel() {
-		return 6;
+		return 4;
 	}
 
 	@Override
