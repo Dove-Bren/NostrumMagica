@@ -107,15 +107,21 @@ public class NostrumMagic implements INostrumMagic {
 	}
 	
 	private void levelup() {
-		mana = maxMana = LevelCurves.maxMana(1);
-		maxxp = LevelCurves.maxXP(1);
-		
-		this.addSkillPoint();
+
 		level++;
+		this.addSkillPoint();
+		setLevel(level);
 		
 		if (entity != null)
 			NostrumMagicaSounds.LEVELUP.play(entity);
 		// TODO cool effects bruh
+	}
+	
+	@Override
+	public void setLevel(int level) {
+		this.level = level;
+		mana = maxMana = LevelCurves.maxMana(level);
+		maxxp = LevelCurves.maxXP(level);
 	}
 
 	@Override
@@ -484,5 +490,5 @@ public class NostrumMagic implements INostrumMagic {
 		this.markDimension = dimension;
 		this.markLocation = pos;
 	}
-	
+
 }

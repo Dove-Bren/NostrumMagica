@@ -92,7 +92,7 @@ public class SpellTomePage extends Item implements ILoreTagged {
 		tooltip.add(I18n.format(enhance.getNameFormat(), new Object[0]) + " " + toRoman(level));
 	}
 	
-	private String toRoman(int num) {
+	public static String toRoman(int num) {
 		if (num <= 0)
 			return "0";
 		

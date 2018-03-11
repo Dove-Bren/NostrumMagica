@@ -308,7 +308,7 @@ public class BookScreen extends GuiScreen {
 			if (title) {
 				int x = xoffset + (width / 2);
 				x -= fonter.getStringWidth("Table Of Contents") / 2;
-				fonter.drawStringWithShadow("Table Of Contents", x, yoffset + 5, 0xFF404040);
+				fonter.drawString("Table Of Contents", x, yoffset + 5, 0xFF202020);
 				yoffset += 10 + (fonter.FONT_HEIGHT);
 			}
 			

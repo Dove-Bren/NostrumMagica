@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.overlay;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.block.material.Material;
@@ -19,8 +20,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class OverlayRenderer extends Gui {
 
 	private static final ResourceLocation GUI_ICONS = new ResourceLocation(NostrumMagica.MODID, "textures/gui/icons.png");
-	private static final int GUI_ORB_WIDTH = 16;
-	private static final int GUI_ORB_HEIGHT = 16;
+	private static final int GUI_ORB_WIDTH = 9;
+	private static final int GUI_ORB_HEIGHT = 9;
 	private static final int GUI_BAR_WIDTH = 17;
 	private static final int GUI_BAR_HEIGHT = 62;
 	private static final int GUI_BAR_OFFSETX = 96;
@@ -42,65 +43,110 @@ public class OverlayRenderer extends Gui {
 			return;
 		
 		EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
-		
 		ScaledResolution scaledRes = event.getResolution();
-		
-		int hudXAnchor = scaledRes.getScaledWidth() / 2 + 89;
-		int hudYAnchor = scaledRes.getScaledHeight() - 49;
-		
-		if (player.isInsideOfMaterial(Material.WATER)) {
-			hudYAnchor -= 10;
-		}
-		
-		int wiggleOffset = 0;
-		if (wiggleIndex > 0)
-			wiggleOffset = OverlayRenderer.wiggleOffsets[wiggleIndex-- % 12];
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null || !attr.isUnlocked())
 			return;
 		
-		int mana = attr.getMana(),
-				maxMana = attr.getMaxMana();
-		float ratio = (float) mana / (float) maxMana;
-		
-		// Orbs
 		if (!Minecraft.getMinecraft().thePlayer.isCreative())
 		{
-			int parts = Math.round(40 * ratio);
-			int whole = parts / 4;
-			int pieces = parts % 4;
+			// Orbs
+			if (ModConfig.config.displayManaOrbs())
+			{
+				int hudXAnchor = scaledRes.getScaledWidth() / 2 + 89;
+				int hudYAnchor = scaledRes.getScaledHeight() - 49;
+				
+				if (player.isInsideOfMaterial(Material.WATER)) {
+					hudYAnchor -= 10;
+				}
+				
+				int wiggleOffset = 0;
+				if (wiggleIndex > 0)
+					wiggleOffset = OverlayRenderer.wiggleOffsets[wiggleIndex-- % 12];
+				
+				int mana = attr.getMana(),
+						maxMana = attr.getMaxMana();
+				float ratio = (float) mana / (float) maxMana;
+				
+				
+				int parts = Math.round(40 * ratio);
+				int whole = parts / 4;
+				int pieces = parts % 4;
+				
+				int i = 0;
+				Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_ICONS);
+				for (; i < whole; i++) {
+					//this.drawTexturedModalRect(hudXAnchor - (), y, textureX, textureY, width, height);
+	//				Gui.drawModalRectWithCustomSizedTexture(hudXAnchor - (9 * i), hudYAnchor,
+	//						64, 0, 16, 16, 256, 256);
+					// Draw a single partle orb
+					this.drawTexturedModalRect(hudXAnchor - (8 * (i + 1)) + wiggleOffset,
+							hudYAnchor,	36, 16, GUI_ORB_WIDTH, GUI_ORB_HEIGHT);
+				}
+				
+				if (pieces != 0) {
+					// Draw a single partle orb
+					this.drawTexturedModalRect(hudXAnchor - (8 * (i + 1)) + wiggleOffset,
+							hudYAnchor, GUI_ORB_WIDTH * pieces, 16, GUI_ORB_WIDTH, GUI_ORB_HEIGHT);
+					i++;
+				}
+				
+				for (; i < 10; i++) {
+					this.drawTexturedModalRect(hudXAnchor - (8 * (i + 1)) + wiggleOffset,
+							hudYAnchor,	0, 16, GUI_ORB_WIDTH, GUI_ORB_HEIGHT);
+				}
+				
+				
+	
+				if (ModConfig.config.displayManaText()) {
+					int centerx = hudXAnchor - (5 * 8);
+					String str = attr.getMana() + "/" + attr.getMaxMana();
+					int width = Minecraft.getMinecraft().fontRendererObj.getStringWidth(str);
+					Minecraft.getMinecraft().fontRendererObj.drawString(
+							str, centerx - width/2, hudYAnchor + 1, 0xFFFFFFFF);
+				}
 			
-			int i = 0;
-			Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_ICONS);
-			for (; i < whole; i++) {
-				//this.drawTexturedModalRect(hudXAnchor - (), y, textureX, textureY, width, height);
-//				Gui.drawModalRectWithCustomSizedTexture(hudXAnchor - (9 * i), hudYAnchor,
-//						64, 0, 16, 16, 256, 256);
-				// Draw a single partle orb
-				this.drawTexturedModalRect(hudXAnchor - (8 * (i + 1)) + wiggleOffset,
-						hudYAnchor,	36, 16, 9, 9);
 			}
 			
-			if (pieces != 0) {
-				// Draw a single partle orb
-				this.drawTexturedModalRect(hudXAnchor - (8 * (i + 1)) + wiggleOffset,
-						hudYAnchor, 9 * pieces, 16, 9, 9);
-				i++;
-			}
-			
-			for (; i < 10; i++) {
-				this.drawTexturedModalRect(hudXAnchor - (8 * (i + 1)) + wiggleOffset,
-						hudYAnchor,	0, 16, 9, 9);
+			if (ModConfig.config.displayManaBar()) {
+				int hudXAnchor = scaledRes.getScaledWidth() - (10 + GUI_BAR_WIDTH);
+				int hudYAnchor = 10 + (GUI_BAR_HEIGHT);
+				int displayHeight = (int) ((float) GUI_BAR_HEIGHT * ((float) attr.getMana() / (float) attr.getMaxMana()));
+				
+				Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_ICONS);
+				this.drawTexturedModalRect(hudXAnchor, hudYAnchor - displayHeight, GUI_BAR_OFFSETX + GUI_BAR_WIDTH, (GUI_BAR_HEIGHT - displayHeight), GUI_BAR_WIDTH, displayHeight);
+				this.drawTexturedModalRect(hudXAnchor, hudYAnchor - GUI_BAR_HEIGHT, GUI_BAR_OFFSETX, 0, GUI_BAR_WIDTH, GUI_BAR_HEIGHT);
+				
+				if (ModConfig.config.displayManaText()) {
+					FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
+					int centerx = hudXAnchor + (int) (.5 * GUI_BAR_WIDTH);
+					String str = "" + attr.getMana();
+					int width = fonter.getStringWidth(str);
+					fonter.drawString(
+							str, centerx - width/2, hudYAnchor - (int) (.66 * GUI_BAR_HEIGHT), 0xFFFFFFFF);
+					
+					str = "-";
+					width = fonter.getStringWidth(str);
+					fonter.drawString(
+							str, centerx - width/2, hudYAnchor - ((int) (.66 * GUI_BAR_HEIGHT) - fonter.FONT_HEIGHT), 0xFFFFFFFF);
+					
+					str = "" + attr.getMaxMana();
+					width = fonter.getStringWidth(str);
+					fonter.drawString(
+							str, centerx - width/2, hudYAnchor - ((int) (.66 * GUI_BAR_HEIGHT) - (2 * fonter.FONT_HEIGHT)), 0xFFFFFFFF);
+				}
 			}
 		}
 		
-		
+		// Bottom left spell slide
 		// Spell name
 		Spell current = NostrumMagica.getCurrentSpell(Minecraft.getMinecraft().thePlayer);
 		if (current != null) {
+			int mult = (false) ? 2 : 1;
 			FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
-			fonter.drawString(current.getName(), 5, scaledRes.getScaledHeight() - (fonter.FONT_HEIGHT + 5), 0xFF000000);
+			Gui.drawRect(0, scaledRes.getScaledHeight() - (fonter.FONT_HEIGHT * mult + 9), 70, scaledRes.getScaledHeight(), 0x50606060);
+			fonter.drawString(current.getName(), 5, scaledRes.getScaledHeight() - (fonter.FONT_HEIGHT + 3), 0xFF000000);
 		}
 		
 	}

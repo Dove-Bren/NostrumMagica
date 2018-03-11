@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 
 import net.minecraft.block.BlockBush;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
@@ -91,6 +92,7 @@ public class NostrumMagicaFlower extends BlockBush {
 	
 	public NostrumMagicaFlower() {
 		super(Material.PLANTS);
+		this.blockSoundType = SoundType.PLANT;
 		
 		this.id = "nostrum_flower";
 		this.setUnlocalizedName(id);

@@ -24,9 +24,13 @@ import net.minecraftforge.fml.relauncher.Side;
 public class ModConfig {
 
 	public static enum Key {
-		//MANA_DISPLAY(),
 		SPELL_DEBUG(Category.SPELL, "spell_debug", false, false, "Print targetting debug information for spells? (Requires config on server set to true as well)"),
-		
+
+		MP_DISPLAY_SPHERES(Category.DISPLAY, "display_spheres", true, false, "Display available mana as mana orbs on the HUD"),
+		MP_DISPLAY_BAR(Category.DISPLAY, "display_bar", false, false, "Display mana as a mana bar on the HUD"),
+		MP_DISPLAY_TEXT(Category.DISPLAY, "display_mp_text", false, false, "Display available mana as text over existing mana displays"),
+		XP_DISPLAY_TEXT(Category.DISPLAY, "display_xp_text", false, false, "Display current and max XP"),
+		XP_DISPLAY_BAR(Category.DISPLAY, "display_xp_bar", true, false, "Display current progress towards next level"),
 		OBELISK_LIST(Category.DISPLAY, "obelisk_list", false, false, "Display known teleportation points in the obelisk as a list"),
 		
 		INNER_DEBUG(Category.TEST, "inner_debug", 0, false, "Testing debug dont use omg blow everyhing up dont do it omg zomb"),
@@ -389,6 +393,26 @@ public class ModConfig {
 	
 	public boolean obeliskReqMagic() {
 		return getBooleanValue(Key.OBELISK_REQ_MAGIC, true);
+	}
+	
+	public boolean displayManaOrbs() {
+		return getBooleanValue(Key.MP_DISPLAY_SPHERES, false);
+	}
+	
+	public boolean displayManaBar() {
+		return getBooleanValue(Key.MP_DISPLAY_BAR, false);
+	}
+	
+	public boolean displayManaText() {
+		return getBooleanValue(Key.MP_DISPLAY_TEXT, false);
+	}
+	
+	public boolean displayXPText() {
+		return getBooleanValue(Key.XP_DISPLAY_TEXT, false);
+	}
+	
+	public boolean displayXPBar() {
+		return getBooleanValue(Key.XP_DISPLAY_BAR, false);
 	}
 	
 }

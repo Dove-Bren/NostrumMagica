@@ -79,15 +79,15 @@ public class MirrorItem extends Item implements ILoreTagged {
 
 			int i = MathHelper.floor_double((double)(playerIn.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
 			EnumFacing enumfacing = EnumFacing.getHorizontal(i + 2);
-			BlockPos blockpos = pos.offset(enumfacing);
+			//BlockPos blockpos = pos.offset(enumfacing);
 
-			if (playerIn.canPlayerEdit(pos, facing, stack) && playerIn.canPlayerEdit(blockpos, facing, stack))
+			if (playerIn.canPlayerEdit(pos, facing, stack))
 			{
-				boolean flag1 = worldIn.getBlockState(blockpos).getBlock().isReplaceable(worldIn, blockpos);
+				//boolean flag1 = worldIn.getBlockState(blockpos).getBlock().isReplaceable(worldIn, blockpos);
 				boolean flag2 = flag || worldIn.isAirBlock(pos);
-				boolean flag3 = flag1 || worldIn.isAirBlock(blockpos);
+				//boolean flag3 = flag1 || worldIn.isAirBlock(blockpos);
 
-				if (flag2 && flag3 && worldIn.getBlockState(pos.down()).isFullyOpaque() && worldIn.getBlockState(blockpos.down()).isFullyOpaque())
+				if (flag2 && worldIn.getBlockState(pos.down()).isFullyOpaque())
 				{
 					IBlockState iblockstate1 = NostrumMirrorBlock.instance().getDefaultState().withProperty(NostrumMirrorBlock.FACING, enumfacing);
 

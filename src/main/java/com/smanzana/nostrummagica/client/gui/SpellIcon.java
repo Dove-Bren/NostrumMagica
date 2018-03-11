@@ -28,6 +28,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -206,6 +207,7 @@ public class SpellIcon {
 		yOffset *= 1f / scaleV;
 		
 		GL11.glScalef(scaleU, scaleV, 0f); // Idk which it is!
+		GlStateManager.color(1f, 1f, 1f, 1f);
 		
 		Minecraft.getMinecraft().getTextureManager().bindTexture(iconSheet);
 		

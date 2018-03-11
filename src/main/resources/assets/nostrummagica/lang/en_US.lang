@@ -222,3 +222,6 @@ ritual.create_obelisk.name=Construct Obelisk
 ritual.create_obelisk.desc=Creates an Obelisk at|the center of the ritual
 ritual.geotoken.name=Construct Geotoken
 ritual.geotoken.desc=Solidifes a Geogem into a Geotoken
+
+enhancement.lower_reagent_cost.name=Lower Reagent Cost
+enhancement.lower_reagent_cost.desc=Reduces the amount of reagents used up when casting a spell

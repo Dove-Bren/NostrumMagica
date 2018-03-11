@@ -26,6 +26,7 @@ public interface INostrumMagic {
 	public float getXP();
 	public float getMaxXP();
 	public void addXP(float xp);
+	public void setLevel(int level);
 	
 	public int getSkillPoints();
 	public void addSkillPoint();

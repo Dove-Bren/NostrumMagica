@@ -11,8 +11,11 @@ import org.apache.logging.log4j.Logger;
 import com.smanzana.nostrummagica.capabilities.AttributeProvider;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.command.CommandEnhanceTome;
+import com.smanzana.nostrummagica.command.CommandGiveSkillpoint;
+import com.smanzana.nostrummagica.command.CommandSetLevel;
 import com.smanzana.nostrummagica.command.CommandSpawnObelisk;
 import com.smanzana.nostrummagica.command.CommandTestConfig;
+import com.smanzana.nostrummagica.command.CommandUnlock;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
@@ -157,6 +160,9 @@ public class NostrumMagica
     	event.registerServerCommand(new CommandTestConfig());
     	event.registerServerCommand(new CommandSpawnObelisk());
     	event.registerServerCommand(new CommandEnhanceTome());
+    	event.registerServerCommand(new CommandSetLevel());
+    	event.registerServerCommand(new CommandUnlock());
+    	event.registerServerCommand(new CommandGiveSkillpoint());
     	loadSeekerRegistry(seekerRegistryFile);
     }
     

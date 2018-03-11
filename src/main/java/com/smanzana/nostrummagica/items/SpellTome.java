@@ -19,6 +19,7 @@ import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -406,5 +407,18 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		}
 		
 		return list;
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+		List<EnhancementWrapper> enhances = getEnhancements(stack);
+		if (enhances == null || enhances.isEmpty())
+			return;
+		
+		for (EnhancementWrapper enhance : enhances) {
+			tooltip.add(I18n.format(enhance.enhancement.getNameFormat(), new Object[0])
+					+ " " + SpellTomePage.toRoman(enhance.level));
+		}
 	}
 }
