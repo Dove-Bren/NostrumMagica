@@ -25,6 +25,7 @@ import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.config.network.ServerConfigMessage;
+import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
 import com.smanzana.nostrummagica.entity.EntityGolemEarth;
 import com.smanzana.nostrummagica.entity.EntityGolemEnder;
 import com.smanzana.nostrummagica.entity.EntityGolemFire;
@@ -175,6 +176,9 @@ public class CommonProxy {
     	registerPotions();
     	registerItems();
     	registerBlocks();
+    	
+    	GameRegistry.register(EnchantmentManaRecovery.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, EnchantmentManaRecovery.ID));
     	
     	GameRegistry.registerWorldGenerator(new NostrumOreGenerator(), 0);
     	GameRegistry.registerWorldGenerator(new NostrumFlowerGenerator(), 0);

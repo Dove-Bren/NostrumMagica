@@ -113,7 +113,7 @@ public class NostrumMagica
 	        }
 	    };
 	    SpellTome.instance().setCreativeTab(NostrumMagica.creativeTab);
-	    NostrumMagica.enhancementTab = new CreativeTabs(MODID) {
+	    NostrumMagica.enhancementTab = new CreativeTabs(MODID + "_enhancements") {
 	    	@Override
 	    	@SideOnly(Side.CLIENT)
 	    	public Item getTabIconItem() {

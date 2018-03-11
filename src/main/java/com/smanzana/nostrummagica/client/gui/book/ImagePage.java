@@ -67,10 +67,12 @@ public class ImagePage implements IBookPage {
 		int y = centery - (this.height / 2);
 		
 		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+		GlStateManager.enableBlend();
 		if (textWidth == -1 || textHeight == -1)
 			parent.drawTexturedModalRect(x, y, uoffset, voffset, this.width, this.height);
 		else
 			Gui.drawModalRectWithCustomSizedTexture(x, y, uoffset, voffset, this.width, this.height, textWidth, textHeight);
+		GlStateManager.disableBlend();
 	}
 
 	@Override

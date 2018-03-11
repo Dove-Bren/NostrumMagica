@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
+import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
 import com.smanzana.nostrummagica.items.EnchantedEquipment;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
@@ -31,6 +32,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.material.Material;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EntityTracker;
@@ -694,8 +696,19 @@ public class PlayerListener {
 		// Called 2 times a second
 		INostrumMagic stats = NostrumMagica.getMagicWrapper(player);
 		
-		// TODO add regen speed upgrades?
-		int mana = 1;
+		float bonus = 0f;
+		
+		for (ItemStack armor : player.getArmorInventoryList()) {
+			int level = EnchantmentHelper.getEnchantmentLevel(EnchantmentManaRecovery.instance(), armor);
+			if (level > 0)
+				bonus += level * .1f;
+		}
+		
+		int mana = 1 + (int) (bonus);
+		bonus = bonus - (int) bonus;
+		if (bonus > 0f && NostrumMagica.rand.nextFloat() < bonus)
+			mana++;
+		
 		stats.addMana(mana);
 		EntityTracker tracker = ((WorldServer) player.worldObj).getEntityTracker();
 		if (tracker == null)

@@ -13,6 +13,10 @@ import net.minecraft.entity.EntityLivingBase;
 public abstract class SpellTomeEnhancement {
 	
 	public static EnhancementLowerReagentCost LOWER_REAGENT_COST;
+	public static EnhancementLowerManaCost LOWER_MANA_COST;
+	public static EnhancementEfficiency EFFICIENCY;
+	public static EnhancementBonusXP BONUS_XP;
+	
 
 	private static Map<String, SpellTomeEnhancement> registry = new HashMap<>();
 	
@@ -90,6 +94,9 @@ public abstract class SpellTomeEnhancement {
 	
 	public static void initDefaultEnhancements() {
 		LOWER_REAGENT_COST = new EnhancementLowerReagentCost();
+		LOWER_MANA_COST = new EnhancementLowerManaCost();
+		BONUS_XP = new EnhancementBonusXP();
+		EFFICIENCY = new EnhancementEfficiency();
 	}
 	
 }
