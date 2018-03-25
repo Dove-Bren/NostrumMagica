@@ -1,7 +1,11 @@
 package com.smanzana.nostrummagica.capabilities;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.smanzana.nostrummagica.quests.NostrumQuest;
+import com.smanzana.nostrummagica.quests.objectives.IObjectiveState;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
@@ -28,6 +32,10 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	private static final String NBT_FINESSE = "finesse";
 	private static final String NBT_MANA = "mana";
 	
+	private static final String NBT_MOD_MANA = "mod_mana";
+	private static final String NBT_MOD_MANA_COST = "mod_mana_cost";
+	private static final String NBT_MOD_MANA_REGEN = "mod_mana_regen";
+	
 	//private static final String NBT_FAMILIARS = "familiars";
 	//private static final String NBT_BINDING = "binding"; // TODO binding interface
 	
@@ -42,6 +50,10 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	private static final String NBT_MARK_DIMENSION = "mark_dim";
 	private static final String NBT_MARK_POS = "mark_pos";
 	
+	private static final String NBT_QUESTS_COMPLETED = "quests_completed";
+	private static final String NBT_QUESTS_CURRENT = "quests_current";
+	private static final String NBT_QUESTS_DATA = "quest_data";
+	
 	@Override
 	public NBTBase writeNBT(Capability<INostrumMagic> capability, INostrumMagic instance, EnumFacing side) {
 		NBTTagCompound nbt = new NBTTagCompound();
@@ -54,6 +66,9 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		nbt.setInteger(NBT_TECH, instance.getTech());
 		nbt.setInteger(NBT_FINESSE, instance.getFinesse());
 		nbt.setInteger(NBT_MANA, instance.getMana());
+		nbt.setFloat(NBT_MOD_MANA, instance.getManaModifier());
+		nbt.setFloat(NBT_MOD_MANA_COST, instance.getManaCostModifier());
+		nbt.setFloat(NBT_MOD_MANA_REGEN, instance.getManaRegenModifier());
 		
 		NBTTagCompound compound = new NBTTagCompound();
 		{
@@ -121,6 +136,38 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			nbt.setTag(NBT_MARK_POS, posTag);
 		}
 		
+		List<String> stringList = instance.getCurrentQuests();
+		if (stringList != null && !stringList.isEmpty()) {
+			NBTTagList tagList = new NBTTagList();
+			for (String quest : stringList) {
+				tagList.appendTag(new NBTTagString(quest));
+			}
+			nbt.setTag(NBT_QUESTS_CURRENT, tagList);
+		}
+		
+		stringList = instance.getCompletedQuests();
+		if (stringList != null && !stringList.isEmpty()) {
+			NBTTagList tagList = new NBTTagList();
+			for (String quest : stringList) {
+				tagList.appendTag(new NBTTagString(quest));
+			}
+			nbt.setTag(NBT_QUESTS_COMPLETED, tagList);
+		}
+		
+		{
+			Map<String, IObjectiveState> data = instance.getQuestDataMap();
+			if (data != null && !data.isEmpty()) {
+				compound = new NBTTagCompound();
+				
+				for (String quest : data.keySet()) {
+					compound.setTag(quest, data.get(quest).toNBT());
+				}
+				
+				nbt.setTag(NBT_QUESTS_DATA, compound);
+			}
+		
+		}
+		
 		return nbt;
 	}
 
@@ -134,8 +181,11 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			tag.getInteger(NBT_CONTROL),
 			tag.getInteger(NBT_TECH),
 			tag.getInteger(NBT_FINESSE),
-			tag.getInteger(NBT_MANA));
-		
+			tag.getInteger(NBT_MANA),
+			tag.getFloat(NBT_MOD_MANA),
+			tag.getFloat(NBT_MOD_MANA_COST),
+			tag.getFloat(NBT_MOD_MANA_REGEN));
+			
 		// LORE
 		NBTTagCompound compound = tag.getCompoundTag(NBT_LORELEVELS);
 		for (String key : compound.getKeySet()) {
@@ -206,6 +256,39 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			
 			instance.setMarkLocation(dimension, location);
 		}
+		
+		// Quests
+		if (tag.hasKey(NBT_QUESTS_CURRENT, NBT.TAG_LIST)) {
+			NBTTagList tagList = tag.getTagList(NBT_QUESTS_CURRENT, NBT.TAG_STRING);
+			for (int i = 0; i < tagList.tagCount(); i++) {
+				String quest = tagList.getStringTagAt(i);
+				instance.addQuest(quest);
+			}
+		}
+		if (tag.hasKey(NBT_QUESTS_COMPLETED, NBT.TAG_LIST)) {
+			NBTTagList tagList = tag.getTagList(NBT_QUESTS_COMPLETED, NBT.TAG_STRING);
+			for (int i = 0; i < tagList.tagCount(); i++) {
+				String quest = tagList.getStringTagAt(i);
+				instance.addQuest(quest);
+				instance.completeQuest(quest);
+			}
+		}
+		Map<String, IObjectiveState> data = new HashMap<>();
+		if (tag.hasKey(NBT_QUESTS_DATA, NBT.TAG_COMPOUND)) {
+			NBTTagCompound dataTag = tag.getCompoundTag(NBT_QUESTS_DATA);
+			for (String key : dataTag.getKeySet()) {
+				NostrumQuest quest = NostrumQuest.lookup(key);
+				if (quest == null)
+					continue;
+				
+				if (quest.getObjective() != null) {
+					IObjectiveState state = quest.getObjective().getBaseState();
+					state.fromNBT(dataTag.getCompoundTag(key));
+					data.put(key, state);
+				}
+			}
+		}
+		instance.setQuestDataMap(data);
 	}
 
 }

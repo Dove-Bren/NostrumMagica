@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -31,6 +32,13 @@ import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
 import com.smanzana.nostrummagica.listeners.PlayerListener;
 import com.smanzana.nostrummagica.proxy.CommonProxy;
+import com.smanzana.nostrummagica.quests.NostrumQuest;
+import com.smanzana.nostrummagica.quests.NostrumQuest.QuestType;
+import com.smanzana.nostrummagica.quests.objectives.ObjectiveRitual;
+import com.smanzana.nostrummagica.quests.rewards.AlterationReward;
+import com.smanzana.nostrummagica.quests.rewards.AttributeReward;
+import com.smanzana.nostrummagica.quests.rewards.AttributeReward.AwardType;
+import com.smanzana.nostrummagica.quests.rewards.IReward;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeConstructGeotoken;
@@ -41,6 +49,7 @@ import com.smanzana.nostrummagica.rituals.outcomes.OutcomePotionEffect;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeRecall;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeTeleportObelisk;
+import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.SpellRegistry;
@@ -128,6 +137,7 @@ public class NostrumMagica
     	RitualRegistry.instance();
     	
     	registerDefaultRituals();
+    	registerDefaultQuests();
     	
     	File dir = new File(event.getSuggestedConfigurationFile().getParentFile(), "NostrumMagica");
     	if (!dir.exists())
@@ -299,6 +309,42 @@ public class NostrumMagica
     	
     	return SpellTome.getSpells(tome);
     	
+    }
+    
+    public static List<NostrumQuest> getActiveQuests(EntityPlayer player) {
+    	return getActiveQuests(getMagicWrapper(player));
+    }
+    
+    public static List<NostrumQuest> getActiveQuests(INostrumMagic attr) {
+    	List<NostrumQuest> list = new LinkedList<>();
+    	List<String> quests = attr.getCurrentQuests();
+    	
+    	if (quests != null && !quests.isEmpty()) 
+    	for (String quest : quests){
+    		NostrumQuest q = NostrumQuest.lookup(quest);
+    		if (q != null)
+    			list.add(q);
+    	}
+    	
+    	return list;
+    }
+    
+    public static List<NostrumQuest> getCompletedQuests(EntityPlayer player) {
+    	return getCompletedQuests(getMagicWrapper(player));
+    }
+    
+    public static List<NostrumQuest> getCompletedQuests(INostrumMagic attr) {
+    	List<NostrumQuest> list = new LinkedList<>();
+    	List<String> quests = attr.getCompletedQuests();
+    	
+    	if (quests != null && !quests.isEmpty()) 
+    	for (String quest : quests){
+    		NostrumQuest q = NostrumQuest.lookup(quest);
+    		if (q != null)
+    			list.add(q);
+    	}
+    	
+    	return list;
     }
     
     private void loadSpellRegistry(File file) {
@@ -526,4 +572,52 @@ public class NostrumMagica
 //					center, outcome)
 //				);
 	}
+    
+    private static void registerDefaultQuests() {
+    	/*
+    	 * String key,
+			QuestType type,
+			int reqLevel,
+			int reqControl,
+			int reqTechnique,
+			int reqFinesse,
+			String[] parentKeys,
+			IObjective objective,
+			IReward[] rewards
+    	 */
+    	new NostrumQuest("start", QuestType.REGULAR, 0, 0, 0, 0, null, null,
+    			wrapAttribute(AwardType.MANA, 0.0500f));
+    	new NostrumQuest("lvl1", QuestType.REGULAR, 2, 0, 0, 0, new String[]{"start"},
+    			null, wrapAttribute(AwardType.MANA, 0.010f));
+    	new NostrumQuest("lvl2-fin", QuestType.REGULAR, 3, 0, 0, 1, new String[]{"lvl1"},
+    			null, wrapAttribute(AwardType.REGEN, 0.0050f));
+    	new NostrumQuest("lvl2-con", QuestType.REGULAR, 3, 1, 0, 0, new String[]{"lvl1"},
+    			null, wrapAttribute(AwardType.COST, -0.005f));
+    	new NostrumQuest("lvl3", QuestType.REGULAR, 4, 0, 0, 0, new String[]{"lvl2-fin", "lvl2-con"},
+    			null, wrapAttribute(AwardType.MANA, 0.005f));
+    	new NostrumQuest("lvl4", QuestType.CHALLEGE, 5, 0, 0, 0, new String[]{"lvl3"},
+    			new ObjectiveRitual("magic_token"),
+    			new IReward[]{new AlterationReward(EAlteration.INFLICT)});
+    	
+    	//new NostrumQuest("lvl2-con", QuestType.REGULAR, 3, 0, 0, 0, new String[]{"lvl1"},
+    	//		null, wrapAttribute(AwardType.COST, -0.005f));
+    	
+    }
+    
+    private static IReward[] wrapAttribute(AwardType type, float val) {
+    	return new IReward[]{new AttributeReward(type, val)};
+    }
+    
+    public static boolean getQuestAvailable(EntityPlayer player, NostrumQuest quest) {
+    	if (quest.getParentKeys() == null || quest.getParentKeys().length == 0)
+			return true;
+		
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		for (String parent : quest.getParentKeys()) {
+			if (attr.getCompletedQuests().contains(parent))
+				return true;
+		}
+		
+		return false;
+    }
 }

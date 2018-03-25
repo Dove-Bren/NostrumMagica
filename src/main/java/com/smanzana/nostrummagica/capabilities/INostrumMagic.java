@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.quests.objectives.IObjectiveState;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -46,6 +47,14 @@ public interface INostrumMagic {
 	public void setMana(int mana);
 	public void addMana(int mana);
 	public void setMaxMana(int max);
+	
+	// Modifiers
+	public float getManaModifier();
+	public float getManaRegenModifier();
+	public float getManaCostModifier();
+	public void addManaModifier(float modifier);
+	public void addManaRegenModifier(float modifier);
+	public void addManaCostModifer(float modifier);
 	
 	// Familiars
 //	public List<IFamiliar> getFamiliars(); // TODO add interface
@@ -91,7 +100,10 @@ public interface INostrumMagic {
 			int control,
 			int tech,
 			int finesse,
-			int mana
+			int mana,
+			float mod_mana,
+			float mod_mana_cost,
+			float mod_mana_regen
 			);
 	
 	public Map<String, Integer> serializeLoreLevels();
@@ -104,4 +116,14 @@ public interface INostrumMagic {
 	// Copy fields out of
 	public void copy(INostrumMagic cap);
 	public void provideEntity(EntityLivingBase entity);
+	
+	// Quests
+	public List<String> getCompletedQuests();
+	public List<String> getCurrentQuests();
+	public void addQuest(String quest);
+	public void completeQuest(String quest);
+	public IObjectiveState getQuestData(String quest);
+	public void setQuestData(String quest, IObjectiveState data);
+	public Map<String, IObjectiveState> getQuestDataMap();
+	public void setQuestDataMap(Map<String, IObjectiveState> map);
 }

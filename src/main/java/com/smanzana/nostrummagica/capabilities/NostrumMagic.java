@@ -11,6 +11,7 @@ import java.util.Set;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.loretag.LoreCache;
+import com.smanzana.nostrummagica.quests.objectives.IObjectiveState;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -56,6 +57,9 @@ public class NostrumMagic implements INostrumMagic {
 	private int finesse;
 	private int mana;
 	private int maxMana;
+	private float modMana;
+	private float modManaCost;
+	private float modManaRegen;
 	
 	//private List<IFamiliar> familiars;
 	private boolean binding; // TODO binding interface
@@ -67,6 +71,9 @@ public class NostrumMagic implements INostrumMagic {
 	private List<SpellShape> shapes; // list of shape keys
 	private List<SpellTrigger> triggers; // list of trigger keys
 	private Map<EAlteration, Boolean> alterations;
+	private List<String> completedQuests;
+	private List<String> currentQuests;
+	private Map<String, IObjectiveState> questData;
 	private BlockPos markLocation;
 	private int markDimension;
 	
@@ -82,6 +89,9 @@ public class NostrumMagic implements INostrumMagic {
 		shapes = new LinkedList<>();
 		triggers = new LinkedList<>();
 		alterations = new EnumMap<>(EAlteration.class);
+		currentQuests = new LinkedList<>();
+		completedQuests = new LinkedList<>();
+		questData = new HashMap<>();
 		
 		binding = false;
 	}
@@ -404,7 +414,7 @@ public class NostrumMagic implements INostrumMagic {
 
 	@Override
 	public void deserialize(boolean unlocked, int level, float xp, int skillpoints, int control, int tech, int finesse,
-			int mana) {
+			int mana, float modMana, float modManaCost, float modManaRegen) {
 		this.unlocked = unlocked;
 		this.level = level;
 		this.xp = xp;
@@ -415,6 +425,9 @@ public class NostrumMagic implements INostrumMagic {
 		this.finesse = finesse;
 		this.mana = mana;
 		this.maxMana = LevelCurves.maxMana(this.level);
+		this.modMana = modMana;
+		this.modManaCost = modManaCost;
+		this.modManaRegen = modManaRegen;
 	}
 
 	@Override
@@ -457,7 +470,8 @@ public class NostrumMagic implements INostrumMagic {
 		System.out.println("Overriding stats from" + this.mana + " to " + cap.getMana() + " mana");
 		this.deserialize(cap.isUnlocked(), cap.getLevel(), cap.getXP(),
 				cap.getSkillPoints(), cap.getControl(), cap.getTech(),
-				cap.getFinesse(), cap.getMana());
+				cap.getFinesse(), cap.getMana(),
+				cap.getManaModifier(), cap.getManaCostModifier(), cap.getManaRegenModifier());
 		
 		this.loreLevels = cap.serializeLoreLevels();
 		this.spellCRCs = cap.serializeSpellHistory();
@@ -468,6 +482,9 @@ public class NostrumMagic implements INostrumMagic {
 		this.triggers = cap.getTriggers();
 		this.markLocation = cap.getMarkLocation();
 		this.markDimension = cap.getMarkDimension();
+		this.currentQuests = cap.getCurrentQuests();
+		this.completedQuests = cap.getCompletedQuests();
+		this.questData = cap.getQuestDataMap();
 	}
 	
 	@Override
@@ -491,4 +508,81 @@ public class NostrumMagic implements INostrumMagic {
 		this.markLocation = pos;
 	}
 
+	@Override
+	public void addManaModifier(float modifier) {
+		this.modMana += modifier;
+	}
+
+	@Override
+	public void addManaRegenModifier(float modifier) {
+		this.modManaRegen += modifier;
+	}
+
+	@Override
+	public void addManaCostModifer(float modifier) {
+		this.modManaCost += modifier;
+	}
+
+	@Override
+	public float getManaModifier() {
+		return this.modMana;
+	}
+
+	@Override
+	public float getManaRegenModifier() {
+		return this.modManaRegen;
+	}
+
+	@Override
+	public float getManaCostModifier() {
+		return this.modManaCost;
+	}
+
+	@Override
+	public List<String> getCompletedQuests() {
+		return this.completedQuests;
+	}
+
+	@Override
+	public List<String> getCurrentQuests() {
+		return this.currentQuests;
+	}
+
+	@Override
+	public void addQuest(String quest) {
+		if (!currentQuests.contains(quest) && !completedQuests.contains(quest))
+			currentQuests.add(quest);
+	}
+
+	@Override
+	public void completeQuest(String quest) {
+		if (!completedQuests.contains(quest) && currentQuests.contains(quest)) {
+			currentQuests.remove(quest);
+			completedQuests.add(quest);
+		}
+			
+	}
+
+	@Override
+	public IObjectiveState getQuestData(String quest) {
+		return questData.get(quest);
+	}
+	
+	@Override
+	public void setQuestData(String quest, IObjectiveState data) {
+		if (data == null)
+			questData.remove(quest);
+		else
+			questData.put(quest, data);
+	}
+	
+	@Override
+	public Map<String, IObjectiveState> getQuestDataMap() {
+		return questData;
+	}
+	
+	@Override
+	public void setQuestDataMap(Map<String, IObjectiveState> map) {
+		this.questData = map;
+	}
 }

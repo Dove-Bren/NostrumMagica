@@ -18,6 +18,7 @@ import com.smanzana.nostrummagica.blocks.NostrumMirrorBlock;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
+import com.smanzana.nostrummagica.client.gui.MirrorGui;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityAltarRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityCandleRenderer;
@@ -416,10 +417,15 @@ public class ClientProxy extends CommonProxy {
 		// Otherwise, stash them for loading when we apply attributes
 		INostrumMagic existing = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer);
 		if (existing != null) {
-			// Stash them
-			existing.copy(override);
-		} else {
 			// apply them
+			existing.copy(override);
+			
+			// If we're on a screen that cares, refresh it
+			if (Minecraft.getMinecraft().currentScreen instanceof MirrorGui) {
+				((MirrorGui) Minecraft.getMinecraft().currentScreen).refresh();
+			}
+		} else {
+			// Stash them
 			overrides = override;
 		}
 	}

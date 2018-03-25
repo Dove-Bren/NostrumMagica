@@ -1,6 +1,5 @@
 package com.smanzana.nostrummagica.client.gui;
 
-import com.smanzana.nostrummagica.blocks.NostrumMirrorBlock;
 import com.smanzana.nostrummagica.blocks.NostrumObelisk.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.blocks.SpellTable.SpellTableEntity;
 import com.smanzana.nostrummagica.client.gui.container.ReagentBagGui;
@@ -90,7 +89,7 @@ public class NostrumGui implements IGuiHandler {
 		}
 		
 		if (ID == mirrorID) {
-			return new NostrumMirrorBlock.MirrorGui(player);
+			return new MirrorGui(player);
 		}
 		
 		if (ID == obeliskID) {

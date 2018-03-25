@@ -234,3 +234,23 @@ enhancement.eff_bonus.name=Spell Power
 enhancement.eff_bonus.desc=Amplifies the potency of cast spells
 
 enchantment.mana_recovery=Mana Recovery
+
+reward.attrib.mana=Bonus Mana %+.2f%%
+reward.attrib.cost=Mana Cost %+.2f%%
+reward.attrib.regen=Mana Regen %+.2f%%
+reward.alteration.inflict=Unlocks the Inflict alteration
+
+objective.ritual.magic_token=Perform Barr's Enchantment
+
+quest.start.name=The Journey Begins
+quest.start.desc=You've discovered the Magic Mirror, where you can grow your skills and unlock new abilities!
+quest.lvl1.name=Level 2
+quest.lvl1.desc=
+quest.lvl2-fin.name=Showing some Finesse
+quest.lvl2-fin.desc=Finesse allows you to make multi-staged spells. It's a must-have for party mages!
+quest.lvl2-con.name=Demonstrating Control
+quest.lvl2-con.desc=Control is needed to make powerful spells. Control limits the number of elements allowed in a spell.
+quest.lvl3.name=Gaining Traction
+quest.lvl3.desc=
+quest.lvl4.name=Alterations
+quest.lvl4.desc=Alterations add different effects to spells. They are combined with Shapes like Elements are.||Take this quest, perform Barr's Enchantment, and unlock the Inflict alteration!
