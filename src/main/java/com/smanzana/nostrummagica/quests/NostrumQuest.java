@@ -160,7 +160,7 @@ public class NostrumQuest {
 	}
 	
 	public int getPlotX() {
-		return -reqControl + reqFinesse;
+		return reqControl - reqFinesse;
 	}
 	
 	public int getPlotY() {

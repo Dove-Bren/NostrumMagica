@@ -35,6 +35,7 @@ import com.smanzana.nostrummagica.proxy.CommonProxy;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.quests.NostrumQuest.QuestType;
 import com.smanzana.nostrummagica.quests.objectives.ObjectiveRitual;
+import com.smanzana.nostrummagica.quests.objectives.ObjectiveSpellCast;
 import com.smanzana.nostrummagica.quests.rewards.AlterationReward;
 import com.smanzana.nostrummagica.quests.rewards.AttributeReward;
 import com.smanzana.nostrummagica.quests.rewards.AttributeReward.AwardType;
@@ -599,6 +600,15 @@ public class NostrumMagica
     			new ObjectiveRitual("magic_token"),
     			new IReward[]{new AlterationReward(EAlteration.INFLICT)});
     	
+    	new NostrumQuest("lvl6-fin", QuestType.REGULAR, 6, 0, 0, 3, new String[]{"lvl4"},
+    			null, wrapAttribute(AwardType.REGEN, 0.005f));
+    	new NostrumQuest("lvl7-fin", QuestType.REGULAR, 7, 0, 0, 4, new String[]{"lvl6-fin"},
+    			null, wrapAttribute(AwardType.MANA, 0.010f));
+    	new NostrumQuest("lvl7-fin7", QuestType.REGULAR, 7, 0, 0, 7, new String[]{"lvl7-fin"},
+    			null, wrapAttribute(AwardType.REGEN, 0.010f));
+    	new NostrumQuest("lvl10-fin10", QuestType.CHALLEGE, 10, 0, 0, 10, new String[]{"lvl7-fin7"},
+    			new ObjectiveSpellCast().numTriggers(10).requiredElement(EMagicElement.ICE),
+    			new IReward[]{new AlterationReward(EAlteration.SUPPORT)});
     	//new NostrumQuest("lvl2-con", QuestType.REGULAR, 3, 0, 0, 0, new String[]{"lvl1"},
     	//		null, wrapAttribute(AwardType.COST, -0.005f));
     	

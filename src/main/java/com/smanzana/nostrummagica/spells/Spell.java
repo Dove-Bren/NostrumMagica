@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.spells;
 
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -387,6 +388,7 @@ public class Spell {
 	
 	public void cast(EntityLivingBase caster, float efficiency) {
 		SpellState state = new SpellState(caster, efficiency);
+		Spell.onCast(caster, this);
 		state.trigger(Lists.newArrayList(caster), null, null, null);
 		
 		NostrumMagicaSounds.CAST_LAUNCH.play(caster);
@@ -905,6 +907,112 @@ public class Spell {
 		}
 		
 		return true;
+	}
+	
+	public static interface ICastListener {
+		
+		public void onCast(EntityLivingBase entity, Spell spell);
+	}
+	
+	private static List<ICastListener> castListeners = new LinkedList<>();
+	public static void registerCastListener(ICastListener listener) {
+		castListeners.add(listener);
+	}
+	
+	private static void onCast(EntityLivingBase entity, Spell spell) {
+		if (castListeners.isEmpty())
+			return;
+		
+		for (ICastListener l : castListeners) {
+			l.onCast(entity, spell);
+		}
+	}
+	
+	public int getComponentCount() {
+		int count = 0;
+		if (!parts.isEmpty())
+			count = parts.size();
+		return count;
+	}
+	
+	public int getElementCount() {
+		int count = 0;
+		if (!parts.isEmpty())
+		for (SpellPart part : parts) {
+			if (!part.isTrigger())
+				count += part.elementCount;
+		}
+		return count;
+	}
+	
+	public int getTriggerCount() {
+		int count = 0;
+		if (!parts.isEmpty())
+		for (SpellPart part : parts) {
+			if (part.isTrigger())
+				count++;
+		}
+		return count;
+	}
+	
+	public Map<EMagicElement, Integer> getElements() {
+		Map<EMagicElement, Integer> list = new EnumMap<>(EMagicElement.class);
+		if (!parts.isEmpty())
+		for (SpellPart part : parts) {
+			if (!part.isTrigger() && part.element != null) {
+				int count = 0;
+				if (list.get(part.element) != null)
+					count = list.get(part.element);
+				count += part.elementCount;
+				list.put(part.element, count);
+			} 
+		}
+		return list;
+	}
+	
+	public Map<EAlteration, Integer> getAlterations() {
+		Map<EAlteration, Integer> list = new EnumMap<>(EAlteration.class);
+		if (!parts.isEmpty())
+		for (SpellPart part : parts) {
+			if (!part.isTrigger() && part.alteration != null) {
+				int count = 0;
+				if (list.get(part.alteration) != null)
+					count = list.get(part.alteration);
+				count++;
+				list.put(part.alteration, count);
+			}
+		}
+		return list;
+	}
+	
+	public Map<SpellTrigger, Integer> getTriggers() {
+		Map<SpellTrigger, Integer> list = new HashMap<>();
+		if (!parts.isEmpty())
+		for (SpellPart part : parts) {
+			if (part.isTrigger()) {
+				int count = 0;
+				if (list.get(part.getTrigger()) != null)
+					count = list.get(part.getTrigger());
+				count++;
+				list.put(part.getTrigger(), count);
+			}
+		}
+		return list;
+	}
+	
+	public Map<SpellShape, Integer> getShapes() {
+		Map<SpellShape, Integer> list = new HashMap<>();
+		if (!parts.isEmpty())
+		for (SpellPart part : parts) {
+			if (!part.isTrigger()) {
+				int count = 0;
+				if (list.get(part.getShape()) != null)
+					count = list.get(part.getShape());
+				count++;
+				list.put(part.getShape(), count);
+			}
+		}
+		return list;
 	}
 	
 }

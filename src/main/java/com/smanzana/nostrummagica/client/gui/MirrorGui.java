@@ -619,6 +619,10 @@ public class MirrorGui extends GuiScreen {
             	tooltip.add(quest.getObjective().getDescription());
             }
             
+//            if (canTake(quest)) {
+//            	tooltip.add(TextFormatting.GREEN + "Click to Accept" + TextFormatting.RESET);
+//            }
+            
             for (String line : tooltip) {
             	int width = fontRendererObj.getStringWidth(line);
             	if (width > maxWidth)

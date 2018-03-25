@@ -241,6 +241,7 @@ reward.attrib.regen=Mana Regen %+.2f%%
 reward.alteration.inflict=Unlocks the Inflict alteration
 
 objective.ritual.magic_token=Perform Barr's Enchantment
+objective.spell=Special Spell Cast
 
 quest.start.name=The Journey Begins
 quest.start.desc=You've discovered the Magic Mirror, where you can grow your skills and unlock new abilities!
