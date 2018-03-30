@@ -619,21 +619,21 @@ public class MirrorGui extends GuiScreen {
             	tooltip.add(quest.getObjective().getDescription());
             }
             
-//            if (canTake(quest)) {
-//            	tooltip.add(TextFormatting.GREEN + "Click to Accept" + TextFormatting.RESET);
-//            }
-            
-            for (String line : tooltip) {
-            	int width = fontRendererObj.getStringWidth(line);
-            	if (width > maxWidth)
-            		maxWidth = width;
-            }
-            
             if (quest.getRewards() != null && quest.getRewards().length != 0)
             for (IReward reward : quest.getRewards()) {
             	String desc = reward.getDescription();
             	if (desc != null && !desc.isEmpty())
             		tooltip.add(TextFormatting.GOLD + desc + TextFormatting.RESET);
+            }
+            
+            if (this.state == QuestState.INACTIVE && canTake(quest)) {
+            	tooltip.add(TextFormatting.GREEN + "Click to Accept" + TextFormatting.RESET);
+            }
+            
+            for (String line : tooltip) {
+            	int width = fontRendererObj.getStringWidth(line);
+            	if (width > maxWidth)
+            		maxWidth = width;
             }
             
             String desc = I18n.format("quest." + quest.getKey() + ".desc", new Object[0]);

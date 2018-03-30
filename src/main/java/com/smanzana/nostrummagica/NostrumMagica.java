@@ -600,6 +600,7 @@ public class NostrumMagica
     			new ObjectiveRitual("magic_token"),
     			new IReward[]{new AlterationReward(EAlteration.INFLICT)});
     	
+    	// LVL-finesse tree
     	new NostrumQuest("lvl6-fin", QuestType.REGULAR, 6, 0, 0, 3, new String[]{"lvl4"},
     			null, wrapAttribute(AwardType.REGEN, 0.005f));
     	new NostrumQuest("lvl7-fin", QuestType.REGULAR, 7, 0, 0, 4, new String[]{"lvl6-fin"},
@@ -609,6 +610,37 @@ public class NostrumMagica
     	new NostrumQuest("lvl10-fin10", QuestType.CHALLEGE, 10, 0, 0, 10, new String[]{"lvl7-fin7"},
     			new ObjectiveSpellCast().numTriggers(10).requiredElement(EMagicElement.ICE),
     			new IReward[]{new AlterationReward(EAlteration.SUPPORT)});
+    	
+    	// LVL-control tree
+    	new NostrumQuest("lvl6-con", QuestType.REGULAR, 6, 3, 0, 0, new String[]{"lvl4"},
+    			null, wrapAttribute(AwardType.COST, -0.005f));
+    	new NostrumQuest("lvl7-con", QuestType.REGULAR, 7, 4, 0, 0, new String[]{"lvl6-con"},
+    			null, wrapAttribute(AwardType.COST, -0.005f));
+    	new NostrumQuest("lvl7-con7", QuestType.REGULAR, 7, 7, 0, 0, new String[]{"lvl7-con"},
+    			null, wrapAttribute(AwardType.COST, -0.010f));
+    	new NostrumQuest("lvl10-con10", QuestType.CHALLEGE, 10, 10, 0, 0, new String[]{"lvl7-con7"},
+    			new ObjectiveSpellCast().numElems(10).requiredElement(EMagicElement.EARTH),
+    			new IReward[]{new AlterationReward(EAlteration.RESIST)});
+    	
+    	// LVL main tree
+    	new NostrumQuest("lvl7", QuestType.CHALLEGE, 7, 0, 0, 0, new String[]{"lvl6-con", "lvl6-fin"},
+    			new ObjectiveRitual("vani"),
+    			wrapAttribute(AwardType.MANA, 0.020f));
+    	new NostrumQuest("lvl8-fin3", QuestType.REGULAR, 8, 0, 0, 3, new String[]{"lvl7"},
+    			null, wrapAttribute(AwardType.COST, -0.005f));
+    	new NostrumQuest("lvl8-fin5", QuestType.REGULAR, 8, 0, 0, 5, new String[]{"lvl7"},
+    			null, wrapAttribute(AwardType.MANA, 0.020f));
+    	new NostrumQuest("lvl10-fin6", QuestType.REGULAR, 10, 0, 0, 6, new String[]{"lvl8-fin5"},
+    			null, wrapAttribute(AwardType.REGEN, 0.100f));
+    	new NostrumQuest("lvl8-con3", QuestType.REGULAR, 8, 3, 0, 0, new String[]{"lvl7"},
+    			null, wrapAttribute(AwardType.REGEN, 0.005f));
+    	new NostrumQuest("lvl8-con5", QuestType.REGULAR, 8, 5, 0, 0, new String[]{"lvl7"},
+    			null, wrapAttribute(AwardType.MANA, 0.040f));
+    	new NostrumQuest("lvl10-con6", QuestType.REGULAR, 10, 6, 0, 0, new String[]{"lvl8-con5"},
+    			null, wrapAttribute(AwardType.COST, -0.050f));
+    	new NostrumQuest("lvl10", QuestType.REGULAR, 10, 0, 0, 0, new String[]{"lvl8-con3", "lvl8-fin3"},
+    			null, wrapAttribute(AwardType.MANA, 0.100f));
+    	
     	//new NostrumQuest("lvl2-con", QuestType.REGULAR, 3, 0, 0, 0, new String[]{"lvl1"},
     	//		null, wrapAttribute(AwardType.COST, -0.005f));
     	
