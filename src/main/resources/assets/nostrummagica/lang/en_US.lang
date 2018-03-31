@@ -35,6 +35,14 @@ item.nostrum_gem.ice.name=Ice Gem
 item.nostrum_gem.wind.name=Wind Gem
 item.nostrum_gem.ender.name=Ender Gem
 
+item.nostrum_essence.basic.name=Physical Essence
+item.nostrum_essence.lightning.name=Lightning Essence
+item.nostrum_essence.fire.name=Fire Essence
+item.nostrum_essence.earth.name=Earth Essence
+item.nostrum_essence.ice.name=Ice Essence
+item.nostrum_essence.wind.name=Wind Essence
+item.nostrum_essence.ender.name=Ender Essence
+
 item.nostrum_rune.physical.name=Physical Rune
 item.nostrum_rune.lightning.name=Lightning Rune
 item.nostrum_rune.fire.name=Fire Rune

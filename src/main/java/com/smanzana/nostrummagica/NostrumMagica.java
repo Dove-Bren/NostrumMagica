@@ -641,8 +641,118 @@ public class NostrumMagica
     	new NostrumQuest("lvl10", QuestType.REGULAR, 10, 0, 0, 0, new String[]{"lvl8-con3", "lvl8-fin3"},
     			null, wrapAttribute(AwardType.MANA, 0.100f));
     	
-    	//new NostrumQuest("lvl2-con", QuestType.REGULAR, 3, 0, 0, 0, new String[]{"lvl1"},
-    	//		null, wrapAttribute(AwardType.COST, -0.005f));
+    	new NostrumQuest("con1", QuestType.REGULAR, 0,
+    			1, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[]{"lvl1"},
+    			null,
+    			wrapAttribute(AwardType.COST, -0.002f));
+    	new NostrumQuest("con2", QuestType.REGULAR, 0,
+    			2, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[]{"con1"},
+    			null,
+    			wrapAttribute(AwardType.MANA, 0.010f));
+    	new NostrumQuest("con7", QuestType.CHALLEGE, 0,
+    			7, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[]{"con2"},
+    			null,
+    			wrapAttribute(AwardType.COST, -0.005f));
+    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			0, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[]{"lvl1"},
+    			null,
+    			wrapAttribute(AwardType.COST, -0.005f));
+    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			0, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[]{"lvl1"},
+    			null,
+    			wrapAttribute(AwardType.COST, -0.005f));
+    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			0, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[]{"lvl1"},
+    			null,
+    			wrapAttribute(AwardType.COST, -0.005f));
+    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			0, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[]{"lvl1"},
+    			null,
+    			wrapAttribute(AwardType.COST, -0.005f));
+    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			0, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[]{"lvl1"},
+    			null,
+    			wrapAttribute(AwardType.COST, -0.005f));
+    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			0, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[]{"lvl1"},
+    			null,
+    			wrapAttribute(AwardType.COST, -0.005f));
+    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			0, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[]{"lvl1"},
+    			null,
+    			wrapAttribute(AwardType.COST, -0.005f));
+    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			0, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[]{"lvl1"},
+    			null,
+    			wrapAttribute(AwardType.COST, -0.005f));
+    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			0, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[]{"lvl1"},
+    			null,
+    			wrapAttribute(AwardType.COST, -0.005f));
+    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			0, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[]{"lvl1"},
+    			null,
+    			wrapAttribute(AwardType.COST, -0.005f));
+    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			0, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[]{"lvl1"},
+    			null,
+    			wrapAttribute(AwardType.COST, -0.005f));
+    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			0, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[]{"lvl1"},
+    			null,
+    			wrapAttribute(AwardType.COST, -0.005f));
+    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			0, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[]{"lvl1"},
+    			null,
+    			wrapAttribute(AwardType.COST, -0.005f));
     	
     }
     

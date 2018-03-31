@@ -249,7 +249,7 @@ public class GolemTask extends EntityAIBase {
 			success = true;
 			double dist = golem.getDistanceSq(target.posX, target.getEntityBoundingBox().minY, target.posZ);
 
-            if (dist <= RANGE_SQR - 125.0 && golem.canEntityBeSeen(target))
+            if (dist <= RANGE_SQR - 25.0 && golem.canEntityBeSeen(target))
             {
             	golem.getNavigator().clearPathEntity();
                 ++this.strafeTime;

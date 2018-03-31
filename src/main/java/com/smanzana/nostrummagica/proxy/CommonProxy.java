@@ -33,12 +33,14 @@ import com.smanzana.nostrummagica.entity.EntityGolemIce;
 import com.smanzana.nostrummagica.entity.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.EntityGolemWind;
+import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
+import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
@@ -89,6 +91,7 @@ import com.smanzana.nostrummagica.world.NostrumFlowerGenerator;
 import com.smanzana.nostrummagica.world.NostrumOreGenerator;
 import com.smanzana.nostrummagica.world.NostrumShrineGenerator;
 
+import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemBlock;
@@ -96,6 +99,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
@@ -171,6 +175,20 @@ public class CommonProxy {
     			1,
     			false
     			);
+    	EntityRegistry.registerModEntity(EntityKoid.class, "entity_koid",
+    			entityID++,
+    			NostrumMagica.instance,
+    			64,
+    			1,
+    			false);
+    	EntityRegistry.addSpawn(EntityKoid.class, 4, 1, 1, EnumCreatureType.MONSTER, 
+    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.MAGICAL));
+    	EntityRegistry.addSpawn(EntityKoid.class, 4, 1, 1, EnumCreatureType.MONSTER, 
+    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.HOT));
+    	EntityRegistry.addSpawn(EntityKoid.class, 4, 1, 1, EnumCreatureType.MONSTER, 
+    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.WET));
+    	EntityRegistry.addSpawn(EntityKoid.class, 4, 1, 1, EnumCreatureType.MONSTER, 
+    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.NETHER));
 	}
 	
 	public void init() {
@@ -299,6 +317,9 @@ public class CommonProxy {
     	
     	SpellTomePage.instance().setRegistryName(NostrumMagica.MODID, SpellTomePage.id);
     	GameRegistry.register(SpellTomePage.instance());
+    	
+    	EssenceItem.instance().setRegistryName(NostrumMagica.MODID, EssenceItem.ID);
+    	GameRegistry.register(EssenceItem.instance());
     }
     
     private void registerBlocks() {

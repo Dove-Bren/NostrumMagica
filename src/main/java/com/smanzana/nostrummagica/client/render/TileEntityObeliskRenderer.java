@@ -1,17 +1,11 @@
 package com.smanzana.nostrummagica.client.render;
 
-import org.lwjgl.opengl.GL11;
-
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.NostrumObelisk;
 import com.smanzana.nostrummagica.blocks.NostrumObelisk.NostrumObeliskEntity;
 
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -34,10 +28,9 @@ public class TileEntityObeliskRenderer extends TileEntitySpecialRenderer<Nostrum
 	private static IBakedModel model = null;
 	private static boolean attemptedLoading = false;
 	
-	private IBlockState blockState;
 	
 	public TileEntityObeliskRenderer() {
-		blockState = NostrumObelisk.instance().getTileState();
+		
 	}
 	
 	@Override
@@ -63,8 +56,8 @@ public class TileEntityObeliskRenderer extends TileEntitySpecialRenderer<Nostrum
 			return;
 		
 		long time = Minecraft.getSystemTime();
-		float rotY = 5.0f * (time / 50 + partialTicks);
-		float rotX = 3.0f * (time / 40 + partialTicks);
+		float rotY = 5.0f * ((time + (20f * partialTicks)) / 50f);
+		float rotX = 3.0f * ((time + (20f * partialTicks)) / 100f);
 		
 		//GlStateManager.pushAttrib();
 		GlStateManager.pushMatrix();
@@ -72,39 +65,19 @@ public class TileEntityObeliskRenderer extends TileEntitySpecialRenderer<Nostrum
 		GlStateManager.rotate(rotY, 0, 1f, 0);
 		GlStateManager.rotate(rotX, 1f, 0, 0);
 		
-		//GlStateManager.disableLighting();
-		//GlStateManager.enableAlpha();
-		//GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 		RenderHelper.disableStandardItemLighting();
 		
 		this.bindTexture(TEXT_LOC);
 		
-		Tessellator tessellator = Tessellator.getInstance();
 		World world = te.getWorld();
-        // Translate back to local view coordinates so that we can do the acual rendering here
-        GlStateManager.translate(-te.getPos().getX(), -te.getPos().getY(), -te.getPos().getZ());
 
         int li = 0xF0;
-        int i1 = li % 65536;
-        int j1 = li / 65536;
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) i1, (float) j1);
         
-        tessellator.getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-        Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer().renderModel(
-                world,
-                model,
-                blockState,
-                te.getPos(),
-                Tessellator.getInstance().getBuffer(),
-                false);
-        tessellator.draw();
-        
-//        Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer().renderModelBrightness(
-//        		model, world.getBlockState(te.getPos()), li, true);
+        Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer().renderModelBrightness(
+        		model, world.getBlockState(te.getPos()), li, true);
 
         RenderHelper.enableStandardItemLighting();
         GlStateManager.popMatrix();
-		//GlStateManager.popAttrib();
 		
 	}
 	

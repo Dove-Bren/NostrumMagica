@@ -25,13 +25,16 @@ import com.smanzana.nostrummagica.client.render.TileEntityCandleRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityObeliskRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntitySymbolRenderer;
 import com.smanzana.nostrummagica.entity.EntityGolem;
+import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.renderer.ModelGolem;
 import com.smanzana.nostrummagica.entity.renderer.RenderGolem;
+import com.smanzana.nostrummagica.entity.renderer.RenderKoid;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
+import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
@@ -67,6 +70,7 @@ import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.resources.I18n;
@@ -82,6 +86,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.client.event.MouseEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -113,6 +118,12 @@ public class ClientProxy extends CommonProxy {
 			@Override
 			public Render<? super EntityGolem> createRenderFor(RenderManager manager) {
 				return new RenderGolem(manager, new ModelGolem(), .8f);
+			}
+		});
+		RenderingRegistry.registerEntityRenderingHandler(EntityKoid.class, new IRenderFactory<EntityKoid>() {
+			@Override
+			public Render<? super EntityKoid> createRenderFor(RenderManager manager) {
+				return new RenderKoid(manager);
 			}
 		});
 		
@@ -168,6 +179,8 @@ public class ClientProxy extends CommonProxy {
     	TileEntityObeliskRenderer.init();
     	
     	OBJLoader.INSTANCE.addDomain(NostrumMagica.MODID);
+    	
+    	MinecraftForge.EVENT_BUS.register(this);
 	}
 	
 	@Override
@@ -283,6 +296,25 @@ public class ClientProxy extends CommonProxy {
 		registerModel(SpellTomePage.instance(),
 				0,
 				SpellTomePage.id);
+		
+		for (EMagicElement element : EMagicElement.values()) {
+			registerModel(EssenceItem.instance(),
+					element.ordinal(),
+					EssenceItem.ID);
+		}
+		IItemColor tinter = new IItemColor() {
+
+			@Override
+			public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+				EMagicElement element = EssenceItem.findType(stack);
+				return element.getColor();
+			}
+			
+		};
+		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(tinter,
+				EssenceItem.instance()
+				);
+		
 	}
 	
 	@Override
@@ -476,5 +508,13 @@ public class ClientProxy extends CommonProxy {
 		NetworkHandler.getSyncChannel().sendToServer(
 				new ObeliskTeleportationRequestMessage(origin, target)
 				);
+	}
+	
+	@SubscribeEvent
+	public void stitchEventPre(TextureStitchEvent.Pre event) {
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "entity/koid"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "entity/golem_ender"));
 	}
 }
