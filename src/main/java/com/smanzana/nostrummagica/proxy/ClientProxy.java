@@ -59,6 +59,7 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
 import com.smanzana.nostrummagica.network.messages.ObeliskTeleportationRequestMessage;
 import com.smanzana.nostrummagica.network.messages.SpellTomeIncrementMessage;
+import com.smanzana.nostrummagica.network.messages.StatRequestMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -75,6 +76,7 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
@@ -450,8 +452,9 @@ public class ClientProxy extends CommonProxy {
 	public void receiveStatOverrides(INostrumMagic override) {
 		// If we can look up stats, apply them.
 		// Otherwise, stash them for loading when we apply attributes
-		INostrumMagic existing = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer);
-		if (existing != null) {
+		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		INostrumMagic existing = NostrumMagica.getMagicWrapper(player);
+		if (existing != null && !player.isDead) {
 			// apply them
 			existing.copy(override);
 			
@@ -510,6 +513,13 @@ public class ClientProxy extends CommonProxy {
 		// Send a request to the server
 		NetworkHandler.getSyncChannel().sendToServer(
 				new ObeliskTeleportationRequestMessage(origin, target)
+				);
+	}
+	
+	@Override
+	public void requestStats(EntityLivingBase entity) {
+		NetworkHandler.getSyncChannel().sendToServer(
+				new StatRequestMessage()
 				);
 	}
 	

@@ -215,7 +215,7 @@ public class NostrumMagic implements INostrumMagic {
 
 	@Override
 	public int getMaxMana() {
-		return (int) (baseMaxMana * (1f + this.getManaModifier()));
+		return Math.round(baseMaxMana * (1f + this.getManaModifier()));
 	}
 
 	@Override

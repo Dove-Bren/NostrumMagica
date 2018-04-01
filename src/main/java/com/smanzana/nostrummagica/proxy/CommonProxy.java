@@ -91,6 +91,7 @@ import com.smanzana.nostrummagica.world.NostrumFlowerGenerator;
 import com.smanzana.nostrummagica.world.NostrumOreGenerator;
 import com.smanzana.nostrummagica.world.NostrumShrineGenerator;
 
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -439,5 +440,9 @@ public class CommonProxy {
 	
 	public void requestObeliskTransportation(BlockPos origin, BlockPos target) {
 		; // server does nothing
+	}
+	
+	public void requestStats(EntityLivingBase entity) {
+		;
 	}
 }

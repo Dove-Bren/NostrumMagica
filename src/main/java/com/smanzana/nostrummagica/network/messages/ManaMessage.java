@@ -56,7 +56,8 @@ public class ManaMessage implements IMessage {
 			INostrumMagic att = NostrumMagica.getMagicWrapper(player);
 			// Regardless of success, server has synced mana with us.
 			
-			att.setMana(mana);
+			if (att != null)
+				att.setMana(mana);
 			
 			// Success or nah?
 			

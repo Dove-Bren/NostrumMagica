@@ -4,7 +4,6 @@ import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -28,6 +27,10 @@ public class CapabilityHandler {
 			//attach that shizz
 			System.out.println("Attaching magic to player");
 			event.addCapability(CAPABILITY_LOC, new AttributeProvider(event.getObject()));
+			
+			if (event.getObject().worldObj != null && event.getObject().worldObj.isRemote) {
+				NostrumMagica.proxy.requestStats((EntityPlayer) event.getObject());
+			}
 		}
 	}
 	
@@ -37,9 +40,8 @@ public class CapabilityHandler {
 			INostrumMagic cap = NostrumMagica.getMagicWrapper(event.getOriginal());
 			event.getEntityPlayer().getCapability(AttributeProvider.CAPABILITY, null)
 				.copy(cap);
-			
-			if (!event.getEntityPlayer().worldObj.isRemote)
-				NostrumMagica.proxy.syncPlayer((EntityPlayerMP) event.getEntityPlayer());
 		//}
+		//if (!event.getEntityPlayer().worldObj.isRemote)
+		//	NostrumMagica.proxy.syncPlayer((EntityPlayerMP) event.getEntityPlayer());
 	}
 }

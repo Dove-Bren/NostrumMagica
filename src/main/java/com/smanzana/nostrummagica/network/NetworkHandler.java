@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.network.messages.SpellDebugMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
 import com.smanzana.nostrummagica.network.messages.SpellTomeIncrementMessage;
+import com.smanzana.nostrummagica.network.messages.StatRequestMessage;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
 
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -58,6 +59,7 @@ public class NetworkHandler {
 		syncChannel.registerMessage(ObeliskTeleportationRequestMessage.Handler.class, ObeliskTeleportationRequestMessage.class, discriminator++, Side.SERVER);
 		syncChannel.registerMessage(ClientSkillUpMessage.Handler.class, ClientSkillUpMessage.class, discriminator++, Side.SERVER);
 		syncChannel.registerMessage(ClientUpdateQuestMessage.Handler.class, ClientUpdateQuestMessage.class, discriminator++, Side.SERVER);
+		syncChannel.registerMessage(StatRequestMessage.Handler.class, StatRequestMessage.class, discriminator++, Side.SERVER);
 	}
 	
 }

@@ -1037,7 +1037,7 @@ public class SpellAction {
 		public void apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
 			if (entity instanceof EntityAnimal) {
 				EntityAnimal animal = (EntityAnimal) entity;
-				animal.addGrowth((int) (count * 5 * efficiency));
+				animal.addGrowth((int) (count * 500 * efficiency));
 				NostrumMagicaSounds.STATUS_BUFF2.play(entity);
 			}
 		}
