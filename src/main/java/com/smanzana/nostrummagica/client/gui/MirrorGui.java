@@ -15,6 +15,9 @@ import com.smanzana.nostrummagica.network.messages.ClientSkillUpMessage;
 import com.smanzana.nostrummagica.network.messages.ClientSkillUpMessage.Type;
 import com.smanzana.nostrummagica.network.messages.ClientUpdateQuestMessage;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
+import com.smanzana.nostrummagica.quests.rewards.AlterationReward;
+import com.smanzana.nostrummagica.quests.rewards.AttributeReward;
+import com.smanzana.nostrummagica.quests.rewards.AttributeReward.AwardType;
 import com.smanzana.nostrummagica.quests.rewards.IReward;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
@@ -47,6 +50,8 @@ public class MirrorGui extends GuiScreen {
 	private static final int TEXT_BUTTON_LENGTH = 16;
 	private static final int TEXT_QUEST_VOFFSET = 258;
 	private static final int TEXT_QUEST_LENGTH = 18;
+	private static final int TEXT_REWARD_OFFSET = 48;
+	private static final int TEXT_REWARD_WIDTH = 32;
 	
 	private static final ResourceLocation RES_BACK_CLOUD = new ResourceLocation(
 			NostrumMagica.MODID, "textures/gui/container/mirror_back_clouds.png");
@@ -482,6 +487,8 @@ public class MirrorGui extends GuiScreen {
     	private boolean mouseOver;
     	private final float fontScale = 0.75f;
     	private boolean canTurnin;
+    	private SpellIcon icon; // Icon to use as this ocon
+    	private int iconOffset; // If icon is null, offset for our icon on the main texture
 		
 		public QuestButton(int parButtonId, int parPosX, int parPosY,
 				NostrumQuest quest, QuestState state) {
@@ -496,6 +503,7 @@ public class MirrorGui extends GuiScreen {
 				if (quest.getObjective().isComplete(NostrumMagica.getMagicWrapper(player)))
 					canTurnin = true;
 			}
+			getIcon();
 		}
 		
 		public void drawTreeLines(Minecraft mc) {
@@ -580,6 +588,15 @@ public class MirrorGui extends GuiScreen {
                 mc.getTextureManager().bindTexture(RES_FORE);
                 Gui.drawScaledCustomSizeModalRect(xPosition, yPosition, textureX, textureY,
                 		TEXT_QUEST_LENGTH, TEXT_QUEST_LENGTH, this.width, this.height, TEXT_WIDTH, TEXT_HEIGHT);
+                
+                if (icon != null) {
+                	icon.draw(this, fontRendererObj, xPosition + 2, yPosition + 3, 12, 12);
+                } else {
+                	GlStateManager.enableBlend();
+                	GlStateManager.color(1f, 1f, 1f, .8f);
+                	Gui.drawScaledCustomSizeModalRect(xPosition + 4, yPosition + 5, iconOffset, TEXT_BUTTON_VOFFSET,
+                		TEXT_REWARD_WIDTH, TEXT_REWARD_WIDTH, 8, 8, TEXT_WIDTH, TEXT_HEIGHT);
+                }
             }
         }
 		
@@ -590,6 +607,21 @@ public class MirrorGui extends GuiScreen {
 				GlStateManager.translate((int) (parX / fontScale) - parX, (int) (parY / fontScale) - parY, 0);
 				drawHoveringText(tooltip, parX, parY);
 				GlStateManager.popMatrix();
+			}
+		}
+		
+		private void getIcon() {
+			icon = null;
+			iconOffset = -1;
+			IReward reward = quest.getRewards()[0];
+			if (reward == null)
+				return;
+			
+			if (reward instanceof AlterationReward) {
+				this.icon = SpellIcon.get(((AlterationReward) reward).getAlteration());
+			} else if (reward instanceof AttributeReward) {
+				AwardType type = ((AttributeReward) reward).getType();
+				iconOffset = TEXT_REWARD_OFFSET + (type.ordinal() * TEXT_REWARD_WIDTH);
 			}
 		}
 		

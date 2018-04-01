@@ -27,4 +27,8 @@ public class AlterationReward implements IReward {
 		return I18n.format("reward.alteration." + alteration.name().toLowerCase(), new Object[0]);
 	}
 	
+	public EAlteration getAlteration() {
+		return this.alteration;
+	}
+	
 }

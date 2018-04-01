@@ -23,7 +23,8 @@ import net.minecraft.world.World;
 public class NostrumMirrorBlock extends BlockHorizontal {
 	
 	public static final String ID = "mirror_block";
-	protected static final AxisAlignedBB MIRROR_AABB = new AxisAlignedBB(0.4D, 0.0D, 0.1D, 0.6D, 1.05D, 0.9D);
+	protected static final AxisAlignedBB MIRROR_AABB_EW = new AxisAlignedBB(0.4D, 0.0D, 0.1D, 0.6D, 1.05D, 0.9D);
+	protected static final AxisAlignedBB MIRROR_AABB_NS = new AxisAlignedBB(0.1D, 0.0D, 0.4D, 0.9D, 1.05D, 0.6D);
 	
 	private static NostrumMirrorBlock instance = null;
 	public static NostrumMirrorBlock instance() {
@@ -97,6 +98,8 @@ public class NostrumMirrorBlock extends BlockHorizontal {
 	
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-		return MIRROR_AABB;
+		if (state.getValue(FACING).getHorizontalIndex() % 2 != 0)
+			return MIRROR_AABB_EW;
+		return MIRROR_AABB_NS;
 	}
 }

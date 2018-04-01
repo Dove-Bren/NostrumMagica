@@ -45,4 +45,8 @@ public class AttributeReward implements IReward {
 	public String getDescription() {
 		return I18n.format("reward.attrib." + type.name().toLowerCase(), new Object[]{modifier * 100f});
 	}
+	
+	public AwardType getType() {
+		return this.type;
+	}
 }
