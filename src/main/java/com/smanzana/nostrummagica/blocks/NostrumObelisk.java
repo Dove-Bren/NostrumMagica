@@ -23,8 +23,8 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -581,27 +581,6 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 		return true;
 	}
 	
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void randomDisplayTick(IBlockState state, World worldIn, BlockPos pos, Random rand) {
-		super.randomDisplayTick(state, worldIn, pos, rand);
-		if (Minecraft.getSystemTime() % 500 != 0)
-			return;
-		System.out.println("tick");
-		if (state.getValue(TILE)) {
-			
-			
-			if (state.getValue(MASTER)) {
-				
-			} else {
-//				((WorldServer) worldIn).spawnParticle(EnumParticleTypes.DRAGON_BREATH,
-//						pos.getX() + 2, pos.getY() + .5, pos.getZ() + .5, 1,
-//						.1, .1, .1, .1, new int[0]);
-				
-			}
-		} 
-	}
-	
 	public static boolean spawnObelisk(World world, BlockPos center) {
 		IBlockState state = world.getBlockState(center);
 		if (state == null || state.getBlockHardness(world, center) > 2.0f)
@@ -617,6 +596,17 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 		
 		for (int i = 0; i < xs.length; i++) {
 			spawnPillar(world, center.add(xs[i], 1, zs[i]), corners[i]);
+		}
+		for (int i = -TILE_OFFSETH; i <= TILE_OFFSETH; i++)
+			for (int j = -TILE_OFFSETH; j <= TILE_OFFSETH; j++) {
+				world.setBlockState(center.add(i, 0, j), Blocks.OBSIDIAN.getDefaultState());
+			}
+		for (int i = -1; i <= 1; i++) {
+			int offset = (TILE_OFFSETH + 1);
+			world.setBlockState(center.add(i, 0, offset), Blocks.OBSIDIAN.getDefaultState());
+			world.setBlockState(center.add(i, 0, -offset), Blocks.OBSIDIAN.getDefaultState());
+			world.setBlockState(center.add(offset, 0, i), Blocks.OBSIDIAN.getDefaultState());
+			world.setBlockState(center.add(-offset, 0, i), Blocks.OBSIDIAN.getDefaultState());
 		}
 		world.setBlockState(center, instance().getMasterState());
 		world.setTileEntity(center, new NostrumObeliskEntity(true));

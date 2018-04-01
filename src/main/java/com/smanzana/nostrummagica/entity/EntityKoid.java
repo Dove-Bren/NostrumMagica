@@ -239,7 +239,7 @@ public class EntityKoid extends EntityMob implements ILoreTagged {
 	@SideOnly(Side.CLIENT)
     public int getBrightnessForRender(float partialTicks)
     {
-        return 15728885;
+        return 15728880;
     }
 
     /**

@@ -35,7 +35,7 @@ item.nostrum_gem.ice.name=Ice Gem
 item.nostrum_gem.wind.name=Wind Gem
 item.nostrum_gem.ender.name=Ender Gem
 
-item.nostrum_essence.basic.name=Physical Essence
+item.nostrum_essence.physical.name=Physical Essence
 item.nostrum_essence.lightning.name=Lightning Essence
 item.nostrum_essence.fire.name=Fire Essence
 item.nostrum_essence.earth.name=Earth Essence
@@ -176,6 +176,7 @@ entity.nostrummagica.ice_golem.name=Ice Golem
 entity.nostrummagica.wind_golem.name=Wind Golem
 entity.nostrummagica.ender_golem.name=End Golem
 entity.nostrummagica.spell_projectile.name=Spell Projectile
+entity.nostrummagica.entity_koid.name=Koid
 
 itemGroup.nostrummagica=Nostrum Magica
 itemGroup.nostrummagica_enhancements=Nostrum Enhancements
@@ -231,6 +232,14 @@ ritual.create_obelisk.name=Construct Obelisk
 ritual.create_obelisk.desc=Creates an Obelisk at|the center of the ritual
 ritual.geotoken.name=Construct Geotoken
 ritual.geotoken.desc=Solidifes a Geogem into a Geotoken
+
+ritual.rune.physical.name=Physical Rune
+ritual.rune.fire.name=Fire Rune
+ritual.rune.ice.name=Ice Rune
+ritual.rune.earth.name=Earth Rune
+ritual.rune.wind.name=Wind Rune
+ritual.rune.lightning.name=Lightning Rune
+ritual.rune.ender.name=Ender Rune
 
 enhancement.lower_reagent_cost.name=Lower Reagent Cost
 enhancement.lower_reagent_cost.desc=Reduces the amount of reagents used up when casting a spell

@@ -21,6 +21,7 @@ import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.EntityGolemWind;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
+import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
@@ -1263,7 +1264,8 @@ public class SpellAction {
 				return;
 			
 			Item item = inhand.getItem();
-			if (item instanceof InfusedGemItem && inhand.getMetadata() == 0) {
+			if ((item instanceof InfusedGemItem && inhand.getMetadata() == 0)
+					|| (item instanceof EssenceItem && EssenceItem.findType(inhand) == element)) {
 				
 				int count = (int) Math.pow(2, level - 1);
 				ItemStack stack = InfusedGemItem.instance().getGem(element, count);

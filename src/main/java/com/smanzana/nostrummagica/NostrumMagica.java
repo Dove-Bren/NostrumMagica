@@ -19,6 +19,7 @@ import com.smanzana.nostrummagica.command.CommandTestConfig;
 import com.smanzana.nostrummagica.command.CommandUnlock;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.items.BlankScroll;
+import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
@@ -27,6 +28,7 @@ import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SeekerIdol;
+import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
@@ -454,6 +456,15 @@ public class NostrumMagica
     
     private void registerDefaultRituals() {
 		RitualRecipe recipe;
+		
+		for (EMagicElement element : EMagicElement.values()) {
+			recipe = RitualRecipe.createTier2("rune." + element.name().toLowerCase(),
+					element,
+					new ReagentType[] {ReagentType.CRYSTABLOOM, ReagentType.MANDRAKE_ROOT, ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST},
+					EssenceItem.instance().getEssence(element, 1),
+					new OutcomeSpawnItem(SpellRune.getRune(element, 1)));
+			RitualRegistry.instance().addRitual(recipe);
+		}
 		
 		recipe = RitualRecipe.createTier1("buff.luck", null,
 				ReagentType.GRAVE_DUST,
