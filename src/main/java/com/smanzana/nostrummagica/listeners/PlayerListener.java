@@ -704,6 +704,9 @@ public class PlayerListener {
 				bonus += level * .1f;
 		}
 		
+		// Pull in character regen bonus
+		bonus += (stats.getManaRegenModifier());
+		
 		int mana = 1 + (int) (bonus);
 		bonus = bonus - (int) bonus;
 		if (bonus > 0f && NostrumMagica.rand.nextFloat() < bonus)

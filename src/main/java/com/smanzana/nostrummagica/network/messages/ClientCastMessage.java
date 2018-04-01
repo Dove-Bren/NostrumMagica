@@ -64,6 +64,9 @@ public class ClientCastMessage implements IMessage {
 			int cost = spell.getManaCost();
 			SpellCastSummary summary = new SpellCastSummary(cost, xp);
 			
+			// Add the player's personal bonuses
+			summary.addCostRate(att.getManaCostModifier());
+			
 			if (!isScroll) {
 				// Find the tome this was cast from, if any
 				ItemStack tome = sp.getHeldItemMainhand();

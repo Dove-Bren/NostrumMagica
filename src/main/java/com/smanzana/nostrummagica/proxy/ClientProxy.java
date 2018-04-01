@@ -373,6 +373,9 @@ public class ClientProxy extends CommonProxy {
 		int cost = spell.getManaCost();
 		SpellCastSummary summary = new SpellCastSummary(cost, 0);
 		
+		// Add the player's personal bonuses
+		summary.addCostRate(-att.getManaCostModifier());
+		
 		// Find the tome this was cast from, if any
 		ItemStack tome = player.getHeldItemMainhand();
 		if (tome == null || !(tome.getItem() instanceof SpellTome))

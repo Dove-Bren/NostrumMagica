@@ -61,6 +61,8 @@ public class NostrumMagic implements INostrumMagic {
 	private float modManaCost;
 	private float modManaRegen;
 	
+	private int baseMaxMana; // Max mana without mana bonuses
+	
 	//private List<IFamiliar> familiars;
 	private boolean binding; // TODO binding interface
 	
@@ -107,7 +109,8 @@ public class NostrumMagic implements INostrumMagic {
 			unlocked = true;
 			level = 1;
 			xp = 0;
-			mana = maxMana = LevelCurves.maxMana(1);
+			baseMaxMana = LevelCurves.maxMana(1);
+			mana = maxMana = getMaxMana();
 			maxxp = LevelCurves.maxXP(1);
 			skillPoints = control = tech = finesse = 0;
 			binding = false;
@@ -130,7 +133,8 @@ public class NostrumMagic implements INostrumMagic {
 	@Override
 	public void setLevel(int level) {
 		this.level = level;
-		mana = maxMana = LevelCurves.maxMana(level);
+		baseMaxMana = LevelCurves.maxMana(level);
+		mana = maxMana = getMaxMana(); 
 		maxxp = LevelCurves.maxXP(level);
 	}
 
@@ -211,24 +215,24 @@ public class NostrumMagic implements INostrumMagic {
 
 	@Override
 	public int getMaxMana() {
-		return maxMana;
+		return (int) (baseMaxMana * (1f + this.getManaModifier()));
 	}
 
 	@Override
 	public void setMana(int mana) {
-		this.mana = Math.min(mana, this.maxMana);
+		this.mana = Math.min(mana, this.getMaxMana());
 	}
 
 	@Override
 	public void addMana(int mana) {
-		this.mana = Math.min(this.mana + mana, this.maxMana);
+		this.mana = Math.min(this.mana + mana, this.getMaxMana());
 	}
 
 	@Override
 	public void setMaxMana(int max) {
-		this.maxMana = max;
-		if (this.mana > maxMana)
-			this.mana = maxMana;
+		this.baseMaxMana = max;
+		if (this.mana > getMaxMana())
+			this.mana = getMaxMana();
 	}
 
 //	@Override
@@ -424,7 +428,8 @@ public class NostrumMagic implements INostrumMagic {
 		this.tech = tech;
 		this.finesse = finesse;
 		this.mana = mana;
-		this.maxMana = LevelCurves.maxMana(this.level);
+		this.baseMaxMana = LevelCurves.maxMana(this.level);
+		this.maxMana = getMaxMana();
 		this.modMana = modMana;
 		this.modManaCost = modManaCost;
 		this.modManaRegen = modManaRegen;
