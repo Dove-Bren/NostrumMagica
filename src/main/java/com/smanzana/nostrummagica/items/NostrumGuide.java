@@ -121,6 +121,7 @@ public class NostrumGuide extends Item implements GuiBook {
 		
 		pages.add(new PlainTextPage(""));
 		
+		pages.add(new TitlePage("Ritual Index", true));
 		for (RitualRecipe ritual : RitualRegistry.instance().getRegisteredRituals()) {
 			pages.add(new RitualRecipePage(ritual));
 		}

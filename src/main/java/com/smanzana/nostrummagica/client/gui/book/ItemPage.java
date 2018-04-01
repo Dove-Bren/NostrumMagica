@@ -1,20 +1,40 @@
 package com.smanzana.nostrummagica.client.gui.book;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.OreDictionary;
 
 public class ItemPage implements IBookPage {
-	
-	private ItemStack item;
 	
 	private int widthCache;
 	
 	private int heightCache;
 	
+	private ItemStack[] itemImages;
+	
 	public ItemPage(ItemStack item) {
-		this.item = item;
+		if (item.getMetadata() == OreDictionary.WILDCARD_VALUE) {
+			List<ItemStack> items = new LinkedList<>();
+			int i;
+			ItemStack image;
+			for (i = 0; i < 16; i++) {
+				image = new ItemStack(item.getItem(), 1, i);
+				IBakedModel model = Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getItemModel(image);
+				if (model == null || model == Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getModelManager().getMissingModel())
+					break;
+				items.add(image);
+			}
+			itemImages = items.toArray(new ItemStack[items.size()]);
+		} else {
+			itemImages = new ItemStack[]{item};
+		}
 	}
 	
 	@Override
@@ -26,6 +46,10 @@ public class ItemPage implements IBookPage {
 		int centery = yoffset + (height / 2);
 		centerx -= 8; //offset for 16x16 item icon
 		centery -= 8;
+
+		int displayIndex = (int) (Minecraft.getSystemTime() / 1500);
+		displayIndex %= itemImages.length;
+		ItemStack item = itemImages[displayIndex];
 		
 		GlStateManager.pushMatrix();
 		
@@ -43,6 +67,9 @@ public class ItemPage implements IBookPage {
 
 	@Override
 	public void overlay(BookScreen parent, FontRenderer fonter, int mouseX, int mouseY, int trueX, int trueY) {
+		int displayIndex = (int) (Minecraft.getSystemTime() / 1500);
+		displayIndex %= itemImages.length;
+		ItemStack item = itemImages[displayIndex];
 		if (item != null) {
 			int centerx = widthCache / 2;
 			int centery = heightCache / 2;

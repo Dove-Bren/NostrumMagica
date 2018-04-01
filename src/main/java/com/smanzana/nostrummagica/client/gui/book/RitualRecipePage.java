@@ -20,9 +20,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.oredict.OreDictionary;
 
 public class RitualRecipePage implements IBookPage {
 	
@@ -47,10 +49,58 @@ public class RitualRecipePage implements IBookPage {
 	private int effWidth;
 	private int effHeight;
 	
+	private ItemStack[] itemImages;
+	private ItemStack[][] extraItemImages;
+	
 	public RitualRecipePage(RitualRecipe recipe) {
 		this.recipe = recipe;
-		tooltip = makeTooltip(recipe);
 		description = makeDescription(recipe);
+		
+		// For each item in recipe, get all images of it
+		if (recipe.getTier() >= 1 && recipe.getCenterItem() != null) {
+			if (recipe.getCenterItem().getMetadata() == OreDictionary.WILDCARD_VALUE) {
+				List<ItemStack> items = new LinkedList<>();
+				int i;
+				ItemStack image;
+				for (i = 0; i < 16; i++) {
+					image = new ItemStack(recipe.getCenterItem().getItem(), 1, i);
+					IBakedModel model = Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getItemModel(image);
+					if (model == null || model == Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getModelManager().getMissingModel())
+						break;
+					items.add(image);
+				}
+				itemImages = items.toArray(new ItemStack[items.size()]);
+			} else {
+				itemImages = new ItemStack[]{recipe.getCenterItem()};
+			}
+		}
+		if (recipe.getTier() == 2) {
+			extraItemImages = new ItemStack[4][];
+			int i = 0;
+			for (ItemStack item : recipe.getExtraItems()) {
+				if (item != null) {
+					if (item.getMetadata() != OreDictionary.WILDCARD_VALUE) {
+						extraItemImages[i] = new ItemStack[] {item};
+					} else {
+						List<ItemStack> items = new LinkedList<>();
+						int j;
+						ItemStack image;
+						for (j = 0; j < 16; j++) {
+							image = new ItemStack(item.getItem(), 1, j);
+							IBakedModel model = Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getItemModel(image);
+							if (model == null || model == Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getModelManager().getMissingModel())
+								break;
+							items.add(image);
+						}
+						extraItemImages[i] = items.toArray(new ItemStack[items.size()]);
+					}
+					
+				}
+				i++;
+			}
+		}
+		
+		tooltip = makeTooltip(recipe);
 	}
 	
 	@Override
@@ -117,6 +167,7 @@ public class RitualRecipePage implements IBookPage {
 			// Has center item
 			item = recipe.getCenterItem();
 			if (item != null) {
+				item = getItemToRender(true, 0);
 				mc.getRenderItem().renderItemIntoGUI(item, centerx - 8, centery - 8);
 			}
 			
@@ -129,6 +180,8 @@ public class RitualRecipePage implements IBookPage {
 						item = recipe.getExtraItems()[count++];
 						if (item == null)
 							continue;
+						
+						item = getItemToRender(false, count-1);
 						
 						x = centerx + (i * ALTAR_OFFSET);
 						y = centery + (j * ALTAR_OFFSET);
@@ -211,7 +264,7 @@ public class RitualRecipePage implements IBookPage {
 		return reagentCache.get(type);
 	}
 	
-	private static List<String> makeTooltip(RitualRecipe recipe) {
+	private List<String> makeTooltip(RitualRecipe recipe) {
 		if (recipe == null)
 			return Lists.newArrayList("Invalid Recipe!");
 		
@@ -221,7 +274,7 @@ public class RitualRecipePage implements IBookPage {
 		if (tier == 0) {
 			list.add(recipe.getTypes()[0].prettyName());
 		} else {
-			list.add(recipe.getCenterItem().getDisplayName() + " (center)");
+			list.add(itemImages[0].getDisplayName() + " (center)");
 			for (ReagentType type : recipe.getTypes()) {
 				if (type == null)
 					continue;
@@ -229,11 +282,11 @@ public class RitualRecipePage implements IBookPage {
 			}
 			
 			if (tier == 2)
-			for (ItemStack extra : recipe.getExtraItems()) {
-				if (extra == null)
+			for (ItemStack[] extraRow : extraItemImages) {
+				if (extraRow == null || extraRow[0] == null)
 					continue;
 				
-				list.add(extra.getDisplayName());
+				list.add(extraRow[0].getDisplayName());
 			}
 		}
 		
@@ -253,5 +306,18 @@ public class RitualRecipePage implements IBookPage {
 		}
 		
 		return gems.get(element);
+	}
+	
+	private ItemStack getItemToRender(boolean center, int index) {
+		ItemStack[] row;
+		if (center) {
+			row = itemImages;
+		} else {
+			row = extraItemImages[index];
+		}
+		
+		int displayIndex = (int) (Minecraft.getSystemTime() / 1500);
+		displayIndex %= row.length;
+		return row[displayIndex];
 	}
 }

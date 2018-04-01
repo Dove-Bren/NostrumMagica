@@ -18,6 +18,7 @@ import com.smanzana.nostrummagica.command.CommandSpawnObelisk;
 import com.smanzana.nostrummagica.command.CommandTestConfig;
 import com.smanzana.nostrummagica.command.CommandUnlock;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
@@ -50,6 +51,8 @@ import com.smanzana.nostrummagica.rituals.outcomes.OutcomeEnchantItem;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeMark;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomePotionEffect;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeRecall;
+import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnEntity;
+import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnEntity.IEntityFactory;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeTeleportObelisk;
 import com.smanzana.nostrummagica.spells.EAlteration;
@@ -71,6 +74,8 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -459,7 +464,7 @@ public class NostrumMagica
 		
 		for (EMagicElement element : EMagicElement.values()) {
 			recipe = RitualRecipe.createTier2("rune." + element.name().toLowerCase(),
-					element,
+					null,
 					new ReagentType[] {ReagentType.CRYSTABLOOM, ReagentType.MANDRAKE_ROOT, ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST},
 					EssenceItem.instance().getEssence(element, 1),
 					new OutcomeSpawnItem(SpellRune.getRune(element, 1)));
@@ -576,6 +581,23 @@ public class NostrumMagica
 					new ReagentType[] {ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK},
 					new ItemStack(PositionCrystal.instance()),
 					new OutcomeTeleportObelisk())
+				);
+		
+		// Spawn Koids -- tier 3. Kani center. Magic Token, gold, gold, essence
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("koid", null,
+					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.GRAVE_DUST},
+					NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1),
+					new ItemStack[] {new ItemStack(Items.GOLD_INGOT), NostrumResourceItem.getItem(ResourceType.TOKEN, 1), new ItemStack(EssenceItem.instance(), 1, OreDictionary.WILDCARD_VALUE), new ItemStack(Items.GOLD_INGOT, 1)},
+					new OutcomeSpawnEntity(new IEntityFactory() {
+						@Override
+						public void spawn(World world, Vec3d pos, EntityPlayer invoker) {
+							EntityKoid koid = new EntityKoid(world);
+							koid.setPosition(pos.xCoord, pos.yCoord, pos.zCoord);
+							world.spawnEntityInWorld(koid);
+							koid.setAttackTarget(invoker);
+						}
+					}, 5))
 				);
 		
 //		RitualRegistry.instance().addRitual(
