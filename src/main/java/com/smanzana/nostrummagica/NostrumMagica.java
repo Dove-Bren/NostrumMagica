@@ -18,6 +18,7 @@ import com.smanzana.nostrummagica.command.CommandSpawnObelisk;
 import com.smanzana.nostrummagica.command.CommandTestConfig;
 import com.smanzana.nostrummagica.command.CommandUnlock;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.EssenceItem;
@@ -37,6 +38,7 @@ import com.smanzana.nostrummagica.listeners.PlayerListener;
 import com.smanzana.nostrummagica.proxy.CommonProxy;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.quests.NostrumQuest.QuestType;
+import com.smanzana.nostrummagica.quests.objectives.ObjectiveKill;
 import com.smanzana.nostrummagica.quests.objectives.ObjectiveRitual;
 import com.smanzana.nostrummagica.quests.objectives.ObjectiveSpellCast;
 import com.smanzana.nostrummagica.quests.rewards.AlterationReward;
@@ -59,6 +61,7 @@ import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.SpellRegistry;
+import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 import com.smanzana.nostrummagica.world.NostrumChunkLoader;
 import com.smanzana.nostrummagica.world.dungeon.NostrumLootHandler;
@@ -629,7 +632,7 @@ public class NostrumMagica
     			null, wrapAttribute(AwardType.COST, -0.005f));
     	new NostrumQuest("lvl3", QuestType.REGULAR, 4, 0, 0, 0, new String[]{"lvl2-fin", "lvl2-con"},
     			null, wrapAttribute(AwardType.MANA, 0.005f));
-    	new NostrumQuest("lvl4", QuestType.CHALLEGE, 5, 0, 0, 0, new String[]{"lvl3"},
+    	new NostrumQuest("lvl4", QuestType.CHALLENGE, 5, 0, 0, 0, new String[]{"lvl3"},
     			new ObjectiveRitual("magic_token"),
     			new IReward[]{new AlterationReward(EAlteration.INFLICT)});
     	
@@ -640,7 +643,7 @@ public class NostrumMagica
     			null, wrapAttribute(AwardType.MANA, 0.010f));
     	new NostrumQuest("lvl7-fin7", QuestType.REGULAR, 7, 0, 0, 7, new String[]{"lvl7-fin"},
     			null, wrapAttribute(AwardType.REGEN, 0.010f));
-    	new NostrumQuest("lvl10-fin10", QuestType.CHALLEGE, 10, 0, 0, 10, new String[]{"lvl7-fin7"},
+    	new NostrumQuest("lvl10-fin10", QuestType.CHALLENGE, 10, 0, 0, 10, new String[]{"lvl7-fin7"},
     			new ObjectiveSpellCast().numTriggers(10).requiredElement(EMagicElement.ICE),
     			new IReward[]{new AlterationReward(EAlteration.SUPPORT)});
     	
@@ -651,12 +654,12 @@ public class NostrumMagica
     			null, wrapAttribute(AwardType.COST, -0.005f));
     	new NostrumQuest("lvl7-con7", QuestType.REGULAR, 7, 7, 0, 0, new String[]{"lvl7-con"},
     			null, wrapAttribute(AwardType.COST, -0.010f));
-    	new NostrumQuest("lvl10-con10", QuestType.CHALLEGE, 10, 10, 0, 0, new String[]{"lvl7-con7"},
+    	new NostrumQuest("lvl10-con10", QuestType.CHALLENGE, 10, 10, 0, 0, new String[]{"lvl7-con7"},
     			new ObjectiveSpellCast().numElems(10).requiredElement(EMagicElement.EARTH),
     			new IReward[]{new AlterationReward(EAlteration.RESIST)});
     	
     	// LVL main tree
-    	new NostrumQuest("lvl7", QuestType.CHALLEGE, 7, 0, 0, 0, new String[]{"lvl6-con", "lvl6-fin"},
+    	new NostrumQuest("lvl7", QuestType.CHALLENGE, 7, 0, 0, 0, new String[]{"lvl6-con", "lvl6-fin"},
     			new ObjectiveRitual("vani"),
     			wrapAttribute(AwardType.MANA, 0.020f));
     	new NostrumQuest("lvl8-fin3", QuestType.REGULAR, 8, 0, 0, 3, new String[]{"lvl7"},
@@ -678,7 +681,7 @@ public class NostrumMagica
     			1, // Control
     			0, // Technique
     			0, // Finesse
-    			new String[]{"lvl1"},
+    			new String[]{"start"},
     			null,
     			wrapAttribute(AwardType.COST, -0.002f));
     	new NostrumQuest("con2", QuestType.REGULAR, 0,
@@ -688,104 +691,192 @@ public class NostrumMagica
     			new String[]{"con1"},
     			null,
     			wrapAttribute(AwardType.MANA, 0.010f));
-    	new NostrumQuest("con7", QuestType.CHALLEGE, 0,
+    	new NostrumQuest("con7", QuestType.CHALLENGE, 0,
     			7, // Control
     			0, // Technique
     			0, // Finesse
     			new String[]{"con2"},
+    			new ObjectiveRitual("koid"),
+    			wrapAttribute(AwardType.COST, -0.050f));
+    	new NostrumQuest("con7-tec1", QuestType.CHALLENGE, 0,
+    			7, // Control
+    			1, // Technique
+    			0, // Finesse
+    			new String[]{"con7", "con6-tec3"},
+    			new ObjectiveSpellCast().numElems(6).requiredElement(EMagicElement.EARTH),
+    			new IReward[] {new AlterationReward(EAlteration.ENCHANT)});
+    	new NostrumQuest("con3-tec2", QuestType.REGULAR, 0,
+    			3, // Control
+    			2, // Technique
+    			0, // Finesse
+    			new String[]{"con2"},
+    			null,
+    			wrapAttribute(AwardType.REGEN, 0.005f));
+    	new NostrumQuest("con5-tec2", QuestType.REGULAR, 0,
+    			5, // Control
+    			2, // Technique
+    			0, // Finesse
+    			new String[]{"con3-tec2"},
+    			null,
+    			wrapAttribute(AwardType.COST, -0.010f));
+    	new NostrumQuest("con5-tec3", QuestType.REGULAR, 0,
+    			5, // Control
+    			3, // Technique
+    			0, // Finesse
+    			new String[]{"con5-tec2", "con1-tec3"},
+    			null,
+    			wrapAttribute(AwardType.COST, -0.015f));
+    	new NostrumQuest("con5-tec4", QuestType.REGULAR, 0,
+    			5, // Control
+    			4, // Technique
+    			0, // Finesse
+    			new String[]{"con5-tec3"},
+    			null,
+    			wrapAttribute(AwardType.COST, -0.015f));
+    	new NostrumQuest("con6-tec3", QuestType.REGULAR, 0,
+    			6, // Control
+    			3, // Technique
+    			0, // Finesse
+    			new String[]{"con5-tec3"},
+    			null,
+    			wrapAttribute(AwardType.REGEN, 0.005f));
+    	new NostrumQuest("con6-tec4", QuestType.CHALLENGE, 0,
+    			6, // Control
+    			4, // Technique
+    			0, // Finesse
+    			new String[]{"con6-tec3", "con5-tec4"},
+    			new ObjectiveKill(EntityGolem.class, "Golem", 30),
+    			new IReward[]{new AlterationReward(EAlteration.SUMMON)});
+    	new NostrumQuest("con1-tec2", QuestType.REGULAR, 0,
+    			1, // Control
+    			2, // Technique
+    			0, // Finesse
+    			new String[]{"con1"},
+    			null,
+    			wrapAttribute(AwardType.COST, -0.008f));
+    	new NostrumQuest("con1-tec3", QuestType.CHALLENGE, 0,
+    			1, // Control
+    			3, // Technique
+    			0, // Finesse
+    			new String[]{"con1-tec2"},
+    			new ObjectiveSpellCast().numElems(3).requiredElement(EMagicElement.LIGHTNING),
+    			wrapAttribute(AwardType.MANA, 0.030f));
+    	new NostrumQuest("con1-tec5", QuestType.REGULAR, 0,
+    			1, // Control
+    			5, // Technique
+    			0, // Finesse
+    			new String[]{"con1-tec3", "fin1-tec2"},
     			null,
     			wrapAttribute(AwardType.COST, -0.005f));
-    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    	
+    	new NostrumQuest("tec1", QuestType.REGULAR, 0,
+    			0, // Control
+    			1, // Technique
+    			0, // Finesse
+    			new String[]{"start"},
+    			null,
+    			wrapAttribute(AwardType.MANA, 0.01f));
+    	new NostrumQuest("tec7", QuestType.CHALLENGE, 0,
+    			0, // Control
+    			7, // Technique
+    			0, // Finesse
+    			new String[]{"con1-tec5", "fin1-tec5"},
+    			new ObjectiveRitual("vani"),
+    			new IReward[] {new AlterationReward(EAlteration.ALTER)});
+
+    	new NostrumQuest("fin1", QuestType.REGULAR, 0,
     			0, // Control
     			0, // Technique
-    			0, // Finesse
-    			new String[]{"lvl1"},
+    			1, // Finesse
+    			new String[]{"start"},
     			null,
-    			wrapAttribute(AwardType.COST, -0.005f));
-    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			wrapAttribute(AwardType.REGEN, 0.002f));
+    	new NostrumQuest("fin3", QuestType.CHALLENGE, 0,
     			0, // Control
     			0, // Technique
-    			0, // Finesse
-    			new String[]{"lvl1"},
-    			null,
-    			wrapAttribute(AwardType.COST, -0.005f));
-    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			3, // Finesse
+    			new String[]{"fin1"},
+    			new ObjectiveSpellCast().numTriggers(3).requiredAlteration(EAlteration.INFLICT),
+    			wrapAttribute(AwardType.REGEN, 0.008f));
+    	new NostrumQuest("fin5", QuestType.REGULAR, 0,
     			0, // Control
     			0, // Technique
-    			0, // Finesse
-    			new String[]{"lvl1"},
+    			5, // Finesse
+    			new String[]{"fin3"},
     			null,
-    			wrapAttribute(AwardType.COST, -0.005f));
-    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			wrapAttribute(AwardType.MANA, 0.020f));
+    	new NostrumQuest("fin7", QuestType.REGULAR, 0,
     			0, // Control
     			0, // Technique
-    			0, // Finesse
-    			new String[]{"lvl1"},
+    			7, // Finesse
+    			new String[]{"fin5"},
     			null,
-    			wrapAttribute(AwardType.COST, -0.005f));
-    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			wrapAttribute(AwardType.REGEN, 0.075f));
+    	new NostrumQuest("fin5-tec2", QuestType.CHALLENGE, 0,
     			0, // Control
-    			0, // Technique
-    			0, // Finesse
-    			new String[]{"lvl1"},
-    			null,
-    			wrapAttribute(AwardType.COST, -0.005f));
-    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			2, // Technique
+    			5, // Finesse
+    			new String[]{"fin5", "fin2-tec3"},
+    			new ObjectiveSpellCast().requiredShape(AoEShape.instance()),
+    			new IReward[] {new AlterationReward(EAlteration.GROWTH)});
+    	new NostrumQuest("fin1-tec2", QuestType.REGULAR, 0,
     			0, // Control
-    			0, // Technique
-    			0, // Finesse
-    			new String[]{"lvl1"},
+    			2, // Technique
+    			1, // Finesse
+    			new String[]{"fin1"},
     			null,
-    			wrapAttribute(AwardType.COST, -0.005f));
-    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			wrapAttribute(AwardType.REGEN, 0.010f));
+    	new NostrumQuest("fin1-tec3", QuestType.CHALLENGE, 0,
     			0, // Control
-    			0, // Technique
-    			0, // Finesse
-    			new String[]{"lvl1"},
-    			null,
-    			wrapAttribute(AwardType.COST, -0.005f));
-    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			3, // Technique
+    			1, // Finesse
+    			new String[]{"fin1-tec2"},
+    			new ObjectiveKill(EntityKoid.class, "Koid", 5),
+    			wrapAttribute(AwardType.MANA, 0.025f));
+    	new NostrumQuest("fin1-tec5", QuestType.REGULAR, 0,
     			0, // Control
-    			0, // Technique
-    			0, // Finesse
-    			new String[]{"lvl1"},
+    			5, // Technique
+    			1, // Finesse
+    			new String[]{"fin1-tec3", "con1-tec2"},
     			null,
-    			wrapAttribute(AwardType.COST, -0.005f));
-    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			wrapAttribute(AwardType.REGEN, 0.050f));
+    	new NostrumQuest("fin2-tec3", QuestType.REGULAR, 0,
     			0, // Control
-    			0, // Technique
-    			0, // Finesse
-    			new String[]{"lvl1"},
+    			3, // Technique
+    			2, // Finesse
+    			new String[]{"fin1-tec3", "fin2-tec5"},
     			null,
-    			wrapAttribute(AwardType.COST, -0.005f));
-    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			wrapAttribute(AwardType.COST, -0.010f));
+    	new NostrumQuest("fin3-tec3", QuestType.REGULAR, 0,
     			0, // Control
-    			0, // Technique
-    			0, // Finesse
-    			new String[]{"lvl1"},
+    			3, // Technique
+    			3, // Finesse
+    			new String[]{"fin2-tec3"},
     			null,
-    			wrapAttribute(AwardType.COST, -0.005f));
-    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			wrapAttribute(AwardType.MANA, 0.050f));
+    	new NostrumQuest("fin2-tec5", QuestType.REGULAR, 0,
     			0, // Control
-    			0, // Technique
-    			0, // Finesse
-    			new String[]{"lvl1"},
+    			5, // Technique
+    			2, // Finesse
+    			new String[]{"fin1-tec5"},
     			null,
-    			wrapAttribute(AwardType.COST, -0.005f));
-    	new NostrumQuest("con", QuestType.REGULAR, 0,
+    			wrapAttribute(AwardType.REGEN, 0.020f));
+    	new NostrumQuest("fin3-tec6", QuestType.CHALLENGE, 0,
     			0, // Control
-    			0, // Technique
-    			0, // Finesse
-    			new String[]{"lvl1"},
-    			null,
-    			wrapAttribute(AwardType.COST, -0.005f));
-    	new NostrumQuest("con", QuestType.REGULAR, 0,
-    			0, // Control
-    			0, // Technique
-    			0, // Finesse
-    			new String[]{"lvl1"},
-    			null,
-    			wrapAttribute(AwardType.COST, -0.005f));
+    			6, // Technique
+    			3, // Finesse
+    			new String[]{"fin2-tec5"},
+    			new ObjectiveRitual("balanced_infusion"),
+    			new IReward[] {new AlterationReward(EAlteration.CONJURE)});
+    	
+    	
+//    	new NostrumQuest("con", QuestType.REGULAR, 0,
+//    			0, // Control
+//    			0, // Technique
+//    			0, // Finesse
+//    			new String[]{"lvl1"},
+//    			null,
+//    			wrapAttribute(AwardType.COST, -0.005f));
     	
     }
     

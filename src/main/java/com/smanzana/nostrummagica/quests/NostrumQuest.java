@@ -33,7 +33,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 public class NostrumQuest {
 
 	public static enum QuestType {
-		CHALLEGE,
+		CHALLENGE,
 		REGULAR,
 	}
 	

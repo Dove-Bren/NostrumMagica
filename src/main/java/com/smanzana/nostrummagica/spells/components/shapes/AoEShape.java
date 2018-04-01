@@ -37,7 +37,7 @@ public class AoEShape extends SpellShape {
 	protected List<EntityLivingBase> getTargets(SpellPartParam param, EntityLivingBase target, World world, BlockPos pos) {
 		List<EntityLivingBase> ret = new LinkedList<>();
 		
-		double radius = (double) param.level;
+		double radius = Math.max(3.0, (double) param.level);
 		
 		for (Entity entity : world.getEntitiesWithinAABBExcludingEntity(null, 
 				new AxisAlignedBB(pos.getX() - radius,
