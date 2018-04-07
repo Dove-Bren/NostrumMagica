@@ -81,6 +81,9 @@ public class ClientCastMessage implements IMessage {
 						enhance.getEnhancement().onCast(
 								enhance.getLevel(), summary, sp, att);
 					}
+					
+					// little hook here for extra effects
+					SpellTome.doSpecialCastEffects(tome, sp);
 				}
 			}
 			

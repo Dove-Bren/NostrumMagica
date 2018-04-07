@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.items;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -14,12 +15,14 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
+import com.smanzana.nostrummagica.potions.FrostbitePotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -27,8 +30,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.relauncher.Side;
@@ -59,6 +66,9 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 	private static final String NBT_ENHANCEMENTS = "tome_enhancements";
 	private static final String NBT_ENHANCEMENT_KEY = "enhancement_key";
 	private static final String NBT_ENHANCEMENT_LEVEL = "enhancement_level";
+	private static final String NBT_PLAYER = "tome_player";
+	private static final String NBT_PLAYER_NAME = "tome_player_name";
+	private static final String NBT_FINISH_TIME = "tome_finish_time";
 	private static SpellTome instance = null;
 	
 	public static SpellTome instance() {
@@ -178,6 +188,68 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		NBTTagCompound nbt = itemStack.getTagCompound();
 		
 		nbt.setInteger(NBT_INDEX, index);
+	}
+	
+	public static UUID getPlayerID(ItemStack itemStack) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+			return null;
+
+		NBTTagCompound nbt = itemStack.getTagCompound();
+		if (nbt == null)
+			return null;
+		
+		try {
+			return UUID.fromString(nbt.getString(NBT_PLAYER));
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	public static String getPlayerName(ItemStack itemStack) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+			return null;
+
+		NBTTagCompound nbt = itemStack.getTagCompound();
+		if (nbt == null)
+			return null;
+		return nbt.getString(NBT_PLAYER_NAME);
+	}
+	
+	public static void setPlayer(ItemStack itemStack, EntityPlayer player) {
+		setPlayer(itemStack, player.getDisplayNameString(), player.getUniqueID());
+	}
+	
+	public static void setPlayer(ItemStack itemStack, String name, UUID id) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+			return;
+
+		NBTTagCompound nbt = itemStack.getTagCompound();
+		if (nbt == null)
+			nbt = new NBTTagCompound();
+		nbt.setString(NBT_PLAYER, id.toString());
+		nbt.setString(NBT_PLAYER_NAME, name);
+		itemStack.setTagCompound(nbt);
+	}
+	
+	public static long getBondTime(ItemStack itemStack) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+			return 0;
+
+		NBTTagCompound nbt = itemStack.getTagCompound();
+		if (nbt == null)
+			return 0;
+		return nbt.getLong(NBT_FINISH_TIME);
+	}
+	
+	public static void setBondTime(ItemStack itemStack, long time) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+			return;
+
+		NBTTagCompound nbt = itemStack.getTagCompound();
+		if (nbt == null)
+			nbt = new NBTTagCompound();
+		nbt.setLong(NBT_FINISH_TIME, time);
+		itemStack.setTagCompound(nbt);
 	}
 	
 	/**
@@ -413,12 +485,149 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
 		List<EnhancementWrapper> enhances = getEnhancements(stack);
-		if (enhances == null || enhances.isEmpty())
+		if (enhances != null && !enhances.isEmpty()) {
+			for (EnhancementWrapper enhance : enhances) {
+				tooltip.add(I18n.format(enhance.enhancement.getNameFormat(), new Object[0])
+						+ " " + SpellTomePage.toRoman(enhance.level));
+			}
+		}
+		
+		String name = getPlayerName(stack);
+		if (name != null && !name.isEmpty()) {
+			tooltip.add("");
+			tooltip.add(TextFormatting.DARK_RED + "Bound to " + name + TextFormatting.RESET);
+		}
+	}
+	
+	public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
+		super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
+		
+		UUID owner = getPlayerID(stack);
+		if (owner != null)
 			return;
 		
-		for (EnhancementWrapper enhance : enhances) {
-			tooltip.add(I18n.format(enhance.enhancement.getNameFormat(), new Object[0])
-					+ " " + SpellTomePage.toRoman(enhance.level));
+		if (!(entityIn instanceof EntityPlayer)) {
+			return;
 		}
+		
+		long time = getBondTime(stack);
+		if (time == 0) {
+			setBondTime(stack, System.currentTimeMillis() + SpellTome.genBondTime(stack));
+			return;
+		}
+		
+		long current = System.currentTimeMillis();
+		if (current >= time) {
+			// Bond!
+			bond(stack, worldIn, (EntityPlayer) entityIn);
+		}
+		
+		
+	}
+	
+	public boolean onDroppedByPlayer(ItemStack item, EntityPlayer player) {
+		boolean ret = super.onDroppedByPlayer(item, player);
+		if (ret)
+			setBondTime(item, 0);
+		return ret;
+	}
+	
+	public static long genBondTime(ItemStack tome) {
+		// Can be cool later. For now, just do 10 minutes
+		return 1000L * 10;//60L * 10L;
+	}
+	
+	public static void bond(ItemStack tome, World world, EntityPlayer player) {
+		setPlayer(tome, player);
+		NostrumMagicaSounds.SHIELD_APPLY.play(player);
+		if (world.isRemote) {
+			player.addChatComponentMessage(new TextComponentTranslation("info.tome.bond"));
+		}
+	}
+	
+	public static boolean isOwner(ItemStack tome, EntityPlayer player) {
+		UUID owner = getPlayerID(tome);
+		if (owner == null)
+			return false;
+		
+		return owner.equals(player.getUniqueID());
+	}
+
+	/**
+	 * Does any special effects when casting a spell from a tome
+	 * @param tome
+	 * @param sp
+	 */
+	public static void doSpecialCastEffects(ItemStack tome, EntityPlayer sp) {
+		if (sp.worldObj.isRemote)
+			return;
+		
+		boolean isOwner = isOwner(tome, sp);
+		if (!isOwner) {
+			UUID id = getPlayerID(tome);
+			if (id == null)
+				return;
+			EntityPlayer player = 
+					sp.worldObj.getMinecraftServer().getPlayerList().getPlayerByUUID(id);
+			if (player != null && !player.isDead) {
+				switch (NostrumMagica.rand.nextInt(4)) {
+				case 0:
+					// Poison them
+					player.addPotionEffect(new PotionEffect(
+							Potion.getPotionFromResourceLocation("poison"),
+							20 * 10,
+							0
+							));
+					player.addPotionEffect(new PotionEffect(
+							Potion.getPotionFromResourceLocation("nausea"),
+							20 * 10,
+							1
+							));
+					break;
+				case 1:
+					// Frostbite
+					player.addPotionEffect(new PotionEffect(
+							FrostbitePotion.instance(),
+							20 * 10,
+							0
+							));
+					player.addPotionEffect(new PotionEffect(
+							Potion.getPotionFromResourceLocation("nausea"),
+							20 * 10,
+							1
+							));
+					break;
+				case 2:
+					// Slow
+					player.addPotionEffect(new PotionEffect(
+							Potion.getPotionFromResourceLocation("slowness"),
+							20 * 10,
+							1
+							));
+					player.addPotionEffect(new PotionEffect(
+							Potion.getPotionFromResourceLocation("nausea"),
+							20 * 10,
+							1
+							));
+					break;
+				case 3:
+				default:
+					// Blindness
+					player.addPotionEffect(new PotionEffect(
+							Potion.getPotionFromResourceLocation("blindness"),
+							20 * 10,
+							0
+							));
+					player.addPotionEffect(new PotionEffect(
+							Potion.getPotionFromResourceLocation("nausea"),
+							20 * 10,
+							1
+							));
+					break;
+				}
+			}
+		}
+		
+		// Could hook up some special effects here
 	}
 }

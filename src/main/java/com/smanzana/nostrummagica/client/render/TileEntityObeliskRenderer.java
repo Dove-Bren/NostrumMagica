@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.client.render;
 
+import com.google.common.base.Function;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumObelisk.NostrumObeliskEntity;
 
@@ -7,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
@@ -42,7 +44,13 @@ public class TileEntityObeliskRenderer extends TileEntitySpecialRenderer<Nostrum
 			try {
 				raw = OBJLoader.INSTANCE.loadModel(MODEL_LOC);
 				model = raw.bake(TRSRTransformation.identity(), DefaultVertexFormats.BLOCK,
-						(location) -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString()));
+						new Function<ResourceLocation, TextureAtlasSprite>() {
+
+					@Override
+					public TextureAtlasSprite apply(ResourceLocation location) {
+						return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString());
+					}
+		});
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.out.println("Failed to load obelisk tile model");

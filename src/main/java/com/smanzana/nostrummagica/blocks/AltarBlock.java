@@ -52,7 +52,7 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 		this.setSoundType(SoundType.STONE);
 		
 		this.isBlockContainer = true;
-		this.setLightOpacity(16);
+		this.setLightOpacity(1);
 	}
 	
 	@Override
