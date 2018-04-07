@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.client.gui;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,6 +21,8 @@ import com.smanzana.nostrummagica.quests.rewards.AttributeReward;
 import com.smanzana.nostrummagica.quests.rewards.AttributeReward.AwardType;
 import com.smanzana.nostrummagica.quests.rewards.IReward;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -185,7 +188,7 @@ public class MirrorGui extends GuiScreen {
 			y = fontRendererObj.FONT_HEIGHT + 2;
 			
 			len = this.fontRendererObj.getStringWidth(unlockPrompt);
-			this.fontRendererObj.drawString(unlockPrompt, (this.width - len) / 2, y + topOffset + (TEXT_CONTENT_HEIGHT / 2), 0xFFFF2000, false);
+			this.fontRendererObj.drawString(unlockPrompt, (this.width - len) / 2, y + topOffset + (TEXT_CONTENT_HEIGHT / 2), 0xFFDFD000, false);
 		}
 		
 		// Black out surrounding screen
@@ -193,7 +196,7 @@ public class MirrorGui extends GuiScreen {
 		Gui.drawRect(0, 0, this.width, topOffset, color);
 		Gui.drawRect(0, topOffset + GUI_HEIGHT, this.width, this.height, color);
 		Gui.drawRect(0, 0, leftOffset, this.height, color);
-		Gui.drawRect(leftOffset + TEXT_WIDTH, 0, this.width, this.height, color);
+		Gui.drawRect(leftOffset + TEXT_WIDTH - 1, 0, this.width, this.height, color);
 		
 		Minecraft.getMinecraft().getTextureManager().bindTexture(RES_FORE);
 		GlStateManager.color(1f, 1f, 1f, 1f);
@@ -296,20 +299,82 @@ public class MirrorGui extends GuiScreen {
 		} else {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			// DRAW ICONS
+			EMagicElement element = null; // Which element we know
+			SpellTrigger trigger = null;
+			SpellShape shape = null;
+			
 			Map<EMagicElement, Boolean> map = attr.getKnownElements();
 			Boolean val;
-			int x = 0;
-			for (EMagicElement element : EMagicElement.values()) {
-				Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET + x - 2, topOffset + TEXT_BOTTOM_VOFFSET - 2, leftOffset + TEXT_BOTTOM_HOFFSET + x + 18, topOffset + TEXT_BOTTOM_VOFFSET + 18, 0xD0000000);
-				val = map.get(element);
-				if (val == null || !val)
-					GlStateManager.color(.1f, .1f, .1f, .9f);
-				else
-					GlStateManager.color(1f, 1f, 1f, 1f);
-				
-				SpellIcon.get(element).draw(this, fontRendererObj, leftOffset + TEXT_BOTTOM_HOFFSET + x, topOffset + TEXT_BOTTOM_VOFFSET, 16, 16);
-				x += 32;
+			for (EMagicElement elem : map.keySet()) {
+				val = map.get(elem);
+				if (val != null && val) {
+					element = elem;
+					break;
+				}
 			}
+			
+			if (!attr.getTriggers().isEmpty())
+				trigger = attr.getTriggers().get(0);
+			
+			if (!attr.getShapes().isEmpty())
+				shape = attr.getShapes().get(0);
+			
+			final int width = 24;
+			final int space = 32;
+			final long cycle = 1500;
+			int x = leftOffset + (int) (.5 * TEXT_WIDTH) + (-width / 2) + (-space) + (-width);
+			int y = topOffset + TEXT_BOTTOM_VOFFSET + width;
+			int strLen;
+			String str;
+
+			GlStateManager.enableBlend();
+			drawRect(x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
+			if (element != null)
+				GlStateManager.color(1f, 1f, 1f, 1f);
+			else {
+				GlStateManager.color(.8f, .5f, .5f, .5f);
+				element = EMagicElement.values()[
+	                  (int) (Minecraft.getSystemTime() / cycle) % EMagicElement.values().length
+				      ];
+			}
+			SpellIcon.get(element).draw(this, this.fontRendererObj, x, y, width, width);
+			str = I18n.format("element.name", new Object[0]);
+			strLen = this.fontRendererObj.getStringWidth(str);
+			this.fontRendererObj.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.fontRendererObj.FONT_HEIGHT), 0xFFFFFF);
+			
+			x += width + space;
+			drawRect(x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
+			if (trigger != null)
+				GlStateManager.color(1f, 1f, 1f, 1f);
+			else {
+				GlStateManager.color(.8f, .5f, .5f, .5f);
+				Collection<SpellTrigger> triggers = SpellTrigger.getAllTriggers();
+				SpellTrigger[] trigArray = triggers.toArray(new SpellTrigger[0]);
+				trigger = trigArray[
+	                  (int) (Minecraft.getSystemTime() / cycle) % trigArray.length
+				      ];
+			}
+			SpellIcon.get(trigger).draw(this, this.fontRendererObj, x, y, width, width);
+			str = I18n.format("trigger.name", new Object[0]);
+			strLen = this.fontRendererObj.getStringWidth(str);
+			this.fontRendererObj.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.fontRendererObj.FONT_HEIGHT), 0xFFFFFF);
+			
+			x += width + space;
+			drawRect(x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
+			if (shape != null)
+				GlStateManager.color(1f, 1f, 1f, 1f);
+			else {
+				GlStateManager.color(.8f, .5f, .5f, .5f);
+				Collection<SpellShape> shapes = SpellShape.getAllShapes();
+				SpellShape[] shapeArray = shapes.toArray(new SpellShape[0]);
+				shape = shapeArray[
+	                  (int) (Minecraft.getSystemTime() / cycle) % shapeArray.length
+				      ];
+			}
+			SpellIcon.get(shape).draw(this, this.fontRendererObj, x, y, width, width);
+			str = I18n.format("shape.name", new Object[0]);
+			strLen = this.fontRendererObj.getStringWidth(str);
+			this.fontRendererObj.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.fontRendererObj.FONT_HEIGHT), 0xFFFFFF);
 		}
 		
 		//super.drawScreen(mouseX, mouseY, partialTicks);
@@ -320,16 +385,20 @@ public class MirrorGui extends GuiScreen {
 			return "";
 		
 		Map<EMagicElement, Boolean> map = attr.getKnownElements();
+		boolean found = false;
 		for (EMagicElement elem : EMagicElement.values()) {
-			if (map.get(elem) == null || !map.get(elem)) {
-				return "Unlock all elements";
+			if (map.get(elem) != null && map.get(elem)) {
+				found = true;
+				break;
 			}
 		}
+		if (!found)
+			return "Unlock an element";
 		
-		if (attr.getShapes().isEmpty())
-			return "Unlock at least one shape";
+		if (attr.getTriggers().isEmpty())
+			return "Unlock at least one trigger";
 		
-		return "Unlock at least one trigger";
+		return "Unlock at least one shape";
 	}
 	
 	@Override

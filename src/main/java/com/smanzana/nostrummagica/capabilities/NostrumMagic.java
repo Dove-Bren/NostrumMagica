@@ -395,17 +395,24 @@ public class NostrumMagic implements INostrumMagic {
 			return;
 		
 		// Unlock (ritual of discovery) if at least one shape and trigger
-		// and all elements have been 'discovered'.
+		// and an element have been 'discovered'.
 		
 		if (shapes.isEmpty() || triggers.isEmpty())
 			return;
 		
+		boolean found = false;
 		for (EMagicElement e : EMagicElement.values()) {
-			if (knownElements.get(e) == null
-					|| !knownElements.get(e))
-				return;
+			if (knownElements.get(e) != null
+					&& knownElements.get(e)) {
+				found = true;
+				break;
+			}
 		}
 		
+		if (!found)
+			return;
+		
+		unlock();
 		// TODO effects
 		if (this.entity != null && !this.entity.worldObj.isRemote
 				&& this.entity instanceof EntityPlayer) {

@@ -207,7 +207,7 @@ public class SpellIcon {
 		yOffset *= 1f / scaleV;
 		
 		GL11.glScalef(scaleU, scaleV, 0f); // Idk which it is!
-		GlStateManager.color(1f, 1f, 1f, 1f);
+		//GlStateManager.color(1f, 1f, 1f, 1f);
 		
 		Minecraft.getMinecraft().getTextureManager().bindTexture(iconSheet);
 		
