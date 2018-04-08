@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.loretag.LoreCache;
@@ -22,8 +24,10 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 
 /**
  * Default implementation of the INostrumMagic interface
@@ -484,6 +488,9 @@ public class NostrumMagic implements INostrumMagic {
 		this.currentQuests = cap.getCurrentQuests();
 		this.completedQuests = cap.getCompletedQuests();
 		this.questData = cap.getQuestDataMap();
+		this.bindingTomeID = cap.getBindingID();
+		this.bindingSpell = cap.getBindingSpell();
+		this.bindingComponent = cap.getBindingComponent();
 	}
 	
 	@Override
@@ -596,9 +603,9 @@ public class NostrumMagic implements INostrumMagic {
 	}
 
 	@Override
-	public void startBinding(Spell spell, int tomeID) {
+	public void startBinding(Spell spell, SpellComponentWrapper comp, int tomeID) {
 		this.bindingSpell = spell;
-		this.bindingComponent = spell.getRandomComponent();
+		this.bindingComponent = comp;
 		this.bindingTomeID = tomeID;
 	}
 
@@ -610,5 +617,32 @@ public class NostrumMagic implements INostrumMagic {
 	@Override
 	public int getBindingID() {
 		return this.bindingTomeID;
+	}
+
+	@Override
+	public void completeBinding() {
+		
+		if (this.entity != null && this.entity instanceof EntityPlayer) {
+			EntityPlayer player = (EntityPlayer) entity;
+			
+			ItemStack tome = NostrumMagica.findTome(player, bindingTomeID);
+			if (tome == null) {
+				player.addChatComponentMessage(new TextComponentTranslation(
+						"info.tome.bind_missing", new Object[] {bindingSpell.getName()}));
+				return;
+			}
+			
+			if (!this.entity.worldObj.isRemote) {
+				NostrumMagicaSounds.LEVELUP.play(player);
+				player.addChatComponentMessage(new TextComponentTranslation(
+						"info.tome.bind_finish", new Object[] {bindingSpell.getName()}));
+			}
+			
+			SpellTome.addSpell(tome, this.bindingSpell);
+		}
+
+		this.bindingSpell = null;
+		this.bindingTomeID = 0;
+		this.bindingComponent = null;
 	}
 }

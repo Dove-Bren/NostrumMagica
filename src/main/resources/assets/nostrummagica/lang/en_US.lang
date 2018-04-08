@@ -204,6 +204,11 @@ info.teleport_obelisk.fail=This Geogem doesn't point to a valid obelisk
 info.tome.bond=You've finished bonding with your SpellTome
 info.tome.levelup=Your tome gains a new level
 info.tome.capacity=Capacity %d
+info.tome.bind=You've begun to bind the spell %s into the tome. You must visit a Shrine of %s
+info.tome.bind_missing=The tome this spell is being bound to is not in your inventory!
+info.tome.bind_finish=You've finished binding the spell into the tome!
+info.tome.full=That tome cannot hold any more spells
+info.tome.noowner=That tome is not bound to you
 
 element.name=Element
 shape.name=Shape
@@ -244,6 +249,8 @@ ritual.koid.name=Void Conjuration
 ritual.koid.desc=Summons 5 Koid from random dimensions
 ritual.tome.name=Ritual of Bonding
 ritual.tome.desc=Combies a plate with pages to create an unbound Spell Tome
+ritual.spell_binding.name=Ritual of Binding
+ritual.spell_binding.desc=Begins to bind a spell into a tome
 
 ritual.rune.physical.name=Physical Rune
 ritual.rune.fire.name=Fire Rune

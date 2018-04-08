@@ -70,7 +70,7 @@ public class ClientCastMessage implements IMessage {
 			
 			if (!isScroll) {
 				// Find the tome this was cast from, if any
-				ItemStack tome = NostrumMagica.getCurrentTome(sp);
+				ItemStack tome = NostrumMagica.findTome(sp, tomeID);
 				
 				if (tome != null && tome.getItem() instanceof SpellTome
 						&& SpellTome.getTomeID(tome) == tomeID) {

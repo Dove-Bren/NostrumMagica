@@ -66,7 +66,8 @@ public interface INostrumMagic {
 	public SpellComponentWrapper getBindingComponent(); // Get current needed component
 	public Spell getBindingSpell();
 	public int getBindingID();
-	public void startBinding(Spell spell, int tomeID);
+	public void startBinding(Spell spell, SpellComponentWrapper component, int tomeID);
+	public void completeBinding();
 	
 	// Lore
 	public boolean hasLore(ILoreTagged tagged);

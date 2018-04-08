@@ -587,8 +587,8 @@ public class SpellRune extends Item implements ILoreTagged {
 				return null;
 			
 			EMagicElement element = getPieceShapeElement(stack);
-			if (element == null)
-				return null;
+			//if (element == null)
+			//	return null;
 			
 			int count = getPieceElementCount(stack);
 			if (count < 1)

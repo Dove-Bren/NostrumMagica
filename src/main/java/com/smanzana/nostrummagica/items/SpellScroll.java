@@ -82,6 +82,19 @@ public class SpellScroll extends Item implements ILoreTagged {
 		itemStack.setStackDisplayName(spell.getName());
 		itemStack.addEnchantment(Enchantment.getEnchantmentByLocation("power"), 1);
 	}
+	
+	public static Spell getSpell(ItemStack itemStack) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellScroll))
+			return null;
+		
+		NBTTagCompound nbt = itemStack.getTagCompound();		
+		if (nbt == null)
+			return null;
+		
+		int id = nbt.getInteger(NBT_SPELL);
+		Spell spell = NostrumMagica.spellRegistry.lookup(id);
+		return spell;
+	}
 
 	@Override
 	public String getLoreKey() {

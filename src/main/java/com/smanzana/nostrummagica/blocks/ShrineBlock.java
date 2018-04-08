@@ -84,6 +84,14 @@ public class ShrineBlock extends SymbolBlock {
 		SymbolTileEntity tile = (SymbolTileEntity) te;
 		SpellComponentWrapper component = tile.getComponent();
 		
+		// Check for binding first
+		if (attr.isBinding()) {
+			if (attr.getBindingComponent().equals(component)) {
+				attr.completeBinding();
+				return true;
+			}
+		}
+		
 		if (component.isElement()) {
 			// Elements either grant knowledge (if the player hasn't unlocked
 			// magic yet) OR start a trial (if the player has unlocked and the

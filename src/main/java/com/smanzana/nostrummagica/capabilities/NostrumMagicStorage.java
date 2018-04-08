@@ -4,10 +4,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.quests.objectives.IObjectiveState;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
@@ -37,7 +40,11 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	private static final String NBT_MOD_MANA_REGEN = "mod_mana_regen";
 	
 	//private static final String NBT_FAMILIARS = "familiars";
-	//private static final String NBT_BINDING = "binding"; // TODO binding interface
+	
+	private static final String NBT_BINDING_COMPONENT = "binding_componenet";
+	private static final String NBT_BINDING_SPELL = "binding_spell";
+	private static final String NBT_BINDING_TOME_ID = "binding_tomeid";
+	//private static final String NBT_BINDING_COMPONENT = "binding";
 	
 	private static final String NBT_LORELEVELS = "lore";
 	private static final String NBT_SPELLCRCS = "spellcrcs"; // spells we've done's CRCs
@@ -168,6 +175,12 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		
 		}
 		
+		if (instance.isBinding()) {
+			nbt.setString(NBT_BINDING_COMPONENT, instance.getBindingComponent().getKeyString());
+			nbt.setInteger(NBT_BINDING_TOME_ID, instance.getBindingID());
+			nbt.setInteger(NBT_BINDING_SPELL, instance.getBindingSpell().getRegistryID());
+		}
+		
 		return nbt;
 	}
 
@@ -289,6 +302,17 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			}
 		}
 		instance.setQuestDataMap(data);
+		
+		if (tag.hasKey(NBT_BINDING_COMPONENT, NBT.TAG_STRING)
+				&& tag.hasKey(NBT_BINDING_SPELL, NBT.TAG_INT)
+				&& tag.hasKey(NBT_BINDING_TOME_ID, NBT.TAG_INT)) {
+			Spell spell = NostrumMagica.spellRegistry.lookup(tag.getInteger(NBT_BINDING_SPELL));
+			if (spell != null) {
+				SpellComponentWrapper comp = SpellComponentWrapper.fromKeyString(tag.getString(NBT_BINDING_COMPONENT));
+				int tomeID = tag.getInteger(NBT_BINDING_TOME_ID);
+				instance.startBinding(spell, comp, tomeID);
+			}
+		}
 	}
 
 }

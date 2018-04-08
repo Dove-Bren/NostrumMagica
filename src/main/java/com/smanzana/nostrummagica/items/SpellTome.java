@@ -710,6 +710,9 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 	public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
 		super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
 		
+		if (worldIn.isRemote)
+			return;
+		
 		UUID owner = getPlayerID(stack);
 		if (owner != null)
 			return;
@@ -748,7 +751,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 	public static void bond(ItemStack tome, World world, EntityPlayer player) {
 		setPlayer(tome, player);
 		NostrumMagicaSounds.SHIELD_APPLY.play(player);
-		if (world.isRemote) {
+		if (!world.isRemote) {
 			player.addChatComponentMessage(new TextComponentTranslation("info.tome.bond"));
 		}
 	}

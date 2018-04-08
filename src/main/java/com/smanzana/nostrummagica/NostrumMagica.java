@@ -32,6 +32,7 @@ import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SeekerIdol;
 import com.smanzana.nostrummagica.items.SpellPlate;
 import com.smanzana.nostrummagica.items.SpellRune;
+import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
@@ -48,6 +49,7 @@ import com.smanzana.nostrummagica.quests.rewards.AttributeReward.AwardType;
 import com.smanzana.nostrummagica.quests.rewards.IReward;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
+import com.smanzana.nostrummagica.rituals.outcomes.OutcomeBindSpell;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeConstructGeotoken;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeCreateObelisk;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeCreateTome;
@@ -210,6 +212,24 @@ public class NostrumMagica
     		potionID++;
     	Potion.REGISTRY.register(potionID, loc, potion);
     	return potionID;
+    }
+    
+    public static ItemStack findTome(EntityPlayer entity, int tomeID) {
+    	// We look in mainhand first, then offhand, then just down
+    	// hotbar.
+    	for (ItemStack item : entity.inventory.mainInventory) {
+    		if (item != null && item.getItem() instanceof SpellTome)
+    			if (SpellTome.getTomeID(item) == tomeID)
+    				return item;
+    	}
+    	
+    	for (ItemStack item : entity.inventory.offHandInventory) {
+    		if (item != null && item.getItem() instanceof SpellTome)
+    			if (SpellTome.getTomeID(item) == tomeID)
+    				return item;
+    	}
+    	
+    	return null;
     }
     
     public static ItemStack getCurrentTome(EntityPlayer entity) {
@@ -640,6 +660,15 @@ public class NostrumMagica
 					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
 					new ItemStack[] {null, null, null, null},
 					new OutcomeCreateTome())
+				);
+		
+		// Spell Binding
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("spell_binding", null,
+					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.BLACK_PEARL},
+					new ItemStack(SpellTome.instance(), 1, OreDictionary.WILDCARD_VALUE),
+					new ItemStack[] {new ItemStack(Items.GOLD_NUGGET), new ItemStack(SpellScroll.instance()), NostrumResourceItem.getItem(ResourceType.TOKEN, 1), new ItemStack(Items.GOLD_NUGGET)},
+					new OutcomeBindSpell())
 				);
 		
 //		RitualRegistry.instance().addRitual(
