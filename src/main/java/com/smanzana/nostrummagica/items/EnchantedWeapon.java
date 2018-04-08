@@ -185,8 +185,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 		return modelID;
 	}
 	
-	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
-    {
+	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		if (element == EMagicElement.WIND) {
 			SpellAction fly = new SpellAction(playerIn);
 			fly.push(5.0f, level);
@@ -196,6 +195,19 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 		}
 
         return EnumActionResult.PASS;
-    }
+	}
+	
+	@Override
+	public boolean itemInteractionForEntity(ItemStack stack, EntityPlayer playerIn, EntityLivingBase target, EnumHand hand) {
+		if (element == EMagicElement.WIND) {
+			SpellAction fly = new SpellAction(playerIn);
+			fly.push(5.0f, level);
+			fly.apply(target, 1.0f);
+			stack.damageItem(2, playerIn);
+			return true;
+		}
+
+        return false;
+	}
 	
 }
