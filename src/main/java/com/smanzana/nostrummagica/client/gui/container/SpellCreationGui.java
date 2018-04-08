@@ -301,7 +301,7 @@ public class SpellCreationGui {
 			}
 			
 			boolean flag = false;
-			for (int i = 2; i < inventory.getSizeInventory(); i++) {
+			for (int i = 2; i < inventory.getReagentSlotIndex(); i++) {
 				stack = inventory.getStackInSlot(i);
 				if (stack == null) {
 					break;
@@ -319,7 +319,7 @@ public class SpellCreationGui {
 			
 			Spell spell = new Spell(name);
 			SpellPart part;
-			for (int i = 1; i < inventory.getSizeInventory(); i++) {
+			for (int i = 1; i < inventory.getReagentSlotIndex(); i++) {
 				stack = inventory.getStackInSlot(i);
 				if (stack == null) {
 					break;

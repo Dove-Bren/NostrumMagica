@@ -49,6 +49,7 @@ import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SeekerIdol;
 import com.smanzana.nostrummagica.items.ShrineSeekingGem;
+import com.smanzana.nostrummagica.items.SpellPlate;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTableItem;
@@ -168,6 +169,19 @@ public class ClientProxy extends CommonProxy {
     	ModelBakery.registerItemVariants(SpellRune.instance(), variants);
     	
     	list = new LinkedList<>();
+    	List<ResourceLocation> list2 = new LinkedList<>();
+    	final int maxTomeCount = 7;
+    	for (i = 1; i <= maxTomeCount; i++) {
+    		list.add(new ResourceLocation(NostrumMagica.MODID, SpellTome.id + i));
+    		list2.add(new ResourceLocation(NostrumMagica.MODID, SpellPlate.id + i));
+    	}
+    	
+    	variants = list.toArray(new ResourceLocation[0]);
+    	ModelBakery.registerItemVariants(SpellTome.instance(), variants);
+    	variants = list2.toArray(new ResourceLocation[0]);
+    	ModelBakery.registerItemVariants(SpellPlate.instance(), variants);
+    	
+    	list = new LinkedList<>();
     	for (ResourceType type : ResourceType.values()) {
     		list.add(new ResourceLocation(NostrumMagica.MODID, type.getUnlocalizedKey()));
     	}
@@ -189,7 +203,7 @@ public class ClientProxy extends CommonProxy {
 	public void init() {
 		super.init();
 		
-		registerModel(SpellTome.instance(), 0, SpellTome.id);
+		//registerModel(SpellTome.instance(), 0, SpellTome.id);
 		registerModel(NostrumGuide.instance(), 0, NostrumGuide.id);
 		registerModel(SpellScroll.instance(), 0, SpellScroll.id);
 		registerModel(BlankScroll.instance(), 0, BlankScroll.id);
@@ -298,6 +312,11 @@ public class ClientProxy extends CommonProxy {
 		registerModel(SpellTomePage.instance(),
 				0,
 				SpellTomePage.id);
+		
+    	for (int i = 1; i <= SpellTome.MAX_TOME_COUNT; i++) {
+    		registerModel(SpellTome.instance(), i - 1, SpellTome.id + i);
+    		registerModel(SpellPlate.instance(), i - 1, SpellPlate.id + i);
+    	}
 		
 		for (EMagicElement element : EMagicElement.values()) {
 			registerModel(EssenceItem.instance(),

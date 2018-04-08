@@ -116,7 +116,7 @@ public class SpellRune extends Item implements ILoreTagged {
 					}
 					if (alt != null && alteration == null)
 						alteration = alt;
-					int shapeCount = SpellRune.getPieceElementCount(stack);
+					int shapeCount = reverseElementCount(SpellRune.getPieceElementCount(stack));
 					if (count + shapeCount > 4)
 						return false;
 					count += shapeCount;
@@ -132,7 +132,7 @@ public class SpellRune extends Item implements ILoreTagged {
 					
 					element = elem;
 					
-					int c = SpellRune.getPieceElementCount(stack);
+					int c = reverseElementCount(SpellRune.getPieceElementCount(stack));
 					if (c + count > 4)
 						return false;
 					count += c;
@@ -150,6 +150,13 @@ public class SpellRune extends Item implements ILoreTagged {
 			}
 			
 			return foundTwo && (shape || ((alteration == null) != (element == null)));
+		}
+
+		private int reverseElementCount(int pieceElementCount) {
+			return (int) Math.pow(2, pieceElementCount - 1);
+			// 1->1
+			// 2->2
+			// 3->4
 		}
 
 		@Override
@@ -195,7 +202,7 @@ public class SpellRune extends Item implements ILoreTagged {
 					if (alt != null && alteration == null)
 						alteration = alt;
 					
-					int shapeCount = SpellRune.getPieceElementCount(stack);
+					int shapeCount = reverseElementCount(SpellRune.getPieceElementCount(stack));
 					if (count + shapeCount > 4)
 						return null;
 					count += shapeCount;
@@ -207,7 +214,7 @@ public class SpellRune extends Item implements ILoreTagged {
 						return null; // Different element types
 					
 					element = elem;
-					int c = SpellRune.getPieceElementCount(stack);
+					int c = reverseElementCount(SpellRune.getPieceElementCount(stack));
 					if (c + count > 4)
 						return null;
 					count += c;

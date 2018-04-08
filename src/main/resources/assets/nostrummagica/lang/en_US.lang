@@ -1,4 +1,5 @@
 item.spellTome.name=Spell Tome
+item.spellTomePlate.name=Tome Plate
 item.spell_scroll.name=Empty Spell Scroll
 item.blank_scroll.name=Blank Scroll
 item.reagent_bag.name=Reagent Bag
@@ -96,8 +97,8 @@ item.sword_ice1.name=Frozen Mace
 item.sword_ice2.name=Morning Star
 item.sword_ice3.name=Blizzard Scepter
 item.sword_wind1.name=Wind Slasher
-item.sword_wind2.name=Hurricane Striker
-item.sword_wind3.name=Glaive
+item.sword_wind2.name=Gust Glaive
+item.sword_wind3.name=Hurricane Striker
 
 item.armor_head_physical1.name=Sturdy Helm
 item.armor_head_physical2.name=Reinforced Helm
@@ -201,6 +202,7 @@ info.obelisk.noroom=There is not enough room to teleport
 info.obelisk.dne=The target obelisk doesn't seem to exist
 info.teleport_obelisk.fail=This Geogem doesn't point to a valid obelisk
 info.tome.bond=You've finished bonding with your SpellTome
+info.tome.levelup=Your tome gains a new level
 
 element.name=Element
 shape.name=Shape

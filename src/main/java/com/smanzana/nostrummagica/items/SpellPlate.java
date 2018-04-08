@@ -1,0 +1,192 @@
+package com.smanzana.nostrummagica.items;
+
+import java.util.List;
+
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
+
+import net.minecraft.client.resources.I18n;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+public class SpellPlate extends Item implements ILoreTagged {
+
+	/*
+	 * Base capacity
+	 * Bonus enhancements
+	 * Level
+	 */
+	
+	private static final String NBT_LEVEL = "nostrum_level";
+	private static final String NBT_TYPE = "nostrum_type";
+	private static SpellPlate instance = null;
+	
+	public static SpellPlate instance() {
+		if (instance == null)
+			instance = new SpellPlate();
+		
+		return instance;
+	}
+	
+	public static final String id = "spellTomePlate";
+	
+	private SpellPlate() {
+		super();
+		this.setUnlocalizedName(id);
+		this.setCreativeTab(NostrumMagica.enhancementTab); // set as icon for tab
+		this.setMaxStackSize(1);
+	}
+	
+	public static ItemStack getItemstack(SpellTomeEnhancement enhancement, int level) {
+		ItemStack stack = new ItemStack(instance);
+		
+		NBTTagCompound nbt = stack.getTagCompound();
+		
+		if (nbt == null)
+			nbt = new NBTTagCompound();
+		
+		nbt.setInteger(NBT_LEVEL, level);
+		nbt.setString(NBT_TYPE, enhancement.getTitleKey());
+		
+		stack.setTagCompound(nbt);
+		return stack;
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+		for (int i = 0; i < SpellTome.MAX_TOME_COUNT; i++) {
+			subItems.add(new ItemStack(this, 1, i));
+		}
+	}
+
+	@Override
+	public String getLoreKey() {
+		return "nostrum_spelltome_plate";
+	}
+
+	@Override
+	public String getLoreDisplayName() {
+		return "Spelltome Pages";
+	}
+
+	@Override
+	public Lore getBasicLore() {
+		return new Lore().add("These pages hold some sort of power, but they don't seem to apply to regular weapons and tools.");
+	}
+
+	@Override
+	public Lore getDeepLore() {
+		return new Lore().add("These pages modify spells cast from a spell tome.", "Pages can be added during spell tome creation to add their effects to the tome.");
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+		SpellTomeEnhancement enhance = getEnhancement(stack);
+		if (enhance == null)
+			return;
+		int level = getLevel(stack);
+		
+		tooltip.add(I18n.format(enhance.getNameFormat(), new Object[0]) + " " + toRoman(level));
+	}
+	
+	public static String toRoman(int num) {
+		if (num <= 0)
+			return "0";
+		
+		switch (num) {
+		case 1:
+			return "I";
+		case 2:
+			return "II";
+		case 3:
+			return "III";
+		case 4:
+			return "IV";
+		case 5:
+			return "V";
+		case 6:
+			return "VI";
+		case 7:
+			return "VII";
+		case 8:
+			return "VIII";
+		case 9:
+			return "IX";
+		case 10:
+			return "X";
+		case 11:
+			return "XI";
+		case 12:
+			return "XII";
+		case 13:
+			return "XIII";
+		case 14:
+			return "XIV";
+		case 15:
+			return "XV";
+		case 16:
+			return "XVI";
+		case 17:
+			return "XVII";
+		case 18:
+			return "XVII";
+		case 19:
+			return "XIX";
+		case 20:
+			return "XX";
+		case 21:
+			return "XXI";
+		case 22:
+			return "XXII";
+		case 23:
+			return "XXIII";
+		case 24:
+			return "XXIV";
+		case 25:
+			return "XXV";
+		case 26:
+			return "XXVI";
+		case 27:
+			return "XXVII";
+		case 28:
+			return "XXVIII";
+		case 29:
+			return "XXIX";
+		case 30:
+			return "XXX";
+		}
+		
+		return "?";
+	}
+	
+	public static int getLevel(ItemStack stack) {
+		if (stack == null || !(stack.getItem() instanceof SpellPlate))
+			return 0;
+		
+		if (!stack.hasTagCompound())
+			return 0;
+		
+		return stack.getTagCompound().getInteger(NBT_LEVEL);
+	}
+	
+	public static SpellTomeEnhancement getEnhancement(ItemStack stack) {
+		if (stack == null || !(stack.getItem() instanceof SpellPlate))
+			return null;
+		
+		if (!stack.hasTagCompound())
+			return null;
+		
+		String key = stack.getTagCompound().getString(NBT_TYPE);
+		SpellTomeEnhancement enhance = SpellTomeEnhancement.lookupEnhancement(key);
+		return enhance;
+	}
+}

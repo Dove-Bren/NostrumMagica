@@ -53,6 +53,7 @@ import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SeekerIdol;
 import com.smanzana.nostrummagica.items.ShrineSeekingGem;
+import com.smanzana.nostrummagica.items.SpellPlate;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTableItem;
@@ -249,6 +250,8 @@ public class CommonProxy {
     private void registerItems() {
     	SpellTome.instance().setRegistryName(NostrumMagica.MODID, SpellTome.id);
     	GameRegistry.register(SpellTome.instance());
+    	SpellPlate.instance().setRegistryName(NostrumMagica.MODID, SpellPlate.id);
+    	GameRegistry.register(SpellPlate.instance());
     	
     	NostrumGuide.instance().setRegistryName(NostrumMagica.MODID, NostrumGuide.id);
     	GameRegistry.register(NostrumGuide.instance());

@@ -22,6 +22,7 @@ import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 
 import net.minecraft.client.resources.I18n;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
@@ -60,6 +61,42 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 			return level;
 		}
 	}
+	
+	private static class LevelCurve {
+		
+		
+		public static int getMaxMana(int level) {
+			switch (level) {
+			case 1:
+			default:
+				return 100;
+			case 2:
+				return 200;
+			case 3:
+				return 500;
+			case 4:
+				return 1000;
+			case 5:
+				return 5000;
+			}
+		}
+		
+		public static int getMaxXP(int level) {
+			switch (level) {
+			case 1:
+			default:
+				return 50;
+			case 2:
+				return 100;
+			case 3:
+				return 200;
+			case 4:
+				return 500;
+			case 5:
+				return 5000;
+			}
+		}
+	}
 
 	private static final String NBT_SPELLS = "nostrum_spells";
 	private static final String NBT_INDEX = "spell_index";
@@ -69,6 +106,10 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 	private static final String NBT_PLAYER = "tome_player";
 	private static final String NBT_PLAYER_NAME = "tome_player_name";
 	private static final String NBT_FINISH_TIME = "tome_finish_time";
+	private static final String NBT_LEVEL = "tome_level";
+	private static final String NBT_XP = "tome_xp";
+	private static final String NBT_MODIFICATIONS = "tome_mods";
+	private static final String NBT_CAPACITY = "tome_capacity";
 	private static SpellTome instance = null;
 	
 	public static SpellTome instance() {
@@ -80,6 +121,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 	
 	public static final String id = "spellTome";
 	public static final String textureName = "tome1";
+	public static final int MAX_TOME_COUNT = 7;
 	
 	private SpellTome() {
 		super();
@@ -188,6 +230,94 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		NBTTagCompound nbt = itemStack.getTagCompound();
 		
 		nbt.setInteger(NBT_INDEX, index);
+	}
+	
+	public static int getXP(ItemStack itemStack) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+			return 0;
+
+		NBTTagCompound nbt = itemStack.getTagCompound();
+		if (nbt == null)
+			return 0;
+		
+			return nbt.getInteger(NBT_XP);
+	}
+	
+	public static void setXP(ItemStack itemStack, int xp) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+			return;
+
+		NBTTagCompound nbt = itemStack.getTagCompound();
+		if (nbt == null)
+			nbt = new NBTTagCompound();
+		nbt.setInteger(NBT_XP, xp);
+		itemStack.setTagCompound(nbt);
+	}
+	
+	public static int getCapacity(ItemStack itemStack) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+			return 0;
+
+		NBTTagCompound nbt = itemStack.getTagCompound();
+		if (nbt == null)
+			return 0;
+		
+			return nbt.getInteger(NBT_CAPACITY);
+	}
+	
+	public static void setCapacity(ItemStack itemStack, int capacity) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+			return;
+
+		NBTTagCompound nbt = itemStack.getTagCompound();
+		if (nbt == null)
+			nbt = new NBTTagCompound();
+		nbt.setInteger(NBT_CAPACITY, capacity);
+		itemStack.setTagCompound(nbt);
+	}
+	
+	public static int getLevel(ItemStack itemStack) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+			return 0;
+
+		NBTTagCompound nbt = itemStack.getTagCompound();
+		if (nbt == null)
+			return 1;
+		
+		return nbt.getInteger(NBT_LEVEL);
+	}
+	
+	public static void setLevel(ItemStack itemStack, int level) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+			return;
+
+		NBTTagCompound nbt = itemStack.getTagCompound();
+		if (nbt == null)
+			nbt = new NBTTagCompound();
+		nbt.setInteger(NBT_LEVEL, level);
+		itemStack.setTagCompound(nbt);
+	}
+	
+	public static int getModifications(ItemStack itemStack) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+			return 0;
+
+		NBTTagCompound nbt = itemStack.getTagCompound();
+		if (nbt == null)
+			return 0;
+		
+		return nbt.getInteger(NBT_MODIFICATIONS);
+	}
+	
+	public static void setModifications(ItemStack itemStack, int mods) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+			return;
+
+		NBTTagCompound nbt = itemStack.getTagCompound();
+		if (nbt == null)
+			nbt = new NBTTagCompound();
+		nbt.setInteger(NBT_MODIFICATIONS, mods);
+		itemStack.setTagCompound(nbt);
 	}
 	
 	public static UUID getPlayerID(ItemStack itemStack) {
@@ -626,8 +756,40 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 					break;
 				}
 			}
+		} else {
+			while (true) {
+				int xp = getXP(tome) + 1;
+				int level = getLevel(tome);
+				int maxxp = LevelCurve.getMaxXP(level);
+				if (xp > maxxp) {
+					xp -= maxxp;
+					level++;
+					
+					doLevelup(tome, sp);
+				} else {
+					break;
+				}
+			}
 		}
 		
 		// Could hook up some special effects here
+	}
+	
+	private static void doLevelup(ItemStack tome, EntityPlayer player) {
+		player.addChatComponentMessage(new TextComponentTranslation("info.tome.levelup", new Object[0]));
+		int mods = getModifications(tome);
+		setModifications(tome, ++mods);
+	}
+	
+	public static int getMaxMana(ItemStack tome) {
+		return LevelCurve.getMaxMana(getLevel(tome));
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+		for (int i = 0; i < SpellTome.MAX_TOME_COUNT; i++) {
+			subItems.add(new ItemStack(this, 1, i));
+		}
 	}
 }

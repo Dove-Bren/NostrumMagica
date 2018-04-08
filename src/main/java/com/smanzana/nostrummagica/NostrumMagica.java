@@ -603,6 +603,8 @@ public class NostrumMagica
 					}, 5))
 				);
 		
+		// Spell Tome Creation
+		
 //		RitualRegistry.instance().addRitual(
 //				RitualRecipe.createTier2("ritual.form_obelisk.name", EMagicElement.ENDER,
 //					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK},

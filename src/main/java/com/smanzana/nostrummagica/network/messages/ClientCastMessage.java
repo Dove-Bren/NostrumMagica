@@ -69,12 +69,17 @@ public class ClientCastMessage implements IMessage {
 			
 			if (!isScroll) {
 				// Find the tome this was cast from, if any
-				ItemStack tome = sp.getHeldItemMainhand();
-				if (tome == null || !(tome.getItem() instanceof SpellTome))
-					tome = sp.getHeldItemOffhand();
+				ItemStack tome = NostrumMagica.getCurrentTome(sp);
 				
 				if (tome != null && tome.getItem() instanceof SpellTome) {
 					// Casting from a tome.
+					
+					// Check if base mana cost exceeds what we can do
+					int cap = SpellTome.getMaxMana(tome);
+					if (cap < cost) {
+						return new ClientCastReplyMessage(false, att.getMana(), 0);
+					}
+					
 					List<EnhancementWrapper> enhancements = SpellTome.getEnhancements(tome);
 					if (enhancements != null && !enhancements.isEmpty())
 					for (EnhancementWrapper enhance : enhancements) {
@@ -84,6 +89,9 @@ public class ClientCastMessage implements IMessage {
 					
 					// little hook here for extra effects
 					SpellTome.doSpecialCastEffects(tome, sp);
+				} else {
+					NostrumMagica.logger.warn("Got cast from client with no tome");
+					return new ClientCastReplyMessage(false, att.getMana(), 0);
 				}
 			}
 			
