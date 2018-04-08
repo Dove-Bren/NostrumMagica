@@ -40,7 +40,7 @@ public class FrostbitePotion extends Potion {
 		if (duration <= 0)
 			return false;
 		
-		int interval = (int) (20.0 * (2.0 / Math.pow(2, amp)));
+		int interval = Math.max(1, (int) (20.0 * (2.0 / Math.pow(2, amp))));
 		return (duration % interval == 0); // 2 seconds, 1 second, .5 seconds, ...
 	}
 

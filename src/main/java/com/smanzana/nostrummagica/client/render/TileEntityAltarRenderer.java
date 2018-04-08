@@ -30,11 +30,12 @@ public class TileEntityAltarRenderer extends TileEntitySpecialRenderer<AltarTile
 		if (item == null)
 			return;
 		
-		float rot = 2.0f * (Minecraft.getSystemTime() / 50 + partialTicks);
+		float rot = 2.0f * (Minecraft.getSystemTime() / 50);
 		float scale = .75f;
+		float yoffset = (float) (.1f * (-.5f + Math.sin(((double) Minecraft.getSystemTime()) / 1000.0)));
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(x + .5, y + 1.25, z + .5);
+		GlStateManager.translate(x + .5, y + 1.25 + yoffset, z + .5);
 		GlStateManager.rotate(rot, 0, 1f, 0);
 		
 		GlStateManager.scale(scale, scale, scale);

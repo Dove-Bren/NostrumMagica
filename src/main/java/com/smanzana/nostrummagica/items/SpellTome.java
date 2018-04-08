@@ -4,13 +4,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.gui.book.BookScreen;
 import com.smanzana.nostrummagica.client.gui.book.HSplitPage;
 import com.smanzana.nostrummagica.client.gui.book.IBookPage;
+import com.smanzana.nostrummagica.client.gui.book.LinedTextPage;
+import com.smanzana.nostrummagica.client.gui.book.PlainTextPage;
 import com.smanzana.nostrummagica.client.gui.book.SpellPreviewPage;
+import com.smanzana.nostrummagica.client.gui.book.TitlePage;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.network.NetworkHandler;
@@ -112,6 +116,31 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		// this.setCreativeTab(NostrumMagica.creativeTab);
 		// Is icon. Handled special in NostrumMagica
 		this.setMaxStackSize(1);
+	}
+	
+	public static ItemStack getItemstack(int type,
+			int capacity,
+			SpellTomeEnhancementWrapper ... enhancements) {
+		return getItemstack(type, capacity, Lists.newArrayList(enhancements));
+	}
+	
+	public static ItemStack getItemstack(int type,
+			int capacity,
+			List<SpellTomeEnhancementWrapper> enhancements) {
+		ItemStack item = new ItemStack(instance(), 1, type) ;
+		setCapacity(item, capacity);
+		if (enhancements != null && !enhancements.isEmpty()) {
+			NBTTagCompound tag = item.getTagCompound();
+			if (tag == null)
+				tag = new NBTTagCompound();
+			
+			writeEnhancements(enhancements, tag);
+				
+			item.setTagCompound(tag);
+			
+		}
+		
+		return item;
 	}
 	
 	@Override
@@ -455,22 +484,50 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		
 		// height 40
 		// width 110
-		boolean top = true;
-		SpellPreviewPage page = null;
-		for (Spell spell : getSpells((stack))) {
-			if (top) {
-				page = new SpellPreviewPage(spell);
-			} else {
-				HSplitPage hp = new HSplitPage(page, new SpellPreviewPage(spell));
-				pages.add(hp);
-			}
+		String ownerName = getPlayerName(stack);
+		if (ownerName == null || ownerName.isEmpty()) {
+			// Tome has not been bound yet
+			pages.add(new HSplitPage(
+					new TitlePage("Unbonded Spelltome", false),
+					new PlainTextPage("  This tome is still being bonded.")
+					));
+		} else {
+			String title = stack.getDisplayName();
+			int level = getLevel(stack);
+			int maxMana = getMaxMana(stack);
+			List<Spell> spells = getSpells(stack);
+			int spellCount = (spells != null && !spells.isEmpty() ? spells.size() : 0);
+			int capacity = getCapacity(stack);
+			int xp = getXP(stack);
+			int maxxp = LevelCurve.getMaxXP(level);
+			int modifications = getModifications(stack);
+			pages.add(new TitlePage(title, false));
+			pages.add(new LinedTextPage("", "",
+					"Level: " + level, "XP: " + xp + "/" + maxxp, "",
+					"Max Mana: " + maxMana,
+					"Modifications: " + modifications,
+					"",
+					spellCount + "/" + capacity + " Spells"));
 			
-			top = !top;
-		}
-		if (!top) {
-			// Last one is partial page and didn't get finished.
-			HSplitPage hp = new HSplitPage(page, null);
-			pages.add(hp);
+			if (spellCount > 0) {
+				boolean top = true;
+				SpellPreviewPage page = null;
+				for (Spell spell : spells) {
+					if (top) {
+						page = new SpellPreviewPage(spell);
+					} else {
+						HSplitPage hp = new HSplitPage(page, new SpellPreviewPage(spell));
+						pages.add(hp);
+					}
+					
+					top = !top;
+				}
+				if (!top) {
+					// Last one is partial page and didn't get finished.
+					HSplitPage hp = new HSplitPage(page, null);
+					pages.add(hp);
+				}
+			}
 		}
 		
 		return new BookScreen(pages);
@@ -531,9 +588,14 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		}
 	}
 	
-	public static ItemStack createTome(ItemStack pages[]) {
-		ItemStack stack = new ItemStack(instance());
-		List<SpellTomeEnhancementWrapper> enhancements = new LinkedList<>();
+	public static ItemStack createTome(ItemStack plate, ItemStack pages[]) {
+		ItemStack stack = new ItemStack(instance(), 1, plate.getMetadata());
+		List<SpellTomeEnhancementWrapper> enhancements = SpellPlate.getEnhancements(plate);
+		
+		if (enhancements == null)
+			enhancements = new LinkedList<>();
+		
+		int capacity = SpellPlate.getCapacity(plate);
 		
 		int len = (pages == null ? 0 : pages.length);
 		for (int i = 0; i < len; i++) {
@@ -554,6 +616,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 			stack.setTagCompound(tag);
 			
 		}
+		
+		setCapacity(stack, capacity);
 			
 		return stack;
 	}
@@ -744,12 +808,13 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 				int xp = getXP(tome) + 1;
 				int level = getLevel(tome);
 				int maxxp = LevelCurve.getMaxXP(level);
-				if (xp > maxxp) {
+				if (xp >= maxxp) {
 					xp -= maxxp;
-					level++;
+					setXP(tome, xp);
 					
 					doLevelup(tome, sp);
 				} else {
+					setXP(tome, xp);
 					break;
 				}
 			}
@@ -762,6 +827,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		player.addChatComponentMessage(new TextComponentTranslation("info.tome.levelup", new Object[0]));
 		int mods = getModifications(tome);
 		setModifications(tome, ++mods);
+		int level = getLevel(tome);
+		setLevel(tome, ++level);
 	}
 	
 	public static int getMaxMana(ItemStack tome) {
@@ -772,7 +839,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 	@SideOnly(Side.CLIENT)
 	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
 		for (int i = 0; i < SpellTome.MAX_TOME_COUNT; i++) {
-			subItems.add(new ItemStack(this, 1, i));
+			subItems.add(getItemstack(i, 10));
 		}
 	}
 }

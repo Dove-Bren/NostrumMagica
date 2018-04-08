@@ -30,7 +30,7 @@ public class SpellPreviewPage implements IBookPage {
 		// Draw element icon
 		SpellIcon elementIcon = SpellIcon.get(spell.getPrimaryElement());
 		int icony = yoffset + (height / 2) + (-12);
-		
+		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 		elementIcon.draw(parent, fonter, xoffset + 4, icony, 24, 24);
 		fonter.drawString(spell.getName(), xoffset + 32, yoffset + 2, spell.getPrimaryElement().getColor());
 		yoffset += fonter.FONT_HEIGHT + 3;

@@ -109,7 +109,7 @@ public class SpellPlate extends Item implements ILoreTagged {
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
 		int capacity = getCapacity(stack);
-		tooltip.add(I18n.format("info.spelltome.capacity", new Object[] {capacity}));
+		tooltip.add(I18n.format("info.tome.capacity", new Object[] {capacity}));
 		
 		List<SpellTomeEnhancementWrapper> enhancements = getEnhancements(stack);
 		if (enhancements != null && !enhancements.isEmpty()) {
