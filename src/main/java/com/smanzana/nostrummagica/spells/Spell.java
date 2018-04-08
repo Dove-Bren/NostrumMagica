@@ -19,6 +19,7 @@ import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
 import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
+import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
@@ -1013,6 +1014,24 @@ public class Spell {
 			}
 		}
 		return list;
+	}
+
+	public SpellComponentWrapper getRandomComponent() {
+		if (this.parts == null || this.parts.size() == 0)
+			return null;
+		int index = NostrumMagica.rand.nextInt(this.parts.size());
+		SpellPart part = parts.get(index);
+		if (part.isTrigger())
+			return new SpellComponentWrapper(part.trigger);
+		else {
+			if (part.alteration != null && NostrumMagica.rand.nextInt(3) == 0) {
+				return new SpellComponentWrapper(part.alteration);
+			}
+			if (part.element != null && NostrumMagica.rand.nextBoolean()) {
+				return new SpellComponentWrapper(part.element);
+			}
+			return new SpellComponentWrapper(part.shape);
+		}
 	}
 	
 }

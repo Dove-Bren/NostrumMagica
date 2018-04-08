@@ -97,6 +97,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 	private static final String NBT_XP = "tome_xp";
 	private static final String NBT_MODIFICATIONS = "tome_mods";
 	private static final String NBT_CAPACITY = "tome_capacity";
+	private static final String NBT_ID = "tome_id";
 	private static SpellTome instance = null;
 	
 	public static SpellTome instance() {
@@ -377,6 +378,29 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		nbt.setString(NBT_PLAYER, id.toString());
 		nbt.setString(NBT_PLAYER_NAME, name);
 		itemStack.setTagCompound(nbt);
+	}
+	
+	private static int genID(ItemStack tome) {
+		int id = NostrumMagica.rand.nextInt();
+		NBTTagCompound nbt = tome.getTagCompound();
+		if (nbt == null)
+			nbt = new NBTTagCompound();
+		
+		nbt.setInteger(NBT_ID, id);
+		return id;
+	}
+	
+	public static int getTomeID(ItemStack itemStack) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+			return 0;
+
+		int id;
+		NBTTagCompound nbt = itemStack.getTagCompound();
+		if (nbt == null)
+			id = genID(itemStack);
+		else
+			id = nbt.getInteger(NBT_ID);
+		return id;
 	}
 	
 	public static long getBondTime(ItemStack itemStack) {

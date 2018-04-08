@@ -50,6 +50,7 @@ public class ClientCastMessage implements IMessage {
 			}
 			
 			boolean isScroll = message.tag.getBoolean(NBT_SCROLL);
+			int tomeID = message.tag.getInteger(NBT_TOME_ID);
 			
 			INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
 			
@@ -71,7 +72,8 @@ public class ClientCastMessage implements IMessage {
 				// Find the tome this was cast from, if any
 				ItemStack tome = NostrumMagica.getCurrentTome(sp);
 				
-				if (tome != null && tome.getItem() instanceof SpellTome) {
+				if (tome != null && tome.getItem() instanceof SpellTome
+						&& SpellTome.getTomeID(tome) == tomeID) {
 					// Casting from a tome.
 					
 					// Check if base mana cost exceeds what we can do
@@ -90,7 +92,7 @@ public class ClientCastMessage implements IMessage {
 					// little hook here for extra effects
 					SpellTome.doSpecialCastEffects(tome, sp);
 				} else {
-					NostrumMagica.logger.warn("Got cast from client with no tome");
+					NostrumMagica.logger.warn("Got cast from client with mismatched tome");
 					return new ClientCastReplyMessage(false, att.getMana(), 0);
 				}
 			}
@@ -151,6 +153,7 @@ public class ClientCastMessage implements IMessage {
 
 	private static final String NBT_ID = "id";
 	private static final String NBT_SCROLL = "isscroll";
+	private static final String NBT_TOME_ID = "tome_id";
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
@@ -160,14 +163,15 @@ public class ClientCastMessage implements IMessage {
 		tag = new NBTTagCompound();
 	}
 	
-	public ClientCastMessage(Spell spell, boolean scroll) {
-		this(spell.getRegistryID(), scroll);
+	public ClientCastMessage(Spell spell, boolean scroll, int tomeID) {
+		this(spell.getRegistryID(), scroll, tomeID);
 	}
 	
-	public ClientCastMessage(int id, boolean scroll) {
+	public ClientCastMessage(int id, boolean scroll, int tomeID) {
 		tag = new NBTTagCompound();
 		
 		tag.setInteger(NBT_ID, id);
+		tag.setInteger(NBT_TOME_ID, tomeID);
 		tag.setBoolean(NBT_SCROLL, scroll);
 	}
 

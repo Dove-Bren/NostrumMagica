@@ -60,7 +60,7 @@ public class SpellScroll extends Item implements ILoreTagged {
 
 		if (worldIn.isRemote) {
 			NetworkHandler.getSyncChannel().sendToServer(
-	    			new ClientCastMessage(spell, true));
+	    			new ClientCastMessage(spell, true, 0));
 		}
 		
 		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);

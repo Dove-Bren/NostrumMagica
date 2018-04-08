@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.quests.objectives.IObjectiveState;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
@@ -62,8 +63,10 @@ public interface INostrumMagic {
 	
 	// Binding
 	public boolean isBinding();
-	public float bindingSecondsLeft();
-	public void startBinding(float duration); // TODO interface for spell and tome we're binding
+	public SpellComponentWrapper getBindingComponent(); // Get current needed component
+	public Spell getBindingSpell();
+	public int getBindingID();
+	public void startBinding(Spell spell, int tomeID);
 	
 	// Lore
 	public boolean hasLore(ILoreTagged tagged);

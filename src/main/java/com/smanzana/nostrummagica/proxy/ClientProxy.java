@@ -450,7 +450,7 @@ public class ClientProxy extends CommonProxy {
 		}
 		
 		NetworkHandler.getSyncChannel().sendToServer(
-    			new ClientCastMessage(spell, false));
+    			new ClientCastMessage(spell, false, SpellTome.getTomeID(tome)));
 	}
 	
 	@Override

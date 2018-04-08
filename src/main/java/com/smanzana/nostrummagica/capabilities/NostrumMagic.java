@@ -16,6 +16,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
@@ -64,7 +65,9 @@ public class NostrumMagic implements INostrumMagic {
 	private int baseMaxMana; // Max mana without mana bonuses
 	
 	//private List<IFamiliar> familiars;
-	private boolean binding; // TODO binding interface
+	private SpellComponentWrapper bindingComponent;
+	private Spell bindingSpell;
+	private int bindingTomeID;
 	
 	private Map<String, Integer> loreLevels;
 	private Set<String> spellCRCs; // spells we've done's CRCs
@@ -94,8 +97,8 @@ public class NostrumMagic implements INostrumMagic {
 		currentQuests = new LinkedList<>();
 		completedQuests = new LinkedList<>();
 		questData = new HashMap<>();
-		
-		binding = false;
+		bindingSpell = null;
+		bindingComponent = null;
 	}
 
 	@Override
@@ -113,7 +116,8 @@ public class NostrumMagic implements INostrumMagic {
 			mana = maxMana = getMaxMana();
 			maxxp = LevelCurves.maxXP(1);
 			skillPoints = control = tech = finesse = 0;
-			binding = false;
+			bindingSpell = null;
+			bindingComponent = null;
 			
 			NostrumMagicaSounds.LEVELUP.play(entity);
 		}
@@ -244,23 +248,6 @@ public class NostrumMagic implements INostrumMagic {
 //	public void addFamiliar(IFamiliar familiar) {
 //		familiars.add(familiar);
 //	}
-
-	@Override
-	public boolean isBinding() {
-		return binding;
-	}
-
-	@Override
-	public float bindingSecondsLeft() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void startBinding(float duration) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public boolean hasLore(ILoreTagged tagged) {
@@ -596,5 +583,32 @@ public class NostrumMagic implements INostrumMagic {
 	@Override
 	public void setQuestDataMap(Map<String, IObjectiveState> map) {
 		this.questData = map;
+	}
+
+	@Override
+	public SpellComponentWrapper getBindingComponent() {
+		return this.bindingComponent;
+	}
+
+	@Override
+	public Spell getBindingSpell() {
+		return this.bindingSpell;
+	}
+
+	@Override
+	public void startBinding(Spell spell, int tomeID) {
+		this.bindingSpell = spell;
+		this.bindingComponent = spell.getRandomComponent();
+		this.bindingTomeID = tomeID;
+	}
+
+	@Override
+	public boolean isBinding() {
+		return this.bindingSpell != null;
+	}
+	
+	@Override
+	public int getBindingID() {
+		return this.bindingTomeID;
 	}
 }
