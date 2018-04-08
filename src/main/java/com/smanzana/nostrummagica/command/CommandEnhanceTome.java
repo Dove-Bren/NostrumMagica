@@ -1,8 +1,8 @@
 package com.smanzana.nostrummagica.command;
 
 import com.smanzana.nostrummagica.items.SpellTome;
-import com.smanzana.nostrummagica.items.SpellTome.EnhancementWrapper;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
+import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -16,12 +16,12 @@ public class CommandEnhanceTome extends CommandBase {
 
 	@Override
 	public String getCommandName() {
-		return "EnhanceTome";
+		return "enhancetome";
 	}
 
 	@Override
 	public String getCommandUsage(ICommandSender sender) {
-		return "/EnhanceTome EnhancementName level";
+		return "/enhancetome EnhancementName level";
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class CommandEnhanceTome extends CommandBase {
 				throw new CommandException("Could not parse level " + args[1]);
 			}
 			
-			SpellTome.addEnhancement(tome, new EnhancementWrapper(enhancement, level));
+			SpellTome.addEnhancement(tome, new SpellTomeEnhancementWrapper(enhancement, level));
 		} else {
 			sender.addChatMessage(new TextComponentString("This command must be run as a player"));
 		}

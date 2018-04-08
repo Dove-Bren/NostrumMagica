@@ -20,6 +20,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
+import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
@@ -43,24 +44,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class SpellTome extends Item implements GuiBook, ILoreTagged {
-	
-	public static final class EnhancementWrapper {
-		protected SpellTomeEnhancement enhancement;
-		protected int level;
-		
-		public EnhancementWrapper(SpellTomeEnhancement enhancement, int level) {
-			this.enhancement = enhancement;
-			this.level = level;
-		}
-
-		public SpellTomeEnhancement getEnhancement() {
-			return enhancement;
-		}
-
-		public int getLevel() {
-			return level;
-		}
-	}
 	
 	private static class LevelCurve {
 		
@@ -513,15 +496,15 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		return new Lore().add("Spell tomes carry spells to be cast over and over again.", "Casting spells from a spell tome requires reagents and mana.", "Spells must be bound into a Spell Tome in order be to used.", "Bind scrolls into the tome through the Ritual of Binding.");
 	}
 	
-	public static List<EnhancementWrapper> getEnhancements(ItemStack stack) {
+	public static List<SpellTomeEnhancementWrapper> getEnhancements(ItemStack stack) {
 		if (stack == null || !(stack.getItem() instanceof SpellTome))
 			return null;
 		
 		return readEnhancements(stack.getTagCompound());
 	}
 	
-	public static void addEnhancement(ItemStack stack, EnhancementWrapper enhancement) {
-		List<EnhancementWrapper> enhances = getEnhancements(stack);
+	public static void addEnhancement(ItemStack stack, SpellTomeEnhancementWrapper enhancement) {
+		List<SpellTomeEnhancementWrapper> enhances = getEnhancements(stack);
 		if (enhances == null)
 			enhances = new LinkedList<>();
 		
@@ -534,7 +517,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 	}
 	
 	public static void applyEnhancements(ItemStack stack, SpellCastSummary summary, EntityLiving caster) {
-		List<EnhancementWrapper> list = getEnhancements(stack);
+		List<SpellTomeEnhancementWrapper> list = getEnhancements(stack);
 		if (list == null)
 			return;
 		
@@ -542,22 +525,22 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		if (attr == null)
 			return;
 		
-		for (EnhancementWrapper wrapper : list) {
-			wrapper.enhancement.onCast(wrapper.level,
+		for (SpellTomeEnhancementWrapper wrapper : list) {
+			wrapper.getEnhancement().onCast(wrapper.getLevel(),
 					summary, caster, attr);
 		}
 	}
 	
 	public static ItemStack createTome(ItemStack pages[]) {
 		ItemStack stack = new ItemStack(instance());
-		List<EnhancementWrapper> enhancements = new LinkedList<>();
+		List<SpellTomeEnhancementWrapper> enhancements = new LinkedList<>();
 		
 		int len = (pages == null ? 0 : pages.length);
 		for (int i = 0; i < len; i++) {
 			if (pages[i] == null || !(pages[i].getItem() instanceof SpellTomePage))
 				continue;
 			
-			enhancements.add(new EnhancementWrapper(SpellTomePage.getEnhancement(pages[i]),
+			enhancements.add(new SpellTomeEnhancementWrapper(SpellTomePage.getEnhancement(pages[i]),
 					SpellTomePage.getLevel(pages[i])));
 		}
 		
@@ -575,23 +558,23 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		return stack;
 	}
 	
-	private static void writeEnhancements(List<EnhancementWrapper> enhancements, NBTTagCompound nbt) {
+	private static void writeEnhancements(List<SpellTomeEnhancementWrapper> enhancements, NBTTagCompound nbt) {
 		if (enhancements == null || enhancements.isEmpty())
 			return;
 		
 		NBTTagList list = new NBTTagList();
-		for (EnhancementWrapper enhance : enhancements) {
+		for (SpellTomeEnhancementWrapper enhance : enhancements) {
 			NBTTagCompound tag = new NBTTagCompound();
-			tag.setString(NBT_ENHANCEMENT_KEY, enhance.enhancement.getTitleKey());
-			tag.setInteger(NBT_ENHANCEMENT_LEVEL, enhance.level);
+			tag.setString(NBT_ENHANCEMENT_KEY, enhance.getEnhancement().getTitleKey());
+			tag.setInteger(NBT_ENHANCEMENT_LEVEL, enhance.getLevel());
 			list.appendTag(tag);
 		}
 		
 		nbt.setTag(NBT_ENHANCEMENTS, list);
 	}
 	
-	private static List<EnhancementWrapper> readEnhancements(NBTTagCompound nbt) {
-		List<EnhancementWrapper> list = new LinkedList<>();
+	private static List<SpellTomeEnhancementWrapper> readEnhancements(NBTTagCompound nbt) {
+		List<SpellTomeEnhancementWrapper> list = new LinkedList<>();
 		
 		if (nbt != null && nbt.hasKey(NBT_ENHANCEMENTS, NBT.TAG_LIST)) {
 			NBTTagList tags = nbt.getTagList(NBT_ENHANCEMENTS, NBT.TAG_COMPOUND);
@@ -604,7 +587,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 					continue;
 				}
 				
-				list.add(new EnhancementWrapper(enhance, tag.getInteger(NBT_ENHANCEMENT_LEVEL)));
+				list.add(new SpellTomeEnhancementWrapper(enhance, tag.getInteger(NBT_ENHANCEMENT_LEVEL)));
 			}
 		}
 		
@@ -614,11 +597,11 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-		List<EnhancementWrapper> enhances = getEnhancements(stack);
+		List<SpellTomeEnhancementWrapper> enhances = getEnhancements(stack);
 		if (enhances != null && !enhances.isEmpty()) {
-			for (EnhancementWrapper enhance : enhances) {
-				tooltip.add(I18n.format(enhance.enhancement.getNameFormat(), new Object[0])
-						+ " " + SpellTomePage.toRoman(enhance.level));
+			for (SpellTomeEnhancementWrapper enhance : enhances) {
+				tooltip.add(I18n.format(enhance.getEnhancement().getNameFormat(), new Object[0])
+						+ " " + SpellTomePage.toRoman(enhance.getLevel()));
 			}
 		}
 		

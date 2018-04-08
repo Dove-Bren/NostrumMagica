@@ -8,9 +8,9 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellTome;
-import com.smanzana.nostrummagica.items.SpellTome.EnhancementWrapper;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
+import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
@@ -80,9 +80,9 @@ public class ClientCastMessage implements IMessage {
 						return new ClientCastReplyMessage(false, att.getMana(), 0);
 					}
 					
-					List<EnhancementWrapper> enhancements = SpellTome.getEnhancements(tome);
+					List<SpellTomeEnhancementWrapper> enhancements = SpellTome.getEnhancements(tome);
 					if (enhancements != null && !enhancements.isEmpty())
-					for (EnhancementWrapper enhance : enhancements) {
+					for (SpellTomeEnhancementWrapper enhance : enhancements) {
 						enhance.getEnhancement().onCast(
 								enhance.getLevel(), summary, sp, att);
 					}

@@ -54,7 +54,6 @@ import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTableItem;
 import com.smanzana.nostrummagica.items.SpellTome;
-import com.smanzana.nostrummagica.items.SpellTome.EnhancementWrapper;
 import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
@@ -68,6 +67,7 @@ import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
+import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelBakery;
@@ -404,9 +404,9 @@ public class ClientProxy extends CommonProxy {
 		
 		if (tome != null && tome.getItem() instanceof SpellTome) {
 			// Casting from a tome.
-			List<EnhancementWrapper> enhancements = SpellTome.getEnhancements(tome);
+			List<SpellTomeEnhancementWrapper> enhancements = SpellTome.getEnhancements(tome);
 			if (enhancements != null && !enhancements.isEmpty())
-			for (EnhancementWrapper enhance : enhancements) {
+			for (SpellTomeEnhancementWrapper enhance : enhancements) {
 				enhance.getEnhancement().onCast(
 						enhance.getLevel(), summary, player, att);
 			}

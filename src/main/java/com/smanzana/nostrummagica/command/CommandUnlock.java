@@ -17,7 +17,7 @@ public class CommandUnlock extends CommandBase {
 
 	@Override
 	public String getCommandName() {
-		return "Unlock";
+		return "nostrumunlock";
 	}
 
 	@Override

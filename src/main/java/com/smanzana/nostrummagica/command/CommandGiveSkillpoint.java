@@ -17,7 +17,7 @@ public class CommandGiveSkillpoint extends CommandBase {
 
 	@Override
 	public String getCommandName() {
-		return "GiveSkillpoint";
+		return "nostrumskillpoint";
 	}
 
 	@Override

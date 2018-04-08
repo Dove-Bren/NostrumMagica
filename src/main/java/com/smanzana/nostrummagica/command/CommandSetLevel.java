@@ -17,7 +17,7 @@ public class CommandSetLevel extends CommandBase {
 
 	@Override
 	public String getCommandName() {
-		return "SetLevel";
+		return "nostrumlevel";
 	}
 
 	@Override

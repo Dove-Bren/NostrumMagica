@@ -13,12 +13,12 @@ public class CommandSpawnObelisk extends CommandBase {
 
 	@Override
 	public String getCommandName() {
-		return "SpawnObelisk";
+		return "spawnobelisk";
 	}
 
 	@Override
 	public String getCommandUsage(ICommandSender sender) {
-		return "/SpawnObelisk";
+		return "/spawnobelisk";
 	}
 
 	@Override
