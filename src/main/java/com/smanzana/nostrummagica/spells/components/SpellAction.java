@@ -31,6 +31,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
@@ -326,6 +327,7 @@ public class SpellAction {
 			Vec3d dest;
 			Vec3d direction = entity.getLookVec().normalize();
 			Vec3d source = entity.getPositionVector();
+			source = source.addVector(0, entity.getEyeHeight(), 0);
 			BlockPos bpos;
 			Vec3d translation = new Vec3d(direction.xCoord * dist,
 					direction.yCoord * dist,
@@ -337,11 +339,12 @@ public class SpellAction {
 			
 			dest = source.add(translation);
 			bpos = new BlockPos(dest.xCoord, dest.yCoord, dest.zCoord);
-			if (entity.worldObj.isAirBlock(bpos)
-					|| entity.worldObj.getBlockState(bpos).getMaterial().isLiquid()) {
-				// Whoo! Looks like we can teleport there!
+			if (isPassable(entity.worldObj, bpos)
+				&& isPassable(entity.worldObj, bpos.add(0, 1, 0))) {
+					// Whoo! Looks like we can teleport there!
 			} else {
 				int i = 4; // Attempt raytrace from (20% * i * pathlength)
+				Vec3d endpoint = dest;
 				dest = null;
 				Vec3d from;
 				double curDist;
@@ -350,26 +353,47 @@ public class SpellAction {
 						// optimization
 						from = source;
 					} else {
-						curDist = dist * (.2 * i);
+						curDist = (.2 * i);
 						from = new Vec3d(translation.xCoord * curDist,
 								translation.yCoord * curDist,
 								translation.zCoord * curDist);
 						from = source.add(from);
 					}
 					
-					RayTraceResult mop = entity.worldObj.rayTraceBlocks(from, translation, false);
+					RayTraceResult mop = entity.worldObj.rayTraceBlocks(from, endpoint, false);
 					if (mop != null && mop.hitVec.distanceTo(from) > 0.5) {
 						// We got one
-						dest = mop.hitVec;
-						break;
+						BlockPos pos = new BlockPos(mop.hitVec);
+						if (isPassable(entity.worldObj, pos) && isPassable(entity.worldObj, pos.add(0, 1, 0))) {
+							dest = mop.hitVec;
+							break;
+						}
 					}
 					
 					i--;
 				}
 			}
 			
-			if (dest != null)
-				entity.setPosition(dest.xCoord, dest.yCoord, dest.zCoord);
+			if (dest != null) {
+				entity.setPositionAndUpdate(.5 + Math.floor(dest.xCoord), Math.floor(dest.yCoord), .5 + Math.floor(dest.zCoord));
+				NostrumMagicaSounds.STATUS_BUFF1.play(entity);
+			}
+		}
+		
+		private boolean isPassable(World world, BlockPos pos) {
+			if (world.isAirBlock(pos))
+				return true;
+			
+			IBlockState state = world.getBlockState(pos);
+			
+			if (state == null)
+				return true;
+			if (state.isTranslucent())
+				return true;
+			if (state.getMaterial().isLiquid())
+				return true;
+			
+			return false;
 		}
 		
 		@Override
