@@ -220,6 +220,9 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		int initial = index;
 		
 		int indices[] = getSpellIDs(itemStack);
+		if (indices == null || indices.length == 0)
+			return -1;
+		
 		index = Math.max(0, Math.min(index + amount, indices.length - 1));
 		
 		nbt.setInteger(NBT_INDEX, index);
@@ -237,6 +240,9 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 			return;
 
 		int indices[] = getSpellIDs(itemStack);
+		if (indices == null || indices.length == 0)
+			return;
+		
 		index = Math.max(0, Math.min(index, indices.length - 1));
 		
 		NBTTagCompound nbt = itemStack.getTagCompound();
@@ -618,6 +624,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		}
 		
 		setCapacity(stack, capacity);
+		setLevel(stack, 1);
 			
 		return stack;
 	}

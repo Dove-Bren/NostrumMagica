@@ -30,6 +30,7 @@ import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SeekerIdol;
+import com.smanzana.nostrummagica.items.SpellPlate;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.SpellTomePage;
@@ -49,6 +50,7 @@ import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeConstructGeotoken;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeCreateObelisk;
+import com.smanzana.nostrummagica.rituals.outcomes.OutcomeCreateTome;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeEnchantItem;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeMark;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomePotionEffect;
@@ -604,6 +606,41 @@ public class NostrumMagica
 				);
 		
 		// Spell Tome Creation
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("tome", null,
+					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
+					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
+					new ItemStack[] {new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance())},
+					new OutcomeCreateTome())
+				);
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("tome", null,
+					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
+					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
+					new ItemStack[] {new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance()), null, new ItemStack(SpellTomePage.instance())},
+					new OutcomeCreateTome())
+				);
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("tome", null,
+					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
+					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
+					new ItemStack[] {new ItemStack(SpellTomePage.instance()), null, null, new ItemStack(SpellTomePage.instance())},
+					new OutcomeCreateTome())
+				);
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("tome", null,
+					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
+					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
+					new ItemStack[] {new ItemStack(SpellTomePage.instance()), null, null, null},
+					new OutcomeCreateTome())
+				);
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("tome", null,
+					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
+					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
+					new ItemStack[] {null, null, null, null},
+					new OutcomeCreateTome())
+				);
 		
 //		RitualRegistry.instance().addRitual(
 //				RitualRecipe.createTier2("ritual.form_obelisk.name", EMagicElement.ENDER,

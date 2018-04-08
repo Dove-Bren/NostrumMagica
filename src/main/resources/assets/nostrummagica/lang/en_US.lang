@@ -242,6 +242,8 @@ ritual.geotoken.name=Construct Geotoken
 ritual.geotoken.desc=Solidifes a Geogem into a Geotoken
 ritual.koid.name=Void Conjuration
 ritual.koid.desc=Summons 5 Koid from random dimensions
+ritual.tome.name=Ritual of Bonding
+ritual.tome.desc=Combies a plate with pages to create an unbound Spell Tome
 
 ritual.rune.physical.name=Physical Rune
 ritual.rune.fire.name=Fire Rune
