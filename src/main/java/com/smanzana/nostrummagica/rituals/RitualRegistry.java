@@ -64,7 +64,7 @@ public class RitualRegistry {
 		
 		// else it's an altar or a candle
 		for (RitualRecipe ritual : instance().knownRituals) {
-			if (ritual.matches(world, pos, element)) {
+			if (ritual.matches(player, world, pos, element)) {
 				ritual.perform(world, player, pos);
 				
 				if (!instance().ritualListeners.isEmpty()) {

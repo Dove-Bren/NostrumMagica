@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.gui.book.BookScreen;
 import com.smanzana.nostrummagica.client.gui.book.HSplitPage;
@@ -130,16 +131,20 @@ public class NostrumGuide extends Item implements GuiBook {
 		pages.add(new PlainTextPage("Not to be confused with the Ritual of Binding, the Ritual of Bonding bonds a player to a Spell Tome. The order of that phrasing is important: the PLAYER is bound to the Tome. As discussed in the previous section, Spell Tomes"));
 		pages.add(new PlainTextPage("are more than mere spell vessels. In the wrong hands, a Spell Tome is an exceptional weapon against the mage to whom it is bound. To actually form this bond, a player must enter a pact with the Tome. This is the Ritual of Bonding."));
 		pages.add(new PlainTextPage("The ritual begins with the collection of an unbound Spell Tome Pages and a tome cover, which can be found in shrine dungeons. A mage should take time to find tome components that will provide the neccessary balance between spell capacity, mana efficiency,"));
-		pages.add(new PlainTextPage("any other special effects that may exist, and (of course) visual appeal. After such components are found, the mage should bring them to a ritual altar. To start the bonding process, the mage must perform the Ritual of Bonding, which will construct the tome from the cover and pages. At that point, the player will"));
-		pages.add(new PlainTextPage("begin binding to the tome. To complete the binding process, the must hold the tome in their inventory for some period of time. Once enough time has passed and the Player has finished bonding, the tome will be made usable and can have spells binded to it."));
+		pages.add(new PlainTextPage("any other special effects that may exist, and (of course) visual appeal. After such components are found, the mage should bring them to a ritual altar. To start the bonding process, the mage must perform the Ritual of Bonding, which will construct the tome from"));
+		pages.add(new PlainTextPage("the cover and pages. At that point, the player will begin binding to the tome. To complete the binding process, the must hold the tome in their inventory for some period of time. Once enough time has passed and the Player has finished bonding, the tome will be"));
 		pages.add(new TitlePage("Ritual of Binding", true));
 		pages.add(new PlainTextPage(""));
 		
 		pages.add(new PlainTextPage(""));
 		
+		EntityPlayer player = NostrumMagica.proxy.getPlayer();
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		
 		pages.add(new TitlePage("Ritual Index", true));
 		for (RitualRecipe ritual : RitualRegistry.instance().getRegisteredRituals()) {
-			pages.add(new RitualRecipePage(ritual));
+			if (ritual.getRequirement() == null || ritual.getRequirement().matches(player, attr))
+				pages.add(new RitualRecipePage(ritual));
 		}
 		
 		pages.add(new PlainTextPage(""));

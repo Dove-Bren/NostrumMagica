@@ -4,13 +4,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.AltarBlock;
 import com.smanzana.nostrummagica.blocks.AltarBlock.AltarTileEntity;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.Candle.CandleTileEntity;
 import com.smanzana.nostrummagica.blocks.ChalkBlock;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.rituals.outcomes.IRitualOutcome;
+import com.smanzana.nostrummagica.rituals.requirements.IRitualRequirement;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.block.state.IBlockState;
@@ -40,22 +43,29 @@ public class RitualRecipe {
 	private ItemStack centerItem;
 	private ItemStack extraItems[];
 	private IRitualOutcome hook;
+	private IRitualRequirement req;
 	private String titleKey;
 	
 	public static RitualRecipe createTier1(String titleKey,
 			EMagicElement element,
 			ReagentType reagent,
+			IRitualRequirement requirement,
 			IRitualOutcome outcome) {
 		RitualRecipe recipe = new RitualRecipe(titleKey, element, 0);
 		
 		recipe.types[0] = reagent;
 		recipe.hook = outcome;
+		recipe.req = requirement;
 		
 		return recipe;
 	}
 	
-	public static RitualRecipe createTier2(String titleKey, EMagicElement element,
-			ReagentType[] reagents, ItemStack center, IRitualOutcome outcome) {
+	public static RitualRecipe createTier2(String titleKey,
+			EMagicElement element,
+			ReagentType[] reagents,
+			ItemStack center, 
+			IRitualRequirement requirement,
+			IRitualOutcome outcome) {
 		RitualRecipe recipe = new RitualRecipe(titleKey, element, 1);
 		
 		for (int i = 0; i < 4 && i < reagents.length; i++) {
@@ -64,12 +74,18 @@ public class RitualRecipe {
 		
 		recipe.centerItem = center;
 		recipe.hook = outcome;
+		recipe.req = requirement;
 		
 		return recipe;
 	}
 	
-	public static RitualRecipe createTier3(String titleKey,EMagicElement element,
-			ReagentType[] reagents, ItemStack center, ItemStack extras[], IRitualOutcome outcome) {
+	public static RitualRecipe createTier3(String titleKey,
+			EMagicElement element,
+			ReagentType[] reagents,
+			ItemStack center,
+			ItemStack extras[],
+			IRitualRequirement requirement,
+			IRitualOutcome outcome) {
 		RitualRecipe recipe = new RitualRecipe(titleKey, element, 2);
 		
 		for (int i = 0; i < 4 && i < reagents.length; i++) {
@@ -82,6 +98,7 @@ public class RitualRecipe {
 		}
 
 		recipe.hook = outcome;
+		recipe.req = requirement;
 		
 		return recipe;
 	}
@@ -98,8 +115,15 @@ public class RitualRecipe {
 			this.extraItems = new ItemStack[4];
 	}
 	
-	public boolean matches(World world, BlockPos center, EMagicElement element) {
+	public boolean matches(EntityPlayer player, World world, BlockPos center, EMagicElement element) {
 		if (element != this.element)
+			return false;
+		
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		if (attr == null)
+			return false;
+		
+		if (this.req != null && !req.matches(player, attr))
 			return false;
 		
 		if (tier > 0 && !(world.getBlockState(center).getBlock() instanceof AltarBlock))
@@ -278,6 +302,10 @@ public class RitualRecipe {
 	
 	public IRitualOutcome getOutcome() {
 		return this.hook;
+	}
+	
+	public IRitualRequirement getRequirement() {
+		return this.req;
 	}
 	
 	public String getTitleKey() {

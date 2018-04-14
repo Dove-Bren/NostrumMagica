@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.smanzana.nostrummagica.capabilities.AttributeProvider;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.command.CommandAllQuests;
 import com.smanzana.nostrummagica.command.CommandEnhanceTome;
 import com.smanzana.nostrummagica.command.CommandGiveSkillpoint;
 import com.smanzana.nostrummagica.command.CommandSetLevel;
@@ -61,11 +62,14 @@ import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnEntity;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnEntity.IEntityFactory;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeTeleportObelisk;
+import com.smanzana.nostrummagica.rituals.requirements.RRequirementElementMastery;
+import com.smanzana.nostrummagica.rituals.requirements.RRequirementShapeMastery;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.SpellRegistry;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
+import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 import com.smanzana.nostrummagica.world.NostrumChunkLoader;
 import com.smanzana.nostrummagica.world.dungeon.NostrumLootHandler;
@@ -188,6 +192,7 @@ public class NostrumMagica
     	event.registerServerCommand(new CommandSetLevel());
     	event.registerServerCommand(new CommandUnlock());
     	event.registerServerCommand(new CommandGiveSkillpoint());
+    	event.registerServerCommand(new CommandAllQuests());
     	loadSeekerRegistry(seekerRegistryFile);
     }
     
@@ -492,12 +497,21 @@ public class NostrumMagica
 					null,
 					new ReagentType[] {ReagentType.CRYSTABLOOM, ReagentType.MANDRAKE_ROOT, ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST},
 					EssenceItem.instance().getEssence(element, 1),
+					new RRequirementElementMastery(element),
 					new OutcomeSpawnItem(SpellRune.getRune(element, 1)));
 			RitualRegistry.instance().addRitual(recipe);
 		}
+		recipe = RitualRecipe.createTier2("rune.single",
+				null,
+				new ReagentType[] {ReagentType.GINSENG, ReagentType.GINSENG, ReagentType.SPIDER_SILK, ReagentType.SKY_ASH},
+				NostrumResourceItem.getItem(ResourceType.TOKEN, 1),
+				new RRequirementShapeMastery(SingleShape.instance()),
+				new OutcomeSpawnItem(SpellRune.getRune(SingleShape.instance())));
+		RitualRegistry.instance().addRitual(recipe);
 		
 		recipe = RitualRecipe.createTier1("buff.luck", null,
 				ReagentType.GRAVE_DUST,
+				null,
 				new OutcomePotionEffect(Potion.getPotionFromResourceLocation("luck"), 0, 20 * 20));
 		
 		RitualRegistry.instance().addRitual(recipe);
@@ -505,6 +519,7 @@ public class NostrumMagica
 		recipe = RitualRecipe.createTier2("enchant.infinity", null,
 				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.CRYSTABLOOM},
 				new ItemStack(Items.BOW),
+				null,
 				new OutcomeEnchantItem(Enchantments.INFINITY, 1));
 		RitualRegistry.instance().addRitual(recipe);
 		
@@ -513,11 +528,13 @@ public class NostrumMagica
 				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.CRYSTABLOOM},
 				InfusedGemItem.instance().getGem(EMagicElement.EARTH, 1),
 				new ItemStack[] {enderpearl, new ItemStack(Items.COMPASS), new ItemStack(Items.MAP, 1, OreDictionary.WILDCARD_VALUE), enderpearl},
+				null,
 				new OutcomeMark());
 		RitualRegistry.instance().addRitual(recipe);
 		
 		recipe = RitualRecipe.createTier1("recall", EMagicElement.LIGHTNING,
 				ReagentType.SKY_ASH,
+				null,
 				new OutcomeRecall());
 		RitualRegistry.instance().addRitual(recipe);
 		
@@ -526,6 +543,7 @@ public class NostrumMagica
 				RitualRecipe.createTier2("kani", null,
 					new ReagentType[] {ReagentType.MANDRAKE_ROOT, ReagentType.MANI_DUST, ReagentType.GINSENG, ReagentType.GRAVE_DUST},
 					NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1),
+					null,
 					new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1)))
 				);
 		
@@ -536,6 +554,7 @@ public class NostrumMagica
 					new ReagentType[] {ReagentType.MANDRAKE_ROOT, ReagentType.MANI_DUST, ReagentType.BLACK_PEARL, ReagentType.CRYSTABLOOM},
 					crystal,
 					new ItemStack[] {crystal, crystal, crystal, crystal},
+					null,
 					new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1)))
 				);
 		
@@ -543,6 +562,7 @@ public class NostrumMagica
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier1("magic_token", null,
 					ReagentType.MANI_DUST,
+					null,
 					new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.TOKEN, 1)))
 				);
 		
@@ -552,6 +572,7 @@ public class NostrumMagica
 					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANDRAKE_ROOT, ReagentType.SPIDER_SILK},
 					crystal,
 					new ItemStack[] {InfusedGemItem.instance().getGem(EMagicElement.FIRE, 1), null, null, InfusedGemItem.instance().getGem(EMagicElement.WIND, 1)},
+					null,
 					new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.SLAB_FIERCE, 1)))
 				);
 		
@@ -561,6 +582,7 @@ public class NostrumMagica
 					new ReagentType[] {ReagentType.CRYSTABLOOM, ReagentType.GINSENG, ReagentType.MANI_DUST, ReagentType.SKY_ASH},
 					crystal,
 					new ItemStack[] {InfusedGemItem.instance().getGem(EMagicElement.ICE, 1), null, null, InfusedGemItem.instance().getGem(EMagicElement.EARTH, 1)},
+					null,
 					new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.SLAB_KIND, 1)))
 				);
 		
@@ -570,6 +592,7 @@ public class NostrumMagica
 					new ReagentType[] {ReagentType.GINSENG, ReagentType.CRYSTABLOOM, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK},
 					NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
 					new ItemStack[] {NostrumResourceItem.getItem(ResourceType.SLAB_KIND, 1), InfusedGemItem.instance().getGem(EMagicElement.ENDER, 1), InfusedGemItem.instance().getGem(EMagicElement.LIGHTNING, 1), NostrumResourceItem.getItem(ResourceType.SLAB_FIERCE, 1)},
+					null,
 					new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.SLAB_BALANCED, 1)))
 				);
 		
@@ -579,6 +602,7 @@ public class NostrumMagica
 					new ReagentType[] {ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.MANDRAKE_ROOT, ReagentType.SPIDER_SILK},
 					new ItemStack(Items.GOLD_INGOT),
 					new ItemStack[] {NostrumResourceItem.getItem(ResourceType.PENDANT_LEFT, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), NostrumResourceItem.getItem(ResourceType.PENDANT_RIGHT, 1)},
+					null,
 					new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.PENDANT_WHOLE, 1)))
 				);
 		
@@ -588,6 +612,7 @@ public class NostrumMagica
 					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.SKY_ASH, ReagentType.MANDRAKE_ROOT, ReagentType.GINSENG},
 					NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
 					new ItemStack[] {NostrumResourceItem.getItem(ResourceType.SLAB_BALANCED, 1), new ItemStack(Items.ENDER_EYE), new ItemStack(Items.ENDER_EYE), new ItemStack(Items.COMPASS)},
+					null,
 					new OutcomeCreateObelisk())
 				);
 		
@@ -597,6 +622,7 @@ public class NostrumMagica
 					new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.GINSENG, ReagentType.MANDRAKE_ROOT, ReagentType.GRAVE_DUST},
 					new ItemStack(PositionCrystal.instance()),
 					new ItemStack[] {new ItemStack(Items.DIAMOND), NostrumResourceItem.getItem(ResourceType.TOKEN, 1), InfusedGemItem.instance().getGem(EMagicElement.EARTH, 1), new ItemStack(BlankScroll.instance())},
+					null,
 					new OutcomeConstructGeotoken())
 				);
 		
@@ -605,6 +631,7 @@ public class NostrumMagica
 				RitualRecipe.createTier2("teleport_obelisk", EMagicElement.ENDER,
 					new ReagentType[] {ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK},
 					new ItemStack(PositionCrystal.instance()),
+					null,
 					new OutcomeTeleportObelisk())
 				);
 		
@@ -614,6 +641,7 @@ public class NostrumMagica
 					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.GRAVE_DUST},
 					NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1),
 					new ItemStack[] {new ItemStack(Items.GOLD_INGOT), NostrumResourceItem.getItem(ResourceType.TOKEN, 1), new ItemStack(EssenceItem.instance(), 1, OreDictionary.WILDCARD_VALUE), new ItemStack(Items.GOLD_INGOT, 1)},
+					null,
 					new OutcomeSpawnEntity(new IEntityFactory() {
 						@Override
 						public void spawn(World world, Vec3d pos, EntityPlayer invoker) {
@@ -631,6 +659,7 @@ public class NostrumMagica
 					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
 					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
 					new ItemStack[] {new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance())},
+					null,
 					new OutcomeCreateTome())
 				);
 		RitualRegistry.instance().addRitual(
@@ -638,6 +667,7 @@ public class NostrumMagica
 					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
 					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
 					new ItemStack[] {new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance()), null, new ItemStack(SpellTomePage.instance())},
+					null,
 					new OutcomeCreateTome())
 				);
 		RitualRegistry.instance().addRitual(
@@ -645,6 +675,7 @@ public class NostrumMagica
 					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
 					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
 					new ItemStack[] {new ItemStack(SpellTomePage.instance()), null, null, new ItemStack(SpellTomePage.instance())},
+					null,
 					new OutcomeCreateTome())
 				);
 		RitualRegistry.instance().addRitual(
@@ -652,6 +683,7 @@ public class NostrumMagica
 					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
 					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
 					new ItemStack[] {new ItemStack(SpellTomePage.instance()), null, null, null},
+					null,
 					new OutcomeCreateTome())
 				);
 		RitualRegistry.instance().addRitual(
@@ -659,6 +691,7 @@ public class NostrumMagica
 					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
 					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
 					new ItemStack[] {null, null, null, null},
+					null,
 					new OutcomeCreateTome())
 				);
 		
@@ -668,6 +701,7 @@ public class NostrumMagica
 					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.BLACK_PEARL},
 					new ItemStack(SpellTome.instance(), 1, OreDictionary.WILDCARD_VALUE),
 					new ItemStack[] {new ItemStack(Items.GOLD_NUGGET), new ItemStack(SpellScroll.instance()), NostrumResourceItem.getItem(ResourceType.TOKEN, 1), new ItemStack(Items.GOLD_NUGGET)},
+					null,
 					new OutcomeBindSpell())
 				);
 		
@@ -698,10 +732,11 @@ public class NostrumMagica
     			null, wrapAttribute(AwardType.REGEN, 0.0050f));
     	new NostrumQuest("lvl2-con", QuestType.REGULAR, 3, 1, 0, 0, new String[]{"lvl1"},
     			null, wrapAttribute(AwardType.COST, -0.005f));
-    	new NostrumQuest("lvl3", QuestType.REGULAR, 4, 0, 0, 0, new String[]{"lvl2-fin", "lvl2-con"},
-    			null, wrapAttribute(AwardType.MANA, 0.005f));
-    	new NostrumQuest("lvl4", QuestType.CHALLENGE, 5, 0, 0, 0, new String[]{"lvl3"},
+    	new NostrumQuest("lvl3", QuestType.CHALLENGE, 4, 0, 0, 0, new String[]{"lvl2-fin", "lvl2-con"},
     			new ObjectiveRitual("magic_token"),
+    			wrapAttribute(AwardType.MANA, 0.005f));
+    	new NostrumQuest("lvl4", QuestType.CHALLENGE, 5, 0, 0, 0, new String[]{"lvl3"},
+    			new ObjectiveRitual("spell_binding"),
     			new IReward[]{new AlterationReward(EAlteration.INFLICT)});
     	
     	// LVL-finesse tree
@@ -728,7 +763,7 @@ public class NostrumMagica
     	
     	// LVL main tree
     	new NostrumQuest("lvl7", QuestType.CHALLENGE, 7, 0, 0, 0, new String[]{"lvl6-con", "lvl6-fin"},
-    			new ObjectiveRitual("vani"),
+    			new ObjectiveRitual("kani"),
     			wrapAttribute(AwardType.MANA, 0.020f));
     	new NostrumQuest("lvl8-fin3", QuestType.REGULAR, 8, 0, 0, 3, new String[]{"lvl7"},
     			null, wrapAttribute(AwardType.COST, -0.005f));
