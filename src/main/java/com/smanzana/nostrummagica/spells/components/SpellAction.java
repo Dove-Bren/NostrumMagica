@@ -61,6 +61,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeHell;
+import net.minecraftforge.oredict.OreDictionary;
 
 public class SpellAction {
 	
@@ -1265,6 +1266,52 @@ public class SpellAction {
 		}
 	}
 	
+	private static class BreakEffect implements SpellEffect {
+
+		private static List<ItemStack> StoneItems = null;
+		
+		private static List<ItemStack> GetStone() {
+			if (StoneItems == null) {
+				StoneItems = OreDictionary.getOres("stone");
+			}
+			
+			return StoneItems;
+		}
+		
+		private boolean onlyStone;
+		
+		public BreakEffect(boolean onlyStone) {
+			this.onlyStone = onlyStone;
+		}
+		
+		@Override
+		public void apply(EntityLivingBase caster, EntityLivingBase entity, float eff) {
+			apply(caster, entity.worldObj, entity.getPosition().add(0, -1, 0), eff);
+		}
+
+		@Override
+		public void apply(EntityLivingBase caster, World world, BlockPos block, float eff) {
+			if (world.isAirBlock(block))
+				return;
+			
+			IBlockState state = world.getBlockState(block);
+			if (state == null || state.getMaterial().isLiquid())
+				return;
+			
+			if (state.getBlockHardness(world, block) >= 100)
+				return;
+			
+			if (this.onlyStone && caster instanceof EntityPlayer) {
+				if (!OreDictionary.containsMatch(false, GetStone(), state.getBlock().getPickBlock(state, null, world, block, (EntityPlayer) caster))) {
+					return;
+				}
+			}
+			
+			world.destroyBlock(block, true);
+		}
+		
+	}
+	
 	private static class InfuseEffect implements SpellEffect {
 		
 		private int level;
@@ -1542,6 +1589,11 @@ public class SpellAction {
 	
 	public SpellAction infuse(EMagicElement element, int level) {
 		effects.add(new InfuseEffect(element, level));
+		return this;
+	}
+	
+	public SpellAction blockBreak(int level) {
+		effects.add(new BreakEffect(level <= 1));
 		return this;
 	}
 }

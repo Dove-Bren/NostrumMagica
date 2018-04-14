@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.world;
 
 import java.util.Random;
 
+import com.smanzana.nostrummagica.blocks.EssenceOre;
 import com.smanzana.nostrummagica.blocks.ManiOre;
 
 import net.minecraft.util.math.BlockPos;
@@ -15,7 +16,8 @@ import net.minecraftforge.fml.common.IWorldGenerator;
 public class NostrumOreGenerator implements IWorldGenerator {
 
 	private static enum OreGen {
-		COPPER(new WorldGenMinable(ManiOre.instance().getDefaultState(), 9), 20, 1, 240);
+		MANI(new WorldGenMinable(ManiOre.instance().getDefaultState(), 9), 20, 1, 240),
+		ESS(new WorldGenMinable(EssenceOre.instance().getDefaultState(), 3), 10, 20, 60);
 		
 		private WorldGenerator gen;
 		

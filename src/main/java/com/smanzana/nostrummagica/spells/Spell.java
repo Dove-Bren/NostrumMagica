@@ -655,9 +655,9 @@ public class Spell {
 			int elementCount) {
 		switch (element) {
 		case PHYSICAL:
-			return new SpellAction(caster).grow(elementCount);
+			return new SpellAction(caster).blockBreak(elementCount);
 		case EARTH:
-			return new SpellAction(caster).geoblock(elementCount);
+			return new SpellAction(caster).grow(elementCount);
 		case ENDER:
 			return new SpellAction(caster).phase(elementCount);
 		case FIRE:

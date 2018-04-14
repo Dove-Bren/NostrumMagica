@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.CursedIce;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
+import com.smanzana.nostrummagica.blocks.EssenceOre;
 import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.blocks.ManiOre;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
@@ -170,8 +171,7 @@ public class ClientProxy extends CommonProxy {
     	
     	list = new LinkedList<>();
     	List<ResourceLocation> list2 = new LinkedList<>();
-    	final int maxTomeCount = 7;
-    	for (i = 1; i <= maxTomeCount; i++) {
+    	for (i = 1; i <= SpellTome.MAX_TOME_COUNT; i++) {
     		list.add(new ResourceLocation(NostrumMagica.MODID, SpellTome.id + i));
     		list2.add(new ResourceLocation(NostrumMagica.MODID, SpellPlate.id + i));
     	}
@@ -267,6 +267,9 @@ public class ClientProxy extends CommonProxy {
 		registerModel(Item.getItemFromBlock(ManiOre.instance()),
 				0,
 				ManiOre.ID);
+		registerModel(Item.getItemFromBlock(EssenceOre.instance()),
+				0,
+				EssenceOre.ID);
 		registerModel(SpellTableItem.instance(),
 				0,
 				SpellTableItem.ID);

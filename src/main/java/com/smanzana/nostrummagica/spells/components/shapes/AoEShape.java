@@ -59,7 +59,7 @@ public class AoEShape extends SpellShape {
 			BlockPos pos) {
 		List<BlockPos> list = new LinkedList<>();
 		
-		int radius = Math.abs((int) param.level);
+		int radius = Math.round(Math.abs(Math.max(2.0f, param.level)));
 		
 		if (radius == 0) {
 			list.add(pos);
@@ -67,14 +67,18 @@ public class AoEShape extends SpellShape {
 			for (int i = -radius; i <= radius; i++) {
 				// x loop. I is offset of x
 				int innerRadius = radius - Math.abs(i);
-				// 0 means just that cell. Otherwise, +- n
-				if (innerRadius == 0) {
-					list.add(pos.add(i, 0, 0));
-				} else {
-					for (int j = -innerRadius; j <= innerRadius; j++) {
-						list.add(pos.add(i, 0, j));
+				for (int j = -innerRadius; j <= innerRadius; j++) {
+					int yRadius = innerRadius - Math.abs(j);
+					// 0 means just that cell. Otherwise, +- n
+					if (yRadius == 0) {
+						list.add(pos.add(i, j, 0));
+					} else {
+						for (int k = -yRadius; k <= yRadius; k++) {
+							list.add(pos.add(i, j, k));
+						}
 					}
 				}
+				
 			}
 		}
 		
