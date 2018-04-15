@@ -1278,10 +1278,10 @@ public class SpellAction {
 			return StoneItems;
 		}
 		
-		private boolean onlyStone;
+		private int level;
 		
-		public BreakEffect(boolean onlyStone) {
-			this.onlyStone = onlyStone;
+		public BreakEffect(int level) {
+			this.level = level;
 		}
 		
 		@Override
@@ -1298,14 +1298,27 @@ public class SpellAction {
 			if (state == null || state.getMaterial().isLiquid())
 				return;
 			
-			if (state.getBlockHardness(world, block) >= 100)
-				return;
-			
-			if (this.onlyStone && caster instanceof EntityPlayer) {
+			boolean onlyStone = (level <= 1);
+			if (onlyStone && caster instanceof EntityPlayer) {
 				if (!OreDictionary.containsMatch(false, GetStone(), state.getBlock().getPickBlock(state, null, world, block, (EntityPlayer) caster))) {
 					return;
 				}
 			}
+			
+			float hardness = state.getBlockHardness(world, block);
+			
+			
+			if (this.level < 3) {
+				int harvestLevel = state.getBlock().getHarvestLevel(state);
+				if (harvestLevel > 1)
+					return;
+				
+				if (hardness >= 10f || hardness < 0f)
+					return;
+			}
+			
+			if (hardness >= 100f || hardness < 0f)
+				return;
 			
 			world.destroyBlock(block, true);
 		}
@@ -1593,7 +1606,7 @@ public class SpellAction {
 	}
 	
 	public SpellAction blockBreak(int level) {
-		effects.add(new BreakEffect(level <= 1));
+		effects.add(new BreakEffect(level));
 		return this;
 	}
 }

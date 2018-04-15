@@ -149,11 +149,16 @@ public class MirrorGui extends GuiScreen {
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - GUI_HEIGHT) / 2;
 		
-		if (unlocked)
+		if (unlocked) {
+			float extra = .2f * (float) Math.sin((double) Minecraft.getSystemTime() / 1500.0);
+			float inv = .2f - extra;
+			GlStateManager.color(.8f + extra, 1f, .8f + inv, 1f);
 			Minecraft.getMinecraft().getTextureManager().bindTexture(RES_BACK_CLEAR);
-		else
+		} else {
+			GlStateManager.color(1f, 1f, 1f, 1f);
 			Minecraft.getMinecraft().getTextureManager().bindTexture(RES_BACK_CLOUD);
-		GlStateManager.color(1f, 1f, 1f, 1f);
+		}
+		
 		Gui.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT);
 		
 		// CONTENT DRAWING
@@ -171,13 +176,6 @@ public class MirrorGui extends GuiScreen {
 						&& button != buttonTechnique
 						&& button != buttonFinesse)
 					button.drawButton(this.mc, mouseX, mouseY);
-			}
-			for (int i = 0; i < this.buttonList.size(); ++i) {
-				GuiButton button = (GuiButton)this.buttonList.get(i);
-				if (button != buttonControl
-						&& button != buttonTechnique
-						&& button != buttonFinesse)
-					((QuestButton) button).drawOverlay(mc, mouseX, mouseY);
 			}
 		} else {
 			int y = 0;
@@ -295,6 +293,14 @@ public class MirrorGui extends GuiScreen {
 					leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 8, 0xFFFFFFFF);
 			this.fontRendererObj.drawString(String.format("%+.1f%%", bonusManaCost * 100f),
 					leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 9, 0xFFFFFFFF);
+			
+			for (int i = 0; i < this.buttonList.size(); ++i) {
+				GuiButton button = (GuiButton)this.buttonList.get(i);
+				if (button != buttonControl
+						&& button != buttonTechnique
+						&& button != buttonFinesse)
+					((QuestButton) button).drawOverlay(mc, mouseX, mouseY);
+			}
 			
 		} else {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
@@ -695,7 +701,7 @@ public class MirrorGui extends GuiScreen {
 		}
 		
 		private List<String> genTooltip() {
-			int maxWidth = 100; 
+			int maxWidth = 200; 
 			tooltip = new LinkedList<>();
 			String title = I18n.format("quest." + quest.getKey() + ".name", new Object[0]);
 			title = TextFormatting.BLUE + title + TextFormatting.RESET;
