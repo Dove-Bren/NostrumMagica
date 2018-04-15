@@ -45,6 +45,7 @@ import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
+import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.MirrorItem;
 import com.smanzana.nostrummagica.items.NostrumGuide;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
@@ -404,6 +405,9 @@ public class CommonProxy {
     	GameRegistry.register(
     			(new ItemBlock(EssenceOre.instance())).setRegistryName(EssenceOre.ID)
     		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(EssenceOre.ID));
+    	
+    	GameRegistry.register(MasteryOrb.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, MasteryOrb.id));
     	
     }
     

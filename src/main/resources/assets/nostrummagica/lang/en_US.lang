@@ -12,6 +12,8 @@ item.nostrum_chalk.name=Chalk
 item.altar_item.name=Altar
 item.nostrum_pos_crystal.name=Geogem
 item.nostrum_pos_token.name=Geotoken
+item.spelltome_page.name=Spelltome Page
+item.mastery_orb.name=Mastery Orb
 
 item.magicswordbase.name=Ethereal Sword
 item.magichelmbase.name=Ethereal Helm
@@ -85,7 +87,6 @@ item.pendant_left.name=Paliv Pendant Fragment
 item.pendant_right.name=Cerci Pendant Fragment
 item.pendant_whole.name=Thano Pendant
 item.token.name=Magic Token
-item.spelltome_page.name=Spelltome Page
 
 item.magic_wall.name=Magic Wall
 item.mani_ore.name=Mani Orej

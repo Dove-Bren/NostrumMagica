@@ -39,6 +39,7 @@ import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
+import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.MirrorItem;
 import com.smanzana.nostrummagica.items.NostrumGuide;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
@@ -315,6 +316,9 @@ public class ClientProxy extends CommonProxy {
 		registerModel(SpellTomePage.instance(),
 				0,
 				SpellTomePage.id);
+		registerModel(MasteryOrb.instance(),
+				0,
+				MasteryOrb.id);
 		
     	for (int i = 1; i <= SpellTome.MAX_TOME_COUNT; i++) {
     		registerModel(SpellTome.instance(), i - 1, SpellTome.id + i);

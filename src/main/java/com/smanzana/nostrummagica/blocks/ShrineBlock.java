@@ -1,14 +1,13 @@
 package com.smanzana.nostrummagica.blocks;
 
-import java.util.EnumMap;
-import java.util.Map;
-
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
+import com.smanzana.nostrummagica.trials.ShrineTrial;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -24,14 +23,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ShrineBlock extends SymbolBlock {
-	
-	private static interface ElementTrial {
-		
-		public boolean canTake(EntityPlayer entityPlayer, INostrumMagic attr);
-		
-		public void start(EntityPlayer entityPlayer, INostrumMagic attr);
-		
-	}
 	
 	public static final String ID = "shrine_block";
 	
@@ -94,19 +85,26 @@ public class ShrineBlock extends SymbolBlock {
 		
 		if (component.isElement()) {
 			// Elements either grant knowledge (if the player hasn't unlocked
-			// magic yet) OR start a trial (if the player has unlocked and the
-			// specific trial requirements have been met)
+			// magic yet) OR start a trial/advance mastery
 			if (!attr.isUnlocked()) {
 				attr.learnElement(component.getElement());
 				return true;
 			}
+
+			// Make sure we have an orb first
+			if (heldItem == null || !(heldItem.getItem() instanceof MasteryOrb)) {
+				return false;
+			}
 			
-			if (!elementTrials.containsKey(component.getElement())) {
+			EMagicElement element = component.getElement();
+			if (!ShrineTrial.shrineTrials.containsKey(element)) {
 				NostrumMagica.logger.error("No trial found for element " + component.getElement().name());
 				return false;
 			} else {
-				if (elementTrials.get(component.getElement()).canTake(playerIn, attr))
-					elementTrials.get(component.getElement()).start(playerIn, attr);
+				if (ShrineTrial.shrineTrials.get(element).canTake(playerIn, attr)) {
+					ShrineTrial.shrineTrials.get(element).start(playerIn, attr);
+					heldItem.splitStack(1);
+				}
 				
 				return true;
 			}
@@ -116,6 +114,4 @@ public class ShrineBlock extends SymbolBlock {
 		
 		return false;
 	}
-	
-	private static Map<EMagicElement, ElementTrial> elementTrials = new EnumMap<>(EMagicElement.class);
 }
