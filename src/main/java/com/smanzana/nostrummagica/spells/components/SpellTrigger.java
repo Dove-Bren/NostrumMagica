@@ -111,4 +111,12 @@ public abstract class SpellTrigger {
 	 * @return
 	 */
 	public abstract List<ItemStack> getReagents();
+
+	/**
+	 * Return the unique item used when crafting this rune.
+	 * Must be unique between all triggers or you risk not being able to craft
+	 * your trigger rune!
+	 * @return
+	 */
+	public abstract ItemStack getCraftItem();
 }

@@ -8,6 +8,8 @@ import com.smanzana.nostrummagica.spells.Spell.SpellState;
 
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -58,6 +60,11 @@ public class AITargetTrigger extends InstantTrigger {
 	@Override
 	public String getDisplayName() {
 		return "AI";
+	}
+
+	@Override
+	public ItemStack getCraftItem() {
+		return new ItemStack(Item.getItemFromBlock(Blocks.BEDROCK));
 	}
 	
 }

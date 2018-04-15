@@ -14,11 +14,13 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.oredict.OreDictionary;
 
 /**
  * Projectile. Does no tracking, etc. Instead, spawns a projectile entity and
@@ -156,6 +158,11 @@ public class ProjectileTrigger extends SpellTrigger {
 	@Override
 	public String getDisplayName() {
 		return "Projectile";
+	}
+
+	@Override
+	public ItemStack getCraftItem() {
+		return new ItemStack(Items.BOW, 1, OreDictionary.WILDCARD_VALUE);
 	}
 	
 }

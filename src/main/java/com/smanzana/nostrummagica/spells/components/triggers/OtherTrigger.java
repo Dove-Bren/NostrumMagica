@@ -8,6 +8,8 @@ import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 
+import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -51,6 +53,11 @@ public class OtherTrigger extends InstantTrigger {
 	@Override
 	public String getDisplayName() {
 		return "Other";
+	}
+
+	@Override
+	public ItemStack getCraftItem() {
+		return new ItemStack(Item.getItemFromBlock(Blocks.GLASS_PANE));
 	}
 	
 }

@@ -62,14 +62,18 @@ import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnEntity;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnEntity.IEntityFactory;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeTeleportObelisk;
+import com.smanzana.nostrummagica.rituals.requirements.RRequirementAlterationMastery;
 import com.smanzana.nostrummagica.rituals.requirements.RRequirementElementMastery;
 import com.smanzana.nostrummagica.rituals.requirements.RRequirementQuest;
 import com.smanzana.nostrummagica.rituals.requirements.RRequirementShapeMastery;
+import com.smanzana.nostrummagica.rituals.requirements.RRequirementTriggerMastery;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.SpellRegistry;
+import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
+import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 import com.smanzana.nostrummagica.world.NostrumChunkLoader;
@@ -502,6 +506,8 @@ public class NostrumMagica
 					new OutcomeSpawnItem(SpellRune.getRune(element, 1)));
 			RitualRegistry.instance().addRitual(recipe);
 		}
+		
+		// Shape Runes
 		recipe = RitualRecipe.createTier2("rune.single",
 				null,
 				new ReagentType[] {ReagentType.GINSENG, ReagentType.GINSENG, ReagentType.SPIDER_SILK, ReagentType.SKY_ASH},
@@ -510,23 +516,111 @@ public class NostrumMagica
 				new OutcomeSpawnItem(SpellRune.getRune(SingleShape.instance())));
 		RitualRegistry.instance().addRitual(recipe);
 		
+		recipe = RitualRecipe.createTier3("rune.chain",
+				null,
+				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK, ReagentType.MANDRAKE_ROOT},
+				SpellRune.getRune(SingleShape.instance()),
+				new ItemStack[] {SpellRune.getRune(SingleShape.instance()), new ItemStack(Items.GOLD_INGOT, 1), SpellRune.getRune(SingleShape.instance()), SpellRune.getRune(SingleShape.instance())},
+				new RRequirementShapeMastery(ChainShape.instance()),
+				new OutcomeSpawnItem(SpellRune.getRune(ChainShape.instance())));
+		RitualRegistry.instance().addRitual(recipe);
+		
+		recipe = RitualRecipe.createTier3("rune.aoe",
+				null,
+				new ReagentType[] {ReagentType.MANI_DUST, ReagentType.GRAVE_DUST, ReagentType.SPIDER_SILK, ReagentType.MANDRAKE_ROOT},
+				SpellRune.getRune(ChainShape.instance()),
+				new ItemStack[] {SpellRune.getRune(ChainShape.instance()), new ItemStack(Items.DIAMOND, 1), SpellRune.getRune(SingleShape.instance()), SpellRune.getRune(ChainShape.instance())},
+				new RRequirementShapeMastery(AoEShape.instance()),
+				new OutcomeSpawnItem(SpellRune.getRune(AoEShape.instance())));
+		RitualRegistry.instance().addRitual(recipe);
+		
+		for (EAlteration alteration : EAlteration.values()) {
+			recipe = RitualRecipe.createTier2("rune." + alteration.name().toLowerCase(),
+					null,
+					new ReagentType[] {ReagentType.GINSENG, ReagentType.GRAVE_DUST, ReagentType.SKY_ASH, ReagentType.GRAVE_DUST},
+					alteration.getReagents().get(0),
+					new RRequirementAlterationMastery(alteration),
+					new OutcomeSpawnItem(SpellRune.getRune(alteration, 1)));
+			RitualRegistry.instance().addRitual(recipe);
+		}
+		
+		for (SpellTrigger trigger : SpellTrigger.getAllTriggers()) {
+			recipe = RitualRecipe.createTier3("rune." + trigger.getTriggerKey().toLowerCase(),
+					null,
+					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.GINSENG, ReagentType.GINSENG},
+					NostrumResourceItem.getItem(ResourceType.TOKEN, 1),
+					new ItemStack[] {new ItemStack(Items.GOLD_NUGGET), trigger.getCraftItem(), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), new ItemStack(Items.GOLD_NUGGET, 1)},
+					new RRequirementTriggerMastery(trigger),
+					new OutcomeSpawnItem(SpellRune.getRune(trigger	, 1)));
+			RitualRegistry.instance().addRitual(recipe);
+		}
+		
+		
 		// Boons
 		{
-			recipe = RitualRecipe.createTier1("buff.luck", null,
+			recipe = RitualRecipe.createTier1("buff.luck", EMagicElement.PHYSICAL,
+					ReagentType.SPIDER_SILK,
+					new RRequirementQuest("boon"),
+					new OutcomePotionEffect(Potion.getPotionFromResourceLocation("luck"), 0, 120 * 20));
+			RitualRegistry.instance().addRitual(recipe);
+
+			recipe = RitualRecipe.createTier1("buff.speed", EMagicElement.WIND,
+					ReagentType.SKY_ASH,
+					new RRequirementQuest("boon"),
+					new OutcomePotionEffect(Potion.getPotionFromResourceLocation("speed"), 0, 120 * 20));
+			RitualRegistry.instance().addRitual(recipe);
+
+			recipe = RitualRecipe.createTier1("buff.strength", EMagicElement.FIRE,
+					ReagentType.MANDRAKE_ROOT,
+					new RRequirementQuest("boon"),
+					new OutcomePotionEffect(Potion.getPotionFromResourceLocation("strength"), 0, 120 * 20));
+			RitualRegistry.instance().addRitual(recipe);
+
+			recipe = RitualRecipe.createTier1("buff.leaping", EMagicElement.LIGHTNING,
+					ReagentType.MANI_DUST,
+					new RRequirementQuest("boon"),
+					new OutcomePotionEffect(Potion.getPotionFromResourceLocation("jump_boost"), 0, 120 * 20));
+			RitualRegistry.instance().addRitual(recipe);
+
+			recipe = RitualRecipe.createTier1("buff.regen", EMagicElement.EARTH,
+					ReagentType.GINSENG,
+					new RRequirementQuest("boon"),
+					new OutcomePotionEffect(Potion.getPotionFromResourceLocation("regeneration"), 0, 120 * 20));
+			RitualRegistry.instance().addRitual(recipe);
+
+			recipe = RitualRecipe.createTier1("buff.fireresist", EMagicElement.FIRE,
+					ReagentType.CRYSTABLOOM,
+					new RRequirementQuest("boon"),
+					new OutcomePotionEffect(Potion.getPotionFromResourceLocation("fire_resistance"), 0, 120 * 20));
+			RitualRegistry.instance().addRitual(recipe);
+
+			recipe = RitualRecipe.createTier1("buff.invisibility", EMagicElement.ENDER,
 					ReagentType.GRAVE_DUST,
 					new RRequirementQuest("boon"),
-					new OutcomePotionEffect(Potion.getPotionFromResourceLocation("luck"), 0, 20 * 20));
+					new OutcomePotionEffect(Potion.getPotionFromResourceLocation("invisibility"), 0, 120 * 20));
+			RitualRegistry.instance().addRitual(recipe);
+
+			recipe = RitualRecipe.createTier1("buff.nightvision", EMagicElement.PHYSICAL,
+					ReagentType.BLACK_PEARL,
+					new RRequirementQuest("boon"),
+					new OutcomePotionEffect(Potion.getPotionFromResourceLocation("night_vision"), 0, 120 * 20));
+			RitualRegistry.instance().addRitual(recipe);
+
+			recipe = RitualRecipe.createTier1("buff.waterbreathing", EMagicElement.ICE,
+					ReagentType.MANI_DUST,
+					new RRequirementQuest("boon"),
+					new OutcomePotionEffect(Potion.getPotionFromResourceLocation("water_breathing"), 0, 120 * 20));
 			RitualRegistry.instance().addRitual(recipe);
 		}
 		
 		// Enchantment
 		{
-		recipe = RitualRecipe.createTier2("enchant.infinity", null,
-				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.CRYSTABLOOM},
-				new ItemStack(Items.BOW),
-				new RRequirementQuest("enchant"),
-				new OutcomeEnchantItem(Enchantments.INFINITY, 1));
-		RitualRegistry.instance().addRitual(recipe);
+			recipe = RitualRecipe.createTier2("enchant.infinity", null,
+					new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.CRYSTABLOOM},
+					new ItemStack(Items.BOW),
+					new RRequirementQuest("enchant"),
+					new OutcomeEnchantItem(Enchantments.INFINITY, 1));
+			RitualRegistry.instance().addRitual(recipe);
 		}
 		
 		ItemStack enderpearl = new ItemStack(Items.ENDER_PEARL);
@@ -1055,15 +1149,15 @@ public class NostrumMagica
     			wrapAttribute(AwardType.REGEN, 0.100f))
     		.offset(3, 9);
     	
-    	new NostrumQuest("hex", QuestType.CHALLENGE, 14,
-    			0, // Control
-    			0, // Technique
-    			0, // Finesse
-    			new String[] {"boon"},
-    			new ObjectiveSpellCast().requiredAlteration(EAlteration.INFLICT)
-    									.numElems(5),
-    			wrapAttribute(AwardType.REGEN, 0.050f))
-    		.offset(4, 10);
+//    	new NostrumQuest("hex", QuestType.CHALLENGE, 14,
+//    			0, // Control
+//    			0, // Technique
+//    			0, // Finesse
+//    			new String[] {"boon"},
+//    			new ObjectiveSpellCast().requiredAlteration(EAlteration.INFLICT)
+//    									.numElems(5),
+//    			wrapAttribute(AwardType.REGEN, 0.050f))
+//    		.offset(4, 10);
     	
     	new NostrumQuest("enchant", QuestType.REGULAR, 13,
     			0, // Control

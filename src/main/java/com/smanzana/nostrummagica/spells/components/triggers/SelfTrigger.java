@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -51,6 +52,11 @@ public class SelfTrigger extends InstantTrigger {
 	@Override
 	public String getDisplayName() {
 		return "Self";
+	}
+
+	@Override
+	public ItemStack getCraftItem() {
+		return new ItemStack(Items.GOLD_INGOT);
 	}
 	
 }

@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -91,6 +92,11 @@ public class BeamTrigger extends InstantTrigger {
 	@Override
 	public String getDisplayName() {
 		return "Beam";
+	}
+
+	@Override
+	public ItemStack getCraftItem() {
+		return new ItemStack(Items.BLAZE_ROD);
 	}
 	
 }

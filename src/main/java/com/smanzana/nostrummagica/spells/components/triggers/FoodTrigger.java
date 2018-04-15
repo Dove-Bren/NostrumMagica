@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -96,6 +97,11 @@ public class FoodTrigger extends SpellTrigger {
 	@Override
 	public String getDisplayName() {
 		return "Food Level";
+	}
+
+	@Override
+	public ItemStack getCraftItem() {
+		return new ItemStack(Items.GOLDEN_CARROT);
 	}
 	
 }

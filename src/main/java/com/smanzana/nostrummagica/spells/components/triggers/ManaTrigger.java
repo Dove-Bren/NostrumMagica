@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
@@ -17,6 +18,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.oredict.OreDictionary;
 
 public class ManaTrigger extends SpellTrigger {
 	
@@ -93,6 +95,11 @@ public class ManaTrigger extends SpellTrigger {
 	@Override
 	public String getDisplayName() {
 		return "Mana Level";
+	}
+
+	@Override
+	public ItemStack getCraftItem() {
+		return new ItemStack(EssenceItem.instance(), 1, OreDictionary.WILDCARD_VALUE);
 	}
 	
 }

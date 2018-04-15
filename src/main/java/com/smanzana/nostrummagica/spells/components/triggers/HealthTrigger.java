@@ -14,9 +14,11 @@ import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.oredict.OreDictionary;
 
 public class HealthTrigger extends SpellTrigger {
 	
@@ -93,6 +95,11 @@ public class HealthTrigger extends SpellTrigger {
 	@Override
 	public String getDisplayName() {
 		return "Health Level";
+	}
+
+	@Override
+	public ItemStack getCraftItem() {
+		return new ItemStack(Items.GOLDEN_APPLE, 1, OreDictionary.WILDCARD_VALUE);
 	}
 	
 }

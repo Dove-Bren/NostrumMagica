@@ -14,6 +14,8 @@ import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -104,6 +106,11 @@ public class ProximityTrigger extends SpellTrigger {
 	@Override
 	public String getDisplayName() {
 		return "Proximity";
+	}
+
+	@Override
+	public ItemStack getCraftItem() {
+		return new ItemStack(Item.getItemFromBlock(Blocks.TRIPWIRE_HOOK));
 	}
 	
 }
