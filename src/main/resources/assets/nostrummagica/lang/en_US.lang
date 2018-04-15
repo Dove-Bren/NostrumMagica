@@ -217,6 +217,8 @@ info.element.starttrial=You've begun the trial of the element %s. Consult the gu
 info.element.mastery1=You've completed the %s trial!
 info.element.mastery2=You've advanced your mastery of the %s element
 info.element.mastery3=You've completely masted the %s element
+info.shrine.exhausted=This shrine's energies have already been used. You must find another
+info.shrine.trigger=You've absorbed the energy from the shrine and gained mastery over the %s trigger
 
 element.name=Element
 shape.name=Shape

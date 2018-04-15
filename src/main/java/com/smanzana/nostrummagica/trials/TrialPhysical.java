@@ -38,7 +38,7 @@ public class TrialPhysical extends ShrineTrial {
 			if (!attr.hasTrial(this.element))
 				return;
 			
-			this.complete((EntityPlayer) e.getEntityLiving());
+			this.complete(player);
 		}
 	}
 	

@@ -8,6 +8,8 @@ import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.trials.ShrineTrial;
 
+import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -16,6 +18,7 @@ import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -24,6 +27,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ShrineBlock extends SymbolBlock {
 	
 	public static final String ID = "shrine_block";
+	private static final PropertyBool EXHAUSTED = PropertyBool.create("exhausted");
 	
 	private static ShrineBlock instance = null;
 	public static ShrineBlock instance() {
@@ -35,6 +39,31 @@ public class ShrineBlock extends SymbolBlock {
 	
 	public ShrineBlock() {
 		super();
+		this.setDefaultState(this.blockState.getBaseState().withProperty(EXHAUSTED, false));
+	}
+	
+	public boolean isExhausted(IBlockState state) {
+		return state.getValue(EXHAUSTED);
+	}
+	
+	public IBlockState getExhaustedState(boolean exhausted) {
+		return this.getDefaultState().withProperty(EXHAUSTED, true);
+	}
+	
+	@Override
+	protected BlockStateContainer createBlockState() {
+		return new BlockStateContainer(this, EXHAUSTED);
+	}
+	
+	@Override
+	public IBlockState getStateFromMeta(int meta) {
+		boolean bool = ((meta & 0x1) == 1);
+		return getDefaultState().withProperty(EXHAUSTED, bool);
+	}
+	
+	@Override
+	public int getMetaFromState(IBlockState state) {
+		return (state.getValue(EXHAUSTED) ? 1 : 0);
 	}
 	
 	@Override
@@ -106,6 +135,27 @@ public class ShrineBlock extends SymbolBlock {
 				}
 				
 				return true;
+			}
+		}
+		
+		if (component.isTrigger()) {
+			if (attr.getTriggers().contains(component.getTrigger()))
+				return false;
+			
+			if (isExhausted(state)) {
+				if (playerIn.worldObj.isRemote) {
+					playerIn.addChatComponentMessage(new TextComponentTranslation("info.shrine.exhausted", new Object[0]));
+				}
+				return true;
+			}
+			
+			attr.addTrigger(component.getTrigger());
+			worldIn.setBlockState(pos, getExhaustedState(true));
+			SymbolTileEntity ent = (SymbolTileEntity) worldIn.getTileEntity(pos);
+			ent.setComponent(component);
+			
+			if (playerIn.worldObj.isRemote) {
+				playerIn.addChatComponentMessage(new TextComponentTranslation("info.shrine.trigger", new Object[] {component.getTrigger().getDisplayName()}));
 			}
 		}
 		

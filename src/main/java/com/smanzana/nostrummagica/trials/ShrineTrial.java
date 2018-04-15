@@ -65,8 +65,10 @@ public abstract class ShrineTrial {
 		if (mastery == null)
 			mastery = 0;
 		
+		mastery = mastery + 1;
+		
 		attr.endTrial(element);
-		attr.setElementMastery(this.element, mastery + 1);
+		attr.setElementMastery(this.element, mastery);
 		
 		if (!player.worldObj.isRemote) {
 			NostrumMagicaSounds.AMBIENT_WOOSH.play(player);

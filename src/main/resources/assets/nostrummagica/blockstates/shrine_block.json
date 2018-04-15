@@ -1,5 +1,6 @@
 {
     "variants": {
-        "normal": { "model": "nostrummagica:pedestal.obj", "x": 270 }
+        "exhausted=false": { "model": "nostrummagica:pedestal.obj", "x": 270 },
+        "exhausted=true": { "model": "nostrummagica:pedestal.obj", "x": 270 }
     }
 }
