@@ -50,6 +50,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	private static final String NBT_SPELLCRCS = "spellcrcs"; // spells we've done's CRCs
 	private static final String NBT_KNOWN_ELEMENTS = "known_elements";
 	private static final String NBT_MASTERED_ELEMENTS = "mastered_elements";
+	private static final String NBT_ELEMENT_TRIALS = "element_trials";
 	private static final String NBT_SHAPES = "shapes"; // list of shape keys
 	private static final String NBT_TRIGGERS = "triggers"; // list of trigger keys
 	private static final String NBT_ALTERATIONS = "alterations";
@@ -103,12 +104,21 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		
 		compound = new NBTTagCompound();
 		{
-			Map<EMagicElement, Boolean> map = instance.serializeMasteredElements();
+			Map<EMagicElement, Integer> map = instance.serializeElementMastery();
+			for (EMagicElement key : map.keySet()) {
+				compound.setInteger(key.name(), map.get(key));
+			}
+		}
+		nbt.setTag(NBT_MASTERED_ELEMENTS, compound);
+		
+		compound = new NBTTagCompound();
+		{
+			Map<EMagicElement, Boolean> map = instance.serializeElementTrials();
 			for (EMagicElement key : map.keySet()) {
 				compound.setBoolean(key.name(), map.get(key));
 			}
 		}
-		nbt.setTag(NBT_MASTERED_ELEMENTS, compound);
+		nbt.setTag(NBT_ELEMENT_TRIALS, compound);
 		
 		list = new NBTTagList();
 		for (SpellShape shape : instance.getShapes()) {
@@ -225,10 +235,19 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		// ELEMENTS
 		compound = tag.getCompoundTag(NBT_MASTERED_ELEMENTS);
 		for (String key : compound.getKeySet()) {
+			int val = compound.getInteger(key);
+			if (val != 0) {
+				EMagicElement elem = EMagicElement.valueOf(key);
+				instance.setElementMastery(elem, val);
+			}
+		}
+		
+		compound = tag.getCompoundTag(NBT_ELEMENT_TRIALS);
+		for (String key : compound.getKeySet()) {
 			Boolean val = compound.getBoolean(key);
 			if (val != null && val) {
 				EMagicElement elem = EMagicElement.valueOf(key);
-				instance.masterElement(elem);
+				instance.startTrial(elem);
 			}
 		}
 		

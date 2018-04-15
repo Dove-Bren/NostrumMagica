@@ -5,7 +5,6 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.MasteryOrb;
-import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.trials.ShrineTrial;
 
@@ -86,8 +85,8 @@ public class ShrineBlock extends SymbolBlock {
 		if (component.isElement()) {
 			// Elements either grant knowledge (if the player hasn't unlocked
 			// magic yet) OR start a trial/advance mastery
+			attr.learnElement(component.getElement());
 			if (!attr.isUnlocked()) {
-				attr.learnElement(component.getElement());
 				return true;
 			}
 
@@ -96,13 +95,13 @@ public class ShrineBlock extends SymbolBlock {
 				return false;
 			}
 			
-			EMagicElement element = component.getElement();
-			if (!ShrineTrial.shrineTrials.containsKey(element)) {
+			ShrineTrial trial = ShrineTrial.getTrial(component.getElement());
+			if (trial == null) {
 				NostrumMagica.logger.error("No trial found for element " + component.getElement().name());
 				return false;
 			} else {
-				if (ShrineTrial.shrineTrials.get(element).canTake(playerIn, attr)) {
-					ShrineTrial.shrineTrials.get(element).start(playerIn, attr);
+				if (trial.canTake(playerIn, attr)) {
+					trial.start(playerIn, attr);
 					heldItem.splitStack(1);
 				}
 				

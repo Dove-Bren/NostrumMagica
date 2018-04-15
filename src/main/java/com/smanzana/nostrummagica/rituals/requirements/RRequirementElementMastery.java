@@ -15,7 +15,7 @@ public class RRequirementElementMastery implements IRitualRequirement{
 
 	@Override
 	public boolean matches(EntityPlayer player, INostrumMagic attr) {
-		Boolean bool = attr.getMasteredElements().get(element);
-		return (bool != null && bool);
+		Integer level = attr.getElementMastery().get(element);
+		return (level != null && level > 0);
 	}
 }

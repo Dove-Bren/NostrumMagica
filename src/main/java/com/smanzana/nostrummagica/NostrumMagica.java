@@ -24,6 +24,7 @@ import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
+import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.PositionCrystal;
@@ -76,6 +77,14 @@ import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
+import com.smanzana.nostrummagica.trials.ShrineTrial;
+import com.smanzana.nostrummagica.trials.TrialEarth;
+import com.smanzana.nostrummagica.trials.TrialEnder;
+import com.smanzana.nostrummagica.trials.TrialFire;
+import com.smanzana.nostrummagica.trials.TrialIce;
+import com.smanzana.nostrummagica.trials.TrialLightning;
+import com.smanzana.nostrummagica.trials.TrialPhysical;
+import com.smanzana.nostrummagica.trials.TrialWind;
 import com.smanzana.nostrummagica.world.NostrumChunkLoader;
 import com.smanzana.nostrummagica.world.dungeon.NostrumLootHandler;
 
@@ -162,6 +171,7 @@ public class NostrumMagica
     	
     	registerDefaultRituals();
     	registerDefaultQuests();
+    	registerDefaultTrials();
     	
     	File dir = new File(event.getSuggestedConfigurationFile().getParentFile(), "NostrumMagica");
     	if (!dir.exists())
@@ -763,6 +773,16 @@ public class NostrumMagica
 					}, 5))
 				);
 		
+		// Mastery Orb
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("mastery_orb", null,
+						new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK},
+						NostrumResourceItem.getItem(ResourceType.PENDANT_WHOLE, 1),
+						new ItemStack[] {new ItemStack(Items.GOLD_INGOT, 1, OreDictionary.WILDCARD_VALUE), new ItemStack(Items.ENDER_PEARL, 1, OreDictionary.WILDCARD_VALUE), new ItemStack(Items.BLAZE_POWDER, 1, OreDictionary.WILDCARD_VALUE), new ItemStack(Items.GOLD_INGOT, 1, OreDictionary.WILDCARD_VALUE)},
+						new RRequirementQuest("mastery_orb"),
+						new OutcomeSpawnItem(new ItemStack(MasteryOrb.instance())))
+				);
+		
 		// Spell Tome Creation
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("tome", null,
@@ -1168,6 +1188,15 @@ public class NostrumMagica
     			wrapAttribute(AwardType.MANA, 0.050f))
     		.offset(4, 11);
     	
+    	new NostrumQuest("mastery_orb", QuestType.REGULAR,
+    			3,
+    			0,
+    			0,
+    			0,
+    			new String[]{"lvl1"},
+    			null,
+    			wrapAttribute(AwardType.MANA, 0.0100f));
+    	
 //    	new NostrumQuest("con", QuestType.REGULAR, 0,
 //    			0, // Control
 //    			0, // Technique
@@ -1176,6 +1205,16 @@ public class NostrumMagica
 //    			null,
 //    			wrapAttribute(AwardType.COST, -0.005f));
     	
+    }
+    
+    private static void registerDefaultTrials() {
+    	ShrineTrial.setTrial(EMagicElement.FIRE, new TrialFire());
+    	ShrineTrial.setTrial(EMagicElement.ICE, new TrialIce());
+    	ShrineTrial.setTrial(EMagicElement.WIND, new TrialWind());
+    	ShrineTrial.setTrial(EMagicElement.EARTH, new TrialEarth());
+    	ShrineTrial.setTrial(EMagicElement.ENDER, new TrialEnder());
+    	ShrineTrial.setTrial(EMagicElement.LIGHTNING, new TrialLightning());
+    	ShrineTrial.setTrial(EMagicElement.PHYSICAL, new TrialPhysical());
     }
     
     private static IReward[] wrapAttribute(AwardType type, float val) {

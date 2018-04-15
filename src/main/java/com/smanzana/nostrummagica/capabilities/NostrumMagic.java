@@ -76,7 +76,8 @@ public class NostrumMagic implements INostrumMagic {
 	private Map<String, Integer> loreLevels;
 	private Set<String> spellCRCs; // spells we've done's CRCs
 	private Map<EMagicElement, Boolean> knownElements;
-	private Map<EMagicElement, Boolean> masteredElements;
+	private Map<EMagicElement, Integer> elementalMastery;
+	private Map<EMagicElement, Boolean> elementTrials;
 	private List<SpellShape> shapes; // list of shape keys
 	private List<SpellTrigger> triggers; // list of trigger keys
 	private Map<EAlteration, Boolean> alterations;
@@ -94,7 +95,8 @@ public class NostrumMagic implements INostrumMagic {
 		loreLevels = new HashMap<>();
 		spellCRCs = new HashSet<>();
 		knownElements = new EnumMap<>(EMagicElement.class);
-		masteredElements = new EnumMap<>(EMagicElement.class);
+		elementalMastery = new EnumMap<>(EMagicElement.class);
+		elementTrials = new EnumMap<>(EMagicElement.class);
 		shapes = new LinkedList<>();
 		triggers = new LinkedList<>();
 		alterations = new EnumMap<>(EAlteration.class);
@@ -326,8 +328,8 @@ public class NostrumMagic implements INostrumMagic {
 	}
 
 	@Override
-	public Map<EMagicElement, Boolean> getMasteredElements() {
-		return masteredElements;
+	public Map<EMagicElement, Integer> getElementMastery() {
+		return elementalMastery;
 	}
 
 	@Override
@@ -367,12 +369,12 @@ public class NostrumMagic implements INostrumMagic {
 	}
 
 	@Override
-	public void masterElement(EMagicElement element) {
+	public void setElementMastery(EMagicElement element, int level) {
 		Boolean known = knownElements.get(element);
 		if (known == null || !known)
 			learnElement(element);
 		
-		masteredElements.put(element, Boolean.TRUE);
+		elementalMastery.put(element, level);
 	}
 
 	@Override
@@ -449,8 +451,13 @@ public class NostrumMagic implements INostrumMagic {
 	}
 
 	@Override
-	public Map<EMagicElement, Boolean> serializeMasteredElements() {
-		return this.masteredElements;
+	public Map<EMagicElement, Integer> serializeElementMastery() {
+		return this.elementalMastery;
+	}
+	
+	@Override
+	public Map<EMagicElement, Boolean> serializeElementTrials() {
+		return this.elementTrials;
 	}
 
 	@Override
@@ -479,7 +486,8 @@ public class NostrumMagic implements INostrumMagic {
 		this.loreLevels = cap.serializeLoreLevels();
 		this.spellCRCs = cap.serializeSpellHistory();
 		this.knownElements = cap.serializeKnownElements();
-		this.masteredElements = cap.serializeMasteredElements();
+		this.elementalMastery = cap.serializeElementMastery();
+		this.elementTrials = cap.serializeElementTrials();
 		this.alterations = cap.serializeAlterations();
 		this.shapes = cap.getShapes();
 		this.triggers = cap.getTriggers();
@@ -644,5 +652,21 @@ public class NostrumMagic implements INostrumMagic {
 		this.bindingSpell = null;
 		this.bindingTomeID = 0;
 		this.bindingComponent = null;
+	}
+
+	@Override
+	public void startTrial(EMagicElement element) {
+		this.elementTrials.put(element, Boolean.TRUE);
+	}
+
+	@Override
+	public void endTrial(EMagicElement element) {
+		this.elementTrials.put(element, Boolean.FALSE);
+	}
+
+	@Override
+	public boolean hasTrial(EMagicElement element) {
+		Boolean bool = this.elementTrials.get(element);
+		return (bool != null && bool);
 	}
 }
