@@ -472,7 +472,7 @@ public class MirrorGui extends GuiScreen {
 				state = QuestState.COMPLETED;
 			else if (NostrumMagica.getActiveQuests(player).contains(quest))
 				state = QuestState.TAKEN;
-			else if (canTake(quest))
+			else if (NostrumMagica.canTakeQuest(player, quest))
 				state = QuestState.INACTIVE;
 			else
 				state = QuestState.UNAVAILABLE;
@@ -483,13 +483,6 @@ public class MirrorGui extends GuiScreen {
 			this.addButton(button);
 			questButtons.put(quest, button);
 		}
-	}
-	
-	private boolean canTake(NostrumQuest quest) {
-		return quest.getReqLevel() <= level
-				&& quest.getReqControl() <= control
-				&& quest.getReqTechnique() <= technique
-				&& quest.getReqFinesse() <= finesse;
 	}
 	
 	/**
@@ -733,59 +726,61 @@ public class MirrorGui extends GuiScreen {
             		tooltip.add(TextFormatting.GOLD + desc + TextFormatting.RESET);
             }
             
-            if (this.state == QuestState.INACTIVE && canTake(quest)) {
+            if (this.state == QuestState.INACTIVE && NostrumMagica.canTakeQuest(player, quest)) {
             	tooltip.add(TextFormatting.GREEN + "Click to Accept" + TextFormatting.RESET);
             }
             
-            for (String line : tooltip) {
-            	int width = fontRendererObj.getStringWidth(line);
-            	if (width > maxWidth)
-            		maxWidth = width;
-            }
-            
-            String desc = I18n.format("quest." + quest.getKey() + ".desc", new Object[0]);
-            if (desc != null && !desc.isEmpty()) {
-            	tooltip.add("");
-            	StringBuffer buf = new StringBuffer();
-            	int index = 0;
-            	while (index < desc.length()) {
-            		if (desc.charAt(index) == '|') {
-            			tooltip.add(buf.toString());
-            			buf = new StringBuffer();
-            		} else {
-	            		int oldlen = fontRendererObj.getStringWidth(buf.toString());
-	            		if (oldlen + fontRendererObj.getCharWidth(desc.charAt(index)) > maxWidth) {
-	            			// Go back until we find a space
-	            			boolean isSpace = desc.charAt(index) == ' ';
-	            			if (!isSpace) {
-	            				int last = buf.length() - 1;
-	            				while (last > 0 && buf.charAt(last) != ' ')
-	            					last--;
-	            				
-	            				if (last == 0) {
-	            					// oh well
-	            					tooltip.add(buf.toString());
-	            					buf = new StringBuffer();
-	            				} else {
-	            					tooltip.add(buf.substring(0, last));
-	            					StringBuffer oldbuf = buf;
-	            					buf = new StringBuffer();
-	            					buf.append(oldbuf.substring(last + 1));
-	            				}
-	            			} else {
-	            				tooltip.add(buf.toString());
-		            			buf = new StringBuffer();
-	            				index++;
-		            			continue; // Don't add it
-	            			}
+            if (this.state == QuestState.TAKEN || this.state == QuestState.COMPLETED) {
+	            for (String line : tooltip) {
+	            	int width = fontRendererObj.getStringWidth(line);
+	            	if (width > maxWidth)
+	            		maxWidth = width;
+	            }
+	            
+	            String desc = I18n.format("quest." + quest.getKey() + ".desc", new Object[0]);
+	            if (desc != null && !desc.isEmpty()) {
+	            	tooltip.add("");
+	            	StringBuffer buf = new StringBuffer();
+	            	int index = 0;
+	            	while (index < desc.length()) {
+	            		if (desc.charAt(index) == '|') {
+	            			tooltip.add(buf.toString());
+	            			buf = new StringBuffer();
+	            		} else {
+		            		int oldlen = fontRendererObj.getStringWidth(buf.toString());
+		            		if (oldlen + fontRendererObj.getCharWidth(desc.charAt(index)) > maxWidth) {
+		            			// Go back until we find a space
+		            			boolean isSpace = desc.charAt(index) == ' ';
+		            			if (!isSpace) {
+		            				int last = buf.length() - 1;
+		            				while (last > 0 && buf.charAt(last) != ' ')
+		            					last--;
+		            				
+		            				if (last == 0) {
+		            					// oh well
+		            					tooltip.add(buf.toString());
+		            					buf = new StringBuffer();
+		            				} else {
+		            					tooltip.add(buf.substring(0, last));
+		            					StringBuffer oldbuf = buf;
+		            					buf = new StringBuffer();
+		            					buf.append(oldbuf.substring(last + 1));
+		            				}
+		            			} else {
+		            				tooltip.add(buf.toString());
+			            			buf = new StringBuffer();
+		            				index++;
+			            			continue; // Don't add it
+		            			}
+		            		}
+	            		
+	            			buf.append(desc.charAt(index));
 	            		}
-            		
-            			buf.append(desc.charAt(index));
-            		}
-            		index++;
-            	}
-            	if (buf.length() > 0)
-            		tooltip.add(buf.toString());
+	            		index++;
+	            	}
+	            	if (buf.length() > 0)
+	            		tooltip.add(buf.toString());
+	            }
             }
             
             return tooltip;

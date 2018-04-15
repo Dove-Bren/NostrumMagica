@@ -63,6 +63,7 @@ import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnEntity.IEntityFac
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeTeleportObelisk;
 import com.smanzana.nostrummagica.rituals.requirements.RRequirementElementMastery;
+import com.smanzana.nostrummagica.rituals.requirements.RRequirementQuest;
 import com.smanzana.nostrummagica.rituals.requirements.RRequirementShapeMastery;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -509,32 +510,37 @@ public class NostrumMagica
 				new OutcomeSpawnItem(SpellRune.getRune(SingleShape.instance())));
 		RitualRegistry.instance().addRitual(recipe);
 		
-		recipe = RitualRecipe.createTier1("buff.luck", null,
-				ReagentType.GRAVE_DUST,
-				null,
-				new OutcomePotionEffect(Potion.getPotionFromResourceLocation("luck"), 0, 20 * 20));
+		// Boons
+		{
+			recipe = RitualRecipe.createTier1("buff.luck", null,
+					ReagentType.GRAVE_DUST,
+					new RRequirementQuest("boon"),
+					new OutcomePotionEffect(Potion.getPotionFromResourceLocation("luck"), 0, 20 * 20));
+			RitualRegistry.instance().addRitual(recipe);
+		}
 		
-		RitualRegistry.instance().addRitual(recipe);
-		
+		// Enchantment
+		{
 		recipe = RitualRecipe.createTier2("enchant.infinity", null,
 				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.CRYSTABLOOM},
 				new ItemStack(Items.BOW),
-				null,
+				new RRequirementQuest("enchant"),
 				new OutcomeEnchantItem(Enchantments.INFINITY, 1));
 		RitualRegistry.instance().addRitual(recipe);
+		}
 		
 		ItemStack enderpearl = new ItemStack(Items.ENDER_PEARL);
 		recipe = RitualRecipe.createTier3("mark", EMagicElement.WIND,
 				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.CRYSTABLOOM},
 				InfusedGemItem.instance().getGem(EMagicElement.EARTH, 1),
 				new ItemStack[] {enderpearl, new ItemStack(Items.COMPASS), new ItemStack(Items.MAP, 1, OreDictionary.WILDCARD_VALUE), enderpearl},
-				null,
+				new RRequirementQuest("recall"),
 				new OutcomeMark());
 		RitualRegistry.instance().addRitual(recipe);
 		
 		recipe = RitualRecipe.createTier1("recall", EMagicElement.LIGHTNING,
 				ReagentType.SKY_ASH,
-				null,
+				new RRequirementQuest("recall"),
 				new OutcomeRecall());
 		RitualRegistry.instance().addRitual(recipe);
 		
@@ -543,7 +549,7 @@ public class NostrumMagica
 				RitualRecipe.createTier2("kani", null,
 					new ReagentType[] {ReagentType.MANDRAKE_ROOT, ReagentType.MANI_DUST, ReagentType.GINSENG, ReagentType.GRAVE_DUST},
 					NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1),
-					null,
+					new RRequirementQuest("lvl3"),
 					new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1)))
 				);
 		
@@ -554,7 +560,7 @@ public class NostrumMagica
 					new ReagentType[] {ReagentType.MANDRAKE_ROOT, ReagentType.MANI_DUST, ReagentType.BLACK_PEARL, ReagentType.CRYSTABLOOM},
 					crystal,
 					new ItemStack[] {crystal, crystal, crystal, crystal},
-					null,
+					new RRequirementQuest("lvl7"),
 					new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1)))
 				);
 		
@@ -612,8 +618,18 @@ public class NostrumMagica
 					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.SKY_ASH, ReagentType.MANDRAKE_ROOT, ReagentType.GINSENG},
 					NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
 					new ItemStack[] {NostrumResourceItem.getItem(ResourceType.SLAB_BALANCED, 1), new ItemStack(Items.ENDER_EYE), new ItemStack(Items.ENDER_EYE), new ItemStack(Items.COMPASS)},
-					null,
+					new RRequirementQuest("obelisk"),
 					new OutcomeCreateObelisk())
+				);
+		
+		// GeoGem -- tier 3. Compass center. 2x Crystal, 2x reagent, Earth Crystal
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("geogem", EMagicElement.EARTH,
+					new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.MANDRAKE_ROOT, ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST},
+					new ItemStack(Items.COMPASS),
+					new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), new ItemStack(ReagentItem.instance(), 1, OreDictionary.WILDCARD_VALUE), new ItemStack(ReagentItem.instance(), 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1)},
+					new RRequirementQuest("geogem"),
+					new OutcomeSpawnItem(new ItemStack(PositionCrystal.instance(), 1)))
 				);
 		
 		// GeoToken -- tier 3. Geogem center. Magic Token, earth crystal, blank scroll, diamond
@@ -621,8 +637,8 @@ public class NostrumMagica
 				RitualRecipe.createTier3("geotoken", EMagicElement.EARTH,
 					new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.GINSENG, ReagentType.MANDRAKE_ROOT, ReagentType.GRAVE_DUST},
 					new ItemStack(PositionCrystal.instance()),
-					new ItemStack[] {new ItemStack(Items.DIAMOND), NostrumResourceItem.getItem(ResourceType.TOKEN, 1), InfusedGemItem.instance().getGem(EMagicElement.EARTH, 1), new ItemStack(BlankScroll.instance())},
-					null,
+					new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), NostrumResourceItem.getItem(ResourceType.TOKEN, 1), InfusedGemItem.instance().getGem(EMagicElement.EARTH, 1), new ItemStack(BlankScroll.instance())},
+					new RRequirementQuest("geotoken"),
 					new OutcomeConstructGeotoken())
 				);
 		
@@ -631,7 +647,7 @@ public class NostrumMagica
 				RitualRecipe.createTier2("teleport_obelisk", EMagicElement.ENDER,
 					new ReagentType[] {ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK},
 					new ItemStack(PositionCrystal.instance()),
-					null,
+					new RRequirementQuest("obelisk"),
 					new OutcomeTeleportObelisk())
 				);
 		
@@ -972,6 +988,91 @@ public class NostrumMagica
     			new ObjectiveRitual("balanced_infusion"),
     			new IReward[] {new AlterationReward(EAlteration.CONJURE)});
     	
+    	new NostrumQuest("geogem", QuestType.CHALLENGE, 5,
+    			0, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[0],
+    			new ObjectiveSpellCast().requiredElement(EMagicElement.EARTH),
+    			wrapAttribute(AwardType.COST, -0.020f))
+    		.offset(-3, 2);
+    	
+    	new NostrumQuest("geotoken", QuestType.CHALLENGE, 5,
+    			0, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[] {"geogem"},
+    			new ObjectiveRitual("geogem"),
+    			wrapAttribute(AwardType.COST, -0.030f))
+    		.offset(-4, 2);
+    	
+    	new NostrumQuest("obelisk", QuestType.CHALLENGE, 10,
+    			0, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[] {"geotoken"},
+    			new ObjectiveSpellCast().requiredElement(EMagicElement.ENDER)
+    			.requiredElement(EMagicElement.ENDER)
+    			.requiredElement(EMagicElement.ENDER),
+    			wrapAttribute(AwardType.MANA, 0.040f))
+    		.offset(-5, 6);
+    	
+    	new NostrumQuest("obelisk2", QuestType.REGULAR, 10,
+    			0, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[] {"obelisk"},
+    			null,
+    			wrapAttribute(AwardType.MANA, 0.010f))
+    		.offset(-6, 6);
+    	
+    	new NostrumQuest("recall", QuestType.CHALLENGE, 10,
+    			0, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[] {"geotoken"},
+    			new ObjectiveSpellCast().requiredElement(EMagicElement.WIND),
+    			wrapAttribute(AwardType.REGEN, 0.040f))
+    		.offset(-5, 8);
+    	
+    	new NostrumQuest("recall2", QuestType.REGULAR, 10,
+    			0, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[] {"recall"},
+    			null,
+    			wrapAttribute(AwardType.REGEN, 0.010f))
+    		.offset(-6, 8);
+    	
+    	new NostrumQuest("boon", QuestType.CHALLENGE, 12,
+    			0, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[0],
+    			new ObjectiveSpellCast().requiredAlteration(EAlteration.RESIST)
+    									.requiredAlteration(EAlteration.SUPPORT)
+    									.requiredAlteration(EAlteration.GROWTH),
+    			wrapAttribute(AwardType.REGEN, 0.100f))
+    		.offset(3, 9);
+    	
+    	new NostrumQuest("hex", QuestType.CHALLENGE, 14,
+    			0, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[] {"boon"},
+    			new ObjectiveSpellCast().requiredAlteration(EAlteration.INFLICT)
+    									.numElems(5),
+    			wrapAttribute(AwardType.REGEN, 0.050f))
+    		.offset(4, 10);
+    	
+    	new NostrumQuest("enchant", QuestType.REGULAR, 13,
+    			0, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[] {"boon"},
+    			null,
+    			wrapAttribute(AwardType.MANA, 0.050f))
+    		.offset(4, 11);
     	
 //    	new NostrumQuest("con", QuestType.REGULAR, 0,
 //    			0, // Control
@@ -988,10 +1089,14 @@ public class NostrumMagica
     }
     
     public static boolean getQuestAvailable(EntityPlayer player, NostrumQuest quest) {
-    	if (quest.getParentKeys() == null || quest.getParentKeys().length == 0)
-			return true;
+    	if (quest.getParentKeys() == null || quest.getParentKeys().length == 0) {
+			return canTakeQuest(player, quest);
+    	}
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		if (attr == null)
+			return false;
+		
 		for (String parent : quest.getParentKeys()) {
 			if (attr.getCompletedQuests().contains(parent))
 				return true;
@@ -999,4 +1104,15 @@ public class NostrumMagica
 		
 		return false;
     }
+    
+    public static boolean canTakeQuest(EntityPlayer player, NostrumQuest quest) {
+    	INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		if (attr == null)
+			return false;
+		
+		return quest.getReqLevel() <= attr.getLevel()
+				&& quest.getReqControl() <= attr.getControl()
+				&& quest.getReqTechnique() <= attr.getTech()
+				&& quest.getReqFinesse() <= attr.getFinesse();
+	}
 }

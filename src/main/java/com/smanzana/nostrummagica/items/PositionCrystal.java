@@ -5,12 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -23,10 +21,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.oredict.OreDictionary;
 
 /**
  * Crystal that stores the location of a position in a world
@@ -36,10 +32,7 @@ import net.minecraftforge.oredict.OreDictionary;
 public class PositionCrystal extends Item implements ILoreTagged {
 
 	public static void init() {
-		GameRegistry.addRecipe(new ItemStack(instance), " C ", "ROR", " C ",
-				'O', Items.COMPASS,
-				'C', NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1),
-				'R', new ItemStack(ReagentItem.instance(), 1, OreDictionary.WILDCARD_VALUE));
+		;
 	}
 	
 	public static final String ID = "nostrum_pos_crystal";

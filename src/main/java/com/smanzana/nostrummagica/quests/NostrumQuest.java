@@ -73,6 +73,12 @@ public class NostrumQuest {
 	 * Rewards are only received once.
 	 */
 	protected IReward[] rewards;
+	
+	/**
+	 * Optional graphical offsets
+	 */
+	protected int offsetX;
+	protected int offsetY;
 
 	/**
 	 * Creates a new quest.
@@ -120,7 +126,16 @@ public class NostrumQuest {
 		if (this.objective != null)
 			this.objective.setParentQuest(this);
 		
+		this.offsetX = 0;
+		this.offsetY = 0;
+		
 		NostrumQuest.register(this);
+	}
+	
+	public NostrumQuest offset(int x, int y) {
+		this.offsetX = x;
+		this.offsetY = y;
+		return this;
 	}
 	
 	public String getKey() {
@@ -160,11 +175,11 @@ public class NostrumQuest {
 	}
 	
 	public int getPlotX() {
-		return reqControl - reqFinesse;
+		return this.offsetX + (reqControl - reqFinesse);
 	}
 	
 	public int getPlotY() {
-		return -(reqLevel != 0 ? reqLevel-1 : 0) + reqTechnique;
+		return this.offsetY + (-(reqLevel != 0 ? reqLevel-1 : 0) + reqTechnique);
 	}
 	
 	/**
