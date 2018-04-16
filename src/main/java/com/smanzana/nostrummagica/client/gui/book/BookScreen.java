@@ -284,6 +284,53 @@ public class BookScreen extends GuiScreen {
         }
     }
 	
+	/**
+	 * Splits one big long string into multiple lined pages based on the
+	 * size of the pages.
+	 * @param pages
+	 * @param input
+	 */
+	public static void makePagesFrom(List<IBookPage> pages, String input) {
+		FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
+		final int maxLines = (PAGE_HEIGHT / (LinedTextPage.LINE_HEIGHT_EXTRA + fonter.FONT_HEIGHT)) - 1;
+		String lines[];
+		int count;
+		StringBuffer buffer = new StringBuffer();
+		while (!input.trim().isEmpty()) {
+			lines = new String[maxLines];
+			count = 0;
+			while (count < maxLines) {
+				
+				if (input.trim().isEmpty()) {
+					lines[count++] = buffer.toString();
+					buffer = new StringBuffer();
+					break;
+				}
+				int length = 0;
+				while (!input.trim().isEmpty()) {
+					int pos = input.indexOf(' ');
+					String word;
+					if (pos == -1)
+						word = input;
+					else
+						word = input.substring(0, pos + 1);
+					
+					int width = fonter.getStringWidth(word);
+					if (length > 0 && length + width > PAGE_WIDTH) {
+						lines[count++] = buffer.toString();
+						buffer = new StringBuffer();
+						break;
+					} else {
+						buffer.append(word);
+						input = input.substring(pos == -1 ? word.length() : pos + 1);
+						length += width;
+					}
+				}
+			}
+			pages.add(new LinedTextPage(lines));
+		}
+	}
+	
 	private static class TableOfContentsPage implements IClickableBookPage {
 
 		private boolean title;
