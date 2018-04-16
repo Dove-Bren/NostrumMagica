@@ -560,7 +560,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 			}
 		}
 		
-		return new BookScreen(pages);
+		return new BookScreen("nostrum_tome_" + getTomeID(stack), pages);
 	}
 
 	@Override

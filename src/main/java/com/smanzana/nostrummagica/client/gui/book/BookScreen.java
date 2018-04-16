@@ -1,14 +1,19 @@
 package com.smanzana.nostrummagica.client.gui.book;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
@@ -22,28 +27,49 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BookScreen extends GuiScreen {
 	
+	private static Map<String, Integer> lastPage;
+	private static int getLastPage(String key) {
+		if (lastPage == null)
+			lastPage = new HashMap<>();
+		
+		Integer val = lastPage.get(key);
+		if (val == null) {
+			val = 0;
+			lastPage.put(key, val);
+		}
+		
+		return val;
+	}
+	
+	private static void setLastPage(String key, int page) {
+		if (lastPage == null)
+			lastPage = new HashMap<>();
+		
+		lastPage.put(key, page);
+	}
+	
 	protected static final ResourceLocation background = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/book_back.png");
 	
-	protected static final int TEXT_WIDTH = 293;
+	protected static final int TEXT_WIDTH = 350;
 	
-	protected static final int TEXT_HEIGHT = 180;
+	protected static final int TEXT_HEIGHT = 210;
 	
-	protected static final int TEXT_WHOLE_WIDTH = 300;
+	protected static final int TEXT_WHOLE_WIDTH = 350;
 	
-	protected static final int TEXT_WHOLE_HEIGHT = 220;
+	protected static final int TEXT_WHOLE_HEIGHT = 250;
 	
-	protected static final int PAGE_WIDTH = 110;
+	protected static final int PAGE_WIDTH = 132;
 	
-	protected static final int PAGE_HEIGHT = 150;
+	protected static final int PAGE_HEIGHT = 180;
 	
-	protected static final int PAGE_HOFFSET = 17;
+	protected static final int PAGE_HOFFSET = 25;
 	
-	protected static final int PAGE_VOFFSET = 16;
+	protected static final int PAGE_VOFFSET = 14;
 	
 	/**
 	 * Distance between left and right page
 	 */
-	protected static final int PAGE_DISTANCE = 40;
+	protected static final int PAGE_DISTANCE = 35;
 	
 	private int currentPage;
 	
@@ -51,18 +77,25 @@ public class BookScreen extends GuiScreen {
 	
 	private List<IBookPage> pages;
 	
+	private String screenKey;
+	
 	private NextPageButton backButton;
-	
 	private NextPageButton nextButton;
+	private HomeButton homeButton;
 	
-	public BookScreen(List<IBookPage> pages) {
-		this(pages, true);
+	public BookScreen(String screenKey, List<IBookPage> pages) {
+		this(screenKey, pages, true);
 	}
 	
-	public BookScreen(List<IBookPage> pages, boolean tableOfContents){
+	public BookScreen(String screenKey, List<IBookPage> pages, boolean tableOfContents){
 		this.pages = pages;
 		this.currentPage = 0;
 		this.maxPage = (pages.size() - 1) / 2;
+		
+		this.screenKey = screenKey;
+		
+		this.width = TEXT_WIDTH;
+		this.height = TEXT_HEIGHT;
 		
 		if (tableOfContents) {
 			LinkedList<String> titles = new LinkedList<>();
@@ -98,20 +131,22 @@ public class BookScreen extends GuiScreen {
 
 	@Override
 	public void initGui() {
-		currentPage = 0;
+		currentPage = getLastPage(screenKey);
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - TEXT_HEIGHT) / 2;
-		backButton = new NextPageButton(0, leftOffset + 20, topOffset + 150, false);
+		backButton = new NextPageButton(0, leftOffset + 30, topOffset + PAGE_HEIGHT + 5, false);
 		this.buttonList.add(backButton);
-		nextButton = new NextPageButton(1, leftOffset + TEXT_WIDTH - (20 + 23), topOffset + 150, true);
-																	//     /\ arrow size
+		nextButton = new NextPageButton(1, leftOffset + TEXT_WIDTH - (35 + 23), topOffset + PAGE_HEIGHT + 5, true);
 		this.buttonList.add(nextButton);
+		homeButton = new HomeButton(2, leftOffset + 30 + 24, topOffset + PAGE_HEIGHT + 3);
+		this.buttonList.add(homeButton);
 	}
 	
 	@Override	
 	public void updateScreen() {
 		backButton.visible = currentPage > 0;
 		nextButton.visible = currentPage < maxPage;
+		homeButton.visible = currentPage > 0;
 	}
 	
 	@Override
@@ -168,7 +203,11 @@ public class BookScreen extends GuiScreen {
 		} else if (button == nextButton) {
 			if (currentPage < maxPage)
 				currentPage++;
+		} else if (button == homeButton) {
+			currentPage = 0;
 		}
+		
+		setLastPage(screenKey, currentPage);
 	}
 	
 	public RenderItem getRenderItem() {
@@ -192,6 +231,7 @@ public class BookScreen extends GuiScreen {
 	public void requestPageChange(int newIndex) {
 		// index is page index. Not book index.
 		currentPage = newIndex / 2; // Now it's book index
+		setLastPage(this.screenKey, currentPage);
 	}
 	
 	@Override
@@ -222,7 +262,6 @@ public class BookScreen extends GuiScreen {
 				}
 			}
 		}
-		
 		
 		super.mouseClicked(mouseX, mouseY, mouseButton);
 	}
@@ -265,7 +304,7 @@ public class BookScreen extends GuiScreen {
                 GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
                 mc.getTextureManager().bindTexture(background);
                 int textureX = 0;
-                int textureY = 192;
+                int textureY = 223;
 
                 if (isButtonPressed)
                 {
@@ -281,6 +320,43 @@ public class BookScreen extends GuiScreen {
         				23, 13, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
                 
             }
+        }
+    }
+
+	@SideOnly(Side.CLIENT)
+    static class HomeButton extends GuiButton {
+		public HomeButton(int parButtonId, int parPosX, int parPosY) {
+            super(parButtonId, parPosX, parPosY, 23, 13, "");
+		}
+
+		/**
+		 *Draws this button to the screen.
+		 */
+        @Override
+        public void drawButton(Minecraft mc, int parX, int parY) {
+        	if (visible) {
+        		boolean isButtonPressed = (parX >= xPosition 
+        				&& parY >= yPosition 
+                      && parX < xPosition + width 
+                      && parY < yPosition + height);
+
+        		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+                mc.getTextureManager().bindTexture(background);
+                int textureX = 48;
+                int textureY = 221;
+
+                if (isButtonPressed) {
+                	textureX += 16;
+                }
+
+                Gui.drawModalRectWithCustomSizedTexture(xPosition, yPosition, textureX, textureY,
+                		16, 16, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+                
+            }
+        }
+        
+        public void playPressSound(SoundHandler soundHandlerIn) {
+        	soundHandlerIn.playSound(PositionedSoundRecord.getMasterRecord(NostrumMagicaSounds.UI_TICK.getEvent(), 1.0F));
         }
     }
 	

@@ -129,6 +129,6 @@ public class NostrumGuide extends Item implements GuiBook {
 		}
 		
 		pages.add(new PlainTextPage(""));
-		return new BookScreen(pages);
+		return new BookScreen("nostrum_guide", pages);
 	}
 }
