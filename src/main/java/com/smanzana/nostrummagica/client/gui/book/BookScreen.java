@@ -132,6 +132,11 @@ public class BookScreen extends GuiScreen {
 	@Override
 	public void initGui() {
 		currentPage = getLastPage(screenKey);
+		if (currentPage > maxPage) {
+			// This is probably a different book
+			setLastPage(screenKey, 0);
+			currentPage = 0;
+		}
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - TEXT_HEIGHT) / 2;
 		backButton = new NextPageButton(0, leftOffset + 30, topOffset + PAGE_HEIGHT + 5, false);

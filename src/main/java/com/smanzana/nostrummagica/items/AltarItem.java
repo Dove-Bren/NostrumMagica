@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.items;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.AltarBlock;
+import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
@@ -16,7 +17,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class AltarItem extends Item implements ILoreTagged {
 
@@ -26,7 +26,7 @@ public class AltarItem extends Item implements ILoreTagged {
 				"SSS", " T ", "TRT",
 				'S', Blocks.STONE_SLAB,
 				'T', Blocks.STONE,
-				'R', new ItemStack(ReagentItem.instance(), 1, OreDictionary.WILDCARD_VALUE)
+				'R', NostrumResourceItem.getItem(ResourceType.TOKEN, 1)
 				);
 	}
 	

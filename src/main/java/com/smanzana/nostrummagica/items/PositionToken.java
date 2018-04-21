@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.items;
 
 import com.smanzana.nostrummagica.blocks.NostrumObelisk;
-import com.smanzana.nostrummagica.blocks.NostrumObelisk.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.blocks.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 

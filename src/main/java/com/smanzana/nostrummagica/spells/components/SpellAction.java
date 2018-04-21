@@ -9,6 +9,7 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.entity.EntityGolem;
@@ -698,6 +699,13 @@ public class SpellAction {
 
 		@Override
 		public void apply(EntityLivingBase caster, World world, BlockPos block, float efficiency) {
+			IBlockState state = world.getBlockState(block);
+			if (state != null && state.getBlock() instanceof Candle) {
+				Candle.light(world, block, state);
+				NostrumMagicaSounds.DAMAGE_FIRE.play(world,
+						block.getX() + .5, block.getY(), block.getZ() + .5);
+				return;
+			}
 			if (!world.isAirBlock(block))
 				block.add(0, 1, 0);
 			if (world.isAirBlock(block)) {

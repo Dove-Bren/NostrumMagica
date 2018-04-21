@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.client.gui;
 
-import com.smanzana.nostrummagica.blocks.NostrumObelisk.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.blocks.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.blocks.SpellTable.SpellTableEntity;
 import com.smanzana.nostrummagica.client.gui.container.ReagentBagGui;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;

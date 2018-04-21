@@ -146,7 +146,7 @@ public class Candle extends Block implements ITileEntityProvider {
     	}
     }
     
-    private void light(World world, BlockPos pos, IBlockState state) {
+    public static void light(World world, BlockPos pos, IBlockState state) {
     	world.setBlockState(pos, state.withProperty(LIT, true));
     }
     

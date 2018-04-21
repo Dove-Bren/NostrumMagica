@@ -1,19 +1,15 @@
 package com.smanzana.nostrummagica.blocks;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.NostrumObelisk.NostrumObeliskEntity.Corner;
-import com.smanzana.nostrummagica.blocks.NostrumObelisk.NostrumObeliskEntity.NostrumObeliskTarget;
+import com.smanzana.nostrummagica.blocks.NostrumObeliskEntity.Corner;
+import com.smanzana.nostrummagica.blocks.NostrumObeliskEntity.NostrumObeliskTarget;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.config.ModConfig;
-import com.smanzana.nostrummagica.world.NostrumChunkLoader;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
@@ -27,29 +23,17 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeChunkManager;
-import net.minecraftforge.common.ForgeChunkManager.Ticket;
-import net.minecraftforge.common.ForgeChunkManager.Type;
-import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -67,304 +51,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  */
 public class NostrumObelisk extends Block implements ITileEntityProvider {
 	
-	public static class NostrumObeliskEntity extends TileEntity implements ITickable {
-		
-		public static class NostrumObeliskTarget {
-			private BlockPos pos;
-			private String title;
-			
-			public NostrumObeliskTarget(BlockPos pos) {
-				this(pos, toTitle(pos));
-			}
-			
-			public NostrumObeliskTarget(BlockPos pos, String title) {
-				this.pos = pos;
-				this.title = title;
-			}
-			
-			private static String toTitle(BlockPos pos) {
-				return "(" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ")";
-			}
-
-			public BlockPos getPos() {
-				return pos;
-			}
-
-			public String getTitle() {
-				return title;
-			}
-		}
-
-		private static final String NBT_TICKET_POS = "obelisk_pos";
-		private static final String NBT_MASTER = "master";
-		private static final String NBT_TARGETS = "targets";
-		private static final String NBT_TARGET_X = "x";
-		private static final String NBT_TARGET_Y = "y";
-		private static final String NBT_TARGET_Z = "z";
-		private static final String NBT_TARGET_TITLE = "title";
-		private static final String NBT_CORNER = "corner";
-		
-		/**
-		 * If master, destroy in all 4 corners
-		 * If not master, search for master by offset in all corners.
-		 * Destroy ALL masters found, not just the first one.
-		 */
-		protected static enum Corner {
-			NE(0),
-			NW(1),
-			SW(2),
-			SE(3);
-			
-			private int offset;
-			private Corner(int offset) {
-				this.offset = offset;
-			}
-			
-			public int getOffset() {
-				return offset;
-			}
-		}
-		
-		private boolean master;
-		private List<NostrumObeliskTarget> targets;
-		private Corner corner;
-		private int aliveCount;
-		
-		private boolean isDestructing;
-		
-		public NostrumObeliskEntity() {
-			master = false;
-			isDestructing = false;
-			targets = new LinkedList<>();
-		}
-		
-		public NostrumObeliskEntity(boolean master) {
-			this();
-			this.master = master;
-		}
-		
-		public NostrumObeliskEntity(Corner corner) {
-			this(false);
-			this.corner = corner;
-		}
-		
-		@Override
-		public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-			nbt = super.writeToNBT(nbt);
-			
-			NBTTagList list = new NBTTagList();
-			
-			if (master && targets.size() > 0)
-			for (NostrumObeliskTarget target : targets) {
-				if (target == null)
-					continue;
-				
-				NBTTagCompound tag = new NBTTagCompound();
-				tag.setInteger(NBT_TARGET_X, target.pos.getX());
-				tag.setInteger(NBT_TARGET_Y, target.pos.getY());
-				tag.setInteger(NBT_TARGET_Z, target.pos.getZ());
-				tag.setString(NBT_TARGET_TITLE, target.title);
-				
-				list.appendTag(tag);
-			}
-			
-			nbt.setTag(NBT_TARGETS, list);
-			nbt.setBoolean(NBT_MASTER, master);
-			if (!master && corner != null) {
-				nbt.setByte(NBT_CORNER, (byte) corner.ordinal());
-			}
-			return nbt;
-		}
-		
-		@Override
-		public void readFromNBT(NBTTagCompound nbt) {
-			super.readFromNBT(nbt);
-			
-			if (nbt == null || !nbt.hasKey(NBT_MASTER, NBT.TAG_BYTE))
-				return;
-
-			this.master = nbt.getBoolean(NBT_MASTER);
-			NBTTagList list = nbt.getTagList(NBT_TARGETS, NBT.TAG_COMPOUND);
-			if (list != null && list.tagCount() > 0) {
-				this.targets = new ArrayList<>(list.tagCount());
-				for (int i = 0; i < list.tagCount(); i++) {
-					NBTTagCompound tag = list.getCompoundTagAt(i);
-					targets.add(new NostrumObeliskTarget(new BlockPos(
-							tag.getInteger(NBT_TARGET_X),
-							tag.getInteger(NBT_TARGET_Y),
-							tag.getInteger(NBT_TARGET_Z)
-							),
-							tag.getString(NBT_TARGET_TITLE)));
-				}
-			}
-			
-			if (!master) {
-				int ord = nbt.getByte(NBT_CORNER);
-				for (Corner c : Corner.values()) {
-					if (c.ordinal() == ord)
-						this.corner = c;
-				}
-			}
-			
-		}
-		
-		public void destroy() {
-			if (isDestructing)
-				return;
-			
-			isDestructing = true;
-			if (master) {
-				// go to all four corners and break all blocks up
-				int xs[] = new int[] {-TILE_OFFSETH, -TILE_OFFSETH, TILE_OFFSETH, TILE_OFFSETH};
-				int zs[] = new int[] {-TILE_OFFSETH, TILE_OFFSETH, -TILE_OFFSETH, TILE_OFFSETH};
-				for (int i = 0; i < xs.length; i++)
-				for (int j = 1; j <= TILE_HEIGHT; j++) { // j starts at one cause the first block is above the base block
-					BlockPos bp = pos.add(xs[i], j, zs[i]);
-					IBlockState state = worldObj.getBlockState(bp);
-					if (state.getBlock() instanceof NostrumObelisk) {
-						worldObj.destroyBlock(bp, false);
-					}
-				}
-
-				if (!worldObj.isRemote) {
-					Ticket ticket = NostrumChunkLoader.instance().pullTicket(genTicketKey());
-					if (ticket != null) {
-						ForgeChunkManager.releaseTicket(ticket);
-					}
-				}
-				
-				worldObj.destroyBlock(pos, false);
-			} else {
-				int xs[] = new int[] {-TILE_OFFSETH, -TILE_OFFSETH, TILE_OFFSETH, TILE_OFFSETH};
-				int zs[] = new int[] {-TILE_OFFSETH, TILE_OFFSETH, -TILE_OFFSETH, TILE_OFFSETH};
-				for (int i = 0; i < xs.length; i++) {
-					BlockPos base = pos.add(xs[i], -TILE_OFFSETY, zs[i]);
-					TileEntity te = worldObj.getTileEntity(base);
-					if (te != null && te instanceof NostrumObeliskEntity) {
-						NostrumObeliskEntity entity = (NostrumObeliskEntity) te;
-						if (entity.master)
-							entity.destroy();
-					}
-				}
-			}
-		}
-		
-		public boolean isMaster() {
-			return this.master;
-		}
-		
-		public void addTarget(BlockPos pos) {
-			targets.add(new NostrumObeliskTarget(pos));
-			dirty();
-		}
-		
-		public void addTarget(BlockPos pos, String title) {
-			targets.add(new NostrumObeliskTarget(pos, title));
-			dirty();
-		}
-		
-		public List<NostrumObeliskTarget> getTargets() {
-			return targets;
-		}
-		
-		@Override
-		public SPacketUpdateTileEntity getUpdatePacket() {
-			return new SPacketUpdateTileEntity(this.pos, 3, this.getUpdateTag());
-		}
-
-		@Override
-		public NBTTagCompound getUpdateTag() {
-			return this.writeToNBT(new NBTTagCompound());
-		}
-		
-		@Override
-		public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
-			super.onDataPacket(net, pkt);
-			handleUpdateTag(pkt.getNbtCompound());
-		}
-		
-		// Registers this TE as a chunk loader. Gets a ticket and forces the chunk.
-		// Relies on already being placed in the world
-		public void init() {
-			if (worldObj.isRemote)
-				return;
-			
-			Ticket chunkTicket = ForgeChunkManager.requestTicket(NostrumMagica.instance, worldObj, Type.NORMAL);
-			chunkTicket.getModData().setTag(NBT_TICKET_POS, NBTUtil.createPosTag(pos));
-			ForgeChunkManager.forceChunk(chunkTicket, new ChunkPos(pos));
-			NostrumChunkLoader.instance().addTicket(genTicketKey(), chunkTicket);
-		}
-		
-		private String genTicketKey() {
-			return "nostrum_obelisk_" + pos.getX() + "_" + pos.getY() + "_" + pos.getZ();
-		}
-		
-		private void dirty() {
-			worldObj.markBlockRangeForRenderUpdate(pos, pos);
-			worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 3);
-			worldObj.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
-			markDirty();
-		}
-
-		@Override
-		public void update() {
-			if (!worldObj.isRemote)
-				return;
-			if (corner == null || master)
-				return;
-			
-			aliveCount++;
-			
-			final long stepInverval = 2;
-			if (aliveCount % stepInverval != 0)
-				return;
-			
-			int step = (int) (aliveCount / stepInverval);
-			int maxStep = (int) ((20 / stepInverval) * 4); // 4 second period
-			step = step % maxStep;
-			float ratio = (float) step / (float) maxStep;
-			float angle = (float) (ratio * 2f * Math.PI); // radians
-			
-			angle += ((double) corner.getOffset() + 1.0) * .25 * (2.0 * Math.PI);
-			
-			float radius = (float) ((1f - ratio) * (TILE_OFFSETH * 1.25));
-			
-			double x, z, y;
-			x = Math.cos(angle) * radius;
-			z = Math.sin(angle) * radius;
-			y = ratio * (-TILE_OFFSETY);
-			
-			BlockPos master = getMasterPos();
-			x += master.getX() + .5;
-			z += master.getZ() + .5;
-			y += pos.getY() + .5;
-			worldObj.spawnParticle(EnumParticleTypes.DRAGON_BREATH, x, y, z, .01, 0, .01, new int[0]);
-			
-		}
-		
-		private BlockPos getMasterPos() {
-			if (this.corner != null)
-			switch (this.corner) {
-			case NE:
-				return pos.add(-TILE_OFFSETH, 1, -TILE_OFFSETH);
-			case NW:
-				return pos.add(TILE_OFFSETH, 1, -TILE_OFFSETH);
-			case SE:
-				return pos.add(-TILE_OFFSETH, 1, TILE_OFFSETH);
-			case SW:
-				return pos.add(TILE_OFFSETH, 1, TILE_OFFSETH);
-			}
-			return pos;
-		}
-		
-	}
+	
 
 	private static final PropertyBool MASTER = PropertyBool.create("master");
 	private static final PropertyBool TILE = PropertyBool.create("tile");
 	
-	private static final int TILE_OFFSETY = 3; // height diff between TE in pillars and master TE
-	private static final int TILE_OFFSETH = 3; // horizontal distance between master and pillars
-	private static final int TILE_HEIGHT = 4; // Total height of corner pillars
+	public static final int TILE_OFFSETY = 3; // height diff between TE in pillars and master TE
+	public static final int TILE_OFFSETH = 3; // horizontal distance between master and pillars
+	public static final int TILE_HEIGHT = 4; // Total height of corner pillars
 	
 	public static final String ID = "nostrum_obelisk";
 	
@@ -649,7 +343,7 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 			return false;
 		
 		NostrumObeliskEntity ent = (NostrumObeliskEntity) te;
-		if (ent.targets == null || ent.targets.isEmpty())
+		if (ent.getTargets() == null || ent.getTargets().isEmpty())
 			return false;
 		
 		// Load it?
@@ -659,10 +353,10 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 				|| !blockIsMaster(state))
 			return false;
 		
-		for (NostrumObeliskTarget targ : ent.targets) {
-			if (targ.pos.getX() == to.getX()
-					&& targ.pos.getY() == to.getY()
-					&& targ.pos.getZ() == to.getZ())
+		for (NostrumObeliskTarget targ : ent.getTargets()) {
+			if (targ.getPos().getX() == to.getX()
+					&& targ.getPos().getY() == to.getY()
+					&& targ.getPos().getZ() == to.getZ())
 				return true;
 		}
 		
