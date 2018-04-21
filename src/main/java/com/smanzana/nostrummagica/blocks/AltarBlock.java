@@ -12,6 +12,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -138,7 +139,7 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 		
 	}
 	
-	public static class AltarTileEntity extends TileEntity {
+	public static class AltarTileEntity extends TileEntity implements ISidedInventory {
 		
 		private ItemStack stack;
 		
@@ -206,6 +207,121 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 			worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 3);
 			worldObj.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
 			markDirty();
+		}
+
+		@Override
+		public int getSizeInventory() {
+			return 1;
+		}
+
+		@Override
+		public ItemStack getStackInSlot(int index) {
+			if (index > 0)
+				return null;
+			return this.stack;
+		}
+
+		@Override
+		public ItemStack decrStackSize(int index, int count) {
+			if (index > 0)
+				return null;
+			ItemStack ret = this.stack.splitStack(count);
+			if (this.stack.stackSize == 0)
+				this.stack = null;
+			this.dirty();
+			return ret;
+		}
+
+		@Override
+		public ItemStack removeStackFromSlot(int index) {
+			if (index > 0)
+				return null;
+			ItemStack ret = this.stack;
+			this.stack = null;
+			dirty();
+			return ret;
+		}
+
+		@Override
+		public void setInventorySlotContents(int index, ItemStack stack) {
+			if (index > 0)
+				return;
+			this.stack = stack;
+			dirty();
+		}
+
+		@Override
+		public int getInventoryStackLimit() {
+			return 1;
+		}
+
+		@Override
+		public boolean isUseableByPlayer(EntityPlayer player) {
+			return true;
+		}
+
+		@Override
+		public void openInventory(EntityPlayer player) {
+			;
+		}
+
+		@Override
+		public void closeInventory(EntityPlayer player) {
+			;
+		}
+
+		@Override
+		public boolean isItemValidForSlot(int index, ItemStack stack) {
+			return index == 0;
+		}
+
+		@Override
+		public int getField(int id) {
+			return 0;
+		}
+
+		@Override
+		public void setField(int id, int value) {
+			
+		}
+
+		@Override
+		public int getFieldCount() {
+			return 0;
+		}
+
+		@Override
+		public void clear() {
+			this.stack = null;
+			dirty();
+		}
+
+		@Override
+		public String getName() {
+			return "Altar";
+		}
+
+		@Override
+		public boolean hasCustomName() {
+			return false;
+		}
+
+		@Override
+		public int[] getSlotsForFace(EnumFacing side) {
+			return new int[] {0};
+		}
+
+		@Override
+		public boolean canInsertItem(int index, ItemStack itemStackIn, EnumFacing direction) {
+			if (index != 0)
+				return false;
+			
+			return stack == null;
+		}
+
+		@Override
+		public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
+			return index == 0 && stack != null;
 		}
 		
 	}
