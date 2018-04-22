@@ -32,6 +32,7 @@ public class ModConfig {
 		XP_DISPLAY_TEXT(Category.DISPLAY, "display_xp_text", false, false, "Display current and max XP"),
 		XP_DISPLAY_BAR(Category.DISPLAY, "display_xp_bar", true, false, "Display current progress towards next level"),
 		OBELISK_LIST(Category.DISPLAY, "obelisk_list", false, false, "Display known teleportation points in the obelisk as a list"),
+		EFFECT_DISPLAY(Category.DISPLAY, "display_effects", true, false, "Allow cool client effects to be rendered. Turn off to enhance performance"),
 		
 		INNER_DEBUG(Category.TEST, "inner_debug", 0, false, "Testing debug dont use omg blow everyhing up dont do it omg zomb"),
 		
@@ -413,6 +414,10 @@ public class ModConfig {
 	
 	public boolean displayXPBar() {
 		return getBooleanValue(Key.XP_DISPLAY_BAR, false);
+	}
+
+	public boolean displayEffects() {
+		return getBooleanValue(Key.EFFECT_DISPLAY, false);
 	}
 	
 }

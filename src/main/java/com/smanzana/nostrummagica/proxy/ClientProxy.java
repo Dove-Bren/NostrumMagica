@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.Candle;
@@ -18,6 +19,12 @@ import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.blocks.NostrumMirrorBlock;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.effects.ClientEffectForm;
+import com.smanzana.nostrummagica.client.effects.ClientEffectMirrored;
+import com.smanzana.nostrummagica.client.effects.ClientEffectRenderer;
+import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierGrow;
+import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierRotate;
+import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierTranslate;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.gui.MirrorGui;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
@@ -72,11 +79,19 @@ import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
@@ -88,12 +103,18 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.client.model.IModel;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
@@ -105,6 +126,7 @@ public class ClientProxy extends CommonProxy {
 	private KeyBinding bindingCast;
 	private KeyBinding bindingScroll;
 	private OverlayRenderer overlayRenderer;
+	private ClientEffectRenderer effectRenderer;
 
 	public ClientProxy() {
 		MinecraftForge.EVENT_BUS.register(this);
@@ -348,6 +370,7 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void postinit() {
 		this.overlayRenderer = new OverlayRenderer();
+		this.effectRenderer = ClientEffectRenderer.instance();
 		
 		super.postinit();
 	}
@@ -362,6 +385,59 @@ public class ClientProxy extends CommonProxy {
 	public void onMouse(MouseEvent event) {
 		int wheel = event.getDwheel();
 		if (wheel != 0) {
+			this.effectRenderer.addEffect(new ClientEffectMirrored(new Vec3d(0, 0, 0), new ClientEffectForm() {
+
+						@Override
+						public void draw(Minecraft mc, float partialTicks, int color) {
+							
+							BlockRendererDispatcher renderer = Minecraft.getMinecraft().getBlockRendererDispatcher();
+							
+							IBakedModel model = renderer.getBlockModelShapes().getModelManager()
+									.getModel(new ModelResourceLocation(
+									NostrumMagica.MODID + ":effects/shield", "normal"));
+							GlStateManager.pushMatrix();
+							GlStateManager.pushAttrib();
+							GlStateManager.enableBlend();
+							GlStateManager.enableAlpha();
+							//GlStateManager.rotate(180f, 1f, 0f, 0f);
+							//GlStateManager.translate(pos.xCoord, pos.yCoord, pos.zCoord);
+							Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+							//renderer.getBlockModelRenderer().renderModelBrightnessColor(model,
+							//		.8f, 1f, .5f, 1f);
+							GlStateManager.disableLighting();
+							GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+							//GlStateManager.color(.5f, 0f, 0f, .5f); // WHY DOESNT THIS WORK??
+							draw(model.getQuads(null, null, 0), color);
+							GlStateManager.disableBlend();
+							GlStateManager.popAttrib();
+							GlStateManager.popMatrix();
+							
+							
+						}
+						
+						private void draw(List<BakedQuad> listQuads, int color) {
+							Tessellator tessellator = Tessellator.getInstance();
+					        VertexBuffer vertexbuffer = tessellator.getBuffer();
+					        int i = 0;
+
+					        for (int j = listQuads.size(); i < j; ++i)
+					        {
+					            BakedQuad bakedquad = (BakedQuad)listQuads.get(i);
+					            vertexbuffer.begin(7, DefaultVertexFormats.ITEM);
+					            
+					            vertexbuffer.addVertexData(bakedquad.getVertexData());
+					            vertexbuffer.putColor4(color);
+
+					            Vec3i vec3i = bakedquad.getFace().getDirectionVec();
+					            vertexbuffer.putNormal((float)vec3i.getX(), (float)vec3i.getY(), (float)vec3i.getZ());
+					            tessellator.draw();
+					        }
+						}
+						
+					}, 20, 5)
+					.modify(new ClientEffectModifierRotate(0, .2f, 0))
+					.modify(new ClientEffectModifierTranslate(0, 1, -1))
+					.modify(new ClientEffectModifierGrow()));
 			if (!NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer)
 					.isUnlocked())
 				return;
@@ -555,5 +631,27 @@ public class ClientProxy extends CommonProxy {
 				NostrumMagica.MODID, "entity/koid"));
 		event.getMap().registerSprite(new ResourceLocation(
 				NostrumMagica.MODID, "entity/golem_ender"));
+	}
+	
+	@SubscribeEvent
+	public void onModelBake(ModelBakeEvent event) {
+    	String[] effects = {"shield"};
+    	for (String key : effects) {
+    		IModel model;
+			try {
+				model = ModelLoaderRegistry.getModel(new ResourceLocation(
+						NostrumMagica.MODID, "effect/" + key
+						));
+				IBakedModel bakedModel = model.bake(TRSRTransformation.identity(), DefaultVertexFormats.ITEM, 
+	    				(location) -> {return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString());});
+	    		event.getModelRegistry().putObject(
+	    				new ModelResourceLocation(NostrumMagica.MODID + ":effects/" + key, "normal"),
+	    				bakedModel);
+			} catch (Exception e) {
+				e.printStackTrace();
+				NostrumMagica.logger.warn("Failed to load effect " + key);
+			}
+    		
+    	}
 	}
 }
