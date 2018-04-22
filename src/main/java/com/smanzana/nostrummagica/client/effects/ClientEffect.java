@@ -88,7 +88,6 @@ public abstract class ClientEffect {
 		
 		ClientEffectRenderDetail detail = new ClientEffectRenderDetail();
 		detail.alpha = detail.red = detail.green = detail.blue = 1f;
-		detail.red = detail.green = 0;
 
 		if (!this.modifiers.isEmpty())
 		for (ClientEffectModifier mod : modifiers) {

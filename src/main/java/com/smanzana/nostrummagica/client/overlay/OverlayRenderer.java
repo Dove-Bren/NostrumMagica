@@ -11,11 +11,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
@@ -46,33 +42,6 @@ public class OverlayRenderer extends Gui {
 		// TODO
 		if (event.getType() != ElementType.ALL)
 			return;
-		
-		{
-			BlockRendererDispatcher renderer = Minecraft.getMinecraft().getBlockRendererDispatcher();
-			
-			IBakedModel model = renderer.getBlockModelShapes().getModelManager()
-					.getModel(new ModelResourceLocation(
-					NostrumMagica.MODID + ":effects/shield", "normal"));
-			GlStateManager.pushMatrix();
-			GlStateManager.pushAttrib();
-			GlStateManager.rotate(180f, 1f, 0f, 0f);
-			GlStateManager.scale(16, 16, 1);
-			GlStateManager.translate(2, -2, 0);
-			GlStateManager.color(1f, 1f, 1f, 1f);
-			Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-			renderer.getBlockModelRenderer().renderModelBrightnessColor(model,
-					1f, 1f, 1f, 1f);
-			int unused;
-			
-//			model = renderer.getBlockModelShapes().getModelManager()
-//					.getModel(new ModelResourceLocation(
-//					NostrumMagica.MODID + ":item/altar_item2", "normal"));
-//			renderer.getBlockModelRenderer().renderModelBrightnessColor(model,
-//					1f, 1f, 1f, 1f);
-			
-			GlStateManager.popAttrib();
-			GlStateManager.popMatrix();
-		}
 		
 		EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
 		ScaledResolution scaledRes = event.getResolution();
