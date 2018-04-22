@@ -27,13 +27,13 @@ public class ClientEffectMirrored extends ClientEffect {
 		this.count = count;
 		this.dAngle = (float) (360f) / (float) count;
 	}
-
+	
 	@Override
-	protected void drawForm(Minecraft mc, float progress, float partialTicks) {
+	protected void drawForm(ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
 		for (int i = 0; i < this.count; i++) {
 			GlStateManager.pushMatrix();
 			GlStateManager.rotate(dAngle * (float) i, 0f, 1f, 0f);
-			super.drawForm(mc, progress, partialTicks);
+			super.drawForm(detail, mc, progress, partialTicks);
 			GlStateManager.popMatrix();
 		}
 		

@@ -28,4 +28,9 @@ public class ClientEffectModifierRotate implements ClientEffectModifier {
 		GlStateManager.rotate(rotZ % 360f, 0f, 0f, 1f);
 	}
 
+	@Override
+	public void earlyApply(ClientEffectRenderDetail detail, float progress) {
+		;
+	}
+
 }

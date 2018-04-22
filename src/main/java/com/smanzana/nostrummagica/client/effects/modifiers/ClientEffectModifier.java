@@ -4,6 +4,8 @@ import com.smanzana.nostrummagica.client.effects.ClientEffect.ClientEffectRender
 
 public interface ClientEffectModifier {
 
+	public void earlyApply(ClientEffectRenderDetail detail, float progress);
+	
 	public void apply(ClientEffectRenderDetail detail, float progress);
 	
 }

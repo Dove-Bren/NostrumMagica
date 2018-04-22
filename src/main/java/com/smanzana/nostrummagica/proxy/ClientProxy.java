@@ -21,11 +21,14 @@ import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.effects.ClientEffectBeam;
 import com.smanzana.nostrummagica.client.effects.ClientEffectForm;
+import com.smanzana.nostrummagica.client.effects.ClientEffectIcon;
 import com.smanzana.nostrummagica.client.effects.ClientEffectMirrored;
 import com.smanzana.nostrummagica.client.effects.ClientEffectRenderer;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierColor;
+import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierFollow;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierGrow;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierRotate;
+import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierShrink;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierTranslate;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.gui.MirrorGui;
@@ -383,6 +386,7 @@ public class ClientProxy extends CommonProxy {
 	public void onMouse(MouseEvent event) {
 		int wheel = event.getDwheel();
 		if (wheel != 0) {
+			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 			this.effectRenderer.addEffect(new ClientEffectMirrored(new Vec3d(0, 0, 0), new ClientEffectForm() {
 
 						@Override
@@ -414,13 +418,17 @@ public class ClientProxy extends CommonProxy {
 						}
 						
 					}, 20, 5)
-					.modify(new ClientEffectModifierRotate(0, .2f, 0))
-					.modify(new ClientEffectModifierTranslate(0, 1, -1))
-					.modify(new ClientEffectModifierGrow()));
+					.modify(new ClientEffectModifierFollow(player))
+					.modify(new ClientEffectModifierRotate(0f, .2f, 0))
+					.modify(new ClientEffectModifierTranslate(0f, 1, -1))
+					.modify(new ClientEffectModifierGrow())
+					.modify(new ClientEffectModifierShrink())
+					);
 			
-			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 			Vec3d look = player.getLook(Minecraft.getMinecraft().getRenderPartialTicks());
-			this.effectRenderer.addEffect(new ClientEffectBeam(look.scale(.5).addVector(0, player.eyeHeight, 0), look.scale(10), 100)
+			this.effectRenderer.addEffect(new ClientEffectBeam(
+					player.getPositionVector().add(look.scale(.5).addVector(0, player.eyeHeight, 0)),
+					look.scale(10), 100)
 					.modify(new ClientEffectModifierColor(0xFFFF0000, 0xFF0000FF, .9f)));
 			
 			if (!NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer)
@@ -620,40 +628,20 @@ public class ClientProxy extends CommonProxy {
 	
 	@SubscribeEvent
 	public void onModelBake(ModelBakeEvent event) {
-    	String[] effects = {"shield", "ting1", "ting2", "ting3", "ting4", "ting5"};
-    	for (String key : effects) {
+    	for (ClientEffectIcon icon: ClientEffectIcon.values()) {
     		IModel model;
 			try {
 				model = ModelLoaderRegistry.getModel(new ResourceLocation(
-						NostrumMagica.MODID, "effect/" + key
+						NostrumMagica.MODID, "effect/" + icon.getModelKey()
 						));
 				IBakedModel bakedModel = model.bake(TRSRTransformation.identity(), DefaultVertexFormats.ITEM, 
 	    				(location) -> {return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString());});
 	    		event.getModelRegistry().putObject(
-	    				new ModelResourceLocation(NostrumMagica.MODID + ":effects/" + key, "normal"),
+	    				new ModelResourceLocation(NostrumMagica.MODID + ":effects/" + icon.getKey(), "normal"),
 	    				bakedModel);
 			} catch (Exception e) {
 				e.printStackTrace();
-				NostrumMagica.logger.warn("Failed to load effect " + key);
-			}
-    		
-    	}
-    	
-    	String[] objs = {"cyl", "shell"};
-    	for (String key : objs) {
-    		IModel model;
-			try {
-				model = ModelLoaderRegistry.getModel(new ResourceLocation(
-						NostrumMagica.MODID, "effect/" + key + ".obj"
-						));
-				IBakedModel bakedModel = model.bake(TRSRTransformation.identity(), DefaultVertexFormats.ITEM, 
-	    				(location) -> {return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString());});
-	    		event.getModelRegistry().putObject(
-	    				new ModelResourceLocation(NostrumMagica.MODID + ":effects/" + key, "normal"),
-	    				bakedModel);
-			} catch (Exception e) {
-				e.printStackTrace();
-				NostrumMagica.logger.warn("Failed to load effect " + key);
+				NostrumMagica.logger.warn("Failed to load effect " + icon.getKey());
 			}
     		
     	}

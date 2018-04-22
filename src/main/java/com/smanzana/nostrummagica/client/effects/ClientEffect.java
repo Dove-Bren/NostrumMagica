@@ -9,7 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.math.Vec3d;
 
-public abstract class ClientEffect {
+public class ClientEffect {
 	
 	public static class ClientEffectRenderDetail {
 		public float alpha;
@@ -75,19 +75,19 @@ public abstract class ClientEffect {
 		GlStateManager.pushMatrix();
 		GlStateManager.pushAttrib();
 		
-		preModHook(progress);
+		ClientEffectRenderDetail detail = new ClientEffectRenderDetail();
+		detail.alpha = detail.red = detail.green = detail.blue = 1f;
 		
-		drawForm(mc, progress, partialTicks);
+		preModHook(detail, progress);
+		
+		drawForm(detail, mc, progress, partialTicks);
 		
 		GlStateManager.popAttrib();
 		GlStateManager.popMatrix();
 		return progress < 1f;
 	}
 	
-	protected void drawForm(Minecraft mc, float progress, float partialTicks) {
-		
-		ClientEffectRenderDetail detail = new ClientEffectRenderDetail();
-		detail.alpha = detail.red = detail.green = detail.blue = 1f;
+	protected void drawForm(ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
 
 		if (!this.modifiers.isEmpty())
 		for (ClientEffectModifier mod : modifiers) {
@@ -97,7 +97,11 @@ public abstract class ClientEffect {
 		form.draw(mc, partialTicks, detail.getColor());
 	}
 	
-	protected void preModHook(float progress) {
+	protected void preModHook(ClientEffectRenderDetail detail, float progress) {
+		if (!this.modifiers.isEmpty())
+		for (ClientEffectModifier mod : modifiers) {
+			mod.earlyApply(detail, progress);
+		}
 		GlStateManager.translate(origin.xCoord, origin.yCoord, origin.zCoord);
 	}
 	

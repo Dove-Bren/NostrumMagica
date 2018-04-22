@@ -3,28 +3,23 @@ package com.smanzana.nostrummagica.client.effects.modifiers;
 import com.smanzana.nostrummagica.client.effects.ClientEffect.ClientEffectRenderDetail;
 
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.EntityLivingBase;
 
-public class ClientEffectModifierTranslate implements ClientEffectModifier {
+public class ClientEffectModifierFollow implements ClientEffectModifier {
 
-	private float x;
-	private float y;
-	private float z;
+	private EntityLivingBase entity;
 	
-	public ClientEffectModifierTranslate(float x,
-									float y,
-									float z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
+	public ClientEffectModifierFollow(EntityLivingBase entity) {
+		this.entity = entity;
 	}
 	
 	@Override
 	public void apply(ClientEffectRenderDetail detail, float progress) {
-		GlStateManager.translate(x, y, z);
+		;
 	}
 
 	@Override
 	public void earlyApply(ClientEffectRenderDetail detail, float progress) {
-		;
+		GlStateManager.translate(entity.posX, entity.posY, entity.posZ);
 	}
 }

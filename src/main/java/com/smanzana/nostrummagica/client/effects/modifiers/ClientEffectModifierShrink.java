@@ -4,7 +4,7 @@ import com.smanzana.nostrummagica.client.effects.ClientEffect.ClientEffectRender
 
 import net.minecraft.client.renderer.GlStateManager;
 
-public class ClientEffectModifierGrow implements ClientEffectModifier {
+public class ClientEffectModifierShrink implements ClientEffectModifier {
 
 	private float startScale;
 	private float startAlpha;
@@ -12,11 +12,11 @@ public class ClientEffectModifierGrow implements ClientEffectModifier {
 	private float endAlpha;
 	private float plateau; // Where to stop progressing and just wait
 	
-	public ClientEffectModifierGrow() {
-		this(.5f, 0f, 1f, 1f, .5f);
+	public ClientEffectModifierShrink() {
+		this(1f, 1f, .5f, 0f, .5f);
 	}
 	
-	public ClientEffectModifierGrow(float startScale, float startAlpha,
+	public ClientEffectModifierShrink(float startScale, float startAlpha,
 							float endScale, float endAlpha,
 							float plateau) {
 		this.startScale = startScale;
@@ -28,16 +28,16 @@ public class ClientEffectModifierGrow implements ClientEffectModifier {
 	
 	@Override
 	public void apply(ClientEffectRenderDetail detail, float progress) {
-		if (progress < this.plateau) {
+		if (progress > this.plateau) {
 			// Stage 1
-			final float frac = progress / plateau;
+			final float frac = (progress - plateau) / plateau;
 			final float scale = startScale + ((endScale - startScale) * frac);
 			final float alpha = startAlpha + ((endAlpha - startAlpha) * frac);
 			GlStateManager.scale(scale, scale, scale);
 			detail.alpha *= alpha;
 		} else {
-			GlStateManager.scale(endScale, endScale, endScale);
-			detail.alpha *= endAlpha;
+			GlStateManager.scale(startScale, startScale, startScale);
+			detail.alpha *= startAlpha;
 			
 		}
 	}

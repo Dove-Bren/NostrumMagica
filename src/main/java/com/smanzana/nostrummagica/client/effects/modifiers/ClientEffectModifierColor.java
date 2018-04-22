@@ -48,4 +48,9 @@ public class ClientEffectModifierColor implements ClientEffectModifier {
 		}
 	}
 
+	@Override
+	public void earlyApply(ClientEffectRenderDetail detail, float progress) {
+		;
+	}
+
 }
