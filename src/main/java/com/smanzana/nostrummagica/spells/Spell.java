@@ -133,6 +133,7 @@ public class Spell {
 				NostrumMagica.proxy.sendSpellDebug((EntityPlayer) this.caster, comp);
 			}
 			
+			boolean first = true;
 			while ((next = (++index < parts.size() ? parts.get(index) : null)) != null && !next.isTrigger()) {
 				// it's a shape. Do it idk
 				SpellShape shape = next.getShape();
@@ -150,16 +151,41 @@ public class Spell {
 				if (targets != null && !targets.isEmpty()) {
 					for (EntityLivingBase targ : targets) {
 						shape.perform(action, param, targ, null, null, this.efficiency);
+						
+						if (first) {
+							
+							SpellComponentWrapper comp;
+							if (next.getAlteration() == null)
+								comp = new SpellComponentWrapper(next.getElement());
+							else
+								comp = new SpellComponentWrapper(next.getAlteration());
+							NostrumMagica.proxy.spawnEffect(null, comp,
+									caster, null, targ, null, new SpellComponentWrapper(next.getElement()));
+						}
+						
 					}
 				} else if (locations != null && !locations.isEmpty()) {
 					// use locations
 					for (BlockPos pos : locations) {
 						shape.perform(action, param, null, world, pos, this.efficiency);
+						
+						if (first) {
+							
+							SpellComponentWrapper comp;
+							if (next.getAlteration() == null)
+								comp = new SpellComponentWrapper(next.getElement());
+							else
+								comp = new SpellComponentWrapper(next.getAlteration());
+							NostrumMagica.proxy.spawnEffect(world, comp,
+									caster, null, null, new Vec3d(pos.getX() + .5, pos.getY(), pos.getZ() + .5), new SpellComponentWrapper(next.getElement()));
+						}
 					}
 				} else {
 					; // Drop it on the floor\
 					next = null;
 				}
+				
+				first = false;
 			}
 			
 			// next is either null or a trigger

@@ -1,5 +1,8 @@
 package com.smanzana.nostrummagica.proxy;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.AltarBlock;
 import com.smanzana.nostrummagica.blocks.Candle;
@@ -62,6 +65,7 @@ import com.smanzana.nostrummagica.items.SpellTableItem;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.network.NetworkHandler;
+import com.smanzana.nostrummagica.network.messages.ClientEffectRenderMessage;
 import com.smanzana.nostrummagica.network.messages.SpellDebugMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
@@ -73,6 +77,7 @@ import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
 import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
@@ -101,7 +106,10 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -459,5 +467,70 @@ public class CommonProxy {
 	
 	public void requestStats(EntityLivingBase entity) {
 		;
+	}
+	
+	/**
+	 * Spawns an client-rendered effect.
+	 * @param world Only needed if caster and target are null
+	 * @param comp
+	 * @param caster
+	 * @param casterPos
+	 * @param target
+	 * @param targetPos
+	 * @param flavor Optional component used to flavor the effect.
+	 */
+	public void spawnEffect(World world, SpellComponentWrapper comp,
+			EntityLivingBase caster, Vec3d casterPos,
+			EntityLivingBase target, Vec3d targetPos,
+			SpellComponentWrapper flavor) {
+		if (world == null) {
+			if (caster == null)
+				world = target.worldObj; // If you NPE here you suck. Supply a world!
+			else
+				world = caster.worldObj;
+		}
+		
+		final double MAX_RANGE_SQR = 2500.0;
+		
+		Set<EntityPlayer> players = new HashSet<>();
+		
+		if (caster != null) {
+			//caster.addTrackingPlayer(player);
+			players.addAll(((WorldServer) world).getEntityTracker()
+				.getTrackingPlayers(caster));
+		}
+		
+		if (target != null) {
+			//caster.addTrackingPlayer(player);
+			players.addAll(((WorldServer) world).getEntityTracker()
+				.getTrackingPlayers(target));
+		}
+		
+		if (players.isEmpty()) {
+			// Fall back to distance check against locations
+			if (casterPos != null) {
+				for (EntityPlayer player : world.playerEntities) {
+					if (player.getDistanceSq(casterPos.xCoord, casterPos.yCoord, casterPos.zCoord) <= MAX_RANGE_SQR)
+						players.add(player);
+				}
+			}
+			
+			if (targetPos != null) {
+				for (EntityPlayer player : world.playerEntities) {
+					if (player.getDistanceSq(targetPos.xCoord, targetPos.yCoord, targetPos.zCoord) <= MAX_RANGE_SQR)
+						players.add(player);
+				}
+			}
+		}
+		
+		if (!players.isEmpty()) {
+			ClientEffectRenderMessage message = new ClientEffectRenderMessage(
+					caster, casterPos,
+					target, targetPos,
+					comp, flavor);
+			for (EntityPlayer player : players) {
+				NetworkHandler.getSyncChannel().sendTo(message, (EntityPlayerMP) player);
+			}
+		}
 	}
 }
