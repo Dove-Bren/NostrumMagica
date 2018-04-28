@@ -684,7 +684,6 @@ public class SpellAction {
 		@Override
 		public void apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
 			int duration = (int) (this.duration * efficiency);
-			
 			if (duration == 0)
 				return; // Nope
 			

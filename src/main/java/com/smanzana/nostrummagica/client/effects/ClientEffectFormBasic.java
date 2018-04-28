@@ -42,6 +42,8 @@ public class ClientEffectFormBasic implements ClientEffectForm {
 			GlStateManager.translate(offset.xCoord, offset.yCoord, offset.zCoord);
 		}
 		
+		GlStateManager.enableBlend();
 		ClientEffectForm.drawModel(model, color);
+		GlStateManager.disableBlend();
 	}
 }

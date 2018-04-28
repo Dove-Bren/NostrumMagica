@@ -661,7 +661,7 @@ public class Spell {
 		case ENDER:
 			return new SpellAction(caster).phase(elementCount);
 		case FIRE:
-			return new SpellAction(caster).burn(0);
+			return new SpellAction(caster).burn(elementCount * 20 * 5);
 		case ICE:
 			return new SpellAction(caster).cursedIce(elementCount);
 		case LIGHTNING:

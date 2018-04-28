@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.Candle;
@@ -19,14 +18,17 @@ import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.blocks.NostrumMirrorBlock;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.effects.ClientEffect;
 import com.smanzana.nostrummagica.client.effects.ClientEffectBeam;
-import com.smanzana.nostrummagica.client.effects.ClientEffectForm;
+import com.smanzana.nostrummagica.client.effects.ClientEffectEchoed;
+import com.smanzana.nostrummagica.client.effects.ClientEffectFormBasic;
 import com.smanzana.nostrummagica.client.effects.ClientEffectIcon;
 import com.smanzana.nostrummagica.client.effects.ClientEffectMirrored;
 import com.smanzana.nostrummagica.client.effects.ClientEffectRenderer;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierColor;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierFollow;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierGrow;
+import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierMove;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierRotate;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierShrink;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierTranslate;
@@ -78,21 +80,24 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.BeamTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.FoodTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.HealthTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.ManaTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.OtherTrigger;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
@@ -104,6 +109,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
@@ -373,6 +379,8 @@ public class ClientProxy extends CommonProxy {
 		this.overlayRenderer = new OverlayRenderer();
 		this.effectRenderer = ClientEffectRenderer.instance();
 		
+		initDefaultEffects(this.effectRenderer);
+		
 		super.postinit();
 	}
 	
@@ -386,50 +394,13 @@ public class ClientProxy extends CommonProxy {
 	public void onMouse(MouseEvent event) {
 		int wheel = event.getDwheel();
 		if (wheel != 0) {
+			initDefaultEffects(this.effectRenderer);
 			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-			this.effectRenderer.addEffect(new ClientEffectMirrored(new Vec3d(0, 0, 0), new ClientEffectForm() {
-
-						@Override
-						public void draw(Minecraft mc, float partialTicks, int color) {
-							
-							BlockRendererDispatcher renderer = Minecraft.getMinecraft().getBlockRendererDispatcher();
-							
-							IBakedModel model = renderer.getBlockModelShapes().getModelManager()
-									.getModel(new ModelResourceLocation(
-									NostrumMagica.MODID + ":effects/shield", "normal"));
-							GlStateManager.pushMatrix();
-							GlStateManager.pushAttrib();
-							GlStateManager.enableBlend();
-							GlStateManager.enableAlpha();
-							//GlStateManager.rotate(180f, 1f, 0f, 0f);
-							//GlStateManager.translate(pos.xCoord, pos.yCoord, pos.zCoord);
-							Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-							//renderer.getBlockModelRenderer().renderModelBrightnessColor(model,
-							//		.8f, 1f, .5f, 1f);
-							GlStateManager.disableLighting();
-							GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-							//GlStateManager.color(.5f, 0f, 0f, .5f); // WHY DOESNT THIS WORK??
-							ClientEffectForm.drawModel(model, color);
-							GlStateManager.disableBlend();
-							GlStateManager.popAttrib();
-							GlStateManager.popMatrix();
-							
-							
-						}
-						
-					}, 20, 5)
-					.modify(new ClientEffectModifierFollow(player))
-					.modify(new ClientEffectModifierRotate(0f, .2f, 0))
-					.modify(new ClientEffectModifierTranslate(0f, 1, -1))
-					.modify(new ClientEffectModifierGrow())
-					.modify(new ClientEffectModifierShrink())
-					);
-			
-			Vec3d look = player.getLook(Minecraft.getMinecraft().getRenderPartialTicks());
-			this.effectRenderer.addEffect(new ClientEffectBeam(
-					player.getPositionVector().add(look.scale(.5).addVector(0, player.eyeHeight, 0)),
-					look.scale(10), 100)
-					.modify(new ClientEffectModifierColor(0xFFFF0000, 0xFF0000FF, .9f)));
+			EntityLivingBase entity = player.worldObj.findNearestEntityWithinAABB(EntityLivingBase.class, new AxisAlignedBB(0, 0, 0, 100, 100, 100), player);
+			this.effectRenderer.spawnEffect(new SpellComponentWrapper(EAlteration.ALTER),
+					null, new Vec3d(0, 0, 0),
+					player, player.getPositionVector(),
+					new SpellComponentWrapper(EMagicElement.WIND));
 			
 			if (!NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer)
 					.isUnlocked())
@@ -645,5 +616,385 @@ public class ClientProxy extends CommonProxy {
 			}
     		
     	}
+	}
+	
+	private static void initDefaultEffects(ClientEffectRenderer renderer) {
+		
+		// elements 
+		for (EMagicElement element : EMagicElement.values()) {
+			renderer.registerEffect(new SpellComponentWrapper(element),
+					(source, sourcePos, target, targetPos, flavor) -> {
+						ClientEffect effect = new ClientEffectMirrored(target == null ? targetPos : new Vec3d(0, 0, 0),
+								new ClientEffectFormBasic(ClientEffectIcon.TING1, 0, 0, 0),
+								500L, 5);
+						
+						if (target != null)
+							effect.modify(new ClientEffectModifierFollow(target));
+						
+						effect
+						.modify(new ClientEffectModifierColor(element.getColor(), element.getColor()))
+						.modify(new ClientEffectModifierRotate(0f, .4f, 0f))
+						.modify(new ClientEffectModifierTranslate(0, 0, -1))
+						.modify(new ClientEffectModifierMove(new Vec3d(0, 1.5, 0), new Vec3d(0, .5, .7), .5f, 1f))
+						.modify(new ClientEffectModifierGrow(.1f, .3f, .2f, .8f, .5f))
+						;
+						return effect;
+					});
+		}
+		
+		// triggers (that have them)
+		renderer.registerEffect(new SpellComponentWrapper(BeamTrigger.instance()),
+				(source, sourcePos, target, targetPos, flavor) -> {
+					ClientEffect effect = new ClientEffectBeam(sourcePos == null ? source.getPositionVector() : sourcePos,
+							targetPos == null ? target.getPositionVector() : targetPos,
+							500L);
+					
+					//if (target != null)
+					//	effect.modify(new ClientEffectModifierFollow(target));
+					
+					if (flavor != null && flavor.isElement()) {
+						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
+					}
+					
+					effect
+					.modify(new ClientEffectModifierGrow(1f, .2f, 1f, 1f, .4f))
+					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, .2f, .6f))
+					;
+					return effect;
+				});
+		
+//		renderer.registerEffect(new SpellComponentWrapper(SelfTrigger.instance()),
+//				(source, sourcePos, target, targetPos, flavor) -> {
+//					ClientEffect effect = new ClientEffect(source == null ? sourcePos : source.getPositionVector(),
+//							new ClientEffectFormBasic(ClientEffectIcon.TING2, 0, 0, 0),
+//							10);
+//					
+//					if (target != null)
+//						effect.modify(new ClientEffectModifierFollow(target));
+//					
+//					if (flavor != null && flavor.isElement()) {
+//						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
+//					}
+//					
+//					effect
+//					.modify(new ClientEffectModifierGrow(1f, .2f, 1f, 1f, .4f))
+//					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, .2f, .6f))
+//					;
+//					return effect;
+//				});
+		// Can't think of a cool one for self. Oh well
+		
+		renderer.registerEffect(new SpellComponentWrapper(OtherTrigger.instance()),
+				(source, sourcePos, target, targetPos, flavor) -> {
+					ClientEffect effect = new ClientEffectMirrored(source == null ? sourcePos : source.getPositionVector(),
+							new ClientEffectFormBasic(ClientEffectIcon.TING3, 0, 0, 0),
+							500L, 6);
+					
+					if (target != null)
+						effect.modify(new ClientEffectModifierFollow(target));
+					
+					if (flavor != null && flavor.isElement()) {
+						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
+					}
+					
+					effect
+					.modify(new ClientEffectModifierTranslate(0, 1, -1))
+					.modify(new ClientEffectModifierRotate(.4f, 0f, .8f))
+					.modify(new ClientEffectModifierGrow(.8f, .2f, 1f, 1f, .3f))
+					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, .2f, .8f))
+					;
+					return effect;
+				});
+		
+		renderer.registerEffect(new SpellComponentWrapper(HealthTrigger.instance()),
+				(source, sourcePos, target, targetPos, flavor) -> {
+					ClientEffect effect = new ClientEffectMirrored(source == null ? sourcePos : source.getPositionVector(),
+							new ClientEffectFormBasic(ClientEffectIcon.TING5, 0, 0, 0),
+							1000L, 4);
+					
+					if (target != null)
+						effect.modify(new ClientEffectModifierFollow(target));
+					
+					effect
+					.modify(new ClientEffectModifierColor(0xFFA50500, 0xFFA50500))
+					.modify(new ClientEffectModifierTranslate(0, 2, -1))
+					.modify(new ClientEffectModifierRotate(0f, .5f, 0f))
+					.modify(new ClientEffectModifierGrow(.8f, .2f, 1f, 1f, .5f))
+					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .8f))
+					;
+					return effect;
+				});
+		
+		renderer.registerEffect(new SpellComponentWrapper(ManaTrigger.instance()),
+				(source, sourcePos, target, targetPos, flavor) -> {
+					ClientEffect effect = new ClientEffectMirrored(source == null ? sourcePos : source.getPositionVector(),
+							new ClientEffectFormBasic(ClientEffectIcon.TING5, 0, 0, 0),
+							1000L, 4);
+					
+					if (target != null)
+						effect.modify(new ClientEffectModifierFollow(target));
+					
+					effect
+					.modify(new ClientEffectModifierColor(0xFF0005A5, 0xFF0005A5))
+					.modify(new ClientEffectModifierTranslate(0, 2, -1))
+					.modify(new ClientEffectModifierRotate(0f, .5f, 0f))
+					.modify(new ClientEffectModifierGrow(.8f, .2f, 1f, 1f, .5f))
+					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .8f))
+					;
+					return effect;
+				});
+		
+		renderer.registerEffect(new SpellComponentWrapper(FoodTrigger.instance()),
+				(source, sourcePos, target, targetPos, flavor) -> {
+					ClientEffect effect = new ClientEffectMirrored(source == null ? sourcePos : source.getPositionVector(),
+							new ClientEffectFormBasic(ClientEffectIcon.TING5, 0, 0, 0),
+							1000L, 4);
+					
+					if (target != null)
+						effect.modify(new ClientEffectModifierFollow(target));
+					
+					effect
+					.modify(new ClientEffectModifierColor(0xFFC6CC30, 0xFFC6CC30))
+					.modify(new ClientEffectModifierTranslate(0, 2, -1))
+					.modify(new ClientEffectModifierRotate(0f, .5f, 0f))
+					.modify(new ClientEffectModifierGrow(.8f, .2f, 1f, 1f, .5f))
+					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .8f))
+					;
+					return effect;
+				});
+		
+		renderer.registerEffect(new SpellComponentWrapper(FoodTrigger.instance()),
+				(source, sourcePos, target, targetPos, flavor) -> {
+					ClientEffect effect = new ClientEffectMirrored(source == null ? sourcePos : source.getPositionVector(),
+							new ClientEffectFormBasic(ClientEffectIcon.TING4, 0, 0, 0),
+							2L * 1000L, 6);
+					
+					if (flavor != null && flavor.isElement()) {
+						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
+					}
+					
+					effect
+					.modify(new ClientEffectModifierRotate(0f, .5f, 0f))
+					.modify(new ClientEffectModifierTranslate(0, 1.5f, -1f))
+					.modify(new ClientEffectModifierMove(new Vec3d(0, 0, 0), new Vec3d(0, 0, -4), 0f, 1f))
+					.modify(new ClientEffectModifierGrow(.8f, .2f, 1f, 1f, .5f))
+					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .8f))
+					;
+					return effect;
+				});
+		
+		// Alterations
+		renderer.registerEffect(new SpellComponentWrapper(EAlteration.INFLICT),
+				(source, sourcePos, target, targetPos, flavor) -> {
+					ClientEffect effect = new ClientEffectMirrored(source == null ? sourcePos : source.getPositionVector(),
+							new ClientEffectFormBasic(ClientEffectIcon.ARROWD, 0, 0, 0),
+							3L * 500L, 6);
+					
+					if (flavor != null && flavor.isElement()) {
+						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
+					}
+					
+					if (target != null) {
+						effect.modify(new ClientEffectModifierFollow(target));
+					}
+					
+					effect
+					.modify(new ClientEffectModifierRotate(0f, .5f, 0f))
+					.modify(new ClientEffectModifierTranslate(0, 1.5f, -1.5f))
+					.modify(new ClientEffectModifierMove(new Vec3d(0, 0, 0), new Vec3d(0, -2, 0), .3f, 1f))
+					.modify(new ClientEffectModifierGrow(.8f, .2f, 1f, 1f, .5f))
+					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .8f))
+					;
+					return effect;
+				});
+
+		renderer.registerEffect(new SpellComponentWrapper(EAlteration.RESIST),
+				(source, sourcePos, target, targetPos, flavor) -> {
+					ClientEffect effect = new ClientEffectMirrored(source == null ? sourcePos : source.getPositionVector(),
+							new ClientEffectFormBasic(ClientEffectIcon.ARROWU, 0, 0, 0),
+							3L * 500L, 6);
+					
+					if (flavor != null && flavor.isElement()) {
+						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
+					}
+					
+					if (target != null) {
+						effect.modify(new ClientEffectModifierFollow(target));
+					}
+					
+					effect
+					.modify(new ClientEffectModifierRotate(0f, .5f, 0f))
+					.modify(new ClientEffectModifierTranslate(0, 0f, -1.5f))
+					.modify(new ClientEffectModifierMove(new Vec3d(0, 0, 0), new Vec3d(0, 1.5, 0), 0f, .7f))
+					.modify(new ClientEffectModifierGrow(.8f, .2f, 1f, 1f, .5f))
+					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .8f))
+					;
+					return effect;
+				});
+
+		renderer.registerEffect(new SpellComponentWrapper(EAlteration.GROWTH),
+				(source, sourcePos, target, targetPos, flavor) -> {
+					ClientEffect effect = new ClientEffectEchoed(new Vec3d(0,0,0), 
+							new ClientEffectMirrored(source == null ? sourcePos : source.getPositionVector(),
+							new ClientEffectFormBasic(ClientEffectIcon.TING3, 0, 0, 0),
+							2L * 1000L, 4), 2L * 1000L, 5, .2f);
+					
+					if (flavor != null && flavor.isElement()) {
+						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
+					}
+					
+					if (target != null) {
+						effect.modify(new ClientEffectModifierFollow(target));
+					}
+					
+					effect
+					.modify(new ClientEffectModifierTranslate(0, 1, 0))
+					.modify(new ClientEffectModifierRotate(1f, 2f, 0f))
+					.modify(new ClientEffectModifierTranslate(.5f, 0f, -1.2f))
+					.modify(new ClientEffectModifierGrow(.2f, .2f, .4f, .6f, .5f))
+					;
+					return effect;
+				});
+
+		renderer.registerEffect(new SpellComponentWrapper(EAlteration.SUPPORT),
+				(source, sourcePos, target, targetPos, flavor) -> {
+					ClientEffect effect;
+					boolean isShield = false;
+					if (flavor != null && flavor.isElement() && 
+							(flavor.getElement() == EMagicElement.EARTH || flavor.getElement() == EMagicElement.ICE)) {
+						// Special ones for shields!
+						effect = new ClientEffectMirrored(source == null ? sourcePos : source.getPositionVector(),
+								new ClientEffectFormBasic(ClientEffectIcon.SHIELD, 0, 0, 0),
+								3L * 500L, 5);
+						isShield = true;
+					} else {
+						effect = new ClientEffectMirrored(source == null ? sourcePos : source.getPositionVector(),
+								new ClientEffectFormBasic(ClientEffectIcon.TING5, 0, 0, 0),
+								3L * 500L, 10);
+					}
+					
+					if (flavor != null && flavor.isElement()) {
+						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
+					}
+					
+					if (target != null) {
+						effect.modify(new ClientEffectModifierFollow(target));
+					}
+					
+					if (!isShield)
+						effect.modify(new ClientEffectModifierRotate(0f, -.5f, 0f));
+					
+					effect.modify(new ClientEffectModifierTranslate(0f, 1f, -1.2f));
+					
+					if (isShield) {
+						effect.modify(new ClientEffectModifierRotate(0f, -.5f, 0f))
+							.modify(new ClientEffectModifierGrow(1f, .2f, 1f, .8f, .5f));
+					} else {
+						effect
+						.modify(new ClientEffectModifierGrow(.2f, .2f, .4f, .6f, .5f))
+						.modify(new ClientEffectModifierShrink(1f, 1f, 0f, 0f, .5f))
+					;
+					}
+					return effect;
+				});
+
+		renderer.registerEffect(new SpellComponentWrapper(EAlteration.ENCHANT),
+				(source, sourcePos, target, targetPos, flavor) -> {
+					ClientEffect effect = new ClientEffectMirrored((source == null ? sourcePos : source.getPositionVector()).addVector(0, 1, 0),
+							new ClientEffectFormBasic(ClientEffectIcon.TING4, 0, 0, 0),
+							3L * 500L, 6, new Vec3d(1, 0, 0));
+					
+					if (flavor != null && flavor.isElement()) {
+						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
+					}
+					
+					if (target != null) {
+						effect.modify(new ClientEffectModifierFollow(target));
+					}
+					
+					effect
+					.modify(new ClientEffectModifierRotate(1f, 0f, 1f))
+					.modify(new ClientEffectModifierTranslate(-.5f, 0f, 1f))
+					.modify(new ClientEffectModifierGrow(.8f, .2f, 1f, .6f, .5f))
+					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .6f))
+					;
+					return effect;
+				});
+
+		renderer.registerEffect(new SpellComponentWrapper(EAlteration.CONJURE),
+				(source, sourcePos, target, targetPos, flavor) -> {
+					ClientEffect effect = new ClientEffectMirrored(source == null ? sourcePos : source.getPositionVector(),
+							new ClientEffectFormBasic(ClientEffectIcon.TING4, 0, 0, 0),
+							1L * 500L, 6);
+					
+					if (flavor != null && flavor.isElement()) {
+						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
+					}
+					
+					if (target != null) {
+						effect.modify(new ClientEffectModifierFollow(target));
+					}
+					
+					effect
+					.modify(new ClientEffectModifierTranslate(0f, 1f, 0f))
+					.modify(new ClientEffectModifierMove(new Vec3d(0, 0, 0), new Vec3d(0, 1.5, 0), 0f, .3f))
+					.modify(new ClientEffectModifierMove(new Vec3d(0, 0, 0), new Vec3d(0, 0, 1.5)))
+					.modify(new ClientEffectModifierMove(new Vec3d(0, 0, 0), new Vec3d(0, -2, 0), 0f, 1f))
+					.modify(new ClientEffectModifierGrow(.6f, .2f, .7f, .6f, .5f))
+					.modify(new ClientEffectModifierShrink(1f, 1f, .5f, 0f, .6f))
+					;
+					return effect;
+				});
+
+		renderer.registerEffect(new SpellComponentWrapper(EAlteration.SUMMON),
+				(source, sourcePos, target, targetPos, flavor) -> {
+					ClientEffect effect = new ClientEffectMirrored(source == null ? sourcePos : source.getPositionVector(),
+							new ClientEffectFormBasic(ClientEffectIcon.TING1, 0, 0, 0),
+							1L * 500L, 6);
+					
+					if (flavor != null && flavor.isElement()) {
+						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
+					}
+					
+					if (target != null) {
+						effect.modify(new ClientEffectModifierFollow(target));
+					}
+					
+					effect
+					.modify(new ClientEffectModifierRotate(0f, -.5f, 0f))
+					.modify(new ClientEffectModifierTranslate(0f, 1f, 0f))
+					.modify(new ClientEffectModifierMove(new Vec3d(0, 0, 0), new Vec3d(0, 1.5, 0), 0f, .3f))
+					.modify(new ClientEffectModifierMove(new Vec3d(0, 0, 0), new Vec3d(0, 0, 1.5)))
+					.modify(new ClientEffectModifierMove(new Vec3d(0, 0, 0), new Vec3d(0, -2, 0), 0f, 1f))
+					.modify(new ClientEffectModifierRotate(1f, 0f, 0f))
+					.modify(new ClientEffectModifierGrow(.6f, .2f, .7f, .6f, .5f))
+					.modify(new ClientEffectModifierShrink(1f, 1f, .5f, 0f, .6f))
+					;
+					return effect;
+				});
+
+		renderer.registerEffect(new SpellComponentWrapper(EAlteration.ALTER),
+				(source, sourcePos, target, targetPos, flavor) -> {
+					ClientEffect effect = new ClientEffectMirrored((source == null ? sourcePos : source.getPositionVector()).addVector(0, 1, 0),
+							new ClientEffectFormBasic(ClientEffectIcon.TING4, 0, 0, 0),
+							2L * 500L, 6, new Vec3d(.5, .5, 0));
+					
+					if (flavor != null && flavor.isElement()) {
+						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
+					}
+					
+					if (target != null) {
+						effect.modify(new ClientEffectModifierFollow(target));
+					}
+					
+					effect
+					.modify(new ClientEffectModifierTranslate(0f, 0f, .5f))
+					.modify(new ClientEffectModifierRotate(1f, 0f, 1f))
+					.modify(new ClientEffectModifierTranslate(-.5f, 0f, 1f))
+					.modify(new ClientEffectModifierGrow(.8f, .2f, 1f, .6f, .5f))
+					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .6f))
+					;
+					return effect;
+				});
 	}
 }

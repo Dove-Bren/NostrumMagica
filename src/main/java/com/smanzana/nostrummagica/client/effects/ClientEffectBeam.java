@@ -56,7 +56,7 @@ public class ClientEffectBeam extends ClientEffect {
 				GlStateManager.pushMatrix();
 				GlStateManager.pushAttrib();
 				
-				
+				//GlStateManager.translate(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ);
 				// Model is length 1 and points y+
 				double len = end.lengthVector();
 				Vec3d norm = end.normalize();
@@ -96,11 +96,11 @@ public class ClientEffectBeam extends ClientEffect {
 	}
 	
 	public ClientEffectBeam(Vec3d origin, Vec3d end, int ticks) {
-		super(origin, new BeamForm(end), ticks);
+		super(origin, new BeamForm(end.subtract(origin)), ticks);
 	}
 	
 	public ClientEffectBeam(Vec3d origin, Vec3d end, long ms) {
-		super(origin, new BeamForm(end), ms);
+		super(origin, new BeamForm(end.subtract(origin)), ms);
 	}
 	
 }

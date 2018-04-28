@@ -33,7 +33,7 @@ public class ClientEffect {
 	protected Vec3d origin;
 	private ClientEffectForm form;
 	
-	private List<ClientEffectModifier> modifiers;
+	protected List<ClientEffectModifier> modifiers;
 	
 	private ClientEffect(Vec3d origin, ClientEffectForm form) {
 		existedMS = 0;
@@ -68,8 +68,9 @@ public class ClientEffect {
 			existedTicks = (int) existedMS / (1000 / 20);
 		}
 		
-		final float progress = durationMS == 0 ? ((float) existedTicks / (float) durationTicks)
-				: (durationTicks == 0 ? (1f) : (float) ((double) existedMS / (double) durationMS));
+		final float progress = durationMS == 0
+				? (durationTicks == 0 ? (1f) : ((float) existedTicks / (float) durationTicks))
+				: (float) ((double) existedMS / (double) durationMS);
 		
 		
 		GlStateManager.pushMatrix();

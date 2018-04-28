@@ -9,7 +9,9 @@ public enum ClientEffectIcon {
 	TING4("ting4", false),
 	TING5("ting5", false),
 	CYL("cyl", true),
-	SHELL("shell", true);
+	SHELL("shell", true),
+	ARROWU("arrow_up", false),
+	ARROWD("arrow_down", false);
 	
 	private String key;
 	private boolean isObj;
