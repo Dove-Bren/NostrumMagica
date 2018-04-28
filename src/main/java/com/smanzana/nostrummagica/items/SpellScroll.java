@@ -5,6 +5,7 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
+import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.enchantment.Enchantment;
@@ -49,8 +50,7 @@ public class SpellScroll extends Item implements ILoreTagged {
 		if (!nbt.hasKey(NBT_SPELL, NBT.TAG_INT))
 			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
 		
-		int id = nbt.getInteger(NBT_SPELL);
-		Spell spell = NostrumMagica.spellRegistry.lookup(id);
+		Spell spell = getSpell(itemStackIn);
 		if (spell == null)
 			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
 		
@@ -93,6 +93,14 @@ public class SpellScroll extends Item implements ILoreTagged {
 		
 		int id = nbt.getInteger(NBT_SPELL);
 		Spell spell = NostrumMagica.spellRegistry.lookup(id);
+		
+		if (spell == null) {
+			NostrumMagica.logger.info("Requesting spell " + id
+					 + " from the server...");
+				NetworkHandler.getSyncChannel().sendToServer(
+		    			new SpellRequestMessage(new int[] {id}));
+		}
+			
 		return spell;
 	}
 

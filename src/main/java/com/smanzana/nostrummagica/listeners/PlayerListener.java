@@ -686,7 +686,7 @@ public class PlayerListener {
 			}
 			
 			int diff = tickCount - info.startTick;
-			if (diff == info.interval)
+			if (diff % info.interval == 0)
 				if (entry.getKey().onEvent(Event.TIME, null))
 					it.remove();
 		}
@@ -998,7 +998,7 @@ public class PlayerListener {
 				));
 		spell.addPart(new SpellPart(
 				SingleShape.instance(),
-				EMagicElement.PHYSICAL,
+				EMagicElement.EARTH,
 				1,
 				EAlteration.CONJURE,
 				new SpellPartParam(0, false)

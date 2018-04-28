@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.client.effects;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -49,7 +50,7 @@ public class ClientEffectRenderer {
 	}
 	
 	private ClientEffectRenderer() {
-		activeEffects = new LinkedList<>();
+		activeEffects = Collections.synchronizedList(new LinkedList<>());
 		registeredEffects = new HashMap<>();
 		MinecraftForge.EVENT_BUS.register(this);
 	}
@@ -73,11 +74,13 @@ public class ClientEffectRenderer {
 		Minecraft mc = Minecraft.getMinecraft();
 		Vec3d playerOffset = mc.thePlayer.getPositionVector();
 		GlStateManager.translate(-playerOffset.xCoord, -playerOffset.yCoord, -playerOffset.zCoord);
+		synchronized(activeEffects) {
 		Iterator<ClientEffect> it = activeEffects.iterator();
-		while (it.hasNext()) {
-			ClientEffect ef = it.next();
-			if (!ef.displayTick(mc, event.getPartialTicks()))
-				it.remove();
+			while (it.hasNext()) {
+				ClientEffect ef = it.next();
+				if (!ef.displayTick(mc, event.getPartialTicks()))
+					it.remove();
+			}
 		}
 		GlStateManager.popMatrix();
 	}
@@ -97,6 +100,9 @@ public class ClientEffectRenderer {
 			NostrumMagica.logger.warn("Trying to spawn effect for unmapped component. Create a mapping for the component " + component);
 			return;
 		}
+		
+		System.out.println("Effect at " + (target != null ? "entity " : "")
+				+ (destPosition == null ? "<no pos>" : "(" + destPosition.xCoord + ", " + destPosition.yCoord + ", " + destPosition.zCoord + ")"));
 		
 		ClientEffect effect = factory.build(caster, sourcePosition, target, destPosition, flavor);
 		if (effect == null)

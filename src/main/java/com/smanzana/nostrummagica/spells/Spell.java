@@ -252,7 +252,7 @@ public class Spell {
 			if (world == null)
 				world = targ.worldObj;
 			if (targ == null)
-				pos = new Vec3d(targpos.getX(), targpos.getY(), targpos.getZ());
+				pos = new Vec3d(targpos.getX() + .5, targpos.getY(), targpos.getZ() + .5);
 			else
 				pos = targ.getPositionVector().addVector(0, targ.getEyeHeight(), 0);
 			

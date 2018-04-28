@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
 import com.smanzana.nostrummagica.listeners.PlayerListener.IMagicListener;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
@@ -28,6 +29,7 @@ public class ProximityTrigger extends SpellTrigger {
 		private Vec3d pos;
 		private boolean set;
 		private float range;
+		private boolean dead;
 		
 		public ProximityTriggerInstance(SpellState state, World world,
 				Vec3d pos, float range) {
@@ -36,23 +38,33 @@ public class ProximityTrigger extends SpellTrigger {
 			this.set = false;
 			this.pos = pos;
 			this.range = range;
+			dead = false;
 		}
 		
 		@Override
 		public void init(EntityLivingBase caster) {
 			// We are instant! Whoo!
-			NostrumMagica.playerListener.registerTimer(this, 20, 0);
+			NostrumMagica.playerListener.registerTimer(this, 20, 100);
 			
 		}
 
 		@Override
 		public boolean onEvent(Event type, EntityLivingBase entity) {
 			// We first wait 20 ticks to allow people to move around.
-			if (!set) {
-				set = true;
-				NostrumMagica.playerListener.registerProximity(this, world, pos, range);
-				// TODO start rendering some sick effect
-				return true;
+			if (type == Event.TIME) {
+				if (dead)
+					return true;
+				
+				NostrumMagica.proxy.spawnEffect(world, new SpellComponentWrapper(instance()),
+						null, null, null, this.pos, null);
+				if (!set) {
+					// Trap is now set!
+					set = true;
+					NostrumMagica.playerListener.registerProximity(this, world, pos, range);
+					return false;
+				}
+				
+				return false;
 			}
 			
 			
@@ -64,6 +76,7 @@ public class ProximityTrigger extends SpellTrigger {
 					null
 					);
 			this.trigger(data);
+			this.dead = true;
 			return true;
 		}
 	}
@@ -100,7 +113,7 @@ public class ProximityTrigger extends SpellTrigger {
 	@Override
 	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw,
 			SpellPartParam params) {
-		return new ProximityTriggerInstance(state, world, pos, params.level);
+		return new ProximityTriggerInstance(state, world, pos, Math.max(1, params.level));
 	}
 
 	@Override

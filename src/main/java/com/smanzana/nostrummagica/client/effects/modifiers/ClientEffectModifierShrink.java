@@ -30,7 +30,7 @@ public class ClientEffectModifierShrink implements ClientEffectModifier {
 	public void apply(ClientEffectRenderDetail detail, float progress) {
 		if (progress > this.plateau) {
 			// Stage 1
-			final float frac = (progress - plateau) / plateau;
+			final float frac = Math.min(1f, (progress - plateau) / (1f - plateau));
 			final float scale = startScale + ((endScale - startScale) * frac);
 			final float alpha = startAlpha + ((endAlpha - startAlpha) * frac);
 			GlStateManager.scale(scale, scale, scale);

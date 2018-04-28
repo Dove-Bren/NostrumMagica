@@ -88,6 +88,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.FoodTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.HealthTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ManaTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.OtherTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.ProximityTrigger;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 
@@ -759,11 +760,11 @@ public class ClientProxy extends CommonProxy {
 					return effect;
 				});
 		
-		renderer.registerEffect(new SpellComponentWrapper(FoodTrigger.instance()),
+		renderer.registerEffect(new SpellComponentWrapper(ProximityTrigger.instance()),
 				(source, sourcePos, target, targetPos, flavor) -> {
 					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
 							new ClientEffectFormBasic(ClientEffectIcon.TING4, 0, 0, 0),
-							2L * 1000L, 6);
+							2L * 1000L, 5);
 					
 					if (flavor != null && flavor.isElement()) {
 						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
@@ -771,10 +772,9 @@ public class ClientProxy extends CommonProxy {
 					
 					effect
 					.modify(new ClientEffectModifierRotate(0f, .5f, 0f))
-					.modify(new ClientEffectModifierTranslate(0, 1.5f, -1f))
-					.modify(new ClientEffectModifierMove(new Vec3d(0, 0, 0), new Vec3d(0, 0, -4), 0f, 1f))
-					.modify(new ClientEffectModifierGrow(.8f, .2f, 1f, 1f, .5f))
-					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .8f))
+					.modify(new ClientEffectModifierTranslate(0, .2f, .5f))
+					.modify(new ClientEffectModifierGrow(.2f, .2f, .4f, .5f, .5f))
+					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .4f))
 					;
 					return effect;
 				});
@@ -999,9 +999,19 @@ public class ClientProxy extends CommonProxy {
 			EntityLivingBase caster, Vec3d casterPos,
 			EntityLivingBase target, Vec3d targetPos,
 			SpellComponentWrapper flavor) {
-		
+		if (world != null || target != null) {
+			if (world == null)
+				world = target.worldObj;
+			if (!world.isRemote) {
+				super.spawnEffect(world, comp, caster, casterPos, target, targetPos, flavor);
+				return;
+			}
+		}
 		if (targetPos == null)
-			targetPos = new Vec3d(0, 0, 0);
+//			if (target != null)
+//				targetPos = target.getPositionVector();
+//			else
+				targetPos = new Vec3d(0, 0, 0);
 		
 		this.effectRenderer.spawnEffect(comp, caster, casterPos, target, targetPos, flavor);
 	}

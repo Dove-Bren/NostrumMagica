@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.Vec3d;
@@ -28,7 +29,6 @@ public class ClientEffectRenderMessage implements IMessage {
 		@Override
 		public IMessage onMessage(ClientEffectRenderMessage message, MessageContext ctx) {
 
-			System.out.println("wild");
 			EntityLivingBase caster, target;
 			Vec3d casterPos, targetPos;
 			SpellComponentWrapper component, flavor;
@@ -58,7 +58,12 @@ public class ClientEffectRenderMessage implements IMessage {
 			if (message.tag.hasKey(NBT_TARGET_ID, NBT.TAG_STRING)) {
 				try {
 					UUID id = UUID.fromString(message.tag.getString(NBT_TARGET_ID));
-					target = NostrumMagica.proxy.getPlayer().worldObj.getPlayerEntityByUUID(id);
+					for (Entity e : NostrumMagica.proxy.getPlayer().worldObj.loadedEntityList) {
+						if (e.getPersistentID().equals(id)) {
+							target = (EntityLivingBase) e;
+							break;
+						}
+					}
 				} catch (Exception e) {
 					;
 				}
