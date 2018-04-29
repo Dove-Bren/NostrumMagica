@@ -6,9 +6,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.entity.EntityLivingBase;
@@ -47,29 +49,44 @@ public class BeamTrigger extends InstantTrigger {
 	protected TriggerData getTargetData(SpellState state, World world,
 				Vec3d pos, float pitch, float yaw) {
 		
+		// Cast from eyes
+		pos = pos.addVector(0, state.getCaster().getEyeHeight(), 0);
+		
 		Collection<RayTraceResult> traces = RayTrace.allInPath(world, pos, pitch, yaw, BEAM_RANGE, true);
+		List<EntityLivingBase> others = null;
+		List<EntityLivingBase> targs = null;
+		List<BlockPos> blocks = null;
 		
-		if (traces == null || traces.isEmpty()) {
-			return new TriggerData(null, null, null, null);
-		}
+		Vec3d end = null;
 		
-		List<EntityLivingBase> others = Lists.newArrayList(state.getSelf());
-		List<EntityLivingBase> targs = new LinkedList<>();
-		List<BlockPos> blocks = new LinkedList<>();
+		if (traces != null && !traces.isEmpty()) {
 		
-		for (RayTraceResult trace : traces) {
-			if (trace == null)
-				continue;
+			others = Lists.newArrayList(state.getSelf());
+			targs = new LinkedList<>();
+			blocks = new LinkedList<>();
 			
-			if (trace.typeOfHit == RayTraceResult.Type.MISS)
-				continue;
-			
-			if (trace.typeOfHit == RayTraceResult.Type.ENTITY && trace.entityHit != null)
-				targs.add((EntityLivingBase) trace.entityHit);
-			else
-				blocks.add(new BlockPos(trace.hitVec.xCoord, trace.hitVec.yCoord, trace.hitVec.zCoord));
+			for (RayTraceResult trace : traces) {
+				if (trace == null)
+					continue;
 				
+				if (trace.typeOfHit == RayTraceResult.Type.MISS)
+					continue;
+				
+				if (trace.typeOfHit == RayTraceResult.Type.ENTITY && trace.entityHit != null) {
+					targs.add((EntityLivingBase) trace.entityHit);
+				} else {
+					blocks.add(new BlockPos(trace.hitVec.xCoord, trace.hitVec.yCoord, trace.hitVec.zCoord));
+				}
+				end = trace.hitVec;
+					
+			}
 		}
+		
+		if (end == null)
+			end = pos.add(RayTrace.directionFromAngles(pitch, yaw).normalize().scale(BEAM_RANGE));
+		
+		NostrumMagica.proxy.spawnEffect(world, new SpellComponentWrapper(this),
+				null, pos, null, end, null);
 		
 		return new TriggerData(targs, others, world, blocks);
 	}

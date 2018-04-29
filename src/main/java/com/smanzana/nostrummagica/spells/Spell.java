@@ -85,13 +85,21 @@ public class Spell {
 				others = new LinkedList<>();
 			
 			if (ModConfig.config.spellDebug() && this.caster instanceof EntityPlayer) {
-				ITextComponent comp = new TextComponentString(name +  "> "),
+				ITextComponent comp = new TextComponentString(""),
 						sib;
 				
+				sib = new TextComponentString(name +  "> ");
+				sib.setStyle((new Style()).setBold(true).setColor(TextFormatting.GOLD));
+				comp.appendSibling(sib);
+				sib = new TextComponentString("");
+				
 				// Get current trigger
-				if (index != -1) {
+				if (index == -1) {
+					sib.appendText(" <<Start Cast>> ");
+				}
+				else {
 					SpellPart part = parts.get(index);
-					comp.appendText("[" + part.getTrigger().getDisplayName() + "]" );
+					sib.appendText("[" + part.getTrigger().getDisplayName() + "] " );
 				}
 				
 				if (targets != null && targets.size() > 0) {
@@ -99,14 +107,18 @@ public class Spell {
 					for (EntityLivingBase ent : targets) {
 						buf += ent.getName() + " ";
 					}
-					comp.appendText("on " + targets.size() + " entities");
-					comp.setStyle((new Style()).setColor(TextFormatting.AQUA)
+					sib.appendText("on ");
+					sib.setStyle((new Style()).setColor(TextFormatting.AQUA).setBold(false));
+					comp.appendSibling(sib);
+					sib = new TextComponentString(targets.size() + " entities");
+					sib.setStyle((new Style()).setColor(TextFormatting.RED)
 							.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, 
 									new TextComponentString(buf))));
+					comp.appendSibling(sib);
 
 					sib = new TextComponentString(" (others)");
 					Style style = new Style();
-					style.setColor(TextFormatting.DARK_AQUA);
+					style.setColor(TextFormatting.DARK_PURPLE);
 					buf = "";
 					if (others != null && others.size() > 0) {
 						for (EntityLivingBase ent : others)
@@ -119,14 +131,22 @@ public class Spell {
 					
 					comp.appendSibling(sib);
 				} else if (locations != null && !locations.isEmpty()) {
-					comp.appendText("on " + locations.size() + " location(s)");
+					sib.appendText("on ");
+					sib.setStyle((new Style()).setColor(TextFormatting.AQUA).setBold(false));
+					comp.appendSibling(sib);
+					sib = new TextComponentString(locations.size() + " location(s)");
 					String buf = "";
 					for (BlockPos pos : locations) {
 						buf += "(" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") ";
 					}
 					
-					comp.setStyle(new Style().setColor(TextFormatting.DARK_GREEN).setHoverEvent(
+					sib.setStyle(new Style().setColor(TextFormatting.DARK_GREEN).setHoverEvent(
 							new HoverEvent(Action.SHOW_TEXT, new TextComponentString(buf))));
+					comp.appendSibling(sib);
+				} else {
+					sib.appendText("no targets");
+					sib.setStyle((new Style()).setColor(TextFormatting.AQUA));
+					comp.appendSibling(sib);
 				}
 				
 				//caster.addChatMessage(comp);
