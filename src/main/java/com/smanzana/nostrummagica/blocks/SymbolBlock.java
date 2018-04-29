@@ -3,7 +3,6 @@ package com.smanzana.nostrummagica.blocks;
 import java.util.Random;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
@@ -23,7 +22,6 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -131,7 +129,6 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
 		private EAlteration alteration;
 		private SpellTrigger trigger;
 		private SpellShape shape;
-		private SpellIcon icon;
 		private float scale;
 		
 		public SymbolTileEntity() {
@@ -184,7 +181,6 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
 			this.alteration = null;
 			this.trigger = null;
 			this.shape = null;
-			icon = SpellIcon.get(element);
 		}
 		
 		private void setAlteration(EAlteration alteration) {
@@ -192,7 +188,6 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
 			this.alteration = alteration;
 			this.trigger = null;
 			this.shape = null;
-			icon = SpellIcon.get(alteration);
 		}
 		
 		private void setTrigger(SpellTrigger trigger) {
@@ -200,7 +195,6 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
 			this.alteration = null;
 			this.trigger = trigger;
 			this.shape = null;
-			icon = SpellIcon.get(trigger);
 		}
 		
 		private void setShape(SpellShape shape) {
@@ -208,11 +202,6 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
 			this.alteration = null;
 			this.trigger = null;
 			this.shape = shape;
-			icon = SpellIcon.get(shape);
-		}
-		
-		public ResourceLocation getSymbolModel() {
-			return icon.getModelLocation();
 		}
 		
 		private static final String NBT_TYPE = "type";

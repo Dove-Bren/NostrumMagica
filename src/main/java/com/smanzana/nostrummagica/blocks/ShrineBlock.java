@@ -5,7 +5,15 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.MasteryOrb;
+import com.smanzana.nostrummagica.items.SpellScroll;
+import com.smanzana.nostrummagica.spells.EAlteration;
+import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.Spell.SpellPart;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
+import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
+import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
+import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.trials.ShrineTrial;
 
 import net.minecraft.block.properties.PropertyBool;
@@ -159,7 +167,87 @@ public class ShrineBlock extends SymbolBlock {
 			}
 		}
 		
-		
+		if (component.isShape()) {
+			boolean pass = false;
+			if (component.getShape() instanceof SingleShape) {
+				pass = true;
+			}
+			
+			if (heldItem != null && heldItem.getItem() instanceof SpellScroll) {
+				Spell spell = SpellScroll.getSpell(heldItem);
+				if (spell != null) {
+					// What we require depends on the shape
+					if (component.getShape() instanceof AoEShape) {
+						boolean speed, leap;
+						speed = leap = false;
+						for (SpellPart part : spell.getSpellParts()) {
+							if (part.isTrigger())
+								continue;
+							if (!(part.getShape() instanceof SingleShape))
+								continue;
+							
+							if (part.getAlteration() == null)
+								continue;
+							
+							if (!speed
+									&& part.getElement() == EMagicElement.WIND
+									&& part.getAlteration() == EAlteration.SUPPORT) {
+								speed = true;
+								continue;
+							}
+							
+							if (!leap
+									&& part.getElement() == EMagicElement.LIGHTNING
+									&& part.getAlteration() == EAlteration.GROWTH) {
+								leap = true;
+								continue;
+							}
+						}
+						
+						if (speed && leap)
+							pass = true;
+					} else if (component.getShape() instanceof ChainShape) {
+						boolean lightning, blind;
+						lightning = blind = false;
+						for (SpellPart part : spell.getSpellParts()) {
+							if (part.isTrigger())
+								continue;
+							if (!(part.getShape() instanceof SingleShape))
+								continue;
+							
+							if (!lightning
+									&& part.getElement() == EMagicElement.LIGHTNING
+									&& part.getAlteration() == null
+									&& part.getElementCount() >= 2) {
+								lightning = true;
+								continue;
+							}
+							
+							if (!blind
+									&& part.getElement() == EMagicElement.ENDER
+									&& part.getAlteration() == EAlteration.INFLICT) {
+								blind = true;
+								continue;
+							}
+						}
+						
+						if (lightning && blind )
+							pass = true;
+					}
+				}
+			}
+			
+			if (pass && !attr.getShapes().contains(component.getShape())) {
+				attr.addShape(component.getShape());
+				if (playerIn.worldObj.isRemote) {
+					playerIn.addChatComponentMessage(new TextComponentTranslation("info.shrine.shape", new Object[] {component.getShape().getDisplayName()}));
+				}
+				
+				if (!(component.getShape() instanceof SingleShape)) {
+					playerIn.setHeldItem(hand, null);
+				}
+			}
+		}
 		
 		return false;
 	}

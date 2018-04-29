@@ -42,6 +42,10 @@ public class SpellScroll extends Item implements ILoreTagged {
 	
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+		
+		if (playerIn.isSneaking())
+			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
+		
 		if (!itemStackIn.hasTagCompound())
 			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
 		

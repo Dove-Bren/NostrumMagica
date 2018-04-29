@@ -251,7 +251,7 @@ public class SeekerIdol extends Item implements ILoreTagged {
 		// We make y the same here so there's no vertical pull
 		Vec3d to = new Vec3d(targ.getX(), pos.yCoord, targ.getZ());
 		
-		NostrumMagica.logger.info("SeekerIdol targetting (" + targ.getX() + ", " + targ.getZ());
+		NostrumMagica.logger.info("SeekerIdol targetting (" + targ.getX() + ", " + targ.getZ() + ")");
 		
 		return to.subtract(pos).normalize();
 	}

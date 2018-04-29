@@ -1078,4 +1078,8 @@ public class Spell {
 		}
 	}
 	
+	public List<SpellPart> getSpellParts() {
+		return this.parts;
+	}
+	
 }

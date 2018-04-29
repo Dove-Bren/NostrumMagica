@@ -220,6 +220,7 @@ info.element.mastery2=You've advanced your mastery of the %s element
 info.element.mastery3=You've completely masted the %s element
 info.shrine.exhausted=This shrine's energies have already been used. You must find another
 info.shrine.trigger=You've absorbed the energy from the shrine and gained mastery over the %s trigger
+info.shrine.shape=You've mastered the %s shape
 
 element.name=Element
 shape.name=Shape

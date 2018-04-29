@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.client.render;
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.blocks.SymbolBlock.SymbolTileEntity;
+import com.smanzana.nostrummagica.client.gui.SpellIcon;
+import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -29,7 +31,17 @@ public class TileEntitySymbolRenderer extends TileEntitySpecialRenderer<SymbolTi
 	public void renderTileEntityAt(SymbolTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
 		
 		// Get the model from the tile entity
-		ResourceLocation textLoc = te.getSymbolModel();
+		SpellComponentWrapper comp = te.getComponent();
+		SpellIcon icon;
+		if (comp.isTrigger())
+			icon = SpellIcon.get(comp.getTrigger());
+		else if (comp.isShape())
+			icon = SpellIcon.get(comp.getShape());
+		else if (comp.isTrigger())
+			icon = SpellIcon.get(comp.getTrigger());
+		else
+			icon = SpellIcon.get(comp.getElement());
+		ResourceLocation textLoc = icon.getModelLocation();
 		float rot = 2.0f * (Minecraft.getSystemTime() / 50 + partialTicks);
 		float scale = te.getScale();
 		VertexBuffer wr = Tessellator.getInstance().getBuffer();

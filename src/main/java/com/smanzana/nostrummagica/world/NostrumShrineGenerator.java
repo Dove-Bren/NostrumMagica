@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumShrineDungeon;
@@ -248,6 +249,17 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
 		if (world.provider.getDimension() != 0)
 			return;
+		
+		long seed = world.getSeed();
+		// Spawn a self somewhere in the 32x32 chunks around 0
+		if (chunkX == (int) ((seed & (0x1F << 14)) >> 14) - 16
+				&& chunkZ == (int) ((seed & (0x1F << 43)) >> 43) - 16) {
+			queuedWrappers.add(new SpellComponentWrapper(SingleShape.instance()));
+			DungeonGen gen = DungeonGen.SHAPE;
+			runGenerator(gen.getGenerator(), world, random, chunkX, chunkZ,
+					gen.getMinY(), gen.getMaxY());
+			return;
+		}
 		
 		if (list == null) {
 			list = new LinkedList<DungeonGen>();

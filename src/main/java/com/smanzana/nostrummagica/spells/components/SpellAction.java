@@ -444,14 +444,11 @@ public class SpellAction {
 							direction.zCoord * magnitude
 							);
 					if (amp < 0) {
-						System.out.println("pull");
 						// pull
 						// Cap force's magnitude at .2 dist
 						double mod = force.lengthVector();
 						if (mod > dist * .2) {
-							System.out.println("length (" + mod + ") too big");
 							mod = (dist * .4) / mod;
-							System.out.println("adjusted to " + mod);
 							force = new Vec3d(
 									force.xCoord * mod,
 									force.yCoord * mod,

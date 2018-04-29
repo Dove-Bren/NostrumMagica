@@ -23,6 +23,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 
 public class KoidTask extends EntityAIBase {
@@ -506,8 +507,8 @@ public class KoidTask extends EntityAIBase {
                 }
                 
                 if (koid.onGround) {
-                	Vec3d forward = koid.getForward();
-                	Vec3d right = koid.getForward().rotatePitch(90.0f);
+                	Vec3d forward = getForward(koid);
+                	Vec3d right = getForward(koid).rotatePitch(90.0f);
                 	double mag = strafeBack ? -.1 : 0;
                 	double x, y, z;
                 	x = forward.xCoord * mag;
@@ -605,6 +606,15 @@ public class KoidTask extends EntityAIBase {
 			return null;
 		
 		return buffSkills.get(rand.nextInt(buffSkills.size()));
+	}
+	
+	private static Vec2f getPitchYaw(EntityLivingBase entity){
+		Vec2f vec2f = new Vec2f(entity.rotationPitch, entity.rotationYaw);
+		return vec2f;
+	}
+
+	private static Vec3d getForward(EntityLivingBase entity) {
+		return Vec3d.fromPitchYawVector(getPitchYaw(entity));
 	}
 	
 }
