@@ -158,6 +158,7 @@ potion.shieldmagic.name=Magic Ward
 potion.rooted.name=Rooted
 potion.magicresist.name=Magic Resist
 potion.magicboost.name=Magic Boost
+potion.familiar.name=Soul Bond
 
 tile.magic_wall.name=Magic Wall
 tile.mani_ore.name=Mani Ore

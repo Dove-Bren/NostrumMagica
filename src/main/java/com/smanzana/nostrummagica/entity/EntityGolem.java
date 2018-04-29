@@ -99,7 +99,6 @@ public abstract class EntityGolem extends EntityTameable implements ILoreTagged 
     
     public abstract void initGolemAttributes();
 
-    // TODO TODO TODO take this into the subclasses
     protected void applyEntityAttributes()
     {
         super.applyEntityAttributes();
@@ -193,16 +192,9 @@ public abstract class EntityGolem extends EntityTameable implements ILoreTagged 
 
 	@Override
 	public EntityAgeable createChild(EntityAgeable ageable) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
-//	@Override
-//	public boolean writeToNBTOptional(NBTTagCompound compound)
-//    {
-//		return false;
-//    }
-
 	public abstract String getTextureKey();
 	
 	@Override

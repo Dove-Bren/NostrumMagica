@@ -292,11 +292,7 @@ public class SpellRune extends Item implements ILoreTagged {
 	}
 
 	public static void init() {
-		
-		// TODO make fancy recipes for actually creating runes
-		
 		GameRegistry.addRecipe(new RuneRecipe());
-		
 	}
 	
 	public SpellRune() {

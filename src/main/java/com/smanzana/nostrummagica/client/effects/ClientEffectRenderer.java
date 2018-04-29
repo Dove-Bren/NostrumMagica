@@ -101,9 +101,6 @@ public class ClientEffectRenderer {
 			return;
 		}
 		
-		System.out.println("Effect at " + (target != null ? "entity " : "")
-				+ (destPosition == null ? "<no pos>" : "(" + destPosition.xCoord + ", " + destPosition.yCoord + ", " + destPosition.zCoord + ")"));
-		
 		ClientEffect effect = factory.build(caster, sourcePosition, target, destPosition, flavor);
 		if (effect == null)
 			return;

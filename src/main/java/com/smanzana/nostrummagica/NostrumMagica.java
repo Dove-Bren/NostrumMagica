@@ -445,7 +445,6 @@ public class NostrumMagica
 				CompressedStreamTools.write(nbt, backup);
 				logger.info("\r\n\r\nSuccessfully backed up to " + backup.getAbsolutePath());
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 				logger.error("Failed to write backup file. Spell changes have been lost.");
 			}
@@ -497,7 +496,6 @@ public class NostrumMagica
 				CompressedStreamTools.write(nbt, backup);
 				logger.info("\r\n\r\nSuccessfully backed up to " + backup.getAbsolutePath());
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 				logger.error("Failed to write backup file. Dungeon locations for seeking have been lost.");
 			}

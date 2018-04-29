@@ -62,6 +62,7 @@ import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 
 /**
@@ -728,6 +729,13 @@ public class PlayerListener {
 		}
 		
 		NostrumMagica.proxy.syncPlayer((EntityPlayerMP) event.player);
+	}
+	
+	@SubscribeEvent
+	public void onDisconnect(PlayerLoggedOutEvent event) {
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(event.player);
+		if (attr != null)
+			attr.clearFamiliars();
 	}
 	
 	// TESTING

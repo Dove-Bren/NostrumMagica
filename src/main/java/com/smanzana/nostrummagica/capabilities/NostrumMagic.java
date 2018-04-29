@@ -68,7 +68,7 @@ public class NostrumMagic implements INostrumMagic {
 	
 	private int baseMaxMana; // Max mana without mana bonuses
 	
-	//private List<IFamiliar> familiars;
+	private List<EntityLivingBase> familiars;
 	private SpellComponentWrapper bindingComponent;
 	private Spell bindingSpell;
 	private int bindingTomeID;
@@ -105,6 +105,7 @@ public class NostrumMagic implements INostrumMagic {
 		questData = new HashMap<>();
 		bindingSpell = null;
 		bindingComponent = null;
+		familiars = new LinkedList<>();
 	}
 
 	@Override
@@ -668,5 +669,27 @@ public class NostrumMagic implements INostrumMagic {
 	public boolean hasTrial(EMagicElement element) {
 		Boolean bool = this.elementTrials.get(element);
 		return (bool != null && bool);
+	}
+
+	@Override
+	public List<EntityLivingBase> getFamiliars() {
+		return familiars;
+	}
+
+	@Override
+	public void addFamiliar(EntityLivingBase familiar) {
+		familiars.add(familiar);
+	}
+
+	@Override
+	public void clearFamiliars() {
+		if (familiars.isEmpty())
+			return;
+		
+		for (EntityLivingBase entity : familiars) {
+			entity.setDead();
+		}
+		
+		familiars.clear();
 	}
 }

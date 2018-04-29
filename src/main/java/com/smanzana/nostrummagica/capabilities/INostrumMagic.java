@@ -58,8 +58,9 @@ public interface INostrumMagic {
 	public void addManaCostModifer(float modifier);
 	
 	// Familiars
-//	public List<IFamiliar> getFamiliars(); // TODO add interface
-//	public void addFamiliar(IFamiliar familiar); // TODO here, too
+	public List<EntityLivingBase> getFamiliars();
+	public void addFamiliar(EntityLivingBase familiar);
+	public void clearFamiliars();
 	
 	// Binding
 	public boolean isBinding();

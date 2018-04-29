@@ -254,7 +254,7 @@ public class Spell {
 			if (targ == null)
 				pos = new Vec3d(targpos.getX() + .5, targpos.getY(), targpos.getZ() + .5);
 			else
-				pos = targ.getPositionVector().addVector(0, targ.getEyeHeight(), 0);
+				pos = targ.getPositionVector();
 			
 			this.triggerInstance = trigger.instance(this, world, pos,
 					(targ == null ? -90.0f : targ.rotationPitch),
@@ -364,8 +364,6 @@ public class Spell {
 	private int registryID;
 	private List<SpellPart> parts;
 	private int manaCost;
-	
-	// TODO some cool effects and stuff
 	
 	private Spell() {
 		this.parts = new LinkedList<>();

@@ -47,9 +47,7 @@ public abstract class SpellTrigger {
 		public SpellTriggerInstance(SpellState state) {
 			this.state = state;
 		}
-		
-		// TODO implementation figured out when to call trigger.
-		
+				
 		protected void trigger(TriggerData data) {
 			state.trigger(data.targets, data.others, data.world, data.pos);
 		}

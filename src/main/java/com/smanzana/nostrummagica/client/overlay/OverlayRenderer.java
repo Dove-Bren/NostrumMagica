@@ -37,9 +37,6 @@ public class OverlayRenderer extends Gui {
 	
 	@SubscribeEvent
 	public void onRender(RenderGameOverlayEvent.Post event) {
-		// if config says one way or the other, do that
-		// like fill in these floats
-		// TODO
 		if (event.getType() != ElementType.ALL)
 			return;
 		

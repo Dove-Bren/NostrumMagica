@@ -162,7 +162,6 @@ public class ShrineRoom extends StaticRoom implements ISpellComponentRoom {
 
 	@Override
 	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

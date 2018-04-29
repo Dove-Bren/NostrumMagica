@@ -15,7 +15,8 @@ public enum PotionIcon {
 	MAGICSHIELD(2, 0),
 	PHYSICALSHIELD(3, 0),
 	ROOTED(4, 0),
-	MAGICBOOST(5, 0);
+	MAGICBOOST(5, 0),
+	FAMILIAR(6, 0);
 	
 	private static final ResourceLocation text = new ResourceLocation(
 			NostrumMagica.MODID, "textures/gui/icons.png");

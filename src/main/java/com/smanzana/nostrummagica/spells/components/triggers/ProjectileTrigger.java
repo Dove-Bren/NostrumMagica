@@ -122,8 +122,6 @@ public class ProjectileTrigger extends SpellTrigger {
 		return 30;
 	}
 
-	// TODO could add element & count to trigger so it can do things differently
-	// based on element and power
 	@Override
 	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw, SpellPartParam params) {
 		// We use param's flip to indicate whether we should continue on max range
@@ -132,7 +130,7 @@ public class ProjectileTrigger extends SpellTrigger {
 			atMax = params.flip;
 		
 		// Add direction
-		pos = new Vec3d(pos.xCoord, pos.yCoord, pos.zCoord);
+		pos = new Vec3d(pos.xCoord, pos.yCoord + state.getSelf().getEyeHeight(), pos.zCoord);
 		return new ProjectileTriggerInstance(state, world, pos, pitch, yaw, atMax);
 	}
 

@@ -26,6 +26,7 @@ import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
+import com.smanzana.nostrummagica.potions.FamiliarPotion;
 import com.smanzana.nostrummagica.potions.MagicBoostPotion;
 import com.smanzana.nostrummagica.potions.MagicResistPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -781,13 +782,43 @@ public class SpellAction {
 
 		@Override
 		public void apply(EntityLivingBase caster, World world, BlockPos block, float efficiency) {
+			NostrumMagica.getMagicWrapper(caster).clearFamiliars();
+			caster.removeActivePotionEffect(FamiliarPotion.instance());
 			for (int i = 0; i < power; i++) {
 				EntityGolem golem = spawnGolem(world);
 				golem.setPosition(block.getX() + .5, block.getY(), block.getZ() + .5);
 				world.spawnEntityInWorld(golem);
 				golem.setOwnerId(caster.getPersistentID());
+				NostrumMagica.getMagicWrapper(caster).addFamiliar(golem);
 			}
-			// TODO add time based on efficiency
+			int time = (int) (20 * 60 * 2.5 * Math.pow(2, Math.max(0, power - 1)) * efficiency);
+			caster.addPotionEffect(new PotionEffect(FamiliarPotion.instance(), time, 0) {
+				@Override
+				public boolean onUpdate(EntityLivingBase entityIn) {
+					// heh snekky
+					boolean ret = super.onUpdate(entityIn);
+					if (ret) {
+						// we're not being removed. Check familiars
+						INostrumMagic attr = NostrumMagica.getMagicWrapper(entityIn);
+						if (attr != null) {
+							boolean active = false;
+							if (!attr.getFamiliars().isEmpty()) {
+								for (EntityLivingBase fam : attr.getFamiliars()) {
+									if (fam.isEntityAlive()) {
+										active = true;
+										break;
+									}
+								}
+							}
+							if (!active) {
+								ret = false;
+							}
+						}
+					}
+					
+					return ret;
+				}
+			});
 			
 			NostrumMagicaSounds.CAST_CONTINUE.play(world,
 					block.getX() + .5, block.getY(), block.getZ() + .5);

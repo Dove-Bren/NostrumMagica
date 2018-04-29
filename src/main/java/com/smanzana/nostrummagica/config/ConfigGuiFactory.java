@@ -10,7 +10,7 @@ public class ConfigGuiFactory implements IModGuiFactory {
 
 	@Override
 	public void initialize(Minecraft minecraftInstance) {
-		// TODO Auto-generated method stub
+		;
 	}
 
 	@Override
@@ -20,14 +20,12 @@ public class ConfigGuiFactory implements IModGuiFactory {
 
 	@Override
 	public Set<RuntimeOptionCategoryElement> runtimeGuiCategories() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
 	public RuntimeOptionGuiHandler getHandlerFor(RuntimeOptionCategoryElement element) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

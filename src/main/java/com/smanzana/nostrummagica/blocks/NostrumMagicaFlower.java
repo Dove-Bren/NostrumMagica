@@ -60,7 +60,6 @@ public class NostrumMagicaFlower extends BlockBush {
 
 		@Override
 		public String getName() {
-			// TODO Auto-generated method stub
 			return this.name().toLowerCase();
 		}
 		
