@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
 import com.smanzana.nostrummagica.listeners.PlayerListener.IMagicListener;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
@@ -33,6 +34,9 @@ public class ManaTrigger extends SpellTrigger {
 			this.amount = amount;
 			this.onHigh = higher;
 			this.entity = entity;
+			
+			if (this.amount <= 0f)
+				this.amount = .5f;
 		}
 		
 		@Override
@@ -44,15 +48,19 @@ public class ManaTrigger extends SpellTrigger {
 
 		@Override
 		public boolean onEvent(Event type, EntityLivingBase entity) {
-			// We only registered for time, so don't bother checking
-			
+			EntityLivingBase self = this.getState().getSelf();
 			TriggerData data = new TriggerData(
-					Lists.newArrayList(this.getState().getSelf()),
-					Lists.newArrayList(this.getState().getSelf()),
+					Lists.newArrayList(self),
+					Lists.newArrayList(self),
 					null,
 					null
 					);
 			this.trigger(data);
+			
+			NostrumMagica.proxy.spawnEffect(self.worldObj,
+					new SpellComponentWrapper(instance()),
+					self, null, self, null, null);
+			
 			return true;
 		}
 	}

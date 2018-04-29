@@ -683,12 +683,13 @@ public class ClientProxy extends CommonProxy {
 		
 		renderer.registerEffect(new SpellComponentWrapper(OtherTrigger.instance()),
 				(source, sourcePos, target, targetPos, flavor) -> {
-					ClientEffect effect = new ClientEffectMirrored(source == null ? sourcePos : source.getPositionVector(),
+					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
 							new ClientEffectFormBasic(ClientEffectIcon.TING3, 0, 0, 0),
 							500L, 6);
 					
-					if (target != null)
+					if (target != null) {
 						effect.modify(new ClientEffectModifierFollow(target));
+					}
 					
 					if (flavor != null && flavor.isElement()) {
 						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
@@ -696,7 +697,7 @@ public class ClientProxy extends CommonProxy {
 					
 					effect
 					.modify(new ClientEffectModifierTranslate(0, 1, -1))
-					.modify(new ClientEffectModifierRotate(.4f, 0f, .8f))
+					.modify(new ClientEffectModifierRotate(.4f, 0f, 1.2f))
 					.modify(new ClientEffectModifierGrow(.8f, .2f, 1f, 1f, .3f))
 					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, .2f, .8f))
 					;
@@ -705,7 +706,7 @@ public class ClientProxy extends CommonProxy {
 		
 		renderer.registerEffect(new SpellComponentWrapper(HealthTrigger.instance()),
 				(source, sourcePos, target, targetPos, flavor) -> {
-					ClientEffect effect = new ClientEffectMirrored(source == null ? sourcePos : source.getPositionVector(),
+					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
 							new ClientEffectFormBasic(ClientEffectIcon.TING5, 0, 0, 0),
 							1000L, 4);
 					
@@ -999,9 +1000,7 @@ public class ClientProxy extends CommonProxy {
 			EntityLivingBase caster, Vec3d casterPos,
 			EntityLivingBase target, Vec3d targetPos,
 			SpellComponentWrapper flavor) {
-		if (world != null || target != null) {
-			if (world == null)
-				world = target.worldObj;
+		if (world != null) {
 			if (!world.isRemote) {
 				super.spawnEffect(world, comp, caster, casterPos, target, targetPos, flavor);
 				return;

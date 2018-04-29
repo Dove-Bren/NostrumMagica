@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -32,6 +34,11 @@ public class OtherTrigger extends InstantTrigger {
 	
 	@Override
 	protected TriggerData getTargetData(SpellState state, World world, Vec3d pos, float pitch, float yaw) {
+		
+		NostrumMagica.proxy.spawnEffect(state.getOther().worldObj,
+				new SpellComponentWrapper(instance()),
+				state.getCaster(), null, state.getOther(), null, null);
+		
 		return new TriggerData(Lists.newArrayList(state.getOther()), Lists.newArrayList(state.getSelf()), world, null);
 	}
 	

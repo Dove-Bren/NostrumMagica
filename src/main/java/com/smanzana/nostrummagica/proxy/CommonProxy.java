@@ -506,6 +506,11 @@ public class CommonProxy {
 				.getTrackingPlayers(target));
 		}
 		
+		if (caster != null && caster == target && caster instanceof EntityPlayer) {
+			// Very specific case here
+			players.add((EntityPlayer) caster);
+		}
+		
 		if (players.isEmpty()) {
 			// Fall back to distance check against locations
 			if (casterPos != null) {
