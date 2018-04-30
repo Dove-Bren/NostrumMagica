@@ -6,6 +6,8 @@ import java.util.List;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.items.NostrumResourceItem;
+import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellRune;
@@ -31,7 +33,7 @@ public abstract class InfoScreenTab {
 	private static InfoScreenTab INFO_ENTITY;
 	
 	public static void init() {
-		if (RITUALS != null)
+		if (INFO_ITEMS != null)
 			return;
 		
 		INFO_REAGENTS = new InfoScreenTab(InfoScreenTabs.INFO_REAGENTS,
@@ -160,6 +162,37 @@ public abstract class InfoScreenTab {
 		
 		INFO_ENTITY = new InfoScreenTab(InfoScreenTabs.INFO_ENTITY,
 				new ItemStack(Items.SKULL)) {
+
+			private List<ILoreTagged> getAvailable(INostrumMagic attr) {
+				List<ILoreTagged> list = new LinkedList<>();
+				for (ILoreTagged tag : attr.getAllLore()) {
+					if (tag.getTab() == this.tab && attr.hasLore(tag))
+						list.add(tag);
+				}
+				
+				return list;
+			}
+			
+			@Override
+			public boolean isVisible(INostrumMagic attr) {
+				List<ILoreTagged> lore = getAvailable(attr);
+				return (!lore.isEmpty());
+			}
+
+			@Override
+			public List<InfoButton> getButtons(int offset, INostrumMagic attr) {
+				List<ILoreTagged> lore = getAvailable(attr);
+				List<InfoButton> buttons = new LinkedList<>();
+				for (ILoreTagged tag : lore) {
+					buttons.add(new LoreInfoButton(offset++, tag));
+				}
+				return buttons;
+			}
+			
+		};
+		
+		INFO_ITEMS = new InfoScreenTab(InfoScreenTabs.INFO_ITEMS,
+				NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1)) {
 
 			private List<ILoreTagged> getAvailable(INostrumMagic attr) {
 				List<ILoreTagged> list = new LinkedList<>();

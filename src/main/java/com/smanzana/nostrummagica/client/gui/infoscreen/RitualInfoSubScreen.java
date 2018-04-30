@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.blocks.AltarBlock;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.ChalkBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 
@@ -17,11 +18,13 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.oredict.OreDictionary;
 
 public class RitualInfoSubScreen implements IInfoSubScreen {
 
@@ -56,12 +59,13 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 			scale = 32;
 			tilt = 20;
 		}
+		tilt = 30;
 		
 		ScaledResolution scaledresolution = new ScaledResolution(mc);
 	    GL11.glViewport(x, -y, mc.displayWidth - x, mc.displayHeight - y);
 	    GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
 	    
-	    GlStateManager.translate(scaledresolution.getScaledWidth() / 2, (scaledresolution.getScaledHeight() * .4), 0);
+	    GlStateManager.translate(scaledresolution.getScaledWidth() / 2, (scaledresolution.getScaledHeight() * .5), -50);
 		GlStateManager.scale(scale, scale, scale);
 
 		GlStateManager.rotate(tilt, 1, 0, 0);
@@ -127,10 +131,10 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 			drawCandle(mc, 2, 0, 2, ritual.getTypes()[3]);
 
 			drawAltar(mc, 0, 0, 0, ritual.getCenterItem());
-			drawAltar(mc, 4, 0, 0, ritual.getExtraItems()[0]);
-			drawAltar(mc, -4, 0, 0, ritual.getExtraItems()[1]);
-			drawAltar(mc, 0, 0, 4, ritual.getExtraItems()[2]);
-			drawAltar(mc, 0, 0, -4, ritual.getExtraItems()[3]);
+			drawAltar(mc, -4, 0, 0, ritual.getExtraItems()[0]);
+			drawAltar(mc, 0, 0, 4, ritual.getExtraItems()[1]);
+			drawAltar(mc, 0, 0, -4, ritual.getExtraItems()[2]);
+			drawAltar(mc, 4, 0, 0, ritual.getExtraItems()[3]);
 		}
 		break; // No fallthrough cause cna't figure out depth
 		case 1: {
@@ -190,9 +194,12 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		
 		GlStateManager.popMatrix();
 		
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(0, 0, 1000);
 		String title = I18n.format("ritual." + ritual.getTitleKey() + ".name", new Object[0]);
 		int len = mc.fontRendererObj.getStringWidth(title);
 		mc.fontRendererObj.drawStringWithShadow(title, x + (width / 2) + (-len / 2), y, 0xFFFFFFFF);
+		GlStateManager.popMatrix();
 		
 	}
 	
@@ -233,10 +240,30 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 	
 	private void drawCandle(Minecraft mc, double x, double y, double z, ReagentType reagent) {
 		drawBlock(mc, candle, x, y, z);
+		if (reagent != null) {
+			GlStateManager.pushMatrix();
+			GlStateManager.enableBlend();
+			GlStateManager.translate(x + .5, y + 1, z + .5);
+			mc.getRenderItem().renderItem(
+					ReagentItem.instance().getReagent(reagent, 1), TransformType.GROUND);
+			GlStateManager.popMatrix();
+		}
 	}
 	
 	private void drawAltar(Minecraft mc, double x, double y, double z, ItemStack item) {
 		drawBlock(mc, altar, x, y, z);
+		if (item != null) {
+			if (item.getMetadata() == OreDictionary.WILDCARD_VALUE) {
+				item = item.copy();
+				item.setItemDamage(0);
+			}
+			GlStateManager.pushMatrix();
+			GlStateManager.enableBlend();
+			GlStateManager.translate(x + .5, y + 1.5, z + .5);
+			mc.getRenderItem().renderItem(
+					item, TransformType.GROUND);
+			GlStateManager.popMatrix();
+		}
 	}
 
 }

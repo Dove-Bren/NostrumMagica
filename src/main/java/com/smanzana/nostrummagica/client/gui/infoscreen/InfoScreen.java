@@ -43,6 +43,8 @@ public class InfoScreen extends GuiScreen {
 		this.attribute = attribute;
 		
 		LoreRegistry.instance().register(new EntityGolemPhysical(Minecraft.getMinecraft().theWorld));
+		
+		
 	}
 	
 	@Override

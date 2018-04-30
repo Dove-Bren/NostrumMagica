@@ -18,6 +18,10 @@ public class LoreInfoSubScreen implements IInfoSubScreen {
 	
 	@Override
 	public void draw(INostrumMagic attr, Minecraft mc, int x, int y, int width, int height) {
+		String title = this.tag.getLoreDisplayName();
+		int len = mc.fontRendererObj.getStringWidth(title);
+		mc.fontRendererObj.drawStringWithShadow(title, x + (width / 2) + (-len / 2), y, 0xFFFFFFFF);
+		
 		Lore lore = attr.getLore(this.tag);
 		
 		List<String> data = lore.getData();
@@ -25,7 +29,7 @@ public class LoreInfoSubScreen implements IInfoSubScreen {
 		for (String line : data)
 			mc.fontRendererObj.drawSplitString(line,
 					x + 5,
-					y + 5 + (i++ * 20),
+					y + 35 + (i++ * 17),
 					width, 0xFFFFFFFF);
 	}
 
