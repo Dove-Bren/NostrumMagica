@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.items;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.SpellTable;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -132,5 +133,10 @@ public class SpellTableItem extends Item implements ILoreTagged {
 	@Override
 	public Lore getDeepLore() {
 		return new Lore().add("Spell Tables are used to create spells.", "Combine spell runes, blank scrolls, and reagents to create Spell Scrolls.", "Spells must begin with a trigger. After that, any triggers or shapes afterwards can be used.", "Reagents must be slotted into the table in order to be used.");
+	}
+
+	@Override
+	public InfoScreenTabs getTab() {
+		return InfoScreenTabs.INFO_SPELLS;
 	}
 }

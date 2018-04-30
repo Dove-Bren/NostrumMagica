@@ -1,9 +1,12 @@
 package com.smanzana.nostrummagica.client.gui;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.blocks.SpellTable.SpellTableEntity;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.container.ReagentBagGui;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
 import com.smanzana.nostrummagica.items.ReagentBag;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,6 +22,7 @@ public class NostrumGui implements IGuiHandler {
 	public static final int spellTableID = 1;
 	public static final int mirrorID = 2;
 	public static final int obeliskID = 3;
+	public static final int infoscreenID = 4;
 	
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
@@ -48,6 +52,10 @@ public class NostrumGui implements IGuiHandler {
 		}
 		
 		if (ID == obeliskID) {
+			return null;
+		}
+		
+		if (ID == infoscreenID) {
 			return null;
 		}
 		
@@ -97,6 +105,13 @@ public class NostrumGui implements IGuiHandler {
 			if (te != null && te instanceof NostrumObeliskEntity) {
 				return new ObeliskScreen((NostrumObeliskEntity) te);
 			}
+		}
+		
+		if (ID == infoscreenID) {
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+			if (attr == null)
+				return null;
+			return new InfoScreen(attr);
 		}
 		
 		// Item based

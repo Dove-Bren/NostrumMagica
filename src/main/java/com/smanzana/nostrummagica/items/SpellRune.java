@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.items;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spells.EAlteration;
@@ -676,6 +677,11 @@ public class SpellRune extends Item implements ILoreTagged {
 			return new SpellComponentWrapper(part.getTrigger());
 		else
 			return new SpellComponentWrapper(part.getShape());
+	}
+
+	@Override
+	public InfoScreenTabs getTab() {
+		return InfoScreenTabs.INFO_SPELLS;
 	}
 	
 }

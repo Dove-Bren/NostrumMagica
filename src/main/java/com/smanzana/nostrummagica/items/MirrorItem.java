@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.items;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumMirrorBlock;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
@@ -128,5 +129,10 @@ public class MirrorItem extends Item implements ILoreTagged {
 	@Override
 	public Lore getDeepLore() {
 		return new Lore().add("The magic mirror allows you to view and increase your magic attributes.", "Use it to spend points you earn as you level up.", "Level up by casting new types of spells.");
+	}
+
+	@Override
+	public InfoScreenTabs getTab() {
+		return InfoScreenTabs.INFO_BLOCKS;
 	}
 }

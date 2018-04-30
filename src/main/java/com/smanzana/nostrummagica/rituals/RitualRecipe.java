@@ -46,7 +46,10 @@ public class RitualRecipe {
 	private IRitualRequirement req;
 	private String titleKey;
 	
+	private ItemStack icon;
+	
 	public static RitualRecipe createTier1(String titleKey,
+			ItemStack icon,
 			EMagicElement element,
 			ReagentType reagent,
 			IRitualRequirement requirement,
@@ -56,11 +59,13 @@ public class RitualRecipe {
 		recipe.types[0] = reagent;
 		recipe.hook = outcome;
 		recipe.req = requirement;
+		recipe.icon = icon;
 		
 		return recipe;
 	}
 	
 	public static RitualRecipe createTier2(String titleKey,
+			ItemStack icon,
 			EMagicElement element,
 			ReagentType[] reagents,
 			ItemStack center, 
@@ -75,11 +80,13 @@ public class RitualRecipe {
 		recipe.centerItem = center;
 		recipe.hook = outcome;
 		recipe.req = requirement;
+		recipe.icon = icon;
 		
 		return recipe;
 	}
 	
 	public static RitualRecipe createTier3(String titleKey,
+			ItemStack icon,
 			EMagicElement element,
 			ReagentType[] reagents,
 			ItemStack center,
@@ -99,6 +106,7 @@ public class RitualRecipe {
 
 		recipe.hook = outcome;
 		recipe.req = requirement;
+		recipe.icon = icon;
 		
 		return recipe;
 	}
@@ -310,6 +318,10 @@ public class RitualRecipe {
 	
 	public String getTitleKey() {
 		return titleKey;
+	}
+
+	public ItemStack getIcon() {
+		return icon;
 	}
 	
 }

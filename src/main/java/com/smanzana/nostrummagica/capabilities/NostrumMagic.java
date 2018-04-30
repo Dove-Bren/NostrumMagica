@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.capabilities;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,6 +14,7 @@ import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.loretag.LoreCache;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.quests.objectives.IObjectiveState;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
@@ -691,5 +693,16 @@ public class NostrumMagic implements INostrumMagic {
 		}
 		
 		familiars.clear();
+	}
+
+	@Override
+	public List<ILoreTagged> getAllLore() {
+		List<ILoreTagged> lore = new ArrayList<>();
+		for (String key : this.loreLevels.keySet()) {
+			ILoreTagged tag = LoreRegistry.instance().lookup(key);
+			if (tag != null)
+				lore.add(tag);
+		}
+		return lore;
 	}
 }

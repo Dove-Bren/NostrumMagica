@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.items;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
@@ -163,5 +164,10 @@ public class NostrumResourceItem extends Item implements ILoreTagged {
 		if (translation.trim().isEmpty())
 			return;
 		tooltip.add(translation);
+	}
+
+	@Override
+	public InfoScreenTabs getTab() {
+		return InfoScreenTabs.INFO_ITEMS;
 	}
 }

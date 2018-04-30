@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.items;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -57,6 +58,11 @@ public class BlankScroll extends Item implements ILoreTagged {
 	@Override
 	public Lore getDeepLore() {
 		return new Lore().add("Blank scrolls are used to make spells.", "By arranging runes and reagents on a Spell table, spells can be drafted onto the scroll to create a Spell Scroll.");
+	}
+
+	@Override
+	public InfoScreenTabs getTab() {
+		return InfoScreenTabs.INFO_ITEMS;
 	}
 	
 }

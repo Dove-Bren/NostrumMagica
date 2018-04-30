@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
 import com.smanzana.nostrummagica.items.EnchantedEquipment;
 import com.smanzana.nostrummagica.items.ReagentBag;
@@ -193,6 +192,16 @@ public class PlayerListener {
 		
 		MinecraftForge.EVENT_BUS.register(this);
 		tickCount = 0;
+	}
+	
+	public void clearAll() {
+		timeInfos.clear();
+		proximityInfos.clear();
+		positionInfos.clear();
+		damagedInfos.clear();
+		healthInfos.clear();
+		foodInfos.clear();
+		manaInfos.clear();
 	}
 	
 	/**
@@ -736,6 +745,10 @@ public class PlayerListener {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(event.player);
 		if (attr != null)
 			attr.clearFamiliars();
+		
+		if (event.player.worldObj.isRemote) {
+			this.clearAll();
+		}
 	}
 	
 	// TESTING
@@ -746,12 +759,6 @@ public class PlayerListener {
 		if (attr != null) {
 			attr.unlock();
 		}
-		
-		e.getEntityPlayer().openGui(NostrumMagica.instance,
-				NostrumGui.spellTableID, e.getWorld(),
-				e.getPos().getX(),
-				e.getPos().getY(),
-				e.getPos().getZ());
 		
 		if (e.getWorld().isRemote)
 			return;

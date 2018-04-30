@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.loretag;
 
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+
 /**
  * Something tagged with lore.
  * Lore has two stages: basic and deep. Basic knowledge is
@@ -53,4 +55,10 @@ public interface ILoreTagged {
 	 * @return
 	 */
 	public Lore getDeepLore();
+	
+	/**
+	 * Return which tab this piece of lore should be displayed under
+	 * @return
+	 */
+	public InfoScreenTabs getTab();
 }

@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.entity;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -57,7 +58,7 @@ public abstract class EntityGolem extends EntityTameable implements ILoreTagged 
         this.isRange = range;
         this.hasBuff = buff;
         
-        if (!worldIn.isRemote)
+        if (worldIn != null && !worldIn.isRemote)
         	gTask.initStance(isMelee, isRange, hasBuff);
         
         idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
@@ -230,6 +231,11 @@ public abstract class EntityGolem extends EntityTameable implements ILoreTagged 
 	@Override
 	public Lore getDeepLore() {
 		return new Lore().add("By infusing stones with an element, a spark of life is born.", "Golems take after the element they are infused with. Golems can have melee attacks, ranged spells, or even buffs they might share with their caster.");
+	}
+
+	@Override
+	public InfoScreenTabs getTab() {
+		return InfoScreenTabs.INFO_ENTITY;
 	}
 	
 	private static class GolemAIFindEntityNearestPlayer extends EntityAINearestAttackableTarget<EntityPlayer> {

@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.items;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.AltarBlock;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -79,6 +80,11 @@ public class AltarItem extends Item implements ILoreTagged {
         } else {
         	return EnumActionResult.FAIL;
         }
+	}
+
+	@Override
+	public InfoScreenTabs getTab() {
+		return InfoScreenTabs.RITUALS;
 	}
 	
 }

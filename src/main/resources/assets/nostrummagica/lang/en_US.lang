@@ -189,6 +189,7 @@ itemGroup.nostrummagica_enhancements=Nostrum Enhancements
 
 key.cast.desc=Cast Spell
 key.spellscroll.desc=Scroll Spells (+ MouseWheel)
+key.infoscreen.desc=Info Screen
 key.nostrummagica.desc=Nostrum Magica
 
 death.attack.magic.PHYSICAL=%1$s was killed by %2$s using physical energies

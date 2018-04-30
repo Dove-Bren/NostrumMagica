@@ -72,6 +72,7 @@ public interface INostrumMagic {
 	
 	// Lore
 	public boolean hasLore(ILoreTagged tagged);
+	public List<ILoreTagged> getAllLore();
 	public Lore getLore(ILoreTagged tagged);
 	public void giveBasicLore(ILoreTagged tagged);
 	public void giveFullLore(ILoreTagged tagged);

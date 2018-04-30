@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
@@ -212,5 +213,10 @@ public class PositionCrystal extends Item implements ILoreTagged {
 			
 			DimensionNames.put(id, provider.getDimensionType().getName());
 		}
+	}
+
+	@Override
+	public InfoScreenTabs getTab() {
+		return InfoScreenTabs.INFO_ITEMS;
 	}
 }

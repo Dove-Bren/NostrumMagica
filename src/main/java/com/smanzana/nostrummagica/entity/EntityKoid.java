@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.entity;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -258,4 +259,9 @@ public class EntityKoid extends EntityMob implements ILoreTagged {
     			this.getElement(),
     			count), 0);
     }
+
+	@Override
+	public InfoScreenTabs getTab() {
+		return InfoScreenTabs.INFO_ENTITY;
+	}
 }

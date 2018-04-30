@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.items;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
@@ -45,6 +46,11 @@ public class MasteryOrb extends Item implements ILoreTagged {
 	@Override
 	public Lore getDeepLore() {
 		return new Lore().add("These orbs are filled with a large amount of unaspected potency.", "By offering them up at Elemental shrines, you can raise your mastery of the elements.");
+	}
+
+	@Override
+	public InfoScreenTabs getTab() {
+		return InfoScreenTabs.INFO_SPELLS;
 	}
 	
 }

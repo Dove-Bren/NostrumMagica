@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.client.gui.book.LinedTextPage;
 import com.smanzana.nostrummagica.client.gui.book.PlainTextPage;
 import com.smanzana.nostrummagica.client.gui.book.SpellPreviewPage;
 import com.smanzana.nostrummagica.client.gui.book.TitlePage;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.network.NetworkHandler;
@@ -869,5 +870,10 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		for (int i = 0; i < SpellTome.MAX_TOME_COUNT; i++) {
 			subItems.add(getItemstack(i, 10));
 		}
+	}
+
+	@Override
+	public InfoScreenTabs getTab() {
+		return InfoScreenTabs.INFO_TOMES;
 	}
 }

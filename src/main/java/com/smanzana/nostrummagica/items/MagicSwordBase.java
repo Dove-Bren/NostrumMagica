@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.items;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
@@ -66,6 +67,11 @@ public class MagicSwordBase extends ItemSword implements ILoreTagged {
 	@Override
 	public Lore getDeepLore() {
 		return new Lore().add("Inserting void crystals into an iron sword creates an Ethereal sword.", "Casting an enchantment on it provides unique effects.");
+	}
+
+	@Override
+	public InfoScreenTabs getTab() {
+		return InfoScreenTabs.INFO_ITEMS;
 	}
 
 }

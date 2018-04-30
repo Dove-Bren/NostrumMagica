@@ -34,6 +34,7 @@ import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierS
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierTranslate;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.gui.MirrorGui;
+import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityAltarRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityCandleRenderer;
@@ -133,6 +134,7 @@ public class ClientProxy extends CommonProxy {
 	
 	private KeyBinding bindingCast;
 	private KeyBinding bindingScroll;
+	private KeyBinding bindingInfo;
 	private OverlayRenderer overlayRenderer;
 	private ClientEffectRenderer effectRenderer;
 
@@ -148,6 +150,8 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.registerKeyBinding(bindingCast);
 		bindingScroll = new KeyBinding("key.spellscroll.desc", Keyboard.KEY_LSHIFT, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingScroll);
+		bindingInfo = new KeyBinding("key.infoscreen.desc", Keyboard.KEY_HOME, "key.nostrummagica.desc");
+		ClientRegistry.registerKeyBinding(bindingInfo);
 		
 		RenderingRegistry.registerEntityRenderingHandler(EntityGolem.class, new IRenderFactory<EntityGolem>() {
 			@Override
@@ -418,6 +422,11 @@ public class ClientProxy extends CommonProxy {
 	public void onKey(KeyInputEvent event) {
 		if (bindingCast.isPressed())
 			doCast();
+		else if (bindingInfo.isPressed()) {
+			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+			player.openGui(NostrumMagica.instance,
+					NostrumGui.infoscreenID, player.worldObj, 0, 0, 0);
+		}
 	}
 	
 	private void doCast() {

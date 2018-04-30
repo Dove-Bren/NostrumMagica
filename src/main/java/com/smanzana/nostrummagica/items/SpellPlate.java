@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
@@ -249,5 +250,10 @@ public class SpellPlate extends Item implements ILoreTagged {
 		}
 		
 		return enhancements;
+	}
+
+	@Override
+	public InfoScreenTabs getTab() {
+		return InfoScreenTabs.INFO_ITEMS;
 	}
 }
