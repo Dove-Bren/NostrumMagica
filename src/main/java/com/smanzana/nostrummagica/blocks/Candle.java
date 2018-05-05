@@ -151,6 +151,15 @@ public class Candle extends Block implements ITileEntityProvider {
     }
     
     public static void extinguish(World world, BlockPos pos, IBlockState state) {
+    	extinguish(world, pos, state, false);
+    }
+    
+    public static void extinguish(World world, BlockPos pos, IBlockState state, boolean force) {
+    	
+    	if (!force && world.getBlockState(pos.add(0, -1, 0)).getBlock()
+				.isFireSource(world, pos.add(0, -1, 0), EnumFacing.UP))
+			return;
+    	
     	if (world.getTileEntity(pos) != null)
     		world.removeTileEntity(pos);
     	
@@ -224,7 +233,7 @@ public class Candle extends Block implements ITileEntityProvider {
 			
 			if (hand == EnumHand.MAIN_HAND || (playerIn.getHeldItemMainhand() == null)) {
 				// putting it out
-				extinguish(worldIn, pos, state);
+				extinguish(worldIn, pos, state, true);
 				return true;
 			}
 			
