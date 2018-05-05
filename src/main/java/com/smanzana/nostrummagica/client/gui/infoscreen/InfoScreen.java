@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.client.gui.infoscreen;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -7,16 +8,16 @@ import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
-import com.smanzana.nostrummagica.loretag.LoreRegistry;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiLabel;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.client.config.GuiUtils;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -41,10 +42,6 @@ public class InfoScreen extends GuiScreen {
 	
 	public InfoScreen(INostrumMagic attribute) {
 		this.attribute = attribute;
-		
-		LoreRegistry.instance().register(new EntityGolemPhysical(Minecraft.getMinecraft().theWorld));
-		
-		
 	}
 	
 	@Override
@@ -76,7 +73,7 @@ public class InfoScreen extends GuiScreen {
 	}
 	
 	@Override
-	public void drawScreen(int parWidth, int parHeight, float p_73863_3_) {
+	public void drawScreen(int mouseX, int mouseY, float p_73863_3_) {
 
 		Gui.drawRect(0, 0, width, height, 0xFF000000);
 		
@@ -85,7 +82,17 @@ public class InfoScreen extends GuiScreen {
 		}
 		
 		// Do buttons and other parent stuff
-		super.drawScreen(parWidth, parHeight, p_73863_3_);
+		for (int i = 0; i < this.buttonList.size(); ++i) {
+			((GuiButton)this.buttonList.get(i)).drawButton(this.mc, mouseX, mouseY);
+		}
+
+		for (int j = 0; j < this.labelList.size(); ++j) {
+			((GuiLabel)this.labelList.get(j)).drawLabel(this.mc, mouseX, mouseY);
+		}
+		
+		for (int i = 0; i < this.buttonList.size(); ++i) {
+			((GuiButton)this.buttonList.get(i)).drawButtonForegroundLayer(mouseX, mouseY);
+		}
 	}
 	
 	@Override
@@ -137,6 +144,7 @@ public class InfoScreen extends GuiScreen {
 		private static final int TEXT_BUTTON_TAB_WIDTH = 32;
         private InfoScreenTab tab;
         private List<InfoButton> buttons;
+        private List<String> desc;
 
         public TabButton(int parButtonId, int parPosX, int parPosY, 
         		INostrumMagic attr, InfoScreenTab tab) {
@@ -146,6 +154,13 @@ public class InfoScreen extends GuiScreen {
             
             if (this.buttons == null || this.buttons.isEmpty())
             	this.visible = false;
+            
+            desc = new ArrayList<>();
+            String name = tab.tab.name();
+            if (name.contains("_")) {
+            	name = name.substring(name.indexOf('_') + 1);
+            }
+            desc.add(name.substring(0, 1).toUpperCase() + name.toLowerCase().substring(1));
         }
         
         public List<InfoButton> getButtons() {
@@ -181,6 +196,22 @@ public class InfoScreen extends GuiScreen {
                 mc.getRenderItem().renderItemIntoGUI(tab.getIcon(), x, y);
             }
         }
+        
+        @Override
+    	public void drawButtonForegroundLayer(int mouseX, int mouseY) {
+    		if (mouseX >= this.xPosition && mouseY > this.yPosition
+    			&& mouseX <= this.xPosition + this.width
+    			&& mouseY <= this.yPosition + this.height) {
+    			Minecraft mc = Minecraft.getMinecraft();
+    			GuiUtils.drawHoveringText(desc,
+    					mouseX,
+    					mouseY,
+    					mc.displayWidth,
+    					mc.displayHeight,
+    					100,
+    					mc.fontRendererObj);
+    		}
+    	}
     }
 	
 }

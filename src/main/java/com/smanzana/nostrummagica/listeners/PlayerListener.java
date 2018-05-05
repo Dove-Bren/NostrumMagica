@@ -60,6 +60,7 @@ import net.minecraftforge.event.entity.player.UseHoeEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
@@ -527,9 +528,10 @@ public class PlayerListener {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(event.getPlayer());
 		
 		if (attr != null && attr.isUnlocked()) {
-			if (event.getState().getBlock() instanceof ILoreTagged)
+			if (event.getState().getBlock() instanceof ILoreTagged) {
 				attr.giveBasicLore((ILoreTagged) event.getState().getBlock());
-			else if (null != LoreRegistry.getPreset(event.getState().getBlock()))
+				System.out.println("lore");
+			} else if (null != LoreRegistry.getPreset(event.getState().getBlock()))
 				attr.giveBasicLore(LoreRegistry.getPreset(event.getState().getBlock()));
 		}
 		
@@ -617,6 +619,19 @@ public class PlayerListener {
 					event.getDrops().add(entity);
 				}
 			}
+		}
+	}
+	
+	@SubscribeEvent
+	public void onCraft(PlayerEvent.ItemCraftedEvent e) {
+		if (e.isCanceled())
+			return;
+		
+		EntityPlayer player = e.player;
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		
+		if (e.crafting.getItem() instanceof ILoreTagged && attr != null && attr.isUnlocked()) {
+			attr.giveBasicLore((ILoreTagged) e.crafting.getItem());
 		}
 	}
 	

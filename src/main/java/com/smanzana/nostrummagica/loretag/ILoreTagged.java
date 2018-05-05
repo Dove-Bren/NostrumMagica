@@ -23,19 +23,19 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
  *
  */
 public interface ILoreTagged {
-
+	
 	/**
 	 * Return a unique string used to persist knowledge.
 	 * Best prefix with your modid or something. This is not shown to
 	 * the player.
 	 * <br />
 	 * This is used as a key when looking up Lore objects. If your entity/block/item
-	 * actually represents multiple, have each type return a unique key (and
-	 * unique lore and display names). Voila!
+	 * actually represents multiple, register an instance of each
+	 * @param o
 	 * @return
 	 */
 	public String getLoreKey();
-	
+
 	/**
 	 * Return the name of this lore-tagged object. <b>This should be translated already.</b>
 	 * @return

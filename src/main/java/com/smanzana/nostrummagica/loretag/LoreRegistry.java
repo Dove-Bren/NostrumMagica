@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
+import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
@@ -87,6 +89,8 @@ public class LoreRegistry {
 		register(PositionCrystal.instance());
 		register(SeekerIdol.instance());
 		register(ShrineSeekingGem.instance());
+		register(new EntityGolemPhysical(null));
+		register(new EntityKoid(null));
 		
 		for (Preset preset : Preset.values()) {
 			register(preset);

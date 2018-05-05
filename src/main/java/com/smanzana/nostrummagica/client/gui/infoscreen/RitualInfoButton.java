@@ -1,5 +1,8 @@
 package com.smanzana.nostrummagica.client.gui.infoscreen;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -8,6 +11,7 @@ import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 
 public class RitualInfoButton extends InfoButton {
@@ -50,5 +54,14 @@ public class RitualInfoButton extends InfoButton {
 			int y = yPosition + (height - itemLength) / 2;
 			mc.getRenderItem().renderItemIntoGUI(iconStack, x, y);
 		}
+	}
+	
+	private List<String> desc = new ArrayList<>(1);
+	@Override
+	public List<String> getDescription() {
+		if (desc.isEmpty())
+			desc.add(I18n.format("ritual." + ritual.getTitleKey() + ".name", new Object[0]));
+		
+		return desc;
 	}
 }

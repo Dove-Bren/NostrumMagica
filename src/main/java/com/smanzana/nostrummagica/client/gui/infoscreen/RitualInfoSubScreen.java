@@ -1,17 +1,22 @@
 package com.smanzana.nostrummagica.client.gui.infoscreen;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.blocks.AltarBlock;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.ChalkBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
@@ -33,6 +38,10 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 	private IBlockState candle;
 	private IBlockState altar;
 	
+	private List<String> desc;
+	
+	private static boolean infopage;
+	
 	public RitualInfoSubScreen(RitualRecipe ritual) {
 		this.ritual = ritual;
 		
@@ -40,10 +49,24 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		candle = Candle.instance().getDefaultState().withProperty(
 				Candle.LIT, true);
 		altar = AltarBlock.instance().getDefaultState();
+		
+		if (I18n.hasKey("ritual." + ritual.getTitleKey() + ".desc")) {
+			String lines = I18n.format("ritual." + ritual.getTitleKey() + ".desc", new Object[0]);
+			List<String> desc = new LinkedList<>();
+			int pos = lines.indexOf('|');
+			while (pos != -1) {
+				desc.add(lines.substring(0, pos));
+				lines = lines.substring(pos + 1);
+				pos = lines.indexOf('|');
+			}
+			desc.add(lines);
+		}
 	}
 	
 	@Override
 	public void draw(INostrumMagic attr, Minecraft mc, int x, int y, int width, int height) {
+		
+		infopage = (desc != null && !desc.isEmpty());
 		
 		GlStateManager.pushMatrix();
 		
@@ -64,6 +87,10 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		ScaledResolution scaledresolution = new ScaledResolution(mc);
 	    GL11.glViewport(x, -y, mc.displayWidth - x, mc.displayHeight - y);
 	    GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
+	    
+	    if (infopage) {
+	    	GlStateManager.translate(-(scaledresolution.getScaledWidth() / 4), 0, 0);
+	    }
 	    
 	    GlStateManager.translate(scaledresolution.getScaledWidth() / 2, (scaledresolution.getScaledHeight() * .5), -50);
 		GlStateManager.scale(scale, scale, scale);
@@ -184,6 +211,14 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		}
 		break;
 		}
+		
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(.5, 2.5, .5);
+		GlStateManager.rotate(20 * angle, 0, 1, 0);
+		GlStateManager.enableBlend();
+		mc.getRenderItem().renderItem(
+				InfusedGemItem.instance().getGem(ritual.getElement(), 1), TransformType.GROUND);
+		GlStateManager.popMatrix();
 
 	    GL11.glViewport(0, 0, mc.displayWidth, mc.displayHeight);
 	    GL11.glMatrixMode(GL11.GL_PROJECTION);
@@ -200,6 +235,16 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		int len = mc.fontRendererObj.getStringWidth(title);
 		mc.fontRendererObj.drawStringWithShadow(title, x + (width / 2) + (-len / 2), y, 0xFFFFFFFF);
 		GlStateManager.popMatrix();
+		
+		if (infopage) {
+			Gui.drawRect(x + (int) (width * .75), y, x + width, y + height, 0xFF203050);
+			
+			int i = 0;
+			for (String line : desc) {
+				mc.fontRendererObj.drawSplitString(line, x + (int) (width * .75) + 5, i + y + 10, (width / 4) - 5, 0xFFFFFFFF);
+				i += mc.fontRendererObj.FONT_HEIGHT * (mc.fontRendererObj.getStringWidth(line) / ((width / 4) - 5));
+			}
+		}
 		
 	}
 	
@@ -228,7 +273,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 		try {
 			mc.getBlockRendererDispatcher().getBlockModelRenderer()
-				.renderModel(mc.theWorld, model, state, new BlockPos(x, y, z), buffer, false);
+				.renderModelFlat(mc.theWorld, model, state, new BlockPos(x, y, z), buffer, false, 55);
 			
 		} catch (Exception e) {
 			

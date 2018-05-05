@@ -93,17 +93,17 @@ public class SpellPlate extends Item implements ILoreTagged {
 
 	@Override
 	public String getLoreDisplayName() {
-		return "Spelltome Pages";
+		return "Spelltome Plates";
 	}
 
 	@Override
 	public Lore getBasicLore() {
-		return new Lore().add("These pages hold some sort of power, but they don't seem to apply to regular weapons and tools.");
+		return new Lore().add("Sturdy wood plates perfect for binding as a tome.");
 	}
 
 	@Override
 	public Lore getDeepLore() {
-		return new Lore().add("These pages modify spells cast from a spell tome.", "Pages can be added during spell tome creation to add their effects to the tome.");
+		return new Lore().add("These plates are used to create spell tomes. Take them and a handful of Spelltome Pages to your ritual altar!");
 	}
 	
 	@Override

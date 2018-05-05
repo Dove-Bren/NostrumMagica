@@ -1,5 +1,8 @@
 package com.smanzana.nostrummagica.client.gui.infoscreen;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -13,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.Item;
@@ -69,6 +73,8 @@ public class LoreInfoButton extends InfoButton {
 					iconStack = new ItemStack(item, 1);
 			} else if (lore instanceof EntityLivingBase) {
 				iconEntity = (Entity) lore;
+				if (iconEntity.worldObj == null)
+					iconEntity.worldObj = mc.theWorld;
 			} else if (lore instanceof LoreRegistry.Preset) {
 				LoreRegistry.Preset preset = (LoreRegistry.Preset) lore;
 				if (preset.getBlock() != null) {
@@ -89,8 +95,18 @@ public class LoreInfoButton extends InfoButton {
 		} else if (iconEntity != null) {
 			int x = xPosition + (width / 2);
 			int y = yPosition + (width - 1);
+			RenderHelper.disableStandardItemLighting();
 			GuiInventory.drawEntityOnScreen(x, y,
 					(int) (width * .4), (float)(xPosition) - mouseX, (float)(yPosition) - mouseY, (EntityLivingBase)iconEntity);
 		}
+	}
+
+	private List<String> desc = new ArrayList<>(1);
+	@Override
+	public List<String> getDescription() {
+		if (desc.isEmpty())
+			desc.add(lore.getLoreDisplayName());
+		
+		return desc;
 	}
 }

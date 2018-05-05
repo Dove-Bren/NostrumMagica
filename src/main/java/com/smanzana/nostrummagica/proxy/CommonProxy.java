@@ -64,6 +64,7 @@ import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTableItem;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.SpellTomePage;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientEffectRenderMessage;
 import com.smanzana.nostrummagica.network.messages.SpellDebugMessage;
@@ -216,6 +217,8 @@ public class CommonProxy {
     	GameRegistry.registerWorldGenerator(new NostrumShrineGenerator(), 0);
     	
     	NetworkRegistry.INSTANCE.registerGuiHandler(NostrumMagica.instance, new NostrumGui());
+    	
+    	LoreRegistry.instance();
 	}
 	
 	public void postinit() {
@@ -420,7 +423,6 @@ public class CommonProxy {
     }
     
     public void syncPlayer(EntityPlayerMP player) {
-    	System.out.println("Sending sync to client");
     	NetworkHandler.getSyncChannel().sendTo(
     			new StatSyncMessage(NostrumMagica.getMagicWrapper(player)),
     			player);

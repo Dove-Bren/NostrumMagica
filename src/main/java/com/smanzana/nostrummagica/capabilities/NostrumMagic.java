@@ -26,6 +26,7 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
@@ -292,6 +293,12 @@ public class NostrumMagic implements INostrumMagic {
 			return; // Already have full
 		
 		loreLevels.put(key, 1);
+		
+		if (NostrumMagica.proxy.getPlayer() != null) {
+			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
+		} else {
+			NostrumMagica.proxy.syncPlayer((EntityPlayerMP) this.entity);			
+		}
 	}
 
 	@Override
@@ -306,6 +313,9 @@ public class NostrumMagic implements INostrumMagic {
 			return; // Already has full
 		
 		loreLevels.put(key, 2);
+		if (NostrumMagica.proxy.getPlayer() != null) {
+			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
+		}
 	}
 
 	@Override
