@@ -66,5 +66,20 @@ public class AITargetTrigger extends InstantTrigger {
 	public ItemStack getCraftItem() {
 		return new ItemStack(Item.getItemFromBlock(Blocks.BEDROCK));
 	}
+
+	@Override
+	public boolean supportsBoolean() {
+		return false;
+	}
+
+	@Override
+	public float[] supportedFloats() {
+		return null;
+	}
+
+	@Override
+	public ItemStack[] supportedFloatCosts() {
+		return null;
+	}
 	
 }

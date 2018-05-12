@@ -84,7 +84,7 @@ public class DelayTrigger extends SpellTrigger {
 	@Override
 	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw,
 			SpellPartParam params) {
-		return new DelayTriggerInstance(state, (int) (params.level * 20));
+		return new DelayTriggerInstance(state, Math.max((int) supportedFloats()[0], (int) params.level));
 	}
 
 	@Override
@@ -95,6 +95,31 @@ public class DelayTrigger extends SpellTrigger {
 	@Override
 	public ItemStack getCraftItem() {
 		return new ItemStack(Items.CLOCK);
+	}
+
+	@Override
+	public boolean supportsBoolean() {
+		return false;
+	}
+
+	@Override
+	public float[] supportedFloats() {
+		return new float[] {10f, 30f, 60f, 120f, 300f};
+	}
+
+	public static ItemStack[] costs = null;
+	@Override
+	public ItemStack[] supportedFloatCosts() {
+		if (costs == null) {
+			costs = new ItemStack[] {
+				null,
+				new ItemStack(Items.REDSTONE),
+				new ItemStack(Items.IRON_INGOT),
+				new ItemStack(Items.GOLD_INGOT),
+				new ItemStack(Items.DIAMOND),
+			};
+		}
+		return costs;
 	}
 	
 }

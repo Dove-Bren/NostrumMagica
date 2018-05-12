@@ -30,7 +30,7 @@ import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrap
 import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -298,7 +298,13 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		if (nbt == null)
 			return 1;
 		
-		return nbt.getInteger(NBT_LEVEL);
+		int level = nbt.getInteger(NBT_LEVEL);
+		if (level <= 0) {
+			setLevel(itemStack, 1);
+			level = 1;
+		}
+		
+		return level;
 	}
 	
 	public static void setLevel(ItemStack itemStack, int level) {
@@ -598,7 +604,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		stack.setTagCompound(tag);
 	}
 	
-	public static void applyEnhancements(ItemStack stack, SpellCastSummary summary, EntityLiving caster) {
+	public static void applyEnhancements(ItemStack stack, SpellCastSummary summary, EntityLivingBase caster) {
 		List<SpellTomeEnhancementWrapper> list = getEnhancements(stack);
 		if (list == null)
 			return;

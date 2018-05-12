@@ -62,4 +62,19 @@ public class SingleShape extends SpellShape {
 		return "Single";
 	}
 
+	@Override
+	public boolean supportsBoolean() {
+		return false;
+	}
+
+	@Override
+	public float[] supportedFloats() {
+		return null;
+	}
+
+	@Override
+	public ItemStack[] supportedFloatCosts() {
+		return null;
+	}
+
 }

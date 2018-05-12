@@ -1,9 +1,11 @@
 package com.smanzana.nostrummagica.client.gui;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.ModificationTable.ModificationTableEntity;
 import com.smanzana.nostrummagica.blocks.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.blocks.SpellTable.SpellTableEntity;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.gui.container.ModificationTableGui;
 import com.smanzana.nostrummagica.client.gui.container.ReagentBagGui;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
@@ -23,6 +25,7 @@ public class NostrumGui implements IGuiHandler {
 	public static final int mirrorID = 2;
 	public static final int obeliskID = 3;
 	public static final int infoscreenID = 4;
+	public static final int modtableID = 5;
 	
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
@@ -57,6 +60,17 @@ public class NostrumGui implements IGuiHandler {
 		
 		if (ID == infoscreenID) {
 			return null;
+		}
+		
+		if (ID == modtableID) {
+			TileEntity ent = world.getTileEntity(new BlockPos(x, y, z));
+			if (ent != null && ent instanceof ModificationTableEntity) {
+				return new ModificationTableGui.ModificationTableContainer(
+						player,
+						player.inventory,
+						(ModificationTableEntity) ent,
+						new BlockPos(x, y, z)); // should be tile inventory
+			}
 		}
 		
 		// Item based
@@ -112,6 +126,17 @@ public class NostrumGui implements IGuiHandler {
 			if (attr == null)
 				return null;
 			return new InfoScreen(attr);
+		}
+		
+		if (ID == modtableID) {
+			TileEntity ent = world.getTileEntity(new BlockPos(x, y, z));
+			if (ent != null && ent instanceof ModificationTableEntity) {
+				return new ModificationTableGui.ModificationGui(new ModificationTableGui.ModificationTableContainer(
+						player,
+						player.inventory,
+						(ModificationTableEntity) ent,
+						new BlockPos(x, y, z))); // should be tile inventory
+			}
 		}
 		
 		// Item based

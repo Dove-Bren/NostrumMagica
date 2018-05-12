@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
@@ -98,7 +99,8 @@ public class HealthTrigger extends SpellTrigger {
 	@Override
 	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw,
 			SpellPartParam params) {
-		return new HealthTriggerInstance(state, state.getCaster(), params.level, params.flip);
+		return new HealthTriggerInstance(state, state.getCaster(),
+				Math.max((int) supportedFloats()[0], (int) params.level), params.flip);
 	}
 
 	@Override
@@ -109,6 +111,30 @@ public class HealthTrigger extends SpellTrigger {
 	@Override
 	public ItemStack getCraftItem() {
 		return new ItemStack(Items.GOLDEN_APPLE, 1, OreDictionary.WILDCARD_VALUE);
+	}
+
+	@Override
+	public boolean supportsBoolean() {
+		return true;
+	}
+
+	@Override
+	public float[] supportedFloats() {
+		return new float[] {.5f, .2f, .8f, 1f};
+	}
+
+	public static ItemStack[] costs = null;
+	@Override
+	public ItemStack[] supportedFloatCosts() {
+		if (costs == null) {
+			costs = new ItemStack[] {
+				null,
+				new ItemStack(Blocks.TRIPWIRE_HOOK),
+				new ItemStack(Items.REPEATER),
+				new ItemStack(Items.ENDER_PEARL),
+			};
+		}
+		return costs;
 	}
 	
 }

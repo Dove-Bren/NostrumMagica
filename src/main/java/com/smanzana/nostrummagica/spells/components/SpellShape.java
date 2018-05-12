@@ -115,5 +115,26 @@ public abstract class SpellShape {
 	 */
 	public abstract List<ItemStack> getReagents();
 	
+	/**
+	 * Whether this shape supports a boolean switch in its SpellPartParam
+	 * @return
+	 */
+	public abstract boolean supportsBoolean();
+	
+	/**
+	 * If this shape supports float values in its SpellPartParams, which floats are
+	 * accepted.
+	 * @return
+	 */
+	public abstract float[] supportedFloats();
+	
+	/**
+	 * Array of itemstack costs for the above floats.
+	 * Should be the same size as the array returned by supportedFloats()
+	 * The idea is you return more valuable materials the higher the float.
+	 * @return
+	 */
+	public abstract ItemStack[] supportedFloatCosts();
+	
 	
 }

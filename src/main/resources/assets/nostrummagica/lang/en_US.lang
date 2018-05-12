@@ -173,6 +173,7 @@ tile.mirror_block.name=Magic Mirror
 tile.nostrum_chalk_block.name=Chalk
 tile.nostrum_candle.name=Candle
 tile.altar_block.name=Altar
+tile.modification_table.name=Modification Table
 
 entity.nostrummagica.physical_golem.name=Metal Golem
 entity.nostrummagica.lightning_golem.name=Lightining Golem

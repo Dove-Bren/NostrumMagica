@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.spells.components.SpellShape;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -43,7 +44,7 @@ public class ChainShape extends SpellShape {
 		if (world == null)
 			world = target.worldObj;
 		
-		int arc = Math.max(2, (int) param.level);
+		int arc = Math.max((int) supportedFloats()[0], (int) param.level);
 		
 		Set<Entity> seen = new HashSet<>();
 		
@@ -97,6 +98,30 @@ public class ChainShape extends SpellShape {
 	@Override
 	public String getDisplayName() {
 		return "Chain";
+	}
+
+	@Override
+	public boolean supportsBoolean() {
+		return false;
+	}
+
+	@Override
+	public float[] supportedFloats() {
+		return new float[] {3f, 4f, 6f, 8f};
+	}
+
+	public static ItemStack[] costs = null;
+	@Override
+	public ItemStack[] supportedFloatCosts() {
+		if (costs == null) {
+			costs = new ItemStack[] {
+				null,
+				new ItemStack(Items.STRING),
+				new ItemStack(Items.GOLD_INGOT),
+				new ItemStack(Items.ENDER_PEARL),
+			};
+		}
+		return costs;
 	}
 
 }

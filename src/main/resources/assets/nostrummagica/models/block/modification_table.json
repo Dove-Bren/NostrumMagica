@@ -1,0 +1,12 @@
+{
+    "parent": "block/cube",
+    "textures": {
+        "particle": "nostrummagica:blocks/modification_table_front",
+        "down": "nostrummagica:blocks/modification_table_front",
+        "up": "nostrummagica:blocks/modification_table_top",
+        "north": "nostrummagica:blocks/modification_table_front",
+        "east": "nostrummagica:blocks/modification_table_front",
+        "south": "nostrummagica:blocks/modification_table_front",
+        "west": "nostrummagica:blocks/modification_table_front"
+    }
+}

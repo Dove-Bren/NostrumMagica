@@ -16,6 +16,7 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
@@ -113,7 +114,8 @@ public class ProximityTrigger extends SpellTrigger {
 	@Override
 	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw,
 			SpellPartParam params) {
-		return new ProximityTriggerInstance(state, world, pos, Math.max(1, params.level));
+		return new ProximityTriggerInstance(state, world, pos,
+				Math.max(supportedFloats()[0], params.level));
 	}
 
 	@Override
@@ -124,6 +126,30 @@ public class ProximityTrigger extends SpellTrigger {
 	@Override
 	public ItemStack getCraftItem() {
 		return new ItemStack(Item.getItemFromBlock(Blocks.TRIPWIRE_HOOK));
+	}
+
+	@Override
+	public boolean supportsBoolean() {
+		return false;
+	}
+
+	@Override
+	public float[] supportedFloats() {
+		return new float[] {1f, 2f, 3f, 5f};
+	}
+
+	public static ItemStack[] costs = null;
+	@Override
+	public ItemStack[] supportedFloatCosts() {
+		if (costs == null) {
+			costs = new ItemStack[] {
+				null,
+				new ItemStack(Items.IRON_INGOT),
+				new ItemStack(Items.GOLD_INGOT),
+				new ItemStack(Items.DIAMOND),
+			};
+		}
+		return costs;
 	}
 	
 }

@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.blocks.EssenceOre;
 import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.blocks.ManiOre;
+import com.smanzana.nostrummagica.blocks.ModificationTable;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.blocks.NostrumMirrorBlock;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
@@ -311,6 +312,9 @@ public class ClientProxy extends CommonProxy {
 		registerModel(MirrorItem.instance(),
 				0,
 				MirrorItem.ID);
+		registerModel(Item.getItemFromBlock(ModificationTable.instance()),
+				0,
+				ModificationTable.ID);
 		
 		registerModel(new ItemBlock(DungeonBlock.instance()), 
 				DungeonBlock.Type.DARK.ordinal(),

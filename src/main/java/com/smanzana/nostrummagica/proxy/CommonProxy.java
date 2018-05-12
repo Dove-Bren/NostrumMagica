@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.blocks.EssenceOre;
 import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.blocks.ManiOre;
+import com.smanzana.nostrummagica.blocks.ModificationTable;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.blocks.NostrumMirrorBlock;
 import com.smanzana.nostrummagica.blocks.NostrumObelisk;
@@ -419,6 +420,14 @@ public class CommonProxy {
     	
     	GameRegistry.register(MasteryOrb.instance(),
     			new ResourceLocation(NostrumMagica.MODID, MasteryOrb.id));
+    	
+    	GameRegistry.register(ModificationTable.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, ModificationTable.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(ModificationTable.instance()).setRegistryName(ModificationTable.ID)
+    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(ModificationTable.ID))
+    			);
+    	ModificationTable.init();
     	
     }
     

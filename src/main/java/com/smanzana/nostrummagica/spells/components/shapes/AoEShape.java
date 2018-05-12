@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.smanzana.nostrummagica.items.NostrumResourceItem;
+import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
@@ -11,11 +13,13 @@ import com.smanzana.nostrummagica.spells.components.SpellShape;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.oredict.OreDictionary;
 
 public class AoEShape extends SpellShape {
 
@@ -37,7 +41,7 @@ public class AoEShape extends SpellShape {
 	protected List<EntityLivingBase> getTargets(SpellPartParam param, EntityLivingBase target, World world, BlockPos pos) {
 		List<EntityLivingBase> ret = new LinkedList<>();
 		
-		double radius = Math.max(3.0, (double) param.level);
+		double radius = Math.max(supportedFloats()[0], (double) param.level);
 		
 		for (Entity entity : world.getEntitiesWithinAABBExcludingEntity(null, 
 				new AxisAlignedBB(pos.getX() - radius,
@@ -98,6 +102,30 @@ public class AoEShape extends SpellShape {
 	@Override
 	public String getDisplayName() {
 		return "Area of Effect";
+	}
+
+	@Override
+	public boolean supportsBoolean() {
+		return false;
+	}
+
+	@Override
+	public float[] supportedFloats() {
+		return new float[] {2f, 3f, 5f, 10f};
+	}
+
+	public static ItemStack[] costs = null;
+	@Override
+	public ItemStack[] supportedFloatCosts() {
+		if (costs == null) {
+			costs = new ItemStack[] {
+				null,
+				new ItemStack(Blocks.REDSTONE_BLOCK, 1, OreDictionary.WILDCARD_VALUE),
+				NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1),
+				NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
+			};
+		}
+		return costs;
 	}
 
 }

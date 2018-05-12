@@ -162,5 +162,20 @@ public class ProjectileTrigger extends SpellTrigger {
 	public ItemStack getCraftItem() {
 		return new ItemStack(Items.BOW, 1, OreDictionary.WILDCARD_VALUE);
 	}
+
+	@Override
+	public boolean supportsBoolean() {
+		return false;
+	}
+
+	@Override
+	public float[] supportedFloats() {
+		return null;
+	}
+
+	@Override
+	public ItemStack[] supportedFloatCosts() {
+		return null;
+	}
 	
 }

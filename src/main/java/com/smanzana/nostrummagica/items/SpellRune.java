@@ -322,6 +322,18 @@ public class SpellRune extends Item implements ILoreTagged {
 			tooltip.add(TextFormatting.AQUA + "Alteration" + TextFormatting.RESET);
 		} else if (isTrigger(stack)) {
 			tooltip.add(TextFormatting.DARK_BLUE + "Trigger" + TextFormatting.RESET);
+			
+			SpellPartParam params = getPieceParam(stack);
+			SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
+			if (comp.getTrigger().supportsBoolean() && params.flip) {
+				tooltip.add("Flip: On");
+			}
+			if (comp.getTrigger().supportedFloats() != null) {
+				float[] vals = comp.getTrigger().supportedFloats();
+				if (params.level != vals[0])
+					tooltip.add("Level: " + params.level);
+			}
+			
 		} else {
 			tooltip.add(TextFormatting.DARK_RED + "Shape" + TextFormatting.RESET);
 			EMagicElement elem = getPieceShapeElement(stack);
@@ -513,7 +525,7 @@ public class SpellRune extends Item implements ILoreTagged {
     	piece.getTagCompound().setInteger(NBT_ELEMENT_COUNT, count);
     }
     
-    private static SpellPartParam getPieceParam(ItemStack piece) {
+    public static SpellPartParam getPieceParam(ItemStack piece) {
     	if (!piece.hasTagCompound())
     		return new SpellPartParam(0f, false);
     	
@@ -522,7 +534,7 @@ public class SpellRune extends Item implements ILoreTagged {
     	return new SpellPartParam(level, flip);
     }
     
-    private static void setPieceParam(ItemStack piece, SpellPartParam params) {
+    public static void setPieceParam(ItemStack piece, SpellPartParam params) {
     	if (!piece.hasTagCompound())
     		return;
     	

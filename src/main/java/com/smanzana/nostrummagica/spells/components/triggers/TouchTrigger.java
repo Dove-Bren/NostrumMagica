@@ -89,5 +89,20 @@ public class TouchTrigger extends InstantTrigger {
 	public ItemStack getCraftItem() {
 		return new ItemStack(Items.IRON_INGOT);
 	}
+
+	@Override
+	public boolean supportsBoolean() {
+		return false;
+	}
+
+	@Override
+	public float[] supportedFloats() {
+		return null;
+	}
+
+	@Override
+	public ItemStack[] supportedFloatCosts() {
+		return null;
+	}
 	
 }
