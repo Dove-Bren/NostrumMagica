@@ -1,4 +1,7 @@
 {
+    "textures": {
+        "particle": "nostrummagica:blocks/table"
+	},
 	"elements": [ 	 
 		{
 			"__comment": "Top",

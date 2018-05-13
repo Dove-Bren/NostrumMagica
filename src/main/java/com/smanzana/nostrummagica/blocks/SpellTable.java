@@ -36,7 +36,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -355,16 +354,6 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 		return ((state.getValue(MASTER) ? 1 : 0) << 2) | (state.getValue(FACING).getHorizontalIndex());
 	}
 	
-	@Override
-	public void onBlockDestroyedByPlayer(World worldIn, BlockPos pos, IBlockState state) {
-		destroy(worldIn, pos, state);
-	}
-	
-	@Override
-	public void onBlockDestroyedByExplosion(World worldIn, BlockPos pos, Explosion explosionIn) {
-		destroy(worldIn, pos, null);
-	}
-	
 	private void destroy(World world, BlockPos pos, IBlockState state) {
 		if (state == null)
 			state = world.getBlockState(pos);
@@ -438,23 +427,10 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 	
 	@Override
 	public void breakBlock(World world, BlockPos pos, IBlockState state) {
-		super.breakBlock(world, pos, state);
-		
-		TileEntity ent = world.getTileEntity(pos);
-		if (ent == null)
-			return;
-		
-		SpellTableEntity table = (SpellTableEntity) ent;
-		for (int i = 0; i < table.getSizeInventory(); i++) {
-			if (table.getStackInSlot(i) != null) {
-				EntityItem item = new EntityItem(
-						world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
-						table.removeStackFromSlot(i));
-				world.spawnEntityInWorld(item);
-			}
-		}
+		this.destroy(world, pos, state);
 		
 		world.removeTileEntity(pos);
+		super.breakBlock(world, pos, state);
 	}
 	
 	@SuppressWarnings("deprecation")

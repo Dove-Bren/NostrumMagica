@@ -17,6 +17,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -92,9 +93,6 @@ public class ModificationTable extends BlockContainer {
 		
 		private String displayName;
 		private ItemStack slots[];
-		
-		private int floatSelection;
-		private boolean boolSelection;
 		
 		public ModificationTableEntity() {
 			displayName = "Modification Table";
@@ -301,5 +299,28 @@ public class ModificationTable extends BlockContainer {
 	@Override
 	public EnumBlockRenderType getRenderType(IBlockState state) {
 		return EnumBlockRenderType.MODEL;
+	}
+	
+	@Override
+	public void breakBlock(World world, BlockPos pos, IBlockState state) {
+		destroy(world, pos, state);
+		super.breakBlock(world, pos, state);
+	}
+	
+	private void destroy(World world, BlockPos pos, IBlockState state) {
+		TileEntity ent = world.getTileEntity(pos);
+		if (ent == null || !(ent instanceof ModificationTableEntity))
+			return;
+		
+		ModificationTableEntity table = (ModificationTableEntity) ent;
+		for (int i = 0; i < table.getSizeInventory(); i++) {
+			if (table.getStackInSlot(i) != null) {
+				EntityItem item = new EntityItem(
+						world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
+						table.removeStackFromSlot(i));
+				world.spawnEntityInWorld(item);
+			}
+		}
+		
 	}
 }

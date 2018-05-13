@@ -100,6 +100,19 @@ public class Spell {
 				else {
 					SpellPart part = parts.get(index);
 					sib.appendText("[" + part.getTrigger().getDisplayName() + "] " );
+					if (part.param.flip || Math.abs(part.param.level) > .001) {
+						Style style = new Style();
+						String buf = "";
+						if (part.param.flip) {
+							buf = "Inverted ";
+						}
+						if (Math.abs(part.param.level) > .001) {
+							buf += String.format("Level %02.1f", part.param.level);
+						}
+						style.setHoverEvent(new HoverEvent(Action.SHOW_TEXT,
+								new TextComponentString(buf)));
+						sib.setStyle(style);
+					}
 				}
 				
 				if (targets != null && targets.size() > 0) {

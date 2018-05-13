@@ -401,6 +401,9 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 			id = genID(itemStack);
 		else
 			id = nbt.getInteger(NBT_ID);
+		
+		if (id == 0)
+			id = genID(itemStack);
 		return id;
 	}
 	

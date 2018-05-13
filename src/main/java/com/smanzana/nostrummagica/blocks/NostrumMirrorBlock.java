@@ -42,6 +42,8 @@ public class NostrumMirrorBlock extends BlockHorizontal {
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setSoundType(SoundType.STONE);
 		this.setHarvestLevel("pickaxe", 2);
+		this.setLightLevel(.4f);
+		this.setLightOpacity(4);
 	}
 	
 	@Override

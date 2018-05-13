@@ -116,6 +116,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.MouseEvent;
@@ -452,10 +453,7 @@ public class ClientProxy extends CommonProxy {
 		summary.addCostRate(-att.getManaCostModifier());
 		
 		// Find the tome this was cast from, if any
-		ItemStack tome = player.getHeldItemMainhand();
-		if (tome == null || !(tome.getItem() instanceof SpellTome))
-			tome = player.getHeldItemOffhand();
-		
+		ItemStack tome = NostrumMagica.getCurrentTome(player); 
 		if (tome != null && tome.getItem() instanceof SpellTome) {
 			// Casting from a tome.
 			List<SpellTomeEnhancementWrapper> enhancements = SpellTome.getEnhancements(tome);
@@ -469,6 +467,7 @@ public class ClientProxy extends CommonProxy {
 		cost = summary.getFinalCost();
 		
 		if (!Minecraft.getMinecraft().thePlayer.isCreative()) {
+			// Check mana
 			if (mana < cost) {
 				
 				for (int i = 0; i < 15; i++) {
@@ -485,6 +484,28 @@ public class ClientProxy extends CommonProxy {
 				return;
 			}
 			
+			// Check attributes
+			int maxComps = 2 * (att.getTech() + 1);
+			int maxTriggers = 1 + (att.getFinesse());
+			int maxElems = 1 + (3 * att.getControl());
+			if (spell.getComponentCount() > maxComps) {
+				player.addChatMessage(new TextComponentTranslation(
+						"info.spell.low_tech", new Object[0]));
+				NostrumMagicaSounds.CAST_FAIL.play(player);
+				return;
+			} else if (spell.getElementCount() > maxElems) {
+				player.addChatMessage(new TextComponentTranslation(
+						"info.spell.low_control", new Object[0]));
+				NostrumMagicaSounds.CAST_FAIL.play(player);
+				return;
+			} else if (spell.getTriggerCount() > maxTriggers) {
+				player.addChatMessage(new TextComponentTranslation(
+						"info.spell.low_finesse", new Object[0]));
+				NostrumMagicaSounds.CAST_FAIL.play(player);
+				return;
+			}
+			
+			// Check reagents
 			Map<ReagentType, Integer> reagents = spell.getRequiredReagents();
 			for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
 				int count = NostrumMagica.getReagentCount(player, row.getKey());
