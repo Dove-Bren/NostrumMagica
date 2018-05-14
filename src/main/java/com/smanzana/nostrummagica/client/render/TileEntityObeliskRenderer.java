@@ -64,8 +64,12 @@ public class TileEntityObeliskRenderer extends TileEntitySpecialRenderer<Nostrum
 			return;
 		
 		long time = Minecraft.getSystemTime();
-		float rotY = 5.0f * ((time + (20f * partialTicks)) / 50f);
-		float rotX = 3.0f * ((time + (20f * partialTicks)) / 100f);
+		float rotY = (float) (time % 3000) / 3000f;
+		float rotX = (float) (time % 5000) / 5000f;
+		
+		
+		rotY *= 360f;
+		rotX *= 360f;
 		
 		//GlStateManager.pushAttrib();
 		GlStateManager.pushMatrix();

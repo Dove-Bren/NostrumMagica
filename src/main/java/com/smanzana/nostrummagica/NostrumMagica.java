@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import com.smanzana.nostrummagica.capabilities.AttributeProvider;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.command.CommandAllQuests;
+import com.smanzana.nostrummagica.command.CommandCreateGeotoken;
 import com.smanzana.nostrummagica.command.CommandEnhanceTome;
 import com.smanzana.nostrummagica.command.CommandGiveSkillpoint;
 import com.smanzana.nostrummagica.command.CommandSetLevel;
@@ -209,6 +210,7 @@ public class NostrumMagica
     	event.registerServerCommand(new CommandUnlock());
     	event.registerServerCommand(new CommandGiveSkillpoint());
     	event.registerServerCommand(new CommandAllQuests());
+    	event.registerServerCommand(new CommandCreateGeotoken());
     	loadSeekerRegistry(seekerRegistryFile);
     }
     

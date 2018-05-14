@@ -18,6 +18,8 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.ForgeChunkManager.Ticket;
 import net.minecraftforge.common.ForgeChunkManager.Type;
@@ -26,16 +28,18 @@ import net.minecraftforge.common.util.Constants.NBT;
 public class NostrumObeliskEntity extends TileEntity implements ITickable {
 	
 	public static class NostrumObeliskTarget {
+		private int dimension;
 		private BlockPos pos;
 		private String title;
 		
-		public NostrumObeliskTarget(BlockPos pos) {
-			this(pos, toTitle(pos));
+		public NostrumObeliskTarget(int dimension, BlockPos pos) {
+			this(dimension, pos, toTitle(pos));
 		}
 		
-		public NostrumObeliskTarget(BlockPos pos, String title) {
+		public NostrumObeliskTarget(int dimension, BlockPos pos, String title) {
 			this.pos = pos;
 			this.title = title;
+			this.dimension = dimension;
 		}
 		
 		private static String toTitle(BlockPos pos) {
@@ -49,6 +53,10 @@ public class NostrumObeliskEntity extends TileEntity implements ITickable {
 		public String getTitle() {
 			return title;
 		}
+		
+		public int getDimension() {
+			return this.dimension;
+		}
 	}
 
 	private static final String NBT_TICKET_POS = "obelisk_pos";
@@ -58,6 +66,7 @@ public class NostrumObeliskEntity extends TileEntity implements ITickable {
 	private static final String NBT_TARGET_Y = "y";
 	private static final String NBT_TARGET_Z = "z";
 	private static final String NBT_TARGET_TITLE = "title";
+	private static final String NBT_TARGET_DIMENSION = "dimension";
 	private static final String NBT_CORNER = "corner";
 	
 	/**
@@ -120,6 +129,7 @@ public class NostrumObeliskEntity extends TileEntity implements ITickable {
 			tag.setInteger(NBT_TARGET_Y, target.pos.getY());
 			tag.setInteger(NBT_TARGET_Z, target.pos.getZ());
 			tag.setString(NBT_TARGET_TITLE, target.title);
+			tag.setInteger(NBT_TARGET_DIMENSION, target.dimension);
 			
 			list.appendTag(tag);
 		}
@@ -145,10 +155,12 @@ public class NostrumObeliskEntity extends TileEntity implements ITickable {
 			this.targets = new ArrayList<>(list.tagCount());
 			for (int i = 0; i < list.tagCount(); i++) {
 				NBTTagCompound tag = list.getCompoundTagAt(i);
-				targets.add(new NostrumObeliskTarget(new BlockPos(
-						tag.getInteger(NBT_TARGET_X),
-						tag.getInteger(NBT_TARGET_Y),
-						tag.getInteger(NBT_TARGET_Z)
+				targets.add(new NostrumObeliskTarget(
+						tag.getInteger(NBT_TARGET_DIMENSION),
+						new BlockPos(
+								tag.getInteger(NBT_TARGET_X),
+								tag.getInteger(NBT_TARGET_Y),
+								tag.getInteger(NBT_TARGET_Z)
 						),
 						tag.getString(NBT_TARGET_TITLE)));
 			}
@@ -209,18 +221,42 @@ public class NostrumObeliskEntity extends TileEntity implements ITickable {
 		return this.master;
 	}
 	
-	public void addTarget(BlockPos pos) {
-		targets.add(new NostrumObeliskTarget(pos));
+	public void addTarget(int dimension, BlockPos pos) {
+		targets.add(new NostrumObeliskTarget(dimension, pos));
 		dirty();
 	}
 	
-	public void addTarget(BlockPos pos, String title) {
-		targets.add(new NostrumObeliskTarget(pos, title));
+	public void addTarget(int dimension, BlockPos pos, String title) {
+		targets.add(new NostrumObeliskTarget(dimension, pos, title));
 		dirty();
 	}
 	
 	public List<NostrumObeliskTarget> getTargets() {
 		return targets;
+	}
+	
+	public boolean canAcceptTarget(int dimension, BlockPos pos) {
+		if (pos.equals(this.pos))
+			return false;
+		
+		if (!targets.isEmpty())
+		for (NostrumObeliskTarget targPos : targets) {
+			if (targPos.dimension == dimension && pos.equals(targPos.pos))
+				return false;
+		}
+		
+		if (!this.worldObj.isRemote) {
+			World world = DimensionManager.getWorld(dimension);
+			if (world == null)
+				return false;
+			
+			IBlockState state = world.getBlockState(pos);
+			if (state == null || !(state.getBlock() instanceof NostrumObelisk)
+					|| !NostrumObelisk.blockIsMaster(state))
+				return false;
+		}
+		
+		return true;
 	}
 	
 	@Override

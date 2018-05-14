@@ -104,19 +104,22 @@ public class PositionToken extends PositionCrystal {
 			if (state != null && state.getBlock() instanceof NostrumObelisk && NostrumObelisk.blockIsMaster(state)) {
 				TileEntity ent = entityItem.worldObj.getTileEntity(pos);
 				if (ent != null && ent instanceof NostrumObeliskEntity) {
-					if (entityItem.getEntityItem().hasDisplayName()) {
-						((NostrumObeliskEntity) ent).addTarget(storedPos, entityItem.getEntityItem().getDisplayName());
-					} else {
-						((NostrumObeliskEntity) ent).addTarget(storedPos);
+					NostrumObeliskEntity obelisk = ((NostrumObeliskEntity) ent);
+					if (obelisk.canAcceptTarget(entityItem.dimension, storedPos)) {
+						if (entityItem.getEntityItem().hasDisplayName()) {
+							obelisk.addTarget(entityItem.dimension, storedPos, entityItem.getEntityItem().getDisplayName());
+						} else {
+							obelisk.addTarget(entityItem.dimension, storedPos);
+						}
+						NostrumMagicaSounds.AMBIENT_WOOSH.play(
+								entityItem.worldObj,
+								pos.getX(),
+								pos.getY(),
+								pos.getZ()
+								);
+						entityItem.setDead();
+						return true;
 					}
-					NostrumMagicaSounds.AMBIENT_WOOSH.play(
-							entityItem.worldObj,
-							pos.getX(),
-							pos.getY(),
-							pos.getZ()
-							);
-					entityItem.setDead();
-					return true;
 				}
 			}
 		}

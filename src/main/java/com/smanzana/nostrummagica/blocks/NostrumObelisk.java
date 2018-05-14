@@ -93,6 +93,29 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
         return false;
     }
 	
+	@Override
+	public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
+		if (state == null)
+			return 0;
+		if (!state.getValue(TILE))
+			return 0;
+		
+		if (!state.getValue(MASTER))
+			return 8;
+		
+		return 12;
+	}
+	
+	@Override
+	public int getLightOpacity(IBlockState state, IBlockAccess world, BlockPos pos) {
+		if (state == null)
+			return 15;
+		if (!state.getValue(TILE))
+			return 15;
+		
+		return 0;
+	}
+	
 	@SuppressWarnings("deprecation")
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
