@@ -227,9 +227,52 @@ info.spell.low_tech=You lack the technique required for such a complex spell
 info.spell.low_finesse=You lack the finesse required by such an intricate spell
 info.spell.low_control=You lack the control to handle such a powerful spell
 
+info.personal.discovery.name=Unlocking Magic
+info.personal.stats.name=Stats
+info.personal.growth.name=Growth
+
+info.discovery.starting=Welcome to Nostrum Magica. To unlock magic, you must first explore the world and unlock spell components. To proceed, you must find and explore at least one dungeon for a shape, one for an element, and one for a trigger. You can read more about spell components in the Spell section of this info screen or in the guide book. Shrines are scattered all over the world and can be recognized by the giant icon floating above the enterance. Visit a shrine and interact with the shrine pedestal hidden within to proceed.
+info.discovery.starting2=Congratulations on finding a shrine pedestal and unlocking a component. In order to unlock magic, you must find one shape, one trigger, and one element, as all of these are needed to create even the most simple spells. Continue exploring until you find at least one of each.
+info.discovery.spells=You've unlocked enough components to unlock magic and make a spell! You can find more details about spell creation in the Spell Creation tab. In order to craft a spell, you'll need a Spell Table, reagents, and runes. Runes are crafted by performing rituals. More information about rituals can be found in the Rituals tab. More complex spells will require higher attributes to cast. More info on this can be found in the Spells tab as well.
+
 element.name=Element
 shape.name=Shape
 trigger.name=Trigger
+alteration.name=Alteration
+
+level.name=Level
+level.desc=Your current level|As you increase your level, you gain more mana as well as ability points you can invest in Technique, Finesse, or Control. These together allow you to cast more powerful spells.
+control.name=Control
+control.desc=Control governs how many elements total you can have in a spell. The more control you have, the more total elements allowed in a spell. The more elements attached to a shape, the more powerful the effect. The more elements in a spell all together, the more powerful the spell.
+technique.name=Technique
+technique.desc=Technique controls the total number of components a spell can have. Investigating in Technique is required to create more complex spells.
+finesse.name=Finesse
+finesse.desc=Finesse increases the amount of triggers you can have in a spell. Triggers dictate the flow of the spell, including when they progress and who they affect.
+mana.name=Mana
+mana.desc=Mana is required to cast spells. You are limited in what spells you can cast by how much mana you have available to you.|Mana naturally regenerates to replenish any that is spent. You gain more mana when you level up.
+manabonus.name=Bonus Mana
+manabonus.desc=Your current mana bonus is applied against your base maximum mana, which is determined by your level. This value comes from bonuses gained by progressing along the stat glyph in the Magic Mirror.
+lmc.name=Lower Mana Cost
+lmc.desc=Lower Mana Cost reduces the amount of mana spent when casting spells.|Lower Mana Cost is calculated proactively, which means lower mana cost allows you to cast spells that cost more than your total amount of mana.
+lrc.name=Lower Reagent Cost
+lrc.desc=Lower Reagent Cost provides a chance of reducing the number of reagents required to cast a spell.|Like Lower Mana Cost, Lower Reagent Cost is calculated proactively. If you have a reagent cost less than 1, you could theoritically keep attempting the spell until you rolled in such a way that all required reagents were nullified.
+manaregen.name=Mana Regen
+manaregen.desc=Mana regenerates passively to replenish any spent mana. In addition to a large pool of mana, a powerful mage will also need fast mana recovery. This value is the bonus to mana regen you have naturally, ignoring any bonuses from your tome.
+potency.name=Potency
+potency.desc=Certain enhancements provide a bonus to the power of spells. For damage spells, this means more damage. For debuffs, this could mean a more powerful debuff or a longer-lasting debuff.
+capacity.name=Capacity
+capacity.desc=Capacity limits the number of spells a single spell tome can hold.
+modifier.name=Modifier
+modifier.desc=Modifiers are used to add additional tome pages to spell tomes, adding new enhancements.
+
+maxelements.name=Max Elements
+maxelements.desc=Maximum total number of elements allowed in a spell for you to cast it. Spells with more elements than this cannot be cast.|Increases by 3 for each point invested in control.
+maxtriggers.name=Max Triggers
+maxtriggers.desc=Maximum number of triggers you can use in a spell. Triggers create different stages in spells, allowing a single spell to have many parts.|Increases by 1 for each point of finesse.
+maxcomponents.name=Max Components
+maxtriggers.desc=Maximum number of shapes and triggers allowed in a spell.|Increases by two for every point invested in technique.
+
+
 ritual.buff.luck.name=Ritual of Luck
 ritual.buff.luck.desc=Gives the Luck I|Effect lasts for 2 minutes
 ritual.buff.speed.name=Ritual of Speed

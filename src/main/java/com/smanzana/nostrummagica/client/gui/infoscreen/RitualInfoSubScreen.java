@@ -64,7 +64,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 	}
 	
 	@Override
-	public void draw(INostrumMagic attr, Minecraft mc, int x, int y, int width, int height) {
+	public void draw(INostrumMagic attr, Minecraft mc, int x, int y, int width, int height, int mouseX, int mouseY) {
 		
 		infopage = (desc != null && !desc.isEmpty());
 		

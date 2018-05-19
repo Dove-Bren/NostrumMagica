@@ -17,7 +17,7 @@ public class LoreInfoSubScreen implements IInfoSubScreen {
 	}
 	
 	@Override
-	public void draw(INostrumMagic attr, Minecraft mc, int x, int y, int width, int height) {
+	public void draw(INostrumMagic attr, Minecraft mc, int x, int y, int width, int height, int mouseX, int mouseY) {
 		String title = this.tag.getLoreDisplayName();
 		int len = mc.fontRendererObj.getStringWidth(title);
 		mc.fontRendererObj.drawStringWithShadow(title, x + (width / 2) + (-len / 2), y, 0xFFFFFFFF);

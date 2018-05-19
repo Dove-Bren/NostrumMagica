@@ -1316,4 +1316,39 @@ public class NostrumMagica
 				&& quest.getReqTechnique() <= attr.getTech()
 				&& quest.getReqFinesse() <= attr.getFinesse();
 	}
+    
+    public static int getMaxComponents(INostrumMagic attr) {
+    	if (attr.isUnlocked())
+    		return 2 * (attr.getTech() + 1);
+    	
+    	return 0;
+    }
+    
+    public static int getMaxTriggers(INostrumMagic attr) {
+    	if (attr.isUnlocked())
+    		return 1 + (attr.getFinesse());
+    	
+    	return 0;
+    }
+    
+    public static int getMaxElements(INostrumMagic attr) {
+    	if (attr.isUnlocked())
+    		return 1 + attr.getControl() * 3;
+    	
+    	return 0;
+    }
+    
+    public static boolean canCast(Spell spell, INostrumMagic attr) {
+    	int comps = getMaxComponents(attr);
+    	int triggers = getMaxTriggers(attr);
+    	int elements = getMaxElements(attr);
+    	
+    	if (spell.getComponentCount() > comps)
+    		return false;
+    	if (spell.getTriggerCount() > triggers)
+    		return false;
+    	if (spell.getElementCount() > elements)
+    		return false;
+    	return true;
+    }
 }

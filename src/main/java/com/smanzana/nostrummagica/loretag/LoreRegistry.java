@@ -17,6 +17,7 @@ import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.MirrorItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.PositionCrystal;
+import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SeekerIdol;
@@ -87,6 +88,7 @@ public class LoreRegistry {
 		register(MirrorItem.instance());
 		register(NostrumResourceItem.instance());
 		register(PositionCrystal.instance());
+		register(PositionToken.instance());
 		register(SeekerIdol.instance());
 		register(ShrineSeekingGem.instance());
 		register(new EntityGolemPhysical(null));

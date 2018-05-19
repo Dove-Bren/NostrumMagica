@@ -6,6 +6,6 @@ import net.minecraft.client.Minecraft;
 
 public interface IInfoSubScreen {
 
-	public void draw(INostrumMagic attr, Minecraft mc, int x, int y, int width, int height);
+	public void draw(INostrumMagic attr, Minecraft mc, int x, int y, int width, int height, int mouseX, int mouseY);
 	
 }

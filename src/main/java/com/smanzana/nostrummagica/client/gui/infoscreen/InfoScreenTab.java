@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellTome;
+import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
@@ -24,6 +25,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 public abstract class InfoScreenTab {
+	private static InfoScreenTab PERSONAL;
 	private static InfoScreenTab RITUALS;
 	private static InfoScreenTab INFO_REAGENTS;
 	private static InfoScreenTab INFO_TOMES;
@@ -237,7 +239,7 @@ public abstract class InfoScreenTab {
 			
 			@Override
 			public boolean isVisible(INostrumMagic attr) {
-				return (!getAvailable(attr).isEmpty());
+				return (attr.isUnlocked() && !getAvailable(attr).isEmpty());
 			}
 
 			@Override
@@ -247,6 +249,38 @@ public abstract class InfoScreenTab {
 				for (RitualRecipe tag : rituals) {
 					buttons.add(new RitualInfoButton(offset++, tag));
 				}
+				return buttons;
+			}
+			
+		};
+		
+		PERSONAL = new InfoScreenTab(InfoScreenTabs.PERSONAL,
+				new ItemStack(Items.SKULL, 1, 3)) {
+
+			@Override
+			public boolean isVisible(INostrumMagic attr) {
+				return true;
+			}
+
+			@Override
+			public List<InfoButton> getButtons(int offset, INostrumMagic attr) {
+				List<InfoButton> buttons = new LinkedList<>();
+				
+				buttons.add(new PersonalInfoButton(offset++, "discovery",
+						new PersonalSubScreen.PersonalDiscoveryScreen(attr),
+						new ItemStack(SpellTome.instance())));
+				
+				if (attr.isUnlocked()) {
+					
+					buttons.add(new PersonalInfoButton(offset++, "stats",
+							new PersonalSubScreen.PersonalStatsScreen(attr),
+							new ItemStack(SpellTomePage.instance())));
+					
+					buttons.add(new PersonalInfoButton(offset++, "growth",
+							new PersonalSubScreen.PersonalGrowthScreen(attr),
+							new ItemStack(Items.COMPASS)));
+				}
+				
 				return buttons;
 			}
 			
@@ -276,6 +310,9 @@ public abstract class InfoScreenTab {
 			break;
 		case INFO_ITEMS:
 			ret = INFO_ITEMS;
+			break;
+		case PERSONAL:
+			ret = PERSONAL;
 			break;
 		}
 		

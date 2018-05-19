@@ -78,7 +78,7 @@ public class InfoScreen extends GuiScreen {
 		Gui.drawRect(0, 0, width, height, 0xFF000000);
 		
 		if (this.subscreen != null) {
-			this.subscreen.draw(attribute, mc, 0, POS_SUBSCREEN_VOFFSET, width, height - POS_SUBSCREEN_VOFFSET);
+			this.subscreen.draw(attribute, mc, 0, POS_SUBSCREEN_VOFFSET, width, height - POS_SUBSCREEN_VOFFSET, mouseX, mouseY);
 		}
 		
 		// Do buttons and other parent stuff

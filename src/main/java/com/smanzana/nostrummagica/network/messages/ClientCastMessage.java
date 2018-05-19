@@ -107,12 +107,7 @@ public class ClientCastMessage implements IMessage {
 					return new ClientCastReplyMessage(false, att.getMana(), 0.0f);
 				
 				// Check that the player can cast this
-				int maxComps = 2 * (att.getTech() + 1);
-				int maxTriggers = 1 + (att.getFinesse());
-				int maxElems = 1 + (3 * att.getControl());
-				if (spell.getComponentCount() > maxComps
-						|| spell.getElementCount() > maxElems
-						|| spell.getTriggerCount() > maxTriggers) {
+				if (!NostrumMagica.canCast(spell, att)) {
 					NostrumMagica.logger.warn("Got cast message from client with too low of stats. They should relog...");
 					return new ClientCastReplyMessage(false, att.getMana(), 0);
 				}
