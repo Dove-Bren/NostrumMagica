@@ -99,58 +99,8 @@ public class ReagentBag extends Item implements ILoreTagged {
 		if (inputItem == null)
 			return inputItem;
 		
-		ItemStack existing[] = getItems(bag);
-		if (existing == null)
-			return inputItem;
-		
-		int remaining = inputItem.stackSize;
-		int original = remaining;
-		for (int i = 0; i < SLOTS; i++) {
-			ItemStack item = existing[i];
-			if (item == null)
-				continue;
-			
-			if (item.getMetadata() == inputItem.getMetadata()) {
-				remaining -= 64 - item.stackSize;
-				if (remaining >= 0)
-					item.stackSize = 64;
-				else
-					item.stackSize = 64 + remaining;
-				
-				if (remaining <= 0)
-					break;
-			}
-		}
-		
-		if (remaining > 0) {
-			// Could'nt fit into existing stacks. Just use first empty one
-			for (int i = 0; i < SLOTS; i++) {
-				if (existing[i] == null) {
-					existing[i] = inputItem.copy();
-					remaining -= 64;
-					if (remaining >= 0)
-						existing[i].stackSize = 64;
-					else
-						existing[i].stackSize = 64 + remaining;
-					
-					if (remaining <= 0)
-						break;
-				}
-			}
-		}
-		
-		if (original != remaining) {
-			for (int i = 0; i < SLOTS; i++) {
-				setItem(bag, existing[i], i);
-			}
-		}
-		
-		if (remaining > 0) {
-			inputItem.stackSize = remaining;
-			return inputItem;
-		}
-		
-		return null;
+		ReagentInventory inv = (ReagentInventory) ReagentBag.instance().asInventory(bag);
+		return inv.addItem(inputItem);
 	}
 	
 	// removes as much as we can and returns waht we couldn't.
@@ -274,7 +224,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 	
 	public static class ReagentInventory extends InventoryBasic {
 
-		private static final int MAX_COUNT = 256;
+		private static final int MAX_COUNT = 127;
 		
 		private ItemStack stack;
 		//private ItemStack[] inventory;
@@ -318,12 +268,41 @@ public class ReagentBag extends Item implements ILoreTagged {
 	     * Return what won't fit.
 	     */
 	    public ItemStack addItem(ItemStack stack) {
-	        ItemStack itemstack = stack.copy();
-	        
-	        if (!(stack.getItem() instanceof ReagentItem))
-	        	return itemstack;
+	    	ItemStack itemstack = stack.copy();
 
-	        return super.addItem(stack);
+	    	if (!(stack.getItem() instanceof ReagentItem))
+	    		return itemstack;
+
+	    	for (int i = 0; i < this.getSizeInventory(); ++i) {
+	            ItemStack itemstack1 = this.getStackInSlot(i);
+
+	            if (itemstack1 == null) {
+	                this.setInventorySlotContents(i, itemstack);
+	                this.markDirty();
+	                return null;
+	            }
+
+	            if (ItemStack.areItemsEqual(itemstack1, itemstack)) {
+	                int j = this.getInventoryStackLimit();
+	                int k = Math.min(itemstack.stackSize, j - itemstack1.stackSize);
+
+	                if (k > 0) {
+	                    itemstack1.stackSize += k;
+	                    itemstack.stackSize -= k;
+
+	                    if (itemstack.stackSize <= 0) {
+	                        this.markDirty();
+	                        return null;
+	                    }
+	                }
+	            }
+	        }
+
+	        if (itemstack.stackSize != stack.stackSize) {
+	            this.markDirty();
+	        }
+
+	        return itemstack;
 	    }
 
 //	    /**

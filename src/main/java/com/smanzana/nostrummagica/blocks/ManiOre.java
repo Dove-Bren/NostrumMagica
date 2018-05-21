@@ -33,7 +33,7 @@ public class ManiOre extends Block {
 		this.setResistance(30.0f);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setSoundType(SoundType.STONE);
-		this.setHarvestLevel("pickaxe", 3);
+		this.setHarvestLevel("pickaxe", 2);
 		
 	}
 	

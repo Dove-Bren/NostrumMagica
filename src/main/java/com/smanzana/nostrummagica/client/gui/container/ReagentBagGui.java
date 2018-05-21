@@ -4,10 +4,13 @@ import java.io.IOException;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentBag;
+import com.smanzana.nostrummagica.items.ReagentBag.ReagentInventory;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ReagentBagToggleMessage;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -19,6 +22,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.client.config.GuiUtils;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -79,9 +83,55 @@ public class ReagentBagGui {
 		
 		@Override
 		public ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
-			System.out.println("transfer item from lsot " + fromSlot);
 			ItemStack prev = null;	
 			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
+			IInventory inv = slot.inventory;
+			
+			if (slot.getHasStack()) {
+				ItemStack stack = slot.getStack();
+				if (inv == inventory) {
+					// shift-click in bag
+					if (playerIn.inventory.addItemStackToInventory(stack.copy())) {
+						slot.putStack(null);
+					}
+				} else {
+					// shift-click in player inventory
+					ReagentInventory realinv = (ReagentInventory) inventory;
+					ItemStack leftover = realinv.addItem(stack);
+					slot.putStack(leftover != null && leftover.stackSize <= 0 ? null : leftover);
+//					if (inventory.isItemValidForSlot(0, stack)) {
+//						for (int i = 0; i < inventory.getSizeInventory(); i++) {
+//							ItemStack inSlot = inventory.getStackInSlot(i);
+//							if (inSlot == null) {
+//								inventory.setInventorySlotContents(i, stack);
+//								stack = null;
+//								break;
+//							} else if (inSlot.getItem() == stack.getItem()
+//									&& inSlot.getMetadata() == stack.getMetadata()
+//									&& inSlot.stackSize < inventory.getInventoryStackLimit()) {
+//								int space = inventory.getInventoryStackLimit() - inSlot.stackSize;
+//								if (space >= stack.stackSize) {
+//									inSlot.stackSize += stack.stackSize;
+//									inventory.setInventorySlotContents(i, inSlot);
+//									stack = null;
+//									break;
+//								} else {
+//									inSlot.stackSize = inventory.getInventoryStackLimit();
+//									inventory.setInventorySlotContents(i, inSlot);
+//									stack.stackSize -= space;
+//								}
+//							}
+//						}
+//						
+//						if (stack == null || stack.stackSize <= 0) {
+//							slot.putStack(null);
+//						} else {
+//							slot.putStack(stack);
+//						}
+//						
+//					}
+				}
+			}
 			
 			if (slot != null && slot.getHasStack()) {
 				ItemStack cur = slot.getStack();
@@ -172,6 +222,18 @@ public class ReagentBagGui {
 					BUTTON_TEXT_VOFFSET,
 					BUTTON_WIDTH, BUTTON_WIDTH,
 					256, 256);
+			
+			int left = (width - xSize) / 2;
+			int top = (height - ySize) / 2;
+			
+			left += BUTTON_HOFFSET;
+			top += BUTTON_VOFFSET;
+			
+			if (mouseX >= left && mouseX <= left + BUTTON_WIDTH && 
+					mouseY >= top && mouseY <= top + BUTTON_WIDTH) {
+				GuiUtils.drawHoveringText(Lists.newArrayList(ReagentBag.isVacuumEnabled(bag.stack) ? "Disable Vacuum" : "Enable Vacuum"),
+						mouseX, mouseY, width, height, 200, this.fontRendererObj);
+			}
 		}
 			
 		@Override
@@ -190,6 +252,7 @@ public class ReagentBagGui {
 					boolean val = ReagentBag.isVacuumEnabled(bag.stack);
 					NetworkHandler.getSyncChannel().sendToServer(
 			    			new ReagentBagToggleMessage(bag.bagPos != 40, val));
+					NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
 			} else {
 				super.mouseClicked(mouseX, mouseY, mouseButton);
 			}

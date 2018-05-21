@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.entity;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.potions.MagicResistPotion;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -131,6 +132,17 @@ public class EntityGolemLightning extends EntityGolem {
 		}
 		
 		super.onUpdate();
+	}
+	
+	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
+		if (this.getOwnerId() == null) {
+			int count = this.rand.nextInt(3) + 1;
+			count += lootingModifier;
+			
+			this.entityDropItem(EssenceItem.instance().getEssence(
+					EMagicElement.LIGHTNING,
+					count), 0);
+		}
 	}
 
 }

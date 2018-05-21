@@ -195,7 +195,7 @@ public class GolemTask extends EntityAIBase {
 		if (target != null && !target.isDead) {
 			double distTarget = target.getPositionVector().distanceTo(golem.getPositionVector());
 			
-			double meleeRange = (double)(golem.width * 2.0F * golem.width * 2.0F + golem.width);
+			double meleeRange = (double)(golem.width * 2.0F * golem.width * 2.0F);
 			if (distTarget < meleeRange) {
 				inMelee = true;
 			}

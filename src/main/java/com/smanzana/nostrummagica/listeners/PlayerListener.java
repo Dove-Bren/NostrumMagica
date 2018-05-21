@@ -19,6 +19,7 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ManaMessage;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -653,16 +654,21 @@ public class PlayerListener {
 		}
 		
 		if (e.getItem().getEntityItem().getItem() instanceof ReagentItem) {
+			int originalSize = addedItem.stackSize;
 			for (ItemStack item : player.inventory.offHandInventory) {
 				// Silly but prefer offhand
 				if (item != null && item.getItem() instanceof ReagentBag) {
 					if (ReagentBag.isVacuumEnabled(item)) {
 						addedItem = ReagentBag.addItem(item, addedItem);
+						if (addedItem == null || addedItem.stackSize < originalSize) {
+							NostrumMagicaSounds.UI_TICK.play(player.worldObj, player.posX, player.posY, player.posZ);
+						}
 						if (addedItem == null) {
 							e.setCanceled(true);
 							e.getItem().setDead();
 							return;
 						}
+						originalSize = addedItem.stackSize;
 					}
 				}
 			}
@@ -670,14 +676,24 @@ public class PlayerListener {
 				if (item != null && item.getItem() instanceof ReagentBag) {
 					if (ReagentBag.isVacuumEnabled(item)) {
 						addedItem = ReagentBag.addItem(item, addedItem);
+						if (addedItem == null || addedItem.stackSize < originalSize) {
+							NostrumMagicaSounds.UI_TICK.play(player.worldObj, player.posX, player.posY, player.posZ);
+						}
 						if (addedItem == null) {
 							e.setCanceled(true);
 							e.getItem().setDead();
 							return;
 						}
+						originalSize = addedItem.stackSize;
 					}
 				}
 			}
+			
+			if (addedItem == null || addedItem.stackSize < e.getItem().getEntityItem().stackSize) {
+				e.setCanceled(true);
+				e.getItem().setEntityItemStack(addedItem);
+			}
+			
 		}
 	}
 	

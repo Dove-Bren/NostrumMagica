@@ -33,7 +33,12 @@ public final class LootUtil {
 		world.setBlockState(pos, Blocks.CHEST.getDefaultState().withProperty(BlockChest.FACING, facing));
 		
 		TileEntityChest chest = (TileEntityChest) world.getTileEntity(pos);
-		chest.setLootTable(new ResourceLocation(loottable), rand.nextLong());
+		
+		if (chest == null) {
+			world.setBlockState(pos, Blocks.GOLD_BLOCK.getDefaultState());
+		} else {
+			chest.setLootTable(new ResourceLocation(loottable), rand.nextLong());
+		}
 	}
 	
 	/**

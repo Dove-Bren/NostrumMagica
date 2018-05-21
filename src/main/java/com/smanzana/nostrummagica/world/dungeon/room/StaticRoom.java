@@ -329,7 +329,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 		}
 		
 		if (y <= locMaxY) {
-			NostrumMagica.logger.warn("Didn't find enough to fill static room!");
+			NostrumMagica.logger.warn("Didn't find enough to fill static room (not tall enough)!");
 		}
 	}
 }

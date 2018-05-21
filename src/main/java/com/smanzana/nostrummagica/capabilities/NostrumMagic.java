@@ -15,6 +15,8 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.loretag.LoreCache;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
+import com.smanzana.nostrummagica.network.NetworkHandler;
+import com.smanzana.nostrummagica.network.messages.LoreMessage;
 import com.smanzana.nostrummagica.quests.objectives.IObjectiveState;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
@@ -296,8 +298,13 @@ public class NostrumMagic implements INostrumMagic {
 		
 		if (NostrumMagica.proxy.getPlayer() != null) {
 			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
-		} else {
-			NostrumMagica.proxy.syncPlayer((EntityPlayerMP) this.entity);			
+		}
+		
+		if (entity != null && entity instanceof EntityPlayer && !entity.worldObj.isRemote) {
+			NetworkHandler.getSyncChannel().sendTo(
+					new LoreMessage(tagged, this),
+					(EntityPlayerMP) entity);
+			
 		}
 	}
 

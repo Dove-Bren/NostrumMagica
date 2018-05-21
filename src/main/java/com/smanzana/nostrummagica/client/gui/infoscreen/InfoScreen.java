@@ -55,7 +55,7 @@ public class InfoScreen extends GuiScreen {
 		// Populate tabs
 		for (InfoScreenTabs tab : InfoScreenTabs.values()) {
 			InfoScreenTab inst = InfoScreenTab.get(tab);
-			if (inst == null)
+			if (inst == null || !inst.isVisible(this.attribute))
 				continue;
 			TabButton butt = new TabButton(globButtonID++,
 					2 + (tabs.size() * (2 + TabButton.TEXT_BUTTON_TAB_WIDTH)), 2,
@@ -152,7 +152,7 @@ public class InfoScreen extends GuiScreen {
             this.tab = tab;
             this.buttons = tab.getButtons(globButtonID++, attr);
             
-            if (this.buttons == null || this.buttons.isEmpty())
+            if (this.buttons == null || this.buttons.isEmpty() || !tab.isVisible(attr))
             	this.visible = false;
             
             desc = new ArrayList<>();

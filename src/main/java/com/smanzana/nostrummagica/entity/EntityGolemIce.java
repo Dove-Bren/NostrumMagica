@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.entity;
 
+import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.potions.MagicShieldPotion;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -90,5 +91,16 @@ public class EntityGolemIce extends EntityGolem {
 	@Override
 	public String getTextureKey() {
 		return "ice";
+	}
+	
+	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
+		if (this.getOwnerId() == null) {
+			int count = this.rand.nextInt(3) + 1;
+			count += lootingModifier;
+			
+			this.entityDropItem(EssenceItem.instance().getEssence(
+					EMagicElement.ICE,
+					count), 0);
+		}
 	}
 }

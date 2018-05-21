@@ -111,27 +111,39 @@ public class NostrumDungeon {
 		if (index == key)
 			key = (key + 1) % starting.getNumExits();
 		IDungeonRoom inEnd;
-		
-		for (DungeonExitPoint exit : starting.getExits(start)) {
+
+		int shrineroom = index;
+		List<DungeonExitPoint> exits = starting.getExits(start);
+		for (DungeonExitPoint exit : exits) {
 			inEnd = null;
-			Path path = new Path(null, 3); // FIXME this should be not 2, but random
+			
 
 			if (index == 0) {
-				inEnd = ending;
-				if (!keyRooms.isEmpty() && !doorRooms.isEmpty())
-					path.hasDoor();
+				; // Skip this one, so we can do it last outside the loop
+			} else {
+				
+				Path path = new Path(null, 2 + rand.nextInt(3));
+				if (key == 0) {
+					if (!keyRooms.isEmpty() && !doorRooms.isEmpty())
+						path.hasKey();
+				}
+				
+				path.spawn(world, exit, inEnd);
 			}
-			
-			if (key == 0) {
-				if (!keyRooms.isEmpty() && !doorRooms.isEmpty())
-					path.hasKey();
-			}
-			
-			path.spawn(world, exit, inEnd);
-
 			index -= 1;
 			key -= 1;
 		}
+		
+		{
+			DungeonExitPoint last = exits.get(shrineroom);
+			Path path = new Path(null, 2 + rand.nextInt(3));
+			inEnd = ending;
+			if (!keyRooms.isEmpty() && !doorRooms.isEmpty())
+				path.hasDoor();
+			
+			path.spawn(world, last, inEnd);
+		}
+		
 	}
 	
 	private class Path {

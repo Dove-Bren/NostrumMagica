@@ -251,14 +251,14 @@ public class EntityKoid extends EntityMob implements ILoreTagged {
         return 1.0F;
     }
     
-    protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-    	int count = this.rand.nextInt(2);
-    	count += lootingModifier;
-    	
-    	this.entityDropItem(EssenceItem.instance().getEssence(
-    			this.getElement(),
-    			count), 0);
-    }
+	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
+		int count = this.rand.nextInt(2);
+		count += lootingModifier;
+		
+		this.entityDropItem(EssenceItem.instance().getEssence(
+				this.getElement(),
+				count), 0);
+	}
 
 	@Override
 	public InfoScreenTabs getTab() {

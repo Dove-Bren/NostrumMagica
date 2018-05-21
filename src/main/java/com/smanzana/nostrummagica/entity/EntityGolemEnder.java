@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.entity;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -106,5 +107,16 @@ public class EntityGolemEnder extends EntityGolem {
 	@Override
 	public String getTextureKey() {
 		return "ender";
+	}
+	
+	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
+		if (this.getOwnerId() == null) {
+			int count = this.rand.nextInt(3) + 1;
+			count += lootingModifier;
+			
+			this.entityDropItem(EssenceItem.instance().getEssence(
+					EMagicElement.ENDER,
+					count), 0);
+		}
 	}
 }
