@@ -48,15 +48,15 @@ public class BookScreen extends GuiScreen {
 		lastPage.put(key, page);
 	}
 	
-	protected static final ResourceLocation background = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/book_back.png");
+	public static final ResourceLocation background = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/book_back.png");
 	
 	protected static final int TEXT_WIDTH = 350;
 	
 	protected static final int TEXT_HEIGHT = 210;
 	
-	protected static final int TEXT_WHOLE_WIDTH = 350;
+	public static final int TEXT_WHOLE_WIDTH = 350;
 	
-	protected static final int TEXT_WHOLE_HEIGHT = 250;
+	public static final int TEXT_WHOLE_HEIGHT = 250;
 	
 	protected static final int PAGE_WIDTH = 132;
 	

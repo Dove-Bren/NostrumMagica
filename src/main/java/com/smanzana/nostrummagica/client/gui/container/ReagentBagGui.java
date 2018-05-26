@@ -16,6 +16,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
@@ -45,7 +46,7 @@ public class ReagentBagGui {
 		
 		protected ReagentBag bag;
 		protected ItemStack stack;
-		protected IInventory inventory;
+		protected ReagentInventory inventory;
 		protected int bagPos;
 		
 		private int bagIDStart;
@@ -96,8 +97,7 @@ public class ReagentBagGui {
 					}
 				} else {
 					// shift-click in player inventory
-					ReagentInventory realinv = (ReagentInventory) inventory;
-					ItemStack leftover = realinv.addItem(stack);
+					ItemStack leftover = inventory.addItem(stack);
 					slot.putStack(leftover != null && leftover.stackSize <= 0 ? null : leftover);
 //					if (inventory.isItemValidForSlot(0, stack)) {
 //						for (int i = 0; i < inventory.getSizeInventory(); i++) {
@@ -183,7 +183,109 @@ public class ReagentBagGui {
 				}
 			}
 			
-			return super.slotClick(slotId, dragType, clickTypeIn, player);
+			ItemStack itemstack = null;
+			InventoryPlayer inventoryplayer = player.inventory;
+
+			if (clickTypeIn == ClickType.PICKUP && (dragType == 0 || dragType == 1)
+					&& slotId >= 0 && inventoryplayer.getItemStack() != null) {
+
+				Slot slot7 = (Slot)this.inventorySlots.get(slotId);
+
+				if (slot7 != null) {
+					ItemStack itemstack9 = slot7.getStack();
+					ItemStack itemstack12 = inventoryplayer.getItemStack();
+
+					if (itemstack9 != null) {
+						itemstack = itemstack9.copy();
+					}
+
+					if (itemstack9 == null) {
+						if (itemstack12 != null && slot7.isItemValid(itemstack12)) {
+							int l2 = dragType == 0 ? itemstack12.stackSize : 1;
+
+							if (l2 > slot7.getItemStackLimit(itemstack12)) {
+								l2 = slot7.getItemStackLimit(itemstack12);
+							}
+
+							slot7.putStack(itemstack12.splitStack(l2));
+
+							if (itemstack12.stackSize == 0) {
+								inventoryplayer.setItemStack((ItemStack)null);
+							}
+						}
+					} else if (slot7.canTakeStack(player)) {
+						if (itemstack12 == null) {
+							if (itemstack9.stackSize > 0) {
+								int k2 = dragType == 0 ? itemstack9.stackSize : (itemstack9.stackSize + 1) / 2;
+								inventoryplayer.setItemStack(slot7.decrStackSize(k2));
+
+								if (itemstack9.stackSize <= 0) {
+									slot7.putStack((ItemStack)null);
+								}
+
+								slot7.onPickupFromSlot(player, inventoryplayer.getItemStack());
+							} else {
+								slot7.putStack((ItemStack)null);
+								inventoryplayer.setItemStack((ItemStack)null);
+							}
+						} else if (slot7.isItemValid(itemstack12)) {
+							if (itemstack9.getItem() == itemstack12.getItem() && itemstack9.getMetadata() == itemstack12.getMetadata() && ItemStack.areItemStackTagsEqual(itemstack9, itemstack12)) {
+								int j2 = dragType == 0 ? itemstack12.stackSize : 1;
+
+								if (j2 > slot7.getItemStackLimit(itemstack12) - itemstack9.stackSize) {
+									j2 = slot7.getItemStackLimit(itemstack12) - itemstack9.stackSize;
+								}
+
+								//if (j2 > itemstack12.getMaxStackSize() - itemstack9.stackSize) {
+								//	j2 = itemstack12.getMaxStackSize() - itemstack9.stackSize;
+								//}
+
+								itemstack12.splitStack(j2);
+
+								if (itemstack12.stackSize == 0) {
+									inventoryplayer.setItemStack((ItemStack)null);
+								}
+
+								itemstack9.stackSize += j2;
+							} else if (itemstack12.stackSize <= slot7.getItemStackLimit(itemstack12)) {
+								slot7.putStack(itemstack12);
+								inventoryplayer.setItemStack(itemstack9);
+							}
+						} else if (itemstack9.getItem() == itemstack12.getItem() && itemstack12.getMaxStackSize() > 1 && (!itemstack9.getHasSubtypes() || itemstack9.getMetadata() == itemstack12.getMetadata()) && ItemStack.areItemStackTagsEqual(itemstack9, itemstack12)) {
+							int i2 = itemstack9.stackSize;
+
+							if (i2 > 0 && i2 + itemstack12.stackSize <= itemstack12.getMaxStackSize()) {
+								itemstack12.stackSize += i2;
+								itemstack9 = slot7.decrStackSize(i2);
+
+								if (itemstack9.stackSize == 0) {
+									slot7.putStack((ItemStack)null);
+								}
+
+								slot7.onPickupFromSlot(player, inventoryplayer.getItemStack());
+							}
+						}
+					}
+
+					slot7.onSlotChanged();
+				}
+	            
+				this.detectAndSendChanges();
+				return itemstack;
+			} else {
+				return super.slotClick(slotId, dragType, clickTypeIn, player);
+			}
+	        
+		}
+		
+		public static boolean canAddItemToSlot(Slot slotIn, ItemStack stack, boolean stackSizeMatters) {
+			boolean flag = slotIn == null || !slotIn.getHasStack();
+
+			if (slotIn != null && slotIn.getHasStack() && stack != null && stack.isItemEqual(slotIn.getStack()) && ItemStack.areItemStackTagsEqual(slotIn.getStack(), stack)){
+				flag |= slotIn.getStack().stackSize + (stackSizeMatters ? 0 : stack.stackSize) <= slotIn.getSlotStackLimit();
+			}
+
+			return flag;
 		}
 
 	}

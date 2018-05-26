@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.client.gui.infoscreen;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -31,6 +32,11 @@ public class LoreInfoSubScreen implements IInfoSubScreen {
 					x + 5,
 					y + 35 + (i++ * 17),
 					width, 0xFFFFFFFF);
+	}
+
+	@Override
+	public Collection<ISubScreenButton> getButtons() {
+		return null;
 	}
 
 }

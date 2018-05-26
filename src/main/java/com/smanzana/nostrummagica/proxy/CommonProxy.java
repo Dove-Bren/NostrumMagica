@@ -65,6 +65,7 @@ import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTableItem;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.SpellTomePage;
+import com.smanzana.nostrummagica.items.SpellcraftGuide;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientEffectRenderMessage;
@@ -262,14 +263,19 @@ public class CommonProxy {
     }
     
     private void registerItems() {
+    	NostrumGuide.instance().setRegistryName(NostrumMagica.MODID, NostrumGuide.id);
+    	GameRegistry.register(NostrumGuide.instance());
+    	NostrumGuide.init();
+    	
+    	SpellcraftGuide.instance().setRegistryName(NostrumMagica.MODID, SpellcraftGuide.id);
+    	GameRegistry.register(SpellcraftGuide.instance());
+    	SpellcraftGuide.init();
+    	
     	SpellTome.instance().setRegistryName(NostrumMagica.MODID, SpellTome.id);
     	GameRegistry.register(SpellTome.instance());
     	SpellPlate.instance().setRegistryName(NostrumMagica.MODID, SpellPlate.id);
     	GameRegistry.register(SpellPlate.instance());
     	
-    	NostrumGuide.instance().setRegistryName(NostrumMagica.MODID, NostrumGuide.id);
-    	GameRegistry.register(NostrumGuide.instance());
-    	NostrumGuide.init();
     	
     	BlankScroll.instance().setRegistryName(NostrumMagica.MODID, BlankScroll.id);
     	GameRegistry.register(BlankScroll.instance());

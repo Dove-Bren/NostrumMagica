@@ -131,6 +131,8 @@ public class NostrumMagic implements INostrumMagic {
 			bindingSpell = null;
 			bindingComponent = null;
 			
+			this.setElementMastery(EMagicElement.PHYSICAL, 1);
+			
 			NostrumMagicaSounds.LEVELUP.play(entity);
 		}
 	}

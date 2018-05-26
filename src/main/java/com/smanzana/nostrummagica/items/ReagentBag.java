@@ -9,7 +9,6 @@ import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -206,12 +205,8 @@ public class ReagentBag extends Item implements ILoreTagged {
 		}
 	}
 	
-	public IInventory asInventory(ItemStack bag) {
-		IInventory inv = new ReagentInventory(bag);
-		
-		
-		
-		return inv;
+	public ReagentInventory asInventory(ItemStack bag) {
+		return new ReagentInventory(bag);
 	}
 	
 	@Override
@@ -242,27 +237,6 @@ public class ReagentBag extends Item implements ILoreTagged {
 			//this. = ReagentBag.getItems(stack);
 		}
 		
-//		/**
-//	     * Returns the stack in the given slot.
-//	     */
-//	    public ItemStack getStackInSlot(int index) {
-//	        return index >= 0 && index < this.inventory.length ? this.inventory[index] : null;
-//	    }
-
-//	    /**
-//	     * Removes up to a specified number of items from an inventory slot and returns them in a new stack.
-//	     */
-//	    public ItemStack decrStackSize(int index, int count) {
-//	        ItemStack itemstack = ItemStackHelper.getAndSplit(this.inventory, index, count);
-//
-//	        if (itemstack != null)
-//	        {
-//	            this.markDirty();
-//	        }
-//
-//	        return itemstack;
-//	    }
-
 	    /**
 	     * Try to add the item to the invntory.
 	     * Return what won't fit.
@@ -305,23 +279,6 @@ public class ReagentBag extends Item implements ILoreTagged {
 	        return itemstack;
 	    }
 
-//	    /**
-//	     * Removes a stack from the given slot and returns it.
-//	     */
-//	    public ItemStack removeStackFromSlot(int index) {
-//	        if (this.reagents[index] != null)
-//	        {
-//	            ItemStack itemstack = this.reagents[index];
-//	            this.reagents[index] = null;
-//	            markDirty();
-//	            return itemstack;
-//	        }
-//	        else
-//	        {
-//	            return null;
-//	        }
-//	    }
-	    
 	    @Override
 	    public void markDirty() {
 	    	// Bleed our changes out to the itemstack
@@ -335,34 +292,6 @@ public class ReagentBag extends Item implements ILoreTagged {
 	    	
 	    	super.markDirty();
 	    }
-
-//	    /**
-//	     * Sets the given item stack to the specified slot in the inventory (can be crafting or armor sections).
-//	     */
-//	    public void setInventorySlotContents(int index, @Nullable ItemStack stack) {
-//	    	// We return 'true' to 'can this go here' for all reagents.
-//	    	// When we get here, though, we actually don't respect the index they
-//	    	// say and instead put it where it should go
-//	    	
-//	    	
-////	    	if (stack == null) {
-////	    		if (index >= reagents.length)
-////		    		return;
-////	    		this.reagents[index] = null;
-////	    		markDirty();
-////	    	} else {
-////	    		addItem(stack); // We don't do strict setting here
-////	    	}
-//	    	
-//	        this.reagents[index] = stack;
-//
-//	        if (stack != null && stack.stackSize > MAX_COUNT)
-//	        {
-//	            stack.stackSize = MAX_COUNT;
-//	        }
-//
-//	        this.markDirty();
-//	    }
 	    
 	    /**
 	     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended.
@@ -381,14 +310,6 @@ public class ReagentBag extends Item implements ILoreTagged {
 	        return stack.getItem() instanceof ReagentItem;
 	    }
 
-//	    public void clear()
-//	    {
-//	        for (int i = 0; i < this.reagents.length; ++i)
-//	        {
-//	            this.inventory[i] = null;
-//	        }
-//	    }
-		
 		
 	}
 

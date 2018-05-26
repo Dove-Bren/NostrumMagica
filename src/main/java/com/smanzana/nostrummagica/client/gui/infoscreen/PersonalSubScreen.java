@@ -128,9 +128,14 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			
 			mc.fontRendererObj.drawSplitString(desc, x + 5, y + 20, width - 10, 0xFFFFFFFF);
 			int len;
-			desc = I18n.format("info.personal.discovery.name", (Object[])null);
+			desc = I18n.format("info.discovery.name", (Object[])null);
 			len = mc.fontRendererObj.getStringWidth(desc);
 			mc.fontRendererObj.drawStringWithShadow(desc, x + ((width - len) / 2), y + 5, 0xFFFFFFFF);
+		}
+
+		@Override
+		public Collection<ISubScreenButton> getButtons() {
+			return null;
 		}
 		
 	}
@@ -323,7 +328,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			
 			String desc;
 			int len;
-			desc = I18n.format("info.personal.stats.name", (Object[])null);
+			desc = I18n.format("info.stats.name", (Object[])null);
 			len = mc.fontRendererObj.getStringWidth(desc);
 			mc.fontRendererObj.drawStringWithShadow(desc, x + ((width - len) / 2), y + 5, 0xFFFFFFFF);
 
@@ -331,6 +336,11 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			for (StatLabel label : labels) {
 				label.drawOverlay(mc, x + 20, y + 20, width, height, mouseX, mouseY);
 			}
+		}
+
+		@Override
+		public Collection<ISubScreenButton> getButtons() {
+			return null;
 		}
 		
 	}
@@ -372,6 +382,11 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				GlStateManager.color(1f, 1f, 1f, alpha);
 				GlStateManager.enableBlend();
 				SpellIcon.get(elem).draw(mc.currentScreen, mc.fontRendererObj, drawX, drawY, iconWidth, iconWidth);
+				
+				if (mastery != null && mastery > 0) {
+					mc.fontRendererObj.drawString(mastery + "", drawX + 1, drawY + 1, 0xFFFFFFFF);
+				}
+				
 				drawX += 5 + iconWidth;
 			}
 			
@@ -441,28 +456,16 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			
 			String desc;
 			int len;
-			desc = I18n.format("info.personal.growth.name", (Object[])null);
+			desc = I18n.format("info.growth.name", (Object[])null);
 			len = mc.fontRendererObj.getStringWidth(desc);
 			mc.fontRendererObj.drawStringWithShadow(desc, x + ((width - len) / 2), y + 5, 0xFFFFFFFF);
+		}
+
+		@Override
+		public Collection<ISubScreenButton> getButtons() {
+			return null;
 		}
 		
 	}
 	
-//	@Override
-//	public void draw(INostrumMagic attr, Minecraft mc, int x, int y, int width, int height) {
-//		String title = this.tag.getLoreDisplayName();
-//		int len = mc.fontRendererObj.getStringWidth(title);
-//		mc.fontRendererObj.drawStringWithShadow(title, x + (width / 2) + (-len / 2), y, 0xFFFFFFFF);
-//		
-//		Lore lore = attr.getLore(this.tag);
-//		
-//		List<String> data = lore.getData();
-//		int i = 0;
-//		for (String line : data)
-//			mc.fontRendererObj.drawSplitString(line,
-//					x + 5,
-//					y + 35 + (i++ * 17),
-//					width, 0xFFFFFFFF);
-//	}
-
 }

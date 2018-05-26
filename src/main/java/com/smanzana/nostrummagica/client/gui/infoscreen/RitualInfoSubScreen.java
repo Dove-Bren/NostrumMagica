@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.client.gui.infoscreen;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -309,6 +310,11 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 					item, TransformType.GROUND);
 			GlStateManager.popMatrix();
 		}
+	}
+
+	@Override
+	public Collection<ISubScreenButton> getButtons() {
+		return null;
 	}
 
 }

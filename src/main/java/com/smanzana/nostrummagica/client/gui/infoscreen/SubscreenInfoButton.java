@@ -13,13 +13,13 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 
-public class PersonalInfoButton extends InfoButton {
+public class SubscreenInfoButton extends InfoButton {
 
-	private PersonalSubScreen screen;
+	private IInfoSubScreen screen;
 	private ItemStack icon;
 	private String descKey;
 	
-	public PersonalInfoButton(int buttonId, String key, PersonalSubScreen screen, ItemStack icon) {
+	public SubscreenInfoButton(int buttonId, String key, IInfoSubScreen screen, ItemStack icon) {
 		super(buttonId, 0, 0);
 		this.screen = screen;
 		this.icon = icon;
@@ -62,7 +62,7 @@ public class PersonalInfoButton extends InfoButton {
 	@Override
 	public List<String> getDescription() {
 		if (desc.isEmpty())
-			desc.add(I18n.format("info.personal." + descKey + ".name", new Object[0]));
+			desc.add(I18n.format("info." + descKey + ".name", new Object[0]));
 		
 		return desc;
 	}

@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.client.gui.infoscreen;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -37,6 +38,7 @@ public class InfoScreen extends GuiScreen {
 	private List<GuiButton> tabs;
 	private List<InfoButton> buttons;
 	private IInfoSubScreen subscreen;
+	private List<ISubScreenButton> subscreenButtons;
 	
 	protected int globButtonID = 0;
 	
@@ -48,6 +50,7 @@ public class InfoScreen extends GuiScreen {
 	public void initGui() {
 		tabs = new LinkedList<>();
 		buttons = new LinkedList<>();
+		subscreenButtons = new LinkedList<>();
 		subscreen = null;
 		
 		InfoScreenTab.init();
@@ -91,8 +94,9 @@ public class InfoScreen extends GuiScreen {
 		}
 		
 		for (int i = 0; i < this.buttonList.size(); ++i) {
-			((GuiButton)this.buttonList.get(i)).drawButtonForegroundLayer(mouseX, mouseY);
+			this.buttonList.get(i).drawButtonForegroundLayer(mouseX, mouseY);
 		}
+		
 	}
 	
 	@Override
@@ -107,8 +111,28 @@ public class InfoScreen extends GuiScreen {
 		
 		if (button instanceof InfoButton) {
 			this.subscreen = ((InfoButton) button).getScreen(attribute);
+			this.subscreenButtons.clear();
+			Collection<ISubScreenButton> screenbutts = subscreen.getButtons();
+			if (screenbutts != null && !screenbutts.isEmpty())
+				this.subscreenButtons.addAll(screenbutts);
+			
+			if (!this.subscreenButtons.isEmpty()) {
+				int i = 0;
+				for (ISubScreenButton butt : subscreenButtons) {
+					butt.xPosition = i;
+					i += butt.width + 2;
+					butt.yPosition = this.height - 15;
+				}
+			}
+			
+			this.buttonList.clear();
+			this.buttonList.addAll(this.tabs);
+			this.buttonList.addAll(this.buttons);
+			this.buttonList.addAll(this.subscreenButtons);
 		} else if (button instanceof TabButton) {
 			activateButtons(((TabButton) button).getButtons());
+		} else if (button instanceof ISubScreenButton) {
+			((ISubScreenButton) button).onClick(attribute);
 		}
 
 	}
@@ -123,6 +147,7 @@ public class InfoScreen extends GuiScreen {
 		this.buttonList.clear();
 		this.buttonList.addAll(this.tabs);
 		this.buttonList.addAll(this.buttons);
+		this.buttonList.addAll(this.subscreenButtons);
 		int i = 0;
 		int j = 0;
 		int cuttoff = this.width / (InfoButton.BUTTON_WIDTH + 2);

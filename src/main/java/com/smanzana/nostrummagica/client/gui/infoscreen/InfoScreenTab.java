@@ -5,18 +5,25 @@ import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.Candle;
+import com.smanzana.nostrummagica.blocks.ModificationTable;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.items.AltarItem;
+import com.smanzana.nostrummagica.items.MirrorItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellRune;
+import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
+import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
+import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
@@ -33,6 +40,7 @@ public abstract class InfoScreenTab {
 	private static InfoScreenTab INFO_BLOCKS;
 	private static InfoScreenTab INFO_ITEMS;
 	private static InfoScreenTab INFO_ENTITY;
+	private static InfoScreenTab INFO_GUIDES;
 	
 	public static void init() {
 		if (INFO_ITEMS != null)
@@ -266,21 +274,82 @@ public abstract class InfoScreenTab {
 			public List<InfoButton> getButtons(int offset, INostrumMagic attr) {
 				List<InfoButton> buttons = new LinkedList<>();
 				
-				buttons.add(new PersonalInfoButton(offset++, "discovery",
+				buttons.add(new SubscreenInfoButton(offset++, "discovery",
 						new PersonalSubScreen.PersonalDiscoveryScreen(attr),
 						new ItemStack(SpellTome.instance())));
 				
 				if (attr.isUnlocked()) {
 					
-					buttons.add(new PersonalInfoButton(offset++, "stats",
+					buttons.add(new SubscreenInfoButton(offset++, "stats",
 							new PersonalSubScreen.PersonalStatsScreen(attr),
 							new ItemStack(SpellTomePage.instance())));
 					
-					buttons.add(new PersonalInfoButton(offset++, "growth",
+					buttons.add(new SubscreenInfoButton(offset++, "growth",
 							new PersonalSubScreen.PersonalGrowthScreen(attr),
 							new ItemStack(Items.COMPASS)));
 				}
 				
+				return buttons;
+			}
+			
+		};
+		
+		INFO_GUIDES = new InfoScreenTab(InfoScreenTabs.INFO_GUIDES,
+				new ItemStack(Items.BOOK)) {
+
+			@Override
+			public boolean isVisible(INostrumMagic attr) {
+				return attr.isUnlocked();
+			}
+
+			@Override
+			public List<InfoButton> getButtons(int offset, INostrumMagic attr) {
+				List<InfoButton> buttons = new LinkedList<>();
+				
+				buttons.add(new SubscreenInfoButton(offset++, "shrines",
+						new PaginatedInfoSubScreen("shrines"),
+						new ItemStack(MirrorItem.instance())));
+				
+				buttons.add(new SubscreenInfoButton(offset++, "spells",
+						new PaginatedInfoSubScreen("spells"),
+						new ItemStack(SpellScroll.instance())));
+				
+				buttons.add(new SubscreenInfoButton(offset++, "trigger",
+						new PaginatedInfoSubScreen("trigger"),
+						SpellRune.getRune(SelfTrigger.instance())));
+				
+				buttons.add(new SubscreenInfoButton(offset++, "shape",
+						new PaginatedInfoSubScreen("shape"),
+						SpellRune.getRune(SingleShape.instance())));
+				
+				buttons.add(new SubscreenInfoButton(offset++, "element",
+						new PaginatedInfoSubScreen("element"),
+						SpellRune.getRune(EMagicElement.FIRE, 1)));
+				
+				buttons.add(new SubscreenInfoButton(offset++, "alteration",
+						new PaginatedInfoSubScreen("alteration"),
+						SpellRune.getRune(EAlteration.INFLICT)));
+				
+				buttons.add(new SubscreenInfoButton(offset++, "spellmaking",
+						new PaginatedInfoSubScreen("spellmaking"),
+						new ItemStack(Items.WRITABLE_BOOK)));
+				
+				buttons.add(new SubscreenInfoButton(offset++, "levelup",
+						new PaginatedInfoSubScreen("levelup"),
+						new ItemStack(Items.SKULL, 1, 3)));
+				
+				buttons.add(new SubscreenInfoButton(offset++, "tomes",
+						new PaginatedInfoSubScreen("tomes"),
+						new ItemStack(SpellTome.instance(), 1, 4)));
+				
+				buttons.add(new SubscreenInfoButton(offset++, "rituals",
+						new PaginatedInfoSubScreen("rituals"),
+						new ItemStack(AltarItem.instance())));
+				
+				buttons.add(new SubscreenInfoButton(offset++, "modification",
+						new PaginatedInfoSubScreen("modification"),
+						new ItemStack(ModificationTable.instance())));
+					
 				return buttons;
 			}
 			
@@ -313,6 +382,9 @@ public abstract class InfoScreenTab {
 			break;
 		case PERSONAL:
 			ret = PERSONAL;
+			break;
+		case INFO_GUIDES:
+			ret = INFO_GUIDES;
 			break;
 		}
 		

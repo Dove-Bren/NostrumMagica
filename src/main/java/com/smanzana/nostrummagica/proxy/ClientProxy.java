@@ -73,6 +73,7 @@ import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTableItem;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.SpellTomePage;
+import com.smanzana.nostrummagica.items.SpellcraftGuide;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
 import com.smanzana.nostrummagica.network.messages.ObeliskTeleportationRequestMessage;
@@ -242,6 +243,7 @@ public class ClientProxy extends CommonProxy {
 		
 		//registerModel(SpellTome.instance(), 0, SpellTome.id);
 		registerModel(NostrumGuide.instance(), 0, NostrumGuide.id);
+		registerModel(SpellcraftGuide.instance(), 0, SpellcraftGuide.id);
 		registerModel(SpellScroll.instance(), 0, SpellScroll.id);
 		registerModel(BlankScroll.instance(), 0, BlankScroll.id);
 		registerModel(ReagentBag.instance(), 0, ReagentBag.id);
