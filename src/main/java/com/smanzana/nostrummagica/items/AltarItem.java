@@ -27,7 +27,7 @@ public class AltarItem extends Item implements ILoreTagged {
 				"SSS", " T ", "TRT",
 				'S', Blocks.STONE_SLAB,
 				'T', Blocks.STONE,
-				'R', NostrumResourceItem.getItem(ResourceType.TOKEN, 1)
+				'R', NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1)
 				);
 	}
 	
@@ -75,7 +75,7 @@ public class AltarItem extends Item implements ILoreTagged {
 		IBlockState state = worldIn.getBlockState(pos);
         if (facing == EnumFacing.UP && playerIn.canPlayerEdit(pos.offset(facing), facing, stack) && state.isFullBlock() && worldIn.isAirBlock(pos.up())) {
         	worldIn.setBlockState(pos.up(), AltarBlock.instance().getDefaultState());
-            stack.damageItem(1, playerIn);
+            stack.stackSize--;
             return EnumActionResult.SUCCESS;
         } else {
         	return EnumActionResult.FAIL;

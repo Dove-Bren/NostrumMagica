@@ -3,6 +3,9 @@ package com.smanzana.nostrummagica.blocks;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.items.AltarItem;
+import com.smanzana.nostrummagica.items.SpellScroll;
+import com.smanzana.nostrummagica.items.SpellTome;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
@@ -47,7 +50,7 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 	public AltarBlock() {
 		super(Material.ROCK, MapColor.OBSIDIAN);
 		this.setUnlocalizedName(ID);
-		this.setHardness(60.0f);
+		this.setHardness(3.5f);
 		this.setResistance(10.0f);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setSoundType(SoundType.STONE);
@@ -96,6 +99,14 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 	@Override
 	public void breakBlock(World world, BlockPos pos, IBlockState state) {
 		super.breakBlock(world, pos, state);
+		
+		EntityItem item = new EntityItem(world,
+				pos.getX() + .5,
+				pos.getY() + .5,
+				pos.getZ() + .5,
+				new ItemStack(AltarItem.instance()));
+		world.spawnEntityInWorld(item);
+		
         world.removeTileEntity(pos);
 	}
 	
@@ -133,6 +144,21 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 				}
 				altar.setItem(null);
 				return true;
+			} else if (heldItem.getItem() instanceof SpellScroll) {
+				if (heldItem.getMetadata() != 2)
+					return false;
+				
+				// meta 2 means an awakened scroll. If we have a tome, BIND!!!!!
+				ItemStack tome = altar.getItem();
+				if (!(tome.getItem() instanceof SpellTome))
+					return false;
+				
+				if (SpellTome.startBinding(playerIn, tome, heldItem)) {
+					heldItem.splitStack(1);
+					return true;
+				} else {
+					return false;
+				}
 			} else
 				return false;
 		}

@@ -13,22 +13,12 @@ import com.smanzana.nostrummagica.items.EnchantedEquipment;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.items.SpellScroll;
-import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ManaMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.spells.EAlteration;
-import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.Spell.SpellPart;
-import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
-import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
-import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.material.Material;
@@ -57,7 +47,6 @@ import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
-import net.minecraftforge.event.entity.player.UseHoeEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -783,296 +772,296 @@ public class PlayerListener {
 	}
 	
 	// TESTING
-	@SubscribeEvent
-	public void onTest(UseHoeEvent e) {
-		
-		INostrumMagic attr = NostrumMagica.getMagicWrapper(e.getEntityPlayer());
-		if (attr != null) {
-			attr.unlock();
-		}
-		
-		if (e.getWorld().isRemote)
-			return;
-		
-		ItemStack tome = new ItemStack(SpellTome.instance(), 1);
-		
-		// Create spell on server side.
-		// Spawn tome with that spell in it
-		Spell spell;
-//		= new Spell("Wind Cutter");
+//	@SubscribeEvent
+//	public void onTest(UseHoeEvent e) {
+//		
+//		INostrumMagic attr = NostrumMagica.getMagicWrapper(e.getEntityPlayer());
+//		if (attr != null) {
+//			attr.unlock();
+//		}
+//		
+//		if (e.getWorld().isRemote)
+//			return;
+//		
+//		ItemStack tome = new ItemStack(SpellTome.instance(), 1);
+//		
+//		// Create spell on server side.
+//		// Spawn tome with that spell in it
+//		Spell spell;
+////		= new Spell("Wind Cutter");
+////		spell.addPart(new SpellPart(
+////				ProjectileTrigger.instance(),
+////				new SpellPartParam(0, false)
+////				));
+////		spell.addPart(new SpellPart(
+////				SingleShape.instance(),
+////				EMagicElement.WIND,
+////				1,
+////				null,
+////				new SpellPartParam(0, false)
+////				));
+////		SpellTome.addSpell(tome, spell);
+////		
+//		spell = new Spell("Wind Palm");
 //		spell.addPart(new SpellPart(
-//				ProjectileTrigger.instance(),
+//				TouchTrigger.instance(),
 //				new SpellPartParam(0, false)
 //				));
 //		spell.addPart(new SpellPart(
 //				SingleShape.instance(),
-//				EMagicElement.WIND,
-//				1,
-//				null,
-//				new SpellPartParam(0, false)
-//				));
-//		SpellTome.addSpell(tome, spell);
-//		
-		spell = new Spell("Wind Palm");
-		spell.addPart(new SpellPart(
-				TouchTrigger.instance(),
-				new SpellPartParam(0, false)
-				));
-		spell.addPart(new SpellPart(
-				SingleShape.instance(),
-				EMagicElement.WIND,
-				3,
-				null,
-				new SpellPartParam(0, false)
-				));
-		SpellTome.addSpell(tome, spell);
-//		
-//		spell = new Spell("Wind Beam Chain");
-//		spell.addPart(new SpellPart(
-//				BeamTrigger.instance(),
-//				new SpellPartParam(0, false)
-//				));
-//		spell.addPart(new SpellPart(
-//				ChainShape.instance(),
 //				EMagicElement.WIND,
 //				3,
 //				null,
-//				new SpellPartParam(3, false)
-//				));
-//		SpellTome.addSpell(tome, spell);
-//		
-//		spell = new Spell("Transmute");
-//		spell.addPart(new SpellPart(
-//				SelfTrigger.instance(),
-//				new SpellPartParam(0, false)
-//				));
-//		spell.addPart(new SpellPart(
-//				SingleShape.instance(),
-//				EMagicElement.PHYSICAL,
-//				1,
-//				EAlteration.ALTER,
 //				new SpellPartParam(0, false)
 //				));
 //		SpellTome.addSpell(tome, spell);
+////		
+////		spell = new Spell("Wind Beam Chain");
+////		spell.addPart(new SpellPart(
+////				BeamTrigger.instance(),
+////				new SpellPartParam(0, false)
+////				));
+////		spell.addPart(new SpellPart(
+////				ChainShape.instance(),
+////				EMagicElement.WIND,
+////				3,
+////				null,
+////				new SpellPartParam(3, false)
+////				));
+////		SpellTome.addSpell(tome, spell);
+////		
+////		spell = new Spell("Transmute");
+////		spell.addPart(new SpellPart(
+////				SelfTrigger.instance(),
+////				new SpellPartParam(0, false)
+////				));
+////		spell.addPart(new SpellPart(
+////				SingleShape.instance(),
+////				EMagicElement.PHYSICAL,
+////				1,
+////				EAlteration.ALTER,
+////				new SpellPartParam(0, false)
+////				));
+////		SpellTome.addSpell(tome, spell);
+////		
+////		spell = new Spell("Alter Fire I");
+////		spell.addPart(new SpellPart(
+////				SelfTrigger.instance(),
+////				new SpellPartParam(0, false)
+////				));
+////		spell.addPart(new SpellPart(
+////				SingleShape.instance(),
+////				EMagicElement.FIRE,
+////				1,
+////				EAlteration.ALTER,
+////				new SpellPartParam(0, false)
+////				));
+////		SpellTome.addSpell(tome, spell);
+////		
+////		spell = new Spell("Alter Ice 3");
+////		spell.addPart(new SpellPart(
+////				SelfTrigger.instance(),
+////				new SpellPartParam(0, false)
+////				));
+////		spell.addPart(new SpellPart(
+////				SingleShape.instance(),
+////				EMagicElement.ICE,
+////				3,
+////				EAlteration.ALTER,
+////				new SpellPartParam(0, false)
+////				));
+////		SpellTome.addSpell(tome, spell);
+////		
+////		spell = new Spell("Summon Zapper");
+////		spell.addPart(new SpellPart(
+////				DamagedTrigger.instance(),
+////				new SpellPartParam(0, false)
+////				));
+////		spell.addPart(new SpellPart(
+////				SingleShape.instance(),
+////				EMagicElement.LIGHTNING,
+////				1,
+////				EAlteration.SUMMON,
+////				new SpellPartParam(0, false)
+////				));
+////		SpellTome.addSpell(tome, spell);
+////		
+////		spell = new Spell("Summon Wind");
+////		spell.addPart(new SpellPart(
+////				ProjectileTrigger.instance(),
+////				new SpellPartParam(0, false)
+////				));
+////		spell.addPart(new SpellPart(
+////				SingleShape.instance(),
+////				EMagicElement.WIND,
+////				1,
+////				EAlteration.SUMMON,
+////				new SpellPartParam(0, false)
+////				));
+////		SpellTome.addSpell(tome, spell);
+////		
+////		spell = new Spell("Summon Ender");
+////		spell.addPart(new SpellPart(
+////				ProjectileTrigger.instance(),
+////				new SpellPartParam(0, false)
+////				));
+////		spell.addPart(new SpellPart(
+////				SingleShape.instance(),
+////				EMagicElement.ENDER,
+////				1,
+////				EAlteration.SUMMON,
+////				new SpellPartParam(0, false)
+////				));
+////		SpellTome.addSpell(tome, spell);
+////		
+////		spell = new Spell("Magic Shield");
+////		spell.addPart(new SpellPart(
+////				ManaTrigger.instance(),
+////				new SpellPartParam(0.5f, false)
+////				));
+////		spell.addPart(new SpellPart(
+////				SingleShape.instance(),
+////				EMagicElement.ICE,
+////				1,
+////				EAlteration.SUPPORT,
+////				new SpellPartParam(0, false)
+////				));
+////		SpellTome.addSpell(tome, spell);
+////		
+////		spell = new Spell("Physical Shield");
+////		spell.addPart(new SpellPart(
+////				HealthTrigger.instance(),
+////				new SpellPartParam(0.5f, false)
+////				));
+////		spell.addPart(new SpellPart(
+////				SingleShape.instance(),
+////				EMagicElement.EARTH,
+////				1,
+////				EAlteration.SUPPORT,
+////				new SpellPartParam(0, false)
+////				));
+////		SpellTome.addSpell(tome, spell);
+////		
+////		spell = new Spell("Pull");
+////		spell.addPart(new SpellPart(
+////				SelfTrigger.instance(),
+////				new SpellPartParam(0, false)
+////				));
+////		spell.addPart(new SpellPart(
+////				SingleShape.instance(),
+////				EMagicElement.LIGHTNING,
+////				1,
+////				EAlteration.SUPPORT,
+////				new SpellPartParam(0, false)
+////				));
+////		SpellTome.addSpell(tome, spell);
+////		
+////		spell = new Spell("Magic Wall I");
+////		spell.addPart(new SpellPart(
+////				ProjectileTrigger.instance(),
+////				new SpellPartParam(0, false)
+////				));
+////		spell.addPart(new SpellPart(
+////				SingleShape.instance(),
+////				EMagicElement.WIND,
+////				1,
+////				EAlteration.CONJURE,
+////				new SpellPartParam(0, false)
+////				));
+////		SpellTome.addSpell(tome, spell);
+////		
+////		spell = new Spell("Geoblock");
+////		spell.addPart(new SpellPart(
+////				ProjectileTrigger.instance(),
+////				new SpellPartParam(0, false)
+////				));
+////		spell.addPart(new SpellPart(
+////				SingleShape.instance(),
+////				EMagicElement.EARTH,
+////				1,
+////				EAlteration.CONJURE,
+////				new SpellPartParam(0, false)
+////				));
+////		SpellTome.addSpell(tome, spell);
+////		
+////		spell = new Spell("Cursed Ice");
+////		spell.addPart(new SpellPart(
+////				ProjectileTrigger.instance(),
+////				new SpellPartParam(0, false)
+////				));
+////		spell.addPart(new SpellPart(
+////				SingleShape.instance(),
+////				EMagicElement.ICE,
+////				1,
+////				EAlteration.CONJURE,
+////				new SpellPartParam(0, false)
+////				));
+////		SpellTome.addSpell(tome, spell);
+////		
+////		spell = new Spell("Cursed Ice III");
+////		spell.addPart(new SpellPart(
+////				ProjectileTrigger.instance(),
+////				new SpellPartParam(0, false)
+////				));
+////		spell.addPart(new SpellPart(
+////				SingleShape.instance(),
+////				EMagicElement.ICE,
+////				3,
+////				EAlteration.CONJURE,
+////				new SpellPartParam(0, false)
+////				));
+////		SpellTome.addSpell(tome, spell);
+////		
+////		spell = new Spell("Phase");
+////		spell.addPart(new SpellPart(
+////				ProjectileTrigger.instance(),
+////				new SpellPartParam(0, false)
+////				));
+////		spell.addPart(new SpellPart(
+////				SingleShape.instance(),
+////				EMagicElement.ENDER,
+////				1,
+////				EAlteration.CONJURE,
+////				new SpellPartParam(0, false)
+////				));
+////		SpellTome.addSpell(tome, spell);
 //		
-//		spell = new Spell("Alter Fire I");
-//		spell.addPart(new SpellPart(
-//				SelfTrigger.instance(),
-//				new SpellPartParam(0, false)
-//				));
-//		spell.addPart(new SpellPart(
-//				SingleShape.instance(),
-//				EMagicElement.FIRE,
-//				1,
-//				EAlteration.ALTER,
-//				new SpellPartParam(0, false)
-//				));
-//		SpellTome.addSpell(tome, spell);
-//		
-//		spell = new Spell("Alter Ice 3");
-//		spell.addPart(new SpellPart(
-//				SelfTrigger.instance(),
-//				new SpellPartParam(0, false)
-//				));
-//		spell.addPart(new SpellPart(
-//				SingleShape.instance(),
-//				EMagicElement.ICE,
-//				3,
-//				EAlteration.ALTER,
-//				new SpellPartParam(0, false)
-//				));
-//		SpellTome.addSpell(tome, spell);
-//		
-//		spell = new Spell("Summon Zapper");
-//		spell.addPart(new SpellPart(
-//				DamagedTrigger.instance(),
-//				new SpellPartParam(0, false)
-//				));
-//		spell.addPart(new SpellPart(
-//				SingleShape.instance(),
-//				EMagicElement.LIGHTNING,
-//				1,
-//				EAlteration.SUMMON,
-//				new SpellPartParam(0, false)
-//				));
-//		SpellTome.addSpell(tome, spell);
-//		
-//		spell = new Spell("Summon Wind");
+//		spell = new Spell("Grow");
 //		spell.addPart(new SpellPart(
 //				ProjectileTrigger.instance(),
 //				new SpellPartParam(0, false)
-//				));
-//		spell.addPart(new SpellPart(
-//				SingleShape.instance(),
-//				EMagicElement.WIND,
-//				1,
-//				EAlteration.SUMMON,
-//				new SpellPartParam(0, false)
-//				));
-//		SpellTome.addSpell(tome, spell);
-//		
-//		spell = new Spell("Summon Ender");
-//		spell.addPart(new SpellPart(
-//				ProjectileTrigger.instance(),
-//				new SpellPartParam(0, false)
-//				));
-//		spell.addPart(new SpellPart(
-//				SingleShape.instance(),
-//				EMagicElement.ENDER,
-//				1,
-//				EAlteration.SUMMON,
-//				new SpellPartParam(0, false)
-//				));
-//		SpellTome.addSpell(tome, spell);
-//		
-//		spell = new Spell("Magic Shield");
-//		spell.addPart(new SpellPart(
-//				ManaTrigger.instance(),
-//				new SpellPartParam(0.5f, false)
-//				));
-//		spell.addPart(new SpellPart(
-//				SingleShape.instance(),
-//				EMagicElement.ICE,
-//				1,
-//				EAlteration.SUPPORT,
-//				new SpellPartParam(0, false)
-//				));
-//		SpellTome.addSpell(tome, spell);
-//		
-//		spell = new Spell("Physical Shield");
-//		spell.addPart(new SpellPart(
-//				HealthTrigger.instance(),
-//				new SpellPartParam(0.5f, false)
 //				));
 //		spell.addPart(new SpellPart(
 //				SingleShape.instance(),
 //				EMagicElement.EARTH,
 //				1,
-//				EAlteration.SUPPORT,
-//				new SpellPartParam(0, false)
-//				));
-//		SpellTome.addSpell(tome, spell);
-//		
-//		spell = new Spell("Pull");
-//		spell.addPart(new SpellPart(
-//				SelfTrigger.instance(),
-//				new SpellPartParam(0, false)
-//				));
-//		spell.addPart(new SpellPart(
-//				SingleShape.instance(),
-//				EMagicElement.LIGHTNING,
-//				1,
-//				EAlteration.SUPPORT,
-//				new SpellPartParam(0, false)
-//				));
-//		SpellTome.addSpell(tome, spell);
-//		
-//		spell = new Spell("Magic Wall I");
-//		spell.addPart(new SpellPart(
-//				ProjectileTrigger.instance(),
-//				new SpellPartParam(0, false)
-//				));
-//		spell.addPart(new SpellPart(
-//				SingleShape.instance(),
-//				EMagicElement.WIND,
-//				1,
 //				EAlteration.CONJURE,
 //				new SpellPartParam(0, false)
 //				));
 //		SpellTome.addSpell(tome, spell);
 //		
-//		spell = new Spell("Geoblock");
-//		spell.addPart(new SpellPart(
-//				ProjectileTrigger.instance(),
-//				new SpellPartParam(0, false)
-//				));
-//		spell.addPart(new SpellPart(
-//				SingleShape.instance(),
-//				EMagicElement.EARTH,
-//				1,
-//				EAlteration.CONJURE,
-//				new SpellPartParam(0, false)
-//				));
-//		SpellTome.addSpell(tome, spell);
+//		ItemStack scroll = new ItemStack(SpellScroll.instance(), 1);
+//		SpellScroll.setSpell(scroll, spell);
 //		
-//		spell = new Spell("Cursed Ice");
-//		spell.addPart(new SpellPart(
-//				ProjectileTrigger.instance(),
-//				new SpellPartParam(0, false)
+//		BlockPos pos = e.getPos().add(0, 1, 0);
+//		e.getWorld().spawnEntityInWorld(new EntityItem(
+//				e.getWorld(),
+//				pos.getX() + .5f,
+//				(float) pos.getY(),
+//				pos.getZ() + .5f,
+//				tome
 //				));
-//		spell.addPart(new SpellPart(
-//				SingleShape.instance(),
-//				EMagicElement.ICE,
-//				1,
-//				EAlteration.CONJURE,
-//				new SpellPartParam(0, false)
+//		e.getWorld().spawnEntityInWorld(new EntityItem(
+//				e.getWorld(),
+//				pos.getX() + .5f,
+//				(float) pos.getY(),
+//				pos.getZ() + .5f,
+//				scroll
 //				));
-//		SpellTome.addSpell(tome, spell);
 //		
-//		spell = new Spell("Cursed Ice III");
-//		spell.addPart(new SpellPart(
-//				ProjectileTrigger.instance(),
-//				new SpellPartParam(0, false)
-//				));
-//		spell.addPart(new SpellPart(
-//				SingleShape.instance(),
-//				EMagicElement.ICE,
-//				3,
-//				EAlteration.CONJURE,
-//				new SpellPartParam(0, false)
-//				));
-//		SpellTome.addSpell(tome, spell);
+//		pos.add(0, 5, 0);
 //		
-//		spell = new Spell("Phase");
-//		spell.addPart(new SpellPart(
-//				ProjectileTrigger.instance(),
-//				new SpellPartParam(0, false)
-//				));
-//		spell.addPart(new SpellPart(
-//				SingleShape.instance(),
-//				EMagicElement.ENDER,
-//				1,
-//				EAlteration.CONJURE,
-//				new SpellPartParam(0, false)
-//				));
-//		SpellTome.addSpell(tome, spell);
-		
-		spell = new Spell("Grow");
-		spell.addPart(new SpellPart(
-				ProjectileTrigger.instance(),
-				new SpellPartParam(0, false)
-				));
-		spell.addPart(new SpellPart(
-				SingleShape.instance(),
-				EMagicElement.EARTH,
-				1,
-				EAlteration.CONJURE,
-				new SpellPartParam(0, false)
-				));
-		SpellTome.addSpell(tome, spell);
-		
-		ItemStack scroll = new ItemStack(SpellScroll.instance(), 1);
-		SpellScroll.setSpell(scroll, spell);
-		
-		BlockPos pos = e.getPos().add(0, 1, 0);
-		e.getWorld().spawnEntityInWorld(new EntityItem(
-				e.getWorld(),
-				pos.getX() + .5f,
-				(float) pos.getY(),
-				pos.getZ() + .5f,
-				tome
-				));
-		e.getWorld().spawnEntityInWorld(new EntityItem(
-				e.getWorld(),
-				pos.getX() + .5f,
-				(float) pos.getY(),
-				pos.getZ() + .5f,
-				scroll
-				));
-		
-		pos.add(0, 5, 0);
-		
-		//NostrumDungeon.temp.spawn(e.getWorld(), new NostrumDungeon.DungeonExitPoint(pos, EnumFacing.NORTH));
-		//(new ShrineRoom()).spawn(null, e.getWorld(), new NostrumDungeon.DungeonExitPoint(pos, EnumFacing.fromAngle(e.getEntityPlayer().rotationYaw)));
-	}
+//		//NostrumDungeon.temp.spawn(e.getWorld(), new NostrumDungeon.DungeonExitPoint(pos, EnumFacing.NORTH));
+//		//(new ShrineRoom()).spawn(null, e.getWorld(), new NostrumDungeon.DungeonExitPoint(pos, EnumFacing.fromAngle(e.getEntityPlayer().rotationYaw)));
+//	}
 }

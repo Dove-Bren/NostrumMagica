@@ -1,5 +1,8 @@
 package com.smanzana.nostrummagica.items;
 
+import java.util.List;
+
+import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -7,22 +10,34 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.oredict.RecipeSorter;
+import net.minecraftforge.oredict.RecipeSorter.Category;
 
 public class SpellScroll extends Item implements ILoreTagged {
 
 	private static final String NBT_SPELL = "nostrum_spell";
+	private static final String NBT_WAKE_START = "nostrum_timer";
+	private static final int WAKE_TIME = 20 * 60 * 5;
 	private static SpellScroll instance = null;
 	
 	public static SpellScroll instance() {
@@ -34,17 +49,30 @@ public class SpellScroll extends Item implements ILoreTagged {
 	
 	public static final String id = "spell_scroll";
 	
+	public static void init() {
+		
+		GameRegistry.addRecipe(new ActivatedRecipe());
+		
+	}
+	
 	private SpellScroll() {
 		super();
 		this.setUnlocalizedName(id);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setMaxStackSize(1);
+		this.setHasSubtypes(true);
 	}
 	
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
 		
 		if (playerIn.isSneaking())
+			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
+		
+		if (itemStackIn == null)
+			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
+		
+		if (itemStackIn.getMetadata() != 0)
 			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
 		
 		if (!itemStackIn.hasTagCompound())
@@ -132,5 +160,97 @@ public class SpellScroll extends Item implements ILoreTagged {
 	@Override
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_SPELLS;
+	}
+	
+	@Override
+	public String getUnlocalizedName(ItemStack stack) {
+		int i = stack.getMetadata();
+		
+		switch (i) {
+		case 1: return "item.spell_scroll_activated";
+		case 2: return "item.spell_scroll_awakened";
+		}
+		
+		
+		return this.getUnlocalizedName();
+	}
+	
+    
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+		if (stack == null)
+			return;
+		
+		int meta = stack.getMetadata();
+		if (meta == 1) {
+			tooltip.add(ChatFormatting.DARK_BLUE + "Activated");
+		} else if (meta == 2) {
+			tooltip.add(ChatFormatting.DARK_GREEN + "Awakened");
+			tooltip.add(ChatFormatting.GRAY + "Use on an altar with a bound spell tome");
+			tooltip.add(ChatFormatting.GRAY + "to begin binding");
+		}
+	}
+	
+	public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
+		super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
+		
+		if (stack == null || stack.getMetadata() != 1)
+			return;
+		
+		NBTTagCompound nbt;
+		if (!stack.hasTagCompound())
+			nbt = new NBTTagCompound();
+		else
+			nbt = stack.getTagCompound();
+		
+		long start = nbt.getLong(NBT_WAKE_START);
+		long worldtime = worldIn.getTotalWorldTime();
+		if (start == 0) {
+			nbt.setLong(NBT_WAKE_START, worldtime);
+			stack.setTagCompound(nbt);
+			return;
+		}
+		
+		if (worldtime > start + WAKE_TIME) {
+			stack.setItemDamage(2);
+			if (!worldIn.isRemote) {
+				NostrumMagicaSounds.DAMAGE_ENDER.play(worldIn, entityIn.posX, entityIn.posY, entityIn.posZ);
+			}
+		}
+	}
+	
+	private static class ActivatedRecipe extends ShapedRecipes {
+
+		public ActivatedRecipe() {
+			super(3, 3, new ItemStack[] {
+				new ItemStack(Items.DIAMOND),
+				new ItemStack(Items.ENDER_PEARL),
+				new ItemStack(Items.DIAMOND),
+				new ItemStack(Items.ENDER_PEARL),
+				new ItemStack(instance(), 1, 0),
+				new ItemStack(Items.ENDER_PEARL),
+				new ItemStack(Items.DIAMOND),
+				new ItemStack(Items.ENDER_PEARL),
+				new ItemStack(Items.DIAMOND),
+			}, new ItemStack(instance(), 1, 1));
+			
+			RecipeSorter.register(NostrumMagica.MODID + ":ScrollRecipe_activated",
+					this.getClass(), Category.SHAPED, "after:minecraft:shaped");
+		}
+		
+		@Override
+		public ItemStack getCraftingResult(InventoryCrafting inv) {
+			// Clone input scroll and set meta
+			ItemStack scroll = inv.getStackInSlot(4);
+			Spell spell = getSpell(scroll);
+			if (spell == null) {
+				return null;
+			}
+			
+			scroll = scroll.copy();
+			scroll.setItemDamage(1);
+			return scroll;
+		}
 	}
 }

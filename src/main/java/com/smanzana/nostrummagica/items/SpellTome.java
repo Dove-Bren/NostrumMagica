@@ -23,10 +23,12 @@ import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
 import com.smanzana.nostrummagica.potions.FrostbitePotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
@@ -535,13 +537,25 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 			int xp = getXP(stack);
 			int maxxp = LevelCurve.getMaxXP(level);
 			int modifications = getModifications(stack);
+			int id = getTomeID(stack);
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer);
+			SpellComponentWrapper comp = (attr.isBinding() && id == attr.getBindingID()) ? attr.getBindingComponent() : null;
+			String bindingName = (comp == null) ? null : attr.getBindingSpell().getName();
+			String compname = (comp == null) ? null :
+				(comp.isAlteration() ? comp.getAlteration().getName() :
+				(comp.isElement() ? comp.getElement().getName() :
+				(comp.isShape() ? comp.getShape().getDisplayName() :
+				(comp.getTrigger().getDisplayName()))));
 			pages.add(new TitlePage(title, false));
 			pages.add(new LinedTextPage("", "",
 					"Level: " + level, "XP: " + xp + "/" + maxxp, "",
 					"Max Mana: " + maxMana,
 					"Modifications: " + modifications,
 					"",
-					spellCount + "/" + capacity + " Spells"));
+					spellCount + "/" + capacity + " Spells",
+					"",
+					(comp != null ? "Binding spell " + bindingName : ""),
+					(comp != null ? "Seek a shrine of " + compname : "")));
 			
 			if (spellCount > 0) {
 				boolean top = true;
@@ -884,5 +898,59 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 	@Override
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_TOMES;
+	}
+	
+	public static boolean startBinding(EntityPlayer player, ItemStack tome, ItemStack scroll) {
+		if (tome == null || scroll == null)
+			return false;
+		
+		Spell spell = SpellScroll.getSpell(scroll);
+		if (spell == null)
+			return false;
+		
+		if (!SpellTome.isOwner(tome, player)) {
+			if (!player.worldObj.isRemote) {
+				player.addChatComponentMessage(new TextComponentTranslation("info.tome.noowner"));
+				
+			}
+			return false;
+		}
+		
+		int capacity = SpellTome.getCapacity(tome);
+		List<Spell> spells = SpellTome.getSpells(tome);
+		int taken = spells == null ? 0 : spells.size();
+		if (taken >= capacity) {
+			if (!player.worldObj.isRemote) {
+				player.addChatComponentMessage(new TextComponentTranslation("info.tome.full"));
+			}
+			return false;
+		}
+		
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		if (attr == null)
+			return false;
+		
+		SpellComponentWrapper comp = spell.getRandomComponent();
+		if (comp == null)
+			return false;
+		
+		String compName;
+		if (comp.isAlteration())
+			compName = comp.getAlteration().getName();
+		else if (comp.isElement())
+			compName = comp.getElement().getName();
+		else if (comp.isTrigger())
+			compName = comp.getTrigger().getDisplayName();
+		else if (comp.isShape())
+			compName = comp.getShape().getDisplayName();
+		else
+			compName = "Physic";
+		
+		attr.startBinding(spell, comp, SpellTome.getTomeID(tome));
+		if (!player.worldObj.isRemote) {
+			player.addChatComponentMessage(new TextComponentTranslation("info.tome.bind", new Object[] {spell.getName(), compName}));
+		}
+		
+		return true;
 	}
 }

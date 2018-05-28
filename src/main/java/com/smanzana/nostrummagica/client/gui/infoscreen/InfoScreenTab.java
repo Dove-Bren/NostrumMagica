@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.ModificationTable;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.AltarItem;
+import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.MirrorItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
@@ -332,6 +333,10 @@ public abstract class InfoScreenTab {
 				
 				buttons.add(new SubscreenInfoButton(offset++, "spellmaking",
 						new PaginatedInfoSubScreen("spellmaking"),
+						new ItemStack(BlankScroll.instance())));
+				
+				buttons.add(new SubscreenInfoButton(offset++, "spellbinding",
+						new PaginatedInfoSubScreen("spellbinding"),
 						new ItemStack(Items.WRITABLE_BOOK)));
 				
 				buttons.add(new SubscreenInfoButton(offset++, "levelup",

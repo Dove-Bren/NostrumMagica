@@ -283,6 +283,7 @@ public class CommonProxy {
     	
     	SpellScroll.instance().setRegistryName(NostrumMagica.MODID, SpellScroll.id);
     	GameRegistry.register(SpellScroll.instance());
+    	SpellScroll.init();
     	
     	SpellTableItem.instance().setRegistryName(NostrumMagica.MODID, SpellTableItem.ID);
     	GameRegistry.register(SpellTableItem.instance());

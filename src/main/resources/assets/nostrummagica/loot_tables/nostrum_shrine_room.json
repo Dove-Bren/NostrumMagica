@@ -6,8 +6,22 @@
       {
         "type": "item",
         "name": "nostrummagica:nostrum_reagent",
-        "weight": 130,
+        "weight": 200,
         "functions": [{ "function": "set_data", "data": { "min": 0, "max": 7 } }]
+      },
+      {
+        "type": "item",
+        "name": "nostrummagica:nostrum_resource",
+        "entryName": "mani_gem",
+        "weight": 4,
+        "functions": [{ "function": "set_data", "data": 1 }]
+      },
+      {
+        "type": "item",
+        "entryName": "kani_gem",
+        "name": "nostrummagica:nostrum_resource",
+        "weight": 2,
+        "functions": [{ "function": "set_data", "data": 2 }]
       },
       {
         "type": "item",
@@ -19,9 +33,51 @@
       {
         "type": "item",
         "name": "nostrummagica:nostrum_rune",
-        "entryName": "runeSpec",
+        "entryName": "runeearth",
         "weight": 2,
         "functions": [{ "function": "set_nbt", "tag": "{type: element, name: EARTH, e_count: 1}" }]
+      },
+      {
+        "type": "item",
+        "name": "nostrummagica:nostrum_rune",
+        "entryName": "runelightning",
+        "weight": 2,
+        "functions": [{ "function": "set_nbt", "tag": "{type: element, name: LIGHTNING, e_count: 1}" }]
+      },
+      {
+        "type": "item",
+        "name": "nostrummagica:nostrum_rune",
+        "entryName": "runeender",
+        "weight": 2,
+        "functions": [{ "function": "set_nbt", "tag": "{type: element, name: ENDER, e_count: 1}" }]
+      },
+      {
+        "type": "item",
+        "name": "nostrummagica:nostrum_rune",
+        "entryName": "runewind",
+        "weight": 2,
+        "functions": [{ "function": "set_nbt", "tag": "{type: element, name: WIND, e_count: 1}" }]
+      },
+      {
+        "type": "item",
+        "name": "nostrummagica:nostrum_rune",
+        "entryName": "runeice",
+        "weight": 2,
+        "functions": [{ "function": "set_nbt", "tag": "{type: element, name: ICE, e_count: 1}" }]
+      },
+      {
+        "type": "item",
+        "name": "nostrummagica:nostrum_rune",
+        "entryName": "runefire",
+        "weight": 2,
+        "functions": [{ "function": "set_nbt", "tag": "{type: element, name: FIRE, e_count: 1}" }]
+      },
+      {
+        "type": "item",
+        "name": "nostrummagica:nostrum_rune",
+        "entryName": "runephysical",
+        "weight": 2,
+        "functions": [{ "function": "set_nbt", "tag": "{type: element, name: PHYSICAL, e_count: 1}" }]
       },
       {
         "type": "item",
@@ -50,6 +106,13 @@
         "entryName": "rune5",
         "weight": 1,
         "functions": [{ "function": "set_nbt", "tag": "{type: shape, name: shape_aoe}" }]
+      },
+      {
+        "type": "item",
+        "name": "nostrummagica:nostrum_rune",
+        "entryName": "runechain",
+        "weight": 1,
+        "functions": [{ "function": "set_nbt", "tag": "{type: shape, name: shape_chain}" }]
       },
       {
         "type": "item",
@@ -240,7 +303,7 @@
       },
       {
         "type": "empty",
-        "weight": 190
+        "weight": 270
       }]
     }]
 }

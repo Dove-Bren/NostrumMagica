@@ -375,6 +375,10 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 			}
 		}
 		
+		EntityItem item = new EntityItem(world, master.getX() + .5, master.getY() + .5, master.getZ() + .5,
+				new ItemStack(SpellTableItem.instance()));
+		world.spawnEntityInWorld(item);
+		
 		world.setBlockToAir(getPaired(state, pos));
 	}
 	

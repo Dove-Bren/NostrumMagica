@@ -73,6 +73,7 @@ import com.smanzana.nostrummagica.rituals.requirements.RRequirementTriggerMaster
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.Spell.SpellPart;
 import com.smanzana.nostrummagica.spells.SpellRegistry;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
@@ -752,7 +753,7 @@ public class NostrumMagica
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("thano_infusion",
 					NostrumResourceItem.getItem(ResourceType.PENDANT_WHOLE, 1),
-					EMagicElement.ICE,
+					null,
 					new ReagentType[] {ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.MANDRAKE_ROOT, ReagentType.SPIDER_SILK},
 					new ItemStack(Items.GOLD_INGOT),
 					new ItemStack[] {NostrumResourceItem.getItem(ResourceType.PENDANT_LEFT, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), NostrumResourceItem.getItem(ResourceType.PENDANT_RIGHT, 1)},
@@ -841,32 +842,11 @@ public class NostrumMagica
 		
 		// Spell Tome Creation
 		RitualRegistry.instance().addRitual(
-				RitualRecipe.createTier3("tome",
+				RitualRecipe.createTier2("tome",
 					new ItemStack(SpellTome.instance()),
 					null,
 					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
 					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
-					new ItemStack[] {new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance())},
-					null,
-					new OutcomeCreateTome())
-				);
-		RitualRegistry.instance().addRitual(
-				RitualRecipe.createTier3("tome",
-					new ItemStack(SpellTome.instance()),
-					null,
-					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
-					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
-					new ItemStack[] {new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance()), null, new ItemStack(SpellTomePage.instance())},
-					null,
-					new OutcomeCreateTome())
-				);
-		RitualRegistry.instance().addRitual(
-				RitualRecipe.createTier3("tome",
-					new ItemStack(SpellTome.instance()),
-					null,
-					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
-					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
-					new ItemStack[] {new ItemStack(SpellTomePage.instance()), null, null, new ItemStack(SpellTomePage.instance())},
 					null,
 					new OutcomeCreateTome())
 				);
@@ -886,7 +866,27 @@ public class NostrumMagica
 					null,
 					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
 					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
-					new ItemStack[] {null, null, null, null},
+					new ItemStack[] {new ItemStack(SpellTomePage.instance()), null, null, new ItemStack(SpellTomePage.instance())},
+					null,
+					new OutcomeCreateTome())
+				);
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("tome",
+					new ItemStack(SpellTome.instance()),
+					null,
+					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
+					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
+					new ItemStack[] {new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance()), null, new ItemStack(SpellTomePage.instance())},
+					null,
+					new OutcomeCreateTome())
+				);
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("tome",
+					new ItemStack(SpellTome.instance()),
+					null,
+					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
+					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
+					new ItemStack[] {new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance())},
 					null,
 					new OutcomeCreateTome())
 				);
@@ -1349,6 +1349,27 @@ public class NostrumMagica
     		return false;
     	if (spell.getElementCount() > elements)
     		return false;
+    	
+    	for (SpellPart part : spell.getSpellParts()) {
+    		if (part.isTrigger())
+    			continue;
+    		EMagicElement elem = part.getElement();
+    		if (elem == null)
+    			elem = EMagicElement.PHYSICAL;
+    		int level = part.getElementCount();
+    		
+    		if (level == 1) {
+    			Boolean know = attr.getKnownElements().get(elem);
+    			if (know == null || !know)
+    				return false;
+			} else {
+				Integer mast = attr.getElementMastery().get(elem);
+				int mastery = (mast == null ? 0 : mast);
+				if (mastery < level)
+					return false;
+			}
+    	}
+    	
     	return true;
     }
 }

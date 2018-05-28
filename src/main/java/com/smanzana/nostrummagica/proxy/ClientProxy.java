@@ -83,6 +83,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.Spell.SpellPart;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
@@ -245,6 +246,8 @@ public class ClientProxy extends CommonProxy {
 		registerModel(NostrumGuide.instance(), 0, NostrumGuide.id);
 		registerModel(SpellcraftGuide.instance(), 0, SpellcraftGuide.id);
 		registerModel(SpellScroll.instance(), 0, SpellScroll.id);
+		registerModel(SpellScroll.instance(), 1, SpellScroll.id);
+		registerModel(SpellScroll.instance(), 2, SpellScroll.id);
 		registerModel(BlankScroll.instance(), 0, BlankScroll.id);
 		registerModel(ReagentBag.instance(), 0, ReagentBag.id);
 		registerModel(SeekerIdol.instance(), 0, SeekerIdol.id);
@@ -506,6 +509,33 @@ public class ClientProxy extends CommonProxy {
 				NostrumMagicaSounds.CAST_FAIL.play(player);
 				return;
 			}
+			
+			// Check elemental mastery
+			for (SpellPart part : spell.getSpellParts()) {
+	    		if (part.isTrigger())
+	    			continue;
+	    		EMagicElement elem = part.getElement();
+	    		if (elem == null)
+	    			elem = EMagicElement.PHYSICAL;
+	    		int level = part.getElementCount();
+	    		
+	    		if (level == 1) {
+	    			Boolean know = att.getKnownElements().get(elem);
+	    			if (know == null || !know) {
+	    				player.addChatMessage(new TextComponentTranslation(
+								"info.spell.no_mastery", new Object[] {elem.getName()}));
+						NostrumMagicaSounds.CAST_FAIL.play(player);
+	    			}
+				} else {
+		    		Integer mast = att.getElementMastery().get(elem);
+		    		int mastery = (mast == null ? 0 : mast);
+		    		if (mastery < level)
+		    			player.addChatMessage(new TextComponentTranslation(
+								"info.spell.low_mastery", new Object[] {elem.getName(), level, mastery}));
+						NostrumMagicaSounds.CAST_FAIL.play(player);
+						return;
+				}
+	    	}
 			
 			// Check reagents
 			Map<ReagentType, Integer> reagents = spell.getRequiredReagents();

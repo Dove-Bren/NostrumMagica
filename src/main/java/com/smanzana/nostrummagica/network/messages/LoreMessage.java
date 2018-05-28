@@ -4,8 +4,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.common.capabilities.Capability;
@@ -35,7 +37,9 @@ public class LoreMessage implements IMessage {
 			
 			ILoreTagged lore = LoreRegistry.instance().lookup(message.tag.getString(NBT_LORE_KEY));
 			String name = lore.getLoreDisplayName();
-			NostrumMagica.proxy.getPlayer().addChatMessage(new TextComponentTranslation("info.lore.get", name));
+			EntityPlayer player = NostrumMagica.proxy.getPlayer();
+			player.addChatMessage(new TextComponentTranslation("info.lore.get", name));
+			NostrumMagicaSounds.UI_TICK.play(player, player.worldObj, player.posX, player.posY, player.posZ);
 			
 			return null;
 		}

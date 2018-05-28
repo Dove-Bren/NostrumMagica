@@ -306,6 +306,15 @@ public class SpellCreationGui {
 				if (stack == null) {
 					break;
 				}
+				if (!SpellRune.isSpellWorthy(stack)) {
+					spellErrorStrings.add("Rune in slot " + (i) + " is not allowed.");
+					if (SpellRune.isShape(stack)) {
+						spellErrorStrings.add("  -> Shapes must have an element attached to them.");
+					} else {
+						spellErrorStrings.add("  -> Elements and Alterations must be combined with a Shape first.");
+					}
+					return null;
+				}
 				if (SpellRune.isShape(stack)) {
 					flag = true;
 					break;
@@ -327,7 +336,7 @@ public class SpellCreationGui {
 				
 				part = SpellRune.getPart(stack);
 				if (part == null) {
-					spellErrorStrings.add("Unfinished spell part in slot " + i);
+					spellErrorStrings.add("Unfinished spell part in slot " + (i + 1));
 					if (SpellRune.isShape(stack))
 						spellErrorStrings.add(" -> Spell parts must have an element");
 					else

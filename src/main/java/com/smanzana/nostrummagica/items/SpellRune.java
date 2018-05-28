@@ -565,8 +565,10 @@ public class SpellRune extends Item implements ILoreTagged {
     }
     
 	public static boolean isSpellWorthy(ItemStack stack) {
-		if (isTrigger(stack) || isAlteration(stack) || isElement(stack))
+		if (isTrigger(stack))
 			return true;
+		if (isAlteration(stack) || isElement(stack))
+			return false;
 		
 		// For shapes, we ALSO need an element
 		if (null == getPieceShapeElement(stack))

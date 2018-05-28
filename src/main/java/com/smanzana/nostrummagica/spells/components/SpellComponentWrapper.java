@@ -67,8 +67,16 @@ public class SpellComponentWrapper {
 				return false;
 			if (other.alteration != alteration)
 				return false;
+			if (other.shape == null && shape != null)
+				return false;
+			if (other.shape != null && shape == null)
+				return false;
 			if (other.shape != null && shape != null &&
 					!other.shape.getShapeKey().equals(shape.getShapeKey()))
+				return false;
+			if (other.trigger == null && trigger != null)
+				return false;
+			if (other.trigger != null && trigger == null)
 				return false;
 			if (other.trigger != null && trigger != null &&
 					!other.trigger.getTriggerKey().equals(trigger.getTriggerKey()))

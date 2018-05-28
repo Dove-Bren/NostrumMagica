@@ -39,9 +39,10 @@ public class ManiOre extends Block {
 	
 	@Override
 	public int quantityDroppedWithBonus(int fortune, Random random) {
-		if (fortune == 0)
-			return 1;
-		return fortune + 1 + (random.nextBoolean() ? 1 : 0);
+		int count = random.nextInt(2) + 1;
+		if (fortune != 0)
+			count += (fortune) + random.nextInt(fortune);
+		return count;
 	}
 	
 	@Override
