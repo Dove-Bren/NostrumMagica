@@ -1423,6 +1423,7 @@ public class SpellAction {
 	
 	private EntityLivingBase source;
 	private List<SpellEffect> effects;
+	private String nameKey;
 	
 	public SpellAction(EntityLivingBase source) {
 		this.source = source;
@@ -1497,18 +1498,18 @@ public class SpellAction {
 			
 		switch (element) {
 		case ENDER:
-			if (ender) return 0.0f;
-			return base;
+			if (ender) return 0.0f; // does not affect ender
+			return base * 1.2f; // return raw damage (+20%) not affected by armor
 		case LIGHTNING:
-			return base * (1f + (float)(armor / 20)); // double in power for every 20 armor
+			return base * (.75f + ((float) armor / 20f)); // double in power for every 20 armor
 		case FIRE:
-			return base * (undead ? 1.5f : 1f);
+			return base * (undead ? 1.5f : 1f); // 1.5x damage against undead. Regular otherwise
 		case EARTH:
-			return base;
+			return base; // raw damage. Not affected by armor
 		case ICE:
-			return base * (undead ? 1.75f : .8f);
+			return base * (undead ? .6f : 1.3f); // More affective against everyhting except undead
 		case WIND:
-			return base * (light ? 1.8f : .8f);
+			return base * (light ? 1.8f : .8f); // 180% against light (enderman included) enemies
 		default:
 			return base;
 		}
@@ -1643,5 +1644,14 @@ public class SpellAction {
 	public SpellAction blockBreak(int level) {
 		effects.add(new BreakEffect(level));
 		return this;
+	}
+	
+	public SpellAction name(String key) {
+		this.nameKey = key;
+		return this;
+	}
+	
+	public String getName() {
+		return this.nameKey;
 	}
 }

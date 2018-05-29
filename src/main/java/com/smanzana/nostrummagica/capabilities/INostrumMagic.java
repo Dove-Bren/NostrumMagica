@@ -138,4 +138,9 @@ public interface INostrumMagic {
 	public void setQuestData(String quest, IObjectiveState data);
 	public Map<String, IObjectiveState> getQuestDataMap();
 	public void setQuestDataMap(Map<String, IObjectiveState> map);
+	
+	// Spell Knowledge
+	public boolean hasKnowledge(EMagicElement element, EAlteration alteration);
+	public void setKnowledge(EMagicElement element, EAlteration alteration);
+	public Map<EMagicElement, Map<EAlteration, Boolean>> getSpellKnowledge();
 }

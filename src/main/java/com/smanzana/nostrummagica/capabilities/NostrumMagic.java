@@ -91,6 +91,7 @@ public class NostrumMagic implements INostrumMagic {
 	private Map<String, IObjectiveState> questData;
 	private BlockPos markLocation;
 	private int markDimension;
+	private Map<EMagicElement, Map<EAlteration, Boolean>> spellKnowledge;
 	
 	private EntityLivingBase entity;
 	
@@ -521,6 +522,7 @@ public class NostrumMagic implements INostrumMagic {
 		this.bindingTomeID = cap.getBindingID();
 		this.bindingSpell = cap.getBindingSpell();
 		this.bindingComponent = cap.getBindingComponent();
+		this.spellKnowledge = cap.getSpellKnowledge();
 	}
 	
 	@Override
@@ -723,5 +725,39 @@ public class NostrumMagic implements INostrumMagic {
 				lore.add(tag);
 		}
 		return lore;
+	}
+	
+	@Override
+	public boolean hasKnowledge(EMagicElement element, EAlteration alteration) {
+		if (spellKnowledge == null)
+			return false;
+		Map<EAlteration, Boolean> map = spellKnowledge.get(element);
+		if (map == null) {
+			return false;
+		}
+		
+		Boolean bool = map.get(alteration);
+		return (bool != null && bool);
+	}
+	
+	@Override
+	public void setKnowledge(EMagicElement element, EAlteration alteration) {
+		if (spellKnowledge == null)
+			spellKnowledge = new EnumMap<>(EMagicElement.class);
+		Map<EAlteration, Boolean> map = spellKnowledge.get(element);
+		if (map == null) {
+			map = new HashMap<>();
+			spellKnowledge.put(element, map);
+		}
+		
+		Boolean old = map.put(alteration, true);
+		if ((old == null || !old) && entity != null && entity instanceof EntityPlayer) {
+			NostrumMagica.proxy.syncPlayer((EntityPlayerMP) entity);
+		}
+	}
+	
+	@Override
+	public Map<EMagicElement, Map<EAlteration, Boolean>> getSpellKnowledge() {
+		return this.spellKnowledge;
 	}
 }

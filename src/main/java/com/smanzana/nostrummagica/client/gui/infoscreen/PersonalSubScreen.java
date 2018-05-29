@@ -2,19 +2,26 @@ package com.smanzana.nostrummagica.client.gui.infoscreen;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
@@ -464,6 +471,182 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		@Override
 		public Collection<ISubScreenButton> getButtons() {
 			return null;
+		}
+		
+	}
+	
+	// Screen with the element + alteration combos you've experienced so far
+	public static class PersonalExplorationScreen extends PersonalSubScreen {
+		
+		private static Map<EAlteration, Map<EMagicElement, SpellAction>> actions = null;
+		private List<Row> rows;
+		private List<Header> headers;
+		
+		public PersonalExplorationScreen(INostrumMagic attr) {
+			super(attr);
+		}
+		
+		@Override
+		public void draw(INostrumMagic attr, Minecraft mc, int x, int y, int width, int height, int mouseX, int mouseY) {
+			
+			if (rows == null) {
+				rows = new LinkedList<>();
+				headers = new LinkedList<>();
+				
+				int posX = 0;
+				int posY = 0;
+				final int xOffset = 100;
+				final int yOffset = 60;
+				
+				for (EMagicElement elem : EMagicElement.values()) {
+					//drawTable(attr, mc, x + posX * xOffset, y + (posY * yOffset), elem, mouseX, mouseY);
+					
+					int curY = posY * yOffset;
+					
+					Header head = new Header(40 + posX * xOffset, curY, elem.getName());
+					curY += 10;
+					headers.add(head);
+					
+					// add one for no alteration
+					rows.add(new Row(posX * xOffset, curY, attr, elem, null));
+					curY += 5;
+					
+					// Add alterations
+					for (EAlteration alt : EAlteration.values()) {
+						rows.add(new Row(posX * xOffset, curY, attr, elem, alt));
+						curY += 5;
+					}
+					
+					posY++;
+					if ((posY + 1) * yOffset > height - 20) {
+						posY = 0;
+						posX++;
+					}
+				}
+			}
+			
+			GlStateManager.pushMatrix();
+			GlStateManager.translate(x + 5, y + 20, 0);
+			for (Header head : headers) {
+				head.draw(mc);
+			}
+			for (Row row : rows) {
+				row.draw(mc);
+			}
+			for (Row row : rows) {
+				row.drawOverlay(mc, mouseX - (x + 5), mouseY - (y + 20));
+			}
+			GlStateManager.popMatrix();
+			
+			String desc;
+			int len;
+			desc = I18n.format("info.growth.name", (Object[])null);
+			len = mc.fontRendererObj.getStringWidth(desc);
+			mc.fontRendererObj.drawStringWithShadow(desc, x + ((width - len) / 2), y + 5, 0xFFFFFFFF);
+		}
+
+		@Override
+		public Collection<ISubScreenButton> getButtons() {
+			return null;
+		}
+		
+		private class Header {
+			private int x;
+			private int y;
+			private String name;
+			
+			public Header(int x, int y, String name) {
+				this.x = x;
+				this.y = y;
+				this.name = name;
+			}
+			
+			public void draw(Minecraft mc) {
+				final float ratio = .8f;
+				int len = mc.fontRendererObj.getStringWidth(name);
+				len = (int) (len * ratio);
+				GlStateManager.pushMatrix();
+				GlStateManager.translate(x, y, 0);
+				GlStateManager.scale(ratio, ratio, 1);
+				mc.fontRendererObj.drawString(name, -len / 2, 0, 0xFFAAAAAA);
+				GlStateManager.popMatrix();
+			}
+		}
+		
+		private class Row {
+			
+			private int x;
+			private int y;
+			private int width;
+			private String alterationName;
+			private String name;
+			private String desc;
+			
+			public Row(int x, int y, INostrumMagic attr, EMagicElement element, EAlteration alteration) {
+				this.x = x;
+				this.y = y;
+				this.alterationName = alteration == null ? "-" : alteration.getName();
+				this.width = 0;
+				
+				SpellAction action = getAction(element, alteration);
+				
+				if (attr.hasKnowledge(element, alteration)) {
+					name = I18n.format("effect." + action.getName() + ".name", (Object[]) null);
+					desc = I18n.format("effect." + action.getName() + ".desc", (Object[]) null);
+				} else {
+					name = "???";
+					desc = null;
+				}
+			}
+			
+			public void draw(Minecraft mc) {
+				final float ratio = .5f;
+				int len = mc.fontRendererObj.getStringWidth(alterationName + ": ");
+				this.width = (int) ((len + mc.fontRendererObj.getStringWidth(name)) * ratio);
+				GlStateManager.pushMatrix();
+				GlStateManager.translate(x, y, 0);
+				GlStateManager.scale(ratio, ratio, 0);
+				mc.fontRendererObj.drawString(alterationName + ": ",
+						0, 0, 0xFFFFFFFF);
+				mc.fontRendererObj.drawString(name,
+						len, 0, 0xFF0000FF);
+				GlStateManager.popMatrix();
+				
+				
+			}
+			
+			public void drawOverlay(Minecraft mc, int mouseX, int mouseY) {
+				if (desc == null)
+					return;
+				
+				final float ratio = .5f;
+				if (mouseX >= x && mouseY >= y
+						&& mouseX <= x + width && mouseY <= y + (int) (mc.fontRendererObj.FONT_HEIGHT * ratio)) {
+					ScaledResolution scaled = new ScaledResolution(mc);
+					GuiUtils.drawHoveringText(Lists.newArrayList(desc), mouseX, mouseY, scaled.getScaledWidth(), scaled.getScaledHeight(), 200, mc.fontRendererObj);
+					RenderHelper.disableStandardItemLighting();
+				}
+			}
+			
+		}
+		
+		private static SpellAction getAction(EMagicElement element, EAlteration alteration) {
+			if (actions == null)
+				actions = new HashMap<>();
+			
+			Map<EMagicElement, SpellAction> map = actions.get(alteration);
+			if (map == null) {
+				map = new EnumMap<>(EMagicElement.class);
+				actions.put(alteration, map);
+			}
+			
+			SpellAction action = map.get(element);
+			if (action == null) {
+				action = Spell.solveAction(null, alteration, element, 1);
+				map.put(element, action);
+			}
+			
+			return action;
 		}
 		
 	}

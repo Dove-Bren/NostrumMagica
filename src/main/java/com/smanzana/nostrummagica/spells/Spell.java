@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
@@ -174,12 +175,10 @@ public class Spell {
 						next.getElement(), next.getElementCount());
 				SpellPartParam param = next.getParam();
 				
-//				if (param.flip) {
-//					// use other instead of self
-//					targs = other;
-//				} else {
-//					targs = targets;
-//				}
+				INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+				if (attr != null && attr.isUnlocked()) {
+					attr.setKnowledge(next.getElement(), next.getAlteration());
+				}
 				
 				if (targets != null && !targets.isEmpty()) {
 					for (EntityLivingBase targ : targets) {
@@ -565,7 +564,8 @@ public class Spell {
 		
 		if (alteration == null) {
 			// Damage spell
-			return new SpellAction(caster).damage(element, 5.0f * elementCount);
+			return new SpellAction(caster).damage(element, 5.0f * elementCount)
+					.name("damage." + element.name().toLowerCase());
 		}
 		
 		switch (alteration) {
@@ -594,14 +594,14 @@ public class Spell {
 			int elementCount) {
 		switch (element) {
 		case PHYSICAL:
-			return new SpellAction(caster).transmute(elementCount);
+			return new SpellAction(caster).transmute(elementCount).name("transmute");
 		case EARTH:
 		case ENDER:
 		case FIRE:
 		case ICE:
 		case LIGHTNING:
 		case WIND:
-			return new SpellAction(caster).infuse(element, elementCount);
+			return new SpellAction(caster).infuse(element, elementCount).name("infuse." + element.name().toLowerCase());
 		}
 		
 		return null;
@@ -613,19 +613,19 @@ public class Spell {
 		int amp = elementCount - 1;
 		switch (element) {
 		case PHYSICAL:
-			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("weakness"), duration, amp);
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("weakness"), duration, amp).name("weakness");
 		case EARTH:
-			return new SpellAction(caster).status(RootedPotion.instance(), duration, amp);
+			return new SpellAction(caster).status(RootedPotion.instance(), duration, amp).name("rooted");
 		case ENDER:
-			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("blindness"), duration, amp);
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("blindness"), duration, amp).name("blindness");
 		case FIRE:
-			return new SpellAction(caster).burn(duration);
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("nausea"), duration / 2, amp).damage(EMagicElement.FIRE, (float) Math.pow(2f, amp)).name("overheat");
 		case ICE:
-			return new SpellAction(caster).status(FrostbitePotion.instance(), duration, amp);
+			return new SpellAction(caster).status(FrostbitePotion.instance(), duration, amp).name("frostbite");
 		case LIGHTNING:
-			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("slowness"), (int) (duration * .7), 5);
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("slowness"), (int) (duration * .7), 5).name("slowness");
 		case WIND:
-			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("poison"), duration, amp);
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("poison"), duration, amp).name("poison");
 		}
 		
 		return null;
@@ -637,19 +637,19 @@ public class Spell {
 		int amp = elementCount - 1;
 		switch (element) {
 		case PHYSICAL:
-			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("resistance"), duration, amp);
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("resistance"), duration, amp).name("resistance");
 		case EARTH:
-			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("strength"), duration, amp);
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("strength"), duration, amp).name("strength");
 		case ENDER:
-			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("invisibility"), duration, amp);
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("invisibility"), duration, amp).name("invisibility");
 		case FIRE:
-			return new SpellAction(caster).status(MagicBoostPotion.instance(), duration, amp);
+			return new SpellAction(caster).status(MagicBoostPotion.instance(), duration, amp).name("magicboost");
 		case ICE:
-			return new SpellAction(caster).dispel(elementCount * (int) (Math.pow(3, elementCount - 1)));
+			return new SpellAction(caster).dispel(elementCount * (int) (Math.pow(3, elementCount - 1))).name("dispel");
 		case LIGHTNING:
-			return new SpellAction(caster).status(MagicResistPotion.instance(), duration, amp);
+			return new SpellAction(caster).status(MagicResistPotion.instance(), duration, amp).name("magicresist");
 		case WIND:
-			return new SpellAction(caster).push(5f + (2 * amp), elementCount);
+			return new SpellAction(caster).push(5f + (2 * amp), elementCount).name("push");
 		}
 		
 		return null;
@@ -661,19 +661,19 @@ public class Spell {
 		int amp = elementCount - 1;
 		switch (element) {
 		case PHYSICAL:
-			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("absorption"), duration * 5, amp);
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("absorption"), duration * 5, amp).name("lifeboost");
 		case EARTH:
-			return new SpellAction(caster).status(PhysicalShieldPotion.instance(), duration, amp);
+			return new SpellAction(caster).status(PhysicalShieldPotion.instance(), duration, amp).name("shield.physical");
 		case ENDER:
-			return new SpellAction(caster).blink(15.0f * elementCount);
+			return new SpellAction(caster).blink(15.0f * elementCount).name("blink");
 		case FIRE:
-			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("fire_resistance"), duration, amp);
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("fire_resistance"), duration, amp).name("fireresist");
 		case ICE:
-			return new SpellAction(caster).status(MagicShieldPotion.instance(), duration, amp);
+			return new SpellAction(caster).status(MagicShieldPotion.instance(), duration, amp).name("shield.magic");
 		case LIGHTNING:
-			return new SpellAction(caster).pull(5 * elementCount, elementCount);
+			return new SpellAction(caster).pull(5 * elementCount, elementCount).name("pull");
 		case WIND:
-			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("speed"), duration, amp);
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("speed"), duration, amp).name("speed");
 		}
 		
 		return null;
@@ -685,19 +685,19 @@ public class Spell {
 		int amp = elementCount - 1;
 		switch (element) {
 		case PHYSICAL:
-			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("saturation"), 1, 4 * elementCount);
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("saturation"), 1, 4 * elementCount).name("food");
 		case EARTH:
-			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("regeneration"), duration, amp);
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("regeneration"), duration, amp).name("regen");
 		case ENDER:
-			return new SpellAction(caster).swap();
+			return new SpellAction(caster).swap().name("swap");
 		case FIRE:
-			return new SpellAction(caster).burnArmor(elementCount);
+			return new SpellAction(caster).burnArmor(elementCount).name("burnarmor");
 		case ICE:
-			return new SpellAction(caster).heal((float) Math.pow(4f, elementCount));
+			return new SpellAction(caster).heal((float) Math.pow(4f, elementCount)).name("heal");
 		case LIGHTNING:
-			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("jump_boost"), duration, amp);
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("jump_boost"), duration, amp).name("jumpboost");
 		case WIND:
-			return new SpellAction(caster).propel(elementCount);
+			return new SpellAction(caster).propel(elementCount).name("propel");
 		}
 		
 		return null;
@@ -705,26 +705,26 @@ public class Spell {
 	
 	private static final SpellAction solveEnchant(EntityLivingBase caster, EMagicElement element,
 			int elementCount) {
-		return new SpellAction(caster).enchant(element, elementCount);
+		return new SpellAction(caster).enchant(element, elementCount).name("enchant." + element.name().toLowerCase());
 	}
 	
 	private static final SpellAction solveConjure(EntityLivingBase caster, EMagicElement element,
 			int elementCount) {
 		switch (element) {
 		case PHYSICAL:
-			return new SpellAction(caster).blockBreak(elementCount);
+			return new SpellAction(caster).blockBreak(elementCount).name("break");
 		case EARTH:
-			return new SpellAction(caster).grow(elementCount);
+			return new SpellAction(caster).grow(elementCount).name("grow");
 		case ENDER:
-			return new SpellAction(caster).phase(elementCount);
+			return new SpellAction(caster).phase(elementCount).name("phase");
 		case FIRE:
-			return new SpellAction(caster).burn(elementCount * 20 * 5);
+			return new SpellAction(caster).burn(elementCount * 20 * 5).name("burn");
 		case ICE:
-			return new SpellAction(caster).cursedIce(elementCount);
+			return new SpellAction(caster).cursedIce(elementCount).name("cursedice");
 		case LIGHTNING:
-			return new SpellAction(caster).lightning();
+			return new SpellAction(caster).lightning().name("lightningbolt");
 		case WIND:
-			return new SpellAction(caster).wall(elementCount);
+			return new SpellAction(caster).wall(elementCount).name("magicwall");
 		}
 		
 		return null;
@@ -732,7 +732,7 @@ public class Spell {
 	
 	private static final SpellAction solveSummon(EntityLivingBase caster, EMagicElement element,
 			int elementCount) {
-		return new SpellAction(caster).summon(element, elementCount);
+		return new SpellAction(caster).summon(element, elementCount).name("summon." + element.name().toLowerCase());
 	}
 	
 	private static final String NBT_SPELL_NAME = "name";

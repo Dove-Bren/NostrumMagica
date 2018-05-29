@@ -10,6 +10,7 @@ public enum InfoScreenTabs {
 	INFO_BLOCKS,
 	INFO_ENTITY,
 	INFO_ITEMS,
+	INFO_TRIALS,
 	;
 	
 }

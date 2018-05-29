@@ -62,6 +62,8 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	private static final String NBT_QUESTS_CURRENT = "quests_current";
 	private static final String NBT_QUESTS_DATA = "quest_data";
 	
+	private static final String NBT_SPELLKNOWLEDGE = "spell_knowledge";
+	
 	@Override
 	public NBTBase writeNBT(Capability<INostrumMagic> capability, INostrumMagic instance, EnumFacing side) {
 		NBTTagCompound nbt = new NBTTagCompound();
@@ -190,6 +192,24 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			nbt.setInteger(NBT_BINDING_TOME_ID, instance.getBindingID());
 			nbt.setInteger(NBT_BINDING_SPELL, instance.getBindingSpell().getRegistryID());
 		}
+		
+		compound = new NBTTagCompound();;
+		Map<EMagicElement, Map<EAlteration, Boolean>> knowledge = instance.getSpellKnowledge();
+		if (knowledge != null && !knowledge.isEmpty())
+		for (EMagicElement elem : knowledge.keySet()) {
+			NBTTagCompound subtag = new NBTTagCompound();
+			Map<EAlteration, Boolean> map = knowledge.get(elem);
+			if (map == null || map.isEmpty())
+				continue;
+			for (EAlteration alt : map.keySet()) {
+				Boolean bool = map.get(alt);
+				if (bool != null && bool) {
+					subtag.setBoolean(alt == null ? "none" : alt.name(), true);
+				}
+			}
+			compound.setTag(elem.name(), subtag);
+		}
+		nbt.setTag(NBT_SPELLKNOWLEDGE, compound);
 		
 		return nbt;
 	}
@@ -330,6 +350,28 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 				SpellComponentWrapper comp = SpellComponentWrapper.fromKeyString(tag.getString(NBT_BINDING_COMPONENT));
 				int tomeID = tag.getInteger(NBT_BINDING_TOME_ID);
 				instance.startBinding(spell, comp, tomeID);
+			}
+		}
+		
+		if (tag.hasKey(NBT_SPELLKNOWLEDGE, NBT.TAG_COMPOUND)) {
+			compound = tag.getCompoundTag(NBT_SPELLKNOWLEDGE);
+			for (String key : compound.getKeySet()) {
+				try {
+					EMagicElement elem = EMagicElement.valueOf(key);
+					NBTTagCompound subtag = compound.getCompoundTag(key);
+					for (String altKey : subtag.getKeySet()) {
+						EAlteration alt;
+						if (altKey.equalsIgnoreCase("none"))
+							alt = null;
+						else
+							alt = EAlteration.valueOf(altKey);
+						if (subtag.getBoolean(altKey)) {
+							instance.setKnowledge(elem, alt);
+						}
+					}
+				} catch (Exception e) {
+					continue;
+				}
 			}
 		}
 	}

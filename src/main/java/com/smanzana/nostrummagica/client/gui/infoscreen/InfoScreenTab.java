@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.blocks.ModificationTable;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
+import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.MirrorItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
@@ -42,6 +43,7 @@ public abstract class InfoScreenTab {
 	private static InfoScreenTab INFO_ITEMS;
 	private static InfoScreenTab INFO_ENTITY;
 	private static InfoScreenTab INFO_GUIDES;
+	private static InfoScreenTab INFO_TRIALS;
 	
 	public static void init() {
 		if (INFO_ITEMS != null)
@@ -288,6 +290,10 @@ public abstract class InfoScreenTab {
 					buttons.add(new SubscreenInfoButton(offset++, "growth",
 							new PersonalSubScreen.PersonalGrowthScreen(attr),
 							new ItemStack(Items.COMPASS)));
+					
+					buttons.add(new SubscreenInfoButton(offset++, "exploration",
+							new PersonalSubScreen.PersonalExplorationScreen(attr),
+							new ItemStack(Items.MAP)));
 				}
 				
 				return buttons;
@@ -354,6 +360,60 @@ public abstract class InfoScreenTab {
 				buttons.add(new SubscreenInfoButton(offset++, "modification",
 						new PaginatedInfoSubScreen("modification"),
 						new ItemStack(ModificationTable.instance())));
+				
+				buttons.add(new SubscreenInfoButton(offset++, "elementdamage",
+						new PaginatedInfoSubScreen("elementdamage"),
+						new ItemStack(Items.DIAMOND_SWORD)));
+				
+				buttons.add(new SubscreenInfoButton(offset++, "reagents",
+						new PaginatedInfoSubScreen("reagents"),
+						ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1)));
+					
+				return buttons;
+			}
+			
+		};
+		
+		INFO_TRIALS = new InfoScreenTab(InfoScreenTabs.INFO_TRIALS,
+				new ItemStack(MasteryOrb.instance())) {
+
+			@Override
+			public boolean isVisible(INostrumMagic attr) {
+				return attr.isUnlocked() &&
+						attr.hasLore(MasteryOrb.instance());
+			}
+
+			@Override
+			public List<InfoButton> getButtons(int offset, INostrumMagic attr) {
+				List<InfoButton> buttons = new LinkedList<>();
+				
+				buttons.add(new SubscreenInfoButton(offset++, "trial.fire",
+						new PaginatedInfoSubScreen("trial.fire"),
+						SpellRune.getRune(EMagicElement.FIRE, 1)));
+				
+				buttons.add(new SubscreenInfoButton(offset++, "trial.ice",
+						new PaginatedInfoSubScreen("trial.ice"),
+						SpellRune.getRune(EMagicElement.ICE, 1)));
+				
+				buttons.add(new SubscreenInfoButton(offset++, "trial.earth",
+						new PaginatedInfoSubScreen("trial.earth"),
+						SpellRune.getRune(EMagicElement.EARTH, 1)));
+				
+				buttons.add(new SubscreenInfoButton(offset++, "trial.wind",
+						new PaginatedInfoSubScreen("trial.wind"),
+						SpellRune.getRune(EMagicElement.WIND, 1)));
+				
+				buttons.add(new SubscreenInfoButton(offset++, "trial.ender",
+						new PaginatedInfoSubScreen("trial.ender"),
+						SpellRune.getRune(EMagicElement.ENDER, 1)));
+				
+				buttons.add(new SubscreenInfoButton(offset++, "trial.lightning",
+						new PaginatedInfoSubScreen("trial.lightning"),
+						SpellRune.getRune(EMagicElement.LIGHTNING, 1)));
+				
+				buttons.add(new SubscreenInfoButton(offset++, "trial.physical",
+						new PaginatedInfoSubScreen("trial.physical"),
+						SpellRune.getRune(EMagicElement.PHYSICAL, 1)));
 					
 				return buttons;
 			}
@@ -390,6 +450,9 @@ public abstract class InfoScreenTab {
 			break;
 		case INFO_GUIDES:
 			ret = INFO_GUIDES;
+			break;
+		case INFO_TRIALS:
+			ret = INFO_TRIALS;
 			break;
 		}
 		
