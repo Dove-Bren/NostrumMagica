@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.blocks;
 
+import java.util.LinkedList;
 import java.util.Random;
 
 import com.smanzana.nostrummagica.items.ReagentItem;
@@ -39,20 +40,16 @@ public class CropGinseng extends BlockCrops {
 
     @Override
     public java.util.List<ItemStack> getDrops(net.minecraft.world.IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-        java.util.List<ItemStack> ret = super.getDrops(world, pos, state, fortune);
+        java.util.List<ItemStack> ret = new LinkedList<>();
         int age = getAge(state);
         Random rand = world instanceof World ? ((World)world).rand : new Random();
 
-        if (age >= getMaxAge())
-        {
-            for (int i = 0; i < 3 + fortune; ++i)
-            {
-                if (rand.nextInt(2 * getMaxAge()) <= age)
-                {
-                    ret.add(getCrops(1));
-                }
-            }
+        int count = 0;
+        if (age >= getMaxAge()) {
+            count = 2 + rand.nextInt(2) + fortune;
         }
+        if (count != 0)
+        	ret.add(getCrops(count));
         return ret;
     }
 

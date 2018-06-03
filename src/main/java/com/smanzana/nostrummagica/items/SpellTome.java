@@ -68,13 +68,15 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 				return 1000;
 			case 5:
 				return 5000;
+			case 6:
+				return 10000;
 			}
 		}
 		
 		public static int getMaxXP(int level) {
 			switch (level) {
 			case 1:
-			default:
+			case 0:
 				return 50;
 			case 2:
 				return 100;
@@ -84,6 +86,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 				return 500;
 			case 5:
 				return 5000;
+			default:
+				return 99999999;
 			}
 		}
 	}

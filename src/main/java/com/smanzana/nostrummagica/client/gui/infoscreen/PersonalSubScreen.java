@@ -581,11 +581,12 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			private String alterationName;
 			private String name;
 			private String desc;
+			private boolean unlocked;
 			
 			public Row(int x, int y, INostrumMagic attr, EMagicElement element, EAlteration alteration) {
 				this.x = x;
 				this.y = y;
-				this.alterationName = alteration == null ? "-" : alteration.getName();
+				this.alterationName = alteration == null ? "  -  " : alteration.getName();
 				this.width = 0;
 				
 				SpellAction action = getAction(element, alteration);
@@ -593,9 +594,11 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				if (attr.hasKnowledge(element, alteration)) {
 					name = I18n.format("effect." + action.getName() + ".name", (Object[]) null);
 					desc = I18n.format("effect." + action.getName() + ".desc", (Object[]) null);
+					unlocked = true;
 				} else {
 					name = "???";
 					desc = null;
+					unlocked = false;
 				}
 			}
 			
@@ -608,8 +611,9 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				GlStateManager.scale(ratio, ratio, 0);
 				mc.fontRendererObj.drawString(alterationName + ": ",
 						0, 0, 0xFFFFFFFF);
+				int color = unlocked ? 0xFF00DD00 : 0xFF0040FF;
 				mc.fontRendererObj.drawString(name,
-						len, 0, 0xFF0000FF);
+						len, 0, color);
 				GlStateManager.popMatrix();
 				
 				

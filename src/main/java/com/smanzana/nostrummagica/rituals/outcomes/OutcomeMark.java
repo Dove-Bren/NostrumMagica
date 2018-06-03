@@ -1,9 +1,13 @@
 package com.smanzana.nostrummagica.rituals.outcomes;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -23,5 +27,12 @@ public class OutcomeMark implements IRitualOutcome {
 			return;
 		
 		attr.setMarkLocation(player.dimension, player.getPosition());
+	}
+
+	@Override
+	public List<String> getDescription() {
+		return Lists.newArrayList(I18n.format("ritual.outcome.mark.desc",
+				new Object[0])
+				.split("\\|"));
 	}
 }

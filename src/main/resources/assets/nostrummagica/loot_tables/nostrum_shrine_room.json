@@ -302,6 +302,20 @@
         }]
       },
       {
+        "type": "item",
+        "name": "nostrummagica:nostrum_resource",
+        "entryName": "thano_left",
+        "weight": 3,
+        "functions": [{ "function": "set_data", "data": 4 }]
+      },
+      {
+        "type": "item",
+        "name": "nostrummagica:nostrum_resource",
+        "entryName": "thano_right",
+        "weight": 3,
+        "functions": [{ "function": "set_data", "data": 5 }]
+      },
+      {
         "type": "empty",
         "weight": 270
       }]

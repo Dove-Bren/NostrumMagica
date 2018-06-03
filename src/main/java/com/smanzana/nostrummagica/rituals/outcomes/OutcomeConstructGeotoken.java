@@ -1,8 +1,12 @@
 package com.smanzana.nostrummagica.rituals.outcomes;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -29,6 +33,13 @@ public class OutcomeConstructGeotoken extends OutcomeSpawnItem {
 			RES = new ItemStack(PositionToken.instance());
 		
 		return RES;
+	}
+
+	@Override
+	public List<String> getDescription() {
+		return Lists.newArrayList(I18n.format("ritual.outcome.construct_geotoken.desc",
+				new Object[0])
+				.split("\\|"));
 	}
 	
 }

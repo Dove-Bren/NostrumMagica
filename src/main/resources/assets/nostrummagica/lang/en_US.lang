@@ -481,6 +481,18 @@ ritual.recall.desc=Teleport to your mark|location. Mark locations with|the Ritua
 ritual.teleport_obelisk.name=Teleport to Obelisk
 ritual.teleport_obelisk.desc=Teleport to the obelisk pointed to the the Geogem
 
+ritual.outcome.teleport_obelisk.desc=Teleport to a distance obelisk.|The obelisk must be pointed to by the Geogem used|as the center item
+ritual.outcome.spawn_item.desc=Forms a %s
+ritual.outcome.construct_geotoken.desc=Solidifies a GeoGem into a GeoToken
+ritual.outcome.spawn_entity.desc=Summons %d %s(s)
+ritual.outcome.recall.desc=Teleport to your mark|location. Mark locations with|the Ritual of Marking.|You cannot recall to|a mark location in|a another dimension.
+ritual.outcome.mark.desc=Mark a location to be|recalled to later.|You can only have|one marked location at|a time.
+ritual.outcome.potion_effect.desc=Gives %s %s|Effect lasts for %d seconds
+ritual.outcome.enchant.desc=Enchant with %s %s
+ritual.outcome.create_tome.desc=Combies a plate with pages to create an unbound Spell Tome
+ritual.outcome.bind_spell.desc=Starts binding a spell to a tome
+ritual.outcome.create_obelisk.desc=Creates an Obelisk at|the center of the ritual
+
 ritual.kani.name=Kani Infusion
 ritual.kani.desc=Promotes a Mani Crystal to a Kani Crystal
 ritual.vani.name=Vani Infusion
@@ -748,3 +760,5 @@ spellcraft.finishing=Finishing The Spell
 spellcraft.finishing_info=After constructing a sequence of runes, you must name your spell. You can do this with the name field above the rune sequencing area. After supplying the name, you will be able to craft the spell as long as there are no errors in your sequence and you have the reagents required.
 spellcraft.problems=Problems
 spellcraft.problems_info=There are some requirements when creating a spell. Firstly, all spells must start with a trigger. Spells must contain at least one shape that has an element associated with it. Spells must have a name. Lastly, you must have enough reagents in the table's reagent slots to pay for the spell. If all of these are true, the submit button will be activated. If not, however, the error indicator will display a red X and the problems will be listed.
+
+nei.category.ritual.name=Nostrum Ritual

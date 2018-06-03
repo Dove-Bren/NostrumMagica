@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.client.gui.book;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.outcomes.IItemRitualOutcome;
+import com.smanzana.nostrummagica.rituals.outcomes.IRitualOutcome;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.client.Minecraft;
@@ -28,12 +29,12 @@ import net.minecraftforge.oredict.OreDictionary;
 
 public class RitualRecipePage implements IBookPage {
 	
-	private static final ResourceLocation TEXTURE = new ResourceLocation(NostrumMagica.MODID, "textures/gui/book_extras.png");
-	private static final int TEXT_WIDTH = 256;
-	private static final int TEXT_HEIGHT = 128;
+	public static final ResourceLocation TEXTURE = new ResourceLocation(NostrumMagica.MODID, "textures/gui/book_extras.png");
+	public static final int TEXT_WIDTH = 256;
+	public static final int TEXT_HEIGHT = 128;
 	private static final int TEXT_HOFFSET = 64;
-	private static final int TEXT_TABLET_VOFFSET = 64;
-	private static final int TEXT_TABLET_WIDTH = 18;
+	public static final int TEXT_TABLET_VOFFSET = 64;
+	public static final int TEXT_TABLET_WIDTH = 18;
 	private static final int COMPONENT_WIDTH[] = new int[] {51, 54, 80};
 	private static final int COMPONENT_HEIGHT[] = new int[] {52, 54, 83};
 	private static final int CANDLE_HOFFSET = 19;
@@ -295,8 +296,12 @@ public class RitualRecipePage implements IBookPage {
 	}
 	
 	private static List<String> makeDescription(RitualRecipe recipe) {
-		return Arrays.asList(I18n.format("ritual." + recipe.getTitleKey() + ".desc", new Object[0])
-				.split("\\|"));
+//		return Arrays.asList(I18n.format("ritual." + recipe.getTitleKey() + ".desc", new Object[0])
+//				.split("\\|"));
+		IRitualOutcome outcome = recipe.getOutcome();
+		if (outcome == null)
+			return new ArrayList<>();
+		return outcome.getDescription();
 	}
 	
 	private Map<EMagicElement, ItemStack> gems = new HashMap<>();

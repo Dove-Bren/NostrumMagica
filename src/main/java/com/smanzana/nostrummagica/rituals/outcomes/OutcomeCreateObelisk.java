@@ -1,5 +1,8 @@
 package com.smanzana.nostrummagica.rituals.outcomes;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.blocks.AltarBlock;
 import com.smanzana.nostrummagica.blocks.AltarBlock.AltarTileEntity;
 import com.smanzana.nostrummagica.blocks.Candle;
@@ -8,6 +11,7 @@ import com.smanzana.nostrummagica.blocks.NostrumObelisk;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -45,6 +49,13 @@ public class OutcomeCreateObelisk implements IRitualOutcome {
 				}
 			}
 		}
+	}
+
+	@Override
+	public List<String> getDescription() {
+		return Lists.newArrayList(I18n.format("ritual.outcome.create_obelisk.desc",
+				(Object[]) null)
+				.split("\\|"));
 	}
 	
 }

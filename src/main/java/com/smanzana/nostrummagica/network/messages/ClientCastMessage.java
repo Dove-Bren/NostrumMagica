@@ -82,12 +82,7 @@ public class ClientCastMessage implements IMessage {
 						return new ClientCastReplyMessage(false, att.getMana(), 0);
 					}
 					
-					List<SpellTomeEnhancementWrapper> enhancements = SpellTome.getEnhancements(tome);
-					if (enhancements != null && !enhancements.isEmpty())
-					for (SpellTomeEnhancementWrapper enhance : enhancements) {
-						enhance.getEnhancement().onCast(
-								enhance.getLevel(), summary, sp, att);
-					}
+					SpellTome.applyEnhancements(tome, summary, sp);
 					
 					// little hook here for extra effects
 					SpellTome.doSpecialCastEffects(tome, sp);
@@ -95,6 +90,13 @@ public class ClientCastMessage implements IMessage {
 					NostrumMagica.logger.warn("Got cast from client with mismatched tome");
 					return new ClientCastReplyMessage(false, att.getMana(), 0);
 				}
+			}
+			
+			// Cap enhancements at -90% LRC
+			{
+				float lrc = summary.getReagentCost();
+				if (lrc < .1f)
+					summary.addCostRate(.1f - lrc); // Add however much we need to get to 1
 			}
 			
 			cost = summary.getFinalCost();
@@ -113,6 +115,9 @@ public class ClientCastMessage implements IMessage {
 				}
 				
 				Map<ReagentType, Integer> reagents = spell.getRequiredReagents();
+				
+				// Scan inventory for any applicable discounts
+				
 				applyReagentRate(reagents, summary.getReagentCost());
 				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
 					int count = NostrumMagica.getReagentCount(sp, row.getKey());
@@ -144,11 +149,16 @@ public class ClientCastMessage implements IMessage {
 				// are required, each rolls with 50% chance of still being needed.
 				// rate 1.5 means 100% of the requirements + a roll for each with
 				// 50% chance of adding another.
-				int def = reagents.get(type);
-				int cost = (def * whole);
-				for (; def > 0; def--) {
-					if (NostrumMagica.rand.nextFloat() < frac)
-						cost++;
+				int cost;
+				if (reagentCost <= 0f) {
+					cost = 0;
+				} else {
+					int def = reagents.get(type);
+					cost = (def * whole);
+					for (; def > 0; def--) {
+						if (NostrumMagica.rand.nextFloat() < frac)
+							cost++;
+					}
 				}
 				
 				reagents.put(type, cost);

@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.blocks;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 import com.smanzana.nostrummagica.items.ReagentItem;
@@ -34,25 +36,23 @@ public class CropMandrakeRoot extends BlockCrops {
 	}
 	
 	protected ItemStack getCrops(int count) {
-        return new ItemStack(ReagentItem.instance(), count, ReagentType.MANDRAKE_ROOT.getMeta());
+        return ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, count);
     }
 
     @Override
     public java.util.List<ItemStack> getDrops(net.minecraft.world.IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-        java.util.List<ItemStack> ret = super.getDrops(world, pos, state, fortune);
+        List<ItemStack> ret = new LinkedList<>();//super.getDrops(world, pos, state, fortune);
         int age = getAge(state);
         Random rand = world instanceof World ? ((World)world).rand : new Random();
 
-        if (age >= getMaxAge())
-        {
-            for (int i = 0; i < 3 + fortune; ++i)
-            {
-                if (rand.nextInt(2 * getMaxAge()) <= age)
-                {
-                    ret.add(getCrops(1));
-                }
-            }
+        int count = 0;
+        if (age >= getMaxAge()){
+        	count = 2 + rand.nextInt(2) + fortune;
         }
+        
+        if (count != 0)
+        	ret.add(getCrops(count));
+        
         return ret;
     }
 

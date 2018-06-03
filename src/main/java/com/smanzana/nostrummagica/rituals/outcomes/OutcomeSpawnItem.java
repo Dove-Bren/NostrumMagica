@@ -1,8 +1,12 @@
 package com.smanzana.nostrummagica.rituals.outcomes;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.blocks.AltarBlock.AltarTileEntity;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -36,5 +40,12 @@ public class OutcomeSpawnItem implements IItemRitualOutcome {
 	@Override
 	public ItemStack getResult() {
 		return stack;
+	}
+
+	@Override
+	public List<String> getDescription() {
+		return Lists.newArrayList(I18n.format("ritual.outcome.spawn_item.desc",
+				new Object[]{stack.getDisplayName()})
+				.split("\\|"));
 	}
 }

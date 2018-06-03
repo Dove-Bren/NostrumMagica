@@ -1,7 +1,11 @@
 package com.smanzana.nostrummagica.rituals.outcomes;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -12,6 +16,8 @@ public class OutcomeSpawnEntity implements IRitualOutcome {
 
 	public static interface IEntityFactory {
 		public void spawn(World world, Vec3d pos, EntityPlayer invoker);
+		
+		public String getEntityName();
 	}
 	
 	protected IEntityFactory factory;
@@ -37,6 +43,14 @@ public class OutcomeSpawnEntity implements IRitualOutcome {
 					center.getZ() + .5 + Math.sin(angle) * distance);
 			this.factory.spawn(world, pos, player);
 		}
+	}
+
+	@Override
+	public List<String> getDescription() {
+		String name = I18n.format(factory.getEntityName(), (Object[]) null);
+		return Lists.newArrayList(I18n.format("ritual.outcome.spawn_entity.desc",
+				new Object[] {count, name})
+				.split("\\|"));
 	}
 	
 }

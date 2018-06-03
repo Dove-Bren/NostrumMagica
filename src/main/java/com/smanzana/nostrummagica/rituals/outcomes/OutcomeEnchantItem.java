@@ -1,8 +1,13 @@
 package com.smanzana.nostrummagica.rituals.outcomes;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.blocks.AltarBlock.AltarTileEntity;
+import com.smanzana.nostrummagica.items.SpellPlate;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -44,5 +49,14 @@ public class OutcomeEnchantItem implements IRitualOutcome {
 			centerItem.addEnchantment(enchantment, level);
 			altar.setItem(centerItem);
 		}
+	}
+
+	@Override
+	public List<String> getDescription() {
+		String name = I18n.format(enchantment.getName(), (Object[]) null);
+		String level = SpellPlate.toRoman(this.level);
+		return Lists.newArrayList(I18n.format("ritual.outcome.enchant.desc",
+				new Object[] {name, level})
+				.split("\\|"));
 	}
 }

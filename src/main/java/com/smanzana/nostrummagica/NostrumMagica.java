@@ -825,6 +825,11 @@ public class NostrumMagica
 							world.spawnEntityInWorld(koid);
 							koid.setAttackTarget(invoker);
 						}
+
+						@Override
+						public String getEntityName() {
+							return "entity.nostrummagica.entity_koid.name";
+						}
 					}, 5))
 				);
 		
