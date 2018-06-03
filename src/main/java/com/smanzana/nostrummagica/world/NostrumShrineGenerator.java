@@ -148,7 +148,6 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 				 .add(new RoomVHallway())
 				 .add(new RoomTee1())
 				 .add(new RoomJail1())
-				 .add(new RoomChallenge1())
 				 .add(new RoomChallenge2())), 20, 50),
 		TRIGGER(new WorldGenNostrumShrine(new NostrumShrineDungeon(
 				// Trigger dungeon
@@ -167,9 +166,7 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 				 .add(new RoomEnd2(true))
 				 .add(new RoomVHallway())
 				 .add(new RoomChallenge2())
-				 .add(new RoomChallenge2())
 				 .add(new RoomTee1())
-				 .add(new RoomJail1())
 				 .add(new RoomChallenge1())), 30, 50),
 		ELEMENT(new WorldGenNostrumShrine(new NostrumShrineDungeon(
 				// Trigger dungeon
@@ -188,8 +185,6 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 				 .add(new RoomEnd2(true))
 				 .add(new RoomVHallway())
 				 .add(new RoomTee1())
-				 .add(new RoomJail1())
-				 .add(new RoomChallenge2())
 				 .add(new RoomChallenge1())), 30, 50);
 		
 		private WorldGenerator gen;

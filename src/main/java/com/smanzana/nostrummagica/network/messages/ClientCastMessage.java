@@ -1,6 +1,5 @@
 package com.smanzana.nostrummagica.network.messages;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -10,7 +9,6 @@ import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
-import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;

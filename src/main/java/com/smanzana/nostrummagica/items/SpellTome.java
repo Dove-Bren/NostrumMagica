@@ -938,10 +938,12 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		if (comp == null)
 			return false;
 		
+		while (comp.isAlteration()) {
+			comp = spell.getRandomComponent();
+		}
+		
 		String compName;
-		if (comp.isAlteration())
-			compName = comp.getAlteration().getName();
-		else if (comp.isElement())
+		if (comp.isElement())
 			compName = comp.getElement().getName();
 		else if (comp.isTrigger())
 			compName = comp.getTrigger().getDisplayName();

@@ -41,7 +41,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	
 	//private static final String NBT_FAMILIARS = "familiars";
 	
-	private static final String NBT_BINDING_COMPONENT = "binding_componenet";
+	private static final String NBT_BINDING_COMPONENT = "binding_component";
 	private static final String NBT_BINDING_SPELL = "binding_spell";
 	private static final String NBT_BINDING_TOME_ID = "binding_tomeid";
 	//private static final String NBT_BINDING_COMPONENT = "binding";
@@ -350,6 +350,8 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 				SpellComponentWrapper comp = SpellComponentWrapper.fromKeyString(tag.getString(NBT_BINDING_COMPONENT));
 				int tomeID = tag.getInteger(NBT_BINDING_TOME_ID);
 				instance.startBinding(spell, comp, tomeID);
+			} else {
+				NostrumMagica.logger.warn("Found illegal spell ID. Player will lose binding information");
 			}
 		}
 		

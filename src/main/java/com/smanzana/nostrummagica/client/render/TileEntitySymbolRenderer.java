@@ -42,7 +42,7 @@ public class TileEntitySymbolRenderer extends TileEntitySpecialRenderer<SymbolTi
 		else
 			icon = SpellIcon.get(comp.getElement());
 		ResourceLocation textLoc = icon.getModelLocation();
-		float rot = 2.0f * (Minecraft.getSystemTime() / 50 + partialTicks);
+		float rot = 2.0f * (Minecraft.getSystemTime() / 50);
 		float scale = te.getScale();
 		VertexBuffer wr = Tessellator.getInstance().getBuffer();
 		

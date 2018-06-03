@@ -42,6 +42,8 @@ import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
 import com.smanzana.nostrummagica.listeners.PlayerListener;
+import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
+import com.smanzana.nostrummagica.listeners.PlayerListener.IMagicListener;
 import com.smanzana.nostrummagica.proxy.CommonProxy;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.quests.NostrumQuest.QuestType;
@@ -93,6 +95,7 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumLootHandler;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -118,7 +121,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 
 @Mod(modid = NostrumMagica.MODID, version = NostrumMagica.VERSION, guiFactory = "com.smanzana.nostrummagica.config.ConfigGuiFactory")
-public class NostrumMagica
+public class NostrumMagica implements IMagicListener
 {
     public static final String MODID = "nostrummagica";
     public static final String VERSION = "1.0";
@@ -194,6 +197,8 @@ public class NostrumMagica
     @EventHandler
     public void postinit(FMLPostInitializationEvent event) {
     	proxy.postinit();
+    	
+    	playerListener.registerTimer(this, 20 * 60 * 5, 20 * 60 * 5);
     }
     
     @EventHandler
@@ -1377,4 +1382,14 @@ public class NostrumMagica
     	
     	return true;
     }
+
+	@Override
+	public boolean onEvent(Event type, EntityLivingBase entity) {
+		if (type == Event.TIME) {
+			NostrumMagica.logger.info("Saving spell and seeker registries...");
+			saveSpellRegistry(spellRegistryFile);
+	    	saveSeekerRegistry(seekerRegistryFile);
+		}
+		return false;
+	}
 }

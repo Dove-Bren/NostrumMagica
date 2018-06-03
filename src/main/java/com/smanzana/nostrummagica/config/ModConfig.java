@@ -290,6 +290,8 @@ public class ModConfig {
 				watcher.onConfigUpdate(this);
 			}
 		}
+		
+		base.save();
 	}
 	
 	@SubscribeEvent

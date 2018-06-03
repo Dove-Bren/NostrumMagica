@@ -235,6 +235,7 @@ public class SpellAction {
 		public void apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
 			entity.addPotionEffect(new PotionEffect(effect, (int) (duration * efficiency), amp));
 			
+			System.out.println("efficiency: " + efficiency);
 			if (effect.isBadEffect()) {
 				caster.setLastAttacker(entity);
 				entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);

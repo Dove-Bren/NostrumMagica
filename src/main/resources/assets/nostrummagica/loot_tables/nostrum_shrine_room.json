@@ -6,7 +6,7 @@
       {
         "type": "item",
         "name": "nostrummagica:nostrum_reagent",
-        "weight": 200,
+        "weight": 280,
         "functions": [{ "function": "set_data", "data": { "min": 0, "max": 7 } }]
       },
       {
@@ -146,7 +146,7 @@
          "type": "item",
          "name": "nostrummagica:spellTomePlate",
          "entryName": "plate1",
-         "weight": 1,
+         "weight": 2,
          "functions": [{
              "function": "set_data",
              "data": {
@@ -197,7 +197,7 @@
         "type": "item",
         "name": "nostrummagica:spelltome_page",
         "entryName": "page",
-        "weight": 3,
+        "weight": 5,
         "functions": [{
             "function": "set_nbt",
             "tag": "{nostrum_type: lower_reagent_cost, nostrum_level: 1}"
@@ -305,19 +305,19 @@
         "type": "item",
         "name": "nostrummagica:nostrum_resource",
         "entryName": "thano_left",
-        "weight": 3,
+        "weight": 6,
         "functions": [{ "function": "set_data", "data": 4 }]
       },
       {
         "type": "item",
         "name": "nostrummagica:nostrum_resource",
         "entryName": "thano_right",
-        "weight": 3,
+        "weight": 6,
         "functions": [{ "function": "set_data", "data": 5 }]
       },
       {
         "type": "empty",
-        "weight": 270
+        "weight": 350
       }]
     }]
 }

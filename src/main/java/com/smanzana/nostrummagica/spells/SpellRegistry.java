@@ -56,9 +56,11 @@ public class SpellRegistry {
 	 * @return
 	 */
 	public int register(Spell spell) {
-		int id = newID();
-		registry.put(id, spell);
-		
+		int id;
+		synchronized(this) {
+			id = newID();
+			registry.put(id, spell);
+		}
 		return id;
 	}
 	
@@ -71,9 +73,11 @@ public class SpellRegistry {
 	 * @return
 	 */
 	public int registerTransient(Spell spell) {
-		int id = register(spell);
-		transients.add(id);
-		return id;
+		synchronized(this) {
+			int id = register(spell);
+			transients.add(id);
+			return id;
+		}
 	}
 	
 	/**
@@ -83,7 +87,9 @@ public class SpellRegistry {
 	 * @param spell
 	 */
 	public void override(int id, Spell spell) {
-		registry.put(id, spell);
+		synchronized(this) {
+			registry.put(id, spell);
+		}
 	}
 	
 	public Spell lookup(int id) {
@@ -91,28 +97,32 @@ public class SpellRegistry {
 	}
 	
 	public void loadFromNBT(NBTTagCompound nbt) {
-		for (String key : nbt.getKeySet()) {
-			int id;
-			try {
-				id = Integer.parseInt(key);
-			} catch (NumberFormatException e) {
-				NostrumMagica.logger.error("Failed to parse id for spell: " + key
-					+ ". Spell will be ignored. This is very bad!");
-				continue;
+		synchronized(this) {
+			for (String key : nbt.getKeySet()) {
+				int id;
+				try {
+					id = Integer.parseInt(key);
+				} catch (NumberFormatException e) {
+					NostrumMagica.logger.error("Failed to parse id for spell: " + key
+						+ ". Spell will be ignored. This is very bad!");
+					continue;
+				}
+				
+				registry.put(id,
+						Spell.fromNBT(nbt.getCompoundTag(key), id));
 			}
-			
-			registry.put(id,
-					Spell.fromNBT(nbt.getCompoundTag(key), id));
 		}
 	}
 	
 	public NBTTagCompound save() {
 		NBTTagCompound nbt = new NBTTagCompound();
 		
-		for (Entry<Integer, Spell> entry : registry.entrySet()) {
-			if (transients.isEmpty() || !transients.contains(entry.getKey()))
-				if (!entry.getValue().isEmpty())
-					nbt.setTag(entry.getKey() + "", entry.getValue().toNBT());
+		synchronized(this) {
+			for (Entry<Integer, Spell> entry : registry.entrySet()) {
+				if (transients.isEmpty() || !transients.contains(entry.getKey()))
+					if (!entry.getValue().isEmpty())
+						nbt.setTag(entry.getKey() + "", entry.getValue().toNBT());
+			}
 		}
 		
 		return nbt;
@@ -123,7 +133,9 @@ public class SpellRegistry {
 	}
 
 	public void clear() {
-		registry.clear();
+		synchronized(this) {
+			registry.clear();
+		}
 	}
 	
 	
