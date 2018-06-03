@@ -299,9 +299,9 @@ public class NostrumMagic implements INostrumMagic {
 		
 		loreLevels.put(key, 1);
 		
-		if (NostrumMagica.proxy.getPlayer() != null) {
-			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
-		}
+//		if (NostrumMagica.proxy.getPlayer() != null) {
+//			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
+//		}
 		
 		if (entity != null && entity instanceof EntityPlayer && !entity.worldObj.isRemote) {
 			NetworkHandler.getSyncChannel().sendTo(
@@ -313,9 +313,6 @@ public class NostrumMagic implements INostrumMagic {
 
 	@Override
 	public void giveFullLore(ILoreTagged tagged) {
-		if (getLore(tagged) != null)
-			return; // Already has some lore
-		
 		String key = tagged.getLoreKey();
 		Integer val = loreLevels.get(key);
 		
@@ -323,8 +320,15 @@ public class NostrumMagic implements INostrumMagic {
 			return; // Already has full
 		
 		loreLevels.put(key, 2);
-		if (NostrumMagica.proxy.getPlayer() != null) {
-			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
+//		if (NostrumMagica.proxy.getPlayer() != null || !NostrumMagica.proxy.getPlayer().worldObj.isRemote) {
+//			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
+//		}
+		
+		if (entity != null && entity instanceof EntityPlayer && !entity.worldObj.isRemote) {
+			NetworkHandler.getSyncChannel().sendTo(
+					new LoreMessage(tagged, this),
+					(EntityPlayerMP) entity);
+			
 		}
 	}
 

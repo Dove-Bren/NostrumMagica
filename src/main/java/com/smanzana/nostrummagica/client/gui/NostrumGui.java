@@ -1,10 +1,12 @@
 package com.smanzana.nostrummagica.client.gui;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.LoreTable.LoreTableEntity;
 import com.smanzana.nostrummagica.blocks.ModificationTable.ModificationTableEntity;
 import com.smanzana.nostrummagica.blocks.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.blocks.SpellTable.SpellTableEntity;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.gui.container.LoreTableGui;
 import com.smanzana.nostrummagica.client.gui.container.ModificationTableGui;
 import com.smanzana.nostrummagica.client.gui.container.ReagentBagGui;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
@@ -26,6 +28,7 @@ public class NostrumGui implements IGuiHandler {
 	public static final int obeliskID = 3;
 	public static final int infoscreenID = 4;
 	public static final int modtableID = 5;
+	public static final int loretableID = 6;
 	
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
@@ -69,6 +72,17 @@ public class NostrumGui implements IGuiHandler {
 						player,
 						player.inventory,
 						(ModificationTableEntity) ent,
+						new BlockPos(x, y, z)); // should be tile inventory
+			}
+		}
+		
+		if (ID == loretableID) {
+			TileEntity ent = world.getTileEntity(new BlockPos(x, y, z));
+			if (ent != null && ent instanceof LoreTableEntity) {
+				return new LoreTableGui.LoreTableContainer(
+						player,
+						player.inventory,
+						(LoreTableEntity) ent,
 						new BlockPos(x, y, z)); // should be tile inventory
 			}
 		}
@@ -135,6 +149,17 @@ public class NostrumGui implements IGuiHandler {
 						player,
 						player.inventory,
 						(ModificationTableEntity) ent,
+						new BlockPos(x, y, z))); // should be tile inventory
+			}
+		}
+		
+		if (ID == loretableID) {
+			TileEntity ent = world.getTileEntity(new BlockPos(x, y, z));
+			if (ent != null && ent instanceof LoreTableEntity) {
+				return new LoreTableGui.LoreTableGuiContainer(new LoreTableGui.LoreTableContainer(
+						player,
+						player.inventory,
+						(LoreTableEntity) ent,
 						new BlockPos(x, y, z))); // should be tile inventory
 			}
 		}

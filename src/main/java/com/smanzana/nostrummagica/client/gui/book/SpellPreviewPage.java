@@ -1,20 +1,40 @@
 package com.smanzana.nostrummagica.client.gui.book;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
+import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.Spell;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraftforge.fml.client.config.GuiUtils;
 
 public class SpellPreviewPage implements IBookPage {
 
 	private Spell spell;
+	private List<String> tooltip;
 	
 	public SpellPreviewPage(Spell spell) {
 		this.spell = spell;
+		tooltip = new ArrayList<>();
+		Map<ReagentType, Integer> reagents = spell.getRequiredReagents();
+		for (ReagentType type : reagents.keySet()) {
+			if (type == null)
+				continue;
+			Integer count = reagents.get(type);
+			if (count == null || count == 0)
+				continue;
+			
+			tooltip.add(count + " " + type.prettyName());
+		}
 	}
 	
 	@Override
@@ -44,6 +64,7 @@ public class SpellPreviewPage implements IBookPage {
 
 	@Override
 	public void overlay(BookScreen parent, FontRenderer fonter, int mouseX, int mouseY, int trueX, int trueY) {
-		; // Nothing to do
+		ScaledResolution res = new ScaledResolution(Minecraft.getMinecraft());
+		GuiUtils.drawHoveringText(tooltip, trueX, trueY, res.getScaledWidth(), res.getScaledHeight(), 200, fonter);
 	}
 }

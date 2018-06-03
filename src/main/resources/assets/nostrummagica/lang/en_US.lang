@@ -177,6 +177,7 @@ tile.nostrum_chalk_block.name=Chalk
 tile.nostrum_candle.name=Candle
 tile.altar_block.name=Altar
 tile.modification_table.name=Modification Table
+tile.lore_table.name=Researcher's Table
 
 entity.nostrummagica.physical_golem.name=Metal Golem
 entity.nostrummagica.lightning_golem.name=Lightining Golem
@@ -489,7 +490,7 @@ ritual.outcome.recall.desc=Teleport to your mark|location. Mark locations with|t
 ritual.outcome.mark.desc=Mark a location to be|recalled to later.|You can only have|one marked location at|a time.
 ritual.outcome.potion_effect.desc=Gives %s %s|Effect lasts for %d seconds
 ritual.outcome.enchant.desc=Enchant with %s %s
-ritual.outcome.create_tome.desc=Combies a plate with pages to create an unbound Spell Tome
+ritual.outcome.create_tome.desc=Combines a plate with pages to create an unbound Spell Tome
 ritual.outcome.bind_spell.desc=Starts binding a spell to a tome
 ritual.outcome.create_obelisk.desc=Creates an Obelisk at|the center of the ritual
 

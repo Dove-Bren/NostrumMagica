@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.blocks.CropMandrakeRoot;
 import com.smanzana.nostrummagica.blocks.CursedIce;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.blocks.EssenceOre;
+import com.smanzana.nostrummagica.blocks.LoreTable;
 import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.blocks.ManiOre;
 import com.smanzana.nostrummagica.blocks.ModificationTable;
@@ -435,6 +436,14 @@ public class CommonProxy {
     					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(ModificationTable.ID))
     			);
     	ModificationTable.init();
+    	
+    	GameRegistry.register(LoreTable.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, LoreTable.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(LoreTable.instance()).setRegistryName(LoreTable.ID)
+    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(LoreTable.ID))
+    			);
+    	LoreTable.init();
     	
     }
     

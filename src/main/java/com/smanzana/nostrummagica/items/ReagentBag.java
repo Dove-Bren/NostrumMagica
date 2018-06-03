@@ -330,7 +330,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 
 	@Override
 	public Lore getDeepLore() {
-		return new Lore().add("Reagent bags provide extra storage for reagents.", "The bag can be configured to automatically take reagents when they are picked up.", "Reagent bags are searched when casting spells that take reagents.");
+		return new Lore().add("Reagent bags provide extra storage for reagents.", "The bag can be configured to automatically take reagents when they are picked up.", "Reagent bags are searched when casting spells that take reagents.", "Holding shift while picking up items will ignore the vacuum feature.");
 	}
 
 	@Override

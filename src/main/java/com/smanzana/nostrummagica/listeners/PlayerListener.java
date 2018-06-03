@@ -642,7 +642,8 @@ public class PlayerListener {
 			attr.giveBasicLore((ILoreTagged) addedItem.getItem());
 		}
 		
-		if (e.getItem().getEntityItem().getItem() instanceof ReagentItem) {
+		if (e.getItem().getEntityItem().getItem() instanceof ReagentItem
+				&& !player.isSneaking()) {
 			int originalSize = addedItem.stackSize;
 			for (ItemStack item : player.inventory.offHandInventory) {
 				// Silly but prefer offhand

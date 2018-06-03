@@ -1,0 +1,12 @@
+{
+    "parent": "block/cube",
+    "textures": {
+        "particle": "nostrummagica:blocks/lore_table_front",
+        "down": "nostrummagica:blocks/lore_table_front",
+        "up": "nostrummagica:blocks/lore_table_top",
+        "north": "nostrummagica:blocks/lore_table_front",
+        "east": "nostrummagica:blocks/lore_table_front",
+        "south": "nostrummagica:blocks/lore_table_front",
+        "west": "nostrummagica:blocks/lore_table_front"
+    }
+}
