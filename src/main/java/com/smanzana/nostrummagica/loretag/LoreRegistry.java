@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
+import com.smanzana.nostrummagica.items.MageStaff;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.MasteryOrb;
@@ -28,6 +29,7 @@ import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTableItem;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.SpellTomePage;
+import com.smanzana.nostrummagica.items.ThanosStaff;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLivingBase;
@@ -93,6 +95,8 @@ public class LoreRegistry {
 		register(ShrineSeekingGem.instance());
 		register(new EntityGolemPhysical(null));
 		register(new EntityKoid(null));
+		register(MageStaff.instance());
+		register(ThanosStaff.instance());
 		
 		for (Preset preset : Preset.values()) {
 			register(preset);

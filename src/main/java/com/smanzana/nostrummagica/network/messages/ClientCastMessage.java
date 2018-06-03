@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.items.ISpellArmor;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -14,6 +15,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -65,10 +67,10 @@ public class ClientCastMessage implements IMessage {
 			
 			// Add the player's personal bonuses
 			summary.addCostRate(att.getManaCostModifier());
-			
+			ItemStack tome = null;
 			if (!isScroll) {
 				// Find the tome this was cast from, if any
-				ItemStack tome = NostrumMagica.findTome(sp, tomeID);
+				tome = NostrumMagica.findTome(sp, tomeID);
 				
 				if (tome != null && tome.getItem() instanceof SpellTome
 						&& SpellTome.getTomeID(tome) == tomeID) {
@@ -82,23 +84,35 @@ public class ClientCastMessage implements IMessage {
 					
 					SpellTome.applyEnhancements(tome, summary, sp);
 					
-					// little hook here for extra effects
-					SpellTome.doSpecialCastEffects(tome, sp);
 				} else {
 					NostrumMagica.logger.warn("Got cast from client with mismatched tome");
 					return new ClientCastReplyMessage(false, att.getMana(), 0);
 				}
 			}
 			
-			// Cap enhancements at -90% LRC
+			// Cap enhancements at 80% LRC
 			{
 				float lrc = summary.getReagentCost();
-				if (lrc < .1f)
-					summary.addCostRate(.1f - lrc); // Add however much we need to get to 1
+				if (lrc < .2f)
+					summary.addCostRate(.2f - lrc); // Add however much we need to get to 1
+			}
+			
+			// Visit an equipped spell armor
+			for (ItemStack equip : sp.getEquipmentAndArmor()) {
+				if (equip == null)
+					continue;
+				if (equip.getItem() instanceof ISpellArmor) {
+					ISpellArmor armor = (ISpellArmor) equip.getItem();
+					armor.apply(sp, summary, equip);
+				}
 			}
 			
 			cost = summary.getFinalCost();
 			xp = summary.getFinalXP();
+			float reagentCost = summary.getReagentCost();
+			
+			cost = Math.max(cost, 0);
+			reagentCost = Math.max(reagentCost, 0);
 			
 			if (!sp.isCreative() && !isScroll) {
 				// Take mana and reagents
@@ -116,10 +130,11 @@ public class ClientCastMessage implements IMessage {
 				
 				// Scan inventory for any applicable discounts
 				
-				applyReagentRate(reagents, summary.getReagentCost());
+				applyReagentRate(reagents, reagentCost);
 				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
 					int count = NostrumMagica.getReagentCount(sp, row.getKey());
 					if (count < row.getValue()) {
+						sp.addChatComponentMessage(new TextComponentTranslation("info.spell.bad_reagent", row.getKey().prettyName()));
 						return new ClientCastReplyMessage(false, att.getMana(), 0);
 					}
 				}
@@ -129,6 +144,11 @@ public class ClientCastMessage implements IMessage {
 				}
 				
 				att.addMana(-cost);
+			}
+			
+			if (!isScroll) {
+				// little hook here for extra effects
+				SpellTome.doSpecialCastEffects(tome, sp);
 			}
 			
 			spell.cast(sp, summary.getEfficiency());

@@ -30,6 +30,9 @@ public class ModConfigGui extends GuiConfig {
 //		}
 		
 		for (Key.Category category : ModConfig.Key.Category.values()) {
+			if (category == Key.Category.SERVER)
+				continue;
+			
 			ConfigCategory cat = ModConfig.config.base.getCategory(category.getName());
 			prepCategory(category);
 			elementList.add(new ConfigElement(cat));

@@ -72,10 +72,9 @@ public class TouchTrigger extends InstantTrigger {
 
 	@Override
 	public List<ItemStack> getReagents() {
-		List<ItemStack> list = new ArrayList<>(2);
+		List<ItemStack> list = new ArrayList<>(1);
 		
 		list.add(ReagentItem.instance().getReagent(ReagentType.GRAVE_DUST, 1));
-		list.add(ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1));
 		
 		return list;
 	}

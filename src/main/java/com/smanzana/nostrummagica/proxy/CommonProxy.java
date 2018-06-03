@@ -48,6 +48,7 @@ import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
+import com.smanzana.nostrummagica.items.MageStaff;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.MasteryOrb;
@@ -67,6 +68,7 @@ import com.smanzana.nostrummagica.items.SpellTableItem;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.items.SpellcraftGuide;
+import com.smanzana.nostrummagica.items.ThanosStaff;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientEffectRenderMessage;
@@ -346,6 +348,14 @@ public class CommonProxy {
     	
     	EssenceItem.instance().setRegistryName(NostrumMagica.MODID, EssenceItem.ID);
     	GameRegistry.register(EssenceItem.instance());
+    	
+    	MageStaff.instance().setRegistryName(NostrumMagica.MODID, MageStaff.ID);
+    	GameRegistry.register(MageStaff.instance());
+    	MageStaff.init();
+    	
+    	ThanosStaff.instance().setRegistryName(NostrumMagica.MODID, ThanosStaff.ID);
+    	GameRegistry.register(ThanosStaff.instance());
+    	ThanosStaff.init();
     }
     
     private void registerBlocks() {

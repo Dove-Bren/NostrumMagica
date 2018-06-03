@@ -27,7 +27,7 @@ public class ClientCastReplyMessage implements IMessage {
 
 			INostrumMagic att = NostrumMagica.getMagicWrapper(
 					NostrumMagica.proxy.getPlayer());
-			// Regardless of success, server has synced mana with us.j
+			// Regardless of success, server has synced mana with us.
 			int mana = message.tag.getInteger(NBT_MANA);
 			float xp = message.tag.getFloat(NBT_XP);
 			boolean success = message.tag.getBoolean(NBT_STATUS);

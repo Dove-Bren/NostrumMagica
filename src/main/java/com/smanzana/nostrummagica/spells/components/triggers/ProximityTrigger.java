@@ -105,7 +105,7 @@ public class ProximityTrigger extends SpellTrigger {
 	public List<ItemStack> getReagents() {
 		List<ItemStack> list = new ArrayList<>(2);
 		
-		list.add(ReagentItem.instance().getReagent(ReagentType.CRYSTABLOOM, 1));
+		list.add(ReagentItem.instance().getReagent(ReagentType.GRAVE_DUST, 1));
 		list.add(ReagentItem.instance().getReagent(ReagentType.BLACK_PEARL, 1));
 		
 		return list;

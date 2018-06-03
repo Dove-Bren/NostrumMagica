@@ -53,7 +53,9 @@ import com.smanzana.nostrummagica.items.ChalkItem;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
 import com.smanzana.nostrummagica.items.EssenceItem;
+import com.smanzana.nostrummagica.items.ISpellArmor;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
+import com.smanzana.nostrummagica.items.MageStaff;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.MasteryOrb;
@@ -75,8 +77,10 @@ import com.smanzana.nostrummagica.items.SpellTableItem;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.items.SpellcraftGuide;
+import com.smanzana.nostrummagica.items.ThanosStaff;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
+import com.smanzana.nostrummagica.network.messages.ClientCastReplyMessage;
 import com.smanzana.nostrummagica.network.messages.ObeliskTeleportationRequestMessage;
 import com.smanzana.nostrummagica.network.messages.SpellTomeIncrementMessage;
 import com.smanzana.nostrummagica.network.messages.StatRequestMessage;
@@ -118,7 +122,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelBakeEvent;
@@ -229,6 +232,8 @@ public class ClientProxy extends CommonProxy {
     	variants = list.toArray(new ResourceLocation[0]);
     	ModelBakery.registerItemVariants(NostrumResourceItem.instance(), variants);
     	
+    	ModelBakery.registerItemVariants(ThanosStaff.instance(), new ResourceLocation(NostrumMagica.MODID, ThanosStaff.ID + "_activated"));
+    	
     	TileEntitySymbolRenderer.init();
     	TileEntityCandleRenderer.init();
     	TileEntityAltarRenderer.init();
@@ -285,6 +290,9 @@ public class ClientProxy extends CommonProxy {
 		
 		Minecraft.getMinecraft().getRenderItem().getItemModelMesher()
 			.register(SpellRune.instance(), new SpellRune.ModelMesher());
+		
+		Minecraft.getMinecraft().getRenderItem().getItemModelMesher()
+			.register(ThanosStaff.instance(), new ThanosStaff.ModelMesher());
 		
 		registerModel(new ItemBlock(NostrumMagicaFlower.instance()), 
 				NostrumMagicaFlower.Type.CRYSTABLOOM.getMeta(),
@@ -372,6 +380,10 @@ public class ClientProxy extends CommonProxy {
     		registerModel(SpellTome.instance(), i - 1, SpellTome.id + i);
     		registerModel(SpellPlate.instance(), i - 1, SpellPlate.id + i);
     	}
+    	
+    	registerModel(MageStaff.instance(),
+    			0,
+    			MageStaff.ID);
 		
 		for (EMagicElement element : EMagicElement.values()) {
 			registerModel(EssenceItem.instance(),
@@ -465,11 +477,38 @@ public class ClientProxy extends CommonProxy {
 		ItemStack tome = NostrumMagica.getCurrentTome(player); 
 		if (tome != null && tome.getItem() instanceof SpellTome) {
 			// Casting from a tome.
+			
+			// Make sure it isn't too hard for the tome
+			int cap = SpellTome.getMaxMana(tome);
+			if (cap < cost) {
+				player.addChatMessage(new TextComponentTranslation(
+						"info.spell.tome_weak", new Object[0]));
+				NostrumMagicaSounds.CAST_FAIL.play(player);
+				return;
+			}
+			
 			List<SpellTomeEnhancementWrapper> enhancements = SpellTome.getEnhancements(tome);
 			if (enhancements != null && !enhancements.isEmpty())
 			for (SpellTomeEnhancementWrapper enhance : enhancements) {
 				enhance.getEnhancement().onCast(
 						enhance.getLevel(), summary, player, att);
+			}
+		}
+		
+		// Cap enhancements at 80% LRC
+		{
+			float lrc = summary.getReagentCost();
+			if (lrc < .2f)
+				summary.addCostRate(.2f - lrc); // Add however much we need to get to 1
+		}
+		
+		// Visit an equipped spell armor
+		for (ItemStack equip : player.getEquipmentAndArmor()) {
+			if (equip == null)
+				continue;
+			if (equip.getItem() instanceof ISpellArmor) {
+				ISpellArmor armor = (ISpellArmor) equip.getItem();
+				armor.apply(player, summary, equip);
 			}
 		}
 		
@@ -529,6 +568,7 @@ public class ClientProxy extends CommonProxy {
 	    				player.addChatMessage(new TextComponentTranslation(
 								"info.spell.no_mastery", new Object[] {elem.getName()}));
 						NostrumMagicaSounds.CAST_FAIL.play(player);
+						return;
 	    			}
 				} else {
 		    		Integer mast = att.getElementMastery().get(elem);
@@ -542,18 +582,20 @@ public class ClientProxy extends CommonProxy {
 	    	}
 			
 			// Check reagents
-			Map<ReagentType, Integer> reagents = spell.getRequiredReagents();
-			for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
-				int count = NostrumMagica.getReagentCount(player, row.getKey());
-				if (count < row.getValue()) {
-					player.addChatMessage(new TextComponentString("Not enough "
-							+ row.getKey().prettyName()));
-					return;
+			// Skip check if there's a server-side chance of it still working anyways
+			if (summary.getReagentCost() >= 1f) {
+				Map<ReagentType, Integer> reagents = spell.getRequiredReagents();
+				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
+					int count = NostrumMagica.getReagentCount(player, row.getKey());
+					if (count < row.getValue()) {
+						player.addChatMessage(new TextComponentTranslation("info.spell.bad_reagent", row.getKey().getName()));
+						return;
+					}
 				}
-			}
-			// actually deduct
-			for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
-				NostrumMagica.removeReagents(player, row.getKey(), row.getValue());
+				// actually deduct
+				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
+					NostrumMagica.removeReagents(player, row.getKey(), row.getValue());
+				}
 			}
 			
 			NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer)

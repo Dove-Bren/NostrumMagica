@@ -49,10 +49,9 @@ public class SingleShape extends SpellShape {
 
 	@Override
 	public List<ItemStack> getReagents() {
-		List<ItemStack> list = new ArrayList<>(2);
+		List<ItemStack> list = new ArrayList<>(1);
 		
-		list.add(ReagentItem.instance().getReagent(ReagentType.GINSENG, 1));
-		list.add(ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1));
+		list.add(ReagentItem.instance().getReagent(ReagentType.CRYSTABLOOM, 1));
 		
 		return list;
 	}

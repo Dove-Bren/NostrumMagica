@@ -101,7 +101,7 @@ public class BeamTrigger extends InstantTrigger {
 		List<ItemStack> list = new ArrayList<>(2);
 		
 		list.add(ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1));
-		list.add(ReagentItem.instance().getReagent(ReagentType.CRYSTABLOOM, 1));
+		list.add(ReagentItem.instance().getReagent(ReagentType.GRAVE_DUST, 1));
 		
 		return list;
 	}

@@ -34,23 +34,13 @@ public class ModConfig {
 		OBELISK_LIST(Category.DISPLAY, "obelisk_list", false, false, "Display known teleportation points in the obelisk as a list"),
 		EFFECT_DISPLAY(Category.DISPLAY, "display_effects", true, false, "Allow cool client effects to be rendered. Turn off to enhance performance"),
 		
-		INNER_DEBUG(Category.TEST, "inner_debug", 0, false, "Testing debug dont use omg blow everyhing up dont do it omg zomb"),
-		
 		OBELISK_REQ_MAGIC(Category.SERVER, "obelisk_req_magic", true, true, "Magic must be unlocked before obelisks can be used or teleported to.");
 		
-		
-//		DEPTH_S(Category.TEST, "depth_s", new Float(0.1f), false, "south depth"),
-//		DEPTH_N(Category.TEST, "depth_n", new Float(0.1f), false, "north depth"),
-//		ROTATE_ANGLE(Category.TEST, "rotate_angle", new Float(45.0f), false, "angle"),
-//		ROTATE_X(Category.TEST, "rotate_x", new Float(0.5f), false, "x"),
-//		ROTATE_Y(Category.TEST, "rotate_y", new Float(1.0f), false, "y"),
-//		ROTATE_Z(Category.TEST, "rotate_z", new Float(0.5f), false, "z");
 		
 		public static enum Category {
 			SERVER("server", "Core properties that MUST be syncronized bytween the server and client. Client values ignored"),
 			DISPLAY("display", "Item tag information and gui display options"),
-			SPELL("spell", "Options that change client-side handling of spells"),
-			TEST("test", "Options used just for debugging and development");
+			SPELL("spell", "Options that change client-side handling of spells");
 			
 			private String categoryName;
 			
@@ -74,6 +64,8 @@ public class ModConfig {
 				for (Category cat : values()) {
 					config.setCategoryComment(cat.categoryName, cat.comment);
 					config.setCategoryRequiresWorldRestart(cat.categoryName, cat == SERVER);
+					config.setCategoryLanguageKey(cat.categoryName,
+							"config.nostrummagica." + cat.categoryName);
 				}
 			}
 			
@@ -250,19 +242,20 @@ public class ModConfig {
 		for (Key key : Key.values())
 		if (!base.hasKey(key.getCategory(), key.getKey())) {
 			if (key.getDefault() instanceof Float) {
-				System.out.println("it's a float");
 				base.getFloat(key.getKey(), key.getCategory(), (Float) key.getDefault(),
-						Float.MIN_VALUE, Float.MAX_VALUE, key.getDescription());
+						Float.MIN_VALUE, Float.MAX_VALUE, "This if float",//key.getDescription(),
+						"config.nostrummagica." + key.getCategory() + "." + key.getKey());
 			}
 			else if (key.getDefault() instanceof Boolean)
 				base.getBoolean(key.getKey(), key.getCategory(), (Boolean) key.getDefault(),
-						key.getDescription());
+						key.getDescription(), "config.nostrummagica." + key.getCategory() + "." + key.getKey());
 			else if (key.getDefault() instanceof Integer)
 				base.getInt(key.getKey(), key.getCategory(), (Integer) key.getDefault(),
-						Integer.MIN_VALUE, Integer.MAX_VALUE, key.getDescription());
+						Integer.MIN_VALUE, Integer.MAX_VALUE, key.getDescription(),
+						"config.nostrummagica." + key.getCategory() + "." + key.getKey());
 			else
 				base.getString(key.getKey(), key.getCategory(), key.getDefault().toString(),
-						key.getDescription());
+						key.getDescription(), "config.nostrummagica." + key.getCategory() + "." + key.getKey());
 		}
 		
 		if (base.hasChanged())
@@ -384,10 +377,6 @@ public class ModConfig {
 	
 	public boolean spellDebug() {
 		return getBooleanValue(Key.SPELL_DEBUG, false);
-	}
-	
-	public int getInnerDebug() {
-		return getIntValue(Key.INNER_DEBUG, false);
 	}
 	
 	public boolean getObeliskList() {

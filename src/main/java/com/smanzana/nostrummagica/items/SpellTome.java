@@ -42,6 +42,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
@@ -156,7 +157,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		if (worldIn.isRemote)
 			NostrumMagica.proxy.openBook(playerIn, this, itemStackIn);
 		
-		return super.onItemRightClick(itemStackIn, worldIn, playerIn, hand);
+		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
     }
 	
 	public static void addSpell(ItemStack itemStack, Spell spell) {

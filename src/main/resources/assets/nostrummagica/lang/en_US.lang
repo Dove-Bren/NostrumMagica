@@ -154,6 +154,12 @@ item.armor_feet_ender1.name=Ender Sandles
 item.armor_feet_ender2.name=Ender Getas
 item.armor_feet_ender3.name=Ender Boots
 
+item.mage_staff.name=Mage Staff
+item.thanos_staff.name=Staff of Thanos
+
+item.info.thanos_staff.charged=Charged
+item.info.thanos.charges=%d Charges
+item.info.thanos.desc=Charged up with XP. Provides reagent-free casts.
 
 potion.frostbite.name=Frostbite
 potion.shieldphysical.name=Physical Ward
@@ -197,6 +203,20 @@ key.spellscroll.desc=Scroll Spells (+ MouseWheel)
 key.infoscreen.desc=Info Screen
 key.nostrummagica.desc=Nostrum Magica
 
+config.nostrummagica.display=Display Options
+config.nostrummagica.display.display_bar=Mana Bar
+config.nostrummagica.display.display_effects=Magic Visual Effects
+config.nostrummagica.display.display_mp_text=Mana Values
+config.nostrummagica.display.display_spheres=Mana Orb Guage
+config.nostrummagica.display.display_xp_text=XP Values
+config.nostrummagica.display.display_xp_bar=XP Bar Overlay
+config.nostrummagica.display.obelisk_list=Obelisk List
+
+config.nostrummagica.server=Server Options
+
+config.nostrummagica.spell=Spell Feedback
+config.nostrummagica.spell.spell_debug=Spell Debug
+
 death.attack.magic.PHYSICAL=%1$s was killed by %2$s using physical energies
 death.attack.magic.WIND=%1$s was sliced to pieces by %2$s's wind magic
 death.attack.magic.EARTH=%1$s was crushed by %2$s's earth magic
@@ -231,7 +251,9 @@ info.spell.low_tech=You lack the technique required for such a complex spell
 info.spell.low_finesse=You lack the finesse required by such an intricate spell
 info.spell.low_control=You lack the control to handle such a powerful spell
 info.spell.low_mastery=This spell requires %s mastery %d, but you only possess mastery %d
-info.spell.no_mastery=This spell require knowledge of the %s element
+info.spell.no_mastery=This spell requires knowledge of the %s element
+info.spell.bad_reagent=You do not have enough %s
+info.spell.tome_weak=Your tome cannot cast such a powerful spell
 
 info.discovery.name=Unlocking Magic
 info.stats.name=Stats

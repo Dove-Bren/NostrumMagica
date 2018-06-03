@@ -4,6 +4,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.DungeonBlock;
+import com.smanzana.nostrummagica.blocks.NostrumObelisk;
+import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellTomePage;
@@ -16,6 +19,7 @@ import mezz.jei.api.BlankModPlugin;
 import mezz.jei.api.IModRegistry;
 import mezz.jei.api.ISubtypeRegistry;
 import mezz.jei.api.JEIPlugin;
+import mezz.jei.api.ingredients.IIngredientBlacklist;
 import mezz.jei.api.ingredients.IModIngredientRegistration;
 import net.minecraft.item.ItemStack;
 
@@ -70,9 +74,14 @@ public class NostrumMagicaJEIPlugin extends BlankModPlugin {
 		
 		
 		// Hide our cool wrapper to outputs
+		IIngredientBlacklist blacklist = registry.getJeiHelpers().getIngredientBlacklist();
 		for (RitualOutcomeWrapper wrapper : ritualOutcomes) {
-			registry.getJeiHelpers().getIngredientBlacklist().addIngredientToBlacklist(wrapper);
+			blacklist.addIngredientToBlacklist(wrapper);
 		}
+		blacklist.addIngredientToBlacklist(new ItemStack(DungeonBlock.instance()));
+		blacklist.addIngredientToBlacklist(new ItemStack(NostrumSingleSpawner.instance()));
+		blacklist.addIngredientToBlacklist(new ItemStack(NostrumObelisk.instance()));
+		
 	}
 	
 }

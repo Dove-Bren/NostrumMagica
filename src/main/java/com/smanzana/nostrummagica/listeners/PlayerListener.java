@@ -10,9 +10,12 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
 import com.smanzana.nostrummagica.items.EnchantedEquipment;
+import com.smanzana.nostrummagica.items.NostrumResourceItem;
+import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.items.ThanosStaff;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
@@ -47,6 +50,7 @@ import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -770,6 +774,46 @@ public class PlayerListener {
 		if (event.player.worldObj.isRemote) {
 			this.clearAll();
 		}
+	}
+	
+	@SubscribeEvent
+	public void onXPPickup(PlayerPickupXpEvent event) {
+		EntityPlayer player = event.getEntityPlayer();
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		int xp = event.getOrb().xpValue;
+		if (attr != null) {
+			for (ItemStack item : player.getEquipmentAndArmor()) {
+				if (item == null)
+					continue;
+				int leftover = tryThanos(player, item, xp);
+				if (leftover == 0) {
+					break;
+				} else if (leftover != xp) {
+					xp = leftover;
+				}
+			}
+			if (xp != 0)
+			for (ItemStack item : player.inventory.mainInventory) {
+				if (item == null)
+					continue;
+				int leftover = tryThanos(player, item, xp);
+				if (leftover == 0) {
+					break;
+				} else if (leftover != xp) {
+					xp = leftover;
+				}
+			}
+		}
+	}
+	
+	private int tryThanos(EntityPlayer player, ItemStack item, int xp) {
+		if (item.getItem() instanceof ThanosStaff) {
+			return ThanosStaff.addXP(item, xp);
+		} else if (item.getItem() == NostrumResourceItem.instance()
+				&& item.getMetadata() == NostrumResourceItem.getMetaFromType(ResourceType.PENDANT_WHOLE)) {
+			return NostrumResourceItem.thanosAddXP(item, xp);
+		}
+		return xp;
 	}
 	
 	// TESTING

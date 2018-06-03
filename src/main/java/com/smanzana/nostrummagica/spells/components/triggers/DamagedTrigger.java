@@ -77,7 +77,7 @@ public class DamagedTrigger extends SpellTrigger {
 		List<ItemStack> list = new ArrayList<>(2);
 		
 		list.add(ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1));
-		list.add(ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1));
+		list.add(ReagentItem.instance().getReagent(ReagentType.GRAVE_DUST, 1));
 		
 		return list;
 	}
