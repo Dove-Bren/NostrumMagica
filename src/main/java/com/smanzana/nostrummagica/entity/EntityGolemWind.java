@@ -100,7 +100,7 @@ public class EntityGolemWind extends EntityGolem {
 			int count = this.rand.nextInt(3) + 1;
 			count += lootingModifier;
 			
-			this.entityDropItem(EssenceItem.instance().getEssence(
+			this.entityDropItem(EssenceItem.getEssence(
 					EMagicElement.WIND,
 					count), 0);
 		}

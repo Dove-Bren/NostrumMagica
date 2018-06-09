@@ -98,7 +98,7 @@ public class EntityGolemIce extends EntityGolem {
 			int count = this.rand.nextInt(3) + 1;
 			count += lootingModifier;
 			
-			this.entityDropItem(EssenceItem.instance().getEssence(
+			this.entityDropItem(EssenceItem.getEssence(
 					EMagicElement.ICE,
 					count), 0);
 		}

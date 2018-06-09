@@ -139,7 +139,7 @@ public class EntityGolemLightning extends EntityGolem {
 			int count = this.rand.nextInt(3) + 1;
 			count += lootingModifier;
 			
-			this.entityDropItem(EssenceItem.instance().getEssence(
+			this.entityDropItem(EssenceItem.getEssence(
 					EMagicElement.LIGHTNING,
 					count), 0);
 		}

@@ -255,7 +255,7 @@ public class EntityKoid extends EntityMob implements ILoreTagged {
 		int count = this.rand.nextInt(2);
 		count += lootingModifier;
 		
-		this.entityDropItem(EssenceItem.instance().getEssence(
+		this.entityDropItem(EssenceItem.getEssence(
 				this.getElement(),
 				count), 0);
 	}

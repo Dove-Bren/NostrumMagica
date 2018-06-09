@@ -471,10 +471,10 @@ public class Spell {
 		
 		// Triggers can report their  cost
 		// Alterations are in enum
-		// Shapes cost 15
-		// First elem is free. Extra costs 30 ea
+		// Shapes cost 10
+		// First elem is free. Extra costs 20 ea
 		// Rolling multiplier makes it more expensive for one long spell vs many small
-		// (rate of 1.2x)
+		// (rate of 1.1x)
 		float cost = 0f;
 		float multiplier = 1f;
 		
