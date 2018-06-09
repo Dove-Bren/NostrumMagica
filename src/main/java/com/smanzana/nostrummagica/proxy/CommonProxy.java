@@ -68,6 +68,7 @@ import com.smanzana.nostrummagica.items.SpellTableItem;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.items.SpellcraftGuide;
+import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.items.ThanosStaff;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
@@ -352,6 +353,9 @@ public class CommonProxy {
     	MageStaff.instance().setRegistryName(NostrumMagica.MODID, MageStaff.ID);
     	GameRegistry.register(MageStaff.instance());
     	MageStaff.init();
+    	
+    	ThanoPendant.instance().setRegistryName(NostrumMagica.MODID, ThanoPendant.ID);
+    	GameRegistry.register(ThanoPendant.instance());
     	
     	ThanosStaff.instance().setRegistryName(NostrumMagica.MODID, ThanosStaff.ID);
     	GameRegistry.register(ThanosStaff.instance());

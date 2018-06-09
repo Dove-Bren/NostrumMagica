@@ -44,7 +44,7 @@ public class TouchTrigger extends InstantTrigger {
 	@Override
 	protected TriggerData getTargetData(SpellState state, World world,
 				Vec3d pos, float pitch, float yaw) {
-		pos = pos.addVector(0, state.getCaster().getEyeHeight(), 0);
+		pos = pos.addVector(0, state.getSelf().getEyeHeight(), 0);
 		
 		RayTraceResult trace = RayTrace.raytrace(world, pos, pitch, yaw, TOUCH_RANGE, true);
 		
@@ -53,7 +53,8 @@ public class TouchTrigger extends InstantTrigger {
 		}
 		
 		List<EntityLivingBase> others = Lists.newArrayList(state.getSelf());
-		if (trace.typeOfHit == RayTraceResult.Type.ENTITY && trace.entityHit != null) {
+		if (trace.typeOfHit == RayTraceResult.Type.ENTITY && trace.entityHit != null
+				&& trace.entityHit.isEntityEqual(state.getSelf())) {
 			// Cast is safe from 'onlyLiving' option in trace
 			return new TriggerData(Lists.newArrayList((EntityLivingBase) trace.entityHit), others, world, null);
 		} else if (trace.typeOfHit == RayTraceResult.Type.BLOCK) {

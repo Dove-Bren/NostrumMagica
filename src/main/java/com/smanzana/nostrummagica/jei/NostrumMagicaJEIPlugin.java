@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
-import com.smanzana.nostrummagica.blocks.NostrumObelisk;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.SpellRune;
@@ -80,7 +79,6 @@ public class NostrumMagicaJEIPlugin extends BlankModPlugin {
 		}
 		blacklist.addIngredientToBlacklist(new ItemStack(DungeonBlock.instance()));
 		blacklist.addIngredientToBlacklist(new ItemStack(NostrumSingleSpawner.instance()));
-		blacklist.addIngredientToBlacklist(new ItemStack(NostrumObelisk.instance()));
 		
 	}
 	

@@ -2,21 +2,17 @@ package com.smanzana.nostrummagica.items;
 
 import java.util.List;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
-import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -27,7 +23,7 @@ import net.minecraftforge.oredict.OreDictionary;
  * @author Skyler
  *
  */
-public class NostrumResourceItem extends Item implements ILoreTagged, ISpellArmor {
+public class NostrumResourceItem extends Item implements ILoreTagged {
 
 	public static enum ResourceType {
 		TOKEN("token"),
@@ -36,7 +32,6 @@ public class NostrumResourceItem extends Item implements ILoreTagged, ISpellArmo
 		CRYSTAL_LARGE("crystal_large"),
 		PENDANT_LEFT("pendant_left"),
 		PENDANT_RIGHT("pendant_right"),
-		PENDANT_WHOLE("pendant_whole"),
 		SLAB_FIERCE("slab_fierce"),
 		SLAB_KIND("slab_kind"),
 		SLAB_BALANCED("slab_balanced");
@@ -57,9 +52,6 @@ public class NostrumResourceItem extends Item implements ILoreTagged, ISpellArmo
 	}
 	
 	public static final String ID = "nostrum_resource";
-	private static final String NBT_THANOS_XP = "thanos_xp";
-	private static final int THANOS_XP_PER = 10;
-	private static final int MAX_THANOS_XP = 5 * THANOS_XP_PER;
 	
 	private static NostrumResourceItem instance = null;
 	public static NostrumResourceItem instance() {
@@ -170,93 +162,10 @@ public class NostrumResourceItem extends Item implements ILoreTagged, ISpellArmo
 				return;
 			tooltip.add(translation);
 		}
-		
-		if (type == ResourceType.PENDANT_WHOLE) {
-			tooltip.add(I18n.format("item.info.thanos.desc", (Object[]) null));
-			int charges = thanosGetWholeCharges(stack);
-			tooltip.add(ChatFormatting.GREEN + I18n.format("item.info.thanos.charges", new Object[] {charges}));
-		}
 	}
 
 	@Override
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_ITEMS;
 	}
-	
-	public static int thanosGetWholeCharges(ItemStack stack) {
-		int xp = thanosGetXP(stack);
-		return xp / THANOS_XP_PER;
-	}
-	
-	public static void thanosSpendCharge(ItemStack stack) {
-		int xp = thanosGetXP(stack);
-		if (xp >= THANOS_XP_PER)
-			xp -= THANOS_XP_PER;
-		
-		thanosSetXP(stack, xp);
-	}
-	
-	/**
-	 * Returns leftover xp
-	 * @param stack
-	 * @param xp
-	 * @return
-	 */
-	public static int thanosAddXP(ItemStack stack, int xp) {
-		if (stack == null)
-			return xp;
-		
-		int inPendant = thanosGetXP(stack);
-		int space = MAX_THANOS_XP - inPendant;
-		int remaining;
-		if (space >= xp) {
-			inPendant += xp;
-			remaining = 0;
-		} else {
-			inPendant = MAX_THANOS_XP;
-			remaining = xp - space;
-		}
-		
-		thanosSetXP(stack, inPendant);
-		
-		return remaining;
-	}
-	
-	private static void thanosSetXP(ItemStack stack, int xp) {
-		if (stack == null)
-			return;
-		
-		NBTTagCompound nbt = stack.getTagCompound();
-		if (nbt == null)
-			nbt = new NBTTagCompound();
-		
-		nbt.setInteger(NBT_THANOS_XP, xp);
-		stack.setTagCompound(nbt);
-	}
-	
-	public static int thanosGetXP(ItemStack stack) {
-		if (stack == null || !stack.hasTagCompound())
-			return 0;
-		
-		NBTTagCompound nbt = stack.getTagCompound();
-		return nbt.getInteger(NBT_THANOS_XP);
-	}
-
-	@Override
-	public void apply(EntityLivingBase caster, SpellCastSummary summary, ItemStack stack) {
-		if (stack == null)
-			return;
-		
-		ResourceType type = getTypeFromMeta(stack.getMetadata());
-		if (type == ResourceType.PENDANT_WHOLE) {
-			int charges = thanosGetWholeCharges(stack);
-			if (charges > 0) {
-				if (!(caster instanceof EntityPlayer) || !((EntityPlayer) caster).isCreative()) {
-					thanosSpendCharge(stack);
-				}
-				summary.addReagentCost(-1f);
-			}
-		}
-	}
-	
 }

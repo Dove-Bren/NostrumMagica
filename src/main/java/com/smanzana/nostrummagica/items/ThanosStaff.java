@@ -35,7 +35,7 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 		instance().setUnlocalizedName(ID);
 		
 		GameRegistry.addRecipe(new ItemStack(instance), "  T", " S ", "S  ",
-				'T', NostrumResourceItem.getItem(ResourceType.PENDANT_WHOLE, 1), 
+				'T', new ItemStack(ThanoPendant.instance()), 
 				'S', new ItemStack(MageStaff.instance(), 1, 0));
 	}
 	

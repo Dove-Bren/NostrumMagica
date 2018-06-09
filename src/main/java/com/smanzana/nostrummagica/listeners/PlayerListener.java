@@ -10,11 +10,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
 import com.smanzana.nostrummagica.items.EnchantedEquipment;
-import com.smanzana.nostrummagica.items.NostrumResourceItem;
-import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.items.ThanosStaff;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
@@ -809,9 +808,8 @@ public class PlayerListener {
 	private int tryThanos(EntityPlayer player, ItemStack item, int xp) {
 		if (item.getItem() instanceof ThanosStaff) {
 			return ThanosStaff.addXP(item, xp);
-		} else if (item.getItem() == NostrumResourceItem.instance()
-				&& item.getMetadata() == NostrumResourceItem.getMetaFromType(ResourceType.PENDANT_WHOLE)) {
-			return NostrumResourceItem.thanosAddXP(item, xp);
+		} else if (item.getItem() instanceof ThanoPendant) {
+			return ThanoPendant.thanosAddXP(item, xp);
 		}
 		return xp;
 	}

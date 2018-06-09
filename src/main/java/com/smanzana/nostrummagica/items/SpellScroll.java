@@ -30,6 +30,7 @@ import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.RecipeSorter;
 import net.minecraftforge.oredict.RecipeSorter.Category;
 
@@ -37,6 +38,7 @@ public class SpellScroll extends Item implements ILoreTagged {
 
 	private static final String NBT_SPELL = "nostrum_spell";
 	private static final String NBT_WAKE_START = "nostrum_timer";
+	private static final String NBT_TYPE = "nostrum_type";
 	private static final int WAKE_TIME = 20 * 60 * 5;
 	private static SpellScroll instance = null;
 	
@@ -61,6 +63,20 @@ public class SpellScroll extends Item implements ILoreTagged {
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setMaxStackSize(1);
 		this.setHasSubtypes(true);
+		this.setMaxDamage(4);
+	}
+	
+	@Override
+	public String getUnlocalizedName(ItemStack stack) {
+		int i = getNestedScrollMeta(stack);
+		
+		switch (i) {
+		case 1: return "item.spell_scroll_activated";
+		case 2: return "item.spell_scroll_awakened";
+		}
+		
+		
+		return this.getUnlocalizedName();
 	}
 	
 	@Override
@@ -72,7 +88,7 @@ public class SpellScroll extends Item implements ILoreTagged {
 		if (itemStackIn == null)
 			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
 		
-		if (itemStackIn.getMetadata() != 0)
+		if (getNestedScrollMeta(itemStackIn) != 0)
 			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
 		
 		if (!itemStackIn.hasTagCompound())
@@ -88,7 +104,8 @@ public class SpellScroll extends Item implements ILoreTagged {
 			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
 		
 		if (!playerIn.isCreative()) {
-			itemStackIn.stackSize--;
+			//itemStackIn.stackSize--;
+			itemStackIn.damageItem(1, playerIn);
 		}
 
 		if (worldIn.isRemote) {
@@ -136,6 +153,28 @@ public class SpellScroll extends Item implements ILoreTagged {
 			
 		return spell;
 	}
+	
+	public static int getNestedScrollMeta(ItemStack scroll) {
+		byte ret = 0;
+		
+		if (scroll != null && scroll.hasTagCompound()) {
+			NBTTagCompound nbt = scroll.getTagCompound();
+			ret = nbt.getByte(NBT_TYPE);
+		}
+		
+		return ret;
+	}
+	
+	public static void setNestedScrollMeta(ItemStack scroll, byte meta) {
+		if (scroll == null)
+			return;
+		
+		NBTTagCompound nbt = scroll.getTagCompound();
+		if (nbt == null)
+			nbt = new NBTTagCompound();
+		
+		nbt.setByte(NBT_TYPE, meta);
+	}
 
 	@Override
 	public String getLoreKey() {
@@ -163,26 +202,12 @@ public class SpellScroll extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public String getUnlocalizedName(ItemStack stack) {
-		int i = stack.getMetadata();
-		
-		switch (i) {
-		case 1: return "item.spell_scroll_activated";
-		case 2: return "item.spell_scroll_awakened";
-		}
-		
-		
-		return this.getUnlocalizedName();
-	}
-	
-    
-	@Override
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
 		if (stack == null)
 			return;
 		
-		int meta = stack.getMetadata();
+		int meta = getNestedScrollMeta(stack);
 		if (meta == 1) {
 			tooltip.add(ChatFormatting.DARK_BLUE + "Activated");
 		} else if (meta == 2) {
@@ -195,7 +220,7 @@ public class SpellScroll extends Item implements ILoreTagged {
 	public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
 		super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
 		
-		if (stack == null || stack.getMetadata() != 1)
+		if (stack == null || getNestedScrollMeta(stack) != 1)
 			return;
 		
 		NBTTagCompound nbt;
@@ -213,7 +238,7 @@ public class SpellScroll extends Item implements ILoreTagged {
 		}
 		
 		if (worldtime > start + WAKE_TIME) {
-			stack.setItemDamage(2);
+			setNestedScrollMeta(stack, (byte) 2);
 			if (!worldIn.isRemote) {
 				NostrumMagicaSounds.DAMAGE_ENDER.play(worldIn, entityIn.posX, entityIn.posY, entityIn.posZ);
 			}
@@ -228,7 +253,7 @@ public class SpellScroll extends Item implements ILoreTagged {
 				new ItemStack(Items.ENDER_PEARL),
 				new ItemStack(Items.DIAMOND),
 				new ItemStack(Items.ENDER_PEARL),
-				new ItemStack(instance(), 1, 0),
+				new ItemStack(instance(), 1, OreDictionary.WILDCARD_VALUE),
 				new ItemStack(Items.ENDER_PEARL),
 				new ItemStack(Items.DIAMOND),
 				new ItemStack(Items.ENDER_PEARL),
@@ -249,7 +274,8 @@ public class SpellScroll extends Item implements ILoreTagged {
 			}
 			
 			scroll = scroll.copy();
-			scroll.setItemDamage(1);
+			scroll.setItemDamage(0);
+			setNestedScrollMeta(scroll, (byte) 1);
 			return scroll;
 		}
 	}

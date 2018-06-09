@@ -77,10 +77,10 @@ import com.smanzana.nostrummagica.items.SpellTableItem;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.items.SpellcraftGuide;
+import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.items.ThanosStaff;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
-import com.smanzana.nostrummagica.network.messages.ClientCastReplyMessage;
 import com.smanzana.nostrummagica.network.messages.ObeliskTeleportationRequestMessage;
 import com.smanzana.nostrummagica.network.messages.SpellTomeIncrementMessage;
 import com.smanzana.nostrummagica.network.messages.StatRequestMessage;
@@ -384,6 +384,10 @@ public class ClientProxy extends CommonProxy {
     	registerModel(MageStaff.instance(),
     			0,
     			MageStaff.ID);
+    	
+    	registerModel(ThanoPendant.instance(),
+    			0,
+    			ThanoPendant.ID);
 		
 		for (EMagicElement element : EMagicElement.values()) {
 			registerModel(EssenceItem.instance(),
@@ -588,14 +592,13 @@ public class ClientProxy extends CommonProxy {
 				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
 					int count = NostrumMagica.getReagentCount(player, row.getKey());
 					if (count < row.getValue()) {
-						player.addChatMessage(new TextComponentTranslation("info.spell.bad_reagent", row.getKey().getName()));
+						player.addChatMessage(new TextComponentTranslation("info.spell.bad_reagent", row.getKey().prettyName()));
 						return;
 					}
 				}
-				// actually deduct
-				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
-					NostrumMagica.removeReagents(player, row.getKey(), row.getValue());
-				}
+				
+				// Don't actually deduct on client.
+				// Response from server will result in deduct if it goes through
 			}
 			
 			NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer)

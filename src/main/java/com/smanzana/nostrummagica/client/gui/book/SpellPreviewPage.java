@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
 
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -20,6 +22,7 @@ import net.minecraftforge.fml.client.config.GuiUtils;
 public class SpellPreviewPage implements IBookPage {
 
 	private Spell spell;
+	private String description;
 	private List<String> tooltip;
 	
 	public SpellPreviewPage(Spell spell) {
@@ -35,6 +38,8 @@ public class SpellPreviewPage implements IBookPage {
 			
 			tooltip.add(count + " " + type.prettyName());
 		}
+		
+		description = spell.getDescription();
 	}
 	
 	@Override
@@ -42,6 +47,8 @@ public class SpellPreviewPage implements IBookPage {
 
 		yoffset += 5;
 		height -= 5;
+		
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer);
 		
 		GL11.glPushMatrix();
 		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
@@ -52,13 +59,27 @@ public class SpellPreviewPage implements IBookPage {
 		int icony = yoffset + (height / 2) + (-12);
 		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 		elementIcon.draw(parent, fonter, xoffset + 4, icony, 24, 24);
-		fonter.drawString(spell.getName(), xoffset + 32, yoffset + 2, spell.getPrimaryElement().getColor());
-		yoffset += fonter.FONT_HEIGHT + 3;
-		fonter.drawString("Mana: " + spell.getManaCost(), xoffset + 32, yoffset, 0xFF354AA8);
-		yoffset += fonter.FONT_HEIGHT + 3;
-		fonter.drawSplitString(spell.getDescription(), xoffset + 32,
-				yoffset, Math.max(32, width - 32), 0xFF000000);
 		
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(xoffset + 32, yoffset + 2, 0);
+		GlStateManager.scale(.7, .7, 1);
+		
+		fonter.drawString(spell.getName(), 0, 0, spell.getPrimaryElement().getColor());
+		yoffset = fonter.FONT_HEIGHT + 3;
+		fonter.drawString("Mana: " + spell.getManaCost(), 0, yoffset, 0xFF354AA8);
+		yoffset += fonter.FONT_HEIGHT + 3;
+		if (attr != null) {
+			float xp = spell.getXP(true);
+			float perc = xp / attr.getMaxXP();
+			perc *= 100f;
+			fonter.drawString(String.format("XP: %.1f (%03.2f%%)", xp, perc)
+					, 0, yoffset, 0xFF0A3500);
+			yoffset += fonter.FONT_HEIGHT + 3;
+		}
+		fonter.drawSplitString(description, 0,
+				yoffset, width, 0xFF000000);
+		
+		GlStateManager.popMatrix();
 		GL11.glPopMatrix();
 	}
 

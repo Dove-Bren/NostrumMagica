@@ -261,7 +261,7 @@ public class Spell {
 									world, null);
 						}
 					}
-				} else {
+				} else if (locations != null && !locations.isEmpty()) {
 					if (locations.size() == 1) {
 						// Base case here, too. Instantiate trigger!!!!
 						spawnTrigger(next.getTrigger(), null, world, locations.get(0), next.getParam());
@@ -273,6 +273,8 @@ public class Spell {
 									world, Lists.newArrayList(targ));
 						}
 					}
+				} else {
+					// Last trigger couldn't carry us forward
 				}
 								
 			}
@@ -623,7 +625,7 @@ public class Spell {
 		case ICE:
 			return new SpellAction(caster).status(FrostbitePotion.instance(), duration, amp).name("frostbite");
 		case LIGHTNING:
-			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("slowness"), (int) (duration * .7), 5).name("slowness");
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("slowness"), (int) (duration * .7), amp + 1).name("slowness");
 		case WIND:
 			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("poison"), duration, amp).name("poison");
 		}

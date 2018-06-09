@@ -79,14 +79,14 @@ public class ClientCastMessage implements IMessage {
 					// Check if base mana cost exceeds what we can do
 					int cap = SpellTome.getMaxMana(tome);
 					if (cap < cost) {
-						return new ClientCastReplyMessage(false, att.getMana(), 0);
+						return new ClientCastReplyMessage(false, att.getMana(), 0, null);
 					}
 					
 					SpellTome.applyEnhancements(tome, summary, sp);
 					
 				} else {
 					NostrumMagica.logger.warn("Got cast from client with mismatched tome");
-					return new ClientCastReplyMessage(false, att.getMana(), 0);
+					return new ClientCastReplyMessage(false, att.getMana(), 0, null);
 				}
 			}
 			
@@ -114,19 +114,21 @@ public class ClientCastMessage implements IMessage {
 			cost = Math.max(cost, 0);
 			reagentCost = Math.max(reagentCost, 0);
 			
+			Map<ReagentType, Integer> reagents = null;
+			
 			if (!sp.isCreative() && !isScroll) {
 				// Take mana and reagents
 				
 				if (att.getMana() < cost)
-					return new ClientCastReplyMessage(false, att.getMana(), 0.0f);
+					return new ClientCastReplyMessage(false, att.getMana(), 0.0f, null);
 				
 				// Check that the player can cast this
 				if (!NostrumMagica.canCast(spell, att)) {
 					NostrumMagica.logger.warn("Got cast message from client with too low of stats. They should relog...");
-					return new ClientCastReplyMessage(false, att.getMana(), 0);
+					return new ClientCastReplyMessage(false, att.getMana(), 0, null);
 				}
 				
-				Map<ReagentType, Integer> reagents = spell.getRequiredReagents();
+				reagents = spell.getRequiredReagents();
 				
 				// Scan inventory for any applicable discounts
 				
@@ -135,7 +137,7 @@ public class ClientCastMessage implements IMessage {
 					int count = NostrumMagica.getReagentCount(sp, row.getKey());
 					if (count < row.getValue()) {
 						sp.addChatComponentMessage(new TextComponentTranslation("info.spell.bad_reagent", row.getKey().prettyName()));
-						return new ClientCastReplyMessage(false, att.getMana(), 0);
+						return new ClientCastReplyMessage(false, att.getMana(), 0, null);
 					}
 				}
 				// actually deduct
@@ -154,7 +156,7 @@ public class ClientCastMessage implements IMessage {
 			spell.cast(sp, summary.getEfficiency());
 			att.addXP(xp);
 
-			return new ClientCastReplyMessage(true, att.getMana(), xp);
+			return new ClientCastReplyMessage(true, att.getMana(), xp, reagents);
 		}
 
 		private void applyReagentRate(Map<ReagentType, Integer> reagents, float reagentCost) {

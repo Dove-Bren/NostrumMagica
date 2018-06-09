@@ -41,6 +41,7 @@ import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.SpellTomePage;
+import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
 import com.smanzana.nostrummagica.listeners.PlayerListener;
 import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
@@ -759,13 +760,13 @@ public class NostrumMagica implements IMagicListener
 		// Thano Pendant -- tier 3. gold ingot. Paliv + Cerci fragments + 2 mani crystals.
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("thano_infusion",
-					NostrumResourceItem.getItem(ResourceType.PENDANT_WHOLE, 1),
+					new ItemStack(ThanoPendant.instance()),
 					null,
 					new ReagentType[] {ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.MANDRAKE_ROOT, ReagentType.SPIDER_SILK},
 					new ItemStack(Items.GOLD_INGOT),
 					new ItemStack[] {NostrumResourceItem.getItem(ResourceType.PENDANT_LEFT, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), NostrumResourceItem.getItem(ResourceType.PENDANT_RIGHT, 1)},
 					null,
-					new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.PENDANT_WHOLE, 1)))
+					new OutcomeSpawnItem(new ItemStack(ThanoPendant.instance())))
 				);
 		
 		// Obelisk -- tier 3. Vani crystal. Balanced slab, 2 eyes of ender, compass.
@@ -846,7 +847,7 @@ public class NostrumMagica implements IMagicListener
 						new ItemStack(MasteryOrb.instance()),
 						null,
 						new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK},
-						NostrumResourceItem.getItem(ResourceType.PENDANT_WHOLE, 1),
+						new ItemStack(ThanoPendant.instance()),
 						new ItemStack[] {new ItemStack(Items.GOLD_INGOT, 1, OreDictionary.WILDCARD_VALUE), new ItemStack(Items.ENDER_PEARL, 1, OreDictionary.WILDCARD_VALUE), new ItemStack(Items.BLAZE_POWDER, 1, OreDictionary.WILDCARD_VALUE), new ItemStack(Items.GOLD_INGOT, 1, OreDictionary.WILDCARD_VALUE)},
 						new RRequirementQuest("mastery_orb"),
 						new OutcomeSpawnItem(new ItemStack(MasteryOrb.instance())))
@@ -854,31 +855,12 @@ public class NostrumMagica implements IMagicListener
 		
 		// Spell Tome Creation
 		RitualRegistry.instance().addRitual(
-				RitualRecipe.createTier2("tome",
-					new ItemStack(SpellTome.instance()),
-					null,
-					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
-					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
-					null,
-					new OutcomeCreateTome())
-				);
-		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("tome",
 					new ItemStack(SpellTome.instance()),
 					null,
 					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
 					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
-					new ItemStack[] {new ItemStack(SpellTomePage.instance()), null, null, null},
-					null,
-					new OutcomeCreateTome())
-				);
-		RitualRegistry.instance().addRitual(
-				RitualRecipe.createTier3("tome",
-					new ItemStack(SpellTome.instance()),
-					null,
-					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
-					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
-					new ItemStack[] {new ItemStack(SpellTomePage.instance()), null, null, new ItemStack(SpellTomePage.instance())},
+					new ItemStack[] {new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance())},
 					null,
 					new OutcomeCreateTome())
 				);
@@ -898,7 +880,26 @@ public class NostrumMagica implements IMagicListener
 					null,
 					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
 					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
-					new ItemStack[] {new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance())},
+					new ItemStack[] {new ItemStack(SpellTomePage.instance()), null, null, new ItemStack(SpellTomePage.instance())},
+					null,
+					new OutcomeCreateTome())
+				);
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("tome",
+					new ItemStack(SpellTome.instance()),
+					null,
+					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
+					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
+					new ItemStack[] {new ItemStack(SpellTomePage.instance()), null, null, null},
+					null,
+					new OutcomeCreateTome())
+				);
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier2("tome",
+					new ItemStack(SpellTome.instance()),
+					null,
+					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
+					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
 					null,
 					new OutcomeCreateTome())
 				);
@@ -910,7 +911,7 @@ public class NostrumMagica implements IMagicListener
 					null,
 					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.BLACK_PEARL},
 					new ItemStack(SpellTome.instance(), 1, OreDictionary.WILDCARD_VALUE),
-					new ItemStack[] {new ItemStack(Items.GOLD_NUGGET), new ItemStack(SpellScroll.instance()), NostrumResourceItem.getItem(ResourceType.TOKEN, 1), new ItemStack(Items.GOLD_NUGGET)},
+					new ItemStack[] {new ItemStack(Items.GOLD_NUGGET), new ItemStack(SpellScroll.instance(), 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.TOKEN, 1), new ItemStack(Items.GOLD_NUGGET)},
 					null,
 					new OutcomeBindSpell())
 				);
