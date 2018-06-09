@@ -522,7 +522,7 @@ public class NostrumMagica implements IMagicListener
 					SpellRune.getRune(element, 1),
 					null,
 					new ReagentType[] {ReagentType.CRYSTABLOOM, ReagentType.MANDRAKE_ROOT, ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST},
-					EssenceItem.instance().getEssence(element, 1),
+					EssenceItem.getEssence(element, 1),
 					new RRequirementElementMastery(element),
 					new OutcomeSpawnItem(SpellRune.getRune(element, 1)));
 			RitualRegistry.instance().addRitual(recipe);
@@ -831,7 +831,7 @@ public class NostrumMagica implements IMagicListener
 		// Spawn Koids -- tier 3. Kani center. Magic Token, gold, gold, essence
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("koid",
-					EssenceItem.instance().getEssence(EMagicElement.ENDER, 1),	
+					EssenceItem.getEssence(EMagicElement.ENDER, 1),	
 					null,
 					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.GRAVE_DUST},
 					NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1),
