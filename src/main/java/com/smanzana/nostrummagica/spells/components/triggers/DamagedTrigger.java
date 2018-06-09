@@ -112,5 +112,15 @@ public class DamagedTrigger extends SpellTrigger {
 	public ItemStack[] supportedFloatCosts() {
 		return null;
 	}
+
+	@Override
+	public String supportedBooleanName() {
+		return null;
+	}
+
+	@Override
+	public String supportedFloatName() {
+		return null;
+	}
 	
 }

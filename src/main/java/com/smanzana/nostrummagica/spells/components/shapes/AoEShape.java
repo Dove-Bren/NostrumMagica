@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
@@ -19,7 +20,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class AoEShape extends SpellShape {
 
@@ -120,7 +120,7 @@ public class AoEShape extends SpellShape {
 		if (costs == null) {
 			costs = new ItemStack[] {
 				null,
-				new ItemStack(Blocks.REDSTONE_BLOCK, 1, OreDictionary.WILDCARD_VALUE),
+				new ItemStack(Blocks.REDSTONE_BLOCK, 1, 0),
 				NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1),
 				NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
 			};
@@ -128,4 +128,14 @@ public class AoEShape extends SpellShape {
 		return costs;
 	}
 
+	@Override
+	public String supportedBooleanName() {
+		return null;
+	}
+
+	@Override
+	public String supportedFloatName() {
+		return I18n.format("modification.aoe.name", (Object[]) null);
+	}
+	
 }

@@ -76,4 +76,14 @@ public class SingleShape extends SpellShape {
 		return null;
 	}
 
+	@Override
+	public String supportedBooleanName() {
+		return null;
+	}
+
+	@Override
+	public String supportedFloatName() {
+		return null;
+	}
+
 }

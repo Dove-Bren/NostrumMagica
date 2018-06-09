@@ -127,6 +127,12 @@ public abstract class SpellTrigger {
 	public abstract boolean supportsBoolean();
 	
 	/**
+	 * Display name for the boolean option.
+	 * @return
+	 */
+	public abstract String supportedBooleanName();
+	
+	/**
 	 * If this shape supports float values in its SpellPartParams, which floats are
 	 * accepted.
 	 * @return
@@ -140,4 +146,9 @@ public abstract class SpellTrigger {
 	 * @return
 	 */
 	public abstract ItemStack[] supportedFloatCosts();
+	
+	/**
+	 * Display name for the float option. Should be translated already
+	 */
+	public abstract String supportedFloatName();
 }

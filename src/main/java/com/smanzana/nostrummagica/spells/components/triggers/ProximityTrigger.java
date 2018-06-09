@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -150,6 +151,16 @@ public class ProximityTrigger extends SpellTrigger {
 			};
 		}
 		return costs;
+	}
+
+	@Override
+	public String supportedBooleanName() {
+		return null;
+	}
+
+	@Override
+	public String supportedFloatName() {
+		return I18n.format("modification.proximity.name", (Object[]) null);
 	}
 	
 }

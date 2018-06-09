@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -119,6 +120,16 @@ public class DelayTrigger extends SpellTrigger {
 			};
 		}
 		return costs;
+	}
+
+	@Override
+	public String supportedBooleanName() {
+		return null;
+	}
+
+	@Override
+	public String supportedFloatName() {
+		return I18n.format("modification.delay.name", (Object[]) null);
 	}
 	
 }

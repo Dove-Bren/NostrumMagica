@@ -86,6 +86,8 @@ public class ModificationTableGui {
 		protected boolean runeMode;
 		protected boolean hasBool;
 		protected boolean hasFloat;
+		protected String floatTitle;
+		protected String boolTitle;
 		
 		public ModificationTableContainer(EntityPlayer player, IInventory playerInv, ModificationTableEntity tableInventory, BlockPos pos) {
 			this.inventory = tableInventory;
@@ -108,21 +110,41 @@ public class ModificationTableGui {
 					if (stack != null && stack.getItem() instanceof SpellRune) {
 						SpellPartParam params = SpellRune.getPieceParam(stack);
 						SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
-						if (comp.getTrigger().supportedFloats() != null) {
-							float[] vals = comp.getTrigger().supportedFloats();
-							int i = 0;
-							for (float val : vals) {
-								if (val == params.level) {
-									floatIndex = i;
-									break;
-								}
-								i++;
-									
-							}
-						}
 						
-						if (comp.getTrigger().supportsBoolean()) {
-							boolIndex = params.flip;
+						if (comp.isTrigger()) {
+							if (comp.getTrigger().supportedFloats() != null) {
+								float[] vals = comp.getTrigger().supportedFloats();
+								int i = 0;
+								for (float val : vals) {
+									if (val == params.level) {
+										floatIndex = i;
+										break;
+									}
+									i++;
+										
+								}
+							}
+							
+							if (comp.getTrigger().supportsBoolean()) {
+								boolIndex = params.flip;
+							}
+						} else if (comp.isShape()) {
+							if (comp.getShape().supportedFloats() != null) {
+								float[] vals = comp.getShape().supportedFloats();
+								int i = 0;
+								for (float val : vals) {
+									if (val == params.level) {
+										floatIndex = i;
+										break;
+									}
+									i++;
+										
+								}
+							}
+							
+							if (comp.getShape().supportsBoolean()) {
+								boolIndex = params.flip;
+							}
 						}
 					}
 					
@@ -251,10 +273,18 @@ public class ModificationTableGui {
 				
 				if (component.isTrigger()) {
 					hasBool = component.getTrigger().supportsBoolean();
+					if (hasBool)
+						boolTitle = component.getTrigger().supportedBooleanName();
 					hasFloat = component.getTrigger().supportedFloats() != null;
+					if (hasFloat)
+						floatTitle = component.getTrigger().supportedFloatName();
 				} else {
 					hasBool = component.getShape().supportsBoolean();
+					if (hasBool)
+						boolTitle = component.getShape().supportedBooleanName();
 					hasFloat = component.getShape().supportedFloats() != null;
+					if (hasFloat)
+						floatTitle = component.getShape().supportedFloatName();
 				}
 				
 				this.isValid = true;
@@ -403,22 +433,22 @@ public class ModificationTableGui {
 				y = verticalMargin + PANEL_VOFFSET + 20;
 				x = horizontalMargin + PANEL_HOFFSET + 5;
 				if (container.hasBool) {
-					mc.fontRendererObj.drawStringWithShadow("Bool:", x, y, 0xFFa0a0a0);
+					mc.fontRendererObj.drawStringWithShadow(container.boolTitle, x, y, 0xFFa0a0a0);
 					
 					
 					
-					y += 20;
+					y += 25;
 				}
 				
 				if (container.hasFloat) {
-					mc.fontRendererObj.drawStringWithShadow("Float:", x, y, 0xFFa0a0a0);
+					mc.fontRendererObj.drawStringWithShadow(container.floatTitle, x, y, 0xFFa0a0a0);
 					
-					y += 20;
+					y += 25;
 				}
 			} else {
 				// Draw tome info
 				int x, y;
-				y = PANEL_VOFFSET + 10;
+				y = verticalMargin + PANEL_VOFFSET + 10;
 				ItemStack tome = container.inventory.getMainSlot();
 				if (tome != null) {
 					String name = tome.getDisplayName();
@@ -617,7 +647,7 @@ public class ModificationTableGui {
 			
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
-			int y = verticalMargin + PANEL_VOFFSET + 20;
+			int y = verticalMargin + PANEL_VOFFSET + 33;
 			int x = horizontalMargin + PANEL_HOFFSET + 50;
 			
 			if (container.inventory.getMainSlot() != null) {
@@ -625,7 +655,7 @@ public class ModificationTableGui {
 					this.addButton(new ToggleButton(buttonID++, x, y, false, container));
 					this.addButton(new ToggleButton(buttonID++, x + 15, y, true, container));
 					
-					y += 20;
+					y += 25;
 				}
 				if (container.hasFloat) {
 					SpellComponentWrapper component = SpellRune.toComponentWrapper(container.inventory.getMainSlot());

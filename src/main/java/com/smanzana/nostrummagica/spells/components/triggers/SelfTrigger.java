@@ -72,5 +72,15 @@ public class SelfTrigger extends InstantTrigger {
 	public ItemStack[] supportedFloatCosts() {
 		return null;
 	}
+
+	@Override
+	public String supportedBooleanName() {
+		return null;
+	}
+
+	@Override
+	public String supportedFloatName() {
+		return null;
+	}
 	
 }

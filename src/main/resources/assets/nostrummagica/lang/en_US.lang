@@ -784,4 +784,14 @@ spellcraft.finishing_info=After constructing a sequence of runes, you must name 
 spellcraft.problems=Problems
 spellcraft.problems_info=There are some requirements when creating a spell. Firstly, all spells must start with a trigger. Spells must contain at least one shape that has an element associated with it. Spells must have a name. Lastly, you must have enough reagents in the table's reagent slots to pay for the spell. If all of these are true, the submit button will be activated. If not, however, the error indicator will display a red X and the problems will be listed.
 
+modification.aoe.name=Effect Radius
+modification.chain.name=Jumps
+modification.proximity.name=Radius
+modification.mana.name=Mana Level
+modification.health.name=Health Level
+modification.food.name=Food Level
+modification.delay.name=Delay (seconds)
+
+modification.level.flip=Trigger When Above
+
 nei.category.ritual.name=Nostrum Ritual

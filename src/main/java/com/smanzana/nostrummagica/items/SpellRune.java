@@ -326,12 +326,12 @@ public class SpellRune extends Item implements ILoreTagged {
 			SpellPartParam params = getPieceParam(stack);
 			SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
 			if (comp.getTrigger().supportsBoolean() && params.flip) {
-				tooltip.add("Flip: On");
+				tooltip.add(comp.getTrigger().supportedBooleanName() + ": On");
 			}
 			if (comp.getTrigger().supportedFloats() != null) {
 				float[] vals = comp.getTrigger().supportedFloats();
 				if (params.level != vals[0])
-					tooltip.add("Level: " + params.level);
+					tooltip.add(comp.getTrigger().getDisplayName() + ": " + params.level);
 			}
 			
 		} else {
@@ -345,6 +345,17 @@ public class SpellRune extends Item implements ILoreTagged {
 			EAlteration alteration = getPieceShapeAlteration(stack);
 			if (alteration != null)
 				tooltip.add(TextFormatting.AQUA + alteration.getName() + TextFormatting.RESET);
+			
+			SpellPartParam params = getPieceParam(stack);
+			SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
+			if (comp.getShape().supportsBoolean() && params.flip) {
+				tooltip.add(comp.getShape().supportedBooleanName() + ": On");
+			}
+			if (comp.getShape().supportedFloats() != null) {
+				float[] vals = comp.getShape().supportedFloats();
+				if (params.level != vals[0])
+					tooltip.add(comp.getShape().getDisplayName() + ": " + params.level);
+			}
 		}
 		
 	}

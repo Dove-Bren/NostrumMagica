@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -137,6 +138,16 @@ public class FoodTrigger extends SpellTrigger {
 			};
 		}
 		return costs;
+	}
+
+	@Override
+	public String supportedBooleanName() {
+		return I18n.format("modification.level.flip", (Object[]) null);
+	}
+
+	@Override
+	public String supportedFloatName() {
+		return I18n.format("modification.food.name", (Object[]) null);
 	}
 	
 }
