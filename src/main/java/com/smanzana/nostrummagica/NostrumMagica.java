@@ -721,6 +721,18 @@ public class NostrumMagica implements IMagicListener
 					new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.TOKEN, 1)))
 				);
 		
+		// magic token x 3 -- tier 3. 9 reagents.
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("magic_token_3",
+					NostrumResourceItem.getItem(ResourceType.TOKEN, 3),
+					null,
+					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.CRYSTABLOOM, ReagentType.GINSENG, ReagentType.GRAVE_DUST},
+					ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1),
+					new ItemStack[] {ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1), ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1), ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1), ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1)},
+					null,
+					new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.TOKEN, 3)))
+				);
+		
 		// fierce slab -- tier 3. Kani crystal. Fire + Wind gems
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("fierce_infusion",

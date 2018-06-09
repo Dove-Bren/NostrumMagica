@@ -349,6 +349,7 @@ public class CommonProxy {
     	
     	EssenceItem.instance().setRegistryName(NostrumMagica.MODID, EssenceItem.ID);
     	GameRegistry.register(EssenceItem.instance());
+    	EssenceItem.init();
     	
     	MageStaff.instance().setRegistryName(NostrumMagica.MODID, MageStaff.ID);
     	GameRegistry.register(MageStaff.instance());

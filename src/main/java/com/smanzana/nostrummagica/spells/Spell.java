@@ -482,13 +482,13 @@ public class Spell {
 			if (part.isTrigger())
 				cost += multiplier * (float) part.getTrigger().getManaCost();
 			else {
-				cost += multiplier * 15f;
+				cost += multiplier * 10f;
 				if (part.getElementCount() > 1)
-					cost += multiplier * (float) (30 * (part.getElementCount() - 1));
+					cost += multiplier * (float) (20 * (part.getElementCount() - 1));
 				if (part.getAlteration() != null)
 					cost += multiplier * (float) part.getAlteration().getCost();
 			}
-			multiplier *= 1.2;
+			multiplier *= 1.1;
 		}
 		
 		manaCost = (int) Math.ceil(cost);
@@ -544,7 +544,7 @@ public class Spell {
 		
 		for (SpellPart part : parts) {
 			if (part.isTrigger())
-				total += 2f;
+				total += 3f;
 			else {
 				total += 1f;
 				if (part.getElementCount() > 1)

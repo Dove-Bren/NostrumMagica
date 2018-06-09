@@ -93,7 +93,9 @@ public class SpellRegistry {
 	}
 	
 	public Spell lookup(int id) {
-		return registry.get(id);
+		synchronized(this) {
+			return registry.get(id);
+		}
 	}
 	
 	public void loadFromNBT(NBTTagCompound nbt) {
@@ -129,7 +131,9 @@ public class SpellRegistry {
 	}
 
 	public List<Spell> getAllSpells() {
-		return Lists.newArrayList(registry.values());
+		synchronized(this) {
+			return Lists.newArrayList(registry.values());
+		}
 	}
 
 	public void clear() {

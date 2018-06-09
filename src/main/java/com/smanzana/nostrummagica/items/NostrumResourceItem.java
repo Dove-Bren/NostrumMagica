@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
@@ -64,8 +65,9 @@ public class NostrumResourceItem extends Item implements ILoreTagged {
 	public static void init() {
 		// Only thing with regular crafting recipe is small crystal
 		
-		GameRegistry.addRecipe(getItem(ResourceType.CRYSTAL_SMALL, 1), " RR", "RDR", "RR ",
+		GameRegistry.addRecipe(getItem(ResourceType.CRYSTAL_SMALL, 1), " MR", "MDM", "RM ",
 				'D', Items.DIAMOND,
+				'M', ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1),
 				'R', new ItemStack(ReagentItem.instance(), 1, OreDictionary.WILDCARD_VALUE));
 	}
 	

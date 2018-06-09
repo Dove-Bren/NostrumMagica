@@ -325,12 +325,13 @@ public class SpellRune extends Item implements ILoreTagged {
 			
 			SpellPartParam params = getPieceParam(stack);
 			SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
+			
 			if (comp.getTrigger().supportsBoolean() && params.flip) {
 				tooltip.add(comp.getTrigger().supportedBooleanName() + ": On");
 			}
 			if (comp.getTrigger().supportedFloats() != null) {
 				float[] vals = comp.getTrigger().supportedFloats();
-				if (params.level != vals[0])
+				if (params.level != 0f && params.level != vals[0])
 					tooltip.add(comp.getTrigger().getDisplayName() + ": " + params.level);
 			}
 			
@@ -353,7 +354,7 @@ public class SpellRune extends Item implements ILoreTagged {
 			}
 			if (comp.getShape().supportedFloats() != null) {
 				float[] vals = comp.getShape().supportedFloats();
-				if (params.level != vals[0])
+				if (params.level != 0f && params.level != vals[0])
 					tooltip.add(comp.getShape().getDisplayName() + ": " + params.level);
 			}
 		}

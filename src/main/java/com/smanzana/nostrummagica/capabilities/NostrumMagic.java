@@ -49,7 +49,7 @@ public class NostrumMagic implements INostrumMagic {
 		private static final float manaBase = 100.0f;
 		
 		public static float maxXP(int level) {
-			return (float) (xpBase * Math.pow(xpGrowth, level));
+			return (float) (xpBase * Math.pow(xpGrowth, level - 1));
 		}
 		
 		public static int maxMana(int level) {

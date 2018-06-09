@@ -11,8 +11,10 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.oredict.OreDictionary;
 
 public class EssenceItem extends Item implements ILoreTagged {
 
@@ -24,6 +26,26 @@ public class EssenceItem extends Item implements ILoreTagged {
 			instance = new EssenceItem();
 		
 		return instance;
+	}
+	
+	public static void init() {
+		GameRegistry.addShapelessRecipe(InfusedGemItem.instance().getGem(null, 1),
+				getEssence(EMagicElement.EARTH, 1),
+				getEssence(EMagicElement.ENDER, 1),
+				getEssence(EMagicElement.FIRE, 1),
+				getEssence(EMagicElement.ICE, 1),
+				getEssence(EMagicElement.LIGHTNING, 1),
+				getEssence(EMagicElement.PHYSICAL, 1),
+				getEssence(EMagicElement.WIND, 1));
+		
+		EMagicElement[] all = EMagicElement.values();
+		EMagicElement last = all[all.length - 1];
+		for (EMagicElement element : all) {
+			GameRegistry.addShapelessRecipe(getEssence(element, 1),
+					getEssence(last, 1),
+					new ItemStack(instance(), 1, OreDictionary.WILDCARD_VALUE));
+			last = element;
+		}
 	}
 	
 	public EssenceItem() {
@@ -89,9 +111,9 @@ public class EssenceItem extends Item implements ILoreTagged {
     	return ret;
     }
     
-    public ItemStack getEssence(EMagicElement element, int count) {
+    public static ItemStack getEssence(EMagicElement element, int count) {
     	int meta = element.ordinal();
-    	return new ItemStack(this, count, meta);
+    	return new ItemStack(instance(), count, meta);
     }
     
 	@Override
