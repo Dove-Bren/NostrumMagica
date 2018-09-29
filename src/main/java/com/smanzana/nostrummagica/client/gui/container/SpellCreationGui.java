@@ -21,6 +21,7 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellCraftMessage;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.Spell.SpellPart;
+import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -124,6 +125,11 @@ public class SpellCreationGui {
 					
 					super.onPickupFromSlot(playerIn, stack);
 				}
+				
+				@Override
+				public int getSlotStackLimit() {
+					return 1;
+				}
 			});
 			
 			RuneSlot prev = null, cur;
@@ -187,39 +193,111 @@ public class SpellCreationGui {
 		
 		@Override
 		public ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
-			ItemStack prev = null;	
 			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
 			
 			if (slot != null && slot.getHasStack()) {
 				ItemStack cur = slot.getStack();
-				prev = cur.copy();
 				
-				
-				
-//				if (fromSlot == mySlot) {
-//					// This is going FROM Brazier to player
-//					if (!this.mergeItemStack(cur, 1, 11, true))
-//						return null;
-//					else
-//						// From Player TO Brazier
-//						if (!this.mergeItemStack(cur, 0, 0, false)) {
-//							return null;
-//						}
-//				}
-				
-				if (cur.stackSize == 0) {
-					slot.putStack((ItemStack) null);
+				if (slot.inventory == this.inventory) {
+					// Trying to take from the table
+					ItemStack dupe = cur.copy();
+					if (playerIn.inventory.addItemStackToInventory(dupe)) {
+						slot.putStack(null);
+						slot.onPickupFromSlot(playerIn, dupe);
+					}
 				} else {
-					slot.onSlotChanged();
+					// Trying to add an item
+					if (cur.getItem() instanceof ReagentItem) {
+						// Adding a reagent. Try to add to reagent spots
+						
+						// Try to add to existing
+						for (int i = 0; i < inventory.getReagentSlotCount(); i++) {
+							ItemStack stack = inventory.getStackInSlot(i + inventory.getReagentSlotIndex());
+							if (stack == null || stack.getItem() != cur.getItem()
+									|| stack.getMetadata() != cur.getMetadata())
+								continue;
+							Slot reagentSlot = this.getSlot(i + inventory.getReagentSlotIndex());
+							
+							int maxsize = Math.min(stack.getMaxStackSize(), reagentSlot.getSlotStackLimit());
+							int room = maxsize - stack.stackSize;
+							if (room >= cur.stackSize) {
+								stack.stackSize += cur.stackSize;
+								cur.stackSize = 0;
+							} else {
+								cur.stackSize -= room;
+								stack.stackSize = maxsize;
+							}
+							
+							if (cur.stackSize <= 0)
+								break;
+						}
+						
+						// If still ahve items, add to empty slots
+						if (cur.stackSize > 0)
+						for (int i = 0; i < inventory.getReagentSlotCount(); i++) {
+							ItemStack stack = inventory.getStackInSlot(i + inventory.getReagentSlotIndex());
+							if (stack != null)
+								continue;
+							Slot reagentSlot = this.getSlot(i + inventory.getReagentSlotIndex());
+							
+							int maxsize = reagentSlot.getSlotStackLimit();
+							if (maxsize >= cur.stackSize) {
+								reagentSlot.putStack(cur.copy());
+								cur.stackSize = 0;
+							} else {
+								reagentSlot.putStack(cur.splitStack(maxsize));
+							}
+							
+							if (cur.stackSize <= 0)
+								break;
+						}
+					} else if (cur.getItem() instanceof BlankScroll) {
+						ItemStack existing = inventory.getStackInSlot(inventory.getScrollSlotIndex());
+						if (existing == null) {
+							inventory.setInventorySlotContents(inventory.getScrollSlotIndex(),
+									cur.splitStack(1));
+							this.validate();
+						}
+					} else if (cur.getItem() instanceof SpellRune) {
+						// Only allow adding if blank scroll is in place
+						ItemStack scroll = inventory.getStackInSlot(inventory.getScrollSlotIndex());
+						if (scroll == null || !(scroll.getItem() instanceof BlankScroll)) {
+							// Do nothing
+						} else if (null != inventory.getStackInSlot(inventory.getRuneSlotIndex() + inventory.getRuneSlotCount() - 1)) {
+							// If something's in last slot, we're full
+							// Table will naturally shift things down
+						} else {
+							// If this is anything but shape or trigger, do nothing
+							SpellComponentWrapper wrapper = SpellRune.toComponentWrapper(cur);
+							boolean add = false;
+							if (wrapper.isTrigger()) {
+								// Can always add triggers
+								add = true;
+							} else if (wrapper.isShape()) {
+								// Must have a trigger in first slot already
+								if (null != inventory.getStackInSlot(inventory.getRuneSlotIndex()))
+									add = true;
+							}
+							
+							if (add) {
+								int index = inventory.getRuneSlotIndex();
+								while (inventory.getStackInSlot(index) != null)
+									index++;
+								
+								inventory.setInventorySlotContents(index, cur.copy());
+								cur = null;
+								this.validate();
+							}
+						}
+					}
 				}
 				
-				if (cur.stackSize == prev.stackSize) {
-					return null;
+				if (cur == null || cur.stackSize <= 0) {
+					slot.putStack(null);
 				}
-				slot.onPickupFromSlot(playerIn, cur);
 			}
 			
-			return prev;
+			return null;
 		}
 		
 		@Override
@@ -456,12 +534,7 @@ public class SpellCreationGui {
 			
 			int x = (width - MESSAGE_WIDTH) / 2;
 			int y = verticalMargin + MESSAGE_DISPLAY_VOFFSET;
-			if (!container.isValid) {
-				Gui.drawModalRectWithCustomSizedTexture(x, y,
-						MESSAGE_VALID_HOFFSET, MESSAGE_VALID_VOFFSET,
-						MESSAGE_WIDTH, MESSAGE_HEIGHT,
-						256, 256);
-			} else {
+			if (container.isValid) {
 				
 				GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 				x = horizontalMargin + STATUS_DISP_HOFFSET;
@@ -538,6 +611,18 @@ public class SpellCreationGui {
 					this.drawHoveringText(container.reagentStrings,
 							mouseX - horizontalMargin, mouseY - verticalMargin);
 				}
+			}
+			
+			if (!container.isValid) {
+				GlStateManager.pushMatrix();
+				GlStateManager.translate(0, 0, 500);
+				mc.getTextureManager().bindTexture(TEXT);
+				Gui.drawModalRectWithCustomSizedTexture((GUI_WIDTH - MESSAGE_WIDTH) / 2,
+						MESSAGE_DISPLAY_VOFFSET,
+						MESSAGE_VALID_HOFFSET, MESSAGE_VALID_VOFFSET,
+						MESSAGE_WIDTH, MESSAGE_HEIGHT,
+						256, 256);
+				GlStateManager.popMatrix();
 			}
 			
 		}
@@ -730,6 +815,7 @@ public class SpellCreationGui {
 			// Which means we just look to see if we have an item.
 			// If not, take item from next
 			if (!this.getHasStack() && next != null && next.getHasStack()) {
+				System.out.println("grabbing stack");
 				this.putStack(next.getStack().copy());
 				next.putStack(null);
 				next.onPickupFromSlot(playerIn, this.getStack());

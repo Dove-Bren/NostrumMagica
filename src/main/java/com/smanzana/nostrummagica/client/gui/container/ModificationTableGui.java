@@ -4,7 +4,6 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.ModificationTable.ModificationTableEntity;
-import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.SpellTomePage;
@@ -23,7 +22,6 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
@@ -86,8 +84,7 @@ public class ModificationTableGui {
 		protected boolean runeMode;
 		protected boolean hasBool;
 		protected boolean hasFloat;
-		protected String floatTitle;
-		protected String boolTitle;
+		protected SpellComponentWrapper component;
 		
 		public ModificationTableContainer(EntityPlayer player, IInventory playerInv, ModificationTableEntity tableInventory, BlockPos pos) {
 			this.inventory = tableInventory;
@@ -173,52 +170,40 @@ public class ModificationTableGui {
 				this.addSlotToContainer(new Slot(playerInv, x, PLAYER_INV_HOFFSET + x * 18, 58 + (PLAYER_INV_VOFFSET)));
 			}
 			
-			// isValid means there's something that can accept a spell
-			// in the tome slot. Is there?
-			isValid = false;
-			ItemStack stack = this.inventory.getStackInSlot(0);
-			if (stack != null && stack.getItem() instanceof BlankScroll)
-				isValid = true;
-			
 			validate();
-			
 		}
 		
 		@Override
 		public ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
-			ItemStack prev = null;	
 			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
 			
 			if (slot != null && slot.getHasStack()) {
 				ItemStack cur = slot.getStack();
-				prev = cur.copy();
 				
-				
-				
-//				if (fromSlot == mySlot) {
-//					// This is going FROM Brazier to player
-//					if (!this.mergeItemStack(cur, 1, 11, true))
-//						return null;
-//					else
-//						// From Player TO Brazier
-//						if (!this.mergeItemStack(cur, 0, 0, false)) {
-//							return null;
-//						}
-//				}
-				
-				if (cur.stackSize == 0) {
-					slot.putStack((ItemStack) null);
+				if (slot.inventory == this.inventory) {
+					// Trying to take our items
+					if (playerIn.inventory.addItemStackToInventory(cur)) {
+						slot.putStack(null);
+						slot.onPickupFromSlot(playerIn, cur);
+					}
 				} else {
-					slot.onSlotChanged();
+					// Trying to add an item
+					Slot mainSlot = this.getSlot(0);
+					if (!mainSlot.getHasStack()) {
+						if (mainSlot.isItemValid(cur))
+							mainSlot.putStack(cur.splitStack(1));
+					} else if (!inputSlot.getHasStack()) {
+						if (inputSlot.isItemValid(cur))
+							inputSlot.putStack(cur.splitStack(1));
+					}
 				}
 				
-				if (cur.stackSize == prev.stackSize) {
-					return null;
+				if (cur == null || cur.stackSize <= 0) {
+					slot.putStack(null);
 				}
-				slot.onPickupFromSlot(playerIn, cur);
 			}
 			
-			return prev;
+			return null;
 		}
 		
 		@Override
@@ -229,18 +214,6 @@ public class ModificationTableGui {
 		@Override
 		public boolean canInteractWith(EntityPlayer playerIn) {
 			return true;
-		}
-		
-		@Override
-		public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, EntityPlayer player) {
-			ItemStack ret = super.slotClick(slotId, dragType, clickTypeIn, player);
-			
-//			isValid = false;
-//			ItemStack stack = this.inventory.getStackInSlot(0);
-//			if (stack != null && (stack.getItem() instanceof SpellTome || stack.getItem() instanceof BlankScroll))
-//				isValid = true;
-			
-			return ret;
 		}
 		
 		public void validate() {
@@ -254,11 +227,12 @@ public class ModificationTableGui {
 			if (inventory.getMainSlot().getItem() instanceof SpellTome) {
 				this.runeMode = false;
 				ItemStack inputItem = inputSlot.getStack();
-				if (inputItem == null || !(inputItem.getItem() instanceof SpellTomePage)) {
+				isValid = (SpellTome.getModifications(inventory.getMainSlot()) > 0);
+				if (!isValid || inputItem == null || !(inputItem.getItem() instanceof SpellTomePage)) {
 					this.isValid = false;
 				}
 				
-				isValid = (SpellTome.getModifications(inventory.getMainSlot()) > 0);
+				
 				inputSlot.setRequired(null);
 				return;
 			}
@@ -266,25 +240,17 @@ public class ModificationTableGui {
 			if (inventory.getMainSlot().getItem() instanceof SpellRune) {
 				this.runeMode = true;
 				SpellComponentWrapper component = SpellRune.toComponentWrapper(inventory.getMainSlot());
-				
+				this.component = component;
 				hasBool = false;
 				hasFloat = false;
 				boolean hasChange = false;
 				
 				if (component.isTrigger()) {
 					hasBool = component.getTrigger().supportsBoolean();
-					if (hasBool)
-						boolTitle = component.getTrigger().supportedBooleanName();
 					hasFloat = component.getTrigger().supportedFloats() != null;
-					if (hasFloat)
-						floatTitle = component.getTrigger().supportedFloatName();
 				} else {
 					hasBool = component.getShape().supportsBoolean();
-					if (hasBool)
-						boolTitle = component.getShape().supportedBooleanName();
 					hasFloat = component.getShape().supportedFloats() != null;
-					if (hasFloat)
-						floatTitle = component.getShape().supportedFloatName();
 				}
 				
 				this.isValid = true;
@@ -433,15 +399,23 @@ public class ModificationTableGui {
 				y = verticalMargin + PANEL_VOFFSET + 20;
 				x = horizontalMargin + PANEL_HOFFSET + 5;
 				if (container.hasBool) {
-					mc.fontRendererObj.drawStringWithShadow(container.boolTitle, x, y, 0xFFa0a0a0);
-					
-					
+					String boolTitle;
+					if (container.component.isTrigger())
+						boolTitle = container.component.getTrigger().supportedBooleanName();
+					else
+						boolTitle = container.component.getShape().supportedBooleanName();
+					mc.fontRendererObj.drawStringWithShadow(boolTitle, x, y, 0xFFa0a0a0);
 					
 					y += 25;
 				}
 				
 				if (container.hasFloat) {
-					mc.fontRendererObj.drawStringWithShadow(container.floatTitle, x, y, 0xFFa0a0a0);
+					String floatTitle;
+					if (container.component.isTrigger())
+						floatTitle = container.component.getTrigger().supportedFloatName();
+					else
+						floatTitle = container.component.getShape().supportedFloatName();
+					mc.fontRendererObj.drawStringWithShadow(floatTitle, x, y, 0xFFa0a0a0);
 					
 					y += 25;
 				}
@@ -518,6 +492,34 @@ public class ModificationTableGui {
 					GlStateManager.popMatrix();
 				}
 			}
+			
+			if (container.inventory.getMainSlot() == null) {
+				ItemStack display;
+				if ((Minecraft.getSystemTime() / 1000) % 2 == 0) {
+					display = new ItemStack(SpellTome.instance());
+				} else {
+					display = SpellRune.getRune(AoEShape.instance());
+				}
+				
+				GlStateManager.pushMatrix();
+				GlStateManager.translate(0, 0, -100);
+				mc.getRenderItem().renderItemIntoGUI(display,
+						horizontalMargin + SLOT_MAIN_HOFFSET,
+						verticalMargin + SLOT_MAIN_VOFFSET);
+				GlStateManager.popMatrix();
+				
+				int color = 0x55FFFFFF;
+				GlStateManager.pushMatrix();
+				GlStateManager.translate(0, 0, 1);
+				Gui.drawRect(
+						horizontalMargin + SLOT_MAIN_HOFFSET,
+						verticalMargin + SLOT_MAIN_VOFFSET,
+						horizontalMargin + SLOT_MAIN_HOFFSET + 16,
+						verticalMargin + SLOT_MAIN_VOFFSET + 16,
+						color);
+				GlStateManager.popMatrix();
+			}
+			
 			if (!container.isValid) {
 				int color = 0x55FFFFFF;
 				if ((container.inputSlot.required != null && container.inputSlot.getHasStack())
@@ -572,33 +574,6 @@ public class ModificationTableGui {
 //					this.drawHoveringText(container.reagentStrings,
 //							mouseX - horizontalMargin, mouseY - verticalMargin);
 //				}
-			}
-			
-			if (container.inventory.getMainSlot() == null) {
-				ItemStack display;
-				if ((Minecraft.getSystemTime() / 1000) % 2 == 0) {
-					display = new ItemStack(SpellTome.instance());
-				} else {
-					display = SpellRune.getRune(AoEShape.instance());
-				}
-				
-				GlStateManager.pushMatrix();
-				GlStateManager.translate(0, 0, -100);
-				mc.getRenderItem().renderItemIntoGUI(display,
-						SLOT_MAIN_HOFFSET,
-						SLOT_MAIN_VOFFSET);
-				GlStateManager.popMatrix();
-				
-				int color = 0x55FFFFFF;
-				GlStateManager.pushMatrix();
-				GlStateManager.translate(0, 0, 1);
-				Gui.drawRect(
-						SLOT_MAIN_HOFFSET,
-						SLOT_MAIN_VOFFSET,
-						SLOT_MAIN_HOFFSET + 16,
-						SLOT_MAIN_VOFFSET + 16,
-						color);
-				GlStateManager.popMatrix();
 			}
 			
 		}

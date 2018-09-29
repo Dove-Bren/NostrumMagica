@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 
 public interface INostrumMagic {
@@ -68,7 +69,7 @@ public interface INostrumMagic {
 	public Spell getBindingSpell();
 	public int getBindingID();
 	public void startBinding(Spell spell, SpellComponentWrapper component, int tomeID);
-	public void completeBinding();
+	public void completeBinding(ItemStack tome); // if tome == null, will require it be in player inventory
 	
 	// Lore
 	public boolean hasLore(ILoreTagged tagged);

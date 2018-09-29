@@ -23,10 +23,20 @@ import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
 public class KoidTask extends EntityAIBase {
+	
+	public static final class Vec2f {
+		public float pitch;
+		public float yaw;
+		
+		public Vec2f(float pitch, float yaw) {
+			this.pitch = pitch;
+			this.yaw = yaw;
+		}
+	}
 
 	private static Map<EMagicElement, List<Spell>> rangedSpells;
 	private static Map<EMagicElement, List<Spell>> meleeSpells;
@@ -614,7 +624,20 @@ public class KoidTask extends EntityAIBase {
 	}
 
 	private static Vec3d getForward(EntityLivingBase entity) {
-		return Vec3d.fromPitchYawVector(getPitchYaw(entity));
+		return fromPitchYawVector(getPitchYaw(entity));
 	}
+	
+	public static Vec3d fromPitchYawVector(Vec2f vector) {
+		return fromPitchYaw(vector.pitch, vector.yaw);
+	}
+	
+	public static Vec3d fromPitchYaw(float p_189986_0_, float p_189986_1_)
+    {
+        float f = MathHelper.cos(-p_189986_1_ * 0.017453292F - (float)Math.PI);
+        float f1 = MathHelper.sin(-p_189986_1_ * 0.017453292F - (float)Math.PI);
+        float f2 = -MathHelper.cos(-p_189986_0_ * 0.017453292F);
+        float f3 = MathHelper.sin(-p_189986_0_ * 0.017453292F);
+        return new Vec3d((double)(f1 * f2), (double)f3, (double)(f * f2));
+    }
 	
 }

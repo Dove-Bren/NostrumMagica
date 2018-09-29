@@ -42,6 +42,7 @@ import com.smanzana.nostrummagica.client.render.TileEntityAltarRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityCandleRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityObeliskRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntitySymbolRenderer;
+import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.renderer.ModelGolem;
@@ -132,6 +133,7 @@ import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.model.TRSRTransformation;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
@@ -1128,5 +1130,18 @@ public class ClientProxy extends CommonProxy {
 				targetPos = new Vec3d(0, 0, 0);
 		
 		this.effectRenderer.spawnEffect(comp, caster, casterPos, target, targetPos, flavor);
+	}
+	
+	private static boolean shownText = false;
+	@SubscribeEvent
+	public void onClientConnect(EntityJoinWorldEvent event) {
+		if (ClientProxy.shownText == false && ModConfig.config.displayLoginText()
+				&& event.getEntity() == Minecraft.getMinecraft().thePlayer) {
+			Minecraft.getMinecraft().thePlayer.addChatMessage(
+					new TextComponentTranslation("info.nostrumwelcome.text", new Object[]{
+							this.bindingInfo.getDisplayName()
+					}));
+			ClientProxy.shownText = true;
+		}
 	}
 }

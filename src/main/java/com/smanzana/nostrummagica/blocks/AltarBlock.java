@@ -153,7 +153,7 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 				if (!(tome.getItem() instanceof SpellTome))
 					return false;
 				
-				if (SpellTome.startBinding(playerIn, tome, heldItem)) {
+				if (SpellTome.startBinding(playerIn, tome, heldItem, false)) {
 					heldItem.splitStack(1);
 					return true;
 				} else {

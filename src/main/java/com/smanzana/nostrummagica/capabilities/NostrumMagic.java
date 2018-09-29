@@ -656,16 +656,18 @@ public class NostrumMagic implements INostrumMagic {
 	}
 
 	@Override
-	public void completeBinding() {
+	public void completeBinding(ItemStack tome) {
 		
 		if (this.entity != null && this.entity instanceof EntityPlayer) {
 			EntityPlayer player = (EntityPlayer) entity;
 			
-			ItemStack tome = NostrumMagica.findTome(player, bindingTomeID);
 			if (tome == null) {
-				player.addChatComponentMessage(new TextComponentTranslation(
-						"info.tome.bind_missing", new Object[] {bindingSpell.getName()}));
-				return;
+				tome = NostrumMagica.findTome(player, bindingTomeID);
+				if (tome == null) {
+					player.addChatComponentMessage(new TextComponentTranslation(
+							"info.tome.bind_missing", new Object[] {bindingSpell.getName()}));
+					return;
+				}
 			}
 			
 			if (!this.entity.worldObj.isRemote) {

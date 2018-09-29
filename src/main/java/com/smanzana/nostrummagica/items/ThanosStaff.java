@@ -107,6 +107,10 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 		summary.addReagentCost(-.05f);
 		summary.addEfficiency(.15f);
 		stack.damageItem(1, caster);
+
+		if (summary.getReagentCost() <= 0) {
+			return;
+		}
 		
 		if (hasFreeCast(stack)) {
 			summary.addReagentCost(-1f);

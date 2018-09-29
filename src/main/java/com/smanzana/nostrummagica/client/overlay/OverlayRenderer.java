@@ -37,7 +37,7 @@ public class OverlayRenderer extends Gui {
 	
 	@SubscribeEvent
 	public void onRender(RenderGameOverlayEvent.Post event) {
-		if (event.getType() != ElementType.ALL)
+		if (event.getType() != ElementType.EXPERIENCE)
 			return;
 		
 		EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
@@ -147,16 +147,19 @@ public class OverlayRenderer extends Gui {
 		// Bottom left spell slide
 		// Spell name
 		Spell current = NostrumMagica.getCurrentSpell(Minecraft.getMinecraft().thePlayer);
-		if (current != null) {
-			boolean xp = ModConfig.config.displayXPText();
+		boolean xp = ModConfig.config.displayXPText();
+		if (current != null || xp) {
+			String text = (current == null ? "" : current.getName());
 			int mult = (xp) ? 2 : 1;
 			FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
-			Gui.drawRect(0, scaledRes.getScaledHeight() - (fonter.FONT_HEIGHT * mult + 9), 70, scaledRes.getScaledHeight(), 0x50606060);
-			fonter.drawString(current.getName(), 5, scaledRes.getScaledHeight() - (fonter.FONT_HEIGHT + 3), 0xFF000000);
+			Gui.drawRect(0, scaledRes.getScaledHeight() - (fonter.FONT_HEIGHT * mult + 9), 100, scaledRes.getScaledHeight(), 0x50606060);
+			fonter.drawString(text, 5, scaledRes.getScaledHeight() - (fonter.FONT_HEIGHT + 3), 0xFF000000);
 			if (xp)
 				fonter.drawString(String.format("%.02f%%", 100f * attr.getXP() / attr.getMaxXP()),
 						5, scaledRes.getScaledHeight() - (fonter.FONT_HEIGHT * 2 + 6), 0xFF000000);
 		}
+		
+		
 		
 	}
 	

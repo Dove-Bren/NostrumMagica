@@ -151,6 +151,10 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellArmor {
 		if (stack == null)
 			return;
 		
+		if (summary.getReagentCost() <= 0) {
+			return;
+		}
+		
 		int charges = thanosGetWholeCharges(stack);
 		if (charges > 0) {
 			if (!(caster instanceof EntityPlayer) || !((EntityPlayer) caster).isCreative()) {

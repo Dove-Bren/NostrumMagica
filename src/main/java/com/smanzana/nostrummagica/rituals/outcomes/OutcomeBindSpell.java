@@ -42,7 +42,7 @@ public class OutcomeBindSpell implements IRitualOutcome {
 		AltarTileEntity altar = (AltarTileEntity) world.getTileEntity(center);
 		altar.setItem(centerItem);
 		
-		if (!SpellTome.startBinding(player, tome, scroll)) {
+		if (!SpellTome.startBinding(player, tome, scroll, true)) {
 			altar = (AltarTileEntity) world.getTileEntity(center.add(4, 0, 0));
 			altar.setItem(scroll);
 		}

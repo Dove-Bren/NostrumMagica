@@ -905,7 +905,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		return InfoScreenTabs.INFO_TOMES;
 	}
 	
-	public static boolean startBinding(EntityPlayer player, ItemStack tome, ItemStack scroll) {
+	public static boolean startBinding(EntityPlayer player, ItemStack tome, ItemStack scroll, boolean quick) {
 		if (tome == null || scroll == null)
 			return false;
 		
@@ -954,8 +954,10 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 			compName = "Physic";
 		
 		attr.startBinding(spell, comp, SpellTome.getTomeID(tome));
-		if (!player.worldObj.isRemote) {
-			player.addChatComponentMessage(new TextComponentTranslation("info.tome.bind", new Object[] {spell.getName(), compName}));
+		if (quick) {
+			attr.completeBinding(tome);
+		} else if (!player.worldObj.isRemote) {
+				player.addChatComponentMessage(new TextComponentTranslation("info.tome.bind", new Object[] {spell.getName(), compName}));
 		}
 		
 		return true;

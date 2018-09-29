@@ -81,6 +81,7 @@ public class ClientEffect {
 		
 		preModHook(detail, progress);
 		
+		GlStateManager.enableBlend();
 		drawForm(detail, mc, progress, partialTicks);
 		
 		GlStateManager.popAttrib();

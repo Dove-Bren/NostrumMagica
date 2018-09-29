@@ -2,9 +2,11 @@ package com.smanzana.nostrummagica.command;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
+import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -46,7 +48,19 @@ public class CommandForceBind extends CommandBase {
 				sender.addChatMessage(new TextComponentString("To force a bind, hold the tome that's being binded to in your main hand"));
 				return;
 			}
-			attr.completeBinding();
+			if (attr.isBinding()) {
+				attr.completeBinding(stack);
+			} else {
+				ItemStack offhand = player.getHeldItemOffhand();
+				if (offhand == null || !(offhand.getItem() instanceof SpellScroll)
+						|| SpellScroll.getSpell(offhand) == null) {
+					sender.addChatMessage(new TextComponentString("Either use while holding a tome that's currently binding OR hold a spell scroll in your offhand"));
+				} else {
+					Spell spell = SpellScroll.getSpell(offhand);
+					attr.startBinding(spell, null, SpellTome.getTomeID(stack));
+					attr.completeBinding(stack);
+				}
+			}
 			NetworkHandler.getSyncChannel().sendTo(
 					new StatSyncMessage(attr)
 					, (EntityPlayerMP) player);

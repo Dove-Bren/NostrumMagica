@@ -34,6 +34,8 @@ public class ModConfig {
 		OBELISK_LIST(Category.DISPLAY, "obelisk_list", false, false, "Display known teleportation points in the obelisk as a list"),
 		EFFECT_DISPLAY(Category.DISPLAY, "display_effects", true, false, "Allow cool client effects to be rendered. Turn off to enhance performance"),
 		
+		LOGIN_TEXT(Category.DISPLAY, "display_login_text", true, false, "On login, show Nostrum Magica welcome text"),
+		
 		OBELISK_REQ_MAGIC(Category.SERVER, "obelisk_req_magic", true, true, "Magic must be unlocked before obelisks can be used or teleported to.");
 		
 		
@@ -411,4 +413,7 @@ public class ModConfig {
 		return getBooleanValue(Key.EFFECT_DISPLAY, false);
 	}
 	
+	public boolean displayLoginText() {
+		return getBooleanValue(Key.LOGIN_TEXT, false);
+	}
 }

@@ -280,6 +280,8 @@ public class ModificationTable extends BlockContainer {
 					SpellTome.addEnhancement(stack, new SpellTomeEnhancementWrapper( 
 							SpellTomePage.getEnhancement(this.getInputSlot()),
 							SpellTomePage.getLevel(this.getInputSlot())));
+					int mods = Math.max(0, SpellTome.getModifications(stack) - 1);
+					SpellTome.setModifications(stack, mods);
 					this.setInventorySlotContents(1, null);
 				}
 			} else if (stack.getItem() instanceof SpellRune) {

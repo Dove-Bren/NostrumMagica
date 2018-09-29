@@ -114,7 +114,7 @@ public class ShrineBlock extends SymbolBlock {
 		// Check for binding first
 		if (attr.isBinding()) {
 			if (attr.getBindingComponent().equals(component)) {
-				attr.completeBinding();
+				attr.completeBinding(null);
 				return true;
 			}
 		}

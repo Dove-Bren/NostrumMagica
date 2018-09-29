@@ -211,6 +211,7 @@ config.nostrummagica.display.display_spheres=Mana Orb Guage
 config.nostrummagica.display.display_xp_text=XP Values
 config.nostrummagica.display.display_xp_bar=XP Bar Overlay
 config.nostrummagica.display.obelisk_list=Obelisk List
+config.nostrummagica.display.display_reagent_nums=Reagent Count
 
 config.nostrummagica.server=Server Options
 
@@ -235,7 +236,8 @@ info.teleport_obelisk.fail=This Geogem doesn't point to a valid obelisk
 info.tome.bond=You've finished bonding with your SpellTome
 info.tome.levelup=Your tome gains a new level
 info.tome.capacity=Capacity %d
-info.tome.bind=You've begun to bind the spell %s into the tome. You must visit a Shrine of %s
+info.tome.bind_fast=You've bound the spell %s into the tome!
+info.tome.bind_start=You've begun to bind the spell %s into the tome. You must visit a Shrine of %s
 info.tome.bind_missing=The tome this spell is being bound to is not in your inventory!
 info.tome.bind_finish=You've finished binding the spell into the tome!
 info.tome.full=That tome cannot hold any more spells
@@ -287,7 +289,9 @@ info.levelup.desc=As you cast spells, you will gain experience points. After gai
 info.elementdamage.name=Elemental Damage
 info.elementdamage.desc=Spell effects that aren't mutated by alterations are simply damage spells. The element that is at play, however, affects how much damage is actually delivered to the target. Each element affects targets differently. Each has a strength and a weakness.|Physical is the most basic damage type. It is equivalent to doing damage regularly, like attacking with a sword. It is the only element affected by armor and does the same amount of raw damage regardless of who the target is.|Fire damage is extra effective against undead enemies (150%%) and normally effective against everone else. This damage (like damage from all the other non-physical elements) ignores armor.|Lighting damage is more effective against heavily-armored opponents. Similarly, it is less effective than other types of magic against those wearing no armor. The base potency for lightning damage is only 75%%, but increases by 5%% for every point of armor (half-icon) they have.|Ender damage is, in general, more effective than other types. It has a base potency multiplier of 120%%. Ender damage does not affect ender mobs like Endermen and the Ender Dragon.|Earth damage is the most basic. Like other magical damage, it ignores armor. It does not recieve bonuses and penalties regardless of who you are attacking.|Ice damage is weak against undead. When applied to undead creatures, only 60%% of the damage is applied. Against living opponents, though, ice does 130%% what it normally would.|Wind damage is amplified when the target is lighter. Heavy targets aren't affected by wind as much. If the target is heavy, they'll only recieve 80%% damage. If they're light, however, they'll be dealt 180%% the original amount!
 info.reagents.name=Reagents
-info.reagents.desc=Casting spells from tomes costs reagents. Reagents can be in your inventory either directly or in reagent bags.|Tome enhancements as well as special properties on some items may reduce the number of reagents you need. Some items have a property called Lower Reagent Cost, which reduces the amount of reagents spent (on average) when casting a spell. Other items provide completely free casts at some cost.|Lower Reagent Cost (LRC) works by providing a chance that each reagent that is required may not be needed. If, for example, you have a total LRC of 5%% and you cast a spell that requires three reagents, each reagent will make a roll against 5%% odds. If the roll succeeds, the reagent will not be required. Using LRC, you can get away with completely free casts even with a small discount. This, of course, won't happen in most cases. Each reagent is rolled against regardless of if multiple of that same reagent type is required. For example, a spell that requires two mandrake root at 5%% LRC will roll for each mandrake root.|Alternatively, some items eliminate reagent costs for a single cast. The Thano Pendant, for example, stores up XP to provide completely reagent-free casts in exchange for a charge. These effects usually require the item to be in one of your hands or equipped.
+info.reagents.desc=Casting spells from tomes costs reagents. Reagents can be in your inventory either directly or in reagent bags. Simple spells do not require reagents. More complicated spells will require reagents be available for use to help channel the required energies to conjure the spell.|Tome enhancements as well as special properties on some items may reduce the number of reagents you need. Some items have a property called Lower Reagent Cost, which reduces the amount of reagents spent (on average) when casting a spell. Other items provide completely free casts at some cost.|Lower Reagent Cost (LRC) works by providing a chance that each reagent that is required may not be needed. If, for example, you have a total LRC of 5%% and you cast a spell that requires three reagents, each reagent will make a roll against 5%% odds. If the roll succeeds, the reagent will not be required. Using LRC, you can get away with completely free casts even with a small discount. This, of course, won't happen in most cases. Each reagent is rolled against regardless of if multiple of that same reagent type is required. For example, a spell that requires two mandrake root at 5%% LRC will roll for each mandrake root.|Alternatively, some items eliminate reagent costs for a single cast. The Thano Pendant, for example, stores up XP to provide completely reagent-free casts in exchange for a charge. These effects usually require the item to be in one of your hands or equipped.
+info.obelisks.name=Obelisks
+info.obelisks.desc=Obelisks are a late-game structure you can use to teleport from one place to another. Obelisk work by storing multiple target destinations in the form of GeoTokens. Once a GeoToken has been added to an obelisk, it can not be removed.|GeoTokens should be added to an obelisk that point to another obelisk. Doing so will allow you to teleport from that obelisk to the other. In order to set up two-way teleportation, you need a GeoToken pointing back to the first obelisk in the second.
 
 info.trial.fire.name=Trial of Fire
 info.trial.fire.desc=In order to pass the trial of fire, you must prove your dedication to the flames. In order to do so, you must give yourself to the lava.|Submerge yourself in lava and perish.
@@ -795,5 +799,7 @@ modification.food.name=Food Level
 modification.delay.name=Delay (seconds)
 
 modification.level.flip=Trigger When Above
+
+info.nostrumwelcome.text=Welcome to Nostrum Magica! Press [%s] to get started!
 
 nei.category.ritual.name=Nostrum Ritual

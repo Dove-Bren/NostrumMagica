@@ -64,7 +64,12 @@ public class NostrumQuest {
 	protected String[] parentKeys;
 	
 	/**
-	 * Challenge objective. Not used if thsi is not a challenge type.
+	 * List of lore keys that are required before this quest can be seen/taken
+	 */
+	protected String[] loreKeys;
+	
+	/**
+	 * Challenge objective. Not used if this is not a challenge type.
 	 */
 	protected IObjective objective;
 	
@@ -109,6 +114,7 @@ public class NostrumQuest {
 			int reqTechnique,
 			int reqFinesse,
 			String[] parentKeys,
+			String[] loreKeys,
 			IObjective objective,
 			IReward[] rewards
 			) {
@@ -120,6 +126,7 @@ public class NostrumQuest {
 		this.reqTechnique = reqTechnique;
 		this.reqFinesse = reqFinesse;
 		this.parentKeys = parentKeys;
+		this.loreKeys = loreKeys;
 		this.objective = objective;
 		this.rewards = rewards;
 		
@@ -148,6 +155,10 @@ public class NostrumQuest {
 
 	public String[] getParentKeys() {
 		return parentKeys;
+	}
+	
+	public String[] getLoreKeys() {
+		return loreKeys;
 	}
 
 	public IObjective getObjective() {

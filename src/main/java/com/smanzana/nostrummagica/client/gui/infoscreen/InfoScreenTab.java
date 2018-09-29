@@ -368,6 +368,10 @@ public abstract class InfoScreenTab {
 				buttons.add(new SubscreenInfoButton(offset++, "reagents",
 						new PaginatedInfoSubScreen("reagents"),
 						ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1)));
+				
+				buttons.add(new SubscreenInfoButton(offset++, "obelisks",
+						new PaginatedInfoSubScreen("obelisks"),
+						new ItemStack(Items.ENDER_PEARL)));
 					
 				return buttons;
 			}
