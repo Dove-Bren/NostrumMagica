@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
@@ -251,7 +252,17 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 	
 	@Override
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
-		if (world.provider.getDimension() != 0)
+		int dim = world.provider.getDimension();
+		int[] dims = ModConfig.config.getDimensionList();
+		boolean found = false;
+		for (int d : dims) {
+			if (d == dim) {
+				found = true;
+				break;
+			}
+		}
+		
+		if (!found)
 			return;
 		
 		long seed = world.getSeed();

@@ -36,7 +36,9 @@ public class ModConfig {
 		
 		LOGIN_TEXT(Category.DISPLAY, "display_login_text", true, false, "On login, show Nostrum Magica welcome text"),
 		
-		OBELISK_REQ_MAGIC(Category.SERVER, "obelisk_req_magic", true, true, "Magic must be unlocked before obelisks can be used or teleported to.");
+		OBELISK_REQ_MAGIC(Category.SERVER, "obelisk_req_magic", true, true, "Magic must be unlocked before obelisks can be used or teleported to."),
+		NOSTRUM_WORLDS(Category.SERVER, "nostrum_worlds", new int[]{0}, true, "Which worlds to generate Nostrum dungeons in"),
+		;
 		
 		
 		public static enum Category {
@@ -148,6 +150,8 @@ public class ModConfig {
 				tag.setBoolean(key, config.getBooleanValue(this, false));
 			else if (def instanceof Integer)
 				tag.setInteger(key, config.getIntValue(this, false));
+			else if (def.getClass().isArray())
+				tag.setIntArray(key,  config.getIntArrayValue(this, false));
 			else
 				tag.setString(key, config.getStringValue(this, false));
 		}
@@ -255,6 +259,9 @@ public class ModConfig {
 				base.getInt(key.getKey(), key.getCategory(), (Integer) key.getDefault(),
 						Integer.MIN_VALUE, Integer.MAX_VALUE, key.getDescription(),
 						"config.nostrummagica." + key.getCategory() + "." + key.getKey());
+			else if (key.getDefault().getClass().isArray())
+				base.get(key.getCategory(), key.getKey(), (int[]) key.getDefault(),
+						key.getDescription());
 			else
 				base.getString(key.getKey(), key.getCategory(), key.getDefault().toString(),
 						key.getDescription(), "config.nostrummagica." + key.getCategory() + "." + key.getKey());
@@ -356,6 +363,14 @@ public class ModConfig {
 		return base.getInt(key.getKey(), key.getCategory(), (Integer) key.getDefault(),
 				Integer.MIN_VALUE, Integer.MAX_VALUE, key.getDescription());
 	}
+	
+	protected int[] getIntArrayValue(Key key, boolean ignoreLocal) {
+		if (!ignoreLocal && localValues.containsKey(key))
+			return (int[]) localValues.get(key);
+		
+		int[] def = (int[]) key.getDefault();
+		return base.get(key.getCategory(), key.getKey(), def).getIntList();
+	}
 
 	protected String getStringValue(Key key, boolean ignoreLocal) {
 		//DOESN'T cast check. Know what you're doing before you do it
@@ -373,6 +388,8 @@ public class ModConfig {
 			return getBooleanValue(key, ignoreLocal);
 		else if (key.getDefault() instanceof Integer)
 			return getIntValue(key, ignoreLocal);
+		else if (key.getDefault().getClass().isArray())
+			return getIntArrayValue(key, ignoreLocal);
 		else
 			return getStringValue(key, ignoreLocal);
 	}	
@@ -415,5 +432,9 @@ public class ModConfig {
 	
 	public boolean displayLoginText() {
 		return getBooleanValue(Key.LOGIN_TEXT, false);
+	}
+	
+	public int[] getDimensionList() {
+		return getIntArrayValue(Key.NOSTRUM_WORLDS, true);
 	}
 }
