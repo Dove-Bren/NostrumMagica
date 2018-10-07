@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.items;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
@@ -13,26 +15,27 @@ import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
 
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
-import net.minecraftforge.oredict.RecipeSorter;
-import net.minecraftforge.oredict.RecipeSorter.Category;
 
 public class SpellScroll extends Item implements ILoreTagged {
 
@@ -52,9 +55,7 @@ public class SpellScroll extends Item implements ILoreTagged {
 	public static final String id = "spell_scroll";
 	
 	public static void init() {
-		
-		GameRegistry.addRecipe(new ActivatedRecipe());
-		
+		;
 	}
 	
 	private SpellScroll() {
@@ -80,8 +81,8 @@ public class SpellScroll extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
-		
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+		ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		if (playerIn.isSneaking())
 			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
 		
@@ -95,6 +96,8 @@ public class SpellScroll extends Item implements ILoreTagged {
 			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
 		
 		NBTTagCompound nbt = itemStackIn.getTagCompound();
+		if (nbt == null)
+			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
 		
 		if (!nbt.hasKey(NBT_SPELL, NBT.TAG_INT))
 			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
@@ -130,7 +133,7 @@ public class SpellScroll extends Item implements ILoreTagged {
 		
 		itemStack.setTagCompound(nbt);
 		itemStack.setStackDisplayName(spell.getName());
-		itemStack.addEnchantment(Enchantment.getEnchantmentByLocation("power"), 1);
+		itemStack.addEnchantment(Enchantments.POWER, 1);
 	}
 	
 	public static Spell getSpell(ItemStack itemStack) {
@@ -157,7 +160,7 @@ public class SpellScroll extends Item implements ILoreTagged {
 	public static int getNestedScrollMeta(ItemStack scroll) {
 		byte ret = 0;
 		
-		if (scroll != null && scroll.hasTagCompound()) {
+		if (scroll != ItemStack.EMPTY && scroll.hasTagCompound()) {
 			NBTTagCompound nbt = scroll.getTagCompound();
 			ret = nbt.getByte(NBT_TYPE);
 		}
@@ -203,7 +206,7 @@ public class SpellScroll extends Item implements ILoreTagged {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+	public void addInformation(ItemStack stack, @Nullable World world,List<String> tooltip, ITooltipFlag flag) {
 		if (stack == null)
 			return;
 		
@@ -245,23 +248,26 @@ public class SpellScroll extends Item implements ILoreTagged {
 		}
 	}
 	
-	private static class ActivatedRecipe extends ShapedRecipes {
+	public static class ActivatedRecipe extends ShapedRecipes {
 
 		public ActivatedRecipe() {
-			super(3, 3, new ItemStack[] {
-				new ItemStack(Items.DIAMOND),
-				new ItemStack(Items.ENDER_PEARL),
-				new ItemStack(Items.DIAMOND),
-				new ItemStack(Items.ENDER_PEARL),
-				new ItemStack(instance(), 1, OreDictionary.WILDCARD_VALUE),
-				new ItemStack(Items.ENDER_PEARL),
-				new ItemStack(Items.DIAMOND),
-				new ItemStack(Items.ENDER_PEARL),
-				new ItemStack(Items.DIAMOND),
-			}, new ItemStack(instance(), 1, 1));
+			super("",
+				3, 3, NonNullList.from(
+				null,
+				Ingredient.fromStacks(new ItemStack(Items.DIAMOND)),
+				Ingredient.fromStacks(new ItemStack(Items.ENDER_PEARL)),
+				Ingredient.fromStacks(new ItemStack(Items.DIAMOND)),
+				Ingredient.fromStacks(new ItemStack(Items.ENDER_PEARL)),
+				Ingredient.fromStacks(new ItemStack(instance(), 1, OreDictionary.WILDCARD_VALUE)),
+				Ingredient.fromStacks(new ItemStack(Items.ENDER_PEARL)),
+				Ingredient.fromStacks(new ItemStack(Items.DIAMOND)),
+				Ingredient.fromStacks(new ItemStack(Items.ENDER_PEARL)),
+				Ingredient.fromStacks(new ItemStack(Items.DIAMOND))
+			), new ItemStack(instance(), 1, 1));
 			
-			RecipeSorter.register(NostrumMagica.MODID + ":ScrollRecipe_activated",
-					this.getClass(), Category.SHAPED, "after:minecraft:shaped");
+			this.setRegistryName(NostrumMagica.MODID, "ScrollRecipe_activated");
+//			RecipeSorter.register(NostrumMagica.MODID + ":ScrollRecipe_activated",
+//					this.getClass(), Category.SHAPED, "after:minecraft:shaped");
 		}
 		
 		@Override

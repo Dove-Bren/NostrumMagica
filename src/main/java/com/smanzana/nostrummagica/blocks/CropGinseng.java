@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.blocks;
 import java.util.LinkedList;
 import java.util.Random;
 
+import javax.annotation.Nonnull;
+
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 
@@ -10,6 +12,7 @@ import net.minecraft.block.BlockCrops;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -34,13 +37,12 @@ public class CropGinseng extends BlockCrops {
 		
 	}
 	
-	protected ItemStack getCrops(int count) {
+	protected @Nonnull ItemStack getCrops(int count) {
         return new ItemStack(ReagentItem.instance(), count, ReagentType.GINSENG.getMeta());
     }
 
     @Override
-    public java.util.List<ItemStack> getDrops(net.minecraft.world.IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-        java.util.List<ItemStack> ret = new LinkedList<>();
+    public void getDrops(NonNullList<ItemStack> drops, net.minecraft.world.IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
         int age = getAge(state);
         Random rand = world instanceof World ? ((World)world).rand : new Random();
 
@@ -49,8 +51,7 @@ public class CropGinseng extends BlockCrops {
             count = 2 + rand.nextInt(2) + fortune;
         }
         if (count != 0)
-        	ret.add(getCrops(count));
-        return ret;
+        	drops.add(getCrops(count));
     }
 
     /**
@@ -67,7 +68,7 @@ public class CropGinseng extends BlockCrops {
     }
     
     @Override
-    public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state) {
+    public @Nonnull ItemStack getItem(World worldIn, BlockPos pos, IBlockState state) {
         return getCrops(1);
     }
 

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
@@ -17,12 +19,14 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -30,18 +34,16 @@ import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
-import net.minecraftforge.oredict.RecipeSorter;
-import net.minecraftforge.oredict.RecipeSorter.Category;
 
 public class SeekerIdol extends Item implements ILoreTagged {
 
@@ -60,7 +62,7 @@ public class SeekerIdol extends Item implements ILoreTagged {
 	}
 	
 	public static void init() {
-		GameRegistry.addRecipe(new IdolRecipe());
+		
 	}
 	
 	public static NBTTagCompound saveRegistryToNBT() {
@@ -198,7 +200,9 @@ public class SeekerIdol extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+		ItemStack itemStackIn = playerIn.getHeldItem(hand);
+		
 		if (worldIn.isRemote)
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
 		
@@ -209,9 +213,9 @@ public class SeekerIdol extends Item implements ILoreTagged {
 		
 		Vec3d dir = findShrineDir(worldIn, playerIn.getPositionVector(), component);
 		if (dir == null) {
-			playerIn.addChatComponentMessage(new TextComponentString("Could not find a shrine of that type! Explore the world more."));
+			playerIn.sendMessage(new TextComponentString("Could not find a shrine of that type! Explore the world more."));
 		} else {
-			playerIn.addVelocity(dir.xCoord * 1, 0, dir.zCoord * 1);
+			playerIn.addVelocity(dir.x * 1, 0, dir.z * 1);
 			playerIn.velocityChanged = true;
 			itemStackIn.damageItem(1, playerIn);
 		}
@@ -250,7 +254,7 @@ public class SeekerIdol extends Item implements ILoreTagged {
 			return null;
 		
 		// We make y the same here so there's no vertical pull
-		Vec3d to = new Vec3d(targ.getX(), pos.yCoord, targ.getZ());
+		Vec3d to = new Vec3d(targ.getX(), pos.y, targ.getZ());
 		
 		NostrumMagica.logger.info("SeekerIdol targetting (" + targ.getX() + ", " + targ.getZ() + ")");
 		
@@ -289,7 +293,7 @@ public class SeekerIdol extends Item implements ILoreTagged {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+	public void addInformation(ItemStack stack, @Nullable World world,List<String> tooltip, ITooltipFlag flag) {
 		SpellComponentWrapper component = getNestedComponent(stack);
 		if (component == null)
 			return;
@@ -338,24 +342,27 @@ public class SeekerIdol extends Item implements ILoreTagged {
 		return stack;
 	}
 	
-	private static class IdolRecipe extends ShapedRecipes {
+	public static class IdolRecipe extends ShapedRecipes {
 
 		//public ShapedRecipes(int width, int height, ItemStack[] p_i1917_3_, ItemStack output)
 		public IdolRecipe() {
-			super(3, 3, new ItemStack[] {
-				new ItemStack(Blocks.COBBLESTONE),
-				NostrumResourceItem.getItem(ResourceType.TOKEN, 1),
-				new ItemStack(Blocks.COBBLESTONE),
-				new ItemStack(Blocks.COBBLESTONE),
-				new ItemStack(SpellRune.instance(), 1, OreDictionary.WILDCARD_VALUE),
-				new ItemStack(Blocks.COBBLESTONE),
-				new ItemStack(Blocks.COBBLESTONE),
-				new ItemStack(Items.GOLD_INGOT),
-				new ItemStack(Blocks.COBBLESTONE),	
-			}, SeekerIdol.getItemStack(new SpellComponentWrapper(EMagicElement.PHYSICAL)));
+			super("",
+				3, 3, NonNullList.from(
+				Ingredient.fromStacks(new ItemStack(Blocks.COBBLESTONE)), // DEFAULT?
+				Ingredient.fromStacks(new ItemStack(Blocks.COBBLESTONE)),
+				Ingredient.fromStacks(NostrumResourceItem.getItem(ResourceType.TOKEN, 1)),
+				Ingredient.fromStacks(new ItemStack(Blocks.COBBLESTONE)),
+				Ingredient.fromStacks(new ItemStack(Blocks.COBBLESTONE)),
+				Ingredient.fromStacks(new ItemStack(SpellRune.instance(), 1, OreDictionary.WILDCARD_VALUE)),
+				Ingredient.fromStacks(new ItemStack(Blocks.COBBLESTONE)),
+				Ingredient.fromStacks(new ItemStack(Blocks.COBBLESTONE)),
+				Ingredient.fromStacks(new ItemStack(Items.GOLD_INGOT)),
+				Ingredient.fromStacks(new ItemStack(Blocks.COBBLESTONE))
+			), SeekerIdol.getItemStack(new SpellComponentWrapper(EMagicElement.PHYSICAL)));
 			
-			RecipeSorter.register(NostrumMagica.MODID + ":IdolRecipe",
-					this.getClass(), Category.SHAPED, "after:minecraft:shaped");
+			this.setRegistryName(NostrumMagica.MODID, "IdolRecipe");
+//			RecipeSorter.register(NostrumMagica.MODID + ":IdolRecipe",
+//					this.getClass(), Category.SHAPED, "after:minecraft:shaped");
 		}
 		
 		@Override

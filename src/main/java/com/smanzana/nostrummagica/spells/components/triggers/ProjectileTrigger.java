@@ -70,11 +70,11 @@ public class ProjectileTrigger extends SpellTrigger {
 					EntitySpellProjectile projectile = new EntitySpellProjectile(self,
 							getState().getSelf(),
 							world,
-							pos.xCoord, pos.yCoord, pos.zCoord,
+							pos.x, pos.y, pos.z,
 							dir,
 							5.0f, PROJECTILE_RANGE);
 					
-					world.spawnEntityInWorld(projectile);
+					world.spawnEntity(projectile);
 			
 				}
 			
@@ -86,7 +86,7 @@ public class ProjectileTrigger extends SpellTrigger {
 		}
 		
 		public void onProjectileHit(Entity entity) {
-			if (entity == null || !(entity instanceof EntityLivingBase)) {
+			if (entity != null && !(entity instanceof EntityLivingBase)) {
 				onProjectileHit(entity.getPosition());
 			} else {
 				getState().trigger(Lists.newArrayList((EntityLivingBase) entity), Lists.newArrayList(getState().getOther()), null, null);
@@ -130,7 +130,7 @@ public class ProjectileTrigger extends SpellTrigger {
 			atMax = params.flip;
 		
 		// Add direction
-		pos = new Vec3d(pos.xCoord, pos.yCoord + state.getSelf().getEyeHeight(), pos.zCoord);
+		pos = new Vec3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
 		return new ProjectileTriggerInstance(state, world, pos, pitch, yaw, atMax);
 	}
 

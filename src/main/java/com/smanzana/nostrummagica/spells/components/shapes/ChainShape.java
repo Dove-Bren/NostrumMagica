@@ -43,7 +43,7 @@ public class ChainShape extends SpellShape {
 		
 		double radius = 6.0;
 		if (world == null)
-			world = target.worldObj;
+			world = target.world;
 		
 		int arc = Math.max((int) supportedFloats()[0], (int) param.level);
 		

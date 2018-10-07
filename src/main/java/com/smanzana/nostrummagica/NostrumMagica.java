@@ -6,6 +6,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -106,7 +109,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
@@ -158,16 +160,16 @@ public class NostrumMagica implements IMagicListener
     	NostrumMagica.creativeTab = new CreativeTabs(MODID){
 	    	@Override
 	        @SideOnly(Side.CLIENT)
-	        public Item getTabIconItem(){
-	    		return SpellTome.instance();
+			public ItemStack getTabIconItem(){
+	    		return new ItemStack(SpellTome.instance());
 	        }
 	    };
 	    SpellTome.instance().setCreativeTab(NostrumMagica.creativeTab);
 	    NostrumMagica.enhancementTab = new CreativeTabs(MODID + "_enhancements") {
 	    	@Override
 	    	@SideOnly(Side.CLIENT)
-	    	public Item getTabIconItem() {
-	    		return SpellTomePage.instance();
+	    	public ItemStack getTabIconItem() {
+	    		return new ItemStack(SpellTomePage.instance());
 	    	}
 	    };
 	    SpellTomePage.instance().setCreativeTab(NostrumMagica.enhancementTab);
@@ -230,6 +232,7 @@ public class NostrumMagica implements IMagicListener
      * Get a null you don't expect? Make sure the server and client configs match, AND
      * that the config includes all the mobs you won't to be tagged.
      */
+    @Nullable
     public static INostrumMagic getMagicWrapper(Entity e) {
     	if (e == null)
     		return null;
@@ -237,49 +240,49 @@ public class NostrumMagica implements IMagicListener
     	return e.getCapability(AttributeProvider.CAPABILITY, null);
     }
     
-    private static int potionID = 65;
+    //private static int potionID = 65;
 	
-    public static int registerPotion(Potion potion, ResourceLocation loc) {
-    	while (Potion.getPotionById(potionID) != null)
-    		potionID++;
-    	Potion.REGISTRY.register(potionID, loc, potion);
-    	return potionID;
-    }
+//    public static int registerPotion(Potion potion, ResourceLocation loc) {
+//    	while (Potion.getPotionById(potionID) != null)
+//    		potionID++;
+//    	Potion.REGISTRY.register(potionID, loc, potion);
+//    	return potionID;
+//    }
     
-    public static ItemStack findTome(EntityPlayer entity, int tomeID) {
+    public static @Nonnull ItemStack findTome(EntityPlayer entity, int tomeID) {
     	// We look in mainhand first, then offhand, then just down
     	// hotbar.
     	for (ItemStack item : entity.inventory.mainInventory) {
-    		if (item != null && item.getItem() instanceof SpellTome)
+    		if (item != ItemStack.EMPTY && item.getItem() instanceof SpellTome)
     			if (SpellTome.getTomeID(item) == tomeID)
     				return item;
     	}
     	
     	for (ItemStack item : entity.inventory.offHandInventory) {
-    		if (item != null && item.getItem() instanceof SpellTome)
+    		if (item != ItemStack.EMPTY && item.getItem() instanceof SpellTome)
     			if (SpellTome.getTomeID(item) == tomeID)
     				return item;
     	}
     	
-    	return null;
+    	return ItemStack.EMPTY;
     }
     
-    public static ItemStack getCurrentTome(EntityPlayer entity) {
+    public static @Nonnull ItemStack getCurrentTome(EntityPlayer entity) {
     	// We look in mainhand first, then offhand, then just down
     	// hotbar.
-    	ItemStack tome = null;
+    	ItemStack tome = ItemStack.EMPTY;
     	
-    	if (entity.getHeldItemMainhand() != null &&
+    	if (entity.getHeldItemMainhand() != ItemStack.EMPTY &&
     			entity.getHeldItemMainhand().getItem() instanceof SpellTome) {
     		tome = entity.getHeldItemMainhand();
-    	} else if (entity.getHeldItemOffhand() != null &&
+    	} else if (entity.getHeldItemOffhand() != ItemStack.EMPTY &&
     			entity.getHeldItemOffhand().getItem() instanceof SpellTome) {
     		tome = entity.getHeldItemOffhand();
     	} else {
     		// hotbar is items 0-8
     		int count = 0;
     		for (ItemStack stack : entity.inventory.mainInventory) {
-        		if (stack != null && stack.getItem() instanceof SpellTome) {
+        		if (stack != ItemStack.EMPTY && stack.getItem() instanceof SpellTome) {
         			tome = stack;
         			break;
         		}
@@ -293,6 +296,7 @@ public class NostrumMagica implements IMagicListener
     	return tome;
     }
     
+    @Nullable
     public static Spell getCurrentSpell(EntityPlayer player) {
     	List<Spell> spells = getSpells(player);
     	if (spells == null || spells.isEmpty())
@@ -304,25 +308,25 @@ public class NostrumMagica implements IMagicListener
     public static int getReagentCount(EntityPlayer player, ReagentType type) {
     	int count = 0;
     	for (ItemStack item : player.inventory.mainInventory) {
-    		if (item != null && item.getItem() instanceof ReagentBag) {
+    		if (item != ItemStack.EMPTY && item.getItem() instanceof ReagentBag) {
     			count += ReagentBag.getReagentCount(item, type);
     		}
     	}
     	for (ItemStack item : player.inventory.offHandInventory) {
-    		if (item != null && item.getItem() instanceof ReagentBag) {
+    		if (item != ItemStack.EMPTY && item.getItem() instanceof ReagentBag) {
     			count += ReagentBag.getReagentCount(item, type);
     		}
     	}
     	for (ItemStack item : player.inventory.mainInventory) {
-    		if (item != null && item.getItem() instanceof ReagentItem
+    		if (item != ItemStack.EMPTY && item.getItem() instanceof ReagentItem
     				&& ReagentItem.findType(item) == type) {
-    			count += item.stackSize;
+    			count += item.getCount();
     		}
     	}
     	for (ItemStack item : player.inventory.offHandInventory) {
-    		if (item != null && item.getItem() instanceof ReagentBag
+    		if (item != ItemStack.EMPTY && item.getItem() instanceof ReagentBag
     				&& ReagentItem.findType(item) == type) {
-    			count += item.stackSize;
+    			count += item.getCount();
     		}
     	}
     	
@@ -335,7 +339,7 @@ public class NostrumMagica implements IMagicListener
     	
 		for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
 			ItemStack item = player.inventory.getStackInSlot(i);
-			if (item == null)
+			if (item == ItemStack.EMPTY)
 				continue;
 			
 			if (item.getItem() instanceof ReagentBag) {
@@ -343,13 +347,13 @@ public class NostrumMagica implements IMagicListener
 			} else if (item.getItem() instanceof ReagentItem) {
 				if (ReagentItem.getTypeFromMeta(item.getMetadata())
 					== type) {
-					if (item.stackSize > count) {
-						item.stackSize -= count;
+					if (item.getCount() > count) {
+						item.setCount(item.getCount() - count);
 						count = 0;
 						break;
 					} else {
-						count -= item.stackSize;
-						player.inventory.setInventorySlotContents(i, null);
+						count -= item.getCount();
+						player.inventory.setInventorySlotContents(i, ItemStack.EMPTY);
 					}
 				}
 			}
@@ -361,7 +365,7 @@ public class NostrumMagica implements IMagicListener
 		return count == 0;
     }
     
-    
+    @Nullable
     public static List<Spell> getSpells(EntityPlayer entity) {
     	if (entity == null)
     		return null;
@@ -369,7 +373,7 @@ public class NostrumMagica implements IMagicListener
     	// We just return the spells from the curernt tome.
     	ItemStack tome = getCurrentTome(entity);
     	
-    	if (tome == null)
+    	if (tome == ItemStack.EMPTY)
     		return null;
     	
     	return SpellTome.getSpells(tome);
@@ -380,8 +384,11 @@ public class NostrumMagica implements IMagicListener
     	return getActiveQuests(getMagicWrapper(player));
     }
     
-    public static List<NostrumQuest> getActiveQuests(INostrumMagic attr) {
+    public static List<NostrumQuest> getActiveQuests(@Nullable INostrumMagic attr) {
     	List<NostrumQuest> list = new LinkedList<>();
+    	if (attr == null)
+    		return list;
+    	
     	List<String> quests = attr.getCurrentQuests();
     	
     	if (quests != null && !quests.isEmpty()) 
@@ -398,8 +405,12 @@ public class NostrumMagica implements IMagicListener
     	return getCompletedQuests(getMagicWrapper(player));
     }
     
-    public static List<NostrumQuest> getCompletedQuests(INostrumMagic attr) {
+    public static List<NostrumQuest> getCompletedQuests(@Nullable INostrumMagic attr) {
     	List<NostrumQuest> list = new LinkedList<>();
+    	
+    	if (attr == null)
+    		return list;
+    	
     	List<String> quests = attr.getCompletedQuests();
     	
     	if (quests != null && !quests.isEmpty()) 
@@ -438,7 +449,8 @@ public class NostrumMagica implements IMagicListener
 			return;
 		}
     	
-    	spellRegistry.loadFromNBT(nbt);
+    	if (nbt != null)
+    		spellRegistry.loadFromNBT(nbt);
     }
     
     private void saveSpellRegistry(File file) {
@@ -489,7 +501,8 @@ public class NostrumMagica implements IMagicListener
 			return;
 		}
     	
-    	SeekerIdol.readRegistryFromNBT(nbt);
+    	if (nbt != null)
+    		SeekerIdol.readRegistryFromNBT(nbt);
     }
     
     private void saveSeekerRegistry(File file) {
@@ -841,8 +854,8 @@ public class NostrumMagica implements IMagicListener
 						@Override
 						public void spawn(World world, Vec3d pos, EntityPlayer invoker) {
 							EntityKoid koid = new EntityKoid(world);
-							koid.setPosition(pos.xCoord, pos.yCoord, pos.zCoord);
-							world.spawnEntityInWorld(koid);
+							koid.setPosition(pos.x, pos.y, pos.z);
+							world.spawnEntity(koid);
 							koid.setAttackTarget(invoker);
 						}
 
@@ -882,7 +895,7 @@ public class NostrumMagica implements IMagicListener
 					null,
 					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
 					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
-					new ItemStack[] {new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance()), null, new ItemStack(SpellTomePage.instance())},
+					new ItemStack[] {new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance()), ItemStack.EMPTY, new ItemStack(SpellTomePage.instance())},
 					null,
 					new OutcomeCreateTome())
 				);
@@ -892,7 +905,7 @@ public class NostrumMagica implements IMagicListener
 					null,
 					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
 					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
-					new ItemStack[] {new ItemStack(SpellTomePage.instance()), null, null, new ItemStack(SpellTomePage.instance())},
+					new ItemStack[] {new ItemStack(SpellTomePage.instance()), ItemStack.EMPTY, ItemStack.EMPTY, new ItemStack(SpellTomePage.instance())},
 					null,
 					new OutcomeCreateTome())
 				);
@@ -902,7 +915,7 @@ public class NostrumMagica implements IMagicListener
 					null,
 					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
 					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
-					new ItemStack[] {new ItemStack(SpellTomePage.instance()), null, null, null},
+					new ItemStack[] {new ItemStack(SpellTomePage.instance()), ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY},
 					null,
 					new OutcomeCreateTome())
 				);

@@ -10,8 +10,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
@@ -21,17 +19,11 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class MirrorItem extends Item implements ILoreTagged {
 
 	public static void init() {
-		GameRegistry.addRecipe(new ItemStack(instance), "RQR", "QGQ", "SSS",
-				'R', new ItemStack(ReagentItem.instance(), 1, OreDictionary.WILDCARD_VALUE),
-				'Q', Items.QUARTZ,
-				'G', Blocks.GLASS,
-				'S', Blocks.STONE);
+		;
 	}
 	
 	private static MirrorItem instance = null;
@@ -53,7 +45,6 @@ public class MirrorItem extends Item implements ILoreTagged {
 		this.setCreativeTab(NostrumMagica.creativeTab);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
 	{
 		
@@ -78,7 +69,7 @@ public class MirrorItem extends Item implements ILoreTagged {
 				pos = pos.up();
 			}
 
-			int i = MathHelper.floor_double((double)(playerIn.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
+			int i = MathHelper.floor((double)(playerIn.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
 			EnumFacing enumfacing = EnumFacing.getHorizontal(i + 2);
 			//BlockPos blockpos = pos.offset(enumfacing);
 
@@ -88,7 +79,7 @@ public class MirrorItem extends Item implements ILoreTagged {
 				boolean flag2 = flag || worldIn.isAirBlock(pos);
 				//boolean flag3 = flag1 || worldIn.isAirBlock(blockpos);
 
-				if (flag2 && worldIn.getBlockState(pos.down()).isFullyOpaque())
+				if (flag2 && worldIn.getBlockState(pos.down()).isOpaqueCube())
 				{
 					IBlockState iblockstate1 = NostrumMirrorBlock.instance().getDefaultState().withProperty(NostrumMirrorBlock.FACING, enumfacing);
 
@@ -96,7 +87,7 @@ public class MirrorItem extends Item implements ILoreTagged {
 
 					SoundType soundtype = iblockstate1.getBlock().getSoundType(iblockstate1, worldIn, pos, playerIn);
 					worldIn.playSound((EntityPlayer)null, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
-					--stack.stackSize;
+					stack.shrink(1);
 					return EnumActionResult.SUCCESS;
 				}
 				else

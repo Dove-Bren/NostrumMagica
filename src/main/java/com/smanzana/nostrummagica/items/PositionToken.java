@@ -45,14 +45,14 @@ public class PositionToken extends PositionCrystal {
 	}
 	
 	@Override
-	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		
 		return EnumActionResult.PASS;
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
-		return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+		return new ActionResult<ItemStack>(EnumActionResult.PASS, playerIn.getHeldItem(hand));
 	}
 
 	@Override
@@ -90,29 +90,29 @@ public class PositionToken extends PositionCrystal {
 	
 	@Override
 	public boolean onEntityItemUpdate(EntityItem entityItem) {
-		if (entityItem.worldObj.isRemote)
+		if (entityItem.world.isRemote)
 			return false;
 			
 		// check if item is above an obelisk. If so, add this target (if we have one) to it
-		BlockPos storedPos = getBlockPosition(entityItem.getEntityItem());
+		BlockPos storedPos = getBlockPosition(entityItem.getItem());
 		if (storedPos != null) {
 			BlockPos pos = entityItem.getPosition().add(0, -1, 0);
 			if (pos.equals(storedPos))
 				return false;
 			
-			IBlockState state = entityItem.worldObj.getBlockState(pos);
+			IBlockState state = entityItem.world.getBlockState(pos);
 			if (state != null && state.getBlock() instanceof NostrumObelisk && NostrumObelisk.blockIsMaster(state)) {
-				TileEntity ent = entityItem.worldObj.getTileEntity(pos);
+				TileEntity ent = entityItem.world.getTileEntity(pos);
 				if (ent != null && ent instanceof NostrumObeliskEntity) {
 					NostrumObeliskEntity obelisk = ((NostrumObeliskEntity) ent);
 					if (obelisk.canAcceptTarget(entityItem.dimension, storedPos)) {
-						if (entityItem.getEntityItem().hasDisplayName()) {
-							obelisk.addTarget(entityItem.dimension, storedPos, entityItem.getEntityItem().getDisplayName());
+						if (entityItem.getItem().hasDisplayName()) {
+							obelisk.addTarget(entityItem.dimension, storedPos, entityItem.getItem().getDisplayName());
 						} else {
 							obelisk.addTarget(entityItem.dimension, storedPos);
 						}
 						NostrumMagicaSounds.AMBIENT_WOOSH.play(
-								entityItem.worldObj,
+								entityItem.world,
 								pos.getX(),
 								pos.getY(),
 								pos.getZ()

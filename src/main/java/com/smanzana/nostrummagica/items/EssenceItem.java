@@ -1,7 +1,5 @@
 package com.smanzana.nostrummagica.items;
 
-import java.util.List;
-
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -11,10 +9,9 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class EssenceItem extends Item implements ILoreTagged {
 
@@ -29,23 +26,7 @@ public class EssenceItem extends Item implements ILoreTagged {
 	}
 	
 	public static void init() {
-		GameRegistry.addShapelessRecipe(InfusedGemItem.instance().getGem(null, 1),
-				getEssence(EMagicElement.EARTH, 1),
-				getEssence(EMagicElement.ENDER, 1),
-				getEssence(EMagicElement.FIRE, 1),
-				getEssence(EMagicElement.ICE, 1),
-				getEssence(EMagicElement.LIGHTNING, 1),
-				getEssence(EMagicElement.PHYSICAL, 1),
-				getEssence(EMagicElement.WIND, 1));
-		
-		EMagicElement[] all = EMagicElement.values();
-		EMagicElement last = all[all.length - 1];
-		for (EMagicElement element : all) {
-			GameRegistry.addShapelessRecipe(getEssence(element, 1),
-					getEssence(last, 1),
-					new ItemStack(instance(), 1, OreDictionary.WILDCARD_VALUE));
-			last = element;
-		}
+		;
 	}
 	
 	public EssenceItem() {
@@ -71,9 +52,12 @@ public class EssenceItem extends Item implements ILoreTagged {
      */
     @SideOnly(Side.CLIENT)
     @Override
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+    	if (this.getCreativeTab() != tab)
+    		return;
+    	
     	for (EMagicElement element: EMagicElement.values()) {
-    		subItems.add(new ItemStack(itemIn, 1, element.ordinal()));
+    		subItems.add(new ItemStack(instance(), 1, element.ordinal()));
     	}
 	}
     

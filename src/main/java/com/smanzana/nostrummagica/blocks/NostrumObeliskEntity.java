@@ -188,26 +188,26 @@ public class NostrumObeliskEntity extends TileEntity implements ITickable {
 			for (int i = 0; i < xs.length; i++)
 			for (int j = 1; j <= NostrumObelisk.TILE_HEIGHT; j++) { // j starts at one cause the first block is above the base block
 				BlockPos bp = pos.add(xs[i], j, zs[i]);
-				IBlockState state = worldObj.getBlockState(bp);
+				IBlockState state = world.getBlockState(bp);
 				if (state.getBlock() instanceof NostrumObelisk) {
-					worldObj.destroyBlock(bp, false);
+					world.destroyBlock(bp, false);
 				}
 			}
 
-			if (!worldObj.isRemote) {
+			if (!world.isRemote) {
 				Ticket ticket = NostrumChunkLoader.instance().pullTicket(genTicketKey());
 				if (ticket != null) {
 					ForgeChunkManager.releaseTicket(ticket);
 				}
 			}
 			
-			worldObj.destroyBlock(pos, false);
+			world.destroyBlock(pos, false);
 		} else {
 			int xs[] = new int[] {-NostrumObelisk.TILE_OFFSETH, -NostrumObelisk.TILE_OFFSETH, NostrumObelisk.TILE_OFFSETH, NostrumObelisk.TILE_OFFSETH};
 			int zs[] = new int[] {-NostrumObelisk.TILE_OFFSETH, NostrumObelisk.TILE_OFFSETH, -NostrumObelisk.TILE_OFFSETH, NostrumObelisk.TILE_OFFSETH};
 			for (int i = 0; i < xs.length; i++) {
 				BlockPos base = pos.add(xs[i], -NostrumObelisk.TILE_OFFSETY, zs[i]);
-				TileEntity te = worldObj.getTileEntity(base);
+				TileEntity te = world.getTileEntity(base);
 				if (te != null && te instanceof NostrumObeliskEntity) {
 					NostrumObeliskEntity entity = (NostrumObeliskEntity) te;
 					if (entity.master)
@@ -245,7 +245,7 @@ public class NostrumObeliskEntity extends TileEntity implements ITickable {
 				return false;
 		}
 		
-		if (!this.worldObj.isRemote) {
+		if (!this.world.isRemote) {
 			World world = DimensionManager.getWorld(dimension);
 			if (world == null)
 				return false;
@@ -278,10 +278,10 @@ public class NostrumObeliskEntity extends TileEntity implements ITickable {
 	// Registers this TE as a chunk loader. Gets a ticket and forces the chunk.
 	// Relies on already being placed in the world
 	public void init() {
-		if (worldObj.isRemote)
+		if (world.isRemote)
 			return;
 		
-		Ticket chunkTicket = ForgeChunkManager.requestTicket(NostrumMagica.instance, worldObj, Type.NORMAL);
+		Ticket chunkTicket = ForgeChunkManager.requestTicket(NostrumMagica.instance, world, Type.NORMAL);
 		chunkTicket.getModData().setTag(NBT_TICKET_POS, NBTUtil.createPosTag(pos));
 		ForgeChunkManager.forceChunk(chunkTicket, new ChunkPos(pos));
 		NostrumChunkLoader.instance().addTicket(genTicketKey(), chunkTicket);
@@ -292,15 +292,15 @@ public class NostrumObeliskEntity extends TileEntity implements ITickable {
 	}
 	
 	private void dirty() {
-		worldObj.markBlockRangeForRenderUpdate(pos, pos);
-		worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 3);
-		worldObj.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
+		world.markBlockRangeForRenderUpdate(pos, pos);
+		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
+		world.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
 		markDirty();
 	}
 
 	@Override
 	public void update() {
-		if (!worldObj.isRemote)
+		if (!world.isRemote)
 			return;
 		if (corner == null || master)
 			return;
@@ -330,7 +330,7 @@ public class NostrumObeliskEntity extends TileEntity implements ITickable {
 		x += master.getX() + .5;
 		z += master.getZ() + .5;
 		y += pos.getY() + .5;
-		worldObj.spawnParticle(EnumParticleTypes.DRAGON_BREATH, x, y, z, .01, 0, .01, new int[0]);
+		world.spawnParticle(EnumParticleTypes.DRAGON_BREATH, x, y, z, .01, 0, .01, new int[0]);
 		
 	}
 	

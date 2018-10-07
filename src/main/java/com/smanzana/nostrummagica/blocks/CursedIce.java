@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import javax.annotation.Nonnull;
+
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.potions.FrostbitePotion;
@@ -64,10 +66,10 @@ public class CursedIce extends Block {
         return false;
     }
 	
-	@Override
-	public boolean isVisuallyOpaque() {
-		return false;
-	}
+//	@Override
+//	public boolean isVisuallyOpaque() {
+//		return false;
+//	}
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
@@ -109,7 +111,7 @@ public class CursedIce extends Block {
 	}
 	
 	@Override
-	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+	public @Nonnull ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
 		return new ItemStack(Item.getItemFromBlock(this), 1, 0);
 	}
 	

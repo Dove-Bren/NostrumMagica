@@ -5,12 +5,9 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.init.Items;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.common.MinecraftForge;
 
 public class MagicArmorBase extends ItemArmor implements ILoreTagged {
 
@@ -24,33 +21,8 @@ public class MagicArmorBase extends ItemArmor implements ILoreTagged {
 		chest = new MagicArmorBase("magicchestbase", EntityEquipmentSlot.CHEST);
 		legs = new MagicArmorBase("magicleggingsbase", EntityEquipmentSlot.LEGS);
 		feet = new MagicArmorBase("magicfeetbase", EntityEquipmentSlot.FEET);
-		
-		GameRegistry.register(helm, new ResourceLocation(
-				NostrumMagica.MODID, "magichelmbase"));
-		GameRegistry.register(chest, new ResourceLocation(
-				NostrumMagica.MODID, "magicchestbase"));
-		GameRegistry.register(legs, new ResourceLocation(
-				NostrumMagica.MODID, "magicleggingsbase"));
-		GameRegistry.register(feet, new ResourceLocation(
-				NostrumMagica.MODID, "magicfeetbase"));
-		
-		/*
-		 * For now, just leather stuff. In the future, something cooler!
-		 */
-		GameRegistry.addShapedRecipe(new ItemStack(helm), "CCC", "C C", " D ",
-				'C', InfusedGemItem.instance().getGem(null, 1),
-				'D', Items.IRON_HELMET);
-		GameRegistry.addShapedRecipe(new ItemStack(chest), "CDC", "CCC", "CCC",
-				'C', InfusedGemItem.instance().getGem(null, 1),
-				'D', Items.IRON_CHESTPLATE);
-		GameRegistry.addShapedRecipe(new ItemStack(legs), "CCC", "CDC", "C C",
-				'C', InfusedGemItem.instance().getGem(null, 1),
-				'D', Items.IRON_LEGGINGS);
-		GameRegistry.addShapedRecipe(new ItemStack(feet), " D ", "C C", "C C",
-				'C', InfusedGemItem.instance().getGem(null, 1),
-				'D', Items.IRON_BOOTS);
 	}
-	
+		
 	private String id;
 
 	public MagicArmorBase(String id, EntityEquipmentSlot slot) {
@@ -59,6 +31,7 @@ public class MagicArmorBase extends ItemArmor implements ILoreTagged {
 		this.setMaxDamage(5);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.id = id;
+		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
 	public String getModelID() {

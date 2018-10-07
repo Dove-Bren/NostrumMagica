@@ -9,6 +9,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.event.RegistryEvent;
 
 public enum NostrumMagicaSounds {
 	
@@ -48,7 +49,7 @@ public enum NostrumMagicaSounds {
 	private NostrumMagicaSounds(String suffix, SoundCategory category, float volume) {
 		this.resource = new ResourceLocation(NostrumMagica.MODID, suffix);
 		this.category = category;
-		this.event = new SoundEvent(resource);
+		this.event = new SoundEvent(resource).setRegistryName(resource);
 		this.volume = volume;
 	}
 	
@@ -57,15 +58,15 @@ public enum NostrumMagicaSounds {
 	}
 	
 	public void play(Entity at) {
-		play(null, at.worldObj, at.getPositionVector());
+		play(null, at.world, at.getPositionVector());
 	}
 	
 	public void play(EntityPlayer at) {
-		play(at, at.worldObj, at.getPositionVector());
+		play(at, at.world, at.getPositionVector());
 	}
 	
 	public void play(EntityPlayer player, World world, Vec3d at) {
-		play(player, world, at.xCoord, at.yCoord, at.zCoord);
+		play(player, world, at.x, at.y, at.z);
 	}
 	
 	public void play(World world, double x, double y, double z) {
@@ -78,11 +79,12 @@ public enum NostrumMagicaSounds {
 				volume, 0.8f + (NostrumMagica.rand.nextFloat() * 0.4f));
 	}
 	
-	public static void registerSounds() {
-		int idOffset = SoundEvent.REGISTRY.getKeys().size();
+	public static void registerSounds(RegistryEvent.Register<SoundEvent> registry) {
+		//int idOffset = SoundEvent.REGISTRY.getKeys().size();
 		
 		for (NostrumMagicaSounds sound : values()) {
-			SoundEvent.REGISTRY.register(idOffset++, sound.resource, sound.event);
+			registry.getRegistry().register(sound.event);
+			//SoundEvent.REGISTRY.register(idOffset++, sound.resource, sound.event);
 		}
 		
 	}

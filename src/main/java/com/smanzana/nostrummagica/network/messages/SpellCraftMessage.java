@@ -39,8 +39,8 @@ public class SpellCraftMessage implements IMessage {
 			BlockPos pos = new BlockPos(x, y, z);
 			String name = message.tag.getString(NBT_NAME);
 			
-			EntityPlayer sp = ctx.getServerHandler().playerEntity;
-			World world = sp.worldObj;
+			EntityPlayer sp = ctx.getServerHandler().player;
+			World world = sp.world;
 			
 			// Get the TE
 			TileEntity TE = world.getTileEntity(pos);

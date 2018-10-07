@@ -35,7 +35,7 @@ public class OtherTrigger extends InstantTrigger {
 	@Override
 	protected TriggerData getTargetData(SpellState state, World world, Vec3d pos, float pitch, float yaw) {
 		
-		NostrumMagica.proxy.spawnEffect(state.getOther().worldObj,
+		NostrumMagica.proxy.spawnEffect(state.getOther().world,
 				new SpellComponentWrapper(instance()),
 				state.getCaster(), null, state.getOther(), null, null);
 		

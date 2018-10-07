@@ -1,7 +1,5 @@
 package com.smanzana.nostrummagica.items;
 
-import java.util.List;
-
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.CropGinseng;
 import com.smanzana.nostrummagica.blocks.CropMandrakeRoot;
@@ -12,16 +10,15 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -116,9 +113,12 @@ public class ReagentItem extends Item implements ILoreTagged {
      */
     @SideOnly(Side.CLIENT)
     @Override
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
-    	for (ReagentType type : ReagentType.values()) {
-    		subItems.add(new ItemStack(itemIn, 1, type.getMeta()));
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+    	if (this.getCreativeTab() != tab)
+    		return;
+    	
+		for (ReagentType type : ReagentType.values()) {
+    		subItems.add(new ItemStack(instance(), 1, type.getMeta()));
     	}
 	}
     
@@ -162,14 +162,15 @@ public class ReagentItem extends Item implements ILoreTagged {
     }
     
     @Override
-    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    	ItemStack stack = playerIn.getHeldItem(hand);
     	ReagentType type = getTypeFromMeta(stack.getMetadata());
     	
     	if (type == ReagentType.MANDRAKE_ROOT) {
 	    	IBlockState state = worldIn.getBlockState(pos);
 	        if (facing == EnumFacing.UP && playerIn.canPlayerEdit(pos.offset(facing), facing, stack) && state.getBlock().canSustainPlant(state, worldIn, pos, EnumFacing.UP, CropMandrakeRoot.instance()) && worldIn.isAirBlock(pos.up())) {
 	        	worldIn.setBlockState(pos.up(), CropMandrakeRoot.instance().getDefaultState());
-	            --stack.stackSize;
+	            stack.shrink(1);
 	            return EnumActionResult.SUCCESS;
 	        } else {
 	        	return EnumActionResult.FAIL;
@@ -180,7 +181,7 @@ public class ReagentItem extends Item implements ILoreTagged {
 	    	IBlockState state = worldIn.getBlockState(pos);
 	        if (facing == EnumFacing.UP && playerIn.canPlayerEdit(pos.offset(facing), facing, stack) && state.getBlock().canSustainPlant(state, worldIn, pos, EnumFacing.UP, CropGinseng.instance()) && worldIn.isAirBlock(pos.up())) {
 	        	worldIn.setBlockState(pos.up(), CropGinseng.instance().getDefaultState());
-	            --stack.stackSize;
+	            stack.shrink(1);
 	            return EnumActionResult.SUCCESS;
 	        } else {
 	        	return EnumActionResult.FAIL;
@@ -191,8 +192,7 @@ public class ReagentItem extends Item implements ILoreTagged {
 	}
 
 	public static void init() {
-		GameRegistry.addShapelessRecipe(instance.getReagent(ReagentType.SPIDER_SILK, 1),
-				Items.STRING, Items.STRING, Items.SUGAR);
+		;
 	}
 
 	@Override

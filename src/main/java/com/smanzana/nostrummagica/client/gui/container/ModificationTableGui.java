@@ -149,10 +149,10 @@ public class ModificationTableGui {
 				}
 				
 				@Override
-				public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack) {
+				public ItemStack onTake(EntityPlayer playerIn, ItemStack stack) {
 					validate();
 					floatIndex = 0;
-					super.onPickupFromSlot(playerIn, stack);
+					return super.onTake(playerIn, stack);
 				}
 			});
 			
@@ -184,7 +184,7 @@ public class ModificationTableGui {
 					// Trying to take our items
 					if (playerIn.inventory.addItemStackToInventory(cur)) {
 						slot.putStack(null);
-						slot.onPickupFromSlot(playerIn, cur);
+						slot.onTake(playerIn, cur);
 					}
 				} else {
 					// Trying to add an item
@@ -198,7 +198,7 @@ public class ModificationTableGui {
 					}
 				}
 				
-				if (cur == null || cur.stackSize <= 0) {
+				if (cur == null || cur.getCount() <= 0) {
 					slot.putStack(null);
 				}
 			}
@@ -392,8 +392,8 @@ public class ModificationTableGui {
 			if (container.runeMode) {
 				// Draw rune sliders or toggles
 				int x, y;
-				int len = mc.fontRendererObj.getStringWidth("Rune Modification");
-				mc.fontRendererObj.drawStringWithShadow("Rune Modification",
+				int len = mc.fontRenderer.getStringWidth("Rune Modification");
+				mc.fontRenderer.drawStringWithShadow("Rune Modification",
 						horizontalMargin + (PANEL_HOFFSET) + (PANEL_WIDTH / 2) - (len / 2),
 						verticalMargin + PANEL_VOFFSET + 5, 0xFFFFFFFF);
 				y = verticalMargin + PANEL_VOFFSET + 20;
@@ -404,7 +404,7 @@ public class ModificationTableGui {
 						boolTitle = container.component.getTrigger().supportedBooleanName();
 					else
 						boolTitle = container.component.getShape().supportedBooleanName();
-					mc.fontRendererObj.drawStringWithShadow(boolTitle, x, y, 0xFFa0a0a0);
+					mc.fontRenderer.drawStringWithShadow(boolTitle, x, y, 0xFFa0a0a0);
 					
 					y += 25;
 				}
@@ -415,7 +415,7 @@ public class ModificationTableGui {
 						floatTitle = container.component.getTrigger().supportedFloatName();
 					else
 						floatTitle = container.component.getShape().supportedFloatName();
-					mc.fontRendererObj.drawStringWithShadow(floatTitle, x, y, 0xFFa0a0a0);
+					mc.fontRenderer.drawStringWithShadow(floatTitle, x, y, 0xFFa0a0a0);
 					
 					y += 25;
 				}
@@ -428,9 +428,9 @@ public class ModificationTableGui {
 					String name = tome.getDisplayName();
 					if (name == null || name.length() == 0)
 						name = "Spell Tome";
-					int len = mc.fontRendererObj.getStringWidth(name);
+					int len = mc.fontRenderer.getStringWidth(name);
 					x = horizontalMargin + PANEL_HOFFSET + (PANEL_WIDTH / 2) - (len / 2);
-					mc.fontRendererObj.drawStringWithShadow(name, x, y, 0xFFFFFFFF);
+					mc.fontRenderer.drawStringWithShadow(name, x, y, 0xFFFFFFFF);
 					y += 20;
 					
 					x = horizontalMargin + PANEL_HOFFSET + 5;
@@ -443,37 +443,37 @@ public class ModificationTableGui {
 					}
 					
 					// Efficiency
-					mc.fontRendererObj.drawStringWithShadow("Efficiency: ", x, y, 0xFFA0A0A0);
-					mc.fontRendererObj.drawString(String.format("%+03.0f%%", (summary.getEfficiency() - 1f) * 100), valX, y, 0xFFFFFFFF);
-					y += 2 + mc.fontRendererObj.FONT_HEIGHT;
+					mc.fontRenderer.drawStringWithShadow("Efficiency: ", x, y, 0xFFA0A0A0);
+					mc.fontRenderer.drawString(String.format("%+03.0f%%", (summary.getEfficiency() - 1f) * 100), valX, y, 0xFFFFFFFF);
+					y += 2 + mc.fontRenderer.FONT_HEIGHT;
 					
 					// LMC
-					mc.fontRendererObj.drawStringWithShadow("Mana Cost: ", x, y, 0xFFA0A0A0);
-					mc.fontRendererObj.drawString(String.format("%+03.0f%%", (summary.getCostRate() - 1f) * 100), valX, y, 0xFFFFFFFF);
-					y += 2 + mc.fontRendererObj.FONT_HEIGHT;
+					mc.fontRenderer.drawStringWithShadow("Mana Cost: ", x, y, 0xFFA0A0A0);
+					mc.fontRenderer.drawString(String.format("%+03.0f%%", (summary.getCostRate() - 1f) * 100), valX, y, 0xFFFFFFFF);
+					y += 2 + mc.fontRenderer.FONT_HEIGHT;
 					
 					// LRC
-					mc.fontRendererObj.drawStringWithShadow("Reagent Cost: ", x, y, 0xFFA0A0A0);
-					mc.fontRendererObj.drawString(String.format("%+03.0f%%", (summary.getReagentCost() - 1f) * 100), valX, y, 0xFFFFFFFF);
-					y += 2 + mc.fontRendererObj.FONT_HEIGHT;
+					mc.fontRenderer.drawStringWithShadow("Reagent Cost: ", x, y, 0xFFA0A0A0);
+					mc.fontRenderer.drawString(String.format("%+03.0f%%", (summary.getReagentCost() - 1f) * 100), valX, y, 0xFFFFFFFF);
+					y += 2 + mc.fontRenderer.FONT_HEIGHT;
 					
 					// XP
-					mc.fontRendererObj.drawStringWithShadow("Bonus XP: ", x, y, 0xFFA0A0A0);
-					mc.fontRendererObj.drawString(String.format("%+03.0f%%", (summary.getXpRate() - 1f) * 100), valX, y, 0xFFFFFFFF);
-					y += 2 + mc.fontRendererObj.FONT_HEIGHT;
+					mc.fontRenderer.drawStringWithShadow("Bonus XP: ", x, y, 0xFFA0A0A0);
+					mc.fontRenderer.drawString(String.format("%+03.0f%%", (summary.getXpRate() - 1f) * 100), valX, y, 0xFFFFFFFF);
+					y += 2 + mc.fontRenderer.FONT_HEIGHT;
 					
 					y = topY;
 					x += 100;
 					valX += 100;
 					
 					// Level
-					mc.fontRendererObj.drawStringWithShadow("Level: ", x, y, 0xFFA0A0A0);
-					mc.fontRendererObj.drawString("" + SpellTome.getLevel(tome), valX, y, 0xFFFFFFFF);
-					y += 2 + mc.fontRendererObj.FONT_HEIGHT;
+					mc.fontRenderer.drawStringWithShadow("Level: ", x, y, 0xFFA0A0A0);
+					mc.fontRenderer.drawString("" + SpellTome.getLevel(tome), valX, y, 0xFFFFFFFF);
+					y += 2 + mc.fontRenderer.FONT_HEIGHT;
 					
 					// Modifications
-					mc.fontRendererObj.drawStringWithShadow("Modifications: ", x, y, 0xFFA0A0A0);
-					mc.fontRendererObj.drawString("" + SpellTome.getModifications(tome), valX, y, 0xFFFFFFFF);
+					mc.fontRenderer.drawStringWithShadow("Modifications: ", x, y, 0xFFA0A0A0);
+					mc.fontRenderer.drawString("" + SpellTome.getModifications(tome), valX, y, 0xFFFFFFFF);
 							
 				}
 			}
@@ -487,8 +487,8 @@ public class ModificationTableGui {
 					GlStateManager.pushMatrix();
 					GlStateManager.translate(0, 0, -100);
 					mc.getRenderItem().renderItemIntoGUI(shadow,
-						horizontalMargin + container.inputSlot.xDisplayPosition,
-						verticalMargin + container.inputSlot.yDisplayPosition);
+						horizontalMargin + container.inputSlot.xPos,
+						verticalMargin + container.inputSlot.yPos);
 					GlStateManager.popMatrix();
 				}
 			}
@@ -528,10 +528,10 @@ public class ModificationTableGui {
 				GlStateManager.pushMatrix();
 				GlStateManager.translate(0, 0, 1);
 				Gui.drawRect(
-						horizontalMargin + container.inputSlot.xDisplayPosition,
-						verticalMargin + container.inputSlot.yDisplayPosition,
-						horizontalMargin + container.inputSlot.xDisplayPosition + 16,
-						verticalMargin + container.inputSlot.yDisplayPosition + 16,
+						horizontalMargin + container.inputSlot.xPos,
+						verticalMargin + container.inputSlot.yPos,
+						horizontalMargin + container.inputSlot.xPos + 16,
+						verticalMargin + container.inputSlot.yPos+ 16,
 						color);
 				GlStateManager.popMatrix();
 			}
@@ -670,14 +670,14 @@ public class ModificationTableGui {
 			}
 			
 			@Override
-			public void drawButton(Minecraft mc, int parX, int parY) {
+			public void drawButton(Minecraft mc, int parX, int parY, float partialTicks) {
 				if (visible) {
 					
 					float tint = 1f;
 					mc.getTextureManager().bindTexture(TEXT);
-					if (parX >= this.xPosition && parY >= this.yPosition
-							&& parX <= this.xPosition + this.width
-							&& parY <= this.yPosition + this.height) {
+					if (parX >= this.x && parY >= this.y
+							&& parX <= this.x + this.width
+							&& parY <= this.y + this.height) {
 						tint = .8f;
 					}
 					
@@ -688,7 +688,7 @@ public class ModificationTableGui {
 						x += BUTTON_WIDTH;
 					
 					GlStateManager.color(tint, tint, tint);
-					this.drawTexturedModalRect(this.xPosition, this.yPosition,
+					this.drawTexturedModalRect(this.x, this.y,
 							BUTTON_TEXT_HOFFSET + x, BUTTON_TEXT_VOFFSET,
 							this.width, this.height);
 				}
@@ -710,14 +710,14 @@ public class ModificationTableGui {
 			}
 			
 			@Override
-			public void drawButton(Minecraft mc, int parX, int parY) {
+			public void drawButton(Minecraft mc, int parX, int parY, float partialTicks) {
 				if (visible) {
 					
 					float tint = 1f;
 					mc.getTextureManager().bindTexture(TEXT);
-					if (parX >= this.xPosition && parY >= this.yPosition
-							&& parX <= this.xPosition + this.width
-							&& parY <= this.yPosition + this.height) {
+					if (parX >= this.x && parY >= this.y
+							&& parX <= this.x + this.width
+							&& parY <= this.y + this.height) {
 						tint = .8f;
 					}
 					
@@ -727,16 +727,16 @@ public class ModificationTableGui {
 					
 					int len;
 					String text = String.format("%.1f", actualVal);
-					len = mc.fontRendererObj.getStringWidth(text);
+					len = mc.fontRenderer.getStringWidth(text);
 					
 					GlStateManager.color(tint, tint, tint);
-					this.drawTexturedModalRect(this.xPosition, this.yPosition,
+					this.drawTexturedModalRect(this.x, this.y,
 							BUTTON_TEXT_HOFFSET + x, BUTTON_TEXT_VOFFSET + BUTTON_HEIGHT,
 							this.width, this.height);
 					
-					mc.fontRendererObj.drawString(text,
-							xPosition + (LARGE_BUTTON_WIDTH / 2) - (len / 2),
-							yPosition + 1,
+					mc.fontRenderer.drawString(text,
+							x + (LARGE_BUTTON_WIDTH / 2) - (len / 2),
+							y + 1,
 							0xFF000000);
 				}
 			}
@@ -754,13 +754,13 @@ public class ModificationTableGui {
 			}
 			
 			@Override
-			public void drawButton(Minecraft mc, int parX, int parY) {
+			public void drawButton(Minecraft mc, int parX, int parY, float partialTicks) {
 				if (visible) {
 					
 					float tint = 1f;
-					if (parX >= this.xPosition && parY >= this.yPosition
-							&& parX <= this.xPosition + this.width
-							&& parY <= this.yPosition + this.height) {
+					if (parX >= this.x && parY >= this.y
+							&& parX <= this.x + this.width
+							&& parY <= this.y + this.height) {
 						tint = .8f;
 					}
 					
@@ -769,7 +769,7 @@ public class ModificationTableGui {
 					int y = 0;
 					if (container.isValid)
 						y += SUBMIT_HEIGHT;
-					this.drawTexturedModalRect(this.xPosition, this.yPosition,
+					this.drawTexturedModalRect(this.x, this.y,
 							SUBMIT_TEXT_HOFFSET, SUBMIT_TEXT_VOFFSET + y,
 							this.width, this.height);
 				}
@@ -783,8 +783,8 @@ public class ModificationTableGui {
 		private ItemStack required;
 		private ModificationTableContainer container;
 
-		public InputSlot(ModificationTableContainer container, IInventory inventoryIn, int index, int xPosition, int yPosition) {
-			super(inventoryIn, index, xPosition, yPosition);
+		public InputSlot(ModificationTableContainer container, IInventory inventoryIn, int index, int x, int y) {
+			super(inventoryIn, index, x, y);
 			this.container = container;
 		}
 		
@@ -813,9 +813,9 @@ public class ModificationTableGui {
 		}
 		
 		@Override
-		public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack) {
+		public ItemStack onTake(EntityPlayer playerIn, ItemStack stack) {
 			container.validate();
-			super.onPickupFromSlot(playerIn, stack);
+			return super.onTake(playerIn, stack);
 		}
 		
 		@Override

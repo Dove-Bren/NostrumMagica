@@ -65,9 +65,9 @@ public abstract class SpellShape {
 						float efficiency) {
 		
 		if (target != null && (world == null || pos == null)) {
-			world = target.worldObj;
+			world = target.world;
 			Vec3d vec = target.getPositionVector();
-			pos = new BlockPos(vec.xCoord, vec.yCoord, vec.zCoord);
+			pos = new BlockPos(vec.x, vec.y, vec.z);
 		}
 		
 		List<EntityLivingBase> entTargets = getTargets(param, target, world, pos);

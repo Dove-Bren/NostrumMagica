@@ -8,7 +8,6 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -18,7 +17,6 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ReagentBag extends Item implements ILoreTagged {
 
@@ -36,10 +34,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 	}
 	
 	public static void init() {
-		GameRegistry.addRecipe(new ItemStack(instance), "GLG", "LRL", "LLL",
-				'L', Items.LEATHER,
-				'G', Items.GOLD_INGOT,
-				'R', ReagentItem.instance());
+		;
 	}
 	
 	public static final String id = "reagent_bag";
@@ -64,7 +59,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 			
 			if (ReagentItem.getTypeFromMeta(item.getMetadata())
 					== type)
-				count += item.stackSize;
+				count += item.getCount();
 		}
 		
 		return count;
@@ -121,12 +116,12 @@ public class ReagentBag extends Item implements ILoreTagged {
 			
 			if (ReagentItem.getTypeFromMeta(item.getMetadata())
 					== type) {
-				if (item.stackSize > remaining) {
-					item.stackSize -= remaining;
+				if (item.getCount() > remaining) {
+					item.shrink(remaining);
 					remaining = 0;
 					break;
 				} else {
-					remaining -= item.stackSize;
+					remaining -= item.getCount();
 					existing[i] = null;
 				}
 			}
@@ -152,7 +147,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 			
 			NBTTagCompound items = bag.getTagCompound().getCompoundTag(NBT_ITEMS);
 			if (items.hasKey(pos + "", NBT.TAG_COMPOUND))
-				return ItemStack.loadItemStackFromNBT(items.getCompoundTag(pos + ""));
+				return new ItemStack(items.getCompoundTag(pos + ""));
 			else
 				return null;
 		}
@@ -210,10 +205,11 @@ public class ReagentBag extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
 		playerIn.openGui(NostrumMagica.instance, NostrumGui.reagentBagID, worldIn,
 				(int) playerIn.posX, (int) playerIn.posY, (int) playerIn.posZ);
 		
+		ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
     }
 	
@@ -258,13 +254,13 @@ public class ReagentBag extends Item implements ILoreTagged {
 
 	            if (ItemStack.areItemsEqual(itemstack1, itemstack)) {
 	                int j = this.getInventoryStackLimit();
-	                int k = Math.min(itemstack.stackSize, j - itemstack1.stackSize);
+	                int k = Math.min(itemstack.getCount(), j - itemstack1.getCount());
 
 	                if (k > 0) {
-	                    itemstack1.stackSize += k;
-	                    itemstack.stackSize -= k;
+	                    itemstack1.grow(k);
+	                    itemstack.shrink(k);
 
-	                    if (itemstack.stackSize <= 0) {
+	                    if (itemstack.getCount() <= 0) {
 	                        this.markDirty();
 	                        return null;
 	                    }
@@ -272,7 +268,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 	            }
 	        }
 
-	        if (itemstack.stackSize != stack.stackSize) {
+	        if (itemstack.getCount() != stack.getCount()) {
 	            this.markDirty();
 	        }
 

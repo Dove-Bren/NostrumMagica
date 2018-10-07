@@ -28,9 +28,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -175,18 +175,18 @@ public class MirrorGui extends GuiScreen {
 				if (button != buttonControl
 						&& button != buttonTechnique
 						&& button != buttonFinesse)
-					button.drawButton(this.mc, mouseX, mouseY);
+					button.drawButton(this.mc, mouseX, mouseY, partialTicks);
 			}
 		} else {
 			int y = 0;
 			String str = "Magic Not Yet Unlocked";
-			int len = this.fontRendererObj.getStringWidth(str);
-			this.fontRendererObj.drawString(str, (this.width - len) / 2, topOffset + (TEXT_CONTENT_HEIGHT / 2), 0xFFFFFFFF, true);
+			int len = this.fontRenderer.getStringWidth(str);
+			this.fontRenderer.drawString(str, (this.width - len) / 2, topOffset + (TEXT_CONTENT_HEIGHT / 2), 0xFFFFFFFF, true);
 			
-			y = fontRendererObj.FONT_HEIGHT + 2;
+			y = fontRenderer.FONT_HEIGHT + 2;
 			
-			len = this.fontRendererObj.getStringWidth(unlockPrompt);
-			this.fontRendererObj.drawString(unlockPrompt, (this.width - len) / 2, y + topOffset + (TEXT_CONTENT_HEIGHT / 2), 0xFFDFD000, false);
+			len = this.fontRenderer.getStringWidth(unlockPrompt);
+			this.fontRenderer.drawString(unlockPrompt, (this.width - len) / 2, y + topOffset + (TEXT_CONTENT_HEIGHT / 2), 0xFFDFD000, false);
 		}
 		
 		// Black out surrounding screen
@@ -212,60 +212,60 @@ public class MirrorGui extends GuiScreen {
 			String str;
 			
 			str = "Level " + level;
-			len = fontRendererObj.getStringWidth(str);
-			this.fontRendererObj.drawString(str, (this.width - len) / 2, topOffset + TEXT_BOTTOM_VOFFSET, 0xFFFFFFFF, true);
-			y += fontRendererObj.FONT_HEIGHT + 10;
+			len = fontRenderer.getStringWidth(str);
+			this.fontRenderer.drawString(str, (this.width - len) / 2, topOffset + TEXT_BOTTOM_VOFFSET, 0xFFFFFFFF, true);
+			y += fontRenderer.FONT_HEIGHT + 10;
 			int yTop = y = KEY_VOFFSET + topOffset + TEXT_BOTTOM_VOFFSET;
 			
 			//leftOffset + TEXT_BOTTOM_HOFFSET, y + topOffset + TEXT_BOTTOM_VOFFSET, colorKey
 			// XP, points
 			Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET - 2, y, leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
 			str = "XP: ";
-			len = fontRendererObj.getStringWidth(String.format("%.02f%%", 100f * xp/maxXP));
-			this.fontRendererObj.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET, y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorKey);
-			this.fontRendererObj.drawString(String.format("%.02f%%", 100f * xp/maxXP), leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH - (len), y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorVal);
+			len = fontRenderer.getStringWidth(String.format("%.02f%%", 100f * xp/maxXP));
+			this.fontRenderer.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET, y + (KEY_HEIGHT - fontRenderer.FONT_HEIGHT) / 2 + 1, colorKey);
+			this.fontRenderer.drawString(String.format("%.02f%%", 100f * xp/maxXP), leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH - (len), y + (KEY_HEIGHT - fontRenderer.FONT_HEIGHT) / 2 + 1, colorVal);
 			y += KEY_HEIGHT + 5;
 			
-//			Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET - 2, topOffset + TEXT_BOTTOM_VOFFSET + y - 2, leftOffset + TEXT_BOTTOM_HOFFSET + keyWidth + 2, topOffset + TEXT_BOTTOM_VOFFSET + y + this.fontRendererObj.FONT_HEIGHT, 0xD0000000);
+//			Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET - 2, topOffset + TEXT_BOTTOM_VOFFSET + y - 2, leftOffset + TEXT_BOTTOM_HOFFSET + keyWidth + 2, topOffset + TEXT_BOTTOM_VOFFSET + y + this.fontRenderer.FONT_HEIGHT, 0xD0000000);
 //			str = "Technique: ";
-//			len = fontRendererObj.getStringWidth("" + attr.getTech());
-//			this.fontRendererObj.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET, y + topOffset + TEXT_BOTTOM_VOFFSET, colorKey);
-//			this.fontRendererObj.drawString("" + attr.getTech(), leftOffset + TEXT_BOTTOM_HOFFSET + keyWidth - (len), y + topOffset + TEXT_BOTTOM_VOFFSET, colorVal);
+//			len = fontRenderer.getStringWidth("" + attr.getTech());
+//			this.fontRenderer.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET, y + topOffset + TEXT_BOTTOM_VOFFSET, colorKey);
+//			this.fontRenderer.drawString("" + attr.getTech(), leftOffset + TEXT_BOTTOM_HOFFSET + keyWidth - (len), y + topOffset + TEXT_BOTTOM_VOFFSET, colorVal);
 			y += KEY_HEIGHT + 5;
 			
 			Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET - 2, y, leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
 			str = "Skill Points: ";
-			len = fontRendererObj.getStringWidth("" + skillPoints);
-			this.fontRendererObj.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET, y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorKey);
-			this.fontRendererObj.drawString("" + skillPoints, leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH - (len), y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorVal);
+			len = fontRenderer.getStringWidth("" + skillPoints);
+			this.fontRenderer.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET, y + (KEY_HEIGHT - fontRenderer.FONT_HEIGHT) / 2 + 1, colorKey);
+			this.fontRenderer.drawString("" + skillPoints, leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH - (len), y + (KEY_HEIGHT - fontRenderer.FONT_HEIGHT) / 2 + 1, colorVal);
 			y += KEY_HEIGHT + 5;
 			
 			// stats
 			y = yTop;
 			Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (2 + KEY_WIDTH), y, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
 			str = "Control: ";
-			len = fontRendererObj.getStringWidth("" + control);
-			this.fontRendererObj.drawString(str, leftOffset + TEXT_BOTTOM_WIDTH + TEXT_BOTTOM_HOFFSET - (KEY_WIDTH), y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorKey);
-			this.fontRendererObj.drawString("" + control, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorVal);
+			len = fontRenderer.getStringWidth("" + control);
+			this.fontRenderer.drawString(str, leftOffset + TEXT_BOTTOM_WIDTH + TEXT_BOTTOM_HOFFSET - (KEY_WIDTH), y + (KEY_HEIGHT - fontRenderer.FONT_HEIGHT) / 2 + 1, colorKey);
+			this.fontRenderer.drawString("" + control, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - fontRenderer.FONT_HEIGHT) / 2 + 1, colorVal);
 			y += KEY_HEIGHT + 5;
 			
 			Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (2 + KEY_WIDTH), y, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
 			str = "Technique: ";
-			len = fontRendererObj.getStringWidth("" + technique);
-			this.fontRendererObj.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - KEY_WIDTH, y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorKey);
-			this.fontRendererObj.drawString("" + technique, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorVal);
+			len = fontRenderer.getStringWidth("" + technique);
+			this.fontRenderer.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - KEY_WIDTH, y + (KEY_HEIGHT - fontRenderer.FONT_HEIGHT) / 2 + 1, colorKey);
+			this.fontRenderer.drawString("" + technique, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - fontRenderer.FONT_HEIGHT) / 2 + 1, colorVal);
 			y += KEY_HEIGHT + 5;
 			
 			Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (2 + KEY_WIDTH), y, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
 			str = "Finess: ";
-			len = fontRendererObj.getStringWidth("" + finesse);
-			this.fontRendererObj.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - KEY_WIDTH, y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorKey);
-			this.fontRendererObj.drawString("" + finesse, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorVal);
+			len = fontRenderer.getStringWidth("" + finesse);
+			this.fontRenderer.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - KEY_WIDTH, y + (KEY_HEIGHT - fontRenderer.FONT_HEIGHT) / 2 + 1, colorKey);
+			this.fontRenderer.drawString("" + finesse, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - fontRenderer.FONT_HEIGHT) / 2 + 1, colorVal);
 			y += KEY_HEIGHT + 5;
 			
-			buttonControl.drawButton(mc, mouseX, mouseY);
-			buttonTechnique.drawButton(mc, mouseX, mouseY);
-			buttonFinesse.drawButton(mc, mouseX, mouseY);
+			buttonControl.drawButton(mc, mouseX, mouseY, partialTicks);
+			buttonTechnique.drawButton(mc, mouseX, mouseY, partialTicks);
+			buttonFinesse.drawButton(mc, mouseX, mouseY, partialTicks);
 			
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			int mana = attr.getMana();
@@ -273,25 +273,25 @@ public class MirrorGui extends GuiScreen {
 			float bonusMana = attr.getManaModifier();
 			float bonusManaRegen = attr.getManaRegenModifier();
 			float bonusManaCost = attr.getManaCostModifier();
-			int fh = fontRendererObj.FONT_HEIGHT;
-			this.fontRendererObj.drawString("Mana:",
+			int fh = fontRenderer.FONT_HEIGHT;
+			this.fontRenderer.drawString("Mana:",
 					leftOffset + TEXT_WIDTH, topOffset + 5, 0xFFFFFFFF);
-			this.fontRendererObj.drawString(" " + mana + "/" + maxMana,
+			this.fontRenderer.drawString(" " + mana + "/" + maxMana,
 					leftOffset + TEXT_WIDTH, topOffset + 5 + fh, 0xFFFFFFFF);
 			
-			this.fontRendererObj.drawString("Bonus Mana:",
+			this.fontRenderer.drawString("Bonus Mana:",
 					leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 4, 0xFFFFFFFF);
-			this.fontRendererObj.drawString(String.format("%+.1f%%", bonusMana * 100f),
+			this.fontRenderer.drawString(String.format("%+.1f%%", bonusMana * 100f),
 					leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 5, 0xFFFFFFFF);
 
-			this.fontRendererObj.drawString("Mana Regen:",
+			this.fontRenderer.drawString("Mana Regen:",
 					leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 6, 0xFFFFFFFF);
-			this.fontRendererObj.drawString(String.format("%+.1f%%", bonusManaRegen * 100f),
+			this.fontRenderer.drawString(String.format("%+.1f%%", bonusManaRegen * 100f),
 					leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 7, 0xFFFFFFFF);
 
-			this.fontRendererObj.drawString("Mana Cost:",
+			this.fontRenderer.drawString("Mana Cost:",
 					leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 8, 0xFFFFFFFF);
-			this.fontRendererObj.drawString(String.format("%+.1f%%", bonusManaCost * 100f),
+			this.fontRenderer.drawString(String.format("%+.1f%%", bonusManaCost * 100f),
 					leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 9, 0xFFFFFFFF);
 			
 			for (int i = 0; i < this.buttonList.size(); ++i) {
@@ -343,10 +343,10 @@ public class MirrorGui extends GuiScreen {
 	                  (int) (Minecraft.getSystemTime() / cycle) % EMagicElement.values().length
 				      ];
 			}
-			SpellIcon.get(element).draw(this, this.fontRendererObj, x, y, width, width);
+			SpellIcon.get(element).draw(this, this.fontRenderer, x, y, width, width);
 			str = I18n.format("element.name", new Object[0]);
-			strLen = this.fontRendererObj.getStringWidth(str);
-			this.fontRendererObj.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.fontRendererObj.FONT_HEIGHT), 0xFFFFFF);
+			strLen = this.fontRenderer.getStringWidth(str);
+			this.fontRenderer.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.fontRenderer.FONT_HEIGHT), 0xFFFFFF);
 			
 			x += width + space;
 			drawRect(x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
@@ -360,10 +360,10 @@ public class MirrorGui extends GuiScreen {
 	                  (int) (Minecraft.getSystemTime() / cycle) % trigArray.length
 				      ];
 			}
-			SpellIcon.get(trigger).draw(this, this.fontRendererObj, x, y, width, width);
+			SpellIcon.get(trigger).draw(this, this.fontRenderer, x, y, width, width);
 			str = I18n.format("trigger.name", new Object[0]);
-			strLen = this.fontRendererObj.getStringWidth(str);
-			this.fontRendererObj.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.fontRendererObj.FONT_HEIGHT), 0xFFFFFF);
+			strLen = this.fontRenderer.getStringWidth(str);
+			this.fontRenderer.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.fontRenderer.FONT_HEIGHT), 0xFFFFFF);
 			
 			x += width + space;
 			drawRect(x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
@@ -377,10 +377,10 @@ public class MirrorGui extends GuiScreen {
 	                  (int) (Minecraft.getSystemTime() / cycle) % shapeArray.length
 				      ];
 			}
-			SpellIcon.get(shape).draw(this, this.fontRendererObj, x, y, width, width);
+			SpellIcon.get(shape).draw(this, this.fontRenderer, x, y, width, width);
 			str = I18n.format("shape.name", new Object[0]);
-			strLen = this.fontRendererObj.getStringWidth(str);
-			this.fontRendererObj.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.fontRendererObj.FONT_HEIGHT), 0xFFFFFF);
+			strLen = this.fontRenderer.getStringWidth(str);
+			this.fontRenderer.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.fontRenderer.FONT_HEIGHT), 0xFFFFFF);
 		}
 		
 		//super.drawScreen(mouseX, mouseY, partialTicks);
@@ -518,20 +518,20 @@ public class MirrorGui extends GuiScreen {
 		}
 		
 		@Override
-        public void drawButton(Minecraft mc, int parX, int parY) {
+        public void drawButton(Minecraft mc, int parX, int parY, float partialTicks) {
 			if (visible) {
 				int textureX = 0;
 				int textureY = TEXT_BUTTON_VOFFSET;
-            	if (parX >= xPosition 
-                  && parY >= yPosition 
-                  && parX < xPosition + width 
-                  && parY < yPosition + height) {
+            	if (parX >= x 
+                  && parY >= y 
+                  && parX < x+ width 
+                  && parY < y + height) {
             		textureX += TEXT_BUTTON_LENGTH;
             	}
                 
             	GlStateManager.color(1f, 1f, 1f, 1f);
                 mc.getTextureManager().bindTexture(RES_FORE);
-                Gui.drawScaledCustomSizeModalRect(xPosition, yPosition, textureX, textureY,
+                Gui.drawScaledCustomSizeModalRect(x, y, textureX, textureY,
         				TEXT_BUTTON_LENGTH, TEXT_BUTTON_LENGTH, this.width, this.height, TEXT_WIDTH, TEXT_HEIGHT);
             }
         }
@@ -592,14 +592,14 @@ public class MirrorGui extends GuiScreen {
 			GlStateManager.pushMatrix();
 			GlStateManager.pushAttrib();
 			GlStateManager.translate(width / 2, height / 2, 0);
-			VertexBuffer buf = Tessellator.getInstance().getBuffer();
+			BufferBuilder buf = Tessellator.getInstance().getBuffer();
 			//GlStateManager.enableBlend();
 	        GlStateManager.disableTexture2D();
 	        //GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 	        GlStateManager.color(1.0f, 1.0f, 1.0f, 0.6f);
 	        buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-	        buf.pos(xPosition, yPosition, 0).endVertex();
-	        buf.pos(other.xPosition, other.yPosition, 0).endVertex();
+	        buf.pos(x, y, 0).endVertex();
+	        buf.pos(other.x, other.y, 0).endVertex();
 	        Tessellator.getInstance().draw();
 	        GlStateManager.enableTexture2D();
 	        //GlStateManager.disableBlend();
@@ -609,22 +609,22 @@ public class MirrorGui extends GuiScreen {
 		}
 		
 		@Override
-        public void drawButton(Minecraft mc, int parX, int parY) {
+        public void drawButton(Minecraft mc, int parX, int parY, float partialTicks) {
 			mouseOver = false;
 			if (visible) {
 				int textureX = 0;
 				int textureY = TEXT_QUEST_VOFFSET;
 				
-				xPosition = (this.offsetX * guiScale) + guiX;
-				yPosition = (this.offsetY * guiScale) + guiY;
+				x = (this.offsetX * guiScale) + guiX;
+				y = (this.offsetY * guiScale) + guiY;
 				
-				xPosition -= this.width / 2;
-				yPosition -= this.height / 2;
+				x -= this.width / 2;
+				y -= this.height / 2;
 				
-            	if (parX >= xPosition 
-                  && parY >= yPosition 
-                  && parX < xPosition + width 
-                  && parY < yPosition + height) {
+            	if (parX >= x 
+                  && parY >= y 
+                  && parX < x + width 
+                  && parY < y + height) {
             		textureY += TEXT_QUEST_LENGTH;
             		mouseOver = true;
             	}
@@ -654,15 +654,15 @@ public class MirrorGui extends GuiScreen {
             	GlStateManager.disableLighting();
             	GlStateManager.disableBlend();
                 mc.getTextureManager().bindTexture(RES_FORE);
-                Gui.drawScaledCustomSizeModalRect(xPosition, yPosition, textureX, textureY,
+                Gui.drawScaledCustomSizeModalRect(x, y, textureX, textureY,
                 		TEXT_QUEST_LENGTH, TEXT_QUEST_LENGTH, this.width, this.height, TEXT_WIDTH, TEXT_HEIGHT);
                 
                 if (icon != null) {
-                	icon.draw(this, fontRendererObj, xPosition + 2, yPosition + 3, 12, 12);
+                	icon.draw(this, fontRenderer, x + 2, y + 3, 12, 12);
                 } else {
                 	GlStateManager.enableBlend();
                 	GlStateManager.color(1f, 1f, 1f, .8f);
-                	Gui.drawScaledCustomSizeModalRect(xPosition + 4, yPosition + 5, iconOffset, TEXT_BUTTON_VOFFSET,
+                	Gui.drawScaledCustomSizeModalRect(x + 4, y + 5, iconOffset, TEXT_BUTTON_VOFFSET,
                 		TEXT_REWARD_WIDTH, TEXT_REWARD_WIDTH, 8, 8, TEXT_WIDTH, TEXT_HEIGHT);
                 }
             }
@@ -732,7 +732,7 @@ public class MirrorGui extends GuiScreen {
             
             if (this.state == QuestState.TAKEN || this.state == QuestState.COMPLETED) {
 	            for (String line : tooltip) {
-	            	int width = fontRendererObj.getStringWidth(line);
+	            	int width = fontRenderer.getStringWidth(line);
 	            	if (width > maxWidth)
 	            		maxWidth = width;
 	            }
@@ -747,8 +747,8 @@ public class MirrorGui extends GuiScreen {
 	            			tooltip.add(buf.toString());
 	            			buf = new StringBuffer();
 	            		} else {
-		            		int oldlen = fontRendererObj.getStringWidth(buf.toString());
-		            		if (oldlen + fontRendererObj.getCharWidth(desc.charAt(index)) > maxWidth) {
+		            		int oldlen = fontRenderer.getStringWidth(buf.toString());
+		            		if (oldlen + fontRenderer.getCharWidth(desc.charAt(index)) > maxWidth) {
 		            			// Go back until we find a space
 		            			boolean isSpace = desc.charAt(index) == ' ';
 		            			if (!isSpace) {

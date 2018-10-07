@@ -19,10 +19,10 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -233,8 +233,8 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(0, 0, 1000);
 		String title = I18n.format("ritual." + ritual.getTitleKey() + ".name", new Object[0]);
-		int len = mc.fontRendererObj.getStringWidth(title);
-		mc.fontRendererObj.drawStringWithShadow(title, x + (width / 2) + (-len / 2), y, 0xFFFFFFFF);
+		int len = mc.fontRenderer.getStringWidth(title);
+		mc.fontRenderer.drawStringWithShadow(title, x + (width / 2) + (-len / 2), y, 0xFFFFFFFF);
 		GlStateManager.popMatrix();
 		
 		if (infopage) {
@@ -242,8 +242,8 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 			
 			int i = 0;
 			for (String line : desc) {
-				mc.fontRendererObj.drawSplitString(line, x + (int) (width * .75) + 5, i + y + 10, (width / 4) - 5, 0xFFFFFFFF);
-				i += mc.fontRendererObj.FONT_HEIGHT * (mc.fontRendererObj.getStringWidth(line) / ((width / 4) - 5));
+				mc.fontRenderer.drawSplitString(line, x + (int) (width * .75) + 5, i + y + 10, (width / 4) - 5, 0xFFFFFFFF);
+				i += mc.fontRenderer.FONT_HEIGHT * (mc.fontRenderer.getStringWidth(line) / ((width / 4) - 5));
 			}
 		}
 		
@@ -270,11 +270,11 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		//mc.getTextureManager().bindTexture(new ResourceLocation(NostrumMagica.MODID, "textures/blocks/ceramic_generic.png"));
 		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		
-		VertexBuffer buffer = Tessellator.getInstance().getBuffer();
+		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 		try {
 			mc.getBlockRendererDispatcher().getBlockModelRenderer()
-				.renderModelFlat(mc.theWorld, model, state, new BlockPos(x, y, z), buffer, false, 55);
+				.renderModelFlat(mc.world, model, state, new BlockPos(x, y, z), buffer, false, 55);
 			
 		} catch (Exception e) {
 			

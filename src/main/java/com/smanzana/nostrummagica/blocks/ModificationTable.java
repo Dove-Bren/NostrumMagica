@@ -1,11 +1,10 @@
 package com.smanzana.nostrummagica.blocks;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
-import com.smanzana.nostrummagica.items.NostrumResourceItem;
-import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.SpellTomePage;
@@ -19,8 +18,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -28,12 +25,11 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class ModificationTable extends BlockContainer {
 	
@@ -48,12 +44,8 @@ public class ModificationTable extends BlockContainer {
 	}
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(ModificationTableEntity.class, "modification_table");
-		GameRegistry.addShapedRecipe(new ItemStack(instance()),
-				"WPW", "WCW", "WWW",
-				'W', new ItemStack(Blocks.PLANKS, 1, OreDictionary.WILDCARD_VALUE),
-				'P', new ItemStack(Items.PAPER, 1, OreDictionary.WILDCARD_VALUE),
-				'C', NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1));
+		GameRegistry.registerTileEntity(ModificationTableEntity.class,
+				new ResourceLocation(NostrumMagica.MODID, "modification_table"));
 	}
 	
 	public ModificationTable() {
@@ -66,13 +58,13 @@ public class ModificationTable extends BlockContainer {
 		this.setHarvestLevel("axe", 0);
 	}
 	
-	@Override
-	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
-		return true;
-	}
+//	@Override
+//	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+//		return true;
+//	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		
 		playerIn.openGui(NostrumMagica.instance,
 				NostrumGui.modtableID, worldIn,
@@ -109,11 +101,11 @@ public class ModificationTable extends BlockContainer {
 			return false;
 		}
 		
-		public ItemStack getMainSlot() {
+		public @Nonnull ItemStack getMainSlot() {
 			return this.getStackInSlot(0);
 		}
 		
-		public ItemStack getInputSlot() {
+		public @Nonnull ItemStack getInputSlot() {
 			return this.getStackInSlot(1);
 		}
 		
@@ -123,39 +115,45 @@ public class ModificationTable extends BlockContainer {
 		}
 
 		@Override
-		public ItemStack getStackInSlot(int index) {
+		public @Nonnull ItemStack getStackInSlot(int index) {
 			if (index < 0 || index >= getSizeInventory())
-				return null;
+				return ItemStack.EMPTY;
 			
-			return slots[index];
+			ItemStack stack = slots[index];
+			return stack == null ? ItemStack.EMPTY : stack;
 		}
 
 		@Override
-		public ItemStack decrStackSize(int index, int count) {
+		public @Nonnull ItemStack decrStackSize(int index, int count) {
 			if (index < 0 || index >= getSizeInventory() || slots[index] == null)
-				return null;
+				return ItemStack.EMPTY;
 			
-			ItemStack stack;
-			if (slots[index].stackSize <= count) {
-				stack = slots[index];
+			ItemStack taken = ItemStack.EMPTY;
+			ItemStack there = this.getStackInSlot(index);
+			
+			if (there == ItemStack.EMPTY)
+				return taken;
+			
+			if (there.getCount() <= count) {
+				taken = this.getStackInSlot(index);
 				slots[index] = null;
 			} else {
-				stack = slots[index].copy();
-				stack.stackSize = count;
-				slots[index].stackSize -= count;
+				taken = slots[index].copy();
+				taken.setCount(count);
+				slots[index].shrink(count);
 			}
 			
 			this.markDirty();
 			
-			return stack;
+			return taken;
 		}
 
 		@Override
-		public ItemStack removeStackFromSlot(int index) {
+		public @Nonnull ItemStack removeStackFromSlot(int index) {
 			if (index < 0 || index >= getSizeInventory())
-				return null;
+				return ItemStack.EMPTY;
 			
-			ItemStack stack = slots[index];
+			ItemStack stack = this.getStackInSlot(index);
 			slots[index] = null;
 			
 			this.markDirty();
@@ -163,9 +161,12 @@ public class ModificationTable extends BlockContainer {
 		}
 
 		@Override
-		public void setInventorySlotContents(int index, ItemStack stack) {
+		public void setInventorySlotContents(int index, @Nullable ItemStack stack) {
 			if (!isItemValidForSlot(index, stack))
 				return;
+			
+			if (stack == ItemStack.EMPTY)
+				stack = null;
 			
 			slots[index] = stack;
 			this.markDirty();
@@ -177,7 +178,7 @@ public class ModificationTable extends BlockContainer {
 		}
 
 		@Override
-		public boolean isUseableByPlayer(EntityPlayer player) {
+		public boolean isUsableByPlayer(EntityPlayer player) {
 			return true;
 		}
 
@@ -190,11 +191,11 @@ public class ModificationTable extends BlockContainer {
 		}
 
 		@Override
-		public boolean isItemValidForSlot(int index, ItemStack stack) {
+		public boolean isItemValidForSlot(int index, @Nullable ItemStack stack) {
 			if (index < 0 || index >= getSizeInventory())
 				return false;
 			
-			if (stack == null)
+			if (stack == null || stack == ItemStack.EMPTY)
 				return true;
 			
 			if (index == 0) {
@@ -236,7 +237,7 @@ public class ModificationTable extends BlockContainer {
 			NBTTagCompound compound = new NBTTagCompound();
 			
 			for (int i = 0; i < getSizeInventory(); i++) {
-				if (getStackInSlot(i) == null)
+				if (getStackInSlot(i) == ItemStack.EMPTY)
 					continue;
 				
 				NBTTagCompound tag = new NBTTagCompound();
@@ -267,7 +268,7 @@ public class ModificationTable extends BlockContainer {
 					continue;
 				}
 				
-				ItemStack stack = ItemStack.loadItemStackFromNBT(items.getCompoundTag(key));
+				ItemStack stack = new ItemStack(items.getCompoundTag(key));
 				this.setInventorySlotContents(id, stack);
 			}
 		}
@@ -276,7 +277,7 @@ public class ModificationTable extends BlockContainer {
 		public void modify(boolean valB, float valF) {
 			ItemStack stack = this.getMainSlot();
 			if (stack.getItem() instanceof SpellTome) {
-				if (this.getInputSlot() != null && this.getInputSlot().getItem() instanceof SpellTomePage) {
+				if (this.getInputSlot() != ItemStack.EMPTY && this.getInputSlot().getItem() instanceof SpellTomePage) {
 					SpellTome.addEnhancement(stack, new SpellTomeEnhancementWrapper( 
 							SpellTomePage.getEnhancement(this.getInputSlot()),
 							SpellTomePage.getLevel(this.getInputSlot())));
@@ -289,6 +290,15 @@ public class ModificationTable extends BlockContainer {
 				SpellRune.setPieceParam(stack, new SpellPartParam(valF, valB));
 			}
 			
+		}
+
+		@Override
+		public boolean isEmpty() {
+			for (ItemStack stack : slots) {
+				if (stack != null && stack.getCount() != 0)
+					return false;
+			}
+			return true;
 		}
 		
 	}
@@ -316,11 +326,11 @@ public class ModificationTable extends BlockContainer {
 		
 		ModificationTableEntity table = (ModificationTableEntity) ent;
 		for (int i = 0; i < table.getSizeInventory(); i++) {
-			if (table.getStackInSlot(i) != null) {
+			if (table.getStackInSlot(i) != ItemStack.EMPTY) {
 				EntityItem item = new EntityItem(
 						world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
 						table.removeStackFromSlot(i));
-				world.spawnEntityInWorld(item);
+				world.spawnEntity(item);
 			}
 		}
 		

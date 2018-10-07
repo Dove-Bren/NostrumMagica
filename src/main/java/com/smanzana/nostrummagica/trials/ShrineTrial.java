@@ -47,9 +47,9 @@ public abstract class ShrineTrial {
 		
 		Integer mastery = attr.getElementMastery().get(this.element);
 		if (mastery == null || mastery == 0) {
-			if (!player.worldObj.isRemote) {
+			if (!player.world.isRemote) {
 				NostrumMagicaSounds.AMBIENT_WOOSH.play(player);
-				player.addChatComponentMessage(new TextComponentTranslation("info.element.starttrial", new Object[] {this.element.getName()}));
+				player.sendMessage(new TextComponentTranslation("info.element.starttrial", new Object[] {this.element.getName()}));
 			}
 		} else {
 			complete(player);
@@ -70,9 +70,9 @@ public abstract class ShrineTrial {
 		attr.endTrial(element);
 		attr.setElementMastery(this.element, mastery);
 		
-		if (!player.worldObj.isRemote) {
+		if (!player.world.isRemote) {
 			NostrumMagicaSounds.AMBIENT_WOOSH.play(player);
-			player.addChatComponentMessage(new TextComponentTranslation("info.element.mastery" + mastery.intValue(), new Object[] {this.element.getName()}));
+			player.sendMessage(new TextComponentTranslation("info.element.mastery" + mastery.intValue(), new Object[] {this.element.getName()}));
 			NostrumMagica.proxy.syncPlayer((EntityPlayerMP) player);
 		}
 			

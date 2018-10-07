@@ -18,6 +18,7 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.util.EnumActionResult;
@@ -26,13 +27,13 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.event.RegistryEvent;
 
 public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 
 	private static Map<EMagicElement, Map<Integer, EnchantedWeapon>> items;
 	
-	public static final void registerWeapons() {
+	public static void registerWeapons(RegistryEvent.Register<Item> event) {
 		items = new EnumMap<EMagicElement, Map<Integer, EnchantedWeapon>>(EMagicElement.class);
 		
 		for (EMagicElement element : EMagicElement.values()) {
@@ -42,7 +43,8 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 					ResourceLocation location = new ResourceLocation(NostrumMagica.MODID, "sword_" + element.name().toLowerCase() + (i + 1));
 					EnchantedWeapon weapon =  new EnchantedWeapon(location.getResourcePath(), element, i + 1);
 					weapon.setUnlocalizedName(location.getResourcePath());
-					GameRegistry.register(weapon, location);
+					weapon.setRegistryName(location);
+					event.getRegistry().register(weapon);
 					items.get(element).put(i + 1, weapon);
 				}
 			}
@@ -112,8 +114,8 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 
         if (equipmentSlot == EntityEquipmentSlot.MAINHAND)
         {
-            multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", damage, 0));
-            multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4000000953674316D, 0));
+            multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", damage, 0));
+            multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4000000953674316D, 0));
         }
 
         return multimap;

@@ -26,17 +26,17 @@ public class ClientEffectModifierMove implements ClientEffectModifier {
 	@Override
 	public void apply(ClientEffectRenderDetail detail, float progress) {
 		if (progress < this.startTime) {
-			GlStateManager.translate(startPos.xCoord, startPos.yCoord, startPos.zCoord);
+			GlStateManager.translate(startPos.x, startPos.y, startPos.z);
 		} else if (progress < this.endTime) {
 			// Stage 1
 			final float frac = (progress - startTime) / (endTime - startTime);
 			GlStateManager.translate(
-					startPos.xCoord + frac * (endPos.xCoord - startPos.xCoord),
-					startPos.yCoord + frac * (endPos.yCoord - startPos.yCoord),
-					startPos.zCoord + frac * (endPos.zCoord - startPos.zCoord)
+					startPos.x + frac * (endPos.x - startPos.x),
+					startPos.y + frac * (endPos.y - startPos.y),
+					startPos.z + frac * (endPos.z - startPos.z)
 					);
 		} else {
-			GlStateManager.translate(endPos.xCoord, endPos.yCoord, endPos.zCoord);
+			GlStateManager.translate(endPos.x, endPos.y, endPos.z);
 			
 		}
 	}

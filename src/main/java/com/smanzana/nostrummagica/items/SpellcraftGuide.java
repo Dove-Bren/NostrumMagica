@@ -13,7 +13,6 @@ import com.smanzana.nostrummagica.client.gui.book.TitlePage;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
@@ -21,10 +20,8 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.oredict.OreDictionary;
 
 /**
  * Guide book
@@ -45,8 +42,7 @@ public class SpellcraftGuide extends Item implements GuiBook {
 	public static final String id = "spellcraft_book";
 	
 	public static void init() {
-		GameRegistry.addShapelessRecipe(new ItemStack(instance()), Items.LEATHER,
-				Items.LEATHER, Items.LEATHER, new ItemStack(SpellRune.instance(), 1, OreDictionary.WILDCARD_VALUE));
+		;
 	}
 	
 	private SpellcraftGuide() {
@@ -57,7 +53,8 @@ public class SpellcraftGuide extends Item implements GuiBook {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+		ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		if (worldIn.isRemote) {
 			NostrumMagica.proxy.openBook(playerIn, this, itemStackIn);
 		}

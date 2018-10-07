@@ -104,7 +104,7 @@ public class ClientEffect {
 		for (ClientEffectModifier mod : modifiers) {
 			mod.earlyApply(detail, progress);
 		}
-		GlStateManager.translate(origin.xCoord, origin.yCoord, origin.zCoord);
+		GlStateManager.translate(origin.x, origin.y, origin.z);
 	}
 	
 }

@@ -46,7 +46,7 @@ public class ManaMessage implements IMessage {
 				return null;
 			}
 			
-			player = player.worldObj.getPlayerEntityByUUID(id);
+			player = player.world.getPlayerEntityByUUID(id);
 			
 			if (player == null) {
 				// Not in this world. Who cares

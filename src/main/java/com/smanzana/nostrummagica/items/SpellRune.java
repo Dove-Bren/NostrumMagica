@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.items;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -16,24 +18,27 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.oredict.OreDictionary;
 
 public class SpellRune extends Item implements ILoreTagged {
 	
@@ -74,8 +79,20 @@ public class SpellRune extends Item implements ILoreTagged {
 
 	}
 	
-	private static class RuneRecipe implements IRecipe {
+	public static class RuneRecipe extends net.minecraftforge.registries.IForgeRegistryEntry.Impl<IRecipe> implements IRecipe {
 
+		public RuneRecipe() {
+			super();
+			this.setRegistryName(NostrumMagica.MODID, "GenericRuneRecipe");
+		}
+		
+		@Override
+		public NonNullList<Ingredient> getIngredients() {
+			return NonNullList.from(null,
+					Ingredient.fromStacks(new ItemStack(SpellRune.instance(), 1, OreDictionary.WILDCARD_VALUE)),
+					Ingredient.fromStacks(new ItemStack(SpellRune.instance(), 1, OreDictionary.WILDCARD_VALUE)));
+		}
+		
 		@Override
 		public boolean matches(InventoryCrafting inv, World worldIn) {
 			boolean foundTwo = false; // Found at least two runes
@@ -259,18 +276,18 @@ public class SpellRune extends Item implements ILoreTagged {
 		}
 
 		@Override
-		public int getRecipeSize() {
-			return 4;
-		}
-
-		@Override
 		public ItemStack getRecipeOutput() {
 			return SpellRune.getRune(EMagicElement.FIRE, 1);
 		}
 
 		@Override
-		public ItemStack[] getRemainingItems(InventoryCrafting inv) {
-			return new ItemStack[inv.getSizeInventory()];
+		public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
+			return NonNullList.create();
+		}
+
+		@Override
+		public boolean canFit(int width, int height) {
+			return width * height > 1;
 		}
 		
 	}
@@ -293,7 +310,7 @@ public class SpellRune extends Item implements ILoreTagged {
 	}
 
 	public static void init() {
-		GameRegistry.addRecipe(new RuneRecipe());
+		;
 	}
 	
 	public SpellRune() {
@@ -312,7 +329,7 @@ public class SpellRune extends Item implements ILoreTagged {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flag) {
 		if (isElement(stack)) {
 			tooltip.add(TextFormatting.DARK_GRAY + "Element" + TextFormatting.RESET);
 			int count = getPieceElementCount(stack);
@@ -366,8 +383,11 @@ public class SpellRune extends Item implements ILoreTagged {
      */
     @SideOnly(Side.CLIENT)
     @Override
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
-    	// Should be synced to client proxy registering variants
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+    	if (this.getCreativeTab() != tab)
+    		return;
+    	
+		// Should be synced to client proxy registering variants
     	for (EMagicElement type : EMagicElement.values()) {
     		subItems.add(getRune(type, 1));
     	}
@@ -554,10 +574,10 @@ public class SpellRune extends Item implements ILoreTagged {
     	piece.getTagCompound().setBoolean(NBT_PARAM_FLIP, params.flip);
     }
     
-    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
-    {
+    @Override
+    public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
     	// Probably wnat this later
-    	return super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ);
+    	return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ);
 	}
     
     public static boolean isShape(ItemStack stack) {

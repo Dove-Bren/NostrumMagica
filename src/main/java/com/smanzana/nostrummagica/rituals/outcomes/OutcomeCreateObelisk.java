@@ -29,7 +29,7 @@ public class OutcomeCreateObelisk implements IRitualOutcome {
 		// All logic contained in obelisk class
 		if (!NostrumObelisk.spawnObelisk(world, center.add(0, -1, 0))) {
 			if (world.isRemote)
-				player.addChatMessage(new TextComponentTranslation("info.create_obelisk.fail", new Object[0]));
+				player.sendMessage(new TextComponentTranslation("info.create_obelisk.fail", new Object[0]));
 		} else if (!world.isRemote) {
 			// clear altar on server
 			TileEntity te = world.getTileEntity(center.add(0, 0, 0));

@@ -4,6 +4,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -30,6 +33,7 @@ import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrap
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -44,6 +48,7 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -127,13 +132,13 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		this.setMaxStackSize(1);
 	}
 	
-	public static ItemStack getItemstack(int type,
+	public static @Nonnull ItemStack getItemstack(int type,
 			int capacity,
 			SpellTomeEnhancementWrapper ... enhancements) {
 		return getItemstack(type, capacity, Lists.newArrayList(enhancements));
 	}
 	
-	public static ItemStack getItemstack(int type,
+	public static @Nonnull ItemStack getItemstack(int type,
 			int capacity,
 			List<SpellTomeEnhancementWrapper> enhancements) {
 		ItemStack item = new ItemStack(instance(), 1, type) ;
@@ -153,15 +158,16 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+		ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		if (worldIn.isRemote)
 			NostrumMagica.proxy.openBook(playerIn, this, itemStackIn);
 		
 		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
     }
 	
-	public static void addSpell(ItemStack itemStack, Spell spell) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+	public static void addSpell(@Nonnull ItemStack itemStack, Spell spell) {
+		if (itemStack == ItemStack.EMPTY || !(itemStack.getItem() instanceof SpellTome))
 			return;
 		
 		NBTTagCompound nbt = itemStack.getTagCompound();
@@ -180,8 +186,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		itemStack.setTagCompound(nbt);
 	}
 	
-	private static int[] getSpellIDs(ItemStack itemStack) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+	private static int[] getSpellIDs(@Nonnull ItemStack itemStack) {
+		if (itemStack == ItemStack.EMPTY || !(itemStack.getItem() instanceof SpellTome))
 			return null;
 		
 		NBTTagCompound nbt = itemStack.getTagCompound();
@@ -203,21 +209,27 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		return ids;
 	}
 	
-	private static int getIndex(ItemStack itemStack) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+	private static int getIndex(@Nonnull ItemStack itemStack) {
+		if (itemStack == ItemStack.EMPTY || !(itemStack.getItem() instanceof SpellTome))
 			return 0;
 
 		NBTTagCompound nbt = itemStack.getTagCompound();
+		if (nbt == null)
+			return 0;
 		
 		return nbt.getInteger(NBT_INDEX);
 	}
 	
 	// Returns resultant index, or -1 on no change
-	public static int incrementIndex(ItemStack itemStack, int amount) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+	public static int incrementIndex(@Nonnull ItemStack itemStack, int amount) {
+		if (itemStack == ItemStack.EMPTY || !(itemStack.getItem() instanceof SpellTome))
 			return -1;
 		
 		NBTTagCompound nbt = itemStack.getTagCompound();
+		if (nbt == null) {
+			nbt = new NBTTagCompound();
+			itemStack.setTagCompound(nbt);
+		}		
 		
 		int index = nbt.getInteger(NBT_INDEX);
 		int initial = index;
@@ -238,8 +250,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		
 	}
 	
-	public static void setIndex(ItemStack itemStack, int index) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+	public static void setIndex(@Nonnull ItemStack itemStack, int index) {
+		if (itemStack == ItemStack.EMPTY || !(itemStack.getItem() instanceof SpellTome))
 			return;
 
 		int indices[] = getSpellIDs(itemStack);
@@ -253,8 +265,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		nbt.setInteger(NBT_INDEX, index);
 	}
 	
-	public static int getXP(ItemStack itemStack) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+	public static int getXP(@Nonnull ItemStack itemStack) {
+		if (itemStack == ItemStack.EMPTY || !(itemStack.getItem() instanceof SpellTome))
 			return 0;
 
 		NBTTagCompound nbt = itemStack.getTagCompound();
@@ -264,8 +276,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 			return nbt.getInteger(NBT_XP);
 	}
 	
-	public static void setXP(ItemStack itemStack, int xp) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+	public static void setXP(@Nonnull ItemStack itemStack, int xp) {
+		if (itemStack == ItemStack.EMPTY || !(itemStack.getItem() instanceof SpellTome))
 			return;
 
 		NBTTagCompound nbt = itemStack.getTagCompound();
@@ -275,19 +287,19 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		itemStack.setTagCompound(nbt);
 	}
 	
-	public static int getCapacity(ItemStack itemStack) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+	public static int getCapacity(@Nonnull ItemStack itemStack) {
+		if (itemStack == ItemStack.EMPTY || !(itemStack.getItem() instanceof SpellTome))
 			return 0;
 
 		NBTTagCompound nbt = itemStack.getTagCompound();
 		if (nbt == null)
 			return 0;
 		
-			return nbt.getInteger(NBT_CAPACITY);
+		return nbt.getInteger(NBT_CAPACITY);
 	}
 	
-	public static void setCapacity(ItemStack itemStack, int capacity) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+	public static void setCapacity(@Nonnull ItemStack itemStack, int capacity) {
+		if (itemStack == ItemStack.EMPTY || !(itemStack.getItem() instanceof SpellTome))
 			return;
 
 		NBTTagCompound nbt = itemStack.getTagCompound();
@@ -297,8 +309,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		itemStack.setTagCompound(nbt);
 	}
 	
-	public static int getLevel(ItemStack itemStack) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+	public static int getLevel(@Nonnull ItemStack itemStack) {
+		if (itemStack == ItemStack.EMPTY || !(itemStack.getItem() instanceof SpellTome))
 			return 0;
 
 		NBTTagCompound nbt = itemStack.getTagCompound();
@@ -314,8 +326,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		return level;
 	}
 	
-	public static void setLevel(ItemStack itemStack, int level) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+	public static void setLevel(@Nonnull ItemStack itemStack, int level) {
+		if (itemStack == ItemStack.EMPTY || !(itemStack.getItem() instanceof SpellTome))
 			return;
 
 		NBTTagCompound nbt = itemStack.getTagCompound();
@@ -325,8 +337,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		itemStack.setTagCompound(nbt);
 	}
 	
-	public static int getModifications(ItemStack itemStack) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+	public static int getModifications(@Nonnull ItemStack itemStack) {
+		if (itemStack == ItemStack.EMPTY || !(itemStack.getItem() instanceof SpellTome))
 			return 0;
 
 		NBTTagCompound nbt = itemStack.getTagCompound();
@@ -336,8 +348,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		return nbt.getInteger(NBT_MODIFICATIONS);
 	}
 	
-	public static void setModifications(ItemStack itemStack, int mods) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+	public static void setModifications(@Nonnull ItemStack itemStack, int mods) {
+		if (itemStack == ItemStack.EMPTY || !(itemStack.getItem() instanceof SpellTome))
 			return;
 
 		NBTTagCompound nbt = itemStack.getTagCompound();
@@ -347,8 +359,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		itemStack.setTagCompound(nbt);
 	}
 	
-	public static UUID getPlayerID(ItemStack itemStack) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+	public static UUID getPlayerID(@Nonnull ItemStack itemStack) {
+		if (itemStack == ItemStack.EMPTY || !(itemStack.getItem() instanceof SpellTome))
 			return null;
 
 		NBTTagCompound nbt = itemStack.getTagCompound();
@@ -362,8 +374,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		}
 	}
 	
-	public static String getPlayerName(ItemStack itemStack) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+	public static String getPlayerName(@Nonnull ItemStack itemStack) {
+		if (itemStack == ItemStack.EMPTY || !(itemStack.getItem() instanceof SpellTome))
 			return null;
 
 		NBTTagCompound nbt = itemStack.getTagCompound();
@@ -372,12 +384,12 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		return nbt.getString(NBT_PLAYER_NAME);
 	}
 	
-	public static void setPlayer(ItemStack itemStack, EntityPlayer player) {
+	public static void setPlayer(@Nonnull ItemStack itemStack, EntityPlayer player) {
 		setPlayer(itemStack, player.getDisplayNameString(), player.getUniqueID());
 	}
 	
-	public static void setPlayer(ItemStack itemStack, String name, UUID id) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+	public static void setPlayer(@Nonnull ItemStack itemStack, String name, UUID id) {
+		if (itemStack == ItemStack.EMPTY || !(itemStack.getItem() instanceof SpellTome))
 			return;
 
 		NBTTagCompound nbt = itemStack.getTagCompound();
@@ -388,7 +400,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		itemStack.setTagCompound(nbt);
 	}
 	
-	private static int genID(ItemStack tome) {
+	private static int genID(@Nonnull ItemStack tome) {
 		int id = NostrumMagica.rand.nextInt();
 		NBTTagCompound nbt = tome.getTagCompound();
 		if (nbt == null)
@@ -398,8 +410,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		return id;
 	}
 	
-	public static int getTomeID(ItemStack itemStack) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+	public static int getTomeID(@Nonnull ItemStack itemStack) {
+		if (itemStack == ItemStack.EMPTY || !(itemStack.getItem() instanceof SpellTome))
 			return 0;
 
 		int id;
@@ -414,8 +426,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		return id;
 	}
 	
-	public static long getBondTime(ItemStack itemStack) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+	public static long getBondTime(@Nonnull ItemStack itemStack) {
+		if (itemStack == ItemStack.EMPTY || !(itemStack.getItem() instanceof SpellTome))
 			return 0;
 
 		NBTTagCompound nbt = itemStack.getTagCompound();
@@ -424,8 +436,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		return nbt.getLong(NBT_FINISH_TIME);
 	}
 	
-	public static void setBondTime(ItemStack itemStack, long time) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+	public static void setBondTime(@Nonnull ItemStack itemStack, long time) {
+		if (itemStack == ItemStack.EMPTY || !(itemStack.getItem() instanceof SpellTome))
 			return;
 
 		NBTTagCompound nbt = itemStack.getTagCompound();
@@ -441,8 +453,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 	 * @param itemStack
 	 * @return
 	 */
-	public static List<Spell> getSpells(ItemStack itemStack) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+	public static List<Spell> getSpells(@Nonnull ItemStack itemStack) {
+		if (itemStack == ItemStack.EMPTY || !(itemStack.getItem() instanceof SpellTome))
 			return null;
 
 		List<Spell> list = new LinkedList<>();
@@ -543,7 +555,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 			int maxxp = LevelCurve.getMaxXP(level);
 			int modifications = getModifications(stack);
 			int id = getTomeID(stack);
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer);
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().player);
 			SpellComponentWrapper comp = (attr.isBinding() && id == attr.getBindingID()) ? attr.getBindingComponent() : null;
 			String bindingName = (comp == null) ? null : attr.getBindingSpell().getName();
 			String compname = (comp == null) ? null :
@@ -562,7 +574,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 					(comp != null ? "Binding spell " + bindingName : ""),
 					(comp != null ? "Seek a shrine of " + compname : "")));
 			
-			if (spellCount > 0) {
+			if (spellCount > 0 && spells != null) {
 				boolean top = true;
 				SpellPreviewPage page = null;
 				for (Spell spell : spells) {
@@ -606,14 +618,14 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		return new Lore().add("Spell tomes carry spells to be cast over and over again.", "Casting spells from a spell tome requires reagents and mana.", "Spells must be bound into a Spell Tome in order be to used.", "Bind scrolls into the tome through the Ritual of Binding.");
 	}
 	
-	public static List<SpellTomeEnhancementWrapper> getEnhancements(ItemStack stack) {
-		if (stack == null || !(stack.getItem() instanceof SpellTome))
+	public static List<SpellTomeEnhancementWrapper> getEnhancements(@Nonnull ItemStack stack) {
+		if (stack == ItemStack.EMPTY || !(stack.getItem() instanceof SpellTome))
 			return null;
 		
 		return readEnhancements(stack.getTagCompound());
 	}
 	
-	public static void addEnhancement(ItemStack stack, SpellTomeEnhancementWrapper enhancement) {
+	public static void addEnhancement(@Nonnull ItemStack stack, SpellTomeEnhancementWrapper enhancement) {
 		List<SpellTomeEnhancementWrapper> enhances = getEnhancements(stack);
 		if (enhances == null)
 			enhances = new LinkedList<>();
@@ -626,7 +638,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		stack.setTagCompound(tag);
 	}
 	
-	public static void applyEnhancements(ItemStack stack, SpellCastSummary summary, EntityLivingBase caster) {
+	public static void applyEnhancements(@Nonnull ItemStack stack, SpellCastSummary summary, EntityLivingBase caster) {
 		List<SpellTomeEnhancementWrapper> list = getEnhancements(stack);
 		if (list == null)
 			return;
@@ -641,7 +653,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		}
 	}
 	
-	public static ItemStack createTome(ItemStack plate, ItemStack pages[]) {
+	public static @Nonnull ItemStack createTome(@Nonnull ItemStack plate, ItemStack pages[]) {
 		ItemStack stack = new ItemStack(instance(), 1, plate.getMetadata());
 		List<SpellTomeEnhancementWrapper> enhancements = SpellPlate.getEnhancements(plate);
 		
@@ -650,13 +662,15 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		
 		int capacity = SpellPlate.getCapacity(plate);
 		
-		int len = (pages == null ? 0 : pages.length);
-		for (int i = 0; i < len; i++) {
-			if (pages[i] == null || !(pages[i].getItem() instanceof SpellTomePage))
-				continue;
-			
-			enhancements.add(new SpellTomeEnhancementWrapper(SpellTomePage.getEnhancement(pages[i]),
-					SpellTomePage.getLevel(pages[i])));
+		if (pages != null) {
+			int len = pages.length;
+			for (int i = 0; i < len; i++) {
+				if (pages[i] == null || !(pages[i].getItem() instanceof SpellTomePage))
+					continue;
+				
+				enhancements.add(new SpellTomeEnhancementWrapper(SpellTomePage.getEnhancement(pages[i]),
+						SpellTomePage.getLevel(pages[i])));
+			}
 		}
 		
 		if (!enhancements.isEmpty()) {
@@ -714,7 +728,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+	public void addInformation(@Nonnull ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flag) {
 		List<SpellTomeEnhancementWrapper> enhances = getEnhancements(stack);
 		if (enhances != null && !enhances.isEmpty()) {
 			for (SpellTomeEnhancementWrapper enhance : enhances) {
@@ -730,7 +744,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		}
 	}
 	
-	public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
+	public void onUpdate(@Nonnull ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
 		super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
 		
 		if (worldIn.isRemote)
@@ -759,27 +773,27 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		
 	}
 	
-	public boolean onDroppedByPlayer(ItemStack item, EntityPlayer player) {
+	public boolean onDroppedByPlayer(@Nonnull ItemStack item, EntityPlayer player) {
 		boolean ret = super.onDroppedByPlayer(item, player);
 		if (ret)
 			setBondTime(item, 0);
 		return ret;
 	}
 	
-	public static long genBondTime(ItemStack tome) {
+	public static long genBondTime(@Nonnull ItemStack tome) {
 		// Can be cool later. For now, just do 10 minutes
 		return 1000L * 10;//60L * 10L;
 	}
 	
-	public static void bond(ItemStack tome, World world, EntityPlayer player) {
+	public static void bond(@Nonnull ItemStack tome, World world, EntityPlayer player) {
 		setPlayer(tome, player);
 		NostrumMagicaSounds.SHIELD_APPLY.play(player);
 		if (!world.isRemote) {
-			player.addChatComponentMessage(new TextComponentTranslation("info.tome.bond"));
+			player.sendMessage(new TextComponentTranslation("info.tome.bond"));
 		}
 	}
 	
-	public static boolean isOwner(ItemStack tome, EntityPlayer player) {
+	public static boolean isOwner(@Nonnull ItemStack tome, EntityPlayer player) {
 		UUID owner = getPlayerID(tome);
 		if (owner == null)
 			return false;
@@ -792,8 +806,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 	 * @param tome
 	 * @param sp
 	 */
-	public static void doSpecialCastEffects(ItemStack tome, EntityPlayer sp) {
-		if (sp.worldObj.isRemote)
+	public static void doSpecialCastEffects(@Nonnull ItemStack tome, EntityPlayer sp) {
+		if (sp.world.isRemote)
 			return;
 		
 		boolean isOwner = isOwner(tome, sp);
@@ -802,7 +816,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 			if (id == null)
 				return;
 			EntityPlayer player = 
-					sp.worldObj.getMinecraftServer().getPlayerList().getPlayerByUUID(id);
+					sp.world.getMinecraftServer().getPlayerList().getPlayerByUUID(id);
 			if (player != null && !player.isDead) {
 				switch (NostrumMagica.rand.nextInt(4)) {
 				case 0:
@@ -880,21 +894,24 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		// Could hook up some special effects here
 	}
 	
-	private static void doLevelup(ItemStack tome, EntityPlayer player) {
-		player.addChatComponentMessage(new TextComponentTranslation("info.tome.levelup", new Object[0]));
+	private static void doLevelup(@Nonnull ItemStack tome, EntityPlayer player) {
+		player.sendMessage(new TextComponentTranslation("info.tome.levelup", new Object[0]));
 		int mods = getModifications(tome);
 		setModifications(tome, ++mods);
 		int level = getLevel(tome);
 		setLevel(tome, ++level);
 	}
 	
-	public static int getMaxMana(ItemStack tome) {
+	public static int getMaxMana(@Nonnull ItemStack tome) {
 		return LevelCurve.getMaxMana(getLevel(tome));
 	}
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+		if (this.getCreativeTab() != tab)
+    		return;
+    	
 		for (int i = 0; i < SpellTome.MAX_TOME_COUNT; i++) {
 			subItems.add(getItemstack(i, 10));
 		}
@@ -905,8 +922,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		return InfoScreenTabs.INFO_TOMES;
 	}
 	
-	public static boolean startBinding(EntityPlayer player, ItemStack tome, ItemStack scroll, boolean quick) {
-		if (tome == null || scroll == null)
+	public static boolean startBinding(EntityPlayer player, @Nonnull ItemStack tome, @Nonnull ItemStack scroll, boolean quick) {
+		if (tome == ItemStack.EMPTY || scroll == ItemStack.EMPTY)
 			return false;
 		
 		Spell spell = SpellScroll.getSpell(scroll);
@@ -914,8 +931,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 			return false;
 		
 		if (!SpellTome.isOwner(tome, player)) {
-			if (!player.worldObj.isRemote) {
-				player.addChatComponentMessage(new TextComponentTranslation("info.tome.noowner"));
+			if (!player.world.isRemote) {
+				player.sendMessage(new TextComponentTranslation("info.tome.noowner"));
 				
 			}
 			return false;
@@ -925,8 +942,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		List<Spell> spells = SpellTome.getSpells(tome);
 		int taken = spells == null ? 0 : spells.size();
 		if (taken >= capacity) {
-			if (!player.worldObj.isRemote) {
-				player.addChatComponentMessage(new TextComponentTranslation("info.tome.full"));
+			if (!player.world.isRemote) {
+				player.sendMessage(new TextComponentTranslation("info.tome.full"));
 			}
 			return false;
 		}
@@ -956,8 +973,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		attr.startBinding(spell, comp, SpellTome.getTomeID(tome));
 		if (quick) {
 			attr.completeBinding(tome);
-		} else if (!player.worldObj.isRemote) {
-				player.addChatComponentMessage(new TextComponentTranslation("info.tome.bind", new Object[] {spell.getName(), compName}));
+		} else if (!player.world.isRemote) {
+				player.sendMessage(new TextComponentTranslation("info.tome.bind", new Object[] {spell.getName(), compName}));
 		}
 		
 		return true;

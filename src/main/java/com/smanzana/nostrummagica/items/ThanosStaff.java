@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.items;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -13,6 +15,7 @@ import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
 import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -22,7 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -32,11 +35,7 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 	private static final String NBT_XP = "absorbed_xp";
 	
 	public static void init() {
-		instance().setUnlocalizedName(ID);
-		
-		GameRegistry.addRecipe(new ItemStack(instance), "  T", " S ", "S  ",
-				'T', new ItemStack(ThanoPendant.instance()), 
-				'S', new ItemStack(MageStaff.instance(), 1, 0));
+		;
 	}
 	
 	private static ThanosStaff instance = null;
@@ -54,6 +53,7 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 		this.setMaxDamage(500);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setMaxStackSize(1);
+		this.setUnlocalizedName(ID);
 	}
 	
 	@Override
@@ -62,8 +62,8 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 
         if (equipmentSlot == EntityEquipmentSlot.MAINHAND)
         {
-            multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 4, 0));
-            multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4000000953674316D, 0));
+            multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 4, 0));
+            multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4000000953674316D, 0));
         }
 
         return multimap;
@@ -122,8 +122,8 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-		super.addInformation(stack, playerIn, tooltip, advanced);
+	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flag) {
+		super.addInformation(stack, world, tooltip, flag);
 		tooltip.add("Magic Potency Bonus: 15%");
 		tooltip.add("Reagent Cost Discount: 5%");
 	}

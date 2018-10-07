@@ -24,7 +24,7 @@ public class TileEntityAltarRenderer extends TileEntitySpecialRenderer<AltarTile
 	}
 	
 	@Override
-	public void renderTileEntityAt(AltarTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
+	public void render(AltarTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
 
 		ItemStack item = te.getItem();
 		if (item == null)

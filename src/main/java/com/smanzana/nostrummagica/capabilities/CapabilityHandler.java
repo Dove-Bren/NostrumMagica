@@ -27,7 +27,7 @@ public class CapabilityHandler {
 			//attach that shizz
 			event.addCapability(CAPABILITY_LOC, new AttributeProvider(event.getObject()));
 			
-			if (event.getObject().worldObj != null && event.getObject().worldObj.isRemote) {
+			if (event.getObject().world != null && event.getObject().world.isRemote) {
 				NostrumMagica.proxy.requestStats((EntityPlayer) event.getObject());
 			}
 		}

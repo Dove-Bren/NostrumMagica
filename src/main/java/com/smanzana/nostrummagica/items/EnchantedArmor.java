@@ -20,18 +20,19 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ISpecialArmor;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.event.RegistryEvent;
 
 public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISpecialArmor {
 
 	private static Map<EMagicElement, Map<EntityEquipmentSlot, Map<Integer, EnchantedArmor>>> items;
 	
-	public static final void registerArmors() {
+	public static void registerArmors(RegistryEvent.Register<Item> event) {
 		items = new EnumMap<EMagicElement, Map<EntityEquipmentSlot, Map<Integer, EnchantedArmor>>>(EMagicElement.class);
 		for (EMagicElement element : EMagicElement.values()) {
 			if (isArmorElement(element)) {
@@ -43,7 +44,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 							ResourceLocation location = new ResourceLocation(NostrumMagica.MODID, "armor_" + slot.name().toLowerCase() + "_" + element.name().toLowerCase() + (i + 1));
 							EnchantedArmor armor =  new EnchantedArmor(location.getResourcePath(), slot, element, i + 1);
 							armor.setUnlocalizedName(location.getResourcePath());
-							GameRegistry.register(armor, location);
+							armor.setRegistryName(location);
+							event.getRegistry().register(armor);
 							items.get(element).get(slot).put(i + 1, armor);
 						}
 					}
@@ -142,8 +144,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 
         if (equipmentSlot == this.armorType)
         {
-            multimap.put(SharedMonsterAttributes.ARMOR.getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor modifier", (double)this.armor, 0));
-            multimap.put(SharedMonsterAttributes.ARMOR_TOUGHNESS.getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor toughness", 1, 0));
+            multimap.put(SharedMonsterAttributes.ARMOR.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor modifier", (double)this.armor, 0));
+            multimap.put(SharedMonsterAttributes.ARMOR_TOUGHNESS.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor toughness", 1, 0));
         }
 
         return multimap;

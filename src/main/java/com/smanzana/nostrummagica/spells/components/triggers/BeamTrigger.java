@@ -75,7 +75,7 @@ public class BeamTrigger extends InstantTrigger {
 				if (trace.typeOfHit == RayTraceResult.Type.ENTITY && trace.entityHit != null) {
 					targs.add((EntityLivingBase) trace.entityHit);
 				} else {
-					blocks.add(new BlockPos(trace.hitVec.xCoord, trace.hitVec.yCoord, trace.hitVec.zCoord));
+					blocks.add(new BlockPos(trace.hitVec.x, trace.hitVec.y, trace.hitVec.z));
 				}
 				end = trace.hitVec;
 					

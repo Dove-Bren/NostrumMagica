@@ -1,14 +1,11 @@
 package com.smanzana.nostrummagica.items;
 
-import java.util.List;
-
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.AltarBlock;
 import com.smanzana.nostrummagica.blocks.AltarBlock.AltarTileEntity;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.Candle.CandleTileEntity;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
@@ -17,16 +14,15 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -48,11 +44,7 @@ public class InfusedGemItem extends Item implements ILoreTagged {
 	}
 	
 	public static void init() {
-		GameRegistry.addRecipe(new ItemStack(instance), " G ", "DED", "BGB",
-				'D', ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1),
-				'G', ReagentItem.instance().getReagent(ReagentType.GRAVE_DUST, 1),
-				'E', Items.ENDER_PEARL,
-				'B', ReagentItem.instance().getReagent(ReagentType.BLACK_PEARL, 1));
+		;
 	}
 	
 	public InfusedGemItem() {
@@ -93,12 +85,15 @@ public class InfusedGemItem extends Item implements ILoreTagged {
      */
     @SideOnly(Side.CLIENT)
     @Override
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
-    	subItems.add(new ItemStack(itemIn, 1, 0));
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+    	if (this.getCreativeTab() != tab)
+    		return;
+    	
+    	subItems.add(new ItemStack(instance(), 1, 0));
     	for (EMagicElement type : EMagicElement.values()) {
     		if (type == EMagicElement.PHYSICAL)
     			continue;
-    		subItems.add(new ItemStack(itemIn, 1, type.ordinal() + 1));
+    		subItems.add(new ItemStack(instance(), 1, type.ordinal() + 1));
     	}
 	}
     
@@ -150,9 +145,10 @@ public class InfusedGemItem extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		//if (worldIn.isRemote)
 			//return EnumActionResult.SUCCESS;
+		ItemStack stack = playerIn.getHeldItem(hand);
 		
 		IBlockState state = worldIn.getBlockState(pos);
 		if (state.getBlock() == null)
@@ -166,7 +162,7 @@ public class InfusedGemItem extends Item implements ILoreTagged {
 				return EnumActionResult.PASS;
 			
  			if (RitualRegistry.attemptRitual(worldIn, pos, playerIn, element)) {
- 				stack.stackSize--;
+ 				stack.shrink(1);
  			}
  			
 			return EnumActionResult.SUCCESS;
@@ -175,7 +171,7 @@ public class InfusedGemItem extends Item implements ILoreTagged {
 				return EnumActionResult.PASS;
 			
 			if (RitualRegistry.attemptRitual(worldIn, pos, playerIn, element)) {
-				stack.stackSize--;
+				stack.shrink(1);
 			}
 			
 			return EnumActionResult.SUCCESS;

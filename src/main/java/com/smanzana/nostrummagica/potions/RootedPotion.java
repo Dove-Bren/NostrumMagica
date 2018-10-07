@@ -29,7 +29,7 @@ public class RootedPotion extends Potion {
 		super(true, (new Color(100, 60, 25)).getRGB());
 
 		this.setPotionName("potion.rooted.name");
-		NostrumMagica.registerPotion(this, Resource);
+		this.setRegistryName(Resource);
 	}
 	
 	public boolean isReady(int duration, int amp) {

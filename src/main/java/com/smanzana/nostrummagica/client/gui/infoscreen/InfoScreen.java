@@ -76,7 +76,7 @@ public class InfoScreen extends GuiScreen {
 	}
 	
 	@Override
-	public void drawScreen(int mouseX, int mouseY, float p_73863_3_) {
+	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 
 		Gui.drawRect(0, 0, width, height, 0xFF000000);
 		
@@ -86,7 +86,7 @@ public class InfoScreen extends GuiScreen {
 		
 		// Do buttons and other parent stuff
 		for (int i = 0; i < this.buttonList.size(); ++i) {
-			((GuiButton)this.buttonList.get(i)).drawButton(this.mc, mouseX, mouseY);
+			((GuiButton)this.buttonList.get(i)).drawButton(this.mc, mouseX, mouseY, partialTicks);
 		}
 
 		for (int j = 0; j < this.labelList.size(); ++j) {
@@ -119,9 +119,9 @@ public class InfoScreen extends GuiScreen {
 			if (!this.subscreenButtons.isEmpty()) {
 				int i = 0;
 				for (ISubScreenButton butt : subscreenButtons) {
-					butt.xPosition = i;
+					butt.x = i;
 					i += butt.width + 2;
-					butt.yPosition = this.height - 15;
+					butt.y = this.height - 15;
 				}
 			}
 			
@@ -153,8 +153,8 @@ public class InfoScreen extends GuiScreen {
 		int cuttoff = this.width / (InfoButton.BUTTON_WIDTH + 2);
 		for (InfoButton button : this.buttons) {
 			button.visible = true;
-			button.xPosition = i++ * (InfoButton.BUTTON_WIDTH + 2);
-			button.yPosition = (j * (InfoButton.BUTTON_WIDTH + 2)) + (POS_TABS_HEIGHT + 2);
+			button.x = i++ * (InfoButton.BUTTON_WIDTH + 2);
+			button.y = (j * (InfoButton.BUTTON_WIDTH + 2)) + (POS_TABS_HEIGHT + 2);
 			
 			if (i >= cuttoff) {
 				i = 0;
@@ -196,37 +196,37 @@ public class InfoScreen extends GuiScreen {
          * Draws this button to the screen.
          */
         @Override
-        public void drawButton(Minecraft mc, int parX, int parY) {
+        public void drawButton(Minecraft mc, int parX, int parY, float PartialTicks) {
             if (visible)
             {
             	final int itemLength = 18;
             	float tint = 1f;
-            	if (parX >= xPosition 
-                  && parY >= yPosition 
-                  && parX < xPosition + width 
-                  && parY < yPosition + height) {
+            	if (parX >= x 
+                  && parY >= y 
+                  && parX < x + width 
+                  && parY < y + height) {
             		tint = .75f;
             	}
                 
                 GL11.glColor4f(tint, tint, tint, 1f);
                 mc.getTextureManager().bindTexture(background);
                 GlStateManager.enableBlend();
-                Gui.drawModalRectWithCustomSizedTexture(xPosition, yPosition, 0, TEXT_BUTTON_TAB_VOFFSET,
+                Gui.drawModalRectWithCustomSizedTexture(x, y, 0, TEXT_BUTTON_TAB_VOFFSET,
                 		TEXT_BUTTON_TAB_WIDTH, TEXT_BUTTON_TAB_WIDTH, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
                 GlStateManager.disableBlend();
                 
                 RenderHelper.enableGUIStandardItemLighting();
-                int x = xPosition + (TEXT_BUTTON_TAB_WIDTH - itemLength) / 2;
-                int y = yPosition + (TEXT_BUTTON_TAB_WIDTH - itemLength) / 2;
-                mc.getRenderItem().renderItemIntoGUI(tab.getIcon(), x, y);
+                int newx = x + (TEXT_BUTTON_TAB_WIDTH - itemLength) / 2;
+                int newy = y + (TEXT_BUTTON_TAB_WIDTH - itemLength) / 2;
+                mc.getRenderItem().renderItemIntoGUI(tab.getIcon(), newx, newy);
             }
         }
         
         @Override
     	public void drawButtonForegroundLayer(int mouseX, int mouseY) {
-    		if (mouseX >= this.xPosition && mouseY > this.yPosition
-    			&& mouseX <= this.xPosition + this.width
-    			&& mouseY <= this.yPosition + this.height) {
+    		if (mouseX >= this.x && mouseY > this.y
+    			&& mouseX <= this.x + this.width
+    			&& mouseY <= this.y + this.height) {
     			Minecraft mc = Minecraft.getMinecraft();
     			GuiUtils.drawHoveringText(desc,
     					mouseX,
@@ -234,7 +234,7 @@ public class InfoScreen extends GuiScreen {
     					mc.displayWidth,
     					mc.displayHeight,
     					100,
-    					mc.fontRendererObj);
+    					mc.fontRenderer);
     		}
     	}
     }

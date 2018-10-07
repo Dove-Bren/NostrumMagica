@@ -26,7 +26,7 @@ public class ClientUpdateQuestMessage implements IMessage {
 
 		@Override
 		public StatSyncMessage onMessage(ClientUpdateQuestMessage message, MessageContext ctx) {
-			EntityPlayer sp = ctx.getServerHandler().playerEntity;
+			EntityPlayer sp = ctx.getServerHandler().player;
 			INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
 			
 			if (att == null) {

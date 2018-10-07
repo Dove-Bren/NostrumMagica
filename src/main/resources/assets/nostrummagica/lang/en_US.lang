@@ -185,15 +185,15 @@ tile.altar_block.name=Altar
 tile.modification_table.name=Modification Table
 tile.lore_table.name=Researcher's Table
 
-entity.nostrummagica.physical_golem.name=Metal Golem
-entity.nostrummagica.lightning_golem.name=Lightining Golem
-entity.nostrummagica.fire_golem.name=Fire Golem
-entity.nostrummagica.earth_golem.name=Earth Golem
-entity.nostrummagica.ice_golem.name=Ice Golem
-entity.nostrummagica.wind_golem.name=Wind Golem
-entity.nostrummagica.ender_golem.name=End Golem
-entity.nostrummagica.spell_projectile.name=Spell Projectile
-entity.nostrummagica.entity_koid.name=Koid
+entity.physical_golem.name=Metal Golem
+entity.lightning_golem.name=Lightining Golem
+entity.fire_golem.name=Fire Golem
+entity.earth_golem.name=Earth Golem
+entity.ice_golem.name=Ice Golem
+entity.wind_golem.name=Wind Golem
+entity.ender_golem.name=End Golem
+entity.spell_projectile.name=Spell Projectile
+entity.entity_koid.name=Koid
 
 itemGroup.nostrummagica=Nostrum Magica
 itemGroup.nostrummagica_enhancements=Nostrum Enhancements

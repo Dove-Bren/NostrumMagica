@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.AltarBlock;
 import com.smanzana.nostrummagica.blocks.AltarBlock.AltarTileEntity;
@@ -50,7 +53,7 @@ public class RitualRecipe {
 	
 	public static RitualRecipe createTier1(String titleKey,
 			ItemStack icon,
-			EMagicElement element,
+			@Nullable EMagicElement element,
 			ReagentType reagent,
 			IRitualRequirement requirement,
 			IRitualOutcome outcome) {
@@ -66,9 +69,9 @@ public class RitualRecipe {
 	
 	public static RitualRecipe createTier2(String titleKey,
 			ItemStack icon,
-			EMagicElement element,
+			@Nullable EMagicElement element,
 			ReagentType[] reagents,
-			ItemStack center, 
+			@Nonnull ItemStack center, 
 			IRitualRequirement requirement,
 			IRitualOutcome outcome) {
 		RitualRecipe recipe = new RitualRecipe(titleKey, element, 1);
@@ -87,9 +90,9 @@ public class RitualRecipe {
 	
 	public static RitualRecipe createTier3(String titleKey,
 			ItemStack icon,
-			EMagicElement element,
+			@Nullable EMagicElement element,
 			ReagentType[] reagents,
-			ItemStack center,
+			@Nonnull ItemStack center,
 			ItemStack extras[],
 			IRitualRequirement requirement,
 			IRitualOutcome outcome) {
@@ -101,7 +104,7 @@ public class RitualRecipe {
 		recipe.centerItem = center;
 		
 		for (int i = 0; i < 4 && i < extras.length; i++) {
-			recipe.extraItems[i] = extras[i];
+			recipe.extraItems[i] = extras[i] == null ? ItemStack.EMPTY : extras[i];
 		}
 
 		recipe.hook = outcome;
@@ -111,7 +114,7 @@ public class RitualRecipe {
 		return recipe;
 	}
 	
-	private RitualRecipe(String nameKey, EMagicElement element, int tier) {
+	private RitualRecipe(String nameKey, @Nullable EMagicElement element, int tier) {
 		this.tier = tier;
 		this.element = element;
 		this.titleKey = nameKey;
@@ -123,7 +126,7 @@ public class RitualRecipe {
 			this.extraItems = new ItemStack[4];
 	}
 	
-	public boolean matches(EntityPlayer player, World world, BlockPos center, EMagicElement element) {
+	public boolean matches(EntityPlayer player, World world, BlockPos center, @Nullable EMagicElement element) {
 		if (element != this.element)
 			return false;
 		
@@ -152,7 +155,7 @@ public class RitualRecipe {
 			// Check altars
 			AltarTileEntity altar = (AltarTileEntity) centerTE;
 			ItemStack stack = altar.getItem();
-			if (stack == null)
+			if (stack == ItemStack.EMPTY)
 				return false;
 			if (!OreDictionary.itemMatches(centerItem, stack, false)) {
 				return false;
@@ -168,13 +171,13 @@ public class RitualRecipe {
 						if (te == null || !(te instanceof AltarTileEntity))
 							return false;
 						altar = (AltarTileEntity) te;
-						if (altar.getItem() != null)
+						if (altar.getItem() != ItemStack.EMPTY && altar.getItem() != null)
 							items.add(altar.getItem());
 					}
 				}
 				
 				for (ItemStack req : extraItems) {
-					if (req == null)
+					if (req == null || req == ItemStack.EMPTY)
 						continue;
 					
 					Iterator<ItemStack> it = items.iterator();
@@ -265,7 +268,7 @@ public class RitualRecipe {
 			te = world.getTileEntity(center);
 			if (te != null && te instanceof AltarTileEntity) {
 				centerItem = ((AltarTileEntity) te).getItem();
-				((AltarTileEntity) te).setItem(null);
+				((AltarTileEntity) te).setItem(ItemStack.EMPTY);
 			}
 			
 			if (tier == 2) {
@@ -278,7 +281,7 @@ public class RitualRecipe {
 						if (te == null || !(te instanceof AltarTileEntity))
 							continue; // oh well, too late now!
 						otherItems[i++] = ((AltarTileEntity) te).getItem();
-						((AltarTileEntity) te).setItem(null);
+						((AltarTileEntity) te).setItem(ItemStack.EMPTY);
 					}
 				}
 			}
@@ -288,7 +291,7 @@ public class RitualRecipe {
 			hook.perform(world, player, centerItem, otherItems, center, this);
 	}
 
-	public EMagicElement getElement() {
+	public @Nullable EMagicElement getElement() {
 		return element;
 	}
 

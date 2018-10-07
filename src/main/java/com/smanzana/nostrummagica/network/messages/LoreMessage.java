@@ -43,8 +43,8 @@ public class LoreMessage implements IMessage {
 			} else {
 				String name = lore.getLoreDisplayName();
 				EntityPlayer player = NostrumMagica.proxy.getPlayer();
-				player.addChatMessage(new TextComponentTranslation("info.lore.get", name));
-				NostrumMagicaSounds.UI_TICK.play(player, player.worldObj, player.posX, player.posY, player.posZ);
+				player.sendMessage(new TextComponentTranslation("info.lore.get", name));
+				NostrumMagicaSounds.UI_TICK.play(player, player.world, player.posX, player.posY, player.posZ);
 			}
 			
 			return null;

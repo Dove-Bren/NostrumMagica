@@ -117,7 +117,7 @@ public class EntityGolemLightning extends EntityGolem {
 	
 	@Override
 	public void onUpdate() {
-		if (worldObj.isRainingAt(this.getPosition())) {
+		if (world.isRainingAt(this.getPosition())) {
 			if (!this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED)
 					.hasModifier(MOVEMENT_STORM_MODIFIER)) {
 				this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED)

@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.blocks;
 import java.util.List;
 import java.util.Random;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -64,10 +65,10 @@ public class MagicWall extends Block {
         return false;
     }
 	
-	@Override
-	public boolean isVisuallyOpaque() {
-		return false;
-	}
+//	@Override
+//	public boolean isVisuallyOpaque() {
+//		return false;
+//	}
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
@@ -111,7 +112,7 @@ public class MagicWall extends Block {
 	}
 	
 	@Override
-	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+	public @Nonnull ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
 		return new ItemStack(Item.getItemFromBlock(this), 1, 0);
 	}
 	
@@ -150,21 +151,21 @@ public class MagicWall extends Block {
 			}
     }
 	
-	@Override
-	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
-		return false;
-    }
+//	@Override
+//	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+//		return false;
+//    }
 	
 	@SuppressWarnings("deprecation")
 	@Override
-    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn) {
+    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean flag) {
         
 		int level = state.getValue(LEVEL);
 		
 		if (level <= 0
 				|| (level >= 2 && !(entityIn instanceof EntityPlayer))
 				|| (level == 1 && !(entityIn instanceof EntityItem))) {
-			super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn);
+			super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, flag);
 		}
 		
     }

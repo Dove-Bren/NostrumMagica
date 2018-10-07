@@ -284,7 +284,7 @@ public class Spell {
 			// instantiate trigger in world
 			Vec3d pos;
 			if (world == null)
-				world = targ.worldObj;
+				world = targ.world;
 			if (targ == null)
 				pos = new Vec3d(targpos.getX() + .5, targpos.getY(), targpos.getZ() + .5);
 			else
@@ -515,7 +515,7 @@ public class Spell {
 				for (ItemStack req : part.getTrigger().getReagents()) {
 					type = ReagentItem.findType(req);
 					int count = costs.get(type);
-					count += req.stackSize;
+					count += req.getCount();
 					costs.put(type, count);
 				}
 			} else {
@@ -527,14 +527,14 @@ public class Spell {
 				for (ItemStack req : part.getShape().getReagents()) {
 					type = ReagentItem.findType(req);
 					int count = costs.get(type);
-					count += req.stackSize;
+					count += req.getCount();
 					costs.put(type, count);
 				}
 				if (part.getAlteration() != null) {
 					for (ItemStack req : part.getAlteration().getReagents()) {
 						type = ReagentItem.findType(req);
 						int count = costs.get(type);
-						count += req.stackSize;
+						count += req.getCount();
 						costs.put(type, count);
 					}
 				}

@@ -31,7 +31,7 @@ public class ClientSkillUpMessage implements IMessage {
 
 		@Override
 		public StatSyncMessage onMessage(ClientSkillUpMessage message, MessageContext ctx) {
-			EntityPlayer sp = ctx.getServerHandler().playerEntity;
+			EntityPlayer sp = ctx.getServerHandler().player;
 			INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
 			
 			if (att == null) {

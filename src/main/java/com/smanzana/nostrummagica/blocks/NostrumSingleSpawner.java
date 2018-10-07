@@ -26,6 +26,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -69,7 +70,8 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 	}
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(SingleSpawnerTE.class, "nostrum_mob_spawner_te");
+		GameRegistry.registerTileEntity(SingleSpawnerTE.class,
+				new ResourceLocation(NostrumMagica.MODID, "nostrum_mob_spawner_te"));
 	}
 	
 	public NostrumSingleSpawner() {
@@ -127,10 +129,10 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		return 0;
 	}
 	
-	@Override
-	public boolean isVisuallyOpaque() {
-		return false;
-	}
+//	@Override
+//	public boolean isVisuallyOpaque() {
+//		return false;
+//	}
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
@@ -163,7 +165,7 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		entity.enablePersistence();
 		entity.setPosition(pos.getX() + 0.5, pos.getY(), pos.getZ() + .5);
 		
-		world.spawnEntityInWorld(entity);
+		world.spawnEntity(entity);
 		
 	}
 	
@@ -231,14 +233,14 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		
 		@Override
 		public void update() {
-			if (!worldObj.isRemote && ++life % 32 == 0) {
-				IBlockState state = this.worldObj.getBlockState(this.pos);
+			if (!world.isRemote && ++life % 32 == 0) {
+				IBlockState state = this.world.getBlockState(this.pos);
 				if (state == null || !(state.getBlock() instanceof NostrumSingleSpawner)) {
-					worldObj.removeTileEntity(pos);
+					world.removeTileEntity(pos);
 					return;
 				}
 				
-				NostrumSingleSpawner.instance().updateTick(worldObj, pos, state, RANDOM);
+				NostrumSingleSpawner.instance().updateTick(world, pos, state, RANDOM);
 			}
 		}
 	}

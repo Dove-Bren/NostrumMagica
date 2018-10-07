@@ -29,11 +29,9 @@ public class FrostbitePotion extends Potion {
 		super(true, 0xFF93E0FF);
 		
 		this.setPotionName("potion.frostbite.name");
-		
 		this.registerPotionAttributeModifier(SharedMonsterAttributes.MOVEMENT_SPEED,
 				"60A6EF27-8A11-2213-A734-30A4B0CC4E90", -0.1D, 2);
-		
-		NostrumMagica.registerPotion(this, Resource);
+		this.setRegistryName(Resource);
 	}
 	
 	public boolean isReady(int duration, int amp) {
@@ -47,7 +45,7 @@ public class FrostbitePotion extends Potion {
 	@Override
 	public void performEffect(EntityLivingBase entity, int amp) {
 		float damage = 1.0f;
-        entity.attackEntityFrom(DamageSource.magic, damage);
+        entity.attackEntityFrom(DamageSource.MAGIC, damage);
     }
 	
 	@SideOnly(Side.CLIENT)

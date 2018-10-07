@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.blocks;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -74,10 +74,10 @@ public class ShrineBlock extends SymbolBlock {
 		return (state.getValue(EXHAUSTED) ? 1 : 0);
 	}
 	
-	@Override
-	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
-		return true;
-	}
+//	@Override
+//	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+//		return true;
+//	}
 	
 	@Override
 	public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
@@ -98,7 +98,7 @@ public class ShrineBlock extends SymbolBlock {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		
 		TileEntity te = worldIn.getTileEntity(pos);
 		if (te == null || !(te instanceof SymbolTileEntity))
@@ -110,6 +110,9 @@ public class ShrineBlock extends SymbolBlock {
 		
 		SymbolTileEntity tile = (SymbolTileEntity) te;
 		SpellComponentWrapper component = tile.getComponent();
+		
+		@Nonnull
+		ItemStack heldItem = playerIn.getHeldItem(hand);
 		
 		// Check for binding first
 		if (attr.isBinding()) {
@@ -128,7 +131,7 @@ public class ShrineBlock extends SymbolBlock {
 			}
 
 			// Make sure we have an orb first
-			if (heldItem == null || !(heldItem.getItem() instanceof MasteryOrb)) {
+			if (heldItem == ItemStack.EMPTY || !(heldItem.getItem() instanceof MasteryOrb)) {
 				return false;
 			}
 			
@@ -151,8 +154,8 @@ public class ShrineBlock extends SymbolBlock {
 				return false;
 			
 			if (isExhausted(state)) {
-				if (playerIn.worldObj.isRemote) {
-					playerIn.addChatComponentMessage(new TextComponentTranslation("info.shrine.exhausted", new Object[0]));
+				if (playerIn.world.isRemote) {
+					playerIn.sendMessage(new TextComponentTranslation("info.shrine.exhausted", new Object[0]));
 				}
 				return true;
 			}
@@ -162,8 +165,8 @@ public class ShrineBlock extends SymbolBlock {
 			SymbolTileEntity ent = (SymbolTileEntity) worldIn.getTileEntity(pos);
 			ent.setComponent(component);
 			
-			if (playerIn.worldObj.isRemote) {
-				playerIn.addChatComponentMessage(new TextComponentTranslation("info.shrine.trigger", new Object[] {component.getTrigger().getDisplayName()}));
+			if (playerIn.world.isRemote) {
+				playerIn.sendMessage(new TextComponentTranslation("info.shrine.trigger", new Object[] {component.getTrigger().getDisplayName()}));
 			}
 		}
 		
@@ -173,7 +176,7 @@ public class ShrineBlock extends SymbolBlock {
 				pass = true;
 			}
 			
-			if (heldItem != null && heldItem.getItem() instanceof SpellScroll) {
+			if (heldItem != ItemStack.EMPTY && heldItem.getItem() instanceof SpellScroll) {
 				Spell spell = SpellScroll.getSpell(heldItem);
 				if (spell != null) {
 					// What we require depends on the shape
@@ -239,12 +242,12 @@ public class ShrineBlock extends SymbolBlock {
 			
 			if (pass && !attr.getShapes().contains(component.getShape())) {
 				attr.addShape(component.getShape());
-				if (playerIn.worldObj.isRemote) {
-					playerIn.addChatComponentMessage(new TextComponentTranslation("info.shrine.shape", new Object[] {component.getShape().getDisplayName()}));
+				if (playerIn.world.isRemote) {
+					playerIn.sendMessage(new TextComponentTranslation("info.shrine.shape", new Object[] {component.getShape().getDisplayName()}));
 				}
 				
 				if (!(component.getShape() instanceof SingleShape)) {
-					playerIn.setHeldItem(hand, null);
+					playerIn.setHeldItem(hand, ItemStack.EMPTY);
 				}
 			}
 		}

@@ -3,8 +3,8 @@ package com.smanzana.nostrummagica.entity.renderer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.ResourceLocation;
 
@@ -59,7 +59,7 @@ public class RenderKoid extends RenderOBJModel<EntityKoid> {
 	}
 
 	@Override
-	protected boolean preRender(EntityKoid entity, int model, VertexBuffer buffer, double x, double y, double z,
+	protected boolean preRender(EntityKoid entity, int model, BufferBuilder buffer, double x, double y, double z,
 			float entityYaw, float partialTicks) {
 		GlStateManager.translate(0, -.5, 0);
 		float frac = (entity.ticksExisted + partialTicks) / (20f * 3.0f);

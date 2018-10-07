@@ -31,7 +31,7 @@ public class PhysicalShieldPotion extends Potion {
 
 		this.setBeneficial();
 		this.setPotionName("potion.shieldphysical.name");
-		NostrumMagica.registerPotion(this, Resource);
+		this.setRegistryName(Resource);
 	}
 	
 	@Override

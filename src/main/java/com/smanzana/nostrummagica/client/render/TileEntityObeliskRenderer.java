@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.client.render;
 
-import com.google.common.base.Function;
+import java.util.function.Function;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumObeliskEntity;
 
@@ -15,6 +16,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.obj.OBJLoader;
+import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
@@ -36,14 +38,15 @@ public class TileEntityObeliskRenderer extends TileEntitySpecialRenderer<Nostrum
 	}
 	
 	@Override
-	public void renderTileEntityAt(NostrumObeliskEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
+	public void render(NostrumObeliskEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
 
 		if (!attemptedLoading && model == null) {
 			IModel raw;
 			attemptedLoading = true;
 			try {
 				raw = OBJLoader.INSTANCE.loadModel(MODEL_LOC);
-				model = raw.bake(TRSRTransformation.identity(), DefaultVertexFormats.BLOCK,
+				IModelState state = TRSRTransformation.identity();
+				model = raw.bake(state, DefaultVertexFormats.BLOCK,
 						new Function<ResourceLocation, TextureAtlasSprite>() {
 
 					@Override

@@ -2,22 +2,23 @@ package com.smanzana.nostrummagica.items;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraft.util.NonNullList;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.oredict.OreDictionary;
 
 /**
  * Misc. resource items for delayed progression
@@ -65,10 +66,7 @@ public class NostrumResourceItem extends Item implements ILoreTagged {
 	public static void init() {
 		// Only thing with regular crafting recipe is small crystal
 		
-		GameRegistry.addRecipe(getItem(ResourceType.CRYSTAL_SMALL, 1), " MR", "MDM", "RM ",
-				'D', Items.DIAMOND,
-				'M', ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1),
-				'R', new ItemStack(ReagentItem.instance(), 1, OreDictionary.WILDCARD_VALUE));
+		
 	}
 	
 	public NostrumResourceItem() {
@@ -81,7 +79,7 @@ public class NostrumResourceItem extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public String getUnlocalizedName(ItemStack stack) {
+	public @Nonnull String getUnlocalizedName(ItemStack stack) {
 		int i = stack.getMetadata();
 		
 		ResourceType type = getTypeFromMeta(i);
@@ -105,9 +103,12 @@ public class NostrumResourceItem extends Item implements ILoreTagged {
      */
     @SideOnly(Side.CLIENT)
     @Override
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
-    	for (ResourceType type : ResourceType.values()) {
-    		subItems.add(new ItemStack(itemIn, 1, getMetaFromType(type)));
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+    	if (this.getCreativeTab() != tab)
+    		return;
+    	
+		for (ResourceType type : ResourceType.values()) {
+    		subItems.add(new ItemStack(instance(), 1, getMetaFromType(type)));
     	}
 	}
     
@@ -150,7 +151,7 @@ public class NostrumResourceItem extends Item implements ILoreTagged {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flag) {
 		if (stack == null)
 			return;
 		

@@ -21,7 +21,7 @@ public class EntitySpellProjectile extends EntityFireball {
 			EntityLivingBase shooter, float speedFactor, double maxDistance) {
 		this(trigger,
 				shooter,
-				shooter.worldObj,
+				shooter.world,
 				shooter.posX, shooter.posY + shooter.getEyeHeight(), shooter.posZ,
 				shooter.getLookVec(),
 				speedFactor, maxDistance
@@ -40,9 +40,9 @@ public class EntitySpellProjectile extends EntityFireball {
 		super(world, fromX, fromY, fromZ, 0, 0, 0);
         this.setSize(0.3125F, 0.3125F);
 		Vec3d accel = getAccel(direction, speedFactor);
-		this.accelerationX = accel.xCoord;
-		this.accelerationY = accel.yCoord;
-		this.accelerationZ = accel.zCoord;
+		this.accelerationX = accel.x;
+		this.accelerationY = accel.y;
+		this.accelerationZ = accel.z;
 		this.shootingEntity = shooter;
 		
 		this.trigger = trigger;
@@ -54,7 +54,7 @@ public class EntitySpellProjectile extends EntityFireball {
 		Vec3d base = direction.normalize();
 		final double tickScale = .05;
 		
-		return new Vec3d(base.xCoord * scale * tickScale, base.yCoord * scale * tickScale, base.zCoord * scale * tickScale);
+		return new Vec3d(base.x * scale * tickScale, base.y * scale * tickScale, base.z * scale * tickScale);
 	}
 	
 	@Override
@@ -63,11 +63,11 @@ public class EntitySpellProjectile extends EntityFireball {
 		
 		// if client
 		if (this.ticksExisted % 5 == 0) {
-			this.worldObj.spawnParticle(EnumParticleTypes.CRIT,
+			this.world.spawnParticle(EnumParticleTypes.CRIT,
 					posX, posY, posZ, 0, 0, 0);
 		}
 		
-		if (!worldObj.isRemote) {
+		if (!world.isRemote) {
 			if (origin == null) {
 				// We got loaded...
 				this.setDead();
@@ -83,7 +83,7 @@ public class EntitySpellProjectile extends EntityFireball {
 
 	@Override
 	protected void onImpact(RayTraceResult result) {
-		if (worldObj.isRemote)
+		if (world.isRemote)
 			return;
 		
 		if (result.typeOfHit == RayTraceResult.Type.MISS) {

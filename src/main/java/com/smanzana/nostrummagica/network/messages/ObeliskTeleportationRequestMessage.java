@@ -44,9 +44,9 @@ public class ObeliskTeleportationRequestMessage implements IMessage {
 			}
 			to = NBTUtil.getPosFromTag(message.tag.getCompoundTag(NBT_TO));
 			
-			EntityPlayer sp = ctx.getServerHandler().playerEntity;
+			EntityPlayer sp = ctx.getServerHandler().player;
 			
-			serverDoRequest(sp.worldObj, sp, from, to);
+			serverDoRequest(sp.world, sp, from, to);
 			
 			return null;
 		}
@@ -99,7 +99,7 @@ public class ObeliskTeleportationRequestMessage implements IMessage {
 		IBlockState state = world.getBlockState(to);
 		if (state == null || !(state.getBlock() instanceof NostrumObelisk)
 				|| !NostrumObelisk.blockIsMaster(state)) {
-			player.addChatComponentMessage(new TextComponentTranslation("info.obelisk.dne"));
+			player.sendMessage(new TextComponentTranslation("info.obelisk.dne"));
 			return false;
 		}
 		
@@ -110,7 +110,7 @@ public class ObeliskTeleportationRequestMessage implements IMessage {
 					|| !NostrumObelisk.blockIsMaster(state)
 					|| !NostrumObelisk.isValidTarget(world, from, to)) {
 				NostrumMagica.logger.error("Something went wrong! Source obelisk does not seem to exist or have the provided target obelisk...");
-				player.addChatComponentMessage(new TextComponentTranslation("info.obelisk.dne"));
+				player.sendMessage(new TextComponentTranslation("info.obelisk.dne"));
 				return false;
 			}
 		}
@@ -121,7 +121,7 @@ public class ObeliskTeleportationRequestMessage implements IMessage {
 				
 			doEffects(world, to);
 		} else {
-			player.addChatComponentMessage(new TextComponentTranslation("info.obelisk.noroom"));
+			player.sendMessage(new TextComponentTranslation("info.obelisk.noroom"));
 		}
 		
 		return true;

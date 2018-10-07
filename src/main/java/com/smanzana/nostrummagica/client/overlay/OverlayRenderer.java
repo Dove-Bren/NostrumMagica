@@ -40,14 +40,14 @@ public class OverlayRenderer extends Gui {
 		if (event.getType() != ElementType.EXPERIENCE)
 			return;
 		
-		EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayerSP player = Minecraft.getMinecraft().player;
 		ScaledResolution scaledRes = event.getResolution();
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null || !attr.isUnlocked())
 			return;
 		
-		if (!Minecraft.getMinecraft().thePlayer.isCreative())
+		if (!Minecraft.getMinecraft().player.isCreative())
 		{
 			// Orbs
 			if (ModConfig.config.displayManaOrbs())
@@ -100,8 +100,8 @@ public class OverlayRenderer extends Gui {
 				if (ModConfig.config.displayManaText()) {
 					int centerx = hudXAnchor - (5 * 8);
 					String str = attr.getMana() + "/" + attr.getMaxMana();
-					int width = Minecraft.getMinecraft().fontRendererObj.getStringWidth(str);
-					Minecraft.getMinecraft().fontRendererObj.drawString(
+					int width = Minecraft.getMinecraft().fontRenderer.getStringWidth(str);
+					Minecraft.getMinecraft().fontRenderer.drawString(
 							str, centerx - width/2, hudYAnchor + 1, 0xFFFFFFFF);
 				}
 			
@@ -124,7 +124,7 @@ public class OverlayRenderer extends Gui {
 				GlStateManager.disableBlend();
 				
 				if (ModConfig.config.displayManaText()) {
-					FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
+					FontRenderer fonter = Minecraft.getMinecraft().fontRenderer;
 					int centerx = hudXAnchor + (int) (.5 * GUI_BAR_WIDTH);
 					String str = "" + attr.getMana();
 					int width = fonter.getStringWidth(str);
@@ -146,12 +146,12 @@ public class OverlayRenderer extends Gui {
 		
 		// Bottom left spell slide
 		// Spell name
-		Spell current = NostrumMagica.getCurrentSpell(Minecraft.getMinecraft().thePlayer);
+		Spell current = NostrumMagica.getCurrentSpell(Minecraft.getMinecraft().player);
 		boolean xp = ModConfig.config.displayXPText();
 		if (current != null || xp) {
 			String text = (current == null ? "" : current.getName());
 			int mult = (xp) ? 2 : 1;
-			FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
+			FontRenderer fonter = Minecraft.getMinecraft().fontRenderer;
 			Gui.drawRect(0, scaledRes.getScaledHeight() - (fonter.FONT_HEIGHT * mult + 9), 100, scaledRes.getScaledHeight(), 0x50606060);
 			fonter.drawString(text, 5, scaledRes.getScaledHeight() - (fonter.FONT_HEIGHT + 3), 0xFF000000);
 			if (xp)

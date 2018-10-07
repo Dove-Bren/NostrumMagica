@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.capabilities;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTBase;
@@ -21,13 +23,13 @@ public class AttributeProvider implements ICapabilitySerializable<NBTBase> {
 	}
 
 	@Override
-	public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
 		return capability == CAPABILITY;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
 		if (capability == CAPABILITY) {
 			if (entity instanceof EntityLivingBase)
 				this.instance.provideEntity((EntityLivingBase) entity);

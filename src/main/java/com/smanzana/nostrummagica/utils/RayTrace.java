@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
@@ -42,10 +44,10 @@ public class RayTrace {
 		if (world == null || fromPos == null || direction == null)
 			return null;
 		
-		double x = direction.xCoord * maxDistance;
-		double y = direction.yCoord * maxDistance;
-		double z = direction.zCoord * maxDistance;
-		toPos = new Vec3d(fromPos.xCoord + x, fromPos.yCoord + y, fromPos.zCoord + z);
+		double x = direction.x* maxDistance;
+		double y = direction.y* maxDistance;
+		double z = direction.z* maxDistance;
+		toPos = new Vec3d(fromPos.x+ x, fromPos.y+ y, fromPos.z+ z);
 		
 		
 		return raytrace(world, fromPos, toPos, onlyLiving);
@@ -70,12 +72,11 @@ public class RayTrace {
         }
         
         List<Entity> list = world.getEntitiesInAABBexcluding(null,
-        		new AxisAlignedBB(fromPos.xCoord, fromPos.yCoord, fromPos.zCoord, toPos.xCoord, toPos.yCoord, toPos.zCoord),
+        		new AxisAlignedBB(fromPos.x, fromPos.y, fromPos.z, toPos.x, toPos.y, toPos.z),
         		Predicates.and(EntitySelectors.NOT_SPECTATING, new Predicate<Entity>()
         {
-            public boolean apply(Entity p_apply_1_)
-            {
-                return p_apply_1_.canBeCollidedWith();
+            public boolean apply(@Nullable Entity p_apply_1_) {
+                return p_apply_1_ != null && p_apply_1_.canBeCollidedWith();
             }
         }));
         // d2 is current closest distance
@@ -92,7 +93,7 @@ public class RayTrace {
             AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().expand((double)f1, (double)f1, (double)f1);
             RayTraceResult movingobjectposition = axisalignedbb.calculateIntercept(fromPos, toPos);
 
-            if (axisalignedbb.isVecInside(fromPos))
+            if (axisalignedbb.contains(fromPos))
             {
                 if (minDist >= 0.0D)
                 {
@@ -138,10 +139,10 @@ public class RayTrace {
 		if (world == null || fromPos == null || direction == null)
 			return null;
 		
-		double x = direction.xCoord * maxDistance;
-		double y = direction.yCoord * maxDistance;
-		double z = direction.zCoord * maxDistance;
-		toPos = new Vec3d(fromPos.xCoord + x, fromPos.yCoord + y, fromPos.zCoord + z);
+		double x = direction.x * maxDistance;
+		double y = direction.y * maxDistance;
+		double z = direction.z * maxDistance;
+		toPos = new Vec3d(fromPos.x + x, fromPos.y + y, fromPos.z + z);
 		
 		
 		return allInPath(world, fromPos, toPos, onlyLiving);
@@ -175,12 +176,11 @@ public class RayTrace {
         }
         
         List<Entity> list = world.getEntitiesInAABBexcluding(null,
-        		new AxisAlignedBB(fromPos.xCoord, fromPos.yCoord, fromPos.zCoord, toPos.xCoord, toPos.yCoord, toPos.zCoord),
+        		new AxisAlignedBB(fromPos.x, fromPos.y, fromPos.z, toPos.x, toPos.y, toPos.z),
         		Predicates.and(EntitySelectors.NOT_SPECTATING, new Predicate<Entity>()
         {
-            public boolean apply(Entity p_apply_1_)
-            {
-                return p_apply_1_.canBeCollidedWith();
+            public boolean apply(@Nullable Entity p_apply_1_) {
+                return p_apply_1_ != null && p_apply_1_.canBeCollidedWith();
             }
         }));
         
@@ -196,7 +196,7 @@ public class RayTrace {
             AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().expand((double)f1, (double)f1, (double)f1);
             RayTraceResult movingobjectposition = axisalignedbb.calculateIntercept(fromPos, toPos);
 
-            if (axisalignedbb.isVecInside(fromPos))
+            if (axisalignedbb.contains(fromPos))
             {
                 ret.add(new RayTraceResult(entity1));
             }

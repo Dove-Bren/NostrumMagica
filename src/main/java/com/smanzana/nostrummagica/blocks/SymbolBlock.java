@@ -21,7 +21,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -43,7 +43,8 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
 	}
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(SymbolTileEntity.class, "nostrum_symbol_te");
+		GameRegistry.registerTileEntity(SymbolTileEntity.class,
+				new ResourceLocation(NostrumMagica.MODID, "nostrum_symbol_te"));
 	}
 	
 	public SymbolBlock() {
@@ -55,15 +56,14 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setSoundType(SoundType.STONE);
 		
-		this.isBlockContainer = true;
 		this.setLightLevel(0.8f);
 		this.setLightOpacity(16);
 	}
 	
-	@Override
-	public boolean isVisuallyOpaque() {
-		return false;
-	}
+//	@Override
+//	public boolean isVisuallyOpaque() {
+//		return false;
+//	}
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
@@ -75,10 +75,10 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
         return false;
     }
 	
-	@Override
-	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
-		return false;
-	}
+//	@Override
+//	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+//		return false;
+//	}
 	
 	@Override
 	public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
@@ -300,9 +300,9 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
 		}
 		
 		private void dirty() {
-			worldObj.markBlockRangeForRenderUpdate(pos, pos);
-			worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 3);
-			worldObj.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
+			world.markBlockRangeForRenderUpdate(pos, pos);
+			world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
+			world.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
 			markDirty();
 		}
 		

@@ -3,6 +3,9 @@ package com.smanzana.nostrummagica.jei;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.client.gui.book.RitualRecipePage;
 import com.smanzana.nostrummagica.rituals.outcomes.IItemRitualOutcome;
@@ -26,7 +29,7 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 	}
 	
 	@Override
-	public void render(Minecraft minecraft, int xPosition, int yPosition, RitualOutcomeWrapper ingredient) {
+	public void render(Minecraft minecraft, int xPosition, int yPosition, @Nullable RitualOutcomeWrapper ingredient) {
 		if (ingredient == null)
 			return;
 		minecraft.getTextureManager().bindTexture(RitualRecipePage.TEXTURE);
@@ -55,7 +58,7 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 	}
 
 	@Override
-	public List<String> getTooltip(Minecraft minecraft, RitualOutcomeWrapper ingredient) {
+	public @Nonnull List<String> getTooltip(Minecraft minecraft, RitualOutcomeWrapper ingredient) {
 		if (ingredient == null)
 			return new LinkedList<>();
 		
@@ -67,9 +70,9 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 	}
 
 	@Override
-	public FontRenderer getFontRenderer(Minecraft minecraft, RitualOutcomeWrapper ingredient) {
+	public @Nonnull FontRenderer getFontRenderer(Minecraft minecraft, RitualOutcomeWrapper ingredient) {
 		if (ingredient == null)
-			return minecraft.fontRendererObj;
+			return minecraft.fontRenderer;
 		
 		FontRenderer render = null;
 		ItemStack stack = fetchItem(ingredient.getOutcome());
@@ -77,7 +80,7 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 			render = stack.getItem().getFontRenderer(stack);
 		
 		if (render == null)
-			render = minecraft.fontRendererObj;
+			render = minecraft.fontRenderer;
 		
 		return render;
 	}

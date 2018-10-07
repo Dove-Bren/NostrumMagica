@@ -30,7 +30,7 @@ public class OutcomeRecall implements IRitualOutcome {
 		BlockPos pos = attr.getMarkLocation();
 		if (pos == null) {
 			if (world.isRemote)
-				player.addChatMessage(new TextComponentTranslation("info.recall.fail", new Object[0]));
+				player.sendMessage(new TextComponentTranslation("info.recall.fail", new Object[0]));
 			return;
 		}
 		
@@ -38,7 +38,7 @@ public class OutcomeRecall implements IRitualOutcome {
 			if (!world.isRemote)
 				player.setPositionAndUpdate(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
 		} else {
-			player.addChatMessage(new TextComponentTranslation("info.recall.baddimension", new Object[0]));
+			player.sendMessage(new TextComponentTranslation("info.recall.baddimension", new Object[0]));
 		}
 	}
 

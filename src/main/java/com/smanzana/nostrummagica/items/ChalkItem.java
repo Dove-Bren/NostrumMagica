@@ -8,7 +8,6 @@ import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
@@ -16,21 +15,11 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class ChalkItem extends Item implements ILoreTagged {
 
 	public static void init() {
-		
-		/*
-		 * In the future, something cool.
-		 * For now, just a wooden sword </3
-		 */
-		GameRegistry.addShapelessRecipe(new ItemStack(instance),
-				new ItemStack(Items.DYE, 1, 15),
-				new ItemStack(Items.DYE, 1, 15),
-				new ItemStack(ReagentItem.instance(), 1, OreDictionary.WILDCARD_VALUE));
+		;
 	}
 	
 	private static ChalkItem instance = null;
@@ -74,8 +63,9 @@ public class ChalkItem extends Item implements ILoreTagged {
 	}
 
 	@Override
-	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		IBlockState state = worldIn.getBlockState(pos);
+		ItemStack stack = playerIn.getHeldItem(hand);
         if (facing == EnumFacing.UP && playerIn.canPlayerEdit(pos.offset(facing), facing, stack) && state.isFullBlock() && worldIn.isAirBlock(pos.up())) {
         	worldIn.setBlockState(pos.up(), ChalkBlock.instance().getDefaultState());
             stack.damageItem(1, playerIn);

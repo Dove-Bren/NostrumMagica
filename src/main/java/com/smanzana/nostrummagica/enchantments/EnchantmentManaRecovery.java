@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.enchantments;
 
+import com.smanzana.nostrummagica.NostrumMagica;
+
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -24,6 +26,7 @@ public class EnchantmentManaRecovery extends Enchantment {
 						EntityEquipmentSlot.CHEST,
 						EntityEquipmentSlot.HEAD});
 		this.setName("mana_recovery");
+		this.setRegistryName(NostrumMagica.MODID, EnchantmentManaRecovery.ID);
 	}
 
     /**

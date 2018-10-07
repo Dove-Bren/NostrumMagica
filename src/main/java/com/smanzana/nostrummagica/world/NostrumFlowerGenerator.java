@@ -8,8 +8,8 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.gen.feature.WorldGenerator;
 import net.minecraftforge.fml.common.IWorldGenerator;
 
@@ -30,7 +30,7 @@ public class NostrumFlowerGenerator implements IWorldGenerator {
 	        {
 	            BlockPos blockpos = position.add(rand.nextInt(8) - rand.nextInt(8), rand.nextInt(4) - rand.nextInt(4), rand.nextInt(8) - rand.nextInt(8));
 
-	            if (worldIn.isAirBlock(blockpos) && (!worldIn.provider.getHasNoSky() || blockpos.getY() < 255) && NostrumMagicaFlower.instance().canBlockStay(worldIn, blockpos, flowerState))
+	            if (worldIn.isAirBlock(blockpos) && (worldIn.provider.hasSkyLight() || blockpos.getY() < 255) && NostrumMagicaFlower.instance().canBlockStay(worldIn, blockpos, flowerState))
 	            {
 	                worldIn.setBlockState(blockpos, flowerState, 2);
 	            }
@@ -121,7 +121,7 @@ public class NostrumFlowerGenerator implements IWorldGenerator {
         int z = chunk_Z * 16 + rand.nextInt(16);
         
         BlockPos pos =  new BlockPos(x, y, z);
-        float temp = b.getFloatTemperature(pos);
+        float temp = b.getTemperature(pos);
         		
         if (temp >= minTemp && temp <= maxTemp)
         	generator.generate(world, rand, pos);

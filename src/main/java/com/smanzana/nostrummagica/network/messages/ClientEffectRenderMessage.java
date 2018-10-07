@@ -40,7 +40,7 @@ public class ClientEffectRenderMessage implements IMessage {
 			if (message.tag.hasKey(NBT_CASTER_ID, NBT.TAG_STRING)) {
 				try {
 					UUID id = UUID.fromString(message.tag.getString(NBT_CASTER_ID));
-					caster = NostrumMagica.proxy.getPlayer().worldObj.getPlayerEntityByUUID(id);
+					caster = NostrumMagica.proxy.getPlayer().world.getPlayerEntityByUUID(id);
 				} catch (Exception e) {
 					;
 				}
@@ -58,7 +58,7 @@ public class ClientEffectRenderMessage implements IMessage {
 			if (message.tag.hasKey(NBT_TARGET_ID, NBT.TAG_STRING)) {
 				try {
 					UUID id = UUID.fromString(message.tag.getString(NBT_TARGET_ID));
-					for (Entity e : NostrumMagica.proxy.getPlayer().worldObj.loadedEntityList) {
+					for (Entity e : NostrumMagica.proxy.getPlayer().world.loadedEntityList) {
 						if (e.getPersistentID().equals(id)) {
 							target = (EntityLivingBase) e;
 							break;
@@ -90,7 +90,7 @@ public class ClientEffectRenderMessage implements IMessage {
 				return null;
 			}
 			
-			NostrumMagica.proxy.spawnEffect(NostrumMagica.proxy.getPlayer().worldObj, 
+			NostrumMagica.proxy.spawnEffect(NostrumMagica.proxy.getPlayer().world, 
 					component,
 					caster, casterPos, target, targetPos, flavor);
 			
@@ -125,9 +125,9 @@ public class ClientEffectRenderMessage implements IMessage {
 			tag.setString(NBT_CASTER_ID, caster.getPersistentID().toString());
 		if (casterPos != null) {
 			NBTTagCompound nbt = new NBTTagCompound();
-			nbt.setDouble("x", casterPos.xCoord);
-			nbt.setDouble("y", casterPos.yCoord);
-			nbt.setDouble("z", casterPos.zCoord);
+			nbt.setDouble("x", casterPos.x);
+			nbt.setDouble("y", casterPos.y);
+			nbt.setDouble("z", casterPos.z);
 			tag.setTag(NBT_CASTER_POS, nbt);
 		}
 			
@@ -135,9 +135,9 @@ public class ClientEffectRenderMessage implements IMessage {
 			tag.setString(NBT_TARGET_ID, target.getPersistentID().toString());
 		if (targetPos != null) {
 			NBTTagCompound nbt = new NBTTagCompound();
-			nbt.setDouble("x", targetPos.xCoord);
-			nbt.setDouble("y", targetPos.yCoord);
-			nbt.setDouble("z", targetPos.zCoord);
+			nbt.setDouble("x", targetPos.x);
+			nbt.setDouble("y", targetPos.y);
+			nbt.setDouble("z", targetPos.z);
 			tag.setTag(NBT_TARGET_POS, nbt);
 		}
 		

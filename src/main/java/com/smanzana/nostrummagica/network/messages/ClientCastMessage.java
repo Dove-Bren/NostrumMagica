@@ -37,7 +37,7 @@ public class ClientCastMessage implements IMessage {
 			// Figure out what spell they have
 			// cast it if they can
 			
-			EntityPlayer sp = ctx.getServerHandler().playerEntity;
+			EntityPlayer sp = ctx.getServerHandler().player;
 			
 			// What spell?
 			Spell spell = NostrumMagica.spellRegistry.lookup(
@@ -136,7 +136,7 @@ public class ClientCastMessage implements IMessage {
 				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
 					int count = NostrumMagica.getReagentCount(sp, row.getKey());
 					if (count < row.getValue()) {
-						sp.addChatComponentMessage(new TextComponentTranslation("info.spell.bad_reagent", row.getKey().prettyName()));
+						sp.sendMessage(new TextComponentTranslation("info.spell.bad_reagent", row.getKey().prettyName()));
 						return new ClientCastReplyMessage(false, att.getMana(), 0, null);
 					}
 				}

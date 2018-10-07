@@ -37,7 +37,7 @@ public class SpellDebugMessage implements IMessage {
 			
 			ITextComponent text = ITextComponent.Serializer.jsonToComponent(chat);
 			
-			NostrumMagica.proxy.getPlayer().addChatMessage(text);
+			NostrumMagica.proxy.getPlayer().sendMessage(text);
 			
 			return null;
 		}

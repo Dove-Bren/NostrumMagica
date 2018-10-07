@@ -7,9 +7,9 @@ import org.lwjgl.opengl.GL11;
 import com.google.common.collect.ImmutableMap;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.entity.Render;
@@ -51,7 +51,7 @@ public abstract class RenderOBJModel<T extends Entity> extends Render<T> {
 	}
 
 	protected abstract ResourceLocation[] getEntityModels();
-	protected abstract boolean preRender(T entity, int model, VertexBuffer buffer, double x, double y, double z, float entityYaw, float partialTicks);
+	protected abstract boolean preRender(T entity, int model, BufferBuilder buffer, double x, double y, double z, float entityYaw, float partialTicks);
 	protected IModel retexture(int i, IModel model) {return model;}
 	protected int getColor(int i, T entity) {return -1;}
 
@@ -82,7 +82,7 @@ public abstract class RenderOBJModel<T extends Entity> extends Render<T> {
 			GlStateManager.pushMatrix();
 
 			Tessellator tessellator = Tessellator.getInstance();
-			VertexBuffer buffer = tessellator.getBuffer();
+			BufferBuilder buffer = tessellator.getBuffer();
 			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
 
 			GlStateManager.rotate(180, 0, 0, 1);

@@ -29,19 +29,19 @@ public class RitualInfoButton extends InfoButton {
 	}
 
 	@Override
-	public void drawButton(Minecraft mc, int mouseX, int mouseY) {
+	public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
 		float tint = 1f;
-		if (mouseX >= xPosition 
-			&& mouseY >= yPosition 
-			&& mouseX < xPosition + width 
-			&& mouseY < yPosition + height) {
+		if (mouseX >= x 
+			&& mouseY >= y 
+			&& mouseX < x + width 
+			&& mouseY < y + height) {
 			tint = .75f;
 		}
 		
 		GL11.glColor4f(tint, tint, tint, 1f);
 		mc.getTextureManager().bindTexture(InfoScreen.background);
 		GlStateManager.enableBlend();
-		Gui.drawModalRectWithCustomSizedTexture(xPosition, yPosition, 0, 0,
+		Gui.drawModalRectWithCustomSizedTexture(x, y, 0, 0,
 				width, height,
 				InfoScreen.TEXT_WHOLE_WIDTH, InfoScreen.TEXT_WHOLE_HEIGHT);
 		GlStateManager.disableBlend();
@@ -50,9 +50,9 @@ public class RitualInfoButton extends InfoButton {
 		
 		ItemStack iconStack = ritual.getIcon();
 		if (iconStack != null) {
-			int x = xPosition + (width - itemLength) / 2;
-			int y = yPosition + (height - itemLength) / 2;
-			mc.getRenderItem().renderItemIntoGUI(iconStack, x, y);
+			int newx = x + (width - itemLength) / 2;
+			int newy = y + (height - itemLength) / 2;
+			mc.getRenderItem().renderItemIntoGUI(iconStack, newx, newy);
 		}
 	}
 	

@@ -1,7 +1,8 @@
 package com.smanzana.nostrummagica.blocks;
 
-import java.util.List;
 import java.util.Random;
+
+import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
@@ -18,12 +19,11 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -80,29 +80,20 @@ public class NostrumMagicaFlower extends BlockBush {
 	
 	public static void init() {
 		instance();
-		GameRegistry.register(instance,
-    			new ResourceLocation(NostrumMagica.MODID, instance.getID()));
-//    	GameRegistry.register(
-//    			(new ItemBlock(instance)).setRegistryName(instance.getID())
-//    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(instance.getID()));
 	}
 	
-	private String id;
+	private static String ID = "nostrum_flower";
 	
 	public NostrumMagicaFlower() {
 		super(Material.PLANTS);
 		this.blockSoundType = SoundType.PLANT;
 		
-		this.id = "nostrum_flower";
-		this.setUnlocalizedName(id);
+		//this.id = "nostrum_flower";
+		this.setUnlocalizedName(ID);
 		this.setCreativeTab(NostrumMagica.creativeTab);
-		//this.setRegistryName(id);
+		this.setRegistryName(NostrumMagica.MODID, ID);
 		
 		this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, Type.MIDNIGHT_IRIS));
-	}
-	
-	public String getID() {
-		return id;
 	}
 	
 	@Override
@@ -110,10 +101,10 @@ public class NostrumMagicaFlower extends BlockBush {
         return true;
     }
 	
-	@Override
-	public boolean isVisuallyOpaque() {
-		return false;
-	}
+//	@Override
+//	public boolean isVisuallyOpaque() {
+//		return false;
+//	}
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
@@ -158,9 +149,13 @@ public class NostrumMagicaFlower extends BlockBush {
     }
 	
 	@SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list) {
+	@Override
+    public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
+		if (tab != NostrumMagica.creativeTab)
+			return;
+		
 		for (Type type : Type.values()) {
-			list.add(new ItemStack(itemIn, 1, type.getKey()));
+			list.add(new ItemStack(instance(), 1, type.getKey()));
 		}
 	}
 	
@@ -179,7 +174,7 @@ public class NostrumMagicaFlower extends BlockBush {
 	}
 	
 	@Override
-	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+	public @Nonnull ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
 		return new ItemStack(Item.getItemFromBlock(this), 1, getMetaFromState(state));
 	}
 	

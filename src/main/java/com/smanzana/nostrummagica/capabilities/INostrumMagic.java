@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.quests.objectives.IObjectiveState;
@@ -69,7 +71,7 @@ public interface INostrumMagic {
 	public Spell getBindingSpell();
 	public int getBindingID();
 	public void startBinding(Spell spell, SpellComponentWrapper component, int tomeID);
-	public void completeBinding(ItemStack tome); // if tome == null, will require it be in player inventory
+	public void completeBinding(@Nonnull ItemStack tome); // if tome == null, will require it be in player inventory
 	
 	// Lore
 	public boolean hasLore(ILoreTagged tagged);

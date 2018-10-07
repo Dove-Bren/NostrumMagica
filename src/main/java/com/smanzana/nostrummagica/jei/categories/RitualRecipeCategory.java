@@ -111,8 +111,8 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipeWrapper
 		
 		
 		String title = recipeName;
-		int len = minecraft.fontRendererObj.getStringWidth(title);
-		minecraft.fontRendererObj.drawString(title, (BACK_WIDTH - len) / 2, 2, 0xFF000000);
+		int len = minecraft.fontRenderer.getStringWidth(title);
+		minecraft.fontRenderer.drawString(title, (BACK_WIDTH - len) / 2, 2, 0xFF000000);
 	}
 
 	@Override

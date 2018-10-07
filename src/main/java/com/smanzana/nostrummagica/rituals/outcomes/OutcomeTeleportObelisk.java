@@ -41,7 +41,7 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 		
 		BlockPos pos = PositionCrystal.getBlockPosition(centerItem);
 		if (pos == null) {
-			player.addChatMessage(new TextComponentTranslation("info.teleport_obelisk.fail", new Object[0]));
+			player.sendMessage(new TextComponentTranslation("info.teleport_obelisk.fail", new Object[0]));
 			return;
 		}
 		

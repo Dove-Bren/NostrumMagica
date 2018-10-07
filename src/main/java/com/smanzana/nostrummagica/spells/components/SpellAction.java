@@ -55,6 +55,7 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -105,7 +106,7 @@ public class SpellAction {
 		@Override
 		public void apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
 			float fin = calcDamage(entity, amount * efficiency, element);
-			source.setLastAttacker(entity);
+			source.setLastAttackedEntity(entity);
 			entity.attackEntityFrom(new MagicDamageSource(source, element), fin);
 			
 			NostrumMagicaSounds sound;
@@ -236,7 +237,7 @@ public class SpellAction {
 			entity.addPotionEffect(new PotionEffect(effect, (int) (duration * efficiency), amp));
 			
 			if (effect.isBadEffect()) {
-				caster.setLastAttacker(entity);
+				caster.setLastAttackedEntity(entity);
 				entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
 				NostrumMagicaSounds.STATUS_DEBUFF2.play(entity);
 			} else {
@@ -332,18 +333,18 @@ public class SpellAction {
 			Vec3d source = entity.getPositionVector();
 			source = source.addVector(0, entity.getEyeHeight(), 0);
 			BlockPos bpos;
-			Vec3d translation = new Vec3d(direction.xCoord * dist,
-					direction.yCoord * dist,
-					direction.zCoord * dist);
+			Vec3d translation = new Vec3d(direction.x * dist,
+					direction.y * dist,
+					direction.z * dist);
 			
 			// Find ideal dest (vect addition). Can we go there? Then go there.
 			// Else step backwards and raycast forward in 1/5 increments.
 			// See if place we hit is same spot as raycast. If so, fail and do again
 			
 			dest = source.add(translation);
-			bpos = new BlockPos(dest.xCoord, dest.yCoord, dest.zCoord);
-			if (isPassable(entity.worldObj, bpos)
-				&& isPassable(entity.worldObj, bpos.add(0, 1, 0))) {
+			bpos = new BlockPos(dest.x, dest.y, dest.z);
+			if (isPassable(entity.world, bpos)
+				&& isPassable(entity.world, bpos.add(0, 1, 0))) {
 					// Whoo! Looks like we can teleport there!
 			} else {
 				int i = 4; // Attempt raytrace from (20% * i * pathlength)
@@ -357,17 +358,17 @@ public class SpellAction {
 						from = source;
 					} else {
 						curDist = (.2 * i);
-						from = new Vec3d(translation.xCoord * curDist,
-								translation.yCoord * curDist,
-								translation.zCoord * curDist);
+						from = new Vec3d(translation.x * curDist,
+								translation.y * curDist,
+								translation.z * curDist);
 						from = source.add(from);
 					}
 					
-					RayTraceResult mop = entity.worldObj.rayTraceBlocks(from, endpoint, false);
+					RayTraceResult mop = entity.world.rayTraceBlocks(from, endpoint, false);
 					if (mop != null && mop.hitVec.distanceTo(from) > 0.5) {
 						// We got one
 						BlockPos pos = new BlockPos(mop.hitVec);
-						if (isPassable(entity.worldObj, pos) && isPassable(entity.worldObj, pos.add(0, 1, 0))) {
+						if (isPassable(entity.world, pos) && isPassable(entity.world, pos.add(0, 1, 0))) {
 							dest = mop.hitVec;
 							break;
 						}
@@ -378,7 +379,7 @@ public class SpellAction {
 			}
 			
 			if (dest != null) {
-				entity.setPositionAndUpdate(.5 + Math.floor(dest.xCoord), Math.floor(dest.yCoord), .5 + Math.floor(dest.zCoord));
+				entity.setPositionAndUpdate(.5 + Math.floor(dest.x), Math.floor(dest.y), .5 + Math.floor(dest.z));
 				NostrumMagicaSounds.STATUS_BUFF1.play(entity);
 			}
 		}
@@ -416,7 +417,7 @@ public class SpellAction {
 		
 		@Override
 		public void apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
-			apply(caster, entity.worldObj, entity.getPosition(), efficiency);
+			apply(caster, entity.world, entity.getPosition(), efficiency);
 		}
 		
 		@Override
@@ -425,10 +426,10 @@ public class SpellAction {
 			// We abs the amp here, but check it belwo for pull and negate vector
 			float magnitude = .35f * (Math.abs(amp) + 1.0f) * (float) Math.min(2.0f, Math.max(0.0f, 1.0f + Math.log(efficiency)));
 			Vec3d center = new Vec3d(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
-			NostrumMagicaSounds.DAMAGE_WIND.play(world, center.xCoord, center.yCoord, center.zCoord);
+			NostrumMagicaSounds.DAMAGE_WIND.play(world, center.x, center.y, center.z);
 			
 			for (Entity e : world.getEntitiesWithinAABBExcludingEntity(null, 
-					new AxisAlignedBB(center.xCoord - range, center.yCoord - range, center.zCoord - range, center.xCoord + range, center.yCoord + range, center.zCoord + range)
+					new AxisAlignedBB(center.x - range, center.y - range, center.z - range, center.x + range, center.y + range, center.z + range)
 					)) {
 				double dist = e.getPositionVector().distanceTo(center); 
 				if (dist <= range) {
@@ -439,9 +440,9 @@ public class SpellAction {
 					Vec3d force;
 					Vec3d direction = e.getPositionVector().addVector(0, e.getEyeHeight(), 0).subtract(center).normalize();
 					force = new Vec3d(
-							direction.xCoord * magnitude,
-							direction.yCoord * magnitude,
-							direction.zCoord * magnitude
+							direction.x * magnitude,
+							direction.y * magnitude,
+							direction.z * magnitude
 							);
 					if (amp < 0) {
 						// pull
@@ -450,19 +451,19 @@ public class SpellAction {
 						if (mod > dist * .2) {
 							mod = (dist * .4) / mod;
 							force = new Vec3d(
-									force.xCoord * mod,
-									force.yCoord * mod,
-									force.zCoord * mod
+									force.x * mod,
+									force.y * mod,
+									force.z * mod
 									);
 						}
 
 						force = new Vec3d(
-								force.xCoord * -1.0,
-								force.yCoord * -1.0,
-								force.zCoord * -1.0);
+								force.x * -1.0,
+								force.y * -1.0,
+								force.z * -1.0);
 					}
 					
-					e.addVelocity(force.xCoord, force.yCoord, force.zCoord);
+					e.addVelocity(force.x, force.y, force.z);
 				}
 			}
 			
@@ -624,7 +625,7 @@ public class SpellAction {
 			
 			if (entity instanceof EntityPlayer) {
 				EntityPlayer p = (EntityPlayer) entity;
-				if (inhand.stackSize == 1) {
+				if (inhand.getCount() == 1) {
 					if (offhand) {
 						p.inventory.removeStackFromSlot(40);
 					} else {
@@ -687,7 +688,7 @@ public class SpellAction {
 			
 			NostrumMagicaSounds.DAMAGE_FIRE.play(entity);
 			
-			caster.setLastAttacker(entity);
+			caster.setLastAttackedEntity(entity);
 			entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
 			entity.hurtResistantTime = 0;
 			
@@ -724,7 +725,7 @@ public class SpellAction {
 		public void apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
 			entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
 			entity.hurtResistantTime = 0;
-			apply(caster, entity.worldObj, entity.getPosition(), efficiency);
+			apply(caster, entity.world, entity.getPosition(), efficiency);
 		}
 
 		@Override
@@ -784,7 +785,7 @@ public class SpellAction {
 			for (int i = 0; i < power; i++) {
 				EntityGolem golem = spawnGolem(world);
 				golem.setPosition(block.getX() + .5, block.getY(), block.getZ() + .5);
-				world.spawnEntityInWorld(golem);
+				world.spawnEntity(golem);
 				golem.setOwnerId(caster.getPersistentID());
 				NostrumMagica.getMagicWrapper(caster).addFamiliar(golem);
 			}
@@ -874,7 +875,7 @@ public class SpellAction {
 					entity.rotationPitch, entity.rotationYawHead
 					);
 			
-			entity.setPositionAndRotation(pos.xCoord, pos.yCoord, pos.zCoord, yaw, pitch);
+			entity.setPositionAndRotation(pos.x, pos.y, pos.z, yaw, pitch);
 		}
 		
 		@Override
@@ -897,11 +898,11 @@ public class SpellAction {
 			Vec3d force = entity.getLookVec().normalize();
 			float scale = 3f * level * (float) (Math.max(0.0, Math.min(2.0, 1.0 - Math.log(efficiency))));
 			
-			force = new Vec3d(force.xCoord * scale, force.yCoord * scale, force.zCoord * scale);
+			force = new Vec3d(force.x * scale, force.y * scale, force.z * scale);
 			
-			entity.motionX += force.xCoord;
-			entity.motionY += force.yCoord;
-			entity.motionZ += force.zCoord;
+			entity.motionX += force.x;
+			entity.motionY += force.y;
+			entity.motionZ += force.z;
 			
 			NostrumMagicaSounds.DAMAGE_WIND.play(entity);
 			
@@ -977,7 +978,7 @@ public class SpellAction {
 									y,
 									z + (NostrumMagica.rand.nextFloat() - .5));
 				
-				world.spawnEntityInWorld(entity);
+				world.spawnEntity(entity);
 			}
 			
 			NostrumMagicaSounds.DAMAGE_ENDER.play(world, block.getX(), block.getY(), block.getZ());
@@ -1021,7 +1022,7 @@ public class SpellAction {
 				
 				if (entity instanceof EntityPlayer) {
 					EntityPlayer p = (EntityPlayer) entity;
-					if (inhand.stackSize == 1) {
+					if (inhand.getCount() == 1) {
 						if (offhand) {
 							p.inventory.removeStackFromSlot(40);
 						} else {
@@ -1053,7 +1054,7 @@ public class SpellAction {
 				
 				if (entity instanceof EntityPlayer) {
 					EntityPlayer p = (EntityPlayer) entity;
-					if (inhand.stackSize == 1) {
+					if (inhand.getCount() == 1) {
 						if (offhand) {
 							p.inventory.removeStackFromSlot(40);
 						} else {
@@ -1144,7 +1145,7 @@ public class SpellAction {
 			}
 			
 			NostrumMagicaSounds.MELT_METAL.play(entity);
-			caster.setLastAttacker(entity);
+			caster.setLastAttackedEntity(entity);
 			entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
 			entity.hurtResistantTime = 0;
 		}
@@ -1166,7 +1167,7 @@ public class SpellAction {
 
 		@Override
 		public void apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
-			apply(caster, entity.worldObj, entity.getPosition().add(0, 1, 0), efficiency);
+			apply(caster, entity.world, entity.getPosition().add(0, 1, 0), efficiency);
 		}
 
 		@Override
@@ -1195,7 +1196,7 @@ public class SpellAction {
 
 		@Override
 		public void apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
-			apply(caster, entity.worldObj, entity.getPosition().add(0, 1, 0), efficiency);
+			apply(caster, entity.world, entity.getPosition().add(0, 1, 0), efficiency);
 		}
 
 		@Override
@@ -1217,14 +1218,14 @@ public class SpellAction {
 
 		@Override
 		public void apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
-			apply(caster, entity.worldObj, entity.getPosition().add(0, -1, 0), efficiency);
+			apply(caster, entity.world, entity.getPosition().add(0, -1, 0), efficiency);
 		}
 
 		@Override
 		public void apply(EntityLivingBase caster, World world, BlockPos block, float efficiency) {
 			
 			Block result;
-			float temp = world.getBiome(block).getFloatTemperature(block);
+			float temp = world.getBiome(block).getTemperature(block);
 			// < 0 exists for icy places
 			// .1 to .2 has somethign to do with snow
 			// desert is 2.0
@@ -1303,9 +1304,9 @@ public class SpellAction {
 	
 	private static class BreakEffect implements SpellEffect {
 
-		private static List<ItemStack> StoneItems = null;
+		private static NonNullList<ItemStack> StoneItems = null;
 		
-		private static List<ItemStack> GetStone() {
+		private static NonNullList<ItemStack> GetStone() {
 			if (StoneItems == null) {
 				StoneItems = OreDictionary.getOres("stone");
 			}
@@ -1321,7 +1322,7 @@ public class SpellAction {
 		
 		@Override
 		public void apply(EntityLivingBase caster, EntityLivingBase entity, float eff) {
-			apply(caster, entity.worldObj, entity.getPosition().add(0, -1, 0), eff);
+			apply(caster, entity.world, entity.getPosition().add(0, -1, 0), eff);
 		}
 
 		@Override
@@ -1391,7 +1392,7 @@ public class SpellAction {
 				
 				if (entity instanceof EntityPlayer) {
 					EntityPlayer p = (EntityPlayer) entity;
-					if (inhand.stackSize == 1) {
+					if (inhand.getCount() == 1) {
 						if (offhand) {
 							p.inventory.removeStackFromSlot(40);
 						} else {
@@ -1431,7 +1432,7 @@ public class SpellAction {
 	}
 	
 	public void apply(EntityLivingBase entity, float efficiency) {
-		if (entity.worldObj.isRemote)
+		if (entity.world.isRemote)
 			return;
 		
 		final EntityLivingBase ent = entity;

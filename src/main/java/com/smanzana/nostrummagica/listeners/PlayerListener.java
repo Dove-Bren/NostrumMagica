@@ -306,7 +306,7 @@ public class PlayerListener {
 				if (entry.getValue() == null)
 					continue;
 				
-				if (entry.getValue().world != ent.worldObj)
+				if (entry.getValue().world != ent.world)
 					continue;
 				
 				double dist = Math.abs(ent.getPositionVector().subtract(entry.getValue().position).lengthVector());
@@ -323,7 +323,7 @@ public class PlayerListener {
 				if (entry.getValue() == null)
 					continue;
 				
-				if (entry.getValue().world != ent.worldObj)
+				if (entry.getValue().world != ent.world)
 					continue;
 				
 				BlockPos entpos = ent.getPosition();
@@ -426,7 +426,7 @@ public class PlayerListener {
 			return;
 		
 		if (event.getAmount() > 0f && event.getSource() instanceof EntityDamageSource) {
-			Entity source = ((EntityDamageSource) event.getSource()).getSourceOfDamage();
+			Entity source = ((EntityDamageSource) event.getSource()).getImmediateSource();
 			
 			if (source instanceof EntityArrow) {
 				source = ((EntityArrow) source).shootingEntity;
@@ -472,13 +472,13 @@ public class PlayerListener {
 
 	@SubscribeEvent
 	public void onDamage(LivingHurtEvent event) {
-		if (event.getSource().getSourceOfDamage() != null) {
+		if (event.getSource().getImmediateSource() != null) {
 			EntityLivingBase source = null;
 			
 			// Projectiles can be from no entity
 			if (event.getSource().isProjectile()) {
 				
-				Entity proj = event.getSource().getSourceOfDamage();
+				Entity proj = event.getSource().getImmediateSource();
 				Entity shooter;
 				if (proj instanceof EntityArrow) {
 					shooter = ((EntityArrow) proj).shootingEntity;
@@ -489,8 +489,8 @@ public class PlayerListener {
 				} else if (proj instanceof EntityThrowable) {
 					source = ((EntityThrowable) proj).getThrower();
 				}
-			} else if (event.getSource().getSourceOfDamage() instanceof EntityLivingBase) {
-				source = (EntityLivingBase) event.getSource().getSourceOfDamage();
+			} else if (event.getSource().getImmediateSource() instanceof EntityLivingBase) {
+				source = (EntityLivingBase) event.getSource().getImmediateSource();
 			}
 			
 			if (source != null) {
@@ -535,7 +535,7 @@ public class PlayerListener {
 					event.getPos().getY() + 0.5,
 					event.getPos().getZ() + 0.5,
 					ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1));
-			event.getWorld().spawnEntityInWorld(entity);
+			event.getWorld().spawnEntity(entity);
 		}
 		if (event.getState().getMaterial() == Material.WEB) {
 			EntityItem entity = new EntityItem(event.getWorld(),
@@ -543,7 +543,7 @@ public class PlayerListener {
 					event.getPos().getY() + 0.5,
 					event.getPos().getZ() + 0.5,
 					ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1));
-			event.getWorld().spawnEntityInWorld(entity);
+			event.getWorld().spawnEntity(entity);
 		}
 		
 		if (event.getState().getBlock() instanceof BlockBush
@@ -553,7 +553,7 @@ public class PlayerListener {
 					event.getPos().getY() + 0.5,
 					event.getPos().getZ() + 0.5,
 					ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1));
-			event.getWorld().spawnEntityInWorld(entity);
+			event.getWorld().spawnEntity(entity);
 		}
 		
 		if (event.getState().getBlock() instanceof BlockBush
@@ -563,7 +563,7 @@ public class PlayerListener {
 					event.getPos().getY() + 0.5,
 					event.getPos().getZ() + 0.5,
 					ReagentItem.instance().getReagent(ReagentType.GINSENG, 1));
-			event.getWorld().spawnEntityInWorld(entity);
+			event.getWorld().spawnEntity(entity);
 		}
 	}
 	
@@ -572,8 +572,8 @@ public class PlayerListener {
 		if (event.isCanceled())
 			return;
 
-		if (event.getSource() != null && event.getSource().getSourceOfDamage() != null && event.getSource().getSourceOfDamage() instanceof EntityPlayer) {
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(event.getSource().getEntity());
+		if (event.getSource() != null && event.getSource().getImmediateSource() != null && event.getSource().getImmediateSource() instanceof EntityPlayer) {
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(event.getSource().getImmediateSource());
 			
 			if (attr != null && attr.isUnlocked()) {
 				if (event.getEntityLiving() instanceof ILoreTagged) {
@@ -591,7 +591,7 @@ public class PlayerListener {
 		if (event.getEntityLiving().isEntityUndead()) {
 			for (int i = 0; i <= event.getLootingLevel(); i++) {
 				if (NostrumMagica.rand.nextFloat() <= 0.3f) {
-					EntityItem entity = new EntityItem(event.getEntity().worldObj,
+					EntityItem entity = new EntityItem(event.getEntity().world,
 							event.getEntity().posX,
 							event.getEntity().posY,
 							event.getEntity().posZ,
@@ -604,7 +604,7 @@ public class PlayerListener {
 		if (event.getEntityLiving() instanceof EntitySpider) {
 			for (int i = 0; i <= event.getLootingLevel(); i++) {
 				if (NostrumMagica.rand.nextFloat() <= 0.4f) {
-					EntityItem entity = new EntityItem(event.getEntity().worldObj,
+					EntityItem entity = new EntityItem(event.getEntity().world,
 							event.getEntity().posX,
 							event.getEntity().posY,
 							event.getEntity().posZ,
@@ -637,7 +637,7 @@ public class PlayerListener {
 			return; // It SAYS EntityItemPickup, so just in case...
 		
 		EntityPlayer player = e.getEntityPlayer();
-		ItemStack addedItem = e.getItem().getEntityItem();
+		ItemStack addedItem = e.getItem().getItem();
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		
@@ -645,23 +645,23 @@ public class PlayerListener {
 			attr.giveBasicLore((ILoreTagged) addedItem.getItem());
 		}
 		
-		if (e.getItem().getEntityItem().getItem() instanceof ReagentItem
+		if (e.getItem().getItem().getItem() instanceof ReagentItem
 				&& !player.isSneaking()) {
-			int originalSize = addedItem.stackSize;
+			int originalSize = addedItem.getCount();
 			for (ItemStack item : player.inventory.offHandInventory) {
 				// Silly but prefer offhand
 				if (item != null && item.getItem() instanceof ReagentBag) {
 					if (ReagentBag.isVacuumEnabled(item)) {
 						addedItem = ReagentBag.addItem(item, addedItem);
-						if (addedItem == null || addedItem.stackSize < originalSize) {
-							NostrumMagicaSounds.UI_TICK.play(player.worldObj, player.posX, player.posY, player.posZ);
+						if (addedItem == null || addedItem.getCount() < originalSize) {
+							NostrumMagicaSounds.UI_TICK.play(player.world, player.posX, player.posY, player.posZ);
 						}
 						if (addedItem == null) {
 							e.setCanceled(true);
 							e.getItem().setDead();
 							return;
 						}
-						originalSize = addedItem.stackSize;
+						originalSize = addedItem.getCount();
 					}
 				}
 			}
@@ -669,22 +669,22 @@ public class PlayerListener {
 				if (item != null && item.getItem() instanceof ReagentBag) {
 					if (ReagentBag.isVacuumEnabled(item)) {
 						addedItem = ReagentBag.addItem(item, addedItem);
-						if (addedItem == null || addedItem.stackSize < originalSize) {
-							NostrumMagicaSounds.UI_TICK.play(player.worldObj, player.posX, player.posY, player.posZ);
+						if (addedItem == null || addedItem.getCount() < originalSize) {
+							NostrumMagicaSounds.UI_TICK.play(player.world, player.posX, player.posY, player.posZ);
 						}
 						if (addedItem == null) {
 							e.setCanceled(true);
 							e.getItem().setDead();
 							return;
 						}
-						originalSize = addedItem.stackSize;
+						originalSize = addedItem.getCount();
 					}
 				}
 			}
 			
-			if (addedItem == null || addedItem.stackSize < e.getItem().getEntityItem().stackSize) {
+			if (addedItem == null || addedItem.getCount() < e.getItem().getItem().getCount()) {
 				e.setCanceled(true);
-				e.getItem().setEntityItemStack(addedItem);
+				e.getItem().setItem(addedItem);
 			}
 			
 		}
@@ -696,7 +696,7 @@ public class PlayerListener {
 		
 		// Regain mana
 		if (tickCount % 10 == 0) {
-			for (World world : FMLCommonHandler.instance().getMinecraftServerInstance().worldServers) {
+			for (World world : FMLCommonHandler.instance().getMinecraftServerInstance().worlds) {
 				for (EntityPlayer player : world.playerEntities) {
 					regenMana(player);
 				}
@@ -747,7 +747,7 @@ public class PlayerListener {
 			mana++;
 		
 		stats.addMana(mana);
-		EntityTracker tracker = ((WorldServer) player.worldObj).getEntityTracker();
+		EntityTracker tracker = ((WorldServer) player.world).getEntityTracker();
 		if (tracker == null)
 			return;
 		
@@ -757,7 +757,7 @@ public class PlayerListener {
 	
 	@SubscribeEvent
 	public void onConnect(PlayerLoggedInEvent event) {
-		if (event.player.worldObj.isRemote) {
+		if (event.player.world.isRemote) {
 			return;
 		}
 		
@@ -770,7 +770,7 @@ public class PlayerListener {
 		if (attr != null)
 			attr.clearFamiliars();
 		
-		if (event.player.worldObj.isRemote) {
+		if (event.player.world.isRemote) {
 			this.clearAll();
 		}
 	}

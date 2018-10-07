@@ -399,7 +399,7 @@ public class ClientProxy extends CommonProxy {
 		IItemColor tinter = new IItemColor() {
 
 			@Override
-			public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+			public int colorMultiplier(ItemStack stack, int tintIndex) {
 				EMagicElement element = EssenceItem.findType(stack);
 				return element.getColor();
 			}
@@ -432,10 +432,10 @@ public class ClientProxy extends CommonProxy {
 		int wheel = event.getDwheel();
 		if (wheel != 0) {
 			
-			if (!NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer)
+			if (!NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().player)
 					.isUnlocked())
 				return;
-			ItemStack tome = NostrumMagica.getCurrentTome(Minecraft.getMinecraft().thePlayer);
+			ItemStack tome = NostrumMagica.getCurrentTome(Minecraft.getMinecraft().player);
 			if (tome != null) {
 				if (bindingScroll.isKeyDown()) {
 					wheel = (wheel > 0 ? -1 : 1);
@@ -455,22 +455,22 @@ public class ClientProxy extends CommonProxy {
 		if (bindingCast.isPressed())
 			doCast();
 		else if (bindingInfo.isPressed()) {
-			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+			EntityPlayer player = Minecraft.getMinecraft().player;
 			player.openGui(NostrumMagica.instance,
-					NostrumGui.infoscreenID, player.worldObj, 0, 0, 0);
+					NostrumGui.infoscreenID, player.world, 0, 0, 0);
 		}
 	}
 	
 	private void doCast() {
 		
-		Spell spell = NostrumMagica.getCurrentSpell(Minecraft.getMinecraft().thePlayer);
+		Spell spell = NostrumMagica.getCurrentSpell(Minecraft.getMinecraft().player);
 		if (spell == null)
 			return;
 		
 		// Do mana check here (it's also done on server)
 		// to stop redundant checks and get mana looking good
 		// on client side immediately
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		INostrumMagic att = NostrumMagica.getMagicWrapper(player);
 		int mana = att.getMana();
 		int cost = spell.getManaCost();
@@ -487,7 +487,7 @@ public class ClientProxy extends CommonProxy {
 			// Make sure it isn't too hard for the tome
 			int cap = SpellTome.getMaxMana(tome);
 			if (cap < cost) {
-				player.addChatMessage(new TextComponentTranslation(
+				player.sendMessage(new TextComponentTranslation(
 						"info.spell.tome_weak", new Object[0]));
 				NostrumMagicaSounds.CAST_FAIL.play(player);
 				return;
@@ -520,14 +520,14 @@ public class ClientProxy extends CommonProxy {
 		
 		cost = summary.getFinalCost();
 		
-		if (!Minecraft.getMinecraft().thePlayer.isCreative()) {
+		if (!Minecraft.getMinecraft().player.isCreative()) {
 			// Check mana
 			if (mana < cost) {
 				
 				for (int i = 0; i < 15; i++) {
 					double offsetx = Math.cos(i * (2 * Math.PI / 15)) * 1.0;
 					double offsetz = Math.sin(i * (2 * Math.PI / 15)) * 1.0;
-					player.worldObj
+					player.world
 						.spawnParticle(EnumParticleTypes.SMOKE_LARGE,
 								player.posX + offsetx, player.posY, player.posZ + offsetz,
 								0, -.5, 0);
@@ -543,17 +543,17 @@ public class ClientProxy extends CommonProxy {
 			int maxTriggers = 1 + (att.getFinesse());
 			int maxElems = 1 + (3 * att.getControl());
 			if (spell.getComponentCount() > maxComps) {
-				player.addChatMessage(new TextComponentTranslation(
+				player.sendMessage(new TextComponentTranslation(
 						"info.spell.low_tech", new Object[0]));
 				NostrumMagicaSounds.CAST_FAIL.play(player);
 				return;
 			} else if (spell.getElementCount() > maxElems) {
-				player.addChatMessage(new TextComponentTranslation(
+				player.sendMessage(new TextComponentTranslation(
 						"info.spell.low_control", new Object[0]));
 				NostrumMagicaSounds.CAST_FAIL.play(player);
 				return;
 			} else if (spell.getTriggerCount() > maxTriggers) {
-				player.addChatMessage(new TextComponentTranslation(
+				player.sendMessage(new TextComponentTranslation(
 						"info.spell.low_finesse", new Object[0]));
 				NostrumMagicaSounds.CAST_FAIL.play(player);
 				return;
@@ -571,7 +571,7 @@ public class ClientProxy extends CommonProxy {
 	    		if (level == 1) {
 	    			Boolean know = att.getKnownElements().get(elem);
 	    			if (know == null || !know) {
-	    				player.addChatMessage(new TextComponentTranslation(
+	    				player.sendMessage(new TextComponentTranslation(
 								"info.spell.no_mastery", new Object[] {elem.getName()}));
 						NostrumMagicaSounds.CAST_FAIL.play(player);
 						return;
@@ -580,7 +580,7 @@ public class ClientProxy extends CommonProxy {
 		    		Integer mast = att.getElementMastery().get(elem);
 		    		int mastery = (mast == null ? 0 : mast);
 		    		if (mastery < level)
-		    			player.addChatMessage(new TextComponentTranslation(
+		    			player.sendMessage(new TextComponentTranslation(
 								"info.spell.low_mastery", new Object[] {elem.getName(), level, mastery}));
 						NostrumMagicaSounds.CAST_FAIL.play(player);
 						return;
@@ -594,7 +594,7 @@ public class ClientProxy extends CommonProxy {
 				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
 					int count = NostrumMagica.getReagentCount(player, row.getKey());
 					if (count < row.getValue()) {
-						player.addChatMessage(new TextComponentTranslation("info.spell.bad_reagent", row.getKey().prettyName()));
+						player.sendMessage(new TextComponentTranslation("info.spell.bad_reagent", row.getKey().prettyName()));
 						return;
 					}
 				}
@@ -603,7 +603,7 @@ public class ClientProxy extends CommonProxy {
 				// Response from server will result in deduct if it goes through
 			}
 			
-			NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer)
+			NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().player)
 				.addMana(-cost);
 		}
 		
@@ -613,7 +613,7 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public void syncPlayer(EntityPlayerMP player) {
-		if (player.worldObj.isRemote)
+		if (player.world.isRemote)
 			return;
 		
 		super.syncPlayer(player);
@@ -621,7 +621,7 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public EntityPlayer getPlayer() {
-		return Minecraft.getMinecraft().thePlayer;
+		return Minecraft.getMinecraft().player;
 	}
 	
 	private INostrumMagic overrides = null;
@@ -629,7 +629,7 @@ public class ClientProxy extends CommonProxy {
 	public void receiveStatOverrides(INostrumMagic override) {
 		// If we can look up stats, apply them.
 		// Otherwise, stash them for loading when we apply attributes
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		INostrumMagic existing = NostrumMagica.getMagicWrapper(player);
 		if (existing != null && !player.isDead) {
 			// apply them
@@ -650,7 +650,7 @@ public class ClientProxy extends CommonProxy {
 		if (overrides == null)
 			return;
 		
-		INostrumMagic existing = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer);
+		INostrumMagic existing = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().player);
 		
 		if (existing == null)
 			return; // Mana got here before we attached
@@ -677,7 +677,7 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public void sendSpellDebug(EntityPlayer player, ITextComponent comp) {
-		if (!player.worldObj.isRemote) {
+		if (!player.world.isRemote) {
 			super.sendSpellDebug(player, comp);
 		}
 		;
@@ -1136,8 +1136,8 @@ public class ClientProxy extends CommonProxy {
 	@SubscribeEvent
 	public void onClientConnect(EntityJoinWorldEvent event) {
 		if (ClientProxy.shownText == false && ModConfig.config.displayLoginText()
-				&& event.getEntity() == Minecraft.getMinecraft().thePlayer) {
-			Minecraft.getMinecraft().thePlayer.addChatMessage(
+				&& event.getEntity() == Minecraft.getMinecraft().player) {
+			Minecraft.getMinecraft().player.sendMessage(
 					new TextComponentTranslation("info.nostrumwelcome.text", new Object[]{
 							this.bindingInfo.getDisplayName()
 					}));

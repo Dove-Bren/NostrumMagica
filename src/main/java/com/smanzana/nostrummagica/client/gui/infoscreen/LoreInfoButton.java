@@ -41,19 +41,19 @@ public class LoreInfoButton extends InfoButton {
 	}
 
 	@Override
-	public void drawButton(Minecraft mc, int mouseX, int mouseY) {
+	public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
 		float tint = 1f;
-		if (mouseX >= xPosition 
-			&& mouseY >= yPosition 
-			&& mouseX < xPosition + width 
-			&& mouseY < yPosition + height) {
+		if (mouseX >= x 
+			&& mouseY >= y 
+			&& mouseX < x + width 
+			&& mouseY < y + height) {
 			tint = .75f;
 		}
 		
 		GL11.glColor4f(tint, tint, tint, 1f);
 		mc.getTextureManager().bindTexture(InfoScreen.background);
 		GlStateManager.enableBlend();
-		Gui.drawModalRectWithCustomSizedTexture(xPosition, yPosition, 0, 0,
+		Gui.drawModalRectWithCustomSizedTexture(x, y, 0, 0,
 				width, height,
 				InfoScreen.TEXT_WHOLE_WIDTH, InfoScreen.TEXT_WHOLE_HEIGHT);
 		GlStateManager.disableBlend();
@@ -73,31 +73,31 @@ public class LoreInfoButton extends InfoButton {
 					iconStack = new ItemStack(item, 1);
 			} else if (lore instanceof EntityLivingBase) {
 				iconEntity = (Entity) lore;
-				if (iconEntity.worldObj == null)
-					iconEntity.worldObj = mc.theWorld;
+				if (iconEntity.world == null)
+					iconEntity.world = mc.world;
 			} else if (lore instanceof LoreRegistry.Preset) {
 				LoreRegistry.Preset preset = (LoreRegistry.Preset) lore;
 				if (preset.getBlock() != null) {
 					Item item = Item.getItemFromBlock(preset.getBlock());
 					if (item != null)
 						iconStack = new ItemStack(item, 1);
-				} else if (preset.getEntity(mc.theWorld) != null) {
-					iconEntity = preset.getEntity(mc.theWorld);
+				} else if (preset.getEntity(mc.world) != null) {
+					iconEntity = preset.getEntity(mc.world);
 				}
 					
 			}
 		}
 		
 		if (iconStack != null) {
-			int x = xPosition + (width - itemLength) / 2;
-			int y = yPosition + (height - itemLength) / 2;
-			mc.getRenderItem().renderItemIntoGUI(iconStack, x, y);
+			int newx = x + (width - itemLength) / 2;
+			int newy = y + (height - itemLength) / 2;
+			mc.getRenderItem().renderItemIntoGUI(iconStack, newx, newy);
 		} else if (iconEntity != null) {
-			int x = xPosition + (width / 2);
-			int y = yPosition + (width - 1);
+			int newx = x + (width / 2);
+			int newy = y + (width - 1);
 			RenderHelper.disableStandardItemLighting();
-			GuiInventory.drawEntityOnScreen(x, y,
-					(int) (width * .4), (float)(xPosition) - mouseX, (float)(yPosition) - mouseY, (EntityLivingBase)iconEntity);
+			GuiInventory.drawEntityOnScreen(newx, newy,
+					(int) (width * .4), (float)(newx) - mouseX, (float)(newy) - mouseY, (EntityLivingBase)iconEntity);
 		}
 	}
 

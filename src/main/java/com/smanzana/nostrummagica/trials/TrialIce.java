@@ -32,14 +32,14 @@ public class TrialIce extends ShrineTrial {
 			if (!attr.hasTrial(this.element))
 				return;
 			
-			if (e.getSource() != DamageSource.drown)
+			if (e.getSource() != DamageSource.DROWN)
 				return;
 			
 			Vec3d pos = e.getEntityLiving().getPositionVector();
-			Biome biome = e.getEntityLiving().worldObj.getBiome(
-					new BlockPos(pos.xCoord, pos.yCoord, pos.zCoord));
+			Biome biome = e.getEntityLiving().world.getBiome(
+					new BlockPos(pos.x, pos.y, pos.z));
 			
-			if (!BiomeDictionary.isBiomeOfType(biome, Type.COLD))
+			if (!BiomeDictionary.hasType(biome, Type.COLD))
 				return;
 			
 			this.complete((EntityPlayer) e.getEntityLiving());

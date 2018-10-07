@@ -4,11 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -63,7 +66,7 @@ public class PositionCrystal extends Item implements ILoreTagged {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flag) {
 		int dim = getDimension(stack);
 		BlockPos pos = getBlockPosition(stack);
 		
@@ -153,7 +156,7 @@ public class PositionCrystal extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		
 		if (worldIn.isRemote)
 			return EnumActionResult.SUCCESS;
@@ -161,13 +164,15 @@ public class PositionCrystal extends Item implements ILoreTagged {
 		if (pos == null)
 			return EnumActionResult.PASS;
 		
+		ItemStack stack = playerIn.getHeldItem(hand);
+		
 		setPosition(stack, playerIn.dimension, pos);
 		return EnumActionResult.SUCCESS;
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
-		
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+		ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		if (playerIn.isSneaking()) {
 			clearPosition(itemStackIn);
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);

@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.blocks;
 
 import java.util.Random;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
@@ -17,7 +17,6 @@ import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemFlintAndSteel;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -28,6 +27,7 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -52,18 +52,8 @@ public class Candle extends Block implements ITileEntityProvider {
 	}
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(CandleTileEntity.class, "nostrum_candle_te");
-		
-		GameRegistry.addShapedRecipe(new ItemStack(instance()),
-				"W",
-				"F",
-				'W', ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1),
-				'F', Items.ROTTEN_FLESH);
-		GameRegistry.addShapedRecipe(new ItemStack(instance()),
-				"W",
-				"F",
-				'W', Items.STRING,
-				'F', Items.ROTTEN_FLESH);
+		GameRegistry.registerTileEntity(CandleTileEntity.class,
+				new ResourceLocation(NostrumMagica.MODID, "nostrum_candle_te"));
 	}
 	
 	public Candle() {
@@ -74,7 +64,6 @@ public class Candle extends Block implements ITileEntityProvider {
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setSoundType(SoundType.PLANT);
 		
-		this.isBlockContainer = true;
 		this.setLightOpacity(16);
 		
 		this.setDefaultState(this.blockState.getBaseState().withProperty(LIT, false));
@@ -101,10 +90,10 @@ public class Candle extends Block implements ITileEntityProvider {
 		return 10;
 	}
 	
-	@Override
-	public boolean isVisuallyOpaque() {
-		return false;
-	}
+//	@Override
+//	public boolean isVisuallyOpaque() {
+//		return false;
+//	}
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
@@ -209,13 +198,16 @@ public class Candle extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 
 //		if (worldIn.isRemote)
 //			return true;
 		
+		@Nonnull
+		ItemStack heldItem = playerIn.getHeldItem(hand);
+		
 		if (!state.getValue(LIT)) {
-			if (heldItem == null)
+			if (heldItem == ItemStack.EMPTY)
 				return false;
 			
 			if (heldItem.getItem() instanceof ItemFlintAndSteel) {
@@ -228,7 +220,7 @@ public class Candle extends Block implements ITileEntityProvider {
 		}
 		
 		// it's lit
-		if (heldItem == null) {
+		if (heldItem == ItemStack.EMPTY) {
 			// only if mainhand or mainhand is null. Otherwise if offhand is
 			// empty, will still put out. Dumb!
 			
@@ -248,7 +240,7 @@ public class Candle extends Block implements ITileEntityProvider {
 		if (te != null)
 			return false;
 		
-		heldItem.stackSize--;
+		heldItem.setCount(heldItem.getCount()-1);
 		
 		ReagentType type = ReagentItem.findType(heldItem);
 		
@@ -330,9 +322,9 @@ public class Candle extends Block implements ITileEntityProvider {
 		}
 		
 		private void dirty() {
-			worldObj.markBlockRangeForRenderUpdate(pos, pos);
-			worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 3);
-			worldObj.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
+			world.markBlockRangeForRenderUpdate(pos, pos);
+			world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
+			world.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
 			markDirty();
 		}
 	}

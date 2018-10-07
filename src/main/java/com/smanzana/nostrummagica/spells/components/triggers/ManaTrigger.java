@@ -60,7 +60,7 @@ public class ManaTrigger extends SpellTrigger {
 					);
 			this.trigger(data);
 			
-			NostrumMagica.proxy.spawnEffect(self.worldObj,
+			NostrumMagica.proxy.spawnEffect(self.world,
 					new SpellComponentWrapper(instance()),
 					self, null, self, null, null);
 			

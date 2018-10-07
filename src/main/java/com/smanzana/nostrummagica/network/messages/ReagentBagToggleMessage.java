@@ -28,7 +28,7 @@ public class ReagentBagToggleMessage implements IMessage {
 		public IMessage onMessage(ReagentBagToggleMessage message, MessageContext ctx) {
 			// Is it on?
 			
-			EntityPlayer sp = ctx.getServerHandler().playerEntity;
+			EntityPlayer sp = ctx.getServerHandler().player;
 			
 			boolean main = message.tag.getBoolean(NBT_MAIN);
 			boolean value = message.tag.getBoolean(NBT_VALUE);
