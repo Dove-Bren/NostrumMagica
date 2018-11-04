@@ -50,6 +50,7 @@ import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MageStaff;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
+import com.smanzana.nostrummagica.items.MagicCharm;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.MirrorItem;
@@ -361,6 +362,9 @@ public class CommonProxy {
     	ThanosStaff.instance().setRegistryName(NostrumMagica.MODID, ThanosStaff.ID);
     	GameRegistry.register(ThanosStaff.instance());
     	ThanosStaff.init();
+    	
+    	MagicCharm.instance().setRegistryName(NostrumMagica.MODID, MagicCharm.ID);
+    	GameRegistry.register(MagicCharm.instance());
     }
     
     private void registerBlocks() {

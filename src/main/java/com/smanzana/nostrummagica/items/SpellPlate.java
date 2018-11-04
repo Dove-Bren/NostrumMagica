@@ -42,7 +42,7 @@ public class SpellPlate extends Item implements ILoreTagged {
 		return instance;
 	}
 	
-	public static final String id = "spellTomePlate";
+	public static final String id = "spelltomeplate";
 	
 	private SpellPlate() {
 		super();

@@ -678,13 +678,13 @@ public class Spell {
 		case PHYSICAL:
 			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("absorption"), duration * 5, amp).name("lifeboost");
 		case EARTH:
-			return new SpellAction(caster).status(PhysicalShieldPotion.instance(), duration, amp).name("shield.physical");
+			return new SpellAction(caster).status(PhysicalShieldPotion.instance(), duration, amp + 1).name("shield.physical");
 		case ENDER:
 			return new SpellAction(caster).blink(15.0f * elementCount).name("blink");
 		case FIRE:
 			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("fire_resistance"), duration, amp).name("fireresist");
 		case ICE:
-			return new SpellAction(caster).status(MagicShieldPotion.instance(), duration, amp).name("shield.magic");
+			return new SpellAction(caster).status(MagicShieldPotion.instance(), duration, amp + 1).name("shield.magic");
 		case LIGHTNING:
 			return new SpellAction(caster).pull(5 * elementCount, elementCount).name("pull");
 		case WIND:

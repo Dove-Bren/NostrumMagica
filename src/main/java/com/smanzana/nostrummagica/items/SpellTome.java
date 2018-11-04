@@ -115,7 +115,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		return instance;
 	}
 	
-	public static final String id = "spellTome";
+	public static final String id = "spelltome";
 	public static final String textureName = "tome1";
 	public static final int MAX_TOME_COUNT = 7;
 	
@@ -562,7 +562,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 					(comp != null ? "Binding spell " + bindingName : ""),
 					(comp != null ? "Seek a shrine of " + compname : "")));
 			
-			if (spellCount > 0) {
+			if (spells != null && spellCount > 0) {
 				boolean top = true;
 				SpellPreviewPage page = null;
 				for (Spell spell : spells) {

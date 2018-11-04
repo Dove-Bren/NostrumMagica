@@ -378,9 +378,11 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			GlStateManager.enableBlend();
 			GlStateManager.enableAlpha();
 			Map<EMagicElement, Integer> elementMaster = attr.getElementMastery();
+			Map<EMagicElement, Boolean> elementKnow = attr.getKnownElements();
 			for (EMagicElement elem : EMagicElement.values()) {
 				Integer mastery = elementMaster.get(elem);
-				if (mastery != null && mastery > 0)
+				Boolean know = elementKnow.get(elem);
+				if (know != null && know)
 					alpha = known;
 				else
 					alpha = unknown;
@@ -390,7 +392,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				GlStateManager.enableBlend();
 				SpellIcon.get(elem).draw(mc.currentScreen, mc.fontRendererObj, drawX, drawY, iconWidth, iconWidth);
 				
-				if (mastery != null && mastery > 0) {
+				if (mastery != null) {
 					mc.fontRendererObj.drawString(mastery + "", drawX + 1, drawY + 1, 0xFFFFFFFF);
 				}
 				

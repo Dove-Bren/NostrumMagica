@@ -161,6 +161,14 @@ item.info.thanos_staff.charged=Charged
 item.info.thanos.charges=%d Charges
 item.info.thanos.desc=Charged up with XP. Provides reagent-free casts.
 
+item.charm.physical.name=Charm of Haste
+item.charm.fire.name=Charm of the Volcano
+item.charm.ice.name=Charm of Protection
+item.charm.wind.name=Charm of Gusts
+item.charm.earth.name=Charm of the Rocksmasher
+item.charm.lightning.name=Charm of the Storm
+item.charm.ender.name=Charm of Return
+
 potion.frostbite.name=Frostbite
 potion.shieldphysical.name=Physical Ward
 potion.shieldmagic.name=Magic Ward
@@ -581,6 +589,14 @@ ritual.rune.trigger_projectile.name=Projectile Rune
 ritual.rune.trigger_proximity.name=Proximity Rune
 ritual.rune.trigger_self.name=Self Rune
 ritual.rune.trigger_touch.name=Touch Rune
+
+ritual.charm.fire.name=Fire Charm
+ritual.charm.ice.name=Ice Charm
+ritual.charm.earth.name=Earth Charm
+ritual.charm.wind.name=Wind Charm
+ritual.charm.ender.name=Ender Charm
+ritual.charm.lightning.name=Lightning Charm
+ritual.charm.physical.name=Physical Charm
 
 enhancement.lower_reagent_cost.name=Lower Reagent Cost
 enhancement.lower_reagent_cost.desc=Reduces the amount of reagents used up when casting a spell

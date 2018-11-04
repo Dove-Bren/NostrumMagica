@@ -58,6 +58,7 @@ import com.smanzana.nostrummagica.items.ISpellArmor;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MageStaff;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
+import com.smanzana.nostrummagica.items.MagicCharm;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.MirrorItem;
@@ -214,6 +215,15 @@ public class ClientProxy extends CommonProxy {
     	variants = list.toArray(new ResourceLocation[0]);
     	ModelBakery.registerItemVariants(SpellRune.instance(), variants);
     	
+    	variants = new ResourceLocation[EMagicElement.values().length];
+		i = 0;
+		for (EMagicElement type : EMagicElement.values()) {
+			variants[i++] = new ResourceLocation(NostrumMagica.MODID,
+					"charm_" + MagicCharm.getNameFromMeta(MagicCharm
+							.getMetaFromType(type)));
+		}
+		ModelBakery.registerItemVariants(MagicCharm.instance(), variants);
+    	
     	list = new LinkedList<>();
     	List<ResourceLocation> list2 = new LinkedList<>();
     	for (i = 1; i <= SpellTome.MAX_TOME_COUNT; i++) {
@@ -288,6 +298,12 @@ public class ClientProxy extends CommonProxy {
 			int meta = gem.getMetaFromElement(type);
 			registerModel(gem, meta,
 					"gem_" + gem.getNameFromMeta(meta));
+		}
+		
+		for (EMagicElement type : EMagicElement.values()) {
+			int meta = MagicCharm.getMetaFromType(type);
+			registerModel(MagicCharm.instance(), meta,
+					"charm_" + MagicCharm.getNameFromMeta(meta));
 		}
 		
 		Minecraft.getMinecraft().getRenderItem().getItemModelMesher()

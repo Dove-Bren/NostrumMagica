@@ -26,6 +26,7 @@ import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
+import com.smanzana.nostrummagica.items.MagicCharm;
 import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.MirrorItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
@@ -927,6 +928,19 @@ public class NostrumMagica implements IMagicListener
 					null,
 					new OutcomeBindSpell())
 				);
+		
+		// Magic Charms
+		for (EMagicElement element : EMagicElement.values()) {
+			RitualRegistry.instance().addRitual(
+					RitualRecipe.createTier2("charm." + element.name().toLowerCase(),
+							MagicCharm.getCharm(element, 1),
+							null,
+							new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT},
+							EssenceItem.getEssence(element, 1),
+							null, 
+							new OutcomeSpawnItem(MagicCharm.getCharm(element, 8)))
+					);
+		}
 		
 //		RitualRegistry.instance().addRitual(
 //				RitualRecipe.createTier2("ritual.form_obelisk.name", EMagicElement.ENDER,

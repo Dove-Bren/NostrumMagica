@@ -145,7 +145,7 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 				altar.setItem(null);
 				return true;
 			} else if (heldItem.getItem() instanceof SpellScroll) {
-				if (heldItem.getMetadata() != 2)
+				if (SpellScroll.getNestedScrollMeta(heldItem) != 2)
 					return false;
 				
 				// meta 2 means an awakened scroll. If we have a tome, BIND!!!!!

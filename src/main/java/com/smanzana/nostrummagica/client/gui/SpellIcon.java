@@ -104,9 +104,9 @@ public class SpellIcon {
 	private SpellIcon(EMagicElement element) {
 		int ord;
 		if (element == null)
-			ord = 0;
-		else
-			ord = element.ordinal();
+			element = EMagicElement.PHYSICAL;
+		
+		ord = element.ordinal();
 		
 		offsetV = vOffsetElement;
 		offsetU = uWidthElement * ord;
@@ -120,9 +120,9 @@ public class SpellIcon {
 	private SpellIcon(EAlteration alteration) {
 		int ord;
 		if (alteration == null)
-			ord = 0;
-		else
-			ord = alteration.ordinal();
+			alteration = EAlteration.INFLICT;
+		
+		ord = alteration.ordinal();
 		
 		offsetV = vOffsetAlteration;
 		offsetU = uWidthAlteration * ord;

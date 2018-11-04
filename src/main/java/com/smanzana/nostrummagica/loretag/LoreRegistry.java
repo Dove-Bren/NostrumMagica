@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MageStaff;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
+import com.smanzana.nostrummagica.items.MagicCharm;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.MirrorItem;
@@ -99,6 +100,7 @@ public class LoreRegistry {
 		register(MageStaff.instance());
 		register(ThanosStaff.instance());
 		register(ThanoPendant.instance());
+		register(MagicCharm.instance());
 		
 		for (Preset preset : Preset.values()) {
 			register(preset);
