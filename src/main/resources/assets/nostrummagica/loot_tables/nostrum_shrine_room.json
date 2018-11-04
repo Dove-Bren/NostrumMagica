@@ -144,7 +144,7 @@
       },
       {
          "type": "item",
-         "name": "nostrummagica:spellTomePlate",
+         "name": "nostrummagica:spelltomeplate",
          "entryName": "plate1",
          "weight": 2,
          "functions": [{
