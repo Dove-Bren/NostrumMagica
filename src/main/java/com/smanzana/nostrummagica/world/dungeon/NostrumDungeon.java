@@ -33,9 +33,16 @@ public class NostrumDungeon {
 		public BlockPos getPos() {
 			return pos;
 		}
+		
+		@Override
+		public String toString() {
+			return "(" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ")[" + facing.name() + "]";
+		}
 	}
 
 	private static Random rand = new Random();
+	private int pathLen;
+	private int pathRand;
 	private List<IDungeonRoom> rooms;
 	protected IDungeonRoom ending;
 	protected IDungeonRoom starting;
@@ -52,6 +59,10 @@ public class NostrumDungeon {
 //	private List<Path> keyPoints; // Potential keys, that is
 	
 	public NostrumDungeon(IDungeonRoom starting, IDungeonRoom ending) {
+		this(starting, ending, 2, 3);
+	}
+	
+	public NostrumDungeon(IDungeonRoom starting, IDungeonRoom ending, int minPath, int randPath) {
 		self = this;
 		rooms = new LinkedList<>();
 		endRooms = new LinkedList<>();
@@ -60,6 +71,8 @@ public class NostrumDungeon {
 		doorRooms = new LinkedList<>();
 		this.ending = ending;
 		this.starting = starting;
+		this.pathLen = minPath; // minimum length of paths
+		this.pathRand = randPath; // add rand(0, (pathRand-1)) to the length of paths
 		
 		if (starting.getNumExits() <= 0)
 			NostrumMagica.logger.warn("Dungeon created with 0-exit starting. This will not work.");
@@ -122,7 +135,7 @@ public class NostrumDungeon {
 				; // Skip this one, so we can do it last outside the loop
 			} else {
 				
-				Path path = new Path(null, 2 + rand.nextInt(3));
+				Path path = new Path(null, pathLen + rand.nextInt(pathRand));
 				if (key == 0) {
 					if (!keyRooms.isEmpty() && !doorRooms.isEmpty())
 						path.hasKey();
@@ -136,7 +149,7 @@ public class NostrumDungeon {
 		
 		{
 			DungeonExitPoint last = exits.get(shrineroom);
-			Path path = new Path(null, 2 + rand.nextInt(3));
+			Path path = new Path(null, pathLen + rand.nextInt(pathRand));
 			inEnd = ending;
 			if (!keyRooms.isEmpty() && !doorRooms.isEmpty())
 				path.hasDoor();
@@ -153,7 +166,7 @@ public class NostrumDungeon {
 		// Head info
 //		private IDungeonRoom firstRoom;
 //		private List<Path> children;
-		private Path parent;
+//		private Path parent;
 		private boolean hasKey; // whether this path will have a key when spawned
 		private boolean hasDoor; // Whether the door should be spawned on this path
 		
@@ -164,7 +177,7 @@ public class NostrumDungeon {
 		
 		public Path(Path parent, int remaining) {
 			this.remaining = remaining;
-			this.parent = parent;
+//			this.parent = parent;
 //			this.firstRoom = room;
 			this.hasKey = false;
 			this.hasDoor = false;

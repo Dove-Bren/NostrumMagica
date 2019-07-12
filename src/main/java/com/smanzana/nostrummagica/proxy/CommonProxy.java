@@ -60,6 +60,7 @@ import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.items.SeekerIdol;
 import com.smanzana.nostrummagica.items.ShrineSeekingGem;
 import com.smanzana.nostrummagica.items.SpellPlate;
@@ -201,14 +202,17 @@ public class CommonProxy {
     			64,
     			1,
     			false);
-    	EntityRegistry.addSpawn(EntityKoid.class, 4, 1, 1, EnumCreatureType.MONSTER, 
+    	
+    	EntityRegistry.addSpawn(EntityKoid.class, 12, 1, 1, EnumCreatureType.MONSTER, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.MAGICAL));
-    	EntityRegistry.addSpawn(EntityKoid.class, 4, 1, 1, EnumCreatureType.MONSTER, 
-    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.HOT));
-    	EntityRegistry.addSpawn(EntityKoid.class, 4, 1, 1, EnumCreatureType.MONSTER, 
-    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.WET));
-    	EntityRegistry.addSpawn(EntityKoid.class, 4, 1, 1, EnumCreatureType.MONSTER, 
+    	EntityRegistry.addSpawn(EntityKoid.class, 12, 1, 1, EnumCreatureType.MONSTER, 
+    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.FOREST));
+    	EntityRegistry.addSpawn(EntityKoid.class, 12, 1, 1, EnumCreatureType.MONSTER, 
+    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.SNOWY));
+    	EntityRegistry.addSpawn(EntityKoid.class, 12, 1, 1, EnumCreatureType.MONSTER, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.NETHER));
+    	EntityRegistry.addSpawn(EntityKoid.class, 12, 1, 1, EnumCreatureType.MONSTER, 
+    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.SPOOKY));
 	}
 	
 	public void init() {
@@ -365,6 +369,11 @@ public class CommonProxy {
     	
     	MagicCharm.instance().setRegistryName(NostrumMagica.MODID, MagicCharm.ID);
     	GameRegistry.register(MagicCharm.instance());
+    	
+    	RuneBag.instance().setRegistryName(NostrumMagica.MODID, RuneBag.id);
+    	GameRegistry.register(RuneBag.instance());
+    	RuneBag.init();
+    	
     }
     
     private void registerBlocks() {

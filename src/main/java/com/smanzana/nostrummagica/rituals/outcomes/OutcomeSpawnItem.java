@@ -25,6 +25,7 @@ public class OutcomeSpawnItem implements IItemRitualOutcome {
 	public void perform(World world, EntityPlayer player, ItemStack centerItem, ItemStack otherItems[], BlockPos center, RitualRecipe recipe) {
 		// If there's an altar, we'll place item in altar
 		// Otherwise, we'll place it on the ground
+		
 		if (recipe.getTier() == 0) {
 			// spawn on ground
 			EntityItem entity = new EntityItem(world,

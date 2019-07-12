@@ -22,6 +22,7 @@ import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.items.SeekerIdol;
 import com.smanzana.nostrummagica.items.ShrineSeekingGem;
 import com.smanzana.nostrummagica.items.SpellPlate;
@@ -101,6 +102,7 @@ public class LoreRegistry {
 		register(ThanosStaff.instance());
 		register(ThanoPendant.instance());
 		register(MagicCharm.instance());
+		register(RuneBag.instance());
 		
 		for (Preset preset : Preset.values()) {
 			register(preset);

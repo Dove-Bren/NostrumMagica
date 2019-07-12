@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -82,8 +83,13 @@ public class SpellScroll extends Item implements ILoreTagged {
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
 		
-		if (playerIn.isSneaking())
-			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
+		if (playerIn.isSneaking()) {
+			// Open scroll screen
+			playerIn.openGui(NostrumMagica.instance,
+					NostrumGui.scrollID, worldIn,
+					(int) playerIn.posX, (int) playerIn.posY, (int) playerIn.posZ);
+			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+		}
 		
 		if (itemStackIn == null)
 			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);

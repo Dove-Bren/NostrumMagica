@@ -70,6 +70,7 @@ import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.items.SeekerIdol;
 import com.smanzana.nostrummagica.items.ShrineSeekingGem;
 import com.smanzana.nostrummagica.items.SpellPlate;
@@ -268,6 +269,7 @@ public class ClientProxy extends CommonProxy {
 		registerModel(SpellScroll.instance(), 2, SpellScroll.id);
 		registerModel(BlankScroll.instance(), 0, BlankScroll.id);
 		registerModel(ReagentBag.instance(), 0, ReagentBag.id);
+		registerModel(RuneBag.instance(), 0, RuneBag.id);
 		registerModel(SeekerIdol.instance(), 0, SeekerIdol.id);
 		registerModel(ShrineSeekingGem.instance(), 0, ShrineSeekingGem.id);
 		for (EnchantedWeapon weapon : EnchantedWeapon.getAll()) {

@@ -9,9 +9,12 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.container.LoreTableGui;
 import com.smanzana.nostrummagica.client.gui.container.ModificationTableGui;
 import com.smanzana.nostrummagica.client.gui.container.ReagentBagGui;
+import com.smanzana.nostrummagica.client.gui.container.RuneBagGui;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
 import com.smanzana.nostrummagica.items.ReagentBag;
+import com.smanzana.nostrummagica.items.RuneBag;
+import com.smanzana.nostrummagica.items.SpellScroll;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -29,6 +32,8 @@ public class NostrumGui implements IGuiHandler {
 	public static final int infoscreenID = 4;
 	public static final int modtableID = 5;
 	public static final int loretableID = 6;
+	public static final int runeBagID = 7;
+	public static final int scrollID = 8;
 	
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
@@ -65,6 +70,10 @@ public class NostrumGui implements IGuiHandler {
 			return null;
 		}
 		
+		if (ID == scrollID) {
+			return null;
+		}
+		
 		if (ID == modtableID) {
 			TileEntity ent = world.getTileEntity(new BlockPos(x, y, z));
 			if (ent != null && ent instanceof ModificationTableEntity) {
@@ -97,10 +106,17 @@ public class NostrumGui implements IGuiHandler {
 		
 		if (inHand != null) {
 			if (ID == reagentBagID && inHand.getItem() instanceof ReagentBag) {
-				
 				return new ReagentBagGui.BagContainer(
 						player.inventory,
 						ReagentBag.instance(),
+						inHand,
+						pos
+						);
+			}
+			if (ID == runeBagID && inHand.getItem() instanceof RuneBag) {
+				return new RuneBagGui.BagContainer(
+						player.inventory,
+						RuneBag.instance(),
 						inHand,
 						pos
 						);
@@ -181,6 +197,16 @@ public class NostrumGui implements IGuiHandler {
 						inHand,
 						pos
 						));
+			}
+			if (ID == runeBagID && inHand.getItem() instanceof RuneBag) {
+				return new RuneBagGui.BagGui(new RuneBagGui.BagContainer(
+						player.inventory,
+						RuneBag.instance(),
+						inHand,
+						pos));
+			}
+			if (ID == scrollID && inHand.getItem() instanceof SpellScroll) {
+				return new ScrollScreen(inHand);
 			}
 			// Else other item stuff
 		}

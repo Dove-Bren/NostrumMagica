@@ -17,6 +17,7 @@ import com.smanzana.nostrummagica.command.CommandEnhanceTome;
 import com.smanzana.nostrummagica.command.CommandForceBind;
 import com.smanzana.nostrummagica.command.CommandGiveSkillpoint;
 import com.smanzana.nostrummagica.command.CommandSetLevel;
+import com.smanzana.nostrummagica.command.CommandSpawnDungeon;
 import com.smanzana.nostrummagica.command.CommandSpawnObelisk;
 import com.smanzana.nostrummagica.command.CommandTestConfig;
 import com.smanzana.nostrummagica.command.CommandUnlock;
@@ -221,6 +222,7 @@ public class NostrumMagica implements IMagicListener
     	event.registerServerCommand(new CommandAllQuests());
     	event.registerServerCommand(new CommandCreateGeotoken());
     	event.registerServerCommand(new CommandForceBind());
+    	event.registerServerCommand(new CommandSpawnDungeon());
     	loadSeekerRegistry(seekerRegistryFile);
     }
     

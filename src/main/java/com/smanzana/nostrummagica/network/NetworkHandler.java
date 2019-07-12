@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.network.messages.ManaMessage;
 import com.smanzana.nostrummagica.network.messages.ModifyMessage;
 import com.smanzana.nostrummagica.network.messages.ObeliskTeleportationRequestMessage;
 import com.smanzana.nostrummagica.network.messages.ReagentBagToggleMessage;
+import com.smanzana.nostrummagica.network.messages.RuneBagToggleMessage;
 import com.smanzana.nostrummagica.network.messages.SpellCraftMessage;
 import com.smanzana.nostrummagica.network.messages.SpellDebugMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
@@ -66,6 +67,7 @@ public class NetworkHandler {
 		syncChannel.registerMessage(ClientEffectRenderMessage.Handler.class, ClientEffectRenderMessage.class, discriminator++, Side.CLIENT);
 		syncChannel.registerMessage(ModifyMessage.Handler.class, ModifyMessage.class, discriminator++, Side.SERVER);
 		syncChannel.registerMessage(LoreMessage.Handler.class, LoreMessage.class, discriminator++, Side.CLIENT);
+		syncChannel.registerMessage(RuneBagToggleMessage.Handler.class, RuneBagToggleMessage.class, discriminator++, Side.SERVER);
 	}
 	
 }

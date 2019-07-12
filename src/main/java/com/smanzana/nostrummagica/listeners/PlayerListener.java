@@ -13,6 +13,8 @@ import com.smanzana.nostrummagica.items.EnchantedEquipment;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.items.RuneBag;
+import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.items.ThanosStaff;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -682,11 +684,49 @@ public class PlayerListener {
 				}
 			}
 			
-			if (addedItem == null || addedItem.stackSize < e.getItem().getEntityItem().stackSize) {
+			if (addedItem.stackSize < e.getItem().getEntityItem().stackSize) {
 				e.setCanceled(true);
 				e.getItem().setEntityItemStack(addedItem);
 			}
 			
+		}
+		
+		if (e.getItem().getEntityItem().getItem() instanceof SpellRune
+				&& !player.isSneaking()) {
+			int originalSize = addedItem.stackSize;
+			for (ItemStack item : player.inventory.offHandInventory) {
+				// Silly but prefer offhand
+				if (item != null && item.getItem() instanceof RuneBag) {
+					if (RuneBag.isVacuumEnabled(item)) {
+						addedItem = RuneBag.addItem(item, addedItem);
+						if (addedItem == null || addedItem.stackSize < originalSize) {
+							NostrumMagicaSounds.UI_TICK.play(player.worldObj, player.posX, player.posY, player.posZ);
+						}
+						if (addedItem == null) {
+							e.setCanceled(true);
+							e.getItem().setDead();
+							return;
+						}
+						originalSize = addedItem.stackSize;
+					}
+				}
+			}
+			for (ItemStack item : player.inventory.mainInventory) {
+				if (item != null && item.getItem() instanceof RuneBag) {
+					if (RuneBag.isVacuumEnabled(item)) {
+						addedItem = RuneBag.addItem(item, addedItem);
+						if (addedItem == null || addedItem.stackSize < originalSize) {
+							NostrumMagicaSounds.UI_TICK.play(player.worldObj, player.posX, player.posY, player.posZ);
+						}
+						if (addedItem == null) {
+							e.setCanceled(true);
+							e.getItem().setDead();
+							return;
+						}
+						originalSize = addedItem.stackSize;
+					}
+				}
+			}
 		}
 	}
 	

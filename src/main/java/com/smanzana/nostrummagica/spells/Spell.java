@@ -134,7 +134,7 @@ public class Spell {
 					Style style = new Style();
 					style.setColor(TextFormatting.DARK_PURPLE);
 					buf = "";
-					if (others != null && others.size() > 0) {
+					if (others.size() > 0) {
 						for (EntityLivingBase ent : others)
 							buf += ent.getName() + " ";
 					} else {
@@ -1109,5 +1109,4 @@ public class Spell {
 	public List<SpellPart> getSpellParts() {
 		return this.parts;
 	}
-	
 }

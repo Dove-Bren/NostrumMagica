@@ -1,10 +1,11 @@
-item.spellTome.name=Spell Tome
-item.spellTomePlate.name=Tome Plate
+item.spelltome.name=Spell Tome
+item.spelltomeplate.name=Tome Plate
 item.spell_scroll.name=Empty Spell Scroll
 item.spell_scroll_activated.name=Activated Spell Scroll
 item.spell_scroll_awakened.name=Awakened Spell Scroll
 item.blank_scroll.name=Blank Scroll
 item.reagent_bag.name=Reagent Bag
+item.rune_bag.name=Rune Bag
 item.spell_table.name=Spell Table
 item.nostrum_guide.name=Nostrum Magica Guide
 item.seeker_idol.name=Seeker Idol

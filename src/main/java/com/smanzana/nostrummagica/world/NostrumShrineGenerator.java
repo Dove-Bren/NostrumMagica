@@ -23,6 +23,7 @@ import com.smanzana.nostrummagica.world.dungeon.room.RoomEnd2;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomGrandHallway;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomHallway;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomJail1;
+import com.smanzana.nostrummagica.world.dungeon.room.RoomLectern;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomLongHallway;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomTee1;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomVHallway;
@@ -186,6 +187,7 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 				 .add(new RoomEnd2(true))
 				 .add(new RoomVHallway())
 				 .add(new RoomTee1())
+				 .add(new RoomLectern())
 				 .add(new RoomChallenge1())), 30, 50);
 		
 		private WorldGenerator gen;
@@ -249,9 +251,16 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 	}
 	
 	private List<DungeonGen> list;
+	private static boolean generating = false; // PREVENT triggering spawns of other dungs recursively
 	
 	@Override
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
+		
+		// Do not allow recursion!
+		if (NostrumShrineGenerator.generating) {
+			return;
+		}
+		
 		int dim = world.provider.getDimension();
 		int[] dims = ModConfig.config.getDimensionList();
 		boolean found = false;
@@ -265,6 +274,8 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 		if (!found)
 			return;
 		
+		NostrumShrineGenerator.generating = true;
+		
 		long seed = world.getSeed();
 		// Spawn a self somewhere in the 32x32 chunks around 0
 		if (chunkX == (int) ((seed & (0x1F << 14)) >> 14) - 16
@@ -273,6 +284,7 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 			DungeonGen gen = DungeonGen.SHAPE;
 			runGenerator(gen.getGenerator(), world, random, chunkX, chunkZ,
 					gen.getMinY(), gen.getMaxY());
+			NostrumShrineGenerator.generating = false;
 			return;
 		}
 		
@@ -284,10 +296,11 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 		Collections.shuffle(list);
 		
 		if (forceTimer == 0) {
+			forceTimer = -1;
 			DungeonGen gen = list.get(0);
 			runGenerator(gen.getGenerator(), world, random, chunkX, chunkZ,
 					gen.getMinY(), gen.getMaxY());
-			forceTimer = -1;
+			NostrumShrineGenerator.generating = false;
 			return;
 		}
 		
@@ -301,6 +314,7 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 				break;
 			}
 		}
+		NostrumShrineGenerator.generating = false;
 		
 	}
 
