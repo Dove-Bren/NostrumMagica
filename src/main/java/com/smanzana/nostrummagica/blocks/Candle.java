@@ -28,6 +28,7 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -137,14 +138,14 @@ public class Candle extends Block implements ITileEntityProvider {
 		return (state.getValue(LIT) ? 1 : 0);
 	}
 	
-    @Override
-    public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
-    	if (state.getValue(LIT)) {
-    		if (rand.nextInt(10) == 0) {
-    			extinguish(worldIn, pos, state);
-    		}
-    	}
-    }
+//    @Override
+//    public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+//    	if (state.getValue(LIT)) {
+//    		if (rand.nextInt(10) == 0) {
+//    			extinguish(worldIn, pos, state);
+//    		}
+//    	}
+//    }
     
     public static void light(World world, BlockPos pos, IBlockState state) {
     	world.setBlockState(pos, state.withProperty(LIT, true));
@@ -232,7 +233,7 @@ public class Candle extends Block implements ITileEntityProvider {
 			// only if mainhand or mainhand is null. Otherwise if offhand is
 			// empty, will still put out. Dumb!
 			
-			if (hand == EnumHand.MAIN_HAND || (playerIn.getHeldItemMainhand() == null)) {
+			if (hand == EnumHand.MAIN_HAND && (playerIn.getHeldItemMainhand() == null)) {
 				// putting it out
 				extinguish(worldIn, pos, state, true);
 				return true;
@@ -262,17 +263,20 @@ public class Candle extends Block implements ITileEntityProvider {
 		return true;
 	}
 	
-	public static class CandleTileEntity extends TileEntity {
+	public static class CandleTileEntity extends TileEntity implements ITickable {
 		
 		private static final String NBT_TYPE = "type";
+		private static Random rand = new Random();
 		private ReagentType type;
+		private int lifeTicks;
 		
 		public CandleTileEntity(ReagentType type) {
+			this();
 			this.type = type;
 		}
 		
 		public CandleTileEntity() {
-			;
+			this.lifeTicks = (20 * 15) + CandleTileEntity.rand.nextInt(20*30);
 		}
 		
 		public ReagentType getType() {
@@ -334,6 +338,19 @@ public class Candle extends Block implements ITileEntityProvider {
 			worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 3);
 			worldObj.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
 			markDirty();
+		}
+		
+		@Override
+		public void update() {
+			this.lifeTicks = Math.max(-1, this.lifeTicks-1);
+			
+			if (this.lifeTicks == 0) {
+				IBlockState state = worldObj.getBlockState(this.pos);
+				if (state == null)
+					return;
+				
+				extinguish(worldObj, this.pos, state, false);
+			}
 		}
 	}
 	
