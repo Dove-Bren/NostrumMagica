@@ -27,6 +27,10 @@ public class DragonTakeoffLandTask extends EntityAIBase {
 			Date then = new Date(cur.getTime() + (1000 * 30));
 			if (now.before(then))
 				return false;
+		} else if (dragon.isFlightTransitioning()) {
+			// Missed it, but it's already changing
+			cur = new Date();
+			return false;
 		}
 		
 		return true;

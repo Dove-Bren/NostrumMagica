@@ -21,8 +21,25 @@ public class DragonMeleeAttackTask extends EntityAIAttackMelee {
 	}
 	
 	@Override
+	public boolean shouldExecute() {
+		this.biteTick = Math.max(0, this.biteTick - 1);
+		boolean flying = false;
+		
+		if (this.attacker instanceof EntityDragonRed) {
+			flying = ((EntityDragonRed) this.attacker).isFlying();
+		}
+		
+		if (flying && biteTick > 0) {
+			return false;
+		}
+		
+		return super.shouldExecute();
+	}
+	
+	@Override
 	public boolean continueExecuting() {
 		boolean ret = super.continueExecuting();
+		this.biteTick = Math.max(0, this.biteTick - 1);
 		
 		if (ret) {
 			
@@ -63,7 +80,7 @@ public class DragonMeleeAttackTask extends EntityAIAttackMelee {
 			flying = ((EntityDragonRed) this.attacker).isFlying();
 		}
 		
-		this.biteTick = Math.max(0, this.biteTick - 1);
+		//this.biteTick = Math.max(0, this.biteTick - 1);
 		
 		if (flying) {
 			if (this.biteTick != 0) {
@@ -74,10 +91,15 @@ public class DragonMeleeAttackTask extends EntityAIAttackMelee {
 		
 		super.updateTask();
 	}
+	
+	@Override
+	public boolean isInterruptible() {
+		return true;
+	}
 
 	@Override
 	protected double getAttackReachSqr(EntityLivingBase attackTarget) {
-		return 25.0;
+		return 30.0;
 	}
 	
 	@Override
@@ -93,7 +115,7 @@ public class DragonMeleeAttackTask extends EntityAIAttackMelee {
 		if (dist <= reach) {
 			EntityDragon dragon = (EntityDragon) this.attacker;
 			boolean attacked = false;
-			if (this.biteTick <= 0) {
+			if (this.biteTick <= 24) {
 				// Bites we actually move closer!
 				if (dist < 20.0) {
 					dragon.bite(entity);

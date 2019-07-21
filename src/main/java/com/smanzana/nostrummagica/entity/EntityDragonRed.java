@@ -201,6 +201,7 @@ public class EntityDragonRed extends EntityDragon {
         this.isImmuneToFire = true;
         this.ignoreFrustumCheck = true;
         this.experienceValue = 500;
+        this.noClip = false;
         
         this.setFlyState(FlyState.LANDED);
 	}
@@ -326,12 +327,12 @@ public class EntityDragonRed extends EntityDragon {
 			new EntityAIBase[] {
 				new DragonLandTask(this),
         		new DragonMeleeAttackTask(this, 1.0D, true),
+        		new DragonTakeoffLandTask(this),
 				new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 3), 12, true, DSPELL_Fireball2),
 				new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 5), 10, false, DSPELL_Speed, DSPELL_Shield),
 				new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 5), 20, false, DSPELL_Weaken),
 				new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 30), 20, true, DSPELL_Curse),
         		//new DragonFlyStrafeTask<EntityDragonRed>(this, 20),
-        		new DragonTakeoffLandTask(this),
         		new DragonFlyRandomTask(this),
 			}
         };
@@ -342,8 +343,8 @@ public class EntityDragonRed extends EntityDragon {
         	},
         	new EntityAIBase[] {
         		new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 3), 20, true, DSPELL_Fireball),
-    			new DragonMeleeAttackTask(this, 1.0D, true),
         		new DragonTakeoffLandTask(this),
+    			new DragonMeleeAttackTask(this, 1.0D, true),
         		new EntityAIWander(this, 1.0D, 30)
         	},
         	new EntityAIBase[] {
@@ -351,8 +352,8 @@ public class EntityDragonRed extends EntityDragon {
 				new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 5), 10, false, DSPELL_Speed, DSPELL_Shield),
 				new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 5), 20, false, DSPELL_Weaken),
 				new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 30), 20, true, DSPELL_Curse),
-    			new DragonMeleeAttackTask(this, 1.0D, true),
         		new DragonTakeoffLandTask(this),
+    			new DragonMeleeAttackTask(this, 1.0D, true),
         		new EntityAIWander(this, 1.0D, 30)
         	}
         		
@@ -567,6 +568,8 @@ public class EntityDragonRed extends EntityDragon {
 	@Override
 	public void onUpdate() {
 		super.onUpdate();
+		
+		//System.out.println("(" + this.posX + ", " + this.posZ + ")");
 		
 		long now = System.currentTimeMillis();
 		if (isFlightTransitioning()) {
