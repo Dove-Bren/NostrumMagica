@@ -265,4 +265,13 @@ public class EntityKoid extends EntityMob implements ILoreTagged {
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_ENTITY;
 	}
+	
+	@Override
+	public boolean attackEntityFrom(DamageSource source, float amount) {
+		if (source.isProjectile()) {
+			amount *= 0.25f;
+		}
+		
+		return super.attackEntityFrom(source, amount);
+	}
 }

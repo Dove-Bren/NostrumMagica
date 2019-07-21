@@ -214,6 +214,15 @@ public abstract class EntityGolem extends EntityTameable implements ILoreTagged 
 	}
 	
 	@Override
+	public boolean attackEntityFrom(DamageSource source, float amount) {
+		if (source.isProjectile()) {
+			amount *= 0.3f;
+		}
+		
+		return super.attackEntityFrom(source, amount);
+	}
+	
+	@Override
 	public String getLoreKey() {
 		return "nostrum__golem";
 	}

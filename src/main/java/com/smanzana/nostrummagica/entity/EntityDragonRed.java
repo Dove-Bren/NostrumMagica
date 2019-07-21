@@ -2,7 +2,6 @@ package com.smanzana.nostrummagica.entity;
 
 import com.smanzana.nostrummagica.entity.tasks.DragonAINearestAttackableTarget;
 import com.smanzana.nostrummagica.entity.tasks.DragonFlyRandomTask;
-import com.smanzana.nostrummagica.entity.tasks.DragonFlyStrafeTask;
 import com.smanzana.nostrummagica.entity.tasks.DragonLandTask;
 import com.smanzana.nostrummagica.entity.tasks.DragonMeleeAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.DragonSpellAttackTask;
