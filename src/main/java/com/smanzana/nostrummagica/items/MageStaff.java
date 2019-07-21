@@ -47,7 +47,7 @@ public class MageStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 
 	public MageStaff() {
 		super(ToolMaterial.WOOD);
-		this.setMaxDamage(100);
+		this.setMaxDamage(200);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setMaxStackSize(1);
 	}
