@@ -33,6 +33,7 @@ public class ModConfig {
 		XP_DISPLAY_BAR(Category.DISPLAY, "display_xp_bar", true, false, "Display current progress towards next level"),
 		OBELISK_LIST(Category.DISPLAY, "obelisk_list", false, false, "Display known teleportation points in the obelisk as a list"),
 		EFFECT_DISPLAY(Category.DISPLAY, "display_effects", true, false, "Allow cool client effects to be rendered. Turn off to enhance performance"),
+		MIRROR_NODE_SPOILERS(Category.DISPLAY, "display_mirror_spoilers", false, false, "If true, show ALL magic mirror upgrades regardless of proximity"),
 		
 		LOGIN_TEXT(Category.DISPLAY, "display_login_text", true, false, "On login, show Nostrum Magica welcome text"),
 		
@@ -436,5 +437,9 @@ public class ModConfig {
 	
 	public int[] getDimensionList() {
 		return getIntArrayValue(Key.NOSTRUM_WORLDS, true);
+	}
+	
+	public boolean displayAllMirrorNodes() {
+		return getBooleanValue(Key.MIRROR_NODE_SPOILERS, false);
 	}
 }

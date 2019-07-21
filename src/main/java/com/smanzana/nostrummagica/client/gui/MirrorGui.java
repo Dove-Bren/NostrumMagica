@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientSkillUpMessage;
 import com.smanzana.nostrummagica.network.messages.ClientSkillUpMessage.Type;
@@ -464,7 +465,7 @@ public class MirrorGui extends GuiScreen {
 		this.addButton(buttonFinesse);
 		
 		for (NostrumQuest quest : NostrumQuest.allQuests()) {
-			if (!NostrumMagica.getQuestAvailable(player, quest))
+			if (!ModConfig.config.displayAllMirrorNodes() && !NostrumMagica.getQuestAvailable(player, quest))
 				continue;
 			
 			QuestState state;
