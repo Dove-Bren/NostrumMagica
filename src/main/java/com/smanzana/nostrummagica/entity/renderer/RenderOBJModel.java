@@ -61,7 +61,7 @@ public abstract class RenderOBJModel<T extends Entity> extends Render<T> {
 		if (this.bakedModels == null) {
 			this.bakedModels = new IBakedModel[this.getEntityModels().length];
 			for (int i=0; i<this.getEntityModels().length; ++i) {
-				IModel model = ModelLoaderRegistry.getModelOrLogError(this.getEntityModels()[i], "Minewatch is missing a model. Please report this to the mod authors.");
+				IModel model = ModelLoaderRegistry.getModelOrLogError(this.getEntityModels()[i], "Nostrum Magica is missing a model. Please report this to the mod authors.");
 				model = this.retexture(i, model);
 				IBakedModel bakedModel = model.bake(model.getDefaultState(), DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter());
 				if (bakedModel instanceof OBJBakedModel && model instanceof OBJModel)

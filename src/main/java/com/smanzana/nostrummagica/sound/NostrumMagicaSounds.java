@@ -34,7 +34,12 @@ public enum NostrumMagicaSounds {
 	CAST_FAIL("spell.cast.fail", SoundCategory.AMBIENT),
 	LEVELUP("player.levelup", SoundCategory.AMBIENT),
 	UI_TICK("ui.tick", SoundCategory.AMBIENT, .4f),
-	AMBIENT_WOOSH("ambient.woosh", SoundCategory.AMBIENT);
+	AMBIENT_WOOSH("ambient.woosh", SoundCategory.AMBIENT),
+	DRAGON_IDLE("mob.dragon.idle", SoundCategory.HOSTILE),
+	DRAGON_LAND_HURT("mob.dragon.land_hurt", SoundCategory.HOSTILE),
+	DRAGON_WATER_HURT("mob.dragon.water_hurt", SoundCategory.HOSTILE),
+	DRAGON_BITE("mob.dragon.attack", SoundCategory.HOSTILE),
+	DRAGON_DEATH("mob.dragon.death", SoundCategory.HOSTILE);
 	
 	private ResourceLocation resource;
 	private SoundCategory category;

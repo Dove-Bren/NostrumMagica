@@ -179,7 +179,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 			float hardness = state.getBlockHardness(world, pos);
 			int harvestLevel = state.getBlock().getHarvestLevel(state);
 			
-			if (hardness > 10 || harvestLevel > 1)
+			if (hardness > 10 || harvestLevel > 1 || hardness < 0)
 				continue;
 			
 			List<ItemStack> drops = state.getBlock().getDrops(world, pos, state, 0);

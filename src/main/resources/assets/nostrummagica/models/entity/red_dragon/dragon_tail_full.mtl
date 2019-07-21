@@ -1,0 +1,8 @@
+# Blender MTL File: 'dragon_lower_offsets.blend'
+# Material Count: 1
+
+newmtl Game_dragon.001
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+d 1.000000
+map_Kd nostrummagica:entity/dragon_C

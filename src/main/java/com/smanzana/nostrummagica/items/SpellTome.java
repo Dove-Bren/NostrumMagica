@@ -652,7 +652,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		
 		int len = (pages == null ? 0 : pages.length);
 		for (int i = 0; i < len; i++) {
-			if (pages[i] == null || !(pages[i].getItem() instanceof SpellTomePage))
+			if (pages == null || pages[i] == null || !(pages[i].getItem() instanceof SpellTomePage))
 				continue;
 			
 			enhancements.add(new SpellTomeEnhancementWrapper(SpellTomePage.getEnhancement(pages[i]),

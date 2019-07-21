@@ -737,6 +737,10 @@ public class PlayerListener {
 		// Regain mana
 		if (tickCount % 10 == 0) {
 			for (World world : FMLCommonHandler.instance().getMinecraftServerInstance().worldServers) {
+				if (world.playerEntities.isEmpty()) {
+					continue;
+				}
+				
 				for (EntityPlayer player : world.playerEntities) {
 					regenMana(player);
 				}

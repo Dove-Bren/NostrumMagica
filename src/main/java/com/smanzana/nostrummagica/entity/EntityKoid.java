@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.entity.tasks.KoidTask;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -98,7 +99,7 @@ public class EntityKoid extends EntityMob implements ILoreTagged {
      */
     protected float getSoundVolume()
     {
-        return 0.4F;
+        return 0.7F;
     }
 
     public float getEyeHeight()
@@ -224,7 +225,7 @@ public class EntityKoid extends EntityMob implements ILoreTagged {
 	
 	public void writeEntityToNBT(NBTTagCompound compound) {
     	super.writeEntityToNBT(compound);
-        compound.setByte("SkeletonType", (byte)this.getElement().ordinal());
+        compound.setByte("KoidType", (byte)this.getElement().ordinal());
 	}
 	
 	@Override

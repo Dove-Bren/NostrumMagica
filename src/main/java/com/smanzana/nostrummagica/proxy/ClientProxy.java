@@ -43,9 +43,11 @@ import com.smanzana.nostrummagica.client.render.TileEntityCandleRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityObeliskRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntitySymbolRenderer;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.entity.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.renderer.ModelGolem;
+import com.smanzana.nostrummagica.entity.renderer.RenderDragonRed;
 import com.smanzana.nostrummagica.entity.renderer.RenderGolem;
 import com.smanzana.nostrummagica.entity.renderer.RenderKoid;
 import com.smanzana.nostrummagica.items.AltarItem;
@@ -174,7 +176,13 @@ public class ClientProxy extends CommonProxy {
 		RenderingRegistry.registerEntityRenderingHandler(EntityKoid.class, new IRenderFactory<EntityKoid>() {
 			@Override
 			public Render<? super EntityKoid> createRenderFor(RenderManager manager) {
-				return new RenderKoid(manager);
+				return new RenderKoid(manager, .3f);
+			}
+		});
+		RenderingRegistry.registerEntityRenderingHandler(EntityDragonRed.class, new IRenderFactory<EntityDragonRed>() {
+			@Override
+			public Render<? super EntityDragonRed> createRenderFor(RenderManager manager) {
+				return new RenderDragonRed(manager, 5);
 			}
 		});
 		
@@ -727,6 +735,8 @@ public class ClientProxy extends CommonProxy {
 				NostrumMagica.MODID, "entity/koid"));
 		event.getMap().registerSprite(new ResourceLocation(
 				NostrumMagica.MODID, "entity/golem_ender"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "entity/dragon_C"));
 	}
 	
 	@SubscribeEvent

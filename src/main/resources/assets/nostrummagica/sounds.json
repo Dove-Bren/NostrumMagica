@@ -193,6 +193,52 @@
         [
             "nostrummagica:ambient/woosh"
         ]
+    },
+    
+    "mob.dragon.idle":
+    {
+        "sounds":
+        [
+            "nostrummagica:entity/dragon/idle1",
+            "nostrummagica:entity/dragon/idle2",
+            "nostrummagica:entity/dragon/idle3"
+        ]
+    },
+    
+    "mob.dragon.land_hurt":
+    {
+        "sounds":
+        [
+            "nostrummagica:entity/dragon/common_hurt1",
+            "nostrummagica:entity/dragon/common_hurt2",
+            "nostrummagica:entity/dragon/land_hurt1"
+        ]
+    },
+    
+    "mob.dragon.water_hurt":
+    {
+        "sounds":
+        [
+            "nostrummagica:entity/dragon/common_hurt1",
+            "nostrummagica:entity/dragon/common_hurt2",
+            "nostrummagica:entity/dragon/underwater_hurt1"
+        ]
+    },
+    
+    "mob.dragon.attack":
+    {
+        "sounds":
+        [
+            "nostrummagica:entity/dragon/bite1"
+        ]
+    },
+    
+    "mob.dragon.death":
+    {
+        "sounds":
+        [
+            "nostrummagica:entity/dragon/death1"
+        ]
     }
     
 }

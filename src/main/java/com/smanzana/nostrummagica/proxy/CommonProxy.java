@@ -32,6 +32,7 @@ import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.config.network.ServerConfigMessage;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
+import com.smanzana.nostrummagica.entity.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.EntityGolemEarth;
 import com.smanzana.nostrummagica.entity.EntityGolemEnder;
 import com.smanzana.nostrummagica.entity.EntityGolemFire;
@@ -200,6 +201,12 @@ public class CommonProxy {
     			entityID++,
     			NostrumMagica.instance,
     			64,
+    			1,
+    			false);
+    	EntityRegistry.registerModEntity(EntityDragonRed.class, "entity_dragon_red", 
+    			entityID++,
+    			NostrumMagica.instance,
+    			128,
     			1,
     			false);
     	
