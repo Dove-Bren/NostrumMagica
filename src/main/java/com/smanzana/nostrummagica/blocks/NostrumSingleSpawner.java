@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.blocks;
 import java.util.Random;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.entity.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.EntityGolemEarth;
 import com.smanzana.nostrummagica.entity.EntityGolemEnder;
 import com.smanzana.nostrummagica.entity.EntityGolemFire;
@@ -42,7 +43,8 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		GOLEM_ICE,
 		GOLEM_LIGHTNING,
 		GOLEM_PHYSICAL,
-		GOLEM_WIND;
+		GOLEM_WIND,
+		DRAGON_RED;
 
 		@Override
 		public String getName() {
@@ -80,6 +82,7 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setSoundType(SoundType.STONE);
 		this.setHarvestLevel("pickaxe", 4);
+		this.setBlockUnbreakable();
 		
 		this.setDefaultState(this.blockState.getBaseState().withProperty(MOB, Type.GOLEM_PHYSICAL));
 	}
@@ -194,6 +197,9 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 			break;
 		case GOLEM_WIND:
 			entity = new EntityGolemWind(world);
+			break;
+		case DRAGON_RED:
+			entity = new EntityDragonRed(world);
 			break;
 		}
 		
