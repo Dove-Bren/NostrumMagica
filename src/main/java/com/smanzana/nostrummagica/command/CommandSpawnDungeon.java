@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
-import com.smanzana.nostrummagica.world.NostrumShrineGenerator;
+import com.smanzana.nostrummagica.world.NostrumDungeonGenerator;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -62,8 +62,8 @@ public class CommandSpawnDungeon extends CommandBase {
 				throw new CommandException("Unknown type: " + (args.length == 1 ? args[0] : "AUTOGEN"));
 			}
 			
-			NostrumShrineGenerator.enqueueShrineRequest(type);
-			NostrumShrineGenerator.forceSpawn(0);
+			NostrumDungeonGenerator.enqueueShrineRequest(type);
+			NostrumDungeonGenerator.forceSpawn(0);
 		}
 		else {
 			throw new CommandException("Too many arguments!");

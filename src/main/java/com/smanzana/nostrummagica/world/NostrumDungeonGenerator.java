@@ -38,7 +38,7 @@ import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.feature.WorldGenerator;
 import net.minecraftforge.fml.common.IWorldGenerator;
 
-public class NostrumShrineGenerator implements IWorldGenerator {
+public class NostrumDungeonGenerator implements IWorldGenerator {
 	
 	private static class ShapeComponent implements NostrumShrineDungeon.ComponentGenerator {
 
@@ -238,7 +238,7 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 	private static List<SpellComponentWrapper> queuedWrappers = new LinkedList<>();
 	private static int forceTimer = -1;
 	
-	public NostrumShrineGenerator() {
+	public NostrumDungeonGenerator() {
 		
 	}
 	
@@ -257,7 +257,7 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
 		
 		// Do not allow recursion!
-		if (NostrumShrineGenerator.generating) {
+		if (NostrumDungeonGenerator.generating) {
 			return;
 		}
 		
@@ -274,7 +274,7 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 		if (!found)
 			return;
 		
-		NostrumShrineGenerator.generating = true;
+		NostrumDungeonGenerator.generating = true;
 		
 		long seed = world.getSeed();
 		// Spawn a self somewhere in the 32x32 chunks around 0
@@ -284,7 +284,7 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 			DungeonGen gen = DungeonGen.SHAPE;
 			runGenerator(gen.getGenerator(), world, random, chunkX, chunkZ,
 					gen.getMinY(), gen.getMaxY());
-			NostrumShrineGenerator.generating = false;
+			NostrumDungeonGenerator.generating = false;
 			return;
 		}
 		
@@ -300,7 +300,7 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 			DungeonGen gen = list.get(0);
 			runGenerator(gen.getGenerator(), world, random, chunkX, chunkZ,
 					gen.getMinY(), gen.getMaxY());
-			NostrumShrineGenerator.generating = false;
+			NostrumDungeonGenerator.generating = false;
 			return;
 		}
 		
@@ -314,7 +314,7 @@ public class NostrumShrineGenerator implements IWorldGenerator {
 				break;
 			}
 		}
-		NostrumShrineGenerator.generating = false;
+		NostrumDungeonGenerator.generating = false;
 		
 	}
 

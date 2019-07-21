@@ -21,6 +21,7 @@ import com.smanzana.nostrummagica.command.CommandSpawnDungeon;
 import com.smanzana.nostrummagica.command.CommandSpawnObelisk;
 import com.smanzana.nostrummagica.command.CommandTestConfig;
 import com.smanzana.nostrummagica.command.CommandUnlock;
+import com.smanzana.nostrummagica.command.CommandUnlockAll;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.EntityKoid;
@@ -223,6 +224,7 @@ public class NostrumMagica implements IMagicListener
     	event.registerServerCommand(new CommandCreateGeotoken());
     	event.registerServerCommand(new CommandForceBind());
     	event.registerServerCommand(new CommandSpawnDungeon());
+    	event.registerServerCommand(new CommandUnlockAll());
     	loadSeekerRegistry(seekerRegistryFile);
     }
     

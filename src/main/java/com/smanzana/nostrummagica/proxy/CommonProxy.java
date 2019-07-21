@@ -107,7 +107,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 import com.smanzana.nostrummagica.world.NostrumFlowerGenerator;
 import com.smanzana.nostrummagica.world.NostrumOreGenerator;
-import com.smanzana.nostrummagica.world.NostrumShrineGenerator;
+import com.smanzana.nostrummagica.world.NostrumDungeonGenerator;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureType;
@@ -220,19 +220,20 @@ public class CommonProxy {
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.NETHER));
     	EntityRegistry.addSpawn(EntityKoid.class, 12, 1, 1, EnumCreatureType.MONSTER, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.SPOOKY));
+
+    	registerItems();
+    	registerBlocks();
 	}
 	
 	public void init() {
     	registerPotions();
-    	registerItems();
-    	registerBlocks();
     	
     	GameRegistry.register(EnchantmentManaRecovery.instance(),
     			new ResourceLocation(NostrumMagica.MODID, EnchantmentManaRecovery.ID));
     	
     	GameRegistry.registerWorldGenerator(new NostrumOreGenerator(), 0);
     	GameRegistry.registerWorldGenerator(new NostrumFlowerGenerator(), 0);
-    	GameRegistry.registerWorldGenerator(new NostrumShrineGenerator(), 0);
+    	GameRegistry.registerWorldGenerator(new NostrumDungeonGenerator(), 0);
     	
     	NetworkRegistry.INSTANCE.registerGuiHandler(NostrumMagica.instance, new NostrumGui());
     	

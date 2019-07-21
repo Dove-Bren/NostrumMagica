@@ -10,7 +10,7 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.world.NostrumShrineGenerator;
+import com.smanzana.nostrummagica.world.NostrumDungeonGenerator;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -102,7 +102,7 @@ public class ShrineSeekingGem extends Item implements ILoreTagged {
 		if (wrapper == null)
 			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
 		
-		NostrumShrineGenerator.enqueueShrineRequest(wrapper);
+		NostrumDungeonGenerator.enqueueShrineRequest(wrapper);
 		itemStackIn.stackSize--;
 		
 		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
