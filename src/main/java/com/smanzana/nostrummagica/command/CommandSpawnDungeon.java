@@ -7,11 +7,14 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.world.NostrumDungeonGenerator;
+import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.EnumFacing;
 
 public class CommandSpawnDungeon extends CommandBase {
 
@@ -54,6 +57,17 @@ public class CommandSpawnDungeon extends CommandBase {
 					len = SpellTrigger.getAllTriggers().size();
 					type = new SpellComponentWrapper((SpellTrigger) SpellTrigger.getAllTriggers().toArray()[rand.nextInt(len)]);
 				}
+			} else if (args[0].equalsIgnoreCase("dragon")) {
+				if (sender instanceof EntityPlayer) {
+					EntityPlayer player = ((EntityPlayer) sender);
+					NostrumDungeonGenerator.DRAGON_DUNGEON.spawn(player.worldObj,
+							new NostrumDungeon.DungeonExitPoint(player.getPosition(), 
+									EnumFacing.HORIZONTALS[rand.nextInt(4)]
+	        				));
+				} else {
+					throw new CommandException("This command must be run as a player");
+				}
+				return;
 			} else {
 				type = SpellComponentWrapper.fromKeyString(args[0]);
 			}

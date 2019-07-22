@@ -14,13 +14,17 @@ import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
+import com.smanzana.nostrummagica.world.dungeon.NostrumDragonDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumShrineDungeon;
+import com.smanzana.nostrummagica.world.dungeon.room.DragonStartRoom;
+import com.smanzana.nostrummagica.world.dungeon.room.RoomArena;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomChallenge1;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomChallenge2;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomEnd1;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomEnd2;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomGrandHallway;
+import com.smanzana.nostrummagica.world.dungeon.room.RoomGrandStaircase;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomHallway;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomJail1;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomLectern;
@@ -131,6 +135,22 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 	    }
 	}
 	
+	public static NostrumDungeon DRAGON_DUNGEON = new NostrumDragonDungeon(
+			new DragonStartRoom(),
+			new RoomArena()
+			).add(new RoomGrandStaircase())
+			 .add(new RoomEnd1(false, true))
+			 .add(new RoomGrandHallway())
+			 .add(new RoomGrandHallway())
+			 .add(new RoomGrandHallway())
+			 .add(new RoomJail1())
+			 .add(new RoomJail1())
+			 .add(new RoomChallenge2())
+			 .add(new RoomChallenge2())
+			 .add(new RoomLectern())
+			 .add(new RoomEnd1(true, false))
+			 .add(new RoomEnd1(false, false));
+	
 	private static enum DungeonGen {
 		SHAPE(new WorldGenNostrumShrine(new NostrumShrineDungeon(
 				// Shape dungeon
@@ -188,7 +208,8 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 				 .add(new RoomVHallway())
 				 .add(new RoomTee1())
 				 .add(new RoomLectern())
-				 .add(new RoomChallenge1())), 30, 50);
+				 .add(new RoomChallenge1())), 30, 50),
+		DRAGON(new WorldGenNostrumShrine(DRAGON_DUNGEON), 30, 60);
 		
 		private WorldGenerator gen;
 		private int minY;
@@ -220,15 +241,20 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 			}
 			
 			int count = 1;
+			int chance = 9000;
 			if (this == ELEMENT)
 				count = 4;
 			else if (this == SHAPE)
 				count = 1;
 			else if (this == TRIGGER)
 				count = 4;
+			else if (this == DRAGON) {
+				count = 1;
+				chance = 15000;
+			}
 			
 			
-			return random.nextInt(9000) < count;
+			return random.nextInt(chance) < count;
 		}
 	}
 	

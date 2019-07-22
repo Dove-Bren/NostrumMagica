@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
+import com.smanzana.nostrummagica.items.DragonEggFragment;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MageStaff;
@@ -98,11 +99,13 @@ public class LoreRegistry {
 		register(ShrineSeekingGem.instance());
 		register(new EntityGolemPhysical(null));
 		register(new EntityKoid(null));
+		//register(new EntityDragonRed(null));
 		register(MageStaff.instance());
 		register(ThanosStaff.instance());
 		register(ThanoPendant.instance());
 		register(MagicCharm.instance());
 		register(RuneBag.instance());
+		register(DragonEggFragment.instance());
 		
 		for (Preset preset : Preset.values()) {
 			register(preset);

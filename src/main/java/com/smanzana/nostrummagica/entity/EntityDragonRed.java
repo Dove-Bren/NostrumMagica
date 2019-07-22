@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.entity.tasks.DragonLandTask;
 import com.smanzana.nostrummagica.entity.tasks.DragonMeleeAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.DragonSpellAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.DragonTakeoffLandTask;
+import com.smanzana.nostrummagica.items.DragonEggFragment;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
@@ -194,13 +195,15 @@ public class EntityDragonRed extends EntityDragon {
 	private EntityAIBase[][] flyingAI;
 	private EntityAIBase[][] groundedAI;
 	
+	private EntityAIBase[] lastAI;
+	
 	public EntityDragonRed(World worldIn) {
 		super(worldIn);
         this.setSize(6F, 4.6F);
         this.stepHeight = 2;
         this.isImmuneToFire = true;
         this.ignoreFrustumCheck = true;
-        this.experienceValue = 500;
+        this.experienceValue = 1000;
         this.noClip = false;
         
         this.setFlyState(FlyState.LANDED);
@@ -376,15 +379,18 @@ public class EntityDragonRed extends EntityDragon {
 	private void setFlyingAI() {
 		DragonPhase phase = this.getPhase();
 		// Remove grounded
-		for (EntityAIBase ai : this.groundedAI[phase.ordinal()]) {
-			this.tasks.removeTask(ai);
+		if (lastAI != null) {
+			for (EntityAIBase ai : lastAI) {
+				this.tasks.removeTask(ai);
+			}
 		}
 		
-		for (int i = 0; i < this.flyingAI[phase.ordinal()].length; i++) {
-			if (this.flyingAI[phase.ordinal()].length == 0)
-				continue;
-			
-			this.tasks.addTask(i, this.flyingAI[phase.ordinal()][i]);
+		lastAI = this.flyingAI[phase.ordinal()];
+		
+		if (lastAI != null && lastAI.length > 0) {
+			for (int i = 0; i < lastAI.length; i++) {
+				this.tasks.addTask(i, lastAI[i]);
+			}
 		}
 	}
 	
@@ -392,12 +398,18 @@ public class EntityDragonRed extends EntityDragon {
 		DragonPhase phase = this.getPhase();
 		
 		// Remove flying
-		for (EntityAIBase ai : this.flyingAI[phase.ordinal()]) {
-			this.tasks.removeTask(ai);
+		if (lastAI != null) {
+			for (EntityAIBase ai : lastAI) {
+				this.tasks.removeTask(ai);
+			}
 		}
 		
-		for (int i = 0; i < this.groundedAI[phase.ordinal()].length; i++) {
-			this.tasks.addTask(i, this.groundedAI[phase.ordinal()][i]);
+		lastAI = this.groundedAI[phase.ordinal()];
+		
+		if (lastAI != null && lastAI.length > 0) {
+			for (int i = 0; i < lastAI.length; i++) {
+				this.tasks.addTask(i, lastAI[i]);
+			}
 		}
 	}
 	
@@ -651,6 +663,10 @@ public class EntityDragonRed extends EntityDragon {
 	@Override
 	public Lore getDeepLore() {
 		return new Lore().add("Red Dragons are greedy creatures. They often live in abandoned castles, and have a strong fondness to anything that's shiny.", "According to some reports, Red Dragons are the only ones which are hatched from eggs.", "Nothing is known about what such eggs would look like.");
+	}
+	
+	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
+		this.entityDropItem(new ItemStack(DragonEggFragment.instance()), 0);
 	}
 
 }

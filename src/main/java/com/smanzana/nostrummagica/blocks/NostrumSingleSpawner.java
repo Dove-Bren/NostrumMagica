@@ -150,7 +150,7 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		super.updateTick(worldIn, pos, state, rand);
 		
 		for (EntityPlayer player : worldIn.playerEntities) {
-			if (player.getDistanceSq(pos) < SPAWN_DIST_SQ) {
+			if (!player.isSpectator() && player.getDistanceSq(pos) < SPAWN_DIST_SQ) {
 				this.spawn(worldIn, pos, state, rand);
 				
 				worldIn.setBlockToAir(pos);

@@ -14,11 +14,9 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class StartRoom extends StaticRoom implements ISpellComponentRoom {
+public class DragonStartRoom extends StaticRoom implements ISpellComponentRoom {
 	
-	private SpellComponentWrapper component;
-	
-	public StartRoom() {
+	public DragonStartRoom() {
 		// End up passing in height to surface?
 		super(-5, -1, -5, 5, 5, 5,
 				// Floor
@@ -34,44 +32,44 @@ public class StartRoom extends StaticRoom implements ISpellComponentRoom {
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",
 				// Layer 1
-				"XXXXXCXXXXX",
-				"XBB  C  BBX",
-				"XB   C   BX",
+				"XXXXXXXXXXX",
+				"XBBBBBBB BX",
+				"XBBBBBBBBBX",
 				"X  CCCCC  X",
 				"X  CCCCC  X",
-				"CCCCDXXCCCC",
+				"X  CDXXC  X",
 				"X  CXXXC  X",
 				"X  CCCCC  X",
-				"XB   C   BX",
-				"XBB  C  BBX",
-				"XXXXXCXXXXX",
+				"CCCCCCCCCCC",
+				"X         X",
+				"XXXXXXXXXXX",
 				// Layer 2
-				"XXXXX XXXXX",
-				"XBB      BX",
+				"XXXXXXXXXXX",
+				"XBBBBBBBBBX",
+				"X BBBBBBB X",
 				"X         X",
 				"X         X",
-				"X         X",
-				"     XX    ",
+				"X    XX   X",
 				"X    RX   X",
 				"X         X",
-				"XB       BX",
-				"XB      BBX",
-				"XXXXX XXXXX",
+				"           ",
+				"X         X",
+				"XXXXXXXXXXX",
 				// Layer 3
 				"XXXXXXXXXXX",
-				"XB	       X",
-				"X         X",
+				"X 	BBBBB  X",
+				"X   BBB   X",
 				"X         X",
 				"X     X   X",
 				"X    XU   X",
 				"X         X",
 				"X         X",
-				"XB        X",
-				"X       BBX",
+				"X         X",
+				"X         X",
 				"XXXXXXXXXXX",
 				// Layer 4
 				"XXXXXXXXXXX",
-				"X 	       X",
+				"X 	BBBBB  X",
 				"X         X",
 				"X         X",
 				"X   XL    X",
@@ -79,7 +77,7 @@ public class StartRoom extends StaticRoom implements ISpellComponentRoom {
 				"X         X",
 				"X         X",
 				"X         X",
-				"X        BX",
+				"X         X",
 				"XXXXXXXXXXX",
 				// Layer 5
 				"XXXXXXXXXXX",
@@ -118,12 +116,12 @@ public class StartRoom extends StaticRoom implements ISpellComponentRoom {
 	
 	@Override
 	public void setComponent(SpellComponentWrapper component) {
-		this.component = component;
+		return;
 	}
 
 	@Override
 	public int getNumExits() {
-		return 4;
+		return 2;
 	}
 
 	@Override
@@ -132,16 +130,10 @@ public class StartRoom extends StaticRoom implements ISpellComponentRoom {
 		
 		BlockPos pos;
 		
-		pos = new BlockPos(0, 0, -5);
-		list.add(NostrumDungeon.asRotated(start, pos, EnumFacing.SOUTH));
-		
-		pos = new BlockPos(0, 0, 5);
-		list.add(NostrumDungeon.asRotated(start, pos, EnumFacing.NORTH));
-		
-		pos = new BlockPos(-5, 0, 0);
+		pos = new BlockPos(-5, 0, 3);
 		list.add(NostrumDungeon.asRotated(start, pos, EnumFacing.EAST));
 		
-		pos = new BlockPos(5, 0, 0);
+		pos = new BlockPos(5, 0, 3);
 		list.add(NostrumDungeon.asRotated(start, pos, EnumFacing.WEST));
 		
 		return list;
@@ -181,7 +173,7 @@ public class StartRoom extends StaticRoom implements ISpellComponentRoom {
 	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start) {
 		List<DungeonExitPoint> list = new LinkedList<>();
 		
-		BlockPos pos = new BlockPos(-4, 0, -4);
+		BlockPos pos = new BlockPos(3, 0, -4);
 		list.add(NostrumDungeon.asRotated(start, pos, EnumFacing.SOUTH));
 		
 		return list;
@@ -191,7 +183,7 @@ public class StartRoom extends StaticRoom implements ISpellComponentRoom {
 	public void spawn(NostrumDungeon dungeon, World world, DungeonExitPoint start) {
 		super.spawn(dungeon, world, start);
 		
-		RoomExtendedShrineStaircase stairs = new RoomExtendedShrineStaircase(component, false);
+		RoomExtendedDragonStaircase stairs = new RoomExtendedDragonStaircase(false);
 		DungeonExitPoint adj = new DungeonExitPoint(start.getPos().add(0, 6, 0), start.getFacing());
 		stairs.spawn(dungeon, world, adj);
 	}

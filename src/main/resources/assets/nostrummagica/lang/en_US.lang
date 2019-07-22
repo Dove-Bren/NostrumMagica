@@ -170,6 +170,9 @@ item.charm.earth.name=Charm of the Rocksmasher
 item.charm.lightning.name=Charm of the Storm
 item.charm.ender.name=Charm of Return
 
+item.dragon_egg.name=Dragon Egg
+item.dragon_egg_part.name=Dragon Egg Fragment
+
 potion.frostbite.name=Frostbite
 potion.shieldphysical.name=Physical Ward
 potion.shieldmagic.name=Magic Ward

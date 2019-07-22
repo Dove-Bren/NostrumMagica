@@ -53,6 +53,7 @@ import com.smanzana.nostrummagica.entity.renderer.RenderKoid;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
+import com.smanzana.nostrummagica.items.DragonEggFragment;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
 import com.smanzana.nostrummagica.items.EssenceItem;
@@ -276,6 +277,7 @@ public class ClientProxy extends CommonProxy {
 		registerModel(SpellScroll.instance(), 1, SpellScroll.id);
 		registerModel(SpellScroll.instance(), 2, SpellScroll.id);
 		registerModel(BlankScroll.instance(), 0, BlankScroll.id);
+		registerModel(DragonEggFragment.instance(), 0, DragonEggFragment.id);
 		registerModel(ReagentBag.instance(), 0, ReagentBag.id);
 		registerModel(RuneBag.instance(), 0, RuneBag.id);
 		registerModel(SeekerIdol.instance(), 0, SeekerIdol.id);

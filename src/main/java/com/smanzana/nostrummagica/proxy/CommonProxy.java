@@ -45,6 +45,7 @@ import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
+import com.smanzana.nostrummagica.items.DragonEggFragment;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
 import com.smanzana.nostrummagica.items.EssenceItem;
@@ -105,9 +106,9 @@ import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProximityTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
+import com.smanzana.nostrummagica.world.NostrumDungeonGenerator;
 import com.smanzana.nostrummagica.world.NostrumFlowerGenerator;
 import com.smanzana.nostrummagica.world.NostrumOreGenerator;
-import com.smanzana.nostrummagica.world.NostrumDungeonGenerator;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureType;
@@ -381,6 +382,10 @@ public class CommonProxy {
     	RuneBag.instance().setRegistryName(NostrumMagica.MODID, RuneBag.id);
     	GameRegistry.register(RuneBag.instance());
     	RuneBag.init();
+    	
+    	DragonEggFragment.instance().setRegistryName(NostrumMagica.MODID, DragonEggFragment.id);
+    	GameRegistry.register(DragonEggFragment.instance());
+    	DragonEggFragment.init();
     	
     }
     

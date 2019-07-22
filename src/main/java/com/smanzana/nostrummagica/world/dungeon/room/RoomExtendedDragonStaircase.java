@@ -3,7 +3,6 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
@@ -17,14 +16,14 @@ import net.minecraft.world.chunk.Chunk;
  * @author Skyler
  *
  */
-public class RoomExtendedStaircase implements IDungeonRoom {
+public class RoomExtendedDragonStaircase implements IDungeonRoom {
 
 	private RoomEntryStairs stairs;
-	private RoomEntryShrine shrine;
+	private RoomEntryDragon entry;
 	
-	public RoomExtendedStaircase(SpellComponentWrapper component, boolean dark) {
+	public RoomExtendedDragonStaircase(boolean dark) {
 		stairs = new RoomEntryStairs(dark);
-		shrine = new RoomEntryShrine(component, dark);
+		entry = new RoomEntryDragon(dark);
 	}
 	
 	@Override
@@ -75,7 +74,7 @@ public class RoomExtendedStaircase implements IDungeonRoom {
 			cur = cur.add(0, stairHeight, 0);
 		}
 		
-		shrine.spawn(dungeon, world, new DungeonExitPoint(cur, start.getFacing()));
+		entry.spawn(dungeon, world, new DungeonExitPoint(cur, start.getFacing()));
 	}
 	
 	@Override

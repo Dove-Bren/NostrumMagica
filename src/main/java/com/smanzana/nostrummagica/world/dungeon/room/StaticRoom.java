@@ -107,21 +107,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 	private int locMaxZ;
 	private BlockState blocks[][][];
 	
-	/**
-	 * 
-	 * @param minX
-	 * @param minY
-	 * @param minZ
-	 * @param maxX
-	 * @param maxY
-	 * @param maxZ
-	 * @param args First, strings that represent a row of blocks with same Y and Z.
-	 * A lot of those. One for each row in each layer, and then repeat for each y
-	 * layer. Then, series of characters followed by IBlockStates or Blocks.
-	 * It's like registering a recipe in GameRegistry
-	 */
-	public StaticRoom(int minX, int minY, int minZ, int maxX, int maxY, int maxZ,
-			Object ... args) {
+	public StaticRoom(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
 		this.locMinX = minX;
 		this.locMinY = minY;
 		this.locMinZ = minZ;
@@ -145,8 +131,26 @@ public abstract class StaticRoom implements IDungeonRoom {
 			locMinZ = locMaxZ;
 			locMaxZ = s;
 		}
+	}
+	
+	/**
+	 * 
+	 * @param minX
+	 * @param minY
+	 * @param minZ
+	 * @param maxX
+	 * @param maxY
+	 * @param maxZ
+	 * @param args First, strings that represent a row of blocks with same Y and Z.
+	 * A lot of those. One for each row in each layer, and then repeat for each y
+	 * layer. Then, series of characters followed by IBlockStates or Blocks.
+	 * It's like registering a recipe in GameRegistry
+	 */
+	public StaticRoom(int minX, int minY, int minZ, int maxX, int maxY, int maxZ,
+			Object ... args) {
+		this(minX, minY, minZ, maxX, maxY, maxZ);
 		
-		s = locMaxX - locMinX;
+		int s = locMaxX - locMinX;
 		blocks = new BlockState[s + 1][][];
 		for (int i = 0; i <= s; i++) {
 			int y = locMaxY - locMinY;
@@ -158,6 +162,12 @@ public abstract class StaticRoom implements IDungeonRoom {
 		}
 		
 		parse(args);
+	}
+	
+	public void setBlocks(BlockState[][][] blocks) {
+		if (this.blocks == null && blocks != null) {
+			this.blocks = blocks;
+		}
 	}
 	
 	@Override
