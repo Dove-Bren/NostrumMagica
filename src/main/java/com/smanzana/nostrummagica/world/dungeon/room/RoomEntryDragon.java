@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
+import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
@@ -12,14 +13,18 @@ import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockTorch;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 // Tiny tight spiral staircase used when creating the entrance to the dungeon
 public class RoomEntryDragon extends StaticRoom {
 	
+	// Number of y levels below the ground we'd like to be
+	public static final int LevelsBelow = 7;
+	
 	public RoomEntryDragon(boolean dark) {
 		
-		super(-5, 0, -5, 5, 15, 5,
+		super(-5, 0, -5, 5, 14, 5,
 				// Floor
 				"BBBBBBBBBBB",
 				"BBBBBBBBBBB",
@@ -42,7 +47,7 @@ public class RoomEntryDragon extends StaticRoom {
 				"B         B",
 				"B         B",
 				"B         B",
-				"B         B",
+				"B    F    B",
 				"BBBBBBBBBBB",
 				//
 				"BBBBBBBBBBB",
@@ -108,116 +113,110 @@ public class RoomEntryDragon extends StaticRoom {
 				"BBBBBBBBBBB",
 				"B   l l   B",
 				"B         B",
+				"B  BBBBBBBB",
+				"B         B",
+				"B     BB  B",
+				"B  M  BB  B",
+				"BBBBBBBB  B",
 				"B         B",
 				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"BB       BB",
+				"BB#######BB",
 				// 
 				"BBBBBBBBBBB",
+				"B   lSl   B",
 				"B         B",
+				"B  BBBBBBBB",
 				"B         B",
+				"B     BB  B",
+				"B  N  BB  B",
+				"BBBBBBBB  B",
+				"B   S     B",
 				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"BB       BB",
+				"BBB#####BBB",
 				//
 				"BBBBBBBBBBB",
 				"B         B",
 				"B         B",
+				"B  BBBBBBBB",
+				"B         B",
+				"B     BB  B",
+				"B     BB  B",
+				"BBBBBBBB  B",
 				"B         B",
 				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"BBB     BBB",
+				"BBBBB#BBBBB",
 				//
+				"BBBBBBBBBBB",
+				"BBBBBBB   B",
+				"BBBBBBBB  B",
+				"BBBBBBBBBBB",
+				"BBBBBBBBBBB",
+				"BBBBBBBBBBB",
+				"BBBBBBBBBBB",
+				"BBBBBBBBBBB",
+				"BBBBBBBBBBB",
+				"BBBBBBBBBBB",
+				"BBBBBBBBBBB",
+				// y11
 				"BBBBBBBBBBB",
 				"B         B",
 				"B         B",
+				"B  BBBBBBBB",
 				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"BBB     BBB",
-				//
-				"BBBBBBBBBBB",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"BBBB   BBBB",
-				//
-				"BBBBBBBBBBB",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"BBBBB BBBBB",
-				//
-				"BBBBBBBBBBB",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
+				"B  BBBBB  B",
+				"B  B F B  B",
+				"B  B   B  B",
 				"B         B",
 				"B         B",
 				"BBBBBBBBBBB",
 				//
 				"BBBBBBBBBBB",
+				"B        WB",
+				"B        WB",
+				"B  BBBBBBBB",
+				"B        GB",
+				"B  BBBBB  B",
+				"B WB S BE B",
+				"B  B   B  B",
 				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
+				"B   N N   B",
 				"BBBBBBBBBBB",
 				//
 				"BBBBBBBBBBB",
 				"B         B",
 				"B         B",
+				"B  BBBBBBBB",
+				"B         B",
+				"B  BBBBB  B",
+				"B  B   B  B",
+				"B  B   B  B",
 				"B         B",
 				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
-				"B         B",
+				"BBBBBBBBBBB",
+				//
+				"BBBBBBBBBBB",
+				"BBBBBBBBBBB",
+				"BBBBBBBBBBB",
+				"BBBBBBBBBBB",
+				"BBBBBBBBBBB",
+				"BBBBBBBBBBB",
+				"BBBBBBBBBBB",
+				"BBBBBBBBBBB",
+				"BBBBBBBBBBB",
+				"BBBBBBBBBBB",
 				"BBBBBBBBBBB",
 				'B', DungeonBlock.instance(),
 				'N', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.NORTH)),
 				'S', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.SOUTH)),
+				'W', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.WEST)),
+				'E', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.EAST)),
 				'l', new BlockState(Blocks.LADDER, Blocks.LADDER.getDefaultState().withProperty(BlockLadder.FACING, EnumFacing.SOUTH)),
 				' ', null,
-				'U', new BlockState(Blocks.STONE_BRICK_STAIRS, Blocks.STONE_BRICK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.NORTH).withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.BOTTOM).withProperty(BlockStairs.SHAPE, BlockStairs.EnumShape.STRAIGHT)));
+				'U', new BlockState(Blocks.STONE_BRICK_STAIRS, Blocks.STONE_BRICK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.NORTH).withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.BOTTOM).withProperty(BlockStairs.SHAPE, BlockStairs.EnumShape.STRAIGHT)),
+				'F', new BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.GOLEM_FIRE.ordinal()),
+				'M', new BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.GOLEM_PHYSICAL.ordinal()),
+				'G', new BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.GOLEM_WIND.ordinal()),
+				'#', Blocks.IRON_BARS);
 	}
 
 	@Override
@@ -262,7 +261,15 @@ public class RoomEntryDragon extends StaticRoom {
 
 	@Override
 	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start) {
-		return new LinkedList<>();
+		List<DungeonExitPoint> list = new LinkedList<>();
+		
+		BlockPos pos = new BlockPos(-1, 11, 1);
+		list.add(NostrumDungeon.asRotated(start, pos, EnumFacing.SOUTH));
+		
+		pos = new BlockPos(1, 11, 1);
+		list.add(NostrumDungeon.asRotated(start, pos, EnumFacing.SOUTH));
+		
+		return list;
 	}
 	
 	@Override

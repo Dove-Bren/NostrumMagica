@@ -23,6 +23,7 @@ public class RoomArena extends StaticRoom {
 		final BlockState wall = new StaticRoom.BlockState(DungeonBlock.instance(), DungeonBlock.instance().getDefaultState());
 		final BlockState lava = new StaticRoom.BlockState(Blocks.LAVA, Blocks.LAVA.getDefaultState());
 		final BlockState spawner = new StaticRoom.BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.DRAGON_RED.ordinal());
+		final BlockState obsidian = new StaticRoom.BlockState(Blocks.OBSIDIAN, Blocks.OBSIDIAN.getDefaultState());
 		
 		
 		int s = maxX - minX;
@@ -47,7 +48,7 @@ public class RoomArena extends StaticRoom {
 				} else if (x == minX || x == maxX || z == minZ || z == maxZ) {
 					// Outline
 					if (x == 0 && z == 0 && (y == 0 || y == 1)) {
-						state = null;
+						state = obsidian;
 					} else {
 						state = wall; 
 					}
@@ -58,7 +59,7 @@ public class RoomArena extends StaticRoom {
 					if (x < minX+3 || x > maxX -3 || z > maxZ - 3) {
 						state = lava;
 					} else if ((x-minX) % ((maxX - minX) / 5) == 0
-							&& !(z < maxZ - 5 && z > minZ + 3)) {
+							&& !(z > maxZ - 5 || z < minZ + 3)) {
 						state = lava;
 					} else {
 						state = wall;

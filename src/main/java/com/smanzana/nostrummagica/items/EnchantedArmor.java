@@ -41,7 +41,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 						items.get(element).put(slot, new HashMap<Integer, EnchantedArmor>());
 						for (int i = 0; i < 3; i++) {
 							ResourceLocation location = new ResourceLocation(NostrumMagica.MODID, "armor_" + slot.name().toLowerCase() + "_" + element.name().toLowerCase() + (i + 1));
-							EnchantedArmor armor =  new EnchantedArmor(location.getResourcePath(), slot, element, i + 1);
+							EnchantedArmor armor =  new EnchantedArmor(location.getResourcePath(), slot, element, i);
 							armor.setUnlocalizedName(location.getResourcePath());
 							GameRegistry.register(armor, location);
 							items.get(element).get(slot).put(i + 1, armor);
@@ -74,30 +74,33 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	
 	private static int calcArmor(EntityEquipmentSlot slot, EMagicElement element, int level) {
 		
+		// Ratio compared to BASE
+		// BASE is 14, 18, 22 for the whole set (with rounding errors)
 		float mod;
 		
 		switch (element) {
+						// 14, 18, 22  BASE
 		case EARTH:
-			mod = 0.8f;
+			mod = (22f/24f); // 11, 16.7, 18
 			break;
 		case ENDER:
-			mod = 0.9f;
+			mod = (20f/24f); // 12, 15, 18
 			break;
 		case FIRE:
-			mod = 1.15f;
+			mod = (20f/24f); // 12, 15, 18
 			break;
 		case PHYSICAL:
-			mod = 1.5f;
+			mod = 1f; // 15, 18.75, 22.5
 			break;
 		default:
-			mod = 1.0f;
+			mod = 0.5f;
 		}
 		
 		int base;
 		
 		switch (slot) {
 		case CHEST:
-			base = 6;
+			base = 8;
 			break;
 		case FEET:
 			base = 2;
@@ -106,7 +109,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			base = 2;
 			break;
 		case LEGS:
-			base = 5;
+			base = 6;
 			break;
 		default:
 			base = 0;
@@ -115,7 +118,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		if (base != 0)
 			base += level - 1;
 		
-		return (int) ((float) base * mod);
+		return Math.max(1, (int) ((float) base * mod));
 	}
 	
 	private int level;
@@ -266,7 +269,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	@Override
 	public ArmorProperties getProperties(EntityLivingBase player, ItemStack armor, DamageSource source, double damage,
 			int slot) {
-		return new ArmorProperties(1, 1.0, this.armor);
+		return new ArmorProperties(1, (double) this.armor / 25.0, Integer.MAX_VALUE);
 	}
 
 	@Override
@@ -276,6 +279,17 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 
 	@Override
 	public void damageArmor(EntityLivingBase entity, ItemStack stack, DamageSource source, int damage, int slot) {
+		//if (slot == 0) {
+			for (EMagicElement elem : new EMagicElement[] {EMagicElement.PHYSICAL, EMagicElement.EARTH, EMagicElement.ENDER})
+			for (EntityEquipmentSlot eslot : EntityEquipmentSlot.values()) {
+				if (eslot == EntityEquipmentSlot.MAINHAND || eslot == EntityEquipmentSlot.OFFHAND) {
+					continue;
+				}
+				
+				int armor = calcArmor(eslot, elem, 2);
+				System.out.println("armor for " + eslot + " (" + elem.name() + "): " + armor);
+			}
+		//}
 		stack.damageItem(damage, entity);
 	}
 	

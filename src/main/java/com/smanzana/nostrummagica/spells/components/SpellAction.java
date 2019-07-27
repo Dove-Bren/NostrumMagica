@@ -104,7 +104,7 @@ public class SpellAction {
 		
 		@Override
 		public void apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
-			float fin = calcDamage(entity, amount * efficiency, element);
+			float fin = calcDamage(caster, entity, amount * efficiency, element);
 			source.setLastAttacker(entity);
 			entity.attackEntityFrom(new MagicDamageSource(source, element), fin);
 			
@@ -1467,7 +1467,7 @@ public class SpellAction {
 		}
 	}
 	
-	public static final float calcDamage(EntityLivingBase target, float base, EMagicElement element) {
+	public static final float calcDamage(EntityLivingBase caster, EntityLivingBase target, float base, EMagicElement element) {
 		float amt = 0f;
 		
 		if (target == null)
@@ -1486,7 +1486,7 @@ public class SpellAction {
 		if (target.height < 1.5f || target instanceof EntityEnderman)
 			light = true;
 		
-		PotionEffect boostEffect = target.getActivePotionEffect(MagicBoostPotion.instance());
+		PotionEffect boostEffect = caster.getActivePotionEffect(MagicBoostPotion.instance());
 		if (boostEffect != null) {
 			base *= Math.pow(1.5, boostEffect.getAmplifier() + 1);
 		}
