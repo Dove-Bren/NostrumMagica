@@ -245,8 +245,8 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		// KNOWNELEMENTS
 		compound = tag.getCompoundTag(NBT_KNOWN_ELEMENTS);
 		for (String key : compound.getKeySet()) {
-			Boolean val = compound.getBoolean(key);
-			if (val != null && val) {
+			boolean val = compound.getBoolean(key);
+			if (val) {
 				EMagicElement elem = EMagicElement.valueOf(key);
 				instance.learnElement(elem);
 			}
@@ -264,8 +264,8 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		
 		compound = tag.getCompoundTag(NBT_ELEMENT_TRIALS);
 		for (String key : compound.getKeySet()) {
-			Boolean val = compound.getBoolean(key);
-			if (val != null && val) {
+			boolean val = compound.getBoolean(key);
+			if (val) {
 				EMagicElement elem = EMagicElement.valueOf(key);
 				instance.startTrial(elem);
 			}
@@ -289,8 +289,8 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 
 		compound = tag.getCompoundTag(NBT_ALTERATIONS);
 		for (String key : compound.getKeySet()) {
-			Boolean val = compound.getBoolean(key);
-			if (val != null && val) {
+			boolean val = compound.getBoolean(key);
+			if (val) {
 				EAlteration elem = EAlteration.valueOf(key);
 				instance.unlockAlteration(elem);
 			}

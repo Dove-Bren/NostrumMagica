@@ -99,41 +99,10 @@ public class RuneBagGui {
 					// shift-click in player inventory
 					ItemStack leftover = inventory.addItem(stack);
 					slot.putStack(leftover != null && leftover.stackSize <= 0 ? null : leftover);
-//					if (inventory.isItemValidForSlot(0, stack)) {
-//						for (int i = 0; i < inventory.getSizeInventory(); i++) {
-//							ItemStack inSlot = inventory.getStackInSlot(i);
-//							if (inSlot == null) {
-//								inventory.setInventorySlotContents(i, stack);
-//								stack = null;
-//								break;
-//							} else if (inSlot.getItem() == stack.getItem()
-//									&& inSlot.getMetadata() == stack.getMetadata()
-//									&& inSlot.stackSize < inventory.getInventoryStackLimit()) {
-//								int space = inventory.getInventoryStackLimit() - inSlot.stackSize;
-//								if (space >= stack.stackSize) {
-//									inSlot.stackSize += stack.stackSize;
-//									inventory.setInventorySlotContents(i, inSlot);
-//									stack = null;
-//									break;
-//								} else {
-//									inSlot.stackSize = inventory.getInventoryStackLimit();
-//									inventory.setInventorySlotContents(i, inSlot);
-//									stack.stackSize -= space;
-//								}
-//							}
-//						}
-//						
-//						if (stack == null || stack.stackSize <= 0) {
-//							slot.putStack(null);
-//						} else {
-//							slot.putStack(stack);
-//						}
-//						
-//					}
 				}
 			}
 			
-			if (slot != null && slot.getHasStack()) {
+			if (slot.getHasStack()) {
 				ItemStack cur = slot.getStack();
 				prev = cur.copy();
 				

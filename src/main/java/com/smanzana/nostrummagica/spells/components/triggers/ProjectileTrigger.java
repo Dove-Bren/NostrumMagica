@@ -86,7 +86,10 @@ public class ProjectileTrigger extends SpellTrigger {
 		}
 		
 		public void onProjectileHit(Entity entity) {
-			if (entity == null || !(entity instanceof EntityLivingBase)) {
+			if (entity == null) {
+				onProjectileHit(new BlockPos(this.pos));
+			}
+			else if (!(entity instanceof EntityLivingBase)) {
 				onProjectileHit(entity.getPosition());
 			} else {
 				getState().trigger(Lists.newArrayList((EntityLivingBase) entity), Lists.newArrayList(getState().getOther()), null, null);

@@ -66,7 +66,7 @@ public class NostrumMagic implements INostrumMagic {
 	private int tech;
 	private int finesse;
 	private int mana;
-	private int maxMana;
+	//private int maxMana; // We calculate max instead of storing it
 	private float modMana;
 	private float modManaCost;
 	private float modManaRegen;
@@ -126,7 +126,7 @@ public class NostrumMagic implements INostrumMagic {
 			level = 1;
 			xp = 0;
 			baseMaxMana = LevelCurves.maxMana(1);
-			mana = maxMana = getMaxMana();
+			mana = getMaxMana();
 			maxxp = LevelCurves.maxXP(1);
 			skillPoints = control = tech = finesse = 0;
 			bindingSpell = null;
@@ -153,7 +153,7 @@ public class NostrumMagic implements INostrumMagic {
 	public void setLevel(int level) {
 		this.level = level;
 		baseMaxMana = LevelCurves.maxMana(level);
-		mana = maxMana = getMaxMana(); 
+		mana = getMaxMana(); 
 		maxxp = LevelCurves.maxXP(level);
 	}
 
@@ -456,7 +456,6 @@ public class NostrumMagic implements INostrumMagic {
 		this.finesse = finesse;
 		this.mana = mana;
 		this.baseMaxMana = LevelCurves.maxMana(this.level);
-		this.maxMana = getMaxMana();
 		this.modMana = modMana;
 		this.modManaCost = modManaCost;
 		this.modManaRegen = modManaRegen;
