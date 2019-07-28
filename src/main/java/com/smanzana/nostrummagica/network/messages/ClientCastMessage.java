@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -104,6 +105,22 @@ public class ClientCastMessage implements IMessage {
 				if (equip.getItem() instanceof ISpellArmor) {
 					ISpellArmor armor = (ISpellArmor) equip.getItem();
 					armor.apply(sp, summary, equip);
+				}
+			}
+			
+			// Possible use baubles
+			IInventory baubles = NostrumMagica.baubles.getBaubles(sp);
+			if (baubles != null) {
+				for (int i = 0; i < baubles.getSizeInventory(); i++) {
+					ItemStack equip = baubles.getStackInSlot(i);
+					if (equip == null) {
+						continue;
+					}
+					
+					if (equip.getItem() instanceof ISpellArmor) {
+						ISpellArmor armor = (ISpellArmor) equip.getItem();
+						armor.apply(sp, summary, equip);
+					}
 				}
 			}
 			

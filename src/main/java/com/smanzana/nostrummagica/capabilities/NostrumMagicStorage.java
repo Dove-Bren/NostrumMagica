@@ -38,6 +38,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	private static final String NBT_MOD_MANA = "mod_mana";
 	private static final String NBT_MOD_MANA_COST = "mod_mana_cost";
 	private static final String NBT_MOD_MANA_REGEN = "mod_mana_regen";
+	private static final String NBT_MOD_MANA_BONUS = "mod_mana_bonus";
 	
 	//private static final String NBT_FAMILIARS = "familiars";
 	
@@ -79,6 +80,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		nbt.setFloat(NBT_MOD_MANA, instance.getManaModifier());
 		nbt.setFloat(NBT_MOD_MANA_COST, instance.getManaCostModifier());
 		nbt.setFloat(NBT_MOD_MANA_REGEN, instance.getManaRegenModifier());
+		nbt.setInteger(NBT_MOD_MANA_BONUS, instance.getManaBonus());
 		
 		NBTTagCompound compound = new NBTTagCompound();
 		{
@@ -226,6 +228,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			tag.getInteger(NBT_FINESSE),
 			tag.getInteger(NBT_MANA),
 			tag.getFloat(NBT_MOD_MANA),
+			tag.getInteger(NBT_MOD_MANA_BONUS),
 			tag.getFloat(NBT_MOD_MANA_COST),
 			tag.getFloat(NBT_MOD_MANA_REGEN));
 			

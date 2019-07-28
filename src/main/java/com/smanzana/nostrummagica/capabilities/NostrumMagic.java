@@ -67,7 +67,8 @@ public class NostrumMagic implements INostrumMagic {
 	private int finesse;
 	private int mana;
 	//private int maxMana; // We calculate max instead of storing it
-	private float modMana;
+	private float modMana; // Additional % mana
+	private int modManaFlat; // Additiona mana (flat int value)
 	private float modManaCost;
 	private float modManaRegen;
 	
@@ -234,7 +235,7 @@ public class NostrumMagic implements INostrumMagic {
 
 	@Override
 	public int getMaxMana() {
-		return Math.round(baseMaxMana * (1f + this.getManaModifier()));
+		return this.getManaBonus() + Math.round(baseMaxMana * (1f + this.getManaModifier()));
 	}
 
 	@Override
@@ -445,7 +446,7 @@ public class NostrumMagic implements INostrumMagic {
 
 	@Override
 	public void deserialize(boolean unlocked, int level, float xp, int skillpoints, int control, int tech, int finesse,
-			int mana, float modMana, float modManaCost, float modManaRegen) {
+			int mana, float modMana, int manaBonus, float modManaCost, float modManaRegen) {
 		this.unlocked = unlocked;
 		this.level = level;
 		this.xp = xp;
@@ -459,6 +460,7 @@ public class NostrumMagic implements INostrumMagic {
 		this.modMana = modMana;
 		this.modManaCost = modManaCost;
 		this.modManaRegen = modManaRegen;
+		this.modManaFlat = manaBonus;
 	}
 
 	@Override
@@ -507,7 +509,7 @@ public class NostrumMagic implements INostrumMagic {
 		this.deserialize(cap.isUnlocked(), cap.getLevel(), cap.getXP(),
 				cap.getSkillPoints(), cap.getControl(), cap.getTech(),
 				cap.getFinesse(), cap.getMana(),
-				cap.getManaModifier(), cap.getManaCostModifier(), cap.getManaRegenModifier());
+				cap.getManaModifier(), cap.getManaBonus(), cap.getManaCostModifier(), cap.getManaRegenModifier());
 		
 		this.loreLevels = cap.serializeLoreLevels();
 		this.spellCRCs = cap.serializeSpellHistory();
@@ -553,6 +555,11 @@ public class NostrumMagic implements INostrumMagic {
 	public void addManaModifier(float modifier) {
 		this.modMana += modifier;
 	}
+	
+	@Override
+	public void addManaBonus(int mana) {
+		this.modManaFlat += mana;
+	}
 
 	@Override
 	public void addManaRegenModifier(float modifier) {
@@ -567,6 +574,11 @@ public class NostrumMagic implements INostrumMagic {
 	@Override
 	public float getManaModifier() {
 		return this.modMana;
+	}
+	
+	@Override
+	public int getManaBonus() {
+		return this.modManaFlat;
 	}
 
 	@Override

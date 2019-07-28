@@ -120,6 +120,7 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -449,7 +450,7 @@ public class ClientProxy extends CommonProxy {
 		super.postinit();
 	}
 	
-	private static void registerModel(Item item, int meta, String modelName) {
+	public static void registerModel(Item item, int meta, String modelName) {
 		Minecraft.getMinecraft().getRenderItem().getItemModelMesher()
     	.register(item, meta,
     			new ModelResourceLocation(NostrumMagica.MODID + ":" + modelName, "inventory"));
@@ -543,6 +544,22 @@ public class ClientProxy extends CommonProxy {
 			if (equip.getItem() instanceof ISpellArmor) {
 				ISpellArmor armor = (ISpellArmor) equip.getItem();
 				armor.apply(player, summary, equip);
+			}
+		}
+		
+		// Possible use baubles
+		IInventory baubles = NostrumMagica.baubles.getBaubles(player);
+		if (baubles != null) {
+			for (int i = 0; i < baubles.getSizeInventory(); i++) {
+				ItemStack equip = baubles.getStackInSlot(i);
+				if (equip == null) {
+					continue;
+				}
+				
+				if (equip.getItem() instanceof ISpellArmor) {
+					ISpellArmor armor = (ISpellArmor) equip.getItem();
+					armor.apply(player, summary, equip);
+				}
 			}
 		}
 		

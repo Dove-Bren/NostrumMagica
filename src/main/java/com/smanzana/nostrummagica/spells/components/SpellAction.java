@@ -9,6 +9,8 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble;
+import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble.ItemType;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -47,6 +49,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
@@ -57,6 +60,7 @@ import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
@@ -323,6 +327,25 @@ public class SpellAction {
 		@Override
 		public void apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
 			NostrumMagicaSounds.STATUS_BUFF1.play(entity);
+			
+			if (caster != null && caster instanceof EntityPlayer) {
+				// Look for lightning belt
+				IInventory baubles = NostrumMagica.baubles.getBaubles((EntityPlayer) caster);
+				if (baubles != null) {
+					for (int i = 0; i < baubles.getSizeInventory(); i++) {
+						ItemStack stack = baubles.getStackInSlot(i);
+						if (stack == null || !(stack.getItem() instanceof ItemMagicBauble)) {
+							continue;
+						}
+						
+						ItemType type = ItemMagicBauble.getTypeFromMeta(stack.getMetadata());
+						if (type == ItemType.BELT_ENDER) {
+							efficiency *= 2;
+							break;
+						}
+					}
+				}
+			}
 			
 			// Apply efficiency bonus
 			float dist = this.dist * efficiency;
@@ -729,9 +752,52 @@ public class SpellAction {
 
 		@Override
 		public void apply(EntityLivingBase caster, World world, BlockPos block, float efficiency) {
-			world.addWeatherEffect(
-					new EntityLightningBolt(world, block.getX() + 0.5, block.getY(), block.getZ() + 0.5, false)
+			
+			int count = 1;
+			
+			if (caster != null && caster instanceof EntityPlayer) {
+				// Look for lightning belt
+				IInventory baubles = NostrumMagica.baubles.getBaubles((EntityPlayer) caster);
+				if (baubles != null) {
+					for (int i = 0; i < baubles.getSizeInventory(); i++) {
+						ItemStack stack = baubles.getStackInSlot(i);
+						if (stack == null || !(stack.getItem() instanceof ItemMagicBauble)) {
+							continue;
+						}
+						
+						ItemType type = ItemMagicBauble.getTypeFromMeta(stack.getMetadata());
+						if (type == ItemType.BELT_LIGHTNING) {
+							count = caster.getRNG().nextInt(3) + 3;
+							break;
+						}
+					}
+				}
+			}
+			
+			MutableBlockPos cursor = new MutableBlockPos(block);
+			Random rand = (caster == null ? new Random() : caster.getRNG());
+			for (int i = 0; i < count; i++) {
+				
+				if (i == 0) {
+					; // Don't adjust pos
+				} else {
+					// Apply random x/z offsets. Then step up to 4 to find surface
+					cursor.setPos(
+							block.getX() + rand.nextInt(4) - 2,
+							block.getY() - 2,
+							block.getZ() + rand.nextInt(4) - 2);
+					
+					// Find surface
+					int dist = 0;
+					while (dist++ < 4 && !world.isAirBlock(cursor)) {
+						cursor.setY(cursor.getY() + 1);
+					}
+				}
+				
+				world.addWeatherEffect(
+					new EntityLightningBolt(world, cursor.getX() + 0.5, cursor.getY(), cursor.getZ() + 0.5, false)
 					);
+			}
 		}
 		
 	}
@@ -929,12 +995,32 @@ public class SpellAction {
 				entity.hurtResistantTime = 0;
 			}
 			
+			double radius = 32.0 * level * efficiency;
+			
+			if (caster != null && caster instanceof EntityPlayer) {
+				// Look for ender belt
+				IInventory baubles = NostrumMagica.baubles.getBaubles((EntityPlayer) caster);
+				if (baubles != null) {
+					for (int i = 0; i < baubles.getSizeInventory(); i++) {
+						ItemStack stack = baubles.getStackInSlot(i);
+						if (stack == null || !(stack.getItem() instanceof ItemMagicBauble)) {
+							continue;
+						}
+						
+						ItemType type = ItemMagicBauble.getTypeFromMeta(stack.getMetadata());
+						if (type == ItemType.BELT_ENDER) {
+							radius *= 2.0;
+							break;
+						}
+					}
+				}
+			}
+			
 			NostrumMagicaSounds.DAMAGE_ENDER.play(entity);
 			
 			for (int i = 0; i < 20; i++) {
 			
 				// Find a random place to teleport
-				double radius = 32.0 * level * efficiency;
 		        double x = entity.posX + (NostrumMagica.rand.nextDouble() - 0.5D) * radius;
 		        double y = entity.posY + (double)(NostrumMagica.rand.nextInt((int) radius) - (int) radius / 2.0);
 		        double z = entity.posZ + (NostrumMagica.rand.nextDouble() - 0.5D) * radius;

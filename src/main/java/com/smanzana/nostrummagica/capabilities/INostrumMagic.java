@@ -51,12 +51,14 @@ public interface INostrumMagic {
 	public void setMaxMana(int max);
 	
 	// Modifiers
-	public float getManaModifier();
+	public float getManaModifier(); // % bonus
+	public int getManaBonus(); // flat int bonus
 	public float getManaRegenModifier();
 	public float getManaCostModifier();
 	public void addManaModifier(float modifier);
 	public void addManaRegenModifier(float modifier);
 	public void addManaCostModifer(float modifier);
+	public void addManaBonus(int bonus);
 	
 	// Familiars
 	public List<EntityLivingBase> getFamiliars();
@@ -114,6 +116,7 @@ public interface INostrumMagic {
 			int finesse,
 			int mana,
 			float mod_mana,
+			int bonus_mana,
 			float mod_mana_cost,
 			float mod_mana_regen
 			);

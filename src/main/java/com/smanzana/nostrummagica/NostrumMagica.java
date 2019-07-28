@@ -9,6 +9,7 @@ import java.util.Random;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.smanzana.nostrummagica.baubles.BaublesProxy;
 import com.smanzana.nostrummagica.capabilities.AttributeProvider;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.command.CommandAllQuests;
@@ -113,6 +114,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -125,7 +127,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 
-@Mod(modid = NostrumMagica.MODID, version = NostrumMagica.VERSION, guiFactory = "com.smanzana.nostrummagica.config.ConfigGuiFactory")
+@Mod(modid = NostrumMagica.MODID, version = NostrumMagica.VERSION, guiFactory = "com.smanzana.nostrummagica.config.ConfigGuiFactory", dependencies = "after:Baubles")
 public class NostrumMagica implements IMagicListener
 {
     public static final String MODID = "nostrummagica";
@@ -135,6 +137,8 @@ public class NostrumMagica implements IMagicListener
     @SidedProxy(clientSide="com.smanzana.nostrummagica.proxy.ClientProxy", serverSide="com.smanzana.nostrummagica.proxy.CommonProxy")
     public static CommonProxy proxy;
     public static NostrumMagica instance;
+    @SidedProxy(clientSide="com.smanzana.nostrummagica.baubles.BaublesClientProxy", serverSide="com.smanzana.nostrummagica.baubles.BaublesProxy")
+    public static BaublesProxy baubles;
     
     public static CreativeTabs creativeTab;
     public static CreativeTabs enhancementTab;
@@ -149,6 +153,7 @@ public class NostrumMagica implements IMagicListener
     @EventHandler
     public void init(FMLInitializationEvent event) {
         proxy.init();
+        baubles.init();
         new NostrumLootHandler();
     }
     
@@ -174,8 +179,13 @@ public class NostrumMagica implements IMagicListener
 	    	}
 	    };
 	    SpellTomePage.instance().setCreativeTab(NostrumMagica.enhancementTab);
+	    
+	    if (Loader.isModLoaded("Baubles")) {
+	    	baubles.enable();
+	    }
     	
     	proxy.preinit();
+    	baubles.preInit();
     	
     	spellRegistry = new SpellRegistry();
     	RitualRegistry.instance();
@@ -197,11 +207,13 @@ public class NostrumMagica implements IMagicListener
     	NostrumChunkLoader.instance();
     	
     	SpellTomeEnhancement.initDefaultEnhancements();
+    	
     }
     
     @EventHandler
     public void postinit(FMLPostInitializationEvent event) {
     	proxy.postinit();
+    	baubles.postInit();
     	
     	playerListener.registerTimer(this, 20 * 60 * 5, 20 * 60 * 5);
     }
@@ -1278,7 +1290,7 @@ public class NostrumMagica implements IMagicListener
     									.requiredAlteration(EAlteration.SUPPORT)
     									.requiredAlteration(EAlteration.GROWTH),
     			wrapAttribute(AwardType.REGEN, 0.100f))
-    		.offset(3, 10);
+    		.offset(1, 10);
     	
 //    	new NostrumQuest("advanced_bags", QuestType.REGULAR, 5,
 //    			0, // Control
@@ -1363,6 +1375,28 @@ public class NostrumMagica implements IMagicListener
     	INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
 			return false;
+		
+		String[] parents = quest.getParentKeys();
+		if (parents != null && parents.length > 0) {
+			List<String> completed = attr.getCompletedQuests();
+			boolean found = false;
+			for (String parent : parents) {
+				for (String comp : completed) {
+					if (comp.equalsIgnoreCase(parent)) {
+						found = true;
+						break;
+					}
+				}
+				
+				if (found) {
+					break;
+				}
+			}
+			
+			if (!found) {
+				return false;
+			}
+		}
 		
 		return quest.getReqLevel() <= attr.getLevel()
 				&& quest.getReqControl() <= attr.getControl()
