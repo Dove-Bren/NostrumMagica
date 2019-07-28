@@ -30,8 +30,6 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 	
@@ -118,19 +116,19 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 		
 	}
 	
-	@SideOnly(Side.CLIENT)
-    public int getBrightnessForRender(float partialTicks)
-    {
-        return 15728880;
-    }
-
-    /**
-     * Gets how bright this entity is.
-     */
-    public float getBrightness(float partialTicks)
-    {
-        return 1.0F;
-    }
+//	@SideOnly(Side.CLIENT)
+//    public int getBrightnessForRender(float partialTicks)
+//    {
+//        return 15728880;
+//    }
+//
+//    /**
+//     * Gets how bright this entity is.
+//     */
+//    public float getBrightness(float partialTicks)
+//    {
+//        return 1.0F;
+//    }
     
 	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
 //		int count = this.rand.nextInt(2);

@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.entity;
 
 import com.smanzana.nostrummagica.entity.tasks.DragonAINearestAttackableTarget;
+import com.smanzana.nostrummagica.entity.tasks.DragonFlyEvasionTask;
 import com.smanzana.nostrummagica.entity.tasks.DragonFlyRandomTask;
 import com.smanzana.nostrummagica.entity.tasks.DragonLandTask;
 import com.smanzana.nostrummagica.entity.tasks.DragonMeleeAttackTask;
@@ -322,7 +323,8 @@ public class EntityDragonRed extends EntityDragon {
 			new EntityAIBase[] {
         		new DragonLandTask(this),
         		new DragonMeleeAttackTask(this, 1.0D, true),
-        		new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 3), 20, true, DSPELL_Fireball),
+        		new DragonFlyEvasionTask(this, 1.0D),
+        		new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 3), 10, true, DSPELL_Fireball),
         		//new DragonFlyStrafeTask<EntityDragonRed>(this, 20),
         		new DragonTakeoffLandTask(this),
         		new DragonFlyRandomTask(this),
@@ -331,6 +333,7 @@ public class EntityDragonRed extends EntityDragon {
 				new DragonLandTask(this),
         		new DragonMeleeAttackTask(this, 1.0D, true),
         		new DragonTakeoffLandTask(this),
+        		new DragonFlyEvasionTask(this, 1.0D),
 				new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 3), 12, true, DSPELL_Fireball2),
 				new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 5), 10, false, DSPELL_Speed, DSPELL_Shield),
 				new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 5), 20, false, DSPELL_Weaken),
@@ -428,7 +431,7 @@ public class EntityDragonRed extends EntityDragon {
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
         this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.33D);
-        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(2000.0D);
+        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(1000.0D);
         this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(15.0D);
         this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(15.0D);
         this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_SPEED);

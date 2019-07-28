@@ -69,11 +69,11 @@ public class DragonMeleeAttackTask extends EntityAIAttackMelee {
 	@Override
 	public void startExecuting() {
 		super.startExecuting();
+		stallTicks = 0;
 	}
 	
 	@Override
 	public void updateTask() {
-		
 		// Can't call super: Want to adjust tactics based on whether we're flying. >.<
 		boolean flying = false;
 		if (this.attacker instanceof EntityDragonRed) {

@@ -34,6 +34,7 @@ public class ModConfig {
 		OBELISK_LIST(Category.DISPLAY, "obelisk_list", false, false, "Display known teleportation points in the obelisk as a list"),
 		EFFECT_DISPLAY(Category.DISPLAY, "display_effects", true, false, "Allow cool client effects to be rendered. Turn off to enhance performance"),
 		MIRROR_NODE_SPOILERS(Category.DISPLAY, "display_mirror_spoilers", false, false, "If true, show ALL magic mirror upgrades regardless of proximity"),
+		ARMOR_DISPLAY(Category.DISPLAY, "overarmor_display", true, false, "Enable displaying armor overlay when armor is > 20 units"),
 		
 		LOGIN_TEXT(Category.DISPLAY, "display_login_text", true, false, "On login, show Nostrum Magica welcome text"),
 		
@@ -441,5 +442,9 @@ public class ModConfig {
 	
 	public boolean displayAllMirrorNodes() {
 		return getBooleanValue(Key.MIRROR_NODE_SPOILERS, false);
+	}
+	
+	public boolean displayArmorOverlay() {
+		return getBooleanValue(Key.ARMOR_DISPLAY, false);
 	}
 }

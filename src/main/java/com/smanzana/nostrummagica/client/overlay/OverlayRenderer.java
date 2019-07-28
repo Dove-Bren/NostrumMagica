@@ -67,15 +67,10 @@ public class OverlayRenderer extends Gui {
 			
 			renderSpellSlide(player, scaledRes, attr);
 		} else if (event.getType() == ElementType.ARMOR) {
-			renderArmorOverlay(player, scaledRes);
+			if (ModConfig.config.displayArmorOverlay()) {
+				renderArmorOverlay(player, scaledRes);
+			}
 		}
-		
-		
-		
-		
-		
-		
-		
 		
 	}
 	
