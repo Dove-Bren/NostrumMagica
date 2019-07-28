@@ -255,7 +255,9 @@ public class ClientProxy extends CommonProxy {
     	variants = list.toArray(new ResourceLocation[0]);
     	ModelBakery.registerItemVariants(NostrumResourceItem.instance(), variants);
     	
-    	ModelBakery.registerItemVariants(ThanosStaff.instance(), new ResourceLocation(NostrumMagica.MODID, ThanosStaff.ID + "_activated"));
+    	ModelBakery.registerItemVariants(ThanosStaff.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, ThanosStaff.ID),
+    			new ResourceLocation(NostrumMagica.MODID, ThanosStaff.ID + "_activated"));
     	
     	TileEntitySymbolRenderer.init();
     	TileEntityCandleRenderer.init();
