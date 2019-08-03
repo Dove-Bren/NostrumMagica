@@ -234,6 +234,7 @@ entity.nostrummagica.ender_golem.name=End Golem
 entity.nostrummagica.spell_projectile.name=Spell Projectile
 entity.nostrummagica.entity_koid.name=Koid
 entity.nostrummagica.entity_dragon_red.name=Red Dragon
+entity.nostrummagica.entity_tame_dragon_red.name=Baby Red Dragon
 
 itemGroup.nostrummagica=Nostrum Magica
 itemGroup.nostrummagica_enhancements=Nostrum Enhancements

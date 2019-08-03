@@ -30,7 +30,6 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAIWander;
-import net.minecraft.entity.ai.EntityMoveHelper;
 import net.minecraft.entity.monster.EntityGiantZombie;
 import net.minecraft.entity.monster.EntityPolarBear;
 import net.minecraft.entity.monster.EntityZombie;
@@ -41,53 +40,29 @@ import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.BossInfo;
 import net.minecraft.world.BossInfoServer;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class EntityDragonRed extends EntityDragon {
+public class EntityDragonRed extends EntityDragonRedBase {
 
-	private static enum FlyState {
-		LANDED,
-		TAKING_OFF,
-		FLYING,
-		LANDING,
-	}
-	
 	private static enum DragonPhase {
 		GROUNDED_PHASE,
 		FLYING_PHASE,
 		RAMPAGE_PHASE,
 	}
 	
-	private static final DataParameter<Integer> DRAGON_FLYING =
-			EntityDataManager.<Integer>createKey(EntityDragonRed.class, DataSerializers.VARINT);
-	private static final DataParameter<Boolean> DRAGON_SLASH =
-			EntityDataManager.<Boolean>createKey(EntityDragonRed.class, DataSerializers.BOOLEAN);
-	private static final DataParameter<Boolean> DRAGON_BITE =
-			EntityDataManager.<Boolean>createKey(EntityDragonRed.class, DataSerializers.BOOLEAN);
 	private static final DataParameter<Integer> DRAGON_PHASE =
 			EntityDataManager.<Integer>createKey(EntityDragonRed.class, DataSerializers.VARINT);
 	
-	private static final String DRAGON_SERIAL_FLYING_TOK = "DragonFlying";
 	private static final String DRAGON_SERIAL_PHASE_TOK = "DragonPhase";
 
-	// How long landing or taking off takes, in milliseconds
-	public static long ANIM_UNFURL_DUR = 1000;
-	
-	public static long ANIM_SLASH_DUR = 500;
-	
-	public static long ANIM_BITE_DUR = 250;
-	
 	private static Spell DSPELL_Fireball;
 	private static Spell DSPELL_Fireball2;
 	private static Spell DSPELL_Speed;
@@ -181,17 +156,6 @@ public class EntityDragonRed extends EntityDragon {
 	
 	private final BossInfoServer bossInfo = (BossInfoServer)(new BossInfoServer(this.getDisplayName(), BossInfo.Color.RED, BossInfo.Overlay.NOTCHED_10)).setDarkenSky(true);
 	
-	// Time we entered our current flying state.
-	// Used for animations.
-	// Set on every state change, meaning the time indicated
-	// depends on our state.
-	private long flyStateTime;
-	
-	// Time in MS when we last slashed.
-	private long slashTime;
-	
-	private long biteTime;
-	
 	// AI. First array is indexed by the phase. Second is just a collection of tasks.
 	private EntityAIBase[][] flyingAI;
 	private EntityAIBase[][] groundedAI;
@@ -206,8 +170,6 @@ public class EntityDragonRed extends EntityDragon {
         this.ignoreFrustumCheck = true;
         this.experienceValue = 1000;
         this.noClip = false;
-        
-        this.setFlyState(FlyState.LANDED);
 	}
 	
 	private DragonPhase getPhase() {
@@ -216,26 +178,6 @@ public class EntityDragonRed extends EntityDragon {
 	
 	private void setPhase(DragonPhase phase) {
 		this.dataManager.set(DRAGON_PHASE, phase.ordinal());
-	}
-	
-	private FlyState getFlyState() {
-		return FlyState.values()[this.dataManager.get(DRAGON_FLYING).intValue()];
-	}
-	
-	private void setFlyState(FlyState state) {
-		this.dataManager.set(DRAGON_FLYING, state.ordinal());
-		//onFlightStateChange();
-	}
-	
-	private void onFlightStateChange() {
-		flyStateTime = System.currentTimeMillis();
-		
-		FlyState state = getFlyState();
-		if (state == FlyState.FLYING) {
-			entityStartFlying();
-		} else if (state == FlyState.LANDED) {
-			entityStopFlying();
-		}
 	}
 	
 	private void onPhaseChange() {
@@ -261,55 +203,10 @@ public class EntityDragonRed extends EntityDragon {
 	
 	@Override
 	public void notifyDataManagerChange(DataParameter<?> key) {
-		if (key == DRAGON_FLYING) {
-			onFlightStateChange();
-		} else if (key == DRAGON_SLASH) {
-			if (this.dataManager.get(DRAGON_SLASH)) {
-				this.slashTime = System.currentTimeMillis();
-			}
-		} else if (key == DRAGON_BITE) {
-			if (this.dataManager.get(DRAGON_BITE)) {
-				this.biteTime = System.currentTimeMillis();
-			}
-		} else if (key == DRAGON_PHASE) {
+		super.notifyDataManagerChange(key);
+		if (key == DRAGON_PHASE) {
 			onPhaseChange();
 		}
-	}
-	
-	public boolean isFlying() {
-		FlyState state = getFlyState();
-		return state == FlyState.FLYING
-				|| (state == FlyState.LANDING && !this.onGround);
-	}
-	
-	// Bad name, but are we currently landing or taking off?
-	public boolean isFlightTransitioning() {
-		FlyState state = getFlyState();
-		return state == FlyState.LANDING
-				|| state == FlyState.TAKING_OFF;
-	}
-	
-	// For use in conjunction with isFlightTransitioning.
-	public boolean isLanding() {
-		FlyState state = getFlyState();
-		return state == FlyState.LANDING;
-	}
-	
-	@Override
-	public boolean isTryingToLand() {
-		return isLanding();
-	}
-	
-	public long getFlyStateTime() {
-		return flyStateTime;
-	}
-	
-	public long getLastSlashTime() {
-		return this.slashTime;
-	}
-	
-	public long getLastBiteTime() {
-		return this.biteTime;
 	}
 	
 	private void initBaseAI() {
@@ -354,12 +251,12 @@ public class EntityDragonRed extends EntityDragon {
         		new EntityAIWander(this, 1.0D, 30)
         	},
         	new EntityAIBase[] {
+        		new DragonTakeoffLandTask(this),
+    			new DragonMeleeAttackTask(this, 1.0D, true),
     			new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 3), 12, true, DSPELL_Fireball2),
 				new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 5), 10, false, DSPELL_Speed, DSPELL_Shield),
 				new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 5), 20, false, DSPELL_Weaken),
 				new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 30), 20, true, DSPELL_Curse),
-        		new DragonTakeoffLandTask(this),
-    			new DragonMeleeAttackTask(this, 1.0D, true),
         		new EntityAIWander(this, 1.0D, 30)
         	}
         		
@@ -379,7 +276,8 @@ public class EntityDragonRed extends EntityDragon {
 		this.targetTasks.addTask(10, new DragonAINearestAttackableTarget<EntityPolarBear>(this, EntityPolarBear.class, true));
 	}
 	
-	private void setFlyingAI() {
+	@Override
+	protected void setFlyingAI() {
 		DragonPhase phase = this.getPhase();
 		// Remove grounded
 		if (lastAI != null) {
@@ -397,7 +295,8 @@ public class EntityDragonRed extends EntityDragon {
 		}
 	}
 	
-	private void setGroundedAI() {
+	@Override
+	protected void setGroundedAI() {
 		DragonPhase phase = this.getPhase();
 		
 		// Remove flying
@@ -418,6 +317,7 @@ public class EntityDragonRed extends EntityDragon {
 	
 	@Override
 	protected void initEntityAI() {
+		super.initEntityAI();
 		this.initBaseAI();
 		
 		if (isFlying()) {
@@ -442,9 +342,6 @@ public class EntityDragonRed extends EntityDragon {
 	@Override
 	protected void entityInit() {
 		super.entityInit();
-		this.dataManager.register(DRAGON_FLYING, FlyState.LANDED.ordinal());
-		this.dataManager.register(DRAGON_SLASH, false);
-		this.dataManager.register(DRAGON_BITE, false);
 		this.dataManager.register(DRAGON_PHASE, DragonPhase.GROUNDED_PHASE.ordinal());
 	}
 	
@@ -468,153 +365,16 @@ public class EntityDragonRed extends EntityDragon {
         	int i = compound.getByte(DRAGON_SERIAL_PHASE_TOK);
             this.setPhase(DragonPhase.values()[i]);
         }
-		
-        if (compound.hasKey(DRAGON_SERIAL_FLYING_TOK, NBT.TAG_ANY_NUMERIC)) {
-        	int i = compound.getByte(DRAGON_SERIAL_FLYING_TOK);
-        	FlyState state = FlyState.values()[i];
-        	if (state == FlyState.LANDING) {
-        		// Actaully flying. Cancel landing
-        		state = FlyState.FLYING;
-        	} else if (state == FlyState.TAKING_OFF) {
-        		// Still on the ground
-        		state = FlyState.LANDED;
-        	}
-            this.setFlyState(state);
-        }
 	}
 	
 	public void writeEntityToNBT(NBTTagCompound compound) {
     	super.writeEntityToNBT(compound);
     	compound.setByte(DRAGON_SERIAL_PHASE_TOK, (byte)this.getPhase().ordinal());
-        compound.setByte(DRAGON_SERIAL_FLYING_TOK, (byte)this.getFlyState().ordinal());
-	}
-	
-	public void startFlying() {
-		if (getFlyState() == FlyState.LANDED) {
-			setFlyState(FlyState.TAKING_OFF);
-		}
-	}
-	
-	public void startLanding() {
-		if (getFlyState() == FlyState.FLYING) {
-			setFlyState(FlyState.LANDING);
-		}
-	}
-	
-	// Actually start flying. Called internally when animations are done.
-	private void entityStartFlying() {
-		if (!this.worldObj.isRemote) {
-			this.moveHelper = new EntityDragon.DragonFlyMoveHelper(this);
-			this.navigator = new EntityDragon.PathNavigateDragonFlier(this, worldObj);
-			this.setFlyingAI();
-		}
-		
-		this.setNoGravity(true);
-		this.addVelocity(Math.cos(this.rotationYaw) * .2, 0.5, Math.sin(this.rotationYaw) * .2);
-	}
-	
-	private void entityStopFlying() {
-		if (!this.worldObj.isRemote) {
-			this.moveHelper = new EntityMoveHelper(this);
-			this.navigator = this.getNewNavigator(worldObj);
-			this.setGroundedAI();
-		}
-		this.setNoGravity(false);
-	}
-	
-	public void slash(EntityLivingBase target) {
-		this.dataManager.set(DRAGON_SLASH, Boolean.TRUE);
-		
-		this.attackEntityAsMob(target);
-	}
-	
-	public void bite(EntityLivingBase target) {
-		this.dataManager.set(DRAGON_BITE, Boolean.TRUE);
-		
-		NostrumMagicaSounds.DRAGON_BITE.play(this);
-		
-		this.biteDamageInternal(target);
-	}
-	
-	private void biteDamageInternal(EntityLivingBase target) {
-		float f = (float)this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
-		
-		// Dragons do 20 damage while on the ground, and 16 when flying
-		if (!this.isFlying()) {
-			f *= 2.0;
-		} else {
-			f *= 1.6;
-		}
-		
-		int i = 0;
-
-		i = 2;
-
-		boolean flag = target.attackEntityFrom(DamageSource.causeMobDamage(this), f);
-
-		if (flag)
-		{
-			if (i > 0)
-			{
-				target.knockBack(this, (float)i * 0.5F, (double)MathHelper.sin(this.rotationYaw * 0.017453292F), (double)(-MathHelper.cos(this.rotationYaw * 0.017453292F)));
-				this.motionX *= 0.6D;
-				this.motionZ *= 0.6D;
-			}
-
-			if (target instanceof EntityPlayer)
-			{
-				EntityPlayer entityplayer = (EntityPlayer)target;
-				ItemStack itemstack1 = entityplayer.isHandActive() ? entityplayer.getActiveItemStack() : null;
-
-				if (itemstack1 != null && itemstack1.getItem() == Items.SHIELD)
-				{
-					float f1 = 0.5F;
-
-					if (this.rand.nextFloat() < f1)
-					{
-						entityplayer.getCooldownTracker().setCooldown(Items.SHIELD, 100);
-						this.worldObj.setEntityState(entityplayer, (byte)30);
-					}
-				}
-			}
-		}
 	}
 	
 	@Override
 	public void onUpdate() {
 		super.onUpdate();
-		
-		//System.out.println("(" + this.posX + ", " + this.posZ + ")");
-		
-		long now = System.currentTimeMillis();
-		if (isFlightTransitioning()) {
-			// Still unfurling wings and stuff. Wait to transition!
-			boolean landing = (FlyState.LANDING == getFlyState());
-			
-			if (landing && !this.onGround) {
-				; // Let movement AI keep going till we find ground
-			} else {
-				if (now - flyStateTime >= ANIM_UNFURL_DUR) {
-					if (landing) {
-						setFlyState(FlyState.LANDED);
-					} else {
-						setFlyState(FlyState.FLYING);
-					}
-				}
-			}
-		}
-		
-		if (this.dataManager.get(DRAGON_SLASH)) {
-			if (now - slashTime >= ANIM_SLASH_DUR) {
-				this.dataManager.set(DRAGON_SLASH, Boolean.FALSE);
-			}
-		}
-		
-		if (this.dataManager.get(DRAGON_BITE)) {
-			if (now - biteTime >= ANIM_BITE_DUR) {
-				this.dataManager.set(DRAGON_BITE, Boolean.FALSE);
-			}
-		}
 		
 		DragonPhase phase = this.getPhase();
 		if (phase == DragonPhase.GROUNDED_PHASE) {

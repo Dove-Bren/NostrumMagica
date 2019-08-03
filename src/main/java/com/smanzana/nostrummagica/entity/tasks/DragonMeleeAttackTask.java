@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.entity.tasks;
 
 import com.smanzana.nostrummagica.entity.EntityDragon;
-import com.smanzana.nostrummagica.entity.EntityDragonRed;
+import com.smanzana.nostrummagica.entity.EntityDragonFlying;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -25,8 +25,8 @@ public class DragonMeleeAttackTask extends EntityAIAttackMelee {
 		this.biteTick = Math.max(0, this.biteTick - 1);
 		boolean flying = false;
 		
-		if (this.attacker instanceof EntityDragonRed) {
-			flying = ((EntityDragonRed) this.attacker).isFlying();
+		if (this.attacker instanceof EntityDragonFlying) {
+			flying = ((EntityDragonFlying) this.attacker).isFlying();
 		}
 		
 		if (flying && biteTick > 0) {
@@ -45,8 +45,8 @@ public class DragonMeleeAttackTask extends EntityAIAttackMelee {
 			
 			boolean flying = false;
 			
-			if (this.attacker instanceof EntityDragonRed) {
-				flying = ((EntityDragonRed) this.attacker).isFlying();
+			if (this.attacker instanceof EntityDragonFlying) {
+				flying = ((EntityDragonFlying) this.attacker).isFlying();
 			}
 			
 			if (flying && biteTick > 0) {
@@ -76,8 +76,8 @@ public class DragonMeleeAttackTask extends EntityAIAttackMelee {
 	public void updateTask() {
 		// Can't call super: Want to adjust tactics based on whether we're flying. >.<
 		boolean flying = false;
-		if (this.attacker instanceof EntityDragonRed) {
-			flying = ((EntityDragonRed) this.attacker).isFlying();
+		if (this.attacker instanceof EntityDragonFlying) {
+			flying = ((EntityDragonFlying) this.attacker).isFlying();
 		}
 		
 		//this.biteTick = Math.max(0, this.biteTick - 1);
@@ -107,8 +107,8 @@ public class DragonMeleeAttackTask extends EntityAIAttackMelee {
 		double reach = this.getAttackReachSqr(entity);
 		boolean flying = false;
 		
-		if (this.attacker instanceof EntityDragonRed) {
-			flying = ((EntityDragonRed) this.attacker).isFlying();
+		if (this.attacker instanceof EntityDragonFlying) {
+			flying = ((EntityDragonFlying) this.attacker).isFlying();
 		}
 		
 

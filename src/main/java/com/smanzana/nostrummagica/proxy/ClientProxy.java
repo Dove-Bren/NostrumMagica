@@ -46,13 +46,16 @@ import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.EntityKoid;
+import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.renderer.ModelGolem;
 import com.smanzana.nostrummagica.entity.renderer.RenderDragonRed;
 import com.smanzana.nostrummagica.entity.renderer.RenderGolem;
 import com.smanzana.nostrummagica.entity.renderer.RenderKoid;
+import com.smanzana.nostrummagica.entity.renderer.RenderTameDragonRed;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
+import com.smanzana.nostrummagica.items.DragonEgg;
 import com.smanzana.nostrummagica.items.DragonEggFragment;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
@@ -187,6 +190,12 @@ public class ClientProxy extends CommonProxy {
 				return new RenderDragonRed(manager, 5);
 			}
 		});
+		RenderingRegistry.registerEntityRenderingHandler(EntityTameDragonRed.class, new IRenderFactory<EntityTameDragonRed>() {
+			@Override
+			public Render<? super EntityTameDragonRed> createRenderFor(RenderManager manager) {
+				return new RenderTameDragonRed(manager, 2);
+			}
+		});
 		
 		ResourceLocation variants[] = new ResourceLocation[ReagentType.values().length];
 		int i = 0;
@@ -281,6 +290,7 @@ public class ClientProxy extends CommonProxy {
 		registerModel(SpellScroll.instance(), 2, SpellScroll.id);
 		registerModel(BlankScroll.instance(), 0, BlankScroll.id);
 		registerModel(DragonEggFragment.instance(), 0, DragonEggFragment.id);
+		registerModel(DragonEgg.instance(), 0, DragonEgg.ID);
 		registerModel(ReagentBag.instance(), 0, ReagentBag.id);
 		registerModel(RuneBag.instance(), 0, RuneBag.id);
 		registerModel(SeekerIdol.instance(), 0, SeekerIdol.id);
@@ -758,6 +768,8 @@ public class ClientProxy extends CommonProxy {
 				NostrumMagica.MODID, "entity/golem_ender"));
 		event.getMap().registerSprite(new ResourceLocation(
 				NostrumMagica.MODID, "entity/dragon_C"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "entity/dragon_TR"));
 	}
 	
 	@SubscribeEvent

@@ -2,16 +2,16 @@ package com.smanzana.nostrummagica.entity.tasks;
 
 import java.util.Date;
 
-import com.smanzana.nostrummagica.entity.EntityDragonRed;
+import com.smanzana.nostrummagica.entity.EntityDragonFlying;
 
 import net.minecraft.entity.ai.EntityAIBase;
 
 public class DragonTakeoffLandTask extends EntityAIBase {
 	
-	private EntityDragonRed dragon;
+	private EntityDragonFlying dragon;
 	private static Date cur;
 	
-	public DragonTakeoffLandTask(EntityDragonRed dragon) {
+	public DragonTakeoffLandTask(EntityDragonFlying dragon) {
 		this.dragon = dragon;
 		
 		this.setMutexBits(3);

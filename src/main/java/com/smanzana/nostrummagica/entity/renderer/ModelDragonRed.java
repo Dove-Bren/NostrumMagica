@@ -7,6 +7,8 @@ import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityDragonRed;
+import com.smanzana.nostrummagica.entity.EntityDragonRedBase;
+import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.entity.Entity;
@@ -158,11 +160,6 @@ public class ModelDragonRed extends ModelBase {
 		
 		GL11.glPushMatrix();
 		
-//		// Offset the base offset
-//		GlStateManager.translate(EDragonPart.BODY.offsetX, EDragonPart.BODY.offsetY, EDragonPart.BODY.offsetZ);
-		
-		//GlStateManager.rotate(180, 1, 0, 0);
-		
 		float modelScale = 1.0f;// / 20.0f; // 16 pixels wide model to .8 blocks
 		GL11.glScalef(modelScale, modelScale, modelScale);
 		
@@ -178,18 +175,24 @@ public class ModelDragonRed extends ModelBase {
 		float frac;
 		float weight;
 		
-		EntityDragonRed dragon = (EntityDragonRed) entityIn;
+		EntityDragonRedBase dragon = (EntityDragonRedBase) entityIn;
 		
 		limbSwing *= .4;
 		limbSwingAmount *= .4;
 		
 		RenderObj wing_left = renderers.get(EDragonPart.WING_LEFT);
 		RenderObj wing_right = renderers.get(EDragonPart.WING_RIGHT);
+		RenderObj body = renderers.get(EDragonPart.BODY);
 		
 		final long now = System.currentTimeMillis();
 		long stateTime = now - dragon.getFlyStateTime();
 		
 		boolean flying = dragon.isFlying();
+		
+		boolean sitting = false;
+		if (dragon instanceof EntityTameDragonRed) {
+			sitting = ((EntityTameDragonRed) dragon).isSitting();
+		}
 		
 		if (flying) {
 			period = 1200.0f;
@@ -200,6 +203,9 @@ public class ModelDragonRed extends ModelBase {
 			wing_left.rotateAngleZ = (weight * .8f);
 			wing_right.rotateAngleX = wing_right.rotateAngleY = 0f;
 			wing_right.rotateAngleZ = -(weight * .8f);
+			body.rotateAngleX = 0f;
+		} else if (sitting) {
+			body.rotateAngleX = -0.3f;
 		} else {
 			float rotX = (float) (2 * Math.PI * 0.14);
 			float rotY = (float) (2 * Math.PI * 0.22);
@@ -224,6 +230,7 @@ public class ModelDragonRed extends ModelBase {
 			wing_right.rotateAngleX = rotX;
 			wing_right.rotateAngleY = -rotY;
 			wing_right.rotateAngleZ = -rotZ;
+			body.rotateAngleX = 0f;
 		}
 		
 		
@@ -236,8 +243,15 @@ public class ModelDragonRed extends ModelBase {
 		RenderObj frontleg_right = renderers.get(EDragonPart.LEG_FRONT_RIGHT);
 		RenderObj backleg_left = renderers.get(EDragonPart.LEG_BACK_LEFT);
 		RenderObj backleg_right = renderers.get(EDragonPart.LEG_BACK_RIGHT);
-		
-		if (!flying) {
+
+		backleg_left.offsetY = (float) EDragonPart.BODY.offsetY - (float) EDragonPart.LEG_BACK_LEFT.offsetY; 
+		backleg_right.offsetY = (float) EDragonPart.BODY.offsetY - (float) EDragonPart.LEG_BACK_RIGHT.offsetY;
+		if (sitting) {
+			frontleg_left.rotateAngleX = .45f;
+			frontleg_right.rotateAngleX = .45f;
+			backleg_left.rotateAngleX = backleg_right.rotateAngleX = 0f;
+			backleg_left.offsetY = backleg_right.offsetY = -.5f;
+		} else if (!flying) {
 			frontleg_left.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount;
 			frontleg_right.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
 			

@@ -96,11 +96,6 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
         return false;
     }
 
-    public boolean shouldAttackEntity(EntityLivingBase target, EntityLivingBase owner)
-    {
-        return target != this;
-    }
-
     public boolean canBeLeashedTo(EntityPlayer player)
     {
         return false;
@@ -116,29 +111,6 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 		
 	}
 	
-//	@SideOnly(Side.CLIENT)
-//    public int getBrightnessForRender(float partialTicks)
-//    {
-//        return 15728880;
-//    }
-//
-//    /**
-//     * Gets how bright this entity is.
-//     */
-//    public float getBrightness(float partialTicks)
-//    {
-//        return 1.0F;
-//    }
-    
-	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-//		int count = this.rand.nextInt(2);
-//		count += lootingModifier;
-//		
-//		this.entityDropItem(EssenceItem.getEssence(
-//				this.getElement(),
-//				count), 0);
-	}
-
 	@Override
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_ENTITY;

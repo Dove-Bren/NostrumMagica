@@ -42,9 +42,11 @@ import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.EntityGolemWind;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
+import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
+import com.smanzana.nostrummagica.items.DragonEgg;
 import com.smanzana.nostrummagica.items.DragonEggFragment;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
@@ -205,6 +207,12 @@ public class CommonProxy {
     			1,
     			false);
     	EntityRegistry.registerModEntity(EntityDragonRed.class, "entity_dragon_red", 
+    			entityID++,
+    			NostrumMagica.instance,
+    			128,
+    			1,
+    			false);
+    	EntityRegistry.registerModEntity(EntityTameDragonRed.class, "entity_tame_dragon_red", 
     			entityID++,
     			NostrumMagica.instance,
     			128,
@@ -386,6 +394,10 @@ public class CommonProxy {
     	DragonEggFragment.instance().setRegistryName(NostrumMagica.MODID, DragonEggFragment.id);
     	GameRegistry.register(DragonEggFragment.instance());
     	DragonEggFragment.init();
+    	
+    	DragonEgg.instance().setRegistryName(NostrumMagica.MODID, DragonEgg.ID);
+    	GameRegistry.register(DragonEgg.instance());
+    	DragonEgg.init();
     	
     }
     

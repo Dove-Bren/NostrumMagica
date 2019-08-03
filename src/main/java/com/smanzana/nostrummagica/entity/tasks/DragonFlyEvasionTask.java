@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.entity.tasks;
 import java.util.Random;
 
 import com.smanzana.nostrummagica.entity.EntityDragon;
-import com.smanzana.nostrummagica.entity.EntityDragonRed;
+import com.smanzana.nostrummagica.entity.EntityDragonFlying;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;
@@ -13,18 +13,29 @@ public class DragonFlyEvasionTask extends EntityAIBase {
 	
 	private EntityDragon dragon;
 	
+	private int cooldown;
+	
 	public DragonFlyEvasionTask(EntityDragon dragon, double speedIn) {
 		this.dragon = dragon;
 		this.setMutexBits(3);
+		
+		cooldown = 0;
 	}
 	
 	@Override
 	public boolean shouldExecute() {
+		
+		// Check cooldown. If actually waiting, decrement and early out.
+		if (cooldown > 0) {
+			cooldown--;
+			return false;
+		}
+		
 		boolean flying = false;
 		EntityLivingBase target;
 		
-		if (this.dragon instanceof EntityDragonRed) {
-			flying = ((EntityDragonRed) this.dragon).isFlying();
+		if (this.dragon instanceof EntityDragonFlying) {
+			flying = ((EntityDragonFlying) this.dragon).isFlying();
 		}
 		
 		if (!flying) {
@@ -44,8 +55,8 @@ public class DragonFlyEvasionTask extends EntityAIBase {
 	public boolean continueExecuting() {
 		boolean flying = false;
 		
-		if (this.dragon instanceof EntityDragonRed) {
-			flying = ((EntityDragonRed) this.dragon).isFlying();
+		if (this.dragon instanceof EntityDragonFlying) {
+			flying = ((EntityDragonFlying) this.dragon).isFlying();
 		}
 		
 		if (!flying) {
@@ -104,6 +115,8 @@ public class DragonFlyEvasionTask extends EntityAIBase {
         if (!dragon.getNavigator().tryMoveToXYZ(x, y, z, 1.0D)) {
         	dragon.getMoveHelper().setMoveTo(x, y, z, 1.0D);
 		}
+        
+        this.cooldown = random.nextInt(20 * 4) + (20 * 3);
 	}
 	
 	@Override

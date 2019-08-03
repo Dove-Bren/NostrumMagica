@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.entity.tasks;
 
-import com.smanzana.nostrummagica.entity.EntityDragonRed;
+import com.smanzana.nostrummagica.entity.EntityDragonRedBase;
 
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
@@ -15,7 +15,7 @@ public class DragonAINearestAttackableTarget<T extends EntityLivingBase> extends
 
 	protected AxisAlignedBB getTargetableArea(double targetDistance) {
 		return this.taskOwner.getEntityBoundingBox().expand(targetDistance,
-				((EntityDragonRed) this.taskOwner).isFlying() ? 32 : 12.0D, targetDistance);
+				((EntityDragonRedBase) this.taskOwner).isFlying() ? 32 : 12.0D, targetDistance);
 	}
 	
 }
