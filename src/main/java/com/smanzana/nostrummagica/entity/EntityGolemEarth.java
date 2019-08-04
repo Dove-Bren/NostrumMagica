@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.entity;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.EssenceItem;
+import com.smanzana.nostrummagica.items.NostrumSkillItem;
+import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
 import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -109,6 +111,10 @@ public class EntityGolemEarth extends EntityGolem {
 			this.entityDropItem(EssenceItem.getEssence(
 					EMagicElement.EARTH,
 					count), 0);
+			
+			if (this.rand.nextInt(200 - (lootingModifier * 20)) == 0) {
+				this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.PENDANT, 1), 0);
+			}
 		}
 	}
 }

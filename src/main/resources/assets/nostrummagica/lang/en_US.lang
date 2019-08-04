@@ -199,6 +199,11 @@ item.ring_gold_corrupted.name=Corrupted Gold Ring
 item.ring_gold_corrupted.desc=%2$s-2%% Mana Cost|%2$s+20%% Magic Potency%1$s
 item.ring_silver_corrupted.name=Corrupted Silver Ring
 item.ring_silver_corrupted.desc=%2$s-4%% Mana Cost|%2$s+10%% Magic Potency%1$s
+item.primordial_mirror.name=Primordial Mirror
+item.essential_ooze.name=Essential Ooze
+item.eldrich_pendant.name=Eldrich Pendant
+item.living_flute.name=Living Flute
+item.dragon_wing.name=Dragon Wing
 
 potion.frostbite.name=Frostbite
 potion.shieldphysical.name=Physical Ward
@@ -644,6 +649,8 @@ ritual.ring_gold_corrupted.name=Craft Corrupted Gold Ring
 ritual.ring_silver.name=Craft Silver Ring
 ritual.ring_silver_true.name=Craft True Silver Ring
 ritual.ring_silver_corrupted.name=Craft Corrupted Silver Ring
+
+ritual.form_primordial_mirror.name=Form Primordial Mirror
 
 enhancement.lower_reagent_cost.name=Lower Reagent Cost
 enhancement.lower_reagent_cost.desc=Reduces the amount of reagents used up when casting a spell

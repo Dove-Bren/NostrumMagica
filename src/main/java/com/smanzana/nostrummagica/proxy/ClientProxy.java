@@ -71,6 +71,8 @@ import com.smanzana.nostrummagica.items.MirrorItem;
 import com.smanzana.nostrummagica.items.NostrumGuide;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
+import com.smanzana.nostrummagica.items.NostrumSkillItem;
+import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
 import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
@@ -264,6 +266,14 @@ public class ClientProxy extends CommonProxy {
     	variants = list.toArray(new ResourceLocation[0]);
     	ModelBakery.registerItemVariants(NostrumResourceItem.instance(), variants);
     	
+    	list = new LinkedList<>();
+    	for (SkillItemType type : SkillItemType.values()) {
+    		list.add(new ResourceLocation(NostrumMagica.MODID, type.getUnlocalizedKey()));
+    	}
+    	
+    	variants = list.toArray(new ResourceLocation[0]);
+    	ModelBakery.registerItemVariants(NostrumSkillItem.instance(), variants);
+    	
     	ModelBakery.registerItemVariants(ThanosStaff.instance(),
     			new ResourceLocation(NostrumMagica.MODID, ThanosStaff.ID),
     			new ResourceLocation(NostrumMagica.MODID, ThanosStaff.ID + "_activated"));
@@ -401,6 +411,12 @@ public class ClientProxy extends CommonProxy {
 		for (ResourceType type : ResourceType.values()) {
 			registerModel(NostrumResourceItem.instance(),
 					NostrumResourceItem.getMetaFromType(type),
+					type.getUnlocalizedKey());
+		}
+		
+		for (SkillItemType type : SkillItemType.values()) {
+			registerModel(NostrumSkillItem.instance(),
+					NostrumSkillItem.getMetaFromType(type),
 					type.getUnlocalizedKey());
 		}
 		

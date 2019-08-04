@@ -60,6 +60,7 @@ import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.MirrorItem;
 import com.smanzana.nostrummagica.items.NostrumGuide;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
+import com.smanzana.nostrummagica.items.NostrumSkillItem;
 import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
@@ -398,6 +399,10 @@ public class CommonProxy {
     	DragonEgg.instance().setRegistryName(NostrumMagica.MODID, DragonEgg.ID);
     	GameRegistry.register(DragonEgg.instance());
     	DragonEgg.init();
+    	
+    	NostrumSkillItem.instance().setRegistryName(NostrumMagica.MODID, NostrumSkillItem.ID);
+    	GameRegistry.register(NostrumSkillItem.instance());
+    	//NostrumSkillItem.init();
     	
     }
     

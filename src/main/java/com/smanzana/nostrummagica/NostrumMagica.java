@@ -34,6 +34,8 @@ import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.MirrorItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
+import com.smanzana.nostrummagica.items.NostrumSkillItem;
+import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
 import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
@@ -957,6 +959,26 @@ public class NostrumMagica implements IMagicListener
 							new OutcomeSpawnItem(MagicCharm.getCharm(element, 8)))
 					);
 		}
+
+		RitualRegistry.instance().addRitual(
+			RitualRecipe.createTier3("form_primordial_mirror",
+				NostrumSkillItem.getItem(SkillItemType.MIRROR, 1), null,
+				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK},
+				new ItemStack(Item.getItemFromBlock(Blocks.GLASS_PANE), 1, OreDictionary.WILDCARD_VALUE),
+				new ItemStack[] {NostrumSkillItem.getItem(SkillItemType.OOZE, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), NostrumSkillItem.getItem(SkillItemType.FLUTE, 1), NostrumSkillItem.getItem(SkillItemType.PENDANT, 1)},
+				null,
+				new OutcomeSpawnItem(NostrumSkillItem.getItem(SkillItemType.MIRROR, 1)))
+		);
+		
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("form_primordial_mirror",
+					NostrumSkillItem.getItem(SkillItemType.MIRROR, 1), null,
+					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK},
+					new ItemStack(Item.getItemFromBlock(Blocks.GLASS_PANE), 1, OreDictionary.WILDCARD_VALUE),
+					new ItemStack[] {null, NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), NostrumSkillItem.getItem(SkillItemType.WING, 1), null},
+					null,
+					new OutcomeSpawnItem(NostrumSkillItem.getItem(SkillItemType.MIRROR, 1)))
+				);
 		
 //		RitualRegistry.instance().addRitual(
 //				RitualRecipe.createTier2("ritual.form_obelisk.name", EMagicElement.ENDER,

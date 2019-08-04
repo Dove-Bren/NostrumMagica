@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.entity;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.EssenceItem;
+import com.smanzana.nostrummagica.items.NostrumSkillItem;
+import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -140,6 +142,10 @@ public class EntityGolemFire extends EntityGolem {
 			this.entityDropItem(EssenceItem.getEssence(
 					EMagicElement.FIRE,
 					count), 0);
+			
+			if (this.rand.nextInt(200 - (lootingModifier * 20)) == 0) {
+				this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.OOZE, 1), 0);
+			}
 		}
 	}
 }

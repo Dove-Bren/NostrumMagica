@@ -8,6 +8,8 @@ import com.smanzana.nostrummagica.entity.tasks.DragonMeleeAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.DragonSpellAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.DragonTakeoffLandTask;
 import com.smanzana.nostrummagica.items.DragonEggFragment;
+import com.smanzana.nostrummagica.items.NostrumSkillItem;
+import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
@@ -430,6 +432,9 @@ public class EntityDragonRed extends EntityDragonRedBase {
 	
 	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
 		this.entityDropItem(new ItemStack(DragonEggFragment.instance()), 0);
+		
+		int count = this.getRNG().nextInt(3 + lootingModifier);
+		this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.WING, count), 0);
 	}
 
 }
