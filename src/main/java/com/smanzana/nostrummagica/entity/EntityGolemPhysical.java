@@ -1,8 +1,8 @@
 package com.smanzana.nostrummagica.entity;
 
 import com.smanzana.nostrummagica.items.EssenceItem;
-import com.smanzana.nostrummagica.items.NostrumSkillItem;
-import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
+import com.smanzana.nostrummagica.items.NostrumRoseItem;
+import com.smanzana.nostrummagica.items.NostrumRoseItem.RoseType;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -101,7 +101,7 @@ public class EntityGolemPhysical extends EntityGolem {
 					count), 0);
 			
 			if (this.rand.nextInt(200 - (lootingModifier * 20)) == 0) {
-				this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.PENDANT, 1), 0);
+				this.entityDropItem(NostrumRoseItem.getItem(RoseType.PALE, 1), 0);
 			}
 		}
 	}

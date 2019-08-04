@@ -34,6 +34,8 @@ import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.MirrorItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
+import com.smanzana.nostrummagica.items.NostrumRoseItem;
+import com.smanzana.nostrummagica.items.NostrumRoseItem.RoseType;
 import com.smanzana.nostrummagica.items.NostrumSkillItem;
 import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
 import com.smanzana.nostrummagica.items.PositionCrystal;
@@ -960,25 +962,63 @@ public class NostrumMagica implements IMagicListener
 					);
 		}
 
-		RitualRegistry.instance().addRitual(
-			RitualRecipe.createTier3("form_primordial_mirror",
-				NostrumSkillItem.getItem(SkillItemType.MIRROR, 1), null,
-				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK},
-				new ItemStack(Item.getItemFromBlock(Blocks.GLASS_PANE), 1, OreDictionary.WILDCARD_VALUE),
-				new ItemStack[] {NostrumSkillItem.getItem(SkillItemType.OOZE, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), NostrumSkillItem.getItem(SkillItemType.FLUTE, 1), NostrumSkillItem.getItem(SkillItemType.PENDANT, 1)},
-				null,
-				new OutcomeSpawnItem(NostrumSkillItem.getItem(SkillItemType.MIRROR, 1)))
-		);
-		
+		//Mirror from wing
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("form_primordial_mirror",
 					NostrumSkillItem.getItem(SkillItemType.MIRROR, 1), null,
 					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK},
 					new ItemStack(Item.getItemFromBlock(Blocks.GLASS_PANE), 1, OreDictionary.WILDCARD_VALUE),
-					new ItemStack[] {null, NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), NostrumSkillItem.getItem(SkillItemType.WING, 1), null},
+					new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), NostrumSkillItem.getItem(SkillItemType.WING, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1)},
 					null,
 					new OutcomeSpawnItem(NostrumSkillItem.getItem(SkillItemType.MIRROR, 1)))
 				);
+		
+		//Mirror from roses
+		for (RoseType type : RoseType.values()) {
+			RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("form_primordial_mirror",
+					NostrumSkillItem.getItem(SkillItemType.MIRROR, 1), null,
+					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK},
+					new ItemStack(Item.getItemFromBlock(Blocks.GLASS_PANE), 1, OreDictionary.WILDCARD_VALUE),
+					new ItemStack[] {NostrumRoseItem.getItem(type, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), NostrumRoseItem.getItem(type, 1), NostrumRoseItem.getItem(type, 1)},
+					null,
+					new OutcomeSpawnItem(NostrumSkillItem.getItem(SkillItemType.MIRROR, 1)))
+				);
+		}
+		
+		//Ooze
+		RitualRegistry.instance().addRitual(
+			RitualRecipe.createTier3("form_essential_ooze",
+				NostrumSkillItem.getItem(SkillItemType.OOZE, 1), null,
+				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK},
+				new ItemStack(Items.SLIME_BALL, 1, OreDictionary.WILDCARD_VALUE),
+				new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), NostrumRoseItem.getItem(RoseType.PALE, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1)},
+				null,
+				new OutcomeSpawnItem(NostrumSkillItem.getItem(SkillItemType.OOZE, 1)))
+			);
+		
+		//Flute
+		RitualRegistry.instance().addRitual(
+			RitualRecipe.createTier3("form_living_flute",
+				NostrumSkillItem.getItem(SkillItemType.FLUTE, 1), null,
+				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK},
+				new ItemStack(Items.REEDS, 1, OreDictionary.WILDCARD_VALUE),
+				new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), NostrumRoseItem.getItem(RoseType.BLOOD, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1)},
+				null,
+				new OutcomeSpawnItem(NostrumSkillItem.getItem(SkillItemType.FLUTE, 1)))
+			);
+		
+		//Pendant
+		RitualRegistry.instance().addRitual(
+			RitualRecipe.createTier3("form_eldrich_pendant",
+				NostrumSkillItem.getItem(SkillItemType.PENDANT, 1), null,
+				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK},
+				new ItemStack(Items.ENDER_PEARL, 1),
+				new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), NostrumRoseItem.getItem(RoseType.ELDRICH, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1)},
+				null,
+				new OutcomeSpawnItem(NostrumSkillItem.getItem(SkillItemType.PENDANT, 1)))
+			);
+		
 		
 //		RitualRegistry.instance().addRitual(
 //				RitualRecipe.createTier2("ritual.form_obelisk.name", EMagicElement.ENDER,

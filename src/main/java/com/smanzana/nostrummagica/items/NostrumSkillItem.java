@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -17,6 +18,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -38,6 +41,10 @@ public class NostrumSkillItem extends Item implements ILoreTagged {
 		
 		public String getUnlocalizedKey() {
 			return key;
+		}
+		
+		private String getDescKey() {
+			return "item." + key + ".desc";
 		}
 	}
 	
@@ -124,18 +131,42 @@ public class NostrumSkillItem extends Item implements ILoreTagged {
 		if (playerIn.isSneaking())
 			return new ActionResult<ItemStack>(EnumActionResult.PASS, stack);
 		
-		if (worldIn.isRemote)
-			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+		
 		
 		SkillItemType type = getTypeFromMeta(stack.getMetadata());
 		
-		if (type == SkillItemType.MIRROR) {
-			// Grant a skill point if they have magic
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
-			if (attr != null && attr.isUnlocked()) {
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
+		if (attr != null && attr.isUnlocked() && type != SkillItemType.WING) {
+			
+			String suffix = null;
+			switch (type) {
+			case FLUTE:
+				attr.addFinesse();
+				suffix = "finesse";
+				break;
+			case MIRROR:
 				attr.addSkillPoint();
-				
-				NostrumMagicaSounds.AMBIENT_WOOSH.play(playerIn);
+				suffix = "point";
+				break;
+			case OOZE:
+				attr.addControl();
+				suffix = "control";
+				break;
+			case PENDANT:
+				attr.addTech();
+				suffix = "technique";
+				break;
+			case WING:
+				// Wings don't do anything
+				break;
+			}
+			
+			if (worldIn.isRemote) {
+				// Display message but don't do anything
+				playerIn.addChatMessage(new TextComponentTranslation("info.skillitem." + suffix, new Object[0]));
+			} else {
+				// Server side
+				NostrumMagicaSounds.AMBIENT_WOOSH.play(null, playerIn.worldObj, playerIn.posX, playerIn.posY, playerIn.posZ);
 				stack.stackSize--;
 				NostrumMagica.proxy.syncPlayer((EntityPlayerMP) playerIn);
 			}
@@ -143,8 +174,28 @@ public class NostrumSkillItem extends Item implements ILoreTagged {
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
 		}
 		
-		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
 		
+		
+		return new ActionResult<ItemStack>(EnumActionResult.PASS, stack);
+		
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+		if (stack == null)
+			return;
+		
+		SkillItemType type = getTypeFromMeta(stack.getMetadata());
+		if (type == null)
+			return;
+		
+		if (I18n.hasKey(type.getDescKey())) {
+			String translation = I18n.format(type.getDescKey(), new Object[0]);
+			if (translation.trim().isEmpty())
+				return;
+			tooltip.add(TextFormatting.BLUE + translation);
+		}
 	}
 	
 	public static int getMetaFromType(SkillItemType element) {

@@ -27,6 +27,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -100,6 +101,10 @@ public class ShrineBlock extends SymbolBlock {
 	@Override
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		
+		if (hand != EnumHand.MAIN_HAND) {
+			return true;
+		}
+		
 		TileEntity te = worldIn.getTileEntity(pos);
 		if (te == null || !(te instanceof SymbolTileEntity))
 			return false;
@@ -107,6 +112,8 @@ public class ShrineBlock extends SymbolBlock {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
 		if (attr == null)
 			return false;
+		
+		
 		
 		SymbolTileEntity tile = (SymbolTileEntity) te;
 		SpellComponentWrapper component = tile.getComponent();
@@ -245,6 +252,24 @@ public class ShrineBlock extends SymbolBlock {
 				
 				if (!(component.getShape() instanceof SingleShape)) {
 					playerIn.setHeldItem(hand, null);
+				}
+			} else if (!pass) {
+				// Shape that we haven't correctly unlocked yet
+				if (playerIn.worldObj.isRemote) {
+					String suffix = "";
+					if (component.getShape() instanceof AoEShape) {
+						suffix = "aoe";
+					} else if (component.getShape() instanceof ChainShape) {
+						suffix = "chain";
+					}
+					
+					TextComponentTranslation trans = new TextComponentTranslation("info.shapehint.preamble", new Object[0]);
+					trans.getStyle().setColor(TextFormatting.DARK_GRAY);
+					playerIn.addChatComponentMessage(trans);
+					
+					trans = new TextComponentTranslation("info.shapehint." + suffix, new Object[0]);
+					trans.getStyle().setColor(TextFormatting.LIGHT_PURPLE);
+					playerIn.addChatComponentMessage(trans);
 				}
 			}
 		}

@@ -2,8 +2,8 @@ package com.smanzana.nostrummagica.entity;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.EssenceItem;
-import com.smanzana.nostrummagica.items.NostrumSkillItem;
-import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
+import com.smanzana.nostrummagica.items.NostrumRoseItem;
+import com.smanzana.nostrummagica.items.NostrumRoseItem.RoseType;
 import com.smanzana.nostrummagica.potions.MagicResistPotion;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -146,7 +146,7 @@ public class EntityGolemLightning extends EntityGolem {
 					count), 0);
 			
 			if (this.rand.nextInt(200 - (lootingModifier * 20)) == 0) {
-				this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.FLUTE, 1), 0);
+				this.entityDropItem(NostrumRoseItem.getItem(RoseType.ELDRICH, 1), 0);
 			}
 		}
 	}

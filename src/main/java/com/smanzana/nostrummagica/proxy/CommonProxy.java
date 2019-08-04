@@ -60,6 +60,7 @@ import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.MirrorItem;
 import com.smanzana.nostrummagica.items.NostrumGuide;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
+import com.smanzana.nostrummagica.items.NostrumRoseItem;
 import com.smanzana.nostrummagica.items.NostrumSkillItem;
 import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.items.PositionToken;
@@ -404,6 +405,8 @@ public class CommonProxy {
     	GameRegistry.register(NostrumSkillItem.instance());
     	//NostrumSkillItem.init();
     	
+    	NostrumRoseItem.instance().setRegistryName(NostrumMagica.MODID, NostrumRoseItem.ID);
+    	GameRegistry.register(NostrumRoseItem.instance());
     }
     
     private void registerBlocks() {

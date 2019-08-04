@@ -200,10 +200,17 @@ item.ring_gold_corrupted.desc=%2$s-2%% Mana Cost|%2$s+20%% Magic Potency%1$s
 item.ring_silver_corrupted.name=Corrupted Silver Ring
 item.ring_silver_corrupted.desc=%2$s-4%% Mana Cost|%2$s+10%% Magic Potency%1$s
 item.primordial_mirror.name=Primordial Mirror
+item.primordial_mirror.desc=Awards 1 Skill Point
 item.essential_ooze.name=Essential Ooze
+item.essential_ooze.desc=Awards 1 Control
 item.eldrich_pendant.name=Eldrich Pendant
+item.eldrich_pendant.desc=Awards 1 Technique
 item.living_flute.name=Living Flute
+item.living_flute.desc=Awards 1 Finesse
 item.dragon_wing.name=Dragon Wing
+item.rose_blood.name=Blood Rose
+item.rose_eldrich.name=Eldrich Rose
+item.rose_pale.name=Pale Rose
 
 potion.frostbite.name=Frostbite
 potion.shieldphysical.name=Physical Ward
@@ -272,7 +279,7 @@ death.attack.magic.ICE=%1$s was frozen by %2$s
 death.attack.magic.FIRE=%1$s was burnt to a crisp by %2$s
 death.attack.magic.ENDER=%1$s was slain by %s$2's Ender energies
 
-info.recall.fail=A mark location must be set first'
+info.recall.fail=A mark location must be set first
 info.recall.baddimension=Your mark location is in a different dimension
 info.obelisk.none=Add the location of other obelisks using a Geotoken to add teleporation destinations
 info.obelisk.nomagic=The workings of the strange stone are lost to you. Perhaps if you knew more about magic...
@@ -302,6 +309,10 @@ info.spell.low_mastery=This spell requires %s mastery %d, but you only possess m
 info.spell.no_mastery=This spell requires knowledge of the %s element
 info.spell.bad_reagent=You do not have enough %s
 info.spell.tome_weak=Your tome cannot cast such a powerful spell
+info.skillitem.finesse=You've been awarded an additional point in Finesse!
+info.skillitem.control=You've been awarded an additional point in Control!
+info.skillitem.technique=You've been awarded an additional point in Technique!
+info.skillitem.point=You've been awarded an additional skill point!
 
 info.discovery.name=Unlocking Magic
 info.stats.name=Stats
@@ -358,8 +369,11 @@ info.discovery.starting=Welcome to Nostrum Magica. To unlock magic, you must fir
 info.discovery.starting2=Congratulations on finding a shrine pedestal and unlocking a component. In order to unlock magic, you must find one shape, one trigger, and one element, as all of these are needed to create even the most simple spells. Continue exploring until you find at least one of each.
 info.discovery.spells=You've unlocked enough components to unlock magic and make a spell! You can find more details about spell creation in the Spell Creation guide. In order to craft a spell, you'll need a Spell Table, reagents, and runes. Runes are crafted by performing rituals. More information about rituals can be found in the Rituals tab. More complex spells will require higher attributes to cast. More info on this can be found in the Spells tab as well.
 
-
 info.lore.get=You've gained more knowledge about %s
+
+info.shapehint.preamble=%2$sThe shrine does not release its energy to you, but instead whispers:%1$s
+info.shapehint.chain="%3$sPresent unto me a spell scroll that will zap my enemies with duplicated potency, and render them blind to their surroundings!%1$s"
+info.shapehint.aoe="%3$sPresent unto me a spell scroll that will help me leap and bound to the stars and distant hills the same!%1$s"
 
 element.name=Element
 shape.name=Shape
@@ -651,6 +665,9 @@ ritual.ring_silver_true.name=Craft True Silver Ring
 ritual.ring_silver_corrupted.name=Craft Corrupted Silver Ring
 
 ritual.form_primordial_mirror.name=Form Primordial Mirror
+ritual.form_essential_ooze.name=Form Essential Ooze
+ritual.form_living_flute.name=Form Living Flute
+ritual.form_eldrich_pendant.name=Form Eldrich Pendant
 
 enhancement.lower_reagent_cost.name=Lower Reagent Cost
 enhancement.lower_reagent_cost.desc=Reduces the amount of reagents used up when casting a spell
