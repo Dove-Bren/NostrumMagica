@@ -66,7 +66,7 @@ public class MagicEffectProxy {
 		if (effects.isEmpty())
 			return;
 		
-		if (event.getSource().isUnblockable())
+		if (event.getSource().isDamageAbsolute())
 			return;
 		
 		UUID id = event.getEntityLiving().getPersistentID();
