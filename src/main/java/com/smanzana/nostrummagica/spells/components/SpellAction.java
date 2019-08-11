@@ -9,6 +9,7 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble.ItemType;
 import com.smanzana.nostrummagica.blocks.Candle;
@@ -39,6 +40,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.item.EntityItem;
@@ -1583,6 +1585,11 @@ public class SpellAction {
 		PotionEffect resEffect = target.getActivePotionEffect(MagicResistPotion.instance());
 		if (resEffect != null) {
 			base *= Math.pow(.5, resEffect.getAmplifier() + 1);
+		}
+		
+		IAttributeInstance attr = target.getEntityAttribute(AttributeMagicResist.instance());
+		if (attr != null && attr.getAttributeValue() != 0.0D) {
+			base *= Math.max(0.0D, Math.min(2.0D, 1.0D - (attr.getAttributeValue() / 100.0D)));
 		}
 			
 		switch (element) {

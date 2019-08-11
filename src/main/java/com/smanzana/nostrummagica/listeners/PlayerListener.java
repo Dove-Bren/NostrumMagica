@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
 import com.smanzana.nostrummagica.items.EnchantedEquipment;
@@ -44,6 +45,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
@@ -727,6 +729,15 @@ public class PlayerListener {
 					}
 				}
 			}
+		}
+	}
+	
+	@SubscribeEvent
+	public void onConstruct(EntityConstructing event) {
+		Entity ent = event.getEntity();
+		if (ent instanceof EntityLivingBase) {
+			EntityLivingBase living = (EntityLivingBase) ent;
+			living.getAttributeMap().registerAttribute(AttributeMagicResist.instance());
 		}
 	}
 	

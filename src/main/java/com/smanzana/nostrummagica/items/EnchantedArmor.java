@@ -10,6 +10,7 @@ import java.util.UUID;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
@@ -121,8 +122,56 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return Math.max(1, (int) ((float) base * mod));
 	}
 	
+	// Calcs magic resist, but as if it were armor which is base 20/25
+	private static int calcMagicResistBase(EntityEquipmentSlot slot, EMagicElement element, int level) {
+		
+		float mod;
+		
+		switch (element) {
+		case EARTH:
+			mod = (18f/24f);
+			break;
+		case ENDER:
+			mod = (22f/24f);
+			break;
+		case FIRE:
+			mod = 1f;
+			break;
+		case PHYSICAL:
+			mod = (10/24f);
+			break;
+		default:
+			mod = 0.5f;
+		}
+		
+		int base;
+		
+		switch (slot) {
+		case CHEST:
+			base = 8;
+			break;
+		case FEET:
+			base = 2;
+			break;
+		case HEAD:
+			base = 2;
+			break;
+		case LEGS:
+			base = 6;
+			break;
+		default:
+			base = 0;
+		}
+		
+		if (base != 0)
+			base += level - 1;
+		
+		return Math.max(1, (int) ((float) base * mod));
+	}
+	
 	private int level;
 	private int armor; // Can't use vanilla; it's final
+	private double magicResistAmount;
 	private EMagicElement element;
 	
 	private String modelID;
@@ -137,6 +186,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		
 		this.armor = calcArmor(type, element, level);
+		this.magicResistAmount = ((double) calcMagicResistBase(type, element, level) * 2.0D); // (/50 so max is 48%, then * 100 for %, so *2)
 	}
 	
 	@Override
@@ -147,6 +197,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
         {
             multimap.put(SharedMonsterAttributes.ARMOR.getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor modifier", (double)this.armor, 0));
             multimap.put(SharedMonsterAttributes.ARMOR_TOUGHNESS.getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor toughness", 1, 0));
+            multimap.put(AttributeMagicResist.instance().getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Resist", (double)this.magicResistAmount, 0));
         }
 
         return multimap;

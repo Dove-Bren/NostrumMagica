@@ -257,6 +257,8 @@ key.spellscroll.desc=Scroll Spells (+ MouseWheel)
 key.infoscreen.desc=Info Screen
 key.nostrummagica.desc=Nostrum Magica
 
+attribute.name.nostrummagica.magic_resist=Magic Resistance
+
 config.nostrummagica.display=Display Options
 config.nostrummagica.display.display_bar=Mana Bar
 config.nostrummagica.display.display_effects=Magic Visual Effects

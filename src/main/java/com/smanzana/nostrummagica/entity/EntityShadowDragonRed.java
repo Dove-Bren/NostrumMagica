@@ -14,6 +14,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
@@ -126,12 +127,12 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 		
 		if (this.target != null) {
 			if (this.target.isDead) {
-				this.kill();
+				this.attackEntityFrom(DamageSource.outOfWorld, (float) this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getAttributeValue());
 			}
 		} else {
 			// If target is null but we're a target-type, DIE
 			if (this.dataManager.get(HASTARGET)) {
-				this.kill();
+				this.attackEntityFrom(DamageSource.outOfWorld, (float) this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getAttributeValue());
 			}
 		}
 	}
