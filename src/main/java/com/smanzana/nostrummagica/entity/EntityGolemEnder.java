@@ -120,7 +120,12 @@ public class EntityGolemEnder extends EntityGolem {
 					EMagicElement.ENDER,
 					count), 0);
 			
-			if (this.rand.nextInt(200 - (lootingModifier * 20)) == 0) {
+			int denom = ROSE_DROP_DENOM;
+			if (wasRecentlyHit) {
+				denom = 150;
+			}
+			
+			if (this.rand.nextInt(denom - (lootingModifier * 20)) == 0) {
 				this.entityDropItem(NostrumRoseItem.getItem(RoseType.ELDRICH, 1), 0);
 			}
 		}

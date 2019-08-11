@@ -78,6 +78,8 @@ public class SpellAction {
 		public MagicDamageSource(Entity source, EMagicElement element) {
 			super("mob", source);
 			this.element = element;
+			
+			this.setDamageBypassesArmor();
 		}
 		
 		@Override
@@ -110,7 +112,8 @@ public class SpellAction {
 		public void apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
 			float fin = calcDamage(caster, entity, amount * efficiency, element);
 			source.setLastAttacker(entity);
-			entity.attackEntityFrom(new MagicDamageSource(source, element), fin);
+			entity.setHealth(Math.max(0f, entity.getHealth() - fin));
+			entity.attackEntityFrom(new MagicDamageSource(source, element), 0);
 			
 			NostrumMagicaSounds sound;
 			switch (element) {

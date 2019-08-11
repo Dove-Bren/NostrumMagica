@@ -1,11 +1,13 @@
 package com.smanzana.nostrummagica.entity;
 
+import com.smanzana.nostrummagica.entity.tasks.DragonAIAggroTable;
 import com.smanzana.nostrummagica.entity.tasks.DragonAINearestAttackableTarget;
 import com.smanzana.nostrummagica.entity.tasks.DragonFlyEvasionTask;
 import com.smanzana.nostrummagica.entity.tasks.DragonFlyRandomTask;
 import com.smanzana.nostrummagica.entity.tasks.DragonLandTask;
 import com.smanzana.nostrummagica.entity.tasks.DragonMeleeAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.DragonSpellAttackTask;
+import com.smanzana.nostrummagica.entity.tasks.DragonSummonShadowAttack;
 import com.smanzana.nostrummagica.entity.tasks.DragonTakeoffLandTask;
 import com.smanzana.nostrummagica.items.DragonEggFragment;
 import com.smanzana.nostrummagica.items.NostrumSkillItem;
@@ -27,6 +29,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.OtherTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIBase;
@@ -47,6 +50,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.DamageSource;
 import net.minecraft.world.BossInfo;
 import net.minecraft.world.BossInfoServer;
 import net.minecraft.world.World;
@@ -164,6 +168,10 @@ public class EntityDragonRed extends EntityDragonRedBase {
 	
 	private EntityAIBase[] lastAI;
 	
+	private DragonSummonShadowAttack<EntityDragonRed> shadowAttack;
+	private DragonFlyEvasionTask evasionTask;
+	private DragonAIAggroTable<EntityDragonRed, EntityLivingBase> aggroTable;
+	
 	public EntityDragonRed(World worldIn) {
 		super(worldIn);
         this.setSize(6F, 4.6F);
@@ -214,51 +222,59 @@ public class EntityDragonRed extends EntityDragonRedBase {
 	private void initBaseAI() {
 		
 		initSpells();
+        shadowAttack = new DragonSummonShadowAttack<EntityDragonRed>(this, 5 * 60, 10);
+        evasionTask = new DragonFlyEvasionTask(this, 1.0D);
+        aggroTable = new DragonAIAggroTable<>(this, true);
 		
 		// Order on these are priority numbers!
 		flyingAI = new EntityAIBase[][] {
 			// PHASE_GROUNDED
 			new EntityAIBase[] {},
 			new EntityAIBase[] {
+				shadowAttack,
         		new DragonLandTask(this),
         		new DragonMeleeAttackTask(this, 1.0D, true),
-        		new DragonFlyEvasionTask(this, 1.0D),
-        		new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 3), 10, true, DSPELL_Fireball),
+        		evasionTask,
+        		new DragonSpellAttackTask<EntityDragonRed>(this, (5 * 5), 10, true, DSPELL_Fireball),
         		//new DragonFlyStrafeTask<EntityDragonRed>(this, 20),
         		new DragonTakeoffLandTask(this),
         		new DragonFlyRandomTask(this),
 			},
 			new EntityAIBase[] {
+				shadowAttack,
 				new DragonLandTask(this),
         		new DragonMeleeAttackTask(this, 1.0D, true),
         		new DragonTakeoffLandTask(this),
-        		new DragonFlyEvasionTask(this, 1.0D),
-				new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 3), 12, true, DSPELL_Fireball2),
-				new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 5), 10, false, DSPELL_Speed, DSPELL_Shield),
-				new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 5), 20, false, DSPELL_Weaken),
-				new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 30), 20, true, DSPELL_Curse),
+        		evasionTask,
+				new DragonSpellAttackTask<EntityDragonRed>(this, (5 * 5), 12, true, DSPELL_Fireball2),
+				new DragonSpellAttackTask<EntityDragonRed>(this, (5 * 12), 10, false, DSPELL_Speed, DSPELL_Shield),
+				new DragonSpellAttackTask<EntityDragonRed>(this, (5 * 10), 20, false, DSPELL_Weaken),
+				new DragonSpellAttackTask<EntityDragonRed>(this, (5 * 45), 20, true, DSPELL_Curse),
         		//new DragonFlyStrafeTask<EntityDragonRed>(this, 20),
         		new DragonFlyRandomTask(this),
 			}
         };
         groundedAI = new EntityAIBase[][] {
         	new EntityAIBase[] {
+    			shadowAttack,
         		new DragonMeleeAttackTask(this, 1.0D, true),
         		new EntityAIWander(this, 1.0D, 30)
         	},
         	new EntityAIBase[] {
-        		new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 3), 20, true, DSPELL_Fireball),
+    			shadowAttack,
+        		new DragonSpellAttackTask<EntityDragonRed>(this, (5 * 5), 20, true, DSPELL_Fireball),
         		new DragonTakeoffLandTask(this),
     			new DragonMeleeAttackTask(this, 1.0D, true),
         		new EntityAIWander(this, 1.0D, 30)
         	},
         	new EntityAIBase[] {
+    			shadowAttack,
         		new DragonTakeoffLandTask(this),
     			new DragonMeleeAttackTask(this, 1.0D, true),
-    			new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 3), 12, true, DSPELL_Fireball2),
-				new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 5), 10, false, DSPELL_Speed, DSPELL_Shield),
-				new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 5), 20, false, DSPELL_Weaken),
-				new DragonSpellAttackTask<EntityDragonRed>(this, (20 * 30), 20, true, DSPELL_Curse),
+    			new DragonSpellAttackTask<EntityDragonRed>(this, (5 * 5), 12, true, DSPELL_Fireball2),
+				new DragonSpellAttackTask<EntityDragonRed>(this, (5 * 12), 10, false, DSPELL_Speed, DSPELL_Shield),
+				new DragonSpellAttackTask<EntityDragonRed>(this, (5 * 10), 20, false, DSPELL_Weaken),
+				new DragonSpellAttackTask<EntityDragonRed>(this, (5 * 45), 20, true, DSPELL_Curse),
         		new EntityAIWander(this, 1.0D, 30)
         	}
         		
@@ -266,16 +282,17 @@ public class EntityDragonRed extends EntityDragonRedBase {
 		
 //      this.tasks.addTask(1, new EntityAISwimming(this));
 //		this.tasks.addTask(4, new EntityAIWander(this, 1.0D, 30));
-        this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, false, new Class[0]));
-		this.targetTasks.addTask(2, new DragonAINearestAttackableTarget<EntityPlayer>(this, EntityPlayer.class, true));
-		this.targetTasks.addTask(3, new DragonAINearestAttackableTarget<EntityZombie>(this, EntityZombie.class, true));
-		this.targetTasks.addTask(4, new DragonAINearestAttackableTarget<EntitySheep>(this, EntitySheep.class, true));
-		this.targetTasks.addTask(5, new DragonAINearestAttackableTarget<EntityCow>(this, EntityCow.class, true));
-		this.targetTasks.addTask(6, new DragonAINearestAttackableTarget<EntityPig>(this, EntityPig.class, true));
-		this.targetTasks.addTask(7, new DragonAINearestAttackableTarget<EntityVillager>(this, EntityVillager.class, true));
-		this.targetTasks.addTask(8, new DragonAINearestAttackableTarget<EntityHorse>(this, EntityHorse.class, true));
-		this.targetTasks.addTask(9, new DragonAINearestAttackableTarget<EntityGiantZombie>(this, EntityGiantZombie.class, true));
-		this.targetTasks.addTask(10, new DragonAINearestAttackableTarget<EntityPolarBear>(this, EntityPolarBear.class, true));
+        this.targetTasks.addTask(1, aggroTable);
+        this.targetTasks.addTask(2, new EntityAIHurtByTarget(this, false, new Class[0]));
+		this.targetTasks.addTask(3, new DragonAINearestAttackableTarget<EntityPlayer>(this, EntityPlayer.class, true));
+		this.targetTasks.addTask(4, new DragonAINearestAttackableTarget<EntityZombie>(this, EntityZombie.class, true));
+		this.targetTasks.addTask(5, new DragonAINearestAttackableTarget<EntitySheep>(this, EntitySheep.class, true));
+		this.targetTasks.addTask(6, new DragonAINearestAttackableTarget<EntityCow>(this, EntityCow.class, true));
+		this.targetTasks.addTask(7, new DragonAINearestAttackableTarget<EntityPig>(this, EntityPig.class, true));
+		this.targetTasks.addTask(8, new DragonAINearestAttackableTarget<EntityVillager>(this, EntityVillager.class, true));
+		this.targetTasks.addTask(9, new DragonAINearestAttackableTarget<EntityHorse>(this, EntityHorse.class, true));
+		this.targetTasks.addTask(10, new DragonAINearestAttackableTarget<EntityGiantZombie>(this, EntityGiantZombie.class, true));
+		this.targetTasks.addTask(11, new DragonAINearestAttackableTarget<EntityPolarBear>(this, EntityPolarBear.class, true));
 	}
 	
 	@Override
@@ -367,6 +384,10 @@ public class EntityDragonRed extends EntityDragonRedBase {
         	int i = compound.getByte(DRAGON_SERIAL_PHASE_TOK);
             this.setPhase(DragonPhase.values()[i]);
         }
+		
+		if (!this.worldObj.isRemote) {
+			this.initEntityAI();
+		}
 	}
 	
 	public void writeEntityToNBT(NBTTagCompound compound) {
@@ -433,8 +454,34 @@ public class EntityDragonRed extends EntityDragonRedBase {
 	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
 		this.entityDropItem(new ItemStack(DragonEggFragment.instance()), 0);
 		
-		int count = this.getRNG().nextInt(3 + lootingModifier);
-		this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.WING, count), 0);
+		int count = this.getRNG().nextInt(2 + lootingModifier);
+		if (count != 0) {
+			this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.WING, count), 0);
+		}
+	}
+	
+	@Override
+	public boolean attackEntityFrom(DamageSource source, float amount) {
+		if (!this.worldObj.isRemote && source.getSourceOfDamage() != null) {
+			Entity ent = source.getSourceOfDamage();
+			if (ent instanceof EntityLivingBase && ent != this) {
+				this.shadowAttack.addToPool((EntityLivingBase) ent);
+				this.aggroTable.addDamage((EntityLivingBase) ent, amount);
+			}
+			
+			this.evasionTask.reset();
+		}
+		
+		return super.attackEntityFrom(source, amount);
+	}
+	
+	@Override
+	public void bite(EntityLivingBase target) {
+		super.bite(target);
+		
+		if (!this.worldObj.isRemote) {
+			this.evasionTask.reset();
+		}
 	}
 
 }

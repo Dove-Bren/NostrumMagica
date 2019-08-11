@@ -124,4 +124,8 @@ public class DragonFlyEvasionTask extends EntityAIBase {
 		return true;
 	}
 	
+	public void reset() {
+		this.cooldown = 0;
+	}
+	
 }

@@ -41,6 +41,7 @@ import net.minecraft.world.World;
 public abstract class EntityGolem extends EntityTameable implements ILoreTagged {
 
 	private static final DataParameter<Float> DATA_HEALTH_ID = EntityDataManager.<Float>createKey(EntityGolem.class, DataSerializers.FLOAT);
+	protected static final int ROSE_DROP_DENOM = 12500;
 
 	protected boolean isMelee;
 	protected boolean isRange;

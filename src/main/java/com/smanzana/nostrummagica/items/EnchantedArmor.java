@@ -279,17 +279,6 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 
 	@Override
 	public void damageArmor(EntityLivingBase entity, ItemStack stack, DamageSource source, int damage, int slot) {
-		//if (slot == 0) {
-			for (EMagicElement elem : new EMagicElement[] {EMagicElement.PHYSICAL, EMagicElement.EARTH, EMagicElement.ENDER})
-			for (EntityEquipmentSlot eslot : EntityEquipmentSlot.values()) {
-				if (eslot == EntityEquipmentSlot.MAINHAND || eslot == EntityEquipmentSlot.OFFHAND) {
-					continue;
-				}
-				
-				int armor = calcArmor(eslot, elem, 2);
-				System.out.println("armor for " + eslot + " (" + elem.name() + "): " + armor);
-			}
-		//}
 		stack.damageItem(damage, entity);
 	}
 	

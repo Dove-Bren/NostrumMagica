@@ -579,7 +579,7 @@ public class Spell {
 		
 		if (alteration == null) {
 			// Damage spell
-			return new SpellAction(caster).damage(element, 5.0f * elementCount)
+			return new SpellAction(caster).damage(element, (float) Math.pow(2, elementCount))
 					.name("damage." + element.name().toLowerCase());
 		}
 		

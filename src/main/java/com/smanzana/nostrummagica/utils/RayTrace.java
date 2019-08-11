@@ -9,6 +9,7 @@ import com.google.common.base.Predicates;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
@@ -189,7 +190,7 @@ public class RayTrace {
         for (int j = 0; j < list.size(); ++j)
         {
             Entity entity1 = (Entity)list.get(j);
-            if (onlyLiving && !(entity1 instanceof EntityLiving))
+            if (onlyLiving && !(entity1 instanceof EntityLivingBase))
             	continue;
             
             float f1 = entity1.getCollisionBorderSize();

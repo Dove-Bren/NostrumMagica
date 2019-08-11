@@ -112,7 +112,12 @@ public class EntityGolemEarth extends EntityGolem {
 					EMagicElement.EARTH,
 					count), 0);
 			
-			if (this.rand.nextInt(200 - (lootingModifier * 20)) == 0) {
+			int denom = ROSE_DROP_DENOM;
+			if (wasRecentlyHit) {
+				denom = 150;
+			}
+			
+			if (this.rand.nextInt(denom - (lootingModifier * 20)) == 0) {
 				this.entityDropItem(NostrumRoseItem.getItem(RoseType.PALE, 1), 0);
 			}
 		}

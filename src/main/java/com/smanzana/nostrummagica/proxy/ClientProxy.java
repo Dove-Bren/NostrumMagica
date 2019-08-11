@@ -46,11 +46,13 @@ import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.EntityKoid;
+import com.smanzana.nostrummagica.entity.EntityShadowDragonRed;
 import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.renderer.ModelGolem;
 import com.smanzana.nostrummagica.entity.renderer.RenderDragonRed;
 import com.smanzana.nostrummagica.entity.renderer.RenderGolem;
 import com.smanzana.nostrummagica.entity.renderer.RenderKoid;
+import com.smanzana.nostrummagica.entity.renderer.RenderShadowDragonRed;
 import com.smanzana.nostrummagica.entity.renderer.RenderTameDragonRed;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
@@ -198,6 +200,12 @@ public class ClientProxy extends CommonProxy {
 			@Override
 			public Render<? super EntityTameDragonRed> createRenderFor(RenderManager manager) {
 				return new RenderTameDragonRed(manager, 2);
+			}
+		});
+		RenderingRegistry.registerEntityRenderingHandler(EntityShadowDragonRed.class, new IRenderFactory<EntityShadowDragonRed>() {
+			@Override
+			public Render<? super EntityShadowDragonRed> createRenderFor(RenderManager manager) {
+				return new RenderShadowDragonRed(manager, 2);
 			}
 		});
 		

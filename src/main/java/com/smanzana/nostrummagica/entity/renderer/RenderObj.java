@@ -94,18 +94,16 @@ public class RenderObj extends ModelRenderer {
 		GlStateManager.pushMatrix();
 		GlStateManager.rotate(180, 1, 0, 0);
 		
-		color = (-1 == color ? color : color | -16777216);
-		
 		for(EnumFacing side : EnumFacing.values()) {
 			List<BakedQuad> quads = model.getQuads(null, side, 0);
 			if(!quads.isEmpty()) 
 				for(BakedQuad quad : quads)
-					LightUtil.renderQuadColor(buffer, quad, color == -1 ? color : color | -16777216);
+					LightUtil.renderQuadColor(buffer, quad, color);
 		}
 		List<BakedQuad> quads = model.getQuads(null, null, 0);
 		if(!quads.isEmpty()) {
 			for(BakedQuad quad : quads) 
-				LightUtil.renderQuadColor(buffer, quad, color == -1 ? color : color | -16777216);
+				LightUtil.renderQuadColor(buffer, quad, color);
 		}
 			
 		GlStateManager.popMatrix();

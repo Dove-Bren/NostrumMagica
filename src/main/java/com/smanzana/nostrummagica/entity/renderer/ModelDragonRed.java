@@ -20,13 +20,18 @@ public class ModelDragonRed extends ModelBase {
 	private Map<EDragonPart, RenderObj> renderers;
 	private RenderObj baseRenderer;
 	
-	public ModelDragonRed() {
+	public ModelDragonRed(int color) {
 		super();
 		
 		renderers = new EnumMap<>(EDragonPart.class);
 		
 		for (EDragonPart part : EDragonPart.values()) {
-			RenderObj render = new RenderObj(this, part.getLoc());
+			RenderObj render = new RenderObj(this, part.getLoc()) {
+				@Override
+				protected int getColor() {
+					return color;
+				}
+			};
 			render.setTextureOffset(0, 0); // TODO add texture offsets?
 			// Set offset?
 			render.offsetX = (float) part.getX();
@@ -51,6 +56,10 @@ public class ModelDragonRed extends ModelBase {
 			
 			renderers.put(part, render);
 		}
+	}
+	
+	public ModelDragonRed() {
+		this(-1);
 	}
 
 	

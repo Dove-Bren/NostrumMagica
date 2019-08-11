@@ -41,6 +41,7 @@ import com.smanzana.nostrummagica.entity.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.EntityGolemWind;
 import com.smanzana.nostrummagica.entity.EntityKoid;
+import com.smanzana.nostrummagica.entity.EntityShadowDragonRed;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
 import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
 import com.smanzana.nostrummagica.items.AltarItem;
@@ -215,6 +216,12 @@ public class CommonProxy {
     			1,
     			false);
     	EntityRegistry.registerModEntity(EntityTameDragonRed.class, "entity_tame_dragon_red", 
+    			entityID++,
+    			NostrumMagica.instance,
+    			128,
+    			1,
+    			false);
+    	EntityRegistry.registerModEntity(EntityShadowDragonRed.class, "entity_shadow_dragon_red", 
     			entityID++,
     			NostrumMagica.instance,
     			128,

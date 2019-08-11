@@ -106,7 +106,12 @@ public class EntityGolemWind extends EntityGolem {
 					EMagicElement.WIND,
 					count), 0);
 			
-			if (this.rand.nextInt(200 - (lootingModifier * 20)) == 0) {
+			int denom = ROSE_DROP_DENOM;
+			if (wasRecentlyHit) {
+				denom = 150;
+			}
+			
+			if (this.rand.nextInt(denom - (lootingModifier * 20)) == 0) {
 				this.entityDropItem(NostrumRoseItem.getItem(RoseType.BLOOD, 1), 0);
 			}
 		}
