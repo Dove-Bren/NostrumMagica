@@ -8,7 +8,6 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -18,6 +17,48 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class RayTrace {
+	
+	public static class NotEntity implements Predicate<EntityLivingBase> {
+		
+		private EntityLivingBase self;
+		
+		public NotEntity(EntityLivingBase self) {
+			this.self = self;
+		}
+		
+		@Override
+		public boolean apply(EntityLivingBase input) {
+			return !input.isEntityEqual(self);
+		}
+	}
+	
+	public static class LivingOnly implements Predicate<Entity> {
+		@Override
+		public boolean apply(Entity input) {
+			return input != null && input instanceof EntityLivingBase;
+		}
+	}
+	
+	public static class OtherLiving implements Predicate<Entity> {
+		
+		private NotEntity filterMe;
+		private LivingOnly filterLiving;
+		
+		public OtherLiving(EntityLivingBase self) {
+			this.filterMe = new NotEntity(self);
+			this.filterLiving = new LivingOnly();
+		}
+		
+		@Override
+		public boolean apply(Entity input) {
+			if (filterLiving.apply(input)) {
+				// is EntityLivingBase
+				return filterMe.apply((EntityLivingBase) input);
+			}
+			
+			return false;
+		}
+	}
 	
 	public static Vec3d directionFromAngles(float pitch, float yaw) {
 		float f = MathHelper.cos(-yaw * 0.017453292F - (float)Math.PI);
@@ -29,15 +70,15 @@ public class RayTrace {
 	}
 	
 	public static RayTraceResult raytrace(World world, Vec3d fromPos, float pitch,
-			float yaw, float maxDistance, boolean onlyLiving) {
+			float yaw, float maxDistance, Predicate<? super Entity> selector) {
 		if (world == null || fromPos == null)
 			return null;
 		
-		return raytrace(world, fromPos, directionFromAngles(pitch, yaw), maxDistance, onlyLiving);
+		return raytrace(world, fromPos, directionFromAngles(pitch, yaw), maxDistance, selector);
 	}
 	
 	public static RayTraceResult raytrace(World world, Vec3d fromPos,
-			Vec3d direction, float maxDistance, boolean onlyLiving) {
+			Vec3d direction, float maxDistance, Predicate<? super Entity> selector) {
 		Vec3d toPos;
 		
 		if (world == null || fromPos == null || direction == null)
@@ -49,11 +90,11 @@ public class RayTrace {
 		toPos = new Vec3d(fromPos.xCoord + x, fromPos.yCoord + y, fromPos.zCoord + z);
 		
 		
-		return raytrace(world, fromPos, toPos, onlyLiving);
+		return raytrace(world, fromPos, toPos, selector);
 	}
 
 	public static RayTraceResult raytrace(World world, Vec3d fromPos, Vec3d toPos,
-			boolean onlyLiving) {
+			Predicate<? super Entity> selector) {
 		
         if (world == null || fromPos == null || toPos == null) {
         	return null;
@@ -76,7 +117,7 @@ public class RayTrace {
         {
             public boolean apply(Entity p_apply_1_)
             {
-                return p_apply_1_.canBeCollidedWith();
+                return p_apply_1_.canBeCollidedWith() && selector.apply(p_apply_1_);
             }
         }));
         // d2 is current closest distance
@@ -86,8 +127,6 @@ public class RayTrace {
         for (int j = 0; j < list.size(); ++j)
         {
             Entity entity1 = (Entity)list.get(j);
-            if (onlyLiving && !(entity1 instanceof EntityLiving))
-            	continue;
             
             float f1 = entity1.getCollisionBorderSize();
             AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().expand((double)f1, (double)f1, (double)f1);
@@ -125,15 +164,15 @@ public class RayTrace {
 	
 	
 	public static Collection<RayTraceResult> allInPath(World world, Vec3d fromPos, float pitch,
-			float yaw, float maxDistance, boolean onlyLiving) {
+			float yaw, float maxDistance, Predicate<? super Entity> selector) {
 		if (world == null || fromPos == null)
 			return null;
 		
-		return allInPath(world, fromPos, directionFromAngles(pitch, yaw), maxDistance, onlyLiving);
+		return allInPath(world, fromPos, directionFromAngles(pitch, yaw), maxDistance, selector);
 	}
 	
 	public static Collection<RayTraceResult> allInPath(World world, Vec3d fromPos,
-			Vec3d direction, float maxDistance, boolean onlyLiving) {
+			Vec3d direction, float maxDistance, Predicate<? super Entity> selector) {
 		Vec3d toPos;
 		
 		if (world == null || fromPos == null || direction == null)
@@ -145,7 +184,7 @@ public class RayTrace {
 		toPos = new Vec3d(fromPos.xCoord + x, fromPos.yCoord + y, fromPos.zCoord + z);
 		
 		
-		return allInPath(world, fromPos, toPos, onlyLiving);
+		return allInPath(world, fromPos, toPos, selector);
 	}
 	
 	/**
@@ -157,7 +196,7 @@ public class RayTrace {
 	 * @return
 	 */
 	public static Collection<RayTraceResult> allInPath(World world, Vec3d fromPos, Vec3d toPos,
-			boolean onlyLiving) {
+			Predicate<? super Entity> selector) {
 		
 		List<RayTraceResult> ret = new LinkedList<>();
 			
@@ -181,7 +220,7 @@ public class RayTrace {
         {
             public boolean apply(Entity p_apply_1_)
             {
-                return p_apply_1_.canBeCollidedWith();
+                return p_apply_1_.canBeCollidedWith() && selector.apply(p_apply_1_);
             }
         }));
         
@@ -190,8 +229,6 @@ public class RayTrace {
         for (int j = 0; j < list.size(); ++j)
         {
             Entity entity1 = (Entity)list.get(j);
-            if (onlyLiving && !(entity1 instanceof EntityLivingBase))
-            	continue;
             
             float f1 = entity1.getCollisionBorderSize();
             AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().expand((double)f1, (double)f1, (double)f1);

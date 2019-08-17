@@ -52,7 +52,7 @@ public class BeamTrigger extends InstantTrigger {
 		// Cast from eyes
 		pos = pos.addVector(0, state.getCaster().getEyeHeight(), 0);
 		
-		Collection<RayTraceResult> traces = RayTrace.allInPath(world, pos, pitch, yaw, BEAM_RANGE, true);
+		Collection<RayTraceResult> traces = RayTrace.allInPath(world, pos, pitch, yaw, BEAM_RANGE, new RayTrace.OtherLiving(state.getCaster()));
 		List<EntityLivingBase> others = null;
 		List<EntityLivingBase> targs = null;
 		List<BlockPos> blocks = null;

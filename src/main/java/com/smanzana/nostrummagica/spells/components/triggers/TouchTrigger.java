@@ -46,7 +46,7 @@ public class TouchTrigger extends InstantTrigger {
 				Vec3d pos, float pitch, float yaw) {
 		pos = pos.addVector(0, state.getSelf().getEyeHeight(), 0);
 		
-		RayTraceResult trace = RayTrace.raytrace(world, pos, pitch, yaw, TOUCH_RANGE, true);
+		RayTraceResult trace = RayTrace.raytrace(world, pos, pitch, yaw, TOUCH_RANGE, new RayTrace.OtherLiving(state.getCaster()));
 		
 		if (trace == null) {
 			return new TriggerData(null, null, null, null);
