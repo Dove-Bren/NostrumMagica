@@ -76,9 +76,8 @@ public class BeamTrigger extends InstantTrigger {
 					targs.add((EntityLivingBase) trace.entityHit);
 				} else {
 					blocks.add(new BlockPos(trace.hitVec.xCoord, trace.hitVec.yCoord, trace.hitVec.zCoord));
+					end = trace.hitVec;
 				}
-				end = trace.hitVec;
-					
 			}
 		}
 		

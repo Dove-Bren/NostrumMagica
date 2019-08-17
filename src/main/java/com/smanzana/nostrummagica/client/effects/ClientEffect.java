@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.client.effects;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.lwjgl.opengl.GL11;
+
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 
 import net.minecraft.client.Minecraft;
@@ -82,6 +84,9 @@ public class ClientEffect {
 		preModHook(detail, progress);
 		
 		GlStateManager.enableBlend();
+		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GlStateManager.disableLighting();
+		GlStateManager.enableAlpha();
 		drawForm(detail, mc, progress, partialTicks);
 		
 		GlStateManager.popAttrib();
