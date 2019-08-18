@@ -104,6 +104,7 @@ public class DragonEgg extends Item implements ILoreTagged {
 		
 		// Spawn
 		EntityTameDragonRed dragon = new EntityTameDragonRed(worldIn);
+		dragon.rollRandomStats();
 		dragon.setPosition(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5);
 		worldIn.spawnEntityInWorld(dragon);
 		

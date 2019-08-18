@@ -24,6 +24,7 @@ import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
@@ -36,6 +37,20 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 	public EntityDragon(World worldIn) {
         super(worldIn);
     }
+	
+	protected void setSize(float width, float length, float height) {
+		if (width != this.width || height != this.height) {
+			float f = this.width;
+			this.width = width;
+			this.height = height;
+			AxisAlignedBB axisalignedbb = this.getEntityBoundingBox();
+			this.setEntityBoundingBox(new AxisAlignedBB(axisalignedbb.minX, axisalignedbb.minY, axisalignedbb.minZ, axisalignedbb.minX + (double)this.width, axisalignedbb.minY + (double)this.height, axisalignedbb.minZ + (double)length));
+
+			if (this.width > f && !this.firstUpdate && !this.worldObj.isRemote) {
+				this.moveEntity((double)(f - this.width), 0.0D, (double)(f - length));
+			}
+		}
+	}
     
 	/*
 	 * TODO: Make a 'FlyingDragon' abstract class. Move bite and slash data things to this class.
@@ -43,6 +58,10 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 	 */
 	public abstract void slash(EntityLivingBase target);
 	public abstract void bite(EntityLivingBase target);
+	
+	public void dragonJump() {
+		; // Default, do nothing
+	}
     
 
     protected SoundEvent getHurtSound() {

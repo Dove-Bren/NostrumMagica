@@ -43,6 +43,7 @@ import com.smanzana.nostrummagica.client.render.TileEntityCandleRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityObeliskRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntitySymbolRenderer;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.entity.EntityDragon;
 import com.smanzana.nostrummagica.entity.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.EntityKoid;
@@ -539,6 +540,11 @@ public class ClientProxy extends CommonProxy {
 			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 			player.openGui(NostrumMagica.instance,
 					NostrumGui.infoscreenID, player.worldObj, 0, 0, 0);
+		} else if (Minecraft.getMinecraft().gameSettings.keyBindJump.isPressed()) {
+			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+			if (player.isRiding() && player.getRidingEntity() instanceof EntityTameDragonRed) {
+				((EntityDragon) player.getRidingEntity()).dragonJump();
+			}
 		}
 	}
 	

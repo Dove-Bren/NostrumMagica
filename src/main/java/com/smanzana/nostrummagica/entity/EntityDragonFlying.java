@@ -10,7 +10,7 @@ import net.minecraftforge.common.util.Constants.NBT;
 
 public abstract class EntityDragonFlying extends EntityDragon {
 
-	private static enum FlyState {
+	protected static enum FlyState {
 		LANDED,
 		TAKING_OFF,
 		FLYING,
@@ -142,10 +142,10 @@ public abstract class EntityDragonFlying extends EntityDragon {
 			this.moveHelper = new EntityDragon.DragonFlyMoveHelper(this);
 			this.navigator = new EntityDragon.PathNavigateDragonFlier(this, worldObj);
 			this.setFlyingAI();
+			this.addVelocity(Math.cos(this.rotationYaw) * .2, 0.5, Math.sin(this.rotationYaw) * .2);
 		}
-		
 		this.setNoGravity(true);
-		this.addVelocity(Math.cos(this.rotationYaw) * .2, 0.5, Math.sin(this.rotationYaw) * .2);
+		
 	}
 	
 	private void entityStopFlying() {
