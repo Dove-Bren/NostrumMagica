@@ -6,13 +6,21 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonBondInfoSheet;
+import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonInfoSheet;
+import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonContainer;
 import com.smanzana.nostrummagica.entity.tasks.DragonAINearestAttackableTarget;
 import com.smanzana.nostrummagica.entity.tasks.DragonMeleeAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowOwnerGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIOwnerHurtByTargetGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIOwnerHurtTargetGeneric;
+import com.smanzana.nostrummagica.entity.tasks.EntityAIPanicGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAISitGeneric;
+import com.smanzana.nostrummagica.items.NostrumRoseItem;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -27,23 +35,31 @@ import net.minecraft.entity.passive.EntityPig;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemSaddle;
+import net.minecraft.init.Items;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryBasic;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.management.PreYggdrasilConverter;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityTameable {
+public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityTameable, ITameDragon {
 
 	protected static final DataParameter<Boolean> TAMED = EntityDataManager.<Boolean>createKey(EntityTameDragonRed.class, DataSerializers.BOOLEAN);
     protected static final DataParameter<Optional<UUID>> OWNER_UNIQUE_ID = EntityDataManager.<Optional<UUID>>createKey(EntityTameDragonRed.class, DataSerializers.OPTIONAL_UNIQUE_ID);
@@ -53,8 +69,14 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
     protected static final DataParameter<Byte> CAPABILITY_JUMP = EntityDataManager.<Byte>createKey(EntityTameDragonRed.class, DataSerializers.BYTE);
     protected static final DataParameter<Float> CAPABILITY_JUMP_HEIGHT = EntityDataManager.<Float>createKey(EntityTameDragonRed.class, DataSerializers.FLOAT);
     protected static final DataParameter<Float> CAPABILITY_SPEED = EntityDataManager.<Float>createKey(EntityTameDragonRed.class, DataSerializers.FLOAT);
+    protected static final DataParameter<Integer> CAPABILITY_MAXMANA = EntityDataManager.<Integer>createKey(EntityTameDragonRed.class, DataSerializers.VARINT);
     protected static final DataParameter<Integer> CAPABILITY_MANA = EntityDataManager.<Integer>createKey(EntityTameDragonRed.class, DataSerializers.VARINT);
     protected static final DataParameter<Boolean> CAPABILITY_MAGIC = EntityDataManager.<Boolean>createKey(EntityTameDragonRed.class, DataSerializers.BOOLEAN);
+    protected static final DataParameter<Integer> CAPABILITY_MAGIC_SIZE  = EntityDataManager.<Integer>createKey(EntityTameDragonRed.class, DataSerializers.VARINT);
+    
+    protected static final DataParameter<Integer> ATTRIBUTE_XP  = EntityDataManager.<Integer>createKey(EntityTameDragonRed.class, DataSerializers.VARINT);
+    protected static final DataParameter<Integer> ATTRIBUTE_LEVEL  = EntityDataManager.<Integer>createKey(EntityTameDragonRed.class, DataSerializers.VARINT);
+    protected static final DataParameter<Float> ATTRIBUTE_BOND  = EntityDataManager.<Float>createKey(EntityTameDragonRed.class, DataSerializers.FLOAT);
     
     protected static final String NBT_TAMED = "Tamed";
     protected static final String NBT_OWNER_ID = "OwnerUUID";
@@ -64,11 +86,28 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
     protected static final String NBT_CAP_JUMPBOOST = "CapableJumpBonus";
     protected static final String NBT_CAP_SPEED = "CapableSpeedBonus";
     protected static final String NBT_CAP_MANA = "CapableMana";
+    protected static final String NBT_CAP_MAXMANA = "CapableMaxMana";
     protected static final String NBT_CAP_MAGIC = "CapableMagic";
+    protected static final String NBT_CAP_MAGIC_SIZE = "CapableMagicSize";
+    protected static final String NBT_ATTR_XP = "AttrXP";
+    protected static final String NBT_ATTR_LEVEL = "AttrLevel";
+    protected static final String NBT_ATTR_BOND = "AttrBond";
+    protected static final String NBT_INVENTORY = "DRInventory";
+    
+    public static final float BOND_LEVEL_FOLLOW = 0.05f;
+    public static final float BOND_LEVEL_PLAYERS = 0.15f;
+    public static final float BOND_LEVEL_CHEST = 0.20f;
+    public static final float BOND_LEVEL_ALLOW_RIDE = 0.50f;
+    public static final float BOND_LEVEL_MAGIC = 0.60f;
+    
+    private static final float DRAGON_MIN_HEALTH = 5.0f;
+    private static final int DRAGON_INV_SIZE = 27;
     
     // AI tasks to swap when tamed
     private DragonAINearestAttackableTarget<EntityPlayer> aiPlayerTarget;
     private EntityAIHurtByTarget aiRevengeTarget;
+    
+    private IInventory inventory;
     
     // Internal timers for controlling while riding
     private int jumpCount; // How many times we've jumped
@@ -79,6 +118,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		this.setSize(6F * .4F, 4.6F * .6F);
         this.stepHeight = 2;
         this.isImmuneToFire = true;
+        
+        this.inventory = new InventoryBasic("Dragon Inventory", true, DRAGON_INV_SIZE);
 	}
 	
 	protected void entityInit() {
@@ -91,22 +132,57 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		this.dataManager.register(CAPABILITY_JUMP_HEIGHT, 0f);
 		this.dataManager.register(CAPABILITY_SPEED, 0f);
 		this.dataManager.register(CAPABILITY_MANA, 0);
+		this.dataManager.register(CAPABILITY_MAXMANA, 0);
 		this.dataManager.register(CAPABILITY_MAGIC, Boolean.FALSE);
+		this.dataManager.register(CAPABILITY_MAGIC_SIZE, 0);
+		this.dataManager.register(ATTRIBUTE_XP, 0);
+		this.dataManager.register(ATTRIBUTE_LEVEL, 0);
+		this.dataManager.register(ATTRIBUTE_BOND, 0f);
 		
-		aiPlayerTarget = new DragonAINearestAttackableTarget<EntityPlayer>(this, EntityPlayer.class, true);
+		final EntityTameDragonRed dragon = this;
+		aiPlayerTarget = new DragonAINearestAttackableTarget<EntityPlayer>(this, EntityPlayer.class, true, new Predicate<EntityPlayer>() {
+			@Override
+			public boolean apply(EntityPlayer input) {
+				float bond = dragon.isTamed() ? dragon.getBond() : 0f;
+				
+				if (bond > BOND_LEVEL_PLAYERS) {
+					// Have a _chance_ of attacking for a while... about 5%
+					bond -= BOND_LEVEL_PLAYERS;
+					if (bond <= .05f) {
+						return (dragon.getRNG().nextFloat() <= bond);
+					} else {
+						return false;
+					}
+				}
+				
+				return true;
+			}
+		});
 		aiRevengeTarget = new EntityAIHurtByTarget(this, false, new Class[0]);
 	}
 	
 	protected void setupTamedAI() {
-		this.targetTasks.removeTask(aiPlayerTarget);
+		//this.targetTasks.removeTask(aiPlayerTarget);
 	}
 	
 	protected void setupBaseAI() {
 		this.tasks.addTask(0, new EntityAISwimming(this));
 		this.tasks.addTask(1, new EntityAISitGeneric<EntityTameDragonRed>(this));
-		this.tasks.addTask(2, new DragonMeleeAttackTask(this, 1.0D, true));
-		this.tasks.addTask(3, new EntityAIFollowOwnerGeneric<EntityTameDragonRed>(this, 1.0D, 16.0F, 4.0F));
-		this.tasks.addTask(4, new EntityAIWander(this, 1.0D, 30));
+		this.tasks.addTask(2, new EntityAIPanicGeneric<EntityTameDragonRed>(this, 1.0D, new Predicate<EntityTameDragonRed>() {
+			@Override
+			public boolean apply(EntityTameDragonRed input) {
+				return input.getHealth() <= DRAGON_MIN_HEALTH;
+			}
+		}));
+		this.tasks.addTask(3, new DragonMeleeAttackTask(this, 1.0D, true, 15.0D));
+		this.tasks.addTask(4, new EntityAIFollowOwnerGeneric<EntityTameDragonRed>(this, 1.0D, 16.0F, 4.0F, new Predicate<EntityTameDragonRed>() {
+			@Override
+			public boolean apply(EntityTameDragonRed input) {
+				// Don't follow unless we've bonded enough
+				return (input.getBond() >= BOND_LEVEL_FOLLOW);
+			}
+		}));
+		this.tasks.addTask(5, new EntityAIWander(this, 1.0D, 30));
 		
 		this.targetTasks.addTask(1, new EntityAIOwnerHurtByTargetGeneric<EntityTameDragonRed>(this));
         this.targetTasks.addTask(2, new EntityAIOwnerHurtTargetGeneric<EntityTameDragonRed>(this));
@@ -134,35 +210,76 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	}
 	
 	@Override
+	public boolean isBreedingItem(@Nullable ItemStack stack) {
+		if (stack == null || !this.isTamed())
+			return false;
+		
+		return stack.getItem() instanceof NostrumRoseItem;
+	}
+	
+	public boolean isHungerItem(ItemStack stack) {
+		if (stack == null) {
+			return false;
+		}
+		
+		Item item = stack.getItem();
+		return (
+				item == Items.BEEF
+			||	item == Items.MUTTON
+			||	item == Items.CHICKEN
+			||	item == Items.PORKCHOP
+				);
+	}
+	
+	@Override
 	public boolean processInteract(EntityPlayer player, EnumHand hand, @Nullable ItemStack stack) {
 		if (this.worldObj.isRemote) {
 			return false;
 		}
 		
+		// Shift-right click toggles the dragon sitting.
+		// When not sitting, right-click mounts the dragon.
+		// When sitting, right-click opens the GUI
 		if (this.isTamed() && player == this.getOwner()) {
 			if (hand == EnumHand.MAIN_HAND) {
-				if (stack == null) {
-					this.setSitting(!this.isSitting());
-				} else if (stack.getItem() instanceof ItemSaddle) {
-					player.startRiding(this);
-					this.setSitting(false);
-				}
 				
-				//donotcheckin
-				{
-					System.out.println("Can fly: " + this.getCanFly());
-					System.out.println("Jumps: " + this.getBonusJumps());
-					System.out.println("Jump Height Bonus: " + this.getJumpHeightBonus());
-					System.out.println("Speed Bonus: " + this.getSpeedBonus());
-					System.out.println("Mana: " + this.getDragonMana());
-					System.out.println("Has Magic: " + this.getCanUseMagic());
+				if (player.isSneaking()) {
+					this.setSitting(!this.isSitting());
+				} else if (this.getHealth() < this.getMaxHealth() && isHungerItem(player.getHeldItem(hand))) {
+					
+					this.heal(5f);
+					this.addBond(.2f);
+					
+					if (!player.isCreative()) {
+						player.getHeldItem(hand).stackSize--;
+					}
+				} else if (this.isSitting()) {
+					//player.openGui(NostrumMagica.instance, NostrumGui.dragonID, this.worldObj, (int) this.posX, (int) this.posY, (int) this.posZ);
+					NostrumMagica.proxy.openDragonGUI(player, this);
+				} else {
+					if (this.getBond() >= BOND_LEVEL_ALLOW_RIDE) {
+						if (this.getHealth() < DRAGON_MIN_HEALTH) {
+							player.addChatComponentMessage(new TextComponentTranslation("info.tamed_dragon.low_health", this.getName()));
+						} else {
+							player.startRiding(this);
+						}
+					} else {
+						player.addChatComponentMessage(new TextComponentTranslation("info.tamed_dragon.no_ride", this.getName()));
+					}
 				}
+				return true;
 			}
 		} else if (!this.isTamed()) {
-			this.tame(player, false);
+			if (hand == EnumHand.MAIN_HAND) {
+				this.tame(player, player.isCreative());
+				return true;
+			}
+		} else if (this.isTamed() && player.isCreative() && hand == EnumHand.MAIN_HAND) {
+			this.tame(player, true);
+			return true;
 		}
 		
-		return false;
+		return false;			
 	}
 	
 	@Nullable
@@ -177,13 +294,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	}
 	
 	@Override
-	public boolean isBreedingItem(@Nullable ItemStack stack) {
-		return false;
-	}
-	
-	@Override
 	 public boolean canBeLeashedTo(EntityPlayer player) {
-		return player == getOwner();
+		return !isSitting() && player == getOwner();
 	}
 
 	@Nullable
@@ -224,8 +336,29 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		compound.setByte(NBT_CAP_JUMP, (byte) this.getBonusJumps());
 		compound.setFloat(NBT_CAP_JUMPBOOST, this.getJumpHeightBonus());
 		compound.setFloat(NBT_CAP_SPEED, this.getSpeedBonus());
-		compound.setInteger(NBT_CAP_MANA, this.getDragonMana());
+		compound.setInteger(NBT_CAP_MANA, this.getCurrentMana());
+		compound.setInteger(NBT_CAP_MAXMANA, this.getDragonMana());
 		compound.setBoolean(NBT_CAP_MAGIC, this.getCanUseMagic());
+		compound.setInteger(NBT_CAP_MAGIC_SIZE, this.getMagicMemorySize());
+		compound.setInteger(NBT_ATTR_XP, this.getXP());
+		compound.setInteger(NBT_ATTR_LEVEL, this.getLevel());
+		compound.setFloat(NBT_ATTR_BOND, this.getBond());
+		
+		// Write inventory
+		{
+			NBTTagList invTag = new NBTTagList();
+			for (int i = 0; i < inventory.getSizeInventory(); i++) {
+				NBTTagCompound tag = new NBTTagCompound();
+				ItemStack stack = inventory.getStackInSlot(i);
+				if (stack != null) {
+					stack.writeToNBT(tag);
+				}
+				
+				invTag.appendTag(tag);
+			}
+			
+			compound.setTag(NBT_INVENTORY, invTag);
+		}
 	}
 
 	/**
@@ -260,9 +393,29 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		float jumpboost = compound.getFloat(NBT_CAP_JUMPBOOST);
 		float speed = compound.getFloat(NBT_CAP_SPEED);
 		int mana = compound.getInteger(NBT_CAP_MANA);
+		int maxmana = compound.getInteger(NBT_CAP_MAXMANA);
 		boolean canCast = compound.getBoolean(NBT_CAP_MAGIC);
+		int magicMemory = compound.getInteger(NBT_CAP_MAGIC_SIZE);
+		int xp = compound.getInteger(NBT_ATTR_XP);
+		int level = compound.getInteger(NBT_ATTR_LEVEL);
+		float bond = compound.getFloat(NBT_ATTR_BOND);
 		
-		this.setStats(canFly, jumps, jumpboost, speed, mana, canCast);
+		this.setStats(canFly, jumps, jumpboost, speed, this.getMaxHealth(), this.getHealth(), maxmana, mana, canCast, magicMemory, xp, level, bond);
+		
+		// Read inventory
+		{
+			NBTTagList list = compound.getTagList(NBT_INVENTORY, NBT.TAG_COMPOUND);
+			this.inventory = new InventoryBasic(this.getName(), true, DRAGON_INV_SIZE);
+			
+			for (int i = 0; i < DRAGON_INV_SIZE; i++) {
+				NBTTagCompound tag = list.getCompoundTagAt(i);
+				ItemStack stack = null;
+				if (tag != null) {
+					stack = ItemStack.loadItemStackFromNBT(tag);
+				}
+				this.inventory.setInventorySlotContents(i, stack);
+			}
+		}
 	}
 	
 	public boolean isTamed() {
@@ -280,18 +433,33 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		
 		boolean success = false;
 		
-		if (force || this.getRNG().nextInt(10) == 0) {
-			this.setTamed(true);
-			this.navigator.clearPathEntity();
-			this.setAttackTarget(null);
-			this.setHealth((float) this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue());
-			this.setOwnerId(player.getUniqueID());
-			
-			success = true;
+		if (force || this.getHealth() < 5.0f) {
+			if (force || this.getRNG().nextInt(10) == 0) {
+				player.addChatComponentMessage(new TextComponentTranslation("info.tamed_dragon.wild.tame_success", this.getName()));
+				
+				this.setTamed(true);
+				this.navigator.clearPathEntity();
+				this.setAttackTarget(null);
+				this.setHealth((float) this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue());
+				this.setOwnerId(player.getUniqueID());
+				this.setSitting(true);
+				
+				success = true;
+			} else {
+				// Failed
+				player.addChatComponentMessage(new TextComponentTranslation("info.tamed_dragon.wild.tame_fail", this.getName()));
+				this.heal(5.0f);
+			}
+		} else {
+			player.addChatComponentMessage(new TextComponentTranslation("info.tamed_dragon.wild.high_health", this.getName()));
 		}
 
 		if (!this.worldObj.isRemote) {
 			this.worldObj.setEntityState(this, success ? (byte) 7 : (byte) 6);
+		}
+		
+		if (!success) {
+			this.setAttackTarget(player);
 		}
 		
 		playTameEffect(success);
@@ -320,28 +488,36 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		}
 	}
 	
-	protected boolean getCanFly() {
+	public boolean getCanFly() {
 		return this.dataManager.get(CAPABILITY_FLY);
 	}
 	
-	protected int getBonusJumps() {
+	public int getBonusJumps() {
 		return (int) this.dataManager.get(CAPABILITY_JUMP);
 	}
 	
-	protected float getJumpHeightBonus() {
+	public float getJumpHeightBonus() {
 		return this.dataManager.get(CAPABILITY_JUMP_HEIGHT);
 	}
 	
-	protected float getSpeedBonus() {
+	public float getSpeedBonus() {
 		return this.dataManager.get(CAPABILITY_SPEED);
 	}
 	
-	protected int getDragonMana() {
+	public int getDragonMana() {
+		return this.dataManager.get(CAPABILITY_MAXMANA);
+	}
+	
+	public int getCurrentMana() {
 		return this.dataManager.get(CAPABILITY_MANA);
 	}
 	
-	protected boolean getCanUseMagic() {
+	public boolean getCanUseMagic() {
 		return this.dataManager.get(CAPABILITY_MAGIC);
+	}
+	
+	public int getMagicMemorySize() {
+		return this.dataManager.get(CAPABILITY_MAGIC_SIZE);
 	}
 	
 	private void setStats(
@@ -349,18 +525,36 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			int bonusJumps,
 			float bonusJumpHeight, // relative. 1 is double the height!
 			float bonusSpeed, // ""
+			float maxHealth,
+			float health,
+			int maxMana,
 			int mana,
-			boolean hasMagic
+			boolean hasMagic,
+			int magicMemory,
+			int xp,
+			int level,
+			float bond
 			) {
+		
+		health = Math.min(health, maxHealth);
+		mana = Math.min(mana, maxMana);
+		bond = Math.min(1f, Math.max(0f, bond));
 		
 		this.dataManager.set(CAPABILITY_FLY, canFly);
 		this.dataManager.set(CAPABILITY_JUMP, (byte) bonusJumps);
 		this.dataManager.set(CAPABILITY_JUMP_HEIGHT, bonusJumpHeight);
 		this.dataManager.set(CAPABILITY_SPEED, bonusSpeed);
+		this.dataManager.set(CAPABILITY_MAXMANA, maxMana);
 		this.dataManager.set(CAPABILITY_MANA, mana);
 		this.dataManager.set(CAPABILITY_MAGIC, hasMagic);
+		this.dataManager.set(CAPABILITY_MAGIC_SIZE, magicMemory);
+		this.dataManager.set(ATTRIBUTE_XP, xp);
+		this.dataManager.set(ATTRIBUTE_LEVEL, level);
+		this.dataManager.set(ATTRIBUTE_BOND, bond);
 		
 		this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.31D * (1D + (double) bonusSpeed));
+		this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(maxHealth);
+		this.setHealth(health);
 	}
 	
 	public void rollRandomStats() {
@@ -376,6 +570,14 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			bonusJumps = 1 + rand.nextInt(2);
 		} else {
 			bonusJumps = rand.nextInt(4);
+		}
+		
+		// Dragons that can't fly are hardier. It's just evolution!
+		float health;
+		if (canFly) {
+			health = 20 + (10 * rand.nextInt(4));
+		} else {
+			health = 50 + (10 * rand.nextInt(3));
 		}
 		
 		// 50% of the time, no jump height bonus.
@@ -406,11 +608,74 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			hasMagic = rand.nextInt(4)  == 0;
 		}
 		
-		this.setStats(canFly, bonusJumps, bonusJumpHeight, bonusSpeed, mana, hasMagic);
+		int magicMemory = 0;
+		if (hasMagic) {
+			magicMemory = rand.nextInt(2) + 1;
+		}
+		
+		this.setStats(canFly, bonusJumps, bonusJumpHeight, bonusSpeed, health, health, mana, mana, hasMagic, magicMemory, this.getXP(), this.getLevel(), this.getBond());
 	}
 	
 	public void rollInheritedStats(EntityTameDragonRed par1, EntityTameDragonRed par2) {
 		// TODO
+	}
+	
+	@Override
+	public void rollStats() {
+		this.rollRandomStats();
+	}
+	
+	public void levelup() {
+		int level = this.getLevel();
+		
+		// Red dragons possible gain jump height, max Health, max Mana, and Speed.
+		Random rand = getRNG();
+		
+		// Jump height:
+		float jumpHeight = 0f;
+		if (rand.nextBoolean()) {
+			jumpHeight = rand.nextFloat() * 0.05f; // 0-5%
+		}
+		
+		// Speed:
+		float speed = 0f;
+		if (rand.nextBoolean() && rand.nextBoolean()) {
+			speed = rand.nextFloat() * 0.05f; // 0-5%
+		}
+		
+		// Magic Memory:
+		int memory = 0;
+		if (this.getCanUseMagic() && rand.nextBoolean()) {
+			memory = rand.nextInt(2);
+		}
+		
+		// Health
+		// 50% 0, 37.5% 10, 12.5% 20
+		float health = (float) (rand.nextInt(1) * 10);
+		if (health > 0 && rand.nextBoolean() && rand.nextBoolean()) {
+			health += 10.0f;
+		}
+		
+		// Mana
+		int mana = 0;
+		if (this.getDragonMana() > 0) {
+			if (rand.nextBoolean()) {
+				mana = (rand.nextInt(30) + 1) * 10;
+			}
+		}
+		
+		health += this.getMaxHealth();
+		mana += this.getCurrentMana();
+		
+		this.setStats(this.getCanFly(), this.getBonusJumps(), this.getJumpHeightBonus() + jumpHeight, this.getSpeedBonus() + speed,
+				health, health, mana, mana, this.getCanUseMagic(), this.getMagicMemorySize() + memory, this.getXP(), level + 1, this.getBond());
+		//canFly, jumps, jumpboost, speed, this.getMaxHealth(), this.getHealth(), maxmana, mana, canCast, magicMemory, xp, level, bond
+		
+		EntityLivingBase owner = this.getOwner();
+		if (owner != null) {
+			NostrumMagicaSounds.DRAGON_DEATH.play(owner);
+			owner.addChatMessage(new TextComponentString(this.getName() + " leveled up!"));
+		}
 	}
 	
 	@Override
@@ -458,7 +723,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	 */
 	@Override
 	public void onDeath(DamageSource cause) {
-		if (!this.worldObj.isRemote && this.worldObj.getGameRules().getBoolean("showDeathMessages") && this.getOwner() instanceof EntityPlayerMP) {
+		if (this.getOwner() != null && !this.worldObj.isRemote && this.worldObj.getGameRules().getBoolean("showDeathMessages") && this.getOwner() instanceof EntityPlayerMP) {
 			this.getOwner().addChatMessage(this.getCombatTracker().getDeathMessage());
 		}
 
@@ -645,8 +910,36 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	}
 	
 	@Override
+	public boolean attackEntityFrom(DamageSource source, float amount) {
+		boolean hurt = super.attackEntityFrom(source, amount);
+		
+		if (hurt && this.isTamed()) {
+			EntityLivingBase owner = this.getOwner();
+			float health = this.getHealth();
+			if (health > 0f && health < DRAGON_MIN_HEALTH) {
+				if (owner != null && owner instanceof EntityPlayer) {
+					((EntityPlayer) this.getOwner()).addChatComponentMessage(new TextComponentTranslation("info.tamed_dragon.low_health", this.getName()));
+				}
+				this.dismountRidingEntity();
+			} else if (health > 0f) {
+				if (source instanceof EntityDamageSource) {
+					if (((EntityDamageSource) source).getEntity() == owner) {
+						// Hurt by the owner!
+						if (this.getRNG().nextBoolean()) {
+							// Remove bond!
+							this.removeBond(0.75f);
+						}
+					}
+				}
+			}
+		}
+		
+		return hurt;
+	}
+	
+	@Override
 	protected float getJumpUpwardsMotion() {
-		return 0.75f * (1f + this.getJumpHeightBonus());
+		return 0.75f * (1f + this.getJumpHeightBonus() + (this.considerFlying() ? 1 : 0));
 	}
 	
 	@Override
@@ -656,6 +949,151 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	
 	private boolean considerFlying() {
 		return this.getCanFly() && jumpCount >= 2;
+	}
+
+	@Override
+	public DragonContainer getGUIContainer() {
+		return new DragonContainer(this,
+				new RedDragonInfoSheet(this),
+				new RedDragonBondInfoSheet(this));
+	}
+	
+	public int getLevel() {
+		return this.dataManager.get(ATTRIBUTE_LEVEL);
+	}
+	
+	protected int getMaxXP(int level) {
+		return (int) (100D * Math.pow(1.5, level));
+	}
+
+	@Override
+	public int getXP() {
+		return this.dataManager.get(ATTRIBUTE_XP);
+	}
+
+	@Override
+	public int getMaxXP() {
+		return this.getMaxXP(getLevel());
+	}
+
+	@Override
+	public int getMana() {
+		return this.getCurrentMana();
+	}
+
+	@Override
+	public int getMaxMana() {
+		return this.getDragonMana();
+	}
+
+	@Override
+	public float getBond() {
+		return this.dataManager.get(ATTRIBUTE_BOND);
+	}
+	
+	protected void setBond(float bond) {
+		this.dataManager.set(ATTRIBUTE_BOND, bond);
+	}
+	
+	/**
+	 * Has a chance of adding some amount of bonding to the dragon.
+	 * Change is random and not in your control.
+	 * Rate influences how much is added. 1f is a normal kind-deed's amount. 2f is double that.
+	 * @param rate
+	 */
+	public void addBond(float rate) {
+		if (getRNG().nextBoolean() && getRNG().nextBoolean()) {
+			float amt = 0.025f;
+			float current = getBond();
+			float mod = rate * (1f + (getRNG().nextFloat() - 0.5f) * .5f); // 100% +- 25% of rate
+			
+			amt *= mod;
+			
+			amt = (current + amt);
+			amt = Math.max(0f, Math.min(1f, amt));
+			
+			setBond(amt);
+		}
+	}
+	
+	public void removeBond(float rate) {
+		float amt = -0.01f;
+		float current = getBond();
+		float mod = rate * (1f + (getRNG().nextFloat() - 0.5f) * .5f); // 100% +- 25% of rate
+		
+		amt *= mod;
+		
+		amt = (current + amt);
+		amt = Math.max(0f, Math.min(1f, amt));
+		
+		setBond(amt);
+	}
+	
+	/**
+	 * Adds some amount of XP to the dragon.
+	 * Note the xp curve before writing an amount. >.<
+	 * @param rate
+	 */
+	public void addXP(int xp) {
+		int newXP = this.getXP() + xp;
+		if (newXP < 0) {
+			newXP = 0;
+		}
+		
+		if (newXP > this.getMaxXP()) {
+			newXP -= this.getMaxXP();
+			this.levelup();
+		}
+		
+		this.dataManager.set(ATTRIBUTE_XP, newXP);
+	}
+	
+	public void slash(EntityLivingBase target) {
+		super.slash(target);
+		
+		if (this.isTamed()) {
+			Random rand = getRNG();
+			int xp = 0;
+			
+			if (rand.nextBoolean() && rand.nextBoolean()) {
+				xp = rand.nextInt(2);
+			}
+			
+			if (target.isDead || target.getHealth() < 0f) {
+				xp += 1;
+			}
+			
+			this.addXP(xp);
+		}
+	}
+	
+	public void bite(EntityLivingBase target) {
+		super.bite(target);
+		
+		if (this.isTamed()) {
+			Random rand = getRNG();
+			int xp = 0;
+			
+			if (rand.nextBoolean()) {
+				xp = rand.nextInt(3);
+			}
+			
+			if (target.isDead || target.getHealth() < 0f) {
+				xp += 2;
+			}
+			
+			this.addXP(xp);
+			
+			EntityLivingBase owner = this.getOwner();
+			if (owner != null && owner.equals(this.getControllingPassenger())) {
+				// Owner is riding
+				this.addBond(.5f);
+			}
+		}
+		
+		if (target instanceof EntityZombie || target instanceof EntityPlayer) {
+			this.heal(2);
+		}
 	}
 
 }

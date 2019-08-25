@@ -1,5 +1,8 @@
 package com.smanzana.nostrummagica.client.gui;
 
+import java.util.List;
+
+import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.LoreTable.LoreTableEntity;
 import com.smanzana.nostrummagica.blocks.ModificationTable.ModificationTableEntity;
@@ -12,10 +15,12 @@ import com.smanzana.nostrummagica.client.gui.container.ReagentBagGui;
 import com.smanzana.nostrummagica.client.gui.container.RuneBagGui;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
+import com.smanzana.nostrummagica.entity.ITameDragon;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.items.SpellScroll;
 
+import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -34,6 +39,7 @@ public class NostrumGui implements IGuiHandler {
 	public static final int loretableID = 6;
 	public static final int runeBagID = 7;
 	public static final int scrollID = 8;
+	public static final int dragonID = 9;
 	
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
@@ -94,6 +100,29 @@ public class NostrumGui implements IGuiHandler {
 						(LoreTableEntity) ent,
 						new BlockPos(x, y, z)); // should be tile inventory
 			}
+		}
+		
+		if (ID == dragonID) {
+			// Dumb that this interface doens't let us pass the dragon in directly!!!
+			
+			List<EntityDragon> list = world.getEntities(EntityDragon.class, new Predicate<EntityDragon>() {
+				@Override
+				public boolean apply(EntityDragon input) {
+					if (input != null && input instanceof ITameDragon) {
+						if (input.getDistanceSq(x, y, z) < 1) {
+							return true;
+						}
+					}
+					return false;
+				}
+			});
+			
+			if (list != null && !list.isEmpty()) {
+				ITameDragon dragon = (ITameDragon) list.get(0);
+				return dragon.getGUIContainer();
+			}
+			
+			return null;
 		}
 		
 		// Item based
@@ -178,6 +207,11 @@ public class NostrumGui implements IGuiHandler {
 						(LoreTableEntity) ent,
 						new BlockPos(x, y, z))); // should be tile inventory
 			}
+		}
+		
+		if (ID == dragonID) {
+			// Clients don't open something with the FML message. Instead we use our own custom message.
+			return null;
 		}
 		
 		// Item based

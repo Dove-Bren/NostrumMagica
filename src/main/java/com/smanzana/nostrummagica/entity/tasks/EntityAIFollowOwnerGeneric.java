@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.entity.tasks;
 
+import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.entity.IEntityTameable;
 
 import net.minecraft.block.material.Material;
@@ -27,8 +28,14 @@ public class EntityAIFollowOwnerGeneric<T extends EntityCreature & IEntityTameab
 	private float maxDist;
 	private float minDist;
 	private float oldWaterCost;
+	
+	protected Predicate<? super T> filter;
 
 	public EntityAIFollowOwnerGeneric(T thePetIn, double followSpeedIn, float minDistIn, float maxDistIn) {
+		this(thePetIn, followSpeedIn, minDistIn, maxDistIn, null);
+	}
+	
+	public EntityAIFollowOwnerGeneric(T thePetIn, double followSpeedIn, float minDistIn, float maxDistIn, Predicate<? super T> filter) {
 		this.thePet = thePetIn;
 		this.theWorld = thePetIn.worldObj;
 		this.followSpeed = followSpeedIn;
@@ -36,6 +43,8 @@ public class EntityAIFollowOwnerGeneric<T extends EntityCreature & IEntityTameab
 		this.minDist = minDistIn;
 		this.maxDist = maxDistIn;
 		this.setMutexBits(3);
+		
+		this.filter = filter;
 	}
 
 	/**
@@ -51,6 +60,8 @@ public class EntityAIFollowOwnerGeneric<T extends EntityCreature & IEntityTameab
 		} else if (this.thePet.isSitting()) {
 			return false;
 		} else if (this.thePet.getDistanceSqToEntity(entitylivingbase) < (double)(this.minDist * this.minDist)) {
+			return false;
+		} else if (this.filter != null && !this.filter.apply(this.thePet)) {
 			return false;
 		} else {
 			this.theOwner = entitylivingbase;

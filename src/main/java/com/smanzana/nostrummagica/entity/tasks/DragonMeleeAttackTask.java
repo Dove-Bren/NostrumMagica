@@ -13,11 +13,17 @@ public class DragonMeleeAttackTask extends EntityAIAttackMelee {
 	
 	protected int biteTick;
 	protected int stallTicks;
+	protected double reachSQR;
 	
 	public DragonMeleeAttackTask(EntityDragon dragon, double speedIn, boolean longMemoryIn) {
+		this(dragon, speedIn, longMemoryIn, 30.0);
+	}
+	
+	public DragonMeleeAttackTask(EntityDragon dragon, double speedIn, boolean longMemoryIn, double reachSQR) {
 		super(dragon, speedIn, longMemoryIn);
 		
 		biteTick = 0;
+		this.reachSQR = reachSQR;
 	}
 	
 	@Override
@@ -99,7 +105,7 @@ public class DragonMeleeAttackTask extends EntityAIAttackMelee {
 
 	@Override
 	protected double getAttackReachSqr(EntityLivingBase attackTarget) {
-		return 30.0;
+		return reachSQR;
 	}
 	
 	@Override

@@ -29,6 +29,7 @@ import com.smanzana.nostrummagica.capabilities.NostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagicStorage;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
+import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonContainer;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.config.network.ServerConfigMessage;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
@@ -44,6 +45,7 @@ import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityShadowDragonRed;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
 import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
+import com.smanzana.nostrummagica.entity.ITameDragon;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
@@ -85,6 +87,7 @@ import com.smanzana.nostrummagica.network.messages.ClientEffectRenderMessage;
 import com.smanzana.nostrummagica.network.messages.SpellDebugMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
+import com.smanzana.nostrummagica.network.messages.TamedDragonGUIOpenMessage;
 import com.smanzana.nostrummagica.potions.FrostbitePotion;
 import com.smanzana.nostrummagica.potions.MagicBoostPotion;
 import com.smanzana.nostrummagica.potions.MagicResistPotion;
@@ -542,6 +545,22 @@ public class CommonProxy {
 	
 	public void openBook(EntityPlayer player, GuiBook book, Object userdata) {
 		; // Server does nothing
+	}
+	
+	public void openDragonGUI(EntityPlayer player, ITameDragon dragon) {
+		// This code is largely taken from FMLNetworkHandler's openGui method, but we use our own message to open the GUI on the client
+		EntityPlayerMP mpPlayer = (EntityPlayerMP) player;
+		DragonContainer container = dragon.getGUIContainer();
+		mpPlayer.getNextWindowId();
+		mpPlayer.closeContainer();
+        int windowId = mpPlayer.currentWindowId;
+        mpPlayer.openContainer = container;
+        mpPlayer.openContainer.windowId = windowId;
+        mpPlayer.openContainer.addListener(mpPlayer);
+        
+        // Open GUI on client
+        TamedDragonGUIOpenMessage message = new TamedDragonGUIOpenMessage(dragon, container.getContainerID(), container.getSheetCount());
+        NetworkHandler.getSyncChannel().sendTo(message, mpPlayer);
 	}
 
 	public void sendServerConfig(EntityPlayerMP player) {

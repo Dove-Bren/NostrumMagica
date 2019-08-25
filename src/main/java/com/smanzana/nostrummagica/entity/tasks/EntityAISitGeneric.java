@@ -27,7 +27,7 @@ public class EntityAISitGeneric<T extends EntityCreature & IEntityTameable> exte
 			return false;
 		} else {
 			EntityLivingBase entitylivingbase = this.theEntity.getOwner();
-			return entitylivingbase == null ? true : (this.theEntity.getDistanceSqToEntity(entitylivingbase) < 144.0D && entitylivingbase.getAITarget() != null ? false : theEntity.isSitting());
+			return entitylivingbase == null ? this.theEntity.isSitting() : (this.theEntity.getDistanceSqToEntity(entitylivingbase) < 144.0D && entitylivingbase.getAITarget() != null ? false : theEntity.isSitting());
 		}
 	}
 

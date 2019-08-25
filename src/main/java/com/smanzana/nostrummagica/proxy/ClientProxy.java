@@ -49,6 +49,7 @@ import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityShadowDragonRed;
 import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
+import com.smanzana.nostrummagica.entity.ITameDragon;
 import com.smanzana.nostrummagica.entity.renderer.ModelGolem;
 import com.smanzana.nostrummagica.entity.renderer.RenderDragonRed;
 import com.smanzana.nostrummagica.entity.renderer.RenderGolem;
@@ -771,6 +772,17 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void openBook(EntityPlayer player, GuiBook book, Object userdata) {
 		Minecraft.getMinecraft().displayGuiScreen(book.getScreen(userdata));
+	}
+	
+	@Override
+	public void openDragonGUI(EntityPlayer player, ITameDragon dragon) {
+		// Integrated clients still need to open the gui...
+		if (!player.worldObj.isRemote) {
+//			DragonContainer container = dragon.getGUIContainer();
+//			DragonGUI gui = new DragonGUI(container);
+//			FMLCommonHandler.instance().showGuiScreen(gui);
+			super.openDragonGUI(player, dragon);
+		}
 	}
 	
 	@Override

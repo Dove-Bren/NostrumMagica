@@ -63,7 +63,7 @@ public class EntitySpellProjectile extends EntityFireball {
 		
 		// if client
 		if (this.ticksExisted % 5 == 0) {
-			this.worldObj.spawnParticle(EnumParticleTypes.CRIT,
+			this.worldObj.spawnParticle(EnumParticleTypes.CRIT_MAGIC,
 					posX, posY, posZ, 0, 0, 0);
 		}
 		

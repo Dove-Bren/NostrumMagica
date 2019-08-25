@@ -189,6 +189,12 @@ public class ModelDragonRed extends ModelBase {
 		limbSwing *= .4;
 		limbSwingAmount *= .4;
 		
+		// Reset all rotations to 0
+		for (EDragonPart part : EDragonPart.values()) {
+			RenderObj render = renderers.get(part);
+			render.rotateAngleX = render.rotateAngleY = render.rotateAngleZ = 0f;
+		}
+		
 		RenderObj wing_left = renderers.get(EDragonPart.WING_LEFT);
 		RenderObj wing_right = renderers.get(EDragonPart.WING_RIGHT);
 		RenderObj body = renderers.get(EDragonPart.BODY);
@@ -213,8 +219,6 @@ public class ModelDragonRed extends ModelBase {
 			wing_right.rotateAngleX = wing_right.rotateAngleY = 0f;
 			wing_right.rotateAngleZ = -(weight * .8f);
 			body.rotateAngleX = 0f;
-		} else if (sitting) {
-			body.rotateAngleX = -0.3f;
 		} else {
 			float rotX = (float) (2 * Math.PI * 0.14);
 			float rotY = (float) (2 * Math.PI * 0.22);
@@ -240,6 +244,10 @@ public class ModelDragonRed extends ModelBase {
 			wing_right.rotateAngleY = -rotY;
 			wing_right.rotateAngleZ = -rotZ;
 			body.rotateAngleX = 0f;
+			
+			if (sitting) {
+				body.rotateAngleX = -0.3f;
+			}
 		}
 		
 		
@@ -260,7 +268,7 @@ public class ModelDragonRed extends ModelBase {
 			frontleg_right.rotateAngleX = .45f;
 			backleg_left.rotateAngleX = backleg_right.rotateAngleX = 0f;
 			backleg_left.offsetY = backleg_right.offsetY = -.5f;
-		} else if (!flying) {
+		} else if (!flying && dragon.onGround) {
 			frontleg_left.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount;
 			frontleg_right.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
 			

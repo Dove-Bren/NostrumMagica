@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.ISpellArmor;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellTome;
+import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
@@ -53,127 +54,144 @@ public class ClientCastMessage implements IMessage {
 			boolean isScroll = message.tag.getBoolean(NBT_SCROLL);
 			int tomeID = message.tag.getInteger(NBT_TOME_ID);
 			
-			INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
-			
-			if (att == null) {
-				NostrumMagica.logger.warn("Could not look up player magic wrapper");
-				return null;
-			}
-			
-			// Cast it!
-			boolean seen = att.wasSpellDone(spell);
-			float xp = spell.getXP(seen);
-			int cost = spell.getManaCost();
-			SpellCastSummary summary = new SpellCastSummary(cost, xp);
-			
-			// Add the player's personal bonuses
-			summary.addCostRate(att.getManaCostModifier());
-			ItemStack tome = null;
-			if (!isScroll) {
-				// Find the tome this was cast from, if any
-				tome = NostrumMagica.findTome(sp, tomeID);
+			ctx.getServerHandler().playerEntity.getServerWorld().addScheduledTask(() -> {
 				
-				if (tome != null && tome.getItem() instanceof SpellTome
-						&& SpellTome.getTomeID(tome) == tomeID) {
-					// Casting from a tome.
+				INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
+				
+				if (att == null) {
+					NostrumMagica.logger.warn("Could not look up player magic wrapper");
+					return;
+				}
+				
+				// Cast it!
+				boolean seen = att.wasSpellDone(spell);
+				float xp = spell.getXP(seen);
+				int cost = spell.getManaCost();
+				SpellCastSummary summary = new SpellCastSummary(cost, xp);
+				
+				// Add the player's personal bonuses
+				summary.addCostRate(att.getManaCostModifier());
+				ItemStack tome = null;
+				if (!isScroll) {
+					// Find the tome this was cast from, if any
+					tome = NostrumMagica.findTome(sp, tomeID);
 					
-					// Check if base mana cost exceeds what we can do
-					int cap = SpellTome.getMaxMana(tome);
-					if (cap < cost) {
-						return new ClientCastReplyMessage(false, att.getMana(), 0, null);
+					if (tome != null && tome.getItem() instanceof SpellTome
+							&& SpellTome.getTomeID(tome) == tomeID) {
+						// Casting from a tome.
+						
+						// Check if base mana cost exceeds what we can do
+						int cap = SpellTome.getMaxMana(tome);
+						if (cap < cost) {
+							NetworkHandler.getSyncChannel().sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
+									ctx.getServerHandler().playerEntity);
+							return;
+						}
+						
+						SpellTome.applyEnhancements(tome, summary, sp);
+						
+					} else {
+						NostrumMagica.logger.warn("Got cast from client with mismatched tome");
+						NetworkHandler.getSyncChannel().sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
+								ctx.getServerHandler().playerEntity);
+						return;
 					}
-					
-					SpellTome.applyEnhancements(tome, summary, sp);
-					
-				} else {
-					NostrumMagica.logger.warn("Got cast from client with mismatched tome");
-					return new ClientCastReplyMessage(false, att.getMana(), 0, null);
 				}
-			}
-			
-			// Cap enhancements at 80% LRC
-			{
-				float lrc = summary.getReagentCost();
-				if (lrc < .2f)
-					summary.addCostRate(.2f - lrc); // Add however much we need to get to 1
-			}
-			
-			// Visit an equipped spell armor
-			for (ItemStack equip : sp.getEquipmentAndArmor()) {
-				if (equip == null)
-					continue;
-				if (equip.getItem() instanceof ISpellArmor) {
-					ISpellArmor armor = (ISpellArmor) equip.getItem();
-					armor.apply(sp, summary, equip);
+				
+				// Cap enhancements at 80% LRC
+				{
+					float lrc = summary.getReagentCost();
+					if (lrc < .2f)
+						summary.addCostRate(.2f - lrc); // Add however much we need to get to 1
 				}
-			}
-			
-			// Possible use baubles
-			IInventory baubles = NostrumMagica.baubles.getBaubles(sp);
-			if (baubles != null) {
-				for (int i = 0; i < baubles.getSizeInventory(); i++) {
-					ItemStack equip = baubles.getStackInSlot(i);
-					if (equip == null) {
+				
+				// Visit an equipped spell armor
+				for (ItemStack equip : sp.getEquipmentAndArmor()) {
+					if (equip == null)
 						continue;
-					}
-					
 					if (equip.getItem() instanceof ISpellArmor) {
 						ISpellArmor armor = (ISpellArmor) equip.getItem();
 						armor.apply(sp, summary, equip);
 					}
 				}
-			}
-			
-			cost = summary.getFinalCost();
-			xp = summary.getFinalXP();
-			float reagentCost = summary.getReagentCost();
-			
-			cost = Math.max(cost, 0);
-			reagentCost = Math.max(reagentCost, 0);
-			
-			Map<ReagentType, Integer> reagents = null;
-			
-			if (!sp.isCreative() && !isScroll) {
-				// Take mana and reagents
 				
-				if (att.getMana() < cost)
-					return new ClientCastReplyMessage(false, att.getMana(), 0.0f, null);
-				
-				// Check that the player can cast this
-				if (!NostrumMagica.canCast(spell, att)) {
-					NostrumMagica.logger.warn("Got cast message from client with too low of stats. They should relog...");
-					return new ClientCastReplyMessage(false, att.getMana(), 0, null);
-				}
-				
-				reagents = spell.getRequiredReagents();
-				
-				// Scan inventory for any applicable discounts
-				
-				applyReagentRate(reagents, reagentCost);
-				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
-					int count = NostrumMagica.getReagentCount(sp, row.getKey());
-					if (count < row.getValue()) {
-						sp.addChatComponentMessage(new TextComponentTranslation("info.spell.bad_reagent", row.getKey().prettyName()));
-						return new ClientCastReplyMessage(false, att.getMana(), 0, null);
+				// Possible use baubles
+				IInventory baubles = NostrumMagica.baubles.getBaubles(sp);
+				if (baubles != null) {
+					for (int i = 0; i < baubles.getSizeInventory(); i++) {
+						ItemStack equip = baubles.getStackInSlot(i);
+						if (equip == null) {
+							continue;
+						}
+						
+						if (equip.getItem() instanceof ISpellArmor) {
+							ISpellArmor armor = (ISpellArmor) equip.getItem();
+							armor.apply(sp, summary, equip);
+						}
 					}
 				}
-				// actually deduct
-				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
-					NostrumMagica.removeReagents(sp, row.getKey(), row.getValue());
+				
+				cost = summary.getFinalCost();
+				xp = summary.getFinalXP();
+				float reagentCost = summary.getReagentCost();
+				
+				cost = Math.max(cost, 0);
+				reagentCost = Math.max(reagentCost, 0);
+				
+				Map<ReagentType, Integer> reagents = null;
+				
+				if (!sp.isCreative() && !isScroll) {
+					// Take mana and reagents
+					
+					if (att.getMana() < cost) {
+						NetworkHandler.getSyncChannel().sendTo(new ClientCastReplyMessage(false, att.getMana(), 0.0f, null),
+								ctx.getServerHandler().playerEntity);
+						return;
+					}
+					
+					// Check that the player can cast this
+					if (!NostrumMagica.canCast(spell, att)) {
+						NostrumMagica.logger.warn("Got cast message from client with too low of stats. They should relog...");
+						NetworkHandler.getSyncChannel().sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
+								ctx.getServerHandler().playerEntity);
+						return;
+					}
+					
+					reagents = spell.getRequiredReagents();
+					
+					// Scan inventory for any applicable discounts
+					
+					applyReagentRate(reagents, reagentCost);
+					for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
+						int count = NostrumMagica.getReagentCount(sp, row.getKey());
+						if (count < row.getValue()) {
+							sp.addChatComponentMessage(new TextComponentTranslation("info.spell.bad_reagent", row.getKey().prettyName()));
+							NetworkHandler.getSyncChannel().sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
+									ctx.getServerHandler().playerEntity);
+							return;
+						}
+					}
+					// actually deduct
+					for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
+						NostrumMagica.removeReagents(sp, row.getKey(), row.getValue());
+					}
+					
+					att.addMana(-cost);
 				}
 				
-				att.addMana(-cost);
-			}
-			
-			if (!isScroll) {
-				// little hook here for extra effects
-				SpellTome.doSpecialCastEffects(tome, sp);
-			}
-			
-			spell.cast(sp, summary.getEfficiency());
-			att.addXP(xp);
+				if (!isScroll) {
+					// little hook here for extra effects
+					SpellTome.doSpecialCastEffects(tome, sp);
+				}
+				
+				spell.cast(sp, summary.getEfficiency());
+				att.addXP(xp);
 
-			return new ClientCastReplyMessage(true, att.getMana(), xp, reagents);
+				NetworkHandler.getSyncChannel().sendTo(new ClientCastReplyMessage(true, att.getMana(), xp, reagents),
+						ctx.getServerHandler().playerEntity);
+			});
+			
+			return null;
 		}
 
 		private void applyReagentRate(Map<ReagentType, Integer> reagents, float reagentCost) {

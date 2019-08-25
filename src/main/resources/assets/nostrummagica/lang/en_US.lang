@@ -378,6 +378,20 @@ info.shapehint.preamble=%2$sThe shrine does not release its energy to you, but i
 info.shapehint.chain="%3$sPresent unto me a spell scroll that will zap my enemies with duplicated potency, and render them blind to their surroundings!%1$s"
 info.shapehint.aoe="%3$sPresent unto me a spell scroll that will help me leap and bound to the stars and distant hills the same!%1$s"
 
+info.tamed_dragon.wild.high_health=The dragon has too much health to attempt to tame
+info.tamed_dragon.wild.tame_fail=You fail to tame the dragon, and spike its ire instead
+info.tamed_dragon.wild.tame_success=You successfully tamed the dragon
+info.tamed_dragon.low_health=%1$s is too low on health to ride
+info.tamed_dragon.no_ride=%1$s is too wild to ride
+
+info.tamed_dragon.red_bond.wild=The baby dragon is mostly wild. It won't even follow you around!
+info.tamed_dragon.red_bond.follow=The baby dragon doesn't trust you yet... but seems to be coming around. Now, when not sitting, it will follow you.
+info.tamed_dragon.red_bond.players=The baby dragon is starting to become fully domesticated. It no longer immediately tries to eat all of your fellow adventurers... at least, it tries not to!
+info.tamed_dragon.red_bond.chest=The baby dragon has started to trust you. It will even allow you to store your items with it for a while!
+info.tamed_dragon.red_bond.ride=Your bond with the baby dragon has increased significantly! It is not comfortable with letting you ride it!
+info.tamed_dragon.red_bond.magic=The baby dragon trusts you nearly completely. You now have the ability to manage how your dragon uses magic!
+info.tamed_dragon.red_bond.full=The baby dragon is now fully bonded with you!
+
 element.name=Element
 shape.name=Shape
 trigger.name=Trigger

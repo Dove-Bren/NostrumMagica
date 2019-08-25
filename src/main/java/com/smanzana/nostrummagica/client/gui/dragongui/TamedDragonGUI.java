@@ -1,0 +1,516 @@
+package com.smanzana.nostrummagica.client.gui.dragongui;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.google.common.collect.Lists;
+import com.mojang.realmsclient.gui.ChatFormatting;
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.entity.EntityDragon;
+import com.smanzana.nostrummagica.entity.ITameDragon;
+import com.smanzana.nostrummagica.network.NetworkHandler;
+import com.smanzana.nostrummagica.network.messages.TamedDragonGUIControlMessage;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.Container;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+/**
+ * A nice wrapped up dragon gui.
+ * 
+ * Doesn't do a lot on its own. Instead, things can build it up using dragon sheets
+ * 
+ * @author Skyler
+ */
+public class TamedDragonGUI {
+	
+	// Need a static registry of open containers for dispatching messages on the server
+	private static Map<Integer, DragonContainer> containers = new HashMap<>();
+	
+	private static int lastKey = 0;
+	
+	private static int register(DragonContainer container) {
+		int id = lastKey++;
+		containers.put(id, container);
+		return id;
+	}
+	
+	private static void registerAt(DragonContainer container, int id) {
+		lastKey = id + 1;
+		containers.put(id, container);
+	}
+	
+	private static void revoke(int id) {
+		containers.remove(id);
+	}
+	
+	public static void updateContainer(int id, NBTTagCompound nbt) {
+		DragonContainer container = containers.get(id);
+		if (container != null) {
+			container.handle(nbt);
+		}
+	}
+
+	public static class DragonContainer extends Container {
+
+		private ITameDragon dragon;
+		
+		private int currentSheet;
+		
+		protected List<IDragonGUISheet> sheets;
+		
+		protected int id;
+		
+		public DragonContainer(ITameDragon dragon, IDragonGUISheet ... sheets) {
+			this.dragon = dragon;
+			this.currentSheet = 0;
+			this.sheets = Lists.newArrayList(sheets);
+			
+			if (!((EntityDragon) dragon).worldObj.isRemote) {
+				this.id = TamedDragonGUI.register(this);				
+			}
+		}
+		
+		public void overrideID(int id) {
+			revoke(id);
+			registerAt(this, id);
+			this.id = id;
+		}
+		
+		@Override
+		public boolean canInteractWith(EntityPlayer playerIn) {
+			if (dragon == null) {
+				// Dragon hasn't been synced yet
+				return false;
+			}
+			return playerIn.equals(dragon.getOwner());
+		}
+
+		// Caution: This assumes only one player has these open!
+		@Override
+		public void onContainerClosed(EntityPlayer playerIn) {
+			revoke(this.id);
+		}
+		
+		public IDragonGUISheet getCurrentSheet() {
+			return sheets.get(currentSheet);
+		}
+		
+		public void setSheet(int index) {
+			this.currentSheet = Math.min(Math.max(0, index), sheets.size() - 1);
+		}
+		
+		public int getSheetIndex() {
+			return this.currentSheet;
+		}
+		
+		public int getContainerID() {
+			return this.id;
+		}
+		
+		public int getSheetCount() {
+			return this.sheets.size();
+		}
+		
+		// Handle a message sent from the client.
+		// Could be a button click to change sheets, some other control message,
+		// or a message for updating a sheet's contents.
+		protected void handle(NBTTagCompound nbt) {
+			DragonContainerMessageType type = NetworkHelper.GetType(nbt);
+			
+			if (type == null) {
+				return;
+			}
+			
+			switch (type) {
+			case SET_SHEET:
+				int index = NetworkHelper.GetSendSheetIndex(nbt);
+				this.setSheet(index);
+				break;
+			case SHEET_DATA:
+				this.getCurrentSheet().handleMessage(NetworkHelper.GetSendSheetData(nbt));
+				break;
+			case REROLL:
+				if (dragon != null && dragon.getOwner() instanceof EntityPlayer && ((EntityPlayer) dragon.getOwner()).isCreative()) {
+					dragon.rollStats();
+				}
+				break;
+			}
+		}
+		
+		// Sheets can call on their handle to the container to sync with the server.
+		// This call doesn't check if it's on the server. It'll just 'send' it. Know what you're doing!
+		public void sendSheetMessage(NBTTagCompound data) {
+			NetworkHelper.ClientSendSheetData(id, data);
+		}
+		
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public static class DragonGUI extends GuiContainer {
+		
+		private static final ResourceLocation TEXT = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/container/tamed_dragon_gui.png");
+		
+		private static int GUI_TEX_WIDTH = 256;
+		private static int GUI_TEX_HEIGHT = 256;
+		
+		private static int GUI_LENGTH_PREVIEW = 48;
+		private static int GUI_INFO_HOFFSET = 12;
+		private static int GUI_INFO_VOFFSET = GUI_LENGTH_PREVIEW + 10;
+		private static int GUI_SHEET_NHOFFSET = 10;
+		private static int GUI_SHEET_MARGIN = 5;
+		private static int GUI_SHEET_BUTTON_WIDTH = 50;
+		private static int GUI_SHEET_BUTTON_HEIGHT = 20;
+		private static int GUI_SHEET_BUTTON_VOFFSET = 5;
+		private static int GUI_SHEET_VOFFSET = GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT + GUI_SHEET_BUTTON_VOFFSET;
+		private static int GUI_SHEET_WIDTH = 246;
+		private static int GUI_SHEET_HEIGHT = 191;
+		
+		//private static int GUI_OPEN_ANIM_TIME = 20 * 1;
+		
+		private DragonContainer container;
+		
+		//private int openTicks;
+		
+		public DragonGUI(DragonContainer container) {
+			super(container);
+			this.container = container;
+			//this.openTicks = 0;
+		}
+		
+		@Override
+		public void initGui() {
+			this.xSize = this.width;
+			this.ySize = this.height;
+			super.initGui();
+		}
+		
+//		@Override
+//		public void updateScreen() {
+//			super.updateScreen();
+//			
+//			this.openTicks++;
+//		}
+
+		@Override
+		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+			GlStateManager.color(1.0F,  1.0F, 1.0F, 1.0F);
+			
+			final int GUI_SHEET_HOFFSET = this.width - (GUI_SHEET_WIDTH + GUI_SHEET_NHOFFSET);
+			final int GUI_SHEET_BUTTON_HOFFSET = GUI_SHEET_HOFFSET;
+			
+			if (this.container.dragon == null) {
+				this.drawCenteredString(fontRendererObj, "Waiting for server...", this.width / 2, this.height / 2, 0XFFAAAAAA);
+				return;
+			}
+			
+			// Draw top-left preview
+			{
+				Gui.drawRect(0, 0, GUI_LENGTH_PREVIEW, GUI_LENGTH_PREVIEW, 0xFF283D2A);
+				
+				int xPosition = GUI_LENGTH_PREVIEW / 2;
+				int yPosition = GUI_LENGTH_PREVIEW / 2;
+				RenderHelper.disableStandardItemLighting();
+				GuiInventory.drawEntityOnScreen(
+						xPosition,
+						(int) (GUI_LENGTH_PREVIEW * .75f),
+						(int) (GUI_LENGTH_PREVIEW * .2),
+						(float) (xPosition) - mouseX,
+						(float) (-yPosition) - mouseY,
+						(EntityLivingBase) container.dragon);
+			}
+			
+			// Move everything forward ahead of the drawn entity
+			// Can't just move entity back cause there's a GRAY plane drawn at just below 0 Z
+			GlStateManager.pushMatrix();
+			GlStateManager.translate(0, 0, 51);
+			
+			// Black background (not overlapping preview)
+			{
+				Gui.drawRect(0, GUI_LENGTH_PREVIEW, width, height, 0xFF000000);
+				Gui.drawRect(GUI_LENGTH_PREVIEW, 0, width, GUI_LENGTH_PREVIEW, 0xFF000000);
+			}
+			
+			// Draw stats and stuff
+			{
+				//Gui.drawRect(GUI_INFO_HOFFSET, GUI_INFO_VOFFSET, GUI_SHEET_HOFFSET - 10, height - 10, 0xFF00FFFF);
+				
+				final int w = (GUI_SHEET_HOFFSET - GUI_SHEET_MARGIN) - (GUI_INFO_HOFFSET * 2);
+				int x = GUI_INFO_HOFFSET;
+				int y = GUI_INFO_VOFFSET;
+				//final int w = 125;
+				final int h = 14;
+				final int centerX = GUI_SHEET_HOFFSET / 2;
+				
+				// Health
+				{
+					this.drawCenteredString(this.fontRendererObj, ChatFormatting.BOLD + "Health", centerX, y, 0xFFFFFFFF);
+					y += fontRendererObj.FONT_HEIGHT + 5;
+					Gui.drawRect(x, y, x + w, y + h, 0xFFD0D0D0);
+					Gui.drawRect(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF201010);
+					
+					int prog = (int) ((float) (w - 2) * (container.dragon.getHealth() / container.dragon.getMaxHealth()));
+					Gui.drawRect(x + 1, y + 1, x + 1 + prog, y + h - 1, 0xFFA02020);
+					
+					this.drawCenteredString(fontRendererObj,
+							String.format("%d / %d", (int) container.dragon.getHealth(), (int) container.dragon.getMaxHealth()),
+							centerX,
+							y + (h / 2) - (fontRendererObj.FONT_HEIGHT / 2),
+							0xFFC0C0C0);
+					
+					y += h + 10;
+				}
+				
+				// Mana
+				if (container.dragon.getMaxMana() > 0) {
+					this.drawCenteredString(this.fontRendererObj, ChatFormatting.BOLD + "Mana", centerX, y, 0xFFFFFFFF);
+					y += fontRendererObj.FONT_HEIGHT + 5;
+					Gui.drawRect(x, y, x + w, y + h, 0xFFD0D0D0);
+					Gui.drawRect(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF101020);
+					
+					int prog = (int) ((float) (w - 2) * ((float) container.dragon.getMana() / (float) container.dragon.getMaxMana()));
+					Gui.drawRect(x + 1, y + 1, x + 1 + prog, y + h - 1, 0xFF2020A0);
+					
+					this.drawCenteredString(fontRendererObj,
+							String.format("%d / %d", (int) container.dragon.getMana(), (int) container.dragon.getMaxMana()),
+							centerX,
+							y + (h / 2) - (fontRendererObj.FONT_HEIGHT / 2),
+							0xFFC0C0C0);
+					
+					y += h + 10;
+				}
+				
+				// Bond
+				// TODO make optional?
+				{
+					float bond = container.dragon.getBond();
+					this.drawCenteredString(this.fontRendererObj, ChatFormatting.BOLD + "Bond", centerX, y, 0xFFFFFFFF);
+					y += fontRendererObj.FONT_HEIGHT + 5;
+					Gui.drawRect(x, y, x + w, y + h, 0xFFD0D0D0);
+					Gui.drawRect(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF201020);
+					
+					int prog = (int) ((float) (w - 2) * bond);
+					Gui.drawRect(x + 1, y + 1, x + 1 + prog, y + h - 1, 0xFFA020A0);
+					
+					this.drawCenteredString(fontRendererObj,
+							String.format("%.2f%%", bond * 100f),
+							centerX,
+							y + (h / 2) - (fontRendererObj.FONT_HEIGHT / 2),
+							bond == 1f ? 0xFFC0FFC0 : 0xFFC0C0C0);
+					
+					y += h + 10;
+				}
+				
+				// XP
+				if (container.dragon.getXP() > -1) {
+					this.drawCenteredString(this.fontRendererObj, ChatFormatting.BOLD + "XP", centerX, y, 0xFFFFFFFF);
+					y += fontRendererObj.FONT_HEIGHT + 5;
+					Gui.drawRect(x, y, x + w, y + h, 0xFFD0D0D0);
+					Gui.drawRect(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF102010);
+					
+					int prog = (int) ((float) (w - 2) * ((float) container.dragon.getXP() / (float) container.dragon.getMaxXP()));
+					Gui.drawRect(x + 1, y + 1, x + 1 + prog, y + h - 1, 0xFF20A020);
+					
+					this.drawCenteredString(fontRendererObj,
+							String.format("%d / %d", (int) container.dragon.getXP(), (int) container.dragon.getMaxXP()),
+							centerX,
+							y + (h / 2) - (fontRendererObj.FONT_HEIGHT / 2),
+							0xFFC0C0C0);
+					
+					y += h + 10;
+				}
+			}
+			
+			if (container.sheets.size() > 0) {
+				int x = GUI_SHEET_BUTTON_HOFFSET;
+				
+				for (IDragonGUISheet sheet : container.sheets) {
+					Gui.drawRect(x, GUI_SHEET_BUTTON_VOFFSET, x + GUI_SHEET_BUTTON_WIDTH, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT, 0xFFFFFFFF);
+					Gui.drawRect(x + 1, GUI_SHEET_BUTTON_VOFFSET + 1, x + GUI_SHEET_BUTTON_WIDTH - 1, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT - 1, 0xFF202020);
+					
+					if (mouseX >= x && mouseX <= x + GUI_SHEET_BUTTON_WIDTH && mouseY >= GUI_SHEET_BUTTON_VOFFSET && mouseY <= GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT) {
+						Gui.drawRect(x, GUI_SHEET_BUTTON_VOFFSET, x + GUI_SHEET_BUTTON_WIDTH, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT, 0x40FFFFFF);
+					}
+					
+					String text = sheet.getButtonText();
+					int strLen = fontRendererObj.getStringWidth(text);
+					int strHeight = fontRendererObj.FONT_HEIGHT;
+					fontRendererObj.drawString(text, x + (GUI_SHEET_BUTTON_WIDTH / 2) - (strLen / 2), GUI_SHEET_BUTTON_VOFFSET + (GUI_SHEET_BUTTON_HEIGHT / 2) - (strHeight / 2), 0xFFFFFFFF);
+					x += GUI_SHEET_BUTTON_WIDTH;
+				}
+				
+				if (mc.thePlayer.isCreative()) {
+					Gui.drawRect(x, GUI_SHEET_BUTTON_VOFFSET, x + GUI_SHEET_BUTTON_WIDTH, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT, 0xFFFFDDFF);
+					Gui.drawRect(x + 1, GUI_SHEET_BUTTON_VOFFSET + 1, x + GUI_SHEET_BUTTON_WIDTH - 1, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT - 1, 0xFF702070);
+					
+					if (mouseX >= x && mouseX <= x + GUI_SHEET_BUTTON_WIDTH && mouseY >= GUI_SHEET_BUTTON_VOFFSET && mouseY <= GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT) {
+						Gui.drawRect(x, GUI_SHEET_BUTTON_VOFFSET, x + GUI_SHEET_BUTTON_WIDTH, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT, 0x40FFFFFF);
+					}
+					
+					String text = "Reroll";
+					int strLen = fontRendererObj.getStringWidth(text);
+					int strHeight = fontRendererObj.FONT_HEIGHT;
+					fontRendererObj.drawString(text, x + (GUI_SHEET_BUTTON_WIDTH / 2) - (strLen / 2), GUI_SHEET_BUTTON_VOFFSET + (GUI_SHEET_BUTTON_HEIGHT / 2) - (strHeight / 2), 0xFFFFFFFF);
+					x += GUI_SHEET_BUTTON_WIDTH;
+				}
+			}
+			
+			mc.getTextureManager().bindTexture(TEXT);
+			
+			// Draw sheet
+			IDragonGUISheet sheet = container.getCurrentSheet();
+			if (sheet != null) {
+				GlStateManager.pushMatrix();
+				GlStateManager.translate(GUI_SHEET_HOFFSET, GUI_SHEET_VOFFSET, 0);
+				
+				GlStateManager.enableAlpha();
+				GlStateManager.enableBlend();
+				GlStateManager.color(1f, 1f, 1f, 1f);
+				drawModalRectWithCustomSizedTexture(-GUI_SHEET_MARGIN, -GUI_SHEET_MARGIN, 0, 0, GUI_SHEET_WIDTH + (GUI_SHEET_MARGIN * 2), GUI_SHEET_HEIGHT + (GUI_SHEET_MARGIN * 2), GUI_TEX_WIDTH, GUI_TEX_HEIGHT);
+				
+				sheet.draw(Minecraft.getMinecraft(), partialTicks, GUI_SHEET_WIDTH, GUI_SHEET_HEIGHT,
+						mouseX - GUI_SHEET_HOFFSET, mouseY - GUI_SHEET_VOFFSET);
+				GlStateManager.popMatrix();
+			}
+			
+			GlStateManager.popMatrix();
+		}
+		
+		@Override
+		protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+			
+			if (!container.canInteractWith(Minecraft.getMinecraft().thePlayer)) {
+				return;
+			}
+			
+			final int GUI_SHEET_HOFFSET = this.width - (GUI_SHEET_WIDTH + GUI_SHEET_NHOFFSET);
+			final int GUI_SHEET_BUTTON_HOFFSET = GUI_SHEET_HOFFSET;
+			
+			// Sheet button?
+			if (mouseX >= GUI_SHEET_BUTTON_HOFFSET && mouseY >= GUI_SHEET_BUTTON_VOFFSET
+					&& mouseY <= GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT) {
+				int buttonIdx = (mouseX - GUI_SHEET_BUTTON_HOFFSET) / GUI_SHEET_BUTTON_WIDTH;
+				if (buttonIdx < container.sheets.size()) {
+					// Clicked a button!
+					NostrumMagicaSounds.UI_TICK.play(Minecraft.getMinecraft().thePlayer);
+					NetworkHelper.ClientSendSheet(container.id, buttonIdx);
+					return;
+				} else if (buttonIdx == container.sheets.size() && Minecraft.getMinecraft().thePlayer.isCreative()) {
+					NetworkHelper.ClientSendReroll(container.id);
+				}
+			}
+			
+			// Clicking on the sheet?
+			if (mouseX >= GUI_SHEET_HOFFSET && mouseX <= GUI_SHEET_HOFFSET + GUI_SHEET_WIDTH
+					&& mouseY >= GUI_SHEET_VOFFSET && mouseY <= GUI_SHEET_VOFFSET + GUI_SHEET_HEIGHT) {
+				IDragonGUISheet sheet = container.getCurrentSheet();
+				if (sheet != null) {
+					sheet.mouseClicked(mouseX - GUI_SHEET_HOFFSET, mouseY - GUI_SHEET_VOFFSET, mouseButton);
+					return;
+				}
+				
+			}
+			
+			super.mouseClicked(mouseX, mouseY, mouseButton);
+		}
+	}
+	
+
+	
+	private static enum DragonContainerMessageType {
+		
+		SET_SHEET("_SETSHEET"),
+		
+		SHEET_DATA("_SHEET_DATA"),
+		
+		REROLL("_REROLL");
+		
+		private final String nbtKey;
+		
+		private DragonContainerMessageType(String key) {
+			this.nbtKey = key;
+		}
+		
+		public String getKey() {
+			return this.nbtKey;
+		}
+	}
+	
+	private static final String NBT_TYPE = "TYPE";
+	private static final String NBT_INDEX = "INDEX";
+	private static final String NBT_USERDATA = "DATA";
+	
+	private static final class NetworkHelper {
+		
+		private static void clientSendInternal(int id, NBTTagCompound nbt) {
+			TamedDragonGUIControlMessage message = new TamedDragonGUIControlMessage(id, nbt);
+			
+			NetworkHandler.getSyncChannel().sendToServer(message);
+		}
+		
+		private static NBTTagCompound base(DragonContainerMessageType type) {
+			NBTTagCompound nbt = new NBTTagCompound();
+			nbt.setString(NBT_TYPE, type.getKey());
+			return nbt;
+		}
+		
+		public static void ClientSendSheet(int id, int sheet) {
+			NBTTagCompound nbt = base(DragonContainerMessageType.SET_SHEET);
+			nbt.setInteger(NBT_INDEX, sheet);
+			
+			clientSendInternal(id, nbt);
+		}
+		
+		public static void ClientSendSheetData(int id, NBTTagCompound data) {
+			NBTTagCompound nbt = base(DragonContainerMessageType.SHEET_DATA);
+			nbt.setTag(NBT_USERDATA, data);
+			
+			clientSendInternal(id, nbt);
+		}
+		
+		public static void ClientSendReroll(int id) {
+			NBTTagCompound nbt = base(DragonContainerMessageType.REROLL);
+			
+			clientSendInternal(id, nbt);
+		}
+		
+		
+		public static DragonContainerMessageType GetType(NBTTagCompound nbt) {
+			String str = nbt.getString(NBT_TYPE);
+			if (str == null || str.isEmpty()) {
+				return null;
+			}
+			
+			for (DragonContainerMessageType type : DragonContainerMessageType.values()) {
+				if (type.getKey().equalsIgnoreCase(str)) {
+					return type;
+				}
+			}
+			
+			return null;
+		}
+		
+		public static int GetSendSheetIndex(NBTTagCompound nbt) {
+			return nbt.getInteger(NBT_INDEX);
+		}
+		
+		public static NBTTagCompound GetSendSheetData(NBTTagCompound nbt) {
+			return nbt.getCompoundTag(NBT_USERDATA);
+		}
+		
+	}
+	
+}
