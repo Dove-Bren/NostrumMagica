@@ -5,7 +5,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.RuneBag;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.capabilities.Capability;
@@ -29,21 +29,23 @@ public class RuneBagToggleMessage implements IMessage {
 			// Is it on?
 			
 			
-			EntityPlayer sp = ctx.getServerHandler().playerEntity;
+			EntityPlayerMP sp = ctx.getServerHandler().playerEntity;
 			
 			boolean main = message.tag.getBoolean(NBT_MAIN);
 			boolean value = message.tag.getBoolean(NBT_VALUE);
 
-			ItemStack bag;
-			if (main)
-				bag = sp.getHeldItemMainhand();
-			else
-				bag = sp.getHeldItemOffhand();
-			if (bag == null || !(bag.getItem() instanceof RuneBag)) {
-				NostrumMagica.logger.warn("Rune bag double-check position was invalid! Is the server behind?");
-			}
-			
-			RuneBag.setVacuumEnabled(bag, value);
+			sp.getServerWorld().addScheduledTask(()-> {
+				ItemStack bag;
+				if (main)
+					bag = sp.getHeldItemMainhand();
+				else
+					bag = sp.getHeldItemOffhand();
+				if (bag == null || !(bag.getItem() instanceof RuneBag)) {
+					NostrumMagica.logger.warn("Rune bag double-check position was invalid! Is the server behind?");
+				}
+				
+				RuneBag.setVacuumEnabled(bag, value);
+			});
 			
 			return null;
 		}

@@ -2,10 +2,11 @@ package com.smanzana.nostrummagica.network.messages;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -26,31 +27,37 @@ public class ClientUpdateQuestMessage implements IMessage {
 
 		@Override
 		public StatSyncMessage onMessage(ClientUpdateQuestMessage message, MessageContext ctx) {
-			EntityPlayer sp = ctx.getServerHandler().playerEntity;
-			INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
-			
-			if (att == null) {
-				NostrumMagica.logger.warn("Could not look up player magic wrapper");
-				return null;
-			}
-			
 			if (!message.tag.hasKey(NBT_QUEST, NBT.TAG_STRING))
 				return null;
 			
-			NostrumQuest quest = NostrumQuest.lookup(message.tag.getString(NBT_QUEST));
+			final EntityPlayerMP sp = ctx.getServerHandler().playerEntity;
 			
-			if (quest == null) {
-				NostrumMagica.logger.warn("Player requested a quest that DNE");
-				return null;
-			}
+			sp.getServerWorld().addScheduledTask(() -> {
+				INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
+				
+				if (att == null) {
+					NostrumMagica.logger.warn("Could not look up player magic wrapper");
+					return;
+				}
+				
+				NostrumQuest quest = NostrumQuest.lookup(message.tag.getString(NBT_QUEST));
+				
+				if (quest == null) {
+					NostrumMagica.logger.warn("Player requested a quest that DNE");
+					return;
+				}
+				
+				if (att.getCurrentQuests().contains(quest.getKey())) {
+					if (quest.getObjective().isComplete(att))
+						quest.completeQuest(sp);
+				} else {
+					quest.startQuest(sp);
+				}
+	
+				 NetworkHandler.getSyncChannel().sendTo(new StatSyncMessage(att), sp);
+			});
 			
-			if (att.getCurrentQuests().contains(quest.getKey())) {
-				if (quest.getObjective().isComplete(att))
-					quest.completeQuest(sp);
-			} else
-				quest.startQuest(sp);
-
-			return new StatSyncMessage(att);
+			return null;
 		}
 	}
 

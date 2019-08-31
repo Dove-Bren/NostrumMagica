@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.capabilities.Capability;
@@ -31,40 +32,42 @@ public class ClientCastReplyMessage implements IMessage {
 		@Override
 		public IMessage onMessage(ClientCastReplyMessage message, MessageContext ctx) {
 
-			EntityPlayer player = NostrumMagica.proxy.getPlayer();
-			INostrumMagic att = NostrumMagica.getMagicWrapper(
-					player);
-			// Regardless of success, server has synced mana with us.
-			int mana = message.tag.getInteger(NBT_MANA);
-			float xp = message.tag.getFloat(NBT_XP);
-			boolean success = message.tag.getBoolean(NBT_STATUS);
-			
-			att.setMana(mana);
-			
-			if (success) {
-				// On success, server sends XP that was added
-				att.addXP(xp);
-			} else {
+			Minecraft.getMinecraft().addScheduledTask(() -> {
+				EntityPlayer player = NostrumMagica.proxy.getPlayer();
+				INostrumMagic att = NostrumMagica.getMagicWrapper(
+						player);
+				// Regardless of success, server has synced mana with us.
+				int mana = message.tag.getInteger(NBT_MANA);
+				float xp = message.tag.getFloat(NBT_XP);
+				boolean success = message.tag.getBoolean(NBT_STATUS);
 				
-			}
-			
-			if (message.tag.hasKey(NBT_REAGENTS, NBT.TAG_COMPOUND)) {
-				NBTTagCompound regs = message.tag.getCompoundTag(NBT_REAGENTS);
-				if (!regs.getKeySet().isEmpty())
-				for (String key : regs.getKeySet()) {
-					int cost = regs.getInteger(key);
-					if (cost == 0)
-						continue;
+				att.setMana(mana);
+				
+				if (success) {
+					// On success, server sends XP that was added
+					att.addXP(xp);
+				} else {
 					
-					try {
-						ReagentType type = ReagentType.valueOf(key);
-						NostrumMagica.removeReagents(player, type, cost);
-					} catch (Exception e) {
-						;
-					}
 				}
 				
-			}
+				if (message.tag.hasKey(NBT_REAGENTS, NBT.TAG_COMPOUND)) {
+					NBTTagCompound regs = message.tag.getCompoundTag(NBT_REAGENTS);
+					if (!regs.getKeySet().isEmpty())
+					for (String key : regs.getKeySet()) {
+						int cost = regs.getInteger(key);
+						if (cost == 0)
+							continue;
+						
+						try {
+							ReagentType type = ReagentType.valueOf(key);
+							NostrumMagica.removeReagents(player, type, cost);
+						} catch (Exception e) {
+							;
+						}
+					}
+					
+				}
+			});
 			
 
 			return null;

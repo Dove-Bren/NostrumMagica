@@ -4,6 +4,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -27,9 +28,12 @@ public class StatSyncMessage implements IMessage {
 			
 			NostrumMagica.logger.info("Recieved Nostrum Magica sync message from server");
 			
-			INostrumMagic override = CAPABILITY.getDefaultInstance();
-			CAPABILITY.getStorage().readNBT(CAPABILITY, override, null, message.tag);
-			NostrumMagica.proxy.receiveStatOverrides(override);
+			Minecraft.getMinecraft().addScheduledTask(() -> {
+				INostrumMagic override = CAPABILITY.getDefaultInstance();
+				CAPABILITY.getStorage().readNBT(CAPABILITY, override, null, message.tag);
+				NostrumMagica.proxy.receiveStatOverrides(override);
+			});
+			
 			
 			return null;
 		}

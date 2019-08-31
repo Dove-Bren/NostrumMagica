@@ -777,12 +777,12 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void openDragonGUI(EntityPlayer player, ITameDragon dragon) {
 		// Integrated clients still need to open the gui...
-		if (!player.worldObj.isRemote) {
+		//if (!player.worldObj.isRemote) {
 //			DragonContainer container = dragon.getGUIContainer();
 //			DragonGUI gui = new DragonGUI(container);
 //			FMLCommonHandler.instance().showGuiScreen(gui);
 			super.openDragonGUI(player, dragon);
-		}
+		//}
 	}
 	
 	@Override

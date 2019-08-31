@@ -24,13 +24,14 @@ public class SpellRequestMessage implements IMessage {
 
 		@Override
 		public SpellRequestReplyMessage onMessage(SpellRequestMessage message, MessageContext ctx) {
+			
+			// Note: This message handler is not on main thread, but the spell registry is threadsafe.
+			
 			// What spells?
-			System.out.println("Request for some spells...");
 			int ids[] = message.tag.getIntArray(NBT_IDS);
 			if (ids == null)
 				return null;
 			
-			System.out.println("requesting " + ids.length + " spells");
 			
 			List<Spell> spells = new LinkedList<>();
 			Spell spell;

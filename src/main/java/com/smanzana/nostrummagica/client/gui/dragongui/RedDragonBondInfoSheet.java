@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.entity.ITameDragon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 
 public class RedDragonBondInfoSheet implements IDragonGUISheet {
@@ -18,12 +19,12 @@ public class RedDragonBondInfoSheet implements IDragonGUISheet {
 	}
 	
 	@Override
-	public void showSheet(ITameDragon dragon, DragonContainer container) {
+	public void showSheet(ITameDragon dragon, EntityPlayer player, DragonContainer container, int width, int height, int offsetX, int offsetY) {
 		
 	}
 
 	@Override
-	public void hideSheet() {
+	public void hideSheet(ITameDragon dragon, EntityPlayer player, DragonContainer container) {
 		
 	}
 
@@ -119,6 +120,11 @@ public class RedDragonBondInfoSheet implements IDragonGUISheet {
 	@Override
 	public String getButtonText() {
 		return "Bonding";
+	}
+
+	@Override
+	public boolean shouldShow(ITameDragon dragon, DragonContainer container) {
+		return true; // always show
 	}
 
 }

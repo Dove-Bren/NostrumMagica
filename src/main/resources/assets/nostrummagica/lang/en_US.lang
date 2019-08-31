@@ -383,6 +383,7 @@ info.tamed_dragon.wild.tame_fail=You fail to tame the dragon, and spike its ire 
 info.tamed_dragon.wild.tame_success=You successfully tamed the dragon
 info.tamed_dragon.low_health=%1$s is too low on health to ride
 info.tamed_dragon.no_ride=%1$s is too wild to ride
+info.tamed_dragon.hurt=%1$s is getting low on health!
 
 info.tamed_dragon.red_bond.wild=The baby dragon is mostly wild. It won't even follow you around!
 info.tamed_dragon.red_bond.follow=The baby dragon doesn't trust you yet... but seems to be coming around. Now, when not sitting, it will follow you.

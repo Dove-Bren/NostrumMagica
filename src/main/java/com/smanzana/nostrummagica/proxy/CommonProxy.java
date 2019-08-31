@@ -550,7 +550,7 @@ public class CommonProxy {
 	public void openDragonGUI(EntityPlayer player, ITameDragon dragon) {
 		// This code is largely taken from FMLNetworkHandler's openGui method, but we use our own message to open the GUI on the client
 		EntityPlayerMP mpPlayer = (EntityPlayerMP) player;
-		DragonContainer container = dragon.getGUIContainer();
+		DragonContainer container = dragon.getGUIContainer(player);
 		mpPlayer.getNextWindowId();
 		mpPlayer.closeContainer();
         int windowId = mpPlayer.currentWindowId;
@@ -559,7 +559,7 @@ public class CommonProxy {
         mpPlayer.openContainer.addListener(mpPlayer);
         
         // Open GUI on client
-        TamedDragonGUIOpenMessage message = new TamedDragonGUIOpenMessage(dragon, container.getContainerID(), container.getSheetCount());
+        TamedDragonGUIOpenMessage message = new TamedDragonGUIOpenMessage(dragon, windowId, container.getContainerID(), container.getSheetCount());
         NetworkHandler.getSyncChannel().sendTo(message, mpPlayer);
 	}
 

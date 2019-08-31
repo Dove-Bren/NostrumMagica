@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -39,14 +39,16 @@ public class SpellCraftMessage implements IMessage {
 			BlockPos pos = new BlockPos(x, y, z);
 			String name = message.tag.getString(NBT_NAME);
 			
-			EntityPlayer sp = ctx.getServerHandler().playerEntity;
+			final EntityPlayerMP sp = ctx.getServerHandler().playerEntity;
+			
+			sp.getServerWorld().addScheduledTask(() -> {
 			World world = sp.worldObj;
 			
 			// Get the TE
 			TileEntity TE = world.getTileEntity(pos);
 			if (TE == null) {
 				NostrumMagica.logger.warn("Got craft message that didn't line up with a crafting table. This is a bug!");
-				return null;
+				return;
 			}
 			
 			SpellTableEntity entity = (SpellTableEntity) TE;
@@ -54,6 +56,7 @@ public class SpellCraftMessage implements IMessage {
 			entity.craft(name);
 			NostrumMagicaSounds.AMBIENT_WOOSH.play(entity.getWorld(), 
 					x, y, z);
+			});
 			
 			return null;
 		}

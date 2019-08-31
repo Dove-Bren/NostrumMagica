@@ -25,6 +25,8 @@ public class SpellRequestReplyMessage implements IMessage {
 
 		@Override
 		public IMessage onMessage(SpellRequestReplyMessage message, MessageContext ctx) {
+			// Note: This handler is not done on the game thread since the spell registry is thread safe.
+			
 			// What spells?
 			NBTTagList list = message.tag.getTagList(NBT_SPELLS, NBT.TAG_COMPOUND);
 			if (list == null)

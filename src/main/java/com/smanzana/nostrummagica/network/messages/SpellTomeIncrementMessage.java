@@ -5,7 +5,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.SpellTome;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -27,11 +27,14 @@ public class SpellTomeIncrementMessage implements IMessage {
 		public IMessage onMessage(SpellTomeIncrementMessage message, MessageContext ctx) {
 			// Is it on?
 			
-			EntityPlayer sp = ctx.getServerHandler().playerEntity;
+			final EntityPlayerMP sp = ctx.getServerHandler().playerEntity;
 			
 			int value = message.tag.getInteger(NBT_VALUE);
-			SpellTome.setIndex(NostrumMagica.getCurrentTome(sp),
-					value);
+			
+			sp.getServerWorld().addScheduledTask(() -> {
+				SpellTome.setIndex(NostrumMagica.getCurrentTome(sp),
+						value);
+			});
 			
 			return null;
 		}

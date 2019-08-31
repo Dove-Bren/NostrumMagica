@@ -4,9 +4,11 @@ import java.util.UUID;
 
 import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI;
 
+import net.minecraft.entity.player.EntityPlayer;
+
 public interface ITameDragon extends IEntityTameable {
 
-	public TamedDragonGUI.DragonContainer getGUIContainer();
+	public TamedDragonGUI.DragonContainer getGUIContainer(EntityPlayer player);
 	
 	public UUID getUniqueID();
 	

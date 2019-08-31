@@ -31,6 +31,7 @@ public class TamedDragonGUIOpenMessage implements IMessage {
 			final UUID uuid = message.tag.getUniqueId(NBT_UUID);
 			final int sheets = message.tag.getInteger(NBT_SHEETS);
 			final int id = message.tag.getInteger(NBT_CONTAINER_ID);
+			final int mcID = message.tag.getInteger(NBT_MC_CONTAINER_ID);
 			
 			Minecraft.getMinecraft().addScheduledTask(() -> {
 				ITameDragon dragon = null;
@@ -46,8 +47,9 @@ public class TamedDragonGUIOpenMessage implements IMessage {
 				}
 				
 				if (dragon != null) {
-					DragonContainer container = dragon.getGUIContainer();
+					DragonContainer container = dragon.getGUIContainer(Minecraft.getMinecraft().thePlayer);
 					container.overrideID(id);
+					container.windowId = mcID;
 					
 					if (sheets != container.getSheetCount()) {
 						NostrumMagica.logger.error("Sheet count differs on client and server for " + dragon);
@@ -69,6 +71,7 @@ public class TamedDragonGUIOpenMessage implements IMessage {
 	private static final String NBT_UUID = "uuid";
 	private static final String NBT_SHEETS = "numsheets"; // for sanity checking
 	private static final String NBT_CONTAINER_ID = "id";
+	private static final String NBT_MC_CONTAINER_ID = "minecraftScreenID";
 	
 	protected NBTTagCompound tag;
 	
@@ -76,12 +79,13 @@ public class TamedDragonGUIOpenMessage implements IMessage {
 		tag = new NBTTagCompound();
 	}
 	
-	public TamedDragonGUIOpenMessage(ITameDragon dragon, int id, int numSheets) {
+	public TamedDragonGUIOpenMessage(ITameDragon dragon, int mcID, int id, int numSheets) {
 		this();
 		
 		tag.setUniqueId(NBT_UUID, dragon.getUniqueID());
 		tag.setInteger(NBT_CONTAINER_ID, id);
 		tag.setInteger(NBT_SHEETS, numSheets);
+		tag.setInteger(NBT_MC_CONTAINER_ID, mcID);
 	}
 
 	@Override

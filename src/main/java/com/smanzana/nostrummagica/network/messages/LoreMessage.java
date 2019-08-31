@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -31,21 +32,25 @@ public class LoreMessage implements IMessage {
 		public IMessage onMessage(LoreMessage message, MessageContext ctx) {
 			//update local attributes
 			
+			
 			INostrumMagic override = CAPABILITY.getDefaultInstance();
 			CAPABILITY.getStorage().readNBT(CAPABILITY, override, null, message.tag.getTag(NBT_ATTRIBUTES));
-			NostrumMagica.proxy.receiveStatOverrides(override);
 			
-			ILoreTagged lore = LoreRegistry.instance().lookup(message.tag.getString(NBT_LORE_KEY));
-			if (lore == null) {
-				NostrumMagica.logger.warn("Tried to award lore with key " + message.tag.getString(NBT_LORE_KEY)
-						+ ", but that lore is not registered!");
-				// Register it with LoreRegistry.register
-			} else {
-				String name = lore.getLoreDisplayName();
-				EntityPlayer player = NostrumMagica.proxy.getPlayer();
-				player.addChatMessage(new TextComponentTranslation("info.lore.get", name));
-				NostrumMagicaSounds.UI_TICK.play(player, player.worldObj, player.posX, player.posY, player.posZ);
-			}
+			Minecraft.getMinecraft().addScheduledTask(() -> {
+				NostrumMagica.proxy.receiveStatOverrides(override);
+				
+				ILoreTagged lore = LoreRegistry.instance().lookup(message.tag.getString(NBT_LORE_KEY));
+				if (lore == null) {
+					NostrumMagica.logger.warn("Tried to award lore with key " + message.tag.getString(NBT_LORE_KEY)
+							+ ", but that lore is not registered!");
+					// Register it with LoreRegistry.register
+				} else {
+					String name = lore.getLoreDisplayName();
+					EntityPlayer player = NostrumMagica.proxy.getPlayer();
+					player.addChatMessage(new TextComponentTranslation("info.lore.get", name));
+					NostrumMagicaSounds.UI_TICK.play(player, player.worldObj, player.posX, player.posY, player.posZ);
+				}
+			});
 			
 			return null;
 		}

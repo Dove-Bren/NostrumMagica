@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 import com.mojang.realmsclient.gui.ChatFormatting;
@@ -23,6 +24,8 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
@@ -43,14 +46,13 @@ public class TamedDragonGUI {
 	private static int lastKey = 0;
 	
 	private static int register(DragonContainer container) {
+		if (container.player.worldObj.isRemote) {
+			throw new IllegalArgumentException("Can't register on the client!");
+		}
+		
 		int id = lastKey++;
 		containers.put(id, container);
 		return id;
-	}
-	
-	private static void registerAt(DragonContainer container, int id) {
-		lastKey = id + 1;
-		containers.put(id, container);
 	}
 	
 	private static void revoke(int id) {
@@ -66,18 +68,24 @@ public class TamedDragonGUI {
 
 	public static class DragonContainer extends Container {
 
+		private EntityPlayer player;
+		
 		private ITameDragon dragon;
 		
 		private int currentSheet;
 		
-		protected List<IDragonGUISheet> sheets;
+		protected List<IDragonGUISheet> sheetsAllInternal;
 		
 		protected int id;
 		
-		public DragonContainer(ITameDragon dragon, IDragonGUISheet ... sheets) {
+		private int guiOffsetX;
+		private int guiOffsetY;
+		
+		public DragonContainer(ITameDragon dragon, EntityPlayer player, IDragonGUISheet ... sheets) {
 			this.dragon = dragon;
+			this.player = player;
 			this.currentSheet = 0;
-			this.sheets = Lists.newArrayList(sheets);
+			this.sheetsAllInternal = Lists.newArrayList(sheets);
 			
 			if (!((EntityDragon) dragon).worldObj.isRemote) {
 				this.id = TamedDragonGUI.register(this);				
@@ -85,9 +93,17 @@ public class TamedDragonGUI {
 		}
 		
 		public void overrideID(int id) {
-			revoke(id);
-			registerAt(this, id);
+			if (!this.player.worldObj.isRemote) {
+				throw new IllegalArgumentException("Can't reset id on the server!");
+			}
+//			revoke(id);
+//			registerAt(this, id);
 			this.id = id;
+		}
+		
+		public void setGUIOffets(int x, int y) {
+			this.guiOffsetX = x;
+			this.guiOffsetY = y;
 		}
 		
 		@Override
@@ -105,16 +121,44 @@ public class TamedDragonGUI {
 			revoke(this.id);
 		}
 		
+		@Override
+		public ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
+			return null;
+		}
+		
+		/**
+		 * Returns a list of sheets this container has.
+		 * This is a collection that's filtered down to what should be shown
+		 * @return
+		 */
+		protected List<IDragonGUISheet> getSheets() {
+			final DragonContainer container = this;
+			return sheetsAllInternal.parallelStream().filter((sheet) -> {
+				return sheet.shouldShow(container.dragon, container);
+			}).collect(Collectors.toList());
+		}
+		
 		public IDragonGUISheet getCurrentSheet() {
-			return sheets.get(currentSheet);
+			return getSheets().get(currentSheet);
 		}
 		
 		public void setSheet(int index) {
-			this.currentSheet = Math.min(Math.max(0, index), sheets.size() - 1);
+			this.getCurrentSheet().hideSheet(dragon, player, this);
+			this.currentSheet = Math.min(Math.max(0, index), getSheets().size() - 1);
+			this.getCurrentSheet().showSheet(dragon, player, this, GUI_SHEET_WIDTH, GUI_SHEET_HEIGHT, guiOffsetX, guiOffsetY);
 		}
 		
 		public int getSheetIndex() {
 			return this.currentSheet;
+		}
+		
+		public void clearSlots() {
+			this.inventorySlots.clear();
+			this.inventoryItemStacks.clear();
+		}
+		
+		public void addSheetSlot(Slot slot) {
+			this.addSlotToContainer(slot);
 		}
 		
 		public int getContainerID() {
@@ -122,7 +166,7 @@ public class TamedDragonGUI {
 		}
 		
 		public int getSheetCount() {
-			return this.sheets.size();
+			return this.getSheets().size();
 		}
 		
 		// Handle a message sent from the client.
@@ -159,13 +203,18 @@ public class TamedDragonGUI {
 		
 	}
 	
+	public static int GUI_SHEET_WIDTH = 246;
+	public static int GUI_SHEET_HEIGHT = 191;
+	public static int GUI_TEX_WIDTH = 256;
+	public static int GUI_TEX_HEIGHT = 256;
+	public static int GUI_TEX_CELL_HOFFSET = 0;
+	public static int GUI_TEX_CELL_VOFFSET = 202;
+	
+	
 	@SideOnly(Side.CLIENT)
 	public static class DragonGUI extends GuiContainer {
 		
 		private static final ResourceLocation TEXT = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/container/tamed_dragon_gui.png");
-		
-		private static int GUI_TEX_WIDTH = 256;
-		private static int GUI_TEX_HEIGHT = 256;
 		
 		private static int GUI_LENGTH_PREVIEW = 48;
 		private static int GUI_INFO_HOFFSET = 12;
@@ -176,8 +225,6 @@ public class TamedDragonGUI {
 		private static int GUI_SHEET_BUTTON_HEIGHT = 20;
 		private static int GUI_SHEET_BUTTON_VOFFSET = 5;
 		private static int GUI_SHEET_VOFFSET = GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT + GUI_SHEET_BUTTON_VOFFSET;
-		private static int GUI_SHEET_WIDTH = 246;
-		private static int GUI_SHEET_HEIGHT = 191;
 		
 		//private static int GUI_OPEN_ANIM_TIME = 20 * 1;
 		
@@ -196,6 +243,9 @@ public class TamedDragonGUI {
 			this.xSize = this.width;
 			this.ySize = this.height;
 			super.initGui();
+			
+			final int GUI_SHEET_HOFFSET = this.width - (GUI_SHEET_WIDTH + GUI_SHEET_NHOFFSET);
+			this.container.setGUIOffets(GUI_SHEET_HOFFSET, GUI_SHEET_VOFFSET);
 		}
 		
 //		@Override
@@ -334,10 +384,10 @@ public class TamedDragonGUI {
 				}
 			}
 			
-			if (container.sheets.size() > 0) {
+			if (container.getSheets().size() > 0) {
 				int x = GUI_SHEET_BUTTON_HOFFSET;
 				
-				for (IDragonGUISheet sheet : container.sheets) {
+				for (IDragonGUISheet sheet : container.getSheets()) {
 					Gui.drawRect(x, GUI_SHEET_BUTTON_VOFFSET, x + GUI_SHEET_BUTTON_WIDTH, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT, 0xFFFFFFFF);
 					Gui.drawRect(x + 1, GUI_SHEET_BUTTON_VOFFSET + 1, x + GUI_SHEET_BUTTON_WIDTH - 1, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT - 1, 0xFF202020);
 					
@@ -396,32 +446,36 @@ public class TamedDragonGUI {
 				return;
 			}
 			
-			final int GUI_SHEET_HOFFSET = this.width - (GUI_SHEET_WIDTH + GUI_SHEET_NHOFFSET);
-			final int GUI_SHEET_BUTTON_HOFFSET = GUI_SHEET_HOFFSET;
+			// Only allow custom clicking s tuff if there isn't an item being held
+			if (Minecraft.getMinecraft().thePlayer.inventory.getItemStack() == null) {
 			
-			// Sheet button?
-			if (mouseX >= GUI_SHEET_BUTTON_HOFFSET && mouseY >= GUI_SHEET_BUTTON_VOFFSET
-					&& mouseY <= GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT) {
-				int buttonIdx = (mouseX - GUI_SHEET_BUTTON_HOFFSET) / GUI_SHEET_BUTTON_WIDTH;
-				if (buttonIdx < container.sheets.size()) {
-					// Clicked a button!
-					NostrumMagicaSounds.UI_TICK.play(Minecraft.getMinecraft().thePlayer);
-					NetworkHelper.ClientSendSheet(container.id, buttonIdx);
-					return;
-				} else if (buttonIdx == container.sheets.size() && Minecraft.getMinecraft().thePlayer.isCreative()) {
-					NetworkHelper.ClientSendReroll(container.id);
-				}
-			}
-			
-			// Clicking on the sheet?
-			if (mouseX >= GUI_SHEET_HOFFSET && mouseX <= GUI_SHEET_HOFFSET + GUI_SHEET_WIDTH
-					&& mouseY >= GUI_SHEET_VOFFSET && mouseY <= GUI_SHEET_VOFFSET + GUI_SHEET_HEIGHT) {
-				IDragonGUISheet sheet = container.getCurrentSheet();
-				if (sheet != null) {
-					sheet.mouseClicked(mouseX - GUI_SHEET_HOFFSET, mouseY - GUI_SHEET_VOFFSET, mouseButton);
-					return;
+				final int GUI_SHEET_HOFFSET = this.width - (GUI_SHEET_WIDTH + GUI_SHEET_NHOFFSET);
+				final int GUI_SHEET_BUTTON_HOFFSET = GUI_SHEET_HOFFSET;
+				
+				// Sheet button?
+				if (mouseX >= GUI_SHEET_BUTTON_HOFFSET && mouseY >= GUI_SHEET_BUTTON_VOFFSET
+						&& mouseY <= GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT) {
+					int buttonIdx = (mouseX - GUI_SHEET_BUTTON_HOFFSET) / GUI_SHEET_BUTTON_WIDTH;
+					if (buttonIdx < container.getSheets().size()) {
+						// Clicked a button!
+						NostrumMagicaSounds.UI_TICK.play(Minecraft.getMinecraft().thePlayer);
+						this.container.setSheet(buttonIdx);
+						NetworkHelper.ClientSendSheet(container.id, buttonIdx);
+						return;
+					} else if (buttonIdx == container.getSheets().size() && Minecraft.getMinecraft().thePlayer.isCreative()) {
+						NetworkHelper.ClientSendReroll(container.id);
+					}
 				}
 				
+				// Clicking on the sheet?
+				if (mouseX >= GUI_SHEET_HOFFSET && mouseX <= GUI_SHEET_HOFFSET + GUI_SHEET_WIDTH
+						&& mouseY >= GUI_SHEET_VOFFSET && mouseY <= GUI_SHEET_VOFFSET + GUI_SHEET_HEIGHT) {
+					IDragonGUISheet sheet = container.getCurrentSheet();
+					if (sheet != null) {
+						sheet.mouseClicked(mouseX - GUI_SHEET_HOFFSET, mouseY - GUI_SHEET_VOFFSET, mouseButton);
+					}
+					
+				}
 			}
 			
 			super.mouseClicked(mouseX, mouseY, mouseButton);

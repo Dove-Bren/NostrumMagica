@@ -2,9 +2,10 @@ package com.smanzana.nostrummagica.network.messages;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.network.NetworkHandler;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -21,15 +22,20 @@ public class StatRequestMessage implements IMessage {
 		@Override
 		public StatSyncMessage onMessage(StatRequestMessage message, MessageContext ctx) {
 			
-			EntityPlayer sp = ctx.getServerHandler().playerEntity;
-			INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
+			final EntityPlayerMP sp = ctx.getServerHandler().playerEntity;
 			
-			if (att == null) {
-				NostrumMagica.logger.warn("Could not look up player magic wrapper");
-				return null;
-			}
-
-			return new StatSyncMessage(att);
+			sp.getServerWorld().addScheduledTask(() -> {
+				INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
+				
+				if (att == null) {
+					NostrumMagica.logger.warn("Could not look up player magic wrapper");
+					return;
+				}
+				
+				NetworkHandler.getSyncChannel().sendTo(new StatSyncMessage(att), sp);
+			});
+			
+			return null;
 		}
 
 	}

@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -29,71 +30,72 @@ public class ClientEffectRenderMessage implements IMessage {
 		@Override
 		public IMessage onMessage(ClientEffectRenderMessage message, MessageContext ctx) {
 
-			EntityLivingBase caster, target;
-			Vec3d casterPos, targetPos;
-			SpellComponentWrapper component, flavor;
-			
-			caster = target = null;
-			casterPos = targetPos = null;
-			flavor = null;
-			
-			if (message.tag.hasKey(NBT_CASTER_ID, NBT.TAG_STRING)) {
-				try {
-					UUID id = UUID.fromString(message.tag.getString(NBT_CASTER_ID));
-					caster = NostrumMagica.proxy.getPlayer().worldObj.getPlayerEntityByUUID(id);
-				} catch (Exception e) {
-					;
-				}
-			}
-			
-			if (message.tag.hasKey(NBT_CASTER_POS, NBT.TAG_COMPOUND)) {
-				NBTTagCompound nbt = message.tag.getCompoundTag(NBT_CASTER_POS);
-				casterPos = new Vec3d(
-						nbt.getDouble("x"),
-						nbt.getDouble("y"),
-						nbt.getDouble("z")
-						);
-			}
-			
-			if (message.tag.hasKey(NBT_TARGET_ID, NBT.TAG_STRING)) {
-				try {
-					UUID id = UUID.fromString(message.tag.getString(NBT_TARGET_ID));
-					for (Entity e : NostrumMagica.proxy.getPlayer().worldObj.loadedEntityList) {
-						if (e.getPersistentID().equals(id)) {
-							target = (EntityLivingBase) e;
-							break;
-						}
+			Minecraft.getMinecraft().addScheduledTask(() -> {
+				EntityLivingBase caster, target;
+				Vec3d casterPos, targetPos;
+				SpellComponentWrapper component, flavor;
+				
+				caster = target = null;
+				casterPos = targetPos = null;
+				flavor = null;
+				
+				if (message.tag.hasKey(NBT_CASTER_ID, NBT.TAG_STRING)) {
+					try {
+						UUID id = UUID.fromString(message.tag.getString(NBT_CASTER_ID));
+						caster = NostrumMagica.proxy.getPlayer().worldObj.getPlayerEntityByUUID(id);
+					} catch (Exception e) {
+						;
 					}
-				} catch (Exception e) {
-					;
 				}
-			}
-			
-			if (message.tag.hasKey(NBT_TARGET_POS, NBT.TAG_COMPOUND)) {
-				NBTTagCompound nbt = message.tag.getCompoundTag(NBT_TARGET_POS);
-				targetPos = new Vec3d(
-						nbt.getDouble("x"),
-						nbt.getDouble("y"),
-						nbt.getDouble("z")
-						);
-			}
-			
-			if (message.tag.hasKey(NBT_FLAVOR, NBT.TAG_STRING)) {
-				String key = message.tag.getString(NBT_FLAVOR);
-				flavor = SpellComponentWrapper.fromKeyString(key);
-			}
-			
-			component = SpellComponentWrapper.fromKeyString(message.tag.getString(NBT_COMPONENT));
-			
-			if (component == null) {
-				NostrumMagica.logger.warn("Malformed effect message");
-				return null;
-			}
-			
-			NostrumMagica.proxy.spawnEffect(NostrumMagica.proxy.getPlayer().worldObj, 
-					component,
-					caster, casterPos, target, targetPos, flavor);
-			
+				
+				if (message.tag.hasKey(NBT_CASTER_POS, NBT.TAG_COMPOUND)) {
+					NBTTagCompound nbt = message.tag.getCompoundTag(NBT_CASTER_POS);
+					casterPos = new Vec3d(
+							nbt.getDouble("x"),
+							nbt.getDouble("y"),
+							nbt.getDouble("z")
+							);
+				}
+				
+				if (message.tag.hasKey(NBT_TARGET_ID, NBT.TAG_STRING)) {
+					try {
+						UUID id = UUID.fromString(message.tag.getString(NBT_TARGET_ID));
+						for (Entity e : NostrumMagica.proxy.getPlayer().worldObj.loadedEntityList) {
+							if (e.getPersistentID().equals(id)) {
+								target = (EntityLivingBase) e;
+								break;
+							}
+						}
+					} catch (Exception e) {
+						;
+					}
+				}
+				
+				if (message.tag.hasKey(NBT_TARGET_POS, NBT.TAG_COMPOUND)) {
+					NBTTagCompound nbt = message.tag.getCompoundTag(NBT_TARGET_POS);
+					targetPos = new Vec3d(
+							nbt.getDouble("x"),
+							nbt.getDouble("y"),
+							nbt.getDouble("z")
+							);
+				}
+				
+				if (message.tag.hasKey(NBT_FLAVOR, NBT.TAG_STRING)) {
+					String key = message.tag.getString(NBT_FLAVOR);
+					flavor = SpellComponentWrapper.fromKeyString(key);
+				}
+				
+				component = SpellComponentWrapper.fromKeyString(message.tag.getString(NBT_COMPONENT));
+				
+				if (component == null) {
+					NostrumMagica.logger.warn("Malformed effect message");
+					return;
+				}
+				
+				NostrumMagica.proxy.spawnEffect(NostrumMagica.proxy.getPlayer().worldObj, 
+						component,
+						caster, casterPos, target, targetPos, flavor);
+			});
 
 			return null;
 		}

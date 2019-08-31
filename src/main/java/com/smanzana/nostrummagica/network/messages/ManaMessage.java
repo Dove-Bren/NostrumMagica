@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.capabilities.Capability;
@@ -33,7 +34,6 @@ public class ManaMessage implements IMessage {
 			try {
 				id = UUID.fromString(message.tag.getString(NBT_UUID));
 			} catch (IllegalArgumentException e) {
-				System.out.println("x");
 				return null; // Just drop it
 			}
 			
@@ -46,18 +46,21 @@ public class ManaMessage implements IMessage {
 				return null;
 			}
 			
-			player = player.worldObj.getPlayerEntityByUUID(id);
+			Minecraft.getMinecraft().addScheduledTask(() -> {
+				EntityPlayer realPlayer = player.worldObj.getPlayerEntityByUUID(id);
 			
-			if (player == null) {
-				// Not in this world. Who cares
-				return null;
-			}
+				if (realPlayer == null) {
+					// Not in this world. Who cares
+					return;
+				}
+				
+				INostrumMagic att = NostrumMagica.getMagicWrapper(realPlayer);
+				// Regardless of success, server has synced mana with us.
+				
+				if (att != null)
+					att.setMana(mana);
+			});
 			
-			INostrumMagic att = NostrumMagica.getMagicWrapper(player);
-			// Regardless of success, server has synced mana with us.
-			
-			if (att != null)
-				att.setMana(mana);
 			
 			// Success or nah?
 			

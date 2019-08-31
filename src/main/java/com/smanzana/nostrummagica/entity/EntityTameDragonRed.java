@@ -10,6 +10,7 @@ import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonBondInfoSheet;
 import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonInfoSheet;
+import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonInventorySheet;
 import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonContainer;
 import com.smanzana.nostrummagica.entity.tasks.DragonAINearestAttackableTarget;
 import com.smanzana.nostrummagica.entity.tasks.DragonMeleeAttackTask;
@@ -29,6 +30,7 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAISwimming;
 import net.minecraft.entity.ai.EntityAIWander;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityCow;
 import net.minecraft.entity.passive.EntityPig;
@@ -71,12 +73,16 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
     protected static final DataParameter<Float> CAPABILITY_SPEED = EntityDataManager.<Float>createKey(EntityTameDragonRed.class, DataSerializers.FLOAT);
     protected static final DataParameter<Integer> CAPABILITY_MAXMANA = EntityDataManager.<Integer>createKey(EntityTameDragonRed.class, DataSerializers.VARINT);
     protected static final DataParameter<Integer> CAPABILITY_MANA = EntityDataManager.<Integer>createKey(EntityTameDragonRed.class, DataSerializers.VARINT);
+    protected static final DataParameter<Float> CAPABILITY_MANA_REGEN  = EntityDataManager.<Float>createKey(EntityTameDragonRed.class, DataSerializers.FLOAT);
     protected static final DataParameter<Boolean> CAPABILITY_MAGIC = EntityDataManager.<Boolean>createKey(EntityTameDragonRed.class, DataSerializers.BOOLEAN);
     protected static final DataParameter<Integer> CAPABILITY_MAGIC_SIZE  = EntityDataManager.<Integer>createKey(EntityTameDragonRed.class, DataSerializers.VARINT);
+    
     
     protected static final DataParameter<Integer> ATTRIBUTE_XP  = EntityDataManager.<Integer>createKey(EntityTameDragonRed.class, DataSerializers.VARINT);
     protected static final DataParameter<Integer> ATTRIBUTE_LEVEL  = EntityDataManager.<Integer>createKey(EntityTameDragonRed.class, DataSerializers.VARINT);
     protected static final DataParameter<Float> ATTRIBUTE_BOND  = EntityDataManager.<Float>createKey(EntityTameDragonRed.class, DataSerializers.FLOAT);
+    
+    protected static final DataParameter<Float> SYNCED_MAX_HEALTH  = EntityDataManager.<Float>createKey(EntityTameDragonRed.class, DataSerializers.FLOAT);
     
     protected static final String NBT_TAMED = "Tamed";
     protected static final String NBT_OWNER_ID = "OwnerUUID";
@@ -86,6 +92,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
     protected static final String NBT_CAP_JUMPBOOST = "CapableJumpBonus";
     protected static final String NBT_CAP_SPEED = "CapableSpeedBonus";
     protected static final String NBT_CAP_MANA = "CapableMana";
+    protected static final String NBT_CAP_MANAREGEN = "CapableManaRegen";
     protected static final String NBT_CAP_MAXMANA = "CapableMaxMana";
     protected static final String NBT_CAP_MAGIC = "CapableMagic";
     protected static final String NBT_CAP_MAGIC_SIZE = "CapableMagicSize";
@@ -132,12 +139,14 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		this.dataManager.register(CAPABILITY_JUMP_HEIGHT, 0f);
 		this.dataManager.register(CAPABILITY_SPEED, 0f);
 		this.dataManager.register(CAPABILITY_MANA, 0);
+		this.dataManager.register(CAPABILITY_MANA_REGEN, 1.0f);
 		this.dataManager.register(CAPABILITY_MAXMANA, 0);
 		this.dataManager.register(CAPABILITY_MAGIC, Boolean.FALSE);
 		this.dataManager.register(CAPABILITY_MAGIC_SIZE, 0);
 		this.dataManager.register(ATTRIBUTE_XP, 0);
 		this.dataManager.register(ATTRIBUTE_LEVEL, 0);
 		this.dataManager.register(ATTRIBUTE_BOND, 0f);
+		this.dataManager.register(SYNCED_MAX_HEALTH, 100.0f);
 		
 		final EntityTameDragonRed dragon = this;
 		aiPlayerTarget = new DragonAINearestAttackableTarget<EntityPlayer>(this, EntityPlayer.class, true, new Predicate<EntityPlayer>() {
@@ -159,6 +168,16 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			}
 		});
 		aiRevengeTarget = new EntityAIHurtByTarget(this, false, new Class[0]);
+	}
+	
+	@Override
+	public void notifyDataManagerChange(DataParameter<?> key) {
+		super.notifyDataManagerChange(key);
+		if (key == SYNCED_MAX_HEALTH) {
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(
+					this.dataManager.get(SYNCED_MAX_HEALTH).floatValue()
+					);
+		}
 	}
 	
 	protected void setupTamedAI() {
@@ -245,6 +264,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 				
 				if (player.isSneaking()) {
 					this.setSitting(!this.isSitting());
+					this.getDataManager().set(CAPABILITY_MANA, this.getDragonMana() / 2);
 				} else if (this.getHealth() < this.getMaxHealth() && isHungerItem(player.getHeldItem(hand))) {
 					
 					this.heal(5f);
@@ -338,6 +358,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		compound.setFloat(NBT_CAP_SPEED, this.getSpeedBonus());
 		compound.setInteger(NBT_CAP_MANA, this.getCurrentMana());
 		compound.setInteger(NBT_CAP_MAXMANA, this.getDragonMana());
+		compound.setFloat(NBT_CAP_MANAREGEN, this.getManaRegen());
 		compound.setBoolean(NBT_CAP_MAGIC, this.getCanUseMagic());
 		compound.setInteger(NBT_CAP_MAGIC_SIZE, this.getMagicMemorySize());
 		compound.setInteger(NBT_ATTR_XP, this.getXP());
@@ -394,13 +415,14 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		float speed = compound.getFloat(NBT_CAP_SPEED);
 		int mana = compound.getInteger(NBT_CAP_MANA);
 		int maxmana = compound.getInteger(NBT_CAP_MAXMANA);
+		float regen = compound.getFloat(NBT_CAP_MANAREGEN);
 		boolean canCast = compound.getBoolean(NBT_CAP_MAGIC);
 		int magicMemory = compound.getInteger(NBT_CAP_MAGIC_SIZE);
 		int xp = compound.getInteger(NBT_ATTR_XP);
 		int level = compound.getInteger(NBT_ATTR_LEVEL);
 		float bond = compound.getFloat(NBT_ATTR_BOND);
 		
-		this.setStats(canFly, jumps, jumpboost, speed, this.getMaxHealth(), this.getHealth(), maxmana, mana, canCast, magicMemory, xp, level, bond);
+		this.setStats(canFly, jumps, jumpboost, speed, this.getMaxHealth(), this.getHealth(), maxmana, mana, regen, canCast, magicMemory, xp, level, bond);
 		
 		// Read inventory
 		{
@@ -512,6 +534,15 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		return this.dataManager.get(CAPABILITY_MANA);
 	}
 	
+	public float getManaRegen() {
+		return this.dataManager.get(CAPABILITY_MANA_REGEN);
+	}
+	
+	public void addManaRegen(float regen) {
+		float old = this.getManaRegen();
+		this.dataManager.set(CAPABILITY_MANA_REGEN, old + regen);
+	}
+	
 	public boolean getCanUseMagic() {
 		return this.dataManager.get(CAPABILITY_MAGIC);
 	}
@@ -529,6 +560,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			float health,
 			int maxMana,
 			int mana,
+			float regen,
 			boolean hasMagic,
 			int magicMemory,
 			int xp,
@@ -546,6 +578,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		this.dataManager.set(CAPABILITY_SPEED, bonusSpeed);
 		this.dataManager.set(CAPABILITY_MAXMANA, maxMana);
 		this.dataManager.set(CAPABILITY_MANA, mana);
+		this.dataManager.set(CAPABILITY_MANA_REGEN, regen);
 		this.dataManager.set(CAPABILITY_MAGIC, hasMagic);
 		this.dataManager.set(CAPABILITY_MAGIC_SIZE, magicMemory);
 		this.dataManager.set(ATTRIBUTE_XP, xp);
@@ -553,7 +586,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		this.dataManager.set(ATTRIBUTE_BOND, bond);
 		
 		this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.31D * (1D + (double) bonusSpeed));
-		this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(maxHealth);
+		this.dataManager.set(SYNCED_MAX_HEALTH, maxHealth);
+		//this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(maxHealth); Synced thr ough data manager
 		this.setHealth(health);
 	}
 	
@@ -598,14 +632,24 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			mana = 2000 + (100 * rand.nextInt(10));
 		}
 		
+		// If we have mana, we have some sort of mana regen
+		float regen = 0f;
+		if (mana > 0) {
+			// Dragons regen kinda slowly. Red dragons have .75 +- .25 regen
+			regen = (rand.nextFloat() * .5f) + .5f;
+		}
+		
 		// Baby dragons may or may not have magic.
+		// Dragons can't have magic if they don't have mana.
 		// If it can fly, it's more likely to be supreme and
 		// have magic (40%). Otherwise, 25%;
-		boolean hasMagic;
-		if (canFly) {
-			hasMagic = rand.nextInt(5) < 2;
-		} else {
-			hasMagic = rand.nextInt(4)  == 0;
+		boolean hasMagic = false;
+		if (mana > 0) {
+			if (canFly) {
+				hasMagic = rand.nextInt(5) < 2;
+			} else {
+				hasMagic = rand.nextInt(4)  == 0;
+			}
 		}
 		
 		int magicMemory = 0;
@@ -613,7 +657,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			magicMemory = rand.nextInt(2) + 1;
 		}
 		
-		this.setStats(canFly, bonusJumps, bonusJumpHeight, bonusSpeed, health, health, mana, mana, hasMagic, magicMemory, this.getXP(), this.getLevel(), this.getBond());
+		this.setStats(canFly, bonusJumps, bonusJumpHeight, bonusSpeed, health, health, mana, mana, regen, hasMagic, magicMemory, this.getXP(), this.getLevel(), this.getBond());
 	}
 	
 	public void rollInheritedStats(EntityTameDragonRed par1, EntityTameDragonRed par2) {
@@ -656,11 +700,16 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			health += 10.0f;
 		}
 		
-		// Mana
+		// Mana + regen
 		int mana = 0;
+		float regen = 0f;
 		if (this.getDragonMana() > 0) {
 			if (rand.nextBoolean()) {
 				mana = (rand.nextInt(30) + 1) * 10;
+			}
+			
+			if (rand.nextBoolean() && rand.nextBoolean()) {
+				regen = rand.nextFloat() * .2f;
 			}
 		}
 		
@@ -668,7 +717,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		mana += this.getCurrentMana();
 		
 		this.setStats(this.getCanFly(), this.getBonusJumps(), this.getJumpHeightBonus() + jumpHeight, this.getSpeedBonus() + speed,
-				health, health, mana, mana, this.getCanUseMagic(), this.getMagicMemorySize() + memory, this.getXP(), level + 1, this.getBond());
+				health, health, mana, mana, regen + this.getManaRegen(), this.getCanUseMagic(), this.getMagicMemorySize() + memory, this.getXP(), level + 1, this.getBond());
 		//canFly, jumps, jumpboost, speed, this.getMaxHealth(), this.getHealth(), maxmana, mana, canCast, magicMemory, xp, level, bond
 		
 		EntityLivingBase owner = this.getOwner();
@@ -725,6 +774,16 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	public void onDeath(DamageSource cause) {
 		if (this.getOwner() != null && !this.worldObj.isRemote && this.worldObj.getGameRules().getBoolean("showDeathMessages") && this.getOwner() instanceof EntityPlayerMP) {
 			this.getOwner().addChatMessage(this.getCombatTracker().getDeathMessage());
+		}
+		
+		if (!this.worldObj.isRemote && this.inventory != null) {
+			for (int i = 0; i < inventory.getSizeInventory(); i++) {
+				ItemStack stack = inventory.getStackInSlot(i);
+				if (stack != null && stack.stackSize != 0) {
+					EntityItem item = new EntityItem(this.worldObj, this.posX, this.posY, this.posZ, stack);
+					this.worldObj.spawnEntityInWorld(item);
+				}
+			}
 		}
 
 		super.onDeath(cause);
@@ -809,6 +868,19 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 				if (this.motionY < 0.0D) {
 					double relief = Math.min(1.0D, this.motionX * this.motionX + this.motionZ * this.motionZ);
 					this.motionY *= (1D - (0.9D * relief));				
+				}
+			}
+		} else {
+			if (this.ticksExisted % 20 == 0) {
+				if (this.getDragonMana() > 0 && this.getCurrentMana() < this.getDragonMana()) {
+					float amt = this.getManaRegen();
+					int mana = (int) (amt);
+					amt = amt - (int) amt;
+					if (amt > 0f && NostrumMagica.rand.nextFloat() < amt)
+						mana++;
+					
+					 int current = this.getCurrentMana();
+					 this.getDataManager().set(CAPABILITY_MANA, Math.min(Math.max(0, current + mana), this.getDragonMana()));
 				}
 			}
 		}
@@ -918,7 +990,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			float health = this.getHealth();
 			if (health > 0f && health < DRAGON_MIN_HEALTH) {
 				if (owner != null && owner instanceof EntityPlayer) {
-					((EntityPlayer) this.getOwner()).addChatComponentMessage(new TextComponentTranslation("info.tamed_dragon.low_health", this.getName()));
+					((EntityPlayer) this.getOwner()).addChatComponentMessage(new TextComponentTranslation("info.tamed_dragon.hurt", this.getName()));
 				}
 				this.dismountRidingEntity();
 			} else if (health > 0f) {
@@ -952,10 +1024,11 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	}
 
 	@Override
-	public DragonContainer getGUIContainer() {
-		return new DragonContainer(this,
+	public DragonContainer getGUIContainer(EntityPlayer player) {
+		return new DragonContainer(this, player,
 				new RedDragonInfoSheet(this),
-				new RedDragonBondInfoSheet(this));
+				new RedDragonBondInfoSheet(this),
+				new RedDragonInventorySheet(this));
 	}
 	
 	public int getLevel() {
@@ -1094,6 +1167,14 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		if (target instanceof EntityZombie || target instanceof EntityPlayer) {
 			this.heal(2);
 		}
+	}
+	
+	public boolean canUseInventory() {
+		return this.isTamed() && this.getBond() >= BOND_LEVEL_CHEST;
+	}
+	
+	public IInventory getInventory() {
+		return this.inventory;
 	}
 
 }

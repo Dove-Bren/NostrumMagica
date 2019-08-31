@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.EnumParticleTypes;
@@ -44,9 +45,12 @@ public class ObeliskTeleportationRequestMessage implements IMessage {
 			}
 			to = NBTUtil.getPosFromTag(message.tag.getCompoundTag(NBT_TO));
 			
-			EntityPlayer sp = ctx.getServerHandler().playerEntity;
+			EntityPlayerMP sp = ctx.getServerHandler().playerEntity;
 			
-			serverDoRequest(sp.worldObj, sp, from, to);
+			final BlockPos fromFinal = from;
+			sp.getServerWorld().addScheduledTask(() -> {
+				serverDoRequest(sp.worldObj, sp, fromFinal, to);				
+			});
 			
 			return null;
 		}

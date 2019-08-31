@@ -39,19 +39,21 @@ public class ModifyMessage implements IMessage {
 			boolean bool = message.tag.getBoolean(NBT_VAL_B);
 			float flt = message.tag.getFloat(NBT_VAL_F);
 			
-			EntityPlayer sp = ctx.getServerHandler().playerEntity;
-			World world = sp.worldObj;
-			
-			// Get the TE
-			TileEntity TE = world.getTileEntity(pos);
-			if (TE == null) {
-				NostrumMagica.logger.warn("Got modifyt message that didn't line up with a modification table. This is a bug!");
-				return null;
-			}
-			
-			ModificationTableEntity entity = (ModificationTableEntity) TE;
-			
-			entity.modify(bool, flt);
+			ctx.getServerHandler().playerEntity.getServerWorld().addScheduledTask(() -> {
+				EntityPlayer sp = ctx.getServerHandler().playerEntity;
+				World world = sp.worldObj;
+				
+				// Get the TE
+				TileEntity TE = world.getTileEntity(pos);
+				if (TE == null) {
+					NostrumMagica.logger.warn("Got modify message that didn't line up with a modification table. This is a bug!");
+					return;
+				}
+				
+				ModificationTableEntity entity = (ModificationTableEntity) TE;
+				
+				entity.modify(bool, flt);
+			});
 			
 			return null;
 		}

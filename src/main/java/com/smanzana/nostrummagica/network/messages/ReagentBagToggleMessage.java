@@ -5,7 +5,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.ReagentBag;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.capabilities.Capability;
@@ -28,21 +28,25 @@ public class ReagentBagToggleMessage implements IMessage {
 		public IMessage onMessage(ReagentBagToggleMessage message, MessageContext ctx) {
 			// Is it on?
 			
-			EntityPlayer sp = ctx.getServerHandler().playerEntity;
+			EntityPlayerMP sp = ctx.getServerHandler().playerEntity;
 			
 			boolean main = message.tag.getBoolean(NBT_MAIN);
 			boolean value = message.tag.getBoolean(NBT_VALUE);
 
-			ItemStack bag;
-			if (main)
-				bag = sp.getHeldItemMainhand();
-			else
-				bag = sp.getHeldItemOffhand();
-			if (bag == null || !(bag.getItem() instanceof ReagentBag)) {
-				NostrumMagica.logger.warn("Reagent bag double-check position was invalid! Is the server behind?");
-			}
 			
-			ReagentBag.setVacuumEnabled(bag, value);
+			
+			sp.getServerWorld().addScheduledTask(() -> {
+				ItemStack bag;
+				if (main)
+					bag = sp.getHeldItemMainhand();
+				else
+					bag = sp.getHeldItemOffhand();
+				if (bag == null || !(bag.getItem() instanceof ReagentBag)) {
+					NostrumMagica.logger.warn("Reagent bag double-check position was invalid! Is the server behind?");
+				}
+				
+				ReagentBag.setVacuumEnabled(bag, value);
+			});
 			
 			return null;
 		}

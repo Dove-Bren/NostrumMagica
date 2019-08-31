@@ -13,7 +13,7 @@ import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -39,7 +39,7 @@ public class ClientCastMessage implements IMessage {
 			// Figure out what spell they have
 			// cast it if they can
 			
-			EntityPlayer sp = ctx.getServerHandler().playerEntity;
+			final EntityPlayerMP sp = ctx.getServerHandler().playerEntity;
 			
 			// What spell?
 			Spell spell = NostrumMagica.spellRegistry.lookup(
@@ -54,7 +54,7 @@ public class ClientCastMessage implements IMessage {
 			boolean isScroll = message.tag.getBoolean(NBT_SCROLL);
 			int tomeID = message.tag.getInteger(NBT_TOME_ID);
 			
-			ctx.getServerHandler().playerEntity.getServerWorld().addScheduledTask(() -> {
+			sp.getServerWorld().addScheduledTask(() -> {
 				
 				INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
 				

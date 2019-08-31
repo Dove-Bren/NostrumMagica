@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.network.messages;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.network.NetworkHandler;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
@@ -31,40 +32,44 @@ public class ClientSkillUpMessage implements IMessage {
 
 		@Override
 		public StatSyncMessage onMessage(ClientSkillUpMessage message, MessageContext ctx) {
-			EntityPlayer sp = ctx.getServerHandler().playerEntity;
-			INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
-			
-			if (att == null) {
-				NostrumMagica.logger.warn("Could not look up player magic wrapper");
-				return null;
-			}
-			
 			if (!message.tag.hasKey(NBT_TYPE, NBT.TAG_INT))
 				return null;
 			
-			int ord = message.tag.getInteger(NBT_TYPE);
-			
-			Type type = Type.values()[ord];
-			
-			if (att.getSkillPoints() > 0) {
-				switch (type) {
-				case CONTROL:
-					att.addControl();
-					break;
-				case FINESSE:
-					att.addFinesse();
-					break;
-				case TECHNIQUE:
-					att.addTech();
-					break;
-				default: // don't take point when something's wrong!
-					return null;
+			ctx.getServerHandler().playerEntity.getServerWorld().addScheduledTask(() -> {
+				EntityPlayer sp = ctx.getServerHandler().playerEntity;
+				INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
+				
+				if (att == null) {
+					NostrumMagica.logger.warn("Could not look up player magic wrapper");
+					return;
 				}
-				att.takeSkillPoint();
-			}
-			
+				
+				int ord = message.tag.getInteger(NBT_TYPE);
+				
+				Type type = Type.values()[ord];
+				
+				if (att.getSkillPoints() > 0) {
+					switch (type) {
+					case CONTROL:
+						att.addControl();
+						break;
+					case FINESSE:
+						att.addFinesse();
+						break;
+					case TECHNIQUE:
+						att.addTech();
+						break;
+					default: // don't take point when something's wrong!
+						return;
+					}
+					att.takeSkillPoint();
+				}
+				
+				NetworkHandler.getSyncChannel().sendTo(new StatSyncMessage(att),
+						ctx.getServerHandler().playerEntity);
+			});
 
-			return new StatSyncMessage(att);
+			return null;
 		}
 	}
 

@@ -119,7 +119,7 @@ public class NostrumGui implements IGuiHandler {
 			
 			if (list != null && !list.isEmpty()) {
 				ITameDragon dragon = (ITameDragon) list.get(0);
-				return dragon.getGUIContainer();
+				return dragon.getGUIContainer(player);
 			}
 			
 			return null;

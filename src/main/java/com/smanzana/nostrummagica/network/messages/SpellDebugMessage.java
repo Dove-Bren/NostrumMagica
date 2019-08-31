@@ -5,6 +5,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.config.ModConfig;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.capabilities.Capability;
@@ -35,9 +36,12 @@ public class SpellDebugMessage implements IMessage {
 			if (chat == null || chat.trim().isEmpty())
 				return null;
 			
-			ITextComponent text = ITextComponent.Serializer.jsonToComponent(chat);
+			final ITextComponent text = ITextComponent.Serializer.jsonToComponent(chat);
 			
-			NostrumMagica.proxy.getPlayer().addChatMessage(text);
+			Minecraft.getMinecraft().addScheduledTask(() -> {
+				NostrumMagica.proxy.getPlayer().addChatMessage(text);
+			});
+			
 			
 			return null;
 		}

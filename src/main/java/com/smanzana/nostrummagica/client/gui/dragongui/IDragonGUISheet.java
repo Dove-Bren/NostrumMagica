@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.client.gui.dragongui;
 import com.smanzana.nostrummagica.entity.ITameDragon;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -16,10 +17,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public interface IDragonGUISheet {
 	
 	// Called when the sheet is first shown. Set up anything that's needed.
-	public void showSheet(ITameDragon dragon, TamedDragonGUI.DragonContainer container);
+	public void showSheet(ITameDragon dragon, EntityPlayer player, TamedDragonGUI.DragonContainer container, int width, int height, int offsetX, int offsetY);
 	
 	// Called when the sheet will no longer be shown.
-	public void hideSheet();
+	public void hideSheet(ITameDragon dragon, EntityPlayer player, TamedDragonGUI.DragonContainer container);
 	// Draw the sheet
 	@SideOnly(Side.CLIENT)
 	public void draw(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY);
@@ -35,5 +36,7 @@ public interface IDragonGUISheet {
 	// Return the (translated!) label for the button
 	@SideOnly(Side.CLIENT)
 	public String getButtonText();
+	
+	public boolean shouldShow(ITameDragon dragon, TamedDragonGUI.DragonContainer container);
 	
 }
