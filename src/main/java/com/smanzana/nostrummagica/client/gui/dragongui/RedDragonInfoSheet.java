@@ -210,4 +210,9 @@ public class RedDragonInfoSheet implements IDragonGUISheet {
 		return true;
 	}
 
+	@Override
+	public void overlay(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+		
+	}
+
 }

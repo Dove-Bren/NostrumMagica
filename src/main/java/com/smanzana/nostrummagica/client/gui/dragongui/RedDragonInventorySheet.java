@@ -1,23 +1,18 @@
 package com.smanzana.nostrummagica.client.gui.dragongui;
 
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonContainer;
 import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.ITameDragon;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
 
 public class RedDragonInventorySheet implements IDragonGUISheet {
-	
-	private static final ResourceLocation TEXT = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/container/tamed_dragon_gui.png");
 	
 	private EntityTameDragonRed dragon;
 	private IInventory dragonInv;
@@ -59,11 +54,9 @@ public class RedDragonInventorySheet implements IDragonGUISheet {
 
 	@Override
 	public void draw(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
-		
-		FontRenderer fonter = mc.fontRendererObj;
 		GlStateManager.color(1.0F,  1.0F, 1.0F, 1.0F);
 		
-		mc.getTextureManager().bindTexture(TEXT);
+		mc.getTextureManager().bindTexture(TamedDragonGUI.DragonGUI.TEXT);
 		
 		// Draw sheet
 		GlStateManager.pushMatrix();
@@ -115,6 +108,11 @@ public class RedDragonInventorySheet implements IDragonGUISheet {
 	@Override
 	public boolean shouldShow(ITameDragon dragon, DragonContainer container) {
 		return this.dragon.canUseInventory();
+	}
+
+	@Override
+	public void overlay(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+		
 	}
 
 }

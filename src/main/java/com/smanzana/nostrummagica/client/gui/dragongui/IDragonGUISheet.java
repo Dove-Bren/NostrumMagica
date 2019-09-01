@@ -21,9 +21,13 @@ public interface IDragonGUISheet {
 	
 	// Called when the sheet will no longer be shown.
 	public void hideSheet(ITameDragon dragon, EntityPlayer player, TamedDragonGUI.DragonContainer container);
+	
 	// Draw the sheet
 	@SideOnly(Side.CLIENT)
 	public void draw(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY);
+	
+	@SideOnly(Side.CLIENT)
+	public void overlay(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY);
 	
 	// Handle a mouse click.
 	// mouseX and mouseY are relative to the sheet, not global.

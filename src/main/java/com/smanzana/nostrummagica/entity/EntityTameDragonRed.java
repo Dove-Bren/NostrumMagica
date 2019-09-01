@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.entity;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
@@ -11,8 +13,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonBondInfoSheet;
 import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonInfoSheet;
 import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonInventorySheet;
+import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonSpellSheet;
 import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonContainer;
 import com.smanzana.nostrummagica.entity.tasks.DragonAINearestAttackableTarget;
+import com.smanzana.nostrummagica.entity.tasks.DragonGambittedSpellAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.DragonMeleeAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowOwnerGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIOwnerHurtByTargetGeneric;
@@ -20,8 +24,10 @@ import com.smanzana.nostrummagica.entity.tasks.EntityAIOwnerHurtTargetGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIPanicGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAISitGeneric;
 import com.smanzana.nostrummagica.items.NostrumRoseItem;
+import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -44,6 +50,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -53,6 +60,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -100,6 +108,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
     protected static final String NBT_ATTR_LEVEL = "AttrLevel";
     protected static final String NBT_ATTR_BOND = "AttrBond";
     protected static final String NBT_INVENTORY = "DRInventory";
+    protected static final String NBT_SPELL_INVENTORY = "DRSpellInventory";
     
     public static final float BOND_LEVEL_FOLLOW = 0.05f;
     public static final float BOND_LEVEL_PLAYERS = 0.15f;
@@ -115,6 +124,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
     private EntityAIHurtByTarget aiRevengeTarget;
     
     private IInventory inventory;
+    private RedDragonSpellInventory spellInventory;
     
     // Internal timers for controlling while riding
     private int jumpCount; // How many times we've jumped
@@ -127,6 +137,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
         this.isImmuneToFire = true;
         
         this.inventory = new InventoryBasic("Dragon Inventory", true, DRAGON_INV_SIZE);
+        this.spellInventory = new RedDragonSpellInventory("Dragon Spell Inventory", true);
 	}
 	
 	protected void entityInit() {
@@ -185,23 +196,170 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	}
 	
 	protected void setupBaseAI() {
-		this.tasks.addTask(0, new EntityAISwimming(this));
-		this.tasks.addTask(1, new EntityAISitGeneric<EntityTameDragonRed>(this));
-		this.tasks.addTask(2, new EntityAIPanicGeneric<EntityTameDragonRed>(this, 1.0D, new Predicate<EntityTameDragonRed>() {
+		int priority = 0;
+		this.tasks.addTask(priority++, new EntityAISwimming(this));
+		this.tasks.addTask(priority++, new EntityAISitGeneric<EntityTameDragonRed>(this));
+		this.tasks.addTask(priority++, new EntityAIPanicGeneric<EntityTameDragonRed>(this, 1.0D, new Predicate<EntityTameDragonRed>() {
 			@Override
 			public boolean apply(EntityTameDragonRed input) {
 				return input.getHealth() <= DRAGON_MIN_HEALTH;
 			}
 		}));
-		this.tasks.addTask(3, new DragonMeleeAttackTask(this, 1.0D, true, 15.0D));
-		this.tasks.addTask(4, new EntityAIFollowOwnerGeneric<EntityTameDragonRed>(this, 1.0D, 16.0F, 4.0F, new Predicate<EntityTameDragonRed>() {
+		// Target gambits
+		final EntityTameDragonRed selfDragon = this;
+		this.tasks.addTask(priority++, new DragonGambittedSpellAttackTask<EntityTameDragonRed>(this, 20, 4) {
+
+			@Override
+			public EntityDragonGambit[] getGambits() {
+				if (!selfDragon.getCanUseMagic()) {
+					return null;
+				}
+				
+				Spell[] spells = getSpells(); // To reuse the login in there
+				
+				return Arrays.copyOf(selfDragon.spellInventory.getTargetGambits(), spells.length);
+			}
+
+			@Override
+			public Spell[] getSpells() {
+				if (!selfDragon.getCanUseMagic()) {
+					return null;
+				}
+				
+				ItemStack[] scrolls = selfDragon.spellInventory.getTargetSpells();
+				Spell[] spells = new Spell[scrolls.length];
+				
+				for (int i = 0; i < spells.length; i++) {
+					// We odn't check for null here cause we sanitize input on placement
+					spells[i] = SpellScroll.getSpell(scrolls[i]);
+				}
+				
+				return spells;
+			}
+
+			@Override
+			public EntityLivingBase getTarget(EntityTameDragonRed dragon) {
+				if (!selfDragon.getCanUseMagic()) {
+					return null;
+				}
+				
+				return selfDragon.getAttackTarget();
+			}
+			
+		});
+		// Self
+		this.tasks.addTask(priority++, new DragonGambittedSpellAttackTask<EntityTameDragonRed>(this, 20, 4) {
+
+			@Override
+			public EntityDragonGambit[] getGambits() {
+				if (!selfDragon.getCanUseMagic()) {
+					return null;
+				}
+				
+				Spell[] spells = getSpells(); // To reuse the login in there
+				
+				return Arrays.copyOf(selfDragon.spellInventory.getSelfGambits(), spells.length);
+			}
+
+			@Override
+			public Spell[] getSpells() {
+				if (!selfDragon.getCanUseMagic()) {
+					return null;
+				}
+				
+				ItemStack[] scrolls = selfDragon.spellInventory.getSelfSpells();
+				Spell[] spells = new Spell[scrolls.length];
+				
+				for (int i = 0; i < spells.length; i++) {
+					// We odn't check for null here cause we sanitize input on placement
+					spells[i] = SpellScroll.getSpell(scrolls[i]);
+				}
+				
+				return spells;
+			}
+
+			@Override
+			public EntityLivingBase getTarget(EntityTameDragonRed dragon) {
+				if (!selfDragon.getCanUseMagic()) {
+					return null;
+				}
+				
+				return selfDragon;
+			}
+			
+		});
+		// Ally
+		this.tasks.addTask(priority++, new DragonGambittedSpellAttackTask<EntityTameDragonRed>(this, 20, 4) {
+
+			@Override
+			public EntityDragonGambit[] getGambits() {
+				if (!selfDragon.getCanUseMagic()) {
+					return null;
+				}
+				
+				Spell[] spells = getSpells(); // To reuse the login in there
+				
+				return Arrays.copyOf(selfDragon.spellInventory.getAllyGambits(), spells.length);
+			}
+
+			@Override
+			public Spell[] getSpells() {
+				if (!selfDragon.getCanUseMagic()) {
+					return null;
+				}
+				
+				ItemStack[] scrolls = selfDragon.spellInventory.getAllySpells();
+				Spell[] spells = new Spell[scrolls.length];
+				
+				for (int i = 0; i < spells.length; i++) {
+					// We odn't check for null here cause we sanitize input on placement
+					spells[i] = SpellScroll.getSpell(scrolls[i]);
+				}
+				
+				return spells;
+			}
+
+			@Override
+			public EntityLivingBase getTarget(EntityTameDragonRed dragon) {
+				if (!selfDragon.getCanUseMagic()) {
+					return null;
+				}
+				
+				if (selfDragon.isTamed()) {
+					EntityLivingBase owner = selfDragon.getOwner();
+					if (owner != null) {
+						List<EntityLivingBase> nearby = owner.worldObj.getEntitiesWithinAABB(EntityLivingBase.class,
+								new AxisAlignedBB(owner.posX - 8, owner.posY - 5, owner.posZ - 8, owner.posX + 8, owner.posY + 5, owner.posZ + 8),
+								new Predicate<EntityLivingBase>() {
+
+									@Override
+									public boolean apply(EntityLivingBase input) {
+										return input != null && (input == owner || input.isOnSameTeam(owner));
+									}
+							
+						});
+						
+						if (nearby == null || nearby.isEmpty()) {
+							return owner;
+						}
+						
+						return nearby.get(getRNG().nextInt(nearby.size()));
+					}
+				}
+				
+				return null;
+			}
+			
+		});
+		this.tasks.addTask(priority++, new DragonMeleeAttackTask(this, 1.0D, true, 15.0D));
+		this.tasks.addTask(priority++, new EntityAIFollowOwnerGeneric<EntityTameDragonRed>(this, 1.0D, 16.0F, 4.0F, new Predicate<EntityTameDragonRed>() {
 			@Override
 			public boolean apply(EntityTameDragonRed input) {
 				// Don't follow unless we've bonded enough
 				return (input.getBond() >= BOND_LEVEL_FOLLOW);
 			}
 		}));
-		this.tasks.addTask(5, new EntityAIWander(this, 1.0D, 30));
+		this.tasks.addTask(priority++, new EntityAIWander(this, 1.0D, 30));
 		
 		this.targetTasks.addTask(1, new EntityAIOwnerHurtByTargetGeneric<EntityTameDragonRed>(this));
         this.targetTasks.addTask(2, new EntityAIOwnerHurtTargetGeneric<EntityTameDragonRed>(this));
@@ -264,7 +422,6 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 				
 				if (player.isSneaking()) {
 					this.setSitting(!this.isSitting());
-					this.getDataManager().set(CAPABILITY_MANA, this.getDragonMana() / 2);
 				} else if (this.getHealth() < this.getMaxHealth() && isHungerItem(player.getHeldItem(hand))) {
 					
 					this.heal(5f);
@@ -294,9 +451,12 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 				this.tame(player, player.isCreative());
 				return true;
 			}
-		} else if (this.isTamed() && player.isCreative() && hand == EnumHand.MAIN_HAND) {
+		} else if (this.isTamed() && player.isCreative() && hand == EnumHand.MAIN_HAND && player.isSneaking()) {
 			this.tame(player, true);
 			return true;
+		} else if (this.isTamed() && hand == EnumHand.MAIN_HAND) {
+			// Someone other than the owner clicked
+			player.addChatComponentMessage(new TextComponentTranslation("info.tamed_dragon.not_yours", this.getName()));
 		}
 		
 		return false;			
@@ -380,6 +540,24 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			
 			compound.setTag(NBT_INVENTORY, invTag);
 		}
+		
+		// Write spell inventory
+		{
+			compound.setTag(NBT_SPELL_INVENTORY, this.spellInventory.toNBT());
+			
+//			NBTTagList invTag = new NBTTagList();
+//			for (int i = 0; i < spellInventory.getSizeInventory(); i++) {
+//				NBTTagCompound tag = new NBTTagCompound();
+//				ItemStack stack = spellInventory.getStackInSlot(i);
+//				if (stack != null) {
+//					stack.writeToNBT(tag);
+//				}
+//				
+//				invTag.appendTag(tag);
+//			}
+//			
+//			compound.setTag(NBT_SPELL_INVENTORY, invTag);
+		}
 	}
 
 	/**
@@ -437,6 +615,26 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 				}
 				this.inventory.setInventorySlotContents(i, stack);
 			}
+		}
+		
+		// Read spell inventory
+		if (canCast) {
+			this.spellInventory = RedDragonSpellInventory.fromNBT(compound.getCompoundTag(NBT_SPELL_INVENTORY));
+			
+//			NBTTagList list = compound.getTagList(NBT_SPELL_INVENTORY, NBT.TAG_COMPOUND);
+//			if (list != null) {
+//				
+//				for (int i = 0; i < spellInventory.getSizeInventory(); i++) {
+//					NBTTagCompound tag = list.getCompoundTagAt(i);
+//					ItemStack stack = null;
+//					if (tag != null) {
+//						stack = ItemStack.loadItemStackFromNBT(tag);
+//					}
+//					this.spellInventory.setInventorySlotContents(i, stack);
+//				}
+//			}
+		} else {
+			this.spellInventory = new RedDragonSpellInventory(this.getName() + " Empty Spell Inventory", true);
 		}
 	}
 	
@@ -1028,7 +1226,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		return new DragonContainer(this, player,
 				new RedDragonInfoSheet(this),
 				new RedDragonBondInfoSheet(this),
-				new RedDragonInventorySheet(this));
+				new RedDragonInventorySheet(this),
+				new RedDragonSpellSheet(this));
 	}
 	
 	public int getLevel() {
@@ -1175,6 +1374,316 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	
 	public IInventory getInventory() {
 		return this.inventory;
+	}
+	
+	public boolean canManageSpells() {
+		return this.isTamed() && this.getCanUseMagic() && this.getBond() >= BOND_LEVEL_MAGIC;
+	}
+	
+	public RedDragonSpellInventory getSpellInventory() {
+		return this.spellInventory;
+	}
+	
+	public static class RedDragonSpellInventory extends InventoryBasic {
+		
+		public static final int MaxSpellsPerCategory = 5;
+		private static final int TargetSpellIndex = 0;
+		private static final int SelfSpellIndex = MaxSpellsPerCategory;
+		private static final int AllySpellIndex = MaxSpellsPerCategory + MaxSpellsPerCategory;
+		
+		private static final String NBT_ITEMS = "items";
+		private static final String NBT_GAMBITS = "predicates";
+		
+		// Items kept in super inventory
+		// Gambits we keep here
+		private EntityDragonGambit gambits[];
+
+		public RedDragonSpellInventory(String title, boolean customName) {
+			super(title, customName, MaxSpellsPerCategory * 3);
+			gambits = new EntityDragonGambit[MaxSpellsPerCategory * 3];
+			Arrays.fill(gambits, EntityDragonGambit.ALWAYS);
+		}
+		
+		public ItemStack[] getTargetSpells() {
+			ItemStack array[] = new ItemStack[MaxSpellsPerCategory];
+			for (int i = 0; i < MaxSpellsPerCategory; i++) {
+				array[i] = this.getStackInSlot(i + TargetSpellIndex);
+			}
+			return array;
+		}
+		
+		public ItemStack[] getSelfSpells() {
+			ItemStack array[] = new ItemStack[MaxSpellsPerCategory];
+			for (int i = 0; i < MaxSpellsPerCategory; i++) {
+				array[i] = this.getStackInSlot(i + SelfSpellIndex);
+			}
+			return array;
+		}
+		
+		public ItemStack[] getAllySpells() {
+			ItemStack array[] = new ItemStack[MaxSpellsPerCategory];
+			for (int i = 0; i < MaxSpellsPerCategory; i++) {
+				array[i] = this.getStackInSlot(i + AllySpellIndex);
+			}
+			return array;
+		}
+		
+		@Nullable
+		public ItemStack setStackInTargetSlot(ItemStack stack, int slotIndex) {
+			if (slotIndex <  TargetSpellIndex || slotIndex >= TargetSpellIndex + MaxSpellsPerCategory) {
+				return stack;
+			}
+			
+			int fixedIndex = slotIndex + TargetSpellIndex;
+			ItemStack ret = this.getStackInSlot(fixedIndex);
+			this.setInventorySlotContents(fixedIndex, stack);
+			return ret;
+		}
+		
+		@Nullable
+		public ItemStack setStackInSelfSlot(ItemStack stack, int slotIndex) {
+			if (slotIndex <  SelfSpellIndex || slotIndex >= SelfSpellIndex + MaxSpellsPerCategory) {
+				return stack;
+			}
+			
+			int fixedIndex = slotIndex + SelfSpellIndex;
+			ItemStack ret = this.getStackInSlot(fixedIndex);
+			this.setInventorySlotContents(fixedIndex, stack);
+			return ret;
+		}
+		
+		@Nullable
+		public ItemStack setStackInAllySlot(ItemStack stack, int slotIndex) {
+			if (slotIndex <  AllySpellIndex || slotIndex >= AllySpellIndex + MaxSpellsPerCategory) {
+				return stack;
+			}
+			
+			int fixedIndex = slotIndex + AllySpellIndex;
+			ItemStack ret = this.getStackInSlot(fixedIndex);
+			this.setInventorySlotContents(fixedIndex, stack);
+			return ret;
+		}
+		
+		public int getUsedSlots() {
+			int count = 0;
+			for (int i = 0; i < this.getSizeInventory(); i++) {
+				if (this.getStackInSlot(i) != null) {
+					count++;
+				}
+			}
+			return count;
+		}
+		
+		public EntityDragonGambit getTargetGambit(int index) {
+			EntityDragonGambit gambit = EntityDragonGambit.ALWAYS;
+			
+			if (index >=  TargetSpellIndex && index < TargetSpellIndex + MaxSpellsPerCategory) {
+				gambit = this.gambits[index + TargetSpellIndex];
+			}
+			
+			return gambit;
+		}
+		
+		public EntityDragonGambit getSelfGambit(int index) {
+			EntityDragonGambit gambit = EntityDragonGambit.ALWAYS;
+			
+			if (index >=  SelfSpellIndex && index < SelfSpellIndex + MaxSpellsPerCategory) {
+				gambit = this.gambits[index + SelfSpellIndex];
+			}
+			
+			return gambit;		
+		}
+		
+		public EntityDragonGambit getAllyGambit(int index) {
+			EntityDragonGambit gambit = EntityDragonGambit.ALWAYS;
+			
+			if (index >=  AllySpellIndex && index < AllySpellIndex + MaxSpellsPerCategory) {
+				gambit = this.gambits[index + AllySpellIndex];
+			}
+			
+			return gambit;
+		}
+		
+		public EntityDragonGambit[] getTargetGambits() {
+			return Arrays.copyOfRange(this.gambits, TargetSpellIndex, TargetSpellIndex + MaxSpellsPerCategory);
+		}
+		
+		public EntityDragonGambit[] getSelfGambits() {
+			return Arrays.copyOfRange(this.gambits, SelfSpellIndex, SelfSpellIndex + MaxSpellsPerCategory);
+		}
+
+		public EntityDragonGambit[] getAllyGambits() {
+			return Arrays.copyOfRange(this.gambits, AllySpellIndex, AllySpellIndex + MaxSpellsPerCategory);
+		}
+		
+		public NBTTagCompound toNBT() {
+			NBTTagCompound nbt = new NBTTagCompound();
+			
+			// Write item inventory
+			{
+				NBTTagList list = new NBTTagList();
+				
+				for (int i = 0; i < this.getSizeInventory(); i++) {
+					NBTTagCompound tag = new NBTTagCompound();
+					
+					ItemStack stack = this.getStackInSlot(i);
+					if (stack != null) {
+						stack.writeToNBT(tag);
+					}
+					
+					list.appendTag(tag);
+				}
+				
+				nbt.setTag(NBT_ITEMS, list);
+			}
+			
+			// Write gambits
+			{
+				NBTTagList list = new NBTTagList();
+				
+				for (int i = 0; i < this.getSizeInventory(); i++) {
+					EntityDragonGambit gambit = gambits[i];
+					if (gambit == null) {
+						gambit = EntityDragonGambit.ALWAYS;
+					}
+					
+					list.appendTag(new NBTTagString(gambit.name()));
+				}
+				
+				nbt.setTag(NBT_GAMBITS, list);
+			}
+			
+			return nbt;
+		}
+		
+		public static RedDragonSpellInventory fromNBT(NBTTagCompound nbt) {
+			RedDragonSpellInventory inv = new RedDragonSpellInventory("Red Dragon Spell Inventory", true);
+			
+			// Item inventory
+			{
+				NBTTagList list = nbt.getTagList(NBT_ITEMS, NBT.TAG_COMPOUND);
+				if (list != null) {
+					for (int i = 0; i < inv.getSizeInventory(); i++) {
+						NBTTagCompound tag = list.getCompoundTagAt(i);
+						ItemStack stack = null;
+						if (tag != null) {
+							stack = ItemStack.loadItemStackFromNBT(tag);
+						}
+						inv.setInventorySlotContents(i, stack);
+					}
+				}
+			}
+			
+			// Gambits
+			{
+				NBTTagList list = nbt.getTagList(NBT_GAMBITS, NBT.TAG_STRING);
+				if (list != null) {
+					for (int i = 0; i < inv.getSizeInventory(); i++) {
+						String name = list.getStringTagAt(i);
+						EntityDragonGambit gambit;
+						try {
+							gambit = EntityDragonGambit.valueOf(name.toUpperCase());
+						} catch (Exception e) {
+							gambit = EntityDragonGambit.ALWAYS;
+						}
+						
+						inv.gambits[i] = gambit;
+					}
+				}
+			}
+			
+			return inv;
+		}
+
+		public EntityDragonGambit[] getAllGambits() {
+			return gambits;
+		}
+
+		public void setGambit(int index, EntityDragonGambit gambit) {
+			if (index < 0 || index >= gambits.length) {
+				return;
+			}
+			
+			gambits[index] = gambit;
+		}
+		
+		private void cleanRow(int startIndex) {
+			for (int i = 0; i < MaxSpellsPerCategory; i++) {
+				int index = i + startIndex;
+				// See if it's empty
+				if (this.getStackInSlot(index) == null) {
+					// This slot is empty. Are there any further on?
+					boolean fixed = false;
+					for (int j = i + 1; j < MaxSpellsPerCategory; j++) {
+						int lookIndex = j + startIndex;
+						ItemStack stack = this.getStackInSlot(lookIndex);
+						if (stack != null) {
+							// Fix gambits first, since we hook into setContents later
+							gambits[index] = gambits[lookIndex];
+							gambits[lookIndex] = EntityDragonGambit.ALWAYS;
+							
+							this.setInventorySlotContents(index, stack);
+							this.setInventorySlotContents(lookIndex, null);
+							
+							fixed = true;
+							break;
+						}
+					}
+					
+					if (!fixed) {
+						// There was no later slot tlhat was good, either. AKA things look good
+						break;
+					}
+					// else look at next I slot and fix that up, too!
+				}
+			}
+		}
+		
+		// Clean up any stacks that are where they shouldn't be.
+		public void clean() {
+			cleanRow(TargetSpellIndex);
+			cleanRow(SelfSpellIndex);
+			cleanRow(AllySpellIndex);
+		}
+		
+		@Override
+		public ItemStack removeStackFromSlot(int index) {
+			ItemStack stack = super.removeStackFromSlot(index);
+			
+			if (stack != null) {
+				// Item removed!
+				gambits[index] = EntityDragonGambit.ALWAYS;
+				this.clean();
+			}
+			
+			return stack;
+		}
+		
+		@Override
+		public void setInventorySlotContents(int index, @Nullable ItemStack stack) {
+			super.setInventorySlotContents(index, stack);
+			
+			if (stack == null) {
+				gambits[index] = EntityDragonGambit.ALWAYS;
+			}
+		}
+		
+		@Override
+		public boolean isItemValidForSlot(int index, ItemStack stack) {
+			if (stack == null) {
+				return true;
+			}
+			
+			if (!(stack.getItem() instanceof SpellScroll)) {
+				return false;
+			}
+			
+			if (SpellScroll.getSpell(stack) == null) {
+				return false;
+			}
+			
+			return true;
+		}
 	}
 
 }

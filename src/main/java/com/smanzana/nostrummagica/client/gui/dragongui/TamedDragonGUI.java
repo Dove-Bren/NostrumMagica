@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.entity.EntityDragon;
 import com.smanzana.nostrummagica.entity.ITameDragon;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.TamedDragonGUIControlMessage;
+import com.smanzana.nostrummagica.network.messages.TamedDragonGUISyncMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.client.Minecraft;
@@ -23,6 +24,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -59,10 +61,18 @@ public class TamedDragonGUI {
 		containers.remove(id);
 	}
 	
-	public static void updateContainer(int id, NBTTagCompound nbt) {
+	public static void updateServerContainer(int id, NBTTagCompound nbt) {
 		DragonContainer container = containers.get(id);
 		if (container != null) {
 			container.handle(nbt);
+		}
+	}
+	
+	private static DragonContainer clientContainer = null;
+	
+	public static void updateClientContainer(NBTTagCompound nbt) {
+		if (clientContainer != null) {
+			clientContainer.handle(nbt);
 		}
 	}
 
@@ -89,6 +99,8 @@ public class TamedDragonGUI {
 			
 			if (!((EntityDragon) dragon).worldObj.isRemote) {
 				this.id = TamedDragonGUI.register(this);				
+			} else {
+				TamedDragonGUI.clientContainer = this;
 			}
 		}
 		
@@ -197,8 +209,12 @@ public class TamedDragonGUI {
 		
 		// Sheets can call on their handle to the container to sync with the server.
 		// This call doesn't check if it's on the server. It'll just 'send' it. Know what you're doing!
-		public void sendSheetMessage(NBTTagCompound data) {
+		public void sendSheetMessageToServer(NBTTagCompound data) {
 			NetworkHelper.ClientSendSheetData(id, data);
+		}
+		
+		public void sendSheetMessageToClient(NBTTagCompound data) {
+			NetworkHelper.ServerSendSheetData((EntityPlayerMP) this.player, data);
 		}
 		
 	}
@@ -209,12 +225,15 @@ public class TamedDragonGUI {
 	public static int GUI_TEX_HEIGHT = 256;
 	public static int GUI_TEX_CELL_HOFFSET = 0;
 	public static int GUI_TEX_CELL_VOFFSET = 202;
+	public static int GUI_TEX_TOGGLE_HOFFSET = 0;
+	public static int GUI_TEX_TOGGLE_VOFFSET = 220;
+	public static int GUI_TEX_TOGGLE_LENGTH = 10;
 	
 	
 	@SideOnly(Side.CLIENT)
 	public static class DragonGUI extends GuiContainer {
 		
-		private static final ResourceLocation TEXT = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/container/tamed_dragon_gui.png");
+		public static final ResourceLocation TEXT = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/container/tamed_dragon_gui.png");
 		
 		private static int GUI_LENGTH_PREVIEW = 48;
 		private static int GUI_INFO_HOFFSET = 12;
@@ -440,6 +459,26 @@ public class TamedDragonGUI {
 		}
 		
 		@Override
+		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+			super.drawGuiContainerForegroundLayer(mouseX, mouseY);
+			
+			final int GUI_SHEET_HOFFSET = this.width - (GUI_SHEET_WIDTH + GUI_SHEET_NHOFFSET);
+			
+			IDragonGUISheet sheet = container.getCurrentSheet();
+			if (sheet != null) {
+				GlStateManager.pushMatrix();
+				GlStateManager.translate(GUI_SHEET_HOFFSET, GUI_SHEET_VOFFSET, 0);
+				
+				GlStateManager.enableAlpha();
+				GlStateManager.enableBlend();
+				
+				sheet.overlay(Minecraft.getMinecraft(), 0f, GUI_SHEET_WIDTH, GUI_SHEET_HEIGHT,
+						mouseX - GUI_SHEET_HOFFSET, mouseY - GUI_SHEET_VOFFSET);
+				GlStateManager.popMatrix();
+			}
+		}
+		
+		@Override
 		protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
 			
 			if (!container.canInteractWith(Minecraft.getMinecraft().thePlayer)) {
@@ -515,6 +554,12 @@ public class TamedDragonGUI {
 			NetworkHandler.getSyncChannel().sendToServer(message);
 		}
 		
+		private static void serverSendInternal(EntityPlayerMP player, NBTTagCompound nbt) {
+			TamedDragonGUISyncMessage message = new TamedDragonGUISyncMessage(nbt);
+			
+			NetworkHandler.getSyncChannel().sendTo(message, player);
+		}
+		
 		private static NBTTagCompound base(DragonContainerMessageType type) {
 			NBTTagCompound nbt = new NBTTagCompound();
 			nbt.setString(NBT_TYPE, type.getKey());
@@ -539,6 +584,13 @@ public class TamedDragonGUI {
 			NBTTagCompound nbt = base(DragonContainerMessageType.REROLL);
 			
 			clientSendInternal(id, nbt);
+		}
+		
+		public static void ServerSendSheetData(EntityPlayerMP player, NBTTagCompound data) {
+			NBTTagCompound nbt = base(DragonContainerMessageType.SHEET_DATA);
+			nbt.setTag(NBT_USERDATA, data);
+			
+			serverSendInternal(player, nbt);
 		}
 		
 		

@@ -384,6 +384,7 @@ info.tamed_dragon.wild.tame_success=You successfully tamed the dragon
 info.tamed_dragon.low_health=%1$s is too low on health to ride
 info.tamed_dragon.no_ride=%1$s is too wild to ride
 info.tamed_dragon.hurt=%1$s is getting low on health!
+info.tamed_dragon.not_yours=%1$s refuses to listen to you
 
 info.tamed_dragon.red_bond.wild=The baby dragon is mostly wild. It won't even follow you around!
 info.tamed_dragon.red_bond.follow=The baby dragon doesn't trust you yet... but seems to be coming around. Now, when not sitting, it will follow you.
@@ -392,6 +393,19 @@ info.tamed_dragon.red_bond.chest=The baby dragon has started to trust you. It wi
 info.tamed_dragon.red_bond.ride=Your bond with the baby dragon has increased significantly! It is not comfortable with letting you ride it!
 info.tamed_dragon.red_bond.magic=The baby dragon trusts you nearly completely. You now have the ability to manage how your dragon uses magic!
 info.tamed_dragon.red_bond.full=The baby dragon is now fully bonded with you!
+
+gambit.always.name=Always
+gambit.always.desc=Dragon will%1$s always%2$s try to use this spell.|Only passed if dragon doesn't have enough mana
+gambit.health_critical.name=Critical Health
+gambit.health_critical.desc=Spell will be cast when the target has%1$s less than 15%% health%2$s
+gambit.health_low.name=Low Health
+gambit.health_low.desc=Spell will be cast when the target has%1$s less than 40%% health%2$s
+gambit.mana_low.name=Low Mana
+gambit.mana_low.desc=Spell will be cast when target has %1$sless than 40%% mana%2$s
+gambit.occasional.name=Occasionally
+gambit.occasional.desc=Dragon will only attempt to cast once %1$severy 60 seconds%2$s
+gambit.frequent.name=Frequently
+gambit.frequent.desc=Dragon will only attempt to cast once %1$severy 20 seconds%2$s
 
 element.name=Element
 shape.name=Shape

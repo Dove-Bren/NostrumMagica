@@ -127,4 +127,9 @@ public class RedDragonBondInfoSheet implements IDragonGUISheet {
 		return true; // always show
 	}
 
+	@Override
+	public void overlay(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+		
+	}
+
 }

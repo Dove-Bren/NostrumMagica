@@ -966,14 +966,15 @@ public class SpellAction {
 		@Override
 		public void apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
 
-			Vec3d force = entity.getLookVec().normalize();
-			float scale = 3f * level * (float) (Math.max(0.0, Math.min(2.0, 1.0 - Math.log(efficiency))));
+			Vec3d force = entity.getLookVec().addVector(0, 0.15, 0).normalize();
+			float scale = 1f * (.5f * (level + 1)) * (float) (Math.max(0.0, Math.min(2.0, 1.0 - Math.log(efficiency))));
 			
 			force = new Vec3d(force.xCoord * scale, force.yCoord * scale, force.zCoord * scale);
 			
 			entity.motionX += force.xCoord;
 			entity.motionY += force.yCoord;
 			entity.motionZ += force.zCoord;
+			entity.velocityChanged = true;
 			
 			NostrumMagicaSounds.DAMAGE_WIND.play(entity);
 			

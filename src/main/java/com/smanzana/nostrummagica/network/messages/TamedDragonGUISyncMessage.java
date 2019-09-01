@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.network.messages;
 import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -10,22 +11,21 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 /**
- * Client has performed some action in a dragon GUI
+ * Server is sending some syncing data to the client GUI
  * @author Skyler
  *
  */
-public class TamedDragonGUIControlMessage implements IMessage {
+public class TamedDragonGUISyncMessage implements IMessage {
 
-	public static class Handler implements IMessageHandler<TamedDragonGUIControlMessage, IMessage> {
+	public static class Handler implements IMessageHandler<TamedDragonGUISyncMessage, IMessage> {
 
 		@Override
-		public IMessage onMessage(TamedDragonGUIControlMessage message, MessageContext ctx) {
+		public IMessage onMessage(TamedDragonGUISyncMessage message, MessageContext ctx) {
 			// Get ID
-			int id = message.tag.getInteger(NBT_KEY);
 			NBTTagCompound nbt = message.tag.getCompoundTag(NBT_MESSAGE);
 			
-			ctx.getServerHandler().playerEntity.getServerWorld().addScheduledTask(() -> {
-				TamedDragonGUI.updateServerContainer(id, nbt);
+			Minecraft.getMinecraft().addScheduledTask(() -> {
+				TamedDragonGUI.updateClientContainer(nbt);
 			});
 			
 			return null;
@@ -33,19 +33,17 @@ public class TamedDragonGUIControlMessage implements IMessage {
 		
 	}
 
-	private static final String NBT_KEY = "key";
 	private static final String NBT_MESSAGE = "message";
 	
 	protected NBTTagCompound tag;
 	
-	public TamedDragonGUIControlMessage() {
+	public TamedDragonGUISyncMessage() {
 		tag = new NBTTagCompound();
 	}
 	
-	public TamedDragonGUIControlMessage(int id, NBTTagCompound data) {
+	public TamedDragonGUISyncMessage(NBTTagCompound data) {
 		this();
 		
-		tag.setInteger(NBT_KEY, id);
 		tag.setTag(NBT_MESSAGE, data);
 	}
 
