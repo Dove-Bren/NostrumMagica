@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.proxy;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -623,6 +624,16 @@ public class ClientProxy extends CommonProxy {
 		}
 		
 		cost = summary.getFinalCost();
+		
+		// Add dragon mana pool
+		Collection<ITameDragon> dragons = NostrumMagica.getNearbyTamedDragons(player, 24, true);
+		if (dragons != null && !dragons.isEmpty()) {
+			for (ITameDragon dragon : dragons) {
+				if (dragon.sharesMana(Minecraft.getMinecraft().thePlayer)) {
+					mana += dragon.getMana();
+				}
+			}
+		}
 		
 		if (!Minecraft.getMinecraft().thePlayer.isCreative()) {
 			// Check mana

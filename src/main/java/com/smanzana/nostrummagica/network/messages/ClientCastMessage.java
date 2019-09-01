@@ -1,18 +1,24 @@
 package com.smanzana.nostrummagica.network.messages;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.entity.ITameDragon;
 import com.smanzana.nostrummagica.items.ISpellArmor;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
+import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
+import com.smanzana.nostrummagica.spells.components.triggers.BeamTrigger;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -115,7 +121,7 @@ public class ClientCastMessage implements IMessage {
 					}
 				}
 				
-				// Possible use baubles
+				// Possibly use baubles
 				IInventory baubles = NostrumMagica.baubles.getBaubles(sp);
 				if (baubles != null) {
 					for (int i = 0; i < baubles.getSizeInventory(); i++) {
@@ -143,7 +149,19 @@ public class ClientCastMessage implements IMessage {
 				if (!sp.isCreative() && !isScroll) {
 					// Take mana and reagents
 					
-					if (att.getMana() < cost) {
+					int mana = att.getMana();
+					
+					// Add dragon mana pool
+					Collection<ITameDragon> dragons = NostrumMagica.getNearbyTamedDragons(sp, 24, true);
+					if (dragons != null && !dragons.isEmpty()) {
+						for (ITameDragon dragon : dragons) {
+							if (dragon.sharesMana(sp)) {
+								mana += dragon.getMana();
+							}
+						}
+					}
+					
+					if (mana < cost) {
 						NetworkHandler.getSyncChannel().sendTo(new ClientCastReplyMessage(false, att.getMana(), 0.0f, null),
 								ctx.getServerHandler().playerEntity);
 						return;
@@ -176,7 +194,35 @@ public class ClientCastMessage implements IMessage {
 						NostrumMagica.removeReagents(sp, row.getKey(), row.getValue());
 					}
 					
-					att.addMana(-cost);
+					
+					// Find some way to pay the mana cost
+					int avail = att.getMana();
+					if (avail >= cost) {
+						att.addMana(-cost);
+						cost = 0;
+					} else {
+						att.addMana(-avail);
+						cost -= avail;
+					}
+					
+					if (cost > 0 && dragons != null) {
+						for (ITameDragon dragon : dragons) {
+							EntityLivingBase ent = (EntityLivingBase) dragon;
+							NostrumMagica.proxy.spawnEffect(sp.worldObj, new SpellComponentWrapper(BeamTrigger.instance()),
+									null, sp.getPositionVector().addVector(0, sp.getEyeHeight(), 0),
+									null, ent.getPositionVector().addVector(0, ent.getEyeHeight(), 0),
+									new SpellComponentWrapper(EMagicElement.ICE));
+							
+							int dAvail = dragon.getMana();
+							if (dAvail >= cost) {
+								dragon.addMana(-cost);
+								break;
+							} else {
+								dragon.addMana(-dAvail);
+								cost -= dAvail;
+							}
+						}
+					}
 				}
 				
 				if (!isScroll) {

@@ -226,27 +226,29 @@ public class SpellScroll extends Item implements ILoreTagged {
 	public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
 		super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
 		
-		if (stack == null || getNestedScrollMeta(stack) != 1)
-			return;
-		
-		NBTTagCompound nbt;
-		if (!stack.hasTagCompound())
-			nbt = new NBTTagCompound();
-		else
-			nbt = stack.getTagCompound();
-		
-		long start = nbt.getLong(NBT_WAKE_START);
-		long worldtime = worldIn.getTotalWorldTime();
-		if (start == 0) {
-			nbt.setLong(NBT_WAKE_START, worldtime);
-			stack.setTagCompound(nbt);
-			return;
-		}
-		
-		if (worldtime > start + WAKE_TIME) {
-			setNestedScrollMeta(stack, (byte) 2);
-			if (!worldIn.isRemote) {
-				NostrumMagicaSounds.DAMAGE_ENDER.play(worldIn, entityIn.posX, entityIn.posY, entityIn.posZ);
+		if (!worldIn.isRemote) {
+			if (stack == null || getNestedScrollMeta(stack) != 1)
+				return;
+			
+			NBTTagCompound nbt;
+			if (!stack.hasTagCompound())
+				nbt = new NBTTagCompound();
+			else
+				nbt = stack.getTagCompound();
+			
+			long start = nbt.getLong(NBT_WAKE_START);
+			long worldtime = worldIn.getMinecraftServer().getTickCounter();
+			if (start == 0) {
+				nbt.setLong(NBT_WAKE_START, worldtime);
+				stack.setTagCompound(nbt);
+				return;
+			}
+			
+			if (worldtime > start + WAKE_TIME) {
+				setNestedScrollMeta(stack, (byte) 2);
+				if (!worldIn.isRemote) {
+					NostrumMagicaSounds.DAMAGE_ENDER.play(worldIn, entityIn.posX, entityIn.posY, entityIn.posZ);
+				}
 			}
 		}
 	}

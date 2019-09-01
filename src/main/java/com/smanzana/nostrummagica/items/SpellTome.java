@@ -957,7 +957,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		if (quick) {
 			attr.completeBinding(tome);
 		} else if (!player.worldObj.isRemote) {
-				player.addChatComponentMessage(new TextComponentTranslation("info.tome.bind", new Object[] {spell.getName(), compName}));
+				player.addChatComponentMessage(new TextComponentTranslation("info.tome.bind_start", new Object[] {spell.getName(), compName}));
 		}
 		
 		return true;

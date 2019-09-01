@@ -1,8 +1,11 @@
 package com.smanzana.nostrummagica.client.overlay;
 
+import java.util.Collection;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.entity.ITameDragon;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.block.material.Material;
@@ -30,6 +33,8 @@ public class OverlayRenderer extends Gui {
 	private static final int GUI_BAR_WIDTH = 17;
 	private static final int GUI_BAR_HEIGHT = 62;
 	private static final int GUI_BAR_OFFSETX = 96;
+	private static final int GUI_WING_OFFSETY = 37;
+	private static final int GUI_WING_SIZE = 20;
 	
 	private int wiggleIndex; // set to multiples of 12 for each wiggle
 	private static final int wiggleOffsets[] = {0, 1, 1, 2, 1, 1, 0, -1, -1, -2, -1, -1};
@@ -74,6 +79,29 @@ public class OverlayRenderer extends Gui {
 		
 	}
 	
+	private void renderOrbsInternal(int whole, int pieces, int x, int y) {
+		int i = 0;
+		Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_ICONS);
+		for (; i < whole; i++) {
+			// Draw a single partle orb
+			this.drawTexturedModalRect(x - (8 * (i + 1)),
+					y,	36, 16, GUI_ORB_WIDTH, GUI_ORB_HEIGHT);
+		}
+		
+		if (pieces != 0) {
+			// Draw a single partle orb
+			this.drawTexturedModalRect(x - (8 * (i + 1)),
+					y, GUI_ORB_WIDTH * pieces, 16, GUI_ORB_WIDTH, GUI_ORB_HEIGHT);
+			i++;
+		}
+		
+		for (; i < 10; i++) {
+			this.drawTexturedModalRect(x - (8 * (i + 1)),
+					y,	0, 16, GUI_ORB_WIDTH, GUI_ORB_HEIGHT);
+		}
+		
+	}
+	
 	private void renderManaOrbs(EntityPlayerSP player, ScaledResolution scaledRes, INostrumMagic attr) {
 		int hudXAnchor = scaledRes.getScaledWidth() / 2 + 89;
 		int hudYAnchor = scaledRes.getScaledHeight() - 49;
@@ -86,47 +114,88 @@ public class OverlayRenderer extends Gui {
 		if (wiggleIndex > 0)
 			wiggleOffset = OverlayRenderer.wiggleOffsets[wiggleIndex-- % 12];
 		
-		int mana = attr.getMana(),
-				maxMana = attr.getMaxMana();
-		float ratio = (float) mana / (float) maxMana;
+		int totalMana = 0;
+		int totalMaxMana = 0;
 		
+		// render background
+		GlStateManager.color(.7f, .4f, .4f, 1f);
+		renderOrbsInternal(10, 0, hudXAnchor + wiggleOffset, hudYAnchor);
+
+		// Render dragon mana first, if available
+		Collection<ITameDragon> dragons = NostrumMagica.getNearbyTamedDragons(player, 24, true);
 		
-		int parts = Math.round(40 * ratio);
-		int whole = parts / 4;
-		int pieces = parts % 4;
-		
-		int i = 0;
-		Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_ICONS);
-		for (; i < whole; i++) {
-			//this.drawTexturedModalRect(hudXAnchor - (), y, textureX, textureY, width, height);
-//				Gui.drawModalRectWithCustomSizedTexture(hudXAnchor - (9 * i), hudYAnchor,
-//						64, 0, 16, 16, 256, 256);
-			// Draw a single partle orb
-			this.drawTexturedModalRect(hudXAnchor - (8 * (i + 1)) + wiggleOffset,
-					hudYAnchor,	36, 16, GUI_ORB_WIDTH, GUI_ORB_HEIGHT);
+		if (dragons != null && !dragons.isEmpty()) {
+			int dragonMana = 0;
+			int dragonMaxMana = 0;
+			
+			for (ITameDragon dragon : dragons) {
+				if (dragon.sharesMana(player)) {
+					totalMana += dragon.getMana();
+					totalMaxMana += dragon.getMaxMana();
+					
+					dragonMana += dragon.getMana();
+					dragonMaxMana += dragon.getMaxMana();
+				}
+			}
+			
+			// Make sure at least ONE is willing to share mana with us
+			if (dragonMaxMana > 0) {
+				float ratio = (float) dragonMana / (float) dragonMaxMana;
+				
+				
+				int parts = Math.round(40 * ratio);
+				int whole = parts / 4;
+				int pieces = parts % 4;
+				
+				//this.drawTexturedModalRect(x - (8 * (i + 1)),
+				//y,	36, 16, GUI_ORB_WIDTH, GUI_ORB_HEIGHT);
+				Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_ICONS);
+				GlStateManager.pushMatrix();
+				//this.drawTexturedModalRect(hudXAnchor + wiggleOffset, hudYAnchor, 10, GUI_WING_OFFSETY, 20, GUI_WING_SIZE);
+				drawScaledCustomSizeModalRect(hudXAnchor + wiggleOffset - 2, hudYAnchor - 6, GUI_WING_SIZE, GUI_WING_OFFSETY,
+						-GUI_WING_SIZE, GUI_WING_SIZE, 10, 10, 256f, 256f);
+				drawScaledCustomSizeModalRect(hudXAnchor + wiggleOffset - 88, hudYAnchor - 6, 0, GUI_WING_OFFSETY,
+						GUI_WING_SIZE, GUI_WING_SIZE, 10, 10, 256f, 256f);
+				GlStateManager.popMatrix();
+				
+				GlStateManager.pushMatrix();
+				GlStateManager.pushAttrib();
+				
+				GlStateManager.color(1f, .0f, .2f, 1f);
+				renderOrbsInternal(whole, pieces, hudXAnchor + wiggleOffset, hudYAnchor);
+				
+				GlStateManager.popAttrib();
+				GlStateManager.popMatrix();
+			}
 		}
 		
-		if (pieces != 0) {
-			// Draw a single partle orb
-			this.drawTexturedModalRect(hudXAnchor - (8 * (i + 1)) + wiggleOffset,
-					hudYAnchor, GUI_ORB_WIDTH * pieces, 16, GUI_ORB_WIDTH, GUI_ORB_HEIGHT);
-			i++;
+		// Render player mana on top
+		{
+			int playerMana = attr.getMana();
+			int playerMaxMana = attr.getMaxMana();
+			float ratio = (float) playerMana / (float) playerMaxMana;
+			
+			
+			int parts = Math.round(40 * ratio);
+			int whole = parts / 4;
+			int pieces = parts % 4;
+			
+			//0094FF
+			GlStateManager.color(0f, .8f, 1f, 1f);
+			renderOrbsInternal(whole, pieces, hudXAnchor + wiggleOffset, hudYAnchor);
+			
+			totalMana += playerMana;
+			totalMaxMana += playerMaxMana;
 		}
-		
-		for (; i < 10; i++) {
-			this.drawTexturedModalRect(hudXAnchor - (8 * (i + 1)) + wiggleOffset,
-					hudYAnchor,	0, 16, GUI_ORB_WIDTH, GUI_ORB_HEIGHT);
-		}
-		
-		
 
 		if (ModConfig.config.displayManaText()) {
 			int centerx = hudXAnchor - (5 * 8);
-			String str = attr.getMana() + "/" + attr.getMaxMana();
+			String str = totalMana + "/" + totalMaxMana;
 			int width = Minecraft.getMinecraft().fontRendererObj.getStringWidth(str);
 			Minecraft.getMinecraft().fontRendererObj.drawString(
 					str, centerx - width/2, hudYAnchor + 1, 0xFFFFFFFF);
 		}
+		
 	}
 	
 	private void renderManaBar(EntityPlayerSP player, ScaledResolution scaledRes, INostrumMagic attr) {

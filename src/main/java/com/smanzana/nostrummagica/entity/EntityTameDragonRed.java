@@ -1077,8 +1077,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 					if (amt > 0f && NostrumMagica.rand.nextFloat() < amt)
 						mana++;
 					
-					 int current = this.getCurrentMana();
-					 this.getDataManager().set(CAPABILITY_MANA, Math.min(Math.max(0, current + mana), this.getDragonMana()));
+					this.addMana(mana);
 				}
 			}
 		}
@@ -1684,6 +1683,16 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			
 			return true;
 		}
+	}
+
+	@Override
+	public void addMana(int mana) {
+		this.dataManager.set(CAPABILITY_MANA, Math.max(0, Math.min(this.getCurrentMana() + mana, this.getDragonMana())));
+	}
+
+	@Override
+	public boolean sharesMana(EntityPlayer player) {
+		return player != null && player.isEntityEqual(this.getOwner()) && this.getBond() >= .95f;
 	}
 
 }

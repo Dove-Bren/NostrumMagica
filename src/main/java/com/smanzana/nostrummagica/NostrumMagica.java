@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -26,6 +27,8 @@ import com.smanzana.nostrummagica.command.CommandUnlockAll;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.EntityKoid;
+import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
+import com.smanzana.nostrummagica.entity.ITameDragon;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
@@ -115,6 +118,7 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
@@ -1520,6 +1524,32 @@ public class NostrumMagica implements IMagicListener
     	}
     	
     	return true;
+    }
+    
+    public static Collection<ITameDragon> getNearbyTamedDragons(EntityLivingBase entity, double blockRadius, boolean onlyOwned) {
+    	List<ITameDragon> list = new LinkedList<>();
+    	
+    	AxisAlignedBB box = new AxisAlignedBB(entity.posX - blockRadius, entity.posY - blockRadius, entity.posZ - blockRadius,
+    			entity.posX + blockRadius, entity.posY + blockRadius, entity.posZ + blockRadius);
+    	
+
+    	List<EntityTameDragonRed> dragonList = entity.worldObj.getEntitiesWithinAABB(EntityTameDragonRed.class, box, (dragon) -> {
+    		return dragon instanceof ITameDragon;
+    	});
+    	
+    	if (dragonList != null && !dragonList.isEmpty()) {
+    		for (EntityTameDragonRed dragon : dragonList) {
+    			ITameDragon tame = (ITameDragon) dragon;
+    			
+    			if (onlyOwned && (!tame.isTamed() || tame.getOwner() != entity)) {
+    				continue;
+    			}
+    			
+    			list.add((ITameDragon) dragon);
+    		}
+    	}
+    	
+    	return list;
     }
 
 	@Override
