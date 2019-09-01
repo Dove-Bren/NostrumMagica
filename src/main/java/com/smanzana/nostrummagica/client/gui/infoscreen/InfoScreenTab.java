@@ -7,8 +7,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.ModificationTable;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.entity.EntityTameDragonRed.TameRedDragonLore;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
+import com.smanzana.nostrummagica.items.DragonEgg;
 import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.MirrorItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
@@ -44,6 +46,7 @@ public abstract class InfoScreenTab {
 	private static InfoScreenTab INFO_ENTITY;
 	private static InfoScreenTab INFO_GUIDES;
 	private static InfoScreenTab INFO_TRIALS;
+	private static InfoScreenTab INFO_DRAGONS;
 	
 	public static void init() {
 		if (INFO_ITEMS != null)
@@ -423,6 +426,40 @@ public abstract class InfoScreenTab {
 			}
 			
 		};
+		
+		INFO_DRAGONS = new InfoScreenTab(InfoScreenTabs.INFO_DRAGONS,
+				new ItemStack(DragonEgg.instance())) {
+
+			@Override
+			public boolean isVisible(INostrumMagic attr) {
+				return attr.isUnlocked() &&
+						attr.hasLore(TameRedDragonLore.instance());
+			}
+
+			@Override
+			public List<InfoButton> getButtons(int offset, INostrumMagic attr) {
+				List<InfoButton> buttons = new LinkedList<>();
+				
+				buttons.add(new SubscreenInfoButton(offset++, "tamed_dragon.intro",
+						new PaginatedInfoSubScreen("tamed_dragon.intro"),
+						new ItemStack(Items.BOOK)));
+				
+				buttons.add(new SubscreenInfoButton(offset++, "tamed_dragon.attributes",
+						new PaginatedInfoSubScreen("tamed_dragon.attributes"),
+						new ItemStack(Items.PAPER)));
+				
+				buttons.add(new SubscreenInfoButton(offset++, "tamed_dragon.bonding",
+						new PaginatedInfoSubScreen("tamed_dragon.bonding"),
+						new ItemStack(Items.SKULL, 1, 3)));
+				
+				buttons.add(new SubscreenInfoButton(offset++, "tamed_dragon.experience",
+						new PaginatedInfoSubScreen("tamed_dragon.experience"),
+						new ItemStack(Items.IRON_SWORD)));
+					
+				return buttons;
+			}
+			
+		};
 	}
 	
 	public static InfoScreenTab get(InfoScreenTabs tab) {
@@ -457,6 +494,9 @@ public abstract class InfoScreenTab {
 			break;
 		case INFO_TRIALS:
 			ret = INFO_TRIALS;
+			break;
+		case INFO_DRAGONS:
+			ret = INFO_DRAGONS;
 			break;
 		}
 		

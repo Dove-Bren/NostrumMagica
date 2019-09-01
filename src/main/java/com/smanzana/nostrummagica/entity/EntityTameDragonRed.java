@@ -10,11 +10,13 @@ import javax.annotation.Nullable;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonBondInfoSheet;
 import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonInfoSheet;
 import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonInventorySheet;
 import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonSpellSheet;
 import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonContainer;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.tasks.DragonAINearestAttackableTarget;
 import com.smanzana.nostrummagica.entity.tasks.DragonGambittedSpellAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.DragonMeleeAttackTask;
@@ -25,6 +27,7 @@ import com.smanzana.nostrummagica.entity.tasks.EntityAIPanicGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAISitGeneric;
 import com.smanzana.nostrummagica.items.NostrumRoseItem;
 import com.smanzana.nostrummagica.items.SpellScroll;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -665,6 +668,10 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 				this.setOwnerId(player.getUniqueID());
 				this.setSitting(true);
 				
+				INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+				if (attr != null) {
+					attr.giveFullLore(TameRedDragonLore.instance());
+				}
 				success = true;
 			} else {
 				// Failed
@@ -1383,6 +1390,16 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	public RedDragonSpellInventory getSpellInventory() {
 		return this.spellInventory;
 	}
+
+	@Override
+	public void addMana(int mana) {
+		this.dataManager.set(CAPABILITY_MANA, Math.max(0, Math.min(this.getCurrentMana() + mana, this.getDragonMana())));
+	}
+
+	@Override
+	public boolean sharesMana(EntityPlayer player) {
+		return player != null && player.isEntityEqual(this.getOwner()) && this.getBond() >= BOND_LEVEL_MANA;
+	}
 	
 	public static class RedDragonSpellInventory extends InventoryBasic {
 		
@@ -1685,15 +1702,43 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			return true;
 		}
 	}
+	
+	public static final class TameRedDragonLore implements ILoreTagged {
+		
+		private static TameRedDragonLore instance = null;
+		public static TameRedDragonLore instance() {
+			if (instance == null) {
+				instance = new TameRedDragonLore();
+			}
+			return instance;
+		}
 
-	@Override
-	public void addMana(int mana) {
-		this.dataManager.set(CAPABILITY_MANA, Math.max(0, Math.min(this.getCurrentMana() + mana, this.getDragonMana())));
-	}
+		@Override
+		public String getLoreKey() {
+			return "lore_tamedragon_red";
+		}
 
-	@Override
-	public boolean sharesMana(EntityPlayer player) {
-		return player != null && player.isEntityEqual(this.getOwner()) && this.getBond() >= BOND_LEVEL_MANA;
+		@Override
+		public String getLoreDisplayName() {
+			return "Baby Red Dragons";
+		}
+
+		@Override
+		public Lore getBasicLore() {
+			return new Lore().add("Baby red dragons are cute!", "Not only are they cute, but they're compotent fighters!");
+		}
+
+		@Override
+		public Lore getDeepLore() {
+			return new Lore().add("Baby red dragons!");
+		}
+
+		@Override
+		public InfoScreenTabs getTab() {
+			// Don't actually display! We're going to show our own page!
+			return null;
+		}
+		
 	}
 
 }

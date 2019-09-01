@@ -11,6 +11,7 @@ public enum InfoScreenTabs {
 	INFO_ENTITY,
 	INFO_ITEMS,
 	INFO_TRIALS,
+	INFO_DRAGONS,
 	;
 	
 }
