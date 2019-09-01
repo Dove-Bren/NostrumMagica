@@ -421,7 +421,7 @@ public class TamedDragonGUI {
 					x += GUI_SHEET_BUTTON_WIDTH;
 				}
 				
-				if (mc.thePlayer.isCreative()) {
+				if (NostrumMagica.proxy.getPlayer().isCreative()) {
 					Gui.drawRect(x, GUI_SHEET_BUTTON_VOFFSET, x + GUI_SHEET_BUTTON_WIDTH, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT, 0xFFFFDDFF);
 					Gui.drawRect(x + 1, GUI_SHEET_BUTTON_VOFFSET + 1, x + GUI_SHEET_BUTTON_WIDTH - 1, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT - 1, 0xFF702070);
 					
@@ -481,12 +481,12 @@ public class TamedDragonGUI {
 		@Override
 		protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
 			
-			if (!container.canInteractWith(Minecraft.getMinecraft().thePlayer)) {
+			if (!container.canInteractWith(NostrumMagica.proxy.getPlayer())) {
 				return;
 			}
 			
 			// Only allow custom clicking s tuff if there isn't an item being held
-			if (Minecraft.getMinecraft().thePlayer.inventory.getItemStack() == null) {
+			if (NostrumMagica.proxy.getPlayer().inventory.getItemStack() == null) {
 			
 				final int GUI_SHEET_HOFFSET = this.width - (GUI_SHEET_WIDTH + GUI_SHEET_NHOFFSET);
 				final int GUI_SHEET_BUTTON_HOFFSET = GUI_SHEET_HOFFSET;
@@ -497,11 +497,11 @@ public class TamedDragonGUI {
 					int buttonIdx = (mouseX - GUI_SHEET_BUTTON_HOFFSET) / GUI_SHEET_BUTTON_WIDTH;
 					if (buttonIdx < container.getSheets().size()) {
 						// Clicked a button!
-						NostrumMagicaSounds.UI_TICK.play(Minecraft.getMinecraft().thePlayer);
+						NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
 						this.container.setSheet(buttonIdx);
 						NetworkHelper.ClientSendSheet(container.id, buttonIdx);
 						return;
-					} else if (buttonIdx == container.getSheets().size() && Minecraft.getMinecraft().thePlayer.isCreative()) {
+					} else if (buttonIdx == container.getSheets().size() && NostrumMagica.proxy.getPlayer().isCreative()) {
 						NetworkHelper.ClientSendReroll(container.id);
 					}
 				}

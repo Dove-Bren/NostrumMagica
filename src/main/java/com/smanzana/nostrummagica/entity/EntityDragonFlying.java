@@ -29,7 +29,7 @@ public abstract class EntityDragonFlying extends EntityDragon {
 	// Used for animations.
 	// Set on every state change, meaning the time indicated
 	// depends on our state.
-	private long flyStateTime;
+	protected long flyStateTime;
 	
 	public EntityDragonFlying(World worldIn) {
 		super(worldIn);
@@ -137,7 +137,7 @@ public abstract class EntityDragonFlying extends EntityDragon {
 	protected abstract void setGroundedAI();
 	
 	// Actually start flying. Called internally when animations are done.
-	private void entityStartFlying() {
+	protected void entityStartFlying() {
 		if (!this.worldObj.isRemote) {
 			this.moveHelper = new EntityDragon.DragonFlyMoveHelper(this);
 			this.navigator = new EntityDragon.PathNavigateDragonFlier(this, worldObj);
@@ -148,7 +148,7 @@ public abstract class EntityDragonFlying extends EntityDragon {
 		
 	}
 	
-	private void entityStopFlying() {
+	protected void entityStopFlying() {
 		if (!this.worldObj.isRemote) {
 			this.moveHelper = new EntityMoveHelper(this);
 			this.navigator = this.getNewNavigator(worldObj);

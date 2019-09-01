@@ -658,7 +658,7 @@ public class Spell {
 		case ENDER:
 			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("invisibility"), duration, amp).name("invisibility");
 		case FIRE:
-			return new SpellAction(caster).status(MagicBoostPotion.instance(), duration, amp).name("magicboost");
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("fire_resistance"), duration, amp).name("fireresist");
 		case ICE:
 			return new SpellAction(caster).dispel(elementCount * (int) (Math.pow(3, elementCount - 1))).name("dispel");
 		case LIGHTNING:
@@ -682,7 +682,7 @@ public class Spell {
 		case ENDER:
 			return new SpellAction(caster).blink(15.0f * elementCount).name("blink");
 		case FIRE:
-			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("fire_resistance"), duration, amp).name("fireresist");
+			return new SpellAction(caster).status(MagicBoostPotion.instance(), duration, amp).name("magicboost");
 		case ICE:
 			return new SpellAction(caster).status(MagicShieldPotion.instance(), duration, amp + 1).name("shield.magic");
 		case LIGHTNING:

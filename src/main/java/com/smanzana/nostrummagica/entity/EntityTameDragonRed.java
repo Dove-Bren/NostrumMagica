@@ -1177,6 +1177,10 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		if (this.jumpCount < 1 + this.getBonusJumps()) {
 			this.jumpCount++;
 			this.jump();
+			
+			if (this.considerFlying()) {
+				this.setFlyState(FlyState.FLYING);
+			}
 		}
 	}
 	
@@ -1184,6 +1188,17 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	public void fall(float distance, float damageMulti) {
 		super.fall(distance, damageMulti);
 		this.jumpCount = 0;
+		this.setFlyState(FlyState.LANDED);
+	}
+	
+	@Override
+	protected void entityStartFlying() {
+		; // We handle flying (gliding) ourselves
+	}
+	
+	@Override
+	protected void entityStopFlying() {
+		; // We handle flying (gliding) ourselves
 	}
 	
 	@Override

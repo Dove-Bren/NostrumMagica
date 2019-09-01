@@ -50,9 +50,9 @@ public class RedDragonBondInfoSheet implements IDragonGUISheet {
 			untrans = "info.tamed_dragon.red_bond.players";
 		} else if (bond < EntityTameDragonRed.BOND_LEVEL_ALLOW_RIDE) {
 			untrans = "info.tamed_dragon.red_bond.chest";
-		} else if (bond < EntityTameDragonRed.BOND_LEVEL_MAGIC) {
+		} else if ((this.dragon.getCanUseMagic() && bond < EntityTameDragonRed.BOND_LEVEL_MAGIC) || (!this.dragon.getCanUseMagic() && bond < 0.9999f)) {
 			untrans = "info.tamed_dragon.red_bond.ride";
-		} else if (bond < 0.9999f) {
+		} else if (this.dragon.getCanUseMagic() && bond < 0.9999f) {
 			untrans = "info.tamed_dragon.red_bond.magic";
 		} else {
 			untrans = "info.tamed_dragon.red_bond.full";

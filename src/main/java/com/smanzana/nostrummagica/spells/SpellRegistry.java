@@ -142,5 +142,12 @@ public class SpellRegistry {
 		}
 	}
 	
+	public void evict(Spell spell) {
+		int id = spell.getRegistryID();
+		
+		synchronized(this) {
+			registry.remove(id);
+		}
+	}
 	
 }

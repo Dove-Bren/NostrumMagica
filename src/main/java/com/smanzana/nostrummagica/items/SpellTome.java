@@ -543,7 +543,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 			int maxxp = LevelCurve.getMaxXP(level);
 			int modifications = getModifications(stack);
 			int id = getTomeID(stack);
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer);
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(NostrumMagica.proxy.getPlayer());
 			SpellComponentWrapper comp = (attr.isBinding() && id == attr.getBindingID()) ? attr.getBindingComponent() : null;
 			String bindingName = (comp == null) ? null : attr.getBindingSpell().getName();
 			String compname = (comp == null) ? null :

@@ -119,6 +119,11 @@ public class SpellScroll extends Item implements ILoreTagged {
 	    			new ClientCastMessage(spell, true, 0));
 		}
 		
+		if (itemStackIn.getItemDamage() > itemStackIn.getMaxDamage()) {
+			// Going to break
+			NostrumMagica.spellRegistry.evict(spell);
+		}
+		
 		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
 		
     }

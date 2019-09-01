@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.gui.dragongui;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonContainer;
 import com.smanzana.nostrummagica.entity.EntityDragonGambit;
 import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
@@ -382,7 +383,7 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 		}
 		
 		sendGambitCycle(index, mouseButton == 0);
-		NostrumMagicaSounds.UI_TICK.play(Minecraft.getMinecraft().thePlayer);
+		NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
 	}
 	
 	private static enum SheetMessageType {
