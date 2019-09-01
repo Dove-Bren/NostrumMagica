@@ -28,7 +28,7 @@ public class RayTrace {
 		
 		@Override
 		public boolean apply(EntityLivingBase input) {
-			return !input.isEntityEqual(self);
+			return (!input.isEntityEqual(self) && !input.isEntityEqual(self.getRidingEntity()));
 		}
 	}
 	

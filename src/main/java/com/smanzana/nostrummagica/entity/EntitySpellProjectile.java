@@ -92,7 +92,7 @@ public class EntitySpellProjectile extends EntityFireball {
 			trigger.onProjectileHit(new BlockPos(result.hitVec));
 			this.setDead();
 		} else if (result.typeOfHit == RayTraceResult.Type.ENTITY) {
-			if (result.entityHit != this.shootingEntity || this.ticksExisted > 20) {
+			if ((result.entityHit != this.shootingEntity && result.entityHit != this.shootingEntity.getRidingEntity()) || this.ticksExisted > 20) {
 				trigger.onProjectileHit(result.entityHit);
 				this.setDead();
 			}
