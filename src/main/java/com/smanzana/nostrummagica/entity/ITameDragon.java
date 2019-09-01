@@ -4,7 +4,6 @@ import java.util.UUID;
 
 import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI;
 
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
 
 public interface ITameDragon extends IEntityTameable {

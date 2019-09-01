@@ -98,7 +98,7 @@ public class RedDragonBondInfoSheet implements IDragonGUISheet {
 				fonter.drawString(str, x, y, capabilityColor);
 				y += h + 2;
 			}
-			if (dragon.getDragonMana() > 0 && bond == 1f) {
+			if (dragon.getDragonMana() > 0 && bond >= EntityTameDragonRed.BOND_LEVEL_MANA ) {
 				str = "Dragon Mana Bond";
 				
 				fonter.drawString(str, x, y, capabilityColor);

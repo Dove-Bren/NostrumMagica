@@ -626,7 +626,7 @@ public class ClientProxy extends CommonProxy {
 		cost = summary.getFinalCost();
 		
 		// Add dragon mana pool
-		Collection<ITameDragon> dragons = NostrumMagica.getNearbyTamedDragons(player, 24, true);
+		Collection<ITameDragon> dragons = NostrumMagica.getNearbyTamedDragons(player, 32, true);
 		if (dragons != null && !dragons.isEmpty()) {
 			for (ITameDragon dragon : dragons) {
 				if (dragon.sharesMana(Minecraft.getMinecraft().thePlayer)) {

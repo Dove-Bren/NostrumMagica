@@ -152,7 +152,7 @@ public class ClientCastMessage implements IMessage {
 					int mana = att.getMana();
 					
 					// Add dragon mana pool
-					Collection<ITameDragon> dragons = NostrumMagica.getNearbyTamedDragons(sp, 24, true);
+					Collection<ITameDragon> dragons = NostrumMagica.getNearbyTamedDragons(sp, 32, true);
 					if (dragons != null && !dragons.isEmpty()) {
 						for (ITameDragon dragon : dragons) {
 							if (dragon.sharesMana(sp)) {

@@ -39,9 +39,13 @@ public class OverlayRenderer extends Gui {
 	private int wiggleIndex; // set to multiples of 12 for each wiggle
 	private static final int wiggleOffsets[] = {0, 1, 1, 2, 1, 1, 0, -1, -1, -2, -1, -1};
 	
+	private int wingIndex; // Controls mana wing animation. Set to -wingAnimDur to play backwards.
+	private static final int wingAnimDur = 20; 
+	
 	public OverlayRenderer() {
 		MinecraftForge.EVENT_BUS.register(this);
 		wiggleIndex = 0;
+		wingIndex = 0;
 	}
 	
 	@SubscribeEvent
@@ -118,12 +122,13 @@ public class OverlayRenderer extends Gui {
 		int totalMaxMana = 0;
 		
 		// render background
-		GlStateManager.color(.7f, .4f, .4f, 1f);
+		GlStateManager.color(.4f, .4f, .4f, 1f);
 		renderOrbsInternal(10, 0, hudXAnchor + wiggleOffset, hudYAnchor);
 
 		// Render dragon mana first, if available
-		Collection<ITameDragon> dragons = NostrumMagica.getNearbyTamedDragons(player, 24, true);
+		Collection<ITameDragon> dragons = NostrumMagica.getNearbyTamedDragons(player, 32, true);
 		
+		boolean hasDragon = false;
 		if (dragons != null && !dragons.isEmpty()) {
 			int dragonMana = 0;
 			int dragonMaxMana = 0;
@@ -140,33 +145,67 @@ public class OverlayRenderer extends Gui {
 			
 			// Make sure at least ONE is willing to share mana with us
 			if (dragonMaxMana > 0) {
+				hasDragon = true;
 				float ratio = (float) dragonMana / (float) dragonMaxMana;
-				
-				
 				int parts = Math.round(40 * ratio);
 				int whole = parts / 4;
 				int pieces = parts % 4;
 				
-				//this.drawTexturedModalRect(x - (8 * (i + 1)),
-				//y,	36, 16, GUI_ORB_WIDTH, GUI_ORB_HEIGHT);
-				Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_ICONS);
-				GlStateManager.pushMatrix();
-				//this.drawTexturedModalRect(hudXAnchor + wiggleOffset, hudYAnchor, 10, GUI_WING_OFFSETY, 20, GUI_WING_SIZE);
-				drawScaledCustomSizeModalRect(hudXAnchor + wiggleOffset - 2, hudYAnchor - 6, GUI_WING_SIZE, GUI_WING_OFFSETY,
-						-GUI_WING_SIZE, GUI_WING_SIZE, 10, 10, 256f, 256f);
-				drawScaledCustomSizeModalRect(hudXAnchor + wiggleOffset - 88, hudYAnchor - 6, 0, GUI_WING_OFFSETY,
-						GUI_WING_SIZE, GUI_WING_SIZE, 10, 10, 256f, 256f);
-				GlStateManager.popMatrix();
+				// If we just found a dragon, start anim
+				if (this.wingIndex == 0) {
+					startWingAnim(true);
+				}
 				
 				GlStateManager.pushMatrix();
 				GlStateManager.pushAttrib();
 				
-				GlStateManager.color(1f, .0f, .2f, 1f);
+				GlStateManager.color(1f, .2f, .2f, 1f);
 				renderOrbsInternal(whole, pieces, hudXAnchor + wiggleOffset, hudYAnchor);
 				
 				GlStateManager.popAttrib();
 				GlStateManager.popMatrix();
 			}
+		}
+		
+		// If no dragon is sharing mana and we're not playing wing animation, start the furl anim
+		if (!hasDragon && wingIndex == wingAnimDur) {
+			startWingAnim(false);
+		}
+		
+		if (wingIndex != 0) {
+			final int index = wingIndex;
+			if (wingIndex < wingAnimDur) {
+				wingIndex++;
+			}
+			
+			final float ratio = ((float) (20 - Math.abs(index)) / 20f);
+			final float rot = ratio * 120.0f;
+			
+			Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_ICONS);
+			
+			GlStateManager.pushMatrix();
+			GlStateManager.translate(0, 0, -.5); // Behind
+			GlStateManager.translate(hudXAnchor + wiggleOffset - 1, hudYAnchor + 3, 0);
+			
+			GlStateManager.rotate(rot, 0, 0, 1f);
+			GlStateManager.translate(-1, -10, 0);
+			GlStateManager.color(1f, 1f, 1f, 1f - ratio);
+			drawScaledCustomSizeModalRect(0, 0, GUI_WING_SIZE, GUI_WING_OFFSETY,
+					-GUI_WING_SIZE, GUI_WING_SIZE, 10, 10, 256f, 256f);
+			GlStateManager.popMatrix();
+			
+			GlStateManager.pushMatrix();
+			GlStateManager.translate(0, 0, -.5); // Behind
+			GlStateManager.translate(hudXAnchor + wiggleOffset - 76, hudYAnchor + 3, 0);
+			
+			GlStateManager.rotate(-rot, 0, 0, 1f);
+			GlStateManager.translate(-10, -10, 0);
+			GlStateManager.color(1f, 1f, 1f, 1f - ratio);
+			drawScaledCustomSizeModalRect(0, 0, 0, GUI_WING_OFFSETY,
+					GUI_WING_SIZE, GUI_WING_SIZE, 10, 10, 256f, 256f);
+			GlStateManager.popMatrix();
+			
+			
 		}
 		
 		// Render player mana on top
@@ -287,6 +326,14 @@ public class OverlayRenderer extends Gui {
 	
 	public void startManaWiggle(int wiggleCount) {
 		this.wiggleIndex = 12 * wiggleCount;
+	}
+	
+	public void startWingAnim(boolean forward) {
+		if (forward) {
+			this.wingIndex = 1;
+		} else {
+			this.wingIndex = -wingAnimDur;
+		}
 	}
 	
 }

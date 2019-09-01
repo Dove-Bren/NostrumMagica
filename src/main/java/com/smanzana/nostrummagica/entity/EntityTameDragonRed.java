@@ -115,6 +115,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
     public static final float BOND_LEVEL_CHEST = 0.20f;
     public static final float BOND_LEVEL_ALLOW_RIDE = 0.50f;
     public static final float BOND_LEVEL_MAGIC = 0.60f;
+    public static final float BOND_LEVEL_MANA = 0.95f;
     
     private static final float DRAGON_MIN_HEALTH = 5.0f;
     private static final int DRAGON_INV_SIZE = 27;
@@ -1692,7 +1693,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 
 	@Override
 	public boolean sharesMana(EntityPlayer player) {
-		return player != null && player.isEntityEqual(this.getOwner()) && this.getBond() >= .95f;
+		return player != null && player.isEntityEqual(this.getOwner()) && this.getBond() >= BOND_LEVEL_MANA;
 	}
 
 }
