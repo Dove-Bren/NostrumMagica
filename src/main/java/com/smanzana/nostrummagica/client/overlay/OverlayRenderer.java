@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.ITameDragon;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -60,6 +61,8 @@ public class OverlayRenderer extends Gui {
 				return;
 			}
 			
+			renderSpellSlide(player, scaledRes, attr);
+			
 			if (Minecraft.getMinecraft().thePlayer.isCreative()
 					|| Minecraft.getMinecraft().thePlayer.isSpectator()) {
 				return;
@@ -74,7 +77,6 @@ public class OverlayRenderer extends Gui {
 				renderManaBar(player, scaledRes, attr);
 			}
 			
-			renderSpellSlide(player, scaledRes, attr);
 		} else if (event.getType() == ElementType.ARMOR) {
 			if (ModConfig.config.displayArmorOverlay()) {
 				renderArmorOverlay(player, scaledRes);
@@ -279,14 +281,42 @@ public class OverlayRenderer extends Gui {
 		Spell current = NostrumMagica.getCurrentSpell(Minecraft.getMinecraft().thePlayer);
 		boolean xp = ModConfig.config.displayXPText();
 		if (current != null || xp) {
-			String text = (current == null ? "" : current.getName());
-			int mult = (xp) ? 2 : 1;
 			FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
-			Gui.drawRect(0, scaledRes.getScaledHeight() - (fonter.FONT_HEIGHT * mult + 9), 100, scaledRes.getScaledHeight(), 0x50606060);
-			fonter.drawString(text, 5, scaledRes.getScaledHeight() - (fonter.FONT_HEIGHT + 3), 0xFF000000);
-			if (xp)
+			final int iconSize = 16;
+			final int iconMargin = 2;
+			final int textOffset = iconSize + (2 * iconMargin);
+			final int textMargin = 5;
+			int slideHeight = iconSize + (2 * iconMargin);
+			
+			if (xp) {
+				slideHeight = Math.max(slideHeight, fonter.FONT_HEIGHT * 2 + 9);
+			}
+			
+			String text = (current == null ? "" : current.getName());
+			
+			Gui.drawRect(textOffset, scaledRes.getScaledHeight() - slideHeight, 120, scaledRes.getScaledHeight(), 0x50606060);
+			
+			// Draw icon
+			if (current != null) {
+				Gui.drawRect(0, scaledRes.getScaledHeight() - slideHeight, textOffset, scaledRes.getScaledHeight(), 0xFF202020);
+				
+				GlStateManager.color(1f, 1f, 1f, 1f);
+				final int drawY = (scaledRes.getScaledHeight() - (slideHeight + iconSize) / 2);
+				SpellIcon.get(current.getIconIndex()).render(Minecraft.getMinecraft(), iconMargin, drawY, iconSize, iconSize);
+			}
+			
+			// Draw name (and maybe xp)
+			
+			if (xp) {
+				// Height is based on this height. Just draw.
+				fonter.drawString(text, textOffset + textMargin, scaledRes.getScaledHeight() - (fonter.FONT_HEIGHT + iconMargin), 0xFF000000);
 				fonter.drawString(String.format("%.02f%%", 100f * attr.getXP() / attr.getMaxXP()),
-						5, scaledRes.getScaledHeight() - (fonter.FONT_HEIGHT * 2 + 6), 0xFF000000);
+						textOffset + textMargin, scaledRes.getScaledHeight() - (fonter.FONT_HEIGHT * 2 + 6), 0xFF000000);
+			} else {
+				// Draw in center
+				final int drawY = (scaledRes.getScaledHeight() - (slideHeight + fonter.FONT_HEIGHT) / 2);
+				fonter.drawString(text, textOffset + textMargin, drawY, 0xFF000000);
+			}
 		}
 	}
 	

@@ -260,7 +260,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 	}
 	
 	private void doEnder(EntityPlayer player, World world) {
-		BlockPos pos = player.getBedLocation();
+		BlockPos pos = player.getBedLocation(player.dimension);
 		if (pos == null) {
 			pos = world.getSpawnPoint();
 			while (!world.isAirBlock(pos)) {

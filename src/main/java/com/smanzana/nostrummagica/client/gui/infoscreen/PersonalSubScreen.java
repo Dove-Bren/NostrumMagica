@@ -11,7 +11,7 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.client.gui.SpellIcon;
+import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -92,7 +92,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		                  (int) (Minecraft.getSystemTime() / cycle) % EMagicElement.values().length
 					      ];
 				}
-				SpellIcon.get(element).draw(Minecraft.getMinecraft().currentScreen, mc.fontRendererObj, drawx, drawy, iconWidth, iconWidth);
+				SpellComponentIcon.get(element).draw(Minecraft.getMinecraft().currentScreen, mc.fontRendererObj, drawx, drawy, iconWidth, iconWidth);
 				str = I18n.format("element.name", new Object[0]);
 				strLen = mc.fontRendererObj.getStringWidth(str);
 				mc.fontRendererObj.drawString(str, (drawx + iconWidth / 2) - strLen/2, drawy - (3 + mc.fontRendererObj.FONT_HEIGHT), 0xFFFFFF);
@@ -109,7 +109,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		                  (int) (Minecraft.getSystemTime() / cycle) % trigArray.length
 					      ];
 				}
-				SpellIcon.get(trigger).draw(Minecraft.getMinecraft().currentScreen, mc.fontRendererObj, drawx, drawy, iconWidth, iconWidth);
+				SpellComponentIcon.get(trigger).draw(Minecraft.getMinecraft().currentScreen, mc.fontRendererObj, drawx, drawy, iconWidth, iconWidth);
 				str = I18n.format("trigger.name", new Object[0]);
 				strLen = mc.fontRendererObj.getStringWidth(str);
 				mc.fontRendererObj.drawString(str, (drawx + iconWidth / 2) - strLen/2, drawy - (3 + mc.fontRendererObj.FONT_HEIGHT), 0xFFFFFF);
@@ -126,7 +126,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		                  (int) (Minecraft.getSystemTime() / cycle) % shapeArray.length
 					      ];
 				}
-				SpellIcon.get(shape).draw(Minecraft.getMinecraft().currentScreen, mc.fontRendererObj, drawx, drawy, iconWidth, iconWidth);
+				SpellComponentIcon.get(shape).draw(Minecraft.getMinecraft().currentScreen, mc.fontRendererObj, drawx, drawy, iconWidth, iconWidth);
 				str = I18n.format("shape.name", new Object[0]);
 				strLen = mc.fontRendererObj.getStringWidth(str);
 				mc.fontRendererObj.drawString(str, (drawx + iconWidth / 2) - strLen/2, drawy - (3 + mc.fontRendererObj.FONT_HEIGHT), 0xFFFFFF);
@@ -390,7 +390,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				Gui.drawRect(drawX, drawY, drawX + iconWidth, drawY + iconWidth, 0xFF406080);
 				GlStateManager.color(1f, 1f, 1f, alpha);
 				GlStateManager.enableBlend();
-				SpellIcon.get(elem).draw(mc.currentScreen, mc.fontRendererObj, drawX, drawY, iconWidth, iconWidth);
+				SpellComponentIcon.get(elem).draw(mc.currentScreen, mc.fontRendererObj, drawX, drawY, iconWidth, iconWidth);
 				
 				if (mastery != null) {
 					mc.fontRendererObj.drawString(mastery + "", drawX + 1, drawY + 1, 0xFFFFFFFF);
@@ -416,7 +416,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				Gui.drawRect(drawX, drawY, drawX + iconWidth, drawY + iconWidth, 0xFF406080);
 				GlStateManager.color(1f, 1f, 1f, alpha);
 				GlStateManager.enableBlend();
-				SpellIcon.get(trigger).draw(mc.currentScreen, mc.fontRendererObj, drawX, drawY, iconWidth, iconWidth);
+				SpellComponentIcon.get(trigger).draw(mc.currentScreen, mc.fontRendererObj, drawX, drawY, iconWidth, iconWidth);
 				drawX += 5 + iconWidth;
 			}
 			
@@ -437,7 +437,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				Gui.drawRect(drawX, drawY, drawX + iconWidth, drawY + iconWidth, 0xFF406080);
 				GlStateManager.color(1f, 1f, 1f, alpha);
 				GlStateManager.enableBlend();
-				SpellIcon.get(shape).draw(mc.currentScreen, mc.fontRendererObj, drawX, drawY, iconWidth, iconWidth);
+				SpellComponentIcon.get(shape).draw(mc.currentScreen, mc.fontRendererObj, drawX, drawY, iconWidth, iconWidth);
 				drawX += 5 + iconWidth;
 			}
 			
@@ -459,7 +459,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				Gui.drawRect(drawX, drawY, drawX + iconWidth, drawY + iconWidth, 0xFF406080);
 				GlStateManager.color(1f, 1f, 1f, alpha);
 				GlStateManager.enableBlend();
-				SpellIcon.get(alteration).draw(mc.currentScreen, mc.fontRendererObj, drawX, drawY, iconWidth, iconWidth);
+				SpellComponentIcon.get(alteration).draw(mc.currentScreen, mc.fontRendererObj, drawX, drawY, iconWidth, iconWidth);
 				drawX += 5 + iconWidth;
 			}
 			

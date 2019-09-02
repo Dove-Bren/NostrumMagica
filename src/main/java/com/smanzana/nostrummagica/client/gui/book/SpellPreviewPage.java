@@ -55,10 +55,11 @@ public class SpellPreviewPage implements IBookPage {
 		Gui.drawRect(xoffset, yoffset, xoffset + width, yoffset + height, 0x40000000);
 		
 		// Draw element icon
-		SpellIcon elementIcon = SpellIcon.get(spell.getPrimaryElement());
+		//SpellComponentIcon elementIcon = SpellComponentIcon.get(spell.getPrimaryElement());
+		SpellIcon icon = SpellIcon.get(spell.getIconIndex());
 		int icony = yoffset + (height / 2) + (-12);
 		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-		elementIcon.draw(parent, fonter, xoffset + 4, icony, 24, 24);
+		icon.render(Minecraft.getMinecraft(), xoffset + 4, icony, 24, 24);
 		
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(xoffset + 32, yoffset + 2, 0);

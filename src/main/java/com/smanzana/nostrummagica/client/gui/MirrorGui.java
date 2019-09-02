@@ -344,7 +344,7 @@ public class MirrorGui extends GuiScreen {
 	                  (int) (Minecraft.getSystemTime() / cycle) % EMagicElement.values().length
 				      ];
 			}
-			SpellIcon.get(element).draw(this, this.fontRendererObj, x, y, width, width);
+			SpellComponentIcon.get(element).draw(this, this.fontRendererObj, x, y, width, width);
 			str = I18n.format("element.name", new Object[0]);
 			strLen = this.fontRendererObj.getStringWidth(str);
 			this.fontRendererObj.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.fontRendererObj.FONT_HEIGHT), 0xFFFFFF);
@@ -361,7 +361,7 @@ public class MirrorGui extends GuiScreen {
 	                  (int) (Minecraft.getSystemTime() / cycle) % trigArray.length
 				      ];
 			}
-			SpellIcon.get(trigger).draw(this, this.fontRendererObj, x, y, width, width);
+			SpellComponentIcon.get(trigger).draw(this, this.fontRendererObj, x, y, width, width);
 			str = I18n.format("trigger.name", new Object[0]);
 			strLen = this.fontRendererObj.getStringWidth(str);
 			this.fontRendererObj.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.fontRendererObj.FONT_HEIGHT), 0xFFFFFF);
@@ -378,7 +378,7 @@ public class MirrorGui extends GuiScreen {
 	                  (int) (Minecraft.getSystemTime() / cycle) % shapeArray.length
 				      ];
 			}
-			SpellIcon.get(shape).draw(this, this.fontRendererObj, x, y, width, width);
+			SpellComponentIcon.get(shape).draw(this, this.fontRendererObj, x, y, width, width);
 			str = I18n.format("shape.name", new Object[0]);
 			strLen = this.fontRendererObj.getStringWidth(str);
 			this.fontRendererObj.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.fontRendererObj.FONT_HEIGHT), 0xFFFFFF);
@@ -556,7 +556,7 @@ public class MirrorGui extends GuiScreen {
     	private boolean mouseOver;
     	private final float fontScale = 0.75f;
     	private boolean canTurnin;
-    	private SpellIcon icon; // Icon to use as this ocon
+    	private SpellComponentIcon icon; // Icon to use as this ocon
     	private int iconOffset; // If icon is null, offset for our icon on the main texture
 		
 		public QuestButton(int parButtonId, int parPosX, int parPosY,
@@ -687,7 +687,7 @@ public class MirrorGui extends GuiScreen {
 				return;
 			
 			if (reward instanceof AlterationReward) {
-				this.icon = SpellIcon.get(((AlterationReward) reward).getAlteration());
+				this.icon = SpellComponentIcon.get(((AlterationReward) reward).getAlteration());
 			} else if (reward instanceof AttributeReward) {
 				AwardType type = ((AttributeReward) reward).getType();
 				iconOffset = TEXT_REWARD_OFFSET + (type.ordinal() * TEXT_REWARD_WIDTH);

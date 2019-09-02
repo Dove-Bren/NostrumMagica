@@ -7,8 +7,10 @@ import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.SpellRune;
+import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.SpellTomePage;
+import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 
@@ -199,7 +201,8 @@ public class ModificationTable extends BlockContainer {
 			
 			if (index == 0) {
 				return stack.getItem() instanceof SpellTome
-						|| stack.getItem() instanceof SpellRune;
+						|| stack.getItem() instanceof SpellRune
+						|| (stack.getItem() instanceof SpellScroll && SpellScroll.getSpell(stack) != null);
 			}
 			
 			if (index == 1)
@@ -287,6 +290,12 @@ public class ModificationTable extends BlockContainer {
 			} else if (stack.getItem() instanceof SpellRune) {
 				this.setInventorySlotContents(1, null);
 				SpellRune.setPieceParam(stack, new SpellPartParam(valF, valB));
+			} else if (stack.getItem() instanceof SpellScroll) {
+				Spell spell = SpellScroll.getSpell(stack);
+				if (spell != null) {
+					spell.setIcon((int) valF);
+					this.setInventorySlotContents(1, null);
+				}
 			}
 			
 		}

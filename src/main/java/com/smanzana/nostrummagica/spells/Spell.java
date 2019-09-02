@@ -395,6 +395,7 @@ public class Spell {
 	}
 
 	private String name;
+	private int iconIndex; // Basically useless on server, selects which icon to show on the client
 	private int registryID;
 	private List<SpellPart> parts;
 	private int manaCost;
@@ -403,6 +404,7 @@ public class Spell {
 		this.parts = new LinkedList<>();
 		manaCost = -1; // un-calculated value
 		name = "";
+		iconIndex = 0;
 	}
 	
 	/**
@@ -432,6 +434,10 @@ public class Spell {
 		return s;
 	}
 	
+	public void setIcon(int index) {
+		this.iconIndex = index;
+	}
+	
 	public void addPart(SpellPart part) {
 		this.parts.add(part);
 		manaCost = -1;
@@ -443,6 +449,10 @@ public class Spell {
 	
 	public int getRegistryID() {
 		return registryID;
+	}
+	
+	public int getIconIndex() {
+		return this.iconIndex;
 	}
 	
 	public void cast(EntityLivingBase caster, float efficiency) {
@@ -752,6 +762,7 @@ public class Spell {
 	
 	private static final String NBT_SPELL_NAME = "name";
 	private static final String NBT_LIST = "parts";
+	private static final String NBT_ICON_INDEX = "ico_index";
 	
 	// Parts
 	private static final String NBT_KEY = "key";
@@ -785,6 +796,7 @@ public class Spell {
 		
 		compound = new NBTTagCompound();
 		compound.setString(NBT_SPELL_NAME, name);
+		compound.setInteger(NBT_ICON_INDEX, iconIndex);
 		compound.setTag(NBT_LIST, list);
 		return compound;
 	}
@@ -801,9 +813,11 @@ public class Spell {
 			return null;
 		
 		String name = nbt.getString(NBT_SPELL_NAME); 
+		int index = nbt.getInteger(NBT_ICON_INDEX);
 		Spell spell = new Spell();
 		spell.name = name;
 		spell.registryID = id;
+		spell.iconIndex = index;
 		
 		NBTTagList list = nbt.getTagList(NBT_LIST, NBT.TAG_COMPOUND);
 		NBTTagCompound tag;

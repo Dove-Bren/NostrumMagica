@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.client.gui.dragongui;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonContainer;
 import com.smanzana.nostrummagica.entity.EntityDragonGambit;
 import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
@@ -10,6 +11,7 @@ import com.smanzana.nostrummagica.entity.EntityTameDragonRed.RedDragonSpellInven
 import com.smanzana.nostrummagica.entity.ITameDragon;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -270,6 +272,92 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void overlay(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+		
+		// Draw spell icon overlays
+		{
+			/*
+			 // Target slots
+			drawRow(mc, partialTicks, leftOffset - 1, dragonTopOffset - 1, "Enemy", dragonInv.getTargetSpells(), dragonInv.getTargetGambits());
+			
+			// Self slots
+			drawRow(mc, partialTicks, leftOffset - 1, dragonTopOffset - 1 + rowIncr, "Self", dragonInv.getSelfSpells(), dragonInv.getSelfGambits());
+			
+			// Ally slots
+			drawRow(mc, partialTicks, leftOffset - 1, dragonTopOffset - 1 + rowIncr + rowIncr, "Ally", dragonInv.getAllySpells(), dragonInv.getAllyGambits());
+			 */
+			ItemStack[] scrolls;
+			int x;
+			int y;
+			final int innerCellWidth = RedDragonSpellSheet.cellWidth - 2;
+			final long period = 2000;
+			final float alpha = .85f + .1f * (float) Math.sin(Math.PI * 2 * (float) (Minecraft.getSystemTime() % period) / period);
+			
+			GlStateManager.pushMatrix();
+			GlStateManager.translate(0, 0, 251);
+			
+			// Target
+			scrolls = dragonInv.getTargetSpells();
+			x = leftOffset;
+			y = dragonTopOffset;
+			for (int i = 0; i < scrolls.length; i++) {
+				ItemStack scroll = scrolls[i];
+				if (scroll == null) {
+					break;
+				}
+				
+				if (scroll.getItem() instanceof SpellScroll) {
+					Spell spell = SpellScroll.getSpell(scroll);
+					if (spell != null) {
+						final SpellIcon icon = SpellIcon.get(spell.getIconIndex());
+						GlStateManager.color(1f, 1f, 1f, alpha);
+						icon.render(mc, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth);
+					}
+				}
+			}
+			
+			// Self
+			scrolls = dragonInv.getSelfSpells();
+			x = leftOffset;
+			y = dragonTopOffset + rowIncr;
+			for (int i = 0; i < scrolls.length; i++) {
+				ItemStack scroll = scrolls[i];
+				if (scroll == null) {
+					break;
+				}
+				
+				if (scroll.getItem() instanceof SpellScroll) {
+					Spell spell = SpellScroll.getSpell(scroll);
+					if (spell != null) {
+						final SpellIcon icon = SpellIcon.get(spell.getIconIndex());
+						GlStateManager.color(1f, 1f, 1f, alpha);
+						icon.render(mc, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth);
+					}
+				}
+			}
+			
+			// Ally
+			scrolls = dragonInv.getAllySpells();
+			x = leftOffset;
+			y = dragonTopOffset + rowIncr + rowIncr;
+			for (int i = 0; i < scrolls.length; i++) {
+				ItemStack scroll = scrolls[i];
+				if (scroll == null) {
+					break;
+				}
+				
+				if (scroll.getItem() instanceof SpellScroll) {
+					Spell spell = SpellScroll.getSpell(scroll);
+					if (spell != null) {
+						final SpellIcon icon = SpellIcon.get(spell.getIconIndex());
+						GlStateManager.color(1f, 1f, 1f, alpha);
+						icon.render(mc, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth);
+					}
+				}
+			}
+			
+			GlStateManager.popMatrix();
+		}
+		
 		// Draw gambit overlay
 		do {
 			if (mouseY < dragonTopOffset - 1 || mouseY > dragonTopOffset - 1 + rowIncr + rowIncr + cellWidth) {
@@ -572,6 +660,15 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 			
 			// If somehow we're past the max spells in a category, do not allow anything in
 			if (subIndex >= RedDragonSpellInventory.MaxSpellsPerCategory) {
+				return false;
+			}
+			
+			// Only scrolls with spells!
+			if (!(stack.getItem() instanceof SpellScroll)) {
+				return false;
+			}
+			
+			if (SpellScroll.getSpell(stack) == null) {
 				return false;
 			}
 			

@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.client.render;
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.blocks.SymbolBlock.SymbolTileEntity;
-import com.smanzana.nostrummagica.client.gui.SpellIcon;
+import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 
 import net.minecraft.client.Minecraft;
@@ -32,15 +32,15 @@ public class TileEntitySymbolRenderer extends TileEntitySpecialRenderer<SymbolTi
 		
 		// Get the model from the tile entity
 		SpellComponentWrapper comp = te.getComponent();
-		SpellIcon icon;
+		SpellComponentIcon icon;
 		if (comp.isTrigger())
-			icon = SpellIcon.get(comp.getTrigger());
+			icon = SpellComponentIcon.get(comp.getTrigger());
 		else if (comp.isShape())
-			icon = SpellIcon.get(comp.getShape());
+			icon = SpellComponentIcon.get(comp.getShape());
 		else if (comp.isTrigger())
-			icon = SpellIcon.get(comp.getTrigger());
+			icon = SpellComponentIcon.get(comp.getTrigger());
 		else
-			icon = SpellIcon.get(comp.getElement());
+			icon = SpellComponentIcon.get(comp.getElement());
 		ResourceLocation textLoc = icon.getModelLocation();
 		float rot = 2.0f * (Minecraft.getSystemTime() / 50);
 		float scale = te.getScale();
