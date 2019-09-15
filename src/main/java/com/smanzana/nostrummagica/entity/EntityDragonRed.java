@@ -6,9 +6,9 @@ import com.smanzana.nostrummagica.entity.tasks.DragonFlyEvasionTask;
 import com.smanzana.nostrummagica.entity.tasks.DragonFlyRandomTask;
 import com.smanzana.nostrummagica.entity.tasks.DragonLandTask;
 import com.smanzana.nostrummagica.entity.tasks.DragonMeleeAttackTask;
-import com.smanzana.nostrummagica.entity.tasks.DragonSpellAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.DragonSummonShadowAttack;
 import com.smanzana.nostrummagica.entity.tasks.DragonTakeoffLandTask;
+import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
 import com.smanzana.nostrummagica.items.DragonEggFragment;
 import com.smanzana.nostrummagica.items.NostrumSkillItem;
 import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
@@ -235,7 +235,7 @@ public class EntityDragonRed extends EntityDragonRedBase {
         		new DragonLandTask(this),
         		new DragonMeleeAttackTask(this, 1.0D, true),
         		evasionTask,
-        		new DragonSpellAttackTask<EntityDragonRed>(this, (5 * 5), 10, true, DSPELL_Fireball),
+        		new EntitySpellAttackTask<EntityDragonRed>(this, (5 * 5), 10, true, null, DSPELL_Fireball),
         		//new DragonFlyStrafeTask<EntityDragonRed>(this, 20),
         		new DragonTakeoffLandTask(this),
         		new DragonFlyRandomTask(this),
@@ -246,10 +246,10 @@ public class EntityDragonRed extends EntityDragonRedBase {
         		new DragonMeleeAttackTask(this, 1.0D, true),
         		new DragonTakeoffLandTask(this),
         		evasionTask,
-				new DragonSpellAttackTask<EntityDragonRed>(this, (5 * 5), 12, true, DSPELL_Fireball2),
-				new DragonSpellAttackTask<EntityDragonRed>(this, (5 * 12), 10, false, DSPELL_Speed, DSPELL_Shield),
-				new DragonSpellAttackTask<EntityDragonRed>(this, (5 * 10), 20, false, DSPELL_Weaken),
-				new DragonSpellAttackTask<EntityDragonRed>(this, (5 * 45), 20, true, DSPELL_Curse),
+				new EntitySpellAttackTask<EntityDragonRed>(this, (5 * 5), 12, true, null, DSPELL_Fireball2),
+				new EntitySpellAttackTask<EntityDragonRed>(this, (5 * 12), 10, false, null, DSPELL_Speed, DSPELL_Shield),
+				new EntitySpellAttackTask<EntityDragonRed>(this, (5 * 10), 20, false, null, DSPELL_Weaken),
+				new EntitySpellAttackTask<EntityDragonRed>(this, (5 * 45), 20, true, null, DSPELL_Curse),
         		//new DragonFlyStrafeTask<EntityDragonRed>(this, 20),
         		new DragonFlyRandomTask(this),
 			}
@@ -262,7 +262,7 @@ public class EntityDragonRed extends EntityDragonRedBase {
         	},
         	new EntityAIBase[] {
     			shadowAttack,
-        		new DragonSpellAttackTask<EntityDragonRed>(this, (5 * 5), 20, true, DSPELL_Fireball),
+        		new EntitySpellAttackTask<EntityDragonRed>(this, (5 * 5), 20, true, null, DSPELL_Fireball),
         		new DragonTakeoffLandTask(this),
     			new DragonMeleeAttackTask(this, 1.0D, true),
         		new EntityAIWander(this, 1.0D, 30)
@@ -271,10 +271,10 @@ public class EntityDragonRed extends EntityDragonRedBase {
     			shadowAttack,
         		new DragonTakeoffLandTask(this),
     			new DragonMeleeAttackTask(this, 1.0D, true),
-    			new DragonSpellAttackTask<EntityDragonRed>(this, (5 * 5), 12, true, DSPELL_Fireball2),
-				new DragonSpellAttackTask<EntityDragonRed>(this, (5 * 12), 10, false, DSPELL_Speed, DSPELL_Shield),
-				new DragonSpellAttackTask<EntityDragonRed>(this, (5 * 10), 20, false, DSPELL_Weaken),
-				new DragonSpellAttackTask<EntityDragonRed>(this, (5 * 45), 20, true, DSPELL_Curse),
+    			new EntitySpellAttackTask<EntityDragonRed>(this, (5 * 5), 12, true, null, DSPELL_Fireball2),
+				new EntitySpellAttackTask<EntityDragonRed>(this, (5 * 12), 10, false, null, DSPELL_Speed, DSPELL_Shield),
+				new EntitySpellAttackTask<EntityDragonRed>(this, (5 * 10), 20, false, null, DSPELL_Weaken),
+				new EntitySpellAttackTask<EntityDragonRed>(this, (5 * 45), 20, true, null, DSPELL_Curse),
         		new EntityAIWander(this, 1.0D, 30)
         	}
         		

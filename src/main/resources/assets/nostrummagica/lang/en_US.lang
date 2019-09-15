@@ -93,7 +93,9 @@ item.pendant_whole.name=Thano Pendant
 item.token.name=Magic Token
 
 item.magic_wall.name=Magic Wall
-item.mani_ore.name=Mani Orej
+item.mani_ore.name=Mani Ore
+item.magic_dirt.name=Crystadirt
+item.crystadirt.name=Crystadirt
 item.essore.name=Essore
 
 item.sword_lightning1.name=Lightning Knife
@@ -222,6 +224,7 @@ potion.familiar.name=Soul Bond
 
 tile.magic_wall.name=Magic Wall
 tile.mani_ore.name=Mani Ore
+tile.magic_dirt=Crystadirt
 tile.essore.name=Essore
 tile.cursed_ice.name=Cursed Ice
 tile.mandrake_crop.name=Mandrake
@@ -248,6 +251,7 @@ entity.nostrummagica.entity_koid.name=Koid
 entity.nostrummagica.entity_dragon_red.name=Red Dragon
 entity.nostrummagica.entity_tame_dragon_red.name=Baby Red Dragon
 entity.nostrummagica.entity_shadow_dragon_red.name=Shadow Red Dragon
+entity.nostrummagica.entity_sprite.name=Sprite
 
 itemGroup.nostrummagica=Nostrum Magica
 itemGroup.nostrummagica_enhancements=Nostrum Enhancements

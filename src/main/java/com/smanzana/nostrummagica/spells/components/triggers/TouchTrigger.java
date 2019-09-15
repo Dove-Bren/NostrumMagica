@@ -39,7 +39,7 @@ public class TouchTrigger extends InstantTrigger {
 		super(TRIGGER_KEY);
 	}
 
-	private static final float TOUCH_RANGE = 3.0f;
+	public static final float TOUCH_RANGE = 3.0f;
 	
 	@Override
 	protected TriggerData getTargetData(SpellState state, World world,

@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.blocks.CursedIce;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.blocks.EssenceOre;
 import com.smanzana.nostrummagica.blocks.LoreTable;
+import com.smanzana.nostrummagica.blocks.MagicDirt;
 import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.blocks.ManiOre;
 import com.smanzana.nostrummagica.blocks.ModificationTable;
@@ -49,6 +50,7 @@ import com.smanzana.nostrummagica.entity.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityShadowDragonRed;
+import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.ITameDragon;
 import com.smanzana.nostrummagica.entity.renderer.ModelGolem;
@@ -56,6 +58,7 @@ import com.smanzana.nostrummagica.entity.renderer.RenderDragonRed;
 import com.smanzana.nostrummagica.entity.renderer.RenderGolem;
 import com.smanzana.nostrummagica.entity.renderer.RenderKoid;
 import com.smanzana.nostrummagica.entity.renderer.RenderShadowDragonRed;
+import com.smanzana.nostrummagica.entity.renderer.RenderSprite;
 import com.smanzana.nostrummagica.entity.renderer.RenderTameDragonRed;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
@@ -209,6 +212,12 @@ public class ClientProxy extends CommonProxy {
 			@Override
 			public Render<? super EntityShadowDragonRed> createRenderFor(RenderManager manager) {
 				return new RenderShadowDragonRed(manager, 2);
+			}
+		});
+		RenderingRegistry.registerEntityRenderingHandler(EntitySprite.class, new IRenderFactory<EntitySprite>() {
+			@Override
+			public Render<? super EntitySprite> createRenderFor(RenderManager manager) {
+				return  new RenderSprite(manager, .7f);
 			}
 		});
 		
@@ -392,6 +401,9 @@ public class ClientProxy extends CommonProxy {
 		registerModel(Item.getItemFromBlock(ManiOre.instance()),
 				0,
 				ManiOre.ID);
+		registerModel(Item.getItemFromBlock(MagicDirt.instance()),
+				0,
+				MagicDirt.ID);
 		registerModel(Item.getItemFromBlock(EssenceOre.instance()),
 				0,
 				EssenceOre.ID);
@@ -839,6 +851,10 @@ public class ClientProxy extends CommonProxy {
 				NostrumMagica.MODID, "entity/dragon_C"));
 		event.getMap().registerSprite(new ResourceLocation(
 				NostrumMagica.MODID, "entity/dragon_TR"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "entity/sprite_core"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "entity/sprite_arms"));
 	}
 	
 	@SubscribeEvent

@@ -274,4 +274,9 @@ public class EntityKoid extends EntityMob implements ILoreTagged {
 		
 		return super.attackEntityFrom(source, amount);
 	}
+	
+	@Override
+	protected boolean isValidLightLevel() {
+		return super.isValidLightLevel(); // Like a regular mob.
+	}
 }

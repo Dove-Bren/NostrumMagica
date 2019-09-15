@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.blocks.CursedIce;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.blocks.EssenceOre;
 import com.smanzana.nostrummagica.blocks.LoreTable;
+import com.smanzana.nostrummagica.blocks.MagicDirt;
 import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.blocks.ManiOre;
 import com.smanzana.nostrummagica.blocks.ModificationTable;
@@ -44,6 +45,7 @@ import com.smanzana.nostrummagica.entity.EntityGolemWind;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityShadowDragonRed;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
+import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.ITameDragon;
 import com.smanzana.nostrummagica.items.AltarItem;
@@ -134,6 +136,7 @@ import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class CommonProxy {
@@ -230,6 +233,12 @@ public class CommonProxy {
     			128,
     			1,
     			false);
+    	EntityRegistry.registerModEntity(EntitySprite.class, "entity_sprite", 
+    			entityID++,
+    			NostrumMagica.instance,
+    			64,
+    			1,
+    			false);
     	
     	EntityRegistry.addSpawn(EntityKoid.class, 12, 1, 1, EnumCreatureType.MONSTER, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.MAGICAL));
@@ -241,6 +250,8 @@ public class CommonProxy {
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.NETHER));
     	EntityRegistry.addSpawn(EntityKoid.class, 12, 1, 1, EnumCreatureType.MONSTER, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.SPOOKY));
+    	EntityRegistry.addSpawn(EntitySprite.class, 40, 1, 4, EnumCreatureType.MONSTER,
+    			ForgeRegistries.BIOMES.getValues().toArray(new Biome[0]));
 
     	registerItems();
     	registerBlocks();
@@ -437,6 +448,13 @@ public class CommonProxy {
     	GameRegistry.register(
     			(new ItemBlock(ManiOre.instance())).setRegistryName(ManiOre.ID)
     		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(ManiOre.ID));
+    	
+    	GameRegistry.register(MagicDirt.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, MagicDirt.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(MagicDirt.instance())).setRegistryName(MagicDirt.ID)
+    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(MagicDirt.ID));
+    	MagicDirt.init();
     	
     	GameRegistry.register(SpellTable.instance(),
     			new ResourceLocation(NostrumMagica.MODID, SpellTable.ID));

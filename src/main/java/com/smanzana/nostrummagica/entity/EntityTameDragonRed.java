@@ -695,7 +695,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	
 	private void playTameEffect(boolean success) {
 		
-		EnumParticleTypes enumparticletypes = success ? EnumParticleTypes.HEART : EnumParticleTypes.SMOKE_NORMAL;
+		EnumParticleTypes enumparticletypes = success ? EnumParticleTypes.HEART : EnumParticleTypes.VILLAGER_ANGRY;
 
 		for (int i = 0; i < 15; ++i) {
 			double d0 = this.rand.nextGaussian() * 0.02D;
@@ -706,6 +706,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	}
 	
 	@SideOnly(Side.CLIENT)
+	@Override
 	public void handleStatusUpdate(byte id) {
 		if (id == 7) {
 			this.playTameEffect(true);

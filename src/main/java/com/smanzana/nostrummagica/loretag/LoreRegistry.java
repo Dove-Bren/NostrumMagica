@@ -6,6 +6,7 @@ import java.util.Map;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.EntityKoid;
+import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntityTameDragonRed.TameRedDragonLore;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
@@ -114,6 +115,7 @@ public class LoreRegistry {
 		register(NostrumRoseItem.instance());
 		register(NostrumSkillItem.instance());
 		register(TameRedDragonLore.instance());
+		register(new EntitySprite(null));
 		
 		for (Preset preset : Preset.values()) {
 			register(preset);

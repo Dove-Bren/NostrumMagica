@@ -167,14 +167,17 @@ public class CursedIce extends Block {
     }
 	
 	public void onEntityWalk(World worldIn, BlockPos pos, Entity entityIn) {
-		int amp = 0;
-		if (worldIn.getBlockState(pos).getValue(LEVEL) == 2)
-			amp = 1;
 		
-		if (entityIn instanceof EntityLivingBase && ((EntityLivingBase) entityIn).getActivePotionEffect(MagicResistPotion.instance()) == null) {
-			EntityLivingBase living = (EntityLivingBase) entityIn;
-			living.addPotionEffect(new PotionEffect(FrostbitePotion.instance(),
-					20, amp));
+		if (!worldIn.isRemote) {
+			int amp = 0;
+			if (worldIn.getBlockState(pos).getValue(LEVEL) == 2)
+				amp = 1;
+			
+			if (entityIn instanceof EntityLivingBase && ((EntityLivingBase) entityIn).getActivePotionEffect(MagicResistPotion.instance()) == null) {
+				EntityLivingBase living = (EntityLivingBase) entityIn;
+				living.addPotionEffect(new PotionEffect(FrostbitePotion.instance(),
+						45, amp));
+			}
 		}
 		
 		super.onEntityWalk(worldIn, pos, entityIn);
