@@ -15,11 +15,13 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -157,6 +159,17 @@ public class NostrumMagicaFlower extends BlockBush {
         return null;
     }
 	
+	@Override
+	public int quantityDropped(IBlockState state, int fortune, Random random) {
+		int count = 1;
+		
+		if (state.getValue(TYPE) == Type.MIDNIGHT_IRIS) {
+			count = 1 + fortune + random.nextInt(2);
+		}
+        
+        return count;
+	}
+	
 	@SideOnly(Side.CLIENT)
     public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list) {
 		for (Type type : Type.values()) {
@@ -185,6 +198,82 @@ public class NostrumMagicaFlower extends BlockBush {
 	
 	@Override
 	public boolean canSilkHarvest(World world, BlockPos pos, IBlockState state, EntityPlayer player) {
-		return true;
+		return false;
+	}
+	
+	@Override
+	public void randomTick(World worldIn, BlockPos pos, IBlockState state, Random random) {
+		if (random.nextBoolean()) {
+			// Check if we're on crystadirt and maybe spread
+			BlockPos groundPos = new BlockPos(pos.getX(), pos.getY() - 1, pos.getZ());
+			IBlockState ground = worldIn.getBlockState(groundPos);
+			
+			if (ground != null && ground.getBlock() instanceof MagicDirt) {
+				// Spread!
+				MutableBlockPos cursor = new MutableBlockPos();
+				boolean affected = false;
+				
+				cursor.setPos(groundPos.getX(), groundPos.getY(), groundPos.getZ());
+				if (this.canSustainBush(worldIn.getBlockState(cursor))) {
+					cursor.setY(cursor.getY() + 1);
+					if (worldIn.isAirBlock(cursor)) {
+						affected = true;
+						worldIn.setBlockState(cursor, this.getState(Type.CRYSTABLOOM));
+					}
+				}
+				
+				cursor.setPos(groundPos.getX() - 1, groundPos.getY(), groundPos.getZ());
+				if (this.canSustainBush(worldIn.getBlockState(cursor))) {
+					cursor.setY(cursor.getY() + 1);
+					if (worldIn.isAirBlock(cursor)) {
+						affected = true;
+						worldIn.setBlockState(cursor, this.getState(Type.CRYSTABLOOM));
+					}
+				}
+				
+				cursor.setPos(groundPos.getX() + 1, groundPos.getY(), groundPos.getZ());
+				if (this.canSustainBush(worldIn.getBlockState(cursor))) {
+					cursor.setY(cursor.getY() + 1);
+					if (worldIn.isAirBlock(cursor)) {
+						affected = true;
+						worldIn.setBlockState(cursor, this.getState(Type.CRYSTABLOOM));
+					}
+				}
+				
+				cursor.setPos(groundPos.getX(), groundPos.getY(), groundPos.getZ() - 1);
+				if (this.canSustainBush(worldIn.getBlockState(cursor))) {
+					cursor.setY(cursor.getY() + 1);
+					if (worldIn.isAirBlock(cursor)) {
+						affected = true;
+						worldIn.setBlockState(cursor, this.getState(Type.CRYSTABLOOM));
+					}
+				}
+				
+				cursor.setPos(groundPos.getX(), groundPos.getY(), groundPos.getZ() + 1);
+				if (this.canSustainBush(worldIn.getBlockState(cursor))) {
+					cursor.setY(cursor.getY() + 1);
+					if (worldIn.isAirBlock(cursor)) {
+						affected = true;
+						worldIn.setBlockState(cursor, this.getState(Type.CRYSTABLOOM));
+					}
+				}
+				
+				if (affected) {
+					worldIn.setBlockState(groundPos, Blocks.DIRT.getDefaultState());
+				}
+			}
+		}
+		
+		super.randomTick(worldIn, pos, state, random);
+	}
+	
+	@Override
+	protected boolean canSustainBush(IBlockState state) {
+		boolean ret = super.canSustainBush(state);
+		if (!ret && state.getBlock() instanceof MagicDirt) {
+			ret = true;
+		}
+		
+		return ret;
 	}
 }

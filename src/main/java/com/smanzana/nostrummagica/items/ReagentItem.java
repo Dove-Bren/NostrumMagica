@@ -5,6 +5,8 @@ import java.util.List;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.CropGinseng;
 import com.smanzana.nostrummagica.blocks.CropMandrakeRoot;
+import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
+import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower.Type;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -180,6 +182,17 @@ public class ReagentItem extends Item implements ILoreTagged {
 	    	IBlockState state = worldIn.getBlockState(pos);
 	        if (facing == EnumFacing.UP && playerIn.canPlayerEdit(pos.offset(facing), facing, stack) && state.getBlock().canSustainPlant(state, worldIn, pos, EnumFacing.UP, CropGinseng.instance()) && worldIn.isAirBlock(pos.up())) {
 	        	worldIn.setBlockState(pos.up(), CropGinseng.instance().getDefaultState());
+	            --stack.stackSize;
+	            return EnumActionResult.SUCCESS;
+	        } else {
+	        	return EnumActionResult.FAIL;
+	        }
+    	}
+    	
+    	if (type == ReagentType.CRYSTABLOOM) {
+    		IBlockState state = worldIn.getBlockState(pos);
+	        if (facing == EnumFacing.UP && playerIn.canPlayerEdit(pos.offset(facing), facing, stack) && state.getBlock().canSustainPlant(state, worldIn, pos, EnumFacing.UP, NostrumMagicaFlower.instance()) && worldIn.isAirBlock(pos.up())) {
+	        	worldIn.setBlockState(pos.up(), NostrumMagicaFlower.instance().getState(Type.CRYSTABLOOM));
 	            --stack.stackSize;
 	            return EnumActionResult.SUCCESS;
 	        } else {
