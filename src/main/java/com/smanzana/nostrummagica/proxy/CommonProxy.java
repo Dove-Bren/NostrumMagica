@@ -240,17 +240,17 @@ public class CommonProxy {
     			1,
     			false);
     	
-    	EntityRegistry.addSpawn(EntityKoid.class, 12, 1, 1, EnumCreatureType.MONSTER, 
+    	EntityRegistry.addSpawn(EntityKoid.class, 20, 1, 1, EnumCreatureType.MONSTER, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.MAGICAL));
-    	EntityRegistry.addSpawn(EntityKoid.class, 12, 1, 1, EnumCreatureType.MONSTER, 
+    	EntityRegistry.addSpawn(EntityKoid.class, 20, 1, 1, EnumCreatureType.MONSTER, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.FOREST));
-    	EntityRegistry.addSpawn(EntityKoid.class, 12, 1, 1, EnumCreatureType.MONSTER, 
+    	EntityRegistry.addSpawn(EntityKoid.class, 20, 1, 1, EnumCreatureType.MONSTER, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.SNOWY));
-    	EntityRegistry.addSpawn(EntityKoid.class, 12, 1, 1, EnumCreatureType.MONSTER, 
+    	EntityRegistry.addSpawn(EntityKoid.class, 20, 1, 1, EnumCreatureType.MONSTER, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.NETHER));
-    	EntityRegistry.addSpawn(EntityKoid.class, 12, 1, 1, EnumCreatureType.MONSTER, 
+    	EntityRegistry.addSpawn(EntityKoid.class, 20, 1, 1, EnumCreatureType.MONSTER, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.SPOOKY));
-    	EntityRegistry.addSpawn(EntitySprite.class, 40, 1, 4, EnumCreatureType.MONSTER,
+    	EntityRegistry.addSpawn(EntitySprite.class, 15, 1, 3, EnumCreatureType.MONSTER,
     			ForgeRegistries.BIOMES.getValues().toArray(new Biome[0]));
 
     	registerItems();
