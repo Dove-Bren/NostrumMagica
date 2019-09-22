@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.items;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.entity.EntityDragonEgg;
 import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -19,6 +20,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
@@ -103,10 +105,16 @@ public class DragonEgg extends Item implements ILoreTagged {
 		}
 		
 		// Spawn
-		EntityTameDragonRed dragon = new EntityTameDragonRed(worldIn);
-		dragon.rollRandomStats();
-		dragon.setPosition(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5);
-		worldIn.spawnEntityInWorld(dragon);
+//		EntityTameDragonRed dragon = new EntityTameDragonRed(worldIn);
+//		dragon.rollRandomStats();
+//		dragon.setPosition(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5);
+//		worldIn.spawnEntityInWorld(dragon);
+		
+		EntityDragonEgg egg = new EntityDragonEgg(worldIn, playerIn, EntityTameDragonRed.rollRandomStats());
+		egg.setPosition(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5);
+		worldIn.spawnEntityInWorld(egg);
+		
+		playerIn.addChatComponentMessage(new TextComponentTranslation("info.egg.place"));
 		
 		if (!playerIn.isCreative()) {
 			stack.stackSize--;

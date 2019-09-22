@@ -249,9 +249,10 @@ entity.nostrummagica.ender_golem.name=End Golem
 entity.nostrummagica.spell_projectile.name=Spell Projectile
 entity.nostrummagica.entity_koid.name=Koid
 entity.nostrummagica.entity_dragon_red.name=Red Dragon
-entity.nostrummagica.entity_tame_dragon_red.name=Baby Red Dragon
+entity.nostrummagica.entity_tame_dragon_red.name=Tamed Red Dragon
 entity.nostrummagica.entity_shadow_dragon_red.name=Shadow Red Dragon
 entity.nostrummagica.entity_sprite.name=Sprite
+entity.nostrummagica.entity_dragon_egg=Dragon Egg
 
 itemGroup.nostrummagica=Nostrum Magica
 itemGroup.nostrummagica_enhancements=Nostrum Enhancements
@@ -377,13 +378,18 @@ info.discovery.starting2=Congratulations on finding a shrine pedestal and unlock
 info.discovery.spells=You've unlocked enough components to unlock magic and make a spell! You can find more details about spell creation in the Spell Creation guide. In order to craft a spell, you'll need a Spell Table, reagents, and runes. Runes are crafted by performing rituals. More information about rituals can be found in the Rituals tab. More complex spells will require higher attributes to cast. More info on this can be found in the Spells tab as well.
 
 info.tamed_dragon.intro.name=Intro
-info.tamed_dragon.intro.desc=Baby dragons can be tamed only after subduing them. Once tamed, a young dragon will likely run around at random and basically pay no attention to you. Given enough time and training, however, your dragon could grow into a respectable fighter and loving companion!||There are a few ways you can interact with your dragon. First, your dragon can be instructed to sit. While sitting, it will not run around nor try to attack anything. When first tamed, baby dragons start out sitting. Your dragon can be toggled in and out of sitting by shift-right clicking them.||If you right-click your dragon while it's sitting, you'll access its GUI. Here you can view information about the dragon. As your bond with the dragon progresses, you may find more ways you can interact with it in the menu...||When your dragon isn't sitting, it will be free to roam. Right-clicking on it while it's roaming will attempt to mount it. However, not all dragons can be ridden. You'll quickly find that even those that can be ridden may not be willing to let you ride them until it's gained some more trust.||Regardless of whether it's sitting or standing, if your dragon is injured and you're holding food, you will feed it by right-clicking it.||If your dragon lets you mount it, you control it similarly to how you control a horse: use the arrow keys to move around, and press space to jump. Unlike horses, dragons do not charge their jump. Depending on your dragon, you may be able to perform multiple jumps. If your dragon can fly or glide, it will begin to do so after a few jumps.||Be warned, however: baby dragons are wild beasts when you first tame them. They will not follow you; they will roam as they please. Additionally, while they know not to eat YOU, other adventurers may have a harder time...
+info.tamed_dragon.intro.desc=Tamed dragons can be tamed only after subduing them. Once tamed, a young dragon will likely run around at random and basically pay no attention to you. Given enough time and training, however, your dragon could grow into a respectable fighter and loving companion!||There are a few ways you can interact with your dragon. First, your dragon can be instructed to sit. While sitting, it will not run around nor try to attack anything. When first tamed, tamed dragons start out sitting. Your dragon can be toggled in and out of sitting by shift-right clicking them.||If you right-click your dragon while it's sitting, you'll access its GUI. Here you can view information about the dragon. As your bond with the dragon progresses, you may find more ways you can interact with it in the menu...||When your dragon isn't sitting, it will be free to roam. Right-clicking on it while it's roaming will attempt to mount it. However, not all dragons can be ridden. You'll quickly find that even those that can be ridden may not be willing to let you ride them until it's gained some more trust.||Regardless of whether it's sitting or standing, if your dragon is injured and you're holding food, you will feed it by right-clicking it.||If your dragon lets you mount it, you control it similarly to how you control a horse: use the arrow keys to move around, and press space to jump. Unlike horses, dragons do not charge their jump. Depending on your dragon, you may be able to perform multiple jumps. If your dragon can fly or glide, it will begin to do so after a few jumps.||Be warned, however: tamed dragons are wild beasts when you first tame them. They will not follow you; they will roam as they please. Additionally, while they know not to eat YOU, other adventurers may have a harder time...
 info.tamed_dragon.attributes.name=Attributes
-info.tamed_dragon.attributes.desc=Baby dragons are not all the same. In fact, there are many different attributes that vary between baby dragons. Some dragons jump high, but can only jump once. Others have a lot of health, but are slower than average. Some may even be able to fly or glide!||You can view the various characteristics and attributes of your dragon by opening its GUI by right-clicking it while it's sitting. The info tab shows all sorts of information about your dragon, including all of it's capabilities. Many advanced capabilities (like riding) won't be able to be used until the dragon has grown to trust you more!
+info.tamed_dragon.attributes.desc=Tamed dragons are not all the same. In fact, there are many different attributes that vary between tamed dragons. Some dragons jump high, but can only jump once. Others have a lot of health, but are slower than average. Some may even be able to fly or glide!||You can view the various characteristics and attributes of your dragon by opening its GUI by right-clicking it while it's sitting. The info tab shows all sorts of information about your dragon, including all of it's capabilities. Many advanced capabilities (like riding) won't be able to be used until the dragon has grown to trust you more!
 info.tamed_dragon.bonding.name=Bonding
-info.tamed_dragon.bonding.desc=Tamed baby dragons begin as completely wild. They will not follow you, and will eat any large pieces of meat nearby -- including other players!||You must experiment to figure out how to increase your bond with the baby dragon.||As your bond increases, you may unlock different behaviors and capabilities of the dragon. Be sure to view the bond tab every once in a while to see the current bond status of your dragon!
+info.tamed_dragon.bonding.desc=Tamed tamed dragons begin as completely wild. They will not follow you, and will eat any large pieces of meat nearby -- including other players!||You must experiment to figure out how to increase your bond with the tamed dragon.||As your bond increases, you may unlock different behaviors and capabilities of the dragon. Be sure to view the bond tab every once in a while to see the current bond status of your dragon!
 info.tamed_dragon.experience.name=Experience
 info.tamed_dragon.experience.desc=Dragons gain experience as they battle. The more the battle, the more experience they will gain. After a while, they may even level up!||When a dragon levels up, its attributes increase. Not all attributes can increase, but most that you see can in some way grow.
+
+info.egg.place=You've placed the dragon egg down. Make sure it doesn't get too cold!
+info.egg.lay=%1$s has laid an egg! In doing so, it's lost some of its bond with you, and is now guarding its new egg!
+info.egg.hatch=The nearby dragon egg has hatched, spawning a new, wild, baby dragon!
+info.egg.death.cold=The nearby dragon egg was not kept warm, and the baby dragon inside is gone.
 
 info.lore.get=You've gained more knowledge about %s
 
@@ -399,13 +405,13 @@ info.tamed_dragon.no_ride=%1$s is too wild to ride
 info.tamed_dragon.hurt=%1$s is getting low on health!
 info.tamed_dragon.not_yours=%1$s refuses to listen to you
 
-info.tamed_dragon.red_bond.wild=The baby dragon is mostly wild. It won't even follow you around!
-info.tamed_dragon.red_bond.follow=The baby dragon doesn't trust you yet... but seems to be coming around. Now, when not sitting, it will follow you.
-info.tamed_dragon.red_bond.players=The baby dragon is starting to become fully domesticated. It no longer immediately tries to eat all of your fellow adventurers... at least, it tries not to!
-info.tamed_dragon.red_bond.chest=The baby dragon has started to trust you. It will even allow you to store your items with it for a while!
-info.tamed_dragon.red_bond.ride=Your bond with the baby dragon has increased significantly! It is now comfortable with letting you ride it!
-info.tamed_dragon.red_bond.magic=The baby dragon trusts you nearly completely. You now have the ability to manage how your dragon uses magic!
-info.tamed_dragon.red_bond.full=The baby dragon is now fully bonded with you!
+info.tamed_dragon.red_bond.wild=The tamed dragon is mostly wild. It won't even follow you around!
+info.tamed_dragon.red_bond.follow=The tamed dragon doesn't trust you yet... but seems to be coming around. Now, when not sitting, it will follow you.
+info.tamed_dragon.red_bond.players=The tamed dragon is starting to become fully domesticated. It no longer immediately tries to eat all of your fellow adventurers... at least, it tries not to!
+info.tamed_dragon.red_bond.chest=The tamed dragon has started to trust you. It will even allow you to store your items with it for a while!
+info.tamed_dragon.red_bond.ride=Your bond with the tamed dragon has increased significantly! It is now comfortable with letting you ride it!
+info.tamed_dragon.red_bond.magic=The tamed dragon trusts you nearly completely. You now have the ability to manage how your dragon uses magic!
+info.tamed_dragon.red_bond.full=The tamed dragon is now fully bonded with you!
 
 gambit.always.name=Always
 gambit.always.desc=Dragon will%1$s always%2$s try to use this spell.|Only passed if dragon doesn't have enough mana

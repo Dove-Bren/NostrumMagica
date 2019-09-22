@@ -46,6 +46,7 @@ import com.smanzana.nostrummagica.client.render.TileEntityObeliskRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntitySymbolRenderer;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityDragon;
+import com.smanzana.nostrummagica.entity.EntityDragonEgg;
 import com.smanzana.nostrummagica.entity.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.EntityKoid;
@@ -54,6 +55,7 @@ import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.ITameDragon;
 import com.smanzana.nostrummagica.entity.renderer.ModelGolem;
+import com.smanzana.nostrummagica.entity.renderer.RenderDragonEgg;
 import com.smanzana.nostrummagica.entity.renderer.RenderDragonRed;
 import com.smanzana.nostrummagica.entity.renderer.RenderGolem;
 import com.smanzana.nostrummagica.entity.renderer.RenderKoid;
@@ -218,6 +220,12 @@ public class ClientProxy extends CommonProxy {
 			@Override
 			public Render<? super EntitySprite> createRenderFor(RenderManager manager) {
 				return  new RenderSprite(manager, .7f);
+			}
+		});
+		RenderingRegistry.registerEntityRenderingHandler(EntityDragonEgg.class, new IRenderFactory<EntityDragonEgg>() {
+			@Override
+			public Render<? super EntityDragonEgg> createRenderFor(RenderManager manager) {
+				return new RenderDragonEgg(manager, .45f);
 			}
 		});
 		

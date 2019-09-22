@@ -34,6 +34,7 @@ import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonCont
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.config.network.ServerConfigMessage;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
+import com.smanzana.nostrummagica.entity.EntityDragonEgg;
 import com.smanzana.nostrummagica.entity.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.EntityGolemEarth;
 import com.smanzana.nostrummagica.entity.EntityGolemEnder;
@@ -239,6 +240,12 @@ public class CommonProxy {
     			64,
     			1,
     			false);
+    	EntityRegistry.registerModEntity(EntityDragonEgg.class, "entity_dragon_egg",
+    			entityID++,
+    			NostrumMagica.instance,
+    			64,
+    			1,
+    			false);
     	
     	EntityRegistry.addSpawn(EntityKoid.class, 20, 1, 1, EnumCreatureType.MONSTER, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.MAGICAL));
@@ -255,6 +262,8 @@ public class CommonProxy {
 
     	registerItems();
     	registerBlocks();
+    	
+    	EntityTameDragonRed.init();
 	}
 	
 	public void init() {

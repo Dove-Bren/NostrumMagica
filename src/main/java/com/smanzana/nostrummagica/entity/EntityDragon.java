@@ -13,7 +13,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityMoveHelper;
 import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.NodeProcessor;
@@ -94,23 +93,6 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
     }
 
     public boolean processInteract(EntityPlayer player, EnumHand hand, @Nullable ItemStack stack)
-    {
-        return false;
-    }
-
-    /**
-     * Checks if the parameter is an item which this animal can be fed to breed it (wheat, carrots or seeds depending on
-     * the animal type)
-     */
-    public boolean isBreedingItem(@Nullable ItemStack stack)
-    {
-        return false;
-    }
-
-    /**
-     * Returns true if the mob is currently able to mate with the specified mob.
-     */
-    public boolean canMateWith(EntityAnimal otherAnimal)
     {
         return false;
     }

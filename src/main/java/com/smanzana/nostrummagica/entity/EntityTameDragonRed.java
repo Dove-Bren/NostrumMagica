@@ -17,9 +17,11 @@ import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonInventorySheet;
 import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonSpellSheet;
 import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonContainer;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.entity.IDragonSpawnData.IDragonSpawnFactory;
 import com.smanzana.nostrummagica.entity.tasks.DragonAINearestAttackableTarget;
 import com.smanzana.nostrummagica.entity.tasks.DragonGambittedSpellAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.DragonMeleeAttackTask;
+import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowEntityGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowOwnerGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIOwnerHurtByTargetGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIOwnerHurtTargetGeneric;
@@ -77,6 +79,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	protected static final DataParameter<Boolean> TAMED = EntityDataManager.<Boolean>createKey(EntityTameDragonRed.class, DataSerializers.BOOLEAN);
     protected static final DataParameter<Optional<UUID>> OWNER_UNIQUE_ID = EntityDataManager.<Optional<UUID>>createKey(EntityTameDragonRed.class, DataSerializers.OPTIONAL_UNIQUE_ID);
     protected static final DataParameter<Boolean> SITTING = EntityDataManager.<Boolean>createKey(EntityTameDragonRed.class, DataSerializers.BOOLEAN);
+    protected static final DataParameter<Float> AGE = EntityDataManager.<Float>createKey(EntityTameDragonRed.class, DataSerializers.FLOAT);
+    protected static final DataParameter<Optional<UUID>> EGG_UNIQUE_ID = EntityDataManager.<Optional<UUID>>createKey(EntityTameDragonRed.class, DataSerializers.OPTIONAL_UNIQUE_ID);
     
     protected static final DataParameter<Boolean> CAPABILITY_FLY = EntityDataManager.<Boolean>createKey(EntityTameDragonRed.class, DataSerializers.BOOLEAN);
     protected static final DataParameter<Byte> CAPABILITY_JUMP = EntityDataManager.<Byte>createKey(EntityTameDragonRed.class, DataSerializers.BYTE);
@@ -98,6 +102,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
     protected static final String NBT_TAMED = "Tamed";
     protected static final String NBT_OWNER_ID = "OwnerUUID";
     protected static final String NBT_SITTING = "Sitting";
+    protected static final String NBT_AGE = "Age";
+    protected static final String NBT_EGG_ID = "EggID";
     protected static final String NBT_CAP_FLY = "CapableFly";
     protected static final String NBT_CAP_JUMP = "CapableJump";
     protected static final String NBT_CAP_JUMPBOOST = "CapableJumpBonus";
@@ -119,9 +125,19 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
     public static final float BOND_LEVEL_ALLOW_RIDE = 0.50f;
     public static final float BOND_LEVEL_MAGIC = 0.60f;
     public static final float BOND_LEVEL_MANA = 0.95f;
+    public static final float BOND_LEVEL_BREED = 0.999f;
     
-    private static final float DRAGON_MIN_HEALTH = 5.0f;
+    private static final float DRAGON_MIN_HEALTH = 10.0f;
     private static final int DRAGON_INV_SIZE = 27;
+    
+    public static void init() {
+    	IDragonSpawnData.register(EntityTameDragonRed.RedDragonSpawnData.SPAWN_KEY, new IDragonSpawnFactory() {
+			@Override
+			public IDragonSpawnData<?> create(NBTTagCompound nbt) {
+				return EntityTameDragonRed.RedDragonSpawnData.fromNBT(nbt);
+			}
+		});
+    }
     
     // AI tasks to swap when tamed
     private DragonAINearestAttackableTarget<EntityPlayer> aiPlayerTarget;
@@ -149,6 +165,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		this.dataManager.register(TAMED, false);
 		this.dataManager.register(OWNER_UNIQUE_ID, Optional.<UUID>absent());
 		this.dataManager.register(SITTING, false);
+		this.dataManager.register(AGE, 0f);
+		this.dataManager.register(EGG_UNIQUE_ID, Optional.<UUID>absent());
 		this.dataManager.register(CAPABILITY_FLY, Boolean.FALSE);
 		this.dataManager.register(CAPABILITY_JUMP, (byte) 0);
 		this.dataManager.register(CAPABILITY_JUMP_HEIGHT, 0f);
@@ -206,7 +224,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		this.tasks.addTask(priority++, new EntityAIPanicGeneric<EntityTameDragonRed>(this, 1.0D, new Predicate<EntityTameDragonRed>() {
 			@Override
 			public boolean apply(EntityTameDragonRed input) {
-				return input.getHealth() <= DRAGON_MIN_HEALTH;
+				return !input.isTamed() && input.getHealth() <= DRAGON_MIN_HEALTH;
 			}
 		}));
 		// Target gambits
@@ -215,7 +233,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 
 			@Override
 			public EntityDragonGambit[] getGambits() {
-				if (!selfDragon.getCanUseMagic()) {
+				if (!selfDragon.isTamed() || !selfDragon.getCanUseMagic()) {
 					return null;
 				}
 				
@@ -355,6 +373,16 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			}
 			
 		});
+		this.tasks.addTask(priority++, new EntityAIFollowEntityGeneric<EntityTameDragonRed>(this, 1.0D, .5f, 1.5f, false) {
+			@Override
+			protected EntityLivingBase getTarget(EntityTameDragonRed entity) {
+				if (selfDragon.isTamed()) {
+					return selfDragon.getEgg(); // can be null
+				}
+				
+				return null;
+			}
+		});
 		this.tasks.addTask(priority++, new DragonMeleeAttackTask(this, 1.0D, true, 15.0D));
 		this.tasks.addTask(priority++, new EntityAIFollowOwnerGeneric<EntityTameDragonRed>(this, 1.0D, 16.0F, 4.0F, new Predicate<EntityTameDragonRed>() {
 			@Override
@@ -390,7 +418,6 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		return 1F;
 	}
 	
-	@Override
 	public boolean isBreedingItem(@Nullable ItemStack stack) {
 		if (stack == null || !this.isTamed())
 			return false;
@@ -426,6 +453,9 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 				
 				if (player.isSneaking()) {
 					this.setSitting(!this.isSitting());
+					if (player.isCreative()) {
+						this.setBond(1f);
+					}
 				} else if (this.getHealth() < this.getMaxHealth() && isHungerItem(player.getHeldItem(hand))) {
 					
 					this.heal(5f);
@@ -437,6 +467,11 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 				} else if (this.isSitting()) {
 					//player.openGui(NostrumMagica.instance, NostrumGui.dragonID, this.worldObj, (int) this.posX, (int) this.posY, (int) this.posZ);
 					NostrumMagica.proxy.openDragonGUI(player, this);
+				} else if (isBreedingItem(player.getHeldItem(hand)) && this.getBond() > BOND_LEVEL_BREED && this.getEgg() == null) {
+					layEgg();
+					if (!player.isCreative()) {
+						player.getHeldItem(hand).stackSize--;
+					}
 				} else {
 					if (this.getBond() >= BOND_LEVEL_ALLOW_RIDE) {
 						if (this.getHealth() < DRAGON_MIN_HEALTH) {
@@ -457,6 +492,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			}
 		} else if (this.isTamed() && player.isCreative() && hand == EnumHand.MAIN_HAND && player.isSneaking()) {
 			this.tame(player, true);
+			this.setBond(1f);
 			return true;
 		} else if (this.isTamed() && hand == EnumHand.MAIN_HAND) {
 			// Someone other than the owner clicked
@@ -490,6 +526,32 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	public void setOwnerId(@Nullable UUID p_184754_1_) {
 		this.dataManager.set(OWNER_UNIQUE_ID, Optional.fromNullable(p_184754_1_));
 	}
+	
+	protected UUID getEggID() {
+		return this.dataManager.get(EGG_UNIQUE_ID).orNull();
+	}
+	
+	public void setEggId(UUID id) {
+		dataManager.set(EGG_UNIQUE_ID, Optional.fromNullable(id));
+	}
+	
+	public EntityDragonEgg getEgg() {
+		UUID id = getEggID();
+		if (id != null) {
+			for (Entity ent : worldObj.loadedEntityList) {
+				if (ent.getUniqueID().equals(id) && ent instanceof EntityDragonEgg) {
+					return (EntityDragonEgg) ent;
+				}
+			}
+			
+			// Means we didn't find the egg.
+			// Either we've left it, so abandon :/  or it hatched or was broken.
+			setEggId(null);
+			return null;
+		}
+		
+		return null;
+	}
 
 	@Nullable
 	public EntityLivingBase getOwner() {
@@ -515,6 +577,12 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		}
 		
 		compound.setBoolean(NBT_SITTING, this.isSitting());
+		compound.setFloat(NBT_AGE, this.getGrowingAge());
+		
+		UUID eggID = this.getEggID();
+		if (eggID != null) {
+			compound.setUniqueId(NBT_EGG_ID, eggID);
+		}
 		
 		compound.setBoolean(NBT_CAP_FLY, this.getCanFly());
 		compound.setByte(NBT_CAP_JUMP, (byte) this.getBonusJumps());
@@ -590,6 +658,9 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		}
 		
 		this.setSitting(compound.getBoolean(NBT_SITTING));
+		this.setGrowingAge(compound.getFloat(NBT_AGE));
+		
+		this.setEggId(compound.getUniqueId(NBT_EGG_ID));
 		
 		boolean canFly = compound.getBoolean(NBT_CAP_FLY);
 		byte jumps = compound.getByte(NBT_CAP_JUMP);
@@ -657,7 +728,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		
 		boolean success = false;
 		
-		if (force || this.getHealth() < 5.0f) {
+		if (force || this.getHealth() < DRAGON_MIN_HEALTH) {
 			if (force || this.getRNG().nextInt(10) == 0) {
 				player.addChatComponentMessage(new TextComponentTranslation("info.tamed_dragon.wild.tame_success", this.getName()));
 				
@@ -798,8 +869,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		this.setHealth(health);
 	}
 	
-	public void rollRandomStats() {
-		Random rand = this.getRNG();
+	public static RedDragonSpawnData rollRandomStats() {
+		Random rand = new Random();
 		boolean canFly = false;
 		int bonusJumps = 0;
 		
@@ -864,16 +935,106 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			magicMemory = rand.nextInt(2) + 1;
 		}
 		
-		this.setStats(canFly, bonusJumps, bonusJumpHeight, bonusSpeed, health, health, mana, mana, regen, hasMagic, magicMemory, this.getXP(), this.getLevel(), this.getBond());
+		//this.setStats(canFly, bonusJumps, bonusJumpHeight, bonusSpeed, health, health, mana, mana, regen, hasMagic, magicMemory, this.getXP(), this.getLevel(), this.getBond());
+		return new RedDragonSpawnData(
+				canFly,
+				bonusJumps,
+				bonusJumpHeight,
+				bonusSpeed,
+				health,
+				mana,
+				regen,
+				hasMagic,
+				magicMemory
+				);
 	}
 	
-	public void rollInheritedStats(EntityTameDragonRed par1, EntityTameDragonRed par2) {
-		// TODO
+	public RedDragonSpawnData rollInheritedStats() {
+		Random random = this.getRNG();
+		
+		boolean canFly = this.getCanFly();
+		if (random.nextInt(5) == 0) {
+			canFly = !canFly;
+		}
+		
+		int bonusJumps = this.getBonusJumps();
+		if (random.nextBoolean()) {
+			bonusJumps += -1 + random.nextInt(3);
+			// cap at 5 and min at 0 or 1 depending on if you can fly
+			bonusJumps = Math.max(canFly ? 1 : 0, Math.min(5, bonusJumps));
+		}
+		
+		// Cap at -30% to 30%. Jitter by +- 5%
+		float bonusJumpHeight = Math.max(-.3f, Math.min(.3f, this.getJumpHeightBonus() + (-.05f + random.nextFloat() * .1f)));
+		// Cap at -20% to 20%. Jitter by +- 5%
+		float bonusSpeed = Math.max(-.2f, Math.min(.2f, this.getSpeedBonus() + (-.05f + random.nextFloat() * .1f)));
+		// Bounded between 10 and 120. Step in either direction
+		int health = Math.max(10, Math.min(120, (int) this.getMaxHealth() + 10 * (random.nextBoolean() ? 1 : -1)));
+		// Mana, if they have it, bounded between 1000 and 5000.
+		// Change (25%) to swap between having some and none.
+		// If swapping to have some, regular roll
+		//int mana = Math.max(10, Math.min(120, (int) this.getDragonMana() + 10 * (random.nextBoolean() ? 1 : -1)));
+		int mana = this.getDragonMana();
+		if (mana > 0) {
+			if (random.nextBoolean() && random.nextBoolean()) {
+				mana = 0;
+			} else {
+				mana = mana + 100 * (random.nextBoolean() ? 1 : -1);
+			}
+		} else if (random.nextBoolean() && random.nextBoolean()) {
+			mana = 2000 + (100 * rand.nextInt(10)); // Same as generating random
+		}
+		
+		if (mana > 0) {
+			mana = Math.max(1000, Math.min(5000, mana));
+		}
+		
+		float regen = 0f;
+		if (mana > 0) {
+			// Bounded between .5 and 2. Jitter +-.05.
+			regen = Math.max(.5f, Math.min(2f, this.getManaRegen() + (-.05f + random.nextFloat() * .1f)));
+		}
+		
+		boolean hasMagic = false;
+		if (mana > 0) {
+			// If already had magic, keep it.
+			// Otherwise, do like random roll chances.
+			if (this.getCanUseMagic()) {
+				hasMagic = true;
+			} else {
+				if (canFly) {
+					hasMagic = rand.nextInt(5) < 2;
+				} else {
+					hasMagic = rand.nextInt(4)  == 0;
+				}
+			}
+		}
+		
+		int magicMemory = 0;
+		if (hasMagic) {
+			// Always re-roll, but with better odds if parents were magic.
+			if (this.getCanUseMagic()) {
+				magicMemory = rand.nextInt(3) + 2;
+			} else {
+				magicMemory = rand.nextInt(2) + 1;
+			}
+		}
+		
+		return new RedDragonSpawnData(
+				canFly,
+				bonusJumps,
+				bonusJumpHeight,
+				bonusSpeed,
+				health,
+				mana,
+				regen,
+				hasMagic,
+				magicMemory
+				);
 	}
 	
-	@Override
 	public void rollStats() {
-		this.rollRandomStats();
+		rollRandomStats().apply(this);
 	}
 	
 	public void levelup() {
@@ -1004,6 +1165,14 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	public void setSitting(boolean sitting) {
 		this.dataManager.set(SITTING, sitting);
 	}
+	
+	public float getGrowingAge() {
+		return this.dataManager.get(AGE);
+	}
+	
+	protected void setGrowingAge(float age) {
+		this.dataManager.set(AGE, Math.max(0, Math.min(1f, age)));
+	}
 
 	@Override
 	public String getLoreKey() {
@@ -1089,6 +1258,16 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 					this.addMana(mana);
 				}
 			}
+			if (this.ticksExisted % (20 * 30) == 0) {
+				this.age();
+			}
+			
+			EntityDragonEgg egg = this.getEgg();
+			if (egg != null) {
+				if (egg.getDistanceSqToEntity(this) < 4.0) {
+					egg.heatUp();
+				}
+			}
 		}
 	}
 	
@@ -1170,7 +1349,9 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	
 	@Override
 	public double getMountedYOffset() {
-		return this.height * 0.6D;
+		// Dragons go from 60% to 100% height.
+		// This is synced with the rendering code.
+		return (this.height * 0.6D) - ((0.4f * this.height) * (1f-getGrowingAge()));
 	}
 	
 	@Override
@@ -1203,8 +1384,23 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	}
 	
 	@Override
+	public boolean hitByEntity(Entity entityIn) {
+		if (this.isRidingOrBeingRiddenBy(entityIn)) {
+			return true;
+		}
+		
+		return super.hitByEntity(entityIn);
+	}
+	
+	@Override
 	public boolean attackEntityFrom(DamageSource source, float amount) {
 		boolean hurt = super.attackEntityFrom(source, amount);
+		
+		if (hurt && source.getSourceOfDamage() != null) {
+			if (this.isRidingOrBeingRiddenBy(source.getSourceOfDamage())) {
+				hurt = false;
+			}
+		}
 		
 		if (hurt && this.isTamed()) {
 			EntityLivingBase owner = this.getOwner();
@@ -1360,6 +1556,10 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			
 			this.addXP(xp);
 		}
+		
+		if (getRNG().nextInt(10) == 0) {
+			this.age();
+		}
 	}
 	
 	public void bite(EntityLivingBase target) {
@@ -1388,6 +1588,39 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		
 		if (target instanceof EntityZombie || target instanceof EntityPlayer) {
 			this.heal(2);
+		}
+		
+		if (getRNG().nextInt(20) == 0) {
+			this.age();
+		}
+	}
+	
+	// Advances the dragon's age a small, random amount.
+	private void age() {
+		float currentAge = this.getGrowingAge();
+		if (currentAge < 1f) {
+			// setter already does bound checkin. So be lazy and just add here!
+			currentAge += 0.001f + (getRNG().nextFloat() * 0.001f);
+			this.setGrowingAge(currentAge);
+		}
+	}
+	
+	private void layEgg() {
+		EntityPlayer player = null;
+		EntityLivingBase owner = this.getOwner();
+		if (owner != null && owner instanceof EntityPlayer) {
+			player = (EntityPlayer) owner;
+		}
+		EntityDragonEgg egg = new EntityDragonEgg(worldObj, player, this.rollInheritedStats());
+		egg.setPosition((int) posX + .5, (int) posY, (int) posZ + .5);
+		if (worldObj.spawnEntityInWorld(egg)) {
+			this.setEggId(egg.getUniqueID());
+			
+			if (player != null) {
+				player.addChatComponentMessage(new TextComponentTranslation("info.egg.lay", this.getDisplayName()));
+			}
+			
+			this.setBond(this.getBond() - .5f);
 		}
 	}
 	
@@ -1753,6 +1986,103 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		public InfoScreenTabs getTab() {
 			// Don't actually display! We're going to show our own page!
 			return null;
+		}
+		
+	}
+	
+	public static class RedDragonSpawnData extends IDragonSpawnData<EntityTameDragonRed> {
+
+		private static final String SPAWN_KEY = "RedDragon";
+		
+		private static RedDragonSpawnData fromNBT(NBTTagCompound nbt) {
+			return new RedDragonSpawnData(
+					nbt.getBoolean("canFly"),
+					nbt.getInteger("bonusJumps"),
+					nbt.getFloat("bonusJumpHeight"),
+					nbt.getFloat("bonusSpeed"),
+					nbt.getFloat("maxHealth"),
+					nbt.getInteger("maxMana"),
+					nbt.getFloat("regen"),
+					nbt.getBoolean("hasMagic"),
+					nbt.getInteger("magicMemory")
+					);
+		}
+		
+		private boolean canFly;
+		private int bonusJumps;
+		private float bonusJumpHeight;
+		private float bonusSpeed;
+		private float maxHealth;
+		private int maxMana;
+		private float regen;
+		private boolean hasMagic;
+		private int magicMemory;
+		
+		public RedDragonSpawnData(
+				boolean canFly,
+				int bonusJumps,
+				float bonusJumpHeight, // relative. 1 is double the height!
+				float bonusSpeed, // ""
+				float maxHealth,
+				int maxMana,
+				float regen,
+				boolean hasMagic,
+				int magicMemory
+				) {
+			this.canFly = canFly;
+			this.bonusJumps = bonusJumps;
+			this.bonusJumpHeight = bonusJumpHeight;
+			this.bonusSpeed = bonusSpeed;
+			this.maxHealth = maxHealth;
+			this.maxMana = maxMana;
+			this.regen = regen;
+			this.hasMagic = hasMagic;
+			this.magicMemory = magicMemory;
+		}
+		
+		@Override
+		public void writeToNBT(NBTTagCompound nbt) {
+			nbt.setBoolean("canFly", canFly);
+			nbt.setInteger("bonusJumps", bonusJumps);
+			nbt.setFloat("bonusJumpHeight", bonusJumpHeight);
+			nbt.setFloat("bonusSpeed", bonusSpeed);
+			nbt.setFloat("maxHealth", maxHealth);
+			nbt.setInteger("maxMana", maxMana);
+			nbt.setFloat("regen", regen);
+			nbt.setBoolean("hasMagic", hasMagic);
+			nbt.setInteger("magicMemory", magicMemory);
+		}
+
+		@Override
+		public EntityTameDragonRed spawnDragon(World world, double x, double y, double z) {
+			EntityTameDragonRed dragon = new EntityTameDragonRed(world);
+			dragon.setPosition(x, y, z);
+			apply(dragon);
+			return dragon;
+		}
+
+		@Override
+		public String getKey() {
+			return SPAWN_KEY;
+		}
+		
+		public void apply(EntityTameDragonRed dragon) {
+			dragon.setStats(
+					canFly,
+					bonusJumps,
+					bonusJumpHeight,
+					bonusSpeed,
+					maxHealth,
+					maxHealth,
+					maxMana,
+					maxMana,
+					regen,
+					hasMagic,
+					magicMemory,
+					dragon.getXP(),
+					dragon.getLevel(),
+					dragon.getBond()
+					);
 		}
 		
 	}
