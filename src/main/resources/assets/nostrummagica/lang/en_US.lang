@@ -224,7 +224,7 @@ potion.familiar.name=Soul Bond
 
 tile.magic_wall.name=Magic Wall
 tile.mani_ore.name=Mani Ore
-tile.magic_dirt=Crystadirt
+tile.magic_dirt.name=Crystadirt
 tile.essore.name=Essore
 tile.cursed_ice.name=Cursed Ice
 tile.mandrake_crop.name=Mandrake

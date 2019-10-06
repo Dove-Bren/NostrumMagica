@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
+import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
 import com.smanzana.nostrummagica.items.EnchantedEquipment;
@@ -25,7 +26,9 @@ import com.smanzana.nostrummagica.network.messages.ManaMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 
-import net.minecraft.block.BlockBush;
+import baubles.api.BaublesApi;
+import baubles.api.cap.IBaublesItemHandler;
+import net.minecraft.block.BlockTallGrass;
 import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
@@ -550,7 +553,7 @@ public class PlayerListener {
 			event.getWorld().spawnEntityInWorld(entity);
 		}
 		
-		if (event.getState().getBlock() instanceof BlockBush
+		if (event.getState().getBlock() instanceof BlockTallGrass
 				&& NostrumMagica.rand.nextFloat() <= 0.05f) {
 			EntityItem entity = new EntityItem(event.getWorld(),
 					event.getPos().getX() + 0.5,
@@ -560,7 +563,7 @@ public class PlayerListener {
 			event.getWorld().spawnEntityInWorld(entity);
 		}
 		
-		if (event.getState().getBlock() instanceof BlockBush
+		if (event.getState().getBlock() instanceof BlockTallGrass
 				&& NostrumMagica.rand.nextFloat() <= 0.05f) {
 			EntityItem entity = new EntityItem(event.getWorld(),
 					event.getPos().getX() + 0.5,
@@ -587,6 +590,17 @@ public class PlayerListener {
 				}
 			}
 			
+		}
+		
+		if (event.getEntityLiving() instanceof EntityPlayer && !event.getEntityLiving().worldObj.isRemote) {
+			// Scan for baubles, since Baubles doesn't call onUnequip when you die....
+			IBaublesItemHandler baubles = BaublesApi.getBaublesHandler((EntityPlayer) event.getEntityLiving());
+			for (int i = 0; i < baubles.getSlots(); i++) {
+				ItemStack stack = baubles.getStackInSlot(i);
+				if (stack != null && stack.getItem() instanceof ItemMagicBauble) {
+					((ItemMagicBauble) stack.getItem()).onUnequipped(stack, event.getEntityLiving());
+				}
+			}
 		}
 	}
 	

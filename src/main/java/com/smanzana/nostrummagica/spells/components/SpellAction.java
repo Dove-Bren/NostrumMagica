@@ -941,17 +941,29 @@ public class SpellAction {
 			float pitch = caster.rotationPitch;
 			float yaw = caster.rotationYawHead;
 			
-			caster.setPositionAndRotation(
-					entity.posX, entity.posY, entity.posZ,
-					entity.rotationPitch, entity.rotationYawHead
-					);
+			if (caster instanceof EntityPlayer) {
+				caster.setPositionAndRotation(caster.posX, caster.posY, caster.posZ, entity.rotationYawHead, entity.rotationPitch);
+				caster.setPositionAndUpdate(
+						entity.posX, entity.posY, entity.posZ);
+			} else {
+				caster.setPositionAndRotation(
+						entity.posX, entity.posY, entity.posZ,
+						entity.rotationPitch, entity.rotationYawHead
+						);
+			}
 			
-			entity.setPositionAndRotation(pos.xCoord, pos.yCoord, pos.zCoord, yaw, pitch);
+			if (entity instanceof EntityPlayer) {
+				entity.setPositionAndRotation(entity.posX, entity.posY, entity.posZ, yaw, pitch);
+				entity.setPositionAndUpdate(pos.xCoord, pos.yCoord, pos.zCoord);
+			} else {
+				entity.setPositionAndRotation(pos.xCoord, pos.yCoord, pos.zCoord, yaw, pitch);
+			}
+			
 		}
 		
 		@Override
 		public void apply(EntityLivingBase caster, World world, BlockPos pos, float efficiency) {
-			; // Doesn't mean anything
+			caster.setPositionAndUpdate(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
 		}
 	}
 	

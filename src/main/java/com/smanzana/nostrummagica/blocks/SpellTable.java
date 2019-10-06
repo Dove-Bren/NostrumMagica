@@ -361,23 +361,20 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 		if (state == null)
 			return;
 		
-		BlockPos master = getMaster(state, pos);
-		TileEntity ent = world.getTileEntity(master);
-		if (!world.isRemote && ent != null) {
-			SpellTableEntity table = (SpellTableEntity) ent;
-			for (int i = 0; i < table.getSizeInventory(); i++) {
-				if (table.getStackInSlot(i) != null) {
-					EntityItem item = new EntityItem(
-							world, master.getX() + .5, master.getY() + .5, master.getZ() + .5,
-							table.removeStackFromSlot(i));
-					world.spawnEntityInWorld(item);
+		if (state.getValue(MASTER)) {
+			TileEntity ent = world.getTileEntity(pos);
+			if (!world.isRemote && ent != null) {
+				SpellTableEntity table = (SpellTableEntity) ent;
+				for (int i = 0; i < table.getSizeInventory(); i++) {
+					if (table.getStackInSlot(i) != null) {
+						EntityItem item = new EntityItem(
+								world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
+								table.removeStackFromSlot(i));
+						world.spawnEntityInWorld(item);
+					}
 				}
 			}
 		}
-		
-		EntityItem item = new EntityItem(world, master.getX() + .5, master.getY() + .5, master.getZ() + .5,
-				new ItemStack(SpellTableItem.instance()));
-		world.spawnEntityInWorld(item);
 		
 		world.setBlockToAir(getPaired(state, pos));
 	}
@@ -386,12 +383,12 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 		return pos.offset(state.getValue(FACING));
 	}
 	
-	private BlockPos getMaster(IBlockState state, BlockPos pos) {
-		if (state.getValue(MASTER))
-			return pos;
-		
-		return pos.offset(state.getValue(FACING));
-	}
+//	private BlockPos getMaster(IBlockState state, BlockPos pos) {
+//		if (state.getValue(MASTER))
+//			return pos;
+//		
+//		return pos.offset(state.getValue(FACING));
+//	}
 	
 	@SideOnly(Side.CLIENT)
     public BlockRenderLayer getBlockLayer() {
@@ -411,7 +408,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 	
 	@Override
 	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-		return state.getValue(MASTER) ? SpellTableItem.instance() : null;
+		return SpellTableItem.instance();//state.getValue(MASTER) ? SpellTableItem.instance() : null;
 	}
 	
 	@Override
