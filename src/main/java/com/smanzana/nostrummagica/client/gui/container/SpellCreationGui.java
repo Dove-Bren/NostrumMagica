@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.client.gui.container;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.SpellTable.SpellTableEntity;
+import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
@@ -23,7 +25,9 @@ import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.Spell.SpellPart;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -81,6 +85,10 @@ public class SpellCreationGui {
 	private static final int REAGENT_BAG_HOFFSET = 23;
 	private static final int REAGENT_BAG_VOFFSET = 112;
 	
+	private static final int ICON_LBUTTON_HOFFSET = 174;
+	private static final int ICON_LBUTTON_VOFFSET = 219; 
+	private static final int ICON_BUTTON_LENGTH = 16;
+	
 	private static final int MANA_VOFFSET = 99;
 	
 	public static class SpellCreationContainer extends Container {
@@ -96,6 +104,7 @@ public class SpellCreationGui {
 		protected List<String> spellErrorStrings; // Updated on validate(); what's wrong?
 		protected List<String> reagentStrings; // Updated on validate; what reagents will be used. Only filled if successful
 		protected StringBuffer name;
+		protected int iconIndex;
 		protected int lastManaCost;
 		
 		public SpellCreationContainer(IInventory playerInv, SpellTableEntity tableInventory, BlockPos pos) {
@@ -104,6 +113,7 @@ public class SpellCreationGui {
 			
 			spellErrorStrings = new LinkedList<>();
 			this.name = new StringBuffer(NAME_MAX + 1);
+			this.iconIndex = 0;
 			
 			this.addSlotToContainer(new Slot(inventory, 0, SLOT_MAIN_HOFFSET, SLOT_MAIN_VOFFSET) {
 				@Override
@@ -115,6 +125,10 @@ public class SpellCreationGui {
 				@Override
 				public void putStack(@Nullable ItemStack stack) {
 					super.putStack(stack);
+					
+					if (stack != null && stack.getItem() instanceof BlankScroll) {
+						iconIndex = NostrumMagica.rand.nextInt(SpellIcon.numIcons);
+					}
 					
 					validate();
 				}
@@ -507,10 +521,48 @@ public class SpellCreationGui {
 	
 	@SideOnly(Side.CLIENT)
 	public static class SpellGui extends GuiContainer {
+		
+		private static class SpellIconButton extends GuiButton {
+			
+			private int value;
+			private SpellCreationContainer container;
+			
+			public SpellIconButton(int buttonId, int x, int y, int val, SpellCreationContainer container) {
+				super(buttonId, x, y, "");
+				this.value = val;
+				this.width = ICON_BUTTON_LENGTH;
+				this.height = ICON_BUTTON_LENGTH;
+				this.container = container;
+			}
+			
+			@Override
+			public void drawButton(Minecraft mc, int mouseX, int mouseY) {
+				float tint = 1f;
+				mc.getTextureManager().bindTexture(TEXT);
+				if (mouseX >= this.xPosition && mouseY >= this.yPosition
+						&& mouseX <= this.xPosition + this.width
+						&& mouseY <= this.yPosition + this.height) {
+					tint = .8f;
+				}
+				
+				int x = 0;
+				if (container.iconIndex != this.value)
+					x += 20;
+				
+				GlStateManager.color(tint, tint, tint);
+				Gui.drawScaledCustomSizeModalRect(xPosition, yPosition, ICON_LBUTTON_HOFFSET + x, ICON_LBUTTON_VOFFSET,
+						20, 20, this.width, this.height, 256, 256);
+				
+				GlStateManager.color(tint, tint, tint);
+				SpellIcon.get(this.value).render(mc, this.xPosition + 2, this.yPosition + 2, this.width - 4, this.height - 4);
+			}
+			
+		}
 
 		private SpellCreationContainer container;
 		private int nameSelectedPos; // -1 for no selection
 		private int counter;
+		private List<SpellIconButton> buttons;
 		
 		public SpellGui(SpellCreationContainer container) {
 			super(container);
@@ -519,6 +571,33 @@ public class SpellCreationGui {
 			this.ySize = GUI_HEIGHT;
 			this.nameSelectedPos = -1;
 			counter = 0;
+			buttons = new ArrayList<>(SpellIcon.numIcons);
+		}
+		
+		@Override
+		public void initGui() {
+			buttons.clear();
+			
+			super.initGui();
+			
+			int extraMargin = 3;
+			final int spaceWidth = ((width - xSize) / 2) - (2 * extraMargin); // amount of space to draw in
+			final int verticalMargin = (height - ySize) / 2;
+			
+			final int perRow = spaceWidth / ICON_BUTTON_LENGTH;
+			extraMargin += (spaceWidth % ICON_BUTTON_LENGTH) / 2; // Center by adding remainder / 2
+			
+			for (int i = 0; i < SpellIcon.numIcons; i++) {
+				SpellIconButton button = new SpellIconButton(i,
+						extraMargin + (i % perRow) * ICON_BUTTON_LENGTH,
+						verticalMargin + (i / perRow) * ICON_BUTTON_LENGTH,
+						i,
+						container);
+						//int buttonId, int x, int y, int val, float actual, SpellCreationContainer container
+				
+				this.buttons.add(button);
+				this.addButton(button);
+			}
 		}
 		
 		@Override
@@ -617,6 +696,8 @@ public class SpellCreationGui {
 				GlStateManager.pushMatrix();
 				GlStateManager.translate(0, 0, 500);
 				mc.getTextureManager().bindTexture(TEXT);
+				GlStateManager.enableAlpha();
+				GlStateManager.enableBlend();
 				Gui.drawModalRectWithCustomSizedTexture((GUI_WIDTH - MESSAGE_WIDTH) / 2,
 						MESSAGE_DISPLAY_VOFFSET,
 						MESSAGE_VALID_HOFFSET, MESSAGE_VALID_VOFFSET,
@@ -625,6 +706,14 @@ public class SpellCreationGui {
 				GlStateManager.popMatrix();
 			}
 			
+		}
+		
+		@Override
+		protected void actionPerformed(GuiButton buttonIn) {
+			// Only type of button we have are icon buttons
+			SpellIconButton button = (SpellIconButton) buttonIn;
+			
+			container.iconIndex = button.value;
 		}
 			
 		@Override
@@ -677,7 +766,8 @@ public class SpellCreationGui {
 									
 									NetworkHandler.getSyncChannel().sendToServer(new SpellCraftMessage(
 											container.name.toString(),
-											container.pos
+											container.pos,
+											container.iconIndex
 											));
 									container.name.delete(0, container.name.length() - 1);
 								}

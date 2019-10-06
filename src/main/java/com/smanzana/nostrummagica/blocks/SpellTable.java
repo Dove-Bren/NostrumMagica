@@ -268,7 +268,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 			}
 		}
 		
-		public void craft(String name) {
+		public void craft(String name, int iconIndex) {
 			ItemStack stack = this.getStackInSlot(0);
 			if (stack == null || !(stack.getItem() instanceof BlankScroll)) {
 				return;
@@ -279,6 +279,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 			
 			if (spell != null) {
 				NostrumMagica.spellRegistry.register(spell);
+				spell.setIcon(iconIndex);
 				ItemStack scroll = new ItemStack(SpellScroll.instance(), 1);
 				SpellScroll.setSpell(scroll, spell);
 				this.clearBoard();

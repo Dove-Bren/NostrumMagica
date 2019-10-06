@@ -38,6 +38,7 @@ public class SpellCraftMessage implements IMessage {
 			int z = message.tag.getInteger(NBT_POS_Z);
 			BlockPos pos = new BlockPos(x, y, z);
 			String name = message.tag.getString(NBT_NAME);
+			int iconIdx = message.tag.getInteger(NBT_ICON_IDX);
 			
 			final EntityPlayerMP sp = ctx.getServerHandler().playerEntity;
 			
@@ -53,7 +54,7 @@ public class SpellCraftMessage implements IMessage {
 			
 			SpellTableEntity entity = (SpellTableEntity) TE;
 			
-			entity.craft(name);
+			entity.craft(name, iconIdx);
 			NostrumMagicaSounds.AMBIENT_WOOSH.play(entity.getWorld(), 
 					x, y, z);
 			});
@@ -66,6 +67,7 @@ public class SpellCraftMessage implements IMessage {
 	private static final String NBT_POS_Y = "y";
 	private static final String NBT_POS_Z = "z";
 	private static final String NBT_NAME = "name";
+	private static final String NBT_ICON_IDX = "icon";
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
@@ -75,13 +77,14 @@ public class SpellCraftMessage implements IMessage {
 		tag = new NBTTagCompound();
 	}
 	
-	public SpellCraftMessage(String name, BlockPos pos) {
+	public SpellCraftMessage(String name, BlockPos pos, int iconIndex) {
 		tag = new NBTTagCompound();
 		
 		tag.setString(NBT_NAME, name);
 		tag.setInteger(NBT_POS_X, pos.getX());
 		tag.setInteger(NBT_POS_Y, pos.getY());
 		tag.setInteger(NBT_POS_Z, pos.getZ());
+		tag.setInteger(NBT_ICON_IDX, iconIndex);
 	}
 
 	@Override
