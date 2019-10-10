@@ -14,15 +14,18 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
+import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.BeamTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.DamagedTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.DelayTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.FoodTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.HealthTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.InstantTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.MagicCutterTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ManaTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.OtherTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProximityTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 
 import net.minecraft.client.Minecraft;
@@ -147,23 +150,29 @@ public class SpellComponentIcon {
 			u = 3;
 		} else if (trigger instanceof DelayTrigger) {
 			u = 4;
-		}
-		//else if (trigger instanceof Trigger) {
-			
-		//}
-		else if (trigger instanceof HealthTrigger) {
+		} else if (trigger instanceof AITargetTrigger) {
+			u = 5;
+		} else if (trigger instanceof HealthTrigger) {
 			u = 6;
 		} else if (trigger instanceof ManaTrigger) {
 			u = 7;
 		} else if (trigger instanceof FoodTrigger) {
 			u = 0;
 			v = 1;
-		} else if (trigger instanceof InstantTrigger) {
+		} else if (trigger instanceof SelfTrigger) {
 			v = 1;
 			u = 1;
 		} else if (trigger instanceof DamagedTrigger) {
 			u = 2;
 			v = 1;
+		} else if (trigger instanceof OtherTrigger) {
+			u = 3;
+			v = 1;
+		} else if (trigger instanceof MagicCutterTrigger) {
+			u = 4;
+			v = 1;
+		} else {
+			System.out.println("Trigger doesn't have set uv: " + trigger);
 		}
 		
 		offsetV = vOffsetTrigger + (uWidthTrigger * v);

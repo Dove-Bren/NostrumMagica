@@ -80,6 +80,8 @@ item.nostrum_rune.trigger_beam.name=Beam Rune
 item.nostrum_rune.trigger_ai.name=AI Rune
 item.nostrum_rune.trigger_delay.name=Delay Rune
 item.nostrum_rune.trigger_mana.name=Mana Rune
+item.nostrum_rune.trigger_vortex_blade.name=Vortex Rune
+item.nostrum_rune.trigger_cutter.name=Magic Cutter Rune
 
 item.crystal_small.name=Mani Crystal
 item.crystal_medium.name=Kani Crystal
@@ -247,6 +249,7 @@ entity.nostrummagica.ice_golem.name=Ice Golem
 entity.nostrummagica.wind_golem.name=Wind Golem
 entity.nostrummagica.ender_golem.name=End Golem
 entity.nostrummagica.spell_projectile.name=Spell Projectile
+entity.nostrummagica.entity_internal_spellsaucer.name=Spell Projectile
 entity.nostrummagica.entity_koid.name=Koid
 entity.nostrummagica.entity_dragon_red.name=Red Dragon
 entity.nostrummagica.entity_tame_dragon_red.name=Tamed Red Dragon
@@ -692,6 +695,8 @@ ritual.rune.trigger_projectile.name=Projectile Rune
 ritual.rune.trigger_proximity.name=Proximity Rune
 ritual.rune.trigger_self.name=Self Rune
 ritual.rune.trigger_touch.name=Touch Rune
+ritual.rune.trigger_cutter.name=Magic Cutter Rune
+ritual.rune.trigger_vortex_blade.name=Vortex Rune
 
 ritual.charm.fire.name=Fire Charm
 ritual.charm.ice.name=Ice Charm

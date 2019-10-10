@@ -542,7 +542,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			
 			String desc;
 			int len;
-			desc = I18n.format("info.growth.name", (Object[])null);
+			desc = I18n.format("info.exploration.name", (Object[])null);
 			len = mc.fontRendererObj.getStringWidth(desc);
 			mc.fontRendererObj.drawStringWithShadow(desc, x + ((width - len) / 2), y + 5, 0xFFFFFFFF);
 		}

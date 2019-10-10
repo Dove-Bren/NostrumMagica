@@ -51,6 +51,7 @@ import com.smanzana.nostrummagica.entity.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityShadowDragonRed;
+import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
 import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.ITameDragon;
@@ -59,6 +60,7 @@ import com.smanzana.nostrummagica.entity.renderer.RenderDragonEgg;
 import com.smanzana.nostrummagica.entity.renderer.RenderDragonRed;
 import com.smanzana.nostrummagica.entity.renderer.RenderGolem;
 import com.smanzana.nostrummagica.entity.renderer.RenderKoid;
+import com.smanzana.nostrummagica.entity.renderer.RenderMagicSaucer;
 import com.smanzana.nostrummagica.entity.renderer.RenderShadowDragonRed;
 import com.smanzana.nostrummagica.entity.renderer.RenderSprite;
 import com.smanzana.nostrummagica.entity.renderer.RenderTameDragonRed;
@@ -226,6 +228,12 @@ public class ClientProxy extends CommonProxy {
 			@Override
 			public Render<? super EntityDragonEgg> createRenderFor(RenderManager manager) {
 				return new RenderDragonEgg(manager, .45f);
+			}
+		});
+		RenderingRegistry.registerEntityRenderingHandler(EntitySpellSaucer.class, new IRenderFactory<EntitySpellSaucer>() {
+			@Override
+			public Render<? super EntitySpellSaucer> createRenderFor(RenderManager manager) {
+				return new RenderMagicSaucer(manager);
 			}
 		});
 		
@@ -858,11 +866,11 @@ public class ClientProxy extends CommonProxy {
 		event.getMap().registerSprite(new ResourceLocation(
 				NostrumMagica.MODID, "entity/dragon_C"));
 		event.getMap().registerSprite(new ResourceLocation(
-				NostrumMagica.MODID, "entity/dragon_TR"));
-		event.getMap().registerSprite(new ResourceLocation(
 				NostrumMagica.MODID, "entity/sprite_core"));
 		event.getMap().registerSprite(new ResourceLocation(
 				NostrumMagica.MODID, "entity/sprite_arms"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "entity/magic_blade"));
 	}
 	
 	@SubscribeEvent
