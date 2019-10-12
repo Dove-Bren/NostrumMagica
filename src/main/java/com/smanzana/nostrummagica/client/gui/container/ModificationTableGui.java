@@ -549,7 +549,7 @@ public class ModificationTableGui {
 //				} else {
 //					display = SpellRune.getRune(AoEShape.instance());
 //				}
-				final int idx = ((int) Minecraft.getSystemTime() / 1000) % shadows.length;
+				final int idx = Math.abs(((int) Minecraft.getSystemTime() / 1000) % shadows.length);
 				display = shadows[idx];
 				
 				GlStateManager.pushMatrix();
@@ -640,9 +640,10 @@ public class ModificationTableGui {
 					} else {
 						vals = component.getShape().supportedFloats();
 					}
+					float fVal = (vals == null ? 0 : vals[container.floatIndex]);
 					NetworkHandler.getSyncChannel().sendToServer(
-							new ModifyMessage(container.pos, container.boolIndex, vals[container.floatIndex]));
-					container.inventory.modify(container.boolIndex, vals[container.floatIndex]);
+							new ModifyMessage(container.pos, container.boolIndex, fVal));
+					container.inventory.modify(container.boolIndex, fVal);
 				} else if (container.scrollMode) {
 					float fVal = (float) container.floatIndex;
 					NetworkHandler.getSyncChannel().sendToServer(

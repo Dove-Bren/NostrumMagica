@@ -34,6 +34,8 @@ import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonCont
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.config.network.ServerConfigMessage;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
+import com.smanzana.nostrummagica.entity.EntityChakramSpellSaucer;
+import com.smanzana.nostrummagica.entity.EntityCyclerSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntityDragonEgg;
 import com.smanzana.nostrummagica.entity.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.EntityGolemEarth;
@@ -46,7 +48,6 @@ import com.smanzana.nostrummagica.entity.EntityGolemWind;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityShadowDragonRed;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
-import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
 import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.ITameDragon;
@@ -113,6 +114,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.DelayTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.FoodTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.HealthTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.MagicCutterTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.MagicCyclerTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ManaTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.OtherTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
@@ -248,7 +250,13 @@ public class CommonProxy {
     			64,
     			1,
     			false);
-    	EntityRegistry.registerModEntity(EntitySpellSaucer.class, "entity_internal_spellsaucer",
+    	EntityRegistry.registerModEntity(EntityChakramSpellSaucer.class, "entity_internal_spellsaucer_chakram",
+    			entityID++,
+    			NostrumMagica.instance,
+    			64,
+    			1,
+    			true);
+    	EntityRegistry.registerModEntity(EntityCyclerSpellSaucer.class, "entity_internal_spellsaucer_cycler",
     			entityID++,
     			NostrumMagica.instance,
     			64,
@@ -318,6 +326,7 @@ public class CommonProxy {
     	SpellTrigger.register(DamagedTrigger.instance());
     	SpellTrigger.register(OtherTrigger.instance());
     	SpellTrigger.register(MagicCutterTrigger.instance());
+    	SpellTrigger.register(MagicCyclerTrigger.instance());
     }
     
     private void registerPotions() {

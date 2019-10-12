@@ -1,7 +1,9 @@
 package com.smanzana.nostrummagica.entity.renderer;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.entity.EntityCyclerSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
+import com.smanzana.nostrummagica.entity.EntitySpellSaucer.Vector;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.Render;
@@ -32,9 +34,19 @@ public class RenderMagicSaucer extends Render<EntitySpellSaucer> {
         GlStateManager.disableCull();
         GlStateManager.enableAlpha();
         
-        GlStateManager.translate(x, y, z);
         
-        GlStateManager.rotate(entity.rotationPitch, 1, 0, 0);
+        if (entity instanceof EntityCyclerSpellSaucer) {
+        	EntityCyclerSpellSaucer cycler = (EntityCyclerSpellSaucer) entity;
+        	
+        	// Instead of rendering real position, render where we should basically be
+        	Vector vec = cycler.getTargetOffsetLoc(partialTicks);
+        	GlStateManager.translate(vec.x, vec.y, vec.z);
+        } else {
+            // Render at actual positional offset from player
+        	GlStateManager.translate(x, y, z);
+            GlStateManager.rotate(entity.rotationPitch, 1, 0, 0);
+        }
+        
         
         mainModel.render(entity, 0f, 0f, 0f, 0f, 0f, 1f);
 		

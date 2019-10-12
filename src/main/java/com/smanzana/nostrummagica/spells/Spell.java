@@ -78,205 +78,218 @@ public class Spell {
 		 * should move forward
 		 */
 		public void trigger(List<EntityLivingBase> targets, List<EntityLivingBase> others, World world, List<BlockPos> locations) {
+			this.trigger(targets, others, world, locations, false);
+		}
+		
+		public void trigger(List<EntityLivingBase> targets, List<EntityLivingBase> others, World world, List<BlockPos> locations, boolean forceSplit) {
 			//for each target/other pair (if more than one), break into multiple spellstates
 			// persist index++ and set self/other, then start doing shapes or next trigger
 			
 			SpellPart next = null;
 			if (others == null)
 				others = new LinkedList<>();
-			
-			if (ModConfig.config.spellDebug() && this.caster instanceof EntityPlayer) {
-				ITextComponent comp = new TextComponentString(""),
-						sib;
-				
-				sib = new TextComponentString(name +  "> ");
-				sib.setStyle((new Style()).setBold(true).setColor(TextFormatting.GOLD));
-				comp.appendSibling(sib);
-				sib = new TextComponentString("");
-				
-				// Get current trigger
-				if (index == -1) {
-					sib.appendText(" <<Start Cast>> ");
-				}
-				else {
-					SpellPart part = parts.get(index);
-					sib.appendText("[" + part.getTrigger().getDisplayName() + "] " );
-					if (part.param.flip || Math.abs(part.param.level) > .001) {
-						Style style = new Style();
-						String buf = "";
-						if (part.param.flip) {
-							buf = "Inverted ";
-						}
-						if (Math.abs(part.param.level) > .001) {
-							buf += String.format("Level %02.1f", part.param.level);
-						}
-						style.setHoverEvent(new HoverEvent(Action.SHOW_TEXT,
-								new TextComponentString(buf)));
-						sib.setStyle(style);
-					}
-				}
-				
-				if (targets != null && targets.size() > 0) {
-					String buf = "";
-					for (EntityLivingBase ent : targets) {
-						buf += ent.getName() + " ";
-					}
-					sib.appendText("on ");
-					sib.setStyle((new Style()).setColor(TextFormatting.AQUA).setBold(false));
-					comp.appendSibling(sib);
-					sib = new TextComponentString(targets.size() + " entities");
-					sib.setStyle((new Style()).setColor(TextFormatting.RED)
-							.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, 
-									new TextComponentString(buf))));
-					comp.appendSibling(sib);
 
-					sib = new TextComponentString(" (others)");
-					Style style = new Style();
-					style.setColor(TextFormatting.DARK_PURPLE);
-					buf = "";
-					if (others.size() > 0) {
-						for (EntityLivingBase ent : others)
-							buf += ent.getName() + " ";
-					} else {
-						buf += this.getSelf().getName();
-					}
-					style.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, new TextComponentString(buf)));
-					sib.setStyle(style);
-					
-					comp.appendSibling(sib);
-				} else if (locations != null && !locations.isEmpty()) {
-					sib.appendText("on ");
-					sib.setStyle((new Style()).setColor(TextFormatting.AQUA).setBold(false));
-					comp.appendSibling(sib);
-					sib = new TextComponentString(locations.size() + " location(s)");
-					String buf = "";
-					for (BlockPos pos : locations) {
-						buf += "(" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") ";
-					}
-					
-					sib.setStyle(new Style().setColor(TextFormatting.DARK_GREEN).setHoverEvent(
-							new HoverEvent(Action.SHOW_TEXT, new TextComponentString(buf))));
-					comp.appendSibling(sib);
-				} else {
-					sib.appendText("no targets");
-					sib.setStyle((new Style()).setColor(TextFormatting.AQUA));
-					comp.appendSibling(sib);
-				}
-				
-				//caster.addChatMessage(comp);
-				NostrumMagica.proxy.sendSpellDebug((EntityPlayer) this.caster, comp);
-			}
 			
-			boolean first = true;
-			while ((next = (++index < parts.size() ? parts.get(index) : null)) != null && !next.isTrigger()) {
-				// it's a shape. Do it idk
-				SpellShape shape = next.getShape();
-				SpellAction action = solveAction(caster, next.getAlteration(),
-						next.getElement(), next.getElementCount());
-				SpellPartParam param = next.getParam();
-				
-				INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
-				if (attr != null && attr.isUnlocked()) {
-					attr.setKnowledge(next.getElement(), next.getAlteration());
-				}
-				
-				if (targets != null && !targets.isEmpty()) {
-					for (EntityLivingBase targ : targets) {
-						shape.perform(action, param, targ, null, null, this.efficiency);
-						
-						if (first) {
-							
-							SpellComponentWrapper comp;
-							if (next.getAlteration() == null)
-								comp = new SpellComponentWrapper(next.getElement());
-							else
-								comp = new SpellComponentWrapper(next.getAlteration());
-							NostrumMagica.proxy.spawnEffect(null, comp,
-									caster, null, targ, null, new SpellComponentWrapper(next.getElement()));
-						}
-						
-					}
-				} else if (locations != null && !locations.isEmpty()) {
-					// use locations
-					for (BlockPos pos : locations) {
-						shape.perform(action, param, null, world, pos, this.efficiency);
-						
-						if (first) {
-							
-							SpellComponentWrapper comp;
-							if (next.getAlteration() == null)
-								comp = new SpellComponentWrapper(next.getElement());
-							else
-								comp = new SpellComponentWrapper(next.getAlteration());
-							NostrumMagica.proxy.spawnEffect(world, comp,
-									caster, null, null, new Vec3d(pos.getX() + .5, pos.getY(), pos.getZ() + .5), new SpellComponentWrapper(next.getElement()));
-						}
-					}
-				} else {
-					; // Drop it on the floor\
-					next = null;
-				}
-				
-				first = false;
-			}
-			
-			// next is either null or a trigger
-			if (next == null) {
-				// end of spell
-				finish();
+			// If being forced to split, dupe state right now and continue on that
+			if (forceSplit) {
+				this.split().trigger(targets, others, world, locations, false);
 			} else {
-				// If we have more than one target/pos we hit, split here so each
-				// can proceed at their own pace
-				
-				// targs is correct (targets or others) based on last spell shape (or
-				// just targets if no previous shape)
-				
-				if (index > 0) {
-					NostrumMagicaSounds.CAST_CONTINUE.play(self);
-				}
-				
-				if (targets != null && !targets.isEmpty()) {
-					if (targets.size() == 1) {
-						// don't need to split
-						// Also base case after a split happens
+			
+				if (ModConfig.config.spellDebug() && this.caster instanceof EntityPlayer) {
+					ITextComponent comp = new TextComponentString(""),
+							sib;
+					
+					sib = new TextComponentString(name +  "> ");
+					sib.setStyle((new Style()).setBold(true).setColor(TextFormatting.GOLD));
+					comp.appendSibling(sib);
+					sib = new TextComponentString("");
+					
+					// Get current trigger
+					if (index == -1) {
+						sib.appendText(" <<Start Cast>> ");
+					}
+					else {
+						SpellPart part = parts.get(index);
+						sib.appendText("[" + part.getTrigger().getDisplayName() + "] " );
+						if (part.param.flip || Math.abs(part.param.level) > .001) {
+							Style style = new Style();
+							String buf = "";
+							if (part.param.flip) {
+								buf = "Inverted ";
+							}
+							if (Math.abs(part.param.level) > .001) {
+								buf += String.format("Level %02.1f", part.param.level);
+							}
+							style.setHoverEvent(new HoverEvent(Action.SHOW_TEXT,
+									new TextComponentString(buf)));
+							sib.setStyle(style);
+						}
+					}
+					
+					if (targets != null && targets.size() > 0) {
+						String buf = "";
+						for (EntityLivingBase ent : targets) {
+							buf += ent.getName() + " ";
+						}
+						sib.appendText("on ");
+						sib.setStyle((new Style()).setColor(TextFormatting.AQUA).setBold(false));
+						comp.appendSibling(sib);
+						sib = new TextComponentString(targets.size() + " entities");
+						sib.setStyle((new Style()).setColor(TextFormatting.RED)
+								.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, 
+										new TextComponentString(buf))));
+						comp.appendSibling(sib);
+	
+						sib = new TextComponentString(" (others)");
+						Style style = new Style();
+						style.setColor(TextFormatting.DARK_PURPLE);
+						buf = "";
+						if (others.size() > 0) {
+							for (EntityLivingBase ent : others)
+								buf += ent.getName() + " ";
+						} else {
+							buf += this.getSelf().getName();
+						}
+						style.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, new TextComponentString(buf)));
+						sib.setStyle(style);
 						
-						// Adjust self, other like if we split
-						if (others.size() > 0)
-							this.other = others.get(0);
-						else
-							this.other = this.self;
-						this.self = targets.get(0);
-						spawnTrigger(next.getTrigger(), this.self, null, null, next.getParam());
-					} else {
-						index--; // Make splits have same trigger as we're performing now
-						for (int i = 0; i < targets.size(); i++) {
-							EntityLivingBase targ = targets.get(i);
-							EntityLivingBase other;
-							if (others.size() >= i)
-								other = others.get(i);
-							else
-								other = this.self;
-							SpellState sub = split();//(targ, other);
-							sub.trigger(Lists.newArrayList(targ), Lists.newArrayList(other),
-									world, null);
+						comp.appendSibling(sib);
+					} else if (locations != null && !locations.isEmpty()) {
+						sib.appendText("on ");
+						sib.setStyle((new Style()).setColor(TextFormatting.AQUA).setBold(false));
+						comp.appendSibling(sib);
+						sib = new TextComponentString(locations.size() + " location(s)");
+						String buf = "";
+						for (BlockPos pos : locations) {
+							buf += "(" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") ";
 						}
-					}
-				} else if (locations != null && !locations.isEmpty()) {
-					if (locations.size() == 1) {
-						// Base case here, too. Instantiate trigger!!!!
-						spawnTrigger(next.getTrigger(), null, world, locations.get(0), next.getParam());
+						
+						sib.setStyle(new Style().setColor(TextFormatting.DARK_GREEN).setHoverEvent(
+								new HoverEvent(Action.SHOW_TEXT, new TextComponentString(buf))));
+						comp.appendSibling(sib);
 					} else {
-						index--; // Make splits have same trigger as we're performing now
-						for (BlockPos targ : locations) {
-							SpellState sub = split();
-							sub.trigger(null, null,
-									world, Lists.newArrayList(targ));
-						}
+						sib.appendText("no targets");
+						sib.setStyle((new Style()).setColor(TextFormatting.AQUA));
+						comp.appendSibling(sib);
 					}
-				} else {
-					// Last trigger couldn't carry us forward
+					
+					//caster.addChatMessage(comp);
+					NostrumMagica.proxy.sendSpellDebug((EntityPlayer) this.caster, comp);
 				}
+			
+				boolean first = true;
+				while ((next = (++index < parts.size() ? parts.get(index) : null)) != null && !next.isTrigger()) {
+					// it's a shape. Do it idk
+					SpellShape shape = next.getShape();
+					SpellAction action = solveAction(caster, next.getAlteration(),
+							next.getElement(), next.getElementCount());
+					SpellPartParam param = next.getParam();
+					
+					INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+					if (attr != null && attr.isUnlocked()) {
+						attr.setKnowledge(next.getElement(), next.getAlteration());
+					}
+					
+					if (targets != null && !targets.isEmpty()) {
+						for (EntityLivingBase targ : targets) {
+							shape.perform(action, param, targ, null, null, this.efficiency);
+							
+							if (first) {
 								
+								SpellComponentWrapper comp;
+								if (next.getAlteration() == null)
+									comp = new SpellComponentWrapper(next.getElement());
+								else
+									comp = new SpellComponentWrapper(next.getAlteration());
+								NostrumMagica.proxy.spawnEffect(null, comp,
+										caster, null, targ, null, new SpellComponentWrapper(next.getElement()));
+							}
+							
+						}
+					} else if (locations != null && !locations.isEmpty()) {
+						// use locations
+						for (BlockPos pos : locations) {
+							shape.perform(action, param, null, world, pos, this.efficiency);
+							
+							if (first) {
+								
+								SpellComponentWrapper comp;
+								if (next.getAlteration() == null)
+									comp = new SpellComponentWrapper(next.getElement());
+								else
+									comp = new SpellComponentWrapper(next.getAlteration());
+								NostrumMagica.proxy.spawnEffect(world, comp,
+										caster, null, null, new Vec3d(pos.getX() + .5, pos.getY(), pos.getZ() + .5), new SpellComponentWrapper(next.getElement()));
+							}
+						}
+					} else {
+						; // Drop it on the floor\
+						next = null;
+					}
+					
+					first = false;
+				}
+				
+				// next is either null or a trigger
+				if (next == null) {
+					// end of spell
+					finish();
+				} else {
+					// If we have more than one target/pos we hit (or if we're being forced to split), split here so each
+					// can proceed at their own pace
+					
+					// targs is correct (targets or others) based on last spell shape (or
+					// just targets if no previous shape)
+					
+					if (index > 0) {
+						NostrumMagicaSounds.CAST_CONTINUE.play(self);
+					}
+					
+					if (targets != null && !targets.isEmpty()) {
+						if (targets.size() == 1) {
+							// don't need to split
+							// Also base case after a split happens
+							
+							// Adjust self, other like if we split
+							if (others.size() > 0)
+								this.other = others.get(0);
+							else
+								this.other = this.self;
+							this.self = targets.get(0);
+							spawnTrigger(next.getTrigger(), this.self, null, null, next.getParam());
+						} else {
+							index--; // Make splits have same trigger as we're performing now
+							for (int i = 0; i < targets.size(); i++) {
+								EntityLivingBase targ = targets.get(i);
+								EntityLivingBase other;
+								if (others.size() >= i)
+									other = others.get(i);
+								else
+									other = this.self;
+								SpellState sub = split();//(targ, other);
+								sub.trigger(Lists.newArrayList(targ), Lists.newArrayList(other),
+										world, null);
+							}
+							index++;
+						}
+					} else if (locations != null && !locations.isEmpty()) {
+						if (locations.size() == 1) {
+							// Base case here, too. Instantiate trigger!!!!
+							spawnTrigger(next.getTrigger(), null, world, locations.get(0), next.getParam());
+						} else {
+							index--; // Make splits have same trigger as we're performing now
+							for (BlockPos targ : locations) {
+								SpellState sub = split();
+								sub.trigger(null, null,
+										world, Lists.newArrayList(targ));
+							}
+							index++;
+						}
+					} else {
+						// Last trigger couldn't carry us forward
+					}
+									
+				}
 			}
 		}
 		

@@ -156,10 +156,14 @@ public class SpellScroll extends Item implements ILoreTagged {
 		Spell spell = NostrumMagica.spellRegistry.lookup(id);
 		
 		if (spell == null) {
-			NostrumMagica.logger.info("Requesting spell " + id
-					 + " from the server...");
-				NetworkHandler.getSyncChannel().sendToServer(
-		    			new SpellRequestMessage(new int[] {id}));
+			if (NostrumMagica.proxy.isServer()) {
+				NostrumMagica.logger.error("Failed to lookup spell in scroll with id " + id);
+			} else {
+				NostrumMagica.logger.info("Requesting spell " + id
+						 + " from the server...");
+					NetworkHandler.getSyncChannel().sendToServer(
+			    			new SpellRequestMessage(new int[] {id}));
+			}
 		}
 			
 		return spell;

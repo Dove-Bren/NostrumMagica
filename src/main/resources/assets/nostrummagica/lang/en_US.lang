@@ -255,7 +255,10 @@ entity.nostrummagica.entity_dragon_red.name=Red Dragon
 entity.nostrummagica.entity_tame_dragon_red.name=Tamed Red Dragon
 entity.nostrummagica.entity_shadow_dragon_red.name=Shadow Red Dragon
 entity.nostrummagica.entity_sprite.name=Sprite
-entity.nostrummagica.entity_dragon_egg=Dragon Egg
+entity.nostrummagica.entity_dragon_egg.name=Dragon Egg
+entity.nostrummagica.entity_internal_spellsaucer_chakram.name=Spell Saucer
+entity.nostrummagica.entity_internal_spellsaucer_cycler.name=Spell Saucer
+entity.nostrummagica.entity_internal_spellsaucer_.name=Spell Saucer
 
 itemGroup.nostrummagica=Nostrum Magica
 itemGroup.nostrummagica_enhancements=Nostrum Enhancements
@@ -952,6 +955,9 @@ modification.mana.name=Mana Level
 modification.health.name=Health Level
 modification.food.name=Food Level
 modification.delay.name=Delay (seconds)
+modification.cutter.name=Piercing
+modification.vortex_blade.bool.name=Hit Blocks
+modification.vortex_blade.float.name=Duration (Seconds)
 
 modification.level.flip=Trigger When Above
 
