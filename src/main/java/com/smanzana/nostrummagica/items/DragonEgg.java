@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.items;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.EntityDragonEgg;
 import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
@@ -114,6 +115,11 @@ public class DragonEgg extends Item implements ILoreTagged {
 		egg.setPosition(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5);
 		worldIn.spawnEntityInWorld(egg);
 		
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
+		if (attr != null) {
+			attr.giveFullLore(egg);
+		}
+		
 		playerIn.addChatComponentMessage(new TextComponentTranslation("info.egg.place"));
 		
 		if (!playerIn.isCreative()) {
@@ -135,12 +141,12 @@ public class DragonEgg extends Item implements ILoreTagged {
 
 	@Override
 	public Lore getBasicLore() {
-		return new Lore().add("A curious egg created from the shells of a Red Dragon's egg. What could be inside?");
+		return new Lore().add("A curious egg created from the shells of a Red Dragon's egg.", "", "Caution: Upon use, the egg will be placed. The egg must be kept warm to have any chance of hatching!");
 	}
 
 	@Override
 	public Lore getDeepLore() {
-		return new Lore().add("A curious egg created from the shells of a Red Dragon's egg.", "When used, will spawn a Baby Red Dragon. Be warned: baby dragons are almost as ferocious as their parents...");
+		return new Lore().add("A curious egg created from the shells of a Red Dragon's egg.", "", "Caution: Upon use, the egg will be placed. The egg must be kept warm to have any chance of hatching! Lots of light and a hay-bale are encouraged!");
 	}
 	
 	@Override

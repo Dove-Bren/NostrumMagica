@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.entity.EntityDragonEgg;
 import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntitySprite;
@@ -116,6 +117,7 @@ public class LoreRegistry {
 		register(NostrumSkillItem.instance());
 		register(TameRedDragonLore.instance());
 		register(new EntitySprite(null));
+		register(new EntityDragonEgg(null));
 		
 		for (Preset preset : Preset.values()) {
 			register(preset);

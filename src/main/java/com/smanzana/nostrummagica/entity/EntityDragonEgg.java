@@ -4,8 +4,11 @@ package com.smanzana.nostrummagica.entity;
 import java.util.UUID;
 
 import com.google.common.base.Optional;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.IDragonSpawnData.IDragonSpawnFactory;
 import com.smanzana.nostrummagica.items.DragonEggFragment;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.block.BlockHay;
 import net.minecraft.entity.Entity;
@@ -22,7 +25,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 
-public class EntityDragonEgg extends EntityLiving {
+public class EntityDragonEgg extends EntityLiving implements ILoreTagged {
 	
 	protected static final DataParameter<Float> HEAT  = EntityDataManager.<Float>createKey(EntityDragonEgg.class, DataSerializers.FLOAT);
 	protected static final DataParameter<Optional<UUID>> PLAYER  = EntityDataManager.<Optional<UUID>>createKey(EntityDragonEgg.class, DataSerializers.OPTIONAL_UNIQUE_ID);
@@ -231,5 +234,31 @@ public class EntityDragonEgg extends EntityLiving {
 		}
 		
 		this.setDead();
+	}
+
+	@Override
+	public String getLoreKey() {
+		return "nostrum_dragon_egg_entity";
+	}
+
+	@Override
+	public String getLoreDisplayName() {
+		return "Caring For Dragon Eggs";
+	}
+
+	@Override
+	public Lore getBasicLore() {
+		// Never used
+		return new Lore().add("");
+	}
+
+	@Override
+	public Lore getDeepLore() {
+		return new Lore().add("You've placed a dragon egg!", "Be careful, as dragon eggs must be kept warm in order to survive!", "To keep the egg warm, keep it near a strong source of light. Additionally, ensure the egg stays on-top of a bed of straw or hay.", "If the egg gets too cold (or if it falls and cracks, or is damaged), it will die, and the creature inside will perish.", "Be warned: Once hatched, the creature inside will be wild, and must be tamed!");
+	}
+	
+	@Override
+	public InfoScreenTabs getTab() {
+		return InfoScreenTabs.INFO_ENTITY;
 	}
 }
