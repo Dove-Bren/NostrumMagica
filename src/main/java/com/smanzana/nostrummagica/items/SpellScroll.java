@@ -121,7 +121,7 @@ public class SpellScroll extends Item implements ILoreTagged {
 		
 		if (itemStackIn.getItemDamage() > itemStackIn.getMaxDamage()) {
 			// Going to break
-			NostrumMagica.spellRegistry.evict(spell);
+			NostrumMagica.getSpellRegistry().evict(spell);
 		}
 		
 		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
@@ -153,7 +153,7 @@ public class SpellScroll extends Item implements ILoreTagged {
 			return null;
 		
 		int id = nbt.getInteger(NBT_SPELL);
-		Spell spell = NostrumMagica.spellRegistry.lookup(id);
+		Spell spell = NostrumMagica.getSpellRegistry().lookup(id);
 		
 		if (spell == null) {
 			if (NostrumMagica.proxy.isServer()) {

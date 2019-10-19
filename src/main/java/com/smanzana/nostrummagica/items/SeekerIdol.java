@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
@@ -35,6 +37,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldSavedData;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -49,9 +52,6 @@ public class SeekerIdol extends Item implements ILoreTagged {
 	private static final String NBT_KEY = "key";
 	private static SeekerIdol instance = null;
 	
-	// SpellComponentWrapper's equals and hash overriden so it can be used as a key
-	private static Map<String, Map<SpellComponentWrapper, List<BlockPos>>> knownDungeons = new HashMap<>();
-	
 	public static SeekerIdol instance() {
 		if (instance == null)
 			instance = new SeekerIdol();
@@ -61,78 +61,6 @@ public class SeekerIdol extends Item implements ILoreTagged {
 	
 	public static void init() {
 		GameRegistry.addRecipe(new IdolRecipe());
-	}
-	
-	public static NBTTagCompound saveRegistryToNBT() {
-		NBTTagCompound base = new NBTTagCompound();
-		
-		for (Entry<String, Map<SpellComponentWrapper, List<BlockPos>>> worldMap : knownDungeons.entrySet()) {
-			NBTTagCompound nbt = new NBTTagCompound();
-			for (Entry<SpellComponentWrapper, List<BlockPos>> row : worldMap.getValue().entrySet()) {
-				NBTTagList list = new NBTTagList();
-				
-				for (BlockPos pos : row.getValue()) {
-					list.appendTag(new NBTTagString(pos.getX() + " " + pos.getY() + " " + pos.getZ()));
-				}
-				
-				nbt.setTag(row.getKey().getKeyString(), list);
-			}
-			base.setTag(worldMap.getKey(), nbt);
-		}
-		
-		return base;
-	}
-	
-	public static void readRegistryFromNBT(NBTTagCompound nbt) {
-		knownDungeons.clear();
-		for (String worldid : nbt.getKeySet()) {
-			Map<SpellComponentWrapper, List<BlockPos>> worldMap = new HashMap<>();
-			for (String key : nbt.getCompoundTag(worldid).getKeySet()) {
-				SpellComponentWrapper comp = SpellComponentWrapper.fromKeyString(key);
-				List<BlockPos> list = new LinkedList<>();
-				NBTTagList tags = nbt.getCompoundTag(worldid).getTagList(key, NBT.TAG_STRING);
-				for (int i = 0; i < tags.tagCount(); i++) {
-					String serial = tags.getStringTagAt(i);
-					int x = 0, y = 0, z = 0;
-					try {
-						int pos = serial.indexOf(' ');
-						x = Integer.parseInt(serial.substring(0, pos));
-						serial = serial.substring(pos + 1);
-						pos = serial.indexOf(' ');
-						y = Integer.parseInt(serial.substring(0, pos));
-						z = Integer.parseInt(serial.substring(pos + 1));
-					} catch (Exception e) {
-						NostrumMagica.logger.warn("Could not reparse dungeon location");
-						continue;
-					}
-					BlockPos pos = new BlockPos(x, y, z);
-					list.add(pos);
-				}
-				
-				worldMap.put(comp, list);
-			}
-			knownDungeons.put(worldid, worldMap);
-		}
-	}
-	
-	private static final String GetWorldID(World world) {
-		String id = world.getWorldInfo().getWorldName()
-				+ "_" + world.getSeed();
-		return id;
-	}
-	
-	public static void addDungeon(World world, SpellComponentWrapper component, BlockPos center) {
-		String id = GetWorldID(world);
-		
-		if (!knownDungeons.containsKey(id)) {
-			knownDungeons.put(id, new HashMap<SpellComponentWrapper, List<BlockPos>>());
-		}
-		
-		if (!knownDungeons.get(id).containsKey(component)){
-			knownDungeons.get(id).put(component, new LinkedList<BlockPos>());
-		}
-		
-		knownDungeons.get(id).get(component).add(center);
 	}
 	
 	public static final String id = "seeker_idol";
@@ -220,19 +148,16 @@ public class SeekerIdol extends Item implements ILoreTagged {
 		
     }
 	
-	private Vec3d findShrineDir(World world, Vec3d pos, SpellComponentWrapper component) {
-		BlockPos targ = null;
+	@Nullable
+	public static BlockPos findNearest(World world, BlockPos from, SpellComponentWrapper component) {
 		double min = Double.MAX_VALUE;
-		BlockPos from = new BlockPos(pos);
-		String worldID = GetWorldID(world);
+		BlockPos targ = null;
+		List<BlockPos> candidates = GetSeekerData(world).findDungeons(component);
 		
-		if (!knownDungeons.containsKey(worldID)) {
-			return null;
-		}
-		if (!knownDungeons.get(worldID).containsKey(component))
+		if (candidates == null || candidates.isEmpty())
 			return null;
 		
-		for (BlockPos bp : knownDungeons.get(worldID).get(component)) {
+		for (BlockPos bp : candidates) {
 			if (targ == null) {
 				targ = bp;
 				min = bp.distanceSq(from);
@@ -245,6 +170,12 @@ public class SeekerIdol extends Item implements ILoreTagged {
 				targ = bp;
 			}
 		}
+		
+		return targ;
+	}
+	
+	private Vec3d findShrineDir(World world, Vec3d pos, SpellComponentWrapper component) {
+		BlockPos targ = findNearest(world, new BlockPos(pos), component);
 		
 		if (targ == null)
 			return null;
@@ -374,5 +305,116 @@ public class SeekerIdol extends Item implements ILoreTagged {
 	@Override
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_ITEMS;
+	}
+	
+	private static SeekerData GetSeekerData(World world) {
+		SeekerData data = (SeekerData) world.getMapStorage().getOrLoadData(
+				SeekerData.class, SeekerData.DATA_NAME);
+		
+		if (data == null) { // still
+			data = new SeekerData();
+			world.getMapStorage().setData(SeekerData.DATA_NAME, data);
+		}
+		
+		return data;
+	}
+	
+	public static void addDungeon(World world, SpellComponentWrapper component, BlockPos center) {
+		SeekerData data = GetSeekerData(world);
+		
+		data.addDungeon(component, center);
+	}
+	
+	public static List<SpellComponentWrapper> getKnownDungeonTypes(World world) {
+		List<SpellComponentWrapper> list = new LinkedList<>();
+		SeekerData data = GetSeekerData(world);
+		if (data != null) {
+			data.getKnownTypes(list);
+		}
+		
+		return list;
+	}
+	
+	private static class SeekerData extends WorldSavedData {
+
+		public static final String DATA_NAME = NostrumMagica.MODID + "_seeker_registry";
+		
+		// SpellComponentWrapper's equals and hash overriden so it can be used as a key
+		private Map<SpellComponentWrapper, List<BlockPos>> knownDungeons;
+		
+		public SeekerData() {
+			this(DATA_NAME);
+		}
+		
+		public SeekerData(String name) {
+			super(name);
+			
+			this.knownDungeons = new HashMap<>();
+		}
+
+		@Override
+		public void readFromNBT(NBTTagCompound nbt) {
+			knownDungeons.clear();
+			
+			for (String key : nbt.getKeySet()) {
+				SpellComponentWrapper comp = SpellComponentWrapper.fromKeyString(key);
+				List<BlockPos> list = new LinkedList<>();
+				NBTTagList tags = nbt.getTagList(key, NBT.TAG_STRING);
+				for (int i = 0; i < tags.tagCount(); i++) {
+					String serial = tags.getStringTagAt(i);
+					int x = 0, y = 0, z = 0;
+					try {
+						int pos = serial.indexOf(' ');
+						x = Integer.parseInt(serial.substring(0, pos));
+						serial = serial.substring(pos + 1);
+						pos = serial.indexOf(' ');
+						y = Integer.parseInt(serial.substring(0, pos));
+						z = Integer.parseInt(serial.substring(pos + 1));
+					} catch (Exception e) {
+						NostrumMagica.logger.warn("Could not reparse dungeon location");
+						continue;
+					}
+					BlockPos pos = new BlockPos(x, y, z);
+					list.add(pos);
+				}
+				
+				knownDungeons.put(comp, list);
+			}
+		}
+
+		@Override
+		public NBTTagCompound writeToNBT(NBTTagCompound base) {
+			for (Entry<SpellComponentWrapper, List<BlockPos>> row : knownDungeons.entrySet()) {
+				NBTTagList list = new NBTTagList();
+				
+				for (BlockPos pos : row.getValue()) {
+					list.appendTag(new NBTTagString(pos.getX() + " " + pos.getY() + " " + pos.getZ()));
+				}
+				
+				base.setTag(row.getKey().getKeyString(), list);
+			}
+			
+			return base;
+		}
+		
+		public void addDungeon(SpellComponentWrapper component, BlockPos center) {
+			if (!knownDungeons.containsKey(component)){
+				knownDungeons.put(component, new LinkedList<BlockPos>());
+			}
+			
+			knownDungeons.get(component).add(center);
+		}
+		
+		@Nullable
+		public List<BlockPos> findDungeons(SpellComponentWrapper component) {
+			return knownDungeons.get(component);
+		}
+		
+		public void getKnownTypes(List<SpellComponentWrapper> listOut) {
+			for (SpellComponentWrapper type : knownDungeons.keySet()) {
+				listOut.add(type);
+			}
+		}
+		
 	}
 }

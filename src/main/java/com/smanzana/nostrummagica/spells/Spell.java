@@ -433,9 +433,9 @@ public class Spell {
 		this.name = name;
 		
 		if (trans)
-			registryID = NostrumMagica.spellRegistry.registerTransient(this);
+			registryID = NostrumMagica.getSpellRegistry().registerTransient(this);
 		else
-			registryID = NostrumMagica.spellRegistry.register(this);
+			registryID = NostrumMagica.getSpellRegistry().register(this);
 	}
 	
 	public static Spell CreateInternal(String name, int id) {
@@ -443,7 +443,7 @@ public class Spell {
 		s.name = name;
 		s.registryID = id;
 		
-		NostrumMagica.spellRegistry.override(id, s);
+		NostrumMagica.getSpellRegistry().override(id, s);
 		return s;
 	}
 	

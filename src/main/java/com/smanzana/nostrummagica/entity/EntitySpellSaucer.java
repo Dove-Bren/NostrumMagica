@@ -64,7 +64,7 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 		
 		if (this.ticksExisted % 5 == 0 && worldObj.isRemote) {
 			this.worldObj.spawnParticle(EnumParticleTypes.CRIT_MAGIC,
-					posX, posY, posZ, 0, 0, 0);
+					posX - .5 + rand.nextFloat(), posY, posZ - .5 + rand.nextFloat(), 0, 0, 0);
 		}
 	}
 	

@@ -48,7 +48,7 @@ public class ClientCastMessage implements IMessage {
 			final EntityPlayerMP sp = ctx.getServerHandler().playerEntity;
 			
 			// What spell?
-			Spell spell = NostrumMagica.spellRegistry.lookup(
+			Spell spell = NostrumMagica.getSpellRegistry().lookup(
 					message.tag.getInteger(NBT_ID)
 					);
 			

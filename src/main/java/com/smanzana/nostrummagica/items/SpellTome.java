@@ -458,7 +458,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 			index = 0;
 		
 		int id = ids[index];
-		Spell spell = NostrumMagica.spellRegistry.lookup(id);
+		Spell spell = NostrumMagica.getSpellRegistry().lookup(id);
 		
 		if (spell != null)
 			list.add(spell);
@@ -468,7 +468,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 				continue;
 			
 			id = ids[i];
-			spell = NostrumMagica.spellRegistry.lookup(id);
+			spell = NostrumMagica.getSpellRegistry().lookup(id);
 			if (spell != null)
 				list.add(spell);
 		}
@@ -487,7 +487,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		int requestcount = 0;
 		for (int i = 0; i < ids.length; i++) {
 			id = ids[i];
-			if (NostrumMagica.spellRegistry.lookup(id) == null) {
+			if (NostrumMagica.getSpellRegistry().lookup(id) == null) {
 				System.out.println("don't know this one: " + id);
 				// Create a temporary spell
 				// Request spell from server

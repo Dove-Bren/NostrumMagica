@@ -36,7 +36,7 @@ public class SpellRequestMessage implements IMessage {
 			List<Spell> spells = new LinkedList<>();
 			Spell spell;
 			for (int id : ids) {
-				spell = NostrumMagica.spellRegistry.lookup(id);
+				spell = NostrumMagica.getSpellRegistry().lookup(id);
 				if (spell != null)
 					spells.add(spell);
 				else

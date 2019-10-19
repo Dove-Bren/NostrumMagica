@@ -1,7 +1,5 @@
 package com.smanzana.nostrummagica;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,6 +16,7 @@ import com.smanzana.nostrummagica.command.CommandCreateGeotoken;
 import com.smanzana.nostrummagica.command.CommandEnhanceTome;
 import com.smanzana.nostrummagica.command.CommandForceBind;
 import com.smanzana.nostrummagica.command.CommandGiveSkillpoint;
+import com.smanzana.nostrummagica.command.CommandGotoDungeon;
 import com.smanzana.nostrummagica.command.CommandSetLevel;
 import com.smanzana.nostrummagica.command.CommandSpawnDungeon;
 import com.smanzana.nostrummagica.command.CommandSpawnObelisk;
@@ -46,7 +45,6 @@ import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.items.SeekerIdol;
 import com.smanzana.nostrummagica.items.SpellPlate;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
@@ -55,8 +53,6 @@ import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
 import com.smanzana.nostrummagica.listeners.PlayerListener;
-import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
-import com.smanzana.nostrummagica.listeners.PlayerListener.IMagicListener;
 import com.smanzana.nostrummagica.proxy.CommonProxy;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.quests.NostrumQuest.QuestType;
@@ -114,14 +110,14 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -130,13 +126,13 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 
 @Mod(modid = NostrumMagica.MODID, version = NostrumMagica.VERSION, guiFactory = "com.smanzana.nostrummagica.config.ConfigGuiFactory", dependencies = "after:Baubles")
-public class NostrumMagica implements IMagicListener
+public class NostrumMagica
 {
     public static final String MODID = "nostrummagica";
     public static final String VERSION = "1.0";
@@ -154,9 +150,7 @@ public class NostrumMagica implements IMagicListener
     public static PlayerListener playerListener;
     public static MagicEffectProxy magicEffectProxy;
     
-    public static SpellRegistry spellRegistry;
-    private File spellRegistryFile; 
-    private File seekerRegistryFile;
+    private static SpellRegistry spellRegistry;
     
     @EventHandler
     public void init(FMLInitializationEvent event) {
@@ -195,20 +189,12 @@ public class NostrumMagica implements IMagicListener
     	proxy.preinit();
     	baubles.preInit();
     	
-    	spellRegistry = new SpellRegistry();
     	RitualRegistry.instance();
     	
     	registerDefaultRituals();
     	registerDefaultQuests();
     	registerDefaultTrials();
     	
-    	File dir = new File(event.getSuggestedConfigurationFile().getParentFile(), "NostrumMagica");
-    	if (!dir.exists())
-    		dir.mkdirs();
-    	spellRegistryFile = new File(dir, "spells.dat"); 
-    	loadSpellRegistry(spellRegistryFile);
-    	seekerRegistryFile = new File(dir, "dungloc.dat"); 
-    	//loadSeekerRegistry(spellRegistryFile);
     	
     	new ModConfig(new Configuration(event.getSuggestedConfigurationFile()));
     	
@@ -223,17 +209,12 @@ public class NostrumMagica implements IMagicListener
     	proxy.postinit();
     	baubles.postInit();
     	
-    	playerListener.registerTimer(this, 20 * 60 * 5, 20 * 60 * 5);
-    }
-    
-    @EventHandler
-    public void shutdown(FMLServerStoppingEvent event) {
-    	saveSpellRegistry(spellRegistryFile);
-    	saveSeekerRegistry(seekerRegistryFile);
+    	MinecraftForge.EVENT_BUS.register(this);
     }
     
     @EventHandler
     public void startup(FMLServerStartingEvent event) {
+    	event.registerServerCommand(new CommandGotoDungeon());
     	event.registerServerCommand(new CommandTestConfig());
     	event.registerServerCommand(new CommandSpawnObelisk());
     	event.registerServerCommand(new CommandEnhanceTome());
@@ -245,7 +226,6 @@ public class NostrumMagica implements IMagicListener
     	event.registerServerCommand(new CommandForceBind());
     	event.registerServerCommand(new CommandSpawnDungeon());
     	event.registerServerCommand(new CommandUnlockAll());
-    	loadSeekerRegistry(seekerRegistryFile);
     }
     
     /**
@@ -435,108 +415,6 @@ public class NostrumMagica implements IMagicListener
     	}
     	
     	return list;
-    }
-    
-    private void loadSpellRegistry(File file) {
-    	if (file == null)
-    		return;
-    	
-    	if (!file.exists())
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				logger.error("Could not create empty file where eventually we'll save "
-						+ "spells to. This is very bad!");
-				e.printStackTrace();
-				return;
-			}
-    	
-    	if (file.length() == 0)
-    		return;
-    	
-    	NBTTagCompound nbt;
-    	try {
-			nbt = CompressedStreamTools.read(file);
-		} catch (IOException e) {
-			e.printStackTrace();
-			logger.error("Could not read in spells data file");
-			return;
-		}
-    	
-    	spellRegistry.loadFromNBT(nbt);
-    }
-    
-    private void saveSpellRegistry(File file) {
-    	if (file == null)
-    		return;
-    	
-    	NBTTagCompound nbt = spellRegistry.save();
-    	try {
-    		CompressedStreamTools.safeWrite(nbt, file);
-    	} catch (IOException e) {
-    		e.printStackTrace();
-    		logger.error("Failed to save spell dictionary! Attempting to write "
-    				+ "to temp file instead");
-    		try {
-				File backup = File.createTempFile("nostrummagica", "spells");
-				CompressedStreamTools.write(nbt, backup);
-				logger.info("\r\n\r\nSuccessfully backed up to " + backup.getAbsolutePath());
-			} catch (IOException e1) {
-				e1.printStackTrace();
-				logger.error("Failed to write backup file. Spell changes have been lost.");
-			}
-    	}
-    }
-    
-    private void loadSeekerRegistry(File file) {
-    	if (file == null)
-    		return;
-    	
-    	if (!file.exists())
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				logger.error("Could not create empty file where eventually we'll save "
-						+ "dungeon locs to. This is very bad!");
-				e.printStackTrace();
-				return;
-			}
-    	
-    	if (file.length() == 0)
-    		return;
-    	
-    	NBTTagCompound nbt;
-    	try {
-			nbt = CompressedStreamTools.read(file);
-		} catch (IOException e) {
-			e.printStackTrace();
-			logger.error("Could not read in dungeon locations data file");
-			return;
-		}
-    	
-    	SeekerIdol.readRegistryFromNBT(nbt);
-    }
-    
-    private void saveSeekerRegistry(File file) {
-    	if (file == null)
-    		return;
-    	
-    	NBTTagCompound nbt = SeekerIdol.saveRegistryToNBT();
-    	try {
-    		CompressedStreamTools.safeWrite(nbt, file);
-    	} catch (IOException e) {
-    		e.printStackTrace();
-    		logger.error("Failed to save dungeon location dictionary! Attempting to write "
-    				+ "to temp file instead");
-    		try {
-				File backup = File.createTempFile("nostrummagica", "dungeonlocations");
-				CompressedStreamTools.write(nbt, backup);
-				logger.info("\r\n\r\nSuccessfully backed up to " + backup.getAbsolutePath());
-			} catch (IOException e1) {
-				e1.printStackTrace();
-				logger.error("Failed to write backup file. Dungeon locations for seeking have been lost.");
-			}
-    	}
     }
     
     private void registerDefaultRituals() {
@@ -1551,14 +1429,41 @@ public class NostrumMagica implements IMagicListener
     	
     	return list;
     }
-
-	@Override
-	public boolean onEvent(Event type, EntityLivingBase entity) {
-		if (type == Event.TIME) {
-			NostrumMagica.logger.info("Saving spell and seeker registries...");
-			saveSpellRegistry(spellRegistryFile);
-	    	saveSeekerRegistry(seekerRegistryFile);
+    
+    public static SpellRegistry getSpellRegistry() {
+    	if (spellRegistry == null) {
+    		throw new RuntimeException("Accessing SpellRegistry before a world has been loaded!");
+    	}
+    	
+    	return spellRegistry;
+    }
+    
+    private void initSpellRegistry(World world) {
+    	spellRegistry = (SpellRegistry) world.getMapStorage().getOrLoadData(
+				SpellRegistry.class, SpellRegistry.DATA_NAME);
+		
+		if (spellRegistry == null) { // still
+			logger.info("===== Creating new global spell registry");
+			spellRegistry = new SpellRegistry();
+			world.getMapStorage().setData(SpellRegistry.DATA_NAME, spellRegistry);
 		}
-		return false;
-	}
+    }
+    
+    @SubscribeEvent
+    public void onWorldLoad(WorldEvent.Load event) {
+    	// Keeping a static reference since some places want to access the registry that don't have world info.
+    	// But registry should be global anyways, so we're going to try and allow it.
+    	// I'm not sure the 'right' way to use global save data like this.
+    	if (event.getWorld().isRemote) {
+    		// Clients just get a spell registry that's empty that is constantly synced with the server's
+    		// Create one if this is our first world.
+    		// If in  the same session we're joining another server (or loading another save), the server thread will load and sync with us.
+    		if (spellRegistry == null) {
+    			spellRegistry = new SpellRegistry();
+    		}
+    	} else {
+    		// Do the correct initialization for persisted data
+			initSpellRegistry(event.getWorld());
+		}
+    }
 }

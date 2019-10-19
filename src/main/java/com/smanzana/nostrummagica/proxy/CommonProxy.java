@@ -568,7 +568,7 @@ public class CommonProxy {
     			new StatSyncMessage(NostrumMagica.getMagicWrapper(player)),
     			player);
     	NetworkHandler.getSyncChannel().sendTo(
-    			new SpellRequestReplyMessage(NostrumMagica.spellRegistry.getAllSpells(), true),
+    			new SpellRequestReplyMessage(NostrumMagica.getSpellRegistry().getAllSpells(), true),
     			player);
     }
 

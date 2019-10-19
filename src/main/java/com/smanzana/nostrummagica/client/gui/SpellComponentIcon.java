@@ -21,6 +21,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.DelayTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.FoodTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.HealthTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.MagicCutterTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.MagicCyclerTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ManaTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.OtherTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
@@ -170,6 +171,9 @@ public class SpellComponentIcon {
 			v = 1;
 		} else if (trigger instanceof MagicCutterTrigger) {
 			u = 4;
+			v = 1;
+		} else if (trigger instanceof MagicCyclerTrigger) {
+			u = 5;
 			v = 1;
 		} else {
 			System.out.println("Trigger doesn't have set uv: " + trigger);

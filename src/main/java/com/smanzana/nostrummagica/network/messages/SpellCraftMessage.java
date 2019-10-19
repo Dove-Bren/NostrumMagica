@@ -43,13 +43,13 @@ public class SpellCraftMessage implements IMessage {
 			final EntityPlayerMP sp = ctx.getServerHandler().playerEntity;
 			
 			sp.getServerWorld().addScheduledTask(() -> {
-			World world = sp.worldObj;
-			
-			// Get the TE
-			TileEntity TE = world.getTileEntity(pos);
-			if (TE == null) {
-				NostrumMagica.logger.warn("Got craft message that didn't line up with a crafting table. This is a bug!");
-				return;
+				World world = sp.worldObj;
+				
+				// Get the TE
+				TileEntity TE = world.getTileEntity(pos);
+				if (TE == null) {
+					NostrumMagica.logger.warn("Got craft message that didn't line up with a crafting table. This is a bug!");
+					return;
 			}
 			
 			SpellTableEntity entity = (SpellTableEntity) TE;

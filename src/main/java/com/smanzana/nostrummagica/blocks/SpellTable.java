@@ -278,7 +278,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 					name, this, new LinkedList<String>(), new LinkedList<String>(), true, true);
 			
 			if (spell != null) {
-				NostrumMagica.spellRegistry.register(spell);
+				NostrumMagica.getSpellRegistry().register(spell);
 				spell.setIcon(iconIndex);
 				ItemStack scroll = new ItemStack(SpellScroll.instance(), 1);
 				SpellScroll.setSpell(scroll, spell);

@@ -11,6 +11,7 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.WorldSavedData;
 
 /**
  * Tags spells with IDs so that looking them up from the tome is easier.
@@ -21,13 +22,21 @@ import net.minecraft.nbt.NBTTagCompound;
  * @author Skyler
  *
  */
-public class SpellRegistry {
+public class SpellRegistry extends WorldSavedData {
 
+	public static final String DATA_NAME =  NostrumMagica.MODID + "_SpellData";
+	
 	private Map<Integer, Spell> registry;
 	private List<Integer> transients;
 	private static final Random rand = new Random();
 	
 	public SpellRegistry() {
+		this(DATA_NAME);
+	}
+	
+	public SpellRegistry(String name) {
+		super(name);
+
 		registry = new HashMap<>();
 		transients = new LinkedList<>();
 	}
@@ -61,6 +70,8 @@ public class SpellRegistry {
 			id = newID();
 			registry.put(id, spell);
 		}
+		
+		this.markDirty();
 		return id;
 	}
 	
@@ -73,11 +84,14 @@ public class SpellRegistry {
 	 * @return
 	 */
 	public int registerTransient(Spell spell) {
+		int id;
 		synchronized(this) {
-			int id = register(spell);
+			id = register(spell);
 			transients.add(id);
-			return id;
 		}
+		
+		this.markDirty();
+		return id;
 	}
 	
 	/**
@@ -90,6 +104,8 @@ public class SpellRegistry {
 		synchronized(this) {
 			registry.put(id, spell);
 		}
+		
+		this.markDirty();
 	}
 	
 	public Spell lookup(int id) {
@@ -98,8 +114,36 @@ public class SpellRegistry {
 		}
 	}
 	
-	public void loadFromNBT(NBTTagCompound nbt) {
+	public List<Spell> getAllSpells() {
 		synchronized(this) {
+			return Lists.newArrayList(registry.values());
+		}
+	}
+
+	public void clear() {
+		synchronized(this) {
+			registry.clear();
+		}
+		
+		this.markDirty();
+	}
+	
+	public void evict(Spell spell) {
+		int id = spell.getRegistryID();
+		
+		synchronized(this) {
+			registry.remove(id);
+		}
+		
+		this.markDirty();
+	}
+
+	@Override
+	public void readFromNBT(NBTTagCompound nbt) {
+		synchronized(this) {
+			this.registry.clear();
+			this.transients.clear();
+			
 			for (String key : nbt.getKeySet()) {
 				int id;
 				try {
@@ -113,11 +157,15 @@ public class SpellRegistry {
 				registry.put(id,
 						Spell.fromNBT(nbt.getCompoundTag(key), id));
 			}
+			
+			NostrumMagica.logger.info("Loaded spell registry (" + registry.size() + " spells)");
 		}
 	}
-	
-	public NBTTagCompound save() {
-		NBTTagCompound nbt = new NBTTagCompound();
+
+	@Override
+	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+		
+		NostrumMagica.logger.info("Saving Spell registry");
 		
 		synchronized(this) {
 			for (Entry<Integer, Spell> entry : registry.entrySet()) {
@@ -128,26 +176,6 @@ public class SpellRegistry {
 		}
 		
 		return nbt;
-	}
-
-	public List<Spell> getAllSpells() {
-		synchronized(this) {
-			return Lists.newArrayList(registry.values());
-		}
-	}
-
-	public void clear() {
-		synchronized(this) {
-			registry.clear();
-		}
-	}
-	
-	public void evict(Spell spell) {
-		int id = spell.getRegistryID();
-		
-		synchronized(this) {
-			registry.remove(id);
-		}
 	}
 	
 }

@@ -34,7 +34,8 @@ public class SpellRequestReplyMessage implements IMessage {
 			
 			boolean clean = message.tag.getBoolean(NBT_CLEAN);
 			if (clean) {
-				NostrumMagica.spellRegistry.clear();
+				NostrumMagica.logger.info("Cleaning spell registry to receive server's copy");
+				NostrumMagica.getSpellRegistry().clear();
 			}
 			
 			for (int i = 0; i < list.tagCount(); i++) {
@@ -44,7 +45,7 @@ public class SpellRequestReplyMessage implements IMessage {
 				Spell spell = Spell.fromNBT(nbt, id);
 				
 				if (spell != null)
-					NostrumMagica.spellRegistry.override(id, spell);
+					NostrumMagica.getSpellRegistry().override(id, spell);
 			}
 			
 			return null;
