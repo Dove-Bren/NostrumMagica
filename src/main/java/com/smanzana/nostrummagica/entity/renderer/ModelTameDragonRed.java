@@ -35,6 +35,7 @@ public class ModelTameDragonRed extends ModelDragonRed {
 		
 		super.render(entity, time, swingProgress, swing, headAngleY, headAngleX, scale);
 		
+		GlStateManager.color(1f, 0, 0);
 		GlStateManager.popMatrix();
 	}
 

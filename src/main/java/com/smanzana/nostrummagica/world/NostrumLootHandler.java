@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.world.dungeon;
+package com.smanzana.nostrummagica.world;
 
 import java.util.List;
 

@@ -447,6 +447,13 @@ public class Spell {
 		return s;
 	}
 	
+	/**
+	 * Takes a transient spell and makes it an official, non-transient spell
+	 */
+	public void promoteFromTrans() {
+		NostrumMagica.getSpellRegistry().removeTransientStatus(this);
+	}
+	
 	public void setIcon(int index) {
 		this.iconIndex = index;
 	}

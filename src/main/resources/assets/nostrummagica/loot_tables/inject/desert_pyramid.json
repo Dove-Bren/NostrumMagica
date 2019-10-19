@@ -13,14 +13,14 @@
         "type": "item",
         "name": "nostrummagica:nostrum_rune",
         "entryName": "rune1",
-        "weight": 4,
+        "weight": 1,
         "functions": [{ "function": "set_nbt", "tag": "{type: shape, name: shape_single}" }]
       },
       {
         "type": "item",
         "name": "nostrummagica:nostrum_rune",
         "entryName": "runeSpec",
-        "weight": 10,
+        "weight": 8,
         "functions": [{ "function": "set_nbt", "tag": "{type: element, name: EARTH, e_count: 1}" }]
       },
       {
@@ -40,37 +40,9 @@
       {
         "type": "item",
         "name": "nostrummagica:nostrum_rune",
-        "entryName": "rune4",
-        "weight": 4,
-        "functions": [{ "function": "set_nbt", "tag": "{type: trigger, name: trigger_projectile}" }]
-      },
-      {
-        "type": "item",
-        "name": "nostrummagica:nostrum_rune",
         "entryName": "rune5",
         "weight": 2,
         "functions": [{ "function": "set_nbt", "tag": "{type: shape, name: shape_aoe}" }]
-      },
-      {
-        "type": "item",
-        "name": "nostrummagica:nostrum_rune",
-        "entryName": "rune6",
-        "weight": 2,
-        "functions": [{ "function": "set_nbt", "tag": "{type: alteration, name: RESIST}" }]
-      },
-      {
-        "type": "item",
-        "name": "nostrummagica:nostrum_rune",
-        "entryName": "rune7",
-        "weight": 2,
-        "functions": [{ "function": "set_nbt", "tag": "{type: alteration, name: INFLICT}" }]
-      },
-      {
-        "type": "item",
-        "name": "nostrummagica:nostrum_rune",
-        "entryName": "rune8",
-        "weight": 2,
-        "functions": [{ "function": "set_nbt", "tag": "{type: alteration, name: GROWTH}" }]
       },
       {
         "type": "item",

@@ -40,6 +40,7 @@ public class ModConfig {
 		
 		OBELISK_REQ_MAGIC(Category.SERVER, "obelisk_req_magic", true, true, "Magic must be unlocked before obelisks can be used or teleported to."),
 		NOSTRUM_WORLDS(Category.SERVER, "nostrum_worlds", new int[]{0}, true, "Which worlds to generate Nostrum dungeons in"),
+		NOSTRUM_DIMENSION_ID(Category.SERVER, "nostrum_dimension_id", 244, true, "Dimension ID for nostrum's sorcery dimension"),
 		;
 		
 		
@@ -446,5 +447,9 @@ public class ModConfig {
 	
 	public boolean displayArmorOverlay() {
 		return getBooleanValue(Key.ARMOR_DISPLAY, false);
+	}
+	
+	public int dimensionIndex() {
+		return getIntValue(Key.NOSTRUM_DIMENSION_ID, true);
 	}
 }

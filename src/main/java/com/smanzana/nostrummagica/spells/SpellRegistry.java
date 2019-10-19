@@ -108,6 +108,14 @@ public class SpellRegistry extends WorldSavedData {
 		this.markDirty();
 	}
 	
+	public void removeTransientStatus(Spell spell) {
+		synchronized(this) {
+			this.transients.remove((Integer) spell.getRegistryID());
+		}
+		
+		this.markDirty();
+	}
+	
 	public Spell lookup(int id) {
 		synchronized(this) {
 			return registry.get(id);

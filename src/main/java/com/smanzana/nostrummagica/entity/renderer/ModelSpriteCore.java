@@ -79,6 +79,8 @@ public class ModelSpriteCore extends ModelOBJ {
 		//frac = (entity.ticksExisted + partialTicks) / (20f * 10f);
 		//GlStateManager.rotate(360f * frac, 1f, 0, 0);
 		
+		GlStateManager.color(1f, 0, 0);
+		
 		return true;
 	}
 }

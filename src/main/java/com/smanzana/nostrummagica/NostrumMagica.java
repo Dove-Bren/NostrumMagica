@@ -17,6 +17,7 @@ import com.smanzana.nostrummagica.command.CommandEnhanceTome;
 import com.smanzana.nostrummagica.command.CommandForceBind;
 import com.smanzana.nostrummagica.command.CommandGiveSkillpoint;
 import com.smanzana.nostrummagica.command.CommandGotoDungeon;
+import com.smanzana.nostrummagica.command.CommandSetDimension;
 import com.smanzana.nostrummagica.command.CommandSetLevel;
 import com.smanzana.nostrummagica.command.CommandSpawnDungeon;
 import com.smanzana.nostrummagica.command.CommandSpawnObelisk;
@@ -100,7 +101,8 @@ import com.smanzana.nostrummagica.trials.TrialLightning;
 import com.smanzana.nostrummagica.trials.TrialPhysical;
 import com.smanzana.nostrummagica.trials.TrialWind;
 import com.smanzana.nostrummagica.world.NostrumChunkLoader;
-import com.smanzana.nostrummagica.world.dungeon.NostrumLootHandler;
+import com.smanzana.nostrummagica.world.NostrumLootHandler;
+import com.smanzana.nostrummagica.world.dimension.NostrumDimensionMapper;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
@@ -150,7 +152,9 @@ public class NostrumMagica
     public static PlayerListener playerListener;
     public static MagicEffectProxy magicEffectProxy;
     
+    // Cached references that have sketchy access rules. See uses in this file.
     private static SpellRegistry spellRegistry;
+    private static NostrumDimensionMapper dimensionMapper;
     
     @EventHandler
     public void init(FMLInitializationEvent event) {
@@ -185,6 +189,8 @@ public class NostrumMagica
 	    if (Loader.isModLoaded("Baubles")) {
 	    	baubles.enable();
 	    }
+	    
+    	new ModConfig(new Configuration(event.getSuggestedConfigurationFile()));
     	
     	proxy.preinit();
     	baubles.preInit();
@@ -196,7 +202,6 @@ public class NostrumMagica
     	registerDefaultTrials();
     	
     	
-    	new ModConfig(new Configuration(event.getSuggestedConfigurationFile()));
     	
     	NostrumChunkLoader.instance();
     	
@@ -226,6 +231,7 @@ public class NostrumMagica
     	event.registerServerCommand(new CommandForceBind());
     	event.registerServerCommand(new CommandSpawnDungeon());
     	event.registerServerCommand(new CommandUnlockAll());
+    	event.registerServerCommand(new CommandSetDimension());
     }
     
     /**
@@ -1438,14 +1444,40 @@ public class NostrumMagica
     	return spellRegistry;
     }
     
+    public static int getOrCreatePlayerDimension(EntityPlayer player) {
+    	NostrumDimensionMapper mapper = getDimensionMapper();
+    	
+    	// Either register or fetch existing mapping
+    	int dim = mapper.register(player.getUniqueID());
+    	
+    	return dim;
+    }
+    
+    public static NostrumDimensionMapper getDimensionMapper() {
+    	if (dimensionMapper == null) {
+    		throw new RuntimeException("Accessing dimension mapper before a world has been loaded!");
+    	}
+    	
+    	return dimensionMapper;
+    }
+    
     private void initSpellRegistry(World world) {
     	spellRegistry = (SpellRegistry) world.getMapStorage().getOrLoadData(
 				SpellRegistry.class, SpellRegistry.DATA_NAME);
 		
 		if (spellRegistry == null) { // still
-			logger.info("===== Creating new global spell registry");
 			spellRegistry = new SpellRegistry();
 			world.getMapStorage().setData(SpellRegistry.DATA_NAME, spellRegistry);
+		}
+    }
+    
+    private void initDimensionMapper(World world) {
+    	dimensionMapper = (NostrumDimensionMapper) world.getMapStorage().getOrLoadData(
+    			NostrumDimensionMapper.class, NostrumDimensionMapper.DATA_NAME);
+		
+		if (dimensionMapper == null) { // still
+			dimensionMapper = new NostrumDimensionMapper();
+			world.getMapStorage().setData(NostrumDimensionMapper.DATA_NAME, dimensionMapper);
 		}
     }
     
@@ -1461,9 +1493,13 @@ public class NostrumMagica
     		if (spellRegistry == null) {
     			spellRegistry = new SpellRegistry();
     		}
+    		if (dimensionMapper == null) {
+    			dimensionMapper = new NostrumDimensionMapper();
+    		}
     	} else {
     		// Do the correct initialization for persisted data
 			initSpellRegistry(event.getWorld());
+			initDimensionMapper(event.getWorld());
 		}
     }
 }

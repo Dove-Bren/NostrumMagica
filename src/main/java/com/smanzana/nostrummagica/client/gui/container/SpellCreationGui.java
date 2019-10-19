@@ -418,7 +418,7 @@ public class SpellCreationGui {
 				return null;
 			}
 			
-			Spell spell = new Spell(name);
+			Spell spell = new Spell(name, true);
 			SpellPart part;
 			for (int i = 1; i < inventory.getReagentSlotIndex(); i++) {
 				stack = inventory.getStackInSlot(i);

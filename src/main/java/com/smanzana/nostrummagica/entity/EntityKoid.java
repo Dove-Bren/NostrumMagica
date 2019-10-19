@@ -66,8 +66,6 @@ public class EntityKoid extends EntityMob implements ILoreTagged {
         this.tasks.addTask(5, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
         this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, false, new Class[0]));
         this.targetTasks.addTask(2, new EntityAINearestAttackableTarget<EntityPlayer>(this, EntityPlayer.class, true));
-        this.targetTasks.addTask(3, new EntityAINearestAttackableTarget<EntityKoid>(this, EntityKoid.class, true));
-        this.targetTasks.addTask(2, new EntityAINearestAttackableTarget<EntityGolem>(this, EntityGolem.class, true));
     }
     
     protected void applyEntityAttributes()

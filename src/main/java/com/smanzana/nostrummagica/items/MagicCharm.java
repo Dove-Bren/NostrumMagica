@@ -126,43 +126,48 @@ public class MagicCharm extends Item implements ILoreTagged {
 	
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World worldIn, EntityPlayer playerIn, EnumHand hand) {
-		if (playerIn.isSneaking())
+		if (playerIn.isSneaking()) {
 			return new ActionResult<ItemStack>(EnumActionResult.PASS, stack);
+		}
 		
 		if (worldIn.isRemote)
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
 		
 		EMagicElement element = MagicCharm.getTypeFromMeta(stack.getMetadata());
+		boolean used = false;
+		
 		switch (element) {
 		case EARTH:
-			doEarth(playerIn, worldIn);
+			used = doEarth(playerIn, worldIn);
 			break;
 		case ENDER:
-			doEnder(playerIn, worldIn);
+			used = doEnder(playerIn, worldIn);
 			break;
 		case FIRE:
-			doFire(playerIn, worldIn);
+			used = doFire(playerIn, worldIn);
 			break;
 		case ICE:
-			doIce(playerIn, worldIn);
+			used = doIce(playerIn, worldIn);
 			break;
 		case LIGHTNING:
-			doLightning(playerIn, worldIn);
+			used = doLightning(playerIn, worldIn);
 			break;
 		case PHYSICAL:
-			doPhysical(playerIn, worldIn);
+			used = doPhysical(playerIn, worldIn);
 			break;
 		case WIND:
-			doWind(playerIn, worldIn);
+			used = doWind(playerIn, worldIn);
 			break;
 		}
 		
-
-		stack.stackSize--;
+		if (used) {
+			stack.stackSize--;			
+		}
+		
 		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
 	}
 	
-	private void doEarth(EntityPlayer player, World world) {
+	private boolean doEarth(EntityPlayer player, World world) {
 		
 		for (int x = -4; x <= 4; x++)
 		for (int y = 0; y < 5; y++)
@@ -193,9 +198,10 @@ public class MagicCharm extends Item implements ILoreTagged {
 		}
 		
 		NostrumMagicaSounds.DAMAGE_EARTH.play(world, player.posX, player.posY, player.posZ);
+		return true;
 	}
 	
-	private void doFire(EntityPlayer player, World world) {
+	private boolean doFire(EntityPlayer player, World world) {
 		
 		for (int x = -5; x <= 5; x++)
 		for (int z = -5; z <= 5; z++)
@@ -230,16 +236,18 @@ public class MagicCharm extends Item implements ILoreTagged {
 		}
 		
 		NostrumMagicaSounds.DAMAGE_FIRE.play(world, player.posX, player.posY, player.posZ);
+		return true;
 	}
 	
-	private void doIce(EntityPlayer player, World world) {
+	private boolean doIce(EntityPlayer player, World world) {
 		player.addPotionEffect(new PotionEffect(MagicShieldPotion.instance(), 20 * 60 * 2, 0));
 		player.addPotionEffect(new PotionEffect(PhysicalShieldPotion.instance(), 20 * 60 * 2, 0));
 		
 		NostrumMagicaSounds.DAMAGE_ICE.play(world, player.posX, player.posY, player.posZ);
+		return true;
 	}
 	
-	private void doWind(EntityPlayer player, World world) {
+	private boolean doWind(EntityPlayer player, World world) {
 		AxisAlignedBB bb = new AxisAlignedBB(
 				player.posX - 3,
 				player.posY - 1,
@@ -257,23 +265,29 @@ public class MagicCharm extends Item implements ILoreTagged {
 			}
 		
 		NostrumMagicaSounds.DAMAGE_WIND.play(world, player.posX, player.posY, player.posZ);
+		return true;
 	}
 	
-	private void doEnder(EntityPlayer player, World world) {
-		BlockPos pos = player.getBedLocation(player.dimension);
-		if (pos == null) {
-			pos = world.getSpawnPoint();
-			while (!world.isAirBlock(pos)) {
-				pos = pos.add(0, 2, 0);
+	private boolean doEnder(EntityPlayer player, World world) { 
+		if (player.dimension == 0) {
+			BlockPos pos = player.getBedLocation(player.dimension);
+			if (pos == null) {
+				pos = world.getSpawnPoint();
+				while (!world.isAirBlock(pos)) {
+					pos = pos.add(0, 2, 0);
+				}
 			}
+			
+			player.setPositionAndUpdate(pos.getX(), pos.getY(), pos.getZ());
+			
+			NostrumMagicaSounds.DAMAGE_ENDER.play(world, player.posX, player.posY, player.posZ);
+			return true;
 		}
 		
-		player.setPositionAndUpdate(pos.getX(), pos.getY(), pos.getZ());
-		
-		NostrumMagicaSounds.DAMAGE_ENDER.play(world, player.posX, player.posY, player.posZ);
+		return false;
 	}
 	
-	private void doPhysical(EntityPlayer player, World world) {
+	private boolean doPhysical(EntityPlayer player, World world) {
 		player.addPotionEffect(new PotionEffect(
 				Potion.getPotionFromResourceLocation("speed"),
 				20 * 30,
@@ -281,9 +295,11 @@ public class MagicCharm extends Item implements ILoreTagged {
 				));
 		
 		NostrumMagicaSounds.DAMAGE_PHYSICAL.play(world, player.posX, player.posY, player.posZ);
+		
+		return true;
 	}
 	
-	private void doLightning(EntityPlayer player, World world) {
+	private boolean doLightning(EntityPlayer player, World world) {
 		if (world.isRaining()) {
 			AxisAlignedBB bb = new AxisAlignedBB(
 					player.posX - 5,
@@ -303,6 +319,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 		}
 		
 		NostrumMagicaSounds.DAMAGE_LIGHTNING.play(world, player.posX, player.posY, player.posZ);
+		return true;
 	}
 	
 	public static int getMetaFromType(EMagicElement element) {

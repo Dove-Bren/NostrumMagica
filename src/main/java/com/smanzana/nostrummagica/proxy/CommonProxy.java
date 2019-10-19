@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.proxy;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.AltarBlock;
@@ -274,7 +275,10 @@ public class CommonProxy {
     	EntityRegistry.addSpawn(EntityKoid.class, 20, 1, 1, EnumCreatureType.MONSTER, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.SPOOKY));
     	EntityRegistry.addSpawn(EntitySprite.class, 15, 1, 3, EnumCreatureType.MONSTER,
-    			ForgeRegistries.BIOMES.getValues().toArray(new Biome[0]));
+    			ForgeRegistries.BIOMES.getValues().stream().filter( (biome) -> {
+    				return !BiomeDictionary.isBiomeOfType(biome, BiomeDictionary.Type.END)
+    						&& BiomeDictionary.isBiomeOfType(biome, BiomeDictionary.Type.NETHER);
+    			}).collect(Collectors.toList()).toArray(new Biome[0]));
 
     	registerItems();
     	registerBlocks();
