@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
@@ -169,11 +170,14 @@ public class NostrumEmptyDimension {
 
 	}
 	
-	public static class DimensionTeleporter extends Teleporter {
+	public static class DimensionEntryTeleporter extends Teleporter {
 		
-		private WorldServer world; 
+		private WorldServer world;
+		private static final int SPAWN_X = 0;
+		private static final int SPAWN_Y = 128;
+		private static final int SPAWN_Z = 0;
 		
-		public DimensionTeleporter(WorldServer worldIn) {
+		public DimensionEntryTeleporter(WorldServer worldIn) {
 			super(worldIn);
 			
 			this.world = worldIn;
@@ -181,7 +185,78 @@ public class NostrumEmptyDimension {
 		
 		@Override
 		public boolean placeInExistingPortal(Entity entityIn, float yaw) {
-			return false;
+			if (!portalExists()) {
+				this.makePortal(entityIn);
+			}
+			
+			int y = SPAWN_Y;
+			int x = SPAWN_X;
+			int z = SPAWN_Z;
+			
+			entityIn.setPositionAndUpdate(x, y, z);
+			entityIn.motionX = entityIn.motionY = entityIn.motionZ = 0;
+			return true;
+		}
+		
+		@Override
+		public void placeInPortal(Entity entityIn, float yaw) {
+			super.placeInPortal(entityIn, yaw);
+		}
+		
+		public boolean portalExists() {
+			BlockPos pos = new BlockPos(SPAWN_X, SPAWN_Y, SPAWN_Z);
+			return !world.isAirBlock(pos);
+		}
+		
+		@Override
+		public boolean makePortal(Entity entityIn) {
+			int y = SPAWN_Y;
+			int x = SPAWN_X;
+			int z = SPAWN_Z;
+			
+			MutableBlockPos pos = new MutableBlockPos(new BlockPos(x, y-1, z));
+			
+			for (int i = -5; i <= 5; i++) {
+				for (int j = -5; j <= 5; j++) {
+					pos.setPos(x + i, y, z + j);
+					world.setBlockState(pos, Blocks.GOLD_BLOCK.getDefaultState());
+				}
+			}
+			
+			return true;
+		}
+		
+		@Override
+		public void removeStalePortalLocations(long worldTime) {
+			; // We only have one and we don't remove it
+		}
+	}
+	
+	public static class DimensionReturnTeleporter extends Teleporter {
+		
+		private WorldServer world; 
+		
+		public DimensionReturnTeleporter(WorldServer worldIn) {
+			super(worldIn);
+			
+			this.world = worldIn;
+		}
+		
+		@Override
+		public boolean placeInExistingPortal(Entity entityIn, float yaw) {
+			BlockPos pos = null;
+			if (entityIn instanceof EntityPlayer) {
+				EntityPlayer player = (EntityPlayer) entityIn;
+				pos = player.getBedLocation(0);
+			}
+			
+			if (pos == null) {
+				pos = world.getSpawnPoint();
+			}
+			
+			entityIn.setPositionAndUpdate(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
+			
+			return true;
 		}
 		
 		@Override
@@ -191,26 +266,12 @@ public class NostrumEmptyDimension {
 		
 		@Override
 		public boolean makePortal(Entity entityIn) {
-			int y = (int) entityIn.posY - 3;
-			int x = (int) entityIn.posX;
-			int z = (int) entityIn.posZ;
-			MutableBlockPos pos = new MutableBlockPos(new BlockPos(entityIn.posX, y, entityIn.posZ));
-			
-			for (int i = -5; i <= 5; i++) {
-				for (int j = -5; j <= 5; j++) {
-					pos.setPos(x + i, y, z + j);
-					world.setBlockState(pos, Blocks.GOLD_BLOCK.getDefaultState());
-				}
-			}
-			
-			entityIn.motionX = entityIn.motionY = entityIn.motionZ = 0;
-			
 			return true;
 		}
 		
 		@Override
 		public void removeStalePortalLocations(long worldTime) {
-			super.removeStalePortalLocations(worldTime);
+			;
 		}
 	}
 	
@@ -233,30 +294,21 @@ public class NostrumEmptyDimension {
 					EntityPlayerMP player = (EntityPlayerMP) ent;
 					MinecraftServer server = player.getServer();
 					server.getPlayerList().transferPlayerToDimension(
-							player, dim, new DimensionTeleporter(server.worldServerForDimension(dim)));
+							player, dim, new DimensionEntryTeleporter(server.worldServerForDimension(dim)));
+				}
+			} else if (event.getEntity().dimension == dim && event.getDimension() == 0) {
+				// Leaving our dimension to homeworld
+				event.setCanceled(true);
+				
+				Entity ent = event.getEntity();
+				if (ent instanceof EntityPlayerMP) {
+					EntityPlayerMP player = (EntityPlayerMP) ent;
+					MinecraftServer server = player.getServer();
+					server.getPlayerList().transferPlayerToDimension(
+							player, event.getDimension(), new DimensionReturnTeleporter(server.worldServerForDimension(event.getDimension())));
 				}
 			}
 		}
 	}
-	
-	
-	
-//	public static class EmptyDimensionWorldType extends WorldType {
-//
-//		public EmptyDimensionWorldType() {
-//			super(EMPTY_WORLD_NAME);
-//		}
-//		
-//		@SideOnly(Side.CLIENT)
-//		public boolean getCanBeCreated() {
-//			return true; // TODO remove! Testing, only!
-//		}
-//		
-//		@Override
-//		public BiomeProvider getBiomeProvider() {
-//			
-//		}
-//		
-//	}
 	
 }

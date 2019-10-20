@@ -38,6 +38,8 @@ public class CommandSetDimension extends CommandBase {
 				} else {
 					sender.addChatMessage(new TextComponentString("That dimension doesn't seem to exist!"));
 				}
+			} else {
+				sender.addChatMessage(new TextComponentString("You must be in creative to execute this command!"));
 			}
 		}
 	}
