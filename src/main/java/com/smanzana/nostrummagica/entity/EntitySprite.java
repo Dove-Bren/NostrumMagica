@@ -196,9 +196,20 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
     	if (this.isAngry()) {
     		entity.addPotionEffect(new PotionEffect(RootedPotion.instance(), 20 * 10));
 		} else {
+			final int finalDur = 20*10;
+			int dur = 20 * 1;
+			if (entity == this.getAttackTarget()) {
+				dur = finalDur;
+			}
+			
 			entity.addPotionEffect(
-				new PotionEffect(Potion.getPotionFromResourceLocation("levitation"), 20 * 10)
-				);							
+				new PotionEffect(Potion.getPotionFromResourceLocation("levitation"), dur)
+				);
+			if (entity instanceof EntityPlayer) {
+				this.addPotionEffect(
+						new PotionEffect(Potion.getPotionFromResourceLocation("glowing"), finalDur)
+					);
+			}
 		}
     }
 
