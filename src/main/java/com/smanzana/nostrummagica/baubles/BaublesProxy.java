@@ -278,6 +278,16 @@ public class BaublesProxy {
 				new RRequirementQuest("rings_corrupted"),
 				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.RING_SILVER_CORRUPTED, 1)));
 		RitualRegistry.instance().addRitual(recipe);
+		
+		recipe = RitualRecipe.createTier3("float_guard",
+				ItemMagicBauble.getItem(ItemType.TRINKET_FLOAT_GUARD, 1),
+				EMagicElement.WIND,
+				new ReagentType[] {ReagentType.SKY_ASH, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.SKY_ASH},
+				new ItemStack(Items.GOLD_INGOT),
+				new ItemStack[] {NostrumResourceItem.getItem(ResourceType.SPRITE_CORE, 1), NostrumResourceItem.getItem(ResourceType.SPRITE_CORE, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), NostrumResourceItem.getItem(ResourceType.SPRITE_CORE, 1)},
+				new RRequirementQuest("ribbons"),
+				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.TRINKET_FLOAT_GUARD, 1)));
+		RitualRegistry.instance().addRitual(recipe);
 	}
 	
 	private void registerLore() {

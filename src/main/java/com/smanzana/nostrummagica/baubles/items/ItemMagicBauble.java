@@ -21,6 +21,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.Potion;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -43,7 +44,8 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 		RING_GOLD_CORRUPTED("ring_gold_corrupted"),
 		RING_SILVER("ring_silver"),
 		RING_SILVER_TRUE("ring_silver_true"),
-		RING_SILVER_CORRUPTED("ring_silver_corrupted");
+		RING_SILVER_CORRUPTED("ring_silver_corrupted"),
+		TRINKET_FLOAT_GUARD("float_guard");
 		
 		private String key;
 		
@@ -198,6 +200,9 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 		case RING_SILVER_TRUE:
 			btype = BaubleType.RING;
 			break;
+		case TRINKET_FLOAT_GUARD:
+			btype = BaubleType.TRINKET;
+			break;
 		}
 		
 		return btype;
@@ -254,6 +259,9 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 			break;
 		case RING_SILVER_TRUE:
 			attr.addManaCostModifer(-0.05f);
+			break;
+		case TRINKET_FLOAT_GUARD:
+			; // Checked upon floating
 			break;
 		}
 		
@@ -314,6 +322,9 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 		case RING_SILVER_TRUE:
 			attr.addManaCostModifer(0.05f);
 			break;
+		case TRINKET_FLOAT_GUARD:
+			; // Checked upon floating
+			break;
 		}
 	}
 
@@ -348,6 +359,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 		case RIBBON_SMALL:
 		case RING_SILVER:
 		case RING_SILVER_TRUE:
+		case TRINKET_FLOAT_GUARD:
 			; // Nothing to do
 			break;
 		case RING_GOLD:
@@ -363,6 +375,38 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 		case RING_SILVER_CORRUPTED:
 			summary.addEfficiency(.10f);
 			break;
+		}
+	}
+	
+	@Override
+	@Optional.Method(modid="Baubles")
+	public void onWornTick(ItemStack stack, EntityLivingBase player) {
+		if (stack == null) {
+			return;
+		}
+		
+		if (!(stack.getItem() instanceof ItemMagicBauble)) {
+			return;
+		}
+		
+		ItemType type = getTypeFromMeta(stack.getMetadata());
+		switch (type) {
+		case BELT_ENDER:
+		case BELT_LIGHTNING:
+		case RIBBON_FIERCE:
+		case RIBBON_KIND:
+		case RIBBON_LARGE:
+		case RIBBON_MEDIUM:
+		case RIBBON_SMALL:
+		case RING_SILVER:
+		case RING_SILVER_TRUE:
+		case RING_GOLD:
+		case RING_GOLD_CORRUPTED:
+		case RING_GOLD_TRUE:
+		case RING_SILVER_CORRUPTED:
+			break;
+		case TRINKET_FLOAT_GUARD:
+			player.removePotionEffect(Potion.getPotionFromResourceLocation("levitation"));
 		}
 	}
 

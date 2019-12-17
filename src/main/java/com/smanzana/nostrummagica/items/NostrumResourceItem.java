@@ -35,7 +35,8 @@ public class NostrumResourceItem extends Item implements ILoreTagged {
 		PENDANT_RIGHT("pendant_right"),
 		SLAB_FIERCE("slab_fierce"),
 		SLAB_KIND("slab_kind"),
-		SLAB_BALANCED("slab_balanced");
+		SLAB_BALANCED("slab_balanced"),
+		SPRITE_CORE("sprite_core");
 		
 		private String key;
 		

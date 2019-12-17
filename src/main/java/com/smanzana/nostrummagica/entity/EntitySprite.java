@@ -8,6 +8,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowEntityGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
+import com.smanzana.nostrummagica.items.NostrumResourceItem;
+import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.potions.RootedPotion;
@@ -330,12 +332,21 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
     }
     
 	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-//		int count = this.rand.nextInt(2);
-//		count += lootingModifier;
-//		
-//		this.entityDropItem(EssenceItem.getEssence(
-//				this.getElement(),
-//				count), 0);
+		int chances = this.rand.nextInt(4);
+		int count = 0;
+		chances += lootingModifier;
+		
+		while (chances > 0) {
+			int eff = Math.min(chances, 4);
+			if (this.rand.nextInt(8) < eff) {
+				count++;
+			}
+			chances -= 4;
+		}
+		
+		for (int i = 0; i < count; i++) {
+			this.entityDropItem(NostrumResourceItem.getItem(ResourceType.SPRITE_CORE, 1), 0);
+		}
 	}
 
 	@Override
