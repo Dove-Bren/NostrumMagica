@@ -175,12 +175,8 @@ public class NostrumDimensionMapper extends WorldSavedData {
 	
 	public NostrumDimensionOffset register(UUID id) {
 		
-		// TODO
-		System.out.println("Register with UUID: " + id);
-		
 		NostrumDimensionOffset existing = this.getOffset(id);
 		if (existing != null) {
-			System.out.println("Existing Offset: " + existing.offsetX + ", " + existing.offsetZ);
 			return existing;
 		}
 		
@@ -192,8 +188,6 @@ public class NostrumDimensionMapper extends WorldSavedData {
 		map.put(id, existing);
 		this.markDirty();
 		
-		System.out.println("New Offset: " + existing.offsetX + ", " + existing.offsetZ);
-		
 		return existing;
 	}
 	
@@ -201,12 +195,6 @@ public class NostrumDimensionMapper extends WorldSavedData {
 		map.clear();
 	}
 
-//	@SideOnly(Side.CLIENT)
-//	public void override(EntityPlayer thePlayer, int dimension) {
-//		//this.unregisterAll();
-//		this.registerInternal(thePlayer.getUniqueID(), dimension);
-//	}
-	
 	@Nullable
 	public NostrumDimensionOffset getOffset(UUID id) {
 		return map.get(id);

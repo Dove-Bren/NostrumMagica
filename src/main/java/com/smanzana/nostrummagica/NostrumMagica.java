@@ -1487,16 +1487,6 @@ public class NostrumMagica
 		}
     }
     
-//    private void initDimensionMapper(World world) {
-//    	dimensionMapper = (NostrumDimensionMapper) world.getMapStorage().getOrLoadData(
-//    			NostrumDimensionMapper.class, NostrumDimensionMapper.DATA_NAME);
-//		
-//		if (dimensionMapper == null) { // still
-//			dimensionMapper = new NostrumDimensionMapper();
-//			world.getMapStorage().setData(NostrumDimensionMapper.DATA_NAME, dimensionMapper);
-//		}
-//    }
-    
     @SubscribeEvent
     public void onWorldLoad(WorldEvent.Load event) {
     	// Keeping a static reference since some places want to access the registry that don't have world info.
@@ -1518,21 +1508,8 @@ public class NostrumMagica
     		// Do the correct initialization for persisted data
 			initSpellRegistry(event.getWorld());
 			getDimensionMapper(event.getWorld());
-			//initDimensionMapper(event.getWorld());
 		}
     }
-    
-//    @SubscribeEvent
-//    public void onClientConnect(ClientConnectedToServerEvent event) {
-//    	// We may be in a dimension we don't know about yet. Fake the dimensions locally until
-//    	// they are synced from the server
-//    	if (dimensionMapper == null) {
-//			dimensionMapper = new NostrumDimensionMapper();
-//		}
-//    	// TODO else clear? I guess no need, huh? We'll have stale map info?
-//    	
-//    	//dimensionMapper.prime();
-//    }
     
     @EventHandler
     public void onServerShutdown(FMLServerStoppedEvent event) {
