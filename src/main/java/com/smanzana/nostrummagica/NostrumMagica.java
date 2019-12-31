@@ -103,12 +103,12 @@ import com.smanzana.nostrummagica.trials.TrialWind;
 import com.smanzana.nostrummagica.world.NostrumChunkLoader;
 import com.smanzana.nostrummagica.world.NostrumLootHandler;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensionMapper;
+import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -116,6 +116,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -1447,24 +1448,16 @@ public class NostrumMagica
     	return spellRegistry;
     }
     
-    public static int getOrCreatePlayerDimension(EntityPlayer player) {
+    /**
+     * Finds (or creates) the offset for a player in the sorcery dimension
+     * @param player
+     * @return
+     */
+    public static BlockPos getOrCreatePlayerDimensionSpawn(EntityPlayer player) {
     	NostrumDimensionMapper mapper = getDimensionMapper(player.worldObj);
-    	int dim;
     	
     	// Either register or fetch existing mapping
-    	Integer existing = mapper.lookup(player.getUniqueID());
-    	if (existing == null) {
-    		dim = mapper.register(player.getUniqueID());
-    		
-    		// Also sync the player to register the new mapping
-    		if (player instanceof EntityPlayerMP) {
-    			NostrumMagica.proxy.syncPlayer((EntityPlayerMP) player);
-    		}
-    	} else {
-    		dim = existing;
-    	}
-    	
-    	return dim;
+    	return mapper.register(player.getUniqueID()).getCenterPos(NostrumEmptyDimension.SPAWN_Y);
     }
     
     public static NostrumDimensionMapper getDimensionMapper(World worldAccess) {
@@ -1480,9 +1473,7 @@ public class NostrumMagica
 			worldAccess.getMapStorage().setData(NostrumDimensionMapper.DATA_NAME, mapper);
 		}
 		
-		if (serverDimensionMapper == null) {
-			serverDimensionMapper = mapper;
-		}
+		serverDimensionMapper = mapper;
 		return mapper;
     }
     
@@ -1526,6 +1517,7 @@ public class NostrumMagica
     	} else {
     		// Do the correct initialization for persisted data
 			initSpellRegistry(event.getWorld());
+			getDimensionMapper(event.getWorld());
 			//initDimensionMapper(event.getWorld());
 		}
     }
@@ -1549,6 +1541,7 @@ public class NostrumMagica
     	// For integrated, this prevents previous world's dimensions from bleeding over
     	if (serverDimensionMapper != null) {
     		// Ran with client
+    		// TODO needed? Shouldn't another load clean it up?
     		serverDimensionMapper.unregisterAll();
     		serverDimensionMapper = null;
     	}

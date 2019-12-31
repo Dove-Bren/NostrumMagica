@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.world.dimension;
 
 import java.util.List;
 
+import com.smanzana.nostrummagica.NostrumMagica;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
@@ -34,9 +36,7 @@ public class NostrumEmptyDimension {
 	private static final String DIMENSION_SUFFIX = "_" + DIMENSION_NAME;
 	private static DimensionType DIMENSION_TYPE;
 	
-	public static final int SPAWN_X = 0;
 	public static final int SPAWN_Y = 128;
-	public static final int SPAWN_Z = 0;
 	
 	public static boolean register(int dim, String identifier) {
 		if (DimensionManager.isDimensionRegistered(dim)) {
@@ -210,15 +210,17 @@ public class NostrumEmptyDimension {
 		
 		@Override
 		public boolean placeInExistingPortal(Entity entityIn, float yaw) {
-			if (!portalExists()) {
+			if (!(entityIn instanceof EntityPlayer)) {
+				return false;
+			}
+			
+			if (!portalExists((EntityPlayer) entityIn)) {
 				this.makePortal(entityIn);
 			}
 			
-			int y = SPAWN_Y;
-			int x = SPAWN_X;
-			int z = SPAWN_Z;
+			BlockPos spawn = NostrumMagica.getOrCreatePlayerDimensionSpawn((EntityPlayer) entityIn);
 			
-			entityIn.setPositionAndUpdate(x, y+1, z);
+			entityIn.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 1, spawn.getZ() + .5);
 			entityIn.motionX = entityIn.motionY = entityIn.motionZ = 0;
 			return true;
 		}
@@ -228,22 +230,24 @@ public class NostrumEmptyDimension {
 			super.placeInPortal(entityIn, yaw);
 		}
 		
-		public boolean portalExists() {
-			BlockPos pos = new BlockPos(SPAWN_X, SPAWN_Y, SPAWN_Z);
-			return !world.isAirBlock(pos);
+		public boolean portalExists(EntityPlayer player) {
+			BlockPos spawn = NostrumMagica.getOrCreatePlayerDimensionSpawn(player);
+			return !world.isAirBlock(spawn);
 		}
 		
 		@Override
 		public boolean makePortal(Entity entityIn) {
-			int y = SPAWN_Y;
-			int x = SPAWN_X;
-			int z = SPAWN_Z;
+			if (!(entityIn instanceof EntityPlayer)) {
+				return false;
+			}
 			
-			MutableBlockPos pos = new MutableBlockPos(new BlockPos(x, y-1, z));
+			BlockPos spawn = NostrumMagica.getOrCreatePlayerDimensionSpawn((EntityPlayer) entityIn);
+			
+			MutableBlockPos pos = new MutableBlockPos(spawn);
 			
 			for (int i = -5; i <= 5; i++) {
 				for (int j = -5; j <= 5; j++) {
-					pos.setPos(x + i, y, z + j);
+					pos.setPos(spawn.getX() + i, spawn.getY(), spawn.getZ() + j);
 					world.setBlockState(pos, Blocks.GOLD_BLOCK.getDefaultState());
 				}
 			}
@@ -253,7 +257,7 @@ public class NostrumEmptyDimension {
 		
 		@Override
 		public void removeStalePortalLocations(long worldTime) {
-			; // We only have one and we don't remove it
+			; // 
 		}
 	}
 	

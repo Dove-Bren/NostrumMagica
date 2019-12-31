@@ -40,8 +40,7 @@ public class ModConfig {
 		
 		OBELISK_REQ_MAGIC(Category.SERVER, "obelisk_req_magic", true, true, "Magic must be unlocked before obelisks can be used or teleported to."),
 		NOSTRUM_WORLDS(Category.SERVER, "nostrum_worlds", new int[]{0}, true, "Which worlds to generate Nostrum dungeons in"),
-		NOSTRUM_DIMENSION_ID(Category.SERVER, "nostrum_dimension_start_id", 244, true, "Starting Dimension ID for nostrum's sorcery dimensions"),
-		NOSTRUM_DIMENSION_LEN(Category.SERVER, "nostrum_dimension_count", 100, true, "Maximum number of player sorcery dimensions that can exist"),
+		NOSTRUM_DIMENSION_ID(Category.SERVER, "nostrum_dimension_id", 244, true, "Dimension ID for Nostrum's Sorcery dimension. Change if other mods want to use the same id."),
 		;
 		
 		
@@ -450,11 +449,7 @@ public class ModConfig {
 		return getBooleanValue(Key.ARMOR_DISPLAY, false);
 	}
 	
-	public int dimensionStartIndex() {
+	public int sorceryDimensionIndex() {
 		return getIntValue(Key.NOSTRUM_DIMENSION_ID, true);
-	}
-	
-	public int dimensionCount() {
-		return getIntValue(Key.NOSTRUM_DIMENSION_LEN, true);
 	}
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.potions.MagicShieldPotion;
@@ -132,8 +133,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 		
 		if (playerIn.isSneaking()) {
 			// return new ActionResult<ItemStack>(EnumActionResult.PASS, stack); TODO
-			int dim = NostrumMagica.getOrCreatePlayerDimension(playerIn);
-			playerIn.changeDimension(dim);
+			playerIn.changeDimension(ModConfig.config.sorceryDimensionIndex());
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
 		}
 		
@@ -286,17 +286,15 @@ public class MagicCharm extends Item implements ILoreTagged {
 			
 			NostrumMagicaSounds.DAMAGE_ENDER.play(world, player.posX, player.posY, player.posZ);
 			return true;
-		} else if (NostrumMagica.getDimensionMapper(world).lookup(player.getUniqueID()) != null) {
-			int dimension = NostrumMagica.getDimensionMapper(world).lookup(player.getUniqueID());
-			if (player.dimension == dimension) {
-				// In  sorcery dimension. Return to beginning
-				player.setPositionAndUpdate(NostrumEmptyDimension.SPAWN_X + .5, NostrumEmptyDimension.SPAWN_Y + 1, NostrumEmptyDimension.SPAWN_Z + .5);
-				// Allow this type of teleportation by updating last coords...
-				player.lastTickPosX = player.posX;
-				player.lastTickPosY = player.posY;
-				player.lastTickPosZ = player.posZ;
-				return true;
-			}
+		} else if (player.dimension == ModConfig.config.sorceryDimensionIndex()) {
+			// In  sorcery dimension. Return to beginning
+			BlockPos spawn = NostrumMagica.getDimensionMapper(player.worldObj).register(player.getUniqueID()).getCenterPos(NostrumEmptyDimension.SPAWN_Y);
+			player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 1, spawn.getZ() + .5);
+			// Allow this type of teleportation by updating last coords...
+			player.lastTickPosX = player.posX;
+			player.lastTickPosY = player.posY;
+			player.lastTickPosZ = player.posZ;
+			return true;
 		}
 		
 		return false;
