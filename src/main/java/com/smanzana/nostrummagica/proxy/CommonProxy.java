@@ -422,6 +422,7 @@ public class CommonProxy {
     	
     	SpellTomePage.instance().setRegistryName(NostrumMagica.MODID, SpellTomePage.id);
     	GameRegistry.register(SpellTomePage.instance());
+    	SpellTomePage.init();
     	
     	EssenceItem.instance().setRegistryName(NostrumMagica.MODID, EssenceItem.ID);
     	GameRegistry.register(EssenceItem.instance());
