@@ -5,6 +5,7 @@ import com.smanzana.nostrummagica.network.messages.ClientCastReplyMessage;
 import com.smanzana.nostrummagica.network.messages.ClientEffectRenderMessage;
 import com.smanzana.nostrummagica.network.messages.ClientSkillUpMessage;
 import com.smanzana.nostrummagica.network.messages.ClientUpdateQuestMessage;
+import com.smanzana.nostrummagica.network.messages.DimensionSyncMessage;
 import com.smanzana.nostrummagica.network.messages.LoreMessage;
 import com.smanzana.nostrummagica.network.messages.ManaMessage;
 import com.smanzana.nostrummagica.network.messages.ModifyMessage;
@@ -74,6 +75,7 @@ public class NetworkHandler {
 		syncChannel.registerMessage(TamedDragonGUIControlMessage.Handler.class, TamedDragonGUIControlMessage.class, discriminator++, Side.SERVER);
 		syncChannel.registerMessage(TamedDragonGUIOpenMessage.Handler.class, TamedDragonGUIOpenMessage.class, discriminator++, Side.CLIENT);
 		syncChannel.registerMessage(TamedDragonGUISyncMessage.Handler.class, TamedDragonGUISyncMessage.class, discriminator++, Side.CLIENT);
+		syncChannel.registerMessage(DimensionSyncMessage.Handler.class, DimensionSyncMessage.class, discriminator++, Side.CLIENT);
 	}
 	
 }

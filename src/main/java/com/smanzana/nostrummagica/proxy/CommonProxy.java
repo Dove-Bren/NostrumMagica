@@ -574,6 +574,12 @@ public class CommonProxy {
     	NetworkHandler.getSyncChannel().sendTo(
     			new SpellRequestReplyMessage(NostrumMagica.getSpellRegistry().getAllSpells(), true),
     			player);
+    	
+//    	Integer dimension = NostrumMagica.getDimensionMapper(player.worldObj).lookup(player.getUniqueID());
+//	    NetworkHandler.getSyncChannel().sendTo(
+//    			new DimensionSyncMessage(dimension),
+//    			player
+//    			);
     }
 
 	public EntityPlayer getPlayer() {

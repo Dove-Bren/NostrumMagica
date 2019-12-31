@@ -826,7 +826,7 @@ public class PlayerListener {
 	
 	@SubscribeEvent
 	public void onConnect(PlayerLoggedInEvent event) {
-		if (!NostrumMagica.proxy.isServer()) {
+		if (event.player.worldObj.isRemote) {
 			return;
 		}
 		

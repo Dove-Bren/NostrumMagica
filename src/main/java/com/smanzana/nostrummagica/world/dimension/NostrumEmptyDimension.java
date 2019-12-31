@@ -30,18 +30,25 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class NostrumEmptyDimension {
 	
-	private static final String DIMENSION_NAME_BASE = "NostrumSorceryDim";
-	private static final String DIMENSION_SUFFIX = "_" + DIMENSION_NAME_BASE;
+	private static final String DIMENSION_NAME = "NostrumSorceryDim";
+	private static final String DIMENSION_SUFFIX = "_" + DIMENSION_NAME;
+	private static DimensionType DIMENSION_TYPE;
+	
+	public static final int SPAWN_X = 0;
+	public static final int SPAWN_Y = 128;
+	public static final int SPAWN_Z = 0;
 	
 	public static boolean register(int dim, String identifier) {
 		if (DimensionManager.isDimensionRegistered(dim)) {
 			return false;
 		}
 		
-		String name = identifier + DIMENSION_SUFFIX;
-		DimensionType type = DimensionType.register(name, "_" + name, dim, EmptyDimensionProvider.class, false);
-		DimensionManager.registerDimension(dim, type);
-		new DimensionListener(dim);
+		if (DIMENSION_TYPE == null) {
+			DIMENSION_TYPE = DimensionType.register(DIMENSION_NAME, DIMENSION_SUFFIX, dim, EmptyDimensionProvider.class, false);
+		}
+		
+		DimensionManager.registerDimension(dim, DIMENSION_TYPE);
+		new DimensionListener(dim); // TODO leaving these around will grow and grow listeners as saves are loaded...
 		return true;
 	}
 	
@@ -128,6 +135,27 @@ public class NostrumEmptyDimension {
 			return fogColor;
 		}
 		
+		@Override
+		public void onWorldUpdateEntities() {
+			// Make sure players aren't teleporting.
+			// TODO this even is fired before updating, sadly. That feels incorrect.
+			// Does it act weirdly?
+			for (EntityPlayer player : worldObj.playerEntities) {
+				if (player.isCreative() || player.isSpectator()) {
+					continue;
+				}
+				
+				double distSqr = Math.pow(player.posX - player.lastTickPosX, 2)
+						+ Math.pow(player.posZ - player.lastTickPosZ, 2)
+						+ Math.pow(player.posY - player.lastTickPosY, 2);
+				if (distSqr > 25) {
+					// Player appears to have teleported
+					player.setPositionAndUpdate(player.lastTickPosX, player.lastTickPosY, player.lastTickPosZ);
+					System.out.println("Teleport? " + distSqr); //TODO donotcheckin
+				}
+			}
+		}
+		
 	}
 	
 	public static class ChunkGeneratorEmpty implements IChunkGenerator {
@@ -173,9 +201,6 @@ public class NostrumEmptyDimension {
 	public static class DimensionEntryTeleporter extends Teleporter {
 		
 		private WorldServer world;
-		private static final int SPAWN_X = 0;
-		private static final int SPAWN_Y = 128;
-		private static final int SPAWN_Z = 0;
 		
 		public DimensionEntryTeleporter(WorldServer worldIn) {
 			super(worldIn);
@@ -193,7 +218,7 @@ public class NostrumEmptyDimension {
 			int x = SPAWN_X;
 			int z = SPAWN_Z;
 			
-			entityIn.setPositionAndUpdate(x, y, z);
+			entityIn.setPositionAndUpdate(x, y+1, z);
 			entityIn.motionX = entityIn.motionY = entityIn.motionZ = 0;
 			return true;
 		}

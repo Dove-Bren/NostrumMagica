@@ -14,11 +14,23 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.WorldSavedData;
 
 /**
- * Maps between players and their unique dimensions
+ * Maps between players and their unique dimensions.
+ * Note: Dimensions capped by some number in config.
  * @author Skyler
  *
  */
 public class NostrumDimensionMapper extends WorldSavedData {
+	
+	private static boolean registered = false;
+	
+	public static void registerDimensions() {
+		if (!registered) {
+			registered = true;
+			for (int i = 0; i < ModConfig.config.dimensionCount(); i++) {
+				NostrumEmptyDimension.register(ModConfig.config.dimensionStartIndex() + i, i + "");
+			}
+		}
+	}
 	
 	public static final String DATA_NAME = NostrumMagica.MODID + "_dimension_mappings";
 	
@@ -33,13 +45,7 @@ public class NostrumDimensionMapper extends WorldSavedData {
 		super(name);
 		
 		this.map = new HashMap<>();
-		highestDimension = ModConfig.config.dimensionIndex();
-	}
-	
-	public void registerDimensions() {
-		for (Entry<UUID, Integer> row : map.entrySet()) {
-			NostrumEmptyDimension.register(row.getValue(), row.getKey().toString());
-		}
+		highestDimension = ModConfig.config.dimensionStartIndex();
 	}
 
 	@Override
@@ -65,15 +71,18 @@ public class NostrumDimensionMapper extends WorldSavedData {
 			}
 		}
 		
-		this.registerDimensions();
+		System.out.println("After load, max is: " + highestDimension);//TODO
 	}
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+		int count = 0;
 		for (Entry<UUID, Integer> row : map.entrySet()) {
 			compound.setInteger(row.getKey().toString(), row.getValue());
+			count++;
 		}
 		
+		NostrumMagica.logger.info("Saved " + count + " dynamic dimensions");
 		return compound;
 	}
 	
@@ -83,19 +92,39 @@ public class NostrumDimensionMapper extends WorldSavedData {
 	}
 	
 	public int register(UUID id) {
-		int dimension;
 		Integer existing = this.lookup(id);
 		if (existing != null) {
-			dimension = existing;
-		} else {
-			dimension = ++highestDimension;
+			return existing;
 		}
 		
-		map.put(id, dimension);
-		NostrumEmptyDimension.register(dimension, id.toString());
+		int dimension = ++highestDimension;
+		while (!registerInternal(id, dimension)) {
+			System.out.println("*");//TODO
+			dimension = ++highestDimension;
+		}
 		this.markDirty();
 		
+		System.out.println("After register, max is: " + highestDimension);//TODO
 		return dimension;
 	}
+	
+	private boolean registerInternal(UUID id, int dimension) {
+//		if (!NostrumEmptyDimension.register(dimension, id.toString())) {
+//			return false;
+//		}
+		map.put(id, dimension);
+		return true;
+	}
+	
+	public void unregisterAll() {
+		map.clear();
+		highestDimension = ModConfig.config.dimensionStartIndex();
+		System.out.println("After unregister, max is: " + highestDimension);//TODO
+	}
 
+//	@SideOnly(Side.CLIENT)
+//	public void override(EntityPlayer thePlayer, int dimension) {
+//		//this.unregisterAll();
+//		this.registerInternal(thePlayer.getUniqueID(), dimension);
+//	}
 }

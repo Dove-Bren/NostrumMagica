@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.potions.MagicShieldPotion;
 import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -126,12 +127,15 @@ public class MagicCharm extends Item implements ILoreTagged {
 	
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World worldIn, EntityPlayer playerIn, EnumHand hand) {
-		if (playerIn.isSneaking()) {
-			return new ActionResult<ItemStack>(EnumActionResult.PASS, stack);
-		}
-		
 		if (worldIn.isRemote)
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+		
+		if (playerIn.isSneaking()) {
+			// return new ActionResult<ItemStack>(EnumActionResult.PASS, stack); TODO
+			int dim = NostrumMagica.getOrCreatePlayerDimension(playerIn);
+			playerIn.changeDimension(dim);
+			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+		}
 		
 		EMagicElement element = MagicCharm.getTypeFromMeta(stack.getMetadata());
 		boolean used = false;
@@ -282,6 +286,17 @@ public class MagicCharm extends Item implements ILoreTagged {
 			
 			NostrumMagicaSounds.DAMAGE_ENDER.play(world, player.posX, player.posY, player.posZ);
 			return true;
+		} else if (NostrumMagica.getDimensionMapper(world).lookup(player.getUniqueID()) != null) {
+			int dimension = NostrumMagica.getDimensionMapper(world).lookup(player.getUniqueID());
+			if (player.dimension == dimension) {
+				// In  sorcery dimension. Return to beginning
+				player.setPositionAndUpdate(NostrumEmptyDimension.SPAWN_X + .5, NostrumEmptyDimension.SPAWN_Y + 1, NostrumEmptyDimension.SPAWN_Z + .5);
+				// Allow this type of teleportation by updating last coords...
+				player.lastTickPosX = player.posX;
+				player.lastTickPosY = player.posY;
+				player.lastTickPosZ = player.posZ;
+				return true;
+			}
 		}
 		
 		return false;

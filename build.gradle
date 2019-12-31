@@ -112,6 +112,3 @@ runClient {
 	args '--username', 'testplayer'
 }
 
-runServer {
-	args 'nogui'
-}

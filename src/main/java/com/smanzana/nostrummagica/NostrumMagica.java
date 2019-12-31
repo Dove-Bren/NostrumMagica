@@ -108,6 +108,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -128,6 +129,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -154,13 +156,14 @@ public class NostrumMagica
     
     // Cached references that have sketchy access rules. See uses in this file.
     private static SpellRegistry spellRegistry;
-    private static NostrumDimensionMapper dimensionMapper;
+    private static NostrumDimensionMapper serverDimensionMapper;
     
     @EventHandler
     public void init(FMLInitializationEvent event) {
         proxy.init();
         baubles.init();
         new NostrumLootHandler();
+        NostrumDimensionMapper.registerDimensions();
     }
     
     @EventHandler
@@ -1445,20 +1448,42 @@ public class NostrumMagica
     }
     
     public static int getOrCreatePlayerDimension(EntityPlayer player) {
-    	NostrumDimensionMapper mapper = getDimensionMapper();
+    	NostrumDimensionMapper mapper = getDimensionMapper(player.worldObj);
+    	int dim;
     	
     	// Either register or fetch existing mapping
-    	int dim = mapper.register(player.getUniqueID());
+    	Integer existing = mapper.lookup(player.getUniqueID());
+    	if (existing == null) {
+    		dim = mapper.register(player.getUniqueID());
+    		
+    		// Also sync the player to register the new mapping
+    		if (player instanceof EntityPlayerMP) {
+    			NostrumMagica.proxy.syncPlayer((EntityPlayerMP) player);
+    		}
+    	} else {
+    		dim = existing;
+    	}
     	
     	return dim;
     }
     
-    public static NostrumDimensionMapper getDimensionMapper() {
-    	if (dimensionMapper == null) {
+    public static NostrumDimensionMapper getDimensionMapper(World worldAccess) {
+    	if (worldAccess.isRemote) {
     		throw new RuntimeException("Accessing dimension mapper before a world has been loaded!");
     	}
     	
-    	return dimensionMapper;
+    	NostrumDimensionMapper mapper = (NostrumDimensionMapper) worldAccess.getMapStorage().getOrLoadData(
+    			NostrumDimensionMapper.class, NostrumDimensionMapper.DATA_NAME);
+		
+		if (mapper == null) { // still
+			mapper = new NostrumDimensionMapper();
+			worldAccess.getMapStorage().setData(NostrumDimensionMapper.DATA_NAME, mapper);
+		}
+		
+		if (serverDimensionMapper == null) {
+			serverDimensionMapper = mapper;
+		}
+		return mapper;
     }
     
     private void initSpellRegistry(World world) {
@@ -1471,21 +1496,26 @@ public class NostrumMagica
 		}
     }
     
-    private void initDimensionMapper(World world) {
-    	dimensionMapper = (NostrumDimensionMapper) world.getMapStorage().getOrLoadData(
-    			NostrumDimensionMapper.class, NostrumDimensionMapper.DATA_NAME);
-		
-		if (dimensionMapper == null) { // still
-			dimensionMapper = new NostrumDimensionMapper();
-			world.getMapStorage().setData(NostrumDimensionMapper.DATA_NAME, dimensionMapper);
-		}
-    }
+//    private void initDimensionMapper(World world) {
+//    	dimensionMapper = (NostrumDimensionMapper) world.getMapStorage().getOrLoadData(
+//    			NostrumDimensionMapper.class, NostrumDimensionMapper.DATA_NAME);
+//		
+//		if (dimensionMapper == null) { // still
+//			dimensionMapper = new NostrumDimensionMapper();
+//			world.getMapStorage().setData(NostrumDimensionMapper.DATA_NAME, dimensionMapper);
+//		}
+//    }
     
     @SubscribeEvent
     public void onWorldLoad(WorldEvent.Load event) {
     	// Keeping a static reference since some places want to access the registry that don't have world info.
     	// But registry should be global anyways, so we're going to try and allow it.
     	// I'm not sure the 'right' way to use global save data like this.
+    	
+    	// Debug: Race condition where spells are created cause the world auto-gen's a dungeon.
+    	// Why isn't this being called first?
+    	System.out.println("Debug: WorldEvent load called");
+    	
     	if (event.getWorld().isRemote) {
     		// Clients just get a spell registry that's empty that is constantly synced with the server's
     		// Create one if this is our first world.
@@ -1493,13 +1523,34 @@ public class NostrumMagica
     		if (spellRegistry == null) {
     			spellRegistry = new SpellRegistry();
     		}
-    		if (dimensionMapper == null) {
-    			dimensionMapper = new NostrumDimensionMapper();
-    		}
     	} else {
     		// Do the correct initialization for persisted data
 			initSpellRegistry(event.getWorld());
-			initDimensionMapper(event.getWorld());
+			//initDimensionMapper(event.getWorld());
 		}
+    }
+    
+//    @SubscribeEvent
+//    public void onClientConnect(ClientConnectedToServerEvent event) {
+//    	// We may be in a dimension we don't know about yet. Fake the dimensions locally until
+//    	// they are synced from the server
+//    	if (dimensionMapper == null) {
+//			dimensionMapper = new NostrumDimensionMapper();
+//		}
+//    	// TODO else clear? I guess no need, huh? We'll have stale map info?
+//    	
+//    	//dimensionMapper.prime();
+//    }
+    
+    @EventHandler
+    public void onServerShutdown(FMLServerStoppedEvent event) {
+    	// Clean up dimension mapping info.
+    	// For standalones, this is sort-of meaningless.
+    	// For integrated, this prevents previous world's dimensions from bleeding over
+    	if (serverDimensionMapper != null) {
+    		// Ran with client
+    		serverDimensionMapper.unregisterAll();
+    		serverDimensionMapper = null;
+    	}
     }
 }
