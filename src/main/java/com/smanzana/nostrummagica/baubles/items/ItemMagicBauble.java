@@ -6,8 +6,6 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.items.ISpellArmor;
-import com.smanzana.nostrummagica.items.NostrumResourceItem;
-import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
@@ -18,13 +16,11 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.Optional;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -83,9 +79,9 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 	public static void init() {
 		instance().setUnlocalizedName(ID);
 		
-		GameRegistry.addRecipe(new ItemStack(instance), " W ", "WCW", " W ",
-				'W', Blocks.WOOL, 
-				'C', NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1));
+//		GameRegistry.addRecipe(new ItemStack(instance), " W ", "WCW", " W ",
+//				'W', Blocks.WOOL, 
+//				'C', NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1));
 	}
 	
 	private static ItemMagicBauble instance = null;

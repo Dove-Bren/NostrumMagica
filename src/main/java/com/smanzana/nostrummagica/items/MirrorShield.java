@@ -8,10 +8,14 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
 import com.smanzana.nostrummagica.listeners.PlayerListener.ISpellActionListener;
 import com.smanzana.nostrummagica.listeners.PlayerListener.SpellActionListenerData;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.loretag.Lore;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -29,7 +33,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class MirrorShield extends Item implements ISpellActionListener {
+public class MirrorShield extends Item implements ISpellActionListener, ILoreTagged {
 
 	private static MirrorShield instance = null;
 	
@@ -112,6 +116,31 @@ public class MirrorShield extends Item implements ISpellActionListener {
 		}
 		
 		return false;
+	}
+
+	@Override
+	public String getLoreKey() {
+		return "mirror_shield";
+	}
+
+	@Override
+	public String getLoreDisplayName() {
+		return I18n.format("lore." + getLoreKey() + ".name");
+	}
+
+	@Override
+	public Lore getBasicLore() {
+		return new Lore().add("A sturdy shield with a mirror magically created from glass and Vani Crystal dust affixed to the front.", "Passively reduces magic damage when in your offhand.", "Reflects some portion of a spell's effects back to the caster when blocking!");
+	}
+
+	@Override
+	public Lore getDeepLore() {
+		return new Lore().add("A sturdy shield with a mirror magically created from glass and Vani Crystal dust affixed to the front.", "Passively reduces magic damage by 10% when in your offhand.", "Reflects 20% of a spell's effects back to the caster when blocking!");
+	}
+
+	@Override
+	public InfoScreenTabs getTab() {
+		return InfoScreenTabs.INFO_ITEMS;
 	}
 
 }

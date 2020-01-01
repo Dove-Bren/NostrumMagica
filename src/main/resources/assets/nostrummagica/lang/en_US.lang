@@ -675,6 +675,8 @@ ritual.spell_binding.name=Ritual of Binding
 ritual.spell_binding.desc=Begins to bind a spell into a tome
 ritual.mastery_orb.name=Ritual of Mastery
 ritual.mastery_orb.desc=Form a Mastery Orb
+ritual.mirror_shield.name=Create Mirror Shield
+ritual.mirror_shield.desc=Create a Mirror Shield
 
 ritual.rune.physical.name=Physical Rune
 ritual.rune.fire.name=Fire Rune
@@ -901,6 +903,8 @@ quest.rings_corrupted.name=Corrupted Rings
 quest.rings_corrupted.desc=What would happen if you infused a Silver Ring with a fierce tablet, you wonder? Ultimately, you've discovered how to make corrupted rings. These rings primarly boost the original stat, but have been twisted...
 quest.belts.name=Magic Belts
 quest.belts.desc=Despite all your efforts, you don't seem to be able to infuse leather with magic reagents. You were able to attach a magical gem, however. You've devised two such belts: One aspected to Ender, and the other to Lightning.
+quest.mirror_shield.name=Mirror Shields
+quest.mirror_shield.desc=Finally, a practical application for magic! If you're an astute mage, you've noticed that armor doesn't resist magic damage, and magic resistance is hard to come by. To remedy this, you've decided to try to affix a sort of mirror to a shield in order to reduce and reflect magical damage!
 
 guide.title=Nostrum Magica Guide
 guide.page1=  Nostrum Magica is a magic mod that focuses on spell creation. The goal is to give you the ability to make the spells YOU want to have and use while providing a reasonable challenge and sense of progression. To do this, Nostrum Magica defines a spell system that revolves around spell components -- Triggers, Shapes, Elements, and Alterations. Spells then cost mana and physical reagents and do everything from healing to reducing attack to creating powerful gear!
@@ -973,3 +977,5 @@ modification.level.flip=Trigger When Above
 info.nostrumwelcome.text=Welcome to Nostrum Magica! Press [%s] to get started!
 
 nei.category.ritual.name=Nostrum Ritual
+
+lore.mirror_shield.name=Mirror Shields

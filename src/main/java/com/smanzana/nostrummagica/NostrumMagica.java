@@ -9,6 +9,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.smanzana.nostrummagica.baubles.BaublesProxy;
+import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble;
+import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble.ItemType;
 import com.smanzana.nostrummagica.capabilities.AttributeProvider;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.command.CommandAllQuests;
@@ -35,6 +37,7 @@ import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MagicCharm;
 import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.MirrorItem;
+import com.smanzana.nostrummagica.items.MirrorShield;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.NostrumRoseItem;
@@ -913,6 +916,19 @@ public class NostrumMagica
 				new OutcomeSpawnItem(NostrumSkillItem.getItem(SkillItemType.PENDANT, 1)))
 			);
 		
+		//Mirror Shield
+		ItemStack extra = (baubles.isEnabled() ? ItemMagicBauble.getItem(ItemType.RIBBON_SMALL, 1) : NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1));
+		
+		RitualRegistry.instance().addRitual(
+			RitualRecipe.createTier3("mirror_shield",
+				new ItemStack(MirrorShield.instance()), null,
+				new ReagentType[] {ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT, ReagentType.SPIDER_SILK, ReagentType.BLACK_PEARL},
+				new ItemStack(Items.SHIELD, 1),
+				new ItemStack[] {extra, NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), new ItemStack(Blocks.GLASS_PANE, 1, OreDictionary.WILDCARD_VALUE), extra},
+				new RRequirementQuest("mirror_shield"),
+				new OutcomeSpawnItem(new ItemStack(MirrorShield.instance())))
+			);
+		
 		
 //		RitualRegistry.instance().addRitual(
 //				RitualRecipe.createTier2("ritual.form_obelisk.name", EMagicElement.ENDER,
@@ -1286,13 +1302,14 @@ public class NostrumMagica
     			null, null,
     			wrapAttribute(AwardType.MANA, 0.0100f));
     	
-    	new NostrumQuest("belts", QuestType.CHALLENGE, 8,
-    			0, // Control
+    	new NostrumQuest("mirror_shield", QuestType.CHALLENGE, 8,
+    			1, // Control
     			0, // Technique
-    			0, // Finesse
+    			1, // Finesse
     			new String[] {"belts"}, // Potentially dependent on bauble quests :)
-    			null, null,
-    			new IReward[]{new AttributeReward(AwardType.REGEN, 0.025f)})
+    			null,
+    			null,
+    			new IReward[]{new AttributeReward(AwardType.MANA, 0.010f)})
     		.offset(3, 6);
     	
 //    	new NostrumQuest("con", QuestType.REGULAR, 0,

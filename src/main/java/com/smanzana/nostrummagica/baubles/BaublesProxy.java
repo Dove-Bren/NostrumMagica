@@ -302,5 +302,9 @@ public class BaublesProxy {
 		return BaubleInventoryHelper.getBaubleInventory(player);
 	}
 	
+	public boolean isEnabled() {
+		return this.enabled;
+	}
+	
 	
 }
