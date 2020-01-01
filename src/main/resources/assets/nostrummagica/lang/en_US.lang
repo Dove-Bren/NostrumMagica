@@ -166,6 +166,8 @@ item.info.thanos_staff.charged=Charged
 item.info.thanos.charges=%d Charges
 item.info.thanos.desc=Charged up with XP. Provides reagent-free casts.
 
+item.mirror_shield.name=Mirror Shield
+
 item.charm.physical.name=Charm of Haste
 item.charm.fire.name=Charm of the Volcano
 item.charm.ice.name=Charm of Protection

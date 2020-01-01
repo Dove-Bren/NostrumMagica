@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
-import com.smanzana.nostrummagica.listeners.PlayerListener.IMagicListener;
+import com.smanzana.nostrummagica.listeners.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
@@ -22,7 +22,7 @@ import net.minecraft.world.World;
 
 public class DelayTrigger extends SpellTrigger {
 	
-	public class DelayTriggerInstance extends SpellTrigger.SpellTriggerInstance implements IMagicListener {
+	public class DelayTriggerInstance extends SpellTrigger.SpellTriggerInstance implements IGenericListener {
 
 		private int delayTicks;
 		
@@ -39,7 +39,7 @@ public class DelayTrigger extends SpellTrigger {
 		}
 
 		@Override
-		public boolean onEvent(Event type, EntityLivingBase entity) {
+		public boolean onEvent(Event type, EntityLivingBase entity, Object unused) {
 			// We only registered for time, so don't bother checking
 			
 			TriggerData data = new TriggerData(

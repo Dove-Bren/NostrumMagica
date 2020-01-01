@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble;
@@ -24,6 +26,7 @@ import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ManaMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spells.SpellActionSummary;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 
 import baubles.api.BaublesApi;
@@ -81,9 +84,10 @@ public class PlayerListener {
 		HEALTH,
 		FOOD,
 		MANA,
+		MAGIC_EFFECT,
 	}
 	
-	public interface IMagicListener {
+	public interface IMagicListener<T> {
 		/**
 		 * Called for each event that is activated.
 		 * @param type The event type this call matches
@@ -91,8 +95,42 @@ public class PlayerListener {
 		 * set this to the entity that did the damaging.
 		 * @return true to remove this listener so it doesn't receive anymore updates
 		 */
-		public boolean onEvent(Event type, EntityLivingBase entity);
+		public boolean onEvent(Event type, EntityLivingBase entity, T data);
 	}
+	
+	/**
+	 * Listener that just doesn't use data
+	 */
+	public interface IGenericListener extends IMagicListener<Object> {};
+	
+	public static class SpellActionListenerData {
+		/**
+		 * Entity being affected
+		 */
+		public EntityLivingBase entity;
+		
+		/**
+		 * Entity that cast the spell. Can be empty.
+		 */
+		@Nullable
+		public EntityLivingBase caster;
+		
+		/**
+		 * Information about the spell being applied
+		 */
+		public SpellActionSummary summary;
+		
+		public SpellActionListenerData(EntityLivingBase entity, @Nullable EntityLivingBase caster, SpellActionSummary summary) {
+			this.entity = entity;
+			this.caster = caster;
+			this.summary = summary;
+		}
+	}
+	
+	/**
+	 * Listener that receives information about a spell/spell effect
+	 */
+	public interface ISpellActionListener extends IMagicListener<SpellActionListenerData> {};
 
 	private class TimeInfo {
 		public int startTick;
@@ -173,14 +211,22 @@ public class PlayerListener {
 		}
 	}
 	
+	private class MagicEffectInfo {
+		public EntityLivingBase entity;
+		public MagicEffectInfo(@Nullable EntityLivingBase entity) {
+			this.entity = entity;
+		}
+	}
+	
 	private int tickCount;
-	private Map<IMagicListener, TimeInfo> timeInfos;
-	private Map<IMagicListener, ProximityInfo> proximityInfos;
-	private Map<IMagicListener, PositionInfo> positionInfos;
-	private Map<IMagicListener, DamagedInfo> damagedInfos;
-	private Map<IMagicListener, HealthInfo> healthInfos;
-	private Map<IMagicListener, FoodInfo> foodInfos;
-	private Map<IMagicListener, ManaInfo> manaInfos;
+	private Map<IGenericListener, TimeInfo> timeInfos;
+	private Map<IGenericListener, ProximityInfo> proximityInfos;
+	private Map<IGenericListener, PositionInfo> positionInfos;
+	private Map<IGenericListener, DamagedInfo> damagedInfos;
+	private Map<IGenericListener, HealthInfo> healthInfos;
+	private Map<IGenericListener, FoodInfo> foodInfos;
+	private Map<IGenericListener, ManaInfo> manaInfos;
+	private Map<ISpellActionListener, MagicEffectInfo> magicEffectInfos;
 	
 	public PlayerListener() {
 		timeInfos = new ConcurrentHashMap<>();
@@ -190,6 +236,7 @@ public class PlayerListener {
 		healthInfos = new ConcurrentHashMap<>();
 		foodInfos = new ConcurrentHashMap<>();
 		manaInfos = new ConcurrentHashMap<>();
+		magicEffectInfos = new ConcurrentHashMap<>();
 		
 		MinecraftForge.EVENT_BUS.register(this);
 		tickCount = 0;
@@ -203,6 +250,7 @@ public class PlayerListener {
 		healthInfos.clear();
 		foodInfos.clear();
 		manaInfos.clear();
+		magicEffectInfos.clear();
 	}
 	
 	/**
@@ -214,7 +262,7 @@ public class PlayerListener {
 	 * @param delay 0 means no delay
 	 * @param interval
 	 */
-	public void registerTimer(IMagicListener listener, int delay, int interval) {
+	public void registerTimer(IGenericListener listener, int delay, int interval) {
 		timeInfos.put(listener,
 				new TimeInfo(tickCount, delay, interval));
 	}
@@ -227,7 +275,7 @@ public class PlayerListener {
 	 * @param pos
 	 * @param range negative just won't work. :)
 	 */
-	public void registerProximity(IMagicListener listener, 
+	public void registerProximity(IGenericListener listener, 
 			World world, Vec3d pos, double range) {
 		proximityInfos.put(listener,
 				new ProximityInfo(world, pos, range));
@@ -240,7 +288,7 @@ public class PlayerListener {
 	 * @param world
 	 * @param blocks
 	 */
-	public void registerPosition(IMagicListener listener,
+	public void registerPosition(IGenericListener listener,
 			World world, Collection<BlockPos> blocks) {
 		positionInfos.put(listener,
 				new PositionInfo(world, blocks));
@@ -253,7 +301,7 @@ public class PlayerListener {
 	 * @param listener
 	 * @param entity
 	 */
-	public void registerHit(IMagicListener listener,
+	public void registerHit(IGenericListener listener,
 			EntityLivingBase entity) {
 		damagedInfos.put(listener,
 				new DamagedInfo(entity));
@@ -266,7 +314,7 @@ public class PlayerListener {
 	 * @param level The level that's critical. THIS IS BETWEEN 0 and 1! It's a fraction!
 	 * @param higher if true, triggers when health is >=. Otherwise, triggers when health <=
 	 */
-	public void registerHealth(IMagicListener listener,
+	public void registerHealth(IGenericListener listener,
 			EntityLivingBase entity, float level, boolean higher) {
 		healthInfos.put(listener,
 				new HealthInfo(entity, level, higher));
@@ -279,7 +327,7 @@ public class PlayerListener {
 	 * @param level The level to listen for. This is in food points
 	 * @param higher If true, triggers when food is greater than or equal to. Otherwise, LTE
 	 */
-	public void registerFood(IMagicListener listener,
+	public void registerFood(IGenericListener listener,
 			EntityPlayer player, int level, boolean higher) {
 		foodInfos.put(listener,
 				new FoodInfo(player, level, higher));
@@ -293,10 +341,21 @@ public class PlayerListener {
 	 * @param level The fraction to listen for. Between 0 and 1 (mana / maxmana)
 	 * @param higher If true, triggers when actual >= level. Otherwise, <=
 	 */
-	public void registerMana(IMagicListener listener,
+	public void registerMana(IGenericListener listener,
 			EntityLivingBase entity, float level, boolean higher) {
 		manaInfos.put(listener,
 				new ManaInfo(entity, level, higher));
+	}
+	
+	/**
+	 * Listens for magical effects being applied (optionally to a specific entity).
+	 * @param listener
+	 * @param entity If provided, the entity to fire when effects are applied to. If left null, fired every time an effect is applied.
+	 */
+	public void registerMagicEffect(ISpellActionListener listener,
+			@Nullable EntityLivingBase entity) {
+		magicEffectInfos.put(listener,
+				new MagicEffectInfo(entity));
 	}
 	
 	@SubscribeEvent
@@ -307,9 +366,9 @@ public class PlayerListener {
 				|| Math.abs(ent.motionY) >= 0.01f
 				|| Math.abs(ent.motionZ) >= 0.01f) {
 			// Moved
-			Iterator<Entry<IMagicListener, ProximityInfo>> it = proximityInfos.entrySet().iterator();
+			Iterator<Entry<IGenericListener, ProximityInfo>> it = proximityInfos.entrySet().iterator();
 			while (it.hasNext()) {
-				Entry<IMagicListener, ProximityInfo> entry = it.next();
+				Entry<IGenericListener, ProximityInfo> entry = it.next();
 				if (entry.getValue() == null)
 					continue;
 				
@@ -318,15 +377,15 @@ public class PlayerListener {
 				
 				double dist = Math.abs(ent.getPositionVector().subtract(entry.getValue().position).lengthVector());
 				if (dist <= entry.getValue().proximity) {
-					if (entry.getKey().onEvent(Event.PROXIMITY, ent))
+					if (entry.getKey().onEvent(Event.PROXIMITY, ent, null))
 						it.remove();
 				}
 					
 			}
 			
-			Iterator<Entry<IMagicListener, PositionInfo>> it2 = positionInfos.entrySet().iterator();
+			Iterator<Entry<IGenericListener, PositionInfo>> it2 = positionInfos.entrySet().iterator();
 			while (it2.hasNext()) {
-				Entry<IMagicListener, PositionInfo> entry = it2.next();
+				Entry<IGenericListener, PositionInfo> entry = it2.next();
 				if (entry.getValue() == null)
 					continue;
 				
@@ -336,16 +395,16 @@ public class PlayerListener {
 				BlockPos entpos = ent.getPosition();
 				for (BlockPos p : entry.getValue().blocks) {
 					if (p.equals(entpos))
-						if (entry.getKey().onEvent(Event.POSITION, ent))
+						if (entry.getKey().onEvent(Event.POSITION, ent, null))
 							it2.remove();
 				}	
 			}
 		}
 		
 		if (ent instanceof EntityPlayer) {
-			Iterator<Entry<IMagicListener, FoodInfo>> it = foodInfos.entrySet().iterator();
+			Iterator<Entry<IGenericListener, FoodInfo>> it = foodInfos.entrySet().iterator();
 			while (it.hasNext()) {
-				Entry<IMagicListener, FoodInfo> entry = it.next();
+				Entry<IGenericListener, FoodInfo> entry = it.next();
 				if (entry.getValue() == null)
 					continue;
 				
@@ -357,11 +416,11 @@ public class PlayerListener {
 				
 				if (entry.getValue().higher) {
 					if (level >= thresh)
-						if (entry.getKey().onEvent(Event.FOOD, ent))
+						if (entry.getKey().onEvent(Event.FOOD, ent, null))
 							it.remove();
 				} else {
 					if (level <= thresh)
-						if (entry.getKey().onEvent(Event.FOOD, ent))
+						if (entry.getKey().onEvent(Event.FOOD, ent, null))
 							it.remove();
 				}
 			}
@@ -369,9 +428,9 @@ public class PlayerListener {
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(ent);
 		if (attr != null) {
-			Iterator<Entry<IMagicListener, ManaInfo>> it = manaInfos.entrySet().iterator();
+			Iterator<Entry<IGenericListener, ManaInfo>> it = manaInfos.entrySet().iterator();
 			while (it.hasNext()) {
-				Entry<IMagicListener, ManaInfo> entry = it.next();
+				Entry<IGenericListener, ManaInfo> entry = it.next();
 				if (entry.getValue() == null)
 					continue;
 				
@@ -386,11 +445,11 @@ public class PlayerListener {
 				
 				if (entry.getValue().higher) {
 					if (level >= thresh)
-						if (entry.getKey().onEvent(Event.MANA, ent))
+						if (entry.getKey().onEvent(Event.MANA, ent, null))
 							it.remove();
 				} else {
 					if (level <= thresh)
-						if (entry.getKey().onEvent(Event.MANA, ent))
+						if (entry.getKey().onEvent(Event.MANA, ent, null))
 							it.remove();
 				}
 			}
@@ -398,9 +457,9 @@ public class PlayerListener {
 	}
 	
 	private void onHealth(EntityLivingBase ent) {
-		Iterator<Entry<IMagicListener, HealthInfo>> it = healthInfos.entrySet().iterator();
+		Iterator<Entry<IGenericListener, HealthInfo>> it = healthInfos.entrySet().iterator();
 		while (it.hasNext()) {
-			Entry<IMagicListener, HealthInfo> entry = it.next();
+			Entry<IGenericListener, HealthInfo> entry = it.next();
 			if (entry.getValue() == null)
 				continue;
 
@@ -412,11 +471,11 @@ public class PlayerListener {
 			
 			if (entry.getValue().higher) {
 				if (level >= thresh)
-					if (entry.getKey().onEvent(Event.HEALTH, ent))
+					if (entry.getKey().onEvent(Event.HEALTH, ent, null))
 						it.remove();
 			} else {
 				if (level <= thresh)
-					if (entry.getKey().onEvent(Event.HEALTH, ent))
+					if (entry.getKey().onEvent(Event.HEALTH, ent, null))
 						it.remove();
 			}
 		}
@@ -501,9 +560,9 @@ public class PlayerListener {
 			}
 			
 			if (source != null) {
-				Iterator<Entry<IMagicListener, DamagedInfo>> it = damagedInfos.entrySet().iterator();
+				Iterator<Entry<IGenericListener, DamagedInfo>> it = damagedInfos.entrySet().iterator();
 				while (it.hasNext()) {
-					Entry<IMagicListener, DamagedInfo> entry = it.next();
+					Entry<IGenericListener, DamagedInfo> entry = it.next();
 					if (entry.getValue() == null)
 						continue;
 					
@@ -511,7 +570,7 @@ public class PlayerListener {
 						continue;
 					}
 					
-					if (entry.getKey().onEvent(Event.DAMAGED, source))
+					if (entry.getKey().onEvent(Event.DAMAGED, source, null))
 						it.remove();
 				}
 			}
@@ -772,14 +831,14 @@ public class PlayerListener {
 			}
 		}
 		
-		Iterator<Entry<IMagicListener, TimeInfo>> it = timeInfos.entrySet().iterator();
+		Iterator<Entry<IGenericListener, TimeInfo>> it = timeInfos.entrySet().iterator();
 		while (it.hasNext()) {
-			Entry<IMagicListener, TimeInfo> entry = it.next();
+			Entry<IGenericListener, TimeInfo> entry = it.next();
 			TimeInfo info = entry.getValue();
 			if (info.delay > 0) {
 				info.delay--;
 				if (info.delay == 0) {
-					if (entry.getKey().onEvent(Event.TIME, null))
+					if (entry.getKey().onEvent(Event.TIME, null, null))
 						it.remove();
 					else {
 						info.startTick = tickCount;
@@ -790,7 +849,7 @@ public class PlayerListener {
 			
 			int diff = tickCount - info.startTick;
 			if (diff % info.interval == 0)
-				if (entry.getKey().onEvent(Event.TIME, null))
+				if (entry.getKey().onEvent(Event.TIME, null, null))
 					it.remove();
 		}
 	}
@@ -883,297 +942,24 @@ public class PlayerListener {
 		return xp;
 	}
 	
-	// TESTING
-//	@SubscribeEvent
-//	public void onTest(UseHoeEvent e) {
-//		
-//		INostrumMagic attr = NostrumMagica.getMagicWrapper(e.getEntityPlayer());
-//		if (attr != null) {
-//			attr.unlock();
-//		}
-//		
-//		if (e.getWorld().isRemote)
-//			return;
-//		
-//		ItemStack tome = new ItemStack(SpellTome.instance(), 1);
-//		
-//		// Create spell on server side.
-//		// Spawn tome with that spell in it
-//		Spell spell;
-////		= new Spell("Wind Cutter");
-////		spell.addPart(new SpellPart(
-////				ProjectileTrigger.instance(),
-////				new SpellPartParam(0, false)
-////				));
-////		spell.addPart(new SpellPart(
-////				SingleShape.instance(),
-////				EMagicElement.WIND,
-////				1,
-////				null,
-////				new SpellPartParam(0, false)
-////				));
-////		SpellTome.addSpell(tome, spell);
-////		
-//		spell = new Spell("Wind Palm");
-//		spell.addPart(new SpellPart(
-//				TouchTrigger.instance(),
-//				new SpellPartParam(0, false)
-//				));
-//		spell.addPart(new SpellPart(
-//				SingleShape.instance(),
-//				EMagicElement.WIND,
-//				3,
-//				null,
-//				new SpellPartParam(0, false)
-//				));
-//		SpellTome.addSpell(tome, spell);
-////		
-////		spell = new Spell("Wind Beam Chain");
-////		spell.addPart(new SpellPart(
-////				BeamTrigger.instance(),
-////				new SpellPartParam(0, false)
-////				));
-////		spell.addPart(new SpellPart(
-////				ChainShape.instance(),
-////				EMagicElement.WIND,
-////				3,
-////				null,
-////				new SpellPartParam(3, false)
-////				));
-////		SpellTome.addSpell(tome, spell);
-////		
-////		spell = new Spell("Transmute");
-////		spell.addPart(new SpellPart(
-////				SelfTrigger.instance(),
-////				new SpellPartParam(0, false)
-////				));
-////		spell.addPart(new SpellPart(
-////				SingleShape.instance(),
-////				EMagicElement.PHYSICAL,
-////				1,
-////				EAlteration.ALTER,
-////				new SpellPartParam(0, false)
-////				));
-////		SpellTome.addSpell(tome, spell);
-////		
-////		spell = new Spell("Alter Fire I");
-////		spell.addPart(new SpellPart(
-////				SelfTrigger.instance(),
-////				new SpellPartParam(0, false)
-////				));
-////		spell.addPart(new SpellPart(
-////				SingleShape.instance(),
-////				EMagicElement.FIRE,
-////				1,
-////				EAlteration.ALTER,
-////				new SpellPartParam(0, false)
-////				));
-////		SpellTome.addSpell(tome, spell);
-////		
-////		spell = new Spell("Alter Ice 3");
-////		spell.addPart(new SpellPart(
-////				SelfTrigger.instance(),
-////				new SpellPartParam(0, false)
-////				));
-////		spell.addPart(new SpellPart(
-////				SingleShape.instance(),
-////				EMagicElement.ICE,
-////				3,
-////				EAlteration.ALTER,
-////				new SpellPartParam(0, false)
-////				));
-////		SpellTome.addSpell(tome, spell);
-////		
-////		spell = new Spell("Summon Zapper");
-////		spell.addPart(new SpellPart(
-////				DamagedTrigger.instance(),
-////				new SpellPartParam(0, false)
-////				));
-////		spell.addPart(new SpellPart(
-////				SingleShape.instance(),
-////				EMagicElement.LIGHTNING,
-////				1,
-////				EAlteration.SUMMON,
-////				new SpellPartParam(0, false)
-////				));
-////		SpellTome.addSpell(tome, spell);
-////		
-////		spell = new Spell("Summon Wind");
-////		spell.addPart(new SpellPart(
-////				ProjectileTrigger.instance(),
-////				new SpellPartParam(0, false)
-////				));
-////		spell.addPart(new SpellPart(
-////				SingleShape.instance(),
-////				EMagicElement.WIND,
-////				1,
-////				EAlteration.SUMMON,
-////				new SpellPartParam(0, false)
-////				));
-////		SpellTome.addSpell(tome, spell);
-////		
-////		spell = new Spell("Summon Ender");
-////		spell.addPart(new SpellPart(
-////				ProjectileTrigger.instance(),
-////				new SpellPartParam(0, false)
-////				));
-////		spell.addPart(new SpellPart(
-////				SingleShape.instance(),
-////				EMagicElement.ENDER,
-////				1,
-////				EAlteration.SUMMON,
-////				new SpellPartParam(0, false)
-////				));
-////		SpellTome.addSpell(tome, spell);
-////		
-////		spell = new Spell("Magic Shield");
-////		spell.addPart(new SpellPart(
-////				ManaTrigger.instance(),
-////				new SpellPartParam(0.5f, false)
-////				));
-////		spell.addPart(new SpellPart(
-////				SingleShape.instance(),
-////				EMagicElement.ICE,
-////				1,
-////				EAlteration.SUPPORT,
-////				new SpellPartParam(0, false)
-////				));
-////		SpellTome.addSpell(tome, spell);
-////		
-////		spell = new Spell("Physical Shield");
-////		spell.addPart(new SpellPart(
-////				HealthTrigger.instance(),
-////				new SpellPartParam(0.5f, false)
-////				));
-////		spell.addPart(new SpellPart(
-////				SingleShape.instance(),
-////				EMagicElement.EARTH,
-////				1,
-////				EAlteration.SUPPORT,
-////				new SpellPartParam(0, false)
-////				));
-////		SpellTome.addSpell(tome, spell);
-////		
-////		spell = new Spell("Pull");
-////		spell.addPart(new SpellPart(
-////				SelfTrigger.instance(),
-////				new SpellPartParam(0, false)
-////				));
-////		spell.addPart(new SpellPart(
-////				SingleShape.instance(),
-////				EMagicElement.LIGHTNING,
-////				1,
-////				EAlteration.SUPPORT,
-////				new SpellPartParam(0, false)
-////				));
-////		SpellTome.addSpell(tome, spell);
-////		
-////		spell = new Spell("Magic Wall I");
-////		spell.addPart(new SpellPart(
-////				ProjectileTrigger.instance(),
-////				new SpellPartParam(0, false)
-////				));
-////		spell.addPart(new SpellPart(
-////				SingleShape.instance(),
-////				EMagicElement.WIND,
-////				1,
-////				EAlteration.CONJURE,
-////				new SpellPartParam(0, false)
-////				));
-////		SpellTome.addSpell(tome, spell);
-////		
-////		spell = new Spell("Geoblock");
-////		spell.addPart(new SpellPart(
-////				ProjectileTrigger.instance(),
-////				new SpellPartParam(0, false)
-////				));
-////		spell.addPart(new SpellPart(
-////				SingleShape.instance(),
-////				EMagicElement.EARTH,
-////				1,
-////				EAlteration.CONJURE,
-////				new SpellPartParam(0, false)
-////				));
-////		SpellTome.addSpell(tome, spell);
-////		
-////		spell = new Spell("Cursed Ice");
-////		spell.addPart(new SpellPart(
-////				ProjectileTrigger.instance(),
-////				new SpellPartParam(0, false)
-////				));
-////		spell.addPart(new SpellPart(
-////				SingleShape.instance(),
-////				EMagicElement.ICE,
-////				1,
-////				EAlteration.CONJURE,
-////				new SpellPartParam(0, false)
-////				));
-////		SpellTome.addSpell(tome, spell);
-////		
-////		spell = new Spell("Cursed Ice III");
-////		spell.addPart(new SpellPart(
-////				ProjectileTrigger.instance(),
-////				new SpellPartParam(0, false)
-////				));
-////		spell.addPart(new SpellPart(
-////				SingleShape.instance(),
-////				EMagicElement.ICE,
-////				3,
-////				EAlteration.CONJURE,
-////				new SpellPartParam(0, false)
-////				));
-////		SpellTome.addSpell(tome, spell);
-////		
-////		spell = new Spell("Phase");
-////		spell.addPart(new SpellPart(
-////				ProjectileTrigger.instance(),
-////				new SpellPartParam(0, false)
-////				));
-////		spell.addPart(new SpellPart(
-////				SingleShape.instance(),
-////				EMagicElement.ENDER,
-////				1,
-////				EAlteration.CONJURE,
-////				new SpellPartParam(0, false)
-////				));
-////		SpellTome.addSpell(tome, spell);
-//		
-//		spell = new Spell("Grow");
-//		spell.addPart(new SpellPart(
-//				ProjectileTrigger.instance(),
-//				new SpellPartParam(0, false)
-//				));
-//		spell.addPart(new SpellPart(
-//				SingleShape.instance(),
-//				EMagicElement.EARTH,
-//				1,
-//				EAlteration.CONJURE,
-//				new SpellPartParam(0, false)
-//				));
-//		SpellTome.addSpell(tome, spell);
-//		
-//		ItemStack scroll = new ItemStack(SpellScroll.instance(), 1);
-//		SpellScroll.setSpell(scroll, spell);
-//		
-//		BlockPos pos = e.getPos().add(0, 1, 0);
-//		e.getWorld().spawnEntityInWorld(new EntityItem(
-//				e.getWorld(),
-//				pos.getX() + .5f,
-//				(float) pos.getY(),
-//				pos.getZ() + .5f,
-//				tome
-//				));
-//		e.getWorld().spawnEntityInWorld(new EntityItem(
-//				e.getWorld(),
-//				pos.getX() + .5f,
-//				(float) pos.getY(),
-//				pos.getZ() + .5f,
-//				scroll
-//				));
-//		
-//		pos.add(0, 5, 0);
-//		
-//		//NostrumDungeon.temp.spawn(e.getWorld(), new NostrumDungeon.DungeonExitPoint(pos, EnumFacing.NORTH));
-//		//(new ShrineRoom()).spawn(null, e.getWorld(), new NostrumDungeon.DungeonExitPoint(pos, EnumFacing.fromAngle(e.getEntityPlayer().rotationYaw)));
-//	}
+	/**
+	 * Signals to magic effect listeners.
+	 * TODO: Make an actual event if users expand?
+	 * @param entity
+	 * @param caster
+	 * @param summary
+	 */
+	public void onMagicEffect(EntityLivingBase entity, @Nullable EntityLivingBase caster, SpellActionSummary summary) {
+		Iterator<Entry<ISpellActionListener, MagicEffectInfo>> it = magicEffectInfos.entrySet().iterator();
+		while (it.hasNext()) {
+			Entry<ISpellActionListener, MagicEffectInfo> entry = it.next();
+			MagicEffectInfo info = entry.getValue();
+			
+			if (info.entity == null || info.entity.equals(entity)) {
+				if (entry.getKey().onEvent(Event.MAGIC_EFFECT, entity, new SpellActionListenerData(entity, caster, summary)))
+					it.remove();
+			}
+		}
+	}
+	
 }

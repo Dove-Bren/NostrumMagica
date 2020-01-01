@@ -80,6 +80,7 @@ import com.smanzana.nostrummagica.items.MagicCharm;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.MirrorItem;
+import com.smanzana.nostrummagica.items.MirrorShield;
 import com.smanzana.nostrummagica.items.NostrumGuide;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
@@ -357,6 +358,7 @@ public class ClientProxy extends CommonProxy {
 		for (EnchantedArmor armor : EnchantedArmor.getAll()) {
 			registerModel(armor, 0, armor.getModelID());
 		}
+		registerModel(MirrorShield.instance(), 0, MirrorShield.id);
 		
 		registerModel(MagicSwordBase.instance(), 0, MagicSwordBase.instance().getModelID());
 		registerModel(MagicArmorBase.helm, 0, MagicArmorBase.helm.getModelID());

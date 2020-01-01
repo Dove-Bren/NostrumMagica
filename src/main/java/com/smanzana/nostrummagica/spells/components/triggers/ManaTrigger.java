@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
-import com.smanzana.nostrummagica.listeners.PlayerListener.IMagicListener;
+import com.smanzana.nostrummagica.listeners.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
@@ -26,7 +26,7 @@ import net.minecraftforge.oredict.OreDictionary;
 
 public class ManaTrigger extends SpellTrigger {
 	
-	public class ManaTriggerInstance extends SpellTrigger.SpellTriggerInstance implements IMagicListener {
+	public class ManaTriggerInstance extends SpellTrigger.SpellTriggerInstance implements IGenericListener {
 
 		private float amount;
 		private boolean onHigh;
@@ -50,7 +50,7 @@ public class ManaTrigger extends SpellTrigger {
 		}
 
 		@Override
-		public boolean onEvent(Event type, EntityLivingBase entity) {
+		public boolean onEvent(Event type, EntityLivingBase entity, Object junk) {
 			EntityLivingBase self = this.getState().getSelf();
 			TriggerData data = new TriggerData(
 					Lists.newArrayList(self),

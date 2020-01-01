@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
-import com.smanzana.nostrummagica.listeners.PlayerListener.IMagicListener;
+import com.smanzana.nostrummagica.listeners.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
@@ -25,7 +25,7 @@ import net.minecraft.world.World;
 
 public class ProximityTrigger extends SpellTrigger {
 	
-	public class ProximityTriggerInstance extends SpellTrigger.SpellTriggerInstance implements IMagicListener {
+	public class ProximityTriggerInstance extends SpellTrigger.SpellTriggerInstance implements IGenericListener {
 
 		private World world;
 		private Vec3d pos;
@@ -51,7 +51,7 @@ public class ProximityTrigger extends SpellTrigger {
 		}
 
 		@Override
-		public boolean onEvent(Event type, EntityLivingBase entity) {
+		public boolean onEvent(Event type, EntityLivingBase entity, Object empty) {
 			// We first wait 20 ticks to allow people to move around.
 			if (type == Event.TIME) {
 				if (dead)

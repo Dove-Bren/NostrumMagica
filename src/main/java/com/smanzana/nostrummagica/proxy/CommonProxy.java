@@ -67,6 +67,7 @@ import com.smanzana.nostrummagica.items.MagicCharm;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.MirrorItem;
+import com.smanzana.nostrummagica.items.MirrorShield;
 import com.smanzana.nostrummagica.items.NostrumGuide;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumRoseItem;
@@ -355,8 +356,6 @@ public class CommonProxy {
     	GameRegistry.register(SpellTome.instance());
     	SpellPlate.instance().setRegistryName(NostrumMagica.MODID, SpellPlate.id);
     	GameRegistry.register(SpellPlate.instance());
-    	
-    	
     	BlankScroll.instance().setRegistryName(NostrumMagica.MODID, BlankScroll.id);
     	GameRegistry.register(BlankScroll.instance());
     	BlankScroll.init();
@@ -377,6 +376,8 @@ public class CommonProxy {
     	MagicArmorBase.init();
     	EnchantedWeapon.registerWeapons();
     	EnchantedArmor.registerArmors();
+    	MirrorShield.instance().setRegistryName(NostrumMagica.MODID, MirrorShield.id);
+    	GameRegistry.register(MirrorShield.instance());
     	
     	ReagentItem.instance().setRegistryName(NostrumMagica.MODID, ReagentItem.ID);
     	GameRegistry.register(ReagentItem.instance());

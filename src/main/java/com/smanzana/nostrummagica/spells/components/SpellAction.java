@@ -34,6 +34,7 @@ import com.smanzana.nostrummagica.potions.MagicBoostPotion;
 import com.smanzana.nostrummagica.potions.MagicResistPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.SpellActionSummary;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -1540,16 +1541,22 @@ public class SpellAction {
 			return;
 		
 		final EntityLivingBase ent = entity;
-		for (SpellEffect e : effects) {
-			final SpellEffect effect = e;
-			entity.getServer().addScheduledTask(new Runnable() {
+		
+		SpellActionSummary summary = new SpellActionSummary(this, efficiency);
+		
+		NostrumMagica.playerListener.onMagicEffect(entity, source, summary);
+		if (!summary.wasCancelled()) {
+			for (SpellEffect e : effects) {
+				final SpellEffect effect = e;
+				entity.getServer().addScheduledTask(new Runnable() {
 
-				@Override
-				public void run() {
-					effect.apply(source, ent, efficiency);
-				}
-				
-			});
+					@Override
+					public void run() {
+						effect.apply(source, ent, summary.getEfficiency());
+					}
+					
+				});
+			}
 		}
 	}
 	
@@ -1559,6 +1566,7 @@ public class SpellAction {
 		
 		final World w = world;
 		final BlockPos b = pos;
+		
 		for (SpellEffect e : effects) {
 			final SpellEffect effect = e;
 			world.getMinecraftServer().addScheduledTask(new Runnable() {
@@ -1598,7 +1606,7 @@ public class SpellAction {
 		
 		PotionEffect resEffect = target.getActivePotionEffect(MagicResistPotion.instance());
 		if (resEffect != null) {
-			base *= Math.pow(.5, resEffect.getAmplifier() + 1);
+			base *= Math.pow(.75, resEffect.getAmplifier() + 1);
 		}
 		
 		IAttributeInstance attr = target.getEntityAttribute(AttributeMagicResist.instance());
@@ -1617,9 +1625,9 @@ public class SpellAction {
 		case EARTH:
 			return base; // raw damage. Not affected by armor
 		case ICE:
-			return base * (undead ? .6f : 1.3f); // More affective against everyhting except undead
+			return base * (undead ? .6f : 1.3f); // More affective against everything except undead
 		case WIND:
-			return base * (light ? 1.8f : .8f); // 180% against light (enderman included) enemies
+			return base * (light ? 1.8f : .8f); // 180% against light (endermen included) enemies
 		default:
 			return base;
 		}
