@@ -465,6 +465,9 @@ capacity.desc=Capacity limits the number of spells a single spell tome can hold.
 modifier.name=Modifier
 modifier.desc=Modifiers are used to add additional tome pages to spell tomes, adding new enhancements.
 
+info.quest.lore_missing=Knowledge of %1$s is required
+info.quest.accept=Click to Accept
+
 maxelements.name=Max Elements
 maxelements.desc=Maximum total number of elements allowed in a spell for you to cast it. Spells with more elements than this cannot be cast.|Increases by 3 for each point invested in control.
 maxtriggers.name=Max Triggers

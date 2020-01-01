@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.quests.objectives.IObjective;
 import com.smanzana.nostrummagica.quests.rewards.IReward;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -102,6 +103,7 @@ public class NostrumQuest {
 	 * @param parentKeys all potential parents. This list is later validated.
 	 * <strong>You are free to add all potential dependencies!</strong> During
 	 * validation, any dependencies that weren't registered are simply ignored.
+	 * @param loreKeys required lore key names that must be known before this quest can be taken.
 	 * @param objective What extra challenge objective must be done to finish and
 	 * get rewards.
 	 * @param rewards given when the quest is completed.
@@ -279,7 +281,31 @@ public class NostrumQuest {
 		}
 		
 		if (count != 0)
-			NostrumMagica.logger.info("Validated " + count + " quest dependencies");
+			NostrumMagica.logger.info("Validated " + count + " quest parent dependencies");
+		
+		count = 0;
+		for (NostrumQuest quest : Registry.values()) {
+			if (quest.loreKeys == null || quest.loreKeys.length == 0) {
+				quest.loreKeys = null;
+				continue;
+			}
+			
+			count++;
+			
+			List<String> outList = new LinkedList<>();
+			for (String dep : quest.loreKeys) {
+				if (LoreRegistry.instance().lookup(dep) != null)
+					outList.add(dep);
+			}
+			
+			if (outList.isEmpty())
+				quest.loreKeys = null;
+			else
+				quest.loreKeys = outList.toArray(new String[0]);
+		}
+		
+		if (count != 0)
+			NostrumMagica.logger.info("Validated " + count + " quest lore dependencies");
 	}
 	
 }

@@ -51,7 +51,8 @@ public class ClientUpdateQuestMessage implements IMessage {
 					if (quest.getObjective().isComplete(att))
 						quest.completeQuest(sp);
 				} else {
-					quest.startQuest(sp);
+					if (NostrumMagica.canTakeQuest(sp, quest))
+						quest.startQuest(sp);
 				}
 	
 				 NetworkHandler.getSyncChannel().sendTo(new StatSyncMessage(att), sp);

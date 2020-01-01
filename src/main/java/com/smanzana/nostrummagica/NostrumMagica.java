@@ -54,6 +54,8 @@ import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
 import com.smanzana.nostrummagica.listeners.PlayerListener;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.proxy.CommonProxy;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.quests.NostrumQuest.QuestType;
@@ -1284,6 +1286,15 @@ public class NostrumMagica
     			null, null,
     			wrapAttribute(AwardType.MANA, 0.0100f));
     	
+    	new NostrumQuest("belts", QuestType.CHALLENGE, 8,
+    			0, // Control
+    			0, // Technique
+    			0, // Finesse
+    			new String[] {"belts"}, // Potentially dependent on bauble quests :)
+    			null, null,
+    			new IReward[]{new AttributeReward(AwardType.REGEN, 0.025f)})
+    		.offset(3, 6);
+    	
 //    	new NostrumQuest("con", QuestType.REGULAR, 0,
 //    			0, // Control
 //    			0, // Technique
@@ -1308,14 +1319,37 @@ public class NostrumMagica
     	return new IReward[]{new AttributeReward(type, val)};
     }
     
+    /**
+     * Whether a quest is visible in the mirror by normal rules.
+     * This is either that one of the parents of the quest has been finished, OR
+     * that the quest has no parent but the conditions to take the quest are fulfilled.
+     * Note: If there are lore requirements and those aren't filled, this returns false
+     * even if the other two conditions are true.
+     * @param player
+     * @param quest
+     * @return
+     */
     public static boolean getQuestAvailable(EntityPlayer player, NostrumQuest quest) {
+    	INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+    	
+    	if (attr == null)
+			return false;
+    	
+    	// Check lore requirements
+    	if (quest.getLoreKeys() != null && quest.getLoreKeys().length != 0) {
+    		for (String lore : quest.getLoreKeys()) {
+    			ILoreTagged loreItem = LoreRegistry.instance().lookup(lore);
+    			if (loreItem != null) {
+    				if (!attr.hasLore(loreItem)) {
+    					return false;
+    				}
+    			}
+    		}
+    	}
+    	
     	if (quest.getParentKeys() == null || quest.getParentKeys().length == 0) {
 			return canTakeQuest(player, quest);
     	}
-		
-		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-		if (attr == null)
-			return false;
 		
 		for (String parent : quest.getParentKeys()) {
 			if (attr.getCompletedQuests().contains(parent))
@@ -1325,10 +1359,28 @@ public class NostrumMagica
 		return false;
     }
     
+    /**
+     * Checks whether all of the conditions required to start a quest have been fulfilled.
+     * @param player
+     * @param quest
+     * @return
+     */
     public static boolean canTakeQuest(EntityPlayer player, NostrumQuest quest) {
     	INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
 			return false;
+		
+		// Check lore requirements
+    	if (quest.getLoreKeys() != null && quest.getLoreKeys().length != 0) {
+    		for (String lore : quest.getLoreKeys()) {
+    			ILoreTagged loreItem = LoreRegistry.instance().lookup(lore);
+    			if (loreItem != null) {
+    				if (!attr.hasLore(loreItem)) {
+    					return false;
+    				}
+    			}
+    		}
+    	}
 		
 		String[] parents = quest.getParentKeys();
 		if (parents != null && parents.length > 0) {

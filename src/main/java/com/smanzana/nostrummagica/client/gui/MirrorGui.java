@@ -12,6 +12,8 @@ import org.lwjgl.opengl.GL11;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientSkillUpMessage;
 import com.smanzana.nostrummagica.network.messages.ClientSkillUpMessage.Type;
@@ -76,6 +78,7 @@ public class MirrorGui extends GuiScreen {
 	private int control;
 	private int level;
 	private int skillPoints;
+	private List<ILoreTagged> lore;
 	private boolean unlocked;
 	private String unlockPrompt;
 	
@@ -116,6 +119,7 @@ public class MirrorGui extends GuiScreen {
 		this.technique = attr.getTech();
 		this.control = attr.getControl();
 		this.finesse = attr.getFinesse();
+		this.lore = attr.getAllLore();
 	}
 	
 	@Override
@@ -703,18 +707,33 @@ public class MirrorGui extends GuiScreen {
             
             TextFormatting bad = TextFormatting.RED;
             TextFormatting good = TextFormatting.GREEN;
+            TextFormatting unique = TextFormatting.DARK_AQUA;
             if (quest.getReqLevel() > 0)
             	tooltip.add("" + (level >= quest.getReqLevel() ? good : bad)
-            			+ "Level: " + quest.getReqLevel() + TextFormatting.RESET);
+            			+ I18n.format("level.name") + ": " + quest.getReqLevel() + TextFormatting.RESET);
             if (quest.getReqControl() > 0)
             	tooltip.add("" + (control >= quest.getReqControl() ? good : bad)
-            			+ "Control: " + quest.getReqControl() + TextFormatting.RESET);
+            			+ I18n.format("control.name") + ": " + quest.getReqControl() + TextFormatting.RESET);
             if (quest.getReqTechnique() > 0)
             	tooltip.add("" + (technique >= quest.getReqTechnique() ? good : bad)
-            			+ "Technique: " + quest.getReqTechnique() + TextFormatting.RESET);
+            			+ I18n.format("technique.name") + ": " + quest.getReqTechnique() + TextFormatting.RESET);
             if (quest.getReqFinesse() > 0)
             	tooltip.add("" + (finesse >= quest.getReqFinesse() ? good : bad)
-            			+ "Finesse: " + quest.getReqFinesse() + TextFormatting.RESET);
+            			+ I18n.format("finesse.name") + ": " + quest.getReqFinesse() + TextFormatting.RESET);
+            
+            // Lore reqs?
+            if (quest.getLoreKeys() != null) {
+            	for (String loreKey : quest.getLoreKeys()) {
+            		ILoreTagged loreItem = LoreRegistry.instance().lookup(loreKey);
+            		if (loreItem != null) {
+            			if (!lore.contains(loreItem)) {
+            				tooltip.add(bad
+            						+ I18n.format("info.quest.lore_missing", new Object[]{unique + loreItem.getLoreDisplayName() + bad})
+            						+ TextFormatting.RESET);
+            			}
+            		}
+            	}
+            }
             
             if (quest.getObjective() != null) {
             	tooltip.add(quest.getObjective().getDescription());
@@ -728,7 +747,7 @@ public class MirrorGui extends GuiScreen {
             }
             
             if (this.state == QuestState.INACTIVE && NostrumMagica.canTakeQuest(player, quest)) {
-            	tooltip.add(TextFormatting.GREEN + "Click to Accept" + TextFormatting.RESET);
+            	tooltip.add(TextFormatting.GREEN + I18n.format("info.quest.accept") + TextFormatting.RESET);
             }
             
             if (this.state == QuestState.TAKEN || this.state == QuestState.COMPLETED) {
