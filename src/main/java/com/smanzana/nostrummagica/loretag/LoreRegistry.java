@@ -23,6 +23,7 @@ import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.MirrorItem;
 import com.smanzana.nostrummagica.items.MirrorShield;
+import com.smanzana.nostrummagica.items.MirrorShieldImproved;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumRoseItem;
 import com.smanzana.nostrummagica.items.NostrumSkillItem;
@@ -120,6 +121,7 @@ public class LoreRegistry {
 		register(new EntitySprite(null));
 		register(new EntityDragonEgg(null));
 		register(MirrorShield.instance());
+		register(MirrorShieldImproved.instance());
 		
 		for (Preset preset : Preset.values()) {
 			register(preset);

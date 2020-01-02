@@ -1,0 +1,25 @@
+{
+    "parent": "nostrummagica:item/true_mirror_shield",
+    "display": {
+        "thirdperson_righthand": {
+            "rotation": [ 45, 315, 0 ],
+            "translation": [ -9.5, -3, 6 ],
+            "scale": [ 1.5, 1.5, 1.5 ]
+        },
+        "thirdperson_lefthand": {
+            "rotation": [ 45, 315, 0 ],
+            "translation": [ -9.5, -3, 6 ],
+            "scale": [ 1.5, 1.5, 1.5 ]
+        },
+        "firstperson_righthand": {
+            "rotation": [ 0, -10, 5 ],
+            "translation": [ 0, 0, 0 ],
+            "scale": [ 2, 2, 2 ]
+        },
+        "firstperson_lefthand": {
+            "rotation": [ 0, 10, 5 ],
+            "translation": [ 0, 0, 0 ],
+            "scale": [ 2, 2, 2 ]
+        }
+    }
+}

@@ -1,0 +1,8 @@
+{
+    "parent": "nostrummagica:item/true_mirror_shield",
+	"textures": {
+		"front": "nostrummagica:items/true_mirror_shield_charged",
+        "back": "nostrummagica:items/true_mirror_shield_charged_back",
+        "blank": "nostrummagica:items/shield_side"
+	}
+}

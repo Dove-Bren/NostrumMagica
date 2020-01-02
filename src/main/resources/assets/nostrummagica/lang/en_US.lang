@@ -167,6 +167,7 @@ item.info.thanos.charges=%d Charges
 item.info.thanos.desc=Charged up with XP. Provides reagent-free casts.
 
 item.mirror_shield.name=Mirror Shield
+item.true_mirror_shield.name=True Mirror Shield
 
 item.charm.physical.name=Charm of Haste
 item.charm.fire.name=Charm of the Volcano
@@ -677,6 +678,8 @@ ritual.mastery_orb.name=Ritual of Mastery
 ritual.mastery_orb.desc=Form a Mastery Orb
 ritual.mirror_shield.name=Create Mirror Shield
 ritual.mirror_shield.desc=Create a Mirror Shield
+ritual.true_mirror_shield.name=Create True Mirror Shield
+ritual.true_mirror_shield.desc=Create a True Mirror Shield
 
 ritual.rune.physical.name=Physical Rune
 ritual.rune.fire.name=Fire Rune
@@ -905,6 +908,8 @@ quest.belts.name=Magic Belts
 quest.belts.desc=Despite all your efforts, you don't seem to be able to infuse leather with magic reagents. You were able to attach a magical gem, however. You've devised two such belts: One aspected to Ender, and the other to Lightning.
 quest.mirror_shield.name=Mirror Shields
 quest.mirror_shield.desc=Finally, a practical application for magic! If you're an astute mage, you've noticed that armor doesn't resist magic damage, and magic resistance is hard to come by. To remedy this, you've decided to try to affix a sort of mirror to a shield in order to reduce and reflect magical damage!
+quest.true_mirror_shield.name=True Mirror Shields
+quest.true_mirror_shield.desc=Mirror shields are incredibly useful for defending against magic attackers. They even can reflect some of the attacking magic back at the caster!|You've decided to try augmenting the shields with more vani crystal in an attempt to further reduce incoming magical effects.
 
 guide.title=Nostrum Magica Guide
 guide.page1=  Nostrum Magica is a magic mod that focuses on spell creation. The goal is to give you the ability to make the spells YOU want to have and use while providing a reasonable challenge and sense of progression. To do this, Nostrum Magica defines a spell system that revolves around spell components -- Triggers, Shapes, Elements, and Alterations. Spells then cost mana and physical reagents and do everything from healing to reducing attack to creating powerful gear!
@@ -979,3 +984,4 @@ info.nostrumwelcome.text=Welcome to Nostrum Magica! Press [%s] to get started!
 nei.category.ritual.name=Nostrum Ritual
 
 lore.mirror_shield.name=Mirror Shields
+lore.true_mirror_shield.name=True Mirror Shields

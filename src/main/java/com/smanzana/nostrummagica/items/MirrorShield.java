@@ -48,7 +48,7 @@ public class MirrorShield extends Item implements ISpellActionListener, ILoreTag
 	public static final UUID MOD_ATTACK_UUID = UUID.fromString("522BB274-43321-56AA-20AE-254BBB743ABB");
 	public static final UUID MOD_RESIST_UUID = UUID.fromString("433CC363-43321-56AA-20AE-254BBB743ABB");
 	
-	private MirrorShield() {
+	protected MirrorShield() {
 		super();
 		this.setUnlocalizedName(id);
 		this.setCreativeTab(NostrumMagica.creativeTab);
@@ -103,7 +103,7 @@ public class MirrorShield extends Item implements ISpellActionListener, ILoreTag
 		
 		if (type == Event.MAGIC_EFFECT) {
 			if (entity.isActiveItemStackBlocking() && entity.getActiveItemStack().getItem() instanceof MirrorShield) {
-				entity.getActiveItemStack().damageItem(NostrumMagica.rand.nextInt(3) + 1, entity);
+				entity.getActiveItemStack().damageItem(NostrumMagica.rand.nextInt(2) + 1, entity);
 				
 				// If there was a caster, reflect part of the spell back
 				if (data.caster != null) {

@@ -38,6 +38,7 @@ import com.smanzana.nostrummagica.items.MagicCharm;
 import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.MirrorItem;
 import com.smanzana.nostrummagica.items.MirrorShield;
+import com.smanzana.nostrummagica.items.MirrorShieldImproved;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.NostrumRoseItem;
@@ -929,6 +930,17 @@ public class NostrumMagica
 				new OutcomeSpawnItem(new ItemStack(MirrorShield.instance())))
 			);
 		
+		extra = (baubles.isEnabled() ? ItemMagicBauble.getItem(ItemType.RIBBON_MEDIUM, 1) : NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1));
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("true_mirror_shield",
+					new ItemStack(MirrorShieldImproved.instance()), null,
+					new ReagentType[] {ReagentType.MANI_DUST, ReagentType.BLACK_PEARL, ReagentType.BLACK_PEARL, ReagentType.MANI_DUST},
+					new ItemStack(MirrorShield.instance()),
+					new ItemStack[] {NostrumResourceItem.getItem(ResourceType.PENDANT_LEFT ,1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), extra, NostrumResourceItem.getItem(ResourceType.PENDANT_RIGHT ,1)},
+					new RRequirementQuest("true_mirror_shield"),
+					new OutcomeSpawnItem(new ItemStack(MirrorShieldImproved.instance())))
+				);
+		
 		
 //		RitualRegistry.instance().addRitual(
 //				RitualRecipe.createTier2("ritual.form_obelisk.name", EMagicElement.ENDER,
@@ -1311,6 +1323,15 @@ public class NostrumMagica
     			null,
     			new IReward[]{new AttributeReward(AwardType.MANA, 0.010f)})
     		.offset(3, 6);
+    	new NostrumQuest("true_mirror_shield", QuestType.CHALLENGE, 8,
+    			1, // Control
+    			0, // Technique
+    			1, // Finesse
+    			new String[] {"mirror_shield"},
+    			new String[] {MirrorShield.instance().getLoreKey()},
+    			null,
+    			new IReward[]{new AttributeReward(AwardType.MANA, 0.025f)})
+    		.offset(4, 6);
     	
 //    	new NostrumQuest("con", QuestType.REGULAR, 0,
 //    			0, // Control
