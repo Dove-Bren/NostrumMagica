@@ -23,6 +23,7 @@ import com.smanzana.nostrummagica.blocks.NostrumMirrorBlock;
 import com.smanzana.nostrummagica.blocks.NostrumObelisk;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.blocks.ShrineBlock;
+import com.smanzana.nostrummagica.blocks.SorceryPortal;
 import com.smanzana.nostrummagica.blocks.SpellTable;
 import com.smanzana.nostrummagica.blocks.SymbolBlock;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
@@ -571,6 +572,14 @@ public class CommonProxy {
     					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(LoreTable.ID))
     			);
     	LoreTable.init();
+    	
+    	GameRegistry.register(SorceryPortal.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, SorceryPortal.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(SorceryPortal.instance()).setRegistryName(SorceryPortal.ID)
+    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(SorceryPortal.ID))
+    			);
+    	SorceryPortal.init();
     	
     }
     

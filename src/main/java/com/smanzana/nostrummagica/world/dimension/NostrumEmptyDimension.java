@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.world.dimension;
 
 import java.util.List;
 
+import org.apache.commons.lang3.reflect.FieldUtils;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.entity.Entity;
@@ -220,6 +222,13 @@ public class NostrumEmptyDimension {
 			
 			BlockPos spawn = NostrumMagica.getOrCreatePlayerDimensionSpawn((EntityPlayer) entityIn);
 			
+			try {
+				FieldUtils.writeField(((EntityPlayerMP)entityIn), "invulnerableDimensionChange", true, true);
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			entityIn.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 1, spawn.getZ() + .5);
 			entityIn.motionX = entityIn.motionY = entityIn.motionZ = 0;
 			return true;
@@ -283,7 +292,17 @@ public class NostrumEmptyDimension {
 				pos = world.getSpawnPoint();
 			}
 			
-			entityIn.setPositionAndUpdate(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
+			if (entityIn instanceof EntityPlayerMP) {
+				try {
+					FieldUtils.writeField(((EntityPlayerMP)entityIn), "invulnerableDimensionChange", true, true);
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				((EntityPlayerMP)entityIn).connection.setPlayerLocation(pos.getX() + .5, pos.getY(), pos.getZ() + .5, entityIn.rotationYaw, entityIn.rotationPitch);
+			} else {
+				entityIn.setPositionAndUpdate(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
+			}
 			
 			return true;
 		}

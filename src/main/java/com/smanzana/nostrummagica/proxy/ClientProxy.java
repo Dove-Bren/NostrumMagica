@@ -21,6 +21,7 @@ import com.smanzana.nostrummagica.blocks.ModificationTable;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.blocks.NostrumMirrorBlock;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
+import com.smanzana.nostrummagica.blocks.SorceryPortal;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.effects.ClientEffect;
 import com.smanzana.nostrummagica.client.effects.ClientEffectBeam;
@@ -43,6 +44,7 @@ import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityAltarRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityCandleRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityObeliskRenderer;
+import com.smanzana.nostrummagica.client.render.TileEntityPortalRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntitySymbolRenderer;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityDragon;
@@ -330,6 +332,7 @@ public class ClientProxy extends CommonProxy {
     	TileEntityCandleRenderer.init();
     	TileEntityAltarRenderer.init();
     	TileEntityObeliskRenderer.init();
+    	TileEntityPortalRenderer.init();
     	
     	OBJLoader.INSTANCE.addDomain(NostrumMagica.MODID);
     	
@@ -439,6 +442,9 @@ public class ClientProxy extends CommonProxy {
 		registerModel(Item.getItemFromBlock(LoreTable.instance()),
 				0,
 				LoreTable.ID);
+		registerModel(Item.getItemFromBlock(SorceryPortal.instance()),
+				0,
+				SorceryPortal.ID);
 		
 		registerModel(new ItemBlock(DungeonBlock.instance()), 
 				DungeonBlock.Type.DARK.ordinal(),
@@ -875,6 +881,8 @@ public class ClientProxy extends CommonProxy {
 				NostrumMagica.MODID, "entity/sprite_arms"));
 		event.getMap().registerSprite(new ResourceLocation(
 				NostrumMagica.MODID, "entity/magic_blade"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "blocks/portal"));
 	}
 	
 	@SubscribeEvent

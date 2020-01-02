@@ -246,6 +246,7 @@ tile.nostrum_candle.name=Candle
 tile.altar_block.name=Altar
 tile.modification_table.name=Modification Table
 tile.lore_table.name=Researcher's Table
+tile.sorcery_portal.name=Portal
 
 entity.nostrummagica.physical_golem.name=Metal Golem
 entity.nostrummagica.lightning_golem.name=Lightining Golem

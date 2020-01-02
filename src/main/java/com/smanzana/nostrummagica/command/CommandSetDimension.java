@@ -33,6 +33,7 @@ public class CommandSetDimension extends CommandBase {
 			
 			if (player.isCreative()) {
 				if (DimensionManager.isDimensionRegistered(dimension)) {
+					System.out.println("Teleport Command!");
 					player.setPortal(player.getPosition());
 					player.changeDimension(dimension);
 				} else {

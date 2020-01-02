@@ -131,12 +131,6 @@ public class MagicCharm extends Item implements ILoreTagged {
 		if (worldIn.isRemote)
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
 		
-		if (playerIn.isSneaking()) {
-			// return new ActionResult<ItemStack>(EnumActionResult.PASS, stack); TODO
-			playerIn.changeDimension(ModConfig.config.sorceryDimensionIndex());
-			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
-		}
-		
 		EMagicElement element = MagicCharm.getTypeFromMeta(stack.getMetadata());
 		boolean used = false;
 		

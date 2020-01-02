@@ -1,0 +1,6 @@
+{
+    "variants": {
+        "master=false": { "model": "nostrummagica:none" },
+        "master=true": { "model": "nostrummagica:none" }
+    }
+}
