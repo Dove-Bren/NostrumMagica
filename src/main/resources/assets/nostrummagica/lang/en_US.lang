@@ -247,6 +247,7 @@ tile.altar_block.name=Altar
 tile.modification_table.name=Modification Table
 tile.lore_table.name=Researcher's Table
 tile.sorcery_portal.name=Portal
+tile.progression_door.name=Mystic Door
 
 entity.nostrummagica.physical_golem.name=Metal Golem
 entity.nostrummagica.lightning_golem.name=Lightining Golem
@@ -334,6 +335,12 @@ info.skillitem.finesse=You've been awarded an additional point in Finesse!
 info.skillitem.control=You've been awarded an additional point in Control!
 info.skillitem.technique=You've been awarded an additional point in Technique!
 info.skillitem.point=You've been awarded an additional skill point!
+info.door.missing.intro=You lack the required knowledge to open this door:
+info.door.missing.unlock=Magic must be unlocked
+info.door.missing.level=Magic level %1$s or greater
+info.door.missing.shape=Unlocked the %1$s shape
+info.door.missing.trigger=Unlocked the %1$s trigger
+info.door.missing.element=Unlocked the %1$s element
 
 info.discovery.name=Unlocking Magic
 info.stats.name=Stats

@@ -21,6 +21,7 @@ import com.smanzana.nostrummagica.blocks.ModificationTable;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.blocks.NostrumMirrorBlock;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
+import com.smanzana.nostrummagica.blocks.ProgressionDoor;
 import com.smanzana.nostrummagica.blocks.SorceryPortal;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.effects.ClientEffect;
@@ -445,6 +446,9 @@ public class ClientProxy extends CommonProxy {
 		registerModel(Item.getItemFromBlock(SorceryPortal.instance()),
 				0,
 				SorceryPortal.ID);
+		registerModel(Item.getItemFromBlock(ProgressionDoor.instance()),
+				0,
+				ProgressionDoor.ID);
 		
 		registerModel(new ItemBlock(DungeonBlock.instance()), 
 				DungeonBlock.Type.DARK.ordinal(),

@@ -1,0 +1,24 @@
+{
+    "parent": "block/cube_all",
+    "textures": {
+        "all": "nostrummagica:blocks/magic_door"
+    },
+    "elements": [
+        {
+            "from": [0, 0, 7.5],
+            "to": [16, 16, 8.5],
+            "faces": {
+                "north": {"texture": "#all"},
+                "south": {"texture": "#all"}
+            }
+        },
+        {
+            "from": [0, 0, 7.5],
+            "to": [16, 16, 8.5],
+            "faces": {
+                "north": {"texture": "#all"},
+                "south": {"texture": "#all"}
+            }
+        }
+    ]
+}
