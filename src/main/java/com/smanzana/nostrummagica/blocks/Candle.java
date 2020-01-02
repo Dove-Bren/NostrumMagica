@@ -76,7 +76,7 @@ public class Candle extends Block implements ITileEntityProvider {
 		this.setSoundType(SoundType.PLANT);
 		
 		this.isBlockContainer = true;
-		this.setLightOpacity(16);
+		//this.setLightOpacity(16);
 		
 		this.setDefaultState(this.blockState.getBaseState().withProperty(LIT, false));
 		this.setTickRandomly(true);

@@ -1,5 +1,5 @@
 {
-    "parent":"nostrummagica:block/dungeon_light",
+    "parent":"nostrummagica:block/dungeon_dark",
     "display": {
         "thirdperson": {
             "rotation": [ 10, -45, 170 ],
