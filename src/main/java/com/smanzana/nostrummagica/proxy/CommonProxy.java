@@ -588,6 +588,7 @@ public class CommonProxy {
     			(new ItemBlock(ProgressionDoor.instance()).setRegistryName(ProgressionDoor.ID)
     					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(ProgressionDoor.ID))
     			);
+    	ProgressionDoor.init();
     	
     }
     

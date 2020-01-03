@@ -46,6 +46,7 @@ import com.smanzana.nostrummagica.client.render.TileEntityAltarRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityCandleRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityObeliskRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityPortalRenderer;
+import com.smanzana.nostrummagica.client.render.TileEntityProgressionDoorRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntitySymbolRenderer;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityDragon;
@@ -334,6 +335,7 @@ public class ClientProxy extends CommonProxy {
     	TileEntityAltarRenderer.init();
     	TileEntityObeliskRenderer.init();
     	TileEntityPortalRenderer.init();
+    	TileEntityProgressionDoorRenderer.init();
     	
     	OBJLoader.INSTANCE.addDomain(NostrumMagica.MODID);
     	

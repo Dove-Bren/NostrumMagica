@@ -341,6 +341,7 @@ info.door.missing.level=Magic level %1$s or greater
 info.door.missing.shape=Unlocked the %1$s shape
 info.door.missing.trigger=Unlocked the %1$s trigger
 info.door.missing.element=Unlocked the %1$s element
+info.door.missing.alteration=Unlocked the %1$s alteration
 
 info.discovery.name=Unlocking Magic
 info.stats.name=Stats

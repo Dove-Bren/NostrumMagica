@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.SoundType;
@@ -60,8 +61,10 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 	
 	@Override
 	public int getMetaFromState(IBlockState state) {
-		return state.getValue(MASTER) ? 1 : 0
+		int meta = (state.getValue(MASTER) ? 1 : 0)
 				| (state.getValue(FACING).getHorizontalIndex() << 1);
+			
+		return meta;
 	}
 	
 	private void destroy(World world, BlockPos pos, IBlockState state) {
@@ -75,16 +78,19 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 			return;
 		
 		if (state.getValue(MASTER)) {
-			// Actually destroy
-			walkDoor(world, pos, state, (checkPos, checkState) -> {
-				world.setBlockToAir(checkPos);
-				return false;
-			});
+			
 		} else {
 			BlockPos master = getMasterPos(world, state, pos);
-			if (master != null)
+			if (master != null && world.getBlockState(master) != null && isMaster(world.getBlockState(master))) {
 				world.setBlockToAir(master);
+			}
 		}
+		
+		// Actually destroy
+		walkDoor(world, pos, state, (checkPos, checkState) -> {
+			world.setBlockToAir(checkPos);
+			return false;
+		});
 		
 		
 		((WorldServer)world).spawnParticle(EnumParticleTypes.LAVA, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
@@ -274,5 +280,6 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 	
 	public void clearDoor(World world, BlockPos onePos, IBlockState state) {
 		destroy(world, onePos, state);
+		NostrumMagicaSounds.LEVELUP.play(world, onePos.getX(), onePos.getY(), onePos.getZ());
 	}
 }

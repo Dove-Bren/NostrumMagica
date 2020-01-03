@@ -37,8 +37,8 @@ public class TileEntitySymbolRenderer extends TileEntitySpecialRenderer<SymbolTi
 			icon = SpellComponentIcon.get(comp.getTrigger());
 		else if (comp.isShape())
 			icon = SpellComponentIcon.get(comp.getShape());
-		else if (comp.isTrigger())
-			icon = SpellComponentIcon.get(comp.getTrigger());
+		else if (comp.isAlteration())
+			icon = SpellComponentIcon.get(comp.getAlteration());
 		else
 			icon = SpellComponentIcon.get(comp.getElement());
 		ResourceLocation textLoc = icon.getModelLocation();
