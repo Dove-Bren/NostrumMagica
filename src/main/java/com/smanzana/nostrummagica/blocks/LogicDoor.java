@@ -1,0 +1,52 @@
+package com.smanzana.nostrummagica.blocks;
+
+import javax.annotation.Nullable;
+
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+
+public class LogicDoor extends NostrumMagicDoor {
+
+	public static final String ID = "logic_door";
+	
+	private static LogicDoor instance = null;
+	public static LogicDoor instance() {
+		if (instance == null)
+			instance = new LogicDoor();
+		
+		return instance;
+	}
+	
+	public static void init() {
+		;
+	}
+	
+	public LogicDoor() {
+		super();
+		this.setUnlocalizedName(ID);
+		
+	}
+	
+	@Override
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+		if (worldIn.isRemote)
+			return true;
+		
+		// Allow creative players to open door
+		if (playerIn.isCreative() && heldItem == null && hand == EnumHand.MAIN_HAND) {
+			this.openDoor(worldIn, pos, state);
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public void openDoor(World world, BlockPos pos, IBlockState state) {
+		this.clearDoor(world, pos, state);
+	}
+}

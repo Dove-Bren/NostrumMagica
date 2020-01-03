@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.CursedIce;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.blocks.EssenceOre;
+import com.smanzana.nostrummagica.blocks.LogicDoor;
 import com.smanzana.nostrummagica.blocks.LoreTable;
 import com.smanzana.nostrummagica.blocks.MagicDirt;
 import com.smanzana.nostrummagica.blocks.MagicWall;
@@ -451,14 +452,17 @@ public class ClientProxy extends CommonProxy {
 		registerModel(Item.getItemFromBlock(ProgressionDoor.instance()),
 				0,
 				ProgressionDoor.ID);
+		registerModel(Item.getItemFromBlock(LogicDoor.instance()),
+				0,
+				LogicDoor.ID);
 		
 		registerModel(new ItemBlock(DungeonBlock.instance()), 
 				DungeonBlock.Type.DARK.ordinal(),
-				DungeonBlock.Type.DARK.getName()
+				DungeonBlock.ID + "_" + DungeonBlock.Type.DARK.getName()
 				);
 		registerModel(new ItemBlock(DungeonBlock.instance()), 
 				DungeonBlock.Type.LIGHT.ordinal(),
-				DungeonBlock.Type.LIGHT.getName()
+				DungeonBlock.ID + "_" + DungeonBlock.Type.LIGHT.getName()
 				);
 		
 		registerModel(new ItemBlock(NostrumMirrorBlock.instance()),

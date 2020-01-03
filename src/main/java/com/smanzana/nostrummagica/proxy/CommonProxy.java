@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.blocks.CropMandrakeRoot;
 import com.smanzana.nostrummagica.blocks.CursedIce;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.blocks.EssenceOre;
+import com.smanzana.nostrummagica.blocks.LogicDoor;
 import com.smanzana.nostrummagica.blocks.LoreTable;
 import com.smanzana.nostrummagica.blocks.MagicDirt;
 import com.smanzana.nostrummagica.blocks.MagicWall;
@@ -589,6 +590,14 @@ public class CommonProxy {
     					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(ProgressionDoor.ID))
     			);
     	ProgressionDoor.init();
+    	
+    	GameRegistry.register(LogicDoor.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, LogicDoor.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(LogicDoor.instance()).setRegistryName(LogicDoor.ID)
+    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(LogicDoor.ID))
+    			);
+    	LogicDoor.init();
     	
     }
     

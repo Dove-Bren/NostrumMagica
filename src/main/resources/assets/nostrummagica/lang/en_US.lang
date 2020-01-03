@@ -248,6 +248,7 @@ tile.modification_table.name=Modification Table
 tile.lore_table.name=Researcher's Table
 tile.sorcery_portal.name=Portal
 tile.progression_door.name=Mystic Door
+tile.progression_door.name=Sealed Door
 
 entity.nostrummagica.physical_golem.name=Metal Golem
 entity.nostrummagica.lightning_golem.name=Lightining Golem

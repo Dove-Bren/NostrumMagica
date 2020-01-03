@@ -1,0 +1,6 @@
+{
+    "parent": "nostrummagica:block/magic_door",
+    "textures": {
+        "all": "nostrummagica:blocks/metal_door"
+    }
+}
