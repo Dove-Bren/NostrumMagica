@@ -17,6 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DimensionType;
+import net.minecraft.world.GameType;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
@@ -112,6 +113,11 @@ public class NostrumEmptyDimension {
 		}
 		
 		@Override
+		public boolean doesWaterVaporize() {
+			return true;
+		}
+		
+		@Override
 		public float calculateCelestialAngle(long worldTime, float partialTicks) {
 			return .5f;
 		}
@@ -153,7 +159,6 @@ public class NostrumEmptyDimension {
 				if (distSqr > 25) {
 					// Player appears to have teleported
 					player.setPositionAndUpdate(player.lastTickPosX, player.lastTickPosY, player.lastTickPosZ);
-					System.out.println("Teleport? " + distSqr); //TODO donotcheckin
 				}
 			}
 		}
@@ -216,21 +221,27 @@ public class NostrumEmptyDimension {
 				return false;
 			}
 			
-			if (!portalExists((EntityPlayer) entityIn)) {
-				this.makePortal(entityIn);
+			EntityPlayer player = (EntityPlayer) entityIn;
+			
+			if (!portalExists(player)) {
+				this.makePortal(player);
 			}
 			
-			BlockPos spawn = NostrumMagica.getOrCreatePlayerDimensionSpawn((EntityPlayer) entityIn);
+			BlockPos spawn = NostrumMagica.getOrCreatePlayerDimensionSpawn(player);
 			
 			try {
-				FieldUtils.writeField(((EntityPlayerMP)entityIn), "invulnerableDimensionChange", true, true);
+				FieldUtils.writeField(((EntityPlayerMP)player), "invulnerableDimensionChange", true, true);
 			} catch (IllegalAccessException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
-			entityIn.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 1, spawn.getZ() + .5);
-			entityIn.motionX = entityIn.motionY = entityIn.motionZ = 0;
+			if (!player.isCreative() && !player.isSpectator()) {
+				player.setGameType(GameType.ADVENTURE);
+			}
+			
+			player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 1, spawn.getZ() + .5);
+			player.motionX = player.motionY = player.motionZ = 0;
 			return true;
 		}
 		
@@ -299,6 +310,11 @@ public class NostrumEmptyDimension {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
+				if (((EntityPlayerMP) entityIn).interactionManager.getGameType() == GameType.ADVENTURE) {
+					((EntityPlayerMP) entityIn).setGameType(GameType.SURVIVAL);
+				}
+				
 				((EntityPlayerMP)entityIn).connection.setPlayerLocation(pos.getX() + .5, pos.getY(), pos.getZ() + .5, entityIn.rotationYaw, entityIn.rotationPitch);
 			} else {
 				entityIn.setPositionAndUpdate(pos.getX() + .5, pos.getY(), pos.getZ() + .5);

@@ -69,7 +69,7 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 
 		@Override
 		public int getColor() {
-			return 0x00FF00FF;
+			return 0x00500050;
 		}
 
 		@Override
