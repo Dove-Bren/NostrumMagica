@@ -58,6 +58,7 @@ import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityShadowDragonRed;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
 import com.smanzana.nostrummagica.entity.EntitySprite;
+import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
 import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.ITameDragon;
 import com.smanzana.nostrummagica.entity.renderer.ModelGolem;
@@ -68,6 +69,7 @@ import com.smanzana.nostrummagica.entity.renderer.RenderKoid;
 import com.smanzana.nostrummagica.entity.renderer.RenderMagicSaucer;
 import com.smanzana.nostrummagica.entity.renderer.RenderShadowDragonRed;
 import com.smanzana.nostrummagica.entity.renderer.RenderSprite;
+import com.smanzana.nostrummagica.entity.renderer.RenderSwitchTrigger;
 import com.smanzana.nostrummagica.entity.renderer.RenderTameDragonRed;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
@@ -241,6 +243,12 @@ public class ClientProxy extends CommonProxy {
 			@Override
 			public Render<? super EntitySpellSaucer> createRenderFor(RenderManager manager) {
 				return new RenderMagicSaucer(manager);
+			}
+		});
+		RenderingRegistry.registerEntityRenderingHandler(EntitySwitchTrigger.class, new IRenderFactory<EntitySwitchTrigger>() {
+			@Override
+			public Render<? super EntitySwitchTrigger> createRenderFor(RenderManager manager) {
+				return new RenderSwitchTrigger(manager);
 			}
 		});
 		

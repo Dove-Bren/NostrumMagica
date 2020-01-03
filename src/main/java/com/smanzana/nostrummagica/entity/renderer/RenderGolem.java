@@ -1,5 +1,8 @@
 package com.smanzana.nostrummagica.entity.renderer;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityGolem;
 
@@ -10,15 +13,23 @@ import net.minecraft.util.ResourceLocation;
 
 public class RenderGolem extends RenderLiving<EntityGolem> {
 
+	private Map<String, ResourceLocation> texCache;
+	
 	public RenderGolem(RenderManager renderManagerIn, ModelBase modelBaseIn, float shadowSizeIn) {
 		super(renderManagerIn, modelBaseIn, shadowSizeIn);
+		texCache = new HashMap<>();
 	}
-
+	
 	@Override
 	protected ResourceLocation getEntityTexture(EntityGolem entity) {
-		return new ResourceLocation(NostrumMagica.MODID,
-				"textures/entity/golem_" + entity.getTextureKey() + ".png"
-				);
+		ResourceLocation loc = texCache.get(entity.getTextureKey());
+		if (loc == null) {
+			loc = new ResourceLocation(NostrumMagica.MODID,
+					"textures/entity/golem_" + entity.getTextureKey() + ".png"
+					);
+			texCache.put(entity.getTextureKey(), loc);
+		}
+		return loc;
 	}
 	
 }

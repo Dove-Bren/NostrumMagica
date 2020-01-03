@@ -27,6 +27,7 @@ import com.smanzana.nostrummagica.blocks.ProgressionDoor;
 import com.smanzana.nostrummagica.blocks.ShrineBlock;
 import com.smanzana.nostrummagica.blocks.SorceryPortal;
 import com.smanzana.nostrummagica.blocks.SpellTable;
+import com.smanzana.nostrummagica.blocks.SwitchBlock;
 import com.smanzana.nostrummagica.blocks.SymbolBlock;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -53,6 +54,7 @@ import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityShadowDragonRed;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
 import com.smanzana.nostrummagica.entity.EntitySprite;
+import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
 import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.ITameDragon;
 import com.smanzana.nostrummagica.items.AltarItem;
@@ -268,6 +270,12 @@ public class CommonProxy {
     			64,
     			1,
     			true);
+    	EntityRegistry.registerModEntity(EntitySwitchTrigger.class, "entity_switch_trigger",
+    			entityID++,
+    			NostrumMagica.instance,
+    			128,
+    			1,
+    			false);
     	
     	EntityRegistry.addSpawn(EntityKoid.class, 20, 1, 1, EnumCreatureType.MONSTER, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.MAGICAL));
@@ -598,6 +606,14 @@ public class CommonProxy {
     					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(LogicDoor.ID))
     			);
     	LogicDoor.init();
+    	
+    	GameRegistry.register(SwitchBlock.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, SwitchBlock.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(SwitchBlock.instance()).setRegistryName(SwitchBlock.ID)
+    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(SwitchBlock.ID))
+    			);
+    	SwitchBlock.init();
     	
     }
     

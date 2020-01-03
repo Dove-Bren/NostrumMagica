@@ -248,7 +248,8 @@ tile.modification_table.name=Modification Table
 tile.lore_table.name=Researcher's Table
 tile.sorcery_portal.name=Portal
 tile.progression_door.name=Mystic Door
-tile.progression_door.name=Sealed Door
+tile.logic_door.name=Sealed Door
+tile.switch_block.name=Switch
 
 entity.nostrummagica.physical_golem.name=Metal Golem
 entity.nostrummagica.lightning_golem.name=Lightining Golem
@@ -268,6 +269,7 @@ entity.nostrummagica.entity_dragon_egg.name=Dragon Egg
 entity.nostrummagica.entity_internal_spellsaucer_chakram.name=Spell Saucer
 entity.nostrummagica.entity_internal_spellsaucer_cycler.name=Spell Saucer
 entity.nostrummagica.entity_internal_spellsaucer_.name=Spell Saucer
+entity.nostrummagica.entity_switch_trigger.name=Mystic Trigger
 
 itemGroup.nostrummagica=Nostrum Magica
 itemGroup.nostrummagica_enhancements=Nostrum Enhancements

@@ -10,7 +10,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class LogicDoor extends NostrumMagicDoor {
+public class LogicDoor extends NostrumMagicDoor implements ITriggeredBlock {
 
 	public static final String ID = "logic_door";
 	
@@ -39,14 +39,14 @@ public class LogicDoor extends NostrumMagicDoor {
 		
 		// Allow creative players to open door
 		if (playerIn.isCreative() && heldItem == null && hand == EnumHand.MAIN_HAND) {
-			this.openDoor(worldIn, pos, state);
+			this.trigger(worldIn, pos, state, null);
 			return true;
 		}
 		
 		return false;
 	}
 	
-	public void openDoor(World world, BlockPos pos, IBlockState state) {
+	public void trigger(World world, BlockPos pos, IBlockState state, BlockPos triggerPos) {
 		this.clearDoor(world, pos, state);
 	}
 }
