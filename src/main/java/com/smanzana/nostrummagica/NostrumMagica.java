@@ -19,6 +19,7 @@ import com.smanzana.nostrummagica.command.CommandEnhanceTome;
 import com.smanzana.nostrummagica.command.CommandForceBind;
 import com.smanzana.nostrummagica.command.CommandGiveSkillpoint;
 import com.smanzana.nostrummagica.command.CommandGotoDungeon;
+import com.smanzana.nostrummagica.command.CommandReadRoom;
 import com.smanzana.nostrummagica.command.CommandSetDimension;
 import com.smanzana.nostrummagica.command.CommandSetLevel;
 import com.smanzana.nostrummagica.command.CommandSpawnDungeon;
@@ -26,6 +27,7 @@ import com.smanzana.nostrummagica.command.CommandSpawnObelisk;
 import com.smanzana.nostrummagica.command.CommandTestConfig;
 import com.smanzana.nostrummagica.command.CommandUnlock;
 import com.smanzana.nostrummagica.command.CommandUnlockAll;
+import com.smanzana.nostrummagica.command.CommandWriteRoom;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.EntityKoid;
@@ -242,6 +244,8 @@ public class NostrumMagica
     	event.registerServerCommand(new CommandSpawnDungeon());
     	event.registerServerCommand(new CommandUnlockAll());
     	event.registerServerCommand(new CommandSetDimension());
+    	event.registerServerCommand(new CommandWriteRoom());
+    	event.registerServerCommand(new CommandReadRoom());
     }
     
     /**
