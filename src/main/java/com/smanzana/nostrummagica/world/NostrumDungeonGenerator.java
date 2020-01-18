@@ -210,6 +210,7 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 				 .add(new RoomLectern())
 				 .add(new RoomChallenge1())), 30, 50),
 		DRAGON(new WorldGenNostrumShrine(DRAGON_DUNGEON), 30, 60);
+//		TEST(new WorldGenNostrumShrine(new NostrumLoadedDungeon("test", new StartRoom(), new RoomArena())), 30, 60);
 		
 		private WorldGenerator gen;
 		private int minY;

@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import com.smanzana.nostrummagica.baubles.BaublesProxy;
 import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble.ItemType;
+import com.smanzana.nostrummagica.blocks.NostrumPortal;
 import com.smanzana.nostrummagica.capabilities.AttributeProvider;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.command.CommandAllQuests;
@@ -112,6 +113,7 @@ import com.smanzana.nostrummagica.world.NostrumChunkLoader;
 import com.smanzana.nostrummagica.world.NostrumLootHandler;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensionMapper;
 import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
+import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
@@ -213,7 +215,7 @@ public class NostrumMagica
     	registerDefaultQuests();
     	registerDefaultTrials();
     	
-    	
+    	DungeonRoomRegistry.instance().loadRegistryFromDisk();
     	
     	NostrumChunkLoader.instance();
     	
@@ -1587,10 +1589,6 @@ public class NostrumMagica
     	// But registry should be global anyways, so we're going to try and allow it.
     	// I'm not sure the 'right' way to use global save data like this.
     	
-    	// Debug: Race condition where spells are created cause the world auto-gen's a dungeon.
-    	// Why isn't this being called first?
-    	System.out.println("Debug: WorldEvent load called");
-    	
     	if (event.getWorld().isRemote) {
     		// Clients just get a spell registry that's empty that is constantly synced with the server's
     		// Create one if this is our first world.
@@ -1598,6 +1596,7 @@ public class NostrumMagica
     		if (spellRegistry == null) {
     			spellRegistry = new SpellRegistry();
     		}
+    		
     	} else {
     		// Do the correct initialization for persisted data
 			initSpellRegistry(event.getWorld());
@@ -1616,5 +1615,8 @@ public class NostrumMagica
     		serverDimensionMapper.unregisterAll();
     		serverDimensionMapper = null;
     	}
+    	
+    	// Reset portal data so previous saves don't screw you over
+    	NostrumPortal.resetTimers();
     }
 }

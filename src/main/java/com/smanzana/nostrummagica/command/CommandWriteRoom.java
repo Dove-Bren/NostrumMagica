@@ -1,19 +1,16 @@
 package com.smanzana.nostrummagica.command;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.LinkedList;
 
-import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.items.PositionCrystal;
-import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomSerializationHelper;
+import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
+import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentString;
 
@@ -45,22 +42,14 @@ public class CommandWriteRoom extends CommandBase {
 				|| (offhand == null || !(offhand.getItem() instanceof PositionCrystal) || PositionCrystal.getBlockPosition(offhand) == null)) {
 				sender.addChatMessage(new TextComponentString("You must be holding a filled geogem in both of your hands"));
 			} else {
-				NBTTagCompound nbt = new NBTTagCompound();
-				nbt.setString("name", args[0]);
-				nbt.setTag("blocks", DungeonRoomSerializationHelper.serialize(player.worldObj,
+				RoomBlueprint blueprint = new RoomBlueprint(player.worldObj,
 						PositionCrystal.getBlockPosition(main),
-						PositionCrystal.getBlockPosition(offhand)));
+						PositionCrystal.getBlockPosition(offhand));
 				
-				File file = new File(ModConfig.config.base.getConfigFile().getParentFile(), "NostrumMagica/dungeon_rooms/captures/capture_" + args[0] + ".dat");
-				try {
-					file.mkdirs();
-					CompressedStreamTools.safeWrite(nbt, file);
-					sender.addChatMessage(new TextComponentString("Room written to " + file.getPath()));
-				} catch (IOException e) {
-					e.printStackTrace();
-					
-					System.out.println("Failed to write out serialized file " + file.toString());
-					sender.addChatMessage(new TextComponentString("Failed to write room"));
+				if (DungeonRoomRegistry.instance().writeRoomAsFile(blueprint, args[0], 1, new LinkedList<>())) {
+					sender.addChatMessage(new TextComponentString("Room written!"));
+				} else {
+					sender.addChatMessage(new TextComponentString("An error was encountered while writing the room"));
 				}
 			}
 		} else {

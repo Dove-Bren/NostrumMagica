@@ -191,6 +191,10 @@ public abstract class NostrumPortal extends Block  {
 		this.teleportEntity(worldIn, pos, entityIn);
 	}
 	
+	public static void resetTimers() {
+		EntityTeleportTimes.clear();
+	}
+	
 	public static abstract class NostrumPortalTileEntityBase extends TileEntity {
 		
 		/**

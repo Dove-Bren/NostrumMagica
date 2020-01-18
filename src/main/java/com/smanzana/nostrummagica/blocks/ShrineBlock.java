@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.MasteryOrb;
+import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -108,6 +109,15 @@ public class ShrineBlock extends SymbolBlock {
 		TileEntity te = worldIn.getTileEntity(pos);
 		if (te == null || !(te instanceof SymbolTileEntity))
 			return false;
+		
+		// code for map building
+		if (playerIn.isCreative() && heldItem != null && heldItem.getItem() instanceof SpellRune) {
+			SpellComponentWrapper comp = SpellRune.toComponentWrapper(heldItem);
+			if (comp != null) {
+				((SymbolTileEntity) te).setComponent(comp);
+				return true;
+			}
+		}
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
 		if (attr == null)

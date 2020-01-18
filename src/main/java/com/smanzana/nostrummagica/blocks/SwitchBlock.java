@@ -14,6 +14,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemEnderEye;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -25,6 +26,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -37,6 +39,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  *
  */
 public class SwitchBlock extends Block {
+	
+	protected static final AxisAlignedBB SWITCH_BLOCK_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1D, 0.2D, 1D);
 
 	public static String ID = "switch_block";
 	
@@ -70,6 +74,11 @@ public class SwitchBlock extends Block {
 	@Override
 	public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
 		return 8;
+	}
+	
+	@Override
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+		return SWITCH_BLOCK_AABB;
 	}
 	
 	@Override
@@ -146,6 +155,18 @@ public class SwitchBlock extends Block {
 				}
 			}
 			return true;
+		} else if (heldItem != null && heldItem.getItem() instanceof ItemEnderEye) {
+			TileEntity te = worldIn.getTileEntity(pos);
+			if (te != null) {
+				SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;
+				BlockPos loc = ent.getOffset().toImmutable().add(pos);
+				IBlockState atState = worldIn.getBlockState(loc);
+				if (atState != null && atState.getBlock() instanceof ITriggeredBlock) {
+					playerIn.setPositionAndUpdate(loc.getX(), loc.getY(), loc.getZ());
+				} else {
+					playerIn.addChatComponentMessage(new TextComponentString("Not pointed at valid triggered block!"));
+				}
+			}
 		} else if (heldItem == null && hand == EnumHand.MAIN_HAND) {
 			TileEntity te = worldIn.getTileEntity(pos);
 			if (te != null) {

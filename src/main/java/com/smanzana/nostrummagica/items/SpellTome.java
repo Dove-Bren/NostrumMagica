@@ -739,7 +739,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		if (owner != null)
 			return;
 		
-		if (!(entityIn instanceof EntityPlayer)) {
+		if (!(entityIn instanceof EntityPlayer) || ((EntityPlayer) entityIn).isCreative()) {
 			return;
 		}
 		

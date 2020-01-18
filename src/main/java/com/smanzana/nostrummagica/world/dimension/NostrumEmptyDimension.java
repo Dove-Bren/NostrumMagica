@@ -1,20 +1,24 @@
 package com.smanzana.nostrummagica.world.dimension;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
+import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Biomes;
-import net.minecraft.init.Blocks;
+import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.GameType;
@@ -29,6 +33,8 @@ import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
+import net.minecraftforge.event.entity.living.EnderTeleportEvent;
+import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -40,6 +46,9 @@ public class NostrumEmptyDimension {
 	private static DimensionType DIMENSION_TYPE;
 	
 	public static final int SPAWN_Y = 128;
+	
+	private static final String DIMENSION_ENTRY_TEMPLATE = "sorcery_lobby.dat";
+	private static final String DIMENSION_WHOLE_TEMPLATE = "sorcery_lobby.dat";
 	
 	public static boolean register(int dim, String identifier) {
 		if (DimensionManager.isDimensionRegistered(dim)) {
@@ -208,11 +217,35 @@ public class NostrumEmptyDimension {
 	public static class DimensionEntryTeleporter extends Teleporter {
 		
 		private WorldServer world;
+		private RoomBlueprint lobbyBlueprint;
+		private RoomBlueprint wholeBlueprint;
 		
 		public DimensionEntryTeleporter(WorldServer worldIn) {
 			super(worldIn);
 			
 			this.world = worldIn;
+			
+			File file = new File(DungeonRoomRegistry.instance().roomLoadFolder, DIMENSION_ENTRY_TEMPLATE);
+			try {
+				NBTTagCompound nbt = CompressedStreamTools.read(file);
+				if (nbt != null) {
+					lobbyBlueprint = DungeonRoomRegistry.instance().loadFromNBT(nbt);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+				NostrumMagica.logger.fatal("Failed to load sorcery lobby from " + file.toString());
+			}
+			
+			file = new File(DungeonRoomRegistry.instance().roomLoadFolder, DIMENSION_WHOLE_TEMPLATE);
+			try {
+				NBTTagCompound nbt = CompressedStreamTools.read(file);
+				if (nbt != null) {
+					wholeBlueprint = DungeonRoomRegistry.instance().loadFromNBT(nbt);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+				NostrumMagica.logger.fatal("Failed to load sorcery dungeon from " + file.toString());
+			}
 		}
 		
 		@Override
@@ -240,7 +273,7 @@ public class NostrumEmptyDimension {
 				player.setGameType(GameType.ADVENTURE);
 			}
 			
-			player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 1, spawn.getZ() + .5);
+			player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 2, spawn.getZ() + .5);
 			player.motionX = player.motionY = player.motionZ = 0;
 			return true;
 		}
@@ -252,7 +285,7 @@ public class NostrumEmptyDimension {
 		
 		public boolean portalExists(EntityPlayer player) {
 			BlockPos spawn = NostrumMagica.getOrCreatePlayerDimensionSpawn(player);
-			return !world.isAirBlock(spawn);
+			return !world.isAirBlock(spawn.up());
 		}
 		
 		@Override
@@ -263,14 +296,15 @@ public class NostrumEmptyDimension {
 			
 			BlockPos spawn = NostrumMagica.getOrCreatePlayerDimensionSpawn((EntityPlayer) entityIn);
 			
-			MutableBlockPos pos = new MutableBlockPos(spawn);
-			
-			for (int i = -5; i <= 5; i++) {
-				for (int j = -5; j <= 5; j++) {
-					pos.setPos(spawn.getX() + i, spawn.getY(), spawn.getZ() + j);
-					world.setBlockState(pos, Blocks.GOLD_BLOCK.getDefaultState());
-				}
-			}
+//			for (int i = -5; i <= 5; i++) {
+//				for (int j = -5; j <= 5; j++) {
+//					pos.setPos(spawn.getX() + i, spawn.getY(), spawn.getZ() + j);
+//					world.setBlockState(pos, Blocks.GOLD_BLOCK.getDefaultState());
+//				}
+//			}
+			final long startTime = System.currentTimeMillis();
+			lobbyBlueprint.spawn(world, spawn);
+			NostrumMagica.logger.info("Took " + ((double) (System.currentTimeMillis() - startTime) / 1000.0) + " seconds to generate sorcery lobby");
 			
 			return true;
 		}
@@ -283,7 +317,7 @@ public class NostrumEmptyDimension {
 	
 	public static class DimensionReturnTeleporter extends Teleporter {
 		
-		private WorldServer world; 
+		private WorldServer world;
 		
 		public DimensionReturnTeleporter(WorldServer worldIn) {
 			super(worldIn);
@@ -349,6 +383,13 @@ public class NostrumEmptyDimension {
 		}
 		
 		@SubscribeEvent
+		public void onEnderTeleport(EnderTeleportEvent event) {
+			if (event.getEntityLiving() != null && event.getEntityLiving().dimension == dim && event.getEntityLiving() instanceof EntityPlayer) {
+				event.setCanceled(true);
+			}
+		}
+		
+		@SubscribeEvent
 		public void onTeleport(EntityTravelToDimensionEvent event) {
 			if (event.getDimension() == dim) {
 				event.setCanceled(true);
@@ -371,6 +412,13 @@ public class NostrumEmptyDimension {
 					server.getPlayerList().transferPlayerToDimension(
 							player, event.getDimension(), new DimensionReturnTeleporter(server.worldServerForDimension(event.getDimension())));
 				}
+			}
+		}
+		
+		@SubscribeEvent
+		public void onExplosion(ExplosionEvent.Detonate event) {
+			if (event.getWorld().provider.getDimension() == dim && event.getAffectedBlocks() != null) {
+				event.getAffectedBlocks().clear();;
 			}
 		}
 	}

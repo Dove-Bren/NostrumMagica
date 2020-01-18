@@ -167,6 +167,10 @@ public class MagicCharm extends Item implements ILoreTagged {
 	
 	private boolean doEarth(EntityPlayer player, World world) {
 		
+		if (world.provider.getDimension() == ModConfig.config.sorceryDimensionIndex()) {
+			return false;
+		}
+		
 		for (int x = -4; x <= 4; x++)
 		for (int y = 0; y < 5; y++)
 		for (int z = -4; z <= 4; z++) {

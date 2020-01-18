@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.blocks;
 
 import java.util.Random;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.EntityGolemEarth;
@@ -11,6 +13,9 @@ import com.smanzana.nostrummagica.entity.EntityGolemIce;
 import com.smanzana.nostrummagica.entity.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.EntityGolemWind;
+import com.smanzana.nostrummagica.items.EssenceItem;
+import com.smanzana.nostrummagica.items.NostrumSkillItem;
+import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
@@ -23,11 +28,15 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -150,7 +159,7 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		super.updateTick(worldIn, pos, state, rand);
 		
 		for (EntityPlayer player : worldIn.playerEntities) {
-			if (!player.isSpectator() && player.getDistanceSq(pos) < SPAWN_DIST_SQ) {
+			if (!player.isSpectator() && !player.isCreative() && player.getDistanceSq(pos) < SPAWN_DIST_SQ) {
 				this.spawn(worldIn, pos, state, rand);
 				
 				worldIn.setBlockToAir(pos);
@@ -226,6 +235,61 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
         return tileentity == null ? false : tileentity.receiveClientEvent(eventID, eventParam);
 	}
 
+	@Override
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+		if (worldIn.isRemote) {
+			return true;
+		}
+		
+		if (hand != EnumHand.MAIN_HAND) {
+			return true;
+		}
+		
+		TileEntity te = worldIn.getTileEntity(pos);
+		if (te == null || !(te instanceof SingleSpawnerTE)) {
+			return true;
+		}
+		
+		if (playerIn.isCreative()) {
+			if (heldItem == null) {
+				playerIn.addChatComponentMessage(new TextComponentString("Currently set to " + state.getValue(MOB).getName()));
+			} else if (heldItem.getItem() instanceof EssenceItem) {
+				Type type = null;
+				switch (EssenceItem.findType(heldItem)) {
+				case EARTH:
+					type = Type.GOLEM_EARTH;
+					break;
+				case ENDER:
+					type = Type.GOLEM_ENDER;
+					break;
+				case FIRE:
+					type = Type.GOLEM_FIRE;
+					break;
+				case ICE:
+					type = Type.GOLEM_ICE;
+					break;
+				case LIGHTNING:
+					type = Type.GOLEM_LIGHTNING;
+					break;
+				case PHYSICAL:
+					type = Type.GOLEM_PHYSICAL;
+					break;
+				case WIND:
+					type = Type.GOLEM_WIND;
+					break;
+				}
+				
+				worldIn.setBlockState(pos, state.withProperty(MOB, type));
+			} else if (heldItem.getItem() instanceof NostrumSkillItem) {
+				if (NostrumSkillItem.getTypeFromMeta(heldItem.getMetadata()) == SkillItemType.WING) {
+					worldIn.setBlockState(pos, state.withProperty(MOB, Type.DRAGON_RED));
+				}
+			}
+			return true;
+		}
+		
+		return false;
+	}
 	
 	public static class SingleSpawnerTE extends TileEntity implements ITickable {
 		

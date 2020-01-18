@@ -172,12 +172,37 @@ public abstract class StaticRoom implements IDungeonRoom {
 	
 	@Override
 	public boolean canSpawnAt(World world, DungeonExitPoint start) {
-		int minX = start.getPos().getX() + locMinX;
-		int minY = start.getPos().getY() + locMinY;
-		int minZ = start.getPos().getZ() + locMinZ;
-		int maxX = start.getPos().getX() + locMaxX;
-		int maxY = start.getPos().getY() + locMaxY;
-		int maxZ = start.getPos().getZ() + locMaxZ;
+		int relMinX = locMinX;
+		int relMinY = locMinY;
+		int relMinZ = locMinZ;
+		int relMaxX = locMaxX;
+		int relMaxY = locMaxY;
+		int relMaxZ = locMaxZ;
+		
+		// Apply rotation
+		for (int i = 0; i < start.getFacing().getOpposite().getHorizontalIndex(); i++) {
+			// Actual coord change is (x,y)->(-y,x)
+			int tmp = relMinX;
+			relMinX = -relMinZ;
+			relMinZ = relMinX;
+			
+			tmp = relMaxX;
+			relMaxX = -relMaxZ;
+			relMaxZ = relMaxX;
+			
+			// Mins/Maxes shifted to other two corners, though. Swap x's
+			tmp = relMinX;
+			relMinX = relMaxX;
+			relMaxX = tmp;
+		}
+		
+		int minX = start.getPos().getX() + relMinX;
+		int minY = start.getPos().getY() + relMinY;
+		int minZ = start.getPos().getZ() + relMinZ;
+		int maxX = start.getPos().getX() + relMaxX;
+		int maxY = start.getPos().getY() + relMaxY;
+		int maxZ = start.getPos().getZ() + relMaxZ;
+		
 		for (int i = minX; i <= maxX; i++)
 		for (int j = minY; j <= maxY; j++)
 		for (int k = minZ; k <= maxZ; k++) {

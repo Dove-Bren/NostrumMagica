@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoom;
 
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -37,6 +38,38 @@ public class NostrumDungeon {
 		@Override
 		public String toString() {
 			return "(" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ")[" + facing.name() + "]";
+		}
+		
+		private static final String NBT_POS = "pos";
+		private static final String NBT_DIR = "facing";
+		
+		
+		public NBTTagCompound toNBT() {
+			NBTTagCompound tag = new NBTTagCompound();
+			tag.setLong(NBT_POS, this.pos.toLong());
+			tag.setByte(NBT_DIR, (byte) facing.getHorizontalIndex());
+			return tag;
+		}
+		
+		public static DungeonExitPoint fromNBT(NBTTagCompound nbt) {
+			BlockPos pos = BlockPos.fromLong(nbt.getLong(NBT_POS));
+			EnumFacing facing = EnumFacing.getHorizontal(nbt.getByte(NBT_DIR));
+			return new DungeonExitPoint(pos, facing);
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (o instanceof DungeonExitPoint) {
+				DungeonExitPoint other = (DungeonExitPoint) o;
+				return other.facing == this.facing && other.pos.equals(this.pos);
+			}
+			
+			return false;
+		}
+		
+		@Override
+		public int hashCode() {
+			return this.facing.hashCode() * 91 + this.pos.hashCode();
 		}
 	}
 
@@ -87,6 +120,15 @@ public class NostrumDungeon {
 		keyRooms.clear();
 		doorRooms.clear();
 		return this;
+	}
+	
+	public void clearRooms() {
+		rooms.clear();
+		// invalidate cache
+		endRooms.clear();
+		contRooms.clear();
+		keyRooms.clear();
+		doorRooms.clear();
 	}
 	
 	public void spawn(World world, DungeonExitPoint start) {

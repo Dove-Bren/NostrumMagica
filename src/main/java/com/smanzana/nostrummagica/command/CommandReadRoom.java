@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.items.PositionCrystal;
-import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomSerializationHelper;
+import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -44,13 +44,7 @@ public class CommandReadRoom extends CommandBase {
 				sender.addChatMessage(new TextComponentString("You must be holding a filled geogem in your main hand"));
 			} else {
 				
-//				NBTTagCompound nbt = new NBTTagCompound();
-//				nbt.setString("name", args[0]);
-//				nbt.setTag("blocks", DungeonRoomSerializationHelper.serialize(player.worldObj,
-//						PositionCrystal.getBlockPosition(main),
-//						PositionCrystal.getBlockPosition(offhand)));
-				
-				File file = new File(ModConfig.config.base.getConfigFile().getParentFile(), "NostrumMagica/dungeon_rooms/captures/capture_" + args[0] + ".dat");
+				File file = new File(ModConfig.config.base.getConfigFile().getParentFile(), "NostrumMagica/dungeon_room_captures/" + args[0] + ".dat");
 				if (file.exists()) {
 					NBTTagCompound nbt = null;
 					try {
@@ -64,7 +58,10 @@ public class CommandReadRoom extends CommandBase {
 					}
 					
 					if (nbt != null) {
-						if (!DungeonRoomSerializationHelper.loadFromNBT(player.worldObj, PositionCrystal.getBlockPosition(main), nbt.getTag("blocks"))) {
+						RoomBlueprint blueprint = RoomBlueprint.fromNBT((NBTTagCompound) nbt.getTag("blueprint"));
+						if (blueprint != null) {
+							blueprint.spawn(player.worldObj, PositionCrystal.getBlockPosition(main));
+						} else {
 							sender.addChatMessage(new TextComponentString("Room failed to load"));
 						}
 					}
