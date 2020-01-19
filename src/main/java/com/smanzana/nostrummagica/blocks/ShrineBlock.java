@@ -224,31 +224,31 @@ public class ShrineBlock extends SymbolBlock {
 						if (speed && leap)
 							pass = true;
 					} else if (component.getShape() instanceof ChainShape) {
-						boolean lightning, blind;
-						lightning = blind = false;
+						boolean ice, weak;
+						ice = weak = false;
 						for (SpellPart part : spell.getSpellParts()) {
 							if (part.isTrigger())
 								continue;
 							if (!(part.getShape() instanceof SingleShape))
 								continue;
 							
-							if (!lightning
-									&& part.getElement() == EMagicElement.LIGHTNING
+							if (!ice
+									&& part.getElement() == EMagicElement.ICE
 									&& part.getAlteration() == null
 									&& part.getElementCount() >= 2) {
-								lightning = true;
+								ice = true;
 								continue;
 							}
 							
-							if (!blind
-									&& part.getElement() == EMagicElement.ENDER
+							if (!weak
+									&& part.getElement() == EMagicElement.PHYSICAL
 									&& part.getAlteration() == EAlteration.INFLICT) {
-								blind = true;
+								weak = true;
 								continue;
 							}
 						}
 						
-						if (lightning && blind )
+						if (ice && weak)
 							pass = true;
 					}
 				}

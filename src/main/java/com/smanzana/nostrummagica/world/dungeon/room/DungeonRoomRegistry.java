@@ -19,6 +19,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.fml.common.ProgressManager;
+import net.minecraftforge.fml.common.ProgressManager.ProgressBar;
 
 public class DungeonRoomRegistry {
 	
@@ -189,6 +191,7 @@ public class DungeonRoomRegistry {
 		if (doRegister) {
 			this.register(name, blueprint, weight, tags);
 		}
+		
 		return blueprint;
 	}
 	
@@ -199,20 +202,43 @@ public class DungeonRoomRegistry {
 	public final File roomLoadFolder;
 	public final File roomSaveFolder;
 	
-	private void loadFromFile(File file) {
-		if (file.isDirectory()) {
-			for (File subfile : file.listFiles()) {
-				loadFromFile(subfile);
+	private void findFiles(File base, List<File> files) {
+		if (base.isDirectory()) {
+			for (File subfile : base.listFiles()) {
+				findFiles(subfile, files);
 			}
 		} else {
-			try {
-				NBTTagCompound nbt = CompressedStreamTools.read(file);
-				if (nbt != null)
-					loadFromNBT(nbt, true);
-			} catch (IOException e) {
-				e.printStackTrace();
-				NostrumMagica.logger.error("Failed to load room from " + file.toString());
+			files.add(base);
+		}
+	}
+	
+	private void loadFromFile(File file) {
+		try {
+			long startTime = System.currentTimeMillis();
+			long time;
+			
+			ProgressBar bar = ProgressManager.push("reading room", 1);
+			bar.step(file.getName());
+			NBTTagCompound nbt = CompressedStreamTools.read(file);
+			ProgressManager.pop(bar);
+			
+			time = System.currentTimeMillis() - startTime;
+			//if (time > 100) {
+				NostrumMagica.logger.warn("Took " + time + "ms to read " + file.getName());
+			//}
+			
+			startTime = System.currentTimeMillis();
+			if (nbt != null) {
+				loadFromNBT(nbt, true);
 			}
+			
+			time = System.currentTimeMillis() - startTime;
+			//if (time > 100) {
+				NostrumMagica.logger.warn("Took " + time + "ms to load " + file.getName());
+			//}
+		} catch (IOException e) {
+			e.printStackTrace();
+			NostrumMagica.logger.error("Failed to load room from " + file.toString());
 		}
 	}
 	
@@ -224,14 +250,21 @@ public class DungeonRoomRegistry {
 	 */
 	public void loadRegistryFromDisk() {
 		this.map.clear();
-		loadFromFile(this.roomLoadFolder);
+		List<File> files = new LinkedList<>();
+		findFiles(this.roomLoadFolder, files);
+		
+		NostrumMagica.logger.info("Loading room cache (" + files.size() + " rooms)...");
+		final long startTime = System.currentTimeMillis();
+		for (File file : files) {
+			loadFromFile(file);
+		}
 		
 		int count = 0;
 		DungeonRoomList list = map.get(INTERNAL_ALL_NAME);
 		if (list != null)
 			count = list.recordList.size();
 		
-		NostrumMagica.logger.info("Loaded " + count + " rooms");
+		NostrumMagica.logger.info("Loaded " + count + " rooms (" + (((double)(System.currentTimeMillis() - startTime) / 1000D)) + " seconds");
 	}
 	
 	public final boolean writeRoomAsFile(RoomBlueprint blueprint, String name, int weight, List<String> tags) {

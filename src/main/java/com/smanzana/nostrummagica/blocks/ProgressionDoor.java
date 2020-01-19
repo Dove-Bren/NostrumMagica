@@ -145,7 +145,11 @@ public class ProgressionDoor extends NostrumMagicDoor {
 			} else {
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
 				
-				if (attr == null || !attr.isUnlocked()) {
+				if (attr == null) {
+					meets = false;
+					if (missingDepStrings != null)
+						missingDepStrings.add(new TextComponentTranslation("info.door.missing.error"));
+				} else if (this.requiredLevel > 0 && !attr.isUnlocked()) {
 					if (missingDepStrings != null)
 						missingDepStrings.add(new TextComponentTranslation("info.door.missing.unlock"));
 					meets = false;

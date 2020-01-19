@@ -169,6 +169,8 @@ public class NostrumMagica
     private static SpellRegistry spellRegistry;
     private static NostrumDimensionMapper serverDimensionMapper;
     
+    public static boolean initFinished = false;
+    
     @EventHandler
     public void init(FMLInitializationEvent event) {
         proxy.init();
@@ -227,6 +229,8 @@ public class NostrumMagica
     public void postinit(FMLPostInitializationEvent event) {
     	proxy.postinit();
     	baubles.postInit();
+    	
+    	initFinished = true;
     	
     	MinecraftForge.EVENT_BUS.register(this);
     }

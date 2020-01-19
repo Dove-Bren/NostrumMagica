@@ -26,6 +26,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.fml.common.ProgressManager;
+import net.minecraftforge.fml.common.ProgressManager.ProgressBar;
 
 /**
  * Contains all the data needed to spawn a room in the world
@@ -34,9 +36,9 @@ import net.minecraftforge.common.util.Constants.NBT;
  */
 public class RoomBlueprint {
 	
-	private static class BlueprintBlock {
-		public IBlockState state;
-		public NBTTagCompound tileEntityData;
+	public static class BlueprintBlock {
+		private IBlockState state;
+		private NBTTagCompound tileEntityData;
 		
 		public BlueprintBlock(IBlockState state, NBTTagCompound teData) {
 			this.state = state;
@@ -59,11 +61,20 @@ public class RoomBlueprint {
 		public static final String NBT_BLOCK = "block_id";
 		public static final String NBT_TILE_ENTITY = "te_data";
 		
-		public static BlueprintBlock fromNBT(NBTTagCompound nbt) {
-			IBlockState state = Block.getStateById(nbt.getInteger(NBT_BLOCK));
+		public static BlueprintBlock fromNBT(byte version, NBTTagCompound nbt) {
+			IBlockState state = null;
 			NBTTagCompound teData = null;
-			if (state != null && nbt.hasKey(NBT_TILE_ENTITY)) {
-				teData = nbt.getCompoundTag(NBT_TILE_ENTITY);
+			switch (version) {
+			case 0:
+				state = Block.getStateById(nbt.getInteger(NBT_BLOCK));
+				if (state != null && nbt.hasKey(NBT_TILE_ENTITY)) {
+					teData = nbt.getCompoundTag(NBT_TILE_ENTITY);
+				}
+				break;
+			case 1:
+				throw new RuntimeException("Blueprint block doesn't understand version " + version);
+			default:
+				throw new RuntimeException("Blueprint block doesn't understand version " + version);
 			}
 			
 			return new BlueprintBlock(state, teData);
@@ -166,6 +177,8 @@ public class RoomBlueprint {
 	public static final String NBT_BLOCK_LIST = "blocks";
 	public static final String NBT_DOOR_LIST = "doors";
 	public static final String NBT_ENTRY = "entry";
+	public static final String NBT_VERSION = "version";
+	public static final String NBT_ENTITIES = "entities";
 	
 	private BlockPos dimensions;
 	private BlueprintBlock[] blocks;
@@ -512,7 +525,34 @@ public class RoomBlueprint {
 		return this.entry;
 	}
 	
-	public static RoomBlueprint fromNBT(NBTTagCompound nbt) {
+	private static class BlueprintSavedTE {
+		
+		public static final String NBT_DATA = "te_data";
+		public static final String NBT_POS = "pos";
+		
+		public NBTTagCompound nbtTagData;
+		public BlockPos pos;
+		
+		public BlueprintSavedTE(NBTTagCompound data, BlockPos pos) {
+			this.nbtTagData = data;
+			this.pos = pos;
+		}
+		
+		public NBTTagCompound toNBT() {
+			NBTTagCompound tag = new NBTTagCompound();
+			tag.setTag(NBT_DATA, nbtTagData);
+			tag.setLong(NBT_POS, pos.toLong());
+			return tag;
+		}
+		
+		public static BlueprintSavedTE fromNBT(NBTTagCompound nbt) {
+			long pos = nbt.getLong(NBT_POS);
+			return new BlueprintSavedTE(nbt.getCompoundTag(NBT_DATA), BlockPos.fromLong(pos));
+		}
+	}
+	
+	@SuppressWarnings("null")
+	private static RoomBlueprint deserializeVersion1(NBTTagCompound nbt) {
 		BlockPos dims = NBTUtil.getPosFromTag(nbt.getCompoundTag(NBT_DIMS));
 		BlueprintBlock[] blocks = null;
 		Set<DungeonExitPoint> doors = null;
@@ -524,14 +564,27 @@ public class RoomBlueprint {
 			NBTTagList list = nbt.getTagList(NBT_BLOCK_LIST, NBT.TAG_COMPOUND);
 			
 			final int count = dims.getX() * dims.getY() * dims.getZ();
+			if (count != list.tagCount()) {
+				return null;
+			}
+			
+			ProgressBar bar = null;
+			if (!NostrumMagica.initFinished) {
+				bar = ProgressManager.push("Loading Room", 2);
+				bar.step("Blocks");
+			}
+			
+			
 			blocks = new BlueprintBlock[count];
 			for (int i = 0; i < count; i++) {
-				if (list.hasNoTags()) {
-					return null;
-				}
 				
-				NBTTagCompound tag = (NBTTagCompound) list.removeTag(0);
-				blocks[i] = BlueprintBlock.fromNBT(tag);
+				
+				NBTTagCompound tag = (NBTTagCompound) list.get(i);
+				blocks[i] = BlueprintBlock.fromNBT((byte)0, tag);
+			}
+			
+			if (!NostrumMagica.initFinished) {
+				bar.step("Doors and Exits");
 			}
 			
 			list = nbt.getTagList(NBT_DOOR_LIST, NBT.TAG_COMPOUND);
@@ -544,11 +597,140 @@ public class RoomBlueprint {
 			if (nbt.hasKey(NBT_ENTRY)) {
 				entry = DungeonExitPoint.fromNBT(nbt.getCompoundTag(NBT_ENTRY));
 			}
+			
+			if (!NostrumMagica.initFinished) {
+				ProgressManager.pop(bar);
+			}
 		}
 		
 		return new RoomBlueprint(dims, blocks, doors, entry);
 	}
 	
+	@SuppressWarnings("null")
+	private static RoomBlueprint deserializeVersion2(NBTTagCompound nbt) {
+		// Store blocks as int array
+		// Store TileEntities separately since there are likely few of them
+		
+		BlockPos dims = NBTUtil.getPosFromTag(nbt.getCompoundTag(NBT_DIMS));
+		BlueprintBlock[] blocks = null;
+		Set<DungeonExitPoint> doors = null;
+		DungeonExitPoint entry = null;
+		
+		if (dims.distanceSq(0, 0, 0) == 0) {
+			return null;
+		} else {
+			int[] list = nbt.getIntArray(NBT_BLOCK_LIST);
+			
+			final int count = dims.getX() * dims.getY() * dims.getZ();
+			if (count != list.length) {
+				return null;
+			}
+			
+			ProgressBar bar = null;
+			if (!NostrumMagica.initFinished) {
+				bar = ProgressManager.push("Loading Room", 2);
+				bar.step("Blocks");
+			}
+			
+			
+			blocks = new BlueprintBlock[count];
+			for (int i = 0; i < count; i++) {
+				int id = list[i];
+				blocks[i] = new BlueprintBlock(id == 0 ? null : Block.getStateById(list[i]), null);
+			}
+			
+			if (nbt.hasKey(NBT_ENTITIES)) {
+				NBTTagList entities = nbt.getTagList(NBT_ENTITIES, NBT.TAG_COMPOUND);
+				int entCount = entities.tagCount();
+				for (int i = 0; i < entCount; i++) {
+					BlueprintSavedTE te = BlueprintSavedTE.fromNBT(entities.getCompoundTagAt(i));
+					
+					// Find offset into data blocks, and then transfer data onto that block
+					blocks[
+					    (te.pos.getX() * dims.getZ() * dims.getY())
+					    + (te.pos.getY() * dims.getZ())
+					    + te.pos.getZ()
+					   ].tileEntityData = te.nbtTagData;
+				}
+			}
+			
+			if (!NostrumMagica.initFinished) {
+				bar.step("Doors and Exits");
+			}
+			
+			NBTTagList doorList = nbt.getTagList(NBT_DOOR_LIST, NBT.TAG_COMPOUND);
+			doors = new HashSet<>();
+			while (!doorList.hasNoTags()) {
+				NBTTagCompound tag = (NBTTagCompound) doorList.removeTag(0);
+				doors.add(DungeonExitPoint.fromNBT(tag));
+			}
+			
+			if (nbt.hasKey(NBT_ENTRY)) {
+				entry = DungeonExitPoint.fromNBT(nbt.getCompoundTag(NBT_ENTRY));
+			}
+			
+			if (!NostrumMagica.initFinished) {
+				ProgressManager.pop(bar);
+			}
+		}
+		
+		return new RoomBlueprint(dims, blocks, doors, entry);
+	}
+	
+	public static RoomBlueprint fromNBT(NBTTagCompound nbt) {
+		byte version = nbt.getByte(NBT_VERSION);
+		switch (version) {
+		case 0:
+			return deserializeVersion1(nbt);
+		case 1:
+			return deserializeVersion2(nbt);
+		default:
+			NostrumMagica.logger.fatal("Blueprint has version we don't understand");
+			throw new RuntimeException("Could not parse blueprint version " + version);
+		}
+	}
+	
+//	public NBTTagCompound toNBT() {
+//		NBTTagCompound nbt = new NBTTagCompound();
+//		NBTTagList entList = new NBTTagList();
+//		int[] blockList = new int[this.blocks.length];
+//		
+//		for (int i = 0; i < blocks.length; i++) {
+//			IBlockState state = this.blocks[i].state;
+//			if (state == null) {
+//				blockList[i] = 0;
+//			} else {
+//				blockList[i] = Block.getStateId(this.blocks[i].state);
+//			}
+//			if (this.blocks[i].tileEntityData != null) {
+//				BlueprintSavedTE te = new BlueprintSavedTE(
+//						this.blocks[i].tileEntityData,
+//						new BlockPos(i / (dimensions.getZ() * dimensions.getY()),
+//								((i / dimensions.getZ()) % dimensions.getY()),
+//								(i % dimensions.getZ())));
+//				entList.appendTag(te.toNBT());
+//			}
+//		}
+//		
+//		nbt.setIntArray(NBT_BLOCK_LIST, blockList);
+//		nbt.setTag(NBT_ENTITIES, entList);
+//		nbt.setTag(NBT_DIMS, NBTUtil.createPosTag(dimensions));
+//		if (this.entry != null) {
+//			nbt.setTag(NBT_ENTRY, entry.toNBT());
+//		}
+//		if (this.doors != null && !this.doors.isEmpty()) {
+//			NBTTagList doorList = new NBTTagList();
+//			for (DungeonExitPoint door : doors) {
+//				doorList.appendTag(door.toNBT());
+//			}
+//			nbt.setTag(NBT_DOOR_LIST, doorList);
+//		}
+//		
+//		nbt.setByte(NBT_VERSION, (byte)1);
+//		return nbt;
+//	}
+	
+	// Version 1
 	public NBTTagCompound toNBT() {
 		NBTTagCompound nbt = new NBTTagCompound();
 		NBTTagList list = new NBTTagList();
@@ -571,6 +753,8 @@ public class RoomBlueprint {
 			}
 			nbt.setTag(NBT_DOOR_LIST, list);
 		}
+		
+		nbt.setByte(NBT_VERSION, (byte)0);
 		
 		return nbt;
 	}

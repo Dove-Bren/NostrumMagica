@@ -1,7 +1,5 @@
 package com.smanzana.nostrummagica.world.dimension;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -10,13 +8,12 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 
+import net.minecraft.block.BlockFire;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Biomes;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -34,6 +31,7 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
 import net.minecraftforge.event.entity.living.EnderTeleportEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -47,8 +45,8 @@ public class NostrumEmptyDimension {
 	
 	public static final int SPAWN_Y = 128;
 	
-	private static final String DIMENSION_ENTRY_TEMPLATE = "sorcery_lobby.dat";
-	private static final String DIMENSION_WHOLE_TEMPLATE = "sorcery_lobby.dat";
+	private static final String DIMENSION_ENTRY_TEMPLATE = "sorcery_lobby";
+	private static final String DIMENSION_WHOLE_TEMPLATE = "sorcery_dungeon";
 	
 	public static boolean register(int dim, String identifier) {
 		if (DimensionManager.isDimensionRegistered(dim)) {
@@ -225,26 +223,15 @@ public class NostrumEmptyDimension {
 			
 			this.world = worldIn;
 			
-			File file = new File(DungeonRoomRegistry.instance().roomLoadFolder, DIMENSION_ENTRY_TEMPLATE);
-			try {
-				NBTTagCompound nbt = CompressedStreamTools.read(file);
-				if (nbt != null) {
-					lobbyBlueprint = DungeonRoomRegistry.instance().loadFromNBT(nbt);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-				NostrumMagica.logger.fatal("Failed to load sorcery lobby from " + file.toString());
+			lobbyBlueprint = DungeonRoomRegistry.instance().getRoom(DIMENSION_ENTRY_TEMPLATE);
+			wholeBlueprint = DungeonRoomRegistry.instance().getRoom(DIMENSION_WHOLE_TEMPLATE);
+			
+			if (lobbyBlueprint == null) {
+				NostrumMagica.logger.fatal("Failed to load sorcery lobby from name " + DIMENSION_ENTRY_TEMPLATE);
 			}
 			
-			file = new File(DungeonRoomRegistry.instance().roomLoadFolder, DIMENSION_WHOLE_TEMPLATE);
-			try {
-				NBTTagCompound nbt = CompressedStreamTools.read(file);
-				if (nbt != null) {
-					wholeBlueprint = DungeonRoomRegistry.instance().loadFromNBT(nbt);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-				NostrumMagica.logger.fatal("Failed to load sorcery dungeon from " + file.toString());
+			if (wholeBlueprint == null) {
+				NostrumMagica.logger.fatal("Failed to load sorcery dungeon from name " + DIMENSION_WHOLE_TEMPLATE);
 			}
 		}
 		
@@ -302,9 +289,13 @@ public class NostrumEmptyDimension {
 //					world.setBlockState(pos, Blocks.GOLD_BLOCK.getDefaultState());
 //				}
 //			}
-			final long startTime = System.currentTimeMillis();
+			long startTime = System.currentTimeMillis();
 			lobbyBlueprint.spawn(world, spawn);
 			NostrumMagica.logger.info("Took " + ((double) (System.currentTimeMillis() - startTime) / 1000.0) + " seconds to generate sorcery lobby");
+			
+			startTime = System.currentTimeMillis();
+			wholeBlueprint.spawn(world, spawn);
+			NostrumMagica.logger.info("Took " + ((double) (System.currentTimeMillis() - startTime) / 1000.0) + " seconds to generate whole dungeon");
 			
 			return true;
 		}
@@ -419,6 +410,13 @@ public class NostrumEmptyDimension {
 		public void onExplosion(ExplosionEvent.Detonate event) {
 			if (event.getWorld().provider.getDimension() == dim && event.getAffectedBlocks() != null) {
 				event.getAffectedBlocks().clear();;
+			}
+		}
+		
+		@SubscribeEvent
+		public void onBlockPlace(BlockEvent.PlaceEvent event) {
+			if (event.getWorld().provider.getDimension() == dim && event.getPlacedBlock().getBlock() instanceof BlockFire) {
+				event.setCanceled(true);
 			}
 		}
 	}

@@ -418,7 +418,7 @@ info.egg.death.cold=The nearby dragon egg was not kept warm, and the baby dragon
 info.lore.get=You've gained more knowledge about %s
 
 info.shapehint.preamble=%2$sThe shrine does not release its energy to you, but instead whispers:%1$s
-info.shapehint.chain="%3$sPresent unto me a spell scroll that will zap my enemies with duplicated potency, and render them blind to their surroundings!%1$s"
+info.shapehint.chain="%3$sPresent unto me a spell scroll that will freeze my enemies with duplicated potency, and render their attacks weak!%1$s"
 info.shapehint.aoe="%3$sPresent unto me a spell scroll that will help me leap and bound to the stars and distant hills the same!%1$s"
 
 info.tamed_dragon.wild.high_health=The dragon has too much health to attempt to tame

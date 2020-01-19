@@ -171,7 +171,7 @@ public abstract class NostrumPortal extends Block  {
 	private static final Map<UUID, Long> EntityTeleportTimes = new HashMap<>();
 	
 	// How long entities must wait before they can teleport again after using a portal, in seconds.
-	public static final int TELEPORT_COOLDOWN = 5;
+	public static final int TELEPORT_COOLDOWN = 10;
 	
 	@Override
 	public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
@@ -195,12 +195,18 @@ public abstract class NostrumPortal extends Block  {
 		EntityTeleportTimes.clear();
 	}
 	
+	public static int getRemainingCooldown(Entity ent) {
+		Long lastTime = EntityTeleportTimes.get(ent.getPersistentID());
+		return lastTime == null ? 0 : ((20 * TELEPORT_COOLDOWN) - (int) (ent.worldObj.getTotalWorldTime() - lastTime)); 
+	}
+	
 	public static abstract class NostrumPortalTileEntityBase extends TileEntity {
 		
 		/**
 		 * Return color the portal should be rendered as. Only 3 least-sig bytes used as 0RGB.
 		 * @return
 		 */
+		@SideOnly(Side.CLIENT)
 		public abstract int getColor();
 		
 		/**
@@ -208,12 +214,14 @@ public abstract class NostrumPortal extends Block  {
 		 * This is in seconds.
 		 * @return
 		 */
+		@SideOnly(Side.CLIENT)
 		public abstract float getRotationPeriod();
 		
 		/**
 		 * Opacity of the portal. This is expresses as 0 to 1.
 		 * @return
 		 */
+		@SideOnly(Side.CLIENT)
 		public abstract float getOpacity();
 		
 	}
