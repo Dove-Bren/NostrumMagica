@@ -6,6 +6,7 @@ import java.util.Random;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.potions.FrostbitePotion;
 import com.smanzana.nostrummagica.potions.MagicResistPotion;
 
@@ -136,6 +137,11 @@ public class CursedIce extends Block {
 	@Override
 	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
 		int level = state.getValue(LEVEL);
+		
+		// Don't grow is in Sorcery dim
+		if (worldIn.provider.getDimension() == ModConfig.config.sorceryDimensionIndex()) {
+			return;
+		}
 		
 		if (NostrumMagica.rand.nextFloat() <= 0.2f * (float) (level + 1)) {
 			List<BlockPos> targets = Lists.newArrayList(pos.add(1, 0, 0),

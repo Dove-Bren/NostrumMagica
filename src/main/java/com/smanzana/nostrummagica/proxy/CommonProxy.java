@@ -26,6 +26,7 @@ import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.blocks.ProgressionDoor;
 import com.smanzana.nostrummagica.blocks.ShrineBlock;
 import com.smanzana.nostrummagica.blocks.SorceryPortal;
+import com.smanzana.nostrummagica.blocks.SorceryPortalSpawner;
 import com.smanzana.nostrummagica.blocks.SpellTable;
 import com.smanzana.nostrummagica.blocks.SwitchBlock;
 import com.smanzana.nostrummagica.blocks.SymbolBlock;
@@ -627,6 +628,10 @@ public class CommonProxy {
     					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(SwitchBlock.ID))
     			);
     	SwitchBlock.init();
+    	
+    	GameRegistry.register(SorceryPortalSpawner.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, SorceryPortalSpawner.ID));
+    	SorceryPortalSpawner.init();
     	
     }
     

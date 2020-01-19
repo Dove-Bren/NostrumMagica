@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.baubles.BaublesProxy;
 import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble.ItemType;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
+import com.smanzana.nostrummagica.blocks.SorceryPortal;
 import com.smanzana.nostrummagica.capabilities.AttributeProvider;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.command.CommandAllQuests;
@@ -53,6 +54,7 @@ import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.items.ShrineSeekingGem;
 import com.smanzana.nostrummagica.items.SpellPlate;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
@@ -78,6 +80,7 @@ import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeBindSpell;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeConstructGeotoken;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeCreateObelisk;
+import com.smanzana.nostrummagica.rituals.outcomes.OutcomeCreatePortal;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeCreateTome;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeMark;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomePotionEffect;
@@ -110,6 +113,7 @@ import com.smanzana.nostrummagica.trials.TrialLightning;
 import com.smanzana.nostrummagica.trials.TrialPhysical;
 import com.smanzana.nostrummagica.trials.TrialWind;
 import com.smanzana.nostrummagica.world.NostrumChunkLoader;
+import com.smanzana.nostrummagica.world.NostrumDungeonGenerator.DungeonGen;
 import com.smanzana.nostrummagica.world.NostrumLootHandler;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensionMapper;
 import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
@@ -949,6 +953,15 @@ public class NostrumMagica
 					new ItemStack[] {NostrumResourceItem.getItem(ResourceType.PENDANT_LEFT ,1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), extra, NostrumResourceItem.getItem(ResourceType.PENDANT_RIGHT ,1)},
 					new RRequirementQuest("true_mirror_shield"),
 					new OutcomeSpawnItem(new ItemStack(MirrorShieldImproved.instance())))
+				);
+		
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier2("spawn_sorcery_portal",
+					new ItemStack(SorceryPortal.instance()), EMagicElement.ENDER,
+					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.BLACK_PEARL, ReagentType.MANDRAKE_ROOT, ReagentType.MANI_DUST},
+					ShrineSeekingGem.getItemstack(DungeonGen.PORTAL),
+					null,
+					new OutcomeCreatePortal())
 				);
 		
 		
