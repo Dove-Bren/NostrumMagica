@@ -24,6 +24,7 @@ import com.smanzana.nostrummagica.blocks.NostrumMirrorBlock;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.blocks.ProgressionDoor;
 import com.smanzana.nostrummagica.blocks.SorceryPortal;
+import com.smanzana.nostrummagica.blocks.SwitchBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.effects.ClientEffect;
 import com.smanzana.nostrummagica.client.effects.ClientEffectBeam;
@@ -355,6 +356,9 @@ public class ClientProxy extends CommonProxy {
     			new ResourceLocation(NostrumMagica.MODID, ThanosStaff.ID),
     			new ResourceLocation(NostrumMagica.MODID, ThanosStaff.ID + "_activated"));
     	
+    	ModelBakery.registerItemVariants(Item.getItemFromBlock(SwitchBlock.instance()),
+    			new ResourceLocation(NostrumMagica.MODID, SwitchBlock.ID));
+    	
     	TileEntitySymbolRenderer.init();
     	TileEntityCandleRenderer.init();
     	TileEntityAltarRenderer.init();
@@ -500,6 +504,10 @@ public class ClientProxy extends CommonProxy {
 		registerModel(AltarItem.instance(),
 				0,
 				AltarItem.ID);
+		
+		registerModel(Item.getItemFromBlock(SwitchBlock.instance()),
+				0,
+				SwitchBlock.ID);
 		
 		for (ResourceType type : ResourceType.values()) {
 			registerModel(NostrumResourceItem.instance(),
