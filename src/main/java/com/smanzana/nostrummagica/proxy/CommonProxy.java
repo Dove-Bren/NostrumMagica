@@ -139,6 +139,7 @@ import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemMultiTexture;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -533,8 +534,13 @@ public class CommonProxy {
     	
     	GameRegistry.register(DungeonBlock.instance(),
     			new ResourceLocation(NostrumMagica.MODID, DungeonBlock.ID));
+    	String[] variants = new String[DungeonBlock.Type.values().length];
+    	for (DungeonBlock.Type type : DungeonBlock.Type.values()) {
+    		variants[type.ordinal()] = type.getName().toLowerCase();
+    	}
     	GameRegistry.register(
-    			(new ItemBlock(DungeonBlock.instance())).setRegistryName(DungeonBlock.ID)
+    			(new ItemMultiTexture(DungeonBlock.instance(), DungeonBlock.instance(), variants))
+    			.setRegistryName(DungeonBlock.ID)
     		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(DungeonBlock.ID));
     	
     	GameRegistry.register(SymbolBlock.instance(),

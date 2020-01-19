@@ -343,6 +343,14 @@ public class ClientProxy extends CommonProxy {
     	variants = list.toArray(new ResourceLocation[0]);
     	ModelBakery.registerItemVariants(NostrumRoseItem.instance(), variants);
     	
+    	list = new LinkedList<>();
+    	for (DungeonBlock.Type type : DungeonBlock.Type.values()) {
+    		list.add(new ResourceLocation(NostrumMagica.MODID, DungeonBlock.ID + "_" + type.getName()));
+    	}
+    	
+    	variants = list.toArray(new ResourceLocation[0]);
+    	ModelBakery.registerItemVariants(Item.getItemFromBlock(DungeonBlock.instance()), variants);
+    	
     	ModelBakery.registerItemVariants(ThanosStaff.instance(),
     			new ResourceLocation(NostrumMagica.MODID, ThanosStaff.ID),
     			new ResourceLocation(NostrumMagica.MODID, ThanosStaff.ID + "_activated"));
@@ -472,11 +480,11 @@ public class ClientProxy extends CommonProxy {
 				0,
 				LogicDoor.ID);
 		
-		registerModel(new ItemBlock(DungeonBlock.instance()), 
+		registerModel(Item.getItemFromBlock(DungeonBlock.instance()), 
 				DungeonBlock.Type.DARK.ordinal(),
 				DungeonBlock.ID + "_" + DungeonBlock.Type.DARK.getName()
 				);
-		registerModel(new ItemBlock(DungeonBlock.instance()), 
+		registerModel(Item.getItemFromBlock(DungeonBlock.instance()), 
 				DungeonBlock.Type.LIGHT.ordinal(),
 				DungeonBlock.ID + "_" + DungeonBlock.Type.LIGHT.getName()
 				);
