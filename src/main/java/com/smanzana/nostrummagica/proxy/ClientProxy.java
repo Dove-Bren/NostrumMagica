@@ -61,6 +61,7 @@ import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
 import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.ITameDragon;
+import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.entity.renderer.ModelGolem;
 import com.smanzana.nostrummagica.entity.renderer.RenderDragonEgg;
 import com.smanzana.nostrummagica.entity.renderer.RenderDragonRed;
@@ -141,6 +142,7 @@ import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderLightningBolt;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
@@ -249,6 +251,12 @@ public class ClientProxy extends CommonProxy {
 			@Override
 			public Render<? super EntitySwitchTrigger> createRenderFor(RenderManager manager) {
 				return new RenderSwitchTrigger(manager);
+			}
+		});
+		RenderingRegistry.registerEntityRenderingHandler(NostrumTameLightning.class, new IRenderFactory<NostrumTameLightning>() {
+			@Override
+			public Render<? super NostrumTameLightning> createRenderFor(RenderManager manager) {
+				return new RenderLightningBolt(manager);
 			}
 		});
 		

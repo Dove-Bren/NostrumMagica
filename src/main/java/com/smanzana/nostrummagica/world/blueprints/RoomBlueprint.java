@@ -538,6 +538,7 @@ public class RoomBlueprint {
 			this.pos = pos;
 		}
 		
+		@SuppressWarnings("unused")
 		public NBTTagCompound toNBT() {
 			NBTTagCompound tag = new NBTTagCompound();
 			tag.setTag(NBT_DATA, nbtTagData);

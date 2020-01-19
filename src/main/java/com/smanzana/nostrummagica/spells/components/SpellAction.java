@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble.ItemType;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.EntityGolemEarth;
 import com.smanzana.nostrummagica.entity.EntityGolemEnder;
@@ -23,6 +24,7 @@ import com.smanzana.nostrummagica.entity.EntityGolemIce;
 import com.smanzana.nostrummagica.entity.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.EntityGolemWind;
+import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
 import com.smanzana.nostrummagica.items.EssenceItem;
@@ -43,12 +45,12 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.boss.EntityDragon;
-import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.monster.EntityEndermite;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -733,6 +735,11 @@ public class SpellAction {
 						block.getX() + .5, block.getY(), block.getZ() + .5);
 				return;
 			}
+			
+			if (world.provider.getDimension() == ModConfig.config.sorceryDimensionIndex()) {
+				return;
+			}
+			
 			if (!world.isAirBlock(block))
 				block.add(0, 1, 0);
 			if (world.isAirBlock(block)) {
@@ -790,9 +797,9 @@ public class SpellAction {
 				} else {
 					// Apply random x/z offsets. Then step up to 4 to find surface
 					cursor.setPos(
-							block.getX() + rand.nextInt(4) - 2,
+							block.getX() + rand.nextInt(6) - 3,
 							block.getY() - 2,
-							block.getZ() + rand.nextInt(4) - 2);
+							block.getZ() + rand.nextInt(6) - 3);
 					
 					// Find surface
 					int dist = 0;
@@ -802,7 +809,7 @@ public class SpellAction {
 				}
 				
 				world.addWeatherEffect(
-					new EntityLightningBolt(world, cursor.getX() + 0.5, cursor.getY(), cursor.getZ() + 0.5, false)
+					new NostrumTameLightning(world, cursor.getX() + 0.5, cursor.getY(), cursor.getZ() + 0.5)
 					);
 			}
 		}
@@ -1435,6 +1442,10 @@ public class SpellAction {
 			if (world.isAirBlock(block))
 				return;
 			
+			if (world.provider.getDimension() == ModConfig.config.sorceryDimensionIndex()) {
+				return;
+			}
+			
 			IBlockState state = world.getBlockState(block);
 			if (state == null || state.getMaterial().isLiquid())
 				return;
@@ -1461,7 +1472,11 @@ public class SpellAction {
 			if (hardness >= 100f || hardness < 0f)
 				return;
 			
-			world.destroyBlock(block, true);
+			if (caster instanceof EntityPlayerMP) {
+				((EntityPlayerMP) caster).interactionManager.tryHarvestBlock(block);
+			} else {
+				world.destroyBlock(block, true);
+			}
 		}
 		
 	}

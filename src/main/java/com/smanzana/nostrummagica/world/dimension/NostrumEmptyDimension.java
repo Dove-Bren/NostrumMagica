@@ -98,7 +98,12 @@ public class NostrumEmptyDimension {
 		
 		@Override
 		public boolean canRespawnHere() {
-			return false;
+			return true;
+		}
+		
+		@Override
+		public int getRespawnDimension(EntityPlayerMP player) {
+			return this.getDimension();
 		}
 		
 		@SideOnly(Side.CLIENT)
@@ -272,7 +277,7 @@ public class NostrumEmptyDimension {
 		
 		public boolean portalExists(EntityPlayer player) {
 			BlockPos spawn = NostrumMagica.getOrCreatePlayerDimensionSpawn(player);
-			return !world.isAirBlock(spawn.up());
+			return !world.isAirBlock(spawn.up().south());
 		}
 		
 		@Override

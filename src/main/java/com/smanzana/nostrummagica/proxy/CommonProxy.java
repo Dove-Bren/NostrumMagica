@@ -57,6 +57,7 @@ import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
 import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.ITameDragon;
+import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
@@ -271,6 +272,12 @@ public class CommonProxy {
     			1,
     			true);
     	EntityRegistry.registerModEntity(EntitySwitchTrigger.class, "entity_switch_trigger",
+    			entityID++,
+    			NostrumMagica.instance,
+    			128,
+    			1,
+    			false);
+    	EntityRegistry.registerModEntity(NostrumTameLightning.class, "nostrum_lightning",
     			entityID++,
     			NostrumMagica.instance,
     			128,

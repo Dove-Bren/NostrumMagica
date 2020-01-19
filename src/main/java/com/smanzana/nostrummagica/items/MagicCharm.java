@@ -205,6 +205,10 @@ public class MagicCharm extends Item implements ILoreTagged {
 	
 	private boolean doFire(EntityPlayer player, World world) {
 		
+		if (world.provider.getDimension() == ModConfig.config.sorceryDimensionIndex()) {
+			return false;
+		}
+		
 		for (int x = -5; x <= 5; x++)
 		for (int z = -5; z <= 5; z++)
 		for (int y = -3; y <= 2; y++) {
