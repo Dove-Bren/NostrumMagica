@@ -417,6 +417,11 @@ info.egg.death.cold=The nearby dragon egg was not kept warm, and the baby dragon
 
 info.lore.get=You've gained more knowledge about %s
 
+info.shrinegem.success=The gem crumbles in your hands. Perhaps it's time to go exploring...
+info.shrinegem.failure=The gem does not crumble. You may have to explore more before you can use it again.
+info.shrinegem.portal=Portal Shrine
+info.shrinegem.dragon=Dragon Shrine
+
 info.shapehint.preamble=%2$sThe shrine does not release its energy to you, but instead whispers:%1$s
 info.shapehint.chain="%3$sPresent unto me a spell scroll that will freeze my enemies with duplicated potency, and render their attacks weak!%1$s"
 info.shapehint.aoe="%3$sPresent unto me a spell scroll that will help me leap and bound to the stars and distant hills the same!%1$s"

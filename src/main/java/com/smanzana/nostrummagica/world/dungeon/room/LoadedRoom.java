@@ -1,10 +1,10 @@
 package com.smanzana.nostrummagica.world.dungeon.room;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
@@ -55,7 +55,8 @@ public class LoadedRoom implements IDungeonRoom {
 	
 	@Override
 	public void spawn(NostrumDungeon dungeon, World world, DungeonExitPoint start) {
-		blueprint.spawn(world, start.getPos(), start.getFacing());
+		// See note about dungeon vs blueprint facing in @getExits
+		blueprint.spawn(world, start.getPos(), start.getFacing().getOpposite());
 	}
 
 	@Override
@@ -67,7 +68,20 @@ public class LoadedRoom implements IDungeonRoom {
 	@Override
 	public List<DungeonExitPoint> getExits(DungeonExitPoint start) {
 		Collection<DungeonExitPoint> exits = blueprint.getExits();
-		return exits == null ? new LinkedList<>() : Lists.newArrayList(exits);
+		
+		// Dungeon notion of direction is backwards to blueprints:
+		// Dungeon wants facing to be you looking back through the door
+		// Blueprint wants your facing as you go in the door
+		List<DungeonExitPoint> ret;
+		if (exits != null) {
+			ret = new ArrayList<>(exits.size());
+			for (DungeonExitPoint door : exits) {
+				ret.add(new DungeonExitPoint(door.getPos(), door.getFacing().getOpposite()));
+			}
+		} else {
+			ret = new LinkedList<>();
+		}
+		return ret;
 	}
 
 	@Override

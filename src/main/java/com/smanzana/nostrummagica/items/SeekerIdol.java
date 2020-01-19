@@ -46,6 +46,8 @@ import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.RecipeSorter;
 import net.minecraftforge.oredict.RecipeSorter.Category;
 
+// TODO remove; no longer have these types of shrines spawning.
+// Remove, or convert like ShrineSeekingGem
 public class SeekerIdol extends Item implements ILoreTagged {
 
 	private static final String NBT_TYPE = "type";

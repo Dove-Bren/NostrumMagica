@@ -1,38 +1,27 @@
 package com.smanzana.nostrummagica.world;
 
-import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig;
-import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
-import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
-import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDragonDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
-import com.smanzana.nostrummagica.world.dungeon.NostrumShrineDungeon;
+import com.smanzana.nostrummagica.world.dungeon.NostrumLoadedDungeon;
 import com.smanzana.nostrummagica.world.dungeon.room.DragonStartRoom;
+import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
+import com.smanzana.nostrummagica.world.dungeon.room.LoadedRoom;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomArena;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomChallenge1;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomChallenge2;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomEnd1;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomEnd2;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomGrandHallway;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomGrandStaircase;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomHallway;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomJail1;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomLectern;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomLongHallway;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomTee1;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomVHallway;
-import com.smanzana.nostrummagica.world.dungeon.room.ShrineRoom;
-import com.smanzana.nostrummagica.world.dungeon.room.StartRoom;
 
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -43,77 +32,6 @@ import net.minecraft.world.gen.feature.WorldGenerator;
 import net.minecraftforge.fml.common.IWorldGenerator;
 
 public class NostrumDungeonGenerator implements IWorldGenerator {
-	
-	private static class ShapeComponent implements NostrumShrineDungeon.ComponentGenerator {
-
-		@Override
-		public SpellComponentWrapper getRandom() {
-			if (!queuedWrappers.isEmpty()) {
-				if (queuedWrappers.get(0).isShape())
-					return queuedWrappers.remove(0);
-			}
-			
-			Collection<SpellShape> shapes = SpellShape.getAllShapes();
-			int pos = NostrumMagica.rand.nextInt(shapes.size());
-			for (SpellShape shape : shapes) {
-				if (pos == 0)
-					return new SpellComponentWrapper(shape);
-				pos--;
-			}
-			
-			// Error condition. Oh well.
-			return new SpellComponentWrapper(shapes.iterator().next());
-		}
-		
-	}
-	
-	private static class TriggerComponent implements NostrumShrineDungeon.ComponentGenerator {
-		
-		@Override
-		public SpellComponentWrapper getRandom() {
-			if (!queuedWrappers.isEmpty()) {
-				if (queuedWrappers.get(0).isTrigger())
-					return queuedWrappers.remove(0);
-			}
-			
-			Collection<SpellTrigger> triggers = SpellTrigger.getAllTriggers();
-			// AI trigger should be skipped.
-			int pos = NostrumMagica.rand.nextInt(triggers.size() - 1);
-			for (SpellTrigger trigger : triggers) {
-				if (trigger == AITargetTrigger.instance())
-					continue;
-				if (pos == 0)
-					return new SpellComponentWrapper(trigger);
-				pos--;
-			}
-			
-			// Error condition. Oh well.
-			return new SpellComponentWrapper(triggers.iterator().next());
-		}
-	}
-	
-	private static class ElementComponent implements NostrumShrineDungeon.ComponentGenerator {
-		
-		@Override
-		public SpellComponentWrapper getRandom() {
-			if (!queuedWrappers.isEmpty()) {
-				if (queuedWrappers.get(0).isElement())
-					return queuedWrappers.remove(0);
-			}
-			
-			return new SpellComponentWrapper(EMagicElement.values()[
-			       NostrumMagica.rand.nextInt(EMagicElement.values().length)]);
-		}
-	}
-	
-//	private static class AlterationComponent implements NostrumShrineDungeon.ComponentGenerator {
-//		
-//		@Override
-//		public SpellComponentWrapper getRandom() {
-//			return new SpellComponentWrapper(EAlteration.values()[
-//			       NostrumMagica.rand.nextInt(EAlteration.values().length)]);
-//		}
-//	}
 
 	private static class WorldGenNostrumShrine extends WorldGenerator {
 		
@@ -151,64 +69,27 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 			 .add(new RoomEnd1(true, false))
 			 .add(new RoomEnd1(false, false));
 	
-	private static enum DungeonGen {
-		SHAPE(new WorldGenNostrumShrine(new NostrumShrineDungeon(
-				// Shape dungeon
-				new ShapeComponent(),
-				new StartRoom(),
-				new ShrineRoom()
-				).add(new RoomHallway())
-				 .add(new RoomHallway())
-				 .add(new RoomLongHallway())
-				 .add(new RoomGrandHallway())
-				 .add(new RoomEnd1(true, false))
-				 .add(new RoomEnd1(false, false))
-				 .add(new RoomEnd1(false, false))
-				 .add(new RoomEnd1(false, true))
-				 .add(new RoomEnd2(false))
-				 .add(new RoomEnd2(true))
-				 .add(new RoomVHallway())
-				 .add(new RoomTee1())
-				 .add(new RoomJail1())
-				 .add(new RoomChallenge2())), 20, 50),
-		TRIGGER(new WorldGenNostrumShrine(new NostrumShrineDungeon(
-				// Trigger dungeon
-				new TriggerComponent(),
-				new StartRoom(),
-				new ShrineRoom()
-				).add(new RoomHallway())
-				 .add(new RoomHallway())
-				 .add(new RoomLongHallway())
-				 .add(new RoomGrandHallway())
-				 .add(new RoomEnd1(true, false))
-				 .add(new RoomEnd1(false, false))
-				 .add(new RoomEnd1(false, false))
-				 .add(new RoomEnd1(false, true))
-				 .add(new RoomEnd2(false))
-				 .add(new RoomEnd2(true))
-				 .add(new RoomVHallway())
-				 .add(new RoomChallenge2())
-				 .add(new RoomTee1())
-				 .add(new RoomChallenge1())), 30, 50),
-		ELEMENT(new WorldGenNostrumShrine(new NostrumShrineDungeon(
-				// Trigger dungeon
-				new ElementComponent(),
-				new StartRoom(),
-				new ShrineRoom()
-				).add(new RoomHallway())
-				 .add(new RoomHallway())
-				 .add(new RoomLongHallway())
-				 .add(new RoomGrandHallway())
-				 .add(new RoomEnd1(true, false))
-				 .add(new RoomEnd1(false, false))
-				 .add(new RoomEnd1(false, false))
-				 .add(new RoomEnd1(false, true))
-				 .add(new RoomEnd2(false))
-				 .add(new RoomEnd2(true))
-				 .add(new RoomVHallway())
-				 .add(new RoomTee1())
-				 .add(new RoomLectern())
-				 .add(new RoomChallenge1())), 30, 50),
+	public static final String PORTAL_ROOM_NAME = "portal_room";
+	
+	public static NostrumDungeon PORTAL_DUNGEON = new NostrumLoadedDungeon(
+			"portal",
+			new DragonStartRoom(),
+			new LoadedRoom(DungeonRoomRegistry.instance().getRoom(PORTAL_ROOM_NAME))
+			).add(new RoomGrandStaircase())
+			 .add(new RoomEnd1(false, true))
+			 .add(new RoomGrandHallway())
+			 .add(new RoomGrandHallway())
+			 .add(new RoomGrandHallway())
+			 .add(new RoomJail1())
+			 .add(new RoomJail1())
+			 .add(new RoomChallenge2())
+			 .add(new RoomChallenge2())
+			 .add(new RoomLectern())
+			 .add(new RoomEnd1(true, false))
+			 .add(new RoomEnd1(false, false));
+	
+	public static enum DungeonGen {
+		PORTAL(new WorldGenNostrumShrine(PORTAL_DUNGEON), 20, 70),
 		DRAGON(new WorldGenNostrumShrine(DRAGON_DUNGEON), 30, 60);
 //		TEST(new WorldGenNostrumShrine(new NostrumLoadedDungeon("test", new StartRoom(), new RoomArena())), 30, 60);
 		
@@ -234,51 +115,73 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 			return maxY;
 		}
 		
-		public boolean chanceSpawn(Random random, World world, int chunkX, int chunkZ) {
-			if (this == ELEMENT) {
-				if (chunkX % 32 == 0 && chunkZ % 24 == 0) {
-					return random.nextBoolean() && random.nextBoolean();
-				}
-			}
+		public boolean chanceSpawn(Random random, World world, int chunkX, int chunkZ, int bonusOdds) {
+			int count = 0;
+			int chance = 1;
 			
-			int count = 1;
-			int chance = 9000;
-			if (this == ELEMENT)
+			// Easy way to think about it:
+			// [count] many in every [chance] chunks.
+			// Note: CHUNK. So multiply by 16 to get blocks.
+			
+			if (this == PORTAL) {
 				count = 4;
-			else if (this == SHAPE)
-				count = 1;
-			else if (this == TRIGGER)
-				count = 4;
+				chance = 200*200;
+			}
 			else if (this == DRAGON) {
 				count = 1;
-				chance = 15000;
+				chance = 100*100;
 			}
 			
+			// Add bonus chance from bonus items
+			count *= Math.max(1, Math.min(MAX_BOOSTS, bonusOdds + 1));
 			
 			return random.nextInt(chance) < count;
 		}
 	}
 	
-	// Some items can queue a certain type of shrine to be spawned next.
-	// This list is the queue
-	// We don't persist it, though :shrug:
-	private static List<SpellComponentWrapper> queuedWrappers = new LinkedList<>();
-	private static int forceTimer = -1;
-	
-	public NostrumDungeonGenerator() {
-		
-	}
-	
-	public static void enqueueShrineRequest(SpellComponentWrapper type) {
-		queuedWrappers.add(type);
-	}
-	
-	public static void forceSpawn(int chunks) {
-		forceTimer = Math.max(0, chunks);
-	}
-	
 	private List<DungeonGen> list;
 	private static boolean generating = false; // PREVENT triggering spawns of other dungs recursively
+	
+	// Some items increase odds of next dungeon spawning. Keep track of that here.
+	private static Map<DungeonGen, Integer> increasedOdds;
+	
+	public static final int MAX_BOOSTS = 10;
+	
+	public NostrumDungeonGenerator() {
+		increasedOdds = new EnumMap<>(DungeonGen.class);
+	}
+	
+	/**
+	 * Attempts to add to the chance that a dungeon type will be spawned.
+	 * Returns whether bonus was applied. Failure indicates rate is maxed already.
+	 * @param type
+	 * @return
+	 */
+	public static boolean boostOdds(DungeonGen type) {
+		Integer boost = increasedOdds.get(type);
+		
+		if (boost != null && boost >= MAX_BOOSTS)
+			return false;
+		
+		int count = 1;
+		if (boost != null)
+			count += boost;
+		
+		increasedOdds.put(type, count);
+		return true;
+	}
+	
+	public static int getBonusOdds(DungeonGen type) {
+		Integer boost = increasedOdds.get(type);
+		if (boost == null)
+			return 0;
+		
+		return (int) boost;
+	}
+	
+	protected static void clearOdds(DungeonGen type) {
+		increasedOdds.remove(type);
+	}
 	
 	@Override
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
@@ -304,11 +207,10 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 		NostrumDungeonGenerator.generating = true;
 		
 		long seed = world.getSeed();
-		// Spawn a self somewhere in the 32x32 chunks around 0
+		// Spawn a portal shrine somewhere in the 32x32 chunks around 0
 		if (chunkX == (int) ((seed & (0x1F << 14)) >> 14) - 16
 				&& chunkZ == (int) ((seed & (0x1F << 43)) >> 43) - 16) {
-			queuedWrappers.add(new SpellComponentWrapper(SingleShape.instance()));
-			DungeonGen gen = DungeonGen.SHAPE;
+			DungeonGen gen = DungeonGen.PORTAL;
 			runGenerator(gen.getGenerator(), world, random, chunkX, chunkZ,
 					gen.getMinY(), gen.getMaxY());
 			NostrumDungeonGenerator.generating = false;
@@ -322,22 +224,12 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 		}
 		Collections.shuffle(list);
 		
-		if (forceTimer == 0) {
-			forceTimer = -1;
-			DungeonGen gen = list.get(0);
-			runGenerator(gen.getGenerator(), world, random, chunkX, chunkZ,
-					gen.getMinY(), gen.getMaxY());
-			NostrumDungeonGenerator.generating = false;
-			return;
-		}
-		
-		if (forceTimer > 0)
-			forceTimer--;
-		
 		for (DungeonGen gen : list) {
-			if (gen.chanceSpawn(random, world, chunkX, chunkZ)) {
+			if (gen.chanceSpawn(random, world, chunkX, chunkZ, getBonusOdds(gen))) {
+				NostrumMagica.logger.info("Generating NostrumMagica dungeon with type " + gen.name());
 				runGenerator(gen.getGenerator(), world, random, chunkX, chunkZ,
 					gen.getMinY(), gen.getMaxY());
+				clearOdds(gen);
 				break;
 			}
 		}

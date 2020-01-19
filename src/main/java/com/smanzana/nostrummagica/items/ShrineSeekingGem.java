@@ -8,13 +8,13 @@ import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
-import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.world.NostrumDungeonGenerator;
+import com.smanzana.nostrummagica.world.NostrumDungeonGenerator.DungeonGen;
 
+import net.minecraft.client.resources.I18n;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
-import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.ShapedRecipes;
@@ -22,20 +22,20 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.RecipeSorter;
 import net.minecraftforge.oredict.RecipeSorter.Category;
 
 // Queued the next shrine to be a certain type
 public class ShrineSeekingGem extends Item implements ILoreTagged {
 
-	private static final String NBT_COMP = "type";
+	private static final String NBT_TYPE = "gen_type";
 	private static ShrineSeekingGem instance = null;
 	
 	public static ShrineSeekingGem instance() {
@@ -46,7 +46,8 @@ public class ShrineSeekingGem extends Item implements ILoreTagged {
 	}
 	
 	public static void init() {
-		GameRegistry.addRecipe(new SeekingGemRecipe());
+		GameRegistry.addRecipe(new SeekingGemRecipe(DungeonGen.PORTAL, new ItemStack(Items.ENDER_PEARL)));
+		GameRegistry.addRecipe(new SeekingGemRecipe(DungeonGen.DRAGON, NostrumResourceItem.getItem(ResourceType.SLAB_FIERCE, 1)));
 	}
 	
 	public static final String id = "seeking_gem";
@@ -58,58 +59,77 @@ public class ShrineSeekingGem extends Item implements ILoreTagged {
 		this.setMaxStackSize(8);
 	}
 	
-	public static SpellComponentWrapper getComponent(ItemStack stack) {
-		if (!stack.hasTagCompound())
-			return null;
+	public static DungeonGen getType(ItemStack stack) {
+		DungeonGen type = DungeonGen.PORTAL;
 		
-		NBTTagCompound nbt = stack.getTagCompound();
+		if (stack.hasTagCompound()) {
+			NBTTagCompound nbt = stack.getTagCompound();
+			
+			if (nbt.hasKey(NBT_TYPE, NBT.TAG_STRING)) {
+				try {
+					type = DungeonGen.valueOf(nbt.getString(NBT_TYPE).toUpperCase());
+				} catch (Exception e) {
+					System.out.println("=== Exception caught: " + nbt.getString(NBT_TYPE));
+					;
+				}
+			} else {
+				System.out.println("=== No key");
+			}
+		} else {
+			System.out.println("=== No tag");
+		}
 		
-		if (!nbt.hasKey(NBT_COMP, NBT.TAG_STRING))
-			return null;
-		
-		return SpellComponentWrapper.fromKeyString(nbt.getString(NBT_COMP));
+		return type;
 	}
 	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
 
-		if (stack == null)
+		if (stack == null) {
 			return;
+		}
 		
-		SpellComponentWrapper component = getComponent(stack);
+		DungeonGen type = getType(stack);
 		
-		if (component == null)
-			return;
-		
-		if (component.isElement()) {
-			tooltip.add(TextFormatting.DARK_BLUE + component.getElement().getName() + TextFormatting.RESET);
-		} else if (component.isAlteration()) {
-			tooltip.add(TextFormatting.DARK_BLUE + component.getAlteration().getName() + TextFormatting.RESET);
-		} else if (component.isTrigger()) {
-			tooltip.add(TextFormatting.DARK_BLUE + component.getTrigger().getDisplayName() + TextFormatting.RESET);
-		} else if (component.isShape()) {
-			tooltip.add(TextFormatting.DARK_BLUE + component.getShape().getDisplayName() + TextFormatting.RESET);
+		tooltip.add(TextFormatting.DARK_BLUE + I18n.format("info.shrinegem." + type.name().toLowerCase()) + TextFormatting.RESET);
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+		for (DungeonGen type : DungeonGen.values()) {
+			subItems.add(getItemstack(type));
 		}
 	}
 	
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
-		if (!itemStackIn.hasTagCompound())
-			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
+		if (worldIn.isRemote) {
+			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+		}
 		
-		SpellComponentWrapper wrapper = getComponent(itemStackIn);
-		if (wrapper == null)
+		if (!itemStackIn.hasTagCompound()) {
 			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
+		}
 		
-		NostrumDungeonGenerator.enqueueShrineRequest(wrapper);
-		itemStackIn.stackSize--;
+		DungeonGen type = getType(itemStackIn);
+		if (type == null) {
+			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
+		}
+		
+		if (NostrumDungeonGenerator.boostOdds(type)) {
+			itemStackIn.stackSize--;
+			playerIn.addChatComponentMessage(new TextComponentTranslation("info.shrinegem.success"));
+		} else {
+			playerIn.addChatComponentMessage(new TextComponentTranslation("info.shrinegem.failure"));
+		}
 		
 		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
 		
     }
 	
-	public static void setComponent(ItemStack stack, SpellComponentWrapper component) {
+	public static void setType(ItemStack stack, DungeonGen type) {
 		if (stack == null)
 			return;
 		
@@ -117,16 +137,16 @@ public class ShrineSeekingGem extends Item implements ILoreTagged {
 			stack.setTagCompound(new NBTTagCompound());
 		
 		NBTTagCompound nbt = stack.getTagCompound();
-		nbt.setString(NBT_COMP, component.getKeyString());
+		nbt.setString(NBT_TYPE, type.name());
 	}
 	
-	public static ItemStack getItemstack(SpellComponentWrapper wrapper) {
-		return getItemstack(wrapper, 1);
+	public static ItemStack getItemstack(DungeonGen type) {
+		return getItemstack(type, 1);
 	}
 	
-	public static ItemStack getItemstack(SpellComponentWrapper wrapper, int count) {
+	public static ItemStack getItemstack(DungeonGen type, int count) {
 		ItemStack stack = new ItemStack(instance(), count);
-		setComponent(stack, wrapper);
+		setType(stack, type);
 		return stack;
 	}
 	
@@ -142,43 +162,31 @@ public class ShrineSeekingGem extends Item implements ILoreTagged {
 
 	@Override
 	public Lore getBasicLore() {
-		return new Lore().add("Seeking gems contain raw essence of spell components.", "On use, they release this energy and help influence the shrines that spawn.");
+		return new Lore().add("Seeking gems contain strong energies attuned to the different types of shrines.", "On use, they release this energy and help influence the shrines that spawn.");
 	}
 
 	@Override
 	public Lore getDeepLore() {
-		return new Lore().add("Seeking gems contain raw essence of a spell component.", "Releasing this energy makes the next shrine that spawns of the provided type.", "Multiple alterations can be queued and will affect shrine generation as they are encountered.");
+		return new Lore().add("Seeking gems contain strong energies attuned to the different types of shrines.", "Releasing this energy makes it more likely that a shrine will spawn.", "There's a maximum number of boosts that can be in affect per shrine type.", "Each additional boost increases the odds.");
 	}
 	
 	private static class SeekingGemRecipe extends ShapedRecipes {
-
-		public SeekingGemRecipe() {
+		
+		public SeekingGemRecipe(DungeonGen type, ItemStack item) {
 			super(3, 3, new ItemStack[] {
 				ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1),
 				ReagentItem.instance().getReagent(ReagentType.GINSENG, 1),
 				ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1),
 				ReagentItem.instance().getReagent(ReagentType.BLACK_PEARL, 1),
-				new ItemStack(SpellRune.instance(), 1, OreDictionary.WILDCARD_VALUE),
+				item,
 				ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1),
 				new ItemStack(Items.GOLD_INGOT),
 				NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1),
 				new ItemStack(Items.GOLD_INGOT),	
-			}, ShrineSeekingGem.getItemstack(new SpellComponentWrapper(EMagicElement.PHYSICAL)));
+			}, ShrineSeekingGem.getItemstack(type));
 			
 			RecipeSorter.register(NostrumMagica.MODID + ":SeekingGemRecipe",
 					this.getClass(), Category.SHAPED, "after:minecraft:shaped");
-		}
-		
-		@Override
-		public ItemStack getCraftingResult(InventoryCrafting inv) {
-			// Just care about the rune in the center
-			ItemStack rune = inv.getStackInSlot(4);
-			SpellComponentWrapper comp = SpellRune.toComponentWrapper(rune);
-			if (comp == null) {
-				return null;
-			}
-			
-			return ShrineSeekingGem.getItemstack(comp);
 		}
 	}
 

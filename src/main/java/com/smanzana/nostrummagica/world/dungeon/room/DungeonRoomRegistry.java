@@ -217,7 +217,7 @@ public class DungeonRoomRegistry {
 			long startTime = System.currentTimeMillis();
 			long time;
 			
-			ProgressBar bar = ProgressManager.push("reading room", 1);
+			ProgressBar bar = ProgressManager.push("Reading Room", 1);
 			bar.step(file.getName());
 			NBTTagCompound nbt = CompressedStreamTools.read(file);
 			ProgressManager.pop(bar);
@@ -264,7 +264,7 @@ public class DungeonRoomRegistry {
 		if (list != null)
 			count = list.recordList.size();
 		
-		NostrumMagica.logger.info("Loaded " + count + " rooms (" + (((double)(System.currentTimeMillis() - startTime) / 1000D)) + " seconds");
+		NostrumMagica.logger.info("Loaded " + count + " rooms (" + (((double)(System.currentTimeMillis() - startTime) / 1000D)) + " seconds)");
 	}
 	
 	public final boolean writeRoomAsFile(RoomBlueprint blueprint, String name, int weight, List<String> tags) {

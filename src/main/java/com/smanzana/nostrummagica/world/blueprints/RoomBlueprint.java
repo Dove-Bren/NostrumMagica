@@ -132,7 +132,7 @@ public class RoomBlueprint {
 					}
 				}
 				
-				world.setBlockState(at, placeState, 0);
+				world.setBlockState(at, placeState, 2);
 				if (tileEntityData != null) {
 					TileEntity te = TileEntity.create(world, tileEntityData);
 					world.setTileEntity(at, te);
@@ -261,7 +261,7 @@ public class RoomBlueprint {
 			 x = dx;
 			 z = dz;
 			break;
-		case EAST:
+		case WEST:
 			// Single rotation: (-z, x)
 			x = -dz;
 			z = dx;
@@ -271,7 +271,7 @@ public class RoomBlueprint {
 			x = -dx;
 			z = -dz;
 			break;
-		case WEST:
+		case EAST:
 			// Triple: (z, -x)
 			x = dz;
 			z = -dx;
@@ -308,34 +308,85 @@ public class RoomBlueprint {
 			modDir = getModDir(entry.getFacing(), direction);
 		}
 		
-		// Outside loop for each chunk
-		// Inner loop loops i, j, k to 0 to < 16 in each
-		// Loops basically always go from 0 to 16 except in edge ones I suppose
-		BlockPos offset = entry == null ? new BlockPos(0,0,0) : entry.getPos();
-		
-		// To get actual least-x leastz coordinates, we need to add offset rotated to proper orientation
-		BlockPos origin;
-		{
-			BlockPos rotOffset = applyRotation(offset, modDir);
-			origin = at.toImmutable().subtract(rotOffset);
-		}
-		final int chunkStartX = origin.getX() / 16;
-		final int chunkStartZ = origin.getZ() / 16;
-		final int chunkRemX = origin.getX() % 16;
-		final int chunkRemZ = origin.getZ() % 16;
-		
-		// To get number of chunks in either direction we're going to go, we have to apply rotation to width and height
-		final int numChunkX;
-		final int numChunkZ;
 		BlockPos adjustedDims;
 		{
 			BlockPos wrapper = new BlockPos(width, 0, length);
 			adjustedDims = applyRotation(wrapper, modDir);
 			
 			// Absolute value because dimensions are unsigned, and rotation can negate x and z but we don't actually care
-			numChunkX = Math.abs(adjustedDims.getX()) / 16;
-			numChunkZ = Math.abs(adjustedDims.getZ()) / 16;
+			adjustedDims = new BlockPos(
+					Math.abs(adjustedDims.getX()),
+					Math.abs(adjustedDims.getY()),
+					Math.abs(adjustedDims.getZ())
+					);
 		}
+		
+		// Outside loop for each chunk
+		// Inner loop loops i, j, k to 0 to < 16 in each
+		// Loops basically always go from 0 to 16 except in edge ones I suppose
+		BlockPos offset = entry == null ? new BlockPos(0,0,0) : entry.getPos();
+		BlockPos unit = applyRotation(new BlockPos(1, 0, 1), modDir);
+		
+		// To get actual least-x leastz coordinates, we need to add offset rotated to proper orientation
+		BlockPos origin;
+		{
+//			//EnumFacing fac = modDir.getHorizontalIndex() % 2 == 1 ? modDir.getOpposite() : modDir;
+//			BlockPos rotUnit = applyRotation(offset, fac);
+//			BlockPos rotOffset = applyRotation(offset, fac);
+//			
+//			// To get proper offset, need to adjust where our origin is, relatively, to achieve correct rotation anchor
+//			if (rotUnit.getX() < 0 || rotUnit.getZ() < 0) {
+//				int px = Math.abs(rotOffset.getX());
+//				int pz = Math.abs(rotOffset.getZ());
+//				
+//				// if x < 0, make into width-x
+//				if (rotUnit.getX() < 0) {
+//					px = width - (px + 1);
+//				}
+//				
+//				// ...
+//				if (rotUnit.getZ() < 0) {
+//					pz = length - (pz + 1);
+//				}
+//				
+//				rotOffset = new BlockPos(px, rotOffset.getY(), pz);
+//			}
+			
+			BlockPos rotOffset = applyRotation(offset, modDir);
+			//BlockPos rotOffset = applyRotation(offset, modDir.getHorizontalIndex() % 2 == 1 ? modDir.getOpposite() : modDir);
+			
+			// To get proper offset, need to adjust where our origin is, relatively, to achieve correct rotation anchor
+			if (unit.getX() < 0 || unit.getZ() < 0) {
+				int px = Math.abs(rotOffset.getX());
+				int pz = Math.abs(rotOffset.getZ());
+				
+				// if x < 0, make into width-x
+				if (unit.getX() < 0) {
+					px = adjustedDims.getX() - (px + 1);
+				}
+				
+				// ...
+				if (unit.getZ() >= 0 || modDir == EnumFacing.SOUTH) {
+					pz = adjustedDims.getZ() - (pz + 1);
+				} 
+//				else {
+//					pz = Math.abs(pz);
+//				}
+				
+				rotOffset = new BlockPos(px, rotOffset.getY(), pz);
+			}
+			
+			origin = at.toImmutable().subtract(rotOffset);
+		}
+		final int chunkStartX = origin.getX() >> 4;
+		final int chunkStartZ = origin.getZ() >> 4;
+		final int chunkRemX = ((origin.getX() % 16) + 16) % 16;
+		final int chunkRemZ = ((origin.getZ() % 16) + 16) % 16;
+		
+		// To get number of chunks in either direction we're going to go, we have to apply rotation to width and height
+		// Note: add 'how far in the chunk we start' to width and height to find actual number of chunks affected
+		final int numChunkX = (adjustedDims.getX() + chunkRemX) / 16;
+		final int numChunkZ = (adjustedDims.getZ() + chunkRemZ) / 16;
 		
 		// Have a list for second-pass block placement
 		List<BlockPos> secondPassBlocks = new ArrayList<>(16 * 4);
@@ -347,8 +398,8 @@ public class RoomBlueprint {
 			final int chunkOffsetZ = (cz + chunkStartZ) * 16;
 			final int startX = (cx == 0 ? chunkRemX : 0);
 			final int startZ = (cz == 0 ? chunkRemZ : 0);
-			final int endX = (cx == numChunkX ? (origin.getX() + adjustedDims.getX()) % 16 : 16);
-			final int endZ = (cz == numChunkZ ? (origin.getZ() + adjustedDims.getZ()) % 16 : 16);
+			final int endX = (cx == numChunkX ? (((origin.getX() + adjustedDims.getX()) % 16) + 16) % 16 : 16);
+			final int endZ = (cz == numChunkZ ? (((origin.getZ() + adjustedDims.getZ()) % 16) + 16) % 16 : 16);
 			
 			
 			
@@ -362,10 +413,28 @@ public class RoomBlueprint {
 				// World pos is simply chunk position + inner loop offset
 				// (j is data y, so offset to world y)
 				cursor.setPos(chunkOffsetX + i, j + origin.getY(), chunkOffsetZ + k);
-				//System.out.println(String.format("Doing pos (%d, %d, %d)", cursor.getX(), cursor.getY(), cursor.getZ()));
 				
 				// Find data position by applying rotation to transform x and z coords into u and v data coords
+				// Also rotate a standard vector to appropriately deal with rotation in data coords
 				BlockPos dataPos = applyRotation(cursor.toImmutable().subtract(origin), modDir);
+				
+				// What is usually encoded as negative (-x), we need to make into (n-x) to flip in data coords, where 0 is lowest
+				if (unit.getX() < 0 || unit.getZ() < 0) {
+					int px = Math.abs(dataPos.getX());
+					int pz = Math.abs(dataPos.getZ());
+					
+					// if x < 0, make into width-x
+					if (unit.getX() < 0) {
+						px = width - (px + 1);
+					}
+					
+					// ...
+					if (unit.getZ() < 0) {
+						pz = length - (pz + 1);
+					}
+					
+					dataPos = new BlockPos(px, dataPos.getY(), pz);
+				}
 				
 				BlueprintBlock block = blocks[
    				       (dataPos.getX() * length * height)
@@ -375,7 +444,7 @@ public class RoomBlueprint {
 				
 				// Either set the block now, or set it up to be placed later (if it might break based on order)
 				if (isSecondPassBlock(block)) {
-					secondPassBlocks.add(new BlockPos(cursor.toImmutable()));
+					secondPassBlocks.add(new BlockPos(cursor));
 				} else {
 					block.spawn(world, cursor, modDir);
 				}
@@ -384,6 +453,24 @@ public class RoomBlueprint {
 			// Spawn all second-pass blocks
 			for (BlockPos secondPos : secondPassBlocks) {
 				BlockPos dataPos = applyRotation(secondPos.toImmutable().subtract(origin), modDir);
+				
+				// What is usually encoded as negative (-x), we need to make into (n-x) to flip in data coords, where 0 is lowest
+				if (unit.getX() < 0 || unit.getZ() < 0) {
+					int px = Math.abs(dataPos.getX());
+					int pz = Math.abs(dataPos.getZ());
+					
+					// if x < 0, make into width-x
+					if (unit.getX() < 0) {
+						px = width - (px + 1);
+					}
+					
+					// ...
+					if (unit.getZ() < 0) {
+						pz = length - (pz + 1);
+					}
+					
+					dataPos = new BlockPos(px, dataPos.getY(), pz);
+				}
 				blocks[
 				       (dataPos.getX() * length * height)
 				       + (dataPos.getY() * length)
