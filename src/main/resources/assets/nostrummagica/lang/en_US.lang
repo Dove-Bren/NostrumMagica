@@ -1008,3 +1008,6 @@ nei.category.ritual.name=Nostrum Ritual
 
 lore.mirror_shield.name=Mirror Shields
 lore.true_mirror_shield.name=True Mirror Shields
+
+modification.damaged_duration.expire=Your On Hit effect expired
+modification.damaged_duration.name=Duration

@@ -34,7 +34,7 @@ public class DelayTrigger extends SpellTrigger {
 		@Override
 		public void init(EntityLivingBase caster) {
 			// We are instant! Whoo!
-			NostrumMagica.playerListener.registerTimer(this, delayTicks, 0);
+			NostrumMagica.playerListener.registerTimer(this, 0, delayTicks);
 			
 		}
 

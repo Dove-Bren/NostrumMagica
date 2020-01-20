@@ -66,6 +66,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 
 /**
@@ -816,41 +817,43 @@ public class PlayerListener {
 	
 	@SubscribeEvent
 	public void onTick(ServerTickEvent event) {
-		tickCount++;
-		
-		// Regain mana
-		if (tickCount % 10 == 0) {
-			for (World world : FMLCommonHandler.instance().getMinecraftServerInstance().worldServers) {
-				if (world.playerEntities.isEmpty()) {
-					continue;
-				}
-				
-				for (EntityPlayer player : world.playerEntities) {
-					regenMana(player);
-				}
-			}
-		}
-		
-		Iterator<Entry<IGenericListener, TimeInfo>> it = timeInfos.entrySet().iterator();
-		while (it.hasNext()) {
-			Entry<IGenericListener, TimeInfo> entry = it.next();
-			TimeInfo info = entry.getValue();
-			if (info.delay > 0) {
-				info.delay--;
-				if (info.delay == 0) {
-					if (entry.getKey().onEvent(Event.TIME, null, null))
-						it.remove();
-					else {
-						info.startTick = tickCount;
+		if (event.phase == Phase.START) {
+			tickCount++;
+			
+			// Regain mana
+			if (tickCount % 10 == 0) {
+				for (World world : FMLCommonHandler.instance().getMinecraftServerInstance().worldServers) {
+					if (world.playerEntities.isEmpty()) {
 						continue;
+					}
+					
+					for (EntityPlayer player : world.playerEntities) {
+						regenMana(player);
 					}
 				}
 			}
 			
-			int diff = tickCount - info.startTick;
-			if (diff % info.interval == 0)
-				if (entry.getKey().onEvent(Event.TIME, null, null))
-					it.remove();
+			Iterator<Entry<IGenericListener, TimeInfo>> it = timeInfos.entrySet().iterator();
+			while (it.hasNext()) {
+				Entry<IGenericListener, TimeInfo> entry = it.next();
+				TimeInfo info = entry.getValue();
+				if (info.delay > 0) {
+					info.delay--;
+					if (info.delay == 0) {
+						if (entry.getKey().onEvent(Event.TIME, null, null))
+							it.remove();
+						else {
+							info.startTick = tickCount;
+							continue;
+						}
+					}
+				}
+				
+				int diff = tickCount - info.startTick;
+				if (diff % info.interval == 0)
+					if (entry.getKey().onEvent(Event.TIME, null, null))
+						it.remove();
+			}
 		}
 	}
 	

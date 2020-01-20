@@ -13,11 +13,15 @@ import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 
 public class DamagedTrigger extends SpellTrigger {
@@ -25,30 +29,44 @@ public class DamagedTrigger extends SpellTrigger {
 	public class DamagedTriggerInstance extends SpellTrigger.SpellTriggerInstance implements IGenericListener {
 
 		private EntityLivingBase entity;
+		private int duration;
+		private boolean expired;
 		
-		public DamagedTriggerInstance(SpellState state, EntityLivingBase entity) {
+		public DamagedTriggerInstance(SpellState state, EntityLivingBase entity, int duration) {
 			super(state);
 			this.entity = entity;
+			this.duration = duration;
+			this.expired = false;
 		}
 		
 		@Override
 		public void init(EntityLivingBase caster) {
 			// We are instant! Whoo!
 			NostrumMagica.playerListener.registerHit(this, entity);
+			NostrumMagica.playerListener.registerTimer(this, 0, 20 * duration);
 			
 		}
 
 		@Override
 		public boolean onEvent(Event type, EntityLivingBase entity, Object unused) {
-			// We only registered for time, so don't bother checking
+			if (type == Event.DAMAGED) {
+				if (!expired) {
+					TriggerData data = new TriggerData(
+							Lists.newArrayList(this.getState().getSelf()),
+							Lists.newArrayList(this.entity),
+							null,
+							null
+							);
+					this.trigger(data);
+				}
+			} else if (type == Event.TIME) {
+				expired = true;
+				if (this.entity instanceof EntityPlayer) {
+					EntityPlayer player = (EntityPlayer) this.entity;
+					player.addChatComponentMessage(new TextComponentTranslation("modification.damaged_duration.expire"));
+				}
+			}
 			
-			TriggerData data = new TriggerData(
-					Lists.newArrayList(this.getState().getSelf()),
-					Lists.newArrayList(entity),
-					null,
-					null
-					);
-			this.trigger(data);
 			return true;
 		}
 	}
@@ -85,7 +103,7 @@ public class DamagedTrigger extends SpellTrigger {
 	@Override
 	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw,
 			SpellPartParam params) {
-		return new DamagedTriggerInstance(state, state.getSelf());
+		return new DamagedTriggerInstance(state, state.getSelf(), (int) params.level);
 	}
 
 	@Override
@@ -105,12 +123,22 @@ public class DamagedTrigger extends SpellTrigger {
 
 	@Override
 	public float[] supportedFloats() {
-		return null;
+		return new float[] {20f, 30f, 40f, 60f, 300f};
 	}
 
+	public static ItemStack[] costs = null;
 	@Override
 	public ItemStack[] supportedFloatCosts() {
-		return null;
+		if (costs == null) {
+			costs = new ItemStack[] {
+				null,
+				new ItemStack(Items.REDSTONE),
+				new ItemStack(Items.IRON_INGOT),
+				new ItemStack(Items.GOLD_INGOT),
+				new ItemStack(Items.DIAMOND),
+			};
+		}
+		return costs;
 	}
 
 	@Override
@@ -120,7 +148,7 @@ public class DamagedTrigger extends SpellTrigger {
 
 	@Override
 	public String supportedFloatName() {
-		return null;
+		return I18n.format("modification.damaged_duration.name", (Object[]) null);
 	}
 	
 }
