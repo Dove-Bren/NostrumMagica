@@ -24,6 +24,10 @@ public class LoadedRoom implements IDungeonRoom {
 	
 	public LoadedRoom(RoomBlueprint blueprint) {
 		this.blueprint = blueprint;
+		
+		if (blueprint == null) {
+			throw new RuntimeException("Blueprint null when creating LoadedRoom. Wrong room name looked up, or too early?");
+		}
 	}
 	
 	// Need to have some sort of 'exit point' placeholder block so that I can encode doorways into the blueprint
@@ -56,7 +60,7 @@ public class LoadedRoom implements IDungeonRoom {
 	@Override
 	public void spawn(NostrumDungeon dungeon, World world, DungeonExitPoint start) {
 		// See note about dungeon vs blueprint facing in @getExits
-		blueprint.spawn(world, start.getPos(), start.getFacing().getOpposite());
+		blueprint.spawn(world, start.getPos(), start.getFacing());
 	}
 
 	@Override

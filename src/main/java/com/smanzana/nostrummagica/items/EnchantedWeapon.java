@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -87,6 +88,8 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 		return (int) ((float) base * mod);
 	}
 	
+	protected static final UUID OFFHAND_ATTACK_SPEED_MODIFIER = UUID.fromString("B2879ABC-4180-1234-B01B-487954A3BAC4");
+	
 	private int level;
 	private int damage;
 	private EMagicElement element;
@@ -107,12 +110,49 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 	}
 	
 	@Override
-	public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
+	public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot slot) {
 		Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
 
-		if (equipmentSlot == EntityEquipmentSlot.MAINHAND) {
+		if (slot == EntityEquipmentSlot.MAINHAND) {
 			multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", damage, 0));
-			multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4000000953674316D, 0));
+			
+			final double amt;
+			switch (element) {
+			case ICE:
+				if (level == 1) {
+					amt = 2.6; // Mace only slightly slower than sword
+				} else if (level == 2) {
+					amt = 3.3; // Morning star slower than vanilla axe!
+				} else {
+					amt = 2.8; // Scepter slower than mace, but not TOO slow
+				}
+				break;
+			case LIGHTNING:
+				if (level == 1) {
+					amt = 1.5; // Knife is very fast! 2.5 attacks per second (vanilla sword is 1.6)
+				} else if (level == 2) {
+					amt = 2.0; // Dagger slower, but still faster than sword
+				} else {
+					amt = 1.6; // Stiletto very fast! Lightning fast, even! lol
+				}
+				break;
+			case WIND:
+				if (level == 1) {
+					amt = 2.4; // Slasher is same as vanilla sword. Heavier, but powered by wind!
+				} else if (level == 2) {
+					amt = 2.6; // Slave is a tad slower
+				} else {
+					amt = 2.1; // Striker is very fast :)
+				}
+				break;
+			default:
+				amt = 2.4;
+			}
+			
+			multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -amt, 0));
+		} else if (slot == EntityEquipmentSlot.OFFHAND && element == EMagicElement.WIND) {
+			final double amt = level * 0.1;
+			multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getAttributeUnlocalizedName(), new AttributeModifier(OFFHAND_ATTACK_SPEED_MODIFIER, "Weapon modifier", amt, 0));
 		}
 
 		return multimap;

@@ -2,8 +2,10 @@ package com.smanzana.nostrummagica.world.blueprints;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -17,6 +19,7 @@ import net.minecraft.block.BlockRedstoneRepeater;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockTorch;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
@@ -37,12 +40,29 @@ import net.minecraftforge.fml.common.ProgressManager.ProgressBar;
 public class RoomBlueprint {
 	
 	public static class BlueprintBlock {
+		
+		private static Map<String, Block> BLOCK_CACHE = new HashMap<>();
+		
+		private static Block CHECK_CACHE(String name) {
+			return BLOCK_CACHE.get(name.toLowerCase());
+		}
+		
+		private static void SET_CACHE(String name, Block block) {
+			BLOCK_CACHE.put(name.toLowerCase(), block);
+		}
+		
 		private IBlockState state;
 		private NBTTagCompound tileEntityData;
 		
 		public BlueprintBlock(IBlockState state, NBTTagCompound teData) {
 			this.state = state;
 			this.tileEntityData = teData;
+			
+			// Refuse to store air
+			if (state != null && state.getBlock() == Blocks.AIR) {
+				state = null;
+				tileEntityData = null;
+			}
 		}
 		
 		public BlueprintBlock(World world, BlockPos pos) {
@@ -59,20 +79,51 @@ public class RoomBlueprint {
 		}
 		
 		public static final String NBT_BLOCK = "block_id";
+		public static final String NBT_BLOCK_TYPE = "block_type";
+		public static final String NBT_BLOCK_STATE = "block_meta";
 		public static final String NBT_TILE_ENTITY = "te_data";
 		
+		@SuppressWarnings("deprecation")
 		public static BlueprintBlock fromNBT(byte version, NBTTagCompound nbt) {
 			IBlockState state = null;
 			NBTTagCompound teData = null;
 			switch (version) {
 			case 0:
 				state = Block.getStateById(nbt.getInteger(NBT_BLOCK));
+				
+				// Block.getStateById defaults to air. Remove it!
+				if (state != null && state.getBlock() == Blocks.AIR) {
+					state = null;
+				}
+				
 				if (state != null && nbt.hasKey(NBT_TILE_ENTITY)) {
 					teData = nbt.getCompoundTag(NBT_TILE_ENTITY);
 				}
 				break;
 			case 1:
 				throw new RuntimeException("Blueprint block doesn't understand version " + version);
+			case 2:
+				String type = nbt.getString(NBT_BLOCK_TYPE);
+				if (!type.isEmpty()) {
+					Block block = CHECK_CACHE(type);
+					if (block == null) {
+						block = Block.getBlockFromName(type);
+						SET_CACHE(type, block);
+					}
+					if (block != null) {
+						state = block.getStateFromMeta(nbt.getInteger(NBT_BLOCK_STATE));
+					}
+				}
+				
+				// Prevent air from getting in
+				if (state != null && state.getBlock() == Blocks.AIR) {
+					state = null;
+				}
+				
+				if (state != null && nbt.hasKey(NBT_TILE_ENTITY)) {
+					teData = nbt.getCompoundTag(NBT_TILE_ENTITY);
+				}
+				break;
 			default:
 				throw new RuntimeException("Blueprint block doesn't understand version " + version);
 			}
@@ -83,8 +134,18 @@ public class RoomBlueprint {
 		public NBTTagCompound toNBT() {
 			NBTTagCompound tag = new NBTTagCompound();
 			
+			// Version 0
+//			if (state != null) {
+//				tag.setInteger(NBT_BLOCK, Block.getStateId(state));
+//				if (tileEntityData != null) {
+//					tag.setTag(NBT_TILE_ENTITY, tileEntityData);
+//				}
+//			}
+			
+			// Version 2
 			if (state != null) {
-				tag.setInteger(NBT_BLOCK, Block.getStateId(state));
+				tag.setString(NBT_BLOCK_TYPE, state.getBlock().getRegistryName().toString());
+				tag.setInteger(NBT_BLOCK_STATE, state.getBlock().getMetaFromState(state));
 				if (tileEntityData != null) {
 					tag.setTag(NBT_TILE_ENTITY, tileEntityData);
 				}
@@ -174,16 +235,20 @@ public class RoomBlueprint {
 	}
 	
 	public static final String NBT_DIMS = "dimensions";
+	public static final String NBT_WHOLE_DIMS = "master_dimensions";
 	public static final String NBT_BLOCK_LIST = "blocks";
 	public static final String NBT_DOOR_LIST = "doors";
 	public static final String NBT_ENTRY = "entry";
 	public static final String NBT_VERSION = "version";
 	public static final String NBT_ENTITIES = "entities";
+	public static final String NBT_PIECE_OFFSET = "part_offset";
+	public static final int MAX_BLUEPRINT_BLOCKS = 32 * 32 * 32;
 	
 	private BlockPos dimensions;
 	private BlueprintBlock[] blocks;
 	private DungeonExitPoint entry;
 	private Set<DungeonExitPoint> doors;
+	private int partOffset; // Only used for fragments
 	
 	public RoomBlueprint(BlockPos dimensions, BlueprintBlock[] blocks, Set<DungeonExitPoint> exits, DungeonExitPoint entry) {
 		if (dimensions != null && blocks != null
@@ -612,6 +677,49 @@ public class RoomBlueprint {
 		return this.entry;
 	}
 	
+	/**
+	 * Adds one blueprint to the other. Returns the original blueprint modified to include blocks from the other.
+	 * This SHOULD be compatible with completely different blueprints.
+	 * For now, all I'm implementing is piecing blueprints broken apart with {@link #toNBTWithBreakdown()}, where
+	 * all blueprints passed in should be within the dimensions of the original.
+	 * @param blueprint
+	 * @return
+	 */
+	public RoomBlueprint join(RoomBlueprint blueprint) {
+		// TODO expand this to accept different ones!
+		
+		final long start = System.currentTimeMillis();
+		
+		if (blueprint.dimensions.getZ() != dimensions.getZ()
+				|| blueprint.dimensions.getY() != dimensions.getY()) {
+			throw new RuntimeException("Can't combine blueprints that don't have the same base size!");
+		}
+		
+		if (!blueprint.entry.equals(entry)) {
+			throw new RuntimeException("Arbitrary blueprint joining not implemented!");
+		}
+		
+		if (blueprint.partOffset == 0) {
+			throw new RuntimeException("Can only join sub-blueprints");
+		}
+		
+		final int base = dimensions.getY() * dimensions.getZ();
+		final int count = blueprint.dimensions.getX() * base;
+		final int offset = blueprint.partOffset * base;
+		System.arraycopy(blueprint.blocks, 0, blocks, offset, Math.min(count, blocks.length - offset));
+		
+		final long now = System.currentTimeMillis();
+		if (now - start > 100) {
+			NostrumMagica.logger.info("Joining to took " + (now - start) + "ms!");
+		}
+		
+		return this;
+	}
+	
+	public boolean shouldSplit() {
+		return dimensions.getX() * dimensions.getY() * dimensions.getZ() > MAX_BLUEPRINT_BLOCKS; 
+	}
+	
 	private static class BlueprintSavedTE {
 		
 		public static final String NBT_DATA = "te_data";
@@ -640,8 +748,11 @@ public class RoomBlueprint {
 	}
 	
 	@SuppressWarnings("null")
-	private static RoomBlueprint deserializeVersion1(NBTTagCompound nbt) {
+	private static RoomBlueprint deserializeNBTStyleInternal(NBTTagCompound nbt, byte version) {
 		BlockPos dims = NBTUtil.getPosFromTag(nbt.getCompoundTag(NBT_DIMS));
+		// When breaking blueprints into pieces, the first one has an actual copy of the real size of the whole thing.
+		// If we have one of those, allocate the FULL array size instead of the small one
+		BlockPos masterDims = NBTUtil.getPosFromTag(nbt.getCompoundTag(NBT_WHOLE_DIMS));
 		BlueprintBlock[] blocks = null;
 		Set<DungeonExitPoint> doors = null;
 		DungeonExitPoint entry = null;
@@ -662,13 +773,15 @@ public class RoomBlueprint {
 				bar.step("Blocks");
 			}
 			
+			if (masterDims.distanceSq(0, 0, 0) == 0) {
+				blocks = new BlueprintBlock[count];
+			} else {
+				blocks = new BlueprintBlock[masterDims.getX() * masterDims.getY() * masterDims.getZ()];
+			}
 			
-			blocks = new BlueprintBlock[count];
 			for (int i = 0; i < count; i++) {
-				
-				
 				NBTTagCompound tag = (NBTTagCompound) list.get(i);
-				blocks[i] = BlueprintBlock.fromNBT((byte)0, tag);
+				blocks[i] = BlueprintBlock.fromNBT((byte)version, tag);
 			}
 			
 			if (!NostrumMagica.initFinished) {
@@ -691,7 +804,11 @@ public class RoomBlueprint {
 			}
 		}
 		
-		return new RoomBlueprint(dims, blocks, doors, entry);
+		return new RoomBlueprint(masterDims.distanceSq(0, 0, 0) == 0 ? dims : masterDims, blocks, doors, entry);
+	}
+	
+	private static RoomBlueprint deserializeVersion1(NBTTagCompound nbt) {
+		return deserializeNBTStyleInternal(nbt, (byte)0);
 	}
 	
 	@SuppressWarnings("null")
@@ -700,6 +817,9 @@ public class RoomBlueprint {
 		// Store TileEntities separately since there are likely few of them
 		
 		BlockPos dims = NBTUtil.getPosFromTag(nbt.getCompoundTag(NBT_DIMS));
+		// When breaking blueprints into pieces, the first one has an actual copy of the real size of the whole thing.
+		// If we have one of those, allocate the FULL array size instead of the small one
+		BlockPos masterDims = NBTUtil.getPosFromTag(nbt.getCompoundTag(NBT_WHOLE_DIMS));
 		BlueprintBlock[] blocks = null;
 		Set<DungeonExitPoint> doors = null;
 		DungeonExitPoint entry = null;
@@ -720,8 +840,12 @@ public class RoomBlueprint {
 				bar.step("Blocks");
 			}
 			
+			if (masterDims.distanceSq(0, 0, 0) == 0) {
+				blocks = new BlueprintBlock[count];
+			} else {
+				blocks = new BlueprintBlock[masterDims.getX() * masterDims.getY() * masterDims.getZ()];
+			}
 			
-			blocks = new BlueprintBlock[count];
 			for (int i = 0; i < count; i++) {
 				int id = list[i];
 				blocks[i] = new BlueprintBlock(id == 0 ? null : Block.getStateById(list[i]), null);
@@ -762,7 +886,17 @@ public class RoomBlueprint {
 			}
 		}
 		
-		return new RoomBlueprint(dims, blocks, doors, entry);
+		return new RoomBlueprint(masterDims.distanceSq(0, 0, 0) == 0 ? dims : masterDims, blocks, doors, entry);
+	}
+	
+	private static RoomBlueprint deserializeVersion3(NBTTagCompound nbt) {
+		RoomBlueprint blueprint = deserializeNBTStyleInternal(nbt, (byte) 2);
+		
+		if (nbt.hasKey(NBT_PIECE_OFFSET)) {
+			blueprint.partOffset = nbt.getInteger(NBT_PIECE_OFFSET);
+		}
+		
+		return blueprint;
 	}
 	
 	public static RoomBlueprint fromNBT(NBTTagCompound nbt) {
@@ -772,6 +906,8 @@ public class RoomBlueprint {
 			return deserializeVersion1(nbt);
 		case 1:
 			return deserializeVersion2(nbt);
+		case 2:
+			return deserializeVersion3(nbt);
 		default:
 			NostrumMagica.logger.fatal("Blueprint has version we don't understand");
 			throw new RuntimeException("Could not parse blueprint version " + version);
@@ -819,32 +955,161 @@ public class RoomBlueprint {
 //	}
 	
 	// Version 1
+//	public NBTTagCompound toNBT() {
+//		NBTTagCompound nbt = new NBTTagCompound();
+//		NBTTagList list = new NBTTagList();
+//		
+//		if (blocks != null) {
+//			for (int i = 0; i < blocks.length; i++) {
+//				list.appendTag(blocks[i].toNBT());
+//			}
+//		}
+//		
+//		nbt.setTag(NBT_BLOCK_LIST, list);
+//		nbt.setTag(NBT_DIMS, NBTUtil.createPosTag(dimensions));
+//		if (this.entry != null) {
+//			nbt.setTag(NBT_ENTRY, entry.toNBT());
+//		}
+//		if (this.doors != null && !this.doors.isEmpty()) {
+//			list = new NBTTagList();
+//			for (DungeonExitPoint door : doors) {
+//				list.appendTag(door.toNBT());
+//			}
+//			nbt.setTag(NBT_DOOR_LIST, list);
+//		}
+//		
+//		nbt.setByte(NBT_VERSION, (byte)0);
+//		
+//		return nbt;
+//	}
+	
 	public NBTTagCompound toNBT() {
+		if (shouldSplit()) {
+			// Too big! Use toNBTWithBreakdown() instead!
+			throw new RuntimeException("Blueprint too large to be written as single blob!");
+		}
+		
+		return toNBTInternal(0, MAX_BLUEPRINT_BLOCKS);
+	}
+	
+	public INBTGenerator toNBTWithBreakdown() {
+		if (!shouldSplit()) {
+			return new INBTGenerator() {
+				boolean used = false;
+				
+				@Override
+				public NBTTagCompound next() {
+					used = true;
+					return toNBT();
+				}
+
+				@Override
+				public int getTotal() {
+					return 1;
+				}
+
+				@Override
+				public boolean hasNext() {
+					return !used;
+				}
+			};
+			//return new NBTTagCompound[]{toNBT()};
+		}
+		
+		// Need to be writing out whole blocks. Get number of blocks based on whole dimensions and whatever fits within the block limit.
+		// Attempt to grab some number of entire Z by Y slices. If we can't even grab a full one, bump it up to a full one anyways.
+		int size = (dimensions.getZ() * dimensions.getY()) / MAX_BLUEPRINT_BLOCKS; //int division
+		if (size == 0) {
+			// Not even one slice could fit. Fudge it anyways.
+			size = dimensions.getZ() * dimensions.getY();
+		}
+		final int xSlices = (int) Math.ceil((double) blocks.length / (double) size);
+		final int fSize = size;
+		
+		return new INBTGenerator() {
+
+			int i = 0;
+			
+			@Override
+			public NBTTagCompound next() {
+				if (i >= xSlices) {
+					return null;
+				}
+				return toNBTInternal(i++ * fSize, fSize);
+			}
+
+			@Override
+			public int getTotal() {
+				return xSlices;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return i < xSlices;
+			}
+			
+		};
+	}
+	
+	// Version 3
+	protected NBTTagCompound toNBTInternal(int startIdx, int count) {
+		
 		NBTTagCompound nbt = new NBTTagCompound();
 		NBTTagList list = new NBTTagList();
+		final int endIdx = Math.min(blocks.length, startIdx + count);
 		
 		if (blocks != null) {
-			for (int i = 0; i < blocks.length; i++) {
+			for (int i = startIdx; i < endIdx; i++) {
 				list.appendTag(blocks[i].toNBT());
 			}
 		}
 		
 		nbt.setTag(NBT_BLOCK_LIST, list);
-		nbt.setTag(NBT_DIMS, NBTUtil.createPosTag(dimensions));
+		{
+			// If whole struct, just dump dims
+			if (startIdx == 0 && endIdx == blocks.length) {
+				nbt.setTag(NBT_DIMS, NBTUtil.createPosTag(dimensions));
+			} else {
+				// Else figure out how big it was
+				final int numBlocks = endIdx - startIdx;
+				final int base = dimensions.getY() * dimensions.getZ();
+				nbt.setTag(NBT_DIMS, NBTUtil.createPosTag(new BlockPos(numBlocks / base, dimensions.getY(), dimensions.getZ())));
+			}
+		}
 		if (this.entry != null) {
 			nbt.setTag(NBT_ENTRY, entry.toNBT());
 		}
-		if (this.doors != null && !this.doors.isEmpty()) {
-			list = new NBTTagList();
-			for (DungeonExitPoint door : doors) {
-				list.appendTag(door.toNBT());
+		
+		// First blueprint (when splitting) has all the extra pieces
+		if (startIdx == 0) {
+			if (this.doors != null && !this.doors.isEmpty()) {
+				list = new NBTTagList();
+				for (DungeonExitPoint door : doors) {
+					list.appendTag(door.toNBT());
+				}
+				nbt.setTag(NBT_DOOR_LIST, list);
 			}
-			nbt.setTag(NBT_DOOR_LIST, list);
+			
+			// Master ALSO has the REAL size, so we can allocate all the space up front instead of resizing
+			nbt.setTag(NBT_WHOLE_DIMS, NBTUtil.createPosTag(dimensions));
+		} else {
+			// Others have their row offset recorded
+			nbt.setInteger(NBT_PIECE_OFFSET, startIdx / (dimensions.getY() * dimensions.getZ()));
 		}
 		
-		nbt.setByte(NBT_VERSION, (byte)0);
+		nbt.setByte(NBT_VERSION, (byte)2);
 		
 		return nbt;
+	}
+	
+	public static interface INBTGenerator {
+		
+		public NBTTagCompound next();
+		
+		public int getTotal();
+		
+		public boolean hasNext();
+		
 	}
 	
 }

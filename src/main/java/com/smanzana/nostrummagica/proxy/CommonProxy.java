@@ -311,6 +311,10 @@ public class CommonProxy {
 	public void init() {
     	registerPotions();
     	
+    	// Moved here because this loads NostrumDungeonGenerator which needs to be after DungeonRoomRegistry is initted
+    	// BUT we can't just move that to before we register blocks or all the sudden all the blueprints are lying
+    	ShrineSeekingGem.init();
+    	
     	GameRegistry.register(EnchantmentManaRecovery.instance(),
     			new ResourceLocation(NostrumMagica.MODID, EnchantmentManaRecovery.ID));
     	
@@ -428,7 +432,6 @@ public class CommonProxy {
     	
     	ShrineSeekingGem.instance().setRegistryName(NostrumMagica.MODID, ShrineSeekingGem.id);
     	GameRegistry.register(ShrineSeekingGem.instance());
-    	ShrineSeekingGem.init();
     	
     	ChalkItem.instance().setRegistryName(NostrumMagica.MODID, ChalkItem.ID);
     	GameRegistry.register(ChalkItem.instance());

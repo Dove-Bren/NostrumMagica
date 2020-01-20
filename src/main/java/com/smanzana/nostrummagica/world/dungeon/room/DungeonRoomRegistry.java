@@ -1,6 +1,8 @@
 package com.smanzana.nostrummagica.world.dungeon.room;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +15,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
+import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint.INBTGenerator;
 
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
@@ -61,6 +64,9 @@ public class DungeonRoomRegistry {
 	}
 	
 	private static final String INTERNAL_ALL_NAME = "all";
+	private static final String ROOM_ROOT_NAME = "root.dat";
+	private static final String ROOM_COMPRESSED_EXT = "gat";
+	private static final String ROOM_ROOT_NAME_COMP = "root." + ROOM_COMPRESSED_EXT;
 	
 	private Map<String, DungeonRoomList> map;
 	
@@ -154,11 +160,11 @@ public class DungeonRoomRegistry {
 	private static final String NBT_WEIGHT = "weight";
 	private static final String NBT_NAME = "name";
 	
-	protected static final NBTTagCompound toNBT(RoomBlueprint blueprint, String name, int weight, List<String> tags) {
+	protected static final NBTTagCompound toNBT(NBTTagCompound blueprintTag, String name, int weight, List<String> tags) {
 		NBTTagCompound nbt = new NBTTagCompound();
 		nbt.setString(NBT_NAME, name);
 		nbt.setInteger(NBT_WEIGHT, weight);
-		nbt.setTag(NBT_BLUEPRINT, blueprint.toNBT());
+		nbt.setTag(NBT_BLUEPRINT, blueprintTag);
 		
 		NBTTagList list = new NBTTagList();
 		for (String tag : tags) {
@@ -182,6 +188,8 @@ public class DungeonRoomRegistry {
 			return null;
 		}
 		
+		// TODO join to master if this is a piece?
+		
 		List<String> tags = new LinkedList<>();
 		NBTTagList list = nbt.getTagList(NBT_TAGS, NBT.TAG_STRING);
 		while (!list.hasNoTags()) {
@@ -191,6 +199,10 @@ public class DungeonRoomRegistry {
 		if (doRegister) {
 			this.register(name, blueprint, weight, tags);
 		}
+		
+		// For version bumping
+//		int unusedWarning;
+//		writeRoomAsFile(blueprint, name, weight, tags);
 		
 		return blueprint;
 	}
@@ -202,10 +214,21 @@ public class DungeonRoomRegistry {
 	public final File roomLoadFolder;
 	public final File roomSaveFolder;
 	
-	private void findFiles(File base, List<File> files) {
+	private void findFiles(File base, List<File> files, List<File> dirs) {
 		if (base.isDirectory()) {
-			for (File subfile : base.listFiles()) {
-				findFiles(subfile, files);
+			File[] subfiles = base.listFiles();
+			
+			// See if this is a composition
+			for (File subfile : subfiles) {
+				if (subfile.getName().equalsIgnoreCase(ROOM_ROOT_NAME)
+						|| subfile.getName().equalsIgnoreCase(ROOM_ROOT_NAME_COMP)) {
+					dirs.add(base);
+					return;
+				}
+			}
+			
+			for (File subfile : subfiles) {
+				findFiles(subfile, files, dirs);
 			}
 		} else {
 			files.add(base);
@@ -219,13 +242,19 @@ public class DungeonRoomRegistry {
 			
 			ProgressBar bar = ProgressManager.push("Reading Room", 1);
 			bar.step(file.getName());
-			NBTTagCompound nbt = CompressedStreamTools.read(file);
+			NBTTagCompound nbt;
+			if (file.getName().endsWith(ROOM_COMPRESSED_EXT)) {
+				nbt = CompressedStreamTools.readCompressed(new FileInputStream(file));
+			} else {
+				nbt = CompressedStreamTools.read(file);
+			}
+			
 			ProgressManager.pop(bar);
 			
 			time = System.currentTimeMillis() - startTime;
-			//if (time > 100) {
+			if (time > 100) {
 				NostrumMagica.logger.warn("Took " + time + "ms to read " + file.getName());
-			//}
+			}
 			
 			startTime = System.currentTimeMillis();
 			if (nbt != null) {
@@ -233,12 +262,104 @@ public class DungeonRoomRegistry {
 			}
 			
 			time = System.currentTimeMillis() - startTime;
-			//if (time > 100) {
+			if (time > 100) {
 				NostrumMagica.logger.warn("Took " + time + "ms to load " + file.getName());
-			//}
+			}
+			
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 			NostrumMagica.logger.error("Failed to load room from " + file.toString());
+		}
+	}
+	
+	private void loadFromCompDir(File dir) {
+		// Look for root, load it, and then load everything else in and join them
+		try {
+			long startTime = System.currentTimeMillis();
+			long time;
+			RoomBlueprint root = null;
+			File rootFile = null;
+			
+			File[] subfiles = dir.listFiles();
+			
+			ProgressBar bar = ProgressManager.push("Reading Room", subfiles.length);
+			
+			for (File subfile : subfiles) {
+				if (subfile.getName().equalsIgnoreCase(ROOM_ROOT_NAME) || subfile.getName().equalsIgnoreCase(ROOM_ROOT_NAME_COMP)) {
+					rootFile = subfile;
+					NBTTagCompound nbt;
+					if (subfile.getName().endsWith(ROOM_COMPRESSED_EXT)) {
+						nbt = CompressedStreamTools.readCompressed(new FileInputStream(subfile));
+					} else {
+						nbt = CompressedStreamTools.read(subfile);
+					}
+					
+					time = System.currentTimeMillis() - startTime;
+					if (time > 100) {
+						NostrumMagica.logger.warn("Took " + time + "ms to read " + dir.getName() + "/" + subfile.getName());
+					}
+					startTime = System.currentTimeMillis();
+					
+					root = loadFromNBT(nbt, true);
+					
+					time = System.currentTimeMillis() - startTime;
+					if (time > 100) {
+						NostrumMagica.logger.warn("Took " + time + "ms to load " + dir.getName() + "/" + subfile.getName());
+					}
+					startTime = System.currentTimeMillis();
+					
+					bar.step(subfile.getName());
+				}
+			}
+			
+			if (root == null) {
+				NostrumMagica.logger.fatal("Failed to load root for " + dir.getName());
+				return;
+			}
+			
+			// Load up all pieces and join
+			for (File subfile : subfiles) {
+				if (subfile == rootFile) {
+					continue;
+				}
+				
+				NBTTagCompound nbt;
+				if (subfile.getName().endsWith(ROOM_COMPRESSED_EXT)) {
+					nbt = CompressedStreamTools.readCompressed(new FileInputStream(subfile));
+				} else {
+					nbt = CompressedStreamTools.read(subfile);
+				}
+				
+				time = System.currentTimeMillis() - startTime;
+				if (time > 100) {
+					NostrumMagica.logger.warn("Took " + time + "ms to read " + dir.getName() + "/" + subfile.getName());
+				}
+				startTime = System.currentTimeMillis();
+				
+				RoomBlueprint blueprint = loadFromNBT(nbt, false);
+				
+				time = System.currentTimeMillis() - startTime;
+				if (time > 100) {
+					NostrumMagica.logger.warn("Took " + time + "ms to load " + dir.getName() + "/" + subfile.getName());
+				}
+				startTime = System.currentTimeMillis();
+				
+				root.join(blueprint);
+				
+				time = System.currentTimeMillis() - startTime;
+				if (time > 100) {
+					NostrumMagica.logger.warn("Took " + time + "ms to merge in " + dir.getName() + "/" + subfile.getName());
+				}
+				startTime = System.currentTimeMillis();
+				
+				bar.step(subfile.getName());
+			}
+			
+			ProgressManager.pop(bar);
+		} catch (IOException e) {
+			e.printStackTrace();
+			NostrumMagica.logger.error("Failed to load complex room from " + dir.toString());
 		}
 	}
 	
@@ -251,12 +372,17 @@ public class DungeonRoomRegistry {
 	public void loadRegistryFromDisk() {
 		this.map.clear();
 		List<File> files = new LinkedList<>();
-		findFiles(this.roomLoadFolder, files);
+		List<File> compDirs = new LinkedList<>();
+		findFiles(this.roomLoadFolder, files, compDirs);
 		
-		NostrumMagica.logger.info("Loading room cache (" + files.size() + " rooms)...");
+		NostrumMagica.logger.info("Loading room cache (" + files.size() + " simple rooms, " + compDirs.size() + " compound rooms)...");
 		final long startTime = System.currentTimeMillis();
 		for (File file : files) {
 			loadFromFile(file);
+		}
+		
+		for (File comp : compDirs) {
+			loadFromCompDir(comp);
 		}
 		
 		int count = 0;
@@ -267,21 +393,60 @@ public class DungeonRoomRegistry {
 		NostrumMagica.logger.info("Loaded " + count + " rooms (" + (((double)(System.currentTimeMillis() - startTime) / 1000D)) + " seconds)");
 	}
 	
-	public final boolean writeRoomAsFile(RoomBlueprint blueprint, String name, int weight, List<String> tags) {
+	private final boolean writeRoomAsFileInternal(File saveFile, NBTTagCompound blueprintTag, String name, int weight, List<String> tags) {
 		boolean success = true;
-		File saveFile = new File(this.roomSaveFolder, name + ".dat");
-		NBTTagCompound nbt = toNBT(blueprint, name, weight, tags);
 		
 		try {
-			saveFile.mkdirs();
-			CompressedStreamTools.safeWrite(nbt, saveFile);
-			NostrumMagica.logger.info("Room written to " + saveFile.getPath());
+			CompressedStreamTools.writeCompressed(toNBT(blueprintTag, name, weight, tags), new FileOutputStream(saveFile));
+			//CompressedStreamTools.safeWrite(toNBT(blueprintTag, name, weight, tags), saveFile);
 		} catch (IOException e) {
 			e.printStackTrace();
 			
 			System.out.println("Failed to write out serialized file " + saveFile.toString());
 			NostrumMagica.logger.error("Failed to write room to " + saveFile.toString());
 			success = false;
+		}
+		
+		return success;
+	}
+	
+	public final boolean writeRoomAsFile(RoomBlueprint blueprint, String name, int weight, List<String> tags) {
+		boolean success = true;
+		String path = null;
+		
+		if (blueprint.shouldSplit()) {
+			File baseDir = new File(this.roomSaveFolder, name);
+			if (!baseDir.mkdirs()) {
+				throw new RuntimeException("Failed to create directories for complex room: " + baseDir.getPath());
+			}
+			
+			INBTGenerator gen = blueprint.toNBTWithBreakdown();
+			NostrumMagica.logger.info("Writing complex room " + name + " as " + gen.getTotal() + " pieces");
+			
+			for (int i = 0; gen.hasNext(); i++) {
+				String fileName;
+				NBTTagCompound nbt = gen.next();
+				if (i == 0) {
+					// Root room has extra info and needs to be identified
+					fileName = ROOM_ROOT_NAME;
+				} else {
+					fileName = name + "_" + i + ".dat";
+				}
+				
+				File outFile = new File(baseDir, fileName);
+				success = writeRoomAsFileInternal(outFile, nbt, name, weight, tags);
+				path = outFile.getPath();
+			}
+		} else {
+			File outFile = new File(this.roomSaveFolder, name + "." + ROOM_COMPRESSED_EXT);
+			success = writeRoomAsFileInternal(outFile,
+					blueprint.toNBT(),
+					name, weight, tags);
+			path = outFile.getPath();
+		}
+		
+		if (success) {
+			NostrumMagica.logger.info("Room written to " + path);
 		}
 		
 		return success;

@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.world.dimension;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -15,6 +16,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Biomes;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DimensionType;
@@ -34,6 +36,7 @@ import net.minecraftforge.event.entity.living.EnderTeleportEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -255,7 +258,9 @@ public class NostrumEmptyDimension {
 			BlockPos spawn = NostrumMagica.getOrCreatePlayerDimensionSpawn(player);
 			
 			try {
-				FieldUtils.writeField(((EntityPlayerMP)player), "invulnerableDimensionChange", true, true);
+				Field field = ReflectionHelper.findField(EntityPlayerMP.class, "invulnerableDimensionChange", "field_184851_cj");
+				field.setAccessible(true);
+				FieldUtils.writeField(field, player, true);
 			} catch (IllegalAccessException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -265,6 +270,8 @@ public class NostrumEmptyDimension {
 				player.setGameType(GameType.ADVENTURE);
 			}
 			
+			spawn = spawn.north();
+			player.rotationYaw = EnumFacing.NORTH.getHorizontalAngle();
 			player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 2, spawn.getZ() + .5);
 			player.motionX = player.motionY = player.motionZ = 0;
 			return true;
@@ -277,7 +284,7 @@ public class NostrumEmptyDimension {
 		
 		public boolean portalExists(EntityPlayer player) {
 			BlockPos spawn = NostrumMagica.getOrCreatePlayerDimensionSpawn(player);
-			return !world.isAirBlock(spawn.up().south());
+			return !world.isAirBlock(spawn.up());
 		}
 		
 		@Override
@@ -335,7 +342,9 @@ public class NostrumEmptyDimension {
 			
 			if (entityIn instanceof EntityPlayerMP) {
 				try {
-					FieldUtils.writeField(((EntityPlayerMP)entityIn), "invulnerableDimensionChange", true, true);
+					Field field = ReflectionHelper.findField(EntityPlayerMP.class, "invulnerableDimensionChange", "field_184851_cj");
+					field.setAccessible(true);
+					FieldUtils.writeField(field, ((EntityPlayerMP) entityIn), true);
 				} catch (IllegalAccessException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

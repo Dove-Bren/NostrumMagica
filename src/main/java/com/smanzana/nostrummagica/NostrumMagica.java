@@ -215,14 +215,14 @@ public class NostrumMagica
     	proxy.preinit();
     	baubles.preInit();
     	
+    	DungeonRoomRegistry.instance().loadRegistryFromDisk();
+    	
     	RitualRegistry.instance();
     	
     	registerDefaultRituals();
     	registerDefaultQuests();
     	registerDefaultTrials();
-    	
-    	DungeonRoomRegistry.instance().loadRegistryFromDisk();
-    	
+
     	NostrumChunkLoader.instance();
     	
     	SpellTomeEnhancement.initDefaultEnhancements();
@@ -1555,7 +1555,11 @@ public class NostrumMagica
     
     public static SpellRegistry getSpellRegistry() {
     	if (spellRegistry == null) {
-    		throw new RuntimeException("Accessing SpellRegistry before a world has been loaded!");
+    		if (proxy.isServer()) {
+    			throw new RuntimeException("Accessing SpellRegistry before a world has been loaded!");
+    		} else {
+    			spellRegistry = new SpellRegistry();
+    		}
     	}
     	
     	return spellRegistry;

@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.command;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import com.smanzana.nostrummagica.config.ModConfig;
@@ -45,10 +46,17 @@ public class CommandReadRoom extends CommandBase {
 			} else {
 				
 				File file = new File(ModConfig.config.base.getConfigFile().getParentFile(), "NostrumMagica/dungeon_room_captures/" + args[0] + ".dat");
+				if (!file.exists()) {
+					file = new File(ModConfig.config.base.getConfigFile().getParentFile(), "NostrumMagica/dungeon_room_captures/" + args[0] + ".gat");
+				}
 				if (file.exists()) {
 					NBTTagCompound nbt = null;
 					try {
-						nbt = CompressedStreamTools.read(file);
+						if (file.getName().endsWith(".gat")) {
+							nbt = CompressedStreamTools.readCompressed(new FileInputStream(file));
+						} else {
+							nbt = CompressedStreamTools.read(file);
+						}
 						sender.addChatMessage(new TextComponentString("Room read from " + file.getPath()));
 					} catch (IOException e) {
 						e.printStackTrace();
