@@ -11,7 +11,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class SorceryPortalSpawner extends Block {
+public class SorceryPortalSpawner extends Block implements ITriggeredBlock {
 	
 	public static final String ID = "portal_spawner";
 	
@@ -62,5 +62,14 @@ public class SorceryPortalSpawner extends Block {
 	@Override
 	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
 		worldIn.setBlockState(pos.up(), SorceryPortal.instance().getStateForPlacement(worldIn, pos, EnumFacing.UP, 0f, 0f, 0f, 0, null, null));
+	}
+
+	@Override
+	public void trigger(World world, BlockPos blockPos, IBlockState state, BlockPos triggerPos) {
+		IBlockState aboveState = world.getBlockState(blockPos.up());
+		SorceryPortal.instance();
+		if (aboveState == null || !(aboveState.getBlock() instanceof SorceryPortal)) {
+			this.onBlockAdded(world, blockPos, state);
+		}
 	}
 }

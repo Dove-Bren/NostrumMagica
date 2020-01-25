@@ -266,11 +266,15 @@ public abstract class StaticRoom implements IDungeonRoom {
 				}
 			}
 			
-			if (blocks[i-locMinX][j-locMinY][k-locMinZ] == null) {
+			BlockState state = blocks[i-locMinX][j-locMinY][k-locMinZ];
+			
+			if (state == null) {
 				world.setBlockToAir(pos);
 			} else {
-				blocks[i-locMinX][j-locMinY][k-locMinZ].set(world, pos, start.getFacing());
+				state.set(world, pos, start.getFacing());
 			}
+			
+			applyBlockOverrides(world, pos, new BlockPos(i, j, k), state);
 			
 		}
 		
@@ -366,5 +370,9 @@ public abstract class StaticRoom implements IDungeonRoom {
 		if (y <= locMaxY) {
 			NostrumMagica.logger.warn("Didn't find enough to fill static room (not tall enough)!");
 		}
+	}
+	
+	protected void applyBlockOverrides(World world, BlockPos worldPos, BlockPos dataPos, BlockState defaultState) {
+		
 	}
 }

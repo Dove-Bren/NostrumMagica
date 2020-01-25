@@ -16,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.TextComponentString;
 
 public class CommandReadRoom extends CommandBase {
@@ -68,7 +69,7 @@ public class CommandReadRoom extends CommandBase {
 					if (nbt != null) {
 						RoomBlueprint blueprint = RoomBlueprint.fromNBT((NBTTagCompound) nbt.getTag("blueprint"));
 						if (blueprint != null) {
-							blueprint.spawn(player.worldObj, PositionCrystal.getBlockPosition(main));
+							blueprint.spawn(player.worldObj, PositionCrystal.getBlockPosition(main), EnumFacing.WEST);
 						} else {
 							sender.addChatMessage(new TextComponentString("Room failed to load"));
 						}

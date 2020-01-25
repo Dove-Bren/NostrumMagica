@@ -326,7 +326,7 @@ public class RoomBlueprint {
 			 x = dx;
 			 z = dz;
 			break;
-		case WEST:
+		case EAST:
 			// Single rotation: (-z, x)
 			x = -dz;
 			z = dx;
@@ -336,7 +336,7 @@ public class RoomBlueprint {
 			x = -dx;
 			z = -dz;
 			break;
-		case EAST:
+		case WEST:
 			// Triple: (z, -x)
 			x = dz;
 			z = -dx;
@@ -378,12 +378,8 @@ public class RoomBlueprint {
 			BlockPos wrapper = new BlockPos(width, 0, length);
 			adjustedDims = applyRotation(wrapper, modDir);
 			
-			// Absolute value because dimensions are unsigned, and rotation can negate x and z but we don't actually care
-			adjustedDims = new BlockPos(
-					Math.abs(adjustedDims.getX()),
-					Math.abs(adjustedDims.getY()),
-					Math.abs(adjustedDims.getZ())
-					);
+			// Note: Some vals may be negative. We leave them for now to get proper offset adjustement, and then
+			// straighten them out for later calcs
 		}
 		
 		// Outside loop for each chunk
@@ -417,31 +413,56 @@ public class RoomBlueprint {
 //				rotOffset = new BlockPos(px, rotOffset.getY(), pz);
 //			}
 			
-			BlockPos rotOffset = applyRotation(offset, modDir);
+			MutableBlockPos rotOffset = new MutableBlockPos(applyRotation(offset, modDir));
 			//BlockPos rotOffset = applyRotation(offset, modDir.getHorizontalIndex() % 2 == 1 ? modDir.getOpposite() : modDir);
 			
-			// To get proper offset, need to adjust where our origin is, relatively, to achieve correct rotation anchor
+			// To get proper offset, need to move so that our old origin (0,0) is at the real one, which is encoded in our adjusted dimensions
+			// Negative values there mean we need to shift our offset
 			if (unit.getX() < 0 || unit.getZ() < 0) {
-				int px = Math.abs(rotOffset.getX());
-				int pz = Math.abs(rotOffset.getZ());
+				int px = Math.abs(adjustedDims.getX());
+				int pz = Math.abs(adjustedDims.getZ());
 				
-				// if x < 0, make into width-x
-				if (unit.getX() < 0) {
-					px = adjustedDims.getX() - (px + 1);
+				if (adjustedDims.getX() < 0) {
+					rotOffset.setPos(rotOffset.getX() + (px - 1), rotOffset.getY(), rotOffset.getZ());
 				}
 				
-				// ...
-				if (unit.getZ() >= 0 || modDir == EnumFacing.SOUTH) {
-					pz = adjustedDims.getZ() - (pz + 1);
-				} 
-//				else {
-//					pz = Math.abs(pz);
-//				}
+				if (adjustedDims.getZ() < 0) {
+					rotOffset.setPos(rotOffset.getX(), rotOffset.getY(), rotOffset.getZ() + (pz - 1));
+				}
 				
-				rotOffset = new BlockPos(px, rotOffset.getY(), pz);
+				adjustedDims = new BlockPos(px, adjustedDims.getY(), pz);
 			}
 			
+//			// To get proper offset, need to adjust where our origin is, relatively, to achieve correct rotation anchor
+//			if (unit.getX() < 0 || unit.getZ() < 0) {
+//				int px = Math.abs(rotOffset.getX());
+//				int pz = Math.abs(rotOffset.getZ());
+//				
+//				// if x < 0, make into width-x
+//				if (unit.getX() < 0) {
+//					px = adjustedDims.getX() - (px + 1);
+//				}
+//				
+//				// ...
+//				if (unit.getZ() < 0) {
+//					pz = adjustedDims.getZ() - (pz + 1);
+//				} 
+////				else {
+////					pz = Math.abs(pz);
+////				}
+//				
+//				rotOffset = new BlockPos(px, rotOffset.getY(), pz);
+//			}
+			
 			origin = at.toImmutable().subtract(rotOffset);
+			
+			// TODO debug!
+			{
+				world.setBlockState(origin, Blocks.REDSTONE_BLOCK.getDefaultState());
+				world.setBlockState(origin.offset(EnumFacing.EAST, adjustedDims.getX()), Blocks.REDSTONE_BLOCK.getDefaultState());
+				world.setBlockState(origin.offset(EnumFacing.SOUTH, adjustedDims.getZ()), Blocks.REDSTONE_BLOCK.getDefaultState());
+				world.setBlockState(origin.offset(EnumFacing.EAST, adjustedDims.getX()).offset(EnumFacing.SOUTH, adjustedDims.getZ()), Blocks.REDSTONE_BLOCK.getDefaultState());
+			}
 		}
 		final int chunkStartX = origin.getX() >> 4;
 		final int chunkStartZ = origin.getZ() >> 4;
@@ -483,10 +504,11 @@ public class RoomBlueprint {
 				// Also rotate a standard vector to appropriately deal with rotation in data coords
 				BlockPos dataPos = applyRotation(cursor.toImmutable().subtract(origin), modDir);
 				
-				// What is usually encoded as negative (-x), we need to make into (n-x) to flip in data coords, where 0 is lowest
+				// Like offset, we may need to shift data to follow origin rotation
 				if (unit.getX() < 0 || unit.getZ() < 0) {
-					int px = Math.abs(dataPos.getX());
-					int pz = Math.abs(dataPos.getZ());
+					// If negative, shift by dimension size (-1 cause 0 offset)
+					int px = dataPos.getX();
+					int pz = dataPos.getZ();
 					
 					// if x < 0, make into width-x
 					if (unit.getX() < 0) {
@@ -500,6 +522,14 @@ public class RoomBlueprint {
 					
 					dataPos = new BlockPos(px, dataPos.getY(), pz);
 				}
+				
+//				// HACK?
+//				if (modDir.getHorizontalIndex() % 2 == 1) {
+//					dataPos = new BlockPos(
+//							adjustedDims.getX() - (dataPos.getX() + 1),
+//							dataPos.getY(),
+//							adjustedDims.getZ() - (dataPos.getZ() + 1));
+//				}
 				
 				BlueprintBlock block = blocks[
    				       (dataPos.getX() * length * height)

@@ -1,9 +1,11 @@
 package com.smanzana.nostrummagica.world.dungeon.room;
 
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -37,6 +39,21 @@ public class DungeonRoomRegistry {
 			this.weight = weight;
 			this.name = name;
 		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (o instanceof DungeonRoomRecord) {
+				DungeonRoomRecord other = (DungeonRoomRecord) o;
+				return other.name.equalsIgnoreCase(name);
+			}
+			
+			return false;
+		}
+		
+		@Override
+		public int hashCode() {
+			return this.name.hashCode() * 17;
+		}
 	}
 	
 	private static final class DungeonRoomList {
@@ -49,6 +66,14 @@ public class DungeonRoomRegistry {
 		}
 		
 		public void add(DungeonRoomRecord record) {
+			if (recordList.contains(record)) {
+				
+				NostrumMagica.logger.info("Overriding DungeonRoom registration for entry " + record.name);
+				
+				DungeonRoomRecord old = recordList.get(recordList.indexOf(record));
+				recordList.remove(record);
+				weightSum -= old.weight;
+			}
 			recordList.add(record);
 			weightSum += record.weight;
 		}
@@ -273,6 +298,44 @@ public class DungeonRoomRegistry {
 		}
 	}
 	
+	private void loadFromFileStream(String name, InputStream stream) {
+		try {
+			long startTime = System.currentTimeMillis();
+			long time;
+			
+			ProgressBar bar = ProgressManager.push("Reading Room", 1);
+			bar.step(name);
+			NBTTagCompound nbt;
+			if (name.endsWith(ROOM_COMPRESSED_EXT)) {
+				nbt = CompressedStreamTools.readCompressed(stream);
+			} else {
+				nbt = CompressedStreamTools.read(new DataInputStream(stream));
+			}
+			
+			ProgressManager.pop(bar);
+			
+			time = System.currentTimeMillis() - startTime;
+			if (time > 100) {
+				NostrumMagica.logger.warn("Took " + time + "ms to read " + name);
+			}
+			
+			startTime = System.currentTimeMillis();
+			if (nbt != null) {
+				loadFromNBT(nbt, true);
+			}
+			
+			time = System.currentTimeMillis() - startTime;
+			if (time > 100) {
+				NostrumMagica.logger.warn("Took " + time + "ms to load " + name);
+			}
+			
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+			NostrumMagica.logger.error("Failed to load room from " + name);
+		}
+	}
+	
 	private void loadFromCompDir(File dir) {
 		// Look for root, load it, and then load everything else in and join them
 		try {
@@ -363,6 +426,122 @@ public class DungeonRoomRegistry {
 		}
 	}
 	
+	private void loadFromCompDirStreams(String compName, String[] fileNames, InputStream[] streams) {
+		// Root is first stream
+		try {
+			long startTime = System.currentTimeMillis();
+			long time;
+			RoomBlueprint root = null;
+			ProgressBar bar = ProgressManager.push("Reading Room", streams.length);
+			
+			NBTTagCompound nbt;
+			
+			if (fileNames.length != streams.length) {
+				throw new RuntimeException("Number of streams doesn't match number of files");
+			}
+			
+			for (int i = 0; i < fileNames.length; i++) {
+				if (fileNames[i].endsWith(ROOM_COMPRESSED_EXT)) {
+					nbt = CompressedStreamTools.readCompressed(streams[i]);
+				} else {
+					nbt = CompressedStreamTools.read(new DataInputStream(streams[i]));
+				}
+				
+				time = System.currentTimeMillis() - startTime;
+				if (time > 100) {
+					NostrumMagica.logger.warn("Took " + time + "ms to read " + compName + "/" + fileNames[i]);
+				}
+				startTime = System.currentTimeMillis();
+				
+				RoomBlueprint blueprint = loadFromNBT(nbt, root == null);
+				
+				time = System.currentTimeMillis() - startTime;
+				if (time > 100) {
+					NostrumMagica.logger.warn("Took " + time + "ms to load " + compName + "/" + fileNames[i]);
+				}
+				startTime = System.currentTimeMillis();
+				
+				if (root == null) {
+					root = blueprint;
+				} else {
+					root.join(blueprint);
+				}
+				
+				bar.step(fileNames[i]);
+			}
+			
+			if (root == null) {
+				NostrumMagica.logger.fatal("Failed to load root for " + compName);
+				return;
+			}
+			
+			ProgressManager.pop(bar);
+		} catch (IOException e) {
+			e.printStackTrace();
+			NostrumMagica.logger.error("Failed to load complex room from " + compName);
+		}
+	}
+	
+	public void loadRegistryFromBuiltin() {
+		// TODO make this be dynamic. Eitehr add manifest at build time to jar, or do the gross iteration of the jar stuff.
+		
+		String[] fileNames = {"grand_hallway.gat", "portal_room.gat", "sorcery_lobby.gat"};
+		String[] compNames = {"sorcery_dungeon"};
+		final int dungeon_piece_count = 260;
+		String[][] compSubnames = new String[1][dungeon_piece_count + 1];
+		
+		InputStream[] files = new InputStream[fileNames.length];
+		InputStream[][] compDirs = new InputStream[compNames.length][]; // lel wrong
+		
+		for (int i = 0; i <= dungeon_piece_count; i++) {
+			compSubnames[0][i] = (i == 0 ? "root.gat" : (compNames[0] + "_" + i + ".gat")); 
+		}
+		
+		boolean error = false;
+		for (int i = 0; i < fileNames.length; i++) {
+			String filename = fileNames[i];
+			InputStream stream = this.getClass().getResourceAsStream("/rooms/" + filename);
+			if (stream == null) {
+				NostrumMagica.logger.fatal("Couldn't locate " + filename + " in resource files");
+				error = true;
+				break;
+			} else {
+				files[i] = stream;
+			}
+		}
+		
+		if (!error) {
+			for (int i = 0; i < compNames.length; i++) {
+				compDirs[i] = new InputStream[compSubnames[i].length];
+				for (int j = 0; j < compSubnames[i].length; j++) {
+					String subName = compSubnames[i][j];
+					String compName = compNames[i];
+					
+					InputStream stream = this.getClass().getResourceAsStream("/rooms/" + compName + "/" + subName);
+					if (stream == null) {
+						NostrumMagica.logger.fatal("Couldn't locate " + compName + "/" + subName + " in resource files");
+						error = true;
+						break;
+					} else {
+						compDirs[i][j] = stream;
+					}
+				}
+			}
+		}
+		
+		if (error) {
+			throw new RuntimeException("Failed to find one or more required files!");
+		}
+		
+		for (int i = 0; i < fileNames.length; i++) {
+			loadFromFileStream(fileNames[i], files[i]);
+		}
+		
+		for (int i = 0; i < compNames.length; i++) {
+			loadFromCompDirStreams(compNames[i], compSubnames[i], compDirs[i]);
+		}
+	}
+	
 	/**
 	 * Attempts to load all room files from the base room directory.
 	 * This recursively scans for rooms.
@@ -371,11 +550,14 @@ public class DungeonRoomRegistry {
 	 */
 	public void loadRegistryFromDisk() {
 		this.map.clear();
+		
+		//loadRegistryFromBuiltin();
+		
 		List<File> files = new LinkedList<>();
 		List<File> compDirs = new LinkedList<>();
 		findFiles(this.roomLoadFolder, files, compDirs);
 		
-		NostrumMagica.logger.info("Loading room cache (" + files.size() + " simple rooms, " + compDirs.size() + " compound rooms)...");
+		NostrumMagica.logger.info("Loading room cache overrides (" + files.size() + " simple rooms, " + compDirs.size() + " compound rooms)...");
 		final long startTime = System.currentTimeMillis();
 		for (File file : files) {
 			loadFromFile(file);
