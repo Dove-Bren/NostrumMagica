@@ -391,28 +391,6 @@ public class RoomBlueprint {
 		// To get actual least-x leastz coordinates, we need to add offset rotated to proper orientation
 		BlockPos origin;
 		{
-//			//EnumFacing fac = modDir.getHorizontalIndex() % 2 == 1 ? modDir.getOpposite() : modDir;
-//			BlockPos rotUnit = applyRotation(offset, fac);
-//			BlockPos rotOffset = applyRotation(offset, fac);
-//			
-//			// To get proper offset, need to adjust where our origin is, relatively, to achieve correct rotation anchor
-//			if (rotUnit.getX() < 0 || rotUnit.getZ() < 0) {
-//				int px = Math.abs(rotOffset.getX());
-//				int pz = Math.abs(rotOffset.getZ());
-//				
-//				// if x < 0, make into width-x
-//				if (rotUnit.getX() < 0) {
-//					px = width - (px + 1);
-//				}
-//				
-//				// ...
-//				if (rotUnit.getZ() < 0) {
-//					pz = length - (pz + 1);
-//				}
-//				
-//				rotOffset = new BlockPos(px, rotOffset.getY(), pz);
-//			}
-			
 			MutableBlockPos rotOffset = new MutableBlockPos(applyRotation(offset, modDir));
 			//BlockPos rotOffset = applyRotation(offset, modDir.getHorizontalIndex() % 2 == 1 ? modDir.getOpposite() : modDir);
 			
@@ -433,36 +411,7 @@ public class RoomBlueprint {
 				adjustedDims = new BlockPos(px, adjustedDims.getY(), pz);
 			}
 			
-//			// To get proper offset, need to adjust where our origin is, relatively, to achieve correct rotation anchor
-//			if (unit.getX() < 0 || unit.getZ() < 0) {
-//				int px = Math.abs(rotOffset.getX());
-//				int pz = Math.abs(rotOffset.getZ());
-//				
-//				// if x < 0, make into width-x
-//				if (unit.getX() < 0) {
-//					px = adjustedDims.getX() - (px + 1);
-//				}
-//				
-//				// ...
-//				if (unit.getZ() < 0) {
-//					pz = adjustedDims.getZ() - (pz + 1);
-//				} 
-////				else {
-////					pz = Math.abs(pz);
-////				}
-//				
-//				rotOffset = new BlockPos(px, rotOffset.getY(), pz);
-//			}
-			
 			origin = at.toImmutable().subtract(rotOffset);
-			
-			// TODO debug!
-			{
-				world.setBlockState(origin, Blocks.REDSTONE_BLOCK.getDefaultState());
-				world.setBlockState(origin.offset(EnumFacing.EAST, adjustedDims.getX()), Blocks.REDSTONE_BLOCK.getDefaultState());
-				world.setBlockState(origin.offset(EnumFacing.SOUTH, adjustedDims.getZ()), Blocks.REDSTONE_BLOCK.getDefaultState());
-				world.setBlockState(origin.offset(EnumFacing.EAST, adjustedDims.getX()).offset(EnumFacing.SOUTH, adjustedDims.getZ()), Blocks.REDSTONE_BLOCK.getDefaultState());
-			}
 		}
 		final int chunkStartX = origin.getX() >> 4;
 		final int chunkStartZ = origin.getZ() >> 4;
@@ -475,7 +424,11 @@ public class RoomBlueprint {
 		final int numChunkZ = (adjustedDims.getZ() + chunkRemZ) / 16;
 		
 		// Have a list for second-pass block placement
-		List<BlockPos> secondPassBlocks = new ArrayList<>(16 * 4);
+		List<BlueprintBlock> secondPassBlocks = new ArrayList<>(16 * 4);
+		List<BlockPos> secondPassPos = new ArrayList<>(16 * 4);
+		
+		// Data has inverse rotation
+		modDir = modDir.getHorizontalIndex() % 2 == 1 ? modDir.getOpposite() : modDir;
 		
 		// Loop over all chunks from <x to >x (and <z to >z)
 		for (int cx = 0; cx <= numChunkX; cx++)
@@ -493,6 +446,7 @@ public class RoomBlueprint {
 			// On low boundary chunks, start i and k and chunkRemX/Z
 			// For high boundary chunks, cap i and k and (width or length / 16)
 			secondPassBlocks.clear();
+			secondPassPos.clear();
 			for (int i = startX; i < endX; i++)
 			for (int j = 0; j < height; j++)
 			for (int k = startZ; k < endZ; k++) {
@@ -501,10 +455,10 @@ public class RoomBlueprint {
 				cursor.setPos(chunkOffsetX + i, j + origin.getY(), chunkOffsetZ + k);
 				
 				// Find data position by applying rotation to transform x and z coords into u and v data coords
-				// Also rotate a standard vector to appropriately deal with rotation in data coords
+				unit = applyRotation(new BlockPos(1, 0, 1), modDir);
 				BlockPos dataPos = applyRotation(cursor.toImmutable().subtract(origin), modDir);
 				
-				// Like offset, we may need to shift data to follow origin rotation
+				// Negative values here, though, imply reflection. So make "-x" be "max - x"
 				if (unit.getX() < 0 || unit.getZ() < 0) {
 					// If negative, shift by dimension size (-1 cause 0 offset)
 					int px = dataPos.getX();
@@ -512,24 +466,16 @@ public class RoomBlueprint {
 					
 					// if x < 0, make into width-x
 					if (unit.getX() < 0) {
-						px = width - (px + 1);
+						px = width + (px - 1);
 					}
 					
 					// ...
 					if (unit.getZ() < 0) {
-						pz = length - (pz + 1);
+						pz = length + (pz - 1);
 					}
 					
 					dataPos = new BlockPos(px, dataPos.getY(), pz);
 				}
-				
-//				// HACK?
-//				if (modDir.getHorizontalIndex() % 2 == 1) {
-//					dataPos = new BlockPos(
-//							adjustedDims.getX() - (dataPos.getX() + 1),
-//							dataPos.getY(),
-//							adjustedDims.getZ() - (dataPos.getZ() + 1));
-//				}
 				
 				BlueprintBlock block = blocks[
    				       (dataPos.getX() * length * height)
@@ -539,86 +485,22 @@ public class RoomBlueprint {
 				
 				// Either set the block now, or set it up to be placed later (if it might break based on order)
 				if (isSecondPassBlock(block)) {
-					secondPassBlocks.add(new BlockPos(cursor));
+					secondPassBlocks.add(block);
+					secondPassPos.add(new BlockPos(cursor));
 				} else {
 					block.spawn(world, cursor, modDir);
 				}
 			}
 			
 			// Spawn all second-pass blocks
-			for (BlockPos secondPos : secondPassBlocks) {
-				BlockPos dataPos = applyRotation(secondPos.toImmutable().subtract(origin), modDir);
-				
-				// What is usually encoded as negative (-x), we need to make into (n-x) to flip in data coords, where 0 is lowest
-				if (unit.getX() < 0 || unit.getZ() < 0) {
-					int px = Math.abs(dataPos.getX());
-					int pz = Math.abs(dataPos.getZ());
-					
-					// if x < 0, make into width-x
-					if (unit.getX() < 0) {
-						px = width - (px + 1);
-					}
-					
-					// ...
-					if (unit.getZ() < 0) {
-						pz = length - (pz + 1);
-					}
-					
-					dataPos = new BlockPos(px, dataPos.getY(), pz);
-				}
-				blocks[
-				       (dataPos.getX() * length * height)
-				       + (dataPos.getY() * length)
-				       + dataPos.getZ()
-				       ].spawn(world, secondPos, modDir);
+			for (int i = 0; i < secondPassBlocks.size(); i++) {
+				BlockPos secondPos = secondPassPos.get(i);
+				BlueprintBlock block = secondPassBlocks.get(i);
+				block.spawn(world, secondPos, modDir);
 			}
 			
 			world.getChunkFromBlockCoords(cursor).setChunkModified();
 		}
-		
-//		
-//		
-//		
-//		// rotate by adjusting cursor set x, y, and z
-//		// That means we still navigate the block array like regular, but place blocks in adjusted world pos
-//		BlockPos offset = entry == null ? new BlockPos(0,0,0) : entry.getPos();
-//		for (int i = 0; i < width; i++)
-//		for (int j = 0; j < height; j++)
-//		for (int k = 0; k < length; k++) {
-//			final int dx = i - offset.getX();
-//			final int dz = k - offset.getZ();
-//			int x = dx;
-//			int z = dz;
-//			int y = j - offset.getY();
-//			switch (modDir) {
-//			case DOWN:
-//			case UP:
-//			case NORTH:
-//				break;
-//			case EAST:
-//				// Single rotation: (-z, x)
-//				x = -dz;
-//				z = dx;
-//				break;
-//			case SOUTH:
-//				// Double rotation: (-x, -z)
-//				x = -dx;
-//				z = -dz;
-//				break;
-//			case WEST:
-//				// Triple: (z, -x)
-//				x = dz;
-//				z = -dx;
-//				break;
-//			}
-//			cursor.setPos(at.getX() + x, at.getY() + y, at.getZ() + z);
-//			
-//			blocks[
-//			       k
-//			       + (j * length)
-//			       + (i * length * height)
-//			       ].spawn(world, cursor, modDir);
-//		}
 	}
 	
 	public BlockPos getDimensions() {

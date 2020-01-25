@@ -69,7 +69,7 @@ public class CommandReadRoom extends CommandBase {
 					if (nbt != null) {
 						RoomBlueprint blueprint = RoomBlueprint.fromNBT((NBTTagCompound) nbt.getTag("blueprint"));
 						if (blueprint != null) {
-							blueprint.spawn(player.worldObj, PositionCrystal.getBlockPosition(main), EnumFacing.WEST);
+							blueprint.spawn(player.worldObj, PositionCrystal.getBlockPosition(main), EnumFacing.EAST);
 						} else {
 							sender.addChatMessage(new TextComponentString("Room failed to load"));
 						}

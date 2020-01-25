@@ -240,23 +240,25 @@ public class DungeonRoomRegistry {
 	public final File roomSaveFolder;
 	
 	private void findFiles(File base, List<File> files, List<File> dirs) {
-		if (base.isDirectory()) {
-			File[] subfiles = base.listFiles();
-			
-			// See if this is a composition
-			for (File subfile : subfiles) {
-				if (subfile.getName().equalsIgnoreCase(ROOM_ROOT_NAME)
-						|| subfile.getName().equalsIgnoreCase(ROOM_ROOT_NAME_COMP)) {
-					dirs.add(base);
-					return;
+		if (base.exists()) {
+			if (base.isDirectory()) {
+				File[] subfiles = base.listFiles();
+				
+				// See if this is a composition
+				for (File subfile : subfiles) {
+					if (subfile.getName().equalsIgnoreCase(ROOM_ROOT_NAME)
+							|| subfile.getName().equalsIgnoreCase(ROOM_ROOT_NAME_COMP)) {
+						dirs.add(base);
+						return;
+					}
 				}
+				
+				for (File subfile : subfiles) {
+					findFiles(subfile, files, dirs);
+				}
+			} else {
+				files.add(base);
 			}
-			
-			for (File subfile : subfiles) {
-				findFiles(subfile, files, dirs);
-			}
-		} else {
-			files.add(base);
 		}
 	}
 	
@@ -551,14 +553,22 @@ public class DungeonRoomRegistry {
 	public void loadRegistryFromDisk() {
 		this.map.clear();
 		
-		//loadRegistryFromBuiltin();
+		int count = 0;
+		long startTime = System.currentTimeMillis();
+		loadRegistryFromBuiltin();
+		
+		DungeonRoomList list = map.get(INTERNAL_ALL_NAME);
+		if (list != null)
+			count = list.recordList.size();
+		
+		NostrumMagica.logger.info("Loaded " + count + " builtin rooms (" + (((double)(System.currentTimeMillis() - startTime) / 1000D)) + " seconds)");
 		
 		List<File> files = new LinkedList<>();
 		List<File> compDirs = new LinkedList<>();
 		findFiles(this.roomLoadFolder, files, compDirs);
 		
 		NostrumMagica.logger.info("Loading room cache overrides (" + files.size() + " simple rooms, " + compDirs.size() + " compound rooms)...");
-		final long startTime = System.currentTimeMillis();
+		startTime = System.currentTimeMillis();
 		for (File file : files) {
 			loadFromFile(file);
 		}
@@ -567,12 +577,12 @@ public class DungeonRoomRegistry {
 			loadFromCompDir(comp);
 		}
 		
-		int count = 0;
-		DungeonRoomList list = map.get(INTERNAL_ALL_NAME);
+
+		list = map.get(INTERNAL_ALL_NAME);
 		if (list != null)
-			count = list.recordList.size();
+			count = list.recordList.size() - count;
 		
-		NostrumMagica.logger.info("Loaded " + count + " rooms (" + (((double)(System.currentTimeMillis() - startTime) / 1000D)) + " seconds)");
+		NostrumMagica.logger.info("Loaded " + count + " room overrides (" + (((double)(System.currentTimeMillis() - startTime) / 1000D)) + " seconds)");
 	}
 	
 	private final boolean writeRoomAsFileInternal(File saveFile, NBTTagCompound blueprintTag, String name, int weight, List<String> tags) {

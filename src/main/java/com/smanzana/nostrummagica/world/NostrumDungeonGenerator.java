@@ -11,7 +11,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDragonDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
+import com.smanzana.nostrummagica.world.dungeon.NostrumLoadedDungeon;
 import com.smanzana.nostrummagica.world.dungeon.room.DragonStartRoom;
+import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
+import com.smanzana.nostrummagica.world.dungeon.room.LoadedRoom;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomArena;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomChallenge2;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomEnd1;
@@ -19,7 +22,6 @@ import com.smanzana.nostrummagica.world.dungeon.room.RoomGrandHallway;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomGrandStaircase;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomJail1;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomLectern;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomPortal;
 
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -67,29 +69,12 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 			 .add(new RoomEnd1(true, false))
 			 .add(new RoomEnd1(false, false));
 	
-	// TODO get blueprint rotation working and use this!
-//	public static final String PORTAL_ROOM_NAME = "portal_room";
-//	
-//	public static NostrumDungeon PORTAL_DUNGEON = new NostrumLoadedDungeon(
-//			"portal",
-//			new DragonStartRoom(),
-//			new LoadedRoom(DungeonRoomRegistry.instance().getRoom(PORTAL_ROOM_NAME))
-//			).add(new RoomGrandStaircase())
-//			 .add(new RoomEnd1(false, true))
-//			 .add(new RoomGrandHallway())
-//			 .add(new RoomGrandHallway())
-//			 .add(new RoomGrandHallway())
-//			 .add(new RoomJail1())
-//			 .add(new RoomJail1())
-//			 .add(new RoomChallenge2())
-//			 .add(new RoomChallenge2())
-//			 .add(new RoomLectern())
-//			 .add(new RoomEnd1(true, false))
-//			 .add(new RoomEnd1(false, false));
+	public static final String PORTAL_ROOM_NAME = "portal_room";
 	
-	public static NostrumDungeon PORTAL_DUNGEON = new NostrumDungeon(
+	public static NostrumDungeon PORTAL_DUNGEON = new NostrumLoadedDungeon(
+			"portal",
 			new DragonStartRoom(),
-			new RoomPortal()
+			new LoadedRoom(DungeonRoomRegistry.instance().getRoom(PORTAL_ROOM_NAME))
 			).add(new RoomGrandStaircase())
 			 .add(new RoomEnd1(false, true))
 			 .add(new RoomGrandHallway())
@@ -102,6 +87,22 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 			 .add(new RoomLectern())
 			 .add(new RoomEnd1(true, false))
 			 .add(new RoomEnd1(false, false));
+	
+//	public static NostrumDungeon PORTAL_DUNGEON = new NostrumDungeon(
+//			new DragonStartRoom(),
+//			new RoomPortal()
+//			).add(new RoomGrandStaircase())
+//			 .add(new RoomEnd1(false, true))
+//			 .add(new RoomGrandHallway())
+//			 .add(new RoomGrandHallway())
+//			 .add(new RoomGrandHallway())
+//			 .add(new RoomJail1())
+//			 .add(new RoomJail1())
+//			 .add(new RoomChallenge2())
+//			 .add(new RoomChallenge2())
+//			 .add(new RoomLectern())
+//			 .add(new RoomEnd1(true, false))
+//			 .add(new RoomEnd1(false, false));
 	
 	public static enum DungeonGen {
 		PORTAL(new WorldGenNostrumShrine(PORTAL_DUNGEON), 20, 70),
