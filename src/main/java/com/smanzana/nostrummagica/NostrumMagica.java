@@ -38,7 +38,9 @@ import com.smanzana.nostrummagica.entity.ITameDragon;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
+import com.smanzana.nostrummagica.items.MageStaff;
 import com.smanzana.nostrummagica.items.MagicCharm;
+import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.MirrorItem;
 import com.smanzana.nostrummagica.items.MirrorShield;
@@ -61,6 +63,7 @@ import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.items.ThanoPendant;
+import com.smanzana.nostrummagica.items.WarlockSword;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
 import com.smanzana.nostrummagica.listeners.PlayerListener;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -962,6 +965,16 @@ public class NostrumMagica
 					ShrineSeekingGem.getItemstack(DungeonGen.PORTAL),
 					null,
 					new OutcomeCreatePortal())
+				);
+		
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("spawn_warlock_sword",
+					new ItemStack(WarlockSword.instance()), EMagicElement.FIRE,
+					new ReagentType[] {ReagentType.MANDRAKE_ROOT, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
+					new ItemStack(MagicSwordBase.instance()),
+					new ItemStack[] {new ItemStack(MageStaff.instance()), NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), new ItemStack(MageStaff.instance())},
+					null,
+					new OutcomeSpawnItem(new ItemStack(WarlockSword.instance())))
 				);
 		
 		

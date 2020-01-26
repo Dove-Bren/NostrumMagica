@@ -1,5 +1,10 @@
 package com.smanzana.nostrummagica.spells;
 
+import com.mojang.realmsclient.gui.ChatFormatting;
+
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
 public enum EMagicElement {
 
 	PHYSICAL("Physical", 0xFF223344),
@@ -24,5 +29,26 @@ public enum EMagicElement {
 
 	public int getColor() {
 		return color;
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public ChatFormatting getChatColor() {
+		switch(this) {
+		case EARTH:
+			return ChatFormatting.GOLD;
+		case ENDER:
+			return ChatFormatting.DARK_PURPLE;
+		case FIRE:
+			return ChatFormatting.DARK_RED;
+		case ICE:
+			return ChatFormatting.AQUA;
+		case LIGHTNING:
+			return ChatFormatting.YELLOW;
+		case PHYSICAL:
+			return ChatFormatting.DARK_GRAY;
+		case WIND:
+			return ChatFormatting.DARK_GREEN;
+		}
+		return null;
 	}
 }

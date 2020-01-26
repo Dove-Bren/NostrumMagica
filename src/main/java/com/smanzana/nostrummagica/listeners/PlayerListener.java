@@ -653,12 +653,14 @@ public class PlayerListener {
 		}
 		
 		if (event.getEntityLiving() instanceof EntityPlayer && !event.getEntityLiving().worldObj.isRemote) {
-			// Scan for baubles, since Baubles doesn't call onUnequip when you die....
-			IBaublesItemHandler baubles = BaublesApi.getBaublesHandler((EntityPlayer) event.getEntityLiving());
-			for (int i = 0; i < baubles.getSlots(); i++) {
-				ItemStack stack = baubles.getStackInSlot(i);
-				if (stack != null && stack.getItem() instanceof ItemMagicBauble) {
-					((ItemMagicBauble) stack.getItem()).onUnequipped(stack, event.getEntityLiving());
+			if (NostrumMagica.baubles.isEnabled()) {
+				// Scan for baubles, since Baubles doesn't call onUnequip when you die....
+				IBaublesItemHandler baubles = BaublesApi.getBaublesHandler((EntityPlayer) event.getEntityLiving());
+				for (int i = 0; i < baubles.getSlots(); i++) {
+					ItemStack stack = baubles.getStackInSlot(i);
+					if (stack != null && stack.getItem() instanceof ItemMagicBauble) {
+						((ItemMagicBauble) stack.getItem()).onUnequipped(stack, event.getEntityLiving());
+					}
 				}
 			}
 		}

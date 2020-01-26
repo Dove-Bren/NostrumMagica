@@ -41,7 +41,7 @@ public class EntityGolemEarth extends EntityGolem {
 	}
 
 	public EntityGolemEarth(World worldIn) {
-		super(worldIn, true, false, true);
+		super(worldIn, EMagicElement.EARTH, true, false, true);
 	}
 
 	@Override

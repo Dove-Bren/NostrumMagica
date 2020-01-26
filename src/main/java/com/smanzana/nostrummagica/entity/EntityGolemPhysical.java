@@ -41,7 +41,7 @@ public class EntityGolemPhysical extends EntityGolem {
 	}
 
 	public EntityGolemPhysical(World worldIn) {
-		super(worldIn, true, true, false);
+		super(worldIn, EMagicElement.PHYSICAL, true, true, false);
 	}
 
 	@Override

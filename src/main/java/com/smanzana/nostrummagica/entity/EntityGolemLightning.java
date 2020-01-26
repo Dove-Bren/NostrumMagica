@@ -56,7 +56,7 @@ public class EntityGolemLightning extends EntityGolem {
 	}
 
 	public EntityGolemLightning(World worldIn) {
-		super(worldIn, false, true, true);
+		super(worldIn, EMagicElement.LIGHTNING, false, true, true);
 	}
 
 	@Override

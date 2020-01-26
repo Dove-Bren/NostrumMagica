@@ -96,6 +96,7 @@ import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.items.SpellcraftGuide;
 import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.items.ThanosStaff;
+import com.smanzana.nostrummagica.items.WarlockSword;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientEffectRenderMessage;
@@ -489,6 +490,10 @@ public class CommonProxy {
     	
     	NostrumRoseItem.instance().setRegistryName(NostrumMagica.MODID, NostrumRoseItem.ID);
     	GameRegistry.register(NostrumRoseItem.instance());
+    	
+    	WarlockSword.instance().setRegistryName(NostrumMagica.MODID, WarlockSword.ID);
+    	GameRegistry.register(WarlockSword.instance());
+    	WarlockSword.init();
     }
     
     private void registerBlocks() {

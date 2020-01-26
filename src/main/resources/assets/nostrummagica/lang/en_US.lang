@@ -221,6 +221,7 @@ item.rose_blood.name=Blood Rose
 item.rose_eldrich.name=Eldrich Rose
 item.rose_pale.name=Pale Rose
 item.sprite_core.name=Sprite Core 
+item.warlock_sword.name=Warlock Blade
 
 potion.frostbite.name=Frostbite
 potion.shieldphysical.name=Physical Ward
@@ -764,6 +765,7 @@ ritual.form_living_flute.name=Form Living Flute
 ritual.form_eldrich_pendant.name=Form Eldrich Pendant
 
 ritual.spawn_sorcery_portal.name=Spawn Sorcery Portal
+ritual.spawn_warlock_sword.name=Craft Warlock Blade
 
 enhancement.lower_reagent_cost.name=Lower Reagent Cost
 enhancement.lower_reagent_cost.desc=Reduces the amount of reagents used up when casting a spell

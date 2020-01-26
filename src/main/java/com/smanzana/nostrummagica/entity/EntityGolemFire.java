@@ -62,7 +62,7 @@ public class EntityGolemFire extends EntityGolem {
 	}
 
 	public EntityGolemFire(World worldIn) {
-		super(worldIn, false, true, true);
+		super(worldIn, EMagicElement.FIRE, false, true, true);
         this.isImmuneToFire = true;
 	}
 

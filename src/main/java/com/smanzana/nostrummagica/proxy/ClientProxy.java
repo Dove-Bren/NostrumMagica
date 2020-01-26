@@ -115,6 +115,7 @@ import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.items.SpellcraftGuide;
 import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.items.ThanosStaff;
+import com.smanzana.nostrummagica.items.WarlockSword;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
 import com.smanzana.nostrummagica.network.messages.ObeliskTeleportationRequestMessage;
@@ -166,6 +167,7 @@ import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.IModel;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
@@ -402,6 +404,9 @@ public class ClientProxy extends CommonProxy {
 		registerModel(MagicArmorBase.chest, 0, MagicArmorBase.chest.getModelID());
 		registerModel(MagicArmorBase.legs, 0, MagicArmorBase.legs.getModelID());
 		registerModel(MagicArmorBase.feet, 0, MagicArmorBase.feet.getModelID());
+		
+		registerModel(WarlockSword.instance(), 0, WarlockSword.ID);
+		ModelLoader.setCustomModelResourceLocation(WarlockSword.instance(), 0, new ModelResourceLocation(NostrumMagica.MODID + ":" + WarlockSword.ID, "inventory"));
 		
 		for (ReagentItem.ReagentType type : ReagentItem.ReagentType.values()) {
 			registerModel(ReagentItem.instance(), type.getMeta(),
@@ -925,6 +930,14 @@ public class ClientProxy extends CommonProxy {
 				NostrumMagica.MODID, "entity/magic_blade"));
 		event.getMap().registerSprite(new ResourceLocation(
 				NostrumMagica.MODID, "blocks/portal"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "models/item/blade"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "models/item/hilt"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "models/item/ruby"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "models/item/wood"));
 	}
 	
 	@SubscribeEvent

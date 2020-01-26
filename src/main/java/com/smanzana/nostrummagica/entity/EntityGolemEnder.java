@@ -51,7 +51,7 @@ public class EntityGolemEnder extends EntityGolem {
 	}
 
 	public EntityGolemEnder(World worldIn) {
-		super(worldIn, false, true, true);
+		super(worldIn, EMagicElement.ENDER, false, true, true);
 	}
 
 	@Override

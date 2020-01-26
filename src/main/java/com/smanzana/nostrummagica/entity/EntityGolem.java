@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.entity.tasks.GolemTask;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -49,8 +50,9 @@ public abstract class EntityGolem extends EntityTameable implements ILoreTagged 
 	
 	private GolemTask gTask;
 	private int idleCooldown;
+	protected EMagicElement element;
 	
-    protected EntityGolem(World worldIn, boolean melee, boolean range, boolean buff)
+    protected EntityGolem(World worldIn, EMagicElement element, boolean melee, boolean range, boolean buff)
     {
         super(worldIn);
         this.setSize(0.8F, 1.6F);
@@ -64,6 +66,7 @@ public abstract class EntityGolem extends EntityTameable implements ILoreTagged 
         	gTask.initStance(isMelee, isRange, hasBuff);
         
         idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
+        this.element = element;
     }
     
     /**
@@ -247,6 +250,10 @@ public abstract class EntityGolem extends EntityTameable implements ILoreTagged 
 	@Override
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_ENTITY;
+	}
+	
+	public EMagicElement getElement() {
+		return this.element;
 	}
 	
 	private static class GolemAIFindEntityNearestPlayer extends EntityAINearestAttackableTarget<EntityPlayer> {

@@ -1,0 +1,23 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "model": "nostrummagica:warlock_sword.obj",
+        "transform": {
+            "scale": 0.125,
+            "thirdperson": {
+                "translation": [0.05, 0, 0.05],
+                "rotation": [ { "x": 0 }, { "y": 90 }, { "z": 0} ]
+            },
+            "firstperson": {
+                "rotation": [ { "x": 0 }, { "y": 90 }, { "z": 15} ]
+            },
+            "gui": {
+                "rotation": [ { "x": 0 }, { "y": 0 }, { "z": -45} ],
+                "translation": [-0.2, -0.25, 0]
+            }
+        }
+    },
+    "variants": {
+        "inventory": [{}]
+    }
+}

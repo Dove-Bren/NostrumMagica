@@ -39,7 +39,7 @@ public class EntityGolemIce extends EntityGolem {
 	}
 
 	public EntityGolemIce(World worldIn) {
-		super(worldIn, true, true, true);
+		super(worldIn, EMagicElement.ICE, true, true, true);
 	}
 
 	@Override

@@ -1,0 +1,46 @@
+# Blender MTL File: 'sword.blend'
+# Material Count: 4
+
+newmtl Handle
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd  nostrummagica:models/item/wood
+
+newmtl Hilt
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.634667 0.634667 0.634667
+Ks 0.380000 0.380000 0.380000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd  nostrummagica:models/item/hilt
+
+newmtl MatBlade
+Ns 686.274510
+Ka 0.200000 0.200000 0.200000
+Kd 0.640000 0.640000 0.640000
+Ks 0.265980 0.293333 0.284763
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 3
+map_Kd  nostrummagica:models/item/blade
+
+newmtl Pommel
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.850000
+illum 2
+map_Kd  nostrummagica:models/item/ruby
