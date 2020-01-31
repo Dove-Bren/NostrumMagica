@@ -852,7 +852,7 @@ public class PlayerListener {
 				}
 				
 				int diff = tickCount - info.startTick;
-				if (diff % info.interval == 0)
+				if (diff % (info.interval == 0 ? 1 : info.interval) == 0)
 					if (entry.getKey().onEvent(Event.TIME, null, null))
 						it.remove();
 			}
