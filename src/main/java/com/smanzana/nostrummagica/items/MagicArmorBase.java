@@ -90,5 +90,22 @@ public class MagicArmorBase extends ItemArmor implements ILoreTagged {
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_ITEMS;
 	}
+	
+	public static MagicArmorBase get(EntityEquipmentSlot slot) {
+		switch (slot) {
+		case CHEST:
+			return chest;
+		case FEET:
+			return feet;
+		case HEAD:
+			return helm;
+		case LEGS:
+			return legs;
+		default:
+			break;
+		}
+		
+		return null;
+	}
 
 }

@@ -44,7 +44,7 @@ public class MagicShieldPotion extends Potion {
 		// Sneaky! We've just been applied
 		//NostrumMagica.specialEffectProxy
 		int armor = 4 * (int) Math.pow(2, amplifier);
-		NostrumMagica.magicEffectProxy.apply(SpecialEffect.SHIELD_MAGIC, (double) armor, entity);
+		NostrumMagica.magicEffectProxy.applyMagicalShield(entity, (double) armor);
 		
 		NostrumMagicaSounds.SHIELD_APPLY.play(entity);
 		

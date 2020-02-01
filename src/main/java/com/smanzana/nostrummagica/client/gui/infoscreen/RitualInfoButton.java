@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 
@@ -50,9 +51,11 @@ public class RitualInfoButton extends InfoButton {
 		
 		ItemStack iconStack = ritual.getIcon();
 		if (iconStack != null) {
+			RenderItem renderItem = mc.getRenderItem();
 			int x = xPosition + (width - itemLength) / 2;
 			int y = yPosition + (height - itemLength) / 2;
-			mc.getRenderItem().renderItemIntoGUI(iconStack, x, y);
+			
+			renderItem.renderItemIntoGUI(iconStack, x, y);
 		}
 	}
 	

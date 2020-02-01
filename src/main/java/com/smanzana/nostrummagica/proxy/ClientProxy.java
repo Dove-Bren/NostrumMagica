@@ -1316,7 +1316,7 @@ public class ClientProxy extends CommonProxy {
 					return effect;
 				});
 
-		renderer.registerEffect(new SpellComponentWrapper(EAlteration.ALTER),
+		renderer.registerEffect(new SpellComponentWrapper(EAlteration.RUIN),
 				(source, sourcePos, target, targetPos, flavor) -> {
 					ClientEffect effect = new ClientEffectMirrored((targetPos == null ? target.getPositionVector() : targetPos).addVector(0, 1, 0),
 							new ClientEffectFormBasic(ClientEffectIcon.TING4, 0, 0, 0),

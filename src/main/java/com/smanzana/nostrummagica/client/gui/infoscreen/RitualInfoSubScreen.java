@@ -86,14 +86,18 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		tilt = 30;
 		
 		ScaledResolution scaledresolution = new ScaledResolution(mc);
-	    GL11.glViewport(x, -y, mc.displayWidth - x, mc.displayHeight - y);
+	    GL11.glViewport(x * scaledresolution.getScaleFactor(), 0, width * scaledresolution.getScaleFactor(), height * scaledresolution.getScaleFactor());
 	    GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
 	    
+	    // We've changed the viewport. Numbers are relative to whole view now
+	    int adjustedWidth = scaledresolution.getScaledWidth();
+	    int adjustedHeight = scaledresolution.getScaledHeight();
+	    
 	    if (infopage) {
-	    	GlStateManager.translate(-(scaledresolution.getScaledWidth() / 4), 0, 0);
+	    	GlStateManager.translate(-(width / 4), 0, 0);
 	    }
 	    
-	    GlStateManager.translate(scaledresolution.getScaledWidth() / 2, (scaledresolution.getScaledHeight() * .5), -50);
+	    GlStateManager.translate(adjustedWidth / 2, (adjustedHeight * .6), -50);
 		GlStateManager.scale(scale, scale, scale);
 
 		GlStateManager.rotate(tilt, 1, 0, 0);

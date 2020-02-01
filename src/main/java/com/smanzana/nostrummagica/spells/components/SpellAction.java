@@ -25,14 +25,11 @@ import com.smanzana.nostrummagica.entity.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.EntityGolemWind;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
-import com.smanzana.nostrummagica.items.EnchantedArmor;
-import com.smanzana.nostrummagica.items.EnchantedWeapon;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
-import com.smanzana.nostrummagica.items.MagicArmorBase;
-import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.potions.FamiliarPotion;
 import com.smanzana.nostrummagica.potions.MagicBoostPotion;
+import com.smanzana.nostrummagica.potions.MagicBuffPotion;
 import com.smanzana.nostrummagica.potions.MagicResistPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -53,7 +50,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemDye;
@@ -876,6 +872,10 @@ public class SpellAction {
 					boolean ret = super.onUpdate(entityIn);
 					if (ret) {
 						// we're not being removed. Check familiars
+						if (entityIn.worldObj.isRemote) {
+							return true;
+						}
+						
 						INostrumMagic attr = NostrumMagica.getMagicWrapper(entityIn);
 						if (attr != null) {
 							boolean active = false;
@@ -1120,18 +1120,28 @@ public class SpellAction {
 			
 			if (inhand == null)
 				return;
+
+			ItemStack addedItem = null;
+			boolean didEmpower = false;
 			
 			Item item = inhand.getItem();
-			if (item instanceof MagicSwordBase) {
-				
-				Item weapon = EnchantedWeapon.get(element, level);
-				if (weapon == null) {
-					NostrumMagicaSounds.CAST_FAIL.play(entity);
-					return;
-				}
-				
-				ItemStack stack = new ItemStack(weapon);
-				
+			if ((item instanceof InfusedGemItem && inhand.getMetadata() == 0)) {
+				int count = (int) Math.pow(2, level - 1);
+				addedItem = InfusedGemItem.instance().getGem(element, count);
+			} else if (item instanceof EssenceItem) {
+				int count = level + 1;
+				double amt = 2 + level;
+				didEmpower = true;
+				caster.removeActivePotionEffect(MagicBuffPotion.instance());
+				NostrumMagica.magicEffectProxy.applyMagicBuff(entity, element, amt, count);
+				entity.addPotionEffect(new PotionEffect(MagicBuffPotion.instance(), 60 * 20, 0));
+			}
+			
+			
+			
+			if (addedItem == null && !didEmpower) {
+				NostrumMagicaSounds.CAST_FAIL.play(entity);
+			} else {
 				if (entity instanceof EntityPlayer) {
 					EntityPlayer p = (EntityPlayer) entity;
 					if (inhand.stackSize == 1) {
@@ -1140,53 +1150,21 @@ public class SpellAction {
 						} else {
 							p.inventory.removeStackFromSlot(p.inventory.currentItem);
 						}
-						((EntityPlayer) entity).inventory.addItemStackToInventory(stack);
 					} else {
 						inhand.splitStack(1);
-						((EntityPlayer) entity).inventory.addItemStackToInventory(stack);
+					}
+					if (addedItem != null) {
+						((EntityPlayer) entity).inventory.addItemStackToInventory(addedItem);
 					}
 					
 					
 				} else {
 					// EntityLiving has held item in slot 0
-					entity.setHeldItem(EnumHand.MAIN_HAND, stack);
-				}
-				NostrumMagicaSounds.CAST_CONTINUE.play(entity);	
-			} else if (item instanceof MagicArmorBase) {
-				EntityEquipmentSlot slot = ((MagicArmorBase) item).getEquipmentSlot();
-				
-				Item armor = EnchantedArmor.get(element, slot, level);
-				if (armor == null) {
-					NostrumMagicaSounds.CAST_FAIL.play(entity);
-					return;
-				}
-				
-				ItemStack stack = new ItemStack(armor);
-				
-				
-				if (entity instanceof EntityPlayer) {
-					EntityPlayer p = (EntityPlayer) entity;
-					if (inhand.stackSize == 1) {
-						if (offhand) {
-							p.inventory.removeStackFromSlot(40);
-						} else {
-							p.inventory.removeStackFromSlot(p.inventory.currentItem);
-						}
-						((EntityPlayer) entity).inventory.addItemStackToInventory(stack);
-					} else {
-						inhand.splitStack(1);
-						((EntityPlayer) entity).inventory.addItemStackToInventory(stack);
+					if (addedItem != null) {
+						entity.setHeldItem(EnumHand.MAIN_HAND, addedItem);
 					}
-					
-					
-				} else {
-					// EntityLiving has held item in slot 0
-					entity.setHeldItem(EnumHand.MAIN_HAND, stack);
 				}
 				NostrumMagicaSounds.CAST_CONTINUE.play(entity);
-				
-			} else {
-				NostrumMagicaSounds.CAST_FAIL.play(entity);
 			}
 			
 		}
@@ -1481,66 +1459,40 @@ public class SpellAction {
 		
 	}
 	
-	private static class InfuseEffect implements SpellEffect {
-		
-		private int level;
-		private EMagicElement element;
-		
-		public InfuseEffect(EMagicElement element, int level) {
-			this.level = level;
-			this.element = element;
-		}
-
-		@Override
-		public void apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
-			ItemStack inhand = entity.getHeldItemMainhand();
-			boolean offhand = false;
-			if (inhand == null) {
-				inhand = entity.getHeldItemOffhand();
-				offhand = true;
-			}
-			
-			if (inhand == null)
-				return;
-			
-			Item item = inhand.getItem();
-			if ((item instanceof InfusedGemItem && inhand.getMetadata() == 0)
-					|| (item instanceof EssenceItem && EssenceItem.findType(inhand) == element)) {
-				
-				int count = (int) Math.pow(2, level - 1);
-				ItemStack stack = InfusedGemItem.instance().getGem(element, count);
-				
-				if (entity instanceof EntityPlayer) {
-					EntityPlayer p = (EntityPlayer) entity;
-					if (inhand.stackSize == 1) {
-						if (offhand) {
-							p.inventory.removeStackFromSlot(40);
-						} else {
-							p.inventory.removeStackFromSlot(p.inventory.currentItem);
-						}
-						((EntityPlayer) entity).inventory.addItemStackToInventory(stack);
-					} else {
-						inhand.splitStack(1);
-						((EntityPlayer) entity).inventory.addItemStackToInventory(stack);
-					}
-					
-					
-				} else {
-					// EntityLiving has held item in slot 0
-					entity.setHeldItem(EnumHand.MAIN_HAND, stack);
-				}
-				NostrumMagicaSounds.CAST_CONTINUE.play(entity);	
-			} else {
-				NostrumMagicaSounds.CAST_FAIL.play(entity);
-			}
-		}
-
-		@Override
-		public void apply(EntityLivingBase caster, World world, BlockPos block, float efficiency) {
-			; // No effect
-		}
-		
-	}
+//	private static class InfuseEffect implements SpellEffect {
+//		
+//		private int level;
+//		private EMagicElement element;
+//		
+//		public InfuseEffect(EMagicElement element, int level) {
+//			this.level = level;
+//			this.element = element;
+//		}
+//
+//		@Override
+//		public void apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+//			ItemStack inhand = entity.getHeldItemMainhand();
+//			boolean offhand = false;
+//			if (inhand == null) {
+//				inhand = entity.getHeldItemOffhand();
+//				offhand = true;
+//			}
+//			
+//			if (inhand == null)
+//				return;
+//			
+//			Item item = inhand.getItem();
+//			 else {
+//				NostrumMagicaSounds.CAST_FAIL.play(entity);
+//			}
+//		}
+//
+//		@Override
+//		public void apply(EntityLivingBase caster, World world, BlockPos block, float efficiency) {
+//			; // No effect
+//		}
+//		
+//	}
 	
 	private EntityLivingBase source;
 	private List<SpellEffect> effects;
@@ -1769,10 +1721,10 @@ public class SpellAction {
 		return this;
 	}
 	
-	public SpellAction infuse(EMagicElement element, int level) {
-		effects.add(new InfuseEffect(element, level));
-		return this;
-	}
+//	public SpellAction infuse(EMagicElement element, int level) {
+//		effects.add(new InfuseEffect(element, level));
+//		return this;
+//	}
 	
 	public SpellAction blockBreak(int level) {
 		effects.add(new BreakEffect(level));

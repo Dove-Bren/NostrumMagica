@@ -609,13 +609,13 @@ public class Spell {
 		
 		if (alteration == null) {
 			// Damage spell
-			return new SpellAction(caster).damage(element, (float) Math.pow(2, elementCount))
+			return new SpellAction(caster).damage(element, (float) (elementCount + 1))
 					.name("damage." + element.name().toLowerCase());
 		}
 		
 		switch (alteration) {
-		case ALTER:
-			return solveAlter(caster, element, elementCount);
+		case RUIN:
+			return solveRuin(caster, element, elementCount);
 		case CONJURE:
 			return solveConjure(caster, element, elementCount);
 		case ENCHANT:
@@ -635,7 +635,7 @@ public class Spell {
 		}
 	}
 	
-	private static final SpellAction solveAlter(EntityLivingBase caster, EMagicElement element,
+	private static final SpellAction solveRuin(EntityLivingBase caster, EMagicElement element,
 			int elementCount) {
 		switch (element) {
 		case PHYSICAL:
@@ -646,7 +646,8 @@ public class Spell {
 		case ICE:
 		case LIGHTNING:
 		case WIND:
-			return new SpellAction(caster).infuse(element, elementCount).name("infuse." + element.name().toLowerCase());
+			return new SpellAction(caster).damage(element, 2f + (float) (2 * elementCount))
+					.name("damage." + element.name().toLowerCase());
 		}
 		
 		return null;

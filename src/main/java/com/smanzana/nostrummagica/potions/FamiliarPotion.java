@@ -41,6 +41,7 @@ public class FamiliarPotion extends Potion {
 	@Override
 	public boolean isReady(int duration, int amp) {
 		return duration > 0 && duration % 5 == 0; // Check every 1/4 a second :shrug:
+		// Note: actual apply check is done in anon class when applying, and validates familiar status
 	}
 	
 	@Override

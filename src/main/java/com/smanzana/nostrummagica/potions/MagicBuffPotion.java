@@ -2,7 +2,6 @@ package com.smanzana.nostrummagica.potions;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
-import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
@@ -13,59 +12,52 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class PhysicalShieldPotion extends Potion {
+public class MagicBuffPotion extends Potion {
 
 	private static final ResourceLocation Resource = new ResourceLocation(
-			NostrumMagica.MODID, "potions-shieldp");
+			NostrumMagica.MODID, "potions-magicbuff");
 	
-	private static PhysicalShieldPotion instance;
-	public static PhysicalShieldPotion instance() {
+	private static MagicBuffPotion instance;
+	public static MagicBuffPotion instance() {
 		if (instance == null)
-			instance = new PhysicalShieldPotion();
+			instance = new MagicBuffPotion();
 		
 		return instance;
 	}
 	
-	private PhysicalShieldPotion() {
+	private MagicBuffPotion() {
 		super(false, 0xFF80805D);
 
 		this.setBeneficial();
-		this.setPotionName("potion.shieldphysical.name");
+		this.setPotionName("potion.magicbuff.name");
 		NostrumMagica.registerPotion(this, Resource);
 	}
 	
 	@Override
 	public boolean isReady(int duration, int amp) {
-		return duration > 0; // Every tick
+		return false; // No tick actions
 	}
 	
 	@Override
 	public void applyAttributesModifiersToEntity(EntityLivingBase entity, AbstractAttributeMap attributeMap, int amplifier) {
-		// Sneaky! We've just been applied
-		//NostrumMagica.specialEffectProxy
-		int armor = 4 * (int) Math.pow(2, amplifier);
-		NostrumMagica.magicEffectProxy.applyPhysicalShield(entity, (double) armor);
-		
-		NostrumMagicaSounds.SHIELD_APPLY.play(entity);
-		
 		super.applyAttributesModifiersToEntity(entity, attributeMap, amplifier);
 	}
 	
 	@Override
 	public void removeAttributesModifiersFromEntity(EntityLivingBase entityLivingBaseIn, AbstractAttributeMap attributeMapIn, int amplifier) {
-		NostrumMagica.magicEffectProxy.remove(SpecialEffect.SHIELD_PHYSICAL, entityLivingBaseIn);
+		NostrumMagica.magicEffectProxy.remove(SpecialEffect.MAGIC_BUFF, entityLivingBaseIn);
 		super.removeAttributesModifiersFromEntity(entityLivingBaseIn, attributeMapIn, amplifier);
     }
 	
 	@SideOnly(Side.CLIENT)
 	@Override
     public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
-		PotionIcon.PHYSICALSHIELD.draw(mc, x + 6, y + 7);
+		PotionIcon.ENCHANT.draw(mc, x + 6, y + 7);
 	}
 	
 	@SideOnly(Side.CLIENT)
 	@Override
     public void renderHUDEffect(int x, int y, PotionEffect effect, net.minecraft.client.Minecraft mc, float alpha) {
-		PotionIcon.PHYSICALSHIELD.draw(mc, x + 3, y + 3);
+		PotionIcon.ENCHANT.draw(mc, x + 3, y + 3);
 	}
 }

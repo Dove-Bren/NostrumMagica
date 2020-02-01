@@ -36,9 +36,12 @@ import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.ITameDragon;
 import com.smanzana.nostrummagica.items.BlankScroll;
+import com.smanzana.nostrummagica.items.EnchantedArmor;
+import com.smanzana.nostrummagica.items.EnchantedWeapon;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MageStaff;
+import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicCharm;
 import com.smanzana.nostrummagica.items.MagicSwordBase;
 import com.smanzana.nostrummagica.items.MasteryOrb;
@@ -128,6 +131,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
@@ -977,6 +981,64 @@ public class NostrumMagica
 					new OutcomeSpawnItem(new ItemStack(WarlockSword.instance())))
 				);
 		
+		// Rituals for all the magic armors
+		for (EMagicElement elem : EMagicElement.values())
+		for (int i = 0; i < 3; i++)
+		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
+			
+			if (EnchantedArmor.isArmorElement(elem)) {
+				if (slot == EntityEquipmentSlot.OFFHAND || slot == EntityEquipmentSlot.MAINHAND) {
+					continue;
+				}				
+			} else {
+				if (slot != EntityEquipmentSlot.MAINHAND) {
+					continue;
+				}
+			}
+			
+			
+			ItemStack outcome;
+			ItemStack input;
+			ItemStack gem;
+			ItemStack essence;
+			String name;
+			if (EnchantedArmor.isArmorElement(elem)) {
+				outcome = new ItemStack(EnchantedArmor.get(elem, slot, i + 1));
+				name = "spawn_enchanted_armor";
+				if (i == 0) {
+					input = new ItemStack(MagicArmorBase.get(slot));
+				} else {
+					input = new ItemStack(EnchantedArmor.get(elem, slot, i ));
+				}
+			} else {
+				outcome = new ItemStack(EnchantedWeapon.get(elem, i + 1));
+				name = "spawn_enchanted_weapon";
+				if (i == 0) {
+					input = new ItemStack(MagicSwordBase.instance());
+				} else {
+					input = new ItemStack(EnchantedWeapon.get(elem, i));
+				}
+			}
+			essence = EssenceItem.getEssence(elem, 1);
+			if (i == 0) {
+				gem = NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1);
+			} else if (i == 1) {
+				gem = NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1);
+			} else {
+				gem = NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1);
+			}
+			
+			RitualRegistry.instance().addRitual(
+					RitualRecipe.createTier3(name,
+						outcome, elem,
+						new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.MANI_DUST, ReagentType.MANI_DUST},
+						input,
+						new ItemStack[] {essence, gem, essence, essence},
+						new RRequirementQuest("magic_armor"),
+						new OutcomeSpawnItem(outcome.copy()))
+					);
+		}
+		
 		
 //		RitualRegistry.instance().addRitual(
 //				RitualRecipe.createTier2("ritual.form_obelisk.name", EMagicElement.ENDER,
@@ -1080,7 +1142,7 @@ public class NostrumMagica
     			0, // Finesse
     			new String[]{"con7", "con6-tec3"},
     			null, new ObjectiveSpellCast().numElems(6).requiredElement(EMagicElement.EARTH),
-    			new IReward[] {new AlterationReward(EAlteration.ENCHANT)});
+    			new IReward[] {new AlterationReward(EAlteration.RUIN)});
     	new NostrumQuest("con3-tec2", QuestType.REGULAR, 0,
     			3, // Control
     			2, // Technique
@@ -1158,7 +1220,7 @@ public class NostrumMagica
     			0, // Finesse
     			new String[]{"con1-tec5", "fin1-tec5"},
     			null, new ObjectiveRitual("vani"),
-    			new IReward[] {new AlterationReward(EAlteration.ALTER)});
+    			new IReward[] {new AlterationReward(EAlteration.ENCHANT)});
 
     	new NostrumQuest("fin1", QuestType.REGULAR, 0,
     			0, // Control
@@ -1368,6 +1430,15 @@ public class NostrumMagica
     			null,
     			new IReward[]{new AttributeReward(AwardType.MANA, 0.025f)})
     		.offset(4, 6);
+    	new NostrumQuest("magic_armor", QuestType.CHALLENGE, 5,
+    			0,
+    			0,
+    			0,
+    			null,
+    			new String[] {MageStaff.instance().getLoreKey()},
+    			null,
+    			new IReward[]{new AttributeReward(AwardType.MANA, 0.025f)})
+    		.offset(-4, 3);
     	
 //    	new NostrumQuest("con", QuestType.REGULAR, 0,
 //    			0, // Control

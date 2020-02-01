@@ -1,10 +1,12 @@
 package com.smanzana.nostrummagica.client.gui.infoscreen;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -32,7 +34,7 @@ public class InfoScreen extends GuiScreen {
 	
 	protected static final int POS_TABS_HEIGHT = 36;
 	protected static final int POS_BUTTONS_HEIGHT = 28;
-	protected static final int POS_SUBSCREEN_VOFFSET = POS_TABS_HEIGHT + POS_BUTTONS_HEIGHT + POS_BUTTONS_HEIGHT;
+	protected static final int POS_SUBSCREEN_VOFFSET = POS_TABS_HEIGHT;
 	
 	private INostrumMagic attribute;
 	private List<GuiButton> tabs;
@@ -41,6 +43,8 @@ public class InfoScreen extends GuiScreen {
 	private List<ISubScreenButton> subscreenButtons;
 	
 	protected int globButtonID = 0;
+	
+	private int scrollY = 0;
 	
 	public InfoScreen(INostrumMagic attribute) {
 		this.attribute = attribute;
@@ -52,6 +56,7 @@ public class InfoScreen extends GuiScreen {
 		buttons = new LinkedList<>();
 		subscreenButtons = new LinkedList<>();
 		subscreen = null;
+		scrollY = 0;
 		
 		InfoScreenTab.init();
 		
@@ -81,20 +86,51 @@ public class InfoScreen extends GuiScreen {
 		Gui.drawRect(0, 0, width, height, 0xFF000000);
 		
 		if (this.subscreen != null) {
-			this.subscreen.draw(attribute, mc, 0, POS_SUBSCREEN_VOFFSET, width, height - POS_SUBSCREEN_VOFFSET, mouseX, mouseY);
+			
+			// Figure out draw offset depending on how many buttons there are
+			final int maxHorizontal = this.width / (InfoButton.BUTTON_WIDTH + 2);
+			int xOffset = 0;
+			int yOffset = POS_BUTTONS_HEIGHT + POS_BUTTONS_HEIGHT;
+			if (buttons.size() > maxHorizontal * 2) {
+				xOffset = (2 + InfoButton.BUTTON_WIDTH) * 5;
+				yOffset = 10;
+			}
+			
+			yOffset += POS_SUBSCREEN_VOFFSET;
+			
+			this.subscreen.draw(attribute, mc, xOffset, yOffset, width - xOffset, height - yOffset, mouseX, mouseY);
 		}
 		
 		// Do buttons and other parent stuff
-		for (int i = 0; i < this.buttonList.size(); ++i) {
-			((GuiButton)this.buttonList.get(i)).drawButton(this.mc, mouseX, mouseY);
+		for (int i = 0; i < this.buttons.size(); ++i) {
+			((GuiButton)this.buttons.get(i)).drawButton(this.mc, mouseX, mouseY);
 		}
+		
+		// Mask out any partial buttons or buttons that are above button line, since we support scrolling
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(0, 0, 500);
+		if (scrollY > 0) {
+			Gui.drawRect(0, 0, width, POS_SUBSCREEN_VOFFSET, 0xFF000000);
+		}
+		
+		for (int i = 0; i < this.tabs.size(); ++i) {
+			((GuiButton)this.tabs.get(i)).drawButton(this.mc, mouseX, mouseY);
+		}
+		GlStateManager.popMatrix();
 
 		for (int j = 0; j < this.labelList.size(); ++j) {
 			((GuiLabel)this.labelList.get(j)).drawLabel(this.mc, mouseX, mouseY);
 		}
 		
-		for (int i = 0; i < this.buttonList.size(); ++i) {
-			this.buttonList.get(i).drawButtonForegroundLayer(mouseX, mouseY);
+		// Only show sub buttons if mouseY is lower than button  vertical offset
+		if (mouseY > POS_SUBSCREEN_VOFFSET) {
+			for (int i = 0; i < this.buttons.size(); ++i) {
+				((GuiButton)this.buttons.get(i)).drawButtonForegroundLayer(mouseX, mouseY);
+			}
+		}
+		
+		for (int i = 0; i < this.tabs.size(); ++i) {
+			((GuiButton)this.tabs.get(i)).drawButtonForegroundLayer(mouseX, mouseY);
 		}
 		
 	}
@@ -110,6 +146,9 @@ public class InfoScreen extends GuiScreen {
 			return;
 		
 		if (button instanceof InfoButton) {
+			// Since we allow scrolling, disallow clicks that are above the button location
+			
+			
 			this.subscreen = ((InfoButton) button).getScreen(attribute);
 			this.subscreenButtons.clear();
 			Collection<ISubScreenButton> screenbutts = subscreen.getButtons();
@@ -130,6 +169,7 @@ public class InfoScreen extends GuiScreen {
 			this.buttonList.addAll(this.buttons);
 			this.buttonList.addAll(this.subscreenButtons);
 		} else if (button instanceof TabButton) {
+			this.subscreen = null;
 			activateButtons(((TabButton) button).getButtons());
 		} else if (button instanceof ISubScreenButton) {
 			((ISubScreenButton) button).onClick(attribute);
@@ -150,15 +190,63 @@ public class InfoScreen extends GuiScreen {
 		this.buttonList.addAll(this.subscreenButtons);
 		int i = 0;
 		int j = 0;
-		int cuttoff = this.width / (InfoButton.BUTTON_WIDTH + 2);
+		
+		// Note: Logic about how to wrap buttons duplicated when figuring out offset for ritual display
+		final int maxHorizontal = this.width / (InfoButton.BUTTON_WIDTH + 2);
+		int cutoff;
+		if (buttons.size() <= maxHorizontal * 2) {
+			cutoff = this.width / (InfoButton.BUTTON_WIDTH + 2); // Wrapped against top
+		} else {
+			cutoff = 5;
+		}
 		for (InfoButton button : this.buttons) {
 			button.visible = true;
 			button.xPosition = i++ * (InfoButton.BUTTON_WIDTH + 2);
 			button.yPosition = (j * (InfoButton.BUTTON_WIDTH + 2)) + (POS_TABS_HEIGHT + 2);
 			
-			if (i >= cuttoff) {
+			if (i >= cutoff) {
 				i = 0;
 				j++;
+			}
+		}
+		
+		scrollY = 0;
+	}
+	
+	@Override
+	public void handleMouseInput() throws IOException {
+		int dWheel = Mouse.getDWheel();
+		if (dWheel != 0) {
+			int mx = Mouse.getEventX() * this.width / this.mc.displayWidth;
+	        int my = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
+			handleMouseScroll(dWheel > 0 ? 1 : -1, mx, my);
+		} else
+			super.handleMouseInput();
+	}
+	
+	protected void handleMouseScroll(int dx, int mouseX, int mouseY) {
+		final int lastScroll = scrollY;
+		scrollY -= dx * 20;
+		
+		// Cap scroll Y to the amount of y overflow we have from buttons
+		final int maxHorizontal = this.width / (InfoButton.BUTTON_WIDTH + 2);
+		if (buttons.size() <= maxHorizontal * 2) {
+			// Wrapped against top
+			scrollY = 0;
+		} else {
+			final int rows = 1 + (buttons.size() / 5);
+			final float visible = ((float) (height - (POS_TABS_HEIGHT + 2)) / (float) (InfoButton.BUTTON_WIDTH + 2));
+			if ((int) visible < rows) {
+				float overflow = (InfoButton.BUTTON_WIDTH + 2) * ((float) rows - visible);
+				scrollY = (int) Math.ceil(Math.max(0, Math.min(overflow, scrollY)));
+			} else {
+				scrollY = 0;
+			}
+		}
+		
+		if (lastScroll != scrollY) {
+			for (InfoButton button : this.buttons) {
+				button.yPosition -= (scrollY - lastScroll);
 			}
 		}
 	}

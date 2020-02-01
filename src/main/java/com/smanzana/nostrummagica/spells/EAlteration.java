@@ -19,7 +19,7 @@ public enum EAlteration {
 	ENCHANT("Enchant", 40, ReagentType.BLACK_PEARL),
 	CONJURE("Conjure", 30, ReagentType.MANDRAKE_ROOT),
 	SUMMON("Summon", 50, ReagentType.MANI_DUST),
-	ALTER("Alter", 40, ReagentType.SPIDER_SILK);
+	RUIN("Ruin", 80, ReagentType.SPIDER_SILK);
 	
 	private ResourceLocation glyph;
 	private String name;
