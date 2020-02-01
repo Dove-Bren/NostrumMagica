@@ -11,10 +11,12 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
+import com.smanzana.nostrummagica.client.model.ModelEnchantedArmorBase;
 import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 
+import net.minecraft.client.model.ModelBiped;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -27,6 +29,8 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ISpecialArmor;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISpecialArmor {
 
@@ -175,6 +179,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	private EMagicElement element;
 	
 	private String modelID;
+	private static ModelEnchantedArmorBase armorModels[];
 	
 	public EnchantedArmor(String modelID, EntityEquipmentSlot type, EMagicElement element, int level) {
 		super(ArmorMaterial.IRON, 0, type);
@@ -187,6 +192,13 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		
 		this.armor = calcArmor(type, element, level);
 		this.magicResistAmount = ((double) calcMagicResistBase(type, element, level) * 2.0D); // (/50 so max is 48%, then * 100 for %, so *2)
+		
+		if (armorModels == null) {
+			armorModels = new ModelEnchantedArmorBase[4];
+			for (int i = 0; i < 4; i++) {
+				armorModels[i] = new ModelEnchantedArmorBase(1f, i);
+			}
+		}
 	}
 	
 	@Override
@@ -260,16 +272,55 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 	
 	@Override
+	@SideOnly(Side.CLIENT)
 	public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type) {
 		if (!(stack.getItem() instanceof EnchantedArmor)) {
 			return null;
 		}
 		
+		// Could support overlay. For now, have unique brightness-adjusted textures for each.
 		if (type != null && type.equalsIgnoreCase("overlay")) {
-			return NostrumMagica.MODID + ":textures/models/armor/none.png";
+			//return NostrumMagica.MODID + ":textures/models/armor/none.png";
+			return NostrumMagica.MODID + ":textures/models/armor/magic_armor_" + element.name().toLowerCase() + "_overlay.png";
 		}
 		
-		return NostrumMagica.MODID + ":textures/models/armor/magic" + level + "_layer_" + (slot == EntityEquipmentSlot.LEGS ? 2 : 1) + ".png"; 
+		return NostrumMagica.MODID + ":textures/models/armor/magic_armor_" + element.name().toLowerCase() + ".png"; 
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public ModelBiped getArmorModel(EntityLivingBase entity, ItemStack stack, EntityEquipmentSlot slot, ModelBiped defaultModel) {
+		
+		int setCount = getSetPieces(entity, stack);
+		ModelEnchantedArmorBase model = armorModels[Math.max(0, Math.min(3, setCount - 1))];
+		model.setVisibleFrom(slot);
+		
+		return model;
+	}
+	
+	public int getSetPieces(EntityLivingBase entity, ItemStack stack) {
+		int count = 0;
+		EMagicElement myElem = ((EnchantedArmor)stack.getItem()).getElement();
+		int myLevel = ((EnchantedArmor)stack.getItem()).getLevel();
+		
+		for (EntityEquipmentSlot slot : new EntityEquipmentSlot[]{EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET}) {
+			ItemStack inSlot = entity.getItemStackFromSlot(slot);
+			if (inSlot == stack) {
+				count++;
+				continue;
+			}
+			
+			if (inSlot == null || !(inSlot.getItem() instanceof EnchantedArmor)) {
+				continue;
+			}
+			
+			EnchantedArmor item = (EnchantedArmor) inSlot.getItem();
+			if (item.getElement() == myElem && item.getLevel() == myLevel) {
+				count++;
+			}
+		}
+		
+		return count;
 	}
 	
 	@Override
@@ -279,24 +330,16 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	
 	@Override
 	public int getColor(ItemStack stack) {
-		switch (element) {
-		case EARTH:
-			return 0xFF874A0D;
-		case ENDER:
-			return 0xFF3D003D;
-		case FIRE:
-			return 0xFFAD1F00;
-		case ICE:
-			return 0xFF6ED1EA;
-		case LIGHTNING:
-			return 0xFFDBE045;
-		case PHYSICAL:
-			return 0xFF91917F;
-		case WIND:
-			return 0xFF4C8E29;
+		// This is brightness. Different elements already tint their textures. We just make brighter with level.
+		switch (level) {
+		default:
+		case 0:
+			return 0xFF3F3F3F;
+		case 1:
+			return 0xFF7F7F7F;
+		case 2:
+			return 0xFFFFFFFF;
 		}
-		
-		return 0xFF00FF00;
 	}
 	
 	public static List<EnchantedArmor> getAll() {
