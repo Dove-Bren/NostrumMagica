@@ -179,6 +179,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	private EMagicElement element;
 	
 	private String modelID;
+	
+	@SideOnly(Side.CLIENT)
 	private static ModelEnchantedArmorBase armorModels[];
 	
 	public EnchantedArmor(String modelID, EntityEquipmentSlot type, EMagicElement element, int level) {
@@ -193,10 +195,12 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		this.armor = calcArmor(type, element, level);
 		this.magicResistAmount = ((double) calcMagicResistBase(type, element, level) * 2.0D); // (/50 so max is 48%, then * 100 for %, so *2)
 		
-		if (armorModels == null) {
-			armorModels = new ModelEnchantedArmorBase[4];
-			for (int i = 0; i < 4; i++) {
-				armorModels[i] = new ModelEnchantedArmorBase(1f, i);
+		if (!NostrumMagica.proxy.isServer()) {
+			if (armorModels == null) {
+				armorModels = new ModelEnchantedArmorBase[4];
+				for (int i = 0; i < 4; i++) {
+					armorModels[i] = new ModelEnchantedArmorBase(1f, i);
+				}
 			}
 		}
 	}
