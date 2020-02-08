@@ -1,7 +1,10 @@
 package com.smanzana.nostrummagica.world.dimension;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 
@@ -394,28 +397,47 @@ public class NostrumEmptyDimension {
 			}
 		}
 		
+		private Map<UUID, Boolean> teleportingMarker = new HashMap<>();
+		
 		@SubscribeEvent
 		public void onTeleport(EntityTravelToDimensionEvent event) {
 			if (event.getDimension() == dim) {
+				Entity ent = event.getEntity();
+				Boolean marker = teleportingMarker.get(ent.getPersistentID());
+				if (marker != null && marker){
+					return;
+				}
+				
 				event.setCanceled(true);
 				
-				Entity ent = event.getEntity();
+				
 				if (ent instanceof EntityPlayerMP) {
 					EntityPlayerMP player = (EntityPlayerMP) ent;
 					MinecraftServer server = player.getServer();
+					teleportingMarker.put(player.getPersistentID(), true);
 					server.getPlayerList().transferPlayerToDimension(
 							player, dim, new DimensionEntryTeleporter(server.worldServerForDimension(dim)));
+					teleportingMarker.put(player.getPersistentID(), false);
 				}
 			} else if (event.getEntity().dimension == dim && event.getDimension() == 0) {
 				// Leaving our dimension to homeworld
-				event.setCanceled(true);
-				
 				Entity ent = event.getEntity();
+				
+				Boolean marker = teleportingMarker.get(ent.getPersistentID());
+				if (marker != null && marker){
+					return;
+				}
+				
+				
+				event.setCanceled(true);
+
 				if (ent instanceof EntityPlayerMP) {
 					EntityPlayerMP player = (EntityPlayerMP) ent;
 					MinecraftServer server = player.getServer();
+					teleportingMarker.put(player.getPersistentID(), true);
 					server.getPlayerList().transferPlayerToDimension(
 							player, event.getDimension(), new DimensionReturnTeleporter(server.worldServerForDimension(event.getDimension())));
+					teleportingMarker.put(player.getPersistentID(), false);
 				}
 			}
 		}

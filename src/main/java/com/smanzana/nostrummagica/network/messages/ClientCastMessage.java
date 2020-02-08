@@ -231,6 +231,12 @@ public class ClientCastMessage implements IMessage {
 				}
 				
 				spell.cast(sp, summary.getEfficiency());
+				
+				// No xp if magic isn't unlocked
+				if (!att.isUnlocked()) {
+					xp = 0;
+				}
+				
 				att.addXP(xp);
 
 				NetworkHandler.getSyncChannel().sendTo(new ClientCastReplyMessage(true, att.getMana(), xp, reagents),
