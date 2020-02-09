@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.items.ChalkItem;
 import com.smanzana.nostrummagica.items.DragonEgg;
 import com.smanzana.nostrummagica.items.DragonEggFragment;
 import com.smanzana.nostrummagica.items.EssenceItem;
+import com.smanzana.nostrummagica.items.HookshotItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MageStaff;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
@@ -122,6 +123,7 @@ public class LoreRegistry {
 		register(new EntityDragonEgg(null));
 		register(MirrorShield.instance());
 		register(MirrorShieldImproved.instance());
+		register(HookshotItem.instance());
 		
 		for (Preset preset : Preset.values()) {
 			register(preset);

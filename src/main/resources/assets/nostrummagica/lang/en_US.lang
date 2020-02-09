@@ -220,8 +220,11 @@ item.dragon_wing.name=Dragon Wing
 item.rose_blood.name=Blood Rose
 item.rose_eldrich.name=Eldrich Rose
 item.rose_pale.name=Pale Rose
-item.sprite_core.name=Sprite Core 
+item.sprite_core.name=Sprite Core
 item.warlock_sword.name=Warlock Blade
+item.hookshot_weak.name=Hookshot
+item.hookshot_medium.name=Farshot
+item.hookshot_strong.name=Grand Hookshot
 
 potion.frostbite.name=Frostbite
 potion.shieldphysical.name=Physical Ward
@@ -275,6 +278,8 @@ entity.nostrummagica.entity_internal_spellsaucer_chakram.name=Spell Saucer
 entity.nostrummagica.entity_internal_spellsaucer_cycler.name=Spell Saucer
 entity.nostrummagica.entity_internal_spellsaucer_.name=Spell Saucer
 entity.nostrummagica.entity_switch_trigger.name=Mystic Trigger
+entity.nostrummagica.nostrum_lightning.name=Lightning Bolt
+entity.nostrummagica.nostrum_hookshot.name=Hookshot Anchor
 
 itemGroup.nostrummagica=Nostrum Magica
 itemGroup.nostrummagica_enhancements=Nostrum Enhancements
@@ -703,6 +708,8 @@ ritual.mirror_shield.name=Create Mirror Shield
 ritual.mirror_shield.desc=Create a Mirror Shield
 ritual.true_mirror_shield.name=Create True Mirror Shield
 ritual.true_mirror_shield.desc=Create a True Mirror Shield
+ritual.improve_hookshot_medium.name=Create FarShot
+ritual.improve_hookshot_strong.name=Create Grand Hookshot
 
 ritual.rune.physical.name=Physical Rune
 ritual.rune.fire.name=Fire Rune

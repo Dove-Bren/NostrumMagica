@@ -51,6 +51,7 @@ import com.smanzana.nostrummagica.entity.EntityGolemIce;
 import com.smanzana.nostrummagica.entity.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.EntityGolemWind;
+import com.smanzana.nostrummagica.entity.EntityHookShot;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityShadowDragonRed;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
@@ -67,6 +68,7 @@ import com.smanzana.nostrummagica.items.DragonEggFragment;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
 import com.smanzana.nostrummagica.items.EssenceItem;
+import com.smanzana.nostrummagica.items.HookshotItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MageStaff;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
@@ -288,6 +290,12 @@ public class CommonProxy {
     			128,
     			1,
     			false);
+    	EntityRegistry.registerModEntity(EntityHookShot.class, "nostrum_hookshot",
+    			entityID++,
+    			NostrumMagica.instance,
+    			128,
+    			1,
+    			true);
     	
     	EntityRegistry.addSpawn(EntityKoid.class, 20, 1, 1, EnumCreatureType.MONSTER, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.MAGICAL));
@@ -498,6 +506,10 @@ public class CommonProxy {
     	WarlockSword.instance().setRegistryName(NostrumMagica.MODID, WarlockSword.ID);
     	GameRegistry.register(WarlockSword.instance());
     	WarlockSword.init();
+    	
+    	HookshotItem.instance().setRegistryName(NostrumMagica.MODID, HookshotItem.ID);
+    	GameRegistry.register(HookshotItem.instance());
+    	HookshotItem.init();
     }
     
     private void registerBlocks() {

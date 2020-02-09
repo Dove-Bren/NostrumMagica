@@ -105,7 +105,6 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		GlStateManager.rotate(180f, 0, 0, 1);
 		GlStateManager.translate(-.5, 0, -.5);
 		
-		
 		switch (tier) {
 		case 0: {
 			drawBlock(mc, chalk, 1, 0, 1);

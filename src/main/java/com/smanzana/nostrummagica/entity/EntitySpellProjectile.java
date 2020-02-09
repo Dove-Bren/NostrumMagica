@@ -101,8 +101,8 @@ public class EntitySpellProjectile extends EntityFireball {
 	}
 	
 	@Override
-	public boolean writeToNBTOptional(NBTTagCompound compound)
-    {
+	public boolean writeToNBTOptional(NBTTagCompound compound) {
+		// Returning false means we won't be saved. That's what we want.
 		return false;
     }
 }

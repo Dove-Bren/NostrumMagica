@@ -39,6 +39,7 @@ import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
 import com.smanzana.nostrummagica.items.EssenceItem;
+import com.smanzana.nostrummagica.items.HookshotItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MageStaff;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
@@ -67,6 +68,7 @@ import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.items.WarlockSword;
+import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
 import com.smanzana.nostrummagica.listeners.PlayerListener;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -1039,6 +1041,29 @@ public class NostrumMagica
 					);
 		}
 		
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("improve_hookshot_medium",
+						new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.MEDIUM, false)),
+						EMagicElement.PHYSICAL,
+						new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.MANI_DUST},
+						new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.WEAK, false)),
+						new ItemStack[] {new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM,  1), null, new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE)},
+						null,
+						new OutcomeSpawnItem(new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.MEDIUM, false)))
+						)
+				);
+		
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("improve_hookshot_strong",
+						new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.STRONG, false)),
+						EMagicElement.PHYSICAL,
+						new ReagentType[] {ReagentType.MANI_DUST, ReagentType.BLACK_PEARL, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK},
+						new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.MEDIUM, false)),
+						new ItemStack[] {new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE,  1), new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE), new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE)},
+						null,
+						new OutcomeSpawnItem(new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.STRONG, false)))
+						)
+				);
 		
 //		RitualRegistry.instance().addRitual(
 //				RitualRecipe.createTier2("ritual.form_obelisk.name", EMagicElement.ENDER,

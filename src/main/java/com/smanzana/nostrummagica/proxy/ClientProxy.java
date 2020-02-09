@@ -55,6 +55,7 @@ import com.smanzana.nostrummagica.entity.EntityDragon;
 import com.smanzana.nostrummagica.entity.EntityDragonEgg;
 import com.smanzana.nostrummagica.entity.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.EntityGolem;
+import com.smanzana.nostrummagica.entity.EntityHookShot;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityShadowDragonRed;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
@@ -67,6 +68,7 @@ import com.smanzana.nostrummagica.entity.renderer.ModelGolem;
 import com.smanzana.nostrummagica.entity.renderer.RenderDragonEgg;
 import com.smanzana.nostrummagica.entity.renderer.RenderDragonRed;
 import com.smanzana.nostrummagica.entity.renderer.RenderGolem;
+import com.smanzana.nostrummagica.entity.renderer.RenderHookShot;
 import com.smanzana.nostrummagica.entity.renderer.RenderKoid;
 import com.smanzana.nostrummagica.entity.renderer.RenderMagicSaucer;
 import com.smanzana.nostrummagica.entity.renderer.RenderShadowDragonRed;
@@ -81,6 +83,7 @@ import com.smanzana.nostrummagica.items.DragonEggFragment;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
 import com.smanzana.nostrummagica.items.EssenceItem;
+import com.smanzana.nostrummagica.items.HookshotItem;
 import com.smanzana.nostrummagica.items.ISpellArmor;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MageStaff;
@@ -116,6 +119,7 @@ import com.smanzana.nostrummagica.items.SpellcraftGuide;
 import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.items.ThanosStaff;
 import com.smanzana.nostrummagica.items.WarlockSword;
+import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
 import com.smanzana.nostrummagica.network.messages.ObeliskTeleportationRequestMessage;
@@ -263,6 +267,13 @@ public class ClientProxy extends CommonProxy {
 			}
 		});
 		
+		RenderingRegistry.registerEntityRenderingHandler(EntityHookShot.class, new IRenderFactory<EntityHookShot>() {
+			@Override
+			public Render<? super EntityHookShot> createRenderFor(RenderManager manager) {
+				return new RenderHookShot(manager);
+			}
+		});
+		
 		ResourceLocation variants[] = new ResourceLocation[ReagentType.values().length];
 		int i = 0;
 		for (ReagentType type : ReagentType.values()) {
@@ -360,6 +371,15 @@ public class ClientProxy extends CommonProxy {
     	
     	ModelBakery.registerItemVariants(Item.getItemFromBlock(SwitchBlock.instance()),
     			new ResourceLocation(NostrumMagica.MODID, SwitchBlock.ID));
+    	
+    	list = new LinkedList<>();
+    	for (HookshotType type : HookshotType.values()) {
+    		list.add(new ResourceLocation(NostrumMagica.MODID, HookshotItem.ID + "_" + HookshotItem.GetTypeSuffix(type)));
+    		list.add(new ResourceLocation(NostrumMagica.MODID, HookshotItem.ID + "_" + HookshotItem.GetTypeSuffix(type) + "_extended"));
+    	}
+    	
+    	variants = list.toArray(new ResourceLocation[0]);
+    	ModelBakery.registerItemVariants(HookshotItem.instance(), variants);
     	
     	TileEntitySymbolRenderer.init();
     	TileEntityCandleRenderer.init();
@@ -578,6 +598,14 @@ public class ClientProxy extends CommonProxy {
 				EssenceItem.instance()
 				);
 		
+		for (HookshotType type : HookshotType.values()) {
+			registerModel(HookshotItem.instance(),
+					HookshotItem.MakeMeta(type, true),
+					HookshotItem.ID + "_" + HookshotItem.GetTypeSuffix(type));
+			registerModel(HookshotItem.instance(),
+					HookshotItem.MakeMeta(type, false),
+					HookshotItem.ID + "_" + HookshotItem.GetTypeSuffix(type));
+		}
 	}
 	
 	@Override

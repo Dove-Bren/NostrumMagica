@@ -239,6 +239,22 @@
         [
             "nostrummagica:entity/dragon/death1"
         ]
+    },
+    
+    "item.hookshot.shoot":
+    {
+        "sounds":
+        [
+            "nostrummagica:items/hookshot_fire"
+        ]
+    },
+    
+    "item.hookshot.tick":
+    {
+        "sounds":
+        [
+            "nostrummagica:items/hookshot_tick"
+        ]
     }
     
 }

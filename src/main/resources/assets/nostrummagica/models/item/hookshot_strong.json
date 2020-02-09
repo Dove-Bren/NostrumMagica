@@ -1,0 +1,14 @@
+{
+    "parent": "item/handheld",
+    "textures": {
+        "layer0": "nostrummagica:items/hookshot_strong"
+    },
+    "overrides": [
+        {
+            "predicate": {
+                "extended": 1
+            },
+            "model": "nostrummagica:item/hookshot_strong_extended"
+        }
+    ]
+}
