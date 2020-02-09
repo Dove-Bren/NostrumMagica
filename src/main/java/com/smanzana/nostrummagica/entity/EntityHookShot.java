@@ -23,6 +23,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -294,10 +295,10 @@ public class EntityHookShot extends Entity {
 		}
 		
 		EntityLivingBase caster = getCaster();
-		if (result.entityHit != null && result.entityHit instanceof EntityLivingBase && (caster == null || caster != result.entityHit)) {
+		if (result.typeOfHit == Type.ENTITY && result.entityHit != null && result.entityHit instanceof EntityLivingBase && (caster == null || caster != result.entityHit)) {
 			tickHooked = this.ticksExisted;
 			setHookedEntity((EntityLivingBase) result.entityHit);
-		} else if (result.hitVec != null) {
+		} else if (result.typeOfHit == Type.BLOCK) {
 			// Make sure type of hookshot supports material
 			if (type == HookshotType.WEAK) {
 				IBlockState state = worldObj.getBlockState(result.getBlockPos());

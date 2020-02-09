@@ -452,6 +452,8 @@ info.tamed_dragon.red_bond.ride=Your bond with the tamed dragon has increased si
 info.tamed_dragon.red_bond.magic=The tamed dragon trusts you nearly completely. You now have the ability to manage how your dragon uses magic!
 info.tamed_dragon.red_bond.full=The tamed dragon is now fully bonded with you!
 
+info.hookshot.bad_dim=The mechanisms seem to have trouble working in this atmosphere...
+
 gambit.always.name=Always
 gambit.always.desc=Dragon will%1$s always%2$s try to use this spell.|Only passed if dragon doesn't have enough mana
 gambit.health_critical.name=Critical Health

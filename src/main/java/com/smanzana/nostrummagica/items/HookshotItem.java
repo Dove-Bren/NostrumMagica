@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityHookShot;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -28,6 +29,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -127,12 +129,16 @@ public class HookshotItem extends Item implements ILoreTagged {
 			if (IsExtended(itemStackIn)) {
 				ClearHookEntity(worldIn, itemStackIn);
 			} else {
-				EntityHookShot hook = new EntityHookShot(worldIn, playerIn, getMaxDistance(itemStackIn), 
-						ProjectileTrigger.getVectorForRotation(playerIn.rotationPitch, playerIn.rotationYaw).scale(getVelocity(itemStackIn)),
-						TypeFromMeta(itemStackIn.getMetadata()));
-				worldIn.spawnEntityInWorld(hook);
-				SetHook(itemStackIn, hook);
-				NostrumMagicaSounds.HOOKSHOT_FIRE.play(worldIn, playerIn.posX, playerIn.posY, playerIn.posZ);
+				if (playerIn.dimension == ModConfig.config.sorceryDimensionIndex()) {
+					playerIn.addChatComponentMessage(new TextComponentTranslation("info.hookshot.bad_dim"));
+				} else {
+					EntityHookShot hook = new EntityHookShot(worldIn, playerIn, getMaxDistance(itemStackIn), 
+							ProjectileTrigger.getVectorForRotation(playerIn.rotationPitch, playerIn.rotationYaw).scale(getVelocity(itemStackIn)),
+							TypeFromMeta(itemStackIn.getMetadata()));
+					worldIn.spawnEntityInWorld(hook);
+					SetHook(itemStackIn, hook);
+					NostrumMagicaSounds.HOOKSHOT_FIRE.play(worldIn, playerIn.posX, playerIn.posY, playerIn.posZ);
+				}
 			}
 		}
 		
