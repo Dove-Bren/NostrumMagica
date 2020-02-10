@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 
@@ -277,6 +278,7 @@ public class NostrumEmptyDimension {
 			player.rotationYaw = EnumFacing.NORTH.getHorizontalAngle();
 			player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 2, spawn.getZ() + .5);
 			player.motionX = player.motionY = player.motionZ = 0;
+			player.setSpawnChunk(spawn.up(2), true, ModConfig.config.sorceryDimensionIndex());
 			return true;
 		}
 		
@@ -341,6 +343,10 @@ public class NostrumEmptyDimension {
 			
 			if (pos == null) {
 				pos = world.getSpawnPoint();
+			}
+			
+			while (pos.getY() < world.provider.getActualHeight() && (!world.isAirBlock(pos) || !world.isAirBlock(pos.up()))) {
+				pos = pos.up();
 			}
 			
 			if (entityIn instanceof EntityPlayerMP) {

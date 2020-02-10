@@ -296,6 +296,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 			player.lastTickPosX = player.posX;
 			player.lastTickPosY = player.posY;
 			player.lastTickPosZ = player.posZ;
+			player.fallDistance = 0;
 			return true;
 		}
 		

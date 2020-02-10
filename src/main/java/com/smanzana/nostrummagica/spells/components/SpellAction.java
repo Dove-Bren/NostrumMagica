@@ -407,6 +407,7 @@ public class SpellAction {
 			
 			if (dest != null) {
 				entity.setPositionAndUpdate(.5 + Math.floor(dest.xCoord), Math.floor(dest.yCoord), .5 + Math.floor(dest.zCoord));
+				entity.fallDistance = 0;
 				NostrumMagicaSounds.STATUS_BUFF1.play(entity);
 			}
 		}
@@ -967,11 +968,15 @@ public class SpellAction {
 				entity.setPositionAndRotation(pos.xCoord, pos.yCoord, pos.zCoord, yaw, pitch);
 			}
 			
+			entity.fallDistance = 0;
+			caster.fallDistance = 0;
+			
 		}
 		
 		@Override
 		public void apply(EntityLivingBase caster, World world, BlockPos pos, float efficiency) {
 			caster.setPositionAndUpdate(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
+			caster.fallDistance = 0;
 		}
 	}
 	
