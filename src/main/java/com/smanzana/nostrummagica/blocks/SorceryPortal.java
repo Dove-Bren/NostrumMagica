@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.blocks;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.config.ModConfig;
 
 import net.minecraft.block.ITileEntityProvider;
@@ -63,6 +64,24 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 		System.out.println("Teleport!");
 		entityIn.setPortal(entityIn.getPosition());
 		if (worldIn.provider.getDimension() != ModConfig.config.sorceryDimensionIndex()) {
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(entityIn);
+			if (attr != null) {
+				// Find bottom block
+				BlockPos bottomBlock = portalPos;
+				if (worldIn.getBlockState(portalPos.down()).getBlock() instanceof SorceryPortal) {
+					bottomBlock = portalPos.down();
+				}
+				
+				// Try to use a block next to the portal
+				BlockPos savedPos = bottomBlock;
+				for (BlockPos pos : new BlockPos[]{bottomBlock.north(), bottomBlock.south(), bottomBlock.east(), bottomBlock.west()}) {
+					if (worldIn.isAirBlock(pos) && worldIn.isAirBlock(pos.up())) {
+						savedPos = pos;
+						break;
+					}
+				}
+				attr.setSorceryPortalLocation(entityIn.dimension, new BlockPos(savedPos));
+			}
 			entityIn.changeDimension(ModConfig.config.sorceryDimensionIndex());
 		} else {
 			entityIn.changeDimension(0);

@@ -147,4 +147,10 @@ public interface INostrumMagic {
 	public boolean hasKnowledge(EMagicElement element, EAlteration alteration);
 	public void setKnowledge(EMagicElement element, EAlteration alteration);
 	public Map<EMagicElement, Map<EAlteration, Boolean>> getSpellKnowledge();
+	
+	// Sorcery Portal
+	public int getSorceryPortalDimension();
+	public BlockPos getSorceryPortalPos();
+	public void clearSorceryPortal();
+	public void setSorceryPortalLocation(int dimension, BlockPos pos);
 }

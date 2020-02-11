@@ -93,6 +93,8 @@ public class NostrumMagic implements INostrumMagic {
 	private BlockPos markLocation;
 	private int markDimension;
 	private Map<EMagicElement, Map<EAlteration, Boolean>> spellKnowledge;
+	private int sorceryPortalDim;
+	private BlockPos sorceryPortalPos;
 	
 	private EntityLivingBase entity;
 	
@@ -113,6 +115,8 @@ public class NostrumMagic implements INostrumMagic {
 		bindingSpell = null;
 		bindingComponent = null;
 		familiars = new LinkedList<>();
+		sorceryPortalDim = 0;
+		sorceryPortalPos = null;
 	}
 
 	@Override
@@ -776,5 +780,26 @@ public class NostrumMagic implements INostrumMagic {
 	@Override
 	public Map<EMagicElement, Map<EAlteration, Boolean>> getSpellKnowledge() {
 		return this.spellKnowledge;
+	}
+	
+	@Override
+	public int getSorceryPortalDimension() {
+		return this.sorceryPortalDim;
+	}
+	
+	@Override
+	public BlockPos getSorceryPortalPos() {
+		return this.sorceryPortalPos;
+	}
+	
+	@Override
+	public void clearSorceryPortal() {
+		this.sorceryPortalPos = null;
+	}
+	
+	@Override
+	public void setSorceryPortalLocation(int dimension, BlockPos pos) {
+		this.sorceryPortalDim = dimension;
+		this.sorceryPortalPos = pos;
 	}
 }

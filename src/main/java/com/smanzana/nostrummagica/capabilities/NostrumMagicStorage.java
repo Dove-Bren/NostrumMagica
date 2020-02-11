@@ -65,6 +65,9 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	
 	private static final String NBT_SPELLKNOWLEDGE = "spell_knowledge";
 	
+	private static final String NBT_SORCERYPORTAL_DIM = "sorcery_portal_dim";
+	private static final String NBT_SORCERYPORTAL_POS = "sorcery_portal_pos";
+	
 	@Override
 	public NBTBase writeNBT(Capability<INostrumMagic> capability, INostrumMagic instance, EnumFacing side) {
 		NBTTagCompound nbt = new NBTTagCompound();
@@ -212,6 +215,11 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			compound.setTag(elem.name(), subtag);
 		}
 		nbt.setTag(NBT_SPELLKNOWLEDGE, compound);
+		
+		if (instance.getSorceryPortalPos() != null) {
+			nbt.setInteger(NBT_SORCERYPORTAL_DIM, instance.getSorceryPortalDimension());
+			nbt.setLong(NBT_SORCERYPORTAL_POS, instance.getSorceryPortalPos().toLong());
+		}
 		
 		return nbt;
 	}
@@ -378,6 +386,12 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 					continue;
 				}
 			}
+		}
+		
+		if (tag.hasKey(NBT_SORCERYPORTAL_POS)) {
+			instance.setSorceryPortalLocation(
+					tag.getInteger(NBT_SORCERYPORTAL_DIM),
+					BlockPos.fromLong(tag.getLong(NBT_SORCERYPORTAL_POS)));
 		}
 	}
 

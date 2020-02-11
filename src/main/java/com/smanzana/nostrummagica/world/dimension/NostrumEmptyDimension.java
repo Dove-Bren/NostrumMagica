@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
@@ -336,9 +337,16 @@ public class NostrumEmptyDimension {
 		@Override
 		public boolean placeInExistingPortal(Entity entityIn, float yaw) {
 			BlockPos pos = null;
-			if (entityIn instanceof EntityPlayer) {
+			
+			if (NostrumMagica.getMagicWrapper(entityIn) != null) {
+				INostrumMagic attr = NostrumMagica.getMagicWrapper(entityIn);
+				pos = attr.getSorceryPortalPos();
+				attr.clearSorceryPortal();
+			}
+			
+			if (pos == null && entityIn instanceof EntityPlayer) {
 				EntityPlayer player = (EntityPlayer) entityIn;
-				pos = player.getBedLocation(0);
+				pos = player.getBedLocation(world.provider.getDimension());
 			}
 			
 			if (pos == null) {
@@ -441,8 +449,16 @@ public class NostrumEmptyDimension {
 					EntityPlayerMP player = (EntityPlayerMP) ent;
 					MinecraftServer server = player.getServer();
 					teleportingMarker.put(player.getPersistentID(), true);
+					
+					int toDim = 0;
+					if (NostrumMagica.getMagicWrapper(player) != null) {
+						INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+						if (attr.getSorceryPortalPos() != null) {
+							toDim = attr.getSorceryPortalDimension();
+						}
+					}
 					server.getPlayerList().transferPlayerToDimension(
-							player, event.getDimension(), new DimensionReturnTeleporter(server.worldServerForDimension(event.getDimension())));
+							player, toDim, new DimensionReturnTeleporter(server.worldServerForDimension(toDim)));
 					teleportingMarker.put(player.getPersistentID(), false);
 				}
 			}
