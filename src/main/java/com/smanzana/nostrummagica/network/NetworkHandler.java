@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.network.messages.ClientEffectRenderMessage;
 import com.smanzana.nostrummagica.network.messages.ClientSkillUpMessage;
 import com.smanzana.nostrummagica.network.messages.ClientUpdateQuestMessage;
 import com.smanzana.nostrummagica.network.messages.LoreMessage;
+import com.smanzana.nostrummagica.network.messages.MagicEffectUpdate;
 import com.smanzana.nostrummagica.network.messages.ManaMessage;
 import com.smanzana.nostrummagica.network.messages.ModifyMessage;
 import com.smanzana.nostrummagica.network.messages.ObeliskTeleportationRequestMessage;
@@ -74,6 +75,7 @@ public class NetworkHandler {
 		syncChannel.registerMessage(TamedDragonGUIControlMessage.Handler.class, TamedDragonGUIControlMessage.class, discriminator++, Side.SERVER);
 		syncChannel.registerMessage(TamedDragonGUIOpenMessage.Handler.class, TamedDragonGUIOpenMessage.class, discriminator++, Side.CLIENT);
 		syncChannel.registerMessage(TamedDragonGUISyncMessage.Handler.class, TamedDragonGUISyncMessage.class, discriminator++, Side.CLIENT);
+		syncChannel.registerMessage(MagicEffectUpdate.Handler.class, MagicEffectUpdate.class, discriminator++, Side.CLIENT);
 	}
 	
 }

@@ -7,6 +7,8 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.ITameDragon;
+import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
+import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.block.material.Material;
@@ -36,6 +38,9 @@ public class OverlayRenderer extends Gui {
 	private static final int GUI_BAR_OFFSETX = 96;
 	private static final int GUI_WING_OFFSETY = 37;
 	private static final int GUI_WING_SIZE = 20;
+	private static final int GUI_SHIELD_PHYS_OFFSETX = 45;
+	private static final int GUI_SHIELD_MAG_OFFSETX = 63;
+	private static final int GUI_SHIELD_OFFSETY = 17;
 	
 	private int wiggleIndex; // set to multiples of 12 for each wiggle
 	private static final int wiggleOffsets[] = {0, 1, 1, 2, 1, 1, 0, -1, -1, -2, -1, -1};
@@ -76,10 +81,13 @@ public class OverlayRenderer extends Gui {
 			if (ModConfig.config.displayManaBar()) {
 				renderManaBar(player, scaledRes, attr);
 			}
-			
 		} else if (event.getType() == ElementType.ARMOR) {
 			if (ModConfig.config.displayArmorOverlay()) {
 				renderArmorOverlay(player, scaledRes);
+			}
+		} else if (event.getType() == ElementType.FOOD) {
+			if (ModConfig.config.displayShieldHearts()) {
+				renderShieldOverlay(player, scaledRes);
 			}
 		}
 		
@@ -352,6 +360,62 @@ public class OverlayRenderer extends Gui {
         GlStateManager.color(1f, 1f, 1f, 1f);
 		GlStateManager.disableBlend();
 		GlStateManager.popMatrix();
+	}
+	
+	private void renderShieldOverlay(EntityPlayerSP player, ScaledResolution scaledRes) {
+		double physical = 0;
+		double magical = 0;
+		EffectData data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.SHIELD_PHYSICAL);
+		if (data != null) {
+			physical = data.getAmt();
+		}
+		data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.SHIELD_MAGIC);
+		if (data != null) {
+			magical = data.getAmt();
+		}
+		
+		// Clone calc of left y offset, since it's not passed through
+		int left_height = 39;
+        int left = scaledRes.getScaledWidth() / 2 - 91;
+        int top = scaledRes.getScaledHeight() - left_height;
+        int whole = (int) Math.ceil(physical) / 2;
+        boolean half = Math.ceil(physical) % 2 == 1;
+        
+        if (physical > 0 || magical > 0) {
+	        GlStateManager.pushMatrix();
+			GlStateManager.enableBlend();
+			GlStateManager.color(1f, 1f, 1f, 1f);
+			Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_ICONS);
+			
+	        for (int i = 0; i < whole; i++)
+	        {
+	            drawTexturedModalRect(left, top, GUI_SHIELD_PHYS_OFFSETX, GUI_SHIELD_OFFSETY, 9, 9);
+	            left += 8;
+	        }
+	        
+	        if (half) {
+	        	drawTexturedModalRect(left, top, GUI_SHIELD_PHYS_OFFSETX + 9, GUI_SHIELD_OFFSETY, 5, 9);
+	        }
+	        
+	        // Repeat for magic
+	        whole = (int) Math.ceil(magical) / 2;
+	        half = Math.ceil(magical) % 2 == 1;
+	        left = scaledRes.getScaledWidth() / 2 - 91;
+	        
+	        for (int i = 0; i < whole; i++)
+	        {
+	            drawTexturedModalRect(left, top, GUI_SHIELD_MAG_OFFSETX, GUI_SHIELD_OFFSETY, 9, 9);
+	            left += 8;
+	        }
+	        
+	        if (half) {
+	        	drawTexturedModalRect(left, top, GUI_SHIELD_MAG_OFFSETX + 9, GUI_SHIELD_OFFSETY, 5, 9);
+	        }
+			
+	        GlStateManager.color(1f, 1f, 1f, 1f);
+			GlStateManager.disableBlend();
+			GlStateManager.popMatrix();
+        }
 	}
 	
 	public void startManaWiggle(int wiggleCount) {

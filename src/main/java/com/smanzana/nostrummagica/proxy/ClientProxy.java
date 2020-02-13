@@ -106,6 +106,8 @@ import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
+import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.items.SeekerIdol;
 import com.smanzana.nostrummagica.items.ShrineSeekingGem;
@@ -1387,6 +1389,11 @@ public class ClientProxy extends CommonProxy {
 				targetPos = new Vec3d(0, 0, 0);
 		
 		this.effectRenderer.spawnEffect(comp, caster, casterPos, target, targetPos, flavor);
+	}
+	
+	@Override
+	public void updatePlayerEffect(EntityPlayerMP player, SpecialEffect effectType, EffectData data) {
+		return;
 	}
 	
 	private static boolean shownText = false;

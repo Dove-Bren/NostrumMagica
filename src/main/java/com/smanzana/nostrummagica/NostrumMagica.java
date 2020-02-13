@@ -1746,6 +1746,8 @@ public class NostrumMagica
     		serverDimensionMapper = null;
     	}
     	
+    	magicEffectProxy.clearAll();
+    	
     	// Reset portal data so previous saves don't screw you over
     	NostrumPortal.resetTimers();
     }

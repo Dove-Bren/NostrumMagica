@@ -99,9 +99,12 @@ import com.smanzana.nostrummagica.items.SpellcraftGuide;
 import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.items.ThanosStaff;
 import com.smanzana.nostrummagica.items.WarlockSword;
+import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
+import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientEffectRenderMessage;
+import com.smanzana.nostrummagica.network.messages.MagicEffectUpdate;
 import com.smanzana.nostrummagica.network.messages.SpellDebugMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
@@ -665,6 +668,12 @@ public class CommonProxy {
     			player);
     	NetworkHandler.getSyncChannel().sendTo(
     			new SpellRequestReplyMessage(NostrumMagica.getSpellRegistry().getAllSpells(), true),
+    			player);
+    }
+    
+    public void updatePlayerEffect(EntityPlayerMP player, SpecialEffect effectType, EffectData data) {
+    	NetworkHandler.getSyncChannel().sendTo(
+    			new MagicEffectUpdate(effectType, data),
     			player);
     }
 
