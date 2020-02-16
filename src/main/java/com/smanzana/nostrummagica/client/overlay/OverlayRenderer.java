@@ -2,26 +2,35 @@ package com.smanzana.nostrummagica.client.overlay;
 
 import java.util.Collection;
 
+import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.ITameDragon;
+import com.smanzana.nostrummagica.items.HookshotItem;
+import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.common.ForgeHooks;
@@ -41,6 +50,8 @@ public class OverlayRenderer extends Gui {
 	private static final int GUI_SHIELD_PHYS_OFFSETX = 45;
 	private static final int GUI_SHIELD_MAG_OFFSETX = 63;
 	private static final int GUI_SHIELD_OFFSETY = 17;
+	private static final int GUI_HOOKSHOT_CROSSHAIR_OFFSETX = 82;
+	private static final int GUI_HOOKSHOT_CROSSHAIR_WIDTH = 10;
 	
 	private int wiggleIndex; // set to multiples of 12 for each wiggle
 	private static final int wiggleOffsets[] = {0, 1, 1, 2, 1, 1, 0, -1, -1, -2, -1, -1};
@@ -52,6 +63,56 @@ public class OverlayRenderer extends Gui {
 		MinecraftForge.EVENT_BUS.register(this);
 		wiggleIndex = 0;
 		wingIndex = 0;
+	}
+	
+	@SubscribeEvent
+	public void onRender(RenderGameOverlayEvent.Pre event) {
+		EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+		ScaledResolution scaledRes = event.getResolution();
+		
+		if (event.getType() == ElementType.CROSSHAIRS) {
+			if (ModConfig.config.displayHookshotCrosshair()) {
+				ItemStack hookshot = player.getHeldItemMainhand();
+				if (hookshot == null || !(hookshot.getItem() instanceof HookshotItem)) {
+					hookshot = player.getHeldItemOffhand();
+				}
+				
+				if (hookshot == null || !(hookshot.getItem() instanceof HookshotItem)) {
+					return;
+				}
+				
+				HookshotType type = HookshotItem.GetType(hookshot);
+				RayTraceResult result = RayTrace.raytrace(player.worldObj, player.getPositionEyes(event.getPartialTicks()),
+						player.rotationPitch, player.rotationYaw, (float) HookshotItem.GetMaxDistance(type),
+						new Predicate<Entity>() {
+
+							@Override
+							public boolean apply(Entity arg0) {
+								return arg0 != null && arg0 != player && HookshotItem.CanBeHooked(type, arg0);
+							}
+					
+				});
+				
+				if (result != null) {
+					boolean hit = false;
+					if (result.typeOfHit == Type.ENTITY) {
+						// Already filtered in raytrace predicate
+						hit = true;
+					} else if (result.typeOfHit == Type.BLOCK) {
+						IBlockState state = player.worldObj.getBlockState(result.getBlockPos());
+						if (state != null && HookshotItem.CanBeHooked(type, state)) {
+							hit = true;
+						}
+					}
+					
+					if (hit) {
+						event.setCanceled(true);
+						renderHookshotCrosshair(player, scaledRes);
+					}
+				}
+				
+			}
+		}
 	}
 	
 	@SubscribeEvent
@@ -416,6 +477,38 @@ public class OverlayRenderer extends Gui {
 			GlStateManager.disableBlend();
 			GlStateManager.popMatrix();
         }
+	}
+	
+	private void renderHookshotCrosshair(EntityPlayerSP player, ScaledResolution scaledResolution) {
+		GlStateManager.pushMatrix();
+		GlStateManager.enableBlend();
+		GlStateManager.color(.7f, .7f, .7f, .7f);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_ICONS);
+		
+		final int period = 30;
+		final float frac = (float) (player.worldObj.getTotalWorldTime() % period) / period;
+		final double radius = 6.0 + 2.0 * (Math.sin(frac * Math.PI * 2));
+		
+		final float rotOffset = 360.0f * ((float) (player.worldObj.getTotalWorldTime() % period) / period);
+		float rot;
+		
+		for (int i = 0; i < 3; i++) {
+			rot = rotOffset + (360.0f / 3) * i;
+			GlStateManager.pushMatrix();
+			GlStateManager.translate(scaledResolution.getScaledWidth() / 2, scaledResolution.getScaledHeight() / 2, 0);
+			
+			GlStateManager.rotate(rot, 0, 0, 1);
+			GlStateManager.translate(0, -radius, 0);
+			GlStateManager.translate(-GUI_HOOKSHOT_CROSSHAIR_WIDTH / 2, -GUI_HOOKSHOT_CROSSHAIR_WIDTH, 0);
+			
+			drawTexturedModalRect(0, 0,
+					GUI_HOOKSHOT_CROSSHAIR_OFFSETX, 0, GUI_HOOKSHOT_CROSSHAIR_WIDTH, GUI_HOOKSHOT_CROSSHAIR_WIDTH);
+			
+			GlStateManager.popMatrix();
+		}
+		
+		GlStateManager.disableBlend();
+		GlStateManager.popMatrix();
 	}
 	
 	public void startManaWiggle(int wiggleCount) {

@@ -117,7 +117,7 @@ public class RayTrace {
         {
             public boolean apply(Entity p_apply_1_)
             {
-                return p_apply_1_.canBeCollidedWith() && selector.apply(p_apply_1_);
+                return p_apply_1_.canBeCollidedWith() && (selector == null || selector.apply(p_apply_1_));
             }
         }));
         // d2 is current closest distance

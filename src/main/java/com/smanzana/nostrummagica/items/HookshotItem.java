@@ -14,6 +14,8 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
@@ -99,7 +101,7 @@ public class HookshotItem extends Item implements ILoreTagged {
 			return;
 		}
 		
-		stack.setItemDamage(MakeMeta(TypeFromMeta(stack.getMetadata()), extended));
+		stack.setItemDamage(MakeMeta(GetType(stack), extended));
 	}
 	
 	@Override
@@ -147,6 +149,14 @@ public class HookshotItem extends Item implements ILoreTagged {
 	
 	public int getMetadata(int damage) {
 		return damage;
+	}
+	
+	public static HookshotType GetType(ItemStack stack) {
+		if (stack == null) {
+			return HookshotType.WEAK;
+		}
+		
+		return TypeFromMeta(stack.getMetadata());
 	}
 	
 	protected static HookshotType TypeFromMeta(int meta) {
@@ -254,11 +264,15 @@ public class HookshotItem extends Item implements ILoreTagged {
 	}
 	
 	protected float getVelocity(ItemStack stack) {
-		return 1f;
+		return GetVelocity(GetType(stack));
 	}
 	
 	protected double getMaxDistance(ItemStack stack) {
-		switch (TypeFromMeta(stack.getMetadata())) {
+		return GetMaxDistance(GetType(stack));
+	}
+	
+	public static double GetMaxDistance(HookshotType type) {
+		switch (type) {
 		case WEAK:
 		default:
 			return 20.0;
@@ -267,6 +281,10 @@ public class HookshotItem extends Item implements ILoreTagged {
 		case STRONG:
 			return 50.0;
 		}
+	}
+	
+	public static float GetVelocity(HookshotType type) {
+		return 1f;
 	}
 	
 	@Override
@@ -279,6 +297,29 @@ public class HookshotItem extends Item implements ILoreTagged {
 	
 	public static String GetTypeSuffix(HookshotType type) {
 		return type.name().toLowerCase();
+	}
+	
+	public static boolean CanBeHooked(HookshotType type, IBlockState blockState) {
+		switch(type) {
+		case STRONG:
+			return true;
+		case MEDIUM:
+			if (blockState.getMaterial().getCanBurn()) {
+				return true;
+			}
+			// fall through
+		case WEAK:
+			if (blockState.getMaterial() == Material.WOOD) {
+				return true;
+			}
+			break;
+		}
+		
+		return false;
+	}
+	
+	public static boolean CanBeHooked(HookshotType type, Entity entity) {
+		return entity instanceof EntityLivingBase;
 	}
 	
 	@Override

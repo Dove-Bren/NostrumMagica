@@ -36,6 +36,7 @@ public class ModConfig {
 		MIRROR_NODE_SPOILERS(Category.DISPLAY, "display_mirror_spoilers", false, false, "If true, show ALL magic mirror upgrades regardless of proximity"),
 		ARMOR_DISPLAY(Category.DISPLAY, "overarmor_display", true, false, "Enable displaying armor overlay when armor is > 20 units"),
 		DISPLAY_SHIELDS(Category.DISPLAY, "shield_display", true, false, "Show magical shield overlay on hearts"),
+		DISPLAY_HOOKSHOT_CROSSHAIR(Category.DISPLAY, "hookshot_crosshair", true, false, "Show special crosshair with the hookshot"),
 		
 		LOGIN_TEXT(Category.DISPLAY, "display_login_text", true, false, "On login, show Nostrum Magica welcome text"),
 		
@@ -456,5 +457,9 @@ public class ModConfig {
 
 	public boolean displayShieldHearts() {
 		return getBooleanValue(Key.DISPLAY_SHIELDS, false);
+	}
+	
+	public boolean displayHookshotCrosshair() {
+		return getBooleanValue(Key.DISPLAY_HOOKSHOT_CROSSHAIR, false);
 	}
 }

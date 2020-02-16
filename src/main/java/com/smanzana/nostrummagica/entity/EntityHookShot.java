@@ -7,10 +7,10 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Optional;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.items.HookshotItem;
 import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -256,7 +256,7 @@ public class EntityHookShot extends Entity {
 					}
 					
 					if (caster != null) {
-						if ((ticksExisted - tickHooked) > 2 && caster.onGround) {
+						if ((ticksExisted - tickHooked) > 6 && caster.onGround) {
 							this.setDead();
 							return;
 						}
@@ -295,25 +295,17 @@ public class EntityHookShot extends Entity {
 		}
 		
 		EntityLivingBase caster = getCaster();
-		if (result.typeOfHit == Type.ENTITY && result.entityHit != null && result.entityHit instanceof EntityLivingBase && (caster == null || caster != result.entityHit)) {
+		if (result.typeOfHit == Type.ENTITY && result.entityHit != null && HookshotItem.CanBeHooked(type, result.entityHit) && (caster == null || caster != result.entityHit)) {
 			tickHooked = this.ticksExisted;
 			setHookedEntity((EntityLivingBase) result.entityHit);
 		} else if (result.typeOfHit == Type.BLOCK) {
 			// Make sure type of hookshot supports material
-			if (type == HookshotType.WEAK) {
-				IBlockState state = worldObj.getBlockState(result.getBlockPos());
-				if (state == null || state.getMaterial() != Material.WOOD) {
-					this.setDead();
-					return;
-				}
+			IBlockState state = worldObj.getBlockState(result.getBlockPos());
+			if (state == null || !HookshotItem.CanBeHooked(type, state)) {
+				this.setDead();
+				return;
 			}
-			if (type == HookshotType.MEDIUM) {
-				IBlockState state = worldObj.getBlockState(result.getBlockPos());
-				if (state == null || (state.getMaterial() != Material.WOOD && !state.getMaterial().getCanBurn())) {
-					this.setDead();
-					return;
-				}
-			}
+			
 			tickHooked = this.ticksExisted;
 			this.setPositionAndUpdate(result.hitVec.xCoord, result.hitVec.yCoord, result.hitVec.zCoord);
 			setHookedInPlace();
