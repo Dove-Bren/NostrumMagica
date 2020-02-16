@@ -124,8 +124,16 @@ public class RitualRecipe {
 	}
 	
 	public boolean matches(EntityPlayer player, World world, BlockPos center, EMagicElement element) {
-		if (element != this.element)
+		if (element == null) {
+			element = EMagicElement.PHYSICAL;
+		}
+		
+		// Do null matching with physical
+		if (element == EMagicElement.PHYSICAL && (this.element != null && this.element != EMagicElement.PHYSICAL)) {
 			return false;
+		} else if (element != this.element) {
+			return false;
+		}
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
