@@ -1032,7 +1032,7 @@ public class NostrumMagica
 			
 			RitualRegistry.instance().addRitual(
 					RitualRecipe.createTier3(name,
-						outcome, elem,
+						outcome, elem == EMagicElement.PHYSICAL ? null : elem,
 						new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.MANI_DUST, ReagentType.MANI_DUST},
 						input,
 						new ItemStack[] {essence, gem, essence, essence},
