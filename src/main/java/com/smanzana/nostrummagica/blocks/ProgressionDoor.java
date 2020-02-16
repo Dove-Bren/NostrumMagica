@@ -205,9 +205,9 @@ public class ProgressionDoor extends NostrumMagicDoor {
 			this.requiredComponents.clear();
 			
 			NBTTagList list = compound.getTagList(NBT_COMPS, NBT.TAG_STRING);
-			while (!list.hasNoTags()) {
-				this.requiredComponents.add(SpellComponentWrapper.fromKeyString(list.getStringTagAt(0)));
-				list.removeTag(0);
+			int count = list.tagCount();
+			for (int i = 0; i < count; i++) {
+				this.requiredComponents.add(SpellComponentWrapper.fromKeyString(list.getStringTagAt(i)));
 			}
 		}
 		

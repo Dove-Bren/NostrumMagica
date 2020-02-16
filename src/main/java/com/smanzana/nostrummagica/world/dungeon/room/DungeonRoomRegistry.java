@@ -217,8 +217,10 @@ public class DungeonRoomRegistry {
 		
 		List<String> tags = new LinkedList<>();
 		NBTTagList list = nbt.getTagList(NBT_TAGS, NBT.TAG_STRING);
-		while (!list.hasNoTags()) {
-			tags.add(((NBTTagString) list.removeTag(0)).getString());
+		
+		int tagCount = list.tagCount();
+		for (int i = 0; i < tagCount; i++) {
+			tags.add(list.getStringTagAt(i));
 		}
 		
 		if (doRegister) {

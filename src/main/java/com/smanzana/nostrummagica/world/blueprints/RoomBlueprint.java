@@ -195,7 +195,7 @@ public class RoomBlueprint {
 				
 				world.setBlockState(at, placeState, 2);
 				if (tileEntityData != null) {
-					TileEntity te = TileEntity.create(world, tileEntityData);
+					TileEntity te = TileEntity.create(world, tileEntityData.copy());
 					world.setTileEntity(at, te);
 				}
 			} else {
@@ -702,8 +702,9 @@ public class RoomBlueprint {
 			
 			list = nbt.getTagList(NBT_DOOR_LIST, NBT.TAG_COMPOUND);
 			doors = new HashSet<>();
-			while (!list.hasNoTags()) {
-				NBTTagCompound tag = (NBTTagCompound) list.removeTag(0);
+			int listCount = list.tagCount();
+			for (int i = 0; i < listCount; i++) {
+				NBTTagCompound tag = (NBTTagCompound) list.getCompoundTagAt(i);
 				doors.add(DungeonExitPoint.fromNBT(tag));
 			}
 			
@@ -784,8 +785,10 @@ public class RoomBlueprint {
 			
 			NBTTagList doorList = nbt.getTagList(NBT_DOOR_LIST, NBT.TAG_COMPOUND);
 			doors = new HashSet<>();
-			while (!doorList.hasNoTags()) {
-				NBTTagCompound tag = (NBTTagCompound) doorList.removeTag(0);
+			
+			int listCount = doorList.tagCount();
+			for (int i = 0; i < listCount; i++) {
+				NBTTagCompound tag = doorList.getCompoundTagAt(i);
 				doors.add(DungeonExitPoint.fromNBT(tag));
 			}
 			
