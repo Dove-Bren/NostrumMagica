@@ -181,8 +181,8 @@ public abstract class NostrumPortal extends Block  {
 		}
 		
 		Long lastTime = EntityTeleportTimes.get(entityIn.getPersistentID());
-		final long now = worldIn.getTotalWorldTime();
-		if (lastTime != null && (now - lastTime) < (20 * TELEPORT_COOLDOWN)) {
+		final long now = System.currentTimeMillis();
+		if (lastTime != null && (now - lastTime) < (1000 * TELEPORT_COOLDOWN)) {
 			// Teleported too recently
 			return;
 		}
@@ -197,7 +197,7 @@ public abstract class NostrumPortal extends Block  {
 	
 	public static int getRemainingCooldown(Entity ent) {
 		Long lastTime = EntityTeleportTimes.get(ent.getPersistentID());
-		return lastTime == null ? 0 : ((20 * TELEPORT_COOLDOWN) - (int) (ent.worldObj.getTotalWorldTime() - lastTime)); 
+		return lastTime == null ? 0 : ((1000 * TELEPORT_COOLDOWN) - (int) (System.currentTimeMillis() - lastTime)); 
 	}
 	
 	public static abstract class NostrumPortalTileEntityBase extends TileEntity {
