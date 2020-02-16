@@ -117,7 +117,7 @@ public class RayTrace {
         {
             public boolean apply(Entity p_apply_1_)
             {
-                return p_apply_1_.canBeCollidedWith() && (selector == null || selector.apply(p_apply_1_));
+                return !p_apply_1_.noClip && (selector == null || selector.apply(p_apply_1_));
             }
         }));
         // d2 is current closest distance
@@ -262,4 +262,58 @@ public class RayTrace {
 		return new RayTraceResult(in.hitVec, in.sideHit, in.getBlockPos());
 	}
 	
+	// Copy of ProjectileUtil method but with ability to collide with other misc entities
+	public static RayTraceResult forwardsRaycast(Entity projectile, boolean includeEntities, boolean ignoreCollideFlag, boolean shouldExclude, Entity maybeExcludedEntity){
+		double d0 = projectile.posX;
+		double d1 = projectile.posY;
+		double d2 = projectile.posZ;
+		double d3 = projectile.motionX;
+		double d4 = projectile.motionY;
+		double d5 = projectile.motionZ;
+		World world = projectile.worldObj;
+		Vec3d vec3d = new Vec3d(d0, d1, d2);
+		Vec3d vec3d1 = new Vec3d(d0 + d3, d1 + d4, d2 + d5);
+		RayTraceResult raytraceresult = world.rayTraceBlocks(vec3d, vec3d1, false, true, false);
+
+		if (includeEntities)
+		{
+			if (raytraceresult != null)
+			{
+				vec3d1 = new Vec3d(raytraceresult.hitVec.xCoord, raytraceresult.hitVec.yCoord, raytraceresult.hitVec.zCoord);
+			}
+
+			Entity entity = null;
+			List<Entity> list = world.getEntitiesWithinAABBExcludingEntity(projectile, projectile.getEntityBoundingBox().addCoord(d3, d4, d5).expandXyz(1.0D));
+			double d6 = 0.0D;
+
+			for (int i = 0; i < list.size(); ++i)
+			{
+				Entity entity1 = (Entity)list.get(i);
+
+				if ((ignoreCollideFlag || entity1.canBeCollidedWith()) && (shouldExclude || !entity1.isEntityEqual(maybeExcludedEntity)) && !entity1.noClip)
+				{
+					AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().expandXyz(0.30000001192092896D);
+					RayTraceResult raytraceresult1 = axisalignedbb.calculateIntercept(vec3d, vec3d1);
+
+					if (raytraceresult1 != null)
+					{
+						double d7 = vec3d.squareDistanceTo(raytraceresult1.hitVec);
+
+						if (d7 < d6 || d6 == 0.0D)
+						{
+							entity = entity1;
+							d6 = d7;
+						}
+					}
+				}
+			}
+
+			if (entity != null)
+			{
+				raytraceresult = new RayTraceResult(entity);
+			}
+		}
+
+		return raytraceresult;
+	}
 }

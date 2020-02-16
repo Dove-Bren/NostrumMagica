@@ -10,10 +10,12 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.HookshotItem;
 import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
@@ -41,6 +43,7 @@ public class EntityHookShot extends Entity {
 	// Sound and other mechanical cache stuff
 	private int tickHooked;
 	private Vec3d posLastPlayed;
+	private boolean isFetch; // Whether we're pulling them to us (or not)
 	
 	private static final String NBT_CASTER_ID = "caster_uuid";
 	private static final String NBT_ATTACHED_ID = "attached_uuid";
@@ -112,7 +115,7 @@ public class EntityHookShot extends Entity {
 		return this.maxLength;
 	}
 	
-	protected void setHookedEntity(EntityLivingBase entity) {
+	protected void setHookedEntity(Entity entity) {
 		this.dataManager.set(DATA_HOOKED_ENTITY, Optional.of(entity.getUniqueID()));
 		setHookedInPlace();
 	}
@@ -126,18 +129,16 @@ public class EntityHookShot extends Entity {
 	}
 	
 	@Nullable
-	public EntityLivingBase getHookedEntity() {
-		EntityLivingBase ret = null;
+	public Entity getHookedEntity() {
+		Entity ret = null;
 		
 		if (this.isHooked()) {
 			Optional<UUID> id = dataManager.get(DATA_HOOKED_ENTITY);
 			if (id.isPresent()) {
 				for (Entity ent : worldObj.loadedEntityList) {
-					if (ent instanceof EntityLivingBase) {
-						if (((EntityLivingBase) ent).getUniqueID().equals(id.get())) {
-							ret = (EntityLivingBase) ent;
-							break;
-						}
+					if (ent.getUniqueID().equals(id.get())) {
+						ret = ent;
+						break;
 					}
 				}
 			}
@@ -181,10 +182,9 @@ public class EntityHookShot extends Entity {
 		{
 			super.onUpdate();
 
-			RayTraceResult raytraceresult = ProjectileHelper.forwardsRaycast(this, true, this.ticksExisted >= 5, caster);
+			RayTraceResult raytraceresult = RayTrace.forwardsRaycast(this, true, true, this.ticksExisted >= 5, caster);
 
-			if (raytraceresult != null)
-			{
+			if (raytraceresult != null) {
 				this.onImpact(raytraceresult);
 			}
 
@@ -219,6 +219,101 @@ public class EntityHookShot extends Entity {
 		}
 	}
 	
+	protected void onHookedUpdate() {
+		EntityLivingBase caster = this.getCaster();
+		Entity attachedEntity = this.getHookedEntity();
+		if (attachedEntity != null) {
+			if (attachedEntity.isDead) {
+				this.isDead = true;
+				return;
+			}
+		}
+		
+		if (caster != null) {
+			final double dist = caster.getDistanceSqToEntity(this);
+			if (dist < 8) {
+				this.setDead();
+				return;
+			}
+		}
+		
+		this.motionX = this.motionY = this.motionZ = 0;
+		
+		if (this.isFetch) {
+			// Bring the hooked entity (and ourselves) back to the shooter
+			if (attachedEntity == null) {
+				this.setDead();
+				return;
+			}
+			
+			if (caster == null) {
+				this.setDead();
+				return;
+			}
+			
+			if (attachedEntity.isSneaking()) {
+				this.setDead();
+				return;
+			}
+			
+			caster.motionX = /*caster.motionY = */ caster.motionZ
+					= attachedEntity.motionX = attachedEntity.motionY = attachedEntity.motionZ = 0;
+			caster.velocityChanged = true;
+			attachedEntity.velocityChanged = true;
+			
+			Vec3d diff = caster.getPositionEyes(0f).subtract(this.getPositionVector());
+			Vec3d velocity = diff.normalize().scale(0.75);
+			this.posX += velocity.xCoord;
+			this.posY += velocity.yCoord;
+			this.posZ += velocity.zCoord;
+			
+			if (attachedEntity instanceof EntityItem) {
+				attachedEntity.motionX = velocity.xCoord;
+				attachedEntity.motionY = velocity.yCoord;
+				attachedEntity.motionZ = velocity.zCoord;
+				attachedEntity.velocityChanged = true;
+			}
+			this.setPositionAndUpdate(posX, posY, posZ);
+			
+			attachedEntity.setPositionAndUpdate(this.posX, this.posY - (attachedEntity.height / 2), this.posZ);
+		} else {
+			// Bring the shooter to the hooked entity
+			
+			if (attachedEntity != null) {
+				if (attachedEntity.isDead) {
+					this.setDead();
+					return;
+				}
+				this.setPositionAndUpdate(attachedEntity.posX, attachedEntity.posY + (attachedEntity.height / 2), attachedEntity.posZ);
+			}
+			
+			if (caster != null) {
+				if ((ticksExisted - tickHooked) > 6 && caster.onGround) {
+					this.setDead();
+					return;
+				}
+				
+				Vec3d diff = this.getPositionVector().subtract(caster.getPositionVector());
+				Vec3d velocity = diff.normalize().scale(0.75);
+				caster.motionX = velocity.xCoord;
+				caster.motionY = velocity.yCoord;
+				caster.motionZ = velocity.zCoord;
+				caster.fallDistance = 0;
+				caster.onGround = true;
+				caster.velocityChanged = true;
+			}
+			
+			// Check about playing sounds
+			if (caster != null) {
+				if (posLastPlayed == null || (posLastPlayed.subtract(caster.getPositionVector()).lengthSquared() > 3)) {
+					NostrumMagicaSounds.HOOKSHOT_TICK.play(worldObj, 
+							caster.posX + caster.motionX, caster.posY + caster.motionY, caster.posZ + caster.motionZ);
+					posLastPlayed = caster.getPositionVector();
+				}
+			}
+		}
+	}
+	
 	@Override
 	public void onUpdate() {
 		super.onUpdate();
@@ -242,46 +337,7 @@ public class EntityHookShot extends Entity {
 				}
 				
 				if (isHooked()) {
-					this.motionX = this.motionY = this.motionZ = 0;
-					
-					EntityLivingBase attachedEntity = this.getHookedEntity();
-					if (attachedEntity != null) {
-						if (attachedEntity.isDead) {
-							this.kill();
-							this.isDead = true;
-							return;
-						}
-						
-						this.setPositionAndUpdate(attachedEntity.posX, attachedEntity.posY + (attachedEntity.height / 2), attachedEntity.posZ);
-					}
-					
-					if (caster != null) {
-						if ((ticksExisted - tickHooked) > 6 && caster.onGround) {
-							this.setDead();
-							return;
-						}
-						
-						final double dist = caster.getDistanceSqToEntity(this);
-						if (dist < 8) {
-							this.setDead();
-						} else {
-							Vec3d diff = this.getPositionVector().subtract(caster.getPositionVector());
-							Vec3d velocity = diff.normalize().scale(0.75);
-							caster.motionX = velocity.xCoord;
-							caster.motionY = velocity.yCoord;
-							caster.motionZ = velocity.zCoord;
-							caster.fallDistance = 0;
-							caster.onGround = true;
-							caster.velocityChanged = true;
-							
-							// Check about playing sounds
-							if (posLastPlayed == null || (posLastPlayed.subtract(caster.getPositionVector()).lengthSquared() > 3)) {
-								NostrumMagicaSounds.HOOKSHOT_TICK.play(worldObj, 
-										caster.posX + caster.motionX, caster.posY + caster.motionY, caster.posZ + caster.motionZ);
-								posLastPlayed = caster.getPositionVector();
-							}
-						}
-					}
+					onHookedUpdate();
 				} else {
 					onFlightUpdate();
 				}
@@ -294,14 +350,38 @@ public class EntityHookShot extends Entity {
 			return;
 		}
 		
+		boolean wantsFetch = false;
+		
 		EntityLivingBase caster = getCaster();
+		
+		if (caster != null) {
+			wantsFetch = caster.isSneaking();
+		}
+		
 		if (result.typeOfHit == Type.ENTITY && result.entityHit != null && HookshotItem.CanBeHooked(type, result.entityHit) && (caster == null || caster != result.entityHit)) {
 			tickHooked = this.ticksExisted;
-			setHookedEntity((EntityLivingBase) result.entityHit);
+			
+			// Large entities cannot be fetched, and instead we'll override and force the play er to go to them.
+			// So if you try to pull a large enemy, you get pulled to them instead hilariously.
+			// Non-living entities are ignored... except for EntityItem which are always fetched.
+			if (result.entityHit instanceof EntityItem) {
+				this.isFetch = true;
+			} else if (!result.entityHit.canBeCollidedWith()) {
+				// ignore the entity for like arrows and stuff
+				return;
+			} else if (result.entityHit.width > 1.5 || result.entityHit.height > 2.5) {
+				this.isFetch = false;
+			} else {
+				this.isFetch = wantsFetch;
+			}
+			
+			setHookedEntity(result.entityHit);
 		} else if (result.typeOfHit == Type.BLOCK) {
+			// If shooter wants fetch, don't hook to blocks
+			
 			// Make sure type of hookshot supports material
 			IBlockState state = worldObj.getBlockState(result.getBlockPos());
-			if (state == null || !HookshotItem.CanBeHooked(type, state)) {
+			if (wantsFetch || state == null || !HookshotItem.CanBeHooked(type, state)) {
 				this.setDead();
 				return;
 			}
@@ -343,10 +423,10 @@ public class EntityHookShot extends Entity {
 		if (hooked) {
 			id = compound.getUniqueId(NBT_ATTACHED_ID);
 			if (id != null) {
-				EntityLivingBase hookedEnt = null;
+				Entity hookedEnt = null;
 				for (Entity ent : this.worldObj.loadedEntityList) {
-					if (ent instanceof EntityLivingBase && ent.getUniqueID().equals(id)) {
-						hookedEnt = (EntityLivingBase) ent;
+					if (ent.getUniqueID().equals(id)) {
+						hookedEnt = ent;
 						break;
 					}
 				}

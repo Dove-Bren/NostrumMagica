@@ -95,9 +95,11 @@ public class OverlayRenderer extends Gui {
 				
 				if (result != null) {
 					boolean hit = false;
+					boolean entity = false;
 					if (result.typeOfHit == Type.ENTITY) {
 						// Already filtered in raytrace predicate
 						hit = true;
+						entity = true;
 					} else if (result.typeOfHit == Type.BLOCK) {
 						IBlockState state = player.worldObj.getBlockState(result.getBlockPos());
 						if (state != null && HookshotItem.CanBeHooked(type, state)) {
@@ -107,7 +109,7 @@ public class OverlayRenderer extends Gui {
 					
 					if (hit) {
 						event.setCanceled(true);
-						renderHookshotCrosshair(player, scaledRes);
+						renderHookshotCrosshair(player, scaledRes, entity);
 					}
 				}
 				
@@ -479,17 +481,26 @@ public class OverlayRenderer extends Gui {
         }
 	}
 	
-	private void renderHookshotCrosshair(EntityPlayerSP player, ScaledResolution scaledResolution) {
+	private void renderHookshotCrosshair(EntityPlayerSP player, ScaledResolution scaledResolution, boolean entity) {
 		GlStateManager.pushMatrix();
 		GlStateManager.enableBlend();
-		GlStateManager.color(.7f, .7f, .7f, .7f);
+		if (entity) {
+			GlStateManager.color(.8f, .8f, .8f, .8f);
+		} else {
+			GlStateManager.color(.5f, .5f, .5f, .7f);
+		}
 		Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_ICONS);
 		
 		final int period = 30;
 		final float frac = (float) (player.worldObj.getTotalWorldTime() % period) / period;
 		final double radius = 6.0 + 2.0 * (Math.sin(frac * Math.PI * 2));
 		
-		final float rotOffset = 360.0f * ((float) (player.worldObj.getTotalWorldTime() % period) / period);
+		final float rotOffset;
+		if (entity) {
+			rotOffset = 360.0f * ((float) (player.worldObj.getTotalWorldTime() % period) / period);
+		} else {
+			rotOffset = 0f;
+		}
 		float rot;
 		
 		for (int i = 0; i < 3; i++) {
@@ -499,7 +510,13 @@ public class OverlayRenderer extends Gui {
 			
 			GlStateManager.rotate(rot, 0, 0, 1);
 			GlStateManager.translate(0, -radius, 0);
-			GlStateManager.translate(-GUI_HOOKSHOT_CROSSHAIR_WIDTH / 2, -GUI_HOOKSHOT_CROSSHAIR_WIDTH, 0);
+			
+			if (player.isSneaking()) {
+				GlStateManager.rotate(180f, 0, 0, 1);
+				GlStateManager.translate(-GUI_HOOKSHOT_CROSSHAIR_WIDTH / 2, 0, 0);
+			} else {
+				GlStateManager.translate(-GUI_HOOKSHOT_CROSSHAIR_WIDTH / 2, -GUI_HOOKSHOT_CROSSHAIR_WIDTH, 0);
+			}
 			
 			drawTexturedModalRect(0, 0,
 					GUI_HOOKSHOT_CROSSHAIR_OFFSETX, 0, GUI_HOOKSHOT_CROSSHAIR_WIDTH, GUI_HOOKSHOT_CROSSHAIR_WIDTH);
