@@ -129,8 +129,10 @@ public class RitualRecipe {
 		}
 		
 		// Do null matching with physical
-		if (element == EMagicElement.PHYSICAL && (this.element != null && this.element != EMagicElement.PHYSICAL)) {
-			return false;
+		if (element == EMagicElement.PHYSICAL) {
+			if (this.element != null && this.element != EMagicElement.PHYSICAL) {
+				return false;
+			}
 		} else if (element != this.element) {
 			return false;
 		}

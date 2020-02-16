@@ -1044,7 +1044,7 @@ public class NostrumMagica
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("improve_hookshot_medium",
 						new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.MEDIUM, false)),
-						null,
+						EMagicElement.PHYSICAL,
 						new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.MANI_DUST},
 						new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.WEAK, false)),
 						new ItemStack[] {new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM,  1), null, new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE)},

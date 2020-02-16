@@ -261,7 +261,7 @@ public class EntityHookShot extends Entity {
 			caster.velocityChanged = true;
 			attachedEntity.velocityChanged = true;
 			
-			Vec3d diff = caster.getPositionEyes(0f).subtract(this.getPositionVector());
+			Vec3d diff = caster.getPositionVector().addVector(0, caster.getEyeHeight(), 0).subtract(this.getPositionVector());
 			Vec3d velocity = diff.normalize().scale(0.75);
 			this.posX += velocity.xCoord;
 			this.posY += velocity.yCoord;

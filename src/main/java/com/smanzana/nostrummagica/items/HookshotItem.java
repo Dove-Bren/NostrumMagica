@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 
+import net.minecraft.block.BlockPane;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -307,6 +308,9 @@ public class HookshotItem extends Item implements ILoreTagged {
 			return true;
 		case MEDIUM:
 			if (blockState.getMaterial().getCanBurn()) {
+				return true;
+			}
+			if (blockState.getBlock() instanceof BlockPane && blockState.getMaterial() == Material.IRON) {
 				return true;
 			}
 			// fall through
