@@ -66,6 +66,7 @@ public class ModelHookShot extends ModelBase {
 		}
 		Tessellator.getInstance().draw();
 		
+		GlStateManager.enableLighting();
 		GlStateManager.popMatrix();
 	}
 	

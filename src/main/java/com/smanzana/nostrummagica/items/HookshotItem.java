@@ -20,7 +20,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -325,7 +324,7 @@ public class HookshotItem extends Item implements ILoreTagged {
 	}
 	
 	public static boolean CanBeHooked(HookshotType type, Entity entity) {
-		return entity instanceof EntityItem || entity instanceof EntityLiving;
+		return entity instanceof EntityItem || entity instanceof EntityLivingBase;
 	}
 	
 	@Override

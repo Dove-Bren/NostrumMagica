@@ -647,7 +647,7 @@ public class Spell {
 		case LIGHTNING:
 		case WIND:
 			return new SpellAction(caster).damage(element, 2f + (float) (2 * elementCount))
-					.name("damage." + element.name().toLowerCase());
+					.name("ruin." + element.name().toLowerCase());
 		}
 		
 		return null;

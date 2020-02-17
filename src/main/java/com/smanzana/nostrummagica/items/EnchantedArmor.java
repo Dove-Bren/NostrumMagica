@@ -173,6 +173,31 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return Math.max(1, (int) ((float) base * mod));
 	}
 	
+	private static int calcArmorDurability(EntityEquipmentSlot slot, EMagicElement element, int level) {
+		float mod = 1f;
+		switch (element) {
+		case EARTH:
+			mod = 1.1f;
+			break;
+		case PHYSICAL:
+			mod = 1.2f;
+			break;
+		case FIRE:
+			mod = 0.9f;
+			break;
+		case ENDER:
+			mod = 0.8f;
+			break;
+		default:
+			break;
+		}
+		
+		int iron = ArmorMaterial.IRON.getDurability(slot);
+		double amt = iron * Math.pow(1.5, level-1);
+		
+		return (int) Math.floor(amt * mod);
+	}
+	
 	private int level;
 	private int armor; // Can't use vanilla; it's final
 	private double magicResistAmount;
@@ -194,6 +219,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		
 		this.armor = calcArmor(type, element, level);
 		this.magicResistAmount = ((double) calcMagicResistBase(type, element, level) * 2.0D); // (/50 so max is 48%, then * 100 for %, so *2)
+		
+		this.setMaxDamage(calcArmorDurability(type, element, level));
 		
 		if (!NostrumMagica.proxy.isServer()) {
 			if (armorModels == null) {
@@ -218,6 +245,11 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 
         return multimap;
     }
+	
+	@Override
+	public int getItemEnchantability() {
+		return 16;
+	}
 	
 	@Override
 	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {

@@ -102,8 +102,8 @@ public class InfoScreen extends GuiScreen {
 		}
 		
 		// Do buttons and other parent stuff
-		for (int i = 0; i < this.buttons.size(); ++i) {
-			((GuiButton)this.buttons.get(i)).drawButton(this.mc, mouseX, mouseY);
+		for (int i = 0; i < this.buttonList.size(); ++i) {
+			((GuiButton)this.buttonList.get(i)).drawButton(this.mc, mouseX, mouseY);
 		}
 		
 		// Mask out any partial buttons or buttons that are above button line, since we support scrolling
@@ -124,8 +124,9 @@ public class InfoScreen extends GuiScreen {
 		
 		// Only show sub buttons if mouseY is lower than button  vertical offset
 		if (mouseY > POS_SUBSCREEN_VOFFSET) {
-			for (int i = 0; i < this.buttons.size(); ++i) {
-				((GuiButton)this.buttons.get(i)).drawButtonForegroundLayer(mouseX, mouseY);
+			for (int i = 0; i < this.buttonList.size(); ++i) {
+				((GuiButton)this.buttonList.get(i)).drawButtonForegroundLayer(mouseX, mouseY);
+				//this.buttonList.get(0).drawButtonForegroundLayer(mouseX, mouseY);
 			}
 		}
 		
@@ -170,6 +171,7 @@ public class InfoScreen extends GuiScreen {
 			this.buttonList.addAll(this.subscreenButtons);
 		} else if (button instanceof TabButton) {
 			this.subscreen = null;
+			this.subscreenButtons.clear();
 			activateButtons(((TabButton) button).getButtons());
 		} else if (button instanceof ISubScreenButton) {
 			((ISubScreenButton) button).onClick(attribute);

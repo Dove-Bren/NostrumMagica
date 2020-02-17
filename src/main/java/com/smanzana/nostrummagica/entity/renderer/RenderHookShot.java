@@ -121,6 +121,7 @@ public class RenderHookShot extends Render<EntityHookShot> {
 			renderChain(wr, cordOffset, segments, perSeg);
 			renderChain(wr, cordVOffset, segments, perSeg);
 			
+			GlStateManager.enableLighting();
 			GlStateManager.enableCull();
 			Minecraft.getMinecraft().getTextureManager().bindTexture(getEntityTexture(entity));
 		}
