@@ -51,10 +51,57 @@ public class RoomBlueprint {
 			BLOCK_CACHE.put(name.toLowerCase(), block);
 		}
 		
+		private static Map<Block, Map<Integer, IBlockState>> BLOCKSTATE_CACHE = new HashMap<>();
+		
+		private static IBlockState CHECK_BLOCKSTATE_CACHE(Block block, Integer meta) {
+			Map<Integer, IBlockState> map = BLOCKSTATE_CACHE.get(block);
+			if (map != null) {
+				return map.get(meta);
+			}
+			
+			return null; 
+		}
+		
+		private static void SET_BLOCKSTATE_CACHE(Block block, Integer meta, IBlockState state) {
+			Map<Integer, IBlockState> map = BLOCKSTATE_CACHE.get(block);
+			if (map == null) {
+				map = new HashMap<>();
+			}
+			
+			map.put(meta, state);
+			BLOCKSTATE_CACHE.put(block, map);
+		}
+		
+		private static Map<IBlockState, BlueprintBlock> BLUEPRINT_CACHE = new HashMap<>();
+		
+		private static BlueprintBlock CHECK_BLUEPRINT_CACHE(IBlockState state) {
+			return BLUEPRINT_CACHE.get(state);
+		}
+		
+		private static void SET_BLUEPRINT_CACHE(IBlockState state, BlueprintBlock block) {
+			BLUEPRINT_CACHE.put(state, block);
+		}
+		
+		public static BlueprintBlock getBlueprintBlock(IBlockState state, NBTTagCompound teData) {
+			BlueprintBlock block = null;
+			if (teData == null) {
+				block = CHECK_BLUEPRINT_CACHE(state);
+			}
+			
+			if (block == null) {
+				block = new BlueprintBlock(state, teData);
+				if (teData == null) {
+					SET_BLUEPRINT_CACHE(state, block);
+				}
+			}
+			
+			return block;
+		}
+		
 		private IBlockState state;
 		private NBTTagCompound tileEntityData;
 		
-		public BlueprintBlock(IBlockState state, NBTTagCompound teData) {
+		private BlueprintBlock(IBlockState state, NBTTagCompound teData) {
 			this.state = state;
 			this.tileEntityData = teData;
 			
@@ -111,7 +158,12 @@ public class RoomBlueprint {
 						SET_CACHE(type, block);
 					}
 					if (block != null) {
-						state = block.getStateFromMeta(nbt.getInteger(NBT_BLOCK_STATE));
+						Integer meta = nbt.getInteger(NBT_BLOCK_STATE);
+						state = CHECK_BLOCKSTATE_CACHE(block, meta);
+						if (state == null) {
+							state = block.getStateFromMeta(meta);
+							SET_BLOCKSTATE_CACHE(block, meta, state);
+						}
 					}
 				}
 				
@@ -128,7 +180,7 @@ public class RoomBlueprint {
 				throw new RuntimeException("Blueprint block doesn't understand version " + version);
 			}
 			
-			return new BlueprintBlock(state, teData);
+			return BlueprintBlock.getBlueprintBlock(state, teData);
 		}
 		
 		public NBTTagCompound toNBT() {
