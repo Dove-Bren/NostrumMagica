@@ -192,7 +192,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			break;
 		}
 		
-		int iron = ArmorMaterial.IRON.getDurability(slot);
+		int iron = ArmorMaterial.DIAMOND.getDurability(slot);
 		double amt = iron * Math.pow(1.5, level-1);
 		
 		return (int) Math.floor(amt * mod);
