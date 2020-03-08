@@ -10,11 +10,12 @@ public class EntitySpellAttackTask<T extends EntityLiving> extends EntityAIBase 
 	
 	
 	protected T entity;
-	protected Spell spells[];
 	protected int delay;
 	protected int odds;
 	protected boolean needsTarget;
 	protected Predicate<T> predicate;
+	
+	protected Spell spells[];
 	
 	protected int attackTicks;
 	
@@ -60,13 +61,21 @@ public class EntitySpellAttackTask<T extends EntityLiving> extends EntityAIBase 
 	public boolean continueExecuting() {
 		return false;
 	}
+	
+	public Spell pickSpell(Spell[] spells, T entity) {
+		if (spells == null || spells.length == 0)
+			return null;
+		
+		return spells[entity.getRNG().nextInt(spells.length)];
+	}
 
 	@Override
 	public void startExecuting() {
-		if (spells == null || spells.length == 0)
-			return;
+		Spell spell = pickSpell(spells, entity);
 		
-		Spell spell = spells[entity.getRNG().nextInt(spells.length)];
+		if (spell == null) {
+			return;
+		}
 		
 		if (needsTarget && null != entity.getAttackTarget()) {
 			entity.faceEntity(entity.getAttackTarget(), 360f, 180f);

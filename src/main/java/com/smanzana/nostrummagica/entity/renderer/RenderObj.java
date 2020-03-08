@@ -205,10 +205,11 @@ public class RenderObj extends ModelRenderer {
 		
 		GlStateManager.cullFace(GlStateManager.CullFace.BACK);
 		GlStateManager.popMatrix();
-		GlStateManager.disableRescaleNormal();
+		//GlStateManager.disableRescaleNormal();
 		GlStateManager.disableBlend();
 		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
+		GlStateManager.color(1f, 1f, 1f, 1f);
 		
 		super.render(scale); // Any boxes and stuff that was added (and children!!!!!!!)
 	}

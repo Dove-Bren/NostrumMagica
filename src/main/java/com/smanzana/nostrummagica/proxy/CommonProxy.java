@@ -30,6 +30,7 @@ import com.smanzana.nostrummagica.blocks.SorceryPortalSpawner;
 import com.smanzana.nostrummagica.blocks.SpellTable;
 import com.smanzana.nostrummagica.blocks.SwitchBlock;
 import com.smanzana.nostrummagica.blocks.SymbolBlock;
+import com.smanzana.nostrummagica.blocks.WispBlock;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagic;
@@ -58,6 +59,7 @@ import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
 import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
 import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
+import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.entity.ITameDragon;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.items.AltarItem;
@@ -299,6 +301,12 @@ public class CommonProxy {
     			128,
     			1,
     			true);
+    	EntityRegistry.registerModEntity(EntityWisp.class, "entity_wisp", 
+    			entityID++,
+    			NostrumMagica.instance,
+    			64,
+    			1,
+    			false);
     	
     	EntityRegistry.addSpawn(EntityKoid.class, 20, 1, 1, EnumCreatureType.MONSTER, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.MAGICAL));
@@ -659,6 +667,14 @@ public class CommonProxy {
     	GameRegistry.register(SorceryPortalSpawner.instance(),
     			new ResourceLocation(NostrumMagica.MODID, SorceryPortalSpawner.ID));
     	SorceryPortalSpawner.init();
+    	
+    	GameRegistry.register(WispBlock.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, WispBlock.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(WispBlock.instance()).setRegistryName(WispBlock.ID)
+    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(WispBlock.ID))
+    			);
+    	WispBlock.init();
     	
     }
     

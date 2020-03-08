@@ -25,6 +25,7 @@ import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.blocks.ProgressionDoor;
 import com.smanzana.nostrummagica.blocks.SorceryPortal;
 import com.smanzana.nostrummagica.blocks.SwitchBlock;
+import com.smanzana.nostrummagica.blocks.WispBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.effects.ClientEffect;
 import com.smanzana.nostrummagica.client.effects.ClientEffectBeam;
@@ -62,6 +63,7 @@ import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
 import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
 import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
+import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.entity.ITameDragon;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.entity.renderer.ModelGolem;
@@ -75,6 +77,7 @@ import com.smanzana.nostrummagica.entity.renderer.RenderShadowDragonRed;
 import com.smanzana.nostrummagica.entity.renderer.RenderSprite;
 import com.smanzana.nostrummagica.entity.renderer.RenderSwitchTrigger;
 import com.smanzana.nostrummagica.entity.renderer.RenderTameDragonRed;
+import com.smanzana.nostrummagica.entity.renderer.RenderWisp;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
@@ -84,6 +87,7 @@ import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.HookshotItem;
+import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
 import com.smanzana.nostrummagica.items.ISpellArmor;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MageStaff;
@@ -106,8 +110,6 @@ import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
-import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.items.SeekerIdol;
 import com.smanzana.nostrummagica.items.ShrineSeekingGem;
@@ -121,7 +123,8 @@ import com.smanzana.nostrummagica.items.SpellcraftGuide;
 import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.items.ThanosStaff;
 import com.smanzana.nostrummagica.items.WarlockSword;
-import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
+import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
+import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
 import com.smanzana.nostrummagica.network.messages.ObeliskTeleportationRequestMessage;
@@ -273,6 +276,13 @@ public class ClientProxy extends CommonProxy {
 			@Override
 			public Render<? super EntityHookShot> createRenderFor(RenderManager manager) {
 				return new RenderHookShot(manager);
+			}
+		});
+		
+		RenderingRegistry.registerEntityRenderingHandler(EntityWisp.class, new IRenderFactory<EntityWisp>() {
+			@Override
+			public Render<? super EntityWisp> createRenderFor(RenderManager manager) {
+				return new RenderWisp(manager, 1f);
 			}
 		});
 		
@@ -608,6 +618,10 @@ public class ClientProxy extends CommonProxy {
 					HookshotItem.MakeMeta(type, false),
 					HookshotItem.ID + "_" + HookshotItem.GetTypeSuffix(type));
 		}
+		
+		registerModel(Item.getItemFromBlock(WispBlock.instance()),
+				0,
+				WispBlock.ID);
 	}
 	
 	@Override
@@ -968,6 +982,8 @@ public class ClientProxy extends CommonProxy {
 				NostrumMagica.MODID, "models/item/ruby"));
 		event.getMap().registerSprite(new ResourceLocation(
 				NostrumMagica.MODID, "models/item/wood"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "models/white"));
 	}
 	
 	@SubscribeEvent
