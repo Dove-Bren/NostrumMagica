@@ -38,6 +38,7 @@ public class ModelWisp extends ModelBase {
 		GlStateManager.scale(adjustedScale, adjustedScale, adjustedScale);
 		fringe.render(entity, time, swingProgress, swing, headAngleY, headAngleX, scale);
 		GlStateManager.popMatrix();
+		GlStateManager.color(1f, 1f, 1f, 1f);
 	}
 	
 }

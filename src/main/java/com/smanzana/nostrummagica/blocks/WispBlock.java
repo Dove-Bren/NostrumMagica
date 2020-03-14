@@ -28,14 +28,19 @@ import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class WispBlock extends BlockContainer {
 	
 	public static final String ID = "wisp_block";
+	protected static final AxisAlignedBB SELECT_AABB = new AxisAlignedBB(.2, .9, .2, .8, 1.3, .8);
+	protected static final AxisAlignedBB COLLIDE_AABB = new AxisAlignedBB(.2, 0, .2, .8, 1.3, .8);
 	
 	private static WispBlock instance = null;
 	public static WispBlock instance() {
@@ -71,6 +76,33 @@ public class WispBlock extends BlockContainer {
 	@Override
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		
+		// Automatically handle scrolls and reagents
+		if (!playerIn.isSneaking() && heldItem != null) {
+			WispBlockTileEntity te = (WispBlockTileEntity) worldIn.getTileEntity(pos);
+			if (heldItem.getItem() instanceof SpellScroll
+					&& te.getScroll() == null
+					&& SpellScroll.getSpell(heldItem) != null) {
+				// Take scroll
+				te.setScroll(heldItem.copy());
+				heldItem.stackSize--;
+				return true;
+			} else if (heldItem.getItem() instanceof ReagentItem) {
+				
+				if (te.getReagent() == null) {
+					te.setReagent(heldItem.splitStack(heldItem.stackSize));
+					return true;
+				} else if (ReagentItem.findType(heldItem) == ReagentItem.findType(te.getReagent())) {
+					int avail = Math.max(0, Math.min(64, 64 - te.getReagent().stackSize));
+					if (avail != 0) {
+						int take = Math.min(avail, heldItem.stackSize);
+						heldItem.stackSize -= take;
+						te.getReagent().stackSize += take;
+						return true;
+					}
+				}
+			}
+		}
+		
 		playerIn.openGui(NostrumMagica.instance,
 				NostrumGui.wispblockID, worldIn,
 				pos.getX(), pos.getY(), pos.getZ());
@@ -85,7 +117,33 @@ public class WispBlock extends BlockContainer {
 	
 	@Override
 	public EnumBlockRenderType getRenderType(IBlockState state) {
-		return EnumBlockRenderType.MODEL;
+		return EnumBlockRenderType.INVISIBLE;
+	}
+	
+	@Override
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+		return SELECT_AABB;
+	}
+	
+	@Override
+	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, World worldIn, BlockPos pos) {
+		return COLLIDE_AABB;
+	}
+	
+	@Override
+	public boolean isOpaqueCube(IBlockState state) {
+		return false;
+	}
+	
+	@Override
+	public boolean isFullCube(IBlockState state) {
+		return false;
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public boolean isTranslucent(IBlockState state) {
+		return true;
 	}
 	
 	@Override

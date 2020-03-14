@@ -258,6 +258,8 @@ tile.progression_door.name=Mystic Door
 tile.logic_door.name=Sealed Door
 tile.switch_block.name=Switch
 tile.portal_spawner.name=Sorcery Portal
+tile.wisp_block.name=Tuned Crystal
+tile.mani_crystal.name=Mani Crystal
 
 entity.nostrummagica.physical_golem.name=Metal Golem
 entity.nostrummagica.lightning_golem.name=Lightining Golem

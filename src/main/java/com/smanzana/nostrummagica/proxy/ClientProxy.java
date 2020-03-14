@@ -51,6 +51,7 @@ import com.smanzana.nostrummagica.client.render.TileEntityObeliskRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityPortalRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityProgressionDoorRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntitySymbolRenderer;
+import com.smanzana.nostrummagica.client.render.TileEntityWispBlockRenderer;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityDragon;
 import com.smanzana.nostrummagica.entity.EntityDragonEgg;
@@ -399,6 +400,7 @@ public class ClientProxy extends CommonProxy {
     	TileEntityObeliskRenderer.init();
     	TileEntityPortalRenderer.init();
     	TileEntityProgressionDoorRenderer.init();
+    	TileEntityWispBlockRenderer.init();
     	
     	OBJLoader.INSTANCE.addDomain(NostrumMagica.MODID);
     	
@@ -984,6 +986,10 @@ public class ClientProxy extends CommonProxy {
 				NostrumMagica.MODID, "models/item/wood"));
 		event.getMap().registerSprite(new ResourceLocation(
 				NostrumMagica.MODID, "models/white"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "models/crystal"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "models/crystal_blank"));
 	}
 	
 	@SubscribeEvent

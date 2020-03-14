@@ -107,7 +107,7 @@ public class KoidTask extends EntityAIBase {
 			
 			// Lightning
 			putSpell(buffSpells, "Magic Shell",
-					AITargetTrigger.instance(),
+					SelfTrigger.instance(),
 					SingleShape.instance(),
 					EMagicElement.LIGHTNING,
 					1,

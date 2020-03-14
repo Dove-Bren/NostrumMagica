@@ -17,6 +17,7 @@ import com.smanzana.nostrummagica.blocks.LogicDoor;
 import com.smanzana.nostrummagica.blocks.LoreTable;
 import com.smanzana.nostrummagica.blocks.MagicDirt;
 import com.smanzana.nostrummagica.blocks.MagicWall;
+import com.smanzana.nostrummagica.blocks.ManiCrystal;
 import com.smanzana.nostrummagica.blocks.ManiOre;
 import com.smanzana.nostrummagica.blocks.ModificationTable;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
@@ -675,6 +676,9 @@ public class CommonProxy {
     					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(WispBlock.ID))
     			);
     	WispBlock.init();
+    	
+    	GameRegistry.register(ManiCrystal.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, ManiCrystal.ID));
     	
     }
     

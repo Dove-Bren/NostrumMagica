@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.gui.container;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.WispBlock.WispBlockTileEntity;
 import com.smanzana.nostrummagica.items.ReagentItem;
@@ -331,7 +332,19 @@ public class WispBlockGui {
 		
 		@Override
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-			;
+			int horizontalMargin = (width - xSize) / 2;
+			int verticalMargin = (height - ySize) / 2;
+			/*
+			 * horizontalMargin + PROGRESS_GUI_HOFFSET,
+						verticalMargin + PROGRESS_GUI_VOFFSET,
+						0, GUI_HEIGHT, x, PROGRESS_HEIGHT, 256, 256);
+			 */
+			if (mouseX >= horizontalMargin + PROGRESS_GUI_HOFFSET
+					&& mouseX <= horizontalMargin + PROGRESS_GUI_HOFFSET + PROGRESS_WIDTH
+					&& mouseY >= verticalMargin + PROGRESS_GUI_VOFFSET
+					&& mouseY <= verticalMargin + PROGRESS_GUI_VOFFSET + PROGRESS_HEIGHT) {
+				this.drawHoveringText(Lists.newArrayList(((int) (container.table.getPartialReagent() * 100.0)) + "%"), mouseX - horizontalMargin, mouseY - verticalMargin);
+			}
 		}
 		
 	}

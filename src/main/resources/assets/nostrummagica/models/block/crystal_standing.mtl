@@ -4,5 +4,5 @@
 newmtl Material.001
 Ka 1.000000 1.000000 1.000000
 Kd 0.640000 0.640000 0.640000
-d 1.000000
-map_Kd nostrummagica:models/white
+d 0.700000
+map_Kd nostrummagica:models/crystal

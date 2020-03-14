@@ -1,0 +1,20 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+      "model": "nostrummagica:crystal_standing.obj"  
+    },
+    "variants": {
+        "facing": {
+            "up": {},
+            "down": { "model": "nostrummagica:crystal_hanging.obj" },
+            "east": { "model": "nostrummagica:crystal_embedded.obj", "y": 180 },
+            "south": { "model": "nostrummagica:crystal_embedded.obj", "y": 270 },
+            "north": { "model": "nostrummagica:crystal_embedded.obj", "y": 90 },
+            "west": { "model": "nostrummagica:crystal_embedded.obj" }
+        },
+        "level": {
+            "0": { },
+            "1": { }
+        }
+    }
+}
