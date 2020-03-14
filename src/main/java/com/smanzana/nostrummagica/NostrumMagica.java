@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble.ItemType;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
 import com.smanzana.nostrummagica.blocks.SorceryPortal;
+import com.smanzana.nostrummagica.blocks.WispBlock;
 import com.smanzana.nostrummagica.capabilities.AttributeProvider;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.command.CommandAllQuests;
@@ -35,6 +36,7 @@ import com.smanzana.nostrummagica.entity.EntityGolem;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.ITameDragon;
+import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
@@ -1062,6 +1064,18 @@ public class NostrumMagica
 						new ItemStack[] {new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE,  1), new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE), new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE)},
 						null,
 						new OutcomeSpawnItem(new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.STRONG, false)))
+						)
+				);
+		
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("wisp_crystal",
+						new ItemStack(WispBlock.instance()),
+						null,
+						new ReagentType[] {ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST},
+						new ItemStack(AltarItem.instance()),
+						new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), new ItemStack(Blocks.OBSIDIAN, 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1)},
+						null,
+						new OutcomeSpawnItem(new ItemStack(WispBlock.instance()))
 						)
 				);
 		

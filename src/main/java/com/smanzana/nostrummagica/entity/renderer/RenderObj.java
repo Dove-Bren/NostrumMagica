@@ -11,6 +11,8 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.GlStateManager.DestFactor;
+import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -58,20 +60,23 @@ public class RenderObj extends ModelRenderer {
 	private void init() {
 		if (!initted) {
 			
-			compiledList = GLAllocation.generateDisplayLists(1);
-			GlStateManager.glNewList(compiledList, GL11.GL_COMPILE);
-			
-			VertexBuffer vertexbuffer = Tessellator.getInstance().getBuffer();
-			
 			IModel model = ModelLoaderRegistry.getModelOrLogError(this.resource, "Nostrum Magica is missing a model. Please report this to the mod authors.");
 			model = this.retexture(model);
 			IBakedModel bakedModel = model.bake(model.getDefaultState(), DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter());
+			
+			VertexBuffer vertexbuffer = Tessellator.getInstance().getBuffer();
+			
 			if (bakedModel instanceof OBJBakedModel && model instanceof OBJModel) {
 				int color = this.getColor();
+				
+				compiledList = GLAllocation.generateDisplayLists(1);
+				GlStateManager.glNewList(compiledList, GL11.GL_COMPILE);
+				
 				renderModel(bakedModel, vertexbuffer, color);
-			}
 
-	        GlStateManager.glEndList();
+				GlStateManager.glEndList();
+			}
+	        
 	        initted = true;
 		}
 	}
@@ -97,12 +102,15 @@ public class RenderObj extends ModelRenderer {
 		for(EnumFacing side : EnumFacing.values()) {
 			List<BakedQuad> quads = model.getQuads(null, side, 0);
 			if(!quads.isEmpty()) 
-				for(BakedQuad quad : quads)
+				for(BakedQuad quad : quads) {
+					//buffer.addVertexData(quad.getVertexData());
 					LightUtil.renderQuadColor(buffer, quad, color);
+				}
 		}
 		List<BakedQuad> quads = model.getQuads(null, null, 0);
 		if(!quads.isEmpty()) {
 			for(BakedQuad quad : quads) 
+				//buffer.addVertexData(quad.getVertexData());
 				LightUtil.renderQuadColor(buffer, quad, color);
 		}
 			
@@ -218,7 +226,17 @@ public class RenderObj extends ModelRenderer {
 	private void renderInternal(float scale, int displayList) {
 		if (!this.isHidden) {
 			if (this.showModel) {
-
+				
+				GlStateManager.enableBlend();
+				GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+				GlStateManager.enableAlpha();
+				final int color = this.getColor();
+				GlStateManager.color(
+						((float) ((color >> 16) & 0xFF)) / 256f,
+						((float) ((color >> 8) & 0xFF)) / 256f,
+						((float) ((color >> 0) & 0xFF)) / 256f,
+						((float) ((color >> 24) & 0xFF)) / 256f
+						);
 				
 				GlStateManager.translate(this.offsetX, this.offsetY, this.offsetZ);
 				GlStateManager.rotate(180, 1, 0, 0);

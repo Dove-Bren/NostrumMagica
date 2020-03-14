@@ -258,7 +258,7 @@ tile.progression_door.name=Mystic Door
 tile.logic_door.name=Sealed Door
 tile.switch_block.name=Switch
 tile.portal_spawner.name=Sorcery Portal
-tile.wisp_block.name=Tuned Crystal
+tile.wisp_block.name=Wisp Crystal
 tile.mani_crystal.name=Mani Crystal
 
 entity.nostrummagica.physical_golem.name=Metal Golem
@@ -282,6 +282,7 @@ entity.nostrummagica.entity_internal_spellsaucer_.name=Spell Saucer
 entity.nostrummagica.entity_switch_trigger.name=Mystic Trigger
 entity.nostrummagica.nostrum_lightning.name=Lightning Bolt
 entity.nostrummagica.nostrum_hookshot.name=Hookshot Anchor
+entity.nostrummagica.entity_wisp.name=Wisp
 
 itemGroup.nostrummagica=Nostrum Magica
 itemGroup.nostrummagica_enhancements=Nostrum Enhancements
@@ -716,6 +717,7 @@ ritual.true_mirror_shield.name=Create True Mirror Shield
 ritual.true_mirror_shield.desc=Create a True Mirror Shield
 ritual.improve_hookshot_medium.name=Create FarShot
 ritual.improve_hookshot_strong.name=Create Grand Hookshot
+ritual.wisp_crystal.name=Craft Wisp Crystal
 
 ritual.rune.physical.name=Physical Rune
 ritual.rune.fire.name=Fire Rune
