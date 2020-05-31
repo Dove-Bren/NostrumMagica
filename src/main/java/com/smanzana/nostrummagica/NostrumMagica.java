@@ -1,6 +1,5 @@
 package com.smanzana.nostrummagica;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -42,6 +41,7 @@ import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.HookshotItem;
+import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MageStaff;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
@@ -70,7 +70,6 @@ import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.items.WarlockSword;
-import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
 import com.smanzana.nostrummagica.listeners.PlayerListener;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -132,6 +131,7 @@ import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -1650,7 +1650,7 @@ public class NostrumMagica
     	return true;
     }
     
-    public static Collection<ITameDragon> getNearbyTamedDragons(EntityLivingBase entity, double blockRadius, boolean onlyOwned) {
+    public static List<ITameDragon> getNearbyTamedDragons(EntityLivingBase entity, double blockRadius, boolean onlyOwned) {
     	List<ITameDragon> list = new LinkedList<>();
     	
     	AxisAlignedBB box = new AxisAlignedBB(entity.posX - blockRadius, entity.posY - blockRadius, entity.posZ - blockRadius,
@@ -1674,6 +1674,12 @@ public class NostrumMagica
     	}
     	
     	return list;
+    }
+    
+    public static List<EntityTameable> getTamedEntities(EntityLivingBase owner) {
+    	return owner.worldObj.getEntities(EntityTameable.class, (ent) -> {
+    		return ent.isTamed() && ent.isOwner(owner);
+    	});
     }
     
     public static SpellRegistry getSpellRegistry() {

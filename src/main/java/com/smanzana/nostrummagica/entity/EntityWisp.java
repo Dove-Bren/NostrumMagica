@@ -103,7 +103,10 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 		
 		priority = 1;
 		this.targetTasks.addTask(priority++, new EntityAIHurtByTarget(this, false, new Class[0]));
-		this.targetTasks.addTask(priority++, new EntityAINearestAttackableTarget<EntityMob>(this, EntityMob.class, true));
+		this.targetTasks.addTask(priority++, new EntityAINearestAttackableTarget<EntityMob>(this, EntityMob.class, 10, true, false, (mob) -> {
+			return (mob instanceof IEntityTameable ? !((IEntityTameable) mob).isTamed()
+					: false);
+		}));
 	}
 	
 	protected void applyEntityAttributes()

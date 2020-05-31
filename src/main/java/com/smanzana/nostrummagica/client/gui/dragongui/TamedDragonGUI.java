@@ -155,7 +155,10 @@ public class TamedDragonGUI {
 		}
 		
 		public void setSheet(int index) {
-			this.getCurrentSheet().hideSheet(dragon, player, this);
+			if (this.currentSheet < this.getSheetCount()) {
+				// If we changed the number of sheets, we may have an invalid one to close. So just don't close it.
+				this.getCurrentSheet().hideSheet(dragon, player, this);
+			}
 			this.currentSheet = Math.min(Math.max(0, index), getSheets().size() - 1);
 			this.getCurrentSheet().showSheet(dragon, player, this, GUI_SHEET_WIDTH, GUI_SHEET_HEIGHT, guiOffsetX, guiOffsetY);
 		}
@@ -201,6 +204,8 @@ public class TamedDragonGUI {
 				break;
 			case REROLL:
 				if (dragon != null && dragon.getOwner() instanceof EntityPlayer && ((EntityPlayer) dragon.getOwner()).isCreative()) {
+					// Reset container sheet. The client will send this as well later.
+					this.setSheet(0);
 					dragon.rollStats();
 				}
 				break;
@@ -507,6 +512,9 @@ public class TamedDragonGUI {
 						return;
 					} else if (buttonIdx == container.getSheets().size() && NostrumMagica.proxy.getPlayer().isCreative()) {
 						NetworkHelper.ClientSendReroll(container.id);
+						// Reset sheet index in case reroll removed a tab
+						this.container.setSheet(0);
+						NetworkHelper.ClientSendSheet(container.id, this.container.currentSheet);
 					}
 				}
 				

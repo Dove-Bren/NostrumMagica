@@ -441,10 +441,6 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	
 	@Override
 	public boolean processInteract(EntityPlayer player, EnumHand hand, @Nullable ItemStack stack) {
-		if (this.worldObj.isRemote) {
-			return false;
-		}
-		
 		// Shift-right click toggles the dragon sitting.
 		// When not sitting, right-click mounts the dragon.
 		// When sitting, right-click opens the GUI
@@ -452,51 +448,75 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			if (hand == EnumHand.MAIN_HAND) {
 				
 				if (player.isSneaking()) {
-					this.setSitting(!this.isSitting());
-					if (player.isCreative()) {
-						this.setBond(1f);
-					}
-				} else if (this.getHealth() < this.getMaxHealth() && isHungerItem(player.getHeldItem(hand))) {
-					
-					this.heal(5f);
-					this.addBond(.2f);
-					
-					if (!player.isCreative()) {
-						player.getHeldItem(hand).stackSize--;
-					}
-				} else if (this.isSitting()) {
-					//player.openGui(NostrumMagica.instance, NostrumGui.dragonID, this.worldObj, (int) this.posX, (int) this.posY, (int) this.posZ);
-					NostrumMagica.proxy.openDragonGUI(player, this);
-				} else if (isBreedingItem(player.getHeldItem(hand)) && this.getBond() > BOND_LEVEL_BREED && this.getEgg() == null) {
-					layEgg();
-					if (!player.isCreative()) {
-						player.getHeldItem(hand).stackSize--;
-					}
-				} else {
-					if (this.getBond() >= BOND_LEVEL_ALLOW_RIDE) {
-						if (this.getHealth() < DRAGON_MIN_HEALTH) {
-							player.addChatComponentMessage(new TextComponentTranslation("info.tamed_dragon.low_health", this.getName()));
-						} else {
-							player.startRiding(this);
+					if (!this.worldObj.isRemote) {
+						this.setSitting(!this.isSitting());
+						if (player.isCreative()) {
+							this.setBond(1f);
 						}
-					} else {
-						player.addChatComponentMessage(new TextComponentTranslation("info.tamed_dragon.no_ride", this.getName()));
 					}
+					return true;
+				} else if (this.getHealth() < this.getMaxHealth() && isHungerItem(stack)) {
+					if (!this.worldObj.isRemote) {
+						this.heal(5f);
+						this.addBond(.2f);
+						
+						if (!player.isCreative()) {
+							player.getHeldItem(hand).stackSize--;
+						}
+					}
+					return true;
+				} else if (this.isSitting() && stack == null) {
+					if (!this.worldObj.isRemote) {
+						//player.openGui(NostrumMagica.instance, NostrumGui.dragonID, this.worldObj, (int) this.posX, (int) this.posY, (int) this.posZ);
+						NostrumMagica.proxy.openDragonGUI(player, this);
+					}
+					return true;
+				} else if (isBreedingItem(stack) && this.getBond() > BOND_LEVEL_BREED && this.getEgg() == null) {
+					if (!this.worldObj.isRemote) {
+						layEgg();
+						if (!player.isCreative()) {
+							stack.stackSize--;
+						}
+					}
+					return true;
+				} else if (stack == null) {
+					if (!this.worldObj.isRemote) {
+						if (this.getBond() >= BOND_LEVEL_ALLOW_RIDE) {
+							if (this.getHealth() < DRAGON_MIN_HEALTH) {
+								player.addChatComponentMessage(new TextComponentTranslation("info.tamed_dragon.low_health", this.getName()));
+							} else {
+								player.startRiding(this);
+							}
+						} else {
+							player.addChatComponentMessage(new TextComponentTranslation("info.tamed_dragon.no_ride", this.getName()));
+						}
+					}
+					return true;
 				}
-				return true;
+				else {
+					; // fall through; we didn't handle it
+				}
+				
 			}
 		} else if (!this.isTamed()) {
 			if (hand == EnumHand.MAIN_HAND) {
-				this.tame(player, player.isCreative());
+				if (!this.worldObj.isRemote) {
+					this.tame(player, player.isCreative());
+				}
 				return true;
 			}
 		} else if (this.isTamed() && player.isCreative() && hand == EnumHand.MAIN_HAND && player.isSneaking()) {
-			this.tame(player, true);
-			this.setBond(1f);
+			if (!this.worldObj.isRemote) {
+				this.tame(player, true);
+				this.setBond(1f);
+			}
 			return true;
 		} else if (this.isTamed() && hand == EnumHand.MAIN_HAND) {
 			// Someone other than the owner clicked
-			player.addChatComponentMessage(new TextComponentTranslation("info.tamed_dragon.not_yours", this.getName()));
+			if (!this.worldObj.isRemote) {
+				player.addChatComponentMessage(new TextComponentTranslation("info.tamed_dragon.not_yours", this.getName()));
+			}
+			return true;
 		}
 		
 		return false;			

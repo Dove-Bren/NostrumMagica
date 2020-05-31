@@ -1,12 +1,15 @@
 package com.smanzana.nostrummagica.client.overlay;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.entity.IEntityTameable;
 import com.smanzana.nostrummagica.entity.ITameDragon;
 import com.smanzana.nostrummagica.items.HookshotItem;
 import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
@@ -22,10 +25,14 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
@@ -52,6 +59,52 @@ public class OverlayRenderer extends Gui {
 	private static final int GUI_SHIELD_OFFSETY = 17;
 	private static final int GUI_HOOKSHOT_CROSSHAIR_OFFSETX = 82;
 	private static final int GUI_HOOKSHOT_CROSSHAIR_WIDTH = 10;
+
+	private static final ResourceLocation GUI_HEALTHBARS = new ResourceLocation(NostrumMagica.MODID, "textures/gui/healthbars.png");
+	private static final int GUI_HEALTHBAR_ORB_BACK_WIDTH = 205;
+	private static final int GUI_HEALTHBAR_ORB_BACK_HEIGHT = 56;
+	private static final int GUI_HEALTHBAR_ORB_HEALTH_BAR_HOFFSET = 2;
+	private static final int GUI_HEALTHBAR_ORB_HEALTH_BAR_VOFFSET = 112;
+	private static final int GUI_HEALTHBAR_ORB_HEALTH_BAR_INNER_HOFFSET = 2;
+	private static final int GUI_HEALTHBAR_ORB_HEALTH_BAR_INNER_VOFFSET = 29;
+	private static final int GUI_HEALTHBAR_ORB_HEALTH_WIDTH = 152;
+	private static final int GUI_HEALTHBAR_ORB_HEALTH_HEIGHT = 18;
+	private static final int GUI_HEALTHBAR_ORB_SECONDARY_BAR_HOFFSET = 61;
+	private static final int GUI_HEALTHBAR_ORB_SECONDARY_BAR_VOFFSET = 129;
+	private static final int GUI_HEALTHBAR_ORB_SECONDARY_BAR_INNER_HOFFSET = 61;
+	private static final int GUI_HEALTHBAR_ORB_SECONDARY_BAR_INNER_VOFFSET = 45;
+	private static final int GUI_HEALTHBAR_ORB_SECONDARY_WIDTH = 105;
+	private static final int GUI_HEALTHBAR_ORB_SECONDARY_HEIGHT = 8;
+	private static final int GUI_HEALTHBAR_ORB_ENTITY_HOFFSET = 177;
+	private static final int GUI_HEALTHBAR_ORB_ENTITY_VOFFSET = 40;
+	private static final int GUI_HEALTHBAR_ORB_ENTITY_WIDTH = 12;
+	private static final int GUI_HEALTHBAR_ORB_NAME_WIDTH = 160;
+	private static final int GUI_HEALTHBAR_ORB_NAME_HEIGHT = 30;
+	private static final int GUI_HEALTHBAR_ORB_NAME_HOFFSET = 20;
+	private static final int GUI_HEALTHBAR_ORB_NAME_VOFFSET = 12;
+	
+	private static final int GUI_HEALTHBAR_BOX_BACK_WIDTH = 191;
+	private static final int GUI_HEALTHBAR_BOX_BACK_HEIGHT = 25;
+	private static final int GUI_HEALTHBAR_BOX_BACK_VOFFSET = 140;
+	private static final int GUI_HEALTHBAR_BOX_HEALTH_BAR_HOFFSET = 2;
+	private static final int GUI_HEALTHBAR_BOX_HEALTH_BAR_VOFFSET = 191;
+	private static final int GUI_HEALTHBAR_BOX_HEALTH_BAR_INNER_HOFFSET = 2;
+	private static final int GUI_HEALTHBAR_BOX_HEALTH_BAR_INNER_VOFFSET = 1;
+	private static final int GUI_HEALTHBAR_BOX_HEALTH_WIDTH = 165;
+	private static final int GUI_HEALTHBAR_BOX_HEALTH_HEIGHT = 18;
+	private static final int GUI_HEALTHBAR_BOX_SECONDARY_BAR_HOFFSET = 61;
+	private static final int GUI_HEALTHBAR_BOX_SECONDARY_BAR_VOFFSET = 211;
+	private static final int GUI_HEALTHBAR_BOX_SECONDARY_BAR_INNER_HOFFSET = 62;
+	private static final int GUI_HEALTHBAR_BOX_SECONDARY_BAR_INNER_VOFFSET = 17;
+	private static final int GUI_HEALTHBAR_BOX_SECONDARY_WIDTH = 104;
+	private static final int GUI_HEALTHBAR_BOX_SECONDARY_HEIGHT = 8;
+	
+	private static final int GUI_HEALTHBAR_ICON_LENGTH = 32;
+	private static final int GUI_HEALTHBAR_ICON_HOFFSET = 207;
+	private static final int GUI_HEALTHBAR_ICON_INTERNAL_HOFFSET = 300;
+	private static final int GUI_HEALTHBAR_ICON_INTERNAL_VOFFSET = 50;
+	private static final int GUI_HEALTHBAR_ICON_STAY_VOFFSET = 0;
+	private static final int GUI_HEALTHBAR_ICON_ATTACK_VOFFSET = GUI_HEALTHBAR_ICON_STAY_VOFFSET + GUI_HEALTHBAR_ICON_LENGTH;
 	
 	private int wiggleIndex; // set to multiples of 12 for each wiggle
 	private static final int wiggleOffsets[] = {0, 1, 1, 2, 1, 1, 0, -1, -1, -2, -1, -1};
@@ -141,8 +194,44 @@ public class OverlayRenderer extends Gui {
 				renderManaOrbs(player, scaledRes, attr);
 			}
 			
+			// Mana bar
 			if (ModConfig.config.displayManaBar()) {
 				renderManaBar(player, scaledRes, attr);
+			}
+			
+			final float scale = 0.5f;
+			int y = 5;
+			int healthbarWidth;
+			int healthbarHeight;
+			int xOffset;
+			
+			// Dragon info
+			if (ModConfig.config.displayDragonHealthbars()) {
+				healthbarWidth = (int) (GUI_HEALTHBAR_ORB_BACK_WIDTH * scale);
+				healthbarHeight = (int) (GUI_HEALTHBAR_ORB_BACK_HEIGHT * scale);
+				xOffset = scaledRes.getScaledWidth() - (2 + healthbarWidth);
+				
+				List<ITameDragon> dragons = NostrumMagica.getNearbyTamedDragons(player, 32, true);
+				Collections.sort(dragons, (left, right) -> {
+					return left.getUniqueID().compareTo(right.getUniqueID());
+				});
+				for (ITameDragon dragon : dragons) {
+					if (dragon instanceof EntityLivingBase) {
+						renderHealthbarOrb(player, scaledRes, (EntityLivingBase) dragon, xOffset, y, scale);
+						y += healthbarHeight + 2;
+					}
+				}
+			}
+			
+			// Pet info
+			if (ModConfig.config.displayPetHealthbars()) {
+				healthbarWidth = (int) (GUI_HEALTHBAR_BOX_BACK_WIDTH * scale);
+				healthbarHeight = (int) (GUI_HEALTHBAR_BOX_BACK_HEIGHT * scale);
+				xOffset = scaledRes.getScaledWidth() - (2 + healthbarWidth);
+				for (EntityTameable tamed : NostrumMagica.getTamedEntities(player)) {
+					renderHealthbarBox(player, scaledRes, tamed, xOffset, y, scale);
+					y += healthbarHeight;
+				}
 			}
 		} else if (event.getType() == ElementType.ARMOR) {
 			if (ModConfig.config.displayArmorOverlay()) {
@@ -525,6 +614,225 @@ public class OverlayRenderer extends Gui {
 		}
 		
 		GlStateManager.disableBlend();
+		GlStateManager.popMatrix();
+	}
+	
+	private void renderHealthbarOrb(EntityPlayerSP player, ScaledResolution scaledRes, EntityLivingBase pet, int xoffset, int yoffset, float scale) {
+		
+		// Render back, scaled bar + middle 'goods', and then foreground. Easy.
+		// For center, render:
+		// 1) healthbar
+		// 2) pet head/icon
+		// 3) pet status icon
+		FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
+		final boolean sitting = (pet instanceof EntityTameable ? ((EntityTameable) pet).isSitting()
+				: pet instanceof IEntityTameable ? ((IEntityTameable) pet).isSitting()
+				: false);
+		final boolean attacking = (pet instanceof EntityLiving ? ((EntityLiving) pet).getAttackTarget() != null : false);
+		final float health = (float) (Math.max(0, Math.ceil(pet.getHealth())) / Math.max(0.01, Math.ceil(pet.getMaxHealth())));
+		boolean hasSecondaryBar = false;
+		float secondaryMeter = 0f;
+		
+		if (pet instanceof ITameDragon) {
+			ITameDragon dragon = (ITameDragon) pet;
+			hasSecondaryBar = true;
+			secondaryMeter = (float) dragon.getXP() / (float) dragon.getMaxXP();
+		}
+		
+		Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_HEALTHBARS);
+		
+		GlStateManager.pushMatrix();
+		
+		GlStateManager.translate(xoffset, yoffset, 0);
+		GlStateManager.scale(scale, scale, 1);
+		
+		GlStateManager.enableBlend();
+		GlStateManager.color(1f, 1f, 1f, 1f);
+		
+		// Draw background
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(0, 0, -100);
+		this.drawGradientRect(GUI_HEALTHBAR_ORB_NAME_HOFFSET, GUI_HEALTHBAR_ORB_NAME_VOFFSET,
+				GUI_HEALTHBAR_ORB_NAME_WIDTH, GUI_HEALTHBAR_ORB_NAME_HEIGHT,
+				0x50000000, 0xA0000000); //nameplate background
+		drawTexturedModalRect(0, 0,
+				0, GUI_HEALTHBAR_ORB_BACK_HEIGHT, GUI_HEALTHBAR_ORB_BACK_WIDTH, GUI_HEALTHBAR_ORB_BACK_HEIGHT);
+		GlStateManager.popMatrix();
+		
+		// Draw middle
+		GlStateManager.pushMatrix();
+		// 	-> Health bar
+		drawTexturedModalRect(
+				GUI_HEALTHBAR_ORB_HEALTH_BAR_INNER_HOFFSET + Math.round(GUI_HEALTHBAR_ORB_HEALTH_WIDTH * (1f-health)),
+				GUI_HEALTHBAR_ORB_HEALTH_BAR_INNER_VOFFSET,
+				GUI_HEALTHBAR_ORB_HEALTH_BAR_HOFFSET + Math.round(GUI_HEALTHBAR_ORB_HEALTH_WIDTH * (1f-health)),
+				GUI_HEALTHBAR_ORB_HEALTH_BAR_VOFFSET,
+				GUI_HEALTHBAR_ORB_HEALTH_WIDTH - Math.round(GUI_HEALTHBAR_ORB_HEALTH_WIDTH * (1f-health)),
+				GUI_HEALTHBAR_ORB_HEALTH_HEIGHT);
+		//	-> Secondary bar
+		if (!hasSecondaryBar) {
+			GlStateManager.color(.7f, .9f, .7f, 1f);
+			secondaryMeter = 1f;
+		} else {
+			GlStateManager.color(1f, .7f, 1f, 1f);
+		}
+		drawTexturedModalRect(
+				GUI_HEALTHBAR_ORB_SECONDARY_BAR_INNER_HOFFSET + Math.round(GUI_HEALTHBAR_ORB_SECONDARY_WIDTH * (1f-secondaryMeter)),
+				GUI_HEALTHBAR_ORB_SECONDARY_BAR_INNER_VOFFSET,
+				GUI_HEALTHBAR_ORB_SECONDARY_BAR_HOFFSET + Math.round(GUI_HEALTHBAR_ORB_SECONDARY_WIDTH * (1f-secondaryMeter)),
+				GUI_HEALTHBAR_ORB_SECONDARY_BAR_VOFFSET,
+				GUI_HEALTHBAR_ORB_SECONDARY_WIDTH - Math.round(GUI_HEALTHBAR_ORB_SECONDARY_WIDTH * (1f-secondaryMeter)),
+				GUI_HEALTHBAR_ORB_SECONDARY_HEIGHT);
+	
+		GlStateManager.color(1f, 1f, 1f, 1f);
+
+		//	-> Icon
+		GuiInventory.drawEntityOnScreen(GUI_HEALTHBAR_ORB_ENTITY_HOFFSET, GUI_HEALTHBAR_ORB_ENTITY_VOFFSET, GUI_HEALTHBAR_ORB_ENTITY_WIDTH, 0, 0, pet);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_HEALTHBARS);
+		GlStateManager.color(1f, 1f, 1f, 1f);
+		
+		//	-> Status
+		GlStateManager.translate(0, 0, 100);
+		if (attacking) {
+			drawTexturedModalRect(0, 0,
+					GUI_HEALTHBAR_ICON_HOFFSET, GUI_HEALTHBAR_ICON_ATTACK_VOFFSET, GUI_HEALTHBAR_ICON_LENGTH, GUI_HEALTHBAR_ICON_LENGTH);
+		} else if (sitting) {
+			GlStateManager.pushMatrix();
+			GlStateManager.scale(.6f, .6f, .6f);
+			GlStateManager.translate(0, 0, 0);
+			drawTexturedModalRect(GUI_HEALTHBAR_ICON_INTERNAL_HOFFSET, GUI_HEALTHBAR_ICON_INTERNAL_VOFFSET,
+					GUI_HEALTHBAR_ICON_HOFFSET, GUI_HEALTHBAR_ICON_STAY_VOFFSET, GUI_HEALTHBAR_ICON_LENGTH, GUI_HEALTHBAR_ICON_LENGTH);
+			GlStateManager.popMatrix();
+		}
+		
+		//	-> Name
+		final String name = pet.hasCustomName() ? pet.getCustomNameTag() : pet.getName();
+		final int nameLen = fonter.getStringWidth(name);
+		//final float fontScale = (1f/scale) * .6f;
+		final float fontScale = scale * 2.4f;
+		GlStateManager.pushMatrix();
+		GlStateManager.scale(fontScale, fontScale, fontScale);
+		fonter.drawString(name, 123 - (nameLen), 25 - (fonter.FONT_HEIGHT + 2), 0xFFFFFFFF);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_HEALTHBARS);
+		GlStateManager.popMatrix();
+		
+		GlStateManager.popMatrix();
+		
+		// Draw foreground
+		GlStateManager.enableBlend();
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(0, 0, 100);
+		drawTexturedModalRect(0, 0,
+				0, 0, GUI_HEALTHBAR_ORB_BACK_WIDTH, GUI_HEALTHBAR_ORB_BACK_HEIGHT);
+		GlStateManager.popMatrix();
+		
+		GlStateManager.popMatrix();
+	}
+	
+	private void renderHealthbarBox(EntityPlayerSP player, ScaledResolution scaledRes, EntityLivingBase pet, int xoffset, int yoffset, float scale) {
+		
+		// Render back, scaled bar + middle 'goods', and then foreground. Easy.
+		// For center, render:
+		// 1) healthbar
+		// 2) pet head/icon
+		// 3) pet status icon
+		FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
+		final float health = (float) (Math.max(0, Math.ceil(pet.getHealth())) / Math.max(0.01, Math.ceil(pet.getMaxHealth())));
+		boolean hasSecondaryBar = false;
+		float secondaryMeter = 0f;
+		final boolean sitting = (pet instanceof EntityTameable ? ((EntityTameable) pet).isSitting()
+				: pet instanceof IEntityTameable ? ((IEntityTameable) pet).isSitting()
+				: false);
+		final boolean attacking = (pet instanceof EntityLiving ? ((EntityLiving) pet).getAttackTarget() != null : false);
+		
+		if (pet instanceof ITameDragon) {
+			ITameDragon dragon = (ITameDragon) pet;
+			hasSecondaryBar = true;
+			secondaryMeter = (float) dragon.getXP() / (float) dragon.getMaxXP();
+		}
+		
+		Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_HEALTHBARS);
+		
+		GlStateManager.pushMatrix();
+		
+		GlStateManager.translate(xoffset, yoffset, 0);
+		GlStateManager.scale(scale, scale, 1);
+		
+		GlStateManager.enableBlend();
+		GlStateManager.color(1f, 1f, 1f, 1f);
+		
+		// Draw background
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(0, 0, -100);
+//		this.drawGradientRect(GUI_HEALTHBAR_ORB_NAME_HOFFSET, GUI_HEALTHBAR_ORB_NAME_VOFFSET,
+//				GUI_HEALTHBAR_ORB_NAME_WIDTH, GUI_HEALTHBAR_ORB_NAME_HEIGHT,
+//				0x50000000, 0xA0000000); //nameplate background
+		drawTexturedModalRect(0, 0,
+				0, GUI_HEALTHBAR_BOX_BACK_VOFFSET + GUI_HEALTHBAR_BOX_BACK_HEIGHT, GUI_HEALTHBAR_BOX_BACK_WIDTH, GUI_HEALTHBAR_BOX_BACK_HEIGHT);
+		GlStateManager.popMatrix();
+		
+		// Draw middle
+		GlStateManager.pushMatrix();
+		// 	-> Health bar
+		drawTexturedModalRect(
+				GUI_HEALTHBAR_BOX_HEALTH_BAR_INNER_HOFFSET + Math.round(GUI_HEALTHBAR_BOX_HEALTH_WIDTH * (1f-health)),
+				GUI_HEALTHBAR_BOX_HEALTH_BAR_INNER_VOFFSET,
+				GUI_HEALTHBAR_BOX_HEALTH_BAR_HOFFSET + Math.round(GUI_HEALTHBAR_BOX_HEALTH_WIDTH * (1f-health)),
+				GUI_HEALTHBAR_BOX_HEALTH_BAR_VOFFSET,
+				GUI_HEALTHBAR_BOX_HEALTH_WIDTH - Math.round(GUI_HEALTHBAR_BOX_HEALTH_WIDTH * (1f-health)),
+				GUI_HEALTHBAR_BOX_HEALTH_HEIGHT);
+		//	-> Secondary bar
+		if (!hasSecondaryBar) {
+			GlStateManager.color(.7f, .9f, .7f, 1f);
+			secondaryMeter = 1f;
+		} else {
+			GlStateManager.color(1f, .7f, 1f, 1f);
+		}
+		drawTexturedModalRect(
+				GUI_HEALTHBAR_BOX_SECONDARY_BAR_INNER_HOFFSET + Math.round(GUI_HEALTHBAR_BOX_SECONDARY_WIDTH * (1f-secondaryMeter)),
+				GUI_HEALTHBAR_BOX_SECONDARY_BAR_INNER_VOFFSET,
+				GUI_HEALTHBAR_BOX_SECONDARY_BAR_HOFFSET + Math.round(GUI_HEALTHBAR_BOX_SECONDARY_WIDTH * (1f-secondaryMeter)),
+				GUI_HEALTHBAR_BOX_SECONDARY_BAR_VOFFSET,
+				GUI_HEALTHBAR_BOX_SECONDARY_WIDTH - Math.round(GUI_HEALTHBAR_BOX_SECONDARY_WIDTH * (1f-secondaryMeter)),
+				GUI_HEALTHBAR_BOX_SECONDARY_HEIGHT);
+	
+		GlStateManager.color(1f, 1f, 1f, 1f);
+		
+		//		-> Status
+		GlStateManager.translate(0, 0, 100);
+		if (attacking) {
+			drawTexturedModalRect(0, 0,
+					GUI_HEALTHBAR_ICON_HOFFSET, GUI_HEALTHBAR_ICON_ATTACK_VOFFSET, GUI_HEALTHBAR_ICON_LENGTH, GUI_HEALTHBAR_ICON_LENGTH);
+		} else if (sitting) {
+			GlStateManager.pushMatrix();
+			GlStateManager.scale(.6f, .6f, .6f);
+			GlStateManager.translate(0, 0, 0);
+			drawTexturedModalRect(282, 6,
+					GUI_HEALTHBAR_ICON_HOFFSET, GUI_HEALTHBAR_ICON_STAY_VOFFSET, GUI_HEALTHBAR_ICON_LENGTH, GUI_HEALTHBAR_ICON_LENGTH);
+			GlStateManager.popMatrix();
+		}
+
+		//	-> Name
+		final String name = pet.hasCustomName() ? pet.getCustomNameTag() : pet.getName();
+		final int nameLen = fonter.getStringWidth(name);
+		//final float fontScale = (1f/scale) * .6f;
+		final float fontScale = scale * 2.4f;
+		GlStateManager.pushMatrix();
+		GlStateManager.scale(fontScale, fontScale, fontScale);
+		fonter.drawStringWithShadow(name, 135 - (nameLen), 14 - (fonter.FONT_HEIGHT + 2), 0xFFFFFFFF);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_HEALTHBARS);
+		GlStateManager.popMatrix();
+		
+		GlStateManager.popMatrix();
+		
+		// Draw foreground
+		GlStateManager.enableBlend();
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(0, 0, 100);
+		drawTexturedModalRect(0, 0,
+				0, GUI_HEALTHBAR_BOX_BACK_VOFFSET, GUI_HEALTHBAR_BOX_BACK_WIDTH, GUI_HEALTHBAR_BOX_BACK_HEIGHT);
+		GlStateManager.popMatrix();
+		
 		GlStateManager.popMatrix();
 	}
 	

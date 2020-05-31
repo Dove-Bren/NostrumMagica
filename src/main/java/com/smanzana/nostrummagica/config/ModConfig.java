@@ -37,6 +37,8 @@ public class ModConfig {
 		ARMOR_DISPLAY(Category.DISPLAY, "overarmor_display", true, false, "Enable displaying armor overlay when armor is > 20 units"),
 		DISPLAY_SHIELDS(Category.DISPLAY, "shield_display", true, false, "Show magical shield overlay on hearts"),
 		DISPLAY_HOOKSHOT_CROSSHAIR(Category.DISPLAY, "hookshot_crosshair", true, false, "Show special crosshair with the hookshot"),
+		DISPLAY_DRAGON_HEALTHBARS(Category.DISPLAY, "dragon_healthbar", true, false, "Display special healthbars for dragons"),
+		DISPLAY_PET_HEALTHBARS(Category.DISPLAY, "pet_healthbar", true, false, "Display healthbars for tamed pets"),
 		
 		LOGIN_TEXT(Category.DISPLAY, "display_login_text", true, false, "On login, show Nostrum Magica welcome text"),
 		
@@ -461,5 +463,13 @@ public class ModConfig {
 	
 	public boolean displayHookshotCrosshair() {
 		return getBooleanValue(Key.DISPLAY_HOOKSHOT_CROSSHAIR, false);
+	}
+	
+	public boolean displayDragonHealthbars() {
+		return getBooleanValue(Key.DISPLAY_DRAGON_HEALTHBARS, false);
+	}
+	
+	public boolean displayPetHealthbars() {
+		return getBooleanValue(Key.DISPLAY_PET_HEALTHBARS, false);
 	}
 }
