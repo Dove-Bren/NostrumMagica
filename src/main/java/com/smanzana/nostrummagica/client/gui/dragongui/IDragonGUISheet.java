@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.client.gui.dragongui;
 
-import com.smanzana.nostrummagica.entity.ITameDragon;
+import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;

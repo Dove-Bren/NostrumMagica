@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.entity;
+package com.smanzana.nostrummagica.entity.dragon;
 
 import com.smanzana.nostrummagica.entity.tasks.DragonAIFocusedTarget;
 import com.smanzana.nostrummagica.entity.tasks.DragonAINearestAttackableTarget;

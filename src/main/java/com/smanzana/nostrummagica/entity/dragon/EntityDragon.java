@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.entity;
+package com.smanzana.nostrummagica.entity.dragon;
 
 import javax.annotation.Nullable;
 

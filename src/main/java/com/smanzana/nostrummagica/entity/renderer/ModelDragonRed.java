@@ -6,9 +6,9 @@ import java.util.Map;
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.entity.EntityDragonRed;
-import com.smanzana.nostrummagica.entity.EntityDragonRedBase;
-import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
+import com.smanzana.nostrummagica.entity.dragon.EntityDragonRed;
+import com.smanzana.nostrummagica.entity.dragon.EntityDragonRedBase;
+import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.entity.Entity;

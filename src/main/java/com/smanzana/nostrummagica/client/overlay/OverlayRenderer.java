@@ -10,7 +10,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.IEntityTameable;
-import com.smanzana.nostrummagica.entity.ITameDragon;
+import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.items.HookshotItem;
 import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
@@ -242,7 +242,6 @@ public class OverlayRenderer extends Gui {
 				renderShieldOverlay(player, scaledRes);
 			}
 		}
-		
 	}
 	
 	private void renderOrbsInternal(int whole, int pieces, int x, int y) {

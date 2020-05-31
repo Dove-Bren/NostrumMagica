@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.entity.renderer;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.entity.EntityDragonRedBase;
+import com.smanzana.nostrummagica.entity.dragon.EntityDragonRedBase;
 
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;

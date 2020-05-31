@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.entity.renderer;
 
 import org.lwjgl.opengl.GL11;
 
-import com.smanzana.nostrummagica.entity.EntityGolem;
+import com.smanzana.nostrummagica.entity.golem.EntityGolem;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;

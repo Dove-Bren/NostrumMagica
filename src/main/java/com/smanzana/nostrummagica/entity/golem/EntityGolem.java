@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.entity;
+package com.smanzana.nostrummagica.entity.golem;
 
 import javax.annotation.Nullable;
 

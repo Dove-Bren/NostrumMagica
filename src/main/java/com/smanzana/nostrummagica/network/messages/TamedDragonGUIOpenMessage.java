@@ -5,7 +5,7 @@ import java.util.UUID;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonContainer;
 import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonGUI;
-import com.smanzana.nostrummagica.entity.ITameDragon;
+import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;

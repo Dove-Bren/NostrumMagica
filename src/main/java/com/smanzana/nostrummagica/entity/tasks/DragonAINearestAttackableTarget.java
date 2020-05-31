@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.entity.tasks;
 
 import com.google.common.base.Predicate;
-import com.smanzana.nostrummagica.entity.EntityDragonRedBase;
+import com.smanzana.nostrummagica.entity.dragon.EntityDragonRedBase;
 
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;

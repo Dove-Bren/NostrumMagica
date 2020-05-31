@@ -17,7 +17,7 @@ import com.smanzana.nostrummagica.client.gui.container.RuneBagGui;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
 import com.smanzana.nostrummagica.client.gui.container.WispBlockGui;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
-import com.smanzana.nostrummagica.entity.ITameDragon;
+import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.items.SpellScroll;

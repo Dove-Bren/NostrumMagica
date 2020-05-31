@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.entity.renderer;
 
-import com.smanzana.nostrummagica.entity.EntityTameDragonRed;
+import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;

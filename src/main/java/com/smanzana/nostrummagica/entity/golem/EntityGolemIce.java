@@ -1,47 +1,45 @@
-package com.smanzana.nostrummagica.entity;
+package com.smanzana.nostrummagica.entity.golem;
 
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.NostrumRoseItem;
 import com.smanzana.nostrummagica.items.NostrumRoseItem.RoseType;
+import com.smanzana.nostrummagica.potions.MagicShieldPotion;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.Spell.SpellPart;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.potion.Potion;
 import net.minecraft.world.World;
 
-public class EntityGolemPhysical extends EntityGolem {
+public class EntityGolemIce extends EntityGolem {
 	
-	private static Spell spellRanged;
-	private static Spell spellDebuff;
+	private static Spell spellRange;
+	private static Spell spellBuff;
 	
 	private static void init() {
-		if (spellRanged == null) {
-			spellRanged = new Spell("Massive Blow", true);
-			//spellRanged.addPart(new SpellPart()); should be projectile
-			spellRanged.addPart(new SpellPart(ProjectileTrigger.instance()));
-			spellRanged.addPart(new SpellPart(SingleShape.instance(),
-					EMagicElement.PHYSICAL,
-					1,
-					null));
-			
-			spellDebuff = new Spell("Corrupt Offense", true);
-			spellDebuff.addPart(new SpellPart(AITargetTrigger.instance()));
-			spellDebuff.addPart(new SpellPart(SingleShape.instance(),
-					EMagicElement.PHYSICAL,
+		if (spellRange == null) {
+			spellRange = new Spell("Chill", true);
+			spellRange.addPart(new SpellPart(AITargetTrigger.instance()));
+			spellRange.addPart(new SpellPart(SingleShape.instance(),
+					EMagicElement.ICE,
 					1,
 					EAlteration.INFLICT));
+			
+			spellBuff = new Spell("Aegis", true);
+			spellBuff.addPart(new SpellPart(AITargetTrigger.instance()));
+			spellBuff.addPart(new SpellPart(SingleShape.instance(),
+					EMagicElement.ICE,
+					1,
+					EAlteration.SUPPORT));
 		}
 	}
 
-	public EntityGolemPhysical(World worldIn) {
-		super(worldIn, EMagicElement.PHYSICAL, true, true, false);
+	public EntityGolemIce(World worldIn) {
+		super(worldIn, EMagicElement.ICE, true, true, true);
 	}
 
 	@Override
@@ -51,44 +49,50 @@ public class EntityGolemPhysical extends EntityGolem {
 
 	@Override
 	public void doRangeTask(EntityLivingBase target) {
-		EntityGolemPhysical.init();
+		EntityGolemIce.init();
 		
-		// Either do debuff or damage
-		if (target.getActivePotionEffect(Potion.getPotionFromResourceLocation("weakness")) == null) {
-			EntityLivingBase targ = this.getAttackTarget();
-			if (targ != target)
-				this.setAttackTarget(target);
-			spellDebuff.cast(this, 1.0f);
-			if (targ != target)
-				this.setAttackTarget(targ);
-		} else {
-			spellRanged.cast(this, 1.0f);
-		}
+		EntityLivingBase targ = this.getAttackTarget();
+		if (targ != target)
+			this.setAttackTarget(target);
+		
+		spellRange.cast(this, 1.0f);
+		
+		if (targ != target)
+			this.setAttackTarget(targ);
 	}
 
 	@Override
 	public void doBuffTask(EntityLivingBase target) {
-		; // shouldn't happen
+		EntityGolemIce.init();
+		
+		EntityLivingBase targ = this.getAttackTarget();
+		if (targ != target)
+			this.setAttackTarget(target);
+		
+		spellBuff.cast(this, 1.0f);
+		
+		if (targ != target)
+			this.setAttackTarget(targ);
 	}
 
 	@Override
 	public boolean shouldDoBuff(EntityLivingBase target) {
-		return true;
+		return target.getActivePotionEffect(MagicShieldPotion.instance()) == null;
 	}
 
 	@Override
 	public void initGolemAttributes() {
-        this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.23D);
+        this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.22D);
 
-        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(16.0D);
+        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20.0D);
 
         this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(6.0D);
-        this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(8.0D);
+        this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(10.0D);
 	}
 
 	@Override
 	public String getTextureKey() {
-		return "physical";
+		return "ice";
 	}
 	
 	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
@@ -97,7 +101,7 @@ public class EntityGolemPhysical extends EntityGolem {
 			count += lootingModifier;
 			
 			this.entityDropItem(EssenceItem.getEssence(
-					EMagicElement.PHYSICAL,
+					EMagicElement.ICE,
 					count), 0);
 			
 			int denom = ROSE_DROP_DENOM;
@@ -110,5 +114,4 @@ public class EntityGolemPhysical extends EntityGolem {
 			}
 		}
 	}
-
 }

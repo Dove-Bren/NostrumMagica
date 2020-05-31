@@ -1,8 +1,9 @@
-package com.smanzana.nostrummagica.entity;
+package com.smanzana.nostrummagica.entity.dragon;
 
 import java.util.UUID;
 
 import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI;
+import com.smanzana.nostrummagica.entity.IEntityTameable;
 
 import net.minecraft.entity.player.EntityPlayer;
 

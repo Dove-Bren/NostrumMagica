@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.entity;
+package com.smanzana.nostrummagica.entity.dragon;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,7 +17,8 @@ import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonInventorySheet;
 import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonSpellSheet;
 import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonContainer;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.entity.IDragonSpawnData.IDragonSpawnFactory;
+import com.smanzana.nostrummagica.entity.IEntityTameable;
+import com.smanzana.nostrummagica.entity.dragon.IDragonSpawnData.IDragonSpawnFactory;
 import com.smanzana.nostrummagica.entity.tasks.DragonAINearestAttackableTarget;
 import com.smanzana.nostrummagica.entity.tasks.DragonGambittedSpellAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.DragonMeleeAttackTask;

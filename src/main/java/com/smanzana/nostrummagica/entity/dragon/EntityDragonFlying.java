@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.entity;
+package com.smanzana.nostrummagica.entity.dragon;
 
 import net.minecraft.entity.ai.EntityMoveHelper;
 import net.minecraft.nbt.NBTTagCompound;

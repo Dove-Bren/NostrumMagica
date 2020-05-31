@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.ModificationTable;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.entity.EntityTameDragonRed.TameRedDragonLore;
+import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed.TameRedDragonLore;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.DragonEgg;

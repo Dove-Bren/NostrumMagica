@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.google.common.collect.Lists;
-import com.smanzana.nostrummagica.entity.EntityDragon;
+import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;

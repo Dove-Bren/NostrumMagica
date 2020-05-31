@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.entity.tasks;
 import java.util.Random;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.entity.EntityGolem;
+import com.smanzana.nostrummagica.entity.golem.EntityGolem;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;

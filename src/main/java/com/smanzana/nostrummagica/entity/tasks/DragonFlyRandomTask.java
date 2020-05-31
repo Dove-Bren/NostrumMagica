@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.entity.tasks;
 
 import java.util.Random;
 
-import com.smanzana.nostrummagica.entity.EntityDragon;
+import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityMoveHelper;

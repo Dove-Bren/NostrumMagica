@@ -5,8 +5,8 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
-import com.smanzana.nostrummagica.entity.EntityDragon;
-import com.smanzana.nostrummagica.entity.EntityShadowDragonRed;
+import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
+import com.smanzana.nostrummagica.entity.dragon.EntityShadowDragonRed;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.entity.EntityLivingBase;

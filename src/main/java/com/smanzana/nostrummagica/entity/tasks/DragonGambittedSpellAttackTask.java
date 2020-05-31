@@ -4,9 +4,9 @@ import java.util.Arrays;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.entity.EntityDragon;
-import com.smanzana.nostrummagica.entity.EntityDragonGambit;
-import com.smanzana.nostrummagica.entity.ITameDragon;
+import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
+import com.smanzana.nostrummagica.entity.dragon.EntityDragonGambit;
+import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.entity.Entity;

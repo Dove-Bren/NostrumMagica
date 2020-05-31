@@ -1,11 +1,11 @@
-package com.smanzana.nostrummagica.entity;
+package com.smanzana.nostrummagica.entity.dragon;
 
 
 import java.util.UUID;
 
 import com.google.common.base.Optional;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.entity.IDragonSpawnData.IDragonSpawnFactory;
+import com.smanzana.nostrummagica.entity.dragon.IDragonSpawnData.IDragonSpawnFactory;
 import com.smanzana.nostrummagica.items.DragonEggFragment;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;

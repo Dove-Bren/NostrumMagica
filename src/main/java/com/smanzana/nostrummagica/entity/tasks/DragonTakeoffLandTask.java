@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.entity.tasks;
 
 import java.util.Date;
 
-import com.smanzana.nostrummagica.entity.EntityDragonFlying;
+import com.smanzana.nostrummagica.entity.dragon.EntityDragonFlying;
 
 import net.minecraft.entity.ai.EntityAIBase;
 

@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.entity.tasks;
 
-import com.smanzana.nostrummagica.entity.EntityDragon;
-import com.smanzana.nostrummagica.entity.EntityDragonFlying;
+import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
+import com.smanzana.nostrummagica.entity.dragon.EntityDragonFlying;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
