@@ -62,10 +62,10 @@ public class EntitySpellProjectile extends EntityFireball {
 		super.onUpdate();
 		
 		// if client
-		if (this.ticksExisted % 5 == 0) {
-			this.worldObj.spawnParticle(EnumParticleTypes.CRIT_MAGIC,
-					posX, posY, posZ, 0, 0, 0);
-		}
+//		if (this.ticksExisted % 5 == 0) {
+//			this.worldObj.spawnParticle(EnumParticleTypes.CRIT_MAGIC,
+//					posX, posY, posZ, 0, 0, 0);
+//		}
 		
 		if (!worldObj.isRemote) {
 			if (origin == null) {
@@ -105,4 +105,14 @@ public class EntitySpellProjectile extends EntityFireball {
 		// Returning false means we won't be saved. That's what we want.
 		return false;
     }
+	
+	@Override
+	protected boolean isFireballFiery() {
+		return false;
+	}
+	
+	@Override
+	protected EnumParticleTypes getParticleType() {
+		return EnumParticleTypes.SPELL_MOB;
+	}
 }
