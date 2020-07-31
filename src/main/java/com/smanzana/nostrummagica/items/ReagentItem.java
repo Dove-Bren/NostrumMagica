@@ -3,8 +3,6 @@ package com.smanzana.nostrummagica.items;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.CropGinseng;
-import com.smanzana.nostrummagica.blocks.CropMandrakeRoot;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower.Type;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
@@ -23,6 +21,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -168,25 +167,12 @@ public class ReagentItem extends Item implements ILoreTagged {
     	ReagentType type = getTypeFromMeta(stack.getMetadata());
     	
     	if (type == ReagentType.MANDRAKE_ROOT) {
-	    	IBlockState state = worldIn.getBlockState(pos);
-	        if (facing == EnumFacing.UP && playerIn.canPlayerEdit(pos.offset(facing), facing, stack) && state.getBlock().canSustainPlant(state, worldIn, pos, EnumFacing.UP, CropMandrakeRoot.instance()) && worldIn.isAirBlock(pos.up())) {
-	        	worldIn.setBlockState(pos.up(), CropMandrakeRoot.instance().getDefaultState());
-	            --stack.stackSize;
-	            return EnumActionResult.SUCCESS;
-	        } else {
-	        	return EnumActionResult.FAIL;
-	        }
+    		// Try to plant as seed. Convenient!
+    		return ReagentSeed.Mandrake.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ);
     	}
     	
     	if (type == ReagentType.GINSENG) {
-	    	IBlockState state = worldIn.getBlockState(pos);
-	        if (facing == EnumFacing.UP && playerIn.canPlayerEdit(pos.offset(facing), facing, stack) && state.getBlock().canSustainPlant(state, worldIn, pos, EnumFacing.UP, CropGinseng.instance()) && worldIn.isAirBlock(pos.up())) {
-	        	worldIn.setBlockState(pos.up(), CropGinseng.instance().getDefaultState());
-	            --stack.stackSize;
-	            return EnumActionResult.SUCCESS;
-	        } else {
-	        	return EnumActionResult.FAIL;
-	        }
+	    	return ReagentSeed.Ginseng.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ);
     	}
     	
     	if (type == ReagentType.CRYSTABLOOM) {
@@ -206,6 +192,9 @@ public class ReagentItem extends Item implements ILoreTagged {
 	public static void init() {
 		GameRegistry.addShapelessRecipe(instance.getReagent(ReagentType.SPIDER_SILK, 1),
 				Items.STRING, Items.STRING, Items.SUGAR);
+		
+		MinecraftForge.addGrassSeed(instance().getReagent(ReagentType.MANDRAKE_ROOT, 1), 6);
+		MinecraftForge.addGrassSeed(instance().getReagent(ReagentType.GINSENG, 1), 5);
 	}
 
 	@Override

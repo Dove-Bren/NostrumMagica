@@ -34,6 +34,9 @@ item.nostrum_reagent.spider_silk.name=Spider Silk
 item.nostrum_reagent.mani_dust.name=Mani Dust
 item.nostrum_reagent.crystabloom.name=Crystabloom
 
+item.reagentseed.mandrake.name=Mandrake Seeds
+item.reagentseed.ginseng.name=Ginseng Seeds
+
 item.nostrum_gem.basic.name=Void Gem
 item.nostrum_gem.lightning.name=Lightning Gem
 item.nostrum_gem.fire.name=Fire Gem

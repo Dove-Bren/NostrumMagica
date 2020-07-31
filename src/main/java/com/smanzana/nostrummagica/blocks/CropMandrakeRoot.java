@@ -6,6 +6,7 @@ import java.util.Random;
 
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.items.ReagentSeed;
 
 import net.minecraft.block.BlockCrops;
 import net.minecraft.block.state.IBlockState;
@@ -38,20 +39,36 @@ public class CropMandrakeRoot extends BlockCrops {
 	protected ItemStack getCrops(int count) {
         return ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, count);
     }
+	
+	protected Item getSeed() {
+		return ReagentSeed.Mandrake;
+	}
+	
+	protected ItemStack getSeeds(int count) {
+		return new ItemStack(getSeed(), count);
+	}
 
     @Override
-    public java.util.List<ItemStack> getDrops(net.minecraft.world.IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
+    public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
         List<ItemStack> ret = new LinkedList<>();//super.getDrops(world, pos, state, fortune);
         int age = getAge(state);
         Random rand = world instanceof World ? ((World)world).rand : new Random();
 
-        int count = 0;
+        int cropCount = 0;
         if (age >= getMaxAge()){
-        	count = 2 + rand.nextInt(2) + fortune;
+        	cropCount = 2 + rand.nextInt(2) + fortune;
         }
         
-        if (count != 0)
-        	ret.add(getCrops(count));
+        if (cropCount != 0) {
+        	ret.add(getCrops(cropCount));
+        }
+        
+        int seedCount = 1;
+        if (age >= getMaxAge()) {
+        	seedCount += rand.nextInt(2) + fortune;
+        }
+        
+        ret.add(getSeeds(seedCount));
         
         return ret;
     }

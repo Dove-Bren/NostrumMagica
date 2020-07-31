@@ -31,7 +31,6 @@ import com.smanzana.nostrummagica.spells.components.SpellAction;
 
 import baubles.api.BaublesApi;
 import baubles.api.cap.IBaublesItemHandler;
-import net.minecraft.block.BlockTallGrass;
 import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
@@ -613,25 +612,25 @@ public class PlayerListener {
 			event.getWorld().spawnEntityInWorld(entity);
 		}
 		
-		if (event.getState().getBlock() instanceof BlockTallGrass
-				&& NostrumMagica.rand.nextFloat() <= 0.05f) {
-			EntityItem entity = new EntityItem(event.getWorld(),
-					event.getPos().getX() + 0.5,
-					event.getPos().getY() + 0.5,
-					event.getPos().getZ() + 0.5,
-					ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1));
-			event.getWorld().spawnEntityInWorld(entity);
-		}
-		
-		if (event.getState().getBlock() instanceof BlockTallGrass
-				&& NostrumMagica.rand.nextFloat() <= 0.05f) {
-			EntityItem entity = new EntityItem(event.getWorld(),
-					event.getPos().getX() + 0.5,
-					event.getPos().getY() + 0.5,
-					event.getPos().getZ() + 0.5,
-					ReagentItem.instance().getReagent(ReagentType.GINSENG, 1));
-			event.getWorld().spawnEntityInWorld(entity);
-		}
+//		if (event.getState().getBlock() instanceof BlockTallGrass
+//				&& NostrumMagica.rand.nextFloat() <= 0.05f) {
+//			EntityItem entity = new EntityItem(event.getWorld(),
+//					event.getPos().getX() + 0.5,
+//					event.getPos().getY() + 0.5,
+//					event.getPos().getZ() + 0.5,
+//					ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1));
+//			event.getWorld().spawnEntityInWorld(entity);
+//		}
+//		
+//		if (event.getState().getBlock() instanceof BlockTallGrass
+//				&& NostrumMagica.rand.nextFloat() <= 0.05f) {
+//			EntityItem entity = new EntityItem(event.getWorld(),
+//					event.getPos().getX() + 0.5,
+//					event.getPos().getY() + 0.5,
+//					event.getPos().getZ() + 0.5,
+//					ReagentItem.instance().getReagent(ReagentType.GINSENG, 1));
+//			event.getWorld().spawnEntityInWorld(entity);
+//		}
 	}
 	
 	@SubscribeEvent

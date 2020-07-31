@@ -110,6 +110,7 @@ import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.ReagentSeed;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.items.SeekerIdol;
@@ -624,6 +625,9 @@ public class ClientProxy extends CommonProxy {
 		registerModel(Item.getItemFromBlock(WispBlock.instance()),
 				0,
 				WispBlock.ID);
+		
+		registerModel(ReagentSeed.Mandrake, 0, ReagentSeed.MANDRAKE_ID);
+		registerModel(ReagentSeed.Ginseng, 0, ReagentSeed.GINSENG_ID);
 	}
 	
 	@Override

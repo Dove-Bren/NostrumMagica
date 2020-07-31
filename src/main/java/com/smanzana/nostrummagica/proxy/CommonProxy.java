@@ -89,6 +89,7 @@ import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.ReagentSeed;
 import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.items.SeekerIdol;
 import com.smanzana.nostrummagica.items.ShrineSeekingGem;
@@ -522,6 +523,11 @@ public class CommonProxy {
     	HookshotItem.instance().setRegistryName(NostrumMagica.MODID, HookshotItem.ID);
     	GameRegistry.register(HookshotItem.instance());
     	HookshotItem.init();
+    	
+    	ReagentSeed.Mandrake.setRegistryName(NostrumMagica.MODID, ReagentSeed.MANDRAKE_ID);
+    	GameRegistry.register(ReagentSeed.Mandrake);
+    	ReagentSeed.Ginseng.setRegistryName(NostrumMagica.MODID, ReagentSeed.GINSENG_ID);
+    	GameRegistry.register(ReagentSeed.Ginseng);
     }
     
     private void registerBlocks() {
