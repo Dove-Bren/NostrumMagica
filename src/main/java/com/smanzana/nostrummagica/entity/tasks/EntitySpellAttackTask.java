@@ -44,17 +44,11 @@ public class EntitySpellAttackTask<T extends EntityLiving> extends EntityAIBase 
 		if (needsTarget && entity.getAttackTarget() == null)
 			return false;
 		
-		if (this.attackTicks == 0) {
-			if (odds > 0 && entity.getRNG().nextInt(odds) == 0) {
-				return true;
-			}
-		}
-		
 		if (needsTarget && !entity.getEntitySenses().canSee(entity.getAttackTarget())){
 			return false;
 		}
 		
-		return false;
+		return (this.attackTicks == 0 && (odds <= 0 || entity.getRNG().nextInt(odds) == 0));
 	}
 	
 	@Override

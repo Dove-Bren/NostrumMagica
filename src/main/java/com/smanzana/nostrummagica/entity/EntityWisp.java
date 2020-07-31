@@ -61,6 +61,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -99,13 +100,15 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 				return getSpellToUse();
 			}
 		});
-		this.tasks.addTask(priority++, new EntityAIStayHomeTask<EntityWisp>(this, 1D, (MAX_WISP_DISTANCE_SQ * .8)));
+		if (this.getHome() != null) {
+			this.tasks.addTask(priority++, new EntityAIStayHomeTask<EntityWisp>(this, 1D, (MAX_WISP_DISTANCE_SQ * .8)));
+		}
 		
 		priority = 1;
-		this.targetTasks.addTask(priority++, new EntityAIHurtByTarget(this, false, new Class[0]));
+		this.targetTasks.addTask(priority++, new EntityAIHurtByTarget(this, true, new Class[] {EntityWisp.class}));
 		this.targetTasks.addTask(priority++, new EntityAINearestAttackableTarget<EntityMob>(this, EntityMob.class, 10, true, false, (mob) -> {
 			return (mob instanceof IEntityTameable ? !((IEntityTameable) mob).isTamed()
-					: false);
+					: true);
 		}));
 	}
 	
@@ -224,7 +227,9 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 	@Override
 	public void readEntityFromNBT(NBTTagCompound compound) {
 		super.readEntityFromNBT(compound);
-		setHome(BlockPos.fromLong(compound.getLong("home")));
+		if (compound.hasKey("home", NBT.TAG_LONG)) {
+			setHome(BlockPos.fromLong(compound.getLong("home")));
+		}
 	}
 	
 	@Override
@@ -301,12 +306,12 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 	}
 	
 	protected Spell getSpellToUse() {
+		ItemStack scroll = null;
 		BlockPos homePos = this.getHome();
-		if (homePos == null) {
-			return null;
+		if (homePos != null) {
+			scroll = WispBlock.instance().getScroll(worldObj, homePos);
 		}
 		
-		ItemStack scroll = WispBlock.instance().getScroll(worldObj, homePos);
 		if (scroll == null) {
 			// Use a random spell
 			init();
