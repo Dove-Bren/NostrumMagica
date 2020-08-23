@@ -36,6 +36,15 @@ public class SorceryPortalSpawner extends Block implements ITriggeredBlock {
 		this.setSoundType(SoundType.STONE);
 	}
 	
+	protected void deactivatePortal(World world, BlockPos pos, IBlockState state) {
+		// Remove portal above us
+		world.setBlockToAir(pos.up());
+	}
+	
+	protected void activatePortal(World world, BlockPos pos, IBlockState state) {
+		world.setBlockState(pos.up(), SorceryPortal.instance().getStateForPlacement(world, pos, EnumFacing.UP, 0f, 0f, 0f, 0, null, null));
+	}
+	
 	private void destroy(World world, BlockPos pos, IBlockState state) {
 		if (state == null)
 			state = world.getBlockState(pos);
@@ -43,8 +52,7 @@ public class SorceryPortalSpawner extends Block implements ITriggeredBlock {
 		if (state == null)
 			return;
 		
-		// Remove portal above us
-		world.setBlockToAir(pos.up());
+		deactivatePortal(world, pos, state);
 	}
 	
 	@Override
@@ -61,7 +69,7 @@ public class SorceryPortalSpawner extends Block implements ITriggeredBlock {
 	
 	@Override
 	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
-		worldIn.setBlockState(pos.up(), SorceryPortal.instance().getStateForPlacement(worldIn, pos, EnumFacing.UP, 0f, 0f, 0f, 0, null, null));
+		activatePortal(worldIn, pos, state);
 	}
 
 	@Override
@@ -69,7 +77,7 @@ public class SorceryPortalSpawner extends Block implements ITriggeredBlock {
 		IBlockState aboveState = world.getBlockState(blockPos.up());
 		SorceryPortal.instance();
 		if (aboveState == null || !(aboveState.getBlock() instanceof SorceryPortal)) {
-			this.onBlockAdded(world, blockPos, state);
+			this.activatePortal(world, blockPos, state);
 		}
 	}
 }

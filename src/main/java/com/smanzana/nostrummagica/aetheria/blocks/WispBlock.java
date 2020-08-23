@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.blocks;
+package com.smanzana.nostrummagica.aetheria.blocks;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.entity.EntityWisp;
@@ -21,13 +22,10 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -66,6 +64,8 @@ public class WispBlock extends BlockContainer {
 		this.setResistance(10.0f);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setSoundType(SoundType.GLASS);
+		
+		int unused; // too many chunk updates! What's this doing??
 	}
 	
 	@Override
@@ -206,7 +206,7 @@ public class WispBlock extends BlockContainer {
 		return table.getMaxWisps();
 	}
 	
-	public static class WispBlockTileEntity extends TileEntity implements ITickable {
+	public static class WispBlockTileEntity extends AetherTickingTileEntity {
 
 		// Synced+saved
 		private ItemStack scroll;
@@ -224,15 +224,21 @@ public class WispBlock extends BlockContainer {
 		private static final int MAX_WISPS = 3;
 		private static final float REAGENT_PER_SECOND = (1f / 120f);  // 1 per 2 minutes
 		
+		private static final int MAX_AETHER = 5000;
+		private static final int AETHER_PER_TICK = 2;
+		
 		private int ticksExisted;
 		
 		public WispBlockTileEntity() {
+			super(0, MAX_AETHER);
 			scroll = null;
 			reagent = null;
 			reagentPartial = 0f;
 			wisps = new LinkedList<>();
 			ticksExisted = 0;
 			activated = false;
+			this.setAutoFill(true);
+			this.setAutoSync(5);
 		}
 		
 		public ItemStack getScroll() {
@@ -335,6 +341,7 @@ public class WispBlock extends BlockContainer {
 
 		@Override
 		public void update() {
+			super.update();
 			ticksExisted++;
 			
 			if (worldObj.isRemote) {
@@ -342,7 +349,9 @@ public class WispBlock extends BlockContainer {
 			}
 			
 			if (!activated) {
-				if (this.getScroll() != null && (this.getReagent() != null || this.reagentPartial >= REAGENT_PER_SECOND)) {
+				if (this.getScroll() != null
+						&& (this.getReagent() != null || this.reagentPartial >= REAGENT_PER_SECOND)
+						/*&& (this.getOnlyMyAether(null) > AETHER_PER_TICK)*/) {
 					activate();
 				} else {
 					return;
@@ -381,6 +390,18 @@ public class WispBlock extends BlockContainer {
 				} else {
 					// Update client
 					this.dirty();
+				}
+			}
+			
+			// Every tick, consume aether
+			if (!wisps.isEmpty()) {
+				final int debt = AETHER_PER_TICK * getWispCount();
+				if (this.drawAether(null, debt) != debt) {
+					// Didn't have enough. Deactivate!
+					deactivate();
+				} else {
+					// Try to fill up what we just spent
+					this.fillAether(1000);
 				}
 			}
 			
@@ -444,21 +465,8 @@ public class WispBlock extends BlockContainer {
 		}
 		
 		@Override
-		public NBTTagCompound getUpdateTag() {
-			return this.writeToNBT(new NBTTagCompound());
-		}
-		
-		@Override
-		public SPacketUpdateTileEntity getUpdatePacket() {
-			NBTTagCompound nbt = new NBTTagCompound();
-			this.writeToNBT(nbt);
-			return new SPacketUpdateTileEntity(this.pos, 3, nbt);
-		}
-		
-		@Override
-		public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
-			super.onDataPacket(net, pkt);
-			handleUpdateTag(pkt.getNbtCompound());
+		protected void onAetherFlowTick(int diff, boolean added, boolean taken) {
+			;
 		}
 	}
 }

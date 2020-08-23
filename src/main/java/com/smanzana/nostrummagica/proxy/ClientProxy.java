@@ -25,7 +25,6 @@ import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.blocks.ProgressionDoor;
 import com.smanzana.nostrummagica.blocks.SorceryPortal;
 import com.smanzana.nostrummagica.blocks.SwitchBlock;
-import com.smanzana.nostrummagica.blocks.WispBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.effects.ClientEffect;
 import com.smanzana.nostrummagica.client.effects.ClientEffectBeam;
@@ -51,7 +50,6 @@ import com.smanzana.nostrummagica.client.render.TileEntityObeliskRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityPortalRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityProgressionDoorRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntitySymbolRenderer;
-import com.smanzana.nostrummagica.client.render.TileEntityWispBlockRenderer;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityHookShot;
 import com.smanzana.nostrummagica.entity.EntityKoid;
@@ -110,8 +108,8 @@ import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
-import com.smanzana.nostrummagica.items.ReagentSeed;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.items.ReagentSeed;
 import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.items.SeekerIdol;
 import com.smanzana.nostrummagica.items.ShrineSeekingGem;
@@ -401,7 +399,6 @@ public class ClientProxy extends CommonProxy {
     	TileEntityObeliskRenderer.init();
     	TileEntityPortalRenderer.init();
     	TileEntityProgressionDoorRenderer.init();
-    	TileEntityWispBlockRenderer.init();
     	
     	OBJLoader.INSTANCE.addDomain(NostrumMagica.MODID);
     	
@@ -621,10 +618,6 @@ public class ClientProxy extends CommonProxy {
 					HookshotItem.MakeMeta(type, false),
 					HookshotItem.ID + "_" + HookshotItem.GetTypeSuffix(type));
 		}
-		
-		registerModel(Item.getItemFromBlock(WispBlock.instance()),
-				0,
-				WispBlock.ID);
 		
 		registerModel(ReagentSeed.Mandrake, 0, ReagentSeed.MANDRAKE_ID);
 		registerModel(ReagentSeed.Ginseng, 0, ReagentSeed.GINSENG_ID);

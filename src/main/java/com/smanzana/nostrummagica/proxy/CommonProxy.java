@@ -31,7 +31,6 @@ import com.smanzana.nostrummagica.blocks.SorceryPortalSpawner;
 import com.smanzana.nostrummagica.blocks.SpellTable;
 import com.smanzana.nostrummagica.blocks.SwitchBlock;
 import com.smanzana.nostrummagica.blocks.SymbolBlock;
-import com.smanzana.nostrummagica.blocks.WispBlock;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagic;
@@ -675,17 +674,8 @@ public class CommonProxy {
     			new ResourceLocation(NostrumMagica.MODID, SorceryPortalSpawner.ID));
     	SorceryPortalSpawner.init();
     	
-    	GameRegistry.register(WispBlock.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, WispBlock.ID));
-    	GameRegistry.register(
-    			(new ItemBlock(WispBlock.instance()).setRegistryName(WispBlock.ID)
-    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(WispBlock.ID))
-    			);
-    	WispBlock.init();
-    	
     	GameRegistry.register(ManiCrystal.instance(),
     			new ResourceLocation(NostrumMagica.MODID, ManiCrystal.ID));
-    	
     }
     
     public void syncPlayer(EntityPlayerMP player) {

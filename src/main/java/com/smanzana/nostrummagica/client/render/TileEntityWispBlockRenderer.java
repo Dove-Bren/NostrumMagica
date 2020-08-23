@@ -3,12 +3,13 @@ package com.smanzana.nostrummagica.client.render;
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.WispBlock.WispBlockTileEntity;
+import com.smanzana.nostrummagica.aetheria.blocks.WispBlock.WispBlockTileEntity;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.GlStateManager.DestFactor;
 import net.minecraft.client.renderer.GlStateManager.SourceFactor;
@@ -188,6 +189,23 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 		tessellator.draw();
 	}
 	
+	protected void renderAetherDebug(WispBlockTileEntity te) {
+		final int aether = te.getAether(null);
+		final int maxAether = te.getMaxAether(null);
+		final String str = aether + " / " + maxAether;
+		final FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
+		
+		GlStateManager.pushMatrix();
+		
+		GlStateManager.rotate(180, 1, 0, 0);
+		// Make billboard
+		GlStateManager.color(1f, 1f, 1f, 1f);
+		GlStateManager.disableBlend();
+		GlStateManager.disableLighting();
+		fonter.drawString(str, -(fonter.getStringWidth(str) / 2), 0, 0xFF000000);
+		GlStateManager.popMatrix();
+	}
+	
 	@Override
 	public void renderTileEntityAt(WispBlockTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
 		
@@ -202,13 +220,13 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 		//float progLongOffset = (float) Math.sin(progressLong * Math.PI * 2);
 		
 		// Figure out color and fetch scroll
-		int color = 0xFFFFFFFF;
+		int baseColor = 0xFFFFFFFF;
 		int spellIcon = -1;
 		ItemStack scroll = te.getScroll();
 		if (scroll != null) {
 			Spell spell = SpellScroll.getSpell(scroll);
 			if (spell != null) {
-				color = spell.getPrimaryElement().getColor();
+				baseColor = spell.getPrimaryElement().getColor();
 				spellIcon = spell.getIconIndex();
 			}
 			
@@ -315,7 +333,14 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 				final float voffset = reagents != null && scroll != null ? (float) (Math.sin((((float) i / ((float) count / 2f)) + progressShort) * Math.PI * 2) * .05) : 0f;
 				//final float rotoffset = reagents != null && scroll != null ? (360f * progressLong) : 0f;
 				final float rotoffset = 360f * progressLong;
+				int color = baseColor;
 				//double voffset = progShortOffset * .01;
+				
+				// draw white if aether levels are low.
+				if ((float) i / (float) count
+						>= (float) te.getAether(null) / (float) te.getMaxAether(null)) {
+					color = 0xFFFFFFFF;
+				}
 				
 				GlStateManager.pushMatrix();
 				Minecraft.getMinecraft().getTextureManager().bindTexture(GEM_TEX_LOC);
@@ -362,6 +387,12 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 			}
 		}
 		
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(0, 2.5, 0);
+		GlStateManager.scale(.05, .05, .05);
+		GlStateManager.rotate(90f + (float) (360.0 * (Math.atan2(z, x) / (2 * Math.PI))), 0, -1, 0);
+		renderAetherDebug(te);
+		GlStateManager.popMatrix();
 		
 		
 		GlStateManager.color(1f, 1f, 1f, 1f);

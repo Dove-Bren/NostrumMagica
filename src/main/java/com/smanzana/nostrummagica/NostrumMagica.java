@@ -7,12 +7,12 @@ import java.util.Random;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.smanzana.nostrummagica.aetheria.AetheriaProxy;
 import com.smanzana.nostrummagica.baubles.BaublesProxy;
 import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble.ItemType;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
 import com.smanzana.nostrummagica.blocks.SorceryPortal;
-import com.smanzana.nostrummagica.blocks.WispBlock;
 import com.smanzana.nostrummagica.capabilities.AttributeProvider;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.command.CommandAllQuests;
@@ -35,7 +35,6 @@ import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
-import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
@@ -173,6 +172,8 @@ public class NostrumMagica
     public static NostrumMagica instance;
     @SidedProxy(clientSide="com.smanzana.nostrummagica.baubles.BaublesClientProxy", serverSide="com.smanzana.nostrummagica.baubles.BaublesProxy")
     public static BaublesProxy baubles;
+    @SidedProxy(clientSide="com.smanzana.nostrummagica.aetheria.AetheriaClientProxy", serverSide="com.smanzana.nostrummagica.aetheria.AetheriaProxy")
+    public static AetheriaProxy aetheria;
     
     public static CreativeTabs creativeTab;
     public static CreativeTabs enhancementTab;
@@ -190,6 +191,7 @@ public class NostrumMagica
     public void init(FMLInitializationEvent event) {
         proxy.init();
         baubles.init();
+        aetheria.init();
         new NostrumLootHandler();
         NostrumDimensionMapper.registerDimensions();
     }
@@ -220,11 +222,15 @@ public class NostrumMagica
 	    if (Loader.isModLoaded("Baubles")) {
 	    	baubles.enable();
 	    }
+	    if (Loader.isModLoaded("nostrumaetheria")) {
+	    	aetheria.enable();
+	    }
 	    
     	new ModConfig(new Configuration(event.getSuggestedConfigurationFile()));
     	
     	proxy.preinit();
     	baubles.preInit();
+    	aetheria.preInit();
     	
     	DungeonRoomRegistry.instance().loadRegistryFromDisk();
     	
@@ -244,6 +250,7 @@ public class NostrumMagica
     public void postinit(FMLPostInitializationEvent event) {
     	proxy.postinit();
     	baubles.postInit();
+    	aetheria.postInit();
     	
     	initFinished = true;
     	
@@ -1067,18 +1074,6 @@ public class NostrumMagica
 						)
 				);
 		
-		RitualRegistry.instance().addRitual(
-				RitualRecipe.createTier3("wisp_crystal",
-						new ItemStack(WispBlock.instance()),
-						null,
-						new ReagentType[] {ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST},
-						new ItemStack(AltarItem.instance()),
-						new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), new ItemStack(Blocks.OBSIDIAN, 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1)},
-						null,
-						new OutcomeSpawnItem(new ItemStack(WispBlock.instance()))
-						)
-				);
-		
 //		RitualRegistry.instance().addRitual(
 //				RitualRecipe.createTier2("ritual.form_obelisk.name", EMagicElement.ENDER,
 //					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK},
@@ -1770,5 +1765,10 @@ public class NostrumMagica
     	
     	// Reset portal data so previous saves don't screw you over
     	NostrumPortal.resetTimers();
+    }
+    
+    public static final boolean isBlockLoaded(World world, BlockPos pos) {
+    	// world's method is stupid and always returns true. Internal func always returns true OR generates chunk. lol.
+    	return (world.getChunkProvider().getLoadedChunk(pos.getX() >> 4, pos.getZ() >> 4) != null);
     }
 }

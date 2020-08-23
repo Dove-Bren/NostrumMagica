@@ -4,11 +4,11 @@ import java.util.List;
 
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.aetheria.blocks.WispBlock.WispBlockTileEntity;
 import com.smanzana.nostrummagica.blocks.LoreTable.LoreTableEntity;
 import com.smanzana.nostrummagica.blocks.ModificationTable.ModificationTableEntity;
 import com.smanzana.nostrummagica.blocks.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.blocks.SpellTable.SpellTableEntity;
-import com.smanzana.nostrummagica.blocks.WispBlock.WispBlockTileEntity;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.container.LoreTableGui;
 import com.smanzana.nostrummagica.client.gui.container.ModificationTableGui;
