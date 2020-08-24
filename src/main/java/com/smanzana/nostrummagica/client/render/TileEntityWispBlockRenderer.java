@@ -190,8 +190,8 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 	}
 	
 	protected void renderAetherDebug(WispBlockTileEntity te) {
-		final int aether = te.getAether(null);
-		final int maxAether = te.getMaxAether(null);
+		final int aether = te.getHandler().getAether(null);
+		final int maxAether = te.getHandler().getMaxAether(null);
 		final String str = aether + " / " + maxAether;
 		final FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
 		
@@ -338,7 +338,7 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 				
 				// draw white if aether levels are low.
 				if ((float) i / (float) count
-						>= (float) te.getAether(null) / (float) te.getMaxAether(null)) {
+						>= (float) te.getHandler().getAether(null) / (float) te.getHandler().getMaxAether(null)) {
 					color = 0xFFFFFFFF;
 				}
 				

@@ -237,7 +237,6 @@ public class WispBlock extends BlockContainer {
 			wisps = new LinkedList<>();
 			ticksExisted = 0;
 			activated = false;
-			this.setAutoFill(true);
 			this.setAutoSync(5);
 		}
 		
@@ -257,7 +256,7 @@ public class WispBlock extends BlockContainer {
 			}
 			
 			this.scroll = item;
-			this.dirty();
+			this.dirtyAndUpdate();
 			return true;
 		}
 		
@@ -277,7 +276,7 @@ public class WispBlock extends BlockContainer {
 			}
 			
 			this.reagent = item;
-			this.dirty();
+			this.dirtyAndUpdate();
 			return true;
 		}
 		
@@ -293,7 +292,7 @@ public class WispBlock extends BlockContainer {
 			return MAX_WISPS;
 		}
 		
-		private void dirty() {
+		private void dirtyAndUpdate() {
 			worldObj.markBlockRangeForRenderUpdate(pos, pos);
 			worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 3);
 			worldObj.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
@@ -309,12 +308,12 @@ public class WispBlock extends BlockContainer {
 			}
 			wisps.clear();
 			
-			dirty();
+			dirtyAndUpdate();
 		}
 		
 		private void activate() {
 			this.activated = true;
-			dirty();
+			dirtyAndUpdate();
 		}
 		
 		private void spawnWisp() {
@@ -335,7 +334,7 @@ public class WispBlock extends BlockContainer {
 				wisp.setPosition(spawnPos.getX() + .5, spawnPos.getY(), spawnPos.getZ() + .5);
 				this.wisps.add(wisp);
 				this.worldObj.spawnEntityInWorld(wisp);
-				this.dirty();
+				this.dirtyAndUpdate();
 			}
 		}
 
@@ -389,19 +388,19 @@ public class WispBlock extends BlockContainer {
 					deactivate();
 				} else {
 					// Update client
-					this.dirty();
+					this.dirtyAndUpdate();
 				}
 			}
 			
 			// Every tick, consume aether
 			if (!wisps.isEmpty()) {
 				final int debt = AETHER_PER_TICK * getWispCount();
-				if (this.drawAether(null, debt) != debt) {
+				if (this.handler.drawAether(null, debt) != debt) {
 					// Didn't have enough. Deactivate!
 					deactivate();
 				} else {
 					// Try to fill up what we just spent
-					this.fillAether(1000);
+					this.handler.fillAether(1000);
 				}
 			}
 			
@@ -414,7 +413,7 @@ public class WispBlock extends BlockContainer {
 				EntityWisp wisp = it.next();
 				if (wisp.isDead) {
 					it.remove();
-					this.dirty();
+					this.dirtyAndUpdate();
 				}
 			}
 			
@@ -465,8 +464,12 @@ public class WispBlock extends BlockContainer {
 		}
 		
 		@Override
-		protected void onAetherFlowTick(int diff, boolean added, boolean taken) {
-			;
+		public void setWorldObj(World world) {
+			super.setWorldObj(world);
+			
+			if (!world.isRemote) {
+				this.handler.setAutoFill(true);
+			}
 		}
 	}
 }
