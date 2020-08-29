@@ -238,6 +238,7 @@ public class WispBlock extends BlockContainer {
 			ticksExisted = 0;
 			activated = false;
 			this.setAutoSync(5);
+			this.handler.configureInOut(true, false);
 		}
 		
 		public ItemStack getScroll() {
