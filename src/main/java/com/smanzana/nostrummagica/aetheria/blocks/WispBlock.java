@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SpellScroll;
+import com.smanzana.nostrummagica.utils.Inventories;
 
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
@@ -20,6 +21,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -64,8 +66,6 @@ public class WispBlock extends BlockContainer {
 		this.setResistance(10.0f);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setSoundType(SoundType.GLASS);
-		
-		int unused; // too many chunk updates! What's this doing??
 	}
 	
 	@Override
@@ -206,8 +206,11 @@ public class WispBlock extends BlockContainer {
 		return table.getMaxWisps();
 	}
 	
-	public static class WispBlockTileEntity extends AetherTickingTileEntity {
+	public static class WispBlockTileEntity extends AetherTickingTileEntity implements IInventory {
 
+		private static final String NBT_INVENTORY = "inventory";
+		private static final String NBT_PARTIAL = "partial";
+		
 		// Synced+saved
 		private ItemStack scroll;
 		private ItemStack reagent;
@@ -249,15 +252,11 @@ public class WispBlock extends BlockContainer {
 			if (item != null && this.scroll != null)
 				return false;
 			
-			if (item != null) {
-				// Valid scroll?
-				if (!(item.getItem() instanceof SpellScroll) || SpellScroll.getSpell(item) == null) {
-					return false;
-				}
+			if (!isItemValidForSlot(0, item)) {
+				return false;
 			}
 			
-			this.scroll = item;
-			this.dirtyAndUpdate();
+			this.setInventorySlotContents(0, item);
 			return true;
 		}
 		
@@ -269,15 +268,11 @@ public class WispBlock extends BlockContainer {
 			if (item != null && this.reagent != null)
 				return false;
 			
-			if (item != null) {
-				// Valid reagent?
-				if (!(item.getItem() instanceof ReagentItem)) {
-					return false;
-				}
+			if (!isItemValidForSlot(1, item)) {
+				return false;
 			}
 			
-			this.reagent = item;
-			this.dirtyAndUpdate();
+			this.setInventorySlotContents(1, item);
 			return true;
 		}
 		
@@ -335,7 +330,7 @@ public class WispBlock extends BlockContainer {
 				wisp.setPosition(spawnPos.getX() + .5, spawnPos.getY(), spawnPos.getZ() + .5);
 				this.wisps.add(wisp);
 				this.worldObj.spawnEntityInWorld(wisp);
-				this.dirtyAndUpdate();
+				//this.dirtyAndUpdate();
 			}
 		}
 
@@ -346,6 +341,15 @@ public class WispBlock extends BlockContainer {
 			
 			if (worldObj.isRemote) {
 				return;
+			}
+			
+			Iterator<EntityWisp> it = wisps.iterator();
+			while (it.hasNext()) {
+				EntityWisp wisp = it.next();
+				if (wisp.isDead) {
+					it.remove();
+					//this.dirtyAndUpdate();
+				}
 			}
 			
 			if (!activated) {
@@ -389,7 +393,7 @@ public class WispBlock extends BlockContainer {
 					deactivate();
 				} else {
 					// Update client
-					this.dirtyAndUpdate();
+					//this.dirtyAndUpdate();
 				}
 			}
 			
@@ -409,15 +413,6 @@ public class WispBlock extends BlockContainer {
 				return;
 			}
 			
-			Iterator<EntityWisp> it = wisps.iterator();
-			while (it.hasNext()) {
-				EntityWisp wisp = it.next();
-				if (wisp.isDead) {
-					it.remove();
-					this.dirtyAndUpdate();
-				}
-			}
-			
 			// If not at max wisps, maybe spawn one every once in a while
 			if (ticksExisted % (20 * 3) == 0 && wisps.size() < getMaxWisps()) {
 				if (NostrumMagica.rand.nextInt(10) == 0) {
@@ -433,19 +428,23 @@ public class WispBlock extends BlockContainer {
 			if (nbt == null)
 				nbt = new NBTTagCompound();
 			
-			if (scroll != null)
-				nbt.setTag("scroll", scroll.serializeNBT());
-			
-			if (reagent != null)
-				nbt.setTag("reagent", reagent.serializeNBT());
-			
 			if (reagentPartial != 0f)
-				nbt.setFloat("partial", reagentPartial);
+				nbt.setFloat(NBT_PARTIAL, reagentPartial);
 			
-			if (activated) {
-				nbt.setBoolean("active", activated);
-				nbt.setInteger("wisps", wisps.size());
-			}
+			nbt.setTag(NBT_INVENTORY, Inventories.serializeInventory(this));
+			
+//			if (scroll != null)
+//				nbt.setTag("scroll", scroll.serializeNBT());
+//			
+//			if (reagent != null)
+//				nbt.setTag("reagent", reagent.serializeNBT());
+//			
+//			
+//			
+//			if (activated) {
+//				nbt.setBoolean("active", activated);
+//				nbt.setInteger("wisps", wisps.size());
+//			}
 			
 			return nbt;
 		}
@@ -457,11 +456,14 @@ public class WispBlock extends BlockContainer {
 			if (nbt == null)
 				return;
 			
-			this.scroll = ItemStack.loadItemStackFromNBT(nbt.getCompoundTag("scroll"));
-			this.reagent = ItemStack.loadItemStackFromNBT(nbt.getCompoundTag("reagent"));
-			this.reagentPartial = nbt.getFloat("partial");
-			this.activated = nbt.getBoolean("active");
-			this.numWisps = nbt.getInteger("wisps");
+			this.clear();
+			Inventories.deserializeInventory(this, nbt.getTag(NBT_INVENTORY));
+			this.reagentPartial = nbt.getFloat(NBT_PARTIAL);
+			
+//			this.scroll = ItemStack.loadItemStackFromNBT(nbt.getCompoundTag("scroll"));
+//			this.reagent = ItemStack.loadItemStackFromNBT(nbt.getCompoundTag("reagent"));
+//			this.activated = nbt.getBoolean("active");
+//			this.numWisps = nbt.getInteger("wisps");
 		}
 		
 		@Override
@@ -471,6 +473,168 @@ public class WispBlock extends BlockContainer {
 			if (!world.isRemote) {
 				this.handler.setAutoFill(true);
 			}
+		}
+		
+		@Override
+		public int getSizeInventory() {
+			return 2;
+		}
+		
+		@Override
+		public ItemStack getStackInSlot(int index) {
+			if (index < 0 || index >= getSizeInventory())
+				return null;
+			
+			if (index == 0) {
+				return scroll;
+			} else {
+				return reagent;
+			}
+		}
+		
+		@Override
+		public ItemStack decrStackSize(int index, int count) {
+			if (index < 0 || index >= getSizeInventory()) {
+				return null;
+			}
+			
+			ItemStack inSlot = getStackInSlot(index);
+			if (inSlot == null) {
+				return null;
+			}
+			
+			ItemStack stack;
+			if (inSlot.stackSize <= count) {
+				stack = inSlot;
+				inSlot = null;
+			} else {
+				stack = inSlot.copy();
+				stack.stackSize = count;
+				inSlot.stackSize -= count;
+			}
+			
+			if (inSlot == null) {
+				setInventorySlotContents(index, inSlot);
+			}
+			
+			this.dirtyAndUpdate();
+			return stack;
+		}
+
+		@Override
+		public ItemStack removeStackFromSlot(int index) {
+			if (index < 0 || index >= getSizeInventory())
+				return null;
+			
+			ItemStack stack;
+			if (index == 0) {
+				stack = scroll;
+				scroll = null;
+			} else {
+				stack = reagent;
+				reagent = null;
+			}
+			
+			this.dirtyAndUpdate();
+			return stack;
+		}
+
+		@Override
+		public void setInventorySlotContents(int index, ItemStack stack) {
+			if (!isItemValidForSlot(index, stack))
+				return;
+			
+			if (index == 0) {
+				scroll = stack;
+			} else {
+				reagent = stack;
+			}
+			
+			this.dirtyAndUpdate();
+		}
+		
+		@Override
+		public int getInventoryStackLimit() {
+			return 64;
+		}
+
+		@Override
+		public boolean isUseableByPlayer(EntityPlayer player) {
+			return true;
+		}
+
+		@Override
+		public void openInventory(EntityPlayer player) {
+		}
+
+		@Override
+		public void closeInventory(EntityPlayer player) {
+		}
+
+		@Override
+		public boolean isItemValidForSlot(int index, ItemStack stack) {
+			if (index < 0 || index >= getSizeInventory())
+				return false;
+			
+			if (index == 0) {
+				return (stack == null || (stack.getItem() instanceof SpellScroll && SpellScroll.getSpell(stack) != null));
+			} else {
+				return (stack == null || stack.getItem() instanceof ReagentItem);
+			}
+			
+		}
+		
+		private static final int partialToInt(float progress) {
+			return Math.round(progress * 10000);
+		}
+		
+		private static final float intToPartial(int value) {
+			return (float) value / 10000f;
+		}
+
+		@Override
+		public int getField(int id) {
+			if (id == 0) {
+				return partialToInt(this.reagentPartial);
+			} else if (id == 1) {
+				return this.activated ? 1 : 0;
+			} else if (id == 2) {
+				return worldObj.isRemote ? numWisps : wisps.size();
+			}
+			return 0;
+		}
+
+		@Override
+		public void setField(int id, int value) {
+			if (id == 0) {
+				this.reagentPartial = intToPartial(value);
+			} else if (id == 1) {
+				this.activated = (value != 0);
+			} else if (id == 2) {
+				this.numWisps = value;
+			}
+		}
+
+		@Override
+		public int getFieldCount() {
+			return 3;
+		}
+
+		@Override
+		public void clear() {
+			for (int i = 0; i < getSizeInventory(); i++) {
+				removeStackFromSlot(i);
+			}
+		}
+
+		@Override
+		public String getName() {
+			return "Wisp Block Inventory";
+		}
+
+		@Override
+		public boolean hasCustomName() {
+			return false;
 		}
 	}
 }

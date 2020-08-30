@@ -182,7 +182,7 @@ public class NostrumDimensionMapper extends WorldSavedData {
 		
 		existing = GetDefaultOffset(id);
 		
-		while (map.containsKey(existing)) {
+		while (map.containsValue(existing)) {
 			existing.bump();
 		}
 		map.put(id, existing);

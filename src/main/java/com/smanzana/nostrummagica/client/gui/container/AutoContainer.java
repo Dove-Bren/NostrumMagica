@@ -19,6 +19,10 @@ public abstract class AutoContainer extends Container {
 	public AutoContainer(IInventory inventory) {
 		this.inventory = inventory;
 		this.oldValues = new int[inventory.getFieldCount()];
+		
+		for (int i = 0; i < oldValues.length; i++) {
+			oldValues[i] = inventory.getField(i) - 1; // lol force an update
+		}
 	}
 	
 	@Override

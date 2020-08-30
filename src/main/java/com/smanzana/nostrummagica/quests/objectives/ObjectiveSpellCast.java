@@ -200,7 +200,7 @@ public class ObjectiveSpellCast implements IObjective, ICastListener {
 		if (!alterations.isEmpty()) {
 			Map<EAlteration, Integer> spellMap = spell.getAlterations();
 			for (EAlteration alteration : alterations.keySet()) {
-				Integer count = elements.get(alteration);
+				Integer count = alterations.get(alteration);
 				if (count == null || count == 0)
 					continue;
 				Integer spellCount = spellMap.get(alteration);
@@ -214,7 +214,7 @@ public class ObjectiveSpellCast implements IObjective, ICastListener {
 		if (!shapes.isEmpty()) {
 			Map<SpellShape, Integer> spellMap = spell.getShapes();
 			for (SpellShape shape: shapes.keySet()) {
-				Integer count = elements.get(shape);
+				Integer count = shapes.get(shape);
 				if (count == null || count == 0)
 					continue;
 				Integer spellCount = spellMap.get(shape);

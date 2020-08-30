@@ -1,11 +1,8 @@
 package com.smanzana.nostrummagica.client.gui.container;
 
-import javax.annotation.Nullable;
-
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.aetheria.blocks.WispBlock.WispBlockTileEntity;
-import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spells.Spell;
 
@@ -13,7 +10,6 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -46,7 +42,7 @@ public class WispBlockGui {
 	private static final int WISP_SOCKET_HOFFSET = 176;
 	private static final int WISP_SOCKET_VOFFSET = 0;
 	
-	public static class WispBlockContainer extends Container {
+	public static class WispBlockContainer extends AutoContainer {
 		
 		// Kept just to report to server which TE is doing crafting
 		protected BlockPos pos;
@@ -59,113 +55,113 @@ public class WispBlockGui {
 		protected Slot reagentSlot;
 		
 		public WispBlockContainer(EntityPlayer player, IInventory playerInv, WispBlockTileEntity table, BlockPos pos) {
+			super(table);
 			this.player = player;
 			this.pos = pos;
 			this.table = table;
-			this.scrollSlot = new Slot(null, 0, SCROLL_SLOT_INPUT_HOFFSET, SCROLL_SLOT_INPUT_VOFFSET) {
+			this.scrollSlot = new Slot(table, 0, SCROLL_SLOT_INPUT_HOFFSET, SCROLL_SLOT_INPUT_VOFFSET) {
 				
-				@Override
-				public boolean isItemValid(@Nullable ItemStack stack) {
-					return stack == null ||
-							(stack.getItem() instanceof SpellScroll && SpellScroll.getSpell(stack) != null);
-				}
-				
-				@Override
-				public void putStack(@Nullable ItemStack stack) {
-					table.setScroll(stack);
-					this.onSlotChanged();
-				}
-				
-				@Override
-				public ItemStack getStack() {
-					return table.getScroll();
-				}
-				
-				@Override
-				public void onSlotChanged() {
-					table.markDirty();
-				}
-				
-				public int getSlotStackLimit() {
-					return 1;
-				}
-				
-				public ItemStack decrStackSize(int amount) {
-					ItemStack item = table.getScroll();
-					if (item != null) {
-						if (table.setScroll(null))
-							return item.copy();
-					}
-					
-					return null;
-				}
-				
-				public boolean isHere(IInventory inv, int slotIn) {
-					return false;
-				}
-				
-				public boolean isSameInventory(Slot other) {
-					return false;
-				}
-				
-				public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack) {
-					//table.onTakeItem(playerIn);
-					super.onPickupFromSlot(playerIn, stack);
-				}
-				
+//				@Override
+//				public boolean isItemValid(@Nullable ItemStack stack) {
+//					return stack == null ||
+//							(stack.getItem() instanceof SpellScroll && SpellScroll.getSpell(stack) != null);
+//				}
+//				
+//				@Override
+//				public void putStack(@Nullable ItemStack stack) {
+//					table.setScroll(stack);
+//					this.onSlotChanged();
+//				}
+//				
+//				@Override
+//				public ItemStack getStack() {
+//					return table.getScroll();
+//				}
+//				
+//				@Override
+//				public void onSlotChanged() {
+//					table.markDirty();
+//				}
+//				
+//				public int getSlotStackLimit() {
+//					return 1;
+//				}
+//				
+//				public ItemStack decrStackSize(int amount) {
+//					ItemStack item = table.getScroll();
+//					if (item != null) {
+//						if (table.setScroll(null))
+//							return item.copy();
+//					}
+//					
+//					return null;
+//				}
+//				
+//				public boolean isHere(IInventory inv, int slotIn) {
+//					return false;
+//				}
+//				
+//				public boolean isSameInventory(Slot other) {
+//					return false;
+//				}
+//				
+//				public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack) {
+//					//table.onTakeItem(playerIn);
+//					super.onPickupFromSlot(playerIn, stack);
+//				}
 			};
 			
 			this.addSlotToContainer(scrollSlot);
 			
-			this.reagentSlot = new Slot(null, 0, REAGENT_SLOT_INPUT_HOFFSET, REAGENT_SLOT_INPUT_VOFFSET) {
+			this.reagentSlot = new Slot(table, 1, REAGENT_SLOT_INPUT_HOFFSET, REAGENT_SLOT_INPUT_VOFFSET) {
 				
-				@Override
-				public boolean isItemValid(@Nullable ItemStack stack) {
-					return stack == null || stack.getItem() instanceof ReagentItem;
-				}
-				
-				@Override
-				public void putStack(@Nullable ItemStack stack) {
-					table.setReagent(stack);
-					this.onSlotChanged();
-				}
-				
-				@Override
-				public ItemStack getStack() {
-					return table.getReagent();
-				}
-				
-				@Override
-				public void onSlotChanged() {
-					table.markDirty();
-				}
-				
-				public int getSlotStackLimit() {
-					return 64;
-				}
-				
-				public ItemStack decrStackSize(int amount) {
-					ItemStack item = table.getReagent();
-					if (item != null) {
-						if (table.setReagent(null))
-							return item.copy();
-					}
-					
-					return null;
-				}
-				
-				public boolean isHere(IInventory inv, int slotIn) {
-					return false;
-				}
-				
-				public boolean isSameInventory(Slot other) {
-					return false;
-				}
-				
-				public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack) {
-					//table.onTakeItem(playerIn);
-					super.onPickupFromSlot(playerIn, stack);
-				}
+//				@Override
+//				public boolean isItemValid(@Nullable ItemStack stack) {
+//					return stack == null || stack.getItem() instanceof ReagentItem;
+//				}
+//				
+//				@Override
+//				public void putStack(@Nullable ItemStack stack) {
+//					table.setReagent(stack);
+//					this.onSlotChanged();
+//				}
+//				
+//				@Override
+//				public ItemStack getStack() {
+//					return table.getReagent();
+//				}
+//				
+//				@Override
+//				public void onSlotChanged() {
+//					table.markDirty();
+//				}
+//				
+//				public int getSlotStackLimit() {
+//					return 64;
+//				}
+//				
+//				public ItemStack decrStackSize(int amount) {
+//					ItemStack item = table.getReagent();
+//					if (item != null) {
+//						if (table.setReagent(null))
+//							return item.copy();
+//					}
+//					
+//					return null;
+//				}
+//				
+//				public boolean isHere(IInventory inv, int slotIn) {
+//					return false;
+//				}
+//				
+//				public boolean isSameInventory(Slot other) {
+//					return false;
+//				}
+//				
+//				public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack) {
+//					//table.onTakeItem(playerIn);
+//					super.onPickupFromSlot(playerIn, stack);
+//				}
 				
 			};
 			
