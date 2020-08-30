@@ -198,7 +198,7 @@ public class NostrumGui implements IGuiHandler {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			if (attr == null)
 				return null;
-			return new InfoScreen(attr);
+			return new InfoScreen(attr, (String) null);
 		}
 		
 		if (ID == modtableID) {

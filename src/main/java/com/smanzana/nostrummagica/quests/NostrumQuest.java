@@ -18,13 +18,13 @@ import net.minecraft.entity.player.EntityPlayerMP;
 
 /**
  * Base class for Nostrum quests.
- * These are objectives/quests that are presented in the mirror.
+ * These are objectives/quests that are presented in the character tab of the mirror.
  * They have parents.
  * They have rewards.
  * If they are a challenge type, they have the challenge specifications
  * <p>
  * Quests should be <emphasis>instantiated</emphasis> during the init phase.
- * The constructor in this abstract class performs registration. Registration is
+ * The constructor in this base class performs registration. Registration is
  * validated during post-init. Registering quests in post-init or afterwards
  * produced undefined behavior.
  * </p>

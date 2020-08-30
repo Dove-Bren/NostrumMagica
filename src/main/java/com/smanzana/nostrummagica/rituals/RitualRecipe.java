@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.Candle.CandleTileEntity;
 import com.smanzana.nostrummagica.blocks.ChalkBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenIndexed;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.rituals.outcomes.IRitualOutcome;
 import com.smanzana.nostrummagica.rituals.requirements.IRitualRequirement;
@@ -24,7 +25,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
 
-public class RitualRecipe {
+public class RitualRecipe implements InfoScreenIndexed {
 	
 	private static final int CHALK_XS[][] = new int[][] {
 		new int[]{-1, 0, 1, -1, 1, -1, 0, 1},
@@ -37,14 +38,14 @@ public class RitualRecipe {
 		new int[]{-3, -3, -3, -3, -2, -2, -2, -2, -2, -1, -1, -1, -1, -1, -1, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3}
 	};
 
-	private EMagicElement element;
-	private int tier;
+	private final EMagicElement element;
+	private final int tier;
 	private ReagentType types[];
 	private ItemStack centerItem;
 	private ItemStack extraItems[];
 	private IRitualOutcome hook;
 	private IRitualRequirement req;
-	private String titleKey;
+	private final String titleKey;
 	
 	private ItemStack icon;
 	
@@ -332,6 +333,11 @@ public class RitualRecipe {
 
 	public ItemStack getIcon() {
 		return icon;
+	}
+
+	@Override
+	public String getInfoScreenKey() {
+		return "ritual::" + titleKey;
 	}
 	
 }

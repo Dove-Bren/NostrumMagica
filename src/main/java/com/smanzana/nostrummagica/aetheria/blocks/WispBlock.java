@@ -289,10 +289,10 @@ public class WispBlock extends BlockContainer {
 		}
 		
 		private void dirtyAndUpdate() {
-			worldObj.markBlockRangeForRenderUpdate(pos, pos);
-			worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 3);
-			worldObj.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
-			markDirty();
+			if (worldObj != null) {
+				worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 3);
+				markDirty();
+			}
 		}
 		
 		// Cleans up any wisps as soon as we deactivate
@@ -456,7 +456,6 @@ public class WispBlock extends BlockContainer {
 			if (nbt == null)
 				return;
 			
-			this.clear();
 			Inventories.deserializeInventory(this, nbt.getTag(NBT_INVENTORY));
 			this.reagentPartial = nbt.getFloat(NBT_PARTIAL);
 			

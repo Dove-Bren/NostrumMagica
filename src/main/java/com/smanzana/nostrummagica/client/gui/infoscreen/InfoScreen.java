@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
@@ -37,7 +39,7 @@ public class InfoScreen extends GuiScreen {
 	protected static final int POS_SUBSCREEN_VOFFSET = POS_TABS_HEIGHT;
 	
 	private INostrumMagic attribute;
-	private List<GuiButton> tabs;
+	private List<TabButton> tabs;
 	private List<InfoButton> buttons;
 	private IInfoSubScreen subscreen;
 	private List<ISubScreenButton> subscreenButtons;
@@ -46,8 +48,51 @@ public class InfoScreen extends GuiScreen {
 	
 	private int scrollY = 0;
 	
-	public InfoScreen(INostrumMagic attribute) {
+	private @Nullable String startKey;
+	
+	public InfoScreen(INostrumMagic attribute, @Nullable String startKey) {
 		this.attribute = attribute;
+		this.startKey = startKey;
+		//this.start = start;
+		
+//		tabs = new LinkedList<>();
+//		buttons = new LinkedList<>();
+//		subscreenButtons = new LinkedList<>();
+//		subscreen = null;
+//		scrollY = 0;
+//		
+//		InfoScreenTab.init();
+//		
+//		// Populate tabs
+//		for (InfoScreenTabs tab : InfoScreenTabs.values()) {
+//			InfoScreenTab inst = InfoScreenTab.get(tab);
+//			if (inst == null || !inst.isVisible(this.attribute))
+//				continue;
+//			TabButton butt = new TabButton(globButtonID++,
+//					2 + (tabs.size() * (2 + TabButton.TEXT_BUTTON_TAB_WIDTH)), 2,
+//					this.attribute, inst);
+//			if (butt.buttons == null || butt.buttons.isEmpty())
+//				continue;
+//			tabs.add(butt);
+//			this.buttonList.add(butt);
+//		}
+//		
+//		// Open up startup location, if one was provided
+//		if (start != null) {
+//			String indexString = start.getInfoScreenKey();
+//			for (TabButton tabButton : tabs) {
+//				InfoButton page = tabButton.tab.lookup(indexString);
+//				if (page != null) {
+//					selectTab(tabButton);
+//					selectScreen(page);
+//					break;
+//				}
+//			}
+//		}
+	}
+	
+	public InfoScreen(INostrumMagic attribute, @Nullable InfoScreenIndexed start) {
+		this(attribute, (start == null ? null : start.getInfoScreenKey()));
 	}
 	
 	@Override
@@ -73,6 +118,25 @@ public class InfoScreen extends GuiScreen {
 			tabs.add(butt);
 			this.buttonList.add(butt);
 		}
+		
+		// Open up startup location, if one was provided
+		if (startKey != null) {
+			for (TabButton tabButton : tabs) {
+				InfoButton page = tabButton.tab.lookup(startKey);
+				if (page != null) {
+					selectTab(tabButton);
+					selectScreen(page);
+					break;
+				}
+			}
+		}
+	}
+	
+	@Override
+	public void onResize(Minecraft mcIn, int w, int h) {
+		// Save our current spot
+		
+		super.onResize(mcIn, w, h);
 	}
 	
 	@Override	
@@ -141,38 +205,44 @@ public class InfoScreen extends GuiScreen {
 		return true;
 	}
 	
+	private void selectTab(TabButton tabButton) {
+		this.subscreen = null;
+		this.subscreenButtons.clear();
+		activateButtons(tabButton.getButtons());
+	}
+	
+	private void selectScreen(InfoButton button) {
+		// Since we allow scrolling, disallow clicks that are above the button location
+		this.subscreen = ((InfoButton) button).getScreen(attribute);
+		this.subscreenButtons.clear();
+		Collection<ISubScreenButton> screenbutts = subscreen.getButtons();
+		if (screenbutts != null && !screenbutts.isEmpty())
+			this.subscreenButtons.addAll(screenbutts);
+		
+		if (!this.subscreenButtons.isEmpty()) {
+			int i = 0;
+			for (ISubScreenButton butt : subscreenButtons) {
+				butt.xPosition = i;
+				i += butt.width + 2;
+				butt.yPosition = this.height - 15;
+			}
+		}
+		
+		this.buttonList.clear();
+		this.buttonList.addAll(this.tabs);
+		this.buttonList.addAll(this.buttons);
+		this.buttonList.addAll(this.subscreenButtons);
+	}
+	
 	@Override
 	public void actionPerformed(GuiButton button) {
 		if (!button.visible)
 			return;
 		
 		if (button instanceof InfoButton) {
-			// Since we allow scrolling, disallow clicks that are above the button location
-			
-			
-			this.subscreen = ((InfoButton) button).getScreen(attribute);
-			this.subscreenButtons.clear();
-			Collection<ISubScreenButton> screenbutts = subscreen.getButtons();
-			if (screenbutts != null && !screenbutts.isEmpty())
-				this.subscreenButtons.addAll(screenbutts);
-			
-			if (!this.subscreenButtons.isEmpty()) {
-				int i = 0;
-				for (ISubScreenButton butt : subscreenButtons) {
-					butt.xPosition = i;
-					i += butt.width + 2;
-					butt.yPosition = this.height - 15;
-				}
-			}
-			
-			this.buttonList.clear();
-			this.buttonList.addAll(this.tabs);
-			this.buttonList.addAll(this.buttons);
-			this.buttonList.addAll(this.subscreenButtons);
+			selectScreen((InfoButton) button);
 		} else if (button instanceof TabButton) {
-			this.subscreen = null;
-			this.subscreenButtons.clear();
-			activateButtons(((TabButton) button).getButtons());
+			selectTab((TabButton) button);
 		} else if (button instanceof ISubScreenButton) {
 			((ISubScreenButton) button).onClick(attribute);
 		}

@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.loretag;
 
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenIndexed;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 
 /**
@@ -61,4 +62,12 @@ public interface ILoreTagged {
 	 * @return
 	 */
 	public InfoScreenTabs getTab();
+	
+	public static String GetInfoKey(ILoreTagged lore) {
+		if (lore instanceof InfoScreenIndexed) {
+			return ((InfoScreenIndexed) lore).getInfoScreenKey();
+		} else {
+			return "Lore::" + lore.getLoreKey();
+		}
+	}
 }

@@ -1,7 +1,9 @@
 package com.smanzana.nostrummagica.client.gui.infoscreen;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.Candle;
@@ -76,7 +78,9 @@ public abstract class InfoScreenTab {
 				List<ILoreTagged> lore = getAvailable(attr);
 				List<InfoButton> buttons = new LinkedList<>();
 				for (ILoreTagged tag : lore) {
-					buttons.add(new LoreInfoButton(offset++, tag));
+					InfoButton button = new LoreInfoButton(offset++, tag);
+					buttons.add(button);
+					index(ILoreTagged.GetInfoKey(tag), button);
 				}
 				return buttons;
 			}
@@ -107,7 +111,9 @@ public abstract class InfoScreenTab {
 				List<ILoreTagged> lore = getAvailable(attr);
 				List<InfoButton> buttons = new LinkedList<>();
 				for (ILoreTagged tag : lore) {
-					buttons.add(new LoreInfoButton(offset++, tag));
+					InfoButton button = new LoreInfoButton(offset++, tag);
+					buttons.add(button);
+					index(ILoreTagged.GetInfoKey(tag), button);
 				}
 				return buttons;
 			}
@@ -138,7 +144,9 @@ public abstract class InfoScreenTab {
 				List<ILoreTagged> lore = getAvailable(attr);
 				List<InfoButton> buttons = new LinkedList<>();
 				for (ILoreTagged tag : lore) {
-					buttons.add(new LoreInfoButton(offset++, tag));
+					InfoButton button = new LoreInfoButton(offset++, tag);
+					buttons.add(button);
+					index(ILoreTagged.GetInfoKey(tag), button);
 				}
 				return buttons;
 			}
@@ -169,7 +177,9 @@ public abstract class InfoScreenTab {
 				List<ILoreTagged> lore = getAvailable(attr);
 				List<InfoButton> buttons = new LinkedList<>();
 				for (ILoreTagged tag : lore) {
-					buttons.add(new LoreInfoButton(offset++, tag));
+					InfoButton button = new LoreInfoButton(offset++, tag);
+					buttons.add(button);
+					index(ILoreTagged.GetInfoKey(tag), button);
 				}
 				return buttons;
 			}
@@ -200,7 +210,9 @@ public abstract class InfoScreenTab {
 				List<ILoreTagged> lore = getAvailable(attr);
 				List<InfoButton> buttons = new LinkedList<>();
 				for (ILoreTagged tag : lore) {
-					buttons.add(new LoreInfoButton(offset++, tag));
+					InfoButton button = new LoreInfoButton(offset++, tag);
+					buttons.add(button);
+					index(ILoreTagged.GetInfoKey(tag), button);
 				}
 				return buttons;
 			}
@@ -231,7 +243,9 @@ public abstract class InfoScreenTab {
 				List<ILoreTagged> lore = getAvailable(attr);
 				List<InfoButton> buttons = new LinkedList<>();
 				for (ILoreTagged tag : lore) {
-					buttons.add(new LoreInfoButton(offset++, tag));
+					InfoButton button = new LoreInfoButton(offset++, tag);
+					buttons.add(button);
+					index(ILoreTagged.GetInfoKey(tag), button);
 				}
 				return buttons;
 			}
@@ -261,7 +275,9 @@ public abstract class InfoScreenTab {
 				List<RitualRecipe> rituals = getAvailable(attr);
 				List<InfoButton> buttons = new LinkedList<>();
 				for (RitualRecipe tag : rituals) {
-					buttons.add(new RitualInfoButton(offset++, tag));
+					RitualInfoButton button = new RitualInfoButton(offset++, tag);
+					buttons.add(button);
+					index(tag.getInfoScreenKey(), button);
 				}
 				return buttons;
 			}
@@ -508,9 +524,11 @@ public abstract class InfoScreenTab {
 	
 	protected InfoScreenTabs tab;
 	private ItemStack icon;
+	protected Map<String, InfoButton> index;
 	private InfoScreenTab(InfoScreenTabs tab, ItemStack icon) {
 		this.tab = tab;
 		this.icon = icon;
+		index = new HashMap<>();
 	}
 	
 	public abstract boolean isVisible(INostrumMagic attr);
@@ -519,5 +537,13 @@ public abstract class InfoScreenTab {
 	
 	public ItemStack getIcon() {
 		return this.icon;
+	}
+	
+	public InfoButton lookup(String lookupString) {
+		return index.get(lookupString);
+	}
+	
+	protected void index(String key, InfoButton button) {
+		index.put(key, button);
 	}
 }

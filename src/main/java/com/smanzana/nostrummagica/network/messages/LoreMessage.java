@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.network.messages;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.command.CommandInfoScreenGoto;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -10,7 +11,11 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.event.ClickEvent;
+import net.minecraft.util.text.event.HoverEvent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -47,7 +52,13 @@ public class LoreMessage implements IMessage {
 				} else {
 					String name = lore.getLoreDisplayName();
 					EntityPlayer player = NostrumMagica.proxy.getPlayer();
-					player.addChatMessage(new TextComponentTranslation("info.lore.get", name));
+					ITextComponent comp = new TextComponentTranslation("info.lore.get", name);
+					Style style = new Style()
+							.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentTranslation("info.screen.goto")))
+							.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, CommandInfoScreenGoto.Command + " " + ILoreTagged.GetInfoKey(lore)));
+					comp = comp.setStyle(style);
+					
+					player.addChatMessage(comp);
 					NostrumMagicaSounds.UI_TICK.play(player, player.worldObj, player.posX, player.posY, player.posZ);
 				}
 			});

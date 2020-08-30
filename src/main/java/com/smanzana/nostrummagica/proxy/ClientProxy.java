@@ -42,7 +42,7 @@ import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierS
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierTranslate;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.gui.MirrorGui;
-import com.smanzana.nostrummagica.client.gui.NostrumGui;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityAltarRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityCandleRenderer;
@@ -50,6 +50,7 @@ import com.smanzana.nostrummagica.client.render.TileEntityObeliskRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityPortalRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityProgressionDoorRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntitySymbolRenderer;
+import com.smanzana.nostrummagica.command.CommandInfoScreenGoto;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityHookShot;
 import com.smanzana.nostrummagica.entity.EntityKoid;
@@ -172,6 +173,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
+import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -629,6 +631,7 @@ public class ClientProxy extends CommonProxy {
 		this.effectRenderer = ClientEffectRenderer.instance();
 		
 		initDefaultEffects(this.effectRenderer);
+		ClientCommandHandler.instance.registerCommand(new CommandInfoScreenGoto());
 		
 		super.postinit();
 	}
@@ -668,8 +671,12 @@ public class ClientProxy extends CommonProxy {
 			doCast();
 		else if (bindingInfo.isPressed()) {
 			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-			player.openGui(NostrumMagica.instance,
-					NostrumGui.infoscreenID, player.worldObj, 0, 0, 0);
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+			if (attr == null)
+				return;
+			Minecraft.getMinecraft().displayGuiScreen(new InfoScreen(attr, (String) null));
+//			player.openGui(NostrumMagica.instance,
+//					NostrumGui.infoscreenID, player.worldObj, 0, 0, 0);
 		} else if (Minecraft.getMinecraft().gameSettings.keyBindJump.isPressed()) {
 			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 			if (player.isRiding() && player.getRidingEntity() instanceof EntityTameDragonRed) {
