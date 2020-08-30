@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.aetheria;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.aetheria.blocks.WispBlock;
+import com.smanzana.nostrummagica.aetheria.items.AetherResourceType;
+import com.smanzana.nostrummagica.aetheria.items.NostrumAetherResourceItem;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
@@ -10,7 +12,9 @@ import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
 
+import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -27,6 +31,9 @@ public class AetheriaProxy {
 	public void enable() {
 		this.enabled = true;
 	}
+	
+	public static Item ItemResources = null;
+	public static Block BlockWisp = null;
 	
 	public boolean preInit() {
 		if (!enabled) {
@@ -59,16 +66,18 @@ public class AetheriaProxy {
 	}
 	
 	private void registerItems() {
-//		ItemMagicBauble.instance().setRegistryName(NostrumMagica.MODID, ItemMagicBauble.ID);
-//    	GameRegistry.register(ItemMagicBauble.instance());
-//    	ItemMagicBauble.init();
+		ItemResources = NostrumAetherResourceItem.instance();
+		ItemResources.setRegistryName(NostrumMagica.MODID, NostrumAetherResourceItem.ID);
+    	GameRegistry.register(ItemResources);
+    	NostrumAetherResourceItem.init();
 	}
 	
 	private void registerBlocks() {
-		GameRegistry.register(WispBlock.instance(),
+		BlockWisp = WispBlock.instance();
+		GameRegistry.register(BlockWisp,
     			new ResourceLocation(NostrumMagica.MODID, WispBlock.ID));
     	GameRegistry.register(
-    			(new ItemBlock(WispBlock.instance()).setRegistryName(WispBlock.ID)
+    			(new ItemBlock(BlockWisp).setRegistryName(WispBlock.ID)
     					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(WispBlock.ID))
     			);
     	WispBlock.init();
@@ -117,5 +126,9 @@ public class AetheriaProxy {
 	
 	public boolean isEnabled() {
 		return this.enabled;
+	}
+	
+	public ItemStack getResourceItem(AetherResourceType type, int count) {
+		return NostrumAetherResourceItem.getItem(type, count);
 	}
 }

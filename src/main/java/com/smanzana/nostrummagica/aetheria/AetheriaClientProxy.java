@@ -1,10 +1,18 @@
 package com.smanzana.nostrummagica.aetheria;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.aetheria.blocks.WispBlock;
+import com.smanzana.nostrummagica.aetheria.items.AetherResourceType;
+import com.smanzana.nostrummagica.aetheria.items.NostrumAetherResourceItem;
 import com.smanzana.nostrummagica.client.render.TileEntityWispBlockRenderer;
 import com.smanzana.nostrummagica.proxy.ClientProxy;
 
+import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 
 //
 public class AetheriaClientProxy extends AetheriaProxy {
@@ -46,13 +54,13 @@ public class AetheriaClientProxy extends AetheriaProxy {
 	}
 	
 	private void registerItemVariants() {
-//		List<ResourceLocation> list = new LinkedList<>();
-//    	for (ItemType type : ItemType.values()) {
-//    		list.add(new ResourceLocation(NostrumMagica.MODID, type.getUnlocalizedKey()));
-//    	}
-//		
-//    	ResourceLocation variants[] = list.toArray(new ResourceLocation[0]);
-//    	ModelBakery.registerItemVariants(NostrumResourceItem.instance(), variants);
+		List<ResourceLocation> list = new LinkedList<>();
+    	for (AetherResourceType type : AetherResourceType.values()) {
+    		list.add(new ResourceLocation(NostrumMagica.MODID, type.getUnlocalizedKey()));
+    	}
+		
+    	ResourceLocation variants[] = list.toArray(new ResourceLocation[list.size()]);
+    	ModelBakery.registerItemVariants(NostrumAetherResourceItem.instance(), variants);
 	}
 	
 	private void registerItemModels() {
@@ -60,10 +68,10 @@ public class AetheriaClientProxy extends AetheriaProxy {
 				0,
 				WispBlock.ID);
     	
-//    	for (ItemType type : ItemType.values()) {
-//    		ClientProxy.registerModel(ItemMagicBauble.instance(),
-//    				ItemMagicBauble.getMetaFromType(type),
-//					type.getUnlocalizedKey());
-//		}
+    	for (AetherResourceType type : AetherResourceType.values()) {
+    		ClientProxy.registerModel(NostrumAetherResourceItem.instance(),
+    				NostrumAetherResourceItem.getMetaFromType(type),
+					type.getUnlocalizedKey());
+		}
 	}
 }

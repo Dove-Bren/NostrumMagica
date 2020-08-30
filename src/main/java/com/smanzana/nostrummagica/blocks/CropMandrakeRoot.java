@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.aetheria.items.AetherResourceType;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.ReagentSeed;
@@ -69,6 +71,12 @@ public class CropMandrakeRoot extends BlockCrops {
         }
         
         ret.add(getSeeds(seedCount));
+        
+        if (NostrumMagica.aetheria.isEnabled()) {
+        	if (rand.nextInt(10) + fortune >= 9) {
+        		ret.add(NostrumMagica.aetheria.getResourceItem(AetherResourceType.FLOWER_MANDRAKE, 1));
+        	}
+        }
         
         return ret;
     }

@@ -229,6 +229,9 @@ item.hookshot_weak.name=Hookshot
 item.hookshot_medium.name=Farshot
 item.hookshot_strong.name=Grand Hookshot
 
+item.ginseng_flower.name=Ginseng Flower
+item.mandrake_flower.name=Mandrake Bloom
+
 potion.frostbite.name=Frostbite
 potion.shieldphysical.name=Physical Ward
 potion.shieldmagic.name=Magic Ward

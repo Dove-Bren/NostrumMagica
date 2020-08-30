@@ -6,7 +6,6 @@ import java.util.List;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble.ItemType;
-import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.proxy.ClientProxy;
 
 import net.minecraft.client.renderer.block.model.ModelBakery;
@@ -55,7 +54,7 @@ public class BaublesClientProxy extends BaublesProxy {
     	}
 		
     	ResourceLocation variants[] = list.toArray(new ResourceLocation[0]);
-    	ModelBakery.registerItemVariants(NostrumResourceItem.instance(), variants);
+    	ModelBakery.registerItemVariants(ItemMagicBauble.instance(), variants);
 	}
 	
 	private void registerItemModels() {
