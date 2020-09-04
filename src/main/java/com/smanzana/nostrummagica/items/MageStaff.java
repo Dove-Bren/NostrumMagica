@@ -15,11 +15,9 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -30,9 +28,9 @@ public class MageStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 	public static void init() {
 		instance().setUnlocalizedName("mage_staff");
 		
-		GameRegistry.addRecipe(new ItemStack(instance), " WW", " WC", "W  ",
-				'W', Blocks.PLANKS, 
-				'C', NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1));
+//		GameRegistry.addRecipe(new ItemStack(instance), " WW", " WC", "W  ",
+//				'W', Blocks.PLANKS, 
+//				'C', NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1));
 	}
 	
 	private static MageStaff instance = null;

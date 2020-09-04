@@ -60,6 +60,7 @@ public class NostrumGui implements IGuiHandler {
 			TileEntity ent = world.getTileEntity(new BlockPos(x, y, z));
 			if (ent != null && ent instanceof SpellTableEntity) {
 				return new SpellCreationGui.SpellCreationContainer(
+						player,
 						player.inventory,
 						(SpellTableEntity) ent,
 						new BlockPos(x, y, z)); // should be tile inventory
@@ -177,6 +178,7 @@ public class NostrumGui implements IGuiHandler {
 			TileEntity ent = world.getTileEntity(new BlockPos(x, y, z));
 			if (ent != null && ent instanceof SpellTableEntity) {
 				return new SpellCreationGui.SpellGui(new SpellCreationGui.SpellCreationContainer(
+						player,
 						player.inventory,
 						(SpellTableEntity) ent,
 						new BlockPos(x, y, z))); // should be tile inventory

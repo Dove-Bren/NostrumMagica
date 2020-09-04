@@ -4,8 +4,6 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
-import com.smanzana.nostrummagica.items.NostrumResourceItem;
-import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
@@ -21,8 +19,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -35,7 +31,6 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class ModificationTable extends BlockContainer {
 	
@@ -51,11 +46,11 @@ public class ModificationTable extends BlockContainer {
 	
 	public static void init() {
 		GameRegistry.registerTileEntity(ModificationTableEntity.class, "modification_table");
-		GameRegistry.addShapedRecipe(new ItemStack(instance()),
-				"WPW", "WCW", "WWW",
-				'W', new ItemStack(Blocks.PLANKS, 1, OreDictionary.WILDCARD_VALUE),
-				'P', new ItemStack(Items.PAPER, 1, OreDictionary.WILDCARD_VALUE),
-				'C', NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1));
+//		GameRegistry.addShapedRecipe(new ItemStack(instance()),
+//				"WPW", "WCW", "WWW",
+//				'W', new ItemStack(Blocks.PLANKS, 1, OreDictionary.WILDCARD_VALUE),
+//				'P', new ItemStack(Items.PAPER, 1, OreDictionary.WILDCARD_VALUE),
+//				'C', NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1));
 	}
 	
 	public ModificationTable() {

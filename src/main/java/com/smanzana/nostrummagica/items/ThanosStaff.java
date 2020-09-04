@@ -22,10 +22,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 
@@ -35,9 +33,9 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 	public static void init() {
 		instance().setUnlocalizedName(ID);
 		
-		GameRegistry.addRecipe(new ItemStack(instance), "  T", " S ", "S  ",
-				'T', new ItemStack(ThanoPendant.instance(), 1, OreDictionary.WILDCARD_VALUE), 
-				'S', new ItemStack(MageStaff.instance(), 1, 0));
+//		GameRegistry.addRecipe(new ItemStack(instance), "  T", " S ", "S  ",
+//				'T', new ItemStack(ThanoPendant.instance(), 1, OreDictionary.WILDCARD_VALUE), 
+//				'S', new ItemStack(MageStaff.instance(), 1, 0));
 	}
 	
 	private static ThanosStaff instance = null;

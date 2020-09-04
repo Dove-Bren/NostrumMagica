@@ -240,7 +240,7 @@ public class BookScreen extends GuiScreen {
 	}
 	
 	@Override
-	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+	public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
 		
 		// going to be checked twice, but oh well. Check our buttons
 		if (backButton.mousePressed(Minecraft.getMinecraft(), mouseX, mouseY)
@@ -410,70 +410,6 @@ public class BookScreen extends GuiScreen {
 			}
 			pages.add(new LinedTextPage(lines));
 		}
-	}
-	
-	private static class TableOfContentsPage implements IClickableBookPage {
-
-		private boolean title;
-		private String[] pages;
-		private Integer[] indices;
-		
-		private int widthCache;
-		private int xCache;
-		private int yCache;
-		
-		public TableOfContentsPage(String[] pages, Integer[] indices, boolean title) {
-			this.title = title;
-			this.pages = pages;
-			this.indices = indices;
-		}
-		
-		@Override
-		public void draw(BookScreen parent, FontRenderer fonter, int xoffset, int yoffset, int width, int height) {
-			widthCache = width;
-			xCache = xoffset;
-			
-			if (title) {
-				int x = xoffset + (width / 2);
-				x -= fonter.getStringWidth("Table Of Contents") / 2;
-				fonter.drawString("Table Of Contents", x, yoffset + 5, 0xFF202020);
-				yoffset += 10 + (fonter.FONT_HEIGHT);
-			}
-			
-			yCache = yoffset;
-			
-			for (int i = 0; i < pages.length; i++) {
-				fonter.drawString(pages[i], xoffset, yoffset, 0xFF400070);
-				yoffset += fonter.FONT_HEIGHT + 2;
-			}
-		}
-
-		@Override
-		public void overlay(BookScreen parent, FontRenderer fonter, int mouseX, int mouseY, int trueX, int trueY) {
-			if (title) {
-				mouseY -= fonter.FONT_HEIGHT + 10;
-			}
-			int index = mouseY / (fonter.FONT_HEIGHT + 2);
-			if (index < pages.length && index >= 0)
-				Gui.drawRect(xCache, yCache + (index * (fonter.FONT_HEIGHT + 2)) - 1, xCache + widthCache, yCache + (index * (fonter.FONT_HEIGHT + 2) + fonter.FONT_HEIGHT) - 1, 0x30000000);
-		}
-
-		@Override
-		public boolean onClick(BookScreen parent, int mouseX, int mouseY, int button) {
-			if (title) {
-				mouseY -= parent.fontRendererObj.FONT_HEIGHT + 10;
-			}
-			if (button == 0) {
-				int index = mouseY / (parent.fontRendererObj.FONT_HEIGHT + 2);
-				if (index < pages.length) {
-					parent.requestPageChange(indices[index]);
-					return true;
-				}
-			}
-			
-			return false;
-		}
-		
 	}
 	
 }

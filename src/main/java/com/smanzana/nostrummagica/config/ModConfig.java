@@ -33,7 +33,7 @@ public class ModConfig {
 		XP_DISPLAY_BAR(Category.DISPLAY, "display_xp_bar", true, false, "Display current progress towards next level"),
 		OBELISK_LIST(Category.DISPLAY, "obelisk_list", false, false, "Display known teleportation points in the obelisk as a list"),
 		EFFECT_DISPLAY(Category.DISPLAY, "display_effects", true, false, "Allow cool client effects to be rendered. Turn off to enhance performance"),
-		MIRROR_NODE_SPOILERS(Category.DISPLAY, "display_mirror_spoilers", false, false, "If true, show ALL magic mirror upgrades regardless of proximity"),
+		MIRROR_QUEST_NODE_SPOILERS(Category.DISPLAY, "display_mirror_quest_spoilers", false, false, "If true, show ALL magic mirror character upgrades regardless of proximity"),
 		ARMOR_DISPLAY(Category.DISPLAY, "overarmor_display", true, false, "Enable displaying armor overlay when armor is > 20 units"),
 		DISPLAY_SHIELDS(Category.DISPLAY, "shield_display", true, false, "Show magical shield overlay on hearts"),
 		DISPLAY_HOOKSHOT_CROSSHAIR(Category.DISPLAY, "hookshot_crosshair", true, false, "Show special crosshair with the hookshot"),
@@ -445,8 +445,8 @@ public class ModConfig {
 		return getIntArrayValue(Key.NOSTRUM_WORLDS, true);
 	}
 	
-	public boolean displayAllMirrorNodes() {
-		return getBooleanValue(Key.MIRROR_NODE_SPOILERS, false);
+	public boolean displayAllMirrorQuestNodes() {
+		return getBooleanValue(Key.MIRROR_QUEST_NODE_SPOILERS, false);
 	}
 	
 	public boolean displayArmorOverlay() {

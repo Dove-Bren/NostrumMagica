@@ -121,6 +121,7 @@ import com.smanzana.nostrummagica.potions.MagicShieldPotion;
 import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
 import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
+import com.smanzana.nostrummagica.research.NostrumResearch;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
@@ -357,6 +358,7 @@ public class CommonProxy {
 		}
 		
 		NostrumQuest.Validate();
+		NostrumResearch.Validate();
 	}
     
     private void registerShapes() {

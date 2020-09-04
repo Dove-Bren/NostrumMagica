@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.network;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
 import com.smanzana.nostrummagica.network.messages.ClientCastReplyMessage;
 import com.smanzana.nostrummagica.network.messages.ClientEffectRenderMessage;
+import com.smanzana.nostrummagica.network.messages.ClientPurchaseResearchMessage;
 import com.smanzana.nostrummagica.network.messages.ClientSkillUpMessage;
 import com.smanzana.nostrummagica.network.messages.ClientUpdateQuestMessage;
 import com.smanzana.nostrummagica.network.messages.LoreMessage;
@@ -76,6 +77,7 @@ public class NetworkHandler {
 		syncChannel.registerMessage(TamedDragonGUIOpenMessage.Handler.class, TamedDragonGUIOpenMessage.class, discriminator++, Side.CLIENT);
 		syncChannel.registerMessage(TamedDragonGUISyncMessage.Handler.class, TamedDragonGUISyncMessage.class, discriminator++, Side.CLIENT);
 		syncChannel.registerMessage(MagicEffectUpdate.Handler.class, MagicEffectUpdate.class, discriminator++, Side.CLIENT);
+		syncChannel.registerMessage(ClientPurchaseResearchMessage.Handler.class, ClientPurchaseResearchMessage.class, discriminator++, Side.SERVER);
 	}
 	
 }

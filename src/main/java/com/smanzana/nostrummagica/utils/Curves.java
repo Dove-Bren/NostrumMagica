@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.utils;
 
+import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 
 public final class Curves {
@@ -35,6 +36,46 @@ public final class Curves {
 		}
 		
 		return bezierInternal(progress, points, 0, points.length - 1);
+	}
+	
+	/**
+	 * Calculates a point along a perfect circle.
+	 * The arc from 0 to 1 progress will form a circle from (radius, 0) and back in a CCW motion.
+	 * If flip, produces the circle in a CW motion.
+	 * @param progress
+	 * @param start
+	 * @param end
+	 * @param flip
+	 * @return
+	 */
+	public static Vec2f alignedArc2D(float progress, double radius, boolean flip) {
+		double relX = Math.cos(progress * 2 * Math.PI);
+		double relY = Math.sin(progress * 2 * Math.PI);
+		
+		if (flip) {
+			double r = relX;
+			relX = relY;
+			relY = r;
+		}
+		return new Vec2f((float) (relX * radius), (float) (relY * radius));
+	}
+	
+	/**
+	 * Calculates points on a 90 degree arc from the start position around a circle of the provided radius.
+	 * Defaults to moving CCW. Flip reverses this.
+	 * @param progress
+	 * @param start
+	 * @param radius
+	 * @param flip
+	 * @return
+	 */
+	public static Vec2f alignedArc2D(float progress, Vec2f start, double radius, boolean flip) {
+		// Find center that is 'radius' units less in X
+		double radiusX = flip ? -radius : radius;
+		Vec2f center = new Vec2f((float) (start.x - radiusX), start.y);
+		return new Vec2f(
+				center.x + (float) (Math.cos(progress * .5 * Math.PI) * radiusX),
+				center.y + (float) (Math.sin(progress * .5 * Math.PI) * radius));
 	}
 	
 }

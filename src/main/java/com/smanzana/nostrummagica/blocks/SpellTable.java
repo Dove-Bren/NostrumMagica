@@ -268,14 +268,14 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 			}
 		}
 		
-		public void craft(String name, int iconIndex) {
+		public void craft(EntityPlayer crafter, String name, int iconIndex) {
 			ItemStack stack = this.getStackInSlot(0);
 			if (stack == null || !(stack.getItem() instanceof BlankScroll)) {
 				return;
 			}
 			
 			Spell spell = SpellCreationGui.SpellCreationContainer.craftSpell(
-					name, this, new LinkedList<String>(), new LinkedList<String>(), true, true);
+					name, this, crafter, new LinkedList<String>(), new LinkedList<String>(), true, true);
 			
 			if (spell != null) {
 				spell.promoteFromTrans();

@@ -163,9 +163,11 @@ public class EntityKoid extends EntityMob implements ILoreTagged {
 		}
 	}
 	
+	public static String LoreKey = "nostrum__koid";
+	
 	@Override
 	public String getLoreKey() {
-		return "nostrum__koid";
+		return LoreKey;
 	}
 
 	@Override

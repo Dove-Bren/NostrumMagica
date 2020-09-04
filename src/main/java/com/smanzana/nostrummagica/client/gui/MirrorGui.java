@@ -2,19 +2,28 @@ package com.smanzana.nostrummagica.client.gui;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.lwjgl.opengl.GL11;
 
+import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.gui.book.BookScreen;
+import com.smanzana.nostrummagica.client.gui.book.IBookPage;
+import com.smanzana.nostrummagica.client.gui.book.ReferencePage;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
+import com.smanzana.nostrummagica.network.messages.ClientPurchaseResearchMessage;
 import com.smanzana.nostrummagica.network.messages.ClientSkillUpMessage;
 import com.smanzana.nostrummagica.network.messages.ClientSkillUpMessage.Type;
 import com.smanzana.nostrummagica.network.messages.ClientUpdateQuestMessage;
@@ -23,21 +32,29 @@ import com.smanzana.nostrummagica.quests.rewards.AlterationReward;
 import com.smanzana.nostrummagica.quests.rewards.AttributeReward;
 import com.smanzana.nostrummagica.quests.rewards.AttributeReward.AwardType;
 import com.smanzana.nostrummagica.quests.rewards.IReward;
+import com.smanzana.nostrummagica.research.NostrumResearch;
+import com.smanzana.nostrummagica.research.NostrumResearch.NostrumResearchTab;
+import com.smanzana.nostrummagica.research.NostrumResearch.Size;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.utils.Curves;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.text.TextFormatting;
 
 public class MirrorGui extends GuiScreen {
@@ -52,12 +69,32 @@ public class MirrorGui extends GuiScreen {
 	private static final int TEXT_CONTENT_VOFFSET = 16;
 	private static final int TEXT_CONTENT_WIDTH = 269;
 	private static final int TEXT_CONTENT_HEIGHT = 151;
-	private static final int TEXT_BUTTON_VOFFSET = 242;
-	private static final int TEXT_BUTTON_LENGTH = 16;
-	private static final int TEXT_QUEST_VOFFSET = 258;
-	private static final int TEXT_QUEST_LENGTH = 18;
-	private static final int TEXT_REWARD_OFFSET = 48;
-	private static final int TEXT_REWARD_WIDTH = 32;
+	private static final int TEXT_ICON_BUTTON_VOFFSET = 198;
+	private static final int TEXT_ICON_BUTTON_LENGTH = 16;
+	private static final int TEXT_ICON_QUEST_VOFFSET = 214;
+	private static final int TEXT_ICON_QUEST_LENGTH = 18;
+	private static final int TEXT_ICON_REWARD_OFFSET = 48;
+	private static final int TEXT_ICON_REWARD_WIDTH = 32;
+	private static final int TEXT_ICON_MAJORBUTTON_HOFFSET = 0;
+	private static final int TEXT_ICON_MAJORBUTTON_VOFFSET = 0;
+	private static final int TEXT_ICON_MAJORBUTTON_WIDTH = 49;
+	private static final int TEXT_ICON_MAJORBUTTON_HEIGHT = 43;
+	private static final int TEXT_ICON_MINORBUTTON_HOFFSET = 101;
+	private static final int TEXT_ICON_MINORBUTTON_VOFFSET = 0;
+	private static final int TEXT_ICON_MINORBUTTON_WIDTH = 35;
+	private static final int TEXT_ICON_MINORBUTTON_HEIGHT = 28;
+	private static final int TEXT_ICON_RESEARCHBUTTON_SMALL_HOFFSET = 0;
+	private static final int TEXT_ICON_RESEARCHBUTTON_SMALL_VOFFSET = 86;
+	private static final int TEXT_ICON_RESEARCHBUTTON_SMALL_WIDTH = 24;
+	private static final int TEXT_ICON_RESEARCHBUTTON_SMALL_HEIGHT = 24;
+	private static final int TEXT_ICON_RESEARCHBUTTON_LARGE_HOFFSET = 24;
+	private static final int TEXT_ICON_RESEARCHBUTTON_LARGE_VOFFSET = 86;
+	private static final int TEXT_ICON_RESEARCHBUTTON_LARGE_WIDTH = 32;
+	private static final int TEXT_ICON_RESEARCHBUTTON_LARGE_HEIGHT = 32;
+	private static final int TEXT_ICON_RESEARCHBUTTON_GIANT_HOFFSET = 56;
+	private static final int TEXT_ICON_RESEARCHBUTTON_GIANT_VOFFSET = 86;
+	private static final int TEXT_ICON_RESEARCHBUTTON_GIANT_WIDTH = 46;
+	private static final int TEXT_ICON_RESEARCHBUTTON_GIANT_HEIGHT = 46;
 	
 	private static final ResourceLocation RES_BACK_CLOUD = new ResourceLocation(
 			NostrumMagica.MODID, "textures/gui/container/mirror_back_clouds.png");
@@ -65,8 +102,11 @@ public class MirrorGui extends GuiScreen {
 			NostrumMagica.MODID, "textures/gui/container/mirror_back_clear.png");
 	private static final ResourceLocation RES_FORE = new ResourceLocation(
 			NostrumMagica.MODID, "textures/gui/container/mirror_foreground.png");
+	private static final ResourceLocation RES_ICONS = new ResourceLocation(
+			NostrumMagica.MODID, "textures/gui/container/mirror_icons.png");
 	
 	private static final int KEY_WIDTH = 70;
+	private final static float fontScale = 0.75f;
 	
 	//private INostrumMagic attr;
 	private EntityPlayer player;
@@ -78,16 +118,25 @@ public class MirrorGui extends GuiScreen {
 	private int control;
 	private int level;
 	private int skillPoints;
+	private int researchPoints;
 	private List<ILoreTagged> lore;
+	private List<String> questsCompleted;
 	private boolean unlocked;
 	private String unlockPrompt;
 	
+	private static boolean isCharacter = true; // static so we go back to the last one the next time you open it up :)
 	
 	private ImproveButton buttonControl;
 	private ImproveButton buttonTechnique;
 	private ImproveButton buttonFinesse;
+	private MajorTabButton tabCharacter;
+	private MajorTabButton tabResearch;
+	private Map<NostrumResearchTab, ResearchTabButton> tabButtons;
 	
-	private static final int guiScale = TEXT_QUEST_LENGTH + 8;
+	private NostrumResearchTab currentTab = NostrumResearchTab.MAGICA;
+	private BookScreen currentInfoScreen = null;
+	
+	private static final int guiScale = TEXT_ICON_QUEST_LENGTH + 8;
 	private int guiX;
 	private int guiY;
 	private int mouseClickX;
@@ -96,16 +145,23 @@ public class MirrorGui extends GuiScreen {
 	private int mouseClickYOffset; //yoffset at time of click
 	
 	private Map<NostrumQuest, QuestButton> questButtons;
+	private Map<NostrumResearch, ResearchButton> researchButtons;
 	private int buttonIDs;
 	
 	public MirrorGui(EntityPlayer player) {
-		this.width = TEXT_WIDTH;
+		this.width = TEXT_WIDTH + TEXT_ICON_MAJORBUTTON_WIDTH;
 		//this.height = GUI_HEIGHT;
 		this.height = 242;
 		cacheAttributes(NostrumMagica.getMagicWrapper(player));
 		this.player = player;
 		questButtons = new HashMap<>();
+		researchButtons = new HashMap<>();
+		tabButtons = new HashMap<>();
 		buttonIDs = 0;
+		
+		for (NostrumResearchTab tab : NostrumResearchTab.All()) {
+			tabButtons.put(tab, new ResearchTabButton(tab, buttonIDs++, 0, 0));
+		}
 	}
 	
 	private void cacheAttributes(INostrumMagic attr) {
@@ -114,12 +170,48 @@ public class MirrorGui extends GuiScreen {
 			unlockPrompt = getUnlockPrompt(attr);
 		this.level = attr.getLevel();
 		this.skillPoints = attr.getSkillPoints();
+		this.researchPoints = attr.getResearchPoints();
 		this.xp = attr.getXP();
 		this.maxXP = attr.getMaxXP();
 		this.technique = attr.getTech();
 		this.control = attr.getControl();
 		this.finesse = attr.getFinesse();
 		this.lore = attr.getAllLore();
+		refreshQuests(attr);
+	}
+	
+	private void refreshQuests(INostrumMagic attr) {
+		this.questsCompleted = attr.getCompletedQuests();
+	}
+	
+	private void setScreen(boolean character) {
+		final int GUI_HEIGHT = 242;
+		final int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
+		final int topOffset = (this.height - GUI_HEIGHT) / 2;
+		
+		if (isCharacter != character) {
+			isCharacter = character;
+			
+			// Reset view
+			this.guiX = leftOffset + TEXT_CONTENT_HOFFSET + (int) ((float) TEXT_CONTENT_WIDTH / 2f);
+			this.guiY = topOffset + TEXT_CONTENT_VOFFSET + (int) ((float) TEXT_CONTENT_HEIGHT / 2f);
+			
+			//this.refresh();
+		}
+	}
+	
+	private void setResearchTab(NostrumResearchTab tab) {
+		final int GUI_HEIGHT = 242;
+		final int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
+		final int topOffset = (this.height - GUI_HEIGHT) / 2;
+		if (tab != this.currentTab) {
+			this.currentTab = tab;
+			
+			this.guiX = leftOffset + TEXT_CONTENT_HOFFSET + (int) ((float) TEXT_CONTENT_WIDTH / 2f);
+			this.guiY = topOffset + TEXT_CONTENT_VOFFSET + (int) ((float) TEXT_CONTENT_HEIGHT / 2f);
+			
+			this.refreshButtons();
+		}
 	}
 	
 	@Override
@@ -135,64 +227,334 @@ public class MirrorGui extends GuiScreen {
 		this.guiX = leftOffset + TEXT_CONTENT_HOFFSET + (int) ((float) TEXT_CONTENT_WIDTH / 2f);
 		this.guiY = topOffset + TEXT_CONTENT_VOFFSET + (int) ((float) TEXT_CONTENT_HEIGHT / 2f);
 		
-		buttonControl = new ImproveButton(buttonIDs++, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (KEY_WIDTH + TEXT_BUTTON_LENGTH),
+		tabCharacter = new MajorTabButton("character", new ItemStack(Items.SKULL, 1, 3), buttonIDs++, leftOffset - TEXT_ICON_MAJORBUTTON_WIDTH, topOffset);
+		tabResearch = new MajorTabButton("research", new ItemStack(SpellTomePage.instance()), buttonIDs++, leftOffset - TEXT_ICON_MAJORBUTTON_WIDTH, topOffset + TEXT_ICON_MAJORBUTTON_HEIGHT);
+		buttonControl = new ImproveButton(buttonIDs++, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (KEY_WIDTH + TEXT_ICON_BUTTON_LENGTH),
 				topOffset + TEXT_BOTTOM_VOFFSET + KEY_VOFFSET);
-		buttonTechnique = new ImproveButton(buttonIDs++, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (KEY_WIDTH + TEXT_BUTTON_LENGTH),
+		buttonTechnique = new ImproveButton(buttonIDs++, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (KEY_WIDTH + TEXT_ICON_BUTTON_LENGTH),
 				topOffset + TEXT_BOTTOM_VOFFSET + KEY_VOFFSET + KEY_HEIGHT);
-		buttonFinesse = new ImproveButton(buttonIDs++, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (KEY_WIDTH + TEXT_BUTTON_LENGTH),
+		buttonFinesse = new ImproveButton(buttonIDs++, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (KEY_WIDTH + TEXT_ICON_BUTTON_LENGTH),
 				topOffset + TEXT_BOTTOM_VOFFSET + KEY_VOFFSET + KEY_HEIGHT + KEY_HEIGHT);
 		
 		refreshButtons();
 	}
 	
-	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+	private void drawCharacterScreenBackground(int mouseX, int mouseY, float partialTicks) {
+		int GUI_HEIGHT = 242;
+		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
+		int topOffset = (this.height - GUI_HEIGHT) / 2;
+		float extra = .2f * (float) Math.sin((double) Minecraft.getSystemTime() / 1500.0);
+		float inv = .2f - extra;
+		GlStateManager.color(.8f + extra, 1f, .8f + inv, 1f);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(RES_BACK_CLEAR);
+		Gui.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT);
 		
+		for (int i = 0; i < this.buttonList.size(); ++i) {
+			GuiButton button = (GuiButton)this.buttonList.get(i);
+			if (button instanceof QuestButton)
+				((QuestButton) button).drawTreeLines(mc);
+		}
+		for (int i = 0; i < this.buttonList.size(); ++i) {
+			GuiButton button = (GuiButton)this.buttonList.get(i);
+			if (button instanceof QuestButton)
+				button.drawButton(this.mc, mouseX, mouseY);
+		}
+	}
+	
+	private void drawCharacterScreenForeground(int mouseX, int mouseY, float partialTicks) {
 		int GUI_HEIGHT = 242;
 		int KEY_HEIGHT = 15;
 		int KEY_VOFFSET = 9;
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - GUI_HEIGHT) / 2;
+		Minecraft.getMinecraft().getTextureManager().bindTexture(RES_FORE);
+		GlStateManager.color(1f, 1f, 1f, 1f);
+		GlStateManager.disableBlend();
+		GlStateManager.disableLighting();
+		Gui.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
 		
-		if (unlocked) {
-			float extra = .2f * (float) Math.sin((double) Minecraft.getSystemTime() / 1500.0);
-			float inv = .2f - extra;
-			GlStateManager.color(.8f + extra, 1f, .8f + inv, 1f);
-			Minecraft.getMinecraft().getTextureManager().bindTexture(RES_BACK_CLEAR);
-		} else {
-			GlStateManager.color(1f, 1f, 1f, 1f);
-			Minecraft.getMinecraft().getTextureManager().bindTexture(RES_BACK_CLOUD);
+		// DRAW STATS
+		int y = 2;
+		int len;
+		int colorKey = 0xFF0A8E0A;
+		int colorVal = 0xFFE4E5D5;
+		String str;
+		
+		str = "Level " + level;
+		len = fontRendererObj.getStringWidth(str);
+		this.fontRendererObj.drawString(str, (this.width - len) / 2, topOffset + TEXT_BOTTOM_VOFFSET, 0xFFFFFFFF, true);
+		y += fontRendererObj.FONT_HEIGHT + 10;
+		int yTop = y = KEY_VOFFSET + topOffset + TEXT_BOTTOM_VOFFSET;
+		
+		//leftOffset + TEXT_BOTTOM_HOFFSET, y + topOffset + TEXT_BOTTOM_VOFFSET, colorKey
+		// XP, points
+		Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET - 2, y, leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
+		str = "XP: ";
+		len = fontRendererObj.getStringWidth(String.format("%.02f%%", 100f * xp/maxXP));
+		this.fontRendererObj.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET, y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorKey);
+		this.fontRendererObj.drawString(String.format("%.02f%%", 100f * xp/maxXP), leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH - (len), y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorVal);
+		y += KEY_HEIGHT + 5;
+		
+//					Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET - 2, topOffset + TEXT_BOTTOM_VOFFSET + y - 2, leftOffset + TEXT_BOTTOM_HOFFSET + keyWidth + 2, topOffset + TEXT_BOTTOM_VOFFSET + y + this.fontRendererObj.FONT_HEIGHT, 0xD0000000);
+//					str = "Technique: ";
+//					len = fontRendererObj.getStringWidth("" + attr.getTech());
+//					this.fontRendererObj.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET, y + topOffset + TEXT_BOTTOM_VOFFSET, colorKey);
+//					this.fontRendererObj.drawString("" + attr.getTech(), leftOffset + TEXT_BOTTOM_HOFFSET + keyWidth - (len), y + topOffset + TEXT_BOTTOM_VOFFSET, colorVal);
+		y += KEY_HEIGHT + 5;
+		
+		Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET - 2, y, leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
+		str = "Skill Points: ";
+		len = fontRendererObj.getStringWidth("" + skillPoints);
+		this.fontRendererObj.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET, y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorKey);
+		this.fontRendererObj.drawString("" + skillPoints, leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH - (len), y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorVal);
+		y += KEY_HEIGHT + 5;
+		
+		// stats
+		y = yTop;
+		Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (2 + KEY_WIDTH), y, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
+		str = "Control: ";
+		len = fontRendererObj.getStringWidth("" + control);
+		this.fontRendererObj.drawString(str, leftOffset + TEXT_BOTTOM_WIDTH + TEXT_BOTTOM_HOFFSET - (KEY_WIDTH), y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorKey);
+		this.fontRendererObj.drawString("" + control, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorVal);
+		y += KEY_HEIGHT + 5;
+		
+		Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (2 + KEY_WIDTH), y, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
+		str = "Technique: ";
+		len = fontRendererObj.getStringWidth("" + technique);
+		this.fontRendererObj.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - KEY_WIDTH, y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorKey);
+		this.fontRendererObj.drawString("" + technique, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorVal);
+		y += KEY_HEIGHT + 5;
+		
+		Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (2 + KEY_WIDTH), y, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
+		str = "Finess: ";
+		len = fontRendererObj.getStringWidth("" + finesse);
+		this.fontRendererObj.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - KEY_WIDTH, y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorKey);
+		this.fontRendererObj.drawString("" + finesse, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorVal);
+		y += KEY_HEIGHT + 5;
+		
+		buttonControl.drawButton(mc, mouseX, mouseY);
+		buttonTechnique.drawButton(mc, mouseX, mouseY);
+		buttonFinesse.drawButton(mc, mouseX, mouseY);
+		
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		int mana = attr.getMana();
+		int maxMana = attr.getMaxMana();
+		float bonusMana = attr.getManaModifier();
+		float bonusManaRegen = attr.getManaRegenModifier();
+		float bonusManaCost = attr.getManaCostModifier();
+		int fh = fontRendererObj.FONT_HEIGHT;
+		this.fontRendererObj.drawString("Mana:",
+				leftOffset + TEXT_WIDTH, topOffset + 5, 0xFFFFFFFF);
+		this.fontRendererObj.drawString(" " + mana + "/" + maxMana,
+				leftOffset + TEXT_WIDTH, topOffset + 5 + fh, 0xFFFFFFFF);
+		
+		this.fontRendererObj.drawString("Bonus Mana:",
+				leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 4, 0xFFFFFFFF);
+		this.fontRendererObj.drawString(String.format("%+.1f%%", bonusMana * 100f),
+				leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 5, 0xFFFFFFFF);
+
+		this.fontRendererObj.drawString("Mana Regen:",
+				leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 6, 0xFFFFFFFF);
+		this.fontRendererObj.drawString(String.format("%+.1f%%", bonusManaRegen * 100f),
+				leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 7, 0xFFFFFFFF);
+
+		this.fontRendererObj.drawString("Mana Cost:",
+				leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 8, 0xFFFFFFFF);
+		this.fontRendererObj.drawString(String.format("%+.1f%%", bonusManaCost * 100f),
+				leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 9, 0xFFFFFFFF);
+		
+		for (int i = 0; i < this.buttonList.size(); ++i) {
+			GuiButton button = (GuiButton)this.buttonList.get(i);
+			if (button instanceof QuestButton)
+				((QuestButton) button).drawOverlay(mc, mouseX, mouseY);
 		}
-		
+	}
+	
+	private void drawResearchScreenBackground(int mouseX, int mouseY, float partialTicks) {
+		int GUI_HEIGHT = 242;
+		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
+		int topOffset = (this.height - GUI_HEIGHT) / 2;
+		float extra = .2f * (float) Math.sin((double) Minecraft.getSystemTime() / 1500.0);
+		float inv = .2f - extra;
+		GlStateManager.color(.8f + extra, 1f, .8f + inv, 1f);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(RES_BACK_CLEAR);
 		Gui.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT);
 		
-		// CONTENT DRAWING
-		if (unlocked) {
-			for (int i = 0; i < this.buttonList.size(); ++i) {
-				GuiButton button = (GuiButton)this.buttonList.get(i);
-				if (button != buttonControl
-						&& button != buttonTechnique
-						&& button != buttonFinesse)
-					((QuestButton) button).drawTreeLines(mc);
+		for (int i = 0; i < this.buttonList.size(); ++i) {
+			GuiButton button = (GuiButton)this.buttonList.get(i);
+			if (button instanceof ResearchButton)
+				((ResearchButton) button).drawTreeLines(mc);
+		}
+		for (int i = 0; i < this.buttonList.size(); ++i) {
+			GuiButton button = (GuiButton)this.buttonList.get(i);
+			if (button instanceof ResearchButton)
+				button.drawButton(this.mc, mouseX, mouseY);
+		}
+	}
+	
+	private void drawResearchScreenForeground(int mouseX, int mouseY, float partialTicks) {
+		int GUI_HEIGHT = 242;
+		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
+		int topOffset = (this.height - GUI_HEIGHT) / 2;
+		Minecraft.getMinecraft().getTextureManager().bindTexture(RES_FORE);
+		GlStateManager.color(1f, 1f, 1f, 1f);
+		GlStateManager.disableBlend();
+		GlStateManager.disableLighting();
+		Gui.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
+		
+		for (int i = 0; i < this.buttonList.size(); ++i) {
+			GuiButton button = (GuiButton)this.buttonList.get(i);
+			if (button instanceof ResearchTabButton) {
+				button.drawButton(mc, mouseX, mouseY);
 			}
-			for (int i = 0; i < this.buttonList.size(); ++i) {
-				GuiButton button = (GuiButton)this.buttonList.get(i);
-				if (button != buttonControl
-						&& button != buttonTechnique
-						&& button != buttonFinesse)
-					button.drawButton(this.mc, mouseX, mouseY);
+		}
+		
+		for (int i = 0; i < this.buttonList.size(); ++i) {
+			GuiButton button = (GuiButton)this.buttonList.get(i);
+			if (button instanceof ResearchButton) {
+				((ResearchButton) button).drawOverlay(mc, mouseX, mouseY);
+			} else if (button instanceof ResearchTabButton) {
+				((ResearchTabButton) button).drawOverlay(mc, mouseX, mouseY);
+			}
+		}
+	}
+	
+	private void drawLockedScreenBackground(int mouseX, int mouseY, float partialTicks) {
+		int GUI_HEIGHT = 242;
+		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
+		int topOffset = (this.height - GUI_HEIGHT) / 2;
+		GlStateManager.color(1f, 1f, 1f, 1f);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(RES_BACK_CLOUD);
+		Gui.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT);
+		
+		int y = 0;
+		String str = "Magic Not Yet Unlocked";
+		int len = this.fontRendererObj.getStringWidth(str);
+		this.fontRendererObj.drawString(str, (this.width - len) / 2, topOffset + (TEXT_CONTENT_HEIGHT / 2), 0xFFFFFFFF, true);
+		
+		y = fontRendererObj.FONT_HEIGHT + 2;
+		
+		len = this.fontRendererObj.getStringWidth(unlockPrompt);
+		this.fontRendererObj.drawString(unlockPrompt, (this.width - len) / 2, y + topOffset + (TEXT_CONTENT_HEIGHT / 2), 0xFFDFD000, false);
+	}
+	
+	private void drawLockedScreenForeground(int mouseX, int mouseY, float partialTicks) {
+		int GUI_HEIGHT = 242;
+		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
+		int topOffset = (this.height - GUI_HEIGHT) / 2;
+		
+		Minecraft.getMinecraft().getTextureManager().bindTexture(RES_FORE);
+		GlStateManager.color(1f, 1f, 1f, 1f);
+		GlStateManager.disableBlend();
+		GlStateManager.disableLighting();
+		Gui.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
+		
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		// DRAW ICONS
+		EMagicElement element = null; // Which element we know
+		SpellTrigger trigger = null;
+		SpellShape shape = null;
+		
+		Map<EMagicElement, Boolean> map = attr.getKnownElements();
+		Boolean val;
+		for (EMagicElement elem : map.keySet()) {
+			val = map.get(elem);
+			if (val != null && val) {
+				element = elem;
+				break;
+			}
+		}
+		
+		if (!attr.getTriggers().isEmpty())
+			trigger = attr.getTriggers().get(0);
+		
+		if (!attr.getShapes().isEmpty())
+			shape = attr.getShapes().get(0);
+		
+		final int width = 24;
+		final int space = 32;
+		final long cycle = 1500;
+		int x = leftOffset + (int) (.5 * TEXT_WIDTH) + (-width / 2) + (-space) + (-width);
+		int y = topOffset + TEXT_BOTTOM_VOFFSET + width;
+		int strLen;
+		String str;
+
+		GlStateManager.enableBlend();
+		drawRect(x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
+		if (element != null)
+			GlStateManager.color(1f, 1f, 1f, 1f);
+		else {
+			GlStateManager.color(.8f, .5f, .5f, .5f);
+			element = EMagicElement.values()[
+                  (int) (Minecraft.getSystemTime() / cycle) % EMagicElement.values().length
+			      ];
+		}
+		SpellComponentIcon.get(element).draw(this, this.fontRendererObj, x, y, width, width);
+		str = I18n.format("element.name", new Object[0]);
+		strLen = this.fontRendererObj.getStringWidth(str);
+		this.fontRendererObj.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.fontRendererObj.FONT_HEIGHT), 0xFFFFFF);
+		
+		x += width + space;
+		drawRect(x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
+		if (trigger != null)
+			GlStateManager.color(1f, 1f, 1f, 1f);
+		else {
+			GlStateManager.color(.8f, .5f, .5f, .5f);
+			Collection<SpellTrigger> triggers = SpellTrigger.getAllTriggers();
+			SpellTrigger[] trigArray = triggers.toArray(new SpellTrigger[0]);
+			trigger = trigArray[
+                  (int) (Minecraft.getSystemTime() / cycle) % trigArray.length
+			      ];
+		}
+		SpellComponentIcon.get(trigger).draw(this, this.fontRendererObj, x, y, width, width);
+		str = I18n.format("trigger.name", new Object[0]);
+		strLen = this.fontRendererObj.getStringWidth(str);
+		this.fontRendererObj.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.fontRendererObj.FONT_HEIGHT), 0xFFFFFF);
+		
+		x += width + space;
+		drawRect(x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
+		if (shape != null)
+			GlStateManager.color(1f, 1f, 1f, 1f);
+		else {
+			GlStateManager.color(.8f, .5f, .5f, .5f);
+			Collection<SpellShape> shapes = SpellShape.getAllShapes();
+			SpellShape[] shapeArray = shapes.toArray(new SpellShape[0]);
+			shape = shapeArray[
+                  (int) (Minecraft.getSystemTime() / cycle) % shapeArray.length
+			      ];
+		}
+		SpellComponentIcon.get(shape).draw(this, this.fontRendererObj, x, y, width, width);
+		str = I18n.format("shape.name", new Object[0]);
+		strLen = this.fontRendererObj.getStringWidth(str);
+		this.fontRendererObj.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.fontRendererObj.FONT_HEIGHT), 0xFFFFFF);
+	}
+	
+	private void drawResearchPages(int mouseX, int mouseY, float partialTicks) {
+		GlStateManager.enableAlpha();
+		GlStateManager.enableBlend();
+		GlStateManager.disableLighting();
+		Gui.drawRect(0, 0, this.width, this.height, 0x60000000);
+		currentInfoScreen.drawScreen(mouseX, mouseY, partialTicks);
+	}
+	
+	@Override
+	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+		int GUI_HEIGHT = 242;
+		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
+		int topOffset = (this.height - GUI_HEIGHT) / 2;
+		
+		if (unlocked) {
+			if (isCharacter) {
+				drawCharacterScreenBackground(mouseX, mouseY, partialTicks);
+			} else {
+				drawResearchScreenBackground(mouseX, mouseY, partialTicks);
 			}
 		} else {
-			int y = 0;
-			String str = "Magic Not Yet Unlocked";
-			int len = this.fontRendererObj.getStringWidth(str);
-			this.fontRendererObj.drawString(str, (this.width - len) / 2, topOffset + (TEXT_CONTENT_HEIGHT / 2), 0xFFFFFFFF, true);
-			
-			y = fontRendererObj.FONT_HEIGHT + 2;
-			
-			len = this.fontRendererObj.getStringWidth(unlockPrompt);
-			this.fontRendererObj.drawString(unlockPrompt, (this.width - len) / 2, y + topOffset + (TEXT_CONTENT_HEIGHT / 2), 0xFFDFD000, false);
+			drawLockedScreenBackground(mouseX, mouseY, partialTicks);
 		}
+		
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(0, 0, 50);
 		
 		// Black out surrounding screen
 		int color = 0xFF000000;
@@ -201,192 +563,33 @@ public class MirrorGui extends GuiScreen {
 		Gui.drawRect(0, 0, leftOffset, this.height, color);
 		Gui.drawRect(leftOffset + TEXT_WIDTH - 1, 0, this.width, this.height, color);
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(RES_FORE);
-		GlStateManager.color(1f, 1f, 1f, 1f);
-		GlStateManager.disableBlend();
-		GlStateManager.disableLighting();
-		Gui.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
-		
-		// TEXT DRAWING
 		if (unlocked) {
-			// DRAW STATS
-			int y = 2;
-			int len;
-			int colorKey = 0xFF0A8E0A;
-			int colorVal = 0xFFE4E5D5;
-			String str;
-			
-			str = "Level " + level;
-			len = fontRendererObj.getStringWidth(str);
-			this.fontRendererObj.drawString(str, (this.width - len) / 2, topOffset + TEXT_BOTTOM_VOFFSET, 0xFFFFFFFF, true);
-			y += fontRendererObj.FONT_HEIGHT + 10;
-			int yTop = y = KEY_VOFFSET + topOffset + TEXT_BOTTOM_VOFFSET;
-			
-			//leftOffset + TEXT_BOTTOM_HOFFSET, y + topOffset + TEXT_BOTTOM_VOFFSET, colorKey
-			// XP, points
-			Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET - 2, y, leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
-			str = "XP: ";
-			len = fontRendererObj.getStringWidth(String.format("%.02f%%", 100f * xp/maxXP));
-			this.fontRendererObj.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET, y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorKey);
-			this.fontRendererObj.drawString(String.format("%.02f%%", 100f * xp/maxXP), leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH - (len), y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorVal);
-			y += KEY_HEIGHT + 5;
-			
-//			Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET - 2, topOffset + TEXT_BOTTOM_VOFFSET + y - 2, leftOffset + TEXT_BOTTOM_HOFFSET + keyWidth + 2, topOffset + TEXT_BOTTOM_VOFFSET + y + this.fontRendererObj.FONT_HEIGHT, 0xD0000000);
-//			str = "Technique: ";
-//			len = fontRendererObj.getStringWidth("" + attr.getTech());
-//			this.fontRendererObj.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET, y + topOffset + TEXT_BOTTOM_VOFFSET, colorKey);
-//			this.fontRendererObj.drawString("" + attr.getTech(), leftOffset + TEXT_BOTTOM_HOFFSET + keyWidth - (len), y + topOffset + TEXT_BOTTOM_VOFFSET, colorVal);
-			y += KEY_HEIGHT + 5;
-			
-			Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET - 2, y, leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
-			str = "Skill Points: ";
-			len = fontRendererObj.getStringWidth("" + skillPoints);
-			this.fontRendererObj.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET, y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorKey);
-			this.fontRendererObj.drawString("" + skillPoints, leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH - (len), y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorVal);
-			y += KEY_HEIGHT + 5;
-			
-			// stats
-			y = yTop;
-			Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (2 + KEY_WIDTH), y, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
-			str = "Control: ";
-			len = fontRendererObj.getStringWidth("" + control);
-			this.fontRendererObj.drawString(str, leftOffset + TEXT_BOTTOM_WIDTH + TEXT_BOTTOM_HOFFSET - (KEY_WIDTH), y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorKey);
-			this.fontRendererObj.drawString("" + control, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorVal);
-			y += KEY_HEIGHT + 5;
-			
-			Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (2 + KEY_WIDTH), y, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
-			str = "Technique: ";
-			len = fontRendererObj.getStringWidth("" + technique);
-			this.fontRendererObj.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - KEY_WIDTH, y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorKey);
-			this.fontRendererObj.drawString("" + technique, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorVal);
-			y += KEY_HEIGHT + 5;
-			
-			Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (2 + KEY_WIDTH), y, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
-			str = "Finess: ";
-			len = fontRendererObj.getStringWidth("" + finesse);
-			this.fontRendererObj.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - KEY_WIDTH, y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorKey);
-			this.fontRendererObj.drawString("" + finesse, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - fontRendererObj.FONT_HEIGHT) / 2 + 1, colorVal);
-			y += KEY_HEIGHT + 5;
-			
-			buttonControl.drawButton(mc, mouseX, mouseY);
-			buttonTechnique.drawButton(mc, mouseX, mouseY);
-			buttonFinesse.drawButton(mc, mouseX, mouseY);
-			
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-			int mana = attr.getMana();
-			int maxMana = attr.getMaxMana();
-			float bonusMana = attr.getManaModifier();
-			float bonusManaRegen = attr.getManaRegenModifier();
-			float bonusManaCost = attr.getManaCostModifier();
-			int fh = fontRendererObj.FONT_HEIGHT;
-			this.fontRendererObj.drawString("Mana:",
-					leftOffset + TEXT_WIDTH, topOffset + 5, 0xFFFFFFFF);
-			this.fontRendererObj.drawString(" " + mana + "/" + maxMana,
-					leftOffset + TEXT_WIDTH, topOffset + 5 + fh, 0xFFFFFFFF);
-			
-			this.fontRendererObj.drawString("Bonus Mana:",
-					leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 4, 0xFFFFFFFF);
-			this.fontRendererObj.drawString(String.format("%+.1f%%", bonusMana * 100f),
-					leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 5, 0xFFFFFFFF);
-
-			this.fontRendererObj.drawString("Mana Regen:",
-					leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 6, 0xFFFFFFFF);
-			this.fontRendererObj.drawString(String.format("%+.1f%%", bonusManaRegen * 100f),
-					leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 7, 0xFFFFFFFF);
-
-			this.fontRendererObj.drawString("Mana Cost:",
-					leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 8, 0xFFFFFFFF);
-			this.fontRendererObj.drawString(String.format("%+.1f%%", bonusManaCost * 100f),
-					leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 9, 0xFFFFFFFF);
-			
-			for (int i = 0; i < this.buttonList.size(); ++i) {
-				GuiButton button = (GuiButton)this.buttonList.get(i);
-				if (button != buttonControl
-						&& button != buttonTechnique
-						&& button != buttonFinesse)
-					((QuestButton) button).drawOverlay(mc, mouseX, mouseY);
+			if (isCharacter) {
+				drawCharacterScreenForeground(mouseX, mouseY, partialTicks);
+			} else {
+				drawResearchScreenForeground(mouseX, mouseY, partialTicks);
 			}
-			
 		} else {
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-			// DRAW ICONS
-			EMagicElement element = null; // Which element we know
-			SpellTrigger trigger = null;
-			SpellShape shape = null;
-			
-			Map<EMagicElement, Boolean> map = attr.getKnownElements();
-			Boolean val;
-			for (EMagicElement elem : map.keySet()) {
-				val = map.get(elem);
-				if (val != null && val) {
-					element = elem;
-					break;
-				}
-			}
-			
-			if (!attr.getTriggers().isEmpty())
-				trigger = attr.getTriggers().get(0);
-			
-			if (!attr.getShapes().isEmpty())
-				shape = attr.getShapes().get(0);
-			
-			final int width = 24;
-			final int space = 32;
-			final long cycle = 1500;
-			int x = leftOffset + (int) (.5 * TEXT_WIDTH) + (-width / 2) + (-space) + (-width);
-			int y = topOffset + TEXT_BOTTOM_VOFFSET + width;
-			int strLen;
-			String str;
-
-			GlStateManager.enableBlend();
-			drawRect(x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
-			if (element != null)
-				GlStateManager.color(1f, 1f, 1f, 1f);
-			else {
-				GlStateManager.color(.8f, .5f, .5f, .5f);
-				element = EMagicElement.values()[
-	                  (int) (Minecraft.getSystemTime() / cycle) % EMagicElement.values().length
-				      ];
-			}
-			SpellComponentIcon.get(element).draw(this, this.fontRendererObj, x, y, width, width);
-			str = I18n.format("element.name", new Object[0]);
-			strLen = this.fontRendererObj.getStringWidth(str);
-			this.fontRendererObj.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.fontRendererObj.FONT_HEIGHT), 0xFFFFFF);
-			
-			x += width + space;
-			drawRect(x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
-			if (trigger != null)
-				GlStateManager.color(1f, 1f, 1f, 1f);
-			else {
-				GlStateManager.color(.8f, .5f, .5f, .5f);
-				Collection<SpellTrigger> triggers = SpellTrigger.getAllTriggers();
-				SpellTrigger[] trigArray = triggers.toArray(new SpellTrigger[0]);
-				trigger = trigArray[
-	                  (int) (Minecraft.getSystemTime() / cycle) % trigArray.length
-				      ];
-			}
-			SpellComponentIcon.get(trigger).draw(this, this.fontRendererObj, x, y, width, width);
-			str = I18n.format("trigger.name", new Object[0]);
-			strLen = this.fontRendererObj.getStringWidth(str);
-			this.fontRendererObj.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.fontRendererObj.FONT_HEIGHT), 0xFFFFFF);
-			
-			x += width + space;
-			drawRect(x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
-			if (shape != null)
-				GlStateManager.color(1f, 1f, 1f, 1f);
-			else {
-				GlStateManager.color(.8f, .5f, .5f, .5f);
-				Collection<SpellShape> shapes = SpellShape.getAllShapes();
-				SpellShape[] shapeArray = shapes.toArray(new SpellShape[0]);
-				shape = shapeArray[
-	                  (int) (Minecraft.getSystemTime() / cycle) % shapeArray.length
-				      ];
-			}
-			SpellComponentIcon.get(shape).draw(this, this.fontRendererObj, x, y, width, width);
-			str = I18n.format("shape.name", new Object[0]);
-			strLen = this.fontRendererObj.getStringWidth(str);
-			this.fontRendererObj.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.fontRendererObj.FONT_HEIGHT), 0xFFFFFF);
+			drawLockedScreenForeground(mouseX, mouseY, partialTicks);
 		}
+		
+		// Draw major tab buttons
+		tabCharacter.drawButton(mc, mouseX, mouseY);
+		tabResearch.drawButton(mc, mouseX, mouseY);
+		if (this.currentInfoScreen == null) {
+			tabCharacter.drawOverlay(mc, mouseX, mouseY);
+			tabResearch.drawOverlay(mc, mouseX, mouseY);
+		}
+		
+		
+		if (this.currentInfoScreen != null) {
+			GlStateManager.pushMatrix();
+			GlStateManager.translate(0, 0, 500);
+			drawResearchPages(mouseX, mouseY, partialTicks);
+			GlStateManager.popMatrix();
+		}
+
+		GlStateManager.popMatrix();
 		
 		//super.drawScreen(mouseX, mouseY, partialTicks);
 	}
@@ -417,6 +620,10 @@ public class MirrorGui extends GuiScreen {
 		if (!button.visible)
 			return;
 		
+		if (this.currentInfoScreen != null) {
+			return; // Re-route all things to the subscren
+		}
+		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		
 		if (button == this.buttonControl) {
@@ -434,7 +641,7 @@ public class MirrorGui extends GuiScreen {
 			NetworkHandler.getSyncChannel().sendToServer(
 					new ClientSkillUpMessage(Type.TECHNIQUE)
 					);
-		} else {
+		} else if (button instanceof QuestButton) {
 			// Quest button
 			QuestButton qb = (QuestButton) button;
 			NostrumQuest quest = qb.quest;
@@ -444,49 +651,144 @@ public class MirrorGui extends GuiScreen {
 					new ClientUpdateQuestMessage(quest)	
 					);
 			}
+		} else if (button instanceof MajorTabButton) {
+			this.setScreen(button == tabCharacter);
+		} else if (button instanceof ResearchTabButton) {
+			this.setResearchTab(((ResearchTabButton) button).tab);
+		} else if (button instanceof ResearchButton) {
+			// Research button
+			ResearchButton rb = (ResearchButton) button;
+			NostrumResearch research = rb.research;
+			
+			if (rb.state == ResearchState.INACTIVE && researchPoints > 0) {
+				NetworkHandler.getSyncChannel().sendToServer(
+					new ClientPurchaseResearchMessage(research)	
+					);
+			} else if (rb.state == ResearchState.COMPLETED) {
+				String info = I18n.format(rb.research.getInfoKey(), new Object[0]);
+				List<IBookPage> pages = new LinkedList<>();
+				BookScreen.makePagesFrom(pages, info);
+				
+				// Add reference page at the end if we have references
+				String[] references = rb.research.getRawReferences();
+				String[] displays = rb.research.getDisplayedReferences();
+
+				if (references != null && references.length > 0) {
+				
+					// translate display names
+					String[] displaysFixed = new String[displays.length];
+					for (int i = 0; i < displays.length; i++) {
+						displaysFixed[i] = I18n.format(displays[i], new Object[0]);
+					}
+					pages.add(new ReferencePage(displaysFixed, references, false));
+				}
+				
+				currentInfoScreen = new BookScreen(System.currentTimeMillis() + "", pages);
+				currentInfoScreen.setWorldAndResolution(mc, width, height);
+			}
 		}
 		
 		refreshButtons();
 	}
 	
 	private void refreshButtons() {
-		if (skillPoints == 0) {
-			buttonControl.visible
-				= buttonTechnique.visible
-				= buttonFinesse.visible
-				= false;
-		} else {
-			buttonControl.visible
-			= buttonTechnique.visible
-			= buttonFinesse.visible
-			= true;
-		}
-		
+		int GUI_HEIGHT = 242;
+		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
+		int topOffset = (this.height - GUI_HEIGHT) / 2;
+//		for (GuiButton button : buttonList) {
+//			button.visible = false;
+//		}
 		this.buttonList.clear();
 		questButtons.clear();
-		this.addButton(buttonControl);
-		this.addButton(buttonTechnique);
-		this.addButton(buttonFinesse);
+		researchButtons.clear();
 		
-		for (NostrumQuest quest : NostrumQuest.allQuests()) {
-			if (!ModConfig.config.displayAllMirrorNodes() && !NostrumMagica.getQuestAvailable(player, quest))
-				continue;
+		// Add main tabs
+		this.addButton(tabCharacter);
+		this.addButton(tabResearch);
+		
+		if (isCharacter) {
+			// Add buttons that show up on the character screen
+			if (skillPoints == 0) {
+				buttonControl.visible
+					= buttonTechnique.visible
+					= buttonFinesse.visible
+					= false;
+			} else {
+				buttonControl.visible
+				= buttonTechnique.visible
+				= buttonFinesse.visible
+				= true;
+			}
 			
-			QuestState state;
-			if (NostrumMagica.getCompletedQuests(player).contains(quest))
-				state = QuestState.COMPLETED;
-			else if (NostrumMagica.getActiveQuests(player).contains(quest))
-				state = QuestState.TAKEN;
-			else if (NostrumMagica.canTakeQuest(player, quest))
-				state = QuestState.INACTIVE;
-			else
-				state = QuestState.UNAVAILABLE;
 			
-			QuestButton button = new QuestButton(buttonIDs++,
-					quest.getPlotX(), quest.getPlotY(),
-					quest, state);
-			this.addButton(button);
-			questButtons.put(quest, button);
+			this.addButton(buttonControl);
+			this.addButton(buttonTechnique);
+			this.addButton(buttonFinesse);
+			
+			for (NostrumQuest quest : NostrumQuest.allQuests()) {
+				if (!ModConfig.config.displayAllMirrorQuestNodes() && !NostrumMagica.getQuestAvailable(player, quest))
+					continue;
+				
+				QuestState state;
+				if (NostrumMagica.getCompletedQuests(player).contains(quest))
+					state = QuestState.COMPLETED;
+				else if (NostrumMagica.getActiveQuests(player).contains(quest))
+					state = QuestState.TAKEN;
+				else if (NostrumMagica.canTakeQuest(player, quest))
+					state = QuestState.INACTIVE;
+				else
+					state = QuestState.UNAVAILABLE;
+				
+				QuestButton button = new QuestButton(buttonIDs++,
+						quest.getPlotX(), quest.getPlotY(),
+						quest, state);
+				this.addButton(button);
+				questButtons.put(quest, button);
+			}
+		} else {
+			// Add buttons that show up on the research screen.
+			// We discover which tabs to display while also filtering research down
+			// to those on the active tab at the same time.
+			Set<NostrumResearchTab> visibleTabs = new HashSet<>();
+			
+			for (NostrumResearch research: NostrumResearch.AllResearch()) {
+				if (!NostrumMagica.getResearchVisible(player, research))
+					continue;
+				
+				visibleTabs.add(research.getTab());
+				if (research.getTab() != this.currentTab) {
+					continue;
+				}
+				
+				ResearchState state;
+				if (NostrumMagica.getCompletedResearch(player).contains(research))
+					state = ResearchState.COMPLETED;
+				else if (NostrumMagica.canPurchaseResearch(player, research))
+					state = ResearchState.INACTIVE;
+				else
+					state = ResearchState.UNAVAILABLE;
+				
+				ResearchButton button = new ResearchButton(buttonIDs++,
+						research.getX(), research.getY(),
+						research, state);
+				this.addButton(button);
+				researchButtons.put(research, button);
+			}
+			
+			int x = leftOffset + TEXT_BOTTOM_HOFFSET - 12;
+			List<NostrumResearchTab> tabList = Lists.newArrayList(visibleTabs);
+			Collections.sort(tabList, (l, r) -> {
+				ResearchTabButton lButton = tabButtons.get(l);
+				ResearchTabButton rButton = tabButtons.get(r);
+				return lButton.id - rButton.id;
+			});
+			for (NostrumResearchTab tab : tabList) {
+				ResearchTabButton button = tabButtons.get(tab);
+				button.xPosition = x;
+				button.yPosition = topOffset + TEXT_BOTTOM_VOFFSET - 1;
+				this.buttonList.add(button);
+				x += TEXT_ICON_MINORBUTTON_WIDTH;
+			}
 		}
 	}
 	
@@ -500,20 +802,102 @@ public class MirrorGui extends GuiScreen {
 	
 	@Override
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-		mouseClickX = mouseX;
-		mouseClickY = mouseY;
-		mouseClickXOffset = guiX;
-		mouseClickYOffset = guiY;
+		
+		if (this.currentInfoScreen != null) {
+			this.currentInfoScreen.mouseClicked(mouseX, mouseY, mouseButton);
+			return;
+		}
+		
+		int GUI_HEIGHT = 242;
+		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
+		int topOffset = (this.height - GUI_HEIGHT) / 2;
+		
+		if (mouseX > leftOffset + TEXT_CONTENT_HOFFSET && mouseX < leftOffset + TEXT_CONTENT_HOFFSET + TEXT_CONTENT_WIDTH
+				&& mouseY > topOffset + TEXT_CONTENT_VOFFSET && mouseY < topOffset + TEXT_CONTENT_VOFFSET + TEXT_CONTENT_HEIGHT) {
+			mouseClickX = mouseX;
+			mouseClickY = mouseY;
+			mouseClickXOffset = guiX;
+			mouseClickYOffset = guiY;
+		} else {
+			mouseClickX = -500;
+		}
 		
 		super.mouseClicked(mouseX, mouseY, mouseButton);
 	}
 	
 	@Override
 	protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
-		guiX = mouseClickXOffset - (mouseClickX - mouseX);
-		guiY = mouseClickYOffset - (mouseClickY - mouseY);
+		if (this.currentInfoScreen != null) {
+			//this.currentInfoScreen.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+			return;
+		}
+		
+		if (mouseClickX > 0) {
+			guiX = mouseClickXOffset - (mouseClickX - mouseX);
+			guiY = mouseClickYOffset - (mouseClickY - mouseY);
+		}
 		
 		super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+	}
+	
+	@Override
+	protected void keyTyped(char typedChar, int keyCode) throws IOException {
+		if (keyCode == 1 && currentInfoScreen != null) {
+			currentInfoScreen = null;
+			return;
+		}
+		
+		super.keyTyped(typedChar, keyCode);
+	}
+	
+	private class MajorTabButton extends GuiButton {
+		
+		private final ItemStack icon;
+		private boolean mouseOver;
+		private List<String> tooltip;
+		
+		public MajorTabButton(String name, ItemStack icon, int parButtonId, int parPosX, int parPosY) {
+			super(parButtonId, parPosX, parPosY, TEXT_ICON_MAJORBUTTON_WIDTH, TEXT_ICON_MAJORBUTTON_HEIGHT, "");
+			this.icon = icon;
+			tooltip = Lists.newArrayList(I18n.format("mirror.tab." + name + ".name", new Object[0]));
+		}
+		
+		@Override
+        public void drawButton(Minecraft mc, int parX, int parY) {
+			if (visible) {
+				int textureX = TEXT_ICON_MAJORBUTTON_HOFFSET;
+				int textureY = TEXT_ICON_MAJORBUTTON_VOFFSET;
+				mouseOver = false;
+            	if (parX >= xPosition 
+                  && parY >= yPosition 
+                  && parX < xPosition + width 
+                  && parY < yPosition + height) {
+            		textureY += TEXT_ICON_MAJORBUTTON_HEIGHT;
+            		mouseOver = true;
+            	}
+            	RenderHelper.disableStandardItemLighting();
+            	GlStateManager.color(1f, 1f, 1f, 1f);
+                mc.getTextureManager().bindTexture(RES_ICONS);
+                Gui.drawScaledCustomSizeModalRect(xPosition, yPosition, textureX, textureY,
+        				TEXT_ICON_MAJORBUTTON_WIDTH, TEXT_ICON_MAJORBUTTON_HEIGHT, this.width, this.height, 256, 256);
+                
+                // Now draw icon
+                GlStateManager.pushMatrix();
+                RenderHelper.enableGUIStandardItemLighting();
+                GlStateManager.translate(0, 0, -50);
+                mc.getRenderItem().renderItemIntoGUI(icon, xPosition + (width - 16) / 2, yPosition + (height - 16) / 2);
+                RenderHelper.disableStandardItemLighting();
+                GlStateManager.popMatrix();
+            }
+        }
+		
+		public void drawOverlay(Minecraft mc, int parX, int parY) {
+			if (mouseOver) {
+				GlStateManager.pushMatrix();
+				drawHoveringText(tooltip, parX, parY);
+				GlStateManager.popMatrix();
+			}
+		}
 	}
 	
     static class ImproveButton extends GuiButton {
@@ -526,18 +910,18 @@ public class MirrorGui extends GuiScreen {
         public void drawButton(Minecraft mc, int parX, int parY) {
 			if (visible) {
 				int textureX = 0;
-				int textureY = TEXT_BUTTON_VOFFSET;
+				int textureY = TEXT_ICON_BUTTON_VOFFSET;
             	if (parX >= xPosition 
                   && parY >= yPosition 
                   && parX < xPosition + width 
                   && parY < yPosition + height) {
-            		textureX += TEXT_BUTTON_LENGTH;
+            		textureX += TEXT_ICON_BUTTON_LENGTH;
             	}
                 
             	GlStateManager.color(1f, 1f, 1f, 1f);
-                mc.getTextureManager().bindTexture(RES_FORE);
+                mc.getTextureManager().bindTexture(RES_ICONS);
                 Gui.drawScaledCustomSizeModalRect(xPosition, yPosition, textureX, textureY,
-        				TEXT_BUTTON_LENGTH, TEXT_BUTTON_LENGTH, this.width, this.height, TEXT_WIDTH, TEXT_HEIGHT);
+        				TEXT_ICON_BUTTON_LENGTH, TEXT_ICON_BUTTON_LENGTH, this.width, this.height, 256, 256);
             }
         }
 	}
@@ -565,7 +949,7 @@ public class MirrorGui extends GuiScreen {
 		
 		public QuestButton(int parButtonId, int parPosX, int parPosY,
 				NostrumQuest quest, QuestState state) {
-			super(parButtonId, parPosX, parPosY, TEXT_QUEST_LENGTH, TEXT_QUEST_LENGTH, "");
+			super(parButtonId, parPosX, parPosY, TEXT_ICON_QUEST_LENGTH, TEXT_ICON_QUEST_LENGTH, "");
 			this.quest = quest;
 			this.state = state;
 			this.offsetX = parPosX;
@@ -603,8 +987,8 @@ public class MirrorGui extends GuiScreen {
 	        //GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 	        GlStateManager.color(1.0f, 1.0f, 1.0f, 0.6f);
 	        buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-	        buf.pos(xPosition, yPosition, 0).endVertex();
-	        buf.pos(other.xPosition, other.yPosition, 0).endVertex();
+	        buf.pos(xPosition - 1, yPosition, 0).endVertex();
+	        buf.pos(other.xPosition - 1, other.yPosition, 0).endVertex();
 	        Tessellator.getInstance().draw();
 	        GlStateManager.enableTexture2D();
 	        //GlStateManager.disableBlend();
@@ -618,7 +1002,7 @@ public class MirrorGui extends GuiScreen {
 			mouseOver = false;
 			if (visible) {
 				int textureX = 0;
-				int textureY = TEXT_QUEST_VOFFSET;
+				int textureY = TEXT_ICON_QUEST_VOFFSET;
 				
 				xPosition = (this.offsetX * guiScale) + guiX;
 				yPosition = (this.offsetY * guiScale) + guiY;
@@ -630,10 +1014,10 @@ public class MirrorGui extends GuiScreen {
                   && parY >= yPosition 
                   && parX < xPosition + width 
                   && parY < yPosition + height) {
-            		textureY += TEXT_QUEST_LENGTH;
+            		textureY += TEXT_ICON_QUEST_LENGTH;
             		mouseOver = true;
             	}
-            	textureX += TEXT_QUEST_LENGTH * quest.getType().ordinal();
+            	textureX += TEXT_ICON_QUEST_LENGTH * quest.getType().ordinal();
                 
             	switch (state) {
 				case COMPLETED:
@@ -658,17 +1042,17 @@ public class MirrorGui extends GuiScreen {
                 
             	GlStateManager.disableLighting();
             	GlStateManager.disableBlend();
-                mc.getTextureManager().bindTexture(RES_FORE);
+                mc.getTextureManager().bindTexture(RES_ICONS);
                 Gui.drawScaledCustomSizeModalRect(xPosition, yPosition, textureX, textureY,
-                		TEXT_QUEST_LENGTH, TEXT_QUEST_LENGTH, this.width, this.height, TEXT_WIDTH, TEXT_HEIGHT);
+                		TEXT_ICON_QUEST_LENGTH, TEXT_ICON_QUEST_LENGTH, this.width, this.height, 256, 256);
                 
                 if (icon != null) {
                 	icon.draw(this, fontRendererObj, xPosition + 2, yPosition + 3, 12, 12);
                 } else {
                 	GlStateManager.enableBlend();
                 	GlStateManager.color(1f, 1f, 1f, .8f);
-                	Gui.drawScaledCustomSizeModalRect(xPosition + 4, yPosition + 5, iconOffset, TEXT_BUTTON_VOFFSET,
-                		TEXT_REWARD_WIDTH, TEXT_REWARD_WIDTH, 8, 8, TEXT_WIDTH, TEXT_HEIGHT);
+                	Gui.drawScaledCustomSizeModalRect(xPosition + 4, yPosition + 5, iconOffset, TEXT_ICON_BUTTON_VOFFSET,
+                		TEXT_ICON_REWARD_WIDTH, TEXT_ICON_REWARD_WIDTH, 8, 8, 256, 256);
                 }
             }
         }
@@ -694,7 +1078,7 @@ public class MirrorGui extends GuiScreen {
 				this.icon = SpellComponentIcon.get(((AlterationReward) reward).getAlteration());
 			} else if (reward instanceof AttributeReward) {
 				AwardType type = ((AttributeReward) reward).getType();
-				iconOffset = TEXT_REWARD_OFFSET + (type.ordinal() * TEXT_REWARD_WIDTH);
+				iconOffset = TEXT_ICON_REWARD_OFFSET + (type.ordinal() * TEXT_ICON_REWARD_WIDTH);
 			}
 		}
 		
@@ -804,6 +1188,357 @@ public class MirrorGui extends GuiScreen {
             }
             
             return tooltip;
+		}
+	}
+    
+    private class ResearchTabButton extends GuiButton {
+		
+		private final NostrumResearchTab tab;
+		private boolean mouseOver;
+		private List<String> tooltip;
+		
+		public ResearchTabButton(NostrumResearchTab tab, int parButtonId, int parPosX, int parPosY) {
+			super(parButtonId, parPosX, parPosY, TEXT_ICON_MINORBUTTON_WIDTH, TEXT_ICON_MINORBUTTON_HEIGHT, "");
+			this.tab = tab;
+			tooltip = Lists.newArrayList(I18n.format(tab.getNameKey(), new Object[0]));
+		}
+		
+		@Override
+        public void drawButton(Minecraft mc, int parX, int parY) {
+			if (visible) {
+				int textureX = TEXT_ICON_MINORBUTTON_HOFFSET;
+				int textureY = TEXT_ICON_MINORBUTTON_VOFFSET;
+				mouseOver = false;
+            	if (parX >= xPosition 
+                  && parY >= yPosition 
+                  && parX < xPosition + width 
+                  && parY < yPosition + height) {
+            		textureY += TEXT_ICON_MINORBUTTON_HEIGHT;
+            		mouseOver = true;
+            	}
+                
+            	GlStateManager.color(1f, 1f, 1f, 1f);
+            	RenderHelper.disableStandardItemLighting();
+                mc.getTextureManager().bindTexture(RES_ICONS);
+                Gui.drawScaledCustomSizeModalRect(xPosition, yPosition, textureX, textureY,
+                		TEXT_ICON_MINORBUTTON_WIDTH, TEXT_ICON_MINORBUTTON_HEIGHT, this.width, this.height, 256, 256);
+                
+                // Now draw icon
+                GlStateManager.pushMatrix();
+                RenderHelper.enableGUIStandardItemLighting();
+                GlStateManager.translate(0, 0, -50);
+                mc.getRenderItem().renderItemIntoGUI(tab.getIcon(), xPosition + (width - 16) / 2, yPosition + (height - 16) / 2);
+                RenderHelper.disableStandardItemLighting();
+                GlStateManager.popMatrix();
+            }
+        }
+		
+		public void drawOverlay(Minecraft mc, int parX, int parY) {
+			if (mouseOver) {
+				GlStateManager.pushMatrix();
+				drawHoveringText(tooltip, parX, parY);
+				GlStateManager.popMatrix();
+			}
+		}
+	}
+    
+    protected static enum ResearchState {
+		UNAVAILABLE,
+		INACTIVE,
+		COMPLETED
+	}
+	
+    private class ResearchButton extends GuiButton {
+    	
+    	private final NostrumResearch research;
+    	private final ResearchState state;
+    	private final int offsetX;
+    	private final int offsetY;
+    	
+    	private List<String> tooltip;
+    	private boolean mouseOver;
+		
+		public ResearchButton(int parButtonId, int parPosX, int parPosY,
+				NostrumResearch research, ResearchState state) {
+			super(parButtonId, parPosX, parPosY, WidthForSize(research.getSize()), HeightForSize(research.getSize()), "");
+			this.research = research;
+			this.state = state;
+			this.offsetX = parPosX;
+			this.offsetY = parPosY;
+			genTooltip();
+		}
+		
+		public void drawTreeLines(Minecraft mc) {
+			if (research.getParentKeys() != null && research.getParentKeys().length != 0) {
+				for (String key : research.getParentKeys()) {
+					NostrumResearch parentResearch = NostrumResearch.lookup(key);
+					if (parentResearch == null)
+						continue;
+					
+					if (parentResearch.getTab() != research.getTab()) {
+						continue;
+					}
+					
+					ResearchButton other = researchButtons.get(parentResearch);
+					if (other != null)
+						renderLine(other);
+				}
+			}
+		}
+		
+		private void renderLine(ResearchButton other) {
+			// Render 2 flat lines instead of 1 crooked one
+			GlStateManager.pushMatrix();
+			GlStateManager.pushAttrib();
+			VertexBuffer buf = Tessellator.getInstance().getBuffer();
+	        GlStateManager.disableTexture2D();
+	        GlStateManager.color(1.0f, 1.0f, 1.0f, 0.6f);
+	        
+	        Vec2f child = new Vec2f(xPosition + ((float) width / 2f), yPosition + ((float) height / 2f));
+	        Vec2f parent = new Vec2f(other.xPosition + ((float) other.width / 2f), other.yPosition + ((float) other.height / 2f));
+	        
+	        if (child.x == parent.x || child.y == parent.y) {
+	        	// Straight line
+	        	buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
+		        buf.pos(child.x, child.y, 0).endVertex();
+		        buf.pos(parent.x, parent.y, 0).endVertex();
+		        Tessellator.getInstance().draw();
+	        } else {
+		        Vec2f diff = new Vec2f(child.x - parent.x, child.y - parent.y);
+		        boolean vertical;// = (Math.abs(diff.y) > Math.abs(diff.x));
+		        
+		        // figure out radius of arc to draw
+		        double radius;
+		        if (Math.abs(diff.x) < Math.abs(diff.y)) {
+		        	radius = Math.abs(diff.x);
+		        	vertical = true;
+		        } else {
+		        	radius = Math.abs(diff.y);
+		        	vertical = false;
+		        }
+		        radius = Math.min(Math.max(radius * .5f, 12), 12);//*= .5f;
+		        double radiusX = (diff.x < 0 ? -1 : 1) * radius;
+		        double radiusY = (diff.y < 0 ? -1 : 1) * radius;
+		        Vec2f center = new Vec2f(vertical ? parent.x : child.x, vertical ? child.y : parent.y);
+		        
+		        Vec2f childTo = new Vec2f(vertical ? center.x + (float) radiusX : center.x, vertical ? center.y : center.y + (float) radiusY);
+		        Vec2f parentTo = new Vec2f(vertical ? center.x : center.x - (float) radiusX, vertical ? center.y - (float) radiusY : center.y);
+		        
+		        buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
+		        buf.pos(child.x, child.y, 0).endVertex();
+		        buf.pos(childTo.x, childTo.y, 0).endVertex();
+		        buf.pos(parentTo.x, parentTo.y, 0).endVertex();
+		        buf.pos(parent.x, parent.y, 0).endVertex();
+		        Tessellator.getInstance().draw();
+		        
+		        // Draw inside curve
+		        int points = 30;
+		        GlStateManager.pushMatrix();
+		        GlStateManager.translate(parentTo.x, parentTo.y, 0);
+		        float rotate = 0f;
+		        boolean flip = false;
+		        if (!vertical) {
+		        	if (diff.x < 0) {
+		        		rotate = 90f;
+		        		flip = (diff.y >= 0);
+		        	} else {
+		        		rotate = 270f;
+		        		flip = (diff.y < 0);
+		        	}
+		        } else {
+		        	if (diff.y < 0) {
+		        		rotate = 180f;
+		        		flip = (diff.x < 0);
+		        	} else {
+		        		rotate = 0f;
+		        		flip = (diff.x >= 0);
+		        	}
+		        }
+		        GlStateManager.rotate(rotate, 0, 0, 1);
+		        buf.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
+		        for (int i = 0; i <= points; i++) {
+		        	float progress = (float) i / (float) points;
+		        	Vec2f point = Curves.alignedArc2D(progress, Vec2f.ZERO, radius, flip);
+		        	buf.pos(point.x, point.y, 0).endVertex();
+		        }
+		        Tessellator.getInstance().draw();
+		        GlStateManager.popMatrix();
+	        }
+	        
+	        GlStateManager.enableTexture2D();
+	        GlStateManager.popAttrib();
+			GlStateManager.popMatrix();
+		}
+		
+		@Override
+        public void drawButton(Minecraft mc, int parX, int parY) {
+			mouseOver = false;
+			if (visible) {
+				int textureX;
+				int textureY;
+				
+				switch (research.getSize()) {
+				case GIANT:
+					textureX = TEXT_ICON_RESEARCHBUTTON_GIANT_HOFFSET;
+					textureY = TEXT_ICON_RESEARCHBUTTON_GIANT_VOFFSET;
+					break;
+				case LARGE:
+					textureX = TEXT_ICON_RESEARCHBUTTON_LARGE_HOFFSET;
+					textureY = TEXT_ICON_RESEARCHBUTTON_LARGE_VOFFSET;
+					break;
+				case NORMAL:
+				default:
+					textureX = TEXT_ICON_RESEARCHBUTTON_SMALL_HOFFSET;
+					textureY = TEXT_ICON_RESEARCHBUTTON_SMALL_VOFFSET;
+					break;
+				}
+				
+				int guiScale = TEXT_ICON_RESEARCHBUTTON_SMALL_WIDTH + 16; // TODO move up?
+				xPosition = (this.offsetX * guiScale) + guiX;
+				yPosition = (this.offsetY * guiScale) + guiY;
+				
+				xPosition -= this.width / 2;
+				yPosition -= this.height / 2;
+				
+            	if (parX >= xPosition 
+                  && parY >= yPosition 
+                  && parX < xPosition + width 
+                  && parY < yPosition + height) {
+            		textureY += this.height;
+            		mouseOver = true;
+            	}
+                
+            	switch (state) {
+				case COMPLETED:
+					GlStateManager.color(.2f, 2f/3f, .2f, 1f);
+					break;
+				case INACTIVE:
+					GlStateManager.color(2f/3f, 0f, 2f/3f, .8f);
+					break;
+				case UNAVAILABLE:
+					GlStateManager.color(.8f, .0f, .0f, .6f);
+					break;
+            	}
+                
+            	GlStateManager.disableLighting();
+                GlStateManager.enableTexture2D();
+                GlStateManager.disableBlend();
+                mc.getTextureManager().bindTexture(RES_ICONS);
+                Gui.drawScaledCustomSizeModalRect(xPosition, yPosition, textureX, textureY,
+                		this.width, this.height, this.width, this.height, 256, 256);
+                
+                // Now draw icon
+                GlStateManager.pushMatrix();
+                GlStateManager.pushAttrib();
+                RenderHelper.enableGUIStandardItemLighting();
+                GlStateManager.translate(0, 0, -140.5);
+                mc.getRenderItem().renderItemAndEffectIntoGUI(research.getIconItem(), xPosition + (width - 16) / 2, yPosition + (height - 16) / 2);
+                mc.getRenderItem().renderItemOverlayIntoGUI(fontRendererObj, research.getIconItem(), xPosition + (width - 16) / 2, yPosition + (height - 16) / 2, null);
+                RenderHelper.disableStandardItemLighting();
+                GlStateManager.enableDepth();
+                GlStateManager.enableBlend();
+                GlStateManager.popAttrib();
+                GlStateManager.popMatrix();
+                
+//                RenderHelper.enableGUIStandardItemLighting();
+//                mc.getRenderItem().renderItemIntoGUI(research.getIconItem(), xPosition + (width -16) / 2, yPosition + (height -16) / 2);
+//                RenderHelper.disableStandardItemLighting();
+//            	GlStateManager.enableBlend();
+            }
+        }
+		
+		public void drawOverlay(Minecraft mc, int parX, int parY) {
+			if (mouseOver) {
+				GlStateManager.pushMatrix();
+				GlStateManager.scale(fontScale, fontScale, 1f);
+				GlStateManager.translate((int) (parX / fontScale) - parX, (int) (parY / fontScale) - parY, 0);
+				drawHoveringText(tooltip, parX, parY);
+				GlStateManager.popMatrix();
+			}
+		}
+		
+		private List<String> genTooltip() {
+			tooltip = new LinkedList<>();
+            tooltip.add(TextFormatting.BLUE + I18n.format(research.getNameKey(), new Object[0]) + TextFormatting.RESET);
+            tooltip.add(TextFormatting.GRAY + I18n.format(research.getDescKey(), new Object[0]) + TextFormatting.RESET);
+            
+            TextFormatting bad = TextFormatting.RED;
+            TextFormatting missingQuest = TextFormatting.DARK_PURPLE;
+            TextFormatting missingLore = TextFormatting.DARK_AQUA;
+            boolean first = false;
+            
+	        // Quest reqs?
+	        if (research.getRequiredQuests() != null) {
+	        	for (String questKey : research.getRequiredQuests()) {
+        			if (!questsCompleted.contains(questKey)) {
+        				if (!first) {
+        					first = true;
+        					tooltip.add("");
+        				}
+        				
+        				NostrumQuest questItem = NostrumQuest.lookup(questKey);
+        				String display = questItem == null ? questKey : I18n.format("quest." + questItem.getKey() + ".name");
+        				
+        				tooltip.add(bad
+        						+ I18n.format("info.research.quest_missing", new Object[]{missingQuest + display + bad})
+        						+ TextFormatting.RESET);
+        			}
+	        	}
+	        }
+            
+            // Lore reqs?
+            if (research.getRequiredLore() != null) {
+            	for (String loreKey : research.getRequiredLore()) {
+            		ILoreTagged loreItem = LoreRegistry.instance().lookup(loreKey);
+            		if (loreItem != null) {
+            			if (!lore.contains(loreItem)) {
+            				if (!first) {
+            					first = true;
+            					tooltip.add("");
+            				}
+            				
+            				tooltip.add(bad
+            						+ I18n.format("info.research.lore_missing", new Object[]{missingLore + loreItem.getLoreDisplayName() + bad})
+            						+ TextFormatting.RESET);
+            			}
+            		}
+            	}
+            }
+            
+            
+            if (this.state == ResearchState.INACTIVE && researchPoints > 0 && NostrumMagica.canPurchaseResearch(player, research)) {
+            	tooltip.add("");
+            	tooltip.add(TextFormatting.GREEN + I18n.format("info.research.purchase") + TextFormatting.RESET);
+            } else if (this.state == ResearchState.COMPLETED) {
+            	tooltip.add("");
+            	tooltip.add(TextFormatting.GREEN + I18n.format("info.research.view") + TextFormatting.RESET);
+            }
+            
+            return tooltip;
+		}
+	}
+    
+    private static int HeightForSize(Size size) {
+		switch (size) {
+		case GIANT:
+			return TEXT_ICON_RESEARCHBUTTON_GIANT_HEIGHT;
+		case LARGE:
+			return TEXT_ICON_RESEARCHBUTTON_LARGE_HEIGHT;
+		case NORMAL:
+		default:
+			return TEXT_ICON_RESEARCHBUTTON_SMALL_HEIGHT;
+		}
+	}
+	
+	private static int WidthForSize(Size size) {
+		switch (size) {
+		case GIANT:
+			return TEXT_ICON_RESEARCHBUTTON_GIANT_WIDTH;
+		case LARGE:
+			return TEXT_ICON_RESEARCHBUTTON_LARGE_WIDTH;
+		case NORMAL:
+		default:
+			return TEXT_ICON_RESEARCHBUTTON_SMALL_WIDTH;
 		}
 	}
 }

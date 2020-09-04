@@ -35,6 +35,10 @@ public interface INostrumMagic {
 	public void addSkillPoint();
 	public void takeSkillPoint();
 	
+	public int getResearchPoints();
+	public void addResearchPoint();
+	public void takeResearchPoint();
+	
 	// Spell crafting attributes
 	public int getControl();
 	public void addControl();
@@ -111,6 +115,7 @@ public interface INostrumMagic {
 			int level,
 			float xp,
 			int skillpoints,
+			int researchpoints,
 			int control,
 			int tech,
 			int finesse,
@@ -142,6 +147,10 @@ public interface INostrumMagic {
 	public void setQuestData(String quest, IObjectiveState data);
 	public Map<String, IObjectiveState> getQuestDataMap();
 	public void setQuestDataMap(Map<String, IObjectiveState> map);
+	
+	// Research
+	public List<String> getCompletedResearches();
+	public void completeResearch(String research);
 	
 	// Spell Knowledge
 	public boolean hasKnowledge(EMagicElement element, EAlteration alteration);

@@ -10,8 +10,10 @@ import javax.annotation.Nullable;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.SpellTable.SpellTableEntity;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ReagentItem;
@@ -94,11 +96,12 @@ public class SpellCreationGui {
 	public static class SpellCreationContainer extends Container {
 		
 		// Kept just to report to server which TE is doing crafting
-		protected BlockPos pos;
+		protected final BlockPos pos;
 		
 		// Actual container variables as well as a couple for keeping track
 		// of crafting state
-		protected SpellTableEntity inventory;
+		protected final SpellTableEntity inventory;
+		protected final EntityPlayer player;
 		protected boolean isValid; // has an acceptable scroll
 		protected boolean spellValid; // grammer checks out
 		protected List<String> spellErrorStrings; // Updated on validate(); what's wrong?
@@ -107,8 +110,9 @@ public class SpellCreationGui {
 		protected int iconIndex;
 		protected int lastManaCost;
 		
-		public SpellCreationContainer(IInventory playerInv, SpellTableEntity tableInventory, BlockPos pos) {
+		public SpellCreationContainer(EntityPlayer crafter, IInventory playerInv, SpellTableEntity tableInventory, BlockPos pos) {
 			this.inventory = tableInventory;
+			this.player = crafter;
 			this.pos = pos;
 			
 			spellErrorStrings = new LinkedList<>();
@@ -356,7 +360,7 @@ public class SpellCreationGui {
 		
 		public Spell makeSpell(String name, boolean clear) {
 			// Don't cache from validate... just in case...
-			Spell spell = craftSpell(name, this.inventory, this.spellErrorStrings, this.reagentStrings, isValid, clear);
+			Spell spell = craftSpell(name, this.inventory, this.player, this.spellErrorStrings, this.reagentStrings, isValid, clear);
 			
 			if (spell == null)
 				return null;
@@ -368,19 +372,30 @@ public class SpellCreationGui {
 			return spell;
 		}
 		
-		public static Spell craftSpell(String name, SpellTableEntity inventory,
+		public static Spell craftSpell(String name, SpellTableEntity inventory, EntityPlayer crafter,
 				List<String> spellErrorStrings, List<String> reagentStrings,
 				boolean isValid, boolean deductReagents) {
 			boolean fail = false;
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(crafter);
+			boolean locked = attr == null || !attr.isUnlocked() || !attr.getCompletedResearches().contains("spellcraft");
 			spellErrorStrings.clear();
 			reagentStrings.clear();
+			
+			String prefix = "";
+			
+			if (locked) {
+				prefix = ChatFormatting.OBFUSCATED + "";
+				spellErrorStrings.add(prefix + "The runes on the board don't respond to your hands");
+				fail = true;
+			}
+			
 			if (name.trim().isEmpty()) {
-				spellErrorStrings.add("Must have a name");
+				spellErrorStrings.add(prefix + "Must have a name");
 				fail = true;
 			}
 			
 			if (!isValid) {
-				spellErrorStrings.add("Missing blank scroll");
+				spellErrorStrings.add(prefix + "Missing blank scroll");
 				return null; // fatal
 			}
 			
@@ -388,7 +403,7 @@ public class SpellCreationGui {
 			
 			stack = inventory.getStackInSlot(1);
 			if (stack == null || !SpellRune.isTrigger(stack)) {
-				spellErrorStrings.add("Spell must begin with a trigger");
+				spellErrorStrings.add(prefix + "Spell must begin with a trigger");
 				return null;
 			}
 			
@@ -399,11 +414,11 @@ public class SpellCreationGui {
 					break;
 				}
 				if (!SpellRune.isSpellWorthy(stack)) {
-					spellErrorStrings.add("Rune in slot " + (i) + " is not allowed.");
+					spellErrorStrings.add(prefix + "Rune in slot " + (i) + " is not allowed.");
 					if (SpellRune.isShape(stack)) {
-						spellErrorStrings.add("  -> Shapes must have an element attached to them.");
+						spellErrorStrings.add(prefix + "  -> Shapes must have an element attached to them.");
 					} else {
-						spellErrorStrings.add("  -> Elements and Alterations must be combined with a Shape first.");
+						spellErrorStrings.add(prefix + "  -> Elements and Alterations must be combined with a Shape first.");
 					}
 					return null;
 				}
@@ -414,7 +429,7 @@ public class SpellCreationGui {
 			}
 			
 			if (!flag) {
-				spellErrorStrings.add("Must have at least one spell shape");
+				spellErrorStrings.add(prefix + "Must have at least one spell shape");
 				return null;
 			}
 			
@@ -428,11 +443,11 @@ public class SpellCreationGui {
 				
 				part = SpellRune.getPart(stack);
 				if (part == null) {
-					spellErrorStrings.add("Unfinished spell part in slot " + (i + 1));
+					spellErrorStrings.add(prefix + "Unfinished spell part in slot " + (i + 1));
 					if (SpellRune.isShape(stack))
-						spellErrorStrings.add(" -> Spell parts must have an element");
+						spellErrorStrings.add(prefix + " -> Spell parts must have an element");
 					else
-						spellErrorStrings.add(" -> This trigger has been corrupted");
+						spellErrorStrings.add(prefix + " -> This trigger has been corrupted");
 					return null;
 				} else {
 					spell.addPart(part);
@@ -449,10 +464,10 @@ public class SpellCreationGui {
 				
 				int left = takeReagent(inventory, type, count, false);
 				if (left != 0) {
-					spellErrorStrings.add("Need " + left + " more " + type.prettyName());
+					spellErrorStrings.add(prefix + "Need " + left + " more " + type.prettyName());
 					fail = true;
 				} else {
-					reagentStrings.add(count + " " + type.prettyName());
+					reagentStrings.add(prefix + count + " " + type.prettyName());
 				}
 				
 			}
@@ -473,7 +488,7 @@ public class SpellCreationGui {
 					int left = takeReagent(inventory, type, count, true);
 					if (left != 0) {
 						System.out.println("Couldn't take all " + type.name());
-						spellErrorStrings.add("Need " + left + " more " + type.prettyName());
+						spellErrorStrings.add(prefix + "Need " + left + " more " + type.prettyName());
 						return null;
 					}
 					

@@ -10,6 +10,10 @@ import java.util.Map;
 import java.util.Set;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.items.BlankScroll;
+import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.SpellRune;
+import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -62,6 +66,7 @@ public class NostrumMagic implements INostrumMagic {
 	private float xp;
 	private float maxxp;
 	private int skillPoints;
+	private int researchPoints;
 	private int control;
 	private int tech;
 	private int finesse;
@@ -90,6 +95,7 @@ public class NostrumMagic implements INostrumMagic {
 	private List<String> completedQuests;
 	private List<String> currentQuests;
 	private Map<String, IObjectiveState> questData;
+	private List<String> completedResearch;
 	private BlockPos markLocation;
 	private int markDimension;
 	private Map<EMagicElement, Map<EAlteration, Boolean>> spellKnowledge;
@@ -112,6 +118,7 @@ public class NostrumMagic implements INostrumMagic {
 		currentQuests = new LinkedList<>();
 		completedQuests = new LinkedList<>();
 		questData = new HashMap<>();
+		completedResearch = new LinkedList<>();
 		bindingSpell = null;
 		bindingComponent = null;
 		familiars = new LinkedList<>();
@@ -138,6 +145,12 @@ public class NostrumMagic implements INostrumMagic {
 			bindingComponent = null;
 			
 			this.setElementMastery(EMagicElement.PHYSICAL, 1);
+			this.completeResearch("origin");
+			//this.completeResearch("spellcraft");
+			this.giveBasicLore(SpellRune.instance());
+			this.giveBasicLore(BlankScroll.instance());
+			this.giveBasicLore(SpellScroll.instance());
+			this.giveBasicLore(ReagentItem.instance());
 			
 			NostrumMagicaSounds.LEVELUP.play(entity);
 		}
@@ -147,6 +160,7 @@ public class NostrumMagic implements INostrumMagic {
 
 		level++;
 		this.addSkillPoint();
+		this.addResearchPoint();
 		setLevel(level);
 		
 		if (entity != null)
@@ -200,6 +214,22 @@ public class NostrumMagic implements INostrumMagic {
 	public void takeSkillPoint() {
 		if (this.skillPoints > 0)
 			this.skillPoints--;
+	}
+	
+	@Override
+	public int getResearchPoints() {
+		return researchPoints;
+	}
+
+	@Override
+	public void addResearchPoint() {
+		this.researchPoints++;
+	}
+
+	@Override
+	public void takeResearchPoint() {
+		if (this.researchPoints > 0)
+			this.researchPoints--;
 	}
 
 	@Override
@@ -449,13 +479,14 @@ public class NostrumMagic implements INostrumMagic {
 	}
 
 	@Override
-	public void deserialize(boolean unlocked, int level, float xp, int skillpoints, int control, int tech, int finesse,
+	public void deserialize(boolean unlocked, int level, float xp, int skillpoints, int researchpoints, int control, int tech, int finesse,
 			int mana, float modMana, int manaBonus, float modManaCost, float modManaRegen) {
 		this.unlocked = unlocked;
 		this.level = level;
 		this.xp = xp;
 		this.maxxp = LevelCurves.maxXP(this.level);
 		this.skillPoints = skillpoints;
+		this.researchPoints = researchpoints;
 		this.control = control;
 		this.tech = tech;
 		this.finesse = finesse;
@@ -511,8 +542,8 @@ public class NostrumMagic implements INostrumMagic {
 	public void copy(INostrumMagic cap) {
 		System.out.println("Overriding stats from" + this.mana + " to " + cap.getMana() + " mana");
 		this.deserialize(cap.isUnlocked(), cap.getLevel(), cap.getXP(),
-				cap.getSkillPoints(), cap.getControl(), cap.getTech(),
-				cap.getFinesse(), cap.getMana(),
+				cap.getSkillPoints(), cap.getResearchPoints(),
+				cap.getControl(), cap.getTech(), cap.getFinesse(), cap.getMana(),
 				cap.getManaModifier(), cap.getManaBonus(), cap.getManaCostModifier(), cap.getManaRegenModifier());
 		
 		this.loreLevels = cap.serializeLoreLevels();
@@ -528,6 +559,7 @@ public class NostrumMagic implements INostrumMagic {
 		this.currentQuests = cap.getCurrentQuests();
 		this.completedQuests = cap.getCompletedQuests();
 		this.questData = cap.getQuestDataMap();
+		this.completedResearch = cap.getCompletedResearches();
 		this.bindingTomeID = cap.getBindingID();
 		this.bindingSpell = cap.getBindingSpell();
 		this.bindingComponent = cap.getBindingComponent();
@@ -801,5 +833,15 @@ public class NostrumMagic implements INostrumMagic {
 	public void setSorceryPortalLocation(int dimension, BlockPos pos) {
 		this.sorceryPortalDim = dimension;
 		this.sorceryPortalPos = pos;
+	}
+
+	@Override
+	public List<String> getCompletedResearches() {
+		return this.completedResearch;
+	}
+
+	@Override
+	public void completeResearch(String research) {
+		this.completedResearch.add(research);
 	}
 }

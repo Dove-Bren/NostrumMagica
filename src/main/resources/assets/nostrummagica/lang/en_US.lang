@@ -508,6 +508,10 @@ modifier.desc=Modifiers are used to add additional tome pages to spell tomes, ad
 
 info.quest.lore_missing=Knowledge of %1$s is required
 info.quest.accept=Click to Accept
+info.research.lore_missing=Knowledge of %1$s is required
+info.research.quest_missing=Must have completed %1$s
+info.research.purchase=Click to Purchase
+info.research.view=Click to View
 
 maxelements.name=Max Elements
 maxelements.desc=Maximum total number of elements allowed in a spell for you to cast it. Spells with more elements than this cannot be cast.|Increases by 3 for each point invested in control.
@@ -1040,3 +1044,19 @@ lore.true_mirror_shield.name=True Mirror Shields
 
 modification.damaged_duration.expire=Your On Hit effect expired
 modification.damaged_duration.name=Duration
+
+mirror.tab.character.name=Attribute Glyph
+mirror.tab.research.name=Research Table
+
+research.tab.magica.name=Magica
+research.tab.advanced_magica.name=Advanced Magica
+research.tab.mysticism.name=Mysticism
+research.tab.outfitting.name=Outfitting
+
+research.testresearch.name=Test Research
+research.testresearch.desc=This is only a test!
+research.testresearch.info=There are some requirements when creating a spell. Firstly, all spells must start with a trigger. Spells must contain at least one shape that has an element associated with it. Spells must have a name. Lastly, you must have enough reagents in the table's reagent slots to pay for the spell. If all of these are true, the submit button will be activated. If not, however, the error indicator will display a red X and the problems will be listed.
+
+research.testresearch2.name=Test Research 2
+research.testresearch2.desc=This is only a test AGAIN!
+research.testresearch2.info=There are some requirements when creating a spell. Firstly, all spells must start with a trigger. Spells must contain at least one shape that has an element associated with it. Spells must have a name. Lastly, you must have enough reagents in the table's reagent slots to pay for the spell. If all of these are true, the submit button will be activated. If not, however, the error indicator will display a red X and the problems will be listed.

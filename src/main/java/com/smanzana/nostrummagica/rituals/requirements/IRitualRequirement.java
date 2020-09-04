@@ -8,4 +8,15 @@ public interface IRitualRequirement {
 	
 	public abstract boolean matches(EntityPlayer player, INostrumMagic attr);
 	
+	public static IRitualRequirement AND(IRitualRequirement ... requirements) {
+		return (player, attr) -> {
+			for (IRitualRequirement req : requirements) {
+				if (!req.matches(player, attr)) {
+					return false;
+				}
+			}
+			return true;
+		};
+	}
+	
 }

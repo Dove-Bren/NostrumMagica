@@ -8,7 +8,6 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -18,7 +17,6 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ReagentBag extends Item implements ILoreTagged {
 
@@ -36,10 +34,10 @@ public class ReagentBag extends Item implements ILoreTagged {
 	}
 	
 	public static void init() {
-		GameRegistry.addRecipe(new ItemStack(instance), "GLG", "LRL", "LLL",
-				'L', Items.LEATHER,
-				'G', Items.GOLD_INGOT,
-				'R', ReagentItem.instance());
+//		GameRegistry.addRecipe(new ItemStack(instance), "GLG", "LRL", "LLL",
+//				'L', Items.LEATHER,
+//				'G', Items.GOLD_INGOT,
+//				'R', ReagentItem.instance());
 	}
 	
 	public static final String id = "reagent_bag";

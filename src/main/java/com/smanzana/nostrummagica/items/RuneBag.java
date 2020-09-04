@@ -7,7 +7,6 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -17,8 +16,6 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class RuneBag extends Item implements ILoreTagged {
 
@@ -36,10 +33,10 @@ public class RuneBag extends Item implements ILoreTagged {
 	}
 	
 	public static void init() {
-		GameRegistry.addRecipe(new ItemStack(instance), "GLG", "LRL", "LLL",
-				'L', Items.LEATHER,
-				'G', Items.GOLD_INGOT,
-				'R', new ItemStack(SpellRune.instance(), 1, OreDictionary.WILDCARD_VALUE));
+//		GameRegistry.addRecipe(new ItemStack(instance), "GLG", "LRL", "LLL",
+//				'L', Items.LEATHER,
+//				'G', Items.GOLD_INGOT,
+//				'R', new ItemStack(SpellRune.instance(), 1, OreDictionary.WILDCARD_VALUE));
 	}
 	
 	public static final String id = "rune_bag";

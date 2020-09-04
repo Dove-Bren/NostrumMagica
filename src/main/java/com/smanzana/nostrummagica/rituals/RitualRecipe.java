@@ -142,6 +142,9 @@ public class RitualRecipe implements InfoScreenIndexed {
 		if (attr == null)
 			return false;
 		
+		if (!attr.getCompletedResearches().contains("rituals"))
+			return false;
+		
 		if (this.req != null && !req.matches(player, attr))
 			return false;
 		

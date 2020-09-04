@@ -267,7 +267,7 @@ public abstract class InfoScreenTab {
 			
 			@Override
 			public boolean isVisible(INostrumMagic attr) {
-				return (attr.isUnlocked() && !getAvailable(attr).isEmpty());
+				return (attr.isUnlocked() && attr.getCompletedResearches().contains("rituals") && !getAvailable(attr).isEmpty());
 			}
 
 			@Override
@@ -331,66 +331,103 @@ public abstract class InfoScreenTab {
 			@Override
 			public List<InfoButton> getButtons(int offset, INostrumMagic attr) {
 				List<InfoButton> buttons = new LinkedList<>();
+				InfoButton button;
 				
-				buttons.add(new SubscreenInfoButton(offset++, "shrines",
+				button = new SubscreenInfoButton(offset++, "shrines",
 						new PaginatedInfoSubScreen("shrines"),
-						new ItemStack(MirrorItem.instance())));
+						new ItemStack(MirrorItem.instance()));
+				buttons.add(button);
+				index("builtin::guides::shrines", button);
 				
-				buttons.add(new SubscreenInfoButton(offset++, "spells",
+				button = new SubscreenInfoButton(offset++, "spells",
 						new PaginatedInfoSubScreen("spells"),
-						new ItemStack(SpellScroll.instance())));
+						new ItemStack(SpellScroll.instance()));
+				buttons.add(button);
+				index("builtin::guides::spells", button);
 				
-				buttons.add(new SubscreenInfoButton(offset++, "trigger",
+				button = new SubscreenInfoButton(offset++, "trigger",
 						new PaginatedInfoSubScreen("trigger"),
-						SpellRune.getRune(SelfTrigger.instance())));
+						SpellRune.getRune(SelfTrigger.instance()));
+				buttons.add(button);
+				index("builtin::guides::trigger", button);
 				
-				buttons.add(new SubscreenInfoButton(offset++, "shape",
+				button = new SubscreenInfoButton(offset++, "shape",
 						new PaginatedInfoSubScreen("shape"),
-						SpellRune.getRune(SingleShape.instance())));
+						SpellRune.getRune(SingleShape.instance()));
+				buttons.add(button);
+				index("builtin::guides::shape", button);
 				
-				buttons.add(new SubscreenInfoButton(offset++, "element",
+				button = new SubscreenInfoButton(offset++, "element",
 						new PaginatedInfoSubScreen("element"),
-						SpellRune.getRune(EMagicElement.FIRE, 1)));
+						SpellRune.getRune(EMagicElement.FIRE, 1));
+				buttons.add(button);
+				index("builtin::guides::element", button);
 				
-				buttons.add(new SubscreenInfoButton(offset++, "alteration",
+				button = new SubscreenInfoButton(offset++, "alteration",
 						new PaginatedInfoSubScreen("alteration"),
-						SpellRune.getRune(EAlteration.INFLICT)));
+						SpellRune.getRune(EAlteration.INFLICT));
+				buttons.add(button);
+				index("builtin::guides::alteration", button);
 				
-				buttons.add(new SubscreenInfoButton(offset++, "spellmaking",
+				button = new SubscreenInfoButton(offset++, "spellmaking",
 						new PaginatedInfoSubScreen("spellmaking"),
-						new ItemStack(BlankScroll.instance())));
+						new ItemStack(BlankScroll.instance()));
+				buttons.add(button);
+				index("builtin::guides::spellmaking", button);
 				
-				buttons.add(new SubscreenInfoButton(offset++, "spellbinding",
-						new PaginatedInfoSubScreen("spellbinding"),
-						new ItemStack(Items.WRITABLE_BOOK)));
+				if (attr.getCompletedResearches().contains("spelltomes")) {
+					button = new SubscreenInfoButton(offset++, "spellbinding",
+							new PaginatedInfoSubScreen("spellbinding"),
+							new ItemStack(Items.WRITABLE_BOOK));
+					buttons.add(button);
+					index("builtin::guides::spellbinding", button);
+					
+					button = new SubscreenInfoButton(offset++, "tomes",
+							new PaginatedInfoSubScreen("tomes"),
+							new ItemStack(SpellTome.instance(), 1, 4));
+					buttons.add(button);
+					index("builtin::guides::tomes", button);
+				}
 				
-				buttons.add(new SubscreenInfoButton(offset++, "levelup",
+				button = new SubscreenInfoButton(offset++, "levelup",
 						new PaginatedInfoSubScreen("levelup"),
-						new ItemStack(Items.SKULL, 1, 3)));
+						new ItemStack(Items.SKULL, 1, 3));
+				buttons.add(button);
+				index("builtin::guides::levelup", button);
 				
-				buttons.add(new SubscreenInfoButton(offset++, "tomes",
-						new PaginatedInfoSubScreen("tomes"),
-						new ItemStack(SpellTome.instance(), 1, 4)));
+				if (attr.getCompletedResearches().contains("rituals")) {
+					button = new SubscreenInfoButton(offset++, "rituals",
+							new PaginatedInfoSubScreen("rituals"),
+							new ItemStack(AltarItem.instance()));
+					buttons.add(button);
+					index("builtin::guides::rituals", button);
+				}
 				
-				buttons.add(new SubscreenInfoButton(offset++, "rituals",
-						new PaginatedInfoSubScreen("rituals"),
-						new ItemStack(AltarItem.instance())));
-				
-				buttons.add(new SubscreenInfoButton(offset++, "modification",
+				button = new SubscreenInfoButton(offset++, "modification",
 						new PaginatedInfoSubScreen("modification"),
-						new ItemStack(ModificationTable.instance())));
+						new ItemStack(ModificationTable.instance()));
+				buttons.add(button);
+				index("builtin::guides::modification", button);
 				
-				buttons.add(new SubscreenInfoButton(offset++, "elementdamage",
+				button = new SubscreenInfoButton(offset++, "elementdamage",
 						new PaginatedInfoSubScreen("elementdamage"),
-						new ItemStack(Items.DIAMOND_SWORD)));
+						new ItemStack(Items.DIAMOND_SWORD));
+				buttons.add(button);
+				index("builtin::guides::elementdamage", button);
 				
-				buttons.add(new SubscreenInfoButton(offset++, "reagents",
+				button = new SubscreenInfoButton(offset++, "reagents",
 						new PaginatedInfoSubScreen("reagents"),
-						ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1)));
+						ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1));
+				buttons.add(button);
+				index("builtin::guides::reagents", button);
 				
-				buttons.add(new SubscreenInfoButton(offset++, "obelisks",
-						new PaginatedInfoSubScreen("obelisks"),
-						new ItemStack(Items.ENDER_PEARL)));
+				if (attr.getCompletedResearches().contains("obelisks")) {
+					button = new SubscreenInfoButton(offset++, "obelisks",
+							new PaginatedInfoSubScreen("obelisks"),
+							new ItemStack(Items.ENDER_PEARL));
+					buttons.add(button);
+					index("builtin::guides::obelisks", button);
+				}
 					
 				return buttons;
 			}
@@ -403,7 +440,7 @@ public abstract class InfoScreenTab {
 			@Override
 			public boolean isVisible(INostrumMagic attr) {
 				return attr.isUnlocked() &&
-						attr.hasLore(MasteryOrb.instance());
+						attr.getCompletedResearches().contains("elemental_trials");
 			}
 
 			@Override

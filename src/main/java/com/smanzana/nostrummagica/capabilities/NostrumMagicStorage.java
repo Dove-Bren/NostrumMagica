@@ -30,6 +30,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	private static final String NBT_LEVEL = "level";
 	private static final String NBT_XP = "xp";
 	private static final String NBT_SKILLPOINTS = "skillpoints";
+	private static final String NBT_RESEARCHPOINTS = "researchpoints";
 	private static final String NBT_CONTROL = "control";
 	private static final String NBT_TECH = "tech";
 	private static final String NBT_FINESSE = "finesse";
@@ -63,6 +64,8 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	private static final String NBT_QUESTS_CURRENT = "quests_current";
 	private static final String NBT_QUESTS_DATA = "quest_data";
 	
+	private static final String NBT_RESEARCHES = "research_completed";
+	
 	private static final String NBT_SPELLKNOWLEDGE = "spell_knowledge";
 	
 	private static final String NBT_SORCERYPORTAL_DIM = "sorcery_portal_dim";
@@ -76,6 +79,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		nbt.setInteger(NBT_LEVEL, instance.getLevel());
 		nbt.setFloat(NBT_XP, instance.getXP());
 		nbt.setInteger(NBT_SKILLPOINTS, instance.getSkillPoints());
+		nbt.setInteger(NBT_RESEARCHPOINTS, instance.getResearchPoints());
 		nbt.setInteger(NBT_CONTROL, instance.getControl());
 		nbt.setInteger(NBT_TECH, instance.getTech());
 		nbt.setInteger(NBT_FINESSE, instance.getFinesse());
@@ -192,6 +196,15 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		
 		}
 		
+		stringList = instance.getCompletedResearches();
+		if (stringList != null && !stringList.isEmpty()) {
+			NBTTagList tagList = new NBTTagList();
+			for (String research : stringList) {
+				tagList.appendTag(new NBTTagString(research));
+			}
+			nbt.setTag(NBT_RESEARCHES, tagList);
+		}
+		
 		if (instance.isBinding()) {
 			nbt.setString(NBT_BINDING_COMPONENT, instance.getBindingComponent().getKeyString());
 			nbt.setInteger(NBT_BINDING_TOME_ID, instance.getBindingID());
@@ -231,6 +244,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			tag.getInteger(NBT_LEVEL),
 			tag.getFloat(NBT_XP),
 			tag.getInteger(NBT_SKILLPOINTS),
+			tag.getInteger(NBT_RESEARCHPOINTS),
 			tag.getInteger(NBT_CONTROL),
 			tag.getInteger(NBT_TECH),
 			tag.getInteger(NBT_FINESSE),
@@ -352,6 +366,14 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			}
 		}
 		instance.setQuestDataMap(data);
+		
+		if (tag.hasKey(NBT_RESEARCHES, NBT.TAG_LIST)) {
+			NBTTagList tagList = tag.getTagList(NBT_RESEARCHES, NBT.TAG_STRING);
+			for (int i = 0; i < tagList.tagCount(); i++) {
+				String research = tagList.getStringTagAt(i);
+				instance.completeResearch(research);
+			}
+		}
 		
 		if (tag.hasKey(NBT_BINDING_COMPONENT, NBT.TAG_STRING)
 				&& tag.hasKey(NBT_BINDING_SPELL, NBT.TAG_INT)
