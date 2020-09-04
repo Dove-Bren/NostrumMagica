@@ -39,12 +39,15 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.utils.Curves;
+import com.smanzana.nostrummagica.utils.OpenGLDebugging;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.GlStateManager.DestFactor;
+import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
@@ -95,6 +98,23 @@ public class MirrorGui extends GuiScreen {
 	private static final int TEXT_ICON_RESEARCHBUTTON_GIANT_VOFFSET = 86;
 	private static final int TEXT_ICON_RESEARCHBUTTON_GIANT_WIDTH = 46;
 	private static final int TEXT_ICON_RESEARCHBUTTON_GIANT_HEIGHT = 46;
+	private static final int TEXT_ICON_ARROW_HOFFSET = 0;
+	private static final int TEXT_ICON_ARROW_VOFFSET = 189;
+	private static final int TEXT_ICON_ARROW_WIDTH = 13;
+	private static final int TEXT_ICON_ARROW_HEIGHT = 9;
+	
+	private static final int BUTTON_QUEST_WIDTH = 18;
+	private static final int BUTTON_QUEST_HEIGHT = 18;
+	private static final int BUTTON_MAJOR_WIDTH = 40;
+	private static final int BUTTON_MAJOR_HEIGHT = 43;
+	private static final int BUTTON_MINOR_WIDTH = 35;
+	private static final int BUTTON_MINOR_HEIGHT = 28;
+	private static final int BUTTON_RESEARCH_SMALL_WIDTH = 24;
+	private static final int BUTTON_RESEARCH_SMALL_HEIGHT = 24;
+	private static final int BUTTON_RESEARCH_LARGE_WIDTH = 28;
+	private static final int BUTTON_RESEARCH_LARGE_HEIGHT = 28;
+	private static final int BUTTON_RESEARCH_GIANT_WIDTH = 40;
+	private static final int BUTTON_RESEARCH_GIANT_HEIGHT = 40;
 	
 	private static final ResourceLocation RES_BACK_CLOUD = new ResourceLocation(
 			NostrumMagica.MODID, "textures/gui/container/mirror_back_clouds.png");
@@ -126,6 +146,9 @@ public class MirrorGui extends GuiScreen {
 	
 	private static boolean isCharacter = true; // static so we go back to the last one the next time you open it up :)
 	
+	private static Set<NostrumResearch> newResearch = null;
+	private static Set<NostrumResearch> seenResearch = null;
+	
 	private ImproveButton buttonControl;
 	private ImproveButton buttonTechnique;
 	private ImproveButton buttonFinesse;
@@ -136,7 +159,7 @@ public class MirrorGui extends GuiScreen {
 	private NostrumResearchTab currentTab = NostrumResearchTab.MAGICA;
 	private BookScreen currentInfoScreen = null;
 	
-	private static final int guiScale = TEXT_ICON_QUEST_LENGTH + 8;
+	private static final int guiScale = BUTTON_QUEST_WIDTH + 8;
 	private int guiX;
 	private int guiY;
 	private int mouseClickX;
@@ -149,7 +172,7 @@ public class MirrorGui extends GuiScreen {
 	private int buttonIDs;
 	
 	public MirrorGui(EntityPlayer player) {
-		this.width = TEXT_WIDTH + TEXT_ICON_MAJORBUTTON_WIDTH;
+		this.width = TEXT_WIDTH + BUTTON_MAJOR_WIDTH;
 		//this.height = GUI_HEIGHT;
 		this.height = 242;
 		cacheAttributes(NostrumMagica.getMagicWrapper(player));
@@ -195,8 +218,8 @@ public class MirrorGui extends GuiScreen {
 			// Reset view
 			this.guiX = leftOffset + TEXT_CONTENT_HOFFSET + (int) ((float) TEXT_CONTENT_WIDTH / 2f);
 			this.guiY = topOffset + TEXT_CONTENT_VOFFSET + (int) ((float) TEXT_CONTENT_HEIGHT / 2f);
-			
-			//this.refresh();
+
+			refreshButtons();
 		}
 	}
 	
@@ -209,6 +232,7 @@ public class MirrorGui extends GuiScreen {
 			
 			this.guiX = leftOffset + TEXT_CONTENT_HOFFSET + (int) ((float) TEXT_CONTENT_WIDTH / 2f);
 			this.guiY = topOffset + TEXT_CONTENT_VOFFSET + (int) ((float) TEXT_CONTENT_HEIGHT / 2f);
+			tab.clearNew();
 			
 			this.refreshButtons();
 		}
@@ -227,8 +251,8 @@ public class MirrorGui extends GuiScreen {
 		this.guiX = leftOffset + TEXT_CONTENT_HOFFSET + (int) ((float) TEXT_CONTENT_WIDTH / 2f);
 		this.guiY = topOffset + TEXT_CONTENT_VOFFSET + (int) ((float) TEXT_CONTENT_HEIGHT / 2f);
 		
-		tabCharacter = new MajorTabButton("character", new ItemStack(Items.SKULL, 1, 3), buttonIDs++, leftOffset - TEXT_ICON_MAJORBUTTON_WIDTH, topOffset);
-		tabResearch = new MajorTabButton("research", new ItemStack(SpellTomePage.instance()), buttonIDs++, leftOffset - TEXT_ICON_MAJORBUTTON_WIDTH, topOffset + TEXT_ICON_MAJORBUTTON_HEIGHT);
+		tabCharacter = new MajorTabButton("character", new ItemStack(Items.SKULL, 1, 3), buttonIDs++, leftOffset - BUTTON_MAJOR_WIDTH, topOffset);
+		tabResearch = new MajorTabButton("research", new ItemStack(SpellTomePage.instance()), buttonIDs++, leftOffset - BUTTON_MAJOR_WIDTH, topOffset + TEXT_ICON_MAJORBUTTON_HEIGHT);
 		buttonControl = new ImproveButton(buttonIDs++, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (KEY_WIDTH + TEXT_ICON_BUTTON_LENGTH),
 				topOffset + TEXT_BOTTOM_VOFFSET + KEY_VOFFSET);
 		buttonTechnique = new ImproveButton(buttonIDs++, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (KEY_WIDTH + TEXT_ICON_BUTTON_LENGTH),
@@ -383,12 +407,12 @@ public class MirrorGui extends GuiScreen {
 		for (int i = 0; i < this.buttonList.size(); ++i) {
 			GuiButton button = (GuiButton)this.buttonList.get(i);
 			if (button instanceof ResearchButton)
-				((ResearchButton) button).drawTreeLines(mc);
+				button.drawButton(this.mc, mouseX, mouseY);
 		}
 		for (int i = 0; i < this.buttonList.size(); ++i) {
 			GuiButton button = (GuiButton)this.buttonList.get(i);
 			if (button instanceof ResearchButton)
-				button.drawButton(this.mc, mouseX, mouseY);
+				((ResearchButton) button).drawTreeLines(mc);
 		}
 	}
 	
@@ -399,6 +423,7 @@ public class MirrorGui extends GuiScreen {
 		Minecraft.getMinecraft().getTextureManager().bindTexture(RES_FORE);
 		GlStateManager.color(1f, 1f, 1f, 1f);
 		GlStateManager.disableBlend();
+    	GlStateManager.enableAlpha();
 		GlStateManager.disableLighting();
 		Gui.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
 		
@@ -408,6 +433,14 @@ public class MirrorGui extends GuiScreen {
 				button.drawButton(mc, mouseX, mouseY);
 			}
 		}
+		
+		int y = topOffset + TEXT_BOTTOM_VOFFSET + BUTTON_MINOR_HEIGHT + 10;
+		int centerX = leftOffset + (TEXT_WIDTH / 2);
+		int width = 100;
+		Gui.drawRect(centerX - (width/2), y - 2, centerX + (width / 2), y + fontRendererObj.FONT_HEIGHT + 2, 0xD0000000);
+		String str = "Points: " + researchPoints;
+		width = fontRendererObj.getStringWidth(str);
+		this.fontRendererObj.drawString(str, centerX - (width/2), y, 0xFFFFFFFF);
 		
 		for (int i = 0; i < this.buttonList.size(); ++i) {
 			GuiButton button = (GuiButton)this.buttonList.get(i);
@@ -631,16 +664,19 @@ public class MirrorGui extends GuiScreen {
 			NetworkHandler.getSyncChannel().sendToServer(
 					new ClientSkillUpMessage(Type.CONTROL)
 					);
+			refreshButtons();
 		} else if (button == this.buttonFinesse) {
 			attr.takeSkillPoint(); // take a local point so our update makes sense
 			NetworkHandler.getSyncChannel().sendToServer(
 					new ClientSkillUpMessage(Type.FINESSE)
 					);
+			refreshButtons();
 		} else if (button == this.buttonTechnique) {
 			attr.takeSkillPoint(); // take a local point so our update makes sense
 			NetworkHandler.getSyncChannel().sendToServer(
 					new ClientSkillUpMessage(Type.TECHNIQUE)
 					);
+			refreshButtons();
 		} else if (button instanceof QuestButton) {
 			// Quest button
 			QuestButton qb = (QuestButton) button;
@@ -650,6 +686,7 @@ public class MirrorGui extends GuiScreen {
 				NetworkHandler.getSyncChannel().sendToServer(
 					new ClientUpdateQuestMessage(quest)	
 					);
+				refreshButtons();
 			}
 		} else if (button instanceof MajorTabButton) {
 			this.setScreen(button == tabCharacter);
@@ -664,6 +701,7 @@ public class MirrorGui extends GuiScreen {
 				NetworkHandler.getSyncChannel().sendToServer(
 					new ClientPurchaseResearchMessage(research)	
 					);
+				refreshButtons();
 			} else if (rb.state == ResearchState.COMPLETED) {
 				String info = I18n.format(rb.research.getInfoKey(), new Object[0]);
 				List<IBookPage> pages = new LinkedList<>();
@@ -685,10 +723,9 @@ public class MirrorGui extends GuiScreen {
 				
 				currentInfoScreen = new BookScreen(System.currentTimeMillis() + "", pages);
 				currentInfoScreen.setWorldAndResolution(mc, width, height);
+				refreshButtons();
 			}
 		}
-		
-		refreshButtons();
 	}
 	
 	private void refreshButtons() {
@@ -750,15 +787,35 @@ public class MirrorGui extends GuiScreen {
 			// We discover which tabs to display while also filtering research down
 			// to those on the active tab at the same time.
 			Set<NostrumResearchTab> visibleTabs = new HashSet<>();
+			boolean firstTime = false;
+			
+			// Set up seen research if this is our first time through
+			if (seenResearch == null) {
+				seenResearch = new HashSet<>();
+				newResearch = new HashSet<>();
+				firstTime = true;
+			}
 			
 			for (NostrumResearch research: NostrumResearch.AllResearch()) {
 				if (!NostrumMagica.getResearchVisible(player, research))
 					continue;
 				
 				visibleTabs.add(research.getTab());
+				
+				if (firstTime) {
+					seenResearch.add(research);
+					newResearch.add(research);
+				}
+				
 				if (research.getTab() != this.currentTab) {
+					if (!newResearch.contains(research)) {
+						research.getTab().markHasNew();
+						newResearch.add(research);
+					}
 					continue;
 				}
+				
+				newResearch.add(research);
 				
 				ResearchState state;
 				if (NostrumMagica.getCompletedResearch(player).contains(research))
@@ -771,6 +828,12 @@ public class MirrorGui extends GuiScreen {
 				ResearchButton button = new ResearchButton(buttonIDs++,
 						research.getX(), research.getY(),
 						research, state);
+				
+				if (!seenResearch.contains(research)) {
+					// play animation
+					button.startAnim();
+					seenResearch.add(research);
+				}
 				this.addButton(button);
 				researchButtons.put(research, button);
 			}
@@ -857,7 +920,7 @@ public class MirrorGui extends GuiScreen {
 		private List<String> tooltip;
 		
 		public MajorTabButton(String name, ItemStack icon, int parButtonId, int parPosX, int parPosY) {
-			super(parButtonId, parPosX, parPosY, TEXT_ICON_MAJORBUTTON_WIDTH, TEXT_ICON_MAJORBUTTON_HEIGHT, "");
+			super(parButtonId, parPosX, parPosY, BUTTON_MAJOR_WIDTH, BUTTON_MAJOR_HEIGHT, "");
 			this.icon = icon;
 			tooltip = Lists.newArrayList(I18n.format("mirror.tab." + name + ".name", new Object[0]));
 		}
@@ -876,6 +939,8 @@ public class MirrorGui extends GuiScreen {
             		mouseOver = true;
             	}
             	RenderHelper.disableStandardItemLighting();
+            	GlStateManager.disableLighting();
+            	GlStateManager.enableAlpha();
             	GlStateManager.color(1f, 1f, 1f, 1f);
                 mc.getTextureManager().bindTexture(RES_ICONS);
                 Gui.drawScaledCustomSizeModalRect(xPosition, yPosition, textureX, textureY,
@@ -949,7 +1014,7 @@ public class MirrorGui extends GuiScreen {
 		
 		public QuestButton(int parButtonId, int parPosX, int parPosY,
 				NostrumQuest quest, QuestState state) {
-			super(parButtonId, parPosX, parPosY, TEXT_ICON_QUEST_LENGTH, TEXT_ICON_QUEST_LENGTH, "");
+			super(parButtonId, parPosX, parPosY, BUTTON_QUEST_WIDTH, BUTTON_QUEST_HEIGHT, "");
 			this.quest = quest;
 			this.state = state;
 			this.offsetX = parPosX;
@@ -1198,7 +1263,7 @@ public class MirrorGui extends GuiScreen {
 		private List<String> tooltip;
 		
 		public ResearchTabButton(NostrumResearchTab tab, int parButtonId, int parPosX, int parPosY) {
-			super(parButtonId, parPosX, parPosY, TEXT_ICON_MINORBUTTON_WIDTH, TEXT_ICON_MINORBUTTON_HEIGHT, "");
+			super(parButtonId, parPosX, parPosY, BUTTON_MINOR_WIDTH, BUTTON_MINOR_HEIGHT, "");
 			this.tab = tab;
 			tooltip = Lists.newArrayList(I18n.format(tab.getNameKey(), new Object[0]));
 		}
@@ -1209,7 +1274,9 @@ public class MirrorGui extends GuiScreen {
 				int textureX = TEXT_ICON_MINORBUTTON_HOFFSET;
 				int textureY = TEXT_ICON_MINORBUTTON_VOFFSET;
 				mouseOver = false;
-            	if (parX >= xPosition 
+				if (currentTab == this.tab) {
+					textureY += TEXT_ICON_MINORBUTTON_HEIGHT + TEXT_ICON_MINORBUTTON_HEIGHT;
+				}else if (parX >= xPosition 
                   && parY >= yPosition 
                   && parX < xPosition + width 
                   && parY < yPosition + height) {
@@ -1219,6 +1286,7 @@ public class MirrorGui extends GuiScreen {
                 
             	GlStateManager.color(1f, 1f, 1f, 1f);
             	RenderHelper.disableStandardItemLighting();
+            	GlStateManager.enableAlpha();
                 mc.getTextureManager().bindTexture(RES_ICONS);
                 Gui.drawScaledCustomSizeModalRect(xPosition, yPosition, textureX, textureY,
                 		TEXT_ICON_MINORBUTTON_WIDTH, TEXT_ICON_MINORBUTTON_HEIGHT, this.width, this.height, 256, 256);
@@ -1230,6 +1298,15 @@ public class MirrorGui extends GuiScreen {
                 mc.getRenderItem().renderItemIntoGUI(tab.getIcon(), xPosition + (width - 16) / 2, yPosition + (height - 16) / 2);
                 RenderHelper.disableStandardItemLighting();
                 GlStateManager.popMatrix();
+                
+                // Draw new tab if there's something new
+                if (tab.hasNew()) {
+                	GlStateManager.color(1f, 1f, 1f, 1f);
+                	RenderHelper.disableStandardItemLighting();
+                    mc.getTextureManager().bindTexture(RES_ICONS);
+                    Gui.drawScaledCustomSizeModalRect(xPosition, yPosition, TEXT_ICON_MINORBUTTON_HOFFSET + TEXT_ICON_MINORBUTTON_WIDTH, TEXT_ICON_MINORBUTTON_VOFFSET,
+                    		TEXT_ICON_MINORBUTTON_WIDTH, TEXT_ICON_MINORBUTTON_HEIGHT, this.width, this.height, 256, 256);
+                }
             }
         }
 		
@@ -1257,6 +1334,7 @@ public class MirrorGui extends GuiScreen {
     	
     	private List<String> tooltip;
     	private boolean mouseOver;
+    	private long animStartMS;
 		
 		public ResearchButton(int parButtonId, int parPosX, int parPosY,
 				NostrumResearch research, ResearchState state) {
@@ -1266,6 +1344,10 @@ public class MirrorGui extends GuiScreen {
 			this.offsetX = parPosX;
 			this.offsetY = parPosY;
 			genTooltip();
+		}
+		
+		public void startAnim() {
+			animStartMS = System.currentTimeMillis();
 		}
 		
 		public void drawTreeLines(Minecraft mc) {
@@ -1287,24 +1369,52 @@ public class MirrorGui extends GuiScreen {
 		}
 		
 		private void renderLine(ResearchButton other) {
-			// Render 2 flat lines instead of 1 crooked one
+			// Render 2 flat lines with a nice circle-arc between them
+			
+			float alpha = (float) (this.animStartMS == 0 ? 1 : ((double)(System.currentTimeMillis() - animStartMS) / 500.0));
+			
+			if (!toggle) {
+				OpenGLDebugging.dumpAllIsEnabled();
+				toggle = true;
+			}
+			
 			GlStateManager.pushMatrix();
-			GlStateManager.pushAttrib();
 			VertexBuffer buf = Tessellator.getInstance().getBuffer();
+	        GlStateManager.enableBlend();
+	        GlStateManager.enableAlpha();
+	        GlStateManager.disableColorMaterial();
+	        GlStateManager.disableColorLogic();
 	        GlStateManager.disableTexture2D();
-	        GlStateManager.color(1.0f, 1.0f, 1.0f, 0.6f);
+	        GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+			GlStateManager.disableLighting();
+	        //GlStateManager.disableDepth();
+	        GlStateManager.glLineWidth(3.5f);
+	        GlStateManager.color(.8f, .8f, .8f, alpha);
 	        
 	        Vec2f child = new Vec2f(xPosition + ((float) width / 2f), yPosition + ((float) height / 2f));
 	        Vec2f parent = new Vec2f(other.xPosition + ((float) other.width / 2f), other.yPosition + ((float) other.height / 2f));
+	        Vec2f diff = new Vec2f(child.x - parent.x, child.y - parent.y);
+	        
+	        Vec2f myCenter = child; // Stash for later
 	        
 	        if (child.x == parent.x || child.y == parent.y) {
 	        	// Straight line
+	        	
+	        	if (child.x == parent.x) {
+	        		// vertical line. Shrink both sides in y
+	        		child = new Vec2f(child.x, child.y + (-Math.signum(diff.y) * ((float) height / 2f)));
+	        		parent = new Vec2f(parent.x, parent.y - (-Math.signum(diff.y) * ((float) other.height / 2f)));
+	        	} else {
+	        		// horizional. "" x
+	        		child = new Vec2f(child.x + (-Math.signum(diff.x) * ((float) width / 2f)), child.y);
+	        		parent = new Vec2f(parent.x - (-Math.signum(diff.x) * ((float) other.width / 2f)), parent.y);
+	        	}
+	        	
 	        	buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
 		        buf.pos(child.x, child.y, 0).endVertex();
 		        buf.pos(parent.x, parent.y, 0).endVertex();
 		        Tessellator.getInstance().draw();
 	        } else {
-		        Vec2f diff = new Vec2f(child.x - parent.x, child.y - parent.y);
 		        boolean vertical;// = (Math.abs(diff.y) > Math.abs(diff.x));
 		        
 		        // figure out radius of arc to draw
@@ -1323,6 +1433,16 @@ public class MirrorGui extends GuiScreen {
 		        
 		        Vec2f childTo = new Vec2f(vertical ? center.x + (float) radiusX : center.x, vertical ? center.y : center.y + (float) radiusY);
 		        Vec2f parentTo = new Vec2f(vertical ? center.x : center.x - (float) radiusX, vertical ? center.y - (float) radiusY : center.y);
+		        
+		        if (vertical) {
+	        		// vertical at parent. Shrink parent y and child x
+		        	child = new Vec2f(child.x + (-Math.signum(diff.x) * ((float) width / 2f)), child.y);
+	        		parent = new Vec2f(parent.x, parent.y - (-Math.signum(diff.y) * ((float) other.height / 2f)));
+	        	} else {
+	        		// inverse of above
+	        		child = new Vec2f(child.x, child.y + (-Math.signum(diff.y) * ((float) height / 2f)));
+	        		parent = new Vec2f(parent.x - (-Math.signum(diff.x) * ((float) other.width / 2f)), parent.y);
+	        	}
 		        
 		        buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
 		        buf.pos(child.x, child.y, 0).endVertex();
@@ -1365,8 +1485,25 @@ public class MirrorGui extends GuiScreen {
 		        GlStateManager.popMatrix();
 	        }
 	        
-	        GlStateManager.enableTexture2D();
-	        GlStateManager.popAttrib();
+	        GlStateManager.translate(child.x, child.y, .1);
+	        if (child.x < myCenter.x) {
+	        	// from left
+	        	GlStateManager.rotate(-90f, 0, 0, 1);
+	        } else if (child.x > myCenter.x) {
+	        	// from right
+	        	GlStateManager.rotate(90f, 0, 0, 1);
+	        } else if (child.y > myCenter.y) {
+	        	// from bottom
+	        	GlStateManager.rotate(180f, 0, 0, 1);
+	        }
+	        GlStateManager.disableLighting();
+            GlStateManager.enableTexture2D();
+            GlStateManager.enableBlend();
+            GlStateManager.color(1f, 1f, 1f, alpha);
+            mc.getTextureManager().bindTexture(RES_ICONS);
+            Gui.drawScaledCustomSizeModalRect(-(TEXT_ICON_ARROW_WIDTH/2) - 1, -(TEXT_ICON_ARROW_HEIGHT/2), TEXT_ICON_ARROW_HOFFSET, TEXT_ICON_ARROW_VOFFSET,
+            		TEXT_ICON_ARROW_WIDTH, TEXT_ICON_ARROW_HEIGHT, 14, 7, 256, 256);
+            GlStateManager.enableDepth();
 			GlStateManager.popMatrix();
 		}
 		
@@ -1374,22 +1511,35 @@ public class MirrorGui extends GuiScreen {
         public void drawButton(Minecraft mc, int parX, int parY) {
 			mouseOver = false;
 			if (visible) {
+				float alpha = (float) (this.animStartMS == 0 ? 1 : ((double)(System.currentTimeMillis() - animStartMS) / 500.0));
 				int textureX;
 				int textureY;
+				int textureW;
+				int textureH;
+				
+				if (alpha >= 1f) {
+					this.animStartMS = 0;
+				}
 				
 				switch (research.getSize()) {
 				case GIANT:
 					textureX = TEXT_ICON_RESEARCHBUTTON_GIANT_HOFFSET;
 					textureY = TEXT_ICON_RESEARCHBUTTON_GIANT_VOFFSET;
+					textureW = TEXT_ICON_RESEARCHBUTTON_GIANT_WIDTH;
+					textureH = TEXT_ICON_RESEARCHBUTTON_GIANT_HEIGHT;
 					break;
 				case LARGE:
 					textureX = TEXT_ICON_RESEARCHBUTTON_LARGE_HOFFSET;
 					textureY = TEXT_ICON_RESEARCHBUTTON_LARGE_VOFFSET;
+					textureW = TEXT_ICON_RESEARCHBUTTON_LARGE_WIDTH;
+					textureH = TEXT_ICON_RESEARCHBUTTON_LARGE_HEIGHT;
 					break;
 				case NORMAL:
 				default:
 					textureX = TEXT_ICON_RESEARCHBUTTON_SMALL_HOFFSET;
 					textureY = TEXT_ICON_RESEARCHBUTTON_SMALL_VOFFSET;
+					textureW = TEXT_ICON_RESEARCHBUTTON_SMALL_WIDTH;
+					textureH = TEXT_ICON_RESEARCHBUTTON_SMALL_HEIGHT;
 					break;
 				}
 				
@@ -1404,32 +1554,33 @@ public class MirrorGui extends GuiScreen {
                   && parY >= yPosition 
                   && parX < xPosition + width 
                   && parY < yPosition + height) {
-            		textureY += this.height;
+            		textureY += textureH;
             		mouseOver = true;
             	}
-                
+            	
+
+                GlStateManager.pushMatrix();
             	switch (state) {
 				case COMPLETED:
-					GlStateManager.color(.2f, 2f/3f, .2f, 1f);
+					GlStateManager.color(.2f, 2f/3f, .2f, alpha);
 					break;
 				case INACTIVE:
-					GlStateManager.color(2f/3f, 0f, 2f/3f, .8f);
+					GlStateManager.color(2f/3f, 0f, 2f/3f, alpha);
 					break;
 				case UNAVAILABLE:
-					GlStateManager.color(.8f, .0f, .0f, .6f);
+					GlStateManager.color(.8f, .0f, .0f, alpha);
 					break;
             	}
                 
             	GlStateManager.disableLighting();
                 GlStateManager.enableTexture2D();
-                GlStateManager.disableBlend();
+                GlStateManager.enableBlend();
+                GlStateManager.enableAlpha();
                 mc.getTextureManager().bindTexture(RES_ICONS);
                 Gui.drawScaledCustomSizeModalRect(xPosition, yPosition, textureX, textureY,
-                		this.width, this.height, this.width, this.height, 256, 256);
+                		textureW, textureH, this.width, this.height, 256, 256);
                 
                 // Now draw icon
-                GlStateManager.pushMatrix();
-                GlStateManager.pushAttrib();
                 RenderHelper.enableGUIStandardItemLighting();
                 GlStateManager.translate(0, 0, -140.5);
                 mc.getRenderItem().renderItemAndEffectIntoGUI(research.getIconItem(), xPosition + (width - 16) / 2, yPosition + (height - 16) / 2);
@@ -1437,18 +1588,20 @@ public class MirrorGui extends GuiScreen {
                 RenderHelper.disableStandardItemLighting();
                 GlStateManager.enableDepth();
                 GlStateManager.enableBlend();
-                GlStateManager.popAttrib();
-                GlStateManager.popMatrix();
                 
 //                RenderHelper.enableGUIStandardItemLighting();
 //                mc.getRenderItem().renderItemIntoGUI(research.getIconItem(), xPosition + (width -16) / 2, yPosition + (height -16) / 2);
 //                RenderHelper.disableStandardItemLighting();
 //            	GlStateManager.enableBlend();
+                
+                GlStateManager.popMatrix();
             }
         }
 		
 		public void drawOverlay(Minecraft mc, int parX, int parY) {
 			if (mouseOver) {
+		        GlStateManager.enableBlend();
+		        GlStateManager.enableAlpha();
 				GlStateManager.pushMatrix();
 				GlStateManager.scale(fontScale, fontScale, 1f);
 				GlStateManager.translate((int) (parX / fontScale) - parX, (int) (parY / fontScale) - parY, 0);
@@ -1521,24 +1674,31 @@ public class MirrorGui extends GuiScreen {
     private static int HeightForSize(Size size) {
 		switch (size) {
 		case GIANT:
-			return TEXT_ICON_RESEARCHBUTTON_GIANT_HEIGHT;
+			return BUTTON_RESEARCH_GIANT_HEIGHT;
 		case LARGE:
-			return TEXT_ICON_RESEARCHBUTTON_LARGE_HEIGHT;
+			return BUTTON_RESEARCH_LARGE_HEIGHT;
 		case NORMAL:
 		default:
-			return TEXT_ICON_RESEARCHBUTTON_SMALL_HEIGHT;
+			return BUTTON_RESEARCH_SMALL_HEIGHT;
 		}
 	}
 	
 	private static int WidthForSize(Size size) {
 		switch (size) {
 		case GIANT:
-			return TEXT_ICON_RESEARCHBUTTON_GIANT_WIDTH;
+			return BUTTON_RESEARCH_GIANT_WIDTH;
 		case LARGE:
-			return TEXT_ICON_RESEARCHBUTTON_LARGE_WIDTH;
+			return BUTTON_RESEARCH_LARGE_WIDTH;
 		case NORMAL:
 		default:
-			return TEXT_ICON_RESEARCHBUTTON_SMALL_WIDTH;
+			return BUTTON_RESEARCH_SMALL_WIDTH;
 		}
 	}
+	
+	public static void resetSeenCache() {
+		seenResearch = null;
+		newResearch = null;
+	}
+	
+	private static boolean toggle = false; int unused;
 }

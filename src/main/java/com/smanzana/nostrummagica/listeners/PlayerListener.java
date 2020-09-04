@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.gui.MirrorGui;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
 import com.smanzana.nostrummagica.items.EnchantedEquipment;
 import com.smanzana.nostrummagica.items.ReagentBag;
@@ -67,6 +68,7 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
 
 /**
  * I lied. It's actually the one and only listener. It listens to time, too. And
@@ -251,6 +253,7 @@ public class PlayerListener {
 		foodInfos.clear();
 		manaInfos.clear();
 		magicEffectInfos.clear();
+		MirrorGui.resetSeenCache();
 	}
 	
 	/**
@@ -901,10 +904,11 @@ public class PlayerListener {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(event.player);
 		if (attr != null)
 			attr.clearFamiliars();
-		
-		if (event.player.worldObj.isRemote) {
-			this.clearAll();
-		}
+	}
+	
+	@SubscribeEvent
+	public void onClientConnect(ClientConnectedToServerEvent event) {
+		this.clearAll();
 	}
 	
 	@SubscribeEvent

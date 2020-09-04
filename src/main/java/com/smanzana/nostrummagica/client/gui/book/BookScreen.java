@@ -390,11 +390,19 @@ public class BookScreen extends GuiScreen {
 				int length = 0;
 				while (!input.trim().isEmpty()) {
 					int pos = input.indexOf(' ');
+					int posNewline = input.indexOf('|');
+					boolean newline = false;
+					
+					if (posNewline != -1 && posNewline < pos) {
+						pos = posNewline;
+						newline = true;
+					}
+					
 					String word;
 					if (pos == -1)
 						word = input;
 					else
-						word = input.substring(0, pos + 1);
+						word = input.substring(0, pos + (newline ? 0 : 1));
 					
 					int width = fonter.getStringWidth(word);
 					if (length > 0 && length + width > PAGE_WIDTH) {
@@ -405,6 +413,12 @@ public class BookScreen extends GuiScreen {
 						buffer.append(word);
 						input = input.substring(pos == -1 ? word.length() : pos + 1);
 						length += width;
+						
+						if (newline) {
+							lines[count++] = buffer.toString();
+							buffer = new StringBuffer();
+							break;
+						}
 					}
 				}
 			}

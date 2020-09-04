@@ -446,34 +446,49 @@ public abstract class InfoScreenTab {
 			@Override
 			public List<InfoButton> getButtons(int offset, INostrumMagic attr) {
 				List<InfoButton> buttons = new LinkedList<>();
+				InfoButton button;
 				
-				buttons.add(new SubscreenInfoButton(offset++, "trial.fire",
+				button = new SubscreenInfoButton(offset++, "trial.fire",
 						new PaginatedInfoSubScreen("trial.fire"),
-						SpellRune.getRune(EMagicElement.FIRE, 1)));
+						SpellRune.getRune(EMagicElement.FIRE, 1));
+				buttons.add(button);
+				this.index("builtin::trials::fire", button);
 				
-				buttons.add(new SubscreenInfoButton(offset++, "trial.ice",
+				button = new SubscreenInfoButton(offset++, "trial.ice",
 						new PaginatedInfoSubScreen("trial.ice"),
-						SpellRune.getRune(EMagicElement.ICE, 1)));
+						SpellRune.getRune(EMagicElement.ICE, 1));
+				buttons.add(button);
+				this.index("builtin::trials::ice", button);
 				
-				buttons.add(new SubscreenInfoButton(offset++, "trial.earth",
+				button = new SubscreenInfoButton(offset++, "trial.earth",
 						new PaginatedInfoSubScreen("trial.earth"),
-						SpellRune.getRune(EMagicElement.EARTH, 1)));
+						SpellRune.getRune(EMagicElement.EARTH, 1));
+				buttons.add(button);
+				this.index("builtin::trials::earth", button);
 				
-				buttons.add(new SubscreenInfoButton(offset++, "trial.wind",
+				button = new SubscreenInfoButton(offset++, "trial.wind",
 						new PaginatedInfoSubScreen("trial.wind"),
-						SpellRune.getRune(EMagicElement.WIND, 1)));
+						SpellRune.getRune(EMagicElement.WIND, 1));
+				buttons.add(button);
+				this.index("builtin::trials::wind", button);
 				
-				buttons.add(new SubscreenInfoButton(offset++, "trial.ender",
+				button = new SubscreenInfoButton(offset++, "trial.ender",
 						new PaginatedInfoSubScreen("trial.ender"),
-						SpellRune.getRune(EMagicElement.ENDER, 1)));
+						SpellRune.getRune(EMagicElement.ENDER, 1));
+				buttons.add(button);
+				this.index("builtin::trials::ender", button);
 				
-				buttons.add(new SubscreenInfoButton(offset++, "trial.lightning",
+				button = new SubscreenInfoButton(offset++, "trial.lightning",
 						new PaginatedInfoSubScreen("trial.lightning"),
-						SpellRune.getRune(EMagicElement.LIGHTNING, 1)));
+						SpellRune.getRune(EMagicElement.LIGHTNING, 1));
+				buttons.add(button);
+				this.index("builtin::trials::lightning", button);
 				
-				buttons.add(new SubscreenInfoButton(offset++, "trial.physical",
+				button = new SubscreenInfoButton(offset++, "trial.physical",
 						new PaginatedInfoSubScreen("trial.physical"),
-						SpellRune.getRune(EMagicElement.PHYSICAL, 1)));
+						SpellRune.getRune(EMagicElement.PHYSICAL, 1));
+				buttons.add(button);
+				this.index("builtin::trials::physical", button);
 					
 				return buttons;
 			}

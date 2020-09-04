@@ -1668,6 +1668,13 @@ public class NostrumMagica
 			.parent("spellcraft")
 			.quest("lvl7")
 			.reference(MasteryOrb.instance())
+			.reference("builtin::trials::fire", "info.trial.fire.name")
+			.reference("builtin::trials::ice", "info.trial.ice.name")
+			.reference("builtin::trials::earth", "info.trial.earth.name")
+			.reference("builtin::trials::wind", "info.trial.wind.name")
+			.reference("builtin::trials::ender", "info.trial.ender.name")
+			.reference("builtin::trials::lightning", "info.trial.lightning.name")
+			.reference("builtin::trials::physical", "info.trial.physical.name")
 		.build("elemental_trials", NostrumResearchTab.MAGICA, Size.NORMAL, -3, 2, true, new ItemStack(MasteryOrb.instance()));
 		
 		NostrumResearch.startBuilding()
@@ -1722,6 +1729,7 @@ public class NostrumMagica
 		
 		NostrumResearch.startBuilding()
 			.parent("rituals")
+			.hiddenParent("magic_token")
 			.lore(EntityKoid.LoreKey)
 			.reference("ritual::koid", "ritual.koid.name")
 		.build("summonkoids", NostrumResearchTab.MAGICA, Size.NORMAL, 2, 0, true, new ItemStack(EssenceItem.instance()));

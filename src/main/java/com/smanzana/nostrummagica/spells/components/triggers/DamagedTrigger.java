@@ -35,7 +35,7 @@ public class DamagedTrigger extends SpellTrigger {
 		public DamagedTriggerInstance(SpellState state, EntityLivingBase entity, int duration) {
 			super(state);
 			this.entity = entity;
-			this.duration = duration;
+			this.duration = duration == 0 ? 20 : duration;
 			this.expired = false;
 		}
 		
@@ -58,12 +58,15 @@ public class DamagedTrigger extends SpellTrigger {
 							null
 							);
 					this.trigger(data);
+					expired = true;
 				}
 			} else if (type == Event.TIME) {
-				expired = true;
-				if (this.entity instanceof EntityPlayer) {
-					EntityPlayer player = (EntityPlayer) this.entity;
-					player.addChatComponentMessage(new TextComponentTranslation("modification.damaged_duration.expire"));
+				if (!expired) {
+					expired = true;
+					if (this.entity instanceof EntityPlayer) {
+						EntityPlayer player = (EntityPlayer) this.entity;
+						player.addChatComponentMessage(new TextComponentTranslation("modification.damaged_duration.expire"));
+					}
 				}
 			}
 			
