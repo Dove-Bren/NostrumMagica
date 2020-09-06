@@ -6,6 +6,7 @@ import java.util.Map;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntitySprite;
+import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed.TameRedDragonLore;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemPhysical;
@@ -43,6 +44,7 @@ import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.items.ThanosStaff;
+import com.smanzana.nostrummagica.items.WarlockSword;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLivingBase;
@@ -124,6 +126,9 @@ public class LoreRegistry {
 		register(MirrorShield.instance());
 		register(MirrorShieldImproved.instance());
 		register(HookshotItem.instance());
+		register(new EntityWisp(null));
+		register(WarlockSword.instance());
+		
 		
 		for (Preset preset : Preset.values()) {
 			register(preset);

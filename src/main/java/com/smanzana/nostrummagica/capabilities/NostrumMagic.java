@@ -61,6 +61,25 @@ public class NostrumMagic implements INostrumMagic {
 		}
 	}
 	
+	public static class KnowledgeCurves {
+	
+		private static final int knowledgeGrowth = 5;
+		private static final int knowledgeBase = 10;
+		
+		public static int maxKnowledge(int level) {
+			return knowledgeBase + (knowledgeGrowth * (level - 1));
+		}
+		
+		public static int knowledgeLevel(int knowledge) {
+			if (knowledge < knowledgeBase) {
+				return 1;
+			}
+			
+			knowledge -= knowledgeBase;
+			return 2 + knowledge / knowledgeGrowth;
+		}
+	}
+	
 	private boolean unlocked;
 	private int level;
 	private float xp;
@@ -320,6 +339,32 @@ public class NostrumMagic implements INostrumMagic {
 		
 		return lore;
 	}
+	
+	public static int getKnowledge(INostrumMagic attr) {
+		int knowledge = 0;
+		for (Integer val : attr.serializeLoreLevels().values()) {
+			if (val == null || val == 0) {
+				continue;
+			}
+			
+			knowledge += val;
+		}
+		return knowledge;
+	}
+	
+	protected void addLoreBonus(NostrumMagic attr, Integer oldVal, int newVal) {
+		if (oldVal == null) {
+			oldVal = 0;
+		}
+		int knowledge = getKnowledge(attr);
+		int oldLvl = KnowledgeCurves.knowledgeLevel(knowledge - (newVal - oldVal));
+		int newLvl = KnowledgeCurves.knowledgeLevel(knowledge);
+		if (oldLvl < newLvl) {
+			for (int i = 0; i < (newLvl - oldLvl); i++) {
+				this.addResearchPoint();
+			}
+		}
+	}
 
 	@Override
 	public void giveBasicLore(ILoreTagged tagged) {
@@ -344,6 +389,8 @@ public class NostrumMagic implements INostrumMagic {
 					(EntityPlayerMP) entity);
 			
 		}
+		
+		addLoreBonus(this, val, 1);
 	}
 
 	@Override
@@ -365,6 +412,8 @@ public class NostrumMagic implements INostrumMagic {
 					(EntityPlayerMP) entity);
 			
 		}
+		
+		addLoreBonus(this, val, 2);
 	}
 
 	@Override

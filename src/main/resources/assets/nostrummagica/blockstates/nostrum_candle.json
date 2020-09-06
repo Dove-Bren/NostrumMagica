@@ -1,6 +1,14 @@
 {
     "variants": {
-        "lit=true": { "model": "nostrummagica:candle_lit" },
-        "lit=false": { "model": "nostrummagica:candle" }
+        "facing=up,lit=true": { "model": "nostrummagica:candle_lit" },
+        "facing=up,lit=false": { "model": "nostrummagica:candle" },
+        "facing=east,lit=true": { "model": "nostrummagica:candle_lit_hanging" },
+        "facing=east,lit=false": { "model": "nostrummagica:candle_hanging" },
+        "facing=south,lit=true": { "model": "nostrummagica:candle_lit_hanging", "y": 90 },
+        "facing=south,lit=false": { "model": "nostrummagica:candle_hanging", "y": 90 },
+        "facing=west,lit=true": { "model": "nostrummagica:candle_lit_hanging", "y": 180 },
+        "facing=west,lit=false": { "model": "nostrummagica:candle_hanging", "y": 180 },
+        "facing=north,lit=true": { "model": "nostrummagica:candle_lit_hanging", "y": 270 },
+        "facing=north,lit=false": { "model": "nostrummagica:candle_hanging", "y": 270 }
     }
 }

@@ -1,16 +1,25 @@
 package com.smanzana.nostrummagica.aetheria;
 
+import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.aetheria.blocks.WispBlock;
 import com.smanzana.nostrummagica.aetheria.items.AetherResourceType;
 import com.smanzana.nostrummagica.aetheria.items.NostrumAetherResourceItem;
+import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.items.ThanoPendant;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
+import com.smanzana.nostrummagica.research.NostrumResearch;
+import com.smanzana.nostrummagica.research.NostrumResearch.NostrumResearchTab;
+import com.smanzana.nostrummagica.research.NostrumResearch.Size;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
+import com.smanzana.nostrummagica.rituals.requirements.RRequirementResearch;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -51,6 +60,8 @@ public class AetheriaProxy {
 		if (!enabled) {
 			return false;
 		}
+		
+		registerAetheriaResearch();
 		
 		return true;
 	}
@@ -95,18 +106,6 @@ public class AetheriaProxy {
 	}
 	
 	private void registerAetheriaRituals() {
-//		RitualRecipe recipe;
-//		
-//		recipe = RitualRecipe.createTier3("small_ribbon",
-//				ItemMagicBauble.getItem(ItemType.RIBBON_SMALL, 1),
-//				null,
-//				new ReagentType[] {ReagentType.MANI_DUST, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK},
-//				NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1),
-//				new ItemStack[] {new ItemStack(Items.GOLD_NUGGET), new ItemStack(Item.getItemFromBlock(Blocks.WOOL)), new ItemStack(Item.getItemFromBlock(Blocks.WOOL)), new ItemStack(Items.GOLD_NUGGET)},
-//				new RRequirementQuest("ribbons"),
-//				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.RIBBON_SMALL, 1)));
-//		RitualRegistry.instance().addRitual(recipe);
-		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("wisp_crystal",
 						new ItemStack(WispBlock.instance()),
@@ -114,14 +113,43 @@ public class AetheriaProxy {
 						new ReagentType[] {ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST},
 						new ItemStack(AltarItem.instance()),
 						new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), new ItemStack(Blocks.OBSIDIAN, 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1)},
-						null,
+						new RRequirementResearch("wispblock"),
 						new OutcomeSpawnItem(new ItemStack(WispBlock.instance()))
 						)
 				);
 	}
 	
+	private void registerAetheriaResearch() {
+		NostrumResearch.startBuilding()
+			.hiddenParent("rituals")
+			.hiddenParent("thano_pendant")
+			.lore(ThanoPendant.instance())
+			.reference(APIProxy.ActivePendantItem)
+		.build("active_pendant", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 0, 0, true, new ItemStack(APIProxy.ActivePendantItem));
+
+		NostrumResearch.startBuilding()
+			.parent("active_pendant")
+			.hiddenParent("thano_pendant")
+			.lore((ILoreTagged) APIProxy.ActivePendantItem)
+			.reference(APIProxy.PassivePendantItem)
+		.build("passive_pendant", (NostrumResearchTab) APIProxy.ResearchTab, Size.LARGE, 1, 1, true, new ItemStack(APIProxy.PassivePendantItem));
+		
+		NostrumResearch.startBuilding()
+			.parent("active_pendant")
+			.lore((ILoreTagged) APIProxy.ActivePendantItem)
+			//.reference(APIProxy.AetherFurnaceBlock)
+		.build("aether_furnace", (NostrumResearchTab) APIProxy.ResearchTab, Size.GIANT, -1, 1, true, new ItemStack(APIProxy.AetherFurnaceBlock));
+		
+		NostrumResearch.startBuilding()
+			.hiddenParent("kani")
+			.hiddenParent("aether_furnace")
+			.lore(EntityWisp.LoreKey)
+		.build("wispblock", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, -3, 2, true, new ItemStack(WispBlock.instance()));
+	}
+	
 	private void registerLore() {
-		//LoreRegistry.instance().register(ItemMagicBauble.instance());
+		LoreRegistry.instance().register((ILoreTagged) APIProxy.PassivePendantItem);
+		LoreRegistry.instance().register((ILoreTagged) APIProxy.ActivePendantItem);
 	}
 	
 	public boolean isEnabled() {
@@ -130,5 +158,9 @@ public class AetheriaProxy {
 	
 	public ItemStack getResourceItem(AetherResourceType type, int count) {
 		return NostrumAetherResourceItem.getItem(type, count);
+	}
+
+	public void reinitResearch() {
+		registerAetheriaResearch();
 	}
 }

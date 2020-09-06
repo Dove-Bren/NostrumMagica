@@ -69,6 +69,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 	
 	protected static final double MAX_WISP_DISTANCE_SQ = 144;
 	protected static final DataParameter<Optional<BlockPos>> HOME  = EntityDataManager.<Optional<BlockPos>>createKey(EntityWisp.class, DataSerializers.OPTIONAL_BLOCK_POS);
+	public static final String LoreKey = "nostrum__wisp";
 	
 	private int idleCooldown;
 	private Spell defaultSpell;
@@ -188,7 +189,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 	
 	@Override
 	public String getLoreKey() {
-		return "nostrum__wisp";
+		return LoreKey;
 	}
 
 	@Override

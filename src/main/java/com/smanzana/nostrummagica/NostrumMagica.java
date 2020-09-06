@@ -1183,6 +1183,19 @@ public class NostrumMagica
 						)
 				);
 		
+		// Lore Table
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("lore_table",
+						new ItemStack(LoreTable.instance()),
+						null,
+						new ReagentType[] {ReagentType.MANI_DUST, ReagentType.GINSENG, ReagentType.CRYSTABLOOM, ReagentType.MANI_DUST},
+						NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1),
+						new ItemStack[] {new ItemStack(Blocks.PLANKS, 1, OreDictionary.WILDCARD_VALUE), new ItemStack(Items.PAPER), new ItemStack(Blocks.CRAFTING_TABLE), new ItemStack(Blocks.PLANKS, 1, OreDictionary.WILDCARD_VALUE)},
+						new RRequirementResearch("loretable"),
+						new OutcomeSpawnItem(new ItemStack(LoreTable.instance()))
+						)
+				);
+		
 		// Modification Table
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("modification_table",
@@ -1464,72 +1477,72 @@ public class NostrumMagica
     			null, new ObjectiveRitual("balanced_infusion"),
     			new IReward[] {new AlterationReward(EAlteration.CONJURE)});
     	
-    	new NostrumQuest("geogem", QuestType.CHALLENGE, 5,
-    			0, // Control
-    			0, // Technique
-    			0, // Finesse
-    			new String[0],
-    			null, new ObjectiveSpellCast().requiredElement(EMagicElement.EARTH),
-    			wrapAttribute(AwardType.COST, -0.020f))
-    		.offset(-3, 2);
-    	
-    	new NostrumQuest("geotoken", QuestType.CHALLENGE, 5,
-    			0, // Control
-    			0, // Technique
-    			0, // Finesse
-    			new String[] {"geogem"},
-    			null, new ObjectiveRitual("geogem"),
-    			wrapAttribute(AwardType.COST, -0.030f))
-    		.offset(-4, 2);
-    	
-    	new NostrumQuest("obelisk", QuestType.CHALLENGE, 10,
-    			0, // Control
-    			0, // Technique
-    			0, // Finesse
-    			new String[] {"geotoken"},
-    			null, new ObjectiveSpellCast().requiredElement(EMagicElement.ENDER)
-    			.requiredElement(EMagicElement.ENDER)
-    			.requiredElement(EMagicElement.ENDER),
-    			wrapAttribute(AwardType.MANA, 0.040f))
-    		.offset(-5, 6);
-    	
-    	new NostrumQuest("obelisk2", QuestType.REGULAR, 10,
-    			0, // Control
-    			0, // Technique
-    			0, // Finesse
-    			new String[] {"obelisk"},
-    			null, null,
-    			wrapAttribute(AwardType.MANA, 0.010f))
-    		.offset(-6, 6);
-    	
-    	new NostrumQuest("recall", QuestType.CHALLENGE, 10,
-    			0, // Control
-    			0, // Technique
-    			0, // Finesse
-    			new String[] {"geotoken"},
-    			null, new ObjectiveSpellCast().requiredElement(EMagicElement.WIND),
-    			wrapAttribute(AwardType.REGEN, 0.040f))
-    		.offset(-5, 8);
-    	
-    	new NostrumQuest("recall2", QuestType.REGULAR, 10,
-    			0, // Control
-    			0, // Technique
-    			0, // Finesse
-    			new String[] {"recall"},
-    			null, null,
-    			wrapAttribute(AwardType.REGEN, 0.010f))
-    		.offset(-6, 8);
-    	
-    	new NostrumQuest("boon", QuestType.CHALLENGE, 12,
-    			0, // Control
-    			0, // Technique
-    			0, // Finesse
-    			new String[0],
-    			null, new ObjectiveSpellCast().requiredAlteration(EAlteration.RESIST)
-    									.requiredAlteration(EAlteration.SUPPORT)
-    									.requiredAlteration(EAlteration.GROWTH),
-    			wrapAttribute(AwardType.REGEN, 0.100f))
-    		.offset(1, 10);
+//    	new NostrumQuest("geogem", QuestType.CHALLENGE, 5,
+//    			0, // Control
+//    			0, // Technique
+//    			0, // Finesse
+//    			new String[0],
+//    			null, new ObjectiveSpellCast().requiredElement(EMagicElement.EARTH),
+//    			wrapAttribute(AwardType.COST, -0.020f))
+//    		.offset(-3, 2);
+//    	
+//    	new NostrumQuest("geotoken", QuestType.CHALLENGE, 5,
+//    			0, // Control
+//    			0, // Technique
+//    			0, // Finesse
+//    			new String[] {"geogem"},
+//    			null, new ObjectiveRitual("geogem"),
+//    			wrapAttribute(AwardType.COST, -0.030f))
+//    		.offset(-4, 2);
+//    	
+//    	new NostrumQuest("obelisk", QuestType.CHALLENGE, 10,
+//    			0, // Control
+//    			0, // Technique
+//    			0, // Finesse
+//    			new String[] {"geotoken"},
+//    			null, new ObjectiveSpellCast().requiredElement(EMagicElement.ENDER)
+//    			.requiredElement(EMagicElement.ENDER)
+//    			.requiredElement(EMagicElement.ENDER),
+//    			wrapAttribute(AwardType.MANA, 0.040f))
+//    		.offset(-5, 6);
+//    	
+//    	new NostrumQuest("obelisk2", QuestType.REGULAR, 10,
+//    			0, // Control
+//    			0, // Technique
+//    			0, // Finesse
+//    			new String[] {"obelisk"},
+//    			null, null,
+//    			wrapAttribute(AwardType.MANA, 0.010f))
+//    		.offset(-6, 6);
+//    	
+//    	new NostrumQuest("recall", QuestType.CHALLENGE, 10,
+//    			0, // Control
+//    			0, // Technique
+//    			0, // Finesse
+//    			new String[] {"geotoken"},
+//    			null, new ObjectiveSpellCast().requiredElement(EMagicElement.WIND),
+//    			wrapAttribute(AwardType.REGEN, 0.040f))
+//    		.offset(-5, 8);
+//    	
+//    	new NostrumQuest("recall2", QuestType.REGULAR, 10,
+//    			0, // Control
+//    			0, // Technique
+//    			0, // Finesse
+//    			new String[] {"recall"},
+//    			null, null,
+//    			wrapAttribute(AwardType.REGEN, 0.010f))
+//    		.offset(-6, 8);
+//    	
+//    	new NostrumQuest("boon", QuestType.CHALLENGE, 12,
+//    			0, // Control
+//    			0, // Technique
+//    			0, // Finesse
+//    			new String[0],
+//    			null, new ObjectiveSpellCast().requiredAlteration(EAlteration.RESIST)
+//    									.requiredAlteration(EAlteration.SUPPORT)
+//    									.requiredAlteration(EAlteration.GROWTH),
+//    			wrapAttribute(AwardType.REGEN, 0.100f))
+//    		.offset(1, 10);
     	
 //    	new NostrumQuest("advanced_bags", QuestType.REGULAR, 5,
 //    			0, // Control
@@ -1560,42 +1573,42 @@ public class NostrumMagica
 //    			wrapAttribute(AwardType.MANA, 0.050f))
 //    		.offset(4, 11);
     	
-    	new NostrumQuest("mastery_orb", QuestType.REGULAR,
-    			3,
-    			0,
-    			0,
-    			0,
-    			new String[]{"lvl1"},
-    			null, null,
-    			wrapAttribute(AwardType.MANA, 0.0100f));
-    	
-    	new NostrumQuest("mirror_shield", QuestType.CHALLENGE, 8,
-    			1, // Control
-    			0, // Technique
-    			1, // Finesse
-    			new String[] {"belts"}, // Potentially dependent on bauble quests :)
-    			null,
-    			null,
-    			new IReward[]{new AttributeReward(AwardType.MANA, 0.010f)})
-    		.offset(3, 6);
-    	new NostrumQuest("true_mirror_shield", QuestType.CHALLENGE, 8,
-    			1, // Control
-    			0, // Technique
-    			1, // Finesse
-    			new String[] {"mirror_shield"},
-    			new String[] {MirrorShield.instance().getLoreKey()},
-    			null,
-    			new IReward[]{new AttributeReward(AwardType.MANA, 0.025f)})
-    		.offset(4, 6);
-    	new NostrumQuest("magic_armor", QuestType.CHALLENGE, 5,
-    			0,
-    			0,
-    			0,
-    			null,
-    			new String[] {MageStaff.instance().getLoreKey()},
-    			null,
-    			new IReward[]{new AttributeReward(AwardType.MANA, 0.025f)})
-    		.offset(-4, 3);
+//    	new NostrumQuest("mastery_orb", QuestType.REGULAR,
+//    			3,
+//    			0,
+//    			0,
+//    			0,
+//    			new String[]{"lvl1"},
+//    			null, null,
+//    			wrapAttribute(AwardType.MANA, 0.0100f));
+//    	
+//    	new NostrumQuest("mirror_shield", QuestType.CHALLENGE, 8,
+//    			1, // Control
+//    			0, // Technique
+//    			1, // Finesse
+//    			new String[] {"belts"}, // Potentially dependent on bauble quests :)
+//    			null,
+//    			null,
+//    			new IReward[]{new AttributeReward(AwardType.MANA, 0.010f)})
+//    		.offset(3, 6);
+//    	new NostrumQuest("true_mirror_shield", QuestType.CHALLENGE, 8,
+//    			1, // Control
+//    			0, // Technique
+//    			1, // Finesse
+//    			new String[] {"mirror_shield"},
+//    			new String[] {MirrorShield.instance().getLoreKey()},
+//    			null,
+//    			new IReward[]{new AttributeReward(AwardType.MANA, 0.025f)})
+//    		.offset(4, 6);
+//    	new NostrumQuest("magic_armor", QuestType.CHALLENGE, 5,
+//    			0,
+//    			0,
+//    			0,
+//    			null,
+//    			new String[] {MageStaff.instance().getLoreKey()},
+//    			null,
+//    			new IReward[]{new AttributeReward(AwardType.MANA, 0.025f)})
+//    		.offset(-4, 3);
     	
 //    	new NostrumQuest("con", QuestType.REGULAR, 0,
 //    			0, // Control
@@ -1825,25 +1838,25 @@ public class NostrumMagica
 		NostrumResearch.startBuilding()
 			.parent("enchanted_armor")
 			.reference("ritual::spawn_enchanted_weapon", "ritual.spawn_enchanted_weapon.name")
-		.build("enchanted_weapons", NostrumResearchTab.OUTFITTING, Size.NORMAL, -1, 1, true, new ItemStack(EnchantedWeapon.get(EMagicElement.WIND, 2)));
+		.build("enchanted_weapons", NostrumResearchTab.OUTFITTING, Size.LARGE, -1, 1, true, new ItemStack(EnchantedWeapon.get(EMagicElement.WIND, 2)));
 		
 		NostrumResearch.startBuilding()
 			.hiddenParent("rituals")
 			.quest("lvl4")
 			.reference("ritual::spawn_enchanted_armor", "ritual.spawn_enchanted_armor.name")
-		.build("enchanted_armor", NostrumResearchTab.OUTFITTING, Size.LARGE, -2, 0, true, new ItemStack(EnchantedArmor.get(EMagicElement.FIRE, EntityEquipmentSlot.CHEST, 2)));
+		.build("enchanted_armor", NostrumResearchTab.OUTFITTING, Size.GIANT, -2, 0, true, new ItemStack(EnchantedArmor.get(EMagicElement.FIRE, EntityEquipmentSlot.CHEST, 2)));
 		
 		NostrumResearch.startBuilding()
 			.parent("enchanted_armor")
-			.hiddenParent(baubles.isEnabled() ? "magic_belts" : "origin")
+			.parent(baubles.isEnabled() ? "belts" : "origin")
 			.reference("ritual::mirror_shield", "ritual.mirror_shield.name")
-		.build("mirror_shield", NostrumResearchTab.OUTFITTING, Size.LARGE, -3, 1, true, new ItemStack(MirrorShield.instance()));
+		.build("mirror_shield", NostrumResearchTab.OUTFITTING, Size.LARGE, -3, 3, true, new ItemStack(MirrorShield.instance()));
 		
 		NostrumResearch.startBuilding()
 			.parent("mirror_shield")
 			.lore(MirrorShield.instance())
 			.reference("ritual::true_mirror_shield", "ritual.true_mirror_shield.name")
-		.build("true_mirror_shield", NostrumResearchTab.OUTFITTING, Size.NORMAL, -3, 2, false, new ItemStack(MirrorShieldImproved.instance()));
+		.build("true_mirror_shield", NostrumResearchTab.OUTFITTING, Size.NORMAL, -3, 4, false, new ItemStack(MirrorShieldImproved.instance()));
 		
 		NostrumResearch.startBuilding()
 			.hiddenParent("rituals")
@@ -1927,6 +1940,12 @@ public class NostrumMagica
     public void reloadDefaultResearch() {
     	NostrumResearch.ClearAllResearch();
     	registerDefaultResearch();
+    	if (baubles.isEnabled()) {
+    		baubles.reinitResearch();
+    	}
+    	if (aetheria.isEnabled()) {
+    		aetheria.reinitResearch();
+    	}
     	NostrumResearch.Validate();
     }
     

@@ -15,6 +15,7 @@ import org.lwjgl.opengl.GL11;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.capabilities.NostrumMagic;
 import com.smanzana.nostrummagica.client.gui.book.BookScreen;
 import com.smanzana.nostrummagica.client.gui.book.IBookPage;
 import com.smanzana.nostrummagica.client.gui.book.ReferencePage;
@@ -39,7 +40,6 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.utils.Curves;
-import com.smanzana.nostrummagica.utils.OpenGLDebugging;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -141,6 +141,8 @@ public class MirrorGui extends GuiScreen {
 	private int researchPoints;
 	private List<ILoreTagged> lore;
 	private List<String> questsCompleted;
+	private int knowledge;
+	private int maxKnowledge;
 	private boolean unlocked;
 	private String unlockPrompt;
 	
@@ -200,6 +202,8 @@ public class MirrorGui extends GuiScreen {
 		this.control = attr.getControl();
 		this.finesse = attr.getFinesse();
 		this.lore = attr.getAllLore();
+		this.knowledge = NostrumMagic.getKnowledge(attr);
+		this.maxKnowledge = NostrumMagic.KnowledgeCurves.maxKnowledge(NostrumMagic.KnowledgeCurves.knowledgeLevel(knowledge) + 1);
 		refreshQuests(attr);
 	}
 	
@@ -436,11 +440,19 @@ public class MirrorGui extends GuiScreen {
 		
 		int y = topOffset + TEXT_BOTTOM_VOFFSET + BUTTON_MINOR_HEIGHT + 10;
 		int centerX = leftOffset + (TEXT_WIDTH / 2);
-		int width = 100;
-		Gui.drawRect(centerX - (width/2), y - 2, centerX + (width / 2), y + fontRendererObj.FONT_HEIGHT + 2, 0xD0000000);
+		int width = 200;
+		Gui.drawRect(centerX - (width/2), y - 4, centerX + (width / 2), y + fontRendererObj.FONT_HEIGHT + 2, 0xD0000000);
 		String str = "Points: " + researchPoints;
 		width = fontRendererObj.getStringWidth(str);
 		this.fontRendererObj.drawString(str, centerX - (width/2), y, 0xFFFFFFFF);
+		
+		width = 200;
+		int knowledgeHeight = 4;
+		y += fontRendererObj.FONT_HEIGHT + 2;
+		int x = Math.round(((float) knowledge / (float) maxKnowledge) * (float) width);
+		Gui.drawRect(centerX - (width/2), y, centerX + (width / 2), y + 2 + knowledgeHeight, 0xFF555555);
+		Gui.drawRect(centerX - (width/2) + 1, y + 1, centerX + (width / 2) - 1, y + 1 + knowledgeHeight, 0xFF000000);
+		Gui.drawRect(centerX - (width/2) + 1, y + 1, centerX - (width/2) + 1 + x, y + 1 + knowledgeHeight, 0xFFFFFF00);
 		
 		for (int i = 0; i < this.buttonList.size(); ++i) {
 			GuiButton button = (GuiButton)this.buttonList.get(i);
@@ -606,20 +618,22 @@ public class MirrorGui extends GuiScreen {
 			drawLockedScreenForeground(mouseX, mouseY, partialTicks);
 		}
 		
-		// Draw major tab buttons
-		tabCharacter.drawButton(mc, mouseX, mouseY);
-		tabResearch.drawButton(mc, mouseX, mouseY);
-		if (this.currentInfoScreen == null) {
-			tabCharacter.drawOverlay(mc, mouseX, mouseY);
-			tabResearch.drawOverlay(mc, mouseX, mouseY);
-		}
-		
-		
-		if (this.currentInfoScreen != null) {
-			GlStateManager.pushMatrix();
-			GlStateManager.translate(0, 0, 500);
-			drawResearchPages(mouseX, mouseY, partialTicks);
-			GlStateManager.popMatrix();
+		if (unlocked) {
+			// Draw major tab buttons
+			tabCharacter.drawButton(mc, mouseX, mouseY);
+			tabResearch.drawButton(mc, mouseX, mouseY);
+			if (this.currentInfoScreen == null) {
+				tabCharacter.drawOverlay(mc, mouseX, mouseY);
+				tabResearch.drawOverlay(mc, mouseX, mouseY);
+			}
+			
+			
+			if (this.currentInfoScreen != null) {
+				GlStateManager.pushMatrix();
+				GlStateManager.translate(0, 0, 500);
+				drawResearchPages(mouseX, mouseY, partialTicks);
+				GlStateManager.popMatrix();
+			}
 		}
 
 		GlStateManager.popMatrix();
@@ -865,6 +879,10 @@ public class MirrorGui extends GuiScreen {
 	
 	@Override
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+		
+		if (!unlocked) {
+			return;
+		}
 		
 		if (this.currentInfoScreen != null) {
 			this.currentInfoScreen.mouseClicked(mouseX, mouseY, mouseButton);
@@ -1373,11 +1391,6 @@ public class MirrorGui extends GuiScreen {
 			
 			float alpha = (float) (this.animStartMS == 0 ? 1 : ((double)(System.currentTimeMillis() - animStartMS) / 500.0));
 			
-			if (!toggle) {
-				OpenGLDebugging.dumpAllIsEnabled();
-				toggle = true;
-			}
-			
 			GlStateManager.pushMatrix();
 			VertexBuffer buf = Tessellator.getInstance().getBuffer();
 	        GlStateManager.enableBlend();
@@ -1699,6 +1712,4 @@ public class MirrorGui extends GuiScreen {
 		seenResearch = null;
 		newResearch = null;
 	}
-	
-	private static boolean toggle = false; int unused;
 }

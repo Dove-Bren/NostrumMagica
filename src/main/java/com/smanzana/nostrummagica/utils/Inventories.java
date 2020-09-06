@@ -159,7 +159,7 @@ public class Inventories {
 	}
 	
 	// TODO make a pool of these and implement a 'set' interface to avoid allocating and deallocing these
-	public static final class ItemStackArrayWrapper implements IInventory {
+	public static class ItemStackArrayWrapper implements IInventory {
 
 		private final ItemStack[] array;
 		
@@ -194,19 +194,23 @@ public class Inventories {
 
 		@Override
 		public ItemStack decrStackSize(int index, int count) {
-			return ItemStackHelper.getAndSplit(array, index, count);
+			ItemStack split =  ItemStackHelper.getAndSplit(array, index, count);
+			markDirty();
+			return split;
 		}
 
 		@Override
 		public ItemStack removeStackFromSlot(int index) {
 			ItemStack stack = array[index];
 			array[index] = null;
+			markDirty();
 			return stack;
 		}
 
 		@Override
 		public void setInventorySlotContents(int index, ItemStack stack) {
 			array[index] = stack;
+			markDirty();
 		}
 
 		@Override
@@ -259,6 +263,7 @@ public class Inventories {
 			for (int i = 0; i < array.length; i++) {
 				array[i] = null;
 			}
+			markDirty();
 		}
 		
 	}

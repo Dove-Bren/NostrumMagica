@@ -4,6 +4,7 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
+import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
@@ -14,8 +15,10 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemFlintAndSteel;
@@ -42,7 +45,17 @@ public class Candle extends Block implements ITileEntityProvider {
 
 	public static String ID = "nostrum_candle";
 	public static PropertyBool LIT = PropertyBool.create("lit");
-	protected static final AxisAlignedBB CANDLE_AABB = new AxisAlignedBB(0.375D, 0.0D, 0.375D, 0.625D, 0.5D, 0.625D);
+	protected static final AxisAlignedBB CANDLE_AABB = new AxisAlignedBB(0.4375D, 0.0D, 0.4375D, 0.5625D, 0.5D, 0.5625D);
+	protected static final AxisAlignedBB CANDLE_E_AABB = new AxisAlignedBB(0.0D, 0.35D, 0.4375D, 0.25D, 0.85D, 0.5625D);
+	protected static final AxisAlignedBB CANDLE_N_AABB = new AxisAlignedBB(0.4375D, 0.35D, 0.75D, 0.5625D, 0.85D, 1D);
+	protected static final AxisAlignedBB CANDLE_W_AABB = new AxisAlignedBB(0.75D, 0.35D, 0.4375D, 1D, 0.85D, 0.5625D);
+	protected static final AxisAlignedBB CANDLE_S_AABB = new AxisAlignedBB(0.4375D, 0.35D, 0D, 0.5625D, 0.85D, 0.25D);
+	
+	public static final PropertyDirection FACING = PropertyDirection.create("facing", new Predicate<EnumFacing>() {
+		public boolean apply(@Nullable EnumFacing facing) {
+			return facing != EnumFacing.DOWN;
+		}
+	});
 	
 	private static Candle instance = null;
 	public static Candle instance() {
@@ -84,12 +97,38 @@ public class Candle extends Block implements ITileEntityProvider {
 	
 	@Override
 	public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
-		return worldIn.getBlockState(pos.down()).isFullBlock();
+		for (EnumFacing enumfacing : FACING.getAllowedValues()) {
+			if (worldIn.getBlockState(pos.offset(enumfacing.getOpposite())).isSideSolid(worldIn, pos.offset(enumfacing), enumfacing)) {
+				return true;
+			}
+		}
+
+        return false;
+	}
+	
+	@Override
+	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, ItemStack stack) {
+		return this.getDefaultState().withProperty(FACING, facing);
 	}
 	
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-		return CANDLE_AABB;
+		EnumFacing facing = state.getValue(FACING);
+		switch (facing) {
+		case EAST:
+			return CANDLE_E_AABB;
+		case NORTH:
+			return CANDLE_N_AABB;
+		case SOUTH:
+			return CANDLE_S_AABB;
+		case WEST:
+			return CANDLE_W_AABB;
+		case UP:
+		case DOWN:
+		default:
+			return CANDLE_AABB;
+		}
+		
 	}
 	
 	@Override
@@ -124,18 +163,19 @@ public class Candle extends Block implements ITileEntityProvider {
 	
 	@Override
 	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, LIT);
+		return new BlockStateContainer(this, LIT, FACING);
 	}
 	
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
 		boolean lit = ((meta & 0x1) == 1);
-		return getDefaultState().withProperty(LIT, lit);
+		EnumFacing facing = EnumFacing.VALUES[(meta >> 1) & 7];
+		return getDefaultState().withProperty(LIT, lit).withProperty(FACING, facing);
 	}
 	
 	@Override
 	public int getMetaFromState(IBlockState state) {
-		return (state.getValue(LIT) ? 1 : 0);
+		return (state.getValue(LIT) ? 1 : 0) | (state.getValue(FACING).ordinal() << 1);
 	}
 	
 //    @Override
@@ -201,10 +241,36 @@ public class Candle extends Block implements ITileEntityProvider {
 		if (null == stateIn || !stateIn.getValue(LIT))
 			return;
 		
+		EnumFacing facing = stateIn.getValue(FACING);
 		double d0 = (double)pos.getX() + 0.5D;
-        double d1 = (double)pos.getY() + 0.6D;
-        double d2 = (double)pos.getZ() + 0.5D;
-
+		double d1 = (double)pos.getY() + 0.6D;
+		double d2 = (double)pos.getZ() + 0.5D;
+		
+		final double hangOffset = .3;
+		
+		switch (facing) {
+		case EAST:
+			d0 -= hangOffset;
+			d1 += .35;
+	        break;
+		case NORTH:
+			d2 += hangOffset;
+			d1 += .35;
+	        break;
+		case SOUTH:
+	        d2 -= hangOffset;
+			d1 += .35;
+	        break;
+		case WEST:
+			d0 += hangOffset;
+			d1 += .35;
+	        break;
+		case UP:
+		case DOWN:
+		default:
+	        break;
+		}
+		
         worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d0, d1, d2, 0.0D, 0.0D, 0.0D, new int[0]);
         worldIn.spawnParticle(EnumParticleTypes.FLAME, d0, d1, d2, 0.0D, 0.0D, 0.0D, new int[0]);
 	}

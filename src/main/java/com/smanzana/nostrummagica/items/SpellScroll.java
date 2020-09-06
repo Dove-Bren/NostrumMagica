@@ -64,7 +64,7 @@ public class SpellScroll extends Item implements ILoreTagged {
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setMaxStackSize(1);
 		this.setHasSubtypes(true);
-		this.setMaxDamage(20);
+		this.setMaxDamage(15);
 	}
 	
 	@Override

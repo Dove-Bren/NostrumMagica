@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.google.common.collect.Lists;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.AltarBlock;
 import com.smanzana.nostrummagica.blocks.AltarBlock.AltarTileEntity;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
@@ -353,6 +354,7 @@ public class RoomLectern extends StaticRoom {
 			ItemStack scroll = new ItemStack(SpellScroll.instance(), 1);
 			Spell spell =  genSpell(world.rand);
 			SpellScroll.setSpell(scroll, spell);
+			scroll.setItemDamage(NostrumMagica.rand.nextInt(10));
 			
 			// Set description
 			NBTTagCompound nbt = scroll.getTagCompound();

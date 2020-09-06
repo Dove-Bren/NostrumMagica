@@ -11,15 +11,13 @@ import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
-import com.smanzana.nostrummagica.quests.NostrumQuest;
-import com.smanzana.nostrummagica.quests.NostrumQuest.QuestType;
-import com.smanzana.nostrummagica.quests.rewards.AttributeReward;
-import com.smanzana.nostrummagica.quests.rewards.AttributeReward.AwardType;
-import com.smanzana.nostrummagica.quests.rewards.IReward;
+import com.smanzana.nostrummagica.research.NostrumResearch;
+import com.smanzana.nostrummagica.research.NostrumResearch.NostrumResearchTab;
+import com.smanzana.nostrummagica.research.NostrumResearch.Size;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
-import com.smanzana.nostrummagica.rituals.requirements.RRequirementQuest;
+import com.smanzana.nostrummagica.rituals.requirements.RRequirementResearch;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -60,6 +58,8 @@ public class BaublesProxy {
 			return false;
 		}
 		
+		registerBaubleResearch();
+		
 		return true;
 	}
 	
@@ -80,59 +80,59 @@ public class BaublesProxy {
 	}
 	
 	private void registerBaubleQuests() {
-		new NostrumQuest("ribbons", QuestType.CHALLENGE, 3,
-    			0, // Control
-    			0, // Technique
-    			0, // Finesse
-    			new String[0],
-    			null, null,
-    			new IReward[]{new AttributeReward(AwardType.REGEN, 0.015f)})
-    		.offset(2, -1);
-		
-		new NostrumQuest("ribbons_enhanced", QuestType.CHALLENGE, 6,
-    			0, // Control
-    			0, // Technique
-    			0, // Finesse
-    			new String[] {"ribbons"},
-    			null, null,
-    			new IReward[]{new AttributeReward(AwardType.MANA, 0.02f)})
-    		.offset(3, 2);
-		
-		new NostrumQuest("rings", QuestType.CHALLENGE, 4,
-    			0, // Control
-    			0, // Technique
-    			0, // Finesse
-    			new String[] {"ribbons"},
-    			null, null,
-    			new IReward[]{new AttributeReward(AwardType.REGEN, 0.025f)})
-    		.offset(2, 1);
-		
-		new NostrumQuest("rings_true", QuestType.CHALLENGE, 7,
-    			0, // Control
-    			0, // Technique
-    			0, // Finesse
-    			new String[] {"rings"},
-    			null, null,
-    			new IReward[]{new AttributeReward(AwardType.REGEN, 0.025f)})
-    		.offset(3, 4);
-		
-		new NostrumQuest("rings_corrupted", QuestType.CHALLENGE, 8,
-    			0, // Control
-    			0, // Technique
-    			0, // Finesse
-    			new String[] {"rings_true"},
-    			null, null,
-    			new IReward[]{new AttributeReward(AwardType.REGEN, 0.05f)})
-    		.offset(4, 5);
-		
-		new NostrumQuest("belts", QuestType.CHALLENGE, 5,
-    			0, // Control
-    			0, // Technique
-    			0, // Finesse
-    			new String[] {"rings"},
-    			null, null,
-    			new IReward[]{new AttributeReward(AwardType.REGEN, 0.025f)})
-    		.offset(2, 3);
+//		new NostrumQuest("ribbons", QuestType.CHALLENGE, 3,
+//    			0, // Control
+//    			0, // Technique
+//    			0, // Finesse
+//    			new String[0],
+//    			null, null,
+//    			new IReward[]{new AttributeReward(AwardType.REGEN, 0.015f)})
+//    		.offset(2, -1);
+//		
+//		new NostrumQuest("ribbons_enhanced", QuestType.CHALLENGE, 6,
+//    			0, // Control
+//    			0, // Technique
+//    			0, // Finesse
+//    			new String[] {"ribbons"},
+//    			null, null,
+//    			new IReward[]{new AttributeReward(AwardType.MANA, 0.02f)})
+//    		.offset(3, 2);
+//		
+//		new NostrumQuest("rings", QuestType.CHALLENGE, 4,
+//    			0, // Control
+//    			0, // Technique
+//    			0, // Finesse
+//    			new String[] {"ribbons"},
+//    			null, null,
+//    			new IReward[]{new AttributeReward(AwardType.REGEN, 0.025f)})
+//    		.offset(2, 1);
+//		
+//		new NostrumQuest("rings_true", QuestType.CHALLENGE, 7,
+//    			0, // Control
+//    			0, // Technique
+//    			0, // Finesse
+//    			new String[] {"rings"},
+//    			null, null,
+//    			new IReward[]{new AttributeReward(AwardType.REGEN, 0.025f)})
+//    		.offset(3, 4);
+//		
+//		new NostrumQuest("rings_corrupted", QuestType.CHALLENGE, 8,
+//    			0, // Control
+//    			0, // Technique
+//    			0, // Finesse
+//    			new String[] {"rings_true"},
+//    			null, null,
+//    			new IReward[]{new AttributeReward(AwardType.REGEN, 0.05f)})
+//    		.offset(4, 5);
+//		
+//		new NostrumQuest("belts", QuestType.CHALLENGE, 5,
+//    			0, // Control
+//    			0, // Technique
+//    			0, // Finesse
+//    			new String[] {"rings"},
+//    			null, null,
+//    			new IReward[]{new AttributeReward(AwardType.REGEN, 0.025f)})
+//    		.offset(2, 3);
 		
 	}
 	
@@ -145,7 +145,7 @@ public class BaublesProxy {
 				new ReagentType[] {ReagentType.MANI_DUST, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK},
 				NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1),
 				new ItemStack[] {new ItemStack(Items.GOLD_NUGGET), new ItemStack(Item.getItemFromBlock(Blocks.WOOL)), new ItemStack(Item.getItemFromBlock(Blocks.WOOL)), new ItemStack(Items.GOLD_NUGGET)},
-				new RRequirementQuest("ribbons"),
+				new RRequirementResearch("ribbons"),
 				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.RIBBON_SMALL, 1)));
 		RitualRegistry.instance().addRitual(recipe);
 		
@@ -155,7 +155,7 @@ public class BaublesProxy {
 				new ReagentType[] {ReagentType.MANI_DUST, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK},
 				ItemMagicBauble.getItem(ItemType.RIBBON_SMALL, 1),
 				new ItemStack[] {new ItemStack(Items.GOLD_INGOT), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), null, new ItemStack(Items.GOLD_INGOT)},
-				new RRequirementQuest("ribbons"),
+				new RRequirementResearch("ribbons"),
 				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.RIBBON_MEDIUM, 1)));
 		RitualRegistry.instance().addRitual(recipe);
 		
@@ -165,7 +165,7 @@ public class BaublesProxy {
 				new ReagentType[] {ReagentType.MANI_DUST, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK},
 				ItemMagicBauble.getItem(ItemType.RIBBON_MEDIUM, 1),
 				new ItemStack[] {new ItemStack(Items.DIAMOND), NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), new ItemStack(Items.EMERALD), new ItemStack(Items.DIAMOND)},
-				new RRequirementQuest("ribbons"),
+				new RRequirementResearch("ribbons"),
 				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.RIBBON_LARGE, 1)));
 		RitualRegistry.instance().addRitual(recipe);
 		
@@ -175,7 +175,7 @@ public class BaublesProxy {
 				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST},
 				ItemMagicBauble.getItem(ItemType.RIBBON_LARGE, 1),
 				new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), NostrumResourceItem.getItem(ResourceType.SLAB_FIERCE, 1), new ItemStack(Items.DIAMOND), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1)},
-				new RRequirementQuest("ribbons_enhanced"),
+				new RRequirementResearch("ribbons_enhanced"),
 				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.RIBBON_FIERCE, 1)));
 		RitualRegistry.instance().addRitual(recipe);
 		
@@ -185,7 +185,7 @@ public class BaublesProxy {
 				new ReagentType[] {ReagentType.SKY_ASH, ReagentType.CRYSTABLOOM, ReagentType.SKY_ASH, ReagentType.CRYSTABLOOM},
 				ItemMagicBauble.getItem(ItemType.RIBBON_LARGE, 1),
 				new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), NostrumResourceItem.getItem(ResourceType.SLAB_KIND, 1), new ItemStack(Items.EMERALD), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1)},
-				new RRequirementQuest("ribbons_enhanced"),
+				new RRequirementResearch("ribbons_enhanced"),
 				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.RIBBON_KIND, 1)));
 		RitualRegistry.instance().addRitual(recipe);
 		
@@ -195,7 +195,7 @@ public class BaublesProxy {
 				new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.GINSENG, ReagentType.SPIDER_SILK, ReagentType.SPIDER_SILK},
 				InfusedGemItem.instance().getGem(EMagicElement.ENDER, 1),
 				new ItemStack[] {new ItemStack(Items.LEATHER), new ItemStack(Items.LEATHER), new ItemStack(Items.LEATHER), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1)},
-				new RRequirementQuest("belts"),
+				new RRequirementResearch("belts"),
 				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.BELT_ENDER, 1)));
 		RitualRegistry.instance().addRitual(recipe);
 		
@@ -205,7 +205,7 @@ public class BaublesProxy {
 				new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.BLACK_PEARL, ReagentType.SPIDER_SILK, ReagentType.SPIDER_SILK},
 				InfusedGemItem.instance().getGem(EMagicElement.LIGHTNING, 1),
 				new ItemStack[] {new ItemStack(Items.LEATHER), new ItemStack(Items.LEATHER), new ItemStack(Items.LEATHER), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1)},
-				new RRequirementQuest("belts"),
+				new RRequirementResearch("belts"),
 				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.BELT_LIGHTNING, 1)));
 		RitualRegistry.instance().addRitual(recipe);
 		
@@ -215,7 +215,7 @@ public class BaublesProxy {
 				new ReagentType[] {ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST},
 				new ItemStack(Items.GOLD_INGOT),
 				new ItemStack[] {new ItemStack(Items.GOLD_NUGGET), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), new ItemStack(Items.GOLD_NUGGET), new ItemStack(Items.GOLD_NUGGET)},
-				new RRequirementQuest("rings"),
+				new RRequirementResearch("rings"),
 				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.RING_GOLD, 1)));
 		RitualRegistry.instance().addRitual(recipe);
 		
@@ -225,7 +225,7 @@ public class BaublesProxy {
 				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANDRAKE_ROOT, ReagentType.CRYSTABLOOM, ReagentType.BLACK_PEARL},
 				ItemMagicBauble.getItem(ItemType.RING_GOLD, 1),
 				new ItemStack[] {new ItemStack(Items.GOLD_INGOT), NostrumResourceItem.getItem(ResourceType.SLAB_FIERCE, 1), null, new ItemStack(Items.GOLD_INGOT)},
-				new RRequirementQuest("rings_true"),
+				new RRequirementResearch("rings_true"),
 				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.RING_GOLD_TRUE, 1)));
 		RitualRegistry.instance().addRitual(recipe);
 		
@@ -235,7 +235,7 @@ public class BaublesProxy {
 				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANDRAKE_ROOT, ReagentType.CRYSTABLOOM, ReagentType.BLACK_PEARL},
 				ItemMagicBauble.getItem(ItemType.RING_GOLD, 1),
 				new ItemStack[] {new ItemStack(Items.GOLD_INGOT), NostrumResourceItem.getItem(ResourceType.SLAB_KIND, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), new ItemStack(Items.GOLD_INGOT)},
-				new RRequirementQuest("rings_corrupted"),
+				new RRequirementResearch("rings_corrupted"),
 				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.RING_GOLD_CORRUPTED, 1)));
 		RitualRegistry.instance().addRitual(recipe);
 		
@@ -255,7 +255,7 @@ public class BaublesProxy {
 				new ReagentType[] {ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST},
 				silver,
 				new ItemStack[] {silver, NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), silver, silver},
-				new RRequirementQuest("rings"),
+				new RRequirementResearch("rings"),
 				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.RING_SILVER, 1)));
 		RitualRegistry.instance().addRitual(recipe);
 		
@@ -265,7 +265,7 @@ public class BaublesProxy {
 				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANDRAKE_ROOT, ReagentType.CRYSTABLOOM, ReagentType.BLACK_PEARL},
 				ItemMagicBauble.getItem(ItemType.RING_SILVER, 1),
 				new ItemStack[] {silver, NostrumResourceItem.getItem(ResourceType.SLAB_KIND, 1), silver, silver},
-				new RRequirementQuest("rings_true"),
+				new RRequirementResearch("rings_true"),
 				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.RING_SILVER_TRUE, 1)));
 		RitualRegistry.instance().addRitual(recipe);
 		
@@ -275,7 +275,7 @@ public class BaublesProxy {
 				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANDRAKE_ROOT, ReagentType.CRYSTABLOOM, ReagentType.BLACK_PEARL},
 				ItemMagicBauble.getItem(ItemType.RING_SILVER, 1),
 				new ItemStack[] {silver, NostrumResourceItem.getItem(ResourceType.SLAB_FIERCE, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), silver},
-				new RRequirementQuest("rings_corrupted"),
+				new RRequirementResearch("rings_corrupted"),
 				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.RING_SILVER_CORRUPTED, 1)));
 		RitualRegistry.instance().addRitual(recipe);
 		
@@ -285,13 +285,61 @@ public class BaublesProxy {
 				new ReagentType[] {ReagentType.SKY_ASH, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.SKY_ASH},
 				new ItemStack(Items.GOLD_INGOT),
 				new ItemStack[] {NostrumResourceItem.getItem(ResourceType.SPRITE_CORE, 1), NostrumResourceItem.getItem(ResourceType.SPRITE_CORE, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), NostrumResourceItem.getItem(ResourceType.SPRITE_CORE, 1)},
-				new RRequirementQuest("ribbons"),
+				new RRequirementResearch("ribbons"),
 				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.TRINKET_FLOAT_GUARD, 1)));
 		RitualRegistry.instance().addRitual(recipe);
 	}
 	
+	private void registerBaubleResearch() {
+		NostrumResearch.startBuilding()
+			.parent("enchanted_armor")
+			.lore(NostrumResourceItem.instance())
+			.reference("ritual::small_ribbon", "ritual.small_ribbon.name")
+		.build("ribbons", NostrumResearchTab.OUTFITTING, Size.NORMAL, -3, 0, true, ItemMagicBauble.getItem(ItemType.RIBBON_SMALL, 1));
+		
+		NostrumResearch.startBuilding()
+			.parent("ribbons")
+			.hiddenParent("vani")
+			.reference("ritual::mana_ribbon", "ritual.mana_ribbon.name")
+			.reference("ritual::jeweled_ribbon", "ritual.jeweled_ribbon.name")
+			.reference("ritual::fierce_ribbon", "ritual.fierce_ribbon.name")
+			.reference("ritual::kind_ribbon", "ritual.kind_ribbon.name")
+		.build("ribbons_enhanced", NostrumResearchTab.OUTFITTING, Size.NORMAL, -3, 1, true, ItemMagicBauble.getItem(ItemType.RIBBON_LARGE, 1));
+		
+		NostrumResearch.startBuilding()
+			.parent("ribbons")
+			.reference("ritual::ring_gold", "ritual.ring_gold.name")
+			.reference("ritual::ring_silver", "ritual.ring_silver.name")
+		.build("rings", NostrumResearchTab.OUTFITTING, Size.NORMAL, -4, 0, true, ItemMagicBauble.getItem(ItemType.RING_GOLD, 1));
+		
+		NostrumResearch.startBuilding()
+			.parent("rings")
+			.hiddenParent("kind_infusion")
+			.hiddenParent("fierce_infusion")
+			.reference("ritual::ring_gold_true", "ritual.ring_gold_true.name")
+			.reference("ritual::ring_silver_true", "ritual.ring_silver_true.name")
+		.build("rings_true", NostrumResearchTab.OUTFITTING, Size.NORMAL, -4, 1, true, ItemMagicBauble.getItem(ItemType.RING_GOLD_TRUE, 1));
+		
+		NostrumResearch.startBuilding()
+			.parent("rings_true")
+			.reference("ritual::ring_gold_corrupted", "ritual.ring_gold_corrupted.name")
+			.reference("ritual::ring_silver_corrupted", "ritual.ring_silver_corrupted.name")
+		.build("rings_corrupted", NostrumResearchTab.OUTFITTING, Size.NORMAL, -4, 2, true, ItemMagicBauble.getItem(ItemType.RING_GOLD_CORRUPTED, 1));
+		
+		NostrumResearch.startBuilding()
+			.parent("rings")
+			.hiddenParent("kani")
+			.reference("ritual::belt_ender", "ritual.belt_ender.name")
+			.reference("ritual::belt_lightning", "ritual.belt_lightning.name")
+		.build("belts", NostrumResearchTab.OUTFITTING, Size.NORMAL, -5, 0, true, ItemMagicBauble.getItem(ItemType.BELT_ENDER, 1));
+	}
+	
 	private void registerLore() {
 		LoreRegistry.instance().register(ItemMagicBauble.instance());
+	}
+	
+	public void reinitResearch() {
+		registerBaubleResearch();
 	}
 	
 	public IInventory getBaubles(EntityPlayer player) {
