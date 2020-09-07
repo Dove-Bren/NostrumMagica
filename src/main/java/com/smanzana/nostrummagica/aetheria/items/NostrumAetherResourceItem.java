@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.aetheria.items;
 
 import java.util.List;
 
+import com.smanzana.nostrumaetheria.api.item.IAetherBurnable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -25,7 +26,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * @author Skyler
  *
  */
-public class NostrumAetherResourceItem extends Item implements ILoreTagged {
+public class NostrumAetherResourceItem extends Item implements ILoreTagged, IAetherBurnable {
 
 	public static final String ID = "nostrum_aether_resource";
 	
@@ -188,5 +189,30 @@ public class NostrumAetherResourceItem extends Item implements ILoreTagged {
 //		}
 		
 		return EnumActionResult.PASS;
+	}
+
+	@Override
+	public int getBurnTicks(ItemStack stack) {
+		AetherResourceType type = getTypeFromMeta(stack.getMetadata());
+		switch (type) {
+		case FLOWER_GINSENG:
+		case FLOWER_MANDRAKE:
+			return 300;
+		}
+		
+		return 0;
+	}
+
+	@Override
+	public float getAetherYield(ItemStack stack) {
+		AetherResourceType type = getTypeFromMeta(stack.getMetadata());
+		switch (type) {
+		case FLOWER_GINSENG:
+			return 300;
+		case FLOWER_MANDRAKE:
+			return 250;
+		}
+		
+		return 0;
 	}
 }

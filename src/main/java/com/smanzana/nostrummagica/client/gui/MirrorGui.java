@@ -147,6 +147,7 @@ public class MirrorGui extends GuiScreen {
 	private String unlockPrompt;
 	
 	private static boolean isCharacter = true; // static so we go back to the last one the next time you open it up :)
+	private static NostrumResearchTab currentTab = NostrumResearchTab.MAGICA;
 	
 	private static Set<NostrumResearch> newResearch = null;
 	private static Set<NostrumResearch> seenResearch = null;
@@ -158,7 +159,6 @@ public class MirrorGui extends GuiScreen {
 	private MajorTabButton tabResearch;
 	private Map<NostrumResearchTab, ResearchTabButton> tabButtons;
 	
-	private NostrumResearchTab currentTab = NostrumResearchTab.MAGICA;
 	private BookScreen currentInfoScreen = null;
 	
 	private static final int guiScale = BUTTON_QUEST_WIDTH + 8;
@@ -231,8 +231,8 @@ public class MirrorGui extends GuiScreen {
 		final int GUI_HEIGHT = 242;
 		final int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		final int topOffset = (this.height - GUI_HEIGHT) / 2;
-		if (tab != this.currentTab) {
-			this.currentTab = tab;
+		if (tab != currentTab) {
+			currentTab = tab;
 			
 			this.guiX = leftOffset + TEXT_CONTENT_HOFFSET + (int) ((float) TEXT_CONTENT_WIDTH / 2f);
 			this.guiY = topOffset + TEXT_CONTENT_VOFFSET + (int) ((float) TEXT_CONTENT_HEIGHT / 2f);
@@ -821,7 +821,7 @@ public class MirrorGui extends GuiScreen {
 					newResearch.add(research);
 				}
 				
-				if (research.getTab() != this.currentTab) {
+				if (research.getTab() != currentTab) {
 					if (!newResearch.contains(research)) {
 						research.getTab().markHasNew();
 						newResearch.add(research);

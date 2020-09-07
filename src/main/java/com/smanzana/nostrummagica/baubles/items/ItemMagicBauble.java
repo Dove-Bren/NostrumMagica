@@ -197,7 +197,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 			btype = BaubleType.RING;
 			break;
 		case TRINKET_FLOAT_GUARD:
-			btype = BaubleType.TRINKET;
+			btype = BaubleType.CHARM;
 			break;
 		}
 		

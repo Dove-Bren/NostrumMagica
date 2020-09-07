@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.items;
 
 import java.util.List;
 
+import com.smanzana.nostrumaetheria.api.item.IAetherBurnable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower.Type;
@@ -26,7 +27,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ReagentItem extends Item implements ILoreTagged {
+public class ReagentItem extends Item implements ILoreTagged, IAetherBurnable {
 
 	public static enum ReagentType implements IStringSerializable {
 		// Do not rearrange.
@@ -220,5 +221,15 @@ public class ReagentItem extends Item implements ILoreTagged {
 	@Override
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_REAGENTS;
+	}
+
+	@Override
+	public int getBurnTicks(ItemStack stack) {
+		return 100;
+	}
+
+	@Override
+	public float getAetherYield(ItemStack stack) {
+		return 100f;
 	}
 }
