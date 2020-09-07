@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.client.effects;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -16,6 +17,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public interface ClientEffectForm {
 	
 	public static void drawModel(IBakedModel model, int color) {
+		GlStateManager.disableBlend();
+		GlStateManager.disableAlpha();
+		GlStateManager.enableBlend();
+		GlStateManager.enableAlpha();
+		GlStateManager.enableTexture2D();
+		
 		List<BakedQuad> listQuads = model.getQuads(null, null, 0);
 		Tessellator tessellator = Tessellator.getInstance();
         VertexBuffer vertexbuffer = tessellator.getBuffer();

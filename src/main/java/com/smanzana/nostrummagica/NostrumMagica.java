@@ -1755,6 +1755,7 @@ public class NostrumMagica
 		NostrumResearch.startBuilding()
 			.hiddenParent("spellcraft")
 			.hiddenParent("rituals")
+			.reference("ritual::lore_table", "ritual.lore_table.name")
 		.build("loretable", NostrumResearchTab.MAGICA, Size.NORMAL, -2, -1, true, new ItemStack(LoreTable.instance()));
 		
 		

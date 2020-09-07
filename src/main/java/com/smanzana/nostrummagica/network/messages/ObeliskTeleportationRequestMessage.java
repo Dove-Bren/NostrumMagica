@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.network.messages;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumObelisk;
+import com.smanzana.nostrummagica.blocks.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
@@ -11,6 +12,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -117,9 +119,30 @@ public class ObeliskTeleportationRequestMessage implements IMessage {
 				player.addChatComponentMessage(new TextComponentTranslation("info.obelisk.dne"));
 				return false;
 			}
+			
+			TileEntity te = world.getTileEntity(from);
+			if (te == null || !(te instanceof NostrumObeliskEntity)) {
+				NostrumMagica.logger.error("Something went wrong! Source obelisk does not seem to exist or have the provided target obelisk...");
+				player.addChatComponentMessage(new TextComponentTranslation("info.obelisk.dne"));
+				return false;
+			}
+			
+			NostrumObeliskEntity obelisk = (NostrumObeliskEntity) te;
+			if (!obelisk.deductForTeleport(to)) {
+				NostrumMagica.logger.error("Something went wrong! Source obelisk does not seem to exist or have the provided target obelisk...");
+				player.addChatComponentMessage(new TextComponentTranslation("info.obelisk.aetherfail"));
+				return false;
+			}
 		}
 		
-		if (player.attemptTeleport(to.getX() + .5, to.getY() + 1, to.getZ() + .5)) {
+		BlockPos targ = null;
+		for (BlockPos attempt : new BlockPos[]{to, to.up(), to.north(), to.north().east(), to.north().west(), to.east(), to.west(), to.south(), to.south().east(), to.south().west()}) {
+			if (player.attemptTeleport(attempt.getX() + .5, attempt.getY() + 1, attempt.getZ() + .5)) {
+				targ = attempt;
+				break;
+			}
+		}
+		if (targ != null) {
 			if (from != null)
 				doEffects(world, from);
 				

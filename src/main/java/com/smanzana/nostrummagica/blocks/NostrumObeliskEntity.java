@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.world.NostrumChunkLoader;
 
@@ -15,7 +16,6 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -25,7 +25,7 @@ import net.minecraftforge.common.ForgeChunkManager.Ticket;
 import net.minecraftforge.common.ForgeChunkManager.Type;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class NostrumObeliskEntity extends TileEntity implements ITickable {
+public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	
 	public static class NostrumObeliskTarget {
 		private int dimension;
@@ -90,6 +90,8 @@ public class NostrumObeliskEntity extends TileEntity implements ITickable {
 		}
 	}
 	
+	private static final float AetherPerBlock = 1f / 2f;
+	
 	private boolean master;
 	private List<NostrumObeliskTarget> targets;
 	private Corner corner;
@@ -98,9 +100,11 @@ public class NostrumObeliskEntity extends TileEntity implements ITickable {
 	private boolean isDestructing;
 	
 	public NostrumObeliskEntity() {
+		super(0, 2000);
 		master = false;
 		isDestructing = false;
 		targets = new LinkedList<>();
+		this.compWrapper.configureInOut(true, false);
 	}
 	
 	public NostrumObeliskEntity(boolean master) {
@@ -111,6 +115,13 @@ public class NostrumObeliskEntity extends TileEntity implements ITickable {
 	public NostrumObeliskEntity(Corner corner) {
 		this(false);
 		this.corner = corner;
+	}
+	
+	@Override
+	public void setWorldObj(World worldObj) {
+		super.setWorldObj(worldObj);
+		this.compWrapper.setAutoFill(!worldObj.isRemote);
+		//aetherHandler.setAutoFill(!worldObj.isRemote);
 	}
 	
 	@Override
@@ -173,7 +184,6 @@ public class NostrumObeliskEntity extends TileEntity implements ITickable {
 					this.corner = c;
 			}
 		}
-		
 	}
 	
 	public void destroy() {
@@ -223,12 +233,12 @@ public class NostrumObeliskEntity extends TileEntity implements ITickable {
 	
 	public void addTarget(int dimension, BlockPos pos) {
 		targets.add(new NostrumObeliskTarget(dimension, pos));
-		dirty();
+		forceUpdate();
 	}
 	
 	public void addTarget(int dimension, BlockPos pos, String title) {
 		targets.add(new NostrumObeliskTarget(dimension, pos, title));
-		dirty();
+		forceUpdate();
 	}
 	
 	public List<NostrumObeliskTarget> getTargets() {
@@ -291,15 +301,15 @@ public class NostrumObeliskEntity extends TileEntity implements ITickable {
 		return "nostrum_obelisk_" + pos.getX() + "_" + pos.getY() + "_" + pos.getZ();
 	}
 	
-	private void dirty() {
-		worldObj.markBlockRangeForRenderUpdate(pos, pos);
+	private void forceUpdate() {
 		worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 3);
-		worldObj.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
 		markDirty();
 	}
 
 	@Override
 	public void update() {
+		super.update();
+		
 		if (!worldObj.isRemote)
 			return;
 		if (corner == null || master)
@@ -347,6 +357,23 @@ public class NostrumObeliskEntity extends TileEntity implements ITickable {
 			return pos.add(NostrumObelisk.TILE_OFFSETH, 1, NostrumObelisk.TILE_OFFSETH);
 		}
 		return pos;
+	};
+	
+	/**
+	 * Attempt to pay any secondary fee for teleportation to the provided location.
+	 * This assumes the destination has been checked, etc.
+	 * @param destination
+	 * @return
+	 */
+	public boolean deductForTeleport(BlockPos destination) {
+		double dist = (Math.abs(this.pos.getX() - destination.getX())
+						 + Math.abs(this.pos.getY() - destination.getY())
+						 + Math.abs(this.pos.getZ() - destination.getZ()));
+		//double dist = Math.sqrt(this.pos.distanceSq(destination));
+		
+		int aetherCost = (int) Math.round(AetherPerBlock * dist);
+		
+		return this.compWrapper.checkAndWithdraw(aetherCost);
 	}
 	
 }

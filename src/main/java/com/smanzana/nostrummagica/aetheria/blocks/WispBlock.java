@@ -241,7 +241,7 @@ public class WispBlock extends BlockContainer {
 			ticksExisted = 0;
 			activated = false;
 			this.setAutoSync(5);
-			this.handler.configureInOut(true, false);
+			this.compWrapper.configureInOut(true, false);
 		}
 		
 		public ItemStack getScroll() {
@@ -400,12 +400,12 @@ public class WispBlock extends BlockContainer {
 			// Every tick, consume aether
 			if (!wisps.isEmpty()) {
 				final int debt = AETHER_PER_TICK * getWispCount();
-				if (this.handler.drawAether(null, debt) != debt) {
+				if (this.compWrapper.getHandlerIfPresent().drawAether(null, debt) != debt) {
 					// Didn't have enough. Deactivate!
 					deactivate();
 				} else {
 					// Try to fill up what we just spent
-					this.handler.fillAether(1000);
+					this.compWrapper.getHandlerIfPresent().fillAether(1000);
 				}
 			}
 			
@@ -470,7 +470,7 @@ public class WispBlock extends BlockContainer {
 			super.setWorldObj(world);
 			
 			if (!world.isRemote) {
-				this.handler.setAutoFill(true);
+				this.compWrapper.setAutoFill(true);
 			}
 		}
 		

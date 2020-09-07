@@ -83,10 +83,12 @@ public class ClientEffect {
 		
 		preModHook(detail, progress);
 		
+		GlStateManager.disableBlend();
+		GlStateManager.disableAlpha();
 		GlStateManager.enableBlend();
+		GlStateManager.enableAlpha();
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GlStateManager.disableLighting();
-		GlStateManager.enableAlpha();
 		drawForm(detail, mc, progress, partialTicks);
 		
 		GlStateManager.popAttrib();

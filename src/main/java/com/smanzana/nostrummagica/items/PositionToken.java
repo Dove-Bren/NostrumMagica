@@ -46,12 +46,21 @@ public class PositionToken extends PositionCrystal {
 	
 	@Override
 	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		if (worldIn.isRemote)
+			return EnumActionResult.SUCCESS;
 		
-		return EnumActionResult.PASS;
+		if (pos == null || !playerIn.isCreative())
+			return EnumActionResult.PASS;
+		
+		setPosition(stack, playerIn.dimension, pos);
+		return EnumActionResult.SUCCESS;
 	}
 	
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+		if (playerIn.isCreative()) {
+			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+		}
 		return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
 	}
 

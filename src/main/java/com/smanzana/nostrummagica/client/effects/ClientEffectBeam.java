@@ -34,9 +34,12 @@ public class ClientEffectBeam extends ClientEffect {
 					: 3;
 			final float alphaMax = .15f;
 			Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+			GlStateManager.disableBlend();
+			GlStateManager.disableAlpha();
 			GlStateManager.enableBlend();
 			GlStateManager.enableAlpha();
 			GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+			GlStateManager.enableTexture2D();
 			GlStateManager.disableTexture2D();
 			for (int i = 0; i < detailCount; i++) {
 				float frac = (float) i / (float) detailCount;
