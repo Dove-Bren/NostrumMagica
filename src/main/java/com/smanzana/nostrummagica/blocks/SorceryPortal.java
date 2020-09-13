@@ -61,7 +61,17 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 	
 	@Override
 	protected void teleportEntity(World worldIn, BlockPos portalPos, Entity entityIn) {
-		System.out.println("Teleport!");
+		entityIn.dismountRidingEntity();
+		entityIn.removePassengers();
+		
+		if (!entityIn.getPassengers().isEmpty()) {
+			return;
+		}
+		
+		if (entityIn.isRiding()) {
+			return;
+		}
+		
 		entityIn.setPortal(entityIn.getPosition());
 		if (worldIn.provider.getDimension() != ModConfig.config.sorceryDimensionIndex()) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(entityIn);
@@ -95,15 +105,15 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 		public int getColor() {
 			EntityPlayer player = NostrumMagica.proxy.getPlayer();
 			if (NostrumPortal.getRemainingCooldown(player) > 0) {
-				return 0x00A00050;
+				return 0x00FF0050;
 			}
-			return 0x00500050;
+			return 0x00C00050;
 		}
 
 		@SideOnly(Side.CLIENT)
 		@Override
 		public float getRotationPeriod() {
-			return 3;
+			return 6;
 		}
 
 		@SideOnly(Side.CLIENT)
@@ -118,6 +128,11 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 		
 		
 		
+	}
+
+	@Override
+	protected boolean canTeleport(World worldIn, BlockPos portalPos, Entity entityIn) {
+		return entityIn instanceof EntityPlayer;
 	}
 	
 }

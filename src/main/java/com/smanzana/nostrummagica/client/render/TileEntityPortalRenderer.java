@@ -1,7 +1,5 @@
 package com.smanzana.nostrummagica.client.render;
 
-import java.util.Random;
-
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -15,9 +13,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class TileEntityPortalRenderer extends TileEntitySpecialRenderer<NostrumPortalTileEntityBase> {
@@ -90,40 +86,6 @@ public class TileEntityPortalRenderer extends TileEntitySpecialRenderer<NostrumP
         RenderHelper.enableStandardItemLighting();
         GlStateManager.enableCull();
         GlStateManager.popMatrix();
-        
-        // Create particles
-        if (((int)time) % 2 == 0) {
-        	Random rand = NostrumMagica.rand;
-        	final float horAngle = rand.nextFloat() * (float) (2 * Math.PI);
-        	final float verAngle = (rand.nextFloat()) * (float) (2 * Math.PI);
-        	final float dist = rand.nextFloat() + 2f;
-        	
-        	final double dx = Math.cos(horAngle) * dist;
-        	final double dz = Math.sin(horAngle) * dist;
-        	final double dy = Math.sin(verAngle) * dist;
-        	final BlockPos pos = te.getPos();
-        	
-        	te.getWorld().spawnParticle(EnumParticleTypes.SUSPENDED_DEPTH,
-        			(double)pos.getX() + 0.5D + dx, (double)pos.getY() + 1.0D + dy, (double)pos.getZ() + 0.5D + dz,
-        			(double)((float)dx + rand.nextFloat()) - 0.5D, (double)((float)dy - rand.nextFloat() - 1.0F), (double)((float)dz + rand.nextFloat()) - 0.5D, new int[0]);
-        }
-        
-        if (((int)time) % 10 == 0) {
-        	Random rand = NostrumMagica.rand;
-        	final float horAngle = rand.nextFloat() * (float) (2 * Math.PI);
-        	final float verAngle = (rand.nextFloat()) * (float) (2 * Math.PI);
-        	final float dist = 1f;
-        	
-        	final double dx = Math.cos(horAngle) * dist;
-        	final double dz = Math.sin(horAngle) * dist;
-        	final double dy = Math.sin(verAngle) * dist;
-        	final BlockPos pos = te.getPos();
-        	
-        	te.getWorld().spawnParticle(EnumParticleTypes.SPELL_WITCH,
-        			(double)pos.getX() + 0.5D + dx, (double)pos.getY() + 1.0D + dy, (double)pos.getZ() + 0.5D + dz,
-        			(double)((float)dx + rand.nextFloat()) - 0.5D, (double)((float)dy - rand.nextFloat() - 1.0F), (double)((float)dz + rand.nextFloat()) - 0.5D, new int[0]);
-        }
-		
 	}
 	
 }

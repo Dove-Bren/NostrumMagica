@@ -7,7 +7,6 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -101,25 +100,14 @@ public class ObeliskTeleportationRequestMessage implements IMessage {
 			return false;
 		}
 		
-		// Verify other obelisk
-		IBlockState state = world.getBlockState(to);
-		if (state == null || !(state.getBlock() instanceof NostrumObelisk)
-				|| !NostrumObelisk.blockIsMaster(state)) {
+		// Validate obelisks
+		if (NostrumObelisk.isValidTarget(world, from, to)) {
 			player.addChatComponentMessage(new TextComponentTranslation("info.obelisk.dne"));
 			return false;
 		}
 		
-		// If we were given from, make sure that's valid too
+		// If we were given from, deduct aether
 		if (from != null) {
-			state = world.getBlockState(from);
-			if (state == null || !(state.getBlock() instanceof NostrumObelisk)
-					|| !NostrumObelisk.blockIsMaster(state)
-					|| !NostrumObelisk.isValidTarget(world, from, to)) {
-				NostrumMagica.logger.error("Something went wrong! Source obelisk does not seem to exist or have the provided target obelisk...");
-				player.addChatComponentMessage(new TextComponentTranslation("info.obelisk.dne"));
-				return false;
-			}
-			
 			TileEntity te = world.getTileEntity(from);
 			if (te == null || !(te instanceof NostrumObeliskEntity)) {
 				NostrumMagica.logger.error("Something went wrong! Source obelisk does not seem to exist or have the provided target obelisk...");

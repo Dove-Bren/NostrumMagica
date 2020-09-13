@@ -114,11 +114,11 @@ public class PositionToken extends PositionCrystal {
 				TileEntity ent = entityItem.worldObj.getTileEntity(pos);
 				if (ent != null && ent instanceof NostrumObeliskEntity) {
 					NostrumObeliskEntity obelisk = ((NostrumObeliskEntity) ent);
-					if (obelisk.canAcceptTarget(entityItem.dimension, storedPos)) {
+					if (obelisk.canAcceptTarget(storedPos)) {
 						if (entityItem.getEntityItem().hasDisplayName()) {
-							obelisk.addTarget(entityItem.dimension, storedPos, entityItem.getEntityItem().getDisplayName());
+							obelisk.addTarget(storedPos, entityItem.getEntityItem().getDisplayName());
 						} else {
-							obelisk.addTarget(entityItem.dimension, storedPos);
+							obelisk.addTarget(storedPos);
 						}
 						NostrumMagicaSounds.SUCCESS_QUEST.play(
 								entityItem.worldObj,

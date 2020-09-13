@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.blocks;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -19,6 +20,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -37,6 +39,7 @@ public abstract class NostrumPortal extends Block  {
 		this.setBlockUnbreakable();
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setSoundType(SoundType.STONE);
+		this.setTickRandomly(true);
 		
 		this.setDefaultState(this.blockState.getBaseState().withProperty(MASTER, false));
 	}
@@ -107,8 +110,16 @@ public abstract class NostrumPortal extends Block  {
 		world.setBlockToAir(getPaired(state, pos));
 	}
 	
-	private BlockPos getPaired(IBlockState state, BlockPos pos) {
+	protected static BlockPos getPaired(IBlockState state, BlockPos pos) {
 		return pos.offset(state.getValue(MASTER) ? EnumFacing.UP : EnumFacing.DOWN);
+	}
+	
+	protected static BlockPos getMaster(IBlockState state, BlockPos pos) {
+		if (!isMaster(state)) {
+			pos = getPaired(state, pos);
+		}
+		
+		return pos;
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -126,7 +137,7 @@ public abstract class NostrumPortal extends Block  {
 		return this.getDefaultState().withProperty(MASTER, true);
 	}
 	
-	public boolean isMaster(IBlockState state) {
+	public static boolean isMaster(IBlockState state) {
 		return state.getValue(MASTER);
 	}
 	
@@ -156,13 +167,62 @@ public abstract class NostrumPortal extends Block  {
 		return getMaster();
 	}
 	
+	public void createPaired(World worldIn, BlockPos pos) {
+		worldIn.setBlockState(pos.up(), getSlaveState());
+	}
+	
 	@Override
 	public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
 		// This method hopefully is ONLY called when placed manually in the world.
 		// Auto-create slave state
-		
-		worldIn.setBlockState(pos.up(), getSlaveState());
+		createPaired(worldIn, pos);
 	}
+	
+	@SideOnly(Side.CLIENT)
+	@Override
+	public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+		if (!isMaster(stateIn)) {
+			return;
+		}
+		
+		// Create particles
+		for (int i = 0; i < 5; i++) {
+	    	final float horAngle = rand.nextFloat() * (float) (2 * Math.PI);
+	    	final float verAngle = (rand.nextFloat()) * (float) (2 * Math.PI);
+	    	final float dist = rand.nextFloat() + 2f;
+	    	
+	    	final double dx = Math.cos(horAngle) * dist;
+	    	final double dz = Math.sin(horAngle) * dist;
+	    	final double dy = Math.sin(verAngle) * dist;
+	    	final double mx = rand.nextFloat() - .5;
+	    	final double mz = rand.nextFloat() - .5;
+	    	
+	    	worldIn.spawnParticle(EnumParticleTypes.SUSPENDED_DEPTH,
+	    			pos.getX() + .5 + dx, pos.getY() + 1 + dy, pos.getZ() + .5 + dz,
+	    			mx, 0, mz,
+	    			new int[0]);
+		}
+
+        
+    	for (int i = 0; i < 5; i++) {
+        	final float horAngle = rand.nextFloat() * (float) (2 * Math.PI);
+        	final float verAngle = (rand.nextFloat()) * (float) (2 * Math.PI);
+        	final float dist = 1f;
+        	
+        	final double dx = Math.cos(horAngle) * dist;
+	    	final double dz = Math.sin(horAngle) * dist;
+	    	final double dy = Math.sin(verAngle) * dist;
+	    	final double mx = rand.nextFloat() - .5;
+	    	final double mz = rand.nextFloat() - .5;
+	    	
+	    	worldIn.spawnParticle(EnumParticleTypes.SPELL_WITCH,
+	    			pos.getX() + .5 + dx, pos.getY() + 1 + dy, pos.getZ() + .5 + dz,
+	    			mx, 0, mz,
+	    			new int[0]);
+    	}
+	}
+	
+	protected abstract boolean canTeleport(World worldIn, BlockPos portalPos, Entity entityIn);
 	
 	protected abstract void teleportEntity(World worldIn, BlockPos portalPos, Entity entityIn);
 	
@@ -187,8 +247,13 @@ public abstract class NostrumPortal extends Block  {
 			return;
 		}
 		
-		EntityTeleportTimes.put(entityIn.getPersistentID(), now);
-		this.teleportEntity(worldIn, pos, entityIn);
+		// Get master block
+		pos = getMaster(state, pos);
+		
+		if (canTeleport(worldIn, pos, entityIn)) {
+			EntityTeleportTimes.put(entityIn.getPersistentID(), now);
+			this.teleportEntity(worldIn, pos, entityIn);
+		}
 	}
 	
 	public static void resetTimers() {

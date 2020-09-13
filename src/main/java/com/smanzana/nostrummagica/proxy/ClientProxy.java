@@ -132,6 +132,7 @@ import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
+import com.smanzana.nostrummagica.network.messages.ObeliskSelectMessage;
 import com.smanzana.nostrummagica.network.messages.ObeliskTeleportationRequestMessage;
 import com.smanzana.nostrummagica.network.messages.SpellTomeIncrementMessage;
 import com.smanzana.nostrummagica.network.messages.StatRequestMessage;
@@ -974,6 +975,14 @@ public class ClientProxy extends CommonProxy {
 		// Send a request to the server
 		NetworkHandler.getSyncChannel().sendToServer(
 				new ObeliskTeleportationRequestMessage(origin, target)
+				);
+	}
+	
+	@Override
+	public void setObeliskIndex(BlockPos obeliskPos, int index) {
+		// Send a request to the server
+		NetworkHandler.getSyncChannel().sendToServer(
+				new ObeliskSelectMessage(obeliskPos, index)
 				);
 	}
 	

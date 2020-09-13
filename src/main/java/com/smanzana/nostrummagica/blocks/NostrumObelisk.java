@@ -354,36 +354,45 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 		}
 	}
 
-	public static boolean isValidTarget(World world, BlockPos from, BlockPos to) {
-		IBlockState state = world.getBlockState(from);
-		if (state == null
-				|| !(state.getBlock() instanceof NostrumObelisk)
-				|| !blockIsMaster(state))
-			return false;
-		
-		TileEntity te = world.getTileEntity(from);
-		if (te == null || !(te instanceof NostrumObeliskEntity))
-			return false;
-		
-		NostrumObeliskEntity ent = (NostrumObeliskEntity) te;
-		if (ent.getTargets() == null || ent.getTargets().isEmpty())
-			return false;
-		
-		// Load it?
-		state = world.getBlockState(to);
-		if (state == null
-				|| !(state.getBlock() instanceof NostrumObelisk)
-				|| !blockIsMaster(state))
-			return false;
-		
-		for (NostrumObeliskTarget targ : ent.getTargets()) {
-			if (targ.getPos().getX() == to.getX()
-					&& targ.getPos().getY() == to.getY()
-					&& targ.getPos().getZ() == to.getZ())
-				return true;
+	public static boolean isValidTarget(World world, @Nullable BlockPos from, BlockPos to) {
+		if (from != null) {
+			IBlockState state = world.getBlockState(from);
+			if (state == null
+					|| !(state.getBlock() instanceof NostrumObelisk)
+					|| !blockIsMaster(state))
+				return false;
+			
+			TileEntity te = world.getTileEntity(from);
+			if (te == null || !(te instanceof NostrumObeliskEntity))
+				return false;
+			
+			NostrumObeliskEntity ent = (NostrumObeliskEntity) te;
+			if (ent.getTargets() == null || ent.getTargets().isEmpty())
+				return false;
+			
+			boolean found = false;
+			for (NostrumObeliskTarget targ : ent.getTargets()) {
+				if (targ.getPos().getX() == to.getX()
+						&& targ.getPos().getY() == to.getY()
+						&& targ.getPos().getZ() == to.getZ()) {
+					found = true;
+					break;
+				}
+			}
+			
+			if (!found) {
+				return false;
+			}
 		}
 		
-		return false;
+		// Load it?
+		IBlockState state = world.getBlockState(to);
+		if (state == null
+				|| !(state.getBlock() instanceof NostrumObelisk)
+				|| !blockIsMaster(state))
+			return false;
+		
+		return true;
 	}
 	
 }

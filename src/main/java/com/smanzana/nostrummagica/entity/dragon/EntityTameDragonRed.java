@@ -1263,7 +1263,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		if (this.worldObj.isRemote) {
 			if (this.considerFlying()) {
 				if (this.motionY < 0.0D) {
-					double relief = Math.min(1.0D, this.motionX * this.motionX + this.motionZ * this.motionZ);
+					double relief = Math.min(1.0D, Math.abs(this.motionX) + Math.abs(this.motionZ));
 					this.motionY *= (1D - (0.9D * relief));				
 				}
 			}
@@ -1314,8 +1314,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			this.setRotation(this.rotationYaw, this.rotationPitch);
 			this.renderYawOffset = this.rotationYaw;
 			this.rotationYawHead = this.renderYawOffset;
-			strafe = entitylivingbase.moveStrafing * 0.5F;
-			forward = entitylivingbase.moveForward;
+			strafe = entitylivingbase.moveStrafing * 0.45F;
+			forward = entitylivingbase.moveForward * .7f;
 
 			if (forward < 0.0F)
 			{

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.world.NostrumChunkLoader;
@@ -15,11 +17,11 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.ForgeChunkManager.Ticket;
 import net.minecraftforge.common.ForgeChunkManager.Type;
@@ -28,18 +30,16 @@ import net.minecraftforge.common.util.Constants.NBT;
 public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	
 	public static class NostrumObeliskTarget {
-		private int dimension;
 		private BlockPos pos;
 		private String title;
 		
-		public NostrumObeliskTarget(int dimension, BlockPos pos) {
-			this(dimension, pos, toTitle(pos));
+		public NostrumObeliskTarget(BlockPos pos) {
+			this(pos, toTitle(pos));
 		}
 		
-		public NostrumObeliskTarget(int dimension, BlockPos pos, String title) {
+		public NostrumObeliskTarget(BlockPos pos, String title) {
 			this.pos = pos;
 			this.title = title;
-			this.dimension = dimension;
 		}
 		
 		private static String toTitle(BlockPos pos) {
@@ -53,10 +53,6 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 		public String getTitle() {
 			return title;
 		}
-		
-		public int getDimension() {
-			return this.dimension;
-		}
 	}
 
 	private static final String NBT_TICKET_POS = "obelisk_pos";
@@ -66,7 +62,7 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	private static final String NBT_TARGET_Y = "y";
 	private static final String NBT_TARGET_Z = "z";
 	private static final String NBT_TARGET_TITLE = "title";
-	private static final String NBT_TARGET_DIMENSION = "dimension";
+	//private static final String NBT_TARGET_DIMENSION = "dimension";
 	private static final String NBT_CORNER = "corner";
 	
 	/**
@@ -94,8 +90,13 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	
 	private boolean master;
 	private List<NostrumObeliskTarget> targets;
+	private int targetIndex;
 	private Corner corner;
 	private int aliveCount;
+	
+	// Not persisted. Temporary overrides on target. targetOverrideEnds is based off aliveCount.
+	private BlockPos targetOverride;
+	private int targetOverrideEnd;
 	
 	private boolean isDestructing;
 	
@@ -104,6 +105,7 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 		master = false;
 		isDestructing = false;
 		targets = new LinkedList<>();
+		targetIndex = 0;
 		this.compWrapper.configureInOut(true, false);
 	}
 	
@@ -140,7 +142,7 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 			tag.setInteger(NBT_TARGET_Y, target.pos.getY());
 			tag.setInteger(NBT_TARGET_Z, target.pos.getZ());
 			tag.setString(NBT_TARGET_TITLE, target.title);
-			tag.setInteger(NBT_TARGET_DIMENSION, target.dimension);
+			//tag.setInteger(NBT_TARGET_DIMENSION, target.dimension);
 			
 			list.appendTag(tag);
 		}
@@ -167,7 +169,7 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 			for (int i = 0; i < list.tagCount(); i++) {
 				NBTTagCompound tag = list.getCompoundTagAt(i);
 				targets.add(new NostrumObeliskTarget(
-						tag.getInteger(NBT_TARGET_DIMENSION),
+						//tag.getInteger(NBT_TARGET_DIMENSION),
 						new BlockPos(
 								tag.getInteger(NBT_TARGET_X),
 								tag.getInteger(NBT_TARGET_Y),
@@ -231,13 +233,13 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 		return this.master;
 	}
 	
-	public void addTarget(int dimension, BlockPos pos) {
-		targets.add(new NostrumObeliskTarget(dimension, pos));
+	public void addTarget(BlockPos pos) {
+		targets.add(new NostrumObeliskTarget(pos));
 		forceUpdate();
 	}
 	
-	public void addTarget(int dimension, BlockPos pos, String title) {
-		targets.add(new NostrumObeliskTarget(dimension, pos, title));
+	public void addTarget(BlockPos pos, String title) {
+		targets.add(new NostrumObeliskTarget(pos, title));
 		forceUpdate();
 	}
 	
@@ -245,28 +247,90 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 		return targets;
 	}
 	
-	public boolean canAcceptTarget(int dimension, BlockPos pos) {
+	public boolean canAcceptTarget(BlockPos pos) {
 		if (pos.equals(this.pos))
 			return false;
 		
 		if (!targets.isEmpty())
 		for (NostrumObeliskTarget targPos : targets) {
-			if (targPos.dimension == dimension && pos.equals(targPos.pos))
+			if (pos.equals(targPos.pos))
 				return false;
 		}
 		
 		if (!this.worldObj.isRemote) {
-			World world = DimensionManager.getWorld(dimension);
-			if (world == null)
-				return false;
-			
-			IBlockState state = world.getBlockState(pos);
+			IBlockState state = worldObj.getBlockState(pos);
 			if (state == null || !(state.getBlock() instanceof NostrumObelisk)
 					|| !NostrumObelisk.blockIsMaster(state))
 				return false;
 		}
 		
 		return true;
+	}
+	
+	public void setTargetIndex(int index) {
+		if (this.targets.size() == 0 || index < 0) {
+			return;
+		}
+		
+		this.targetIndex = Math.min(targets.size() - 1, index);
+		refreshPortal();
+	}
+	
+	public @Nullable BlockPos getCurrentTarget() {
+		if (targetOverride != null) {
+			return targetOverride;
+		}
+		
+		if (this.targets.size() == 0) {
+			return null;
+		}
+		
+		return targets.get(Math.min(targets.size() - 1, targetIndex)).getPos();
+	}
+	
+	public boolean hasOverride() {
+		return this.targetOverride != null;
+	}
+	
+	protected void deactivatePortal() {
+		// Remove portal above us
+		worldObj.setBlockToAir(pos.up());
+	}
+	
+	protected void activatePortal() {
+		worldObj.setBlockState(pos.up(), ObeliskPortal.instance().getStateForPlacement(worldObj, pos, EnumFacing.UP, 0f, 0f, 0f, 0, null, null));
+		ObeliskPortal.instance().createPaired(worldObj, pos.up());
+	}
+	
+	protected void refreshPortal() {
+		@Nullable BlockPos target;
+		boolean valid;
+		if (this.targetOverride != null) {
+			valid = true;
+			target = this.targetOverride;
+		} else {
+			target = this.getCurrentTarget();
+			valid = (target != null && IsValidObelisk(worldObj, target));
+		}
+		
+		if (valid) {
+			// Make sure there's a portal
+			activatePortal();
+		} else {
+			deactivatePortal();
+		}
+	}
+	
+	public static boolean IsValidObelisk(World world, BlockPos pos) {
+		IBlockState state = world.getBlockState(pos);
+		return !(state == null || !(state.getBlock() instanceof NostrumObelisk)
+				|| !NostrumObelisk.blockIsMaster(state));
+	}
+	
+	public void setOverride(BlockPos override, int durationTicks) {
+		this.targetOverride = override;
+		this.targetOverrideEnd = this.aliveCount + durationTicks;
+		this.refreshPortal();
 	}
 	
 	@Override
@@ -316,6 +380,11 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 			return;
 		
 		aliveCount++;
+		
+		if (targetOverride != null && aliveCount >= targetOverrideEnd) {
+			targetOverride = null;
+			refreshPortal();
+		}
 		
 		final long stepInverval = 2;
 		if (aliveCount % stepInverval != 0)
@@ -375,5 +444,4 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 		
 		return this.compWrapper.checkAndWithdraw(aetherCost);
 	}
-	
 }

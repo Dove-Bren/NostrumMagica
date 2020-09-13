@@ -92,9 +92,10 @@ public class ObeliskScreen extends GuiScreen {
 		this.yOffset = getScaled(tileEntity.getPos().getZ()) - (this.height / 2);
 		int id = 0;
 		
-		this.centralButton = new DestinationButton(id++, 0, 0, tileEntity.getPos(), true, false, "", true);
+		this.centralButton = new DestinationButton(id++, 0, 0, tileEntity.getPos(), -1, true, false, "", true);
 		
 		int listY = 0;
+		int index = 0;
 		for (NostrumObeliskTarget target: tileEntity.getTargets()) {
 			//boolean valid = NostrumObelisk.isValidTarget(tileEntity.getWorld(), tileEntity.getPos(), pos);
 			boolean valid = true; // Would be cool, but need some communication
@@ -104,10 +105,11 @@ public class ObeliskScreen extends GuiScreen {
 			
 			if (drawList) {
 				listButtons.add(
-						new DestinationButton(id++, 10, 50 + (listY++ * 20), target.getPos(), false, true, target.getTitle(), valid));
+						new DestinationButton(id++, 10, 50 + (listY++ * 20), target.getPos(), index, false, true, target.getTitle(), valid));
 			}
-			DestinationButton button = new DestinationButton(id++, 0, 0, target.getPos(), false, false, target.getTitle(), valid);
+			DestinationButton button = new DestinationButton(id++, 0, 0, target.getPos(), index, false, false, target.getTitle(), valid);
 			floatingButtons.add(button);
+			index++;
 		}
 		
 		this.buttonList.add(centralButton);
@@ -266,7 +268,7 @@ public class ObeliskScreen extends GuiScreen {
 		if (!butt.isValid)
 			return;
 		
-		NostrumMagica.proxy.requestObeliskTransportation(tileEntity.getPos(), ((DestinationButton) button).pos);		
+		NostrumMagica.proxy.setObeliskIndex(tileEntity.getPos(), butt.obeliskIndex);
 		Minecraft.getMinecraft().displayGuiScreen(null);
 	}
 	
@@ -274,31 +276,30 @@ public class ObeliskScreen extends GuiScreen {
     static class DestinationButton extends GuiButton
     {
         private final BlockPos pos;
+        private final int obeliskIndex;
         private final boolean isListed;
         private final String title;
         private final boolean isCenter;
         private final boolean isValid;
 
         public DestinationButton(int parButtonId, int parPosX, int parPosY, 
-              BlockPos pos, boolean isCenter, boolean isListed, String title,
-              boolean isValid)
-        {
+              BlockPos pos, int index, boolean isCenter, boolean isListed, String title,
+              boolean isValid) {
             super(parButtonId, parPosX, parPosY, 13, 13, "");
             this.pos = pos;
+            this.obeliskIndex = index;
             this.isListed = isListed;
             this.title = title;
             this.isCenter = isCenter;
             this.isValid = isValid;
         }
-
+        
         /**
          * Draws this button to the screen.
          */
         @Override
-        public void drawButton(Minecraft mc, int parX, int parY)
-        {
-            if (visible)
-            {
+        public void drawButton(Minecraft mc, int parX, int parY) {
+            if (visible) {
                 int textureX = 0;
                 int textureY = TEXT_BACK_HEIGHT;
                 if (isCenter) {

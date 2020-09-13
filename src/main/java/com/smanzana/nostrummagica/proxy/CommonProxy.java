@@ -25,6 +25,7 @@ import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.blocks.NostrumMirrorBlock;
 import com.smanzana.nostrummagica.blocks.NostrumObelisk;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
+import com.smanzana.nostrummagica.blocks.ObeliskPortal;
 import com.smanzana.nostrummagica.blocks.ProgressionDoor;
 import com.smanzana.nostrummagica.blocks.PutterBlock;
 import com.smanzana.nostrummagica.blocks.ShrineBlock;
@@ -34,6 +35,8 @@ import com.smanzana.nostrummagica.blocks.SpellTable;
 import com.smanzana.nostrummagica.blocks.SwitchBlock;
 import com.smanzana.nostrummagica.blocks.SymbolBlock;
 import com.smanzana.nostrummagica.blocks.TeleportRune;
+import com.smanzana.nostrummagica.blocks.TeleportationPortal;
+import com.smanzana.nostrummagica.blocks.TemporaryTeleportationPortal;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagic;
@@ -617,6 +620,9 @@ public class CommonProxy {
     	GameRegistry.register(NostrumObelisk.instance(),
     			new ResourceLocation(NostrumMagica.MODID, NostrumObelisk.ID));
     	NostrumObelisk.init();
+    	GameRegistry.register(ObeliskPortal.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, ObeliskPortal.ID));
+    	ObeliskPortal.init();
     	
     	GameRegistry.register(EssenceOre.instance(),
     			new ResourceLocation(NostrumMagica.MODID, EssenceOre.ID));
@@ -650,6 +656,14 @@ public class CommonProxy {
     					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(SorceryPortal.ID))
     			);
     	SorceryPortal.init();
+    	
+    	GameRegistry.register(TeleportationPortal.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, TeleportationPortal.ID));
+    	TeleportationPortal.init();
+    	
+    	GameRegistry.register(TemporaryTeleportationPortal.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, TemporaryTeleportationPortal.ID));
+    	TemporaryTeleportationPortal.init();
     	
     	GameRegistry.register(ProgressionDoor.instance(),
     			new ResourceLocation(NostrumMagica.MODID, ProgressionDoor.ID));
@@ -777,6 +791,10 @@ public class CommonProxy {
 	}
 	
 	public void requestObeliskTransportation(BlockPos origin, BlockPos target) {
+		; // server does nothing
+	}
+	
+	public void setObeliskIndex(BlockPos obeliskPos, int index) {
 		; // server does nothing
 	}
 	

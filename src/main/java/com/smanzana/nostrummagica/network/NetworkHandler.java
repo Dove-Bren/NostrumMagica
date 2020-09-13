@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.network.messages.LoreMessage;
 import com.smanzana.nostrummagica.network.messages.MagicEffectUpdate;
 import com.smanzana.nostrummagica.network.messages.ManaMessage;
 import com.smanzana.nostrummagica.network.messages.ModifyMessage;
+import com.smanzana.nostrummagica.network.messages.ObeliskSelectMessage;
 import com.smanzana.nostrummagica.network.messages.ObeliskTeleportationRequestMessage;
 import com.smanzana.nostrummagica.network.messages.ReagentBagToggleMessage;
 import com.smanzana.nostrummagica.network.messages.RuneBagToggleMessage;
@@ -66,6 +67,7 @@ public class NetworkHandler {
 		syncChannel.registerMessage(SpellCraftMessage.Handler.class, SpellCraftMessage.class, discriminator++, Side.SERVER);
 		syncChannel.registerMessage(SpellDebugMessage.Handler.class, SpellDebugMessage.class, discriminator++, Side.CLIENT);
 		syncChannel.registerMessage(ObeliskTeleportationRequestMessage.Handler.class, ObeliskTeleportationRequestMessage.class, discriminator++, Side.SERVER);
+		syncChannel.registerMessage(ObeliskSelectMessage.Handler.class, ObeliskSelectMessage.class, discriminator++, Side.SERVER);
 		syncChannel.registerMessage(ClientSkillUpMessage.Handler.class, ClientSkillUpMessage.class, discriminator++, Side.SERVER);
 		syncChannel.registerMessage(ClientUpdateQuestMessage.Handler.class, ClientUpdateQuestMessage.class, discriminator++, Side.SERVER);
 		syncChannel.registerMessage(StatRequestMessage.Handler.class, StatRequestMessage.class, discriminator++, Side.SERVER);
