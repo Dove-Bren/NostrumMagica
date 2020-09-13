@@ -164,7 +164,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
     }
 
 	@Override
-	public SpellAction getTriggerAction(EntityLivingBase user, boolean offense) {
+	public SpellAction getTriggerAction(EntityLivingBase user, boolean offense, ItemStack stack) {
 		if (!offense)
 			return null;
 		
@@ -198,7 +198,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 	}
 
 	@Override
-	public boolean shouldTrigger(boolean offense) {
+	public boolean shouldTrigger(boolean offense, ItemStack stack) {
 		return offense;
 	}
 	

@@ -1,0 +1,6 @@
+{
+    "variants": {
+        "normal": { "model": "nostrummagica:magic_rune" },
+        "inventory": { "model": "nostrummagica:magic_rune" }
+    }
+}

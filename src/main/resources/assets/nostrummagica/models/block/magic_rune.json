@@ -1,0 +1,21 @@
+{
+    "parent": "block/thin_block",
+    "textures": {
+        "all": "nostrummagica:blocks/magic_rune",
+        "particle": "nostrummagica:blocks/magic_rune"
+    },
+    "elements": [
+        {
+            "from": [ 0, 0, 0 ],
+            "to": [ 16, 0.125, 16 ],
+            "faces": {
+                "down":  { "uv": [ 0,  0, 16, 16 ], "texture": "#all", "cullface": "down" },
+                "up":    { "uv": [ 0,  0, 16, 16 ], "texture": "#all" },
+                "north": { "uv": [ 0, 0, 16, 16 ], "texture": "#all", "cullface": "north" },
+                "south": { "uv": [ 0, 0, 16, 16 ], "texture": "#all", "cullface": "south" },
+                "west":  { "uv": [ 0, 0, 16, 16 ], "texture": "#all", "cullface": "west" },
+                "east":  { "uv": [ 0, 0, 16, 16 ], "texture": "#all", "cullface": "east" }
+            }
+        }
+    ]
+}

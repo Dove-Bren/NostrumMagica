@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.items;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemStack;
 
 public interface EnchantedEquipment {
 
@@ -20,13 +21,14 @@ public interface EnchantedEquipment {
 	 * @param offense Are WE the ones attacking? (this is a weapon)
 	 * @return null to issue no action, or the action to issue
 	 */
-	public SpellAction getTriggerAction(EntityLivingBase user, boolean offense);
+	public SpellAction getTriggerAction(EntityLivingBase user, boolean offense, ItemStack stack);
 	
 	/**
 	 * Should we trigger?
+	 * @param stack TODO
 	 * @param offsense Are we attacking?
 	 * @return
 	 */
-	public boolean shouldTrigger(boolean offense);
+	public boolean shouldTrigger(boolean offense, ItemStack stack);
 	
 }

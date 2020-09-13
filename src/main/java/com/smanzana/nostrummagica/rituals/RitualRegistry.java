@@ -73,7 +73,7 @@ public class RitualRegistry {
 					}
 				}
 				
-				NostrumMagicaSounds.AMBIENT_WOOSH.play(world,
+				NostrumMagicaSounds.AMBIENT_WOOSH2.play(world,
 						pos.getX(), pos.getY(), pos.getZ());
 				
 				return true;

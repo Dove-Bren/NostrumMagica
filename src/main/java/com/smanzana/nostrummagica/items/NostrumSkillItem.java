@@ -166,7 +166,7 @@ public class NostrumSkillItem extends Item implements ILoreTagged {
 				playerIn.addChatMessage(new TextComponentTranslation("info.skillitem." + suffix, new Object[0]));
 			} else {
 				// Server side
-				NostrumMagicaSounds.AMBIENT_WOOSH.play(null, playerIn.worldObj, playerIn.posX, playerIn.posY, playerIn.posZ);
+				NostrumMagicaSounds.LORE.play(null, playerIn.worldObj, playerIn.posX, playerIn.posY, playerIn.posZ);
 				stack.stackSize--;
 				NostrumMagica.proxy.syncPlayer((EntityPlayerMP) playerIn);
 			}

@@ -157,8 +157,8 @@ public class MagicWall extends Block {
 	
 	@SuppressWarnings("deprecation")
 	@Override
-    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn) {
-        
+	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn) {
+		
 		int level = state.getValue(LEVEL);
 		
 		if (level <= 0

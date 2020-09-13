@@ -59,7 +59,7 @@ public class LoreMessage implements IMessage {
 					comp = comp.setStyle(style);
 					
 					player.addChatMessage(comp);
-					NostrumMagicaSounds.UI_TICK.play(player, player.worldObj, player.posX, player.posY, player.posZ);
+					NostrumMagicaSounds.LORE.play(player, player.worldObj, player.posX, player.posY, player.posZ);
 				}
 			});
 			

@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.research.NostrumResearch;
 import com.smanzana.nostrummagica.research.NostrumResearch.NostrumResearchTab;
@@ -19,6 +20,8 @@ import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
 import com.smanzana.nostrummagica.rituals.requirements.RRequirementResearch;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.components.triggers.DamagedTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -288,6 +291,36 @@ public class BaublesProxy {
 				new RRequirementResearch("ribbons"),
 				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.TRINKET_FLOAT_GUARD, 1)));
 		RitualRegistry.instance().addRitual(recipe);
+		
+		recipe = RitualRecipe.createTier3("shield_ring_small",
+				ItemMagicBauble.getItem(ItemType.SHIELD_RING_SMALL, 1),
+				EMagicElement.EARTH,
+				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT},
+				ItemMagicBauble.getItem(ItemType.RING_SILVER, 1),
+				new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), SpellRune.getRune(SelfTrigger.instance()), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1)},
+				new RRequirementResearch("shield_rings"),
+				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.SHIELD_RING_SMALL, 1)));
+		RitualRegistry.instance().addRitual(recipe);
+		
+		recipe = RitualRecipe.createTier3("shield_ring_large",
+				ItemMagicBauble.getItem(ItemType.SHIELD_RING_LARGE, 1),
+				EMagicElement.EARTH,
+				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT},
+				ItemMagicBauble.getItem(ItemType.SHIELD_RING_SMALL, 1),
+				new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), silver, NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1)},
+				new RRequirementResearch("shield_rings"),
+				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.SHIELD_RING_LARGE, 1)));
+		RitualRegistry.instance().addRitual(recipe);
+		
+		recipe = RitualRecipe.createTier3("elude_cape_small",
+				ItemMagicBauble.getItem(ItemType.ELUDE_CAPE_SMALL, 1),
+				EMagicElement.WIND,
+				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT},
+				new ItemStack(Blocks.WOOL, 1, OreDictionary.WILDCARD_VALUE),
+				new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), SpellRune.getRune(DamagedTrigger.instance()), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1)},
+				new RRequirementResearch("elude_capes"),
+				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.ELUDE_CAPE_SMALL, 1)));
+		RitualRegistry.instance().addRitual(recipe);
 	}
 	
 	private void registerBaubleResearch() {
@@ -332,6 +365,22 @@ public class BaublesProxy {
 			.reference("ritual::belt_ender", "ritual.belt_ender.name")
 			.reference("ritual::belt_lightning", "ritual.belt_lightning.name")
 		.build("belts", NostrumResearchTab.OUTFITTING, Size.NORMAL, -5, 0, true, ItemMagicBauble.getItem(ItemType.BELT_ENDER, 1));
+		
+		if (NostrumMagica.aetheria.isEnabled()) {
+			NostrumResearch.startBuilding()
+				.parent("rings")
+				.hiddenParent("kani")
+				.hiddenParent("aether_gem")
+				.reference("ritual::shield_ring_small", "ritual.shield_ring_small.name")
+				.reference("ritual::shield_ring_large", "ritual.shield_ring_large.name")
+			.build("shield_rings", NostrumResearchTab.OUTFITTING, Size.NORMAL, -4, -1, true, ItemMagicBauble.getItem(ItemType.SHIELD_RING_SMALL, 1));
+
+			NostrumResearch.startBuilding()
+				.parent("belts")
+				.hiddenParent("shield_rings")
+				.reference("ritual::elude_cape_small", "ritual.elude_cape_small.name")
+			.build("elude_capes", NostrumResearchTab.OUTFITTING, Size.NORMAL, -6, 0, true, ItemMagicBauble.getItem(ItemType.ELUDE_CAPE_SMALL, 1));
+		}
 	}
 	
 	private void registerLore() {

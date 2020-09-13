@@ -55,7 +55,7 @@ public class SpellCraftMessage implements IMessage {
 			SpellTableEntity entity = (SpellTableEntity) TE;
 			
 			entity.craft(sp, name, iconIdx);
-			NostrumMagicaSounds.AMBIENT_WOOSH.play(entity.getWorld(), 
+			NostrumMagicaSounds.UI_RESEARCH.play(entity.getWorld(), 
 					x, y, z);
 			});
 			

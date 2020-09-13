@@ -199,10 +199,12 @@ public class NostrumResearch {
 			return;
 		
 		attr.completeResearch(research.getKey());
-		if (!player.worldObj.isRemote)
-			NostrumMagicaSounds.AMBIENT_WOOSH.play(player.worldObj, player.posX, player.posY, player.posZ);
-		else
+		if (!player.worldObj.isRemote) {
+			NostrumMagicaSounds.SUCCESS_RESEARCH.play(player.worldObj, player.posX, player.posY, player.posZ);
+			NostrumMagicaSounds.UI_RESEARCH.play(player.worldObj, player.posX, player.posY, player.posZ);
+		} else {
 			NostrumMagica.proxy.syncPlayer((EntityPlayerMP) player);
+		}
 	}
 
 

@@ -165,6 +165,7 @@ public class NostrumMagic implements INostrumMagic {
 			
 			this.setElementMastery(EMagicElement.PHYSICAL, 1);
 			this.completeResearch("origin");
+			this.addResearchPoint();
 			//this.completeResearch("spellcraft");
 			this.giveBasicLore(SpellRune.instance());
 			this.giveBasicLore(BlankScroll.instance());

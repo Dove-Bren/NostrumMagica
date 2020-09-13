@@ -120,7 +120,7 @@ public class PositionToken extends PositionCrystal {
 						} else {
 							obelisk.addTarget(entityItem.dimension, storedPos);
 						}
-						NostrumMagicaSounds.AMBIENT_WOOSH.play(
+						NostrumMagicaSounds.SUCCESS_QUEST.play(
 								entityItem.worldObj,
 								pos.getX(),
 								pos.getY(),

@@ -205,8 +205,8 @@ public class NostrumMagica
     @EventHandler
     public void init(FMLInitializationEvent event) {
         proxy.init();
-        baubles.init();
         aetheria.init();
+        baubles.init();
         new NostrumLootHandler();
         NostrumDimensionMapper.registerDimensions();
     }
@@ -244,8 +244,8 @@ public class NostrumMagica
     	new ModConfig(new Configuration(event.getSuggestedConfigurationFile()));
     	
     	proxy.preinit();
-    	baubles.preInit();
     	aetheria.preInit();
+    	baubles.preInit();
     	
     	DungeonRoomRegistry.instance().loadRegistryFromDisk();
     	
@@ -265,8 +265,8 @@ public class NostrumMagica
     @EventHandler
     public void postinit(FMLPostInitializationEvent event) {
     	proxy.postinit();
-    	baubles.postInit();
     	aetheria.postInit();
+    	baubles.postInit();
     	
     	initFinished = true;
     	

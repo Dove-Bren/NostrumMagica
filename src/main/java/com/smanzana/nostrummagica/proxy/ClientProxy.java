@@ -18,13 +18,16 @@ import com.smanzana.nostrummagica.blocks.LoreTable;
 import com.smanzana.nostrummagica.blocks.MagicDirt;
 import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.blocks.ManiOre;
+import com.smanzana.nostrummagica.blocks.MimicBlock;
 import com.smanzana.nostrummagica.blocks.ModificationTable;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.blocks.NostrumMirrorBlock;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.blocks.ProgressionDoor;
+import com.smanzana.nostrummagica.blocks.PutterBlock;
 import com.smanzana.nostrummagica.blocks.SorceryPortal;
 import com.smanzana.nostrummagica.blocks.SwitchBlock;
+import com.smanzana.nostrummagica.blocks.TeleportRune;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.effects.ClientEffect;
 import com.smanzana.nostrummagica.client.effects.ClientEffectBeam;
@@ -43,6 +46,7 @@ import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierT
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.gui.MirrorGui;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
+import com.smanzana.nostrummagica.client.model.MimicBlockBakedModel;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityAltarRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityCandleRenderer;
@@ -166,6 +170,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -623,6 +628,21 @@ public class ClientProxy extends CommonProxy {
 		
 		registerModel(ReagentSeed.Mandrake, 0, ReagentSeed.MANDRAKE_ID);
 		registerModel(ReagentSeed.Ginseng, 0, ReagentSeed.GINSENG_ID);
+		
+		registerModel(Item.getItemFromBlock(MimicBlock.door()),
+				0,
+				MimicBlock.ID_DOOR);
+		registerModel(Item.getItemFromBlock(MimicBlock.facade()),
+				0,
+				MimicBlock.ID_FACADE);
+
+		registerModel(Item.getItemFromBlock(TeleportRune.instance()),
+				0,
+				TeleportRune.ID);
+		
+		registerModel(Item.getItemFromBlock(PutterBlock.instance()),
+				0,
+				PutterBlock.ID);
 	}
 	
 	@Override
@@ -1014,6 +1034,14 @@ public class ClientProxy extends CommonProxy {
 				NostrumMagica.logger.warn("Failed to load effect " + icon.getKey());
 			}
     		
+    	}
+    	
+    	MimicBlockBakedModel model = new MimicBlockBakedModel();
+    	for (EnumFacing facing : EnumFacing.values()) {
+    		event.getModelRegistry().putObject(new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_DOOR), "facing=" + facing.name().toLowerCase()),
+    				model);
+    		event.getModelRegistry().putObject(new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_FACADE), "facing=" + facing.name().toLowerCase()),
+    				model);
     	}
 	}
 	

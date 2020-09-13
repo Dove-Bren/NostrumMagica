@@ -2,25 +2,36 @@ package com.smanzana.nostrummagica.baubles.items;
 
 import java.util.List;
 
+import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.items.ISpellArmor;
+import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
 import baubles.api.BaubleType;
 import baubles.api.IBauble;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
+import net.minecraft.util.EntityDamageSource;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.fml.common.Optional;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -41,7 +52,10 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 		RING_SILVER("ring_silver"),
 		RING_SILVER_TRUE("ring_silver_true"),
 		RING_SILVER_CORRUPTED("ring_silver_corrupted"),
-		TRINKET_FLOAT_GUARD("float_guard");
+		TRINKET_FLOAT_GUARD("float_guard"),
+		SHIELD_RING_SMALL("shield_ring_small"),
+		SHIELD_RING_LARGE("shield_ring_large"),
+		ELUDE_CAPE_SMALL("elude_cape_small");
 		
 		private String key;
 		
@@ -105,6 +119,8 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setMaxStackSize(1);
 		this.setHasSubtypes(true);
+		
+		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
 	@Override
@@ -119,6 +135,13 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
     @Override
 	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
 		for (ItemType type : ItemType.values()) {
+			if (!NostrumMagica.aetheria.isEnabled()) {
+				if (type == ItemType.SHIELD_RING_LARGE
+						|| type == ItemType.SHIELD_RING_SMALL
+						|| type == ItemType.ELUDE_CAPE_SMALL) {
+					continue;
+				}
+			}
 			subItems.add(new ItemStack(itemIn, 1, getMetaFromType(type)));
 		}
 	}
@@ -194,10 +217,15 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 		case RING_SILVER:
 		case RING_SILVER_CORRUPTED:
 		case RING_SILVER_TRUE:
+		case SHIELD_RING_LARGE:
+		case SHIELD_RING_SMALL:
 			btype = BaubleType.RING;
 			break;
 		case TRINKET_FLOAT_GUARD:
 			btype = BaubleType.CHARM;
+			break;
+		case ELUDE_CAPE_SMALL:
+			btype = BaubleType.BODY;
 			break;
 		}
 		
@@ -258,6 +286,13 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 			break;
 		case TRINKET_FLOAT_GUARD:
 			; // Checked upon floating
+			break;
+		case ELUDE_CAPE_SMALL:
+			; // Checked upon attack
+			break;
+		case SHIELD_RING_LARGE:
+		case SHIELD_RING_SMALL:
+			; // Checked on equipped tick
 			break;
 		}
 		
@@ -321,6 +356,13 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 		case TRINKET_FLOAT_GUARD:
 			; // Checked upon floating
 			break;
+		case ELUDE_CAPE_SMALL:
+			; // Checked upon attack
+			break;
+		case SHIELD_RING_LARGE:
+		case SHIELD_RING_SMALL:
+			; // Checked on equipped tick
+			break;
 		}
 	}
 
@@ -356,6 +398,9 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 		case RING_SILVER:
 		case RING_SILVER_TRUE:
 		case TRINKET_FLOAT_GUARD:
+		case ELUDE_CAPE_SMALL:
+		case SHIELD_RING_LARGE:
+		case SHIELD_RING_SMALL:
 			; // Nothing to do
 			break;
 		case RING_GOLD:
@@ -403,6 +448,102 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 			break;
 		case TRINKET_FLOAT_GUARD:
 			player.removePotionEffect(Potion.getPotionFromResourceLocation("levitation"));
+			break;
+		case ELUDE_CAPE_SMALL:
+			break;
+		case SHIELD_RING_LARGE:
+		case SHIELD_RING_SMALL:
+			
+			if (!player.worldObj.isRemote) {
+				double shield = (type == ItemType.SHIELD_RING_LARGE ? 4 : 2);
+				int cost = (int) (shield * 100);
+				
+				// Check if we have enough aether and if the player is missing a shield
+				if (player.ticksExisted % 40 == 0 && NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.SHIELD_PHYSICAL) == null) {
+					IInventory inv = null;
+					if (player instanceof EntityPlayer) {
+						inv = ((EntityPlayer) player).inventory;
+					}
+					
+					if (inv != null) {
+						int taken = APIProxy.drawFromInventory(player.worldObj, player, inv, cost, stack);
+						if (taken > 0) {
+							// Apply shields! Amount depends on how much aether was consumed
+							shield *= ((float) taken / (float) cost);
+							NostrumMagica.magicEffectProxy.applyPhysicalShield(player, shield);
+						}
+					}
+				}
+			}
+			
+			break;
+		}
+	}
+	
+	@SubscribeEvent
+	public void onAttack(LivingAttackEvent event) {
+		if (event.isCanceled()) {
+			return;
+		}
+		
+		if (event.getAmount() > 0f && event.getEntityLiving() instanceof EntityPlayer && event.getSource() instanceof EntityDamageSource) {
+			Entity source = ((EntityDamageSource) event.getSource()).getSourceOfDamage();
+			EntityPlayer player = (EntityPlayer) event.getEntityLiving();
+			IInventory inv = NostrumMagica.baubles.getBaubles(player);
+			if (inv != null) {
+				for (int i = 0; i < inv.getSizeInventory(); i++) {
+					ItemStack stack = inv.getStackInSlot(i);
+					if (stack == null || !(stack.getItem() instanceof ItemMagicBauble))
+						continue;
+					
+					ItemType type = getTypeFromMeta(stack.getMetadata());
+					switch (type) {
+					case BELT_ENDER:
+					case BELT_LIGHTNING:
+					case RIBBON_FIERCE:
+					case RIBBON_KIND:
+					case RIBBON_LARGE:
+					case RIBBON_MEDIUM:
+					case RIBBON_SMALL:
+					case RING_SILVER:
+					case RING_SILVER_TRUE:
+					case TRINKET_FLOAT_GUARD:
+					case SHIELD_RING_LARGE:
+					case SHIELD_RING_SMALL:
+					case RING_GOLD:
+					case RING_GOLD_CORRUPTED:
+					case RING_GOLD_TRUE:
+					case RING_SILVER_CORRUPTED:
+						break;
+					case ELUDE_CAPE_SMALL:
+						
+						float chance = .15f;
+						int cost = 150;
+						
+						// Check to see if we're facing the enemy that attacked us
+						Vec3d attackFrom = source.getPositionVector().subtract(player.getPositionVector());
+						double attackFromYaw = -Math.atan2(attackFrom.xCoord, attackFrom.zCoord) * 180.0F / (float)Math.PI;
+						
+						if (Math.abs(((player.rotationYaw + 360f) % 360f) - ((attackFromYaw + 360f) % 360f)) < 30f) {
+							if (NostrumMagica.rand.nextFloat() < chance) {
+								// If there's aether, dodge!
+								int taken = APIProxy.drawFromInventory(player.worldObj, player, player.inventory, cost, stack);
+								if (taken > 0) {
+									// Dodge!
+									event.setCanceled(true);
+									NostrumMagicaSounds.DAMAGE_WIND.play(player.worldObj, player.posX, player.posY, player.posZ);
+									float dir = player.rotationYaw + (NostrumMagica.rand.nextBoolean() ? -1 : 1) * 90f;
+									float velocity = .5f;
+									player.motionX = velocity * MathHelper.cos(dir);
+									player.motionZ = velocity * MathHelper.sin(dir);
+									player.velocityChanged = true;
+								}
+							}
+						}
+						break;
+					}
+				}
+			}
 		}
 	}
 

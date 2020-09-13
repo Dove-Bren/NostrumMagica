@@ -138,6 +138,14 @@
         ]
     },
     
+    "spell.debuff3":
+    {
+        "sounds":
+        [
+            "nostrummagica:spell/debuff3"
+        ]
+    },
+    
     "spell.shield.cast":
     {
         "sounds":
@@ -178,11 +186,49 @@
         ]
     },
     
+    "player.lore.get":
+    {
+        "sounds":
+        [
+            "nostrummagica:ambient/lore"
+        ]
+    },
+    
     "ui.tick":
     {
         "sounds":
         [
             "nostrummagica:ui/tick"
+        ]
+    },
+    
+    "ui.success.quest":
+    {
+        "sounds":
+        [
+            "nostrummagica:ui/success1"
+        ]
+    },
+    
+    "ui.success.research":
+    {
+        "sounds":
+        [
+            "nostrummagica:ui/success2"
+        ]
+    },
+    
+    "ui.research.progress":
+    {
+        "sounds":
+        [
+            "nostrummagica:ui/hmm1",
+            "nostrummagica:ui/hmm2",
+            "nostrummagica:ui/hmm3",
+            "nostrummagica:ui/hmm4",
+            "nostrummagica:ui/hmm5",
+            "nostrummagica:ui/hmm6",
+            "nostrummagica:ui/hmm7"
         ]
     },
     
@@ -192,6 +238,15 @@
         "sounds":
         [
             "nostrummagica:ambient/woosh"
+        ]
+    },
+    
+    "ambient.woosh2":
+    {
+        "category": "neutral",
+        "sounds":
+        [
+            "nostrummagica:ambient/fairy_fanfare"
         ]
     },
     

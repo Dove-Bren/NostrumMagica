@@ -280,6 +280,6 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 	
 	public void clearDoor(World world, BlockPos onePos, IBlockState state) {
 		destroy(world, onePos, state);
-		NostrumMagicaSounds.LEVELUP.play(world, onePos.getX(), onePos.getY(), onePos.getZ());
+		NostrumMagicaSounds.AMBIENT_WOOSH2.play(world, onePos.getX(), onePos.getY(), onePos.getZ());
 	}
 }

@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble;
+import com.smanzana.nostrummagica.blocks.TeleportRune;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.MirrorGui;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
@@ -44,6 +45,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.entity.projectile.EntityThrowable;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.math.BlockPos;
@@ -516,10 +518,27 @@ public class PlayerListener {
 						continue;
 					
 					EnchantedEquipment ench = (EnchantedEquipment) stack.getItem();
-					if (ench.shouldTrigger(false)) {
-						SpellAction action = ench.getTriggerAction(livingTarget, false);
+					if (ench.shouldTrigger(false, stack)) {
+						SpellAction action = ench.getTriggerAction(livingTarget, false, stack);
 						if (action != null)
 							action.apply(livingSource, 1.0f);
+					}
+				}
+				if (NostrumMagica.baubles.isEnabled() && livingTarget instanceof EntityPlayer) {
+					IInventory inv = NostrumMagica.baubles.getBaubles((EntityPlayer) livingTarget);
+					if (inv != null) {
+						for (int i = 0; i < inv.getSizeInventory(); i++) {
+							ItemStack stack = inv.getStackInSlot(i);
+							if (stack == null || !(stack.getItem() instanceof EnchantedEquipment))
+								continue;
+							
+							EnchantedEquipment ench = (EnchantedEquipment) stack.getItem();
+							if (ench.shouldTrigger(false, stack)) {
+								SpellAction action = ench.getTriggerAction(livingTarget, false, stack);
+								if (action != null)
+									action.apply(livingSource, 1.0f);
+							}
+						}
 					}
 				}
 		
@@ -529,10 +548,27 @@ public class PlayerListener {
 						continue;
 					
 					EnchantedEquipment ench = (EnchantedEquipment) stack.getItem();
-					if (ench.shouldTrigger(true)) {
-						SpellAction action = ench.getTriggerAction(livingSource, true);
+					if (ench.shouldTrigger(true, stack)) {
+						SpellAction action = ench.getTriggerAction(livingSource, true, stack);
 						if (action != null)
 							action.apply(livingTarget, 1.0f);
+					}
+				}
+				if (NostrumMagica.baubles.isEnabled() && livingSource instanceof EntityPlayer) {
+					IInventory inv = NostrumMagica.baubles.getBaubles((EntityPlayer) livingSource);
+					if (inv != null) {
+						for (int i = 0; i < inv.getSizeInventory(); i++) {
+							ItemStack stack = inv.getStackInSlot(i);
+							if (stack == null || !(stack.getItem() instanceof EnchantedEquipment))
+								continue;
+							
+							EnchantedEquipment ench = (EnchantedEquipment) stack.getItem();
+							if (ench.shouldTrigger(true, stack)) {
+								SpellAction action = ench.getTriggerAction(livingSource, true, stack);
+								if (action != null)
+									action.apply(livingTarget, 1.0f);
+							}
+						}
 					}
 				}
 			}
@@ -858,6 +894,8 @@ public class PlayerListener {
 					if (entry.getKey().onEvent(Event.TIME, null, null))
 						it.remove();
 			}
+			
+			TeleportRune.tick();
 		}
 	}
 	

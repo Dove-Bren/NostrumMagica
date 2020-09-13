@@ -19,18 +19,21 @@ import com.smanzana.nostrummagica.blocks.MagicDirt;
 import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.blocks.ManiCrystal;
 import com.smanzana.nostrummagica.blocks.ManiOre;
+import com.smanzana.nostrummagica.blocks.MimicBlock;
 import com.smanzana.nostrummagica.blocks.ModificationTable;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.blocks.NostrumMirrorBlock;
 import com.smanzana.nostrummagica.blocks.NostrumObelisk;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.blocks.ProgressionDoor;
+import com.smanzana.nostrummagica.blocks.PutterBlock;
 import com.smanzana.nostrummagica.blocks.ShrineBlock;
 import com.smanzana.nostrummagica.blocks.SorceryPortal;
 import com.smanzana.nostrummagica.blocks.SorceryPortalSpawner;
 import com.smanzana.nostrummagica.blocks.SpellTable;
 import com.smanzana.nostrummagica.blocks.SwitchBlock;
 import com.smanzana.nostrummagica.blocks.SymbolBlock;
+import com.smanzana.nostrummagica.blocks.TeleportRune;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagic;
@@ -678,6 +681,36 @@ public class CommonProxy {
     	
     	GameRegistry.register(ManiCrystal.instance(),
     			new ResourceLocation(NostrumMagica.MODID, ManiCrystal.ID));
+    	
+    	GameRegistry.register(MimicBlock.door(),
+    			new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_DOOR));
+    	GameRegistry.register(
+    			(new ItemBlock(MimicBlock.door()).setRegistryName(MimicBlock.ID_DOOR)
+    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(MimicBlock.ID_DOOR))
+    			);
+    	
+    	GameRegistry.register(MimicBlock.facade(),
+    			new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_FACADE));
+    	GameRegistry.register(
+    			(new ItemBlock(MimicBlock.facade()).setRegistryName(MimicBlock.ID_FACADE)
+    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(MimicBlock.ID_FACADE))
+    			);
+    	
+    	GameRegistry.register(TeleportRune.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, TeleportRune.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(TeleportRune.instance()).setRegistryName(TeleportRune.ID)
+    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(TeleportRune.ID))
+    			);
+    	TeleportRune.init();
+    	
+    	GameRegistry.register(PutterBlock.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, PutterBlock.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(PutterBlock.instance()).setRegistryName(PutterBlock.ID)
+    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(PutterBlock.ID))
+    			);
+    	PutterBlock.init();
     }
     
     public void syncPlayer(EntityPlayerMP player) {
