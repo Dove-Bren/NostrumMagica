@@ -59,6 +59,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	
 	private static final String NBT_MARK_DIMENSION = "mark_dim";
 	private static final String NBT_MARK_POS = "mark_pos";
+	private static final String NBT_ENHANCED_TELEPORT = "enhanced_teleport";
 	
 	private static final String NBT_QUESTS_COMPLETED = "quests_completed";
 	private static final String NBT_QUESTS_CURRENT = "quests_current";
@@ -162,6 +163,9 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			posTag.setInteger("z", markPos.getZ());
 			nbt.setInteger(NBT_MARK_DIMENSION, instance.getMarkDimension());
 			nbt.setTag(NBT_MARK_POS, posTag);
+		}
+		if (instance.hasEnhancedTeleport()) {
+			nbt.setBoolean(NBT_ENHANCED_TELEPORT, true);
 		}
 		
 		List<String> stringList = instance.getCurrentQuests();
@@ -332,6 +336,10 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			int dimension = tag.getInteger(NBT_MARK_DIMENSION);
 			
 			instance.setMarkLocation(dimension, location);
+		}
+		
+		if (tag.hasKey(NBT_ENHANCED_TELEPORT) && tag.getBoolean(NBT_ENHANCED_TELEPORT)) {
+			instance.unlockEnhancedTeleport();
 		}
 		
 		// Quests

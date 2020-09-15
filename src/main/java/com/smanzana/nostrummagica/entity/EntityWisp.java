@@ -14,6 +14,8 @@ import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIStayHomeTask;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
+import com.smanzana.nostrummagica.items.NostrumResourceItem;
+import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -294,7 +296,12 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 	}
 	
 	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-		;
+		if (wasRecentlyHit && this.getHome() == null) {
+			int chance = 1 + (2 * lootingModifier);
+			if (this.rand.nextInt(100) < chance) {
+				this.entityDropItem(NostrumResourceItem.getItem(ResourceType.WISP_PEBBLE, 1), 0);
+			}
+		}
 	}
 
 	@Override

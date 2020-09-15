@@ -374,17 +374,19 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	public void update() {
 		super.update();
 		
+
+		aliveCount++;
+		
+		if (!worldObj.isRemote && targetOverride != null && aliveCount >= targetOverrideEnd) {
+			targetOverride = null;
+			refreshPortal();
+		}
+		
 		if (!worldObj.isRemote)
 			return;
 		if (corner == null || master)
 			return;
 		
-		aliveCount++;
-		
-		if (targetOverride != null && aliveCount >= targetOverrideEnd) {
-			targetOverride = null;
-			refreshPortal();
-		}
 		
 		final long stepInverval = 2;
 		if (aliveCount % stepInverval != 0)
@@ -435,6 +437,12 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	 * @return
 	 */
 	public boolean deductForTeleport(BlockPos destination) {
+		
+		if (this.targetOverride != null && destination == this.targetOverride) {
+			// No cost for overrides
+			return true;
+		}
+		
 		double dist = (Math.abs(this.pos.getX() - destination.getX())
 						 + Math.abs(this.pos.getY() - destination.getY())
 						 + Math.abs(this.pos.getZ() - destination.getZ()));

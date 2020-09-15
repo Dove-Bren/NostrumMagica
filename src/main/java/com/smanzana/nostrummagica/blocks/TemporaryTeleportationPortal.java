@@ -1,5 +1,10 @@
 package com.smanzana.nostrummagica.blocks;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.block.state.IBlockState;
@@ -62,6 +67,78 @@ public class TemporaryTeleportationPortal extends TeleportationPortal  {
 		instance().createPaired(world, at);
 		
 		spawnPortal(world, at, target, duration);
+	}
+	
+	public static BlockPos spawnNearby(World world, BlockPos center, double radius, boolean centerValid, BlockPos target, int duration) {
+		// Find a spot to place it!
+		List<BlockPos> next = new LinkedList<>();
+		Set<BlockPos> seen = new HashSet<>();
+		
+		if (centerValid) {
+			// Try center and grow from there
+			next.add(center);
+			seen.add(center.up());
+		} else {
+			// avoid center location by unrolling surrounding blocks
+			seen.add(center);
+			seen.add(center.up());
+			next.add(center.north());
+			next.add(center.west());
+			next.add(center.east());
+			next.add(center.south());
+		}
+		
+		BlockPos found = null;
+		while (!next.isEmpty()) {
+			BlockPos loc = next.remove(0);
+			seen.add(loc);
+			
+			int lDist = Math.abs(loc.getX() - center.getX()) + Math.abs(loc.getY() - center.getY()) + Math.abs(loc.getZ() - center.getZ());
+			
+			// Less than here so the last visited are the exact border
+			if (lDist < radius) {
+				for (BlockPos pos : new BlockPos[]{loc.up(), loc.down(), loc.north(), loc.south(), loc.east(), loc.west()}) {
+					if (!seen.contains(pos) && !next.contains(pos)) {
+						next.add(pos);
+					}
+				}
+			}
+
+			if (!centerValid && lDist <= 1) {
+				continue;
+			}
+			
+			boolean pass = true;
+			for (BlockPos pos : new BlockPos[]{loc, loc.up()}) {
+				if (!world.isAirBlock(pos)) {
+					IBlockState state = world.getBlockState(loc);
+					if (!state.getBlock().isReplaceable(world, loc)) {
+						pass = false;
+						break;
+					}
+				}
+			}
+			
+			if (!pass) {
+				continue;
+			}
+			
+			// Check that it's on ground
+			IBlockState ground = world.getBlockState(loc.down());
+			if (!ground.getMaterial().blocksMovement()) {
+			//if (!ground.isSideSolid(world, loc.down(), EnumFacing.UP)) {
+				continue;
+			}
+			
+			// Success. Use this position!
+			found = loc;
+			break;
+		}
+		
+		if (found != null) {
+			spawn(world, found, target, duration);
+		}
+		return found;
 	}
 	
 	public static class TemporaryPortalTileEntity extends TeleportationPortalTileEntity implements ITickable  {

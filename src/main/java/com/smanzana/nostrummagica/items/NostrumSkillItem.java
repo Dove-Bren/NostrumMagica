@@ -31,7 +31,8 @@ public class NostrumSkillItem extends Item implements ILoreTagged {
 		OOZE("essential_ooze"),
 		PENDANT("eldrich_pendant"),
 		FLUTE("living_flute"),
-		WING("dragon_wing");
+		WING("dragon_wing"),
+		ENDER_PIN("ender_pin");
 		
 		private String key;
 		
@@ -131,12 +132,14 @@ public class NostrumSkillItem extends Item implements ILoreTagged {
 		if (playerIn.isSneaking())
 			return new ActionResult<ItemStack>(EnumActionResult.PASS, stack);
 		
-		
-		
 		SkillItemType type = getTypeFromMeta(stack.getMetadata());
-		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
 		if (attr != null && attr.isUnlocked() && type != SkillItemType.WING) {
+			
+			if (type == SkillItemType.ENDER_PIN  && attr.hasEnhancedTeleport()) {
+				playerIn.addChatMessage(new TextComponentTranslation("info.skillitem.advtele.unlocked", new Object[0]));
+				return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+			}
 			
 			String suffix = null;
 			switch (type) {
@@ -158,6 +161,10 @@ public class NostrumSkillItem extends Item implements ILoreTagged {
 				break;
 			case WING:
 				// Wings don't do anything
+				break;
+			case ENDER_PIN:
+				attr.unlockEnhancedTeleport();;
+				suffix = "advtele";
 				break;
 			}
 			

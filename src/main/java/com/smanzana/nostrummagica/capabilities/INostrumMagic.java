@@ -108,6 +108,8 @@ public interface INostrumMagic {
 	public void setMarkLocation(int dimension, BlockPos location);
 	public BlockPos getMarkLocation();
 	public int getMarkDimension();
+	public void unlockEnhancedTeleport();
+	public boolean hasEnhancedTeleport();
 	
 	// Serialization/Deserialization. Do not call.
 	public void deserialize(

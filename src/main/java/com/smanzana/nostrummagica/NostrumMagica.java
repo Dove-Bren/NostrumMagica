@@ -11,11 +11,15 @@ import com.smanzana.nostrummagica.aetheria.AetheriaProxy;
 import com.smanzana.nostrummagica.baubles.BaublesProxy;
 import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble.ItemType;
+import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.blocks.LoreTable;
+import com.smanzana.nostrummagica.blocks.MimicBlock;
 import com.smanzana.nostrummagica.blocks.ModificationTable;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
+import com.smanzana.nostrummagica.blocks.PutterBlock;
 import com.smanzana.nostrummagica.blocks.SorceryPortal;
+import com.smanzana.nostrummagica.blocks.TeleportRune;
 import com.smanzana.nostrummagica.capabilities.AttributeProvider;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.command.CommandAllQuests;
@@ -794,7 +798,7 @@ public class NostrumMagica
 					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.SKY_ASH, ReagentType.MANDRAKE_ROOT, ReagentType.GINSENG},
 					NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
 					new ItemStack[] {NostrumResourceItem.getItem(ResourceType.SLAB_BALANCED, 1), new ItemStack(Items.ENDER_EYE), new ItemStack(Items.ENDER_EYE), new ItemStack(Items.COMPASS)},
-					new RRequirementResearch("obelisk"),
+					new RRequirementResearch("obelisks"),
 					new OutcomeCreateObelisk())
 				);
 		
@@ -1003,6 +1007,18 @@ public class NostrumMagica
 				new OutcomeSpawnItem(NostrumSkillItem.getItem(SkillItemType.PENDANT, 1)))
 			);
 		
+		// Ender pin
+		RitualRegistry.instance().addRitual(
+			RitualRecipe.createTier3("ender_pin",
+				NostrumSkillItem.getItem(SkillItemType.ENDER_PIN, 1),
+				EMagicElement.ENDER,
+				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANDRAKE_ROOT, ReagentType.SPIDER_SILK},
+				NostrumResourceItem.getItem(ResourceType.WISP_PEBBLE, 1),
+				new ItemStack[] {NostrumResourceItem.getItem(ResourceType.ENDER_BRISTLE, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), NostrumResourceItem.getItem(ResourceType.ENDER_BRISTLE, 1), NostrumResourceItem.getItem(ResourceType.ENDER_BRISTLE, 1)},
+				new RRequirementResearch("ender_pin"),
+				new OutcomeSpawnItem(NostrumSkillItem.getItem(SkillItemType.ENDER_PIN, 1)))
+			);
+		
 		//Mirror Shield
 		ItemStack extra = (baubles.isEnabled() ? ItemMagicBauble.getItem(ItemType.RIBBON_SMALL, 1) : NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1));
 		
@@ -1208,6 +1224,53 @@ public class NostrumMagica
 						new OutcomeSpawnItem(new ItemStack(ModificationTable.instance()))
 						)
 				);
+		
+		// Teleport Runes
+		RitualRegistry.instance().addRitual(
+			RitualRecipe.createTier3("teleportrune",
+				new ItemStack(TeleportRune.instance()),
+				EMagicElement.ENDER,
+				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.SKY_ASH, ReagentType.MANDRAKE_ROOT, ReagentType.BLACK_PEARL},
+				new ItemStack(Blocks.CARPET, 1, OreDictionary.WILDCARD_VALUE),
+				new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), new ItemStack(Items.ENDER_PEARL), new ItemStack(ChalkItem.instance(), 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1)},
+				new RRequirementResearch("teleportrune"),
+				new OutcomeSpawnItem(new ItemStack(TeleportRune.instance(), 2)))
+			);
+		
+		// Putter
+		RitualRegistry.instance().addRitual(
+			RitualRecipe.createTier2("putter",
+				new ItemStack(PutterBlock.instance()),
+				null,
+				new ReagentType[] {ReagentType.MANDRAKE_ROOT, ReagentType.SPIDER_SILK, ReagentType.BLACK_PEARL, ReagentType.BLACK_PEARL},
+				new ItemStack(Blocks.DROPPER),
+				new RRequirementResearch("putter"),
+				new OutcomeSpawnItem(new ItemStack(PutterBlock.instance())))
+			);
+		
+		// Facade
+		RitualRegistry.instance().addRitual(
+			RitualRecipe.createTier3("mimic_facade",
+				new ItemStack(MimicBlock.facade()),
+				null,
+				new ReagentType[] {ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.GRAVE_DUST, ReagentType.GINSENG},
+				new ItemStack(Blocks.GLASS, 1, OreDictionary.WILDCARD_VALUE),
+				new ItemStack[] {new ItemStack(Blocks.PLANKS, 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1), new ItemStack(Blocks.GLOWSTONE, 1, OreDictionary.WILDCARD_VALUE)},
+				new RRequirementResearch("magicfacade"),
+				new OutcomeSpawnItem(new ItemStack(MimicBlock.facade(), 8)))
+			);
+		
+		// Door
+		RitualRegistry.instance().addRitual(
+			RitualRecipe.createTier3("mimic_door",
+				new ItemStack(MimicBlock.door()),
+				null,
+				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.CRYSTABLOOM, ReagentType.GRAVE_DUST, ReagentType.GINSENG},
+				new ItemStack(Items.IRON_DOOR, 1, OreDictionary.WILDCARD_VALUE),
+				new ItemStack[] {new ItemStack(MimicBlock.facade()), new ItemStack(MimicBlock.facade()), new ItemStack(MimicBlock.facade()), new ItemStack(MimicBlock.facade())},
+				new RRequirementResearch("magicfacade"),
+				new OutcomeSpawnItem(new ItemStack(MimicBlock.door(), 1)))
+			);
 		
 		
 //		RitualRegistry.instance().addRitual(
@@ -1635,6 +1698,7 @@ public class NostrumMagica
     	NostrumResearchTab.MAGICA = new NostrumResearchTab("magica", SpellTome.getItemstack(3, 1, (List<SpellTomeEnhancementWrapper>)null));
 		NostrumResearchTab.MYSTICISM = new NostrumResearchTab("mysticism", NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1));
 		NostrumResearchTab.OUTFITTING = new NostrumResearchTab("outfitting", new ItemStack(MageStaff.instance()));
+		NostrumResearchTab.TINKERING = new NostrumResearchTab("tinkering", new ItemStack(PutterBlock.instance()));
 		NostrumResearchTab.ADVANCED_MAGICA = new NostrumResearchTab("advanced_magica", new ItemStack(ThanoPendant.instance()));
 		
 		// Then register researches
@@ -1701,31 +1765,15 @@ public class NostrumMagica
 		
 		NostrumResearch.startBuilding()
 			.parent("rituals")
-			.reference(PositionCrystal.instance())
-		.build("geogems", NostrumResearchTab.MAGICA, Size.NORMAL, 2, 2, false, new ItemStack(PositionCrystal.instance()));
+		.build("candles", NostrumResearchTab.MAGICA, Size.NORMAL, 2, 2, false, new ItemStack(Candle.instance()));
 		
 		NostrumResearch.startBuilding()
-			.parent("geogems")
-			.lore(PositionCrystal.instance())
-			.reference(PositionToken.instance())
-		.build("geotokens", NostrumResearchTab.MAGICA, Size.NORMAL, 2, 3, true, new ItemStack(PositionToken.instance()));
-		
-		NostrumResearch.startBuilding()
-			.parent("geotokens")
-			.hiddenParent("balanced_infusion")
+			.hiddenParent("geotokens")
+			.parent("rituals")
 			.lore(PositionToken.instance())
-			.quest("lvl10")
-			.reference("builtin::guides::obelisks", "info.obelisks.name")
-			.reference("ritual::create_obelisk", "ritual.create_obelisk.name")
-		.build("obelisks", NostrumResearchTab.MAGICA, Size.LARGE, 1, 4, true, new ItemStack(DungeonBlock.instance(), 1, DungeonBlock.Type.DARK.ordinal()));
-		
-		NostrumResearch.startBuilding()
-			.parent("geotokens")
-			.lore(PositionToken.instance())
-			.quest("lvl10")
 			.reference("ritual::mark", "ritual.mark.name")
 			.reference("ritual::recall", "ritual.recall.name")
-		.build("markrecall", NostrumResearchTab.MAGICA, Size.LARGE, 3, 4, true, new ItemStack(Items.COMPASS));
+		.build("markrecall", NostrumResearchTab.MAGICA, Size.LARGE, 4, 2, true, new ItemStack(Items.COMPASS));
 		
 		NostrumResearch.startBuilding()
 			.parent("rituals")
@@ -1738,25 +1786,20 @@ public class NostrumMagica
 			.reference("ritual::buff.invisibility", "ritual.buff.invisibility.name")
 			.reference("ritual::buff.nightvision", "ritual.buff.nightvision.name")
 			.reference("ritual::buff.waterbreathing", "ritual.buff.waterbreathing.name")
-		.build("boon", NostrumResearchTab.MAGICA, Size.LARGE, 4, 2, true, new ItemStack(Items.SPLASH_POTION));
+		.build("boon", NostrumResearchTab.MAGICA, Size.LARGE, 3, 0, true, new ItemStack(Items.SPLASH_POTION));
 		
 		NostrumResearch.startBuilding()
 			.parent("rituals")
 			.hiddenParent("magic_token")
 			.lore(EntityKoid.LoreKey)
 			.reference("ritual::koid", "ritual.koid.name")
-		.build("summonkoids", NostrumResearchTab.MAGICA, Size.NORMAL, 2, 0, true, new ItemStack(EssenceItem.instance()));
-		
-		NostrumResearch.startBuilding()
-			.parent("rituals")
-			.reference("ritual::spawn_sorcery_portal", "ritual.spawn_sorcery_portal.name")
-		.build("sorceryportal", NostrumResearchTab.MAGICA, Size.LARGE, 4, 0, true, new ItemStack(SorceryPortal.instance()));
+		.build("summonkoids", NostrumResearchTab.MAGICA, Size.NORMAL, 3, 2, true, new ItemStack(EssenceItem.instance()));
 		
 		NostrumResearch.startBuilding()
 			.hiddenParent("spellcraft")
-			.hiddenParent("rituals")
+			.parent("rituals")
 			.reference("ritual::lore_table", "ritual.lore_table.name")
-		.build("loretable", NostrumResearchTab.MAGICA, Size.NORMAL, -2, -1, true, new ItemStack(LoreTable.instance()));
+		.build("loretable", NostrumResearchTab.MAGICA, Size.NORMAL, 2, 0, true, new ItemStack(LoreTable.instance()));
 		
 		
 		// Mysticism Tab (Resources)
@@ -1764,27 +1807,27 @@ public class NostrumMagica
 			.hiddenParent("rituals")
 			.lore(ReagentItem.instance())
 			.reference("ritual::magic_token", "ritual.magic_token.name")
-		.build("magic_token", NostrumResearchTab.MYSTICISM, Size.NORMAL, 0, 0, true, NostrumResourceItem.getItem(ResourceType.TOKEN, 1));
+		.build("magic_token", NostrumResearchTab.MYSTICISM, Size.NORMAL, -1, 0, true, NostrumResourceItem.getItem(ResourceType.TOKEN, 1));
 		
 		NostrumResearch.startBuilding()
 			.parent("magic_token")
 			.quest("lvl3")
 			.reference("ritual::magic_token_3", "ritual.magic_token_3.name")
-		.build("magic_token_3", NostrumResearchTab.MYSTICISM, Size.NORMAL, -1, 0, true, NostrumResourceItem.getItem(ResourceType.TOKEN, 1));
+		.build("magic_token_3", NostrumResearchTab.MYSTICISM, Size.NORMAL, -2, 0, true, NostrumResourceItem.getItem(ResourceType.TOKEN, 1));
 		
 		NostrumResearch.startBuilding()
 			.parent("magic_token")
 			.lore(NostrumResourceItem.instance())
 			.quest("lvl3")
 			.reference("ritual::kani", "ritual.kani.name")
-		.build("kani", NostrumResearchTab.MYSTICISM, Size.NORMAL, 0, 1, true, NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1));
+		.build("kani", NostrumResearchTab.MYSTICISM, Size.NORMAL, -1, 1, true, NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1));
 		
 		NostrumResearch.startBuilding()
 			.parent("kani")
 			.quest("lvl7")
 			.lore(NostrumResourceItem.instance())
 			.reference("ritual::vani", "ritual.vani.name")
-		.build("vani", NostrumResearchTab.MYSTICISM, Size.LARGE, 0, 2, true, NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1));
+		.build("vani", NostrumResearchTab.MYSTICISM, Size.LARGE, -1, 2, true, NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1));
 		
 		NostrumResearch.startBuilding()
 			.hiddenParent("magic_token")
@@ -1795,24 +1838,24 @@ public class NostrumMagica
 			.reference("ritual::rune.inflict", "ritual.rune.inflict.name")
 			.reference("ritual::rune.trigger_touch", "ritual.rune.trigger_touch.name")
 			.reference("ritual::rune.trigger_self", "ritual.rune.trigger_self.name")
-		.build("spellrunes", NostrumResearchTab.MYSTICISM, Size.LARGE, -2, 0, true, SpellRune.getRune(SingleShape.instance()));
+		.build("spellrunes", NostrumResearchTab.MYSTICISM, Size.GIANT, 0, 0, true, SpellRune.getRune(SingleShape.instance()));
 		
 		NostrumResearch.startBuilding()
 			.hiddenParent("kani")
 			.reference("ritual::fierce_infusion", "ritual.fierce_infusion.name")
-		.build("fierce_infusion", NostrumResearchTab.MYSTICISM, Size.NORMAL, 2, 1, true, NostrumResourceItem.getItem(ResourceType.SLAB_FIERCE, 1));
+		.build("fierce_infusion", NostrumResearchTab.MYSTICISM, Size.NORMAL, 1, 0, true, NostrumResourceItem.getItem(ResourceType.SLAB_FIERCE, 1));
 		
 		NostrumResearch.startBuilding()
 			.hiddenParent("kani")
 			.reference("ritual::kind_infusion", "ritual.kind_infusion.name")
-		.build("kind_infusion", NostrumResearchTab.MYSTICISM, Size.NORMAL, 4, 1, true, NostrumResourceItem.getItem(ResourceType.SLAB_KIND, 1));
+		.build("kind_infusion", NostrumResearchTab.MYSTICISM, Size.NORMAL, 3, 0, true, NostrumResourceItem.getItem(ResourceType.SLAB_KIND, 1));
 		
 		NostrumResearch.startBuilding()
 			.hiddenParent("vani")
 			.parent("fierce_infusion")
 			.parent("kind_infusion")
 			.reference("ritual::balanced_infusion", "ritual.balanced_infusion.name")
-		.build("balanced_infusion", NostrumResearchTab.MYSTICISM, Size.NORMAL, 3, 2, true, NostrumResourceItem.getItem(ResourceType.SLAB_BALANCED, 1));
+		.build("balanced_infusion", NostrumResearchTab.MYSTICISM, Size.LARGE, 2, 1, true, NostrumResourceItem.getItem(ResourceType.SLAB_BALANCED, 1));
 		
 		
 		// Outfitting (weapon/armor)
@@ -1897,6 +1940,56 @@ public class NostrumMagica
 		.build("charms", NostrumResearchTab.OUTFITTING, Size.NORMAL, 0, 0, true, MagicCharm.getCharm(EMagicElement.ENDER, 1));
 		
 		
+		// Tinkering
+		NostrumResearch.startBuilding()
+			.parent("rituals")
+			.quest("lvl4")
+			.reference(PositionCrystal.instance())
+		.build("geogems", NostrumResearchTab.TINKERING, Size.NORMAL, 1, -1, false, new ItemStack(PositionCrystal.instance()));
+		
+		NostrumResearch.startBuilding()
+			.parent("geogems")
+			.lore(PositionCrystal.instance())
+			.reference(PositionToken.instance())
+		.build("geotokens", NostrumResearchTab.TINKERING, Size.LARGE, 1, 0, true, new ItemStack(PositionToken.instance()));
+		
+		NostrumResearch.startBuilding()
+			.parent("geotokens")
+			.hiddenParent("markrecall")
+			.hiddenParent("balanced_infusion")
+			.lore(PositionToken.instance())
+			.quest("lvl10")
+			.reference("builtin::guides::obelisks", "info.obelisks.name")
+			.reference("ritual::create_obelisk", "ritual.create_obelisk.name")
+		.build("obelisks", NostrumResearchTab.TINKERING, Size.GIANT, 2, 1, true, new ItemStack(DungeonBlock.instance(), 1, DungeonBlock.Type.DARK.ordinal()));
+		
+		NostrumResearch.startBuilding()
+			.hiddenParent("markrecall")
+			.parent("obelisks")
+			.reference("ritual::spawn_sorcery_portal", "ritual.spawn_sorcery_portal.name")
+		.build("sorceryportal", NostrumResearchTab.TINKERING, Size.NORMAL, 2, 2, true, new ItemStack(SorceryPortal.instance()));
+		
+		NostrumResearch.startBuilding()
+			.parent("geotokens")
+			.hiddenParent("markrecall")
+			.lore(PositionToken.instance())
+			.quest("lvly")
+			.reference("ritual::teleportrune", "ritual.teleportrune.name")
+		.build("teleportrune", NostrumResearchTab.TINKERING, Size.NORMAL, 2, -1, true, new ItemStack(TeleportRune.instance()));
+		
+		NostrumResearch.startBuilding()
+			.hiddenParent("rituals")
+			.hiddenParent("magic_token")
+			.reference("ritual::putter", "ritual.putter.name")
+		.build("putter", NostrumResearchTab.TINKERING, Size.NORMAL, -1, 1, true, new ItemStack(PutterBlock.instance()));
+		
+		NostrumResearch.startBuilding()
+			.hiddenParent("rituals")
+			.reference("ritual::mimic_facade", "ritual.mimic_facade.name")
+			.reference("ritual::mimic_door", "ritual.mimic_door.name")
+		.build("magicfacade", NostrumResearchTab.TINKERING, Size.NORMAL, -2, 1, true, new ItemStack(MimicBlock.facade()));
+		
+		
 		// Advanced Magica
 		NostrumResearch.startBuilding()
 			.hiddenParent("vani")
@@ -1934,6 +2027,11 @@ public class NostrumMagica
 			.lore(NostrumSkillItem.instance())
 			.reference("ritual::form_primordial_mirror", "ritual.form_primordial_mirror.name")
 		.build("stat_items_wing", NostrumResearchTab.ADVANCED_MAGICA, Size.NORMAL, -2, 1, true, NostrumSkillItem.getItem(SkillItemType.WING, 1));
+		
+		NostrumResearch.startBuilding()
+			.parent("stat_items")
+			.reference("ritual::ender_pin", "ritual.ender_pin.name")
+		.build("ender_pin", NostrumResearchTab.ADVANCED_MAGICA, Size.LARGE, -3, 0, true, NostrumSkillItem.getItem(SkillItemType.ENDER_PIN, 1));
 		
 		//NostrumResearchTab tab, Size size, int x, int y, boolean hidden, ItemStack icon
     }

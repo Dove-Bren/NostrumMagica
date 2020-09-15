@@ -488,6 +488,7 @@ public class NostrumResearch {
 		public static NostrumResearchTab MAGICA = null;
 		public static NostrumResearchTab ADVANCED_MAGICA = null;
 		public static NostrumResearchTab MYSTICISM = null;
+		public static NostrumResearchTab TINKERING = null;
 		public static NostrumResearchTab OUTFITTING = null;
 		
 		private static List<NostrumResearchTab> AllTabs = new LinkedList<>();

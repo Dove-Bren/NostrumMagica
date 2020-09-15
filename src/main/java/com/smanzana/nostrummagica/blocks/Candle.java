@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.blocks;
 
+import java.util.List;
 import java.util.Random;
 
 import javax.annotation.Nullable;
@@ -8,6 +9,8 @@ import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.network.NetworkHandler;
+import com.smanzana.nostrummagica.network.messages.CandleIgniteMessage;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
@@ -19,6 +22,7 @@ import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemFlintAndSteel;
@@ -37,6 +41,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -56,6 +61,7 @@ public class Candle extends Block implements ITileEntityProvider {
 			return facing != EnumFacing.DOWN;
 		}
 	});
+	private static final int TICK_DELAY = 5;
 	
 	private static Candle instance = null;
 	public static Candle instance() {
@@ -95,10 +101,14 @@ public class Candle extends Block implements ITileEntityProvider {
 		this.setTickRandomly(true);
 	}
 	
+	protected boolean canPlaceAt(World worldIn, BlockPos pos, EnumFacing facing) {
+		return (worldIn.getBlockState(pos.offset(facing.getOpposite())).isSideSolid(worldIn, pos.offset(facing), facing));
+	}
+	
 	@Override
 	public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
 		for (EnumFacing enumfacing : FACING.getAllowedValues()) {
-			if (worldIn.getBlockState(pos.offset(enumfacing.getOpposite())).isSideSolid(worldIn, pos.offset(enumfacing), enumfacing)) {
+			if (canPlaceAt(worldIn, pos, enumfacing)) {
 				return true;
 			}
 		}
@@ -188,7 +198,13 @@ public class Candle extends Block implements ITileEntityProvider {
 //    }
     
     public static void light(World world, BlockPos pos, IBlockState state) {
-    	world.setBlockState(pos, state.withProperty(LIT, true));
+    	if (!state.getValue(LIT)) {
+	    	world.setBlockState(pos, state.withProperty(LIT, true));
+			
+			if (!world.isUpdateScheduled(pos, state.getBlock())) {
+				world.scheduleUpdate(pos, state.getBlock(), TICK_DELAY);
+			}
+    	}
     }
     
     public static void extinguish(World world, BlockPos pos, IBlockState state) {
@@ -197,13 +213,33 @@ public class Candle extends Block implements ITileEntityProvider {
     
     public static void extinguish(World world, BlockPos pos, IBlockState state, boolean force) {
     	
-    	if (world.getTileEntity(pos) != null)
+    	if (world.getTileEntity(pos) != null) {
     		world.removeTileEntity(pos);
+    		world.notifyBlockUpdate(pos, state, state, 2);
+    	}
+    	
+    	if (!world.isRemote) {
+			NetworkHandler.getSyncChannel().sendToAllAround(new CandleIgniteMessage(world.provider.getDimension(), pos, null),
+					new NetworkRegistry.TargetPoint(world.provider.getDimension(), pos.getX(), pos.getY(), pos.getZ(), 64));
+		}
     	
     	if (!force && world.getBlockState(pos.add(0, -1, 0)).getBlock()
-				.isFireSource(world, pos.add(0, -1, 0), EnumFacing.UP))
+				.isFireSource(world, pos.add(0, -1, 0), EnumFacing.UP)) {
+			
+			if (!world.isUpdateScheduled(pos, state.getBlock())) {
+				world.scheduleUpdate(pos, state.getBlock(), TICK_DELAY);
+			}
 			return;
+    	}
     	
+    	if (!force && world.getBlockState(pos.add(0, -2, 0)).getBlock()
+				.isFireSource(world, pos.add(0, -2, 0), EnumFacing.UP)) {
+			
+			if (!world.isUpdateScheduled(pos, state.getBlock())) {
+				world.scheduleUpdate(pos, state.getBlock(), TICK_DELAY);
+			}
+			return;
+    	}
     	
     	world.setBlockState(pos, state.withProperty(LIT, false));
     }
@@ -213,6 +249,11 @@ public class Candle extends Block implements ITileEntityProvider {
 		return null;
 		
 		// We don't create when the block is placed.
+	}
+	
+	@Override
+	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
+		super.onBlockAdded(worldIn, pos, state);
 	}
 	
 	@Override
@@ -276,6 +317,36 @@ public class Candle extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
+	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+		// Check for a reagent item over the candle
+		if (state.getValue(LIT) && worldIn.getTileEntity(pos) == null) {
+			List<EntityItem> items = worldIn.getEntitiesWithinAABB(EntityItem.class, Block.FULL_BLOCK_AABB.offset(pos).expand(1, 1, 1));
+			if (items != null && !items.isEmpty()) {
+				for (EntityItem item : items) {
+					ItemStack stack = item.getEntityItem();
+					if (stack.getItem() instanceof ReagentItem) {
+						ReagentType type = ReagentItem.findType(stack.splitStack(1));
+						if (type != null) {
+							setReagent(worldIn, pos, state, type);
+						}
+						
+						if (stack.stackSize <= 0) {
+							item.setDead();
+						}
+						
+						break;
+					}
+				}
+			}
+			
+			if (!worldIn.isUpdateScheduled(pos, this)) {
+				worldIn.scheduleUpdate(pos, this, TICK_DELAY);
+			}
+		}
+		
+	}
+	
+	@Override
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 
 //		if (worldIn.isRemote)
@@ -322,11 +393,48 @@ public class Candle extends Block implements ITileEntityProvider {
 		if (type == null)
 			return false;
 		
-		CandleTileEntity candle = new CandleTileEntity(type);
-		worldIn.setTileEntity(pos, candle);
-		candle.dirty();
+		setReagent(worldIn, pos, state, type);
 		
 		return true;
+	}
+	
+	public static void setReagent(World world, BlockPos pos, IBlockState state, ReagentType type) {
+		if (world.isRemote && type == null) {
+			extinguish(world, pos, state, false);
+			return;
+		}
+		
+		light(world, pos, state);
+		
+		CandleTileEntity candle = null;
+		if (world.getTileEntity(pos) != null) {
+			TileEntity te = world.getTileEntity(pos);
+			if (te instanceof CandleTileEntity) {
+				candle = (CandleTileEntity) te;
+			} else {
+				world.removeTileEntity(pos);
+			}
+		}
+		
+		if (candle == null) {
+			candle = new CandleTileEntity(type);
+			world.setTileEntity(pos, candle);
+		}
+		
+		candle.type = type;
+		candle.dirty();
+		
+		if (!world.isRemote) {
+			NetworkHandler.getSyncChannel().sendToAllAround(new CandleIgniteMessage(world.provider.getDimension(), pos, type),
+					new NetworkRegistry.TargetPoint(world.provider.getDimension(), pos.getX(), pos.getY(), pos.getZ(), 64));
+		}
+	}
+	
+	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn) {
+		if (!canPlaceAt(worldIn, pos, state.getValue(FACING))) {
+			this.dropBlockAsItem(worldIn, pos, state, 0);
+			worldIn.setBlockToAir(pos);
+		}
 	}
 	
 	public static class CandleTileEntity extends TileEntity implements ITickable {
@@ -410,7 +518,7 @@ public class Candle extends Block implements ITileEntityProvider {
 		public void update() {
 			this.lifeTicks = Math.max(-1, this.lifeTicks-1);
 			
-			if (this.lifeTicks == 0) {
+			if (this.lifeTicks == 0 && !worldObj.isRemote) {
 				IBlockState state = worldObj.getBlockState(this.pos);
 				if (state == null)
 					return;

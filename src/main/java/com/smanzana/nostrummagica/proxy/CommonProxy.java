@@ -47,6 +47,7 @@ import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonCont
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.config.network.ServerConfigMessage;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
+import com.smanzana.nostrummagica.entity.EntityAreaEffect;
 import com.smanzana.nostrummagica.entity.EntityChakramSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntityCyclerSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntityHookShot;
@@ -315,6 +316,12 @@ public class CommonProxy {
     			64,
     			1,
     			false);
+    	EntityRegistry.registerModEntity(EntityAreaEffect.class, "entity_effect_cloud", 
+    			entityID++,
+    			NostrumMagica.instance,
+    			64,
+    			1,
+    			false);
     	
     	EntityRegistry.addSpawn(EntityKoid.class, 20, 1, 1, EnumCreatureType.MONSTER, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.MAGICAL));
@@ -331,6 +338,16 @@ public class CommonProxy {
     				return !BiomeDictionary.isBiomeOfType(biome, BiomeDictionary.Type.END)
     						&& BiomeDictionary.isBiomeOfType(biome, BiomeDictionary.Type.NETHER);
     			}).collect(Collectors.toList()).toArray(new Biome[0]));
+    	EntityRegistry.addSpawn(EntityWisp.class, 10, 1, 2, EnumCreatureType.AMBIENT, 
+    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.MAGICAL));
+    	EntityRegistry.addSpawn(EntityWisp.class, 10, 1, 2, EnumCreatureType.AMBIENT, 
+    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.FOREST));
+    	EntityRegistry.addSpawn(EntityWisp.class, 10, 1, 2, EnumCreatureType.AMBIENT, 
+    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.SNOWY));
+    	EntityRegistry.addSpawn(EntityWisp.class, 10, 1, 2, EnumCreatureType.AMBIENT, 
+    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.NETHER));
+    	EntityRegistry.addSpawn(EntityWisp.class, 10, 1, 2, EnumCreatureType.AMBIENT, 
+    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.SPOOKY));
 
     	registerItems();
     	registerBlocks();

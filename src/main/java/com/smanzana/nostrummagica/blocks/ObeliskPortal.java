@@ -99,11 +99,11 @@ public class ObeliskPortal extends TeleportationPortal {
 		@SideOnly(Side.CLIENT)
 		@Override
 		public int getColor() {
-			EntityPlayer player = NostrumMagica.proxy.getPlayer();
-			if (NostrumPortal.getRemainingCooldown(player) > 0) {
-				return 0x00A00050;
+			TileEntity te = worldObj.getTileEntity(pos.down());
+			if (te != null && te instanceof NostrumObeliskEntity && ((NostrumObeliskEntity) te).hasOverride()) {
+				return 0x0000FF50;
 			}
-			return 0x00500050;
+			return 0x004000FF;
 		}
 
 		@SideOnly(Side.CLIENT)

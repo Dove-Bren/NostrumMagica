@@ -10,22 +10,32 @@ import java.util.UUID;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.entity.EntityAreaEffect;
+import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaEntityEffect;
+import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaLocationEffect;
 import com.smanzana.nostrummagica.potions.FrostbitePotion;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
@@ -224,16 +234,167 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 		return modelID;
 	}
 	
+	@Override
+	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+		Vec3d dir = playerIn.getLookVec();
+		dir = dir.addVector(0, -dir.yCoord, 0).normalize();
+		if (element == EMagicElement.ICE) {
+			
+			if (playerIn.getCooledAttackStrength(0.5F) > .95) {
+				
+				if (!worldIn.isRemote) {
+//					EntityAreaEffectCloud cloud = new EntityAreaEffect(worldIn, );
+//	
+//					dir = dir.scale(5f/(3f * 20f));
+//					cloud.setOwner(playerIn);
+//					cloud.setWaitTime(5);
+//					cloud.setRadius(0.5f);
+//					cloud.setRadiusPerTick((1f + level * .75f) / (20f * 3));
+//					cloud.setDuration(20 * 3);
+//					//cloud.setColor(0xFFFF0000);
+//					//cloud.setParticle(EnumParticleTypes.SPELL);
+//					cloud.addEffect(new PotionEffect(FrostbitePotion.instance(), 20 * 10));
+//					worldIn.spawnEntityInWorld(cloud);
+//					cloud.motionX = dir.xCoord;
+//					cloud.motionY = dir.yCoord;
+//					cloud.motionZ = dir.zCoord;
+					
+					spawnIceCloud(worldIn, playerIn, new Vec3d(playerIn.posX + dir.xCoord, playerIn.posY + .75, playerIn.posZ + dir.zCoord), dir, level);
+					
+					itemStackIn.damageItem(2, playerIn);
+				}
+				
+				playerIn.resetCooldown();
+			}
+			
+			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+		} else if (element == EMagicElement.WIND) {
+			if (playerIn.getCooledAttackStrength(0.5F) > .95) {
+				
+				if (!worldIn.isRemote) {
+//					EntityAreaEffectCloud cloud = new EntityAreaEffect(worldIn, );
+//	
+//					dir = dir.scale(5f/(3f * 20f));
+//					cloud.setOwner(playerIn);
+//					cloud.setWaitTime(5);
+//					cloud.setRadius(0.5f);
+//					cloud.setRadiusPerTick((1f + level * .75f) / (20f * 3));
+//					cloud.setDuration(20 * 3);
+//					//cloud.setColor(0xFFFF0000);
+//					//cloud.setParticle(EnumParticleTypes.SPELL);
+//					cloud.addEffect(new PotionEffect(FrostbitePotion.instance(), 20 * 10));
+//					worldIn.spawnEntityInWorld(cloud);
+//					cloud.motionX = dir.xCoord;
+//					cloud.motionY = dir.yCoord;
+//					cloud.motionZ = dir.zCoord;
+					
+					spawnVortex(worldIn, playerIn, new Vec3d(playerIn.posX + dir.xCoord, playerIn.posY + .75, playerIn.posZ + dir.zCoord), dir, level);
+					
+					itemStackIn.damageItem(2, playerIn);
+				}
+				
+				playerIn.resetCooldown();
+			}
+		}
+			
+        return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
+	}
+	
+	@Override
 	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		if (element == EMagicElement.WIND) {
-			SpellAction fly = new SpellAction(playerIn);
-			fly.push(5.0f, level);
-			fly.apply(worldIn, pos, 1.0f);
-			stack.damageItem(3, playerIn);
+		if (!worldIn.isRemote) {
+			Vec3d dir = new Vec3d(pos).addVector(hitX, 0, hitZ).subtract(playerIn.getPositionVector());
+			dir = dir.addVector(0, -dir.yCoord, 0);
+			dir = dir.normalize();
+			if (element == EMagicElement.WIND) {
+//				SpellAction fly = new SpellAction(playerIn);
+//				fly.push(5.0f, level);
+//				fly.apply(worldIn, pos, 1.0f);
+				spawnVortex(worldIn, playerIn, new Vec3d(pos.getX() + hitX, pos.getY() + 1, pos.getZ() + hitZ), dir, level);
+				stack.damageItem(3, playerIn);
+				return EnumActionResult.SUCCESS;
+			} else if (element == EMagicElement.ICE) {
+//				dir = dir.scale(5f/(3f * 20f));
+//				EntityAreaEffectCloud cloud = new EntityAreaEffect(worldIn, pos.getX() + hitX, pos.getY() + 1, pos.getZ() + hitZ);
+//				cloud.setOwner(playerIn);
+//				cloud.setWaitTime(5);
+//				cloud.setRadius(0.5f);
+//				cloud.setRadiusPerTick((1f + level * .75f) / (20f * 3));
+//				cloud.setDuration((int) (20 * (3 + level * .5f)));
+//				//cloud.setColor(0xFFFF0000);
+//				//cloud.setParticle(EnumParticleTypes.SPELL);
+//				cloud.addEffect(new PotionEffect(FrostbitePotion.instance(), 20 * 10));
+//				worldIn.spawnEntityInWorld(cloud);
+//				cloud.motionX = dir.xCoord;
+//				cloud.motionY = dir.yCoord;
+//				cloud.motionZ = dir.zCoord;
+				spawnIceCloud(worldIn, playerIn, new Vec3d(pos.getX() + hitX, pos.getY() + 1, pos.getZ() + hitZ), dir, level);
+				stack.damageItem(3, playerIn);
+				return EnumActionResult.SUCCESS;
+			}
+			return EnumActionResult.PASS;
+		} else {
 			return EnumActionResult.SUCCESS;
 		}
-
-        return EnumActionResult.PASS;
+	}
+	
+	protected static void spawnIceCloud(World world, EntityPlayer caster, Vec3d at, Vec3d direction, int level) {
+		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 3 seconds
+		EntityAreaEffect cloud = new EntityAreaEffect(world, at.xCoord, at.yCoord, at.zCoord);
+		cloud.setOwner(caster);
+		cloud.setWaitTime(5);
+		cloud.setRadius(0.5f);
+		cloud.setRadiusPerTick((1f + level * .75f) / (20f * 3)); // 1 (+ .75 per extra level) extra radius per 3 seconds
+		cloud.setDuration((int) (20 * (3 + level * .5f))); // 3 seconds + a half a second per extra level
+		cloud.addEffect(new PotionEffect(FrostbitePotion.instance(), 20 * 10));
+		cloud.addEffect((IAreaLocationEffect)(worldIn, pos) -> {
+			IBlockState state = worldIn.getBlockState(pos);
+			if (state.getMaterial() == Material.WATER
+					&& (state.getBlock() == Blocks.WATER || state.getBlock() == Blocks.FLOWING_WATER)) {
+				worldIn.setBlockState(pos, Blocks.ICE.getDefaultState());
+			}
+		});
+		cloud.setVerticleStepping(true);
+		world.spawnEntityInWorld(cloud);
+		cloud.motionX = direction.xCoord;
+		cloud.motionY = direction.yCoord;
+		cloud.motionZ = direction.zCoord;
+	}
+	
+	protected static void spawnVortex(World world, EntityPlayer caster, Vec3d at, Vec3d direction, int level) {
+		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 10 seconds
+		EntityAreaEffect cloud = new EntityAreaEffect(world, at.xCoord, at.yCoord, at.zCoord);
+		cloud.setOwner(caster);
+		cloud.setWaitTime(10);
+		cloud.setRadius(.5f);
+		cloud.setRadiusPerTick((.25f + level * .5f) / (20f * 10));
+		cloud.setDuration((int) (20 * (3 + level * .5f))); // 3 seconds + a half a second per extra level
+		cloud.addEffect((IAreaEntityEffect)(worldIn, entity) -> {
+			if (entity.noClip || entity.hasNoGravity()) {
+				return;
+			}
+			// upward effect
+			final int period = 20;
+			final float prog = ((float) (entity.ticksExisted % period) / (float) period);
+			final double dy = (Math.sin(prog * 2 * Math.PI) + 1) / 2;
+			final Vec3d target = new Vec3d(cloud.posX, cloud.posY + 2 + dy, cloud.posZ);
+			final Vec3d diff = target.subtract(entity.getPositionVector());
+			entity.motionX = diff.xCoord / 2;
+			entity.motionY = diff.yCoord / 2;
+			entity.motionZ = diff.zCoord / 2;
+			entity.velocityChanged = true;
+			//entity.posY = 2 + dy;
+			//entity.setPositionAndUpdate(cloud.posX, cloud.posY + 2 + dy, cloud.posZ);
+		});
+		cloud.setVerticleStepping(true);
+		cloud.setEffectDelay(0);
+		cloud.setWaddle(direction, 1);
+		cloud.setParticle(EnumParticleTypes.SWEEP_ATTACK);
+		cloud.setParticleParam1(10);
+		world.spawnEntityInWorld(cloud);
+		cloud.motionX = direction.xCoord;
+		cloud.motionY = direction.yCoord;
+		cloud.motionZ = direction.zCoord;
 	}
 	
 	@Override

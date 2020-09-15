@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.items;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.TemporaryTeleportationPortal;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -14,6 +16,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -284,7 +287,15 @@ public class MagicCharm extends Item implements ILoreTagged {
 				}
 			}
 			
-			player.setPositionAndUpdate(pos.getX(), pos.getY(), pos.getZ());
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+			if (attr != null && attr.hasEnhancedTeleport() && !player.isSneaking()) {
+				BlockPos portal = TemporaryTeleportationPortal.spawnNearby(world, player.getPosition(), 4, false, pos, 20 * 30);
+				if (portal != null) {
+					TemporaryTeleportationPortal.spawnNearby(world, pos, 4, true, portal, 20 * 30);
+				}
+			} else {
+				player.setPositionAndUpdate(pos.getX(), pos.getY(), pos.getZ());
+			}
 			
 			NostrumMagicaSounds.DAMAGE_ENDER.play(world, player.posX, player.posY, player.posZ);
 			return true;
@@ -343,6 +354,18 @@ public class MagicCharm extends Item implements ILoreTagged {
 			return 0;
 		
 		return element.ordinal();
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+		EMagicElement element = MagicCharm.getTypeFromMeta(stack.getMetadata());
+		if (element == EMagicElement.ENDER) {
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
+			if (attr != null && attr.hasEnhancedTeleport()) {
+				tooltip.add(I18n.format("info.endercharm.enhanced", new Object[0]));
+			}
+		}
 	}
 	
 }

@@ -117,6 +117,7 @@ public class NostrumMagic implements INostrumMagic {
 	private List<String> completedResearch;
 	private BlockPos markLocation;
 	private int markDimension;
+	private boolean enhancedTeleport;
 	private Map<EMagicElement, Map<EAlteration, Boolean>> spellKnowledge;
 	private int sorceryPortalDim;
 	private BlockPos sorceryPortalPos;
@@ -143,6 +144,7 @@ public class NostrumMagic implements INostrumMagic {
 		familiars = new LinkedList<>();
 		sorceryPortalDim = 0;
 		sorceryPortalPos = null;
+		enhancedTeleport = false;
 	}
 
 	@Override
@@ -614,6 +616,7 @@ public class NostrumMagic implements INostrumMagic {
 		this.bindingSpell = cap.getBindingSpell();
 		this.bindingComponent = cap.getBindingComponent();
 		this.spellKnowledge = cap.getSpellKnowledge();
+		this.enhancedTeleport = cap.hasEnhancedTeleport();
 	}
 	
 	@Override
@@ -893,5 +896,15 @@ public class NostrumMagic implements INostrumMagic {
 	@Override
 	public void completeResearch(String research) {
 		this.completedResearch.add(research);
+	}
+	
+	@Override
+	public void unlockEnhancedTeleport() {
+		this.enhancedTeleport = true;
+	}
+	
+	@Override
+	public boolean hasEnhancedTeleport() {
+		return this.enhancedTeleport;
 	}
 }
