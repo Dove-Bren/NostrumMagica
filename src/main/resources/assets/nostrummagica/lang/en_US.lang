@@ -388,6 +388,7 @@ info.door.missing.alteration=Unlocked the %1$s alteration
 info.teleportrune.unloaded=The targetting location cannot be observed!
 info.teleportrune.norune=The stored location does not point to a teleportation rune!
 info.teleportrune.toofar=The distant rune is too far away!
+info.screen.goto=Click to view
 
 info.discovery.name=Unlocking Magic
 info.stats.name=Stats
@@ -1215,3 +1216,7 @@ research.putter.info=  Rituals have allowed you to enhance droppers to be a litt
 research.magicfacade.name=Magic Facade
 research.magicfacade.desc=Fake walls
 research.magicfacade.info=  A very simple and practical application of magic is that of an illusion. To that end, you've invented a ritual which allows you to create illusory blocks!|  Magic Facade clocks take the appearance of blocks next to them, but only in one direction. However, the facade blocks are completely intangeable.|  You've also extended this idea to create a one-way door. Like the facade, it's invisible and intangeable from all sides but one. From that side, these magic doors prevent entry.|  Most orientations of facade and door blocks take their appearance from the block underneath them. Stacking facades or doors works, too. Facades or doors that are facing down look to the east.
+
+research.wispblock.name=Wisp Summoning
+research.wispblock.desc=Wispful thinking?
+research.wispblock.info=  You've seen wisps floating along the night sky, and you've even seen them fight. They obviously have some affinity to magic and can cast spells. And they appear to have the same enemies as you. So... why not work together?|  You've created a block that allows you to summon wisps to fill the air, dance around, and (most importantly) kill mobs. The wisp block requires Aether to function, some extra reagents to burn, and a scroll, but will slowly spawn wisps that cast the spell in the scroll.

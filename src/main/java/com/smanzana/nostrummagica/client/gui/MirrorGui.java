@@ -42,6 +42,7 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.utils.Curves;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -391,10 +392,13 @@ public class MirrorGui extends GuiScreen {
 		this.fontRendererObj.drawString(String.format("%+.1f%%", bonusManaCost * 100f),
 				leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 9, 0xFFFFFFFF);
 		
-		for (int i = 0; i < this.buttonList.size(); ++i) {
-			GuiButton button = (GuiButton)this.buttonList.get(i);
-			if (button instanceof QuestButton)
-				((QuestButton) button).drawOverlay(mc, mouseX, mouseY);
+		if (mouseX >= leftOffset + TEXT_CONTENT_HOFFSET && mouseX <= leftOffset + TEXT_CONTENT_HOFFSET + TEXT_CONTENT_WIDTH
+				&& mouseY >= topOffset + TEXT_CONTENT_VOFFSET && mouseY <= topOffset + TEXT_CONTENT_VOFFSET + TEXT_CONTENT_HEIGHT) {
+			for (int i = 0; i < this.buttonList.size(); ++i) {
+				GuiButton button = (GuiButton)this.buttonList.get(i);
+				if (button instanceof QuestButton)
+					((QuestButton) button).drawOverlay(mc, mouseX, mouseY);
+			}
 		}
 	}
 	
@@ -454,10 +458,14 @@ public class MirrorGui extends GuiScreen {
 		Gui.drawRect(centerX - (width/2) + 1, y + 1, centerX + (width / 2) - 1, y + 1 + knowledgeHeight, 0xFF000000);
 		Gui.drawRect(centerX - (width/2) + 1, y + 1, centerX - (width/2) + 1 + x, y + 1 + knowledgeHeight, 0xFFFFFF00);
 		
+		boolean mouseContent =  (mouseX >= leftOffset + TEXT_CONTENT_HOFFSET && mouseX <= leftOffset + TEXT_CONTENT_HOFFSET + TEXT_CONTENT_WIDTH
+				&& mouseY >= topOffset + TEXT_CONTENT_VOFFSET && mouseY <= topOffset + TEXT_CONTENT_VOFFSET + TEXT_CONTENT_HEIGHT);
 		for (int i = 0; i < this.buttonList.size(); ++i) {
 			GuiButton button = (GuiButton)this.buttonList.get(i);
 			if (button instanceof ResearchButton) {
-				((ResearchButton) button).drawOverlay(mc, mouseX, mouseY);
+				if (mouseContent) {
+					((ResearchButton) button).drawOverlay(mc, mouseX, mouseY);
+				}
 			} else if (button instanceof ResearchTabButton) {
 				((ResearchTabButton) button).drawOverlay(mc, mouseX, mouseY);
 			}
@@ -1015,8 +1023,35 @@ public class MirrorGui extends GuiScreen {
 		TAKEN,
 		COMPLETED
 	}
+    
+    private static abstract class GuiObscuredButton extends GuiButton {
+
+		public GuiObscuredButton(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText) {
+			super(buttonId, x, y, widthIn, heightIn, buttonText);
+		}
+		
+		@Override
+		public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
+			final int GUI_HEIGHT = 242;
+			final int leftOffset = (mc.currentScreen.width - TEXT_WIDTH) / 2; //distance from left
+			final int topOffset = (mc.currentScreen.height - GUI_HEIGHT) / 2;
+			if (super.mousePressed(mc, mouseX, mouseY)) {
+				if (mouseX >= leftOffset + TEXT_CONTENT_HOFFSET && mouseX <= leftOffset + TEXT_CONTENT_HOFFSET + TEXT_CONTENT_WIDTH
+						&& mouseY >= topOffset + TEXT_CONTENT_VOFFSET && mouseY <= topOffset + TEXT_CONTENT_VOFFSET + TEXT_CONTENT_HEIGHT) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		@Override
+		public void playPressSound(SoundHandler soundHandlerIn) {
+			super.playPressSound(soundHandlerIn);
+		}
+    	
+    }
 	
-    class QuestButton extends GuiButton {
+    private class QuestButton extends GuiObscuredButton {
     	
     	private NostrumQuest quest;
     	private QuestState state;
@@ -1343,7 +1378,7 @@ public class MirrorGui extends GuiScreen {
 		COMPLETED
 	}
 	
-    private class ResearchButton extends GuiButton {
+    private class ResearchButton extends GuiObscuredButton {
     	
     	private final NostrumResearch research;
     	private final ResearchState state;
