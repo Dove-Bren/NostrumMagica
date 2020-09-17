@@ -338,15 +338,15 @@ public class CommonProxy {
     				return !BiomeDictionary.isBiomeOfType(biome, BiomeDictionary.Type.END)
     						&& BiomeDictionary.isBiomeOfType(biome, BiomeDictionary.Type.NETHER);
     			}).collect(Collectors.toList()).toArray(new Biome[0]));
-    	EntityRegistry.addSpawn(EntityWisp.class, 10, 1, 2, EnumCreatureType.AMBIENT, 
+    	EntityRegistry.addSpawn(EntityWisp.class, 1, 1, 2, EnumCreatureType.AMBIENT, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.MAGICAL));
-    	EntityRegistry.addSpawn(EntityWisp.class, 10, 1, 2, EnumCreatureType.AMBIENT, 
+    	EntityRegistry.addSpawn(EntityWisp.class, 1, 1, 2, EnumCreatureType.AMBIENT, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.FOREST));
-    	EntityRegistry.addSpawn(EntityWisp.class, 10, 1, 2, EnumCreatureType.AMBIENT, 
+    	EntityRegistry.addSpawn(EntityWisp.class, 1, 1, 2, EnumCreatureType.AMBIENT, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.SNOWY));
-    	EntityRegistry.addSpawn(EntityWisp.class, 10, 1, 2, EnumCreatureType.AMBIENT, 
+    	EntityRegistry.addSpawn(EntityWisp.class, 1, 1, 2, EnumCreatureType.AMBIENT, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.NETHER));
-    	EntityRegistry.addSpawn(EntityWisp.class, 10, 1, 2, EnumCreatureType.AMBIENT, 
+    	EntityRegistry.addSpawn(EntityWisp.class, 1, 1, 2, EnumCreatureType.AMBIENT, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.SPOOKY));
 
     	registerItems();

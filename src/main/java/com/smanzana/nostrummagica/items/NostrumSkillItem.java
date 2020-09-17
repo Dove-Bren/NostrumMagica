@@ -32,7 +32,9 @@ public class NostrumSkillItem extends Item implements ILoreTagged {
 		PENDANT("eldrich_pendant"),
 		FLUTE("living_flute"),
 		WING("dragon_wing"),
-		ENDER_PIN("ender_pin");
+		ENDER_PIN("ender_pin"),
+		RESEARCH_SCROLL_SMALL("research_scroll_small"),
+		RESEARCH_SCROLL_LARGE("research_scroll_large");
 		
 		private String key;
 		
@@ -165,6 +167,16 @@ public class NostrumSkillItem extends Item implements ILoreTagged {
 			case ENDER_PIN:
 				attr.unlockEnhancedTeleport();;
 				suffix = "advtele";
+				break;
+			case RESEARCH_SCROLL_LARGE:
+				attr.addResearchPoint();
+				attr.addResearchPoint();
+				attr.addResearchPoint();
+				suffix = "research";
+				break;
+			case RESEARCH_SCROLL_SMALL:
+				attr.addResearchPoint();
+				suffix = "research";
 				break;
 			}
 			

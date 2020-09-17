@@ -59,6 +59,7 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.relauncher.Side;
@@ -463,6 +464,30 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 	@Override
 	public boolean isOnLadder() {
 		return false;
+	}
+	
+	@Override
+	public boolean getCanSpawnHere() {
+		if (!super.getCanSpawnHere()) {
+			return false;
+		}
+		
+		BlockPos blockpos = new BlockPos(this.posX, this.getEntityBoundingBox().minY, this.posZ);
+
+		if (this.worldObj.getLightFor(EnumSkyBlock.SKY, blockpos) > this.rand.nextInt(32)) {
+			return false;
+		} else {
+			int i = this.worldObj.getLightFromNeighbors(blockpos);
+
+			if (this.worldObj.isThundering()) {
+				int j = this.worldObj.getSkylightSubtracted();
+				this.worldObj.setSkylightSubtracted(10);
+				i = this.worldObj.getLightFromNeighbors(blockpos);
+				this.worldObj.setSkylightSubtracted(j);
+			}
+
+			return i <= this.rand.nextInt(12);
+		}
 	}
 	
 	static class AIRandomFly extends EntityAIBase {

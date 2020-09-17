@@ -302,40 +302,28 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 	
 	@Override
 	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		if (!worldIn.isRemote) {
+		if (playerIn.getCooledAttackStrength(0.5F) > .95) {
 			Vec3d dir = new Vec3d(pos).addVector(hitX, 0, hitZ).subtract(playerIn.getPositionVector());
 			dir = dir.addVector(0, -dir.yCoord, 0);
 			dir = dir.normalize();
 			if (element == EMagicElement.WIND) {
-//				SpellAction fly = new SpellAction(playerIn);
-//				fly.push(5.0f, level);
-//				fly.apply(worldIn, pos, 1.0f);
-				spawnVortex(worldIn, playerIn, new Vec3d(pos.getX() + hitX, pos.getY() + 1, pos.getZ() + hitZ), dir, level);
-				stack.damageItem(3, playerIn);
+				if (!worldIn.isRemote) {
+					spawnVortex(worldIn, playerIn, new Vec3d(pos.getX() + hitX, pos.getY() + 1, pos.getZ() + hitZ), dir, level);
+					stack.damageItem(3, playerIn);
+				}
+				playerIn.resetCooldown();
 				return EnumActionResult.SUCCESS;
 			} else if (element == EMagicElement.ICE) {
-//				dir = dir.scale(5f/(3f * 20f));
-//				EntityAreaEffectCloud cloud = new EntityAreaEffect(worldIn, pos.getX() + hitX, pos.getY() + 1, pos.getZ() + hitZ);
-//				cloud.setOwner(playerIn);
-//				cloud.setWaitTime(5);
-//				cloud.setRadius(0.5f);
-//				cloud.setRadiusPerTick((1f + level * .75f) / (20f * 3));
-//				cloud.setDuration((int) (20 * (3 + level * .5f)));
-//				//cloud.setColor(0xFFFF0000);
-//				//cloud.setParticle(EnumParticleTypes.SPELL);
-//				cloud.addEffect(new PotionEffect(FrostbitePotion.instance(), 20 * 10));
-//				worldIn.spawnEntityInWorld(cloud);
-//				cloud.motionX = dir.xCoord;
-//				cloud.motionY = dir.yCoord;
-//				cloud.motionZ = dir.zCoord;
-				spawnIceCloud(worldIn, playerIn, new Vec3d(pos.getX() + hitX, pos.getY() + 1, pos.getZ() + hitZ), dir, level);
-				stack.damageItem(3, playerIn);
+				if (!worldIn.isRemote) { 
+					spawnIceCloud(worldIn, playerIn, new Vec3d(pos.getX() + hitX, pos.getY() + 1, pos.getZ() + hitZ), dir, level);
+					stack.damageItem(3, playerIn);
+				}
+				playerIn.resetCooldown();
 				return EnumActionResult.SUCCESS;
 			}
-			return EnumActionResult.PASS;
-		} else {
-			return EnumActionResult.SUCCESS;
 		}
+		return EnumActionResult.PASS;
+		
 	}
 	
 	protected static void spawnIceCloud(World world, EntityPlayer caster, Vec3d at, Vec3d direction, int level) {

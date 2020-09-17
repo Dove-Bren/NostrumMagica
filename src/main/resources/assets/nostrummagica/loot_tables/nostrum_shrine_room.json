@@ -380,6 +380,30 @@
             ]
       },
       {
+        "type": "item",
+        "name": "nostrummagica:SkillItem",
+        "entryName": "researchscroll",
+        "weight": 1,
+        "functions": [
+            {
+                "function": "set_data",
+                "data": 7,
+                "conditions": [{
+                    "condition": "random_chance",
+                    "chance": 0.1
+                }]
+            },
+            {
+                "function": "set_data",
+                "data": 6,
+                "conditions": [{
+                    "condition": "random_chance",
+                    "chance": 1
+                }]
+            }
+            ]
+      },
+      {
         "type": "empty",
         "weight": 350
       }]
