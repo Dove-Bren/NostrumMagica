@@ -100,6 +100,7 @@ import com.smanzana.nostrummagica.quests.rewards.IReward;
 import com.smanzana.nostrummagica.research.NostrumResearch;
 import com.smanzana.nostrummagica.research.NostrumResearch.NostrumResearchTab;
 import com.smanzana.nostrummagica.research.NostrumResearch.Size;
+import com.smanzana.nostrummagica.research.NostrumResearch.SpellSpec;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeBindSpell;
@@ -1771,6 +1772,8 @@ public class NostrumMagica
 			.hiddenParent("geotokens")
 			.parent("rituals")
 			.lore(PositionToken.instance())
+			.spellComponent(EMagicElement.ENDER, EAlteration.GROWTH)
+			.spellComponent(EMagicElement.ENDER, EAlteration.SUPPORT)
 			.reference("ritual::mark", "ritual.mark.name")
 			.reference("ritual::recall", "ritual.recall.name")
 		.build("markrecall", NostrumResearchTab.MAGICA, Size.LARGE, 4, 2, true, new ItemStack(Items.COMPASS));
@@ -2195,6 +2198,30 @@ public class NostrumMagica
     				if (!attr.hasLore(loreItem)) {
     					return false;
     				}
+    			}
+    		}
+    	}
+    	
+    	// Check spell requirements
+    	if (research.getRequiredSpellComponents() != null && research.getRequiredSpellComponents().length != 0) {
+    		for (SpellSpec spec : research.getRequiredSpellComponents()) {
+    			if (spec.element == null && spec.alteration == null) {
+    				continue;
+    			} else if (spec.element == null) {
+    				// Just alteration
+    				if (!attr.getAlterations().containsKey(spec.alteration) || !attr.getAlterations().get(spec.alteration)) {
+    					return false;
+    				}
+    			} else if (spec.alteration == null) {
+    				// Just element
+    				if (!attr.getKnownElements().containsKey(spec.element) || !attr.getKnownElements().get(spec.element)) {
+    					return false;
+    				}
+    			} else {
+    				// Both. Check that it's actually been cast, not just unlocked :)
+	    			if (!attr.hasKnowledge(spec.element, spec.alteration)) {
+	    				return false;
+	    			}
     			}
     		}
     	}

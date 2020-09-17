@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenIndexed;
@@ -13,6 +15,8 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spells.EAlteration;
+import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -64,6 +68,11 @@ public class NostrumResearch {
 	protected String[] questKeys;
 	
 	/**
+	 * List of spell components that the player must have seen before this research can be seen/purchased.
+	 */
+	protected SpellSpec[] spellKeys;
+	
+	/**
 	 * Positional offsets for display.
 	 */
 	protected final int x;
@@ -96,6 +105,7 @@ public class NostrumResearch {
 			String[] parents, String[] hiddenParents,
 			String[] lore,
 			String[] quests,
+			SpellSpec[] spellComponents,
 			String[] references, String[] referenceDisplays) {
 		this.key = key;
 		this.size = size;
@@ -110,6 +120,7 @@ public class NostrumResearch {
 		this.references = (references != null && references.length == 0) ? null : references;
 		this.referenceDisplays = (references != null && references.length == 0) ? null : referenceDisplays; // note uses 'references'
 		this.tab = tab;
+		this.spellKeys = spellComponents;
 		
 		NostrumResearch.register(this);
 	}
@@ -174,6 +185,10 @@ public class NostrumResearch {
 		return this.questKeys;
 	}
 	
+	public SpellSpec[] getRequiredSpellComponents() {
+		return this.spellKeys;
+	}
+	
 	public boolean isHidden() {
 		return hidden;
 	}
@@ -212,12 +227,13 @@ public class NostrumResearch {
 	 *             Builder methods
 	 ***********************************************/
 	public static final class Builder {
-		protected List<String> parentKeys;
-		protected List<String> hiddenParentKeys;
-		protected List<String> loreKeys;
-		protected List<String> questKeys;
-		protected List<String> references;
-		protected List<String> referenceDisplays;
+		protected final List<String> parentKeys;
+		protected final List<String> hiddenParentKeys;
+		protected final List<String> loreKeys;
+		protected final List<String> questKeys;
+		protected final List<String> references;
+		protected final List<String> referenceDisplays;
+		protected final List<SpellSpec> spellComps;
 		
 		protected Builder() {
 			parentKeys = new LinkedList<>();
@@ -226,6 +242,7 @@ public class NostrumResearch {
 			questKeys = new LinkedList<>();
 			references = new LinkedList<>();
 			referenceDisplays = new LinkedList<>();
+			spellComps = new LinkedList<>();
 		}
 		
 		public Builder parent(String parent) {
@@ -273,12 +290,22 @@ public class NostrumResearch {
 			}
 		}
 		
+		public Builder spellComponent(SpellSpec component) {
+			this.spellComps.add(component);
+			return this;
+		}
+		
+		public Builder spellComponent(EMagicElement element, EAlteration alteration) {
+			return spellComponent(new SpellSpec(element, alteration));
+		}
+		
 		public NostrumResearch build(String key, NostrumResearchTab tab, Size size, int x, int y, boolean hidden, ItemStack icon) {
 			return new NostrumResearch(key, tab, size, x, y, hidden, icon,
 					parentKeys.isEmpty() ? null : parentKeys.toArray(new String[parentKeys.size()]),
 					hiddenParentKeys.isEmpty() ? null : hiddenParentKeys.toArray(new String[hiddenParentKeys.size()]),
 					loreKeys.isEmpty() ? null : loreKeys.toArray(new String[loreKeys.size()]),
 					questKeys.isEmpty() ? null : questKeys.toArray(new String[questKeys.size()]),
+					spellComps.isEmpty() ? null : spellComps.toArray(new SpellSpec[spellComps.size()]),
 					references.isEmpty() ? null : references.toArray(new String[references.size()]),
 					referenceDisplays.isEmpty() ? null : referenceDisplays.toArray(new String[referenceDisplays.size()])
 					);
@@ -499,4 +526,32 @@ public class NostrumResearch {
 	}
 	
 	
+	
+	/***********************************************
+	 *               Helper classes
+	 ***********************************************/
+	
+	public static final class SpellSpec {
+		@Nullable
+		public final EMagicElement element;
+		
+		@Nullable
+		public final EAlteration alteration;
+		
+		public SpellSpec(@Nullable EMagicElement element, @Nullable EAlteration alteration) {
+			this.element = element;
+			this.alteration = alteration;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			return (o instanceof SpellSpec && ((SpellSpec) o).alteration == this.alteration && ((SpellSpec) o).element == this.element);
+		}
+		
+		@Override
+		public int hashCode() {
+			return (1217 * (element == null ? 1 : element.ordinal() + 2)
+					+ 887 * (alteration == null ? 1 : alteration.ordinal() + 2));
+		}
+	}
 }
