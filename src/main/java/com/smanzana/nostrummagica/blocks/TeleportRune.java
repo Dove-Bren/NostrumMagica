@@ -144,6 +144,7 @@ public class TeleportRune extends BlockContainer  {
 	}
 	
 	protected void teleportEntity(World worldIn, BlockPos portalPos, Entity entityIn) {
+		System.out.println("TELEPORT");
 		TileEntity te = worldIn.getTileEntity(portalPos);
 		if (te == null || !(te instanceof TeleportRuneTileEntity)) {
 			return;
@@ -161,25 +162,29 @@ public class TeleportRune extends BlockContainer  {
 		entityIn.lastTickPosZ = entityIn.prevPosZ = target.getZ() + .5;
 		
 		if (!worldIn.isRemote) {
-			entityIn.setPositionAndUpdate(target.getX() + .5, target.getY() + .005, target.getZ() + .5);
-
-			double dx = target.getX() + .5;
-			double dy = target.getY() + 1;
-			double dz = target.getZ() + .5;
-			for (int i = 0; i < 10; i++) {
-				
-				((WorldServer) worldIn).spawnParticle(EnumParticleTypes.DRAGON_BREATH,
-						dx,
-						dy,
-						dz,
-						10,
-						.25,
-						.6,
-						.25,
-						.1,
-						new int[0]);
-			}
-			NostrumMagicaSounds.DAMAGE_ENDER.play(worldIn, dx, dy, dz);
+			NostrumMagica.playerListener.registerTimer((type, entity, data) -> {
+				//Event type, EntityLivingBase entity, T data
+				entityIn.setPositionAndUpdate(target.getX() + .5, target.getY() + .005, target.getZ() + .5);
+	
+				double dx = target.getX() + .5;
+				double dy = target.getY() + 1;
+				double dz = target.getZ() + .5;
+				for (int i = 0; i < 10; i++) {
+					
+					((WorldServer) worldIn).spawnParticle(EnumParticleTypes.DRAGON_BREATH,
+							dx,
+							dy,
+							dz,
+							10,
+							.25,
+							.6,
+							.25,
+							.1,
+							new int[0]);
+				}
+				NostrumMagicaSounds.DAMAGE_ENDER.play(worldIn, dx, dy, dz);
+				return true;
+			}, 0, 0);
 		}
 	}
 	
@@ -209,7 +214,9 @@ public class TeleportRune extends BlockContainer  {
 			DumbIntegratedGuard = true;
 		}
 		
+		
 		if (charge > TELEPORT_CHARGE_TIME * 20) {
+			System.out.println("Check?");
 			EntityTeleportCharge.put(entityIn.getUniqueID(), -(TELEPORT_CHARGE_TIME * 20));
 			if (!worldIn.isRemote) {
 				this.teleportEntity(worldIn, pos, entityIn);

@@ -85,31 +85,43 @@ public class TeleportationPortal extends NostrumPortal implements ITileEntityPro
 			TeleportationPortalTileEntity ent = (TeleportationPortalTileEntity) te;
 			BlockPos target = ent.getTarget();
 			if (target != null) {
-				worldIn.getChunkFromBlockCoords(target);
 				
-				if (entityIn instanceof EntityPlayerMP) {
-					((EntityPlayerMP) entityIn).connection.setPlayerLocation(target.getX() + .5, target.getY() + .1, target.getZ() + .5, entityIn.rotationYaw, entityIn.rotationPitch);
-				} else {
-					entityIn.setPositionAndUpdate(target.getX() + .5, target.getY() + .1, target.getZ() + .5);
-				}
-				entityIn.fallDistance = 0;
-				worldIn.updateEntityWithOptionalForce(entityIn, true);
+				NostrumMagica.playerListener.registerTimer((type, entity, data) -> {
 				
-				// effects, sound, etc.
-				double x = target.getX() + .5;
-				double y = target.getY() + 1.4;
-				double z = target.getZ() + .5;
-				NostrumMagicaSounds.DAMAGE_ENDER.play(worldIn, x, y, z);
-				((WorldServer) worldIn).spawnParticle(EnumParticleTypes.DRAGON_BREATH,
-						x,
-						y,
-						z,
-						50,
-						.3,
-						.5,
-						.3,
-						.2,
-						new int[0]);
+					worldIn.getChunkFromBlockCoords(target);
+					
+					entityIn.lastTickPosX = entityIn.prevPosX = target.getX() + .5;
+					entityIn.lastTickPosY = entityIn.prevPosY = target.getY() + .1;
+					entityIn.lastTickPosZ = entityIn.prevPosZ = target.getZ() + .5;
+					if (!worldIn.isRemote) {
+						if (entityIn instanceof EntityPlayerMP) {
+							((EntityPlayerMP) entityIn).connection.setPlayerLocation(target.getX() + .5, target.getY() + .1, target.getZ() + .5, entityIn.rotationYaw, entityIn.rotationPitch);
+						} else {
+							entityIn.setPositionAndUpdate(target.getX() + .5, target.getY() + .1, target.getZ() + .5);
+						}
+						entityIn.fallDistance = 0;
+						//entityIn.velocityChanged = true;
+						worldIn.updateEntityWithOptionalForce(entityIn, true);
+							
+						// effects, sound, etc.
+						double x = target.getX() + .5;
+						double y = target.getY() + 1.4;
+						double z = target.getZ() + .5;
+						NostrumMagicaSounds.DAMAGE_ENDER.play(worldIn, x, y, z);
+						((WorldServer) worldIn).spawnParticle(EnumParticleTypes.DRAGON_BREATH,
+								x,
+								y,
+								z,
+								50,
+								.3,
+								.5,
+								.3,
+								.2,
+								new int[0]);
+						
+					}
+					return true;
+				}, 0, 0);
 			}
 		}
 	}
@@ -147,7 +159,7 @@ public class TeleportationPortal extends NostrumPortal implements ITileEntityPro
 		@Override
 		public int getColor() {
 			EntityPlayer player = NostrumMagica.proxy.getPlayer();
-			if (NostrumPortal.getRemainingCooldown(player) > 0) {
+			if (NostrumPortal.getRemainingCharge(player) > 0) {
 				return 0x00A00050;
 			}
 			return 0x00500050;
@@ -163,7 +175,7 @@ public class TeleportationPortal extends NostrumPortal implements ITileEntityPro
 		@Override
 		public float getOpacity() {
 			EntityPlayer player = NostrumMagica.proxy.getPlayer();
-			if (NostrumPortal.getRemainingCooldown(player) > 0) {
+			if (NostrumPortal.getRemainingCharge(player) > 0) {
 				return 0.5f;
 			}
 			return .9f;

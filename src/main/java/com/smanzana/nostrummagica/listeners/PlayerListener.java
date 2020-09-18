@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble;
+import com.smanzana.nostrummagica.blocks.NostrumPortal;
 import com.smanzana.nostrummagica.blocks.TeleportRune;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.MirrorGui;
@@ -895,6 +896,7 @@ public class PlayerListener {
 						it.remove();
 			}
 			
+			NostrumPortal.tick();
 			TeleportRune.tick();
 		}
 	}

@@ -13,12 +13,12 @@ import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.gui.StackableScreen;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiLabel;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.ResourceLocation;
@@ -26,7 +26,7 @@ import net.minecraftforge.fml.client.config.GuiUtils;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class InfoScreen extends GuiScreen {
+public class InfoScreen extends StackableScreen {
 	
 	protected static final ResourceLocation background = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/container/infoscreen.png");
 	
@@ -51,6 +51,7 @@ public class InfoScreen extends GuiScreen {
 	private @Nullable String startKey;
 	
 	public InfoScreen(INostrumMagic attribute, @Nullable String startKey) {
+		super();
 		this.attribute = attribute;
 		this.startKey = startKey;
 		//this.start = start;

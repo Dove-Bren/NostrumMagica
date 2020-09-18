@@ -95,6 +95,9 @@ public class MirrorShield extends Item implements ISpellActionListener, ILoreTag
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
 		playerIn.setActiveHand(hand);
+		
+		NostrumMagica.playerListener.registerMagicEffect(this, null);
+		
 		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
 	}
 

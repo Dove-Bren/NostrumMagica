@@ -25,6 +25,7 @@ import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.blocks.NostrumMirrorBlock;
 import com.smanzana.nostrummagica.blocks.NostrumObelisk;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
+import com.smanzana.nostrummagica.blocks.NostrumSpawnAndTrigger;
 import com.smanzana.nostrummagica.blocks.ObeliskPortal;
 import com.smanzana.nostrummagica.blocks.ProgressionDoor;
 import com.smanzana.nostrummagica.blocks.PutterBlock;
@@ -344,10 +345,16 @@ public class CommonProxy {
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.FOREST));
     	EntityRegistry.addSpawn(EntityWisp.class, 1, 1, 2, EnumCreatureType.AMBIENT, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.SNOWY));
-    	EntityRegistry.addSpawn(EntityWisp.class, 1, 1, 2, EnumCreatureType.AMBIENT, 
+    	EntityRegistry.addSpawn(EntityWisp.class, 13, 1, 2, EnumCreatureType.MONSTER, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.NETHER));
     	EntityRegistry.addSpawn(EntityWisp.class, 1, 1, 2, EnumCreatureType.AMBIENT, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.SPOOKY));
+    	
+
+    	EntityRegistry.addSpawn(EntityShadowDragonRed.class, 10, 1, 3, EnumCreatureType.MONSTER, 
+    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.NETHER));
+    	EntityRegistry.addSpawn(EntityTameDragonRed.class, 2, 1, 1, EnumCreatureType.MONSTER, 
+    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.NETHER));
 
     	registerItems();
     	registerBlocks();
@@ -598,6 +605,13 @@ public class CommonProxy {
     			(new ItemBlock(NostrumSingleSpawner.instance())).setRegistryName(NostrumSingleSpawner.ID)
     		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(NostrumSingleSpawner.ID));
     	NostrumSingleSpawner.init();
+    	
+    	GameRegistry.register(NostrumSpawnAndTrigger.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, NostrumSpawnAndTrigger.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(NostrumSpawnAndTrigger.instance())).setRegistryName(NostrumSpawnAndTrigger.ID)
+    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(NostrumSpawnAndTrigger.ID));
+    	NostrumSpawnAndTrigger.init();
     	
     	GameRegistry.register(DungeonBlock.instance(),
     			new ResourceLocation(NostrumMagica.MODID, DungeonBlock.ID));

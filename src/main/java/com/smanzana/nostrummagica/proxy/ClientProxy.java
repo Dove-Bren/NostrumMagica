@@ -23,6 +23,7 @@ import com.smanzana.nostrummagica.blocks.ModificationTable;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.blocks.NostrumMirrorBlock;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
+import com.smanzana.nostrummagica.blocks.NostrumSpawnAndTrigger;
 import com.smanzana.nostrummagica.blocks.ProgressionDoor;
 import com.smanzana.nostrummagica.blocks.PutterBlock;
 import com.smanzana.nostrummagica.blocks.SorceryPortal;
@@ -492,6 +493,9 @@ public class ClientProxy extends CommonProxy {
 		registerModel(Item.getItemFromBlock(NostrumSingleSpawner.instance()),
 				0,
 				NostrumSingleSpawner.ID);
+		registerModel(Item.getItemFromBlock(NostrumSpawnAndTrigger.instance()),
+				0,
+				NostrumSpawnAndTrigger.ID);
 		registerModel(Item.getItemFromBlock(CursedIce.instance()),
 				0,
 				CursedIce.ID);
@@ -1047,9 +1051,13 @@ public class ClientProxy extends CommonProxy {
     	
     	MimicBlockBakedModel model = new MimicBlockBakedModel();
     	for (EnumFacing facing : EnumFacing.values()) {
-    		event.getModelRegistry().putObject(new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_DOOR), "facing=" + facing.name().toLowerCase()),
+    		event.getModelRegistry().putObject(new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_DOOR), "facing=" + facing.name().toLowerCase() + ",unbreakable=false"),
     				model);
-    		event.getModelRegistry().putObject(new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_FACADE), "facing=" + facing.name().toLowerCase()),
+    		event.getModelRegistry().putObject(new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_DOOR), "facing=" + facing.name().toLowerCase() + ",unbreakable=true"),
+    				model);
+    		event.getModelRegistry().putObject(new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_FACADE), "facing=" + facing.name().toLowerCase() + ",unbreakable=false"),
+    				model);
+    		event.getModelRegistry().putObject(new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_FACADE), "facing=" + facing.name().toLowerCase() + ",unbreakable=true"),
     				model);
     	}
 	}

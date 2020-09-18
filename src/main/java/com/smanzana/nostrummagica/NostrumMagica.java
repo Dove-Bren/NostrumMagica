@@ -1168,7 +1168,7 @@ public class NostrumMagica
 						null,
 						new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.MANDRAKE_ROOT, ReagentType.GINSENG, ReagentType.SPIDER_SILK},
 						new ItemStack(ReagentBag.instance()),
-						new ItemStack[] {new ItemStack(Items.LEATHER), new ItemStack(Items.GOLD_INGOT), new ItemStack(SpellRune.instance(), 1, OreDictionary.WILDCARD_VALUE), new ItemStack(Items.LEATHER)},
+						new ItemStack[] {new ItemStack(Items.LEATHER), new ItemStack(Items.GOLD_INGOT), SpellRune.getRune(EMagicElement.FIRE, 1), new ItemStack(Items.LEATHER)},
 						new RRequirementResearch("rune_bag"),
 						new OutcomeSpawnItem(new ItemStack(RuneBag.instance()))
 						)

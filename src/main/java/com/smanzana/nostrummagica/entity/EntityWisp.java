@@ -28,7 +28,6 @@ import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
-import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.BeamTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.MagicCutterTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
@@ -61,6 +60,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeHell;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -130,10 +130,14 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 		
 		priority = 1;
 		this.targetTasks.addTask(priority++, new EntityAIHurtByTarget(this, true, new Class[] {EntityWisp.class}));
-		this.targetTasks.addTask(priority++, new EntityAINearestAttackableTarget<EntityMob>(this, EntityMob.class, 10, true, false, (mob) -> {
-			return (mob instanceof IEntityTameable ? !((IEntityTameable) mob).isTamed()
-					: true);
-		}));
+		if (worldObj != null && this.rand.nextBoolean() && worldObj.getBiome(this.getPosition()) instanceof BiomeHell) {
+			this.targetTasks.addTask(priority++, new EntityAINearestAttackableTarget<EntityPlayer>(this, EntityPlayer.class, 10, true, false, null));
+		} else {
+			this.targetTasks.addTask(priority++, new EntityAINearestAttackableTarget<EntityMob>(this, EntityMob.class, 10, true, false, (mob) -> {
+				return (mob instanceof IEntityTameable ? !((IEntityTameable) mob).isTamed()
+						: true);
+			}));
+		}
 	}
 	
 	protected void applyEntityAttributes()
@@ -633,7 +637,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 			
 			// Fire
 			putSpell("Burn",
-					AITargetTrigger.instance(),
+					ProjectileTrigger.instance(),
 					SingleShape.instance(),
 					EMagicElement.FIRE,
 					1,

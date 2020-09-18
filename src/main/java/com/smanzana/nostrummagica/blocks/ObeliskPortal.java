@@ -116,7 +116,7 @@ public class ObeliskPortal extends TeleportationPortal {
 		@Override
 		public float getOpacity() {
 			EntityPlayer player = NostrumMagica.proxy.getPlayer();
-			if (NostrumPortal.getRemainingCooldown(player) > 0) {
+			if (NostrumPortal.getCooldownTime(player) > 0) {
 				return 0.5f;
 			}
 			return .9f;

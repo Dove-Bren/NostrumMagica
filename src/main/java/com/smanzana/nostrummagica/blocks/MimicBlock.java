@@ -10,6 +10,7 @@ import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.BlockPistonBase;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -56,6 +57,8 @@ public class MimicBlock extends BlockDirectional {
 		}
 		
 	};
+	
+	public static PropertyBool UNBREAKABLE = PropertyBool.create("unbreakable");
 
 	public static String ID_DOOR = "mimic_door";
 	public static String ID_FACADE = "mimic_facade";
@@ -94,7 +97,7 @@ public class MimicBlock extends BlockDirectional {
 	
 	@Override
 	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer.Builder(this).add(FACING).add(NESTED_STATE).build();
+		return new BlockStateContainer.Builder(this).add(FACING).add(UNBREAKABLE).add(NESTED_STATE).build();
 	}
 	
 	@Override
@@ -115,12 +118,14 @@ public class MimicBlock extends BlockDirectional {
 	
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
-		return getDefaultState().withProperty(FACING, EnumFacing.values()[meta % EnumFacing.values().length]);
+		int faceMeta = meta & 0x7;
+		int unbreakableMeta = (meta >> 3) & 1;
+		return getDefaultState().withProperty(FACING, EnumFacing.values()[faceMeta]).withProperty(UNBREAKABLE, unbreakableMeta == 1);
 	}
 	
 	@Override
 	public int getMetaFromState(IBlockState state) {
-		return (state.getValue(FACING)).ordinal();
+		return (state.getValue(FACING).ordinal()) | ((state.getValue(UNBREAKABLE) ? 1 : 0) << 3);
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -130,6 +135,11 @@ public class MimicBlock extends BlockDirectional {
 		//return worldIn.getBlockState(pos.down()).getActualState(worldIn, pos.down());
 	}
 	
+	@SuppressWarnings("deprecation")
+	@Override
+	public float getBlockHardness(IBlockState blockState, World worldIn, BlockPos pos) {
+		return blockState.getValue(UNBREAKABLE) ? -1f : super.getBlockHardness(blockState, worldIn, pos);
+	}
 	
 	@Override
 	public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side) {
@@ -198,7 +208,9 @@ public class MimicBlock extends BlockDirectional {
 	@Override
 	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, ItemStack stack) {
 		//EnumFacing enumfacing = EnumFacing.getHorizontal(MathHelper.floor_double((double)(placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3).getOpposite();
-		return this.getDefaultState().withProperty(FACING, BlockPistonBase.getFacingFromEntity(pos, placer));
+		return this.getDefaultState()
+				.withProperty(FACING, BlockPistonBase.getFacingFromEntity(pos, placer))
+				.withProperty(UNBREAKABLE, meta == 1);
 	}
 	
 	@Override

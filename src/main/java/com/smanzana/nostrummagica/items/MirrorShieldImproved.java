@@ -18,7 +18,6 @@ import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -73,8 +72,7 @@ public class MirrorShieldImproved extends MirrorShield {
 	
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
-		playerIn.setActiveHand(hand);
-		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+		return super.onItemRightClick(itemStackIn, worldIn, playerIn, hand);
 	}
 
 	@Override

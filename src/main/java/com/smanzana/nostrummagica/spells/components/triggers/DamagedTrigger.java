@@ -57,7 +57,10 @@ public class DamagedTrigger extends SpellTrigger {
 							null,
 							null
 							);
-					this.trigger(data);
+					
+					entity.worldObj.getMinecraftServer().addScheduledTask(() -> {
+						this.trigger(data);
+					});
 					expired = true;
 				}
 			} else if (type == Event.TIME) {

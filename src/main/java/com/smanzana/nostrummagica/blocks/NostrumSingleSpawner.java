@@ -66,8 +66,8 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		}
 	}
 	
-	private static final int SPAWN_DIST_SQ = 900; // 30^2 
-	private static final PropertyEnum<Type> MOB = PropertyEnum.create("mob", Type.class);
+	protected static final int SPAWN_DIST_SQ = 900; // 30^2 
+	protected static final PropertyEnum<Type> MOB = PropertyEnum.create("mob", Type.class);
 
 	public static final String ID = "nostrum_spawner";
 	
@@ -168,7 +168,7 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		}
 	}
 	
-	private void spawn(World world, BlockPos pos, IBlockState state, Random rand) {
+	protected EntityLiving spawn(World world, BlockPos pos, IBlockState state, Random rand) {
 		Type type = state.getValue(MOB);
 		EntityLiving entity = getEntity(type, world, pos);
 		
@@ -176,10 +176,10 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		entity.setPosition(pos.getX() + 0.5, pos.getY(), pos.getZ() + .5);
 		
 		world.spawnEntityInWorld(entity);
-		
+		return entity;
 	}
 	
-	private static EntityLiving getEntity(Type type, World world, BlockPos pos) {
+	protected static EntityLiving getEntity(Type type, World world, BlockPos pos) {
 		if (type == null)
 			return null;
 		
@@ -293,22 +293,26 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 	
 	public static class SingleSpawnerTE extends TileEntity implements ITickable {
 		
-		private int life;
+		protected int ticksExisted;
 		
 		public SingleSpawnerTE() {
-			life = 0;
+			ticksExisted = 0;
+		}
+		
+		protected void majorTick(IBlockState state) {
+			NostrumSingleSpawner.instance().updateTick(worldObj, pos, state, RANDOM);
 		}
 		
 		@Override
 		public void update() {
-			if (!worldObj.isRemote && ++life % 32 == 0) {
+			if (!worldObj.isRemote && ++ticksExisted % 32 == 0) {
 				IBlockState state = this.worldObj.getBlockState(this.pos);
 				if (state == null || !(state.getBlock() instanceof NostrumSingleSpawner)) {
 					worldObj.removeTileEntity(pos);
 					return;
 				}
 				
-				NostrumSingleSpawner.instance().updateTick(worldObj, pos, state, RANDOM);
+				majorTick(state);
 			}
 		}
 	}

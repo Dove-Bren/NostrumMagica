@@ -104,7 +104,7 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 		@Override
 		public int getColor() {
 			EntityPlayer player = NostrumMagica.proxy.getPlayer();
-			if (NostrumPortal.getRemainingCooldown(player) > 0) {
+			if (NostrumPortal.getRemainingCharge(player) > 0) {
 				return 0x00FF0050;
 			}
 			return 0x00C00050;
@@ -120,7 +120,7 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 		@Override
 		public float getOpacity() {
 			EntityPlayer player = NostrumMagica.proxy.getPlayer();
-			if (NostrumPortal.getRemainingCooldown(player) > 0) {
+			if (NostrumPortal.getRemainingCharge(player) > 0) {
 				return 0.5f;
 			}
 			return .9f;

@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.blocks;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
@@ -16,6 +17,7 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
@@ -228,42 +230,126 @@ public abstract class NostrumPortal extends Block  {
 	
 	// Note: Just doing a dumb little static map cause we don't really care to persist portal cooldowns. Just
 	// There to be nice to players.
-	private static final Map<UUID, Long> EntityTeleportTimes = new HashMap<>();
+	private static final Map<UUID, Integer> EntityTeleportCharge = new HashMap<>();
 	
-	// How long entities must wait before they can teleport again after using a portal, in seconds.
-	public static final int TELEPORT_COOLDOWN = 10;
+	// How long entities must wait in the teleporation block before they teleport
+	public static final int TELEPORT_CHARGE_TIME = 3;
+	
+	private static boolean DumbIntegratedGuard = false;
 	
 	@Override
 	public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
-		// Check if player teleported too recently
-		if (worldIn.isRemote) {
-			return;
+		Integer charge = EntityTeleportCharge.get(entityIn.getUniqueID());
+		if (charge == null) {
+			charge = 0;
 		}
 		
-		Long lastTime = EntityTeleportTimes.get(entityIn.getPersistentID());
-		final long now = System.currentTimeMillis();
-		if (lastTime != null && (now - lastTime) < (1000 * TELEPORT_COOLDOWN)) {
-			// Teleported too recently
-			return;
+		if (worldIn.isRemote && entityIn == NostrumMagica.proxy.getPlayer() && ((!DumbIntegratedGuard && charge == 0) || (DumbIntegratedGuard && charge == 2))) {
+			entityIn.playSound(SoundEvents.BLOCK_PORTAL_TRIGGER, 1f, (4f / (float) TELEPORT_CHARGE_TIME));
 		}
 		
-		// Get master block
-		pos = getMaster(state, pos);
-		
-		if (canTeleport(worldIn, pos, entityIn)) {
-			EntityTeleportTimes.put(entityIn.getPersistentID(), now);
-			this.teleportEntity(worldIn, pos, entityIn);
+		if (!DumbIntegratedGuard) {
+			charge += 2;
+			DumbIntegratedGuard = true;
 		}
+		
+		
+		if (charge > TELEPORT_CHARGE_TIME * 20) {
+			EntityTeleportCharge.put(entityIn.getUniqueID(), -(TELEPORT_CHARGE_TIME * 5 * 20));
+			if (!worldIn.isRemote) {
+				this.teleportEntity(worldIn, pos, entityIn);
+			}
+		} else {
+			EntityTeleportCharge.put(entityIn.getUniqueID(), charge);
+			if (worldIn.isRemote && charge >= 0) {
+				int count = (charge / 20) / TELEPORT_CHARGE_TIME;
+				for (int i = 0; i < count + 1; i++) {
+					double dx = pos.getX() + .5;
+					double dy = pos.getY() + .5;
+					double dz = pos.getZ() + .5;
+					
+					double mx = .25 * (NostrumMagica.rand.nextFloat() - .5f);
+					double my = .5 * (NostrumMagica.rand.nextFloat() - .5f);
+					double mz = .25 * (NostrumMagica.rand.nextFloat() - .5f);
+					worldIn.spawnParticle(EnumParticleTypes.DRAGON_BREATH, dx + mx, dy, dz + mz, mx / 3, my, mz / 3, new int[0]);
+				}
+			}
+		}
+	}
+	
+	public static void tick() {
+		Iterator<UUID> it = EntityTeleportCharge.keySet().iterator();
+		while (it.hasNext()) {
+			UUID key = it.next();
+			Integer charge = EntityTeleportCharge.get(key);
+			if (charge != null) {
+				if (charge > 0) {
+					charge--;
+				} else if (charge < 0) {
+					charge++;
+				}
+			}
+			
+			if (charge == null || charge == 0) {
+				it.remove();
+			} else {
+				EntityTeleportCharge.put(key, charge);
+			}
+		}
+		DumbIntegratedGuard = false;
 	}
 	
 	public static void resetTimers() {
-		EntityTeleportTimes.clear();
+		EntityTeleportCharge.clear();
 	}
 	
-	public static int getRemainingCooldown(Entity ent) {
-		Long lastTime = EntityTeleportTimes.get(ent.getPersistentID());
-		return lastTime == null ? 0 : ((1000 * TELEPORT_COOLDOWN) - (int) (System.currentTimeMillis() - lastTime)); 
+	public static int getRemainingCharge(Entity ent) {
+		Integer charge = EntityTeleportCharge.get(ent.getPersistentID());
+		return TELEPORT_CHARGE_TIME - (charge == null ? 0 : charge) * 20; 
 	}
+	
+	public static int getCooldownTime(Entity ent) {
+		Integer charge = EntityTeleportCharge.get(ent.getPersistentID());
+		return (charge == null || charge >= 0 ? 0 : -charge);
+	}
+	
+//	// Note: Just doing a dumb little static map cause we don't really care to persist portal cooldowns. Just
+//	// There to be nice to players.
+//	private static final Map<UUID, Long> EntityTeleportTimes = new HashMap<>();
+//	
+//	// How long entities must wait before they can teleport again after using a portal, in seconds.
+//	public static final int TELEPORT_COOLDOWN = 10;
+//	
+//	@Override
+//	public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
+//
+//		if (!worldIn.isRemote) {
+//			// Check if player teleported too recently
+//			Long lastTime = EntityTeleportTimes.get(entityIn.getPersistentID());
+//			final long now = System.currentTimeMillis();
+//			if (lastTime != null && (now - lastTime) < (1000 * TELEPORT_COOLDOWN)) {
+//				// Teleported too recently
+//				return;
+//			}
+//			
+//			// Get master block
+//			pos = getMaster(state, pos);
+//			
+//			if (canTeleport(worldIn, pos, entityIn)) {
+//				EntityTeleportTimes.put(entityIn.getPersistentID(), now);
+//				this.teleportEntity(worldIn, pos, entityIn);
+//			}
+//		}
+//	}
+//	
+//	public static void resetTimers() {
+//		EntityTeleportTimes.clear();
+//	}
+//	
+//	public static int getRemainingCooldown(Entity ent) {
+//		Long lastTime = EntityTeleportTimes.get(ent.getPersistentID());
+//		return lastTime == null ? 0 : ((1000 * TELEPORT_COOLDOWN) - (int) (System.currentTimeMillis() - lastTime)); 
+//	}
 	
 	public static abstract class NostrumPortalTileEntityBase extends TileEntity {
 		

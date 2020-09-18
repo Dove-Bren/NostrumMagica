@@ -170,7 +170,7 @@ public class TemporaryTeleportationPortal extends TeleportationPortal  {
 		@Override
 		public int getColor() {
 			EntityPlayer player = NostrumMagica.proxy.getPlayer();
-			if (NostrumPortal.getRemainingCooldown(player) > 0) {
+			if (NostrumPortal.getRemainingCharge(player) > 0) {
 				return 0x00400000;
 			}
 			return 0x003030FF;
@@ -197,7 +197,7 @@ public class TemporaryTeleportationPortal extends TeleportationPortal  {
 			}
 			
 			EntityPlayer player = NostrumMagica.proxy.getPlayer();
-			if (NostrumPortal.getRemainingCooldown(player) > 0) {
+			if (NostrumPortal.getRemainingCharge(player) > 0) {
 				opacity *= 0.5f;
 			}
 			

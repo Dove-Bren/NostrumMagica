@@ -160,11 +160,11 @@ public class MirrorGui extends GuiScreen {
 	private MajorTabButton tabResearch;
 	private Map<NostrumResearchTab, ResearchTabButton> tabButtons;
 	
-	private BookScreen currentInfoScreen = null;
+	private static BookScreen currentInfoScreen = null;
 	
 	private static final int guiScale = BUTTON_QUEST_WIDTH + 8;
-	private int guiX;
-	private int guiY;
+	private static int guiX;
+	private static int guiY;
 	private int mouseClickX;
 	private int mouseClickY;
 	private int mouseClickXOffset; //xoffset at time of click
@@ -221,8 +221,8 @@ public class MirrorGui extends GuiScreen {
 			isCharacter = character;
 			
 			// Reset view
-			this.guiX = leftOffset + TEXT_CONTENT_HOFFSET + (int) ((float) TEXT_CONTENT_WIDTH / 2f);
-			this.guiY = topOffset + TEXT_CONTENT_VOFFSET + (int) ((float) TEXT_CONTENT_HEIGHT / 2f);
+			MirrorGui.guiX = leftOffset + TEXT_CONTENT_HOFFSET + (int) ((float) TEXT_CONTENT_WIDTH / 2f);
+			MirrorGui.guiY = topOffset + TEXT_CONTENT_VOFFSET + (int) ((float) TEXT_CONTENT_HEIGHT / 2f);
 
 			refreshButtons();
 		}
@@ -235,8 +235,8 @@ public class MirrorGui extends GuiScreen {
 		if (tab != currentTab) {
 			currentTab = tab;
 			
-			this.guiX = leftOffset + TEXT_CONTENT_HOFFSET + (int) ((float) TEXT_CONTENT_WIDTH / 2f);
-			this.guiY = topOffset + TEXT_CONTENT_VOFFSET + (int) ((float) TEXT_CONTENT_HEIGHT / 2f);
+			MirrorGui.guiX = leftOffset + TEXT_CONTENT_HOFFSET + (int) ((float) TEXT_CONTENT_WIDTH / 2f);
+			MirrorGui.guiY = topOffset + TEXT_CONTENT_VOFFSET + (int) ((float) TEXT_CONTENT_HEIGHT / 2f);
 			tab.clearNew();
 			
 			this.refreshButtons();
@@ -253,8 +253,10 @@ public class MirrorGui extends GuiScreen {
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - GUI_HEIGHT) / 2;
 		
-		this.guiX = leftOffset + TEXT_CONTENT_HOFFSET + (int) ((float) TEXT_CONTENT_WIDTH / 2f);
-		this.guiY = topOffset + TEXT_CONTENT_VOFFSET + (int) ((float) TEXT_CONTENT_HEIGHT / 2f);
+		if (guiX == 0 && guiY == 0) {
+			MirrorGui.guiX = leftOffset + TEXT_CONTENT_HOFFSET + (int) ((float) TEXT_CONTENT_WIDTH / 2f);
+			MirrorGui.guiY = topOffset + TEXT_CONTENT_VOFFSET + (int) ((float) TEXT_CONTENT_HEIGHT / 2f);
+		}
 		
 		tabCharacter = new MajorTabButton("character", new ItemStack(Items.SKULL, 1, 3), buttonIDs++, leftOffset - BUTTON_MAJOR_WIDTH, topOffset);
 		tabResearch = new MajorTabButton("research", new ItemStack(SpellTomePage.instance()), buttonIDs++, leftOffset - BUTTON_MAJOR_WIDTH, topOffset + TEXT_ICON_MAJORBUTTON_HEIGHT);
@@ -630,13 +632,13 @@ public class MirrorGui extends GuiScreen {
 			// Draw major tab buttons
 			tabCharacter.drawButton(mc, mouseX, mouseY);
 			tabResearch.drawButton(mc, mouseX, mouseY);
-			if (this.currentInfoScreen == null) {
+			if (MirrorGui.currentInfoScreen == null) {
 				tabCharacter.drawOverlay(mc, mouseX, mouseY);
 				tabResearch.drawOverlay(mc, mouseX, mouseY);
 			}
 			
 			
-			if (this.currentInfoScreen != null) {
+			if (MirrorGui.currentInfoScreen != null) {
 				GlStateManager.pushMatrix();
 				GlStateManager.translate(0, 0, 500);
 				drawResearchPages(mouseX, mouseY, partialTicks);
@@ -675,7 +677,7 @@ public class MirrorGui extends GuiScreen {
 		if (!button.visible)
 			return;
 		
-		if (this.currentInfoScreen != null) {
+		if (MirrorGui.currentInfoScreen != null) {
 			return; // Re-route all things to the subscren
 		}
 		
@@ -892,8 +894,8 @@ public class MirrorGui extends GuiScreen {
 			return;
 		}
 		
-		if (this.currentInfoScreen != null) {
-			this.currentInfoScreen.mouseClicked(mouseX, mouseY, mouseButton);
+		if (MirrorGui.currentInfoScreen != null) {
+			MirrorGui.currentInfoScreen.mouseClicked(mouseX, mouseY, mouseButton);
 			return;
 		}
 		
@@ -916,7 +918,8 @@ public class MirrorGui extends GuiScreen {
 	
 	@Override
 	protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
-		if (this.currentInfoScreen != null) {
+		if (currentInfoScreen != null) {
+			mouseClickX = -500;
 			//this.currentInfoScreen.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
 			return;
 		}

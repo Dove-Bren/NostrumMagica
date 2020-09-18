@@ -5,6 +5,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class ReferencePage extends TableOfContentsPage {
@@ -23,7 +24,16 @@ public class ReferencePage extends TableOfContentsPage {
 			if (attr == null)
 				return false;
 			
-			Minecraft.getMinecraft().displayGuiScreen(new InfoScreen(attr, references[index]));
+			// If we're nested in another screen, set up prev links
+			GuiScreen holdingScreen = Minecraft.getMinecraft().currentScreen;
+			if (holdingScreen == parent) {
+				holdingScreen = null;
+			}
+			
+			InfoScreen screen = new InfoScreen(attr, references[index]);
+			screen.setPrevScreen(holdingScreen);
+			Minecraft.getMinecraft().displayGuiScreen(screen);
+			
 			return true;
 		}
 		return false;
