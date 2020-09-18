@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 
@@ -178,9 +179,8 @@ public class ModelDragonRed extends ModelBase {
 	}
 	
 	@Override
-	public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entityIn) {
-		
-		float period;
+	public void setLivingAnimations(EntityLivingBase entityIn, float limbSwing, float limbSwingAmount, float partialTicks) {
+		super.setLivingAnimations(entityIn, limbSwing, limbSwingAmount, partialTicks);
 		float frac;
 		float weight;
 		
@@ -210,8 +210,7 @@ public class ModelDragonRed extends ModelBase {
 		}
 		
 		if (flying) {
-			period = 1200.0f;
-			frac = (float) (stateTime % period) / period;
+			frac = dragon.getWingFlag(partialTicks);
 			weight = (float) Math.sin(frac * Math.PI * 2);
 			
 			wing_left.rotateAngleX = wing_left.rotateAngleY = 0f;
@@ -219,6 +218,18 @@ public class ModelDragonRed extends ModelBase {
 			wing_right.rotateAngleX = wing_right.rotateAngleY = 0f;
 			wing_right.rotateAngleZ = -(weight * .8f);
 			body.rotateAngleX = 0f;
+		} else if (!dragon.onGround && dragon.motionY < -.62f) {
+			// Falling
+			float rotX = (float) (2 * Math.PI * 0.14);
+			float rotY = (float) (2 * Math.PI * 0.12);
+			float rotZ = (float) (2 * Math.PI * 0.05);
+			wing_left.rotateAngleX = rotX;
+			wing_left.rotateAngleY = rotY;
+			wing_left.rotateAngleZ = rotZ;
+			wing_right.rotateAngleX = rotX;
+			wing_right.rotateAngleY = -rotY;
+			wing_right.rotateAngleZ = -rotZ;
+			body.rotateAngleX = -.1f;
 		} else {
 			float rotX = (float) (2 * Math.PI * 0.14);
 			float rotY = (float) (2 * Math.PI * 0.22);
@@ -249,6 +260,84 @@ public class ModelDragonRed extends ModelBase {
 				body.rotateAngleX = -0.3f;
 			}
 		}
+	}
+	
+	@Override
+	public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entityIn) {
+		
+		float period;
+		float frac;
+		float weight;
+		
+		EntityDragonRedBase dragon = (EntityDragonRedBase) entityIn;
+		
+		limbSwing *= .4;
+		limbSwingAmount *= .4;
+		
+		// Reset all rotations to 0
+//		for (EDragonPart part : EDragonPart.values()) {
+//			RenderObj render = renderers.get(part);
+//			render.rotateAngleX = render.rotateAngleY = render.rotateAngleZ = 0f;
+//		}
+		
+//		RenderObj wing_left = renderers.get(EDragonPart.WING_LEFT);
+//		RenderObj wing_right = renderers.get(EDragonPart.WING_RIGHT);
+//		RenderObj body = renderers.get(EDragonPart.BODY);
+		
+		final long now = System.currentTimeMillis();
+		long stateTime = now - dragon.getFlyStateTime();
+		
+		boolean flying = dragon.isFlying();
+		
+		boolean sitting = false;
+		if (dragon instanceof EntityTameDragonRed) {
+			sitting = ((EntityTameDragonRed) dragon).isSitting();
+		}
+//		
+//		if (flying) {
+//			if (dragon instanceof EntityTameDragonRed) {
+//				frac = dragon.getWingFlag();
+//			} else {
+//				period = 1200.0f;
+//				frac = (float) (stateTime % period) / period;
+//			}
+//			weight = (float) Math.sin(frac * Math.PI * 2);
+//			
+//			wing_left.rotateAngleX = wing_left.rotateAngleY = 0f;
+//			wing_left.rotateAngleZ = (weight * .8f);
+//			wing_right.rotateAngleX = wing_right.rotateAngleY = 0f;
+//			wing_right.rotateAngleZ = -(weight * .8f);
+//			body.rotateAngleX = 0f;
+//		} else {
+//			float rotX = (float) (2 * Math.PI * 0.14);
+//			float rotY = (float) (2 * Math.PI * 0.22);
+//			float rotZ = (float) (2 * Math.PI * 0.05);
+//			
+//			if (dragon.isFlightTransitioning()) {
+//				float scale = (float) (stateTime)
+//						/ (float) EntityDragonRed.ANIM_UNFURL_DUR;
+//				
+//				if (!dragon.isLanding()) {
+//					scale = (1f - scale);
+//				}
+//				
+//				rotX *= scale;
+//				rotY *= scale;
+//				rotZ *= scale;
+//			}
+//			
+//			wing_left.rotateAngleX = rotX;
+//			wing_left.rotateAngleY = rotY;
+//			wing_left.rotateAngleZ = rotZ;
+//			wing_right.rotateAngleX = rotX;
+//			wing_right.rotateAngleY = -rotY;
+//			wing_right.rotateAngleZ = -rotZ;
+//			body.rotateAngleX = 0f;
+//			
+//			if (sitting) {
+//				body.rotateAngleX = -0.3f;
+//			}
+//		}
 		
 		
 		

@@ -1377,6 +1377,11 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	
 	@Override
 	public void dragonJump() {
+		if (this.jumpCount == 0 && !this.onGround) {
+			// Lose first jump if you didn't jump from the ground
+			jumpCount = 1;
+		}
+		
 		if (this.jumpCount < 1 + this.getBonusJumps()) {
 			this.jumpCount++;
 			this.jump();
@@ -1450,6 +1455,12 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	@Override
 	protected float getJumpUpwardsMotion() {
 		return 0.75f * (1f + this.getJumpHeightBonus() + (this.considerFlying() ? 1 : 0));
+	}
+	
+	@Override
+	protected void jump() {
+		super.jump();
+		this.flapWing();
 	}
 	
 	@Override

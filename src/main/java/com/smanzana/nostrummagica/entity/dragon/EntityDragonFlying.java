@@ -25,11 +25,17 @@ public abstract class EntityDragonFlying extends EntityDragon {
 	// How long landing or taking off takes, in milliseconds
 	public static long ANIM_UNFURL_DUR = 1000;
 	
+	protected static float WING_FLAP_PER_TICK = (1f / 20f * 1f);
+	
 	// Time we entered our current flying state.
 	// Used for animations.
 	// Set on every state change, meaning the time indicated
 	// depends on our state.
 	protected long flyStateTime;
+	
+	// Like vanilla's swing progress but for wing flags
+	protected float wingFlapProgress;
+	protected float wingFlapSpeed = 1f; // Relative speed. 1f is normal speed
 	
 	public EntityDragonFlying(World worldIn) {
 		super(worldIn);
@@ -92,6 +98,27 @@ public abstract class EntityDragonFlying extends EntityDragon {
 		return flyStateTime;
 	}
 	
+	public float getWingFlag(float partialTicks) {
+		return getWingFlapping()
+				? wingFlapProgress + (partialTicks * WING_FLAP_PER_TICK * wingFlapSpeed)
+				: 0f;
+	}
+	
+	public void flapWing(float speed) {
+		if (!getWingFlapping()) {
+			this.wingFlapSpeed = speed;
+			this.wingFlapProgress = WING_FLAP_PER_TICK * wingFlapSpeed;
+		}
+	}
+	
+	public boolean getWingFlapping() {
+		return wingFlapProgress > 0f && wingFlapProgress < 1f;
+	}
+	
+	public void flapWing() {
+		flapWing(1f);
+	}
+	
 	@Override
 	protected void entityInit() {
 		super.entityInit();
@@ -142,8 +169,8 @@ public abstract class EntityDragonFlying extends EntityDragon {
 			this.moveHelper = new EntityDragon.DragonFlyMoveHelper(this);
 			this.navigator = new EntityDragon.PathNavigateDragonFlier(this, worldObj);
 			this.setFlyingAI();
-			this.addVelocity(Math.cos(this.rotationYaw) * .2, 0.5, Math.sin(this.rotationYaw) * .2);
 		}
+		this.addVelocity(Math.cos(this.rotationYaw) * .2, 0.5, Math.sin(this.rotationYaw) * .2);
 		this.setNoGravity(true);
 		
 	}
@@ -181,6 +208,17 @@ public abstract class EntityDragonFlying extends EntityDragon {
 			}
 		}
 		
+	}
+	
+	@Override
+	public void onEntityUpdate() {
+		super.onEntityUpdate();
+		
+		if (this.isFlying()) {
+			if (this.getWingFlapping()) {
+				this.wingFlapProgress += WING_FLAP_PER_TICK * this.wingFlapSpeed;
+			}
+		}
 	}
 
 }
