@@ -121,7 +121,7 @@ public class TeleportationPortal extends NostrumPortal implements ITileEntityPro
 						
 					}
 					return true;
-				}, 0, 0);
+				}, 1, 0);
 			}
 		}
 	}

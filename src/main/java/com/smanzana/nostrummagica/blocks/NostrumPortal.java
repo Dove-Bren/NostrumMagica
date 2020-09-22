@@ -254,7 +254,7 @@ public abstract class NostrumPortal extends Block  {
 		}
 		
 		
-		if (charge > TELEPORT_CHARGE_TIME * 20) {
+		if (charge > TELEPORT_CHARGE_TIME * 20 && this.canTeleport(worldIn, pos, entityIn)) {
 			EntityTeleportCharge.put(entityIn.getUniqueID(), -(TELEPORT_CHARGE_TIME * 5 * 20));
 			if (!worldIn.isRemote) {
 				this.teleportEntity(worldIn, pos, entityIn);

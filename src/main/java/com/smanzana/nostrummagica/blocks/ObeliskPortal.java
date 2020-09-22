@@ -13,6 +13,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -50,21 +51,38 @@ public class ObeliskPortal extends TeleportationPortal {
 	}
 	
 	@Override
+	protected void teleportEntity(World worldIn, BlockPos portalPos, Entity entityIn) {
+		TileEntity te = worldIn.getTileEntity(portalPos.down());
+		if (te != null && te instanceof NostrumObeliskEntity) {
+			NostrumObeliskEntity ent = (NostrumObeliskEntity) te;
+			if (ent.deductForTeleport(ent.getCurrentTarget())) {
+				super.teleportEntity(worldIn, portalPos, entityIn);
+			} else {
+				if (entityIn instanceof EntityPlayer) {
+					((EntityPlayer) entityIn).addChatComponentMessage(new TextComponentTranslation("info.obelisk.aetherfail"));
+				}
+			}
+		}
+	}
+	
+	@Override
 	protected boolean canTeleport(World worldIn, BlockPos portalPos, Entity entityIn) {
 		// Specifically disallow EntityItems so that we can stuck suck up position crystals
 		if (entityIn == null || entityIn instanceof EntityItem) {
 			return false;
 		}
 		
-		// Check if the obelisk can afford it.
-		TileEntity te = worldIn.getTileEntity(portalPos.down());
-		if (te != null && te instanceof NostrumObeliskEntity) {
-			BlockPos target =  ((NostrumObeliskEntity) te).getCurrentTarget();
-			if (target != null) {
-				return ((NostrumObeliskEntity) te).deductForTeleport(target);
-			}
-		}
-		return false;
+		return true;
+		
+//		// Check if the obelisk can afford it.
+//		TileEntity te = worldIn.getTileEntity(portalPos.down());
+//		if (te != null && te instanceof NostrumObeliskEntity) {
+//			BlockPos target =  ((NostrumObeliskEntity) te).getCurrentTarget();
+//			if (target != null) {
+//				return ((NostrumObeliskEntity) te).canAffordTeleport(target);
+//			}
+//		}
+//		return false;
 	}
 	
 	@Override

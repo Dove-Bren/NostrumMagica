@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -2039,6 +2040,8 @@ public class NostrumMagica
 		//NostrumResearchTab tab, Size size, int x, int y, boolean hidden, ItemStack icon
     }
     
+    private List<Function<Integer, Integer>> researchReloadHooks = new LinkedList<>();
+    
     public void reloadDefaultResearch() {
     	NostrumResearch.ClearAllResearch();
     	registerDefaultResearch();
@@ -2048,7 +2051,15 @@ public class NostrumMagica
     	if (aetheria.isEnabled()) {
     		aetheria.reinitResearch();
     	}
+    	
+    	for (Function<Integer, Integer> hook : researchReloadHooks) {
+    		hook.apply(0);
+    	}
     	NostrumResearch.Validate();
+    }
+    
+    public void registerResearchReloadHook(Function<Integer, Integer> hook) {
+    	this.researchReloadHooks.add(hook);
     }
     
     private static IReward[] wrapAttribute(AwardType type, float val) {

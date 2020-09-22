@@ -13,8 +13,10 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
@@ -93,6 +95,12 @@ public class MimicBlock extends BlockDirectional {
 		this.isDoor = isDoor;
 		
 		MinecraftForge.EVENT_BUS.register(this);
+	}
+	
+	@Override
+	public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list) {
+		list.add(new ItemStack(this));
+		list.add(new ItemStack(this, 1, 1));
 	}
 	
 	@Override

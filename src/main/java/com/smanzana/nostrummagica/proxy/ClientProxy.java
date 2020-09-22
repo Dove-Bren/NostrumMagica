@@ -637,8 +637,14 @@ public class ClientProxy extends CommonProxy {
 		registerModel(Item.getItemFromBlock(MimicBlock.door()),
 				0,
 				MimicBlock.ID_DOOR);
+		registerModel(Item.getItemFromBlock(MimicBlock.door()),
+				1,
+				MimicBlock.ID_DOOR);
 		registerModel(Item.getItemFromBlock(MimicBlock.facade()),
 				0,
+				MimicBlock.ID_FACADE);
+		registerModel(Item.getItemFromBlock(MimicBlock.facade()),
+				1,
 				MimicBlock.ID_FACADE);
 
 		registerModel(Item.getItemFromBlock(TeleportRune.instance()),

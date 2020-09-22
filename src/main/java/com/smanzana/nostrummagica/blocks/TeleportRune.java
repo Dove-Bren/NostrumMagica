@@ -184,7 +184,7 @@ public class TeleportRune extends BlockContainer  {
 				}
 				NostrumMagicaSounds.DAMAGE_ENDER.play(worldIn, dx, dy, dz);
 				return true;
-			}, 0, 0);
+			}, 1, 0);
 		}
 	}
 	

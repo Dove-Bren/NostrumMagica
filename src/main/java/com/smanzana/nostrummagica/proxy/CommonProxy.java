@@ -731,14 +731,14 @@ public class CommonProxy {
     			new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_DOOR));
     	GameRegistry.register(
     			(new ItemBlock(MimicBlock.door()).setRegistryName(MimicBlock.ID_DOOR)
-    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(MimicBlock.ID_DOOR))
+    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(MimicBlock.ID_DOOR).setHasSubtypes(true))
     			);
     	
     	GameRegistry.register(MimicBlock.facade(),
     			new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_FACADE));
     	GameRegistry.register(
     			(new ItemBlock(MimicBlock.facade()).setRegistryName(MimicBlock.ID_FACADE)
-    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(MimicBlock.ID_FACADE))
+    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(MimicBlock.ID_FACADE).setHasSubtypes(true))
     			);
     	
     	GameRegistry.register(TeleportRune.instance(),

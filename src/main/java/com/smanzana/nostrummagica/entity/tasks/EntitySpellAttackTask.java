@@ -5,6 +5,7 @@ import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.player.EntityPlayer;
 
 public class EntitySpellAttackTask<T extends EntityLiving> extends EntityAIBase {
 	
@@ -41,11 +42,18 @@ public class EntitySpellAttackTask<T extends EntityLiving> extends EntityAIBase 
 			return false;
 		}
 		
-		if (needsTarget && entity.getAttackTarget() == null)
+		if (needsTarget && (entity.getAttackTarget() == null || entity.getAttackTarget().isDead))
 			return false;
 		
 		if (needsTarget && !entity.getEntitySenses().canSee(entity.getAttackTarget())){
 			return false;
+		}
+		
+		if (needsTarget && entity.getAttackTarget() instanceof EntityPlayer) {
+			EntityPlayer player = (EntityPlayer) entity.getAttackTarget();
+			if (player.isCreative() || player.isSpectator()) {
+				return false;
+			}
 		}
 		
 		return (this.attackTicks == 0 && (odds <= 0 || entity.getRNG().nextInt(odds) == 0));

@@ -629,7 +629,6 @@ public class PlayerListener {
 		if (attr != null && attr.isUnlocked()) {
 			if (event.getState().getBlock() instanceof ILoreTagged) {
 				attr.giveBasicLore((ILoreTagged) event.getState().getBlock());
-				System.out.println("lore");
 			} else if (null != LoreRegistry.getPreset(event.getState().getBlock()))
 				attr.giveBasicLore(LoreRegistry.getPreset(event.getState().getBlock()));
 		}
@@ -881,19 +880,22 @@ public class PlayerListener {
 				if (info.delay > 0) {
 					info.delay--;
 					if (info.delay == 0) {
-						if (entry.getKey().onEvent(Event.TIME, null, null))
+						if (entry.getKey().onEvent(Event.TIME, null, null)) {
 							it.remove();
-						else {
+							continue;
+						} else {
 							info.startTick = tickCount;
 							continue;
 						}
 					}
 				}
 				
-				int diff = tickCount - info.startTick;
-				if (diff % (info.interval == 0 ? 1 : info.interval) == 0)
-					if (entry.getKey().onEvent(Event.TIME, null, null))
-						it.remove();
+				if (info.interval > 0 && info.delay == 0) {
+					int diff = tickCount - info.startTick;
+					if (diff % (info.interval == 0 ? 1 : info.interval) == 0)
+						if (entry.getKey().onEvent(Event.TIME, null, null))
+							it.remove();
+				}
 			}
 			
 			NostrumPortal.tick();

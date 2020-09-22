@@ -122,7 +122,7 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	@Override
 	public void setWorldObj(World worldObj) {
 		super.setWorldObj(worldObj);
-		this.compWrapper.setAutoFill(!worldObj.isRemote);
+		this.compWrapper.setAutoFill(!worldObj.isRemote && this.isMaster());
 		//aetherHandler.setAutoFill(!worldObj.isRemote);
 	}
 	
@@ -212,6 +212,8 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 					ForgeChunkManager.releaseTicket(ticket);
 				}
 			}
+			
+			this.deactivatePortal();
 			
 			worldObj.destroyBlock(pos, false);
 		} else {
@@ -430,17 +432,10 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 		return pos;
 	};
 	
-	/**
-	 * Attempt to pay any secondary fee for teleportation to the provided location.
-	 * This assumes the destination has been checked, etc.
-	 * @param destination
-	 * @return
-	 */
-	public boolean deductForTeleport(BlockPos destination) {
-		
+	protected int getAetherCost(BlockPos destination) {
 		if (this.targetOverride != null && destination == this.targetOverride) {
 			// No cost for overrides
-			return true;
+			return 0;
 		}
 		
 		double dist = (Math.abs(this.pos.getX() - destination.getX())
@@ -448,8 +443,20 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 						 + Math.abs(this.pos.getZ() - destination.getZ()));
 		//double dist = Math.sqrt(this.pos.distanceSq(destination));
 		
-		int aetherCost = (int) Math.round(AetherPerBlock * dist);
-		
-		return this.compWrapper.checkAndWithdraw(aetherCost);
+		return (int) Math.round(AetherPerBlock * dist);
+	}
+	
+	public boolean canAffordTeleport(BlockPos destination) {
+		return this.compWrapper.check(getAetherCost(destination));
+	}
+	
+	/**
+	 * Attempt to pay any secondary fee for teleportation to the provided location.
+	 * This assumes the destination has been checked, etc.
+	 * @param destination
+	 * @return
+	 */
+	public boolean deductForTeleport(BlockPos destination) {
+		return this.compWrapper.checkAndWithdraw(getAetherCost(destination));
 	}
 }

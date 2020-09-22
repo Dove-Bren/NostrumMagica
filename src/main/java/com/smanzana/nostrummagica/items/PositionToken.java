@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.items;
 
 import com.smanzana.nostrummagica.blocks.NostrumObelisk;
 import com.smanzana.nostrummagica.blocks.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.blocks.ObeliskPortal;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
@@ -52,6 +53,11 @@ public class PositionToken extends PositionCrystal {
 		if (pos == null || !playerIn.isCreative())
 			return EnumActionResult.PASS;
 		
+		IBlockState state = worldIn.getBlockState(pos);
+		while (state.getBlock() instanceof ObeliskPortal) {
+			pos = pos.down();
+			state = worldIn.getBlockState(pos);
+		}
 		setPosition(stack, playerIn.dimension, pos);
 		return EnumActionResult.SUCCESS;
 	}

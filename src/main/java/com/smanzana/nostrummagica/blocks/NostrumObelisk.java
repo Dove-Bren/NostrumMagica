@@ -291,6 +291,9 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 			return false;
 		}
 		
+		if (!worldIn.isRemote) {
+			worldIn.notifyBlockUpdate(pos, state, state, 2);
+		}
 		playerIn.openGui(NostrumMagica.instance,
 				NostrumGui.obeliskID, worldIn,
 				pos.getX(), pos.getY(), pos.getZ());

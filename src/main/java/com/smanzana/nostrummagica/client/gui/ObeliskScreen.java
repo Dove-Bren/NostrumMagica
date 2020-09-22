@@ -97,16 +97,14 @@ public class ObeliskScreen extends GuiScreen {
 		int listY = 0;
 		int index = 0;
 		for (NostrumObeliskTarget target: tileEntity.getTargets()) {
-			//boolean valid = NostrumObelisk.isValidTarget(tileEntity.getWorld(), tileEntity.getPos(), pos);
-			boolean valid = true; // Would be cool, but need some communication
+			boolean valid = tileEntity.canAffordTeleport(target.getPos());
+			//boolean valid = true; // Would be cool, but need some communication
 			// between the server and client to get a list of actual valid ones,
 			// since the client doesn't have those chunks loaded and returns
 			// null or air blocks when fetching blockstates
 			
-			if (drawList) {
-				listButtons.add(
-						new DestinationButton(id++, 10, 50 + (listY++ * 20), target.getPos(), index, false, true, target.getTitle(), valid));
-			}
+			listButtons.add(
+					new DestinationButton(id++, 10, 50 + (listY++ * 20), target.getPos(), index, false, true, target.getTitle(), valid));
 			DestinationButton button = new DestinationButton(id++, 0, 0, target.getPos(), index, false, false, target.getTitle(), valid);
 			floatingButtons.add(button);
 			index++;
@@ -115,6 +113,10 @@ public class ObeliskScreen extends GuiScreen {
 		this.buttonList.add(centralButton);
 		this.buttonList.addAll(floatingButtons);
 		this.buttonList.addAll(listButtons);
+		
+		for (DestinationButton butt : listButtons) {
+			butt.visible = drawList;
+		}
 		
 		this.updateButtons();
 	}
@@ -125,7 +127,7 @@ public class ObeliskScreen extends GuiScreen {
 	}
 	
 	@Override
-	public void drawScreen(int parWidth, int parHeight, float p_73863_3_) {
+	public void drawScreen(int mouseX, int mouseY, float p_73863_3_) {
 
 		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 		Minecraft.getMinecraft().getTextureManager().bindTexture(background);
@@ -141,22 +143,43 @@ public class ObeliskScreen extends GuiScreen {
 			return;
 		}
 		
-		if (drawList) {
-			GlStateManager.pushAttrib();
-			drawRect(0, 0, this.width / 3, this.height, 0xFF304060);
-			GlStateManager.popAttrib();
-		}
-		
-		this.fontRendererObj.drawString("<" + xOffset + "," + yOffset + ">", 5, 5, 0xFFFFFF);
-		this.fontRendererObj.drawString("Scale: " + this.scale, 5, 20, 0xFFFFFFFF);
-		
 		for (DestinationButton other : floatingButtons)
 		{
 			renderLine(centralButton, other);
 		}
 		
-		// Do buttons and other parent stuff
-		super.drawScreen(parWidth, parHeight, p_73863_3_);
+		// Do buttons
+		centralButton.drawButton(mc, mouseX, mouseY);
+		for (DestinationButton butt : floatingButtons) {
+			butt.drawButton(mc, mouseX, mouseY);
+		}
+		
+		if (drawList) {
+			GlStateManager.pushAttrib();
+			drawRect(0, 0, this.width / 3, this.height, 0xFF304060);
+			GlStateManager.popAttrib();
+			
+			int left = (this.width / 3) - 14;
+			boolean mouseover = (mouseX >= left && mouseX <= left + 14 && mouseY <= 14);
+			Minecraft.getMinecraft().getTextureManager().bindTexture(background);
+			Gui.drawScaledCustomSizeModalRect(left, 0, 42 + (mouseover ? 14 : 0), 78, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+		} else {
+			int left = 0;
+			boolean mouseover = (mouseX >= left && mouseX <= left + 14 && mouseY <= 14);
+			Minecraft.getMinecraft().getTextureManager().bindTexture(background);
+			Gui.drawScaledCustomSizeModalRect(left, 0, 42 + (mouseover ? 14 : 0), 64, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+		}
+		
+		GlStateManager.color(1f, 1f, 1f, 1f);
+		GlStateManager.enableBlend();
+		GlStateManager.disableLighting();
+		this.fontRendererObj.drawString("<" + xOffset + "," + yOffset + ">", 35, 5, 0xFFFFFFFF);
+		this.fontRendererObj.drawString("Scale: " + this.scale, 35, 20, 0xFFFFFFFF);
+		
+		for (DestinationButton butt : listButtons) {
+			butt.drawButton(mc, mouseX, mouseY);
+		}
+		
 	}
 	
 	@Override
@@ -203,25 +226,50 @@ public class ObeliskScreen extends GuiScreen {
 	
 	@Override
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-		mouseClickX = mouseX;
-		mouseClickY = mouseY;
-		mouseClickXOffset = xOffset;
-		mouseClickYOffset = yOffset;
+		if (mouseButton == 0) {
+			int left;
+			if (drawList) {
+				left = (this.width / 3) - 14;
+			} else {
+				left = 0;
+			}
+			
+			boolean mouseover = (mouseX >= left && mouseX <= left + 14 && mouseY <= 14);
+			if (mouseover) {
+				// click the list button
+				drawList = !drawList;
+				for (DestinationButton butt : listButtons) {
+					butt.visible = drawList;
+				}
+				centralButton.playPressSound(this.mc.getSoundHandler());
+				this.updateButtons();
+			} else if (drawList && mouseX < this.width / 3) {
+				;
+			} else {
+				mouseClickX = mouseX;
+				mouseClickY = mouseY;
+				mouseClickXOffset = xOffset;
+				mouseClickYOffset = yOffset;
+			}
+		}
 		
 		super.mouseClicked(mouseX, mouseY, mouseButton);
 	}
 	
 	@Override
 	protected void mouseReleased(int mouseX, int mouseY, int state) {
-		
+		mouseClickX = -1;
+		mouseClickY = -1;
 	}
 	
 	@Override
 	protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
-		xOffset = mouseClickXOffset + (mouseClickX - mouseX);
-		yOffset = mouseClickYOffset + (mouseClickY - mouseY);
-		
-		updateButtons();
+		if (clickedMouseButton == 0 && mouseClickX > 0 && mouseClickY >= 0) {
+			xOffset = mouseClickXOffset + (mouseClickX - mouseX);
+			yOffset = mouseClickYOffset + (mouseClickY - mouseY);
+			
+			updateButtons();
+		}
 		
 		super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
 	}
@@ -310,6 +358,9 @@ public class ObeliskScreen extends GuiScreen {
                       && parX < xPosition + width 
                       && parY < yPosition + height) {
                 		textureX = TEXT_ICON_LENGTH;
+                	}
+                	if (!isValid) {
+                		textureY += TEXT_ICON_LENGTH;
                 	}
                 }
                 
