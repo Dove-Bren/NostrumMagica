@@ -97,12 +97,17 @@ public class NostrumResearch {
 	protected final String[] references;
 	protected final String[] referenceDisplays;
 	
+	/**
+	 * Other research items that should automatically be unlocked/purchased when this one is
+	 */
+	protected final String[] linkedKeys;
+	
 	protected final NostrumResearchTab tab;
 	
 	protected String[] allParents; // Filled in during validation
 	
 	private NostrumResearch(String key, NostrumResearchTab tab, Size size, int x, int y, boolean hidden, ItemStack icon,
-			String[] parents, String[] hiddenParents,
+			String[] parents, String[] hiddenParents, String[] linked,
 			String[] lore,
 			String[] quests,
 			SpellSpec[] spellComponents,
@@ -115,6 +120,7 @@ public class NostrumResearch {
 		this.iconItem = icon;
 		this.parentKeys = (parents != null && parents.length == 0) ? null : parents; // empty->null
 		this.hiddenParentKeys = (hiddenParents != null && hiddenParents.length == 0) ? null : hiddenParents;
+		this.linkedKeys = (linked != null && linked.length == 0) ? null : linked;
 		this.loreKeys = (lore != null && lore.length == 0) ? null : lore;
 		this.questKeys = (quests != null && quests.length == 0) ? null : quests;
 		this.references = (references != null && references.length == 0) ? null : references;
@@ -214,6 +220,11 @@ public class NostrumResearch {
 			return;
 		
 		attr.completeResearch(research.getKey());
+		if (research.linkedKeys != null) {
+			for (String link : research.linkedKeys) {
+				attr.completeResearch(link);
+			}
+		}
 		if (!player.worldObj.isRemote) {
 			NostrumMagicaSounds.SUCCESS_RESEARCH.play(player.worldObj, player.posX, player.posY, player.posZ);
 			NostrumMagicaSounds.UI_RESEARCH.play(player.worldObj, player.posX, player.posY, player.posZ);
@@ -229,6 +240,7 @@ public class NostrumResearch {
 	public static final class Builder {
 		protected final List<String> parentKeys;
 		protected final List<String> hiddenParentKeys;
+		protected final List<String> linkedKeys;
 		protected final List<String> loreKeys;
 		protected final List<String> questKeys;
 		protected final List<String> references;
@@ -238,6 +250,7 @@ public class NostrumResearch {
 		protected Builder() {
 			parentKeys = new LinkedList<>();
 			hiddenParentKeys = new LinkedList<>();
+			linkedKeys = new LinkedList<>();
 			loreKeys = new LinkedList<>();
 			questKeys = new LinkedList<>();
 			references = new LinkedList<>();
@@ -252,6 +265,11 @@ public class NostrumResearch {
 		
 		public Builder hiddenParent(String parent) {
 			hiddenParentKeys.add(parent);
+			return this;
+		}
+		
+		public Builder link(String key) {
+			this.linkedKeys.add(key);
 			return this;
 		}
 		
@@ -303,6 +321,7 @@ public class NostrumResearch {
 			return new NostrumResearch(key, tab, size, x, y, hidden, icon,
 					parentKeys.isEmpty() ? null : parentKeys.toArray(new String[parentKeys.size()]),
 					hiddenParentKeys.isEmpty() ? null : hiddenParentKeys.toArray(new String[hiddenParentKeys.size()]),
+					linkedKeys.isEmpty() ? null : linkedKeys.toArray(new String[linkedKeys.size()]),
 					loreKeys.isEmpty() ? null : loreKeys.toArray(new String[loreKeys.size()]),
 					questKeys.isEmpty() ? null : questKeys.toArray(new String[questKeys.size()]),
 					spellComps.isEmpty() ? null : spellComps.toArray(new SpellSpec[spellComps.size()]),

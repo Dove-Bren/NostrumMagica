@@ -35,6 +35,7 @@ public abstract class AutoContainer extends Container {
 				for (IContainerListener listener : this.listeners) {
 					listener.sendProgressBarUpdate(this, i, value);
 				}
+				oldValues[i] = value;
 			}
 		}
 	}
