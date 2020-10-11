@@ -9,7 +9,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.config.ModConfig;
-import com.smanzana.nostrummagica.entity.IEntityTameable;
+import com.smanzana.nostrummagica.entity.IEntityPet;
+import com.smanzana.nostrummagica.entity.PetInfo;
+import com.smanzana.nostrummagica.entity.PetInfo.PetAction;
+import com.smanzana.nostrummagica.entity.PetInfo.SecondaryFlavor;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.items.HookshotItem;
 import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
@@ -28,11 +31,9 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
@@ -105,6 +106,7 @@ public class OverlayRenderer extends Gui {
 	private static final int GUI_HEALTHBAR_ICON_INTERNAL_VOFFSET = 50;
 	private static final int GUI_HEALTHBAR_ICON_STAY_VOFFSET = 0;
 	private static final int GUI_HEALTHBAR_ICON_ATTACK_VOFFSET = GUI_HEALTHBAR_ICON_STAY_VOFFSET + GUI_HEALTHBAR_ICON_LENGTH;
+	private static final int GUI_HEALTHBAR_ICON_WORK_VOFFSET = GUI_HEALTHBAR_ICON_ATTACK_VOFFSET + GUI_HEALTHBAR_ICON_LENGTH;
 	
 	private int wiggleIndex; // set to multiples of 12 for each wiggle
 	private static final int wiggleOffsets[] = {0, 1, 1, 2, 1, 1, 0, -1, -1, -2, -1, -1};
@@ -228,7 +230,11 @@ public class OverlayRenderer extends Gui {
 				healthbarWidth = (int) (GUI_HEALTHBAR_BOX_BACK_WIDTH * scale);
 				healthbarHeight = (int) (GUI_HEALTHBAR_BOX_BACK_HEIGHT * scale);
 				xOffset = scaledRes.getScaledWidth() - (2 + healthbarWidth);
-				for (EntityTameable tamed : NostrumMagica.getTamedEntities(player)) {
+				final boolean hideDragons = ModConfig.config.displayDragonHealthbars();
+				for (EntityLivingBase tamed : NostrumMagica.getTamedEntities(player)) {
+					if (hideDragons && tamed instanceof ITameDragon) {
+						continue;
+					}
 					renderHealthbarBox(player, scaledRes, tamed, xOffset, y, scale);
 					y += healthbarHeight;
 				}
@@ -624,19 +630,36 @@ public class OverlayRenderer extends Gui {
 		// 2) pet head/icon
 		// 3) pet status icon
 		FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
-		final boolean sitting = (pet instanceof EntityTameable ? ((EntityTameable) pet).isSitting()
-				: pet instanceof IEntityTameable ? ((IEntityTameable) pet).isSitting()
-				: false);
-		final boolean attacking = (pet instanceof EntityLiving ? ((EntityLiving) pet).getAttackTarget() != null : false);
-		final float health = (float) (Math.max(0, Math.ceil(pet.getHealth())) / Math.max(0.01, Math.ceil(pet.getMaxHealth())));
-		boolean hasSecondaryBar = false;
-		float secondaryMeter = 0f;
+//		final boolean sitting = (pet instanceof EntityTameable ? ((EntityTameable) pet).isSitting()
+//				: pet instanceof IEntityTameable ? ((IEntityTameable) pet).isSitting()
+//				: false);
+//		final boolean attacking = (pet instanceof EntityLiving ? ((EntityLiving) pet).getAttackTarget() != null : false);
+//		final float health = (float) (Math.max(0, Math.ceil(pet.getHealth())) / Math.max(0.01, Math.ceil(pet.getMaxHealth())));
+//		boolean hasSecondaryBar = false;
+//		float secondaryMeter = 0f;
+//		
+//		if (pet instanceof ITameDragon) {
+//			ITameDragon dragon = (ITameDragon) pet;
+//			hasSecondaryBar = true;
+//			secondaryMeter = (float) dragon.getXP() / (float) dragon.getMaxXP();
+//		}
 		
-		if (pet instanceof ITameDragon) {
-			ITameDragon dragon = (ITameDragon) pet;
-			hasSecondaryBar = true;
-			secondaryMeter = (float) dragon.getXP() / (float) dragon.getMaxXP();
+		PetInfo info;
+		if (pet instanceof IEntityPet) {
+			IEntityPet iPet = (IEntityPet) pet;
+			info = iPet.getPetSummary();
+		} else {
+			info = PetInfo.Wrap(pet);
 		}
+		
+		final float health = (float) info.getHpPercent();//(float) (Math.max(0, Math.ceil(pet.getHealth())) / Math.max(0.01, Math.ceil(pet.getMaxHealth())));
+		final boolean hasSecondaryBar = info.getMaxSecondary() > 0;
+		float secondaryMeter = (float) info.getSecondaryPercent();
+		final SecondaryFlavor flavor = info.getSecondaryFlavor();
+		final PetAction action = info.getPetAction();
+		
+		info.release();
+		info = null;
 		
 		Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_HEALTHBARS);
 		
@@ -673,7 +696,10 @@ public class OverlayRenderer extends Gui {
 			GlStateManager.color(.7f, .9f, .7f, 1f);
 			secondaryMeter = 1f;
 		} else {
-			GlStateManager.color(1f, .7f, 1f, 1f);
+			GlStateManager.color(flavor.colorR(secondaryMeter),
+					flavor.colorG(secondaryMeter),
+					flavor.colorB(secondaryMeter),
+					flavor.colorA(secondaryMeter));
 		}
 		drawTexturedModalRect(
 				GUI_HEALTHBAR_ORB_SECONDARY_BAR_INNER_HOFFSET + Math.round(GUI_HEALTHBAR_ORB_SECONDARY_WIDTH * (1f-secondaryMeter)),
@@ -692,17 +718,20 @@ public class OverlayRenderer extends Gui {
 		
 		//	-> Status
 		GlStateManager.translate(0, 0, 100);
-		if (attacking) {
-			drawTexturedModalRect(0, 0,
+		GlStateManager.pushMatrix();
+		GlStateManager.scale(.6f, .6f, .6f);
+		GlStateManager.translate(0, 0, 0);
+		if (action == PetAction.ATTACKING) {
+			drawTexturedModalRect(GUI_HEALTHBAR_ICON_INTERNAL_HOFFSET, GUI_HEALTHBAR_ICON_INTERNAL_VOFFSET,
 					GUI_HEALTHBAR_ICON_HOFFSET, GUI_HEALTHBAR_ICON_ATTACK_VOFFSET, GUI_HEALTHBAR_ICON_LENGTH, GUI_HEALTHBAR_ICON_LENGTH);
-		} else if (sitting) {
-			GlStateManager.pushMatrix();
-			GlStateManager.scale(.6f, .6f, .6f);
-			GlStateManager.translate(0, 0, 0);
+		} else if (action == PetAction.SITTING) {
 			drawTexturedModalRect(GUI_HEALTHBAR_ICON_INTERNAL_HOFFSET, GUI_HEALTHBAR_ICON_INTERNAL_VOFFSET,
 					GUI_HEALTHBAR_ICON_HOFFSET, GUI_HEALTHBAR_ICON_STAY_VOFFSET, GUI_HEALTHBAR_ICON_LENGTH, GUI_HEALTHBAR_ICON_LENGTH);
-			GlStateManager.popMatrix();
+		} else if (action == PetAction.WORKING) {
+			drawTexturedModalRect(GUI_HEALTHBAR_ICON_INTERNAL_HOFFSET, GUI_HEALTHBAR_ICON_INTERNAL_VOFFSET,
+					GUI_HEALTHBAR_ICON_HOFFSET, GUI_HEALTHBAR_ICON_WORK_VOFFSET, GUI_HEALTHBAR_ICON_LENGTH, GUI_HEALTHBAR_ICON_LENGTH);
 		}
+		GlStateManager.popMatrix();
 		
 		//	-> Name
 		final String name = pet.hasCustomName() ? pet.getCustomNameTag() : pet.getName();
@@ -736,19 +765,27 @@ public class OverlayRenderer extends Gui {
 		// 2) pet head/icon
 		// 3) pet status icon
 		FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
-		final float health = (float) (Math.max(0, Math.ceil(pet.getHealth())) / Math.max(0.01, Math.ceil(pet.getMaxHealth())));
-		boolean hasSecondaryBar = false;
-		float secondaryMeter = 0f;
-		final boolean sitting = (pet instanceof EntityTameable ? ((EntityTameable) pet).isSitting()
-				: pet instanceof IEntityTameable ? ((IEntityTameable) pet).isSitting()
-				: false);
-		final boolean attacking = (pet instanceof EntityLiving ? ((EntityLiving) pet).getAttackTarget() != null : false);
 		
-		if (pet instanceof ITameDragon) {
-			ITameDragon dragon = (ITameDragon) pet;
-			hasSecondaryBar = true;
-			secondaryMeter = (float) dragon.getXP() / (float) dragon.getMaxXP();
+		PetInfo info;
+		if (pet instanceof IEntityPet) {
+			IEntityPet iPet = (IEntityPet) pet;
+			info = iPet.getPetSummary();
+		} else {
+			info = PetInfo.Wrap(pet);
 		}
+		
+		final float health = (float) info.getHpPercent();//(float) (Math.max(0, Math.ceil(pet.getHealth())) / Math.max(0.01, Math.ceil(pet.getMaxHealth())));
+		final boolean hasSecondaryBar = info.getMaxSecondary() > 0;
+		float secondaryMeter = (float) info.getSecondaryPercent();
+		final SecondaryFlavor flavor = info.getSecondaryFlavor();
+//		final boolean sitting = (pet instanceof EntityTameable ? ((EntityTameable) pet).isSitting()
+//				: pet instanceof IEntityTameable ? ((IEntityTameable) pet).isSitting()
+//				: false);
+//		final boolean attacking = (pet instanceof EntityLiving ? ((EntityLiving) pet).getAttackTarget() != null : false);
+		final PetAction action = info.getPetAction();
+		
+		info.release();
+		info = null;
 		
 		Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_HEALTHBARS);
 		
@@ -785,7 +822,10 @@ public class OverlayRenderer extends Gui {
 			GlStateManager.color(.7f, .9f, .7f, 1f);
 			secondaryMeter = 1f;
 		} else {
-			GlStateManager.color(1f, .7f, 1f, 1f);
+			GlStateManager.color(flavor.colorR(secondaryMeter),
+					flavor.colorG(secondaryMeter),
+					flavor.colorB(secondaryMeter),
+					flavor.colorA(secondaryMeter));
 		}
 		drawTexturedModalRect(
 				GUI_HEALTHBAR_BOX_SECONDARY_BAR_INNER_HOFFSET + Math.round(GUI_HEALTHBAR_BOX_SECONDARY_WIDTH * (1f-secondaryMeter)),
@@ -799,17 +839,20 @@ public class OverlayRenderer extends Gui {
 		
 		//		-> Status
 		GlStateManager.translate(0, 0, 100);
-		if (attacking) {
-			drawTexturedModalRect(0, 0,
+		GlStateManager.pushMatrix();
+		GlStateManager.scale(.6f, .6f, .6f);
+		GlStateManager.translate(0, 0, 0);
+		if (action == PetAction.ATTACKING) {
+			drawTexturedModalRect(282, 6,
 					GUI_HEALTHBAR_ICON_HOFFSET, GUI_HEALTHBAR_ICON_ATTACK_VOFFSET, GUI_HEALTHBAR_ICON_LENGTH, GUI_HEALTHBAR_ICON_LENGTH);
-		} else if (sitting) {
-			GlStateManager.pushMatrix();
-			GlStateManager.scale(.6f, .6f, .6f);
-			GlStateManager.translate(0, 0, 0);
+		} else if (action == PetAction.SITTING) {
 			drawTexturedModalRect(282, 6,
 					GUI_HEALTHBAR_ICON_HOFFSET, GUI_HEALTHBAR_ICON_STAY_VOFFSET, GUI_HEALTHBAR_ICON_LENGTH, GUI_HEALTHBAR_ICON_LENGTH);
-			GlStateManager.popMatrix();
+		} else if (action == PetAction.WORKING) {
+			drawTexturedModalRect(282, 6,
+					GUI_HEALTHBAR_ICON_HOFFSET, GUI_HEALTHBAR_ICON_WORK_VOFFSET, GUI_HEALTHBAR_ICON_LENGTH, GUI_HEALTHBAR_ICON_LENGTH);
 		}
+		GlStateManager.popMatrix();
 
 		//	-> Name
 		final String name = pet.hasCustomName() ? pet.getCustomNameTag() : pet.getName();

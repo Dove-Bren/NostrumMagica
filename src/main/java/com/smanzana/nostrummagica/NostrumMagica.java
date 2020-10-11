@@ -1,8 +1,10 @@
 package com.smanzana.nostrummagica;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
@@ -42,6 +44,7 @@ import com.smanzana.nostrummagica.command.CommandUnlockAll;
 import com.smanzana.nostrummagica.command.CommandWriteRoom;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityKoid;
+import com.smanzana.nostrummagica.entity.IEntityTameable;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
@@ -151,6 +154,7 @@ import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.IEntityOwnable;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -2337,10 +2341,34 @@ public class NostrumMagica
     	return list;
     }
     
-    public static List<EntityTameable> getTamedEntities(EntityLivingBase owner) {
-    	return owner.worldObj.getEntities(EntityTameable.class, (ent) -> {
-    		return ent.isTamed() && ent.isOwner(owner);
-    	});
+    public static List<EntityLivingBase> getTamedEntities(EntityLivingBase owner) {
+    	List<EntityLivingBase> ents = new ArrayList<>();
+    	final UUID id = owner.getUniqueID();
+    	for (Entity e : owner.worldObj.loadedEntityList) {
+    		if (!(e instanceof EntityLivingBase)) {
+    			continue;
+    		}
+    		
+    		EntityLivingBase ent = (EntityLivingBase) e;
+    		if (ent instanceof IEntityTameable) {
+    			IEntityTameable tame = (IEntityTameable) ent;
+    			if (tame.isTamed() && tame.getOwnerId() != null && tame.getOwnerId().equals(id)) {
+    				ents.add(ent);
+    			}
+    		} else if (ent instanceof EntityTameable) {
+    			EntityTameable tame = (EntityTameable) ent;
+    			if (tame.isTamed() && tame.isOwner(owner)) {
+    				ents.add(ent);
+    			}
+    		} else if (ent instanceof IEntityOwnable) {
+    			IEntityOwnable tame = (IEntityOwnable) ent;
+    			if (tame.getOwnerId() != null && tame.getOwnerId().equals(id)) {
+    				ents.add(ent);
+    			}
+    		}
+    		
+    	}
+    	return ents;
     }
     
     public static SpellRegistry getSpellRegistry() {

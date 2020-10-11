@@ -40,6 +40,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.IEntityOwnable;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.entity.item.EntityItem;
@@ -100,7 +101,34 @@ public class SpellAction {
 		public void apply(EntityLivingBase caster, World world, BlockPos block, float eff);
 	}
 	
-	private class DamageEffect implements SpellEffect {
+	private static abstract class NegativeSpellEffect implements SpellEffect {
+		
+		protected boolean isHarmful() {
+			return true;
+		}
+		
+		protected abstract void applyEffect(EntityLivingBase caster, EntityLivingBase entity, float eff);
+		
+		public final void apply(EntityLivingBase caster, EntityLivingBase entity, float eff) {
+			if (entity != null && isHarmful() && caster != entity) {
+				if (entity instanceof IEntityOwnable) {
+					if (caster.getUniqueID().equals(((IEntityOwnable) entity).getOwnerId())) {
+						return; // We own the target entity
+					}
+				}
+				
+				if (caster instanceof IEntityOwnable) {
+					if (entity.getUniqueID().equals(((IEntityOwnable) caster).getOwnerId())) {
+						return; // We own the target entity
+					}
+				}
+			}
+			
+			applyEffect(caster, entity, eff);
+		}
+	}
+	
+	private class DamageEffect extends NegativeSpellEffect {
 		private float amount;
 		private EMagicElement element;
 		
@@ -110,7 +138,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public void applyEffect(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
 			float fin = calcDamage(caster, entity, amount * efficiency, element);
 			source.setLastAttacker(entity);
 			//entity.setHealth(Math.max(0f, entity.getHealth() - fin));
@@ -229,7 +257,7 @@ public class SpellAction {
 		}
 	}
 	
-	private class StatusEffect implements SpellEffect {
+	private class StatusEffect extends NegativeSpellEffect {
 		private Potion effect;
 		private int duration;
 		private int amp;
@@ -241,7 +269,12 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		protected boolean isHarmful() {
+			return this.effect.isBadEffect();
+		}
+		
+		@Override
+		public void applyEffect(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
 			entity.addPotionEffect(new PotionEffect(effect, (int) (duration * efficiency), amp));
 			
 			if (effect.isBadEffect()) {
@@ -434,7 +467,7 @@ public class SpellAction {
 		}
 	}
 	
-	private class PushEffect implements SpellEffect {
+	private class PushEffect extends NegativeSpellEffect {
 		private float range;
 		private int amp; // - is pull
 		
@@ -444,7 +477,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public void applyEffect(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
 			apply(caster, entity.worldObj, entity.getPosition(), efficiency);
 		}
 		
@@ -700,7 +733,7 @@ public class SpellAction {
 		}
 	}
 	
-	private static class BurnEffect implements SpellEffect {
+	private static class BurnEffect extends NegativeSpellEffect {
 
 		private int duration;
 		
@@ -709,7 +742,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public void applyEffect(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
 			int duration = (int) (this.duration * efficiency);
 			if (duration == 0)
 				return; // Nope
@@ -748,14 +781,14 @@ public class SpellAction {
 		
 	}
 	
-	private static class LightningEffect implements SpellEffect {
+	private static class LightningEffect extends NegativeSpellEffect {
 		
 		public LightningEffect() {
 			
 		}
 		
 		@Override
-		public void apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public void applyEffect(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
 			entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
 			entity.hurtResistantTime = 0;
 			apply(caster, entity.worldObj, entity.getPosition(), efficiency);
@@ -935,14 +968,14 @@ public class SpellAction {
 		}
 	}
 	
-	private static class SwapEffect implements SpellEffect {
+	private static class SwapEffect extends NegativeSpellEffect {
 		
 		public SwapEffect() {
 			
 		}
 		
 		@Override
-		public void apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public void applyEffect(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
 			if (caster == null || entity == null)
 				return;
 			
@@ -1210,7 +1243,7 @@ public class SpellAction {
 		}
 	}
 	
-	private static class BurnArmorEffect implements SpellEffect {
+	private static class BurnArmorEffect extends NegativeSpellEffect {
 		
 		private int level;
 		
@@ -1219,7 +1252,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public void applyEffect(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
 			int amount = (int) (20 * level * efficiency);
 			if (level > 2)
 				amount *= 2;

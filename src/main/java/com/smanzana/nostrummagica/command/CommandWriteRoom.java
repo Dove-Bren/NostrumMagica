@@ -44,7 +44,8 @@ public class CommandWriteRoom extends CommandBase {
 			} else {
 				RoomBlueprint blueprint = new RoomBlueprint(player.worldObj,
 						PositionCrystal.getBlockPosition(main),
-						PositionCrystal.getBlockPosition(offhand));
+						PositionCrystal.getBlockPosition(offhand),
+						true);
 				
 				if (DungeonRoomRegistry.instance().writeRoomAsFile(blueprint, args[0], 1, new LinkedList<>())) {
 					sender.addChatMessage(new TextComponentString("Room written!"));

@@ -3,11 +3,14 @@ package com.smanzana.nostrummagica.entity.dragon;
 import java.util.UUID;
 
 import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI;
-import com.smanzana.nostrummagica.entity.IEntityTameable;
+import com.smanzana.nostrummagica.entity.IEntityPet;
+import com.smanzana.nostrummagica.entity.PetInfo;
+import com.smanzana.nostrummagica.entity.PetInfo.PetAction;
+import com.smanzana.nostrummagica.entity.PetInfo.SecondaryFlavor;
 
 import net.minecraft.entity.player.EntityPlayer;
 
-public interface ITameDragon extends IEntityTameable {
+public interface ITameDragon extends IEntityPet {
 
 	public TamedDragonGUI.DragonContainer getGUIContainer(EntityPlayer player);
 	
@@ -35,5 +38,11 @@ public interface ITameDragon extends IEntityTameable {
 	public void addMana(int mana);
 	
 	public boolean sharesMana(EntityPlayer player);
+	
+	public PetAction getPetAction();
+	
+	public default PetInfo getPetSummary() {
+		return PetInfo.claim(getHealth(), getMaxHealth(), getXP(), getMaxXP(), SecondaryFlavor.PROGRESS, getPetAction());
+	}
 	
 }

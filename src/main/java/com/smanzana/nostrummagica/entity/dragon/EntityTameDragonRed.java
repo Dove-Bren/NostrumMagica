@@ -18,6 +18,7 @@ import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonSpellSheet;
 import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonContainer;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.IEntityTameable;
+import com.smanzana.nostrummagica.entity.PetInfo.PetAction;
 import com.smanzana.nostrummagica.entity.dragon.IDragonSpawnData.IDragonSpawnFactory;
 import com.smanzana.nostrummagica.entity.tasks.DragonAINearestAttackableTarget;
 import com.smanzana.nostrummagica.entity.tasks.DragonGambittedSpellAttackTask;
@@ -99,6 +100,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
     protected static final DataParameter<Float> ATTRIBUTE_BOND  = EntityDataManager.<Float>createKey(EntityTameDragonRed.class, DataSerializers.FLOAT);
     
     protected static final DataParameter<Float> SYNCED_MAX_HEALTH  = EntityDataManager.<Float>createKey(EntityTameDragonRed.class, DataSerializers.FLOAT);
+    protected static final DataParameter<PetAction> DATA_PET_ACTION = EntityDataManager.<PetAction>createKey(EntityTameDragonRed.class, PetAction.Serializer);
     
     protected static final String NBT_TAMED = "Tamed";
     protected static final String NBT_OWNER_ID = "OwnerUUID";
@@ -181,6 +183,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		this.dataManager.register(ATTRIBUTE_LEVEL, 0);
 		this.dataManager.register(ATTRIBUTE_BOND, 0f);
 		this.dataManager.register(SYNCED_MAX_HEALTH, 100.0f);
+		this.dataManager.register(DATA_PET_ACTION, PetAction.WAITING);
 		
 		final EntityTameDragonRed dragon = this;
 		aiPlayerTarget = new DragonAINearestAttackableTarget<EntityPlayer>(this, EntityPlayer.class, true, new Predicate<EntityPlayer>() {
@@ -411,6 +414,21 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		this.setupBaseAI();
 		if (this.isTamed()) {
 			this.setupTamedAI();
+		}
+	}
+	
+	@Override
+	public void onEntityUpdate() {
+		super.onEntityUpdate();
+		
+		if (worldObj != null && !worldObj.isRemote) {
+			if (!this.isSitting()) {
+				if (this.getAttackTarget() == null) {
+					setPetAction(PetAction.WAITING);
+				} else {
+					setPetAction(PetAction.ATTACKING);
+				}
+			}
 		}
 	}
 	
@@ -1185,6 +1203,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	
 	public void setSitting(boolean sitting) {
 		this.dataManager.set(SITTING, sitting);
+		setPetAction(PetAction.SITTING);
 	}
 	
 	public float getGrowingAge() {
@@ -1252,6 +1271,32 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			if (isOnSameTeam(target)) {
 				this.setAttackTarget(null);
 				aiRevengeTarget.resetTask();
+			}
+		}
+		
+		if (worldObj.isRemote) {
+			// If strong flight gets added here, this should be adjusted so that strong flight can flap when standing still, etc.
+			// Checking whether motion is high is great for gliding but probably won't work well if the dragon can wade basically
+			if (this.isFlying() && !this.getWingFlapping()) {
+				final double motion = Math.abs(motionX) + Math.abs(motionZ);
+				
+				final double glideStallMotion = .4;
+				boolean flap = false;
+				boolean flapFast = false;
+				
+				if (this.posY > this.prevPosY) {
+					flap = true;
+					flapFast = true;
+				}
+				// Gliding TODO hide behind 'is gliding flier' bool
+				else if (motion > glideStallMotion && ticksExisted % 160 == 0) {
+					flap = true;
+					flapFast = false;
+				}
+				
+				if (flap) {
+					this.flapWing(flapFast ? 1f : .5f);
+				}
 			}
 		}
 	}
@@ -1680,6 +1725,15 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	@Override
 	public boolean sharesMana(EntityPlayer player) {
 		return player != null && player.isEntityEqual(this.getOwner()) && this.getBond() >= BOND_LEVEL_MANA;
+	}
+	
+	public void setPetAction(PetAction action) {
+		dataManager.set(DATA_PET_ACTION, action);
+	}
+
+	@Override
+	public PetAction getPetAction() {
+		return dataManager.get(DATA_PET_ACTION);
 	}
 	
 	public static class RedDragonSpellInventory extends InventoryBasic {
@@ -2118,5 +2172,4 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		}
 		
 	}
-
 }

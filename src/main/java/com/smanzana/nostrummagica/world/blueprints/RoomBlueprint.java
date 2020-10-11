@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
@@ -219,7 +221,42 @@ public class RoomBlueprint {
 			return in;
 		}
 		
-		public void spawn(World world, BlockPos at, EnumFacing facing) {
+		public IBlockState getSpawnState(EnumFacing facing) {
+//			if (state != null) {
+//				IBlockState placeState = state;
+//				
+//				if (facing != null && facing.getOpposite().getHorizontalIndex() != 0) {
+//					
+//					Block block = placeState.getBlock();
+//					if (block instanceof BlockHorizontal) {
+//						EnumFacing cur = placeState.getValue(BlockHorizontal.FACING);
+//						cur = rotate(cur, facing);
+//						placeState = placeState.withProperty(BlockHorizontal.FACING, cur);
+//					} else if (block instanceof BlockTorch) {
+//						EnumFacing cur = placeState.getValue(BlockTorch.FACING);
+//						cur = rotate(cur, facing);
+//						placeState = placeState.withProperty(BlockTorch.FACING, cur);
+//					} else if (block instanceof BlockLadder) {
+//						EnumFacing cur = placeState.getValue(BlockLadder.FACING);
+//						cur = rotate(cur, facing);
+//						placeState = placeState.withProperty(BlockLadder.FACING, cur);
+//					} else if (block instanceof BlockStairs) {
+//						EnumFacing cur = placeState.getValue(BlockStairs.FACING);
+//						cur = rotate(cur, facing);
+//						placeState = placeState.withProperty(BlockStairs.FACING, cur);
+//					}
+//				}
+//				
+//				world.setBlockState(at, placeState, 2);
+//				if (tileEntityData != null) {
+//					TileEntity te = TileEntity.create(world, tileEntityData.copy());
+//					world.setTileEntity(at, te);
+//				}
+//			} else {
+//				world.removeTileEntity(at);
+//				world.setBlockToAir(at);
+//			}
+			
 			if (state != null) {
 				IBlockState placeState = state;
 				
@@ -245,15 +282,14 @@ public class RoomBlueprint {
 					}
 				}
 				
-				world.setBlockState(at, placeState, 2);
-				if (tileEntityData != null) {
-					TileEntity te = TileEntity.create(world, tileEntityData.copy());
-					world.setTileEntity(at, te);
-				}
+				return placeState;
 			} else {
-				world.removeTileEntity(at);
-				world.setBlockToAir(at);
+				return null;
 			}
+		}
+		
+		public NBTTagCompound getTileEntityData() {
+			return tileEntityData;
 		}
 		
 		public boolean isDoorIndicator() {
@@ -294,6 +330,7 @@ public class RoomBlueprint {
 	public static final String NBT_VERSION = "version";
 	public static final String NBT_ENTITIES = "entities";
 	public static final String NBT_PIECE_OFFSET = "part_offset";
+	public static final String NBT_PIECE_COMPOSITE = "composite_marker";
 	public static final int MAX_BLUEPRINT_BLOCKS = 32 * 32 * 32;
 	
 	private BlockPos dimensions;
@@ -301,6 +338,13 @@ public class RoomBlueprint {
 	private DungeonExitPoint entry;
 	private Set<DungeonExitPoint> doors;
 	private int partOffset; // Only used for fragments
+	
+	// Overriding/wrapping interface
+	protected IBlueprintSpawner spawnerFunc;
+	
+	// Cached sublist of blocks for previews (5x2x5)
+	private BlueprintBlock[][][] previewBlocks = new BlueprintBlock[5][2][5];
+	
 	
 	public RoomBlueprint(BlockPos dimensions, BlueprintBlock[] blocks, Set<DungeonExitPoint> exits, DungeonExitPoint entry) {
 		if (dimensions != null && blocks != null
@@ -311,10 +355,25 @@ public class RoomBlueprint {
 		this.blocks = blocks;
 		this.doors = exits == null ? new HashSet<>() : exits;
 		this.entry = entry;
+
+		refreshPreview();
 	}
 	
-	public RoomBlueprint(World world, BlockPos pos1, BlockPos pos2) {
+	/**
+	 * Scans the world between two block positions and captures all blocks, blockstates, and tile entities
+	 * to save as a blueprint.
+	 * @param world
+	 * @param pos1
+	 * @param pos2
+	 * @param usePlaceholders if true, special blocks to mark entries and doors (For dungeon genning) are detected. Otherwise, just a regular room.
+	 */
+	public RoomBlueprint(World world, BlockPos pos1, BlockPos pos2, boolean usePlaceholders) {
+		this(world, pos1, pos2, usePlaceholders, null, null);
+	}
+	
+	public RoomBlueprint(World world, BlockPos pos1, BlockPos pos2, boolean usePlaceholders, BlockPos origin, EnumFacing originDir) {
 		this(null, null, null, null);
+		
 		BlockPos low = new BlockPos(pos1.getX() < pos2.getX() ? pos1.getX() : pos2.getX(),
 				pos1.getY() < pos2.getY() ? pos1.getY() : pos2.getY(),
 				pos1.getZ() < pos2.getZ() ? pos1.getZ() : pos2.getZ());
@@ -342,19 +401,72 @@ public class RoomBlueprint {
 		for (int k = 0; k < length; k++) {
 			cursor.setPos(pos1.getX() + i, pos1.getY() + j, pos1.getZ() + k);
 			BlueprintBlock block = new BlueprintBlock(world, cursor);
-			if (block.isDoorIndicator()) {
-				this.doors.add(new DungeonExitPoint(cursor.toImmutable().subtract(pos1), block.getFacing().getOpposite()));
-				block = new BlueprintBlock((IBlockState) null, null); // Make block an air one
-			} else if (block.isEntry()) {
-				if (this.entry != null) {
-					NostrumMagica.logger.error("Found multiple entry points to room while creating blueprint!");
+			
+			// Maybe check for blocks th at actually indicate entries and exits
+			if (usePlaceholders) {
+				if (block.isDoorIndicator()) {
+					this.doors.add(new DungeonExitPoint(cursor.toImmutable().subtract(pos1), block.getFacing().getOpposite()));
+					block = new BlueprintBlock((IBlockState) null, null); // Make block an air one
+				} else if (block.isEntry()) {
+					if (this.entry != null) {
+						NostrumMagica.logger.error("Found multiple entry points to room while creating blueprint!");
+					}
+					this.entry = new DungeonExitPoint(cursor.toImmutable().subtract(pos1), block.getFacing());
+					block = new BlueprintBlock((IBlockState) null, null); // Make block an air one
 				}
-				this.entry = new DungeonExitPoint(cursor.toImmutable().subtract(pos1), block.getFacing());
-				block = new BlueprintBlock((IBlockState) null, null); // Make block an air one
 			}
 			
 			blocks[slot++] = block;
 		}
+		
+		// If no placeholders, center xz in the blueprint
+		if (origin != null && originDir != null) {
+			if (this.entry != null) {
+				NostrumMagica.logger.error("Had a legit entry point but stamping another in");
+			}
+			this.entry = new DungeonExitPoint(origin, originDir);
+		}
+		
+		if (this.entry == null && !usePlaceholders) {
+			this.entry = new DungeonExitPoint(new BlockPos(width / 2, 0, length / 2), EnumFacing.NORTH);
+		}
+		refreshPreview();
+	}
+	
+	protected void refreshPreview() {
+		// Get preview based on 'entry' origin point and blocks around it
+		if (dimensions != null) {
+			BlockPos offset = (entry == null ? BlockPos.ORIGIN : entry.getPos());
+			for (int xOff = -2; xOff <= 2; xOff++)
+			for (int yOff = 0; yOff <= 1; yOff++)
+			for (int zOff = -2; zOff <= 2; zOff++) {
+				final int x = xOff + offset.getX();
+				final int y = yOff + offset.getY();
+				final int z = zOff + offset.getZ();
+				
+				if (x < 0 || y < 0 || z < 0
+					|| x >= dimensions.getX()
+					|| y >= dimensions.getY()
+					|| z >= dimensions.getZ()) {
+					previewBlocks[xOff + 2][yOff][zOff + 2] = null;
+					continue;
+				}
+				
+				final int bIndex = (x * dimensions.getY() * dimensions.getZ())
+						+ (y * dimensions.getZ())
+						+ z;
+				if (bIndex < 0 || bIndex >= blocks.length) {
+					previewBlocks[xOff + 2][yOff][zOff + 2] = null;
+				} else {
+					previewBlocks[xOff + 2][yOff][zOff + 2] =
+							blocks[bIndex];
+				}
+			}
+		}
+	}
+	
+	public void setSpawningFunc(@Nullable IBlueprintSpawner spawner) {
+		this.spawnerFunc = spawner;
 	}
 	
 	private static EnumFacing getModDir(EnumFacing original, EnumFacing newFacing) {
@@ -405,6 +517,27 @@ public class RoomBlueprint {
 		}
 		
 		return false;
+	}
+	
+	protected void placeBlock(World world, BlockPos at, EnumFacing direction, BlueprintBlock block) {
+		
+		if (spawnerFunc != null) {
+			spawnerFunc.spawnBlock(world, at, direction, block);
+		} else {
+			IBlockState placeState = block.getSpawnState(direction);
+			if (placeState != null) {
+				world.setBlockState(at, placeState, 2);
+				
+				NBTTagCompound tileEntityData = block.getTileEntityData();
+				if (tileEntityData != null) {
+					TileEntity te = TileEntity.create(world, tileEntityData.copy());
+					world.setTileEntity(at, te);
+				}
+			} else {
+				world.removeTileEntity(at);
+				world.setBlockToAir(at);
+			}
+		}
 	}
 	
 	public void spawn(World world, BlockPos at) {
@@ -540,7 +673,7 @@ public class RoomBlueprint {
 					secondPassBlocks.add(block);
 					secondPassPos.add(new BlockPos(cursor));
 				} else {
-					block.spawn(world, cursor, modDir);
+					placeBlock(world, cursor, modDir, block);
 				}
 			}
 			
@@ -548,7 +681,7 @@ public class RoomBlueprint {
 			for (int i = 0; i < secondPassBlocks.size(); i++) {
 				BlockPos secondPos = secondPassPos.get(i);
 				BlueprintBlock block = secondPassBlocks.get(i);
-				block.spawn(world, secondPos, modDir);
+				placeBlock(world, secondPos, modDir, block);
 			}
 			
 			world.getChunkFromBlockCoords(cursor).setChunkModified();
@@ -642,6 +775,17 @@ public class RoomBlueprint {
 	}
 	
 	/**
+	 * Returns a preview of the blueprint centered around the blueprint entry point.
+	 * Note that the preview is un-rotated. You must rotate yourself if you want that.
+	 * Also note that this is a 5x2x5 preview.
+	 * And again, Note that air blocks and blocks outside the template are null in the arrays.
+	 * @return
+	 */
+	public BlueprintBlock[][][] getPreview() {
+		return this.previewBlocks;
+	}
+	
+	/**
 	 * Adds one blueprint to the other. Returns the original blueprint modified to include blocks from the other.
 	 * This SHOULD be compatible with completely different blueprints.
 	 * For now, all I'm implementing is piecing blueprints broken apart with {@link #toNBTWithBreakdown()}, where
@@ -711,7 +855,6 @@ public class RoomBlueprint {
 		}
 	}
 	
-	@SuppressWarnings("null")
 	private static RoomBlueprint deserializeNBTStyleInternal(NBTTagCompound nbt, byte version) {
 		BlockPos dims = NBTUtil.getPosFromTag(nbt.getCompoundTag(NBT_DIMS));
 		// When breaking blueprints into pieces, the first one has an actual copy of the real size of the whole thing.
@@ -776,7 +919,6 @@ public class RoomBlueprint {
 		return deserializeNBTStyleInternal(nbt, (byte)0);
 	}
 	
-	@SuppressWarnings("null")
 	private static RoomBlueprint deserializeVersion2(NBTTagCompound nbt) {
 		// Store blocks as int array
 		// Store TileEntities separately since there are likely few of them
@@ -1077,6 +1219,11 @@ public class RoomBlueprint {
 		
 		public boolean hasNext();
 		
+	}
+	
+	public static interface IBlueprintSpawner {
+		
+		public void spawnBlock(World world, BlockPos pos, EnumFacing direction, BlueprintBlock block);
 	}
 	
 }

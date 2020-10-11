@@ -416,6 +416,10 @@ public class EntityDragonRed extends EntityDragonRedBase {
 			if (this.isFlying() && !this.getWingFlapping()) {
 				if ((this.posY > this.prevPosY) || (this.motionX + this.motionZ < .2)) {
 					this.flapWing(this.motionX + this.motionZ < .2 ? .5f : 1f);
+				} else {
+					//if (this.ticksExisted % 5 == 0) {
+						System.out.println("total motion: " + (motionX + motionZ));
+					//}
 				}
 			}
 		}

@@ -19,6 +19,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
@@ -288,7 +289,10 @@ public class MagicEffectProxy {
 		}
 		
 		if (potion != null) {
-			entity.removePotionEffect(potion);
+			PotionEffect eff = entity.getActivePotionEffect(potion);
+			if (eff.getDuration() > 1) {
+				entity.removePotionEffect(potion);
+			}
 		}
 	}
 	

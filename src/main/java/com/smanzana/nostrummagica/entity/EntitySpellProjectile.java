@@ -1,7 +1,11 @@
 package com.smanzana.nostrummagica.entity;
 
+import javax.annotation.Nullable;
+
+import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger.ProjectileTriggerInstance;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.nbt.NBTTagCompound;
@@ -16,6 +20,8 @@ public class EntitySpellProjectile extends EntityFireball {
 	private ProjectileTriggerInstance trigger;
 	private double maxDistance; // Squared distance so no sqrt
 	private Vec3d origin;
+	
+	private @Nullable Predicate<Entity> filter;
 
 	public EntitySpellProjectile(ProjectileTriggerInstance trigger,
 			EntityLivingBase shooter, float speedFactor, double maxDistance) {
@@ -48,6 +54,10 @@ public class EntitySpellProjectile extends EntityFireball {
 		this.trigger = trigger;
 		this.maxDistance = Math.pow(maxDistance, 2);
 		this.origin = new Vec3d(fromX, fromY, fromZ);
+	}
+	
+	public void setFilter(@Nullable Predicate<Entity> filter) {
+		this.filter = filter;
 	}
 	
 	private Vec3d getAccel(Vec3d direction, double scale) {
@@ -92,10 +102,12 @@ public class EntitySpellProjectile extends EntityFireball {
 			trigger.onProjectileHit(new BlockPos(result.hitVec));
 			this.setDead();
 		} else if (result.typeOfHit == RayTraceResult.Type.ENTITY) {
-			if ((result.entityHit != shootingEntity && !shootingEntity.isRidingOrBeingRiddenBy(result.entityHit))
-					|| this.ticksExisted > 20) {
-				trigger.onProjectileHit(result.entityHit);
-				this.setDead();
+			if (filter == null || filter.apply(result.entityHit)) {
+				if ((result.entityHit != shootingEntity && !shootingEntity.isRidingOrBeingRiddenBy(result.entityHit))
+						|| this.ticksExisted > 20) {
+					trigger.onProjectileHit(result.entityHit);
+					this.setDead();
+				}
 			}
 		}
 	}
