@@ -44,7 +44,12 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 	
 	// Same as parent's reapplicationDelay
 	protected int effectDelay;
+	
 	protected boolean verticalSteps;
+	protected boolean gravity;
+	protected double gravitySpeed;
+	protected float radiusPerFall;
+	protected boolean walksOnLiquid;
 	
 	private float prevHeight;
 	private Vec3d waddleDir;
@@ -57,6 +62,8 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 		effectDelays = new HashMap<>();
 		effectDelay = 20;
 		verticalSteps = false;
+		gravity = false;
+		gravitySpeed = 0;
 	}
 	
 	public EntityAreaEffect(World worldIn, double x, double y, double z) {
@@ -93,6 +100,19 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 		this.verticalSteps = shouldStep;
 	}
 	
+	public boolean hasGravity() {
+		return gravity;
+	}
+	
+	public double getGravitySpeed() {
+		return gravitySpeed;
+	}
+	
+	public void setGravity(boolean hasGravity, double gravitySpeed) {
+		this.gravity = hasGravity;
+		this.gravitySpeed = gravitySpeed;
+	}
+	
 	public void addEffect(IAreaEntityEffect effect) {
 		this.entityEffects.add(effect);
 	}
@@ -104,6 +124,18 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 	public void setWaddle(Vec3d direction, double waddle) {
 		this.waddleDir = direction;
 		this.waddleMagnitude = waddle;
+	}
+	
+	public void setRadiusPerFall(float radiusPerBlock) {
+		this.radiusPerFall = radiusPerBlock;
+	}
+	
+	public void setWalksWater() {
+		this.walksOnLiquid = true;
+	}
+	
+	public boolean getWalksWater() {
+		return this.walksOnLiquid;
 	}
 	
 	public boolean canApply(Entity ent) {
@@ -124,6 +156,14 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 				it.remove();
 			}
 		}
+	}
+	
+	protected void onFall(double prevY) {
+		this.setRadius(this.getRadius() + (float) (Math.ceil(Math.abs(posY - prevY)) * radiusPerFall));
+	}
+	
+	protected void onClimb(double prevY) {
+		;
 	}
 	
 	@Override
@@ -153,35 +193,61 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
         this.posY += this.motionY;
         this.posZ += this.motionZ;
         
-        // TODO make configurable
-        if (verticalSteps) {
-        	boolean elevated = false;
-        	MutableBlockPos pos = new MutableBlockPos();
-        	
-        	// Move up out of solid blocks
+        boolean elevated = false;
+        MutableBlockPos pos = new MutableBlockPos();
+        final double startY = this.posY;
+        
+        // Move up out of solid blocks
+        if (this.doesVerticalSteps()) {
         	while (true) {
         		pos.setPos(this);
         		IBlockState state = worldObj.getBlockState(pos);
 	        	if (state == null || !state.getMaterial().blocksMovement()) {
-	        		// Done
-	        		break;
+	        		
+	        		if (!this.getWalksWater() || !state.getMaterial().isLiquid()) {
+		        		// Done
+		        		break;
+	        		}
 	        	}
 	        	
 	        	this.posY += 1;
 	        	elevated = true;
         	}
         	
-        	// Move down if too far up
-        	// Skip doing if we just elevated because that means there was a solid block.
-        	// Only go 1 block per run
-        	if (!elevated && posY > 1) {
+        	if (elevated) {
+        		this.onClimb(startY);
+        	}
+        }
+        
+        // Move down if too far up
+    	// Skip doing if we just elevated because that means there was a solid block.
+        if (this.hasGravity() && !elevated) {
+        	double left = this.gravitySpeed;
+        	while (posY > 1 && left > 0) {
         		pos.setPos(posX, posY - 1, posZ);
         		IBlockState state = worldObj.getBlockState(pos);
 	        	if (state != null && state.getMaterial().blocksMovement()) {
 	        		// Done
-	        	} else {
-	        		this.posY -= 1;
+	        		break;
 	        	}
+	        	
+	        	// Also stop if state is liquid and we walk on liquid
+	        	if (state != null && state.getMaterial().isLiquid() && this.walksOnLiquid) {
+	        		break;
+	        	}
+	        	
+        		if (left >= 1) {
+	        		this.posY -= 1;
+	        		left -= 1;
+        		} else {
+        			this.posY -= left;
+        			left = 0;
+        		}
+        		elevated = true;
+        	}
+        	
+        	if (elevated) {
+        		this.onFall(startY);
         	}
         }
         
@@ -277,7 +343,7 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 			if (this.ticksExisted % 5 == 0) {
 				// Blocks
 				AxisAlignedBB box = this.getEntityBoundingBox();
-				for (BlockPos pos : BlockPos.getAllInBox(new BlockPos(box.minX, box.minY, box.minZ), new BlockPos(box.maxX, box.maxY, box.maxZ))) {
+				for (BlockPos pos : BlockPos.getAllInBox(new BlockPos(box.minX, box.minY - 1, box.minZ), new BlockPos(box.maxX, box.maxY, box.maxZ))) {
 					double dx = (pos.getX() + .5) - this.posX;
 					double dz = (pos.getZ() + .5) - this.posZ;
 					double d = dx * dx + dz * dz;

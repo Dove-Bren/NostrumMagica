@@ -343,6 +343,8 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 			}
 		});
 		cloud.setVerticleStepping(true);
+		cloud.setGravity(true, .1);
+		//cloud.setWalksWater();
 		world.spawnEntityInWorld(cloud);
 		cloud.motionX = direction.xCoord;
 		cloud.motionY = direction.yCoord;
@@ -375,6 +377,9 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 			//entity.setPositionAndUpdate(cloud.posX, cloud.posY + 2 + dy, cloud.posZ);
 		});
 		cloud.setVerticleStepping(true);
+		cloud.setGravity(true, 1);
+		cloud.setRadiusPerFall(.1f);
+		cloud.setWalksWater();
 		cloud.setEffectDelay(0);
 		cloud.setWaddle(direction, 1);
 		cloud.setParticle(EnumParticleTypes.SWEEP_ATTACK);
