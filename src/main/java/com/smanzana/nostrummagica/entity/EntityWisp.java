@@ -207,8 +207,9 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 		if (idleCooldown > 0) {
 			idleCooldown--;
 			if (idleCooldown == 0) {
-				if (this.getAttackTarget() == null)
-					NostrumMagicaSounds.DAMAGE_WIND.play(this);
+				if (this.getAttackTarget() == null) {
+					NostrumMagicaSounds.WISP_IDLE.play(this);
+				}
 				idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10); 
 			}
 		}

@@ -197,7 +197,7 @@ public class TemporaryTeleportationPortal extends TeleportationPortal  {
 			}
 			
 			EntityPlayer player = NostrumMagica.proxy.getPlayer();
-			if (NostrumPortal.getRemainingCharge(player) > 0) {
+			if (NostrumPortal.getCooldownTime(player) > 0) {
 				opacity *= 0.5f;
 			}
 			

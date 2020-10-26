@@ -77,18 +77,22 @@ public final class RenderFuncs {
 	private static final Matrix4f M4fZero = new Matrix4f();
 	
 	public static void RenderModelWithColor(IBakedModel model, int color, VertexBuffer buffer, Vector3f offset) {
+		RenderModelWithColor(model, color, buffer, offset, M4fZero);
+	}
+	
+	public static void RenderModelWithColor(IBakedModel model, int color, VertexBuffer buffer, Vector3f offset, Matrix4f transform) {
 		GlStateManager.pushMatrix();
 
 		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
 		// TODO provide blockstate?
 		for (EnumFacing enumfacing : EnumFacing.values()) {
-			//renderQuadsColor(buffer, model.getQuads((IBlockState) null, enumfacing, 0L), color, offset);
 			renderQuads(model.getQuads((IBlockState) null, enumfacing, 0L), offset, new VertexBufferConsumer(buffer), buffer,
-					M4fZero, 1f, color);
+					transform, 1f, color);
 		}
-
-		//renderQuadsColor(buffer, model.getQuads((IBlockState) null, (EnumFacing) null, 0L), color);
+		
+		renderQuads(model.getQuads((IBlockState) null, null, 0L), offset, new VertexBufferConsumer(buffer), buffer,
+				transform, 1f, color);
 
 		GlStateManager.popMatrix();
 	}

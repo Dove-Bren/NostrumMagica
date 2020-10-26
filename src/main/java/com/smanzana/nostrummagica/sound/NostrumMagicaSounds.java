@@ -47,7 +47,11 @@ public enum NostrumMagicaSounds {
 	DRAGON_BITE("mob.dragon.attack", SoundCategory.HOSTILE),
 	DRAGON_DEATH("mob.dragon.death", SoundCategory.HOSTILE),
 	HOOKSHOT_FIRE("item.hookshot.shoot", SoundCategory.PLAYERS),
-	HOOKSHOT_TICK("item.hookshot.tick", SoundCategory.PLAYERS);
+	HOOKSHOT_TICK("item.hookshot.tick", SoundCategory.PLAYERS),
+	WISP_HURT("mob.wisp.hurt", SoundCategory.NEUTRAL),
+	WISP_DEATH("mob.wisp.death", SoundCategory.NEUTRAL),
+	WISP_IDLE("mob.wisp.idle", SoundCategory.NEUTRAL),
+	PORTAL("ambient.portal", SoundCategory.AMBIENT);
 	
 	private ResourceLocation resource;
 	private SoundCategory category;

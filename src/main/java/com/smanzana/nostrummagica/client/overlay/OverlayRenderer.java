@@ -202,7 +202,7 @@ public class OverlayRenderer extends Gui {
 			}
 			
 			final float scale = 0.5f;
-			int y = 35;
+			int y = 75;
 			int healthbarWidth;
 			int healthbarHeight;
 			int xOffset;

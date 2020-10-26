@@ -158,7 +158,7 @@
     {
         "sounds":
         [
-            "nostrummagica:spell/cast"
+            "nostrummagica:spell/cast2"
         ]
     },
     
@@ -250,6 +250,15 @@
         ]
     },
     
+    "ambient.portal":
+    {
+        "category": "neutral",
+        "sounds":
+        [
+            "nostrummagica:ambient/portal"
+        ]
+    },
+    
     "mob.dragon.idle":
     {
         "sounds":
@@ -293,6 +302,35 @@
         "sounds":
         [
             "nostrummagica:entity/dragon/death1"
+        ]
+    },
+    
+    "mob.wisp.death":
+    {
+        "sounds":
+        [
+            "nostrummagica:entity/wisp/die1",
+            "nostrummagica:entity/wisp/die2"
+        ]
+    },
+    
+    "mob.wisp.hurt":
+    {
+        "sounds":
+        [
+            "nostrummagica:entity/wisp/hurt1"
+        ]
+    },
+    
+    "mob.wisp.idle":
+    {
+        "sounds":
+        [
+            "nostrummagica:entity/wisp/idle1",
+            "nostrummagica:entity/wisp/idle2",
+            "nostrummagica:entity/wisp/idle3",
+            "nostrummagica:entity/wisp/idle4",
+            "nostrummagica:entity/wisp/idle5"
         ]
     },
     

@@ -19,6 +19,7 @@ public class Inventories {
     	}
     	
     	ItemStack itemstack = stack.copy();
+    	int emptyPos = -1;
 
     	for (int i = 0; i < inventory.getSizeInventory(); ++i) {
     		if (!inventory.isItemValidForSlot(i, itemstack)) {
@@ -28,11 +29,17 @@ public class Inventories {
             ItemStack itemstack1 = inventory.getStackInSlot(i);
 
             if (itemstack1 == null) {
-            	if (commit) {
-	                inventory.setInventorySlotContents(i, itemstack);
-	                inventory.markDirty();
+            	// If just looking to see if it'll fit, return success.
+            	if (!commit) {
+            		return null;
             	}
-                return null;
+            	
+            	// Otherwise, mark the first empty spot but keep looking for places to stack
+            	if (emptyPos == -1) {
+            		emptyPos = i;
+            	}
+            	
+            	continue;
             }
             
             if (ItemStacks.stacksMatch(itemstack, itemstack1)) {
@@ -53,6 +60,15 @@ public class Inventories {
             	}
             }
         }
+    	
+    	// If we found an empty spot, add it now
+    	if (emptyPos != -1) {
+    		if (commit) {
+                inventory.setInventorySlotContents(emptyPos, itemstack);
+                inventory.markDirty();
+        	}
+            return null;
+    	}
 
         return itemstack;
     }
@@ -79,8 +95,8 @@ public class Inventories {
     	}
     	
     	ItemStack itemstack = stack.copy();
-
-    	for (int i = 0; i < inventory.getSizeInventory(); ++i) {
+    	
+    	for (int i = inventory.getSizeInventory() - 1; i >= 0 ; i--) {
     		ItemStack inSlot = inventory.getStackInSlot(i);
     		
     		if (inSlot == null) {
