@@ -35,7 +35,7 @@ minecraft {
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 }
 
-repositories {
+repositories {  
     maven {
         // location of the maven that hosts JEI files
         name = "Progwml6 maven"

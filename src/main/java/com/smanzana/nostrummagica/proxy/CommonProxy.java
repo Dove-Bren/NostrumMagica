@@ -58,6 +58,7 @@ import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
 import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
+import com.smanzana.nostrummagica.entity.PetInfo;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.EntityShadowDragonRed;
@@ -184,6 +185,8 @@ public class CommonProxy {
 		capabilityHandler = new CapabilityHandler();
 		NetworkHandler.getInstance();
 		NostrumMagicaSounds.registerSounds();
+		
+		PetInfo.PetAction.Init();
 		
     	registerShapes();
     	registerTriggers();

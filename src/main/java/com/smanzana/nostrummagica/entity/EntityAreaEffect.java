@@ -200,7 +200,7 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
         // Move up out of solid blocks
         if (this.doesVerticalSteps()) {
         	while (true) {
-        		pos.setPos(this);
+        		pos.setPos(this.getPosition());
         		IBlockState state = worldObj.getBlockState(pos);
 	        	if (state == null || !state.getMaterial().blocksMovement()) {
 	        		

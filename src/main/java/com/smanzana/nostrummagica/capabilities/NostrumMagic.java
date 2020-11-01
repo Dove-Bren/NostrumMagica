@@ -63,8 +63,8 @@ public class NostrumMagic implements INostrumMagic {
 	
 	public static class KnowledgeCurves {
 	
-		private static final int knowledgeGrowth = 5;
-		private static final int knowledgeBase = 10;
+		private static final int knowledgeGrowth = 2;
+		private static final int knowledgeBase = 2;
 		
 		public static int maxKnowledge(int level) {
 			return knowledgeBase + (knowledgeGrowth * (level - 1));
@@ -182,6 +182,8 @@ public class NostrumMagic implements INostrumMagic {
 
 		level++;
 		this.addSkillPoint();
+		this.addResearchPoint();
+		this.addResearchPoint();
 		this.addResearchPoint();
 		setLevel(level);
 		

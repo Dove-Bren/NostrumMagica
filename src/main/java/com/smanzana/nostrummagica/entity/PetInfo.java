@@ -115,7 +115,10 @@ public class PetInfo {
 			}
 		}
 		
-		public static final JobSerializer Serializer = new JobSerializer();
+		public static JobSerializer Serializer = null;
+		public static void Init() {
+			Serializer = new JobSerializer();
+		}
 	}
 
 	private double currentHp;

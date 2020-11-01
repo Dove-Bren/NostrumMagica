@@ -168,8 +168,9 @@ public class MimicBlock extends BlockDirectional {
 			solid = false;
 		} else if (entityIn != null) {
 			EnumFacing side = state.getValue(FACING);
-			Vec3d center = entityBox.getCenter();
-			//center = new Vec3d(center.xCoord, entityBox.minY, center.zCoord);
+			// cant use getCenter cause it's client-side only
+			//Vec3d center = entityBox.getCenter();
+			Vec3d center = new Vec3d(entityBox.minX + (entityBox.maxX - entityBox.minX) * 0.5D, entityBox.minY + (entityBox.maxY - entityBox.minY) * 0.5D, entityBox.minZ + (entityBox.maxZ - entityBox.minZ) * 0.5D);
 			
 			// XZ motion isn't stored on the server and is handled client-side
 			double dx = entityIn.posX - entityIn.lastTickPosX;
@@ -259,6 +260,7 @@ public class MimicBlock extends BlockDirectional {
 	}
 	
 	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
 	public void onBlockHighlight(DrawBlockHighlightEvent event) {
 		if (event.getTarget().typeOfHit == RayTraceResult.Type.BLOCK) {
 			BlockPos pos = event.getTarget().getBlockPos();

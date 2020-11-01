@@ -96,6 +96,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 	
 	private int idleCooldown;
 	private Spell defaultSpell;
+	private @Nullable Spell lastSpell;
 	
 	public EntityWisp(World worldIn) {
 		super(worldIn);
@@ -342,7 +343,13 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 			scroll = WispBlock.instance().getScroll(worldObj, homePos);
 		}
 		
-		if (scroll == null) {
+		@Nullable Spell spell = null;
+		
+		if (scroll != null) {
+			spell = SpellScroll.getSpell(scroll);
+		}
+		
+		if (spell == null) {
 			// Use a random spell
 			init();
 			if (this.defaultSpell == null) {
@@ -350,10 +357,15 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 				this.dataManager.set(ELEMENT, defaultSpell.getPrimaryElement());
 			}
 			
-			return this.defaultSpell;
+			spell = this.defaultSpell;
 		}
 		
-		return SpellScroll.getSpell(scroll);
+		if (spell != lastSpell) {
+			lastSpell = spell;
+			this.dataManager.set(ELEMENT, spell.getPrimaryElement());
+		}
+		
+		return spell;
 	}
 	
 	// Adapted from the wisp move helper

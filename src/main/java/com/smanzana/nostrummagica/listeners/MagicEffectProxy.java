@@ -290,7 +290,7 @@ public class MagicEffectProxy {
 		
 		if (potion != null) {
 			PotionEffect eff = entity.getActivePotionEffect(potion);
-			if (eff.getDuration() > 1) {
+			if (eff != null && eff.getDuration() > 1) {
 				entity.removePotionEffect(potion);
 			}
 		}

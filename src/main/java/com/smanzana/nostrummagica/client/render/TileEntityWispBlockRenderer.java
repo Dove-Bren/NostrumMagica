@@ -9,7 +9,6 @@ import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.GlStateManager.DestFactor;
 import net.minecraft.client.renderer.GlStateManager.SourceFactor;
@@ -190,20 +189,20 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 	}
 	
 	protected void renderAetherDebug(WispBlockTileEntity te) {
-		final int aether = te.getHandler().getAether(null);
-		final int maxAether = te.getHandler().getMaxAether(null);
-		final String str = aether + " / " + maxAether;
-		final FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
-		
-		GlStateManager.pushMatrix();
-		
-		GlStateManager.rotate(180, 1, 0, 0);
-		// Make billboard
-		GlStateManager.color(1f, 1f, 1f, 1f);
-		GlStateManager.disableBlend();
-		GlStateManager.disableLighting();
-		fonter.drawString(str, -(fonter.getStringWidth(str) / 2), 0, 0xFF000000);
-		GlStateManager.popMatrix();
+//		final int aether = te.getHandler().getAether(null);
+//		final int maxAether = te.getHandler().getMaxAether(null);
+//		final String str = aether + " / " + maxAether;
+//		final FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
+//		
+//		GlStateManager.pushMatrix();
+//		
+//		GlStateManager.rotate(180, 1, 0, 0);
+//		// Make billboard
+//		GlStateManager.color(1f, 1f, 1f, 1f);
+//		GlStateManager.disableBlend();
+//		GlStateManager.disableLighting();
+//		fonter.drawString(str, -(fonter.getStringWidth(str) / 2), 0, 0xFF000000);
+//		GlStateManager.popMatrix();
 	}
 	
 	@Override

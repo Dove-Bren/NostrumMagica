@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
+import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
@@ -132,6 +133,10 @@ public class ManiCrystal extends Block {
 	@Override
 	public void randomTick(World worldIn, BlockPos pos, IBlockState state, Random random) {
 		if (worldIn.isRemote) {
+			return;
+		}
+		
+		if (worldIn.provider instanceof NostrumEmptyDimension.EmptyDimensionProvider) {
 			return;
 		}
 		

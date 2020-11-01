@@ -49,6 +49,9 @@ public class MimicBlockBakedModel implements IBakedModel {
 		
 		if (nestedState != null) {
 			nestedModel = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(nestedState);
+			if (nestedModel == null) {
+			}
+		} else {
 		}
 		
 		return nestedModel == null ? missing : nestedModel;

@@ -35,6 +35,7 @@ import com.smanzana.nostrummagica.spells.components.SpellAction;
 import baubles.api.BaublesApi;
 import baubles.api.cap.IBaublesItemHandler;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -69,6 +70,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
@@ -900,6 +902,16 @@ public class PlayerListener {
 			
 			NostrumPortal.tick();
 			TeleportRune.tick();
+		}
+	}
+	
+	@SubscribeEvent
+	public void onTick(ClientTickEvent event) {
+		if (event.phase == Phase.START) {
+			if (!Minecraft.getMinecraft().isIntegratedServerRunning() && Minecraft.getMinecraft().thePlayer != null) {
+				NostrumPortal.tick();
+				TeleportRune.tick();
+			}
 		}
 	}
 	
