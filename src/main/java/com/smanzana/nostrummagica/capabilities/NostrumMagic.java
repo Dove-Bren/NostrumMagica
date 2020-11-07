@@ -384,6 +384,8 @@ public class NostrumMagic implements INostrumMagic {
 		
 		loreLevels.put(key, 1);
 		
+		addLoreBonus(this, val, 1);
+		
 //		if (NostrumMagica.proxy.getPlayer() != null) {
 //			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
 //		}
@@ -394,8 +396,6 @@ public class NostrumMagic implements INostrumMagic {
 					(EntityPlayerMP) entity);
 			
 		}
-		
-		addLoreBonus(this, val, 1);
 	}
 
 	@Override

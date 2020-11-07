@@ -215,7 +215,7 @@ public class OverlayRenderer extends Gui {
 				
 				List<ITameDragon> dragons = NostrumMagica.getNearbyTamedDragons(player, 32, true);
 				Collections.sort(dragons, (left, right) -> {
-					return left.getUniqueID().compareTo(right.getUniqueID());
+					return ((EntityLivingBase) (left)).getUniqueID().compareTo(((EntityLivingBase) right).getUniqueID());
 				});
 				for (ITameDragon dragon : dragons) {
 					if (dragon instanceof EntityLivingBase) {

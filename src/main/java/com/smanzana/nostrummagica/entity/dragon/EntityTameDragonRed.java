@@ -18,7 +18,9 @@ import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonSpellSheet;
 import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonContainer;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.IEntityTameable;
+import com.smanzana.nostrummagica.entity.PetInfo;
 import com.smanzana.nostrummagica.entity.PetInfo.PetAction;
+import com.smanzana.nostrummagica.entity.PetInfo.SecondaryFlavor;
 import com.smanzana.nostrummagica.entity.dragon.IDragonSpawnData.IDragonSpawnFactory;
 import com.smanzana.nostrummagica.entity.tasks.DragonAINearestAttackableTarget;
 import com.smanzana.nostrummagica.entity.tasks.DragonGambittedSpellAttackTask;
@@ -37,6 +39,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IEntityOwnable;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -73,11 +76,13 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityTameable, ITameDragon {
 
+	protected static final DataParameter<Boolean> HATCHED = EntityDataManager.<Boolean>createKey(EntityTameDragonRed.class, DataSerializers.BOOLEAN);
 	protected static final DataParameter<Boolean> TAMED = EntityDataManager.<Boolean>createKey(EntityTameDragonRed.class, DataSerializers.BOOLEAN);
     protected static final DataParameter<Optional<UUID>> OWNER_UNIQUE_ID = EntityDataManager.<Optional<UUID>>createKey(EntityTameDragonRed.class, DataSerializers.OPTIONAL_UNIQUE_ID);
     protected static final DataParameter<Boolean> SITTING = EntityDataManager.<Boolean>createKey(EntityTameDragonRed.class, DataSerializers.BOOLEAN);
@@ -102,6 +107,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
     protected static final DataParameter<Float> SYNCED_MAX_HEALTH  = EntityDataManager.<Float>createKey(EntityTameDragonRed.class, DataSerializers.FLOAT);
     protected static final DataParameter<PetAction> DATA_PET_ACTION = EntityDataManager.<PetAction>createKey(EntityTameDragonRed.class, PetAction.Serializer);
     
+    protected static final String NBT_HATCHED = "Hatched";
     protected static final String NBT_TAMED = "Tamed";
     protected static final String NBT_OWNER_ID = "OwnerUUID";
     protected static final String NBT_SITTING = "Sitting";
@@ -184,6 +190,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		this.dataManager.register(ATTRIBUTE_BOND, 0f);
 		this.dataManager.register(SYNCED_MAX_HEALTH, 100.0f);
 		this.dataManager.register(DATA_PET_ACTION, PetAction.WAITING);
+		this.dataManager.register(HATCHED, false);
 		
 		final EntityTameDragonRed dragon = this;
 		aiPlayerTarget = new DragonAINearestAttackableTarget<EntityPlayer>(this, EntityPlayer.class, true, new Predicate<EntityPlayer>() {
@@ -556,6 +563,18 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	 public boolean canBeLeashedTo(EntityPlayer player) {
 		return !isSitting() && player == getOwner();
 	}
+	
+	public boolean wasHatched() {
+		return this.dataManager.get(HATCHED);
+	}
+	
+	public void setWasHatched(boolean hatched) {
+		this.dataManager.set(HATCHED, hatched);
+		
+		if (worldObj != null && !worldObj.isRemote) {
+			ReflectionHelper.setPrivateValue(EntityLiving.class, this, hatched, "persistenceRequired", "field_82179_bU");
+		}
+	}
 
 	@Nullable
 	public UUID getOwnerId() {
@@ -669,6 +688,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 //			
 //			compound.setTag(NBT_SPELL_INVENTORY, invTag);
 		}
+		
+		compound.setBoolean(NBT_HATCHED, this.wasHatched());
 	}
 
 	/**
@@ -750,6 +771,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		} else {
 			this.spellInventory = new RedDragonSpellInventory(this.getName() + " Empty Spell Inventory", true);
 		}
+		
+		this.setWasHatched(compound.getBoolean(NBT_HATCHED));
 	}
 	
 	public boolean isTamed() {
@@ -760,6 +783,9 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		this.dataManager.set(TAMED, tamed);
 		if (tamed) {
 			this.setupTamedAI();
+			if (worldObj != null && !worldObj.isRemote) {
+				ReflectionHelper.setPrivateValue(EntityLiving.class, this, true, "persistenceRequired", "field_82179_bU");
+			}
 		}
 	}
 	
@@ -1259,7 +1285,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	
 	@Override
 	protected boolean canDespawn() {
-		return false;
+		return !this.wasHatched() && !this.isTamed();
 	}
 	
 	@Override
@@ -2171,5 +2197,10 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 					);
 		}
 		
+	}
+	
+	@Override
+	public PetInfo getPetSummary() {
+		return PetInfo.claim(getHealth(), getMaxHealth(), getXP(), getMaxXP(), SecondaryFlavor.PROGRESS, getPetAction());
 	}
 }

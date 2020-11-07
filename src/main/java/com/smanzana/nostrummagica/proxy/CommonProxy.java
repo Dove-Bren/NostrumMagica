@@ -354,7 +354,7 @@ public class CommonProxy {
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.SPOOKY));
     	
 
-    	EntityRegistry.addSpawn(EntityShadowDragonRed.class, 10, 1, 3, EnumCreatureType.MONSTER, 
+    	EntityRegistry.addSpawn(EntityShadowDragonRed.class, 15, 1, 2, EnumCreatureType.MONSTER, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.NETHER));
     	EntityRegistry.addSpawn(EntityTameDragonRed.class, 2, 1, 1, EnumCreatureType.MONSTER, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.NETHER));

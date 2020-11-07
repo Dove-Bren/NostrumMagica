@@ -1037,8 +1037,6 @@ public class ClientProxy extends CommonProxy {
 	
 	@SubscribeEvent
 	public void onModelBake(ModelBakeEvent event) {
-		NostrumMagica.logger.info("Injecting model overrides");
-		
     	for (ClientEffectIcon icon: ClientEffectIcon.values()) {
     		IModel model;
 			try {

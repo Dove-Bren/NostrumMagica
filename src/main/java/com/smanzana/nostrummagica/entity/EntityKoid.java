@@ -6,6 +6,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.tasks.KoidTask;
 import com.smanzana.nostrummagica.items.EssenceItem;
+import com.smanzana.nostrummagica.items.NostrumSkillItem;
+import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -259,6 +261,12 @@ public class EntityKoid extends EntityMob implements ILoreTagged {
 		this.entityDropItem(EssenceItem.getEssence(
 				this.getElement(),
 				count), 0);
+		
+		// Research scroll
+		int chances = 1 + lootingModifier;
+		if (rand.nextInt(100) < chances) {
+			this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.RESEARCH_SCROLL_SMALL, 1), 0);
+		}
 	}
 
 	@Override

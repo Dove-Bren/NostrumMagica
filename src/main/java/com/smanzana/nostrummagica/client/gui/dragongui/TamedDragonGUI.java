@@ -82,6 +82,8 @@ public class TamedDragonGUI {
 		
 		private ITameDragon dragon;
 		
+		private EntityLivingBase livingDragon;
+		
 		private int currentSheet;
 		
 		protected List<IDragonGUISheet> sheetsAllInternal;
@@ -93,6 +95,7 @@ public class TamedDragonGUI {
 		
 		public DragonContainer(ITameDragon dragon, EntityPlayer player, IDragonGUISheet ... sheets) {
 			this.dragon = dragon;
+			this.livingDragon = (EntityLivingBase) dragon;
 			this.player = player;
 			this.currentSheet = 0;
 			this.sheetsAllInternal = Lists.newArrayList(sheets);
@@ -336,11 +339,11 @@ public class TamedDragonGUI {
 					Gui.drawRect(x, y, x + w, y + h, 0xFFD0D0D0);
 					Gui.drawRect(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF201010);
 					
-					int prog = (int) ((float) (w - 2) * (container.dragon.getHealth() / container.dragon.getMaxHealth()));
+					int prog = (int) ((float) (w - 2) * (container.livingDragon.getHealth() / container.livingDragon.getMaxHealth()));
 					Gui.drawRect(x + 1, y + 1, x + 1 + prog, y + h - 1, 0xFFA02020);
 					
 					this.drawCenteredString(fontRendererObj,
-							String.format("%d / %d", (int) container.dragon.getHealth(), (int) container.dragon.getMaxHealth()),
+							String.format("%d / %d", (int) container.livingDragon.getHealth(), (int) container.livingDragon.getMaxHealth()),
 							centerX,
 							y + (h / 2) - (fontRendererObj.FONT_HEIGHT / 2),
 							0xFFC0C0C0);

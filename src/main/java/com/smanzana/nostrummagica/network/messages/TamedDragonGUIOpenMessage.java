@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -83,7 +84,7 @@ public class TamedDragonGUIOpenMessage implements IMessage {
 	public TamedDragonGUIOpenMessage(ITameDragon dragon, int mcID, int id, int numSheets) {
 		this();
 		
-		tag.setUniqueId(NBT_UUID, dragon.getUniqueID());
+		tag.setUniqueId(NBT_UUID, ((EntityLivingBase) dragon).getUniqueID());
 		tag.setInteger(NBT_CONTAINER_ID, id);
 		tag.setInteger(NBT_SHEETS, numSheets);
 		tag.setInteger(NBT_MC_CONTAINER_ID, mcID);

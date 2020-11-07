@@ -203,8 +203,10 @@ public class MirrorGui extends GuiScreen {
 		this.control = attr.getControl();
 		this.finesse = attr.getFinesse();
 		this.lore = attr.getAllLore();
-		this.knowledge = NostrumMagic.getKnowledge(attr);
-		this.maxKnowledge = NostrumMagic.KnowledgeCurves.maxKnowledge(NostrumMagic.KnowledgeCurves.knowledgeLevel(knowledge) + 1);
+		final int actKnowledge = NostrumMagic.getKnowledge(attr); 
+		this.knowledge = actKnowledge - NostrumMagic.KnowledgeCurves.maxKnowledge(NostrumMagic.KnowledgeCurves.knowledgeLevel(actKnowledge) - 1);
+		this.maxKnowledge = NostrumMagic.KnowledgeCurves.maxKnowledge(NostrumMagic.KnowledgeCurves.knowledgeLevel(actKnowledge))
+				- NostrumMagic.KnowledgeCurves.maxKnowledge(NostrumMagic.KnowledgeCurves.knowledgeLevel(actKnowledge) - 1);
 		refreshQuests(attr);
 	}
 	
@@ -455,7 +457,7 @@ public class MirrorGui extends GuiScreen {
 		width = 200;
 		int knowledgeHeight = 4;
 		y += fontRendererObj.FONT_HEIGHT + 2;
-		int x = Math.round(((float) knowledge / (float) maxKnowledge) * (float) width);
+		final int x = Math.round(((float) knowledge / (float) maxKnowledge) * (float) width);
 		Gui.drawRect(centerX - (width/2), y, centerX + (width / 2), y + 2 + knowledgeHeight, 0xFF555555);
 		Gui.drawRect(centerX - (width/2) + 1, y + 1, centerX + (width / 2) - 1, y + 1 + knowledgeHeight, 0xFF000000);
 		Gui.drawRect(centerX - (width/2) + 1, y + 1, centerX - (width/2) + 1 + x, y + 1 + knowledgeHeight, 0xFFFFFF00);

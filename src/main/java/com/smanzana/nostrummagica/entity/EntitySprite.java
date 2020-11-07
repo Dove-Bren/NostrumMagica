@@ -9,6 +9,8 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowEntityGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
+import com.smanzana.nostrummagica.items.NostrumSkillItem;
+import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -332,6 +334,7 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
     }
     
 	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
+		// Sprite Core
 		int chances = this.rand.nextInt(4);
 		int count = 0;
 		chances += lootingModifier;
@@ -346,6 +349,12 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
 		
 		for (int i = 0; i < count; i++) {
 			this.entityDropItem(NostrumResourceItem.getItem(ResourceType.SPRITE_CORE, 1), 0);
+		}
+		
+		// Research scroll
+		chances = 1 + lootingModifier;
+		if (rand.nextInt(100) < chances) {
+			this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.RESEARCH_SCROLL_SMALL, 1), 0);
 		}
 	}
 
