@@ -43,7 +43,7 @@ public class CropMandrakeRoot extends BlockCrops {
     }
 	
 	protected Item getSeed() {
-		return ReagentSeed.Mandrake;
+		return ReagentSeed.mandrake;
 	}
 	
 	protected ItemStack getSeeds(int count) {

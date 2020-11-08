@@ -14,9 +14,10 @@ import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIStayHomeTask;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
+import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
-import com.smanzana.nostrummagica.items.NostrumSkillItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
+import com.smanzana.nostrummagica.items.NostrumSkillItem;
 import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -30,6 +31,7 @@ import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
+import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.BeamTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.MagicCutterTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
@@ -54,11 +56,13 @@ import net.minecraft.network.datasync.DataSerializer;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
@@ -99,6 +103,8 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 	private int idleCooldown;
 	private Spell defaultSpell;
 	private @Nullable Spell lastSpell;
+	private int perilTicks;
+	private @Nullable BlockPos perilLoc;
 	
 	public EntityWisp(World worldIn) {
 		super(worldIn);
@@ -107,6 +113,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 		this.moveHelper = new WispMoveHelper(this);
 		
 		idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
+		perilTicks = 0;
 	}
 	
 	public EntityWisp(World worldIn, BlockPos homePos) {
@@ -214,6 +221,40 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 					NostrumMagicaSounds.WISP_IDLE.play(this);
 				}
 				idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10); 
+			}
+		}
+		
+		if (!worldObj.isRemote && this.getHome() == null && !this.isDead && this.getHealth() > 0) {
+			if (perilLoc == null || !perilLoc.equals(getPosition())) {
+				MutableBlockPos cursor = new MutableBlockPos();
+				cursor.setPos(getPosition());
+				while (worldObj.isAirBlock(cursor)) {
+					cursor.move(EnumFacing.DOWN);
+				}
+				
+				final int diff = (int) (posY) - cursor.getY();
+				if (diff > 30) {
+					perilLoc = this.getPosition().toImmutable();
+				}
+			}
+			
+			if (perilLoc != null) {
+				perilTicks++;
+				if (perilTicks > 20 * 20) {
+					// POP
+					final EMagicElement elem;
+					if (this.defaultSpell != null) {
+						elem = this.defaultSpell.getPrimaryElement();
+					} else {
+						// else random
+						elem = EMagicElement.values()[rand.nextInt(EMagicElement.values().length)];
+					}
+					
+					this.attackEntityFrom(DamageSource.drown, 4.0F);
+					if (this.isDead || this.getHealth() <= 0) {
+						this.entityDropItem(EssenceItem.getEssence(elem, 1), 0);
+					}
+				}
 			}
 		}
 	}
@@ -658,7 +699,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 			
 			// Fire
 			putSpell("Burn",
-					ProjectileTrigger.instance(),
+					AITargetTrigger.instance(),
 					SingleShape.instance(),
 					EMagicElement.FIRE,
 					1,

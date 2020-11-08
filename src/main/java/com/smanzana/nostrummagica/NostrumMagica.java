@@ -44,6 +44,7 @@ import com.smanzana.nostrummagica.command.CommandUnlockAll;
 import com.smanzana.nostrummagica.command.CommandWriteRoom;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityKoid;
+import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.entity.IEntityTameable;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
@@ -76,6 +77,7 @@ import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.ReagentSeed;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.items.ShrineSeekingGem;
@@ -746,6 +748,18 @@ public class NostrumMagica
 					new ItemStack[] {ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1), ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1), ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1), ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1)},
 					new RRequirementResearch("magic_token_3"),
 					new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.TOKEN, 3)))
+				);
+		
+		// essence plant seed
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("essence_seed",
+					new ItemStack(ReagentSeed.essence),
+					null,
+					new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.MANDRAKE_ROOT, ReagentType.GINSENG, ReagentType.MANI_DUST},
+					NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1),
+					new ItemStack[] {new ItemStack(ReagentSeed.mandrake), new ItemStack(EssenceItem.instance(), 1, OreDictionary.WILDCARD_VALUE), new ItemStack(EssenceItem.instance(), 1, OreDictionary.WILDCARD_VALUE), new ItemStack(ReagentSeed.ginseng)},
+					new RRequirementResearch("essence_seeds"),
+					new OutcomeSpawnItem(new ItemStack(ReagentSeed.essence)))
 				);
 		
 		// fierce slab -- tier 3. Kani crystal. Fire + Wind gems
@@ -1822,6 +1836,14 @@ public class NostrumMagica
 			.quest("lvl3")
 			.reference("ritual::magic_token_3", "ritual.magic_token_3.name")
 		.build("magic_token_3", NostrumResearchTab.MYSTICISM, Size.NORMAL, -2, 0, true, NostrumResourceItem.getItem(ResourceType.TOKEN, 1));
+		
+		NostrumResearch.startBuilding()
+			.hiddenParent("magic_token")
+			.lore(EssenceItem.instance())
+			.lore(EntityKoid.LoreKey)
+			.lore(EntityWisp.LoreKey)
+			.reference("ritual::essence_seed", "ritual.essence_seed.name")
+		.build("essence_seeds", NostrumResearchTab.MYSTICISM, Size.NORMAL, -3, 0, false, new ItemStack(ReagentSeed.essence));
 		
 		NostrumResearch.startBuilding()
 			.parent("magic_token")

@@ -36,6 +36,7 @@ item.nostrum_reagent.crystabloom.name=Crystabloom
 
 item.reagentseed.mandrake.name=Mandrake Seeds
 item.reagentseed.ginseng.name=Ginseng Seeds
+item.reagentseed.essence.name=Essence Seeds
 
 item.nostrum_gem.basic.name=Void Gem
 item.nostrum_gem.lightning.name=Lightning Gem
@@ -261,6 +262,7 @@ tile.essore.name=Essore
 tile.cursed_ice.name=Cursed Ice
 tile.mandrake_crop.name=Mandrake
 tile.ginseng_crop.name=Ginseng
+tile.esscrop.name=Essence Crop
 tile.spell_table.name=Spell Table
 tile.nostrum_spawner.name=Nostrum Spawner
 tile.nostrum_spawner_trigger.name=Nostrum Trigger Spawner
@@ -766,6 +768,7 @@ ritual.thanos_staff.name=Thano Infusion (Staff)
 ritual.lore_table.name=Create Researcher's Table
 ritual.modification_table.name=Create Modification Table
 ritual.wisp_crystal.name=Craft Wisp Crystal
+ritual.essence_seed.name=Create Essence Seed
 
 ritual.rune.physical.name=Physical Rune
 ritual.rune.fire.name=Fire Rune
@@ -1217,6 +1220,9 @@ research.putter.info=  Rituals have allowed you to enhance droppers to be a litt
 research.magicfacade.name=Magic Facade
 research.magicfacade.desc=Fake walls
 research.magicfacade.info=  A very simple and practical application of magic is that of an illusion. To that end, you've invented a ritual which allows you to create illusory blocks!|  Magic Facade clocks take the appearance of blocks next to them, but only in one direction. However, the facade blocks are completely intangeable.|  You've also extended this idea to create a one-way door. Like the facade, it's invisible and intangeable from all sides but one. From that side, these magic doors prevent entry.|  Most orientations of facade and door blocks take their appearance from the block underneath them. Stacking facades or doors works, too. Facades or doors that are facing down look to the east.
+research.essence_seeds.name=Essence Seeds
+research.essence_seeds.desc=Renewable Essence
+research.essence_seeds.info=  In a feat of magic and inginuity, you've created seeds that store the power of magical essences.|  These seeds, once matured, will drop random magical essences.
 
 research.wispblock.name=Wisp Summoning
 research.wispblock.desc=Wispful thinking?

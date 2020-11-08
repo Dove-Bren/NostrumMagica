@@ -84,9 +84,19 @@ public class NostrumEmptyDimension {
 			fogColor = new Vec3d(.2, .2, .2);
 		}
 		
+		protected void onWorldAttached() {
+			// Force keep-inventory game rule
+			if (worldObj != null) {
+				worldObj.getGameRules().setOrCreateGameRule("keepInventory", "true");
+			}
+		}
+		
 		@Override
 		public void createBiomeProvider() {
 			this.biomeProvider = new BiomeProviderSingle(Biomes.SKY);
+			
+			// Sucky place for this hook but the actual hook is final
+			this.onWorldAttached();
 		}
 		
 		@Override

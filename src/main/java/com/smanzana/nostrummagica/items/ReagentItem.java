@@ -169,11 +169,11 @@ public class ReagentItem extends Item implements ILoreTagged, IAetherBurnable {
     	
     	if (type == ReagentType.MANDRAKE_ROOT) {
     		// Try to plant as seed. Convenient!
-    		return ReagentSeed.Mandrake.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ);
+    		return ReagentSeed.mandrake.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ);
     	}
     	
     	if (type == ReagentType.GINSENG) {
-	    	return ReagentSeed.Ginseng.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ);
+	    	return ReagentSeed.ginseng.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ);
     	}
     	
     	if (type == ReagentType.CRYSTABLOOM) {

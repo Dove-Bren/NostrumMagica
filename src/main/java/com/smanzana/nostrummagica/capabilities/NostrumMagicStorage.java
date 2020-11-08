@@ -291,6 +291,17 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			}
 		}
 		
+		// PATCH #1: Known implies mastery 1
+		for (EMagicElement elem : EMagicElement.values()) {
+			Boolean known = instance.getKnownElements().get(elem);
+			if (known != null && known) {
+				Integer mastery = instance.getElementMastery().get(elem);
+				if (mastery == null || mastery <= 0) {
+					instance.setElementMastery(elem, 1);
+				}
+			}
+		}
+		
 		compound = tag.getCompoundTag(NBT_ELEMENT_TRIALS);
 		for (String key : compound.getKeySet()) {
 			boolean val = compound.getBoolean(key);

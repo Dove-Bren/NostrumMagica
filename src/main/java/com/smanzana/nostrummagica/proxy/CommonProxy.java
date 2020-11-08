@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.AltarBlock;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.ChalkBlock;
+import com.smanzana.nostrummagica.blocks.CropEssence;
 import com.smanzana.nostrummagica.blocks.CropGinseng;
 import com.smanzana.nostrummagica.blocks.CropMandrakeRoot;
 import com.smanzana.nostrummagica.blocks.CursedIce;
@@ -558,10 +559,12 @@ public class CommonProxy {
     	GameRegistry.register(HookshotItem.instance());
     	HookshotItem.init();
     	
-    	ReagentSeed.Mandrake.setRegistryName(NostrumMagica.MODID, ReagentSeed.MANDRAKE_ID);
-    	GameRegistry.register(ReagentSeed.Mandrake);
-    	ReagentSeed.Ginseng.setRegistryName(NostrumMagica.MODID, ReagentSeed.GINSENG_ID);
-    	GameRegistry.register(ReagentSeed.Ginseng);
+    	ReagentSeed.mandrake.setRegistryName(NostrumMagica.MODID, ReagentSeed.mandrake.getItemID());
+    	GameRegistry.register(ReagentSeed.mandrake);
+    	ReagentSeed.ginseng.setRegistryName(NostrumMagica.MODID, ReagentSeed.ginseng.getItemID());
+    	GameRegistry.register(ReagentSeed.ginseng);
+    	ReagentSeed.essence.setRegistryName(NostrumMagica.MODID, ReagentSeed.essence.getItemID());
+    	GameRegistry.register(ReagentSeed.essence);
     }
     
     private void registerBlocks() {
@@ -759,6 +762,10 @@ public class CommonProxy {
     					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(PutterBlock.ID))
     			);
     	PutterBlock.init();
+    	
+    	GameRegistry.register(CropEssence.instance(),
+    			new ResourceLocation(NostrumMagica.MODID, CropEssence.ID));
+    	//CropEssence.init();
     }
     
     public void syncPlayer(EntityPlayerMP player) {

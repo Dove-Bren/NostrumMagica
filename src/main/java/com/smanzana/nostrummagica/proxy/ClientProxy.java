@@ -631,8 +631,9 @@ public class ClientProxy extends CommonProxy {
 					HookshotItem.ID + "_" + HookshotItem.GetTypeSuffix(type));
 		}
 		
-		registerModel(ReagentSeed.Mandrake, 0, ReagentSeed.MANDRAKE_ID);
-		registerModel(ReagentSeed.Ginseng, 0, ReagentSeed.GINSENG_ID);
+		registerModel(ReagentSeed.mandrake, 0, ReagentSeed.mandrake.getItemID());
+		registerModel(ReagentSeed.ginseng, 0, ReagentSeed.ginseng.getItemID());
+		registerModel(ReagentSeed.essence, 0, ReagentSeed.essence.getItemID());
 		
 		registerModel(Item.getItemFromBlock(MimicBlock.door()),
 				0,

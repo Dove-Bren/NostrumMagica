@@ -479,6 +479,9 @@ public class NostrumMagic implements INostrumMagic {
 				player.addChatComponentMessage(new TextComponentString("The forces of "
 						+ element.getName() + " have been unlocked!"));
 			}
+			
+			// Edit: Start at mastery 1 instead of 0
+			this.setElementMastery(element, 1);
 
 			doUnlockCheck();
 		}

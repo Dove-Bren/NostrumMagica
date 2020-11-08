@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "age=0": { "model": "nostrummagica:esscrop_stage0" },
+        "age=1": { "model": "nostrummagica:esscrop_stage1" },
+        "age=2": { "model": "nostrummagica:esscrop_stage2" },
+        "age=3": { "model": "nostrummagica:esscrop_stage3" }
+    }
+}
