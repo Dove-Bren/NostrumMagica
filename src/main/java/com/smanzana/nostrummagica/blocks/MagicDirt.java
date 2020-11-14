@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.blocks;
 
+import java.util.Random;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 
@@ -7,8 +9,11 @@ import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -39,5 +44,30 @@ public class MagicDirt extends Block {
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setSoundType(SoundType.GROUND);
 		this.setHarvestLevel("shovel", 1);
+		this.setTickRandomly(true);
+	}
+	
+	@Override
+	public void randomTick(World worldIn, BlockPos pos, IBlockState state, Random random) {
+		if (random.nextBoolean() & random.nextBoolean()) {
+			// Check neighbors. If there are 2+ other blocks, dont' expand. Otherwise, convert neighbors into magic dirt
+			int count = 0;
+			BlockPos[] neighbors = new BlockPos[]{pos.north(), pos.south(), pos.east(), pos.west()};
+			for (BlockPos neighbor : neighbors) {
+				IBlockState neighborState = worldIn.getBlockState(neighbor);
+				if (neighborState != null && neighborState.getBlock() == this) {
+					count++;
+				}
+			}
+			
+			if (count < 2) {
+				for (BlockPos neighbor : neighbors) {
+					IBlockState neighborState = worldIn.getBlockState(neighbor);
+					if (neighborState != null && neighborState.getBlock() != this && neighborState.getBlockHardness(worldIn, neighbor) <= 1) {
+						worldIn.setBlockState(neighbor, this.getDefaultState());
+					}
+				}
+			}
+		}
 	}
 }

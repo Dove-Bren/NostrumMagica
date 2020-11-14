@@ -1,13 +1,16 @@
 package com.smanzana.nostrummagica.blocks;
 
+import java.util.List;
 import java.util.Random;
 
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
@@ -37,6 +40,7 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 	
 	public static final String ID = "altar_block";
 	protected static final AxisAlignedBB ALTAR_AABB = new AxisAlignedBB(0.3D, 0.0D, 0.3D, 0.7D, 0.8D, 0.7D);
+	private static final int TICK_DELAY = 5;
 	
 	private static AltarBlock instance = null;
 	public static AltarBlock instance() {
@@ -139,6 +143,39 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
+	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
+		if (!worldIn.isUpdateScheduled(pos, this)) {
+			worldIn.scheduleUpdate(pos, this, TICK_DELAY);
+		}
+		
+		super.onBlockAdded(worldIn, pos, state);
+	}
+	
+	@Override
+	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+		TileEntity te = worldIn.getTileEntity(pos);
+		if (te != null && te instanceof AltarTileEntity && ((AltarTileEntity) te).getItem() == null) {
+			AltarTileEntity altar = (AltarTileEntity) te;
+			List<EntityItem> items = worldIn.getEntitiesWithinAABB(EntityItem.class, Block.FULL_BLOCK_AABB.offset(pos).offset(0, 1, 0).expand(1, 1, 1));
+			if (items != null && !items.isEmpty()) {
+				EntityItem first = items.get(0);
+				ItemStack stack = first.getEntityItem();
+				
+				altar.setItem(stack.splitStack(1));
+				if (stack.stackSize <= 0) {
+					first.setDead();
+				}
+			}
+		}
+		
+		if (!worldIn.isUpdateScheduled(pos, this)) {
+			worldIn.scheduleUpdate(pos, this, TICK_DELAY);
+		}
+		
+		super.updateTick(worldIn, pos, state, rand);
+	}
+	
+	@Override
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		TileEntity te = worldIn.getTileEntity(pos);
 		if (te == null)
@@ -155,12 +192,18 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 		} else {
 			// Has an item
 			if (heldItem == null) {
-				if (!playerIn.inventory.addItemStackToInventory(altar.getItem())) {
+				final ItemStack altarItem = altar.getItem();
+				if (!playerIn.inventory.addItemStackToInventory(altarItem)) {
 					worldIn.spawnEntityInWorld(
 							new EntityItem(worldIn,
 									pos.getX() + .5, pos.getY() + 1.2, pos.getZ() + .5,
 									altar.getItem())
 							);
+				} else {
+					INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
+					if (altarItem.getItem() instanceof ILoreTagged && attr != null && attr.isUnlocked()) {
+						attr.giveBasicLore((ILoreTagged) altarItem.getItem());
+					}
 				}
 				altar.setItem(null);
 				return true;

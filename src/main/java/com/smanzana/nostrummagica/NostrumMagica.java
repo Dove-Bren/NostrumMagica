@@ -755,7 +755,7 @@ public class NostrumMagica
 				RitualRecipe.createTier3("essence_seed",
 					new ItemStack(ReagentSeed.essence),
 					null,
-					new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.MANDRAKE_ROOT, ReagentType.GINSENG, ReagentType.MANI_DUST},
+					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.MANDRAKE_ROOT, ReagentType.GINSENG, ReagentType.MANI_DUST},
 					NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1),
 					new ItemStack[] {new ItemStack(ReagentSeed.mandrake), new ItemStack(EssenceItem.instance(), 1, OreDictionary.WILDCARD_VALUE), new ItemStack(EssenceItem.instance(), 1, OreDictionary.WILDCARD_VALUE), new ItemStack(ReagentSeed.ginseng)},
 					new RRequirementResearch("essence_seeds"),
@@ -842,7 +842,7 @@ public class NostrumMagica
 					new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.GINSENG, ReagentType.MANDRAKE_ROOT, ReagentType.GRAVE_DUST},
 					new ItemStack(PositionCrystal.instance()),
 					new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), NostrumResourceItem.getItem(ResourceType.TOKEN, 1), InfusedGemItem.instance().getGem(EMagicElement.EARTH, 1), new ItemStack(BlankScroll.instance())},
-					new RRequirementResearch("geotoken"),
+					new RRequirementResearch("geotokens"),
 					new OutcomeConstructGeotoken())
 				);
 		
@@ -1987,7 +1987,7 @@ public class NostrumMagica
 			.parent("geotokens")
 			.hiddenParent("markrecall")
 			.hiddenParent("balanced_infusion")
-			.lore(PositionToken.instance())
+			//.lore(PositionToken.instance())
 			.quest("lvl10")
 			.reference("builtin::guides::obelisks", "info.obelisks.name")
 			.reference("ritual::create_obelisk", "ritual.create_obelisk.name")

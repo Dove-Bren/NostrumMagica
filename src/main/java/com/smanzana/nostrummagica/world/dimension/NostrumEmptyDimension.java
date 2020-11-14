@@ -85,10 +85,11 @@ public class NostrumEmptyDimension {
 		}
 		
 		protected void onWorldAttached() {
-			// Force keep-inventory game rule
-			if (worldObj != null) {
-				worldObj.getGameRules().setOrCreateGameRule("keepInventory", "true");
-			}
+			// Can't do this. Gamerules aren't dimension specific
+//			// Force keep-inventory game rule
+//			if (worldObj != null) {
+//				worldObj.getGameRules().setOrCreateGameRule("keepInventory", "true");
+//			}
 		}
 		
 		@Override
@@ -433,7 +434,6 @@ public class NostrumEmptyDimension {
 				}
 				
 				event.setCanceled(true);
-				
 				
 				if (ent instanceof EntityPlayerMP) {
 					EntityPlayerMP player = (EntityPlayerMP) ent;
