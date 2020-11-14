@@ -49,7 +49,7 @@ public class MagicDirt extends Block {
 	
 	@Override
 	public void randomTick(World worldIn, BlockPos pos, IBlockState state, Random random) {
-		if (random.nextBoolean() & random.nextBoolean()) {
+		if (random.nextBoolean() && random.nextBoolean() && random.nextBoolean()) {
 			// Check neighbors. If there are 2+ other blocks, dont' expand. Otherwise, convert neighbors into magic dirt
 			int count = 0;
 			BlockPos[] neighbors = new BlockPos[]{pos.north(), pos.south(), pos.east(), pos.west()};
@@ -63,7 +63,11 @@ public class MagicDirt extends Block {
 			if (count < 2) {
 				for (BlockPos neighbor : neighbors) {
 					IBlockState neighborState = worldIn.getBlockState(neighbor);
-					if (neighborState != null && neighborState.getBlock() != this && neighborState.getBlockHardness(worldIn, neighbor) <= 1) {
+					if (neighborState != null
+							&& neighborState.isFullBlock()
+							&& neighborState.getMaterial() != Material.AIR
+							&& neighborState.getBlock() != this
+							&& neighborState.getBlockHardness(worldIn, neighbor) <= 1) {
 						worldIn.setBlockState(neighbor, this.getDefaultState());
 					}
 				}

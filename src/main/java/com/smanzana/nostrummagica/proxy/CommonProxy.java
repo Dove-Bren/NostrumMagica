@@ -769,6 +769,8 @@ public class CommonProxy {
     }
     
     public void syncPlayer(EntityPlayerMP player) {
+    	INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+    	attr.refresh(player);
     	NetworkHandler.getSyncChannel().sendTo(
     			new StatSyncMessage(NostrumMagica.getMagicWrapper(player)),
     			player);

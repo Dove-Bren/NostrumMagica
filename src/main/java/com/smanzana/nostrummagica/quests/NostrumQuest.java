@@ -195,6 +195,12 @@ public class NostrumQuest {
 		return this.offsetY + (-(reqLevel != 0 ? reqLevel-1 : 0) + reqTechnique);
 	}
 	
+	public void grantReward(EntityPlayer player) {
+		for (IReward reward : this.rewards) {
+			reward.award(player);
+		}
+	}
+	
 	/**
 	 * Marks this quest as complete for the player.
 	 * This distributes reward and updates the player's quest state.
@@ -206,9 +212,7 @@ public class NostrumQuest {
 			return;
 		
 		attr.completeQuest(getKey());
-		for (IReward reward : this.rewards) {
-			reward.award(player);
-		}
+		grantReward(player);
 		
 		// TODO if there's some sort of listener, it should be cleaned up here
 		

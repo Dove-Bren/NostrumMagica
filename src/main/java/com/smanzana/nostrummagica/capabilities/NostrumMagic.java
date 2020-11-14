@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SpellRune;
@@ -21,6 +22,7 @@ import com.smanzana.nostrummagica.loretag.LoreCache;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.LoreMessage;
+import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.quests.objectives.IObjectiveState;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
@@ -30,6 +32,8 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
+import baubles.api.BaublesApi;
+import baubles.api.cap.IBaublesItemHandler;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -911,5 +915,39 @@ public class NostrumMagic implements INostrumMagic {
 	@Override
 	public boolean hasEnhancedTeleport() {
 		return this.enhancedTeleport;
+	}
+
+	@Override
+	public void refresh(EntityPlayerMP player) {
+		if (NostrumMagica.baubles.isEnabled()) {
+			IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);
+			for (int i = 0; i < baubles.getSlots(); i++) {
+				ItemStack stack = baubles.getStackInSlot(i);
+				if (stack != null && stack.getItem() instanceof ItemMagicBauble) {
+					((ItemMagicBauble) stack.getItem()).onUnequipped(stack, player);
+				}
+			}
+		}
+		
+		this.modMana = 0;
+		this.modManaCost = 0;
+		this.modManaFlat = 0;
+		this.modManaRegen = 0;
+		
+		// Reapply quests
+		for (String string : this.completedQuests) {
+			NostrumQuest quest = NostrumQuest.lookup(string);
+			quest.grantReward(player);
+		}
+		
+		if (NostrumMagica.baubles.isEnabled()) {
+			IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);
+			for (int i = 0; i < baubles.getSlots(); i++) {
+				ItemStack stack = baubles.getStackInSlot(i);
+				if (stack != null && stack.getItem() instanceof ItemMagicBauble) {
+					((ItemMagicBauble) stack.getItem()).onEquipped(stack, player);
+				}
+			}
+		}
 	}
 }

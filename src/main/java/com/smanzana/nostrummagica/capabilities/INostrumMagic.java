@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 
@@ -164,4 +165,7 @@ public interface INostrumMagic {
 	public BlockPos getSorceryPortalPos();
 	public void clearSorceryPortal();
 	public void setSorceryPortalLocation(int dimension, BlockPos pos);
+	
+	// Refresh attributes and rescan for them
+	public void refresh(EntityPlayerMP player);
 }
