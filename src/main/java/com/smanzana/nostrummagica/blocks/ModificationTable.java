@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.SpellTomePage;
+import com.smanzana.nostrummagica.items.WarlockSword;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
@@ -197,7 +198,8 @@ public class ModificationTable extends BlockContainer {
 			if (index == 0) {
 				return stack.getItem() instanceof SpellTome
 						|| stack.getItem() instanceof SpellRune
-						|| (stack.getItem() instanceof SpellScroll && SpellScroll.getSpell(stack) != null);
+						|| (stack.getItem() instanceof SpellScroll && SpellScroll.getSpell(stack) != null)
+						|| stack.getItem() instanceof WarlockSword;
 			}
 			
 			if (index == 1)
@@ -291,6 +293,9 @@ public class ModificationTable extends BlockContainer {
 					spell.setIcon((int) valF);
 					this.setInventorySlotContents(1, null);
 				}
+			} else if (stack.getItem() instanceof WarlockSword) {
+				this.setInventorySlotContents(1, null);
+				WarlockSword.addCapacity(stack, 2);
 			}
 			
 		}

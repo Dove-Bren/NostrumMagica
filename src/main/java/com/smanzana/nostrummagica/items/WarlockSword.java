@@ -55,7 +55,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor 
 	}
 
 	public WarlockSword() {
-		super(ToolMaterial.STONE);
+		super(ToolMaterial.DIAMOND);
 		this.setMaxDamage(600);
 		this.setUnlocalizedName(ID);
 		this.setCreativeTab(NostrumMagica.creativeTab);

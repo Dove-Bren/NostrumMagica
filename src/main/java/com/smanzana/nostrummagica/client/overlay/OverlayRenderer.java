@@ -16,8 +16,10 @@ import com.smanzana.nostrummagica.entity.PetInfo.SecondaryFlavor;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.items.HookshotItem;
 import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
+import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
@@ -41,6 +43,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
+import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -888,6 +891,56 @@ public class OverlayRenderer extends Gui {
 		} else {
 			this.wingIndex = -wingAnimDur;
 		}
+	}
+	
+	private void renderLoreIcon(boolean loreIsDeep) {
+		
+		final int u = (160 + (loreIsDeep ? 0 : 32));
+		
+		GlStateManager.enableBlend();
+		GlStateManager.color(.6f, .6f, .6f, .6f);
+		Minecraft.getMinecraft().getRenderItem().renderItemIntoGUI(new ItemStack(SpellScroll.instance()), 0, 0);
+		
+		GlStateManager.color(1f, 1f, 1f, 1f);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_ICONS);
+		
+		Gui.drawScaledCustomSizeModalRect(0, 0, u, 0, 32, 32, 8, 8, 256, 256);
+	}
+	
+	@SubscribeEvent
+	public void onTooltipRender(RenderTooltipEvent.PostBackground event) {
+		ItemStack stack = event.getStack();
+		if (stack == null || !(stack.getItem() instanceof ILoreTagged)) {
+			return;
+		}
+		
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer);
+		if (attr == null || !attr.isUnlocked()) {
+			return;
+		}
+		
+		ILoreTagged tag = (ILoreTagged) stack.getItem();
+		
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(event.getX() + event.getWidth() - 2, event.getY() - 10, 50);
+		renderLoreIcon(attr.hasFullLore(tag));
+		GlStateManager.popMatrix();
+	}
+	
+	@SubscribeEvent
+	public void onTooltipRender(RenderTooltipEvent.PostText event) {
+//		ItemStack stack = event.getStack();
+//		if (stack == null || !(stack.getItem() instanceof ILoreTagged)) {
+//			return;
+//		}
+//		
+//		INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer);
+//		if (attr == null || !attr.isUnlocked()) {
+//			return;
+//		}
+//		
+//		ILoreTagged tag = (ILoreTagged) stack.getItem();
+//		renderLoreIcon(attr.hasFullLore(tag));
 	}
 	
 }

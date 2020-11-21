@@ -331,6 +331,14 @@ public class NostrumMagic implements INostrumMagic {
 	public boolean hasLore(ILoreTagged tagged) {
 		return (getLore(tagged) != null);
 	}
+	
+	@Override
+	public boolean hasFullLore(ILoreTagged tagged) {
+		String key = tagged.getLoreKey();
+		Integer level = loreLevels.get(key);
+		
+		return (level != null && level >= 2);
+	}
 
 	@Override
 	public Lore getLore(ILoreTagged tagged) {

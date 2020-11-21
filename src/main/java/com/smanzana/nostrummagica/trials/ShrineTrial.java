@@ -46,7 +46,7 @@ public abstract class ShrineTrial {
 		attr.startTrial(this.element);
 		
 		Integer mastery = attr.getElementMastery().get(this.element);
-		if (mastery == null || mastery == 0) {
+		if (mastery == null || mastery == 1) {
 			if (!player.worldObj.isRemote) {
 				NostrumMagicaSounds.STATUS_DEBUFF3.play(player);
 				player.addChatComponentMessage(new TextComponentTranslation("info.element.starttrial", new Object[] {this.element.getName()}));

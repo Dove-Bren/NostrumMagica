@@ -89,6 +89,10 @@ public class Inventories {
 		return canFit(new ItemStackArrayWrapper(inventory), stack);
 	}
 	
+	public static final ItemStack simulateAddItem(IInventory inventory, @Nullable ItemStack stack) {
+		return attemptAddToInventory(inventory, stack, false);
+	}
+	
 	private static final ItemStack attemptRemoveFromInventory(IInventory inventory, @Nullable ItemStack stack, boolean commit) {
 		if (stack == null) {
     		return null;

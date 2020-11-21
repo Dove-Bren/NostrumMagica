@@ -32,7 +32,10 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 
 public class PutterBlock extends BlockContainer {
 	
@@ -267,6 +270,63 @@ public class PutterBlock extends BlockContainer {
 			return newItem;
 		}
 		
+		@Override
+		public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+			return (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+		}
+		
+		private IItemHandler handlerProxy = null;
+		
+		@SuppressWarnings("unchecked")
+		@Override
+		public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+			if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+				if (handlerProxy == null) {
+					handlerProxy = new IItemHandler() {
+
+						@Override
+						public int getSlots() {
+							return inventory.getSizeInventory();
+						}
+
+						@Override
+						public ItemStack getStackInSlot(int slot) {
+							return inventory.getStackInSlot(slot);
+						}
+
+						@Override
+						public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+							if (simulate) {
+								return Inventories.simulateAddItem(inventory, stack);
+							} else {
+								return Inventories.addItem(inventory, stack);
+							}
+						}
+
+						@Override
+						public ItemStack extractItem(int slot, int amount, boolean simulate) {
+							ItemStack stack = inventory.getStackInSlot(slot);
+							if (stack == null) {
+								return stack;
+							}
+							
+							stack = stack.copy();
+							ItemStack taken = stack.splitStack(amount);
+							if (!simulate) {
+								inventory.setInventorySlotContents(slot, stack); // Set it back to dirty the inventory
+							}
+							
+							return taken;
+						}
+						
+					};
+				}
+				
+				return (T) handlerProxy;
+			}
+			
+			return null;
+		}
 	}
 
 	@Override

@@ -26,6 +26,7 @@ import com.smanzana.nostrummagica.blocks.TeleportRune;
 import com.smanzana.nostrummagica.capabilities.AttributeProvider;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.command.CommandAllQuests;
+import com.smanzana.nostrummagica.command.CommandAllResearch;
 import com.smanzana.nostrummagica.command.CommandCreateGeotoken;
 import com.smanzana.nostrummagica.command.CommandEnhanceTome;
 import com.smanzana.nostrummagica.command.CommandForceBind;
@@ -77,8 +78,8 @@ import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
-import com.smanzana.nostrummagica.items.ReagentSeed;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.items.ReagentSeed;
 import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.items.ShrineSeekingGem;
 import com.smanzana.nostrummagica.items.SpellPlate;
@@ -295,6 +296,7 @@ public class NostrumMagica
     	event.registerServerCommand(new CommandUnlock());
     	event.registerServerCommand(new CommandGiveSkillpoint());
     	event.registerServerCommand(new CommandAllQuests());
+    	event.registerServerCommand(new CommandAllResearch());
     	event.registerServerCommand(new CommandCreateGeotoken());
     	event.registerServerCommand(new CommandForceBind());
     	event.registerServerCommand(new CommandSpawnDungeon());
@@ -1079,7 +1081,7 @@ public class NostrumMagica
 					new ItemStack(MagicSwordBase.instance()),
 					new ItemStack[] {new ItemStack(MageStaff.instance()), NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), new ItemStack(MageStaff.instance())},
 					new RRequirementResearch("warlock_sword"),
-					new OutcomeSpawnItem(new ItemStack(WarlockSword.instance())))
+					new OutcomeSpawnItem(WarlockSword.addCapacity(new ItemStack(WarlockSword.instance()), 10)))
 				);
 		
 		// Rituals for all the magic armors

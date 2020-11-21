@@ -1,0 +1,14 @@
+{
+    "parent": "item/handheld",
+    "textures": {
+        "layer0": "nostrummagica:items/hookshot_claw"
+    },
+    "overrides": [
+        {
+            "predicate": {
+                "extended": 1
+            },
+            "model": "nostrummagica:item/hookshot_claw_extended"
+        }
+    ]
+}
