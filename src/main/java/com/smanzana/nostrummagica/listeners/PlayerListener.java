@@ -48,6 +48,7 @@ import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.math.BlockPos;
@@ -743,8 +744,13 @@ public class PlayerListener {
 		EntityPlayer player = e.player;
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		
-		if (e.crafting.getItem() instanceof ILoreTagged && attr != null && attr.isUnlocked()) {
-			attr.giveBasicLore((ILoreTagged) e.crafting.getItem());
+		if (attr != null && attr.isUnlocked()) {
+			if (e.crafting.getItem() instanceof ILoreTagged) {
+				attr.giveBasicLore((ILoreTagged) e.crafting.getItem());
+			} else if (e.crafting.getItem() instanceof ItemBlock &&
+					((ItemBlock)e.crafting.getItem()).getBlock() instanceof ILoreTagged) {
+				attr.giveBasicLore((ILoreTagged) ((ItemBlock) e.crafting.getItem()).getBlock());
+			}
 		}
 	}
 	
@@ -761,8 +767,13 @@ public class PlayerListener {
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		
-		if (addedItem.getItem() instanceof ILoreTagged && attr != null && attr.isUnlocked()) {
-			attr.giveBasicLore((ILoreTagged) addedItem.getItem());
+		if (attr != null && attr.isUnlocked()) {
+			if (addedItem.getItem() instanceof ILoreTagged) {
+				attr.giveBasicLore((ILoreTagged) addedItem.getItem());
+			} else if (addedItem.getItem() instanceof ItemBlock &&
+					((ItemBlock)addedItem.getItem()).getBlock() instanceof ILoreTagged) {
+				attr.giveBasicLore((ILoreTagged) ((ItemBlock) addedItem.getItem()).getBlock());
+			}
 		}
 		
 		if (e.getItem().getEntityItem().getItem() instanceof ReagentItem

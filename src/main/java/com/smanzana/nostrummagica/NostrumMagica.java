@@ -7,6 +7,8 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.function.Function;
 
+import javax.annotation.Nullable;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -158,6 +160,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IEntityOwnable;
+import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -591,7 +594,7 @@ public class NostrumMagica
 					null,
 					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.GINSENG, ReagentType.GINSENG},
 					NostrumResourceItem.getItem(ResourceType.TOKEN, 1),
-					new ItemStack[] {new ItemStack(Items.GOLD_NUGGET), trigger.getCraftItem(), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), new ItemStack(Items.GOLD_NUGGET, 1)},
+					new ItemStack[] {new ItemStack(Items.GOLD_NUGGET), trigger.getCraftItem(), null, new ItemStack(Items.GOLD_NUGGET, 1)},
 					IRitualRequirement.AND(
 							new RRequirementTriggerMastery(trigger),
 							new RRequirementResearch("spellrunes")
@@ -2331,7 +2334,7 @@ public class NostrumMagica
 			} else {
 				Integer mast = attr.getElementMastery().get(elem);
 				int mastery = (mast == null ? 0 : mast);
-				if (mastery < level)
+				if (level < mastery)
 					return false;
 			}
     	}
@@ -2489,4 +2492,27 @@ public class NostrumMagica
     	// world's method is stupid and always returns true. Internal func always returns true OR generates chunk. lol.
     	return (world.getChunkProvider().getLoadedChunk(pos.getX() >> 4, pos.getZ() >> 4) != null);
     }
+    
+    public static boolean IsSameTeam(EntityLivingBase ent1, EntityLivingBase ent2) {
+		if (ent1 == ent2) {
+			return true;
+		}
+		
+		if (ent1.getTeam() != null || ent2.getTeam() != null) { // If teams are at play, just use those.
+			return ent1.isOnSameTeam(ent2);
+		}
+		
+		if (ent1 instanceof IEntityOwnable) {
+			IEntityOwnable tamed = (IEntityOwnable) ent1;
+			@Nullable Entity owner = tamed.getOwner();
+			if (owner != null && owner instanceof EntityLivingBase) {
+				// Are they on the same team as our owner?
+				return IsSameTeam((EntityLivingBase) owner, ent2);
+			}
+		}
+		
+		// Non-ownable entities with no teams involved.
+		// Assume mobs are on a different team than anything else
+		return (ent1 instanceof IMob == ent2 instanceof IMob);
+	}
 }

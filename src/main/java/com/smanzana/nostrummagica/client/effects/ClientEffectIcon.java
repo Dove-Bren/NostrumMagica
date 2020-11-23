@@ -11,7 +11,9 @@ public enum ClientEffectIcon {
 	CYL("cyl", true),
 	SHELL("shell", true),
 	ARROWU("arrow_up", false),
-	ARROWD("arrow_down", false);
+	ARROWD("arrow_down", false),
+	ORB_CLOUDY("orb_cloudy", true),
+	ORB_SCALED("orb_scaled", true);
 	
 	private String key;
 	private boolean isObj;

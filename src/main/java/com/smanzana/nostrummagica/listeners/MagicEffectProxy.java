@@ -160,10 +160,18 @@ public class MagicEffectProxy {
 			return;
 		
 		record.remove(effect);
+		// Send a little bit of an update to the entity (if it's a player) to update UI
+		if (entity instanceof EntityPlayerMP) {
+			NostrumMagica.proxy.updatePlayerEffect((EntityPlayerMP) entity, effect, null);
+		}
 	}
 	
 	public void removeAll(EntityLivingBase entity) {
-		effects.remove(entity.getPersistentID());
+		for (SpecialEffect eff : SpecialEffect.values()) {
+			remove(eff, entity);
+		}
+//		effects.remove(entity.getPersistentID());
+		
 	}
 	
 	@SubscribeEvent

@@ -1,11 +1,13 @@
 package com.smanzana.nostrummagica.spells.components.shapes;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
@@ -18,7 +20,6 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class ChainShape extends SpellShape {
@@ -36,40 +37,83 @@ public class ChainShape extends SpellShape {
 	private ChainShape() {
 		super(SHAPE_KEY);
 	}
-
+	
 	@Override
 	protected List<EntityLivingBase> getTargets(SpellPartParam param, EntityLivingBase target, World world, BlockPos pos) {
 		List<EntityLivingBase> ret = new LinkedList<>();
 		
-		double radius = 6.0;
+		if (target == null) {
+			return ret;
+		}
+		
+		double radius = 7.0;
 		if (world == null)
 			world = target.worldObj;
 		
-		int arc = Math.max((int) supportedFloats()[0], (int) param.level);
+		int arc = Math.max((int) supportedFloats()[0], (int) param.level) + 1; // +1 to include center
+		final boolean teamLock = param.flip;
 		
-		Set<Entity> seen = new HashSet<>();
+		final Set<Entity> seen = new HashSet<>();
+		final List<EntityLivingBase> next = new ArrayList<>(arc * 2);
 		
-		while (target != null && arc > 0) {
-			ret.add(target);
-			seen.add(target);
-			pos = target.getPosition();
-			target = null;
-
+		next.add(target);
+		
+		while (!next.isEmpty() && arc > 0) {
+			final EntityLivingBase center = next.remove(0);
+			
+			if (seen.contains(center)) {
+				continue;
+			}
+			
+			seen.add(center);
+			ret.add(center); // Assume all entities put in `cur` that haven't been seen yet count in terms of teams, living, etc.
 			arc--;
-			if (arc > 0)
-			for (Entity entity : world.getEntitiesWithinAABBExcludingEntity(null, 
-					new AxisAlignedBB(pos.getX() - radius,
-								pos.getY() - radius,
-								pos.getZ() - radius,
-								pos.getX() + radius,
-								pos.getY() + radius,
-								pos.getZ() + radius))) {
-				if (entity instanceof EntityLivingBase)
-					if (Math.abs(entity.getPositionVector().distanceTo(new Vec3d(pos.getX(), pos.getY(), pos.getZ()))) <= radius
-							&& !seen.contains(entity)) {
-						target = (EntityLivingBase) entity;
-						break;
-					}
+			
+			if (arc == 0) {
+				break; // No sense in continuing
+			}
+			
+			// Find any other eligible entities around them
+			List<Entity> entities = world.getEntitiesInAABBexcluding(null, 
+					new AxisAlignedBB(center.posX - radius,
+								center.posY - radius,
+								center.posZ - radius,
+								center.posX + radius,
+								center.posY + radius,
+								center.posZ + radius),
+					(ent) -> {
+						return ent != null && ent instanceof EntityLivingBase;
+					});
+			Collections.sort(entities, (a, b) -> {
+				return (int) (a.getDistanceSqToEntity(center) - b.getDistanceSqToEntity(center));
+			});
+			
+			// Note: Could do this filtering inside the entity iteration. Just filtering to living is probably okay.
+			final double radiusSq = radius * radius;
+			for (Entity ent : entities) {
+				if (!(ent instanceof EntityLivingBase)) {
+					continue;
+				}
+				
+				if (seen.contains(ent)) {
+					continue;
+				}
+				
+				EntityLivingBase living = (EntityLivingBase) ent;
+				
+				// Check actual distance
+				if (Math.abs(living.getDistanceSqToEntity(center)) > radiusSq) {
+					// since things are sorted, any after this are bad
+					break;
+				}
+				
+				// Check team requirements, if required
+				if (teamLock && !NostrumMagica.IsSameTeam(living, center)) {
+					continue;
+				}
+				
+				// Eligible!
+				next.add(living);
 			}
 		}
 		
@@ -103,7 +147,7 @@ public class ChainShape extends SpellShape {
 
 	@Override
 	public boolean supportsBoolean() {
-		return false;
+		return true;
 	}
 
 	@Override
@@ -127,7 +171,7 @@ public class ChainShape extends SpellShape {
 
 	@Override
 	public String supportedBooleanName() {
-		return null;
+		return I18n.format("modification.chain.bool.name", (Object[]) null);
 	}
 
 	@Override

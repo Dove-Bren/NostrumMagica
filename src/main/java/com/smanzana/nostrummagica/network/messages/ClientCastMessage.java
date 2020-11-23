@@ -211,7 +211,7 @@ public class ClientCastMessage implements IMessage {
 							NostrumMagica.proxy.spawnEffect(sp.worldObj, new SpellComponentWrapper(BeamTrigger.instance()),
 									null, sp.getPositionVector().addVector(0, sp.getEyeHeight(), 0),
 									null, ent.getPositionVector().addVector(0, ent.getEyeHeight(), 0),
-									new SpellComponentWrapper(EMagicElement.ICE));
+									new SpellComponentWrapper(EMagicElement.ICE), false, 0);
 							
 							int dAvail = dragon.getMana();
 							if (dAvail >= cost) {

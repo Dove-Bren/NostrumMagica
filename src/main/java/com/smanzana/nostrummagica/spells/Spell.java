@@ -1,10 +1,13 @@
 package com.smanzana.nostrummagica.spells;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -190,41 +193,64 @@ public class Spell {
 						attr.setKnowledge(next.getElement(), next.getAlteration());
 					}
 					
+					final List<EntityLivingBase> affectedEnts = new ArrayList<>();
+					final List<BlockPos> affectedPos = new ArrayList<>();
+					
 					if (targets != null && !targets.isEmpty()) {
 						for (EntityLivingBase targ : targets) {
-							shape.perform(action, param, targ, null, null, this.efficiency);
-							
-							if (first) {
-								
-								SpellComponentWrapper comp;
-								if (next.getAlteration() == null)
-									comp = new SpellComponentWrapper(next.getElement());
-								else
-									comp = new SpellComponentWrapper(next.getAlteration());
-								NostrumMagica.proxy.spawnEffect(null, comp,
-										caster, null, targ, null, new SpellComponentWrapper(next.getElement()));
-							}
-							
+							shape.perform(action, param, targ, null, null, this.efficiency, affectedEnts, affectedPos);
 						}
 					} else if (locations != null && !locations.isEmpty()) {
 						// use locations
 						for (BlockPos pos : locations) {
-							shape.perform(action, param, null, world, pos, this.efficiency);
-							
-							if (first) {
-								
-								SpellComponentWrapper comp;
-								if (next.getAlteration() == null)
-									comp = new SpellComponentWrapper(next.getElement());
-								else
-									comp = new SpellComponentWrapper(next.getAlteration());
-								NostrumMagica.proxy.spawnEffect(world, comp,
-										caster, null, null, new Vec3d(pos.getX() + .5, pos.getY(), pos.getZ() + .5), new SpellComponentWrapper(next.getElement()));
-							}
+							shape.perform(action, param, null, world, pos, this.efficiency, affectedEnts, affectedPos);
 						}
 					} else {
 						; // Drop it on the floor\
 						next = null;
+					}
+					
+
+					if (first) {
+						final boolean harmful = action.isHarmful();
+						
+						if (!affectedEnts.isEmpty())
+						for (EntityLivingBase affected : affectedEnts) {
+							SpellComponentWrapper comp;
+							if (next.getAlteration() == null)
+								comp = new SpellComponentWrapper(next.getElement());
+							else
+								comp = new SpellComponentWrapper(next.getAlteration());
+							
+							NostrumMagica.proxy.spawnEffect(null, comp,
+									caster, null, affected, null,
+									new SpellComponentWrapper(next.getElement()), harmful, 0);
+						}
+						
+						if (!affectedPos.isEmpty())
+						for (BlockPos affectPos : affectedPos) {
+							SpellComponentWrapper comp;
+							if (next.getAlteration() == null)
+								comp = new SpellComponentWrapper(next.getElement());
+							else
+								comp = new SpellComponentWrapper(next.getAlteration());
+							
+							NostrumMagica.proxy.spawnEffect(world, comp,
+									caster, null, null, new Vec3d(affectPos.getX() + .5, affectPos.getY(), affectPos.getZ() + .5),
+									new SpellComponentWrapper(next.getElement()), harmful, 0);
+						}
+						
+						// One more for the shape itself
+						final @Nullable EntityLivingBase centerEnt = (targets == null || targets.isEmpty() ? null : targets.get(0));
+						final @Nullable BlockPos centerBP = (locations == null || locations.isEmpty() ? null : locations.get(0));
+						if (centerEnt != null || centerBP != null) {
+							final Vec3d centerPos = (centerEnt == null ? new Vec3d(centerBP.getX() + .5, centerBP.getY(), centerBP.getZ() + .5) : centerEnt.getPositionVector().addVector(0, centerEnt.height / 2, 0));
+							final float p= (shape.supportedFloats() == null || shape.supportedFloats().length == 0 ? 0 : (
+									param.level == 0f ? shape.supportedFloats()[0] : param.level));
+							NostrumMagica.proxy.spawnEffect(world, new SpellComponentWrapper(shape),
+									caster, null, null, centerPos,
+									new SpellComponentWrapper(next.getElement()), harmful, p);
+						}
 					}
 					
 					first = false;

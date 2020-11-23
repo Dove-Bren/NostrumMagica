@@ -268,10 +268,10 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 			}
 		}
 		
-		public void craft(EntityPlayer crafter, String name, int iconIndex) {
+		public Spell craft(EntityPlayer crafter, String name, int iconIndex) {
 			ItemStack stack = this.getStackInSlot(0);
 			if (stack == null || !(stack.getItem() instanceof BlankScroll)) {
-				return;
+				return null;
 			}
 			
 			Spell spell = SpellCreationGui.SpellCreationContainer.craftSpell(
@@ -285,6 +285,8 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 				this.clearBoard();
 				this.setInventorySlotContents(0, scroll);
 			}
+			
+			return spell;
 		}
 		
 	}

@@ -149,14 +149,16 @@ public class NostrumMagicaFlower extends BlockBush {
 	
 	@Override
 	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-        switch (state.getValue(TYPE)) {
-		case CRYSTABLOOM:
-		case MIDNIGHT_IRIS:
-			return ReagentItem.instance();
-        }
-        
-        // fall through
-        return null;
+//        switch (state.getValue(TYPE)) {
+//		case CRYSTABLOOM:
+//		case MIDNIGHT_IRIS:
+//			return ReagentItem.instance();
+//        }
+//        
+//        // fall through
+//        return null;
+		
+		return ReagentItem.instance();
     }
 	
 	@Override

@@ -320,7 +320,7 @@ public class Candle extends Block implements ITileEntityProvider {
 	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
 		// Check for a reagent item over the candle
 		if (state.getValue(LIT) && worldIn.getTileEntity(pos) == null) {
-			List<EntityItem> items = worldIn.getEntitiesWithinAABB(EntityItem.class, Block.FULL_BLOCK_AABB.offset(pos).expand(1, 1, 1));
+			List<EntityItem> items = worldIn.getEntitiesWithinAABB(EntityItem.class, Block.FULL_BLOCK_AABB.offset(pos).expand(0, 1, 0));
 			if (items != null && !items.isEmpty()) {
 				for (EntityItem item : items) {
 					ItemStack stack = item.getEntityItem();

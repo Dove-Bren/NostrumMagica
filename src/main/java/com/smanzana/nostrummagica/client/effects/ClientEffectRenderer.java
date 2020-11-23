@@ -35,7 +35,9 @@ public class ClientEffectRenderer {
 			Vec3d sourcePosition,
 			EntityLivingBase target,
 			Vec3d destPosition,
-			SpellComponentWrapper flavor);
+			SpellComponentWrapper flavor,
+			boolean isNegative,
+			float compParam);
 	}
 
 	private Map<SpellComponentWrapper, ClientEffectFactory> registeredEffects;
@@ -74,14 +76,16 @@ public class ClientEffectRenderer {
 		Minecraft mc = Minecraft.getMinecraft();
 		Vec3d playerOffset = mc.thePlayer.getPositionEyes(event.getPartialTicks()).addVector(0, -mc.thePlayer.eyeHeight, 0);
 		GlStateManager.translate(-playerOffset.xCoord, -playerOffset.yCoord, -playerOffset.zCoord);
+		
 		synchronized(activeEffects) {
-		Iterator<ClientEffect> it = activeEffects.iterator();
+			Iterator<ClientEffect> it = activeEffects.iterator();
 			while (it.hasNext()) {
 				ClientEffect ef = it.next();
 				if (!ef.displayTick(mc, event.getPartialTicks()))
 					it.remove();
 			}
 		}
+		
 		GlStateManager.popMatrix();
 	}
 	
@@ -94,14 +98,16 @@ public class ClientEffectRenderer {
 			Vec3d sourcePosition,
 			EntityLivingBase target,
 			Vec3d destPosition,
-			SpellComponentWrapper flavor) {
+			SpellComponentWrapper flavor,
+			boolean isNegative,
+			float compParam) {
 		ClientEffectFactory factory = registeredEffects.get(component);
 		if (factory == null) {
 			NostrumMagica.logger.warn("Trying to spawn effect for unmapped component. Create a mapping for the component " + component);
 			return;
 		}
 		
-		ClientEffect effect = factory.build(caster, sourcePosition, target, destPosition, flavor);
+		ClientEffect effect = factory.build(caster, sourcePosition, target, destPosition, flavor, isNegative, compParam);
 		if (effect == null)
 			return;
 		

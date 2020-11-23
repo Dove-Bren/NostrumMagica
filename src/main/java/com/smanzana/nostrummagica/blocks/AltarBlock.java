@@ -22,6 +22,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -156,7 +157,7 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 		TileEntity te = worldIn.getTileEntity(pos);
 		if (te != null && te instanceof AltarTileEntity && ((AltarTileEntity) te).getItem() == null) {
 			AltarTileEntity altar = (AltarTileEntity) te;
-			List<EntityItem> items = worldIn.getEntitiesWithinAABB(EntityItem.class, Block.FULL_BLOCK_AABB.offset(pos).offset(0, 1, 0).expand(1, 1, 1));
+			List<EntityItem> items = worldIn.getEntitiesWithinAABB(EntityItem.class, Block.FULL_BLOCK_AABB.offset(pos).offset(0, 1, 0).expand(0, 1, 0));
 			if (items != null && !items.isEmpty()) {
 				EntityItem first = items.get(0);
 				ItemStack stack = first.getEntityItem();
@@ -201,8 +202,13 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 							);
 				} else {
 					INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
-					if (altarItem.getItem() instanceof ILoreTagged && attr != null && attr.isUnlocked()) {
-						attr.giveBasicLore((ILoreTagged) altarItem.getItem());
+					if (attr != null && attr.isUnlocked()) {
+						if (altarItem.getItem() instanceof ILoreTagged) {
+							attr.giveBasicLore((ILoreTagged) altarItem.getItem());
+						} else if (altarItem.getItem() instanceof ItemBlock &&
+								((ItemBlock) altarItem.getItem()).getBlock() instanceof ILoreTagged) {
+							attr.giveBasicLore((ILoreTagged) ((ItemBlock) altarItem.getItem()).getBlock());
+						}
 					}
 				}
 				altar.setItem(null);

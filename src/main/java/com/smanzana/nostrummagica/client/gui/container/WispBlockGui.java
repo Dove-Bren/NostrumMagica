@@ -1,8 +1,11 @@
 package com.smanzana.nostrummagica.client.gui.container;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.aetheria.blocks.WispBlock.WispBlockTileEntity;
+import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spells.Spell;
 
@@ -61,11 +64,11 @@ public class WispBlockGui {
 			this.table = table;
 			this.scrollSlot = new Slot(table, 0, SCROLL_SLOT_INPUT_HOFFSET, SCROLL_SLOT_INPUT_VOFFSET) {
 				
-//				@Override
-//				public boolean isItemValid(@Nullable ItemStack stack) {
-//					return stack == null ||
-//							(stack.getItem() instanceof SpellScroll && SpellScroll.getSpell(stack) != null);
-//				}
+				@Override
+				public boolean isItemValid(@Nullable ItemStack stack) {
+					return stack == null ||
+							(stack.getItem() instanceof SpellScroll && SpellScroll.getSpell(stack) != null);
+				}
 //				
 //				@Override
 //				public void putStack(@Nullable ItemStack stack) {
@@ -115,10 +118,10 @@ public class WispBlockGui {
 			
 			this.reagentSlot = new Slot(table, 1, REAGENT_SLOT_INPUT_HOFFSET, REAGENT_SLOT_INPUT_VOFFSET) {
 				
-//				@Override
-//				public boolean isItemValid(@Nullable ItemStack stack) {
-//					return stack == null || stack.getItem() instanceof ReagentItem;
-//				}
+				@Override
+				public boolean isItemValid(@Nullable ItemStack stack) {
+					return stack == null || stack.getItem() instanceof ReagentItem;
+				}
 //				
 //				@Override
 //				public void putStack(@Nullable ItemStack stack) {
@@ -213,7 +216,7 @@ public class WispBlockGui {
 						scrollSlot.putStack(stack);
 					} else if (!reagentSlot.getHasStack()
 							&& reagentSlot.isItemValid(cur)) {
-						ItemStack stack = cur.splitStack(1);
+						ItemStack stack = cur.splitStack(cur.getMaxStackSize());
 						reagentSlot.putStack(stack);
 					} else {
 						prev = null;

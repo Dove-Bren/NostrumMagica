@@ -298,7 +298,7 @@ entity.nostrummagica.spell_projectile.name=Spell Projectile
 entity.nostrummagica.entity_internal_spellsaucer.name=Spell Projectile
 entity.nostrummagica.entity_koid.name=Koid
 entity.nostrummagica.entity_dragon_red.name=Red Dragon
-entity.nostrummagica.entity_tame_dragon_red.name=Tamed Red Dragon
+entity.nostrummagica.entity_tame_dragon_red.name=Young Red Dragon
 entity.nostrummagica.entity_shadow_dragon_red.name=Shadow Red Dragon
 entity.nostrummagica.entity_sprite.name=Sprite
 entity.nostrummagica.entity_dragon_egg.name=Dragon Egg
@@ -1030,7 +1030,9 @@ spellcraft.problems=Problems
 spellcraft.problems_info=There are some requirements when creating a spell. Firstly, all spells must start with a trigger. Spells must contain at least one shape that has an element associated with it. Spells must have a name. Lastly, you must have enough reagents in the table's reagent slots to pay for the spell. If all of these are true, the submit button will be activated. If not, however, the error indicator will display a red X and the problems will be listed.
 
 modification.aoe.name=Effect Radius
+modification.aoe.bool.name=Ignore Allies
 modification.chain.name=Jumps
+modification.chain.bool.name=Team Lock
 modification.proximity.name=Radius
 modification.mana.name=Mana Level
 modification.health.name=Health Level
@@ -1045,6 +1047,7 @@ modification.level.flip=Trigger When Above
 info.nostrumwelcome.text=Welcome to Nostrum Magica! Press [%s] to get started!
 
 nei.category.ritual.name=Nostrum Ritual
+info.jei.recipe.ritual.invalid=%1$sWarning!%2$s|You haven't unlocked the ability to perform this ritual.
 
 lore.mirror_shield.name=Mirror Shields
 lore.true_mirror_shield.name=True Mirror Shields

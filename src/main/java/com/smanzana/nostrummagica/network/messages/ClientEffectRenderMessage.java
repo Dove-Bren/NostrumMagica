@@ -92,9 +92,12 @@ public class ClientEffectRenderMessage implements IMessage {
 					return;
 				}
 				
+				final boolean negative = message.tag.getBoolean(NBT_NEGATIVE);
+				final float param = message.tag.getFloat(NBT_PARAM);
+				
 				NostrumMagica.proxy.spawnEffect(NostrumMagica.proxy.getPlayer().worldObj, 
 						component,
-						caster, casterPos, target, targetPos, flavor);
+						caster, casterPos, target, targetPos, flavor, negative, param);
 			});
 
 			return null;
@@ -109,6 +112,8 @@ public class ClientEffectRenderMessage implements IMessage {
 	
 	private static final String NBT_COMPONENT = "comp";
 	private static final String NBT_FLAVOR = "flavor";
+	private static final String NBT_NEGATIVE = "negative";
+	private static final String NBT_PARAM = "param";
 	
 	protected NBTTagCompound tag;
 	
@@ -120,7 +125,9 @@ public class ClientEffectRenderMessage implements IMessage {
 			EntityLivingBase caster, Vec3d casterPos,
 			EntityLivingBase target, Vec3d targetPos,
 			SpellComponentWrapper component,
-			SpellComponentWrapper flavor) {
+			SpellComponentWrapper flavor,
+			boolean negative,
+			float param) {
 		tag = new NBTTagCompound();
 		
 		if (caster != null)
@@ -146,6 +153,9 @@ public class ClientEffectRenderMessage implements IMessage {
 		tag.setString(NBT_COMPONENT, component.getKeyString());
 		if (flavor != null)
 			tag.setString(NBT_FLAVOR, flavor.getKeyString());
+		
+		tag.setBoolean(NBT_NEGATIVE, negative);
+		tag.setFloat(NBT_PARAM, param);
 	}
 
 	@Override

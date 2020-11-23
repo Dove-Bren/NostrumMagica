@@ -36,6 +36,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
@@ -893,25 +894,38 @@ public class OverlayRenderer extends Gui {
 		}
 	}
 	
-	private void renderLoreIcon(boolean loreIsDeep) {
-		
-		final int u = (160 + (loreIsDeep ? 0 : 32));
+	private void renderLoreIcon(Boolean loreIsDeep) {
 		
 		GlStateManager.enableBlend();
 		GlStateManager.color(.6f, .6f, .6f, .6f);
 		Minecraft.getMinecraft().getRenderItem().renderItemIntoGUI(new ItemStack(SpellScroll.instance()), 0, 0);
-		
 		GlStateManager.color(1f, 1f, 1f, 1f);
-		Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_ICONS);
 		
-		Gui.drawScaledCustomSizeModalRect(0, 0, u, 0, 32, 32, 8, 8, 256, 256);
+		if (loreIsDeep != null) {
+			final int u = (160 + (loreIsDeep ? 0 : 32));
+			Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_ICONS);
+			Gui.drawScaledCustomSizeModalRect(8, 8, u, 0, 32, 32, 8, 8, 256, 256);
+		}
 	}
 	
 	@SubscribeEvent
 	public void onTooltipRender(RenderTooltipEvent.PostBackground event) {
 		ItemStack stack = event.getStack();
-		if (stack == null || !(stack.getItem() instanceof ILoreTagged)) {
+		if (stack == null) {
 			return;
+		}
+		
+		final ILoreTagged tag;
+		if (stack.getItem() instanceof ItemBlock) {
+			if (!(((ItemBlock) stack.getItem()).getBlock() instanceof ILoreTagged)) {
+				return;
+			} else {
+				tag = (ILoreTagged) ((ItemBlock) stack.getItem()).getBlock();
+			}
+		} else if (!(stack.getItem() instanceof ILoreTagged)) {
+			return;
+		} else {
+			tag = (ILoreTagged) stack.getItem();
 		}
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer);
@@ -919,11 +933,18 @@ public class OverlayRenderer extends Gui {
 			return;
 		}
 		
-		ILoreTagged tag = (ILoreTagged) stack.getItem();
+		final Boolean hasFullLore;
+		if (attr.hasFullLore(tag)) {
+			hasFullLore = true;
+		} else if (attr.hasLore(tag)) {
+			hasFullLore = false;
+		} else {
+			hasFullLore = null;
+		}
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(event.getX() + event.getWidth() - 2, event.getY() - 10, 50);
-		renderLoreIcon(attr.hasFullLore(tag));
+		GlStateManager.translate(event.getX() + event.getWidth() - 4, event.getY() + event.getHeight() - 6, 50);
+		renderLoreIcon(hasFullLore);
 		GlStateManager.popMatrix();
 	}
 	

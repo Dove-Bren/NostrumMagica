@@ -62,7 +62,9 @@ public abstract class SpellShape {
 						EntityLivingBase target,
 						World world,
 						BlockPos pos,
-						float efficiency) {
+						float efficiency,
+						List<EntityLivingBase> affectedEnts,
+						List<BlockPos> affectedPos) {
 		
 		if (target != null && (world == null || pos == null)) {
 			world = target.worldObj;
@@ -73,15 +75,21 @@ public abstract class SpellShape {
 		List<EntityLivingBase> entTargets = getTargets(param, target, world, pos);
 		if (entTargets != null && !entTargets.isEmpty())
 		for (EntityLivingBase ent : entTargets) {
-			if (ent != null)
-				action.apply(ent, efficiency);
+			if (ent != null) {
+				if (action.apply(ent, efficiency)) {
+					affectedEnts.add(ent);
+				}
+			}
 		}
 		
 		List<BlockPos> blockTargets = getTargetLocations(param, target, world, pos);
 		if (blockTargets != null && !blockTargets.isEmpty())
 		for (BlockPos bp : blockTargets) {
-			if (bp != null)
-				action.apply(world, bp, efficiency);
+			if (bp != null) {
+				if (action.apply(world, bp, efficiency)) {
+					affectedPos.add(bp);
+				}
+			}
 		}
 	}
 	

@@ -37,7 +37,7 @@ public class OtherTrigger extends InstantTrigger {
 		
 		NostrumMagica.proxy.spawnEffect(state.getOther().worldObj,
 				new SpellComponentWrapper(instance()),
-				state.getCaster(), null, state.getOther(), null, null);
+				state.getCaster(), null, state.getOther(), null, null, false, 0);
 		
 		return new TriggerData(Lists.newArrayList(state.getOther()), Lists.newArrayList(state.getSelf()), world, null);
 	}

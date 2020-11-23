@@ -3,12 +3,16 @@ package com.smanzana.nostrummagica.jei.categories;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.Lists;
+import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.book.RitualRecipePage;
 import com.smanzana.nostrummagica.jei.RitualOutcomeJEIRenderer;
 import com.smanzana.nostrummagica.jei.RitualOutcomeWrapper;
 import com.smanzana.nostrummagica.jei.wrappers.RitualRecipeWrapper;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
+import com.smanzana.nostrummagica.rituals.requirements.IRitualRequirement;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import mezz.jei.api.IGuiHelper;
@@ -22,6 +26,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -45,6 +50,7 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipeWrapper
 	private EMagicElement recipeFlavor;
 	private int recipeTier;
 	private String recipeName;
+	private boolean canPerform;
 	
 	public RitualRecipeCategory(IGuiHelper guiHelper) {
 		title = I18n.format("nei.category.ritual.name", (Object[]) null);
@@ -108,6 +114,10 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipeWrapper
 				RING_WIDTH, RING_HEIGHT, RING_WIDTH, RING_HEIGHT);
 		
 		GlStateManager.popMatrix();
+		
+		if (!canPerform) {
+			minecraft.fontRendererObj.drawString(ChatFormatting.BOLD + "x" + ChatFormatting.RESET, 108, 70, 0xFFAA0000);
+		}
 		
 		
 		String title = recipeName;
@@ -187,16 +197,47 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipeWrapper
 		
 		guiItemStacks.set(ingredients);
 		guiOutcomes.set(ingredients);
+		
+		// Check whether this ritual can be performed
+		canPerform = true;
+		EntityPlayer player = NostrumMagica.proxy.getPlayer();
+		if (player != null) {
+			// Client side, so check if player has unlocked the ritual
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+			if (!attr.isUnlocked()) {
+				canPerform = false;
+			} else if (ritual.getRequirement() != null) {
+				IRitualRequirement req = ritual.getRequirement();
+				if (!req.matches(player, attr)) {
+					canPerform = false;
+				}
+			}
+		}
 	}
 
 	@Override
 	public IDrawable getIcon() {
 		return null;
 	}
+	
+	private String tooltipInvalidKey = null;
+	private List<String> tooltipInvalid = null;
+	private List<String> tooltipEmpty = new ArrayList<>();
 
 	@Override
 	public List<String> getTooltipStrings(int mouseX, int mouseY) {
-		return new ArrayList<String>();
+		//108, 70
+		if (!this.canPerform
+				&& mouseX > 101 && mouseX < 124
+				&& mouseY > 66 && mouseY < 85) {
+			if (tooltipInvalidKey == null || !tooltipInvalidKey.equals(I18n.format("info.jei.recipe.ritual.invalid", ChatFormatting.BOLD + "" + ChatFormatting.RED, ChatFormatting.BLACK))) {
+				tooltipInvalidKey = I18n.format("info.jei.recipe.ritual.invalid", ChatFormatting.BOLD + "" + ChatFormatting.RED, ChatFormatting.BLACK);;
+				tooltipInvalid = Lists.newArrayList(tooltipInvalidKey.split("\\|"));
+			}
+			return tooltipInvalid;
+		}
+			
+		return tooltipEmpty;
 	}
 
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.ReagentItem;
@@ -41,7 +42,8 @@ public class AoEShape extends SpellShape {
 	protected List<EntityLivingBase> getTargets(SpellPartParam param, EntityLivingBase target, World world, BlockPos pos) {
 		List<EntityLivingBase> ret = new LinkedList<>();
 		
-		double radius = Math.max(supportedFloats()[0], (double) param.level);
+		double radius = Math.max(supportedFloats()[0], (double) param.level) + .5;
+		final boolean ignoreAllies = param.flip;
 		
 		for (Entity entity : world.getEntitiesWithinAABBExcludingEntity(null, 
 				new AxisAlignedBB(pos.getX() - radius,
@@ -50,7 +52,7 @@ public class AoEShape extends SpellShape {
 							pos.getX() + radius,
 							pos.getY() + radius,
 							pos.getZ() + radius))) {
-			if (entity instanceof EntityLivingBase)
+			if (entity instanceof EntityLivingBase && (!ignoreAllies || !NostrumMagica.IsSameTeam(target, (EntityLivingBase) entity)))
 				if (Math.abs(entity.getPositionVector().distanceTo(new Vec3d(pos.getX(), pos.getY(), pos.getZ()))) <= radius)
 					ret.add((EntityLivingBase) entity);
 		}
@@ -63,7 +65,7 @@ public class AoEShape extends SpellShape {
 			BlockPos pos) {
 		List<BlockPos> list = new LinkedList<>();
 		
-		int radius = Math.round(Math.abs(Math.max(2.0f, param.level)));
+		final int radius = Math.round(Math.abs(Math.max(2.0f, param.level)));
 		
 		if (radius == 0) {
 			list.add(pos);
@@ -106,7 +108,7 @@ public class AoEShape extends SpellShape {
 
 	@Override
 	public boolean supportsBoolean() {
-		return false;
+		return true;
 	}
 
 	@Override
@@ -130,7 +132,7 @@ public class AoEShape extends SpellShape {
 
 	@Override
 	public String supportedBooleanName() {
-		return null;
+		return I18n.format("modification.aoe.bool.name", (Object[]) null);
 	}
 
 	@Override

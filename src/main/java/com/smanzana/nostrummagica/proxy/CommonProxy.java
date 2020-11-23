@@ -854,11 +854,13 @@ public class CommonProxy {
 	 * @param target
 	 * @param targetPos
 	 * @param flavor Optional component used to flavor the effect.
+	 * @param negative whether the effect should be considered 'negative'/harmful
+	 * @param param optional extra float param for display
 	 */
 	public void spawnEffect(World world, SpellComponentWrapper comp,
 			EntityLivingBase caster, Vec3d casterPos,
 			EntityLivingBase target, Vec3d targetPos,
-			SpellComponentWrapper flavor) {
+			SpellComponentWrapper flavor, boolean isNegative, float compParam) {
 		if (world == null) {
 			if (caster == null)
 				world = target.worldObj; // If you NPE here you suck. Supply a world!
@@ -908,7 +910,8 @@ public class CommonProxy {
 			ClientEffectRenderMessage message = new ClientEffectRenderMessage(
 					caster, casterPos,
 					target, targetPos,
-					comp, flavor);
+					comp, flavor,
+					isNegative, compParam);
 			for (EntityPlayer player : players) {
 				NetworkHandler.getSyncChannel().sendTo(message, (EntityPlayerMP) player);
 			}

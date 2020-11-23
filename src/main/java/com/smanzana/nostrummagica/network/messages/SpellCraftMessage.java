@@ -1,9 +1,12 @@
 package com.smanzana.nostrummagica.network.messages;
 
+import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.SpellTable.SpellTableEntity;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spells.Spell;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -50,14 +53,21 @@ public class SpellCraftMessage implements IMessage {
 				if (TE == null) {
 					NostrumMagica.logger.warn("Got craft message that didn't line up with a crafting table. This is a bug!");
 					return;
+				}
+				
+				SpellTableEntity entity = (SpellTableEntity) TE;
+				
+				Spell spell = entity.craft(sp, name, iconIdx);
+				if (spell != null) {
+					NostrumMagicaSounds.UI_RESEARCH.play(entity.getWorld(), 
+							x, y, z);
+					}
+				
+					NetworkHandler.getSyncChannel().sendTo(
+							new SpellRequestReplyMessage(Lists.newArrayList(spell)),
+							sp);
 			}
-			
-			SpellTableEntity entity = (SpellTableEntity) TE;
-			
-			entity.craft(sp, name, iconIdx);
-			NostrumMagicaSounds.UI_RESEARCH.play(entity.getWorld(), 
-					x, y, z);
-			});
+			);
 			
 			return null;
 		}
