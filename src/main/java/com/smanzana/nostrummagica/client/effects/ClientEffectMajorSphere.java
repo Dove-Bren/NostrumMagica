@@ -49,6 +49,10 @@ public class ClientEffectMajorSphere extends ClientEffect {
 				model = MODEL_SCALY;
 			}
 			
+			GlStateManager.disableBlend();
+			GlStateManager.enableBlend();
+			GlStateManager.disableAlpha();
+			GlStateManager.enableAlpha();
 			GlStateManager.disableTexture2D();
 			GlStateManager.enableTexture2D();
 			GlStateManager.color(0f, 0f, 0f, 0f);

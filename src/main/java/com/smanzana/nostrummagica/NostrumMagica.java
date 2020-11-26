@@ -2334,7 +2334,7 @@ public class NostrumMagica
 			} else {
 				Integer mast = attr.getElementMastery().get(elem);
 				int mastery = (mast == null ? 0 : mast);
-				if (level < mastery)
+				if (mastery < level)
 					return false;
 			}
     	}

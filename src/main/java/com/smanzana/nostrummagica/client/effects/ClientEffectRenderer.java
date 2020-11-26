@@ -93,6 +93,8 @@ public class ClientEffectRenderer {
 		registeredEffects.put(component, factory);
 	}
 	
+	private static boolean DidWarned = false;
+	
 	public void spawnEffect(SpellComponentWrapper component,
 			EntityLivingBase caster,
 			Vec3d sourcePosition,
@@ -103,7 +105,10 @@ public class ClientEffectRenderer {
 			float compParam) {
 		ClientEffectFactory factory = registeredEffects.get(component);
 		if (factory == null) {
-			NostrumMagica.logger.warn("Trying to spawn effect for unmapped component. Create a mapping for the component " + component);
+			if (!DidWarned) {
+				NostrumMagica.logger.warn("Trying to spawn effect for unmapped component. Create a mapping for the component " + component);
+				DidWarned = true;
+			}
 			return;
 		}
 		

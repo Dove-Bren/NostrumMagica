@@ -722,8 +722,10 @@ public class ClientProxy extends CommonProxy {
 	private void doCast() {
 		
 		Spell spell = NostrumMagica.getCurrentSpell(Minecraft.getMinecraft().thePlayer);
-		if (spell == null)
+		if (spell == null) {
+			System.out.println("LOUD NULL SPELL"); // TODO remove
 			return;
+		}
 		
 		// Do mana check here (it's also done on server)
 		// to stop redundant checks and get mana looking good
@@ -748,6 +750,7 @@ public class ClientProxy extends CommonProxy {
 				player.addChatMessage(new TextComponentTranslation(
 						"info.spell.tome_weak", new Object[0]));
 				NostrumMagicaSounds.CAST_FAIL.play(player);
+				System.out.println("LOUD tome weak"); // TODO remove
 				return;
 			}
 			
@@ -816,8 +819,11 @@ public class ClientProxy extends CommonProxy {
 								player.posX + offsetx, player.posY, player.posZ + offsetz,
 								0, -.5, 0);
 					
-					NostrumMagicaSounds.CAST_FAIL.play(player);
 				}
+				
+				System.out.println("LOUD LOW MANA"); // TODO remove
+				
+				NostrumMagicaSounds.CAST_FAIL.play(player);
 				overlayRenderer.startManaWiggle(2);
 				return;
 			}
@@ -829,16 +835,19 @@ public class ClientProxy extends CommonProxy {
 			if (spell.getComponentCount() > maxComps) {
 				player.addChatMessage(new TextComponentTranslation(
 						"info.spell.low_tech", new Object[0]));
+				System.out.println("LOUD LOW TECH"); // TODO remove
 				NostrumMagicaSounds.CAST_FAIL.play(player);
 				return;
 			} else if (spell.getElementCount() > maxElems) {
 				player.addChatMessage(new TextComponentTranslation(
 						"info.spell.low_control", new Object[0]));
+				System.out.println("LOUD LOW CONTROL"); // TODO remove
 				NostrumMagicaSounds.CAST_FAIL.play(player);
 				return;
 			} else if (spell.getTriggerCount() > maxTriggers) {
 				player.addChatMessage(new TextComponentTranslation(
 						"info.spell.low_finesse", new Object[0]));
+				System.out.println("LOUD LOW FINESSE"); // TODO remove
 				NostrumMagicaSounds.CAST_FAIL.play(player);
 				return;
 			}
@@ -857,17 +866,19 @@ public class ClientProxy extends CommonProxy {
 	    			if (know == null || !know) {
 	    				player.addChatMessage(new TextComponentTranslation(
 								"info.spell.no_mastery", new Object[] {elem.getName()}));
+	    				System.out.println("LOUD NO MASTERY"); // TODO remove
 						NostrumMagicaSounds.CAST_FAIL.play(player);
 						return;
 	    			}
 				} else {
 		    		Integer mast = att.getElementMastery().get(elem);
 		    		int mastery = (mast == null ? 0 : mast);
-		    		if (mastery < level)
+		    		if (mastery < level) {
 		    			player.addChatMessage(new TextComponentTranslation(
-								"info.spell.low_mastery", new Object[] {elem.getName(), level, mastery}));
+							"info.spell.low_mastery", new Object[] {elem.getName(), level, mastery}));
 						NostrumMagicaSounds.CAST_FAIL.play(player);
 						return;
+		    		}
 				}
 	    	}
 			
@@ -879,6 +890,7 @@ public class ClientProxy extends CommonProxy {
 					int count = NostrumMagica.getReagentCount(player, row.getKey());
 					if (count < row.getValue()) {
 						player.addChatMessage(new TextComponentTranslation("info.spell.bad_reagent", row.getKey().prettyName()));
+						System.out.println("LOUD BAD REAGENT"); // TODO remove
 						return;
 					}
 				}

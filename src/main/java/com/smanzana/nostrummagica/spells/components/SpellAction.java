@@ -911,6 +911,10 @@ public class SpellAction {
 
 		@Override
 		public boolean apply(EntityLivingBase caster, World world, BlockPos block, float efficiency) {
+			if (NostrumMagica.getMagicWrapper(caster) == null) {
+				return false;
+			}
+			
 			NostrumMagica.getMagicWrapper(caster).clearFamiliars();
 			caster.removeActivePotionEffect(FamiliarPotion.instance());
 			for (int i = 0; i < power; i++) {
