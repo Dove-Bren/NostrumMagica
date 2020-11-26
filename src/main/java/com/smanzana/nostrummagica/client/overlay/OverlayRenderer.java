@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -14,6 +16,7 @@ import com.smanzana.nostrummagica.entity.PetInfo;
 import com.smanzana.nostrummagica.entity.PetInfo.PetAction;
 import com.smanzana.nostrummagica.entity.PetInfo.SecondaryFlavor;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
+import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.HookshotItem;
 import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
 import com.smanzana.nostrummagica.items.SpellScroll;
@@ -44,6 +47,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
+import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
@@ -962,6 +966,20 @@ public class OverlayRenderer extends Gui {
 //		
 //		ILoreTagged tag = (ILoreTagged) stack.getItem();
 //		renderLoreIcon(attr.hasFullLore(tag));
+	}
+	
+	@SubscribeEvent
+	public void onPlayerRender(RenderPlayerEvent.Post event) {
+		if (event.getEntityPlayer() != Minecraft.getMinecraft().thePlayer) {
+			// For other players, possibly do armor render ticks
+			for (@Nullable ItemStack equipStack : event.getEntityPlayer().getArmorInventoryList()) {
+				if (equipStack == null || !(equipStack.getItem() instanceof EnchantedArmor)) {
+					continue;
+				}
+				
+				((EnchantedArmor) equipStack.getItem()).onArmorTick(event.getEntityPlayer().worldObj, event.getEntityPlayer(), equipStack);
+			}
+		}
 	}
 	
 }

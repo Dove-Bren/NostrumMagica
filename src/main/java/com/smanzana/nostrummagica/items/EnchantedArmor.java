@@ -26,7 +26,9 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.minecraftforge.common.ISpecialArmor;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -413,6 +415,72 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	@Override
 	public void damageArmor(EntityLivingBase entity, ItemStack stack, DamageSource source, int damage, int slot) {
 		stack.damageItem(damage, entity);
+	}
+	
+	@Override
+	public void onArmorTick(World world, EntityPlayer player, ItemStack itemStack) {
+		super.onArmorTick(world, player, itemStack);
+		if (!world.isRemote) {
+			return;
+		}
+		
+		final int setCount = getSetPieces(player, itemStack);
+		final int displayLevel = (level + 1) * (setCount * setCount);
+		
+		if (NostrumMagica.rand.nextInt(400) > displayLevel) {
+			return;
+		}
+		
+		final double dx;
+		final double dy;
+		final double dz;
+		final EnumParticleTypes effect;
+		final int mult;
+		final float rangeMod;
+		switch (element) {
+		case EARTH:
+			effect = EnumParticleTypes.SUSPENDED_DEPTH;
+			dx = dy = dz = 0;
+			mult = 1;
+			rangeMod = 1;
+			break;
+		case FIRE:
+			effect = EnumParticleTypes.FLAME;
+			dx = dz = 0;
+			dy = .025;
+			mult = 1;
+			rangeMod = 2;
+			break;
+		case ENDER:
+			effect = EnumParticleTypes.PORTAL;
+			dx = dy = dz = 0;
+			mult = 2;
+			rangeMod = 1.5f;
+			break;
+		case PHYSICAL:
+		case WIND:
+		case ICE:
+		case LIGHTNING:
+		default:
+			effect = null;
+			dx = dy = dz = 0;
+			mult = 0;
+			rangeMod = 0;
+			break;
+		}
+		
+		if (effect == null) {
+			return;
+		}
+		
+		for (int i = 0; i < mult; i++) {
+			final float rd = NostrumMagica.rand.nextFloat();
+			final float radius = .5f + (NostrumMagica.rand.nextFloat() * (.5f * rangeMod));
+			final double px = (player.posX + radius * Math.cos(rd * Math.PI * 2));
+			final double py = (player.posY + (NostrumMagica.rand.nextFloat() * 2));
+			final double pz = (player.posZ + radius * Math.sin(rd * Math.PI * 2));
+			world.spawnParticle(effect, px, py, pz, dx, dy, dz, new int[0]);
+		}
 	}
 	
 }
