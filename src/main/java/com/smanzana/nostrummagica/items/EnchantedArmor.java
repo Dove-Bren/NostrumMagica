@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.items;
 
+import java.lang.reflect.Field;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -43,6 +44,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ISpecialArmor;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -593,6 +595,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 	
 	protected static void UpdateEntity(EntityLivingBase entity) {
+		
+		// Check and change attributes
 		if (EntityChangedEquipment(entity)) {
 			// Figure out attributes and set.
 			// Also capture current armor status and cache it.
@@ -642,6 +646,59 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			
 			// Create and save new map
 			LastEquipState.put(entity, cacheMap);
+		}
+		
+		// Check for world-changing full set bonuses
+		// Note: Cheat and just look at helm. if helm isn't right, full set isn't set anyways
+		@Nullable ItemStack helm = entity.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
+		if (helm != null && helm.getItem() instanceof EnchantedArmor) {
+			EnchantedArmor type = (EnchantedArmor) helm.getItem();
+			final int setCount = type.getSetPieces(entity, helm);
+			if (setCount == 4) {
+				// Full set!
+				final EMagicElement element = type.getElement();
+				final int level = type.getLevel();
+				
+				if (element == EMagicElement.FIRE) {
+					// Fire prevents fire.
+					// Level 1(0) reduces fire time (25% reduction by 50% of the time reducing by another tick)
+					// Level 2(1) halves fire time
+					// Level 3(2) prevents fire all-together
+					if (level == 2) {
+						if (entity.isBurning()) {
+							entity.extinguish();
+						}
+					} else {
+						if (level == 1 || NostrumMagica.rand.nextBoolean()) {
+							try {
+								Field fireField = ReflectionHelper.findField(Entity.class, "fire", "field_70151_c");
+								fireField.setAccessible(true);
+								
+								int val = fireField.getInt(entity);
+								
+								if (val > 0) {
+									// On fire so decrease
+									
+									// Decrease every other 20 so damage ticks aren't doubled.
+									// Do this by checking if divisible by 40 (true every 2 %20).
+									// (We skip odds to get to evens to simplify logic)
+									if (val % 2 == 0) {
+										if (val % 20 != 0 || val % 40 == 0) {
+											fireField.setInt(entity, val - 1);
+										}
+									} else {
+										; // Skip so that next tick is even
+									}
+								}
+								
+								fireField.setAccessible(false);
+							} catch (Exception e) {
+								; // This will happen every tick, so don't log
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 	
@@ -745,6 +802,16 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 						tooltip.add(TextFormatting.RED + " " + I18n.format("attribute.modifier.take.0", String.format("%.2f", val), I18n.format("attribute.name." + (String)entry.getKey().getAttributeUnlocalizedName())));
 					}
 				}
+			}
+		}
+		
+		// Also show special bonuses
+		// TODO make this a bit more... extensible?
+		if (showFull || setCount == 4) {
+			if (element == EMagicElement.FIRE) {
+				tooltip.add(ChatFormatting.DARK_PURPLE
+						+ I18n.format("info.armor.set_bonus.fire." + level, new Object[0])
+						+ ChatFormatting.RESET);
 			}
 		}
 	}

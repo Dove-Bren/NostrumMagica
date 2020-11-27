@@ -53,6 +53,7 @@ import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -504,7 +505,16 @@ public class PlayerListener {
 		if (event.isCanceled())
 			return;
 		
-		if (event.getAmount() > 0f && event.getSource() instanceof EntityDamageSource) {
+		if (event.getSource().isFireDamage() && event.getSource() != DamageSource.lava && !event.getSource().getDamageType().equalsIgnoreCase("lava")) {
+			// If wearing full lava set, ignore
+			final boolean fullSet = EnchantedArmor.GetSetCount(event.getEntityLiving(), EMagicElement.FIRE, 2) == 4;
+			if (fullSet) {
+				event.setCanceled(true);
+				return;
+			}
+		}
+		
+		if (event.getAmount() > 0f && event.getSource() instanceof EntityDamageSource && !((EntityDamageSource) event.getSource()).getIsThornsDamage()) {
 			Entity source = ((EntityDamageSource) event.getSource()).getSourceOfDamage();
 			
 			if (source instanceof EntityArrow) {

@@ -419,6 +419,10 @@ info.screen.goto=Click to view
 info.armor.set_status=%1$s Set Bonus %3$s(%2$d/4)%4$s
 info.armor.set_total=%1$s Set Bonus %2$s(Complete)%3$s
 
+info.armor.set_bonus.fire.0=Reduced Flame Duration
+info.armor.set_bonus.fire.1=Halved Flame Duration
+info.armor.set_bonus.fire.2=Flame Immunity
+
 info.discovery.name=Unlocking Magic
 info.stats.name=Stats
 info.growth.name=Growth

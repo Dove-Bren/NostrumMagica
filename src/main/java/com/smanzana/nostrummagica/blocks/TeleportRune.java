@@ -9,6 +9,8 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble;
+import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble.ItemType;
 import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
@@ -21,6 +23,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -194,7 +197,7 @@ public class TeleportRune extends BlockContainer  {
 	
 	// How long entities must wait in the teleporation block before they teleport
 	public static final int TELEPORT_CHARGE_TIME = 2;
-	public static final int TELEPORT_RANGE = 32;
+	public static final int TELEPORT_RANGE = 64;
 	
 	private static boolean DumbIntegratedGuard = false;
 	
@@ -304,7 +307,26 @@ public class TeleportRune extends BlockContainer  {
 					+ Math.abs(heldPos.getY() - pos.getY())
 					+ Math.abs(heldPos.getZ() - pos.getZ());
 			
-			if (dist > TELEPORT_RANGE) {
+			boolean hasEnderBelt = false;
+			// Look for lightning belt
+			IInventory baubles = NostrumMagica.baubles.getBaubles(playerIn);
+			if (baubles != null) {
+				for (int i = 0; i < baubles.getSizeInventory(); i++) {
+					ItemStack stack = baubles.getStackInSlot(i);
+					if (stack == null || !(stack.getItem() instanceof ItemMagicBauble)) {
+						continue;
+					}
+					
+					ItemType type = ItemMagicBauble.getTypeFromMeta(stack.getMetadata());
+					if (type == ItemType.BELT_ENDER) {
+						hasEnderBelt = true;
+						break;
+					}
+				}
+			}
+			final double range = TELEPORT_RANGE * (hasEnderBelt ? 2 : 1);
+			
+			if (dist > range) {
 				playerIn.addChatComponentMessage(new TextComponentTranslation("info.teleportrune.toofar"));
 				return true;
 			}

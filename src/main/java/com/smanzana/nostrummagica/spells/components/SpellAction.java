@@ -18,6 +18,7 @@ import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
+import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemEarth;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemEnder;
@@ -193,6 +194,13 @@ public class SpellAction {
 		@Override
 		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
 			entity.heal(amount * efficiency);
+			
+			if (entity instanceof EntityTameDragonRed) {
+				EntityTameDragonRed dragon = (EntityTameDragonRed) entity;
+				if (dragon.isTamed() && dragon.getOwner() == caster) {
+					dragon.addBond(1f);
+				}
+			}
 			
 			NostrumMagicaSounds.STATUS_BUFF2.play(entity);
 			return true;
@@ -1676,15 +1684,30 @@ public class SpellAction {
 			// It still gains power from magic boost (above) AND is still reduces with magic reduction (below).
 		} else {
 		
-			int armor = target.getTotalArmorValue();
-			boolean undead = target.isEntityUndead();
-			boolean ender = false;
+			final int armor = target.getTotalArmorValue();
+			final boolean undead = target.isEntityUndead();
+			final boolean ender;
+			final boolean light;
+			final boolean flamy;
+			
 			if (target instanceof EntityEnderman || target instanceof EntityEndermite
-					|| target instanceof EntityDragon)
+					|| target instanceof EntityDragon) {
 				ender = true;
-			boolean light = false;
-			if (target.height < 1.5f || target instanceof EntityEnderman)
+			} else {
+				ender = false;
+			}
+			
+			if (target.height < 1.5f || target instanceof EntityEnderman) {
 				light = true;
+			} else {
+				light = false;
+			}
+			
+			if (target.isImmuneToFire()) {
+				flamy = true;
+			} else {
+				flamy = false;
+			}
 			
 			PotionEffect resEffect = target.getActivePotionEffect(MagicResistPotion.instance());
 			if (resEffect != null) {
@@ -1705,13 +1728,16 @@ public class SpellAction {
 				base *= (.75f + ((float) armor / 20f)); // double in power for every 20 armor
 				break;
 			case FIRE:
-				base *= (undead ? 1.5f : 1f); // 1.5x damage against undead. Regular otherwise
+				base *= (undead ? 1.5f : (flamy ? .5f : 1f)); // 1.5x damage against undead. Regular otherwise
 				break;
 			case EARTH:
 				//base; // raw damage. Not affected by armor
 				break;
 			case ICE:
 				base *= (undead ? .6f : 1.3f); // More affective against everything except undead
+				if (target.isBurning()) {
+					base *= 2;
+				}
 				break;
 			case WIND:
 				base *= (light ? 1.8f : .8f); // 180% against light (endermen included) enemies
