@@ -19,7 +19,7 @@ public class AttributeMagicResist extends RangedAttribute {
 	}
 	
 	private AttributeMagicResist() {
-		super(null, unlocalized_name, 0, 0.0D, 100.0D);
+		super(null, unlocalized_name, 0, -100.0D, 100.0D);
 	}
 
 }

@@ -246,6 +246,22 @@ item.hookshot_strong.name=Grand Hookshot
 item.ginseng_flower.name=Ginseng Flower
 item.mandrake_flower.name=Mandrake Bloom
 
+item.armor.set.physical.0.name=Sturdy
+item.armor.set.physical.1.name=Reinforced
+item.armor.set.physical.2.name=Deep Metal
+
+item.armor.set.fire.0.name=Spark
+item.armor.set.fire.1.name=Fire
+item.armor.set.fire.2.name=Lava
+
+item.armor.set.earth.0.name=Rock
+item.armor.set.earth.1.name=Earth
+item.armor.set.earth.2.name=Tremor
+
+item.armor.set.ender.0.name=Endermite
+item.armor.set.ender.1.name=Enderman
+item.armor.set.ender.2.name=Ender
+
 potion.frostbite.name=Frostbite
 potion.shieldphysical.name=Physical Ward
 potion.shieldmagic.name=Magic Ward
@@ -319,6 +335,13 @@ key.infoscreen.desc=Info Screen
 key.nostrummagica.desc=Nostrum Magica
 
 attribute.name.nostrummagica.magic_resist=Magic Resistance
+attribute.name.nostrummagica.magic_reduct_fire=Fire Magic Reduction
+attribute.name.nostrummagica.magic_reduct_ice=Ice Magic Reduction
+attribute.name.nostrummagica.magic_reduct_earth=Earth Magic Reduction
+attribute.name.nostrummagica.magic_reduct_wind=Wind Magic Reduction
+attribute.name.nostrummagica.magic_reduct_ender=Ender Magic Reduction
+attribute.name.nostrummagica.magic_reduct_lightning=Lightning Magic Reduction
+attribute.name.nostrummagica.magic_reduct_physical=Physical Magic Reduction
 
 config.nostrummagica.display=Display Options
 config.nostrummagica.display.display_bar=Mana Bar
@@ -392,6 +415,9 @@ info.teleportrune.unloaded=The targetting location cannot be observed!
 info.teleportrune.norune=The stored location does not point to a teleportation rune!
 info.teleportrune.toofar=The distant rune is too far away!
 info.screen.goto=Click to view
+
+info.armor.set_status=%1$s Set Bonus %3$s(%2$d/4)%4$s
+info.armor.set_total=%1$s Set Bonus %2$s(Complete)%3$s
 
 info.discovery.name=Unlocking Magic
 info.stats.name=Stats

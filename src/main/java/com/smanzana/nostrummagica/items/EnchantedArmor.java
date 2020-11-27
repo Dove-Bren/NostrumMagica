@@ -5,29 +5,41 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
+
+import javax.annotation.Nullable;
+
+import org.lwjgl.input.Keyboard;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.attributes.AttributeMagicReduction;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.client.model.ModelEnchantedArmorBase;
 import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBiped;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.EntityEquipmentSlot.Type;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ISpecialArmor;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -75,9 +87,13 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		}
 	}
 	
-	// Vanilla UUIDS. can get out of sync. :(
-	//private static final UUID[] ARMOR_MODIFIERS = new UUID[] {UUID.fromString("845DB27C-C624-495F-8C9F-6020A9A58B6B"), UUID.fromString("D8499B04-0E66-4726-AB29-64469D734E0D"), UUID.fromString("9F3D476D-C118-4544-8365-64846904B48E"), UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150")};
+	// UUIDs for modifiers for base attributes from armor
 	private static final UUID[] ARMOR_MODIFIERS = new UUID[] {UUID.fromString("922AB274-1111-56FE-19AE-365AA9758B8B"), UUID.fromString("D1459204-0E61-4716-A129-61666D432E0D"), UUID.fromString("1F7D236D-1118-6524-3375-34814505B28E"), UUID.fromString("2A632266-F4E1-2E67-7836-64FD783B7A50")};
+	
+	// UUIDs for set-based modifiers.
+	// Each corresponds to a slot that's adding its bonus
+	private static final UUID[] SET_MODIFIERS = new UUID[] {UUID.fromString("29F29D77-7DC5-4B68-970F-853633662A72"), UUID.fromString("A84E2267-7D48-4943-9C1C-25A022E85930"), UUID.fromString("D48816AD-B00D-4098-B686-2FC24436CD56"), UUID.fromString("104C2D3C-3987-4D56-9727-FFBEE388F6AF")};
+	
 	
 	private static int calcArmor(EntityEquipmentSlot slot, EMagicElement element, int level) {
 		
@@ -175,6 +191,58 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return Math.max(1, (int) ((float) base * mod));
 	}
 	
+	private static final double calcMagicReduct(EntityEquipmentSlot slot, EMagicElement element, int level) {
+		// each piece will give (.1, .15, .25) of their type depending on level.
+		return (level == 0 ? .1 : (level == 1 ? .15 : .25));
+	}
+	
+	private static final double calcMagicSetReductTotal(EMagicElement armorElement, int setCount, EMagicElement targetElement) {
+		if (setCount < 1 || setCount > 4) {
+			return 0;
+		}
+		
+		// Fire will resist 2 fire damage (total 3 with max level set). [0, .5, 1, 2]
+		// Earth will resist 1 earth damage (total 2 with max level set) AND .5 in all other elements. [0, .25, .5, 1][0, 0, 0, .5]
+		// Ender will resist 5 ender damage (total 6 with max level set) but -.5 in all others. [0, 1, 3, 5][0, -.1, -.3, -.5]
+		final double[] setTotalFire = {0, .5, 1, 2};
+		final double[] setTotalEarth = {0, .125, .25, .5};
+		final double[] setTotalEarthBonus = {0, 0, 0, .5};
+		final double[] setTotalEnder = {0, 1, 3, 5};
+		final double[] setTotalEnderBonus = {0, -.1, -.3, -.5};
+		
+		final double reduc;
+		
+		if (armorElement == EMagicElement.FIRE) {
+			// Only affect fire
+			if (targetElement == EMagicElement.FIRE) {
+				reduc = setTotalFire[setCount - 1]; // (1/4 per piece split evenly)
+			} else {
+				reduc = 0;
+			}
+		} else if (armorElement == EMagicElement.EARTH) {
+			if (targetElement == EMagicElement.EARTH) {
+				reduc = setTotalEarth[setCount - 1];
+			} else {
+				reduc = setTotalEarthBonus[setCount - 1];
+			}
+		} else if (armorElement == EMagicElement.ENDER) {
+			if (targetElement == EMagicElement.ENDER) {
+				reduc = setTotalEnder[setCount - 1];
+			} else {
+				reduc = setTotalEnderBonus[setCount - 1];
+			}
+		} else {
+			reduc = 0;
+		}
+		
+		return reduc;
+	}
+	
+	private static final double calcMagicSetReduct(EntityEquipmentSlot slot, EMagicElement armorElement, int setCount, EMagicElement targetElement) {
+		return calcMagicSetReductTotal(armorElement, setCount, targetElement) / setCount; // split evenly amonst all [setCount] pieces.
+		// COULD make different pieces make up bigger chunks of the pie but ehh
+	}
+	
 	private static int calcArmorDurability(EntityEquipmentSlot slot, EMagicElement element, int level) {
 		float mod = 1f;
 		switch (element) {
@@ -203,6 +271,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	private int level;
 	private int armor; // Can't use vanilla; it's final
 	private double magicResistAmount;
+	private double magicReducAmount;
 	private EMagicElement element;
 	
 	private String modelID;
@@ -221,6 +290,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		
 		this.armor = calcArmor(type, element, level);
 		this.magicResistAmount = ((double) calcMagicResistBase(type, element, level) * 2.0D); // (/50 so max is 48%, then * 100 for %, so *2)
+		this.magicReducAmount = calcMagicReduct(type, element, level);
 		
 		this.setMaxDamage(calcArmorDurability(type, element, level));
 		
@@ -243,6 +313,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
             multimap.put(SharedMonsterAttributes.ARMOR.getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor modifier", (double)this.armor, 0));
             multimap.put(SharedMonsterAttributes.ARMOR_TOUGHNESS.getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor toughness", 1, 0));
             multimap.put(AttributeMagicResist.instance().getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Resist", (double)this.magicResistAmount, 0));
+            multimap.put(AttributeMagicReduction.instance(this.element).getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Reduction", (double)this.magicReducAmount, 0));
         }
 
         return multimap;
@@ -336,29 +407,28 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return model;
 	}
 	
-	public int getSetPieces(EntityLivingBase entity, ItemStack stack) {
+	public static int GetSetCount(EntityLivingBase entity, EMagicElement element, int level) {
 		int count = 0;
-		EMagicElement myElem = ((EnchantedArmor)stack.getItem()).getElement();
-		int myLevel = ((EnchantedArmor)stack.getItem()).getLevel();
 		
 		for (EntityEquipmentSlot slot : new EntityEquipmentSlot[]{EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET}) {
 			ItemStack inSlot = entity.getItemStackFromSlot(slot);
-			if (inSlot == stack) {
-				count++;
-				continue;
-			}
-			
 			if (inSlot == null || !(inSlot.getItem() instanceof EnchantedArmor)) {
 				continue;
 			}
 			
 			EnchantedArmor item = (EnchantedArmor) inSlot.getItem();
-			if (item.getElement() == myElem && item.getLevel() == myLevel) {
+			if (item.getElement() == element && item.getLevel() == level) {
 				count++;
 			}
 		}
 		
 		return count;
+	}
+	
+	public int getSetPieces(EntityLivingBase entity, ItemStack stack) {
+		final EMagicElement myElem = ((EnchantedArmor)stack.getItem()).getElement();
+		final int myLevel = ((EnchantedArmor)stack.getItem()).getLevel();
+		return GetSetCount(entity, myElem, myLevel);
 	}
 	
 	@Override
@@ -417,14 +487,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		stack.damageItem(damage, entity);
 	}
 	
-	@Override
-	public void onArmorTick(World world, EntityPlayer player, ItemStack itemStack) {
-		super.onArmorTick(world, player, itemStack);
-		if (!world.isRemote) {
-			return;
-		}
-		
-		final int setCount = getSetPieces(player, itemStack);
+	protected void onArmorDisplayTick(World world, EntityPlayer player, ItemStack itemStack, int setCount) {
 		final int displayLevel = (level + 1) * (setCount * setCount);
 		
 		if (NostrumMagica.rand.nextInt(400) > displayLevel) {
@@ -480,6 +543,209 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			final double py = (player.posY + (NostrumMagica.rand.nextFloat() * 2));
 			final double pz = (player.posZ + radius * Math.sin(rd * Math.PI * 2));
 			world.spawnParticle(effect, px, py, pz, dx, dy, dz, new int[0]);
+		}
+	}
+	
+	protected void onServerTick(World world, EntityPlayer player, ItemStack stack, int setCount) {
+		
+	}
+	
+	@Override
+	public void onArmorTick(World world, EntityPlayer player, ItemStack itemStack) {
+		super.onArmorTick(world, player, itemStack);
+		
+		final int setCount = getSetPieces(player, itemStack);
+		if (!world.isRemote) {
+			onServerTick(world, player, itemStack, setCount);
+		} else {
+			onArmorDisplayTick(world, player, itemStack, setCount);
+		}
+	}
+	
+	// hacky little map to avoid thrashing attributes every tick
+	protected static final Map<EntityLivingBase, Map<EntityEquipmentSlot, ItemStack>> LastEquipState = new HashMap<>();
+	
+	protected static Map<EntityEquipmentSlot, ItemStack> GetLastTickState(EntityLivingBase entity) {
+		Map<EntityEquipmentSlot, ItemStack> map = LastEquipState.get(entity);
+		if (map == null) {
+			map = new EnumMap<>(EntityEquipmentSlot.class);
+			LastEquipState.put(entity, map);
+		}
+		return map;
+	}
+	
+	protected static boolean EntityChangedEquipment(EntityLivingBase entity) {
+		Map<EntityEquipmentSlot, ItemStack> map = GetLastTickState(entity);
+		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
+			if (slot.getSlotType() != Type.ARMOR) {
+				continue;
+			}
+			
+			@Nullable final ItemStack inSlot = entity.getItemStackFromSlot(slot);
+			@Nullable final ItemStack lastTick = map.get(slot);
+			
+			// Same check Vanilla uses to apply attributes
+			if (!ItemStack.areItemStacksEqual(inSlot, lastTick)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	protected static void UpdateEntity(EntityLivingBase entity) {
+		if (EntityChangedEquipment(entity)) {
+			// Figure out attributes and set.
+			// Also capture current armor status and cache it.
+			Map<EntityEquipmentSlot, ItemStack> cacheMap = new EnumMap<>(EntityEquipmentSlot.class);
+			Multimap<String, AttributeModifier> attribMap = HashMultimap.<String, AttributeModifier>create();	
+
+			for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
+				if (slot.getSlotType() != Type.ARMOR) {
+					continue;
+				}
+				
+				ItemStack inSlot = entity.getItemStackFromSlot(slot);
+				final int setCount;
+				final @Nullable EMagicElement armorElem;
+				if (inSlot != null) {
+					inSlot = inSlot.copy();
+					
+					if (inSlot.getItem() instanceof EnchantedArmor) {
+						EnchantedArmor armorType = (EnchantedArmor) inSlot.getItem();
+						setCount = armorType.getSetPieces(entity, inSlot);
+						armorElem = armorType.getElement();
+					} else {
+						setCount = 0;
+						armorElem = null;
+					}
+				} else {
+					setCount = 0;
+					armorElem = null;
+				}
+				
+				// Figure out how much this SHOULD be giving
+				for (EMagicElement elem : EMagicElement.values()) {
+					final double reduct = (setCount > 0 && armorElem != null)
+							? calcMagicSetReduct(slot, armorElem, setCount, elem)
+							: 0;
+						
+					// Important to do this even with 0 to remove previous bonuses
+					attribMap.put(AttributeMagicReduction.instance(elem).getAttributeUnlocalizedName(), new AttributeModifier(SET_MODIFIERS[slot.getIndex()], "Magic Reduction (Set)", reduct, 0));
+				}
+				
+				// Add captured value to map
+				cacheMap.put(slot, inSlot);
+			}
+			
+			// Update attributes
+			entity.getAttributeMap().applyAttributeModifiers(attribMap);
+			
+			// Create and save new map
+			LastEquipState.put(entity, cacheMap);
+		}
+	}
+	
+	// Updates all entities' current set bonuses (or lack there-of) from enchanted armor
+	public static void ServerWorldTick(World world) {
+		for (Entity ent : world.loadedEntityList) {
+			if (ent instanceof EntityLivingBase) {
+				UpdateEntity((EntityLivingBase) ent);
+			}
+		}
+	}
+	
+	public static Map<IAttribute, Double> FindCurrentSetBonus(@Nullable Map<IAttribute, Double> map, EntityLivingBase entity, EMagicElement element, int level) {
+		if (map == null) {
+			map = new HashMap<>();
+		}
+		
+		final int setCount = GetSetCount(entity, element, level);
+		
+		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
+			if (slot.getSlotType() != Type.ARMOR) {
+				continue;
+			}
+			
+			@Nullable ItemStack inSlot = entity.getItemStackFromSlot(slot);
+			if (inSlot == null || !(inSlot.getItem() instanceof EnchantedArmor)) {
+				continue;
+			}
+			
+			EnchantedArmor armorType = (EnchantedArmor) inSlot.getItem();
+			final int inSlotLevel = armorType.getLevel();
+			final EMagicElement inSlotElement = armorType.getElement();
+			if (inSlotLevel != level || inSlotElement != element) {
+				continue;
+			}
+			
+			for (EMagicElement elem : EMagicElement.values()) {
+				final double reduct = calcMagicSetReduct(slot, element, setCount, elem);
+				if (reduct == 0) {
+					continue;
+				}
+				
+				final AttributeMagicReduction inst = AttributeMagicReduction.instance(elem);
+				Double cur = map.get(inst);
+				if (cur == null) {
+					cur = 0.0;
+				}
+				
+				cur = cur + reduct;
+					
+				map.put(inst, cur);
+			}
+		}
+		
+		return map;
+	}
+	
+	private Map<IAttribute, Double> setMapInst = new HashMap<>();
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+		final boolean showFull = Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());
+		final int setCount = this.getSetPieces(playerIn, stack);
+		
+		final String setName = I18n.format("item.armor.set." + element.name().toLowerCase() + "." + level + ".name", new Object[0]);
+		if (showFull) {
+			tooltip.add(I18n.format("info.armor.set_total", setName, ChatFormatting.DARK_PURPLE, ChatFormatting.RESET));
+		} else {
+			
+			final String countFormat = "" + (setCount == 4 ? ChatFormatting.GOLD : ChatFormatting.YELLOW);
+			tooltip.add(I18n.format("info.armor.set_status", setName, setCount, countFormat, "" + ChatFormatting.RESET));
+		}
+		
+		synchronized(setMapInst) {
+			setMapInst.clear();
+			
+			if (showFull) {
+				// Show total
+				for (EMagicElement targElem : EMagicElement.values()) {
+					final double reduc = calcMagicSetReductTotal(element, 4, targElem);
+					setMapInst.put(AttributeMagicReduction.instance(targElem), reduc);
+				}
+			} else {
+				// Show current
+				FindCurrentSetBonus(setMapInst, playerIn, element, level); // puts into setMapInst
+			}
+			
+			if (!setMapInst.isEmpty()) {
+				for (Entry<IAttribute, Double> entry : setMapInst.entrySet()) {
+					Double val = entry.getValue();
+					if (val == null || val == 0) {
+						continue;
+					}
+					
+					// Formatting here copied from Vanilla
+					if (val > 0) {
+						tooltip.add(TextFormatting.BLUE + " " + I18n.format("attribute.modifier.plus.0", String.format("%.2f", val), I18n.format("attribute.name." + (String)entry.getKey().getAttributeUnlocalizedName())));
+					} else {
+						val = -val;
+						tooltip.add(TextFormatting.RED + " " + I18n.format("attribute.modifier.take.0", String.format("%.2f", val), I18n.format("attribute.name." + (String)entry.getKey().getAttributeUnlocalizedName())));
+					}
+				}
+			}
 		}
 	}
 	

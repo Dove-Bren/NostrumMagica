@@ -31,7 +31,7 @@ public class EnchantmentManaRecovery extends Enchantment {
      */
     public int getMinEnchantability(int enchantmentLevel)
     {
-        return enchantmentLevel * 15;
+        return 10 + ((enchantmentLevel - 1) * 15); // 10, 25, 40
     }
 
     /**
@@ -39,12 +39,12 @@ public class EnchantmentManaRecovery extends Enchantment {
      */
     public int getMaxEnchantability(int enchantmentLevel)
     {
-        return this.getMinEnchantability(enchantmentLevel) + 50;
+        return this.getMinEnchantability(enchantmentLevel) + 15;
     }
 
     public boolean isTreasureEnchantment()
     {
-        return true;
+        return false;
     }
 
     /**

@@ -9,6 +9,7 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.attributes.AttributeMagicReduction;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble.ItemType;
@@ -1664,51 +1665,70 @@ public class SpellAction {
 		if (target == null)
 			return amt;
 		
-		if (element == EMagicElement.PHYSICAL)
-			return applyArmor(target, base);
-		
-		int armor = target.getTotalArmorValue();
-		boolean undead = target.isEntityUndead();
-		boolean ender = false;
-		if (target instanceof EntityEnderman || target instanceof EntityEndermite
-				|| target instanceof EntityDragon)
-			ender = true;
-		boolean light = false;
-		if (target.height < 1.5f || target instanceof EntityEnderman)
-			light = true;
-		
 		PotionEffect boostEffect = caster.getActivePotionEffect(MagicBoostPotion.instance());
 		if (boostEffect != null) {
 			base *= Math.pow(1.5, boostEffect.getAmplifier() + 1);
 		}
 		
-		PotionEffect resEffect = target.getActivePotionEffect(MagicResistPotion.instance());
-		if (resEffect != null) {
-			base *= Math.pow(.75, resEffect.getAmplifier() + 1);
+		if (element == EMagicElement.PHYSICAL) {
+			base = applyArmor(target, base);
+			// Physical is reduced by real armor but not affected by magic resist effects and attributes.
+			// It still gains power from magic boost (above) AND is still reduces with magic reduction (below).
+		} else {
+		
+			int armor = target.getTotalArmorValue();
+			boolean undead = target.isEntityUndead();
+			boolean ender = false;
+			if (target instanceof EntityEnderman || target instanceof EntityEndermite
+					|| target instanceof EntityDragon)
+				ender = true;
+			boolean light = false;
+			if (target.height < 1.5f || target instanceof EntityEnderman)
+				light = true;
+			
+			PotionEffect resEffect = target.getActivePotionEffect(MagicResistPotion.instance());
+			if (resEffect != null) {
+				base *= Math.pow(.75, resEffect.getAmplifier() + 1);
+			}
+			
+			IAttributeInstance attr = target.getEntityAttribute(AttributeMagicResist.instance());
+			if (attr != null && attr.getAttributeValue() != 0.0D) {
+				base *= Math.max(0.0D, Math.min(2.0D, 1.0D - (attr.getAttributeValue() / 100.0D)));
+			}
+				
+			switch (element) {
+			case ENDER:
+				if (ender) return 0.0f; // does not affect ender
+				base *= 1.2f; // return raw damage (+20%) not affected by armor
+				break;
+			case LIGHTNING:
+				base *= (.75f + ((float) armor / 20f)); // double in power for every 20 armor
+				break;
+			case FIRE:
+				base *= (undead ? 1.5f : 1f); // 1.5x damage against undead. Regular otherwise
+				break;
+			case EARTH:
+				//base; // raw damage. Not affected by armor
+				break;
+			case ICE:
+				base *= (undead ? .6f : 1.3f); // More affective against everything except undead
+				break;
+			case WIND:
+				base *= (light ? 1.8f : .8f); // 180% against light (endermen included) enemies
+				break;
+			default:
+				//base;
+				break;
+			}
 		}
 		
-		IAttributeInstance attr = target.getEntityAttribute(AttributeMagicResist.instance());
+		// Apply armor reductions
+		IAttributeInstance attr = target.getEntityAttribute(AttributeMagicReduction.instance(element));
 		if (attr != null && attr.getAttributeValue() != 0.0D) {
-			base *= Math.max(0.0D, Math.min(2.0D, 1.0D - (attr.getAttributeValue() / 100.0D)));
+			base -= attr.getAttributeValue();
 		}
-			
-		switch (element) {
-		case ENDER:
-			if (ender) return 0.0f; // does not affect ender
-			return base * 1.2f; // return raw damage (+20%) not affected by armor
-		case LIGHTNING:
-			return base * (.75f + ((float) armor / 20f)); // double in power for every 20 armor
-		case FIRE:
-			return base * (undead ? 1.5f : 1f); // 1.5x damage against undead. Regular otherwise
-		case EARTH:
-			return base; // raw damage. Not affected by armor
-		case ICE:
-			return base * (undead ? .6f : 1.3f); // More affective against everything except undead
-		case WIND:
-			return base * (light ? 1.8f : .8f); // 180% against light (endermen included) enemies
-		default:
-			return base;
-		}
+		
+		return base;
 	}
 	
 	public static final float applyArmor(EntityLivingBase target, float damage) {
