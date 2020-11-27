@@ -53,7 +53,7 @@ public class ClientEffectEchoed extends ClientEffect {
 			GlStateManager.pushMatrix();
 			if (!this.modifiers.isEmpty())
 				for (ClientEffectModifier mod : modifiers) {
-					mod.apply(newDetail, progress + diff);
+					mod.apply(newDetail, progress + diff, partialTicks);
 				}
 			
 			effect.drawForm(newDetail, mc, progress + diff, partialTicks);

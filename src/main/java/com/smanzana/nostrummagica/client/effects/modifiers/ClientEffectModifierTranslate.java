@@ -19,12 +19,12 @@ public class ClientEffectModifierTranslate implements ClientEffectModifier {
 	}
 	
 	@Override
-	public void apply(ClientEffectRenderDetail detail, float progress) {
+	public void apply(ClientEffectRenderDetail detail, float progress, float partialTicks) {
 		GlStateManager.translate(x, y, z);
 	}
 
 	@Override
-	public void earlyApply(ClientEffectRenderDetail detail, float progress) {
+	public void earlyApply(ClientEffectRenderDetail detail, float progress, float partialTicks) {
 		;
 	}
 }

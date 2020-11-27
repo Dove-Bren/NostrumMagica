@@ -1528,6 +1528,10 @@ public class ClientProxy extends CommonProxy {
 			EntityLivingBase caster, Vec3d casterPos,
 			EntityLivingBase target, Vec3d targetPos,
 			SpellComponentWrapper flavor, boolean isNegative, float compParam) {
+		if (world == null && target != null) {
+			world = target.worldObj;
+		}
+		
 		if (world != null) {
 			if (!world.isRemote) {
 				super.spawnEffect(world, comp, caster, casterPos, target, targetPos, flavor, isNegative, compParam);

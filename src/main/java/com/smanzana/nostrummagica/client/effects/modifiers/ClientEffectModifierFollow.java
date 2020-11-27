@@ -4,6 +4,7 @@ import com.smanzana.nostrummagica.client.effects.ClientEffect.ClientEffectRender
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.math.Vec3d;
 
 public class ClientEffectModifierFollow implements ClientEffectModifier {
 
@@ -14,12 +15,13 @@ public class ClientEffectModifierFollow implements ClientEffectModifier {
 	}
 	
 	@Override
-	public void apply(ClientEffectRenderDetail detail, float progress) {
+	public void apply(ClientEffectRenderDetail detail, float progress, float partialTicks) {
 		;
 	}
 
 	@Override
-	public void earlyApply(ClientEffectRenderDetail detail, float progress) {
-		GlStateManager.translate(entity.posX, entity.posY, entity.posZ);
+	public void earlyApply(ClientEffectRenderDetail detail, float progress, float partialTicks) {
+		Vec3d pos = entity.getPositionEyes(partialTicks).subtract(0, entity.getEyeHeight(), 0);
+		GlStateManager.translate(pos.xCoord, pos.yCoord, pos.zCoord);
 	}
 }

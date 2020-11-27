@@ -81,7 +81,7 @@ public class ClientEffect {
 		ClientEffectRenderDetail detail = new ClientEffectRenderDetail();
 		detail.alpha = detail.red = detail.green = detail.blue = 1f;
 		
-		preModHook(detail, progress);
+		preModHook(detail, progress, partialTicks);
 		
 		GlStateManager.disableBlend();
 		GlStateManager.disableAlpha();
@@ -100,16 +100,16 @@ public class ClientEffect {
 
 		if (!this.modifiers.isEmpty())
 		for (ClientEffectModifier mod : modifiers) {
-			mod.apply(detail, progress);
+			mod.apply(detail, progress, partialTicks);
 		}
 		
 		form.draw(mc, partialTicks, detail.getColor());
 	}
 	
-	protected void preModHook(ClientEffectRenderDetail detail, float progress) {
+	protected void preModHook(ClientEffectRenderDetail detail, float progress, float partialTicks) {
 		if (!this.modifiers.isEmpty())
 		for (ClientEffectModifier mod : modifiers) {
-			mod.earlyApply(detail, progress);
+			mod.earlyApply(detail, progress, partialTicks);
 		}
 		GlStateManager.translate(origin.xCoord, origin.yCoord, origin.zCoord);
 	}

@@ -136,6 +136,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
     public static final float BOND_LEVEL_MANA = 0.95f;
     public static final float BOND_LEVEL_BREED = 0.999f;
     
+    private static final double DRAGON_BOND_DISTANCE_SQ = 100;
+    
     private static final float DRAGON_MIN_HEALTH = 10.0f;
     private static final int DRAGON_INV_SIZE = 27;
     
@@ -1658,6 +1660,16 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			}
 			
 			this.addXP(xp);
+			
+			// Bond with nearby owner
+			@Nullable EntityLivingBase owner = this.getOwner();
+			if (owner != null) {
+				if (owner.equals(this.getControllingPassenger())) {
+					this.addBond(.5f);
+				} else if (this.getDistanceSqToEntity(owner) < DRAGON_BOND_DISTANCE_SQ) {
+					this.addBond(.2f);
+				}
+			}
 		}
 		
 		if (getRNG().nextInt(10) == 0) {
@@ -1682,10 +1694,14 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			
 			this.addXP(xp);
 			
-			EntityLivingBase owner = this.getOwner();
-			if (owner != null && owner.equals(this.getControllingPassenger())) {
-				// Owner is riding
-				this.addBond(.5f);
+			// Bond with nearby owner
+			@Nullable EntityLivingBase owner = this.getOwner();
+			if (owner != null) {
+				if (owner.equals(this.getControllingPassenger())) {
+					this.addBond(.5f);
+				} else if (this.getDistanceSqToEntity(owner) < DRAGON_BOND_DISTANCE_SQ) {
+					this.addBond(.2f);
+				}
 			}
 		}
 		

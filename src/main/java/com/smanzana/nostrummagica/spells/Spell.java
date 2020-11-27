@@ -222,7 +222,7 @@ public class Spell {
 							else
 								comp = new SpellComponentWrapper(next.getAlteration());
 							
-							NostrumMagica.proxy.spawnEffect(null, comp,
+							NostrumMagica.proxy.spawnEffect(world, comp,
 									caster, null, affected, null,
 									new SpellComponentWrapper(next.getElement()), harmful, 0);
 						}

@@ -19,7 +19,7 @@ public class ClientEffectModifierRotate implements ClientEffectModifier {
 	}
 	
 	@Override
-	public void apply(ClientEffectRenderDetail detail, float progress) {
+	public void apply(ClientEffectRenderDetail detail, float progress, float partialTicks) {
 		float rotX = progress * rotationsX * 360f;
 		float rotY = progress * rotationsY * 360f;
 		float rotZ = progress * rotationsZ * 360f;
@@ -29,7 +29,7 @@ public class ClientEffectModifierRotate implements ClientEffectModifier {
 	}
 
 	@Override
-	public void earlyApply(ClientEffectRenderDetail detail, float progress) {
+	public void earlyApply(ClientEffectRenderDetail detail, float progress, float partialTicks) {
 		;
 	}
 

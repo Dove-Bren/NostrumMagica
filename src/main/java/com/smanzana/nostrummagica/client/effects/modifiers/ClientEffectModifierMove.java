@@ -24,7 +24,7 @@ public class ClientEffectModifierMove implements ClientEffectModifier {
 	}
 	
 	@Override
-	public void apply(ClientEffectRenderDetail detail, float progress) {
+	public void apply(ClientEffectRenderDetail detail, float progress, float partialTicks) {
 		if (progress < this.startTime) {
 			GlStateManager.translate(startPos.xCoord, startPos.yCoord, startPos.zCoord);
 		} else if (progress < this.endTime) {
@@ -42,7 +42,7 @@ public class ClientEffectModifierMove implements ClientEffectModifier {
 	}
 
 	@Override
-	public void earlyApply(ClientEffectRenderDetail detail, float progress) {
+	public void earlyApply(ClientEffectRenderDetail detail, float progress, float partialTicks) {
 		;
 	}
 
