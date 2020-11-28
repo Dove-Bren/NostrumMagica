@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.ActiveHopper;
 import com.smanzana.nostrummagica.blocks.AltarBlock;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.ChalkBlock;
@@ -766,6 +767,15 @@ public class CommonProxy {
     	GameRegistry.register(CropEssence.instance(),
     			new ResourceLocation(NostrumMagica.MODID, CropEssence.ID));
     	//CropEssence.init();
+    	
+    	GameRegistry.register(ActiveHopper.instance,
+    			new ResourceLocation(NostrumMagica.MODID, ActiveHopper.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(ActiveHopper.instance).setRegistryName(ActiveHopper.ID)
+    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(ActiveHopper.ID))
+    			);
+    	ActiveHopper.init();
+    	// TODO ritual and research
     }
     
     public void syncPlayer(EntityPlayerMP player) {

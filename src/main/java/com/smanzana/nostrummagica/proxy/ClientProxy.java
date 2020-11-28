@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import org.lwjgl.input.Keyboard;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.ActiveHopper;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.CursedIce;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
@@ -657,6 +658,9 @@ public class ClientProxy extends CommonProxy {
 		registerModel(Item.getItemFromBlock(PutterBlock.instance()),
 				0,
 				PutterBlock.ID);
+		registerModel(Item.getItemFromBlock(ActiveHopper.instance),
+				0,
+				ActiveHopper.ID);
 	}
 	
 	@Override

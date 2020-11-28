@@ -16,6 +16,7 @@ import com.smanzana.nostrummagica.aetheria.AetheriaProxy;
 import com.smanzana.nostrummagica.baubles.BaublesProxy;
 import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble.ItemType;
+import com.smanzana.nostrummagica.blocks.ActiveHopper;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.blocks.LoreTable;
@@ -1273,6 +1274,18 @@ public class NostrumMagica
 				new OutcomeSpawnItem(new ItemStack(PutterBlock.instance())))
 			);
 		
+		// Active Hopper
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("active_hopper",
+					new ItemStack(ActiveHopper.instance),
+					null,
+					new ReagentType[] {ReagentType.MANDRAKE_ROOT, ReagentType.SPIDER_SILK, ReagentType.GINSENG, ReagentType.CRYSTABLOOM},
+					new ItemStack(Blocks.HOPPER),
+					new ItemStack[] {new ItemStack(Blocks.HOPPER), new ItemStack(Blocks.REDSTONE_BLOCK), new ItemStack(Blocks.HOPPER), new ItemStack(Blocks.HOPPER)},
+					new RRequirementResearch("active_hopper"),
+					new OutcomeSpawnItem(new ItemStack(ActiveHopper.instance, 4)))
+				);
+		
 		// Facade
 		RitualRegistry.instance().addRitual(
 			RitualRecipe.createTier3("mimic_facade",
@@ -2016,13 +2029,18 @@ public class NostrumMagica
 			.hiddenParent("rituals")
 			.hiddenParent("magic_token")
 			.reference("ritual::putter", "ritual.putter.name")
-		.build("putter", NostrumResearchTab.TINKERING, Size.NORMAL, -1, 1, true, new ItemStack(PutterBlock.instance()));
+		.build("putter", NostrumResearchTab.TINKERING, Size.NORMAL, -1, -1, true, new ItemStack(PutterBlock.instance()));
+		
+		NostrumResearch.startBuilding()
+			.parent("putter")
+			.reference("ritual::active_hopper", "ritual.active_hopper.name")
+		.build("active_hopper", NostrumResearchTab.TINKERING, Size.NORMAL, -1, 0, true, new ItemStack(ActiveHopper.instance));
 		
 		NostrumResearch.startBuilding()
 			.hiddenParent("rituals")
 			.reference("ritual::mimic_facade", "ritual.mimic_facade.name")
 			.reference("ritual::mimic_door", "ritual.mimic_door.name")
-		.build("magicfacade", NostrumResearchTab.TINKERING, Size.NORMAL, -2, 1, true, new ItemStack(MimicBlock.facade()));
+		.build("magicfacade", NostrumResearchTab.TINKERING, Size.NORMAL, -2, -1, true, new ItemStack(MimicBlock.facade()));
 		
 		
 		// Advanced Magica
@@ -2193,6 +2211,11 @@ public class NostrumMagica
     	INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
 			return false;
+		
+		List<String> finished = attr.getCompletedResearches();
+		if (finished.contains(research.getKey())) {
+			return true;
+		}
     	
     	if (research.isHidden()) {
     		return canPurchaseResearch(player, research);
@@ -2203,7 +2226,6 @@ public class NostrumMagica
     		return true;
     	}
     	
-    	List<String> finished = attr.getCompletedResearches();
     	if (finished == null || finished.isEmpty()) {
     		return false;
     	}

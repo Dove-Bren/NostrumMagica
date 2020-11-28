@@ -1,0 +1,7 @@
+{
+    "parent": "nostrummagica:block/active_hopper_off",
+    "textures": {
+        "particle": "nostrummagica:blocks/hopper_outside_on",
+        "side": "nostrummagica:blocks/hopper_outside_on"
+    }
+}

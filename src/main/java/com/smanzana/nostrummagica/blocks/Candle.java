@@ -87,9 +87,9 @@ public class Candle extends Block implements ITileEntityProvider {
 	}
 	
 	public Candle() {
-		super(Material.BARRIER, MapColor.DIAMOND);
+		super(Material.CLOTH, MapColor.DIAMOND);
 		this.setUnlocalizedName(ID);
-		this.setHardness(1.0f);
+		this.setHardness(0.1f);
 		this.setResistance(10.0f);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setSoundType(SoundType.PLANT);

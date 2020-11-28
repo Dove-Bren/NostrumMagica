@@ -5,12 +5,14 @@ import java.util.List;
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.aetheria.blocks.WispBlock.WispBlockTileEntity;
+import com.smanzana.nostrummagica.blocks.ActiveHopper.ActiveHopperTileEntity;
 import com.smanzana.nostrummagica.blocks.LoreTable.LoreTableEntity;
 import com.smanzana.nostrummagica.blocks.ModificationTable.ModificationTableEntity;
 import com.smanzana.nostrummagica.blocks.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.blocks.PutterBlock.PutterBlockTileEntity;
 import com.smanzana.nostrummagica.blocks.SpellTable.SpellTableEntity;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.gui.container.ActiveHopperGui;
 import com.smanzana.nostrummagica.client.gui.container.LoreTableGui;
 import com.smanzana.nostrummagica.client.gui.container.ModificationTableGui;
 import com.smanzana.nostrummagica.client.gui.container.PutterBlockGui;
@@ -46,6 +48,7 @@ public class NostrumGui implements IGuiHandler {
 	public static final int dragonID = 9;
 	public static final int wispblockID = 10;
 	public static final int putterBlockID = 11;
+	public static final int activeHopperID = 11;
 	
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
@@ -126,6 +129,15 @@ public class NostrumGui implements IGuiHandler {
 				return new PutterBlockGui.PutterBlockContainer(
 						player.inventory,
 						(PutterBlockTileEntity) ent); // should be tile inventory
+			}
+		}
+		
+		if (ID == activeHopperID) {
+			TileEntity ent = world.getTileEntity(new BlockPos(x, y, z));
+			if (ent != null && ent instanceof ActiveHopperTileEntity) {
+				return new ActiveHopperGui.ActiveHopperContainer(
+						player.inventory,
+						(ActiveHopperTileEntity) ent); // should be tile inventory
 			}
 		}
 		
@@ -254,6 +266,15 @@ public class NostrumGui implements IGuiHandler {
 				return new PutterBlockGui.PutterBlockGuiContainer(new PutterBlockGui.PutterBlockContainer(
 						player.inventory,
 						(PutterBlockTileEntity) ent)); // should be tile inventory
+			}
+		}
+		
+		if (ID == activeHopperID) {
+			TileEntity ent = world.getTileEntity(new BlockPos(x, y, z));
+			if (ent != null && ent instanceof ActiveHopperTileEntity) {
+				return new ActiveHopperGui.ActiveHopperGuiContainer(new ActiveHopperGui.ActiveHopperContainer(
+						player.inventory,
+						(ActiveHopperTileEntity) ent)); // should be tile inventory
 			}
 		}
 		
