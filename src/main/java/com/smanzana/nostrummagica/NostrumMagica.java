@@ -19,6 +19,7 @@ import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble.ItemType;
 import com.smanzana.nostrummagica.blocks.ActiveHopper;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
+import com.smanzana.nostrummagica.blocks.ItemDuct;
 import com.smanzana.nostrummagica.blocks.LoreTable;
 import com.smanzana.nostrummagica.blocks.MimicBlock;
 import com.smanzana.nostrummagica.blocks.ModificationTable;
@@ -1286,6 +1287,18 @@ public class NostrumMagica
 					new OutcomeSpawnItem(new ItemStack(ActiveHopper.instance, 4)))
 				);
 		
+		// Active Hopper
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("item_duct",
+					new ItemStack(ItemDuct.instance),
+					null,
+					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SPIDER_SILK, ReagentType.GINSENG, ReagentType.MANDRAKE_ROOT},
+					new ItemStack(Blocks.HOPPER),
+					new ItemStack[] {new ItemStack(Items.IRON_INGOT), new ItemStack(Blocks.IRON_BLOCK), new ItemStack(Items.IRON_INGOT), new ItemStack(Blocks.REDSTONE_BLOCK)},
+					new RRequirementResearch("item_duct"),
+					new OutcomeSpawnItem(new ItemStack(ItemDuct.instance, 16)))
+				);
+		
 		// Facade
 		RitualRegistry.instance().addRitual(
 			RitualRecipe.createTier3("mimic_facade",
@@ -2035,6 +2048,11 @@ public class NostrumMagica
 			.parent("putter")
 			.reference("ritual::active_hopper", "ritual.active_hopper.name")
 		.build("active_hopper", NostrumResearchTab.TINKERING, Size.NORMAL, -1, 0, true, new ItemStack(ActiveHopper.instance));
+		
+		NostrumResearch.startBuilding()
+			.parent("active_hopper")
+			.reference("ritual::item_duct", "ritual.item_duct.name")
+		.build("item_duct", NostrumResearchTab.TINKERING, Size.LARGE, -1, 1, true, new ItemStack(ItemDuct.instance));
 		
 		NostrumResearch.startBuilding()
 			.hiddenParent("rituals")

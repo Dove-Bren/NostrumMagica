@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.blocks.CropMandrakeRoot;
 import com.smanzana.nostrummagica.blocks.CursedIce;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.blocks.EssenceOre;
+import com.smanzana.nostrummagica.blocks.ItemDuct;
 import com.smanzana.nostrummagica.blocks.LogicDoor;
 import com.smanzana.nostrummagica.blocks.LoreTable;
 import com.smanzana.nostrummagica.blocks.MagicDirt;
@@ -775,7 +776,14 @@ public class CommonProxy {
     					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(ActiveHopper.ID))
     			);
     	ActiveHopper.init();
-    	// TODO ritual and research
+    	
+    	GameRegistry.register(ItemDuct.instance,
+    			new ResourceLocation(NostrumMagica.MODID, ItemDuct.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(ItemDuct.instance).setRegistryName(ItemDuct.ID)
+    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(ItemDuct.ID))
+    			);
+    	ItemDuct.init();
     }
     
     public void syncPlayer(EntityPlayerMP player) {

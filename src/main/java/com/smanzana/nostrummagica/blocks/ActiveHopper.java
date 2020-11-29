@@ -228,7 +228,7 @@ public class ActiveHopper extends BlockContainer {
 		return BlockRenderLayer.CUTOUT_MIPPED;
 	}
 	
-	public static class ActiveHopperTileEntity extends TileEntity implements IHopper, ITickable {
+	public static class ActiveHopperTileEntity extends TileEntity implements IHopper, ISidedInventory, ITickable {
 		
 		private static final String NBT_SLOT = "slot";
 		private static final String NBT_CUSTOMNAME = "custom_name";
@@ -272,10 +272,18 @@ public class ActiveHopper extends BlockContainer {
 		public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState) {
 			return !(newState.getBlock() instanceof ActiveHopper);
 		}
+		
+		private static final int NUM_SLOTS = 1;
+		private static final int[] SLOTS_ARR = new int[NUM_SLOTS];
+		{
+			for (int i = 0; i < NUM_SLOTS; i++) {
+				SLOTS_ARR[i] = i;
+			}
+		}
 
 		@Override
 		public int getSizeInventory() {
-			return 1;
+			return NUM_SLOTS;
 		}
 
 		@Override
@@ -485,13 +493,24 @@ public class ActiveHopper extends BlockContainer {
 			@Nullable TileEntity te = worldObj.getTileEntity(pos.offset(direction));
 			
 			if (te != null) {
-				if (te instanceof IInventory) {
-					return pushInto((IInventory) te, direction);
-				}
-				
 				if (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite())) {
 					@Nullable IItemHandler handler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite());
 					return pushInto(handler, direction);
+				}
+				
+				if (te instanceof IInventory) {
+					
+					IInventory inv = (IInventory) te;
+					
+					// Special cast for stupid chests :P
+					if (te instanceof TileEntityChest) {
+						IBlockState state = worldObj.getBlockState(pos.offset(direction));
+						if (state != null && state.getBlock() instanceof BlockChest) {
+							inv = ((BlockChest)state.getBlock()).getContainer(worldObj, pos.offset(direction), true);
+						}
+					}
+					
+					return pushInto(inv, direction);
 				}
 			}
 			
@@ -516,8 +535,13 @@ public class ActiveHopper extends BlockContainer {
 					
 					// Can insert. Would it fit?
 					@Nullable ItemStack inSlot = sided.getStackInSlot(insertIndex);
-					if (inSlot == null
-							|| !inSlot.isStackable()
+					if (inSlot == null) {
+						sided.setInventorySlotContents(insertIndex, copyToInsert);
+						this.decrStackSize(0, 1);
+						return true;
+					}
+					
+					if (!inSlot.isStackable()
 							|| inSlot.stackSize >= inSlot.getMaxStackSize()
 							|| inSlot.stackSize >= sided.getInventoryStackLimit()) {
 						continue;
@@ -564,6 +588,11 @@ public class ActiveHopper extends BlockContainer {
 			@Nullable TileEntity te = worldObj.getTileEntity(pos.offset(direction));
 			
 			if (te != null) {
+				if (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction)) {
+					@Nullable IItemHandler handler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction);
+					return pullFrom(handler, direction);
+				}
+				
 				if (te instanceof IInventory) {
 					
 					IInventory inv = (IInventory) te;
@@ -576,11 +605,6 @@ public class ActiveHopper extends BlockContainer {
 						}
 					}
 					return pullFrom(inv, direction);
-				}
-				
-				if (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction)) {
-					@Nullable IItemHandler handler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction);
-					return pullFrom(handler, direction);
 				}
 			}
 			
@@ -670,6 +694,33 @@ public class ActiveHopper extends BlockContainer {
 			
 			final BlockPos spot = forPull ? pos.offset(direction.getOpposite()) : pos.offset(direction);
 			return new AxisAlignedBB(0, 0, 0, 1, 1, 1).offset(spot);
+		}
+		
+		@Override
+		public int[] getSlotsForFace(EnumFacing side) {
+			return SLOTS_ARR;
+		}
+
+		@Override
+		public boolean canInsertItem(int index, ItemStack itemStackIn, EnumFacing side) {
+			final EnumFacing direction = GetFacing(worldObj.getBlockState(pos));
+			if (side == direction) {
+				// Coming in our output
+				return false;
+			}
+			
+			return canPull(itemStackIn);
+		}
+
+		@Override
+		public boolean canExtractItem(int index, ItemStack stack, EnumFacing side) {
+			final EnumFacing direction = GetFacing(worldObj.getBlockState(pos));
+			if (side == direction.getOpposite()) {
+				// pulling from our mouth?
+				return false;
+			}
+			
+			return true;
 		}
 		
 	}
