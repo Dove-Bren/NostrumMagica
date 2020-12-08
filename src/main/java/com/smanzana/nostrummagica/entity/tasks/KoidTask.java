@@ -548,8 +548,10 @@ public class KoidTask extends EntityAIBase {
 	
 	private void setupCombat() {
 		int count = rand.nextInt(3) + 2;
+		int attempts = 10;
 		
-		while (count > 0) {
+		while (count > 0 && attempts > 0) {
+			attempts--;
 			int type = rand.nextInt(3);
 			if (type-- == 0) {
 				// Melee, if it's there

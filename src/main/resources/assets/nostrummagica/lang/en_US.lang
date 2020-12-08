@@ -163,6 +163,13 @@ item.armor_feet_ender1.name=Ender Sandles
 item.armor_feet_ender2.name=Ender Getas
 item.armor_feet_ender3.name=Ender Boots
 
+item.dragonarmor_body_iron.name=Scale Dragon Armor
+item.dragonarmor_body_gold.name=Golden Dragon Armor
+item.dragonarmor_body_diamond.name=Diamond Dragon Armor
+item.dragonarmor_helm_iron.name=Scale Dragon Helm
+item.dragonarmor_helm_gold.name=Golden Dragon Helm
+item.dragonarmor_helm_diamond.name=Diamond Dragon Helm
+
 item.mage_staff.name=Mage Staff
 item.thanos_staff.name=Staff of Thanos
 
@@ -261,6 +268,9 @@ item.armor.set.earth.2.name=Tremor
 item.armor.set.ender.0.name=Endermite
 item.armor.set.ender.1.name=Enderman
 item.armor.set.ender.2.name=Ender
+
+item.modifiers.dragonslot.body=When on body:
+item.modifiers.dragonslot.helm=When on head:
 
 potion.frostbite.name=Frostbite
 potion.shieldphysical.name=Physical Ward
@@ -875,6 +885,20 @@ ritual.spawn_warlock_sword.name=Craft Warlock Blade
 ritual.spawn_enchanted_armor.name=Enchant Armor
 ritual.spawn_enchanted_weapon.name=Enchant Weapon
 
+ritual.craft_dragonarmor_body_iron.name=Craft Scale Dragon Armor
+ritual.craft_dragonarmor_body_gold.name=Craft Golden Dragon Armor
+ritual.craft_dragonarmor_body_diamond.name=Craft Diamond Dragon Armor
+ritual.craft_dragonarmor_helm_iron.name=Craft Scale Dragon Helm
+ritual.craft_dragonarmor_helm_gold.name=Craft Golden Dragon Helm
+ritual.craft_dragonarmor_helm_diamond.name=Craft Diamond Dragon Helm
+
+ritual.upgrade_dragonarmor_body_iron.name=Upgrade To Scale Dragon Armor
+ritual.upgrade_dragonarmor_body_gold.name=Upgrade To Golden Dragon Armor
+ritual.upgrade_dragonarmor_body_diamond.name=Upgrade To Diamond Dragon Armor
+ritual.upgrade_dragonarmor_helm_iron.name=Upgrade To Scale Dragon Helm
+ritual.upgrade_dragonarmor_helm_gold.name=Upgrade To Golden Dragon Helm
+ritual.upgrade_dragonarmor_helm_diamond.name=Upgrade To Diamond Dragon Helm
+
 enhancement.lower_reagent_cost.name=Lower Reagent Cost
 enhancement.lower_reagent_cost.desc=Reduces the amount of reagents used up when casting a spell
 enhancement.lower_mana_cost.name=Lower Mana Cost
@@ -1266,6 +1290,9 @@ research.magicfacade.info=  A very simple and practical application of magic is 
 research.essence_seeds.name=Essence Seeds
 research.essence_seeds.desc=Renewable Essence
 research.essence_seeds.info=  In a feat of magic and inginuity, you've created seeds that store the power of magical essences.|  These seeds, once matured, will drop random magical essences.
+research.dragon_armor.name=Dragon Armor
+research.dragon_armor.desc=Protecting your new partner
+research.dragon_armor.info=  Dragons have natural armor from their thick dragon hide. However, a few trips into the nether with your companion was all it took to realize some extra padding wouldn't hurt.|  Dragon armor can be equipped on a dragon in the inventory tab, assuming you've gained enough dragon bond to access it. Dragons can wear body armor as well as helmets.
 
 research.wispblock.name=Wisp Summoning
 research.wispblock.desc=Wispful thinking?

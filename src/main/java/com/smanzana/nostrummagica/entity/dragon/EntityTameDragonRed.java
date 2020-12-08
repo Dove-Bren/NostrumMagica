@@ -21,6 +21,7 @@ import com.smanzana.nostrummagica.entity.IEntityTameable;
 import com.smanzana.nostrummagica.entity.PetInfo;
 import com.smanzana.nostrummagica.entity.PetInfo.PetAction;
 import com.smanzana.nostrummagica.entity.PetInfo.SecondaryFlavor;
+import com.smanzana.nostrummagica.entity.dragon.EntityDragon.DragonEquipmentInventory.IChangeListener;
 import com.smanzana.nostrummagica.entity.dragon.IDragonSpawnData.IDragonSpawnFactory;
 import com.smanzana.nostrummagica.entity.tasks.DragonAINearestAttackableTarget;
 import com.smanzana.nostrummagica.entity.tasks.DragonGambittedSpellAttackTask;
@@ -31,6 +32,7 @@ import com.smanzana.nostrummagica.entity.tasks.EntityAIOwnerHurtByTargetGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIOwnerHurtTargetGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIPanicGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAISitGeneric;
+import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
 import com.smanzana.nostrummagica.items.NostrumRoseItem;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -80,7 +82,7 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityTameable, ITameDragon {
+public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityTameable, ITameDragon, IChangeListener {
 
 	protected static final DataParameter<Boolean> HATCHED = EntityDataManager.<Boolean>createKey(EntityTameDragonRed.class, DataSerializers.BOOLEAN);
 	protected static final DataParameter<Boolean> TAMED = EntityDataManager.<Boolean>createKey(EntityTameDragonRed.class, DataSerializers.BOOLEAN);
@@ -107,6 +109,9 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
     protected static final DataParameter<Float> SYNCED_MAX_HEALTH  = EntityDataManager.<Float>createKey(EntityTameDragonRed.class, DataSerializers.FLOAT);
     protected static final DataParameter<PetAction> DATA_PET_ACTION = EntityDataManager.<PetAction>createKey(EntityTameDragonRed.class, PetAction.Serializer);
     
+    protected static final DataParameter<Optional<ItemStack>> DATA_ARMOR_BODY = EntityDataManager.<Optional<ItemStack>>createKey(EntityTameDragonRed.class, DataSerializers.OPTIONAL_ITEM_STACK);
+    protected static final DataParameter<Optional<ItemStack>> DATA_ARMOR_HELM = EntityDataManager.<Optional<ItemStack>>createKey(EntityTameDragonRed.class, DataSerializers.OPTIONAL_ITEM_STACK);
+    
     protected static final String NBT_HATCHED = "Hatched";
     protected static final String NBT_TAMED = "Tamed";
     protected static final String NBT_OWNER_ID = "OwnerUUID";
@@ -126,6 +131,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
     protected static final String NBT_ATTR_LEVEL = "AttrLevel";
     protected static final String NBT_ATTR_BOND = "AttrBond";
     protected static final String NBT_INVENTORY = "DRInventory";
+    protected static final String NBT_EQUIPMENT = "DREquipment";
     protected static final String NBT_SPELL_INVENTORY = "DRSpellInventory";
     
     public static final float BOND_LEVEL_FOLLOW = 0.05f;
@@ -154,7 +160,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
     private DragonAINearestAttackableTarget<EntityPlayer> aiPlayerTarget;
     private EntityAIHurtByTarget aiRevengeTarget;
     
-    private IInventory inventory;
+    private IInventory inventory; // Full player-accessable inventory
+    private final DragonEquipmentInventory equipment;
     private RedDragonSpellInventory spellInventory;
     
     // Internal timers for controlling while riding
@@ -168,6 +175,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
         this.isImmuneToFire = true;
         
         this.inventory = new InventoryBasic("Dragon Inventory", true, DRAGON_INV_SIZE);
+        this.equipment = new DragonEquipmentInventory(this);
         this.spellInventory = new RedDragonSpellInventory("Dragon Spell Inventory", true);
 	}
 	
@@ -193,6 +201,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		this.dataManager.register(SYNCED_MAX_HEALTH, 100.0f);
 		this.dataManager.register(DATA_PET_ACTION, PetAction.WAITING);
 		this.dataManager.register(HATCHED, false);
+		this.dataManager.register(DATA_ARMOR_BODY, Optional.absent());
+		this.dataManager.register(DATA_ARMOR_HELM, Optional.absent());
 		
 		final EntityTameDragonRed dragon = this;
 		aiPlayerTarget = new DragonAINearestAttackableTarget<EntityPlayer>(this, EntityPlayer.class, true, new Predicate<EntityPlayer>() {
@@ -673,6 +683,12 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			compound.setTag(NBT_INVENTORY, invTag);
 		}
 		
+		// Write equipment
+		{
+			NBTTagCompound equipTag = this.equipment.serializeNBT();
+			compound.setTag(NBT_EQUIPMENT, equipTag);
+		}
+		
 		// Write spell inventory
 		{
 			compound.setTag(NBT_SPELL_INVENTORY, this.spellInventory.toNBT());
@@ -752,6 +768,12 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 				}
 				this.inventory.setInventorySlotContents(i, stack);
 			}
+		}
+		
+		// Read equipment
+		{
+			this.equipment.clear();
+			this.equipment.readFromNBT(compound.getCompoundTag(NBT_EQUIPMENT));
 		}
 		
 		// Read spell inventory
@@ -1211,9 +1233,19 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			this.getOwner().addChatMessage(this.getCombatTracker().getDeathMessage());
 		}
 		
-		if (!this.worldObj.isRemote && this.inventory != null) {
-			for (int i = 0; i < inventory.getSizeInventory(); i++) {
-				ItemStack stack = inventory.getStackInSlot(i);
+		if (!this.worldObj.isRemote) {
+			if (this.inventory != null) {
+				for (int i = 0; i < inventory.getSizeInventory(); i++) {
+					ItemStack stack = inventory.getStackInSlot(i);
+					if (stack != null && stack.stackSize != 0) {
+						EntityItem item = new EntityItem(this.worldObj, this.posX, this.posY, this.posZ, stack);
+						this.worldObj.spawnEntityInWorld(item);
+					}
+				}
+			}
+			
+			for (DragonEquipmentSlot slot : DragonEquipmentSlot.values()) {
+				ItemStack stack = equipment.getStackInSlot(slot);
 				if (stack != null && stack.stackSize != 0) {
 					EntityItem item = new EntityItem(this.worldObj, this.posX, this.posY, this.posZ, stack);
 					this.worldObj.spawnEntityInWorld(item);
@@ -2218,5 +2250,66 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	@Override
 	public PetInfo getPetSummary() {
 		return PetInfo.claim(getHealth(), getMaxHealth(), getXP(), getMaxXP(), SecondaryFlavor.PROGRESS, getPetAction());
+	}
+
+	@Override
+	public void onChange(DragonEquipmentSlot slot, ItemStack oldStack, ItemStack newStack) {
+		if (slot != null) {
+			if (slot == DragonEquipmentSlot.BODY) {
+				dataManager.set(DATA_ARMOR_BODY, Optional.fromNullable(newStack));
+			} else if (slot == DragonEquipmentSlot.HELM) {
+				dataManager.set(DATA_ARMOR_HELM, Optional.fromNullable(newStack));
+			}
+		}
+		// else
+		// All slots changed. Scan and update!
+		for (DragonEquipmentSlot scanSlot : DragonEquipmentSlot.values()) {
+			@Nullable ItemStack inSlot = equipment.getStackInSlot(scanSlot);
+			if (scanSlot == DragonEquipmentSlot.BODY) {
+				dataManager.set(DATA_ARMOR_BODY, Optional.fromNullable(inSlot));
+			} else if (scanSlot == DragonEquipmentSlot.HELM) {
+				dataManager.set(DATA_ARMOR_HELM, Optional.fromNullable(inSlot));
+			}
+		}
+	}
+	
+	public DragonEquipmentInventory getDragonEquipmentInventory() {
+		return this.equipment;
+	}
+	
+//	// I hate this
+//	private static final Map<DragonArmorMaterial, Map<DragonEquipmentSlot, ItemStack>> ClientStacks = new EnumMap<>(DragonArmorMaterial.class);
+	
+	@Override
+	public @Nullable ItemStack getDragonEquipment(DragonEquipmentSlot slot) {
+		// Defer to synced data param if on client. Otherwise, look in equipment inventory
+		if (this.worldObj.isRemote) {
+			
+//			// Init stacks if missing
+//			if (ClientStacks.isEmpty() || ClientStacks.get(DragonArmorMaterial.IRON) == null) {
+//				for (DragonArmorMaterial mat : DragonArmorMaterial.values()) {
+//					Map<DragonEquipmentSlot, ItemStack> submap = new EnumMap<>(DragonEquipmentSlot.class);
+//					for (DragonEquipmentSlot initSlot : DragonEquipmentSlot.values()) {
+//						submap.put(initSlot, new ItemStack(DragonArmor.GetArmor(initSlot, mat)));
+//					}
+//					ClientStacks.put(mat, submap);
+//				}
+//			}
+			
+			switch (slot) {
+			case BODY:
+				return dataManager.get(DATA_ARMOR_BODY).orNull();
+			case HELM:
+				return dataManager.get(DATA_ARMOR_HELM).orNull();
+			case WINGS: // UNIMPLEMENTED
+			case CREST: // UNIMPLEMENTED
+			default:
+				break;
+			}
+			
+			return null;
+		} else {
+			return this.equipment.getStackInSlot(slot);
+		}
 	}
 }

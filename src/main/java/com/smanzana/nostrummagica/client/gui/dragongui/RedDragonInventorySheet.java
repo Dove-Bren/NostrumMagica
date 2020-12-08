@@ -1,6 +1,8 @@
 package com.smanzana.nostrummagica.client.gui.dragongui;
 
 import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonContainer;
+import com.smanzana.nostrummagica.entity.dragon.EntityDragon.DragonEquipmentInventory;
+import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 
@@ -10,12 +12,14 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
 public class RedDragonInventorySheet implements IDragonGUISheet {
 	
 	private EntityTameDragonRed dragon;
 	private IInventory dragonInv;
+	private DragonEquipmentInventory dragonEquips;
 	private IInventory playerInv;
 	
 	public RedDragonInventorySheet(EntityTameDragonRed dragon) {
@@ -34,6 +38,25 @@ public class RedDragonInventorySheet implements IDragonGUISheet {
 		dragonInv = this.dragon.getInventory();
 		for (int i = 0; i < dragonInv.getSizeInventory(); i++) {
 			Slot slotIn = new Slot(dragonInv, i, leftOffset + offsetX + (cellWidth * (i % invRow)), dragonTopOffset + offsetY + (cellWidth * (i / invRow)));
+			container.addSheetSlot(slotIn);
+		}
+		
+		dragonEquips = this.dragon.getDragonEquipmentInventory();
+		for (DragonEquipmentSlot slot : DragonEquipmentSlot.values()) {
+			// NOT IMPLEMENTED TODO
+			{
+				if (slot == DragonEquipmentSlot.CREST || slot == DragonEquipmentSlot.WINGS) {
+					continue;
+				}
+			}
+			// NOT IMPLEMENTED TODO
+			final int i = slot.ordinal();
+			Slot slotIn = new Slot(dragonEquips, i, leftOffset + offsetX - (cellWidth + 4), dragonTopOffset + offsetY + (cellWidth * i * 2)) {
+				@Override
+				public boolean isItemValid(ItemStack stack) {
+					return dragonEquips.isItemValidForSlot(this.getSlotIndex(), stack);
+				}
+			};
 			container.addSheetSlot(slotIn);
 		}
 
@@ -71,6 +94,23 @@ public class RedDragonInventorySheet implements IDragonGUISheet {
 			for (int i = 0; i < dragonInv.getSizeInventory(); i++) {
 				GlStateManager.color(1f, 1f, 1f, 1f);
 				Gui.drawModalRectWithCustomSizedTexture(leftOffset - 1 + (cellWidth * (i % invRow)), dragonTopOffset - 1 + (cellWidth * (i / invRow)),
+						TamedDragonGUI.GUI_TEX_CELL_HOFFSET, TamedDragonGUI.GUI_TEX_CELL_VOFFSET,
+						cellWidth, cellWidth,
+						256, 256);
+			}
+			
+			for (DragonEquipmentSlot slot : DragonEquipmentSlot.values()) {
+				// NOT IMPLEMENTED TODO
+				{
+					if (slot == DragonEquipmentSlot.CREST || slot == DragonEquipmentSlot.WINGS) {
+						continue;
+					}
+				}
+				// NOT IMPLEMENTED TODO
+				
+				final int i = slot.ordinal();
+				GlStateManager.color(1f, 1f, 1f, 1f);
+				Gui.drawModalRectWithCustomSizedTexture(leftOffset - 1 - (cellWidth + 4), dragonTopOffset - 1 + (cellWidth * (i * 2)),
 						TamedDragonGUI.GUI_TEX_CELL_HOFFSET, TamedDragonGUI.GUI_TEX_CELL_VOFFSET,
 						cellWidth, cellWidth,
 						256, 256);

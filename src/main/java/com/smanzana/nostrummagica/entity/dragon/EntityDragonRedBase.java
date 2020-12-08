@@ -143,5 +143,5 @@ public abstract class EntityDragonRedBase extends EntityDragonFlying {
 			}
 		}
 	}
-
+	
 }

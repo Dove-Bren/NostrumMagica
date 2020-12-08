@@ -1,8 +1,13 @@
 package com.smanzana.nostrummagica.entity.dragon;
 
+import java.util.EnumMap;
+import java.util.Map;
+
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.items.DragonArmor;
+import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
@@ -14,7 +19,11 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityMoveHelper;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.pathfinding.NodeProcessor;
 import net.minecraft.pathfinding.PathFinder;
 import net.minecraft.pathfinding.PathNavigate;
@@ -28,8 +37,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants.NBT;
 
 public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 	
@@ -353,6 +364,240 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 	    {
 	        return !this.worldObj.getBlockState(pos).isFullBlock();
 	    }
+	}
+	
+	public static class DragonEquipmentInventory implements IInventory {
+		
+		public static interface IChangeListener {
+			/**
+			 * Called any time a slot has been changed (including deserialization).
+			 * This includes when the inventory is cleared. To denote that ALL FIELDS ARE POSSIBLY CHANGING,
+			 * clearing sends with a null slot.
+			 * @param slot The slot that was changed, or null if all slots were possibly touched (clear, deserialization)
+			 * @param oldStack
+			 * @param newStack
+			 */
+			public void onChange(@Nullable DragonEquipmentSlot slot, @Nullable ItemStack oldStack, @Nullable ItemStack newStack);
+		}
+		
+		private static final String NBT_LIST = "slots";
+		private static final String NBT_SLOT = "slot";
+		private static final String NBT_ITEM = "item";
+		
+		private final Map<DragonEquipmentSlot, ItemStack> slots;
+		private IChangeListener listener; // Runtime only
+		
+		public DragonEquipmentInventory() {
+			slots = new EnumMap<>(DragonEquipmentSlot.class);
+		}
+		
+		public DragonEquipmentInventory(IChangeListener listener) {
+			this();
+			setListener(listener);
+		}
+		
+		public void setListener(@Nullable IChangeListener listener) {
+			this.listener = listener;
+		}
+		
+		public @Nullable ItemStack getStackInSlot(DragonEquipmentSlot slot) {
+			return slots.get(slot);
+		}
+		
+		public void setStackInSlot(DragonEquipmentSlot slot, @Nullable ItemStack stack) {
+			@Nullable ItemStack oldStack = slots.get(slot);
+			slots.put(slot, stack);
+			
+			if (listener != null) {
+				listener.onChange(slot, oldStack, stack);
+			}
+		}
+		
+		public void clear() {
+			slots.clear();
+			if (listener != null) {
+				listener.onChange(null, null, null);
+			}
+		}
+		
+		public NBTTagCompound serializeNBT() {
+			NBTTagCompound tag = new NBTTagCompound();
+			writeToNBT(tag);
+			return tag;
+		}
+		
+		public void writeToNBT(NBTTagCompound nbt) {
+			NBTTagList list = new NBTTagList();
+			for (DragonEquipmentSlot slot : DragonEquipmentSlot.values()) {
+				@Nullable ItemStack stack = getStackInSlot(slot);
+				if (stack != null) {
+					NBTTagCompound wrapper = new NBTTagCompound();
+					wrapper.setString(NBT_SLOT, slot.name().toLowerCase());
+					wrapper.setTag(NBT_ITEM, stack.serializeNBT());
+					list.appendTag(wrapper);
+				}
+			}
+			
+			nbt.setTag(NBT_LIST, list);
+		}
+		
+		public void readFromNBT(NBTTagCompound nbt) {
+			this.clear();
+			
+			NBTTagList list = nbt.getTagList(NBT_LIST, NBT.TAG_COMPOUND);
+			for (int i = 0; i < list.tagCount(); i++) {
+				NBTTagCompound wrapper = list.getCompoundTagAt(i);
+				try {
+					DragonEquipmentSlot slot = DragonEquipmentSlot.valueOf(wrapper.getString(NBT_SLOT).toUpperCase());
+					ItemStack stack = ItemStack.loadItemStackFromNBT(wrapper.getCompoundTag(NBT_ITEM));
+					//this.setStackInSlot(slot, stack); Don't want to send updates to listener for each item
+					slots.put(slot, stack);
+				} catch (Exception e) {
+					;
+				}
+			}
+			
+			if (listener != null) {
+				listener.onChange(null, null, null);
+			}
+		}
+		
+		public static DragonEquipmentInventory FromNBT(NBTTagCompound nbt) {
+			DragonEquipmentInventory inventory = new DragonEquipmentInventory();
+			inventory.readFromNBT(nbt);
+			return inventory;
+		}
+
+		@Override
+		public String getName() {
+			return null;
+		}
+
+		@Override
+		public boolean hasCustomName() {
+			return false;
+		}
+
+		@Override
+		public ITextComponent getDisplayName() {
+			return null;
+		}
+
+		@Override
+		public int getSizeInventory() {
+			return DragonEquipmentSlot.values().length;
+		}
+		
+		protected static final DragonEquipmentSlot GETSLOT(int index) {
+			return DragonEquipmentSlot.values()[index];
+		}
+
+		@Override
+		public ItemStack getStackInSlot(int index) {
+			return this.getStackInSlot(GETSLOT(index));
+		}
+
+		@Override
+		public ItemStack decrStackSize(int index, int count) {
+			DragonEquipmentSlot slot = GETSLOT(index);
+			ItemStack inSlot = slots.get(slot);
+			ItemStack taken = null;
+			if (inSlot != null) {
+				taken = inSlot.splitStack(count);
+				if (inSlot.stackSize <= 0) {
+					inSlot = null;
+				}
+				setStackInSlot(slot, inSlot); // Handles dirty and setting null
+			}
+			
+			return taken;
+		}
+
+		@Override
+		public ItemStack removeStackFromSlot(int index) {
+			return slots.remove(GETSLOT(index));
+		}
+
+		@Override
+		public void setInventorySlotContents(int index, ItemStack stack) {
+			this.setStackInSlot(GETSLOT(index), stack);
+		}
+
+		@Override
+		public int getInventoryStackLimit() {
+			return 1;
+		}
+
+		@Override
+		public void markDirty() {
+			;
+		}
+
+		@Override
+		public boolean isUseableByPlayer(EntityPlayer player) {
+			return true;
+		}
+
+		@Override
+		public void openInventory(EntityPlayer player) {
+			;
+		}
+
+		@Override
+		public void closeInventory(EntityPlayer player) {
+			;
+		}
+
+		@Override
+		public boolean isItemValidForSlot(int index, ItemStack stack) {
+			if (stack == null) {
+				return true;
+			}
+			
+			if (!(stack.getItem() instanceof DragonArmor)) {
+				return false;
+			}
+
+			DragonEquipmentSlot slot = GETSLOT(index);
+			if (slot == null) {
+				return false;
+			}
+			
+			DragonArmor armor = (DragonArmor) stack.getItem();
+			return armor.getSlot() == slot;
+		}
+
+		@Override
+		public int getField(int id) {
+			return 0;
+		}
+
+		@Override
+		public void setField(int id, int value) {
+			;
+		}
+
+		@Override
+		public int getFieldCount() {
+			return 0;
+		}
+	}
+	
+	public @Nullable ItemStack getDragonEquipment(DragonEquipmentSlot slot) {
+		return null;
+	}
+	
+	@Override
+	public @Nullable ItemStack getItemStackFromSlot(EntityEquipmentSlot slot) {
+		// Adapt to dragon equipment slot system to take advantage of vanilla's equipment tracking
+		// and attribute system
+		final DragonEquipmentSlot dragonSlot = DragonEquipmentSlot.FindForSlot(slot);
+		
+		if (dragonSlot != null) {
+			return getDragonEquipment(dragonSlot);
+		} else {		
+			return super.getItemStackFromSlot(slot);
+		}
 	}
 	
 }

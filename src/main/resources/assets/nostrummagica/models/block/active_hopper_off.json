@@ -84,5 +84,11 @@
                 "east":  { "texture": "#side" }
             }
         }
-    ]
+    ],
+	"display": {
+		"gui": {
+			"rotation": [23, 45, 0],
+			"scale": [ 0.6, 0.6, 0.6 ]
+		}
+	}
 }

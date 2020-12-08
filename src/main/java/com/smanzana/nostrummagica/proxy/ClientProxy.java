@@ -89,6 +89,7 @@ import com.smanzana.nostrummagica.entity.renderer.RenderWisp;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
+import com.smanzana.nostrummagica.items.DragonArmor;
 import com.smanzana.nostrummagica.items.DragonEgg;
 import com.smanzana.nostrummagica.items.DragonEggFragment;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
@@ -440,6 +441,9 @@ public class ClientProxy extends CommonProxy {
 		}
 		for (EnchantedArmor armor : EnchantedArmor.getAll()) {
 			registerModel(armor, 0, armor.getModelID());
+		}
+		for (DragonArmor armor : DragonArmor.GetAllArmors()) {
+			registerModel(armor, 0, armor.getResourceLocation());
 		}
 		registerModel(MirrorShield.instance(), 0, MirrorShield.id);
 		registerModel(MirrorShieldImproved.instance(), 0, MirrorShieldImproved.id);
@@ -1034,6 +1038,12 @@ public class ClientProxy extends CommonProxy {
 				NostrumMagica.MODID, "entity/golem_ender"));
 		event.getMap().registerSprite(new ResourceLocation(
 				NostrumMagica.MODID, "entity/dragon_C"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "models/armor/dragon_scales"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "models/armor/dragon_scales_gold"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "models/armor/dragon_scales_diamond"));
 		event.getMap().registerSprite(new ResourceLocation(
 				NostrumMagica.MODID, "entity/sprite_core"));
 		event.getMap().registerSprite(new ResourceLocation(

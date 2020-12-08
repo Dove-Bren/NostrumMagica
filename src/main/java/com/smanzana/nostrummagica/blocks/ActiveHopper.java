@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.utils.ItemStacks;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockContainer;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
@@ -78,6 +79,10 @@ public class ActiveHopper extends BlockContainer {
 	
 	public ActiveHopper() {
 		super(Material.IRON, MapColor.STONE);
+		this.setHardness(3.0F);
+		this.setHarvestLevel("pickaxe", 2);
+		this.setResistance(8.0F);
+		this.setSoundType(SoundType.METAL);
 		this.setUnlocalizedName(ID);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.DOWN).withProperty(ENABLED, true));
@@ -660,6 +665,16 @@ public class ActiveHopper extends BlockContainer {
 		
 		private boolean pullFrom(IItemHandler handler, EnumFacing direction) {
 			for (int i = 0; i < handler.getSlots(); i++) {
+				
+				@Nullable ItemStack inSlot = handler.getStackInSlot(i);
+				if (inSlot == null) {
+					continue;
+				}
+				
+				if (!canPull(inSlot)) {
+					continue;
+				}
+				
 				if (handler.extractItem(i, 1, true) != null) {
 					@Nullable ItemStack drawn = handler.extractItem(i, 1, false);
 					this.addStack(drawn);

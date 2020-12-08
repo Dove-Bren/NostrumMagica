@@ -77,6 +77,7 @@ import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
+import com.smanzana.nostrummagica.items.DragonArmor;
 import com.smanzana.nostrummagica.items.DragonEgg;
 import com.smanzana.nostrummagica.items.DragonEggFragment;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
@@ -464,6 +465,7 @@ public class CommonProxy {
     	MagicArmorBase.init();
     	EnchantedWeapon.registerWeapons();
     	EnchantedArmor.registerArmors();
+    	DragonArmor.registerArmors();
     	
     	MirrorShield.instance().setRegistryName(NostrumMagica.MODID, MirrorShield.id);
     	GameRegistry.register(MirrorShield.instance());

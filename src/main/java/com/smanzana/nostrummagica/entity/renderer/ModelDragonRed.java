@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.entity.renderer;
 
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
@@ -9,6 +10,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonRedBase;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
+import com.smanzana.nostrummagica.utils.MemoryPool;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.entity.Entity;
@@ -17,8 +19,58 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 
 public class ModelDragonRed extends ModelBase {
+	
+	public static enum EDragonOverlayMaterial {
+		NONE(""),
+		SCALES("scales"),
+		GOLD("gold"),
+		DIAMOND("diamond");
+		
+		public final String locSuffix;
+		
+		private EDragonOverlayMaterial(String locSuffix) {
+			this.locSuffix = locSuffix;
+		}
+		
+		public String getSuffix() {
+			return locSuffix;
+		}
+	}
+	
+	protected static class DragonArmorKey {
+		public EDragonArmorPart part;
+		public EDragonOverlayMaterial material;
+		
+		public DragonArmorKey() {
+			;
+		}
+		
+		public DragonArmorKey set(EDragonArmorPart part, EDragonOverlayMaterial material) {
+			this.part = part;
+			this.material = material;
+			return this;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (o instanceof DragonArmorKey) {
+				DragonArmorKey other = (DragonArmorKey) o;
+				return other.part == this.part && other.material == this.material;
+			}
+			return false;
+		}
+		
+		@Override
+		public int hashCode() {
+			return (part.ordinal() << 16) | material.ordinal(); 
+		}
+	}
+	
+	protected static final MemoryPool<DragonArmorKey> KeyPool = new MemoryPool<>(() -> { return new DragonArmorKey(); });
 
 	private Map<EDragonPart, RenderObj> renderers;
+	private Map<DragonArmorKey, RenderObj> overlays;
+	private Map<EDragonArmorPart, EDragonOverlayMaterial> overlayMaterial;
 	private RenderObj baseRenderer;
 	
 	public ModelDragonRed(int color) {
@@ -56,6 +108,45 @@ public class ModelDragonRed extends ModelBase {
 			}
 			
 			renderers.put(part, render);
+		}
+		
+		overlays = new HashMap<>();
+		overlayMaterial = new EnumMap<>(EDragonArmorPart.class);
+		
+		for (EDragonArmorPart part : EDragonArmorPart.values()) {
+			for (EDragonOverlayMaterial material : EDragonOverlayMaterial.values()) {
+				if (material == EDragonOverlayMaterial.NONE) {
+					continue;
+				}
+				
+				ResourceLocation loc = new ResourceLocation(NostrumMagica.MODID, part.getLocPrefix() + material.getSuffix() + ".obj");
+				RenderObj render = new RenderObj(this, loc) {
+					@Override
+					protected int getColor() {
+						return color;
+					}
+				};
+				render.setTextureOffset(0, 0); // TODO add texture offsets?
+				render.offsetX = (float) part.getX();
+				render.offsetY = (float) part.getY();
+				render.offsetZ = (float) part.getZ();
+				
+				if (part.parent == null) {
+					NostrumMagica.logger.error("What part is " + part.name() + "   and why isn't it parented?");
+				} else {
+					RenderObj parent = renderers.get(part.parent);
+					if (null == parent) {
+						NostrumMagica.logger.error("Dragon part iteration did not set up parents right!");
+					} else {
+						parent.addChild(render);
+					}
+				}
+				
+				DragonArmorKey key = new DragonArmorKey().set(part, material); // NOT using pool for actual map keys
+				overlays.put(key, render);
+			}
+			
+			overlayMaterial.put(part, EDragonOverlayMaterial.NONE);
 		}
 	}
 	
@@ -162,11 +253,87 @@ public class ModelDragonRed extends ModelBase {
 		}
 	}
 	
+	public static enum EDragonArmorPart {
+		BODY("entity/red_dragon/body_overlay_", 0, 0, 0, EDragonPart.BODY),
+		HEAD("entity/red_dragon/head_overlay_", 0, -1.90, -1.575, EDragonPart.NECK); // have to copy insteadof parenting :(
+		
+		private final String locPrefix;
+		private final EDragonPart parent;
+		public final double offsetX;
+		public final double offsetY;
+		public final double offsetZ;
+		
+		private EDragonArmorPart(String pathPrefix, double offsetX, double offsetY, double offsetZ, EDragonPart parent) {
+			locPrefix = pathPrefix;
+			this.parent = parent;
+			this.offsetX = offsetX;
+			this.offsetY = offsetY;
+			this.offsetZ = offsetZ;
+		}
+		
+		public static ResourceLocation[] allLocs() {
+			EDragonPart[] parts = EDragonPart.values();
+			ResourceLocation[] locs = new ResourceLocation[parts.length];
+			
+			for (int i = 0; i < parts.length; i++) {
+				locs[i] = parts[i].getLoc();
+			}
+			
+			return locs;
+		}
+		
+		public String getLocPrefix() {
+			return locPrefix;
+		}
+		
+		public double getX() {
+			// Special case for 0
+			if (this.offsetX == 0) {
+				return 0;
+			}
+			
+			double parX = (this.parent == null ? 0 : this.parent.offsetX);
+			
+			return offsetX - parX;
+		}
+		
+		public double getY() {
+			// Special case for 0
+			if (this.offsetY == 0) {
+				return 0;
+			}
+			double parY = (this.parent == null ? 0 : this.parent.offsetY);
+			
+			return offsetY - parY;
+		}
+		
+		public double getZ() {
+			// Special case for 0
+			if (this.offsetZ == 0) {
+				return 0;
+			}
+			double parZ = (this.parent == null ? 0 : this.parent.offsetZ);
+			
+			return offsetZ - parZ;
+		}
+		
+		public EDragonPart getParent() {
+			return parent;
+		}
+	}
+	
 	
 	@Override
 	public void render(Entity entity, float time, float swingProgress,
 			float swing, float headAngleY, float headAngleX, float scale) {
 		setRotationAngles(time, swingProgress, swing, headAngleY, headAngleX, scale, entity);
+		
+		// Update overlay visiblility
+		for (DragonArmorKey key : overlays.keySet()) {
+			final RenderObj renderer = overlays.get(key);
+			final EDragonOverlayMaterial material = overlayMaterial.get(key.part);
+			renderer.isHidden = (material != key.material);
+		}
 		
 		GL11.glPushMatrix();
 		
@@ -231,8 +398,8 @@ public class ModelDragonRed extends ModelBase {
 			wing_right.rotateAngleZ = -rotZ;
 			body.rotateAngleX = -.1f;
 		} else {
-			float rotX = (float) (2 * Math.PI * 0.14);
-			float rotY = (float) (2 * Math.PI * 0.22);
+			float rotX = (float) (2 * Math.PI * 0.168);
+			float rotY = (float) (2 * Math.PI * 0.2);
 			float rotZ = (float) (2 * Math.PI * 0.05);
 			
 			if (dragon.isFlightTransitioning()) {
@@ -398,6 +565,28 @@ public class ModelDragonRed extends ModelBase {
 		float amt = (float) (weight * (.785398163397)) / 6; // 45degrees in radians
 		tail.rotateAngleY = amt;
 		
+
+		for (EDragonOverlayMaterial mat : EDragonOverlayMaterial.values()) {
+			if (mat == EDragonOverlayMaterial.NONE) {
+				continue;
+			}
+			DragonArmorKey key = KeyPool.claim().set(EDragonArmorPart.HEAD, mat);
+			RenderObj headArmor = overlays.get(key); //TODO why is this needed?
+			headArmor.rotateAngleY = head.rotateAngleY;
+			headArmor.rotateAngleX = head.rotateAngleX;
+			KeyPool.release(key);
+		}
+		
+	}
+	
+	public void setOverlayMaterial(EDragonArmorPart part, EDragonOverlayMaterial material) {
+		this.overlayMaterial.put(part, material);
+	}
+	
+	public void hideAllOverlays() {
+		for (EDragonArmorPart part : EDragonArmorPart.values()) {
+			overlayMaterial.put(part, EDragonOverlayMaterial.NONE);
+		}
 	}
 
 }

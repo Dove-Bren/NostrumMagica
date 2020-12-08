@@ -57,6 +57,7 @@ import com.smanzana.nostrummagica.entity.golem.EntityGolem;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
+import com.smanzana.nostrummagica.items.DragonArmor;
 import com.smanzana.nostrummagica.items.DragonEggFragment;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
@@ -94,6 +95,8 @@ import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.items.ThanosStaff;
 import com.smanzana.nostrummagica.items.WarlockSword;
+import com.smanzana.nostrummagica.items.DragonArmor.DragonArmorMaterial;
+import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
 import com.smanzana.nostrummagica.listeners.PlayerListener;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -838,7 +841,7 @@ public class NostrumMagica
 					new ItemStack(Items.COMPASS),
 					new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), new ItemStack(ReagentItem.instance(), 1, OreDictionary.WILDCARD_VALUE), new ItemStack(ReagentItem.instance(), 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1)},
 					new RRequirementResearch("geogems"),
-					new OutcomeSpawnItem(new ItemStack(PositionCrystal.instance(), 1)))
+					new OutcomeSpawnItem(new ItemStack(PositionCrystal.instance(), 4)))
 				);
 		
 		// GeoToken -- tier 3. Geogem center. Magic Token, earth crystal, blank scroll, diamond
@@ -1148,6 +1151,91 @@ public class NostrumMagica
 						new RRequirementResearch(research),
 						new OutcomeSpawnItem(outcome.copy()))
 					);
+		}
+		
+		// Dragon armors
+		for (DragonArmorMaterial material : DragonArmorMaterial.values()) {
+			final ItemStack augment;
+			final ItemStack cost;
+			final @Nullable DragonArmorMaterial prevMat;
+			switch (material) {
+			case DIAMOND:
+			default:
+				augment = new ItemStack(Blocks.DIAMOND_BLOCK);
+				cost = NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1);
+				prevMat = DragonArmorMaterial.GOLD;
+				break;
+			case GOLD:
+				augment = new ItemStack(Blocks.GOLD_BLOCK);
+				cost = NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1);
+				prevMat = DragonArmorMaterial.IRON;
+				break;
+			case IRON:
+				augment = new ItemStack(Blocks.IRON_BLOCK);
+				cost = NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1);
+				prevMat = null;
+				break;
+			}
+			
+			for (DragonEquipmentSlot slot : DragonEquipmentSlot.values()) {
+				// 2 rituals each. 1 is 2 horse armor (base) + cost. The other is previous tier + block of material (augment) + cost
+				
+				// NOT IMPLEMENTED TODO
+				{
+					if (slot == DragonEquipmentSlot.CREST || slot == DragonEquipmentSlot.WINGS) {
+						continue;
+					}
+				}
+				// NOT IMPLEMENTED TODO
+				
+				final ItemStack result = new ItemStack(DragonArmor.GetArmor(slot, material));
+				final ItemStack base;
+				final @Nullable ItemStack prev = (prevMat == null ? null : new ItemStack(DragonArmor.GetArmor(slot, prevMat)));
+				
+				// Craft from horse armor
+				switch (slot) {
+				case BODY:
+				case WINGS:
+				case CREST:
+				default:
+					if (DragonArmorMaterial.IRON == material) base = new ItemStack(Items.IRON_HORSE_ARMOR);
+					else if (DragonArmorMaterial.GOLD == material) base = new ItemStack(Items.GOLDEN_HORSE_ARMOR);
+					else /*if (DragonArmorMaterial.DIAMOND == material)*/ base = new ItemStack(Items.DIAMOND_HORSE_ARMOR);
+					break;
+				case HELM:
+					if (DragonArmorMaterial.IRON == material) base = new ItemStack(Items.IRON_HELMET);
+					else if (DragonArmorMaterial.GOLD == material) base = new ItemStack(Items.GOLDEN_HELMET);
+					else /*if (DragonArmorMaterial.DIAMOND == material)*/ base = new ItemStack(Items.DIAMOND_HELMET);
+					break;
+				}
+
+				RitualRegistry.instance().addRitual(
+						RitualRecipe.createTier3("craft_dragonarmor_" + slot.getName() + "_" + material.name().toLowerCase(),
+								result,
+								EMagicElement.PHYSICAL,
+								new ReagentType[] {ReagentType.MANDRAKE_ROOT, ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.MANI_DUST},
+								base,
+								new ItemStack[] {null, base, cost, null},
+								new RRequirementResearch("dragon_armor"),
+								new OutcomeSpawnItem(result.copy())
+								)
+						);
+				
+				if (prev != null) {
+					// Upgrade ritual
+					RitualRegistry.instance().addRitual(
+							RitualRecipe.createTier3("upgrade_dragonarmor_" + slot.getName() + "_" + material.name().toLowerCase(),
+									result,
+									EMagicElement.PHYSICAL,
+									new ReagentType[] {ReagentType.MANDRAKE_ROOT, ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.MANI_DUST},
+									prev,
+									new ItemStack[] {null, augment, cost, null},
+									new RRequirementResearch("dragon_armor"),
+									new OutcomeSpawnItem(result.copy())
+									)
+							);
+				}
+			}
 		}
 		
 		RitualRegistry.instance().addRitual(
@@ -1950,6 +2038,12 @@ public class NostrumMagica
 			.quest("lvl4")
 			.reference("ritual::spawn_enchanted_armor", "ritual.spawn_enchanted_armor.name")
 		.build("enchanted_armor", NostrumResearchTab.OUTFITTING, Size.GIANT, -2, 0, true, new ItemStack(EnchantedArmor.get(EMagicElement.FIRE, EntityEquipmentSlot.CHEST, 2)));
+		
+		NostrumResearch.startBuilding()
+			.parent("enchanted_armor")
+			.lore(EntityTameDragonRed.TameRedDragonLore.instance())//craft_dragonarmor_
+			.reference("ritual::craft_dragonarmor_body_iron", "ritual.craft_dragonarmor_body_iron.name")
+		.build("dragon_armor", NostrumResearchTab.OUTFITTING, Size.LARGE, -1, 2, true, new ItemStack(DragonArmor.GetArmor(DragonEquipmentSlot.HELM, DragonArmorMaterial.IRON)));
 		
 		NostrumResearch.startBuilding()
 			.parent("enchanted_armor")
