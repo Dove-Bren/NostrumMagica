@@ -1,12 +1,13 @@
 package com.smanzana.nostrummagica.spells.components;
 
-import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicReduction;
@@ -318,49 +319,16 @@ public class SpellAction {
 		@Override
 		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
 			NostrumMagicaSounds.STATUS_BUFF1.play(entity);
-			Collection<PotionEffect> effects = entity.getActivePotionEffects();
-			Random rand = new Random();
-			if (number == -1 || effects.size() < number)
+			
+			if (number == -1 || effects.size() < number) {
 				entity.clearActivePotions();
-			else {
-				int ids[] = new int[number];
-				int cur = 0;
-				while (cur < number) {
-					int id = rand.nextInt(number);
-					if (cur == 0) {
-						ids[cur++] = id;
-					} else {
-						// Make sure we don't already have this ID
-						boolean found = false;
-						for (int i = 0; i < cur; i++) {
-							if (ids[i] == id) {
-								found = true;
-								break;
-							}
-						}
-						if (found)
-							continue;
-						
-						ids[cur++] = id;
-					}
-						
-				}
-				
-				Iterator<PotionEffect> it = effects.iterator();
-				PotionEffect effect;
-				int index = 0;
-				int len = effects.size();
-				while (index < len) {
-					effect = it.next();
-					for (int i = 0; i < number; i++) {
-						// is ids[i] == index? If so, remove
-						if (ids[i] == index) {
-							entity.removePotionEffect(effect.getPotion());
-							break;
-						}
-					}
-					
-					index++;
+			} else {
+				// Remove #number effects. We do this by getting another list of effects and shuffling, and then
+				// just walking that list to remove from the real one
+				List<PotionEffect> effectList = Lists.newArrayList(entity.getActivePotionEffects());
+				Collections.shuffle(effectList);
+				for (int i = 0; i < number; i++) {
+					entity.removePotionEffect(effectList.get(i).getPotion());
 				}
 			}
 			return true;

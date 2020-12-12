@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.rituals.outcomes;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.blocks.AltarBlock.AltarTileEntity;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
@@ -16,9 +18,15 @@ import net.minecraft.world.World;
 public class OutcomeSpawnItem implements IItemRitualOutcome {
 
 	protected ItemStack stack;
+	protected @Nullable ItemStack leftoverStack;
 	
 	public OutcomeSpawnItem(ItemStack stack) {
+		this(stack, null);
+	}
+	
+	public OutcomeSpawnItem(ItemStack stack, @Nullable ItemStack leftoverStack) {
 		this.stack = stack;
+		this.leftoverStack = leftoverStack;
 	}
 	
 	@Override
@@ -35,6 +43,14 @@ public class OutcomeSpawnItem implements IItemRitualOutcome {
 		} else {
 			AltarTileEntity altar = (AltarTileEntity) world.getTileEntity(center);
 			altar.setItem(stack.copy());
+		}
+		
+		// repeat for any leftover stack
+		if (leftoverStack != null) {
+			EntityItem entity = new EntityItem(world,
+					center.getX() + .5, center.getY() + 1, center.getZ() + .5,
+					leftoverStack.copy());
+			world.spawnEntityInWorld(entity);
 		}
 	}
 

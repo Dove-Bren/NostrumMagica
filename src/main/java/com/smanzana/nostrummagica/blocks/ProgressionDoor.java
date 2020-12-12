@@ -256,10 +256,13 @@ public class ProgressionDoor extends NostrumMagicDoor {
 		public EnumFacing getFace() {
 			if (faceStash == null) {
 				IBlockState state = worldObj.getBlockState(getPos());
+				faceStash = EnumFacing.NORTH;
 				if (state != null) {
-					faceStash = state.getValue(FACING);
-				} else {
-					faceStash = EnumFacing.NORTH;
+					try {
+						faceStash = state.getValue(FACING);
+					} catch (Exception e) {
+						;
+					}
 				}
 			}
 			

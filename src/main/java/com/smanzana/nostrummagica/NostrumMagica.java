@@ -863,7 +863,7 @@ public class NostrumMagica
 					EMagicElement.ENDER,
 					new ReagentType[] {ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK},
 					new ItemStack(PositionCrystal.instance()),
-					new RRequirementResearch("obelisk"),
+					new RRequirementResearch("obelisks"),
 					new OutcomeTeleportObelisk())
 				);
 		
