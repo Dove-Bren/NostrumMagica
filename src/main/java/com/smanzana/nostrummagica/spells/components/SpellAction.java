@@ -1243,14 +1243,28 @@ public class SpellAction {
 
 		@Override
 		public boolean apply(EntityLivingBase caster, World world, BlockPos block, float efficiency) {
-			if (world.isAirBlock(block))
+			if (world.isAirBlock(block)) {
 				block = block.add(0, -1, 0);
-			ItemStack junk = new ItemStack(Items.DYE, 10);
-			for (int i = 0; i < count; i++)
-				ItemDye.applyBonemeal(junk, world, block);
+			}
 			
-			NostrumMagicaSounds.STATUS_BUFF2.play(world, block.getX(), block.getY(), block.getZ()); // TODO this and fire both movep osition up which is bad
-			return true;
+			if (world.isAirBlock(block)) {
+				return false;
+			}
+			
+			ItemStack junk = new ItemStack(Items.DYE, 10); // each apply call may reduce count by 1
+			boolean worked = false;
+			for (int i = 0; i < count; i++) {
+				if (!ItemDye.applyBonemeal(junk, world, block)) {
+					break;
+				}
+				worked = true;
+			}
+			
+			if (worked) {
+				NostrumMagicaSounds.STATUS_BUFF2.play(world, block.getX(), block.getY(), block.getZ()); // TODO this and fire both movep osition up which is bad
+			}
+			
+			return worked;
 		}
 	}
 	

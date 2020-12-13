@@ -208,9 +208,9 @@ public class NostrumAetherResourceItem extends Item implements ILoreTagged, IAet
 		AetherResourceType type = getTypeFromMeta(stack.getMetadata());
 		switch (type) {
 		case FLOWER_GINSENG:
-			return 300;
+			return 450;
 		case FLOWER_MANDRAKE:
-			return 250;
+			return 350;
 		}
 		
 		return 0;

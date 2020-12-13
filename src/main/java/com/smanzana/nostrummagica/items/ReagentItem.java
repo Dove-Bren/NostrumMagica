@@ -230,6 +230,6 @@ public class ReagentItem extends Item implements ILoreTagged, IAetherBurnable {
 
 	@Override
 	public float getAetherYield(ItemStack stack) {
-		return 100f;
+		return 150f;
 	}
 }
