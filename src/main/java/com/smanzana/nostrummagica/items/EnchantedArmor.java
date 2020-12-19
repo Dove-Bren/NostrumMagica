@@ -572,6 +572,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		if (map == null) {
 			map = new EnumMap<>(EntityEquipmentSlot.class);
 			LastEquipState.put(entity, map);
+			System.out.println("EQUIPSTATE ADD"); // TODO remove
 		}
 		return map;
 	}
@@ -594,7 +595,32 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return false;
 	}
 	
+	public static final boolean EntityHasEnchantedArmor(EntityLivingBase entity) {
+		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
+			if (slot.getSlotType() != Type.ARMOR) {
+				continue;
+			}
+			
+			ItemStack inSlot = entity.getItemStackFromSlot(slot);
+			if (inSlot != null  && inSlot.getItem() instanceof EnchantedArmor) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	protected static void UpdateEntity(EntityLivingBase entity) {
+		
+		if (entity.isDead) {
+			LastEquipState.remove(entity);
+			return;
+		}
+		
+		// Only do any of this if they have a piece of enchanted armor (or they used to)
+		if (!LastEquipState.containsKey(entity) && !EntityHasEnchantedArmor(entity)) {
+			return;
+		}
 		
 		// Check and change attributes
 		if (EntityChangedEquipment(entity)) {
@@ -646,6 +672,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			
 			// Create and save new map
 			LastEquipState.put(entity, cacheMap);
+			System.out.println("EQUIPSTATE ADD EXTRRA"); // TODO remove
 		}
 		
 		// Check for world-changing full set bonuses

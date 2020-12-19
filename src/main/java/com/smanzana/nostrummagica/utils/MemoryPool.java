@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import com.smanzana.nostrummagica.NostrumMagica;
+
 public class MemoryPool<T> {
 	
 	public static interface Allocator<T> {
@@ -27,6 +29,7 @@ public class MemoryPool<T> {
 	}
 	
 	protected void grow() {
+		NostrumMagica.logger.info("Growing pool");
 		grow(Math.max(1, loaned.size()));
 	}
 	
@@ -42,7 +45,7 @@ public class MemoryPool<T> {
 			grow();
 		}
 		
-		T obj = pool.get(0);
+		T obj = pool.remove(0);
 		loaned.add(obj);
 		return obj;
 	}

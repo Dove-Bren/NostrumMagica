@@ -261,7 +261,7 @@ public class ProgressionDoor extends NostrumMagicDoor {
 					try {
 						faceStash = state.getValue(FACING);
 					} catch (Exception e) {
-						;
+						NostrumMagica.logger.warn("Failed to get face for progression tile entity");
 					}
 				}
 			}

@@ -10,6 +10,7 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.items.IItemHandler;
 
 public class Inventories {
 
@@ -72,6 +73,20 @@ public class Inventories {
 
         return itemstack;
     }
+	
+	private static final ItemStack attemptAddToInventory(IItemHandler handler, @Nullable ItemStack stack, boolean commit) {
+    	if (stack == null) {
+    		return null;
+    	}
+    	
+    	stack = stack.copy();
+
+    	for (int i = 0; i < handler.getSlots() && stack != null; ++i) {
+    		stack = handler.insertItem(i, stack, !commit);
+        }
+    	
+        return stack;
+    }
 	 
 	public static final ItemStack addItem(IInventory inventory, @Nullable ItemStack stack) {
 		return attemptAddToInventory(inventory, stack, true);
@@ -79,6 +94,10 @@ public class Inventories {
 	
 	public static final ItemStack addItem(ItemStack[] inventory, @Nullable ItemStack stack) {
 		return addItem(new ItemStackArrayWrapper(inventory), stack);
+	}
+	
+	public static final ItemStack addItem(IItemHandler handler, @Nullable ItemStack stack) {
+		return attemptAddToInventory(handler, stack, true);
 	}
 	
 	public static final boolean canFit(IInventory inventory, @Nullable ItemStack stack) {
@@ -89,8 +108,16 @@ public class Inventories {
 		return canFit(new ItemStackArrayWrapper(inventory), stack);
 	}
 	
+	public static final boolean canFit(IItemHandler handler, @Nullable ItemStack stack) {
+		return null == attemptAddToInventory(handler, stack, false);
+	}
+	
 	public static final ItemStack simulateAddItem(IInventory inventory, @Nullable ItemStack stack) {
 		return attemptAddToInventory(inventory, stack, false);
+	}
+	
+	public static final ItemStack simulateAddItem(IItemHandler handler, @Nullable ItemStack stack) {
+		return attemptAddToInventory(handler, stack, false);
 	}
 	
 	private static final ItemStack attemptRemoveFromInventory(IInventory inventory, @Nullable ItemStack stack, boolean commit) {

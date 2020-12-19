@@ -264,9 +264,13 @@ public class ModificationTableGui {
 				if (component.isTrigger()) {
 					hasBool = component.getTrigger().supportsBoolean();
 					hasFloat = component.getTrigger().supportedFloats() != null;
-				} else {
+				} else if (component.isShape()) {
 					hasBool = component.getShape().supportsBoolean();
 					hasFloat = component.getShape().supportedFloats() != null;
+				} else {
+					this.isValid = false;
+					this.runeMode = false;
+					return;
 				}
 				
 				this.isValid = true;
