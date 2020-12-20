@@ -1,0 +1,8 @@
+# Blender MTL File: 'thorn.blend'
+# Material Count: 1
+
+newmtl ThornSkin
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+d 1.000000
+map_Kd nostrummagica:effects/thornskin

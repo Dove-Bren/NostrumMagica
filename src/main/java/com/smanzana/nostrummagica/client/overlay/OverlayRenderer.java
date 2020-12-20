@@ -9,6 +9,14 @@ import javax.annotation.Nullable;
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.effects.ClientEffect;
+import com.smanzana.nostrummagica.client.effects.ClientEffectAnimated;
+import com.smanzana.nostrummagica.client.effects.ClientEffectFormBasic;
+import com.smanzana.nostrummagica.client.effects.ClientEffectIcon;
+import com.smanzana.nostrummagica.client.effects.ClientEffectRenderer;
+import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierGrow;
+import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierShrink;
+import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierTranslate;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.IEntityPet;
@@ -45,8 +53,10 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.RayTraceResult.Type;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
+import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.common.ForgeHooks;
@@ -969,6 +979,34 @@ public class OverlayRenderer extends Gui {
 	}
 	
 	@SubscribeEvent
+	public void onEntityRender(RenderLivingEvent.Post<EntityLivingBase> event) {
+		if (event.getEntity().ticksExisted % 4 == 0) {
+			if (NostrumMagica.magicEffectProxy.getData(event.getEntity(), SpecialEffect.ROOTED) != null) {
+				final ClientEffect effect = new ClientEffectAnimated(event.getEntity().getPositionVector(), 1000L,
+						new ClientEffect[] {
+							new ClientEffect(Vec3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_0, 0, 0, 0), 1500L),
+							new ClientEffect(Vec3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_1, 0, 0, 0), 1500L),
+							new ClientEffect(Vec3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_2, 0, 0, 0), 1500L),
+							new ClientEffect(Vec3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_3, 0, 0, 0), 1500L),
+							new ClientEffect(Vec3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_4, 0, 0, 0), 1500L),
+						},
+						new float[] {
+							.1f,
+							.2f,
+							.3f,
+							.4f,
+							1f
+						});
+				effect
+					.modify(new ClientEffectModifierTranslate(NostrumMagica.rand.nextFloat() - .5f, 0, NostrumMagica.rand.nextFloat() - .5f, 0, NostrumMagica.rand.nextFloat() * 360f))
+					.modify(new ClientEffectModifierGrow(.05f, 1f, .1f, 1f, .2f))
+					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, .0f, .8f));
+				ClientEffectRenderer.instance().addEffect(effect);
+			}
+		}
+	}
+	
+	@SubscribeEvent
 	public void onPlayerRender(RenderPlayerEvent.Post event) {
 		if (event.getEntityPlayer() != Minecraft.getMinecraft().thePlayer) {
 			// For other players, possibly do armor render ticks
@@ -980,6 +1018,30 @@ public class OverlayRenderer extends Gui {
 				((EnchantedArmor) equipStack.getItem()).onArmorTick(event.getEntityPlayer().worldObj, event.getEntityPlayer(), equipStack);
 			}
 		}
+		
+//		// Render special status effects
+//		if (event.getEntityPlayer().ticksExisted % 4 == 0 && event.getEntityPlayer().isPotionActive(RootedPotion.instance())) {
+//			final ClientEffect effect = new ClientEffectAnimated(event.getEntityPlayer().getPositionVector(), 1000L,
+//					new ClientEffect[] {
+//						new ClientEffect(Vec3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_0, 0, 0, 0), 1500L),
+//						new ClientEffect(Vec3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_1, 0, 0, 0), 1500L),
+//						new ClientEffect(Vec3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_2, 0, 0, 0), 1500L),
+//						new ClientEffect(Vec3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_3, 0, 0, 0), 1500L),
+//						new ClientEffect(Vec3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_4, 0, 0, 0), 1500L),
+//					},
+//					new float[] {
+//						.1f,
+//						.2f,
+//						.3f,
+//						.4f,
+//						1f
+//					});
+//			effect
+//				.modify(new ClientEffectModifierTranslate(NostrumMagica.rand.nextFloat() - .5f, 0, NostrumMagica.rand.nextFloat() - .5f, 0, NostrumMagica.rand.nextFloat() * 360f))
+//				.modify(new ClientEffectModifierGrow(.05f, 1f, .1f, 1f, .2f))
+//				.modify(new ClientEffectModifierShrink(1f, 1f, 1f, .0f, .8f));
+//			ClientEffectRenderer.instance().addEffect(effect);
+//		}
 	}
 	
 }

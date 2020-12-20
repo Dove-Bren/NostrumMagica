@@ -190,6 +190,13 @@ public class SpellScroll extends Item implements ILoreTagged {
 		
 		nbt.setByte(NBT_TYPE, meta);
 	}
+	
+	public static ItemStack create(Spell spell, byte meta) {
+		ItemStack scroll = new ItemStack(instance(), 1);
+		setSpell(scroll, spell);
+		setNestedScrollMeta(scroll, meta);
+		return scroll;
+	}
 
 	@Override
 	public String getLoreKey() {

@@ -1070,6 +1070,8 @@ public class ClientProxy extends CommonProxy {
 				NostrumMagica.MODID, "effects/mist_bad"));
 		event.getMap().registerSprite(new ResourceLocation(
 				NostrumMagica.MODID, "effects/mist_good"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "effects/thornskin"));
 	}
 	
 	@SubscribeEvent

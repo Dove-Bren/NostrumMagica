@@ -1065,7 +1065,7 @@ public class SpellAction {
 				entity.hurtResistantTime = 0;
 			}
 			
-			double radius = 32.0 * level * efficiency;
+			double radius = (16 + (32.0 * level)) * efficiency;
 			
 			if (caster != null && caster instanceof EntityPlayer) {
 				// Look for ender belt

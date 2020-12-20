@@ -118,6 +118,7 @@ public class MagicEffectProxy {
 		SHIELD_PHYSICAL,
 		SHIELD_MAGIC,
 		MAGIC_BUFF,
+		ROOTED, // Just visual. Actual effects are in potion
 	}
 	
 	private Map<UUID, Map<SpecialEffect, EffectData>> effects;
@@ -151,6 +152,10 @@ public class MagicEffectProxy {
 	
 	public void applyMagicBuff(EntityLivingBase entity, EMagicElement element, double value, int count) {
 		apply(SpecialEffect.MAGIC_BUFF, new EffectData().element(element).amt(value).count(count), entity);
+	}
+	
+	public void applyRootedEffect(EntityLivingBase entity) {
+		apply(SpecialEffect.ROOTED, new EffectData().count(1), entity);
 	}
 	
 	public void remove(SpecialEffect effect, EntityLivingBase entity) {

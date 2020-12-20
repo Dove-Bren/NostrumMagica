@@ -57,7 +57,6 @@ public class ClientEffectBeam extends ClientEffect {
 						.getModel(new ModelResourceLocation(
 						NostrumMagica.MODID + ":effects/cyl", "normal"));
 				GlStateManager.pushMatrix();
-				GlStateManager.pushAttrib();
 				
 				//GlStateManager.translate(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ);
 				// Model is length 1 and points y+
@@ -88,7 +87,6 @@ public class ClientEffectBeam extends ClientEffect {
 				
 				//GlStateManager.color(.5f, 0f, 0f, .5f); // WHY DOESNT THIS WORK??
 				//draw(model.getQuads(null, null, 0), color);
-				GlStateManager.popAttrib();
 				GlStateManager.popMatrix();
 				
 			}

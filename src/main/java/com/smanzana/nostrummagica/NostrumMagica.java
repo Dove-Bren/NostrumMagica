@@ -37,6 +37,7 @@ import com.smanzana.nostrummagica.command.CommandForceBind;
 import com.smanzana.nostrummagica.command.CommandGiveResearchpoint;
 import com.smanzana.nostrummagica.command.CommandGiveSkillpoint;
 import com.smanzana.nostrummagica.command.CommandGotoDungeon;
+import com.smanzana.nostrummagica.command.CommandRandomSpell;
 import com.smanzana.nostrummagica.command.CommandReadRoom;
 import com.smanzana.nostrummagica.command.CommandReloadResearch;
 import com.smanzana.nostrummagica.command.CommandSetDimension;
@@ -58,6 +59,8 @@ import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
 import com.smanzana.nostrummagica.items.DragonArmor;
+import com.smanzana.nostrummagica.items.DragonArmor.DragonArmorMaterial;
+import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
 import com.smanzana.nostrummagica.items.DragonEggFragment;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
@@ -95,8 +98,6 @@ import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.items.ThanosStaff;
 import com.smanzana.nostrummagica.items.WarlockSword;
-import com.smanzana.nostrummagica.items.DragonArmor.DragonArmorMaterial;
-import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
 import com.smanzana.nostrummagica.listeners.PlayerListener;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -314,6 +315,7 @@ public class NostrumMagica
     	event.registerServerCommand(new CommandReadRoom());
     	event.registerServerCommand(new CommandGiveResearchpoint());
     	event.registerServerCommand(new CommandReloadResearch());
+    	event.registerServerCommand(new CommandRandomSpell());
     }
     
     /**

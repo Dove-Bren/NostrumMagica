@@ -339,15 +339,15 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		SpellAction action = null;
 		switch (element) {
 		case EARTH:
-			if (NostrumMagica.rand.nextFloat() <= 0.15f * (float) level)
-				action = new SpellAction(user).status(RootedPotion.instance(), 20 * 2, 0);
+			if (NostrumMagica.rand.nextFloat() <= 0.15f * (float) (level + 1))
+				action = new SpellAction(user).status(RootedPotion.instance(), 20 * 5 * (level + 1), 0);
 			break;
 		case ENDER:
-			if (NostrumMagica.rand.nextFloat() <= 0.15f * (float) level)
+			if (NostrumMagica.rand.nextFloat() <= 0.15f * (float) (level + 1))
 				action = new SpellAction(user).phase(level);
 			break;
 		case FIRE:
-			if (NostrumMagica.rand.nextFloat() <= 0.35f * (float) level)
+			if (NostrumMagica.rand.nextFloat() <= 0.35f * (float) (level + 1))
 				action = new SpellAction(user).burn(5 * 20);
 			break;
 		case PHYSICAL:
@@ -364,7 +364,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 
 	@Override
 	public boolean shouldTrigger(boolean offense, ItemStack stack) {
-		return !offense;
+		final float chancePer = (this.element == EMagicElement.FIRE ? .2f : .15f);
+		return !offense && NostrumMagica.rand.nextFloat() <= chancePer * (float) (level + 1);
 	}
 	
 	public static EnchantedArmor get(EMagicElement element, EntityEquipmentSlot slot, int level) {
@@ -572,7 +573,6 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		if (map == null) {
 			map = new EnumMap<>(EntityEquipmentSlot.class);
 			LastEquipState.put(entity, map);
-			System.out.println("EQUIPSTATE ADD"); // TODO remove
 		}
 		return map;
 	}
@@ -672,7 +672,6 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			
 			// Create and save new map
 			LastEquipState.put(entity, cacheMap);
-			System.out.println("EQUIPSTATE ADD EXTRRA"); // TODO remove
 		}
 		
 		// Check for world-changing full set bonuses

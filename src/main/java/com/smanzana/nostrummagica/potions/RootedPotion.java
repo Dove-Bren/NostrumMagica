@@ -3,9 +3,11 @@ package com.smanzana.nostrummagica.potions;
 import java.awt.Color;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
@@ -48,6 +50,19 @@ public class RootedPotion extends Potion {
         }
         entity.motionX = 0.0;
         entity.motionZ = 0.0;
+    }
+	
+	@Override
+	public void applyAttributesModifiersToEntity(EntityLivingBase entity, AbstractAttributeMap attributeMap, int amplifier) {
+		// Sneaky! We've just been applied
+		NostrumMagica.magicEffectProxy.applyRootedEffect(entity);
+		super.applyAttributesModifiersToEntity(entity, attributeMap, amplifier);
+	}
+	
+	@Override
+	public void removeAttributesModifiersFromEntity(EntityLivingBase entityLivingBaseIn, AbstractAttributeMap attributeMapIn, int amplifier) {
+		NostrumMagica.magicEffectProxy.remove(SpecialEffect.ROOTED, entityLivingBaseIn);
+		super.removeAttributesModifiersFromEntity(entityLivingBaseIn, attributeMapIn, amplifier);
     }
 	
 	@SideOnly(Side.CLIENT)

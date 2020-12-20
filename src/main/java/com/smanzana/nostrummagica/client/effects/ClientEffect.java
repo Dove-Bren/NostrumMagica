@@ -27,13 +27,14 @@ public class ClientEffect {
 		}
 	}
 
+	final protected Vec3d origin;
+	final private ClientEffectForm form;
+
 	protected long startTime;
 	protected long existedMS;
 	protected int existedTicks;
 	protected long durationMS;
 	protected int durationTicks;
-	protected Vec3d origin;
-	private ClientEffectForm form;
 	
 	protected List<ClientEffectModifier> modifiers;
 	
@@ -71,12 +72,11 @@ public class ClientEffect {
 		}
 		
 		final float progress = durationMS == 0
-				? (durationTicks == 0 ? (1f) : ((float) existedTicks / (float) durationTicks))
-				: (float) ((double) existedMS / (double) durationMS);
+				? (durationTicks == 0 ? (1f) : (((float) existedTicks + partialTicks) / (float) durationTicks))
+				: (float) (((double) existedMS + (partialTicks * (1000 / 20))) / (double) durationMS);
 		
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.pushAttrib();
 		
 		ClientEffectRenderDetail detail = new ClientEffectRenderDetail();
 		detail.alpha = detail.red = detail.green = detail.blue = 1f;
@@ -90,8 +90,10 @@ public class ClientEffect {
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GlStateManager.disableLighting();
 		drawForm(detail, mc, progress, partialTicks);
+		GlStateManager.enableBlend();
+		GlStateManager.enableAlpha();
+		GlStateManager.enableColorMaterial();
 		
-		GlStateManager.popAttrib();
 		GlStateManager.popMatrix();
 		return progress < 1f;
 	}

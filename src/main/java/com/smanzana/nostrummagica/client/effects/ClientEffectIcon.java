@@ -13,7 +13,12 @@ public enum ClientEffectIcon {
 	ARROWU("arrow_up", false),
 	ARROWD("arrow_down", false),
 	ORB_CLOUDY("orb_cloudy", true),
-	ORB_SCALED("orb_scaled", true);
+	ORB_SCALED("orb_scaled", true),
+	THORN_0("thorn0", true),
+	THORN_1("thorn1", true),
+	THORN_2("thorn2", true),
+	THORN_3("thorn3", true),
+	THORN_4("thorn4", true),;
 	
 	private String key;
 	private boolean isObj;
