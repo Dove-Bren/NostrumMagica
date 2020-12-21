@@ -11,7 +11,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the nessasary things for Forge to be setup.
 
 
-version = "1.10.2-1.6.17"
+version = "1.10.2-1.6.18"
 group= "com.smanzana.nostrummagica" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "nostrummagica"
 
@@ -118,7 +118,39 @@ processResources
     }
 }
 
-runClient {
-	args '--username', 'testplayer'
+task coreJar(type: Jar) {
+	from(sourceSets.main.output) {
+		include 'com/smanzana/nostrummagica/transforms/**'
+	}
+	manifest {
+		attributes 'FMLCorePlugin': 'com.smanzana.nostrummagica.transforms.NostrumTransformPlugin'
+		attributes 'FMLCorePluginContainsFMLMod': 'true'
+	}
+	classifier = 'core'
 }
 
+task deobfJar(type: Jar) {
+	from sourceSets.main.output
+	classifier = 'deobf'
+}
+
+jar {
+	exclude 'com/smanzana/nostrummagica/transforms/**'
+	from(coreJar.archivePath.absolutePath) {
+		include '*'
+		into ("META-INF/libraries")
+	}
+	manifest {
+		attributes 'ContainedDeps': coreJar.archivePath.name
+	}
+}
+
+reobf {
+	coreJar { mappingType = 'SEARGE' }
+}
+
+runClient {
+	args '--username', 'testplayer'
+}	
+
+build.dependsOn coreJar, deobfJar, jar

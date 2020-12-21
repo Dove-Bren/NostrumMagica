@@ -19,6 +19,7 @@ import com.smanzana.nostrummagica.client.gui.MirrorGui;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedEquipment;
+import com.smanzana.nostrummagica.items.HookshotItem;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
@@ -597,6 +598,24 @@ public class PlayerListener {
 
 	@SubscribeEvent
 	public void onDamage(LivingHurtEvent event) {
+		// Make hookshots not damage someone if you reach the wall
+		if (event.getSource() == DamageSource.flyIntoWall) {
+			EntityLivingBase ent = event.getEntityLiving();
+			for (@Nullable ItemStack held : new ItemStack[] {ent.getHeldItemMainhand(), ent.getHeldItemOffhand()}) {
+				if (held == null) {
+					continue;
+				}
+				
+				if (held.getItem() instanceof HookshotItem) {
+					// Could check if we're actually being pulled here. Going to be lazy...
+					if (HookshotItem.IsExtended(held)) {
+						event.setCanceled(true);
+						return;
+					}
+				}
+			}
+		}
+		
 		if (event.getSource().getSourceOfDamage() != null) {
 			EntityLivingBase source = null;
 			

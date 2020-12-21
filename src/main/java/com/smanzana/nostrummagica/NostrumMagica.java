@@ -1264,6 +1264,18 @@ public class NostrumMagica
 						)
 				);
 		
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("improve_hookshot_claw",
+						new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.CLAW, false)),
+						null,
+						new ReagentType[] {ReagentType.MANI_DUST, ReagentType.BLACK_PEARL, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK},
+						new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.STRONG, false)),
+						new ItemStack[] {new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM,  1), new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE), new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE)},
+						new RRequirementResearch("hookshot_claw"),
+						new OutcomeSpawnItem(new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.CLAW, false)))
+						)
+				);
+		
 		// Reagent bag
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("reagent_bag",
@@ -2085,6 +2097,11 @@ public class NostrumMagica
 		.build("hookshot_strong", NostrumResearchTab.OUTFITTING, Size.NORMAL, 2, -1, false, new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.STRONG, false)));
 		
 		NostrumResearch.startBuilding()
+			.parent("hookshot_strong")
+			.reference("ritual::improve_hookshot_claw", "ritual.improve_hookshot_claw.name")
+		.build("hookshot_claw", NostrumResearchTab.OUTFITTING, Size.NORMAL, 3, -1, false, new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.CLAW, false)));
+		
+		NostrumResearch.startBuilding()
 			.hiddenParent("magic_token")
 			.lore(EssenceItem.instance())
 			.reference("ritual::charm.physical", "ritual.charm.physical.name")
@@ -2197,6 +2214,7 @@ public class NostrumMagica
 		
 		NostrumResearch.startBuilding()
 			.parent("stat_items")
+			.hiddenParent("sorceryportal")
 			.reference("ritual::ender_pin", "ritual.ender_pin.name")
 		.build("ender_pin", NostrumResearchTab.ADVANCED_MAGICA, Size.LARGE, -3, 0, true, NostrumSkillItem.getItem(SkillItemType.ENDER_PIN, 1));
 		

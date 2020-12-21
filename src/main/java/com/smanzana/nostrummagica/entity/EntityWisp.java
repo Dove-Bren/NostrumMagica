@@ -1,6 +1,5 @@
 package com.smanzana.nostrummagica.entity;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -50,9 +49,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializer;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
@@ -75,28 +72,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 	
 	protected static final double MAX_WISP_DISTANCE_SQ = 144;
 	protected static final DataParameter<Optional<BlockPos>> HOME  = EntityDataManager.<Optional<BlockPos>>createKey(EntityWisp.class, DataSerializers.OPTIONAL_BLOCK_POS);
-	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(EntityWisp.class, new DataSerializer<EMagicElement>() {
-
-		{
-			DataSerializers.registerSerializer(this);
-		}
-		
-		@Override
-		public void write(PacketBuffer buf, EMagicElement value) {
-			buf.writeEnumValue(value);
-		}
-
-		@Override
-		public EMagicElement read(PacketBuffer buf) throws IOException {
-			return buf.readEnumValue(EMagicElement.class);
-		}
-
-		@Override
-		public DataParameter<EMagicElement> createKey(int id) {
-			return new DataParameter<>(id, this);
-		}
-		
-	});
+	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(EntityWisp.class, EMagicElement.Serializer);
 	
 	public static final String LoreKey = "nostrum__wisp";
 	

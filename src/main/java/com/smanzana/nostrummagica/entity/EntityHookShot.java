@@ -34,7 +34,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class EntityHookShot extends Entity {
 	
 	private double maxLength;
-	protected HookshotType type;
 	
 	public double velocityX;
 	public double velocityY;
@@ -43,7 +42,6 @@ public class EntityHookShot extends Entity {
 	// Sound and other mechanical cache stuff
 	private int tickHooked;
 	private Vec3d posLastPlayed;
-	private boolean isFetch; // Whether we're pulling them to us (or not)
 	
 	private static final String NBT_CASTER_ID = "caster_uuid";
 	private static final String NBT_ATTACHED_ID = "attached_uuid";
@@ -53,7 +51,9 @@ public class EntityHookShot extends Entity {
 	private static final String NBT_VELOCITYY = "velocity_y";
 	private static final String NBT_VELOCITYZ = "velocity_z";
 	
+	protected static final DataParameter<HookshotType> DATA_TYPE = EntityDataManager.<HookshotType>createKey(EntityHookShot.class, HookshotType.Serializer);
 	protected static final DataParameter<Boolean> DATA_HOOKED = EntityDataManager.<Boolean>createKey(EntityHookShot.class, DataSerializers.BOOLEAN);
+	protected static final DataParameter<Boolean> DATA_FETCHING = EntityDataManager.<Boolean>createKey(EntityHookShot.class, DataSerializers.BOOLEAN);
 	protected static final DataParameter<Optional<UUID>> DATA_CASTING_ENTITY = EntityDataManager.<Optional<UUID>>createKey(EntityHookShot.class, DataSerializers.OPTIONAL_UNIQUE_ID);
 	protected static final DataParameter<Optional<UUID>> DATA_HOOKED_ENTITY = EntityDataManager.<Optional<UUID>>createKey(EntityHookShot.class, DataSerializers.OPTIONAL_UNIQUE_ID);
 	
@@ -72,7 +72,7 @@ public class EntityHookShot extends Entity {
 		this.velocityX = direction.xCoord;
 		this.velocityY = direction.yCoord;
 		this.velocityZ = direction.zCoord;
-		this.type = type;
+		this.setType(type);
 	}
 	
 	public void setCaster(EntityLivingBase caster) {
@@ -83,8 +83,12 @@ public class EntityHookShot extends Entity {
 		this.maxLength = max;
 	}
 	
+	protected void setType(HookshotType type) {
+		this.dataManager.set(DATA_TYPE, type);
+	}
+	
 	public HookshotType getType() {
-		return this.type;
+		return dataManager.get(DATA_TYPE);
 	}
 	
 	@Nullable
@@ -126,6 +130,21 @@ public class EntityHookShot extends Entity {
 	
 	public boolean isHooked() {
 		return dataManager.get(DATA_HOOKED);
+	}
+	
+	protected void setIsFetch(boolean isFetch) {
+		dataManager.set(DATA_FETCHING, isFetch);
+	}
+	
+	public boolean isFetch() {
+		return dataManager.get(DATA_FETCHING);
+	}
+	
+	public boolean isPulling() {
+		// TODO isFetch and type are not on client, but client uses it to render.
+		return isHooked()
+				&& !isFetch()
+				&& (this.getType() != HookshotType.CLAW || this.getCaster().getDistanceSqToEntity(this) > 8);
 	}
 	
 	@Nullable
@@ -232,14 +251,16 @@ public class EntityHookShot extends Entity {
 		if (caster != null) {
 			final double dist = caster.getDistanceSqToEntity(this);
 			if (dist < 8) {
-				this.setDead();
-				return;
+				if (this.getType() != HookshotType.CLAW || caster.isSneaking()) {
+					this.setDead();
+					return;
+				}
 			}
 		}
 		
 		this.motionX = this.motionY = this.motionZ = 0;
 		
-		if (this.isFetch) {
+		if (this.isFetch()) {
 			// Bring the hooked entity (and ourselves) back to the shooter
 			if (attachedEntity == null) {
 				this.setDead();
@@ -299,7 +320,7 @@ public class EntityHookShot extends Entity {
 				caster.motionY = velocity.yCoord;
 				caster.motionZ = velocity.zCoord;
 				caster.fallDistance = 0;
-				caster.onGround = true;
+				//caster.onGround = true;
 				caster.velocityChanged = true;
 			}
 			
@@ -358,21 +379,27 @@ public class EntityHookShot extends Entity {
 			wantsFetch = caster.isSneaking();
 		}
 		
-		if (result.typeOfHit == Type.ENTITY && result.entityHit != null && HookshotItem.CanBeHooked(type, result.entityHit) && (caster == null || caster != result.entityHit)) {
+		if (result.typeOfHit == Type.ENTITY && result.entityHit != null && HookshotItem.CanBeHooked(getType(), result.entityHit) && (caster == null || caster != result.entityHit)) {
 			tickHooked = this.ticksExisted;
 			
 			// Large entities cannot be fetched, and instead we'll override and force the play er to go to them.
 			// So if you try to pull a large enemy, you get pulled to them instead hilariously.
 			// Non-living entities are ignored... except for EntityItem which are always fetched.
 			if (result.entityHit instanceof EntityItem) {
-				this.isFetch = true;
+				this.setIsFetch(true);
 			} else if (!result.entityHit.canBeCollidedWith()) {
 				// ignore the entity for like arrows and stuff
 				return;
 			} else if (result.entityHit.width > 1.5 || result.entityHit.height > 2.5) {
-				this.isFetch = false;
+				this.setIsFetch(false);
 			} else {
-				this.isFetch = wantsFetch;
+				this.setIsFetch(wantsFetch);
+			}
+			
+			// Have to do this before officially being 'hooked'
+			if (!this.isFetch() && caster != null) {
+				// Pulling player towards them. Go ahead and move the player up since they're in elytra mode now
+				caster.setPositionAndUpdate(caster.posX, caster.posY + caster.getEyeHeight(), caster.posZ);
 			}
 			
 			setHookedEntity(result.entityHit);
@@ -381,13 +408,21 @@ public class EntityHookShot extends Entity {
 			
 			// Make sure type of hookshot supports material
 			IBlockState state = worldObj.getBlockState(result.getBlockPos());
-			if (wantsFetch || state == null || !HookshotItem.CanBeHooked(type, state)) {
+			if (wantsFetch || state == null || !HookshotItem.CanBeHooked(getType(), state)) {
 				this.setDead();
 				return;
 			}
 			
+			// Can't be fetch
+			
 			tickHooked = this.ticksExisted;
 			this.setPositionAndUpdate(result.hitVec.xCoord, result.hitVec.yCoord, result.hitVec.zCoord);
+			
+			// Have to do this before officially being 'hooked'
+			if (caster != null) {
+				// Pulling player towards them. Go ahead and move the player up since they're in elytra mode now
+				caster.setPositionAndUpdate(caster.posX, caster.posY + caster.getEyeHeight(), caster.posZ);
+			}
 			setHookedInPlace();
 		} else {
 			return;
@@ -405,6 +440,8 @@ public class EntityHookShot extends Entity {
 		dataManager.register(DATA_HOOKED, Boolean.FALSE);
 		dataManager.register(DATA_HOOKED_ENTITY, Optional.<UUID>absent());
 		dataManager.register(DATA_CASTING_ENTITY, Optional.<UUID>absent());
+		dataManager.register(DATA_FETCHING, Boolean.FALSE);
+		dataManager.register(DATA_TYPE, HookshotType.WEAK);
 	}
 
 	@Override

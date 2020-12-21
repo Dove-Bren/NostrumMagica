@@ -1,7 +1,13 @@
 package com.smanzana.nostrummagica.spells;
 
+import java.io.IOException;
+
 import com.mojang.realmsclient.gui.ChatFormatting;
 
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializer;
+import net.minecraft.network.datasync.DataSerializers;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -51,4 +57,27 @@ public enum EMagicElement {
 		}
 		return null;
 	}
+	
+	public static final DataSerializer<EMagicElement> Serializer = new DataSerializer<EMagicElement>() {
+
+		{
+			DataSerializers.registerSerializer(this);
+		}
+		
+		@Override
+		public void write(PacketBuffer buf, EMagicElement value) {
+			buf.writeEnumValue(value);
+		}
+
+		@Override
+		public EMagicElement read(PacketBuffer buf) throws IOException {
+			return buf.readEnumValue(EMagicElement.class);
+		}
+
+		@Override
+		public DataParameter<EMagicElement> createKey(int id) {
+			return new DataParameter<>(id, this);
+		}
+		
+	};
 }

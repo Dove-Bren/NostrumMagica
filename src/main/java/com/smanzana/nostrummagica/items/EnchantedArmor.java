@@ -48,7 +48,7 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISpecialArmor {
+public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISpecialArmor, IElytraProvider {
 
 	private static Map<EMagicElement, Map<EntityEquipmentSlot, Map<Integer, EnchantedArmor>>> items;
 	
@@ -840,6 +840,14 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 						+ ChatFormatting.RESET);
 			}
 		}
+	}
+
+	@Override
+	public boolean isElytraFlying(EntityLivingBase entity, ItemStack stack) {
+//		if (!entity.onGround && entity.motionY > 0) {
+//			return this.level == 2 && this.getEquipmentSlot() == EntityEquipmentSlot.CHEST;
+//		}
+		return false;
 	}
 	
 }

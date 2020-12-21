@@ -45,6 +45,7 @@ public class ModConfig {
 		OBELISK_REQ_MAGIC(Category.SERVER, "obelisk_req_magic", true, true, "Magic must be unlocked before obelisks can be used or teleported to."),
 		NOSTRUM_WORLDS(Category.SERVER, "nostrum_worlds", new int[]{0}, true, "Which worlds to generate Nostrum dungeons in"),
 		NOSTRUM_DIMENSION_ID(Category.SERVER, "nostrum_dimension_id", 244, true, "Dimension ID for Nostrum's Sorcery dimension. Change if other mods want to use the same id."),
+		NOSTRUM_OVERRIDE_ELYTRA(Category.SERVER, "nostrum_elytra_override", true, true, "If true, Nostrum will override (via ASM transformation) elytra flying."),
 		;
 		
 		
@@ -471,5 +472,9 @@ public class ModConfig {
 	
 	public boolean displayPetHealthbars() {
 		return getBooleanValue(Key.DISPLAY_PET_HEALTHBARS, false);
+	}
+	
+	public boolean overrideElytraCode() {
+		return getBooleanValue(Key.NOSTRUM_OVERRIDE_ELYTRA, true);
 	}
 }
