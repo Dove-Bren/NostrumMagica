@@ -1072,6 +1072,8 @@ public class ClientProxy extends CommonProxy {
 				NostrumMagica.MODID, "effects/mist_good"));
 		event.getMap().registerSprite(new ResourceLocation(
 				NostrumMagica.MODID, "effects/thornskin"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "entity/dragonflightwing"));
 	}
 	
 	@SubscribeEvent
@@ -1583,5 +1585,14 @@ public class ClientProxy extends CommonProxy {
 					}));
 			ClientProxy.shownText = true;
 		}
+	}
+	
+	@Override
+	public void sendMana(EntityPlayer player) {
+		if (player.worldObj.isRemote) {
+			return;
+		}
+		
+		super.sendMana(player);
 	}
 }

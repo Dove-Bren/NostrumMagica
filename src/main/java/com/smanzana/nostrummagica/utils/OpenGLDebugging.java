@@ -1,9 +1,9 @@
 package com.smanzana.nostrummagica.utils;
 
+import java.nio.ByteBuffer;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-
-import java.nio.ByteBuffer;
 
 /**
  * User: The Grey Ghost

@@ -440,4 +440,10 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 		return false;
 	}
 	
+	@SideOnly(Side.CLIENT)
+	@Override
+	public boolean shouldRenderElyta(EntityLivingBase entity, ItemStack stack) {
+		return false;
+	}
+	
 }

@@ -2,9 +2,9 @@ package com.smanzana.nostrummagica.client.gui.dragongui;
 
 import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonContainer;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon.DragonEquipmentInventory;
-import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
+import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;

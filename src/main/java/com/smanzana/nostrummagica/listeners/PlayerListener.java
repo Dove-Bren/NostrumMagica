@@ -29,12 +29,12 @@ import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.items.ThanosStaff;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
-import com.smanzana.nostrummagica.network.NetworkHandler;
-import com.smanzana.nostrummagica.network.messages.ManaMessage;
+import com.smanzana.nostrummagica.potions.LightningChargePotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.SpellActionSummary;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
+import com.smanzana.nostrummagica.utils.Projectiles;
 
 import baubles.api.BaublesApi;
 import baubles.api.cap.IBaublesItemHandler;
@@ -43,7 +43,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.EntityTracker;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntitySpider;
 import net.minecraft.entity.player.EntityPlayer;
@@ -54,15 +53,16 @@ import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
+import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
@@ -70,6 +70,7 @@ import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock;
 import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -506,12 +507,27 @@ public class PlayerListener {
 		if (event.isCanceled())
 			return;
 		
-		if (event.getSource().isFireDamage() && event.getSource() != DamageSource.lava && !event.getSource().getDamageType().equalsIgnoreCase("lava")) {
-			// If wearing full lava set, ignore
-			final boolean fullSet = EnchantedArmor.GetSetCount(event.getEntityLiving(), EMagicElement.FIRE, 2) == 4;
-			if (fullSet) {
-				event.setCanceled(true);
-				return;
+		if (event.getSource().isFireDamage()) {
+			
+			// lava set ignores fire damage (but not lava). True lava set ignores lava as well
+			final boolean lavaSet = EnchantedArmor.GetSetCount(event.getEntityLiving(), EMagicElement.FIRE, 2) == 4;
+			final boolean trueSet = EnchantedArmor.GetSetCount(event.getEntityLiving(), EMagicElement.FIRE, 3) == 4;
+			final boolean isLava = event.getSource() == DamageSource.lava || event.getSource().getDamageType().equalsIgnoreCase("lava");
+			if (lavaSet || trueSet) {
+				final int manaCost = 1; // / 4
+				final INostrumMagic attr = NostrumMagica.getMagicWrapper(event.getEntityLiving());
+				final int mana = (attr != null ? attr.getMana() : 0);
+				// true set requires mana to prevent lava damage, though
+				if (!isLava || mana >= manaCost) {
+					event.setCanceled(true);
+					if (isLava && event.getEntityLiving().ticksExisted % 4 == 0) {
+						attr.addMana(-manaCost);
+						if (event.getEntityLiving() instanceof EntityPlayer) {
+							NostrumMagica.proxy.sendMana((EntityPlayer) event.getEntityLiving());
+						}
+					}
+					return;
+				}
 			}
 		}
 		
@@ -621,18 +637,18 @@ public class PlayerListener {
 			
 			// Projectiles can be from no entity
 			if (event.getSource().isProjectile()) {
-				
-				Entity proj = event.getSource().getSourceOfDamage();
-				Entity shooter;
-				if (proj instanceof EntityArrow) {
-					shooter = ((EntityArrow) proj).shootingEntity;
-					if (shooter != null && shooter instanceof EntityLivingBase)
-						source = (EntityLivingBase) shooter;
-				} else if (proj instanceof EntityFireball) {
-					source = ((EntityFireball) proj).shootingEntity;
-				} else if (proj instanceof EntityThrowable) {
-					source = ((EntityThrowable) proj).getThrower();
-				}
+				source = Projectiles.getShooter(event.getSource().getSourceOfDamage());
+//				Entity proj = event.getSource().getSourceOfDamage();
+//				Entity shooter;
+//				if (proj instanceof EntityArrow) {
+//					shooter = ((EntityArrow) proj).shootingEntity;
+//					if (shooter != null && shooter instanceof EntityLivingBase)
+//						source = (EntityLivingBase) shooter;
+//				} else if (proj instanceof EntityFireball) {
+//					source = ((EntityFireball) proj).shootingEntity;
+//				} else if (proj instanceof EntityThrowable) {
+//					source = ((EntityThrowable) proj).getThrower();
+//				}
 			} else if (event.getSource().getSourceOfDamage() instanceof EntityLivingBase) {
 				source = (EntityLivingBase) event.getSource().getSourceOfDamage();
 			}
@@ -988,12 +1004,7 @@ public class PlayerListener {
 			mana++;
 		
 		stats.addMana(mana);
-		EntityTracker tracker = ((WorldServer) player.worldObj).getEntityTracker();
-		if (tracker == null)
-			return;
-		
-		tracker.sendToTrackingAndSelf(player, NetworkHandler.getSyncChannel()
-				.getPacketFrom(new ManaMessage(player, stats.getMana())));
+		NostrumMagica.proxy.sendMana(player);
 	}
 	
 	@SubscribeEvent
@@ -1044,6 +1055,56 @@ public class PlayerListener {
 					xp = leftover;
 				}
 			}
+		}
+	}
+	
+	@SubscribeEvent
+	public void onLightning(EntityStruckByLightningEvent e) {
+		if (e.isCanceled()) {
+			return;
+		}
+		
+		if (e.getEntity().worldObj.isRemote) {
+			return;
+		}
+		
+		if (!(e.getEntity() instanceof EntityLivingBase)) {
+			return;
+		}
+		
+		EntityLivingBase living = (EntityLivingBase) e.getEntity();
+		
+		final boolean hasLightningSet = EnchantedArmor.GetSetCount(living, EMagicElement.LIGHTNING, 3) == 4;
+		if (hasLightningSet) {
+			living.addPotionEffect(new PotionEffect(LightningChargePotion.instance(), 20 * 30, 0));
+		}
+		
+	}
+	
+	@SubscribeEvent
+	public void onLeftClick(LeftClickBlock e) {
+		if (e.isCanceled()) {
+			return;
+		}
+		
+		EntityPlayer player = e.getEntityPlayer();
+		if (player.worldObj.isRemote) {
+			return;
+		}
+		
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		if (attr == null || attr.getMana() < 20) {
+			return;
+		}
+		
+		if (EnchantedArmor.GetSetCount(player, EMagicElement.EARTH, 3) != 4) {
+			return;
+		}
+		
+		if (EnchantedArmor.DoEarthDig(player.worldObj, player, e.getPos(), e.getFace())) {
+			attr.addMana(-20);
+			NostrumMagica.proxy.sendMana(player);
+			e.setCanceled(true);
 		}
 	}
 	

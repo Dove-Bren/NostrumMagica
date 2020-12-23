@@ -28,9 +28,11 @@ import com.smanzana.nostrummagica.entity.golem.EntityGolemIce;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
+import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.potions.FamiliarPotion;
+import com.smanzana.nostrummagica.potions.LightningChargePotion;
 import com.smanzana.nostrummagica.potions.MagicBoostPotion;
 import com.smanzana.nostrummagica.potions.MagicBuffPotion;
 import com.smanzana.nostrummagica.potions.MagicResistPotion;
@@ -368,6 +370,11 @@ public class SpellAction {
 						}
 					}
 				}
+			}
+			
+			if (EnchantedArmor.GetSetCount(entity, EMagicElement.ENDER, 3) == 4) {
+				// has full ender set
+				efficiency *= 2;
 			}
 			
 			// Apply efficiency bonus
@@ -1086,6 +1093,11 @@ public class SpellAction {
 				}
 			}
 			
+			if (EnchantedArmor.GetSetCount(entity, EMagicElement.ENDER, 3) == 4) {
+				// has full ender set
+				radius *= 2.0;
+			}
+			
 			NostrumMagicaSounds.DAMAGE_ENDER.play(entity);
 			
 			for (int i = 0; i < 20; i++) {
@@ -1655,9 +1667,14 @@ public class SpellAction {
 		if (target == null)
 			return amt;
 		
+		// Really, I should just make an attribute for magic potency (which could be the same that everyhting else has, too!)
 		PotionEffect boostEffect = caster.getActivePotionEffect(MagicBoostPotion.instance());
 		if (boostEffect != null) {
 			base *= Math.pow(1.5, boostEffect.getAmplifier() + 1);
+		}
+		boostEffect = caster.getActivePotionEffect(LightningChargePotion.instance());
+		if (boostEffect != null) {
+			base *= 2.0;
 		}
 		
 		if (element == EMagicElement.PHYSICAL) {

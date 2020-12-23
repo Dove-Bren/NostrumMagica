@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.spells;
 
 import java.io.IOException;
 
+import javax.annotation.Nullable;
+
 import com.mojang.realmsclient.gui.ChatFormatting;
 
 import net.minecraft.network.PacketBuffer;
@@ -21,12 +23,13 @@ public enum EMagicElement {
 	WIND("Wind", 0xFF36A035),
 	ENDER("Ender", 0xFF41117F);
 	
-	private String name;
-	private int color;
+	private final String name;
+	private final int color;
 	
 	private EMagicElement(String name, int color) {
 		this.name = name;
 		this.color = color;
+		// I wanted to store opposite, but can't do that in constructor here
 	}
 
 	public String getName() {
@@ -55,6 +58,27 @@ public enum EMagicElement {
 		case WIND:
 			return ChatFormatting.DARK_GREEN;
 		}
+		return null;
+	}
+	
+	public @Nullable EMagicElement getOpposite() {
+		switch (this) {
+		case EARTH:
+			return WIND;
+		case ENDER:
+			return LIGHTNING;
+		case FIRE:
+			return ICE;
+		case ICE:
+			return FIRE;
+		case LIGHTNING:
+			return ENDER;
+		case PHYSICAL:
+			return null;
+		case WIND:
+			return EARTH;
+		}
+		
 		return null;
 	}
 	

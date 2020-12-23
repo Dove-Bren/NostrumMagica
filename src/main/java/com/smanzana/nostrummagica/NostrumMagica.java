@@ -118,6 +118,7 @@ import com.smanzana.nostrummagica.research.NostrumResearch.Size;
 import com.smanzana.nostrummagica.research.NostrumResearch.SpellSpec;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
+import com.smanzana.nostrummagica.rituals.outcomes.IRitualOutcome;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeBindSpell;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeConstructGeotoken;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeCreateObelisk;
@@ -1094,9 +1095,9 @@ public class NostrumMagica
 					new OutcomeSpawnItem(WarlockSword.addCapacity(new ItemStack(WarlockSword.instance()), 10)))
 				);
 		
-		// Rituals for all the magic armors
+		// Rituals for base the magic armors and weapons
 		for (EMagicElement elem : EMagicElement.values())
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 3; i++) // Note: only 3. True versions are below
 		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
 			
 			if (EnchantedArmor.isArmorElement(elem)) {
@@ -1152,6 +1153,35 @@ public class NostrumMagica
 						new ItemStack[] {essence, gem, essence, essence},
 						new RRequirementResearch(research),
 						new OutcomeSpawnItem(outcome.copy()))
+					);
+		}
+		
+		// True and corrupted elemental armors
+		for (EMagicElement elem : EMagicElement.values())
+		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
+			if (slot == EntityEquipmentSlot.OFFHAND || slot == EntityEquipmentSlot.MAINHAND) {
+				continue;
+			}
+
+			final boolean isTrue = EnchantedArmor.isArmorElement(elem);
+			final ItemStack augment = (isTrue ? NostrumResourceItem.getItem(ResourceType.SLAB_KIND, 1) : NostrumResourceItem.getItem(ResourceType.SLAB_FIERCE, 1));
+			
+			final ItemStack input = new ItemStack(EnchantedArmor.get(isTrue ? elem : elem.getOpposite(), slot, 3));
+			final String name = "spawn_enchanted_armor";
+			final String research = "enchanted_armor_adv";
+			final ItemStack wings = (isTrue ? NostrumSkillItem.getItem(SkillItemType.WING, 1) : new ItemStack(Items.ELYTRA));
+			final IRitualOutcome outcome = (isTrue
+					? new OutcomeSpawnItem(new ItemStack(EnchantedArmor.get(elem, slot, 4)))
+					: new OutcomeSpawnItem(new ItemStack(EnchantedArmor.get(elem, slot, 4)), new ItemStack(Items.ELYTRA)));
+			
+			RitualRegistry.instance().addRitual(
+					RitualRecipe.createTier3(name,
+						new ItemStack(EnchantedArmor.get(elem, slot, 4)), elem == EMagicElement.PHYSICAL ? null : elem,
+						new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.MANI_DUST, ReagentType.MANI_DUST},
+						input,
+						new ItemStack[] {new ItemStack(Blocks.OBSIDIAN, 1, OreDictionary.WILDCARD_VALUE), wings, augment, NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1)},
+						new RRequirementResearch(research),
+						outcome)
 					);
 		}
 		
@@ -2055,9 +2085,16 @@ public class NostrumMagica
 		
 		NostrumResearch.startBuilding()
 			.parent("enchanted_armor")
-			.lore(EntityTameDragonRed.TameRedDragonLore.instance())//craft_dragonarmor_
+			.hiddenParent("kind_infusion")
+			.hiddenParent("fierce_infusion")
+			.reference("ritual::spawn_enchanted_armor", "ritual.spawn_enchanted_armor.name")
+		.build("enchanted_armor_adv", NostrumResearchTab.OUTFITTING, Size.LARGE, -1, 2, true, new ItemStack(EnchantedArmor.get(EMagicElement.ENDER, EntityEquipmentSlot.CHEST, 3)));
+		
+		NostrumResearch.startBuilding()
+			.parent("enchanted_armor")
+			.lore(EntityTameDragonRed.TameRedDragonLore.instance())
 			.reference("ritual::craft_dragonarmor_body_iron", "ritual.craft_dragonarmor_body_iron.name")
-		.build("dragon_armor", NostrumResearchTab.OUTFITTING, Size.LARGE, -1, 2, true, new ItemStack(DragonArmor.GetArmor(DragonEquipmentSlot.HELM, DragonArmorMaterial.IRON)));
+		.build("dragon_armor", NostrumResearchTab.OUTFITTING, Size.LARGE, -1, 3, true, new ItemStack(DragonArmor.GetArmor(DragonEquipmentSlot.HELM, DragonArmorMaterial.IRON)));
 		
 		NostrumResearch.startBuilding()
 			.parent("enchanted_armor")

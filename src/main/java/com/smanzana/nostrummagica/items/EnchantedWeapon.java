@@ -5,17 +5,24 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble;
+import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble.ItemType;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaEntityEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaLocationEffect;
+import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.potions.FrostbitePotion;
+import com.smanzana.nostrummagica.potions.LightningChargePotion;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
+import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -25,6 +32,7 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.potion.PotionEffect;
@@ -35,6 +43,8 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -295,6 +305,36 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 				
 				playerIn.resetCooldown();
 			}
+			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+		} else if (element == EMagicElement.LIGHTNING && EnchantedArmor.GetSetCount(playerIn, EMagicElement.LIGHTNING, 3) == 4) {
+			if (playerIn.getCooledAttackStrength(0.5F) > .95) {
+				// If full set, strike at targetting location (unless sneaking, then strike self)
+				if (!worldIn.isRemote) {
+					boolean used = false;
+					if (playerIn.isSneaking()) {
+						used = summonBoltOnSelf(playerIn);
+					} else if (playerIn.isPotionActive(LightningChargePotion.instance())) {
+						// This should be client-side... TODO do it on client and send via armor message?
+						
+						// Do quick mana check prior to actually doing raytrace. Redone inside helper func.
+						INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
+						if (attr != null && attr.getMana() >= 30) {
+							final float maxDist = 50;
+							RayTraceResult mop = RayTrace.raytrace(worldIn, playerIn.getPositionVector().addVector(0, playerIn.eyeHeight, 0), playerIn.getLookVec(), maxDist, (ent) -> { return ent != playerIn;});
+							if (mop != null && mop.typeOfHit != RayTraceResult.Type.MISS) {
+								final Vec3d at = (mop.typeOfHit == RayTraceResult.Type.ENTITY ? mop.entityHit.getPositionVector() : mop.hitVec);
+								used = summonBoltAtTarget(playerIn, worldIn, at);
+							}
+						}
+					}
+					if (used) {
+						itemStackIn.damageItem(1, playerIn);
+					}
+				}
+				
+				playerIn.resetCooldown();
+			}
+			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
 		}
 			
         return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
@@ -317,6 +357,31 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 				if (!worldIn.isRemote) { 
 					spawnIceCloud(worldIn, playerIn, new Vec3d(pos.getX() + hitX, pos.getY() + 1, pos.getZ() + hitZ), dir, level);
 					stack.damageItem(3, playerIn);
+				}
+				playerIn.resetCooldown();
+				return EnumActionResult.SUCCESS;
+			} else if (element == EMagicElement.LIGHTNING && EnchantedArmor.GetSetCount(playerIn, EMagicElement.LIGHTNING, 3) == 4) {
+				if (!worldIn.isRemote) {
+					boolean used = false;
+					if (playerIn.isSneaking()) {
+						used = summonBoltOnSelf(playerIn);
+					} else if (playerIn.isPotionActive(LightningChargePotion.instance())) {
+						// This should be client-side... TODO do it on client and send via armor message?
+						
+						// Do quick mana check prior to actually doing raytrace. Redone inside helper func.
+						INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
+						if (attr != null && attr.getMana() >= 30) {
+							final float maxDist = 50;
+							RayTraceResult mop = RayTrace.raytrace(worldIn, playerIn.getPositionVector().addVector(0, playerIn.eyeHeight, 0), playerIn.getLookVec(), maxDist, (ent) -> { return ent != playerIn;});
+							if (mop != null && mop.typeOfHit != RayTraceResult.Type.MISS) {
+								final Vec3d at = (mop.typeOfHit == RayTraceResult.Type.ENTITY ? mop.entityHit.getPositionVector() : mop.hitVec);
+								used = summonBoltAtTarget(playerIn, worldIn, at);
+							}
+						}
+					}
+					if (used) {
+						stack.damageItem(1, playerIn);
+					}
 				}
 				playerIn.resetCooldown();
 				return EnumActionResult.SUCCESS;
@@ -352,6 +417,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 	}
 	
 	protected static void spawnVortex(World world, EntityPlayer caster, Vec3d at, Vec3d direction, int level) {
+		final int hurricaneCount = EnchantedArmor.GetSetCount(caster, EMagicElement.WIND, 3);
 		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 10 seconds
 		EntityAreaEffect cloud = new EntityAreaEffect(world, at.xCoord, at.yCoord, at.zCoord);
 		cloud.setOwner(caster);
@@ -362,6 +428,12 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 		cloud.addEffect((IAreaEntityEffect)(worldIn, entity) -> {
 			if (entity.noClip || entity.hasNoGravity()) {
 				return;
+			}
+			if (hurricaneCount == 4 && entity == caster) {
+				// Only affect caster if they jump
+				if (entity.onGround) {
+					return;
+				}
 			}
 			// upward effect
 			final int period = 20;
@@ -388,6 +460,84 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 		cloud.motionX = direction.xCoord;
 		cloud.motionY = direction.yCoord;
 		cloud.motionZ = direction.zCoord;
+	}
+	
+	protected static boolean summonBoltOnSelf(EntityLivingBase entity) {
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
+		if (attr == null || attr.getMana() < 30) {
+			return false;
+		}
+		
+		entity.worldObj.addWeatherEffect(
+				new NostrumTameLightning(entity.worldObj, entity.posX, entity.posY, entity.posZ)
+				);
+		attr.addMana(-30);
+		if (entity instanceof EntityPlayer) {
+			NostrumMagica.proxy.sendMana((EntityPlayer) entity);
+		}
+		return true;
+	}
+	
+	protected static boolean summonBoltAtTarget(EntityLivingBase caster, World world, Vec3d pos) {
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+		if (attr == null || attr.getMana() < 30) {
+			return false;
+		}
+		
+		int count = 1;
+		if (caster != null && caster instanceof EntityPlayer) {
+			// Look for lightning belt
+			IInventory baubles = NostrumMagica.baubles.getBaubles((EntityPlayer) caster);
+			if (baubles != null) {
+				for (int i = 0; i < baubles.getSizeInventory(); i++) {
+					ItemStack stack = baubles.getStackInSlot(i);
+					if (stack == null || !(stack.getItem() instanceof ItemMagicBauble)) {
+						continue;
+					}
+					
+					ItemType type = ItemMagicBauble.getTypeFromMeta(stack.getMetadata());
+					if (type == ItemType.BELT_LIGHTNING) {
+						count = caster.getRNG().nextInt(3) + 3;
+						break;
+					}
+				}
+			}
+		}
+		
+		MutableBlockPos cursor = new MutableBlockPos();
+		Random rand = (caster == null ? new Random() : caster.getRNG());
+		for (int i = 0; i < count; i++) {
+			
+			if (i == 0) {
+				world.addWeatherEffect(
+						new NostrumTameLightning(world, pos.xCoord, pos.yCoord, pos.zCoord)
+						);
+			} else {
+				// Apply random x/z offsets. Then step up to 4 to find surface
+				cursor.setPos(
+						pos.xCoord + rand.nextInt(6) - 3,
+						pos.yCoord - 2,
+						pos.zCoord + rand.nextInt(6) - 3);
+				
+				// Find surface
+				int dist = 0;
+				while (dist++ < 4 && !world.isAirBlock(cursor)) {
+					cursor.setY(cursor.getY() + 1);
+				}
+				
+				if (world.isAirBlock(cursor)) {
+					world.addWeatherEffect(
+						new NostrumTameLightning(world, cursor.getX() + 0.5, cursor.getY(), cursor.getZ() + 0.5)
+						);
+				}
+			}
+		}
+		
+		attr.addMana(-30);
+		if (caster instanceof EntityPlayer) {
+			NostrumMagica.proxy.sendMana((EntityPlayer) caster);
+		}
+		return true;
 	}
 	
 	@Override

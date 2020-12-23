@@ -6,9 +6,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAreaEffectCloud;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -16,8 +19,8 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -36,7 +39,12 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 		public void apply(World world, BlockPos pos);
 	}
 	
-	 private static final DataParameter<Float> HEIGHT = EntityDataManager.<Float>createKey(EntityAreaEffect.class, DataSerializers.FLOAT);
+	private static final DataParameter<Float> HEIGHT = EntityDataManager.<Float>createKey(EntityAreaEffect.class, DataSerializers.FLOAT);
+	private static final DataParameter<Integer> EXTRA_PARTICLE = EntityDataManager.<Integer>createKey(EntityAreaEffect.class, DataSerializers.VARINT);
+	private static final DataParameter<Integer> EXTRA_PARTICLE_PARAM_1 = EntityDataManager.<Integer>createKey(EntityAreaEffect.class, DataSerializers.VARINT);
+	private static final DataParameter<Integer> EXTRA_PARTICLE_PARAM_2 = EntityDataManager.<Integer>createKey(EntityAreaEffect.class, DataSerializers.VARINT);
+	private static final DataParameter<Float> EXTRA_PARTICLE_OFFSET_Y = EntityDataManager.<Float>createKey(EntityAreaEffect.class, DataSerializers.FLOAT);
+	private static final DataParameter<Float> EXTRA_PARTICLE_FREQUENCY = EntityDataManager.<Float>createKey(EntityAreaEffect.class, DataSerializers.FLOAT);
 	
 	protected final List<IAreaEntityEffect> entityEffects;
 	protected final List<IAreaLocationEffect> locationEffects;
@@ -44,12 +52,14 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 	
 	// Same as parent's reapplicationDelay
 	protected int effectDelay;
+	protected int waitTime = 20; // Copy of parent's, captured for time checks
 	
 	protected boolean verticalSteps;
 	protected boolean gravity;
 	protected double gravitySpeed;
 	protected float radiusPerFall;
 	protected boolean walksOnLiquid;
+	protected boolean ignoreOwner;
 	
 	private float prevHeight;
 	private Vec3d waddleDir;
@@ -138,7 +148,94 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 		return this.walksOnLiquid;
 	}
 	
+	public void setIgnoreOwner(boolean ignore) {
+		this.ignoreOwner = ignore;
+	}
+	
+	public boolean getIgnoreOwner() {
+		return this.ignoreOwner;
+	}
+	
+	public @Nullable EnumParticleTypes getCustomParticle() {
+		final int id = this.getDataManager().get(EXTRA_PARTICLE);
+		if (id == -1) {
+			return null;
+		}
+		return EnumParticleTypes.getParticleFromId(id);
+	}
+
+	public void setCustomParticle(@Nullable EnumParticleTypes particleIn) {
+		this.getDataManager().set(EXTRA_PARTICLE, particleIn == null ? -1 : particleIn.getParticleID());
+	}
+
+	public int getCustomParticleParam1() {
+		return ((Integer)this.getDataManager().get(EXTRA_PARTICLE_PARAM_1)).intValue();
+	}
+
+	public void setCustomParticleParam1(int particleParam) {
+		this.getDataManager().set(EXTRA_PARTICLE_PARAM_1, Integer.valueOf(particleParam));
+	}
+
+	public int getCustomParticleParam2() {
+		return ((Integer)this.getDataManager().get(EXTRA_PARTICLE_PARAM_2)).intValue();
+	}
+
+	public void setCustomParticleParam2(int particleParam) {
+		this.getDataManager().set(EXTRA_PARTICLE_PARAM_2, Integer.valueOf(particleParam));
+	}
+	
+	public float getCustomParticleYOffset() {
+		return dataManager.get(EXTRA_PARTICLE_OFFSET_Y);
+	}
+	
+	public void setCustomParticleYOffset(float offset) {
+		this.dataManager.set(EXTRA_PARTICLE_OFFSET_Y, offset);
+	}
+	
+	public float getCustomParticleFrequency() {
+		return dataManager.get(EXTRA_PARTICLE_FREQUENCY);
+	}
+	
+	public void setCustomParticleFrequency(float frequency) {
+		this.dataManager.set(EXTRA_PARTICLE_FREQUENCY, frequency);
+	}
+	
+	public void setIgnoreRadius(boolean ignore) {
+		super.setIgnoreRadius(ignore);
+	}
+	
+	@Override
+	public void setWaitTime(int waitTimeIn) {
+		// capture and save
+		this.waitTime = waitTimeIn;
+		super.setWaitTime(waitTimeIn);
+	}
+	
+	/**
+	 * Adds the provided number of ticks to this effect's duration.
+	 * If the effect has finished 'waiting' and is in the 'duration' portion of its time,
+	 * time is always added to the 'duration' count.
+	 * Otherwise, time is either added to 'duration' or 'wait' based on
+	 * whether 'allowWait' is true.
+	 * @param ticks
+	 * @param allowWait
+	 */
+	public void addTime(int ticks, boolean allowWait) {
+		if (this.ticksExisted < this.waitTime && allowWait) {
+			// Add to wait time
+			this.setWaitTime(this.waitTime + ticks);
+		} else {
+			this.setDuration(this.getDuration() + ticks);
+		}
+	}
+	
 	public boolean canApply(Entity ent) {
+		if (getIgnoreOwner()) {
+			EntityLivingBase owner = this.getOwner();
+			if (ent == owner) {
+				return false;
+			}
+		}
 		Integer delay = effectDelays.get(ent);
 		return (delay == null || delay < this.ticksExisted);
 	}
@@ -277,7 +374,8 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 	
 	protected void clientUpdateTick() {
 		
-		if (this.height > 2) {
+		// Augment vanilla particles for tall areas
+		if (this.height > 2 && !this.shouldIgnoreRadius()) {
 			float radius = this.getRadius();
 			float area = (float)Math.PI * radius * radius;
 			EnumParticleTypes enumparticletypes = this.getParticle();
@@ -309,6 +407,39 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 				}
 			}
 		}
+		
+		// Do custom particle spawning
+		final EnumParticleTypes particle = this.getCustomParticle();
+		final float frequency = this.getCustomParticleFrequency();
+		if (particle != null && frequency > 0f) { // optional
+			final float radius = this.getRadius();
+			final float area = (float)Math.PI * radius * radius;
+			final int[] aint = new int[particle.getArgumentCount()];
+			final float yOffset = this.getCustomParticleYOffset();
+	
+			if (aint.length > 0) {
+				aint[0] = this.getCustomParticleParam1();
+			}
+	
+			if (aint.length > 1) {
+				aint[1] = this.getCustomParticleParam2();
+			}
+			
+			// Could support adding more, but will opt to just reduce for now
+	
+			for (int i = 0; (float)i < area; ++i) {
+				if (this.rand.nextFloat() > frequency) {
+					continue;
+				}
+				float f6 = this.rand.nextFloat() * ((float)Math.PI * 2F);
+				float f7 = MathHelper.sqrt_float(this.rand.nextFloat()) * radius;
+				float f8 = MathHelper.cos(f6) * f7;
+				float f9 = MathHelper.sin(f6) * f7;
+				double y = rand.nextDouble() * (this.height - .5) + .5;
+	
+				this.worldObj.spawnParticle(particle, this.posX + (double)f8, this.posY + y + yOffset, this.posZ + (double)f9, (0.5D - this.rand.nextDouble()) * 0.15D, 0.009999999776482582D, (0.5D - this.rand.nextDouble()) * 0.15D, aint);
+			}
+		}
 	}
 	
 	@Override
@@ -328,7 +459,7 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 						double dz = ent.posZ - this.posZ;
 						double d = dx * dx + dz * dz;
 						
-						if (d > this.getRadius()) {
+						if (d > this.getRadius() * this.getRadius()) {
 							continue;
 						}
 						
@@ -348,7 +479,7 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 					double dz = (pos.getZ() + .5) - this.posZ;
 					double d = dx * dx + dz * dz;
 					
-					if (d > this.getRadius()) {
+					if (d > this.getRadius() * this.getRadius()) {
 						continue;
 					}
 					
@@ -377,6 +508,11 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 		super.entityInit();
 		
 		this.getDataManager().register(HEIGHT, 1f);
+        this.getDataManager().register(EXTRA_PARTICLE, Integer.valueOf(-1));
+        this.getDataManager().register(EXTRA_PARTICLE_PARAM_1, Integer.valueOf(0));
+        this.getDataManager().register(EXTRA_PARTICLE_PARAM_2, Integer.valueOf(0));
+        this.getDataManager().register(EXTRA_PARTICLE_OFFSET_Y, 0f);
+        this.getDataManager().register(EXTRA_PARTICLE_FREQUENCY, 1f);
 	}
 	
 	@Override
@@ -392,10 +528,27 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 	@Override
 	protected void readEntityFromNBT(NBTTagCompound compound) {
 		super.readEntityFromNBT(compound);
+		
+		if (compound.hasKey("Particle", 8)) {
+			@Nullable EnumParticleTypes enumparticletypes = EnumParticleTypes.getByName(compound.getString("Particle"));
+			this.setCustomParticle(enumparticletypes);
+		}
+		this.setCustomParticleParam1(compound.getInteger("ParticleParam1"));
+		this.setCustomParticleParam2(compound.getInteger("ParticleParam2"));
+		this.setCustomParticleYOffset(compound.getFloat("ParticleYOffset"));
+		this.setCustomParticleFrequency(compound.getFloat("ParticleFreq"));
 	}
 	
 	@Override
 	protected void writeEntityToNBT(NBTTagCompound compound) {
 		super.writeEntityToNBT(compound);
+		
+		if (this.getCustomParticle() != null) {
+			compound.setString("Particle", this.getCustomParticle().getParticleName());
+		}
+        compound.setInteger("ParticleParam1", this.getCustomParticleParam1());
+        compound.setInteger("ParticleParam2", this.getCustomParticleParam2());
+        compound.setFloat("ParticleYOffset", this.getCustomParticleYOffset());
+        compound.setFloat("ParticleFreq", this.getCustomParticleFrequency());
 	}
 }

@@ -307,7 +307,7 @@ public class NostrumMagic implements INostrumMagic {
 
 	@Override
 	public void addMana(int mana) {
-		this.mana = Math.min(this.mana + mana, this.getMaxMana());
+		this.mana = Math.max(0, Math.min(this.mana + mana, this.getMaxMana()));
 	}
 
 	@Override

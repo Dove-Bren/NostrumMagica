@@ -4,15 +4,20 @@ import java.lang.reflect.Field;
 import java.nio.IntBuffer;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import com.smanzana.nostrummagica.NostrumMagica;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
@@ -21,12 +26,17 @@ import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.crash.CrashReport;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ReportedException;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.client.model.pipeline.LightUtil;
 import net.minecraftforge.client.model.pipeline.VertexBufferConsumer;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
@@ -35,7 +45,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public final class RenderFuncs {
-
+	
+	private static final MutableBlockPos cursor = new MutableBlockPos(); // If there are ever threads at play, this will not work
+	
 	public static final void RenderBlockOutline(EntityPlayer player, World world, Vec3d pos, IBlockState blockState, float partialTicks) {
 		GlStateManager.enableBlend();
 		GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
@@ -220,5 +232,181 @@ public final class RenderFuncs {
 			crashReport.makeCategory("Reflectively Accessing BufferBuilder#rawIntBuffer");
 			throw new ReportedException(crashReport);
 		}
+	}
+	
+	public static void renderWeather(BlockPos at, float partialTicks, boolean snow) {
+		//throw new RuntimeException("Not finished implementing");
+		final Minecraft mc = Minecraft.getMinecraft();
+		//enableLightmap();
+		disableLightmap();
+		Entity entity = mc.getRenderViewEntity();
+		World world = mc.theWorld;
+//		int entPosX = MathHelper.floor_double(entity.posX);
+		int entPosY = MathHelper.floor_double(entity.posY);
+//		int entPosZ = MathHelper.floor_double(entity.posZ);
+		Tessellator tessellator = Tessellator.getInstance();
+		VertexBuffer vertexbuffer = tessellator.getBuffer();
+		GlStateManager.disableCull();
+		GlStateManager.glNormal3f(0.0F, 1.0F, 0.0F);
+		GlStateManager.enableBlend();
+		GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+		GlStateManager.alphaFunc(516, 0.1F);
+		GlStateManager.color(1f, 1f, 1f, 1f);
+		GlStateManager.disableTexture2D();
+		GlStateManager.enableTexture2D();
+		double entPosDX = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * (double)partialTicks;
+		double entPosDY = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * (double)partialTicks;
+		double entPosDZ = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * (double)partialTicks;
+		int entPosDYFloor = MathHelper.floor_double(entPosDY);
+		int radius = 5;
+
+		if (mc.gameSettings.fancyGraphics)
+		{
+			radius = 10;
+		}
+
+		float f1 = (float)getRendererUpdateCount() + partialTicks;
+		vertexbuffer.setTranslation(-entPosDX, -entPosDY, -entPosDZ);
+		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+
+		Biome biome = world.getBiome(at);
+
+		if (biome.canRain() || biome.getEnableSnow())
+		{
+			int percipWorldY = world.getPrecipitationHeight(at).getY();
+			int percipMinY = entPosY - radius;
+			int percipMaxY = entPosY + radius;
+
+			if (percipMinY < percipWorldY)
+			{
+				percipMinY = percipWorldY;
+			}
+
+			if (percipMaxY < percipWorldY)
+			{
+				percipMaxY = percipWorldY;
+			}
+
+			int lightSampleY = percipWorldY;
+
+			if (percipWorldY < entPosDYFloor)
+			{
+				lightSampleY = entPosDYFloor;
+			}
+
+			if (percipMinY != percipMaxY)
+			{
+				mc.getTextureManager().bindTexture(SNOW_TEXTURES);
+				vertexbuffer.begin(7, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
+				if (!snow)
+				{
+					mc.getTextureManager().bindTexture(RAIN_TEXTURES);
+					double d5 = -((double)(getRendererUpdateCount() + 0 * 0 * 3121 + 0 * 45238971 + 0 * 0 * 418711 + 0 * 13761 & 31) + (double)partialTicks) / 32.0D * (3.0D + 0);
+					double d6 = (double)((float)at.getX() + 0.5F) - entity.posX;
+					double d7 = (double)((float)at.getZ() + 0.5F) - entity.posZ;
+					float f3 = MathHelper.sqrt_double(d6 * d6 + d7 * d7) / (float)radius;
+					float f4 = ((1.0F - f3 * f3) * 0.5F + 0.5F) * .5f;
+					cursor.setPos(at.getX(), lightSampleY, at.getZ());
+					int j3 = world.getCombinedLight(cursor, 0);
+					int k3 = j3 >> 16 & 65535;
+					int l3 = j3 & 65535;
+					vertexbuffer.pos((double)at.getX() - 0 + 0.5D, (double)percipMaxY, (double)at.getZ() - 0 + 0.5D).tex(0.0D, (double)percipMinY * 0.25D + d5).color(1.0F, 1.0F, 1.0F, f4).lightmap(k3, l3).endVertex();
+					vertexbuffer.pos((double)at.getX() + 0 + 0.5D, (double)percipMaxY, (double)at.getZ() + 0 + 0.5D).tex(1.0D, (double)percipMinY * 0.25D + d5).color(1.0F, 1.0F, 1.0F, f4).lightmap(k3, l3).endVertex();
+					vertexbuffer.pos((double)at.getX() + 0 + 0.5D, (double)percipMinY, (double)at.getZ() + 0 + 0.5D).tex(1.0D, (double)percipMaxY * 0.25D + d5).color(1.0F, 1.0F, 1.0F, f4).lightmap(k3, l3).endVertex();
+					vertexbuffer.pos((double)at.getX() - 0 + 0.5D, (double)percipMinY, (double)at.getZ() - 0 + 0.5D).tex(0.0D, (double)percipMaxY * 0.25D + d5).color(1.0F, 1.0F, 1.0F, f4).lightmap(k3, l3).endVertex();
+				}
+				else
+				{
+					double d8 = (double)(-((float)(getRendererUpdateCount() & 511) + partialTicks) / 512.0F);
+					double d9 = 0 + (double)f1 * 0.01D * (double)((float) .5D);
+					double d10 = 0 + (double)(f1 * (float) .5D) * 0.001D;
+					double d11 = (double)((float)at.getX() + 0.5F) - entity.posX;
+					double d12 = (double)((float)at.getZ() + 0.5F) - entity.posZ;
+					float f6 = MathHelper.sqrt_double(d11 * d11 + d12 * d12) / (float)radius;
+					float f5 = ((1.0F - f6 * f6) * 0.3F + 0.5F) * .5f;
+					cursor.setPos(at.getX(), lightSampleY, at.getZ());
+					int i4 = (world.getCombinedLight(cursor, 0) * 3 + 15728880) / 4;
+					int j4 = i4 >> 16 & 65535;
+					int k4 = i4 & 65535;
+					vertexbuffer.pos((double)at.getX() - 0 + 0.5D, (double)percipMaxY, (double)at.getZ() - 0 + 0.5D).tex(0.0D + d9, (double)percipMinY * 0.25D + d8 + d10).color(1.0F, 1.0F, 1.0F, f5).lightmap(j4, k4).endVertex();
+					vertexbuffer.pos((double)at.getX() + 0 + 0.5D, (double)percipMaxY, (double)at.getZ() + 0 + 0.5D).tex(1.0D + d9, (double)percipMinY * 0.25D + d8 + d10).color(1.0F, 1.0F, 1.0F, f5).lightmap(j4, k4).endVertex();
+					vertexbuffer.pos((double)at.getX() + 0 + 0.5D, (double)percipMinY, (double)at.getZ() + 0 + 0.5D).tex(1.0D + d9, (double)percipMaxY * 0.25D + d8 + d10).color(1.0F, 1.0F, 1.0F, f5).lightmap(j4, k4).endVertex();
+					vertexbuffer.pos((double)at.getX() - 0 + 0.5D, (double)percipMinY, (double)at.getZ() - 0 + 0.5D).tex(0.0D + d9, (double)percipMaxY * 0.25D + d8 + d10).color(1.0F, 1.0F, 1.0F, f5).lightmap(j4, k4).endVertex();
+				}
+				tessellator.draw();
+			}
+		}
+		
+		// End of old double loop
+
+		vertexbuffer.setTranslation(0.0D, 0.0D, 0.0D);
+		GlStateManager.enableCull();
+		GlStateManager.disableBlend();
+		GlStateManager.alphaFunc(516, 0.1F);
+		//disableLightmap();
+	}
+	
+	public static void disableLightmap() {
+		GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
+		GlStateManager.disableTexture2D();
+		GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
+	}
+
+	public static void enableLightmap() {
+		GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
+		GlStateManager.matrixMode(5890);
+		GlStateManager.loadIdentity();
+		GlStateManager.scale(0.00390625F, 0.00390625F, 0.00390625F);
+		GlStateManager.translate(8.0F, 8.0F, 8.0F);
+		GlStateManager.matrixMode(5888);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(getLocationLightMap());
+		GlStateManager.glTexParameteri(3553, 10241, 9729);
+		GlStateManager.glTexParameteri(3553, 10240, 9729);
+		GlStateManager.glTexParameteri(3553, 10242, 10496);
+		GlStateManager.glTexParameteri(3553, 10243, 10496);
+		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		GlStateManager.enableTexture2D();
+		GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
+    }
+	
+	private static @Nullable EntityRenderer cachedRenderer; // Renderer pulled and modified to expose internal maps and resources
+	private static @Nullable Field cachedLightMapField; // Pulled from renderer above
+	private static @Nullable Field cachedRendererUpdateCountField; // Pulled from renderer above
+	private static final ResourceLocation RAIN_TEXTURES = new ResourceLocation("textures/environment/rain.png");
+	private static final ResourceLocation SNOW_TEXTURES = new ResourceLocation("textures/environment/snow.png");
+	
+	private static final EntityRenderer getCachedRenderer() {
+		final EntityRenderer cur = Minecraft.getMinecraft().entityRenderer;
+		if (cur != cachedRenderer) {
+			// Refresh cache
+			NostrumMagica.logger.info("Refreshing entity renderer cache");
+			cachedRenderer = cur;
+			cachedLightMapField = ReflectionHelper.findField(EntityRenderer.class, "locationLightMap", "field_110922_T");
+			cachedRendererUpdateCountField = ReflectionHelper.findField(EntityRenderer.class, "rendererUpdateCount", "field_78529_t");
+			//cachedLightMapField.setAccessible(true); // done for us in reflection helper
+		}
+		
+		return cachedRenderer;
+	}
+	
+	private static final @Nullable ResourceLocation getLocationLightMap() {
+		final EntityRenderer renderer = getCachedRenderer(); // Also sets up field
+		try {
+			return (ResourceLocation) cachedLightMapField.get(renderer);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	private static final int getRendererUpdateCount() {
+		final EntityRenderer renderer = getCachedRenderer(); // Also sets up field
+		try {
+			return (int) cachedRendererUpdateCountField.get(renderer);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return 0;
 	}
 }

@@ -51,7 +51,8 @@ public enum NostrumMagicaSounds {
 	WISP_HURT("mob.wisp.hurt", SoundCategory.NEUTRAL),
 	WISP_DEATH("mob.wisp.death", SoundCategory.NEUTRAL),
 	WISP_IDLE("mob.wisp.idle", SoundCategory.NEUTRAL),
-	PORTAL("ambient.portal", SoundCategory.AMBIENT);
+	PORTAL("ambient.portal", SoundCategory.AMBIENT),
+	WING_FLAP("entity.wing.flap", SoundCategory.PLAYERS);
 	
 	private ResourceLocation resource;
 	private SoundCategory category;
@@ -90,9 +91,13 @@ public enum NostrumMagicaSounds {
 	}
 	
 	public void play(EntityPlayer player, World world, double x, double y, double z) {
-		world.playSound(player, x, y, z,
-				event, category,
-				volume, 0.8f + (NostrumMagica.rand.nextFloat() * 0.4f));
+		if (world.isRemote) {
+			world.playSound(x, y, z, event, category, volume, .8f + (NostrumMagica.rand.nextFloat() * 0.4f), false);
+		} else {
+			world.playSound(player, x, y, z,
+					event, category,
+					volume, 0.8f + (NostrumMagica.rand.nextFloat() * 0.4f));
+		}
 	}
 	
 	public static void registerSounds() {

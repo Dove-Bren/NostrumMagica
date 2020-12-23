@@ -31,7 +31,7 @@ public class MagicBoostPotion extends Potion {
 	}
 	
 	public boolean isReady(int duration, int amp) {
-		return duration > 0; // Every tick
+		return false; // No tick effects
 	}
 	
 	@SideOnly(Side.CLIENT)

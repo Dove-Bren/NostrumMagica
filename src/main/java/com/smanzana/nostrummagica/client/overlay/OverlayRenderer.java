@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.client.overlay;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 import javax.annotation.Nullable;
 
@@ -18,6 +20,8 @@ import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierG
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierShrink;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierTranslate;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
+import com.smanzana.nostrummagica.client.render.LayerCustomElytra;
+import com.smanzana.nostrummagica.client.render.LayerDragonFlightWings;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.IEntityPet;
 import com.smanzana.nostrummagica.entity.PetInfo;
@@ -43,6 +47,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -1006,8 +1011,19 @@ public class OverlayRenderer extends Gui {
 		}
 	}
 	
+	private static final Map<RenderPlayer, Boolean> InjectedSet = new WeakHashMap<>();
+	
 	@SubscribeEvent
 	public void onPlayerRender(RenderPlayerEvent.Post event) {
+		if (!InjectedSet.containsKey(event.getRenderer())) {
+			InjectedSet.put(event.getRenderer(), true);
+			
+			// EnderIO injects custom cape layer so that capes don't render if an elytra-like item is present. We won't bother.
+			// Instead, we just inject a layer for our custom elytras, and another for dragon-flight wings
+			event.getRenderer().addLayer(new LayerCustomElytra(event.getRenderer()));
+			event.getRenderer().addLayer(new LayerDragonFlightWings(event.getRenderer()));
+		}
+		
 		if (event.getEntityPlayer() != Minecraft.getMinecraft().thePlayer) {
 			// For other players, possibly do armor render ticks
 			for (@Nullable ItemStack equipStack : event.getEntityPlayer().getArmorInventoryList()) {

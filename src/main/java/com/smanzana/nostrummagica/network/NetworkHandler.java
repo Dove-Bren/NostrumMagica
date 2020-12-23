@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.network.messages.ClientEffectRenderMessage;
 import com.smanzana.nostrummagica.network.messages.ClientPurchaseResearchMessage;
 import com.smanzana.nostrummagica.network.messages.ClientSkillUpMessage;
 import com.smanzana.nostrummagica.network.messages.ClientUpdateQuestMessage;
+import com.smanzana.nostrummagica.network.messages.EnchantedArmorStateUpdate;
 import com.smanzana.nostrummagica.network.messages.LoreMessage;
 import com.smanzana.nostrummagica.network.messages.MagicEffectUpdate;
 import com.smanzana.nostrummagica.network.messages.ManaMessage;
@@ -82,6 +83,9 @@ public class NetworkHandler {
 		syncChannel.registerMessage(MagicEffectUpdate.Handler.class, MagicEffectUpdate.class, discriminator++, Side.CLIENT);
 		syncChannel.registerMessage(ClientPurchaseResearchMessage.Handler.class, ClientPurchaseResearchMessage.class, discriminator++, Side.SERVER);
 		syncChannel.registerMessage(CandleIgniteMessage.Handler.class, CandleIgniteMessage.class, discriminator++, Side.CLIENT);
+		syncChannel.registerMessage(EnchantedArmorStateUpdate.Handler.class, EnchantedArmorStateUpdate.class, discriminator++, Side.CLIENT);
+		syncChannel.registerMessage(EnchantedArmorStateUpdate.Handler.class, EnchantedArmorStateUpdate.class, discriminator++, Side.SERVER);
+		
 	}
 	
 }

@@ -11,8 +11,10 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble.ItemType;
+import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
@@ -324,7 +326,8 @@ public class TeleportRune extends BlockContainer  {
 					}
 				}
 			}
-			final double range = TELEPORT_RANGE * (hasEnderBelt ? 2 : 1);
+			final boolean hasEnderSet = EnchantedArmor.GetSetCount(playerIn, EMagicElement.ENDER, 3) == 4;
+			final double range = TELEPORT_RANGE * (hasEnderBelt ? 2 : 1) * (hasEnderSet ? 2 : 1);
 			
 			if (dist > range) {
 				playerIn.addChatComponentMessage(new TextComponentTranslation("info.teleportrune.toofar"));

@@ -121,12 +121,14 @@ import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientEffectRenderMessage;
 import com.smanzana.nostrummagica.network.messages.MagicEffectUpdate;
+import com.smanzana.nostrummagica.network.messages.ManaMessage;
 import com.smanzana.nostrummagica.network.messages.SpellDebugMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
 import com.smanzana.nostrummagica.network.messages.TamedDragonGUIOpenMessage;
 import com.smanzana.nostrummagica.potions.FamiliarPotion;
 import com.smanzana.nostrummagica.potions.FrostbitePotion;
+import com.smanzana.nostrummagica.potions.LightningChargePotion;
 import com.smanzana.nostrummagica.potions.MagicBoostPotion;
 import com.smanzana.nostrummagica.potions.MagicBuffPotion;
 import com.smanzana.nostrummagica.potions.MagicResistPotion;
@@ -161,6 +163,7 @@ import com.smanzana.nostrummagica.world.NostrumFlowerGenerator;
 import com.smanzana.nostrummagica.world.NostrumOreGenerator;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.EntityTracker;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -430,6 +433,7 @@ public class CommonProxy {
     	MagicBoostPotion.instance();
     	MagicBuffPotion.instance();
     	FamiliarPotion.instance();
+    	LightningChargePotion.instance();
     }
     
     private void registerItems() {
@@ -936,5 +940,22 @@ public class CommonProxy {
 				NetworkHandler.getSyncChannel().sendTo(message, (EntityPlayerMP) player);
 			}
 		}
+	}
+	
+	public void sendMana(EntityPlayer player) {
+		EntityTracker tracker = ((WorldServer) player.worldObj).getEntityTracker();
+		if (tracker == null)
+			return;
+		
+		INostrumMagic stats = NostrumMagica.getMagicWrapper(player);
+		final int mana;
+		if (stats == null) {
+			mana = 0;
+		} else {
+			mana = stats.getMana();
+		}
+		
+		tracker.sendToTrackingAndSelf(player, NetworkHandler.getSyncChannel()
+				.getPacketFrom(new ManaMessage(player, mana)));
 	}
 }

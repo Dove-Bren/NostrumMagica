@@ -348,6 +348,14 @@
         [
             "nostrummagica:items/hookshot_tick"
         ]
+    },
+    
+    "entity.wing.flap":
+    {
+        "sounds":
+        [
+            "nostrummagica:entity/wing_flap"
+        ]
     }
     
 }
