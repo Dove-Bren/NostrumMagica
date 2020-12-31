@@ -42,6 +42,8 @@ public class ModConfig {
 		
 		LOGIN_TEXT(Category.DISPLAY, "display_login_text", true, false, "On login, show Nostrum Magica welcome text"),
 		
+		CONTROL_DASH_DOUBLEPRESS(Category.CONTROL, "ender_dash_double_press", true, false, "Activate Ender Dash on movement key double-press"),
+		
 		OBELISK_REQ_MAGIC(Category.SERVER, "obelisk_req_magic", true, true, "Magic must be unlocked before obelisks can be used or teleported to."),
 		NOSTRUM_WORLDS(Category.SERVER, "nostrum_worlds", new int[]{0}, true, "Which worlds to generate Nostrum dungeons in"),
 		NOSTRUM_DIMENSION_ID(Category.SERVER, "nostrum_dimension_id", 244, true, "Dimension ID for Nostrum's Sorcery dimension. Change if other mods want to use the same id."),
@@ -52,6 +54,7 @@ public class ModConfig {
 		public static enum Category {
 			SERVER("server", "Core properties that MUST be syncronized bytween the server and client. Client values ignored"),
 			DISPLAY("display", "Item tag information and gui display options"),
+			CONTROL("controls", "Options to change various controls"),
 			SPELL("spell", "Options that change client-side handling of spells");
 			
 			private String categoryName;
@@ -327,7 +330,7 @@ public class ModConfig {
 				localValues.put(key, newValue);
 				return true;
 			} else {
-				NostrumMagica.logger.warn("Bad attempted config assignment: "
+				NostrumMagica.logger.warn("Bad attempted config assignment for " + key.key + ": "
 						+ newValue + "[" + newValue.getClass() + "] -> ["
 						+ key.getDefault().getClass() + "]");
 				return false;
@@ -476,5 +479,9 @@ public class ModConfig {
 	
 	public boolean overrideElytraCode() {
 		return getBooleanValue(Key.NOSTRUM_OVERRIDE_ELYTRA, true);
+	}
+	
+	public boolean doubleEnderDash() {
+		return getBooleanValue(Key.CONTROL_DASH_DOUBLEPRESS, false);
 	}
 }

@@ -90,14 +90,18 @@ public enum NostrumMagicaSounds {
 		play(null, world, x, y, z);
 	}
 	
+	public void playClient(Entity at) {
+		playClient(at.worldObj, at.posX, at.posY, at.posZ);
+	}
+	
+	public void playClient(World world, double x, double y, double z) {
+		world.playSound(x, y, z, event, category, volume, .8f + (NostrumMagica.rand.nextFloat() * 0.4f), false);
+	}
+	
 	public void play(EntityPlayer player, World world, double x, double y, double z) {
-		if (world.isRemote) {
-			world.playSound(x, y, z, event, category, volume, .8f + (NostrumMagica.rand.nextFloat() * 0.4f), false);
-		} else {
-			world.playSound(player, x, y, z,
-					event, category,
-					volume, 0.8f + (NostrumMagica.rand.nextFloat() * 0.4f));
-		}
+		world.playSound(player, x, y, z,
+				event, category,
+				volume, 0.8f + (NostrumMagica.rand.nextFloat() * 0.4f));
 	}
 	
 	public static void registerSounds() {

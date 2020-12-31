@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.listeners;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -73,6 +74,7 @@ import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock;
 import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
+import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
@@ -674,6 +676,23 @@ public class PlayerListener {
 	}
 	
 	@SubscribeEvent
+	public void onBlockDrops(HarvestDropsEvent event) {
+		if (event.isCanceled()) {
+			return;
+		}
+		
+		final List<ItemStack> drops = event.getDrops();
+		
+		if (event.getState().getMaterial() == Material.LEAVES
+				&& NostrumMagica.rand.nextFloat() <= 0.2f) {
+			drops.add(ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1));
+		}
+		if (event.getState().getMaterial() == Material.WEB) {
+			drops.add(ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1));
+		}
+	}
+	
+	@SubscribeEvent
 	public void onBlockBreak(BreakEvent event) {
 		if (event.isCanceled())
 			return;
@@ -685,24 +704,6 @@ public class PlayerListener {
 				attr.giveBasicLore((ILoreTagged) event.getState().getBlock());
 			} else if (null != LoreRegistry.getPreset(event.getState().getBlock()))
 				attr.giveBasicLore(LoreRegistry.getPreset(event.getState().getBlock()));
-		}
-		
-		if (event.getState().getMaterial() == Material.LEAVES
-				&& NostrumMagica.rand.nextFloat() <= 0.2f) {
-			EntityItem entity = new EntityItem(event.getWorld(),
-					event.getPos().getX() + 0.5,
-					event.getPos().getY() + 0.5,
-					event.getPos().getZ() + 0.5,
-					ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1));
-			event.getWorld().spawnEntityInWorld(entity);
-		}
-		if (event.getState().getMaterial() == Material.WEB) {
-			EntityItem entity = new EntityItem(event.getWorld(),
-					event.getPos().getX() + 0.5,
-					event.getPos().getY() + 0.5,
-					event.getPos().getZ() + 0.5,
-					ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1));
-			event.getWorld().spawnEntityInWorld(entity);
 		}
 		
 //		if (event.getState().getBlock() instanceof BlockTallGrass

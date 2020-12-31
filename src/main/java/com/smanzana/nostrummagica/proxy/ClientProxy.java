@@ -414,6 +414,8 @@ public class ClientProxy extends CommonProxy {
     	TileEntityPortalRenderer.init();
     	TileEntityProgressionDoorRenderer.init();
     	
+    	EnchantedArmor.ClientInit();
+    	
     	OBJLoader.INSTANCE.addDomain(NostrumMagica.MODID);
     	
     	MinecraftForge.EVENT_BUS.register(this);

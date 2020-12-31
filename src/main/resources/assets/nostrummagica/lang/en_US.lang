@@ -383,6 +383,11 @@ itemGroup.nostrummagica_enhancements=Nostrum Enhancements
 key.cast.desc=Cast Spell
 key.spellscroll.desc=Scroll Spells (+ MouseWheel)
 key.infoscreen.desc=Info Screen
+key.dash.left.desc=Ender Dash Left
+key.dash.right.desc=Ender Dash Right
+key.dash.back.desc=Ender Dash Back
+key.armor.toggle.desc=Toggle Armor On-hit Effects
+
 key.nostrummagica.desc=Nostrum Magica
 
 attribute.name.nostrummagica.magic_resist=Magic Resistance

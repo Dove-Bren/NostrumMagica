@@ -447,8 +447,6 @@ public class SpellAction {
 			
 			if (state == null)
 				return true;
-			if (state.isTranslucent())
-				return true;
 			if (state.getMaterial().isLiquid())
 				return true;
 			if (!state.getMaterial().blocksMovement())

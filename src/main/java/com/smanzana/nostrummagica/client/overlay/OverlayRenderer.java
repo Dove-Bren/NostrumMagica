@@ -986,7 +986,8 @@ public class OverlayRenderer extends Gui {
 	@SubscribeEvent
 	public void onEntityRender(RenderLivingEvent.Post<EntityLivingBase> event) {
 		if (event.getEntity().ticksExisted % 4 == 0) {
-			if (NostrumMagica.magicEffectProxy.getData(event.getEntity(), SpecialEffect.ROOTED) != null) {
+			EffectData data = NostrumMagica.magicEffectProxy.getData(event.getEntity(), SpecialEffect.ROOTED);
+			if (data != null && data.getCount() != 0) {
 				final ClientEffect effect = new ClientEffectAnimated(event.getEntity().getPositionVector(), 1000L,
 						new ClientEffect[] {
 							new ClientEffect(Vec3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_0, 0, 0, 0), 1500L),

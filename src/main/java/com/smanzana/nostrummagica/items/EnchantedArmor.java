@@ -23,6 +23,7 @@ import com.smanzana.nostrummagica.attributes.AttributeMagicReduction;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.model.ModelEnchantedArmorBase;
+import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaEntityEffect;
 import com.smanzana.nostrummagica.network.NetworkHandler;
@@ -36,12 +37,15 @@ import com.smanzana.nostrummagica.utils.Projectiles;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockCrops;
+import net.minecraft.block.BlockSapling;
 import net.minecraft.block.IGrowable;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IProjectile;
@@ -74,8 +78,12 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.ISpecialArmor;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
+import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
@@ -128,10 +136,13 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	// UUIDs for modifiers for base attributes from armor
 	private static final UUID[] ARMOR_MODIFIERS = new UUID[] {UUID.fromString("922AB274-1111-56FE-19AE-365AA9758B8B"), UUID.fromString("D1459204-0E61-4716-A129-61666D432E0D"), UUID.fromString("1F7D236D-1118-6524-3375-34814505B28E"), UUID.fromString("2A632266-F4E1-2E67-7836-64FD783B7A50")};
 	
+	// UUID for speed and jump-boost modifiers
+	private static final UUID[] ARMOR_SPEED_MODS = new UUID[] {UUID.fromString("822AB274-1111-56FE-19AE-365AA9758B8B"), UUID.fromString("C1459204-0E61-4716-A129-61666D432E0D"), UUID.fromString("2F7D236D-1118-6524-3375-34814505B28E"), UUID.fromString("3A632266-F4E1-2E67-7836-64FD783B7A50")};
+	//private static final UUID[] ARMOR_JUMP_MODS = new UUID[] {UUID.fromString("722AB274-1111-56FE-19AE-365AA9758B8B"), UUID.fromString("B1459204-0E61-4716-A129-61666D432E0D"), UUID.fromString("3F7D236D-1118-6524-3375-34814505B28E"), UUID.fromString("4A632266-F4E1-2E67-7836-64FD783B7A50")};
+	
 	// UUIDs for set-based modifiers.
 	// Each corresponds to a slot that's adding its bonus
 	private static final UUID[] SET_MODIFIERS = new UUID[] {UUID.fromString("29F29D77-7DC5-4B68-970F-853633662A72"), UUID.fromString("A84E2267-7D48-4943-9C1C-25A022E85930"), UUID.fromString("D48816AD-B00D-4098-B686-2FC24436CD56"), UUID.fromString("104C2D3C-3987-4D56-9727-FFBEE388F6AF")};
-	
 	
 	private static int calcArmor(EntityEquipmentSlot slot, EMagicElement element, int level) {
 		
@@ -349,11 +360,53 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return (int) Math.floor(amt * mod);
 	}
 	
+	private static double calcArmorSpeedBoost(EntityEquipmentSlot slot, EMagicElement element, int level) {
+		if (level < 3) {
+			return 0;
+		}
+		
+		switch (element) {
+		case EARTH:
+		case ENDER:
+		case FIRE:
+		case ICE:
+		case LIGHTNING:
+		case PHYSICAL:
+			return .05; // +5% per piecce. 20% for 4 pieces (same as speed I)
+		case WIND:
+			return .075; // +7.5% per piecce. 30% for 4 pieces (halfway between speed I and II)
+		}
+		
+		return 0;
+	}
+	
+	private static double calcArmorJumpBoost(EntityEquipmentSlot slot, EMagicElement element, int level) {
+		if (level < 3) {
+			return 0;
+		}
+		
+		switch (element) {
+		case EARTH:
+		case ENDER:
+		case FIRE:
+		case ICE:
+		case LIGHTNING:
+		case PHYSICAL:
+			return .2; // same as jump-boost 2
+		case WIND:
+			return .3;
+		}
+		
+		return 0;
+	}
+	
 	private int level;
 	private int armor; // Can't use vanilla; it's final
 	private double magicResistAmount;
 	private double magicReducAmount;
 	private EMagicElement element;
+	private double jumpBoost;
+	private double speedBoost;
 	
 	private String modelID;
 	
@@ -372,6 +425,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		this.armor = calcArmor(type, element, level);
 		this.magicResistAmount = (Math.round((double) calcMagicResistBase(type, element, level) * 4.0D)); // Return is out of 25, so x 4 for %
 		this.magicReducAmount = calcMagicReduct(type, element, level);
+		this.jumpBoost = calcArmorJumpBoost(type, element, level);
+		this.speedBoost = calcArmorSpeedBoost(type, element, level);
 		
 		this.setMaxDamage(calcArmorDurability(type, element, level));
 		
@@ -393,6 +448,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
         {
             multimap.put(SharedMonsterAttributes.ARMOR.getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor modifier", (double)this.armor, 0));
             multimap.put(SharedMonsterAttributes.ARMOR_TOUGHNESS.getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor toughness", 1, 0));
+            multimap.put(SharedMonsterAttributes.MOVEMENT_SPEED.getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_SPEED_MODS[equipmentSlot.getIndex()], "Armor speed boost", (double)this.speedBoost, 2));
             multimap.put(AttributeMagicResist.instance().getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Resist", (double)this.magicResistAmount, 0));
             multimap.put(AttributeMagicReduction.instance(this.element).getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Reduction", (double)this.magicReducAmount, 0));
         }
@@ -414,6 +470,10 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	public SpellAction getTriggerAction(EntityLivingBase user, boolean offense, ItemStack stack) {
 		if (offense)
 			return null;
+		
+		if (!GetArmorHitEffectsEnabled(user)) {
+			return null;
+		}
 		
 		SpellAction action = null;
 		switch (element) {
@@ -1029,10 +1089,10 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		}
 	}
 	
-	protected static final int MANA_JUMP_COST = 75;
+	protected static final int MANA_JUMP_COST = 50;
 	protected static final int MANA_DRAGON_FLIGHT = 1;
-	protected static final int WIND_TORNADO_COST = 100;
-	protected static final int ENDER_DASH_COST = 30;
+	protected static final int WIND_TORNADO_COST = 50;
+	protected static final int ENDER_DASH_COST = 20;
 	protected static final int EARTH_GROW_COST = 5;
 	
 	protected boolean hasManaJump(EntityLivingBase entity) {
@@ -1136,6 +1196,54 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	private int lastLeftTicks = -1;
 	private boolean rightPressedEarly = false;
 	private int lastRightTicks = -1;
+	
+	private static KeyBinding bindingEnderLeft;
+	private static KeyBinding bindingEnderRight;
+	private static KeyBinding bindingEnderBack;
+	// private static KeyBinding bindingSummonTornado;
+	private static KeyBinding bindingToggleArmorEffect;
+	
+	public static final void ClientInit() {
+		bindingEnderLeft = new KeyBinding("key.dash.left.desc", Keyboard.KEY_NUMPAD7, "key.nostrummagica.desc");
+		ClientRegistry.registerKeyBinding(bindingEnderLeft);
+
+		bindingEnderRight = new KeyBinding("key.dash.right.desc", Keyboard.KEY_NUMPAD9, "key.nostrummagica.desc");
+		ClientRegistry.registerKeyBinding(bindingEnderRight);
+
+		bindingEnderBack = new KeyBinding("key.dash.back.desc", Keyboard.KEY_NUMPAD2, "key.nostrummagica.desc");
+		ClientRegistry.registerKeyBinding(bindingEnderBack);
+
+		bindingToggleArmorEffect = new KeyBinding("key.armor.toggle.desc", Keyboard.KEY_NUMPAD5, "key.nostrummagica.desc");
+		ClientRegistry.registerKeyBinding(bindingToggleArmorEffect);
+		
+	}
+	
+	protected void clientDashSide(EntityLivingBase ent, boolean right) {
+		this.consumeEnderDash(ent);
+		NetworkHandler.getSyncChannel().sendToServer(new EnchantedArmorStateUpdate(ArmorState.ENDER_DASH_SIDE, right, 0));
+	}
+	
+	protected void clientDashBack(EntityLivingBase ent) {
+		this.consumeEnderDash(ent);
+		NetworkHandler.getSyncChannel().sendToServer(new EnchantedArmorStateUpdate(ArmorState.ENDER_DASH_BACK, false, 0));
+	}
+	
+	@SubscribeEvent
+	public void onKey(KeyInputEvent event) {
+		EntityPlayer player = NostrumMagica.proxy.getPlayer();
+		if (bindingEnderLeft.isPressed()) {
+			clientDashSide(player, false);
+		} else if (bindingEnderRight.isPressed()) {
+			clientDashSide(player, true);
+		} else if (bindingEnderBack.isPressed()) {
+			clientDashBack(player);
+		} else if (bindingToggleArmorEffect.isPressed()) {
+			NostrumMagicaSounds.UI_TICK.playClient(player);
+			final boolean enabled = !GetArmorHitEffectsEnabled(player);
+			SetArmorHitEffectsEnabled(player, enabled);
+			NetworkHandler.getSyncChannel().sendToServer(new EnchantedArmorStateUpdate(ArmorState.EFFECT_TOGGLE, enabled, 0));
+		}
+	}
 	
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
@@ -1258,30 +1366,25 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 					return;
 				}
 				
-				if (this.hasEnderDash(player)) {
-					this.consumeEnderDash(player);
-					NetworkHandler.getSyncChannel().sendToServer(new EnchantedArmorStateUpdate(ArmorState.ENDER_DASH_BACK, false, 0));
+				if (ModConfig.config.doubleEnderDash() && this.hasEnderDash(player)) {
+					clientDashBack(player);
 					return;
 				}
 			}
 			
 			if (doubleLeft) {
-				if (this.hasEnderDash(player)) {
-					this.consumeEnderDash(player);
-					NetworkHandler.getSyncChannel().sendToServer(new EnchantedArmorStateUpdate(ArmorState.ENDER_DASH_SIDE, false, 0));
+				if (ModConfig.config.doubleEnderDash() && this.hasEnderDash(player)) {
+					clientDashSide(player, false);
 					return;
 				}
 			}
 			
 			if (doubleRight) {
-				if (this.hasEnderDash(player)) {
-					this.consumeEnderDash(player);
-					NetworkHandler.getSyncChannel().sendToServer(new EnchantedArmorStateUpdate(ArmorState.ENDER_DASH_SIDE, true, 0));
+				if (ModConfig.config.doubleEnderDash() && this.hasEnderDash(player)) {
+					clientDashSide(player, true);
 					return;
 				}
 			}
-			
-			// in the future, consider making ender teleport be able to happen while falling too
 		}
 		
 		lastTickGround = player.onGround;
@@ -1328,6 +1431,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	// Note: We only care about players. This could be expanded but would also need better cleanup 
 	// to avoid infinite RAM spam
 	private static final Map<UUID, Map<FlyingTrackedData, Integer>> ArmorFlyingMap = new HashMap<>();
+	
+	private static final Map<UUID, Boolean> ArmorHitEffectMap = new HashMap<>();
 	
 	protected static boolean ArmorCheckFlying(EntityLivingBase ent) {
 		final UUID id = ent.getUniqueID();
@@ -1385,7 +1490,6 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			if (curTicks > lastTicks + WING_FLAP_DURATION) {
 				map.put(FlyingTrackedData.LAST_WING_FLAP, curTicks);
 				changed = true;
-				System.out.println("Putting " + curTicks);
 			}
 		}
 		
@@ -1398,24 +1502,51 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return Math.max(0.0f, Math.min(1.0f, (float) (curTicks - flapStartTicks) / WING_FLAP_DURATION));
 	}
 	
+	public static final void SetArmorHitEffectsEnabled(EntityLivingBase ent, boolean enabled) {
+		final UUID key = ent.getUniqueID();
+		if (enabled) {
+			ArmorHitEffectMap.put(key, enabled);
+		} else {
+			ArmorHitEffectMap.remove(key);
+		}
+	}
+	
+	public static final boolean GetArmorHitEffectsEnabled(EntityLivingBase ent) {
+		Boolean val = ArmorHitEffectMap.get(ent.getUniqueID());
+		return (val != null && val.booleanValue());
+	}
+	
 	private static final boolean DoEnderDash(EntityLivingBase entity, Vec3d dir) {
 		final float dashDist = 4.0f;
 		final Vec3d idealVec = entity.getPositionVector().addVector(dashDist * dir.xCoord, dashDist * dir.yCoord, dashDist * dir.zCoord);
-		RayTraceResult mop = RayTrace.raytrace(entity.worldObj, entity.getPositionVector(), idealVec, (ent) -> {
-			return false;
-		});
 		
-		final Vec3d spot;
-		if (mop != null && mop.typeOfHit == RayTraceResult.Type.BLOCK) {
-			spot = mop.hitVec;
-		} else {
-			// Didn't hit anything. Just hop over there
-			spot = idealVec;
+		// Do three traces from y=0, y=1, and y=2. Take best one
+		Vec3d bestResult = null;
+		double bestDist = -1;
+		final Vec3d startPos = entity.getPositionVector();
+		for (int y = -1; y <= 4; y++) {
+			final Vec3d end = idealVec.addVector(0, y, 0);
+			RayTraceResult mop = RayTrace.raytrace(entity.worldObj, startPos.addVector(0, y, 0), end, (ent) -> {
+				return false;
+			});
+			
+			final Vec3d spot;
+			if (mop != null && mop.typeOfHit == RayTraceResult.Type.BLOCK) {
+				spot = mop.hitVec;
+			} else {
+				// Didn't hit anything. Count as ideal
+				spot = end;
+			}
+			
+			final double dist = startPos.addVector(0, y, 0).distanceTo(spot);
+			if (dist > bestDist) {
+				bestDist = dist;
+				bestResult = spot;
+			}
 		}
 		
-		final Vec3d oldPos = entity.getPositionVector();
-		if (entity.attemptTeleport(spot.xCoord, spot.yCoord, spot.zCoord)) {
-			entity.worldObj.playSound(null, oldPos.xCoord, oldPos.yCoord, oldPos.zCoord,
+		if (entity.attemptTeleport(bestResult.xCoord, bestResult.yCoord, bestResult.zCoord)) {
+			entity.worldObj.playSound(null, startPos.xCoord, startPos.yCoord, startPos.zCoord,
 					SoundEvents.ENTITY_ENDERMEN_TELEPORT, SoundCategory.PLAYERS,
 					1f, 1f);
 			return true;
@@ -1432,7 +1563,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			IBlockState state = world.getBlockState(cursor);
 			if (state != null && state.getBlock() instanceof IGrowable) {
 				IGrowable growable = (IGrowable) state.getBlock();
-				if (growable == Blocks.GRASS) {
+				if (!(growable instanceof BlockCrops) && !(growable instanceof BlockSapling)) {
 					continue;
 				}
 				if (growable.canGrow(world, cursor, state, false) && growable.canUseBonemeal(world, itemRand, cursor, state)) {
@@ -1521,6 +1652,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			return;
 		}
 		
+		final EnchantedArmor armor = (EnchantedArmor) chest.getItem();
+		
 		switch (state) {
 		case FLYING:
 			SetArmorFlying(ent, data);
@@ -1529,18 +1662,17 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		case JUMP:
 			// Deduct mana
 			if (!ent.worldObj.isRemote) {
-				((EnchantedArmor) chest.getItem()).consumeManaJump(ent);
+				armor.consumeManaJump(ent);
 			}
 			break;
 		case ENDER_DASH_BACK:
-			if (!ent.worldObj.isRemote) {
+			if (!ent.worldObj.isRemote && armor.hasEnderDash(ent)) {
 				final Vec3d realLook = ent.getLookVec();
 				final Vec3d fakeLook = new Vec3d(realLook.xCoord, 0, realLook.zCoord);
 				Vec3d dir = fakeLook.scale(-1);
 				if (DoEnderDash(ent, dir)) {
-					((EnchantedArmor) chest.getItem()).consumeEnderDash(ent);
+					armor.consumeEnderDash(ent);
 				} else {
-					System.out.println("Failed dash");
 					if (ent instanceof EntityPlayer) {
 						NostrumMagica.proxy.sendMana((EntityPlayer) ent);
 					}
@@ -1548,18 +1680,18 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			}
 			break;
 		case ENDER_DASH_SIDE:
-			if (!ent.worldObj.isRemote) {
+			if (!ent.worldObj.isRemote && armor.hasEnderDash(ent)) {
 				final Vec3d realLook = ent.getLookVec();
 				final Vec3d fakeLook = new Vec3d(realLook.xCoord, 0, realLook.zCoord);
 				final Vec3d dir = fakeLook.rotateYaw((float) ((Math.PI / 2) * (data ? -1 : 1)));
 				if (DoEnderDash(ent, dir)) {
-					((EnchantedArmor) chest.getItem()).consumeEnderDash(ent);
+					armor.consumeEnderDash(ent);
 				}
 			}
 			break;
 		case WIND_TORNADO:
-			if (!ent.worldObj.isRemote) {
-				((EnchantedArmor) chest.getItem()).consumeWindTornado(ent);
+			if (!ent.worldObj.isRemote && armor.hasWindTornado(ent)) {
+				armor.consumeWindTornado(ent);
 				EntityAreaEffect cloud = new EntityAreaEffect(ent.worldObj, ent.posX, ent.posY, ent.posZ);
 				cloud.setOwner(ent);
 				
@@ -1618,16 +1750,60 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			// Deduct mana
 			if (data) {
 				if (!ent.worldObj.isRemote) {
-					((EnchantedArmor) chest.getItem()).consumeDragonFlight(ent);
+					armor.consumeDragonFlight(ent);
 				} else {
 					if (SetArmorWingFlap(ent)) {
 						if (ent instanceof EntityPlayer) {
-							NostrumMagicaSounds.WING_FLAP.play((EntityPlayer) ent);
+							NostrumMagicaSounds.WING_FLAP.playClient((EntityPlayer) ent);
 						}
 					}
 				}
 			}
 			break;
+		case EFFECT_TOGGLE:
+			SetArmorHitEffectsEnabled(ent, data);
+			break;
+		}
+	}
+	
+	@SubscribeEvent
+	public void onJump(LivingJumpEvent event) {
+		// Full true/corrupt sets give jump boost
+		if (event.isCanceled()) {
+			return;
+		}
+
+		EntityLivingBase ent = event.getEntityLiving();
+		@Nullable ItemStack chestplate = ent.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
+		if (chestplate == null || !(chestplate.getItem() instanceof EnchantedArmor)) {
+			return;
+		}
+		
+		EnchantedArmor armor = (EnchantedArmor) chestplate.getItem();
+		if (armor.level >= 3 && armor == this && armor.getSetPieces(ent) == 4) {
+			// Jump-boost gives an extra .1 per level. We want 2-block height so we do .2
+			ent.motionY += armor.jumpBoost;
+		}
+	}
+	
+	@SubscribeEvent
+	public void onJump(LivingFallEvent event) {
+		// Full true/corrupt sets give jump boost
+		if (event.isCanceled()) {
+			return;
+		}
+
+		EntityLivingBase ent = event.getEntityLiving();
+		@Nullable ItemStack chestplate = ent.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
+		if (chestplate == null || !(chestplate.getItem() instanceof EnchantedArmor)) {
+			return;
+		}
+		
+		EnchantedArmor armor = (EnchantedArmor) chestplate.getItem();
+		if (armor.level >= 3 && armor == this && armor.getSetPieces(ent) == 4) {
+			// Jump-boost gives an extra .1 per level. We want 2-block height so we do .2
+			final float amt = (float) (armor.jumpBoost / .1f);
+			event.setDistance(Math.max(0f, event.getDistance() - amt));
 		}
 	}
 }

@@ -56,6 +56,7 @@ public class EnchantedArmorStateUpdate implements IMessage {
 		ENDER_DASH_SIDE,
 		ENDER_DASH_BACK,
 		WIND_TORNADO,
+		EFFECT_TOGGLE,
 	}
 	
 	private static final String NBT_ID = "id";

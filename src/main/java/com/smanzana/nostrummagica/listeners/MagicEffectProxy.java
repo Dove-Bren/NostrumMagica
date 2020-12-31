@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.potions.MagicBuffPotion;
 import com.smanzana.nostrummagica.potions.MagicShieldPotion;
 import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
+import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
@@ -296,6 +297,9 @@ public class MagicEffectProxy {
 			break;
 		case SHIELD_MAGIC:
 			potion = MagicShieldPotion.instance();
+			break;
+		case ROOTED:
+			potion = RootedPotion.instance();
 			break;
 		default:
 			;
