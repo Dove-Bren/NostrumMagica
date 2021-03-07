@@ -93,7 +93,10 @@ public class ActiveHopper extends BlockContainer {
 	}
 	
 	public static boolean GetEnabled(IBlockState state) {
-		return state.getValue(ENABLED);
+		if (state != null && state.getBlock() instanceof ActiveHopper) {
+			return state.getValue(ENABLED);
+		}
+		return false;
 	}
 	
 	@Override
