@@ -2,16 +2,19 @@ buildscript {
     repositories {
         jcenter()
         maven { url = "http://files.minecraftforge.net/maven" }
+        mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
     }
 }
-apply plugin: 'net.minecraftforge.gradle.forge'
-//Only edit below this line, the above code adds and enables the nessasary things for Forge to be setup.
+apply plugin: 'net.minecraftforge.gradle'
+// Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
 
 
-version = "1.10.2-1.6.23"
+version = "1.10.2-1.7.0"
 group= "com.smanzana.nostrummagica" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "nostrummagica"
 
@@ -21,9 +24,9 @@ compileJava {
 }
 
 minecraft {
-    version = "1.10.2-12.18.3.2185"
+    //version = "1.10.2-12.18.3.2185"
     //version = "1.12.2-14.23.4.2705"
-    runDir = "run"
+    //runDir = "run"
     
     // the mappings can be changed at any time, and must be in the following format.
     // snapshot_YYYYMMDD   snapshot are built nightly.
@@ -31,8 +34,29 @@ minecraft {
     // Use non-default mappings at your own risk. they may not allways work.
     // simply re-run your setup task after changing the mappings to update your workspace.
     //mappings = "snapshot_20171003"
-    mappings = "snapshot_20161111"
+    //mappings = "snapshot_20161111"
+	 mappings channel: 'snapshot', version: '20171003-1.12'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+	runs {
+        client {
+            workingDirectory project.file('run')
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+        }
+
+        server {
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+        }
+    }
 }
 
 repositories {  
@@ -63,7 +87,9 @@ repositories {
 
 dependencies {
     
-    deobfProvided "mezz.jei:jei_${mc_version}:${jei_version}:api"
+	minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2854'
+	
+    deobf "mezz.jei:jei_${mc_version}:${jei_version}:api"
     runtime "mezz.jei:jei_${mc_version}:${jei_version}"
 
     //provided 'com.enderio.Enderio:enderio:1.10.2-3.1.193:api'
@@ -100,6 +126,7 @@ dependencies {
 
 }
 
+/*
 processResources
 {
     // this will ensure that this task is redone when the versions change.
@@ -119,6 +146,7 @@ processResources
         exclude 'mcmod.info'
     }
 }
+*/
 
 task coreJar(type: Jar) {
 	from(sourceSets.main.output) {
@@ -148,12 +176,16 @@ jar {
 	}
 }
 
+/*
 reobf {
 	coreJar { mappingType = 'SEARGE' }
 }
+*/
 
+/*
 runClient {
 	args '--username', 'testplayer'
 }	
+*/
 
 build.dependsOn coreJar, deobfJar, jar
