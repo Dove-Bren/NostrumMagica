@@ -1,11 +1,11 @@
-package com.smanzana.nostrummagica.baubles;
+package com.smanzana.nostrummagica.integration.baubles;
 
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.baubles.inventory.BaubleInventoryHelper;
-import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble;
-import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble.ItemType;
+import com.smanzana.nostrummagica.integration.baubles.inventory.BaubleInventoryHelper;
+import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
+import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble.ItemType;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;

@@ -1191,11 +1191,11 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	private boolean jumpPressedEarly = false; // For telling whether jump remains pressed or released and pressed again
 	private boolean lastTickGround = false; // For checking if the player just jumped this tick
 	private boolean backPressedEarly = false;
-	private int lastBackTicks = -1;
+	private long lastBackMSecs = -1;
 	private boolean leftPressedEarly = false;
-	private int lastLeftTicks = -1;
+	private long lastLeftMSecs = -1;
 	private boolean rightPressedEarly = false;
-	private int lastRightTicks = -1;
+	private long lastRightMSecs = -1;
 	
 	private static KeyBinding bindingEnderLeft;
 	private static KeyBinding bindingEnderRight;
@@ -1271,21 +1271,29 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		final boolean doubleBack;
 		final boolean doubleLeft;
 		final boolean doubleRight;
+		final long msecAllowance = 200;
+		final long nowMsecs = System.currentTimeMillis();
 		if (backPress) {
-			doubleBack = (player.ticksExisted - lastBackTicks < 5);
-			lastBackTicks = player.ticksExisted;
+			doubleBack = (nowMsecs - lastBackMSecs < msecAllowance);
+			lastBackMSecs = nowMsecs;
+			lastLeftMSecs = 0;
+			lastRightMSecs = 0;
 		} else {
 			doubleBack = false;
 		}
 		if (leftPress) {
-			doubleLeft = (player.ticksExisted - lastLeftTicks < 5);
-			lastLeftTicks = player.ticksExisted;
+			doubleLeft = (nowMsecs - lastLeftMSecs < msecAllowance);
+			lastLeftMSecs = nowMsecs;
+			lastBackMSecs = 0;
+			lastRightMSecs = 0;
 		} else {
 			doubleLeft = false;
 		}
 		if (rightPress) {
-			doubleRight = (player.ticksExisted - lastRightTicks < 5);
-			lastRightTicks = player.ticksExisted;
+			doubleRight = (nowMsecs - lastRightMSecs < msecAllowance);
+			lastRightMSecs = nowMsecs;
+			lastLeftMSecs = 0;
+			lastBackMSecs = 0;
 		} else {
 			doubleRight = false;
 		}
@@ -1450,6 +1458,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		synchronized(ArmorFlyingMap) {
 			if (!flying) {
 				ArmorFlyingMap.remove(ent.getUniqueID());
+				ent.fallDistance = 0;
 			} else {			
 				if (!ArmorFlyingMap.containsKey(ent.getUniqueID())) {
 					ArmorFlyingMap.put(ent.getUniqueID(), new EnumMap<>(FlyingTrackedData.class));

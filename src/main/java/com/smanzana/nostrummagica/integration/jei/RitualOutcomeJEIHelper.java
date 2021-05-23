@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.jei;
+package com.smanzana.nostrummagica.integration.jei;
 
 import java.awt.Color;
 import java.util.ArrayList;

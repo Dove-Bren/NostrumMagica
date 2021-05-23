@@ -12,10 +12,6 @@ import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.smanzana.nostrummagica.aetheria.AetheriaProxy;
-import com.smanzana.nostrummagica.baubles.BaublesProxy;
-import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble;
-import com.smanzana.nostrummagica.baubles.items.ItemMagicBauble.ItemType;
 import com.smanzana.nostrummagica.blocks.ActiveHopper;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
@@ -55,6 +51,11 @@ import com.smanzana.nostrummagica.entity.IEntityTameable;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
+import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
+import com.smanzana.nostrummagica.integration.baubles.BaublesProxy;
+import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
+import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble.ItemType;
+import com.smanzana.nostrummagica.integration.enderio.EnderIOProxy;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
@@ -208,10 +209,12 @@ public class NostrumMagica
     @SidedProxy(clientSide="com.smanzana.nostrummagica.proxy.ClientProxy", serverSide="com.smanzana.nostrummagica.proxy.CommonProxy")
     public static CommonProxy proxy;
     public static NostrumMagica instance;
-    @SidedProxy(clientSide="com.smanzana.nostrummagica.baubles.BaublesClientProxy", serverSide="com.smanzana.nostrummagica.baubles.BaublesProxy")
+    @SidedProxy(clientSide="com.smanzana.nostrummagica.integration.baubles.BaublesClientProxy", serverSide="com.smanzana.nostrummagica.integration.baubles.BaublesProxy")
     public static BaublesProxy baubles;
-    @SidedProxy(clientSide="com.smanzana.nostrummagica.aetheria.AetheriaClientProxy", serverSide="com.smanzana.nostrummagica.aetheria.AetheriaProxy")
+    @SidedProxy(clientSide="com.smanzana.nostrummagica.integration.aetheria.AetheriaClientProxy", serverSide="com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy")
     public static AetheriaProxy aetheria;
+    @SidedProxy(clientSide="com.smanzana.nostrummagica.integration.enderio.EnderIOClientProxy", serverSide="com.smanzana.nostrummagica.integration.enderio.EnderIOProxy")
+    public static EnderIOProxy enderIO;
     
     public static CreativeTabs creativeTab;
     public static CreativeTabs enhancementTab;
@@ -230,6 +233,7 @@ public class NostrumMagica
         proxy.init();
         aetheria.init();
         baubles.init();
+        enderIO.init();
         new NostrumLootHandler();
         NostrumDimensionMapper.registerDimensions();
     }
@@ -263,12 +267,16 @@ public class NostrumMagica
 	    if (Loader.isModLoaded("nostrumaetheria")) {
 	    	aetheria.enable();
 	    }
+	    if (Loader.isModLoaded("enderio") || Loader.isModLoaded("EnderIO")) {
+	    	enderIO.enable();
+	    }
 	    
     	new ModConfig(new Configuration(event.getSuggestedConfigurationFile()));
     	
     	proxy.preinit();
     	aetheria.preInit();
     	baubles.preInit();
+    	enderIO.preInit();
     	
     	DungeonRoomRegistry.instance().loadRegistryFromDisk();
     	
@@ -290,6 +298,7 @@ public class NostrumMagica
     	proxy.postinit();
     	aetheria.postInit();
     	baubles.postInit();
+    	enderIO.postInit();
     	
     	initFinished = true;
     	
@@ -2268,6 +2277,9 @@ public class NostrumMagica
     	}
     	if (aetheria.isEnabled()) {
     		aetheria.reinitResearch();
+    	}
+    	if (enderIO.isEnabled()) {
+    		enderIO.reinitResearch();
     	}
     	
     	for (Function<Integer, Integer> hook : researchReloadHooks) {

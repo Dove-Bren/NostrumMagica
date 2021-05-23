@@ -20,6 +20,8 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
+import crazypants.enderio.api.teleport.IItemOfTravel;
+import crazypants.enderio.api.teleport.TravelSource;
 import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
@@ -31,14 +33,19 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor {
+public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor, IItemOfTravel {
 
 	public static String ID = "warlock_sword";
 	private static final String NBT_LEVELS = "levels";
 	private static final String NBT_CAPACITY = "capacity";
+	private static final String NBT_ENDERIO_TRAVEL_CAP = "enderio_travel";
 	
 	public static void init() {
 		
@@ -56,7 +63,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor 
 
 	public WarlockSword() {
 		super(ToolMaterial.DIAMOND);
-		this.setMaxDamage(600);
+		this.setMaxDamage(1200);
 		this.setUnlocalizedName(ID);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setMaxStackSize(1);
@@ -137,6 +144,9 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor 
 		
 		if (extra) {
 			tooltip.add("Capacity: " + getCapacity(stack));
+			if (hasEnderIOTravel(stack)) {
+				tooltip.add(ChatFormatting.DARK_PURPLE + "EnderIO Travel Anchor Support" + ChatFormatting.RESET);
+			}
 		} else {
 			tooltip.add("[Hold Shift]");			
 		}
@@ -211,6 +221,26 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor 
 		return stack;
 	}
 	
+	public static boolean hasEnderIOTravel(ItemStack stack) {
+		NBTTagCompound nbt = stack.getTagCompound();
+		if (nbt == null) {
+			return false;
+		}
+		
+		return nbt.getBoolean(NBT_ENDERIO_TRAVEL_CAP);
+	}
+	
+	public static ItemStack setEnderIOTravel(ItemStack stack, boolean hasTravel) {
+		NBTTagCompound nbt = stack.getTagCompound();
+		if (nbt == null) {
+			nbt = new NBTTagCompound();
+		}
+		
+		nbt.setBoolean(NBT_ENDERIO_TRAVEL_CAP, hasTravel);
+		stack.setTagCompound(nbt);
+		return stack;
+	}
+	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
@@ -227,6 +257,10 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor 
 				EMagicElement.ICE, 2),
 				EMagicElement.EARTH, 2),
 				EMagicElement.LIGHTNING, 2));
+		
+		if (NostrumMagica.enderIO.isEnabled()) {
+			subItems.add(setEnderIOTravel(addCapacity(new ItemStack(itemIn), 10), true));
+		}
 	}
 	
 	@Override
@@ -279,5 +313,47 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor 
 			}
 		}
 	}
+	
+	private boolean canEnderTravel(ItemStack item, EntityPlayer player) {
+		return hasEnderIOTravel(item)//getLevel(item, EMagicElement.ENDER) > 0
+				&& (NostrumMagica.getMagicWrapper(player) != null)
+				&& (NostrumMagica.getMagicWrapper(player).isUnlocked());
+	}
+
+	@Override
+	public void extractInternal(ItemStack item, int power) {
+		;
+	}
+
+	@Override
+	public int getEnergyStored(ItemStack item) {
+		return 100000;
+	}
+
+	@Override
+	public boolean isActive(EntityPlayer player, ItemStack item) {
+		return player.isSneaking()
+				&& canEnderTravel(item, player);
+	}
+	
+	@Override
+	public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+		
+		// Earlier right-click stuff here
+		if (playerIn.isSneaking()) {
+			
+		} else {
+			// else if nothign else, try client-side enderIO teleport?
+			if (canEnderTravel(stack, playerIn)) {
+				if (worldIn.isRemote) {
+					NostrumMagica.enderIO.AttemptEnderIOTravel(stack, hand, worldIn, playerIn, TravelSource.STAFF);
+				}
+			}
+		}
+			
+		playerIn.swingArm(hand);
+		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+	}
+	
 
 }

@@ -1,7 +1,7 @@
-package com.smanzana.nostrummagica.jei.handlers;
+package com.smanzana.nostrummagica.integration.jei.handlers;
 
-import com.smanzana.nostrummagica.jei.categories.RitualRecipeCategory;
-import com.smanzana.nostrummagica.jei.wrappers.RitualRecipeWrapper;
+import com.smanzana.nostrummagica.integration.jei.categories.RitualRecipeCategory;
+import com.smanzana.nostrummagica.integration.jei.wrappers.RitualRecipeWrapper;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 
 import mezz.jei.api.recipe.IRecipeHandler;

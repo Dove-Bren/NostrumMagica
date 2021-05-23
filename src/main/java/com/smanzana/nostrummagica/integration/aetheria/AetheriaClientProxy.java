@@ -1,13 +1,13 @@
-package com.smanzana.nostrummagica.aetheria;
+package com.smanzana.nostrummagica.integration.aetheria;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.aetheria.blocks.WispBlock;
-import com.smanzana.nostrummagica.aetheria.items.AetherResourceType;
-import com.smanzana.nostrummagica.aetheria.items.NostrumAetherResourceItem;
 import com.smanzana.nostrummagica.client.render.TileEntityWispBlockRenderer;
+import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock;
+import com.smanzana.nostrummagica.integration.aetheria.items.AetherResourceType;
+import com.smanzana.nostrummagica.integration.aetheria.items.NostrumAetherResourceItem;
 import com.smanzana.nostrummagica.proxy.ClientProxy;
 
 import net.minecraft.client.renderer.block.model.ModelBakery;

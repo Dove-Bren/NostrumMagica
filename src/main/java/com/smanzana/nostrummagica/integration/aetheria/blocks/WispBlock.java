@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.aetheria.blocks;
+package com.smanzana.nostrummagica.integration.aetheria.blocks;
 
 import java.util.Iterator;
 import java.util.LinkedList;

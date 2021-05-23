@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.jei;
+package com.smanzana.nostrummagica.integration.jei;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -6,11 +6,11 @@ import java.util.List;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
+import com.smanzana.nostrummagica.integration.jei.categories.RitualRecipeCategory;
+import com.smanzana.nostrummagica.integration.jei.handlers.RitualRecipeHandler;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellTomePage;
-import com.smanzana.nostrummagica.jei.categories.RitualRecipeCategory;
-import com.smanzana.nostrummagica.jei.handlers.RitualRecipeHandler;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
 

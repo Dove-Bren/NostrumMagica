@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.aetheria.items;
+package com.smanzana.nostrummagica.integration.aetheria.items;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.baubles.items;
+package com.smanzana.nostrummagica.integration.baubles.items;
 
 import java.util.List;
 

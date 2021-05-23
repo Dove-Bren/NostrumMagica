@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.jei.categories;
+package com.smanzana.nostrummagica.integration.jei.categories;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,9 +8,9 @@ import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.book.RitualRecipePage;
-import com.smanzana.nostrummagica.jei.RitualOutcomeJEIRenderer;
-import com.smanzana.nostrummagica.jei.RitualOutcomeWrapper;
-import com.smanzana.nostrummagica.jei.wrappers.RitualRecipeWrapper;
+import com.smanzana.nostrummagica.integration.jei.RitualOutcomeJEIRenderer;
+import com.smanzana.nostrummagica.integration.jei.RitualOutcomeWrapper;
+import com.smanzana.nostrummagica.integration.jei.wrappers.RitualRecipeWrapper;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.requirements.IRitualRequirement;
 import com.smanzana.nostrummagica.spells.EMagicElement;

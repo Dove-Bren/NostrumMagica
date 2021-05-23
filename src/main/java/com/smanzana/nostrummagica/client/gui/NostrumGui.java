@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.aetheria.blocks.WispBlock.WispBlockTileEntity;
 import com.smanzana.nostrummagica.blocks.ActiveHopper.ActiveHopperTileEntity;
 import com.smanzana.nostrummagica.blocks.LoreTable.LoreTableEntity;
 import com.smanzana.nostrummagica.blocks.ModificationTable.ModificationTableEntity;
@@ -22,6 +21,7 @@ import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
 import com.smanzana.nostrummagica.client.gui.container.WispBlockGui;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
+import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock.WispBlockTileEntity;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.items.SpellScroll;

@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.baubles.inventory;
+package com.smanzana.nostrummagica.integration.baubles.inventory;
 
 import baubles.api.BaublesApi;
 import baubles.api.inv.BaublesInventoryWrapper;

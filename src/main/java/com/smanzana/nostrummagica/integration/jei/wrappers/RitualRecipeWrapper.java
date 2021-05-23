@@ -1,12 +1,12 @@
-package com.smanzana.nostrummagica.jei.wrappers;
+package com.smanzana.nostrummagica.integration.jei.wrappers;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.smanzana.nostrummagica.integration.jei.RitualOutcomeWrapper;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.jei.RitualOutcomeWrapper;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.outcomes.IItemRitualOutcome;
 
