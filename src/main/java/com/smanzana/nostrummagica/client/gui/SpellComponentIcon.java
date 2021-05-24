@@ -24,8 +24,8 @@ import com.smanzana.nostrummagica.spells.components.triggers.MagicCutterTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.MagicCyclerTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ManaTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.OtherTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProximityTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 
@@ -145,7 +145,6 @@ public class SpellComponentIcon {
 			; // actually is 0 0
 		} else if (trigger instanceof ProximityTrigger) {
 			u = 1;
-		} else if (trigger instanceof ProjectileTrigger) {
 			u = 2;
 		} else if (trigger instanceof BeamTrigger) {
 			u = 3;
@@ -174,6 +173,9 @@ public class SpellComponentIcon {
 			v = 1;
 		} else if (trigger instanceof MagicCyclerTrigger) {
 			u = 5;
+			v = 1;
+		} else if (trigger instanceof SeekingBulletTrigger) {
+			u = 6;
 			v = 1;
 		} else {
 			System.out.println("Trigger doesn't have set uv: " + trigger);

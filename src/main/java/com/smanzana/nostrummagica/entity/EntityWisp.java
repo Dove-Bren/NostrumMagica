@@ -30,10 +30,10 @@ import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
-import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.BeamTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.MagicCutterTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -675,7 +675,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 			
 			// Fire
 			putSpell("Burn",
-					AITargetTrigger.instance(),
+					SeekingBulletTrigger.instance(),
 					SingleShape.instance(),
 					EMagicElement.FIRE,
 					1,

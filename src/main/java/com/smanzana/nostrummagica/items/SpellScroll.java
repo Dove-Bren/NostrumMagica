@@ -13,6 +13,8 @@ import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
@@ -35,7 +37,7 @@ import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.RecipeSorter;
 import net.minecraftforge.oredict.RecipeSorter.Category;
 
-public class SpellScroll extends Item implements ILoreTagged {
+public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 
 	private static final String NBT_SPELL = "nostrum_spell";
 	private static final String NBT_WAKE_START = "nostrum_timer";
@@ -302,5 +304,16 @@ public class SpellScroll extends Item implements ILoreTagged {
 			setNestedScrollMeta(scroll, (byte) 1);
 			return scroll;
 		}
+	}
+
+	@Override
+	public boolean shouldTrace(World world, EntityPlayer player, ItemStack stack) {
+		Spell spell = getSpell(stack);
+		SpellTrigger firstTrigger = null;
+		if (spell != null && !spell.getSpellParts().isEmpty()) {
+			firstTrigger = spell.getSpellParts().get(0).getTrigger();
+		}
+		
+		return firstTrigger != null && firstTrigger instanceof SeekingBulletTrigger;
 	}
 }

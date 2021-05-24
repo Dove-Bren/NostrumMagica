@@ -86,6 +86,7 @@ item.nostrum_rune.trigger_delay.name=Delay Rune
 item.nostrum_rune.trigger_mana.name=Mana Rune
 item.nostrum_rune.trigger_vortex_blade.name=Vortex Rune
 item.nostrum_rune.trigger_cutter.name=Magic Cutter Rune
+item.nostrum_rune.trigger_bullet.name=Seeking Bullet Rune
 
 item.crystal_small.name=Mani Crystal
 item.crystal_medium.name=Kani Crystal
@@ -362,6 +363,7 @@ entity.nostrummagica.ice_golem.name=Ice Golem
 entity.nostrummagica.wind_golem.name=Wind Golem
 entity.nostrummagica.ender_golem.name=End Golem
 entity.nostrummagica.spell_projectile.name=Spell Projectile
+entity.nostrummagica.spell_bullet.name=Spell Projectile
 entity.nostrummagica.entity_internal_spellsaucer.name=Spell Projectile
 entity.nostrummagica.entity_koid.name=Koid
 entity.nostrummagica.entity_dragon_red.name=Red Dragon
@@ -898,6 +900,7 @@ ritual.rune.trigger_self.name=Self Rune
 ritual.rune.trigger_touch.name=Touch Rune
 ritual.rune.trigger_cutter.name=Magic Cutter Rune
 ritual.rune.trigger_vortex_blade.name=Vortex Rune
+ritual.rune.trigger_bullet.name=Seeking Bullet Rune
 
 ritual.charm.fire.name=Fire Charm
 ritual.charm.ice.name=Ice Charm
@@ -951,6 +954,8 @@ ritual.upgrade_dragonarmor_helm_iron.name=Upgrade To Scale Dragon Helm
 ritual.upgrade_dragonarmor_helm_gold.name=Upgrade To Golden Dragon Helm
 ritual.upgrade_dragonarmor_helm_diamond.name=Upgrade To Diamond Dragon Helm
 
+ritual.warlock_sword.upgrade.travel.name=Warlock Blade Ender Travel Upgrade
+
 enhancement.lower_reagent_cost.name=Lower Reagent Cost
 enhancement.lower_reagent_cost.desc=Reduces the amount of reagents used up when casting a spell
 enhancement.lower_mana_cost.name=Lower Mana Cost
@@ -973,6 +978,7 @@ reward.alteration.ruin=Unlocks the Ruin alteration
 reward.alteration.conjure=Unlocks the Conjure alteration
 reward.alteration.growth=Unlocks the Growth alteration
 reward.alteration.enchant=Unlocks the Enchant alteration
+reward.trigger.trigger_bullet=Unlocks Seeking Bullet Trigger
 
 objective.ritual.magic_token=Perform Barr's Enchantment
 objective.ritual.kani=Perform a Kani Infusion
@@ -1059,6 +1065,8 @@ quest.con1-tec3.name=Controlled Technique II
 quest.con1-tec3.desc=In order to advance, you must produce and cast a spell that contains 3 or more elements total, one of which is Lightning.
 quest.con1-tec5.name=Controlled Technique III
 quest.con1-tec5.desc=
+quest.tec3.name=Technique Apprentice
+quest.tec3.desc=
 quest.tec7.name=Technique Master
 quest.tec7.desc=By now, you've probably noticed many rituals take attuned gems. Where do those come from? You've finally reached that point.||Perform the Vani ritual as evidence of your progress to unlock the Enchant alteration.
 quest.fin1-tec2.name=Fine Technique

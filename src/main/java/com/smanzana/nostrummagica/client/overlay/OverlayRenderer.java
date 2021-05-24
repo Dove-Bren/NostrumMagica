@@ -31,11 +31,13 @@ import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.HookshotItem;
 import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
+import com.smanzana.nostrummagica.items.IRaytraceOverlay;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.block.material.Material;
@@ -47,6 +49,8 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.GlStateManager.DestFactor;
+import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -83,6 +87,8 @@ public class OverlayRenderer extends Gui {
 	private static final int GUI_SHIELD_OFFSETY = 17;
 	private static final int GUI_HOOKSHOT_CROSSHAIR_OFFSETX = 82;
 	private static final int GUI_HOOKSHOT_CROSSHAIR_WIDTH = 10;
+	private static final int GUI_TARGET_CROSSHAIR_OFFSETY = 58;
+	private static final int GUI_TARGET_CROSSHAIR_WIDTH = 7;
 
 	private static final ResourceLocation GUI_HEALTHBARS = new ResourceLocation(NostrumMagica.MODID, "textures/gui/healthbars.png");
 	private static final int GUI_HEALTHBAR_ORB_BACK_WIDTH = 205;
@@ -269,6 +275,33 @@ public class OverlayRenderer extends Gui {
 		} else if (event.getType() == ElementType.FOOD) {
 			if (ModConfig.config.displayShieldHearts()) {
 				renderShieldOverlay(player, scaledRes);
+			}
+		} else if (event.getType() == ElementType.CROSSHAIRS) {
+			//if (ModConfig.config.displayShieldHearts())
+			{
+				ItemStack held = player.getHeldItemMainhand();
+				if (held == null || !(held.getItem() instanceof IRaytraceOverlay) || !((IRaytraceOverlay) held.getItem()).shouldTrace(player.worldObj, player, held)) {
+					held = player.getHeldItemOffhand();
+					if (held == null || !(held.getItem() instanceof IRaytraceOverlay) || !((IRaytraceOverlay) held.getItem()).shouldTrace(player.worldObj, player, held)) {
+						held = null;
+					}
+				}
+				
+				if (held != null) {
+					RayTraceResult result = RayTrace.raytraceApprox(player.worldObj, player.getPositionEyes(event.getPartialTicks()),
+							player.rotationPitch, player.rotationYaw, SeekingBulletTrigger.MAX_DIST,
+							new Predicate<Entity>() {
+	
+								@Override
+								public boolean apply(Entity arg0) {
+									return arg0 != null && arg0 != player && arg0 instanceof EntityLivingBase;
+								}
+						
+					}, .5);
+					if (result != null && result.entityHit != null) {
+						renderCrosshairTargetOverlay(player, scaledRes);
+					}
+				}
 			}
 		}
 	}
@@ -640,6 +673,24 @@ public class OverlayRenderer extends Gui {
 			
 			GlStateManager.popMatrix();
 		}
+		
+		GlStateManager.disableBlend();
+		GlStateManager.popMatrix();
+	}
+	
+	private void renderCrosshairTargetOverlay(EntityPlayerSP player, ScaledResolution scaledResolution) {
+		GlStateManager.pushMatrix();
+		GlStateManager.enableBlend();
+		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+		GlStateManager.color(.5f, .5f, .5f, .9f);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_ICONS);
+		
+		GlStateManager.translate(scaledResolution.getScaledWidth() / 2, scaledResolution.getScaledHeight() / 2, 0);
+		
+		GlStateManager.translate(-GUI_TARGET_CROSSHAIR_WIDTH / 2, -(GUI_TARGET_CROSSHAIR_WIDTH / 2), 0);
+		
+		drawTexturedModalRect(0, 0,
+				0, GUI_TARGET_CROSSHAIR_OFFSETY, GUI_TARGET_CROSSHAIR_WIDTH, GUI_TARGET_CROSSHAIR_WIDTH);
 		
 		GlStateManager.disableBlend();
 		GlStateManager.popMatrix();

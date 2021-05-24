@@ -33,6 +33,7 @@ import com.smanzana.nostrummagica.quests.rewards.AlterationReward;
 import com.smanzana.nostrummagica.quests.rewards.AttributeReward;
 import com.smanzana.nostrummagica.quests.rewards.AttributeReward.AwardType;
 import com.smanzana.nostrummagica.quests.rewards.IReward;
+import com.smanzana.nostrummagica.quests.rewards.TriggerReward;
 import com.smanzana.nostrummagica.research.NostrumResearch;
 import com.smanzana.nostrummagica.research.NostrumResearch.NostrumResearchTab;
 import com.smanzana.nostrummagica.research.NostrumResearch.Size;
@@ -1199,6 +1200,8 @@ public class MirrorGui extends GuiScreen {
 			
 			if (reward instanceof AlterationReward) {
 				this.icon = SpellComponentIcon.get(((AlterationReward) reward).getAlteration());
+			} else if (reward instanceof TriggerReward) {
+				this.icon = SpellComponentIcon.get(((TriggerReward) reward).getTrigger());
 			} else if (reward instanceof AttributeReward) {
 				AwardType type = ((AttributeReward) reward).getType();
 				iconOffset = TEXT_ICON_REWARD_OFFSET + (type.ordinal() * TEXT_ICON_REWARD_WIDTH);

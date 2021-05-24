@@ -77,6 +77,18 @@ public class RayTrace {
 		return raytrace(world, fromPos, directionFromAngles(pitch, yaw), maxDistance, selector);
 	}
 	
+	public static RayTraceResult raytraceApprox(World world, Vec3d fromPos, float pitch,
+			float yaw, float maxDistance, Predicate<? super Entity> selector, double nearbyRadius) {
+		if (world == null || fromPos == null)
+			return null;
+		
+		RayTraceResult result = raytrace(world, fromPos, pitch, yaw, maxDistance, selector);
+		if (nearbyRadius > 0) {
+			result = nearbyRayTrace(world, result, nearbyRadius, selector);
+		}
+		return result;
+	}
+	
 	public static RayTraceResult raytrace(World world, Vec3d fromPos,
 			Vec3d direction, float maxDistance, Predicate<? super Entity> selector) {
 		Vec3d toPos;
@@ -91,6 +103,20 @@ public class RayTrace {
 		
 		
 		return raytrace(world, fromPos, toPos, selector);
+	}
+	
+
+	
+	public static RayTraceResult raytraceApprox(World world, Vec3d fromPos,
+			Vec3d direction, float maxDistance, Predicate<? super Entity> selector, double nearbyRadius) {
+		if (world == null || fromPos == null)
+			return null;
+		
+		RayTraceResult result = raytrace(world, fromPos, direction, maxDistance, selector);
+		if (nearbyRadius > 0) {
+			result = nearbyRayTrace(world, result, nearbyRadius, selector);
+		}
+		return result;
 	}
 
 	public static RayTraceResult raytrace(World world, Vec3d fromPos, Vec3d toPos,
@@ -315,5 +341,41 @@ public class RayTrace {
 		}
 
 		return raytraceresult;
+	}
+	
+	public static RayTraceResult nearbyRayTrace(World world, RayTraceResult result, Predicate<? super Entity> selector) {
+		return nearbyRayTrace(world, result, .5, selector);
+	}
+	
+	public static RayTraceResult nearbyRayTrace(World world, RayTraceResult result, double maxDist, Predicate<? super Entity> selector) {
+		if (result == null || result.entityHit != null) {
+			return result;
+		}
+		
+		// Get entities near the result
+		Vec3d hitPos = result.hitVec;
+		List<Entity> entities = world.getEntitiesInAABBexcluding(null, new AxisAlignedBB(
+				hitPos.xCoord, hitPos.yCoord, hitPos.zCoord, hitPos.xCoord, hitPos.yCoord, hitPos.zCoord 
+				).expandXyz(maxDist), selector);
+		double minDist = 0;
+		Entity minEnt = null;
+		for (Entity ent : entities) {
+			if (selector != null && !selector.apply(ent)) {
+				continue;
+			}
+			
+			double distSq = hitPos.squareDistanceTo(ent.getPositionVector());
+			if (minEnt == null || distSq < minDist) {
+				minEnt = ent;
+				minDist = distSq;
+			}
+		}
+		
+		if (minEnt != null) { 
+			result = new RayTraceResult(minEnt);
+		}
+		
+		return result;
+	
 	}
 }

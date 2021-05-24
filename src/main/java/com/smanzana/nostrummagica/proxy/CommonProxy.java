@@ -56,6 +56,7 @@ import com.smanzana.nostrummagica.entity.EntityChakramSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntityCyclerSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntityHookShot;
 import com.smanzana.nostrummagica.entity.EntityKoid;
+import com.smanzana.nostrummagica.entity.EntitySpellBullet;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
 import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
@@ -156,6 +157,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.ManaTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.OtherTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProximityTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 import com.smanzana.nostrummagica.world.NostrumDungeonGenerator;
@@ -333,6 +335,13 @@ public class CommonProxy {
     			64,
     			1,
     			false);
+    	EntityRegistry.registerModEntity(EntitySpellBullet.class, "spell_bullet",
+    			entityID++,
+    			NostrumMagica.instance,
+    			64,
+    			1,
+    			true
+    			);
     	
     	EntityRegistry.addSpawn(EntityKoid.class, 20, 1, 1, EnumCreatureType.MONSTER, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.MAGICAL));
@@ -422,6 +431,7 @@ public class CommonProxy {
     	SpellTrigger.register(OtherTrigger.instance());
     	SpellTrigger.register(MagicCutterTrigger.instance());
     	SpellTrigger.register(MagicCyclerTrigger.instance());
+    	SpellTrigger.register(SeekingBulletTrigger.instance());
     }
     
     private void registerPotions() {

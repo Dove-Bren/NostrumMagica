@@ -12,13 +12,20 @@ import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.EntityKoid;
+import com.smanzana.nostrummagica.entity.IEntityTameable;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.Spell.SpellPart;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
+import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
+import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
+import com.smanzana.nostrummagica.utils.RayTrace;
 
 import crazypants.enderio.api.teleport.IItemOfTravel;
 import crazypants.enderio.api.teleport.TravelSource;
@@ -36,11 +43,12 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor, IItemOfTravel {
+public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor, IItemOfTravel, IRaytraceOverlay {
 
 	public static String ID = "warlock_sword";
 	private static final String NBT_LEVELS = "levels";
@@ -322,7 +330,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 
 	@Override
 	public void extractInternal(ItemStack item, int power) {
-		;
+		item.attemptDamageItem(1, NostrumMagica.rand);
 	}
 
 	@Override
@@ -336,24 +344,91 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 				&& canEnderTravel(item, player);
 	}
 	
+	private static Spell[] MissleSpells = null;
+	
+	private static void InitMissleSpells() {
+		if (MissleSpells == null) {
+			MissleSpells = new Spell[EMagicElement.values().length];
+			for (EMagicElement elem : EMagicElement.values()) {
+				Spell spell = new Spell("WarlockMissle_" + elem.name(), true);
+				spell.addPart(new SpellPart(SeekingBulletTrigger.instance()));
+				spell.addPart(new SpellPart(SingleShape.instance(), elem, 1, null));
+				MissleSpells[elem.ordinal()] = spell;
+			}
+		}
+	}
+	
+	private static Spell GetMissleSpell(EMagicElement elem) {
+		InitMissleSpells();
+		return MissleSpells[elem.ordinal()];
+	}
+	
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World worldIn, EntityPlayer playerIn, EnumHand hand) {
 		
-		// Earlier right-click stuff here
-		if (playerIn.isSneaking()) {
-			
-		} else {
-			// else if nothign else, try client-side enderIO teleport?
-			if (canEnderTravel(stack, playerIn)) {
-				if (worldIn.isRemote) {
-					NostrumMagica.enderIO.AttemptEnderIOTravel(stack, hand, worldIn, playerIn, TravelSource.STAFF);
+		if (playerIn.getCooledAttackStrength(0.5F) > .95) {
+		
+			// Earlier right-click stuff here
+			if (!playerIn.isSneaking()) {
+				if (!worldIn.isRemote) {
+					// We have a target?
+					RayTraceResult result = RayTrace.raytraceApprox(worldIn, playerIn.getPositionVector().addVector(0, playerIn.eyeHeight, 0),
+							playerIn.rotationPitch, playerIn.rotationYaw, SeekingBulletTrigger.MAX_DIST, (ent) -> {
+								if (ent != null && playerIn != ent) {
+									if (ent instanceof IEntityTameable) {
+										if (playerIn.getUniqueID().equals(((IEntityTameable) ent).getOwnerId())) {
+											return false; // We own the target entity
+										}
+									}
+								}
+								
+								return true;
+							}, .5);
+					
+					if (result != null && result.entityHit != null) {
+						boolean any = false;
+						Map<EMagicElement, Float> power = getLevels(stack);
+						for (EMagicElement elem : EMagicElement.values()) {
+							Float val = power.get(elem);
+							if (val != null && val >= 1f) {
+								Spell missle = GetMissleSpell(elem);
+								missle.cast(playerIn, .5f * (int) (float) val);
+								any = true;
+							}
+						}
+						
+						if (any) {
+							stack.damageItem(1, playerIn);
+							NostrumMagicaSounds.DAMAGE_LIGHTNING.play(playerIn);
+						}
+					}
+				}
+			} else {
+				// else if nothign else, try client-side enderIO teleport?
+				if (canEnderTravel(stack, playerIn)) {
+					if (worldIn.isRemote) {
+						NostrumMagica.enderIO.AttemptEnderIOTravel(stack, hand, worldIn, playerIn, TravelSource.STAFF);
+					}
 				}
 			}
 		}
-			
+		
+		playerIn.resetCooldown();
 		playerIn.swingArm(hand);
 		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
 	}
 	
+	@Override
+	public boolean shouldTrace(World world, EntityPlayer player, ItemStack stack) {
+		Map<EMagicElement, Float> power = getLevels(stack);
+		for (EMagicElement elem : EMagicElement.values()) {
+			Float val = power.get(elem);
+			if (val != null && val >= 1f) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
 
 }

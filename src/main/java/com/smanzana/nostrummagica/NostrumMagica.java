@@ -113,6 +113,7 @@ import com.smanzana.nostrummagica.quests.rewards.AlterationReward;
 import com.smanzana.nostrummagica.quests.rewards.AttributeReward;
 import com.smanzana.nostrummagica.quests.rewards.AttributeReward.AwardType;
 import com.smanzana.nostrummagica.quests.rewards.IReward;
+import com.smanzana.nostrummagica.quests.rewards.TriggerReward;
 import com.smanzana.nostrummagica.research.NostrumResearch;
 import com.smanzana.nostrummagica.research.NostrumResearch.NostrumResearchTab;
 import com.smanzana.nostrummagica.research.NostrumResearch.Size;
@@ -147,6 +148,7 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
+import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 import com.smanzana.nostrummagica.trials.ShrineTrial;
@@ -1628,7 +1630,7 @@ public class NostrumMagica
     			1, // Control
     			5, // Technique
     			0, // Finesse
-    			new String[]{"con1-tec3", "fin1-tec2"},
+    			new String[]{"con1-tec3", "tec3"},
     			null, null,
     			wrapAttribute(AwardType.COST, -0.005f));
     	
@@ -1639,6 +1641,13 @@ public class NostrumMagica
     			new String[]{"start"},
     			null, null,
     			wrapAttribute(AwardType.MANA, 0.01f));
+    	new NostrumQuest("tec3", QuestType.CHALLENGE, 0,
+    			0, // Control
+    			3, // Technique
+    			0, // Finesse
+    			new String[]{"con1-tec2", "fin1-tec2"},
+    			null, null,
+    			new IReward[] {new TriggerReward(SeekingBulletTrigger.instance())});
     	new NostrumQuest("tec7", QuestType.CHALLENGE, 0,
     			0, // Control
     			7, // Technique
@@ -1700,7 +1709,7 @@ public class NostrumMagica
     			0, // Control
     			5, // Technique
     			1, // Finesse
-    			new String[]{"fin1-tec3", "con1-tec2"},
+    			new String[]{"fin1-tec3", "tec3"},
     			null, null,
     			wrapAttribute(AwardType.REGEN, 0.050f));
     	new NostrumQuest("fin2-tec3", QuestType.REGULAR, 0,
