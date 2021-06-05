@@ -88,6 +88,9 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		ScaledResolution scaledresolution = new ScaledResolution(mc);
 	    GL11.glViewport(x * scaledresolution.getScaleFactor(), 0, width * scaledresolution.getScaleFactor(), height * scaledresolution.getScaleFactor());
 	    GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
+        //GlStateManager.clearDepth(1.0D);
+	    //System.out.println(GL11.glGetInteger(GL11.GL_DEPTH_FUNC) + "");
+	    //GL11.glDepthFunc(GL11.GL_LEQUAL);
 	    
 	    // We've changed the viewport. Numbers are relative to whole view now
 	    int adjustedWidth = scaledresolution.getScaledWidth();
@@ -98,7 +101,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 	    }
 	    
 	    GlStateManager.translate(adjustedWidth / 2, (adjustedHeight * .6), -50);
-		GlStateManager.scale(scale, scale, scale);
+		GlStateManager.scale(scale, scale, -scale);
 
 		GlStateManager.rotate(tilt, 1, 0, 0);
 		GlStateManager.rotate(angle, 0, 1, 0);
@@ -257,14 +260,15 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		if (model == null)
 			return;
 		
-		GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
+		//GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
 		
 		GlStateManager.pushMatrix();
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GlStateManager.enableDepth();
 		//GlStateManager.translate(x, y, z);
 		GlStateManager.enableCull();
 		GlStateManager.enableRescaleNormal();
 		RenderHelper.disableStandardItemLighting();
+		GlStateManager.depthMask(true);
 		mc.entityRenderer.disableLightmap();
 		
 		GlStateManager.disableLighting();

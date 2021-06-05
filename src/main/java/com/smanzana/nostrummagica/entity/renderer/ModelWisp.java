@@ -36,7 +36,9 @@ public class ModelWisp extends ModelBase {
 		GlStateManager.translate(0, entity.height / 2, 0);
 		core.render(entity, time, swingProgress, swing, headAngleY, headAngleX, scale);
 		GlStateManager.scale(adjustedScale, adjustedScale, adjustedScale);
+		GlStateManager.depthMask(false);
 		fringe.render(entity, time, swingProgress, swing, headAngleY, headAngleX, scale);
+		GlStateManager.depthMask(true);
 		GlStateManager.popMatrix();
 		GlStateManager.color(1f, 1f, 1f, 1f);
 	}

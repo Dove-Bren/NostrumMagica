@@ -367,6 +367,23 @@ public class Spell {
 		private void finish() {
 			; // Nothing I can think of right now, but maybe in the future...
 		}
+		
+		public EMagicElement getNextElement() {
+			for (int i = this.index; i < parts.size(); i++) {
+				SpellPart part = parts.get(i);
+				if (part.isTrigger()) {
+					continue;
+				}
+				
+				if (part.getElement() == null) {
+					System.out.print(".");
+				}
+				
+				return part.getElement() == null ? EMagicElement.PHYSICAL : part.getElement();
+			}
+			
+			return EMagicElement.PHYSICAL;
+		}
 	}
 	
 	public static class SpellPart {
@@ -672,7 +689,7 @@ public class Spell {
 		case ICE:
 		case LIGHTNING:
 		case WIND:
-			return new SpellAction(caster).damage(element, 2f + (float) (2 * elementCount))
+			return new SpellAction(caster).damage(element, 2f + (float) (2 * (elementCount+1)))
 					.name("ruin." + element.name().toLowerCase());
 		}
 		
@@ -691,7 +708,7 @@ public class Spell {
 		case ENDER:
 			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("blindness"), duration, amp).name("blindness");
 		case FIRE:
-			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("nausea"), duration / 2, amp).damage(EMagicElement.FIRE, (float) Math.pow(2f, amp)).name("overheat");
+			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("nausea"), duration / 2, amp).damage(EMagicElement.FIRE, 1 + (amp / 2)).name("overheat");
 		case ICE:
 			return new SpellAction(caster).status(FrostbitePotion.instance(), duration, amp).name("frostbite");
 		case LIGHTNING:

@@ -71,7 +71,7 @@ public class CommandRandomSpell extends CommandBase {
 		final List<SpellShape> shapes = Lists.newArrayList(SpellShape.getAllShapes());
 		final SpellShape shape = shapes.get(rand.nextInt(shapes.size()));
 		final EMagicElement elem = EMagicElement.values()[rand.nextInt(EMagicElement.values().length)];
-		final int power = rand.nextInt(3);
+		final int power = rand.nextInt(3) + 1;
 		final EAlteration alt;
 		if (rand.nextBoolean()) {
 			alt = EAlteration.values()[rand.nextInt(EAlteration.values().length)];

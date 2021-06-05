@@ -8,9 +8,11 @@ import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
 import com.smanzana.nostrummagica.entity.IEntityTameable;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.utils.Projectiles;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -76,18 +78,29 @@ public class ProjectileTrigger extends SpellTrigger {
 							5.0f, PROJECTILE_RANGE);
 					
 					projectile.setFilter((ent) -> {
-						if (ent != null && getState().getSelf() != ent) {
-							if (ent instanceof IEntityTameable) {
-								if (getState().getSelf().getUniqueID().equals(((IEntityTameable) ent).getOwnerId())) {
-									return false; // We own the target entity
-								}
+						
+						if (ent == null) {
+							return false;
+						}
+						
+						if (ent == getState().getSelf()) {
+							return false;
+						}
+						
+						if (ent instanceof IEntityTameable) {
+							if (getState().getSelf().getUniqueID().equals(((IEntityTameable) ent).getOwnerId())) {
+								return false; // We own the target entity
 							}
-							
-							if (getState().getSelf() instanceof IEntityTameable) {
-								if (ent.getUniqueID().equals(((IEntityTameable) getState().getSelf()).getOwnerId())) {
-									return false; // We own the target entity
-								}
+						}
+						
+						if (getState().getSelf() instanceof IEntityTameable) {
+							if (ent.getUniqueID().equals(((IEntityTameable) getState().getSelf()).getOwnerId())) {
+								return false; // We own the target entity
 							}
+						}
+						
+						if (Projectiles.getShooter(ent) == getState().getSelf()) {
+							return false;
 						}
 						
 						return true;
@@ -120,6 +133,11 @@ public class ProjectileTrigger extends SpellTrigger {
 				onProjectileHit(lastPos);
 			else
 				getState().triggerFail();
+		}
+		
+		public EMagicElement getElement() {
+			// Return element on next shape
+			return getState().getNextElement();
 		}
 	}
 

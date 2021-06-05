@@ -3,12 +3,17 @@ package com.smanzana.nostrummagica.entity;
 import javax.annotation.Nullable;
 
 import com.google.common.base.Predicate;
+import com.smanzana.nostrummagica.client.particles.ParticleGlowOrb;
+import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger.ProjectileTriggerInstance;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -16,6 +21,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class EntitySpellProjectile extends EntityFireball {
+	
+	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(EntitySpellProjectile.class, EMagicElement.Serializer);
 	
 	private ProjectileTriggerInstance trigger;
 	private double maxDistance; // Squared distance so no sqrt
@@ -54,6 +61,15 @@ public class EntitySpellProjectile extends EntityFireball {
 		this.trigger = trigger;
 		this.maxDistance = Math.pow(maxDistance, 2);
 		this.origin = new Vec3d(fromX, fromY, fromZ);
+		
+		this.setElement(trigger.getElement());
+	}
+	
+	@Override
+	protected void entityInit() {
+		super.entityInit();
+		
+		this.dataManager.register(ELEMENT, EMagicElement.PHYSICAL);
 	}
 	
 	public void setFilter(@Nullable Predicate<Entity> filter) {
@@ -88,6 +104,18 @@ public class EntitySpellProjectile extends EntityFireball {
 				trigger.onFizzle(this.getPosition());
 				this.setDead();
 			}
+		} else {
+			int color = getElement().getColor();
+			for (int i = 0; i < 2; i++)
+			Minecraft.getMinecraft().effectRenderer.addEffect(new ParticleGlowOrb(
+					worldObj,
+					posX, posY + height/2f, posZ,
+					(float) ((color >> 16) & 255) / 255f,//.3f,
+					(float) ((color >> 8) & 255) / 255f,//1f,
+					(float) ((color >> 0) & 255) / 255f,//.4f,
+					.135f,
+					40
+					).setMotion(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025));
 		}
 	}
 
@@ -125,6 +153,14 @@ public class EntitySpellProjectile extends EntityFireball {
 	
 	@Override
 	protected EnumParticleTypes getParticleType() {
-		return EnumParticleTypes.SPELL_MOB;
+		return EnumParticleTypes.SUSPENDED;
+	}
+	
+	public void setElement(EMagicElement element) {
+		this.dataManager.set(ELEMENT, element);
+	}
+	
+	public EMagicElement getElement() {
+		return this.dataManager.get(ELEMENT);
 	}
 }

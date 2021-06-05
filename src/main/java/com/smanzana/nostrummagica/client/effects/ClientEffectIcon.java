@@ -14,6 +14,7 @@ public enum ClientEffectIcon {
 	ARROWD("arrow_down", false),
 	ORB_CLOUDY("orb_cloudy", true),
 	ORB_SCALED("orb_scaled", true),
+	ORB_PURE("orb_pure", true),
 	THORN_0("thorn0", true),
 	THORN_1("thorn1", true),
 	THORN_2("thorn2", true),

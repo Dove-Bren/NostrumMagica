@@ -1166,31 +1166,46 @@ public class SpellAction {
 		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
 			
 			ItemStack inhand = entity.getHeldItemMainhand();
-			boolean offhand = false;
-			if (inhand == null) {
-				inhand = entity.getHeldItemOffhand();
-				offhand = true;
-			}
 			
-			if (inhand == null)
-				return false;
-
+			boolean offhand = false;
 			ItemStack addedItem = null;
 			boolean didEmpower = false;
 			
-			Item item = inhand.getItem();
-			if ((item instanceof InfusedGemItem && inhand.getMetadata() == 0)) {
-				int count = (int) Math.pow(2, level - 1);
-				addedItem = InfusedGemItem.instance().getGem(element, count);
-			} else if (item instanceof EssenceItem) {
-				int count = level + 1;
-				double amt = 2 + level;
-				didEmpower = true;
-				caster.removeActivePotionEffect(MagicBuffPotion.instance());
-				NostrumMagica.magicEffectProxy.applyMagicBuff(entity, element, amt, count);
-				entity.addPotionEffect(new PotionEffect(MagicBuffPotion.instance(), 60 * 20, 0));
+			// Main hand attempt
+			if (inhand != null) {
+				Item item = inhand.getItem();
+				if ((item instanceof InfusedGemItem && inhand.getMetadata() == 0)) {
+					int count = (int) Math.pow(2, level - 1);
+					addedItem = InfusedGemItem.instance().getGem(element, count);
+				} else if (item instanceof EssenceItem) {
+					int count = level + 1;
+					double amt = 2 + level;
+					didEmpower = true;
+					caster.removeActivePotionEffect(MagicBuffPotion.instance());
+					NostrumMagica.magicEffectProxy.applyMagicBuff(entity, element, amt, count);
+					entity.addPotionEffect(new PotionEffect(MagicBuffPotion.instance(), 60 * 20, 0));
+				}
 			}
 			
+			if (!didEmpower && addedItem == null) {
+				// couldn't do main hand. Attempt offhand
+				inhand = entity.getHeldItemOffhand();
+				if (inhand != null) {
+					offhand = true;
+					Item item = inhand.getItem();
+					if ((item instanceof InfusedGemItem && inhand.getMetadata() == 0)) {
+						int count = (int) Math.pow(2, level - 1);
+						addedItem = InfusedGemItem.instance().getGem(element, count);
+					} else if (item instanceof EssenceItem) {
+						int count = level + 1;
+						double amt = 2 + level;
+						didEmpower = true;
+						caster.removeActivePotionEffect(MagicBuffPotion.instance());
+						NostrumMagica.magicEffectProxy.applyMagicBuff(entity, element, amt, count);
+						entity.addPotionEffect(new PotionEffect(MagicBuffPotion.instance(), 60 * 20, 0));
+					}
+				}
+			}
 			
 			
 			if (addedItem == null && !didEmpower) {

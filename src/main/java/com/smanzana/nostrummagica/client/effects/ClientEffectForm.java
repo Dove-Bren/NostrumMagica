@@ -25,6 +25,7 @@ public interface ClientEffectForm {
 		GlStateManager.enableBlend();
 		GlStateManager.enableAlpha();
 		GlStateManager.enableTexture2D();
+		GlStateManager.depthMask(false);
 		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		
 		List<BakedQuad> listQuads = model.getQuads(null, null, 0);
@@ -44,6 +45,7 @@ public interface ClientEffectForm {
             vertexbuffer.putNormal((float)vec3i.getX(), (float)vec3i.getY(), (float)vec3i.getZ());
             tessellator.draw();
 		}
+		GlStateManager.depthMask(true);
 	}
 
 	public void draw(Minecraft mc, float partialTicks, int color);

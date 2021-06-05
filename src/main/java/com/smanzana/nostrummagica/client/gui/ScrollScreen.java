@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.items.SpellPlate;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.Spell.SpellPart;
@@ -48,8 +49,9 @@ public class ScrollScreen extends GuiScreen {
 				if (part.isTrigger()) {
 					this.components.add(part.getTrigger().getDisplayName());
 				} else {
+					final String intensity = SpellPlate.toRoman(part.getElementCount());	
 					this.components.add(" - " + part.getShape().getDisplayName());
-					this.components.add("   " + part.getElement().getName()
+					this.components.add("   " + part.getElement().getName() + " " + intensity
 							+ (part.getAlteration() == null ? "" : (" [" + part.getAlteration().getName() + "]")));
 				}
 			}

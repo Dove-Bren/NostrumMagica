@@ -56,7 +56,7 @@ public class EntityKoid extends EntityMob implements ILoreTagged {
 	
     protected EntityKoid(World worldIn, EMagicElement element) {
         super(worldIn);
-        this.setSize(0.5F, .8F);
+        this.setSize(0.8F, 1F);
         
         this.setElement(element);
         idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);

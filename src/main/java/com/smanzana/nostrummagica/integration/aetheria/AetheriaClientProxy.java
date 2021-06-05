@@ -4,7 +4,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.render.TileEntityAetherInfuserRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityWispBlockRenderer;
+import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuser;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock;
 import com.smanzana.nostrummagica.integration.aetheria.items.AetherResourceType;
 import com.smanzana.nostrummagica.integration.aetheria.items.NostrumAetherResourceItem;
@@ -28,6 +30,7 @@ public class AetheriaClientProxy extends AetheriaProxy {
 		}
 
     	TileEntityWispBlockRenderer.init();
+    	TileEntityAetherInfuserRenderer.init();
 		
 		registerItemVariants();
 		
@@ -73,5 +76,9 @@ public class AetheriaClientProxy extends AetheriaProxy {
     				NostrumAetherResourceItem.getMetaFromType(type),
 					type.getUnlocalizedKey());
 		}
+
+		ClientProxy.registerModel(Item.getItemFromBlock(AetherInfuser.instance()),
+				0,
+				AetherInfuser.ID);
 	}
 }

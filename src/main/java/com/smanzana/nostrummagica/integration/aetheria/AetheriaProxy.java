@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.integration.aetheria;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityWisp;
+import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuser;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock;
 import com.smanzana.nostrummagica.integration.aetheria.items.AetherResourceType;
 import com.smanzana.nostrummagica.integration.aetheria.items.NostrumAetherResourceItem;
@@ -42,6 +43,7 @@ public class AetheriaProxy {
 	
 	public static Item ItemResources = null;
 	public static Block BlockWisp = null;
+	public static Block BlockerInfuser = null;
 	
 	public boolean preInit() {
 		if (!enabled) {
@@ -91,6 +93,15 @@ public class AetheriaProxy {
     					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(WispBlock.ID))
     			);
     	WispBlock.init();
+
+    	BlockerInfuser = AetherInfuser.instance();
+		GameRegistry.register(BlockerInfuser,
+    			new ResourceLocation(NostrumMagica.MODID, AetherInfuser.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(BlockerInfuser).setRegistryName(AetherInfuser.ID)
+    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(AetherInfuser.ID))
+    			);
+    	AetherInfuser.init();
 	}
 	
 	private void registerAetheriaQuests() {

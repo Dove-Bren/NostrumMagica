@@ -10,6 +10,7 @@ import com.google.common.base.Optional;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.client.particles.ParticleGlowOrb;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIStayHomeTask;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock;
@@ -37,6 +38,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigge
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIBase;
@@ -232,6 +234,21 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 					}
 				}
 			}
+		}
+		
+		if (worldObj.isRemote) {
+			EMagicElement element = this.getElement();
+			if (element == null) element = EMagicElement.PHYSICAL;
+			int color = element.getColor();
+			Minecraft.getMinecraft().effectRenderer.addEffect(new ParticleGlowOrb(
+					worldObj,
+					posX, posY + height/2f, posZ,
+					(float) ((color >> 16) & 255) / 255f,//.3f,
+					(float) ((color >> 8) & 255) / 255f,//1f,
+					(float) ((color >> 0) & 255) / 255f,//.4f,
+					.3f,
+					40
+					).setMotion(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025));
 		}
 	}
 	

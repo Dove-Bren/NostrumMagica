@@ -53,6 +53,7 @@ public class TileEntityPortalRenderer extends TileEntitySpecialRenderer<NostrumP
 		GlStateManager.disableLighting();
 		GlStateManager.enableAlpha();
 		GlStateManager.disableCull();
+		GlStateManager.depthMask(false);
 		int color = te.getColor();
 		GlStateManager.color(
 				((color >> 16) & 255) / 255f,
@@ -85,6 +86,7 @@ public class TileEntityPortalRenderer extends TileEntitySpecialRenderer<NostrumP
 		
         RenderHelper.enableStandardItemLighting();
         GlStateManager.enableCull();
+		GlStateManager.depthMask(true);
         GlStateManager.popMatrix();
 	}
 	

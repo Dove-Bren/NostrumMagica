@@ -347,6 +347,7 @@ tile.logic_door.name=Sealed Door
 tile.switch_block.name=Switch
 tile.portal_spawner.name=Sorcery Portal
 tile.wisp_block.name=Wisp Crystal
+tile.infuser_multiblk.name=Aether Infuser
 tile.mani_crystal.name=Mani Crystal
 tile.mimic_door.name=Mimic Door
 tile.mimic_facade.name=Mimic Facade
