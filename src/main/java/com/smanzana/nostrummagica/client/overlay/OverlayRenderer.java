@@ -12,6 +12,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.ModificationTable;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.effects.ClientEffect;
 import com.smanzana.nostrummagica.client.effects.ClientEffectAnimated;
@@ -39,6 +40,7 @@ import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
@@ -1105,6 +1107,22 @@ public class OverlayRenderer extends Gui {
 		}
 	}
 	
+	private void renderEnchantableIcon() {
+		GlStateManager.enableBlend();
+		GlStateManager.color(1f, 1f, 1f, 1f);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_ICONS);
+		Gui.drawScaledCustomSizeModalRect(6, 6, 192, 32, 32, 32, 12, 12, 256, 256);
+		GlStateManager.color(1f, 1f, 1f, 1f);
+	}
+	
+	private void renderConfigurableIcon() {
+		GlStateManager.enableBlend();
+		GlStateManager.color(1f, 1f, 1f, 1f);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_ICONS);
+		Gui.drawScaledCustomSizeModalRect(8, 8, 160, 32, 32, 32, 8, 8, 256, 256);
+		GlStateManager.color(1f, 1f, 1f, 1f);
+	}
+	
 	@SubscribeEvent
 	public void onTooltipRender(RenderTooltipEvent.PostBackground event) {
 		ItemStack stack = event.getStack();
@@ -1112,38 +1130,58 @@ public class OverlayRenderer extends Gui {
 			return;
 		}
 		
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer);
+		if (attr == null || !attr.isUnlocked()) {
+			return; // no highlights
+		}
+		
+		// Lore icon
 		final ILoreTagged tag;
 		if (stack.getItem() instanceof ItemBlock) {
 			if (!(((ItemBlock) stack.getItem()).getBlock() instanceof ILoreTagged)) {
-				return;
+				tag = null;
 			} else {
 				tag = (ILoreTagged) ((ItemBlock) stack.getItem()).getBlock();
 			}
 		} else if (!(stack.getItem() instanceof ILoreTagged)) {
-			return;
+			tag = null;
 		} else {
 			tag = (ILoreTagged) stack.getItem();
 		}
 		
-		INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer);
-		if (attr == null || !attr.isUnlocked()) {
-			return;
+		if (tag != null) {
+			final Boolean hasFullLore;
+			if (attr.hasFullLore(tag)) {
+				hasFullLore = true;
+			} else if (attr.hasLore(tag)) {
+				hasFullLore = false;
+			} else {
+				hasFullLore = null;
+			}
+			
+			GlStateManager.pushMatrix();
+			GlStateManager.translate(event.getX() + event.getWidth() - 4, event.getY() + event.getHeight() - 6, 50);
+			renderLoreIcon(hasFullLore);
+			GlStateManager.popMatrix();
 		}
 		
-		final Boolean hasFullLore;
-		if (attr.hasFullLore(tag)) {
-			hasFullLore = true;
-		} else if (attr.hasLore(tag)) {
-			hasFullLore = false;
-		} else {
-			hasFullLore = null;
+		// Enchantable?
+		if (SpellAction.isEnchantable(stack)) {
+			GlStateManager.pushMatrix();
+			GlStateManager.translate(event.getX() + event.getWidth() - 8, event.getY() + event.getHeight() - 24, 50);
+			renderEnchantableIcon();
+			GlStateManager.popMatrix();
 		}
 		
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(event.getX() + event.getWidth() - 4, event.getY() + event.getHeight() - 6, 50);
-		renderLoreIcon(hasFullLore);
-		GlStateManager.popMatrix();
+		// Configurable?
+		if (ModificationTable.IsModifiable(stack)) {
+			GlStateManager.pushMatrix();
+			GlStateManager.translate(event.getX() - 15, event.getY() + event.getHeight() - 8, 50);
+			renderConfigurableIcon();
+			GlStateManager.popMatrix();
+		}
 	}
+		
 	
 	@SubscribeEvent
 	public void onTooltipRender(RenderTooltipEvent.PostText event) {

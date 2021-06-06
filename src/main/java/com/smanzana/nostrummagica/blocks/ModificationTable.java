@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.items.WarlockSword;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
+import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 
 import net.minecraft.block.BlockContainer;
@@ -21,6 +22,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -196,10 +198,7 @@ public class ModificationTable extends BlockContainer {
 				return true;
 			
 			if (index == 0) {
-				return stack.getItem() instanceof SpellTome
-						|| stack.getItem() instanceof SpellRune
-						|| (stack.getItem() instanceof SpellScroll && SpellScroll.getSpell(stack) != null)
-						|| stack.getItem() instanceof WarlockSword;
+				return IsModifiable(stack);
 			}
 			
 			if (index == 1)
@@ -333,5 +332,28 @@ public class ModificationTable extends BlockContainer {
 			}
 		}
 		
+	}
+	
+	public static boolean IsModifiable(ItemStack stack) {
+		if (stack == null) {
+			return false;
+		}
+		
+		Item item = stack.getItem();
+		
+		if (item instanceof SpellRune) {
+			SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
+			
+			if (comp.isTrigger()) {
+				return comp.getTrigger().supportedFloats() != null || comp.getTrigger().supportsBoolean();
+			} else if (comp.isShape()) {
+				return comp.getShape().supportedFloats() != null || comp.getShape().supportsBoolean();
+			}
+		}
+		
+		return item instanceof SpellTome
+				//|| item instanceof SpellRune
+				|| (item instanceof SpellScroll && SpellScroll.getSpell(stack) != null)
+				|| item instanceof WarlockSword;
 	}
 }
