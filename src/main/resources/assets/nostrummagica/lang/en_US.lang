@@ -1153,7 +1153,7 @@ modification.aoe.name=Effect Radius
 modification.aoe.bool.name=Ignore Allies
 modification.chain.name=Jumps
 modification.chain.bool.name=Team Lock
-modification.proximity.name=Radius
+modification.proximity.name=Diameter
 modification.mana.name=Mana Level
 modification.health.name=Health Level
 modification.food.name=Food Level
@@ -1173,6 +1173,9 @@ lore.mirror_shield.name=Mirror Shields
 lore.true_mirror_shield.name=True Mirror Shields
 
 modification.damaged_duration.expire=Your On Hit effect expired
+modification.damaged_duration.health=Your On Hit effect expired
+modification.damaged_duration.mana=Your On Hit effect expired
+modification.damaged_duration.food=Your On Hit effect expired
 modification.damaged_duration.name=Duration
 
 mirror.tab.character.name=Attribute Glyph

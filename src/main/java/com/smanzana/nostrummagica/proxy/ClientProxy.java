@@ -1321,9 +1321,11 @@ public class ClientProxy extends CommonProxy {
 						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
 					}
 					
+					param = Math.max(1f, param);
+					
 					effect
 					.modify(new ClientEffectModifierRotate(0f, .5f, 0f))
-					.modify(new ClientEffectModifierTranslate(0, .2f, .5f))
+					.modify(new ClientEffectModifierTranslate(0, .2f, (.5f * param)))
 					.modify(new ClientEffectModifierGrow(.2f, .2f, .4f, .5f, .5f))
 					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .4f))
 					;

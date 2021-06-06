@@ -48,7 +48,7 @@ public class CommandRandomSpell extends CommandBase {
 			
 			final Spell spell = CreateRandomSpell(name, null);
 			EntityPlayer player = (EntityPlayer) sender;
-			ItemStack stack = SpellScroll.create(spell, (byte) 0);
+			ItemStack stack = SpellScroll.create(spell);
 			player.inventory.addItemStackToInventory(stack);
 		} else {
 			sender.addChatMessage(new TextComponentString("This command must be run as a player"));

@@ -58,11 +58,11 @@ public class ProximityTrigger extends SpellTrigger {
 					return true;
 				
 				NostrumMagica.proxy.spawnEffect(world, new SpellComponentWrapper(instance()),
-						null, null, null, this.pos, null, false, 0);
+						null, null, null, this.pos, new SpellComponentWrapper(getState().getNextElement()), false, range);
 				if (!set) {
 					// Trap is now set!
 					set = true;
-					NostrumMagica.playerListener.registerProximity(this, world, pos, range);
+					NostrumMagica.playerListener.registerProximity(this, world, pos, range / 2f);
 					return false;
 				}
 				

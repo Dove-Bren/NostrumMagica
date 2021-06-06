@@ -8,8 +8,6 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.AltarItem;
-import com.smanzana.nostrummagica.items.SpellScroll;
-import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 
 import net.minecraft.block.Block;
@@ -213,21 +211,6 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 				}
 				altar.setItem(null);
 				return true;
-			} else if (heldItem.getItem() instanceof SpellScroll) {
-				if (SpellScroll.getNestedScrollMeta(heldItem) != 2)
-					return false;
-				
-				// meta 2 means an awakened scroll. If we have a tome, BIND!!!!!
-				ItemStack tome = altar.getItem();
-				if (!(tome.getItem() instanceof SpellTome))
-					return false;
-				
-				if (SpellTome.startBinding(playerIn, tome, heldItem, false)) {
-					heldItem.splitStack(1);
-					return true;
-				} else {
-					return false;
-				}
 			} else
 				return false;
 		}
