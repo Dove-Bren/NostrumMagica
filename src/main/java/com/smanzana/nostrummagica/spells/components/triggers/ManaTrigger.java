@@ -1,13 +1,19 @@
 package com.smanzana.nostrummagica.spells.components.triggers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
 import com.smanzana.nostrummagica.listeners.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
@@ -17,10 +23,12 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -31,38 +39,63 @@ public class ManaTrigger extends SpellTrigger {
 		private float amount;
 		private boolean onHigh;
 		private EntityLivingBase entity;
+		private int duration;
+		private boolean expired;
 		
-		public ManaTriggerInstance(SpellState state, EntityLivingBase entity, float amount, boolean higher) {
+		public ManaTriggerInstance(SpellState state, EntityLivingBase entity, float amount, boolean higher, int duration) {
 			super(state);
 			this.amount = amount;
 			this.onHigh = higher;
 			this.entity = entity;
+			this.duration = duration;
 			
 			if (this.amount <= 0f)
 				this.amount = .5f;
+			if (this.duration <= 0)
+				this.duration = 20;
 		}
 		
 		@Override
 		public void init(EntityLivingBase caster) {
 			// We are instant! Whoo!
 			NostrumMagica.playerListener.registerMana(this, entity, amount, onHigh);
+			NostrumMagica.playerListener.registerTimer(this, 0, 20 * duration);
 			
+			if (SetTrigger(entity, this)) {
+				NostrumMagica.magicEffectProxy.applyOnManaEffect(entity, entity.ticksExisted, 20 * duration);
+			}
 		}
 
 		@Override
 		public boolean onEvent(Event type, EntityLivingBase entity, Object junk) {
-			EntityLivingBase self = this.getState().getSelf();
-			TriggerData data = new TriggerData(
-					Lists.newArrayList(self),
-					Lists.newArrayList(self),
-					null,
-					null
-					);
-			this.trigger(data);
-			
-			NostrumMagica.proxy.spawnEffect(self.worldObj,
-					new SpellComponentWrapper(instance()),
-					self, null, self, null, null, false, 0);
+			if (type == Event.MANA) {
+				if (!expired) {
+					TriggerData data = new TriggerData(
+							Lists.newArrayList(this.getState().getSelf()),
+							Lists.newArrayList(this.getState().getSelf()),
+							null,
+							null
+							);
+					
+					this.entity.worldObj.getMinecraftServer().addScheduledTask(() -> {
+						this.trigger(data);
+						NostrumMagica.proxy.spawnEffect(this.getState().getSelf().worldObj,
+								new SpellComponentWrapper(instance()),
+								this.getState().getSelf(), null, this.getState().getSelf(), null, null, false, 0);
+						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_MANA, this.entity);
+					});
+					expired = true;
+				}
+			} else if (type == Event.TIME) {
+				if (!expired) {
+					expired = true;
+					if (this.entity instanceof EntityPlayer) {
+						EntityPlayer player = (EntityPlayer) this.entity;
+						player.addChatComponentMessage(new TextComponentTranslation("modification.damaged_duration.mana"));
+						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_MANA, this.entity);
+					}
+				}
+			}
 			
 			return true;
 		}
@@ -76,6 +109,16 @@ public class ManaTrigger extends SpellTrigger {
 			instance = new ManaTrigger();
 		
 		return instance;
+	}
+	
+	private static final Map<UUID, ManaTriggerInstance> ActiveMap = new HashMap<>();
+	
+	private static final boolean SetTrigger(EntityLivingBase entity, @Nullable ManaTriggerInstance trigger) {
+		ManaTriggerInstance existing = ActiveMap.put(entity.getUniqueID(), trigger);
+		if (existing != null && existing != trigger) {
+			existing.expired = true;
+		}
+		return existing == null || existing != trigger;
 	}
 	
 	private ManaTrigger() {
@@ -101,7 +144,7 @@ public class ManaTrigger extends SpellTrigger {
 	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw,
 			SpellPartParam params) {
 		return new ManaTriggerInstance(state, state.getCaster(),
-				Math.max((int) supportedFloats()[0], (int) params.level), params.flip);
+				Math.max((int) supportedFloats()[0], (int) params.level), params.flip, 300);
 	}
 
 	@Override

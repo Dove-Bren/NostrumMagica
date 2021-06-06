@@ -8,6 +8,8 @@ import java.util.WeakHashMap;
 
 import javax.annotation.Nullable;
 
+import org.lwjgl.opengl.GL11;
+
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -51,7 +53,10 @@ import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.GlStateManager.DestFactor;
 import net.minecraft.client.renderer.GlStateManager.SourceFactor;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.entity.RenderPlayer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -89,6 +94,9 @@ public class OverlayRenderer extends Gui {
 	private static final int GUI_HOOKSHOT_CROSSHAIR_WIDTH = 10;
 	private static final int GUI_TARGET_CROSSHAIR_OFFSETY = 58;
 	private static final int GUI_TARGET_CROSSHAIR_WIDTH = 7;
+	private static final int GUI_CONTINGENCY_ICON_OFFSETX = 22;
+	private static final int GUI_CONTINGENCY_ICON_OFFSETY = 37;
+	private static final int GUI_CONTINGENCY_ICON_LENGTH = 18;
 
 	private static final ResourceLocation GUI_HEALTHBARS = new ResourceLocation(NostrumMagica.MODID, "textures/gui/healthbars.png");
 	private static final int GUI_HEALTHBAR_ORB_BACK_WIDTH = 205;
@@ -303,6 +311,52 @@ public class OverlayRenderer extends Gui {
 					}
 				}
 			}
+		} else if (event.getType() == ElementType.POTION_ICONS) {
+			// TODO config option
+						{
+							final int nowTicks = player.ticksExisted;
+							int offsetX = 0;
+							EffectData data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_DAMAGE);
+							if (data != null) {
+								if (data.getAmt() == 0) {
+									data.amt(player.ticksExisted);
+								}
+								float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
+								timer = 1f - timer;
+								renderContingencyShield(player, scaledRes, 0, offsetX, timer);
+								offsetX++;
+							}
+							data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_MANA);
+							if (data != null) {
+								if (data.getAmt() == 0) {
+									data.amt(player.ticksExisted);
+								}
+								float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
+								timer = 1f - timer;
+								renderContingencyShield(player, scaledRes, 1, offsetX, timer);
+								offsetX++;
+							}
+							data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_HEALTH);
+							if (data != null) {
+								if (data.getAmt() == 0) {
+									data.amt(player.ticksExisted);
+								}
+								float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
+								timer = 1f - timer;
+								renderContingencyShield(player, scaledRes, 2, offsetX, timer);
+								offsetX++;
+							}
+							data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_FOOD);
+							if (data != null) {
+								if (data.getAmt() == 0) {
+									data.amt(player.ticksExisted);
+								}
+								float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
+								timer = 1f - timer;
+								renderContingencyShield(player, scaledRes, 3, offsetX, timer);
+								offsetX++;
+							}
+						}
 		}
 	}
 	
@@ -622,7 +676,7 @@ public class OverlayRenderer extends Gui {
 	        }
 	        
 	        if (half) {
-	        	drawTexturedModalRect(left, top, GUI_SHIELD_MAG_OFFSETX + 9, GUI_SHIELD_OFFSETY, 5, 9);
+	        	drawTexturedModalRect(left, top, GUI_SHIELD_MAG_OFFSETX, GUI_SHIELD_OFFSETY + 9, 5, 9);
 	        }
 			
 	        GlStateManager.color(1f, 1f, 1f, 1f);
@@ -691,6 +745,79 @@ public class OverlayRenderer extends Gui {
 		
 		drawTexturedModalRect(0, 0,
 				0, GUI_TARGET_CROSSHAIR_OFFSETY, GUI_TARGET_CROSSHAIR_WIDTH, GUI_TARGET_CROSSHAIR_WIDTH);
+		
+		GlStateManager.disableBlend();
+		GlStateManager.popMatrix();
+	}
+	
+	private void renderContingencyShield(EntityPlayerSP player, ScaledResolution scaledResolution, int typeOffset, int xoffset, float timer) {
+		final int left = (scaledResolution.getScaledWidth() / 2 + 91) + 10 + (xoffset * GUI_CONTINGENCY_ICON_LENGTH);
+		final int top = scaledResolution.getScaledHeight() - (2 + GUI_CONTINGENCY_ICON_LENGTH);
+		final double borderScale = 1.07;
+		final VertexBuffer buffer = Tessellator.getInstance().getBuffer();
+		final int width = GUI_CONTINGENCY_ICON_LENGTH; // for readability
+		final int height = GUI_CONTINGENCY_ICON_LENGTH; // for readability
+		
+		GlStateManager.pushMatrix();
+		GlStateManager.enableBlend();
+		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_ICONS);
+		
+		GlStateManager.translate(left, top, 0);
+		
+		GlStateManager.pushMatrix();
+		GlStateManager.color(1f, .25f, .3f, 1f);
+		GlStateManager.translate(-.5, -.5, 0);
+		GlStateManager.scale(borderScale, borderScale, borderScale);
+		buffer.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_TEX);
+		
+		final float uMin = ((float) (GUI_CONTINGENCY_ICON_OFFSETX + (3 * GUI_CONTINGENCY_ICON_LENGTH))) / 256f;
+		final float uMax = ((float) (GUI_CONTINGENCY_ICON_OFFSETX + (4 * GUI_CONTINGENCY_ICON_LENGTH))) / 256f;
+		final float vMin = ((float) (GUI_CONTINGENCY_ICON_OFFSETY - GUI_CONTINGENCY_ICON_LENGTH)) / 256f;
+		final float vMax = ((float) (GUI_CONTINGENCY_ICON_OFFSETY)) / 256f;
+		
+		final int fullTris = (int) (timer / .25f);
+		// x, y, z, u, v
+		final float[][] coords = new float[][] {
+			new float[]{0,		0, 		0, uMin, vMin}, // top left
+			new float[]{0,		height, 0, uMin, vMax}, // bottom left
+			new float[]{width, 	height,	0, uMax, vMax}, // bottom right
+			new float[]{width, 	0,		0, uMax, vMin}, // top right
+			new float[]{0,		0, 		0, uMin, vMin}, // top left
+		};
+		
+		// triangle fans. 1 per quarter. auto draw around
+		
+		buffer.pos(width/2f, height/2f, 0).tex((uMin + uMax) / 2f, (vMin + vMax) / 2f).endVertex();
+		
+		for (int i = 0; i <= fullTris; i++) {
+			buffer.pos(coords[i][0], coords[i][1], coords[i][2]).tex(coords[i][3], coords[i][4]).endVertex();
+		}
+		
+		// draw partial
+		if (fullTris < 4) {
+			final float partial = (timer - (fullTris * .25f)) * 4;
+			buffer
+				.pos(coords[fullTris][0] * (1f-partial) + coords[fullTris+1][0] * partial,
+					 coords[fullTris][1] * (1f-partial) + coords[fullTris+1][1] * partial,
+					 coords[fullTris][2] * (1f-partial) + coords[fullTris+1][2] * partial)
+				.tex(coords[fullTris][3] * (1f-partial) + coords[fullTris+1][3] * partial,
+					 coords[fullTris][4] * (1f-partial) + coords[fullTris+1][4] * partial)
+				.endVertex();
+		}
+		
+		
+		Tessellator.getInstance().draw();
+		
+//		drawTexturedModalRect(0, 0,
+//				GUI_CONTINGENCY_ICON_OFFSETX + (3 * GUI_CONTINGENCY_ICON_LENGTH),
+//				GUI_CONTINGENCY_ICON_OFFSETY - GUI_CONTINGENCY_ICON_LENGTH, GUI_CONTINGENCY_ICON_LENGTH, GUI_CONTINGENCY_ICON_LENGTH);
+		GlStateManager.popMatrix();
+
+		GlStateManager.color(.5f, .5f, .5f, 1f);
+		drawTexturedModalRect(0, 0,
+				GUI_CONTINGENCY_ICON_OFFSETX + (typeOffset * GUI_CONTINGENCY_ICON_LENGTH),
+				GUI_CONTINGENCY_ICON_OFFSETY, GUI_CONTINGENCY_ICON_LENGTH, GUI_CONTINGENCY_ICON_LENGTH);
 		
 		GlStateManager.disableBlend();
 		GlStateManager.popMatrix();

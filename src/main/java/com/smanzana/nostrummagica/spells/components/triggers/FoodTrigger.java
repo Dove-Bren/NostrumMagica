@@ -1,12 +1,18 @@
 package com.smanzana.nostrummagica.spells.components.triggers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
 import com.smanzana.nostrummagica.listeners.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
@@ -21,6 +27,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 
 public class FoodTrigger extends SpellTrigger {
@@ -30,41 +37,68 @@ public class FoodTrigger extends SpellTrigger {
 		private int amount;
 		private boolean onHigh;
 		private EntityLivingBase entity;
+		private int duration;
+		private boolean expired;
 		
-		public FoodTriggerInstance(SpellState state, EntityLivingBase entity, int amount, boolean higher) {
+		public FoodTriggerInstance(SpellState state, EntityLivingBase entity, int amount, boolean higher, int duration) {
 			super(state);
 			this.amount = amount;
 			this.onHigh = higher;
 			this.entity = entity;
+			this.duration = duration;
 			
 			if (this.amount <= 0)
 				this.amount = 10;
+			if (this.duration <= 0)
+				this.duration = 20;
 		}
 		
 		@Override
 		public void init(EntityLivingBase caster) {
-			if (entity instanceof EntityPlayer)
+			if (entity instanceof EntityPlayer) {
 				NostrumMagica.playerListener.registerFood(this, (EntityPlayer) entity, amount, onHigh);
-			else
+				NostrumMagica.playerListener.registerTimer(this, 0, 20 * duration);
+			} else {
 				NostrumMagica.playerListener.registerTimer(this, 20, 0);
+			}
+			
+			
+			if (SetTrigger(entity, this)) {
+				NostrumMagica.magicEffectProxy.applyOnFoodEffect(entity, entity.ticksExisted, 20 * duration);
+			}
 			
 		}
 
 		@Override
 		public boolean onEvent(Event type, EntityLivingBase entity, Object unused) {
-			
-			EntityLivingBase self = this.getState().getSelf();
-			TriggerData data = new TriggerData(
-					Lists.newArrayList(self),
-					Lists.newArrayList(self),
-					null,
-					null
-					);
-			this.trigger(data);
-			
-			NostrumMagica.proxy.spawnEffect(self.worldObj,
-					new SpellComponentWrapper(instance()),
-					self, null, self, null, null, false, 0);
+			if (type == Event.FOOD || (type == Event.TIME && !(this.entity instanceof EntityPlayer))) {
+				if (!expired) {
+					TriggerData data = new TriggerData(
+							Lists.newArrayList(this.getState().getSelf()),
+							Lists.newArrayList(this.getState().getSelf()),
+							null,
+							null
+							);
+					
+					this.entity.worldObj.getMinecraftServer().addScheduledTask(() -> {
+						this.trigger(data);
+						NostrumMagica.proxy.spawnEffect(this.getState().getSelf().worldObj,
+								new SpellComponentWrapper(instance()),
+								this.getState().getSelf(), null, this.getState().getSelf(), null, null, false, 0);
+						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_FOOD, this.entity);
+					});
+					expired = true;
+				}
+			} else if (type == Event.TIME) {
+				if (!expired) {
+					expired = true;
+					if (this.entity instanceof EntityPlayer) {
+						EntityPlayer player = (EntityPlayer) this.entity;
+						player.addChatComponentMessage(new TextComponentTranslation("modification.damaged_duration.health"));
+						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_FOOD, this.entity);
+					}
+				}
+			}
 			
 			return true;
 		}
@@ -78,6 +112,16 @@ public class FoodTrigger extends SpellTrigger {
 			instance = new FoodTrigger();
 		
 		return instance;
+	}
+	
+	private static final Map<UUID, FoodTriggerInstance> ActiveMap = new HashMap<>();
+	
+	private static final boolean SetTrigger(EntityLivingBase entity, @Nullable FoodTriggerInstance trigger) {
+		FoodTriggerInstance existing = ActiveMap.put(entity.getUniqueID(), trigger);
+		if (existing != null && existing != trigger) {
+			existing.expired = true;
+		}
+		return existing == null || existing != trigger;
 	}
 	
 	private FoodTrigger() {
@@ -103,7 +147,7 @@ public class FoodTrigger extends SpellTrigger {
 	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw,
 			SpellPartParam params) {
 		return new FoodTriggerInstance(state, state.getCaster(),
-				Math.max((int) supportedFloats()[0], (int) params.level), params.flip);
+				Math.max((int) supportedFloats()[0], (int) params.level), params.flip, 300);
 	}
 
 	@Override

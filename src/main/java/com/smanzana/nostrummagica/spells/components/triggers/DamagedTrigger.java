@@ -1,12 +1,18 @@
 package com.smanzana.nostrummagica.spells.components.triggers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
 import com.smanzana.nostrummagica.listeners.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
@@ -45,6 +51,9 @@ public class DamagedTrigger extends SpellTrigger {
 			NostrumMagica.playerListener.registerHit(this, entity);
 			NostrumMagica.playerListener.registerTimer(this, 0, 20 * duration);
 			
+			if (SetTrigger(entity, this)) {
+				NostrumMagica.magicEffectProxy.applyOnHitEffect(entity, entity.ticksExisted, 20 * duration);
+			}
 		}
 
 		@Override
@@ -60,6 +69,7 @@ public class DamagedTrigger extends SpellTrigger {
 					
 					entity.worldObj.getMinecraftServer().addScheduledTask(() -> {
 						this.trigger(data);
+						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_DAMAGE, this.entity);
 					});
 					expired = true;
 				}
@@ -69,6 +79,7 @@ public class DamagedTrigger extends SpellTrigger {
 					if (this.entity instanceof EntityPlayer) {
 						EntityPlayer player = (EntityPlayer) this.entity;
 						player.addChatComponentMessage(new TextComponentTranslation("modification.damaged_duration.expire"));
+						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_DAMAGE, this.entity);
 					}
 				}
 			}
@@ -85,6 +96,16 @@ public class DamagedTrigger extends SpellTrigger {
 			instance = new DamagedTrigger();
 		
 		return instance;
+	}
+	
+	private static final Map<UUID, DamagedTriggerInstance> ActiveMap = new HashMap<>();
+	
+	private static final boolean SetTrigger(EntityLivingBase entity, @Nullable DamagedTriggerInstance trigger) {
+		DamagedTriggerInstance existing = ActiveMap.put(entity.getUniqueID(), trigger);
+		if (existing != null && existing != trigger) {
+			existing.expired = true;
+		}
+		return existing == null || existing != trigger;
 	}
 	
 	private DamagedTrigger() {

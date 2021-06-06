@@ -120,6 +120,10 @@ public class MagicEffectProxy {
 		SHIELD_MAGIC,
 		MAGIC_BUFF,
 		ROOTED, // Just visual. Actual effects are in potion
+		CONTINGENCY_DAMAGE, // Just visual. Actual effects are in trigger instance
+		CONTINGENCY_HEALTH, // Just visual. Actual effects are in trigger instance
+		CONTINGENCY_MANA, // Just visual. Actual effects are in trigger instance
+		CONTINGENCY_FOOD, // Just visual. Actual effects are in trigger instance
 	}
 	
 	private Map<UUID, Map<SpecialEffect, EffectData>> effects;
@@ -157,6 +161,22 @@ public class MagicEffectProxy {
 	
 	public void applyRootedEffect(EntityLivingBase entity) {
 		apply(SpecialEffect.ROOTED, new EffectData().count(1), entity);
+	}
+	
+	public void applyOnHitEffect(EntityLivingBase entity, double startTicks, int duration) {
+		apply(SpecialEffect.CONTINGENCY_DAMAGE, new EffectData().amt(0).count(duration), entity);
+	}
+	
+	public void applyOnHealthEffect(EntityLivingBase entity, double startTicks, int duration) {
+		apply(SpecialEffect.CONTINGENCY_HEALTH, new EffectData().amt(0).count(duration), entity);
+	}
+	
+	public void applyOnManaEffect(EntityLivingBase entity, double startTicks, int duration) {
+		apply(SpecialEffect.CONTINGENCY_MANA, new EffectData().amt(0).count(duration), entity);
+	}
+	
+	public void applyOnFoodEffect(EntityLivingBase entity, double startTicks, int duration) {
+		apply(SpecialEffect.CONTINGENCY_FOOD, new EffectData().amt(0).count(duration), entity);
 	}
 	
 	public void remove(SpecialEffect effect, EntityLivingBase entity) {
@@ -333,6 +353,15 @@ public class MagicEffectProxy {
 			Map<SpecialEffect, EffectData> map = effects.get(id);
 			if (map == null) {
 				map = new EnumMap<>(SpecialEffect.class);
+			}
+			
+			// HACK OH WELL
+			// contingencies use packet receive time as 'start time' for an approximation
+			if (effect == SpecialEffect.CONTINGENCY_DAMAGE
+					|| effect == SpecialEffect.CONTINGENCY_HEALTH
+					|| effect == SpecialEffect.CONTINGENCY_MANA
+					|| effect == SpecialEffect.CONTINGENCY_FOOD) {
+				override.amt = NostrumMagica.proxy.getPlayer().ticksExisted;
 			}
 			
 			map.put(effect, override);
