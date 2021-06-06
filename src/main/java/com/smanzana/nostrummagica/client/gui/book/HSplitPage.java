@@ -7,7 +7,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.util.ResourceLocation;
 
-public class HSplitPage implements IBookPage {
+public class HSplitPage implements IClickableBookPage {
 	
 	private static ResourceLocation divide = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/divide.png");
 	
@@ -68,6 +68,21 @@ public class HSplitPage implements IBookPage {
 		} else if (bottom != null && mouseY > subheight + divideSize) {
 			bottom.overlay(parent, fonter, mouseX, mouseY - (subheight + divideSize), trueX, trueY);
 		}
+	}
+
+	@Override
+	public boolean onClick(BookScreen parent, int mouseX, int mouseY, int button) {
+		int divideSize = 10; //amount in middle as seperation.
+		if (!drawSplit)
+			divideSize = 0;
+		int subheight = (heightCache - divideSize) / 2;
+		
+		if (mouseY < subheight && top != null && top instanceof IClickableBookPage) {
+			((IClickableBookPage) top).onClick(parent, mouseX, mouseY, button);
+		} else if (mouseY > subheight + divideSize && bottom != null && bottom instanceof IClickableBookPage) {
+			((IClickableBookPage) bottom).onClick(parent, mouseX, mouseY - (subheight + divideSize), button);
+		}
+		return false;
 	}
 	
 }

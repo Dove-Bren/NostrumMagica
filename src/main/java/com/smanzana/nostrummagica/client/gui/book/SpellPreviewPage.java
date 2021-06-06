@@ -4,12 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
+import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.network.NetworkHandler;
+import com.smanzana.nostrummagica.network.messages.ClientTomeDropSpellMessage;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.client.Minecraft;
@@ -17,15 +23,18 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.client.config.GuiUtils;
 
-public class SpellPreviewPage implements IBookPage {
+public class SpellPreviewPage implements IClickableBookPage {
 
 	private Spell spell;
 	private String description;
 	private List<String> tooltip;
+	private final ItemStack tome;
 	
-	public SpellPreviewPage(Spell spell) {
+	public SpellPreviewPage(ItemStack tome, Spell spell) {
 		this.spell = spell;
 		tooltip = new ArrayList<>();
 		Map<ReagentType, Integer> reagents = spell.getRequiredReagents();
@@ -38,8 +47,11 @@ public class SpellPreviewPage implements IBookPage {
 			
 			tooltip.add(count + " " + type.prettyName());
 		}
+		tooltip.add(ChatFormatting.GRAY + "Click for details" + ChatFormatting.RESET);
+		tooltip.add(ChatFormatting.DARK_RED + "Shift+Right Click to remove and destroy" + ChatFormatting.RESET);
 		
 		description = spell.getDescription();
+		this.tome = tome;
 	}
 	
 	@Override
@@ -88,5 +100,24 @@ public class SpellPreviewPage implements IBookPage {
 	public void overlay(BookScreen parent, FontRenderer fonter, int mouseX, int mouseY, int trueX, int trueY) {
 		ScaledResolution res = new ScaledResolution(Minecraft.getMinecraft());
 		GuiUtils.drawHoveringText(tooltip, trueX, trueY, res.getScaledWidth(), res.getScaledHeight(), 200, fonter);
+	}
+
+	@Override
+	public boolean onClick(BookScreen parent, int mouseX, int mouseY, int button) {
+		EntityPlayer player = NostrumMagica.proxy.getPlayer();
+		
+		if (button == 0) {
+			player.openGui(NostrumMagica.instance,
+					NostrumGui.scrollID, player.worldObj,
+					spell.getRegistryID(), (int) player.posY, (int) player.posZ);
+		} else if (button == 1 && Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
+			// Fake on client
+			SpellTome.removeSpell(tome, spell.getRegistryID());
+			NostrumMagica.proxy.openBook(player, (SpellTome) tome.getItem(), tome);
+			
+			NetworkHandler.getSyncChannel()
+			.sendToServer(new ClientTomeDropSpellMessage(tome, spell.getRegistryID()));
+		}
+		return true;
 	}
 }

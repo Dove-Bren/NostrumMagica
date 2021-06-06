@@ -79,9 +79,10 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 		
 		if (playerIn.isSneaking()) {
 			// Open scroll screen
+			final int spellId = itemStackIn.getTagCompound() == null ? 0 : itemStackIn.getTagCompound().getInteger(NBT_SPELL);
 			playerIn.openGui(NostrumMagica.instance,
 					NostrumGui.scrollID, worldIn,
-					(int) playerIn.posX, (int) playerIn.posY, (int) playerIn.posZ);
+					spellId, (int) playerIn.posY, (int) playerIn.posZ);
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
 		}
 		

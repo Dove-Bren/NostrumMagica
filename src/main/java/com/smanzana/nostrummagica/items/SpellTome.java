@@ -24,6 +24,8 @@ import com.smanzana.nostrummagica.potions.FrostbitePotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
+import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
@@ -50,7 +52,7 @@ import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class SpellTome extends Item implements GuiBook, ILoreTagged {
+public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOverlay {
 	
 	private static class LevelCurve {
 		
@@ -177,6 +179,40 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		nbt.setTag(NBT_SPELLS, tags);
 		
 		itemStack.setTagCompound(nbt);
+	}
+	
+	public static boolean removeSpell(ItemStack itemStack, int spellID) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+			return false;
+		
+		NBTTagCompound nbt = itemStack.getTagCompound();
+		
+		if (nbt == null)
+			nbt = new NBTTagCompound();
+		
+		NBTTagList tags = nbt.getTagList(NBT_SPELLS, NBT.TAG_INT);
+		boolean found = false;
+		
+		if (tags == null)
+			tags = new NBTTagList();
+		
+		for (int i = 0; i < tags.tagCount(); i++) {
+			if (tags.getIntAt(i) == spellID) {
+				tags.removeTag(i);
+				found = true;
+				if (i >= getIndex(itemStack)) {
+					incrementIndex(itemStack, -1);
+				}
+				break;
+			}
+		}
+		
+		if (found) {
+			nbt.setTag(NBT_SPELLS, tags);
+			itemStack.setTagCompound(nbt);
+		}
+		
+		return found;
 	}
 	
 	private static int[] getSpellIDs(ItemStack itemStack) {
@@ -454,8 +490,11 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		}
 		
 		int index = getIndex(itemStack);
-		if (ids.length < index)
+		if (index < 0) {
 			index = 0;
+		} else if (index >= ids.length) {
+			index = ids.length - 1;
+		}
 		
 		int id = ids[index];
 		Spell spell = NostrumMagica.getSpellRegistry().lookup(id);
@@ -566,9 +605,9 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 				SpellPreviewPage page = null;
 				for (Spell spell : spells) {
 					if (top) {
-						page = new SpellPreviewPage(spell);
+						page = new SpellPreviewPage(stack, spell);
 					} else {
-						HSplitPage hp = new HSplitPage(page, new SpellPreviewPage(spell));
+						HSplitPage hp = new HSplitPage(page, new SpellPreviewPage(stack, spell));
 						pages.add(hp);
 					}
 					
@@ -960,5 +999,16 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged {
 		}
 		
 		return true;
+	}
+
+	@Override
+	public boolean shouldTrace(World world, EntityPlayer player, ItemStack stack) {
+		Spell spell = NostrumMagica.getCurrentSpell(player);
+		if (spell != null && spell.getSpellParts() != null && spell.getSpellParts().get(0).isTrigger()) {
+			SpellTrigger trigger = spell.getSpellParts().get(0).getTrigger();
+			return trigger instanceof SeekingBulletTrigger;
+		}
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

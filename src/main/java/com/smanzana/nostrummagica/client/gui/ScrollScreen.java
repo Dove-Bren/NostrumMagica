@@ -32,8 +32,12 @@ public class ScrollScreen extends GuiScreen {
 	private final SpellIcon icon;
 	
 	public ScrollScreen(ItemStack scroll) {
+		this(SpellScroll.getSpell(scroll));
+	}
+	
+	public ScrollScreen(Spell spellIn) {
+		this.spell = spellIn;
 		this.components = new LinkedList<>();
-		this.spell = SpellScroll.getSpell(scroll);
 		
 		if (spell == null) {
 			this.name = "Unknown Spell";

@@ -24,7 +24,7 @@ import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock.WispBlockTileEntity;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.RuneBag;
-import com.smanzana.nostrummagica.items.SpellScroll;
+import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.entity.player.EntityPlayer;
@@ -283,6 +283,11 @@ public class NostrumGui implements IGuiHandler {
 			return null;
 		}
 		
+		if (ID == scrollID) {
+			Spell spell = NostrumMagica.getSpellRegistry().lookup(x);
+			return new ScrollScreen(spell);
+		}
+		
 		// Item based
 		int pos = player.inventory.currentItem + 27;
 		ItemStack inHand = player.getHeldItemMainhand();
@@ -307,9 +312,6 @@ public class NostrumGui implements IGuiHandler {
 						RuneBag.instance(),
 						inHand,
 						pos));
-			}
-			if (ID == scrollID && inHand.getItem() instanceof SpellScroll) {
-				return new ScrollScreen(inHand);
 			}
 			// Else other item stuff
 		}
