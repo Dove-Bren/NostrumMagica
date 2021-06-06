@@ -15,11 +15,11 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaEntityEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaLocationEffect;
+import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble.ItemType;
-import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.potions.FrostbitePotion;
-import com.smanzana.nostrummagica.potions.LightningChargePotion;
+import com.smanzana.nostrummagica.potions.LightningAttackPotion;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.utils.RayTrace;
@@ -246,6 +246,11 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 	
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+		
+		if (itemStackIn != playerIn.getHeldItem(hand)) {
+			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
+		}
+		
 		Vec3d dir = playerIn.getLookVec();
 		dir = dir.addVector(0, -dir.yCoord, 0).normalize();
 		if (element == EMagicElement.ICE) {
@@ -313,7 +318,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 					boolean used = false;
 					if (playerIn.isSneaking()) {
 						used = summonBoltOnSelf(playerIn);
-					} else if (playerIn.isPotionActive(LightningChargePotion.instance())) {
+					} else if (playerIn.isPotionActive(LightningAttackPotion.instance())) {
 						// This should be client-side... TODO do it on client and send via armor message?
 						
 						// Do quick mana check prior to actually doing raytrace. Redone inside helper func.
@@ -365,7 +370,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 					boolean used = false;
 					if (playerIn.isSneaking()) {
 						used = summonBoltOnSelf(playerIn);
-					} else if (playerIn.isPotionActive(LightningChargePotion.instance())) {
+					} else if (playerIn.isPotionActive(LightningAttackPotion.instance())) {
 						// This should be client-side... TODO do it on client and send via armor message?
 						
 						// Do quick mana check prior to actually doing raytrace. Redone inside helper func.

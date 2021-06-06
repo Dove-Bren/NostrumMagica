@@ -30,7 +30,9 @@ import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.items.ThanosStaff;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
+import com.smanzana.nostrummagica.potions.LightningAttackPotion;
 import com.smanzana.nostrummagica.potions.LightningChargePotion;
+import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.SpellActionSummary;
@@ -470,6 +472,15 @@ public class PlayerListener {
 						if (entry.getKey().onEvent(Event.MANA, ent, null))
 							it.remove();
 				}
+			}
+		}
+		
+		if (ent.getActivePotionEffect(RootedPotion.instance()) != null) {
+			if (ent.getActivePotionEffect(LightningChargePotion.instance()) != null
+					|| ent.getActivePotionEffect(LightningAttackPotion.instance()) != null) {
+				ent.removePotionEffect(LightningChargePotion.instance());
+				ent.removePotionEffect(LightningAttackPotion.instance());
+				ent.removePotionEffect(RootedPotion.instance());
 			}
 		}
 	}
@@ -1077,7 +1088,23 @@ public class PlayerListener {
 		
 		final boolean hasLightningSet = EnchantedArmor.GetSetCount(living, EMagicElement.LIGHTNING, 3) == 4;
 		if (hasLightningSet) {
-			living.addPotionEffect(new PotionEffect(LightningChargePotion.instance(), 20 * 30, 0));
+			// Alternate between buff and attack modes
+			PotionEffect boostEffect = living.getActivePotionEffect(LightningChargePotion.instance());
+			PotionEffect attackEffect = living.getActivePotionEffect(LightningAttackPotion.instance());
+			boolean tooSoon = (boostEffect == null ? (attackEffect == null ? 0 : attackEffect.getDuration()) : boostEffect.getDuration())
+					> (20 * 30 - 5);
+			
+			if (!tooSoon) {
+				if (boostEffect != null) {
+					living.removePotionEffect(LightningChargePotion.instance());
+					living.addPotionEffect(new PotionEffect(LightningAttackPotion.instance(), 20 * 30, 0));
+				} else {
+					if (attackEffect != null) {
+						living.removePotionEffect(LightningAttackPotion.instance());
+					}
+					living.addPotionEffect(new PotionEffect(LightningChargePotion.instance(), 20 * 30, 0));
+				}
+			}
 		}
 		
 	}

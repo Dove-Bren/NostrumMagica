@@ -13,25 +13,26 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class LightningChargePotion extends Potion {
+public class LightningAttackPotion extends Potion {
 
 	private static final ResourceLocation Resource = new ResourceLocation(
-			NostrumMagica.MODID, "potions-lightningcharge");
+			NostrumMagica.MODID, "potions-lightningattack");
 	
-	private static LightningChargePotion instance;
-	public static LightningChargePotion instance() {
+	private static LightningAttackPotion instance;
+	public static LightningAttackPotion instance() {
 		if (instance == null)
-			instance = new LightningChargePotion();
+			instance = new LightningAttackPotion();
 		
 		return instance;
 	}
 	
-	private LightningChargePotion() {
+	private LightningAttackPotion() {
 		super(false, 0xFFFFF200);
 
 		this.setBeneficial();
-		this.setPotionName("potion.lightningcharge.name");
-		this.registerPotionAttributeModifier(SharedMonsterAttributes.MOVEMENT_SPEED, "3AA5821F-1B8B-4E94-BF6C-7A58449F587B", 0.2D, 1);
+		this.setPotionName("potion.lightningattack.name");
+		this.registerPotionAttributeModifier(SharedMonsterAttributes.ATTACK_DAMAGE, "3AA5821F-0F7B-4E94-BF6C-7A58449F587B", 5.0D, 0);
+		this.registerPotionAttributeModifier(SharedMonsterAttributes.MOVEMENT_SPEED, "45e147fd-c876-48f2-b65a-6454fe86b46d".toUpperCase(), -0.5D, 2);
 		NostrumMagica.registerPotion(this, Resource);
 	}
 	
@@ -58,12 +59,12 @@ public class LightningChargePotion extends Potion {
 	@SideOnly(Side.CLIENT)
 	@Override
     public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
-		PotionIcon.LIGHTNINGMOVE.draw(mc, x + 6, y + 7);
+		PotionIcon.LIGHTNINGATTACK.draw(mc, x + 6, y + 7);
 	}
 	
 	@SideOnly(Side.CLIENT)
 	@Override
     public void renderHUDEffect(int x, int y, PotionEffect effect, net.minecraft.client.Minecraft mc, float alpha) {
-		PotionIcon.LIGHTNINGMOVE.draw(mc, x + 3, y + 3);
+		PotionIcon.LIGHTNINGATTACK.draw(mc, x + 3, y + 3);
 	}
 }

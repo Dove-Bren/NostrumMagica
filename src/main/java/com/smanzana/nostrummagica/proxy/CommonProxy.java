@@ -129,6 +129,7 @@ import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
 import com.smanzana.nostrummagica.network.messages.TamedDragonGUIOpenMessage;
 import com.smanzana.nostrummagica.potions.FamiliarPotion;
 import com.smanzana.nostrummagica.potions.FrostbitePotion;
+import com.smanzana.nostrummagica.potions.LightningAttackPotion;
 import com.smanzana.nostrummagica.potions.LightningChargePotion;
 import com.smanzana.nostrummagica.potions.MagicBoostPotion;
 import com.smanzana.nostrummagica.potions.MagicBuffPotion;
@@ -444,6 +445,7 @@ public class CommonProxy {
     	MagicBuffPotion.instance();
     	FamiliarPotion.instance();
     	LightningChargePotion.instance();
+    	LightningAttackPotion.instance();
     }
     
     private void registerItems() {

@@ -320,6 +320,7 @@ potion.magicboost.name=Magic Boost
 potion.familiar.name=Soul Bond
 potion.magicbuff.name=Magic Strikes
 potion.lightningcharge.name=Lightning Charge
+potion.lightningattack.name=Lightning Fury
 
 tile.magic_wall.name=Magic Wall
 tile.mani_ore.name=Mani Ore
@@ -743,7 +744,7 @@ effect.enchant.wind.desc=Transforms some items into wind variants, and applies a
 effect.enchant.ender.name=Ender Enchantment
 effect.enchant.ender.desc=Transforms some items into ender variants, and applies a ender echantment to others
 effect.enchant.lightning.name=Lightning Enchantment
-effect.enchant.lightning.desc=Transforms some lightning into fire variants, and applies a lightning echantment to others
+effect.enchant.lightning.desc=Transforms some items into lightning variants, and applies a lightning echantment to others
 effect.enchant.physical.name=Metal Enchantment
 effect.enchant.physical.desc=Transforms some items into metal variants, and applies a metal echantment to others
 effect.break.name=Break
