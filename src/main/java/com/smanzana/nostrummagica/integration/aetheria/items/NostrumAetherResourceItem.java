@@ -108,18 +108,18 @@ public class NostrumAetherResourceItem extends Item implements ILoreTagged, IAet
 
 	@Override
 	public String getLoreDisplayName() {
-		return "Aether Resources";
+		return "Aether Flowers";
 	}
 	
 	@Override
 	public Lore getBasicLore() {
-		return new Lore().add("");
+		return new Lore().add("Flowers of mandrake and ginseng that can't be used as reagents... and yet, you can tell there's something magical about them.");
 				
 	}
 	
 	@Override
 	public Lore getDeepLore() {
-		return new Lore().add("");
+		return new Lore().add("Flowers of mandrake and ginseng with high levels of aether.", "These flowers cannot be used as reagents by themselves but produce more aether than regular reagents when burned.");
 	}
 	
 	@Override
@@ -147,47 +147,6 @@ public class NostrumAetherResourceItem extends Item implements ILoreTagged, IAet
 	
 	@Override
 	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		
-//		// Copied from ItemBed (vanilla) with some modifications
-//		AetherResourceType type = getTypeFromMeta(stack.getMetadata()); 
-//		
-//		if (type != AetherResourceType.CRYSTAL_SMALL && type != AetherResourceType.CRYSTAL_MEDIUM) {
-//			return EnumActionResult.PASS;
-//		}
-//		
-//		if (worldIn.isRemote) {
-//			return EnumActionResult.SUCCESS;
-//		} else {
-//			IBlockState iblockstate = worldIn.getBlockState(pos);
-//			Block block = iblockstate.getBlock();
-//
-//			if (!block.isReplaceable(worldIn, pos)) {
-//				pos = pos.offset(facing);
-//			}
-//			
-//			// If setting on the side of a non-full block, promote to a regular standing one
-//			if (facing != EnumFacing.UP) {
-//				if (!worldIn.getBlockState(pos.offset(facing.getOpposite())).isFullBlock()) {
-//					facing = EnumFacing.UP;
-//				}
-//			}
-//
-//			if (playerIn.canPlayerEdit(pos, facing, stack) && (block.isReplaceable(worldIn, pos) || worldIn.isAirBlock(pos))) {
-//				IBlockState iblockstate1 = ManiCrystal.instance().getDefaultState()
-//						.withProperty(ManiCrystal.FACING, facing)
-//						.withProperty(ManiCrystal.LEVEL, type == AetherResourceType.CRYSTAL_MEDIUM ? 1 : 0);
-//
-//				worldIn.setBlockState(pos, iblockstate1, 11);
-//
-//				SoundType soundtype = iblockstate1.getBlock().getSoundType(iblockstate1, worldIn, pos, playerIn);
-//				worldIn.playSound((EntityPlayer)null, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
-//				--stack.stackSize;
-//				return EnumActionResult.SUCCESS;
-//			} else {
-//				return EnumActionResult.FAIL;
-//			}
-//		}
-		
 		return EnumActionResult.PASS;
 	}
 
