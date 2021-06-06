@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.particles.ParticleGlowOrb;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 
@@ -13,6 +14,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -266,6 +268,10 @@ public class NostrumMagicaFlower extends BlockBush {
 			}
 		}
 		
+		if (worldIn.isRemote) {
+			
+		}
+		
 		super.randomTick(worldIn, pos, state, random);
 	}
 	
@@ -277,5 +283,36 @@ public class NostrumMagicaFlower extends BlockBush {
 		}
 		
 		return ret;
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+		super.randomDisplayTick(stateIn, worldIn, pos, rand);
+		
+		if (rand.nextBoolean()) {
+			final int color;
+			if (stateIn.getValue(TYPE) == Type.MIDNIGHT_IRIS) {
+				color = 0xFF601099;
+			} else {
+				//color = 0xFFF5FF3D;
+				if (rand.nextBoolean()) {
+					color = 0xFF86C3DA;
+				} else {
+					color = 0xFFD87F9E;
+				}
+			}
+			
+			Minecraft.getMinecraft().effectRenderer.addEffect(new ParticleGlowOrb(
+					worldIn,
+					pos.getX() + rand.nextFloat(),
+					pos.getY() + rand.nextFloat(),
+					pos.getZ() + rand.nextFloat(),
+					(float) ((color >> 16) & 255) / 255f,//.3f,
+					(float) ((color >> 8) & 255) / 255f,//1f,
+					(float) ((color >> 0) & 255) / 255f,//.4f,
+					.3f,
+					40
+					).setMotion(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025));
+		}
 	}
 }
