@@ -215,6 +215,21 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		return found;
 	}
 	
+	public static void clearSpells(ItemStack itemStack) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
+			return;
+		
+		NBTTagCompound nbt = itemStack.getTagCompound();
+		
+		if (nbt == null)
+			nbt = new NBTTagCompound();
+		
+		NBTTagList tags = new NBTTagList(); // new list to replace old
+		nbt.setTag(NBT_SPELLS, tags);
+		
+		itemStack.setTagCompound(nbt);
+	}
+	
 	private static int[] getSpellIDs(ItemStack itemStack) {
 		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
 			return null;

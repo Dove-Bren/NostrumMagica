@@ -1,6 +1,9 @@
 package com.smanzana.nostrummagica.integration.aetheria;
 
+import java.util.List;
+
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
+import com.smanzana.nostrumaetheria.api.recipes.IAetherUnravelerRecipe;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuser;
@@ -11,6 +14,8 @@ import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.items.SpellScroll;
+import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.research.NostrumResearch;
@@ -20,6 +25,7 @@ import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
 import com.smanzana.nostrummagica.rituals.requirements.RRequirementResearch;
+import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -63,6 +69,9 @@ public class AetheriaProxy {
 		registerAetheriaQuests();
 		registerAetheriaRituals();
 		registerAetheriaResearch();
+		
+		// register unravel recipes
+		APIProxy.addUnravelerRecipe(new TomeUnravelerRecipe());
 		
 		return true;
 	}
@@ -153,5 +162,50 @@ public class AetheriaProxy {
 
 	public void reinitResearch() {
 		registerAetheriaResearch();
+	}
+	
+	protected static class TomeUnravelerRecipe implements IAetherUnravelerRecipe {
+
+		private static final int AETHER_COST = 5000;
+		private static final int DURATION = 20 * 120;
+		
+		@Override
+		public boolean matches(ItemStack stack) {
+			return stack.getItem() instanceof SpellTome && !SpellTome.getSpells(stack).isEmpty();
+		}
+
+		@Override
+		public int getAetherCost(ItemStack stack) {
+			return AETHER_COST;
+		}
+		
+		@Override
+		public int getDuration(ItemStack stack) {
+			return DURATION;
+		}
+
+		@Override
+		public ItemStack[] unravel(ItemStack stack) {
+			ItemStack[] ret = new ItemStack[1];
+			
+			List<Spell> spells = SpellTome.getSpells(stack);
+			if (spells == null || spells.isEmpty()) {
+				ret[0] = stack.copy();
+			} else {
+				ret = new ItemStack[spells.size() + 1];
+				ret[0] = stack.copy();
+				int i = 1;
+				for (Spell spell : spells) {
+					ItemStack scroll = SpellScroll.create(spell);
+					ret[i++] = scroll;
+				}
+			}
+			
+			// Clear tome
+			SpellTome.clearSpells(ret[0]);
+			
+			return ret;
+		}
+		
 	}
 }
