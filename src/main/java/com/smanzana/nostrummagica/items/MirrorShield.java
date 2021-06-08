@@ -109,7 +109,7 @@ public class MirrorShield extends Item implements ISpellActionListener, ILoreTag
 				entity.getActiveItemStack().damageItem(NostrumMagica.rand.nextInt(2) + 1, entity);
 				
 				// If there was a caster, reflect part of the spell back
-				if (data.caster != null) {
+				if (data.caster != null && data.caster != entity) {
 					data.summary.getAction().apply(data.caster, 0.2f);
 				}
 				

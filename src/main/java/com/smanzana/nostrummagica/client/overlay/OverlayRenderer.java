@@ -23,6 +23,7 @@ import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierG
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierShrink;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierTranslate;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
+import com.smanzana.nostrummagica.client.render.LayerAetherCloak;
 import com.smanzana.nostrummagica.client.render.LayerCustomElytra;
 import com.smanzana.nostrummagica.client.render.LayerDragonFlightWings;
 import com.smanzana.nostrummagica.config.ModConfig;
@@ -1239,6 +1240,7 @@ public class OverlayRenderer extends Gui {
 			// Instead, we just inject a layer for our custom elytras, and another for dragon-flight wings
 			event.getRenderer().addLayer(new LayerCustomElytra(event.getRenderer()));
 			event.getRenderer().addLayer(new LayerDragonFlightWings(event.getRenderer()));
+			event.getRenderer().addLayer(new LayerAetherCloak(event.getRenderer()));
 		}
 		
 		if (event.getEntityPlayer() != Minecraft.getMinecraft().thePlayer) {
@@ -1251,30 +1253,6 @@ public class OverlayRenderer extends Gui {
 				((EnchantedArmor) equipStack.getItem()).onArmorTick(event.getEntityPlayer().worldObj, event.getEntityPlayer(), equipStack);
 			}
 		}
-		
-//		// Render special status effects
-//		if (event.getEntityPlayer().ticksExisted % 4 == 0 && event.getEntityPlayer().isPotionActive(RootedPotion.instance())) {
-//			final ClientEffect effect = new ClientEffectAnimated(event.getEntityPlayer().getPositionVector(), 1000L,
-//					new ClientEffect[] {
-//						new ClientEffect(Vec3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_0, 0, 0, 0), 1500L),
-//						new ClientEffect(Vec3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_1, 0, 0, 0), 1500L),
-//						new ClientEffect(Vec3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_2, 0, 0, 0), 1500L),
-//						new ClientEffect(Vec3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_3, 0, 0, 0), 1500L),
-//						new ClientEffect(Vec3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_4, 0, 0, 0), 1500L),
-//					},
-//					new float[] {
-//						.1f,
-//						.2f,
-//						.3f,
-//						.4f,
-//						1f
-//					});
-//			effect
-//				.modify(new ClientEffectModifierTranslate(NostrumMagica.rand.nextFloat() - .5f, 0, NostrumMagica.rand.nextFloat() - .5f, 0, NostrumMagica.rand.nextFloat() * 360f))
-//				.modify(new ClientEffectModifierGrow(.05f, 1f, .1f, 1f, .2f))
-//				.modify(new ClientEffectModifierShrink(1f, 1f, 1f, .0f, .8f));
-//			ClientEffectRenderer.instance().addEffect(effect);
-//		}
 	}
 	
 }

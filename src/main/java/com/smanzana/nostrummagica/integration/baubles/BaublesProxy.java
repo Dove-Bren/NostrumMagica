@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.baubles.inventory.BaubleInventoryHelper;
+import com.smanzana.nostrummagica.integration.baubles.items.ItemAetherCloak;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble.ItemType;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
@@ -80,6 +81,12 @@ public class BaublesProxy {
 		ItemMagicBauble.instance().setRegistryName(NostrumMagica.MODID, ItemMagicBauble.ID);
     	GameRegistry.register(ItemMagicBauble.instance());
     	ItemMagicBauble.init();
+
+    	if (NostrumMagica.aetheria.isEnabled()) {
+			ItemAetherCloak.instance().setRegistryName(NostrumMagica.MODID, ItemAetherCloak.ID);
+	    	GameRegistry.register(ItemAetherCloak.instance());
+	    	ItemAetherCloak.init();
+    	}
 	}
 	
 	private void registerBaubleQuests() {

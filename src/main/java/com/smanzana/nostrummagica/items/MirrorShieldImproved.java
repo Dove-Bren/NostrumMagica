@@ -90,7 +90,7 @@ public class MirrorShieldImproved extends MirrorShield {
 				}
 				
 				// If there was a caster, reflect part of the spell back
-				if (data.caster != null) {
+				if (data.caster != null && data.caster != entity) {
 					data.summary.getAction().apply(data.caster, reduc);
 				}
 				

@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.renderer.ModelDragonFlightWings;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
+import com.smanzana.nostrummagica.items.ICapeProvider;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.client.entity.AbstractClientPlayer;
@@ -37,13 +38,24 @@ public class LayerDragonFlightWings implements LayerRenderer<AbstractClientPlaye
 	}
 	
 	public boolean shouldRender(AbstractClientPlayer player) {
+		final boolean flying = player.isElytraFlying();
 		// Maybe should have an interface?
-		return (
+		if (
 				EnchantedArmor.GetSetCount(player, EMagicElement.PHYSICAL, 3) == 4
 				|| EnchantedArmor.GetSetCount(player, EMagicElement.EARTH, 3) == 4
 				|| EnchantedArmor.GetSetCount(player, EMagicElement.FIRE, 3) == 4
 				|| EnchantedArmor.GetSetCount(player, EMagicElement.ENDER, 3) == 4
-				);
+				) {
+			if (flying) {
+				return true;
+			}
+			
+			ItemStack cape = LayerAetherCloak.ShouldRender(player);
+			return cape == null || !((ICapeProvider) cape.getItem()).shouldPreventOtherRenders(player, cape);
+		}
+				
+		
+		return false;
 	}
 	
 	public void render(AbstractClientPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale, boolean enchanted) {

@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.integration.baubles.items.ItemAetherCloak;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble.ItemType;
 import com.smanzana.nostrummagica.proxy.ClientProxy;
@@ -65,5 +66,7 @@ public class BaublesClientProxy extends BaublesProxy {
     				ItemMagicBauble.getMetaFromType(type),
 					type.getUnlocalizedKey());
 		}
+    	
+    	ClientProxy.registerModel(ItemAetherCloak.instance(), 0, ItemAetherCloak.ID);
 	}
 }

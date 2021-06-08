@@ -546,5 +546,4 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 			}
 		}
 	}
-
 }
