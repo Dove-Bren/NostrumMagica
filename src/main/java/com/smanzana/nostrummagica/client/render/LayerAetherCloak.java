@@ -13,20 +13,35 @@ import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.GlStateManager.DestFactor;
 import net.minecraft.client.renderer.GlStateManager.SourceFactor;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.model.IModel;
+import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
+import scala.actors.threadpool.Arrays;
 
 public class LayerAetherCloak implements LayerRenderer<AbstractClientPlayer> {
 
-	protected static final Map<ResourceLocation, ModelAetherCloak> ModelCache = new HashMap<>();
+	protected static final Map<Integer, ModelAetherCloak> ModelCache = new HashMap<>();
 	
-	protected static final ModelAetherCloak GetModel(ResourceLocation model) {
-		ModelAetherCloak cloak = ModelCache.get(model);
+	protected static final ModelAetherCloak GetModel(ResourceLocation models[]) {
+		int hash = Arrays.deepHashCode(models);
+		ModelAetherCloak cloak = ModelCache.get(hash);
 		if (cloak == null) {
-			cloak = new ModelAetherCloak(model, 64, 64); // TODO make texture size configurable
+			IBakedModel[] bakedModels = new IBakedModel[models.length];
+			int i = 0;
+			for (ResourceLocation modelLoc : models) {
+				IModel rawModel = ModelLoaderRegistry.getModelOrLogError(modelLoc, "Nostrum Magica is missing a model. Please report this to the mod authors.");
+				bakedModels[i++] = rawModel.bake(rawModel.getDefaultState(), DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter());
+			}
+			
+			cloak = new ModelAetherCloak(bakedModels, 64, 64); // TODO make texture size configurable
+			ModelCache.put(hash, cloak);
 		}
 		return cloak;
 	}
@@ -47,7 +62,7 @@ public class LayerAetherCloak implements LayerRenderer<AbstractClientPlayer> {
 	}
 	
 	public static @Nullable ItemStack ShouldRender(AbstractClientPlayer player) {
-		Iterable<ItemStack> equipment = player.getEquipmentAndArmor();
+		Iterable<ItemStack> equipment = player.getArmorInventoryList();
 		for (ItemStack stack : equipment) {
 			if (stack != null && stack.getItem() instanceof ICapeProvider) {
 				if (((ICapeProvider) stack.getItem()).shouldRenderCape(player, stack)) {
@@ -78,7 +93,7 @@ public class LayerAetherCloak implements LayerRenderer<AbstractClientPlayer> {
 	
 	public void render(AbstractClientPlayer player, ItemStack stack, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 		final ICapeProvider provider = ((ICapeProvider)stack.getItem());
-		final ModelAetherCloak model = GetModel(provider.getCapeModel(player, stack));
+		final ModelAetherCloak model = GetModel(provider.getCapeModels(player, stack));
 		
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 0.9F);
 		
@@ -96,17 +111,11 @@ public class LayerAetherCloak implements LayerRenderer<AbstractClientPlayer> {
 		GlStateManager.enableColorMaterial();
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 
-		final ResourceLocation texture = provider.getCapeTexture(player, stack);
-		if (texture != null) {
-			this.renderPlayer.bindTexture(texture);
-		}
-		
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(0.0F, 0.0F, 0.125F);
 		model.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale, player);
-		model.render(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+		model.renderEx(player, provider, stack, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
 
-		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 		GlStateManager.popMatrix();
 	}
 

@@ -7,8 +7,14 @@ import java.util.Random;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
+import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.AltarBlock;
+import com.smanzana.nostrummagica.blocks.AltarBlock.AltarTileEntity;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.ParticleGlowOrb;
+import com.smanzana.nostrummagica.utils.Inventories.ItemStackArrayWrapper;
 
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
@@ -18,7 +24,9 @@ import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -28,7 +36,9 @@ import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -167,12 +177,56 @@ public class AetherInfuser extends BlockContainer {
 			this.compWrapper.configureInOut(true, false);
 		}
 		
-//		private void dirtyAndUpdate() {
-//			if (worldObj != null) {
-//				worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 3);
-//				markDirty();
-//			}
-//		}
+		protected void chargePlayer(EntityPlayer player) {
+			int chargeAmount = Math.min(CHARGE_PER_TICK, this.getCharge());
+			final int startAmount = chargeAmount;
+			// Try both regular inventory and bauble inventory
+			IInventory inv = player.inventory;
+			chargeAmount -= APIProxy.pushToInventory(worldObj, player, inv, chargeAmount);
+			
+			inv = NostrumMagica.baubles.getBaubles(player);
+			if (inv != null) {
+				chargeAmount -= APIProxy.pushToInventory(worldObj, player, inv, chargeAmount);
+			}
+			
+			if (startAmount != chargeAmount) {
+				this.getHandler().drawAether(null, startAmount - chargeAmount);
+				NostrumParticles.GLOW_ORB.spawn(worldObj, new SpawnParams(
+						3,
+						player.posX, player.posY + player.height/2f, player.posZ, 2.0,
+						40, 0,
+						player.getEntityId()
+						));
+			}
+			
+			// TODO look at held item for lenses
+		}
+		
+		protected void chargeAltar(BlockPos pos, AltarTileEntity te) {
+			int chargeAmount = Math.min(CHARGE_PER_TICK, this.getCharge());
+			final int startAmount = chargeAmount;
+			if (te != null && te.getItem() != null) {
+				ItemStack held = te.getItem();
+				IInventory inv = new ItemStackArrayWrapper(new ItemStack[] {held});
+				chargeAmount -= APIProxy.pushToInventory(worldObj, null, inv, chargeAmount);
+			}
+			
+			if (startAmount != chargeAmount) {
+				this.getHandler().drawAether(null, startAmount - chargeAmount);
+				// Set number to spawn based on how much aether we actually put in
+				final int diff = startAmount - chargeAmount;
+				float countRaw = (float) diff / (float) (CHARGE_PER_TICK / 3);
+				final int whole = (int) countRaw;
+				if (whole > 0 || NostrumMagica.rand.nextFloat() < countRaw) {
+					NostrumParticles.GLOW_ORB.spawn(worldObj, new SpawnParams(
+							whole > 0 ? whole : 1,
+							pos.getX() + .5, pos.getY() + 1.2, pos.getZ() + .5, 2.0,
+							40, 0,
+							new Vec3d(pos.getX() + .5, pos.getY() + 1.2, pos.getZ() + .5)
+							));
+				}
+			}
+		}
 		
 		@Override
 		public void update() {
@@ -217,8 +271,35 @@ public class AetherInfuser extends BlockContainer {
 				return;
 			}
 			
-			// TODO look for things to charge or infuse
-			// Possibly spawn particles
+			// First, check for altars
+			if (worldObj.getBlockState(pos.up()).getBlock() instanceof AltarBlock) {
+				// Altar!
+				chargeAltar(pos.up(), (AltarTileEntity) worldObj.getTileEntity(pos.up()));
+			} else {
+				// Check for entities in AoE
+				List<Entity> candidates = worldObj.getEntitiesWithinAABB(EntityPlayer.class, new AxisAlignedBB(
+						pos.north().north().east().east().up().up().up(),
+						pos.south().south().west().west().up()
+						));
+				EntityPlayer minPlayer = null;
+				double minDist = Double.MAX_VALUE;
+				for (Entity candidate : candidates) {
+					if (!(candidate instanceof EntityPlayer)) {
+						continue;
+					}
+					
+					EntityPlayer player = (EntityPlayer) candidate;
+					final double dist = player.getDistanceSq(pos.getX() + .5, pos.getY() + .5 + 2, pos.getZ() + .5);
+					if (dist < 4 && dist < minDist) {
+						minDist = dist;
+						minPlayer = player;
+					}
+				}
+				
+				if (minPlayer != null) {
+					chargePlayer(minPlayer);
+				}
+			}
 			
 		}
 		
@@ -249,7 +330,7 @@ public class AetherInfuser extends BlockContainer {
 			super.setWorldObj(world);
 			
 			if (!world.isRemote) {
-				this.compWrapper.setAutoFill(true);
+				this.compWrapper.setAutoFill(true, 20);
 			}
 		}
 		

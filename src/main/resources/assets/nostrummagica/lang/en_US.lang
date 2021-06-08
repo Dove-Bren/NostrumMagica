@@ -313,6 +313,13 @@ item.armor.set.wind.3.name=Hurricane
 item.modifiers.dragonslot.body=When on body:
 item.modifiers.dragonslot.helm=When on head:
 
+item.aether_cloak.runed=Runed
+item.aether_cloak.wings=Display Wings
+item.aether_cloak.trimmed=Trimmed Design
+item.aether_cloak.color.outside=Outside Dyed %s
+item.aether_cloak.color.inside=Inside Dyed %s
+item.aether_cloak.color.runes=Rune Color %s
+
 potion.frostbite.name=Frostbite
 potion.shieldphysical.name=Physical Ward
 potion.shieldmagic.name=Magic Ward

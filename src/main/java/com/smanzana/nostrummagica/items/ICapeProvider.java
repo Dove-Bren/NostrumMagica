@@ -2,7 +2,6 @@ package com.smanzana.nostrummagica.items;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
@@ -16,14 +15,16 @@ public interface ICapeProvider {
 	public boolean shouldRenderCape(EntityLivingBase entity, ItemStack stack);
 	
 	@SideOnly(Side.CLIENT)
-	public ResourceLocation getCapeModel(EntityLivingBase entity, ItemStack stack);
+	public ResourceLocation[] getCapeModels(EntityLivingBase entity, ItemStack stack);
 	
 	@SideOnly(Side.CLIENT)
-	public @Nullable ResourceLocation getCapeTexture(EntityLivingBase entity, ItemStack stack);
+	public @Nullable ResourceLocation[] getCapeTextures(EntityLivingBase entity, ItemStack stack);
 	
 	@SideOnly(Side.CLIENT)
-	public void preRender(Entity entity, int model, VertexBuffer buffer, double x, double y, double z,
-					float entityYaw, float partialTicks);
+	public int getColor(EntityLivingBase entity, ItemStack stack, int model);
+	
+	@SideOnly(Side.CLIENT)
+	public void preRender(Entity entity, int model, ItemStack stack, float entityYaw, float partialTicks);
 	
 	@SideOnly(Side.CLIENT)
 	public boolean shouldPreventOtherRenders(EntityLivingBase entity, ItemStack stack);

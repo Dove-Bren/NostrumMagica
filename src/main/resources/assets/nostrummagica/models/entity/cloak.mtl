@@ -5,11 +5,17 @@ newmtl Inside
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
 d 1.000000
-map_Kd nostrummagica:models/armor/dragon_scales_gold
+map_Kd nostrummagica:models/armor/aether_cloak_inside
 
 newmtl Outside
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
 d 1.000000
-map_Kd nostrummagica:models/armor/dragon_scales
+map_Kd nostrummagica:models/armor/aether_cloak_outside
+
+newmtl OutsideDecor
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+d 1.000000
+map_Kd nostrummagica:models/armor/aether_cloak_decor
 

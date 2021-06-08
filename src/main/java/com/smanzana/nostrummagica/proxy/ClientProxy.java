@@ -1077,7 +1077,11 @@ public class ClientProxy extends CommonProxy {
 		event.getMap().registerSprite(new ResourceLocation(
 				NostrumMagica.MODID, "entity/dragonflightwing"));
 		event.getMap().registerSprite(new ResourceLocation(
-				NostrumMagica.MODID, "models/armor/aether_cloak_uv"));
+				NostrumMagica.MODID, "models/armor/aether_cloak_decor"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "models/armor/aether_cloak_inside"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "models/armor/aether_cloak_outside"));
 	}
 	
 	@SubscribeEvent

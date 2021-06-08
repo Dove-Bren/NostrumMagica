@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.render;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.items.ICapeProvider;
 import com.smanzana.nostrummagica.items.IElytraProvider;
 
 import net.minecraft.client.entity.AbstractClientPlayer;
@@ -35,6 +36,12 @@ public class LayerCustomElytra extends LayerElytra {
 	}
 	
 	public boolean shouldRender(AbstractClientPlayer player) {
+		final boolean flying = player.isElytraFlying();
+		ItemStack cape = LayerAetherCloak.ShouldRender(player);
+		if (!flying && cape != null && ((ICapeProvider) cape.getItem()).shouldPreventOtherRenders(player, cape)) {
+			return false;
+		}
+		
 		for (@Nullable ItemStack stack : player.getEquipmentAndArmor()) {
 			if (stack != null && stack.getItem() instanceof IElytraProvider) {
 				if (((IElytraProvider) stack.getItem()).shouldRenderElyta(player, stack)) {
