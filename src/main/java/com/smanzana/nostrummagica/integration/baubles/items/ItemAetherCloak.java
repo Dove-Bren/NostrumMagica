@@ -55,6 +55,7 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 
 	public static String ID = "aether_cloak";
 	private static final String NBT_AETHER_PROGRESS = "aether_progress";
+	private static final String NBT_AETHER_SPENDER = "aether_spender";
 	private static final String NBT_DISPLAY_WINGS = "display_wings";
 	private static final String NBT_DISPLAY_TRIMMED = "display_trimmed";
 	private static final String NBT_DISPLAY_COLOR_OUTSIDE = "color_outside";
@@ -359,7 +360,10 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 	@SideOnly(Side.CLIENT)
     @Override
 	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
-		super.getSubItems(itemIn, tab, subItems);
+		//super.getSubItems(itemIn, tab, subItems);
+		
+		ItemStack basic = new ItemStack(instance());
+		subItems.add(basic);
 		
 		ItemStack full = new ItemStack(instance());
 		
@@ -372,6 +376,20 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 //		tag.setInteger(NBT_AETHER_STORED, MAX_AETHER_MAX);
 		
 		subItems.add(full);
+		
+		ItemStack complete = new ItemStack(instance());
+		comp = this.getAetherHandler(complete);
+		comp.setMaxAether(MAX_AETHER_MAX);
+		comp.setAether(MAX_AETHER_MAX);
+		AetherItem.SaveItem(complete);
+		setRuneColor(complete, EnumDyeColor.RED);
+		setOutsideColor(complete, EnumDyeColor.BLACK);
+		setInsideColor(complete, EnumDyeColor.PINK);
+		setDisplayWings(complete, true);
+		setDisplayRunes(complete, true);
+		setDisplayTrimmed(complete, true);
+		setAetherCaster(complete, true);
+		subItems.add(complete);
 	}
 	
 	@Override
@@ -534,6 +552,18 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 		}
 		
 		summary.addEfficiency(.25f);
+		
+		if (isAetherCaster(stack) && summary.getReagentCost() > 0f) {
+			// Attempt to spend aether to cover reagent cost
+			// 100 aether for full cast
+			final int cost = (int) Math.ceil(100 * summary.getReagentCost());
+			if (this.getAether(stack) >= cost) {
+				if ((!(caster instanceof EntityPlayer) || !((EntityPlayer) caster).isCreative()) && !caster.worldObj.isRemote) {
+					this.deductAether(stack, cost);
+				}
+				summary.addReagentCost(-summary.getReagentCost());
+			}
+		}
 	}
 	
 	@Override
@@ -717,6 +747,24 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 		nbt.setBoolean(NBT_DISPLAY_RUNES, display);
 		stack.setTagCompound(nbt);
 	}
+	
+	public boolean isAetherCaster(ItemStack stack) {
+		NBTTagCompound nbt = stack.getTagCompound();
+		if (nbt == null || !nbt.hasKey(NBT_AETHER_SPENDER)) {
+			return false;
+		}
+		return nbt.getBoolean(NBT_AETHER_SPENDER);
+	}
+	
+	public void setAetherCaster(ItemStack stack, boolean caster) {
+		NBTTagCompound nbt = stack.getTagCompound();
+		if (nbt == null) {
+			nbt = new NBTTagCompound();
+		}
+		
+		nbt.setBoolean(NBT_AETHER_SPENDER, caster);
+		stack.setTagCompound(nbt);
+	}
 
 	@Override
 	protected int getDefaultMaxAether(ItemStack stack) {
@@ -735,7 +783,7 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 
 	@Override
 	public boolean canBeDrawnFrom(@Nullable ItemStack stack, @Nullable World worldIn, Entity entityIn) {
-		return true;
+		return false;
 	}
 
 	@SideOnly(Side.CLIENT)

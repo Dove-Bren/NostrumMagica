@@ -50,23 +50,23 @@ public class ClientCastReplyMessage implements IMessage {
 					
 				}
 				
-				if (message.tag.hasKey(NBT_REAGENTS, NBT.TAG_COMPOUND)) {
-					NBTTagCompound regs = message.tag.getCompoundTag(NBT_REAGENTS);
-					if (!regs.getKeySet().isEmpty())
-					for (String key : regs.getKeySet()) {
-						int cost = regs.getInteger(key);
-						if (cost == 0)
-							continue;
-						
-						try {
-							ReagentType type = ReagentType.valueOf(key);
-							NostrumMagica.removeReagents(player, type, cost);
-						} catch (Exception e) {
-							;
-						}
-					}
-					
-				}
+//				if (message.tag.hasKey(NBT_REAGENTS, NBT.TAG_COMPOUND)) {
+//					NBTTagCompound regs = message.tag.getCompoundTag(NBT_REAGENTS);
+//					if (!regs.getKeySet().isEmpty())
+//					for (String key : regs.getKeySet()) {
+//						int cost = regs.getInteger(key);
+//						if (cost == 0)
+//							continue;
+//						
+//						try {
+//							ReagentType type = ReagentType.valueOf(key);
+//							NostrumMagica.removeReagents(player, type, cost);
+//						} catch (Exception e) {
+//							;
+//						}
+//					}
+//					
+//				}
 			});
 			
 

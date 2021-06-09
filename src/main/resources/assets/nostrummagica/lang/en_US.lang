@@ -319,6 +319,7 @@ item.aether_cloak.trimmed=Trimmed Design
 item.aether_cloak.color.outside=Outside Dyed %s
 item.aether_cloak.color.inside=Inside Dyed %s
 item.aether_cloak.color.runes=Rune Color %s
+item.aether_cloak.spender=Aether Caster
 
 potion.frostbite.name=Frostbite
 potion.shieldphysical.name=Physical Ward
@@ -938,6 +939,8 @@ ritual.float_guard.name=Craft Float Guard
 ritual.shield_ring_small.name=Craft Shield Ring
 ritual.shield_ring_large.name=Craft Strong Shield Ring
 ritual.elude_cape_small.name=Craft Elusion Cloak
+ritual.aether_cloak.name=Craft Aether Cloak
+ritual.aether_cloak_caster_upgrade.name=Aether Caster Upgrade
 
 ritual.form_primordial_mirror.name=Form Primordial Mirror
 ritual.form_essential_ooze.name=Form Essential Ooze
@@ -1377,3 +1380,6 @@ research.dragon_armor.info=  Dragons have natural armor from their thick dragon 
 research.wispblock.name=Wisp Summoning
 research.wispblock.desc=Wispful thinking?
 research.wispblock.info=  You've seen wisps floating along the night sky, and you've even seen them fight. They obviously have some affinity to magic and can cast spells. And they appear to have the same enemies as you. So... why not work together?|  You've created a block that allows you to summon wisps to fill the air, dance around, and (most importantly) kill mobs. The wisp block requires Aether to function, some extra reagents to burn, and a scroll, but will slowly spawn wisps that cast the spell in the scroll.
+research.aether_cloaks.name=Aether Cloaks
+research.aether_cloaks.desc=Functional & Fashionable!
+research.aether_cloaks.info=  Aether Gems are handy for taking aether with you, but they have very limited capacity. You tried fashioning earings and rings out of the aether gems to get even a little more aether capacity, but couldn't get any of it to work.|  Imbueing cloth with the properties of aether, however, has shown to be incredible fruitful!|  The Aether Cloak allows you to store a LOT of aether. While you're wearing it, the cloak will automatically provide aether for any items you have that take aether.|  Quite mysteriously, the cloak seems to grow in capacity the more you use it, as well!|  You also think you can enhance the cloak to provide the aether in a more efficient manner, allowing you to draw upon the aether directly to cast spells!||  Aether cloaks support many different display options as well. Have wings and want to see them through the cape? Cut a hole in it! Cloak too big? Chop some of it off! Want a red cloak? Dye it!

@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.integration.baubles;
 
 import java.util.List;
 
+import com.google.common.collect.Lists;
+import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.baubles.inventory.BaubleInventoryHelper;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemAetherCloak;
@@ -18,6 +20,7 @@ import com.smanzana.nostrummagica.research.NostrumResearch.NostrumResearchTab;
 import com.smanzana.nostrummagica.research.NostrumResearch.Size;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
+import com.smanzana.nostrummagica.rituals.outcomes.OutcomeModifyCenterItemGeneric;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
 import com.smanzana.nostrummagica.rituals.requirements.RRequirementResearch;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -53,7 +56,6 @@ public class BaublesProxy {
 		
 		registerItems();
 		registerBaubleQuests();
-		registerBaubleRituals();
 		return true;
 	}
 	
@@ -61,7 +63,8 @@ public class BaublesProxy {
 		if (!enabled) {
 			return false;
 		}
-		
+
+		registerBaubleRituals();
 		registerBaubleResearch();
 		
 		return true;
@@ -90,60 +93,7 @@ public class BaublesProxy {
 	}
 	
 	private void registerBaubleQuests() {
-//		new NostrumQuest("ribbons", QuestType.CHALLENGE, 3,
-//    			0, // Control
-//    			0, // Technique
-//    			0, // Finesse
-//    			new String[0],
-//    			null, null,
-//    			new IReward[]{new AttributeReward(AwardType.REGEN, 0.015f)})
-//    		.offset(2, -1);
-//		
-//		new NostrumQuest("ribbons_enhanced", QuestType.CHALLENGE, 6,
-//    			0, // Control
-//    			0, // Technique
-//    			0, // Finesse
-//    			new String[] {"ribbons"},
-//    			null, null,
-//    			new IReward[]{new AttributeReward(AwardType.MANA, 0.02f)})
-//    		.offset(3, 2);
-//		
-//		new NostrumQuest("rings", QuestType.CHALLENGE, 4,
-//    			0, // Control
-//    			0, // Technique
-//    			0, // Finesse
-//    			new String[] {"ribbons"},
-//    			null, null,
-//    			new IReward[]{new AttributeReward(AwardType.REGEN, 0.025f)})
-//    		.offset(2, 1);
-//		
-//		new NostrumQuest("rings_true", QuestType.CHALLENGE, 7,
-//    			0, // Control
-//    			0, // Technique
-//    			0, // Finesse
-//    			new String[] {"rings"},
-//    			null, null,
-//    			new IReward[]{new AttributeReward(AwardType.REGEN, 0.025f)})
-//    		.offset(3, 4);
-//		
-//		new NostrumQuest("rings_corrupted", QuestType.CHALLENGE, 8,
-//    			0, // Control
-//    			0, // Technique
-//    			0, // Finesse
-//    			new String[] {"rings_true"},
-//    			null, null,
-//    			new IReward[]{new AttributeReward(AwardType.REGEN, 0.05f)})
-//    		.offset(4, 5);
-//		
-//		new NostrumQuest("belts", QuestType.CHALLENGE, 5,
-//    			0, // Control
-//    			0, // Technique
-//    			0, // Finesse
-//    			new String[] {"rings"},
-//    			null, null,
-//    			new IReward[]{new AttributeReward(AwardType.REGEN, 0.025f)})
-//    		.offset(2, 3);
-		
+		; // no quests
 	}
 	
 	private void registerBaubleRituals() {
@@ -328,6 +278,32 @@ public class BaublesProxy {
 				new RRequirementResearch("elude_capes"),
 				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.ELUDE_CAPE_SMALL, 1)));
 		RitualRegistry.instance().addRitual(recipe);
+		
+		recipe = RitualRecipe.createTier3("aether_cloak",
+				new ItemStack(ItemAetherCloak.instance()),
+				EMagicElement.ICE,
+				new ReagentType[] {ReagentType.MANDRAKE_ROOT, ReagentType.SPIDER_SILK, ReagentType.BLACK_PEARL, ReagentType.SKY_ASH},
+				new ItemStack(APIProxy.AetherBatterySmallBlock),
+				new ItemStack[] {new ItemStack(APIProxy.AetherGemItem, 1, OreDictionary.WILDCARD_VALUE), ItemMagicBauble.getItem(ItemType.ELUDE_CAPE_SMALL, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), new ItemStack(APIProxy.AetherGemItem, 1, OreDictionary.WILDCARD_VALUE)},
+				new RRequirementResearch("aether_cloaks"),
+				new OutcomeSpawnItem(new ItemStack(ItemAetherCloak.instance())));
+		RitualRegistry.instance().addRitual(recipe);
+		
+		ItemStack casterCloak = new ItemStack(ItemAetherCloak.instance());
+		ItemAetherCloak.instance().setAetherCaster(casterCloak, true);
+		recipe = RitualRecipe.createTier3("aether_cloak_caster_upgrade",
+				casterCloak,
+				EMagicElement.FIRE,
+				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.CRYSTABLOOM},
+				new ItemStack(ItemAetherCloak.instance()),
+				new ItemStack[] {new ItemStack(APIProxy.PassivePendantItem, 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), null, new ItemStack(APIProxy.PassivePendantItem, 1, OreDictionary.WILDCARD_VALUE)},
+				new RRequirementResearch("aether_cloaks"),
+				new OutcomeModifyCenterItemGeneric((world, player, item, otherItems, centerPos, recipeIn) -> {
+					if (item != null && item.getItem() instanceof ItemAetherCloak) {
+						((ItemAetherCloak) item.getItem()).setAetherCaster(item, true);
+					}
+				}, Lists.newArrayList("Allows using aether from the cloak in place of reagents")));
+		RitualRegistry.instance().addRitual(recipe);
 	}
 	
 	private void registerBaubleResearch() {
@@ -387,11 +363,19 @@ public class BaublesProxy {
 				.hiddenParent("shield_rings")
 				.reference("ritual::elude_cape_small", "ritual.elude_cape_small.name")
 			.build("elude_capes", NostrumResearchTab.OUTFITTING, Size.NORMAL, -6, 0, true, ItemMagicBauble.getItem(ItemType.ELUDE_CAPE_SMALL, 1));
+			
+			NostrumResearch.startBuilding()
+				.parent("elude_capes")
+				.reference("ritual::aether_cloak", "ritual.aether_cloak.name")
+				.reference("ritual::aether_cloak_caster_upgrade", "ritual.aether_cloak_caster_upgrade.name")
+			.build("aether_cloaks", NostrumResearchTab.OUTFITTING, Size.NORMAL, -6, 1, true, new ItemStack(ItemAetherCloak.instance()));
+			
 		}
 	}
 	
 	private void registerLore() {
 		LoreRegistry.instance().register(ItemMagicBauble.instance());
+		LoreRegistry.instance().register(ItemAetherCloak.instance());
 	}
 	
 	public void reinitResearch() {
