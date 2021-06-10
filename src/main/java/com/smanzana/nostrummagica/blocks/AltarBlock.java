@@ -7,7 +7,9 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuser.AetherInfuserTileEntity;
 import com.smanzana.nostrummagica.items.AltarItem;
+import com.smanzana.nostrummagica.items.IAetherInfuserLens;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 
 import net.minecraft.block.Block;
@@ -217,7 +219,7 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 		
 	}
 	
-	public static class AltarTileEntity extends TileEntity implements ISidedInventory {
+	public static class AltarTileEntity extends TileEntity implements ISidedInventory, IAetherInfusableTileEntity {
 		
 		private ItemStack stack;
 		
@@ -400,6 +402,23 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 		@Override
 		public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
 			return index == 0 && stack != null;
+		}
+
+		@Override
+		public boolean canAcceptAetherInfuse(AetherInfuserTileEntity source, int maxAether) {
+			return stack != null && stack.getItem() instanceof IAetherInfuserLens;
+		}
+
+		@Override
+		public int acceptAetherInfuse(AetherInfuserTileEntity source, int maxAether) {
+			final IAetherInfuserLens infusable = ((IAetherInfuserLens) stack.getItem());
+			final int leftover;
+			if (infusable.canAcceptAetherInfuse(stack, pos, source, maxAether)) {
+				leftover = infusable.acceptAetherInfuse(stack, pos, source, maxAether);
+			} else {
+				leftover = maxAether;
+			}
+			return leftover;
 		}
 		
 	}

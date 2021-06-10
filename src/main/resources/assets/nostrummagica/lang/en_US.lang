@@ -321,6 +321,25 @@ item.aether_cloak.color.inside=Inside Dyed %s
 item.aether_cloak.color.runes=Rune Color %s
 item.aether_cloak.spender=Aether Caster
 
+item.lens_spread.name=Spread Lens
+item.lens_spread.desc=Spreads aether to lenses on nearby Altars
+item.lens_wide_charge.name=Charge Lens
+item.lens_wide_charge.desc=Charges items in distant players' inventories
+item.lens_grow.name=Growth Lens
+item.lens_grow.desc=Grows nearby crops
+item.lens_swiftness.name=Speed Lens
+item.lens_swiftness.desc=Gives a speed effect to nearby players
+item.lens_elevator.name=Elevator Lens
+item.lens_elevator.desc=Lifts any non-sneaking jumping players around the lense
+item.lens_heal.name=Heal Lense
+item.lens_heal.desc=Heals nearby players
+item.lens_bore.name=Bore Lens
+item.lens_bore.desc=Digs a large hole under the lense
+item.lens_bore_reversed.name=Reversed Bore Lens
+item.lens_bore_reversed.desc=Digs up instead of down
+
+item.lens.master=Master Lens
+
 potion.frostbite.name=Frostbite
 potion.shieldphysical.name=Physical Ward
 potion.shieldmagic.name=Magic Ward
@@ -827,6 +846,7 @@ ritual.outcome.create_tome.desc=Combines a plate with pages to create an unbound
 ritual.outcome.bind_spell.desc=Starts binding a spell to a tome
 ritual.outcome.create_obelisk.desc=Creates an Obelisk at|the center of the ritual
 ritual.outcome.create_portal.desc=Spawns a portal to the|Sorcery Dimension
+ritual.outcome.create_obelisk.desc=Creates an Aether Infuser at|the center of the ritual
 
 ritual.kani.name=Kani Infusion
 ritual.kani.desc=Promotes a Mani Crystal to a Kani Crystal
@@ -969,6 +989,15 @@ ritual.upgrade_dragonarmor_helm_gold.name=Upgrade To Golden Dragon Helm
 ritual.upgrade_dragonarmor_helm_diamond.name=Upgrade To Diamond Dragon Helm
 
 ritual.warlock_sword.upgrade.travel.name=Warlock Blade Ender Travel Upgrade
+
+ritual.construct_aether_infuser.name=Construct Aether Infuser
+ritual.make_lens_spread.name=Make Spread Lens
+ritual.make_lens_wide_charge.name=Make Charge Lens
+ritual.make_lens_grow.name=Make Growth Lens
+ritual.make_lens_swiftness.name=Make Speed Lense
+ritual.make_lens_elevator.name=Make Elevator Lens
+ritual.make_lens_heal.name=Make Heal Lens
+ritual.make_lens_bore.name=Make Bore Lens
 
 enhancement.lower_reagent_cost.name=Lower Reagent Cost
 enhancement.lower_reagent_cost.desc=Reduces the amount of reagents used up when casting a spell
@@ -1383,3 +1412,6 @@ research.wispblock.info=  You've seen wisps floating along the night sky, and yo
 research.aether_cloaks.name=Aether Cloaks
 research.aether_cloaks.desc=Functional & Fashionable!
 research.aether_cloaks.info=  Aether Gems are handy for taking aether with you, but they have very limited capacity. You tried fashioning earings and rings out of the aether gems to get even a little more aether capacity, but couldn't get any of it to work.|  Imbueing cloth with the properties of aether, however, has shown to be incredible fruitful!|  The Aether Cloak allows you to store a LOT of aether. While you're wearing it, the cloak will automatically provide aether for any items you have that take aether.|  Quite mysteriously, the cloak seems to grow in capacity the more you use it, as well!|  You also think you can enhance the cloak to provide the aether in a more efficient manner, allowing you to draw upon the aether directly to cast spells!||  Aether cloaks support many different display options as well. Have wings and want to see them through the cape? Cut a hole in it! Cloak too big? Chop some of it off! Want a red cloak? Dye it!
+research.aether_infusers.name=Aether Infusers
+research.aether_infusers.desc=Aether Tools
+research.aether_infusers.info=  Aether Infusers by themselves take a lot of aether and store them, creating a pure bubble of aether for quick charging players' inventories or items on altars above the infuser.|  If there's an altar above the Aether Infuser, all aether from the infuser will go to any item on the altar. For things that store Aether, this means they'll get charged quickly.|  If no altar is above the infuser, any players that step into the aether bubble will have all items in their inventory charged.||  Aether Infusers that have altars above them can also use Lenses to change their behavior. From growing nearby plants to granting swiftness, different lenses have different effects.|  Note that Master Lenses have to be placed on an altar above an Aether Infuser to work.|  Also note the Spread Lens allows nearby altars with lenses on them to work!

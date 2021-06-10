@@ -1563,7 +1563,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return false;
 	}
 	
-	private static synchronized final boolean DoEarthGrow(World world, BlockPos center) {
+	public static synchronized final boolean DoEarthGrow(World world, BlockPos center) {
 		Collections.shuffle(EARTH_SCAN_POS);
 		
 		MutableBlockPos cursor = new MutableBlockPos();

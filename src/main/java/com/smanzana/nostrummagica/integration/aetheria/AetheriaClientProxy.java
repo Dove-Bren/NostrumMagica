@@ -10,6 +10,8 @@ import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuser;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock;
 import com.smanzana.nostrummagica.integration.aetheria.items.AetherResourceType;
 import com.smanzana.nostrummagica.integration.aetheria.items.NostrumAetherResourceItem;
+import com.smanzana.nostrummagica.integration.baubles.items.ItemAetherLens;
+import com.smanzana.nostrummagica.integration.baubles.items.ItemAetherLens.LensType;
 import com.smanzana.nostrummagica.proxy.ClientProxy;
 
 import net.minecraft.client.renderer.block.model.ModelBakery;
@@ -64,6 +66,15 @@ public class AetheriaClientProxy extends AetheriaProxy {
 		
     	ResourceLocation variants[] = list.toArray(new ResourceLocation[list.size()]);
     	ModelBakery.registerItemVariants(NostrumAetherResourceItem.instance(), variants);
+    	
+    	
+    	list.clear();
+		for (LensType type : LensType.values()) {
+			list.add(new ResourceLocation(NostrumMagica.MODID,
+					ItemAetherLens.UNLOC_PREFIX + type.getUnlocSuffix()));
+		}
+		variants = list.toArray(new ResourceLocation[list.size()]);
+		ModelBakery.registerItemVariants(ItemAetherLens.instance(), variants);
 	}
 	
 	private void registerItemModels() {
@@ -80,5 +91,11 @@ public class AetheriaClientProxy extends AetheriaProxy {
 		ClientProxy.registerModel(Item.getItemFromBlock(AetherInfuser.instance()),
 				0,
 				AetherInfuser.ID);
+    	
+    	for (LensType type : LensType.values()) {
+    		ClientProxy.registerModel(ItemAetherLens.instance(),
+    				ItemAetherLens.MetaFromType(type),
+    				ItemAetherLens.UNLOC_PREFIX + type.getUnlocSuffix());
+		}
 	}
 }
