@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.client.render;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +24,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
-import scala.actors.threadpool.Arrays;
 
 public class LayerAetherCloak implements LayerRenderer<AbstractClientPlayer> {
 

@@ -3,11 +3,11 @@ package com.smanzana.nostrummagica.entity;
 import javax.annotation.Nullable;
 
 import com.google.common.base.Predicate;
-import com.smanzana.nostrummagica.client.particles.ParticleGlowOrb;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger.ProjectileTriggerInstance;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityFireball;
@@ -106,16 +106,12 @@ public class EntitySpellProjectile extends EntityFireball {
 			}
 		} else {
 			int color = getElement().getColor();
-			for (int i = 0; i < 2; i++)
-			Minecraft.getMinecraft().effectRenderer.addEffect(new ParticleGlowOrb(
-					worldObj,
-					posX, posY + height/2f, posZ,
-					(float) ((color >> 16) & 255) / 255f,//.3f,
-					(float) ((color >> 8) & 255) / 255f,//1f,
-					(float) ((color >> 0) & 255) / 255f,//.4f,
-					.135f,
-					40
-					).setMotion(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025));
+			color = (0x19000000) | (color & 0x00FFFFFF);
+			NostrumParticles.GLOW_ORB.spawn(worldObj, new SpawnParams(
+					2,
+					posX, posY + height/2f, posZ, 0, 40, 0,
+					new Vec3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), false
+				).color(color));
 		}
 	}
 

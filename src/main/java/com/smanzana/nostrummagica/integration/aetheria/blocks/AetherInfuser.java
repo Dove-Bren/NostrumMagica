@@ -15,7 +15,6 @@ import com.smanzana.nostrummagica.blocks.AltarBlock.AltarTileEntity;
 import com.smanzana.nostrummagica.blocks.IAetherInfusableTileEntity;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.client.particles.ParticleGlowOrb;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemAetherLens;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemAetherLens.LensType;
 import com.smanzana.nostrummagica.items.IAetherInfuserLens;
@@ -29,7 +28,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -185,7 +183,7 @@ public class AetherInfuser extends BlockContainer {
 		// Client-only + transient
 		private int effectTime; // forever-growing at rate dependent on 'active'
 		@SideOnly(Side.CLIENT)
-		private List<EffectSpark> sparks = new ArrayList<>();
+		private List<EffectSpark> sparks;
 		
 		public AetherInfuserTileEntity() {
 			super(0, MAX_CHARGE);
@@ -294,6 +292,7 @@ public class AetherInfuser extends BlockContainer {
 					// extra particles
 					final float CHANCE = (float) getCharge() / ((float) MAX_CHARGE * 1f);
 					final float RADIUS = 3;
+					final Random rand = NostrumMagica.rand;
 					if (NostrumMagica.rand.nextFloat() < CHANCE) {
 						final double x = (pos.getX() + .5 + (NostrumMagica.rand.nextFloat() * RADIUS)) - (RADIUS / 2f);
 						final double y = (pos.getY() + 1.5 + (NostrumMagica.rand.nextFloat() * RADIUS)) - 1;
@@ -303,17 +302,11 @@ public class AetherInfuser extends BlockContainer {
 								0, 0, 0, 0);
 						
 						int num = (active ? 10 : NostrumMagica.rand.nextFloat() < .05f ? 1 : 0);
-						
-						for (int i = 0; i < num; i++)
-						Minecraft.getMinecraft().effectRenderer.addEffect(new ParticleGlowOrb(
-								worldObj,
-								x, y, z,
-								.3f,
-								1f,
-								.4f,
-								.1f,
-								100
-								));
+						NostrumParticles.GLOW_ORB.spawn(worldObj, new SpawnParams(
+								num,
+								x, y, z, 0, 100, 20,
+								new Vec3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), false
+							).color(.1f, .3f, 1f, .4f));
 					}
 				}
 				
@@ -440,6 +433,8 @@ public class AetherInfuser extends BlockContainer {
 			
 			if (!world.isRemote) {
 				this.compWrapper.setAutoFill(true, 20);
+			} else {
+				this.sparks = new ArrayList<>();
 			}
 			
 			NostrumMagica.playerListener.registerTimer((type, entity, data)->{
