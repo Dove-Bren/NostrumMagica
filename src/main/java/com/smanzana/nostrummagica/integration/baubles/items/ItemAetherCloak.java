@@ -536,7 +536,11 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 	 */
 	@Override
 	@Optional.Method(modid="Baubles")
-	public boolean canEquip(ItemStack itemstack, EntityLivingBase player) {		
+	public boolean canEquip(ItemStack itemstack, EntityLivingBase player) {
+		if (player.worldObj.isRemote && player != NostrumMagica.proxy.getPlayer()) {
+			return true;
+		}
+		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		return attr != null && attr.isUnlocked();
 	}
@@ -789,7 +793,7 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 	@SideOnly(Side.CLIENT)
 	@Override
 	public boolean shouldRenderCape(EntityLivingBase entity, ItemStack stack) {
-		return stack != null && stack.getItem() instanceof ItemAetherCloak && this.getAether(stack) > 0;
+		return stack != null && stack.getItem() instanceof ItemAetherCloak;
 	}
 
 	@SideOnly(Side.CLIENT)

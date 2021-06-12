@@ -12,5 +12,5 @@ public class BaubleInventoryHelper {
 	public static IInventory getBaubleInventory(EntityPlayer player) {
 		return new BaublesInventoryWrapper(BaublesApi.getBaublesHandler(player));
 	}
-	
+
 }
