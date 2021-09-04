@@ -135,7 +135,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 		this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.1D);
 		this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(5.0D);
 		this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(0.0D);
-		this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(60.0D);
+		this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(30.0);
 		this.getEntityAttribute(AttributeMagicResist.instance()).setBaseValue(50.0D);
 	}
 

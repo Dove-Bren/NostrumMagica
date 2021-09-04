@@ -761,6 +761,10 @@ public class OverlayRenderer extends Gui {
 		final int width = GUI_CONTINGENCY_ICON_LENGTH; // for readability
 		final int height = GUI_CONTINGENCY_ICON_LENGTH; // for readability
 		
+		if (timer <= 0) {
+			return;
+		}
+		
 		GlStateManager.pushMatrix();
 		GlStateManager.enableBlend();
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);

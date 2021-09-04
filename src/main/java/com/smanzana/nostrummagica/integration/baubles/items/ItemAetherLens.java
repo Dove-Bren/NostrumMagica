@@ -246,6 +246,7 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 	
 	protected int doGrow(World world, BlockPos center, int maxAether) {
 		if (EnchantedArmor.DoEarthGrow(world, center)) {
+			AetherInfuserTileEntity.DoChargeEffect(world, center, 1, 0xFF22FF44);
 			return LensType.GROW.getAetherPerTick();
 		}
 		return 0;
@@ -261,7 +262,8 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 						|| e.getActivePotionEffect(Potion.getPotionFromResourceLocation("speed")).getDuration() < 20);
 		})) {
 			ent.addPotionEffect(new PotionEffect(Potion.getPotionFromResourceLocation("speed"), 40, 0, false, false));
-			cost += 5;
+			cost += 2;
+			AetherInfuserTileEntity.DoChargeEffect(ent, 1, 0xFF77AA22);
 		}
 		return cost;
 	}
@@ -280,6 +282,7 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 				cost += 1;
 				ent.motionY = Math.min(.3, ent.motionY + .1);
 				ent.velocityChanged = true;
+				AetherInfuserTileEntity.DoChargeEffect(ent, 1, 0xFF77AA22);
 			}
 			ent.fallDistance = 0;
 		}
@@ -297,6 +300,7 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 		})) {
 			ent.heal(.25f);
 			cost += 2;
+			AetherInfuserTileEntity.DoChargeEffect(ent, 1, 0xFFFF5555);
 		}
 		return cost;
 	}
@@ -312,7 +316,7 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 			}
 			
 			final IBlockState blockstate = world.getBlockState(cursor);
-			if (blockstate.getBlockHardness(world, cursor) < 0) {
+			if (blockstate.getBlockHardness(world, cursor) < 0 || blockstate.getMaterial().isLiquid()) {
 				cursor.move(down ? EnumFacing.DOWN : EnumFacing.UP);
 				continue;
 			}
@@ -331,7 +335,7 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 			final IBlockState state = world.getBlockState(pos);
 			drops.addAll(state.getBlock().getDrops(world, pos, state, 0));
 			world.destroyBlock(pos, false);
-			
+			AetherInfuserTileEntity.DoChargeEffect(world, pos, 1, 0xFF664400);
 		}
 		
 		for (ItemStack stack : drops) {

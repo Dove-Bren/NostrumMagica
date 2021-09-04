@@ -180,6 +180,10 @@ public enum NostrumParticles {
 				tag.setInteger(NBT_TARGET_ENT_ID, params.targetEntID);
 			}
 			
+			if (params.color != null) {
+				tag.setInteger("color", params.color);
+			}
+			
 			return tag;
 		}
 		
@@ -235,6 +239,13 @@ public enum NostrumParticles {
 						new Vec3d(0, .1, 0), false
 						);
 			}
+			
+			// Extra optional data
+			if (tag.hasKey("color", NBT.TAG_INT)) {
+				params.color(tag.getInteger("color"));
+			}
+			
+			
 			return params;
 		}
 	}

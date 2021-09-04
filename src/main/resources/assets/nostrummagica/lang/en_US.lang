@@ -256,7 +256,7 @@ item.shield_ring_large.desc=Uses aether to protect the wearer with a magical shi
 item.elude_cape_small.name=Elusion Cloak
 item.elude_cape_small.desc=Uses aether to automatically dodge attacks
 item.aether_cloak.name=Aether Cloak
-item.aether_cloak.desc=Stores up large amounts of Aether
+item.aether_cloak.desc=Stores up large amounts of Aether|%2$s+25%% Mana Regen%1$s
 item.primordial_mirror.name=Primordial Mirror
 item.primordial_mirror.desc=Awards 1 Skill Point
 item.essential_ooze.name=Essential Ooze
@@ -409,6 +409,7 @@ entity.nostrummagica.entity_switch_trigger.name=Mystic Trigger
 entity.nostrummagica.nostrum_lightning.name=Lightning Bolt
 entity.nostrummagica.nostrum_hookshot.name=Hookshot Anchor
 entity.nostrummagica.entity_wisp.name=Wisp
+entity.nostrummagica.entity_lux.name=Lux
 
 itemGroup.nostrummagica=Nostrum Magica
 itemGroup.nostrummagica_enhancements=Nostrum Enhancements

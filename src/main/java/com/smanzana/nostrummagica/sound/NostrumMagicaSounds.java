@@ -52,7 +52,11 @@ public enum NostrumMagicaSounds {
 	WISP_DEATH("mob.wisp.death", SoundCategory.NEUTRAL),
 	WISP_IDLE("mob.wisp.idle", SoundCategory.NEUTRAL),
 	PORTAL("ambient.portal", SoundCategory.AMBIENT),
-	WING_FLAP("entity.wing.flap", SoundCategory.PLAYERS);
+	WING_FLAP("entity.wing.flap", SoundCategory.PLAYERS),
+	LUX_HURT("mob.lux.hurt", SoundCategory.NEUTRAL),
+	LUX_DEATH("mob.lux.death", SoundCategory.NEUTRAL),
+	LUX_IDLE("mob.lux.idle", SoundCategory.NEUTRAL)
+	;
 	
 	private ResourceLocation resource;
 	private SoundCategory category;

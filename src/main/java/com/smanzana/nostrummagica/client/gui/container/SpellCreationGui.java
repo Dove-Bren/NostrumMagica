@@ -107,7 +107,7 @@ public class SpellCreationGui {
 		protected List<String> spellErrorStrings; // Updated on validate(); what's wrong?
 		protected List<String> reagentStrings; // Updated on validate; what reagents will be used. Only filled if successful
 		protected StringBuffer name;
-		protected int iconIndex;
+		protected int iconIndex; // -1 indicates none has been selected yet
 		protected int lastManaCost;
 		
 		public SpellCreationContainer(EntityPlayer crafter, IInventory playerInv, SpellTableEntity tableInventory, BlockPos pos) {
@@ -117,7 +117,7 @@ public class SpellCreationGui {
 			
 			spellErrorStrings = new LinkedList<>();
 			this.name = new StringBuffer(NAME_MAX + 1);
-			this.iconIndex = 0;
+			this.iconIndex = -1;
 			
 			this.addSlotToContainer(new Slot(inventory, 0, SLOT_MAIN_HOFFSET, SLOT_MAIN_VOFFSET) {
 				@Override
@@ -129,10 +129,6 @@ public class SpellCreationGui {
 				@Override
 				public void putStack(@Nullable ItemStack stack) {
 					super.putStack(stack);
-					
-					if (stack != null && stack.getItem() instanceof BlankScroll) {
-						iconIndex = NostrumMagica.rand.nextInt(SpellIcon.numIcons);
-					}
 					
 					validate();
 				}
@@ -341,26 +337,26 @@ public class SpellCreationGui {
 		}
 		
 		public void validate() {
-			validate(name.toString());
+			validate(name.toString(), this.iconIndex);
 		}
 		
-		public void validate(String name) {
+		public void validate(String name, int iconIdx) {
 			if (spellErrorStrings == null)
 				spellErrorStrings = new LinkedList<>();
 			if (reagentStrings == null)
 				reagentStrings = new LinkedList<>();
 			
-			Spell spell = makeSpell(name);
+			Spell spell = makeSpell(name, iconIdx);
 			spellValid = (spell != null);
 		}
 		
-		public Spell makeSpell(String name) {
-			return makeSpell(name, false);
+		public Spell makeSpell(String name, int iconIdx) {
+			return makeSpell(name, iconIdx, false);
 		}
 		
-		public Spell makeSpell(String name, boolean clear) {
+		public Spell makeSpell(String name, int iconIdx, boolean clear) {
 			// Don't cache from validate... just in case...
-			Spell spell = craftSpell(name, this.inventory, this.player, this.spellErrorStrings, this.reagentStrings, isValid, clear);
+			Spell spell = craftSpell(name, iconIdx, this.inventory, this.player, this.spellErrorStrings, this.reagentStrings, isValid, clear);
 			
 			if (spell == null)
 				return null;
@@ -372,7 +368,7 @@ public class SpellCreationGui {
 			return spell;
 		}
 		
-		public static Spell craftSpell(String name, SpellTableEntity inventory, EntityPlayer crafter,
+		public static Spell craftSpell(String name, int iconIdx, SpellTableEntity inventory, EntityPlayer crafter,
 				List<String> spellErrorStrings, List<String> reagentStrings,
 				boolean isValid, boolean deductReagents) {
 			boolean fail = false;
@@ -389,14 +385,19 @@ public class SpellCreationGui {
 				fail = true;
 			}
 			
+			if (!isValid) {
+				spellErrorStrings.add(prefix + "Missing blank scroll");
+				return null; // fatal
+			}
+			
 			if (name.trim().isEmpty()) {
 				spellErrorStrings.add(prefix + "Must have a name");
 				fail = true;
 			}
 			
-			if (!isValid) {
-				spellErrorStrings.add(prefix + "Missing blank scroll");
-				return null; // fatal
+			if (iconIdx < 0) {
+				spellErrorStrings.add(prefix + "Must have a spell icon selected");
+				fail = true;
 			}
 			
 			ItemStack stack;
@@ -729,6 +730,7 @@ public class SpellCreationGui {
 			SpellIconButton button = (SpellIconButton) buttonIn;
 			
 			container.iconIndex = button.value;
+			container.validate();
 		}
 			
 		@Override
@@ -769,7 +771,7 @@ public class SpellCreationGui {
 							container.validate();
 							if (container.spellValid) {
 								// whoo make spell
-								Spell spell = container.makeSpell(container.name.toString(), true);
+								Spell spell = container.makeSpell(container.name.toString(), container.iconIndex, true);
 								if (spell != null) {
 									// All of this happens again and is synced back to client
 									// But in the mean, might as well do it here for the
@@ -784,7 +786,8 @@ public class SpellCreationGui {
 											container.pos,
 											container.iconIndex
 											));
-									container.name.delete(0, container.name.length() - 1);
+									container.name.delete(0, container.name.length());
+									container.iconIndex = -1;
 								}
 							} else {
 								// Don't

@@ -62,6 +62,7 @@ import com.smanzana.nostrummagica.command.CommandInfoScreenGoto;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityHookShot;
 import com.smanzana.nostrummagica.entity.EntityKoid;
+import com.smanzana.nostrummagica.entity.EntityLux;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
 import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
@@ -80,6 +81,7 @@ import com.smanzana.nostrummagica.entity.renderer.RenderDragonRed;
 import com.smanzana.nostrummagica.entity.renderer.RenderGolem;
 import com.smanzana.nostrummagica.entity.renderer.RenderHookShot;
 import com.smanzana.nostrummagica.entity.renderer.RenderKoid;
+import com.smanzana.nostrummagica.entity.renderer.RenderLux;
 import com.smanzana.nostrummagica.entity.renderer.RenderMagicSaucer;
 import com.smanzana.nostrummagica.entity.renderer.RenderShadowDragonRed;
 import com.smanzana.nostrummagica.entity.renderer.RenderSprite;
@@ -297,6 +299,13 @@ public class ClientProxy extends CommonProxy {
 			@Override
 			public Render<? super EntityWisp> createRenderFor(RenderManager manager) {
 				return new RenderWisp(manager, 1f);
+			}
+		});
+		
+		RenderingRegistry.registerEntityRenderingHandler(EntityLux.class, new IRenderFactory<EntityLux>() {
+			@Override
+			public Render<? super EntityLux> createRenderFor(RenderManager manager) {
+				return new RenderLux(manager, 1f);
 			}
 		});
 		

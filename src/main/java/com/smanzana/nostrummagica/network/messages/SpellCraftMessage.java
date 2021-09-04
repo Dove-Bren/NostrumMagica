@@ -55,6 +55,11 @@ public class SpellCraftMessage implements IMessage {
 					return;
 				}
 				
+				if (iconIdx < 0) {
+					NostrumMagica.logger.warn("Got craft message with no icon idx!");
+					return;
+				}
+				
 				SpellTableEntity entity = (SpellTableEntity) TE;
 				
 				Spell spell = entity.craft(sp, name, iconIdx);
@@ -63,9 +68,8 @@ public class SpellCraftMessage implements IMessage {
 							x, y, z);
 					}
 				
-					NetworkHandler.getSyncChannel().sendTo(
-							new SpellRequestReplyMessage(Lists.newArrayList(spell)),
-							sp);
+					NetworkHandler.getSyncChannel().sendToAll(
+							new SpellRequestReplyMessage(Lists.newArrayList(spell)));
 			}
 			);
 			

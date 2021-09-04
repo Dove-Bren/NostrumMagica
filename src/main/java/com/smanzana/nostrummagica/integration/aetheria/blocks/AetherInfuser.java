@@ -200,7 +200,7 @@ public class AetherInfuser extends BlockContainer {
 					entity.posX, entity.posY + entity.height/2f, entity.posZ, 2.0,
 					40, 0,
 					entity.getEntityId()
-					).color(.2f, .4f, 1, .3f));
+					).color(color));
 		}
 		
 		public static final void DoChargeEffect(World world, BlockPos pos, int count, int color) {
@@ -213,6 +213,15 @@ public class AetherInfuser extends BlockContainer {
 					center.xCoord, center.yCoord, center.zCoord, 2.0,
 					40, 0,
 					center
+					).color(color));
+		}
+		
+		public static final void DoChargeEffect(World world, Vec3d start, Vec3d end, int count, int color) {
+			NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
+					count,
+					start.xCoord, start.yCoord, start.zCoord, .5,
+					120, 20,
+					end
 					).color(color));
 		}
 		
@@ -320,7 +329,6 @@ public class AetherInfuser extends BlockContainer {
 			
 			if (this.centerAltar != null && !this.hasAreaCharge()) {
 				// Altar!
-				// Use lens TODO
 				if (this.hasLens()) {
 					int maxAether = Math.min(CHARGE_PER_TICK, this.getCharge());
 					final int originalMax = maxAether;
@@ -338,9 +346,12 @@ public class AetherInfuser extends BlockContainer {
 										final int whole = (int) countRaw;
 										if (whole > 0 || NostrumMagica.rand.nextFloat() < countRaw) {
 											DoChargeEffect(worldObj,
+													new Vec3d(pos.getX() + .5, pos.getY() + 1.2, pos.getZ() + .5),
 													new Vec3d(teRaw.getPos().getX() + .5, teRaw.getPos().getY() + 1.2, teRaw.getPos().getZ() + .5),
 													whole > 0 ? whole : 1,
 													0x4D3366FF);
+											
+											
 										}
 									}
 									
@@ -385,6 +396,7 @@ public class AetherInfuser extends BlockContainer {
 						));
 				EntityPlayer minPlayer = null;
 				double minDist = Double.MAX_VALUE;
+				final double radiusSq = radius * radius;
 				for (Entity candidate : candidates) {
 					if (!(candidate instanceof EntityPlayer)) {
 						continue;
@@ -392,7 +404,7 @@ public class AetherInfuser extends BlockContainer {
 					
 					EntityPlayer player = (EntityPlayer) candidate;
 					final double dist = player.getDistanceSq(pos.getX() + .5, pos.getY() + .5 + 2, pos.getZ() + .5);
-					if (dist < radius && dist < minDist) {
+					if (dist < radiusSq && dist < minDist) {
 						minDist = dist;
 						minPlayer = player;
 					}

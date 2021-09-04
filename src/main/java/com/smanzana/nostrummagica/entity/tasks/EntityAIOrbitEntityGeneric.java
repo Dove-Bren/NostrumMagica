@@ -154,7 +154,7 @@ public class EntityAIOrbitEntityGeneric<T extends EntityLiving> extends EntityAI
 				> 512) {
 			ent.setPosition(cursor.xCoord + orbitTarget.posX, cursor.yCoord + orbitTarget.posY + orbitTarget.getEyeHeight() + .75, cursor.zCoord + orbitTarget.posZ);
 		} else {
-			ent.getMoveHelper().setMoveTo(cursor.xCoord + orbitTarget.posX, cursor.yCoord + orbitTarget.posY + orbitTarget.getEyeHeight() + .75, cursor.zCoord + orbitTarget.posZ, 1);
+			ent.getMoveHelper().setMoveTo(cursor.xCoord + orbitTarget.posX, cursor.yCoord + orbitTarget.posY + orbitTarget.getEyeHeight() + .75, cursor.zCoord + orbitTarget.posZ, 2);
 		}
 	}
 	

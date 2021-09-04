@@ -53,7 +53,7 @@ public class CommandUnlockAll extends CommandBase {
 			}
 			for (EMagicElement elem : EMagicElement.values()) {
 				attr.learnElement(elem);
-				attr.setElementMastery(elem, 2);
+				attr.setElementMastery(elem, 3);
 			}
 			
 			NetworkHandler.getSyncChannel().sendTo(

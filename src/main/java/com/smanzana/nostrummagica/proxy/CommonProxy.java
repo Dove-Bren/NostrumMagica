@@ -56,6 +56,7 @@ import com.smanzana.nostrummagica.entity.EntityChakramSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntityCyclerSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntityHookShot;
 import com.smanzana.nostrummagica.entity.EntityKoid;
+import com.smanzana.nostrummagica.entity.EntityLux;
 import com.smanzana.nostrummagica.entity.EntitySpellBullet;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
 import com.smanzana.nostrummagica.entity.EntitySprite;
@@ -343,6 +344,12 @@ public class CommonProxy {
     			1,
     			true
     			);
+    	EntityRegistry.registerModEntity(EntityLux.class, "entity_lux", 
+    			entityID++,
+    			NostrumMagica.instance,
+    			64,
+    			1,
+    			false);
     	
     	EntityRegistry.addSpawn(EntityKoid.class, 20, 1, 1, EnumCreatureType.MONSTER, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.MAGICAL));
@@ -369,7 +376,13 @@ public class CommonProxy {
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.NETHER));
     	EntityRegistry.addSpawn(EntityWisp.class, 1, 1, 2, EnumCreatureType.AMBIENT, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.SPOOKY));
-    	
+
+    	EntityRegistry.addSpawn(EntityLux.class, 6, 1, 3, EnumCreatureType.CREATURE, 
+    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.MAGICAL));
+    	EntityRegistry.addSpawn(EntityLux.class, 6, 1, 2, EnumCreatureType.CREATURE, 
+    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.FOREST));
+    	EntityRegistry.addSpawn(EntityLux.class, 4, 1, 2, EnumCreatureType.CREATURE, 
+    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.JUNGLE));
 
     	EntityRegistry.addSpawn(EntityShadowDragonRed.class, 15, 1, 2, EnumCreatureType.MONSTER, 
     			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.NETHER));

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.EntityKoid;
+import com.smanzana.nostrummagica.entity.EntityLux;
 import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
@@ -128,6 +129,7 @@ public class LoreRegistry {
 		register(HookshotItem.instance());
 		register(new EntityWisp(null));
 		register(WarlockSword.instance());
+		register(new EntityLux(null));
 		
 		
 		for (Preset preset : Preset.values()) {

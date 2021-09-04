@@ -275,7 +275,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 			}
 			
 			Spell spell = SpellCreationGui.SpellCreationContainer.craftSpell(
-					name, this, crafter, new LinkedList<String>(), new LinkedList<String>(), true, true);
+					name, iconIndex, this, crafter, new LinkedList<String>(), new LinkedList<String>(), true, true);
 			
 			if (spell != null) {
 				spell.promoteFromTrans();

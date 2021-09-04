@@ -333,6 +333,30 @@
             "nostrummagica:entity/wisp/idle5"
         ]
     },
+	
+	 "mob.lux.hurt":
+    {
+        "sounds":
+        [
+            "nostrummagica:entity/lux/hurt1"
+        ]
+    },
+	
+	 "mob.lux.idle":
+    {
+        "sounds":
+        [
+            "nostrummagica:entity/lux/idle1"
+        ]
+    },
+	
+	 "mob.lux.death":
+    {
+        "sounds":
+        [
+            "nostrummagica:entity/lux/death1"
+        ]
+    },
     
     "item.hookshot.shoot":
     {
