@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.items;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
@@ -12,6 +14,7 @@ import com.smanzana.nostrummagica.world.NostrumDungeonGenerator;
 import com.smanzana.nostrummagica.world.NostrumDungeonGenerator.DungeonGen;
 
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -22,6 +25,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -84,9 +88,9 @@ public class ShrineSeekingGem extends Item implements ILoreTagged {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 
-		if (stack == null) {
+		if (stack.isEmpty()) {
 			return;
 		}
 		
@@ -97,14 +101,15 @@ public class ShrineSeekingGem extends Item implements ILoreTagged {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
 		for (DungeonGen type : DungeonGen.values()) {
 			subItems.add(getItemstack(type));
 		}
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		if (worldIn.isRemote) {
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
 		}
@@ -119,10 +124,10 @@ public class ShrineSeekingGem extends Item implements ILoreTagged {
 		}
 		
 		if (NostrumDungeonGenerator.boostOdds(type)) {
-			itemStackIn.stackSize--;
-			playerIn.addChatComponentMessage(new TextComponentTranslation("info.shrinegem.success"));
+			itemStackIn.shrink(1);
+			playerIn.sendMessage(new TextComponentTranslation("info.shrinegem.success"));
 		} else {
-			playerIn.addChatComponentMessage(new TextComponentTranslation("info.shrinegem.failure"));
+			playerIn.sendMessage(new TextComponentTranslation("info.shrinegem.failure"));
 		}
 		
 		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
@@ -130,7 +135,7 @@ public class ShrineSeekingGem extends Item implements ILoreTagged {
     }
 	
 	public static void setType(ItemStack stack, DungeonGen type) {
-		if (stack == null)
+		if (stack.isEmpty())
 			return;
 		
 		if (!stack.hasTagCompound())

@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.items;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -11,12 +13,14 @@ import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.NonNullList;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -51,7 +55,7 @@ public class SpellPlate extends Item implements ILoreTagged {
 		this.setMaxStackSize(1);
 	}
 	
-	public static ItemStack getItemstack(int type, int capacity,
+	public static @Nonnull ItemStack getItemstack(int type, int capacity,
 			SpellTomeEnhancementWrapper ... enhancements) {
 		type = type % SpellTome.MAX_TOME_COUNT;
 		ItemStack stack = new ItemStack(instance, 1, type);
@@ -80,7 +84,7 @@ public class SpellPlate extends Item implements ILoreTagged {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
 		for (int i = 0; i < SpellTome.MAX_TOME_COUNT; i++) {
 			subItems.add(getItemstack(i, 10));
 		}
@@ -108,7 +112,7 @@ public class SpellPlate extends Item implements ILoreTagged {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		int capacity = getCapacity(stack);
 		tooltip.add(I18n.format("info.tome.capacity", new Object[] {capacity}));
 		
@@ -194,7 +198,7 @@ public class SpellPlate extends Item implements ILoreTagged {
 	}
 	
 	public static int getCapacity(ItemStack stack) {
-		if (stack == null || !(stack.getItem() instanceof SpellPlate))
+		if (stack .isEmpty() || !(stack.getItem() instanceof SpellPlate))
 			return 0;
 		
 		if (!stack.hasTagCompound())
@@ -203,30 +207,8 @@ public class SpellPlate extends Item implements ILoreTagged {
 		return stack.getTagCompound().getInteger(NBT_CAPACITY);
 	}
 	
-	/*
-	 * NBTTagCompound nbt = stack.getTagCompound();
-		
-		if (nbt == null)
-			nbt = new NBTTagCompound();
-		
-		nbt.setInteger(NBT_CAPACITY, capacity);
-		if (enhancements != null && enhancements.length > 0) {
-			NBTTagList list = new NBTTagList();
-			for (SpellTomeEnhancementWrapper enhance : enhancements) {
-				NBTTagCompound tag = new NBTTagCompound();
-				tag.setString(NBT_ENHANCEMENT_TYPE, enhance.getEnhancement().getTitleKey());
-				tag.setInteger(NBT_ENHANCEMENT_LEVEL, enhance.getLevel());
-				list.appendTag(tag);
-			}
-			
-			nbt.setTag(NBT_ENHANCEMENTS, list);
-		}
-		
-		stack.setTagCompound(nbt);
-	 */
-	
 	public static List<SpellTomeEnhancementWrapper> getEnhancements(ItemStack stack) {
-		if (stack == null || !(stack.getItem() instanceof SpellPlate))
+		if (stack.isEmpty() || !(stack.getItem() instanceof SpellPlate))
 			return null;
 		
 		if (!stack.hasTagCompound())

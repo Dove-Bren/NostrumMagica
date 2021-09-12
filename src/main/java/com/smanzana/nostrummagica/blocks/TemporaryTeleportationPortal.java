@@ -12,6 +12,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -36,7 +37,7 @@ public class TemporaryTeleportationPortal extends TeleportationPortal  {
 	}
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(TemporaryPortalTileEntity.class, "limited_teleportation_portal");
+		GameRegistry.registerTileEntity(TemporaryPortalTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "limited_teleportation_portal"));
 	}
 	
 	public TemporaryTeleportationPortal() {
@@ -157,12 +158,12 @@ public class TemporaryTeleportationPortal extends TeleportationPortal  {
 		
 		@Override
 		public void update() {
-			if (worldObj == null || worldObj.isRemote) {
+			if (world == null || world.isRemote) {
 				return;
 			}
 			
-			if (worldObj.getTotalWorldTime() >= this.endticks) {
-				worldObj.setBlockToAir(pos);
+			if (world.getTotalWorldTime() >= this.endticks) {
+				world.setBlockToAir(pos);
 			}
 		}
 		
@@ -187,8 +188,8 @@ public class TemporaryTeleportationPortal extends TeleportationPortal  {
 		public float getOpacity() {
 			float opacity = .9f;
 			
-			if (worldObj != null) {
-				final long now =  worldObj.getTotalWorldTime();
+			if (world != null) {
+				final long now =  world.getTotalWorldTime();
 				final long FadeTicks = 20 * 5;
 				final long left = Math.max(0, endticks - now);
 				if (left < FadeTicks) {

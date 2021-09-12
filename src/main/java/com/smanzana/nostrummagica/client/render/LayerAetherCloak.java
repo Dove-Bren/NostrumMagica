@@ -18,6 +18,8 @@ import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -61,7 +63,7 @@ public class LayerAetherCloak implements LayerRenderer<AbstractClientPlayer> {
 		}
 	}
 	
-	public static @Nullable ItemStack ShouldRender(AbstractClientPlayer player) {
+	public static @Nullable ItemStack ShouldRender(EntityLivingBase player) {
 		Iterable<ItemStack> equipment = player.getArmorInventoryList();
 		for (ItemStack stack : equipment) {
 			if (stack != null && stack.getItem() instanceof ICapeProvider) {
@@ -72,13 +74,15 @@ public class LayerAetherCloak implements LayerRenderer<AbstractClientPlayer> {
 		}
 		
 		// Nothing so far. Check baubles if there're there.
-		IInventory inventory = NostrumMagica.baubles.getBaubles(player);
-		if (inventory != null) {
-			for (int i = 0; i < inventory.getSizeInventory(); i++) {
-				ItemStack stack = inventory.getStackInSlot(i);
-				if (stack != null && stack.getItem() instanceof ICapeProvider) {
-					if (((ICapeProvider) stack.getItem()).shouldRenderCape(player, stack)) {
-						return stack;
+		if (player instanceof EntityPlayer) {
+			IInventory inventory = NostrumMagica.baubles.getBaubles((EntityPlayer) player);
+			if (inventory != null) {
+				for (int i = 0; i < inventory.getSizeInventory(); i++) {
+					ItemStack stack = inventory.getStackInSlot(i);
+					if (stack != null && stack.getItem() instanceof ICapeProvider) {
+						if (((ICapeProvider) stack.getItem()).shouldRenderCape(player, stack)) {
+							return stack;
+						}
 					}
 				}
 			}
@@ -87,7 +91,7 @@ public class LayerAetherCloak implements LayerRenderer<AbstractClientPlayer> {
 		return null;
 	}
 	
-	public @Nullable ItemStack shouldRender(AbstractClientPlayer player) {
+	public @Nullable ItemStack shouldRender(EntityLivingBase player) {
 		return ShouldRender(player);
 	}
 	

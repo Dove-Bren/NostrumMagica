@@ -15,12 +15,12 @@ import net.minecraft.util.text.TextComponentString;
 public class CommandEnhanceTome extends CommandBase {
 
 	@Override
-	public String getCommandName() {
+	public String getName() {
 		return "enhancetome";
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender sender) {
+	public String getUsage(ICommandSender sender) {
 		return "/enhancetome EnhancementName level";
 	}
 
@@ -34,7 +34,7 @@ public class CommandEnhanceTome extends CommandBase {
 			EntityPlayer player = (EntityPlayer) sender;
 			ItemStack tome = player.getHeldItemMainhand();
 			if (tome == null || !(tome.getItem() instanceof SpellTome)) {
-				sender.addChatMessage(new TextComponentString("Did not find a spelltome in your mainhand!"));
+				sender.sendMessage(new TextComponentString("Did not find a spelltome in your mainhand!"));
 				return;
 			}
 			
@@ -51,7 +51,7 @@ public class CommandEnhanceTome extends CommandBase {
 			
 			SpellTome.addEnhancement(tome, new SpellTomeEnhancementWrapper(enhancement, level));
 		} else {
-			sender.addChatMessage(new TextComponentString("This command must be run as a player"));
+			sender.sendMessage(new TextComponentString("This command must be run as a player"));
 		}
 	}
 

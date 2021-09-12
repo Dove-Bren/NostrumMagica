@@ -201,7 +201,7 @@ public class EntityDragonRed extends EntityDragonRedBase {
 		} else if (phase == DragonPhase.RAMPAGE_PHASE) {
 			NostrumMagicaSounds.DRAGON_DEATH.play(this);
 			// No convenience. Set up AI depending on if we're flying or not
-			if (!this.worldObj.isRemote) {
+			if (!this.world.isRemote) {
 				if (this.isFlying()) {
 					this.setFlyingAI();
 				} else {
@@ -385,7 +385,7 @@ public class EntityDragonRed extends EntityDragonRedBase {
             this.setPhase(DragonPhase.values()[i]);
         }
 		
-		if (!this.worldObj.isRemote) {
+		if (!this.world.isRemote) {
 			this.initEntityAI();
 		}
 	}
@@ -412,7 +412,7 @@ public class EntityDragonRed extends EntityDragonRedBase {
 			}
 		}
 		
-		if (worldObj.isRemote) {
+		if (world.isRemote) {
 			if (this.isFlying() && !this.getWingFlapping()) {
 				if ((this.posY > this.prevPosY) || (this.motionX + this.motionZ < .2)) {
 					this.flapWing(this.motionX + this.motionZ < .2 ? .5f : 1f);
@@ -476,8 +476,8 @@ public class EntityDragonRed extends EntityDragonRedBase {
 	
 	@Override
 	public boolean attackEntityFrom(DamageSource source, float amount) {
-		if (!this.worldObj.isRemote && source.getSourceOfDamage() != null) {
-			Entity ent = source.getSourceOfDamage();
+		if (!this.world.isRemote && source.getTrueSource() != null) {
+			Entity ent = source.getTrueSource();
 			if (ent instanceof EntityLivingBase && ent != this) {
 				this.shadowAttack.addToPool((EntityLivingBase) ent);
 				this.aggroTable.addDamage((EntityLivingBase) ent, amount);
@@ -493,7 +493,7 @@ public class EntityDragonRed extends EntityDragonRedBase {
 	public void bite(EntityLivingBase target) {
 		super.bite(target);
 		
-		if (!this.worldObj.isRemote) {
+		if (!this.world.isRemote) {
 			this.evasionTask.reset();
 		}
 	}

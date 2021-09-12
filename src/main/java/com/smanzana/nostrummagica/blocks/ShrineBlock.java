@@ -1,7 +1,5 @@
 package com.smanzana.nostrummagica.blocks;
 
-import javax.annotation.Nullable;
-
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.MasteryOrb;
@@ -100,7 +98,7 @@ public class ShrineBlock extends SymbolBlock {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		
 		if (hand != EnumHand.MAIN_HAND) {
 			return true;
@@ -110,8 +108,10 @@ public class ShrineBlock extends SymbolBlock {
 		if (te == null || !(te instanceof SymbolTileEntity))
 			return false;
 		
+		ItemStack heldItem = playerIn.getHeldItem(hand);
+		
 		// code for map building
-		if (playerIn.isCreative() && heldItem != null && heldItem.getItem() instanceof SpellRune) {
+		if (playerIn.isCreative() && !heldItem.isEmpty() && heldItem.getItem() instanceof SpellRune) {
 			SpellComponentWrapper comp = SpellRune.toComponentWrapper(heldItem);
 			if (comp != null) {
 				((SymbolTileEntity) te).setComponent(comp);
@@ -145,7 +145,7 @@ public class ShrineBlock extends SymbolBlock {
 			}
 
 			// Make sure we have an orb first
-			if (heldItem == null || !(heldItem.getItem() instanceof MasteryOrb)) {
+			if (heldItem.isEmpty() || !(heldItem.getItem() instanceof MasteryOrb)) {
 				return false;
 			}
 			
@@ -168,8 +168,8 @@ public class ShrineBlock extends SymbolBlock {
 				return false;
 			
 			if (isExhausted(state)) {
-				if (playerIn.worldObj.isRemote) {
-					playerIn.addChatComponentMessage(new TextComponentTranslation("info.shrine.exhausted", new Object[0]));
+				if (playerIn.world.isRemote) {
+					playerIn.sendMessage(new TextComponentTranslation("info.shrine.exhausted", new Object[0]));
 				}
 				return true;
 			}
@@ -179,8 +179,8 @@ public class ShrineBlock extends SymbolBlock {
 			SymbolTileEntity ent = (SymbolTileEntity) worldIn.getTileEntity(pos);
 			ent.setComponent(component);
 			
-			if (playerIn.worldObj.isRemote) {
-				playerIn.addChatComponentMessage(new TextComponentTranslation("info.shrine.trigger", new Object[] {component.getTrigger().getDisplayName()}));
+			if (playerIn.world.isRemote) {
+				playerIn.sendMessage(new TextComponentTranslation("info.shrine.trigger", new Object[] {component.getTrigger().getDisplayName()}));
 			}
 		}
 		
@@ -190,7 +190,7 @@ public class ShrineBlock extends SymbolBlock {
 				pass = true;
 			}
 			
-			if (heldItem != null && heldItem.getItem() instanceof SpellScroll) {
+			if (!heldItem.isEmpty() && heldItem.getItem() instanceof SpellScroll) {
 				Spell spell = SpellScroll.getSpell(heldItem);
 				if (spell != null) {
 					// What we require depends on the shape
@@ -256,8 +256,8 @@ public class ShrineBlock extends SymbolBlock {
 			
 			if (pass && !attr.getShapes().contains(component.getShape())) {
 				attr.addShape(component.getShape());
-				if (playerIn.worldObj.isRemote) {
-					playerIn.addChatComponentMessage(new TextComponentTranslation("info.shrine.shape", new Object[] {component.getShape().getDisplayName()}));
+				if (playerIn.world.isRemote) {
+					playerIn.sendMessage(new TextComponentTranslation("info.shrine.shape", new Object[] {component.getShape().getDisplayName()}));
 				}
 				
 				if (!(component.getShape() instanceof SingleShape)) {
@@ -265,7 +265,7 @@ public class ShrineBlock extends SymbolBlock {
 				}
 			} else if (!pass) {
 				// Shape that we haven't correctly unlocked yet
-				if (playerIn.worldObj.isRemote) {
+				if (playerIn.world.isRemote) {
 					String suffix = "";
 					if (component.getShape() instanceof AoEShape) {
 						suffix = "aoe";
@@ -275,11 +275,11 @@ public class ShrineBlock extends SymbolBlock {
 					
 					TextComponentTranslation trans = new TextComponentTranslation("info.shapehint.preamble", new Object[0]);
 					trans.getStyle().setColor(TextFormatting.DARK_GRAY);
-					playerIn.addChatComponentMessage(trans);
+					playerIn.sendMessage(trans);
 					
 					trans = new TextComponentTranslation("info.shapehint." + suffix, new Object[0]);
 					trans.getStyle().setColor(TextFormatting.LIGHT_PURPLE);
-					playerIn.addChatComponentMessage(trans);
+					playerIn.sendMessage(trans);
 				}
 			}
 		}

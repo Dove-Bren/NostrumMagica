@@ -12,12 +12,12 @@ import net.minecraft.util.text.TextComponentString;
 public class CommandSpawnObelisk extends CommandBase {
 
 	@Override
-	public String getCommandName() {
+	public String getName() {
 		return "spawnobelisk";
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender sender) {
+	public String getUsage(ICommandSender sender) {
 		return "/spawnobelisk";
 	}
 
@@ -27,10 +27,10 @@ public class CommandSpawnObelisk extends CommandBase {
 			EntityPlayer player = (EntityPlayer) sender;
 			if (!NostrumObelisk.spawnObelisk(sender.getEntityWorld(),
 					player.getPosition().add(0, -1, 0))) {
-				sender.addChatMessage(new TextComponentString("Not enough space to spawn an obelisk"));
+				sender.sendMessage(new TextComponentString("Not enough space to spawn an obelisk"));
 			}
 		} else {
-			sender.addChatMessage(new TextComponentString("This command must be run as a player"));
+			sender.sendMessage(new TextComponentString("This command must be run as a player"));
 		}
 	}
 

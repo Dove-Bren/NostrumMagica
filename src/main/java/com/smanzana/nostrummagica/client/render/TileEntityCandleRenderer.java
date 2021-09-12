@@ -33,7 +33,7 @@ public class TileEntityCandleRenderer extends TileEntitySpecialRenderer<CandleTi
 	}
 	
 	@Override
-	public void renderTileEntityAt(CandleTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
+	public void render(CandleTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
 
 		ItemStack item = itemCache.get(te.getType());
 		

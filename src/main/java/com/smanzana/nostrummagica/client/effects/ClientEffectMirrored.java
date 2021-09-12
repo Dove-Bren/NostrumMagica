@@ -49,7 +49,7 @@ public class ClientEffectMirrored extends ClientEffect {
 			newDetail.blue = detail.blue;
 			
 			GlStateManager.pushMatrix();
-			GlStateManager.rotate(dAngle * (float) i, (float) eulers.xCoord, (float) eulers.yCoord, (float) eulers.zCoord);
+			GlStateManager.rotate(dAngle * (float) i, (float) eulers.x, (float) eulers.y, (float) eulers.z);
 			super.drawForm(newDetail, mc, progress, partialTicks);
 			GlStateManager.popMatrix();
 		}

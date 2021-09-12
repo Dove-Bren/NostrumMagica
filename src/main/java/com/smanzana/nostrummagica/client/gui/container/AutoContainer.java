@@ -41,7 +41,7 @@ public abstract class AutoContainer extends Container {
 				int value = inventory.getField(i);
 				if (value != oldValues[i]) {
 					for (IContainerListener listener : this.listeners) {
-						listener.sendProgressBarUpdate(this, i, value);
+						listener.sendWindowProperty(this, i, value);
 					}
 					oldValues[i] = value;
 				}

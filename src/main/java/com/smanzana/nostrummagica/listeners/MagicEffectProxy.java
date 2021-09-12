@@ -202,7 +202,7 @@ public class MagicEffectProxy {
 	
 	@SubscribeEvent
 	public void onAttack(LivingHurtEvent event) {
-		if (event.getEntity().worldObj.isRemote) {
+		if (event.getEntity().world.isRemote) {
 			return;
 		}
 		
@@ -253,7 +253,7 @@ public class MagicEffectProxy {
 			return;
 		}
 		
-		if (e.getEntity().worldObj.isRemote) {
+		if (e.getEntity().world.isRemote) {
 			return;
 		}
 		
@@ -273,7 +273,7 @@ public class MagicEffectProxy {
 			return;
 		}
 		
-		Entity source = e.getSource().getSourceOfDamage();
+		Entity source = e.getSource().getTrueSource();
 		if (source != null && source instanceof EntityLivingBase) {
 			EntityLivingBase living = (EntityLivingBase) source;
 			UUID id = living.getPersistentID();

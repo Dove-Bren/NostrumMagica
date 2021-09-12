@@ -27,7 +27,7 @@ public class SpellTomeIncrementMessage implements IMessage {
 		public IMessage onMessage(SpellTomeIncrementMessage message, MessageContext ctx) {
 			// Is it on?
 			
-			final EntityPlayerMP sp = ctx.getServerHandler().playerEntity;
+			final EntityPlayerMP sp = ctx.getServerHandler().player;
 			
 			int value = message.tag.getInteger(NBT_VALUE);
 			

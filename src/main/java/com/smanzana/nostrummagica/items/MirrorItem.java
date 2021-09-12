@@ -54,7 +54,7 @@ public class MirrorItem extends Item implements ILoreTagged {
 	}
 	
 	@SuppressWarnings("deprecation")
-	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
+	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
 	{
 		
 		// Copied from ItemBed (vanilla) with some modifications
@@ -72,13 +72,14 @@ public class MirrorItem extends Item implements ILoreTagged {
 			IBlockState iblockstate = worldIn.getBlockState(pos);
 			Block block = iblockstate.getBlock();
 			boolean flag = block.isReplaceable(worldIn, pos);
+			final ItemStack stack = playerIn.getHeldItem(hand);
 
 			if (!flag)
 			{
 				pos = pos.up();
 			}
 
-			int i = MathHelper.floor_double((double)(playerIn.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
+			int i = MathHelper.floor((double)(playerIn.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
 			EnumFacing enumfacing = EnumFacing.getHorizontal(i + 2);
 			//BlockPos blockpos = pos.offset(enumfacing);
 
@@ -88,7 +89,7 @@ public class MirrorItem extends Item implements ILoreTagged {
 				boolean flag2 = flag || worldIn.isAirBlock(pos);
 				//boolean flag3 = flag1 || worldIn.isAirBlock(blockpos);
 
-				if (flag2 && worldIn.getBlockState(pos.down()).isFullyOpaque())
+				if (flag2 && worldIn.getBlockState(pos.down()).isSideSolid(worldIn, pos.down(), EnumFacing.UP))
 				{
 					IBlockState iblockstate1 = NostrumMirrorBlock.instance().getDefaultState().withProperty(NostrumMirrorBlock.FACING, enumfacing);
 
@@ -96,7 +97,7 @@ public class MirrorItem extends Item implements ILoreTagged {
 
 					SoundType soundtype = iblockstate1.getBlock().getSoundType(iblockstate1, worldIn, pos, playerIn);
 					worldIn.playSound((EntityPlayer)null, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
-					--stack.stackSize;
+					stack.shrink(1);
 					return EnumActionResult.SUCCESS;
 				}
 				else

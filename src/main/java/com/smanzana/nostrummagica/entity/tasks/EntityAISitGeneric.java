@@ -8,10 +8,10 @@ import net.minecraft.entity.ai.EntityAIBase;
 
 public class EntityAISitGeneric<T extends EntityCreature & IEntityTameable> extends EntityAIBase {
 	
-	private final T theEntity;
+	private final T entity;
 
 	public EntityAISitGeneric(T entityIn) {
-		this.theEntity = entityIn;
+		this.entity = entityIn;
 		this.setMutexBits(5);
 	}
 
@@ -19,15 +19,15 @@ public class EntityAISitGeneric<T extends EntityCreature & IEntityTameable> exte
 	 * Returns whether the EntityAIBase should begin execution.
 	 */
 	public boolean shouldExecute() {
-		if (!this.theEntity.isTamed()) {
+		if (!this.entity.isTamed()) {
 			return false;
-		} else if (this.theEntity.isInWater()) {
+		} else if (this.entity.isInWater()) {
 			return false;
-		} else if (!this.theEntity.onGround) {
+		} else if (!this.entity.onGround) {
 			return false;
 		} else {
-			EntityLivingBase entitylivingbase = this.theEntity.getOwner();
-			return entitylivingbase == null ? this.theEntity.isSitting() : (this.theEntity.getDistanceSqToEntity(entitylivingbase) < 144.0D && entitylivingbase.getAITarget() != null ? false : theEntity.isSitting());
+			EntityLivingBase entitylivingbase = this.entity.getOwner();
+			return entitylivingbase == null ? this.entity.isSitting() : (this.entity.getDistanceSq(entitylivingbase) < 144.0D && entitylivingbase.getRevengeTarget() != null ? false : entity.isSitting());
 		}
 	}
 
@@ -35,7 +35,7 @@ public class EntityAISitGeneric<T extends EntityCreature & IEntityTameable> exte
 	 * Execute a one shot task or start executing a continuous task
 	 */
 	public void startExecuting() {
-		this.theEntity.getNavigator().clearPathEntity();
+		this.entity.getNavigator().clearPath();
 	}
 
 }

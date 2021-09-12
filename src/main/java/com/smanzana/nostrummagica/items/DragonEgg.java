@@ -86,7 +86,7 @@ public class DragonEgg extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		
 		if (worldIn.isRemote)
 			return EnumActionResult.SUCCESS;
@@ -113,17 +113,17 @@ public class DragonEgg extends Item implements ILoreTagged {
 		
 		EntityDragonEgg egg = new EntityDragonEgg(worldIn, playerIn, EntityTameDragonRed.rollRandomStats());
 		egg.setPosition(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5);
-		worldIn.spawnEntityInWorld(egg);
+		worldIn.spawnEntity(egg);
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
 		if (attr != null) {
 			attr.giveFullLore(egg);
 		}
 		
-		playerIn.addChatComponentMessage(new TextComponentTranslation("info.egg.place"));
+		playerIn.sendMessage(new TextComponentTranslation("info.egg.place"));
 		
 		if (!playerIn.isCreative()) {
-			stack.stackSize--;
+			playerIn.getHeldItem(hand).shrink(1);
 		}
 		
 		return EnumActionResult.SUCCESS;

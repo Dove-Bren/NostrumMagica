@@ -11,12 +11,12 @@ public class CommandTestConfig extends CommandBase {
 	public static int level = 0;
 	
 	@Override
-	public String getCommandName() {
+	public String getName() {
 		return "testconfig";
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender sender) {
+	public String getUsage(ICommandSender sender) {
 		return "/testconfig [level]";
 	}
 
@@ -25,7 +25,7 @@ public class CommandTestConfig extends CommandBase {
 		try {
 			level = Integer.parseInt(args[0]);
 		} catch (NumberFormatException e) {
-			sender.addChatMessage(new TextComponentString("Failed to parse level"));
+			sender.sendMessage(new TextComponentString("Failed to parse level"));
 		}
 	}
 

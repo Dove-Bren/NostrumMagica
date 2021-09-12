@@ -49,7 +49,7 @@ public class EntityAIAttackRanged<T extends EntityLiving> extends EntityAIBase
 	/**
 	 * Returns whether an in-progress EntityAIBase should continue executing
 	 */
-	public boolean continueExecuting() {
+	public boolean shouldContinueExecuting() {
 		return (this.shouldExecute() || !this.entity.getNavigator().noPath()) && this.hasWeaponEquipped(entity);
 	}
 	
@@ -145,7 +145,7 @@ public class EntityAIAttackRanged<T extends EntityLiving> extends EntityAIBase
 			}
 
 			if (d0 <= (double)this.maxAttackDistance && this.seeTime >= 20) {
-				this.entity.getNavigator().clearPathEntity();
+				this.entity.getNavigator().clearPath();
 				++this.strafingTime;
 			} else {
 				this.entity.getNavigator().tryMoveToEntityLiving(entitylivingbase, this.moveSpeedAmp);

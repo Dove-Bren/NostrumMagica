@@ -4,7 +4,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
@@ -27,7 +27,7 @@ public class ModelMagicSaucer extends ModelOBJ {
 	}
 
 	@Override
-	protected boolean preRender(Entity entity, int model, VertexBuffer buffer, double x, double y, double z,
+	protected boolean preRender(Entity entity, int model, BufferBuilder buffer, double x, double y, double z,
 			float entityYaw, float partialTicks) {
 		GlStateManager.scale(.5, .5, .5);
 		GlStateManager.translate(0, entity.height, 0);

@@ -83,7 +83,7 @@ public class ObjectiveKill implements IObjective {
 	public void onDeath(LivingDeathEvent event) {
 		EntityLivingBase dead = event.getEntityLiving();
 		if (entityClass.isInstance(dead)) {
-			Entity source = event.getSource().getSourceOfDamage();
+			Entity source = event.getSource().getTrueSource();
 			EntityPlayer player = null;
 			if (source instanceof EntityPlayer) {
 				player = (EntityPlayer) source;
@@ -126,7 +126,7 @@ public class ObjectiveKill implements IObjective {
 			s.count++;
 			
 			attr.setQuestData(quest.getKey(), s);
-			if (!player.worldObj.isRemote) {
+			if (!player.world.isRemote) {
 				// Spells are cast on the server, so sync to client quest state
 				NetworkHandler.getSyncChannel().sendTo(
 						new StatSyncMessage(attr), (EntityPlayerMP) player);

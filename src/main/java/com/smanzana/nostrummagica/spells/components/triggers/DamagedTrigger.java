@@ -67,7 +67,7 @@ public class DamagedTrigger extends SpellTrigger {
 							null
 							);
 					
-					entity.worldObj.getMinecraftServer().addScheduledTask(() -> {
+					entity.world.getMinecraftServer().addScheduledTask(() -> {
 						this.trigger(data);
 						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_DAMAGE, this.entity);
 					});
@@ -78,7 +78,7 @@ public class DamagedTrigger extends SpellTrigger {
 					expired = true;
 					if (this.entity instanceof EntityPlayer) {
 						EntityPlayer player = (EntityPlayer) this.entity;
-						player.addChatComponentMessage(new TextComponentTranslation("modification.damaged_duration.expire"));
+						player.sendMessage(new TextComponentTranslation("modification.damaged_duration.expire"));
 						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_DAMAGE, this.entity);
 					}
 				}

@@ -5,8 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Nullable;
-
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.SpellRune;
@@ -25,6 +23,7 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -46,7 +45,7 @@ public class ProgressionDoor extends NostrumMagicDoor {
 	}
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(ProgressionDoorTileEntity.class, "progression_door");
+		GameRegistry.registerTileEntity(ProgressionDoorTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "progression_door"));
 	}
 	
 	public ProgressionDoor() {
@@ -69,7 +68,7 @@ public class ProgressionDoor extends NostrumMagicDoor {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (worldIn.isRemote)
 			return true;
 		
@@ -79,12 +78,13 @@ public class ProgressionDoor extends NostrumMagicDoor {
 			// Mostly debug code, but could be useful for map devs as well
 			if (playerIn.isCreative()) {
 				ProgressionDoorTileEntity te = (ProgressionDoorTileEntity) worldIn.getTileEntity(master);
-				if (heldItem != null && heldItem.getItem() instanceof SpellRune) {
+				ItemStack heldItem = playerIn.getHeldItem(hand);
+				if (!heldItem.isEmpty() && heldItem.getItem() instanceof SpellRune) {
 					te.require(SpellRune.toComponentWrapper(heldItem));
 					te.dirty();
 					return true;
 				}
-				if (heldItem == null && hand == EnumHand.MAIN_HAND) {
+				if (heldItem.isEmpty() && hand == EnumHand.MAIN_HAND) {
 					te.level((te.getRequiredLevel() + 1) % 15);
 					te.dirty();
 					return true;
@@ -93,9 +93,9 @@ public class ProgressionDoor extends NostrumMagicDoor {
 			
 			List<ITextComponent> missingDepStrings = new LinkedList<>();
 			if (!((ProgressionDoorTileEntity) worldIn.getTileEntity(master)).meetsRequirements(playerIn, missingDepStrings)) {
-				playerIn.addChatComponentMessage(new TextComponentTranslation("info.door.missing.intro"));
+				playerIn.sendMessage(new TextComponentTranslation("info.door.missing.intro"));
 				for (ITextComponent text : missingDepStrings) {
-					playerIn.addChatComponentMessage(text);
+					playerIn.sendMessage(text);
 				}
 				NostrumMagicaSounds.CAST_FAIL.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 			} else {
@@ -246,16 +246,16 @@ public class ProgressionDoor extends NostrumMagicDoor {
 		}
 		
 		protected void dirty() {
-			worldObj.markBlockRangeForRenderUpdate(pos, pos);
-			worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 3);
-			worldObj.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
+			world.markBlockRangeForRenderUpdate(pos, pos);
+			world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
+			world.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
 			markDirty();
 		}
 		
 		private EnumFacing faceStash = null;
 		public EnumFacing getFace() {
 			if (faceStash == null) {
-				IBlockState state = worldObj.getBlockState(getPos());
+				IBlockState state = world.getBlockState(getPos());
 				faceStash = EnumFacing.NORTH;
 				if (state != null) {
 					try {
@@ -279,7 +279,7 @@ public class ProgressionDoor extends NostrumMagicDoor {
 				cursor.move(EnumFacing.DOWN, 1);
 				
 				while (cursor.getY() >= 0) {
-					IBlockState state = worldObj.getBlockState(cursor);
+					IBlockState state = world.getBlockState(cursor);
 					if (state == null || !(state.getBlock() instanceof ProgressionDoor))
 						break;
 					
@@ -294,7 +294,7 @@ public class ProgressionDoor extends NostrumMagicDoor {
 				// Right:
 				while (true) {
 					cursor.move(getFace().rotateY());
-					IBlockState state = worldObj.getBlockState(cursor);
+					IBlockState state = world.getBlockState(cursor);
 					if (state == null || !(state.getBlock() instanceof ProgressionDoor))
 						break;
 				}
@@ -307,7 +307,7 @@ public class ProgressionDoor extends NostrumMagicDoor {
 				// Left
 				while (true) {
 					cursor.move(getFace().rotateYCCW());
-					IBlockState state = worldObj.getBlockState(cursor);
+					IBlockState state = world.getBlockState(cursor);
 					if (state == null || !(state.getBlock() instanceof ProgressionDoor))
 						break;
 				}

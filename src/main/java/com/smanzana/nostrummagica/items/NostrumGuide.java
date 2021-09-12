@@ -61,7 +61,9 @@ public class NostrumGuide extends Item implements GuiBook {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+		final ItemStack itemStackIn = playerIn.getHeldItem(hand);
+		
 		if (worldIn.isRemote) {
 			NostrumMagica.proxy.openBook(playerIn, this, itemStackIn);
 		}

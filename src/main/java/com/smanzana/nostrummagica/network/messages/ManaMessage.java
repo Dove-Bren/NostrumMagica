@@ -47,7 +47,7 @@ public class ManaMessage implements IMessage {
 			}
 			
 			Minecraft.getMinecraft().addScheduledTask(() -> {
-				EntityPlayer realPlayer = player.worldObj.getPlayerEntityByUUID(id);
+				EntityPlayer realPlayer = player.world.getPlayerEntityByUUID(id);
 			
 				if (realPlayer == null) {
 					// Not in this world. Who cares

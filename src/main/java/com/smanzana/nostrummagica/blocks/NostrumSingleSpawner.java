@@ -2,8 +2,6 @@ package com.smanzana.nostrummagica.blocks;
 
 import java.util.Random;
 
-import javax.annotation.Nullable;
-
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemEarth;
@@ -35,6 +33,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
@@ -80,7 +79,7 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 	}
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(SingleSpawnerTE.class, "nostrum_mob_spawner_te");
+		GameRegistry.registerTileEntity(SingleSpawnerTE.class, new ResourceLocation(NostrumMagica.MODID, "nostrum_mob_spawner_te"));
 	}
 	
 	public NostrumSingleSpawner() {
@@ -139,10 +138,10 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		return 0;
 	}
 	
-	@Override
-	public boolean isVisuallyOpaque() {
-		return false;
-	}
+//	@Override
+//	public boolean isVisuallyOpaque() {
+//		return false;
+//	}
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
@@ -175,7 +174,7 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		entity.enablePersistence();
 		entity.setPosition(pos.getX() + 0.5, pos.getY(), pos.getZ() + .5);
 		
-		world.spawnEntityInWorld(entity);
+		world.spawnEntity(entity);
 		return entity;
 	}
 	
@@ -236,7 +235,7 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 	}
 
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (worldIn.isRemote) {
 			return true;
 		}
@@ -251,8 +250,9 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		}
 		
 		if (playerIn.isCreative()) {
-			if (heldItem == null) {
-				playerIn.addChatComponentMessage(new TextComponentString("Currently set to " + state.getValue(MOB).getName()));
+			ItemStack heldItem = playerIn.getHeldItem(hand);
+			if (heldItem.isEmpty()) {
+				playerIn.sendMessage(new TextComponentString("Currently set to " + state.getValue(MOB).getName()));
 			} else if (heldItem.getItem() instanceof EssenceItem) {
 				Type type = null;
 				switch (EssenceItem.findType(heldItem)) {
@@ -300,15 +300,15 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		}
 		
 		protected void majorTick(IBlockState state) {
-			NostrumSingleSpawner.instance().updateTick(worldObj, pos, state, RANDOM);
+			NostrumSingleSpawner.instance().updateTick(world, pos, state, RANDOM);
 		}
 		
 		@Override
 		public void update() {
-			if (!worldObj.isRemote && ++ticksExisted % 32 == 0) {
-				IBlockState state = this.worldObj.getBlockState(this.pos);
+			if (!world.isRemote && ++ticksExisted % 32 == 0) {
+				IBlockState state = this.world.getBlockState(this.pos);
 				if (state == null || !(state.getBlock() instanceof NostrumSingleSpawner)) {
-					worldObj.removeTileEntity(pos);
+					world.removeTileEntity(pos);
 					return;
 				}
 				

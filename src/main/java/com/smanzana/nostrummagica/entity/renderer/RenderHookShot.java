@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -40,7 +40,7 @@ public class RenderHookShot extends Render<EntityHookShot> {
 		return true;
 	}
 	
-	private void renderChain(VertexBuffer wr, Vec3d cordOffset, double segments, Vec3d perSeg) {
+	private void renderChain(BufferBuilder wr, Vec3d cordOffset, double segments, Vec3d perSeg) {
 		final int wholeSegments = (int) segments;
 		final double partialSegment = segments - wholeSegments;
 		double v;
@@ -53,8 +53,8 @@ public class RenderHookShot extends Render<EntityHookShot> {
 		
 		// Do first two vertices
 		// Note: UV is always the top here, but when going through the list, flips back and forth.
-		wr.pos(0 - (cordOffset.xCoord / 2.0), 0 - (cordOffset.yCoord / 2), 0 - (cordOffset.zCoord / 2)).tex(0, 0).endVertex();
-		wr.pos(0 + (cordOffset.xCoord / 2.0), 0 + (cordOffset.yCoord / 2), 0 + (cordOffset.zCoord / 2)).tex(1, 0).endVertex();
+		wr.pos(0 - (cordOffset.x / 2.0), 0 - (cordOffset.y / 2), 0 - (cordOffset.z / 2)).tex(0, 0).endVertex();
+		wr.pos(0 + (cordOffset.x / 2.0), 0 + (cordOffset.y / 2), 0 + (cordOffset.z / 2)).tex(1, 0).endVertex();
 		texFlip = true;
 
 		// Broke down into two cases instead of generalizing to make common case easier. Is this slower or faster?
@@ -62,18 +62,18 @@ public class RenderHookShot extends Render<EntityHookShot> {
 			if (i == wholeSegments) {
 				// last piece which is likely a partial piece
 				v = (texFlip ? partialSegment : (1.0 - partialSegment));
-				rx = ((i + partialSegment) * perSeg.xCoord);
-				ry = ((i + partialSegment) * perSeg.yCoord);
-				rz = ((i + partialSegment) * perSeg.zCoord);
+				rx = ((i + partialSegment) * perSeg.x);
+				ry = ((i + partialSegment) * perSeg.y);
+				rz = ((i + partialSegment) * perSeg.z);
 			} else {
 				v = (texFlip ? 1 : 0);
-				rx = ((i + 1) * perSeg.xCoord);
-				ry = ((i + 1) * perSeg.yCoord);
-				rz = ((i + 1) * perSeg.zCoord);
+				rx = ((i + 1) * perSeg.x);
+				ry = ((i + 1) * perSeg.y);
+				rz = ((i + 1) * perSeg.z);
 			}
 			
-			wr.pos(rx - (cordOffset.xCoord / 2), ry - (cordOffset.yCoord / 2), rz - (cordOffset.zCoord / 2)).tex(0, v).endVertex();
-			wr.pos(rx + (cordOffset.xCoord / 2), ry + (cordOffset.yCoord / 2), rz + (cordOffset.zCoord / 2)).tex(1, v).endVertex();
+			wr.pos(rx - (cordOffset.x / 2), ry - (cordOffset.y / 2), rz - (cordOffset.z / 2)).tex(0, v).endVertex();
+			wr.pos(rx + (cordOffset.x / 2), ry + (cordOffset.y / 2), rz + (cordOffset.z / 2)).tex(1, v).endVertex();
 			texFlip = !texFlip;
 		}
 		Tessellator.getInstance().draw();
@@ -85,7 +85,7 @@ public class RenderHookShot extends Render<EntityHookShot> {
 		final double texLen = .2;
 		final double chainWidth = .1;
 		
-		VertexBuffer wr = Tessellator.getInstance().getBuffer();
+		BufferBuilder wr = Tessellator.getInstance().getBuffer();
 		GlStateManager.pushMatrix();
 		
 		GlStateManager.translate(x, y, z);

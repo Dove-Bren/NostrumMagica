@@ -80,7 +80,7 @@ public class EntityDragonEgg extends EntityLiving implements ILoreTagged {
 	
 	@Override
 	public void fall(float distance, float damageMultiplier) {
-		this.attackEntityFrom(DamageSource.fall, 9999f);
+		this.attackEntityFrom(DamageSource.FALL, 9999f);
 	}
 	
 	@Override
@@ -159,13 +159,13 @@ public class EntityDragonEgg extends EntityLiving implements ILoreTagged {
 		super.onLivingUpdate();
 		
 		if (!this.isDead && !this.dead) {
-			if (!worldObj.isRemote && this.ticksExisted > 20) {
+			if (!world.isRemote && this.ticksExisted > 20) {
 				float heatLoss = .05f;
 				
-				if (worldObj.isRainingAt(getPosition())) {
+				if (world.isRainingAt(getPosition())) {
 					heatLoss = .1f;
-				} else if (worldObj.getLight(this.getPosition()) > 8) {
-					if (worldObj.getBlockState(getPosition().add(0, -1, 0)).getBlock() instanceof BlockHay) {
+				} else if (world.getLight(this.getPosition()) > 8) {
+					if (world.getBlockState(getPosition().add(0, -1, 0)).getBlock() instanceof BlockHay) {
 						heatLoss = 0f;
 					}
 				}
@@ -175,10 +175,10 @@ public class EntityDragonEgg extends EntityLiving implements ILoreTagged {
 				if (this.getHeat() <= 0f) {
 					EntityPlayer player = this.getPlayer();
 					if (player != null) {
-						player.addChatComponentMessage(new TextComponentTranslation("info.egg.death.cold"));
+						player.sendMessage(new TextComponentTranslation("info.egg.death.cold"));
 					}
 					
-					this.attackEntityFrom(DamageSource.starve, 9999f);
+					this.attackEntityFrom(DamageSource.STARVE, 9999f);
 				} else if (this.ageTimer-- <= 0) {
 					// HATCH
 					this.hatch();
@@ -192,7 +192,7 @@ public class EntityDragonEgg extends EntityLiving implements ILoreTagged {
 		EntityPlayer player = null;
 		
 		if (id != null) {
-			player = this.worldObj.getPlayerEntityByUUID(id);
+			player = this.world.getPlayerEntityByUUID(id);
 		}
 		
 		return player;
@@ -225,11 +225,11 @@ public class EntityDragonEgg extends EntityLiving implements ILoreTagged {
 	private void hatch() {
 		
 		if (this.spawnData != null) {
-			this.worldObj.spawnEntityInWorld((EntityLivingBase) this.spawnData.spawnDragon(worldObj, posX, posY, posZ));
+			this.world.spawnEntity((EntityLivingBase) this.spawnData.spawnDragon(world, posX, posY, posZ));
 			
 			EntityPlayer player = this.getPlayer();
 			if (player != null) {
-				player.addChatComponentMessage(new TextComponentTranslation("info.egg.hatch"));
+				player.sendMessage(new TextComponentTranslation("info.egg.hatch"));
 			}
 		}
 		

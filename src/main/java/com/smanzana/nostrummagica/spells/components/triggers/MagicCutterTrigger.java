@@ -66,7 +66,7 @@ public class MagicCutterTrigger extends SpellTrigger {
 					EntitySpellSaucer projectile = new EntityChakramSpellSaucer(self, 
 							getState().getSelf(),
 							world,
-							pos.xCoord, pos.yCoord, pos.zCoord,
+							pos.x, pos.y, pos.z,
 							dir,
 							5.0f, piercing ? PROJECTILE_RANGE/2 : PROJECTILE_RANGE, piercing);
 					
@@ -74,7 +74,7 @@ public class MagicCutterTrigger extends SpellTrigger {
 //							getState().getSelf(),
 //							5.0f, 500);
 					
-					world.spawnEntityInWorld(projectile);
+					world.spawnEntity(projectile);
 			
 				}
 			
@@ -128,7 +128,7 @@ public class MagicCutterTrigger extends SpellTrigger {
 			piercing = params.flip;
 		
 		// Add direction
-		pos = new Vec3d(pos.xCoord, pos.yCoord + state.getSelf().getEyeHeight(), pos.zCoord);
+		pos = new Vec3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
 		return new MagicCutterTriggerInstance(state, world, pos, pitch, yaw, piercing);
 	}
 

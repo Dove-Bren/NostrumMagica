@@ -15,9 +15,9 @@ public final class Curves {
 		Vec3d blendStart = bezierInternal(progress, points, start, end - 1);
 		Vec3d blendEnd = bezierInternal(progress, points, start + 1, end);
 		return new Vec3d(
-				blendStart.xCoord * (1 - progress) + blendEnd.xCoord * progress,
-				blendStart.yCoord * (1 - progress) + blendEnd.yCoord * progress,
-				blendStart.zCoord * (1 - progress) + blendEnd.zCoord * progress
+				blendStart.x * (1 - progress) + blendEnd.x * progress,
+				blendStart.y * (1 - progress) + blendEnd.y * progress,
+				blendStart.z * (1 - progress) + blendEnd.z * progress
 				);
 	}
 	

@@ -35,7 +35,7 @@ public class OutcomeRecall implements IRitualOutcome {
 		BlockPos pos = attr.getMarkLocation();
 		if (pos == null) {
 			if (world.isRemote)
-				player.addChatMessage(new TextComponentTranslation("info.recall.fail", new Object[0]));
+				player.sendMessage(new TextComponentTranslation("info.recall.fail", new Object[0]));
 			return;
 		}
 		
@@ -59,12 +59,12 @@ public class OutcomeRecall implements IRitualOutcome {
 					double dz = Math.sin(dirD) * dist;
 					EntityItem drop = new EntityItem(world, pos.getX() + .5 + dx, pos.getY() + 2, pos.getZ() + .5 + dz,
 							NostrumResourceItem.getItem(ResourceType.ENDER_BRISTLE, 1));
-					world.spawnEntityInWorld(drop);
+					world.spawnEntity(drop);
 					NostrumMagicaSounds.CAST_FAIL.play(world, pos.getX() + .5, pos.getY() + 2, pos.getZ() + .5);
 				}
 			}
 		} else {
-			player.addChatMessage(new TextComponentTranslation("info.recall.baddimension", new Object[0]));
+			player.sendMessage(new TextComponentTranslation("info.recall.baddimension", new Object[0]));
 		}
 	}
 

@@ -43,14 +43,14 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
         
         // Set initial motion perpendicular to where we're going to add some cross
         Vec3d tilt = direction.rotateYaw(90f * (this.rand.nextBoolean() ? 1 : -1)).scale(2);
-        this.motionX = tilt.xCoord;
-        this.motionY = tilt.yCoord;
-        this.motionZ = tilt.zCoord;
+        this.motionX = tilt.x;
+        this.motionY = tilt.y;
+        this.motionZ = tilt.z;
         
         // Raytrace at hit point, or just go max distance.
         // If piercing, only cap to raytrace if we hit an entity
         
-        RayTraceResult trace = RayTrace.raytrace(worldObj, this.getPositionVector(), direction, (float) maxDistance, new RayTrace.OtherLiving(shootingEntity));
+        RayTraceResult trace = RayTrace.raytrace(world, this.getPositionVector(), direction, (float) maxDistance, new RayTrace.OtherLiving(shootingEntity));
         if (trace != null && trace.typeOfHit != RayTraceResult.Type.MISS) {
         	if (trace.typeOfHit == RayTraceResult.Type.ENTITY) {
         		this.target = trace.hitVec.addVector(0D, trace.entityHit.height / 2.0, 0D);
@@ -70,7 +70,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 			EntityLivingBase shooter, float speedFactor, double maxDistance, boolean piercing) {
 		this(trigger,
 				shooter,
-				shooter.worldObj,
+				shooter.world,
 				shooter.posX, shooter.posY + shooter.getEyeHeight(), shooter.posZ,
 				shooter.getLookVec(),
 				speedFactor, maxDistance, piercing
@@ -104,7 +104,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 	public void onUpdate() {
 		super.onUpdate();
 		
-		if (!worldObj.isRemote) {
+		if (!world.isRemote) {
 			
 			if (origin == null) {
 				// We got loaded...
@@ -122,7 +122,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 			RayTraceResult raytraceresult = ProjectileHelper.forwardsRaycast(this, true, this.ticksInAir >= 25, this.shootingEntity);
 			
 			// Also calc pitch and yaw
-			float f = MathHelper.sqrt_double(motionX * motionX + motionZ * motionZ);
+			float f = MathHelper.sqrt(motionX * motionX + motionZ * motionZ);
             this.rotationPitch = (float)(MathHelper.atan2(motionY, (double)f) * (180D / Math.PI));
             this.rotationYaw = (float)(MathHelper.atan2(motionX, motionZ) * (180D / Math.PI));
 			
@@ -166,9 +166,9 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 					
 					// Capture motion to get boomerang-effect
 					Vec3d motion = new Vec3d(accel.x, accel.y, accel.z).normalize().scale(2);
-					this.motionX += motion.xCoord;
-					this.motionY += motion.yCoord;
-					this.motionZ += motion.zCoord;
+					this.motionX += motion.x;
+					this.motionY += motion.y;
+					this.motionZ += motion.z;
 				}
 			}
 		}
@@ -185,10 +185,11 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 	}
 
 	@Override
-	protected void setThrowableHeadingFrom(double xStart, double yStart, double zStart, double xTo, double yTo, double zTo, float velocity, float inaccuracy) {
-		super.setThrowableHeadingFrom(xStart, yStart, zStart, xTo, yTo, zTo, velocity, inaccuracy);
+	protected void shoot(double xStart, double yStart, double zStart, double xTo, double yTo, double zTo, float velocity, float inaccuracy) {
+		super.shoot(xStart, yStart, zStart, xTo, yTo, zTo, velocity, inaccuracy);
 		this.origin = new Vec3d(xStart, yStart, zStart);
 		this.target = new Vec3d(xTo, yTo, zTo);
 	}
+
 
 }

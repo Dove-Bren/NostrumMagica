@@ -48,7 +48,7 @@ public class TamedDragonGUI {
 	private static int lastKey = 0;
 	
 	private static int register(DragonContainer container) {
-		if (container.player.worldObj.isRemote) {
+		if (container.player.world.isRemote) {
 			throw new IllegalArgumentException("Can't register on the client!");
 		}
 		
@@ -100,7 +100,7 @@ public class TamedDragonGUI {
 			this.currentSheet = 0;
 			this.sheetsAllInternal = Lists.newArrayList(sheets);
 			
-			if (!((EntityDragon) dragon).worldObj.isRemote) {
+			if (!((EntityDragon) dragon).world.isRemote) {
 				this.id = TamedDragonGUI.register(this);				
 			} else {
 				TamedDragonGUI.clientContainer = this;
@@ -108,7 +108,7 @@ public class TamedDragonGUI {
 		}
 		
 		public void overrideID(int id) {
-			if (!this.player.worldObj.isRemote) {
+			if (!this.player.world.isRemote) {
 				throw new IllegalArgumentException("Can't reset id on the server!");
 			}
 //			revoke(id);
@@ -290,7 +290,7 @@ public class TamedDragonGUI {
 			final int GUI_SHEET_BUTTON_HOFFSET = GUI_SHEET_HOFFSET;
 			
 			if (this.container.dragon == null) {
-				this.drawCenteredString(fontRendererObj, "Waiting for server...", this.width / 2, this.height / 2, 0XFFAAAAAA);
+				this.drawCenteredString(fontRenderer, "Waiting for server...", this.width / 2, this.height / 2, 0XFFAAAAAA);
 				return;
 			}
 			
@@ -334,18 +334,18 @@ public class TamedDragonGUI {
 				
 				// Health
 				{
-					this.drawCenteredString(this.fontRendererObj, ChatFormatting.BOLD + "Health", centerX, y, 0xFFFFFFFF);
-					y += fontRendererObj.FONT_HEIGHT + 5;
+					this.drawCenteredString(this.fontRenderer, ChatFormatting.BOLD + "Health", centerX, y, 0xFFFFFFFF);
+					y += fontRenderer.FONT_HEIGHT + 5;
 					Gui.drawRect(x, y, x + w, y + h, 0xFFD0D0D0);
 					Gui.drawRect(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF201010);
 					
 					int prog = (int) ((float) (w - 2) * (container.livingDragon.getHealth() / container.livingDragon.getMaxHealth()));
 					Gui.drawRect(x + 1, y + 1, x + 1 + prog, y + h - 1, 0xFFA02020);
 					
-					this.drawCenteredString(fontRendererObj,
+					this.drawCenteredString(fontRenderer,
 							String.format("%d / %d", (int) container.livingDragon.getHealth(), (int) container.livingDragon.getMaxHealth()),
 							centerX,
-							y + (h / 2) - (fontRendererObj.FONT_HEIGHT / 2),
+							y + (h / 2) - (fontRenderer.FONT_HEIGHT / 2),
 							0xFFC0C0C0);
 					
 					y += h + 10;
@@ -353,18 +353,18 @@ public class TamedDragonGUI {
 				
 				// Mana
 				if (container.dragon.getMaxMana() > 0) {
-					this.drawCenteredString(this.fontRendererObj, ChatFormatting.BOLD + "Mana", centerX, y, 0xFFFFFFFF);
-					y += fontRendererObj.FONT_HEIGHT + 5;
+					this.drawCenteredString(this.fontRenderer, ChatFormatting.BOLD + "Mana", centerX, y, 0xFFFFFFFF);
+					y += fontRenderer.FONT_HEIGHT + 5;
 					Gui.drawRect(x, y, x + w, y + h, 0xFFD0D0D0);
 					Gui.drawRect(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF101020);
 					
 					int prog = (int) ((float) (w - 2) * ((float) container.dragon.getMana() / (float) container.dragon.getMaxMana()));
 					Gui.drawRect(x + 1, y + 1, x + 1 + prog, y + h - 1, 0xFF2020A0);
 					
-					this.drawCenteredString(fontRendererObj,
+					this.drawCenteredString(fontRenderer,
 							String.format("%d / %d", (int) container.dragon.getMana(), (int) container.dragon.getMaxMana()),
 							centerX,
-							y + (h / 2) - (fontRendererObj.FONT_HEIGHT / 2),
+							y + (h / 2) - (fontRenderer.FONT_HEIGHT / 2),
 							0xFFC0C0C0);
 					
 					y += h + 10;
@@ -374,18 +374,18 @@ public class TamedDragonGUI {
 				// TODO make optional?
 				{
 					float bond = container.dragon.getBond();
-					this.drawCenteredString(this.fontRendererObj, ChatFormatting.BOLD + "Bond", centerX, y, 0xFFFFFFFF);
-					y += fontRendererObj.FONT_HEIGHT + 5;
+					this.drawCenteredString(this.fontRenderer, ChatFormatting.BOLD + "Bond", centerX, y, 0xFFFFFFFF);
+					y += fontRenderer.FONT_HEIGHT + 5;
 					Gui.drawRect(x, y, x + w, y + h, 0xFFD0D0D0);
 					Gui.drawRect(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF201020);
 					
 					int prog = (int) ((float) (w - 2) * bond);
 					Gui.drawRect(x + 1, y + 1, x + 1 + prog, y + h - 1, 0xFFA020A0);
 					
-					this.drawCenteredString(fontRendererObj,
+					this.drawCenteredString(fontRenderer,
 							String.format("%.2f%%", bond * 100f),
 							centerX,
-							y + (h / 2) - (fontRendererObj.FONT_HEIGHT / 2),
+							y + (h / 2) - (fontRenderer.FONT_HEIGHT / 2),
 							bond == 1f ? 0xFFC0FFC0 : 0xFFC0C0C0);
 					
 					y += h + 10;
@@ -393,18 +393,18 @@ public class TamedDragonGUI {
 				
 				// XP
 				if (container.dragon.getXP() > -1) {
-					this.drawCenteredString(this.fontRendererObj, ChatFormatting.BOLD + "XP", centerX, y, 0xFFFFFFFF);
-					y += fontRendererObj.FONT_HEIGHT + 5;
+					this.drawCenteredString(this.fontRenderer, ChatFormatting.BOLD + "XP", centerX, y, 0xFFFFFFFF);
+					y += fontRenderer.FONT_HEIGHT + 5;
 					Gui.drawRect(x, y, x + w, y + h, 0xFFD0D0D0);
 					Gui.drawRect(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF102010);
 					
 					int prog = (int) ((float) (w - 2) * ((float) container.dragon.getXP() / (float) container.dragon.getMaxXP()));
 					Gui.drawRect(x + 1, y + 1, x + 1 + prog, y + h - 1, 0xFF20A020);
 					
-					this.drawCenteredString(fontRendererObj,
+					this.drawCenteredString(fontRenderer,
 							String.format("%d / %d", (int) container.dragon.getXP(), (int) container.dragon.getMaxXP()),
 							centerX,
-							y + (h / 2) - (fontRendererObj.FONT_HEIGHT / 2),
+							y + (h / 2) - (fontRenderer.FONT_HEIGHT / 2),
 							0xFFC0C0C0);
 					
 					y += h + 10;
@@ -427,9 +427,9 @@ public class TamedDragonGUI {
 					}
 					
 					String text = sheet.getButtonText();
-					int strLen = fontRendererObj.getStringWidth(text);
-					int strHeight = fontRendererObj.FONT_HEIGHT;
-					fontRendererObj.drawString(text, x + (GUI_SHEET_BUTTON_WIDTH / 2) - (strLen / 2), GUI_SHEET_BUTTON_VOFFSET + (GUI_SHEET_BUTTON_HEIGHT / 2) - (strHeight / 2), 0xFFFFFFFF);
+					int strLen = fontRenderer.getStringWidth(text);
+					int strHeight = fontRenderer.FONT_HEIGHT;
+					fontRenderer.drawString(text, x + (GUI_SHEET_BUTTON_WIDTH / 2) - (strLen / 2), GUI_SHEET_BUTTON_VOFFSET + (GUI_SHEET_BUTTON_HEIGHT / 2) - (strHeight / 2), 0xFFFFFFFF);
 					x += GUI_SHEET_BUTTON_WIDTH;
 				}
 				
@@ -442,9 +442,9 @@ public class TamedDragonGUI {
 					}
 					
 					String text = "Reroll";
-					int strLen = fontRendererObj.getStringWidth(text);
-					int strHeight = fontRendererObj.FONT_HEIGHT;
-					fontRendererObj.drawString(text, x + (GUI_SHEET_BUTTON_WIDTH / 2) - (strLen / 2), GUI_SHEET_BUTTON_VOFFSET + (GUI_SHEET_BUTTON_HEIGHT / 2) - (strHeight / 2), 0xFFFFFFFF);
+					int strLen = fontRenderer.getStringWidth(text);
+					int strHeight = fontRenderer.FONT_HEIGHT;
+					fontRenderer.drawString(text, x + (GUI_SHEET_BUTTON_WIDTH / 2) - (strLen / 2), GUI_SHEET_BUTTON_VOFFSET + (GUI_SHEET_BUTTON_HEIGHT / 2) - (strHeight / 2), 0xFFFFFFFF);
 					x += GUI_SHEET_BUTTON_WIDTH;
 				}
 			}

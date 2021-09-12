@@ -10,11 +10,13 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -69,10 +71,7 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellArmor {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-		if (stack == null)
-			return;
-		
+	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		tooltip.add(I18n.format("item.info.thanos.desc", (Object[]) null));
 		int charges = thanosGetWholeCharges(stack);
 		tooltip.add(ChatFormatting.GREEN + I18n.format("item.info.thanos.charges", new Object[] {charges}));
@@ -103,7 +102,7 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellArmor {
 	 * @return
 	 */
 	public static int thanosAddXP(ItemStack stack, int xp) {
-		if (stack == null)
+		if (stack.isEmpty())
 			return xp;
 		
 		int inPendant = thanosGetXP(stack);
@@ -123,7 +122,7 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellArmor {
 	}
 	
 	private static void thanosSetXP(ItemStack stack, int xp) {
-		if (stack == null)
+		if (stack.isEmpty())
 			return;
 		
 		NBTTagCompound nbt = stack.getTagCompound();
@@ -139,7 +138,7 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellArmor {
 	}
 	
 	public static int thanosGetXP(ItemStack stack) {
-		if (stack == null || !stack.hasTagCompound())
+		if (stack.isEmpty() || !stack.hasTagCompound())
 			return 0;
 		
 		NBTTagCompound nbt = stack.getTagCompound();
@@ -148,7 +147,7 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellArmor {
 
 	@Override
 	public void apply(EntityLivingBase caster, SpellCastSummary summary, ItemStack stack) {
-		if (stack == null)
+		if (stack.isEmpty())
 			return;
 		
 		if (summary.getReagentCost() <= 0) {

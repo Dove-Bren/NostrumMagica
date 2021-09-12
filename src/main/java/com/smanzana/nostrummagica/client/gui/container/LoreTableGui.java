@@ -98,9 +98,9 @@ public class LoreTableGui {
 					return false;
 				}
 				
-				public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack) {
+				public ItemStack onTake(EntityPlayer playerIn, ItemStack stack) {
 					table.onTakeItem(playerIn);
-					super.onPickupFromSlot(playerIn, stack);
+					return super.onTake(playerIn, stack);
 				}
 				
 			};
@@ -133,7 +133,7 @@ public class LoreTableGui {
 					// Trying to take our item
 					if (playerIn.inventory.addItemStackToInventory(cur)) {
 						inputSlot.putStack(null);
-						inputSlot.onPickupFromSlot(playerIn, cur);
+						inputSlot.onTake(playerIn, cur);
 					} else {
 						prev = null;
 					}

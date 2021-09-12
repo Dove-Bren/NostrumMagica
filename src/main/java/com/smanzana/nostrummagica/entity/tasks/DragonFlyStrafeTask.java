@@ -31,7 +31,7 @@ public class DragonFlyStrafeTask<T extends EntityDragon> extends EntityAIBase {
 	}
 	
 	@Override
-	public boolean continueExecuting() {
+	public boolean shouldContinueExecuting() {
 		return shouldExecute();
 	}
 	
@@ -66,7 +66,7 @@ public class DragonFlyStrafeTask<T extends EntityDragon> extends EntityAIBase {
 
             if (d0 <= (double)this.maxAttackDistance && this.seeTime >= 20)
             {
-                this.dragon.getNavigator().clearPathEntity();
+                this.dragon.getNavigator().clearPath();
                 ++this.strafingTime;
             }
             else

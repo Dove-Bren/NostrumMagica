@@ -8,13 +8,14 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -66,7 +67,7 @@ public class SpellTomePage extends Item implements ILoreTagged {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
 		// For all registered enhancements, create an item in the creative tab
 		for (SpellTomeEnhancement enhancement : SpellTomeEnhancement.getEnhancements()) {
 			subItems.add(getItemstack(enhancement, enhancement.getMaxLevel()));
@@ -95,7 +96,7 @@ public class SpellTomePage extends Item implements ILoreTagged {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		SpellTomeEnhancement enhance = getEnhancement(stack);
 		if (enhance == null)
 			return;
@@ -180,7 +181,7 @@ public class SpellTomePage extends Item implements ILoreTagged {
 	}
 	
 	public static int getLevel(ItemStack stack) {
-		if (stack == null || !(stack.getItem() instanceof SpellTomePage))
+		if (stack.isEmpty() || !(stack.getItem() instanceof SpellTomePage))
 			return 0;
 		
 		if (!stack.hasTagCompound())
@@ -190,7 +191,7 @@ public class SpellTomePage extends Item implements ILoreTagged {
 	}
 	
 	public static SpellTomeEnhancement getEnhancement(ItemStack stack) {
-		if (stack == null || !(stack.getItem() instanceof SpellTomePage))
+		if (stack.isEmpty() || !(stack.getItem() instanceof SpellTomePage))
 			return null;
 		
 		if (!stack.hasTagCompound())
@@ -210,7 +211,7 @@ public class SpellTomePage extends Item implements ILoreTagged {
 			
 			for (int i = 0; i < inv.getSizeInventory(); i++) {
 				ItemStack stack = inv.getStackInSlot(i);
-				if (stack == null)
+				if (stack.isEmpty())
 					continue;
 				
 				if (!(stack.getItem() instanceof SpellTomePage))
@@ -249,22 +250,22 @@ public class SpellTomePage extends Item implements ILoreTagged {
 					continue;
 				
 				if (!(stack.getItem() instanceof SpellTomePage))
-					return null;
+					return ItemStack.EMPTY;
 				
 				SpellTomeEnhancement cur = SpellTomePage.getEnhancement(stack);
 				if (cur == null)
-					return null;
+					return ItemStack.EMPTY;
 				
 				if (enhancement != null && enhancement != cur)
-					return null;
+					return ItemStack.EMPTY;
 				
 				int level = SpellTomePage.getLevel(stack);
 				if (0 == level)
-					return null;
+					return ItemStack.EMPTY;
 				
 				// Optimization to disallow adding when you are already max level
 				if (level >= cur.getMaxLevel())
-					return null;
+					return ItemStack.EMPTY;
 				
 				enhancement = cur;
 				sum += level;
@@ -272,12 +273,12 @@ public class SpellTomePage extends Item implements ILoreTagged {
 			}
 			
 			if (count < 2 || enhancement == null)
-				return null;
+				return ItemStack.EMPTY;
 			
 			// Check level
 			int level = 1 + (int) (Math.log(sum) / Math.log(2)); // Log base 2, floored
 			if (level > enhancement.getMaxLevel())
-				return null;
+				return ItemStack.EMPTY;
 			
 			return getItemstack(enhancement, level);
 		}

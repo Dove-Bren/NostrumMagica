@@ -39,7 +39,7 @@ public class SpellDebugMessage implements IMessage {
 			final ITextComponent text = ITextComponent.Serializer.jsonToComponent(chat);
 			
 			Minecraft.getMinecraft().addScheduledTask(() -> {
-				NostrumMagica.proxy.getPlayer().addChatMessage(text);
+				NostrumMagica.proxy.getPlayer().sendMessage(text);
 			});
 			
 			

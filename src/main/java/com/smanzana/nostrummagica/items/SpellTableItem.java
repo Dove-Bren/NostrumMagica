@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.items;
 
+import javax.annotation.Nonnull;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.SpellTable;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
@@ -54,7 +56,7 @@ public class SpellTableItem extends Item implements ILoreTagged {
 	}
 	
 	@SuppressWarnings("deprecation")
-	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
+	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
 	{
 		
 		// Copied from ItemBed (vanilla) with some modifications
@@ -78,9 +80,10 @@ public class SpellTableItem extends Item implements ILoreTagged {
 				pos = pos.up();
 			}
 
-			int i = MathHelper.floor_double((double)(playerIn.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
+			int i = MathHelper.floor((double)(playerIn.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
 			EnumFacing enumfacing = EnumFacing.getHorizontal(i + 1);
 			BlockPos blockpos = pos.offset(enumfacing);
+			final @Nonnull ItemStack stack = playerIn.getHeldItem(hand);
 
 			if (playerIn.canPlayerEdit(pos, facing, stack) && playerIn.canPlayerEdit(blockpos, facing, stack))
 			{
@@ -88,7 +91,7 @@ public class SpellTableItem extends Item implements ILoreTagged {
 				boolean flag2 = flag || worldIn.isAirBlock(pos);
 				boolean flag3 = flag1 || worldIn.isAirBlock(blockpos);
 
-				if (flag2 && flag3 && worldIn.getBlockState(pos.down()).isFullyOpaque() && worldIn.getBlockState(blockpos.down()).isFullyOpaque())
+				if (flag2 && flag3 && worldIn.getBlockState(pos.down()).isSideSolid(worldIn, pos.down(), EnumFacing.UP) && worldIn.getBlockState(blockpos.down()).isSideSolid(worldIn, blockpos.down(), EnumFacing.UP))
 				{
 					IBlockState iblockstate1 = SpellTable.instance().getSlaveState(enumfacing);
 
@@ -100,7 +103,7 @@ public class SpellTableItem extends Item implements ILoreTagged {
 
 					SoundType soundtype = iblockstate1.getBlock().getSoundType(iblockstate1, worldIn, pos, playerIn);
 					worldIn.playSound((EntityPlayer)null, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
-					--stack.stackSize;
+					stack.shrink(1);;
 					return EnumActionResult.SUCCESS;
 				}
 				else

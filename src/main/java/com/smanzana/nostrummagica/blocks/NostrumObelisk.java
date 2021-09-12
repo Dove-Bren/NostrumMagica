@@ -27,6 +27,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -71,7 +72,7 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 	}
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(NostrumObeliskEntity.class, "nostrum_obelisk");
+		GameRegistry.registerTileEntity(NostrumObeliskEntity.class, new ResourceLocation(NostrumMagica.MODID, "nostrum_obelisk"));
 	}
 	
 	public NostrumObelisk() {
@@ -131,10 +132,10 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 		super.updateTick(worldIn, pos, state, rand);
 	}
 	
-	@Override
-	public boolean isVisuallyOpaque() {
-		return false;
-	}
+//	@Override
+//	public boolean isVisuallyOpaque() {
+//		return false;
+//	}
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
@@ -249,7 +250,7 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 	
 	@Override
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
-		return null;
+		return ItemStack.EMPTY;
 	}
 
 	@Override
@@ -277,7 +278,7 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		
 		if (state.getValue(MASTER) == false) {
 			return false;
@@ -286,7 +287,7 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
 		if (!ModConfig.config.obeliskReqMagic() && (attr == null || !attr.isUnlocked())) {
 			if (worldIn.isRemote) {
-				playerIn.addChatComponentMessage(new TextComponentTranslation("info.obelisk.nomagic"));
+				playerIn.sendMessage(new TextComponentTranslation("info.obelisk.nomagic"));
 			}
 			return false;
 		}

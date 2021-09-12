@@ -16,6 +16,7 @@ import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import baubles.api.BaubleType;
 import baubles.api.IBauble;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -25,9 +26,11 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.EntityDamageSource;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.fml.common.Optional;
@@ -133,7 +136,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 	
 	@SideOnly(Side.CLIENT)
     @Override
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
 		for (ItemType type : ItemType.values()) {
 			if (!NostrumMagica.aetheria.isEnabled()) {
 				if (type == ItemType.SHIELD_RING_LARGE
@@ -142,7 +145,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 					continue;
 				}
 			}
-			subItems.add(new ItemStack(itemIn, 1, getMetaFromType(type)));
+			subItems.add(new ItemStack(this, 1, getMetaFromType(type)));
 		}
 	}
 	
@@ -174,10 +177,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-		if (stack == null)
-			return;
-		
+	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		ItemType type = getTypeFromMeta(stack.getMetadata());
 		if (type == null)
 			return;
@@ -378,7 +378,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 
 	@Override
 	public void apply(EntityLivingBase caster, SpellCastSummary summary, ItemStack stack) {
-		if (stack == null) {
+		if (stack.isEmpty()) {
 			return;
 		}
 		
@@ -422,7 +422,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 	@Override
 	@Optional.Method(modid="Baubles")
 	public void onWornTick(ItemStack stack, EntityLivingBase player) {
-		if (stack == null) {
+		if (stack.isEmpty()) {
 			return;
 		}
 		
@@ -454,7 +454,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 		case SHIELD_RING_LARGE:
 		case SHIELD_RING_SMALL:
 			
-			if (!player.worldObj.isRemote) {
+			if (!player.world.isRemote) {
 				double shield = (type == ItemType.SHIELD_RING_LARGE ? 4 : 2);
 				int cost = (int) (shield * 100);
 				
@@ -466,7 +466,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 					}
 					
 					if (inv != null) {
-						int taken = APIProxy.drawFromInventory(player.worldObj, player, inv, cost, stack);
+						int taken = APIProxy.drawFromInventory(player.world, player, inv, cost, stack);
 						if (taken > 0) {
 							// Apply shields! Amount depends on how much aether was consumed
 							shield *= ((float) taken / (float) cost);
@@ -487,13 +487,13 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 		}
 		
 		if (event.getAmount() > 0f && event.getEntityLiving() instanceof EntityPlayer && event.getSource() instanceof EntityDamageSource) {
-			Entity source = ((EntityDamageSource) event.getSource()).getSourceOfDamage();
+			Entity source = ((EntityDamageSource) event.getSource()).getTrueSource();
 			EntityPlayer player = (EntityPlayer) event.getEntityLiving();
 			IInventory inv = NostrumMagica.baubles.getBaubles(player);
 			if (inv != null) {
 				for (int i = 0; i < inv.getSizeInventory(); i++) {
 					ItemStack stack = inv.getStackInSlot(i);
-					if (stack == null || !(stack.getItem() instanceof ItemMagicBauble))
+					if (stack.isEmpty() || !(stack.getItem() instanceof ItemMagicBauble))
 						continue;
 					
 					ItemType type = getTypeFromMeta(stack.getMetadata());
@@ -522,16 +522,16 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 						
 						// Check to see if we're facing the enemy that attacked us
 						Vec3d attackFrom = source.getPositionVector().subtract(player.getPositionVector());
-						double attackFromYaw = -Math.atan2(attackFrom.xCoord, attackFrom.zCoord) * 180.0F / (float)Math.PI;
+						double attackFromYaw = -Math.atan2(attackFrom.x, attackFrom.z) * 180.0F / (float)Math.PI;
 						
 						if (Math.abs(((player.rotationYaw + 360f) % 360f) - ((attackFromYaw + 360f) % 360f)) < 30f) {
 							if (NostrumMagica.rand.nextFloat() < chance) {
 								// If there's aether, dodge!
-								int taken = APIProxy.drawFromInventory(player.worldObj, player, player.inventory, cost, stack);
+								int taken = APIProxy.drawFromInventory(player.world, player, player.inventory, cost, stack);
 								if (taken > 0) {
 									// Dodge!
 									event.setCanceled(true);
-									NostrumMagicaSounds.DAMAGE_WIND.play(player.worldObj, player.posX, player.posY, player.posZ);
+									NostrumMagicaSounds.DAMAGE_WIND.play(player.world, player.posX, player.posY, player.posZ);
 									float dir = player.rotationYaw + (NostrumMagica.rand.nextBoolean() ? -1 : 1) * 90f;
 									float velocity = .5f;
 									player.motionX = velocity * MathHelper.cos(dir);

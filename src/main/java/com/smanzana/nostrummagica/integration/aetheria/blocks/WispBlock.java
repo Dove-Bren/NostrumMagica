@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -28,6 +28,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -51,7 +52,7 @@ public class WispBlock extends BlockContainer {
 	}
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(WispBlockTileEntity.class, ID + "_entity");
+		GameRegistry.registerTileEntity(WispBlockTileEntity.class, new ResourceLocation(NostrumMagica.MODID, ID + "_entity"));
 //		GameRegistry.addShapedRecipe(new ItemStack(instance()),
 //				"WGW", "WCW", "WWW",
 //				'W', new ItemStack(Blocks.PLANKS, 1, OreDictionary.WILDCARD_VALUE),
@@ -69,34 +70,36 @@ public class WispBlock extends BlockContainer {
 	}
 	
 	@Override
-	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
 		return true;
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+		
+		ItemStack heldItem = playerIn.getHeldItem(hand);
 		
 		// Automatically handle scrolls and reagents
-		if (!playerIn.isSneaking() && heldItem != null) {
+		if (!playerIn.isSneaking() && !heldItem.isEmpty()) {
 			WispBlockTileEntity te = (WispBlockTileEntity) worldIn.getTileEntity(pos);
 			if (heldItem.getItem() instanceof SpellScroll
 					&& te.getScroll() == null
 					&& SpellScroll.getSpell(heldItem) != null) {
 				// Take scroll
 				te.setScroll(heldItem.copy());
-				heldItem.stackSize--;
+				heldItem.shrink(1);
 				return true;
 			} else if (heldItem.getItem() instanceof ReagentItem) {
 				
-				if (te.getReagent() == null) {
-					te.setReagent(heldItem.splitStack(heldItem.stackSize));
+				if (te.getReagent() == ItemStack.EMPTY) {
+					te.setReagent(heldItem.splitStack(heldItem.getCount()));
 					return true;
 				} else if (ReagentItem.findType(heldItem) == ReagentItem.findType(te.getReagent())) {
-					int avail = Math.max(0, Math.min(64, 64 - te.getReagent().stackSize));
+					int avail = Math.max(0, Math.min(64, 64 - te.getReagent().getCount()));
 					if (avail != 0) {
-						int take = Math.min(avail, heldItem.stackSize);
-						heldItem.stackSize -= take;
-						te.getReagent().stackSize += take;
+						int take = Math.min(avail, heldItem.getCount());
+						heldItem.shrink(take);
+						te.getReagent().grow(take);
 						return true;
 					}
 				}
@@ -126,7 +129,7 @@ public class WispBlock extends BlockContainer {
 	}
 	
 	@Override
-	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, World worldIn, BlockPos pos) {
+	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
 		return COLLIDE_AABB;
 	}
 	
@@ -159,21 +162,21 @@ public class WispBlock extends BlockContainer {
 		
 		WispBlockTileEntity table = (WispBlockTileEntity) ent;
 		ItemStack item = table.getScroll();
-		if (item != null) {
+		if (!item.isEmpty()) {
 			double x, y, z;
 			x = pos.getX() + .5;
 			y = pos.getY() + .5;
 			z = pos.getZ() + .5;
-			world.spawnEntityInWorld(new EntityItem(world, x, y, z, item.copy()));
+			world.spawnEntity(new EntityItem(world, x, y, z, item.copy()));
 		}
 		
 		item = table.getReagent();
-		if (item != null) {
+		if (!item.isEmpty()) {
 			double x, y, z;
 			x = pos.getX() + .5;
 			y = pos.getY() + .5;
 			z = pos.getZ() + .5;
-			world.spawnEntityInWorld(new EntityItem(world, x, y, z, item.copy()));
+			world.spawnEntity(new EntityItem(world, x, y, z, item.copy()));
 		}
 		
 		table.deactivate();
@@ -212,8 +215,8 @@ public class WispBlock extends BlockContainer {
 		private static final String NBT_PARTIAL = "partial";
 		
 		// Synced+saved
-		private ItemStack scroll;
-		private ItemStack reagent;
+		private @Nonnull ItemStack scroll;
+		private @Nonnull ItemStack reagent;
 		private float reagentPartial;
 		private boolean activated;
 		
@@ -234,8 +237,8 @@ public class WispBlock extends BlockContainer {
 		
 		public WispBlockTileEntity() {
 			super(0, MAX_AETHER);
-			scroll = null;
-			reagent = null;
+			scroll = ItemStack.EMPTY;
+			reagent = ItemStack.EMPTY;
 			reagentPartial = 0f;
 			wisps = new LinkedList<>();
 			ticksExisted = 0;
@@ -249,7 +252,7 @@ public class WispBlock extends BlockContainer {
 		}
 		
 		public boolean setScroll(ItemStack item) {
-			if (item != null && this.scroll != null)
+			if (!item.isEmpty() && !this.scroll.isEmpty())
 				return false;
 			
 			if (!isItemValidForSlot(0, item)) {
@@ -265,7 +268,7 @@ public class WispBlock extends BlockContainer {
 		}
 		
 		public boolean setReagent(ItemStack item) {
-			if (item != null && this.reagent != null)
+			if (!item.isEmpty() && !this.reagent.isEmpty())
 				return false;
 			
 			if (!isItemValidForSlot(1, item)) {
@@ -281,7 +284,7 @@ public class WispBlock extends BlockContainer {
 		}
 		
 		public int getWispCount() {
-			return this.worldObj.isRemote ? this.numWisps : this.wisps.size();
+			return this.world.isRemote ? this.numWisps : this.wisps.size();
 		}
 		
 		public int getMaxWisps() {
@@ -289,8 +292,8 @@ public class WispBlock extends BlockContainer {
 		}
 		
 		private void dirtyAndUpdate() {
-			if (worldObj != null) {
-				worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 3);
+			if (world != null) {
+				world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
 				markDirty();
 			}
 		}
@@ -323,13 +326,13 @@ public class WispBlock extends BlockContainer {
 						NostrumMagica.rand.nextInt(10) - 5,
 						NostrumMagica.rand.nextInt(5),
 						NostrumMagica.rand.nextInt(10) - 5);
-			} while (!worldObj.isAirBlock(spawnPos) && attempts-- >= 0);
+			} while (!world.isAirBlock(spawnPos) && attempts-- >= 0);
 			
-			if (worldObj.isAirBlock(spawnPos)) {
-				EntityWisp wisp = new EntityWisp(this.worldObj, this.pos);
+			if (world.isAirBlock(spawnPos)) {
+				EntityWisp wisp = new EntityWisp(this.world, this.pos);
 				wisp.setPosition(spawnPos.getX() + .5, spawnPos.getY(), spawnPos.getZ() + .5);
 				this.wisps.add(wisp);
-				this.worldObj.spawnEntityInWorld(wisp);
+				this.world.spawnEntity(wisp);
 				//this.dirtyAndUpdate();
 			}
 		}
@@ -339,7 +342,7 @@ public class WispBlock extends BlockContainer {
 			super.update();
 			ticksExisted++;
 			
-			if (worldObj.isRemote) {
+			if (world.isRemote) {
 				return;
 			}
 			
@@ -353,8 +356,8 @@ public class WispBlock extends BlockContainer {
 			}
 			
 			if (!activated) {
-				if (this.getScroll() != null
-						&& (this.getReagent() != null || this.reagentPartial >= REAGENT_PER_SECOND)
+				if (!this.getScroll().isEmpty()
+						&& (!this.getReagent().isEmpty() || this.reagentPartial >= REAGENT_PER_SECOND)
 						/*&& (this.getOnlyMyAether(null) > AETHER_PER_TICK)*/) {
 					activate();
 				} else {
@@ -363,7 +366,7 @@ public class WispBlock extends BlockContainer {
 			}
 			
 			// If no scroll is present, deactivate
-			if (this.getScroll() == null) {
+			if (this.getScroll().isEmpty()) {
 				deactivate();
 				return;
 			}
@@ -375,10 +378,10 @@ public class WispBlock extends BlockContainer {
 					// Not enough partial. Try to consume from reagent stack.
 					// If not there, next bit of logic will turn reagentPartial negative and
 					// know to deactivate
-					if (getReagent() != null && getReagent().stackSize > 0) {
+					if (getReagent() != null && getReagent().getCount() > 0) {
 						reagentPartial += 1f;
-						if (getReagent().stackSize > 1) {
-							getReagent().splitStack(1);
+						if (getReagent().getCount() > 1) {
+							getReagent().shrink(1);
 						} else {
 							setReagent(null);
 						}
@@ -466,8 +469,8 @@ public class WispBlock extends BlockContainer {
 		}
 		
 		@Override
-		public void setWorldObj(World world) {
-			super.setWorldObj(world);
+		public void setWorldCreate(World world) {
+			super.setWorldCreate(world);
 			
 			if (!world.isRemote) {
 				this.compWrapper.setAutoFill(true);
@@ -482,7 +485,7 @@ public class WispBlock extends BlockContainer {
 		@Override
 		public ItemStack getStackInSlot(int index) {
 			if (index < 0 || index >= getSizeInventory())
-				return null;
+				return ItemStack.EMPTY;
 			
 			if (index == 0) {
 				return scroll;
@@ -494,25 +497,25 @@ public class WispBlock extends BlockContainer {
 		@Override
 		public ItemStack decrStackSize(int index, int count) {
 			if (index < 0 || index >= getSizeInventory()) {
-				return null;
+				return ItemStack.EMPTY;
 			}
 			
 			ItemStack inSlot = getStackInSlot(index);
-			if (inSlot == null) {
-				return null;
+			if (inSlot.isEmpty()) {
+				return ItemStack.EMPTY;
 			}
 			
 			ItemStack stack;
-			if (inSlot.stackSize <= count) {
+			if (inSlot.getCount() <= count) {
 				stack = inSlot;
-				inSlot = null;
+				inSlot = ItemStack.EMPTY;
 			} else {
 				stack = inSlot.copy();
-				stack.stackSize = count;
-				inSlot.stackSize -= count;
+				stack.setCount(count);
+				inSlot.shrink(count);
 			}
 			
-			if (inSlot == null) {
+			if (inSlot.isEmpty()) {
 				setInventorySlotContents(index, inSlot);
 			}
 			
@@ -523,15 +526,15 @@ public class WispBlock extends BlockContainer {
 		@Override
 		public ItemStack removeStackFromSlot(int index) {
 			if (index < 0 || index >= getSizeInventory())
-				return null;
+				return ItemStack.EMPTY;
 			
 			ItemStack stack;
 			if (index == 0) {
 				stack = scroll;
-				scroll = null;
+				scroll = ItemStack.EMPTY;
 			} else {
 				stack = reagent;
-				reagent = null;
+				reagent = ItemStack.EMPTY;
 			}
 			
 			this.dirtyAndUpdate();
@@ -558,7 +561,7 @@ public class WispBlock extends BlockContainer {
 		}
 
 		@Override
-		public boolean isUseableByPlayer(EntityPlayer player) {
+		public boolean isUsableByPlayer(EntityPlayer player) {
 			return true;
 		}
 
@@ -576,9 +579,9 @@ public class WispBlock extends BlockContainer {
 				return false;
 			
 			if (index == 0) {
-				return (stack == null || (stack.getItem() instanceof SpellScroll && SpellScroll.getSpell(stack) != null));
+				return (stack.isEmpty() || (stack.getItem() instanceof SpellScroll && SpellScroll.getSpell(stack) != null));
 			} else {
-				return (stack == null || stack.getItem() instanceof ReagentItem);
+				return (stack.isEmpty() || stack.getItem() instanceof ReagentItem);
 			}
 			
 		}
@@ -598,7 +601,7 @@ public class WispBlock extends BlockContainer {
 			} else if (id == 1) {
 				return this.activated ? 1 : 0;
 			} else if (id == 2) {
-				return worldObj.isRemote ? numWisps : wisps.size();
+				return world.isRemote ? numWisps : wisps.size();
 			}
 			return 0;
 		}
@@ -634,6 +637,11 @@ public class WispBlock extends BlockContainer {
 		@Override
 		public boolean hasCustomName() {
 			return false;
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return !scroll.isEmpty() || !reagent.isEmpty();
 		}
 	}
 }

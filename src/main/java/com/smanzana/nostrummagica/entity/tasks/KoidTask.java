@@ -338,7 +338,7 @@ public class KoidTask extends EntityAIBase {
 	}
 
 	@Override
-	public boolean continueExecuting() {
+	public boolean shouldContinueExecuting() {
 		return running;
 	}
 	
@@ -462,7 +462,7 @@ public class KoidTask extends EntityAIBase {
         	//	if (koid.getNavigator().)
         	//}
 			
-        	koid.getNavigator().clearPathEntity();
+        	koid.getNavigator().clearPath();
 			success = koid.getNavigator().tryMoveToEntityLiving(target, 1.0);
 			if (success) {
 				updateCooldown = 5;
@@ -474,7 +474,7 @@ public class KoidTask extends EntityAIBase {
 
             if (dist <= RANGE_SQR - 64.0 && koid.canEntityBeSeen(target))
             {
-            	koid.getNavigator().clearPathEntity();
+            	koid.getNavigator().clearPath();
             	++this.strafeTime;
             }
             else
@@ -486,7 +486,7 @@ public class KoidTask extends EntityAIBase {
             	if (updateCooldown > 0 && !koid.getNavigator().noPath())
         			return true;
             	
-            	koid.getNavigator().clearPathEntity();
+            	koid.getNavigator().clearPath();
             	koid.getNavigator().tryMoveToEntityLiving(target, 1.0);
                 this.updateCooldown = 5;
             }
@@ -522,13 +522,13 @@ public class KoidTask extends EntityAIBase {
                 	Vec3d right = getForward(koid).rotatePitch(90.0f);
                 	double mag = strafeBack ? -.1 : 0;
                 	double x, y, z;
-                	x = forward.xCoord * mag;
-                	y = forward.yCoord * mag;
-                	z = forward.zCoord * mag;
+                	x = forward.x * mag;
+                	y = forward.y * mag;
+                	z = forward.z * mag;
                 	mag = strafeClockwise ? -.3 : .3;
-                	x += right.xCoord * mag;
-                	y += right.yCoord * mag;
-                	z += right.zCoord * mag;
+                	x += right.x * mag;
+                	y += right.y * mag;
+                	z += right.z * mag;
                 	y += .8;
                 	koid.addVelocity(x, y, z);
                 	koid.onGround = false;

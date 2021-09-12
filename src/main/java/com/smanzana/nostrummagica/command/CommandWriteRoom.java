@@ -17,12 +17,12 @@ import net.minecraft.util.text.TextComponentString;
 public class CommandWriteRoom extends CommandBase {
 
 	@Override
-	public String getCommandName() {
+	public String getName() {
 		return "writeroom";
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender sender) {
+	public String getUsage(ICommandSender sender) {
 		return "/writeroom [name]";
 	}
 
@@ -40,21 +40,21 @@ public class CommandWriteRoom extends CommandBase {
 			ItemStack offhand = player.getHeldItemOffhand();
 			if ((main == null || !(main.getItem() instanceof PositionCrystal) || PositionCrystal.getBlockPosition(main) == null)
 				|| (offhand == null || !(offhand.getItem() instanceof PositionCrystal) || PositionCrystal.getBlockPosition(offhand) == null)) {
-				sender.addChatMessage(new TextComponentString("You must be holding a filled geogem in both of your hands"));
+				sender.sendMessage(new TextComponentString("You must be holding a filled geogem in both of your hands"));
 			} else {
-				RoomBlueprint blueprint = new RoomBlueprint(player.worldObj,
+				RoomBlueprint blueprint = new RoomBlueprint(player.world,
 						PositionCrystal.getBlockPosition(main),
 						PositionCrystal.getBlockPosition(offhand),
 						true);
 				
 				if (DungeonRoomRegistry.instance().writeRoomAsFile(blueprint, args[0], 1, new LinkedList<>())) {
-					sender.addChatMessage(new TextComponentString("Room written!"));
+					sender.sendMessage(new TextComponentString("Room written!"));
 				} else {
-					sender.addChatMessage(new TextComponentString("An error was encountered while writing the room"));
+					sender.sendMessage(new TextComponentString("An error was encountered while writing the room"));
 				}
 			}
 		} else {
-			sender.addChatMessage(new TextComponentString("This command must be run as a creative player"));
+			sender.sendMessage(new TextComponentString("This command must be run as a creative player"));
 		}
 	}
 

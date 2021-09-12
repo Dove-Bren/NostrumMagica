@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
@@ -30,7 +30,7 @@ public class TileEntityPortalRenderer extends TileEntitySpecialRenderer<NostrumP
 	}
 	
 	@Override
-	public void renderTileEntityAt(NostrumPortalTileEntityBase te, double x, double y, double z, float partialTicks, int destroyStage) {
+	public void render(NostrumPortalTileEntityBase te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
 		double rotY = (Math.atan2(z+.5, x+.5) / (2 * Math.PI));
 		
 		rotY *= -360f;
@@ -45,7 +45,7 @@ public class TileEntityPortalRenderer extends TileEntitySpecialRenderer<NostrumP
 		GlStateManager.rotate((float)rotY, 0, 1, 0);
 		
 		
-		VertexBuffer wr = Tessellator.getInstance().getBuffer();
+		BufferBuilder wr = Tessellator.getInstance().getBuffer();
 		Minecraft.getMinecraft().getTextureManager().bindTexture(TEX_LOC);
 		
 		GlStateManager.enableBlend();

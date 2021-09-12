@@ -27,7 +27,7 @@ public class DragonLandTask extends EntityAIBase {
 	}
 	
 	@Override
-	public boolean continueExecuting() {
+	public boolean shouldContinueExecuting() {
 		
 		if (dragon.onGround || dragon.isInWater()) {
 			return false;
@@ -52,7 +52,7 @@ public class DragonLandTask extends EntityAIBase {
 		// Don't trust heightmap; just loop. Not that bad.
 		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(dragon.getPosition());
 		while(pos.getY() > 0) {
-			if (dragon.worldObj.isAirBlock(pos)) {
+			if (dragon.world.isAirBlock(pos)) {
 				pos.setY(pos.getY() - 1);
 			} else {
 				break;

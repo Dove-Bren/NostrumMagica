@@ -1,9 +1,9 @@
 package com.smanzana.nostrummagica.items;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -37,6 +37,7 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
@@ -120,7 +121,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 	}
 	
 	public static boolean IsExtended(ItemStack stack) {
-		if (stack == null || !(stack.getItem() instanceof HookshotItem)) {
+		if (stack.isEmpty() || !(stack.getItem() instanceof HookshotItem)) {
 			return false;
 		}
 		
@@ -128,7 +129,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 	}
 	
 	public static void SetExtended(ItemStack stack, boolean extended) {
-		if (stack == null || !(stack.getItem() instanceof HookshotItem)) {
+		if (stack.isEmpty() || !(stack.getItem() instanceof HookshotItem)) {
 			return;
 		}
 		
@@ -157,7 +158,8 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 	}
 
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+		final ItemStack itemStackIn = playerIn.getHeldItem(hand); 
 		final HookshotType type = GetType(itemStackIn);
 		if (true) {
 			if (type == null) {
@@ -178,8 +180,8 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 					} else {
 						// Check if there are other hookshots that might want this event if we're in the mainhand (and checked first)
 						if (hand == EnumHand.MAIN_HAND) {
-							@Nullable ItemStack offHandStack = playerIn.getHeldItemOffhand();
-							if (offHandStack != null && offHandStack.getItem() instanceof HookshotItem) {
+							@Nonnull ItemStack offHandStack = playerIn.getHeldItemOffhand();
+							if (!offHandStack.isEmpty() && offHandStack.getItem() instanceof HookshotItem) {
 								// See if it's hooked yet or not. If it's hooked, we'll handle this event. Otherwise, we'll pass it
 								@Nullable EntityHookShot otherHook = GetHookEntity(worldIn, offHandStack);
 								if (IsExtended(offHandStack) && otherHook != null && otherHook.isHooked()) {
@@ -202,12 +204,12 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 			} else {
 				if (!worldIn.isRemote) {
 					if (playerIn.dimension == ModConfig.config.sorceryDimensionIndex()) {
-						playerIn.addChatComponentMessage(new TextComponentTranslation("info.hookshot.bad_dim"));
+						playerIn.sendMessage(new TextComponentTranslation("info.hookshot.bad_dim"));
 					} else {
 						EntityHookShot hook = new EntityHookShot(worldIn, playerIn, getMaxDistance(itemStackIn), 
 								ProjectileTrigger.getVectorForRotation(playerIn.rotationPitch, playerIn.rotationYaw).scale(getVelocity(itemStackIn)),
 								TypeFromMeta(itemStackIn.getMetadata()));
-						worldIn.spawnEntityInWorld(hook);
+						worldIn.spawnEntity(hook);
 						SetHook(itemStackIn, hook);
 						NostrumMagicaSounds.HOOKSHOT_FIRE.play(worldIn, playerIn.posX, playerIn.posY, playerIn.posZ);
 					}
@@ -230,7 +232,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 	}
 	
 	public static HookshotType GetType(ItemStack stack) {
-		if (stack == null) {
+		if (stack.isEmpty()) {
 			return HookshotType.WEAK;
 		}
 		
@@ -347,8 +349,8 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 			if (entityIn instanceof EntityLivingBase) {
 				EntityLivingBase living = (EntityLivingBase) entityIn;
 				final EnumHand hand = (itemSlot == 0 ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND);
-				@Nullable final ItemStack otherHand = living.getHeldItem(hand == EnumHand.MAIN_HAND ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND);
-				if (otherHand != null && otherHand.getItem() instanceof HookshotItem && IsExtended(otherHand)) {
+				@Nonnull final ItemStack otherHand = living.getHeldItem(hand == EnumHand.MAIN_HAND ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND);
+				if (!otherHand.isEmpty() && otherHand.getItem() instanceof HookshotItem && IsExtended(otherHand)) {
 					EntityHookShot otherHook = GetHookEntity(worldIn, otherHand);
 					if (otherHook != null && otherHook.isPulling() && otherHook.ticksExisted < anchor.ticksExisted) {
 						ClearHookEntity(worldIn, stack);
@@ -386,9 +388,9 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
 		for (HookshotType type : HookshotType.values()) {
-			subItems.add(new ItemStack(itemIn, 1, MakeMeta(type, false)));
+			subItems.add(new ItemStack(this, 1, MakeMeta(type, false)));
 		}
 	}
 	
@@ -433,7 +435,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 	public boolean isElytraFlying(EntityLivingBase entityIn, ItemStack stack) {
 		if (IsExtended(stack)) {
 			// See if we're being pulled
-			EntityHookShot anchor = GetHookEntity(entityIn.worldObj, stack);
+			EntityHookShot anchor = GetHookEntity(entityIn.world, stack);
 			return anchor != null && anchor.isPulling();
 		}
 		

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -19,6 +20,7 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -37,7 +39,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldSavedData;
+import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -76,7 +78,7 @@ public class SeekerIdol extends Item implements ILoreTagged {
 	}
 	
 	private SpellComponentWrapper getNestedComponent(ItemStack itemStackIn) {
-		if (itemStackIn == null || !(itemStackIn.getItem() instanceof SeekerIdol))
+		if (itemStackIn.isEmpty() || !(itemStackIn.getItem() instanceof SeekerIdol))
 			return null;
 		
 		NBTTagCompound nbt = itemStackIn.getTagCompound();
@@ -128,7 +130,8 @@ public class SeekerIdol extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		if (worldIn.isRemote)
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
 		
@@ -139,9 +142,9 @@ public class SeekerIdol extends Item implements ILoreTagged {
 		
 		Vec3d dir = findShrineDir(worldIn, playerIn.getPositionVector(), component);
 		if (dir == null) {
-			playerIn.addChatComponentMessage(new TextComponentString("Could not find a shrine of that type! Explore the world more."));
+			playerIn.sendMessage(new TextComponentString("Could not find a shrine of that type! Explore the world more."));
 		} else {
-			playerIn.addVelocity(dir.xCoord * 1, 0, dir.zCoord * 1);
+			playerIn.addVelocity(dir.x* 1, 0, dir.z* 1);
 			playerIn.velocityChanged = true;
 			itemStackIn.damageItem(1, playerIn);
 		}
@@ -183,7 +186,7 @@ public class SeekerIdol extends Item implements ILoreTagged {
 			return null;
 		
 		// We make y the same here so there's no vertical pull
-		Vec3d to = new Vec3d(targ.getX(), pos.yCoord, targ.getZ());
+		Vec3d to = new Vec3d(targ.getX(), pos.y, targ.getZ());
 		
 		NostrumMagica.logger.info("SeekerIdol targetting (" + targ.getX() + ", " + targ.getZ() + ")");
 		
@@ -191,7 +194,7 @@ public class SeekerIdol extends Item implements ILoreTagged {
 	}
 	
 	public static void setComponent(ItemStack itemStack, SpellComponentWrapper component) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SeekerIdol))
+		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SeekerIdol))
 			return;
 		
 		NBTTagCompound nbt = itemStack.getTagCompound();
@@ -222,7 +225,7 @@ public class SeekerIdol extends Item implements ILoreTagged {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		SpellComponentWrapper component = getNestedComponent(stack);
 		if (component == null)
 			return;
@@ -297,7 +300,7 @@ public class SeekerIdol extends Item implements ILoreTagged {
 			ItemStack rune = inv.getStackInSlot(4);
 			SpellComponentWrapper comp = SpellRune.toComponentWrapper(rune);
 			if (comp == null) {
-				return null;
+				return ItemStack.EMPTY;
 			}
 			
 			return SeekerIdol.getItemStack(comp);

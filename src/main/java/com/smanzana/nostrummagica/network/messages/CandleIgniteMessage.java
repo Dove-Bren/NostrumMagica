@@ -38,12 +38,12 @@ public class CandleIgniteMessage implements IMessage {
 					return;
 				}
 				
-				IBlockState state = player.worldObj.getBlockState(pos);
+				IBlockState state = player.world.getBlockState(pos);
 				if (state == null || !(state.getBlock() instanceof Candle)) {
 					return;
 				}
 				
-				Candle.setReagent(player.worldObj, pos, state, type);
+				Candle.setReagent(player.world, pos, state, type);
 			});
 			
 			return null;

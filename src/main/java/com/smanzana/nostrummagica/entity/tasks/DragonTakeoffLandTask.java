@@ -37,7 +37,7 @@ public class DragonTakeoffLandTask extends EntityAIBase {
 	}
 
 	@Override
-	public boolean continueExecuting() {
+	public boolean shouldContinueExecuting() {
 		return dragon.isFlightTransitioning();
 	}
 	

@@ -22,9 +22,9 @@ public abstract class InfoButton extends GuiButton {
 	
 	@Override
 	public void drawButtonForegroundLayer(int mouseX, int mouseY) {
-		if (mouseX >= this.xPosition && mouseY > this.yPosition
-			&& mouseX <= this.xPosition + this.width
-			&& mouseY <= this.yPosition + this.height) {
+		if (mouseX >= this.x && mouseY > this.y
+			&& mouseX <= this.x + this.width
+			&& mouseY <= this.y + this.height) {
 			Minecraft mc = Minecraft.getMinecraft();
 			GuiUtils.drawHoveringText(getDescription(),
 					mouseX,
@@ -32,7 +32,7 @@ public abstract class InfoButton extends GuiButton {
 					mc.displayWidth,
 					mc.displayHeight,
 					100,
-					mc.fontRendererObj);
+					mc.fontRenderer);
 		}
 	}
 }

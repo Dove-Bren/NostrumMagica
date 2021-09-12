@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -16,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -79,9 +81,9 @@ public class NostrumAetherResourceItem extends Item implements ILoreTagged, IAet
      */
     @SideOnly(Side.CLIENT)
     @Override
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
     	for (AetherResourceType type : AetherResourceType.values()) {
-    		subItems.add(new ItemStack(itemIn, 1, getMetaFromType(type)));
+    		subItems.add(new ItemStack(this, 1, getMetaFromType(type)));
     	}
 	}
     
@@ -124,10 +126,7 @@ public class NostrumAetherResourceItem extends Item implements ILoreTagged, IAet
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-		if (stack == null)
-			return;
-		
+	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		AetherResourceType type = getTypeFromMeta(stack.getMetadata());
 		if (type == null)
 			return;
@@ -146,7 +145,48 @@ public class NostrumAetherResourceItem extends Item implements ILoreTagged, IAet
 	}
 	
 	@Override
-	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		
+//		// Copied from ItemBed (vanilla) with some modifications
+//		AetherResourceType type = getTypeFromMeta(stack.getMetadata()); 
+//		
+//		if (type != AetherResourceType.CRYSTAL_SMALL && type != AetherResourceType.CRYSTAL_MEDIUM) {
+//			return EnumActionResult.PASS;
+//		}
+//		
+//		if (worldIn.isRemote) {
+//			return EnumActionResult.SUCCESS;
+//		} else {
+//			IBlockState iblockstate = worldIn.getBlockState(pos);
+//			Block block = iblockstate.getBlock();
+//
+//			if (!block.isReplaceable(worldIn, pos)) {
+//				pos = pos.offset(facing);
+//			}
+//			
+//			// If setting on the side of a non-full block, promote to a regular standing one
+//			if (facing != EnumFacing.UP) {
+//				if (!worldIn.getBlockState(pos.offset(facing.getOpposite())).isFullBlock()) {
+//					facing = EnumFacing.UP;
+//				}
+//			}
+//
+//			if (playerIn.canPlayerEdit(pos, facing, stack) && (block.isReplaceable(worldIn, pos) || worldIn.isAirBlock(pos))) {
+//				IBlockState iblockstate1 = ManiCrystal.instance().getDefaultState()
+//						.withProperty(ManiCrystal.FACING, facing)
+//						.withProperty(ManiCrystal.LEVEL, type == AetherResourceType.CRYSTAL_MEDIUM ? 1 : 0);
+//
+//				worldIn.setBlockState(pos, iblockstate1, 11);
+//
+//				SoundType soundtype = iblockstate1.getBlock().getSoundType(iblockstate1, worldIn, pos, playerIn);
+//				worldIn.playSound((EntityPlayer)null, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
+//				--stack.stackSize;
+//				return EnumActionResult.SUCCESS;
+//			} else {
+//				return EnumActionResult.FAIL;
+//			}
+//		}
+		
 		return EnumActionResult.PASS;
 	}
 

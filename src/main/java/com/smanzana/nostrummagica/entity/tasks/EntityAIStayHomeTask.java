@@ -66,7 +66,7 @@ public class EntityAIStayHomeTask<T extends EntityCreature> extends EntityAIBase
 						home.getX() + (Math.cos(angle) * dist),
 						home.getY() + (Math.cos(tilt) * dist),
 						home.getZ() + (Math.sin(angle) * dist));
-				if (!creature.worldObj.isAirBlock(new BlockPos(targ.xCoord, targ.yCoord, targ.zCoord))) {
+				if (!creature.world.isAirBlock(new BlockPos(targ.x, targ.y, targ.z))) {
 					targ = null;
 				}
 			} while (targ == null && attempts > 0);
@@ -76,14 +76,14 @@ public class EntityAIStayHomeTask<T extends EntityCreature> extends EntityAIBase
 			}
 			
 			//this.creature.getNavigator().tryMoveToXYZ(targ.xCoord, targ.yCoord, targ.zCoord, this.speed);
-			this.creature.getMoveHelper().setMoveTo(targ.xCoord, targ.yCoord, targ.zCoord, this.speed);
+			this.creature.getMoveHelper().setMoveTo(targ.x, targ.y, targ.z, this.speed);
 		}
 	}
 
 	/**
 	 * Returns whether an in-progress EntityAIBase should continue executing
 	 */
-	public boolean continueExecuting() {
+	public boolean shouldContinueExecuting() {
 		EntityMoveHelper mover = creature.getMoveHelper();
 		return mover.isUpdating() && ((mover.getX() - creature.posX) + (mover.getY() - creature.posY) + (mover.getZ() - creature.posZ) > 2);
 	}

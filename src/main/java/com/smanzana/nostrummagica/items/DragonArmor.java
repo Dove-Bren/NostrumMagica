@@ -17,6 +17,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EnumCreatureAttribute;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -32,6 +33,7 @@ import net.minecraft.network.datasync.DataSerializer;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -320,9 +322,9 @@ public class DragonArmor extends Item {
 		Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();	
 
 		if (equipmentSlot == this.slot) {
-			multimap.put(SharedMonsterAttributes.ARMOR.getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.ordinal()], "Armor modifier", (double)this.getArmorValue(), 0));
-			multimap.put(SharedMonsterAttributes.ARMOR_TOUGHNESS.getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.ordinal()], "Armor toughness", this.getArmorToughness(), 0));
-			multimap.put(AttributeMagicResist.instance().getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.ordinal()], "Magic Resist", (double)this.getMagicResistance(), 0));
+			multimap.put(SharedMonsterAttributes.ARMOR.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.ordinal()], "Armor modifier", (double)this.getArmorValue(), 0));
+			multimap.put(SharedMonsterAttributes.ARMOR_TOUGHNESS.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.ordinal()], "Armor toughness", this.getArmorToughness(), 0));
+			multimap.put(AttributeMagicResist.instance().getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.ordinal()], "Magic Resist", (double)this.getMagicResistance(), 0));
 		}
 
 		return multimap;
@@ -340,7 +342,7 @@ public class DragonArmor extends Item {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		// Disable vanilla's so we can do our own
 		if (!stack.hasTagCompound() || !stack.getTagCompound().hasKey("HideFlags", 99)) {
 			NBTTagCompound tag = stack.getTagCompound();
@@ -351,6 +353,8 @@ public class DragonArmor extends Item {
 			tag.setInteger("HideFlags", 2);
 			stack.setTagCompound(tag);
 		}
+		
+		EntityPlayer player = NostrumMagica.proxy.getPlayer();
 		
 		// Copied from vanilla's ItemStack
 		for (DragonEquipmentSlot dragonSlot : DragonEquipmentSlot.values())
@@ -370,13 +374,13 @@ public class DragonArmor extends Item {
 
 					if (attributemodifier.getID() == Item.ATTACK_DAMAGE_MODIFIER)
 					{
-						d0 = d0 + playerIn.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getBaseValue();
+						d0 = d0 + player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getBaseValue();
 						d0 = d0 + (double)EnchantmentHelper.getModifierForCreature(stack, EnumCreatureAttribute.UNDEFINED);
 						flag = true;
 					}
 					else if (attributemodifier.getID() == Item.ATTACK_SPEED_MODIFIER)
 					{
-						d0 += playerIn.getEntityAttribute(SharedMonsterAttributes.ATTACK_SPEED).getBaseValue();
+						d0 += player.getEntityAttribute(SharedMonsterAttributes.ATTACK_SPEED).getBaseValue();
 						flag = true;
 					}
 
@@ -408,7 +412,7 @@ public class DragonArmor extends Item {
 			}
 		}
 		
-		super.addInformation(stack, playerIn, tooltip, advanced);
+		super.addInformation(stack, worldIn, tooltip, flagIn);
 	}
 	
 }

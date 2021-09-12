@@ -43,8 +43,8 @@ public class DragonMeleeAttackTask extends EntityAIAttackMelee {
 	}
 	
 	@Override
-	public boolean continueExecuting() {
-		boolean ret = super.continueExecuting();
+	public boolean shouldContinueExecuting() {
+		boolean ret = super.shouldContinueExecuting();
 		this.biteTick = Math.max(0, this.biteTick - 1);
 		
 		if (ret) {

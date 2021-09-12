@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.lwjgl.input.Keyboard;
@@ -48,6 +49,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IProjectile;
@@ -68,6 +70,7 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -84,11 +87,11 @@ import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -448,11 +451,11 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 
         if (equipmentSlot == this.armorType)
         {
-            multimap.put(SharedMonsterAttributes.ARMOR.getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor modifier", (double)this.armor, 0));
-            multimap.put(SharedMonsterAttributes.ARMOR_TOUGHNESS.getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor toughness", 1, 0));
-            multimap.put(SharedMonsterAttributes.MOVEMENT_SPEED.getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_SPEED_MODS[equipmentSlot.getIndex()], "Armor speed boost", (double)this.speedBoost, 2));
-            multimap.put(AttributeMagicResist.instance().getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Resist", (double)this.magicResistAmount, 0));
-            multimap.put(AttributeMagicReduction.instance(this.element).getAttributeUnlocalizedName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Reduction", (double)this.magicReducAmount, 0));
+            multimap.put(SharedMonsterAttributes.ARMOR.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor modifier", (double)this.armor, 0));
+            multimap.put(SharedMonsterAttributes.ARMOR_TOUGHNESS.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor toughness", 1, 0));
+            multimap.put(SharedMonsterAttributes.MOVEMENT_SPEED.getName(), new AttributeModifier(ARMOR_SPEED_MODS[equipmentSlot.getIndex()], "Armor speed boost", (double)this.speedBoost, 2));
+            multimap.put(AttributeMagicResist.instance().getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Resist", (double)this.magicResistAmount, 0));
+            multimap.put(AttributeMagicReduction.instance(this.element).getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Reduction", (double)this.magicReducAmount, 0));
         }
 
         return multimap;
@@ -556,7 +559,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		
 		for (EntityEquipmentSlot slot : new EntityEquipmentSlot[]{EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET}) {
 			ItemStack inSlot = entity.getItemStackFromSlot(slot);
-			if (inSlot == null || !(inSlot.getItem() instanceof EnchantedArmor)) {
+			if (inSlot.isEmpty() || !(inSlot.getItem() instanceof EnchantedArmor)) {
 				continue;
 			}
 			
@@ -747,7 +750,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 					
 					// Refresh nearby tornados
 					if (player.onGround)
-					for (EntityAreaEffect cloud : world.getEntitiesWithinAABB(EntityAreaEffect.class, (new AxisAlignedBB(0, 0, 0, 1, 1, 1)).offset(player.posX, player.posY, player.posZ).expandXyz(5), (effect) -> {
+					for (EntityAreaEffect cloud : world.getEntitiesWithinAABB(EntityAreaEffect.class, (new AxisAlignedBB(0, 0, 0, 1, 1, 1)).offset(player.posX, player.posY, player.posZ).grow(5), (effect) -> {
 						return effect != null
 								&& (effect.getCustomParticle() == EnumParticleTypes.SWEEP_ATTACK || effect.getParticle() == EnumParticleTypes.SWEEP_ATTACK);
 					})) {
@@ -793,6 +796,9 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		Map<EntityEquipmentSlot, ItemStack> map = LastEquipState.get(entity);
 		if (map == null) {
 			map = new EnumMap<>(EntityEquipmentSlot.class);
+			for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
+				map.put(slot, ItemStack.EMPTY);
+			}
 			LastEquipState.put(entity, map);
 		}
 		return map;
@@ -805,8 +811,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 				continue;
 			}
 			
-			@Nullable final ItemStack inSlot = entity.getItemStackFromSlot(slot);
-			@Nullable final ItemStack lastTick = map.get(slot);
+			@Nonnull final ItemStack inSlot = entity.getItemStackFromSlot(slot);
+			@Nonnull final ItemStack lastTick = map.get(slot);
 			
 			// Same check Vanilla uses to apply attributes
 			if (!ItemStack.areItemStacksEqual(inSlot, lastTick)) {
@@ -823,7 +829,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			}
 			
 			ItemStack inSlot = entity.getItemStackFromSlot(slot);
-			if (inSlot != null  && inSlot.getItem() instanceof EnchantedArmor) {
+			if (!inSlot.isEmpty()  && inSlot.getItem() instanceof EnchantedArmor) {
 				return true;
 			}
 		}
@@ -858,7 +864,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 				ItemStack inSlot = entity.getItemStackFromSlot(slot);
 				final int setCount;
 				final @Nullable EMagicElement armorElem;
-				if (inSlot != null) {
+				if (!inSlot.isEmpty()) {
 					inSlot = inSlot.copy();
 					
 					if (inSlot.getItem() instanceof EnchantedArmor) {
@@ -881,7 +887,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 							: 0;
 						
 					// Important to do this even with 0 to remove previous bonuses
-					attribMap.put(AttributeMagicReduction.instance(elem).getAttributeUnlocalizedName(), new AttributeModifier(SET_MODIFIERS[slot.getIndex()], "Magic Reduction (Set)", reduct, 0));
+					attribMap.put(AttributeMagicReduction.instance(elem).getName(), new AttributeModifier(SET_MODIFIERS[slot.getIndex()], "Magic Reduction (Set)", reduct, 0));
 				}
 				
 				// Add captured value to map
@@ -897,8 +903,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		
 		// Check for world-changing full set bonuses
 		// Note: Cheat and just look at helm. if helm isn't right, full set isn't set anyways
-		@Nullable ItemStack helm = entity.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
-		if (helm != null && helm.getItem() instanceof EnchantedArmor) {
+		@Nonnull ItemStack helm = entity.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
+		if (!helm.isEmpty() && helm.getItem() instanceof EnchantedArmor) {
 			EnchantedArmor type = (EnchantedArmor) helm.getItem();
 			final int setCount = GetSetPieces(entity, type);
 			if (setCount == 4) {
@@ -918,7 +924,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 					} else {
 						if (level == 1 || NostrumMagica.rand.nextBoolean()) {
 							try {
-								Field fireField = ReflectionHelper.findField(Entity.class, "fire", "field_70151_c");
+								Field fireField = ObfuscationReflectionHelper.findField(Entity.class, "fire");
 								fireField.setAccessible(true);
 								
 								int val = fireField.getInt(entity);
@@ -970,8 +976,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 				continue;
 			}
 			
-			@Nullable ItemStack inSlot = entity.getItemStackFromSlot(slot);
-			if (inSlot == null || !(inSlot.getItem() instanceof EnchantedArmor)) {
+			@Nonnull ItemStack inSlot = entity.getItemStackFromSlot(slot);
+			if (inSlot.isEmpty() || !(inSlot.getItem() instanceof EnchantedArmor)) {
 				continue;
 			}
 			
@@ -1007,9 +1013,9 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		final boolean showFull = Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());
-		final int setCount = this.getSetPieces(playerIn);
+		final int setCount = this.getSetPieces(NostrumMagica.proxy.getPlayer());
 		
 		final String setName = I18n.format("item.armor.set." + element.name().toLowerCase() + "." + level + ".name", new Object[0]);
 		if (showFull) {
@@ -1031,7 +1037,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 				}
 			} else {
 				// Show current
-				FindCurrentSetBonus(setMapInst, playerIn, element, level); // puts into setMapInst
+				FindCurrentSetBonus(setMapInst, NostrumMagica.proxy.getPlayer(), element, level); // puts into setMapInst
 			}
 			
 			if (!setMapInst.isEmpty()) {
@@ -1043,10 +1049,10 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 					
 					// Formatting here copied from Vanilla
 					if (val > 0) {
-						tooltip.add(TextFormatting.BLUE + " " + I18n.format("attribute.modifier.plus.0", String.format("%.2f", val), I18n.format("attribute.name." + (String)entry.getKey().getAttributeUnlocalizedName())));
+						tooltip.add(TextFormatting.BLUE + " " + I18n.format("attribute.modifier.plus.0", String.format("%.2f", val), I18n.format("attribute.name." + (String)entry.getKey().getName())));
 					} else {
 						val = -val;
-						tooltip.add(TextFormatting.RED + " " + I18n.format("attribute.modifier.take.0", String.format("%.2f", val), I18n.format("attribute.name." + (String)entry.getKey().getAttributeUnlocalizedName())));
+						tooltip.add(TextFormatting.RED + " " + I18n.format("attribute.modifier.take.0", String.format("%.2f", val), I18n.format("attribute.name." + (String)entry.getKey().getName())));
 					}
 				}
 			}
@@ -1258,7 +1264,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public void onClientTick(TickEvent.ClientTickEvent event) {
-		final EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+		final EntityPlayerSP player = Minecraft.getMinecraft().player;
 		if (player == null) {
 			return;
 		}
@@ -1424,7 +1430,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		if (entity instanceof EntityPlayer) {
 			final EntityPlayer player = (EntityPlayer) entity;
 			final EnchantedArmorStateUpdate message = new EnchantedArmorStateUpdate(ArmorState.FLYING, ArmorCheckFlying(player), player.getEntityId());
-			if (player.worldObj.isRemote) {
+			if (player.world.isRemote) {
 				assert(player == NostrumMagica.proxy.getPlayer());
 				NetworkHandler.getSyncChannel().sendToServer(message);
 			} else if (toPlayer != null) {
@@ -1537,7 +1543,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	
 	private static final boolean DoEnderDash(EntityLivingBase entity, Vec3d dir) {
 		final float dashDist = 4.0f;
-		final Vec3d idealVec = entity.getPositionVector().addVector(dashDist * dir.xCoord, dashDist * dir.yCoord, dashDist * dir.zCoord);
+		final Vec3d idealVec = entity.getPositionVector().addVector(dashDist * dir.x, dashDist * dir.y, dashDist * dir.z);
 		
 		// Do three traces from y=0, y=1, and y=2. Take best one
 		Vec3d bestResult = null;
@@ -1545,7 +1551,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		final Vec3d startPos = entity.getPositionVector();
 		for (int y = -1; y <= 4; y++) {
 			final Vec3d end = idealVec.addVector(0, y, 0);
-			RayTraceResult mop = RayTrace.raytrace(entity.worldObj, startPos.addVector(0, y, 0), end, (ent) -> {
+			RayTraceResult mop = RayTrace.raytrace(entity.world, startPos.addVector(0, y, 0), end, (ent) -> {
 				return false;
 			});
 			
@@ -1564,8 +1570,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			}
 		}
 		
-		if (entity.attemptTeleport(bestResult.xCoord, bestResult.yCoord, bestResult.zCoord)) {
-			entity.worldObj.playSound(null, startPos.xCoord, startPos.yCoord, startPos.zCoord,
+		if (bestResult != null && entity.attemptTeleport(bestResult.x, bestResult.y, bestResult.z)) {
+			entity.world.playSound(null, startPos.x, startPos.y, startPos.z,
 					SoundEvents.ENTITY_ENDERMEN_TELEPORT, SoundCategory.PLAYERS,
 					1f, 1f);
 			return true;
@@ -1643,7 +1649,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 					}
 				);
 		
-		List<ItemStack> drops;
+		NonNullList<ItemStack> drops = NonNullList.create();
 		for (BlockPos at : positions) {
 			state = world.getBlockState(at);
 			if (state == null) {
@@ -1655,10 +1661,10 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 				continue;
 			}
 			
-			drops = state.getBlock().getDrops(world, at, state, 0); // Fortune?
+			state.getBlock().getDrops(drops, world, at, state, 0); // Fortune?
 			world.destroyBlock(at, false);
 			for (ItemStack stack : drops) {
-				world.spawnEntityInWorld(new EntityItem(world, at.getX() + .5, at.getY() + .5, at.getZ() + .5, stack));
+				world.spawnEntity(new EntityItem(world, at.getX() + .5, at.getY() + .5, at.getZ() + .5, stack));
 			}
 		}
 		
@@ -1667,7 +1673,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	
 	public static final void HandleStateUpdate(ArmorState state, EntityLivingBase ent, boolean data) {
 		ItemStack chest = ent.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
-		if (chest == null || !(chest.getItem() instanceof EnchantedArmor)) {
+		if (chest.isEmpty() || !(chest.getItem() instanceof EnchantedArmor)) {
 			return;
 		}
 		
@@ -1680,14 +1686,14 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			break;
 		case JUMP:
 			// Deduct mana
-			if (!ent.worldObj.isRemote) {
+			if (!ent.world.isRemote) {
 				armor.consumeManaJump(ent);
 			}
 			break;
 		case ENDER_DASH_BACK:
-			if (!ent.worldObj.isRemote && armor.hasEnderDash(ent)) {
+			if (!ent.world.isRemote && armor.hasEnderDash(ent)) {
 				final Vec3d realLook = ent.getLookVec();
-				final Vec3d fakeLook = new Vec3d(realLook.xCoord, 0, realLook.zCoord);
+				final Vec3d fakeLook = new Vec3d(realLook.x, 0, realLook.z);
 				Vec3d dir = fakeLook.scale(-1);
 				if (DoEnderDash(ent, dir)) {
 					armor.consumeEnderDash(ent);
@@ -1699,9 +1705,9 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			}
 			break;
 		case ENDER_DASH_SIDE:
-			if (!ent.worldObj.isRemote && armor.hasEnderDash(ent)) {
+			if (!ent.world.isRemote && armor.hasEnderDash(ent)) {
 				final Vec3d realLook = ent.getLookVec();
-				final Vec3d fakeLook = new Vec3d(realLook.xCoord, 0, realLook.zCoord);
+				final Vec3d fakeLook = new Vec3d(realLook.x, 0, realLook.z);
 				final Vec3d dir = fakeLook.rotateYaw((float) ((Math.PI / 2) * (data ? -1 : 1)));
 				if (DoEnderDash(ent, dir)) {
 					armor.consumeEnderDash(ent);
@@ -1709,9 +1715,9 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			}
 			break;
 		case WIND_TORNADO:
-			if (!ent.worldObj.isRemote && armor.hasWindTornado(ent)) {
+			if (!ent.world.isRemote && armor.hasWindTornado(ent)) {
 				armor.consumeWindTornado(ent);
-				EntityAreaEffect cloud = new EntityAreaEffect(ent.worldObj, ent.posX, ent.posY, ent.posZ);
+				EntityAreaEffect cloud = new EntityAreaEffect(ent.world, ent.posX, ent.posY, ent.posZ);
 				cloud.setOwner(ent);
 				
 				cloud.height = 5f;
@@ -1751,9 +1757,9 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 					final double dy = (Math.sin(prog * 2 * Math.PI) + 1) / 2;
 					final Vec3d target = new Vec3d(cloud.posX, cloud.posY + 2 + dy, cloud.posZ);
 					final Vec3d diff = target.subtract(entity.getPositionVector());
-					entity.motionX = 0;//diff.xCoord / 2;
-					entity.motionY = diff.yCoord / 2;
-					entity.motionZ = 0;//diff.zCoord / 2;
+					entity.motionX = 0;//diff.x/ 2;
+					entity.motionY = diff.y/ 2;
+					entity.motionZ = 0;//diff.z/ 2;
 					entity.velocityChanged = true;
 					//entity.posY = 2 + dy;
 					//entity.setPositionAndUpdate(cloud.posX, cloud.posY + 2 + dy, cloud.posZ);
@@ -1762,13 +1768,13 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 				cloud.setCustomParticle(EnumParticleTypes.SWEEP_ATTACK);
 				cloud.setCustomParticleParam1(10);
 				cloud.setCustomParticleFrequency(.2f);
-				ent.worldObj.spawnEntityInWorld(cloud);
+				ent.world.spawnEntity(cloud);
 			}
 			break;
 		case DRAGON_FLIGHT_TICK:
 			// Deduct mana
 			if (data) {
-				if (!ent.worldObj.isRemote) {
+				if (!ent.world.isRemote) {
 					armor.consumeDragonFlight(ent);
 				} else {
 					if (SetArmorWingFlap(ent)) {
@@ -1793,8 +1799,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		}
 
 		EntityLivingBase ent = event.getEntityLiving();
-		@Nullable ItemStack chestplate = ent.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
-		if (chestplate == null || !(chestplate.getItem() instanceof EnchantedArmor)) {
+		@Nonnull ItemStack chestplate = ent.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
+		if (chestplate.isEmpty() || !(chestplate.getItem() instanceof EnchantedArmor)) {
 			return;
 		}
 		
@@ -1813,8 +1819,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		}
 
 		EntityLivingBase ent = event.getEntityLiving();
-		@Nullable ItemStack chestplate = ent.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
-		if (chestplate == null || !(chestplate.getItem() instanceof EnchantedArmor)) {
+		@Nonnull ItemStack chestplate = ent.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
+		if (chestplate.isEmpty() || !(chestplate.getItem() instanceof EnchantedArmor)) {
 			return;
 		}
 		

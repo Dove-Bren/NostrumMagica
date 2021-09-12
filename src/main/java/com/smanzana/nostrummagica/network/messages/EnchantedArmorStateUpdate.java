@@ -34,7 +34,7 @@ public class EnchantedArmorStateUpdate implements IMessage {
 			}
 			final boolean data = message.tag.getBoolean(NBT_DATA);
 			
-			EntityLivingBase ent = (ctx.side.isClient() ? (EntityLivingBase) NostrumMagica.proxy.getPlayer().worldObj.getEntityByID(id) : ctx.getServerHandler().playerEntity);
+			EntityLivingBase ent = (ctx.side.isClient() ? (EntityLivingBase) NostrumMagica.proxy.getPlayer().world.getEntityByID(id) : ctx.getServerHandler().player);
 			if (ent != null) {
 				EnchantedArmor.HandleStateUpdate(state, ent, data);
 				if (ctx.side.isServer()) {

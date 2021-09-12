@@ -17,6 +17,7 @@ import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -32,6 +33,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -93,9 +95,9 @@ public class MagicCharm extends Item implements ILoreTagged {
 	
 	@SideOnly(Side.CLIENT)
     @Override
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
     	for (EMagicElement element: EMagicElement.values()) {
-    		subItems.add(new ItemStack(itemIn, 1, element.ordinal()));
+    		subItems.add(new ItemStack(this, 1, element.ordinal()));
     	}
 	}
 	
@@ -130,7 +132,10 @@ public class MagicCharm extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+		
+		final ItemStack stack = playerIn.getHeldItem(hand);
+		
 		if (worldIn.isRemote)
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
 		
@@ -162,7 +167,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 		}
 		
 		if (used) {
-			stack.stackSize--;			
+			stack.shrink(1);			
 		}
 		
 		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
@@ -192,11 +197,12 @@ public class MagicCharm extends Item implements ILoreTagged {
 			if (hardness > 10 || harvestLevel > 1 || hardness < 0)
 				continue;
 			
-			List<ItemStack> drops = state.getBlock().getDrops(world, pos, state, 0);
-			if (drops != null && !drops.isEmpty())
+			NonNullList<ItemStack> drops = NonNullList.create();
+			state.getBlock().getDrops(drops, world, pos, state, 0);
+			if (!drops.isEmpty())
 				for (ItemStack drop : drops) {
 					EntityItem item = new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), drop);
-					world.spawnEntityInWorld(item);
+					world.spawnEntity(item);
 				}
 			
 			world.setBlockToAir(pos);
@@ -270,7 +276,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 				Vec3d vec = e.getPositionVector().subtract(player.getPositionVector().addVector(0, -1, 0));
 				vec = vec.normalize();
 				vec = vec.scale(2);
-				e.setVelocity(vec.xCoord, vec.yCoord, vec.zCoord);
+				e.setVelocity(vec.x, vec.y, vec.z);
 			}
 		
 		NostrumMagicaSounds.DAMAGE_WIND.play(world, player.posX, player.posY, player.posZ);
@@ -301,7 +307,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 			return true;
 		} else if (player.dimension == ModConfig.config.sorceryDimensionIndex()) {
 			// In  sorcery dimension. Return to beginning
-			BlockPos spawn = NostrumMagica.getDimensionMapper(player.worldObj).register(player.getUniqueID()).getCenterPos(NostrumEmptyDimension.SPAWN_Y);
+			BlockPos spawn = NostrumMagica.getDimensionMapper(player.world).register(player.getUniqueID()).getCenterPos(NostrumEmptyDimension.SPAWN_Y);
 			player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 1, spawn.getZ() + .5);
 			// Allow this type of teleportation by updating last coords...
 			player.lastTickPosX = player.posX;
@@ -338,7 +344,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 			List<Entity> entities = world.getEntitiesWithinAABB(EntityLivingBase.class, bb);
 			if (entities != null && !entities.isEmpty())
 				for (Entity e : entities) {
-					world.spawnEntityInWorld(new EntityLightningBolt(world, e.posX, e.posY, e.posZ, false));
+					world.spawnEntity(new EntityLightningBolt(world, e.posX, e.posY, e.posZ, false));
 				}
 		} else {
 			world.getWorldInfo().setRaining(true);
@@ -358,10 +364,10 @@ public class MagicCharm extends Item implements ILoreTagged {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		EMagicElement element = MagicCharm.getTypeFromMeta(stack.getMetadata());
 		if (element == EMagicElement.ENDER) {
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(NostrumMagica.proxy.getPlayer());
 			if (attr != null && attr.hasEnhancedTeleport()) {
 				tooltip.add(I18n.format("info.endercharm.enhanced", new Object[0]));
 			}

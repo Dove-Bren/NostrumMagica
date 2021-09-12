@@ -43,10 +43,10 @@ public class SpellCraftMessage implements IMessage {
 			String name = message.tag.getString(NBT_NAME);
 			int iconIdx = message.tag.getInteger(NBT_ICON_IDX);
 			
-			final EntityPlayerMP sp = ctx.getServerHandler().playerEntity;
+			final EntityPlayerMP sp = ctx.getServerHandler().player;
 			
 			sp.getServerWorld().addScheduledTask(() -> {
-				World world = sp.worldObj;
+				World world = sp.world;
 				
 				// Get the TE
 				TileEntity TE = world.getTileEntity(pos);

@@ -36,6 +36,7 @@ import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -150,7 +151,7 @@ public class ItemDuct extends BlockContainer {
 	public static final ItemDuct instance = new ItemDuct();
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(ItemDuctTileEntity.class, "item_duct_te");
+		GameRegistry.registerTileEntity(ItemDuctTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "item_duct_te"));
 	}
 	
 	public ItemDuct() {
@@ -204,9 +205,10 @@ public class ItemDuct extends BlockContainer {
 		return new ItemDuctTileEntity();
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, ItemStack stack) {
-		return super.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, placer, stack);
+	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+		return super.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, placer);
 	}
 	
 	@Override
@@ -256,7 +258,7 @@ public class ItemDuct extends BlockContainer {
 	}
 	
 	@Override
-	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn) {
+	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
 		addCollisionBoxToList(pos, entityBox, collidingBoxes, BASE_AABB);
 		for (EnumFacing dir : EnumFacing.VALUES) {
 			if (GetFacingActive(state.getActualState(worldIn, pos), dir)) {
@@ -287,7 +289,7 @@ public class ItemDuct extends BlockContainer {
 				output = 0;
 			} else {
 				float frac = (float) ent.itemQueue.size() / (float) ItemDuctTileEntity.MAX_STACKS;
-				output = 1 + MathHelper.floor_float(frac * 14);
+				output = 1 + MathHelper.floor(frac * 14);
 			}
 		} else {
 			output = 0;
@@ -311,7 +313,7 @@ public class ItemDuct extends BlockContainer {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 //		playerIn.openGui(NostrumMagica.instance,
 //				NostrumGui.activeHopperID, worldIn,
 //				pos.getX(), pos.getY(), pos.getZ());
@@ -321,10 +323,10 @@ public class ItemDuct extends BlockContainer {
 		return false;
 	}
 	
-	@Override
-	public boolean isFullyOpaque(IBlockState state) {
-		return true; // Copying vanilla
-	}
+//	@Override
+//	public boolean isFullyOpaque(IBlockState state) {
+//		return true; // Copying vanilla
+//	}
 	
 	@Override
 	public EnumBlockRenderType getRenderType(IBlockState state) {
@@ -374,7 +376,7 @@ public class ItemDuct extends BlockContainer {
 			
 			public static final ItemEntry fromNBT(NBTTagCompound tag) {
 				final long tick = tag.getLong(NBT_TICK);
-				final ItemStack stack = ItemStack.loadItemStackFromNBT(tag.getCompoundTag(NBT_ITEM));
+				final ItemStack stack = new ItemStack(tag.getCompoundTag(NBT_ITEM));
 				final EnumFacing dir = EnumFacing.VALUES[tag.getInteger(NBT_DIRECTION)];
 				return new ItemEntry(tick, stack, dir);
 			}
@@ -399,11 +401,11 @@ public class ItemDuct extends BlockContainer {
 			public ItemStack getStackInSlot(int slot) {
 				// Treat slot 0 as special always-available slot for insertion
 				if (slot == 0) {
-					return null;
+					return ItemStack.EMPTY;
 				}
 				
 				if (slot >= entity.itemQueue.size()) {
-					return null;
+					return ItemStack.EMPTY;
 				}
 				
 				return entity.itemQueue.get(slot).stack;
@@ -421,10 +423,15 @@ public class ItemDuct extends BlockContainer {
 			@Override
 			public ItemStack extractItem(int slot, int amount, boolean simulate) {
 				if (slot != 0) {
-					return null;
+					return ItemStack.EMPTY;
 				}
 				
 				return entity.extractItem(amount, this.side, simulate);
+			}
+
+			@Override
+			public int getSlotLimit(int slot) {
+				return 64;
 			}
 			
 		}
@@ -518,14 +525,14 @@ public class ItemDuct extends BlockContainer {
 		}
 		
 		protected boolean tryAdd(@Nullable ItemStack stack, EnumFacing dir) {
-			if (stack == null) {
+			if (stack.isEmpty()) {
 				return false;
 			}
 			
 			if (isFull()) {
 				// Drop on floor
 				// TODO make it actually drop on the face that it's being added?
-				InventoryHelper.spawnItemStack(worldObj, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, stack);
+				InventoryHelper.spawnItemStack(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, stack);
 				return false;
 			}
 			
@@ -553,17 +560,17 @@ public class ItemDuct extends BlockContainer {
 				tryAdd(stack, side);
 			}
 			
-			return null; // Always 'take' it
+			return ItemStack.EMPTY; // Always 'take' it
 		}
 
 		public ItemStack extractItem(int amount, EnumFacing side, boolean simulate) {
 			// No extraction at all!
-			return null;
+			return ItemStack.EMPTY;
 		}
 		
 		@Override
 		public void update() {
-			if (worldObj != null && !worldObj.isRemote) {
+			if (world != null && !world.isRemote) {
 				this.ticks++;
 				
 				// Check any items and see if it's time they move on.
@@ -611,7 +618,7 @@ public class ItemDuct extends BlockContainer {
 			// First, try direction it wants
 			stack = attemptPush(stack, entry.inputDirection.getOpposite());
 			
-			if (stack != null) {
+			if (!stack.isEmpty()) {
 				// Push in random directions
 				List<EnumFacing> rand = Lists.newArrayList(EnumFacing.VALUES);
 				Collections.shuffle(rand);
@@ -623,16 +630,16 @@ public class ItemDuct extends BlockContainer {
 					
 					stack = attemptPush(stack, dir);
 							
-					if (stack == null) {
+					if (stack.isEmpty()) {
 						break;
 					}
 				}
 			}
 			
-			if (stack != null) {
+			if (!stack.isEmpty()) {
 				// Throw on the floor!
 				// TODO make it actually drop on the face that we would be coming out of
-				InventoryHelper.spawnItemStack(worldObj, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, stack);
+				InventoryHelper.spawnItemStack(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, stack);
 			}
 		}
 		
@@ -644,8 +651,8 @@ public class ItemDuct extends BlockContainer {
 		 * @param direction
 		 * @return
 		 */
-		private @Nullable ItemStack attemptPush(ItemStack stack, EnumFacing direction) {
-			@Nullable TileEntity te = worldObj.getTileEntity(pos.offset(direction));
+		private @Nonnull ItemStack attemptPush(ItemStack stack, EnumFacing direction) {
+			@Nullable TileEntity te = world.getTileEntity(pos.offset(direction));
 			
 			if (te != null) {
 				if (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite())) {
@@ -659,9 +666,9 @@ public class ItemDuct extends BlockContainer {
 					
 					// Special cast for stupid chests :P
 					if (te instanceof TileEntityChest) {
-						IBlockState state = worldObj.getBlockState(pos.offset(direction));
+						IBlockState state = world.getBlockState(pos.offset(direction));
 						if (state != null && state.getBlock() instanceof BlockChest) {
-							inv = ((BlockChest)state.getBlock()).getContainer(worldObj, pos.offset(direction), true);
+							inv = ((BlockChest)state.getBlock()).getContainer(world, pos.offset(direction), true);
 						}
 					}
 					
@@ -672,7 +679,7 @@ public class ItemDuct extends BlockContainer {
 			return stack;
 		}
 		
-		private @Nullable ItemStack pushInto(ItemStack stack, IInventory inventory, EnumFacing direction) {
+		private @Nonnull ItemStack pushInto(ItemStack stack, IInventory inventory, EnumFacing direction) {
 			if (inventory instanceof ISidedInventory) {
 				ISidedInventory sided = (ISidedInventory) inventory;
 				for (int insertIndex : sided.getSlotsForFace(direction.getOpposite())) {
@@ -684,14 +691,14 @@ public class ItemDuct extends BlockContainer {
 					@Nullable ItemStack inSlot = sided.getStackInSlot(insertIndex);
 					final int maxStack = (stack.isStackable() ? Math.min(stack.getMaxStackSize(), sided.getInventoryStackLimit()) : 1);
 					final int taken;
-					if (inSlot == null) {
-						taken = Math.min(maxStack, stack.stackSize);
+					if (inSlot.isEmpty()) {
+						taken = Math.min(maxStack, stack.getCount());
 						inSlot = stack.splitStack(maxStack);
 					} else if (ItemStacks.stacksMatch(stack, inSlot)) {
-						taken = Math.min(maxStack - inSlot.stackSize, stack.stackSize);
+						taken = Math.min(maxStack - inSlot.getCount(), stack.getCount());
 						if (taken > 0) {
 							stack.splitStack(taken);
-							inSlot.stackSize += taken;
+							inSlot.setCount(inSlot.getCount() + taken);
 						}
 					} else {
 						taken = 0;
@@ -699,8 +706,8 @@ public class ItemDuct extends BlockContainer {
 					
 					if (taken > 0) {
 						sided.setInventorySlotContents(insertIndex, inSlot);
-						if (stack.stackSize <= 0) {
-							stack = null;
+						if (stack.getCount() <= 0) {
+							stack = ItemStack.EMPTY;
 							break;
 						}
 					}
@@ -712,7 +719,7 @@ public class ItemDuct extends BlockContainer {
 			return stack;
 		}
 		
-		private @Nullable ItemStack pushInto(ItemStack stack, IItemHandler handler, EnumFacing direction) {
+		private @Nonnull ItemStack pushInto(ItemStack stack, IItemHandler handler, EnumFacing direction) {
 			// TODO safe to always run with false?
 			return ItemHandlerHelper.insertItem(handler, stack, false);
 		}

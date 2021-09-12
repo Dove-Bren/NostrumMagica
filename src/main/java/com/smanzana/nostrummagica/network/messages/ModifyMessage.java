@@ -39,9 +39,9 @@ public class ModifyMessage implements IMessage {
 			boolean bool = message.tag.getBoolean(NBT_VAL_B);
 			float flt = message.tag.getFloat(NBT_VAL_F);
 			
-			ctx.getServerHandler().playerEntity.getServerWorld().addScheduledTask(() -> {
-				EntityPlayer sp = ctx.getServerHandler().playerEntity;
-				World world = sp.worldObj;
+			ctx.getServerHandler().player.getServerWorld().addScheduledTask(() -> {
+				EntityPlayer sp = ctx.getServerHandler().player;
+				World world = sp.world;
 				
 				// Get the TE
 				TileEntity TE = world.getTileEntity(pos);

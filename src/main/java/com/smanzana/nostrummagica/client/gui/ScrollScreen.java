@@ -83,8 +83,8 @@ public class ScrollScreen extends GuiScreen {
 		
 		Gui.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
 		
-		final int nameWidth = this.fontRendererObj.getStringWidth(this.name);
-		this.fontRendererObj.drawString(this.name, leftOffset + (TEXT_BACK_WIDTH / 2) - (nameWidth / 2), topOffset + titleYOffset, color);
+		final int nameWidth = this.fontRenderer.getStringWidth(this.name);
+		this.fontRenderer.drawString(this.name, leftOffset + (TEXT_BACK_WIDTH / 2) - (nameWidth / 2), topOffset + titleYOffset, color);
 		
 		if (this.icon != null) {
 			final int iconLen = 32;
@@ -97,7 +97,7 @@ public class ScrollScreen extends GuiScreen {
 		
 		int i = 0;
 		for (String line : this.components) {
-			this.fontRendererObj.drawString(line, leftOffset + listXOffset, 10 + topOffset + listYOffset + (i * this.fontRendererObj.FONT_HEIGHT + 2), 0xFF000000);
+			this.fontRenderer.drawString(line, leftOffset + listXOffset, 10 + topOffset + listYOffset + (i * this.fontRenderer.FONT_HEIGHT + 2), 0xFF000000);
 			i++;
 		}
 		

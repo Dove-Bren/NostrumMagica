@@ -27,7 +27,7 @@ public class TrialFire extends ShrineTrial {
 			if (!attr.hasTrial(this.element))
 				return;
 			
-			if (e.getSource() != DamageSource.lava)
+			if (e.getSource() != DamageSource.LAVA)
 				return;
 			
 			this.complete((EntityPlayer) e.getEntityLiving());

@@ -37,8 +37,8 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 	
 	@Override
 	public void draw(INostrumMagic attr, Minecraft mc, int x, int y, int width, int height, int mouseX, int mouseY) {
-		int len = mc.fontRendererObj.getStringWidth(desc);
-		mc.fontRendererObj.drawStringWithShadow(desc, x + (width / 2) + (-len / 2), y, 0xFFFFFFFF);
+		int len = mc.fontRenderer.getStringWidth(desc);
+		mc.fontRenderer.drawStringWithShadow(desc, x + (width / 2) + (-len / 2), y, 0xFFFFFFFF);
 		
 		if (pages == null) {
 			String translation = I18n.format("info." + key + ".desc", (Object[]) null);
@@ -47,22 +47,22 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 		
 		int i = 0;
 		for (String line : pages[page])
-			mc.fontRendererObj.drawString(line,
+			mc.fontRenderer.drawString(line,
 					x + 5,
-					y + 20 + (i++ * (mc.fontRendererObj.FONT_HEIGHT + LINE_HEIGHT_EXTRA)),
+					y + 20 + (i++ * (mc.fontRenderer.FONT_HEIGHT + LINE_HEIGHT_EXTRA)),
 					0xFFFFFFFF);
 		
 		if (pages.length > 1) {
 			String str = (page + 1) + " / " + pages.length;
-			len = mc.fontRendererObj.getStringWidth(str);
-			mc.fontRendererObj.drawString(str,
+			len = mc.fontRenderer.getStringWidth(str);
+			mc.fontRenderer.drawString(str,
 					x + (width - len) / 2,
-					y + height - (mc.fontRendererObj.FONT_HEIGHT + 2), 0xFFDD55);
+					y + height - (mc.fontRenderer.FONT_HEIGHT + 2), 0xFFDD55);
 		}
 	}
 	
 	private void paginate(String input, int pageWidth, int pageHeight) {
-		FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
+		FontRenderer fonter = Minecraft.getMinecraft().fontRenderer;
 		final int maxLines = (pageHeight / (LINE_HEIGHT_EXTRA + fonter.FONT_HEIGHT)) - 1;
 		int count;
 		List<String[]> pages = new LinkedList<>();
@@ -139,12 +139,12 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 		}
 
 		@Override
-		public void drawButton(Minecraft mc, int parX, int parY) {
+		public void drawButton(Minecraft mc, int parX, int parY, float partialTicks) {
 			if (visible) {
-				boolean isButtonPressed = (parX >= xPosition 
-						&& parY >= yPosition 
-						&& parX < xPosition + width 
-						&& parY < yPosition + height);
+				boolean isButtonPressed = (parX >= this.x 
+						&& parY >= this.y 
+						&& parX < this.x + width 
+						&& parY < this.y + height);
 
 				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 				mc.getTextureManager().bindTexture(BookScreen.background);
@@ -159,7 +159,7 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 					textureY += 13;
 				}
 
-				Gui.drawModalRectWithCustomSizedTexture(xPosition, yPosition, textureX, textureY,
+				Gui.drawModalRectWithCustomSizedTexture(this.x, this.y, textureX, textureY,
 						23, 13, BookScreen.TEXT_WHOLE_WIDTH, BookScreen.TEXT_WHOLE_HEIGHT);
 
 			}
@@ -183,12 +183,12 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 		}
 
         @Override
-        public void drawButton(Minecraft mc, int parX, int parY) {
+        public void drawButton(Minecraft mc, int parX, int parY, float partialTicks) {
         	if (visible) {
-        		boolean isButtonPressed = (parX >= xPosition 
-        				&& parY >= yPosition 
-                      && parX < xPosition + width 
-                      && parY < yPosition + height);
+        		boolean isButtonPressed = (parX >= this.x 
+        				&& parY >= this.y 
+                      && parX < this.x + width 
+                      && parY < this.y + height);
 
         		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
                 mc.getTextureManager().bindTexture(BookScreen.background);
@@ -199,7 +199,7 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
                 	textureX += 16;
                 }
 
-                Gui.drawModalRectWithCustomSizedTexture(xPosition, yPosition, textureX, textureY,
+                Gui.drawModalRectWithCustomSizedTexture(this.x, this.y, textureX, textureY,
                 		16, 16, BookScreen.TEXT_WHOLE_WIDTH, BookScreen.TEXT_WHOLE_HEIGHT);
                 
             }

@@ -40,6 +40,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigge
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.MoverType;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
@@ -119,7 +120,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 		
 		priority = 1;
 		this.targetTasks.addTask(priority++, new EntityAIHurtByTarget(this, true, new Class[] {EntityWisp.class}));
-		if (worldObj != null && this.rand.nextBoolean() && worldObj.getBiome(this.getPosition()) instanceof BiomeHell) {
+		if (world != null && this.rand.nextBoolean() && world.getBiome(this.getPosition()) instanceof BiomeHell) {
 			this.targetTasks.addTask(priority++, new EntityAINearestAttackableTarget<EntityPlayer>(this, EntityPlayer.class, 10, true, false, null));
 		} else {
 			this.targetTasks.addTask(priority++, new EntityAINearestAttackableTarget<EntityMob>(this, EntityMob.class, 10, true, false, (mob) -> {
@@ -203,11 +204,11 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 			}
 		}
 		
-		if (!worldObj.isRemote && this.getHome() == null && !this.isDead && this.getHealth() > 0) {
+		if (!world.isRemote && this.getHome() == null && !this.isDead && this.getHealth() > 0) {
 			if (perilLoc == null || !perilLoc.equals(getPosition())) {
 				MutableBlockPos cursor = new MutableBlockPos();
 				cursor.setPos(getPosition());
-				while (worldObj.isAirBlock(cursor)) {
+				while (world.isAirBlock(cursor)) {
 					cursor.move(EnumFacing.DOWN);
 				}
 				
@@ -229,7 +230,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 						elem = EMagicElement.values()[rand.nextInt(EMagicElement.values().length)];
 					}
 					
-					this.attackEntityFrom(DamageSource.drown, 4.0F);
+					this.attackEntityFrom(DamageSource.DROWN, 4.0F);
 					if (this.isDead || this.getHealth() <= 0) {
 						this.entityDropItem(EssenceItem.getEssence(elem, 1), 0);
 					}
@@ -366,7 +367,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 			double d0 = this.rand.nextGaussian() * 0.02D;
 			double d1 = this.rand.nextGaussian() * 0.02D;
 			double d2 = this.rand.nextGaussian() * 0.02D;
-			this.worldObj.spawnParticle(enumparticletypes, this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.height), this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, d0, d1, d2, new int[0]);
+			this.world.spawnParticle(enumparticletypes, this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.height), this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, d0, d1, d2, new int[0]);
 		}
 	}
 	
@@ -378,7 +379,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 		ItemStack scroll = null;
 		BlockPos homePos = this.getHome();
 		if (homePos != null) {
-			scroll = WispBlock.instance().getScroll(worldObj, homePos);
+			scroll = WispBlock.instance().getScroll(world, homePos);
 		}
 		
 		@Nullable Spell spell = null;
@@ -430,7 +431,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 
 				if (this.courseChangeCooldown-- <= 0) {
 					this.courseChangeCooldown += this.parentEntity.getRNG().nextInt(5) + 2;
-					d3 = (double)MathHelper.sqrt_double(d3);
+					d3 = (double)MathHelper.sqrt(d3);
 
 					if (this.isNotColliding(this.posX, this.posY, this.posZ, d3)) {
 						this.parentEntity.motionX += d0 / d3 * 0.005D;
@@ -455,7 +456,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 			for (int i = 1; (double)i < p_179926_7_; ++i) {
 				axisalignedbb = axisalignedbb.offset(d0, d1, d2);
 
-				if (!this.parentEntity.worldObj.getCollisionBoxes(this.parentEntity, axisalignedbb).isEmpty()) {
+				if (!this.parentEntity.world.getCollisionBoxes(this.parentEntity, axisalignedbb).isEmpty()) {
 					return false;
 				}
 			}
@@ -466,16 +467,16 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 	
 	// Copied from EntityFlying class
 	@Override
-	public void moveEntityWithHeading(float strafe, float forward) {
+	public void travel(float strafe, float vertical, float forward) {
 		if (this.isInWater()) {
-			this.moveRelative(strafe, forward, 0.02F);
-			this.moveEntity(this.motionX, this.motionY, this.motionZ);
+			this.moveRelative(strafe, vertical, forward, 0.02F);
+			this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
 			this.motionX *= 0.800000011920929D;
 			this.motionY *= 0.800000011920929D;
 			this.motionZ *= 0.800000011920929D;
 		} else if (this.isInLava()) {
-			this.moveRelative(strafe, forward, 0.02F);
-			this.moveEntity(this.motionX, this.motionY, this.motionZ);
+			this.moveRelative(strafe, vertical, forward, 0.02F);
+			this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
 			this.motionX *= 0.5D;
 			this.motionY *= 0.5D;
 			this.motionZ *= 0.5D;
@@ -483,18 +484,24 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 			float f = 0.91F;
 
 			if (this.onGround) {
-				f = this.worldObj.getBlockState(new BlockPos(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.getEntityBoundingBox().minY) - 1, MathHelper.floor_double(this.posZ))).getBlock().slipperiness * 0.91F;
+				//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getEntityBoundingBox().minY) - 1, MathHelper.floor(this.posZ))).getBlock().slipperiness * 0.91F;
+				BlockPos underPos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getEntityBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
+				IBlockState underState = this.world.getBlockState(underPos);
+				f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.91F;
 			}
 
 			float f1 = 0.16277136F / (f * f * f);
-			this.moveRelative(strafe, forward, this.onGround ? 0.1F * f1 : 0.02F);
+			this.moveRelative(strafe, vertical, forward, this.onGround ? 0.1F * f1 : 0.02F);
 			f = 0.91F;
 
 			if (this.onGround) {
-				f = this.worldObj.getBlockState(new BlockPos(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.getEntityBoundingBox().minY) - 1, MathHelper.floor_double(this.posZ))).getBlock().slipperiness * 0.91F;
+				//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getEntityBoundingBox().minY) - 1, MathHelper.floor(this.posZ))).getBlock().slipperiness * 0.91F;
+				BlockPos underPos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getEntityBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
+				IBlockState underState = this.world.getBlockState(underPos);
+				f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.91F;
 			}
 
-			this.moveEntity(this.motionX, this.motionY, this.motionZ);
+			this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
 			this.motionX *= (double)f;
 			this.motionY *= (double)f;
 			this.motionZ *= (double)f;
@@ -503,7 +510,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 		this.prevLimbSwingAmount = this.limbSwingAmount;
 		double d1 = this.posX - this.prevPosX;
 		double d0 = this.posZ - this.prevPosZ;
-		float f2 = MathHelper.sqrt_double(d1 * d1 + d0 * d0) * 4.0F;
+		float f2 = MathHelper.sqrt(d1 * d1 + d0 * d0) * 4.0F;
 
 		if (f2 > 1.0F) {
 			f2 = 1.0F;
@@ -529,16 +536,16 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 		
 		BlockPos blockpos = new BlockPos(this.posX, this.getEntityBoundingBox().minY, this.posZ);
 
-		if (this.worldObj.getLightFor(EnumSkyBlock.SKY, blockpos) > this.rand.nextInt(32)) {
+		if (this.world.getLightFor(EnumSkyBlock.SKY, blockpos) > this.rand.nextInt(32)) {
 			return false;
 		} else {
-			int i = this.worldObj.getLightFromNeighbors(blockpos);
+			int i = this.world.getLightFromNeighbors(blockpos);
 
-			if (this.worldObj.isThundering()) {
-				int j = this.worldObj.getSkylightSubtracted();
-				this.worldObj.setSkylightSubtracted(10);
-				i = this.worldObj.getLightFromNeighbors(blockpos);
-				this.worldObj.setSkylightSubtracted(j);
+			if (this.world.isThundering()) {
+				int j = this.world.getSkylightSubtracted();
+				this.world.setSkylightSubtracted(10);
+				i = this.world.getLightFromNeighbors(blockpos);
+				this.world.setSkylightSubtracted(j);
 			}
 
 			return i <= this.rand.nextInt(12);

@@ -20,12 +20,12 @@ import net.minecraft.util.text.event.HoverEvent;
 public class CommandGotoDungeon extends CommandBase {
 
 	@Override
-	public String getCommandName() {
+	public String getName() {
 		return "tpdung";
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender sender) {
+	public String getUsage(ICommandSender sender) {
 		return "/tpdung [type]";
 	}
 
@@ -38,33 +38,33 @@ public class CommandGotoDungeon extends CommandBase {
 				// Get type
 				SpellComponentWrapper wrapper = SpellComponentWrapper.fromKeyString(args[0]);
 				
-				BlockPos pos = SeekerIdol.findNearest(player.worldObj, player.getPosition(), wrapper);
+				BlockPos pos = SeekerIdol.findNearest(player.world, player.getPosition(), wrapper);
 				if (pos == null) {
-					sender.addChatMessage(new TextComponentString("No dungeons of type " + wrapper.getKeyString() + " found"));
+					sender.sendMessage(new TextComponentString("No dungeons of type " + wrapper.getKeyString() + " found"));
 				} else {
 					player.setPositionAndUpdate(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5);
 				}
 			} else {
-				List<SpellComponentWrapper> types = SeekerIdol.getKnownDungeonTypes(player.worldObj);
+				List<SpellComponentWrapper> types = SeekerIdol.getKnownDungeonTypes(player.world);
 				
 				if (types.isEmpty()) {
-					sender.addChatMessage(new TextComponentString("No dungeons have been generated yet! Explore to find more!"));
+					sender.sendMessage(new TextComponentString("No dungeons have been generated yet! Explore to find more!"));
 				} else {
-					sender.addChatMessage(new TextComponentString("Select which type of dungeon to jump to:"));
+					sender.sendMessage(new TextComponentString("Select which type of dungeon to jump to:"));
 					for (SpellComponentWrapper type : types) {
-						sender.addChatMessage(new TextComponentString(type.toString())
+						sender.sendMessage(new TextComponentString(type.toString())
 								.setStyle(new Style()
 										.setColor(TextFormatting.DARK_GREEN)
 										.setUnderlined(true)
 										.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString("Click to go!")))
-										.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + this.getCommandName() + " " + type.getKeyString()))));
+										.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + this.getName() + " " + type.getKeyString()))));
 					}
 				}
 			}
 			
 			
 		} else {
-			sender.addChatMessage(new TextComponentString("This command must be run as a player"));
+			sender.sendMessage(new TextComponentString("This command must be run as a player"));
 		}
 	}
 

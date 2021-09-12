@@ -69,9 +69,9 @@ public class EntityHookShot extends Entity {
 		setCaster(caster);
 		setMaxLength(maxLength);
 		this.setPosition(caster.posX, caster.posY + (caster.getEyeHeight()), caster.posZ);
-		this.velocityX = direction.xCoord;
-		this.velocityY = direction.yCoord;
-		this.velocityZ = direction.zCoord;
+		this.velocityX = direction.x;
+		this.velocityY = direction.y;
+		this.velocityZ = direction.z;
 		this.setType(type);
 	}
 	
@@ -102,7 +102,7 @@ public class EntityHookShot extends Entity {
 		UUID id = getCasterID();
 		
 		if (id != null) {
-			for (Entity ent : worldObj.loadedEntityList) {
+			for (Entity ent : world.loadedEntityList) {
 				if (ent instanceof EntityLivingBase) {
 					if (((EntityLivingBase) ent).getUniqueID().equals(id)) {
 						ret = (EntityLivingBase) ent;
@@ -144,7 +144,7 @@ public class EntityHookShot extends Entity {
 		// TODO isFetch and type are not on client, but client uses it to render.
 		return isHooked()
 				&& !isFetch()
-				&& (this.getType() != HookshotType.CLAW || this.getCaster().getDistanceSqToEntity(this) > 8);
+				&& (this.getType() != HookshotType.CLAW || this.getCaster().getDistanceSq(this) > 8);
 	}
 	
 	@Nullable
@@ -154,7 +154,7 @@ public class EntityHookShot extends Entity {
 		if (this.isHooked()) {
 			Optional<UUID> id = dataManager.get(DATA_HOOKED_ENTITY);
 			if (id.isPresent()) {
-				for (Entity ent : worldObj.loadedEntityList) {
+				for (Entity ent : world.loadedEntityList) {
 					if (ent.getUniqueID().equals(id.get())) {
 						ret = ent;
 						break;
@@ -197,7 +197,7 @@ public class EntityHookShot extends Entity {
 	
 	protected void onFlightUpdate() {
 		EntityLivingBase caster = this.getCaster();
-		if (this.worldObj.isRemote || (caster == null || !caster.isDead) && this.worldObj.isBlockLoaded(new BlockPos(this)))
+		if (this.world.isRemote || (caster == null || !caster.isDead) && this.world.isBlockLoaded(new BlockPos(this)))
 		{
 			super.onUpdate();
 
@@ -217,7 +217,7 @@ public class EntityHookShot extends Entity {
 			{
 				for (int i = 0; i < 4; ++i)
 				{
-					this.worldObj.spawnParticle(EnumParticleTypes.WATER_BUBBLE, this.posX - this.motionX * 0.25D, this.posY - this.motionY * 0.25D, this.posZ - this.motionZ * 0.25D, this.motionX, this.motionY, this.motionZ, new int[0]);
+					this.world.spawnParticle(EnumParticleTypes.WATER_BUBBLE, this.posX - this.motionX * 0.25D, this.posY - this.motionY * 0.25D, this.posZ - this.motionZ * 0.25D, this.motionX, this.motionY, this.motionZ, new int[0]);
 				}
 
 				f = 0.8F;
@@ -229,7 +229,7 @@ public class EntityHookShot extends Entity {
 			this.motionX *= (double)f;
 			this.motionY *= (double)f;
 			this.motionZ *= (double)f;
-			//this.worldObj.spawnParticle(this.getParticleType(), this.posX, this.posY + 0.5D, this.posZ, 0.0D, 0.0D, 0.0D, new int[0]);
+			//this.world.spawnParticle(this.getParticleType(), this.posX, this.posY + 0.5D, this.posZ, 0.0D, 0.0D, 0.0D, new int[0]);
 			this.setPosition(this.posX, this.posY, this.posZ);
 		}
 		else
@@ -249,7 +249,7 @@ public class EntityHookShot extends Entity {
 		}
 		
 		if (caster != null) {
-			final double dist = caster.getDistanceSqToEntity(this);
+			final double dist = caster.getDistanceSq(this);
 			if (dist < 8) {
 				if (this.getType() != HookshotType.CLAW || caster.isSneaking()) {
 					this.setDead();
@@ -284,14 +284,14 @@ public class EntityHookShot extends Entity {
 			
 			Vec3d diff = caster.getPositionVector().addVector(0, caster.getEyeHeight(), 0).subtract(this.getPositionVector());
 			Vec3d velocity = diff.normalize().scale(0.75);
-			this.posX += velocity.xCoord;
-			this.posY += velocity.yCoord;
-			this.posZ += velocity.zCoord;
+			this.posX += velocity.x;
+			this.posY += velocity.y;
+			this.posZ += velocity.z;
 			
 			if (attachedEntity instanceof EntityItem) {
-				attachedEntity.motionX = velocity.xCoord;
-				attachedEntity.motionY = velocity.yCoord;
-				attachedEntity.motionZ = velocity.zCoord;
+				attachedEntity.motionX = velocity.x;
+				attachedEntity.motionY = velocity.y;
+				attachedEntity.motionZ = velocity.z;
 				attachedEntity.velocityChanged = true;
 			}
 			this.setPositionAndUpdate(posX, posY, posZ);
@@ -316,9 +316,9 @@ public class EntityHookShot extends Entity {
 				
 				Vec3d diff = this.getPositionVector().subtract(caster.getPositionVector());
 				Vec3d velocity = diff.normalize().scale(0.75);
-				caster.motionX = velocity.xCoord;
-				caster.motionY = velocity.yCoord;
-				caster.motionZ = velocity.zCoord;
+				caster.motionX = velocity.x;
+				caster.motionY = velocity.y;
+				caster.motionZ = velocity.z;
 				caster.fallDistance = 0;
 				//caster.onGround = true;
 				caster.velocityChanged = true;
@@ -327,7 +327,7 @@ public class EntityHookShot extends Entity {
 			// Check about playing sounds
 			if (caster != null) {
 				if (posLastPlayed == null || (posLastPlayed.subtract(caster.getPositionVector()).lengthSquared() > 3)) {
-					NostrumMagicaSounds.HOOKSHOT_TICK.play(worldObj, 
+					NostrumMagicaSounds.HOOKSHOT_TICK.play(world, 
 							caster.posX + caster.motionX, caster.posY + caster.motionY, caster.posZ + caster.motionZ);
 					posLastPlayed = caster.getPositionVector();
 				}
@@ -340,7 +340,7 @@ public class EntityHookShot extends Entity {
 		super.onUpdate();
 		
 		if (!this.isDead) {
-			if (!worldObj.isRemote) {
+			if (!world.isRemote) {
 				EntityLivingBase caster = this.getCaster();
 				
 				// Make sure caster still exists
@@ -351,7 +351,7 @@ public class EntityHookShot extends Entity {
 				
 				// Check length
 				if (caster != null) {
-					final double dist = caster.getDistanceSqToEntity(this);
+					final double dist = caster.getDistanceSq(this);
 					if (dist > (maxLength*maxLength)) {
 						this.setDead();
 					}
@@ -407,7 +407,7 @@ public class EntityHookShot extends Entity {
 			// If shooter wants fetch, don't hook to blocks
 			
 			// Make sure type of hookshot supports material
-			IBlockState state = worldObj.getBlockState(result.getBlockPos());
+			IBlockState state = world.getBlockState(result.getBlockPos());
 			if (wantsFetch || state == null || !HookshotItem.CanBeHooked(getType(), state)) {
 				this.setDead();
 				return;
@@ -416,7 +416,7 @@ public class EntityHookShot extends Entity {
 			// Can't be fetch
 			
 			tickHooked = this.ticksExisted;
-			this.setPositionAndUpdate(result.hitVec.xCoord, result.hitVec.yCoord, result.hitVec.zCoord);
+			this.setPositionAndUpdate(result.hitVec.x, result.hitVec.y, result.hitVec.z);
 			
 			// Have to do this before officially being 'hooked'
 			if (caster != null) {
@@ -461,7 +461,7 @@ public class EntityHookShot extends Entity {
 			id = compound.getUniqueId(NBT_ATTACHED_ID);
 			if (id != null) {
 				Entity hookedEnt = null;
-				for (Entity ent : this.worldObj.loadedEntityList) {
+				for (Entity ent : this.world.loadedEntityList) {
 					if (ent.getUniqueID().equals(id)) {
 						hookedEnt = ent;
 						break;

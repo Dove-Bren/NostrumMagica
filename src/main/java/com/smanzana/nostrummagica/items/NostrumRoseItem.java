@@ -1,7 +1,5 @@
 package com.smanzana.nostrummagica.items;
 
-import java.util.List;
-
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -10,6 +8,7 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -78,9 +77,9 @@ public class NostrumRoseItem extends Item implements ILoreTagged {
 	
 	@SideOnly(Side.CLIENT)
     @Override
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
     	for (RoseType type: RoseType.values()) {
-    		subItems.add(new ItemStack(itemIn, 1, getMetaFromType(type)));
+    		subItems.add(new ItemStack(thiss, 1, getMetaFromType(type)));
     	}
 	}
 	

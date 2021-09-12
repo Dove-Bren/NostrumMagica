@@ -45,7 +45,7 @@ public class ClientCastMessage implements IMessage {
 			// Figure out what spell they have
 			// cast it if they can
 			
-			final EntityPlayerMP sp = ctx.getServerHandler().playerEntity;
+			final EntityPlayerMP sp = ctx.getServerHandler().player;
 			
 			// What spell?
 			Spell spell = NostrumMagica.getSpellRegistry().lookup(
@@ -90,7 +90,7 @@ public class ClientCastMessage implements IMessage {
 						int cap = SpellTome.getMaxMana(tome);
 						if (cap < cost) {
 							NetworkHandler.getSyncChannel().sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
-									ctx.getServerHandler().playerEntity);
+									ctx.getServerHandler().player);
 							return;
 						}
 						
@@ -99,7 +99,7 @@ public class ClientCastMessage implements IMessage {
 					} else {
 						NostrumMagica.logger.warn("Got cast from client with mismatched tome");
 						NetworkHandler.getSyncChannel().sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
-								ctx.getServerHandler().playerEntity);
+								ctx.getServerHandler().player);
 						return;
 					}
 				}
@@ -163,7 +163,7 @@ public class ClientCastMessage implements IMessage {
 					
 					if (mana < cost) {
 						NetworkHandler.getSyncChannel().sendTo(new ClientCastReplyMessage(false, att.getMana(), 0.0f, null),
-								ctx.getServerHandler().playerEntity);
+								ctx.getServerHandler().player);
 						return;
 					}
 					
@@ -171,7 +171,7 @@ public class ClientCastMessage implements IMessage {
 					if (!NostrumMagica.canCast(spell, att)) {
 						NostrumMagica.logger.warn("Got cast message from client with too low of stats. They should relog...");
 						NetworkHandler.getSyncChannel().sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
-								ctx.getServerHandler().playerEntity);
+								ctx.getServerHandler().player);
 						return;
 					}
 					
@@ -183,9 +183,9 @@ public class ClientCastMessage implements IMessage {
 					for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
 						int count = NostrumMagica.getReagentCount(sp, row.getKey());
 						if (count < row.getValue()) {
-							sp.addChatComponentMessage(new TextComponentTranslation("info.spell.bad_reagent", row.getKey().prettyName()));
+							sp.sendMessage(new TextComponentTranslation("info.spell.bad_reagent", row.getKey().prettyName()));
 							NetworkHandler.getSyncChannel().sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
-									ctx.getServerHandler().playerEntity);
+									ctx.getServerHandler().player);
 							return;
 						}
 					}
@@ -208,7 +208,7 @@ public class ClientCastMessage implements IMessage {
 					if (cost > 0 && dragons != null) {
 						for (ITameDragon dragon : dragons) {
 							EntityLivingBase ent = (EntityLivingBase) dragon;
-							NostrumMagica.proxy.spawnEffect(sp.worldObj, new SpellComponentWrapper(BeamTrigger.instance()),
+							NostrumMagica.proxy.spawnEffect(sp.world, new SpellComponentWrapper(BeamTrigger.instance()),
 									null, sp.getPositionVector().addVector(0, sp.getEyeHeight(), 0),
 									null, ent.getPositionVector().addVector(0, ent.getEyeHeight(), 0),
 									new SpellComponentWrapper(EMagicElement.ICE), false, 0);
@@ -240,7 +240,7 @@ public class ClientCastMessage implements IMessage {
 				att.addXP(xp);
 
 				NetworkHandler.getSyncChannel().sendTo(new ClientCastReplyMessage(true, att.getMana(), xp, reagents),
-						ctx.getServerHandler().playerEntity);
+						ctx.getServerHandler().player);
 			});
 			
 			return null;

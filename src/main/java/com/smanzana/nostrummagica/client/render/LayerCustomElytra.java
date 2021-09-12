@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.layers.LayerArmorBase;
 import net.minecraft.client.renderer.entity.layers.LayerElytra;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EnumPlayerModelParts;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
@@ -28,14 +29,14 @@ public class LayerCustomElytra extends LayerElytra {
 	}
 	
 	@Override
-	public void doRenderLayer(AbstractClientPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+	public void doRenderLayer(EntityLivingBase player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 		if (shouldRender(player)) {
 			@Nullable ItemStack chestpiece = player.getItemStackFromSlot(EntityEquipmentSlot.CHEST); 
 			render(player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale, (chestpiece != null && chestpiece.isItemEnchanted()));
 		}
 	}
 	
-	public boolean shouldRender(AbstractClientPlayer player) {
+	public boolean shouldRender(EntityLivingBase player) {
 		final boolean flying = player.isElytraFlying();
 		ItemStack cape = LayerAetherCloak.ShouldRender(player);
 		if (!flying && cape != null && ((ICapeProvider) cape.getItem()).shouldPreventOtherRenders(player, cape)) {
@@ -53,14 +54,19 @@ public class LayerCustomElytra extends LayerElytra {
 		return false;
 	}
 	
-	public void render(AbstractClientPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale, boolean enchanted) {
+	public void render(EntityLivingBase player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale, boolean enchanted) {
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 		GlStateManager.enableBlend();
 
-		if (player.isPlayerInfoSet() && player.getLocationElytra() != null) {
-			this.renderPlayer.bindTexture(player.getLocationElytra());
-		} else if (player.hasPlayerInfo() && player.getLocationCape() != null && player.isWearing(EnumPlayerModelParts.CAPE)) {
-			this.renderPlayer.bindTexture(player.getLocationCape());
+		if (player instanceof AbstractClientPlayer) {
+			AbstractClientPlayer clientPlayer = (AbstractClientPlayer) player;
+			if (clientPlayer.isPlayerInfoSet() && clientPlayer.getLocationElytra() != null) {
+				this.renderPlayer.bindTexture(clientPlayer.getLocationElytra());
+			} else if (clientPlayer.hasPlayerInfo() && clientPlayer.getLocationCape() != null && clientPlayer.isWearing(EnumPlayerModelParts.CAPE)) {
+				this.renderPlayer.bindTexture(clientPlayer.getLocationCape());
+			} else {
+				this.renderPlayer.bindTexture(TEXTURE_ELYTRA);
+			}
 		} else {
 			this.renderPlayer.bindTexture(TEXTURE_ELYTRA);
 		}

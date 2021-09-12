@@ -2,6 +2,12 @@ package com.smanzana.nostrummagica.items;
 
 import java.util.List;
 
+<<<<<<< ba775cbb6bf7699be9c429d23e89792081fd0f06
+=======
+import javax.annotation.Nonnull;
+
+import com.mojang.realmsclient.gui.ChatFormatting;
+>>>>>>> First wave of updates to get to 1.12.
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
@@ -14,6 +20,7 @@ import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -75,7 +82,8 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		
 		if (playerIn.isSneaking()) {
 			// Open scroll screen
@@ -86,11 +94,8 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
 		}
 		
-		if (itemStackIn == null)
+		if (itemStackIn.isEmpty())
 			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
-		
-//		if (getNestedScrollMeta(itemStackIn) != 0)
-//			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
 		
 		if (!itemStackIn.hasTagCompound())
 			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
@@ -124,7 +129,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
     }
 	
 	public static void setSpell(ItemStack itemStack, Spell spell) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SpellScroll))
+		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellScroll))
 			return;
 		
 		NBTTagCompound nbt = itemStack.getTagCompound();
@@ -141,7 +146,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 	}
 	
 	public static Spell getSpell(ItemStack itemStack) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SpellScroll))
+		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellScroll))
 			return null;
 		
 		NBTTagCompound nbt = itemStack.getTagCompound();		
@@ -166,7 +171,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 	}
 	
 	public static int getMaxDurability(ItemStack itemStack) {
-		if (itemStack == null || !(itemStack.getItem() instanceof SpellScroll))
+		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellScroll))
 			return 1;
 		
 		NBTTagCompound nbt = itemStack.getTagCompound();		
@@ -179,7 +184,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 //	public static int getNestedScrollMeta(ItemStack scroll) {
 //		byte ret = 0;
 //		
-//		if (scroll != null && scroll.hasTagCompound()) {
+//		if (!scroll.isEmpty() && scroll.hasTagCompound()) {
 //			NBTTagCompound nbt = scroll.getTagCompound();
 //			ret = nbt.getByte(NBT_TYPE);
 //		}
@@ -188,7 +193,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 //	}
 //	
 //	public static void setNestedScrollMeta(ItemStack scroll, byte meta) {
-//		if (scroll == null)
+//		if (scroll.isEmpty())
 //			return;
 //		
 //		NBTTagCompound nbt = scroll.getTagCompound();
@@ -248,25 +253,15 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-		if (stack == null)
-			return;
-		
-//		int meta = getNestedScrollMeta(stack);
-//		if (meta == 1) {
-//			tooltip.add(ChatFormatting.DARK_BLUE + "Activated");
-//		} else if (meta == 2) {
-//			tooltip.add(ChatFormatting.DARK_GREEN + "Awakened");
-//			tooltip.add(ChatFormatting.GRAY + "Use on an altar with a bound spell tome");
-//			tooltip.add(ChatFormatting.GRAY + "to begin binding");
-//		}
+	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+		;
 	}
 	
 	public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
 		super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
 		
 //		if (!worldIn.isRemote) {
-//			if (stack == null || getNestedScrollMeta(stack) != 1)
+//			if (stack.isRemote() || getNestedScrollMeta(stack) != 1)
 //				return;
 //			
 //			NBTTagCompound nbt;

@@ -16,6 +16,7 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.InventoryCrafting;
@@ -26,6 +27,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
@@ -59,7 +61,7 @@ public class SpellRune extends Item implements ILoreTagged {
 			 */
 			String suffix = "blank";
 			
-			if (stack != null) {
+			if (!stack.isEmpty()) {
 				suffix = getPieceName(stack);
 				if (suffix == null || suffix.trim().isEmpty())
 					suffix = "blank";
@@ -85,7 +87,7 @@ public class SpellRune extends Item implements ILoreTagged {
 			int count = 0;
 			for (int i = 0; i < inv.getSizeInventory(); i++) {
 				ItemStack stack = inv.getStackInSlot(i);
-				if (stack == null)
+				if (stack.isEmpty())
 					continue;
 				
 				if (!(stack.getItem() instanceof SpellRune))
@@ -161,7 +163,7 @@ public class SpellRune extends Item implements ILoreTagged {
 		}
 
 		@Override
-		public ItemStack getCraftingResult(InventoryCrafting inv) {
+		public @Nonnull ItemStack getCraftingResult(InventoryCrafting inv) {
 			SpellShape shape = null;
 			EMagicElement element = null;
 			EAlteration alteration = null;
@@ -169,62 +171,62 @@ public class SpellRune extends Item implements ILoreTagged {
 			int count = 0;
 			for (int i = 0; i < inv.getSizeInventory(); i++) {
 				ItemStack stack = inv.getStackInSlot(i);
-				if (stack == null)
+				if (stack.isEmpty())
 					continue;
 				
 				if (!(stack.getItem() instanceof SpellRune))
-					return null;
+					return ItemStack.EMPTY;
 				
 				if (SpellRune.isTrigger(stack))
-					return null;
+					return ItemStack.EMPTY;
 				
 				if (SpellRune.isShape(stack)) {
 					if (shape != null) {
 						// We already found a shape
-						return null;
+						return ItemStack.EMPTY;
 					}
 					shape = SpellShape.get(SpellRune.getPieceName(stack));
 					if (shape == null)
-						return null;
+						return ItemStack.EMPTY;
 					
 					params = SpellRune.getPieceParam(stack);
 					
 					EMagicElement shapeElem = SpellRune.getPieceShapeElement(stack);
 					if (element != null && shapeElem != null && shapeElem != element) {
-						return null; // multiple elements
+						return ItemStack.EMPTY; // multiple elements
 					}
 					if (shapeElem != null)
 						element = shapeElem;
 					EAlteration alt = SpellRune.getPieceShapeAlteration(stack);
 					if (alt != null && alteration != null) {
 						// Can't have two alterations
-						return null;
+						return ItemStack.EMPTY;
 					}
 					if (alt != null && alteration == null)
 						alteration = alt;
 					
 					int shapeCount = reverseElementCount(SpellRune.getPieceElementCount(stack));
 					if (count + shapeCount > 4)
-						return null;
+						return ItemStack.EMPTY;
 					count += shapeCount;
 				} else if (SpellRune.isElement(stack)) {
 					EMagicElement elem = SpellRune.getElement(stack);
 					if (elem == null)
-						return null; // CORRUPT
+						return ItemStack.EMPTY; // CORRUPT
 					if (element != null && elem != element) 
-						return null; // Different element types
+						return ItemStack.EMPTY; // Different element types
 					
 					element = elem;
 					int c = reverseElementCount(SpellRune.getPieceElementCount(stack));
 					if (c + count > 4)
-						return null;
+						return ItemStack.EMPTY;
 					count += c;
 				} else if (SpellRune.isAlteration(stack)) {
 					EAlteration alt = SpellRune.getAlteration(stack);
 					if (alt == null)
-						return null; // CORRUPT
+						return ItemStack.EMPTY; // CORRUPT
 					if (alteration != null)
-						return null;
+						return ItemStack.EMPTY;
 					alteration = alt;
 				}
 			}
@@ -312,7 +314,7 @@ public class SpellRune extends Item implements ILoreTagged {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		if (isElement(stack)) {
 			tooltip.add(TextFormatting.DARK_GRAY + "Element" + TextFormatting.RESET);
 			int count = getPieceElementCount(stack);
@@ -366,7 +368,7 @@ public class SpellRune extends Item implements ILoreTagged {
      */
     @SideOnly(Side.CLIENT)
     @Override
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
     	// Should be synced to client proxy registering variants
     	for (EMagicElement type : EMagicElement.values()) {
     		subItems.add(getRune(type, 1));
@@ -554,10 +556,10 @@ public class SpellRune extends Item implements ILoreTagged {
     	piece.getTagCompound().setBoolean(NBT_PARAM_FLIP, params.flip);
     }
     
-    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
+    public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
     	// Probably wnat this later
-    	return super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ);
+    	return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ);
 	}
     
     public static boolean isShape(ItemStack stack) {
@@ -688,7 +690,7 @@ public class SpellRune extends Item implements ILoreTagged {
 	}
 	
 	public static SpellComponentWrapper toComponentWrapper(ItemStack rune) {
-		if (rune == null || !(rune.getItem() instanceof SpellRune))
+		if (rune.isEmpty() || !(rune.getItem() instanceof SpellRune))
 			return null;
 		
 		if (isElement(rune)) {

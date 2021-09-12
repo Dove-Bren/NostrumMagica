@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.entity.renderer;
 
 import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModel;
@@ -17,7 +17,7 @@ public abstract class ModelOBJ extends ModelBase {
 	}
 
 	protected abstract ResourceLocation[] getEntityModels();
-	protected abstract boolean preRender(Entity entity, int model, VertexBuffer buffer, double x, double y, double z, float entityYaw, float partialTicks);
+	protected abstract boolean preRender(Entity entity, int model, BufferBuilder buffer, double x, double y, double z, float entityYaw, float partialTicks);
 	protected IModel retexture(int i, IModel model) {return model;}
 	protected int getColor(int i, Entity entity) {return -1;}
 
@@ -54,7 +54,7 @@ public abstract class ModelOBJ extends ModelBase {
 		}
 
 		@Override
-		protected boolean preRender(VertexBuffer buffer) {
+		protected boolean preRender(BufferBuilder buffer) {
 			return ModelOBJ.this.preRender(ent, this.modelIdx, buffer, ent.posX, ent.posY, ent.posZ, ent.rotationYaw, 0);
 		}
 		

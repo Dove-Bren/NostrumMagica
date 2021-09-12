@@ -8,10 +8,10 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
@@ -32,7 +32,7 @@ public class ObeliskPortal extends TeleportationPortal {
 	}
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(ObeliskPortalTileEntity.class, "obelisk_portal");
+		GameRegistry.registerTileEntity(ObeliskPortalTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "obelisk_portal"));
 	}
 	
 	public ObeliskPortal() {
@@ -59,7 +59,7 @@ public class ObeliskPortal extends TeleportationPortal {
 				super.teleportEntity(worldIn, portalPos, entityIn);
 			} else {
 				if (entityIn instanceof EntityPlayer) {
-					((EntityPlayer) entityIn).addChatComponentMessage(new TextComponentTranslation("info.obelisk.aetherfail"));
+					((EntityPlayer) entityIn).sendMessage(new TextComponentTranslation("info.obelisk.aetherfail"));
 				}
 			}
 		}
@@ -86,12 +86,12 @@ public class ObeliskPortal extends TeleportationPortal {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		pos = getMaster(state, pos); // find master
 		
 		IBlockState parentState = worldIn.getBlockState(pos.down());
 		if (parentState != null && parentState.getBlock() instanceof NostrumObelisk) {
-			parentState.getBlock().onBlockActivated(worldIn, pos.down(), parentState, playerIn, hand, heldItem, side, hitX, hitY, hitZ);
+			parentState.getBlock().onBlockActivated(worldIn, pos.down(), parentState, playerIn, hand, side, hitX, hitY, hitZ);
 		}
 		
 		return true;
@@ -102,7 +102,7 @@ public class ObeliskPortal extends TeleportationPortal {
 		@Override
 		public @Nullable BlockPos getTarget() {
 			// Defer to obelisk below us
-			TileEntity te = worldObj.getTileEntity(pos.down());
+			TileEntity te = world.getTileEntity(pos.down());
 			if (te != null && te instanceof NostrumObeliskEntity) {
 				BlockPos target = ((NostrumObeliskEntity) te).getCurrentTarget();
 				if (target != null) {
@@ -117,7 +117,7 @@ public class ObeliskPortal extends TeleportationPortal {
 		@SideOnly(Side.CLIENT)
 		@Override
 		public int getColor() {
-			TileEntity te = worldObj.getTileEntity(pos.down());
+			TileEntity te = world.getTileEntity(pos.down());
 			if (te != null && te instanceof NostrumObeliskEntity && ((NostrumObeliskEntity) te).hasOverride()) {
 				return 0x0000FF50;
 			}

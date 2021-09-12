@@ -211,7 +211,7 @@ public class Spell {
 					}
 					
 
-					if (first) {
+					if (first && next != null) {
 						final boolean harmful = action.isHarmful();
 						
 						if (!affectedEnts.isEmpty())
@@ -244,6 +244,7 @@ public class Spell {
 						final @Nullable EntityLivingBase centerEnt = (targets == null || targets.isEmpty() ? null : targets.get(0));
 						final @Nullable BlockPos centerBP = (locations == null || locations.isEmpty() ? null : locations.get(0));
 						if (centerEnt != null || centerBP != null) {
+							@SuppressWarnings("null")
 							final Vec3d centerPos = (centerEnt == null ? new Vec3d(centerBP.getX() + .5, centerBP.getY(), centerBP.getZ() + .5) : centerEnt.getPositionVector().addVector(0, centerEnt.height / 2, 0));
 							final float p= (shape.supportedFloats() == null || shape.supportedFloats().length == 0 ? 0 : (
 									param.level == 0f ? shape.supportedFloats()[0] : param.level));
@@ -323,7 +324,7 @@ public class Spell {
 			// instantiate trigger in world
 			Vec3d pos;
 			if (world == null)
-				world = targ.worldObj;
+				world = targ.world;
 			if (targ == null)
 				pos = new Vec3d(targpos.getX() + .5, targpos.getY(), targpos.getZ() + .5);
 			else
@@ -588,7 +589,7 @@ public class Spell {
 				for (ItemStack req : part.getTrigger().getReagents()) {
 					type = ReagentItem.findType(req);
 					int count = costs.get(type);
-					count += req.stackSize;
+					count += req.getCount();
 					costs.put(type, count);
 				}
 			} else {
@@ -600,14 +601,14 @@ public class Spell {
 				for (ItemStack req : part.getShape().getReagents()) {
 					type = ReagentItem.findType(req);
 					int count = costs.get(type);
-					count += req.stackSize;
+					count += req.getCount();
 					costs.put(type, count);
 				}
 				if (part.getAlteration() != null) {
 					for (ItemStack req : part.getAlteration().getReagents()) {
 						type = ReagentItem.findType(req);
 						int count = costs.get(type);
-						count += req.stackSize;
+						count += req.getCount();
 						costs.put(type, count);
 					}
 				}

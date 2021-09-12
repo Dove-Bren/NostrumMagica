@@ -8,7 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -26,7 +26,7 @@ public class ModelHookShot extends ModelBase {
 	@Override
 	public void render(Entity entity, float time, float swingProgress,
 			float swing, float headAngleY, float headAngleX, float scale) {
-		VertexBuffer wr = Tessellator.getInstance().getBuffer();
+		BufferBuilder wr = Tessellator.getInstance().getBuffer();
 		
 		GlStateManager.pushMatrix();
 		

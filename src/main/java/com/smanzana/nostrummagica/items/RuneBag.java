@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.items;
 
+import javax.annotation.Nonnull;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
@@ -48,17 +50,17 @@ public class RuneBag extends Item implements ILoreTagged {
 		this.setMaxStackSize(1);
 	}
 	
-	public static void setItem(ItemStack bag, ItemStack item, int pos) {
+	public static void setItem(ItemStack bag, @Nonnull ItemStack item, int pos) {
 		if (pos > SLOTS - 1)
 			return;
 		
-		if (bag != null && bag.getItem() instanceof RuneBag) {
+		if (!bag.isEmpty() && bag.getItem() instanceof RuneBag) {
 			if (!bag.hasTagCompound())
 				bag.setTagCompound(new NBTTagCompound());
 			
 			NBTTagCompound nbt = bag.getTagCompound();
 			NBTTagCompound items = nbt.getCompoundTag(NBT_ITEMS);
-			if (item == null)
+			if (item.isEmpty())
 				items.removeTag(pos + "");
 			else {
 				NBTTagCompound compound = new NBTTagCompound();
@@ -73,26 +75,26 @@ public class RuneBag extends Item implements ILoreTagged {
 
 	// returns what it couldn't fit
 	public static ItemStack addItem(ItemStack bag, ItemStack inputItem) {
-		if (inputItem == null)
+		if (inputItem.isEmpty())
 			return inputItem;
 		
 		RuneInventory inv = (RuneInventory) RuneBag.instance().asInventory(bag);
 		return inv.addItem(inputItem);
 	}
 	
-	public static ItemStack getItem(ItemStack bag, int pos) {
+	public static @Nonnull ItemStack getItem(ItemStack bag, int pos) {
 		if (pos > SLOTS - 1)
-			return null;
+			return ItemStack.EMPTY;
 		
-		if (bag != null && bag.getItem() instanceof RuneBag) {
+		if (!bag.isEmpty() && bag.getItem() instanceof RuneBag) {
 			if (!bag.hasTagCompound())
-				return null;
+				return ItemStack.EMPTY;
 			
 			NBTTagCompound items = bag.getTagCompound().getCompoundTag(NBT_ITEMS);
 			if (items.hasKey(pos + "", NBT.TAG_COMPOUND))
-				return ItemStack.loadItemStackFromNBT(items.getCompoundTag(pos + ""));
+				return new ItemStack(items.getCompoundTag(pos + ""));
 			else
-				return null;
+				return ItemStack.EMPTY;
 		}
 		
 		return null;
@@ -100,12 +102,12 @@ public class RuneBag extends Item implements ILoreTagged {
 	
 	/**
 	 * Returns either null (no bag) or an array of size SLOTS with either
-	 * items or nulls
+	 * items or ItemStack.EMPTY
 	 * @param bag
 	 * @return
 	 */
 	public static ItemStack[] getItems(ItemStack bag) {
-		if (bag == null)
+		if (bag.isEmpty())
 			return null;
 		
 		ItemStack ret[] = new ItemStack[SLOTS];
@@ -117,7 +119,7 @@ public class RuneBag extends Item implements ILoreTagged {
 	}
 	
 	public static boolean isVacuumEnabled(ItemStack stack) {
-		if (stack != null && stack.getItem() instanceof RuneBag) {
+		if (!stack.isEmpty() && stack.getItem() instanceof RuneBag) {
 			if (!stack.hasTagCompound())
 				stack.setTagCompound(new NBTTagCompound());
 			
@@ -128,7 +130,7 @@ public class RuneBag extends Item implements ILoreTagged {
 	}
 	
 	public static boolean toggleVacuumEnabled(ItemStack stack) {
-		if (stack != null && stack.getItem() instanceof RuneBag) {
+		if (!stack.isEmpty() && stack.getItem() instanceof RuneBag) {
 			boolean enabled = isVacuumEnabled(stack);
 			stack.getTagCompound().setBoolean(NBT_VACUUM, !enabled);
 			return !enabled;
@@ -138,7 +140,7 @@ public class RuneBag extends Item implements ILoreTagged {
 	}
 	
 	public static void setVacuumEnabled(ItemStack stack, boolean set) {
-		if (stack != null && stack.getItem() instanceof RuneBag) {
+		if (!stack.isEmpty() && stack.getItem() instanceof RuneBag) {
 			stack.getTagCompound().setBoolean(NBT_VACUUM, set);
 		}
 	}
@@ -148,18 +150,18 @@ public class RuneBag extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
 		playerIn.openGui(NostrumMagica.instance, NostrumGui.runeBagID, worldIn,
 				(int) playerIn.posX, (int) playerIn.posY, (int) playerIn.posZ);
 		
-		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, playerIn.getHeldItem(hand));
     }
 	
 	public static class RuneInventory extends InventoryBasic {
 
 		private static final int MAX_COUNT = 1;
 		
-		private ItemStack stack;
+		private @Nonnull ItemStack stack;
 		
 		public RuneInventory(ItemStack stack) {
 			super("Rune Bag", false, SLOTS);
@@ -176,7 +178,7 @@ public class RuneBag extends Item implements ILoreTagged {
 	     * Try to add the item to the invntory.
 	     * Return what won't fit.
 	     */
-	    public ItemStack addItem(ItemStack stack) {
+	    public @Nonnull ItemStack addItem(ItemStack stack) {
 	    	ItemStack itemstack = stack.copy();
 
 	    	if (!(stack.getItem() instanceof SpellRune))
@@ -185,10 +187,10 @@ public class RuneBag extends Item implements ILoreTagged {
 	    	for (int i = 0; i < this.getSizeInventory(); ++i) {
 	            ItemStack itemstack1 = this.getStackInSlot(i);
 
-	            if (itemstack1 == null) {
+	            if (itemstack1.isEmpty()) {
 	                this.setInventorySlotContents(i, itemstack);
 	                this.markDirty();
-	                return null;
+	                return ItemStack.EMPTY;
 	            }
 	        }
 
@@ -198,7 +200,7 @@ public class RuneBag extends Item implements ILoreTagged {
 	    @Override
 	    public void markDirty() {
 	    	// Bleed our changes out to the itemstack
-	    	if (stack != null) {
+	    	if (!stack.isEmpty()) {
 	    		for (int i = 0; i < this.getSizeInventory(); i++) {
 	    			RuneBag.setItem(stack, this.getStackInSlot(i), i);
 	    		}

@@ -66,7 +66,7 @@ public class FrostbitePotion extends Potion {
 		final int blizzardCount = EnchantedArmor.GetSetCount(entity, EMagicElement.ICE, 3);
 		if (blizzardCount == 4) {
 			entity.heal(1);
-			if (!entity.worldObj.isRemote) {
+			if (!entity.world.isRemote) {
 				final int interval = Math.max(1, (int) (20.0 * (2.0 / Math.pow(2, amp))));
 				final INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
 				final int manaPerSecond = 10;
@@ -79,7 +79,7 @@ public class FrostbitePotion extends Potion {
 					NostrumMagica.proxy.sendMana((EntityPlayer) entity);
 				}
 				
-				EntityAreaEffect cloud = new EntityAreaEffect(entity.worldObj, entity.posX, entity.posY, entity.posZ);
+				EntityAreaEffect cloud = new EntityAreaEffect(entity.world, entity.posX, entity.posY, entity.posZ);
 				cloud.setOwner(entity);
 				cloud.setIgnoreOwner(true);
 				cloud.setRadius(10f);
@@ -118,11 +118,11 @@ public class FrostbitePotion extends Potion {
 						}
 					}
 				});
-				entity.worldObj.spawnEntityInWorld(cloud);
+				entity.world.spawnEntity(cloud);
 			}
 		} else {
 			float damage = 1.0f;
-	        entity.attackEntityFrom(DamageSource.magic, damage);
+	        entity.attackEntityFrom(DamageSource.MAGIC, damage);
 		}
     }
 	

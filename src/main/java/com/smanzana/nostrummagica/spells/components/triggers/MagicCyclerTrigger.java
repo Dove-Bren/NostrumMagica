@@ -54,7 +54,7 @@ public class MagicCyclerTrigger extends SpellTrigger {
 							getState().getSelf(),
 							5.0f, (int) duration * 20, onBlocks);
 					
-					world.spawnEntityInWorld(projectile);
+					world.spawnEntity(projectile);
 			
 				}
 			
@@ -112,7 +112,7 @@ public class MagicCyclerTrigger extends SpellTrigger {
 			
 		
 		// Add direction
-		pos = new Vec3d(pos.xCoord, pos.yCoord + state.getSelf().getEyeHeight(), pos.zCoord);
+		pos = new Vec3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
 		return new MagicCyclerTriggerInstance(state, world, pos, onBlocks, duration);
 	}
 

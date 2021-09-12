@@ -20,12 +20,12 @@ import net.minecraft.util.text.TextComponentString;
 public class CommandForceBind extends CommandBase {
 
 	@Override
-	public String getCommandName() {
+	public String getName() {
 		return "nostrumbind";
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender sender) {
+	public String getUsage(ICommandSender sender) {
 		return "/nostrumbind";
 	}
 
@@ -39,13 +39,13 @@ public class CommandForceBind extends CommandBase {
 			EntityPlayer player = (EntityPlayer) sender;
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			if (attr == null) {
-				sender.addChatMessage(new TextComponentString("Could not find magic wrapper"));
+				sender.sendMessage(new TextComponentString("Could not find magic wrapper"));
 				return;
 			}
 			
 			ItemStack stack = player.getHeldItemMainhand();
 			if (stack == null || !(stack.getItem() instanceof SpellTome)) {
-				sender.addChatMessage(new TextComponentString("To force a bind, hold the tome that's being binded to in your main hand"));
+				sender.sendMessage(new TextComponentString("To force a bind, hold the tome that's being binded to in your main hand"));
 				return;
 			}
 			if (attr.isBinding()) {
@@ -54,7 +54,7 @@ public class CommandForceBind extends CommandBase {
 				ItemStack offhand = player.getHeldItemOffhand();
 				if (offhand == null || !(offhand.getItem() instanceof SpellScroll)
 						|| SpellScroll.getSpell(offhand) == null) {
-					sender.addChatMessage(new TextComponentString("Either use while holding a tome that's currently binding OR hold a spell scroll in your offhand"));
+					sender.sendMessage(new TextComponentString("Either use while holding a tome that's currently binding OR hold a spell scroll in your offhand"));
 				} else {
 					Spell spell = SpellScroll.getSpell(offhand);
 					attr.startBinding(spell, null, SpellTome.getTomeID(stack));
@@ -65,7 +65,7 @@ public class CommandForceBind extends CommandBase {
 					new StatSyncMessage(attr)
 					, (EntityPlayerMP) player);
 		} else {
-			sender.addChatMessage(new TextComponentString("This command must be run as a player"));
+			sender.sendMessage(new TextComponentString("This command must be run as a player"));
 		}
 	}
 

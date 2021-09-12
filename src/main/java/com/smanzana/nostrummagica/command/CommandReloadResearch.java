@@ -12,12 +12,12 @@ import net.minecraft.util.text.TextComponentString;
 public class CommandReloadResearch extends CommandBase {
 
 	@Override
-	public String getCommandName() {
+	public String getName() {
 		return "RReload";
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender sender) {
+	public String getUsage(ICommandSender sender) {
 		return "/RReload";
 	}
 
@@ -27,7 +27,7 @@ public class CommandReloadResearch extends CommandBase {
 		if (sender instanceof EntityPlayer) {
 			NostrumMagica.instance.reloadDefaultResearch();
 		} else {
-			sender.addChatMessage(new TextComponentString("This command must be run as a player"));
+			sender.sendMessage(new TextComponentString("This command must be run as a player"));
 		}
 	}
 

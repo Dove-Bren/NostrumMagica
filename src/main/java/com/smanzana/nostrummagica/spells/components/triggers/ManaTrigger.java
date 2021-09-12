@@ -77,9 +77,9 @@ public class ManaTrigger extends SpellTrigger {
 							null
 							);
 					
-					this.entity.worldObj.getMinecraftServer().addScheduledTask(() -> {
+					this.entity.world.getMinecraftServer().addScheduledTask(() -> {
 						this.trigger(data);
-						NostrumMagica.proxy.spawnEffect(this.getState().getSelf().worldObj,
+						NostrumMagica.proxy.spawnEffect(this.getState().getSelf().world,
 								new SpellComponentWrapper(instance()),
 								this.getState().getSelf(), null, this.getState().getSelf(), null, null, false, 0);
 						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_MANA, this.entity);
@@ -91,7 +91,7 @@ public class ManaTrigger extends SpellTrigger {
 					expired = true;
 					if (this.entity instanceof EntityPlayer) {
 						EntityPlayer player = (EntityPlayer) this.entity;
-						player.addChatComponentMessage(new TextComponentTranslation("modification.damaged_duration.mana"));
+						player.sendMessage(new TextComponentTranslation("modification.damaged_duration.mana"));
 						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_MANA, this.entity);
 					}
 				}

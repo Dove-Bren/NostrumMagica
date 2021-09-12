@@ -96,10 +96,10 @@ public class RayTrace {
 		if (world == null || fromPos == null || direction == null)
 			return null;
 		
-		double x = direction.xCoord * maxDistance;
-		double y = direction.yCoord * maxDistance;
-		double z = direction.zCoord * maxDistance;
-		toPos = new Vec3d(fromPos.xCoord + x, fromPos.yCoord + y, fromPos.zCoord + z);
+		double x = direction.x * maxDistance;
+		double y = direction.y * maxDistance;
+		double z = direction.z * maxDistance;
+		toPos = new Vec3d(fromPos.x + x, fromPos.y + y, fromPos.z + z);
 		
 		
 		return raytrace(world, fromPos, toPos, selector);
@@ -138,7 +138,7 @@ public class RayTrace {
         }
         
         List<Entity> list = world.getEntitiesInAABBexcluding(null,
-        		new AxisAlignedBB(fromPos.xCoord, fromPos.yCoord, fromPos.zCoord, toPos.xCoord, toPos.yCoord, toPos.zCoord),
+        		new AxisAlignedBB(fromPos.x, fromPos.y, fromPos.z, toPos.x, toPos.y, toPos.z),
         		Predicates.and(EntitySelectors.NOT_SPECTATING, new Predicate<Entity>()
         {
             public boolean apply(Entity p_apply_1_)
@@ -158,7 +158,7 @@ public class RayTrace {
             AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().expand((double)f1, (double)f1, (double)f1);
             RayTraceResult movingobjectposition = axisalignedbb.calculateIntercept(fromPos, toPos);
 
-            if (axisalignedbb.isVecInside(fromPos))
+            if (axisalignedbb.contains(fromPos))
             {
                 if (minDist >= 0.0D)
                 {
@@ -204,10 +204,10 @@ public class RayTrace {
 		if (world == null || fromPos == null || direction == null)
 			return null;
 		
-		double x = direction.xCoord * maxDistance;
-		double y = direction.yCoord * maxDistance;
-		double z = direction.zCoord * maxDistance;
-		toPos = new Vec3d(fromPos.xCoord + x, fromPos.yCoord + y, fromPos.zCoord + z);
+		double x = direction.x * maxDistance;
+		double y = direction.y * maxDistance;
+		double z = direction.z * maxDistance;
+		toPos = new Vec3d(fromPos.x + x, fromPos.y + y, fromPos.z + z);
 		
 		
 		return allInPath(world, fromPos, toPos, selector);
@@ -241,7 +241,7 @@ public class RayTrace {
         }
         
         List<Entity> list = world.getEntitiesInAABBexcluding(null,
-        		new AxisAlignedBB(fromPos.xCoord, fromPos.yCoord, fromPos.zCoord, toPos.xCoord, toPos.yCoord, toPos.zCoord),
+        		new AxisAlignedBB(fromPos.x, fromPos.y, fromPos.z, toPos.x, toPos.y, toPos.z),
         		Predicates.and(EntitySelectors.NOT_SPECTATING, new Predicate<Entity>()
         {
             public boolean apply(Entity p_apply_1_)
@@ -260,7 +260,7 @@ public class RayTrace {
             AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().expand((double)f1, (double)f1, (double)f1);
             RayTraceResult movingobjectposition = axisalignedbb.calculateIntercept(fromPos, toPos);
 
-            if (axisalignedbb.isVecInside(fromPos))
+            if (axisalignedbb.contains(fromPos))
             {
                 ret.add(new RayTraceResult(entity1));
             }
@@ -296,7 +296,7 @@ public class RayTrace {
 		double d3 = projectile.motionX;
 		double d4 = projectile.motionY;
 		double d5 = projectile.motionZ;
-		World world = projectile.worldObj;
+		World world = projectile.world;
 		Vec3d vec3d = new Vec3d(d0, d1, d2);
 		Vec3d vec3d1 = new Vec3d(d0 + d3, d1 + d4, d2 + d5);
 		RayTraceResult raytraceresult = world.rayTraceBlocks(vec3d, vec3d1, false, true, false);
@@ -305,11 +305,11 @@ public class RayTrace {
 		{
 			if (raytraceresult != null)
 			{
-				vec3d1 = new Vec3d(raytraceresult.hitVec.xCoord, raytraceresult.hitVec.yCoord, raytraceresult.hitVec.zCoord);
+				vec3d1 = new Vec3d(raytraceresult.hitVec.x, raytraceresult.hitVec.y, raytraceresult.hitVec.z);
 			}
 
 			Entity entity = null;
-			List<Entity> list = world.getEntitiesWithinAABBExcludingEntity(projectile, projectile.getEntityBoundingBox().addCoord(d3, d4, d5).expandXyz(1.0D));
+			List<Entity> list = world.getEntitiesWithinAABBExcludingEntity(projectile, projectile.getEntityBoundingBox().offset(d3, d4, d5).grow(1.0D));
 			double d6 = 0.0D;
 
 			for (int i = 0; i < list.size(); ++i)
@@ -318,7 +318,7 @@ public class RayTrace {
 
 				if ((ignoreCollideFlag || entity1.canBeCollidedWith()) && (shouldExclude || !entity1.isEntityEqual(maybeExcludedEntity)) && !entity1.noClip)
 				{
-					AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().expandXyz(0.30000001192092896D);
+					AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().grow(0.30000001192092896D);
 					RayTraceResult raytraceresult1 = axisalignedbb.calculateIntercept(vec3d, vec3d1);
 
 					if (raytraceresult1 != null)

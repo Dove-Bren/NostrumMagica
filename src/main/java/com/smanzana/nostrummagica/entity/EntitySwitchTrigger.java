@@ -68,7 +68,7 @@ public class EntitySwitchTrigger extends EntityLiving {
 	
 	@Override
 	public boolean attackEntityFrom(DamageSource source, float amount) {
-		TileEntity te = worldObj.getTileEntity(getPosition());
+		TileEntity te = world.getTileEntity(getPosition());
 		if (te == null || !(te instanceof SwitchBlockTileEntity)) {
 			return false;
 		}
@@ -87,10 +87,10 @@ public class EntitySwitchTrigger extends EntityLiving {
 		if (this.cachePos == null || this.cacheEntity == null || !this.getPosition().equals(cachePos) || cacheEntity.getTriggerEntity() != this) {
 			cacheEntity = null;
 			this.cachePos = this.getPosition().toImmutable();
-			TileEntity te = worldObj.getTileEntity(cachePos);
+			TileEntity te = world.getTileEntity(cachePos);
 			if (te != null && te instanceof SwitchBlockTileEntity) {
 				SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;
-				if (worldObj.isRemote || ent.getTriggerEntity() == this) {
+				if (world.isRemote || ent.getTriggerEntity() == this) {
 					cacheEntity = ent;
 				}
 			}
@@ -104,7 +104,7 @@ public class EntitySwitchTrigger extends EntityLiving {
 		super.onLivingUpdate();
 		
 		if (!this.isDead && !this.dead) {
-			if (!worldObj.isRemote && this.ticksExisted > 20) {
+			if (!world.isRemote && this.ticksExisted > 20) {
 				
 				if (this.ticksExisted % 20 == 0) {
 					// Clear cache every once in a while

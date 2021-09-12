@@ -60,7 +60,7 @@ public class TouchTrigger extends InstantTrigger {
 		} else if (trace.typeOfHit == RayTraceResult.Type.BLOCK) {
 			Vec3d vec = trace.hitVec;
 			return new TriggerData(null, others, world,
-					Lists.newArrayList(new BlockPos(Math.floor(vec.xCoord), Math.floor(vec.yCoord), Math.floor(vec.zCoord))));
+					Lists.newArrayList(new BlockPos(Math.floor(vec.x), Math.floor(vec.y), Math.floor(vec.z))));
 		} else {
 			return new TriggerData(null, null, null, null);
 		}

@@ -77,7 +77,7 @@ public abstract class DragonGambittedSpellAttackTask<T extends EntityDragon & IT
 	}
 	
 	@Override
-	public boolean continueExecuting() {
+	public boolean shouldContinueExecuting() {
 		return false;
 	}
 	
@@ -103,7 +103,7 @@ public abstract class DragonGambittedSpellAttackTask<T extends EntityDragon & IT
 				continue;
 			}
 			
-			int nowTicks = dragon.worldObj.getMinecraftServer().getTickCounter();
+			int nowTicks = dragon.world.getMinecraftServer().getTickCounter();
 			
 			switch (gambit) {
 			case ALWAYS:

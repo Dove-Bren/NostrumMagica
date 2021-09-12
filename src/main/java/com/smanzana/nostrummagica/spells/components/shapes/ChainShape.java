@@ -48,7 +48,7 @@ public class ChainShape extends SpellShape {
 		
 		double radius = 7.0;
 		if (world == null)
-			world = target.worldObj;
+			world = target.world;
 		
 		int arc = Math.max((int) supportedFloats()[0], (int) param.level) + 1; // +1 to include center
 		final boolean teamLock = param.flip;
@@ -85,7 +85,7 @@ public class ChainShape extends SpellShape {
 						return ent != null && ent instanceof EntityLivingBase;
 					});
 			Collections.sort(entities, (a, b) -> {
-				return (int) (a.getDistanceSqToEntity(center) - b.getDistanceSqToEntity(center));
+				return (int) (a.getDistanceSq(center) - b.getDistanceSq(center));
 			});
 			
 			// Note: Could do this filtering inside the entity iteration. Just filtering to living is probably okay.
@@ -102,7 +102,7 @@ public class ChainShape extends SpellShape {
 				EntityLivingBase living = (EntityLivingBase) ent;
 				
 				// Check actual distance
-				if (Math.abs(living.getDistanceSqToEntity(center)) > radiusSq) {
+				if (Math.abs(living.getDistanceSq(center)) > radiusSq) {
 					// since things are sorted, any after this are bad
 					break;
 				}

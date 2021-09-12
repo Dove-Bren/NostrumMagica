@@ -3,8 +3,6 @@ package com.smanzana.nostrummagica.blocks;
 import java.util.Random;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
-
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.NostrumSkillItem;
@@ -21,6 +19,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.IBlockAccess;
@@ -47,7 +46,7 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 	}
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(SpawnerTriggerTE.class, "nostrum_mob_spawner_trigger_te");
+		GameRegistry.registerTileEntity(SpawnerTriggerTE.class, new ResourceLocation(NostrumMagica.MODID, "nostrum_mob_spawner_trigger_te"));
 	}
 	
 	public NostrumSpawnAndTrigger() {
@@ -81,7 +80,7 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (worldIn.isRemote) {
 			return true;
 		}
@@ -98,8 +97,9 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 		SpawnerTriggerTE ent = (SpawnerTriggerTE) te;
 		
 		if (playerIn.isCreative()) {
-			if (heldItem == null) {
-				playerIn.addChatComponentMessage(new TextComponentString("Currently set to " + state.getValue(MOB).getName()));
+			ItemStack heldItem = playerIn.getHeldItem(hand);
+			if (heldItem.isEmpty()) {
+				playerIn.sendMessage(new TextComponentString("Currently set to " + state.getValue(MOB).getName()));
 			} else if (heldItem.getItem() instanceof EssenceItem) {
 				Type type = null;
 				switch (EssenceItem.findType(heldItem)) {
@@ -145,7 +145,7 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 					if (atState != null && atState.getBlock() instanceof ITriggeredBlock) {
 						playerIn.setPositionAndUpdate(loc.getX(), loc.getY(), loc.getZ());
 					} else {
-						playerIn.addChatComponentMessage(new TextComponentString("Not pointed at valid triggered block!"));
+						playerIn.sendMessage(new TextComponentString("Not pointed at valid triggered block!"));
 					}
 				}
 			}
@@ -185,9 +185,9 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 		protected void trigger(IBlockState state) {
 			
 			if (triggerOffset != null) {
-				state = worldObj.getBlockState(pos.add(this.triggerOffset));
+				state = world.getBlockState(pos.add(this.triggerOffset));
 				if (state.getBlock() instanceof ITriggeredBlock) {
-					((ITriggeredBlock) state.getBlock()).trigger(worldObj, pos.add(triggerOffset), state, pos);
+					((ITriggeredBlock) state.getBlock()).trigger(world, pos.add(triggerOffset), state, pos);
 				}
 				triggerOffset = null;
 			}
@@ -197,7 +197,7 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 		protected void majorTick(IBlockState state) {
 			if (unlinkedEntID != null) {
 				// Need to find our entity!
-				for (EntityLivingBase ent : worldObj.getEntities(EntityLivingBase.class, (ent) -> { return ent.getPersistentID().equals(unlinkedEntID);})) {
+				for (EntityLivingBase ent : world.getEntities(EntityLivingBase.class, (ent) -> { return ent.getPersistentID().equals(unlinkedEntID);})) {
 					this.entity = ent;
 					unlinkedEntID = null;
 					break;
@@ -207,14 +207,14 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 					// Give up
 					unlinkedEntID = null;
 					this.trigger(state);
-					worldObj.setBlockToAir(pos);
+					world.setBlockToAir(pos);
 				}
 			} else if (entity == null) {
-				for (EntityPlayer player : worldObj.playerEntities) {
+				for (EntityPlayer player : world.playerEntities) {
 					if (!player.isSpectator() && !player.isCreative() && player.getDistanceSq(pos) < SPAWN_DIST_SQ) {
-						entity = instance().spawn(worldObj, pos, state, NostrumMagica.rand);
-						worldObj.notifyBlockUpdate(pos, state, state, 2);
-						worldObj.addBlockEvent(pos, state.getBlock(), 9, 0);
+						entity = instance().spawn(world, pos, state, NostrumMagica.rand);
+						world.notifyBlockUpdate(pos, state, state, 2);
+						world.addBlockEvent(pos, state.getBlock(), 9, 0);
 						this.markDirty();
 						return;
 					}
@@ -222,7 +222,7 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 			} else {
 				if (entity.isDead) {
 					this.trigger(state);
-					worldObj.setBlockToAir(pos);
+					world.setBlockToAir(pos);
 				}
 			}
 		}

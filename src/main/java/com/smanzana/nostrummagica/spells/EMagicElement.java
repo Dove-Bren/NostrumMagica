@@ -85,6 +85,7 @@ public enum EMagicElement {
 	public static final DataSerializer<EMagicElement> Serializer = new DataSerializer<EMagicElement>() {
 
 		{
+			broke();
 			DataSerializers.registerSerializer(this);
 		}
 		
@@ -101,6 +102,11 @@ public enum EMagicElement {
 		@Override
 		public DataParameter<EMagicElement> createKey(int id) {
 			return new DataParameter<>(id, this);
+		}
+
+		@Override
+		public EMagicElement copyValue(EMagicElement value) {
+			return value;
 		}
 		
 	};

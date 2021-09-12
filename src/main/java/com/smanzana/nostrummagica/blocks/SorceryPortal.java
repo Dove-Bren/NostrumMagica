@@ -9,6 +9,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -33,7 +34,7 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 	}
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(SorceryPortalTileEntity.class, "sorcery_portal");
+		GameRegistry.registerTileEntity(SorceryPortalTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "sorcery_portal"));
 	}
 	
 	public SorceryPortal() {

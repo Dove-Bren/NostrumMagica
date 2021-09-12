@@ -87,7 +87,7 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
     	int priority = 1;
     	this.tasks.addTask(priority++, new EntitySpellAttackTask<EntitySprite>(this, 20, 4, true, (sprite) -> {
     		return sprite.isAngry() && sprite.getAttackTarget() != null
-    				&& sprite.getAttackTarget().getDistanceSqToEntity(sprite) <= TouchTrigger.TOUCH_RANGE * TouchTrigger.TOUCH_RANGE;
+    				&& sprite.getAttackTarget().getDistanceSq(sprite) <= TouchTrigger.TOUCH_RANGE * TouchTrigger.TOUCH_RANGE;
     	}, EARTH_ZAP));
         this.tasks.addTask(priority++, new EntityAISwimming(this));
         this.tasks.addTask(priority++, new EntityAIFollowEntityGeneric<EntitySprite>(this, 1D, 2f, 4f, false, null) {
@@ -230,7 +230,7 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
 			}
 		}
 		
-		if (effectCooldown > 0 && !worldObj.isRemote) {
+		if (effectCooldown > 0 && !world.isRemote) {
 			effectCooldown--;
 			if (effectCooldown == 0) {
 				
@@ -239,7 +239,7 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
 				// Non-players
 				AxisAlignedBB bb = new AxisAlignedBB(posX - 6, posY - 40, posZ - 6,
 						posX + 6, posY + 40, posZ + 6);
-				List<Entity> entities = worldObj.getEntitiesWithinAABBExcludingEntity(this, bb);
+				List<Entity> entities = world.getEntitiesWithinAABBExcludingEntity(this, bb);
 				
 				for (Entity entity : entities) {
 					if (entity instanceof EntityLivingBase && !(entity instanceof EntitySprite)) {
@@ -253,12 +253,12 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
 				}
 				
 				// Players
-				for (EntityPlayer player : worldObj.playerEntities) {
+				for (EntityPlayer player : world.playerEntities) {
 					if (player.isCreative() || player.isSpectator()) {
 						continue;
 					}
 					
-					if (player.getDistanceSqToEntity(this) <= EFFECT_DISTANCE_SQ) {
+					if (player.getDistanceSq(this) <= EFFECT_DISTANCE_SQ) {
 						applyEffect(player);
 					}
 				}
@@ -375,8 +375,8 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
 			setAngry(true);
 			effectCooldown = 1; // Make next tick grou nd everyone again
 			
-			if (!this.worldObj.isRemote) {
-				this.worldObj.setEntityState(this, (byte) 6);
+			if (!this.world.isRemote) {
+				this.world.setEntityState(this, (byte) 6);
 			}
 		}
 		
@@ -389,7 +389,7 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
 			double d0 = this.rand.nextGaussian() * 0.02D;
 			double d1 = this.rand.nextGaussian() * 0.02D;
 			double d2 = this.rand.nextGaussian() * 0.02D;
-			this.worldObj.spawnParticle(enumparticletypes, this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.height), this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, d0, d1, d2, new int[0]);
+			this.world.spawnParticle(enumparticletypes, this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.height), this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, d0, d1, d2, new int[0]);
 		}
 	}
 	
@@ -413,8 +413,8 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
 	protected boolean isValidLightLevel() {
 		BlockPos blockpos = new BlockPos(this.posX, this.getEntityBoundingBox().minY, this.posZ);
 		
-		if (worldObj.getBlockState(blockpos).getMaterial() == Material.GRASS) {
-			return worldObj.getLightFromNeighbors(blockpos) <= this.getRNG().nextInt(12);
+		if (world.getBlockState(blockpos).getMaterial() == Material.GRASS) {
+			return world.getLightFromNeighbors(blockpos) <= this.getRNG().nextInt(12);
 		}
 		
 		return super.isValidLightLevel();

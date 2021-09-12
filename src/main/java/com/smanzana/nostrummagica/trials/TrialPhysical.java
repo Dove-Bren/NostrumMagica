@@ -22,11 +22,11 @@ public class TrialPhysical extends ShrineTrial {
 	public void onDeath(LivingDeathEvent e) {
 		if (e.getEntityLiving() instanceof EntityIronGolem) {
 			DamageSource source = e.getSource();
-			if (source.getSourceOfDamage() == null ||
-					!(source.getSourceOfDamage() instanceof EntityPlayer))
+			if (source.getTrueSource() == null ||
+					!(source.getTrueSource() instanceof EntityPlayer))
 				return;
 			
-			EntityPlayer player = (EntityPlayer) source.getSourceOfDamage();
+			EntityPlayer player = (EntityPlayer) source.getTrueSource();
 			
 			if (player.getHeldItemMainhand() != null)
 				return;

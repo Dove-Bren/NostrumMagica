@@ -31,7 +31,7 @@ public class RedDragonBondInfoSheet implements IDragonGUISheet {
 	@Override
 	public void draw(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		
-		FontRenderer fonter = mc.fontRendererObj;
+		FontRenderer fonter = mc.fontRenderer;
 		int x = 0;
 		int y = 5;
 		final int infoColor = 0xFFFFFFFF;

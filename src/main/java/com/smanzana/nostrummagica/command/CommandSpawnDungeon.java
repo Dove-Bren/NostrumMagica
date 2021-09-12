@@ -15,12 +15,12 @@ public class CommandSpawnDungeon extends CommandBase {
 	private static Random rand = null;
 	
 	@Override
-	public String getCommandName() {
+	public String getName() {
 		return "NostrumSpawnDungeon";
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender sender) {
+	public String getUsage(ICommandSender sender) {
 		return "/NostrumSpawnDungeon [type]";
 	}
 
@@ -52,7 +52,7 @@ public class CommandSpawnDungeon extends CommandBase {
 			}
 			
 			EntityPlayer player = ((EntityPlayer) sender);
-			type.getGenerator().generate(player.worldObj, rand, player.getPosition());
+			type.getGenerator().generate(player.world, rand, player.getPosition());
 		}
 		else {
 			throw new CommandException("Too many arguments!");

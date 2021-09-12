@@ -1,7 +1,5 @@
 package com.smanzana.nostrummagica.items;
 
-import java.util.List;
-
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -11,6 +9,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -71,9 +70,9 @@ public class EssenceItem extends Item implements ILoreTagged {
      */
     @SideOnly(Side.CLIENT)
     @Override
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
     	for (EMagicElement element: EMagicElement.values()) {
-    		subItems.add(new ItemStack(itemIn, 1, element.ordinal()));
+    		subItems.add(new ItemStack(this, 1, element.ordinal()));
     	}
 	}
     

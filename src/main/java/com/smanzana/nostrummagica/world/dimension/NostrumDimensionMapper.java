@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.config.ModConfig;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldSavedData;
+import net.minecraft.world.storage.WorldSavedData;
 
 /**
  * Maps between player and their unique offset in the Sorcery dimension.

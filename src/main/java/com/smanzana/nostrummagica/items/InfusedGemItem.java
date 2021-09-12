@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.items;
 
-import java.util.List;
+import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.AltarBlock;
@@ -24,6 +24,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -93,12 +94,12 @@ public class InfusedGemItem extends Item implements ILoreTagged {
      */
     @SideOnly(Side.CLIENT)
     @Override
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
-    	subItems.add(new ItemStack(itemIn, 1, 0));
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+    	subItems.add(new ItemStack(this, 1, 0));
     	for (EMagicElement type : EMagicElement.values()) {
     		if (type == EMagicElement.PHYSICAL)
     			continue;
-    		subItems.add(new ItemStack(itemIn, 1, type.ordinal() + 1));
+    		subItems.add(new ItemStack(this, 1, type.ordinal() + 1));
     	}
 	}
     
@@ -150,10 +151,11 @@ public class InfusedGemItem extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		//if (worldIn.isRemote)
 			//return EnumActionResult.SUCCESS;
 		
+		final @Nonnull ItemStack stack = playerIn.getHeldItem(hand);
 		IBlockState state = worldIn.getBlockState(pos);
 		if (state.getBlock() == null)
 			return EnumActionResult.PASS;
@@ -166,7 +168,7 @@ public class InfusedGemItem extends Item implements ILoreTagged {
 				return EnumActionResult.PASS;
 			
  			if (RitualRegistry.attemptRitual(worldIn, pos, playerIn, element)) {
- 				stack.stackSize--;
+ 				stack.shrink(1);
  			}
  			
 			return EnumActionResult.SUCCESS;
@@ -175,7 +177,7 @@ public class InfusedGemItem extends Item implements ILoreTagged {
 				return EnumActionResult.PASS;
 			
 			if (RitualRegistry.attemptRitual(worldIn, pos, playerIn, element)) {
-				stack.stackSize--;
+				stack.shrink(1);
 			}
 			
 			return EnumActionResult.SUCCESS;

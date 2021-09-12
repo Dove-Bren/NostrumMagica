@@ -44,7 +44,7 @@ public class EntityAIOrbitEntityGeneric<T extends EntityLiving> extends EntityAI
 	public EntityAIOrbitEntityGeneric(T orbiter, EntityLivingBase target, double orbitDistance, double orbitPeriod, double assembleSpeed,
 			double ringWobbleSpeed, int ringWobbleBumps, Predicate<? super T> startFilter, Predicate<? super T> continueFilter) {
 		this.ent = orbiter;
-		this.theWorld = orbiter.worldObj;
+		this.theWorld = orbiter.world;
 		this.entMovementHelper = orbiter.getMoveHelper();
 		this.orbitTarget = target;
 		this.orbitDistance = orbitDistance;
@@ -77,15 +77,15 @@ public class EntityAIOrbitEntityGeneric<T extends EntityLiving> extends EntityAI
 		} else if (this.ent.getMoveHelper().isUpdating()
 				&& ent.getDistanceSq(ent.getMoveHelper().getX(), ent.getMoveHelper().getY(), ent.getMoveHelper().getZ()) > 1.0) {
 			return false;
-		} else if (!ent.worldObj.equals(entitylivingbase.getEntityWorld())) {
+		} else if (!ent.world.equals(entitylivingbase.getEntityWorld())) {
 			return false;
-		} else if (ent.getDistanceSqToEntity(entitylivingbase) > 1024) {
+		} else if (ent.getDistanceSq(entitylivingbase) > 1024) {
 			return false;
 		} else if (startPred != null && !startPred.apply(ent)) {
 			return false;
 		} else {
 			this.orbitTarget = entitylivingbase; // In case getOrbitTarget is overriden
-			this.theWorld = entitylivingbase.worldObj;
+			this.theWorld = entitylivingbase.world;
 			return true;
 		}
 	}
@@ -93,12 +93,12 @@ public class EntityAIOrbitEntityGeneric<T extends EntityLiving> extends EntityAI
 	/**
 	 * Returns whether an in-progress EntityAIBase should continue executing
 	 */
-	public boolean continueExecuting() {
+	public boolean shouldContinueExecuting() {
 		// Only stop if something died, something changed worlds, or a continue pred was provided and returns false.
 		
 		if (		ent.isDead
 				|| orbitTarget.isDead
-				|| !ent.worldObj.equals(orbitTarget.worldObj)
+				|| !ent.world.equals(orbitTarget.world)
 				|| (continuePred != null && !continuePred.apply(ent))) {
 			return false;
 		}

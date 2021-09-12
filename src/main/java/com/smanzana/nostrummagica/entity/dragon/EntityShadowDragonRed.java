@@ -127,12 +127,12 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 		
 		if (this.target != null) {
 			if (this.target.isDead) {
-				this.attackEntityFrom(DamageSource.outOfWorld, (float) this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getAttributeValue());
+				this.attackEntityFrom(DamageSource.OUT_OF_WORLD, (float) this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getAttributeValue());
 			}
 		} else {
 			// If target is null but we're a target-type, DIE
 			if (this.dataManager.get(HASTARGET)) {
-				this.attackEntityFrom(DamageSource.outOfWorld, (float) this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getAttributeValue());
+				this.attackEntityFrom(DamageSource.OUT_OF_WORLD, (float) this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getAttributeValue());
 			}
 		}
 	}

@@ -30,7 +30,7 @@ public class ClientUpdateQuestMessage implements IMessage {
 			if (!message.tag.hasKey(NBT_QUEST, NBT.TAG_STRING))
 				return null;
 			
-			final EntityPlayerMP sp = ctx.getServerHandler().playerEntity;
+			final EntityPlayerMP sp = ctx.getServerHandler().player;
 			
 			sp.getServerWorld().addScheduledTask(() -> {
 				INostrumMagic att = NostrumMagica.getMagicWrapper(sp);

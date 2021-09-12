@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
 import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -22,6 +23,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -61,8 +63,8 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 
         if (equipmentSlot == EntityEquipmentSlot.MAINHAND)
         {
-            multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 4, 0));
-            multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4000000953674316D, 0));
+            multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 4, 0));
+            multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4000000953674316D, 0));
         }
 
         return multimap;
@@ -96,7 +98,7 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 	
 	@Override
 	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return repair != null && repair.getItem() == NostrumResourceItem.instance()
+        return !repair.isEmpty() && repair.getItem() == NostrumResourceItem.instance()
         		&& NostrumResourceItem.getTypeFromMeta(repair.getMetadata()) == ResourceType.CRYSTAL_SMALL;
     }
 
@@ -121,28 +123,28 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-		super.addInformation(stack, playerIn, tooltip, advanced);
+	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+		super.addInformation(stack, worldIn, tooltip, flagIn);
 		tooltip.add("Magic Potency Bonus: 15%");
 		tooltip.add("Reagent Cost Discount: 5%");
 	}
 	
 	public static boolean hasFreeCast(ItemStack staff) {
-		if (staff == null || !staff.hasTagCompound())
+		if (staff.isEmpty() || !staff.hasTagCompound())
 			return false;
 		int xp = getXP(staff);
 		return xp >= 10;
 	}
 	
 	public static void removeFreeCast(ItemStack staff) {
-		if (staff == null || !staff.hasTagCompound())
+		if (staff.isEmpty() || !staff.hasTagCompound())
 			return;
 		
 		setXP(staff, (byte) 0);
 	}
 	
 	public static int getXP(ItemStack staff) {
-		if (staff == null || !staff.hasTagCompound())
+		if (staff.isEmpty() || !staff.hasTagCompound())
 			return 0;
 		
 		NBTTagCompound nbt = staff.getTagCompound();
@@ -150,7 +152,7 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 	}
 	
 	private static void setXP(ItemStack staff, byte xp) {
-		if (staff == null)
+		if (staff.isEmpty())
 			return;
 		
 		NBTTagCompound nbt = staff.getTagCompound();
@@ -162,7 +164,7 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 	}
 	
 	public static int addXP(ItemStack staff, int xp) {
-		if (staff == null)
+		if (staff.isEmpty())
 			return xp;
 		
 		int inStaff = getXP(staff);

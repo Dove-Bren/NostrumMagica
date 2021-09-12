@@ -37,7 +37,7 @@ public class TamedDragonGUIOpenMessage implements IMessage {
 			Minecraft.getMinecraft().addScheduledTask(() -> {
 				ITameDragon dragon = null;
 				//for (Entity ent : Minecraft.getMinecraft().theWorld.getLoadedEntityList()) {
-				for (Entity ent : NostrumMagica.proxy.getPlayer().worldObj.loadedEntityList) {
+				for (Entity ent : NostrumMagica.proxy.getPlayer().world.loadedEntityList) {
 					if (ent == null || !(ent instanceof ITameDragon)) {
 						continue;
 					}

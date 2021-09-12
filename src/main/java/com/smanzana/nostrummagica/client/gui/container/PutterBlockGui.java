@@ -76,16 +76,16 @@ public class PutterBlockGui {
 				prev = stack.copy();
 
 				stack = Inventories.addItem(to, stack);
-				if (stack != null && stack.stackSize == 0) {
+				if (stack != null && stack.getCount() == 0) {
 					stack = null;
 				}
 				
-				if (stack != null && stack.stackSize == prev.stackSize) {
+				if (stack != null && stack.getCount() == prev.getCount()) {
 					return null;
 				};
 				
 				slot.putStack(stack);
-				slot.onPickupFromSlot(playerIn, stack);
+				slot.onTake(playerIn, stack);
 			}
 
 			return prev;

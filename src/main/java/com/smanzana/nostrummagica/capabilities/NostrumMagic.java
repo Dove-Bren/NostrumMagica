@@ -402,7 +402,7 @@ public class NostrumMagic implements INostrumMagic {
 //			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
 //		}
 		
-		if (entity != null && entity instanceof EntityPlayer && !entity.worldObj.isRemote) {
+		if (entity != null && entity instanceof EntityPlayer && !entity.world.isRemote) {
 			NetworkHandler.getSyncChannel().sendTo(
 					new LoreMessage(tagged, this),
 					(EntityPlayerMP) entity);
@@ -419,11 +419,11 @@ public class NostrumMagic implements INostrumMagic {
 			return; // Already has full
 		
 		loreLevels.put(key, 2);
-//		if (NostrumMagica.proxy.getPlayer() != null || !NostrumMagica.proxy.getPlayer().worldObj.isRemote) {
+//		if (NostrumMagica.proxy.getPlayer() != null || !NostrumMagica.proxy.getPlayer().world.isRemote) {
 //			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
 //		}
 		
-		if (entity != null && entity instanceof EntityPlayer && !entity.worldObj.isRemote) {
+		if (entity != null && entity instanceof EntityPlayer && !entity.world.isRemote) {
 			NetworkHandler.getSyncChannel().sendTo(
 					new LoreMessage(tagged, this),
 					(EntityPlayerMP) entity);
@@ -485,10 +485,10 @@ public class NostrumMagic implements INostrumMagic {
 		if (old == null || !old) {
 			// Learned for the first time
 			// TODO effect
-			if (this.entity != null && !this.entity.worldObj.isRemote
+			if (this.entity != null && !this.entity.world.isRemote
 					&& this.entity instanceof EntityPlayer) {
 				EntityPlayer player = (EntityPlayer) this.entity;
-				player.addChatComponentMessage(new TextComponentString("The forces of "
+				player.sendMessage(new TextComponentString("The forces of "
 						+ element.getName() + " have been unlocked!"));
 			}
 			
@@ -538,10 +538,10 @@ public class NostrumMagic implements INostrumMagic {
 		
 		unlock();
 		// TODO effects
-		if (this.entity != null && !this.entity.worldObj.isRemote
+		if (this.entity != null && !this.entity.world.isRemote
 				&& this.entity instanceof EntityPlayer) {
 			EntityPlayer player = (EntityPlayer) this.entity;
-			player.addChatComponentMessage(new TextComponentString(
+			player.sendMessage(new TextComponentString(
 					"Magic Unlocked"));
 		}
 		
@@ -781,15 +781,15 @@ public class NostrumMagic implements INostrumMagic {
 			if (tome == null) {
 				tome = NostrumMagica.findTome(player, bindingTomeID);
 				if (tome == null) {
-					player.addChatComponentMessage(new TextComponentTranslation(
+					player.sendMessage(new TextComponentTranslation(
 							"info.tome.bind_missing", new Object[] {bindingSpell.getName()}));
 					return;
 				}
 			}
 			
-			if (!this.entity.worldObj.isRemote) {
+			if (!this.entity.world.isRemote) {
 				NostrumMagicaSounds.LEVELUP.play(player);
-				player.addChatComponentMessage(new TextComponentTranslation(
+				player.sendMessage(new TextComponentTranslation(
 						"info.tome.bind_finish", new Object[] {bindingSpell.getName()}));
 			}
 			

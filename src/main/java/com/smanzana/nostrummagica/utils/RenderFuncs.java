@@ -15,12 +15,12 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -39,7 +39,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.client.model.pipeline.LightUtil;
 import net.minecraftforge.client.model.pipeline.VertexBufferConsumer;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -59,7 +59,7 @@ public final class RenderFuncs {
 			double d0 = player.lastTickPosX + (player.posX - player.lastTickPosX) * (double)partialTicks;
 			double d1 = player.lastTickPosY + (player.posY - player.lastTickPosY) * (double)partialTicks;
 			double d2 = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * (double)partialTicks;
-			RenderGlobal.drawSelectionBoundingBox(blockState.getSelectedBoundingBox(world, new BlockPos(pos)).expandXyz(0.0020000000949949026D).offset(-d0, -d1, -d2), 0.0F, 0.0F, 0.0F, 0.4F);
+			RenderGlobal.drawSelectionBoundingBox(blockState.getSelectedBoundingBox(world, new BlockPos(pos)).grow(0.0020000000949949026D).offset(-d0, -d1, -d2), 0.0F, 0.0F, 0.0F, 0.4F);
 		}
 
 		GlStateManager.depthMask(true);
@@ -73,7 +73,7 @@ public final class RenderFuncs {
 	
 	public static void RenderModelWithColor(IBakedModel model, int color) {
 		Tessellator tessellator = Tessellator.getInstance();
-		VertexBuffer buffer = tessellator.getBuffer();
+		BufferBuilder buffer = tessellator.getBuffer();
 		buffer.begin(7, DefaultVertexFormats.ITEM);
 		
 		RenderModelWithColor(model, color, buffer);
@@ -82,17 +82,17 @@ public final class RenderFuncs {
 	
 	private static final Vector3f Vec3fZero = new Vector3f();
 	
-	public static void RenderModelWithColor(IBakedModel model, int color, VertexBuffer buffer) {
+	public static void RenderModelWithColor(IBakedModel model, int color, BufferBuilder buffer) {
 		RenderModelWithColor(model, color, buffer, Vec3fZero);
 	}
 	
 	private static final Matrix4f M4fZero = new Matrix4f();
 	
-	public static void RenderModelWithColor(IBakedModel model, int color, VertexBuffer buffer, Vector3f offset) {
+	public static void RenderModelWithColor(IBakedModel model, int color, BufferBuilder buffer, Vector3f offset) {
 		RenderModelWithColor(model, color, buffer, offset, M4fZero);
 	}
 	
-	public static void RenderModelWithColor(IBakedModel model, int color, VertexBuffer buffer, Vector3f offset, Matrix4f transform) {
+	public static void RenderModelWithColor(IBakedModel model, int color, BufferBuilder buffer, Vector3f offset, Matrix4f transform) {
 		GlStateManager.pushMatrix();
 
 		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
@@ -109,7 +109,7 @@ public final class RenderFuncs {
 		GlStateManager.popMatrix();
 	}
 
-//	private static void renderQuadsColor(VertexBuffer buffer, List<BakedQuad> quads, int color) {
+//	private static void renderQuadsColor(BufferBuilder buffer, List<BakedQuad> quads, int color) {
 //
 //		int i = 0;
 //		for (int j = quads.size(); i < j; ++i) {
@@ -141,7 +141,7 @@ public final class RenderFuncs {
 	 * @param brightness the brightness of the model. The packed lightmap coordinate system is pretty complex and a lot of parameters are not necessary here so only the dominant one is implemented.
 	 * @param color      the color of the quad. This is a color multiplier in the ARGB format.
 	 */
-	public static void renderQuads(Iterable<BakedQuad> quads, Vector3f baseOffset, VertexBufferConsumer pipeline, VertexBuffer buffer, Matrix4f transform, float brightness, int color) {
+	public static void renderQuads(Iterable<BakedQuad> quads, Vector3f baseOffset, VertexBufferConsumer pipeline, BufferBuilder buffer, Matrix4f transform, float brightness, int color) {
 		// Get the raw int buffer of the buffer builder object.
 		IntBuffer intBuf = getIntBuffer(buffer);
 
@@ -197,7 +197,7 @@ public final class RenderFuncs {
 	 * @param offset the offset for the int buffer, in ints.
 	 * @param pos    the position to add to the buffer.
 	 */
-	public static void putPositionForVertex(VertexBuffer buffer, IntBuffer intBuf, int offset, Vector3f pos) {
+	public static void putPositionForVertex(BufferBuilder buffer, IntBuffer intBuf, int offset, Vector3f pos) {
 		// Getting the old position data in the buffer currently.
 		float ox = Float.intBitsToFloat(intBuf.get(offset));
 		float oy = Float.intBitsToFloat(intBuf.get(offset + 1));
@@ -214,7 +214,7 @@ public final class RenderFuncs {
 		intBuf.put(offset + 2, z);
 	}
 	
-	private static final Field bufferBuilder_rawIntBuffer = ReflectionHelper.findField(VertexBuffer.class, "rawIntBuffer", "field_178999_b", "field_178999_b");
+	private static final Field bufferBuilder_rawIntBuffer = ObfuscationReflectionHelper.findField(BufferBuilder.class, "rawIntBuffer");
 	
 	/**
 	 * A getter for the rawIntBuffer field value of the BufferBuilder.
@@ -223,7 +223,7 @@ public final class RenderFuncs {
 	 * @return the rawIntbuffer component
 	 */
 	@Nonnull
-	public static IntBuffer getIntBuffer(VertexBuffer buffer) {
+	public static IntBuffer getIntBuffer(BufferBuilder buffer) {
 		try {
 			return (IntBuffer) bufferBuilder_rawIntBuffer.get(buffer);
 		} catch (IllegalAccessException exception) {
@@ -240,12 +240,12 @@ public final class RenderFuncs {
 		//enableLightmap();
 		disableLightmap();
 		Entity entity = mc.getRenderViewEntity();
-		World world = mc.theWorld;
+		World world = mc.world;
 //		int entPosX = MathHelper.floor_double(entity.posX);
-		int entPosY = MathHelper.floor_double(entity.posY);
+		int entPosY = MathHelper.floor(entity.posY);
 //		int entPosZ = MathHelper.floor_double(entity.posZ);
 		Tessellator tessellator = Tessellator.getInstance();
-		VertexBuffer vertexbuffer = tessellator.getBuffer();
+		BufferBuilder vertexbuffer = tessellator.getBuffer();
 		GlStateManager.disableCull();
 		GlStateManager.glNormal3f(0.0F, 1.0F, 0.0F);
 		GlStateManager.enableBlend();
@@ -257,7 +257,7 @@ public final class RenderFuncs {
 		double entPosDX = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * (double)partialTicks;
 		double entPosDY = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * (double)partialTicks;
 		double entPosDZ = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * (double)partialTicks;
-		int entPosDYFloor = MathHelper.floor_double(entPosDY);
+		int entPosDYFloor = MathHelper.floor(entPosDY);
 		int radius = 5;
 
 		if (mc.gameSettings.fancyGraphics)
@@ -304,7 +304,7 @@ public final class RenderFuncs {
 					double d5 = -((double)(getRendererUpdateCount() + 0 * 0 * 3121 + 0 * 45238971 + 0 * 0 * 418711 + 0 * 13761 & 31) + (double)partialTicks) / 32.0D * (3.0D + 0);
 					double d6 = (double)((float)at.getX() + 0.5F) - entity.posX;
 					double d7 = (double)((float)at.getZ() + 0.5F) - entity.posZ;
-					float f3 = MathHelper.sqrt_double(d6 * d6 + d7 * d7) / (float)radius;
+					float f3 = MathHelper.sqrt(d6 * d6 + d7 * d7) / (float)radius;
 					float f4 = ((1.0F - f3 * f3) * 0.5F + 0.5F) * .5f;
 					cursor.setPos(at.getX(), lightSampleY, at.getZ());
 					int j3 = world.getCombinedLight(cursor, 0);
@@ -322,7 +322,7 @@ public final class RenderFuncs {
 					double d10 = 0 + (double)(f1 * (float) .5D) * 0.001D;
 					double d11 = (double)((float)at.getX() + 0.5F) - entity.posX;
 					double d12 = (double)((float)at.getZ() + 0.5F) - entity.posZ;
-					float f6 = MathHelper.sqrt_double(d11 * d11 + d12 * d12) / (float)radius;
+					float f6 = MathHelper.sqrt(d11 * d11 + d12 * d12) / (float)radius;
 					float f5 = ((1.0F - f6 * f6) * 0.3F + 0.5F) * .5f;
 					cursor.setPos(at.getX(), lightSampleY, at.getZ());
 					int i4 = (world.getCombinedLight(cursor, 0) * 3 + 15728880) / 4;
@@ -381,8 +381,8 @@ public final class RenderFuncs {
 			// Refresh cache
 			NostrumMagica.logger.info("Refreshing entity renderer cache");
 			cachedRenderer = cur;
-			cachedLightMapField = ReflectionHelper.findField(EntityRenderer.class, "locationLightMap", "field_110922_T");
-			cachedRendererUpdateCountField = ReflectionHelper.findField(EntityRenderer.class, "rendererUpdateCount", "field_78529_t");
+			cachedLightMapField = ObfuscationReflectionHelper.findField(EntityRenderer.class, "locationLightMap");
+			cachedRendererUpdateCountField = ObfuscationReflectionHelper.findField(EntityRenderer.class, "rendererUpdateCount");
 			//cachedLightMapField.setAccessible(true); // done for us in reflection helper
 		}
 		

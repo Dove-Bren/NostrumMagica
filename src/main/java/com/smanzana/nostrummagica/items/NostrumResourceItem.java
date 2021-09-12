@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.items;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.ManiCrystal;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
@@ -13,6 +15,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -21,6 +24,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -118,9 +122,9 @@ public class NostrumResourceItem extends Item implements ILoreTagged {
      */
     @SideOnly(Side.CLIENT)
     @Override
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
     	for (ResourceType type : ResourceType.values()) {
-    		subItems.add(new ItemStack(itemIn, 1, getMetaFromType(type)));
+    		subItems.add(new ItemStack(this, 1, getMetaFromType(type)));
     	}
 	}
     
@@ -163,10 +167,7 @@ public class NostrumResourceItem extends Item implements ILoreTagged {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-		if (stack == null)
-			return;
-		
+	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		ResourceType type = getTypeFromMeta(stack.getMetadata());
 		if (type == null)
 			return;
@@ -185,7 +186,8 @@ public class NostrumResourceItem extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		final @Nonnull ItemStack stack = playerIn.getHeldItem(hand);
 		
 		// Copied from ItemBed (vanilla) with some modifications
 		ResourceType type = getTypeFromMeta(stack.getMetadata()); 
@@ -220,7 +222,7 @@ public class NostrumResourceItem extends Item implements ILoreTagged {
 
 				SoundType soundtype = iblockstate1.getBlock().getSoundType(iblockstate1, worldIn, pos, playerIn);
 				worldIn.playSound((EntityPlayer)null, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
-				--stack.stackSize;
+				stack.shrink(1);
 				return EnumActionResult.SUCCESS;
 			} else {
 				return EnumActionResult.FAIL;

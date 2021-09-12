@@ -7,10 +7,10 @@ import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
@@ -28,7 +28,7 @@ public class TileEntitySymbolRenderer extends TileEntitySpecialRenderer<SymbolTi
 	}
 	
 	@Override
-	public void renderTileEntityAt(SymbolTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
+	public void render(SymbolTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
 		
 		// Get the model from the tile entity
 		SpellComponentWrapper comp = te.getComponent();
@@ -44,7 +44,7 @@ public class TileEntitySymbolRenderer extends TileEntitySpecialRenderer<SymbolTi
 		ResourceLocation textLoc = icon.getModelLocation();
 		float rot = 2.0f * (Minecraft.getSystemTime() / 50);
 		float scale = te.getScale();
-		VertexBuffer wr = Tessellator.getInstance().getBuffer();
+		BufferBuilder wr = Tessellator.getInstance().getBuffer();
 		
 		Minecraft.getMinecraft().getTextureManager().bindTexture(textLoc);
 		GlStateManager.pushMatrix();

@@ -64,7 +64,7 @@ public class DragonSummonShadowAttack<T extends EntityDragon> extends EntityAIBa
 	}
 	
 	@Override
-	public boolean continueExecuting() {
+	public boolean shouldContinueExecuting() {
 		return false;
 	}
 
@@ -79,7 +79,7 @@ public class DragonSummonShadowAttack<T extends EntityDragon> extends EntityAIBa
 		Iterator<EntityLivingBase> it = pool.iterator();
 		while (it.hasNext()) {
 			EntityLivingBase targ = it.next();
-			if (targ.isDead || targ.getDistanceSqToEntity(dragon) > MaxRange) {
+			if (targ.isDead || targ.getDistanceSq(dragon) > MaxRange) {
 				it.remove();
 			}
 		}
@@ -89,12 +89,12 @@ public class DragonSummonShadowAttack<T extends EntityDragon> extends EntityAIBa
 		
 		Random rand = dragon.getRNG();
 		for (EntityLivingBase targ : this.pool) {
-			EntityShadowDragonRed ent = new EntityShadowDragonRed(targ.worldObj, targ);
+			EntityShadowDragonRed ent = new EntityShadowDragonRed(targ.world, targ);
 			ent.setPosition(targ.posX + 5.0 * (rand.nextDouble() - .5D), targ.posY, targ.posZ + 5.0 * (rand.nextDouble() - .5D));
-			targ.worldObj.spawnEntityInWorld(ent);
+			targ.world.spawnEntity(ent);
 		}
 		
-		NostrumMagicaSounds.DRAGON_DEATH.play(dragon.worldObj, dragon.posX, dragon.posY, dragon.posZ);
+		NostrumMagicaSounds.DRAGON_DEATH.play(dragon.world, dragon.posX, dragon.posY, dragon.posZ);
 		
 		attackTicks = this.delay;
 	}

@@ -30,19 +30,21 @@ import com.smanzana.nostrummagica.utils.RayTrace;
 import crazypants.enderio.api.teleport.IItemOfTravel;
 import crazypants.enderio.api.teleport.TravelSource;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.Item;
+import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -83,8 +85,8 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 
         if (equipmentSlot == EntityEquipmentSlot.MAINHAND)
         {
-            multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 6, 0));
-            multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.7000000953674316D, 0));
+            multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 6, 0));
+            multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.7000000953674316D, 0));
         }
 
         return multimap;
@@ -118,7 +120,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 	
 	@Override
 	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return repair != null && repair.getItem() == NostrumResourceItem.instance()
+        return !repair.isEmpty() && repair.getItem() == NostrumResourceItem.instance()
         		&& NostrumResourceItem.getTypeFromMeta(repair.getMetadata()) == ResourceType.CRYSTAL_MEDIUM;
     }
 
@@ -130,8 +132,8 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-		super.addInformation(stack, playerIn, tooltip, advanced);
+	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+		super.addInformation(stack, worldIn, tooltip, flagIn);
 		tooltip.add("Magic Potency Bonus: 10%");
 		
 		boolean extra = Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());
@@ -251,16 +253,16 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
-		subItems.add(addCapacity(new ItemStack(itemIn), 10));
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+		subItems.add(addCapacity(new ItemStack(this), 10));
 		subItems.add(setLevel(setLevel(setLevel(setLevel(
-				new ItemStack(itemIn),
+				new ItemStack(this),
 				EMagicElement.PHYSICAL, 1),
 				EMagicElement.FIRE, 2),
 				EMagicElement.WIND, 2),
 				EMagicElement.ENDER, 2));
 		subItems.add(setLevel(setLevel(setLevel(setLevel(
-				new ItemStack(itemIn),
+				new ItemStack(this),
 				EMagicElement.PHYSICAL, 1),
 				EMagicElement.ICE, 2),
 				EMagicElement.EARTH, 2),

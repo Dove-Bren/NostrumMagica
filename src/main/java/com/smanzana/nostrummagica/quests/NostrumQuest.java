@@ -216,8 +216,8 @@ public class NostrumQuest {
 		
 		// TODO if there's some sort of listener, it should be cleaned up here
 		
-		if (!player.worldObj.isRemote)
-			NostrumMagicaSounds.SUCCESS_QUEST.play(player.worldObj, player.posX, player.posY, player.posZ);
+		if (!player.world.isRemote)
+			NostrumMagicaSounds.SUCCESS_QUEST.play(player.world, player.posX, player.posY, player.posZ);
 		else
 			NostrumMagica.proxy.syncPlayer((EntityPlayerMP) player);
 	}

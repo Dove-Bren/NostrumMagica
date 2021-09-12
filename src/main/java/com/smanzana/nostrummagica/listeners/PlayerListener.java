@@ -392,7 +392,7 @@ public class PlayerListener {
 				if (entry.getValue() == null)
 					continue;
 				
-				if (entry.getValue().world != ent.worldObj)
+				if (entry.getValue().world != ent.world)
 					continue;
 				
 				double dist = Math.abs(ent.getPositionVector().subtract(entry.getValue().position).lengthVector());
@@ -409,7 +409,7 @@ public class PlayerListener {
 				if (entry.getValue() == null)
 					continue;
 				
-				if (entry.getValue().world != ent.worldObj)
+				if (entry.getValue().world != ent.world)
 					continue;
 				
 				BlockPos entpos = ent.getPosition();
@@ -525,7 +525,7 @@ public class PlayerListener {
 			// lava set ignores fire damage (but not lava). True lava set ignores lava as well
 			final boolean lavaSet = EnchantedArmor.GetSetCount(event.getEntityLiving(), EMagicElement.FIRE, 2) == 4;
 			final boolean trueSet = EnchantedArmor.GetSetCount(event.getEntityLiving(), EMagicElement.FIRE, 3) == 4;
-			final boolean isLava = event.getSource() == DamageSource.lava || event.getSource().getDamageType().equalsIgnoreCase("lava");
+			final boolean isLava = event.getSource() == DamageSource.LAVA || event.getSource().getDamageType().equalsIgnoreCase("lava");
 			if (lavaSet || trueSet) {
 				final int manaCost = 1; // / 4
 				final INostrumMagic attr = NostrumMagica.getMagicWrapper(event.getEntityLiving());
@@ -545,7 +545,7 @@ public class PlayerListener {
 		}
 		
 		if (event.getAmount() > 0f && event.getSource() instanceof EntityDamageSource && !((EntityDamageSource) event.getSource()).getIsThornsDamage()) {
-			Entity source = ((EntityDamageSource) event.getSource()).getSourceOfDamage();
+			Entity source = ((EntityDamageSource) event.getSource()).getTrueSource();
 			
 			if (source instanceof EntityArrow) {
 				source = ((EntityArrow) source).shootingEntity;
@@ -628,7 +628,7 @@ public class PlayerListener {
 	@SubscribeEvent
 	public void onDamage(LivingHurtEvent event) {
 		// Make hookshots not damage someone if you reach the wall
-		if (event.getSource() == DamageSource.flyIntoWall) {
+		if (event.getSource() == DamageSource.FLY_INTO_WALL) {
 			EntityLivingBase ent = event.getEntityLiving();
 			for (@Nullable ItemStack held : new ItemStack[] {ent.getHeldItemMainhand(), ent.getHeldItemOffhand()}) {
 				if (held == null) {
@@ -645,13 +645,13 @@ public class PlayerListener {
 			}
 		}
 		
-		if (event.getSource().getSourceOfDamage() != null) {
+		if (event.getSource().getTrueSource() != null) {
 			EntityLivingBase source = null;
 			
 			// Projectiles can be from no entity
 			if (event.getSource().isProjectile()) {
-				source = Projectiles.getShooter(event.getSource().getSourceOfDamage());
-//				Entity proj = event.getSource().getSourceOfDamage();
+				source = Projectiles.getShooter(event.getSource().getTrueSource());
+//				Entity proj = event.getSource().getTrueSource();
 //				Entity shooter;
 //				if (proj instanceof EntityArrow) {
 //					shooter = ((EntityArrow) proj).shootingEntity;
@@ -662,8 +662,8 @@ public class PlayerListener {
 //				} else if (proj instanceof EntityThrowable) {
 //					source = ((EntityThrowable) proj).getThrower();
 //				}
-			} else if (event.getSource().getSourceOfDamage() instanceof EntityLivingBase) {
-				source = (EntityLivingBase) event.getSource().getSourceOfDamage();
+			} else if (event.getSource().getTrueSource() instanceof EntityLivingBase) {
+				source = (EntityLivingBase) event.getSource().getTrueSource();
 			}
 			
 			if (source != null) {
@@ -743,8 +743,8 @@ public class PlayerListener {
 		if (event.isCanceled())
 			return;
 
-		if (event.getSource() != null && event.getSource().getSourceOfDamage() != null && event.getSource().getSourceOfDamage() instanceof EntityPlayer) {
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(event.getSource().getEntity());
+		if (event.getSource() != null && event.getSource().getTrueSource() != null && event.getSource().getTrueSource() instanceof EntityPlayer) {
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(event.getSource().getTrueSource());
 			
 			if (attr != null && attr.isUnlocked()) {
 				if (event.getEntityLiving() instanceof ILoreTagged) {
@@ -756,8 +756,8 @@ public class PlayerListener {
 			
 		}
 		
-		if (event.getEntityLiving() instanceof EntityPlayer && !event.getEntityLiving().worldObj.isRemote) {
-			if (NostrumMagica.baubles.isEnabled() && event.getEntityLiving().worldObj.getGameRules().getBoolean("keepInventory")) {
+		if (event.getEntityLiving() instanceof EntityPlayer && !event.getEntityLiving().world.isRemote) {
+			if (NostrumMagica.baubles.isEnabled() && event.getEntityLiving().world.getGameRules().getBoolean("keepInventory")) {
 				// Scan for baubles, since Baubles doesn't call onUnequip when you die....
 				IBaublesItemHandler baubles = BaublesApi.getBaublesHandler((EntityPlayer) event.getEntityLiving());
 				for (int i = 0; i < baubles.getSlots(); i++) {
@@ -775,7 +775,7 @@ public class PlayerListener {
 		if (event.getEntityLiving().isEntityUndead()) {
 			for (int i = 0; i <= event.getLootingLevel(); i++) {
 				if (NostrumMagica.rand.nextFloat() <= 0.3f) {
-					EntityItem entity = new EntityItem(event.getEntity().worldObj,
+					EntityItem entity = new EntityItem(event.getEntity().world,
 							event.getEntity().posX,
 							event.getEntity().posY,
 							event.getEntity().posZ,
@@ -788,7 +788,7 @@ public class PlayerListener {
 		if (event.getEntityLiving() instanceof EntitySpider) {
 			for (int i = 0; i <= event.getLootingLevel(); i++) {
 				if (NostrumMagica.rand.nextFloat() <= 0.4f) {
-					EntityItem entity = new EntityItem(event.getEntity().worldObj,
+					EntityItem entity = new EntityItem(event.getEntity().world,
 							event.getEntity().posX,
 							event.getEntity().posY,
 							event.getEntity().posZ,
@@ -826,7 +826,7 @@ public class PlayerListener {
 			return; // It SAYS EntityItemPickup, so just in case...
 		
 		EntityPlayer player = e.getEntityPlayer();
-		ItemStack addedItem = e.getItem().getEntityItem();
+		ItemStack addedItem = e.getItem().getItem();
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		
@@ -839,23 +839,23 @@ public class PlayerListener {
 			}
 		}
 		
-		if (e.getItem().getEntityItem().getItem() instanceof ReagentItem
+		if (e.getItem().getItem().getItem() instanceof ReagentItem
 				&& !player.isSneaking()) {
-			int originalSize = addedItem.stackSize;
+			int originalSize = addedItem.getCount();
 			for (ItemStack item : player.inventory.offHandInventory) {
 				// Silly but prefer offhand
 				if (item != null && item.getItem() instanceof ReagentBag) {
 					if (ReagentBag.isVacuumEnabled(item)) {
 						addedItem = ReagentBag.addItem(item, addedItem);
-						if (addedItem == null || addedItem.stackSize < originalSize) {
-							NostrumMagicaSounds.UI_TICK.play(player.worldObj, player.posX, player.posY, player.posZ);
+						if (addedItem == null || addedItem.getCount() < originalSize) {
+							NostrumMagicaSounds.UI_TICK.play(player.world, player.posX, player.posY, player.posZ);
 						}
 						if (addedItem == null) {
 							e.setCanceled(true);
 							e.getItem().setDead();
 							return;
 						}
-						originalSize = addedItem.stackSize;
+						originalSize = addedItem.getCount();
 					}
 				}
 			}
@@ -863,43 +863,43 @@ public class PlayerListener {
 				if (item != null && item.getItem() instanceof ReagentBag) {
 					if (ReagentBag.isVacuumEnabled(item)) {
 						addedItem = ReagentBag.addItem(item, addedItem);
-						if (addedItem == null || addedItem.stackSize < originalSize) {
-							NostrumMagicaSounds.UI_TICK.play(player.worldObj, player.posX, player.posY, player.posZ);
+						if (addedItem == null || addedItem.getCount() < originalSize) {
+							NostrumMagicaSounds.UI_TICK.play(player.world, player.posX, player.posY, player.posZ);
 						}
 						if (addedItem == null) {
 							e.setCanceled(true);
 							e.getItem().setDead();
 							return;
 						}
-						originalSize = addedItem.stackSize;
+						originalSize = addedItem.getCount();
 					}
 				}
 			}
 			
-			if (addedItem.stackSize < e.getItem().getEntityItem().stackSize) {
+			if (addedItem.getCount() < e.getItem().getItem().getCount()) {
 				e.setCanceled(true);
-				e.getItem().setEntityItemStack(addedItem);
+				e.getItem().setItem(addedItem);
 			}
 			
 		}
 		
-		if (e.getItem().getEntityItem().getItem() instanceof SpellRune
+		if (e.getItem().getItem().getItem() instanceof SpellRune
 				&& !player.isSneaking()) {
-			int originalSize = addedItem.stackSize;
+			int originalSize = addedItem.getCount();
 			for (ItemStack item : player.inventory.offHandInventory) {
 				// Silly but prefer offhand
 				if (item != null && item.getItem() instanceof RuneBag) {
 					if (RuneBag.isVacuumEnabled(item)) {
 						addedItem = RuneBag.addItem(item, addedItem);
-						if (addedItem == null || addedItem.stackSize < originalSize) {
-							NostrumMagicaSounds.UI_TICK.play(player.worldObj, player.posX, player.posY, player.posZ);
+						if (addedItem == null || addedItem.getCount() < originalSize) {
+							NostrumMagicaSounds.UI_TICK.play(player.world, player.posX, player.posY, player.posZ);
 						}
 						if (addedItem == null) {
 							e.setCanceled(true);
 							e.getItem().setDead();
 							return;
 						}
-						originalSize = addedItem.stackSize;
+						originalSize = addedItem.getCount();
 					}
 				}
 			}
@@ -907,15 +907,15 @@ public class PlayerListener {
 				if (item != null && item.getItem() instanceof RuneBag) {
 					if (RuneBag.isVacuumEnabled(item)) {
 						addedItem = RuneBag.addItem(item, addedItem);
-						if (addedItem == null || addedItem.stackSize < originalSize) {
-							NostrumMagicaSounds.UI_TICK.play(player.worldObj, player.posX, player.posY, player.posZ);
+						if (addedItem == null || addedItem.getCount() < originalSize) {
+							NostrumMagicaSounds.UI_TICK.play(player.world, player.posX, player.posY, player.posZ);
 						}
 						if (addedItem == null) {
 							e.setCanceled(true);
 							e.getItem().setDead();
 							return;
 						}
-						originalSize = addedItem.stackSize;
+						originalSize = addedItem.getCount();
 					}
 				}
 			}
@@ -941,7 +941,7 @@ public class PlayerListener {
 			
 			// Regain mana
 			if (tickCount % 10 == 0) {
-				for (World world : FMLCommonHandler.instance().getMinecraftServerInstance().worldServers) {
+				for (World world : FMLCommonHandler.instance().getMinecraftServerInstance().worlds) {
 					if (world.playerEntities.isEmpty()) {
 						continue;
 					}
@@ -988,7 +988,7 @@ public class PlayerListener {
 	@SubscribeEvent
 	public void onTick(ClientTickEvent event) {
 		if (event.phase == Phase.START) {
-			if (!Minecraft.getMinecraft().isIntegratedServerRunning() && Minecraft.getMinecraft().thePlayer != null) {
+			if (!Minecraft.getMinecraft().isIntegratedServerRunning() && Minecraft.getMinecraft().player != null) {
 				NostrumPortal.tick();
 				TeleportRune.tick();
 			}
@@ -1021,7 +1021,7 @@ public class PlayerListener {
 	
 	@SubscribeEvent
 	public void onConnect(PlayerLoggedInEvent event) {
-		if (event.player.worldObj.isRemote) {
+		if (event.player.world.isRemote) {
 			return;
 		}
 		
@@ -1076,7 +1076,7 @@ public class PlayerListener {
 			return;
 		}
 		
-		if (e.getEntity().worldObj.isRemote) {
+		if (e.getEntity().world.isRemote) {
 			return;
 		}
 		
@@ -1116,7 +1116,7 @@ public class PlayerListener {
 		}
 		
 		EntityPlayer player = e.getEntityPlayer();
-		if (player.worldObj.isRemote) {
+		if (player.world.isRemote) {
 			return;
 		}
 		
@@ -1129,7 +1129,7 @@ public class PlayerListener {
 			return;
 		}
 		
-		if (EnchantedArmor.DoEarthDig(player.worldObj, player, e.getPos(), e.getFace())) {
+		if (EnchantedArmor.DoEarthDig(player.world, player, e.getPos(), e.getFace())) {
 			attr.addMana(-20);
 			NostrumMagica.proxy.sendMana(player);
 			e.setCanceled(true);

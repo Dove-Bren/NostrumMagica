@@ -37,7 +37,7 @@ public class EntityAIFollowOwnerGeneric<T extends EntityCreature & IEntityTameab
 	
 	public EntityAIFollowOwnerGeneric(T thePetIn, double followSpeedIn, float minDistIn, float maxDistIn, Predicate<? super T> filter) {
 		this.thePet = thePetIn;
-		this.theWorld = thePetIn.worldObj;
+		this.theWorld = thePetIn.world;
 		this.followSpeed = followSpeedIn;
 		this.petPathfinder = thePetIn.getNavigator();
 		this.minDist = minDistIn;
@@ -59,7 +59,7 @@ public class EntityAIFollowOwnerGeneric<T extends EntityCreature & IEntityTameab
 			return false;
 		} else if (this.thePet.isSitting()) {
 			return false;
-		} else if (this.thePet.getDistanceSqToEntity(entitylivingbase) < (double)(this.minDist * this.minDist)) {
+		} else if (this.thePet.getDistanceSq(entitylivingbase) < (double)(this.minDist * this.minDist)) {
 			return false;
 		} else if (this.filter != null && !this.filter.apply(this.thePet)) {
 			return false;
@@ -72,8 +72,8 @@ public class EntityAIFollowOwnerGeneric<T extends EntityCreature & IEntityTameab
 	/**
 	 * Returns whether an in-progress EntityAIBase should continue executing
 	 */
-	public boolean continueExecuting() {
-		return !this.petPathfinder.noPath() && this.thePet.getDistanceSqToEntity(this.theOwner) > (double)(this.maxDist * this.maxDist) && !this.thePet.isSitting();
+	public boolean shouldContinueExecuting() {
+		return !this.petPathfinder.noPath() && this.thePet.getDistanceSq(this.theOwner) > (double)(this.maxDist * this.maxDist) && !this.thePet.isSitting();
 	}
 
 	/**
@@ -90,7 +90,7 @@ public class EntityAIFollowOwnerGeneric<T extends EntityCreature & IEntityTameab
 	 */
 	public void resetTask() {
 		this.theOwner = null;
-		this.petPathfinder.clearPathEntity();
+		this.petPathfinder.clearPath();
 		this.thePet.setPathPriority(PathNodeType.WATER, this.oldWaterCost);
 	}
 
@@ -111,10 +111,10 @@ public class EntityAIFollowOwnerGeneric<T extends EntityCreature & IEntityTameab
 
 				if (!this.petPathfinder.tryMoveToEntityLiving(this.theOwner, this.followSpeed)) {
 					if (!this.thePet.getLeashed()) {
-						if (this.thePet.getDistanceSqToEntity(this.theOwner) >= 144.0D) {
-							int i = MathHelper.floor_double(this.theOwner.posX) - 2;
-							int j = MathHelper.floor_double(this.theOwner.posZ) - 2;
-							int k = MathHelper.floor_double(this.theOwner.getEntityBoundingBox().minY);
+						if (this.thePet.getDistanceSq(this.theOwner) >= 144.0D) {
+							int i = MathHelper.floor(this.theOwner.posX) - 2;
+							int j = MathHelper.floor(this.theOwner.posZ) - 2;
+							int k = MathHelper.floor(this.theOwner.getEntityBoundingBox().minY);
 							
 							MutableBlockPos pos1 = new MutableBlockPos();
 							MutableBlockPos pos2 = new MutableBlockPos();
@@ -127,7 +127,7 @@ public class EntityAIFollowOwnerGeneric<T extends EntityCreature & IEntityTameab
 									pos3.setPos(i + l, k + 1, j + i1);
 									if ((l < 1 || i1 < 1 || l > 3 || i1 > 3) && this.theWorld.getBlockState(new BlockPos(pos1)).isSideSolid(theWorld, pos1, EnumFacing.UP) && this.isEmptyBlock(pos2) && this.isEmptyBlock(pos3)) {
 										this.thePet.setLocationAndAngles((double)((float)(i + l) + 0.5F), (double)k, (double)((float)(j + i1) + 0.5F), this.thePet.rotationYaw, this.thePet.rotationPitch);
-										this.petPathfinder.clearPathEntity();
+										this.petPathfinder.clearPath();
 										return;
 									}
 								}

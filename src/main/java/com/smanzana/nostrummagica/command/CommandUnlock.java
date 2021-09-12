@@ -16,12 +16,12 @@ import net.minecraft.util.text.TextComponentString;
 public class CommandUnlock extends CommandBase {
 
 	@Override
-	public String getCommandName() {
+	public String getName() {
 		return "nostrumunlock";
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender sender) {
+	public String getUsage(ICommandSender sender) {
 		return "/nostrumunlock";
 	}
 
@@ -32,7 +32,7 @@ public class CommandUnlock extends CommandBase {
 			EntityPlayer player = (EntityPlayer) sender;
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			if (attr == null) {
-				sender.addChatMessage(new TextComponentString("Could not find magic wrapper"));
+				sender.sendMessage(new TextComponentString("Could not find magic wrapper"));
 				return;
 			}
 			
@@ -41,7 +41,7 @@ public class CommandUnlock extends CommandBase {
 					new StatSyncMessage(attr)
 					, (EntityPlayerMP) player);
 		} else {
-			sender.addChatMessage(new TextComponentString("This command must be run as a player"));
+			sender.sendMessage(new TextComponentString("This command must be run as a player"));
 		}
 	}
 

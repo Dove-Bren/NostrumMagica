@@ -36,6 +36,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -72,8 +73,7 @@ public class Candle extends Block implements ITileEntityProvider {
 	}
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(CandleTileEntity.class, "nostrum_candle_te");
-		
+		GameRegistry.registerTileEntity(CandleTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "nostrum_candle_te"));
 		GameRegistry.addShapedRecipe(new ItemStack(instance()),
 				"W",
 				"F",
@@ -94,7 +94,7 @@ public class Candle extends Block implements ITileEntityProvider {
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setSoundType(SoundType.PLANT);
 		
-		this.isBlockContainer = true;
+		this.hasTileEntity = true;
 		//this.setLightOpacity(16);
 		
 		this.setDefaultState(this.blockState.getBaseState().withProperty(LIT, false));
@@ -117,7 +117,7 @@ public class Candle extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, ItemStack stack) {
+	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
 		return this.getDefaultState().withProperty(FACING, facing);
 	}
 	
@@ -151,10 +151,10 @@ public class Candle extends Block implements ITileEntityProvider {
 		return 10;
 	}
 	
-	@Override
-	public boolean isVisuallyOpaque() {
-		return false;
-	}
+//	@Override
+//	public boolean isVisuallyOpaque() {
+//		return false;
+//	}
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
@@ -323,14 +323,14 @@ public class Candle extends Block implements ITileEntityProvider {
 			List<EntityItem> items = worldIn.getEntitiesWithinAABB(EntityItem.class, Block.FULL_BLOCK_AABB.offset(pos).expand(0, 1, 0));
 			if (items != null && !items.isEmpty()) {
 				for (EntityItem item : items) {
-					ItemStack stack = item.getEntityItem();
+					ItemStack stack = item.getItem();
 					if (stack.getItem() instanceof ReagentItem) {
 						ReagentType type = ReagentItem.findType(stack.splitStack(1));
 						if (type != null) {
 							setReagent(worldIn, pos, state, type);
 						}
 						
-						if (stack.stackSize <= 0) {
+						if (stack.getCount() <= 0) {
 							item.setDead();
 						}
 						
@@ -347,13 +347,15 @@ public class Candle extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 
 //		if (worldIn.isRemote)
 //			return true;
 		
+		ItemStack heldItem = playerIn.getHeldItem(hand);
+		
 		if (!state.getValue(LIT)) {
-			if (heldItem == null)
+			if (heldItem.isEmpty())
 				return false;
 			
 			if (heldItem.getItem() instanceof ItemFlintAndSteel) {
@@ -366,11 +368,11 @@ public class Candle extends Block implements ITileEntityProvider {
 		}
 		
 		// it's lit
-		if (heldItem == null) {
+		if (heldItem.isEmpty()) {
 			// only if mainhand or mainhand is null. Otherwise if offhand is
 			// empty, will still put out. Dumb!
 			
-			if (hand == EnumHand.MAIN_HAND && (playerIn.getHeldItemMainhand() == null)) {
+			if (hand == EnumHand.MAIN_HAND && (playerIn.getHeldItemMainhand().isEmpty())) {
 				// putting it out
 				extinguish(worldIn, pos, state, true);
 				return true;
@@ -386,7 +388,7 @@ public class Candle extends Block implements ITileEntityProvider {
 		if (te != null)
 			return false;
 		
-		heldItem.stackSize--;
+		heldItem.splitStack(1);
 		
 		ReagentType type = ReagentItem.findType(heldItem);
 		
@@ -508,9 +510,9 @@ public class Candle extends Block implements ITileEntityProvider {
 		}
 		
 		private void dirty() {
-			worldObj.markBlockRangeForRenderUpdate(pos, pos);
-			worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 3);
-			worldObj.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
+			world.markBlockRangeForRenderUpdate(pos, pos);
+			world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
+			world.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
 			markDirty();
 		}
 		
@@ -518,12 +520,12 @@ public class Candle extends Block implements ITileEntityProvider {
 		public void update() {
 			this.lifeTicks = Math.max(-1, this.lifeTicks-1);
 			
-			if (this.lifeTicks == 0 && !worldObj.isRemote) {
-				IBlockState state = worldObj.getBlockState(this.pos);
+			if (this.lifeTicks == 0 && !world.isRemote) {
+				IBlockState state = world.getBlockState(this.pos);
 				if (state == null)
 					return;
 				
-				extinguish(worldObj, this.pos, state, false);
+				extinguish(world, this.pos, state, false);
 			}
 		}
 	}

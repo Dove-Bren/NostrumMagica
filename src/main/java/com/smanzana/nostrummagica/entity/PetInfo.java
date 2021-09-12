@@ -8,7 +8,8 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializer;
-import net.minecraft.network.datasync.DataSerializers;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.registries.DataSerializerEntry;
 
 public class PetInfo {
 	
@@ -96,7 +97,7 @@ public class PetInfo {
 		public final static class JobSerializer implements DataSerializer<PetAction> {
 			
 			private JobSerializer() {
-				DataSerializers.registerSerializer(this);
+				ForgeRegistries.DATA_SERIALIZERS.register(new DataSerializerEntry(this));
 			}
 			
 			@Override
@@ -112,6 +113,11 @@ public class PetInfo {
 			@Override
 			public DataParameter<PetAction> createKey(int id) {
 				return new DataParameter<>(id, this);
+			}
+
+			@Override
+			public PetAction copyValue(PetAction value) {
+				return value;
 			}
 		}
 		

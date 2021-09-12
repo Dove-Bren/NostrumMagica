@@ -1,7 +1,5 @@
 package com.smanzana.nostrummagica.blocks;
 
-import javax.annotation.Nullable;
-
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -33,14 +31,17 @@ public class LogicDoor extends NostrumMagicDoor implements ITriggeredBlock {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (worldIn.isRemote)
 			return true;
 		
 		// Allow creative players to open door
-		if (playerIn.isCreative() && heldItem == null && hand == EnumHand.MAIN_HAND) {
-			this.trigger(worldIn, pos, state, null);
-			return true;
+		if (playerIn.isCreative()) {
+			ItemStack heldItem = playerIn.getHeldItem(hand);
+			if (heldItem.isEmpty() && hand == EnumHand.MAIN_HAND) {
+				this.trigger(worldIn, pos, state, null);
+				return true;
+			}
 		}
 		
 		return false;

@@ -70,8 +70,8 @@ public class MirrorShield extends Item implements ISpellActionListener, ILoreTag
 		Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
 
 		if (equipmentSlot == EntityEquipmentSlot.OFFHAND) {
-			multimap.put(SharedMonsterAttributes.ARMOR.getAttributeUnlocalizedName(), new AttributeModifier(MOD_ATTACK_UUID, "Offhand Modifier", 1, 0));
-			multimap.put(AttributeMagicResist.instance().getAttributeUnlocalizedName(), new AttributeModifier(MOD_RESIST_UUID, "Magic Shield Resist", 10, 0));
+			multimap.put(SharedMonsterAttributes.ARMOR.getName(), new AttributeModifier(MOD_ATTACK_UUID, "Offhand Modifier", 1, 0));
+			multimap.put(AttributeMagicResist.instance().getName(), new AttributeModifier(MOD_RESIST_UUID, "Magic Shield Resist", 10, 0));
 		}
 
 		return multimap;
@@ -93,12 +93,12 @@ public class MirrorShield extends Item implements ISpellActionListener, ILoreTag
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
 		playerIn.setActiveHand(hand);
 		
 		NostrumMagica.playerListener.registerMagicEffect(this, null);
 		
-		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, playerIn.getHeldItem(hand));
 	}
 
 	@Override

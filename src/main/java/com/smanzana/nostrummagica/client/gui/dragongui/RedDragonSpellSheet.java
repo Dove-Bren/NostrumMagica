@@ -125,7 +125,7 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 		leftOffset = (width - invWidth) / 2;
 		initSlots();
 		
-		if (!player.worldObj.isRemote) {
+		if (!player.world.isRemote) {
 			this.sendAllGambits(dragonInv.getAllGambits());
 		}
 	}
@@ -201,7 +201,7 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 		int count;
 		int ghostCount;
 		
-		mc.fontRendererObj.drawString(title, 5, y + 1 + (cellWidth - mc.fontRendererObj.FONT_HEIGHT) / 2, 0xFFFFFFFF);
+		mc.fontRenderer.drawString(title, 5, y + 1 + (cellWidth - mc.fontRenderer.FONT_HEIGHT) / 2, 0xFFFFFFFF);
 		mc.getTextureManager().bindTexture(TamedDragonGUI.DragonGUI.TEXT);
 		
 		count = 0;
@@ -413,7 +413,7 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 			
 			EntityDragonGambit gambit = dragonInv.getAllGambits()[index];
 			if (gambit != null) {
-				GuiUtils.drawHoveringText(gambit.getDesc(), mouseX, mouseY, this.width, this.height, 150, mc.fontRendererObj);
+				GuiUtils.drawHoveringText(gambit.getDesc(), mouseX, mouseY, this.width, this.height, 150, mc.fontRenderer);
 			}
 			
 			GlStateManager.popMatrix();
@@ -690,7 +690,7 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 		
 		@Override
 		@SideOnly(Side.CLIENT)
-		public boolean canBeHovered() {
+		public boolean isEnabled() {
 			if (subIndex >= RedDragonSpellInventory.MaxSpellsPerCategory) {
 				return false;
 			}
@@ -724,7 +724,7 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 			super.onSlotChanged();
 			sheet.dragonInv.clean();
 			
-			if (!this.dragon.worldObj.isRemote) {
+			if (!this.dragon.world.isRemote) {
 				sheet.sendAllGambits(sheet.dragonInv.getAllGambits());
 			}
 			sheet.container.clearSlots();

@@ -3,9 +3,9 @@ package com.smanzana.nostrummagica.client.effects;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -30,7 +30,7 @@ public interface ClientEffectForm {
 		
 		List<BakedQuad> listQuads = model.getQuads(null, null, 0);
 		Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer vertexbuffer = tessellator.getBuffer();
+        BufferBuilder vertexbuffer = tessellator.getBuffer();
         int i = 0;
 
         for (int j = listQuads.size(); i < j; ++i)

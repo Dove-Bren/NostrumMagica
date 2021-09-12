@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Random;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
@@ -34,6 +34,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
@@ -57,11 +58,13 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 		 */
 		
 		private String displayName;
-		private ItemStack slots[];
+		private @Nonnull ItemStack slots[];
 		
 		public SpellTableEntity() {
 			displayName = "Spell Table";
 			slots = new ItemStack[getSizeInventory()];
+			for (int i = 0; i < slots.length; i++)
+				slots[i] = ItemStack.EMPTY;
 		}
 		
 		@Override
@@ -94,7 +97,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 			return 9;
 		}
 		
-		public ItemStack[] getReagentSlots() {
+		public @Nonnull ItemStack[] getReagentSlots() {
 			return Arrays.copyOfRange(slots, getReagentSlotIndex(), getReagentSlotIndex() + getReagentSlotCount() - 1);
 		}
 
@@ -104,28 +107,19 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 		}
 
 		@Override
-		public ItemStack getStackInSlot(int index) {
+		public @Nonnull ItemStack getStackInSlot(int index) {
 			if (index < 0 || index >= getSizeInventory())
-				return null;
+				return ItemStack.EMPTY;
 			
 			return slots[index];
 		}
 
 		@Override
 		public ItemStack decrStackSize(int index, int count) {
-			if (index < 0 || index >= getSizeInventory() || slots[index] == null)
-				return null;
+			if (index < 0 || index >= getSizeInventory() || slots[index].isEmpty())
+				return ItemStack.EMPTY;
 			
-			ItemStack stack;
-			if (slots[index].stackSize <= count) {
-				stack = slots[index];
-				slots[index] = null;
-			} else {
-				stack = slots[index].copy();
-				stack.stackSize = count;
-				slots[index].stackSize -= count;
-			}
-			
+			ItemStack stack = slots[index].splitStack(count);
 			this.markDirty();
 			
 			return stack;
@@ -134,17 +128,17 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 		@Override
 		public ItemStack removeStackFromSlot(int index) {
 			if (index < 0 || index >= getSizeInventory())
-				return null;
+				return ItemStack.EMPTY;
 			
 			ItemStack stack = slots[index];
-			slots[index] = null;
+			slots[index] = ItemStack.EMPTY;
 			
 			this.markDirty();
 			return stack;
 		}
 
 		@Override
-		public void setInventorySlotContents(int index, ItemStack stack) {
+		public void setInventorySlotContents(int index, @Nonnull ItemStack stack) {
 			if (index < 0 || index >= getSizeInventory())
 				return;
 			
@@ -158,7 +152,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 		}
 
 		@Override
-		public boolean isUseableByPlayer(EntityPlayer player) {
+		public boolean isUsableByPlayer(EntityPlayer player) {
 			return true;
 		}
 
@@ -171,11 +165,11 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 		}
 
 		@Override
-		public boolean isItemValidForSlot(int index, ItemStack stack) {
+		public boolean isItemValidForSlot(int index, @Nonnull ItemStack stack) {
 			if (index < 0 || index >= getSizeInventory())
 				return false;
 			
-			if (stack == null)
+			if (stack.isEmpty())
 				return true;
 			
 			if (index == 0) {
@@ -232,7 +226,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 			NBTTagCompound compound = new NBTTagCompound();
 			
 			for (int i = 0; i < getSizeInventory(); i++) {
-				if (getStackInSlot(i) == null)
+				if (getStackInSlot(i).isEmpty())
 					continue;
 				
 				NBTTagCompound tag = new NBTTagCompound();
@@ -263,14 +257,14 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 					continue;
 				}
 				
-				ItemStack stack = ItemStack.loadItemStackFromNBT(items.getCompoundTag(key));
+				ItemStack stack = new ItemStack(items.getCompoundTag(key));
 				this.setInventorySlotContents(id, stack);
 			}
 		}
 		
 		public Spell craft(EntityPlayer crafter, String name, int iconIndex) {
 			ItemStack stack = this.getStackInSlot(0);
-			if (stack == null || !(stack.getItem() instanceof BlankScroll)) {
+			if (stack.isEmpty() || !(stack.getItem() instanceof BlankScroll)) {
 				return null;
 			}
 			
@@ -288,7 +282,16 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 			
 			return spell;
 		}
-		
+
+		@Override
+		public boolean isEmpty() {
+			for (ItemStack stack : slots) {
+				if (!stack.isEmpty()) {
+					return false;
+				}
+			}
+			return true;
+		}
 	}
 
 	private static final PropertyBool MASTER = PropertyBool.create("master");
@@ -304,7 +307,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 	}
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(SpellTableEntity.class, "spell_table");
+		GameRegistry.registerTileEntity(SpellTableEntity.class, new ResourceLocation(NostrumMagica.MODID, "spell_table"));
 	}
 	
 	public SpellTable() {
@@ -325,10 +328,10 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
         return false;
     }
 	
-	@Override
-	public boolean isVisuallyOpaque() {
-		return false;
-	}
+//	@Override
+//	public boolean isVisuallyOpaque() {
+//		return false;
+//	}
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
@@ -373,7 +376,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 						EntityItem item = new EntityItem(
 								world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
 								table.removeStackFromSlot(i));
-						world.spawnEntityInWorld(item);
+						world.spawnEntity(item);
 					}
 				}
 			}
@@ -446,7 +449,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		
 		if (state.getValue(MASTER) == false) {
 			pos = pos.offset(state.getValue(FACING));

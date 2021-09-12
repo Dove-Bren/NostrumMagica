@@ -196,7 +196,7 @@ public class WispBlockGui {
 					// Trying to take our scroll
 					if (playerIn.inventory.addItemStackToInventory(cur)) {
 						scrollSlot.putStack(null);
-						scrollSlot.onPickupFromSlot(playerIn, cur);
+						scrollSlot.onTake(playerIn, cur);
 					} else {
 						prev = null;
 					}
@@ -204,7 +204,7 @@ public class WispBlockGui {
 					// Trying to take our reagent
 					if (playerIn.inventory.addItemStackToInventory(cur)) {
 						reagentSlot.putStack(null);
-						reagentSlot.onPickupFromSlot(playerIn, cur);
+						reagentSlot.onTake(playerIn, cur);
 					} else {
 						prev = null;
 					}

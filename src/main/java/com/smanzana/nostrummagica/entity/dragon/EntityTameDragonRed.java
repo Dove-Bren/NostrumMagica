@@ -109,8 +109,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
     protected static final DataParameter<Float> SYNCED_MAX_HEALTH  = EntityDataManager.<Float>createKey(EntityTameDragonRed.class, DataSerializers.FLOAT);
     protected static final DataParameter<PetAction> DATA_PET_ACTION = EntityDataManager.<PetAction>createKey(EntityTameDragonRed.class, PetAction.Serializer);
     
-    protected static final DataParameter<Optional<ItemStack>> DATA_ARMOR_BODY = EntityDataManager.<Optional<ItemStack>>createKey(EntityTameDragonRed.class, DataSerializers.OPTIONAL_ITEM_STACK);
-    protected static final DataParameter<Optional<ItemStack>> DATA_ARMOR_HELM = EntityDataManager.<Optional<ItemStack>>createKey(EntityTameDragonRed.class, DataSerializers.OPTIONAL_ITEM_STACK);
+    protected static final DataParameter<ItemStack> DATA_ARMOR_BODY = EntityDataManager.<ItemStack>createKey(EntityTameDragonRed.class, DataSerializers.ITEM_STACK);
+    protected static final DataParameter<ItemStack> DATA_ARMOR_HELM = EntityDataManager.<ItemStack>createKey(EntityTameDragonRed.class, DataSerializers.ITEM_STACK);
     
     protected static final String NBT_HATCHED = "Hatched";
     protected static final String NBT_TAMED = "Tamed";
@@ -201,8 +201,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		this.dataManager.register(SYNCED_MAX_HEALTH, 100.0f);
 		this.dataManager.register(DATA_PET_ACTION, PetAction.WAITING);
 		this.dataManager.register(HATCHED, false);
-		this.dataManager.register(DATA_ARMOR_BODY, Optional.absent());
-		this.dataManager.register(DATA_ARMOR_HELM, Optional.absent());
+		this.dataManager.register(DATA_ARMOR_BODY, ItemStack.EMPTY);
+		this.dataManager.register(DATA_ARMOR_HELM, ItemStack.EMPTY);
 		
 		final EntityTameDragonRed dragon = this;
 		aiPlayerTarget = new DragonAINearestAttackableTarget<EntityPlayer>(this, EntityPlayer.class, true, new Predicate<EntityPlayer>() {
@@ -373,7 +373,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 				if (selfDragon.isTamed()) {
 					EntityLivingBase owner = selfDragon.getOwner();
 					if (owner != null) {
-						List<EntityLivingBase> nearby = owner.worldObj.getEntitiesWithinAABB(EntityLivingBase.class,
+						List<EntityLivingBase> nearby = owner.world.getEntitiesWithinAABB(EntityLivingBase.class,
 								new AxisAlignedBB(owner.posX - 8, owner.posY - 5, owner.posZ - 8, owner.posX + 8, owner.posY + 5, owner.posZ + 8),
 								new Predicate<EntityLivingBase>() {
 
@@ -440,7 +440,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	public void onEntityUpdate() {
 		super.onEntityUpdate();
 		
-		if (worldObj != null && !worldObj.isRemote) {
+		if (world != null && !world.isRemote) {
 			if (!this.isSitting()) {
 				if (this.getAttackTarget() == null) {
 					setPetAction(PetAction.WAITING);
@@ -486,7 +486,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			if (hand == EnumHand.MAIN_HAND) {
 				
 				if (player.isSneaking()) {
-					if (!this.worldObj.isRemote) {
+					if (!this.world.isRemote) {
 						this.setSitting(!this.isSitting());
 						if (player.isCreative()) {
 							this.setBond(1f);
@@ -494,39 +494,39 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 					}
 					return true;
 				} else if (this.getHealth() < this.getMaxHealth() && isHungerItem(stack)) {
-					if (!this.worldObj.isRemote) {
+					if (!this.world.isRemote) {
 						this.heal(5f);
 						this.addBond(.2f);
 						
 						if (!player.isCreative()) {
-							player.getHeldItem(hand).stackSize--;
+							player.getHeldItem(hand).shrink(1);
 						}
 					}
 					return true;
 				} else if (this.isSitting() && stack == null) {
-					if (!this.worldObj.isRemote) {
-						//player.openGui(NostrumMagica.instance, NostrumGui.dragonID, this.worldObj, (int) this.posX, (int) this.posY, (int) this.posZ);
+					if (!this.world.isRemote) {
+						//player.openGui(NostrumMagica.instance, NostrumGui.dragonID, this.world, (int) this.posX, (int) this.posY, (int) this.posZ);
 						NostrumMagica.proxy.openDragonGUI(player, this);
 					}
 					return true;
 				} else if (isBreedingItem(stack) && this.getBond() > BOND_LEVEL_BREED && this.getEgg() == null) {
-					if (!this.worldObj.isRemote) {
+					if (!this.world.isRemote) {
 						layEgg();
 						if (!player.isCreative()) {
-							stack.stackSize--;
+							stack.shrink(1);
 						}
 					}
 					return true;
 				} else if (stack == null) {
-					if (!this.worldObj.isRemote) {
+					if (!this.world.isRemote) {
 						if (this.getBond() >= BOND_LEVEL_ALLOW_RIDE) {
 							if (this.getHealth() < DRAGON_MIN_HEALTH) {
-								player.addChatComponentMessage(new TextComponentTranslation("info.tamed_dragon.low_health", this.getName()));
+								player.sendMessage(new TextComponentTranslation("info.tamed_dragon.low_health", this.getName()));
 							} else {
 								player.startRiding(this);
 							}
 						} else {
-							player.addChatComponentMessage(new TextComponentTranslation("info.tamed_dragon.no_ride", this.getName()));
+							player.sendMessage(new TextComponentTranslation("info.tamed_dragon.no_ride", this.getName()));
 						}
 					}
 					return true;
@@ -538,21 +538,21 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			}
 		} else if (!this.isTamed()) {
 			if (hand == EnumHand.MAIN_HAND) {
-				if (!this.worldObj.isRemote) {
+				if (!this.world.isRemote) {
 					this.tame(player, player.isCreative());
 				}
 				return true;
 			}
 		} else if (this.isTamed() && player.isCreative() && hand == EnumHand.MAIN_HAND && player.isSneaking()) {
-			if (!this.worldObj.isRemote) {
+			if (!this.world.isRemote) {
 				this.tame(player, true);
 				this.setBond(1f);
 			}
 			return true;
 		} else if (this.isTamed() && hand == EnumHand.MAIN_HAND) {
 			// Someone other than the owner clicked
-			if (!this.worldObj.isRemote) {
-				player.addChatComponentMessage(new TextComponentTranslation("info.tamed_dragon.not_yours", this.getName()));
+			if (!this.world.isRemote) {
+				player.sendMessage(new TextComponentTranslation("info.tamed_dragon.not_yours", this.getName()));
 			}
 			return true;
 		}
@@ -583,7 +583,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	public void setWasHatched(boolean hatched) {
 		this.dataManager.set(HATCHED, hatched);
 		
-		if (worldObj != null && !worldObj.isRemote) {
+		if (world != null && !world.isRemote) {
 			ReflectionHelper.setPrivateValue(EntityLiving.class, this, hatched, "persistenceRequired", "field_82179_bU");
 		}
 	}
@@ -608,7 +608,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	public EntityDragonEgg getEgg() {
 		UUID id = getEggID();
 		if (id != null) {
-			for (Entity ent : worldObj.loadedEntityList) {
+			for (Entity ent : world.loadedEntityList) {
 				if (ent.getUniqueID().equals(id) && ent instanceof EntityDragonEgg) {
 					return (EntityDragonEgg) ent;
 				}
@@ -627,7 +627,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	public EntityLivingBase getOwner() {
 		try {
 			UUID uuid = this.getOwnerId();
-			return uuid == null ? null : this.worldObj.getPlayerEntityByUUID(uuid);
+			return uuid == null ? null : this.world.getPlayerEntityByUUID(uuid);
 		} catch (IllegalArgumentException var2) {
 			return null;
 		}
@@ -764,7 +764,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 				NBTTagCompound tag = list.getCompoundTagAt(i);
 				ItemStack stack = null;
 				if (tag != null) {
-					stack = ItemStack.loadItemStackFromNBT(tag);
+					stack = new ItemStack(tag);
 				}
 				this.inventory.setInventorySlotContents(i, stack);
 			}
@@ -787,7 +787,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 //					NBTTagCompound tag = list.getCompoundTagAt(i);
 //					ItemStack stack = null;
 //					if (tag != null) {
-//						stack = ItemStack.loadItemStackFromNBT(tag);
+//						stack = new ItemStack(tag);
 //					}
 //					this.spellInventory.setInventorySlotContents(i, stack);
 //				}
@@ -807,7 +807,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		this.dataManager.set(TAMED, tamed);
 		if (tamed) {
 			this.setupTamedAI();
-			if (worldObj != null && !worldObj.isRemote) {
+			if (world != null && !world.isRemote) {
 				ReflectionHelper.setPrivateValue(EntityLiving.class, this, true, "persistenceRequired", "field_82179_bU");
 			}
 		}
@@ -819,10 +819,10 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		
 		if (force || this.getHealth() < DRAGON_MIN_HEALTH) {
 			if (force || this.getRNG().nextInt(10) == 0) {
-				player.addChatComponentMessage(new TextComponentTranslation("info.tamed_dragon.wild.tame_success", this.getName()));
+				player.sendMessage(new TextComponentTranslation("info.tamed_dragon.wild.tame_success", this.getName()));
 				
 				this.setTamed(true);
-				this.navigator.clearPathEntity();
+				this.navigator.clearPath();
 				this.setAttackTarget(null);
 				this.setHealth((float) this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue());
 				this.setOwnerId(player.getUniqueID());
@@ -835,15 +835,15 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 				success = true;
 			} else {
 				// Failed
-				player.addChatComponentMessage(new TextComponentTranslation("info.tamed_dragon.wild.tame_fail", this.getName()));
+				player.sendMessage(new TextComponentTranslation("info.tamed_dragon.wild.tame_fail", this.getName()));
 				this.heal(5.0f);
 			}
 		} else {
-			player.addChatComponentMessage(new TextComponentTranslation("info.tamed_dragon.wild.high_health", this.getName()));
+			player.sendMessage(new TextComponentTranslation("info.tamed_dragon.wild.high_health", this.getName()));
 		}
 
-		if (!this.worldObj.isRemote) {
-			this.worldObj.setEntityState(this, success ? (byte) 7 : (byte) 6);
+		if (!this.world.isRemote) {
+			this.world.setEntityState(this, success ? (byte) 7 : (byte) 6);
 		}
 		
 		if (!success) {
@@ -861,7 +861,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			double d0 = this.rand.nextGaussian() * 0.02D;
 			double d1 = this.rand.nextGaussian() * 0.02D;
 			double d2 = this.rand.nextGaussian() * 0.02D;
-			this.worldObj.spawnParticle(enumparticletypes, this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.height), this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, d0, d1, d2, new int[0]);
+			this.world.spawnParticle(enumparticletypes, this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.height), this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, d0, d1, d2, new int[0]);
 		}
 	}
 	
@@ -1180,7 +1180,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		EntityLivingBase owner = this.getOwner();
 		if (owner != null) {
 			NostrumMagicaSounds.DRAGON_DEATH.play(owner);
-			owner.addChatMessage(new TextComponentString(this.getName() + " leveled up!"));
+			owner.sendMessage(new TextComponentString(this.getName() + " leveled up!"));
 		}
 	}
 	
@@ -1229,26 +1229,26 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	 */
 	@Override
 	public void onDeath(DamageSource cause) {
-		if (this.getOwner() != null && !this.worldObj.isRemote && this.worldObj.getGameRules().getBoolean("showDeathMessages") && this.getOwner() instanceof EntityPlayerMP) {
-			this.getOwner().addChatMessage(this.getCombatTracker().getDeathMessage());
+		if (this.getOwner() != null && !this.world.isRemote && this.world.getGameRules().getBoolean("showDeathMessages") && this.getOwner() instanceof EntityPlayerMP) {
+			this.getOwner().sendMessage(this.getCombatTracker().getDeathMessage());
 		}
 		
-		if (!this.worldObj.isRemote) {
+		if (!this.world.isRemote) {
 			if (this.inventory != null) {
 				for (int i = 0; i < inventory.getSizeInventory(); i++) {
 					ItemStack stack = inventory.getStackInSlot(i);
-					if (stack != null && stack.stackSize != 0) {
-						EntityItem item = new EntityItem(this.worldObj, this.posX, this.posY, this.posZ, stack);
-						this.worldObj.spawnEntityInWorld(item);
+					if (stack != null && stack.getCount() != 0) {
+						EntityItem item = new EntityItem(this.world, this.posX, this.posY, this.posZ, stack);
+						this.world.spawnEntity(item);
 					}
 				}
 			}
 			
 			for (DragonEquipmentSlot slot : DragonEquipmentSlot.values()) {
 				ItemStack stack = equipment.getStackInSlot(slot);
-				if (stack != null && stack.stackSize != 0) {
-					EntityItem item = new EntityItem(this.worldObj, this.posX, this.posY, this.posZ, stack);
-					this.worldObj.spawnEntityInWorld(item);
+				if (stack != null && stack.getCount() != 0) {
+					EntityItem item = new EntityItem(this.world, this.posX, this.posY, this.posZ, stack);
+					this.world.spawnEntity(item);
 				}
 			}
 		}
@@ -1334,7 +1334,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			}
 		}
 		
-		if (worldObj.isRemote) {
+		if (world.isRemote) {
 			// If strong flight gets added here, this should be adjusted so that strong flight can flap when standing still, etc.
 			// Checking whether motion is high is great for gliding but probably won't work well if the dragon can wade basically
 			if (this.isFlying() && !this.getWingFlapping()) {
@@ -1365,7 +1365,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	public void onLivingUpdate() {
 		super.onLivingUpdate();
 		
-		if (this.worldObj.isRemote) {
+		if (this.world.isRemote) {
 			if (this.considerFlying()) {
 				if (this.motionY < 0.0D) {
 					double relief = Math.min(1.0D, Math.abs(this.motionX) + Math.abs(this.motionZ));
@@ -1390,7 +1390,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			
 			EntityDragonEgg egg = this.getEgg();
 			if (egg != null) {
-				if (egg.getDistanceSqToEntity(this) < 4.0) {
+				if (egg.getDistanceSq(this) < 4.0) {
 					egg.heatUp();
 				}
 			}
@@ -1405,7 +1405,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 //	}
 	
 	@Override
-	public void moveEntityWithHeading(float strafe, float forward) {
+	public void travel(float strafe, float vertical, float forward) {
 		
 		if (this.onGround && this.motionY <= 0) {
 			this.jumpCount = 0;
@@ -1444,7 +1444,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 //				}
 				
 				this.setAIMoveSpeed((float)this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue());
-				super.moveEntityWithHeading(strafe, forward);
+				super.travel(strafe, vertical, forward);
 			}
 			else if (entitylivingbase instanceof EntityPlayer)
 			{
@@ -1456,7 +1456,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			this.prevLimbSwingAmount = this.limbSwingAmount;
 			double d1 = this.posX - this.prevPosX;
 			double d0 = this.posZ - this.prevPosZ;
-			float f2 = MathHelper.sqrt_double(d1 * d1 + d0 * d0) * 4.0F;
+			float f2 = MathHelper.sqrt(d1 * d1 + d0 * d0) * 4.0F;
 
 			if (f2 > 1.0F)
 			{
@@ -1469,7 +1469,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		else
 		{
 			this.jumpMovementFactor = 0.02F;
-			super.moveEntityWithHeading(strafe, forward);
+			super.travel(strafe, vertical, forward);
 		}
 	}
 	
@@ -1527,8 +1527,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	public boolean attackEntityFrom(DamageSource source, float amount) {
 		boolean hurt = super.attackEntityFrom(source, amount);
 		
-		if (hurt && source.getSourceOfDamage() != null) {
-			if (this.isRidingOrBeingRiddenBy(source.getSourceOfDamage())) {
+		if (hurt && source.getTrueSource() != null) {
+			if (this.isRidingOrBeingRiddenBy(source.getTrueSource())) {
 				hurt = false;
 			}
 		}
@@ -1538,17 +1538,15 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			float health = this.getHealth();
 			if (health > 0f && health < DRAGON_MIN_HEALTH) {
 				if (owner != null && owner instanceof EntityPlayer) {
-					((EntityPlayer) this.getOwner()).addChatComponentMessage(new TextComponentTranslation("info.tamed_dragon.hurt", this.getName()));
+					((EntityPlayer) this.getOwner()).sendMessage(new TextComponentTranslation("info.tamed_dragon.hurt", this.getName()));
 				}
 				this.dismountRidingEntity();
 			} else if (health > 0f) {
-				if (source instanceof EntityDamageSource) {
-					if (((EntityDamageSource) source).getEntity() == owner) {
-						// Hurt by the owner!
-						if (this.getRNG().nextBoolean()) {
-							// Remove bond!
-							this.removeBond(0.75f);
-						}
+				if (source.getTrueSource() == owner) {
+					// Hurt by the owner!
+					if (this.getRNG().nextBoolean()) {
+						// Remove bond!
+						this.removeBond(0.75f);
 					}
 				}
 			}
@@ -1698,7 +1696,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			if (owner != null) {
 				if (owner.equals(this.getControllingPassenger())) {
 					this.addBond(.5f);
-				} else if (this.getDistanceSqToEntity(owner) < DRAGON_BOND_DISTANCE_SQ) {
+				} else if (this.getDistanceSq(owner) < DRAGON_BOND_DISTANCE_SQ) {
 					this.addBond(.2f);
 				}
 			}
@@ -1731,7 +1729,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			if (owner != null) {
 				if (owner.equals(this.getControllingPassenger())) {
 					this.addBond(.5f);
-				} else if (this.getDistanceSqToEntity(owner) < DRAGON_BOND_DISTANCE_SQ) {
+				} else if (this.getDistanceSq(owner) < DRAGON_BOND_DISTANCE_SQ) {
 					this.addBond(.2f);
 				}
 			}
@@ -1762,13 +1760,13 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		if (owner != null && owner instanceof EntityPlayer) {
 			player = (EntityPlayer) owner;
 		}
-		EntityDragonEgg egg = new EntityDragonEgg(worldObj, player, this.rollInheritedStats());
+		EntityDragonEgg egg = new EntityDragonEgg(world, player, this.rollInheritedStats());
 		egg.setPosition((int) posX + .5, (int) posY, (int) posZ + .5);
-		if (worldObj.spawnEntityInWorld(egg)) {
+		if (world.spawnEntity(egg)) {
 			this.setEggId(egg.getUniqueID());
 			
 			if (player != null) {
-				player.addChatComponentMessage(new TextComponentTranslation("info.egg.lay", this.getDisplayName()));
+				player.sendMessage(new TextComponentTranslation("info.egg.lay", this.getDisplayName()));
 			}
 			
 			this.setBond(this.getBond() - .5f);
@@ -1993,7 +1991,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 						NBTTagCompound tag = list.getCompoundTagAt(i);
 						ItemStack stack = null;
 						if (tag != null) {
-							stack = ItemStack.loadItemStackFromNBT(tag);
+							stack = new ItemStack(tag);
 						}
 						inv.setInventorySlotContents(i, stack);
 					}
@@ -2256,9 +2254,9 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	public void onChange(DragonEquipmentSlot slot, ItemStack oldStack, ItemStack newStack) {
 		if (slot != null) {
 			if (slot == DragonEquipmentSlot.BODY) {
-				dataManager.set(DATA_ARMOR_BODY, Optional.fromNullable(newStack));
+				dataManager.set(DATA_ARMOR_BODY, newStack);
 			} else if (slot == DragonEquipmentSlot.HELM) {
-				dataManager.set(DATA_ARMOR_HELM, Optional.fromNullable(newStack));
+				dataManager.set(DATA_ARMOR_HELM, newStack);
 			}
 		}
 		// else
@@ -2266,9 +2264,9 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		for (DragonEquipmentSlot scanSlot : DragonEquipmentSlot.values()) {
 			@Nullable ItemStack inSlot = equipment.getStackInSlot(scanSlot);
 			if (scanSlot == DragonEquipmentSlot.BODY) {
-				dataManager.set(DATA_ARMOR_BODY, Optional.fromNullable(inSlot));
+				dataManager.set(DATA_ARMOR_BODY, inSlot);
 			} else if (scanSlot == DragonEquipmentSlot.HELM) {
-				dataManager.set(DATA_ARMOR_HELM, Optional.fromNullable(inSlot));
+				dataManager.set(DATA_ARMOR_HELM, inSlot);
 			}
 		}
 	}
@@ -2283,7 +2281,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	@Override
 	public @Nullable ItemStack getDragonEquipment(DragonEquipmentSlot slot) {
 		// Defer to synced data param if on client. Otherwise, look in equipment inventory
-		if (this.worldObj.isRemote) {
+		if (this.world.isRemote) {
 			
 //			// Init stacks if missing
 //			if (ClientStacks.isEmpty() || ClientStacks.get(DragonArmorMaterial.IRON) == null) {
@@ -2298,9 +2296,9 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			
 			switch (slot) {
 			case BODY:
-				return dataManager.get(DATA_ARMOR_BODY).orNull();
+				return dataManager.get(DATA_ARMOR_BODY);
 			case HELM:
-				return dataManager.get(DATA_ARMOR_HELM).orNull();
+				return dataManager.get(DATA_ARMOR_HELM);
 			case WINGS: // UNIMPLEMENTED
 			case CREST: // UNIMPLEMENTED
 			default:

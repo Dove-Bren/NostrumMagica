@@ -46,7 +46,7 @@ public class DragonFlyRandomTask extends EntityAIBase {
     /**
      * Returns whether an in-progress EntityAIBase should continue executing
      */
-    public boolean continueExecuting()
+    public boolean shouldContinueExecuting()
     {
         return false;
     }
@@ -65,7 +65,7 @@ public class DragonFlyRandomTask extends EntityAIBase {
         {
         	BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(this.parentEntity.getPosition());
     		while(pos.getY() > 0) {
-    			if (this.parentEntity.worldObj.isAirBlock(pos)) {
+    			if (this.parentEntity.world.isAirBlock(pos)) {
     				pos.setY(pos.getY() - 1);
     			} else {
     				break;
@@ -73,7 +73,7 @@ public class DragonFlyRandomTask extends EntityAIBase {
     		}
         	
         	for (int i = 0; i < 20 + (random.nextInt(6) - 3); i++) {
-        		if (this.parentEntity.worldObj.isAirBlock(pos)) {
+        		if (this.parentEntity.world.isAirBlock(pos)) {
         			pos.setY(pos.getY() + 1);
         		}
         	}

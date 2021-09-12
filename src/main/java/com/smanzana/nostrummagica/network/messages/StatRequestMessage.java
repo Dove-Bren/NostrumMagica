@@ -22,7 +22,7 @@ public class StatRequestMessage implements IMessage {
 		@Override
 		public StatSyncMessage onMessage(StatRequestMessage message, MessageContext ctx) {
 			
-			final EntityPlayerMP sp = ctx.getServerHandler().playerEntity;
+			final EntityPlayerMP sp = ctx.getServerHandler().player;
 			
 			sp.getServerWorld().addScheduledTask(() -> {
 				INostrumMagic att = NostrumMagica.getMagicWrapper(sp);

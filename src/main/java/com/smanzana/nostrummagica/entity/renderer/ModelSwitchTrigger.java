@@ -11,7 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -31,7 +31,7 @@ public class ModelSwitchTrigger extends ModelBase {
 	@Override
 	public void render(Entity entity, float time, float swingProgress,
 			float swing, float headAngleY, float headAngleX, float scale) {
-		VertexBuffer wr = Tessellator.getInstance().getBuffer();
+		BufferBuilder wr = Tessellator.getInstance().getBuffer();
 		EntitySwitchTrigger trigger = (EntitySwitchTrigger) entity;
 		SwitchBlockTileEntity te = trigger.getLinkedTileEntity();
 		
@@ -136,7 +136,7 @@ public class ModelSwitchTrigger extends ModelBase {
 			}
 		}
 		
-		final float time = entitylivingbaseIn.worldObj.getTotalWorldTime() + partialTickTime;
+		final float time = entitylivingbaseIn.world.getTotalWorldTime() + partialTickTime;
 		final float period = (float) (20 * (fast ? spinActivated : spinIdle));
 		float angle = 360f * ((time % period) / period);
 		GlStateManager.rotate(angle, 0, 1, 0);

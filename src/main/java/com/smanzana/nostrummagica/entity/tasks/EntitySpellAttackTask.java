@@ -60,7 +60,7 @@ public class EntitySpellAttackTask<T extends EntityLiving> extends EntityAIBase 
 	}
 	
 	@Override
-	public boolean continueExecuting() {
+	public boolean shouldContinueExecuting() {
 		return false;
 	}
 	

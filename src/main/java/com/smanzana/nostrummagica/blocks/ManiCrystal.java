@@ -143,7 +143,7 @@ public class ManiCrystal extends Block {
 		if (random.nextInt(2) <= state.getValue(LEVEL)) {
 			
 			// Check if there are too many already
-			if (worldIn.getEntitiesWithinAABB(EntityWisp.class, this.getBoundingBox(state, worldIn, pos).offset(pos).expandXyz(20)).size() > 5) {
+			if (worldIn.getEntitiesWithinAABB(EntityWisp.class, this.getBoundingBox(state, worldIn, pos).offset(pos).grow(20)).size() > 5) {
 				return;
 			}
 			
@@ -161,7 +161,7 @@ public class ManiCrystal extends Block {
 			if (worldIn.isAirBlock(spawnPos)) {
 				EntityWisp wisp = new EntityWisp(worldIn, pos);
 				wisp.setPosition(spawnPos.getX() + .5, spawnPos.getY(), spawnPos.getZ() + .5);
-				worldIn.spawnEntityInWorld(wisp);
+				worldIn.spawnEntity(wisp);
 			}
 		}
 	}
@@ -187,7 +187,7 @@ public class ManiCrystal extends Block {
 	}
 	
 	@Override
-	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, World worldIn, BlockPos pos) {
+	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
 		EnumFacing facing = blockState.getValue(FACING);
 		if (facing == null) {
 			facing = EnumFacing.UP;
@@ -229,23 +229,21 @@ public class ManiCrystal extends Block {
 		return true;
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
-	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn) {
-		super.neighborChanged(state, worldIn, pos, blockIn);
+	public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor) {
+		super.onNeighborChange(world, pos, neighbor);
 		
-		if (worldIn.isRemote) {
-			return;
-		}
-		
-		EnumFacing facing = state.getValue(FACING);
-		if (facing == EnumFacing.UP || facing == EnumFacing.DOWN) {
-			return;
-		}
-		
-		if (worldIn.isAirBlock(pos.offset(facing.getOpposite()))) {
-			this.dropBlockAsItem(worldIn, pos, state, 0);
-			worldIn.setBlockToAir(pos);
+		if (world instanceof World && !((World) world).isRemote) {
+			IBlockState state = world.getBlockState(pos);
+			EnumFacing facing = state.getValue(FACING);
+			if (facing == EnumFacing.UP || facing == EnumFacing.DOWN) {
+				return;
+			}
+			
+			if (world.isAirBlock(pos.offset(facing.getOpposite()))) {
+				this.dropBlockAsItem((World) world, pos, state, 0);
+				((World) world).setBlockToAir(pos);
+			}
 		}
 	}
 }

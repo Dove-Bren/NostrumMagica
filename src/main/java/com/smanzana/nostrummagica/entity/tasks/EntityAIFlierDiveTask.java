@@ -35,7 +35,7 @@ public class EntityAIFlierDiveTask<T extends EntityLiving> extends EntityAIBase
 	}
 	
 	protected boolean attackedTooRecently() {
-		return lastAttackTicks != 0 && entity.worldObj.getTotalWorldTime() <= lastAttackTicks + attackDelay;
+		return lastAttackTicks != 0 && entity.world.getTotalWorldTime() <= lastAttackTicks + attackDelay;
 	}
 
 	/**
@@ -47,7 +47,7 @@ public class EntityAIFlierDiveTask<T extends EntityLiving> extends EntityAIBase
 		}
 		
 		EntityLivingBase target = entity.getAttackTarget();
-		if (entity.getDistanceSqToEntity(target) > maxAttackDistance) {
+		if (entity.getDistanceSq(target) > maxAttackDistance) {
 			return false;
 		}
 		
@@ -69,7 +69,7 @@ public class EntityAIFlierDiveTask<T extends EntityLiving> extends EntityAIBase
 	/**
 	 * Returns whether an in-progress EntityAIBase should continue executing
 	 */
-	public boolean continueExecuting() {
+	public boolean shouldContinueExecuting() {
 		return (stallTicks < (20 * 1) && !attackedTooRecently());
 	}
 	
@@ -105,7 +105,7 @@ public class EntityAIFlierDiveTask<T extends EntityLiving> extends EntityAIBase
 			// If close enough, attack!
 			if (entity.getDistanceSq(target.posX, target.posY + (target.height / 2), target.posZ) < Math.max(entity.width * entity.width, 1.5)) {
 				this.attackTarget(entity, target);
-				this.lastAttackTicks = entity.worldObj.getTotalWorldTime();
+				this.lastAttackTicks = entity.world.getTotalWorldTime();
 				entity.getMoveHelper().strafe(1f, 0f);
 			} else {
 			

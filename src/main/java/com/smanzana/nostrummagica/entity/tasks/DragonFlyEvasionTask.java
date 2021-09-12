@@ -52,7 +52,7 @@ public class DragonFlyEvasionTask extends EntityAIBase {
 	}
 	
 	@Override
-	public boolean continueExecuting() {
+	public boolean shouldContinueExecuting() {
 		boolean flying = false;
 		
 		if (this.dragon instanceof EntityDragonFlying) {
@@ -87,7 +87,7 @@ public class DragonFlyEvasionTask extends EntityAIBase {
         	
         	// First, find the ground
     		while(pos.getY() > 0) {
-    			if (this.dragon.worldObj.isAirBlock(pos)) {
+    			if (this.dragon.world.isAirBlock(pos)) {
     				pos.setY(pos.getY() - 1);
     			} else {
     				break;
@@ -101,7 +101,7 @@ public class DragonFlyEvasionTask extends EntityAIBase {
         	
     		int height = 15 + (random.nextInt(6) - 3);
         	for (int i = 0; i < height; i++) {
-        		if (this.dragon.worldObj.isAirBlock(pos)) {
+        		if (this.dragon.world.isAirBlock(pos)) {
         			pos.setY(pos.getY() + 1);
         		} else {
         			pos.setY(pos.getY() - 1);

@@ -134,7 +134,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 		Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
 
 		if (slot == EntityEquipmentSlot.MAINHAND) {
-			multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", damage, 0));
+			multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", damage, 0));
 			
 			final double amt;
 			switch (element) {
@@ -169,10 +169,10 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 				amt = 2.4;
 			}
 			
-			multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -amt, 0));
+			multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -amt, 0));
 		} else if (slot == EntityEquipmentSlot.OFFHAND && element == EMagicElement.WIND) {
 			final double amt = level * 0.1;
-			multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getAttributeUnlocalizedName(), new AttributeModifier(OFFHAND_ATTACK_SPEED_MODIFIER, "Weapon modifier", amt, 0));
+			multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(OFFHAND_ATTACK_SPEED_MODIFIER, "Weapon modifier", amt, 0));
 		}
 
 		return multimap;
@@ -245,14 +245,12 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
-		
-		if (itemStackIn != playerIn.getHeldItem(hand)) {
-			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
-		}
-		
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
 		Vec3d dir = playerIn.getLookVec();
-		dir = dir.addVector(0, -dir.yCoord, 0).normalize();
+		dir = dir.addVector(0, -dir.y, 0).normalize();
+		
+		ItemStack itemStackIn = playerIn.getHeldItem(hand);
+		
 		if (element == EMagicElement.ICE) {
 			
 			if (playerIn.getCooledAttackStrength(0.5F) > .95) {
@@ -270,11 +268,11 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 //					//cloud.setParticle(EnumParticleTypes.SPELL);
 //					cloud.addEffect(new PotionEffect(FrostbitePotion.instance(), 20 * 10));
 //					worldIn.spawnEntityInWorld(cloud);
-//					cloud.motionX = dir.xCoord;
-//					cloud.motionY = dir.yCoord;
-//					cloud.motionZ = dir.zCoord;
+//					cloud.motionX = dir.x;
+//					cloud.motionY = dir.y;
+//					cloud.motionZ = dir.z;
 					
-					spawnIceCloud(worldIn, playerIn, new Vec3d(playerIn.posX + dir.xCoord, playerIn.posY + .75, playerIn.posZ + dir.zCoord), dir, level);
+					spawnIceCloud(worldIn, playerIn, new Vec3d(playerIn.posX + dir.x, playerIn.posY + .75, playerIn.posZ + dir.z), dir, level);
 					
 					itemStackIn.damageItem(2, playerIn);
 				}
@@ -299,11 +297,11 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 //					//cloud.setParticle(EnumParticleTypes.SPELL);
 //					cloud.addEffect(new PotionEffect(FrostbitePotion.instance(), 20 * 10));
 //					worldIn.spawnEntityInWorld(cloud);
-//					cloud.motionX = dir.xCoord;
-//					cloud.motionY = dir.yCoord;
-//					cloud.motionZ = dir.zCoord;
+//					cloud.motionX = dir.x;
+//					cloud.motionY = dir.y;
+//					cloud.motionZ = dir.z;
 					
-					spawnVortex(worldIn, playerIn, new Vec3d(playerIn.posX + dir.xCoord, playerIn.posY + .75, playerIn.posZ + dir.zCoord), dir, level);
+					spawnVortex(worldIn, playerIn, new Vec3d(playerIn.posX + dir.x, playerIn.posY + .75, playerIn.posZ + dir.z), dir, level);
 					
 					itemStackIn.damageItem(2, playerIn);
 				}
@@ -346,10 +344,11 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 	}
 	
 	@Override
-	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		ItemStack stack = playerIn.getHeldItem(hand);
 		if (playerIn.getCooledAttackStrength(0.5F) > .95) {
 			Vec3d dir = new Vec3d(pos).addVector(hitX, 0, hitZ).subtract(playerIn.getPositionVector());
-			dir = dir.addVector(0, -dir.yCoord, 0);
+			dir = dir.addVector(0, -dir.y, 0);
 			dir = dir.normalize();
 			if (element == EMagicElement.WIND) {
 				if (!worldIn.isRemote) {
@@ -398,7 +397,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 	
 	protected static void spawnIceCloud(World world, EntityPlayer caster, Vec3d at, Vec3d direction, int level) {
 		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 3 seconds
-		EntityAreaEffect cloud = new EntityAreaEffect(world, at.xCoord, at.yCoord, at.zCoord);
+		EntityAreaEffect cloud = new EntityAreaEffect(world, at.x, at.y, at.z);
 		cloud.setOwner(caster);
 		cloud.setWaitTime(5);
 		cloud.setRadius(0.5f);
@@ -415,16 +414,16 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 		cloud.setVerticleStepping(true);
 		cloud.setGravity(true, .1);
 		//cloud.setWalksWater();
-		world.spawnEntityInWorld(cloud);
-		cloud.motionX = direction.xCoord;
-		cloud.motionY = direction.yCoord;
-		cloud.motionZ = direction.zCoord;
+		world.spawnEntity(cloud);
+		cloud.motionX = direction.x;
+		cloud.motionY = direction.y;
+		cloud.motionZ = direction.z;
 	}
 	
 	protected static void spawnVortex(World world, EntityPlayer caster, Vec3d at, Vec3d direction, int level) {
 		final int hurricaneCount = EnchantedArmor.GetSetCount(caster, EMagicElement.WIND, 3);
 		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 10 seconds
-		EntityAreaEffect cloud = new EntityAreaEffect(world, at.xCoord, at.yCoord, at.zCoord);
+		EntityAreaEffect cloud = new EntityAreaEffect(world, at.x, at.y, at.z);
 		cloud.setOwner(caster);
 		cloud.setWaitTime(10);
 		cloud.setRadius(.5f);
@@ -446,9 +445,9 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 			final double dy = (Math.sin(prog * 2 * Math.PI) + 1) / 2;
 			final Vec3d target = new Vec3d(cloud.posX, cloud.posY + 2 + dy, cloud.posZ);
 			final Vec3d diff = target.subtract(entity.getPositionVector());
-			entity.motionX = diff.xCoord / 2;
-			entity.motionY = diff.yCoord / 2;
-			entity.motionZ = diff.zCoord / 2;
+			entity.motionX = diff.x / 2;
+			entity.motionY = diff.y / 2;
+			entity.motionZ = diff.z / 2;
 			entity.velocityChanged = true;
 			//entity.posY = 2 + dy;
 			//entity.setPositionAndUpdate(cloud.posX, cloud.posY + 2 + dy, cloud.posZ);
@@ -461,10 +460,10 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 		cloud.setWaddle(direction, 1);
 		cloud.setParticle(EnumParticleTypes.SWEEP_ATTACK);
 		cloud.setParticleParam1(10);
-		world.spawnEntityInWorld(cloud);
-		cloud.motionX = direction.xCoord;
-		cloud.motionY = direction.yCoord;
-		cloud.motionZ = direction.zCoord;
+		world.spawnEntity(cloud);
+		cloud.motionX = direction.x;
+		cloud.motionY = direction.y;
+		cloud.motionZ = direction.z;
 	}
 	
 	protected static boolean summonBoltOnSelf(EntityLivingBase entity) {
@@ -473,8 +472,8 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 			return false;
 		}
 		
-		entity.worldObj.addWeatherEffect(
-				new NostrumTameLightning(entity.worldObj, entity.posX, entity.posY, entity.posZ)
+		entity.world.addWeatherEffect(
+				new NostrumTameLightning(entity.world, entity.posX, entity.posY, entity.posZ)
 				);
 		attr.addMana(-30);
 		if (entity instanceof EntityPlayer) {
@@ -496,7 +495,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 			if (baubles != null) {
 				for (int i = 0; i < baubles.getSizeInventory(); i++) {
 					ItemStack stack = baubles.getStackInSlot(i);
-					if (stack == null || !(stack.getItem() instanceof ItemMagicBauble)) {
+					if (stack.isEmpty() || !(stack.getItem() instanceof ItemMagicBauble)) {
 						continue;
 					}
 					
@@ -515,14 +514,14 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 			
 			if (i == 0) {
 				world.addWeatherEffect(
-						new NostrumTameLightning(world, pos.xCoord, pos.yCoord, pos.zCoord)
+						new NostrumTameLightning(world, pos.x, pos.y, pos.z)
 						);
 			} else {
 				// Apply random x/z offsets. Then step up to 4 to find surface
 				cursor.setPos(
-						pos.xCoord + rand.nextInt(6) - 3,
-						pos.yCoord - 2,
-						pos.zCoord + rand.nextInt(6) - 3);
+						pos.x + rand.nextInt(6) - 3,
+						pos.y - 2,
+						pos.z + rand.nextInt(6) - 3);
 				
 				// Find surface
 				int dist = 0;

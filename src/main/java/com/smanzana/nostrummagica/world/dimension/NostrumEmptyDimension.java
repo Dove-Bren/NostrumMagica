@@ -33,15 +33,15 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.biome.BiomeProviderSingle;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.IChunkGenerator;
+import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
 import net.minecraftforge.event.entity.living.EnderTeleportEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -78,8 +78,7 @@ public class NostrumEmptyDimension {
 		public EmptyDimensionProvider() {
 			super();
 			
-			this.hasNoSky = true;
-			this.isHellWorld = false;
+			this.nether = false;
 			this.skyColor = new Vec3d(.2D, 0D, .2D);
 			fogColor = new Vec3d(.2, .2, .2);
 		}
@@ -87,13 +86,15 @@ public class NostrumEmptyDimension {
 		protected void onWorldAttached() {
 			// Can't do this. Gamerules aren't dimension specific
 //			// Force keep-inventory game rule
-//			if (worldObj != null) {
-//				worldObj.getGameRules().setOrCreateGameRule("keepInventory", "true");
+//			if (world != null) {
+//				world.getGameRules().setOrCreateGameRule("keepInventory", "true");
 //			}
 		}
 		
 		@Override
-		public void createBiomeProvider() {
+		protected void init() {
+			super.init();
+			this.hasSkyLight = false;
 			this.biomeProvider = new BiomeProviderSingle(Biomes.SKY);
 			
 			// Sucky place for this hook but the actual hook is final
@@ -102,7 +103,7 @@ public class NostrumEmptyDimension {
 		
 		@Override
 		public IChunkGenerator createChunkGenerator() {
-			return new ChunkGeneratorEmpty(this.worldObj);
+			return new ChunkGeneratorEmpty(this.world);
 		}
 
 		@Override
@@ -179,7 +180,7 @@ public class NostrumEmptyDimension {
 			// Make sure players aren't teleporting.
 			// TODO this even is fired before updating, sadly. That feels incorrect.
 			// Does it act weirdly?
-			for (EntityPlayer player : worldObj.playerEntities) {
+			for (EntityPlayer player : world.playerEntities) {
 				if (player.isCreative() || player.isSpectator()) {
 					continue;
 				}
@@ -205,7 +206,7 @@ public class NostrumEmptyDimension {
 		}
 
 		@Override
-		public Chunk provideChunk(int x, int z) {
+		public Chunk generateChunk(int x, int z) {
 			return new Chunk(world, x, z);
 		}
 
@@ -225,13 +226,19 @@ public class NostrumEmptyDimension {
 		}
 
 		@Override
-		public BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos position) {
+		public BlockPos getNearestStructurePos(World worldIn, String structureName, BlockPos position,
+				boolean findUnexplored) {
 			return null;
 		}
 
 		@Override
 		public void recreateStructures(Chunk chunkIn, int x, int z) {
 			
+		}
+
+		@Override
+		public boolean isInsideStructure(World worldIn, String structureName, BlockPos pos) {
+			return false;
 		}
 
 	}
@@ -274,7 +281,7 @@ public class NostrumEmptyDimension {
 			BlockPos spawn = NostrumMagica.getOrCreatePlayerDimensionSpawn(player);
 			
 			try {
-				Field field = ReflectionHelper.findField(EntityPlayerMP.class, "invulnerableDimensionChange", "field_184851_cj");
+				Field field = ObfuscationReflectionHelper.findField(EntityPlayerMP.class, "invulnerableDimensionChange");
 				field.setAccessible(true);
 				FieldUtils.writeField(field, player, true);
 			} catch (IllegalAccessException e) {
@@ -370,7 +377,7 @@ public class NostrumEmptyDimension {
 			
 			if (entityIn instanceof EntityPlayerMP) {
 				try {
-					Field field = ReflectionHelper.findField(EntityPlayerMP.class, "invulnerableDimensionChange", "field_184851_cj");
+					Field field = ObfuscationReflectionHelper.findField(EntityPlayerMP.class, "invulnerableDimensionChange");
 					field.setAccessible(true);
 					FieldUtils.writeField(field, ((EntityPlayerMP) entityIn), true);
 				} catch (IllegalAccessException e) {
@@ -440,7 +447,7 @@ public class NostrumEmptyDimension {
 					MinecraftServer server = player.getServer();
 					teleportingMarker.put(player.getPersistentID(), true);
 					server.getPlayerList().transferPlayerToDimension(
-							player, dim, new DimensionEntryTeleporter(server.worldServerForDimension(dim)));
+							player, dim, new DimensionEntryTeleporter(server.getWorld(dim)));
 					teleportingMarker.put(player.getPersistentID(), false);
 				}
 			} else if (event.getEntity().dimension == dim && event.getDimension() == 0) {
@@ -468,7 +475,7 @@ public class NostrumEmptyDimension {
 						}
 					}
 					server.getPlayerList().transferPlayerToDimension(
-							player, toDim, new DimensionReturnTeleporter(server.worldServerForDimension(toDim)));
+							player, toDim, new DimensionReturnTeleporter(server.getWorld(toDim)));
 					teleportingMarker.put(player.getPersistentID(), false);
 				}
 			}
@@ -482,7 +489,7 @@ public class NostrumEmptyDimension {
 		}
 		
 		@SubscribeEvent
-		public void onBlockPlace(BlockEvent.PlaceEvent event) {
+		public void onBlockPlace(@SuppressWarnings("deprecation") BlockEvent.PlaceEvent event) {
 			if (event.getWorld().provider.getDimension() == dim && event.getPlacedBlock().getBlock() instanceof BlockFire) {
 				event.setCanceled(true);
 			}

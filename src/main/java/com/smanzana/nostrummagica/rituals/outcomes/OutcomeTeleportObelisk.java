@@ -48,7 +48,7 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 		
 		BlockPos pos = PositionCrystal.getBlockPosition(centerItem);
 		if (pos == null) {
-			player.addChatMessage(new TextComponentTranslation("info.teleport_obelisk.fail", new Object[0]));
+			player.sendMessage(new TextComponentTranslation("info.teleport_obelisk.fail", new Object[0]));
 			return;
 		}
 		
@@ -57,7 +57,7 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 				TileEntity te = world.getTileEntity(pos);
 				if (te == null || !(te instanceof NostrumObeliskEntity)) {
 					NostrumMagica.logger.error("Something went wrong! Source obelisk does not seem to exist or have the provided target obelisk...");
-					player.addChatComponentMessage(new TextComponentTranslation("info.teleport_obelisk.fail"));
+					player.sendMessage(new TextComponentTranslation("info.teleport_obelisk.fail"));
 					return;
 				}
 				
@@ -78,7 +78,7 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 				double dz = Math.sin(dirD) * dist;
 				EntityItem drop = new EntityItem(world, pos.getX() + .5 + dx, pos.getY() + 2, pos.getZ() + .5 + dz,
 						NostrumResourceItem.getItem(ResourceType.ENDER_BRISTLE, 1));
-				world.spawnEntityInWorld(drop);
+				world.spawnEntity(drop);
 				NostrumMagicaSounds.CAST_FAIL.play(world, pos.getX() + .5, pos.getY() + 2, pos.getZ() + .5);
 			}
 		}

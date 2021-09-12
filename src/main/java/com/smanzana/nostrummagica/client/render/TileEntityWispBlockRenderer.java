@@ -9,11 +9,11 @@ import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.GlStateManager.DestFactor;
 import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -40,7 +40,7 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 	}
 	
 	// 0,0 is bottom point
-	protected void renderPlatform(Tessellator tessellator, VertexBuffer buffer) {
+	protected void renderPlatform(Tessellator tessellator, BufferBuilder buffer) {
 		// Top
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
 		
@@ -73,7 +73,7 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 	}
 	
 	// Origin at center of bottom
-	protected void renderBase(Tessellator tessellator, VertexBuffer buffer) {
+	protected void renderBase(Tessellator tessellator, BufferBuilder buffer) {
 		
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
 		
@@ -116,7 +116,7 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 		tessellator.draw();
 	}
 	
-	protected void renderGem(Tessellator tessellator, VertexBuffer buffer, boolean outline) {
+	protected void renderGem(Tessellator tessellator, BufferBuilder buffer, boolean outline) {
 		if (!outline) {
 			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
 		} else {
@@ -206,7 +206,7 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 	}
 	
 	@Override
-	public void renderTileEntityAt(WispBlockTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
+	public void render(WispBlockTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
 		
 		final float shortPeriod = 3f;
 		final float longPeriod = 30f;
@@ -233,7 +233,7 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 		ItemStack reagents = te.getReagent();
 		
 		Tessellator tessellator = Tessellator.getInstance();
-		VertexBuffer buffer = tessellator.getBuffer();
+		BufferBuilder buffer = tessellator.getBuffer();
 		GlStateManager.pushAttrib();
 		GlStateManager.enableBlend();
 		

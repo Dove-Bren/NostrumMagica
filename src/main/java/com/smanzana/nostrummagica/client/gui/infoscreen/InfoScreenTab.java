@@ -258,7 +258,7 @@ public abstract class InfoScreenTab {
 			private List<RitualRecipe> getAvailable(INostrumMagic attr) {
 				List<RitualRecipe> list = new LinkedList<>();
 				for (RitualRecipe ritual : RitualRegistry.instance().getRegisteredRituals()) {
-					if (ritual.getRequirement() == null || ritual.getRequirement().matches(Minecraft.getMinecraft().thePlayer, attr))
+					if (ritual.getRequirement() == null || ritual.getRequirement().matches(Minecraft.getMinecraft().player, attr))
 						list.add(ritual);
 				}
 				

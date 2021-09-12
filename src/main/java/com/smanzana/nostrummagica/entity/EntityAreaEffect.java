@@ -274,8 +274,8 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 			final float prog = ((float) ((this.ticksExisted + (period / 4)) % period)) / (float) period;
 			final double offset = Math.sin(2 * Math.PI * prog) * waddleMagnitude;
 			
-			motionX = waddleDir.xCoord + (offset * waddleDir.zCoord);
-			motionZ = waddleDir.zCoord + (offset * -waddleDir.xCoord);
+			motionX = waddleDir.x + (offset * waddleDir.z);
+			motionZ = waddleDir.z + (offset * -waddleDir.x);
 			height = 5f;
 		}
 	}
@@ -298,7 +298,7 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
         if (this.doesVerticalSteps()) {
         	while (true) {
         		pos.setPos(this.getPosition());
-        		IBlockState state = worldObj.getBlockState(pos);
+        		IBlockState state = world.getBlockState(pos);
 	        	if (state == null || !state.getMaterial().blocksMovement()) {
 	        		
 	        		if (!this.getWalksWater() || !state.getMaterial().isLiquid()) {
@@ -322,7 +322,7 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
         	double left = this.gravitySpeed;
         	while (posY > 1 && left > 0) {
         		pos.setPos(posX, posY - 1, posZ);
-        		IBlockState state = worldObj.getBlockState(pos);
+        		IBlockState state = world.getBlockState(pos);
 	        	if (state != null && state.getMaterial().blocksMovement()) {
 	        		// Done
 	        		break;
@@ -348,7 +348,7 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
         	}
         }
         
-        if (worldObj.isRemote) {
+        if (world.isRemote) {
         	prevHeight = this.height;
         	this.height = dataManager.get(HEIGHT);
         } else {
@@ -362,13 +362,13 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 	
 	protected void applyEffects(Entity ent) {
 		for (IAreaEntityEffect effect : this.entityEffects) {
-			effect.apply(worldObj, ent);
+			effect.apply(world, ent);
 		}
 	}
 	
 	protected void applyEffects(BlockPos pos) {
 		for (IAreaLocationEffect effect : this.locationEffects) {
-			effect.apply(worldObj, pos);
+			effect.apply(world, pos);
 		}
 	}
 	
@@ -391,7 +391,7 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 	
 			for (int i = 0; (float)i < area; ++i) {
 				float f6 = this.rand.nextFloat() * ((float)Math.PI * 2F);
-				float f7 = MathHelper.sqrt_float(this.rand.nextFloat()) * radius;
+				float f7 = MathHelper.sqrt(this.rand.nextFloat()) * radius;
 				float f8 = MathHelper.cos(f6) * f7;
 				float f9 = MathHelper.sin(f6) * f7;
 				double y = rand.nextDouble() * (this.height - .5) + .5;
@@ -401,9 +401,9 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 					int i2 = l1 >> 16 & 255;
 					int j2 = l1 >> 8 & 255;
 					int j1 = l1 & 255;
-					this.worldObj.spawnParticle(EnumParticleTypes.SPELL_MOB, this.posX + (double)f8, this.posY + y, this.posZ + (double)f9, (double)((float)i2 / 255.0F), (double)((float)j2 / 255.0F), (double)((float)j1 / 255.0F), new int[0]);
+					this.world.spawnParticle(EnumParticleTypes.SPELL_MOB, this.posX + (double)f8, this.posY + y, this.posZ + (double)f9, (double)((float)i2 / 255.0F), (double)((float)j2 / 255.0F), (double)((float)j1 / 255.0F), new int[0]);
 				} else {
-					this.worldObj.spawnParticle(this.getParticle(), this.posX + (double)f8, this.posY + y, this.posZ + (double)f9, (0.5D - this.rand.nextDouble()) * 0.15D, 0.009999999776482582D, (0.5D - this.rand.nextDouble()) * 0.15D, aint);
+					this.world.spawnParticle(this.getParticle(), this.posX + (double)f8, this.posY + y, this.posZ + (double)f9, (0.5D - this.rand.nextDouble()) * 0.15D, 0.009999999776482582D, (0.5D - this.rand.nextDouble()) * 0.15D, aint);
 				}
 			}
 		}
@@ -432,12 +432,12 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 					continue;
 				}
 				float f6 = this.rand.nextFloat() * ((float)Math.PI * 2F);
-				float f7 = MathHelper.sqrt_float(this.rand.nextFloat()) * radius;
+				float f7 = MathHelper.sqrt(this.rand.nextFloat()) * radius;
 				float f8 = MathHelper.cos(f6) * f7;
 				float f9 = MathHelper.sin(f6) * f7;
 				double y = rand.nextDouble() * (this.height - .5) + .5;
 	
-				this.worldObj.spawnParticle(particle, this.posX + (double)f8, this.posY + y + yOffset, this.posZ + (double)f9, (0.5D - this.rand.nextDouble()) * 0.15D, 0.009999999776482582D, (0.5D - this.rand.nextDouble()) * 0.15D, aint);
+				this.world.spawnParticle(particle, this.posX + (double)f8, this.posY + y + yOffset, this.posZ + (double)f9, (0.5D - this.rand.nextDouble()) * 0.15D, 0.009999999776482582D, (0.5D - this.rand.nextDouble()) * 0.15D, aint);
 			}
 		}
 	}
@@ -448,11 +448,11 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 		
 		// Additional effects
 		// Sadly, parent class doesn't make it easy to extend, so we redo some work here
-		if (!worldObj.isRemote) {
+		if (!world.isRemote) {
 			
 			if (this.effectDelay < 5 || this.ticksExisted % 5 == 0) {
 				// Entities...
-				List<Entity> list = this.worldObj.<Entity>getEntitiesWithinAABB(Entity.class, this.getEntityBoundingBox(), (ent) -> { return ent != this;});
+				List<Entity> list = this.world.<Entity>getEntitiesWithinAABB(Entity.class, this.getEntityBoundingBox(), (ent) -> { return ent != this;});
 				if (list != null && !list.isEmpty()) {
 					for (Entity ent : list) {
 						double dx = ent.posX - this.posX;

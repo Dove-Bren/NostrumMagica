@@ -16,7 +16,7 @@ import net.minecraft.world.World;
 
 public class EntityAIFollowEntityGeneric<T extends EntityLiving> extends EntityAIBase {
 	
-	private final T theEntity;
+	private final T entity;
 	private EntityLivingBase theTarget;
 	private World theWorld;
 	private final double followSpeed;
@@ -28,15 +28,15 @@ public class EntityAIFollowEntityGeneric<T extends EntityLiving> extends EntityA
 	private boolean canTeleport;
 	
 
-	public EntityAIFollowEntityGeneric(T theEntityIn, double followSpeedIn, float minDistIn, float maxDistIn, boolean canTeleport) {
-		this(theEntityIn, followSpeedIn, minDistIn, maxDistIn, canTeleport, null);
+	public EntityAIFollowEntityGeneric(T entityIn, double followSpeedIn, float minDistIn, float maxDistIn, boolean canTeleport) {
+		this(entityIn, followSpeedIn, minDistIn, maxDistIn, canTeleport, null);
 	}
 	
-	public EntityAIFollowEntityGeneric(T theEntityIn, double followSpeedIn, float minDistIn, float maxDistIn, boolean canTeleport, EntityLivingBase target) {
-		this.theEntity = theEntityIn;
-		this.theWorld = theEntity.worldObj;
+	public EntityAIFollowEntityGeneric(T entityIn, double followSpeedIn, float minDistIn, float maxDistIn, boolean canTeleport, EntityLivingBase target) {
+		this.entity = entityIn;
+		this.theWorld = entity.world;
 		this.followSpeed = followSpeedIn;
-		this.petPathfinder = theEntity.getNavigator();
+		this.petPathfinder = entity.getNavigator();
 		this.minDist = minDistIn;
 		this.maxDist = maxDistIn;
 		this.canTeleport = canTeleport;
@@ -57,15 +57,15 @@ public class EntityAIFollowEntityGeneric<T extends EntityLiving> extends EntityA
 	 * Returns whether the EntityAIBase should begin execution.
 	 */
 	public boolean shouldExecute() {
-		EntityLivingBase entitylivingbase = this.getTarget(this.theEntity);
+		EntityLivingBase entitylivingbase = this.getTarget(this.entity);
 
 		if (entitylivingbase == null) {
 			return false;
 		} else if (entitylivingbase instanceof EntityPlayer && ((EntityPlayer)entitylivingbase).isSpectator()) {
 			return false;
-		} else if (!this.canFollow(theEntity)) {
+		} else if (!this.canFollow(entity)) {
 			return false;
-		} else if (this.theEntity.getDistanceSqToEntity(entitylivingbase) < (double)(this.minDist * this.minDist)) {
+		} else if (this.entity.getDistanceSq(entitylivingbase) < (double)(this.minDist * this.minDist)) {
 			return false;
 		} else {
 			this.theTarget = entitylivingbase;
@@ -76,8 +76,8 @@ public class EntityAIFollowEntityGeneric<T extends EntityLiving> extends EntityA
 	/**
 	 * Returns whether an in-progress EntityAIBase should continue executing
 	 */
-	public boolean continueExecuting() {
-		return !this.petPathfinder.noPath() && this.theEntity.getDistanceSqToEntity(this.theTarget) > (double)(this.maxDist * this.maxDist) && this.canFollow(theEntity);
+	public boolean shouldContinueExecuting() {
+		return !this.petPathfinder.noPath() && this.entity.getDistanceSq(this.theTarget) > (double)(this.maxDist * this.maxDist) && this.canFollow(entity);
 	}
 
 	/**
@@ -85,8 +85,8 @@ public class EntityAIFollowEntityGeneric<T extends EntityLiving> extends EntityA
 	 */
 	public void startExecuting() {
 		this.timeToRecalcPath = 0;
-		this.oldWaterCost = this.theEntity.getPathPriority(PathNodeType.WATER);
-		this.theEntity.setPathPriority(PathNodeType.WATER, 0.0F);
+		this.oldWaterCost = this.entity.getPathPriority(PathNodeType.WATER);
+		this.entity.setPathPriority(PathNodeType.WATER, 0.0F);
 	}
 
 	/**
@@ -94,8 +94,8 @@ public class EntityAIFollowEntityGeneric<T extends EntityLiving> extends EntityA
 	 */
 	public void resetTask() {
 		this.theTarget = null;
-		this.petPathfinder.clearPathEntity();
-		this.theEntity.setPathPriority(PathNodeType.WATER, this.oldWaterCost);
+		this.petPathfinder.clearPath();
+		this.entity.setPathPriority(PathNodeType.WATER, this.oldWaterCost);
 	}
 
 	private boolean isEmptyBlock(BlockPos pos) {
@@ -107,18 +107,18 @@ public class EntityAIFollowEntityGeneric<T extends EntityLiving> extends EntityA
 	 * Updates the task
 	 */
 	public void updateTask() {
-		this.theEntity.getLookHelper().setLookPositionWithEntity(this.theTarget, 10.0F, (float)this.theEntity.getVerticalFaceSpeed());
+		this.entity.getLookHelper().setLookPositionWithEntity(this.theTarget, 10.0F, (float)this.entity.getVerticalFaceSpeed());
 
-		if (this.canFollow(theEntity)) {
+		if (this.canFollow(entity)) {
 			if (--this.timeToRecalcPath <= 0) {
 				this.timeToRecalcPath = 10;
 
 				if (!this.petPathfinder.tryMoveToEntityLiving(this.theTarget, this.followSpeed) && this.canTeleport) {
-					if (!this.theEntity.getLeashed()) {
-						if (this.theEntity.getDistanceSqToEntity(this.theTarget) >= 144.0D) {
-							int i = MathHelper.floor_double(this.theTarget.posX) - 2;
-							int j = MathHelper.floor_double(this.theTarget.posZ) - 2;
-							int k = MathHelper.floor_double(this.theTarget.getEntityBoundingBox().minY);
+					if (!this.entity.getLeashed()) {
+						if (this.entity.getDistanceSq(this.theTarget) >= 144.0D) {
+							int i = MathHelper.floor(this.theTarget.posX) - 2;
+							int j = MathHelper.floor(this.theTarget.posZ) - 2;
+							int k = MathHelper.floor(this.theTarget.getEntityBoundingBox().minY);
 							
 							MutableBlockPos pos1 = new MutableBlockPos();
 							MutableBlockPos pos2 = new MutableBlockPos();
@@ -130,8 +130,8 @@ public class EntityAIFollowEntityGeneric<T extends EntityLiving> extends EntityA
 									pos2.setPos(i + l, k, j + i1);
 									pos3.setPos(i + l, k + 1, j + i1);
 									if ((l < 1 || i1 < 1 || l > 3 || i1 > 3) && this.theWorld.getBlockState(new BlockPos(pos1)).isSideSolid(theWorld, pos1, EnumFacing.UP) && this.isEmptyBlock(pos2) && this.isEmptyBlock(pos3)) {
-										this.theEntity.setLocationAndAngles((double)((float)(i + l) + 0.5F), (double)k, (double)((float)(j + i1) + 0.5F), this.theEntity.rotationYaw, this.theEntity.rotationPitch);
-										this.petPathfinder.clearPathEntity();
+										this.entity.setLocationAndAngles((double)((float)(i + l) + 0.5F), (double)k, (double)((float)(j + i1) + 0.5F), this.entity.rotationYaw, this.entity.rotationPitch);
+										this.petPathfinder.clearPath();
 										return;
 									}
 								}

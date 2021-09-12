@@ -162,7 +162,7 @@ public class OverlayRenderer extends Gui {
 	
 	@SubscribeEvent
 	public void onRender(RenderGameOverlayEvent.Pre event) {
-		EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayerSP player = Minecraft.getMinecraft().player;
 		ScaledResolution scaledRes = event.getResolution();
 		
 		if (event.getType() == ElementType.CROSSHAIRS) {
@@ -177,7 +177,7 @@ public class OverlayRenderer extends Gui {
 				}
 				
 				HookshotType type = HookshotItem.GetType(hookshot);
-				RayTraceResult result = RayTrace.raytrace(player.worldObj, player.getPositionEyes(event.getPartialTicks()),
+				RayTraceResult result = RayTrace.raytrace(player.world, player.getPositionEyes(event.getPartialTicks()),
 						player.rotationPitch, player.rotationYaw, (float) HookshotItem.GetMaxDistance(type),
 						new Predicate<Entity>() {
 
@@ -196,7 +196,7 @@ public class OverlayRenderer extends Gui {
 						hit = true;
 						entity = true;
 					} else if (result.typeOfHit == Type.BLOCK) {
-						IBlockState state = player.worldObj.getBlockState(result.getBlockPos());
+						IBlockState state = player.world.getBlockState(result.getBlockPos());
 						if (state != null && HookshotItem.CanBeHooked(type, state)) {
 							hit = true;
 						}
@@ -214,7 +214,7 @@ public class OverlayRenderer extends Gui {
 	
 	@SubscribeEvent
 	public void onRender(RenderGameOverlayEvent.Post event) {
-		EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayerSP player = Minecraft.getMinecraft().player;
 		ScaledResolution scaledRes = event.getResolution();
 		
 		if (event.getType() == ElementType.EXPERIENCE) {
@@ -226,8 +226,8 @@ public class OverlayRenderer extends Gui {
 			
 			renderSpellSlide(player, scaledRes, attr);
 			
-			if (Minecraft.getMinecraft().thePlayer.isCreative()
-					|| Minecraft.getMinecraft().thePlayer.isSpectator()) {
+			if (Minecraft.getMinecraft().player.isCreative()
+					|| Minecraft.getMinecraft().player.isSpectator()) {
 				return;
 			}
 			
@@ -510,8 +510,8 @@ public class OverlayRenderer extends Gui {
 		if (ModConfig.config.displayManaText()) {
 			int centerx = hudXAnchor - (5 * 8);
 			String str = totalMana + "/" + totalMaxMana;
-			int width = Minecraft.getMinecraft().fontRendererObj.getStringWidth(str);
-			Minecraft.getMinecraft().fontRendererObj.drawString(
+			int width = Minecraft.getMinecraft().fontRenderer.getStringWidth(str);
+			Minecraft.getMinecraft().fontRenderer.drawString(
 					str, centerx - width/2, hudYAnchor + 1, 0xFFFFFFFF);
 		}
 		
@@ -534,7 +534,7 @@ public class OverlayRenderer extends Gui {
 		GlStateManager.disableBlend();
 		
 		if (ModConfig.config.displayManaText()) {
-			FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
+			FontRenderer fonter = Minecraft.getMinecraft().fontRenderer;
 			int centerx = hudXAnchor + (int) (.5 * GUI_BAR_WIDTH);
 			String str = "" + attr.getMana();
 			int width = fonter.getStringWidth(str);
@@ -556,10 +556,10 @@ public class OverlayRenderer extends Gui {
 	private void renderSpellSlide(EntityPlayerSP player, ScaledResolution scaledRes, INostrumMagic attr) {
 		// Bottom left spell slide
 		// Spell name
-		Spell current = NostrumMagica.getCurrentSpell(Minecraft.getMinecraft().thePlayer);
+		Spell current = NostrumMagica.getCurrentSpell(Minecraft.getMinecraft().player);
 		boolean xp = ModConfig.config.displayXPText();
 		if (current != null || xp) {
-			FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
+			FontRenderer fonter = Minecraft.getMinecraft().fontRenderer;
 			final int iconSize = 16;
 			final int iconMargin = 2;
 			final int textOffset = iconSize + (2 * iconMargin);
@@ -603,8 +603,8 @@ public class OverlayRenderer extends Gui {
 		int left_height = 39;
 		IAttributeInstance attrMaxHealth = player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
         float healthMax = (float)attrMaxHealth.getAttributeValue();
-        float absorb = MathHelper.ceiling_float_int(player.getAbsorptionAmount());
-		int healthRows = MathHelper.ceiling_float_int((healthMax + absorb) / 2.0F / 10.0F);
+        float absorb = MathHelper.ceil(player.getAbsorptionAmount());
+		int healthRows = MathHelper.ceil((healthMax + absorb) / 2.0F / 10.0F);
         int rowHeight = Math.max(10 - (healthRows - 2), 3);
 
         left_height += (healthRows * rowHeight);
@@ -699,12 +699,12 @@ public class OverlayRenderer extends Gui {
 		Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_ICONS);
 		
 		final int period = 30;
-		final float frac = (float) (player.worldObj.getTotalWorldTime() % period) / period;
+		final float frac = (float) (player.world.getTotalWorldTime() % period) / period;
 		final double radius = 6.0 + 2.0 * (Math.sin(frac * Math.PI * 2));
 		
 		final float rotOffset;
 		if (entity) {
-			rotOffset = 360.0f * ((float) (player.worldObj.getTotalWorldTime() % period) / period);
+			rotOffset = 360.0f * ((float) (player.world.getTotalWorldTime() % period) / period);
 		} else {
 			rotOffset = 0f;
 		}
@@ -837,7 +837,7 @@ public class OverlayRenderer extends Gui {
 		// 1) healthbar
 		// 2) pet head/icon
 		// 3) pet status icon
-		FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
+		FontRenderer fonter = Minecraft.getMinecraft().fontRenderer;
 //		final boolean sitting = (pet instanceof EntityTameable ? ((EntityTameable) pet).isSitting()
 //				: pet instanceof IEntityTameable ? ((IEntityTameable) pet).isSitting()
 //				: false);
@@ -972,7 +972,7 @@ public class OverlayRenderer extends Gui {
 		// 1) healthbar
 		// 2) pet head/icon
 		// 3) pet status icon
-		FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
+		FontRenderer fonter = Minecraft.getMinecraft().fontRenderer;
 		
 		PetInfo info;
 		if (pet instanceof IEntityPet) {
@@ -1135,7 +1135,7 @@ public class OverlayRenderer extends Gui {
 			return;
 		}
 		
-		INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer);
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().player);
 		if (attr == null || !attr.isUnlocked()) {
 			return; // no highlights
 		}
@@ -1195,7 +1195,7 @@ public class OverlayRenderer extends Gui {
 //			return;
 //		}
 //		
-//		INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer);
+//		INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().player);
 //		if (attr == null || !attr.isUnlocked()) {
 //			return;
 //		}
@@ -1247,14 +1247,14 @@ public class OverlayRenderer extends Gui {
 			event.getRenderer().addLayer(new LayerAetherCloak(event.getRenderer()));
 		}
 		
-		if (event.getEntityPlayer() != Minecraft.getMinecraft().thePlayer) {
+		if (event.getEntityPlayer() != Minecraft.getMinecraft().player) {
 			// For other players, possibly do armor render ticks
 			for (@Nullable ItemStack equipStack : event.getEntityPlayer().getArmorInventoryList()) {
 				if (equipStack == null || !(equipStack.getItem() instanceof EnchantedArmor)) {
 					continue;
 				}
 				
-				((EnchantedArmor) equipStack.getItem()).onArmorTick(event.getEntityPlayer().worldObj, event.getEntityPlayer(), equipStack);
+				((EnchantedArmor) equipStack.getItem()).onArmorTick(event.getEntityPlayer().world, event.getEntityPlayer(), equipStack);
 			}
 		}
 	}

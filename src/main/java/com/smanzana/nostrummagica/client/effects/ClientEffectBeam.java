@@ -62,12 +62,12 @@ public class ClientEffectBeam extends ClientEffect {
 				// Model is length 1 and points y+
 				double len = end.lengthVector();
 				Vec3d norm = end.normalize();
-				double xzdist = Math.min(1.0, Math.max(-1.0, Math.sqrt(norm.xCoord * norm.xCoord + norm.zCoord * norm.zCoord)));
+				double xzdist = Math.min(1.0, Math.max(-1.0, Math.sqrt(norm.x * norm.x + norm.z * norm.z)));
 				float angle = (float) (Math.asin(xzdist) / (2.0 * Math.PI));
-				float x = (float) (Math.asin(norm.xCoord) / (2.0 * Math.PI));
-				float z = (float) (Math.asin(norm.zCoord) / (2.0 * Math.PI));
-				GlStateManager.rotate((norm.yCoord > 0 ? 1 : -1f) * 360f * angle, z, 0, -x);
-				if (norm.yCoord < 0) {
+				float x = (float) (Math.asin(norm.x) / (2.0 * Math.PI));
+				float z = (float) (Math.asin(norm.z) / (2.0 * Math.PI));
+				GlStateManager.rotate((norm.y > 0 ? 1 : -1f) * 360f * angle, z, 0, -x);
+				if (norm.y < 0) {
 					GlStateManager.rotate(180f, 1, 0, 1);
 				}
 				GlStateManager.scale(.2 * radius, len, .2 * radius);

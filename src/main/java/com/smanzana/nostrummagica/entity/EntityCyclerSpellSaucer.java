@@ -56,7 +56,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 			EntityLivingBase shooter, float speedFactor, int durationTicks, boolean onBlocks) {
 		this(trigger,
 				shooter,
-				shooter.worldObj,
+				shooter.world,
 				shooter.posX, shooter.posY + shooter.getEyeHeight(), shooter.posZ,
 				speedFactor, durationTicks, onBlocks
 				);
@@ -79,7 +79,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 			// Try and do a fixup
 			UUID shooterID = this.dataManager.get(SHOOTER).orNull();
 			if (shooterID != null) {
-				Entity entity = worldObj.loadedEntityList.stream()
+				Entity entity = world.loadedEntityList.stream()
 						.filter((ent) -> { return ent.getUniqueID().equals(shooterID);})
 						.findAny().orElse(null);
 				
@@ -117,7 +117,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 			// Try and do a fixup
 			UUID shooterID = this.dataManager.get(SHOOTER).orNull();
 			if (shooterID != null) {
-				Entity entity = worldObj.loadedEntityList.stream()
+				Entity entity = world.loadedEntityList.stream()
 						.filter((ent) -> { return ent.getUniqueID().equals(shooterID);})
 						.findAny().orElse(null);
 				
@@ -151,7 +151,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 	public void onUpdate() {
 		super.onUpdate();
 		
-		if (!worldObj.isRemote) {
+		if (!world.isRemote) {
 			
 			if (this.shootingEntity == null || this.ticksExisted >= duration) {
 				// Expired, or got loaded!
@@ -169,7 +169,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 //	        this.motionY += accel.y;
 //	        this.motionZ += accel.z;
 			
-			List<Entity> collidedEnts = worldObj.getEntitiesInAABBexcluding(this, this.getEntityBoundingBox(), (ent) -> {
+			List<Entity> collidedEnts = world.getEntitiesInAABBexcluding(this, this.getEntityBoundingBox(), (ent) -> {
 				return ent instanceof EntityLivingBase;
 			});
 			if (!collidedEnts.isEmpty()) {
@@ -256,7 +256,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 	
 	@Override
 	public boolean canImpact(BlockPos pos) {
-		return onBlocks && !this.worldObj.isAirBlock(pos) && this.worldObj.getBlockState(pos).isOpaqueCube();
+		return onBlocks && !this.world.isAirBlock(pos) && this.world.getBlockState(pos).isOpaqueCube();
 	}
 	
 	static final AxisAlignedBB _BoundingBox = new AxisAlignedBB(-.5, -.1, -.5, .5, .1, .5);

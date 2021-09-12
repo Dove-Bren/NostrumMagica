@@ -71,11 +71,12 @@ public class AltarItem extends Item implements ILoreTagged {
 	}
 
 	@Override
-	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		IBlockState state = worldIn.getBlockState(pos);
+		ItemStack stack = playerIn.getHeldItem(hand);
         if (facing == EnumFacing.UP && playerIn.canPlayerEdit(pos.offset(facing), facing, stack) && state.isFullBlock() && worldIn.isAirBlock(pos.up())) {
         	worldIn.setBlockState(pos.up(), AltarBlock.instance().getDefaultState());
-            stack.stackSize--;
+            stack.shrink(1);
             return EnumActionResult.SUCCESS;
         } else {
         	return EnumActionResult.FAIL;

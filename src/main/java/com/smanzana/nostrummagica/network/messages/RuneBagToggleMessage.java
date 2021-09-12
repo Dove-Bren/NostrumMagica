@@ -29,7 +29,7 @@ public class RuneBagToggleMessage implements IMessage {
 			// Is it on?
 			
 			
-			EntityPlayerMP sp = ctx.getServerHandler().playerEntity;
+			EntityPlayerMP sp = ctx.getServerHandler().player;
 			
 			boolean main = message.tag.getBoolean(NBT_MAIN);
 			boolean value = message.tag.getBoolean(NBT_VALUE);

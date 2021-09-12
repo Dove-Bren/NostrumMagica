@@ -36,7 +36,7 @@ public class TileEntityObeliskRenderer extends TileEntitySpecialRenderer<Nostrum
 	}
 	
 	@Override
-	public void renderTileEntityAt(NostrumObeliskEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
+	public void render(NostrumObeliskEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
 
 		if (!attemptedLoading && model == null) {
 			IModel raw;

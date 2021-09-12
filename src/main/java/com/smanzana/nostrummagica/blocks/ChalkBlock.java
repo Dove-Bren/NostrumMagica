@@ -36,10 +36,10 @@ public class ChalkBlock extends Block {
 		return CHALK_AABB;
 	}
 	
-	@Override
-	public boolean isVisuallyOpaque() {
-		return false;
-	}
+//	@Override
+//	public boolean isVisuallyOpaque() {
+//		return false;
+//	}
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
@@ -62,9 +62,11 @@ public class ChalkBlock extends Block {
 	}
 	
 	@Override
-	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn) {
-		if (!canPlaceBlockAt(worldIn, pos)) {
-			worldIn.setBlockToAir(pos);
+	public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor) {
+		if (world instanceof World && !((World) world).isRemote) {
+			if (!canPlaceBlockAt((World) world, pos)) {
+				((World) world).setBlockToAir(pos);
+			}
 		}
 	}
 }

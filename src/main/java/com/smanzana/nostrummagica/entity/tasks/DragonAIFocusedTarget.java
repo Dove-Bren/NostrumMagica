@@ -26,7 +26,7 @@ public class DragonAIFocusedTarget<T extends EntityLivingBase> extends EntityAIB
 	}
 	
 	@Override
-	public boolean continueExecuting() {
+	public boolean shouldContinueExecuting() {
 		return false;
 	}
 }

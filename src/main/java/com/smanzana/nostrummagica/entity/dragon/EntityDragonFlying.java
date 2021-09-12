@@ -165,9 +165,9 @@ public abstract class EntityDragonFlying extends EntityDragon {
 	
 	// Actually start flying. Called internally when animations are done.
 	protected void entityStartFlying() {
-		if (!this.worldObj.isRemote) {
+		if (!this.world.isRemote) {
 			this.moveHelper = new EntityDragon.DragonFlyMoveHelper(this);
-			this.navigator = new EntityDragon.PathNavigateDragonFlier(this, worldObj);
+			this.navigator = new EntityDragon.PathNavigateDragonFlier(this, world);
 			this.setFlyingAI();
 		}
 		this.addVelocity(Math.cos(this.rotationYaw) * .2, 0.5, Math.sin(this.rotationYaw) * .2);
@@ -176,9 +176,9 @@ public abstract class EntityDragonFlying extends EntityDragon {
 	}
 	
 	protected void entityStopFlying() {
-		if (!this.worldObj.isRemote) {
+		if (!this.world.isRemote) {
 			this.moveHelper = new EntityMoveHelper(this);
-			this.navigator = this.getNewNavigator(worldObj);
+			this.navigator = this.createNavigator(world);
 			this.setGroundedAI();
 		}
 		this.setNoGravity(false);

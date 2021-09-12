@@ -62,8 +62,8 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 		ticksInAir++;
 		ticksExisted++;
 		
-		if (this.ticksExisted % 5 == 0 && worldObj.isRemote) {
-			this.worldObj.spawnParticle(EnumParticleTypes.CRIT_MAGIC,
+		if (this.ticksExisted % 5 == 0 && world.isRemote) {
+			this.world.spawnParticle(EnumParticleTypes.CRIT_MAGIC,
 					posX - .5 + rand.nextFloat(), posY, posZ - .5 + rand.nextFloat(), 0, 0, 0);
 		}
 	}
@@ -85,7 +85,7 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 	}
 
 	protected void onImpact(RayTraceResult result) {
-		if (worldObj.isRemote)
+		if (world.isRemote)
 			return;
 		
 		if (result.typeOfHit == RayTraceResult.Type.MISS) {
@@ -94,7 +94,7 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 			BlockPos pos = result.getBlockPos();
 			boolean dieOnImpact = this.dieOnImpact(pos);
 			boolean canImpact = this.canImpact(pos);
-			Vector vec = new Vector().set((int) result.hitVec.xCoord, (int) result.hitVec.yCoord, (int) result.hitVec.zCoord);
+			Vector vec = new Vector().set((int) result.hitVec.x, (int) result.hitVec.y, (int) result.hitVec.z);
 			if (canImpact && (dieOnImpact || !this.hasBeenHit(vec))) {
 				trigger.onProjectileHit(new BlockPos(result.hitVec));
 				
@@ -124,13 +124,13 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 		}
 	}
 	
-	protected void setThrowableHeadingFrom(double xStart, double yStart, double zStart, double xTo, double yTo, double zTo, float velocity, float inaccuracy) {
+	protected void shoot(double xStart, double yStart, double zStart, double xTo, double yTo, double zTo, float velocity, float inaccuracy) {
 		this.ticksExisted = 0;
 	}
 
 	@Override
-	public void setThrowableHeading(double x, double y, double z, float velocity, float inaccuracy) {
-		this.setThrowableHeadingFrom(posX, posY, posZ, x, y, z, velocity, inaccuracy);
+	public void shoot(double x, double y, double z, float velocity, float inaccuracy) {
+		this.shoot(posX, posY, posZ, x, y, z, velocity, inaccuracy);
 	}
 
 	@Override
@@ -147,7 +147,7 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 	protected void readEntityFromNBT(NBTTagCompound compound) {
 		this.speed = compound.getFloat("speed");
 		UUID uuid = compound.getUniqueId("shooterID");
-		this.shootingEntity = (EntityLivingBase) worldObj.loadedEntityList.stream().filter((ent) -> { return ent.getUniqueID().equals(uuid);}).findFirst().orElse(null);
+		this.shootingEntity = (EntityLivingBase) world.loadedEntityList.stream().filter((ent) -> { return ent.getUniqueID().equals(uuid);}).findFirst().orElse(null);
 	}
 
 	@Override
@@ -200,15 +200,15 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 		}
 		
 		public Vector set(Vec3d vec) {
-			this.set(vec.xCoord, vec.yCoord, vec.zCoord);
+			this.set(vec.x, vec.y, vec.z);
 			
 			return this;
 		}
 		
 		public Vector subtract(Vec3d vec) {
-			this.x -= vec.xCoord;
-			this.y -= vec.yCoord;
-			this.z -= vec.zCoord;
+			this.x -= vec.x;
+			this.y -= vec.y;
+			this.z -= vec.z;
 			
 			return this;
 		}

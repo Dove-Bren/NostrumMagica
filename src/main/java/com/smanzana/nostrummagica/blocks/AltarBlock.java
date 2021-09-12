@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.blocks;
 import java.util.List;
 import java.util.Random;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -17,6 +17,7 @@ import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -30,6 +31,7 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -52,7 +54,7 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 	}
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(AltarTileEntity.class, "nostrum_altar_te");
+		GameRegistry.registerTileEntity(AltarTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "nostrum_altar_te"));
 	}
 	
 	public AltarBlock() {
@@ -63,7 +65,7 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setSoundType(SoundType.STONE);
 		
-		this.isBlockContainer = true;
+		this.hasTileEntity = true;
 		this.setLightOpacity(1);
 	}
 	
@@ -72,10 +74,10 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 		return ALTAR_AABB;
 	}
 	
-	@Override
-	public boolean isVisuallyOpaque() {
-		return false;
-	}
+//	@Override
+//	public boolean isVisuallyOpaque() {
+//		return false;
+//	}
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
@@ -88,8 +90,8 @@ public class AltarBlock extends Block implements ITileEntityProvider {
     }
 	
 	@Override
-	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
-		return true;
+	public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
+		return BlockFaceShape.SOLID;
 	}
 	
 	@Override
@@ -111,7 +113,7 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 				pos.getY() + .5,
 				pos.getZ() + .5,
 				new ItemStack(AltarItem.instance()));
-		world.spawnEntityInWorld(item);
+		world.spawnEntity(item);
 		
 		TileEntity te = world.getTileEntity(pos);
 		if (te != null) {
@@ -122,7 +124,7 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 						pos.getY() + .5,
 						pos.getZ() + .5,
 						altar.getItem());
-				world.spawnEntityInWorld(item);
+				world.spawnEntity(item);
 			}
 		}
 		
@@ -160,10 +162,10 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 			List<EntityItem> items = worldIn.getEntitiesWithinAABB(EntityItem.class, Block.FULL_BLOCK_AABB.offset(pos).offset(0, 1, 0).expand(0, 1, 0));
 			if (items != null && !items.isEmpty()) {
 				EntityItem first = items.get(0);
-				ItemStack stack = first.getEntityItem();
+				ItemStack stack = first.getItem();
 				
 				altar.setItem(stack.splitStack(1));
-				if (stack.stackSize <= 0) {
+				if (stack.getCount() <= 0) {
 					first.setDead();
 				}
 			}
@@ -177,25 +179,27 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		TileEntity te = worldIn.getTileEntity(pos);
 		if (te == null)
 			return false;
 		
+		ItemStack heldItem = playerIn.getHeldItem(hand);
+		
 		AltarTileEntity altar = (AltarTileEntity) te;
-		if (altar.getItem() == null) {
+		if (altar.getItem().isEmpty()) {
 			// Accepting items
-			if (heldItem != null) {
+			if (!heldItem.isEmpty()) {
 				altar.setItem(heldItem.splitStack(1));
 				return true;
 			} else
 				return false;
 		} else {
 			// Has an item
-			if (heldItem == null) {
+			if (heldItem.isEmpty()) {
 				final ItemStack altarItem = altar.getItem();
 				if (!playerIn.inventory.addItemStackToInventory(altarItem)) {
-					worldIn.spawnEntityInWorld(
+					worldIn.spawnEntity(
 							new EntityItem(worldIn,
 									pos.getX() + .5, pos.getY() + 1.2, pos.getZ() + .5,
 									altar.getItem())
@@ -211,7 +215,7 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 						}
 					}
 				}
-				altar.setItem(null);
+				altar.setItem(ItemStack.EMPTY);
 				return true;
 			} else
 				return false;
@@ -221,17 +225,17 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 	
 	public static class AltarTileEntity extends TileEntity implements ISidedInventory, IAetherInfusableTileEntity {
 		
-		private ItemStack stack;
+		private @Nonnull ItemStack stack = ItemStack.EMPTY;
 		
 		public AltarTileEntity() {
 			
 		}
 		
-		public ItemStack getItem() {
+		public @Nonnull ItemStack getItem() {
 			return stack;
 		}
 		
-		public void setItem(ItemStack stack) {
+		public void setItem(@Nonnull ItemStack stack) {
 			this.stack = stack;
 			dirty();
 		}
@@ -242,7 +246,7 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 		public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 			nbt = super.writeToNBT(nbt);
 			
-			if (stack != null) {
+			if (stack != ItemStack.EMPTY) {
 				NBTTagCompound tag = new NBTTagCompound();
 				tag = stack.writeToNBT(tag);
 				nbt.setTag(NBT_ITEM, tag);
@@ -259,10 +263,10 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 				return;
 				
 			if (!nbt.hasKey(NBT_ITEM, NBT.TAG_COMPOUND)) {
-				stack = null;
+				stack = ItemStack.EMPTY;
 			} else {
 				NBTTagCompound tag = nbt.getCompoundTag(NBT_ITEM);
-				stack = ItemStack.loadItemStackFromNBT(tag);
+				stack = new ItemStack(tag);
 			}
 		}
 		
@@ -283,9 +287,9 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 		}
 		
 		private void dirty() {
-			worldObj.markBlockRangeForRenderUpdate(pos, pos);
-			worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 3);
-			worldObj.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
+			world.markBlockRangeForRenderUpdate(pos, pos);
+			world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
+			world.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
 			markDirty();
 		}
 
@@ -297,17 +301,17 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 		@Override
 		public ItemStack getStackInSlot(int index) {
 			if (index > 0)
-				return null;
+				return ItemStack.EMPTY;
 			return this.stack;
 		}
 
 		@Override
 		public ItemStack decrStackSize(int index, int count) {
 			if (index > 0)
-				return null;
+				return ItemStack.EMPTY;
 			ItemStack ret = this.stack.splitStack(count);
-			if (this.stack.stackSize == 0)
-				this.stack = null;
+			if (this.stack.getCount() == 0)
+				this.stack = ItemStack.EMPTY;
 			this.dirty();
 			return ret;
 		}
@@ -315,9 +319,9 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 		@Override
 		public ItemStack removeStackFromSlot(int index) {
 			if (index > 0)
-				return null;
+				return ItemStack.EMPTY;
 			ItemStack ret = this.stack;
-			this.stack = null;
+			this.stack = ItemStack.EMPTY;
 			dirty();
 			return ret;
 		}
@@ -336,7 +340,7 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 		}
 
 		@Override
-		public boolean isUseableByPlayer(EntityPlayer player) {
+		public boolean isUsableByPlayer(EntityPlayer player) {
 			return true;
 		}
 
@@ -372,7 +376,7 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 
 		@Override
 		public void clear() {
-			this.stack = null;
+			this.stack = ItemStack.EMPTY;
 			dirty();
 		}
 
@@ -396,12 +400,17 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 			if (index != 0)
 				return false;
 			
-			return stack == null;
+			return stack.isEmpty();
 		}
 
 		@Override
 		public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
-			return index == 0 && stack != null;
+			return index == 0 && !stack.isEmpty();
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return stack.isEmpty();
 		}
 
 		@Override

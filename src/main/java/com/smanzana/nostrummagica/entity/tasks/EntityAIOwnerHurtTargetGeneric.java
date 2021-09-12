@@ -8,13 +8,13 @@ import net.minecraft.entity.ai.EntityAITarget;
 
 public class EntityAIOwnerHurtTargetGeneric<T extends EntityCreature & IEntityTameable> extends EntityAITarget {
 	
-	T theEntityTameable;
+	T entityTameable;
 	EntityLivingBase theTarget;
 	private int timestamp;
 
-	public EntityAIOwnerHurtTargetGeneric(T theEntityTameableIn) {
-		super(theEntityTameableIn, false);
-		this.theEntityTameable = theEntityTameableIn;
+	public EntityAIOwnerHurtTargetGeneric(T entityTameableIn) {
+		super(entityTameableIn, false);
+		this.entityTameable = entityTameableIn;
 		this.setMutexBits(1);
 	}
 
@@ -22,16 +22,16 @@ public class EntityAIOwnerHurtTargetGeneric<T extends EntityCreature & IEntityTa
 	 * Returns whether the EntityAIBase should begin execution.
 	 */
 	public boolean shouldExecute() {
-		if (!this.theEntityTameable.isTamed()) {
+		if (!this.entityTameable.isTamed()) {
 			return false;
 		} else {
-			EntityLivingBase entitylivingbase = this.theEntityTameable.getOwner();
+			EntityLivingBase entitylivingbase = this.entityTameable.getOwner();
 
 			if (entitylivingbase == null) {
 				return false;
 			} else {
-				this.theTarget = entitylivingbase.getLastAttacker();
-				int i = entitylivingbase.getLastAttackerTime();
+				this.theTarget = entitylivingbase.getRevengeTarget();
+				int i = entitylivingbase.getRevengeTimer();
 				return i != this.timestamp && this.isSuitableTarget(this.theTarget, false);
 			}
 		}
@@ -42,10 +42,10 @@ public class EntityAIOwnerHurtTargetGeneric<T extends EntityCreature & IEntityTa
 	 */
 	public void startExecuting() {
 		this.taskOwner.setAttackTarget(this.theTarget);
-		EntityLivingBase entitylivingbase = this.theEntityTameable.getOwner();
+		EntityLivingBase entitylivingbase = this.entityTameable.getOwner();
 
 		if (entitylivingbase != null) {
-			this.timestamp = entitylivingbase.getLastAttackerTime();
+			this.timestamp = entitylivingbase.getRevengeTimer();
 		}
 
 		super.startExecuting();

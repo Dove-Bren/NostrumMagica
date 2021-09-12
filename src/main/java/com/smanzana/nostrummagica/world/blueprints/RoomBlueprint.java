@@ -684,7 +684,7 @@ public class RoomBlueprint {
 				placeBlock(world, secondPos, modDir, block);
 			}
 			
-			world.getChunkFromBlockCoords(cursor).setChunkModified();
+			world.getChunkFromBlockCoords(cursor).markDirty();
 		}
 	}
 	
@@ -891,7 +891,7 @@ public class RoomBlueprint {
 				blocks[i] = BlueprintBlock.fromNBT((byte)version, tag);
 			}
 			
-			if (!NostrumMagica.initFinished) {
+			if (!NostrumMagica.initFinished && bar != null) {
 				bar.step("Doors and Exits");
 			}
 			
@@ -973,7 +973,7 @@ public class RoomBlueprint {
 				}
 			}
 			
-			if (!NostrumMagica.initFinished) {
+			if (!NostrumMagica.initFinished && bar != null) {
 				bar.step("Doors and Exits");
 			}
 			

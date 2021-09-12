@@ -35,8 +35,8 @@ public class ClientSkillUpMessage implements IMessage {
 			if (!message.tag.hasKey(NBT_TYPE, NBT.TAG_INT))
 				return null;
 			
-			ctx.getServerHandler().playerEntity.getServerWorld().addScheduledTask(() -> {
-				EntityPlayer sp = ctx.getServerHandler().playerEntity;
+			ctx.getServerHandler().player.getServerWorld().addScheduledTask(() -> {
+				EntityPlayer sp = ctx.getServerHandler().player;
 				INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
 				
 				if (att == null) {
@@ -66,7 +66,7 @@ public class ClientSkillUpMessage implements IMessage {
 				}
 				
 				NetworkHandler.getSyncChannel().sendTo(new StatSyncMessage(att),
-						ctx.getServerHandler().playerEntity);
+						ctx.getServerHandler().player);
 			});
 
 			return null;

@@ -134,10 +134,10 @@ public class SpellCreationGui {
 				}
 				
 				@Override
-				public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack) {
+				public ItemStack onTake(EntityPlayer playerIn, ItemStack stack) {
 					validate();
 					
-					super.onPickupFromSlot(playerIn, stack);
+					return super.onTake(playerIn, stack);
 				}
 				
 				@Override
@@ -175,10 +175,10 @@ public class SpellCreationGui {
 					}
 					
 					@Override
-					public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack) {
+					public ItemStack onTake(EntityPlayer playerIn, ItemStack stack) {
 						validate();
 						
-						super.onPickupFromSlot(playerIn, stack);
+						return super.onTake(playerIn, stack);
 					}
 				});
 			}
@@ -217,7 +217,7 @@ public class SpellCreationGui {
 					ItemStack dupe = cur.copy();
 					if (playerIn.inventory.addItemStackToInventory(dupe)) {
 						slot.putStack(null);
-						slot.onPickupFromSlot(playerIn, dupe);
+						slot.onTake(playerIn, dupe);
 					}
 				} else {
 					// Trying to add an item
@@ -233,21 +233,21 @@ public class SpellCreationGui {
 							Slot reagentSlot = this.getSlot(i + inventory.getReagentSlotIndex());
 							
 							int maxsize = Math.min(stack.getMaxStackSize(), reagentSlot.getSlotStackLimit());
-							int room = maxsize - stack.stackSize;
-							if (room >= cur.stackSize) {
-								stack.stackSize += cur.stackSize;
-								cur.stackSize = 0;
+							int room = maxsize - stack.getCount();
+							if (room >= cur.getCount()) {
+								stack.grow(cur.getCount());
+								cur.setCount(0);
 							} else {
-								cur.stackSize -= room;
-								stack.stackSize = maxsize;
+								cur.shrink(room);
+								stack.setCount(maxsize);
 							}
 							
-							if (cur.stackSize <= 0)
+							if (cur.getCount() <= 0)
 								break;
 						}
 						
 						// If still ahve items, add to empty slots
-						if (cur.stackSize > 0)
+						if (cur.getCount() > 0)
 						for (int i = 0; i < inventory.getReagentSlotCount(); i++) {
 							ItemStack stack = inventory.getStackInSlot(i + inventory.getReagentSlotIndex());
 							if (stack != null)
@@ -255,14 +255,14 @@ public class SpellCreationGui {
 							Slot reagentSlot = this.getSlot(i + inventory.getReagentSlotIndex());
 							
 							int maxsize = reagentSlot.getSlotStackLimit();
-							if (maxsize >= cur.stackSize) {
+							if (maxsize >= cur.getCount()) {
 								reagentSlot.putStack(cur.copy());
-								cur.stackSize = 0;
+								cur.setCount(0);
 							} else {
 								reagentSlot.putStack(cur.splitStack(maxsize));
 							}
 							
-							if (cur.stackSize <= 0)
+							if (cur.getCount() <= 0)
 								break;
 						}
 					} else if (cur.getItem() instanceof BlankScroll) {
@@ -306,7 +306,7 @@ public class SpellCreationGui {
 					}
 				}
 				
-				if (cur == null || cur.stackSize <= 0) {
+				if (cur == null || cur.getCount() <= 0) {
 					slot.putStack(null);
 				}
 			}
@@ -515,12 +515,12 @@ public class SpellCreationGui {
 				continue;
 			
 			if (ReagentItem.findType(stack) == type) {
-				if (stack.stackSize > count) {
+				if (stack.getCount() > count) {
 					if (take)
 						inventory.decrStackSize(i, count);
 					count = 0;
 				} else {
-					count -= stack.stackSize;
+					count -= stack.getCount();
 					if (take)
 						inventory.setInventorySlotContents(i, null);
 				}
@@ -552,12 +552,12 @@ public class SpellCreationGui {
 			}
 			
 			@Override
-			public void drawButton(Minecraft mc, int mouseX, int mouseY) {
+			public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
 				float tint = 1f;
 				mc.getTextureManager().bindTexture(TEXT);
-				if (mouseX >= this.xPosition && mouseY >= this.yPosition
-						&& mouseX <= this.xPosition + this.width
-						&& mouseY <= this.yPosition + this.height) {
+				if (mouseX >= this.x && mouseY >= this.y
+						&& mouseX <= this.x + this.width
+						&& mouseY <= this.y + this.height) {
 					tint = .8f;
 				}
 				
@@ -566,11 +566,11 @@ public class SpellCreationGui {
 					x += 20;
 				
 				GlStateManager.color(tint, tint, tint);
-				Gui.drawScaledCustomSizeModalRect(xPosition, yPosition, ICON_LBUTTON_HOFFSET + x, ICON_LBUTTON_VOFFSET,
+				Gui.drawScaledCustomSizeModalRect(this.x, this.y, ICON_LBUTTON_HOFFSET + x, ICON_LBUTTON_VOFFSET,
 						20, 20, this.width, this.height, 256, 256);
 				
 				GlStateManager.color(tint, tint, tint);
-				SpellIcon.get(this.value).render(mc, this.xPosition + 2, this.yPosition + 2, this.width - 4, this.height - 4);
+				SpellIcon.get(this.value).render(mc, this.x + 2, this.y + 2, this.width - 4, this.height - 4);
 			}
 			
 		}
@@ -645,7 +645,7 @@ public class SpellCreationGui {
 						256, 256);
 				
 				GL11.glPushMatrix();
-				mc.fontRendererObj.drawString(container.name.toString(), 
+				mc.fontRenderer.drawString(container.name.toString(), 
 						horizontalMargin + NAME_HOFFSET + 2,
 						verticalMargin + NAME_VOFFSET + 2, 
 						0xFF000000);
@@ -653,11 +653,11 @@ public class SpellCreationGui {
 					
 					x = horizontalMargin + NAME_HOFFSET + 2;
 					for (int i = 0; i < nameSelectedPos; i++) {
-						x += mc.fontRendererObj.getCharWidth(container.name.charAt(i));
+						x += mc.fontRenderer.getCharWidth(container.name.charAt(i));
 					}
 					
 					Gui.drawRect(x, verticalMargin + NAME_VOFFSET + 1,
-							x + 1, verticalMargin + NAME_VOFFSET + 3 + mc.fontRendererObj.FONT_HEIGHT,
+							x + 1, verticalMargin + NAME_VOFFSET + 3 + mc.fontRenderer.FONT_HEIGHT,
 							0xFF000000);
 					
 					if (counter > 60)
@@ -667,8 +667,8 @@ public class SpellCreationGui {
 				if (container.spellValid) {
 					String str = "Spell Cost: " + container.lastManaCost;
 					x = this.width / 2;
-					x -= mc.fontRendererObj.getStringWidth(str) / 2;
-					mc.fontRendererObj.drawString(str, x, verticalMargin + MANA_VOFFSET, 0xFFD3D3D3);
+					x -= mc.fontRenderer.getStringWidth(str) / 2;
+					mc.fontRenderer.drawString(str, x, verticalMargin + MANA_VOFFSET, 0xFFD3D3D3);
 				}
 				
 				GL11.glPopMatrix();
@@ -751,8 +751,8 @@ public class SpellCreationGui {
 							int offset = mouseX - left;
 							offset -= 5; // offset of drawn text
 							int index = 0;
-							while (index < container.name.length() && offset >= mc.fontRendererObj.getCharWidth(container.name.charAt(index))) {
-								offset -= mc.fontRendererObj.getCharWidth(container.name.charAt(index));
+							while (index < container.name.length() && offset >= mc.fontRenderer.getCharWidth(container.name.charAt(index))) {
+								offset -= mc.fontRenderer.getCharWidth(container.name.charAt(index));
 								index++;
 							}
 							nameSelectedPos = Math.min(container.name.length(), index + 1);
@@ -802,7 +802,7 @@ public class SpellCreationGui {
 		
 		protected void keyTyped(char typedChar, int keyCode) throws IOException {
 			if (keyCode == 1) {
-				this.mc.thePlayer.closeScreen();
+				this.mc.player.closeScreen();
 			}
 
 			if (nameSelectedPos != -1 && isValidKey(keyCode)) {
@@ -866,8 +866,8 @@ public class SpellCreationGui {
 		private RuneSlot next;
 		private SpellCreationContainer container;
 		
-		public RuneSlot(SpellCreationContainer container, RuneSlot prev, IInventory inventoryIn, int index, int xPosition, int yPosition) {
-			super(inventoryIn, index, xPosition, yPosition);
+		public RuneSlot(SpellCreationContainer container, RuneSlot prev, IInventory inventoryIn, int index, int x, int y) {
+			super(inventoryIn, index, x, y);
 			this.prev = prev;
 			this.container = container;
 		}
@@ -905,7 +905,7 @@ public class SpellCreationGui {
 		
 		@Override
 		@SideOnly(Side.CLIENT)
-		public boolean canBeHovered() {
+		public boolean isEnabled() {
 			return (prev == null ||
 					prev.getHasStack());
 		}
@@ -918,7 +918,7 @@ public class SpellCreationGui {
 		}
 		
 		@Override
-		public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack) {
+		public ItemStack onTake(EntityPlayer playerIn, ItemStack stack) {
 			// This is called AFTER things have been changed or swapped
 			// Which means we just look to see if we have an item.
 			// If not, take item from next
@@ -926,12 +926,12 @@ public class SpellCreationGui {
 				System.out.println("grabbing stack");
 				this.putStack(next.getStack().copy());
 				next.putStack(null);
-				next.onPickupFromSlot(playerIn, this.getStack());
+				next.onTake(playerIn, this.getStack());
 			}
 
 			container.validate();
 			
-			super.onPickupFromSlot(playerIn, stack);
+			return super.onTake(playerIn, stack);
 		}
 		
 		@Override

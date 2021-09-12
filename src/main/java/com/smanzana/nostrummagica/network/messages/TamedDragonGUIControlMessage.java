@@ -24,7 +24,7 @@ public class TamedDragonGUIControlMessage implements IMessage {
 			int id = message.tag.getInteger(NBT_KEY);
 			NBTTagCompound nbt = message.tag.getCompoundTag(NBT_MESSAGE);
 			
-			ctx.getServerHandler().playerEntity.getServerWorld().addScheduledTask(() -> {
+			ctx.getServerHandler().player.getServerWorld().addScheduledTask(() -> {
 				TamedDragonGUI.updateServerContainer(id, nbt);
 			});
 			

@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.blocks;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
@@ -29,6 +29,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -48,7 +49,7 @@ public class ModificationTable extends BlockContainer {
 	}
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(ModificationTableEntity.class, "modification_table");
+		GameRegistry.registerTileEntity(ModificationTableEntity.class, new ResourceLocation(NostrumMagica.MODID, "modification_table"));
 //		GameRegistry.addShapedRecipe(new ItemStack(instance()),
 //				"WPW", "WCW", "WWW",
 //				'W', new ItemStack(Blocks.PLANKS, 1, OreDictionary.WILDCARD_VALUE),
@@ -67,12 +68,12 @@ public class ModificationTable extends BlockContainer {
 	}
 	
 	@Override
-	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
 		return true;
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		
 		playerIn.openGui(NostrumMagica.instance,
 				NostrumGui.modtableID, worldIn,
@@ -92,11 +93,14 @@ public class ModificationTable extends BlockContainer {
 		 */
 		
 		private String displayName;
-		private ItemStack slots[];
+		private @Nonnull ItemStack slots[];
 		
 		public ModificationTableEntity() {
 			displayName = "Modification Table";
 			slots = new ItemStack[getSizeInventory()];
+			for (int i = 0; i < slots.length; i++) {
+				slots[i] = ItemStack.EMPTY;
+			}
 		}
 		
 		@Override
@@ -109,11 +113,11 @@ public class ModificationTable extends BlockContainer {
 			return false;
 		}
 		
-		public ItemStack getMainSlot() {
+		public  @Nonnull ItemStack getMainSlot() {
 			return this.getStackInSlot(0);
 		}
 		
-		public ItemStack getInputSlot() {
+		public @Nonnull ItemStack getInputSlot() {
 			return this.getStackInSlot(1);
 		}
 		
@@ -123,26 +127,24 @@ public class ModificationTable extends BlockContainer {
 		}
 
 		@Override
-		public ItemStack getStackInSlot(int index) {
+		public  @Nonnull ItemStack getStackInSlot(int index) {
 			if (index < 0 || index >= getSizeInventory())
-				return null;
+				return ItemStack.EMPTY;
 			
 			return slots[index];
 		}
 
 		@Override
-		public ItemStack decrStackSize(int index, int count) {
-			if (index < 0 || index >= getSizeInventory() || slots[index] == null)
-				return null;
+		public @Nonnull ItemStack decrStackSize(int index, int count) {
+			if (index < 0 || index >= getSizeInventory() || slots[index].isEmpty())
+				return ItemStack.EMPTY;
 			
-			ItemStack stack;
-			if (slots[index].stackSize <= count) {
+			@Nonnull ItemStack stack;
+			if (slots[index].getCount() <= count) {
 				stack = slots[index];
-				slots[index] = null;
+				slots[index] = ItemStack.EMPTY;
 			} else {
-				stack = slots[index].copy();
-				stack.stackSize = count;
-				slots[index].stackSize -= count;
+				stack = slots[index].splitStack(count);
 			}
 			
 			this.markDirty();
@@ -151,19 +153,19 @@ public class ModificationTable extends BlockContainer {
 		}
 
 		@Override
-		public ItemStack removeStackFromSlot(int index) {
+		public @Nonnull ItemStack removeStackFromSlot(int index) {
 			if (index < 0 || index >= getSizeInventory())
-				return null;
+				return ItemStack.EMPTY;
 			
 			ItemStack stack = slots[index];
-			slots[index] = null;
+			slots[index] = ItemStack.EMPTY;
 			
 			this.markDirty();
 			return stack;
 		}
 
 		@Override
-		public void setInventorySlotContents(int index, ItemStack stack) {
+		public void setInventorySlotContents(int index, @Nonnull ItemStack stack) {
 			if (!isItemValidForSlot(index, stack))
 				return;
 			
@@ -177,7 +179,7 @@ public class ModificationTable extends BlockContainer {
 		}
 
 		@Override
-		public boolean isUseableByPlayer(EntityPlayer player) {
+		public boolean isUsableByPlayer(EntityPlayer player) {
 			return true;
 		}
 
@@ -190,11 +192,11 @@ public class ModificationTable extends BlockContainer {
 		}
 
 		@Override
-		public boolean isItemValidForSlot(int index, ItemStack stack) {
+		public boolean isItemValidForSlot(int index, @Nonnull ItemStack stack) {
 			if (index < 0 || index >= getSizeInventory())
 				return false;
 			
-			if (stack == null)
+			if (stack.isEmpty())
 				return true;
 			
 			if (index == 0) {
@@ -235,7 +237,7 @@ public class ModificationTable extends BlockContainer {
 			NBTTagCompound compound = new NBTTagCompound();
 			
 			for (int i = 0; i < getSizeInventory(); i++) {
-				if (getStackInSlot(i) == null)
+				if (getStackInSlot(i).isEmpty())
 					continue;
 				
 				NBTTagCompound tag = new NBTTagCompound();
@@ -266,7 +268,7 @@ public class ModificationTable extends BlockContainer {
 					continue;
 				}
 				
-				ItemStack stack = ItemStack.loadItemStackFromNBT(items.getCompoundTag(key));
+				ItemStack stack = new ItemStack(items.getCompoundTag(key));
 				this.setInventorySlotContents(id, stack);
 			}
 		}
@@ -281,24 +283,33 @@ public class ModificationTable extends BlockContainer {
 							SpellTomePage.getLevel(this.getInputSlot())));
 					int mods = Math.max(0, SpellTome.getModifications(stack) - 1);
 					SpellTome.setModifications(stack, mods);
-					this.setInventorySlotContents(1, null);
+					this.setInventorySlotContents(1, ItemStack.EMPTY);
 				}
 			} else if (stack.getItem() instanceof SpellRune) {
-				this.setInventorySlotContents(1, null);
+				this.setInventorySlotContents(1, ItemStack.EMPTY);
 				SpellRune.setPieceParam(stack, new SpellPartParam(valF, valB));
 			} else if (stack.getItem() instanceof SpellScroll) {
 				Spell spell = SpellScroll.getSpell(stack);
 				if (spell != null) {
 					spell.setIcon((int) valF);
-					this.setInventorySlotContents(1, null);
+					this.setInventorySlotContents(1, ItemStack.EMPTY);
 				}
 			} else if (stack.getItem() instanceof WarlockSword) {
-				this.setInventorySlotContents(1, null);
+				this.setInventorySlotContents(1, ItemStack.EMPTY);
 				WarlockSword.addCapacity(stack, 2);
 			}
 			
 		}
-		
+
+		@Override
+		public boolean isEmpty() {
+			for (@Nonnull ItemStack stack : slots) {
+				if (!stack.isEmpty()) {
+					return false;
+				}
+			}
+			return true;
+		}
 	}
 
 	@Override
@@ -324,11 +335,11 @@ public class ModificationTable extends BlockContainer {
 		
 		ModificationTableEntity table = (ModificationTableEntity) ent;
 		for (int i = 0; i < table.getSizeInventory(); i++) {
-			if (table.getStackInSlot(i) != null) {
+			if (!table.getStackInSlot(i).isEmpty()) {
 				EntityItem item = new EntityItem(
 						world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
 						table.removeStackFromSlot(i));
-				world.spawnEntityInWorld(item);
+				world.spawnEntity(item);
 			}
 		}
 		

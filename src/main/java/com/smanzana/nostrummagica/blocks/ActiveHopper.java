@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.blocks;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -17,6 +18,7 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -39,6 +41,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.Mirror;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -74,7 +77,7 @@ public class ActiveHopper extends BlockContainer {
 	public static final ActiveHopper instance = new ActiveHopper();
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(ActiveHopperTileEntity.class, "active_hopper_te");
+		GameRegistry.registerTileEntity(ActiveHopperTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "active_hopper_te"));
 	}
 	
 	public ActiveHopper() {
@@ -132,7 +135,7 @@ public class ActiveHopper extends BlockContainer {
 	}
 	
 	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, ItemStack stack) {
+	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
 		if (facing == EnumFacing.UP) {
 			facing = EnumFacing.DOWN;
 		}
@@ -150,7 +153,7 @@ public class ActiveHopper extends BlockContainer {
 	}
 	
 	@Override
-	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn) {
+	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
 		if (GetFacing(state) == EnumFacing.DOWN) {
 			addCollisionBoxToList(pos, entityBox, collidingBoxes, BASE_AABB);
 			addCollisionBoxToList(pos, entityBox, collidingBoxes, SOUTH_AABB);
@@ -176,7 +179,7 @@ public class ActiveHopper extends BlockContainer {
 	}
 	
 	@Override
-	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn) {
+	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
 		updateState(worldIn, pos, state);
 	}
 	
@@ -203,17 +206,12 @@ public class ActiveHopper extends BlockContainer {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		playerIn.openGui(NostrumMagica.instance,
 				NostrumGui.activeHopperID, worldIn,
 				pos.getX(), pos.getY(), pos.getZ());
 		
 		return true;
-	}
-	
-	@Override
-	public boolean isFullyOpaque(IBlockState state) {
-		return true; // Copying vanilla
 	}
 	
 	@Override
@@ -236,13 +234,18 @@ public class ActiveHopper extends BlockContainer {
 		return BlockRenderLayer.CUTOUT_MIPPED;
 	}
 	
+	@Override
+	public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
+		return face == EnumFacing.UP ? BlockFaceShape.BOWL : BlockFaceShape.UNDEFINED;
+	}
+	
 	public static class ActiveHopperTileEntity extends TileEntity implements IHopper, ISidedInventory, ITickable {
 		
 		private static final String NBT_SLOT = "slot";
 		private static final String NBT_CUSTOMNAME = "custom_name";
 		private static final String NBT_COOLDOWN = "cooldown";
 		
-		private @Nullable ItemStack slot;
+		private @Nonnull ItemStack slot = ItemStack.EMPTY;
 		private @Nullable String customName;
 		private int transferCooldown = -1;
 		
@@ -254,7 +257,7 @@ public class ActiveHopper extends BlockContainer {
 		public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 			nbt = super.writeToNBT(nbt);
 			
-			if (slot != null) {
+			if (!slot.isEmpty()) {
 				nbt.setTag(NBT_SLOT, slot.serializeNBT());
 			}
 			
@@ -271,7 +274,7 @@ public class ActiveHopper extends BlockContainer {
 		public void readFromNBT(NBTTagCompound nbt) {
 			super.readFromNBT(nbt);
 			
-			slot = ItemStack.loadItemStackFromNBT(nbt.getCompoundTag(NBT_SLOT)); // nulls if empty
+			slot = (nbt.hasKey(NBT_SLOT) ? new ItemStack(nbt.getCompoundTag(NBT_SLOT)) : ItemStack.EMPTY); // nulls if empty
 			customName = (nbt.hasKey(NBT_CUSTOMNAME) ? nbt.getString(NBT_CUSTOMNAME) : null);
 			transferCooldown = nbt.getInteger(NBT_COOLDOWN);
 		}
@@ -295,42 +298,42 @@ public class ActiveHopper extends BlockContainer {
 		}
 
 		@Override
-		public ItemStack getStackInSlot(int index) {
+		public @Nonnull ItemStack getStackInSlot(int index) {
 			if (index != 0) {
-				return null;
+				return ItemStack.EMPTY;
 			}
 			
 			return slot;
 		}
 
 		@Override
-		public ItemStack decrStackSize(int index, int count) {
-			if (index != 0 || slot == null) {
-				return null;
+		public @Nonnull ItemStack decrStackSize(int index, int count) {
+			if (index != 0 || slot.isEmpty()) {
+				return ItemStack.EMPTY;
 			}
 			
 			ItemStack ret = slot.splitStack(count);
-			if (slot.stackSize <= 0) {
-				slot = null;
+			if (slot.getCount() <= 0) {
+				slot = ItemStack.EMPTY;
 			}
 			this.markDirty();
 			return ret;
 		}
 
 		@Override
-		public ItemStack removeStackFromSlot(int index) {
-			if (index != 0 || slot == null) {
-				return null;
+		public @Nonnull ItemStack removeStackFromSlot(int index) {
+			if (index != 0 || slot.isEmpty()) {
+				return ItemStack.EMPTY;
 			}
 			
 			ItemStack ret = slot;
-			slot = null;
+			slot = ItemStack.EMPTY;
 			this.markDirty();
 			return ret;
 		}
 
 		@Override
-		public void setInventorySlotContents(int index, ItemStack stack) {
+		public void setInventorySlotContents(int index, @Nonnull ItemStack stack) {
 			if (index == 0) {
 				slot = stack;
 				this.markDirty();
@@ -343,7 +346,7 @@ public class ActiveHopper extends BlockContainer {
 		}
 
 		@Override
-		public boolean isUseableByPlayer(EntityPlayer player) {
+		public boolean isUsableByPlayer(EntityPlayer player) {
 			return true;
 		}
 
@@ -379,8 +382,8 @@ public class ActiveHopper extends BlockContainer {
 
 		@Override
 		public void clear() {
-			if (slot != null) {
-				slot = null;
+			if (!slot.isEmpty()) {
+				slot = ItemStack.EMPTY;
 				this.markDirty();
 			}
 		}
@@ -416,10 +419,10 @@ public class ActiveHopper extends BlockContainer {
 
 		@Override
 		public void update() {
-			if (worldObj != null && !worldObj.isRemote) {
+			if (world != null && !world.isRemote) {
 				this.transferCooldown--;
 				
-				if (!isOnTransferCooldown() && GetEnabled(worldObj.getBlockState(pos))) {
+				if (!isOnTransferCooldown() && GetEnabled(world.getBlockState(pos))) {
 					this.hopperTick();
 					this.setTransferCooldown(8); // same rate as vanilla
 				}
@@ -443,13 +446,13 @@ public class ActiveHopper extends BlockContainer {
 		 * @return
 		 */
 		public boolean canPullAny() {
-			return slot != null
+			return !slot.isEmpty()
 					&& slot.isStackable()
-					&& slot.stackSize < slot.getMaxStackSize();
+					&& slot.getCount() < slot.getMaxStackSize();
 		}
 		
-		public boolean canPull(@Nullable ItemStack stack) {
-			if (stack == null) {
+		public boolean canPull(@Nonnull ItemStack stack) {
+			if (stack.isEmpty()) {
 				return false;
 			}
 			
@@ -460,21 +463,21 @@ public class ActiveHopper extends BlockContainer {
 			return ItemStacks.stacksMatch(stack, slot);
 		}
 		
-		public void addStack(@Nullable ItemStack stack) {
-			if (slot == null) {
+		public void addStack(@Nonnull ItemStack stack) {
+			if (slot.isEmpty()) {
 				// Error condition
 				slot = stack;
 				this.markDirty();
 			} else if (ItemStacks.stacksMatch(slot, stack)) {
-				slot.stackSize = Math.min(slot.getMaxStackSize(), slot.stackSize + stack.stackSize);
+				slot.setCount(Math.min(slot.getMaxStackSize(), slot.getCount() + stack.getCount()));
 				this.markDirty();
 			}
 		}
 		
 		public boolean canPush() {
-			return slot != null
+			return !slot.isEmpty()
 					&& slot.isStackable()
-					&& slot.stackSize > 1; // don't push out last item stack!
+					&& slot.getCount() > 1; // don't push out last item stack!
 		}
 		
 		// Called to actually pull and push items
@@ -497,8 +500,8 @@ public class ActiveHopper extends BlockContainer {
 		
 		private boolean pushItems() {
 			// Inventory we want to push into is in direction FACING
-			final EnumFacing direction = GetFacing(worldObj.getBlockState(pos));
-			@Nullable TileEntity te = worldObj.getTileEntity(pos.offset(direction));
+			final EnumFacing direction = GetFacing(world.getBlockState(pos));
+			@Nullable TileEntity te = world.getTileEntity(pos.offset(direction));
 			
 			if (te != null) {
 				if (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite())) {
@@ -512,9 +515,9 @@ public class ActiveHopper extends BlockContainer {
 					
 					// Special cast for stupid chests :P
 					if (te instanceof TileEntityChest) {
-						IBlockState state = worldObj.getBlockState(pos.offset(direction));
+						IBlockState state = world.getBlockState(pos.offset(direction));
 						if (state != null && state.getBlock() instanceof BlockChest) {
-							inv = ((BlockChest)state.getBlock()).getContainer(worldObj, pos.offset(direction), true);
+							inv = ((BlockChest)state.getBlock()).getContainer(world, pos.offset(direction), true);
 						}
 					}
 					
@@ -523,7 +526,7 @@ public class ActiveHopper extends BlockContainer {
 			}
 			
 			final AxisAlignedBB captureBox = getCaptureBB(false);
-			for (Entity e : worldObj.getEntitiesInAABBexcluding(null, captureBox, EntitySelectors.HAS_INVENTORY)) {
+			for (Entity e : world.getEntitiesInAABBexcluding(null, captureBox, EntitySelectors.HAS_INVENTORY)) {
 				// Vanilla uses a random entity in the list. We'll just use the first.
 				return pushInto((IInventory) e, direction);
 			}
@@ -533,7 +536,7 @@ public class ActiveHopper extends BlockContainer {
 		
 		private boolean pushInto(IInventory inventory, EnumFacing direction) {
 			ItemStack copyToInsert = slot.copy();
-			copyToInsert.stackSize = 1;
+			copyToInsert.setCount(1);
 			if (inventory instanceof ISidedInventory) {
 				ISidedInventory sided = (ISidedInventory) inventory;
 				for (int insertIndex : sided.getSlotsForFace(direction.getOpposite())) {
@@ -542,16 +545,16 @@ public class ActiveHopper extends BlockContainer {
 					}
 					
 					// Can insert. Would it fit?
-					@Nullable ItemStack inSlot = sided.getStackInSlot(insertIndex);
-					if (inSlot == null) {
+					@Nonnull ItemStack inSlot = sided.getStackInSlot(insertIndex);
+					if (inSlot.isEmpty()) {
 						sided.setInventorySlotContents(insertIndex, copyToInsert);
 						this.decrStackSize(0, 1);
 						return true;
 					}
 					
 					if (!inSlot.isStackable()
-							|| inSlot.stackSize >= inSlot.getMaxStackSize()
-							|| inSlot.stackSize >= sided.getInventoryStackLimit()) {
+							|| inSlot.getCount() >= inSlot.getMaxStackSize()
+							|| inSlot.getCount() >= sided.getInventoryStackLimit()) {
 						continue;
 					}
 					
@@ -559,13 +562,13 @@ public class ActiveHopper extends BlockContainer {
 						continue;
 					}
 					
-					inSlot.stackSize++;
+					inSlot.setCount(inSlot.getCount()+1);
 					sided.setInventorySlotContents(insertIndex, inSlot);
 					this.decrStackSize(0, 1);
 					return true;
 				}
 			} else {
-				if (Inventories.addItem(inventory, copyToInsert) == null) {
+				if (Inventories.addItem(inventory, copyToInsert).isEmpty()) {
 					this.decrStackSize(0, 1);
 					return true;
 				}
@@ -578,10 +581,10 @@ public class ActiveHopper extends BlockContainer {
 		
 		private boolean pushInto(IItemHandler handler, EnumFacing direction) {
 			ItemStack copyToInsert = slot.copy();
-			copyToInsert.stackSize = 1;
+			copyToInsert.setCount(1);
 			
-			@Nullable ItemStack ret = ItemHandlerHelper.insertItem(handler, copyToInsert, true);
-			if (ret == null || ret.stackSize == 0) {
+			@Nonnull ItemStack ret = ItemHandlerHelper.insertItem(handler, copyToInsert, true);
+			if (ret.isEmpty() || ret.getCount() == 0) {
 				ItemHandlerHelper.insertItem(handler, copyToInsert, false);
 				this.decrStackSize(0, 1);
 				return true;
@@ -592,8 +595,8 @@ public class ActiveHopper extends BlockContainer {
 		
 		private boolean pullItems() {
 			// We want to pull from opposite(FACING)
-			final EnumFacing direction = GetFacing(worldObj.getBlockState(pos)).getOpposite();
-			@Nullable TileEntity te = worldObj.getTileEntity(pos.offset(direction));
+			final EnumFacing direction = GetFacing(world.getBlockState(pos)).getOpposite();
+			@Nullable TileEntity te = world.getTileEntity(pos.offset(direction));
 			
 			if (te != null) {
 				if (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction)) {
@@ -607,9 +610,9 @@ public class ActiveHopper extends BlockContainer {
 					
 					// Special cast for stupid chests :P
 					if (te instanceof TileEntityChest) {
-						IBlockState state = worldObj.getBlockState(pos.offset(direction));
+						IBlockState state = world.getBlockState(pos.offset(direction));
 						if (state != null && state.getBlock() instanceof BlockChest) {
-							inv = ((BlockChest)state.getBlock()).getContainer(worldObj, pos.offset(direction), true);
+							inv = ((BlockChest)state.getBlock()).getContainer(world, pos.offset(direction), true);
 						}
 					}
 					return pullFrom(inv, direction);
@@ -617,7 +620,7 @@ public class ActiveHopper extends BlockContainer {
 			}
 			
 			final AxisAlignedBB captureBox = getCaptureBB(true);
-			for (Entity e : worldObj.getEntitiesInAABBexcluding(null, captureBox, EntitySelectors.HAS_INVENTORY)) {
+			for (Entity e : world.getEntitiesInAABBexcluding(null, captureBox, EntitySelectors.HAS_INVENTORY)) {
 				// Vanilla uses a random entity in the list. We'll just use the first.
 				return pullFrom((IInventory) e, direction);
 			}
@@ -629,8 +632,8 @@ public class ActiveHopper extends BlockContainer {
 			if (inventory instanceof ISidedInventory) {
 				ISidedInventory sided = (ISidedInventory) inventory;
 				for (int i : sided.getSlotsForFace(direction)) {
-					@Nullable ItemStack inSlot = sided.getStackInSlot(i);
-					if (inSlot == null) {
+					@Nonnull ItemStack inSlot = sided.getStackInSlot(i);
+					if (inSlot.isEmpty()) {
 						continue;
 					}
 					
@@ -642,14 +645,14 @@ public class ActiveHopper extends BlockContainer {
 						continue;
 					}
 					
-					ItemStack pulled = sided.decrStackSize(i, 1);
+					@Nonnull ItemStack pulled = sided.decrStackSize(i, 1);
 					this.addStack(pulled);
 					return true;
 				}
 			} else {
 				for (int i = 0; i < inventory.getSizeInventory(); i++) {
-					@Nullable ItemStack inSlot = inventory.getStackInSlot(i);
-					if (inSlot == null) {
+					@Nonnull ItemStack inSlot = inventory.getStackInSlot(i);
+					if (inSlot.isEmpty()) {
 						continue;
 					}
 					
@@ -669,8 +672,8 @@ public class ActiveHopper extends BlockContainer {
 		private boolean pullFrom(IItemHandler handler, EnumFacing direction) {
 			for (int i = 0; i < handler.getSlots(); i++) {
 				
-				@Nullable ItemStack inSlot = handler.getStackInSlot(i);
-				if (inSlot == null) {
+				@Nonnull ItemStack inSlot = handler.getStackInSlot(i);
+				if (inSlot.isEmpty()) {
 					continue;
 				}
 				
@@ -678,8 +681,8 @@ public class ActiveHopper extends BlockContainer {
 					continue;
 				}
 				
-				if (handler.extractItem(i, 1, true) != null) {
-					@Nullable ItemStack drawn = handler.extractItem(i, 1, false);
+				if (handler.extractItem(i, 1, true) != ItemStack.EMPTY) {
+					@Nonnull ItemStack drawn = handler.extractItem(i, 1, false);
 					this.addStack(drawn);
 					return true;
 				}
@@ -689,12 +692,12 @@ public class ActiveHopper extends BlockContainer {
 		}
 		
 		private boolean captureNearbyItems() {
-			for (EntityItem entity : worldObj.getEntitiesWithinAABB(EntityItem.class, getCaptureBB(true))) {
+			for (EntityItem entity : world.getEntitiesWithinAABB(EntityItem.class, getCaptureBB(true))) {
 				// try and pull from the stack
-				@Nullable ItemStack stack = entity.getEntityItem();
+				@Nonnull ItemStack stack = entity.getItem();
 				if (canPull(stack)) {
 					this.addStack(stack.splitStack(1)); // reduces stack size by 1
-					entity.setEntityItemStack(stack); // Try and force an update
+					entity.setItem(stack); // Try and force an update
 					return true;
 				}
 			}
@@ -703,7 +706,7 @@ public class ActiveHopper extends BlockContainer {
 		}
 		
 		private AxisAlignedBB getCaptureBB(boolean forPull) {
-			final EnumFacing direction = GetFacing(worldObj.getBlockState(pos));
+			final EnumFacing direction = GetFacing(world.getBlockState(pos));
 			
 			if (direction == EnumFacing.DOWN) {
 				// Down has different collision so do a custom box
@@ -721,7 +724,7 @@ public class ActiveHopper extends BlockContainer {
 
 		@Override
 		public boolean canInsertItem(int index, ItemStack itemStackIn, EnumFacing side) {
-			final EnumFacing direction = GetFacing(worldObj.getBlockState(pos));
+			final EnumFacing direction = GetFacing(world.getBlockState(pos));
 			if (side == direction) {
 				// Coming in our output
 				return false;
@@ -732,7 +735,7 @@ public class ActiveHopper extends BlockContainer {
 
 		@Override
 		public boolean canExtractItem(int index, ItemStack stack, EnumFacing side) {
-			final EnumFacing direction = GetFacing(worldObj.getBlockState(pos));
+			final EnumFacing direction = GetFacing(world.getBlockState(pos));
 			if (side == direction.getOpposite()) {
 				// pulling from our mouth?
 				return false;
@@ -740,6 +743,10 @@ public class ActiveHopper extends BlockContainer {
 			
 			return true;
 		}
-		
+
+		@Override
+		public boolean isEmpty() {
+			return slot.isEmpty();
+		}
 	}
 }

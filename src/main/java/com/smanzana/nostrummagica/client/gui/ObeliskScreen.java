@@ -17,9 +17,9 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
@@ -78,8 +78,8 @@ public class ObeliskScreen extends GuiScreen {
 	private void translateButton(DestinationButton button) {
 		// raw x is getScaled(button.pos.x)
 		// Render x is button.pos.x - te.x SCALED
-		button.xPosition = getScaled(button.pos.getX()) - xOffset;
-		button.yPosition = getScaled(button.pos.getZ()) - yOffset;
+		button.x = getScaled(button.pos.getX()) - xOffset;
+		button.y = getScaled(button.pos.getZ()) - yOffset;
 	}
 	
 	@Override
@@ -127,7 +127,7 @@ public class ObeliskScreen extends GuiScreen {
 	}
 	
 	@Override
-	public void drawScreen(int mouseX, int mouseY, float p_73863_3_) {
+	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 
 		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 		Minecraft.getMinecraft().getTextureManager().bindTexture(background);
@@ -139,7 +139,7 @@ public class ObeliskScreen extends GuiScreen {
 		
 		if (this.centralButton == null) {
 			// No targets. Draw error string
-			this.fontRendererObj.drawSplitString(errorString, (this.width - (this.width / 2)) / 2, this.height / 2 - 100, this.width / 2, 0xFFFFFF);
+			this.fontRenderer.drawSplitString(errorString, (this.width - (this.width / 2)) / 2, this.height / 2 - 100, this.width / 2, 0xFFFFFF);
 			return;
 		}
 		
@@ -149,9 +149,9 @@ public class ObeliskScreen extends GuiScreen {
 		}
 		
 		// Do buttons
-		centralButton.drawButton(mc, mouseX, mouseY);
+		centralButton.drawButton(mc, mouseX, mouseY, partialTicks);
 		for (DestinationButton butt : floatingButtons) {
-			butt.drawButton(mc, mouseX, mouseY);
+			butt.drawButton(mc, mouseX, mouseY, partialTicks);
 		}
 		
 		if (drawList) {
@@ -173,11 +173,11 @@ public class ObeliskScreen extends GuiScreen {
 		GlStateManager.color(1f, 1f, 1f, 1f);
 		GlStateManager.enableBlend();
 		GlStateManager.disableLighting();
-		this.fontRendererObj.drawString("<" + xOffset + "," + yOffset + ">", 35, 5, 0xFFFFFFFF);
-		this.fontRendererObj.drawString("Scale: " + this.scale, 35, 20, 0xFFFFFFFF);
+		this.fontRenderer.drawString("<" + xOffset + "," + yOffset + ">", 35, 5, 0xFFFFFFFF);
+		this.fontRenderer.drawString("Scale: " + this.scale, 35, 20, 0xFFFFFFFF);
 		
 		for (DestinationButton butt : listButtons) {
-			butt.drawButton(mc, mouseX, mouseY);
+			butt.drawButton(mc, mouseX, mouseY, partialTicks);
 		}
 		
 	}
@@ -288,14 +288,14 @@ public class ObeliskScreen extends GuiScreen {
 		GlStateManager.pushMatrix();
 		GlStateManager.pushAttrib();
 		GlStateManager.translate(TEXT_ICON_LENGTH / 2, TEXT_ICON_LENGTH / 2, 0);
-		VertexBuffer buf = Tessellator.getInstance().getBuffer();
+		BufferBuilder buf = Tessellator.getInstance().getBuffer();
 		//GlStateManager.enableBlend();
         GlStateManager.disableTexture2D();
         //GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.color(1.0f, 1.0f, 1.0f, 0.6f);
         buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-        buf.pos(center.xPosition, center.yPosition, 0).endVertex();
-        buf.pos(other.xPosition, other.yPosition, 0).endVertex();
+        buf.pos(center.x, center.y, 0).endVertex();
+        buf.pos(other.x, other.y, 0).endVertex();
         Tessellator.getInstance().draw();
         GlStateManager.enableTexture2D();
         //GlStateManager.disableBlend();
@@ -346,17 +346,17 @@ public class ObeliskScreen extends GuiScreen {
          * Draws this button to the screen.
          */
         @Override
-        public void drawButton(Minecraft mc, int parX, int parY) {
+        public void drawButton(Minecraft mc, int parX, int parY, float partialTicks) {
             if (visible) {
                 int textureX = 0;
                 int textureY = TEXT_BACK_HEIGHT;
                 if (isCenter) {
                 	textureX = 2 * TEXT_ICON_LENGTH;
                 } else {
-                	if (parX >= xPosition 
-                      && parY >= yPosition 
-                      && parX < xPosition + width 
-                      && parY < yPosition + height) {
+                	if (parX >= x 
+                      && parY >= y 
+                      && parX < x + width 
+                      && parY < y + height) {
                 		textureX = TEXT_ICON_LENGTH;
                 	}
                 	if (!isValid) {
@@ -368,23 +368,23 @@ public class ObeliskScreen extends GuiScreen {
                 GL11.glColor4f(val, 1.0f, val, val);
                 mc.getTextureManager().bindTexture(background);
                 GlStateManager.enableBlend();
-                Gui.drawModalRectWithCustomSizedTexture(xPosition, yPosition, textureX, textureY,
+                Gui.drawModalRectWithCustomSizedTexture(x, y, textureX, textureY,
         				TEXT_ICON_LENGTH, TEXT_ICON_LENGTH, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
                 GlStateManager.disableBlend();
                 
                 if (!isCenter) {
                 	// Draw the name below
-                	FontRenderer fonter = mc.fontRendererObj;
+                	FontRenderer fonter = mc.fontRenderer;
                 	int textWidth = fonter.getStringWidth(title);
                 	int buttonWidth = TEXT_ICON_LENGTH;
                 	int color = isValid ? 0xB0B0B0 : 0xB05050;
                 	if (isListed) {
                 		// Draw to the right
-                		fonter.drawString(title, xPosition + buttonWidth + 5, yPosition + ((buttonWidth - fonter.FONT_HEIGHT + 1) / 2), color);
+                		fonter.drawString(title, x + buttonWidth + 5, y + ((buttonWidth - fonter.FONT_HEIGHT + 1) / 2), color);
                 	} else {
                 		// Draw above
-                		int x = xPosition + (buttonWidth / 2) - (textWidth / 2);
-                		fonter.drawString(title, x, yPosition - (5 + fonter.FONT_HEIGHT), color);
+                		int xPos = x + (buttonWidth / 2) - (textWidth / 2);
+                		fonter.drawString(title, xPos, y - (5 + fonter.FONT_HEIGHT), color);
                 	}
                 	
                 }

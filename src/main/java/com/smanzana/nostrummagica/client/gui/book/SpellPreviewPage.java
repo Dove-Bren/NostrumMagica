@@ -60,7 +60,7 @@ public class SpellPreviewPage implements IClickableBookPage {
 		yoffset += 5;
 		height -= 5;
 		
-		INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer);
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().player);
 		
 		GL11.glPushMatrix();
 		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);

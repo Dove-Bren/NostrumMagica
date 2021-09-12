@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.blocks;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -23,6 +23,7 @@ import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -42,7 +43,7 @@ public class LoreTable extends BlockContainer {
 	}
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(LoreTableEntity.class, "lore_table");
+		GameRegistry.registerTileEntity(LoreTableEntity.class, new ResourceLocation(NostrumMagica.MODID, "lore_table"));
 //		GameRegistry.addShapedRecipe(new ItemStack(instance()),
 //				"WGW", "WCW", "WWW",
 //				'W', new ItemStack(Blocks.PLANKS, 1, OreDictionary.WILDCARD_VALUE),
@@ -61,12 +62,12 @@ public class LoreTable extends BlockContainer {
 	}
 	
 	@Override
-	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
 		return true;
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		
 		playerIn.openGui(NostrumMagica.instance,
 				NostrumGui.loretableID, worldIn,
@@ -77,7 +78,7 @@ public class LoreTable extends BlockContainer {
 	
 	public static class LoreTableEntity extends TileEntity implements ITickable {
 
-		private ItemStack item;
+		private @Nonnull ItemStack item;
 		private float progress;
 		private String lorekey;
 		private int ticksExisted;
@@ -85,7 +86,7 @@ public class LoreTable extends BlockContainer {
 		public LoreTableEntity() {
 			progress = 0f;
 			lorekey = null;
-			item = null;
+			item = ItemStack.EMPTY;
 			ticksExisted = 0;
 		}
 		
@@ -117,15 +118,15 @@ public class LoreTable extends BlockContainer {
 			}
 		}
 		
-		public ItemStack getItem() {
+		public @Nonnull ItemStack getItem() {
 			return item;
 		}
 		
-		public boolean setItem(ItemStack item) {
-			if (item != null && this.item != null)
+		public boolean setItem(@Nonnull ItemStack item) {
+			if (!item.isEmpty() && !this.item.isEmpty())
 				return false;
 			
-			if (item != null) {
+			if (!item.isEmpty()) {
 				// Make sure it has lore
 				if (!(item.getItem() instanceof ILoreTagged)) {
 					return false;
@@ -144,15 +145,15 @@ public class LoreTable extends BlockContainer {
 		
 		public void setProgress(float progress) {
 			this.progress = progress;
-			if (worldObj != null && !worldObj.isRemote) {
-				worldObj.addBlockEvent(pos, blockType, 0, PROGRESS_TO_INT(progress));
+			if (world != null && !world.isRemote) {
+				world.addBlockEvent(pos, blockType, 0, PROGRESS_TO_INT(progress));
 			}
 		}
 		
 		private void dirty() {
-			worldObj.markBlockRangeForRenderUpdate(pos, pos);
-			worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 3);
-			worldObj.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
+			world.markBlockRangeForRenderUpdate(pos, pos);
+			world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
+			world.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
 			markDirty();
 		}
 		
@@ -163,7 +164,7 @@ public class LoreTable extends BlockContainer {
 			if (nbt == null)
 				nbt = new NBTTagCompound();
 			
-			if (item != null)
+			if (!item.isEmpty())
 				nbt.setTag("item", item.serializeNBT());
 			
 			if (lorekey != null)
@@ -183,7 +184,9 @@ public class LoreTable extends BlockContainer {
 			
 			this.progress = nbt.getFloat("progress");
 			if (nbt.hasKey("item", NBT.TAG_COMPOUND))
-				this.item = ItemStack.loadItemStackFromNBT(nbt.getCompoundTag("item"));
+				this.item = new ItemStack(nbt.getCompoundTag("item"));
+			else
+				this.item = ItemStack.EMPTY;
 			
 			if (nbt.hasKey("lore", NBT.TAG_STRING))
 				this.lorekey = nbt.getString("lore");
@@ -195,8 +198,8 @@ public class LoreTable extends BlockContainer {
 		public void update() {
 			ticksExisted++;
 			
-			if (worldObj != null && !worldObj.isRemote) {
-				if (item != null && lorekey == null) {
+			if (world != null && !world.isRemote) {
+				if (!item.isEmpty() && lorekey == null) {
 					progress += 1f / (30f * 20f); // 30 seconds
 					if (ticksExisted % 5 == 0) {
 						setProgress(progress);
@@ -205,7 +208,7 @@ public class LoreTable extends BlockContainer {
 					if (progress >= 1f) {
 						if (item.getItem() instanceof ILoreTagged) {
 							this.lorekey = ((ILoreTagged) item.getItem()).getLoreKey();
-							NostrumMagicaSounds.DAMAGE_ICE.play(worldObj,
+							NostrumMagicaSounds.DAMAGE_ICE.play(world,
 									pos.getX(), pos.getY(), pos.getZ());
 						}
 					}
@@ -223,7 +226,7 @@ public class LoreTable extends BlockContainer {
 		
 		@Override
 		public boolean receiveClientEvent(int id, int type) {
-			if (worldObj != null && worldObj.isRemote) {
+			if (world != null && world.isRemote) {
 				if (id == 0) {
 					this.progress = INT_TO_PROGRESS(type);
 					return true;
@@ -258,12 +261,12 @@ public class LoreTable extends BlockContainer {
 		
 		LoreTableEntity table = (LoreTableEntity) ent;
 		ItemStack item = table.getItem();
-		if (item != null) {
+		if (!item.isEmpty()) {
 			double x, y, z;
 			x = pos.getX() + .5;
 			y = pos.getY() + .5;
 			z = pos.getZ() + .5;
-			world.spawnEntityInWorld(new EntityItem(world, x, y, z, item.copy()));
+			world.spawnEntity(new EntityItem(world, x, y, z, item.copy()));
 		}
 		
 	}

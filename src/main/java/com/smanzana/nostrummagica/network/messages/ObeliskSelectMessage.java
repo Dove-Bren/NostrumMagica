@@ -32,9 +32,9 @@ public class ObeliskSelectMessage implements IMessage {
 				final BlockPos obeliskPos = BlockPos.fromLong(message.tag.getLong(NBT_OBELISK));
 				final int index = message.tag.getInteger(NBT_INDEX);
 				
-				EntityPlayerMP player = ctx.getServerHandler().playerEntity;
+				EntityPlayerMP player = ctx.getServerHandler().player;
 				player.getServerWorld().addScheduledTask(() -> {
-					TileEntity te = player.worldObj.getTileEntity(obeliskPos);
+					TileEntity te = player.world.getTileEntity(obeliskPos);
 					if (te != null && te instanceof NostrumObeliskEntity) {
 						((NostrumObeliskEntity) te).setTargetIndex(index);
 					}

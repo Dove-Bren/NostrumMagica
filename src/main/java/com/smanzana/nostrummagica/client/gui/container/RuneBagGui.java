@@ -98,7 +98,7 @@ public class RuneBagGui {
 				} else {
 					// shift-click in player inventory
 					ItemStack leftover = inventory.addItem(stack);
-					slot.putStack(leftover != null && leftover.stackSize <= 0 ? null : leftover);
+					slot.putStack(leftover != null && leftover.getCount() <= 0 ? null : leftover);
 				}
 			}
 			
@@ -119,16 +119,16 @@ public class RuneBagGui {
 						}
 				}**/
 				
-				if (cur.stackSize == 0) {
+				if (cur.getCount() == 0) {
 					slot.putStack((ItemStack) null);
 				} else {
 					slot.onSlotChanged();
 				}
 				
-				if (cur.stackSize == prev.stackSize) {
+				if (cur.getCount() == prev.getCount()) {
 					return null;
 				}
-				slot.onPickupFromSlot(playerIn, cur);
+				slot.onTake(playerIn, cur);
 			}
 			
 			return prev;
@@ -170,7 +170,7 @@ public class RuneBagGui {
 
 					if (itemstack9 == null) {
 						if (itemstack12 != null && slot7.isItemValid(itemstack12)) {
-							int l2 = dragType == 0 ? itemstack12.stackSize : 1;
+							int l2 = dragType == 0 ? itemstack12.getCount() : 1;
 
 							if (l2 > slot7.getItemStackLimit(itemstack12)) {
 								l2 = slot7.getItemStackLimit(itemstack12);
@@ -178,60 +178,60 @@ public class RuneBagGui {
 
 							slot7.putStack(itemstack12.splitStack(l2));
 
-							if (itemstack12.stackSize == 0) {
+							if (itemstack12.getCount() == 0) {
 								inventoryplayer.setItemStack((ItemStack)null);
 							}
 						}
 					} else if (slot7.canTakeStack(player)) {
 						if (itemstack12 == null) {
-							if (itemstack9.stackSize > 0) {
-								int k2 = dragType == 0 ? itemstack9.stackSize : (itemstack9.stackSize + 1) / 2;
+							if (itemstack9.getCount() > 0) {
+								int k2 = dragType == 0 ? itemstack9.getCount() : (itemstack9.getCount() + 1) / 2;
 								inventoryplayer.setItemStack(slot7.decrStackSize(k2));
 
-								if (itemstack9.stackSize <= 0) {
+								if (itemstack9.getCount() <= 0) {
 									slot7.putStack((ItemStack)null);
 								}
 
-								slot7.onPickupFromSlot(player, inventoryplayer.getItemStack());
+								slot7.onTake(player, inventoryplayer.getItemStack());
 							} else {
 								slot7.putStack((ItemStack)null);
 								inventoryplayer.setItemStack((ItemStack)null);
 							}
 						} else if (slot7.isItemValid(itemstack12)) {
 							if (itemstack9.getItem() == itemstack12.getItem() && itemstack9.getMetadata() == itemstack12.getMetadata() && ItemStack.areItemStackTagsEqual(itemstack9, itemstack12)) {
-								int j2 = dragType == 0 ? itemstack12.stackSize : 1;
+								int j2 = dragType == 0 ? itemstack12.getCount() : 1;
 
-								if (j2 > slot7.getItemStackLimit(itemstack12) - itemstack9.stackSize) {
-									j2 = slot7.getItemStackLimit(itemstack12) - itemstack9.stackSize;
+								if (j2 > slot7.getItemStackLimit(itemstack12) - itemstack9.getCount()) {
+									j2 = slot7.getItemStackLimit(itemstack12) - itemstack9.getCount();
 								}
 
-								//if (j2 > itemstack12.getMaxStackSize() - itemstack9.stackSize) {
-								//	j2 = itemstack12.getMaxStackSize() - itemstack9.stackSize;
+								//if (j2 > itemstack12.getMaxStackSize() - itemstack9.getCount()) {
+								//	j2 = itemstack12.getMaxStackSize() - itemstack9.getCount();
 								//}
 
 								itemstack12.splitStack(j2);
 
-								if (itemstack12.stackSize == 0) {
+								if (itemstack12.getCount() == 0) {
 									inventoryplayer.setItemStack((ItemStack)null);
 								}
 
-								itemstack9.stackSize += j2;
-							} else if (itemstack12.stackSize <= slot7.getItemStackLimit(itemstack12)) {
+								itemstack9.grow(j2);
+							} else if (itemstack12.getCount() <= slot7.getItemStackLimit(itemstack12)) {
 								slot7.putStack(itemstack12);
 								inventoryplayer.setItemStack(itemstack9);
 							}
 						} else if (itemstack9.getItem() == itemstack12.getItem() && itemstack12.getMaxStackSize() > 1 && (!itemstack9.getHasSubtypes() || itemstack9.getMetadata() == itemstack12.getMetadata()) && ItemStack.areItemStackTagsEqual(itemstack9, itemstack12)) {
-							int i2 = itemstack9.stackSize;
+							int i2 = itemstack9.getCount();
 
-							if (i2 > 0 && i2 + itemstack12.stackSize <= itemstack12.getMaxStackSize()) {
-								itemstack12.stackSize += i2;
+							if (i2 > 0 && i2 + itemstack12.getCount() <= itemstack12.getMaxStackSize()) {
+								itemstack12.grow(i2);
 								itemstack9 = slot7.decrStackSize(i2);
 
-								if (itemstack9.stackSize == 0) {
+								if (itemstack9.getCount() == 0) {
 									slot7.putStack((ItemStack)null);
 								}
 
-								slot7.onPickupFromSlot(player, inventoryplayer.getItemStack());
+								slot7.onTake(player, inventoryplayer.getItemStack());
 							}
 						}
 					}
@@ -251,7 +251,7 @@ public class RuneBagGui {
 			boolean flag = slotIn == null || !slotIn.getHasStack();
 
 			if (slotIn != null && slotIn.getHasStack() && stack != null && stack.isItemEqual(slotIn.getStack()) && ItemStack.areItemStackTagsEqual(slotIn.getStack(), stack)){
-				flag |= slotIn.getStack().stackSize + (stackSizeMatters ? 0 : stack.stackSize) <= slotIn.getSlotStackLimit();
+				flag |= slotIn.getStack().getCount() + (stackSizeMatters ? 0 : stack.getCount()) <= slotIn.getSlotStackLimit();
 			}
 
 			return flag;
@@ -303,7 +303,7 @@ public class RuneBagGui {
 			if (mouseX >= left && mouseX <= left + BUTTON_WIDTH && 
 					mouseY >= top && mouseY <= top + BUTTON_WIDTH) {
 				GuiUtils.drawHoveringText(Lists.newArrayList(RuneBag.isVacuumEnabled(bag.stack) ? "Disable Vacuum" : "Enable Vacuum"),
-						mouseX, mouseY, width, height, 200, this.fontRendererObj);
+						mouseX, mouseY, width, height, 200, this.fontRenderer);
 			}
 		}
 			

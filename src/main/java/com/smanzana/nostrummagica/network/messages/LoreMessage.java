@@ -58,8 +58,8 @@ public class LoreMessage implements IMessage {
 							.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, CommandInfoScreenGoto.Command + " " + ILoreTagged.GetInfoKey(lore)));
 					comp = comp.setStyle(style);
 					
-					player.addChatMessage(comp);
-					NostrumMagicaSounds.LORE.play(player, player.worldObj, player.posX, player.posY, player.posZ);
+					player.sendMessage(comp);
+					NostrumMagicaSounds.LORE.play(player, player.world, player.posX, player.posY, player.posZ);
 				}
 			});
 			

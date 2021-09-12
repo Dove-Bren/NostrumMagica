@@ -59,7 +59,7 @@ public class MirrorShieldImproved extends MirrorShield {
 		Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
 
 		if (equipmentSlot == EntityEquipmentSlot.OFFHAND) {
-			multimap.put(AttributeMagicResist.instance().getAttributeUnlocalizedName(), new AttributeModifier(MOD_RESIST_UUID, "Magic Shield Resist", 20, 0));
+			multimap.put(AttributeMagicResist.instance().getName(), new AttributeModifier(MOD_RESIST_UUID, "Magic Shield Resist", 20, 0));
 		}
 
 		return multimap;
@@ -71,8 +71,8 @@ public class MirrorShieldImproved extends MirrorShield {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
-		return super.onItemRightClick(itemStackIn, worldIn, playerIn, hand);
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+		return super.onItemRightClick(worldIn, playerIn, hand);
 	}
 
 	@Override
@@ -100,7 +100,7 @@ public class MirrorShieldImproved extends MirrorShield {
 				else
 					data.summary.addEfficiency(-reduc);
 			} else {
-				if (entity.getHeldItemOffhand() != null && entity.getHeldItemOffhand().getItem() instanceof MirrorShieldImproved) {
+				if (!entity.getHeldItemOffhand().isEmpty() && entity.getHeldItemOffhand().getItem() instanceof MirrorShieldImproved) {
 					// If holding mirror shield in offhand but not actively blocking, have chance of charging
 					if (!getBlockCharged(entity.getHeldItemOffhand()) && itemRand.nextFloat() < CHARGE_CHANCE)
 						markBlockCharged(entity.getHeldItemOffhand(), true);
@@ -129,7 +129,7 @@ public class MirrorShieldImproved extends MirrorShield {
 	// TODO another shield that absorbs mana instead of reflecting?
 
 	public static boolean getBlockCharged(ItemStack stack) {
-		if (stack == null || !(stack.getItem() instanceof MirrorShieldImproved)) {
+		if (stack.isEmpty() || !(stack.getItem() instanceof MirrorShieldImproved)) {
 			return false;
 		}
 		
@@ -142,7 +142,7 @@ public class MirrorShieldImproved extends MirrorShield {
 	}
 	
 	public static void markBlockCharged(ItemStack stack, boolean charged) {
-		if (stack == null || !(stack.getItem() instanceof MirrorShieldImproved)) {
+		if (stack.isEmpty() || !(stack.getItem() instanceof MirrorShieldImproved)) {
 			return;
 		}
 		

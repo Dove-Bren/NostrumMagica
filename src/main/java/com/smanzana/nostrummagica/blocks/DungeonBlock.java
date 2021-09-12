@@ -1,6 +1,5 @@
 package com.smanzana.nostrummagica.blocks;
 
-import java.util.List;
 import java.util.Random;
 
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -16,6 +15,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -91,9 +91,9 @@ public class DungeonBlock extends Block {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list) {
+	public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
 		for (Type type : Type.values()) {
-			list.add(new ItemStack(itemIn, 1, type.ordinal()));
+			list.add(new ItemStack(this, 1, type.ordinal()));
 		}
 	}
 }

@@ -249,16 +249,16 @@ public class NostrumMagica
     	NostrumMagica.creativeTab = new CreativeTabs(MODID){
 	    	@Override
 	        @SideOnly(Side.CLIENT)
-	        public Item getTabIconItem(){
-	    		return SpellTome.instance();
+	        public ItemStack getTabIconItem(){
+	    		return new ItemStack(SpellTome.instance());
 	        }
 	    };
 	    SpellTome.instance().setCreativeTab(NostrumMagica.creativeTab);
 	    NostrumMagica.enhancementTab = new CreativeTabs(MODID + "_enhancements") {
 	    	@Override
 	    	@SideOnly(Side.CLIENT)
-	    	public Item getTabIconItem() {
-	    		return SpellTomePage.instance();
+	    	public ItemStack getTabIconItem() {
+	    		return new ItemStack(SpellTomePage.instance());
 	    	}
 	    };
 	    SpellTomePage.instance().setCreativeTab(NostrumMagica.enhancementTab);
@@ -423,13 +423,13 @@ public class NostrumMagica
     	for (ItemStack item : player.inventory.mainInventory) {
     		if (item != null && item.getItem() instanceof ReagentItem
     				&& ReagentItem.findType(item) == type) {
-    			count += item.stackSize;
+    			count += item.getCount();
     		}
     	}
     	for (ItemStack item : player.inventory.offHandInventory) {
     		if (item != null && item.getItem() instanceof ReagentBag
     				&& ReagentItem.findType(item) == type) {
-    			count += item.stackSize;
+    			count += item.getCount();
     		}
     	}
     	
@@ -450,12 +450,12 @@ public class NostrumMagica
 			} else if (item.getItem() instanceof ReagentItem) {
 				if (ReagentItem.getTypeFromMeta(item.getMetadata())
 					== type) {
-					if (item.stackSize > count) {
-						item.stackSize -= count;
+					if (item.getCount() > count) {
+						item.shrink(count);
 						count = 0;
 						break;
 					} else {
-						count -= item.stackSize;
+						count -= item.getCount();
 						player.inventory.setInventorySlotContents(i, null);
 					}
 				}
@@ -894,8 +894,8 @@ public class NostrumMagica
 						@Override
 						public void spawn(World world, Vec3d pos, EntityPlayer invoker) {
 							EntityKoid koid = new EntityKoid(world);
-							koid.setPosition(pos.xCoord, pos.yCoord, pos.zCoord);
-							world.spawnEntityInWorld(koid);
+							koid.setPosition(pos.x, pos.y, pos.z);
+							world.spawnEntity(koid);
 							koid.setAttackTarget(invoker);
 						}
 
@@ -2561,7 +2561,7 @@ public class NostrumMagica
     			entity.posX + blockRadius, entity.posY + blockRadius, entity.posZ + blockRadius);
     	
 
-    	List<EntityTameDragonRed> dragonList = entity.worldObj.getEntitiesWithinAABB(EntityTameDragonRed.class, box, (dragon) -> {
+    	List<EntityTameDragonRed> dragonList = entity.world.getEntitiesWithinAABB(EntityTameDragonRed.class, box, (dragon) -> {
     		return dragon instanceof ITameDragon;
     	});
     	
@@ -2583,7 +2583,7 @@ public class NostrumMagica
     public static List<EntityLivingBase> getTamedEntities(EntityLivingBase owner) {
     	List<EntityLivingBase> ents = new ArrayList<>();
     	final UUID id = owner.getUniqueID();
-    	for (Entity e : owner.worldObj.loadedEntityList) {
+    	for (Entity e : owner.world.loadedEntityList) {
     		if (!(e instanceof EntityLivingBase)) {
     			continue;
     		}
@@ -2628,7 +2628,7 @@ public class NostrumMagica
      * @return
      */
     public static BlockPos getOrCreatePlayerDimensionSpawn(EntityPlayer player) {
-    	NostrumDimensionMapper mapper = getDimensionMapper(player.worldObj);
+    	NostrumDimensionMapper mapper = getDimensionMapper(player.world);
     	
     	// Either register or fetch existing mapping
     	return mapper.register(player.getUniqueID()).getCenterPos(NostrumEmptyDimension.SPAWN_Y);

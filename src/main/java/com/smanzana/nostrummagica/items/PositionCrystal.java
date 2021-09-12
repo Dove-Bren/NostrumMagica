@@ -4,11 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -63,7 +66,7 @@ public class PositionCrystal extends Item implements ILoreTagged {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		int dim = getDimension(stack);
 		BlockPos pos = getBlockPosition(stack);
 		
@@ -79,7 +82,7 @@ public class PositionCrystal extends Item implements ILoreTagged {
 	}
 	
 	public static BlockPos getBlockPosition(ItemStack stack) {
-		if (stack == null || !(stack.getItem() instanceof PositionCrystal))
+		if (stack.isEmpty() || !(stack.getItem() instanceof PositionCrystal))
 			return null;
 		
 		NBTTagCompound nbt = stack.getTagCompound();
@@ -104,7 +107,7 @@ public class PositionCrystal extends Item implements ILoreTagged {
 	 * @return
 	 */
 	public static int getDimension(ItemStack stack) {
-		if (stack == null || !(stack.getItem() instanceof PositionCrystal))
+		if (stack.isEmpty() || !(stack.getItem() instanceof PositionCrystal))
 			return 0;
 		
 		NBTTagCompound nbt = stack.getTagCompound();
@@ -115,7 +118,7 @@ public class PositionCrystal extends Item implements ILoreTagged {
 	}
 	
 	public static void setPosition(ItemStack stack, int dimension, BlockPos pos) {
-		if (stack == null || !(stack.getItem() instanceof PositionCrystal))
+		if (stack.isEmpty() || !(stack.getItem() instanceof PositionCrystal))
 			return;
 		
 		if (pos == null)
@@ -136,7 +139,7 @@ public class PositionCrystal extends Item implements ILoreTagged {
 	}
 	
 	public static void clearPosition(ItemStack stack) {
-		if (stack == null || !(stack.getItem() instanceof PositionCrystal))
+		if (stack.isEmpty() || !(stack.getItem() instanceof PositionCrystal))
 			return;
 		
 		NBTTagCompound tag;
@@ -153,7 +156,8 @@ public class PositionCrystal extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		final @Nonnull ItemStack stack = playerIn.getHeldItem(hand);
 		
 		if (worldIn.isRemote)
 			return EnumActionResult.SUCCESS;
@@ -166,7 +170,8 @@ public class PositionCrystal extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		
 		if (playerIn.isSneaking()) {
 			clearPosition(itemStackIn);

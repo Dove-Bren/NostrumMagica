@@ -120,10 +120,10 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	}
 	
 	@Override
-	public void setWorldObj(World worldObj) {
-		super.setWorldObj(worldObj);
-		this.compWrapper.setAutoFill(!worldObj.isRemote && this.isMaster());
-		//aetherHandler.setAutoFill(!worldObj.isRemote);
+	public void setWorld(World world) {
+		super.setWorld(world);
+		this.compWrapper.setAutoFill(!world.isRemote && this.isMaster());
+		//aetherHandler.setAutoFill(!world.isRemote);
 	}
 	
 	@Override
@@ -200,13 +200,13 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 			for (int i = 0; i < xs.length; i++)
 			for (int j = 1; j <= NostrumObelisk.TILE_HEIGHT; j++) { // j starts at one cause the first block is above the base block
 				BlockPos bp = pos.add(xs[i], j, zs[i]);
-				IBlockState state = worldObj.getBlockState(bp);
+				IBlockState state = world.getBlockState(bp);
 				if (state.getBlock() instanceof NostrumObelisk) {
-					worldObj.destroyBlock(bp, false);
+					world.destroyBlock(bp, false);
 				}
 			}
 
-			if (!worldObj.isRemote) {
+			if (!world.isRemote) {
 				Ticket ticket = NostrumChunkLoader.instance().pullTicket(genTicketKey());
 				if (ticket != null) {
 					ForgeChunkManager.releaseTicket(ticket);
@@ -215,13 +215,13 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 			
 			this.deactivatePortal();
 			
-			worldObj.destroyBlock(pos, false);
+			world.destroyBlock(pos, false);
 		} else {
 			int xs[] = new int[] {-NostrumObelisk.TILE_OFFSETH, -NostrumObelisk.TILE_OFFSETH, NostrumObelisk.TILE_OFFSETH, NostrumObelisk.TILE_OFFSETH};
 			int zs[] = new int[] {-NostrumObelisk.TILE_OFFSETH, NostrumObelisk.TILE_OFFSETH, -NostrumObelisk.TILE_OFFSETH, NostrumObelisk.TILE_OFFSETH};
 			for (int i = 0; i < xs.length; i++) {
 				BlockPos base = pos.add(xs[i], -NostrumObelisk.TILE_OFFSETY, zs[i]);
-				TileEntity te = worldObj.getTileEntity(base);
+				TileEntity te = world.getTileEntity(base);
 				if (te != null && te instanceof NostrumObeliskEntity) {
 					NostrumObeliskEntity entity = (NostrumObeliskEntity) te;
 					if (entity.master)
@@ -259,8 +259,8 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 				return false;
 		}
 		
-		if (!this.worldObj.isRemote) {
-			IBlockState state = worldObj.getBlockState(pos);
+		if (!this.world.isRemote) {
+			IBlockState state = world.getBlockState(pos);
 			if (state == null || !(state.getBlock() instanceof NostrumObelisk)
 					|| !NostrumObelisk.blockIsMaster(state))
 				return false;
@@ -296,12 +296,12 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	
 	protected void deactivatePortal() {
 		// Remove portal above us
-		worldObj.setBlockToAir(pos.up());
+		world.setBlockToAir(pos.up());
 	}
 	
 	protected void activatePortal() {
-		worldObj.setBlockState(pos.up(), ObeliskPortal.instance().getStateForPlacement(worldObj, pos, EnumFacing.UP, 0f, 0f, 0f, 0, null, null));
-		ObeliskPortal.instance().createPaired(worldObj, pos.up());
+		world.setBlockState(pos.up(), ObeliskPortal.instance().getStateForPlacement(world, pos, EnumFacing.UP, 0f, 0f, 0f, 0, null));
+		ObeliskPortal.instance().createPaired(world, pos.up());
 	}
 	
 	protected void refreshPortal() {
@@ -312,7 +312,7 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 			target = this.targetOverride;
 		} else {
 			target = this.getCurrentTarget();
-			valid = (target != null && IsValidObelisk(worldObj, target));
+			valid = (target != null && IsValidObelisk(world, target));
 		}
 		
 		if (valid) {
@@ -354,10 +354,10 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	// Registers this TE as a chunk loader. Gets a ticket and forces the chunk.
 	// Relies on already being placed in the world
 	public void init() {
-		if (worldObj.isRemote)
+		if (world.isRemote)
 			return;
 		
-		Ticket chunkTicket = ForgeChunkManager.requestTicket(NostrumMagica.instance, worldObj, Type.NORMAL);
+		Ticket chunkTicket = ForgeChunkManager.requestTicket(NostrumMagica.instance, world, Type.NORMAL);
 		chunkTicket.getModData().setTag(NBT_TICKET_POS, NBTUtil.createPosTag(pos));
 		ForgeChunkManager.forceChunk(chunkTicket, new ChunkPos(pos));
 		NostrumChunkLoader.instance().addTicket(genTicketKey(), chunkTicket);
@@ -368,7 +368,7 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	}
 	
 	private void forceUpdate() {
-		worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 3);
+		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
 		markDirty();
 	}
 
@@ -379,12 +379,12 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 
 		aliveCount++;
 		
-		if (!worldObj.isRemote && targetOverride != null && aliveCount >= targetOverrideEnd) {
+		if (!world.isRemote && targetOverride != null && aliveCount >= targetOverrideEnd) {
 			targetOverride = null;
 			refreshPortal();
 		}
 		
-		if (!worldObj.isRemote)
+		if (!world.isRemote)
 			return;
 		if (corner == null || master)
 			return;
@@ -413,7 +413,7 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 		x += master.getX() + .5;
 		z += master.getZ() + .5;
 		y += pos.getY() + .5;
-		worldObj.spawnParticle(EnumParticleTypes.DRAGON_BREATH, x, y, z, .01, 0, .01, new int[0]);
+		world.spawnParticle(EnumParticleTypes.DRAGON_BREATH, x, y, z, .01, 0, .01, new int[0]);
 		
 	}
 	

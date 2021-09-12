@@ -36,6 +36,7 @@ import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -62,7 +63,7 @@ public class TeleportRune extends BlockContainer  {
 	}
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(TeleportRuneTileEntity.class, "teleport_rune");;
+		GameRegistry.registerTileEntity(TeleportRuneTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "teleport_rune"));
 	}
 	
 	public TeleportRune() {
@@ -80,10 +81,10 @@ public class TeleportRune extends BlockContainer  {
         return true;
     }
 	
-	@Override
-	public boolean isVisuallyOpaque() {
-		return false;
-	}
+//	@Override
+//	public boolean isVisuallyOpaque() {
+//		return false;
+//	}
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
@@ -106,12 +107,12 @@ public class TeleportRune extends BlockContainer  {
 	}
 	
 	@Override
-	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
 		return false;
 	}
 	
 	@Override
-	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, World worldIn, BlockPos pos) {
+	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
 		return NULL_AABB;
 		//return super.getCollisionBoundingBox(blockState, worldIn, pos);
 	}
@@ -272,12 +273,14 @@ public class TeleportRune extends BlockContainer  {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (worldIn.isRemote) {
 			return true;
 		}
 		
-		if (heldItem == null || !(heldItem.getItem() instanceof PositionCrystal)) {
+		ItemStack heldItem = playerIn.getHeldItem(hand);
+		
+		if (heldItem.isEmpty() || !(heldItem.getItem() instanceof PositionCrystal)) {
 			return false;
 		}
 		
@@ -295,13 +298,13 @@ public class TeleportRune extends BlockContainer  {
 		if (!playerIn.isCreative()) {
 			// 1) has to be another teleport rune there, and 2) has to be within X blocks
 			if (!NostrumMagica.isBlockLoaded(worldIn, heldPos)) {
-				playerIn.addChatComponentMessage(new TextComponentTranslation("info.teleportrune.unloaded"));
+				playerIn.sendMessage(new TextComponentTranslation("info.teleportrune.unloaded"));
 				return true;
 			}
 			
 			IBlockState targetState = worldIn.getBlockState(heldPos);
 			if (targetState == null || !(targetState.getBlock() instanceof TeleportRune)) {
-				playerIn.addChatComponentMessage(new TextComponentTranslation("info.teleportrune.norune"));
+				playerIn.sendMessage(new TextComponentTranslation("info.teleportrune.norune"));
 				return true;
 			}
 			
@@ -315,7 +318,7 @@ public class TeleportRune extends BlockContainer  {
 			if (baubles != null) {
 				for (int i = 0; i < baubles.getSizeInventory(); i++) {
 					ItemStack stack = baubles.getStackInSlot(i);
-					if (stack == null || !(stack.getItem() instanceof ItemMagicBauble)) {
+					if (stack.isEmpty() || !(stack.getItem() instanceof ItemMagicBauble)) {
 						continue;
 					}
 					
@@ -330,7 +333,7 @@ public class TeleportRune extends BlockContainer  {
 			final double range = TELEPORT_RANGE * (hasEnderBelt ? 2 : 1) * (hasEnderSet ? 2 : 1);
 			
 			if (dist > range) {
-				playerIn.addChatComponentMessage(new TextComponentTranslation("info.teleportrune.toofar"));
+				playerIn.sendMessage(new TextComponentTranslation("info.teleportrune.toofar"));
 				return true;
 			}
 		}
@@ -474,9 +477,9 @@ public class TeleportRune extends BlockContainer  {
 		}
 		
 		protected void flush() {
-			if (worldObj != null && !worldObj.isRemote) {
-				IBlockState state = worldObj.getBlockState(pos);
-				worldObj.notifyBlockUpdate(pos, state, state, 2);
+			if (world != null && !world.isRemote) {
+				IBlockState state = world.getBlockState(pos);
+				world.notifyBlockUpdate(pos, state, state, 2);
 			}
 		}
 	}

@@ -205,7 +205,7 @@ public class EntityKoid extends EntityMob implements ILoreTagged {
 	}
 	
 	public void setCombatTask() {
-		if (this.worldObj != null && !this.worldObj.isRemote) {
+		if (this.world != null && !this.world.isRemote) {
 			if (kTask != null)
 				this.tasks.removeTask(kTask);
 			

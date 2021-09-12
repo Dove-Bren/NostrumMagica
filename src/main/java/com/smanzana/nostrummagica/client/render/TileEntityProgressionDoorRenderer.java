@@ -9,11 +9,11 @@ import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
@@ -35,10 +35,10 @@ public class TileEntityProgressionDoorRenderer extends TileEntitySpecialRenderer
 	}
 	
 	@Override
-	public void renderTileEntityAt(ProgressionDoor.ProgressionDoorTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
+	public void render(ProgressionDoor.ProgressionDoorTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
 		
 		double time = (double)te.getWorld().getTotalWorldTime() + partialTicks;
-		INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer);
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().player);
 		
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(x + .5, y + 1.2, z + .5);
@@ -55,7 +55,7 @@ public class TileEntityProgressionDoorRenderer extends TileEntitySpecialRenderer
 		GlStateManager.rotate((float) rotY, 0, -1, 0);
 		
 		
-		VertexBuffer wr = Tessellator.getInstance().getBuffer();
+		BufferBuilder wr = Tessellator.getInstance().getBuffer();
 		
 		GlStateManager.enableBlend();
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -79,7 +79,7 @@ public class TileEntityProgressionDoorRenderer extends TileEntitySpecialRenderer
 			GlStateManager.rotate((float) (360.0 * (time % spinRate) / spinRate),
 					0, 1, 0);
 			
-			if (te.meetsRequirements(Minecraft.getMinecraft().thePlayer, null))
+			if (te.meetsRequirements(Minecraft.getMinecraft().player, null))
 				GlStateManager.color(0f, 1f, 1f, .8f);
 			else
 				GlStateManager.color(1f, .3f, .6f, .8f);

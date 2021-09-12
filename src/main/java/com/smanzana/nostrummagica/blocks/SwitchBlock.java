@@ -24,6 +24,7 @@ import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
@@ -53,7 +54,7 @@ public class SwitchBlock extends Block {
 	}
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(SwitchBlockTileEntity.class, "switch_block_tile_entity");
+		GameRegistry.registerTileEntity(SwitchBlockTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "switch_block_tile_entity"));
 	}
 	
 	public SwitchBlock() {
@@ -81,10 +82,10 @@ public class SwitchBlock extends Block {
 		return SWITCH_BLOCK_AABB;
 	}
 	
-	@Override
-	public boolean isVisuallyOpaque() {
-		return false;
-	}
+//	@Override
+//	public boolean isVisuallyOpaque() {
+//		return false;
+//	}
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
@@ -107,12 +108,12 @@ public class SwitchBlock extends Block {
 	}
 	
 	@Override
-	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
 		return false;
 	}
 	
 	@Override
-	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, World worldIn, BlockPos pos) {
+	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
 		return NULL_AABB;
 	}
 	
@@ -139,12 +140,14 @@ public class SwitchBlock extends Block {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (worldIn.isRemote || !playerIn.isCreative()) {
 			return false;
 		}
 		
-		if (heldItem != null && heldItem.getItem() instanceof PositionCrystal) {
+		ItemStack heldItem = playerIn.getHeldItem(hand);
+		
+		if (!heldItem.isEmpty() && heldItem.getItem() instanceof PositionCrystal) {
 			BlockPos heldPos = PositionCrystal.getBlockPosition(heldItem);
 			if (heldPos != null && PositionCrystal.getDimension(heldItem) == worldIn.provider.getDimension()) {
 				TileEntity te = worldIn.getTileEntity(pos);
@@ -155,7 +158,7 @@ public class SwitchBlock extends Block {
 				}
 			}
 			return true;
-		} else if (heldItem != null && heldItem.getItem() instanceof ItemEnderEye) {
+		} else if (!heldItem.isEmpty() && heldItem.getItem() instanceof ItemEnderEye) {
 			TileEntity te = worldIn.getTileEntity(pos);
 			if (te != null) {
 				SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;
@@ -164,10 +167,10 @@ public class SwitchBlock extends Block {
 				if (atState != null && atState.getBlock() instanceof ITriggeredBlock) {
 					playerIn.setPositionAndUpdate(loc.getX(), loc.getY(), loc.getZ());
 				} else {
-					playerIn.addChatComponentMessage(new TextComponentString("Not pointed at valid triggered block!"));
+					playerIn.sendMessage(new TextComponentString("Not pointed at valid triggered block!"));
 				}
 			}
-		} else if (heldItem == null && hand == EnumHand.MAIN_HAND) {
+		} else if (heldItem.isEmpty() && hand == EnumHand.MAIN_HAND) {
 			TileEntity te = worldIn.getTileEntity(pos);
 			if (te != null) {
 				SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;
@@ -255,9 +258,9 @@ public class SwitchBlock extends Block {
 		}
 		
 		private void dirty() {
-			worldObj.markBlockRangeForRenderUpdate(pos, pos);
-			worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 3);
-			worldObj.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
+			world.markBlockRangeForRenderUpdate(pos, pos);
+			world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
+			world.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
 			markDirty();
 		}
 		
@@ -294,21 +297,21 @@ public class SwitchBlock extends Block {
 		
 		@Override
 		public void update() {
-			if (worldObj.isRemote) {
+			if (world.isRemote) {
 				return;
 			}
 			
 			// Create entity here if it doesn't exist
-			if (triggerEntity == null || triggerEntity.isDead || triggerEntity.worldObj != this.worldObj
+			if (triggerEntity == null || triggerEntity.isDead || triggerEntity.world != this.world
 					|| triggerEntity.getDistanceSq(this.pos.up()) > 1.5) {
 				// Entity is dead OR is too far away
 				if (triggerEntity != null && !triggerEntity.isDead) {
 					triggerEntity.setDead();
 				}
 				
-				triggerEntity = new EntitySwitchTrigger(this.worldObj);
+				triggerEntity = new EntitySwitchTrigger(this.world);
 				triggerEntity.setPosition(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
-				worldObj.spawnEntityInWorld(triggerEntity);
+				world.spawnEntity(triggerEntity);
 			}
 		}
 		
@@ -316,19 +319,19 @@ public class SwitchBlock extends Block {
 			if (!this.triggered) {
 				if (type == SwitchType.ANY || isMagic) {
 					this.triggered = true;
-					NostrumMagicaSounds.DAMAGE_ICE.play(worldObj, pos.getX() + .5, pos.getY(), pos.getZ() + .5);
+					NostrumMagicaSounds.DAMAGE_ICE.play(world, pos.getX() + .5, pos.getY(), pos.getZ() + .5);
 					this.dirty();
 					
 					BlockPos triggerPos = this.getPos().add(this.getOffset());
-					IBlockState state = worldObj.getBlockState(triggerPos);
+					IBlockState state = world.getBlockState(triggerPos);
 					if (state == null || !(state.getBlock() instanceof ITriggeredBlock)) {
 						return;
 					}
 					
-					((ITriggeredBlock) state.getBlock()).trigger(worldObj, triggerPos, state, this.getPos());
+					((ITriggeredBlock) state.getBlock()).trigger(world, triggerPos, state, this.getPos());
 				} else {
 					// Wrong input type
-					NostrumMagicaSounds.CAST_FAIL.play(worldObj, pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5);
+					NostrumMagicaSounds.CAST_FAIL.play(world, pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5);
 				}
 			}
 		}

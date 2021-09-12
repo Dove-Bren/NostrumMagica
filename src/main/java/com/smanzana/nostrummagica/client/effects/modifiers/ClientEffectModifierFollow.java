@@ -22,6 +22,6 @@ public class ClientEffectModifierFollow implements ClientEffectModifier {
 	@Override
 	public void earlyApply(ClientEffectRenderDetail detail, float progress, float partialTicks) {
 		Vec3d pos = entity.getPositionEyes(partialTicks).subtract(0, entity.getEyeHeight(), 0);
-		GlStateManager.translate(pos.xCoord, pos.yCoord, pos.zCoord);
+		GlStateManager.translate(pos.x, pos.y, pos.z);
 	}
 }

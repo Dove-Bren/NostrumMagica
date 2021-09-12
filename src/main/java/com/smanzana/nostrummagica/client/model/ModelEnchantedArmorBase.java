@@ -284,8 +284,8 @@ public class ModelEnchantedArmorBase extends ModelBiped {
 	}
 	
 	@Override
-	public void setInvisible(boolean invisible) {
-		super.setInvisible(invisible);
+	public void setVisible(boolean visible) {
+		super.setVisible(visible);
 	}
 	
 	@Override

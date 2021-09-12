@@ -80,9 +80,9 @@ public class FoodTrigger extends SpellTrigger {
 							null
 							);
 					
-					this.entity.worldObj.getMinecraftServer().addScheduledTask(() -> {
+					this.entity.world.getMinecraftServer().addScheduledTask(() -> {
 						this.trigger(data);
-						NostrumMagica.proxy.spawnEffect(this.getState().getSelf().worldObj,
+						NostrumMagica.proxy.spawnEffect(this.getState().getSelf().world,
 								new SpellComponentWrapper(instance()),
 								this.getState().getSelf(), null, this.getState().getSelf(), null, null, false, 0);
 						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_FOOD, this.entity);
@@ -94,7 +94,7 @@ public class FoodTrigger extends SpellTrigger {
 					expired = true;
 					if (this.entity instanceof EntityPlayer) {
 						EntityPlayer player = (EntityPlayer) this.entity;
-						player.addChatComponentMessage(new TextComponentTranslation("modification.damaged_duration.health"));
+						player.sendMessage(new TextComponentTranslation("modification.damaged_duration.health"));
 						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_FOOD, this.entity);
 					}
 				}

@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.block.BlockDirectional;
-import net.minecraft.block.BlockPistonBase;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
@@ -16,10 +15,10 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -98,7 +97,7 @@ public class MimicBlock extends BlockDirectional {
 	}
 	
 	@Override
-	public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list) {
+	public void getSubBlocks(CreativeTabs itemIn, NonNullList<ItemStack> list) {
 		list.add(new ItemStack(this));
 		list.add(new ItemStack(this, 1, 1));
 	}
@@ -154,14 +153,14 @@ public class MimicBlock extends BlockDirectional {
 		return false;
 	}
 	
-	@Override
-	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
-		return false;
-	}
+//	@Override
+//	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+//		return false;
+//	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn) {
+	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
 		boolean solid = false;
 		
 		if (!isDoor) {
@@ -181,29 +180,29 @@ public class MimicBlock extends BlockDirectional {
 			
 			switch (side) {
 			case DOWN:
-				solid = center.yCoord < pos.getY() && entityIn.motionY >= 0;
+				solid = center.y < pos.getY() && entityIn.motionY >= 0;
 				break;
 			case EAST:
-				solid = center.xCoord > pos.getX() + 1 && dx <= 0;
+				solid = center.x > pos.getX() + 1 && dx <= 0;
 				break;
 			case NORTH:
-				solid = center.zCoord < pos.getZ() && dz >= 0;
+				solid = center.z < pos.getZ() && dz >= 0;
 				break;
 			case SOUTH:
-				solid = center.zCoord > pos.getZ() + 1 && dz <= 0;
+				solid = center.z > pos.getZ() + 1 && dz <= 0;
 				break;
 			case UP:
 			default:
-				solid = center.yCoord > pos.getY() + 1 && entityIn.motionY <= 0;
+				solid = center.y > pos.getY() + 1 && entityIn.motionY <= 0;
 				break;
 			case WEST:
-				solid = center.xCoord < pos.getX() && dx >= 0;
+				solid = center.x < pos.getX() && dx >= 0;
 				break;
 			}
 		}
 		
 		if (solid) {
-			super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn);
+			super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
 		}
     }
 	
@@ -215,10 +214,10 @@ public class MimicBlock extends BlockDirectional {
 	}
 	
 	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, ItemStack stack) {
+	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
 		//EnumFacing enumfacing = EnumFacing.getHorizontal(MathHelper.floor_double((double)(placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3).getOpposite();
 		return this.getDefaultState()
-				.withProperty(FACING, BlockPistonBase.getFacingFromEntity(pos, placer))
+				.withProperty(FACING, EnumFacing.getDirectionFromEntityLiving(pos, placer))
 				.withProperty(UNBREAKABLE, meta == 1);
 	}
 	
@@ -227,10 +226,10 @@ public class MimicBlock extends BlockDirectional {
         return true;
     }
 	
-	@Override
-	public boolean isVisuallyOpaque() {
-		return false;
-	}
+//	@Override
+//	public boolean isVisuallyOpaque() {
+//		return false;
+//	}
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
@@ -264,7 +263,7 @@ public class MimicBlock extends BlockDirectional {
 	public void onBlockHighlight(DrawBlockHighlightEvent event) {
 		if (event.getTarget().typeOfHit == RayTraceResult.Type.BLOCK) {
 			BlockPos pos = event.getTarget().getBlockPos();
-			IBlockState hit = event.getPlayer().worldObj.getBlockState(pos);
+			IBlockState hit = event.getPlayer().world.getBlockState(pos);
 			if (hit != null && hit.getBlock() == this) {
 				EnumFacing face = hit.getValue(FACING);
 				boolean outside = false;

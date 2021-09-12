@@ -15,6 +15,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -41,7 +42,7 @@ public class TeleportationPortal extends NostrumPortal implements ITileEntityPro
 	}
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(TeleportationPortalTileEntity.class, "teleportation_portal");
+		GameRegistry.registerTileEntity(TeleportationPortalTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "teleportation_portal"));
 	}
 	
 	public TeleportationPortal() {
@@ -149,9 +150,9 @@ public class TeleportationPortal extends NostrumPortal implements ITileEntityPro
 			this.target = target;
 			this.markDirty();
 			
-			if (worldObj != null) {
-				IBlockState state = worldObj.getBlockState(pos);
-				worldObj.notifyBlockUpdate(pos, state, state, 2);
+			if (world != null) {
+				IBlockState state = world.getBlockState(pos);
+				world.notifyBlockUpdate(pos, state, state, 2);
 			}
 		}
 		

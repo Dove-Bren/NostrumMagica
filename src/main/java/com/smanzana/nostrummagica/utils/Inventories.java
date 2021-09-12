@@ -1,10 +1,9 @@
 package com.smanzana.nostrummagica.utils;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -14,9 +13,9 @@ import net.minecraftforge.items.IItemHandler;
 
 public class Inventories {
 
-	private static final ItemStack attemptAddToInventory(IInventory inventory, @Nullable ItemStack stack, boolean commit) {
-    	if (stack == null) {
-    		return null;
+	private static final @Nonnull ItemStack attemptAddToInventory(IInventory inventory, @Nonnull ItemStack stack, boolean commit) {
+    	if (stack.isEmpty()) {
+    		return ItemStack.EMPTY;
     	}
     	
     	ItemStack itemstack = stack.copy();
@@ -29,10 +28,10 @@ public class Inventories {
     		
             ItemStack itemstack1 = inventory.getStackInSlot(i);
 
-            if (itemstack1 == null) {
+            if (itemstack1.isEmpty()) {
             	// If just looking to see if it'll fit, return success.
             	if (!commit) {
-            		return null;
+            		return ItemStack.EMPTY;
             	}
             	
             	// Otherwise, mark the first empty spot but keep looking for places to stack
@@ -45,19 +44,19 @@ public class Inventories {
             
             if (ItemStacks.stacksMatch(itemstack, itemstack1)) {
             	// stacks appear to match. Deduct stack size
-            	int room = itemstack1.getMaxStackSize() - itemstack1.stackSize;
-            	if (room >= itemstack.stackSize) {
+            	int room = itemstack1.getMaxStackSize() - itemstack1.getCount();
+            	if (room >= itemstack.getCount()) {
             		if (commit) {
-	            		itemstack1.stackSize += itemstack.stackSize;
+	            		itemstack1.grow(itemstack.getCount());
 	            		inventory.markDirty();
             		}
-            		return null;
+            		return ItemStack.EMPTY;
             	} else if (room > 0) {
             		if (commit) {
-	            		itemstack1.stackSize += room;
+	            		itemstack1.grow(room);
 	            		inventory.markDirty();
             		}
-            		itemstack.stackSize -= room;
+            		itemstack.shrink(room);
             	}
             }
         }
@@ -68,61 +67,61 @@ public class Inventories {
                 inventory.setInventorySlotContents(emptyPos, itemstack);
                 inventory.markDirty();
         	}
-            return null;
+            return ItemStack.EMPTY;
     	}
 
         return itemstack;
     }
 	
-	private static final ItemStack attemptAddToInventory(IItemHandler handler, @Nullable ItemStack stack, boolean commit) {
-    	if (stack == null) {
-    		return null;
+	private static final @Nonnull ItemStack attemptAddToInventory(IItemHandler handler, @Nonnull ItemStack stack, boolean commit) {
+    	if (stack.isEmpty()) {
+    		return ItemStack.EMPTY;
     	}
     	
     	stack = stack.copy();
 
-    	for (int i = 0; i < handler.getSlots() && stack != null; ++i) {
+    	for (int i = 0; i < handler.getSlots() && !stack.isEmpty(); ++i) {
     		stack = handler.insertItem(i, stack, !commit);
         }
     	
         return stack;
     }
 	 
-	public static final ItemStack addItem(IInventory inventory, @Nullable ItemStack stack) {
+	public static final @Nonnull ItemStack addItem(IInventory inventory, @Nonnull ItemStack stack) {
 		return attemptAddToInventory(inventory, stack, true);
 	}
 	
-	public static final ItemStack addItem(ItemStack[] inventory, @Nullable ItemStack stack) {
+	public static final @Nonnull ItemStack addItem(ItemStack[] inventory, @Nonnull ItemStack stack) {
 		return addItem(new ItemStackArrayWrapper(inventory), stack);
 	}
 	
-	public static final ItemStack addItem(IItemHandler handler, @Nullable ItemStack stack) {
+	public static final @Nonnull ItemStack addItem(IItemHandler handler, @Nonnull ItemStack stack) {
 		return attemptAddToInventory(handler, stack, true);
 	}
 	
-	public static final boolean canFit(IInventory inventory, @Nullable ItemStack stack) {
-		return null == attemptAddToInventory(inventory, stack, false);
+	public static final boolean canFit(IInventory inventory, @Nonnull ItemStack stack) {
+		return attemptAddToInventory(inventory, stack, false).isEmpty();
 	}
 	
-	public static final boolean canFit(ItemStack[] inventory, @Nullable ItemStack stack) {
+	public static final boolean canFit(ItemStack[] inventory, @Nonnull ItemStack stack) {
 		return canFit(new ItemStackArrayWrapper(inventory), stack);
 	}
 	
-	public static final boolean canFit(IItemHandler handler, @Nullable ItemStack stack) {
-		return null == attemptAddToInventory(handler, stack, false);
+	public static final boolean canFit(IItemHandler handler, @Nonnull ItemStack stack) {
+		return attemptAddToInventory(handler, stack, false).isEmpty();
 	}
 	
-	public static final ItemStack simulateAddItem(IInventory inventory, @Nullable ItemStack stack) {
+	public static final @Nonnull ItemStack simulateAddItem(IInventory inventory, @Nonnull ItemStack stack) {
 		return attemptAddToInventory(inventory, stack, false);
 	}
 	
-	public static final ItemStack simulateAddItem(IItemHandler handler, @Nullable ItemStack stack) {
+	public static final @Nonnull ItemStack simulateAddItem(IItemHandler handler, @Nonnull ItemStack stack) {
 		return attemptAddToInventory(handler, stack, false);
 	}
 	
-	private static final ItemStack attemptRemoveFromInventory(IInventory inventory, @Nullable ItemStack stack, boolean commit) {
-		if (stack == null) {
-    		return null;
+	private static final @Nonnull ItemStack attemptRemoveFromInventory(IInventory inventory, @Nonnull ItemStack stack, boolean commit) {
+		if (stack.isEmpty()) {
+    		return ItemStack.EMPTY;
     	}
     	
     	ItemStack itemstack = stack.copy();
@@ -130,27 +129,27 @@ public class Inventories {
     	for (int i = inventory.getSizeInventory() - 1; i >= 0 ; i--) {
     		ItemStack inSlot = inventory.getStackInSlot(i);
     		
-    		if (inSlot == null) {
+    		if (inSlot.isEmpty()) {
     			continue;
     		}
     		
             if (ItemStacks.stacksMatch(itemstack, inSlot)) {
             	// stacks appear to match. Deduct stack size
-            	if (inSlot.stackSize > itemstack.stackSize) {
+            	if (inSlot.getCount() > itemstack.getCount()) {
             		if (commit) {
-	            		inSlot.stackSize -= itemstack.stackSize;
+	            		inSlot.shrink(itemstack.getCount());
 	            		inventory.markDirty();
             		}
-            		return null;
+            		return ItemStack.EMPTY;
             	} else {
-            		itemstack.stackSize -= inSlot.stackSize;
+            		itemstack.shrink(inSlot.getCount());
             		if (commit) {
             			inventory.removeStackFromSlot(i);
 	            		inventory.markDirty();
             		}
             		
-            		if (itemstack.stackSize <= 0) {
-            			return null;
+            		if (itemstack.getCount() <= 0) {
+            			return ItemStack.EMPTY;
             		}
             	}
            	}
@@ -159,27 +158,27 @@ public class Inventories {
         return itemstack;
 	}
 	
-	public static final boolean contains(IInventory inventory, @Nullable ItemStack items) {
-		return null == attemptRemoveFromInventory(inventory, items, false);
+	public static final boolean contains(IInventory inventory, @Nonnull ItemStack items) {
+		return attemptRemoveFromInventory(inventory, items, false).isEmpty();
 	}
 	
-	public static final boolean contains(ItemStack[] inventory, @Nullable ItemStack items) {
+	public static final boolean contains(ItemStack[] inventory, @Nonnull ItemStack items) {
 		return contains(new ItemStackArrayWrapper(inventory), items);
 	}
 	
-	public static final ItemStack remove(IInventory inventory, @Nullable ItemStack items) {
+	public static final @Nonnull ItemStack remove(IInventory inventory, @Nonnull ItemStack items) {
 		return attemptRemoveFromInventory(inventory, items, true);
 	}
 	
-	public static final ItemStack remove(ItemStack[] inventory, @Nullable ItemStack items) {
+	public static final @Nonnull ItemStack remove(ItemStack[] inventory, @Nonnull ItemStack items) {
 		return remove(new ItemStackArrayWrapper(inventory), items);
 	}
 	
 	public static final NBTBase serializeInventory(IInventory inv) {
 		NBTTagList list = new NBTTagList();
 		for (int i = 0; i < inv.getSizeInventory(); i++) {
-			@Nullable ItemStack stack = inv.getStackInSlot(i);
-			if (stack != null) {
+			@Nonnull ItemStack stack = inv.getStackInSlot(i);
+			if (!stack.isEmpty()) {
 				list.appendTag(stack.serializeNBT());
 			} else {
 				list.appendTag(new NBTTagCompound());
@@ -198,7 +197,7 @@ public class Inventories {
 		NBTTagList list = (NBTTagList) nbt;
 		for (int i = 0; i < list.tagCount(); i++) {
 			NBTTagCompound tag = list.getCompoundTagAt(i);
-			@Nullable ItemStack stack = ItemStack.loadItemStackFromNBT(tag);
+			@Nonnull ItemStack stack = new ItemStack(tag);
 			base.setInventorySlotContents(i, stack);
 		}
 		
@@ -208,7 +207,7 @@ public class Inventories {
 	// TODO make a pool of these and implement a 'set' interface to avoid allocating and deallocing these
 	public static class ItemStackArrayWrapper implements IInventory {
 
-		private final ItemStack[] array;
+		private final @Nonnull ItemStack[] array;
 		
 		public ItemStackArrayWrapper(ItemStack array[]) {
 			this.array = array;
@@ -235,27 +234,30 @@ public class Inventories {
 		}
 
 		@Override
-		public ItemStack getStackInSlot(int index) {
+		public @Nonnull ItemStack getStackInSlot(int index) {
 			return array[index];
 		}
 
 		@Override
-		public ItemStack decrStackSize(int index, int count) {
-			ItemStack split =  ItemStackHelper.getAndSplit(array, index, count);
+		public @Nonnull ItemStack decrStackSize(int index, int count) {
+			ItemStack split = ItemStack.EMPTY;
+			if (index < array.length) {
+				split = array[index].splitStack(count);
+			}
 			markDirty();
 			return split;
 		}
 
 		@Override
-		public ItemStack removeStackFromSlot(int index) {
+		public @Nonnull ItemStack removeStackFromSlot(int index) {
 			ItemStack stack = array[index];
-			array[index] = null;
+			array[index] = ItemStack.EMPTY;
 			markDirty();
 			return stack;
 		}
 
 		@Override
-		public void setInventorySlotContents(int index, ItemStack stack) {
+		public void setInventorySlotContents(int index, @Nonnull ItemStack stack) {
 			array[index] = stack;
 			markDirty();
 		}
@@ -268,11 +270,6 @@ public class Inventories {
 		@Override
 		public void markDirty() {
 			;
-		}
-
-		@Override
-		public boolean isUseableByPlayer(EntityPlayer player) {
-			return false;
 		}
 
 		@Override
@@ -308,9 +305,25 @@ public class Inventories {
 		@Override
 		public void clear() {
 			for (int i = 0; i < array.length; i++) {
-				array[i] = null;
+				array[i] = ItemStack.EMPTY;
 			}
 			markDirty();
+		}
+
+		@Override
+		public boolean isEmpty() {
+			for (int i = 0; i < array.length; i++) {
+				if (!array[i].isEmpty()) {
+					return false;
+				}
+			}
+			
+			return true;
+		}
+
+		@Override
+		public boolean isUsableByPlayer(EntityPlayer player) {
+			return true;
 		}
 		
 	}

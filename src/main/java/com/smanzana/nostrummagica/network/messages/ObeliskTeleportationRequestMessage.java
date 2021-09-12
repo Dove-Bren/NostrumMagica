@@ -46,11 +46,11 @@ public class ObeliskTeleportationRequestMessage implements IMessage {
 			}
 			to = NBTUtil.getPosFromTag(message.tag.getCompoundTag(NBT_TO));
 			
-			EntityPlayerMP sp = ctx.getServerHandler().playerEntity;
+			EntityPlayerMP sp = ctx.getServerHandler().player;
 			
 			final BlockPos fromFinal = from;
 			sp.getServerWorld().addScheduledTask(() -> {
-				serverDoRequest(sp.worldObj, sp, fromFinal, to);				
+				serverDoRequest(sp.world, sp, fromFinal, to);				
 			});
 			
 			return null;
@@ -102,7 +102,7 @@ public class ObeliskTeleportationRequestMessage implements IMessage {
 		
 		// Validate obelisks
 		if (NostrumObelisk.isValidTarget(world, from, to)) {
-			player.addChatComponentMessage(new TextComponentTranslation("info.obelisk.dne"));
+			player.sendMessage(new TextComponentTranslation("info.obelisk.dne"));
 			return false;
 		}
 		
@@ -111,14 +111,14 @@ public class ObeliskTeleportationRequestMessage implements IMessage {
 			TileEntity te = world.getTileEntity(from);
 			if (te == null || !(te instanceof NostrumObeliskEntity)) {
 				NostrumMagica.logger.error("Something went wrong! Source obelisk does not seem to exist or have the provided target obelisk...");
-				player.addChatComponentMessage(new TextComponentTranslation("info.obelisk.dne"));
+				player.sendMessage(new TextComponentTranslation("info.obelisk.dne"));
 				return false;
 			}
 			
 			NostrumObeliskEntity obelisk = (NostrumObeliskEntity) te;
 			if (!obelisk.deductForTeleport(to)) {
 				NostrumMagica.logger.error("Something went wrong! Source obelisk does not seem to exist or have the provided target obelisk...");
-				player.addChatComponentMessage(new TextComponentTranslation("info.obelisk.aetherfail"));
+				player.sendMessage(new TextComponentTranslation("info.obelisk.aetherfail"));
 				return false;
 			}
 		}
@@ -136,7 +136,7 @@ public class ObeliskTeleportationRequestMessage implements IMessage {
 				
 			doEffects(world, to);
 		} else {
-			player.addChatComponentMessage(new TextComponentTranslation("info.obelisk.noroom"));
+			player.sendMessage(new TextComponentTranslation("info.obelisk.noroom"));
 		}
 		
 		return true;

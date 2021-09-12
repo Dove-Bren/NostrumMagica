@@ -57,7 +57,7 @@ public class GolemTask extends EntityAIBase {
 		
 		double distOwner = 0;
 		if (owner.dimension == golem.dimension) {
-			distOwner = owner.getDistanceSqToEntity(golem);
+			distOwner = owner.getDistanceSq(golem);
 		}
 		
 		if (distOwner > 900.0) {
@@ -68,7 +68,7 @@ public class GolemTask extends EntityAIBase {
 	}
 
 	@Override
-	public boolean continueExecuting() {
+	public boolean shouldContinueExecuting() {
 		return running;
 	}
 	
@@ -124,7 +124,7 @@ public class GolemTask extends EntityAIBase {
 			owner = golem;
 		double distOwner = 0;
 		if (owner.dimension == golem.dimension) {
-			distOwner = owner.getDistanceSqToEntity(golem);
+			distOwner = owner.getDistanceSq(golem);
 		}
 		
 		if (distOwner > 900.0) {
@@ -240,7 +240,7 @@ public class GolemTask extends EntityAIBase {
         	if (updateCooldown > 0 && !golem.getNavigator().noPath())
     			return true;
 			
-        	golem.getNavigator().clearPathEntity();
+        	golem.getNavigator().clearPath();
 			success = golem.getNavigator().tryMoveToEntityLiving(target, 1.0);
 			if (success) {
 				updateCooldown = 5;
@@ -252,7 +252,7 @@ public class GolemTask extends EntityAIBase {
 
             if (dist <= RANGE_SQR - 25.0 && golem.canEntityBeSeen(target))
             {
-            	golem.getNavigator().clearPathEntity();
+            	golem.getNavigator().clearPath();
                 ++this.strafeTime;
             }
             else
@@ -264,7 +264,7 @@ public class GolemTask extends EntityAIBase {
             	if (updateCooldown > 0 && !golem.getNavigator().noPath())
         			return true;
             	
-            	golem.getNavigator().clearPathEntity();
+            	golem.getNavigator().clearPath();
             	golem.getNavigator().tryMoveToEntityLiving(target, 1.0);
                 this.updateCooldown = 5;
             }

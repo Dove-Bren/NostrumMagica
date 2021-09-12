@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.GlStateManager.DestFactor;
 import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -64,7 +64,7 @@ public class RenderObj extends ModelRenderer {
 			model = this.retexture(model);
 			IBakedModel bakedModel = model.bake(model.getDefaultState(), DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter());
 			
-			VertexBuffer vertexbuffer = Tessellator.getInstance().getBuffer();
+			BufferBuilder vertexbuffer = Tessellator.getInstance().getBuffer();
 			
 			if (bakedModel instanceof OBJBakedModel && model instanceof OBJModel) {
 				int color = this.getColor();
@@ -81,7 +81,7 @@ public class RenderObj extends ModelRenderer {
 		}
 	}
 
-	protected boolean preRender(VertexBuffer buffer) {
+	protected boolean preRender(BufferBuilder buffer) {
 		return true;
 	}
 	
@@ -94,7 +94,7 @@ public class RenderObj extends ModelRenderer {
 	}
 
 	@SideOnly(Side.CLIENT)
-    private void renderModel(IBakedModel model, VertexBuffer buffer, int color) {
+    private void renderModel(IBakedModel model, BufferBuilder buffer, int color) {
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
 		GlStateManager.pushMatrix();
 		GlStateManager.rotate(180, 1, 0, 0);
@@ -130,7 +130,7 @@ public class RenderObj extends ModelRenderer {
 //			GlStateManager.pushMatrix();
 //
 //			Tessellator tessellator = Tessellator.getInstance();
-//			VertexBuffer buffer = tessellator.getBuffer();
+//			BufferBuilder buffer = tessellator.getBuffer();
 //			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
 //
 //			GlStateManager.rotate(180, 0, 0, 1);
@@ -190,7 +190,7 @@ public class RenderObj extends ModelRenderer {
 		init();
 		
 		Tessellator tessellator = Tessellator.getInstance();
-		VertexBuffer buffer = tessellator.getBuffer();
+		BufferBuilder buffer = tessellator.getBuffer();
 		GlStateManager.shadeModel(GL11.GL_SMOOTH);
 		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);

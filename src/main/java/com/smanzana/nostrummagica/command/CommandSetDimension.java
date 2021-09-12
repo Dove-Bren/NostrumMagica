@@ -11,12 +11,12 @@ import net.minecraftforge.common.DimensionManager;
 public class CommandSetDimension extends CommandBase {
 
 	@Override
-	public String getCommandName() {
+	public String getName() {
 		return "tpdm";
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender sender) {
+	public String getUsage(ICommandSender sender) {
 		return "/tpdm [dimension]";
 	}
 
@@ -37,10 +37,10 @@ public class CommandSetDimension extends CommandBase {
 					player.setPortal(player.getPosition());
 					player.changeDimension(dimension);
 				} else {
-					sender.addChatMessage(new TextComponentString("That dimension doesn't seem to exist!"));
+					sender.sendMessage(new TextComponentString("That dimension doesn't seem to exist!"));
 				}
 			} else {
-				sender.addChatMessage(new TextComponentString("You must be in creative to execute this command!"));
+				sender.sendMessage(new TextComponentString("You must be in creative to execute this command!"));
 			}
 		}
 	}
