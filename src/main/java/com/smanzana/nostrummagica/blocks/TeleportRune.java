@@ -6,9 +6,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
-
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.tiles.TeleportRuneTileEntity;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble.ItemType;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
@@ -27,24 +26,18 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -60,10 +53,6 @@ public class TeleportRune extends BlockContainer  {
 		}
 		
 		return instance;
-	}
-	
-	public static void init() {
-		GameRegistry.registerTileEntity(TeleportRuneTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "teleport_rune"));
 	}
 	
 	public TeleportRune() {
@@ -403,84 +392,6 @@ public class TeleportRune extends BlockContainer  {
 			double mz = 1 * (rand.nextFloat() - .5f);
 			
 			worldIn.spawnParticle(EnumParticleTypes.PORTAL, dx + mx, dy, dz + mz, mx / 3, 0.0D, mz / 3, new int[0]);
-		}
-	}
-	
-	public static class TeleportRuneTileEntity extends TileEntity {
-		
-		private static final String NBT_OFFSET = "offset";
-		
-		private BlockPos teleOffset = null;
-		
-		public TeleportRuneTileEntity() {
-			super();
-		}
-		
-		/**
-		 * Sets where to teleport to as an offset from the block itself.
-		 * OFFSET, not target location. Went ahead and used ints here to make it more obvious.
-		 * @param offsetX
-		 * @param offsetY
-		 * @param offsetZ
-		 */
-		public void setOffset(int offsetX, int offsetY, int offsetZ) {
-			this.teleOffset = new BlockPos(offsetX, offsetY, offsetZ);
-			flush();
-		}
-		
-		public void setTargetPosition(BlockPos target) {
-			if (target == null) {
-				this.teleOffset = null;
-			} else {
-				this.teleOffset = target.subtract(pos);
-			}
-			flush();
-		}
-		
-		public @Nullable BlockPos getOffset() {
-			return teleOffset;
-		}
-		
-		@Override
-		public SPacketUpdateTileEntity getUpdatePacket() {
-			return new SPacketUpdateTileEntity(this.pos, 3, this.getUpdateTag());
-		}
-
-		@Override
-		public NBTTagCompound getUpdateTag() {
-			return this.writeToNBT(new NBTTagCompound());
-		}
-		
-		@Override
-		public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
-			super.onDataPacket(net, pkt);
-			handleUpdateTag(pkt.getNbtCompound());
-		}
-		
-		public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-			super.writeToNBT(compound);
-			
-			if (teleOffset != null) {
-				compound.setLong(NBT_OFFSET, teleOffset.toLong());
-			}
-			
-			return compound;
-		}
-		
-		public void readFromNBT(NBTTagCompound compound) {
-			super.readFromNBT(compound);
-			
-			teleOffset = null;
-			if (compound.hasKey(NBT_OFFSET, NBT.TAG_LONG)) {
-				teleOffset = BlockPos.fromLong(compound.getLong(NBT_OFFSET));
-			}
-		}
-		
-		protected void flush() {
-			if (world != null && !world.isRemote) {
-				IBlockState state = world.getBlockState(pos);
-				world.notifyBlockUpdate(pos, state, state, 2);
-			}
 		}
 	}
 }

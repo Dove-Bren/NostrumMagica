@@ -69,7 +69,6 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.management.PreYggdrasilConverter;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -78,7 +77,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -584,7 +583,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		this.dataManager.set(HATCHED, hatched);
 		
 		if (world != null && !world.isRemote) {
-			ReflectionHelper.setPrivateValue(EntityLiving.class, this, hatched, "persistenceRequired", "field_82179_bU");
+			ObfuscationReflectionHelper.setPrivateValue(EntityLiving.class, this, hatched, "persistenceRequired");
 		}
 	}
 
@@ -808,7 +807,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		if (tamed) {
 			this.setupTamedAI();
 			if (world != null && !world.isRemote) {
-				ReflectionHelper.setPrivateValue(EntityLiving.class, this, true, "persistenceRequired", "field_82179_bU");
+				ObfuscationReflectionHelper.setPrivateValue(EntityLiving.class, this, true, "persistenceRequired");
 			}
 		}
 	}

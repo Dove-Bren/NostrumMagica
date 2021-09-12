@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.tiles.CandleTileEntity;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.network.NetworkHandler;
@@ -27,21 +28,15 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemFlintAndSteel;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.ITickable;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -73,7 +68,6 @@ public class Candle extends Block implements ITileEntityProvider {
 	}
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(CandleTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "nostrum_candle_te"));
 		GameRegistry.addShapedRecipe(new ItemStack(instance()),
 				"W",
 				"F",
@@ -423,8 +417,7 @@ public class Candle extends Block implements ITileEntityProvider {
 			world.setTileEntity(pos, candle);
 		}
 		
-		candle.type = type;
-		candle.dirty();
+		candle.setReagentType(type);
 		
 		if (!world.isRemote) {
 			NetworkHandler.getSyncChannel().sendToAllAround(new CandleIgniteMessage(world.provider.getDimension(), pos, type),
@@ -436,97 +429,6 @@ public class Candle extends Block implements ITileEntityProvider {
 		if (!canPlaceAt(worldIn, pos, state.getValue(FACING))) {
 			this.dropBlockAsItem(worldIn, pos, state, 0);
 			worldIn.setBlockToAir(pos);
-		}
-	}
-	
-	public static class CandleTileEntity extends TileEntity implements ITickable {
-		
-		private static final String NBT_TYPE = "type";
-		private static Random rand = new Random();
-		private ReagentType type;
-		private int lifeTicks;
-		
-		public CandleTileEntity(ReagentType type) {
-			this();
-			this.type = type;
-		}
-		
-		public CandleTileEntity() {
-			this.lifeTicks = (20 * 15) + CandleTileEntity.rand.nextInt(20*30);
-		}
-		
-		public ReagentType getType() {
-			return type;
-		}
-		
-		private ReagentType parseType(String serial) {
-			for (ReagentType type : ReagentType.values()) {
-				if (type.name().equalsIgnoreCase(serial))
-					return type;
-			}
-			
-			return null;
-		}
-		
-		private String serializeType(ReagentType type) {
-			if (type == null)
-				return "null";
-			return type.name().toLowerCase();
-		}
-		
-		@Override
-		public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-			nbt = super.writeToNBT(nbt);
-			
-			nbt.setString(NBT_TYPE, serializeType(type));
-			
-			return nbt;
-		}
-		
-		@Override
-		public void readFromNBT(NBTTagCompound nbt) {
-			super.readFromNBT(nbt);
-			
-			if (nbt == null || !nbt.hasKey(NBT_TYPE, NBT.TAG_STRING))
-				return;
-			
-			this.type = parseType(nbt.getString(NBT_TYPE));
-		}
-		
-		@Override
-		public SPacketUpdateTileEntity getUpdatePacket() {
-			return new SPacketUpdateTileEntity(this.pos, 3, this.getUpdateTag());
-		}
-
-		@Override
-		public NBTTagCompound getUpdateTag() {
-			return this.writeToNBT(new NBTTagCompound());
-		}
-		
-		@Override
-		public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
-			super.onDataPacket(net, pkt);
-			handleUpdateTag(pkt.getNbtCompound());
-		}
-		
-		private void dirty() {
-			world.markBlockRangeForRenderUpdate(pos, pos);
-			world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
-			world.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
-			markDirty();
-		}
-		
-		@Override
-		public void update() {
-			this.lifeTicks = Math.max(-1, this.lifeTicks-1);
-			
-			if (this.lifeTicks == 0 && !world.isRemote) {
-				IBlockState state = world.getBlockState(this.pos);
-				if (state == null)
-					return;
-				
-				extinguish(world, this.pos, state, false);
-			}
 		}
 	}
 	

@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.client.render;
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.ProgressionDoor;
+import com.smanzana.nostrummagica.blocks.tiles.ProgressionDoorTileEntity;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
@@ -20,10 +20,10 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
-public class TileEntityProgressionDoorRenderer extends TileEntitySpecialRenderer<ProgressionDoor.ProgressionDoorTileEntity> {
+public class TileEntityProgressionDoorRenderer extends TileEntitySpecialRenderer<ProgressionDoorTileEntity> {
 
 	public static void init() {
-		ClientRegistry.bindTileEntitySpecialRenderer(ProgressionDoor.ProgressionDoorTileEntity.class,
+		ClientRegistry.bindTileEntitySpecialRenderer(ProgressionDoorTileEntity.class,
 				new TileEntityProgressionDoorRenderer());
 	}
 	
@@ -35,7 +35,7 @@ public class TileEntityProgressionDoorRenderer extends TileEntitySpecialRenderer
 	}
 	
 	@Override
-	public void render(ProgressionDoor.ProgressionDoorTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+	public void render(ProgressionDoorTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
 		
 		double time = (double)te.getWorld().getTotalWorldTime() + partialTicks;
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().player);

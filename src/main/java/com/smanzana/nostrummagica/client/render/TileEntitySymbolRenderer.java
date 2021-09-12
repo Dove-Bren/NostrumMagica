@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.render;
 
 import org.lwjgl.opengl.GL11;
 
-import com.smanzana.nostrummagica.blocks.SymbolBlock.SymbolTileEntity;
+import com.smanzana.nostrummagica.blocks.tiles.SymbolTileEntity;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 

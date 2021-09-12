@@ -1,15 +1,18 @@
 package com.smanzana.nostrummagica.rituals;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.AltarBlock;
-import com.smanzana.nostrummagica.blocks.AltarBlock.AltarTileEntity;
 import com.smanzana.nostrummagica.blocks.Candle;
-import com.smanzana.nostrummagica.blocks.Candle.CandleTileEntity;
 import com.smanzana.nostrummagica.blocks.ChalkBlock;
+import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
+import com.smanzana.nostrummagica.blocks.tiles.CandleTileEntity;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenIndexed;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
@@ -72,6 +75,10 @@ public class RitualRecipe implements InfoScreenIndexed {
 			ItemStack center, 
 			IRitualRequirement requirement,
 			IRitualOutcome outcome) {
+		if (center == null || center.isEmpty()) {
+			throw new RuntimeException("Center item of tier 2 ritual cannot be empty!");
+		}
+		
 		RitualRecipe recipe = new RitualRecipe(titleKey, element, 1);
 		
 		for (int i = 0; i < 4 && i < reagents.length; i++) {
@@ -94,6 +101,10 @@ public class RitualRecipe implements InfoScreenIndexed {
 			ItemStack extras[],
 			IRitualRequirement requirement,
 			IRitualOutcome outcome) {
+		if (center == null || center.isEmpty()) {
+			throw new RuntimeException("Center item of tier 3 ritual cannot be empty!");
+		}
+		
 		RitualRecipe recipe = new RitualRecipe(titleKey, element, 2);
 		
 		for (int i = 0; i < 4 && i < reagents.length; i++) {
@@ -102,6 +113,9 @@ public class RitualRecipe implements InfoScreenIndexed {
 		recipe.centerItem = center;
 		
 		for (int i = 0; i < 4 && i < extras.length; i++) {
+			if (extras[i] == null) {
+				throw new RuntimeException(String.format("Extra item %d of tier 3 ritual cannot be null!", i));
+			}
 			recipe.extraItems[i] = extras[i];
 		}
 
@@ -120,8 +134,10 @@ public class RitualRecipe implements InfoScreenIndexed {
 			this.types = new ReagentType[1];
 		else
 			this.types = new ReagentType[4];
-		if (tier == 2)
+		if (tier == 2) {
 			this.extraItems = new ItemStack[4];
+			Arrays.fill(extraItems, ItemStack.EMPTY);
+		}
 	}
 	
 	public boolean matches(EntityPlayer player, World world, BlockPos center, EMagicElement element) {
@@ -165,8 +181,8 @@ public class RitualRecipe implements InfoScreenIndexed {
 		} else {
 			// Check altars
 			AltarTileEntity altar = (AltarTileEntity) centerTE;
-			ItemStack stack = altar.getItem();
-			if (stack == null)
+			@Nonnull ItemStack stack = altar.getItem();
+			if (stack.isEmpty())
 				return false;
 			if (!OreDictionary.itemMatches(centerItem, stack, false)) {
 				return false;
@@ -182,13 +198,13 @@ public class RitualRecipe implements InfoScreenIndexed {
 						if (te == null || !(te instanceof AltarTileEntity))
 							return false;
 						altar = (AltarTileEntity) te;
-						if (altar.getItem() != null)
+						if (!altar.getItem().isEmpty())
 							items.add(altar.getItem());
 					}
 				}
 				
 				for (ItemStack req : extraItems) {
-					if (req == null)
+					if (req.isEmpty())
 						continue;
 					
 					Iterator<ItemStack> it = items.iterator();
@@ -260,8 +276,8 @@ public class RitualRecipe implements InfoScreenIndexed {
 		if (world.isRemote)
 			return;
 		
-		ItemStack centerItem = null;
-		ItemStack otherItems[] = null;
+		@Nonnull ItemStack centerItem = null;
+		@Nonnull ItemStack otherItems[] = null;
 		
 		// Do cleanup of altars and candles, etc
 		if (tier == 0) {
@@ -284,6 +300,7 @@ public class RitualRecipe implements InfoScreenIndexed {
 			
 			if (tier == 2) {
 				otherItems = new ItemStack[4];
+				Arrays.fill(otherItems, ItemStack.EMPTY);
 				int i = 0;
 				for (int x = -4; x <= 4; x+=4) {
 					int diff = 4 - Math.abs(x);
@@ -292,7 +309,7 @@ public class RitualRecipe implements InfoScreenIndexed {
 						if (te == null || !(te instanceof AltarTileEntity))
 							continue; // oh well, too late now!
 						otherItems[i++] = ((AltarTileEntity) te).getItem();
-						((AltarTileEntity) te).setItem(null);
+						((AltarTileEntity) te).setItem(ItemStack.EMPTY);
 					}
 				}
 			}

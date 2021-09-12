@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.network.messages;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.SpellTable.SpellTableEntity;
+import com.smanzana.nostrummagica.blocks.tiles.SpellTableEntity;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;

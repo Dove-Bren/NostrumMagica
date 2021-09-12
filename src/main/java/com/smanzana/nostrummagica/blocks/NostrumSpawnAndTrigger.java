@@ -1,9 +1,9 @@
 package com.smanzana.nostrummagica.blocks;
 
 import java.util.Random;
-import java.util.UUID;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.tiles.SpawnerTriggerTileEntity;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.NostrumSkillItem;
 import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
@@ -11,20 +11,16 @@ import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemEnderEye;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -45,10 +41,6 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 		return instance;
 	}
 	
-	public static void init() {
-		GameRegistry.registerTileEntity(SpawnerTriggerTE.class, new ResourceLocation(NostrumMagica.MODID, "nostrum_mob_spawner_trigger_te"));
-	}
-	
 	public NostrumSpawnAndTrigger() {
 		super();
 		this.setUnlocalizedName(ID);
@@ -60,9 +52,9 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 	public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
 		if (NostrumMagica.proxy.getPlayer().isCreative()) {
 			TileEntity te = blockAccess.getTileEntity(pos);
-			if (te != null && te instanceof SpawnerTriggerTE) {
-				SpawnerTriggerTE ent = ((SpawnerTriggerTE) te);
-				return (ent.entity == null && ent.unlinkedEntID == null);
+			if (te != null && te instanceof SpawnerTriggerTileEntity) {
+				SpawnerTriggerTileEntity ent = ((SpawnerTriggerTileEntity) te);
+				return (ent.getSpawnedEntity() == null && ent.getUnlinkedEntID() == null);
 			}
 		}
 		return false;
@@ -76,7 +68,7 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 	
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		return new SpawnerTriggerTE();
+		return new SpawnerTriggerTileEntity();
 	}
 	
 	@Override
@@ -90,11 +82,11 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 		}
 		
 		TileEntity te = worldIn.getTileEntity(pos);
-		if (te == null || !(te instanceof SpawnerTriggerTE)) {
+		if (te == null || !(te instanceof SpawnerTriggerTileEntity)) {
 			return true;
 		}
 		
-		SpawnerTriggerTE ent = (SpawnerTriggerTE) te;
+		SpawnerTriggerTileEntity ent = (SpawnerTriggerTileEntity) te;
 		
 		if (playerIn.isCreative()) {
 			ItemStack heldItem = playerIn.getHeldItem(hand);
@@ -153,112 +145,5 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 		}
 		
 		return false;
-	}
-	
-	public static class SpawnerTriggerTE extends SingleSpawnerTE {
-		
-		private static final String NBT_ENTITY_ID = "entity_id";
-		private static final String NBT_TRIGGER_OFFSET = "trigger_offset";
-		
-		protected EntityLivingBase entity;
-		protected BlockPos triggerOffset;
-		
-		private UUID unlinkedEntID;
-		
-		public SpawnerTriggerTE() {
-			super();
-		}
-		
-		public void setTriggerOffset(BlockPos offset) {
-			triggerOffset = offset;
-			this.markDirty();
-		}
-		
-		public void setTriggerPosition(int x, int y, int z) {
-			this.setTriggerOffset(new BlockPos(x - pos.getX(), y - pos.getY(), z - pos.getZ()));
-		}
-		
-		public BlockPos getTriggerOffset() {
-			return triggerOffset;
-		}
-		
-		protected void trigger(IBlockState state) {
-			
-			if (triggerOffset != null) {
-				state = world.getBlockState(pos.add(this.triggerOffset));
-				if (state.getBlock() instanceof ITriggeredBlock) {
-					((ITriggeredBlock) state.getBlock()).trigger(world, pos.add(triggerOffset), state, pos);
-				}
-				triggerOffset = null;
-			}
-		}
-		
-		@Override
-		protected void majorTick(IBlockState state) {
-			if (unlinkedEntID != null) {
-				// Need to find our entity!
-				for (EntityLivingBase ent : world.getEntities(EntityLivingBase.class, (ent) -> { return ent.getPersistentID().equals(unlinkedEntID);})) {
-					this.entity = ent;
-					unlinkedEntID = null;
-					break;
-				}
-				
-				if (entity == null && ticksExisted > 20 * 15) {
-					// Give up
-					unlinkedEntID = null;
-					this.trigger(state);
-					world.setBlockToAir(pos);
-				}
-			} else if (entity == null) {
-				for (EntityPlayer player : world.playerEntities) {
-					if (!player.isSpectator() && !player.isCreative() && player.getDistanceSq(pos) < SPAWN_DIST_SQ) {
-						entity = instance().spawn(world, pos, state, NostrumMagica.rand);
-						world.notifyBlockUpdate(pos, state, state, 2);
-						world.addBlockEvent(pos, state.getBlock(), 9, 0);
-						this.markDirty();
-						return;
-					}
-				}
-			} else {
-				if (entity.isDead) {
-					this.trigger(state);
-					world.setBlockToAir(pos);
-				}
-			}
-		}
-		
-		@Override
-		public void update() {
-			super.update();
-		}
-		
-		@Override
-		public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-			nbt = super.writeToNBT(nbt);
-			
-			if (triggerOffset != null) {
-				nbt.setLong(NBT_TRIGGER_OFFSET, triggerOffset.toLong());
-			}
-			if (entity != null) {
-				nbt.setUniqueId(NBT_ENTITY_ID, entity.getPersistentID());
-			} else if (this.unlinkedEntID != null) {
-				nbt.setUniqueId(NBT_ENTITY_ID, this.unlinkedEntID);
-			}
-			
-			return nbt;
-		}
-		
-		@Override
-		public void readFromNBT(NBTTagCompound nbt) {
-			super.readFromNBT(nbt);
-			
-			if (nbt.hasUniqueId(NBT_ENTITY_ID)) {
-				this.unlinkedEntID = nbt.getUniqueId(NBT_ENTITY_ID);
-			}
-			
-			if (nbt.hasKey(NBT_TRIGGER_OFFSET)) {
-				this.triggerOffset = BlockPos.fromLong(nbt.getLong(NBT_TRIGGER_OFFSET));
-			}
-		}
 	}
 }

@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.function.Function;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.apache.logging.log4j.LogManager;
@@ -232,6 +233,12 @@ public class NostrumMagica
     
     @EventHandler
     public void init(FMLInitializationEvent event) {
+    	// Register rituals, quests, etc. after item and block init
+    	registerDefaultRituals();
+    	registerDefaultQuests();
+    	registerDefaultTrials();
+    	registerDefaultResearch();
+    	
         proxy.init();
         aetheria.init();
         baubles.init();
@@ -283,11 +290,6 @@ public class NostrumMagica
     	DungeonRoomRegistry.instance().loadRegistryFromDisk();
     	
     	RitualRegistry.instance();
-    	
-    	registerDefaultRituals();
-    	registerDefaultQuests();
-    	registerDefaultTrials();
-    	registerDefaultResearch();
 
     	NostrumChunkLoader.instance();
     	
@@ -344,26 +346,28 @@ public class NostrumMagica
     	return e.getCapability(AttributeProvider.CAPABILITY, null);
     }
     
-    private static int potionID = 65;
+    //private static int potionID = 65;
 	
     public static int registerPotion(Potion potion, ResourceLocation loc) {
-    	while (Potion.getPotionById(potionID) != null)
-    		potionID++;
-    	Potion.REGISTRY.register(potionID, loc, potion);
-    	return potionID;
+    	// TODO this doesn't do anything now, right?
+    	return 0;
+//    	while (Potion.getPotionById(potionID) != null)
+//    		potionID++;
+//    	Potion.REGISTRY.register(potionID, loc, potion);
+//    	return potionID;
     }
     
     public static ItemStack findTome(EntityPlayer entity, int tomeID) {
     	// We look in mainhand first, then offhand, then just down
     	// hotbar.
     	for (ItemStack item : entity.inventory.mainInventory) {
-    		if (item != null && item.getItem() instanceof SpellTome)
+    		if (!item.isEmpty() && item.getItem() instanceof SpellTome)
     			if (SpellTome.getTomeID(item) == tomeID)
     				return item;
     	}
     	
     	for (ItemStack item : entity.inventory.offHandInventory) {
-    		if (item != null && item.getItem() instanceof SpellTome)
+    		if (!item.isEmpty() && item.getItem() instanceof SpellTome)
     			if (SpellTome.getTomeID(item) == tomeID)
     				return item;
     	}
@@ -371,10 +375,10 @@ public class NostrumMagica
     	return null;
     }
     
-    public static ItemStack getCurrentTome(EntityPlayer entity) {
+    public static @Nonnull ItemStack getCurrentTome(EntityPlayer entity) {
     	// We look in mainhand first, then offhand, then just down
     	// hotbar.
-    	ItemStack tome = null;
+    	ItemStack tome = ItemStack.EMPTY;
     	
     	if (entity.getHeldItemMainhand() != null &&
     			entity.getHeldItemMainhand().getItem() instanceof SpellTome) {
@@ -386,7 +390,7 @@ public class NostrumMagica
     		// hotbar is items 0-8
     		int count = 0;
     		for (ItemStack stack : entity.inventory.mainInventory) {
-        		if (stack != null && stack.getItem() instanceof SpellTome) {
+        		if (!stack.isEmpty() && stack.getItem() instanceof SpellTome) {
         			tome = stack;
         			break;
         		}
@@ -411,23 +415,23 @@ public class NostrumMagica
     public static int getReagentCount(EntityPlayer player, ReagentType type) {
     	int count = 0;
     	for (ItemStack item : player.inventory.mainInventory) {
-    		if (item != null && item.getItem() instanceof ReagentBag) {
+    		if (!item.isEmpty() && item.getItem() instanceof ReagentBag) {
     			count += ReagentBag.getReagentCount(item, type);
     		}
     	}
     	for (ItemStack item : player.inventory.offHandInventory) {
-    		if (item != null && item.getItem() instanceof ReagentBag) {
+    		if (!item.isEmpty() && item.getItem() instanceof ReagentBag) {
     			count += ReagentBag.getReagentCount(item, type);
     		}
     	}
     	for (ItemStack item : player.inventory.mainInventory) {
-    		if (item != null && item.getItem() instanceof ReagentItem
+    		if (!item.isEmpty() && item.getItem() instanceof ReagentItem
     				&& ReagentItem.findType(item) == type) {
     			count += item.getCount();
     		}
     	}
     	for (ItemStack item : player.inventory.offHandInventory) {
-    		if (item != null && item.getItem() instanceof ReagentBag
+    		if (!item.isEmpty() && item.getItem() instanceof ReagentBag
     				&& ReagentItem.findType(item) == type) {
     			count += item.getCount();
     		}
@@ -442,7 +446,7 @@ public class NostrumMagica
     	
 		for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
 			ItemStack item = player.inventory.getStackInSlot(i);
-			if (item == null)
+			if (item.isEmpty())
 				continue;
 			
 			if (item.getItem() instanceof ReagentBag) {
@@ -476,7 +480,7 @@ public class NostrumMagica
     	// We just return the spells from the curernt tome.
     	ItemStack tome = getCurrentTome(entity);
     	
-    	if (tome == null)
+    	if (tome.isEmpty())
     		return null;
     	
     	return SpellTome.getSpells(tome);
@@ -613,7 +617,7 @@ public class NostrumMagica
 					null,
 					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.GINSENG, ReagentType.GINSENG},
 					NostrumResourceItem.getItem(ResourceType.TOKEN, 1),
-					new ItemStack[] {new ItemStack(Items.GOLD_NUGGET), trigger.getCraftItem(), null, new ItemStack(Items.GOLD_NUGGET, 1)},
+					new ItemStack[] {new ItemStack(Items.GOLD_NUGGET), trigger.getCraftItem(), ItemStack.EMPTY, new ItemStack(Items.GOLD_NUGGET, 1)},
 					IRitualRequirement.AND(
 							new RRequirementTriggerMastery(trigger),
 							new RRequirementResearch("spellrunes")
@@ -793,7 +797,7 @@ public class NostrumMagica
 					EMagicElement.LIGHTNING,
 					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANDRAKE_ROOT, ReagentType.SPIDER_SILK},
 					crystal,
-					new ItemStack[] {InfusedGemItem.instance().getGem(EMagicElement.FIRE, 1), null, null, InfusedGemItem.instance().getGem(EMagicElement.WIND, 1)},
+					new ItemStack[] {InfusedGemItem.instance().getGem(EMagicElement.FIRE, 1), ItemStack.EMPTY, ItemStack.EMPTY, InfusedGemItem.instance().getGem(EMagicElement.WIND, 1)},
 					new RRequirementResearch("fierce_infusion"),
 					new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.SLAB_FIERCE, 1)))
 				);
@@ -805,7 +809,7 @@ public class NostrumMagica
 					EMagicElement.ENDER,
 					new ReagentType[] {ReagentType.CRYSTABLOOM, ReagentType.GINSENG, ReagentType.MANI_DUST, ReagentType.SKY_ASH},
 					crystal,
-					new ItemStack[] {InfusedGemItem.instance().getGem(EMagicElement.ICE, 1), null, null, InfusedGemItem.instance().getGem(EMagicElement.EARTH, 1)},
+					new ItemStack[] {InfusedGemItem.instance().getGem(EMagicElement.ICE, 1), ItemStack.EMPTY, ItemStack.EMPTY, InfusedGemItem.instance().getGem(EMagicElement.EARTH, 1)},
 					new RRequirementResearch("kind_infusion"),
 					new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.SLAB_KIND, 1)))
 				);
@@ -935,7 +939,7 @@ public class NostrumMagica
 					null,
 					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
 					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
-					new ItemStack[] {new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance()), null, new ItemStack(SpellTomePage.instance())},
+					new ItemStack[] {new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance()), ItemStack.EMPTY, new ItemStack(SpellTomePage.instance())},
 					new RRequirementResearch("spelltomes_advanced"),
 					new OutcomeCreateTome())
 				);
@@ -945,7 +949,7 @@ public class NostrumMagica
 					null,
 					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
 					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
-					new ItemStack[] {new ItemStack(SpellTomePage.instance()), null, null, new ItemStack(SpellTomePage.instance())},
+					new ItemStack[] {new ItemStack(SpellTomePage.instance()), ItemStack.EMPTY, ItemStack.EMPTY, new ItemStack(SpellTomePage.instance())},
 					new RRequirementResearch("spelltomes_advanced"),
 					new OutcomeCreateTome())
 				);
@@ -955,7 +959,7 @@ public class NostrumMagica
 					null,
 					new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST},
 					new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
-					new ItemStack[] {new ItemStack(SpellTomePage.instance()), null, null, null},
+					new ItemStack[] {new ItemStack(SpellTomePage.instance()), ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY},
 					new RRequirementResearch("spelltomes_advanced"),
 					new OutcomeCreateTome())
 				);
@@ -1233,7 +1237,7 @@ public class NostrumMagica
 				
 				final ItemStack result = new ItemStack(DragonArmor.GetArmor(slot, material));
 				final ItemStack base;
-				final @Nullable ItemStack prev = (prevMat == null ? null : new ItemStack(DragonArmor.GetArmor(slot, prevMat)));
+				final @Nonnull ItemStack prev = (prevMat == null ? ItemStack.EMPTY : new ItemStack(DragonArmor.GetArmor(slot, prevMat)));
 				
 				// Craft from horse armor
 				switch (slot) {
@@ -1258,13 +1262,13 @@ public class NostrumMagica
 								EMagicElement.PHYSICAL,
 								new ReagentType[] {ReagentType.MANDRAKE_ROOT, ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.MANI_DUST},
 								base,
-								new ItemStack[] {null, base, cost, null},
+								new ItemStack[] {ItemStack.EMPTY, base, cost, ItemStack.EMPTY},
 								new RRequirementResearch("dragon_armor"),
 								new OutcomeSpawnItem(result.copy())
 								)
 						);
 				
-				if (prev != null) {
+				if (!prev.isEmpty()) {
 					// Upgrade ritual
 					RitualRegistry.instance().addRitual(
 							RitualRecipe.createTier3("upgrade_dragonarmor_" + slot.getName() + "_" + material.name().toLowerCase(),
@@ -1272,7 +1276,7 @@ public class NostrumMagica
 									EMagicElement.PHYSICAL,
 									new ReagentType[] {ReagentType.MANDRAKE_ROOT, ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.MANI_DUST},
 									prev,
-									new ItemStack[] {null, augment, cost, null},
+									new ItemStack[] {ItemStack.EMPTY, augment, cost, ItemStack.EMPTY},
 									new RRequirementResearch("dragon_armor"),
 									new OutcomeSpawnItem(result.copy())
 									)
@@ -1287,7 +1291,7 @@ public class NostrumMagica
 						EMagicElement.PHYSICAL,
 						new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.MANI_DUST},
 						new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.WEAK, false)),
-						new ItemStack[] {new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM,  1), null, new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE)},
+						new ItemStack[] {new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM,  1), ItemStack.EMPTY, new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE)},
 						new RRequirementResearch("hookshot_medium"),
 						new OutcomeSpawnItem(new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.MEDIUM, false)))
 						)

@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.client.gui.container;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.LoreTable.LoreTableEntity;
+import com.smanzana.nostrummagica.blocks.tiles.LoreTableEntity;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 
 import net.minecraft.client.Minecraft;

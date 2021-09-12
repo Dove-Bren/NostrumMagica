@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.network.messages;
 
-import com.smanzana.nostrummagica.blocks.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;

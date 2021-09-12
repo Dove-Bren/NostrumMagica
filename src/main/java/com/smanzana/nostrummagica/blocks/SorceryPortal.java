@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.blocks;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.tiles.SorceryPortalTileEntity;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.config.ModConfig;
 
@@ -9,12 +10,8 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * Portal that takes players to and from the Sorcery dimension
@@ -31,10 +28,6 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 			instance = new SorceryPortal();
 		
 		return instance;
-	}
-	
-	public static void init() {
-		GameRegistry.registerTileEntity(SorceryPortalTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "sorcery_portal"));
 	}
 	
 	public SorceryPortal() {
@@ -99,35 +92,6 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 		}
 	}
 	
-	public static class SorceryPortalTileEntity extends NostrumPortal.NostrumPortalTileEntityBase  {
-
-		@SideOnly(Side.CLIENT)
-		@Override
-		public int getColor() {
-			EntityPlayer player = NostrumMagica.proxy.getPlayer();
-			if (NostrumPortal.getRemainingCharge(player) > 0) {
-				return 0x00FF0050;
-			}
-			return 0x00C00050;
-		}
-
-		@SideOnly(Side.CLIENT)
-		@Override
-		public float getRotationPeriod() {
-			return 6;
-		}
-
-		@SideOnly(Side.CLIENT)
-		@Override
-		public float getOpacity() {
-			EntityPlayer player = NostrumMagica.proxy.getPlayer();
-			if (NostrumPortal.getCooldownTime(player) > 0) {
-				return 0.5f;
-			}
-			return .9f;
-		}
-	}
-
 	@Override
 	protected boolean canTeleport(World worldIn, BlockPos portalPos, Entity entityIn) {
 		return entityIn instanceof EntityPlayer;

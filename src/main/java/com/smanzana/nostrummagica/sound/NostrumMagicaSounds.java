@@ -71,6 +71,7 @@ public enum NostrumMagicaSounds {
 		this.resource = new ResourceLocation(NostrumMagica.MODID, suffix);
 		this.category = category;
 		this.event = new SoundEvent(resource);
+		event.setRegistryName(resource);
 		this.volume = volume;
 	}
 	
@@ -108,15 +109,6 @@ public enum NostrumMagicaSounds {
 				volume, 0.8f + (NostrumMagica.rand.nextFloat() * 0.4f));
 	}
 	
-	public static void registerSounds() {
-		int idOffset = SoundEvent.REGISTRY.getKeys().size();
-		
-		for (NostrumMagicaSounds sound : values()) {
-			SoundEvent.REGISTRY.register(idOffset++, sound.resource, sound.event);
-		}
-		
-	}
-
 	public SoundEvent getEvent() {
 		return event;
 	}

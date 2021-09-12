@@ -20,10 +20,6 @@ public class LogicDoor extends NostrumMagicDoor implements ITriggeredBlock {
 		return instance;
 	}
 	
-	public static void init() {
-		;
-	}
-	
 	public LogicDoor() {
 		super();
 		this.setUnlocalizedName(ID);

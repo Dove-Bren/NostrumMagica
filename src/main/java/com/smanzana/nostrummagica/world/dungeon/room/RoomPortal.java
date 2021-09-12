@@ -5,9 +5,9 @@ import java.util.List;
 
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.blocks.DungeonBlock.Type;
+import com.smanzana.nostrummagica.blocks.tiles.SwitchBlockTileEntity;
 import com.smanzana.nostrummagica.blocks.SorceryPortalSpawner;
 import com.smanzana.nostrummagica.blocks.SwitchBlock;
-import com.smanzana.nostrummagica.blocks.SwitchBlock.SwitchBlockTileEntity;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.init.Blocks;
@@ -307,7 +307,7 @@ public class RoomPortal extends StaticRoom {
 			}
 			world.setBlockState(worldPos, SwitchBlock.instance().getDefaultState());
 			TileEntity te = world.getTileEntity(worldPos);
-			if (te != null && te instanceof SwitchBlock.SwitchBlockTileEntity) {
+			if (te != null && te instanceof SwitchBlockTileEntity) {
 				SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;
 				ent.setOffset(tilePos.subtract(worldPos));
 				tilePos = null;

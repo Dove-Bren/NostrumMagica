@@ -1,8 +1,12 @@
 package com.smanzana.nostrummagica.proxy;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.ActiveHopper;
@@ -41,6 +45,25 @@ import com.smanzana.nostrummagica.blocks.SymbolBlock;
 import com.smanzana.nostrummagica.blocks.TeleportRune;
 import com.smanzana.nostrummagica.blocks.TeleportationPortal;
 import com.smanzana.nostrummagica.blocks.TemporaryTeleportationPortal;
+import com.smanzana.nostrummagica.blocks.tiles.ActiveHopperTileEntity;
+import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
+import com.smanzana.nostrummagica.blocks.tiles.CandleTileEntity;
+import com.smanzana.nostrummagica.blocks.tiles.ItemDuctTileEntity;
+import com.smanzana.nostrummagica.blocks.tiles.LoreTableEntity;
+import com.smanzana.nostrummagica.blocks.tiles.ModificationTableEntity;
+import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.blocks.tiles.ObeliskPortalTileEntity;
+import com.smanzana.nostrummagica.blocks.tiles.ProgressionDoorTileEntity;
+import com.smanzana.nostrummagica.blocks.tiles.PutterBlockTileEntity;
+import com.smanzana.nostrummagica.blocks.tiles.SingleSpawnerTileEntity;
+import com.smanzana.nostrummagica.blocks.tiles.SorceryPortalTileEntity;
+import com.smanzana.nostrummagica.blocks.tiles.SpawnerTriggerTileEntity;
+import com.smanzana.nostrummagica.blocks.tiles.SpellTableEntity;
+import com.smanzana.nostrummagica.blocks.tiles.SwitchBlockTileEntity;
+import com.smanzana.nostrummagica.blocks.tiles.SymbolTileEntity;
+import com.smanzana.nostrummagica.blocks.tiles.TeleportRuneTileEntity;
+import com.smanzana.nostrummagica.blocks.tiles.TeleportationPortalTileEntity;
+import com.smanzana.nostrummagica.blocks.tiles.TemporaryPortalTileEntity;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagic;
@@ -166,14 +189,20 @@ import com.smanzana.nostrummagica.world.NostrumDungeonGenerator;
 import com.smanzana.nostrummagica.world.NostrumFlowerGenerator;
 import com.smanzana.nostrummagica.world.NostrumOreGenerator;
 
+import net.minecraft.block.Block;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EntityTracker;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemMultiTexture;
+import net.minecraft.potion.Potion;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
@@ -181,229 +210,40 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.registry.EntityRegistry;
+import net.minecraftforge.fml.common.registry.EntityEntry;
+import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.registries.IForgeRegistry;
 
 public class CommonProxy {
 	
 	public CapabilityHandler capabilityHandler;
 	
 	public void preinit() {
-		CapabilityManager.INSTANCE.register(INostrumMagic.class, new NostrumMagicStorage(), NostrumMagic.class);
+		MinecraftForge.EVENT_BUS.register(this);
+		
+		CapabilityManager.INSTANCE.register(INostrumMagic.class, new NostrumMagicStorage(), NostrumMagic::new);
 		capabilityHandler = new CapabilityHandler();
 		NetworkHandler.getInstance();
-		NostrumMagicaSounds.registerSounds();
 		
 		PetInfo.PetAction.Init();
 		
     	registerShapes();
     	registerTriggers();
     	
-    	int entityID = 0;
-    	EntityRegistry.registerModEntity(EntitySpellProjectile.class, "spell_projectile",
-    			entityID++,
-    			NostrumMagica.instance,
-    			64,
-    			1,
-    			true
-    			);
-    	EntityRegistry.registerModEntity(EntityGolemPhysical.class, "physical_golem",
-    			entityID++,
-    			NostrumMagica.instance,
-    			64,
-    			1,
-    			false
-    			);
-    	EntityRegistry.registerModEntity(EntityGolemLightning.class, "lightning_golem",
-    			entityID++,
-    			NostrumMagica.instance,
-    			64,
-    			1,
-    			false
-    			);
-    	EntityRegistry.registerModEntity(EntityGolemFire.class, "fire_golem",
-    			entityID++,
-    			NostrumMagica.instance,
-    			64,
-    			1,
-    			false
-    			);
-    	EntityRegistry.registerModEntity(EntityGolemEarth.class, "earth_golem",
-    			entityID++,
-    			NostrumMagica.instance,
-    			64,
-    			1,
-    			false
-    			);
-    	EntityRegistry.registerModEntity(EntityGolemIce.class, "ice_golem",
-    			entityID++,
-    			NostrumMagica.instance,
-    			64,
-    			1,
-    			false
-    			);
-    	EntityRegistry.registerModEntity(EntityGolemWind.class, "wind_golem",
-    			entityID++,
-    			NostrumMagica.instance,
-    			64,
-    			1,
-    			false
-    			);
-    	EntityRegistry.registerModEntity(EntityGolemEnder.class, "ender_golem",
-    			entityID++,
-    			NostrumMagica.instance,
-    			64,
-    			1,
-    			false
-    			);
-    	EntityRegistry.registerModEntity(EntityKoid.class, "entity_koid",
-    			entityID++,
-    			NostrumMagica.instance,
-    			64,
-    			1,
-    			false);
-    	EntityRegistry.registerModEntity(EntityDragonRed.class, "entity_dragon_red", 
-    			entityID++,
-    			NostrumMagica.instance,
-    			128,
-    			1,
-    			false);
-    	EntityRegistry.registerModEntity(EntityTameDragonRed.class, "entity_tame_dragon_red", 
-    			entityID++,
-    			NostrumMagica.instance,
-    			128,
-    			1,
-    			false);
-    	EntityRegistry.registerModEntity(EntityShadowDragonRed.class, "entity_shadow_dragon_red", 
-    			entityID++,
-    			NostrumMagica.instance,
-    			128,
-    			1,
-    			false);
-    	EntityRegistry.registerModEntity(EntitySprite.class, "entity_sprite", 
-    			entityID++,
-    			NostrumMagica.instance,
-    			64,
-    			1,
-    			false);
-    	EntityRegistry.registerModEntity(EntityDragonEgg.class, "entity_dragon_egg",
-    			entityID++,
-    			NostrumMagica.instance,
-    			64,
-    			1,
-    			false);
-    	EntityRegistry.registerModEntity(EntityChakramSpellSaucer.class, "entity_internal_spellsaucer_chakram",
-    			entityID++,
-    			NostrumMagica.instance,
-    			64,
-    			1,
-    			true);
-    	EntityRegistry.registerModEntity(EntityCyclerSpellSaucer.class, "entity_internal_spellsaucer_cycler",
-    			entityID++,
-    			NostrumMagica.instance,
-    			64,
-    			1,
-    			true);
-    	EntityRegistry.registerModEntity(EntitySwitchTrigger.class, "entity_switch_trigger",
-    			entityID++,
-    			NostrumMagica.instance,
-    			128,
-    			1,
-    			false);
-    	EntityRegistry.registerModEntity(NostrumTameLightning.class, "nostrum_lightning",
-    			entityID++,
-    			NostrumMagica.instance,
-    			128,
-    			1,
-    			false);
-    	EntityRegistry.registerModEntity(EntityHookShot.class, "nostrum_hookshot",
-    			entityID++,
-    			NostrumMagica.instance,
-    			128,
-    			1,
-    			true);
-    	EntityRegistry.registerModEntity(EntityWisp.class, "entity_wisp", 
-    			entityID++,
-    			NostrumMagica.instance,
-    			64,
-    			1,
-    			false);
-    	EntityRegistry.registerModEntity(EntityAreaEffect.class, "entity_effect_cloud", 
-    			entityID++,
-    			NostrumMagica.instance,
-    			64,
-    			1,
-    			false);
-    	EntityRegistry.registerModEntity(EntitySpellBullet.class, "spell_bullet",
-    			entityID++,
-    			NostrumMagica.instance,
-    			64,
-    			1,
-    			true
-    			);
-    	EntityRegistry.registerModEntity(EntityLux.class, "entity_lux", 
-    			entityID++,
-    			NostrumMagica.instance,
-    			64,
-    			1,
-    			false);
-    	
-    	EntityRegistry.addSpawn(EntityKoid.class, 20, 1, 1, EnumCreatureType.MONSTER, 
-    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.MAGICAL));
-    	EntityRegistry.addSpawn(EntityKoid.class, 20, 1, 1, EnumCreatureType.MONSTER, 
-    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.FOREST));
-    	EntityRegistry.addSpawn(EntityKoid.class, 20, 1, 1, EnumCreatureType.MONSTER, 
-    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.SNOWY));
-    	EntityRegistry.addSpawn(EntityKoid.class, 20, 1, 1, EnumCreatureType.MONSTER, 
-    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.NETHER));
-    	EntityRegistry.addSpawn(EntityKoid.class, 20, 1, 1, EnumCreatureType.MONSTER, 
-    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.SPOOKY));
-    	EntityRegistry.addSpawn(EntitySprite.class, 15, 1, 3, EnumCreatureType.MONSTER,
-    			ForgeRegistries.BIOMES.getValues().stream().filter( (biome) -> {
-    				return !BiomeDictionary.isBiomeOfType(biome, BiomeDictionary.Type.END)
-    						&& BiomeDictionary.isBiomeOfType(biome, BiomeDictionary.Type.NETHER);
-    			}).collect(Collectors.toList()).toArray(new Biome[0]));
-    	EntityRegistry.addSpawn(EntityWisp.class, 1, 1, 2, EnumCreatureType.AMBIENT, 
-    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.MAGICAL));
-    	EntityRegistry.addSpawn(EntityWisp.class, 1, 1, 2, EnumCreatureType.AMBIENT, 
-    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.FOREST));
-    	EntityRegistry.addSpawn(EntityWisp.class, 1, 1, 2, EnumCreatureType.AMBIENT, 
-    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.SNOWY));
-    	EntityRegistry.addSpawn(EntityWisp.class, 13, 1, 2, EnumCreatureType.MONSTER, 
-    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.NETHER));
-    	EntityRegistry.addSpawn(EntityWisp.class, 1, 1, 2, EnumCreatureType.AMBIENT, 
-    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.SPOOKY));
-
-    	EntityRegistry.addSpawn(EntityLux.class, 6, 1, 3, EnumCreatureType.CREATURE, 
-    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.MAGICAL));
-    	EntityRegistry.addSpawn(EntityLux.class, 6, 1, 2, EnumCreatureType.CREATURE, 
-    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.FOREST));
-    	EntityRegistry.addSpawn(EntityLux.class, 4, 1, 2, EnumCreatureType.CREATURE, 
-    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.JUNGLE));
-
-    	EntityRegistry.addSpawn(EntityShadowDragonRed.class, 15, 1, 2, EnumCreatureType.MONSTER, 
-    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.NETHER));
-    	EntityRegistry.addSpawn(EntityTameDragonRed.class, 2, 1, 1, EnumCreatureType.MONSTER, 
-    			BiomeDictionary.getBiomesForType(BiomeDictionary.Type.NETHER));
-
-    	registerItems();
-    	registerBlocks();
-    	
     	EntityTameDragonRed.init();
 	}
 	
 	public void init() {
-    	registerPotions();
-    	
     	// Moved here because this loads NostrumDungeonGenerator which needs to be after DungeonRoomRegistry is initted
     	// BUT we can't just move that to before we register blocks or all the sudden all the blueprints are lying
     	ShrineSeekingGem.init();
-    	
-    	GameRegistry.register(EnchantmentManaRecovery.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, EnchantmentManaRecovery.ID));
     	
     	GameRegistry.registerWorldGenerator(new NostrumOreGenerator(), 0);
     	GameRegistry.registerWorldGenerator(new NostrumFlowerGenerator(), 0);
@@ -448,46 +288,54 @@ public class CommonProxy {
     	SpellTrigger.register(SeekingBulletTrigger.instance());
     }
     
-    private void registerPotions() {
-    	RootedPotion.instance();
-    	MagicResistPotion.instance();
-    	PhysicalShieldPotion.instance();
-    	MagicShieldPotion.instance();
-    	FrostbitePotion.instance();
-    	MagicBoostPotion.instance();
-    	MagicBuffPotion.instance();
-    	FamiliarPotion.instance();
-    	LightningChargePotion.instance();
-    	LightningAttackPotion.instance();
+    @SubscribeEvent
+    private void registerPotions(RegistryEvent.Register<Potion> event) {
+    	final IForgeRegistry<Potion> registry = event.getRegistry();
+    	
+    	registry.register(RootedPotion.instance());
+    	registry.register(MagicResistPotion.instance());
+    	registry.register(PhysicalShieldPotion.instance());
+    	registry.register(MagicShieldPotion.instance());
+    	registry.register(FrostbitePotion.instance());
+    	registry.register(MagicBoostPotion.instance());
+    	registry.register(MagicBuffPotion.instance());
+    	registry.register(FamiliarPotion.instance());
+    	registry.register(LightningChargePotion.instance());
+    	registry.register(LightningAttackPotion.instance());
     }
     
-    private void registerItems() {
+    private List<Item> blockItemsToRegister = new ArrayList<>();
+    
+    @SubscribeEvent
+    private void registerItems(RegistryEvent.Register<Item> event) {
+    	final IForgeRegistry<Item> registry = event.getRegistry();
+    	
     	NostrumGuide.instance().setRegistryName(NostrumMagica.MODID, NostrumGuide.id);
-    	GameRegistry.register(NostrumGuide.instance());
+    	registry.register(NostrumGuide.instance());
     	NostrumGuide.init();
     	
     	SpellcraftGuide.instance().setRegistryName(NostrumMagica.MODID, SpellcraftGuide.id);
-    	GameRegistry.register(SpellcraftGuide.instance());
+    	registry.register(SpellcraftGuide.instance());
     	SpellcraftGuide.init();
     	
     	SpellTome.instance().setRegistryName(NostrumMagica.MODID, SpellTome.id);
-    	GameRegistry.register(SpellTome.instance());
+    	registry.register(SpellTome.instance());
     	SpellPlate.instance().setRegistryName(NostrumMagica.MODID, SpellPlate.id);
-    	GameRegistry.register(SpellPlate.instance());
+    	registry.register(SpellPlate.instance());
     	BlankScroll.instance().setRegistryName(NostrumMagica.MODID, BlankScroll.id);
-    	GameRegistry.register(BlankScroll.instance());
+    	registry.register(BlankScroll.instance());
     	BlankScroll.init();
     	
     	SpellScroll.instance().setRegistryName(NostrumMagica.MODID, SpellScroll.id);
-    	GameRegistry.register(SpellScroll.instance());
+    	registry.register(SpellScroll.instance());
     	SpellScroll.init();
     	
     	SpellTableItem.instance().setRegistryName(NostrumMagica.MODID, SpellTableItem.ID);
-    	GameRegistry.register(SpellTableItem.instance());
+    	registry.register(SpellTableItem.instance());
     	SpellTableItem.init();
     	
     	MirrorItem.instance().setRegistryName(NostrumMagica.MODID, MirrorItem.ID);
-    	GameRegistry.register(MirrorItem.instance());
+    	registry.register(MirrorItem.instance());
     	MirrorItem.init();
     	
     	MagicSwordBase.init();
@@ -497,324 +345,407 @@ public class CommonProxy {
     	DragonArmor.registerArmors();
     	
     	MirrorShield.instance().setRegistryName(NostrumMagica.MODID, MirrorShield.id);
-    	GameRegistry.register(MirrorShield.instance());
+    	registry.register(MirrorShield.instance());
     	
     	MirrorShieldImproved.instance().setRegistryName(NostrumMagica.MODID, MirrorShieldImproved.id);
-    	GameRegistry.register(MirrorShieldImproved.instance());
+    	registry.register(MirrorShieldImproved.instance());
     	
     	ReagentItem.instance().setRegistryName(NostrumMagica.MODID, ReagentItem.ID);
-    	GameRegistry.register(ReagentItem.instance());
+    	registry.register(ReagentItem.instance());
     	ReagentItem.init();
     	InfusedGemItem.instance().setRegistryName(NostrumMagica.MODID, InfusedGemItem.ID);
-    	GameRegistry.register(InfusedGemItem.instance());
+    	registry.register(InfusedGemItem.instance());
     	InfusedGemItem.init();
     	SpellRune.instance().setRegistryName(NostrumMagica.MODID, SpellRune.ID);
-    	GameRegistry.register(SpellRune.instance());
+    	registry.register(SpellRune.instance());
     	SpellRune.init();
     	
     	NostrumResourceItem.instance().setRegistryName(NostrumMagica.MODID, NostrumResourceItem.ID);
-    	GameRegistry.register(NostrumResourceItem.instance());
+    	registry.register(NostrumResourceItem.instance());
     	NostrumResourceItem.init();
     	
     	ReagentBag.instance().setRegistryName(NostrumMagica.MODID, ReagentBag.id);
-    	GameRegistry.register(ReagentBag.instance());
+    	registry.register(ReagentBag.instance());
     	ReagentBag.init();
     	
     	SeekerIdol.instance().setRegistryName(NostrumMagica.MODID, SeekerIdol.id);
-    	GameRegistry.register(SeekerIdol.instance());
+    	registry.register(SeekerIdol.instance());
     	SeekerIdol.init();
     	
     	ShrineSeekingGem.instance().setRegistryName(NostrumMagica.MODID, ShrineSeekingGem.id);
-    	GameRegistry.register(ShrineSeekingGem.instance());
+    	registry.register(ShrineSeekingGem.instance());
     	
     	ChalkItem.instance().setRegistryName(NostrumMagica.MODID, ChalkItem.ID);
-    	GameRegistry.register(ChalkItem.instance());
+    	registry.register(ChalkItem.instance());
     	ChalkItem.init();
     	
     	AltarItem.instance().setRegistryName(NostrumMagica.MODID, AltarItem.ID);
-    	GameRegistry.register(AltarItem.instance());
+    	registry.register(AltarItem.instance());
     	AltarItem.init();
     	
     	PositionCrystal.instance().setRegistryName(NostrumMagica.MODID, PositionCrystal.ID);
-    	GameRegistry.register(PositionCrystal.instance());
+    	registry.register(PositionCrystal.instance());
     	PositionCrystal.init();
     	
     	PositionToken.instance().setRegistryName(NostrumMagica.MODID, PositionToken.ID);
-    	GameRegistry.register(PositionToken.instance());
+    	registry.register(PositionToken.instance());
     	PositionToken.init();
     	
     	SpellTomePage.instance().setRegistryName(NostrumMagica.MODID, SpellTomePage.id);
-    	GameRegistry.register(SpellTomePage.instance());
+    	registry.register(SpellTomePage.instance());
     	SpellTomePage.init();
     	
     	EssenceItem.instance().setRegistryName(NostrumMagica.MODID, EssenceItem.ID);
-    	GameRegistry.register(EssenceItem.instance());
+    	registry.register(EssenceItem.instance());
     	EssenceItem.init();
     	
     	MageStaff.instance().setRegistryName(NostrumMagica.MODID, MageStaff.ID);
-    	GameRegistry.register(MageStaff.instance());
+    	registry.register(MageStaff.instance());
     	MageStaff.init();
     	
     	ThanoPendant.instance().setRegistryName(NostrumMagica.MODID, ThanoPendant.ID);
-    	GameRegistry.register(ThanoPendant.instance());
+    	registry.register(ThanoPendant.instance());
     	
     	ThanosStaff.instance().setRegistryName(NostrumMagica.MODID, ThanosStaff.ID);
-    	GameRegistry.register(ThanosStaff.instance());
+    	registry.register(ThanosStaff.instance());
     	ThanosStaff.init();
     	
     	MagicCharm.instance().setRegistryName(NostrumMagica.MODID, MagicCharm.ID);
-    	GameRegistry.register(MagicCharm.instance());
+    	registry.register(MagicCharm.instance());
     	
     	RuneBag.instance().setRegistryName(NostrumMagica.MODID, RuneBag.id);
-    	GameRegistry.register(RuneBag.instance());
+    	registry.register(RuneBag.instance());
     	RuneBag.init();
     	
     	DragonEggFragment.instance().setRegistryName(NostrumMagica.MODID, DragonEggFragment.id);
-    	GameRegistry.register(DragonEggFragment.instance());
+    	registry.register(DragonEggFragment.instance());
     	DragonEggFragment.init();
     	
     	DragonEgg.instance().setRegistryName(NostrumMagica.MODID, DragonEgg.ID);
-    	GameRegistry.register(DragonEgg.instance());
+    	registry.register(DragonEgg.instance());
     	DragonEgg.init();
     	
     	NostrumSkillItem.instance().setRegistryName(NostrumMagica.MODID, NostrumSkillItem.ID);
-    	GameRegistry.register(NostrumSkillItem.instance());
+    	registry.register(NostrumSkillItem.instance());
     	//NostrumSkillItem.init();
     	
     	NostrumRoseItem.instance().setRegistryName(NostrumMagica.MODID, NostrumRoseItem.ID);
-    	GameRegistry.register(NostrumRoseItem.instance());
+    	registry.register(NostrumRoseItem.instance());
     	
     	WarlockSword.instance().setRegistryName(NostrumMagica.MODID, WarlockSword.ID);
-    	GameRegistry.register(WarlockSword.instance());
+    	registry.register(WarlockSword.instance());
     	WarlockSword.init();
     	
     	HookshotItem.instance().setRegistryName(NostrumMagica.MODID, HookshotItem.ID);
-    	GameRegistry.register(HookshotItem.instance());
+    	registry.register(HookshotItem.instance());
     	HookshotItem.init();
     	
     	ReagentSeed.mandrake.setRegistryName(NostrumMagica.MODID, ReagentSeed.mandrake.getItemID());
-    	GameRegistry.register(ReagentSeed.mandrake);
+    	registry.register(ReagentSeed.mandrake);
     	ReagentSeed.ginseng.setRegistryName(NostrumMagica.MODID, ReagentSeed.ginseng.getItemID());
-    	GameRegistry.register(ReagentSeed.ginseng);
+    	registry.register(ReagentSeed.ginseng);
     	ReagentSeed.essence.setRegistryName(NostrumMagica.MODID, ReagentSeed.essence.getItemID());
-    	GameRegistry.register(ReagentSeed.essence);
-    }
-    
-    private void registerBlocks() {
-    	GameRegistry.register(MagicWall.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, MagicWall.ID));
-    	GameRegistry.register(
-    			(new ItemBlock(MagicWall.instance())).setRegistryName(MagicWall.ID)
-    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(MagicWall.ID));
-
-    	GameRegistry.register(CursedIce.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, CursedIce.ID));
-    	GameRegistry.register(
-    			(new ItemBlock(CursedIce.instance())).setRegistryName(CursedIce.ID)
-    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(CursedIce.ID));
+    	registry.register(ReagentSeed.essence);
     	
-    	GameRegistry.register(ManiOre.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, ManiOre.ID));
-    	GameRegistry.register(
-    			(new ItemBlock(ManiOre.instance())).setRegistryName(ManiOre.ID)
-    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(ManiOre.ID));
+    	MasteryOrb.instance().setRegistryName(MasteryOrb.id);
+    	registry.register(MasteryOrb.instance());
     	
-    	GameRegistry.register(MagicDirt.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, MagicDirt.ID));
-    	GameRegistry.register(
-    			(new ItemBlock(MagicDirt.instance())).setRegistryName(MagicDirt.ID)
-    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(MagicDirt.ID));
-    	MagicDirt.init();
+    	for (Item item : blockItemsToRegister) {
+    		registry.register(item);
+    	}
     	
-    	GameRegistry.register(SpellTable.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, SpellTable.ID));
-    	SpellTable.init();
-    	
-    	NostrumMagicaFlower.init();
-    	
-    	GameRegistry.register(CropMandrakeRoot.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, CropMandrakeRoot.ID));
-    	
-    	GameRegistry.register(CropGinseng.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, CropGinseng.ID));
-    	
-    	GameRegistry.register(NostrumSingleSpawner.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, NostrumSingleSpawner.ID));
-    	GameRegistry.register(
-    			(new ItemBlock(NostrumSingleSpawner.instance())).setRegistryName(NostrumSingleSpawner.ID)
-    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(NostrumSingleSpawner.ID));
-    	NostrumSingleSpawner.init();
-    	
-    	GameRegistry.register(NostrumSpawnAndTrigger.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, NostrumSpawnAndTrigger.ID));
-    	GameRegistry.register(
-    			(new ItemBlock(NostrumSpawnAndTrigger.instance())).setRegistryName(NostrumSpawnAndTrigger.ID)
-    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(NostrumSpawnAndTrigger.ID));
-    	NostrumSpawnAndTrigger.init();
-    	
-    	GameRegistry.register(DungeonBlock.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, DungeonBlock.ID));
     	String[] variants = new String[DungeonBlock.Type.values().length];
     	for (DungeonBlock.Type type : DungeonBlock.Type.values()) {
     		variants[type.ordinal()] = type.getName().toLowerCase();
     	}
-    	GameRegistry.register(
+    	registry.register(
     			(new ItemMultiTexture(DungeonBlock.instance(), DungeonBlock.instance(), variants))
     			.setRegistryName(DungeonBlock.ID)
     		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(DungeonBlock.ID));
+    }
+    
+    private void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
+    	block.setRegistryName(registryName);
+    	registry.register(block);
+    }
+    
+    private void registerBlockAndItemBlock(Block block, String registryName, @Nullable CreativeTabs tab, IForgeRegistry<Block> registry) {
+    	registerBlock(block, registryName, registry);
     	
-    	GameRegistry.register(SymbolBlock.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, SymbolBlock.ID));
-    	SymbolBlock.init();
-
-    	GameRegistry.register(ShrineBlock.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, ShrineBlock.ID));
+    	ItemBlock item = new ItemBlock(block);
+    	item.setRegistryName(registryName);
+    	item.setUnlocalizedName(registryName);
+    	item.setCreativeTab(tab == null ? NostrumMagica.creativeTab : tab);
+    	blockItemsToRegister.add(item);
+    }
+    
+    private void registerBlockAndItemBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
+    	registerBlockAndItemBlock(block, registryName, null, registry);
+    }
+    
+    @SubscribeEvent
+    private void registerBlocks(RegistryEvent.Register<Block> event) {
+    	final IForgeRegistry<Block> registry = event.getRegistry();
     	
-    	GameRegistry.register(NostrumMirrorBlock.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, NostrumMirrorBlock.ID));
+    	registerBlockAndItemBlock(MagicWall.instance(), MagicWall.ID, registry);
+    	registerBlockAndItemBlock(CursedIce.instance(), CursedIce.ID, registry);
+    	registerBlockAndItemBlock(ManiOre.instance(), ManiOre.ID, registry);
+    	registerBlockAndItemBlock(MagicDirt.instance(), MagicDirt.ID, registry);
+    	registerBlock(SpellTable.instance(), SpellTable.ID, registry);
+    	registerBlock(NostrumMagicaFlower.instance(), NostrumMagicaFlower.ID, registry);
+    	registerBlock(CropMandrakeRoot.instance(), CropMandrakeRoot.ID, registry);
+    	registerBlock(CropGinseng.instance(), CropGinseng.ID, registry);
+    	registerBlockAndItemBlock(NostrumSingleSpawner.instance(), NostrumSingleSpawner.ID, registry);
+    	registerBlockAndItemBlock(NostrumSpawnAndTrigger.instance(), NostrumSpawnAndTrigger.ID, registry);
     	
-    	GameRegistry.register(ChalkBlock.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, ChalkBlock.ID));
+    	// DungeonBlock item variants registered by hand in item register method
+    	registerBlock(DungeonBlock.instance(), DungeonBlock.ID, registry);
     	
-    	GameRegistry.register(AltarBlock.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, AltarBlock.ID));
-    	AltarBlock.init();
+    	registerBlock(SymbolBlock.instance(), SymbolBlock.ID, registry);
+    	registerBlock(ShrineBlock.instance(), ShrineBlock.ID, registry);
+    	registerBlock(NostrumMirrorBlock.instance(), NostrumMirrorBlock.ID, registry);
+    	registerBlock(ChalkBlock.instance(), ChalkBlock.ID, registry);
+    	registerBlock(AltarBlock.instance(), AltarBlock.ID, registry);
+    	registerBlockAndItemBlock(Candle.instance(), Candle.ID, registry);
+    	registerBlock(NostrumObelisk.instance(), NostrumObelisk.ID, registry);
+    	registerBlock(ObeliskPortal.instance(), ObeliskPortal.ID, registry);
+    	registerBlockAndItemBlock(EssenceOre.instance(), EssenceOre.ID, registry);
+    	registerBlockAndItemBlock(ModificationTable.instance(), ModificationTable.ID, registry);
+    	registerBlockAndItemBlock(LoreTable.instance(), LoreTable.ID, registry);
+    	registerBlockAndItemBlock(SorceryPortal.instance(), SorceryPortal.ID, registry);
+    	registerBlock(TeleportationPortal.instance(), TeleportationPortal.ID, registry);
+    	registerBlock(TemporaryTeleportationPortal.instance(), TemporaryTeleportationPortal.ID, registry);
+    	registerBlockAndItemBlock(ProgressionDoor.instance(), ProgressionDoor.ID, registry);
+    	registerBlockAndItemBlock(LogicDoor.instance(), LogicDoor.ID, registry);
+    	registerBlockAndItemBlock(SwitchBlock.instance(), SwitchBlock.ID, registry);
+    	registerBlock(SorceryPortalSpawner.instance(), SorceryPortalSpawner.ID, registry);
+    	registerBlock(ManiCrystal.instance(), ManiCrystal.ID, registry);
+    	registerBlockAndItemBlock(MimicBlock.door(), MimicBlock.ID_DOOR, registry);
+    	registerBlockAndItemBlock(MimicBlock.facade(), MimicBlock.ID_FACADE, registry);
+    	registerBlockAndItemBlock(TeleportRune.instance(), TeleportRune.ID, registry);
+    	registerBlockAndItemBlock(PutterBlock.instance(), PutterBlock.ID, registry);
+    	registerBlock(CropEssence.instance(), CropEssence.ID, registry);
+    	registerBlockAndItemBlock(ActiveHopper.instance, ActiveHopper.ID, registry);
+    	registerBlockAndItemBlock(ItemDuct.instance, ItemDuct.ID, registry);
     	
-    	GameRegistry.register(Candle.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, Candle.ID));
-    	GameRegistry.register(
-    			(new ItemBlock(Candle.instance())).setRegistryName(Candle.ID)
-    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(Candle.ID));
+    	MagicDirt.init();
     	Candle.init();
     	
-    	GameRegistry.register(NostrumObelisk.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, NostrumObelisk.ID));
-    	NostrumObelisk.init();
-    	GameRegistry.register(ObeliskPortal.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, ObeliskPortal.ID));
-    	ObeliskPortal.init();
+    	registerTileEntities();
     	
-    	GameRegistry.register(EssenceOre.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, EssenceOre.ID));
-    	GameRegistry.register(
-    			(new ItemBlock(EssenceOre.instance())).setRegistryName(EssenceOre.ID)
-    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(EssenceOre.ID));
+
     	
-    	GameRegistry.register(MasteryOrb.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, MasteryOrb.id));
-    	
-    	GameRegistry.register(ModificationTable.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, ModificationTable.ID));
-    	GameRegistry.register(
-    			(new ItemBlock(ModificationTable.instance()).setRegistryName(ModificationTable.ID)
-    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(ModificationTable.ID))
-    			);
-    	ModificationTable.init();
-    	
-    	GameRegistry.register(LoreTable.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, LoreTable.ID));
-    	GameRegistry.register(
-    			(new ItemBlock(LoreTable.instance()).setRegistryName(LoreTable.ID)
-    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(LoreTable.ID))
-    			);
-    	LoreTable.init();
-    	
-    	GameRegistry.register(SorceryPortal.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, SorceryPortal.ID));
-    	GameRegistry.register(
-    			(new ItemBlock(SorceryPortal.instance()).setRegistryName(SorceryPortal.ID)
-    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(SorceryPortal.ID))
-    			);
-    	SorceryPortal.init();
-    	
-    	GameRegistry.register(TeleportationPortal.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, TeleportationPortal.ID));
-    	TeleportationPortal.init();
-    	
-    	GameRegistry.register(TemporaryTeleportationPortal.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, TemporaryTeleportationPortal.ID));
-    	TemporaryTeleportationPortal.init();
-    	
-    	GameRegistry.register(ProgressionDoor.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, ProgressionDoor.ID));
-    	GameRegistry.register(
-    			(new ItemBlock(ProgressionDoor.instance()).setRegistryName(ProgressionDoor.ID)
-    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(ProgressionDoor.ID))
-    			);
-    	ProgressionDoor.init();
-    	
-    	GameRegistry.register(LogicDoor.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, LogicDoor.ID));
-    	GameRegistry.register(
-    			(new ItemBlock(LogicDoor.instance()).setRegistryName(LogicDoor.ID)
-    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(LogicDoor.ID))
-    			);
-    	LogicDoor.init();
-    	
-    	GameRegistry.register(SwitchBlock.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, SwitchBlock.ID));
-    	GameRegistry.register(
-    			(new ItemBlock(SwitchBlock.instance()).setRegistryName(SwitchBlock.ID)
-    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(SwitchBlock.ID))
-    			);
-    	SwitchBlock.init();
-    	
-    	GameRegistry.register(SorceryPortalSpawner.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, SorceryPortalSpawner.ID));
-    	SorceryPortalSpawner.init();
-    	
-    	GameRegistry.register(ManiCrystal.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, ManiCrystal.ID));
-    	
-    	GameRegistry.register(MimicBlock.door(),
-    			new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_DOOR));
-    	GameRegistry.register(
-    			(new ItemBlock(MimicBlock.door()).setRegistryName(MimicBlock.ID_DOOR)
-    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(MimicBlock.ID_DOOR).setHasSubtypes(true))
-    			);
-    	
-    	GameRegistry.register(MimicBlock.facade(),
-    			new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_FACADE));
-    	GameRegistry.register(
-    			(new ItemBlock(MimicBlock.facade()).setRegistryName(MimicBlock.ID_FACADE)
-    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(MimicBlock.ID_FACADE).setHasSubtypes(true))
-    			);
-    	
-    	GameRegistry.register(TeleportRune.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, TeleportRune.ID));
-    	GameRegistry.register(
-    			(new ItemBlock(TeleportRune.instance()).setRegistryName(TeleportRune.ID)
-    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(TeleportRune.ID))
-    			);
-    	TeleportRune.init();
-    	
-    	GameRegistry.register(PutterBlock.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, PutterBlock.ID));
-    	GameRegistry.register(
-    			(new ItemBlock(PutterBlock.instance()).setRegistryName(PutterBlock.ID)
-    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(PutterBlock.ID))
-    			);
-    	PutterBlock.init();
-    	
-    	GameRegistry.register(CropEssence.instance(),
-    			new ResourceLocation(NostrumMagica.MODID, CropEssence.ID));
-    	//CropEssence.init();
-    	
-    	GameRegistry.register(ActiveHopper.instance,
-    			new ResourceLocation(NostrumMagica.MODID, ActiveHopper.ID));
-    	GameRegistry.register(
-    			(new ItemBlock(ActiveHopper.instance).setRegistryName(ActiveHopper.ID)
-    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(ActiveHopper.ID))
-    			);
-    	ActiveHopper.init();
-    	
-    	GameRegistry.register(ItemDuct.instance,
-    			new ResourceLocation(NostrumMagica.MODID, ItemDuct.ID));
-    	GameRegistry.register(
-    			(new ItemBlock(ItemDuct.instance).setRegistryName(ItemDuct.ID)
-    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(ItemDuct.ID))
-    			);
-    	ItemDuct.init();
+    	// These ItemBlocks were setting setHasSubtypes. I think it's useless tho and can beignored? Confirm. #TODO DONOTCHECKIN
+//    	registry.register(MimicBlock.door(),
+//    			new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_DOOR));
+//    	registry.register(
+//    			(new ItemBlock(MimicBlock.door()).setRegistryName(MimicBlock.ID_DOOR)
+//    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(MimicBlock.ID_DOOR).setHasSubtypes(true))
+//    			);
+//    	
+//    	registry.register(MimicBlock.facade(),
+//    			new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_FACADE));
+//    	registry.register(
+//    			(new ItemBlock(MimicBlock.facade()).setRegistryName(MimicBlock.ID_FACADE)
+//    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(MimicBlock.ID_FACADE).setHasSubtypes(true))
+//    			);
+    }
+    
+    private void registerTileEntities() {
+    	GameRegistry.registerTileEntity(SpellTableEntity.class, new ResourceLocation(NostrumMagica.MODID, "spell_table"));
+    	GameRegistry.registerTileEntity(SingleSpawnerTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "nostrum_mob_spawner_te"));
+    	GameRegistry.registerTileEntity(SpawnerTriggerTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "nostrum_mob_spawner_trigger_te"));
+    	GameRegistry.registerTileEntity(SymbolTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "nostrum_symbol_te"));
+    	GameRegistry.registerTileEntity(AltarTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "nostrum_altar_te"));
+    	GameRegistry.registerTileEntity(CandleTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "nostrum_candle_te"));
+    	GameRegistry.registerTileEntity(NostrumObeliskEntity.class, new ResourceLocation(NostrumMagica.MODID, "nostrum_obelisk"));
+    	GameRegistry.registerTileEntity(ObeliskPortalTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "obelisk_portal"));
+    	GameRegistry.registerTileEntity(ModificationTableEntity.class, new ResourceLocation(NostrumMagica.MODID, "modification_table"));
+    	GameRegistry.registerTileEntity(LoreTableEntity.class, new ResourceLocation(NostrumMagica.MODID, "lore_table"));
+    	GameRegistry.registerTileEntity(SorceryPortalTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "sorcery_portal"));
+    	GameRegistry.registerTileEntity(TeleportationPortalTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "teleportation_portal"));
+    	GameRegistry.registerTileEntity(TemporaryPortalTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "limited_teleportation_portal"));
+    	GameRegistry.registerTileEntity(ProgressionDoorTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "progression_door"));
+    	GameRegistry.registerTileEntity(SwitchBlockTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "switch_block_tile_entity"));
+    	GameRegistry.registerTileEntity(TeleportRuneTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "teleport_rune"));
+    	GameRegistry.registerTileEntity(PutterBlockTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "putter_entity"));
+    	GameRegistry.registerTileEntity(ActiveHopperTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "active_hopper_te"));
+    	GameRegistry.registerTileEntity(ItemDuctTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "item_duct_te"));
+    }
+    
+    @SubscribeEvent
+    private void registerEntities(RegistryEvent.Register<EntityEntry> event) {
+    	int entityID = 0;
+    	final IForgeRegistry<EntityEntry> registry = event.getRegistry();
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntitySpellProjectile.class)
+    			.id("spell_projectile", entityID++)
+    			.name("spell_projectile")
+    			.tracker(64, 1, true)
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntityGolemPhysical.class)
+    			.id("physical_golem", entityID++)
+    			.name("physical_golem")
+    			.tracker(64, 1, false)
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntityGolemLightning.class)
+    			.id("lightning_golem", entityID++)
+    			.name("lightning_golem")
+    			.tracker(64, 1, false)
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntityGolemFire.class)
+    			.id("fire_golem", entityID++)
+    			.name("fire_golem")
+    			.tracker(64, 1, false)
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntityGolemEarth.class)
+    			.id("earth_golem", entityID++)
+    			.name("earth_golem")
+    			.tracker(64, 1, false)
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntityGolemIce.class)
+    			.id("ice_golem", entityID++)
+    			.name("ice_golem")
+    			.tracker(64, 1, false)
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntityGolemWind.class)
+    			.id("wind_golem", entityID++)
+    			.name("wind_golem")
+    			.tracker(64, 1, false)
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntityGolemEnder.class)
+    			.id("ender_golem", entityID++)
+    			.name("ender_golem")
+    			.tracker(64, 1, false)
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntityKoid.class)
+    			.id("entity_koid", entityID++)
+    			.name("entity_koid")
+    			.tracker(64, 1, false)
+    			.spawn(EnumCreatureType.MONSTER, 20, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.MAGICAL))
+    			.spawn(EnumCreatureType.MONSTER, 20, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.FOREST))
+				.spawn(EnumCreatureType.MONSTER, 20, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.SNOWY))
+				.spawn(EnumCreatureType.MONSTER, 20, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER))
+				.spawn(EnumCreatureType.MONSTER, 20, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.SPOOKY))
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntityDragonRed.class)
+    			.id("entity_dragon_red", entityID++)
+    			.name("entity_dragon_red")
+    			.tracker(128, 1, false)
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntityTameDragonRed.class)
+    			.id("entity_tame_dragon_red", entityID++)
+    			.name("entity_tame_dragon_red")
+    			.tracker(128, 1, false)
+    			.spawn(EnumCreatureType.MONSTER, 2, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER))
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntityShadowDragonRed.class)
+    			.id("entity_shadow_dragon_red", entityID++)
+    			.name("entity_shadow_dragon_red")
+    			.tracker(128, 1, false)
+    			.spawn(EnumCreatureType.MONSTER, 15, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER))
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntitySprite.class)
+    			.id("entity_sprite", entityID++)
+    			.name("entity_sprite")
+    			.tracker(64, 1, false)
+    			.spawn(EnumCreatureType.MONSTER, 15, 1, 3, ForgeRegistries.BIOMES.getValuesCollection().stream().filter( (biome) -> {
+    				return !BiomeDictionary.hasType(biome, BiomeDictionary.Type.END)
+    						&& BiomeDictionary.hasType(biome, BiomeDictionary.Type.NETHER);
+    			}).collect(Collectors.toList()))
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntitySpellBullet.class)
+    			.id("spell_bullet", entityID++)
+    			.name("spell_bullet")
+    			.tracker(64, 1, true)
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntityLux.class)
+    			.id("entity_lux", entityID++)
+    			.name("entity_lux")
+    			.tracker(64, 1, false)
+    			.spawn(EnumCreatureType.CREATURE, 6, 1, 3, BiomeDictionary.getBiomes(BiomeDictionary.Type.MAGICAL))
+    			.spawn(EnumCreatureType.CREATURE, 6, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.FOREST))
+				.spawn(EnumCreatureType.CREATURE, 4, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.JUNGLE))
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntityDragonEgg.class)
+    			.id("entity_dragon_egg", entityID++)
+    			.name("entity_dragon_egg")
+    			.tracker(64, 1, false)
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntityChakramSpellSaucer.class)
+    			.id("entity_internal_spellsaucer_chakram", entityID++)
+    			.name("entity_internal_spellsaucer_chakram")
+    			.tracker(64, 1, true)
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntityCyclerSpellSaucer.class)
+    			.id("entity_internal_spellsaucer_cycler", entityID++)
+    			.name("entity_internal_spellsaucer_cycler")
+    			.tracker(64, 1, true)
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntitySwitchTrigger.class)
+    			.id("entity_switch_trigger", entityID++)
+    			.name("entity_switch_trigger")
+    			.tracker(128, 1, false)
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(NostrumTameLightning.class)
+    			.id("nostrum_lightning", entityID++)
+    			.name("nostrum_lightning")
+    			.tracker(128, 1, false)
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntityHookShot.class)
+    			.id("nostrum_hookshot", entityID++)
+    			.name("nostrum_hookshot")
+    			.tracker(128, 1, true)
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntityWisp.class)
+    			.id("entity_wisp", entityID++)
+    			.name("entity_wisp")
+    			.tracker(64, 1, false)
+    			.spawn(EnumCreatureType.AMBIENT, 1, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.MAGICAL))
+    			.spawn(EnumCreatureType.AMBIENT, 1, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.FOREST))
+    			.spawn(EnumCreatureType.AMBIENT, 1, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.SNOWY))
+    			.spawn(EnumCreatureType.AMBIENT, 1, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.SPOOKY))
+    			.spawn(EnumCreatureType.MONSTER, 13, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER))
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntityAreaEffect.class)
+    			.id("entity_effect_cloud", entityID++)
+    			.name("entity_effect_cloud")
+    			.tracker(64, 1, false)
+    		.build());
+    }
+    
+    @SubscribeEvent
+    private void registerEnchantments(RegistryEvent.Register<Enchantment> event) {
+    	event.getRegistry().register(EnchantmentManaRecovery.instance());
+    }
+    
+    @SubscribeEvent
+    private void registerSounds(RegistryEvent.Register<SoundEvent> event) {
+		for (NostrumMagicaSounds sound : NostrumMagicaSounds.values()) {
+			event.getRegistry().register(sound.getEvent());
+		}
     }
     
     public void syncPlayer(EntityPlayerMP player) {
@@ -912,9 +843,9 @@ public class CommonProxy {
 			SpellComponentWrapper flavor, boolean isNegative, float compParam) {
 		if (world == null) {
 			if (caster == null)
-				world = target.worldObj; // If you NPE here you suck. Supply a world!
+				world = target.world; // If you NPE here you suck. Supply a world!
 			else
-				world = caster.worldObj;
+				world = caster.world;
 		}
 		
 		final double MAX_RANGE_SQR = 2500.0;
@@ -942,14 +873,14 @@ public class CommonProxy {
 			// Fall back to distance check against locations
 			if (casterPos != null) {
 				for (EntityPlayer player : world.playerEntities) {
-					if (player.getDistanceSq(casterPos.xCoord, casterPos.yCoord, casterPos.zCoord) <= MAX_RANGE_SQR)
+					if (player.getDistanceSq(casterPos.x, casterPos.y, casterPos.z) <= MAX_RANGE_SQR)
 						players.add(player);
 				}
 			}
 			
 			if (targetPos != null) {
 				for (EntityPlayer player : world.playerEntities) {
-					if (player.getDistanceSq(targetPos.xCoord, targetPos.yCoord, targetPos.zCoord) <= MAX_RANGE_SQR)
+					if (player.getDistanceSq(targetPos.x, targetPos.y, targetPos.z) <= MAX_RANGE_SQR)
 						players.add(player);
 				}
 			}
@@ -968,7 +899,7 @@ public class CommonProxy {
 	}
 	
 	public void sendMana(EntityPlayer player) {
-		EntityTracker tracker = ((WorldServer) player.worldObj).getEntityTracker();
+		EntityTracker tracker = ((WorldServer) player.world).getEntityTracker();
 		if (tracker == null)
 			return;
 		

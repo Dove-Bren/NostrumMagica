@@ -778,9 +778,9 @@ public class NostrumMagic implements INostrumMagic {
 		if (this.entity != null && this.entity instanceof EntityPlayer) {
 			EntityPlayer player = (EntityPlayer) entity;
 			
-			if (tome == null) {
+			if (tome.isEmpty()) {
 				tome = NostrumMagica.findTome(player, bindingTomeID);
-				if (tome == null) {
+				if (tome.isEmpty()) {
 					player.sendMessage(new TextComponentTranslation(
 							"info.tome.bind_missing", new Object[] {bindingSpell.getName()}));
 					return;
@@ -931,7 +931,7 @@ public class NostrumMagic implements INostrumMagic {
 			IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);
 			for (int i = 0; i < baubles.getSlots(); i++) {
 				ItemStack stack = baubles.getStackInSlot(i);
-				if (stack != null && stack.getItem() instanceof ItemMagicBauble) {
+				if (!stack.isEmpty() && stack.getItem() instanceof ItemMagicBauble) {
 					((ItemMagicBauble) stack.getItem()).onUnequipped(stack, player);
 				}
 			}
@@ -952,7 +952,7 @@ public class NostrumMagic implements INostrumMagic {
 			IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);
 			for (int i = 0; i < baubles.getSlots(); i++) {
 				ItemStack stack = baubles.getStackInSlot(i);
-				if (stack != null && stack.getItem() instanceof ItemMagicBauble) {
+				if (!stack.isEmpty() && stack.getItem() instanceof ItemMagicBauble) {
 					((ItemMagicBauble) stack.getItem()).onEquipped(stack, player);
 				}
 			}

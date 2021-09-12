@@ -5,8 +5,9 @@ import java.util.Random;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.NostrumObeliskEntity.Corner;
-import com.smanzana.nostrummagica.blocks.NostrumObeliskEntity.NostrumObeliskTarget;
+import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity.Corner;
+import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity.NostrumObeliskTarget;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.config.ModConfig;
@@ -27,7 +28,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -35,7 +35,6 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -69,10 +68,6 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 			instance = new NostrumObelisk();
 		
 		return instance;
-	}
-	
-	public static void init() {
-		GameRegistry.registerTileEntity(NostrumObeliskEntity.class, new ResourceLocation(NostrumMagica.MODID, "nostrum_obelisk"));
 	}
 	
 	public NostrumObelisk() {

@@ -24,6 +24,7 @@ public class EnchantmentManaRecovery extends Enchantment {
 						EntityEquipmentSlot.CHEST,
 						EntityEquipmentSlot.HEAD});
 		this.setName("mana_recovery");
+		this.setRegistryName(ID);
 	}
 
     /**

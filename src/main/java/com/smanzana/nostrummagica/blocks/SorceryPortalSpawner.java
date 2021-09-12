@@ -23,10 +23,6 @@ public class SorceryPortalSpawner extends Block implements ITriggeredBlock {
 		return instance;
 	}
 	
-	public static void init() {
-		
-	}
-	
 	public SorceryPortalSpawner() {
 		super(Material.ROCK, MapColor.OBSIDIAN);
 		this.setUnlocalizedName(ID);

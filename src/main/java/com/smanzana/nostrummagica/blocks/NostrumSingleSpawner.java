@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.blocks;
 import java.util.Random;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.tiles.SingleSpawnerTileEntity;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemEarth;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemEnder;
@@ -32,12 +33,9 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.ITickable;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -65,7 +63,7 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		}
 	}
 	
-	protected static final int SPAWN_DIST_SQ = 900; // 30^2 
+	public static final int SPAWN_DIST_SQ = 900; // 30^2 
 	protected static final PropertyEnum<Type> MOB = PropertyEnum.create("mob", Type.class);
 
 	public static final String ID = "nostrum_spawner";
@@ -76,10 +74,6 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 			instance = new NostrumSingleSpawner();
 		
 		return instance;
-	}
-	
-	public static void init() {
-		GameRegistry.registerTileEntity(SingleSpawnerTE.class, new ResourceLocation(NostrumMagica.MODID, "nostrum_mob_spawner_te"));
 	}
 	
 	public NostrumSingleSpawner() {
@@ -167,7 +161,7 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		}
 	}
 	
-	protected EntityLiving spawn(World world, BlockPos pos, IBlockState state, Random rand) {
+	public EntityLiving spawn(World world, BlockPos pos, IBlockState state, Random rand) {
 		Type type = state.getValue(MOB);
 		EntityLiving entity = getEntity(type, world, pos);
 		
@@ -217,7 +211,7 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		return new SingleSpawnerTE();
+		return new SingleSpawnerTileEntity();
 	}
 	
 	@Override
@@ -245,7 +239,7 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		}
 		
 		TileEntity te = worldIn.getTileEntity(pos);
-		if (te == null || !(te instanceof SingleSpawnerTE)) {
+		if (te == null || !(te instanceof SingleSpawnerTileEntity)) {
 			return true;
 		}
 		
@@ -289,31 +283,5 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		}
 		
 		return false;
-	}
-	
-	public static class SingleSpawnerTE extends TileEntity implements ITickable {
-		
-		protected int ticksExisted;
-		
-		public SingleSpawnerTE() {
-			ticksExisted = 0;
-		}
-		
-		protected void majorTick(IBlockState state) {
-			NostrumSingleSpawner.instance().updateTick(world, pos, state, RANDOM);
-		}
-		
-		@Override
-		public void update() {
-			if (!world.isRemote && ++ticksExisted % 32 == 0) {
-				IBlockState state = this.world.getBlockState(this.pos);
-				if (state == null || !(state.getBlock() instanceof NostrumSingleSpawner)) {
-					world.removeTileEntity(pos);
-					return;
-				}
-				
-				majorTick(state);
-			}
-		}
 	}
 }

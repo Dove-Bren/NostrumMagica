@@ -3,8 +3,8 @@ package com.smanzana.nostrummagica.entity.renderer;
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.SwitchBlock.SwitchBlockTileEntity;
-import com.smanzana.nostrummagica.blocks.SwitchBlock.SwitchBlockTileEntity.SwitchType;
+import com.smanzana.nostrummagica.blocks.tiles.SwitchBlockTileEntity;
+import com.smanzana.nostrummagica.blocks.tiles.SwitchBlockTileEntity.SwitchType;
 import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
 
 import net.minecraft.client.Minecraft;

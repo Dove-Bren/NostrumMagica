@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.blocks;
+package com.smanzana.nostrummagica.blocks.tiles;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -8,6 +8,8 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.NostrumObelisk;
+import com.smanzana.nostrummagica.blocks.ObeliskPortal;
 import com.smanzana.nostrummagica.world.NostrumChunkLoader;
 
 import net.minecraft.block.state.IBlockState;
@@ -70,7 +72,7 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	 * If not master, search for master by offset in all corners.
 	 * Destroy ALL masters found, not just the first one.
 	 */
-	protected static enum Corner {
+	public static enum Corner {
 		NE(0),
 		NW(1),
 		SW(2),

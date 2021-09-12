@@ -21,14 +21,12 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -83,31 +81,17 @@ public class NostrumMagicaFlower extends BlockBush {
 	};
 	public static NostrumMagicaFlower crystabloom;
 	
-	public static void init() {
-		instance();
-		GameRegistry.register(instance,
-    			new ResourceLocation(NostrumMagica.MODID, instance.getID()));
-//    	GameRegistry.register(
-//    			(new ItemBlock(instance)).setRegistryName(instance.getID())
-//    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(instance.getID()));
-	}
+	public static final String ID = "nostrum_flower";
 	
-	private String id;
 	
 	public NostrumMagicaFlower() {
 		super(Material.PLANTS);
 		this.blockSoundType = SoundType.PLANT;
 		
-		this.id = "nostrum_flower";
-		this.setUnlocalizedName(id);
+		this.setUnlocalizedName(ID);
 		this.setCreativeTab(NostrumMagica.creativeTab);
-		//this.setRegistryName(id);
 		
 		this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, Type.MIDNIGHT_IRIS));
-	}
-	
-	public String getID() {
-		return id;
 	}
 	
 	@Override

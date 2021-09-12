@@ -189,6 +189,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.IModel;
@@ -218,7 +219,7 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public void preinit() {
-		super.preinit();
+		super.preinit(); // registers for event handling
 		
 		bindingCast = new KeyBinding("key.cast.desc", Keyboard.KEY_LCONTROL, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingCast);
@@ -226,88 +227,6 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.registerKeyBinding(bindingScroll);
 		bindingInfo = new KeyBinding("key.infoscreen.desc", Keyboard.KEY_HOME, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingInfo);
-		
-		RenderingRegistry.registerEntityRenderingHandler(EntityGolem.class, new IRenderFactory<EntityGolem>() {
-			@Override
-			public Render<? super EntityGolem> createRenderFor(RenderManager manager) {
-				return new RenderGolem(manager, new ModelGolem(), .8f);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntityKoid.class, new IRenderFactory<EntityKoid>() {
-			@Override
-			public Render<? super EntityKoid> createRenderFor(RenderManager manager) {
-				return new RenderKoid(manager, .3f);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntityDragonRed.class, new IRenderFactory<EntityDragonRed>() {
-			@Override
-			public Render<? super EntityDragonRed> createRenderFor(RenderManager manager) {
-				return new RenderDragonRed(manager, 5);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntityTameDragonRed.class, new IRenderFactory<EntityTameDragonRed>() {
-			@Override
-			public Render<? super EntityTameDragonRed> createRenderFor(RenderManager manager) {
-				return new RenderTameDragonRed(manager, 2);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntityShadowDragonRed.class, new IRenderFactory<EntityShadowDragonRed>() {
-			@Override
-			public Render<? super EntityShadowDragonRed> createRenderFor(RenderManager manager) {
-				return new RenderShadowDragonRed(manager, 2);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntitySprite.class, new IRenderFactory<EntitySprite>() {
-			@Override
-			public Render<? super EntitySprite> createRenderFor(RenderManager manager) {
-				return  new RenderSprite(manager, .7f);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntityDragonEgg.class, new IRenderFactory<EntityDragonEgg>() {
-			@Override
-			public Render<? super EntityDragonEgg> createRenderFor(RenderManager manager) {
-				return new RenderDragonEgg(manager, .45f);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntitySpellSaucer.class, new IRenderFactory<EntitySpellSaucer>() {
-			@Override
-			public Render<? super EntitySpellSaucer> createRenderFor(RenderManager manager) {
-				return new RenderMagicSaucer(manager);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntitySwitchTrigger.class, new IRenderFactory<EntitySwitchTrigger>() {
-			@Override
-			public Render<? super EntitySwitchTrigger> createRenderFor(RenderManager manager) {
-				return new RenderSwitchTrigger(manager);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(NostrumTameLightning.class, new IRenderFactory<NostrumTameLightning>() {
-			@Override
-			public Render<? super NostrumTameLightning> createRenderFor(RenderManager manager) {
-				return new RenderLightningBolt(manager);
-			}
-		});
-		
-		RenderingRegistry.registerEntityRenderingHandler(EntityHookShot.class, new IRenderFactory<EntityHookShot>() {
-			@Override
-			public Render<? super EntityHookShot> createRenderFor(RenderManager manager) {
-				return new RenderHookShot(manager);
-			}
-		});
-		
-		RenderingRegistry.registerEntityRenderingHandler(EntityWisp.class, new IRenderFactory<EntityWisp>() {
-			@Override
-			public Render<? super EntityWisp> createRenderFor(RenderManager manager) {
-				return new RenderWisp(manager, 1f);
-			}
-		});
-		
-		RenderingRegistry.registerEntityRenderingHandler(EntityLux.class, new IRenderFactory<EntityLux>() {
-			@Override
-			public Render<? super EntityLux> createRenderFor(RenderManager manager) {
-				return new RenderLux(manager, 1f);
-			}
-		});
 		
 		ResourceLocation variants[] = new ResourceLocation[ReagentType.values().length];
 		int i = 0;
@@ -433,7 +352,21 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void init() {
 		super.init();
+	}
+	
+	@Override
+	public void postinit() {
+		this.overlayRenderer = new OverlayRenderer();
+		this.effectRenderer = ClientEffectRenderer.instance();
 		
+		initDefaultEffects(this.effectRenderer);
+		ClientCommandHandler.instance.registerCommand(new CommandInfoScreenGoto());
+		
+		super.postinit();
+	}
+	
+	@SubscribeEvent
+	private void registerAllModels(ModelRegistryEvent event) {
 		//registerModel(SpellTome.instance(), 0, SpellTome.id);
 		registerModel(NostrumGuide.instance(), 0, NostrumGuide.id);
 		registerModel(SpellcraftGuide.instance(), 0, SpellcraftGuide.id);
@@ -491,11 +424,8 @@ public class ClientProxy extends CommonProxy {
 					"charm_" + MagicCharm.getNameFromMeta(meta));
 		}
 		
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher()
-			.register(SpellRune.instance(), new SpellRune.ModelMesher());
-		
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher()
-			.register(ThanosStaff.instance(), new ThanosStaff.ModelMesher());
+		ModelLoader.setCustomMeshDefinition(SpellRune.instance(), new SpellRune.ModelMesher());
+		ModelLoader.setCustomMeshDefinition(ThanosStaff.instance(), new ThanosStaff.ModelMesher());
 		
 		registerModel(new ItemBlock(NostrumMagicaFlower.instance()), 
 				NostrumMagicaFlower.Type.CRYSTABLOOM.getMeta(),
@@ -629,9 +559,8 @@ public class ClientProxy extends CommonProxy {
 					EssenceItem.ID);
 		}
 		IItemColor tinter = new IItemColor() {
-
 			@Override
-			public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+			public int colorMultiplier(ItemStack stack, int tintIndex) {
 				EMagicElement element = EssenceItem.findType(stack);
 				return element.getColor();
 			}
@@ -680,23 +609,96 @@ public class ClientProxy extends CommonProxy {
 		registerModel(Item.getItemFromBlock(ItemDuct.instance),
 				0,
 				ItemDuct.ID);
-	}
-	
-	@Override
-	public void postinit() {
-		this.overlayRenderer = new OverlayRenderer();
-		this.effectRenderer = ClientEffectRenderer.instance();
 		
-		initDefaultEffects(this.effectRenderer);
-		ClientCommandHandler.instance.registerCommand(new CommandInfoScreenGoto());
-		
-		super.postinit();
+		registerEntityRenderers();
 	}
 	
 	public static void registerModel(Item item, int meta, String modelName) {
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher()
-    	.register(item, meta,
-    			new ModelResourceLocation(NostrumMagica.MODID + ":" + modelName, "inventory"));
+		ModelLoader.setCustomModelResourceLocation(item, meta, new ModelResourceLocation(NostrumMagica.MODID + ":" + modelName, "inventory"));
+	}
+	
+	private void registerEntityRenderers() {
+		RenderingRegistry.registerEntityRenderingHandler(EntityGolem.class, new IRenderFactory<EntityGolem>() {
+			@Override
+			public Render<? super EntityGolem> createRenderFor(RenderManager manager) {
+				return new RenderGolem(manager, new ModelGolem(), .8f);
+			}
+		});
+		RenderingRegistry.registerEntityRenderingHandler(EntityKoid.class, new IRenderFactory<EntityKoid>() {
+			@Override
+			public Render<? super EntityKoid> createRenderFor(RenderManager manager) {
+				return new RenderKoid(manager, .3f);
+			}
+		});
+		RenderingRegistry.registerEntityRenderingHandler(EntityDragonRed.class, new IRenderFactory<EntityDragonRed>() {
+			@Override
+			public Render<? super EntityDragonRed> createRenderFor(RenderManager manager) {
+				return new RenderDragonRed(manager, 5);
+			}
+		});
+		RenderingRegistry.registerEntityRenderingHandler(EntityTameDragonRed.class, new IRenderFactory<EntityTameDragonRed>() {
+			@Override
+			public Render<? super EntityTameDragonRed> createRenderFor(RenderManager manager) {
+				return new RenderTameDragonRed(manager, 2);
+			}
+		});
+		RenderingRegistry.registerEntityRenderingHandler(EntityShadowDragonRed.class, new IRenderFactory<EntityShadowDragonRed>() {
+			@Override
+			public Render<? super EntityShadowDragonRed> createRenderFor(RenderManager manager) {
+				return new RenderShadowDragonRed(manager, 2);
+			}
+		});
+		RenderingRegistry.registerEntityRenderingHandler(EntitySprite.class, new IRenderFactory<EntitySprite>() {
+			@Override
+			public Render<? super EntitySprite> createRenderFor(RenderManager manager) {
+				return  new RenderSprite(manager, .7f);
+			}
+		});
+		RenderingRegistry.registerEntityRenderingHandler(EntityDragonEgg.class, new IRenderFactory<EntityDragonEgg>() {
+			@Override
+			public Render<? super EntityDragonEgg> createRenderFor(RenderManager manager) {
+				return new RenderDragonEgg(manager, .45f);
+			}
+		});
+		RenderingRegistry.registerEntityRenderingHandler(EntitySpellSaucer.class, new IRenderFactory<EntitySpellSaucer>() {
+			@Override
+			public Render<? super EntitySpellSaucer> createRenderFor(RenderManager manager) {
+				return new RenderMagicSaucer(manager);
+			}
+		});
+		RenderingRegistry.registerEntityRenderingHandler(EntitySwitchTrigger.class, new IRenderFactory<EntitySwitchTrigger>() {
+			@Override
+			public Render<? super EntitySwitchTrigger> createRenderFor(RenderManager manager) {
+				return new RenderSwitchTrigger(manager);
+			}
+		});
+		RenderingRegistry.registerEntityRenderingHandler(NostrumTameLightning.class, new IRenderFactory<NostrumTameLightning>() {
+			@Override
+			public Render<? super NostrumTameLightning> createRenderFor(RenderManager manager) {
+				return new RenderLightningBolt(manager);
+			}
+		});
+		
+		RenderingRegistry.registerEntityRenderingHandler(EntityHookShot.class, new IRenderFactory<EntityHookShot>() {
+			@Override
+			public Render<? super EntityHookShot> createRenderFor(RenderManager manager) {
+				return new RenderHookShot(manager);
+			}
+		});
+		
+		RenderingRegistry.registerEntityRenderingHandler(EntityWisp.class, new IRenderFactory<EntityWisp>() {
+			@Override
+			public Render<? super EntityWisp> createRenderFor(RenderManager manager) {
+				return new RenderWisp(manager, 1f);
+			}
+		});
+		
+		RenderingRegistry.registerEntityRenderingHandler(EntityLux.class, new IRenderFactory<EntityLux>() {
+			@Override
+			public Render<? super EntityLux> createRenderFor(RenderManager manager) {
+				return new RenderLux(manager, 1f);
+			}
+		});
 	}
 	
 	@SubscribeEvent
@@ -704,11 +706,11 @@ public class ClientProxy extends CommonProxy {
 		int wheel = event.getDwheel();
 		if (wheel != 0) {
 			
-			if (!NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer)
+			if (!NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().player)
 					.isUnlocked())
 				return;
-			ItemStack tome = NostrumMagica.getCurrentTome(Minecraft.getMinecraft().thePlayer);
-			if (tome != null) {
+			ItemStack tome = NostrumMagica.getCurrentTome(Minecraft.getMinecraft().player);
+			if (!tome.isEmpty()) {
 				if (bindingScroll.isKeyDown()) {
 					wheel = (wheel > 0 ? -1 : 1);
 					int index = SpellTome.incrementIndex(tome, wheel);
@@ -727,15 +729,15 @@ public class ClientProxy extends CommonProxy {
 		if (bindingCast.isPressed())
 			doCast();
 		else if (bindingInfo.isPressed()) {
-			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+			EntityPlayer player = Minecraft.getMinecraft().player;
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			if (attr == null)
 				return;
 			Minecraft.getMinecraft().displayGuiScreen(new InfoScreen(attr, (String) null));
 //			player.openGui(NostrumMagica.instance,
-//					NostrumGui.infoscreenID, player.worldObj, 0, 0, 0);
+//					NostrumGui.infoscreenID, player.world, 0, 0, 0);
 		} else if (Minecraft.getMinecraft().gameSettings.keyBindJump.isPressed()) {
-			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+			EntityPlayer player = Minecraft.getMinecraft().player;
 			if (player.isRiding() && player.getRidingEntity() instanceof EntityTameDragonRed) {
 				((EntityDragon) player.getRidingEntity()).dragonJump();
 			}
@@ -744,7 +746,7 @@ public class ClientProxy extends CommonProxy {
 	
 	private void doCast() {
 		
-		Spell spell = NostrumMagica.getCurrentSpell(Minecraft.getMinecraft().thePlayer);
+		Spell spell = NostrumMagica.getCurrentSpell(Minecraft.getMinecraft().player);
 		if (spell == null) {
 			System.out.println("LOUD NULL SPELL"); // TODO remove
 			return;
@@ -753,7 +755,7 @@ public class ClientProxy extends CommonProxy {
 		// Do mana check here (it's also done on server)
 		// to stop redundant checks and get mana looking good
 		// on client side immediately
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		INostrumMagic att = NostrumMagica.getMagicWrapper(player);
 		int mana = att.getMana();
 		int cost = spell.getManaCost();
@@ -764,13 +766,13 @@ public class ClientProxy extends CommonProxy {
 		
 		// Find the tome this was cast from, if any
 		ItemStack tome = NostrumMagica.getCurrentTome(player); 
-		if (tome != null && tome.getItem() instanceof SpellTome) {
+		if (!tome.isEmpty() && tome.getItem() instanceof SpellTome) {
 			// Casting from a tome.
 			
 			// Make sure it isn't too hard for the tome
 			int cap = SpellTome.getMaxMana(tome);
 			if (cap < cost) {
-				player.addChatMessage(new TextComponentTranslation(
+				player.sendMessage(new TextComponentTranslation(
 						"info.spell.tome_weak", new Object[0]));
 				NostrumMagicaSounds.CAST_FAIL.play(player);
 				System.out.println("LOUD tome weak"); // TODO remove
@@ -794,7 +796,7 @@ public class ClientProxy extends CommonProxy {
 		
 		// Visit an equipped spell armor
 		for (ItemStack equip : player.getEquipmentAndArmor()) {
-			if (equip == null)
+			if (equip.isEmpty())
 				continue;
 			if (equip.getItem() instanceof ISpellArmor) {
 				ISpellArmor armor = (ISpellArmor) equip.getItem();
@@ -807,7 +809,7 @@ public class ClientProxy extends CommonProxy {
 		if (baubles != null) {
 			for (int i = 0; i < baubles.getSizeInventory(); i++) {
 				ItemStack equip = baubles.getStackInSlot(i);
-				if (equip == null) {
+				if (equip.isEmpty()) {
 					continue;
 				}
 				
@@ -824,20 +826,20 @@ public class ClientProxy extends CommonProxy {
 		Collection<ITameDragon> dragons = NostrumMagica.getNearbyTamedDragons(player, 32, true);
 		if (dragons != null && !dragons.isEmpty()) {
 			for (ITameDragon dragon : dragons) {
-				if (dragon.sharesMana(Minecraft.getMinecraft().thePlayer)) {
+				if (dragon.sharesMana(Minecraft.getMinecraft().player)) {
 					mana += dragon.getMana();
 				}
 			}
 		}
 		
-		if (!Minecraft.getMinecraft().thePlayer.isCreative()) {
+		if (!Minecraft.getMinecraft().player.isCreative()) {
 			// Check mana
 			if (mana < cost) {
 				
 				for (int i = 0; i < 15; i++) {
 					double offsetx = Math.cos(i * (2 * Math.PI / 15)) * 1.0;
 					double offsetz = Math.sin(i * (2 * Math.PI / 15)) * 1.0;
-					player.worldObj
+					player.world
 						.spawnParticle(EnumParticleTypes.SMOKE_LARGE,
 								player.posX + offsetx, player.posY, player.posZ + offsetz,
 								0, -.5, 0);
@@ -856,19 +858,19 @@ public class ClientProxy extends CommonProxy {
 			int maxTriggers = 1 + (att.getFinesse());
 			int maxElems = 1 + (3 * att.getControl());
 			if (spell.getComponentCount() > maxComps) {
-				player.addChatMessage(new TextComponentTranslation(
+				player.sendMessage(new TextComponentTranslation(
 						"info.spell.low_tech", new Object[0]));
 				System.out.println("LOUD LOW TECH"); // TODO remove
 				NostrumMagicaSounds.CAST_FAIL.play(player);
 				return;
 			} else if (spell.getElementCount() > maxElems) {
-				player.addChatMessage(new TextComponentTranslation(
+				player.sendMessage(new TextComponentTranslation(
 						"info.spell.low_control", new Object[0]));
 				System.out.println("LOUD LOW CONTROL"); // TODO remove
 				NostrumMagicaSounds.CAST_FAIL.play(player);
 				return;
 			} else if (spell.getTriggerCount() > maxTriggers) {
-				player.addChatMessage(new TextComponentTranslation(
+				player.sendMessage(new TextComponentTranslation(
 						"info.spell.low_finesse", new Object[0]));
 				System.out.println("LOUD LOW FINESSE"); // TODO remove
 				NostrumMagicaSounds.CAST_FAIL.play(player);
@@ -887,7 +889,7 @@ public class ClientProxy extends CommonProxy {
 	    		if (level == 1) {
 	    			Boolean know = att.getKnownElements().get(elem);
 	    			if (know == null || !know) {
-	    				player.addChatMessage(new TextComponentTranslation(
+	    				player.sendMessage(new TextComponentTranslation(
 								"info.spell.no_mastery", new Object[] {elem.getName()}));
 	    				System.out.println("LOUD NO MASTERY"); // TODO remove
 						NostrumMagicaSounds.CAST_FAIL.play(player);
@@ -897,7 +899,7 @@ public class ClientProxy extends CommonProxy {
 		    		Integer mast = att.getElementMastery().get(elem);
 		    		int mastery = (mast == null ? 0 : mast);
 		    		if (mastery < level) {
-		    			player.addChatMessage(new TextComponentTranslation(
+		    			player.sendMessage(new TextComponentTranslation(
 							"info.spell.low_mastery", new Object[] {elem.getName(), level, mastery}));
 						NostrumMagicaSounds.CAST_FAIL.play(player);
 						return;
@@ -912,7 +914,7 @@ public class ClientProxy extends CommonProxy {
 				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
 					int count = NostrumMagica.getReagentCount(player, row.getKey());
 					if (count < row.getValue()) {
-						player.addChatMessage(new TextComponentTranslation("info.spell.bad_reagent", row.getKey().prettyName()));
+						player.sendMessage(new TextComponentTranslation("info.spell.bad_reagent", row.getKey().prettyName()));
 						System.out.println("LOUD BAD REAGENT"); // TODO remove
 						return;
 					}
@@ -922,7 +924,7 @@ public class ClientProxy extends CommonProxy {
 				// Response from server will result in deduct if it goes through
 			}
 			
-			NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer)
+			NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().player)
 				.addMana(-cost);
 		}
 		
@@ -932,7 +934,7 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public void syncPlayer(EntityPlayerMP player) {
-		if (player.worldObj.isRemote)
+		if (player.world.isRemote)
 			return;
 		
 		super.syncPlayer(player);
@@ -940,7 +942,7 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public EntityPlayer getPlayer() {
-		return Minecraft.getMinecraft().thePlayer;
+		return Minecraft.getMinecraft().player;
 	}
 	
 	private INostrumMagic overrides = null;
@@ -948,7 +950,7 @@ public class ClientProxy extends CommonProxy {
 	public void receiveStatOverrides(INostrumMagic override) {
 		// If we can look up stats, apply them.
 		// Otherwise, stash them for loading when we apply attributes
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		INostrumMagic existing = NostrumMagica.getMagicWrapper(player);
 		if (existing != null && !player.isDead) {
 			// apply them
@@ -969,7 +971,7 @@ public class ClientProxy extends CommonProxy {
 		if (overrides == null)
 			return;
 		
-		INostrumMagic existing = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().thePlayer);
+		INostrumMagic existing = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().player);
 		
 		if (existing == null)
 			return; // Mana got here before we attached
@@ -992,7 +994,7 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void openDragonGUI(EntityPlayer player, ITameDragon dragon) {
 		// Integrated clients still need to open the gui...
-		//if (!player.worldObj.isRemote) {
+		//if (!player.world.isRemote) {
 //			DragonContainer container = dragon.getGUIContainer();
 //			DragonGUI gui = new DragonGUI(container);
 //			FMLCommonHandler.instance().showGuiScreen(gui);
@@ -1007,7 +1009,7 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public void sendSpellDebug(EntityPlayer player, ITextComponent comp) {
-		if (!player.worldObj.isRemote) {
+		if (!player.world.isRemote) {
 			super.sendSpellDebug(player, comp);
 		}
 		;
@@ -1570,7 +1572,7 @@ public class ClientProxy extends CommonProxy {
 			EntityLivingBase target, Vec3d targetPos,
 			SpellComponentWrapper flavor, boolean isNegative, float compParam) {
 		if (world == null && target != null) {
-			world = target.worldObj;
+			world = target.world;
 		}
 		
 		if (world != null) {
@@ -1597,8 +1599,8 @@ public class ClientProxy extends CommonProxy {
 	@SubscribeEvent
 	public void onClientConnect(EntityJoinWorldEvent event) {
 		if (ClientProxy.shownText == false && ModConfig.config.displayLoginText()
-				&& event.getEntity() == Minecraft.getMinecraft().thePlayer) {
-			Minecraft.getMinecraft().thePlayer.addChatMessage(
+				&& event.getEntity() == Minecraft.getMinecraft().player) {
+			Minecraft.getMinecraft().player.sendMessage(
 					new TextComponentTranslation("info.nostrumwelcome.text", new Object[]{
 							this.bindingInfo.getDisplayName()
 					}));
@@ -1608,7 +1610,7 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public void sendMana(EntityPlayer player) {
-		if (player.worldObj.isRemote) {
+		if (player.world.isRemote) {
 			return;
 		}
 		
