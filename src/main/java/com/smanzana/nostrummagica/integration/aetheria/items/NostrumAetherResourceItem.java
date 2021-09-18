@@ -40,16 +40,10 @@ public class NostrumAetherResourceItem extends Item implements ILoreTagged, IAet
 		return instance;
 	}
 	
-	public static void init() {
-//		GameRegistry.addRecipe(getItem(AetherResourceType.CRYSTAL_SMALL, 1), " MR", "MDM", "RM ",
-//				'D', Items.DIAMOND,
-//				'M', ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1),
-//				'R', new ItemStack(ReagentItem.instance(), 1, OreDictionary.WILDCARD_VALUE));
-	}
-	
 	public NostrumAetherResourceItem() {
 		super();
 		this.setUnlocalizedName(ID);
+		this.setRegistryName(NostrumMagica.MODID, ID);
 		this.setMaxDamage(0);
 		this.setMaxStackSize(64);
 		this.setCreativeTab(NostrumMagica.creativeTab);

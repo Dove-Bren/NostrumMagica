@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.blocks;
 
-import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuser.AetherInfuserTileEntity;
+import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileEntity;
 
 /**
  * Marks that this entity might have some behavior based on receiving aether from a nearby aether infuser

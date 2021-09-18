@@ -33,8 +33,11 @@ import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.registries.IForgeRegistry;
 
 //
 public class BaublesProxy {
@@ -54,7 +57,8 @@ public class BaublesProxy {
 			return false;
 		}
 		
-		registerItems();
+		MinecraftForge.EVENT_BUS.register(this);
+		
 		registerBaubleQuests();
 		return true;
 	}
@@ -80,20 +84,16 @@ public class BaublesProxy {
 		return true;
 	}
 	
-	private void registerItems() {
-		ItemMagicBauble.instance().setRegistryName(NostrumMagica.MODID, ItemMagicBauble.ID);
-    	GameRegistry.register(ItemMagicBauble.instance());
-    	ItemMagicBauble.init();
-
-    	if (NostrumMagica.aetheria.isEnabled()) {
-			ItemAetherCloak.instance().setRegistryName(NostrumMagica.MODID, ItemAetherCloak.ID);
-	    	GameRegistry.register(ItemAetherCloak.instance());
-	    	ItemAetherCloak.init();
-    	}
+	@SubscribeEvent
+	private void registerItems(RegistryEvent.Register<Item> event) {
+		final IForgeRegistry<Item> registry = event.getRegistry();
+		
+    	registry.register(ItemMagicBauble.instance());
+    	registry.register(ItemAetherCloak.instance());
 	}
 	
 	private void registerBaubleQuests() {
-		; // no quests
+		
 	}
 	
 	private void registerBaubleRituals() {

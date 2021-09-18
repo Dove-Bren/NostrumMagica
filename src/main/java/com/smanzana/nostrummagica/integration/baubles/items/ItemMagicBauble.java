@@ -93,14 +93,6 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 	
 	public static String ID = "ribbon";
 	
-	public static void init() {
-		instance().setUnlocalizedName(ID);
-		
-//		GameRegistry.addRecipe(new ItemStack(instance), " W ", "WCW", " W ",
-//				'W', Blocks.WOOL, 
-//				'C', NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1));
-	}
-	
 	private static ItemMagicBauble instance = null;
 
 	public static ItemMagicBauble instance() {
@@ -122,6 +114,8 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setMaxStackSize(1);
 		this.setHasSubtypes(true);
+		this.setUnlocalizedName(ID);
+		this.setRegistryName(NostrumMagica.MODID, ID);
 		
 		MinecraftForge.EVENT_BUS.register(this);
 	}

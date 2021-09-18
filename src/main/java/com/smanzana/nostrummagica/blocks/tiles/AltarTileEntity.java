@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.blocks.tiles;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.blocks.IAetherInfusableTileEntity;
-import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuser.AetherInfuserTileEntity;
+import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileEntity;
 import com.smanzana.nostrummagica.items.IAetherInfuserLens;
 
 import net.minecraft.entity.player.EntityPlayer;

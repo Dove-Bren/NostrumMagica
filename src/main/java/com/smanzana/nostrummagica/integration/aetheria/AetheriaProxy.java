@@ -2,22 +2,26 @@ package com.smanzana.nostrummagica.integration.aetheria;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.api.recipes.IAetherUnravelerRecipe;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuser;
+import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileEntity;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock;
+import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock.WispBlockTileEntity;
 import com.smanzana.nostrummagica.integration.aetheria.items.AetherResourceType;
 import com.smanzana.nostrummagica.integration.aetheria.items.NostrumAetherResourceItem;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemAetherLens;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemAetherLens.LensType;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
-import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
-import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
+import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
+import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.research.NostrumResearch;
@@ -38,8 +42,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.registries.IForgeRegistry;
 
 public class AetheriaProxy {
 	private boolean enabled;
@@ -62,8 +70,8 @@ public class AetheriaProxy {
 			return false;
 		}
 		
-		registerItems();
-		registerBlocks();
+		MinecraftForge.EVENT_BUS.register(this);
+		
 		return true;
 	}
 	
@@ -92,47 +100,40 @@ public class AetheriaProxy {
 		return true;
 	}
 	
-	private void registerItems() {
-		ItemResources = NostrumAetherResourceItem.instance();
-		ItemResources.setRegistryName(NostrumMagica.MODID, NostrumAetherResourceItem.ID);
-    	GameRegistry.register(ItemResources);
-    	NostrumAetherResourceItem.init();
+	@SubscribeEvent
+	private void registerItems(RegistryEvent.Register<Item> event) {
+    	final IForgeRegistry<Item> registry = event.getRegistry();
     	
+    	ItemResources = NostrumAetherResourceItem.instance();
+    	registry.register(ItemResources);
     	ItemLens = ItemAetherLens.instance();
-    	ItemLens.setRegistryName(NostrumMagica.MODID, ItemAetherLens.ID);
-    	GameRegistry.register(ItemLens);
-    	ItemAetherLens.init();
+    	registry.register(ItemLens);
+    	
+    	registry.register(
+    			(new ItemBlock(WispBlock.instance()).setRegistryName(WispBlock.ID)
+    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(WispBlock.ID))
+    	);
+    	registry.register(
+    			(new ItemBlock(AetherInfuser.instance()).setRegistryName(AetherInfuser.ID)
+    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(AetherInfuser.ID))
+    	);
 	}
 	
-	private void registerBlocks() {
+	@SubscribeEvent
+	private void registerBlocks(RegistryEvent.Register<Block> event) {
+    	final IForgeRegistry<Block> registry = event.getRegistry();
+    	
 		BlockWisp = WispBlock.instance();
-		GameRegistry.register(BlockWisp,
-    			new ResourceLocation(NostrumMagica.MODID, WispBlock.ID));
-    	GameRegistry.register(
-    			(new ItemBlock(BlockWisp).setRegistryName(WispBlock.ID)
-    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(WispBlock.ID))
-    			);
-    	WispBlock.init();
-
-    	BlockerInfuser = AetherInfuser.instance();
-		GameRegistry.register(BlockerInfuser,
-    			new ResourceLocation(NostrumMagica.MODID, AetherInfuser.ID));
-    	GameRegistry.register(
-    			(new ItemBlock(BlockerInfuser).setRegistryName(AetherInfuser.ID)
-    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(AetherInfuser.ID))
-    			);
-    	AetherInfuser.init();
+		registry.register(BlockWisp);
+		BlockerInfuser = AetherInfuser.instance();
+		registry.register(BlockerInfuser);
+		
+    	GameRegistry.registerTileEntity(WispBlockTileEntity.class, new ResourceLocation(NostrumMagica.MODID, WispBlock.ID + "_entity"));
+    	GameRegistry.registerTileEntity(AetherInfuserTileEntity.class, new ResourceLocation(NostrumMagica.MODID, AetherInfuser.ID + "_entity"));
 	}
 	
 	private void registerAetheriaQuests() {
-//		new NostrumQuest("ribbons", QuestType.CHALLENGE, 3,
-//    			0, // Control
-//    			0, // Technique
-//    			0, // Finesse
-//    			new String[0],
-//    			null, null,
-//    			new IReward[]{new AttributeReward(AwardType.REGEN, 0.015f)})
-//    		.offset(2, -1);
+		
 	}
 	
 	private void registerAetheriaRituals() {
@@ -161,8 +162,8 @@ public class AetheriaProxy {
 				);
 		
 		for (LensType type : LensType.values()) {
-			final ItemStack ingredient = type.getIngredient();
-			if (ingredient == null) {
+			final @Nonnull ItemStack ingredient = type.getIngredient();
+			if (ingredient.isEmpty()) {
 				continue;
 			}
 			
@@ -172,7 +173,7 @@ public class AetheriaProxy {
 						null,
 						new ReagentType[] {ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK},
 						new ItemStack(Blocks.GLASS_PANE),
-						new ItemStack[] {null, ingredient.copy(), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), null},
+						new ItemStack[] {ItemStack.EMPTY, ingredient.copy(), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), ItemStack.EMPTY},
 						new RRequirementResearch("aether_infusers"),
 						new OutcomeSpawnItem(ItemAetherLens.Create(type, 1))
 				)
@@ -187,7 +188,7 @@ public class AetheriaProxy {
 			.lore(EntityWisp.LoreKey)
 			.reference("ritual::wisp_crystal", "ritual.wisp_crystal.name")
 		.build("wispblock", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, -3, 2, true, new ItemStack(WispBlock.instance()));
-
+		
 		NostrumResearch.startBuilding()
 			.hiddenParent("aether_battery")
 			.parent("aether_charger")
@@ -215,7 +216,7 @@ public class AetheriaProxy {
 	public ItemStack getResourceItem(AetherResourceType type, int count) {
 		return NostrumAetherResourceItem.getItem(type, count);
 	}
-	
+
 	public boolean CreateAetherInfuser(World world, BlockPos pos) {
 		if (isEnabled()) {
 			AetherInfuser.SetBlock(world, pos, true);
@@ -240,7 +241,7 @@ public class AetheriaProxy {
 		private static final int DURATION = 20 * 120;
 		
 		@Override
-		public boolean matches(ItemStack stack) {
+		public boolean matches(@Nonnull ItemStack stack) {
 			return stack.getItem() instanceof SpellTome && !SpellTome.getSpells(stack).isEmpty();
 		}
 
@@ -257,6 +258,7 @@ public class AetheriaProxy {
 		@Override
 		public ItemStack[] unravel(ItemStack stack) {
 			ItemStack[] ret = new ItemStack[1];
+			ret[0] = ItemStack.EMPTY;
 			
 			List<Spell> spells = SpellTome.getSpells(stack);
 			if (spells == null || spells.isEmpty()) {

@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.items;
 
-import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuser.AetherInfuserTileEntity;
+import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileEntity;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;

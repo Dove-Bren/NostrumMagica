@@ -33,7 +33,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -51,18 +50,10 @@ public class WispBlock extends BlockContainer {
 		return instance;
 	}
 	
-	public static void init() {
-		GameRegistry.registerTileEntity(WispBlockTileEntity.class, new ResourceLocation(NostrumMagica.MODID, ID + "_entity"));
-//		GameRegistry.addShapedRecipe(new ItemStack(instance()),
-//				"WGW", "WCW", "WWW",
-//				'W', new ItemStack(Blocks.PLANKS, 1, OreDictionary.WILDCARD_VALUE),
-//				'G', new ItemStack(Blocks.GLASS_PANE, 1, OreDictionary.WILDCARD_VALUE),
-//				'C', NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1));
-	}
-	
 	public WispBlock() {
 		super(Material.GLASS, MapColor.DIAMOND);
 		this.setUnlocalizedName(ID);
+		this.setRegistryName(new ResourceLocation(NostrumMagica.MODID, WispBlock.ID));
 		this.setHardness(3.0f);
 		this.setResistance(10.0f);
 		this.setCreativeTab(NostrumMagica.creativeTab);

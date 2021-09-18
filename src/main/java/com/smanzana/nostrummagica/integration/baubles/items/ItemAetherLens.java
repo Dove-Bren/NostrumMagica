@@ -1,14 +1,13 @@
 package com.smanzana.nostrummagica.integration.baubles.items;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuser.AetherInfuserTileEntity;
+import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileEntity;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.IAetherInfuserLens;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
@@ -18,6 +17,7 @@ import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IEntityOwnable;
@@ -28,16 +28,15 @@ import net.minecraft.init.Items;
 import net.minecraft.init.PotionTypes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
@@ -52,14 +51,14 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 		ELEVATOR("elevator", false, 1, 0, new ItemStack(Blocks.DISPENSER)), // aether taken per entity
 		HEAL("heal", false, 5, 0, PotionUtils.addPotionToItemStack(new ItemStack(Items.POTIONITEM), PotionTypes.HEALING)), // aether taken per entity
 		BORE("bore", false, 20, 50, new ItemStack(Items.DIAMOND_PICKAXE, 1, OreDictionary.WILDCARD_VALUE)),
-		BORE_REVERSED("bore_reversed", false, 20, 50, null),
+		BORE_REVERSED("bore_reversed", false, 20, 50, ItemStack.EMPTY),
 		;
 		
 		private final String unlocName; // unlocalized name fragment
 		private final boolean isMaster; // whether this lense requires an original aether infuser
 		private final int aetherPerTick; // Aether we require to work each work tick
 		private final int interval;
-		private final ItemStack ingredient;
+		private final @Nonnull ItemStack ingredient;
 		
 		private LensType(String unlocName, boolean isMaster, int tickInterval, int aetherPerTick, @Nullable ItemStack ingredient) {
 			this.unlocName = unlocName;
@@ -93,20 +92,6 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 	public static String ID = "aether_lens_item";
 	public static String UNLOC_PREFIX = "lens_";
 	
-	public static void init() {
-		instance().setUnlocalizedName(ID);
-		
-		// Reverse bore
-		ItemStack reversedStack = Create(LensType.BORE_REVERSED, 1);
-		ItemStack regularStack = Create(LensType.BORE, 1);
-		GameRegistry.addRecipe(new ShapelessRecipes(reversedStack, Lists.newArrayList(
-				regularStack
-				)));
-		GameRegistry.addRecipe(new ShapelessRecipes(regularStack, Lists.newArrayList(
-				reversedStack
-				)));
-	}
-	
 	private static ItemAetherLens instance = null;
 
 	public static ItemAetherLens instance() {
@@ -118,6 +103,8 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 	}
 	
 	public ItemAetherLens() {
+		this.setUnlocalizedName(ID);
+		this.setRegistryName(NostrumMagica.MODID, ID);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setMaxStackSize(16);
 		this.setHasSubtypes(true);
@@ -142,7 +129,7 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 	
 	@SideOnly(Side.CLIENT)
     @Override
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
 		for (LensType type : LensType.values()) {
 			subItems.add(Create(type, 1));
 		}
@@ -176,11 +163,8 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-		super.addInformation(stack, playerIn, tooltip, advanced);
-		
-		if (stack == null)
-			return;
+	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+		super.addInformation(stack, worldIn, tooltip, flagIn);
 		
 		final LensType type = TypeFromMeta(stack.getMetadata()); 
 		
@@ -328,19 +312,19 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 			return false; // nothing to do
 		}
 		
-		List<ItemStack> drops = new ArrayList<>();
+		final NonNullList<ItemStack> drops = NonNullList.create();
 		for (int x = -2; x <= 2; x++)
 		for (int z = -2; z <= 2; z++) {
 			final BlockPos pos = cursor.toImmutable().add(x, 0, z);
 			final IBlockState state = world.getBlockState(pos);
-			drops.addAll(state.getBlock().getDrops(world, pos, state, 0));
+			state.getBlock().getDrops(drops, world, pos, state, 0);
 			world.destroyBlock(pos, false);
 			AetherInfuserTileEntity.DoChargeEffect(world, pos, 1, 0xFF664400);
 		}
 		
 		for (ItemStack stack : drops) {
 			// put drops right above bore altar
-			world.spawnEntityInWorld(new EntityItem(world, center.getX() + .5, center.getY() + 1.2, center.getZ() + .5, stack));
+			world.spawnEntity(new EntityItem(world, center.getX() + .5, center.getY() + 1.2, center.getZ() + .5, stack));
 		}
 		
 		return true;
