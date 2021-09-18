@@ -11,7 +11,6 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spells.EAlteration;
@@ -22,12 +21,8 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
@@ -41,12 +36,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.oredict.OreDictionary;
-import net.minecraftforge.oredict.RecipeSorter;
-import net.minecraftforge.oredict.RecipeSorter.Category;
 
 // TODO remove; no longer have these types of shrines spawning.
 // Remove, or convert like ShrineSeekingGem
@@ -63,15 +54,12 @@ public class SeekerIdol extends Item implements ILoreTagged {
 		return instance;
 	}
 	
-	public static void init() {
-		GameRegistry.addRecipe(new IdolRecipe());
-	}
-	
 	public static final String id = "seeker_idol";
 	
 	private SeekerIdol() {
 		super();
 		this.setUnlocalizedName(id);
+		this.setRegistryName(NostrumMagica.MODID, SeekerIdol.id);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setMaxStackSize(1);
 		this.setMaxDamage(25);
@@ -274,39 +262,6 @@ public class SeekerIdol extends Item implements ILoreTagged {
 		return stack;
 	}
 	
-	private static class IdolRecipe extends ShapedRecipes {
-
-		//public ShapedRecipes(int width, int height, ItemStack[] p_i1917_3_, ItemStack output)
-		public IdolRecipe() {
-			super(3, 3, new ItemStack[] {
-				new ItemStack(Blocks.COBBLESTONE),
-				NostrumResourceItem.getItem(ResourceType.TOKEN, 1),
-				new ItemStack(Blocks.COBBLESTONE),
-				new ItemStack(Blocks.COBBLESTONE),
-				new ItemStack(SpellRune.instance(), 1, OreDictionary.WILDCARD_VALUE),
-				new ItemStack(Blocks.COBBLESTONE),
-				new ItemStack(Blocks.COBBLESTONE),
-				new ItemStack(Items.GOLD_INGOT),
-				new ItemStack(Blocks.COBBLESTONE),	
-			}, SeekerIdol.getItemStack(new SpellComponentWrapper(EMagicElement.PHYSICAL)));
-			
-			RecipeSorter.register(NostrumMagica.MODID + ":IdolRecipe",
-					this.getClass(), Category.SHAPED, "after:minecraft:shaped");
-		}
-		
-		@Override
-		public ItemStack getCraftingResult(InventoryCrafting inv) {
-			// Just care about the rune in the center
-			ItemStack rune = inv.getStackInSlot(4);
-			SpellComponentWrapper comp = SpellRune.toComponentWrapper(rune);
-			if (comp == null) {
-				return ItemStack.EMPTY;
-			}
-			
-			return SeekerIdol.getItemStack(comp);
-		}
-	}
-
 	@Override
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_ITEMS;

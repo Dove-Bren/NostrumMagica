@@ -35,10 +35,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  */
 public class PositionCrystal extends Item implements ILoreTagged {
 
-	public static void init() {
-		;
-	}
-	
 	public static final String ID = "nostrum_pos_crystal";
 	private static final String NBT_DIMENSION = "dimension";
 	private static final String NBT_X = "x";
@@ -60,6 +56,7 @@ public class PositionCrystal extends Item implements ILoreTagged {
 		super();
 		this.setMaxStackSize(1);
 		this.setUnlocalizedName(ID);
+		this.setRegistryName(NostrumMagica.MODID, PositionCrystal.ID);
 		this.setMaxDamage(0);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 	}

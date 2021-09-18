@@ -1,0 +1,20 @@
+{
+  "type": "forge:ore_shapeless",
+  "result": {
+    "item": "nostrummagica:blank_scroll"
+  },
+  "ingredients": [
+    {
+      "item": "minecraft:paper"
+    },
+    {
+      "item": "minecraft:paper"
+    },
+    {
+      "item": "#REAGENT_MANDRAKE"
+    },
+    {
+      "item": "#REAGENT_CRYSTABLOOM"
+    }
+  ]
+}

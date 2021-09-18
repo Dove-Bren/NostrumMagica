@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.items;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -33,9 +35,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 
 public class SpellRune extends Item implements ILoreTagged {
 	
@@ -76,7 +78,7 @@ public class SpellRune extends Item implements ILoreTagged {
 
 	}
 	
-	private static class RuneRecipe implements IRecipe {
+	public static class RuneRecipe extends IForgeRegistryEntry.Impl<IRecipe> implements IRecipe {
 
 		@Override
 		public boolean matches(InventoryCrafting inv, World worldIn) {
@@ -261,18 +263,18 @@ public class SpellRune extends Item implements ILoreTagged {
 		}
 
 		@Override
-		public int getRecipeSize() {
-			return 4;
-		}
-
-		@Override
 		public ItemStack getRecipeOutput() {
 			return SpellRune.getRune(EMagicElement.FIRE, 1);
 		}
 
 		@Override
-		public ItemStack[] getRemainingItems(InventoryCrafting inv) {
-			return new ItemStack[inv.getSizeInventory()];
+		public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
+			return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
+		}
+
+		@Override
+		public boolean canFit(int width, int height) {
+			return width * height >= 4;
 		}
 		
 	}
@@ -294,13 +296,10 @@ public class SpellRune extends Item implements ILoreTagged {
 		return instance;
 	}
 
-	public static void init() {
-		GameRegistry.addRecipe(new RuneRecipe());
-	}
-	
 	public SpellRune() {
 		super();
 		this.setUnlocalizedName(ID);
+		this.setRegistryName(NostrumMagica.MODID, SpellRune.ID);
 		this.setMaxDamage(0);
 		this.setMaxStackSize(1);
 		this.setCreativeTab(NostrumMagica.creativeTab);

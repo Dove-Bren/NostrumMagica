@@ -13,7 +13,6 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
@@ -23,8 +22,6 @@ import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -99,6 +96,7 @@ public class ReagentItem extends Item implements ILoreTagged, IAetherBurnable {
 	public ReagentItem() {
 		super();
 		this.setUnlocalizedName(ID);
+		this.setRegistryName(NostrumMagica.MODID, ReagentItem.ID);
 		this.setMaxDamage(0);
 		this.setMaxStackSize(64);
 		this.setCreativeTab(NostrumMagica.creativeTab);
@@ -190,14 +188,6 @@ public class ReagentItem extends Item implements ILoreTagged, IAetherBurnable {
     	}
     	
     	return EnumActionResult.PASS;
-	}
-
-	public static void init() {
-		GameRegistry.addShapelessRecipe(instance.getReagent(ReagentType.SPIDER_SILK, 1),
-				Items.STRING, Items.STRING, Items.SUGAR);
-		
-		MinecraftForge.addGrassSeed(instance().getReagent(ReagentType.MANDRAKE_ROOT, 1), 6);
-		MinecraftForge.addGrassSeed(instance().getReagent(ReagentType.GINSENG, 1), 5);
 	}
 
 	@Override

@@ -8,7 +8,6 @@ import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
@@ -16,23 +15,9 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class ChalkItem extends Item implements ILoreTagged {
 
-	public static void init() {
-		
-		/*
-		 * In the future, something cool.
-		 * For now, just a wooden sword </3
-		 */
-		GameRegistry.addShapelessRecipe(new ItemStack(instance),
-				new ItemStack(Items.DYE, 1, 15),
-				new ItemStack(Items.DYE, 1, 15),
-				new ItemStack(ReagentItem.instance(), 1, OreDictionary.WILDCARD_VALUE));
-	}
-	
 	private static ChalkItem instance = null;
 
 	public static ChalkItem instance() {
@@ -47,6 +32,7 @@ public class ChalkItem extends Item implements ILoreTagged {
 
 	public ChalkItem() {
 		this.setUnlocalizedName(ID);
+		this.setRegistryName(NostrumMagica.MODID, ChalkItem.ID);
 		this.setMaxStackSize(1);
 		this.setMaxDamage(20);
 		this.setCreativeTab(NostrumMagica.creativeTab);

@@ -43,6 +43,7 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellArmor {
 	public ThanoPendant() {
 		super();
 		this.setUnlocalizedName(ID);
+		this.setRegistryName(NostrumMagica.MODID, ID);
 		this.setMaxDamage(MAX_THANOS_XP / THANOS_XP_PER);
 		this.setMaxStackSize(1);
 		this.setCreativeTab(NostrumMagica.creativeTab);

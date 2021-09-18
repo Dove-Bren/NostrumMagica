@@ -25,7 +25,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemFlintAndSteel;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -38,7 +37,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -65,19 +63,6 @@ public class Candle extends Block implements ITileEntityProvider {
 				instance = new Candle();
 			
 			return instance;
-	}
-	
-	public static void init() {
-		GameRegistry.addShapedRecipe(new ItemStack(instance()),
-				"W",
-				"F",
-				'W', ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1),
-				'F', Items.ROTTEN_FLESH);
-		GameRegistry.addShapedRecipe(new ItemStack(instance()),
-				"W",
-				"F",
-				'W', Items.STRING,
-				'F', Items.ROTTEN_FLESH);
 	}
 	
 	public Candle() {

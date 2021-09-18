@@ -33,6 +33,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.potion.PotionEffect;
@@ -47,13 +48,13 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.registries.IForgeRegistry;
 
 public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 
 	private static Map<EMagicElement, Map<Integer, EnchantedWeapon>> items;
 	
-	public static final void registerWeapons() {
+	public static final void registerWeapons(final IForgeRegistry<Item> registry) {
 		items = new EnumMap<EMagicElement, Map<Integer, EnchantedWeapon>>(EMagicElement.class);
 		
 		for (EMagicElement element : EMagicElement.values()) {
@@ -63,7 +64,8 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 					ResourceLocation location = new ResourceLocation(NostrumMagica.MODID, "sword_" + element.name().toLowerCase() + (i + 1));
 					EnchantedWeapon weapon =  new EnchantedWeapon(location.getResourcePath(), element, i + 1);
 					weapon.setUnlocalizedName(location.getResourcePath());
-					GameRegistry.register(weapon, location);
+					weapon.setRegistryName(location);
+					registry.register(weapon);
 					items.get(element).put(i + 1, weapon);
 				}
 			}

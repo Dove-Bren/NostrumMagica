@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.items;
 
 import javax.annotation.Nonnull;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumObelisk;
 import com.smanzana.nostrummagica.blocks.ObeliskPortal;
 import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity;
@@ -27,9 +28,6 @@ import net.minecraft.world.World;
  */
 public class PositionToken extends PositionCrystal {
 
-	public static void init() {
-	}
-	
 	public static final String ID = "nostrum_pos_token";
 
 	private static PositionToken instance = null;
@@ -45,6 +43,7 @@ public class PositionToken extends PositionCrystal {
 	public PositionToken() {
 		super();
 		this.setUnlocalizedName(ID);
+		this.setRegistryName(NostrumMagica.MODID, PositionToken.ID);
 	}
 	
 	@Override

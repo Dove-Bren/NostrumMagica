@@ -1,0 +1,30 @@
+{
+  "type": "forge:ore_shaped",
+  "result": {
+    "item": "nostrummagica:spell_table"
+  },
+  "pattern": [
+    "CBD",
+    "PPP",
+    "L L"
+  ],
+  "key": {
+    "P": {
+	  "type": "forge:ore_dict",
+      "ore": "plankWood"
+    },
+    "L": {
+	  "type": "forge:ore_dict",
+	  "ore": "logWood"
+    },
+    "C": {
+      "item": "#REAGENT_CRYSTABLOOM"
+    },
+    "B": {
+      "item": "#REAGENT_BLACKPEARL"
+    },
+    "D": {
+      "item": "#REAGENT_MANIDUST"
+    }
+  }
+}

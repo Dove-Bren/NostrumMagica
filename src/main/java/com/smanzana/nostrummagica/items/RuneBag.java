@@ -34,18 +34,12 @@ public class RuneBag extends Item implements ILoreTagged {
 		return instance;
 	}
 	
-	public static void init() {
-//		GameRegistry.addRecipe(new ItemStack(instance), "GLG", "LRL", "LLL",
-//				'L', Items.LEATHER,
-//				'G', Items.GOLD_INGOT,
-//				'R', new ItemStack(SpellRune.instance(), 1, OreDictionary.WILDCARD_VALUE));
-	}
-	
 	public static final String id = "rune_bag";
 	
 	private RuneBag() {
 		super();
 		this.setUnlocalizedName(id);
+		this.setRegistryName(NostrumMagica.MODID, id);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setMaxStackSize(1);
 	}

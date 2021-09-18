@@ -63,6 +63,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.EntityEquipmentSlot.Type;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
@@ -91,15 +92,15 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.registries.IForgeRegistry;
 
 public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISpecialArmor, IElytraProvider {
 
 	private static Map<EMagicElement, Map<EntityEquipmentSlot, Map<Integer, EnchantedArmor>>> items;
 	
-	public static final void registerArmors() {
+	public static final void registerArmors(final IForgeRegistry<Item> registry) {
 		items = new EnumMap<EMagicElement, Map<EntityEquipmentSlot, Map<Integer, EnchantedArmor>>>(EMagicElement.class);
 		for (EMagicElement element : EMagicElement.values()) {
 			items.put(element, new EnumMap<EntityEquipmentSlot, Map<Integer, EnchantedArmor>>(EntityEquipmentSlot.class));
@@ -113,7 +114,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 						ResourceLocation location = new ResourceLocation(NostrumMagica.MODID, "armor_" + slot.name().toLowerCase() + "_" + element.name().toLowerCase() + (i + 1));
 						EnchantedArmor armor =  new EnchantedArmor(location.getResourcePath(), slot, element, i);
 						armor.setUnlocalizedName(location.getResourcePath());
-						GameRegistry.register(armor, location);
+						armor.setRegistryName(location);
+						registry.register(armor);
 						items.get(element).get(slot).put(i + 1, armor);
 						MinecraftForge.EVENT_BUS.register(armor);
 					}

@@ -18,15 +18,12 @@ public class DragonEggFragment extends Item implements ILoreTagged {
 		return instance;
 	}
 	
-	public static void init() {
-		;
-	}
-	
 	public static final String id = "dragon_egg_part";
 	
 	private DragonEggFragment() {
 		super();
 		this.setUnlocalizedName(id);
+		this.setRegistryName(NostrumMagica.MODID, id);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setMaxStackSize(3);
 	}

@@ -23,6 +23,7 @@ public class MasteryOrb extends Item implements ILoreTagged {
 	private MasteryOrb() {
 		super();
 		this.setUnlocalizedName(id);
+		this.setRegistryName(NostrumMagica.MODID, id);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setMaxStackSize(8);
 	}

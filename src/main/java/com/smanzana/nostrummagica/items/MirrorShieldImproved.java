@@ -44,6 +44,7 @@ public class MirrorShieldImproved extends MirrorShield {
 	private MirrorShieldImproved() {
 		super();
 		this.setUnlocalizedName(id);
+		this.setRegistryName(NostrumMagica.MODID, MirrorShieldImproved.id);
 		this.setMaxDamage(1250);
 		
 		this.addPropertyOverride(new ResourceLocation("charged"), new IItemPropertyGetter() {

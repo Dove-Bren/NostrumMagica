@@ -43,6 +43,7 @@ public class NostrumRoseItem extends Item implements ILoreTagged {
 	public NostrumRoseItem() {
 		super();
 		this.setUnlocalizedName(ID);
+		this.setRegistryName(NostrumMagica.MODID, ID);
 		this.setMaxDamage(0);
 		this.setMaxStackSize(16);
 		this.setCreativeTab(NostrumMagica.creativeTab);
@@ -79,7 +80,7 @@ public class NostrumRoseItem extends Item implements ILoreTagged {
     @Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
     	for (RoseType type: RoseType.values()) {
-    		subItems.add(new ItemStack(thiss, 1, getMetaFromType(type)));
+    		subItems.add(new ItemStack(this, 1, getMetaFromType(type)));
     	}
 	}
 	

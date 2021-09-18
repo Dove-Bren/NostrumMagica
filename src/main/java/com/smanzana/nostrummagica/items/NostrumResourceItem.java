@@ -7,7 +7,6 @@ import javax.annotation.Nonnull;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.ManiCrystal;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
@@ -18,7 +17,6 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
@@ -28,10 +26,8 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.oredict.OreDictionary;
 
 /**
  * Misc. resource items for delayed progression
@@ -79,18 +75,10 @@ public class NostrumResourceItem extends Item implements ILoreTagged {
 		return instance;
 	}
 	
-	public static void init() {
-		// Only thing with regular crafting recipe is small crystal
-		
-		GameRegistry.addRecipe(getItem(ResourceType.CRYSTAL_SMALL, 1), " MR", "MDM", "RM ",
-				'D', Items.DIAMOND,
-				'M', ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1),
-				'R', new ItemStack(ReagentItem.instance(), 1, OreDictionary.WILDCARD_VALUE));
-	}
-	
 	public NostrumResourceItem() {
 		super();
 		this.setUnlocalizedName(ID);
+		this.setRegistryName(NostrumMagica.MODID, NostrumResourceItem.ID);
 		this.setMaxDamage(0);
 		this.setMaxStackSize(64);
 		this.setCreativeTab(NostrumMagica.creativeTab);

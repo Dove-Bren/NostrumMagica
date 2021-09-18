@@ -56,6 +56,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 	public MagicCharm() {
 		super();
 		this.setUnlocalizedName(ID);
+		this.setRegistryName(NostrumMagica.MODID, ID);
 		this.setMaxDamage(0);
 		this.setMaxStackSize(16);
 		this.setCreativeTab(NostrumMagica.creativeTab);

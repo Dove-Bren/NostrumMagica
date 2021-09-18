@@ -1,0 +1,453 @@
+[
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "runeAny"
+    },
+    "name": "RUNE_ANY"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "reagentAny"
+    },
+    "name": "REAGENT_ANY"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "reagentMandrakeRoot"
+    },
+    "name": "REAGENT_MANDRAKE"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "reagentGinseng"
+    },
+    "name": "REAGENT_GINSENG"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "reagentSpiderSilk"
+    },
+    "name": "REAGENT_SPIDERSILK"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "reagentBlackPearl"
+    },
+    "name": "REAGENT_BLACKPEARL"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "reagentSkyAsh"
+    },
+    "name": "REAGENT_SKYASH"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "reagentGraveDust"
+    },
+    "name": "REAGENT_GRAVEDUST"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "reagentManiDust"
+    },
+    "name": "REAGENT_MANIDUST"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "reagentCrystabloom"
+    },
+    "name": "REAGENT_CRYSTABLOOM"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "infgemAny"
+    },
+    "name": "INFUSEDGEM_ANY"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "infgemVoid"
+    },
+    "name": "INFUSEDGEM_VOID"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "infgemFire"
+    },
+    "name": "INFUSEDGEM_FIRE"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "infgemIce"
+    },
+    "name": "INFUSEDGEM_ICE"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "infgemWind"
+    },
+    "name": "INFUSEDGEM_WIND"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "infgemEarth"
+    },
+    "name": "INFUSEDGEM_EARTH"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "infgemLightning"
+    },
+    "name": "INFUSEDGEM_LIGHTNING"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "infgemEnder"
+    },
+    "name": "INFUSEDGEM_ENDER"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nrToken"
+    },
+    "name": "RESOURCE_TOKEN"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nrCrystalSmall"
+    },
+    "name": "RESOURCE_CRYSTALSMALL"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nrCrystalMedium"
+    },
+    "name": "RESOURCE_CRYSTALMEDIUM"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nrCrystalLarge"
+    },
+    "name": "RESOURCE_CRYSTALLARGE"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nrPendantLeft"
+    },
+    "name": "RESOURCE_PENDANTLEFT"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nrPendantRight"
+    },
+    "name": "RESOURCE_PENDANTRIGHT"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nrSlabFierce"
+    },
+    "name": "RESOURCE_SLABFIERCE"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nrSlabKind"
+    },
+    "name": "RESOURCE_SLABKIND"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nrSlabBalanced"
+    },
+    "name": "RESOURCE_SLABBALANCED"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nrSpriteCore"
+    },
+    "name": "RESOURCE_SPRITECORE"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nrEnderBristle"
+    },
+    "name": "RESOURCE_ENDERBRISTLE"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nrWispPebble"
+    },
+    "name": "RESOURCE_WISPPEBBLE"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "spellpageAny"
+    },
+    "name": "SPELLPAGE_ANY"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nessenceAny"
+    },
+    "name": "ESSENCE_ANY"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nessenceVoid"
+    },
+    "name": "ESSENCE_VOID"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nessenceFire"
+    },
+    "name": "ESSENCE_FIRE"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nessenceIce"
+    },
+    "name": "ESSENCE_ICE"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nessenceWind"
+    },
+    "name": "ESSENCE_WIND"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nessenceEarth"
+    },
+    "name": "ESSENCE_EARTH"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nessenceLightning"
+    },
+    "name": "ESSENCE_LIGHTNING"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nessenceEnder"
+    },
+    "name": "ESSENCE_ENDER"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nsiAny"
+    },
+    "name": "SKILLITEM_ANY"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nsiMirror"
+    },
+    "name": "SKILLITEM_MIRROR"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nsiOoze"
+    },
+    "name": "SKILLITEM_OOZE"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nsiPendant"
+    },
+    "name": "SKILLITEM_PENDANT"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nsiFlute"
+    },
+    "name": "SKILLITEM_FLUTE"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nsiWing"
+    },
+    "name": "SKILLITEM_WING"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nsiEnderPin"
+    },
+    "name": "SKILLITEM_ENDERPIN"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nsiResearchSmall"
+    },
+    "name": "SKILLITEM_RESEARCHSMALL"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nsiResearchLarge"
+    },
+    "name": "SKILLITEM_LARGE"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "roseAny"
+    },
+    "name": "ROSE_ANY"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "roseBlood"
+    },
+    "name": "ROSE_BLOOD"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "roseEldrich"
+    },
+    "name": "ROSE_ELDRICH"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "rosePale"
+    },
+    "name": "ROSE_PALE"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nhookshotAny"
+    },
+    "name": "HOOKSHOT_ANY"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nhookshotWeak"
+    },
+    "name": "HOOKSHOT_WEAK"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nhookshotMedium"
+    },
+    "name": "HOOKSHOT_MEDIUM"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nhookshotStrong"
+    },
+    "name": "HOOKSHOT_STRONG"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nhookshotClaw"
+    },
+    "name": "HOOKSHOT_CLAW"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nrseedMandrake"
+    },
+    "name": "REAGENTSEED_MANDRAKE"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nrseedGinseng"
+    },
+    "name": "REAGENTSEED_GINSENG"
+  },
+  {
+    "ingredient": {
+      "type": "forge:ore_dict",
+      "ore": "nrseedEssence"
+    },
+    "name": "REAGENTSEED_ESSENCE"
+  },
+  
+  
+  
+  
+  
+  
+  {
+    "ingredient": {
+      "type": "minecraft:item_nbt",
+      "item": "nostrummagica:nostrum_rune",
+	  "data": 0,
+	  "nbt": "{type: shape, name: shape_single}"
+    },
+    "name": "RUNE_SINGLE"
+  },{
+    "ingredient": {
+      "type": "minecraft:item_nbt",
+      "item": "nostrummagica:nostrum_rune",
+	  "data": 0,
+	  "nbt": "{type: shape, name: shape_chain}"
+    },
+    "name": "RUNE_CHAIN"
+  },{
+     "ingredient": {
+      "type": "minecraft:item_nbt",
+      "item": "nostrummagica:nostrum_rune",
+	  "data": 0,
+	  "nbt": "{type: shape, name: shape_aoe}"
+    },
+    "name": "RUNE_AOE"
+  }
+]

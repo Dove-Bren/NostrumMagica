@@ -1,0 +1,5 @@
+{
+	"recipes": {
+		"ore_shaped_with_remaining": "com.smanzana.nostrummagica.crafting.RecipeFactoryShapedWithRemaining"
+	}
+}

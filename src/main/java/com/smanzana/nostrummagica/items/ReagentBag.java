@@ -35,18 +35,12 @@ public class ReagentBag extends Item implements ILoreTagged {
 		return instance;
 	}
 	
-	public static void init() {
-//		GameRegistry.addRecipe(new ItemStack(instance), "GLG", "LRL", "LLL",
-//				'L', Items.LEATHER,
-//				'G', Items.GOLD_INGOT,
-//				'R', ReagentItem.instance());
-	}
-	
 	public static final String id = "reagent_bag";
 	
 	private ReagentBag() {
 		super();
 		this.setUnlocalizedName(id);
+		this.setRegistryName(NostrumMagica.MODID, ReagentBag.id);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setMaxStackSize(1);
 	}

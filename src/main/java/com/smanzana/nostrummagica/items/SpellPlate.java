@@ -51,6 +51,7 @@ public class SpellPlate extends Item implements ILoreTagged {
 	private SpellPlate() {
 		super();
 		this.setUnlocalizedName(id);
+		this.setRegistryName(NostrumMagica.MODID, SpellPlate.id);
 		this.setCreativeTab(NostrumMagica.enhancementTab); // set as icon for tab
 		this.setMaxStackSize(1);
 	}

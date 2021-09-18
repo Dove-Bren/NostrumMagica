@@ -5,17 +5,11 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
-import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -23,8 +17,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.oredict.OreDictionary;
 
 /**
  * Dragon spawning egg
@@ -33,38 +25,6 @@ import net.minecraftforge.oredict.OreDictionary;
  */
 public class DragonEgg extends Item implements ILoreTagged {
 
-	public static void init() {
-		ItemStack gold = new ItemStack(Item.getItemFromBlock(Blocks.GOLD_BLOCK), 1, OreDictionary.WILDCARD_VALUE);
-		ItemStack crystal = NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1);
-		ItemStack star = new ItemStack(Items.NETHER_STAR, 1, OreDictionary.WILDCARD_VALUE);
-		ItemStack shell = new ItemStack(DragonEggFragment.instance());
-		ItemStack egg = new ItemStack(Item.getItemFromBlock(Blocks.DRAGON_EGG));
-		GameRegistry.addRecipe(new ShapedRecipes(3, 3, new ItemStack[] {
-				crystal, shell, star, shell, egg, shell, gold, gold, gold
-		}, new ItemStack(instance())) {
-			@Override
-			public ItemStack[] getRemainingItems(InventoryCrafting inv) {
-				ItemStack[] aitemstack = new ItemStack[inv.getSizeInventory()];
-				
-				int j = 4;
-				int len = inv.getSizeInventory();
-				if (len < 4) {
-					len = 0;
-				}
-				
-				for (int i = 0; i < len; i++) {
-					if (i == j) {
-						aitemstack[i] = egg;
-					} else {
-						aitemstack[i] = null;
-					}
-				}
-				
-				return aitemstack;
-			}
-		});
-	}
-	
 	public static final String ID = "dragon_egg";
 
 	private static DragonEgg instance = null;
@@ -81,6 +41,7 @@ public class DragonEgg extends Item implements ILoreTagged {
 		super();
 		this.setMaxStackSize(1);
 		this.setUnlocalizedName(ID);
+		this.setRegistryName(NostrumMagica.MODID, ID);
 		this.setMaxDamage(0);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 	}

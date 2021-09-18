@@ -5,7 +5,6 @@ import javax.annotation.Nonnull;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.SpellTable;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
@@ -13,7 +12,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
@@ -23,19 +21,9 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class SpellTableItem extends Item implements ILoreTagged {
 
-	public static void init() {
-		GameRegistry.addRecipe(new ItemStack(instance), "CBD", "PPP", "L L",
-				'P', Blocks.PLANKS,
-				'L', Blocks.LOG,
-				'C', ReagentItem.instance().getReagent(ReagentType.CRYSTABLOOM, 1),
-				'B', ReagentItem.instance().getReagent(ReagentType.BLACK_PEARL, 1),
-				'D', ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1));
-	}
-	
 	private static SpellTableItem instance = null;
 	public static final String ID = "spell_table";
 
@@ -51,11 +39,11 @@ public class SpellTableItem extends Item implements ILoreTagged {
 		super();
 		this.setMaxStackSize(64);
 		this.setUnlocalizedName(ID);
+		this.setRegistryName(NostrumMagica.MODID, SpellTableItem.ID);
 		this.setMaxDamage(0);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
 	{
 		

@@ -1,0 +1,14 @@
+{
+  "type": "forge:ore_shapeless",
+  "result": {
+    "item": "#ESSENCE_FIRE"
+  },
+  "ingredients": [
+    {
+      "item": "#ESSENCE_LIGHTNING"
+    },
+    {
+      "item": "#ESSENCE_ANY"
+    }
+  ]
+}

@@ -32,14 +32,6 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 	public static String ID = "thanos_staff";
 	private static final String NBT_XP = "absorbed_xp";
 	
-	public static void init() {
-		instance().setUnlocalizedName(ID);
-		
-//		GameRegistry.addRecipe(new ItemStack(instance), "  T", " S ", "S  ",
-//				'T', new ItemStack(ThanoPendant.instance(), 1, OreDictionary.WILDCARD_VALUE), 
-//				'S', new ItemStack(MageStaff.instance(), 1, 0));
-	}
-	
 	private static ThanosStaff instance = null;
 
 	public static ThanosStaff instance() {
@@ -55,6 +47,8 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 		this.setMaxDamage(500);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setMaxStackSize(1);
+		this.setUnlocalizedName(ID);
+		this.setRegistryName(NostrumMagica.MODID, ID);
 	}
 	
 	@Override

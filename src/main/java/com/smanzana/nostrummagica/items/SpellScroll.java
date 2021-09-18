@@ -2,12 +2,8 @@ package com.smanzana.nostrummagica.items;
 
 import java.util.List;
 
-<<<<<<< ba775cbb6bf7699be9c429d23e89792081fd0f06
-=======
 import javax.annotation.Nonnull;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
->>>>>>> First wave of updates to get to 1.12.
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
@@ -53,15 +49,10 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 	
 	public static final String id = "spell_scroll";
 	
-	public static void init() {
-		
-		//GameRegistry.addRecipe(new ActivatedRecipe());
-		
-	}
-	
 	private SpellScroll() {
 		super();
 		this.setUnlocalizedName(id);
+		this.setRegistryName(NostrumMagica.MODID, SpellScroll.id);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setMaxStackSize(1);
 		this.setHasSubtypes(true);
@@ -286,41 +277,6 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 //			}
 //		}
 	}
-	
-//	private static class ActivatedRecipe extends ShapedRecipes {
-//
-//		public ActivatedRecipe() {
-//			super(3, 3, new ItemStack[] {
-//				new ItemStack(Items.DIAMOND),
-//				new ItemStack(Items.ENDER_PEARL),
-//				new ItemStack(Items.DIAMOND),
-//				new ItemStack(Items.ENDER_PEARL),
-//				new ItemStack(instance(), 1, OreDictionary.WILDCARD_VALUE),
-//				new ItemStack(Items.ENDER_PEARL),
-//				new ItemStack(Items.DIAMOND),
-//				new ItemStack(Items.ENDER_PEARL),
-//				new ItemStack(Items.DIAMOND),
-//			}, new ItemStack(instance(), 1, 1));
-//			
-//			RecipeSorter.register(NostrumMagica.MODID + ":ScrollRecipe_activated",
-//					this.getClass(), Category.SHAPED, "after:minecraft:shaped");
-//		}
-//		
-//		@Override
-//		public ItemStack getCraftingResult(InventoryCrafting inv) {
-//			// Clone input scroll and set meta
-//			ItemStack scroll = inv.getStackInSlot(4);
-//			Spell spell = getSpell(scroll);
-//			if (spell == null) {
-//				return null;
-//			}
-//			
-//			scroll = scroll.copy();
-//			scroll.setItemDamage(0);
-//			setNestedScrollMeta(scroll, (byte) 1);
-//			return scroll;
-//		}
-//	}
 
 	@Override
 	public boolean shouldTrace(World world, EntityPlayer player, ItemStack stack) {

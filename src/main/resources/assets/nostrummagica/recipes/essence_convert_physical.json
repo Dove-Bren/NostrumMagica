@@ -1,0 +1,14 @@
+{
+  "type": "forge:ore_shapeless",
+  "result": {
+    "item": "#ESSENCE_VOID"
+  },
+  "ingredients": [
+    {
+      "item": "#ESSENCE_ENDER"
+    },
+    {
+      "item": "#ESSENCE_ANY"
+    }
+  ]
+}

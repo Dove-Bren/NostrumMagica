@@ -1,0 +1,17 @@
+{
+  "type": "forge:ore_shapeless",
+  "result": {
+    "item": "#REAGENT_SPIDERSILK"
+  },
+  "ingredients": [
+    {
+      "item": "minecraft:string"
+    },
+    {
+      "item": "minecraft:string"
+    },
+    {
+      "item": "minecraft:sugar"
+    }
+  ]
+}

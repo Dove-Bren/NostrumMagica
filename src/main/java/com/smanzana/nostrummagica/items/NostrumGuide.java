@@ -18,7 +18,6 @@ import com.smanzana.nostrummagica.rituals.RitualRegistry;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
@@ -26,7 +25,6 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -48,16 +46,12 @@ public class NostrumGuide extends Item implements GuiBook {
 	
 	public static final String id = "nostrum_guide";
 	
-	public static void init() {
-		GameRegistry.addShapelessRecipe(new ItemStack(instance()), Items.LEATHER,
-				Items.LEATHER, Items.LEATHER, BlankScroll.instance());
-	}
-	
 	private NostrumGuide() {
 		super();
 		this.setUnlocalizedName(id);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setMaxStackSize(1);
+		setRegistryName(NostrumMagica.MODID, NostrumGuide.id);
 	}
 	
 	@Override

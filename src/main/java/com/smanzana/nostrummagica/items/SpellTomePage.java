@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.items;
 
 import java.util.List;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -10,18 +11,13 @@ import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.oredict.RecipeSorter;
-import net.minecraftforge.oredict.RecipeSorter.Category;
 
 public class SpellTomePage extends Item implements ILoreTagged {
 
@@ -36,16 +32,12 @@ public class SpellTomePage extends Item implements ILoreTagged {
 		return instance;
 	}
 	
-	public static void init() {
-		RecipeSorter.register("SpellTomeUpgradeRecipe", TomePageRecipe.class, Category.SHAPELESS, "");
-		GameRegistry.addRecipe(new TomePageRecipe());
-	}
-	
 	public static final String id = "spelltome_page";
 	
 	private SpellTomePage() {
 		super();
 		this.setUnlocalizedName(id);
+		this.setRegistryName(NostrumMagica.MODID, SpellTomePage.id);
 		//this.setCreativeTab(NostrumMagica.creativeTab); // set as icon for tab
 		this.setMaxStackSize(1);
 	}
@@ -200,103 +192,5 @@ public class SpellTomePage extends Item implements ILoreTagged {
 		String key = stack.getTagCompound().getString(NBT_TYPE);
 		SpellTomeEnhancement enhance = SpellTomeEnhancement.lookupEnhancement(key);
 		return enhance;
-	}
-	
-	private static class TomePageRecipe implements IRecipe {
-
-		@Override
-		public boolean matches(InventoryCrafting inv, World worldIn) {
-			SpellTomeEnhancement enhancement = null;
-			int count = 0;
-			
-			for (int i = 0; i < inv.getSizeInventory(); i++) {
-				ItemStack stack = inv.getStackInSlot(i);
-				if (stack.isEmpty())
-					continue;
-				
-				if (!(stack.getItem() instanceof SpellTomePage))
-					return false;
-				
-				SpellTomeEnhancement cur = SpellTomePage.getEnhancement(stack);
-				if (cur == null)
-					return false;
-				
-				if (enhancement != null && enhancement != cur)
-					return false;
-				
-				int level = SpellTomePage.getLevel(stack);
-				if (0 == level)
-					return false;
-				
-				if (level >= cur.getMaxLevel())
-					return false;
-				
-				enhancement = cur;
-				count++;
-			}
-			
-			return count > 1;
-		}
-
-		@Override
-		public ItemStack getCraftingResult(InventoryCrafting inv) {
-			SpellTomeEnhancement enhancement = null;
-			int sum = 0;
-			int count = 0;
-			
-			for (int i = 0; i < inv.getSizeInventory(); i++) {
-				ItemStack stack = inv.getStackInSlot(i);
-				if (stack == null)
-					continue;
-				
-				if (!(stack.getItem() instanceof SpellTomePage))
-					return ItemStack.EMPTY;
-				
-				SpellTomeEnhancement cur = SpellTomePage.getEnhancement(stack);
-				if (cur == null)
-					return ItemStack.EMPTY;
-				
-				if (enhancement != null && enhancement != cur)
-					return ItemStack.EMPTY;
-				
-				int level = SpellTomePage.getLevel(stack);
-				if (0 == level)
-					return ItemStack.EMPTY;
-				
-				// Optimization to disallow adding when you are already max level
-				if (level >= cur.getMaxLevel())
-					return ItemStack.EMPTY;
-				
-				enhancement = cur;
-				sum += level;
-				count++;
-			}
-			
-			if (count < 2 || enhancement == null)
-				return ItemStack.EMPTY;
-			
-			// Check level
-			int level = 1 + (int) (Math.log(sum) / Math.log(2)); // Log base 2, floored
-			if (level > enhancement.getMaxLevel())
-				return ItemStack.EMPTY;
-			
-			return getItemstack(enhancement, level);
-		}
-
-		@Override
-		public int getRecipeSize() {
-			return 4;
-		}
-
-		@Override
-		public ItemStack getRecipeOutput() {
-			return SpellTomePage.getItemstack(SpellTomeEnhancement.EFFICIENCY, 1);
-		}
-
-		@Override
-		public ItemStack[] getRemainingItems(InventoryCrafting inv) {
-			return new ItemStack[inv.getSizeInventory()];
-		}
-		
 	}
 }

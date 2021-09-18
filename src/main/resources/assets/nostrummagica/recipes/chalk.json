@@ -1,0 +1,19 @@
+{
+  "type": "forge:ore_shapeless",
+  "result": {
+    "item": "nostrummagica:nostrum_chalk"
+  },
+  "ingredients": [
+    {
+      "item": "minecraft:dye",
+	  "data": 15
+    },
+    {
+      "item": "minecraft:dye",
+	  "data": 15
+    },
+    {
+      "item": "#REAGENT_ANY"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "type": "forge:ore_shaped",
+  "result": {
+    "item": "nostrummagica:"
+  },
+  "pattern": [
+    "SSS",
+    "SAS",
+    "SSS"
+  ],
+  "key": {
+    "A": {
+      "item": "nostrummagica:"
+    },
+    "S": {
+      "item": "nostrummagica:"
+    }
+  }
+}

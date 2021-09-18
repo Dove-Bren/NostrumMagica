@@ -57,10 +57,6 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 	private static final String NBT_CAPACITY = "capacity";
 	private static final String NBT_ENDERIO_TRAVEL_CAP = "enderio_travel";
 	
-	public static void init() {
-		
-	}
-	
 	private static WarlockSword instance = null;
 
 	public static WarlockSword instance() {
@@ -75,6 +71,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 		super(ToolMaterial.DIAMOND);
 		this.setMaxDamage(1200);
 		this.setUnlocalizedName(ID);
+		this.setRegistryName(NostrumMagica.MODID, ID);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setMaxStackSize(1);
 	}

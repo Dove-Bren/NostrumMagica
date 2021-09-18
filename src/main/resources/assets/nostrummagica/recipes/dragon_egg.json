@@ -1,0 +1,35 @@
+{
+  "type": "nostrummagica:ore_shaped_with_remaining",
+  "result": {
+    "item": "nostrummagica:dragon_egg"
+  },
+  "pattern": [
+    "CSN",
+    "SES",
+    "GGG"
+  ],
+  "key": {
+    "C": {
+      "item": "#RESOURCE_CRYSTALLARGE"
+    },
+    "S": {
+      "item": "nostrummagica:dragon_egg_part"
+    },
+    "N": {
+      "type": "forge:ore_dict",
+	  "ore": "netherStar"
+    },
+    "E": {
+      "item": "minecraft:dragon_egg"
+    },
+    "G": {
+      "type": "forge:ore_dict",
+	  "ore": "blockGold"
+    }
+  },
+  "remaining": [
+    {
+		"item": "minecraft:dragon_egg"
+	}
+  ]
+}

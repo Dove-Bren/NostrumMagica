@@ -51,6 +51,7 @@ public class MirrorShield extends Item implements ISpellActionListener, ILoreTag
 	protected MirrorShield() {
 		super();
 		this.setUnlocalizedName(id);
+		this.setRegistryName(NostrumMagica.MODID, MirrorShield.id);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setMaxStackSize(1);
 		this.setMaxDamage(750);

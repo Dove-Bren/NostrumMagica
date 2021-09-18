@@ -68,6 +68,7 @@ public class NostrumSkillItem extends Item implements ILoreTagged {
 	public NostrumSkillItem() {
 		super();
 		this.setUnlocalizedName(ID);
+		this.setRegistryName(NostrumMagica.MODID, ID);
 		this.setMaxDamage(0);
 		this.setMaxStackSize(1);
 		this.setCreativeTab(NostrumMagica.creativeTab);

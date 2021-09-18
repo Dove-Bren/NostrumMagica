@@ -26,14 +26,6 @@ public class MageStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 
 	public static String ID = "mage_staff";
 	
-	public static void init() {
-		instance().setUnlocalizedName("mage_staff");
-		
-//		GameRegistry.addRecipe(new ItemStack(instance), " WW", " WC", "W  ",
-//				'W', Blocks.PLANKS, 
-//				'C', NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1));
-	}
-	
 	private static MageStaff instance = null;
 
 	public static MageStaff instance() {
@@ -49,6 +41,8 @@ public class MageStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 		this.setMaxDamage(200);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setMaxStackSize(1);
+		this.setUnlocalizedName(ID);
+		this.setRegistryName(NostrumMagica.MODID, ID);
 	}
 	
 	@Override

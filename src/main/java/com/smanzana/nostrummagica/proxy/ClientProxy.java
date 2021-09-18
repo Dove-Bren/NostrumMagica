@@ -393,10 +393,10 @@ public class ClientProxy extends CommonProxy {
 		registerModel(MirrorShieldImproved.instance(), 0, MirrorShieldImproved.id);
 		
 		registerModel(MagicSwordBase.instance(), 0, MagicSwordBase.instance().getModelID());
-		registerModel(MagicArmorBase.helm, 0, MagicArmorBase.helm.getModelID());
-		registerModel(MagicArmorBase.chest, 0, MagicArmorBase.chest.getModelID());
-		registerModel(MagicArmorBase.legs, 0, MagicArmorBase.legs.getModelID());
-		registerModel(MagicArmorBase.feet, 0, MagicArmorBase.feet.getModelID());
+		registerModel(MagicArmorBase.helm(), 0, MagicArmorBase.helm().getModelID());
+		registerModel(MagicArmorBase.chest(), 0, MagicArmorBase.chest().getModelID());
+		registerModel(MagicArmorBase.legs(), 0, MagicArmorBase.legs().getModelID());
+		registerModel(MagicArmorBase.feet(), 0, MagicArmorBase.feet().getModelID());
 		
 		registerModel(WarlockSword.instance(), 0, WarlockSword.ID);
 		ModelLoader.setCustomModelResourceLocation(WarlockSword.instance(), 0, new ModelResourceLocation(NostrumMagica.MODID + ":" + WarlockSword.ID, "inventory"));

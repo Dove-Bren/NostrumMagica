@@ -1,0 +1,23 @@
+{
+  "type": "forge:ore_shaped",
+  "result": {
+    "item": "#RESOURCE_CRYSTALSMALL"
+  },
+  "pattern": [
+    " MR",
+    "MDM",
+    "RM "
+  ],
+  "key": {
+    "M": {
+      "item": "#REAGENT_MANIDUST"
+    },
+    "R": {
+      "item": "#REAGENT_ANY"
+    },
+    "D": {
+      "type": "forge:ore_dict",
+	  "ore": "gemDiamond"
+    }
+  }
+}

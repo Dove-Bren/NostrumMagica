@@ -34,9 +34,9 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.registries.IForgeRegistry;
 
 public class DragonArmor extends Item {
 
@@ -133,7 +133,7 @@ public class DragonArmor extends Item {
 	
 	private static Map<DragonArmorMaterial, Map<DragonEquipmentSlot, DragonArmor>> items;
 	
-	public static final void registerArmors() {
+	public static final void registerArmors(final IForgeRegistry<Item> registry) {
 		items = new EnumMap<DragonArmorMaterial, Map<DragonEquipmentSlot, DragonArmor>>(DragonArmorMaterial.class);
 		for (DragonArmorMaterial material : DragonArmorMaterial.values()) {
 			items.put(material, new EnumMap<DragonEquipmentSlot, DragonArmor>(DragonEquipmentSlot.class));
@@ -150,7 +150,8 @@ public class DragonArmor extends Item {
 				ResourceLocation location = new ResourceLocation(NostrumMagica.MODID, "dragonarmor_" + slot.name().toLowerCase() + "_" + material.name().toLowerCase());
 				DragonArmor armor = new DragonArmor(location.getResourcePath(), slot, material);
 				armor.setUnlocalizedName(location.getResourcePath());
-				GameRegistry.register(armor, location);
+				armor.setRegistryName(location);
+				registry.register(armor);
 				items.get(material).put(slot, armor);
 			}
 		}

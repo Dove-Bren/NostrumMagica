@@ -3,13 +3,11 @@ package com.smanzana.nostrummagica.items;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.AltarBlock;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
@@ -17,20 +15,9 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class AltarItem extends Item implements ILoreTagged {
 
-	public static void init() {
-		
-		GameRegistry.addShapedRecipe(new ItemStack(instance),
-				"SSS", " T ", "TRT",
-				'S', Blocks.STONE_SLAB,
-				'T', Blocks.STONE,
-				'R', NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1)
-				);
-	}
-	
 	private static AltarItem instance = null;
 
 	public static AltarItem instance() {
@@ -45,6 +32,7 @@ public class AltarItem extends Item implements ILoreTagged {
 
 	public AltarItem() {
 		this.setUnlocalizedName(ID);
+		this.setRegistryName(NostrumMagica.MODID, AltarItem.ID);
 		this.setMaxStackSize(8);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 	}

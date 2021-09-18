@@ -130,6 +130,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		// this.setCreativeTab(NostrumMagica.creativeTab);
 		// Is icon. Handled special in NostrumMagica
 		this.setMaxStackSize(1);
+		setRegistryName(NostrumMagica.MODID, SpellTome.id);
 	}
 	
 	public static ItemStack getItemstack(int type,
@@ -158,7 +159,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
 		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		if (worldIn.isRemote)
 			NostrumMagica.proxy.openBook(playerIn, this, itemStackIn);

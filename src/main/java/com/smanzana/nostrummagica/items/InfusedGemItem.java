@@ -8,7 +8,6 @@ import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.blocks.tiles.CandleTileEntity;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
@@ -17,7 +16,6 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -27,7 +25,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -48,17 +45,10 @@ public class InfusedGemItem extends Item implements ILoreTagged {
 		return instance;
 	}
 	
-	public static void init() {
-		GameRegistry.addRecipe(new ItemStack(instance), " G ", "DED", "BGB",
-				'D', ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1),
-				'G', ReagentItem.instance().getReagent(ReagentType.GRAVE_DUST, 1),
-				'E', Items.ENDER_PEARL,
-				'B', ReagentItem.instance().getReagent(ReagentType.BLACK_PEARL, 1));
-	}
-	
 	public InfusedGemItem() {
 		super();
 		this.setUnlocalizedName(ID);
+		this.setRegistryName(NostrumMagica.MODID, InfusedGemItem.ID);
 		this.setMaxDamage(0);
 		this.setMaxStackSize(16);
 		this.setCreativeTab(NostrumMagica.creativeTab);

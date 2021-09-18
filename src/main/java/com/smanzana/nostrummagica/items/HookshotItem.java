@@ -24,8 +24,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -41,10 +39,8 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 	
@@ -78,16 +74,6 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 		};
 	}
 
-	public static void init() {
-		GameRegistry.addShapedRecipe(new ItemStack(instance(), 1, MakeMeta(HookshotType.WEAK, false)),
-				" RF", "DIR", "WD ",
-				'W', new ItemStack(Blocks.PLANKS, 1, OreDictionary.WILDCARD_VALUE),
-				'R', new ItemStack(Items.REDSTONE),
-				'D', new ItemStack(Items.DIAMOND),
-				'I', new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE),
-				'F', new ItemStack(Items.FLINT));
-	}
-	
 	private static HookshotItem instance = null;
 
 	public static HookshotItem instance() {
@@ -105,6 +91,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 	public HookshotItem() {
 		super();
 		this.setUnlocalizedName(ID);
+		this.setRegistryName(NostrumMagica.MODID, ID);
 		this.setMaxStackSize(1);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.hasSubtypes = true;
