@@ -23,6 +23,13 @@ public interface IRitualOutcome {
 	public void perform(World world, EntityPlayer player, ItemStack centerItem, ItemStack otherItems[], BlockPos center, RitualRecipe recipe);
 	
 	/**
+	 * Returns a unique identifier for this type of ritual outcome.
+	 * This does not need to be readable and is not shown to the user.
+	 * @return
+	 */
+	public String getName();
+	
+	/**
 	 * Return a list of strings to serve as a description for this outcome.
 	 * The description should already be translated
 	 * @return

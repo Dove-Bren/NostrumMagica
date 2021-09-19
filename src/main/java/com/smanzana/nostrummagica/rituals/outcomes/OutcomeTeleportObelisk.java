@@ -84,6 +84,11 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 		}
 		
 	}
+	
+	@Override
+	public String getName() {
+		return "teleport_obelisk";
+	}
 
 	@Override
 	public List<String> getDescription() {

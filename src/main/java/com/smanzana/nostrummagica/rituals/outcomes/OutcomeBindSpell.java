@@ -47,6 +47,11 @@ public class OutcomeBindSpell implements IRitualOutcome {
 			altar.setItem(scroll);
 		}
 	}
+	
+	@Override
+	public String getName() {
+		return "bind_spell";
+	}
 
 	@Override
 	public List<String> getDescription() {

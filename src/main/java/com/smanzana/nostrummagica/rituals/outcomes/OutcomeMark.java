@@ -28,6 +28,11 @@ public class OutcomeMark implements IRitualOutcome {
 		
 		attr.setMarkLocation(player.dimension, player.getPosition());
 	}
+	
+	@Override
+	public String getName() {
+		return "mark";
+	}
 
 	@Override
 	public List<String> getDescription() {

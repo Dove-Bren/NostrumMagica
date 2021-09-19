@@ -67,6 +67,11 @@ public class OutcomeRecall implements IRitualOutcome {
 			player.sendMessage(new TextComponentTranslation("info.recall.baddimension", new Object[0]));
 		}
 	}
+	
+	@Override
+	public String getName() {
+		return "recall";
+	}
 
 	@Override
 	public List<String> getDescription() {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.smanzana.nostrummagica.integration.jei.RitualOutcomeWrapper;
+import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeIngredientType;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
@@ -11,10 +12,12 @@ import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.outcomes.IItemRitualOutcome;
 
 import mezz.jei.api.ingredients.IIngredients;
-import mezz.jei.api.recipe.BlankRecipeWrapper;
+import mezz.jei.api.ingredients.VanillaTypes;
+import mezz.jei.api.recipe.IRecipeWrapper;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 
-public class RitualRecipeWrapper extends BlankRecipeWrapper {
+public class RitualRecipeWrapper implements IRecipeWrapper {
 
 	private RitualRecipe ritual;
 	private List<ItemStack> inputs;
@@ -39,19 +42,19 @@ public class RitualRecipeWrapper extends BlankRecipeWrapper {
 		inputs.add(reagent3);
 		inputs.add(reagent4);
 		inputs.add(ritual.getCenterItem());
-		ItemStack extras[] = ritual.getExtraItems();
+		NonNullList<ItemStack> extras = ritual.getExtraItems();
 		ItemStack extra1, extra2, extra3, extra4;
 		extra1 = extra2 = extra3 = extra4 = null;
 		if (extras != null) {
-			int len = extras.length;
+			int len = extras.size();
 			if (len > 0)
-				extra1 = extras[0];
+				extra1 = extras.get(0);
 			if (len > 1)
-				extra2 = extras[1];
+				extra2 = extras.get(1);
 			if (len > 2)
-				extra3 = extras[2];
+				extra3 = extras.get(2);
 			if (len > 3)
-				extra4 = extras[3];
+				extra4 = extras.get(3);
 		}
 		inputs.add(extra1);
 		inputs.add(extra2);
@@ -63,11 +66,11 @@ public class RitualRecipeWrapper extends BlankRecipeWrapper {
 	
 	@Override
 	public void getIngredients(IIngredients ingredients) {
-		ingredients.setInputs(ItemStack.class, inputs);
+		ingredients.setInputs(VanillaTypes.ITEM, inputs);
 		if (ritual.getOutcome() instanceof IItemRitualOutcome) {
-			ingredients.setOutput(ItemStack.class, ((IItemRitualOutcome) ritual.getOutcome()).getResult());
+			ingredients.setOutput(VanillaTypes.ITEM, ((IItemRitualOutcome) ritual.getOutcome()).getResult());
 		} else {
-			ingredients.setOutput(RitualOutcomeWrapper.class, new RitualOutcomeWrapper(ritual.getOutcome()));
+			ingredients.setOutput(RitualOutcomeIngredientType.instance, new RitualOutcomeWrapper(ritual.getOutcome()));
 		}
 	}
 	

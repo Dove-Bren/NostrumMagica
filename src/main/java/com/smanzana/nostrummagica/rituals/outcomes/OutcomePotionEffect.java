@@ -27,6 +27,11 @@ public class OutcomePotionEffect implements IRitualOutcome {
 		// Apply effect to the player
 		player.addPotionEffect(effect);
 	}
+	
+	@Override
+	public String getName() {
+		return "apply_potion_effect";
+	}
 
 	@Override
 	public List<String> getDescription() {

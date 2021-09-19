@@ -37,6 +37,11 @@ public class OutcomeCreateTome implements IRitualOutcome {
 			altar.setItem(tome);
 		}
 	}
+	
+	@Override
+	public String getName() {
+		return "create_tome";
+	}
 
 	@Override
 	public List<String> getDescription() {

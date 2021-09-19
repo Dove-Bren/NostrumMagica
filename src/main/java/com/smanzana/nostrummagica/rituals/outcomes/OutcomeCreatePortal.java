@@ -29,6 +29,11 @@ public class OutcomeCreatePortal implements IRitualOutcome {
 		((AltarTileEntity) te).setItem(null);
 		world.destroyBlock(center, true);
 	}
+	
+	@Override
+	public String getName() {
+		return "create_portal";
+	}
 
 	@Override
 	public List<String> getDescription() {

@@ -58,6 +58,11 @@ public class OutcomeSpawnItem implements IItemRitualOutcome {
 	public ItemStack getResult() {
 		return stack;
 	}
+	
+	@Override
+	public String getName() {
+		return "spawn_item";
+	}
 
 	@Override
 	public List<String> getDescription() {

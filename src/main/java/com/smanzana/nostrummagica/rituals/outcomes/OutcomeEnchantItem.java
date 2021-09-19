@@ -50,6 +50,11 @@ public class OutcomeEnchantItem implements IRitualOutcome {
 			altar.setItem(centerItem);
 		}
 	}
+	
+	@Override
+	public String getName() {
+		return "enchant_item";
+	}
 
 	@Override
 	public List<String> getDescription() {

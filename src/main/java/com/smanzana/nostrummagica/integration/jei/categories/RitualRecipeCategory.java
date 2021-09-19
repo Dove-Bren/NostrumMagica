@@ -3,13 +3,15 @@ package com.smanzana.nostrummagica.integration.jei.categories;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import com.google.common.collect.Lists;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.client.gui.book.RitualRecipePage;
-import com.smanzana.nostrummagica.integration.jei.RitualOutcomeJEIRenderer;
 import com.smanzana.nostrummagica.integration.jei.RitualOutcomeWrapper;
+import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeIngredientType;
+import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeJEIRenderer;
 import com.smanzana.nostrummagica.integration.jei.wrappers.RitualRecipeWrapper;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.requirements.IRitualRequirement;
@@ -21,6 +23,7 @@ import mezz.jei.api.gui.IGuiIngredientGroup;
 import mezz.jei.api.gui.IGuiItemStackGroup;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.ingredients.IIngredients;
+import mezz.jei.api.ingredients.VanillaTypes;
 import mezz.jei.api.recipe.IRecipeCategory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -54,9 +57,9 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipeWrapper
 	
 	public RitualRecipeCategory(IGuiHelper guiHelper) {
 		title = I18n.format("nei.category.ritual.name", (Object[]) null);
-		backgroundTier1 = guiHelper.createDrawable(TEXT_TIER1, 0, 0, BACK_WIDTH, BACK_HEIGHT, 10, 0, 0, 0);
-		backgroundTier2 = guiHelper.createDrawable(TEXT_TIER2, 0, 0, BACK_WIDTH, BACK_HEIGHT, 10, 0, 0, 0);
-		backgroundTier3 = guiHelper.createDrawable(TEXT_TIER3, 0, 0, BACK_WIDTH, BACK_HEIGHT, 10, 0, 0, 0);
+		backgroundTier1 = guiHelper.drawableBuilder(TEXT_TIER1, 0, 0, BACK_WIDTH, BACK_HEIGHT).addPadding(10, 0, 0, 0).build();
+		backgroundTier2 = guiHelper.drawableBuilder(TEXT_TIER2, 0, 0, BACK_WIDTH, BACK_HEIGHT).addPadding(10, 0, 0, 0).build();
+		backgroundTier3 = guiHelper.drawableBuilder(TEXT_TIER3, 0, 0, BACK_WIDTH, BACK_HEIGHT).addPadding(10, 0, 0, 0).build();
 		recipeFlavor = null;
 		recipeTier = 0;
 	}
@@ -116,26 +119,13 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipeWrapper
 		GlStateManager.popMatrix();
 		
 		if (!canPerform) {
-			minecraft.fontRendererObj.drawString(ChatFormatting.BOLD + "x" + ChatFormatting.RESET, 108, 70, 0xFFAA0000);
+			minecraft.fontRenderer.drawString(ChatFormatting.BOLD + "x" + ChatFormatting.RESET, 108, 70, 0xFFAA0000);
 		}
 		
 		
 		String title = recipeName;
-		int len = minecraft.fontRendererObj.getStringWidth(title);
-		minecraft.fontRendererObj.drawString(title, (BACK_WIDTH - len) / 2, 2, 0xFF000000);
-	}
-
-	@Override
-	public void drawAnimations(Minecraft minecraft) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	@Deprecated
-	public void setRecipe(IRecipeLayout recipeLayout, RitualRecipeWrapper recipeWrapper) {
-		//
-		NostrumMagica.logger.warn("Using old interface for " + recipeWrapper.getRitual().getTitleKey());
+		int len = minecraft.fontRenderer.getStringWidth(title);
+		minecraft.fontRenderer.drawString(title, (BACK_WIDTH - len) / 2, 2, 0xFF000000);
 	}
 
 	@Override
@@ -185,14 +175,15 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipeWrapper
 		}
 		
 		IGuiIngredientGroup<RitualOutcomeWrapper> guiOutcomes =
-				recipeLayout.getIngredientsGroup(RitualOutcomeWrapper.class);
+				recipeLayout.getIngredientsGroup(RitualOutcomeIngredientType.instance);
 		
-		List<ItemStack> itemOuts = ingredients.getOutputs(ItemStack.class);
+		int unused; // why don't I have to change this after changing its type?
+		List<List<ItemStack>> itemOuts = ingredients.getOutputs(VanillaTypes.ITEM);
 		if (itemOuts != null && itemOuts.size() > 0) {
 			guiItemStacks.init(10, false, 132, 66);
 		} else {
 			guiOutcomes.init(11, false, RitualOutcomeJEIRenderer.instance(),
-					132, 64, RitualRecipePage.TEXT_TABLET_WIDTH + 4, RitualRecipePage.TEXT_TABLET_WIDTH + 4, 2, 2);
+					132, 64, RitualOutcomeJEIRenderer.RITUAL_TEXT_TABLET_WIDTH + 4, RitualOutcomeJEIRenderer.RITUAL_TEXT_TABLET_WIDTH + 4, 2, 2);
 		}
 		
 		guiItemStacks.set(ingredients);
@@ -238,6 +229,12 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipeWrapper
 		}
 			
 		return tooltipEmpty;
+	}
+
+	@Nonnull
+	@Override
+	public String getModName() {
+		return NostrumMagica.MODID;
 	}
 
 }

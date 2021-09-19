@@ -44,6 +44,11 @@ public class OutcomeSpawnEntity implements IRitualOutcome {
 			this.factory.spawn(world, pos, player);
 		}
 	}
+	
+	@Override
+	public String getName() {
+		return "spawn_entity";
+	}
 
 	@Override
 	public List<String> getDescription() {

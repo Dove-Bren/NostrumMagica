@@ -3,35 +3,47 @@ package com.smanzana.nostrummagica.integration.jei;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.DungeonBlock;
-import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.integration.jei.categories.RitualRecipeCategory;
-import com.smanzana.nostrummagica.integration.jei.handlers.RitualRecipeHandler;
+import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeIngredientType;
+import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeJEIHelper;
+import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeJEIRenderer;
+import com.smanzana.nostrummagica.integration.jei.wrappers.RitualRecipeWrapper;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
 
-import mezz.jei.api.BlankModPlugin;
+import mezz.jei.api.IModPlugin;
 import mezz.jei.api.IModRegistry;
 import mezz.jei.api.ISubtypeRegistry;
 import mezz.jei.api.JEIPlugin;
 import mezz.jei.api.ingredients.IIngredientBlacklist;
 import mezz.jei.api.ingredients.IModIngredientRegistration;
+import mezz.jei.api.recipe.IRecipeCategoryRegistration;
 import net.minecraft.item.ItemStack;
 
 @JEIPlugin
-public class NostrumMagicaJEIPlugin extends BlankModPlugin {
+public class NostrumMagicaJEIPlugin implements IModPlugin {
 	
 	private List<RitualOutcomeWrapper> ritualOutcomes;
 	
 	@Override
-	public void registerItemSubtypes(ISubtypeRegistry subtypeRegistry) {
+	public void registerItemSubtypes(@Nonnull ISubtypeRegistry subtypeRegistry) {
 		subtypeRegistry.registerSubtypeInterpreter(SpellRune.instance(), new ISubtypeRegistry.ISubtypeInterpreter() {
+			
 			@Override
+			@Nullable
 			public String getSubtypeInfo(ItemStack itemStack) {
+				return apply(itemStack); // remove once removed
+			}
+
+			@Override
+			public String apply(ItemStack itemStack) {
 				return SpellRune.toComponentWrapper(itemStack).getKeyString();
 			}
 		});
@@ -49,27 +61,28 @@ public class NostrumMagicaJEIPlugin extends BlankModPlugin {
 		RitualOutcomeJEIHelper helper = new RitualOutcomeJEIHelper();
 		RitualOutcomeJEIRenderer renderer = RitualOutcomeJEIRenderer.instance();
 		
-		ingredientRegistry.register(RitualOutcomeWrapper.class,
+		ingredientRegistry.register(RitualOutcomeIngredientType.instance,
 				ritualOutcomes,
 				helper,
 				renderer);
 	}
 	
 	@Override
+	public void registerCategories(IRecipeCategoryRegistration registry) {
+		registry.addRecipeCategories(new RitualRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
+	}
+	
+	@Override
 	public void register(IModRegistry registry) {
 		NostrumMagica.logger.info("Registering rituals with JEI...");
-		registry.addRecipeCategories(
-				new RitualRecipeCategory(registry.getJeiHelpers().getGuiHelper())
-				);
-		registry.addRecipeHandlers(new RitualRecipeHandler());
 		
-		registry.addRecipes(RitualRegistry.instance().getRegisteredRituals());
+		registry.handleRecipes(RitualRecipe.class, RitualRecipeWrapper::new, RitualRecipeCategory.UID);
 		
-		NostrumMagica.logger.info("Registered " + RitualRegistry.instance().getRegisteredRituals().size()
-				+ " rituals");
+		registry.addRecipes(RitualRegistry.instance().getRegisteredRituals(), RitualRecipeCategory.UID);
 		
-		registry.addRecipeCategoryCraftingItem(new ItemStack(AltarItem.instance()),
-				RitualRecipeCategory.UID);
+		NostrumMagica.logger.info("Registered " + RitualRegistry.instance().getRegisteredRituals().size() + " rituals");
+		
+		registry.addRecipeCatalyst(new ItemStack(AltarItem.instance()), RitualRecipeCategory.UID);
 		
 		
 		// Hide our cool wrapper to outputs
@@ -77,8 +90,9 @@ public class NostrumMagicaJEIPlugin extends BlankModPlugin {
 		for (RitualOutcomeWrapper wrapper : ritualOutcomes) {
 			blacklist.addIngredientToBlacklist(wrapper);
 		}
-		blacklist.addIngredientToBlacklist(new ItemStack(DungeonBlock.instance()));
-		blacklist.addIngredientToBlacklist(new ItemStack(NostrumSingleSpawner.instance()));
+		//blacklist.addIngredientToBlacklist(new ItemStack(DungeonBlock.instance()));
+		//blacklist.addIngredientToBlacklist(new ItemStack(NostrumSingleSpawner.instance()));
+		int unused; // hmmm above doesn't work? is block registering right?
 		
 	}
 	

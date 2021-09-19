@@ -34,6 +34,11 @@ public class OutcomeConstructGeotoken extends OutcomeSpawnItem {
 		
 		return RES;
 	}
+	
+	@Override
+	public String getName() {
+		return "create_geotoken";
+	}
 
 	@Override
 	public List<String> getDescription() {

@@ -95,7 +95,7 @@ public class LoreRegistry {
 		register(SpellRune.instance());
 		register(ReagentBag.instance());
 		register(MagicSwordBase.instance());
-		register(MagicArmorBase.helm);
+		register(MagicArmorBase.helm());
 		register(BlankScroll.instance());
 		register(SpellTableItem.instance());
 		register(InfusedGemItem.instance());

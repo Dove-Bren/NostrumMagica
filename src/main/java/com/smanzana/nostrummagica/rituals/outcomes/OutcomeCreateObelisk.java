@@ -50,6 +50,11 @@ public class OutcomeCreateObelisk implements IRitualOutcome {
 			}
 		}
 	}
+	
+	@Override
+	public String getName() {
+		return "create_obelisk";
+	}
 
 	@Override
 	public List<String> getDescription() {
