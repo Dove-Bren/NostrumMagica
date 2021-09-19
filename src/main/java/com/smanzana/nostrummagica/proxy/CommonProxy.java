@@ -68,6 +68,10 @@ import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
 import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.research.NostrumResearch;
+import com.smanzana.nostrummagica.serializers.DragonArmorMaterialSerializer;
+import com.smanzana.nostrummagica.serializers.HookshotTypeDataSerializer;
+import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
+import com.smanzana.nostrummagica.serializers.OptionalDragonArmorMaterialSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
@@ -119,6 +123,7 @@ import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.registries.DataSerializerEntry;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class CommonProxy {
@@ -386,6 +391,16 @@ public class CommonProxy {
     	
     	registry.register(new SpellRune.RuneRecipe());
     	registry.register(new SpellTomePageCombineRecipe());
+    }
+    
+    @SubscribeEvent
+    private void registerDataSerializers(RegistryEvent.Register<DataSerializerEntry> event) {
+    	final IForgeRegistry<DataSerializerEntry> registry = event.getRegistry();
+    	
+    	registry.register(new DataSerializerEntry(DragonArmorMaterialSerializer.instance));
+    	registry.register(new DataSerializerEntry(OptionalDragonArmorMaterialSerializer.instance));
+    	registry.register(new DataSerializerEntry(MagicElementDataSerializer.instance));
+    	registry.register(new DataSerializerEntry(HookshotTypeDataSerializer.instance));
     }
     
     public void syncPlayer(EntityPlayerMP player) {

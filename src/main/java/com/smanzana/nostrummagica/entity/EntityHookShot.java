@@ -9,6 +9,7 @@ import com.google.common.base.Optional;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.HookshotItem;
 import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
+import com.smanzana.nostrummagica.serializers.HookshotTypeDataSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
@@ -51,7 +52,7 @@ public class EntityHookShot extends Entity {
 	private static final String NBT_VELOCITYY = "velocity_y";
 	private static final String NBT_VELOCITYZ = "velocity_z";
 	
-	protected static final DataParameter<HookshotType> DATA_TYPE = EntityDataManager.<HookshotType>createKey(EntityHookShot.class, HookshotType.Serializer);
+	protected static final DataParameter<HookshotType> DATA_TYPE = EntityDataManager.<HookshotType>createKey(EntityHookShot.class, HookshotTypeDataSerializer.instance);
 	protected static final DataParameter<Boolean> DATA_HOOKED = EntityDataManager.<Boolean>createKey(EntityHookShot.class, DataSerializers.BOOLEAN);
 	protected static final DataParameter<Boolean> DATA_FETCHING = EntityDataManager.<Boolean>createKey(EntityHookShot.class, DataSerializers.BOOLEAN);
 	protected static final DataParameter<Optional<UUID>> DATA_CASTING_ENTITY = EntityDataManager.<Optional<UUID>>createKey(EntityHookShot.class, DataSerializers.OPTIONAL_UNIQUE_ID);

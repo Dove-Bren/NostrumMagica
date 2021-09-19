@@ -1,6 +1,5 @@
 package com.smanzana.nostrummagica.items;
 
-import java.io.IOException;
 import java.util.UUID;
 
 import javax.annotation.Nonnull;
@@ -28,10 +27,6 @@ import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializer;
-import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
@@ -49,29 +44,6 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 		MEDIUM,
 		STRONG,
 		CLAW;
-		
-		public static final DataSerializer<HookshotType> Serializer = new DataSerializer<HookshotType>() {
-
-			{
-				DataSerializers.registerSerializer(this);
-			}
-			
-			@Override
-			public void write(PacketBuffer buf, HookshotType value) {
-				buf.writeEnumValue(value);
-			}
-
-			@Override
-			public HookshotType read(PacketBuffer buf) throws IOException {
-				return buf.readEnumValue(HookshotType.class);
-			}
-
-			@Override
-			public DataParameter<HookshotType> createKey(int id) {
-				return new DataParameter<>(id, this);
-			}
-			
-		};
 	}
 
 	private static HookshotItem instance = null;

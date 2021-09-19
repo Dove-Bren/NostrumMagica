@@ -529,17 +529,18 @@ public class PlayerListener {
 			if (lavaSet || trueSet) {
 				final int manaCost = 1; // / 4
 				final INostrumMagic attr = NostrumMagica.getMagicWrapper(event.getEntityLiving());
-				final int mana = (attr != null ? attr.getMana() : 0);
-				// true set requires mana to prevent lava damage, though
-				if (!isLava || mana >= manaCost) {
-					event.setCanceled(true);
-					if (isLava && event.getEntityLiving().ticksExisted % 4 == 0) {
-						attr.addMana(-manaCost);
-						if (event.getEntityLiving() instanceof EntityPlayer) {
-							NostrumMagica.proxy.sendMana((EntityPlayer) event.getEntityLiving());
+				if (attr != null) {
+					// true set requires mana to prevent lava damage, though
+					if (!isLava || attr.getMana() >= manaCost) {
+						event.setCanceled(true);
+						if (isLava && event.getEntityLiving().ticksExisted % 4 == 0) {
+							attr.addMana(-manaCost);
+							if (event.getEntityLiving() instanceof EntityPlayer) {
+								NostrumMagica.proxy.sendMana((EntityPlayer) event.getEntityLiving());
+							}
 						}
+						return;
 					}
-					return;
 				}
 			}
 		}

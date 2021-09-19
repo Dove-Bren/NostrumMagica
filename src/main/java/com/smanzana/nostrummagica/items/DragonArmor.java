@@ -1,6 +1,5 @@
 package com.smanzana.nostrummagica.items;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -10,7 +9,6 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -27,10 +25,6 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializer;
-import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -75,60 +69,6 @@ public class DragonArmor extends Item {
 		GOLD,
 		IRON,
 		DIAMOND;
-		
-		public final static class MaterialSerializer implements DataSerializer<DragonArmorMaterial> {
-			
-			private MaterialSerializer() {
-				DataSerializers.registerSerializer(this);
-			}
-			
-			@Override
-			public void write(PacketBuffer buf, DragonArmorMaterial value) {
-				buf.writeEnumValue(value);
-			}
-
-			@Override
-			public DragonArmorMaterial read(PacketBuffer buf) throws IOException {
-				return buf.readEnumValue(DragonArmorMaterial.class);
-			}
-
-			@Override
-			public DataParameter<DragonArmorMaterial> createKey(int id) {
-				return new DataParameter<>(id, this);
-			}
-		}
-		
-		public final static class OptionalMaterialSerializer implements DataSerializer<Optional<DragonArmorMaterial>> {
-			
-			private OptionalMaterialSerializer() {
-				DataSerializers.registerSerializer(this);
-			}
-			
-			@Override
-			public void write(PacketBuffer buf, Optional<DragonArmorMaterial> value) {
-				buf.writeBoolean(value.isPresent());
-				if (value.isPresent()) {
-					buf.writeEnumValue(value.get());
-				}
-			}
-
-			@Override
-			public Optional<DragonArmorMaterial> read(PacketBuffer buf) throws IOException {
-				return buf.readBoolean() ? Optional.of(buf.readEnumValue(DragonArmorMaterial.class)) : Optional.absent();
-			}
-
-			@Override
-			public DataParameter<Optional<DragonArmorMaterial>> createKey(int id) {
-				return new DataParameter<>(id, this);
-			}
-		}
-		
-		public static MaterialSerializer Serializer = null;
-		public static OptionalMaterialSerializer OptionalSerializer = null;
-		public static void Init() {
-			Serializer = new MaterialSerializer();
-			OptionalSerializer = new OptionalMaterialSerializer();
-		}
 	}
 	
 	private static Map<DragonArmorMaterial, Map<DragonEquipmentSlot, DragonArmor>> items;

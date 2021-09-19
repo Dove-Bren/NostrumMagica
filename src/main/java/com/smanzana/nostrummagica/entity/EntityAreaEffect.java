@@ -301,7 +301,7 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
         		IBlockState state = world.getBlockState(pos);
 	        	if (state == null || !state.getMaterial().blocksMovement()) {
 	        		
-	        		if (!this.getWalksWater() || !state.getMaterial().isLiquid()) {
+	        		if (state == null || !this.getWalksWater() || !state.getMaterial().isLiquid()) {
 		        		// Done
 		        		break;
 	        		}
