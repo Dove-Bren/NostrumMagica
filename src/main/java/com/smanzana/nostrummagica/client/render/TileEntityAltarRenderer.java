@@ -27,7 +27,7 @@ public class TileEntityAltarRenderer extends TileEntitySpecialRenderer<AltarTile
 	public void render(AltarTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
 
 		ItemStack item = te.getItem();
-		if (item == null)
+		if (item.isEmpty())
 			return;
 		
 		float rot = 2.0f * (Minecraft.getSystemTime() / 50);

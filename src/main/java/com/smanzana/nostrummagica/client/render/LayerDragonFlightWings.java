@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.client.render;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.renderer.ModelDragonFlightWings;
@@ -32,8 +32,8 @@ public class LayerDragonFlightWings implements LayerRenderer<AbstractClientPlaye
 	@Override
 	public void doRenderLayer(AbstractClientPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 		if (shouldRender(player)) {
-			@Nullable ItemStack chestpiece = player.getItemStackFromSlot(EntityEquipmentSlot.CHEST); 
-			render(player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale, (chestpiece != null && chestpiece.isItemEnchanted()));
+			@Nonnull ItemStack chestpiece = player.getItemStackFromSlot(EntityEquipmentSlot.CHEST); 
+			render(player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale, (!chestpiece.isEmpty() && chestpiece.isItemEnchanted()));
 		}
 	}
 	
@@ -59,9 +59,9 @@ public class LayerDragonFlightWings implements LayerRenderer<AbstractClientPlaye
 	}
 	
 	public void render(AbstractClientPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale, boolean enchanted) {
-		ItemStack stack = player.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
+		@Nonnull ItemStack stack = player.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 0.9F);
-		if (stack != null && stack.getItem() instanceof EnchantedArmor) {
+		if (!stack.isEmpty() && stack.getItem() instanceof EnchantedArmor) {
 			final int color = ((EnchantedArmor) stack.getItem()).getElement().getColor(); //ARBG
 			GlStateManager.color((float)((color >> 16) & 0xFF) / 255f,
 					(float)((color >> 8) & 0xFF) / 255f,

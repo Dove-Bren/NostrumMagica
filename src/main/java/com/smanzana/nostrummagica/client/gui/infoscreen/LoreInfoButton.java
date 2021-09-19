@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.client.gui.infoscreen;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -27,7 +29,7 @@ public class LoreInfoButton extends InfoButton {
 	private ILoreTagged lore;
 	
 	// Cache
-	private ItemStack iconStack = null;
+	private @Nonnull ItemStack iconStack = ItemStack.EMPTY;
 	private Entity iconEntity = null;
 	
 	public LoreInfoButton(int buttonId, ILoreTagged lore) {
@@ -60,7 +62,7 @@ public class LoreInfoButton extends InfoButton {
 		
 		final int itemLength = 16;
 		
-		if (iconStack == null && iconEntity == null) {
+		if (iconStack.isEmpty() && iconEntity == null) {
 			if (lore instanceof Item) {
 				if (lore instanceof SpellRune) {
 					iconStack = SpellRune.getRune(EMagicElement.FIRE, 1);
@@ -88,7 +90,7 @@ public class LoreInfoButton extends InfoButton {
 			}
 		}
 		
-		if (iconStack != null) {
+		if (!iconStack.isEmpty()) {
 			int x = this.x + (width - itemLength) / 2;
 			int y = this.y + (height - itemLength) / 2;
 			mc.getRenderItem().renderItemIntoGUI(iconStack, x, y);

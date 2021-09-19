@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.base.Optional;
@@ -181,7 +182,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 		return flag;
 	}
 
-	public boolean processInteract(EntityPlayer player, EnumHand hand, @Nullable ItemStack stack)
+	public boolean processInteract(EntityPlayer player, EnumHand hand, @Nonnull ItemStack stack)
 	{
 		return false;
 	}
@@ -377,7 +378,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 	}
 	
 	protected Spell getSpellToUse() {
-		ItemStack scroll = null;
+		ItemStack scroll = ItemStack.EMPTY;
 		BlockPos homePos = this.getHome();
 		if (homePos != null) {
 			scroll = WispBlock.instance().getScroll(world, homePos);
@@ -385,7 +386,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 		
 		@Nullable Spell spell = null;
 		
-		if (scroll != null) {
+		if (!scroll.isEmpty()) {
 			spell = SpellScroll.getSpell(scroll);
 		}
 		

@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.client.gui.dragongui;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
@@ -23,6 +23,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.client.config.GuiUtils;
 import net.minecraftforge.fml.relauncher.Side;
@@ -67,42 +68,41 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 //		final int toggleSize = TamedDragonGUI.GUI_TEX_TOGGLE_LENGTH;
 //		final int rowIncr = cellWidth + toggleSize + rowMargin;
 		
-		ItemStack slots[];
 		int lastCount = 0;
 		
 		// Target slots
-		slots = dragonInv.getTargetSpells();
+		NonNullList<ItemStack> slots = dragonInv.getTargetSpells();
 		SpellSlot lastSlot = null;
-		for (int i = 0; i < slots.length && i < RedDragonSpellInventory.MaxSpellsPerCategory; i++) {
+		for (int i = 0; i < slots.size() && i < RedDragonSpellInventory.MaxSpellsPerCategory; i++) {
 			SpellSlot slotIn = new SpellSlot(this, lastSlot, this.dragon, dragonInv, i,
 					i + lastCount, leftOffset + offsetX + ((cellWidth + rowHMargin) * (i % invRow)), dragonTopOffset + offsetY);
 			lastSlot = slotIn;
 			container.addSheetSlot(slotIn);
 		}
 		
-		lastCount += slots.length;
+		lastCount += slots.size();
 		
 		// Self slots
 		slots = dragonInv.getSelfSpells();
 		lastSlot = null;
-		for (int i = 0; i < slots.length; i++) {
+		for (int i = 0; i < slots.size(); i++) {
 			SpellSlot slotIn = new SpellSlot(this, lastSlot, this.dragon, dragonInv, i,
 						i + lastCount, leftOffset + offsetX + ((cellWidth + rowHMargin) * (i % invRow)), dragonTopOffset + offsetY + rowIncr);
 			lastSlot = slotIn;
 			container.addSheetSlot(slotIn);
 		}
-		lastCount += slots.length;
+		lastCount += slots.size();
 		
 		// Ally slots
 		slots = dragonInv.getAllySpells();
 		lastSlot = null;
-		for (int i = 0; i < slots.length; i++) {
+		for (int i = 0; i < slots.size(); i++) {
 			SpellSlot slotIn = new SpellSlot(this, lastSlot, this.dragon, dragonInv, i,
 					i + lastCount, leftOffset + offsetX + ((cellWidth + rowHMargin) * (i % invRow)), dragonTopOffset + offsetY + rowIncr + rowIncr);
 			lastSlot = slotIn;
 			container.addSheetSlot(slotIn);
 		}
-		lastCount += slots.length;
+		lastCount += slots.size();
 
 		final int playerTopOffset = dragonTopOffset + (rowIncr * 3) + 10;
 		for (int i = 0; i < playerInvSize; i++) {
@@ -144,12 +144,12 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 				256, 256);
 	}
 	
-	private static ItemStack scrollShadow = null;
+	private static @Nonnull ItemStack scrollShadow = ItemStack.EMPTY;
 	
 	private void drawNextCell(Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
 		
-		if (scrollShadow == null) {
+		if (scrollShadow.isEmpty()) {
 			scrollShadow = new ItemStack(SpellScroll.instance());
 		}
 		
@@ -194,7 +194,7 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 				256, 256);
 	}
 	
-	private void drawRow(Minecraft mc, float partialTicks, int x, int y, String title, ItemStack slots[], EntityDragonGambit gambits[]) {
+	private void drawRow(Minecraft mc, float partialTicks, int x, int y, String title, NonNullList<ItemStack> slots, EntityDragonGambit gambits[]) {
 		
 		final int usedCount = dragonInv.getUsedSlots();
 		final int extraCount = Math.max(0, this.dragon.getMagicMemorySize() - usedCount);
@@ -206,8 +206,8 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 		
 		count = 0;
 		ghostCount = 0;
-		for (int i = 0; i < slots.length; i++) {
-			if (slots[i] != null) {
+		for (int i = 0; i < slots.size(); i++) {
+			if (!slots.get(i).isEmpty()) {
 				count++;
 				this.drawCell(mc, partialTicks, x + ((cellWidth + rowHMargin) * (i % invRow)), y);
 				drawGambit(mc, partialTicks, x + ((cellWidth + rowHMargin) * (i % invRow)) + cellWidth, y + 1, gambits[i]);
@@ -285,7 +285,7 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 			// Ally slots
 			drawRow(mc, partialTicks, leftOffset - 1, dragonTopOffset - 1 + rowIncr + rowIncr, "Ally", dragonInv.getAllySpells(), dragonInv.getAllyGambits());
 			 */
-			ItemStack[] scrolls;
+			NonNullList<ItemStack> scrolls;
 			int x;
 			int y;
 			final int innerCellWidth = RedDragonSpellSheet.cellWidth - 2;
@@ -299,9 +299,9 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 			scrolls = dragonInv.getTargetSpells();
 			x = leftOffset;
 			y = dragonTopOffset;
-			for (int i = 0; i < scrolls.length; i++) {
-				ItemStack scroll = scrolls[i];
-				if (scroll == null) {
+			for (int i = 0; i < scrolls.size(); i++) {
+				ItemStack scroll = scrolls.get(i);
+				if (scroll.isEmpty()) {
 					break;
 				}
 				
@@ -319,9 +319,9 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 			scrolls = dragonInv.getSelfSpells();
 			x = leftOffset;
 			y = dragonTopOffset + rowIncr;
-			for (int i = 0; i < scrolls.length; i++) {
-				ItemStack scroll = scrolls[i];
-				if (scroll == null) {
+			for (int i = 0; i < scrolls.size(); i++) {
+				ItemStack scroll = scrolls.get(i);
+				if (scroll.isEmpty()) {
 					break;
 				}
 				
@@ -339,9 +339,9 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 			scrolls = dragonInv.getAllySpells();
 			x = leftOffset;
 			y = dragonTopOffset + rowIncr + rowIncr;
-			for (int i = 0; i < scrolls.length; i++) {
-				ItemStack scroll = scrolls[i];
-				if (scroll == null) {
+			for (int i = 0; i < scrolls.size(); i++) {
+				ItemStack scroll = scrolls.get(i);
+				if (scroll.isEmpty()) {
 					break;
 				}
 				
@@ -403,7 +403,7 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 			}
 			
 			int index = (row * RedDragonSpellInventory.MaxSpellsPerCategory) + col;
-			if (dragonInv.getStackInSlot(index) == null) {
+			if (dragonInv.getStackInSlot(index).isEmpty()) {
 				break;
 			}
 			
@@ -466,7 +466,7 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 		}
 		
 		int index = (row * RedDragonSpellInventory.MaxSpellsPerCategory) + col;
-		if (dragonInv.getStackInSlot(index) == null) {
+		if (dragonInv.getStackInSlot(index).isEmpty()) {
 			return;
 		}
 		
@@ -649,12 +649,12 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 		}
 		
 		@Override
-		public boolean isItemValid(@Nullable ItemStack stack) {
+		public boolean isItemValid(@Nonnull ItemStack stack) {
 			if (!dragon.canManageSpells())
 				return false;
 			
 			// Can always empty slot
-			if (stack == null) {
+			if (stack.isEmpty()) {
 				return true;
 			}
 			

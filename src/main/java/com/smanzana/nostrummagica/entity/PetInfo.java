@@ -1,15 +1,9 @@
 package com.smanzana.nostrummagica.entity;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializer;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
-import net.minecraftforge.registries.DataSerializerEntry;
 
 public class PetInfo {
 	
@@ -92,39 +86,7 @@ public class PetInfo {
 		ATTACKING,
 		IDLING,
 		WORKING,
-		WAITING;
-		
-		public final static class JobSerializer implements DataSerializer<PetAction> {
-			
-			private JobSerializer() {
-				ForgeRegistries.DATA_SERIALIZERS.register(new DataSerializerEntry(this));
-			}
-			
-			@Override
-			public void write(PacketBuffer buf, PetAction value) {
-				buf.writeEnumValue(value);
-			}
-
-			@Override
-			public PetAction read(PacketBuffer buf) throws IOException {
-				return buf.readEnumValue(PetAction.class);
-			}
-
-			@Override
-			public DataParameter<PetAction> createKey(int id) {
-				return new DataParameter<>(id, this);
-			}
-
-			@Override
-			public PetAction copyValue(PetAction value) {
-				return value;
-			}
-		}
-		
-		public static JobSerializer Serializer = null;
-		public static void Init() {
-			Serializer = new JobSerializer();
-		}
+		WAITING
 	}
 
 	private double currentHp;

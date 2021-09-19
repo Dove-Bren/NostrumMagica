@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.client.render;
 
+import javax.annotation.Nonnull;
+
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -221,8 +223,8 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 		// Figure out color and fetch scroll
 		int baseColor = 0xFFFFFFFF;
 		int spellIcon = -1;
-		ItemStack scroll = te.getScroll();
-		if (scroll != null) {
+		@Nonnull ItemStack scroll = te.getScroll();
+		if (!scroll.isEmpty()) {
 			Spell spell = SpellScroll.getSpell(scroll);
 			if (spell != null) {
 				baseColor = spell.getPrimaryElement().getColor();
@@ -265,7 +267,7 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 		GlStateManager.popMatrix();
 		
 		// Scroll
-		if (scroll != null) {
+		if (!scroll.isEmpty()) {
 			GlStateManager.pushMatrix();
 			GlStateManager.translate(0, 1.31 + platOffset, 0);
 			GlStateManager.rotate(360f * progressLong, 0, 1, 0);
@@ -286,7 +288,7 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 		}
 		
 		// Reagent
-		if (reagents != null) {
+		if (!reagents.isEmpty()) {
 			GlStateManager.pushMatrix();
 			GlStateManager.translate(0, 1.31 + platOffset, 0);
 			GlStateManager.rotate(360f * progressLong, 0, 1, 0);
@@ -306,10 +308,10 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 		}
 		
 		// Gem effect
-		if (scroll != null || reagents != null) {
+		if (!scroll.isEmpty() || !reagents.isEmpty()) {
 			
 			// Draw spell icon
-			if (scroll != null) {
+			if (!scroll.isEmpty()) {
 				GlStateManager.pushMatrix();
 				GlStateManager.translate(0, 2 + platOffset, 0);
 				GlStateManager.scale(.5, .5, .5);
@@ -329,7 +331,7 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 			//GlStateManager.enableLighting();
 			final int count = 16;
 			for (int i = 0; i < count; i++) {
-				final float voffset = reagents != null && scroll != null ? (float) (Math.sin((((float) i / ((float) count / 2f)) + progressShort) * Math.PI * 2) * .05) : 0f;
+				final float voffset = !reagents.isEmpty() && !scroll.isEmpty() ? (float) (Math.sin((((float) i / ((float) count / 2f)) + progressShort) * Math.PI * 2) * .05) : 0f;
 				//final float rotoffset = reagents != null && scroll != null ? (360f * progressLong) : 0f;
 				final float rotoffset = 360f * progressLong;
 				int color = baseColor;

@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.client.gui.container;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.tiles.LoreTableEntity;
@@ -56,12 +56,12 @@ public class LoreTableGui {
 			this.inputSlot = new Slot(null, 0, SLOT_INPUT_HOFFSET, SLOT_INPUT_VOFFSET) {
 				
 				@Override
-				public boolean isItemValid(@Nullable ItemStack stack) {
-					return stack == null || stack.getItem() instanceof ILoreTagged;
+				public boolean isItemValid(@Nonnull ItemStack stack) {
+					return stack.isEmpty() || stack.getItem() instanceof ILoreTagged;
 				}
 				
 				@Override
-				public void putStack(@Nullable ItemStack stack) {
+				public void putStack(@Nonnull ItemStack stack) {
 					table.setItem(stack);
 					this.onSlotChanged();
 				}
@@ -82,12 +82,12 @@ public class LoreTableGui {
 				
 				public ItemStack decrStackSize(int amount) {
 					ItemStack item = table.getItem();
-					if (item != null) {
-						if (table.setItem(null))
+					if (!item.isEmpty()) {
+						if (table.setItem(ItemStack.EMPTY))
 							return item.copy();
 					}
 					
-					return null;
+					return ItemStack.EMPTY;
 				}
 				
 				public boolean isHere(IInventory inv, int slotIn) {
@@ -122,7 +122,7 @@ public class LoreTableGui {
 		
 		@Override
 		public ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
-			ItemStack prev = null;	
+			@Nonnull ItemStack prev = ItemStack.EMPTY;	
 			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
 			
 			if (slot != null && slot.getHasStack()) {
@@ -132,10 +132,10 @@ public class LoreTableGui {
 				if (slot == this.inputSlot) {
 					// Trying to take our item
 					if (playerIn.inventory.addItemStackToInventory(cur)) {
-						inputSlot.putStack(null);
+						inputSlot.putStack(ItemStack.EMPTY);
 						inputSlot.onTake(playerIn, cur);
 					} else {
-						prev = null;
+						prev = ItemStack.EMPTY;
 					}
 				} else {
 					// Trying to add an item
@@ -144,7 +144,7 @@ public class LoreTableGui {
 						ItemStack stack = cur.splitStack(1);
 						inputSlot.putStack(stack);
 					} else {
-						prev = null;
+						prev = ItemStack.EMPTY;
 					}
 				}
 				

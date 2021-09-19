@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.entity;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
@@ -162,7 +162,7 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
         return flag;
     }
 
-    public boolean processInteract(EntityPlayer player, EnumHand hand, @Nullable ItemStack stack)
+    public boolean processInteract(EntityPlayer player, EnumHand hand, @Nonnull ItemStack stack)
     {
         return false;
     }
@@ -171,7 +171,7 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
      * Checks if the parameter is an item which this animal can be fed to breed it (wheat, carrots or seeds depending on
      * the animal type)
      */
-    public boolean isBreedingItem(@Nullable ItemStack stack)
+    public boolean isBreedingItem(@Nonnull ItemStack stack)
     {
         return false;
     }

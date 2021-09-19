@@ -1,6 +1,5 @@
 package com.smanzana.nostrummagica.spells.components.triggers;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,6 +15,7 @@ import com.smanzana.nostrummagica.utils.RayTrace;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -96,13 +96,10 @@ public class BeamTrigger extends InstantTrigger {
 	}
 
 	@Override
-	public List<ItemStack> getReagents() {
-		List<ItemStack> list = new ArrayList<>(2);
-		
-		list.add(ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1));
-		list.add(ReagentItem.instance().getReagent(ReagentType.GRAVE_DUST, 1));
-		
-		return list;
+	public NonNullList<ItemStack> getReagents() {
+		return NonNullList.from(ItemStack.EMPTY,
+				ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1),
+				ReagentItem.instance().getReagent(ReagentType.GRAVE_DUST, 1));
 	}
 
 	@Override
@@ -126,7 +123,7 @@ public class BeamTrigger extends InstantTrigger {
 	}
 
 	@Override
-	public ItemStack[] supportedFloatCosts() {
+	public NonNullList<ItemStack> supportedFloatCosts() {
 		return null;
 	}
 

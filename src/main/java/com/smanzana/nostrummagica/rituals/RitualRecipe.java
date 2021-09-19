@@ -331,7 +331,7 @@ public class RitualRecipe implements InfoScreenIndexed {
 		return types;
 	}
 
-	public ItemStack getCenterItem() {
+	public @Nonnull ItemStack getCenterItem() {
 		return centerItem;
 	}
 

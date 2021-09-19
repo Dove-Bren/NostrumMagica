@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.client.gui;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.SpellPlate;
 import com.smanzana.nostrummagica.items.SpellScroll;
@@ -31,7 +33,7 @@ public class ScrollScreen extends GuiScreen {
 	private final int color;
 	private final SpellIcon icon;
 	
-	public ScrollScreen(ItemStack scroll) {
+	public ScrollScreen(@Nonnull ItemStack scroll) {
 		this(SpellScroll.getSpell(scroll));
 	}
 	

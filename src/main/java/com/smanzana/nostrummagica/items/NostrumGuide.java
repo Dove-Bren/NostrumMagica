@@ -4,17 +4,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.gui.book.BookScreen;
 import com.smanzana.nostrummagica.client.gui.book.HSplitPage;
 import com.smanzana.nostrummagica.client.gui.book.IBookPage;
 import com.smanzana.nostrummagica.client.gui.book.ImagePage;
 import com.smanzana.nostrummagica.client.gui.book.PlainTextPage;
-import com.smanzana.nostrummagica.client.gui.book.RitualRecipePage;
 import com.smanzana.nostrummagica.client.gui.book.TitlePage;
-import com.smanzana.nostrummagica.rituals.RitualRecipe;
-import com.smanzana.nostrummagica.rituals.RitualRegistry;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -115,14 +111,14 @@ public class NostrumGuide extends Item implements GuiBook {
 		
 		pages.add(new PlainTextPage(""));
 		
-		EntityPlayer player = NostrumMagica.proxy.getPlayer();
-		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-		
-		pages.add(new TitlePage(T("ritual_index"), true));
-		for (RitualRecipe ritual : RitualRegistry.instance().getRegisteredRituals()) {
-			if (ritual.getRequirement() == null || ritual.getRequirement().matches(player, attr))
-				pages.add(new RitualRecipePage(ritual));
-		}
+//		EntityPlayer player = NostrumMagica.proxy.getPlayer();
+//		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+//		
+//		pages.add(new TitlePage(T("ritual_index"), true));
+//		for (RitualRecipe ritual : RitualRegistry.instance().getRegisteredRituals()) {
+//			if (ritual.getRequirement() == null || ritual.getRequirement().matches(player, attr))
+//				pages.add(new RitualRecipePage(ritual));
+//		}
 		
 		pages.add(new PlainTextPage(""));
 		return new BookScreen("nostrum_guide", pages);

@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -121,7 +122,7 @@ public abstract class SpellShape {
 	 * Both type and count of the itemstacks will be respected.
 	 * @return
 	 */
-	public abstract List<ItemStack> getReagents();
+	public abstract NonNullList<ItemStack> getReagents();
 	
 	/**
 	 * Whether this shape supports a boolean switch in its SpellPartParam
@@ -148,7 +149,7 @@ public abstract class SpellShape {
 	 * The idea is you return more valuable materials the higher the float.
 	 * @return
 	 */
-	public abstract ItemStack[] supportedFloatCosts();
+	public abstract NonNullList<ItemStack> supportedFloatCosts();
 	
 	/**
 	 * Display name for the float option. Should be translated already

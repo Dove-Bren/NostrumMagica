@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.client.gui.container;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.tiles.ActiveHopperTileEntity;
@@ -52,10 +52,10 @@ public class ActiveHopperGui {
 		}
 		
 		@Override
-		@Nullable
+		@Nonnull
 		public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
 			Slot slot = (Slot)this.inventorySlots.get(index);
-			ItemStack prev = null;
+			ItemStack prev = ItemStack.EMPTY;
 
 			if (slot != null && slot.getHasStack()) {
 				//IInventory from = slot.inventory;
@@ -71,12 +71,12 @@ public class ActiveHopperGui {
 				prev = stack.copy();
 
 				stack = Inventories.addItem(to, stack);
-				if (stack != null && stack.getCount() == 0) {
-					stack = null;
+				if (!stack.isEmpty() && stack.getCount() == 0) {
+					stack = ItemStack.EMPTY;
 				}
 				
-				if (stack != null && stack.getCount() == prev.getCount()) {
-					return null;
+				if (!stack.isEmpty() && stack.getCount() == prev.getCount()) {
+					return ItemStack.EMPTY;
 				};
 				
 				slot.putStack(stack);

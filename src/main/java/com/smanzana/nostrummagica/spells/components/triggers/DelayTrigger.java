@@ -1,8 +1,5 @@
 package com.smanzana.nostrummagica.spells.components.triggers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
@@ -17,6 +14,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -73,12 +71,9 @@ public class DelayTrigger extends SpellTrigger {
 	}
 
 	@Override
-	public List<ItemStack> getReagents() {
-		List<ItemStack> list = new ArrayList<>(1);
-		
-		list.add(ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1));
-		
-		return list;
+	public NonNullList<ItemStack> getReagents() {
+		return NonNullList.from(ItemStack.EMPTY,
+				ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1));
 	}
 
 	@Override
@@ -107,17 +102,17 @@ public class DelayTrigger extends SpellTrigger {
 		return new float[] {10f, 30f, 60f, 120f, 300f};
 	}
 
-	public static ItemStack[] costs = null;
+	public static NonNullList<ItemStack> costs = null;
 	@Override
-	public ItemStack[] supportedFloatCosts() {
+	public NonNullList<ItemStack> supportedFloatCosts() {
 		if (costs == null) {
-			costs = new ItemStack[] {
-				null,
+			costs = NonNullList.from(ItemStack.EMPTY,
+				ItemStack.EMPTY,
 				new ItemStack(Items.REDSTONE),
 				new ItemStack(Items.IRON_INGOT),
 				new ItemStack(Items.GOLD_INGOT),
-				new ItemStack(Items.DIAMOND),
-			};
+				new ItemStack(Items.DIAMOND)
+			);
 		}
 		return costs;
 	}

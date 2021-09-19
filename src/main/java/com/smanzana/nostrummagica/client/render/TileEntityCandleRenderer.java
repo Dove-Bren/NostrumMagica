@@ -1,13 +1,11 @@
 package com.smanzana.nostrummagica.client.render;
 
-import java.util.EnumMap;
-import java.util.Map;
-
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.blocks.tiles.CandleTileEntity;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.utils.NonNullEnumMap;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -23,10 +21,10 @@ public class TileEntityCandleRenderer extends TileEntitySpecialRenderer<CandleTi
 				new TileEntityCandleRenderer());
 	}
 	
-	private Map<ReagentType, ItemStack> itemCache;
+	private NonNullEnumMap<ReagentType, ItemStack> itemCache;
 	
 	public TileEntityCandleRenderer() {
-		itemCache = new EnumMap<>(ReagentType.class);
+		itemCache = new NonNullEnumMap<>(ReagentType.class, ItemStack.EMPTY);
 		for (ReagentType type : ReagentType.values()) {
 			itemCache.put(type, ReagentItem.instance().getReagent(type, 1));
 		}

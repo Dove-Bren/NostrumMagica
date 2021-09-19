@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
+import javax.annotation.Nonnull;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -186,7 +188,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
     }
 
 	@Override
-	public SpellAction getTriggerAction(EntityLivingBase user, boolean offense, ItemStack stack) {
+	public SpellAction getTriggerAction(EntityLivingBase user, boolean offense, @Nonnull ItemStack stack) {
 		if (!offense)
 			return null;
 		
@@ -220,7 +222,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 	}
 
 	@Override
-	public boolean shouldTrigger(boolean offense, ItemStack stack) {
+	public boolean shouldTrigger(boolean offense, @Nonnull ItemStack stack) {
 		return offense;
 	}
 	

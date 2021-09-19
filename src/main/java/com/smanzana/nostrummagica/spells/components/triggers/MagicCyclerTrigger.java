@@ -1,8 +1,5 @@
 package com.smanzana.nostrummagica.spells.components.triggers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.entity.EntityCyclerSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
@@ -19,6 +16,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -117,13 +115,10 @@ public class MagicCyclerTrigger extends SpellTrigger {
 	}
 
 	@Override
-	public List<ItemStack> getReagents() {
-		List<ItemStack> list = new ArrayList<>(1);
-		
-		list.add(ReagentItem.instance().getReagent(ReagentType.GINSENG, 1));
-		list.add(ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1));
-		
-		return list;
+	public NonNullList<ItemStack> getReagents() {
+		return NonNullList.from(ItemStack.EMPTY,
+				ReagentItem.instance().getReagent(ReagentType.GINSENG, 1),
+				ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1));
 	}
 
 	@Override
@@ -150,15 +145,15 @@ public class MagicCyclerTrigger extends SpellTrigger {
 		};
 	}
 	
-	public static ItemStack[] costs = null;
+	public static NonNullList<ItemStack> costs = null;
 	@Override
-	public ItemStack[] supportedFloatCosts() {
+	public NonNullList<ItemStack> supportedFloatCosts() {
 		if (costs == null) {
-			costs = new ItemStack[] {
-				null,
+			costs = NonNullList.from(ItemStack.EMPTY,
+				ItemStack.EMPTY,
 				new ItemStack(Items.COAL),
-				new ItemStack(Blocks.COAL_BLOCK),
-			};
+				new ItemStack(Blocks.COAL_BLOCK)
+			);
 		}
 		return costs;
 	}

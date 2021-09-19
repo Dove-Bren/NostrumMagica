@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.client.gui.infoscreen;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -49,8 +51,8 @@ public class RitualInfoButton extends InfoButton {
 		
 		final int itemLength = 16;
 		
-		ItemStack iconStack = ritual.getIcon();
-		if (iconStack != null) {
+		@Nonnull ItemStack iconStack = ritual.getIcon();
+		if (!iconStack.isEmpty()) {
 			RenderItem renderItem = mc.getRenderItem();
 			int x = this.x + (width - itemLength) / 2;
 			int y = this.y + (height - itemLength) / 2;

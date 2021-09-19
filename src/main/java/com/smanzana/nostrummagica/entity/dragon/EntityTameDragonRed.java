@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.base.Optional;
@@ -37,6 +38,7 @@ import com.smanzana.nostrummagica.items.NostrumRoseItem;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.serializers.PetJobSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
 
@@ -71,6 +73,7 @@ import net.minecraft.server.management.PreYggdrasilConverter;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
@@ -106,7 +109,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
     protected static final DataParameter<Float> ATTRIBUTE_BOND  = EntityDataManager.<Float>createKey(EntityTameDragonRed.class, DataSerializers.FLOAT);
     
     protected static final DataParameter<Float> SYNCED_MAX_HEALTH  = EntityDataManager.<Float>createKey(EntityTameDragonRed.class, DataSerializers.FLOAT);
-    protected static final DataParameter<PetAction> DATA_PET_ACTION = EntityDataManager.<PetAction>createKey(EntityTameDragonRed.class, PetAction.Serializer);
+    protected static final DataParameter<PetAction> DATA_PET_ACTION = EntityDataManager.<PetAction>createKey(EntityTameDragonRed.class, PetJobSerializer.instance);
     
     protected static final DataParameter<ItemStack> DATA_ARMOR_BODY = EntityDataManager.<ItemStack>createKey(EntityTameDragonRed.class, DataSerializers.ITEM_STACK);
     protected static final DataParameter<ItemStack> DATA_ARMOR_HELM = EntityDataManager.<ItemStack>createKey(EntityTameDragonRed.class, DataSerializers.ITEM_STACK);
@@ -270,12 +273,12 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 					return null;
 				}
 				
-				ItemStack[] scrolls = selfDragon.spellInventory.getTargetSpells();
-				Spell[] spells = new Spell[scrolls.length];
+				NonNullList<ItemStack> scrolls = selfDragon.spellInventory.getTargetSpells();
+				Spell[] spells = new Spell[scrolls.size()];
 				
 				for (int i = 0; i < spells.length; i++) {
 					// We odn't check for null here cause we sanitize input on placement
-					spells[i] = SpellScroll.getSpell(scrolls[i]);
+					spells[i] = SpellScroll.getSpell(scrolls.get(i));
 				}
 				
 				return spells;
@@ -311,12 +314,12 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 					return null;
 				}
 				
-				ItemStack[] scrolls = selfDragon.spellInventory.getSelfSpells();
-				Spell[] spells = new Spell[scrolls.length];
+				NonNullList<ItemStack> scrolls = selfDragon.spellInventory.getSelfSpells();
+				Spell[] spells = new Spell[scrolls.size()];
 				
 				for (int i = 0; i < spells.length; i++) {
 					// We odn't check for null here cause we sanitize input on placement
-					spells[i] = SpellScroll.getSpell(scrolls[i]);
+					spells[i] = SpellScroll.getSpell(scrolls.get(i));
 				}
 				
 				return spells;
@@ -352,12 +355,12 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 					return null;
 				}
 				
-				ItemStack[] scrolls = selfDragon.spellInventory.getAllySpells();
-				Spell[] spells = new Spell[scrolls.length];
+				NonNullList<ItemStack> scrolls = selfDragon.spellInventory.getAllySpells();
+				Spell[] spells = new Spell[scrolls.size()];
 				
 				for (int i = 0; i < spells.length; i++) {
 					// We odn't check for null here cause we sanitize input on placement
-					spells[i] = SpellScroll.getSpell(scrolls[i]);
+					spells[i] = SpellScroll.getSpell(scrolls.get(i));
 				}
 				
 				return spells;
@@ -455,15 +458,15 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		return 1F;
 	}
 	
-	public boolean isBreedingItem(@Nullable ItemStack stack) {
-		if (stack == null || !this.isTamed())
+	public boolean isBreedingItem(@Nonnull ItemStack stack) {
+		if (stack.isEmpty() || !this.isTamed())
 			return false;
 		
 		return stack.getItem() instanceof NostrumRoseItem;
 	}
 	
-	public boolean isHungerItem(ItemStack stack) {
-		if (stack == null) {
+	public boolean isHungerItem(@Nonnull ItemStack stack) {
+		if (stack.isEmpty()) {
 			return false;
 		}
 		
@@ -477,7 +480,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	}
 	
 	@Override
-	public boolean processInteract(EntityPlayer player, EnumHand hand, @Nullable ItemStack stack) {
+	public boolean processInteract(EntityPlayer player, EnumHand hand, @Nonnull ItemStack stack) {
 		// Shift-right click toggles the dragon sitting.
 		// When not sitting, right-click mounts the dragon.
 		// When sitting, right-click opens the GUI
@@ -502,7 +505,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 						}
 					}
 					return true;
-				} else if (this.isSitting() && stack == null) {
+				} else if (this.isSitting() && stack.isEmpty()) {
 					if (!this.world.isRemote) {
 						//player.openGui(NostrumMagica.instance, NostrumGui.dragonID, this.world, (int) this.posX, (int) this.posY, (int) this.posZ);
 						NostrumMagica.proxy.openDragonGUI(player, this);
@@ -516,7 +519,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 						}
 					}
 					return true;
-				} else if (stack == null) {
+				} else if (stack.isEmpty()) {
 					if (!this.world.isRemote) {
 						if (this.getBond() >= BOND_LEVEL_ALLOW_RIDE) {
 							if (this.getHealth() < DRAGON_MIN_HEALTH) {
@@ -672,7 +675,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			for (int i = 0; i < inventory.getSizeInventory(); i++) {
 				NBTTagCompound tag = new NBTTagCompound();
 				ItemStack stack = inventory.getStackInSlot(i);
-				if (stack != null) {
+				if (!stack.isEmpty()) {
 					stack.writeToNBT(tag);
 				}
 				
@@ -761,7 +764,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			
 			for (int i = 0; i < DRAGON_INV_SIZE; i++) {
 				NBTTagCompound tag = list.getCompoundTagAt(i);
-				ItemStack stack = null;
+				ItemStack stack = ItemStack.EMPTY;
 				if (tag != null) {
 					stack = new ItemStack(tag);
 				}
@@ -784,7 +787,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 //				
 //				for (int i = 0; i < spellInventory.getSizeInventory(); i++) {
 //					NBTTagCompound tag = list.getCompoundTagAt(i);
-//					ItemStack stack = null;
+//					ItemStack stack = ItemStack.EMPTY;
 //					if (tag != null) {
 //						stack = new ItemStack(tag);
 //					}
@@ -1236,7 +1239,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			if (this.inventory != null) {
 				for (int i = 0; i < inventory.getSizeInventory(); i++) {
 					ItemStack stack = inventory.getStackInSlot(i);
-					if (stack != null && stack.getCount() != 0) {
+					if (!stack.isEmpty()) {
 						EntityItem item = new EntityItem(this.world, this.posX, this.posY, this.posZ, stack);
 						this.world.spawnEntity(item);
 					}
@@ -1245,7 +1248,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			
 			for (DragonEquipmentSlot slot : DragonEquipmentSlot.values()) {
 				ItemStack stack = equipment.getStackInSlot(slot);
-				if (stack != null && stack.getCount() != 0) {
+				if (!stack.isEmpty()) {
 					EntityItem item = new EntityItem(this.world, this.posX, this.posY, this.posZ, stack);
 					this.world.spawnEntity(item);
 				}
@@ -1827,31 +1830,31 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			Arrays.fill(gambits, EntityDragonGambit.ALWAYS);
 		}
 		
-		public ItemStack[] getTargetSpells() {
-			ItemStack array[] = new ItemStack[MaxSpellsPerCategory];
+		public NonNullList<ItemStack> getTargetSpells() {
+			NonNullList<ItemStack> list = NonNullList.withSize(MaxSpellsPerCategory, ItemStack.EMPTY);
 			for (int i = 0; i < MaxSpellsPerCategory; i++) {
-				array[i] = this.getStackInSlot(i + TargetSpellIndex);
+				list.set(i, this.getStackInSlot(i + TargetSpellIndex));
 			}
-			return array;
+			return list;
 		}
 		
-		public ItemStack[] getSelfSpells() {
-			ItemStack array[] = new ItemStack[MaxSpellsPerCategory];
+		public NonNullList<ItemStack> getSelfSpells() {
+			NonNullList<ItemStack> list = NonNullList.withSize(MaxSpellsPerCategory, ItemStack.EMPTY);
 			for (int i = 0; i < MaxSpellsPerCategory; i++) {
-				array[i] = this.getStackInSlot(i + SelfSpellIndex);
+				list.set(i, this.getStackInSlot(i + SelfSpellIndex));
 			}
-			return array;
+			return list;
 		}
 		
-		public ItemStack[] getAllySpells() {
-			ItemStack array[] = new ItemStack[MaxSpellsPerCategory];
+		public NonNullList<ItemStack> getAllySpells() {
+			NonNullList<ItemStack> list = NonNullList.withSize(MaxSpellsPerCategory, ItemStack.EMPTY);
 			for (int i = 0; i < MaxSpellsPerCategory; i++) {
-				array[i] = this.getStackInSlot(i + AllySpellIndex);
+				list.set(i, this.getStackInSlot(i + AllySpellIndex));
 			}
-			return array;
+			return list;
 		}
 		
-		@Nullable
+		@Nonnull
 		public ItemStack setStackInTargetSlot(ItemStack stack, int slotIndex) {
 			if (slotIndex <  TargetSpellIndex || slotIndex >= TargetSpellIndex + MaxSpellsPerCategory) {
 				return stack;
@@ -1863,7 +1866,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			return ret;
 		}
 		
-		@Nullable
+		@Nonnull
 		public ItemStack setStackInSelfSlot(ItemStack stack, int slotIndex) {
 			if (slotIndex <  SelfSpellIndex || slotIndex >= SelfSpellIndex + MaxSpellsPerCategory) {
 				return stack;
@@ -1875,7 +1878,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			return ret;
 		}
 		
-		@Nullable
+		@Nonnull
 		public ItemStack setStackInAllySlot(ItemStack stack, int slotIndex) {
 			if (slotIndex <  AllySpellIndex || slotIndex >= AllySpellIndex + MaxSpellsPerCategory) {
 				return stack;
@@ -1890,7 +1893,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		public int getUsedSlots() {
 			int count = 0;
 			for (int i = 0; i < this.getSizeInventory(); i++) {
-				if (this.getStackInSlot(i) != null) {
+				if (!this.getStackInSlot(i).isEmpty()) {
 					count++;
 				}
 			}
@@ -1950,7 +1953,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 					NBTTagCompound tag = new NBTTagCompound();
 					
 					ItemStack stack = this.getStackInSlot(i);
-					if (stack != null) {
+					if (!stack.isEmpty()) {
 						stack.writeToNBT(tag);
 					}
 					
@@ -1988,7 +1991,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 				if (list != null) {
 					for (int i = 0; i < inv.getSizeInventory(); i++) {
 						NBTTagCompound tag = list.getCompoundTagAt(i);
-						ItemStack stack = null;
+						ItemStack stack = ItemStack.EMPTY;
 						if (tag != null) {
 							stack = new ItemStack(tag);
 						}
@@ -2034,19 +2037,19 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			for (int i = 0; i < MaxSpellsPerCategory; i++) {
 				int index = i + startIndex;
 				// See if it's empty
-				if (this.getStackInSlot(index) == null) {
+				if (this.getStackInSlot(index).isEmpty()) {
 					// This slot is empty. Are there any further on?
 					boolean fixed = false;
 					for (int j = i + 1; j < MaxSpellsPerCategory; j++) {
 						int lookIndex = j + startIndex;
 						ItemStack stack = this.getStackInSlot(lookIndex);
-						if (stack != null) {
+						if (!stack.isEmpty()) {
 							// Fix gambits first, since we hook into setContents later
 							gambits[index] = gambits[lookIndex];
 							gambits[lookIndex] = EntityDragonGambit.ALWAYS;
 							
 							this.setInventorySlotContents(index, stack);
-							this.setInventorySlotContents(lookIndex, null);
+							this.setInventorySlotContents(lookIndex, ItemStack.EMPTY);
 							
 							fixed = true;
 							break;
@@ -2070,10 +2073,10 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		}
 		
 		@Override
-		public ItemStack removeStackFromSlot(int index) {
+		public @Nonnull ItemStack removeStackFromSlot(int index) {
 			ItemStack stack = super.removeStackFromSlot(index);
 			
-			if (stack != null) {
+			if (!stack.isEmpty()) {
 				// Item removed!
 				gambits[index] = EntityDragonGambit.ALWAYS;
 				this.clean();
@@ -2083,17 +2086,17 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		}
 		
 		@Override
-		public void setInventorySlotContents(int index, @Nullable ItemStack stack) {
+		public void setInventorySlotContents(int index, @Nonnull ItemStack stack) {
 			super.setInventorySlotContents(index, stack);
 			
-			if (stack == null) {
+			if (stack.isEmpty()) {
 				gambits[index] = EntityDragonGambit.ALWAYS;
 			}
 		}
 		
 		@Override
-		public boolean isItemValidForSlot(int index, ItemStack stack) {
-			if (stack == null) {
+		public boolean isItemValidForSlot(int index, @Nonnull ItemStack stack) {
+			if (stack.isEmpty()) {
 				return true;
 			}
 			
@@ -2261,7 +2264,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		// else
 		// All slots changed. Scan and update!
 		for (DragonEquipmentSlot scanSlot : DragonEquipmentSlot.values()) {
-			@Nullable ItemStack inSlot = equipment.getStackInSlot(scanSlot);
+			@Nonnull ItemStack inSlot = equipment.getStackInSlot(scanSlot);
 			if (scanSlot == DragonEquipmentSlot.BODY) {
 				dataManager.set(DATA_ARMOR_BODY, inSlot);
 			} else if (scanSlot == DragonEquipmentSlot.HELM) {
@@ -2278,7 +2281,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 //	private static final Map<DragonArmorMaterial, Map<DragonEquipmentSlot, ItemStack>> ClientStacks = new EnumMap<>(DragonArmorMaterial.class);
 	
 	@Override
-	public @Nullable ItemStack getDragonEquipment(DragonEquipmentSlot slot) {
+	public @Nonnull ItemStack getDragonEquipment(DragonEquipmentSlot slot) {
 		// Defer to synced data param if on client. Otherwise, look in equipment inventory
 		if (this.world.isRemote) {
 			
@@ -2304,7 +2307,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 				break;
 			}
 			
-			return null;
+			return ItemStack.EMPTY;
 		} else {
 			return this.equipment.getStackInSlot(slot);
 		}

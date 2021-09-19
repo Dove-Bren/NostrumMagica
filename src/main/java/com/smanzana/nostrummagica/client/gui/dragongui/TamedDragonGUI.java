@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
+
 import com.google.common.collect.Lists;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -137,8 +139,8 @@ public class TamedDragonGUI {
 		}
 		
 		@Override
-		public ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
-			return null;
+		public @Nonnull ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
+			return ItemStack.EMPTY;
 		}
 		
 		/**
@@ -498,7 +500,7 @@ public class TamedDragonGUI {
 			}
 			
 			// Only allow custom clicking s tuff if there isn't an item being held
-			if (NostrumMagica.proxy.getPlayer().inventory.getItemStack() == null) {
+			if (NostrumMagica.proxy.getPlayer().inventory.getItemStack().isEmpty()) {
 			
 				final int GUI_SHEET_HOFFSET = this.width - (GUI_SHEET_WIDTH + GUI_SHEET_NHOFFSET);
 				final int GUI_SHEET_BUTTON_HOFFSET = GUI_SHEET_HOFFSET;

@@ -30,7 +30,6 @@ import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
 import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
-import com.smanzana.nostrummagica.entity.PetInfo;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.EntityShadowDragonRed;
@@ -72,6 +71,7 @@ import com.smanzana.nostrummagica.serializers.DragonArmorMaterialSerializer;
 import com.smanzana.nostrummagica.serializers.HookshotTypeDataSerializer;
 import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
 import com.smanzana.nostrummagica.serializers.OptionalDragonArmorMaterialSerializer;
+import com.smanzana.nostrummagica.serializers.PetJobSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
@@ -136,8 +136,6 @@ public class CommonProxy {
 		CapabilityManager.INSTANCE.register(INostrumMagic.class, new NostrumMagicStorage(), NostrumMagic::new);
 		capabilityHandler = new CapabilityHandler();
 		NetworkHandler.getInstance();
-		
-		PetInfo.PetAction.Init();
 		
     	registerShapes();
     	registerTriggers();
@@ -401,6 +399,7 @@ public class CommonProxy {
     	registry.register(new DataSerializerEntry(OptionalDragonArmorMaterialSerializer.instance));
     	registry.register(new DataSerializerEntry(MagicElementDataSerializer.instance));
     	registry.register(new DataSerializerEntry(HookshotTypeDataSerializer.instance));
+    	registry.register(new DataSerializerEntry(PetJobSerializer.instance));
     }
     
     public void syncPlayer(EntityPlayerMP player) {

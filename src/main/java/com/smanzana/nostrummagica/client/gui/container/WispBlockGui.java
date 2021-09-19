@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.client.gui.container;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -65,8 +65,8 @@ public class WispBlockGui {
 			this.scrollSlot = new Slot(table, 0, SCROLL_SLOT_INPUT_HOFFSET, SCROLL_SLOT_INPUT_VOFFSET) {
 				
 				@Override
-				public boolean isItemValid(@Nullable ItemStack stack) {
-					return stack == null ||
+				public boolean isItemValid(@Nonnull ItemStack stack) {
+					return stack.isEmpty() ||
 							(stack.getItem() instanceof SpellScroll && SpellScroll.getSpell(stack) != null);
 				}
 //				
@@ -119,8 +119,8 @@ public class WispBlockGui {
 			this.reagentSlot = new Slot(table, 1, REAGENT_SLOT_INPUT_HOFFSET, REAGENT_SLOT_INPUT_VOFFSET) {
 				
 				@Override
-				public boolean isItemValid(@Nullable ItemStack stack) {
-					return stack == null || stack.getItem() instanceof ReagentItem;
+				public boolean isItemValid(@Nonnull ItemStack stack) {
+					return stack.isEmpty() || stack.getItem() instanceof ReagentItem;
 				}
 //				
 //				@Override
@@ -185,7 +185,7 @@ public class WispBlockGui {
 		
 		@Override
 		public ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
-			ItemStack prev = null;	
+			ItemStack prev = ItemStack.EMPTY;	
 			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
 			
 			if (slot != null && slot.getHasStack()) {
@@ -195,18 +195,18 @@ public class WispBlockGui {
 				if (slot == this.scrollSlot) {
 					// Trying to take our scroll
 					if (playerIn.inventory.addItemStackToInventory(cur)) {
-						scrollSlot.putStack(null);
+						scrollSlot.putStack(ItemStack.EMPTY);
 						scrollSlot.onTake(playerIn, cur);
 					} else {
-						prev = null;
+						prev = ItemStack.EMPTY;
 					}
 				} else if (slot == this.reagentSlot) {
 					// Trying to take our reagent
 					if (playerIn.inventory.addItemStackToInventory(cur)) {
-						reagentSlot.putStack(null);
+						reagentSlot.putStack(ItemStack.EMPTY);
 						reagentSlot.onTake(playerIn, cur);
 					} else {
-						prev = null;
+						prev = ItemStack.EMPTY;
 					}
 				} else {
 					// Trying to add an item
@@ -219,7 +219,7 @@ public class WispBlockGui {
 						ItemStack stack = cur.splitStack(cur.getMaxStackSize());
 						reagentSlot.putStack(stack);
 					} else {
-						prev = null;
+						prev = ItemStack.EMPTY;
 					}
 				}
 				
@@ -271,10 +271,10 @@ public class WispBlockGui {
 			
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
-			ItemStack scroll = container.table.getScroll();
+			@Nonnull ItemStack scroll = container.table.getScroll();
 			int color = 0xFFFFFFFF;
 			
-			if (scroll != null) {
+			if (!scroll.isEmpty()) {
 				Spell spell = SpellScroll.getSpell(scroll);
 				if (spell != null) {
 					color = spell.getPrimaryElement().getColor();

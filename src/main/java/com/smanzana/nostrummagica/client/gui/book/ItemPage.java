@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.client.gui.book;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -19,7 +21,7 @@ public class ItemPage implements IBookPage {
 	
 	private ItemStack[] itemImages;
 	
-	public ItemPage(ItemStack item) {
+	public ItemPage(@Nonnull ItemStack item) {
 		if (item.getMetadata() == OreDictionary.WILDCARD_VALUE) {
 			List<ItemStack> items = new LinkedList<>();
 			int i;
@@ -57,7 +59,7 @@ public class ItemPage implements IBookPage {
 		GlStateManager.translate(0.0F, 0.0F, 32.0F);
         itemRender.zLevel = 200.0F;
         net.minecraft.client.gui.FontRenderer font = null;
-        if (item != null) font = item.getItem().getFontRenderer(item);
+        if (!item.isEmpty()) font = item.getItem().getFontRenderer(item);
         if (font == null) font = fonter;
         itemRender.renderItemAndEffectIntoGUI(item, centerx, centery);
         itemRender.zLevel = 0.0F;
@@ -70,7 +72,7 @@ public class ItemPage implements IBookPage {
 		int displayIndex = (int) (Minecraft.getSystemTime() / 1500);
 		displayIndex %= itemImages.length;
 		ItemStack item = itemImages[displayIndex];
-		if (item != null) {
+		if (!item.isEmpty()) {
 			int centerx = widthCache / 2;
 			int centery = heightCache / 2;
 			int x = centerx - 8;

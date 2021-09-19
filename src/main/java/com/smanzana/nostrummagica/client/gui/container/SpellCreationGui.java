@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import org.lwjgl.opengl.GL11;
 
@@ -121,14 +121,18 @@ public class SpellCreationGui {
 			
 			this.addSlotToContainer(new Slot(inventory, 0, SLOT_MAIN_HOFFSET, SLOT_MAIN_VOFFSET) {
 				@Override
-				public boolean isItemValid(@Nullable ItemStack stack) {
-					return (stack == null
+				public boolean isItemValid(@Nonnull ItemStack stack) {
+					return (stack.isEmpty()
 							|| stack.getItem() instanceof BlankScroll);
 				}
 				
 				@Override
-				public void putStack(@Nullable ItemStack stack) {
+				public void putStack(@Nonnull ItemStack stack) {
 					super.putStack(stack);
+					
+					if (!stack.isEmpty() && stack.getItem() instanceof BlankScroll) {
+						iconIndex = NostrumMagica.rand.nextInt(SpellIcon.numIcons);
+					}
 					
 					validate();
 				}
@@ -168,14 +172,14 @@ public class SpellCreationGui {
 					}
 					
 					@Override
-					public void putStack(@Nullable ItemStack stack) {
+					public void putStack(@Nonnull ItemStack stack) {
 						super.putStack(stack);
 						
 						validate();
 					}
 					
 					@Override
-					public ItemStack onTake(EntityPlayer playerIn, ItemStack stack) {
+					public @Nonnull ItemStack onTake(EntityPlayer playerIn, ItemStack stack) {
 						validate();
 						
 						return super.onTake(playerIn, stack);
@@ -197,8 +201,8 @@ public class SpellCreationGui {
 			// isValid means there's something that can accept a spell
 			// in the tome slot. Is there?
 			isValid = false;
-			ItemStack stack = this.inventory.getStackInSlot(0);
-			if (stack != null && stack.getItem() instanceof BlankScroll)
+			@Nonnull ItemStack stack = this.inventory.getStackInSlot(0);
+			if (!stack.isEmpty() && stack.getItem() instanceof BlankScroll)
 				isValid = true;
 			
 			validate();
@@ -216,7 +220,7 @@ public class SpellCreationGui {
 					// Trying to take from the table
 					ItemStack dupe = cur.copy();
 					if (playerIn.inventory.addItemStackToInventory(dupe)) {
-						slot.putStack(null);
+						slot.putStack(ItemStack.EMPTY);
 						slot.onTake(playerIn, dupe);
 					}
 				} else {
@@ -227,7 +231,7 @@ public class SpellCreationGui {
 						// Try to add to existing
 						for (int i = 0; i < inventory.getReagentSlotCount(); i++) {
 							ItemStack stack = inventory.getStackInSlot(i + inventory.getReagentSlotIndex());
-							if (stack == null || stack.getItem() != cur.getItem()
+							if (stack.isEmpty() || stack.getItem() != cur.getItem()
 									|| stack.getMetadata() != cur.getMetadata())
 								continue;
 							Slot reagentSlot = this.getSlot(i + inventory.getReagentSlotIndex());
@@ -247,10 +251,10 @@ public class SpellCreationGui {
 						}
 						
 						// If still ahve items, add to empty slots
-						if (cur.getCount() > 0)
+						if (!cur.isEmpty())
 						for (int i = 0; i < inventory.getReagentSlotCount(); i++) {
 							ItemStack stack = inventory.getStackInSlot(i + inventory.getReagentSlotIndex());
-							if (stack != null)
+							if (!stack.isEmpty())
 								continue;
 							Slot reagentSlot = this.getSlot(i + inventory.getReagentSlotIndex());
 							
@@ -262,12 +266,12 @@ public class SpellCreationGui {
 								reagentSlot.putStack(cur.splitStack(maxsize));
 							}
 							
-							if (cur.getCount() <= 0)
+							if (cur.isEmpty())
 								break;
 						}
 					} else if (cur.getItem() instanceof BlankScroll) {
 						ItemStack existing = inventory.getStackInSlot(inventory.getScrollSlotIndex());
-						if (existing == null) {
+						if (existing.isEmpty()) {
 							inventory.setInventorySlotContents(inventory.getScrollSlotIndex(),
 									cur.splitStack(1));
 							this.validate();
@@ -275,9 +279,9 @@ public class SpellCreationGui {
 					} else if (cur.getItem() instanceof SpellRune) {
 						// Only allow adding if blank scroll is in place
 						ItemStack scroll = inventory.getStackInSlot(inventory.getScrollSlotIndex());
-						if (scroll == null || !(scroll.getItem() instanceof BlankScroll)) {
+						if (scroll.isEmpty() || !(scroll.getItem() instanceof BlankScroll)) {
 							// Do nothing
-						} else if (null != inventory.getStackInSlot(inventory.getRuneSlotIndex() + inventory.getRuneSlotCount() - 1)) {
+						} else if (!inventory.getStackInSlot(inventory.getRuneSlotIndex() + inventory.getRuneSlotCount() - 1).isEmpty()) {
 							// If something's in last slot, we're full
 							// Table will naturally shift things down
 						} else {
@@ -289,29 +293,29 @@ public class SpellCreationGui {
 								add = true;
 							} else if (wrapper.isShape()) {
 								// Must have a trigger in first slot already
-								if (null != inventory.getStackInSlot(inventory.getRuneSlotIndex()))
+								if (!inventory.getStackInSlot(inventory.getRuneSlotIndex()).isEmpty())
 									add = true;
 							}
 							
 							if (add) {
 								int index = inventory.getRuneSlotIndex();
-								while (inventory.getStackInSlot(index) != null)
+								while (!inventory.getStackInSlot(index).isEmpty())
 									index++;
 								
 								inventory.setInventorySlotContents(index, cur.copy());
-								cur = null;
+								cur = ItemStack.EMPTY;
 								this.validate();
 							}
 						}
 					}
 				}
 				
-				if (cur == null || cur.getCount() <= 0) {
-					slot.putStack(null);
+				if (cur.isEmpty()) {
+					slot.putStack(ItemStack.EMPTY);
 				}
 			}
 			
-			return null;
+			return ItemStack.EMPTY;
 		}
 		
 		@Override
@@ -330,7 +334,7 @@ public class SpellCreationGui {
 			
 			isValid = false;
 			ItemStack stack = this.inventory.getStackInSlot(0);
-			if (stack != null && (stack.getItem() instanceof SpellTome || stack.getItem() instanceof BlankScroll))
+			if (!stack.isEmpty() && (stack.getItem() instanceof SpellTome || stack.getItem() instanceof BlankScroll))
 				isValid = true;
 			
 			return ret;
@@ -400,10 +404,8 @@ public class SpellCreationGui {
 				fail = true;
 			}
 			
-			ItemStack stack;
-			
-			stack = inventory.getStackInSlot(1);
-			if (stack == null || !SpellRune.isTrigger(stack)) {
+			@Nonnull ItemStack stack = inventory.getStackInSlot(1);
+			if (stack.isEmpty() || !SpellRune.isTrigger(stack)) {
 				spellErrorStrings.add(prefix + "Spell must begin with a trigger");
 				return null;
 			}
@@ -411,7 +413,7 @@ public class SpellCreationGui {
 			boolean flag = false;
 			for (int i = 2; i < inventory.getReagentSlotIndex(); i++) {
 				stack = inventory.getStackInSlot(i);
-				if (stack == null) {
+				if (stack.isEmpty()) {
 					break;
 				}
 				if (!SpellRune.isSpellWorthy(stack)) {
@@ -438,7 +440,7 @@ public class SpellCreationGui {
 			SpellPart part;
 			for (int i = 1; i < inventory.getReagentSlotIndex(); i++) {
 				stack = inventory.getStackInSlot(i);
-				if (stack == null) {
+				if (stack.isEmpty()) {
 					break;
 				}
 				
@@ -499,7 +501,7 @@ public class SpellCreationGui {
 			return spell;
 		}
 		
-		public void setScroll(ItemStack item) {
+		public void setScroll(@Nonnull ItemStack item) {
 			this.inventory.setInventorySlotContents(0, item);
 			isValid = false;
 		}
@@ -510,8 +512,8 @@ public class SpellCreationGui {
 	// returns amount needed still. 0 means all that were needed are there
 	private static int takeReagent(SpellTableEntity inventory, ReagentType type, int count, boolean take) {
 		for (int i = inventory.getReagentSlotIndex(); i < inventory.getReagentSlotIndex() + inventory.getReagentSlotCount(); i++) {
-			ItemStack stack = inventory.getStackInSlot(i);
-			if (stack == null)
+			@Nonnull ItemStack stack = inventory.getStackInSlot(i);
+			if (stack.isEmpty())
 				continue;
 			
 			if (ReagentItem.findType(stack) == type) {
@@ -522,7 +524,7 @@ public class SpellCreationGui {
 				} else {
 					count -= stack.getCount();
 					if (take)
-						inventory.setInventorySlotContents(i, null);
+						inventory.setInventorySlotContents(i, ItemStack.EMPTY);
 				}
 				
 				if (count == 0)
@@ -877,7 +879,7 @@ public class SpellCreationGui {
 		}
 		
 		@Override
-		public boolean isItemValid(@Nullable ItemStack stack) {
+		public boolean isItemValid(@Nonnull ItemStack stack) {
 			// Can put the item in if:
 			// it's empty
 			// OR previous slot is not null (not the first trigger-only slot)
@@ -890,7 +892,7 @@ public class SpellCreationGui {
 					!prev.getHasStack())
 				return false;
 			
-			if (stack == null)
+			if (stack.isEmpty())
 				return true;
 			
 			if (!(stack.getItem() instanceof SpellRune))
@@ -911,21 +913,21 @@ public class SpellCreationGui {
 		}
 		
 		@Override
-		public void putStack(@Nullable ItemStack stack) {
+		public void putStack(@Nonnull ItemStack stack) {
 			super.putStack(stack);
 			
 			container.validate();
 		}
 		
 		@Override
-		public ItemStack onTake(EntityPlayer playerIn, ItemStack stack) {
+		public @Nonnull ItemStack onTake(EntityPlayer playerIn, ItemStack stack) {
 			// This is called AFTER things have been changed or swapped
 			// Which means we just look to see if we have an item.
 			// If not, take item from next
 			if (!this.getHasStack() && next != null && next.getHasStack()) {
 				System.out.println("grabbing stack");
 				this.putStack(next.getStack().copy());
-				next.putStack(null);
+				next.putStack(ItemStack.EMPTY);
 				next.onTake(playerIn, this.getStack());
 			}
 

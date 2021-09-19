@@ -82,7 +82,7 @@ public class WispBlock extends BlockContainer {
 				return true;
 			} else if (heldItem.getItem() instanceof ReagentItem) {
 				
-				if (te.getReagent() == ItemStack.EMPTY) {
+				if (te.getReagent().isEmpty()) {
 					te.setReagent(heldItem.splitStack(heldItem.getCount()));
 					return true;
 				} else if (ReagentItem.findType(heldItem) == ReagentItem.findType(te.getReagent())) {
@@ -173,10 +173,10 @@ public class WispBlock extends BlockContainer {
 		table.deactivate();
 	}
 	
-	public ItemStack getScroll(World world, BlockPos pos) {
+	public @Nonnull ItemStack getScroll(World world, BlockPos pos) {
 		TileEntity ent = world.getTileEntity(pos);
 		if (ent == null || !(ent instanceof WispBlockTileEntity))
-			return null;
+			return ItemStack.EMPTY;
 		
 		WispBlockTileEntity table = (WispBlockTileEntity) ent;
 		return table.getScroll();

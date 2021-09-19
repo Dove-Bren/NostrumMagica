@@ -1,6 +1,5 @@
 package com.smanzana.nostrummagica.spells.components.shapes;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -11,6 +10,7 @@ import com.smanzana.nostrummagica.spells.components.SpellShape;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -48,10 +48,10 @@ public class SingleShape extends SpellShape {
 	}
 
 	@Override
-	public List<ItemStack> getReagents() {
-		List<ItemStack> list = new ArrayList<>(1);
-		
-		list.add(ReagentItem.instance().getReagent(ReagentType.CRYSTABLOOM, 1));
+	public NonNullList<ItemStack> getReagents() {
+		NonNullList<ItemStack> list = NonNullList.from(ItemStack.EMPTY,
+				ReagentItem.instance().getReagent(ReagentType.CRYSTABLOOM, 1)
+			);
 		
 		return list;
 	}
@@ -72,7 +72,7 @@ public class SingleShape extends SpellShape {
 	}
 
 	@Override
-	public ItemStack[] supportedFloatCosts() {
+	public NonNullList<ItemStack> supportedFloatCosts() {
 		return null;
 	}
 

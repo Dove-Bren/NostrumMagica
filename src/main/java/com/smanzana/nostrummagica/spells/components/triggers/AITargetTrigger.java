@@ -1,8 +1,5 @@
 package com.smanzana.nostrummagica.spells.components.triggers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 
@@ -11,6 +8,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -51,10 +49,8 @@ public class AITargetTrigger extends InstantTrigger {
 	}
 
 	@Override
-	public List<ItemStack> getReagents() {
-		List<ItemStack> list = new ArrayList<>(1);
-		
-		return list;
+	public NonNullList<ItemStack> getReagents() {
+		return NonNullList.create();
 	}
 
 	@Override
@@ -78,7 +74,7 @@ public class AITargetTrigger extends InstantTrigger {
 	}
 
 	@Override
-	public ItemStack[] supportedFloatCosts() {
+	public NonNullList<ItemStack> supportedFloatCosts() {
 		return null;
 	}
 

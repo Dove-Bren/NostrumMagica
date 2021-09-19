@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.client.gui.dragongui;
 
+import javax.annotation.Nonnull;
+
 import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonContainer;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon.DragonEquipmentInventory;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
@@ -53,7 +55,7 @@ public class RedDragonInventorySheet implements IDragonGUISheet {
 			final int i = slot.ordinal();
 			Slot slotIn = new Slot(dragonEquips, i, leftOffset + offsetX - (cellWidth + 4), dragonTopOffset + offsetY + (cellWidth * i * 2)) {
 				@Override
-				public boolean isItemValid(ItemStack stack) {
+				public boolean isItemValid(@Nonnull ItemStack stack) {
 					return dragonEquips.isItemValidForSlot(this.getSlotIndex(), stack);
 				}
 			};

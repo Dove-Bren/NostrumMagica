@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.entity.renderer;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonRedBase;
@@ -38,11 +38,11 @@ public class RenderDragonRed extends RenderLiving<EntityDragonRedBase> {
 	@Override
 	public void doRender(EntityDragonRedBase dragon, double x, double y, double z, float entityYaw, float partialTicks) {
 		// Set up armor visiblity
-		@Nullable final ItemStack chestArmor = dragon.getDragonEquipment(DragonEquipmentSlot.BODY);
-		@Nullable final ItemStack headArmor = dragon.getDragonEquipment(DragonEquipmentSlot.HELM);
+		@Nonnull final ItemStack chestArmor = dragon.getDragonEquipment(DragonEquipmentSlot.BODY);
+		@Nonnull final ItemStack headArmor = dragon.getDragonEquipment(DragonEquipmentSlot.HELM);
 		final EDragonOverlayMaterial chestMaterial;
 		final EDragonOverlayMaterial headMaterial;
-		if (chestArmor == null || !(chestArmor.getItem() instanceof DragonArmor)) {
+		if (chestArmor.isEmpty() || !(chestArmor.getItem() instanceof DragonArmor)) {
 			chestMaterial = EDragonOverlayMaterial.NONE;
 		} else {
 			DragonArmor armor = (DragonArmor) chestArmor.getItem();
@@ -63,7 +63,7 @@ public class RenderDragonRed extends RenderLiving<EntityDragonRedBase> {
 		}
 		this.dragonModel.setOverlayMaterial(EDragonArmorPart.BODY, chestMaterial);
 		
-		if (headArmor == null || !(headArmor.getItem() instanceof DragonArmor)) {
+		if (headArmor.isEmpty() || !(headArmor.getItem() instanceof DragonArmor)) {
 			headMaterial = EDragonOverlayMaterial.NONE;
 		} else {
 			DragonArmor armor = (DragonArmor) headArmor.getItem();

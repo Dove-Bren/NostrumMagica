@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -564,7 +565,7 @@ public class PlayerListener {
 				// Defense
 				if (event.getAmount() > 0 && livingTarget != livingSource) {
 					for (ItemStack stack : livingTarget.getEquipmentAndArmor()) {
-						if (stack == null || !(stack.getItem() instanceof EnchantedEquipment))
+						if (stack.isEmpty() || !(stack.getItem() instanceof EnchantedEquipment))
 							continue;
 						
 						EnchantedEquipment ench = (EnchantedEquipment) stack.getItem();
@@ -579,7 +580,7 @@ public class PlayerListener {
 						if (inv != null) {
 							for (int i = 0; i < inv.getSizeInventory(); i++) {
 								ItemStack stack = inv.getStackInSlot(i);
-								if (stack == null || !(stack.getItem() instanceof EnchantedEquipment))
+								if (stack.isEmpty() || !(stack.getItem() instanceof EnchantedEquipment))
 									continue;
 								
 								EnchantedEquipment ench = (EnchantedEquipment) stack.getItem();
@@ -595,7 +596,7 @@ public class PlayerListener {
 		
 				// Offense
 				for (ItemStack stack : livingSource.getEquipmentAndArmor()) {
-					if (stack == null || !(stack.getItem() instanceof EnchantedEquipment))
+					if (stack.isEmpty() || !(stack.getItem() instanceof EnchantedEquipment))
 						continue;
 					
 					EnchantedEquipment ench = (EnchantedEquipment) stack.getItem();
@@ -610,7 +611,7 @@ public class PlayerListener {
 					if (inv != null) {
 						for (int i = 0; i < inv.getSizeInventory(); i++) {
 							ItemStack stack = inv.getStackInSlot(i);
-							if (stack == null || !(stack.getItem() instanceof EnchantedEquipment))
+							if (stack.isEmpty() || !(stack.getItem() instanceof EnchantedEquipment))
 								continue;
 							
 							EnchantedEquipment ench = (EnchantedEquipment) stack.getItem();
@@ -631,8 +632,8 @@ public class PlayerListener {
 		// Make hookshots not damage someone if you reach the wall
 		if (event.getSource() == DamageSource.FLY_INTO_WALL) {
 			EntityLivingBase ent = event.getEntityLiving();
-			for (@Nullable ItemStack held : new ItemStack[] {ent.getHeldItemMainhand(), ent.getHeldItemOffhand()}) {
-				if (held == null) {
+			for (@Nonnull ItemStack held : new ItemStack[] {ent.getHeldItemMainhand(), ent.getHeldItemOffhand()}) {
+				if (held.isEmpty()) {
 					continue;
 				}
 				
@@ -763,7 +764,7 @@ public class PlayerListener {
 				IBaublesItemHandler baubles = BaublesApi.getBaublesHandler((EntityPlayer) event.getEntityLiving());
 				for (int i = 0; i < baubles.getSlots(); i++) {
 					ItemStack stack = baubles.getStackInSlot(i);
-					if (stack != null && stack.getItem() instanceof ItemMagicBauble) {
+					if (!stack.isEmpty() && stack.getItem() instanceof ItemMagicBauble) {
 						((ItemMagicBauble) stack.getItem()).onUnequipped(stack, event.getEntityLiving());
 					}
 				}
@@ -845,13 +846,13 @@ public class PlayerListener {
 			int originalSize = addedItem.getCount();
 			for (ItemStack item : player.inventory.offHandInventory) {
 				// Silly but prefer offhand
-				if (item != null && item.getItem() instanceof ReagentBag) {
+				if (!item.isEmpty() && item.getItem() instanceof ReagentBag) {
 					if (ReagentBag.isVacuumEnabled(item)) {
 						addedItem = ReagentBag.addItem(item, addedItem);
-						if (addedItem == null || addedItem.getCount() < originalSize) {
+						if (addedItem.isEmpty() || addedItem.getCount() < originalSize) {
 							NostrumMagicaSounds.UI_TICK.play(player.world, player.posX, player.posY, player.posZ);
 						}
-						if (addedItem == null) {
+						if (addedItem.isEmpty()) {
 							e.setCanceled(true);
 							e.getItem().setDead();
 							return;
@@ -861,13 +862,13 @@ public class PlayerListener {
 				}
 			}
 			for (ItemStack item : player.inventory.mainInventory) {
-				if (item != null && item.getItem() instanceof ReagentBag) {
+				if (!item.isEmpty() && item.getItem() instanceof ReagentBag) {
 					if (ReagentBag.isVacuumEnabled(item)) {
 						addedItem = ReagentBag.addItem(item, addedItem);
-						if (addedItem == null || addedItem.getCount() < originalSize) {
+						if (addedItem.isEmpty() || addedItem.getCount() < originalSize) {
 							NostrumMagicaSounds.UI_TICK.play(player.world, player.posX, player.posY, player.posZ);
 						}
-						if (addedItem == null) {
+						if (addedItem.isEmpty()) {
 							e.setCanceled(true);
 							e.getItem().setDead();
 							return;
@@ -889,13 +890,13 @@ public class PlayerListener {
 			int originalSize = addedItem.getCount();
 			for (ItemStack item : player.inventory.offHandInventory) {
 				// Silly but prefer offhand
-				if (item != null && item.getItem() instanceof RuneBag) {
+				if (!item.isEmpty() && item.getItem() instanceof RuneBag) {
 					if (RuneBag.isVacuumEnabled(item)) {
 						addedItem = RuneBag.addItem(item, addedItem);
-						if (addedItem == null || addedItem.getCount() < originalSize) {
+						if (addedItem.isEmpty() || addedItem.getCount() < originalSize) {
 							NostrumMagicaSounds.UI_TICK.play(player.world, player.posX, player.posY, player.posZ);
 						}
-						if (addedItem == null) {
+						if (addedItem.isEmpty()) {
 							e.setCanceled(true);
 							e.getItem().setDead();
 							return;
@@ -905,13 +906,13 @@ public class PlayerListener {
 				}
 			}
 			for (ItemStack item : player.inventory.mainInventory) {
-				if (item != null && item.getItem() instanceof RuneBag) {
+				if (!item.isEmpty() && item.getItem() instanceof RuneBag) {
 					if (RuneBag.isVacuumEnabled(item)) {
 						addedItem = RuneBag.addItem(item, addedItem);
-						if (addedItem == null || addedItem.getCount() < originalSize) {
+						if (addedItem.isEmpty() || addedItem.getCount() < originalSize) {
 							NostrumMagicaSounds.UI_TICK.play(player.world, player.posX, player.posY, player.posZ);
 						}
-						if (addedItem == null) {
+						if (addedItem.isEmpty()) {
 							e.setCanceled(true);
 							e.getItem().setDead();
 							return;
@@ -1048,7 +1049,7 @@ public class PlayerListener {
 		int xp = event.getOrb().xpValue;
 		if (attr != null) {
 			for (ItemStack item : player.getEquipmentAndArmor()) {
-				if (item == null)
+				if (item.isEmpty())
 					continue;
 				int leftover = tryThanos(player, item, xp);
 				if (leftover == 0) {
@@ -1059,7 +1060,7 @@ public class PlayerListener {
 			}
 			if (xp != 0)
 			for (ItemStack item : player.inventory.mainInventory) {
-				if (item == null)
+				if (item.isEmpty())
 					continue;
 				int leftover = tryThanos(player, item, xp);
 				if (leftover == 0) {

@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.gui.container;
 
 import java.io.IOException;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -45,13 +45,13 @@ public class RuneBagGui {
 	public static class BagContainer extends Container {
 		
 		protected RuneBag bag;
-		protected ItemStack stack;
+		protected @Nonnull ItemStack stack;
 		protected RuneInventory inventory;
 		protected int bagPos;
 		
 		private int bagIDStart;
 		
-		public BagContainer(IInventory playerInv, RuneBag bag, ItemStack stack, int bagPos) {
+		public BagContainer(IInventory playerInv, RuneBag bag, @Nonnull ItemStack stack, int bagPos) {
 			this.stack = stack;
 			this.inventory = bag.asInventory(stack);
 			this.bag = bag;
@@ -74,7 +74,7 @@ public class RuneBagGui {
 				for (int j = 0; j < 9; j++) {
 					
 					this.addSlotToContainer(new Slot(inventory, i * 9 + j, BAG_INV_HOFFSET + j * 18, BAG_INV_VOFFSET + i * 18) {
-						public boolean isItemValid(@Nullable ItemStack stack) {
+						public boolean isItemValid(@Nonnull ItemStack stack) {
 					        return this.inventory.isItemValidForSlot(this.getSlotIndex(), stack);
 					    }
 					});
@@ -84,7 +84,7 @@ public class RuneBagGui {
 		
 		@Override
 		public ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
-			ItemStack prev = null;	
+			ItemStack prev = ItemStack.EMPTY;	
 			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
 			IInventory inv = slot.inventory;
 			
@@ -93,12 +93,12 @@ public class RuneBagGui {
 				if (inv == inventory) {
 					// shift-click in bag
 					if (playerIn.inventory.addItemStackToInventory(stack.copy())) {
-						slot.putStack(null);
+						slot.putStack(ItemStack.EMPTY);
 					}
 				} else {
 					// shift-click in player inventory
 					ItemStack leftover = inventory.addItem(stack);
-					slot.putStack(leftover != null && leftover.getCount() <= 0 ? null : leftover);
+					slot.putStack(leftover);
 				}
 			}
 			
@@ -119,14 +119,14 @@ public class RuneBagGui {
 						}
 				}**/
 				
-				if (cur.getCount() == 0) {
-					slot.putStack((ItemStack) null);
+				if (cur.isEmpty()) {
+					slot.putStack(ItemStack.EMPTY);
 				} else {
 					slot.onSlotChanged();
 				}
 				
 				if (cur.getCount() == prev.getCount()) {
-					return null;
+					return ItemStack.EMPTY;
 				}
 				slot.onTake(playerIn, cur);
 			}
@@ -148,15 +148,15 @@ public class RuneBagGui {
 		public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, EntityPlayer player) {
 			if (slotId < bagIDStart) {
 				if (slotId == bagPos) {
-					return null;
+					return ItemStack.EMPTY;
 				}
 			}
 			
-			ItemStack itemstack = null;
+			ItemStack itemstack = ItemStack.EMPTY;
 			InventoryPlayer inventoryplayer = player.inventory;
 
 			if (clickTypeIn == ClickType.PICKUP && (dragType == 0 || dragType == 1)
-					&& slotId >= 0 && inventoryplayer.getItemStack() != null) {
+					&& slotId >= 0 && !inventoryplayer.getItemStack().isEmpty()) {
 
 				Slot slot7 = (Slot)this.inventorySlots.get(slotId);
 
@@ -164,12 +164,12 @@ public class RuneBagGui {
 					ItemStack itemstack9 = slot7.getStack();
 					ItemStack itemstack12 = inventoryplayer.getItemStack();
 
-					if (itemstack9 != null) {
+					if (!itemstack9.isEmpty()) {
 						itemstack = itemstack9.copy();
 					}
 
-					if (itemstack9 == null) {
-						if (itemstack12 != null && slot7.isItemValid(itemstack12)) {
+					if (itemstack9.isEmpty()) {
+						if (!itemstack12.isEmpty() && slot7.isItemValid(itemstack12)) {
 							int l2 = dragType == 0 ? itemstack12.getCount() : 1;
 
 							if (l2 > slot7.getItemStackLimit(itemstack12)) {
@@ -178,24 +178,24 @@ public class RuneBagGui {
 
 							slot7.putStack(itemstack12.splitStack(l2));
 
-							if (itemstack12.getCount() == 0) {
-								inventoryplayer.setItemStack((ItemStack)null);
+							if (itemstack12.isEmpty()) {
+								inventoryplayer.setItemStack(ItemStack.EMPTY);
 							}
 						}
 					} else if (slot7.canTakeStack(player)) {
-						if (itemstack12 == null) {
-							if (itemstack9.getCount() > 0) {
+						if (itemstack12.isEmpty()) {
+							if (!itemstack9.isEmpty()) {
 								int k2 = dragType == 0 ? itemstack9.getCount() : (itemstack9.getCount() + 1) / 2;
 								inventoryplayer.setItemStack(slot7.decrStackSize(k2));
 
-								if (itemstack9.getCount() <= 0) {
-									slot7.putStack((ItemStack)null);
+								if (itemstack9.isEmpty()) {
+									slot7.putStack(ItemStack.EMPTY);
 								}
 
 								slot7.onTake(player, inventoryplayer.getItemStack());
 							} else {
-								slot7.putStack((ItemStack)null);
-								inventoryplayer.setItemStack((ItemStack)null);
+								slot7.putStack(ItemStack.EMPTY);
+								inventoryplayer.setItemStack(ItemStack.EMPTY);
 							}
 						} else if (slot7.isItemValid(itemstack12)) {
 							if (itemstack9.getItem() == itemstack12.getItem() && itemstack9.getMetadata() == itemstack12.getMetadata() && ItemStack.areItemStackTagsEqual(itemstack9, itemstack12)) {
@@ -211,8 +211,8 @@ public class RuneBagGui {
 
 								itemstack12.splitStack(j2);
 
-								if (itemstack12.getCount() == 0) {
-									inventoryplayer.setItemStack((ItemStack)null);
+								if (itemstack12.isEmpty()) {
+									inventoryplayer.setItemStack(ItemStack.EMPTY);
 								}
 
 								itemstack9.grow(j2);
@@ -227,8 +227,8 @@ public class RuneBagGui {
 								itemstack12.grow(i2);
 								itemstack9 = slot7.decrStackSize(i2);
 
-								if (itemstack9.getCount() == 0) {
-									slot7.putStack((ItemStack)null);
+								if (itemstack9.isEmpty()) {
+									slot7.putStack(ItemStack.EMPTY);
 								}
 
 								slot7.onTake(player, inventoryplayer.getItemStack());
@@ -250,7 +250,7 @@ public class RuneBagGui {
 		public static boolean canAddItemToSlot(Slot slotIn, ItemStack stack, boolean stackSizeMatters) {
 			boolean flag = slotIn == null || !slotIn.getHasStack();
 
-			if (slotIn != null && slotIn.getHasStack() && stack != null && stack.isItemEqual(slotIn.getStack()) && ItemStack.areItemStackTagsEqual(slotIn.getStack(), stack)){
+			if (slotIn != null && slotIn.getHasStack() && !stack.isEmpty() && stack.isItemEqual(slotIn.getStack()) && ItemStack.areItemStackTagsEqual(slotIn.getStack(), stack)){
 				flag |= slotIn.getStack().getCount() + (stackSizeMatters ? 0 : stack.getCount()) <= slotIn.getSlotStackLimit();
 			}
 

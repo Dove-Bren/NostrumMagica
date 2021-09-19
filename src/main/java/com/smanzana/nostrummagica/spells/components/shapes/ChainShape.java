@@ -18,6 +18,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -131,11 +132,11 @@ public class ChainShape extends SpellShape {
 	}
 
 	@Override
-	public List<ItemStack> getReagents() {
-		List<ItemStack> list = new ArrayList<>(2);
-		
-		list.add(ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1));
-		list.add(ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1));
+	public NonNullList<ItemStack> getReagents() {
+		NonNullList<ItemStack> list = NonNullList.from(ItemStack.EMPTY,
+			ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1),
+			ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1)
+		);
 		
 		return list;
 	}
@@ -155,16 +156,16 @@ public class ChainShape extends SpellShape {
 		return new float[] {3f, 4f, 6f, 8f};
 	}
 
-	public static ItemStack[] costs = null;
+	public static NonNullList<ItemStack> costs = null;
 	@Override
-	public ItemStack[] supportedFloatCosts() {
+	public NonNullList<ItemStack> supportedFloatCosts() {
 		if (costs == null) {
-			costs = new ItemStack[] {
-				null,
+			costs = NonNullList.from(ItemStack.EMPTY, 
+				ItemStack.EMPTY,
 				new ItemStack(Items.STRING),
 				new ItemStack(Items.GOLD_INGOT),
-				new ItemStack(Items.ENDER_PEARL),
-			};
+				new ItemStack(Items.ENDER_PEARL)
+			);
 		}
 		return costs;
 	}

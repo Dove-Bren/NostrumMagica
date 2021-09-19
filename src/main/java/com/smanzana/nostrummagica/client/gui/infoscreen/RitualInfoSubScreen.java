@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.blocks.AltarBlock;
@@ -303,9 +305,9 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		}
 	}
 	
-	private void drawAltar(Minecraft mc, double x, double y, double z, ItemStack item) {
+	private void drawAltar(Minecraft mc, double x, double y, double z, @Nonnull ItemStack item) {
 		drawBlock(mc, altar, x, y, z);
-		if (item != null) {
+		if (!item.isEmpty()) {
 			if (item.getMetadata() == OreDictionary.WILDCARD_VALUE) {
 				item = item.copy();
 				item.setItemDamage(0);

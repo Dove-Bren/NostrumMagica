@@ -36,6 +36,7 @@ import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
+import com.smanzana.nostrummagica.utils.NonNullEnumMap;
 import com.smanzana.nostrummagica.utils.Projectiles;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
@@ -474,7 +475,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
     }
 
 	@Override
-	public SpellAction getTriggerAction(EntityLivingBase user, boolean offense, ItemStack stack) {
+	public SpellAction getTriggerAction(EntityLivingBase user, boolean offense, @Nonnull ItemStack stack) {
 		if (offense)
 			return null;
 		
@@ -509,7 +510,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 
 	@Override
-	public boolean shouldTrigger(boolean offense, ItemStack stack) {
+	public boolean shouldTrigger(boolean offense, @Nonnull ItemStack stack) {
 		final float chancePer = (this.element == EMagicElement.FIRE ? .2f : .15f);
 		return !offense && NostrumMagica.rand.nextFloat() <= chancePer * (float) (Math.min(2, level) + 1);
 	}
@@ -797,10 +798,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	protected static Map<EntityEquipmentSlot, ItemStack> GetLastTickState(EntityLivingBase entity) {
 		Map<EntityEquipmentSlot, ItemStack> map = LastEquipState.get(entity);
 		if (map == null) {
-			map = new EnumMap<>(EntityEquipmentSlot.class);
-			for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
-				map.put(slot, ItemStack.EMPTY);
-			}
+			map = new NonNullEnumMap<>(EntityEquipmentSlot.class, ItemStack.EMPTY);
 			LastEquipState.put(entity, map);
 		}
 		return map;

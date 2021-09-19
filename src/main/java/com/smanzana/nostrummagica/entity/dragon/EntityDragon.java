@@ -1,8 +1,8 @@
 package com.smanzana.nostrummagica.entity.dragon;
 
-import java.util.EnumMap;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.items.DragonArmor;
 import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.utils.NonNullEnumMap;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -104,7 +105,7 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
         return this.height * 0.95F;
     }
 
-    public boolean processInteract(EntityPlayer player, EnumHand hand, @Nullable ItemStack stack)
+    public boolean processInteract(EntityPlayer player, EnumHand hand, @Nonnull ItemStack stack)
     {
         return false;
     }
@@ -378,7 +379,7 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 			 * @param oldStack
 			 * @param newStack
 			 */
-			public void onChange(@Nullable DragonEquipmentSlot slot, @Nullable ItemStack oldStack, @Nullable ItemStack newStack);
+			public void onChange(@Nullable DragonEquipmentSlot slot, @Nonnull ItemStack oldStack, @Nonnull ItemStack newStack);
 		}
 		
 		private static final String NBT_LIST = "slots";
@@ -389,7 +390,7 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 		private IChangeListener listener; // Runtime only
 		
 		public DragonEquipmentInventory() {
-			slots = new EnumMap<>(DragonEquipmentSlot.class);
+			slots = new NonNullEnumMap<>(DragonEquipmentSlot.class, ItemStack.EMPTY);
 		}
 		
 		public DragonEquipmentInventory(IChangeListener listener) {
@@ -401,12 +402,12 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 			this.listener = listener;
 		}
 		
-		public @Nullable ItemStack getStackInSlot(DragonEquipmentSlot slot) {
+		public @Nonnull ItemStack getStackInSlot(DragonEquipmentSlot slot) {
 			return slots.get(slot);
 		}
 		
-		public void setStackInSlot(DragonEquipmentSlot slot, @Nullable ItemStack stack) {
-			@Nullable ItemStack oldStack = slots.get(slot);
+		public void setStackInSlot(DragonEquipmentSlot slot, @Nonnull ItemStack stack) {
+			@Nonnull ItemStack oldStack = slots.get(slot);
 			slots.put(slot, stack);
 			
 			if (listener != null) {
@@ -417,7 +418,7 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 		public void clear() {
 			slots.clear();
 			if (listener != null) {
-				listener.onChange(null, null, null);
+				listener.onChange(null, ItemStack.EMPTY, ItemStack.EMPTY);
 			}
 		}
 		
@@ -430,8 +431,8 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 		public void writeToNBT(NBTTagCompound nbt) {
 			NBTTagList list = new NBTTagList();
 			for (DragonEquipmentSlot slot : DragonEquipmentSlot.values()) {
-				@Nullable ItemStack stack = getStackInSlot(slot);
-				if (stack != null) {
+				@Nonnull ItemStack stack = getStackInSlot(slot);
+				if (!stack.isEmpty()) {
 					NBTTagCompound wrapper = new NBTTagCompound();
 					wrapper.setString(NBT_SLOT, slot.name().toLowerCase());
 					wrapper.setTag(NBT_ITEM, stack.serializeNBT());
@@ -494,19 +495,19 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 		}
 
 		@Override
-		public ItemStack getStackInSlot(int index) {
+		public @Nonnull ItemStack getStackInSlot(int index) {
 			return this.getStackInSlot(GETSLOT(index));
 		}
 
 		@Override
-		public ItemStack decrStackSize(int index, int count) {
+		public @Nonnull ItemStack decrStackSize(int index, int count) {
 			DragonEquipmentSlot slot = GETSLOT(index);
 			ItemStack inSlot = slots.get(slot);
-			ItemStack taken = null;
-			if (inSlot != null) {
+			ItemStack taken = ItemStack.EMPTY;
+			if (!inSlot.isEmpty()) {
 				taken = inSlot.splitStack(count);
 				if (inSlot.getCount() <= 0) {
-					inSlot = null;
+					inSlot = ItemStack.EMPTY;
 				}
 				setStackInSlot(slot, inSlot); // Handles dirty and setting null
 			}
@@ -515,7 +516,7 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 		}
 
 		@Override
-		public ItemStack removeStackFromSlot(int index) {
+		public @Nonnull ItemStack removeStackFromSlot(int index) {
 			return slots.remove(GETSLOT(index));
 		}
 
@@ -551,7 +552,7 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 
 		@Override
 		public boolean isItemValidForSlot(int index, ItemStack stack) {
-			if (stack == null) {
+			if (stack.isEmpty()) {
 				return true;
 			}
 			
@@ -587,7 +588,7 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 		public boolean isEmpty() {
 			for (DragonEquipmentSlot slot : DragonEquipmentSlot.values()) {
 				ItemStack stack = slots.get(slot);
-				if (stack != null && stack != ItemStack.EMPTY) {
+				if (!stack.isEmpty()) {
 					return false;
 				}
 			}
@@ -596,12 +597,12 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 		}
 	}
 	
-	public @Nullable ItemStack getDragonEquipment(DragonEquipmentSlot slot) {
-		return null;
+	public @Nonnull ItemStack getDragonEquipment(DragonEquipmentSlot slot) {
+		return ItemStack.EMPTY;
 	}
 	
 	@Override
-	public @Nullable ItemStack getItemStackFromSlot(EntityEquipmentSlot slot) {
+	public @Nonnull ItemStack getItemStackFromSlot(EntityEquipmentSlot slot) {
 		// Adapt to dragon equipment slot system to take advantage of vanilla's equipment tracking
 		// and attribute system
 		final DragonEquipmentSlot dragonSlot = DragonEquipmentSlot.FindForSlot(slot);

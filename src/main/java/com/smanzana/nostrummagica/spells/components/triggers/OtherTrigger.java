@@ -1,8 +1,5 @@
 package com.smanzana.nostrummagica.spells.components.triggers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
@@ -13,6 +10,7 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -48,12 +46,9 @@ public class OtherTrigger extends InstantTrigger {
 	}
 
 	@Override
-	public List<ItemStack> getReagents() {
-		List<ItemStack> list = new ArrayList<>(1);
-		
-		list.add(ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1));
-		
-		return list;
+	public NonNullList<ItemStack> getReagents() {
+		return NonNullList.from(ItemStack.EMPTY,
+				ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1));
 	}
 
 	@Override
@@ -77,7 +72,7 @@ public class OtherTrigger extends InstantTrigger {
 	}
 
 	@Override
-	public ItemStack[] supportedFloatCosts() {
+	public NonNullList<ItemStack> supportedFloatCosts() {
 		return null;
 	}
 

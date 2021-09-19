@@ -1,8 +1,6 @@
 package com.smanzana.nostrummagica.client.gui.container;
 
-import java.util.Arrays;
-
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.tiles.ModificationTableEntity;
@@ -31,6 +29,7 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
@@ -102,16 +101,16 @@ public class ModificationTableGui {
 			this.addSlotToContainer(new Slot(inventory, 0, SLOT_MAIN_HOFFSET, SLOT_MAIN_VOFFSET) {
 				
 				@Override
-				public boolean isItemValid(@Nullable ItemStack stack) {
+				public boolean isItemValid(@Nonnull ItemStack stack) {
 					return inventory.isItemValidForSlot(this.slotNumber, stack);
 				}
 				
 				@Override
-				public void putStack(@Nullable ItemStack stack) {
+				public void putStack(@Nonnull ItemStack stack) {
 					super.putStack(stack);
 					floatIndex = 0;
 					
-					if (stack != null && stack.getItem() instanceof SpellRune) {
+					if (!stack.isEmpty() && stack.getItem() instanceof SpellRune) {
 						SpellPartParam params = SpellRune.getPieceParam(stack);
 						SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
 						
@@ -150,7 +149,7 @@ public class ModificationTableGui {
 								boolIndex = params.flip;
 							}
 						}
-					} else if (stack != null && stack.getItem() instanceof SpellScroll) {
+					} else if (!stack.isEmpty() && stack.getItem() instanceof SpellScroll) {
 						// Shouldn't be null since we disallow null in the slot... but let's just be safe. This is UI code.
 						Spell spell = SpellScroll.getSpell(stack);
 						if (spell != null) {
@@ -187,7 +186,7 @@ public class ModificationTableGui {
 		}
 		
 		@Override
-		public ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
+		public @Nonnull ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
 			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
 			
 			if (slot != null && slot.getHasStack()) {
@@ -196,7 +195,7 @@ public class ModificationTableGui {
 				if (slot.inventory == this.inventory) {
 					// Trying to take our items
 					if (playerIn.inventory.addItemStackToInventory(cur)) {
-						slot.putStack(null);
+						slot.putStack(ItemStack.EMPTY);
 						slot.onTake(playerIn, cur);
 					}
 				} else {
@@ -211,12 +210,12 @@ public class ModificationTableGui {
 					}
 				}
 				
-				if (cur == null || cur.getCount() <= 0) {
-					slot.putStack(null);
+				if (cur.isEmpty() || cur.getCount() <= 0) {
+					slot.putStack(ItemStack.EMPTY);
 				}
 			}
 			
-			return null;
+			return ItemStack.EMPTY;
 		}
 		
 		@Override
@@ -231,7 +230,7 @@ public class ModificationTableGui {
 		
 		public void validate() {
 			modIndex++;
-			if (this.inventory.getMainSlot() == null) {
+			if (this.inventory.getMainSlot().isEmpty()) {
 				this.isValid = false;
 				this.runeMode = false;
 				this.scrollMode = false;
@@ -243,12 +242,12 @@ public class ModificationTableGui {
 				this.scrollMode = false;
 				ItemStack inputItem = inputSlot.getStack();
 				isValid = (SpellTome.getModifications(inventory.getMainSlot()) > 0);
-				if (!isValid || inputItem == null || !(inputItem.getItem() instanceof SpellTomePage)) {
+				if (!isValid || inputItem.isEmpty() || !(inputItem.getItem() instanceof SpellTomePage)) {
 					this.isValid = false;
 				}
 				
 				
-				inputSlot.setRequired(null);
+				inputSlot.setRequired(ItemStack.EMPTY);
 				return;
 			}
 			
@@ -291,12 +290,12 @@ public class ModificationTableGui {
 					if (hasChange) {
 						ItemStack required;
 						if (component.isTrigger())
-							required = component.getTrigger().supportedFloatCosts()[floatIndex];
+							required = component.getTrigger().supportedFloatCosts().get(floatIndex);
 						else
-							required = component.getShape().supportedFloatCosts()[floatIndex];
+							required = component.getShape().supportedFloatCosts().get(floatIndex);
 						
 						inputSlot.setRequired(required);
-						if (required == null) {
+						if (required.isEmpty()) {
 							this.isValid = !inputSlot.getHasStack();
 						} else if (inputSlot.getHasStack()) {
 							this.isValid = OreDictionary.itemMatches(required, inputSlot.getStack(), true);
@@ -305,7 +304,7 @@ public class ModificationTableGui {
 						}
 					}
 					else
-						inputSlot.setRequired(null);
+						inputSlot.setRequired(ItemStack.EMPTY);
 					
 				}
 				
@@ -340,7 +339,7 @@ public class ModificationTableGui {
 					hasChange = cur != (int) this.floatIndex;
 				}
 				
-				if (!isValid || !hasChange || inputItem == null || !(OreDictionary.itemMatches(realRequired, inputItem, false))) {
+				if (!isValid || !hasChange || inputItem.isEmpty() || !(OreDictionary.itemMatches(realRequired, inputItem, false))) {
 					this.isValid = false;
 				}
 				
@@ -375,8 +374,8 @@ public class ModificationTableGui {
 		private int localModIndex = 0;
 		
 		private SpellCastSummary summary;
-		private ItemStack pageShadow;
-		private ItemStack[] shadows;
+		private @Nonnull ItemStack pageShadow;
+		private NonNullList<ItemStack> shadows;
 		
 		private static int buttonID = -1;
 		private GuiButton submitButton;
@@ -387,27 +386,19 @@ public class ModificationTableGui {
 			this.xSize = GUI_WIDTH;
 			this.ySize = GUI_HEIGHT;
 			pageShadow = new ItemStack(SpellTomePage.instance());
-			shadows = new ItemStack[50];
-			shadows[0] = new ItemStack(SpellTome.instance());
-			shadows[1] = new ItemStack(SpellScroll.instance(), 1);
-			int i = 2;
+			shadows = NonNullList.create();
+			shadows.add(new ItemStack(SpellTome.instance())); // hasto be index 0
+			shadows.add(new ItemStack(SpellScroll.instance(), 1)); // has to be index 1
 			for (SpellShape shape : SpellShape.getAllShapes()) {
-				if (i >= 50)
-					break;
 				if (shape.supportsBoolean() || shape.supportedFloats() != null) {
-					shadows[i] = SpellRune.getRune(shape);
-					i++;
+					shadows.add(SpellRune.getRune(shape));
 				}
 			}
 			for (SpellTrigger trigger: SpellTrigger.getAllTriggers()) {
-				if (i >= 50)
-					break;
 				if (trigger.supportsBoolean() || trigger.supportedFloats() != null) {
-					shadows[i] = SpellRune.getRune(trigger);
-					i++;
+					shadows.add(SpellRune.getRune(trigger));
 				}
 			}
-			shadows = Arrays.copyOf(shadows, i);
 		}
 		
 		@Override
@@ -477,7 +468,7 @@ public class ModificationTableGui {
 				int x, y;
 				y = verticalMargin + PANEL_VOFFSET + 10;
 				ItemStack tome = container.inventory.getMainSlot();
-				if (tome != null) {
+				if (!tome.isEmpty()) {
 					String name = tome.getDisplayName();
 					if (name == null || name.length() == 0)
 						name = "Spell Tome";
@@ -533,10 +524,10 @@ public class ModificationTableGui {
 			
 			if (!container.inputSlot.getHasStack()) {
 				ItemStack shadow = container.inputSlot.required;
-				if (shadow == null && !container.runeMode) {
+				if (shadow.isEmpty() && !container.runeMode) {
 					shadow = pageShadow;
 				}
-				if (shadow != null) {
+				if (!shadow.isEmpty()) {
 					GlStateManager.pushMatrix();
 					GlStateManager.translate(0, 0, -100);
 					mc.getRenderItem().renderItemIntoGUI(shadow,
@@ -546,15 +537,15 @@ public class ModificationTableGui {
 				}
 			}
 			
-			if (container.inventory.getMainSlot() == null) {
+			if (container.inventory.getMainSlot().isEmpty()) {
 				ItemStack display;
 //				if ((Minecraft.getSystemTime() / 1000) % 2 == 0) {
 //					display = new ItemStack(SpellTome.instance());
 //				} else {
 //					display = SpellRune.getRune(AoEShape.instance());
 //				}
-				final int idx = Math.abs(((int) Minecraft.getSystemTime() / 1000) % shadows.length);
-				display = shadows[idx];
+				final int idx = Math.abs(((int) Minecraft.getSystemTime() / 1000) % shadows.size());
+				display = shadows.get(idx);
 				
 				GlStateManager.pushMatrix();
 				GlStateManager.translate(0, 0, -100);
@@ -577,8 +568,8 @@ public class ModificationTableGui {
 			
 			if (!container.isValid) {
 				int color = 0x55FFFFFF;
-				if ((container.inputSlot.required != null && container.inputSlot.getHasStack())
-						|| (container.inputSlot.required == null && container.inputSlot.getHasStack()))
+				if ((!container.inputSlot.required.isEmpty() && container.inputSlot.getHasStack())
+						|| (container.inputSlot.required.isEmpty() && container.inputSlot.getHasStack()))
 					color = 0x90FF5050;
 				GlStateManager.pushMatrix();
 				GlStateManager.translate(0, 0, 1);
@@ -690,7 +681,7 @@ public class ModificationTableGui {
 			int y = verticalMargin + PANEL_VOFFSET + 33;
 			int x = horizontalMargin + PANEL_HOFFSET + 50;
 			
-			if (container.inventory.getMainSlot() != null) {
+			if (!container.inventory.getMainSlot().isEmpty()) {
 				if (container.hasBool) {
 					this.addButton(new ToggleButton(buttonID++, x, y, false, container));
 					this.addButton(new ToggleButton(buttonID++, x + 15, y, true, container));
@@ -896,8 +887,8 @@ public class ModificationTableGui {
 		}
 		
 		@Override
-		public boolean isItemValid(@Nullable ItemStack stack) {
-			if (stack == null)
+		public boolean isItemValid(@Nonnull ItemStack stack) {
+			if (stack.isEmpty())
 				return true;
 			
 			//if (!container.inventory.getWorld().isRemote)
@@ -913,7 +904,7 @@ public class ModificationTableGui {
 		}
 		
 		@Override
-		public void putStack(@Nullable ItemStack stack) {
+		public void putStack(@Nonnull ItemStack stack) {
 			super.putStack(stack);
 			
 			container.validate();
@@ -930,7 +921,7 @@ public class ModificationTableGui {
 			return 1;
 		}
 		
-		public void setRequired(ItemStack required) {
+		public void setRequired(@Nonnull ItemStack required) {
 			this.required = required;
 		}
 		

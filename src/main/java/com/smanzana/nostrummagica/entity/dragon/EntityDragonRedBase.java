@@ -107,9 +107,9 @@ public abstract class EntityDragonRedBase extends EntityDragonFlying {
 			if (target instanceof EntityPlayer)
 			{
 				EntityPlayer entityplayer = (EntityPlayer)target;
-				ItemStack itemstack1 = entityplayer.isHandActive() ? entityplayer.getActiveItemStack() : null;
+				ItemStack itemstack1 = entityplayer.isHandActive() ? entityplayer.getActiveItemStack() : ItemStack.EMPTY;
 
-				if (itemstack1 != null && itemstack1.getItem() == Items.SHIELD)
+				if (!itemstack1.isEmpty() && itemstack1.getItem() == Items.SHIELD)
 				{
 					float f1 = 0.5F;
 

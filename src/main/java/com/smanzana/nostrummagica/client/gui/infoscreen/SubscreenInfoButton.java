@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.client.gui.infoscreen;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -16,10 +18,10 @@ import net.minecraft.item.ItemStack;
 public class SubscreenInfoButton extends InfoButton {
 
 	private IInfoSubScreen screen;
-	private ItemStack icon;
+	private @Nonnull ItemStack icon;
 	private String descKey;
 	
-	public SubscreenInfoButton(int buttonId, String key, IInfoSubScreen screen, ItemStack icon) {
+	public SubscreenInfoButton(int buttonId, String key, IInfoSubScreen screen, @Nonnull ItemStack icon) {
 		super(buttonId, 0, 0);
 		this.screen = screen;
 		this.icon = icon;
@@ -51,7 +53,7 @@ public class SubscreenInfoButton extends InfoButton {
 		
 		final int itemLength = 16;
 		
-		if (icon != null) {
+		if (!icon.isEmpty()) {
 			int x = this.x + (width - itemLength) / 2;
 			int y = this.y + (height - itemLength) / 2;
 			mc.getRenderItem().renderItemIntoGUI(icon, x, y);

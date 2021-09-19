@@ -1,6 +1,5 @@
 package com.smanzana.nostrummagica.spells.components.shapes;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,6 +16,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -92,11 +92,11 @@ public class AoEShape extends SpellShape {
 	}
 
 	@Override
-	public List<ItemStack> getReagents() {
-		List<ItemStack> list = new ArrayList<>(2);
-		
-		list.add(ReagentItem.instance().getReagent(ReagentType.BLACK_PEARL, 1));
-		list.add(ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1));
+	public NonNullList<ItemStack> getReagents() {
+		NonNullList<ItemStack> list = NonNullList.from(ItemStack.EMPTY,
+			ReagentItem.instance().getReagent(ReagentType.BLACK_PEARL, 1),
+			ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1)
+		);
 		
 		return list;
 	}
@@ -116,16 +116,16 @@ public class AoEShape extends SpellShape {
 		return new float[] {2f, 3f, 5f, 10f};
 	}
 
-	public static ItemStack[] costs = null;
+	public static NonNullList<ItemStack> costs = null;
 	@Override
-	public ItemStack[] supportedFloatCosts() {
+	public NonNullList<ItemStack> supportedFloatCosts() {
 		if (costs == null) {
-			costs = new ItemStack[] {
-				null,
+			costs = NonNullList.from(ItemStack.EMPTY, 
+				ItemStack.EMPTY,
 				new ItemStack(Blocks.REDSTONE_BLOCK, 1, 0),
 				NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1),
-				NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
-			};
+				NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1)
+			);
 		}
 		return costs;
 	}

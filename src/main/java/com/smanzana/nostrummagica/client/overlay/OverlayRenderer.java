@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import org.lwjgl.opengl.GL11;
 
@@ -168,11 +168,11 @@ public class OverlayRenderer extends Gui {
 		if (event.getType() == ElementType.CROSSHAIRS) {
 			if (ModConfig.config.displayHookshotCrosshair()) {
 				ItemStack hookshot = player.getHeldItemMainhand();
-				if (hookshot == null || !(hookshot.getItem() instanceof HookshotItem)) {
+				if (hookshot.isEmpty() || !(hookshot.getItem() instanceof HookshotItem)) {
 					hookshot = player.getHeldItemOffhand();
 				}
 				
-				if (hookshot == null || !(hookshot.getItem() instanceof HookshotItem)) {
+				if (hookshot.isEmpty() || !(hookshot.getItem() instanceof HookshotItem)) {
 					return;
 				}
 				
@@ -1131,7 +1131,7 @@ public class OverlayRenderer extends Gui {
 	@SubscribeEvent
 	public void onTooltipRender(RenderTooltipEvent.PostBackground event) {
 		ItemStack stack = event.getStack();
-		if (stack == null) {
+		if (stack.isEmpty()) {
 			return;
 		}
 		
@@ -1191,7 +1191,7 @@ public class OverlayRenderer extends Gui {
 	@SubscribeEvent
 	public void onTooltipRender(RenderTooltipEvent.PostText event) {
 //		ItemStack stack = event.getStack();
-//		if (stack == null || !(stack.getItem() instanceof ILoreTagged)) {
+//		if (stack.isEmpty() || !(stack.getItem() instanceof ILoreTagged)) {
 //			return;
 //		}
 //		
@@ -1249,8 +1249,8 @@ public class OverlayRenderer extends Gui {
 		
 		if (event.getEntityPlayer() != Minecraft.getMinecraft().player) {
 			// For other players, possibly do armor render ticks
-			for (@Nullable ItemStack equipStack : event.getEntityPlayer().getArmorInventoryList()) {
-				if (equipStack == null || !(equipStack.getItem() instanceof EnchantedArmor)) {
+			for (@Nonnull ItemStack equipStack : event.getEntityPlayer().getArmorInventoryList()) {
+				if (equipStack.isEmpty() || !(equipStack.getItem() instanceof EnchantedArmor)) {
 					continue;
 				}
 				

@@ -1,8 +1,6 @@
 package com.smanzana.nostrummagica.spells.components.triggers;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,6 +24,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
@@ -118,13 +117,10 @@ public class DamagedTrigger extends SpellTrigger {
 	}
 
 	@Override
-	public List<ItemStack> getReagents() {
-		List<ItemStack> list = new ArrayList<>(2);
-		
-		list.add(ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1));
-		list.add(ReagentItem.instance().getReagent(ReagentType.GRAVE_DUST, 1));
-		
-		return list;
+	public NonNullList<ItemStack> getReagents() {
+		return NonNullList.from(ItemStack.EMPTY,
+				ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1),
+				ReagentItem.instance().getReagent(ReagentType.GRAVE_DUST, 1));
 	}
 
 	@Override
@@ -153,17 +149,17 @@ public class DamagedTrigger extends SpellTrigger {
 		return new float[] {20f, 30f, 40f, 60f, 300f};
 	}
 
-	public static ItemStack[] costs = null;
+	public static NonNullList<ItemStack> costs = null;
 	@Override
-	public ItemStack[] supportedFloatCosts() {
+	public NonNullList<ItemStack> supportedFloatCosts() {
 		if (costs == null) {
-			costs = new ItemStack[] {
-				null,
+			costs = NonNullList.from(ItemStack.EMPTY,
+				ItemStack.EMPTY,
 				new ItemStack(Items.REDSTONE),
 				new ItemStack(Items.IRON_INGOT),
 				new ItemStack(Items.GOLD_INGOT),
-				new ItemStack(Items.DIAMOND),
-			};
+				new ItemStack(Items.DIAMOND)
+			);
 		}
 		return costs;
 	}

@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.client.render;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.items.ICapeProvider;
 import com.smanzana.nostrummagica.items.IElytraProvider;
@@ -31,20 +31,20 @@ public class LayerCustomElytra extends LayerElytra {
 	@Override
 	public void doRenderLayer(EntityLivingBase player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 		if (shouldRender(player)) {
-			@Nullable ItemStack chestpiece = player.getItemStackFromSlot(EntityEquipmentSlot.CHEST); 
-			render(player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale, (chestpiece != null && chestpiece.isItemEnchanted()));
+			@Nonnull ItemStack chestpiece = player.getItemStackFromSlot(EntityEquipmentSlot.CHEST); 
+			render(player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale, (!chestpiece.isEmpty() && chestpiece.isItemEnchanted()));
 		}
 	}
 	
 	public boolean shouldRender(EntityLivingBase player) {
 		final boolean flying = player.isElytraFlying();
 		ItemStack cape = LayerAetherCloak.ShouldRender(player);
-		if (!flying && cape != null && ((ICapeProvider) cape.getItem()).shouldPreventOtherRenders(player, cape)) {
+		if (!flying && !cape.isEmpty() && ((ICapeProvider) cape.getItem()).shouldPreventOtherRenders(player, cape)) {
 			return false;
 		}
 		
-		for (@Nullable ItemStack stack : player.getEquipmentAndArmor()) {
-			if (stack != null && stack.getItem() instanceof IElytraProvider) {
+		for (@Nonnull ItemStack stack : player.getEquipmentAndArmor()) {
+			if (!stack.isEmpty() && stack.getItem() instanceof IElytraProvider) {
 				if (((IElytraProvider) stack.getItem()).shouldRenderElyta(player, stack)) {
 					return true;
 				}

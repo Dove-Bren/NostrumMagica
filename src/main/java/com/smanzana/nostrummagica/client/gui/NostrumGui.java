@@ -167,12 +167,12 @@ public class NostrumGui implements IGuiHandler {
 		// Item based
 		int pos = player.inventory.currentItem + 27;
 		ItemStack inHand = player.getHeldItemMainhand();
-		if (inHand == null) {
+		if (inHand.isEmpty()) {
 			inHand = player.getHeldItemOffhand();
 			pos = 40;
 		}
 		
-		if (inHand != null) {
+		if (!inHand.isEmpty()) {
 			if (ID == reagentBagID && inHand.getItem() instanceof ReagentBag) {
 				return new ReagentBagGui.BagContainer(
 						player.inventory,
@@ -291,12 +291,12 @@ public class NostrumGui implements IGuiHandler {
 		// Item based
 		int pos = player.inventory.currentItem + 27;
 		ItemStack inHand = player.getHeldItemMainhand();
-		if (inHand == null) {
+		if (inHand.isEmpty()) {
 			inHand = player.getHeldItemOffhand();
 			pos = 40;
 		}
 		
-		if (inHand != null) {
+		if (!inHand.isEmpty()) {
 			if (ID == reagentBagID && inHand.getItem() instanceof ReagentBag) {
 				
 				return new ReagentBagGui.BagGui(new ReagentBagGui.BagContainer(

@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.ModificationTable;
@@ -575,9 +577,9 @@ public abstract class InfoScreenTab {
 	}
 	
 	protected InfoScreenTabs tab;
-	private ItemStack icon;
+	private @Nonnull ItemStack icon;
 	protected Map<String, InfoButton> index;
-	private InfoScreenTab(InfoScreenTabs tab, ItemStack icon) {
+	private InfoScreenTab(InfoScreenTabs tab, @Nonnull ItemStack icon) {
 		this.tab = tab;
 		this.icon = icon;
 		index = new HashMap<>();
@@ -587,7 +589,7 @@ public abstract class InfoScreenTab {
 	
 	public abstract List<InfoButton> getButtons(int IDOffset, INostrumMagic attr);
 	
-	public ItemStack getIcon() {
+	public @Nonnull ItemStack getIcon() {
 		return this.icon;
 	}
 	

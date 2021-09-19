@@ -1,8 +1,5 @@
 package com.smanzana.nostrummagica.spells.components.triggers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.entity.EntityChakramSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
@@ -19,6 +16,7 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -142,12 +140,9 @@ public class MagicCutterTrigger extends SpellTrigger {
     }
 
 	@Override
-	public List<ItemStack> getReagents() {
-		List<ItemStack> list = new ArrayList<>(1);
-		
-		list.add(ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1));
-		
-		return list;
+	public NonNullList<ItemStack> getReagents() {
+		return NonNullList.from(ItemStack.EMPTY,
+				ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1));
 	}
 
 	@Override
@@ -171,7 +166,7 @@ public class MagicCutterTrigger extends SpellTrigger {
 	}
 
 	@Override
-	public ItemStack[] supportedFloatCosts() {
+	public NonNullList<ItemStack> supportedFloatCosts() {
 		return null;
 	}
 
