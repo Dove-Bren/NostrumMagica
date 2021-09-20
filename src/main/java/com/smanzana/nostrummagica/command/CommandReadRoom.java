@@ -42,7 +42,7 @@ public class CommandReadRoom extends CommandBase {
 			
 			// Must be a position crystals in hand with low corner selected
 			ItemStack main = player.getHeldItemMainhand();
-			if ((main == null || !(main.getItem() instanceof PositionCrystal) || PositionCrystal.getBlockPosition(main) == null)) {
+			if ((main.isEmpty() || !(main.getItem() instanceof PositionCrystal) || PositionCrystal.getBlockPosition(main) == null)) {
 				sender.sendMessage(new TextComponentString("You must be holding a filled geogem in your main hand"));
 			} else {
 				

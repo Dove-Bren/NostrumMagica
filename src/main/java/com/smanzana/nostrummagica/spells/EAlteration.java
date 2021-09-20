@@ -1,13 +1,11 @@
 package com.smanzana.nostrummagica.spells;
 
-import java.util.List;
-
-import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 
 public enum EAlteration {
@@ -49,8 +47,8 @@ public enum EAlteration {
 	 * Both type and count of the itemstacks will be respected.
 	 * @return
 	 */
-	public List<ItemStack> getReagents() {
-		return Lists.newArrayList(ReagentItem.instance().getReagent(reagent, 1));
+	public NonNullList<ItemStack> getReagents() {
+		return NonNullList.from(ItemStack.EMPTY, ReagentItem.instance().getReagent(reagent, 1));
 	}
 	
 }

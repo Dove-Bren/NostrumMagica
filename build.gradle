@@ -38,7 +38,7 @@ minecraft {
 	 mappings channel: 'snapshot', version: '20171003-1.12'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 	runs {
-        client {
+        NostrumClient {
             workingDirectory project.file('run')
 
             // Recommended logging data for a userdev environment
@@ -48,7 +48,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
         }
 
-        server {
+        NostrumServer {
 
             // Recommended logging data for a userdev environment
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
@@ -94,7 +94,7 @@ dependencies {
 	compileOnly fg.deobf("mezz.jei:jei_${mc_version}:${jei_version}:api")
     runtimeOnly fg.deobf("mezz.jei:jei_${mc_version}:${jei_version}")
 
-    compile "baubles:Baubles:1.12:1.5.2"
+    compile "baubles:baubles:1.12:1.5.2"
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"

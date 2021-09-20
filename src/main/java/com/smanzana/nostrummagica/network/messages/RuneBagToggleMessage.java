@@ -40,7 +40,7 @@ public class RuneBagToggleMessage implements IMessage {
 					bag = sp.getHeldItemMainhand();
 				else
 					bag = sp.getHeldItemOffhand();
-				if (bag == null || !(bag.getItem() instanceof RuneBag)) {
+				if (bag.isEmpty() || !(bag.getItem() instanceof RuneBag)) {
 					NostrumMagica.logger.warn("Rune bag double-check position was invalid! Is the server behind?");
 				}
 				

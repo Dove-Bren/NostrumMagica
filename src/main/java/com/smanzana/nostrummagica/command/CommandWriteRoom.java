@@ -38,8 +38,8 @@ public class CommandWriteRoom extends CommandBase {
 			// Must be holding two position crystals in hands with corners selected
 			ItemStack main = player.getHeldItemMainhand();
 			ItemStack offhand = player.getHeldItemOffhand();
-			if ((main == null || !(main.getItem() instanceof PositionCrystal) || PositionCrystal.getBlockPosition(main) == null)
-				|| (offhand == null || !(offhand.getItem() instanceof PositionCrystal) || PositionCrystal.getBlockPosition(offhand) == null)) {
+			if ((main.isEmpty() || !(main.getItem() instanceof PositionCrystal) || PositionCrystal.getBlockPosition(main) == null)
+				|| (offhand.isEmpty() || !(offhand.getItem() instanceof PositionCrystal) || PositionCrystal.getBlockPosition(offhand) == null)) {
 				sender.sendMessage(new TextComponentString("You must be holding a filled geogem in both of your hands"));
 			} else {
 				RoomBlueprint blueprint = new RoomBlueprint(player.world,

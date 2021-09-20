@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -87,7 +88,7 @@ public class NostrumResearch {
 	/**
 	 * Icon to display
 	 */
-	protected final ItemStack iconItem;
+	protected final @Nonnull ItemStack iconItem;
 	
 	/**
 	 * Things to link to when the player is viewing the details of their completed research.
@@ -106,7 +107,7 @@ public class NostrumResearch {
 	
 	protected String[] allParents; // Filled in during validation
 	
-	private NostrumResearch(String key, NostrumResearchTab tab, Size size, int x, int y, boolean hidden, ItemStack icon,
+	private NostrumResearch(String key, NostrumResearchTab tab, Size size, int x, int y, boolean hidden, @Nonnull ItemStack icon,
 			String[] parents, String[] hiddenParents, String[] linked,
 			String[] lore,
 			String[] quests,
@@ -147,7 +148,7 @@ public class NostrumResearch {
 		return y;
 	}
 
-	public ItemStack getIconItem() {
+	public @Nonnull ItemStack getIconItem() {
 		return iconItem;
 	}
 	
@@ -317,7 +318,7 @@ public class NostrumResearch {
 			return spellComponent(new SpellSpec(element, alteration));
 		}
 		
-		public NostrumResearch build(String key, NostrumResearchTab tab, Size size, int x, int y, boolean hidden, ItemStack icon) {
+		public NostrumResearch build(String key, NostrumResearchTab tab, Size size, int x, int y, boolean hidden, @Nonnull ItemStack icon) {
 			return new NostrumResearch(key, tab, size, x, y, hidden, icon,
 					parentKeys.isEmpty() ? null : parentKeys.toArray(new String[parentKeys.size()]),
 					hiddenParentKeys.isEmpty() ? null : hiddenParentKeys.toArray(new String[hiddenParentKeys.size()]),
@@ -490,14 +491,14 @@ public class NostrumResearch {
 		/**
 		 * The icon to display on the tab. Required.
 		 */
-		private final ItemStack icon;
+		private final @Nonnull ItemStack icon;
 		
 		/**
 		 * Client-only. Whether a new research event has happened on this tab.
 		 */
 		private boolean hasNew;
 		
-		public NostrumResearchTab(String key, ItemStack icon) {
+		public NostrumResearchTab(String key, @Nonnull ItemStack icon) {
 			this.key = key;
 			this.icon = icon;
 			
@@ -508,7 +509,7 @@ public class NostrumResearch {
 			return key;
 		}
 		
-		public ItemStack getIcon() {
+		public @Nonnull ItemStack getIcon() {
 			return icon;
 		}
 		

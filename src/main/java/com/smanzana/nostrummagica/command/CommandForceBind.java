@@ -44,7 +44,7 @@ public class CommandForceBind extends CommandBase {
 			}
 			
 			ItemStack stack = player.getHeldItemMainhand();
-			if (stack == null || !(stack.getItem() instanceof SpellTome)) {
+			if (stack.isEmpty() || !(stack.getItem() instanceof SpellTome)) {
 				sender.sendMessage(new TextComponentString("To force a bind, hold the tome that's being binded to in your main hand"));
 				return;
 			}
@@ -52,7 +52,7 @@ public class CommandForceBind extends CommandBase {
 				attr.completeBinding(stack);
 			} else {
 				ItemStack offhand = player.getHeldItemOffhand();
-				if (offhand == null || !(offhand.getItem() instanceof SpellScroll)
+				if (offhand.isEmpty() || !(offhand.getItem() instanceof SpellScroll)
 						|| SpellScroll.getSpell(offhand) == null) {
 					sender.sendMessage(new TextComponentString("Either use while holding a tome that's currently binding OR hold a spell scroll in your offhand"));
 				} else {

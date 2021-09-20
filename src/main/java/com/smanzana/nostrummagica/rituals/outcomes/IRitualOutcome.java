@@ -2,10 +2,13 @@ package com.smanzana.nostrummagica.rituals.outcomes;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -20,7 +23,7 @@ public interface IRitualOutcome {
 	 * @param center
 	 * @param recipe
 	 */
-	public void perform(World world, EntityPlayer player, ItemStack centerItem, ItemStack otherItems[], BlockPos center, RitualRecipe recipe);
+	public void perform(World world, EntityPlayer player, ItemStack centerItem, @Nullable NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe);
 	
 	/**
 	 * Returns a unique identifier for this type of ritual outcome.

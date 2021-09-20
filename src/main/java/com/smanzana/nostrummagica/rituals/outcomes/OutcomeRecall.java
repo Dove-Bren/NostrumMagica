@@ -15,6 +15,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
@@ -26,7 +27,7 @@ public class OutcomeRecall implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, EntityPlayer player, ItemStack centerItem, ItemStack otherItems[], BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, EntityPlayer player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
 		// Return the player to their marked location, if they have one
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)

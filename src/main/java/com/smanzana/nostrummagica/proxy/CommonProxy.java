@@ -114,9 +114,9 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.EntityEntry;
@@ -126,12 +126,13 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.DataSerializerEntry;
 import net.minecraftforge.registries.IForgeRegistry;
 
+@Mod.EventBusSubscriber(modid = NostrumMagica.MODID)
 public class CommonProxy {
 	
 	public CapabilityHandler capabilityHandler;
 	
 	public void preinit() {
-		MinecraftForge.EVENT_BUS.register(this);
+		//MinecraftForge.EVENT_BUS.register(this);
 		
 		CapabilityManager.INSTANCE.register(INostrumMagic.class, new NostrumMagicStorage(), NostrumMagic::new);
 		capabilityHandler = new CapabilityHandler();

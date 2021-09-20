@@ -700,7 +700,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		}
 	}
 	
-	public static ItemStack createTome(ItemStack plate, ItemStack pages[]) {
+	public static ItemStack createTome(@Nonnull ItemStack plate, NonNullList<ItemStack> pages) {
 		ItemStack stack = new ItemStack(instance(), 1, plate.getMetadata());
 		List<SpellTomeEnhancementWrapper> enhancements = SpellPlate.getEnhancements(plate);
 		
@@ -709,13 +709,12 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		
 		int capacity = SpellPlate.getCapacity(plate);
 		
-		int len = (pages == null ? 0 : pages.length);
-		for (int i = 0; i < len; i++) {
-			if (pages == null || pages[i] == null || !(pages[i].getItem() instanceof SpellTomePage))
+		for (ItemStack page : pages) {
+			if (pages.isEmpty() || !(page.getItem() instanceof SpellTomePage))
 				continue;
 			
-			enhancements.add(new SpellTomeEnhancementWrapper(SpellTomePage.getEnhancement(pages[i]),
-					SpellTomePage.getLevel(pages[i])));
+			enhancements.add(new SpellTomeEnhancementWrapper(SpellTomePage.getEnhancement(page),
+					SpellTomePage.getLevel(page)));
 		}
 		
 		if (!enhancements.isEmpty()) {

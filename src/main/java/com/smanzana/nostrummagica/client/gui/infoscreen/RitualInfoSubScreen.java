@@ -167,10 +167,10 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 			drawCandle(mc, 2, 0, 2, ritual.getTypes()[3]);
 
 			drawAltar(mc, 0, 0, 0, ritual.getCenterItem());
-			drawAltar(mc, -4, 0, 0, ritual.getExtraItems()[0]);
-			drawAltar(mc, 0, 0, 4, ritual.getExtraItems()[1]);
-			drawAltar(mc, 0, 0, -4, ritual.getExtraItems()[2]);
-			drawAltar(mc, 4, 0, 0, ritual.getExtraItems()[3]);
+			drawAltar(mc, -4, 0, 0, ritual.getExtraItems().get(0));
+			drawAltar(mc, 0, 0, 4, ritual.getExtraItems().get(1));
+			drawAltar(mc, 0, 0, -4, ritual.getExtraItems().get(2));
+			drawAltar(mc, 4, 0, 0, ritual.getExtraItems().get(3));
 		}
 		break; // No fallthrough cause cna't figure out depth
 		case 1: {

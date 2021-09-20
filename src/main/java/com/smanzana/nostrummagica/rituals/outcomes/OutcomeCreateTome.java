@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -20,10 +21,10 @@ public class OutcomeCreateTome implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, EntityPlayer player, ItemStack centerItem, ItemStack otherItems[], BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, EntityPlayer player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
 		// Take plates and pages from the altars.
 		ItemStack tome = SpellTome.createTome(centerItem, otherItems);
-		if (tome == null)
+		if (tome.isEmpty())
 			return;
 		
 		// If there's an altar, we'll enchant the item there

@@ -360,7 +360,7 @@ public class SpellAction {
 				if (baubles != null) {
 					for (int i = 0; i < baubles.getSizeInventory(); i++) {
 						ItemStack stack = baubles.getStackInSlot(i);
-						if (stack == null || !(stack.getItem() instanceof ItemMagicBauble)) {
+						if (stack.isEmpty() || !(stack.getItem() instanceof ItemMagicBauble)) {
 							continue;
 						}
 						
@@ -627,16 +627,16 @@ public class SpellAction {
 		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
 			ItemStack inhand = entity.getHeldItemMainhand();
 			boolean offhand = false;
-			if (inhand == null) {
+			if (inhand.isEmpty()) {
 				inhand = entity.getHeldItemOffhand();
 				offhand = true;
 			}
 			
-			if (inhand == null)
+			if (inhand.isEmpty())
 				return false;
 			
 			Item item = inhand.getItem();
-			ItemStack stack = null;
+			ItemStack stack = ItemStack.EMPTY;
 			if (items.contains(item)) {
 				Iterator<Item> it = items.iterator();
 				Item next = it.next();
@@ -675,7 +675,7 @@ public class SpellAction {
 				}
 			}
 			
-			if (stack == null) {
+			if (stack.isEmpty()) {
 				NostrumMagicaSounds.CAST_FAIL.play(entity);
 				return false;
 			} else {
@@ -808,7 +808,7 @@ public class SpellAction {
 				if (baubles != null) {
 					for (int i = 0; i < baubles.getSizeInventory(); i++) {
 						ItemStack stack = baubles.getStackInSlot(i);
-						if (stack == null || !(stack.getItem() instanceof ItemMagicBauble)) {
+						if (stack.isEmpty() || !(stack.getItem() instanceof ItemMagicBauble)) {
 							continue;
 						}
 						
@@ -1079,7 +1079,7 @@ public class SpellAction {
 				if (baubles != null) {
 					for (int i = 0; i < baubles.getSizeInventory(); i++) {
 						ItemStack stack = baubles.getStackInSlot(i);
-						if (stack == null || !(stack.getItem() instanceof ItemMagicBauble)) {
+						if (stack.isEmpty() || !(stack.getItem() instanceof ItemMagicBauble)) {
 							continue;
 						}
 						
@@ -1165,7 +1165,6 @@ public class SpellAction {
 		
 		@Override
 		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
-			
 			ItemStack inhand = entity.getHeldItemMainhand();
 			boolean offhand = false;
 			if (!isEnchantable(inhand)) {
@@ -1173,7 +1172,10 @@ public class SpellAction {
 				offhand = true;
 			}
 			
-			ItemStack addedItem = null;
+			if (inhand.isEmpty())
+				return false;
+
+			ItemStack addedItem = ItemStack.EMPTY;
 			boolean didEmpower = false;
 			
 			// Main hand attempt
@@ -1192,7 +1194,7 @@ public class SpellAction {
 				}
 			}
 			
-			if (addedItem == null && !didEmpower) {
+			if (addedItem.isEmpty() && !didEmpower) {
 				NostrumMagicaSounds.CAST_FAIL.play(entity);
 			} else {
 				if (entity instanceof EntityPlayer) {
@@ -1206,14 +1208,14 @@ public class SpellAction {
 					} else {
 						inhand.splitStack(1);
 					}
-					if (addedItem != null) {
+					if (!addedItem.isEmpty()) {
 						((EntityPlayer) entity).inventory.addItemStackToInventory(addedItem);
 					}
 					
 					
 				} else {
 					// EntityLiving has held item in slot 0
-					if (addedItem != null) {
+					if (!addedItem.isEmpty()) {
 						entity.setHeldItem(EnumHand.MAIN_HAND, addedItem);
 					}
 				}
@@ -1293,14 +1295,14 @@ public class SpellAction {
 			
 			int count = 0;
 			for (ItemStack equip : entity.getArmorInventoryList()) {
-				if (equip == null)
+				if (equip.isEmpty())
 					continue;
 				
 				count++;
 			}
 			if (count != 0) {
 				for (ItemStack equip : entity.getArmorInventoryList()) {
-					if (equip == null)
+					if (equip.isEmpty())
 						continue;
 					equip.damageItem(amount/count, entity);
 				}
@@ -1551,12 +1553,12 @@ public class SpellAction {
 //		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
 //			ItemStack inhand = entity.getHeldItemMainhand();
 //			boolean offhand = false;
-//			if (inhand == null) {
+//			if (inhand.isEmpty()) {
 //				inhand = entity.getHeldItemOffhand();
 //				offhand = true;
 //			}
 //			
-//			if (inhand == null)
+//			if (inhand.isEmpty())
 //				return;
 //			
 //			Item item = inhand.getItem();

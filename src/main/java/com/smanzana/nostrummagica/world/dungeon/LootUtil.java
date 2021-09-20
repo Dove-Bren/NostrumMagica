@@ -9,6 +9,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -50,13 +51,13 @@ public final class LootUtil {
 	 * @param loot
 	 */
 	public static final void createLoot(World world, BlockPos pos, EnumFacing facing,
-			ItemStack[] loot) {
+			NonNullList<ItemStack> loot) {
 		world.setBlockState(pos, Blocks.CHEST.getDefaultState().withProperty(BlockChest.FACING, facing));
 		
 		TileEntityChest chest = (TileEntityChest) world.getTileEntity(pos);
-		int len = Math.min(27, loot.length);
+		int len = Math.min(27, loot.size());
 		for (int i = 0; i < len; i++) {
-			chest.setInventorySlotContents(i, loot[i]);
+			chest.setInventorySlotContents(i, loot.get(i));
 		}
 	}
 	

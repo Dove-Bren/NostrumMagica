@@ -15,6 +15,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
@@ -25,7 +26,7 @@ public class OutcomeCreateObelisk implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, EntityPlayer player, ItemStack centerItem, ItemStack otherItems[], BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, EntityPlayer player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
 		// All logic contained in obelisk class
 		if (!NostrumObelisk.spawnObelisk(world, center.add(0, -1, 0))) {
 			if (world.isRemote)
@@ -35,7 +36,7 @@ public class OutcomeCreateObelisk implements IRitualOutcome {
 			TileEntity te = world.getTileEntity(center.add(0, 0, 0));
 			if (te == null || !(te instanceof AltarTileEntity))
 				return;
-			((AltarTileEntity) te).setItem(null);
+			((AltarTileEntity) te).setItem(ItemStack.EMPTY);
 			
 			// Break all altars, chalk, candles
 			int radius = 4;

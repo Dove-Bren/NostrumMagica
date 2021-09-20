@@ -41,7 +41,7 @@ public class ReagentBagToggleMessage implements IMessage {
 					bag = sp.getHeldItemMainhand();
 				else
 					bag = sp.getHeldItemOffhand();
-				if (bag == null || !(bag.getItem() instanceof ReagentBag)) {
+				if (bag.isEmpty() || !(bag.getItem() instanceof ReagentBag)) {
 					NostrumMagica.logger.warn("Reagent bag double-check position was invalid! Is the server behind?");
 				}
 				

@@ -9,27 +9,28 @@ import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class OutcomeConstructGeotoken extends OutcomeSpawnItem {
 
 	public OutcomeConstructGeotoken() {
-		super(null);
+		super(ItemStack.EMPTY);
 	}
 	
 	@Override
-	public void perform(World world, EntityPlayer player, ItemStack centerItem, ItemStack otherItems[], BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, EntityPlayer player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
 		// set up stack and then call super to spawn it
 		this.stack = PositionToken.constructFrom(centerItem);
 		
 		super.perform(world, player, centerItem, otherItems, center, recipe);
 	}
 
-	private static ItemStack RES = null;
+	private static ItemStack RES = ItemStack.EMPTY;
 	@Override
 	public ItemStack getResult() {
-		if (RES == null)
+		if (RES.isEmpty())
 			RES = new ItemStack(PositionToken.instance());
 		
 		return RES;

@@ -33,7 +33,7 @@ public class CommandEnhanceTome extends CommandBase {
 		if (sender instanceof EntityPlayer) {
 			EntityPlayer player = (EntityPlayer) sender;
 			ItemStack tome = player.getHeldItemMainhand();
-			if (tome == null || !(tome.getItem() instanceof SpellTome)) {
+			if (tome.isEmpty() || !(tome.getItem() instanceof SpellTome)) {
 				sender.sendMessage(new TextComponentString("Did not find a spelltome in your mainhand!"));
 				return;
 			}

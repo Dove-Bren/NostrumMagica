@@ -13,6 +13,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -366,22 +367,22 @@ public class NostrumDungeon {
 		}
 
 		private void spawnKey(World world, DungeonExitPoint keyLocation) {
-			ItemStack loot[] = new ItemStack[27];
+			NonNullList<ItemStack> loot = NonNullList.withSize(27, ItemStack.EMPTY);
 			for (int i = 0; i < 27; i++) {
 				if (rand.nextFloat() < .2) {
-					loot[i] = new ItemStack(Items.ARROW, rand.nextInt(3) + 1);
+					loot.set(i, new ItemStack(Items.ARROW, rand.nextInt(3) + 1));
 				} else if (rand.nextFloat() < .5) {
-					loot[i] = ReagentItem.instance().getReagent(
+					loot.set(i, ReagentItem.instance().getReagent(
 							ReagentType.values()[rand.nextInt(ReagentType.values().length)],
-							rand.nextInt(10) + 1);
+							rand.nextInt(10) + 1));
 				} else if (rand.nextFloat() < .5) {
-					loot[i] = ReagentItem.instance().getReagent(
+					loot.set(i, ReagentItem.instance().getReagent(
 							ReagentType.values()[rand.nextInt(ReagentType.values().length)],
-							rand.nextInt(20) + 1);
+							rand.nextInt(20) + 1));
 				}
 			}
 			
-			loot[rand.nextInt(27)] = new ItemStack(Items.GOLDEN_APPLE); // FIXME should be key
+			loot.set(rand.nextInt(27), new ItemStack(Items.GOLDEN_APPLE)); // FIXME should be key
 			LootUtil.createLoot(world, keyLocation.getPos(), keyLocation.getFacing(),
 					loot);
 		}

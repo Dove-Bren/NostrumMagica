@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -21,22 +22,22 @@ public class OutcomeBindSpell implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, EntityPlayer player, ItemStack centerItem, ItemStack otherItems[], BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, EntityPlayer player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
 		// Take the spell and tome and begin the player binding
 		
 		// Tome has to be center.
 		ItemStack tome = centerItem;
-		ItemStack scroll = null;
-		if (otherItems != null && otherItems.length > 0)
+		ItemStack scroll = ItemStack.EMPTY;
+		if (otherItems != null && otherItems.size() > 0)
 		for (ItemStack other : otherItems) {
-			if (other != null && other.getItem() instanceof SpellScroll) {
+			if (!other.isEmpty() && other.getItem() instanceof SpellScroll) {
 				scroll = other;
 				break;
 			}
 		}
 		
-		if (tome == null || !(tome.getItem() instanceof SpellTome)
-				|| scroll == null)
+		if (tome.isEmpty() || !(tome.getItem() instanceof SpellTome)
+				|| scroll.isEmpty())
 			return;
 		
 		AltarTileEntity altar = (AltarTileEntity) world.getTileEntity(center);

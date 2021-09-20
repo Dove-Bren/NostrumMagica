@@ -1,11 +1,12 @@
 package com.smanzana.nostrummagica.rituals;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+
+import org.apache.commons.lang3.Validate;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.AltarBlock;
@@ -24,6 +25,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
@@ -44,16 +46,16 @@ public class RitualRecipe implements InfoScreenIndexed {
 	private final EMagicElement element;
 	private final int tier;
 	private ReagentType types[];
-	private ItemStack centerItem;
-	private ItemStack extraItems[];
+	private @Nonnull ItemStack centerItem;
+	private NonNullList<ItemStack> extraItems;
 	private IRitualOutcome hook;
 	private IRitualRequirement req;
 	private final String titleKey;
 	
-	private ItemStack icon;
+	private @Nonnull ItemStack icon;
 	
 	public static RitualRecipe createTier1(String titleKey,
-			ItemStack icon,
+			@Nonnull ItemStack icon,
 			EMagicElement element,
 			ReagentType reagent,
 			IRitualRequirement requirement,
@@ -65,14 +67,16 @@ public class RitualRecipe implements InfoScreenIndexed {
 		recipe.req = requirement;
 		recipe.icon = icon;
 		
+		Validate.notNull(icon);
+		
 		return recipe;
 	}
 	
 	public static RitualRecipe createTier2(String titleKey,
-			ItemStack icon,
+			@Nonnull ItemStack icon,
 			EMagicElement element,
 			ReagentType[] reagents,
-			ItemStack center, 
+			@Nonnull ItemStack center, 
 			IRitualRequirement requirement,
 			IRitualOutcome outcome) {
 		if (center == null || center.isEmpty()) {
@@ -90,15 +94,18 @@ public class RitualRecipe implements InfoScreenIndexed {
 		recipe.req = requirement;
 		recipe.icon = icon;
 		
+		Validate.notNull(icon);
+		Validate.notNull(center);
+		
 		return recipe;
 	}
 	
 	public static RitualRecipe createTier3(String titleKey,
-			ItemStack icon,
+			@Nonnull ItemStack icon,
 			EMagicElement element,
 			ReagentType[] reagents,
-			ItemStack center,
-			ItemStack extras[],
+			@Nonnull ItemStack center,
+			@Nonnull ItemStack extras[],
 			IRitualRequirement requirement,
 			IRitualOutcome outcome) {
 		if (center == null || center.isEmpty()) {
@@ -116,12 +123,14 @@ public class RitualRecipe implements InfoScreenIndexed {
 			if (extras[i] == null) {
 				throw new RuntimeException(String.format("Extra item %d of tier 3 ritual cannot be null!", i));
 			}
-			recipe.extraItems[i] = extras[i];
+			recipe.extraItems.set(i, extras[i]);
 		}
 
 		recipe.hook = outcome;
 		recipe.req = requirement;
 		recipe.icon = icon;
+		
+		Validate.notNull(icon);
 		
 		return recipe;
 	}
@@ -130,13 +139,14 @@ public class RitualRecipe implements InfoScreenIndexed {
 		this.tier = tier;
 		this.element = element;
 		this.titleKey = nameKey;
-		if (tier == 0)
+		if (tier == 0) {
 			this.types = new ReagentType[1];
-		else
+		} else {
 			this.types = new ReagentType[4];
+		}
+		
 		if (tier == 2) {
-			this.extraItems = new ItemStack[4];
-			Arrays.fill(extraItems, ItemStack.EMPTY);
+			this.extraItems = NonNullList.withSize(4, ItemStack.EMPTY);
 		}
 	}
 	
@@ -190,7 +200,7 @@ public class RitualRecipe implements InfoScreenIndexed {
 			TileEntity te;
 			
 			if (tier == 2) {
-				List<ItemStack> items = new ArrayList<>(4);
+				List<ItemStack> items = NonNullList.create();
 				for (int x = -4; x <= 4; x+=4) {
 					int diff = 4 - Math.abs(x);
 					for (int z = -diff; z <= diff; z+=8) {
@@ -277,7 +287,7 @@ public class RitualRecipe implements InfoScreenIndexed {
 			return;
 		
 		@Nonnull ItemStack centerItem = null;
-		@Nonnull ItemStack otherItems[] = null;
+		NonNullList<ItemStack> otherItems = null;
 		
 		// Do cleanup of altars and candles, etc
 		if (tier == 0) {
@@ -295,20 +305,18 @@ public class RitualRecipe implements InfoScreenIndexed {
 			te = world.getTileEntity(center);
 			if (te != null && te instanceof AltarTileEntity) {
 				centerItem = ((AltarTileEntity) te).getItem();
-				((AltarTileEntity) te).setItem(null);
+				((AltarTileEntity) te).setItem(ItemStack.EMPTY);
 			}
 			
 			if (tier == 2) {
-				otherItems = new ItemStack[4];
-				Arrays.fill(otherItems, ItemStack.EMPTY);
-				int i = 0;
+				otherItems = NonNullList.create();
 				for (int x = -4; x <= 4; x+=4) {
 					int diff = 4 - Math.abs(x);
 					for (int z = -diff; z <= diff; z+=8) {
 						te = world.getTileEntity(center.add(x, 0, z));
 						if (te == null || !(te instanceof AltarTileEntity))
 							continue; // oh well, too late now!
-						otherItems[i++] = ((AltarTileEntity) te).getItem();
+						otherItems.add(((AltarTileEntity) te).getItem());
 						((AltarTileEntity) te).setItem(ItemStack.EMPTY);
 					}
 				}
@@ -335,7 +343,7 @@ public class RitualRecipe implements InfoScreenIndexed {
 		return centerItem;
 	}
 
-	public ItemStack[] getExtraItems() {
+	public NonNullList<ItemStack> getExtraItems() {
 		return extraItems;
 	}
 	
@@ -351,7 +359,7 @@ public class RitualRecipe implements InfoScreenIndexed {
 		return titleKey;
 	}
 
-	public ItemStack getIcon() {
+	public @Nonnull ItemStack getIcon() {
 		return icon;
 	}
 

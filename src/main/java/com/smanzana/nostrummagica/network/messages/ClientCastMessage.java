@@ -77,12 +77,12 @@ public class ClientCastMessage implements IMessage {
 				
 				// Add the player's personal bonuses
 				summary.addCostRate(att.getManaCostModifier());
-				ItemStack tome = null;
+				ItemStack tome = ItemStack.EMPTY;
 				if (!isScroll) {
 					// Find the tome this was cast from, if any
 					tome = NostrumMagica.findTome(sp, tomeID);
 					
-					if (tome != null && tome.getItem() instanceof SpellTome
+					if (!tome.isEmpty() && tome.getItem() instanceof SpellTome
 							&& SpellTome.getTomeID(tome) == tomeID) {
 						// Casting from a tome.
 						
@@ -113,7 +113,7 @@ public class ClientCastMessage implements IMessage {
 				
 				// Visit an equipped spell armor
 				for (ItemStack equip : sp.getEquipmentAndArmor()) {
-					if (equip == null)
+					if (equip.isEmpty())
 						continue;
 					if (equip.getItem() instanceof ISpellArmor) {
 						ISpellArmor armor = (ISpellArmor) equip.getItem();
@@ -126,7 +126,7 @@ public class ClientCastMessage implements IMessage {
 				if (baubles != null) {
 					for (int i = 0; i < baubles.getSizeInventory(); i++) {
 						ItemStack equip = baubles.getStackInSlot(i);
-						if (equip == null) {
+						if (equip.isEmpty()) {
 							continue;
 						}
 						
