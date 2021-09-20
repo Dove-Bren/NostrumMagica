@@ -15,15 +15,15 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public class ParticleGlowOrb extends BatchRenderParticle {
+public class ParticleFilledOrb extends BatchRenderParticle {
 	
-	private static final ResourceLocation TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/effects/glow_orb.png");
+	private static final ResourceLocation TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/effects/filled_orb.png");
 	
 	protected final float maxAlpha;
 	protected Vec3d targetPos;
 	protected Entity targetEntity;
 	
-	public ParticleGlowOrb(World worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
+	public ParticleFilledOrb(World worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
 		super(worldIn, x, y, z, 0, 0, 0);
 		
 		particleRed = red;
@@ -34,32 +34,32 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 		particleMaxAge = lifetime;
 	}
 	
-	public ParticleGlowOrb setFloats(boolean floats) {
+	public ParticleFilledOrb setFloats(boolean floats) {
 		return setFloatStrength(floats ? -.01f : 0);
 	}
 	
-	public ParticleGlowOrb setFloatStrength(float strength) {
+	public ParticleFilledOrb setFloatStrength(float strength) {
 		particleGravity = strength;
 		return this;
 	}
 	
-	public ParticleGlowOrb setMotion(Vec3d motion) {
+	public ParticleFilledOrb setMotion(Vec3d motion) {
 		return this.setMotion(motion.xCoord, motion.yCoord, motion.zCoord);
 	}
 	
-	public ParticleGlowOrb setMotion(double xVelocity, double yVelocity, double zVelocity) {
+	public ParticleFilledOrb setMotion(double xVelocity, double yVelocity, double zVelocity) {
 		this.motionX = xVelocity;
 		this.motionY = yVelocity;
 		this.motionZ = zVelocity;
 		return this;
 	}
 	
-	public ParticleGlowOrb setTarget(Entity ent) {
+	public ParticleFilledOrb setTarget(Entity ent) {
 		targetEntity = ent;
 		return this;
 	}
 	
-	public ParticleGlowOrb setTarget(Vec3d targetPos) {
+	public ParticleFilledOrb setTarget(Vec3d targetPos) {
 		this.targetPos = targetPos;
 		return this;
 	}
@@ -86,7 +86,7 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 	
 	@Override
 	public int hashCode() {
-		return 37 * 419 + 5119;
+		return 29 * 419 + 5119;
 	}
 
 	@Override
@@ -96,7 +96,6 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 
 	@Override
 	public void renderBatched(VertexBuffer buffer, float partialTicks) {
-		BatchRenderParticle.RenderQuad(buffer, this, renderParams, partialTicks, .1f);
 		BatchRenderParticle.RenderQuad(buffer, this, renderParams, partialTicks, .05f);
 	}
 	
@@ -129,11 +128,11 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 		}
 	}
 	
-	public static final class Factory implements INostrumParticleFactory<ParticleGlowOrb> {
+	public static final class Factory implements INostrumParticleFactory<ParticleFilledOrb> {
 
 		@Override
-		public ParticleGlowOrb createParticle(World world, SpawnParams params) {
-			ParticleGlowOrb particle = null;
+		public ParticleFilledOrb createParticle(World world, SpawnParams params) {
+			ParticleFilledOrb particle = null;
 			for (int i = 0; i < params.count; i++) {
 				final double spawnX = params.spawnX + (NostrumMagica.rand.nextDouble() * 2 - 1) * params.spawnJitterRadius;
 				final double spawnY = params.spawnY + (NostrumMagica.rand.nextDouble() * 2 - 1) * params.spawnJitterRadius;
@@ -142,7 +141,7 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 						? new float[] {.2f, .4f, 1f, .3f}
 						: ColorUtil.ARGBToColor(params.color));
 				final int lifetime = params.lifetime + (params.lifetimeJitter > 0 ? NostrumMagica.rand.nextInt(params.lifetimeJitter) : 0);
-				particle = new ParticleGlowOrb(world, spawnX, spawnY, spawnZ, colors[0], colors[1], colors[2], colors[3], lifetime);
+				particle = new ParticleFilledOrb(world, spawnX, spawnY, spawnZ, colors[0], colors[1], colors[2], colors[3], lifetime);
 				
 				if (params.targetEntID != null) {
 					particle.setTarget(world.getEntityByID(params.targetEntID));

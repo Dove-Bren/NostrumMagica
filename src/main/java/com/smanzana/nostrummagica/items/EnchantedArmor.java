@@ -23,6 +23,8 @@ import com.smanzana.nostrummagica.attributes.AttributeMagicReduction;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.model.ModelEnchantedArmorBase;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaEntityEffect;
@@ -680,12 +682,20 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			data = new int[] {Block.getStateId(Blocks.SNOW.getDefaultState())};
 			break;
 		case LIGHTNING:
-			effect = EnumParticleTypes.FALLING_DUST;
-			dx = dz = 0;
-			dy = -.025;
-			mult = 1;
-			rangeMod = 1;
-			data = new int[] {Block.getStateId(Blocks.GOLD_BLOCK.getDefaultState())};
+//			effect = EnumParticleTypes.FALLING_DUST;
+//			dx = dz = 0;
+//			dy = -.025;
+//			mult = 1;
+//			rangeMod = 1;
+//			data = new int[] {Block.getStateId(Blocks.GOLD_BLOCK.getDefaultState())};
+			effect = null;
+			dx = dz = dy = mult = 0;
+			rangeMod = 0;
+			//int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, 
+			//Vec3d velocity, boolean unused
+			NostrumParticles.LIGHTNING_STATIC.spawn(world, new SpawnParams(
+					1, player.posX, player.posY + 1, player.posZ, 1, 20 * 1, 0, new Vec3d(0, 0.01 * (NostrumMagica.rand.nextBoolean() ? 1 : -1), 0), false
+					).color(.8f, 1f, 1f, 0f));
 			break;
 		case PHYSICAL:
 		case WIND:

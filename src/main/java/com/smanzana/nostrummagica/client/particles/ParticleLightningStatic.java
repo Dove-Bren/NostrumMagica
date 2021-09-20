@@ -15,15 +15,29 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public class ParticleGlowOrb extends BatchRenderParticle {
+public class ParticleLightningStatic extends BatchRenderParticle {
 	
-	private static final ResourceLocation TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/effects/glow_orb.png");
+	private static final ResourceLocation[] TEX_1_LOCS = new ResourceLocation[] {
+			new ResourceLocation(NostrumMagica.MODID, "textures/effects/lightning1_0.png"),
+			new ResourceLocation(NostrumMagica.MODID, "textures/effects/lightning1_1.png"),
+			new ResourceLocation(NostrumMagica.MODID, "textures/effects/lightning1_2.png"),
+			new ResourceLocation(NostrumMagica.MODID, "textures/effects/lightning1_3.png"),
+	};
+	private static final ResourceLocation[] TEX_2_LOCS = new ResourceLocation[] {
+			new ResourceLocation(NostrumMagica.MODID, "textures/effects/lightning2_0.png"),
+			new ResourceLocation(NostrumMagica.MODID, "textures/effects/lightning2_1.png"),
+			new ResourceLocation(NostrumMagica.MODID, "textures/effects/lightning2_2.png"),
+			new ResourceLocation(NostrumMagica.MODID, "textures/effects/lightning2_3.png"),
+	};
 	
 	protected final float maxAlpha;
 	protected Vec3d targetPos;
 	protected Entity targetEntity;
 	
-	public ParticleGlowOrb(World worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
+	protected int type;
+	protected int ticksExisted;
+	
+	public ParticleLightningStatic(World worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
 		super(worldIn, x, y, z, 0, 0, 0);
 		
 		particleRed = red;
@@ -32,41 +46,60 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 		particleAlpha = 0f;
 		this.maxAlpha = alpha;
 		particleMaxAge = lifetime;
+		
+		type = NostrumMagica.rand.nextInt(2);
 	}
 	
-	public ParticleGlowOrb setFloats(boolean floats) {
+	public ParticleLightningStatic setFloats(boolean floats) {
 		return setFloatStrength(floats ? -.01f : 0);
 	}
 	
-	public ParticleGlowOrb setFloatStrength(float strength) {
+	public ParticleLightningStatic setFloatStrength(float strength) {
 		particleGravity = strength;
 		return this;
 	}
 	
-	public ParticleGlowOrb setMotion(Vec3d motion) {
+	public ParticleLightningStatic setMotion(Vec3d motion) {
 		return this.setMotion(motion.xCoord, motion.yCoord, motion.zCoord);
 	}
 	
-	public ParticleGlowOrb setMotion(double xVelocity, double yVelocity, double zVelocity) {
+	public ParticleLightningStatic setMotion(double xVelocity, double yVelocity, double zVelocity) {
 		this.motionX = xVelocity;
 		this.motionY = yVelocity;
 		this.motionZ = zVelocity;
 		return this;
 	}
 	
-	public ParticleGlowOrb setTarget(Entity ent) {
+	public ParticleLightningStatic setTarget(Entity ent) {
 		targetEntity = ent;
 		return this;
 	}
 	
-	public ParticleGlowOrb setTarget(Vec3d targetPos) {
+	public ParticleLightningStatic setTarget(Vec3d targetPos) {
 		this.targetPos = targetPos;
 		return this;
 	}
 	
+	protected float getDisplayProgress() {
+		return (float) particleAge / (float) particleMaxAge;
+	}
+	
+	protected static int GetDisplayFrame(float progress, int count) {
+		return progress < 1f ? (int) (progress * count) : count-1;
+	}
+	
+	protected ResourceLocation[] getAnimationTextures(int type) {
+		switch (type) {
+		default:
+		case 0: return TEX_1_LOCS;
+		case 1: return TEX_2_LOCS;
+		}
+	}
+	
 	@Override
 	public ResourceLocation getTexture() {
-		return TEX_LOC;
+		final ResourceLocation[] textures = getAnimationTextures(type);
+		return textures[GetDisplayFrame(getDisplayProgress(), textures.length)];
 	}
 
 	@Override
@@ -86,7 +119,9 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 	
 	@Override
 	public int hashCode() {
-		return 37 * 419 + 5119;
+		final ResourceLocation[] textures = getAnimationTextures(type);
+		final int idx = GetDisplayFrame(getDisplayProgress(), textures.length);
+		return type * 419 + 311 * idx + 19;
 	}
 
 	@Override
@@ -96,7 +131,6 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 
 	@Override
 	public void renderBatched(VertexBuffer buffer, float partialTicks) {
-		BatchRenderParticle.RenderQuad(buffer, this, renderParams, partialTicks, .1f);
 		BatchRenderParticle.RenderQuad(buffer, this, renderParams, partialTicks, .05f);
 	}
 	
@@ -107,9 +141,9 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 		if (this.particleAge < 20) {
 			// fade in in first second
 			this.particleAlpha = ((float) particleAge / 20f);
-		} else if (this.particleAge >= this.particleMaxAge - 20f) {
-			// Fade out in last second
-			this.particleAlpha = ((float) (particleMaxAge - particleAge) / 20f);
+//		} else if (this.particleAge >= this.particleMaxAge - 20f) {
+//			// Fade out in last second
+//			this.particleAlpha = ((float) (particleMaxAge - particleAge) / 20f);
 		} else {
 			this.particleAlpha = 1f;
 		}
@@ -129,11 +163,11 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 		}
 	}
 	
-	public static final class Factory implements INostrumParticleFactory<ParticleGlowOrb> {
+	public static final class Factory implements INostrumParticleFactory<ParticleLightningStatic> {
 
 		@Override
-		public ParticleGlowOrb createParticle(World world, SpawnParams params) {
-			ParticleGlowOrb particle = null;
+		public ParticleLightningStatic createParticle(World world, SpawnParams params) {
+			ParticleLightningStatic particle = null;
 			for (int i = 0; i < params.count; i++) {
 				final double spawnX = params.spawnX + (NostrumMagica.rand.nextDouble() * 2 - 1) * params.spawnJitterRadius;
 				final double spawnY = params.spawnY + (NostrumMagica.rand.nextDouble() * 2 - 1) * params.spawnJitterRadius;
@@ -142,7 +176,7 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 						? new float[] {.2f, .4f, 1f, .3f}
 						: ColorUtil.ARGBToColor(params.color));
 				final int lifetime = params.lifetime + (params.lifetimeJitter > 0 ? NostrumMagica.rand.nextInt(params.lifetimeJitter) : 0);
-				particle = new ParticleGlowOrb(world, spawnX, spawnY, spawnZ, colors[0], colors[1], colors[2], colors[3], lifetime);
+				particle = new ParticleLightningStatic(world, spawnX, spawnY, spawnZ, colors[0], colors[1], colors[2], colors[3], lifetime);
 				
 				if (params.targetEntID != null) {
 					particle.setTarget(world.getEntityByID(params.targetEntID));
