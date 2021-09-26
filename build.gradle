@@ -2,16 +2,13 @@ buildscript {
     repositories {
         jcenter()
         maven { url = "http://files.minecraftforge.net/maven" }
-        mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
     }
 }
-apply plugin: 'net.minecraftforge.gradle'
-// Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
+apply plugin: 'net.minecraftforge.gradle.forge'
+//Only edit below this line, the above code adds and enables the nessasary things for Forge to be setup.
 
 
 version = "1.10.2-1.7.0"
@@ -25,8 +22,10 @@ compileJava {
 
 minecraft {
     //version = "1.10.2-12.18.3.2185"
-    //version = "1.12.2-14.23.4.2705"
-    //runDir = "run"
+    version = "${mc_version}-${forge_version}"
+    runDir = "run"
+	useDepAts = true
+	mappings = "snapshot_20171003"
     
     // the mappings can be changed at any time, and must be in the following format.
     // snapshot_YYYYMMDD   snapshot are built nightly.
@@ -35,10 +34,11 @@ minecraft {
     // simply re-run your setup task after changing the mappings to update your workspace.
     //mappings = "snapshot_20171003"
     //mappings = "snapshot_20161111"
-	 mappings channel: 'snapshot', version: '20171003-1.12'
+	//mappings channel: 'snapshot', version: '20171003-1.12'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+	/*
 	runs {
-        NostrumClient {
+        client {
             workingDirectory project.file('run')
 
             // Recommended logging data for a userdev environment
@@ -48,7 +48,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
         }
 
-        NostrumServer {
+        server {
 
             // Recommended logging data for a userdev environment
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
@@ -57,6 +57,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
         }
     }
+	*/
 }
 
 repositories {  
@@ -87,14 +88,20 @@ repositories {
 
 dependencies {
     
-	minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2854'
+	//implementation fileTree(dir: "${project.rootDir}/libs", include: '*.jar')
 	
-    //deobfCompile "mezz.jei:jei_${mc_version}:${jei_version}"
-    //runtime "mezz.jei:jei_${mc_version}:${jei_version}"
-	compileOnly fg.deobf("mezz.jei:jei_${mc_version}:${jei_version}:api")
-    runtimeOnly fg.deobf("mezz.jei:jei_${mc_version}:${jei_version}")
+    deobfCompile "mezz.jei:jei_${mc_version}:${jei_version}:api"
+    runtime "mezz.jei:jei_${mc_version}:${jei_version}"
+	
+	//compile "com.enderio:EnderIO:1.12.2-5.3.70"
+	deobfCompile "com.enderio.core:EnderCore:1.12.2-0.5.76"
+    deobfCompile("com.enderio:EnderIO:1.12.2-5.3.68") {
+        exclude group: 'com.enderio', module: 'ap'
+        exclude group: "deobf.com.enderio.core"
+    }
 
     compile "baubles:baubles:1.12:1.5.2"
+	
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"
@@ -117,7 +124,7 @@ dependencies {
 
 }
 
-/*
+
 processResources
 {
     // this will ensure that this task is redone when the versions change.
@@ -137,7 +144,7 @@ processResources
         exclude 'mcmod.info'
     }
 }
-*/
+
 
 task coreJar(type: Jar) {
 	from(sourceSets.main.output) {
@@ -167,16 +174,16 @@ jar {
 	}
 }
 
-/*
+
 reobf {
 	coreJar { mappingType = 'SEARGE' }
 }
-*/
 
-/*
+
+
 runClient {
 	args '--username', 'testplayer'
 }	
-*/
+
 
 build.dependsOn coreJar, deobfJar, jar
