@@ -46,17 +46,17 @@ public class PositionCrystal extends Item implements ILoreTagged {
 
 	public static PositionCrystal instance() {
 		if (instance == null)
-			instance = new PositionCrystal();
+			instance = new PositionCrystal(ID);
 	
 		return instance;
 
 	}
 
-	public PositionCrystal() {
+	public PositionCrystal(final String id) {
 		super();
 		this.setMaxStackSize(1);
-		this.setUnlocalizedName(ID);
-		this.setRegistryName(NostrumMagica.MODID, PositionCrystal.ID);
+		this.setUnlocalizedName(id);
+		this.setRegistryName(NostrumMagica.MODID, id);
 		this.setMaxDamage(0);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 	}

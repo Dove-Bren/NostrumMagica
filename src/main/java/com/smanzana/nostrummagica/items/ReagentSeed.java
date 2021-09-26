@@ -57,11 +57,12 @@ public class ReagentSeed extends ItemSeeds {
 	
 	private ReagentSeed(SeedType type) {
 		super(type.getCropState().getBlock(), Blocks.FARMLAND);
+		
+		this.type = type;
+		
 		this.setUnlocalizedName(type.getUnlocName());
 		this.setRegistryName(NostrumMagica.MODID, this.getItemID());
 		this.setCreativeTab(NostrumMagica.creativeTab);
-		
-		this.type = type;
 	}
 	
 	 public EnumPlantType getPlantType(IBlockAccess world, BlockPos pos) {

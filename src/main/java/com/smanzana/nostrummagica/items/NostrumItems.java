@@ -95,7 +95,7 @@ public class NostrumItems {
 	}
 
 	@SubscribeEvent
-    private void registerItems(RegistryEvent.Register<Item> event) {
+	public void registerItems(RegistryEvent.Register<Item> event) {
     	final IForgeRegistry<Item> registry = event.getRegistry();
     	registry.register(NostrumGuide.instance());
 //    	GameRegistry.addShapelessRecipe(new ItemStack(NostrumGuide.instance()), Items.LEATHER,

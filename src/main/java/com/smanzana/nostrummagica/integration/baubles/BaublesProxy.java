@@ -85,7 +85,7 @@ public class BaublesProxy {
 	}
 	
 	@SubscribeEvent
-	private void registerItems(RegistryEvent.Register<Item> event) {
+	public void registerItems(RegistryEvent.Register<Item> event) {
 		final IForgeRegistry<Item> registry = event.getRegistry();
 		
     	registry.register(ItemMagicBauble.instance());

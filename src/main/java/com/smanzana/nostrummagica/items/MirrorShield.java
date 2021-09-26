@@ -39,19 +39,19 @@ public class MirrorShield extends Item implements ISpellActionListener, ILoreTag
 	
 	public static MirrorShield instance() {
 		if (instance == null)
-			instance = new MirrorShield();
+			instance = new MirrorShield(ID);
 		
 		return instance;
 	}
 	
-	public static final String id = "mirror_shield";
+	public static final String ID = "mirror_shield";
 	public static final UUID MOD_ATTACK_UUID = UUID.fromString("522BB274-43321-56AA-20AE-254BBB743ABB");
 	public static final UUID MOD_RESIST_UUID = UUID.fromString("433CC363-43321-56AA-20AE-254BBB743ABB");
 	
-	protected MirrorShield() {
+	protected MirrorShield(final String id) {
 		super();
 		this.setUnlocalizedName(id);
-		this.setRegistryName(NostrumMagica.MODID, MirrorShield.id);
+		this.setRegistryName(NostrumMagica.MODID, id);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setMaxStackSize(1);
 		this.setMaxDamage(750);

@@ -101,7 +101,7 @@ public class AetheriaProxy {
 	}
 	
 	@SubscribeEvent
-	private void registerItems(RegistryEvent.Register<Item> event) {
+	public void registerItems(RegistryEvent.Register<Item> event) {
     	final IForgeRegistry<Item> registry = event.getRegistry();
     	
     	ItemResources = NostrumAetherResourceItem.instance();
@@ -120,7 +120,7 @@ public class AetheriaProxy {
 	}
 	
 	@SubscribeEvent
-	private void registerBlocks(RegistryEvent.Register<Block> event) {
+	public void registerBlocks(RegistryEvent.Register<Block> event) {
     	final IForgeRegistry<Block> registry = event.getRegistry();
     	
 		BlockWisp = WispBlock.instance();

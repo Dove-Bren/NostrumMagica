@@ -48,8 +48,8 @@ public class FrostbitePotion extends Potion {
 		
 		this.registerPotionAttributeModifier(SharedMonsterAttributes.MOVEMENT_SPEED,
 				"60A6EF27-8A11-2213-A734-30A4B0CC4E90", -0.1D, 2);
-		
-		NostrumMagica.registerPotion(this, Resource);
+
+		this.setRegistryName(Resource);
 	}
 	
 	public boolean isReady(int duration, int amp) {

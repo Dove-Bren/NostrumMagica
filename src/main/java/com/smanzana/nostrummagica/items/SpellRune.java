@@ -79,6 +79,10 @@ public class SpellRune extends Item implements ILoreTagged {
 	}
 	
 	public static class RuneRecipe extends IForgeRegistryEntry.Impl<IRecipe> implements IRecipe {
+		
+		public RuneRecipe() {
+			this.setRegistryName("nostrum.recipe.rune");
+		}
 
 		@Override
 		public boolean matches(InventoryCrafting inv, World worldIn) {

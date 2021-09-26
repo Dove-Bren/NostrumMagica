@@ -2,7 +2,6 @@ package com.smanzana.nostrummagica.items;
 
 import javax.annotation.Nonnull;
 
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumObelisk;
 import com.smanzana.nostrummagica.blocks.ObeliskPortal;
 import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity;
@@ -41,9 +40,8 @@ public class PositionToken extends PositionCrystal {
 	}
 
 	public PositionToken() {
-		super();
+		super(ID);
 		this.setUnlocalizedName(ID);
-		this.setRegistryName(NostrumMagica.MODID, PositionToken.ID);
 	}
 	
 	@Override

@@ -35,7 +35,7 @@ public class FamiliarPotion extends Potion {
 
 		this.setBeneficial();
 		this.setPotionName("potion.familiar.name");
-		NostrumMagica.registerPotion(this, Resource);
+		this.setRegistryName(Resource);
 	}
 	
 	@Override

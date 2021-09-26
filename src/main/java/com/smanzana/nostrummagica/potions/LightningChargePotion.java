@@ -32,7 +32,7 @@ public class LightningChargePotion extends Potion {
 		this.setBeneficial();
 		this.setPotionName("potion.lightningcharge.name");
 		this.registerPotionAttributeModifier(SharedMonsterAttributes.MOVEMENT_SPEED, "3AA5821F-1B8B-4E94-BF6C-7A58449F587B", 0.2D, 1);
-		NostrumMagica.registerPotion(this, Resource);
+		this.setRegistryName(Resource);
 	}
 	
 	@Override

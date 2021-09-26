@@ -1,11 +1,12 @@
 {
   "type": "forge:ore_shapeless",
   "result": {
-    "item": "#ESSENCE_LIGHTNING"
+    "item": "nostrum_essence",
+	"data": 1
   },
   "ingredients": [
     {
-      "item": "#ESSENCE_PHYSICAL"
+      "item": "#ESSENCE_VOID"
     },
     {
       "item": "#ESSENCE_ANY"

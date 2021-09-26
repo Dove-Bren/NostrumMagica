@@ -31,7 +31,7 @@ public class MagicBuffPotion extends Potion {
 
 		this.setBeneficial();
 		this.setPotionName("potion.magicbuff.name");
-		NostrumMagica.registerPotion(this, Resource);
+		this.setRegistryName(Resource);
 	}
 	
 	@Override

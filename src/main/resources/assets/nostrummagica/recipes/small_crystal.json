@@ -1,7 +1,8 @@
 {
   "type": "forge:ore_shaped",
   "result": {
-    "item": "#RESOURCE_CRYSTALSMALL"
+    "item": "nostrum_resource",
+	"data": 1
   },
   "pattern": [
     " MR",

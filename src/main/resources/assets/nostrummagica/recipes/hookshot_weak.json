@@ -1,7 +1,8 @@
 {
   "type": "forge:ore_shaped",
   "result": {
-    "item": "#HOOKSHOT_WEAK"
+    "item": "hookshot",
+	"data": 0
   },
   "pattern": [
     " RF",
@@ -11,19 +12,19 @@
   "key": {
     "W": {
       "type": "forge:ore_dict",
-	  "ore": "plankWood",
+	  "ore": "plankWood"
     },
     "R": {
       "type": "forge:ore_dict",
-	  "ore": "dustRedstone",
+	  "ore": "dustRedstone"
     },
     "D": {
       "type": "forge:ore_dict",
-	  "ore": "gemDiamond",
+	  "ore": "gemDiamond"
     },
     "I": {
       "type": "forge:ore_dict",
-	  "ore": "blockIron",
+	  "ore": "blockIron"
     },
     "F": {
       "item": "minecraft:flint"

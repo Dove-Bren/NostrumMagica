@@ -89,6 +89,7 @@ import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.jei.NostrumMagicaJEIPlugin;
 import com.smanzana.nostrummagica.items.ReagentSeed;
 import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.items.ShrineSeekingGem;
@@ -180,7 +181,6 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -344,17 +344,6 @@ public class NostrumMagica
     		return null;
     	
     	return e.getCapability(AttributeProvider.CAPABILITY, null);
-    }
-    
-    //private static int potionID = 65;
-	
-    public static int registerPotion(Potion potion, ResourceLocation loc) {
-    	// TODO this doesn't do anything now, right?
-    	return 0;
-//    	while (Potion.getPotionById(potionID) != null)
-//    		potionID++;
-//    	Potion.REGISTRY.register(potionID, loc, potion);
-//    	return potionID;
     }
     
     public static ItemStack findTome(EntityPlayer entity, int tomeID) {

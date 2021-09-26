@@ -1,7 +1,8 @@
 {
   "type": "forge:ore_shapeless",
   "result": {
-    "item": "#REAGENT_SPIDERSILK"
+    "item": "nostrum_reagent",
+	"data": 1
   },
   "ingredients": [
     {

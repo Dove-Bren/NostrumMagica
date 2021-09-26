@@ -10,7 +10,8 @@
   ],
   "key": {
     "S": {
-      "item": "minecraft:stone_slab"
+      "item": "minecraft:stone_slab",
+	  "data": 0
     },
     "T": {
       "type": "forge:ore_dict",

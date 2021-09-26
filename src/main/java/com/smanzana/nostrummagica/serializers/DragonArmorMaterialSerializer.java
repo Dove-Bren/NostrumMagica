@@ -14,7 +14,7 @@ public final class DragonArmorMaterialSerializer implements DataSerializer<Drago
 	public static final DragonArmorMaterialSerializer instance = new DragonArmorMaterialSerializer();
 	
 	private DragonArmorMaterialSerializer() {
-		;
+		
 	}
 	
 	@Override

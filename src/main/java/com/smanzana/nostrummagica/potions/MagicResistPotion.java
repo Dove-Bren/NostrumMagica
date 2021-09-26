@@ -27,7 +27,7 @@ public class MagicResistPotion extends Potion {
 
 		this.setBeneficial();
 		this.setPotionName("potion.magicresist.name");
-		NostrumMagica.registerPotion(this, Resource);
+		this.setRegistryName(Resource);
 	}
 	
 	public boolean isReady(int duration, int amp) {

@@ -188,6 +188,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ClientCommandHandler;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.MouseEvent;
@@ -366,7 +367,7 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@SubscribeEvent
-	private void registerAllModels(ModelRegistryEvent event) {
+	public void registerAllModels(ModelRegistryEvent event) {
 		//registerModel(SpellTome.instance(), 0, SpellTome.id);
 		registerModel(NostrumGuide.instance(), 0, NostrumGuide.id);
 		registerModel(SpellcraftGuide.instance(), 0, SpellcraftGuide.id);
@@ -389,7 +390,7 @@ public class ClientProxy extends CommonProxy {
 		for (DragonArmor armor : DragonArmor.GetAllArmors()) {
 			registerModel(armor, 0, armor.getResourceLocation());
 		}
-		registerModel(MirrorShield.instance(), 0, MirrorShield.id);
+		registerModel(MirrorShield.instance(), 0, MirrorShield.ID);
 		registerModel(MirrorShieldImproved.instance(), 0, MirrorShieldImproved.id);
 		
 		registerModel(MagicSwordBase.instance(), 0, MagicSwordBase.instance().getModelID());
@@ -558,17 +559,6 @@ public class ClientProxy extends CommonProxy {
 					element.ordinal(),
 					EssenceItem.ID);
 		}
-		IItemColor tinter = new IItemColor() {
-			@Override
-			public int colorMultiplier(ItemStack stack, int tintIndex) {
-				EMagicElement element = EssenceItem.findType(stack);
-				return element.getColor();
-			}
-			
-		};
-		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(tinter,
-				EssenceItem.instance()
-				);
 		
 		for (HookshotType type : HookshotType.values()) {
 			registerModel(HookshotItem.instance(),
@@ -611,6 +601,21 @@ public class ClientProxy extends CommonProxy {
 				ItemDuct.ID);
 		
 		registerEntityRenderers();
+	}
+	
+	@SubscribeEvent
+	public void registerColorHandlers(ColorHandlerEvent.Item ev) {
+		IItemColor tinter = new IItemColor() {
+			@Override
+			public int colorMultiplier(ItemStack stack, int tintIndex) {
+				EMagicElement element = EssenceItem.findType(stack);
+				return element.getColor();
+			}
+			
+		};
+		ev.getItemColors().registerItemColorHandler(tinter,
+				EssenceItem.instance()
+				);
 	}
 	
 	public static void registerModel(Item item, int meta, String modelName) {

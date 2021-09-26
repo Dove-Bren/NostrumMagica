@@ -13,6 +13,10 @@ public class NostrumTameLightning extends EntityLightningBolt {
 	
 	/** Declares which state the lightning bolt is in. Whether it's in the air, hit the ground, etc. */
 	private int lightningState;
+	
+	public NostrumTameLightning(World worldIn) {
+		this(worldIn, 0, 0, 0);
+	}
 
 	public NostrumTameLightning(World worldIn, double x, double y, double z) {
 		super(worldIn, x, y, z, true);

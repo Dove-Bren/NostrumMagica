@@ -560,15 +560,17 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	public static int GetSetCount(EntityLivingBase entity, EMagicElement element, int level) {
 		int count = 0;
 		
-		for (EntityEquipmentSlot slot : new EntityEquipmentSlot[]{EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET}) {
-			ItemStack inSlot = entity.getItemStackFromSlot(slot);
-			if (inSlot.isEmpty() || !(inSlot.getItem() instanceof EnchantedArmor)) {
-				continue;
-			}
-			
-			EnchantedArmor item = (EnchantedArmor) inSlot.getItem();
-			if (item.getElement() == element && item.getLevel() == level) {
-				count++;
+		if (entity != null) {
+			for (EntityEquipmentSlot slot : new EntityEquipmentSlot[]{EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET}) {
+				ItemStack inSlot = entity.getItemStackFromSlot(slot);
+				if (inSlot.isEmpty() || !(inSlot.getItem() instanceof EnchantedArmor)) {
+					continue;
+				}
+				
+				EnchantedArmor item = (EnchantedArmor) inSlot.getItem();
+				if (item.getElement() == element && item.getLevel() == level) {
+					count++;
+				}
 			}
 		}
 		
@@ -1015,7 +1017,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		final boolean showFull = Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());
-		final int setCount = this.getSetPieces(NostrumMagica.proxy.getPlayer());
+		final @Nullable EntityPlayer player = NostrumMagica.proxy.getPlayer();
+		final int setCount = this.getSetPieces(player);
 		
 		final String setName = I18n.format("item.armor.set." + element.name().toLowerCase() + "." + level + ".name", new Object[0]);
 		if (showFull) {
@@ -1026,48 +1029,51 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			tooltip.add(I18n.format("info.armor.set_status", setName, setCount, countFormat, "" + ChatFormatting.RESET));
 		}
 		
-		synchronized(setMapInst) {
-			setMapInst.clear();
-			
-			if (showFull) {
-				// Show total
-				for (EMagicElement targElem : EMagicElement.values()) {
-					final double reduc = calcMagicSetReductTotal(element, 4, targElem);
-					setMapInst.put(AttributeMagicReduction.instance(targElem), reduc);
-				}
-			} else {
-				// Show current
-				FindCurrentSetBonus(setMapInst, NostrumMagica.proxy.getPlayer(), element, level); // puts into setMapInst
-			}
-			
-			if (!setMapInst.isEmpty()) {
-				for (Entry<IAttribute, Double> entry : setMapInst.entrySet()) {
-					Double val = entry.getValue();
-					if (val == null || val == 0) {
-						continue;
-					}
-					
-					// Formatting here copied from Vanilla
-					if (val > 0) {
-						tooltip.add(TextFormatting.BLUE + " " + I18n.format("attribute.modifier.plus.0", String.format("%.2f", val), I18n.format("attribute.name." + (String)entry.getKey().getName())));
-					} else {
-						val = -val;
-						tooltip.add(TextFormatting.RED + " " + I18n.format("attribute.modifier.take.0", String.format("%.2f", val), I18n.format("attribute.name." + (String)entry.getKey().getName())));
-					}
-				}
-			}
-		}
+		if (player != null) {
 		
-		// Also show special bonuses
-		// TODO make this a bit more... extensible?
-		if (showFull || setCount == 4) {
-			final String key = "info.armor.set_bonus." + element.name().toLowerCase() + "." + level;
-			if (I18n.hasKey(key)) {
-				final String full = I18n.format(key, new Object[0]);
-				for (String line : full.split("\\|"))
-				tooltip.add(ChatFormatting.DARK_PURPLE + " "
-						+ line
-						+ ChatFormatting.RESET);
+			synchronized(setMapInst) {
+				setMapInst.clear();
+				
+				if (showFull) {
+					// Show total
+					for (EMagicElement targElem : EMagicElement.values()) {
+						final double reduc = calcMagicSetReductTotal(element, 4, targElem);
+						setMapInst.put(AttributeMagicReduction.instance(targElem), reduc);
+					}
+				} else {
+					// Show current
+					FindCurrentSetBonus(setMapInst, player, element, level); // puts into setMapInst
+				}
+				
+				if (!setMapInst.isEmpty()) {
+					for (Entry<IAttribute, Double> entry : setMapInst.entrySet()) {
+						Double val = entry.getValue();
+						if (val == null || val == 0) {
+							continue;
+						}
+						
+						// Formatting here copied from Vanilla
+						if (val > 0) {
+							tooltip.add(TextFormatting.BLUE + " " + I18n.format("attribute.modifier.plus.0", String.format("%.2f", val), I18n.format("attribute.name." + (String)entry.getKey().getName())));
+						} else {
+							val = -val;
+							tooltip.add(TextFormatting.RED + " " + I18n.format("attribute.modifier.take.0", String.format("%.2f", val), I18n.format("attribute.name." + (String)entry.getKey().getName())));
+						}
+					}
+				}
+			}
+			
+			// Also show special bonuses
+			// TODO make this a bit more... extensible?
+			if (showFull || setCount == 4) {
+				final String key = "info.armor.set_bonus." + element.name().toLowerCase() + "." + level;
+				if (I18n.hasKey(key)) {
+					final String full = I18n.format(key, new Object[0]);
+					for (String line : full.split("\\|"))
+					tooltip.add(ChatFormatting.DARK_PURPLE + " "
+							+ line
+							+ ChatFormatting.RESET);
+				}
 			}
 		}
 	}

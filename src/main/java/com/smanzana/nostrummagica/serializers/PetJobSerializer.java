@@ -7,15 +7,13 @@ import com.smanzana.nostrummagica.entity.PetInfo;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializer;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
-import net.minecraftforge.registries.DataSerializerEntry;
 
 public final class PetJobSerializer implements DataSerializer<PetInfo.PetAction> {
 	
 	public static PetJobSerializer instance = new PetJobSerializer();
 	
 	private PetJobSerializer() {
-		ForgeRegistries.DATA_SERIALIZERS.register(new DataSerializerEntry(this));
+		;
 	}
 	
 	@Override

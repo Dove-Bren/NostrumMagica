@@ -116,7 +116,6 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.EntityEntry;
@@ -126,7 +125,6 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.DataSerializerEntry;
 import net.minecraftforge.registries.IForgeRegistry;
 
-@Mod.EventBusSubscriber(modid = NostrumMagica.MODID)
 public class CommonProxy {
 	
 	public CapabilityHandler capabilityHandler;
@@ -192,7 +190,7 @@ public class CommonProxy {
     }
     
     @SubscribeEvent
-    private void registerPotions(RegistryEvent.Register<Potion> event) {
+    public void registerPotions(RegistryEvent.Register<Potion> event) {
     	final IForgeRegistry<Potion> registry = event.getRegistry();
     	
     	registry.register(RootedPotion.instance());
@@ -210,7 +208,7 @@ public class CommonProxy {
    
     
     @SubscribeEvent
-    private void registerEntities(RegistryEvent.Register<EntityEntry> event) {
+    public void registerEntities(RegistryEvent.Register<EntityEntry> event) {
     	int entityID = 0;
     	final IForgeRegistry<EntityEntry> registry = event.getRegistry();
     	registry.register(EntityEntryBuilder.create()
@@ -373,19 +371,19 @@ public class CommonProxy {
     }
     
     @SubscribeEvent
-    private void registerEnchantments(RegistryEvent.Register<Enchantment> event) {
+    public void registerEnchantments(RegistryEvent.Register<Enchantment> event) {
     	event.getRegistry().register(EnchantmentManaRecovery.instance());
     }
     
     @SubscribeEvent
-    private void registerSounds(RegistryEvent.Register<SoundEvent> event) {
+    public void registerSounds(RegistryEvent.Register<SoundEvent> event) {
 		for (NostrumMagicaSounds sound : NostrumMagicaSounds.values()) {
 			event.getRegistry().register(sound.getEvent());
 		}
     }
     
     @SubscribeEvent
-    private void registerCustomRecipes(RegistryEvent.Register<IRecipe> event) {
+    public void registerCustomRecipes(RegistryEvent.Register<IRecipe> event) {
     	final IForgeRegistry<IRecipe> registry = event.getRegistry();
     	
     	registry.register(new SpellRune.RuneRecipe());
@@ -393,14 +391,14 @@ public class CommonProxy {
     }
     
     @SubscribeEvent
-    private void registerDataSerializers(RegistryEvent.Register<DataSerializerEntry> event) {
+    public void registerDataSerializers(RegistryEvent.Register<DataSerializerEntry> event) {
     	final IForgeRegistry<DataSerializerEntry> registry = event.getRegistry();
     	
-    	registry.register(new DataSerializerEntry(DragonArmorMaterialSerializer.instance));
-    	registry.register(new DataSerializerEntry(OptionalDragonArmorMaterialSerializer.instance));
-    	registry.register(new DataSerializerEntry(MagicElementDataSerializer.instance));
-    	registry.register(new DataSerializerEntry(HookshotTypeDataSerializer.instance));
-    	registry.register(new DataSerializerEntry(PetJobSerializer.instance));
+    	registry.register(new DataSerializerEntry(DragonArmorMaterialSerializer.instance).setRegistryName("nostrum.serial.dragon_armor"));
+    	registry.register(new DataSerializerEntry(OptionalDragonArmorMaterialSerializer.instance).setRegistryName("nostrum.serial.dragon_armor_opt"));
+    	registry.register(new DataSerializerEntry(MagicElementDataSerializer.instance).setRegistryName("nostrum.serial.element"));
+    	registry.register(new DataSerializerEntry(HookshotTypeDataSerializer.instance).setRegistryName("nostrum.serial.hookshot_type"));
+    	registry.register(new DataSerializerEntry(PetJobSerializer.instance).setRegistryName("nostrum.serial.pet_job"));
     }
     
     public void syncPlayer(EntityPlayerMP player) {
