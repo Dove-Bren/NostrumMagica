@@ -220,7 +220,7 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public void preinit() {
-		super.preinit(); // registers for event handling
+		super.preinit();
 		
 		bindingCast = new KeyBinding("key.cast.desc", Keyboard.KEY_LCONTROL, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingCast);
@@ -229,6 +229,39 @@ public class ClientProxy extends CommonProxy {
 		bindingInfo = new KeyBinding("key.infoscreen.desc", Keyboard.KEY_HOME, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingInfo);
 		
+		
+    	
+    	TileEntitySymbolRenderer.init();
+    	TileEntityCandleRenderer.init();
+    	TileEntityAltarRenderer.init();
+    	TileEntityObeliskRenderer.init();
+    	TileEntityPortalRenderer.init();
+    	TileEntityProgressionDoorRenderer.init();
+    	
+    	EnchantedArmor.ClientInit();
+    	
+    	OBJLoader.INSTANCE.addDomain(NostrumMagica.MODID);
+    	
+    	MinecraftForge.EVENT_BUS.register(this);
+	}
+	
+	@Override
+	public void init() {
+		super.init();
+	}
+	
+	@Override
+	public void postinit() {
+		this.overlayRenderer = new OverlayRenderer();
+		this.effectRenderer = ClientEffectRenderer.instance();
+		
+		initDefaultEffects(this.effectRenderer);
+		ClientCommandHandler.instance.registerCommand(new CommandInfoScreenGoto());
+		
+		super.postinit();
+	}
+	
+	private void registerItemVariants(ModelRegistryEvent event) {
 		ResourceLocation variants[] = new ResourceLocation[ReagentType.values().length];
 		int i = 0;
 		for (ReagentType type : ReagentType.values()) {
@@ -335,39 +368,13 @@ public class ClientProxy extends CommonProxy {
     	
     	variants = list.toArray(new ResourceLocation[0]);
     	ModelBakery.registerItemVariants(HookshotItem.instance(), variants);
-    	
-    	TileEntitySymbolRenderer.init();
-    	TileEntityCandleRenderer.init();
-    	TileEntityAltarRenderer.init();
-    	TileEntityObeliskRenderer.init();
-    	TileEntityPortalRenderer.init();
-    	TileEntityProgressionDoorRenderer.init();
-    	
-    	EnchantedArmor.ClientInit();
-    	
-    	OBJLoader.INSTANCE.addDomain(NostrumMagica.MODID);
-    	
-    	MinecraftForge.EVENT_BUS.register(this);
-	}
-	
-	@Override
-	public void init() {
-		super.init();
-	}
-	
-	@Override
-	public void postinit() {
-		this.overlayRenderer = new OverlayRenderer();
-		this.effectRenderer = ClientEffectRenderer.instance();
-		
-		initDefaultEffects(this.effectRenderer);
-		ClientCommandHandler.instance.registerCommand(new CommandInfoScreenGoto());
-		
-		super.postinit();
 	}
 	
 	@SubscribeEvent
 	public void registerAllModels(ModelRegistryEvent event) {
+		
+		registerItemVariants(event);
+		
 		//registerModel(SpellTome.instance(), 0, SpellTome.id);
 		registerModel(NostrumGuide.instance(), 0, NostrumGuide.id);
 		registerModel(SpellcraftGuide.instance(), 0, SpellcraftGuide.id);
