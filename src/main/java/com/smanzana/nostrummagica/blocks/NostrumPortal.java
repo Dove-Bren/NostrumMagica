@@ -53,10 +53,10 @@ public abstract class NostrumPortal extends Block  {
         return true;
     }
 	
-//	@Override
-//	public boolean isVisuallyOpaque() {
-//		return false;
-//	}
+	@Override
+	public boolean isFullCube(IBlockState state) {
+		return false;
+	}
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {

@@ -62,10 +62,10 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
         return false;
     }
 	
-//	@Override
-//	public boolean isVisuallyOpaque() {
-//		return false;
-//	}
+	@Override
+	public boolean isFullCube(IBlockState state) {
+		return false;
+	}
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {

@@ -60,11 +60,6 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 		return ALTAR_AABB;
 	}
 	
-//	@Override
-//	public boolean isVisuallyOpaque() {
-//		return false;
-//	}
-	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
 		return false;

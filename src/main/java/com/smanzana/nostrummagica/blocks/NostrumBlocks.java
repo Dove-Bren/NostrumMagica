@@ -52,7 +52,7 @@ public class NostrumBlocks {
 	private void registerBlockItem(Block block, String registryName, IForgeRegistry<Item> registry) {
 		registerBlockItem(block, registryName, null, registry);
 	}
-
+	
     @SubscribeEvent
     public void registerItems(RegistryEvent.Register<Item> event) {
     	final IForgeRegistry<Item> registry = event.getRegistry();
@@ -71,8 +71,8 @@ public class NostrumBlocks {
     	registerBlockItem(ProgressionDoor.instance(), ProgressionDoor.ID, registry);
     	registerBlockItem(LogicDoor.instance(), LogicDoor.ID, registry);
     	registerBlockItem(SwitchBlock.instance(), SwitchBlock.ID, registry);
-    	registerBlockItem(MimicBlock.door(), MimicBlock.ID_DOOR, registry);
-    	registerBlockItem(MimicBlock.facade(), MimicBlock.ID_FACADE, registry);
+//    	registerBlockItem(MimicBlock.door(), MimicBlock.ID_DOOR, registry);
+//    	registerBlockItem(MimicBlock.facade(), MimicBlock.ID_FACADE, registry);
     	registerBlockItem(TeleportRune.instance(), TeleportRune.ID, registry);
     	registerBlockItem(PutterBlock.instance(), PutterBlock.ID, registry);
     	registerBlockItem(ActiveHopper.instance, ActiveHopper.ID, registry);
@@ -87,6 +87,15 @@ public class NostrumBlocks {
     			(new ItemMultiTexture(DungeonBlock.instance(), DungeonBlock.instance(), variants))
     			.setRegistryName(DungeonBlock.ID)
     		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(DungeonBlock.ID));
+    	
+    	registry.register((new ItemMultiTexture(MimicBlock.door(), MimicBlock.door(), new String[] {
+    			"breakable", // 0 meta
+    			"unbreakable", // 1 meta
+    		})).setRegistryName(MimicBlock.ID_DOOR).setCreativeTab(NostrumMagica.creativeTab));
+    	registry.register((new ItemMultiTexture(MimicBlock.facade(), MimicBlock.facade(), new String[] {
+    			"breakable", // 0 meta
+    			"unbreakable", // 1 meta
+    		})).setRegistryName(MimicBlock.ID_FACADE).setCreativeTab(NostrumMagica.creativeTab));
     	
     }
     
@@ -119,6 +128,28 @@ public class NostrumBlocks {
     	registerBlock(SorceryPortalSpawner.instance(), SorceryPortalSpawner.ID, registry);
     	registerBlock(ManiCrystal.instance(), ManiCrystal.ID, registry);
     	registerBlock(CropEssence.instance(), CropEssence.ID, registry);
+    	
+    	registerBlock(MagicWall.instance(), MagicWall.ID, registry);
+    	registerBlock(CursedIce.instance(), CursedIce.ID, registry);
+    	registerBlock(ManiOre.instance(), ManiOre.ID, registry);
+    	registerBlock(MagicDirt.instance(), MagicDirt.ID, registry);
+    	registerBlock(NostrumSingleSpawner.instance(), NostrumSingleSpawner.ID, registry);
+    	registerBlock(NostrumSpawnAndTrigger.instance(), NostrumSpawnAndTrigger.ID, registry);
+    	registerBlock(Candle.instance(), Candle.ID, registry);
+    	registerBlock(EssenceOre.instance(), EssenceOre.ID, registry);
+    	registerBlock(ModificationTable.instance(), ModificationTable.ID, registry);
+    	registerBlock(LoreTable.instance(), LoreTable.ID, registry);
+    	registerBlock(SorceryPortal.instance(), SorceryPortal.ID, registry);
+    	registerBlock(ProgressionDoor.instance(), ProgressionDoor.ID, registry);
+    	registerBlock(LogicDoor.instance(), LogicDoor.ID, registry);
+    	registerBlock(SwitchBlock.instance(), SwitchBlock.ID, registry);
+    	registerBlock(MimicBlock.door(), MimicBlock.ID_DOOR, registry);
+    	registerBlock(MimicBlock.facade(), MimicBlock.ID_FACADE, registry);
+    	registerBlock(TeleportRune.instance(), TeleportRune.ID, registry);
+    	registerBlock(PutterBlock.instance(), PutterBlock.ID, registry);
+    	registerBlock(ActiveHopper.instance, ActiveHopper.ID, registry);
+    	registerBlock(ItemDuct.instance, ItemDuct.ID, registry);
+    	
     	
 //			GameRegistry.addRecipe(new ItemStack(MagicDirt.instance()), " D ", "DCD", " D ",
 //					'D', new ItemStack(Blocks.DIRT, 1, OreDictionary.WILDCARD_VALUE),

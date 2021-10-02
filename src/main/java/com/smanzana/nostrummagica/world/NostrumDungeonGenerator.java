@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.function.Function;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig;
@@ -105,18 +106,26 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 //			 .add(new RoomEnd1(false, false));
 	
 	public static enum DungeonGen {
-		PORTAL(new WorldGenNostrumShrine(PORTAL_DUNGEON), 20, 70),
-		DRAGON(new WorldGenNostrumShrine(DRAGON_DUNGEON), 30, 60);
+		PORTAL((i) -> { return new WorldGenNostrumShrine(PORTAL_DUNGEON);}, 20, 70),
+		DRAGON((i) -> { return new WorldGenNostrumShrine(DRAGON_DUNGEON);}, 30, 60);
 //		TEST(new WorldGenNostrumShrine(new NostrumLoadedDungeon("test", new StartRoom(), new RoomArena())), 30, 60);
 		
-		private WorldGenerator gen;
-		private int minY;
-		private int maxY;
+		private WorldGenerator gen = null;
+		private final Function<Integer, WorldGenerator> constructor;
+		private final int minY;
+		private final int maxY;
 		
-		private DungeonGen(WorldGenerator gen, int minY, int maxY) {
-			this.gen = gen;
+		private DungeonGen(Function<Integer, WorldGenerator> constructor, int minY, int maxY) {
+			this.constructor = constructor;
 			this.minY = minY;
 			this.maxY = maxY;
+		}
+		
+		public void initGen() {
+			if (this.gen != null) {
+				throw new RuntimeException("Init called twice on smae DungeonGen enum value");
+			}
+			gen = constructor.apply(0);
 		}
 		
 		public WorldGenerator getGenerator() {
@@ -152,6 +161,12 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 			count *= Math.max(1, Math.min(MAX_BOOSTS, bonusOdds + 1));
 			
 			return random.nextInt(chance) < count;
+		}
+	}
+	
+	public static void initGens() {
+		for (DungeonGen gen : DungeonGen.values()) {
+			gen.initGen();
 		}
 	}
 	

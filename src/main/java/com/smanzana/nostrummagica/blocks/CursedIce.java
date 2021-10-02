@@ -65,11 +65,6 @@ public class CursedIce extends Block {
         return false;
     }
 	
-//	@Override
-//	public boolean isVisuallyOpaque() {
-//		return false;
-//	}
-	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
 		return false;

@@ -69,11 +69,6 @@ public class SwitchBlock extends Block {
 		return SWITCH_BLOCK_AABB;
 	}
 	
-//	@Override
-//	public boolean isVisuallyOpaque() {
-//		return false;
-//	}
-	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
 		return false;

@@ -127,6 +127,10 @@ public class RoomBlueprint {
 			}
 		}
 		
+		protected void fixupOldTEs(String newID) {
+			tileEntityData.setString("id", newID);
+		}
+		
 		public static final String NBT_BLOCK = "block_id";
 		public static final String NBT_BLOCK_TYPE = "block_type";
 		public static final String NBT_BLOCK_STATE = "block_meta";
@@ -531,7 +535,22 @@ public class RoomBlueprint {
 				NBTTagCompound tileEntityData = block.getTileEntityData();
 				if (tileEntityData != null) {
 					TileEntity te = TileEntity.create(world, tileEntityData.copy());
-					world.setTileEntity(at, te);
+					if (te == null) {
+						// Before 1.12.2 ids weren't namespaced. Now they are. Check if it's an old Nostrum TE
+						final NBTTagCompound copy = tileEntityData.copy();
+						final String newID = NostrumMagica.MODID + ":" + copy.getString("id");
+						copy.setString("id", newID);
+						te = TileEntity.create(world, copy);
+						if (te != null) {
+							block.fixupOldTEs(newID);
+						}
+					}
+					
+					if (te != null) {
+						world.setTileEntity(at, te);
+					} else {
+						NostrumMagica.logger.error("Could not deserialize TileEntity with id \"" + tileEntityData.getString("id") + "\"");
+					}
 				}
 			} else {
 				world.removeTileEntity(at);

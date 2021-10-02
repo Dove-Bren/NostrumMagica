@@ -161,6 +161,7 @@ import com.smanzana.nostrummagica.trials.TrialLightning;
 import com.smanzana.nostrummagica.trials.TrialPhysical;
 import com.smanzana.nostrummagica.trials.TrialWind;
 import com.smanzana.nostrummagica.world.NostrumChunkLoader;
+import com.smanzana.nostrummagica.world.NostrumDungeonGenerator;
 import com.smanzana.nostrummagica.world.NostrumDungeonGenerator.DungeonGen;
 import com.smanzana.nostrummagica.world.NostrumLootHandler;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensionMapper;
@@ -237,13 +238,16 @@ public class NostrumMagica
     	registerDefaultQuests();
     	registerDefaultTrials();
     	registerDefaultResearch();
+
+        new NostrumLootHandler();
+    	DungeonRoomRegistry.instance().loadRegistryFromDisk();
+        NostrumDimensionMapper.registerDimensions();
+        NostrumDungeonGenerator.initGens();
     	
         proxy.init();
         aetheria.init();
         baubles.init();
         enderIO.init();
-        new NostrumLootHandler();
-        NostrumDimensionMapper.registerDimensions();
     }
     
     @EventHandler
@@ -285,8 +289,6 @@ public class NostrumMagica
     	aetheria.preInit();
     	baubles.preInit();
     	enderIO.preInit();
-    	
-    	DungeonRoomRegistry.instance().loadRegistryFromDisk();
     	
     	RitualRegistry.instance();
 

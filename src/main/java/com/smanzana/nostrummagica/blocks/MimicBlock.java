@@ -172,8 +172,13 @@ public class MimicBlock extends BlockDirectional {
 			Vec3d center = new Vec3d(entityBox.minX + (entityBox.maxX - entityBox.minX) * 0.5D, entityBox.minY + (entityBox.maxY - entityBox.minY) * 0.5D, entityBox.minZ + (entityBox.maxZ - entityBox.minZ) * 0.5D);
 			
 			// XZ motion isn't stored on the server and is handled client-side
-			double dx = entityIn.posX - entityIn.lastTickPosX;
-			double dz = entityIn.posZ - entityIn.lastTickPosZ;
+			// Server also resets lastPos in an inconvenient way.
+			final double dx = worldIn.isRemote
+					? (entityIn.motionX)
+					: (entityIn.posX - NostrumMagica.playerListener.getLastTickPos(entityIn).x);
+			final double dz = worldIn.isRemote
+					? (entityIn.motionZ)
+					: (entityIn.posZ - NostrumMagica.playerListener.getLastTickPos(entityIn).z);
 			
 			// Offset center back to old position to prevent sneaking back inside!
 			center = center.addVector(-dx, 0, -dz);
@@ -226,10 +231,10 @@ public class MimicBlock extends BlockDirectional {
         return true;
     }
 	
-//	@Override
-//	public boolean isVisuallyOpaque() {
-//		return false;
-//	}
+	@Override
+	public boolean isFullCube(IBlockState state) {
+		return false;
+	}
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {

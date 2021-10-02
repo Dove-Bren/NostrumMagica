@@ -127,10 +127,10 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 		super.updateTick(worldIn, pos, state, rand);
 	}
 	
-//	@Override
-//	public boolean isVisuallyOpaque() {
-//		return false;
-//	}
+	@Override
+	public boolean isFullCube(IBlockState state) {
+		return false;
+	}
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {

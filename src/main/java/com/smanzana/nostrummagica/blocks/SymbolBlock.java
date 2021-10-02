@@ -48,11 +48,6 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
 		this.setLightOpacity(16);
 	}
 	
-//	@Override
-//	public boolean isVisuallyOpaque() {
-//		return false;
-//	}
-	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
 		return false;

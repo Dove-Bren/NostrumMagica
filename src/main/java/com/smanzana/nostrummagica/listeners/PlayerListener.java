@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.listeners;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -984,6 +985,8 @@ public class PlayerListener {
 			for (World world : DimensionManager.getWorlds()) {
 				EnchantedArmor.ServerWorldTick(world);
 			}
+		} else if (event.phase == Phase.END) {
+			updateTrackedEntities();
 		}
 	}
 	
@@ -1163,6 +1166,37 @@ public class PlayerListener {
 			if (info.entity == null || info.entity.equals(entity)) {
 				if (entry.getKey().onEvent(Event.MAGIC_EFFECT, entity, new SpellActionListenerData(entity, caster, summary)))
 					it.remove();
+			}
+		}
+	}
+	
+	protected Map<Entity, Vec3d> lastPosCache = new HashMap<>();
+	
+	/**
+	 * Returns the position of an entity at the end of server ticking the last time it happened.
+	 * This can serve as 'what position did the entity end up at last tick'.
+	 * If entity is not tracked, returns its current position as a best-guess.
+	 * @param ent
+	 * @return
+	 */
+	public Vec3d getLastTickPos(Entity ent) {
+		Vec3d ret = lastPosCache.get(ent);
+		if (ret == null) {
+			ret = ent.getPositionVector();
+			lastPosCache.put(ent, ret);
+		}
+		return ret;
+	}
+	
+	protected void updateTrackedEntities() {
+		// Look at entities being tracked. If dead or removed, remove from tracking. Else stash their current positions.
+		Iterator<Entry<Entity, Vec3d>> it = lastPosCache.entrySet().iterator();
+		while (it.hasNext()) {
+			Entry<Entity, Vec3d> entry = it.next();
+			if (entry.getKey() == null || entry.getKey().isDead) {
+				it.remove();
+			} else {
+				entry.setValue(entry.getKey().getPositionVector());
 			}
 		}
 	}
