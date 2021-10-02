@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger.ProjectileTriggerInstance;
 
@@ -22,7 +23,7 @@ import net.minecraft.world.World;
 
 public class EntitySpellProjectile extends EntityFireball {
 	
-	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(EntitySpellProjectile.class, EMagicElement.Serializer);
+	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(EntitySpellProjectile.class, MagicElementDataSerializer.instance);
 	
 	private ProjectileTriggerInstance trigger;
 	private double maxDistance; // Squared distance so no sqrt
@@ -107,7 +108,7 @@ public class EntitySpellProjectile extends EntityFireball {
 		} else {
 			int color = getElement().getColor();
 			color = (0x19000000) | (color & 0x00FFFFFF);
-			NostrumParticles.GLOW_ORB.spawn(worldObj, new SpawnParams(
+			NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 					2,
 					posX, posY + height/2f, posZ, 0, 40, 0,
 					new Vec3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), false

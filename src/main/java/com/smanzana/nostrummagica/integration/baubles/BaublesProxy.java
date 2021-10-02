@@ -299,7 +299,7 @@ public class BaublesProxy {
 				new ItemStack[] {new ItemStack(APIProxy.PassivePendantItem, 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), null, new ItemStack(APIProxy.PassivePendantItem, 1, OreDictionary.WILDCARD_VALUE)},
 				new RRequirementResearch("aether_cloaks"),
 				new OutcomeModifyCenterItemGeneric((world, player, item, otherItems, centerPos, recipeIn) -> {
-					if (item != null && item.getItem() instanceof ItemAetherCloak) {
+					if (!item.isEmpty() && item.getItem() instanceof ItemAetherCloak) {
 						((ItemAetherCloak) item.getItem()).setAetherCaster(item, true);
 					}
 				}, Lists.newArrayList("Allows using aether from the cloak in place of reagents")));

@@ -44,13 +44,13 @@ public class ModelAetherCloak extends ModelBase {
 		final EntityLivingBase living = (EntityLivingBase) entityIn;
 		final float objScale = .425f;
 		final boolean isFlying = living.isElytraFlying();
-		final boolean hasChestpiece = (living.getItemStackFromSlot(EntityEquipmentSlot.CHEST) != null);
+		final boolean hasChestpiece = (!living.getItemStackFromSlot(EntityEquipmentSlot.CHEST).isEmpty());
 		final @Nullable ResourceLocation[] textures = provider.getCapeTextures(living, stack);
 		
 		// Get how 'forward' we're moving for cape rotation
 		Vec3d look = entityIn.getLook(ageInTicks % 1f);
 		double motionForward = look
-				.subtract(0, look.yCoord, 0)
+				.subtract(0, look.y, 0)
 				.dotProduct(new Vec3d(entityIn.motionX, 0, entityIn.motionZ));
 		float rot = -10f;
 		final float moveMaxRot = (!isFlying && motionForward > 0 ? -20f : 10f);

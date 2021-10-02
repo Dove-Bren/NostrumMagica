@@ -5,11 +5,11 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.utils.ColorUtil;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.GlStateManager.DestFactor;
 import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
@@ -60,7 +60,7 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 	}
 	
 	public ParticleLightningStatic setMotion(Vec3d motion) {
-		return this.setMotion(motion.xCoord, motion.yCoord, motion.zCoord);
+		return this.setMotion(motion.x, motion.y, motion.z);
 	}
 	
 	public ParticleLightningStatic setMotion(double xVelocity, double yVelocity, double zVelocity) {
@@ -130,7 +130,7 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 	}
 
 	@Override
-	public void renderBatched(VertexBuffer buffer, float partialTicks) {
+	public void renderBatched(BufferBuilder buffer, float partialTicks) {
 		BatchRenderParticle.RenderQuad(buffer, this, renderParams, partialTicks, .05f);
 	}
 	

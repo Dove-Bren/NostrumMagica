@@ -55,12 +55,12 @@ public class MagicBuffPotion extends Potion {
     public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
 		PotionIcon.ENCHANT.draw(mc, x + 6, y + 7);
 		
-		EffectData data = NostrumMagica.magicEffectProxy.getData(mc.thePlayer, SpecialEffect.MAGIC_BUFF);
+		EffectData data = NostrumMagica.magicEffectProxy.getData(mc.player, SpecialEffect.MAGIC_BUFF);
 		int count = data == null ? 0 : data.getCount();
 		if (count > 0) {
 			String display = "" + count;
-			int width = mc.fontRendererObj.getStringWidth(display);
-			mc.fontRendererObj.drawString("" + count, x + 6 + (20 - width), y + 7 + (20 - mc.fontRendererObj.FONT_HEIGHT), 0xFFFFFFFF);
+			int width = mc.fontRenderer.getStringWidth(display);
+			mc.fontRenderer.drawString("" + count, x + 6 + (20 - width), y + 7 + (20 - mc.fontRenderer.FONT_HEIGHT), 0xFFFFFFFF);
 		}
 		
 	}
@@ -70,12 +70,12 @@ public class MagicBuffPotion extends Potion {
     public void renderHUDEffect(int x, int y, PotionEffect effect, net.minecraft.client.Minecraft mc, float alpha) {
 		PotionIcon.ENCHANT.draw(mc, x + 3, y + 3);
 		
-		EffectData data = NostrumMagica.magicEffectProxy.getData(mc.thePlayer, SpecialEffect.MAGIC_BUFF);
+		EffectData data = NostrumMagica.magicEffectProxy.getData(mc.player, SpecialEffect.MAGIC_BUFF);
 		int count = data == null ? 0 : data.getCount();
 		if (count > 0) {
 			String display = "" + count;
-			int width = mc.fontRendererObj.getStringWidth(display);
-			mc.fontRendererObj.drawString("" + count, x + 6 + (16 - width), y + 7 + (16 - mc.fontRendererObj.FONT_HEIGHT), 0xFFFFFFFF);
+			int width = mc.fontRenderer.getStringWidth(display);
+			mc.fontRenderer.drawString("" + count, x + 6 + (16 - width), y + 7 + (16 - mc.fontRenderer.FONT_HEIGHT), 0xFFFFFFFF);
 		}
 		
 	}

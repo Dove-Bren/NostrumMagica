@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.client.particles;
 
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -25,7 +25,7 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 	 * Render to the provided vertex buffer in a nice cached manner.
 	 * Note: rotation should be saved from original render call
 	 */
-	public abstract void renderBatched(VertexBuffer wr, float partialTicks);
+	public abstract void renderBatched(BufferBuilder wr, float partialTicks);
 	
 	/**
 	 * Return the texture to use when rendering this particle
@@ -53,7 +53,7 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 	public abstract int compareTo(BatchRenderParticle o);
 	
 	@Override
-	public void renderParticle(VertexBuffer worldRendererIn, Entity entityIn, float partialTicks, float rotationX, float rotationXZ, float rotationZ, float rotationYZ, float rotationXY) {
+	public void renderParticle(BufferBuilder worldRendererIn, Entity entityIn, float partialTicks, float rotationX, float rotationXZ, float rotationZ, float rotationYZ, float rotationXY) {
 		renderParams.rotX = rotationX;
 		renderParams.rotXZ = rotationXZ;
 		renderParams.rotZ = rotationZ;
@@ -74,7 +74,7 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 		public float rotXY;
 	}
 	
-	public static void RenderQuad(VertexBuffer buffer, BatchRenderParticle particle, RenderParams params, float partialTicks, float scale) {
+	public static void RenderQuad(BufferBuilder buffer, BatchRenderParticle particle, RenderParams params, float partialTicks, float scale) {
 		final float offsetX = (float)(particle.prevPosX + (particle.posX - particle.prevPosX) * partialTicks - Particle.interpPosX);
 		final float offsetY = (float)(particle.prevPosY + (particle.posY - particle.prevPosY) * partialTicks - Particle.interpPosY);
 		final float offsetZ = (float)(particle.prevPosZ + (particle.posZ - particle.prevPosZ) * partialTicks - Particle.interpPosZ);

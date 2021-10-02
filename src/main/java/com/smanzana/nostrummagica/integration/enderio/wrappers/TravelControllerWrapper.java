@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.integration.enderio.wrappers;
 
 import crazypants.enderio.api.teleport.TravelSource;
-import crazypants.enderio.teleport.TravelController;
+import crazypants.enderio.base.teleport.TravelController;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
@@ -14,7 +14,7 @@ public class TravelControllerWrapper {
 	}
 	
 	public static boolean activateTravelAccessable(ItemStack equipped, EnumHand hand, World world, EntityPlayer player, TravelSource source) {
-		return TravelController.instance.activateTravelAccessable(equipped, hand, world, player, source);
+		return TravelController.activateTravelAccessable(equipped, hand, world, player, source);
 	}
 	
 }

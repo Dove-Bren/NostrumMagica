@@ -28,7 +28,7 @@ public class ClientTomeDropSpellMessage implements IMessage {
 			if (!message.tag.hasKey(NBT_TOME, NBT.TAG_INT) || !message.tag.hasKey(NBT_SPELL, NBT.TAG_INT))
 				return null;
 			
-			final EntityPlayerMP sp = ctx.getServerHandler().playerEntity;
+			final EntityPlayerMP sp = ctx.getServerHandler().player;
 			final int tomeID = message.tag.getInteger(NBT_TOME);
 			final int spellID = message.tag.getInteger(NBT_SPELL);
 			

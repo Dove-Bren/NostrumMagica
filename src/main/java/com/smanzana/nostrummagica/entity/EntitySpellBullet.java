@@ -64,7 +64,7 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 			double speed,
 			EnumParticleTypes particle,
 			boolean blockyPath) {
-		super(shooter.worldObj, shooter, target, axis);
+		super(shooter.world, shooter, target, axis);
 		this.steps = 1;
 		this.trigger = self;
 		this.shooter = shooter;
@@ -91,7 +91,7 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 	
 	@Override
 	public boolean attackEntityFrom(DamageSource source, float amount) {
-		if (!this.worldObj.isRemote) {
+		if (!this.world.isRemote) {
 			trigger.onProjectileHit(this.getPosition());
 		}
 		this.setDead();
@@ -137,11 +137,11 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 
 			if (currentAxis != EnumFacing.Axis.X)
 			{
-				if (blockpos1.getX() < targetPos.getX() && this.worldObj.isAirBlock(blockpos1.east()))
+				if (blockpos1.getX() < targetPos.getX() && this.world.isAirBlock(blockpos1.east()))
 				{
 					list.add(EnumFacing.EAST);
 				}
-				else if (blockpos1.getX() > targetPos.getX() && this.worldObj.isAirBlock(blockpos1.west()))
+				else if (blockpos1.getX() > targetPos.getX() && this.world.isAirBlock(blockpos1.west()))
 				{
 					list.add(EnumFacing.WEST);
 				}
@@ -149,11 +149,11 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 
 			if (currentAxis != EnumFacing.Axis.Y)
 			{
-				if (blockpos1.getY() < targetPos.getY() && this.worldObj.isAirBlock(blockpos1.up()))
+				if (blockpos1.getY() < targetPos.getY() && this.world.isAirBlock(blockpos1.up()))
 				{
 					list.add(EnumFacing.UP);
 				}
-				else if (blockpos1.getY() > targetPos.getY() && this.worldObj.isAirBlock(blockpos1.down()))
+				else if (blockpos1.getY() > targetPos.getY() && this.world.isAirBlock(blockpos1.down()))
 				{
 					list.add(EnumFacing.DOWN);
 				}
@@ -161,11 +161,11 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 
 			if (currentAxis != EnumFacing.Axis.Z)
 			{
-				if (blockpos1.getZ() < targetPos.getZ() && this.worldObj.isAirBlock(blockpos1.south()))
+				if (blockpos1.getZ() < targetPos.getZ() && this.world.isAirBlock(blockpos1.south()))
 				{
 					list.add(EnumFacing.SOUTH);
 				}
-				else if (blockpos1.getZ() > targetPos.getZ() && this.worldObj.isAirBlock(blockpos1.north()))
+				else if (blockpos1.getZ() > targetPos.getZ() && this.world.isAirBlock(blockpos1.north()))
 				{
 					list.add(EnumFacing.NORTH);
 				}
@@ -175,7 +175,7 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 
 			if (list.isEmpty())
 			{
-				for (int i = 5; !this.worldObj.isAirBlock(blockpos1.offset(enumfacing)) && i > 0; --i)
+				for (int i = 5; !this.world.isAirBlock(blockpos1.offset(enumfacing)) && i > 0; --i)
 				{
 					enumfacing = EnumFacing.random(this.rand);
 				}
@@ -194,7 +194,7 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 		double deltaX = targetX - this.posX;
 		double deltaY = targetY - this.posY;
 		double deltaZ = targetZ - this.posZ;
-		double dist = (double)MathHelper.sqrt_double(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+		double dist = (double)MathHelper.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
 
 		if (dist == 0.0D)
 		{
@@ -218,7 +218,7 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 	 */
 	public void onUpdate()
 	{
-		if (!this.worldObj.isRemote && this.worldObj.getDifficulty() == EnumDifficulty.PEACEFUL)
+		if (!this.world.isRemote && this.world.getDifficulty() == EnumDifficulty.PEACEFUL)
 		{
 			this.setDead();
 		}
@@ -227,7 +227,7 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 			//super.onUpdate();
 			this.onEntityUpdate();
 
-			if (!this.worldObj.isRemote)
+			if (!this.world.isRemote)
 			{
 				double dist = Double.MAX_VALUE;
 				if (this.target == null || !this.target.isEntityAlive() || this.target instanceof EntityPlayer && ((EntityPlayer)this.target).isSpectator())
@@ -240,9 +240,9 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 				else
 				{
 					dist = target.getPositionVector().addVector(0, target.height / 2, 0).distanceTo(this.getPositionVector());
-					this.targetDeltaX = MathHelper.clamp_double(this.targetDeltaX * 1.025D, -1.0D, 1.0D);
-					this.targetDeltaY = MathHelper.clamp_double(this.targetDeltaY * 1.025D, -1.0D, 1.0D);
-					this.targetDeltaZ = MathHelper.clamp_double(this.targetDeltaZ * 1.025D, -1.0D, 1.0D);
+					this.targetDeltaX = MathHelper.clamp(this.targetDeltaX * 1.025D, -1.0D, 1.0D);
+					this.targetDeltaY = MathHelper.clamp(this.targetDeltaY * 1.025D, -1.0D, 1.0D);
+					this.targetDeltaZ = MathHelper.clamp(this.targetDeltaZ * 1.025D, -1.0D, 1.0D);
 					final double adj = (this.blockyPath ? .2 : (dist < 2 ? .3 : .05));
 					this.motionX += (this.targetDeltaX - this.motionX) * adj;
 					this.motionY += (this.targetDeltaY - this.motionY) * adj;
@@ -263,9 +263,9 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 			this.setPosition(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
 			ProjectileHelper.rotateTowardsMovement(this, 0.5F);
 
-			if (this.worldObj.isRemote)
+			if (this.world.isRemote)
 			{
-				this.worldObj.spawnParticle(particle, this.posX - this.motionX, this.posY - this.motionY + 0.15D, this.posZ - this.motionZ, 0.0D, 0.0D, 0.0D, new int[0]);
+				this.world.spawnParticle(particle, this.posX - this.motionX, this.posY - this.motionY + 0.15D, this.posZ - this.motionZ, 0.0D, 0.0D, 0.0D, new int[0]);
 			}
 			else if (this.target != null && !this.target.isDead)
 			{
@@ -284,7 +284,7 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 					BlockPos blockpos = new BlockPos(this);
 					EnumFacing.Axis enumfacing$axis = this.direction.getAxis();
 
-					if (this.worldObj.isBlockNormalCube(blockpos.offset(this.direction), false))
+					if (this.world.isBlockNormalCube(blockpos.offset(this.direction), false))
 					{
 						this.selectNextMoveDirection(enumfacing$axis);
 					}

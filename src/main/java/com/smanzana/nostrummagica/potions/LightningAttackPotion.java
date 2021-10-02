@@ -31,9 +31,9 @@ public class LightningAttackPotion extends Potion {
 
 		this.setBeneficial();
 		this.setPotionName("potion.lightningattack.name");
+		this.setRegistryName(Resource);
 		this.registerPotionAttributeModifier(SharedMonsterAttributes.ATTACK_DAMAGE, "3AA5821F-0F7B-4E94-BF6C-7A58449F587B", 5.0D, 0);
 		this.registerPotionAttributeModifier(SharedMonsterAttributes.MOVEMENT_SPEED, "45e147fd-c876-48f2-b65a-6454fe86b46d".toUpperCase(), -0.5D, 2);
-		NostrumMagica.registerPotion(this, Resource);
 	}
 	
 	@Override

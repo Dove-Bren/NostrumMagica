@@ -1,8 +1,5 @@
 package com.smanzana.nostrummagica.spells.components.triggers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntitySpellBullet;
@@ -20,6 +17,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
@@ -110,7 +108,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 					if (target != null) {
 						Vec3d vec = target.getPositionVector().subtract(caster.getPositionVector());
 						forwardDir = vec.normalize();
-						axis = EnumFacing.getFacingFromVector((float) vec.xCoord, (float) vec.yCoord, (float) vec.zCoord).getAxis();
+						axis = EnumFacing.getFacingFromVector((float) vec.x, (float) vec.y, (float) vec.z).getAxis();
 					}
 					
 					// Start with motion ortho to forward
@@ -120,10 +118,10 @@ public class SeekingBulletTrigger extends SpellTrigger {
 					startMotion = startMotion.scale(.4);
 					
 					EntitySpellBullet bullet = new EntitySpellBullet(self, getState().getSelf(), target, axis);
-					bullet.motionX = startMotion.xCoord;
-					bullet.motionY = startMotion.yCoord;
-					bullet.motionZ = startMotion.zCoord;
-					//bullet.setVelocity(startMotion.xCoord, startMotion.yCoord, startMotion.zCoord); client only :(
+					bullet.motionX = startMotion.x;
+					bullet.motionY = startMotion.y;
+					bullet.motionZ = startMotion.z;
+					//bullet.setVelocity(startMotion.x, startMotion.y, startMotion.z); client only :(
 					
 					bullet.setFilter((ent) -> {
 						if (ent != null && getState().getSelf() != ent) {
@@ -143,7 +141,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 						return true;
 					});
 					
-					world.spawnEntityInWorld(bullet);
+					world.spawnEntity(bullet);
 			
 				}
 			
@@ -188,7 +186,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 	@Override
 	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw, SpellPartParam params) {
 		// Add direction
-		pos = new Vec3d(pos.xCoord, pos.yCoord + state.getSelf().getEyeHeight(), pos.zCoord);
+		pos = new Vec3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
 		return new SeekingBulletTriggerInstance(state, world, pos, pitch, yaw);
 	}
 
@@ -202,8 +200,8 @@ public class SeekingBulletTrigger extends SpellTrigger {
     }
 
 	@Override
-	public List<ItemStack> getReagents() {
-		List<ItemStack> list = new ArrayList<>(1);
+	public NonNullList<ItemStack> getReagents() {
+		NonNullList<ItemStack> list = NonNullList.create();
 		
 		list.add(ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1));
 		list.add(ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1));
@@ -232,7 +230,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 	}
 
 	@Override
-	public ItemStack[] supportedFloatCosts() {
+	public NonNullList<ItemStack> supportedFloatCosts() {
 		return null;
 	}
 

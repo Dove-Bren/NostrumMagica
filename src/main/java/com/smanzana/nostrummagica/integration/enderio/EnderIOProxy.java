@@ -139,7 +139,7 @@ public class EnderIOProxy {
 				new ItemStack[] {new ItemStack(Items.ENDER_PEARL), new ItemStack(EnderIOItemWrapper.GetItem(EnderIOItemType.TRAVEL_STAFF), 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), new ItemStack(Items.GOLD_INGOT)},
 				new RRequirementResearch("warlock_sword"),
 				new OutcomeModifyCenterItemGeneric((world, player, item, otherItems, centerPos, recipeIn) -> {
-					if (item != null && item.getItem() instanceof WarlockSword) {
+					if (!item.isEmpty() && item.getItem() instanceof WarlockSword) {
 						WarlockSword.setEnderIOTravel(item, true);
 					}
 				}, Lists.newArrayList("Allows teleportation to EnderIO Travel Anchors")));

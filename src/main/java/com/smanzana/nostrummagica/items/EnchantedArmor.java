@@ -630,12 +630,16 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		if (source.isDamageAbsolute() || source.isUnblockable()) {
 			return new ArmorProperties(1, 0.0, 0);
 		}
-		return new ArmorProperties(1, (double) this.armor / 25.0, Integer.MAX_VALUE);
+		
+		// This is deducted in addition to amount from attributes -- which cap out at diamond level.
+		// Subtract diamond level when calculating ratio
+		final int extraArmorPts = this.armor - ArmorMaterial.DIAMOND.getDamageReductionAmount(armorType);
+		return new ArmorProperties(1, Math.max(0, (double) extraArmorPts / 25.0), Integer.MAX_VALUE);
 	}
 
 	@Override
 	public int getArmorDisplay(EntityPlayer player, ItemStack armor, int slot) {
-		return this.armor;
+		return 0; // this.armor; this is now "extra" on top of attributes
 	}
 
 	@Override

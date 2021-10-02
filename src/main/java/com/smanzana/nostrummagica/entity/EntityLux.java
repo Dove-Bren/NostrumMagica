@@ -6,6 +6,7 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.function.Predicate;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.base.Optional;
@@ -33,6 +34,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MoverType;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
@@ -67,7 +69,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 	protected static final double MAX_WISP_DISTANCE_SQ = 144;
 	protected static final DataParameter<Optional<BlockPos>> HOME  = EntityDataManager.<Optional<BlockPos>>createKey(EntityLux.class, DataSerializers.OPTIONAL_BLOCK_POS);
 	protected static final DataParameter<Optional<UUID>> OWNER = EntityDataManager.<Optional<UUID>>createKey(EntityLux.class, DataSerializers.OPTIONAL_UNIQUE_ID);
-	protected static final DataParameter<Optional<ItemStack>> POLLINATED_ITEM = EntityDataManager.<Optional<ItemStack>>createKey(EntityLux.class, DataSerializers.OPTIONAL_ITEM_STACK);
+	protected static final DataParameter<ItemStack> POLLINATED_ITEM = EntityDataManager.<ItemStack>createKey(EntityLux.class, DataSerializers.ITEM_STACK);
 	protected static final DataParameter<Integer> COMMUNITY_SCORE = EntityDataManager.<Integer>createKey(EntityLux.class, DataSerializers.VARINT);
 	
 	// For display
@@ -146,7 +148,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 			@Override
 			public boolean shouldExecute() {
 				// Don't even try if we're already full
-				if (getPollinatedItem() != null) {
+				if (!getPollinatedItem().isEmpty()) {
 					return false;
 				}
 				
@@ -160,7 +162,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 
 			@Override
 			protected void onArrive(EntityLux lux, BlockPos pos) {
-				IBlockState state = lux.worldObj.getBlockState(pos);
+				IBlockState state = lux.world.getBlockState(pos);
 				lux.onFlowerVisit(pos, state);
 			}
 			
@@ -224,7 +226,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		return flag;
 	}
 
-	public boolean processInteract(EntityPlayer player, EnumHand hand, @Nullable ItemStack stack)
+	public boolean processInteract(EntityPlayer player, EnumHand hand, @Nonnull ItemStack stack)
 	{
 		return false;
 	}
@@ -238,15 +240,15 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 	public void onUpdate() {
 		super.onUpdate();
 		
-		if (worldObj.isRemote) {
+		if (world.isRemote) {
 			ItemStack stack = this.getPollinatedItem();
-			if (stack == null) {
+			if (stack.isEmpty()) {
 				// 'drip' particles every once in a while
 				if (rand.nextBoolean() && rand.nextBoolean() && rand.nextBoolean() && rand.nextBoolean()
 						&& rand.nextBoolean() && rand.nextBoolean()) { // 1/64
 					// darken if community  score is high
 					final float darken = (getCommunityScore() >= 50 ? .2f : 0f);
-					NostrumParticles.GLOW_ORB.spawn(worldObj, new SpawnParams(
+					NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 							1,
 							posX, posY + height/2, posZ,
 							0.05, 40, 10,
@@ -258,7 +260,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 				if (rand.nextBoolean() && rand.nextBoolean() && rand.nextBoolean() && rand.nextBoolean()) { // 1/16
 					// darken if community  score is high
 					final float darken = (getCommunityScore() >= 50 ? .2f : 0f);
-					NostrumParticles.GLOW_ORB.spawn(worldObj, new SpawnParams(
+					NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 							1,
 							posX, posY + height/2, posZ,
 							1, 15, 0,
@@ -276,7 +278,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 					
 					// If pollinated, drop item occasionally
 					ItemStack stack = this.getPollinatedItem();
-					if (stack != null && rand.nextInt(10) == 0) {
+					if (!stack.isEmpty() && rand.nextInt(10) == 0) {
 						this.onPollinationComplete(stack);
 						this.setPollinatedItem(null);
 					}
@@ -285,7 +287,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 					final AxisAlignedBB bb = new AxisAlignedBB(
 							posX - 32, posY - 32, posZ - 32, posX + 32, posY + 32, posZ + 32
 							);
-					final int count = worldObj.getEntitiesWithinAABB(EntityLux.class, bb).size();
+					final int count = world.getEntitiesWithinAABB(EntityLux.class, bb).size();
 					this.incrCommunityScore(count);
 					
 					idleCooldown = rand.nextInt(20 * 30) + (20 * 10); 
@@ -322,7 +324,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		
 		this.dataManager.register(HOME, Optional.absent());
 		this.dataManager.register(OWNER, Optional.absent());
-		this.dataManager.register(POLLINATED_ITEM, Optional.absent());
+		this.dataManager.register(POLLINATED_ITEM, ItemStack.EMPTY);
 		this.dataManager.register(COMMUNITY_SCORE, 0);
 		this.dataManager.register(ROOSTING, false);
 	}
@@ -352,9 +354,9 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		}
 		
 		if (compound.hasKey("pollinated_item", NBT.TAG_COMPOUND)) {
-			setPollinatedItem(ItemStack.loadItemStackFromNBT(compound.getCompoundTag("pollinated_item")));
+			setPollinatedItem(new ItemStack(compound.getCompoundTag("pollinated_item")));
 		} else {
-			setPollinatedItem(null);
+			setPollinatedItem(ItemStack.EMPTY);
 		}
 		
 		setCommunityScore(compound.getInteger("community"));
@@ -373,7 +375,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		if (getOwnerId() != null) {
 			compound.setUniqueId("owner", getOwnerId());
 		}
-		if (getPollinatedItem() != null) {
+		if (!getPollinatedItem().isEmpty()) {
 			compound.setTag("pollinated_item", getPollinatedItem().serializeNBT());
 		}
 		compound.setInteger("community", getCommunityScore());
@@ -435,7 +437,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 			double d0 = this.rand.nextGaussian() * 0.02D;
 			double d1 = this.rand.nextGaussian() * 0.02D;
 			double d2 = this.rand.nextGaussian() * 0.02D;
-			this.worldObj.spawnParticle(enumparticletypes, this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.height), this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, d0, d1, d2, new int[0]);
+			this.world.spawnParticle(enumparticletypes, this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.height), this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, d0, d1, d2, new int[0]);
 		}
 	}
 	
@@ -456,7 +458,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 				double d2 = this.posZ - this.parentEntity.posZ;
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 
-				d3 = (double)MathHelper.sqrt_double(d3);
+				d3 = (double)MathHelper.sqrt(d3);
 				
 				if (Math.abs(d3) < .01) {
 					this.parentEntity.motionX = 0;
@@ -481,16 +483,16 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 	
 	// Copied from EntityFlying class
 	@Override
-	public void moveEntityWithHeading(float strafe, float forward) {
+	public void travel(float strafe, float vertical, float forward) {
 		if (this.isInWater()) {
-			this.moveRelative(strafe, forward, 0.02F);
-			this.moveEntity(this.motionX, this.motionY, this.motionZ);
+			this.moveRelative(strafe, vertical, forward, 0.02F);
+			this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
 			this.motionX *= 0.800000011920929D;
 			this.motionY *= 0.800000011920929D;
 			this.motionZ *= 0.800000011920929D;
 		} else if (this.isInLava()) {
-			this.moveRelative(strafe, forward, 0.02F);
-			this.moveEntity(this.motionX, this.motionY, this.motionZ);
+			this.moveRelative(strafe, vertical, forward, 0.02F);
+			this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
 			this.motionX *= 0.5D;
 			this.motionY *= 0.5D;
 			this.motionZ *= 0.5D;
@@ -498,18 +500,22 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 			float f = 0.91F;
 
 			if (this.onGround) {
-				f = this.worldObj.getBlockState(new BlockPos(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.getEntityBoundingBox().minY) - 1, MathHelper.floor_double(this.posZ))).getBlock().slipperiness * 0.91F;
+				final BlockPos pos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getEntityBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
+				final IBlockState state = world.getBlockState(pos);
+				f = state.getBlock().getSlipperiness(state, world, pos, this) * 0.91F;
 			}
 
 			float f1 = 0.16277136F / (f * f * f);
-			this.moveRelative(strafe, forward, this.onGround ? 0.1F * f1 : 0.02F);
+			this.moveRelative(strafe, vertical, forward, this.onGround ? 0.1F * f1 : 0.02F);
 			f = 0.91F;
 
 			if (this.onGround) {
-				f = this.worldObj.getBlockState(new BlockPos(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.getEntityBoundingBox().minY) - 1, MathHelper.floor_double(this.posZ))).getBlock().slipperiness * 0.91F;
+				final BlockPos pos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getEntityBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
+				final IBlockState state = world.getBlockState(pos);
+				f = state.getBlock().getSlipperiness(state, world, pos, this) * 0.91F;
 			}
 
-			this.moveEntity(this.motionX, this.motionY, this.motionZ);
+			this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
 			this.motionX *= (double)f;
 			this.motionY *= (double)f;
 			this.motionZ *= (double)f;
@@ -518,7 +524,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		this.prevLimbSwingAmount = this.limbSwingAmount;
 		double d1 = this.posX - this.prevPosX;
 		double d0 = this.posZ - this.prevPosZ;
-		float f2 = MathHelper.sqrt_double(d1 * d1 + d0 * d0) * 4.0F;
+		float f2 = MathHelper.sqrt(d1 * d1 + d0 * d0) * 4.0F;
 
 		if (f2 > 1.0F) {
 			f2 = 1.0F;
@@ -540,7 +546,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 	public boolean getCanSpawnHere() {
 		BlockPos blockpos = new BlockPos(this.posX, this.getEntityBoundingBox().minY, this.posZ);
 
-		return this.worldObj.getLightFor(EnumSkyBlock.SKY, blockpos) >= 8;
+		return this.world.getLightFor(EnumSkyBlock.SKY, blockpos) >= 8;
 	}
 	
 	static class AIRandomFly extends EntityAIBase {
@@ -586,7 +592,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 				final double d1 = this.parentEntity.posY + (double)((random.nextFloat() * 2.0F - 1.0F) * radius);
 				
 				// check acceptable y first
-				if (d1 <= 0 || d1 > parentEntity.worldObj.getHeight()) {
+				if (d1 <= 0 || d1 > parentEntity.world.getHeight()) {
 					continue;
 				}
 				
@@ -597,14 +603,14 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 				MutableBlockPos cursor = new MutableBlockPos();
 				cursor.setPos(d0, d1, d2);
 				
-				if (!parentEntity.worldObj.isAirBlock(cursor)) {
+				if (!parentEntity.world.isAirBlock(cursor)) {
 					continue;
 				}
 				
 				// Check how high above ground that is, and retry if too far up
 				int yDiff = 1;
 				cursor.move(EnumFacing.DOWN);
-				while (cursor.getY() > 0 && parentEntity.worldObj.isAirBlock(cursor)) {
+				while (cursor.getY() > 0 && parentEntity.world.isAirBlock(cursor)) {
 					cursor.move(EnumFacing.DOWN);
 					yDiff++;
 				}
@@ -628,7 +634,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		private long lastWakeTicks = -1;
 		
 		public static final Predicate<EntityLux> ROOST_AT_NIGHT = (ent) -> {
-			return ent.worldObj != null && !ent.worldObj.isDaytime();
+			return ent.world != null && !ent.world.isDaytime();
 		};
 
 		public AIRoostTask(EntityLux lux) {
@@ -658,7 +664,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 					return predicate.test(parentEntity);
 				} else {
 					// random wake jitter from already-running task
-					if (parentEntity.worldObj.getTotalWorldTime() - lastWakeTicks > 20 * 3) {
+					if (parentEntity.world.getTotalWorldTime() - lastWakeTicks > 20 * 3) {
 						if (parentEntity.rand.nextInt(4) == 0) {
 							return predicate.test(parentEntity);
 						} else {
@@ -681,7 +687,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		 * Returns whether the EntityAIBase should begin execution.
 		 */
 		public boolean shouldExecute() {
-			if (lastAttemptTicks < 0 || parentEntity.worldObj.getTotalWorldTime() - lastAttemptTicks > 5 * 20) {
+			if (lastAttemptTicks < 0 || parentEntity.world.getTotalWorldTime() - lastAttemptTicks > 5 * 20) {
 				//EntityMoveHelper entitymovehelper = this.parentEntity.getMoveHelper();
 				return shouldRoost();
 			}
@@ -694,8 +700,8 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		public boolean continueExecuting() {
 			if (shouldRoost() && roostPos != null) {
 				// If roost position is destroyed, bail out
-				if (parentEntity.worldObj.isAirBlock(roostPos) // fast simple check
-						|| !parentEntity.isGoodLeavesBlock(parentEntity.worldObj.getBlockState(roostPos), roostPos)) {
+				if (parentEntity.world.isAirBlock(roostPos) // fast simple check
+						|| !parentEntity.isGoodLeavesBlock(parentEntity.world.getBlockState(roostPos), roostPos)) {
 					return false;
 				}
 				
@@ -726,7 +732,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		 * Execute a one shot task or start executing a continuous task
 		 */
 		public void startExecuting() {
-			lastAttemptTicks = lastWakeTicks = parentEntity.worldObj.getTotalWorldTime();
+			lastAttemptTicks = lastWakeTicks = parentEntity.world.getTotalWorldTime();
 			
 			// Try to find roost location
 			roostPos = this.getRoostLocation(parentEntity);
@@ -785,7 +791,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		 */
 		public boolean shouldExecute() {
 			
-			if (parentEntity.worldObj.getTotalWorldTime() - lastAttemptTicks < 20 * 5) {
+			if (parentEntity.world.getTotalWorldTime() - lastAttemptTicks < 20 * 5) {
 				// too soon
 				return false;
 			}
@@ -815,7 +821,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		 */
 		public void startExecuting() {
 			running = true;
-			lastAttemptTicks = parentEntity.worldObj.getTotalWorldTime();
+			lastAttemptTicks = parentEntity.world.getTotalWorldTime();
 			
 			targetPos = this.getNearbyFeature(parentEntity);
 			if (targetPos != null) {
@@ -843,7 +849,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 						targetPos.getZ() + .5) < .05) {
 					this.onArrive(parentEntity, targetPos);
 					// use 'lastAttemptTicks' to effectively make sure we dont' try again for 'delay' ticks
-					lastAttemptTicks = parentEntity.worldObj.getTotalWorldTime() + this.delay;
+					lastAttemptTicks = parentEntity.world.getTotalWorldTime() + this.delay;
 					running = false;
 				}
 			}
@@ -865,7 +871,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		UUID ownerID = getOwnerId();
 		EntityLivingBase owner = null;
 		if (ownerID != null) {
-			List<EntityLivingBase> ids = this.worldObj.getEntities(EntityLivingBase.class, (ent) -> {
+			List<EntityLivingBase> ids = this.world.getEntities(EntityLivingBase.class, (ent) -> {
 				return ent != null && ent.getUniqueID().equals(ownerID);
 			});
 			if (ids != null && ids.size() > 0) {
@@ -888,12 +894,12 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		this.dataManager.set(OWNER, Optional.fromNullable(ownerID));
 	}
 	
-	public @Nullable ItemStack getPollinatedItem() {
-		return dataManager.get(POLLINATED_ITEM).orNull();
+	public @Nonnull ItemStack getPollinatedItem() {
+		return dataManager.get(POLLINATED_ITEM);
 	}
 	
-	public void setPollinatedItem(@Nullable ItemStack stack) {
-		dataManager.set(POLLINATED_ITEM, Optional.fromNullable(stack));
+	public void setPollinatedItem(@Nonnull ItemStack stack) {
+		dataManager.set(POLLINATED_ITEM, stack);
 	}
 	
 	public int getCommunityScore() {
@@ -925,11 +931,11 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 	@Override
 	public float getSwingProgress(float partialTicks) {
 		if (this.swingStartTicks == 0) {
-			swingStartTicks = worldObj.getTotalWorldTime();
+			swingStartTicks = world.getTotalWorldTime();
 		}
 		
 		final long SWING_TICKS = 20 * 2;
-		final long now = worldObj.getTotalWorldTime();
+		final long now = world.getTotalWorldTime();
 		final long diff = (now - swingStartTicks) % SWING_TICKS;
 		final double curTicks = diff + partialTicks;
 		return (float) (curTicks / (double) SWING_TICKS);
@@ -941,7 +947,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 	
 	protected boolean isGoodLeavesBlock(IBlockState state, BlockPos pos) {
 		return isLeavesBlock(state)
-				&& worldObj.isAirBlock(pos.down());
+				&& world.isAirBlock(pos.down());
 	}
 	
 	/**
@@ -951,13 +957,13 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 	 * @return
 	 */
 	protected @Nullable BlockPos findNearbyLeaves() {
-		if (worldObj == null) {
+		if (world == null) {
 			return null;
 		}
 		
 		// Check home space
 		BlockPos homePos = this.getHome();
-		if (homePos != null && this.isGoodLeavesBlock(worldObj.getBlockState(homePos), homePos)) {
+		if (homePos != null && this.isGoodLeavesBlock(world.getBlockState(homePos), homePos)) {
 			return homePos;
 		}
 		
@@ -972,11 +978,11 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 			cursor.setPos(center.getX() + x, center.getY() + y, center.getZ() + z);
 			
 			// Make sure y if suitable
-			if (cursor.getY() <= 0 || cursor.getY() > worldObj.getHeight()) {
+			if (cursor.getY() <= 0 || cursor.getY() > world.getHeight()) {
 				continue;
 			}
 			
-			IBlockState state = worldObj.getBlockState(cursor);
+			IBlockState state = world.getBlockState(cursor);
 			if (isGoodLeavesBlock(state, cursor)) {
 				leaves.add(cursor.toImmutable());
 			}
@@ -1003,7 +1009,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 	 * @return
 	 */
 	protected @Nullable BlockPos findNearbyFlowers() {
-		if (worldObj == null) {
+		if (world == null) {
 			return null;
 		}
 		
@@ -1018,11 +1024,11 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 			cursor.setPos(center.getX() + x, center.getY() + y, center.getZ() + z);
 			
 			// Make sure y if suitable
-			if (cursor.getY() <= 0 || cursor.getY() > worldObj.getHeight()) {
+			if (cursor.getY() <= 0 || cursor.getY() > world.getHeight()) {
 				continue;
 			}
 			
-			IBlockState state = worldObj.getBlockState(cursor);
+			IBlockState state = world.getBlockState(cursor);
 			if (isFlowersBlock(state)) {
 				flowers.add(cursor.toImmutable());
 			}
@@ -1047,7 +1053,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 				setPollinatedItem(reagentStack);
 			}
 			
-			((WorldServer) worldObj).spawnParticle(EnumParticleTypes.VILLAGER_HAPPY,
+			((WorldServer) world).spawnParticle(EnumParticleTypes.VILLAGER_HAPPY,
 					posX,
 					posY + height / 2,
 					posZ,
@@ -1062,7 +1068,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 	
 	@Nullable
 	protected static final IBlockState resolvePlantable(ItemStack stack) {
-		if (stack == null) {
+		if (stack.isEmpty()) {
 			return null;
 		}
 		
@@ -1091,10 +1097,10 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		MutableBlockPos cursor = new MutableBlockPos();
 		cursor.setPos(this.getPosition());
 		while (cursor.getY() > 0) {
-			IBlockState state = worldObj.getBlockState(cursor);
+			IBlockState state = world.getBlockState(cursor);
 			if (
 				state == null
-				|| state.getBlock().isAir(state, worldObj, cursor)
+				|| state.getBlock().isAir(state, world, cursor)
 				|| !state.isOpaqueCube()
 				|| state.getMaterial() == Material.LEAVES
 				) {
@@ -1110,10 +1116,10 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		
 		if (flowerState != null
 				&& flowerState.getBlock() instanceof BlockBush
-				&& ((BlockBush) flowerState.getBlock()).canPlaceBlockAt(worldObj, cursor.toImmutable())) {
-			worldObj.setBlockState(cursor.toImmutable(), flowerState);
+				&& ((BlockBush) flowerState.getBlock()).canPlaceBlockAt(world, cursor.toImmutable())) {
+			world.setBlockState(cursor.toImmutable(), flowerState);
 			
-			((WorldServer) worldObj).spawnParticle(EnumParticleTypes.VILLAGER_HAPPY,
+			((WorldServer) world).spawnParticle(EnumParticleTypes.VILLAGER_HAPPY,
 					cursor.getX() + .5,
 					cursor.getY() + .5,
 					cursor.getZ() + .5,
@@ -1147,7 +1153,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 	}
 	
 	protected void doBreed() {
-		worldObj.spawnEntityInWorld(new EntityLux(worldObj));
+		world.spawnEntity(new EntityLux(world));
 	}
 	
 	protected void attemptBreed() {

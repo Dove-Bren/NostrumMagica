@@ -108,7 +108,7 @@ public class SpellPreviewPage implements IClickableBookPage {
 		
 		if (button == 0) {
 			player.openGui(NostrumMagica.instance,
-					NostrumGui.scrollID, player.worldObj,
+					NostrumGui.scrollID, player.world,
 					spell.getRegistryID(), (int) player.posY, (int) player.posZ);
 		} else if (button == 1 && Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
 			// Fake on client

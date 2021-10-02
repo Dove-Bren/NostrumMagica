@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.integration.enderio.wrappers;
 
-import crazypants.enderio.ModObject;
+import crazypants.enderio.base.init.ModObject;
 import net.minecraft.item.Item;
 
 public class EnderIOItemWrapper {

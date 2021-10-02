@@ -240,11 +240,11 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 			}
 		}
 		
-		if (worldObj.isRemote) {
+		if (world.isRemote) {
 			EMagicElement element = this.getElement();
 			if (element == null) element = EMagicElement.PHYSICAL;
 			int color = element.getColor();
-			NostrumParticles.GLOW_ORB.spawn(worldObj, new SpawnParams(
+			NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 					1, posX, posY + height/2f, posZ, 0, 40, 0,
 					new Vec3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025), false
 					).color(color));

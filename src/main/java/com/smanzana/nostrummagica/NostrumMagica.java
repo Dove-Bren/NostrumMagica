@@ -89,7 +89,6 @@ import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.jei.NostrumMagicaJEIPlugin;
 import com.smanzana.nostrummagica.items.ReagentSeed;
 import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.items.ShrineSeekingGem;
@@ -361,7 +360,7 @@ public class NostrumMagica
     				return item;
     	}
     	
-    	return null;
+    	return ItemStack.EMPTY;
     }
     
     public static @Nonnull ItemStack getCurrentTome(EntityPlayer entity) {
@@ -369,10 +368,10 @@ public class NostrumMagica
     	// hotbar.
     	ItemStack tome = ItemStack.EMPTY;
     	
-    	if (entity.getHeldItemMainhand() != null &&
+    	if (!entity.getHeldItemMainhand().isEmpty() &&
     			entity.getHeldItemMainhand().getItem() instanceof SpellTome) {
     		tome = entity.getHeldItemMainhand();
-    	} else if (entity.getHeldItemOffhand() != null &&
+    	} else if (!entity.getHeldItemOffhand().isEmpty() &&
     			entity.getHeldItemOffhand().getItem() instanceof SpellTome) {
     		tome = entity.getHeldItemOffhand();
     	} else {
@@ -449,7 +448,7 @@ public class NostrumMagica
 						break;
 					} else {
 						count -= item.getCount();
-						player.inventory.setInventorySlotContents(i, null);
+						player.inventory.setInventorySlotContents(i, ItemStack.EMPTY);
 					}
 				}
 			}

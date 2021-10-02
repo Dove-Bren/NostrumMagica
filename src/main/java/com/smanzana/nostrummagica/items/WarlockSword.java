@@ -4,6 +4,8 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import org.lwjgl.input.Keyboard;
 
 import com.google.common.collect.HashMultimap;
@@ -29,6 +31,7 @@ import com.smanzana.nostrummagica.utils.RayTrace;
 
 import crazypants.enderio.api.teleport.IItemOfTravel;
 import crazypants.enderio.api.teleport.TravelSource;
+import info.loenwind.autoconfig.factory.IValue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
@@ -37,7 +40,6 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.nbt.NBTTagCompound;
@@ -266,7 +268,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 				EMagicElement.LIGHTNING, 2));
 		
 		if (NostrumMagica.enderIO.isEnabled()) {
-			subItems.add(setEnderIOTravel(addCapacity(new ItemStack(itemIn), 10), true));
+			subItems.add(setEnderIOTravel(addCapacity(new ItemStack(this), 10), true));
 		}
 	}
 	
@@ -329,7 +331,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 
 	@Override
 	public void extractInternal(ItemStack item, int power) {
-		item.attemptDamageItem(1, NostrumMagica.rand);
+		item.attemptDamageItem(1, NostrumMagica.rand, null);
 	}
 
 	@Override
@@ -363,8 +365,9 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World worldIn, EntityPlayer playerIn, EnumHand hand) {
-		
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+
+		final @Nonnull ItemStack stack = playerIn.getHeldItem(hand);
 		if (playerIn.getCooledAttackStrength(0.5F) > .95) {
 		
 			// Earlier right-click stuff here
@@ -428,6 +431,11 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 		}
 		
 		return false;
+	}
+
+	@Override
+	public void extractInternal(ItemStack item, IValue<Integer> power) {
+		extractInternal(item, power.get());
 	}
 
 }

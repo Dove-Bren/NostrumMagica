@@ -165,17 +165,17 @@ public enum NostrumParticles {
 			
 			if (params.velocity != null) {
 				NBTTagCompound subtag = new NBTTagCompound();
-				subtag.setDouble("x", params.velocity.xCoord);
-				subtag.setDouble("y", params.velocity.yCoord);
-				subtag.setDouble("z", params.velocity.zCoord);
+				subtag.setDouble("x", params.velocity.x);
+				subtag.setDouble("y", params.velocity.y);
+				subtag.setDouble("z", params.velocity.z);
 				tag.setTag(NBT_VELOCITY, subtag);
 			}
 			
 			if (params.targetPos != null) {
 				NBTTagCompound subtag = new NBTTagCompound();
-				subtag.setDouble("x", params.targetPos.xCoord);
-				subtag.setDouble("y", params.targetPos.yCoord);
-				subtag.setDouble("z", params.targetPos.zCoord);
+				subtag.setDouble("x", params.targetPos.x);
+				subtag.setDouble("y", params.targetPos.y);
+				subtag.setDouble("z", params.targetPos.z);
 				tag.setTag(NBT_TARGET_POS, subtag);
 			}
 			

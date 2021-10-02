@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.renderer.ModelAetherCloak;
@@ -58,15 +58,15 @@ public class LayerAetherCloak implements LayerRenderer<AbstractClientPlayer> {
 	@Override
 	public void doRenderLayer(AbstractClientPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 		ItemStack capeItem = shouldRender(player);
-		if (capeItem != null) {
+		if (!capeItem.isEmpty()) {
 			render(player, capeItem, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
 		}
 	}
 	
-	public static @Nullable ItemStack ShouldRender(EntityLivingBase player) {
+	public static @Nonnull ItemStack ShouldRender(EntityLivingBase player) {
 		Iterable<ItemStack> equipment = player.getArmorInventoryList();
 		for (ItemStack stack : equipment) {
-			if (stack != null && stack.getItem() instanceof ICapeProvider) {
+			if (!stack.isEmpty() && stack.getItem() instanceof ICapeProvider) {
 				if (((ICapeProvider) stack.getItem()).shouldRenderCape(player, stack)) {
 					return stack;
 				}
@@ -79,7 +79,7 @@ public class LayerAetherCloak implements LayerRenderer<AbstractClientPlayer> {
 			if (inventory != null) {
 				for (int i = 0; i < inventory.getSizeInventory(); i++) {
 					ItemStack stack = inventory.getStackInSlot(i);
-					if (stack != null && stack.getItem() instanceof ICapeProvider) {
+					if (!stack.isEmpty() && stack.getItem() instanceof ICapeProvider) {
 						if (((ICapeProvider) stack.getItem()).shouldRenderCape(player, stack)) {
 							return stack;
 						}
@@ -88,10 +88,10 @@ public class LayerAetherCloak implements LayerRenderer<AbstractClientPlayer> {
 			}
 		}
 		
-		return null;
+		return ItemStack.EMPTY;
 	}
 	
-	public @Nullable ItemStack shouldRender(EntityLivingBase player) {
+	public @Nonnull ItemStack shouldRender(EntityLivingBase player) {
 		return ShouldRender(player);
 	}
 	

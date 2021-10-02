@@ -53,11 +53,11 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.GlStateManager.DestFactor;
 import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
@@ -291,15 +291,15 @@ public class OverlayRenderer extends Gui {
 			//if (ModConfig.config.displayShieldHearts())
 			{
 				ItemStack held = player.getHeldItemMainhand();
-				if (held == null || !(held.getItem() instanceof IRaytraceOverlay) || !((IRaytraceOverlay) held.getItem()).shouldTrace(player.worldObj, player, held)) {
+				if (held.isEmpty() || !(held.getItem() instanceof IRaytraceOverlay) || !((IRaytraceOverlay) held.getItem()).shouldTrace(player.world, player, held)) {
 					held = player.getHeldItemOffhand();
-					if (held == null || !(held.getItem() instanceof IRaytraceOverlay) || !((IRaytraceOverlay) held.getItem()).shouldTrace(player.worldObj, player, held)) {
-						held = null;
+					if (held.isEmpty() || !(held.getItem() instanceof IRaytraceOverlay) || !((IRaytraceOverlay) held.getItem()).shouldTrace(player.world, player, held)) {
+						held = ItemStack.EMPTY;
 					}
 				}
 				
-				if (held != null) {
-					RayTraceResult result = RayTrace.raytraceApprox(player.worldObj, player.getPositionEyes(event.getPartialTicks()),
+				if (!held.isEmpty()) {
+					RayTraceResult result = RayTrace.raytraceApprox(player.world, player.getPositionEyes(event.getPartialTicks()),
 							player.rotationPitch, player.rotationYaw, SeekingBulletTrigger.MAX_DIST,
 							new Predicate<Entity>() {
 	
@@ -757,7 +757,7 @@ public class OverlayRenderer extends Gui {
 		final int left = (scaledResolution.getScaledWidth() / 2 + 91) + 10 + (xoffset * GUI_CONTINGENCY_ICON_LENGTH);
 		final int top = scaledResolution.getScaledHeight() - (2 + GUI_CONTINGENCY_ICON_LENGTH);
 		final double borderScale = 1.07;
-		final VertexBuffer buffer = Tessellator.getInstance().getBuffer();
+		final BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		final int width = GUI_CONTINGENCY_ICON_LENGTH; // for readability
 		final int height = GUI_CONTINGENCY_ICON_LENGTH; // for readability
 		

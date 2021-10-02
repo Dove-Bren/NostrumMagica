@@ -8,15 +8,16 @@ import org.lwjgl.opengl.GL11;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.effects.ClientEffectForm;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileEntity;
+import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileEntity.EffectSpark;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.GlStateManager.DestFactor;
 import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -45,7 +46,7 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 		sparks = new ArrayList<>();
 	}
 	
-	private void renderOrb(Tessellator tessellator, VertexBuffer buffer, float opacity, boolean outside) {
+	private void renderOrb(Tessellator tessellator, BufferBuilder buffer, float opacity, boolean outside) {
 		
 		final float mult = 2 * ORB_RADIUS * (outside ? 1 : -1);
 		final int color = 0x0033BB88 | ((int) (opacity * 255f) << 24);
@@ -80,7 +81,7 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 		GlStateManager.popMatrix();
 	}
 	
-	private void renderSpark(Tessellator tessellator, VertexBuffer buffer, Vec3d camera, int ticks, float partialTicks, EffectSpark spark) {
+	private void renderSpark(Tessellator tessellator, BufferBuilder buffer, Vec3d camera, int ticks, float partialTicks, EffectSpark spark) {
 		
 		// Translation
 		final float pitch = spark.getPitch(ticks, partialTicks);
@@ -155,7 +156,7 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 	}
 	
 	@Override
-	public void renderTileEntityAt(AetherInfuserTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
+	public void render(AetherInfuserTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
 		
 		final float ORB_PERIOD = 200f;
 		
@@ -169,11 +170,11 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 		// 0f to .4f
 		final float maxOrbOpacity = .075f;
 		final float orbOpacity = maxOrbOpacity * (.75f + .25f * (float)Math.sin(t * 2 * Math.PI)) * te.getChargePerc();
-		Vec3d trueCamPos = ActiveRenderInfo.getPosition();
-		Vec3d camOffset = new Vec3d((x + .5) - trueCamPos.xCoord, (y + 1) - trueCamPos.yCoord, (z + .5) - trueCamPos.zCoord);
+		Vec3d trueCamPos = ActiveRenderInfo.getCameraPosition();
+		Vec3d camOffset = new Vec3d((x + .5) - trueCamPos.x, (y + 1) - trueCamPos.y, (z + .5) - trueCamPos.z);
 		
 		Tessellator tessellator = Tessellator.getInstance();
-		VertexBuffer buffer = tessellator.getBuffer();
+		BufferBuilder buffer = tessellator.getBuffer();
 		
 		GlStateManager.enableBlend();
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);

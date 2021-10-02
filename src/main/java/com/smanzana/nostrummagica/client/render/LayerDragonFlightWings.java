@@ -51,7 +51,7 @@ public class LayerDragonFlightWings implements LayerRenderer<AbstractClientPlaye
 			}
 			
 			ItemStack cape = LayerAetherCloak.ShouldRender(player);
-			return cape == null || !((ICapeProvider) cape.getItem()).shouldPreventOtherRenders(player, cape);
+			return cape.isEmpty() || !((ICapeProvider) cape.getItem()).shouldPreventOtherRenders(player, cape);
 		}
 				
 		

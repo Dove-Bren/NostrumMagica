@@ -1092,12 +1092,6 @@ public class ClientProxy extends CommonProxy {
 		event.getMap().registerSprite(new ResourceLocation(
 				NostrumMagica.MODID, "models/crystal_blank"));
 		event.getMap().registerSprite(new ResourceLocation(
-				NostrumMagica.MODID, "effects/mist_bad"));
-		event.getMap().registerSprite(new ResourceLocation(
-				NostrumMagica.MODID, "effects/mist_good"));
-		event.getMap().registerSprite(new ResourceLocation(
-				NostrumMagica.MODID, "effects/thornskin"));
-		event.getMap().registerSprite(new ResourceLocation(
 				NostrumMagica.MODID, "entity/dragonflightwing"));
 		event.getMap().registerSprite(new ResourceLocation(
 				NostrumMagica.MODID, "models/armor/aether_cloak_decor"));
@@ -1105,7 +1099,54 @@ public class ClientProxy extends CommonProxy {
 				NostrumMagica.MODID, "models/armor/aether_cloak_inside"));
 		event.getMap().registerSprite(new ResourceLocation(
 				NostrumMagica.MODID, "models/armor/aether_cloak_outside"));
-	}
+		
+
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "effects/mist_bad"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "effects/mist_good"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "effects/thornskin"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "effects/ting1"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "effects/ting2"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "effects/ting3"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "effects/ting4"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "effects/ting5"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "effects/shield"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "effects/arrow_down"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "effects/arrow_up"));
+		
+		/*
+		SHIELD("shield", false),
+		TING1("ting1", false),
+		TING2("ting2", false),
+		TING3("ting3", false),
+		TING4("ting4", false),
+		TING5("ting5", false),
+		CYL("cyl", true),
+		SHELL("shell", true),
+		ARROWU("arrow_up", false),
+		ARROWD("arrow_down", false),
+		ORB_CLOUDY("orb_cloudy", true),
+		ORB_SCALED("orb_scaled", true),
+		ORB_PURE("orb_pure", true),
+		THORN_0("thorn0", true),
+		THORN_1("thorn1", true),
+		THORN_2("thorn2", true),
+		THORN_3("thorn3", true),
+		THORN_4("thorn4", true),
+		 */
+    }
+    	
+		
 	
 	@SubscribeEvent
 	public void onModelBake(ModelBakeEvent event) {
@@ -1115,8 +1156,7 @@ public class ClientProxy extends CommonProxy {
 				model = ModelLoaderRegistry.getModel(new ResourceLocation(
 						NostrumMagica.MODID, "effect/" + icon.getModelKey()
 						));
-				IBakedModel bakedModel = model.bake(TRSRTransformation.identity(), DefaultVertexFormats.ITEM, 
-	    				(location) -> {return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString());});
+				IBakedModel bakedModel = model.bake(TRSRTransformation.identity(), DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter());
 	    		event.getModelRegistry().putObject(
 	    				new ModelResourceLocation(NostrumMagica.MODID + ":effects/" + icon.getKey(), "normal"),
 	    				bakedModel);

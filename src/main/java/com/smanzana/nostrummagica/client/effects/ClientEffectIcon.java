@@ -19,7 +19,8 @@ public enum ClientEffectIcon {
 	THORN_1("thorn1", true),
 	THORN_2("thorn2", true),
 	THORN_3("thorn3", true),
-	THORN_4("thorn4", true),;
+	THORN_4("thorn4", true),
+	;
 	
 	private String key;
 	private boolean isObj;

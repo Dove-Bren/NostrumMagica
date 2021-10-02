@@ -2,13 +2,14 @@ package com.smanzana.nostrummagica.client.effects;
 
 import java.util.List;
 
+import com.enderio.core.client.render.RenderUtil;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.math.Vec3i;
 import net.minecraftforge.fml.relauncher.Side;
@@ -18,7 +19,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public interface ClientEffectForm {
 	
 	public static void drawModel(IBakedModel model, int color) {
-		Minecraft mc = Minecraft.getMinecraft();
 		GlStateManager.disableBlend();
 		GlStateManager.disableAlpha();
 		GlStateManager.disableTexture2D();
@@ -26,7 +26,7 @@ public interface ClientEffectForm {
 		GlStateManager.enableAlpha();
 		GlStateManager.enableTexture2D();
 		GlStateManager.depthMask(false);
-		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+		RenderUtil.bindBlockTexture();
 		
 		List<BakedQuad> listQuads = model.getQuads(null, null, 0);
 		Tessellator tessellator = Tessellator.getInstance();

@@ -355,8 +355,8 @@ public class RayTrace {
 		// Get entities near the result
 		Vec3d hitPos = result.hitVec;
 		List<Entity> entities = world.getEntitiesInAABBexcluding(null, new AxisAlignedBB(
-				hitPos.xCoord, hitPos.yCoord, hitPos.zCoord, hitPos.xCoord, hitPos.yCoord, hitPos.zCoord 
-				).expandXyz(maxDist), selector);
+				hitPos.x, hitPos.y, hitPos.z, hitPos.x, hitPos.y, hitPos.z
+				).grow(maxDist), selector);
 		double minDist = 0;
 		Entity minEnt = null;
 		for (Entity ent : entities) {
