@@ -480,10 +480,11 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	}
 	
 	@Override
-	public boolean processInteract(EntityPlayer player, EnumHand hand, @Nonnull ItemStack stack) {
+	public boolean processInteract(EntityPlayer player, EnumHand hand) {
 		// Shift-right click toggles the dragon sitting.
 		// When not sitting, right-click mounts the dragon.
 		// When sitting, right-click opens the GUI
+		final @Nonnull ItemStack stack = player.getHeldItem(hand);
 		if (this.isTamed() && player == this.getOwner()) {
 			if (hand == EnumHand.MAIN_HAND) {
 				
@@ -837,10 +838,12 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 				success = true;
 			} else {
 				// Failed
+				System.out.println("Sending message");
 				player.sendMessage(new TextComponentTranslation("info.tamed_dragon.wild.tame_fail", this.getName()));
 				this.heal(5.0f);
 			}
 		} else {
+			System.out.println("Sending message");
 			player.sendMessage(new TextComponentTranslation("info.tamed_dragon.wild.high_health", this.getName()));
 		}
 

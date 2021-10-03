@@ -59,6 +59,10 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 		this.setMaxDamage(100);
 	}
 	
+	public boolean isEnchantable(ItemStack stack) {
+		return false;
+	}
+	
 	@Override
 	public String getUnlocalizedName(ItemStack stack) {
 //		int i = getNestedScrollMeta(stack);

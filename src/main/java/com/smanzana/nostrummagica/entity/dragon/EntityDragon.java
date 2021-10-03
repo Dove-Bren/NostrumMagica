@@ -105,8 +105,8 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
         return this.height * 0.95F;
     }
 
-    public boolean processInteract(EntityPlayer player, EnumHand hand, @Nonnull ItemStack stack)
-    {
+    @Override
+    public boolean processInteract(EntityPlayer player, EnumHand hand) {
         return false;
     }
 

@@ -38,6 +38,10 @@ public class ChalkItem extends Item implements ILoreTagged {
 		this.setCreativeTab(NostrumMagica.creativeTab);
 	}
 	
+	public boolean isEnchantable(ItemStack stack) {
+		return false;
+	}
+	
 	@Override
 	public String getLoreKey() {
 		return "nostrum_chalk";

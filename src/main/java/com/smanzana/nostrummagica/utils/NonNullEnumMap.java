@@ -5,12 +5,16 @@ import java.util.EnumMap;
 public class NonNullEnumMap<K extends Enum<K>, V> extends EnumMap<K,V> {
 
 	private static final long serialVersionUID = 2249448301163273450L;
+	
+	protected final Class<K> keyClass;
+	protected final V defaultValue;
 
 	public NonNullEnumMap(Class<K> keyType, V fill) {
 		super(keyType);
-		for (K type : keyType.getEnumConstants()) {
-			this.put(type, fill);
-		}
+		
+		this.defaultValue = fill;
+		this.keyClass = keyType;
+		clear();
 	}
 	
 	@Override
@@ -23,6 +27,13 @@ public class NonNullEnumMap<K extends Enum<K>, V> extends EnumMap<K,V> {
 		}
 		
 		return super.put(key, value);
+	}
+	
+	@Override
+	public void clear() {
+		for (K type : this.keyClass.getEnumConstants()) {
+			this.put(type, defaultValue);
+		}
 	}
 	
 }

@@ -79,6 +79,10 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 		});
 	}
 	
+	public boolean isEnchantable(ItemStack stack) {
+		return false;
+	}
+	
 	public static boolean IsExtended(ItemStack stack) {
 		if (stack.isEmpty() || !(stack.getItem() instanceof HookshotItem)) {
 			return false;

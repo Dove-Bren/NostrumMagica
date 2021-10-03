@@ -48,6 +48,10 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellArmor {
 		this.setMaxStackSize(1);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 	}
+	
+	public boolean isEnchantable(ItemStack stack) {
+		return false;
+	}
     
     @Override
 	public String getLoreKey() {

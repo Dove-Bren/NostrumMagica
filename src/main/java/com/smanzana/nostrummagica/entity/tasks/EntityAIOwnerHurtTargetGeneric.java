@@ -30,8 +30,8 @@ public class EntityAIOwnerHurtTargetGeneric<T extends EntityCreature & IEntityTa
 			if (entitylivingbase == null) {
 				return false;
 			} else {
-				this.theTarget = entitylivingbase.getRevengeTarget();
-				int i = entitylivingbase.getRevengeTimer();
+				this.theTarget = entitylivingbase.getLastAttackedEntity();
+				int i = entitylivingbase.getLastAttackedEntityTime();
 				return i != this.timestamp && this.isSuitableTarget(this.theTarget, false);
 			}
 		}

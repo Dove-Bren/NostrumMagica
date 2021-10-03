@@ -147,6 +147,7 @@ public class SpellAction {
 		public boolean applyEffect(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
 			float fin = calcDamage(caster, entity, amount * efficiency, element);
 			source.setLastAttackedEntity(entity);
+			entity.setRevengeTarget(caster);
 			//entity.setHealth(Math.max(0f, entity.getHealth() - fin));
 			entity.hurtResistantTime = 0;
 			entity.attackEntityFrom(new MagicDamageSource(source, element), fin);
@@ -298,6 +299,7 @@ public class SpellAction {
 			
 			if (effect.isBadEffect()) {
 				caster.setLastAttackedEntity(entity);
+				entity.setRevengeTarget(caster);
 				entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
 				NostrumMagicaSounds.STATUS_DEBUFF2.play(entity);
 			} else {
@@ -750,6 +752,7 @@ public class SpellAction {
 			NostrumMagicaSounds.DAMAGE_FIRE.play(entity);
 			
 			caster.setLastAttackedEntity(entity);
+			entity.setRevengeTarget(caster);
 			entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
 			entity.hurtResistantTime = 0;
 			
@@ -792,6 +795,7 @@ public class SpellAction {
 		
 		@Override
 		public boolean applyEffect(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+			entity.setRevengeTarget(caster);
 			entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
 			entity.hurtResistantTime = 0;
 			return apply(caster, entity.world, entity.getPosition(), efficiency);
@@ -1067,6 +1071,7 @@ public class SpellAction {
 		public boolean applyEffect(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
 			if (caster != entity && entity instanceof EntityLiving) {
 				// Make sure they want to attack you if you do it
+				entity.setRevengeTarget(caster);
 				entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
 				entity.hurtResistantTime = 0;
 			}
@@ -1310,6 +1315,7 @@ public class SpellAction {
 			
 			NostrumMagicaSounds.MELT_METAL.play(entity);
 			caster.setLastAttackedEntity(entity);
+			entity.setRevengeTarget(caster);
 			entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
 			entity.hurtResistantTime = 0;
 			return true;

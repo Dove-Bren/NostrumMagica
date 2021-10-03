@@ -65,6 +65,10 @@ public class SeekerIdol extends Item implements ILoreTagged {
 		this.setMaxDamage(25);
 	}
 	
+	public boolean isEnchantable(ItemStack stack) {
+		return false;
+	}
+	
 	private SpellComponentWrapper getNestedComponent(ItemStack itemStackIn) {
 		if (itemStackIn.isEmpty() || !(itemStackIn.getItem() instanceof SeekerIdol))
 			return null;
