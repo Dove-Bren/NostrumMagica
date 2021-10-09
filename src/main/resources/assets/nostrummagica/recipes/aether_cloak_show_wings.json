@@ -1,0 +1,18 @@
+{
+  "type": "nostrummagica:aether_cloak_toggle",
+  "key": "show_wings",
+  "display": {
+	  "item": "nostrummagica:aether_cloak",
+	  "nbt": {
+		  "display_wings": true
+	  }
+  },
+  "ingredients": [
+    {
+      "item": "#AETHER_CLOAK"
+    },
+    {
+      "item": "minecraft:shears"
+    }
+  ]
+}

@@ -18,10 +18,10 @@ import com.smanzana.nostrummagica.integration.baubles.items.ItemAetherLens;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemAetherLens.LensType;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
-import com.smanzana.nostrummagica.items.SpellScroll;
-import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.items.SpellScroll;
+import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.research.NostrumResearch;
@@ -39,6 +39,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -256,25 +257,22 @@ public class AetheriaProxy {
 		}
 
 		@Override
-		public ItemStack[] unravel(ItemStack stack) {
-			ItemStack[] ret = new ItemStack[1];
-			ret[0] = ItemStack.EMPTY;
+		public NonNullList<ItemStack> unravel(ItemStack stack) {
+			NonNullList<ItemStack> ret = NonNullList.create();
+			ret.add(stack.copy());
 			
 			List<Spell> spells = SpellTome.getSpells(stack);
 			if (spells == null || spells.isEmpty()) {
-				ret[0] = stack.copy();
+				;
 			} else {
-				ret = new ItemStack[spells.size() + 1];
-				ret[0] = stack.copy();
-				int i = 1;
 				for (Spell spell : spells) {
 					ItemStack scroll = SpellScroll.create(spell);
-					ret[i++] = scroll;
+					ret.add(scroll);
 				}
 			}
 			
 			// Clear tome
-			SpellTome.clearSpells(ret[0]);
+			SpellTome.clearSpells(ret.get(0));
 			
 			return ret;
 		}

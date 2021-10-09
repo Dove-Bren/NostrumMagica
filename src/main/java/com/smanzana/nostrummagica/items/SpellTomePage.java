@@ -60,9 +60,11 @@ public class SpellTomePage extends Item implements ILoreTagged {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-		// For all registered enhancements, create an item in the creative tab
-		for (SpellTomeEnhancement enhancement : SpellTomeEnhancement.getEnhancements()) {
-			subItems.add(getItemstack(enhancement, enhancement.getMaxLevel()));
+		if (this.isInCreativeTab(tab)) {
+			// For all registered enhancements, create an item in the creative tab
+			for (SpellTomeEnhancement enhancement : SpellTomeEnhancement.getEnhancements()) {
+				subItems.add(getItemstack(enhancement, enhancement.getMaxLevel()));
+			}
 		}
 	}
 

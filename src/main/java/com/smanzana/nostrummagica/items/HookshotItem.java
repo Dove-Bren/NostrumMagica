@@ -352,8 +352,10 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-		for (HookshotType type : HookshotType.values()) {
-			subItems.add(new ItemStack(this, 1, MakeMeta(type, false)));
+		if (this.isInCreativeTab(tab)) {
+			for (HookshotType type : HookshotType.values()) {
+				subItems.add(new ItemStack(this, 1, MakeMeta(type, false)));
+			}
 		}
 	}
 	

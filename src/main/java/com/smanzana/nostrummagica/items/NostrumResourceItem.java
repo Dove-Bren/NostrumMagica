@@ -111,8 +111,10 @@ public class NostrumResourceItem extends Item implements ILoreTagged {
     @SideOnly(Side.CLIENT)
     @Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-    	for (ResourceType type : ResourceType.values()) {
-    		subItems.add(new ItemStack(this, 1, getMetaFromType(type)));
+    	if (this.isInCreativeTab(tab)) {
+	    	for (ResourceType type : ResourceType.values()) {
+	    		subItems.add(new ItemStack(this, 1, getMetaFromType(type)));
+	    	}
     	}
 	}
     

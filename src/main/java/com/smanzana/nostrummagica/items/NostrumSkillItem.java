@@ -104,9 +104,11 @@ public class NostrumSkillItem extends Item implements ILoreTagged {
 	@SideOnly(Side.CLIENT)
     @Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-    	for (SkillItemType type: SkillItemType.values()) {
-    		subItems.add(new ItemStack(this, 1, getMetaFromType(type)));
-    	}
+		if (this.isInCreativeTab(tab)) {
+	    	for (SkillItemType type: SkillItemType.values()) {
+	    		subItems.add(new ItemStack(this, 1, getMetaFromType(type)));
+	    	}
+		}
 	}
 	
 	@Override

@@ -23,8 +23,9 @@ public abstract class AetherCloakModificationRecipe extends ShapelessOreRecipe {
 	private final NonNullList<Ingredient> ingredients;
 	private final TransformFuncs func;
 	private @Nullable final ResourceLocation group;
+	private final @Nonnull ItemStack displayStack;
 	
-	public AetherCloakModificationRecipe(ResourceLocation group, NonNullList<Ingredient> ingredients, TransformFuncs func) {
+	public AetherCloakModificationRecipe(ResourceLocation group, @Nonnull ItemStack displayStack, NonNullList<Ingredient> ingredients, TransformFuncs func) {
 		super(group, ingredients, ItemStack.EMPTY);
 		
 		if (ingredients == null || ingredients.isEmpty()) {
@@ -44,9 +45,14 @@ public abstract class AetherCloakModificationRecipe extends ShapelessOreRecipe {
 			throw new JsonParseException("At least one ingredient must allow a blank Aether Cloak");
 		}
 		
+		if (displayStack == null || displayStack.isEmpty() || !(displayStack.getItem() instanceof ItemAetherCloak)) {
+			throw new JsonParseException("Display item must be an aether cloak");
+		}
+		
 		this.ingredients = ingredients;
 		this.func = func;
 		this.group = group;
+		this.displayStack = displayStack;
 	}
 	
 	/**
@@ -101,7 +107,7 @@ public abstract class AetherCloakModificationRecipe extends ShapelessOreRecipe {
 
 	@Override
 	public ItemStack getRecipeOutput() {
-		return new ItemStack(ItemAetherCloak.instance());
+		return displayStack;
 	}
 
 	@Override

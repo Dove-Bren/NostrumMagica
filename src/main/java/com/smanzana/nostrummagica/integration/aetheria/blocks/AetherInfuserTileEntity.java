@@ -99,7 +99,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 			NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 					count,
 					start.x, start.y, start.z, .5,
-					120, 20,
+					60, 20,
 					end
 					).color(color));
 		}

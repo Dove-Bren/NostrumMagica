@@ -8,7 +8,7 @@ import net.minecraftforge.fml.common.Optional;
 
 public class BaubleInventoryHelper {
 
-	@Optional.Method(modid="Baubles")
+	@Optional.Method(modid="baubles")
 	public static IInventory getBaubleInventory(EntityPlayer player) {
 		return new BaublesInventoryWrapper(BaublesApi.getBaublesHandler(player));
 	}

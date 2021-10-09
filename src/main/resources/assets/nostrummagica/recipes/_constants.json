@@ -421,6 +421,71 @@
   },
   
   
+  {
+    "ingredient": {
+      "item": "nostrummagica:aether_cloak"
+    },
+    "name": "AETHER_CLOAK"
+  },
+  
+  {
+    "ingredient": {
+      "item": "nostrummagica:aether_lens_item",
+	  "data": 0
+    },
+    "name": "AETHER_LENS_SPREAD"
+  },
+  {
+    "ingredient": {
+      "item": "nostrummagica:aether_lens_item",
+	  "data": 1
+    },
+    "name": "AETHER_LENS_CHARGE"
+  },
+  {
+    "ingredient": {
+      "item": "nostrummagica:aether_lens_item",
+	  "data": 2
+    },
+    "name": "AETHER_LENS_GROW"
+  },
+  {
+    "ingredient": {
+      "item": "nostrummagica:aether_lens_item",
+	  "data": 3
+    },
+    "name": "AETHER_LENS_SWIFTNESS"
+  },
+  {
+    "ingredient": {
+      "item": "nostrummagica:aether_lens_item",
+	  "data": 4
+    },
+    "name": "AETHER_LENS_ELEVATOR"
+  },
+  {
+    "ingredient": {
+      "item": "nostrummagica:aether_lens_item",
+	  "data": 5
+    },
+    "name": "AETHER_LENS_HEAL"
+  },
+  {
+    "ingredient": {
+      "item": "nostrummagica:aether_lens_item",
+	  "data": 6
+    },
+    "name": "AETHER_LENS_BORE"
+  },
+  {
+    "ingredient": {
+      "item": "nostrummagica:aether_lens_item",
+	  "data": 7
+    },
+    "name": "AETHER_LENS_BORE_REVERSED"
+  },
+  
+  
   
   
   

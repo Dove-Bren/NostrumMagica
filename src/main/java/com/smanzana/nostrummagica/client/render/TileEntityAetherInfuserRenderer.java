@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
+import com.enderio.core.client.render.RenderUtil;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.effects.ClientEffectForm;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileEntity;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileEntity.EffectSpark;
 
@@ -18,9 +18,6 @@ import net.minecraft.client.renderer.GlStateManager.DestFactor;
 import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
@@ -36,8 +33,8 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 				new TileEntityAetherInfuserRenderer());
 	}
 	
-	private static final ModelResourceLocation ORB_MODEL_LOC = new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, "effects/orb_pure"), "normal");
-	private static IBakedModel MODEL_ORB;
+	//private static final ModelResourceLocation ORB_MODEL_LOC = new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, "effects/orb_pure"), "normal");
+	//private static IBakedModel MODEL_ORB;
 	private static final ResourceLocation SPARK_TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/effects/glow_orb.png");
 	
 	private List<EffectSpark> sparks;
@@ -49,11 +46,6 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 	private void renderOrb(Tessellator tessellator, BufferBuilder buffer, float opacity, boolean outside) {
 		
 		final float mult = 2 * ORB_RADIUS * (outside ? 1 : -1);
-		final int color = 0x0033BB88 | ((int) (opacity * 255f) << 24);
-		
-		if (MODEL_ORB == null) {
-			MODEL_ORB = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getModel(ORB_MODEL_LOC);
-		}
 		
 		GlStateManager.disableBlend();
 		GlStateManager.enableBlend();
@@ -63,7 +55,7 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 		GlStateManager.enableTexture2D();
 		GlStateManager.color(0f, 0f, 0f, 0f);
 		GlStateManager.color(1f, 1f, 1f, 1f);
-		GlStateManager.alphaFunc(GL11.GL_ALWAYS, 0.0f);
+		//GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0f);
 		GlStateManager.disableLighting();
 		GlStateManager.enableCull();
 		GlStateManager.depthMask(false);
@@ -74,7 +66,46 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(0, ORB_RADIUS - .5f, 0);
 		GlStateManager.scale(mult, mult, mult);
-		ClientEffectForm.drawModel(MODEL_ORB, color);
+		
+		{
+			//ClientEffectForm.drawModel(MODEL_ORB, color);
+			// ARGB
+			// final int color = 0x0033BB88 | ((int) (opacity * 255f) << 24);
+			final float red = .2f;
+			final float green = .73f;
+			final float blue = .53f;
+			final float alpha = opacity;
+			
+			//GlStateManager.disableCull();
+			//GlStateManager.disableDepth();
+			GlStateManager.alphaFunc(516, 0);
+			Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation(NostrumMagica.MODID, "textures/effects/slate.png"));
+			final int rows = 10;
+			final int cols = 10;
+			final double radius = 1;
+			for (int i = 1; i <= rows; i++) {
+				final double yRad0 = Math.PI * (-0.5f + (float) (i - 1) / (float) rows);
+				final double y0 = Math.sin(yRad0);
+				final double yR0 = Math.cos(yRad0);
+				final double yRad1 = Math.PI * (-0.5f + (float) (i) / (float) rows);
+				final double y1 = Math.sin(yRad1);
+				final double yR1 = Math.cos(yRad1);
+
+				buffer.begin(GL11.GL_QUAD_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL);
+				for (int j = 0; j <= cols; j++) {
+					final double xRad = Math.PI * 2 * (double) ((float) (j-1) / (float) cols);
+					final double x = Math.cos(xRad);
+					final double z = Math.sin(xRad);
+					
+					buffer.pos(radius * x * yR0, radius * y0, radius * z * yR0).tex(0, 0).color(red, green, blue, alpha)
+						.normal((float) (x * yR0), (float) (y0), (float) (z * yR0)).endVertex();
+					buffer.pos(radius * x * yR1, radius * y1, radius * z * yR1).tex(1, 1).color(red, green, blue, alpha)
+						.normal((float) (x * yR1), (float) (y1), (float) (z * yR1)).endVertex();
+				}
+				tessellator.draw();
+				
+			}
+		}
 
 		GlStateManager.enableDepth();
 		GlStateManager.depthMask(true);
@@ -186,7 +217,7 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(x + .5, y + 1, z + .5);
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+		RenderUtil.bindBlockTexture();
 		renderOrb(tessellator, buffer, orbOpacity, false);
 		renderOrb(tessellator, buffer, orbOpacity, true);
 		

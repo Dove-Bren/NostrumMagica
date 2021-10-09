@@ -273,7 +273,7 @@ public class NostrumMagica
 	    };
 	    SpellTomePage.instance().setCreativeTab(NostrumMagica.enhancementTab);
 	    
-	    if (Loader.isModLoaded("Baubles")) {
+	    if (Loader.isModLoaded("baubles")) {
 	    	baubles.enable();
 	    }
 	    if (Loader.isModLoaded("nostrumaetheria")) {

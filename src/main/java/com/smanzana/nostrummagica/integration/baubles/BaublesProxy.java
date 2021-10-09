@@ -114,7 +114,7 @@ public class BaublesProxy {
 				null,
 				new ReagentType[] {ReagentType.MANI_DUST, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK},
 				ItemMagicBauble.getItem(ItemType.RIBBON_SMALL, 1),
-				new ItemStack[] {new ItemStack(Items.GOLD_INGOT), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), null, new ItemStack(Items.GOLD_INGOT)},
+				new ItemStack[] {new ItemStack(Items.GOLD_INGOT), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), ItemStack.EMPTY, new ItemStack(Items.GOLD_INGOT)},
 				new RRequirementResearch("ribbons"),
 				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.RIBBON_MEDIUM, 1)));
 		RitualRegistry.instance().addRitual(recipe);
@@ -184,7 +184,7 @@ public class BaublesProxy {
 				null,
 				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANDRAKE_ROOT, ReagentType.CRYSTABLOOM, ReagentType.BLACK_PEARL},
 				ItemMagicBauble.getItem(ItemType.RING_GOLD, 1),
-				new ItemStack[] {new ItemStack(Items.GOLD_INGOT), NostrumResourceItem.getItem(ResourceType.SLAB_FIERCE, 1), null, new ItemStack(Items.GOLD_INGOT)},
+				new ItemStack[] {new ItemStack(Items.GOLD_INGOT), NostrumResourceItem.getItem(ResourceType.SLAB_FIERCE, 1), ItemStack.EMPTY, new ItemStack(Items.GOLD_INGOT)},
 				new RRequirementResearch("rings_true"),
 				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.RING_GOLD_TRUE, 1)));
 		RitualRegistry.instance().addRitual(recipe);
@@ -296,7 +296,7 @@ public class BaublesProxy {
 				EMagicElement.FIRE,
 				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.CRYSTABLOOM},
 				new ItemStack(ItemAetherCloak.instance()),
-				new ItemStack[] {new ItemStack(APIProxy.PassivePendantItem, 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), null, new ItemStack(APIProxy.PassivePendantItem, 1, OreDictionary.WILDCARD_VALUE)},
+				new ItemStack[] {new ItemStack(APIProxy.PassivePendantItem, 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), ItemStack.EMPTY, new ItemStack(APIProxy.PassivePendantItem, 1, OreDictionary.WILDCARD_VALUE)},
 				new RRequirementResearch("aether_cloaks"),
 				new OutcomeModifyCenterItemGeneric((world, player, item, otherItems, centerPos, recipeIn) -> {
 					if (!item.isEmpty() && item.getItem() instanceof ItemAetherCloak) {

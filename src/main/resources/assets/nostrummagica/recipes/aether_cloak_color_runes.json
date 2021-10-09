@@ -1,0 +1,23 @@
+{
+  "type": "nostrummagica:aether_cloak_color",
+  "key": "color_runes",
+  "display": {
+	  "item": "nostrummagica:aether_cloak",
+	  "nbt": {
+		  "color_runes": 15
+	  }
+  },
+  "ingredients": [
+    {
+      "item": "#AETHER_CLOAK"
+    },
+    {
+      "item": "minecraft:dye",
+	  "data": 32767
+    },
+    {
+      "type": "forge:ore_dict",
+	  "ore": "gemQuartz"
+    }
+  ]
+}

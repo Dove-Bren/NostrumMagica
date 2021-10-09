@@ -11,6 +11,8 @@ import com.smanzana.nostrummagica.proxy.ClientProxy;
 
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 //
 public class BaublesClientProxy extends BaublesProxy {
@@ -25,7 +27,6 @@ public class BaublesClientProxy extends BaublesProxy {
 			return false;
 		}
 		
-		registerItemVariants();
 		return true;
 	}
 	
@@ -35,7 +36,6 @@ public class BaublesClientProxy extends BaublesProxy {
 			return false;
 		}
 		
-		registerItemModels();
 		return true;
 	}
 	
@@ -48,7 +48,13 @@ public class BaublesClientProxy extends BaublesProxy {
 		return true;
 	}
 	
-	private void registerItemVariants() {
+	@SubscribeEvent
+	public void registerAllModels(ModelRegistryEvent event) {
+		registerItemVariants(event);
+		registerItemModels(event);
+	}
+	
+	private void registerItemVariants(ModelRegistryEvent event) {
 		List<ResourceLocation> list = new LinkedList<>();
     	for (ItemType type : ItemType.values()) {
     		list.add(new ResourceLocation(NostrumMagica.MODID, type.getUnlocalizedKey()));
@@ -58,9 +64,7 @@ public class BaublesClientProxy extends BaublesProxy {
     	ModelBakery.registerItemVariants(ItemMagicBauble.instance(), variants);
 	}
 	
-	private void registerItemModels() {
-		
-    	
+	private void registerItemModels(ModelRegistryEvent event) {
     	for (ItemType type : ItemType.values()) {
     		ClientProxy.registerModel(ItemMagicBauble.instance(),
     				ItemMagicBauble.getMetaFromType(type),

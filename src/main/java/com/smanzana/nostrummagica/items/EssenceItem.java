@@ -50,8 +50,10 @@ public class EssenceItem extends Item implements ILoreTagged {
     @SideOnly(Side.CLIENT)
     @Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-    	for (EMagicElement element: EMagicElement.values()) {
-    		subItems.add(new ItemStack(this, 1, element.ordinal()));
+    	if (this.isInCreativeTab(tab)) {
+	    	for (EMagicElement element: EMagicElement.values()) {
+	    		subItems.add(new ItemStack(this, 1, element.ordinal()));
+	    	}
     	}
 	}
     

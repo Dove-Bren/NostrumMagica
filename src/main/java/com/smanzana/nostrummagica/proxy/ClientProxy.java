@@ -1123,6 +1123,8 @@ public class ClientProxy extends CommonProxy {
 				NostrumMagica.MODID, "effects/arrow_down"));
 		event.getMap().registerSprite(new ResourceLocation(
 				NostrumMagica.MODID, "effects/arrow_up"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "effects/slate"));
 		
 		/*
 		SHIELD("shield", false),

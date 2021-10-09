@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.crafting;
 
+import javax.annotation.Nonnull;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -16,12 +18,12 @@ import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.IRecipeFactory;
 import net.minecraftforge.common.crafting.JsonContext;
 
-public abstract class RecipeFactoryAetherCloakToggle implements IRecipeFactory {
+public class RecipeFactoryAetherCloakToggle implements IRecipeFactory {
 
 	private static final class AetherCloakToggleRecipe extends AetherCloakModificationRecipe {
 
-		public AetherCloakToggleRecipe(ResourceLocation group, NonNullList<Ingredient> ingredients, TransformFuncs func) {
-			super(group, ingredients, func);
+		public AetherCloakToggleRecipe(ResourceLocation group, @Nonnull ItemStack display, NonNullList<Ingredient> ingredients, TransformFuncs func) {
+			super(group, display, ingredients, func);
 		}
 	}
 	
@@ -54,8 +56,13 @@ public abstract class RecipeFactoryAetherCloakToggle implements IRecipeFactory {
 			throw new JsonParseException("Could not find Toggleable upgrade with key [" + toggleKey + "]");
 		}
 		
+		ItemStack displayStack = CraftingHelper.getItemStack(JsonUtils.getJsonObject(json, "display"), context);
+		if (displayStack == null || displayStack.isEmpty()) {
+			throw new JsonParseException("\"display\" section is required and must be a valid itemstack (not ingredient)");
+		}
+		
 		final ToggleUpgrades upgradeFinal = upgrade;
-		return new AetherCloakToggleRecipe(group.isEmpty() ? null : new ResourceLocation(group), ingredients, new TransformFuncs() {
+		return new AetherCloakToggleRecipe(group.isEmpty() ? null : new ResourceLocation(group), displayStack, ingredients, new TransformFuncs() {
 			@Override
 			public boolean isAlreadySet(ItemStack cloak, NonNullList<ItemStack> extras) {
 				return upgradeFinal.getFunc().isSet(cloak);

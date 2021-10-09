@@ -17,6 +17,8 @@ import com.smanzana.nostrummagica.proxy.ClientProxy;
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 //
 public class AetheriaClientProxy extends AetheriaProxy {
@@ -34,8 +36,6 @@ public class AetheriaClientProxy extends AetheriaProxy {
     	TileEntityWispBlockRenderer.init();
     	TileEntityAetherInfuserRenderer.init();
 		
-		registerItemVariants();
-		
 		return true;
 	}
 	
@@ -45,7 +45,6 @@ public class AetheriaClientProxy extends AetheriaProxy {
 			return false;
 		}
 		
-		registerItemModels();
 		return true;
 	}
 	
@@ -58,7 +57,7 @@ public class AetheriaClientProxy extends AetheriaProxy {
 		return true;
 	}
 	
-	private void registerItemVariants() {
+	private void registerItemVariants(ModelRegistryEvent event) {
 		List<ResourceLocation> list = new LinkedList<>();
     	for (AetherResourceType type : AetherResourceType.values()) {
     		list.add(new ResourceLocation(NostrumMagica.MODID, type.getUnlocalizedKey()));
@@ -77,7 +76,10 @@ public class AetheriaClientProxy extends AetheriaProxy {
 		ModelBakery.registerItemVariants(ItemAetherLens.instance(), variants);
 	}
 	
-	private void registerItemModels() {
+	@SubscribeEvent
+	public void registerAllModels(ModelRegistryEvent event) {
+		registerItemVariants(event);
+		
 		ClientProxy.registerModel(Item.getItemFromBlock(WispBlock.instance()),
 				0,
 				WispBlock.ID);

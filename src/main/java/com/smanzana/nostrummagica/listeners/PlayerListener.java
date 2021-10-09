@@ -760,7 +760,7 @@ public class PlayerListener {
 		}
 		
 		if (event.getEntityLiving() instanceof EntityPlayer && !event.getEntityLiving().world.isRemote) {
-			if (NostrumMagica.baubles.isEnabled() && event.getEntityLiving().world.getGameRules().getBoolean("keepInventory")) {
+			if (NostrumMagica.baubles.isEnabled() && !event.getEntityLiving().world.getGameRules().getBoolean("keepInventory")) {
 				// Scan for baubles, since Baubles doesn't call onUnequip when you die....
 				IBaublesItemHandler baubles = BaublesApi.getBaublesHandler((EntityPlayer) event.getEntityLiving());
 				for (int i = 0; i < baubles.getSlots(); i++) {

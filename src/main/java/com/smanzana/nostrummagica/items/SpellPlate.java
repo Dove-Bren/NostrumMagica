@@ -86,8 +86,10 @@ public class SpellPlate extends Item implements ILoreTagged {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-		for (int i = 0; i < SpellTome.MAX_TOME_COUNT; i++) {
-			subItems.add(getItemstack(i, 10));
+		if (this.isInCreativeTab(tab)) {
+			for (int i = 0; i < SpellTome.MAX_TOME_COUNT; i++) {
+				subItems.add(getItemstack(i, 10));
+			}
 		}
 	}
 

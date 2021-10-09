@@ -85,11 +85,13 @@ public class InfusedGemItem extends Item implements ILoreTagged {
     @SideOnly(Side.CLIENT)
     @Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-    	subItems.add(new ItemStack(this, 1, 0));
-    	for (EMagicElement type : EMagicElement.values()) {
-    		if (type == EMagicElement.PHYSICAL)
-    			continue;
-    		subItems.add(new ItemStack(this, 1, type.ordinal() + 1));
+    	if (this.isInCreativeTab(tab)) {
+	    	subItems.add(new ItemStack(this, 1, 0));
+	    	for (EMagicElement type : EMagicElement.values()) {
+	    		if (type == EMagicElement.PHYSICAL)
+	    			continue;
+	    		subItems.add(new ItemStack(this, 1, type.ordinal() + 1));
+	    	}
     	}
 	}
     

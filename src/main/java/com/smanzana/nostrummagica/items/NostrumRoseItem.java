@@ -79,9 +79,11 @@ public class NostrumRoseItem extends Item implements ILoreTagged {
 	@SideOnly(Side.CLIENT)
     @Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-    	for (RoseType type: RoseType.values()) {
-    		subItems.add(new ItemStack(this, 1, getMetaFromType(type)));
-    	}
+		if (this.isInCreativeTab(tab)) {
+	    	for (RoseType type: RoseType.values()) {
+	    		subItems.add(new ItemStack(this, 1, getMetaFromType(type)));
+	    	}
+		}
 	}
 	
 	@Override

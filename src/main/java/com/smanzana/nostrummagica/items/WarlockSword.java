@@ -253,22 +253,24 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-		subItems.add(addCapacity(new ItemStack(this), 10));
-		subItems.add(setLevel(setLevel(setLevel(setLevel(
-				new ItemStack(this),
-				EMagicElement.PHYSICAL, 1),
-				EMagicElement.FIRE, 2),
-				EMagicElement.WIND, 2),
-				EMagicElement.ENDER, 2));
-		subItems.add(setLevel(setLevel(setLevel(setLevel(
-				new ItemStack(this),
-				EMagicElement.PHYSICAL, 1),
-				EMagicElement.ICE, 2),
-				EMagicElement.EARTH, 2),
-				EMagicElement.LIGHTNING, 2));
-		
-		if (NostrumMagica.enderIO.isEnabled()) {
-			subItems.add(setEnderIOTravel(addCapacity(new ItemStack(this), 10), true));
+		if (this.isInCreativeTab(tab)) {
+			subItems.add(addCapacity(new ItemStack(this), 10));
+			subItems.add(setLevel(setLevel(setLevel(setLevel(
+					new ItemStack(this),
+					EMagicElement.PHYSICAL, 1),
+					EMagicElement.FIRE, 2),
+					EMagicElement.WIND, 2),
+					EMagicElement.ENDER, 2));
+			subItems.add(setLevel(setLevel(setLevel(setLevel(
+					new ItemStack(this),
+					EMagicElement.PHYSICAL, 1),
+					EMagicElement.ICE, 2),
+					EMagicElement.EARTH, 2),
+					EMagicElement.LIGHTNING, 2));
+			
+			if (NostrumMagica.enderIO.isEnabled()) {
+				subItems.add(setEnderIOTravel(addCapacity(new ItemStack(this), 10), true));
+			}
 		}
 	}
 	

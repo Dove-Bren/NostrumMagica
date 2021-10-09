@@ -38,7 +38,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-@Optional.Interface(iface="baubles.api.IBauble", modid="Baubles")
+@Optional.Interface(iface="baubles.api.IBauble", modid="baubles")
 public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, IBauble {
 
 	public static enum ItemType {
@@ -131,15 +131,17 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 	@SideOnly(Side.CLIENT)
     @Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-		for (ItemType type : ItemType.values()) {
-			if (!NostrumMagica.aetheria.isEnabled()) {
-				if (type == ItemType.SHIELD_RING_LARGE
-						|| type == ItemType.SHIELD_RING_SMALL
-						|| type == ItemType.ELUDE_CAPE_SMALL) {
-					continue;
+		if (this.isInCreativeTab(tab)) {
+			for (ItemType type : ItemType.values()) {
+				if (!NostrumMagica.aetheria.isEnabled()) {
+					if (type == ItemType.SHIELD_RING_LARGE
+							|| type == ItemType.SHIELD_RING_SMALL
+							|| type == ItemType.ELUDE_CAPE_SMALL) {
+						continue;
+					}
 				}
+				subItems.add(new ItemStack(this, 1, getMetaFromType(type)));
 			}
-			subItems.add(new ItemStack(this, 1, getMetaFromType(type)));
 		}
 	}
 	
@@ -189,7 +191,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 	}
 	
 	@Override
-	@Optional.Method(modid="Baubles")
+	@Optional.Method(modid="baubles")
 	public BaubleType getBaubleType(ItemStack itemstack) {
 		BaubleType btype = BaubleType.RING;
 		ItemType type = getTypeFromMeta(itemstack.getMetadata());
@@ -227,7 +229,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 	}
 	
 	@Override
-	@Optional.Method(modid="Baubles")
+	@Optional.Method(modid="baubles")
 	public void onEquipped(ItemStack itemstack, EntityLivingBase player) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null) {
@@ -296,7 +298,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 	 * This method is called when the bauble is unequipped by a player
 	 */
 	@Override
-	@Optional.Method(modid="Baubles")
+	@Optional.Method(modid="baubles")
 	public void onUnequipped(ItemStack itemstack, EntityLivingBase player) {	
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null) {
@@ -364,7 +366,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 	 * can this bauble be placed in a bauble slot
 	 */
 	@Override
-	@Optional.Method(modid="Baubles")
+	@Optional.Method(modid="baubles")
 	public boolean canEquip(ItemStack itemstack, EntityLivingBase player) {		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		return attr != null && attr.isUnlocked();
@@ -414,7 +416,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 	}
 	
 	@Override
-	@Optional.Method(modid="Baubles")
+	@Optional.Method(modid="baubles")
 	public void onWornTick(ItemStack stack, EntityLivingBase player) {
 		if (stack.isEmpty()) {
 			return;

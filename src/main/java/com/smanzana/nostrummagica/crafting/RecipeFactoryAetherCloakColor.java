@@ -22,12 +22,12 @@ import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.IRecipeFactory;
 import net.minecraftforge.common.crafting.JsonContext;
 
-public abstract class RecipeFactoryAetherCloakColor implements IRecipeFactory {
+public class RecipeFactoryAetherCloakColor implements IRecipeFactory {
 
 	private static final class AetherCloakToggleRecipe extends AetherCloakModificationRecipe {
 
-		public AetherCloakToggleRecipe(ResourceLocation group, NonNullList<Ingredient> ingredients, TransformFuncs func) {
-			super(group, ingredients, func);
+		public AetherCloakToggleRecipe(ResourceLocation group, @Nonnull ItemStack display, NonNullList<Ingredient> ingredients, TransformFuncs func) {
+			super(group, display, ingredients, func);
 		}
 	}
 	
@@ -60,8 +60,13 @@ public abstract class RecipeFactoryAetherCloakColor implements IRecipeFactory {
 			throw new JsonParseException("Could not find Color upgrade with key [" + toggleKey + "]");
 		}
 		
+		ItemStack displayStack = CraftingHelper.getItemStack(JsonUtils.getJsonObject(json, "display"), context);
+		if (displayStack == null || displayStack.isEmpty()) {
+			throw new JsonParseException("\"display\" section is required and must be a valid itemstack (not ingredient)");
+		}
+		
 		final ColorUpgrades upgradeFinal = upgrade;
-		return new AetherCloakToggleRecipe(group.isEmpty() ? null : new ResourceLocation(group), ingredients, new TransformFuncs() {
+		return new AetherCloakToggleRecipe(group.isEmpty() ? null : new ResourceLocation(group), displayStack, ingredients, new TransformFuncs() {
 			@Override
 			public boolean isAlreadySet(ItemStack cloak, NonNullList<ItemStack> extras) {
 				EnumDyeColor color = findColor(extras);

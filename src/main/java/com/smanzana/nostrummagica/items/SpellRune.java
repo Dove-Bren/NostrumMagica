@@ -372,18 +372,20 @@ public class SpellRune extends Item implements ILoreTagged {
     @SideOnly(Side.CLIENT)
     @Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-    	// Should be synced to client proxy registering variants
-    	for (EMagicElement type : EMagicElement.values()) {
-    		subItems.add(getRune(type, 1));
-    	}
-    	for (EAlteration type : EAlteration.values()) {
-    		subItems.add(getRune(type));
-    	}
-    	for (SpellShape type : SpellShape.getAllShapes()) {
-    		subItems.add(getRune(type));
-    	}
-    	for (SpellTrigger type : SpellTrigger.getAllTriggers()) {
-    		subItems.add(getRune(type));
+    	if (this.isInCreativeTab(tab)) {
+	    	// Should be synced to client proxy registering variants
+	    	for (EMagicElement type : EMagicElement.values()) {
+	    		subItems.add(getRune(type, 1));
+	    	}
+	    	for (EAlteration type : EAlteration.values()) {
+	    		subItems.add(getRune(type));
+	    	}
+	    	for (SpellShape type : SpellShape.getAllShapes()) {
+	    		subItems.add(getRune(type));
+	    	}
+	    	for (SpellTrigger type : SpellTrigger.getAllTriggers()) {
+	    		subItems.add(getRune(type));
+	    	}
     	}
 	}
     

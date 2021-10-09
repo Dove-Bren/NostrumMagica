@@ -23,6 +23,7 @@ import baubles.api.BaubleType;
 import baubles.api.IBauble;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -42,7 +43,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-@Optional.Interface(iface="baubles.api.IBauble", modid="Baubles")
+@Optional.Interface(iface="baubles.api.IBauble", modid="baubles")
 public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellArmor, IBauble, ICapeProvider {
 	
 	public static interface UpgradeToggleFunc {
@@ -448,36 +449,38 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 	@SideOnly(Side.CLIENT)
     @Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-		//super.getSubItems(itemIn, tab, subItems);
-		
-		ItemStack basic = new ItemStack(instance());
-		subItems.add(basic);
-		
-		ItemStack full = new ItemStack(instance());
-		
-		IAetherHandlerComponent comp = this.getAetherHandler(full);
-		comp.setMaxAether(MAX_AETHER_MAX);
-		comp.setAether(MAX_AETHER_MAX);
-		AetherItem.SaveItem(full);
-		
-//		tag.setInteger(NBT_AETHER_MAX, MAX_AETHER_MAX);
-//		tag.setInteger(NBT_AETHER_STORED, MAX_AETHER_MAX);
-		
-		subItems.add(full);
-		
-		ItemStack complete = new ItemStack(instance());
-		comp = this.getAetherHandler(complete);
-		comp.setMaxAether(MAX_AETHER_MAX);
-		comp.setAether(MAX_AETHER_MAX);
-		AetherItem.SaveItem(complete);
-		setRuneColor(complete, EnumDyeColor.RED);
-		setOutsideColor(complete, EnumDyeColor.BLACK);
-		setInsideColor(complete, EnumDyeColor.PINK);
-		setDisplayWings(complete, true);
-		setDisplayRunes(complete, true);
-		setDisplayTrimmed(complete, true);
-		setAetherCaster(complete, true);
-		subItems.add(complete);
+		if (this.isInCreativeTab(tab)) {
+			//super.getSubItems(itemIn, tab, subItems);
+			
+			ItemStack basic = new ItemStack(instance());
+			subItems.add(basic);
+			
+			ItemStack full = new ItemStack(instance());
+			
+			IAetherHandlerComponent comp = this.getAetherHandler(full);
+			comp.setMaxAether(MAX_AETHER_MAX);
+			comp.setAether(MAX_AETHER_MAX);
+			AetherItem.SaveItem(full);
+			
+	//		tag.setInteger(NBT_AETHER_MAX, MAX_AETHER_MAX);
+	//		tag.setInteger(NBT_AETHER_STORED, MAX_AETHER_MAX);
+			
+			subItems.add(full);
+			
+			ItemStack complete = new ItemStack(instance());
+			comp = this.getAetherHandler(complete);
+			comp.setMaxAether(MAX_AETHER_MAX);
+			comp.setAether(MAX_AETHER_MAX);
+			AetherItem.SaveItem(complete);
+			setRuneColor(complete, EnumDyeColor.RED);
+			setOutsideColor(complete, EnumDyeColor.BLACK);
+			setInsideColor(complete, EnumDyeColor.PINK);
+			setDisplayWings(complete, true);
+			setDisplayRunes(complete, true);
+			setDisplayTrimmed(complete, true);
+			setAetherCaster(complete, true);
+			subItems.add(complete);
+		}
 	}
 	
 	@Override
@@ -508,8 +511,8 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-		super.addInformation(stack, playerIn, tooltip, advanced);
+	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+		super.addInformation(stack, worldIn, tooltip, flagIn);
 		
 		if (I18n.hasKey("item.aether_cloak.desc")) {
 			// Format with placeholders for blue and red formatting
@@ -559,7 +562,7 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 	}
 	
 	@Override
-	@Optional.Method(modid="Baubles")
+	@Optional.Method(modid="baubles")
 	public BaubleType getBaubleType(ItemStack itemstack) {
 		return BaubleType.BODY;
 	}
@@ -592,7 +595,7 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 	}
 	
 	@Override
-	@Optional.Method(modid="Baubles")
+	@Optional.Method(modid="baubles")
 	public void onEquipped(ItemStack itemstack, EntityLivingBase player) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null) {
@@ -606,7 +609,7 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 	 * This method is called when the bauble is unequipped by a player
 	 */
 	@Override
-	@Optional.Method(modid="Baubles")
+	@Optional.Method(modid="baubles")
 	public void onUnequipped(ItemStack itemstack, EntityLivingBase player) {	
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null) {
@@ -620,7 +623,7 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 	 * can this bauble be placed in a bauble slot
 	 */
 	@Override
-	@Optional.Method(modid="Baubles")
+	@Optional.Method(modid="baubles")
 	public boolean canEquip(ItemStack itemstack, EntityLivingBase player) {
 		if (player.world.isRemote && player != NostrumMagica.proxy.getPlayer()) {
 			return true;
@@ -656,7 +659,7 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 	}
 	
 	@Override
-	@Optional.Method(modid="Baubles")
+	@Optional.Method(modid="baubles")
 	public void onWornTick(ItemStack stack, EntityLivingBase player) {
 		if (stack.isEmpty()) {
 			return;

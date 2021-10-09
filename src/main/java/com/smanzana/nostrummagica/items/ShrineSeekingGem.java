@@ -91,8 +91,10 @@ public class ShrineSeekingGem extends Item implements ILoreTagged {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-		for (DungeonGen type : DungeonGen.values()) {
-			subItems.add(getItemstack(type));
+		if (this.isInCreativeTab(tab)) {
+			for (DungeonGen type : DungeonGen.values()) {
+				subItems.add(getItemstack(type));
+			}
 		}
 	}
 	

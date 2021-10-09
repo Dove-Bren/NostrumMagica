@@ -4,28 +4,30 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
+import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.JsonUtils;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.common.crafting.CraftingHelper.ShapedPrimer;
 import net.minecraftforge.common.crafting.IRecipeFactory;
-import net.minecraftforge.common.crafting.IShapedRecipe;
 import net.minecraftforge.common.crafting.JsonContext;
 import net.minecraftforge.oredict.ShapedOreRecipe;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 
 public class RecipeFactoryShapedWithRemaining implements IRecipeFactory {
 
-	private static final class ShapedOreRecipeWrapper extends IForgeRegistryEntry.Impl<IRecipe> implements IShapedRecipe {
+	private static final class ShapedOreRecipeWrapper extends ShapedOreRecipe {
 
 		private final ShapedOreRecipe inner;
 		private final NonNullList<Ingredient> remaining;
 		
 		public ShapedOreRecipeWrapper(ShapedOreRecipe original, NonNullList<Ingredient> remaining) {
+			super(new ResourceLocation(original.getGroup()), original.getRecipeOutput(), makeFakePrimer(original));
 			inner = original;
 			this.remaining = remaining;
 			
@@ -34,34 +36,13 @@ public class RecipeFactoryShapedWithRemaining implements IRecipeFactory {
 			}
 		}
 		
-		@Override
-		public boolean matches(InventoryCrafting inv, World worldIn) {
-			return inner.matches(inv, worldIn);
-		}
-
-		@Override
-		public ItemStack getCraftingResult(InventoryCrafting inv) {
-			return inner.getCraftingResult(inv);
-		}
-
-		@Override
-		public boolean canFit(int width, int height) {
-			return inner.canFit(width, height);
-		}
-
-		@Override
-		public ItemStack getRecipeOutput() {
-			return inner.getRecipeOutput();
-		}
-
-		@Override
-		public int getRecipeWidth() {
-			return inner.getRecipeWidth();
-		}
-
-		@Override
-		public int getRecipeHeight() {
-			return inner.getRecipeHeight();
+		protected static ShapedPrimer makeFakePrimer(ShapedOreRecipe original) {
+			ShapedPrimer primer = new ShapedPrimer();
+			primer.width = original.getRecipeWidth();
+			primer.height = original.getRecipeHeight();
+			primer.mirrored = false;
+			primer.input = original.getIngredients();
+			return primer;
 		}
 		
 		@Override
@@ -80,27 +61,13 @@ public class RecipeFactoryShapedWithRemaining implements IRecipeFactory {
 				
 				for (Ingredient ingredientToLeave : remaining) {
 					if (ingredientToLeave.apply(inv.getStackInSlot(i))) {
-						list.set(i, inv.getStackInSlot(i)); // Stamp it back in there
+						list.set(i, inv.getStackInSlot(i).copy()); // Stamp it back in there
+						break;
 					}
 				}
 			}
 			
 			return list;
-		}
-		
-		@Override
-		public NonNullList<Ingredient> getIngredients() {
-			return inner.getIngredients();
-		}
-		
-		@Override
-		public boolean isDynamic() {
-			return inner.isDynamic();
-		}
-		
-		@Override
-		public String getGroup() {
-			return inner.getGroup();
 		}
 		
 	}

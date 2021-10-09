@@ -118,8 +118,10 @@ public class ReagentItem extends Item implements ILoreTagged, IAetherBurnable {
     @SideOnly(Side.CLIENT)
     @Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-    	for (ReagentType type : ReagentType.values()) {
-    		subItems.add(new ItemStack(this, 1, type.getMeta()));
+    	if (this.isInCreativeTab(tab)) {
+	    	for (ReagentType type : ReagentType.values()) {
+	    		subItems.add(new ItemStack(this, 1, type.getMeta()));
+	    	}
     	}
 	}
     

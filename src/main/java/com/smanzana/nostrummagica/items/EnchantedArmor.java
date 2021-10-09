@@ -776,7 +776,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 				if (attr != null && attr.getMana() >= EARTH_GROW_COST && !ArmorCheckFlying(player)) {
 					if (player.ticksExisted % 40 == 0) {
 						// Attempt bonemeal
-						if (DoEarthGrow(world, player.getPosition())) {
+						if (DoEarthGrow(world, player.getPosition()) != null) {
 							attr.addMana(-EARTH_GROW_COST);
 							NostrumMagica.proxy.sendMana(player);
 						}
@@ -1589,7 +1589,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return false;
 	}
 	
-	public static synchronized final boolean DoEarthGrow(World world, BlockPos center) {
+	public static synchronized final @Nullable BlockPos DoEarthGrow(World world, BlockPos center) {
 		Collections.shuffle(EARTH_SCAN_POS);
 		
 		MutableBlockPos cursor = new MutableBlockPos();
@@ -1613,12 +1613,12 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 							cursor.getZ() + .5 + (-.5 + itemRand.nextDouble()),
 							2,
 							.2, .2, .2, 0, new int[0]);
-					return true;
+					return cursor.toImmutable();
 				}
 			}
 		}
 		
-		return false;
+		return null;
 	}
 	
 	public static final boolean DoEarthDig(World world, EntityPlayer player, BlockPos pos, EnumFacing face) {

@@ -35,6 +35,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -130,8 +131,10 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 	@SideOnly(Side.CLIENT)
     @Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-		for (LensType type : LensType.values()) {
-			subItems.add(Create(type, 1));
+		if (this.isInCreativeTab(tab)) {
+			for (LensType type : LensType.values()) {
+				subItems.add(Create(type, 1));
+			}
 		}
 	}
 	
@@ -229,8 +232,13 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 	}
 	
 	protected int doGrow(World world, BlockPos center, int maxAether) {
-		if (EnchantedArmor.DoEarthGrow(world, center)) {
-			AetherInfuserTileEntity.DoChargeEffect(world, center, 1, 0xFF22FF44);
+		@Nullable BlockPos growPos = EnchantedArmor.DoEarthGrow(world, center); 
+		if (growPos != null) {
+			AetherInfuserTileEntity.DoChargeEffect(world,
+					new Vec3d(center.getX() + .5, center.getY() + 1, center.getZ() + .5),
+					new Vec3d(growPos.getX() + .5, growPos.getY() + .5, growPos.getZ() + .5),
+					1, 0x6622FF44);
+			
 			return LensType.GROW.getAetherPerTick();
 		}
 		return 0;

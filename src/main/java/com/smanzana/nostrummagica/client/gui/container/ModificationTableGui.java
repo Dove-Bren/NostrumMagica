@@ -417,6 +417,7 @@ public class ModificationTableGui {
 		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+			super.drawDefaultBackground();
 			
 			if (localModIndex != container.modIndex) {
 				this.refreshButtons();

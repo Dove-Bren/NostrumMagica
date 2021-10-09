@@ -76,8 +76,10 @@ public class NostrumAetherResourceItem extends Item implements ILoreTagged, IAet
     @SideOnly(Side.CLIENT)
     @Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-    	for (AetherResourceType type : AetherResourceType.values()) {
-    		subItems.add(new ItemStack(this, 1, getMetaFromType(type)));
+    	if (this.isInCreativeTab(tab)) {
+	    	for (AetherResourceType type : AetherResourceType.values()) {
+	    		subItems.add(new ItemStack(this, 1, getMetaFromType(type)));
+	    	}
     	}
 	}
     
