@@ -577,7 +577,8 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		/**
 		 * Returns whether an in-progress EntityAIBase should continue executing
 		 */
-		public boolean continueExecuting() {
+		@Override
+		public boolean shouldContinueExecuting() {
 			return false;
 		}
 
@@ -697,7 +698,8 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		/**
 		 * Returns whether an in-progress EntityAIBase should continue executing
 		 */
-		public boolean continueExecuting() {
+		@Override
+		public boolean shouldContinueExecuting() {
 			if (shouldRoost() && roostPos != null) {
 				// If roost position is destroyed, bail out
 				if (parentEntity.world.isAirBlock(roostPos) // fast simple check
@@ -812,7 +814,8 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		/**
 		 * Returns whether an in-progress EntityAIBase should continue executing
 		 */
-		public boolean continueExecuting() {
+		@Override
+		public boolean shouldContinueExecuting() {
 			return running;
 		}
 
