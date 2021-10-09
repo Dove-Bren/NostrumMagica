@@ -13,7 +13,6 @@ import com.smanzana.nostrummagica.network.messages.ReagentBagToggleMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -260,7 +259,7 @@ public class ReagentBagGui {
 	}
 	
 	@SideOnly(Side.CLIENT)
-	public static class BagGui extends GuiContainer {
+	public static class BagGui extends AutoGuiContainer {
 
 		private BagContainer bag;
 		
@@ -273,8 +272,6 @@ public class ReagentBagGui {
 		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-			super.drawDefaultBackground();
-			
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			

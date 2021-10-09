@@ -8,7 +8,6 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -170,7 +169,7 @@ public class LoreTableGui {
 	}
 	
 	@SideOnly(Side.CLIENT)
-	public static class LoreTableGuiContainer extends GuiContainer {
+	public static class LoreTableGuiContainer extends AutoGuiContainer {
 
 		private LoreTableContainer container;
 		
@@ -189,8 +188,6 @@ public class LoreTableGui {
 		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-			super.drawDefaultBackground();
-			
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			

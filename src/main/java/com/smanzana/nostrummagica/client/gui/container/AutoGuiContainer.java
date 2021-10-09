@@ -8,9 +8,9 @@ import net.minecraft.inventory.Container;
  * @author Skyler
  *
  */
-public abstract class AutoContainerGUI extends GuiContainer {
+public abstract class AutoGuiContainer extends GuiContainer {
 
-	public AutoContainerGUI(Container inventorySlotsIn) {
+	public AutoGuiContainer(Container inventorySlotsIn) {
 		super(inventorySlotsIn);
 	}
 	

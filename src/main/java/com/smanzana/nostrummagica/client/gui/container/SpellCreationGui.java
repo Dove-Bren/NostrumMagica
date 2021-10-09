@@ -30,7 +30,6 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ClickType;
@@ -538,7 +537,7 @@ public class SpellCreationGui {
 	private static final int NAME_MAX = 20;
 	
 	@SideOnly(Side.CLIENT)
-	public static class SpellGui extends GuiContainer {
+	public static class SpellGui extends AutoGuiContainer {
 		
 		private static class SpellIconButton extends GuiButton {
 			
@@ -620,8 +619,6 @@ public class SpellCreationGui {
 		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-			super.drawDefaultBackground();
-			
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			

@@ -21,7 +21,6 @@ import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -368,7 +367,7 @@ public class ModificationTableGui {
 	}
 	
 	@SideOnly(Side.CLIENT)
-	public static class ModificationGui extends GuiContainer {
+	public static class ModificationGui extends AutoGuiContainer {
 
 		private ModificationTableContainer container;
 		private int localModIndex = 0;
@@ -417,8 +416,6 @@ public class ModificationTableGui {
 		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-			super.drawDefaultBackground();
-			
 			if (localModIndex != container.modIndex) {
 				this.refreshButtons();
 				this.localModIndex = container.modIndex;

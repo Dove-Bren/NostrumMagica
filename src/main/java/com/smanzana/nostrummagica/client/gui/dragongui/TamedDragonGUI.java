@@ -11,6 +11,7 @@ import javax.annotation.Nonnull;
 import com.google.common.collect.Lists;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.container.AutoGuiContainer;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.network.NetworkHandler;
@@ -20,7 +21,6 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
@@ -241,7 +241,7 @@ public class TamedDragonGUI {
 	
 	
 	@SideOnly(Side.CLIENT)
-	public static class DragonGUI extends GuiContainer {
+	public static class DragonGUI extends AutoGuiContainer {
 		
 		public static final ResourceLocation TEXT = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/container/tamed_dragon_gui.png");
 		

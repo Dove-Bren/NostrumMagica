@@ -7,7 +7,6 @@ import com.smanzana.nostrummagica.blocks.tiles.ActiveHopperTileEntity;
 import com.smanzana.nostrummagica.utils.Inventories;
 
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -98,7 +97,7 @@ public class ActiveHopperGui {
 	}
 	
 	@SideOnly(Side.CLIENT)
-	public static class ActiveHopperGuiContainer extends GuiContainer {
+	public static class ActiveHopperGuiContainer extends AutoGuiContainer {
 
 		public ActiveHopperGuiContainer(ActiveHopperContainer container) {
 			super(container);
@@ -114,8 +113,6 @@ public class ActiveHopperGui {
 		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-			super.drawDefaultBackground();
-			
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			

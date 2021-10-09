@@ -10,7 +10,6 @@ import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -249,7 +248,7 @@ public class WispBlockGui {
 	}
 	
 	@SideOnly(Side.CLIENT)
-	public static class WispBlockGuiContainer extends GuiContainer {
+	public static class WispBlockGuiContainer extends AutoGuiContainer {
 
 		private WispBlockContainer container;
 		
@@ -268,8 +267,6 @@ public class WispBlockGui {
 		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-			super.drawDefaultBackground();
-			
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			@Nonnull ItemStack scroll = container.table.getScroll();

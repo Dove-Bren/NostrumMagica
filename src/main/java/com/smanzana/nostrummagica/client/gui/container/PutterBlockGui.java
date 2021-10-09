@@ -7,7 +7,6 @@ import com.smanzana.nostrummagica.blocks.tiles.PutterBlockTileEntity;
 import com.smanzana.nostrummagica.utils.Inventories;
 
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -103,7 +102,7 @@ public class PutterBlockGui {
 	}
 	
 	@SideOnly(Side.CLIENT)
-	public static class PutterBlockGuiContainer extends GuiContainer {
+	public static class PutterBlockGuiContainer extends AutoGuiContainer {
 
 		//private PutterBlockContainer container;
 		
@@ -122,8 +121,6 @@ public class PutterBlockGui {
 		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-			super.drawDefaultBackground();
-			
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			
