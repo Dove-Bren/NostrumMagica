@@ -215,7 +215,7 @@ public class ClientProxy extends CommonProxy {
 	private ClientEffectRenderer effectRenderer;
 
 	public ClientProxy() {
-		MinecraftForge.EVENT_BUS.register(this);
+		super();
 	}
 	
 	@Override

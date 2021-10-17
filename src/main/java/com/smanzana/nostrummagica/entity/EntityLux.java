@@ -829,6 +829,8 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 			targetPos = this.getNearbyFeature(parentEntity);
 			if (targetPos != null) {
 				parentEntity.moveHelper.setMoveTo(targetPos.getX() + .5, targetPos.getY() + .5, targetPos.getZ() + .5, .3);
+			} else {
+				running = false;
 			}
 		}
 		

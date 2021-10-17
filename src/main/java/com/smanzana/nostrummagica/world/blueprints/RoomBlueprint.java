@@ -473,7 +473,7 @@ public class RoomBlueprint {
 		this.spawnerFunc = spawner;
 	}
 	
-	private static EnumFacing getModDir(EnumFacing original, EnumFacing newFacing) {
+	public static EnumFacing getModDir(EnumFacing original, EnumFacing newFacing) {
 		EnumFacing out = EnumFacing.NORTH;
 		int rotCount = (4 + newFacing.getHorizontalIndex() - original.getHorizontalIndex()) % 4;
 		while (rotCount-- > 0) {

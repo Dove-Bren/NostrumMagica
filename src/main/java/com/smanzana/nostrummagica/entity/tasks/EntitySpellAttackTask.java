@@ -1,9 +1,12 @@
 package com.smanzana.nostrummagica.entity.tasks;
 
+import javax.annotation.Nullable;
+
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.player.EntityPlayer;
 
@@ -70,6 +73,14 @@ public class EntitySpellAttackTask<T extends EntityLiving> extends EntityAIBase 
 		
 		return spells[entity.getRNG().nextInt(spells.length)];
 	}
+	
+	public @Nullable EntityLivingBase getTarget() {
+		if (needsTarget && null != entity.getAttackTarget()) {
+			return entity.getAttackTarget();
+		}
+		
+		return null;
+	}
 
 	@Override
 	public void startExecuting() {
@@ -79,8 +90,9 @@ public class EntitySpellAttackTask<T extends EntityLiving> extends EntityAIBase 
 			return;
 		}
 		
-		if (needsTarget && null != entity.getAttackTarget()) {
-			entity.faceEntity(entity.getAttackTarget(), 360f, 180f);
+		EntityLivingBase target = getTarget();
+		if (target != null) {
+			entity.faceEntity(target, 360f, 180f);
 		}
 		
 		spell.cast(entity, 1);

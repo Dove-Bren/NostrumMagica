@@ -66,9 +66,19 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(0, ORB_RADIUS - .5f, 0);
 		GlStateManager.scale(mult, mult, mult);
+//		
+//		{
+//			final int color = 0x0033BB88 | (((int) (opacity * 255f) << 24) & 0xFF000000);
+//			//if (MODEL_ORB == null) {
+//				//MODEL_ORB = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getModel(ORB_MODEL_LOC);
+//				IBakedModel MODEL_ORB = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getModel(new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, "effects/orb_pure"), "normal"));
+//			//}
+//			
+//			ClientEffectForm.drawModel(MODEL_ORB, color);
+//		}
 		
 		{
-			//ClientEffectForm.drawModel(MODEL_ORB, color);
+			//ClientEffectForm.drawModel(Model, color);
 			// ARGB
 			// final int color = 0x0033BB88 | ((int) (opacity * 255f) << 24);
 			final float red = .2f;

@@ -114,6 +114,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -128,6 +129,10 @@ import net.minecraftforge.registries.IForgeRegistry;
 public class CommonProxy {
 	
 	public CapabilityHandler capabilityHandler;
+	
+	public CommonProxy() {
+		MinecraftForge.EVENT_BUS.register(this);
+	}
 	
 	public void preinit() {
 		//MinecraftForge.EVENT_BUS.register(this);

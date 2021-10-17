@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.utils;
 
 import java.lang.reflect.Field;
+import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
 import javax.annotation.Nonnull;
@@ -173,6 +174,7 @@ public final class RenderFuncs {
 
 				// Uploading the difference back to the buffer. Have to use the helper function since the provided putX methods upload the data for a quad, not a vertex and this data is vertex-dependent.
 				putPositionForVertex(buffer, intBuf, vertexIndex, new Vector3f(vert.x - vertX, vert.y - vertY, vert.z - vertZ));
+				//putColor4ForVertex(buffer, intBuf, vertexIndex, color);
 			}
 
 			// Uploading the origin position to the buffer. This is an addition operation.
@@ -185,7 +187,8 @@ public final class RenderFuncs {
 //			buffer.putBrightness4(bVal, bVal, bVal, bVal);
 
 			// Uploading the color multiplier to the buffer
-			buffer.putColor4(color);
+			//buffer.putColor4(color); Vanilla sucks and now ignores the alpha bit
+			putColor4(buffer, intBuf,  color);
 		}
 	}
 	
@@ -212,6 +215,27 @@ public final class RenderFuncs {
 		intBuf.put(offset, x);
 		intBuf.put(offset + 1, y);
 		intBuf.put(offset + 2, z);
+	}
+	
+	
+	public static void putColor4(BufferBuilder buffer, IntBuffer intBuf, int colorARGB) {
+		// got to get to RGBA
+		int color = colorARGB << 8
+				| ((colorARGB >> 24) & 255);
+		
+		if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
+			// swap color around
+			color = Integer.reverse(color);
+		}
+		for (int i = 0; i < 4; ++i) {
+			int colorIdx = buffer.getColorIndex(i + 1);
+			intBuf.put(colorIdx, color);
+		}
+	}
+	
+	public static void putColor4ForVertex(BufferBuilder buffer, IntBuffer intBuf, int offset, int color) {
+		int colorIdx = buffer.getColorIndex(offset);
+		intBuf.put(colorIdx, color);
 	}
 	
 	private static final Field bufferBuilder_rawIntBuffer = ObfuscationReflectionHelper.findField(BufferBuilder.class, "rawIntBuffer");

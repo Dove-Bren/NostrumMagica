@@ -49,8 +49,7 @@ public enum EntityDragonGambit {
 	
 	@SideOnly(Side.CLIENT)
 	public List<String> getDesc() {
-		//if (this.desc == null) {
-		{
+		if (this.desc == null) {
 			String raw = I18n.format("gambit." + getUnlocName() + ".desc", "" + ChatFormatting.DARK_GREEN + ChatFormatting.BOLD, ChatFormatting.RESET);
 			String[] lines = raw.split("\\|");
 			
