@@ -71,6 +71,8 @@ public class BaublesClientProxy extends BaublesProxy {
 					type.getUnlocalizedKey());
 		}
     	
-    	ClientProxy.registerModel(ItemAetherCloak.instance(), 0, ItemAetherCloak.ID);
+    	if (NostrumMagica.aetheria.isEnabled()) {
+    		ClientProxy.registerModel(ItemAetherCloak.instance(), 0, ItemAetherCloak.ID);
+    	}
 	}
 }

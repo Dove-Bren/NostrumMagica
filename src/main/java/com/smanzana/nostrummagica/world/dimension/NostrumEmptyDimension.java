@@ -298,6 +298,7 @@ public class NostrumEmptyDimension {
 			player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 2, spawn.getZ() + .5);
 			player.motionX = player.motionY = player.motionZ = 0;
 			player.setSpawnChunk(spawn.up(2), true, ModConfig.config.sorceryDimensionIndex());
+			
 			return true;
 		}
 		

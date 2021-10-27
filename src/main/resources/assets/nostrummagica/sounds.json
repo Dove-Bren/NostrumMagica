@@ -380,6 +380,99 @@
         [
             "nostrummagica:entity/wing_flap"
         ]
-    }
+    },
+	
+	"music.dungeon1.intro":
+	{
+		"stream": true,
+		"preload": true,
+		"sounds":
+		[
+			"nostrummagica:music/nostrumdesolation_inoutro"
+		]
+	},
+	"music.dungeon1.low":
+	{
+		"stream": true,
+		"preload": true,
+		"sounds":
+		[
+			"nostrummagica:music/nostrumdesolation_low"
+		]
+	},
+	"music.dungeon1.high":
+	{
+		"stream": true,
+		"preload": true,
+		"sounds":
+		[
+			"nostrummagica:music/nostrumdesolation_high"
+		]
+	},
+	
+	"music.dungeon2.intro":
+	{
+		"stream": true,
+		"preload": true,
+		"sounds":
+		[
+			"nostrummagica:music/dark_rythm_intro"
+		]
+	},
+	"music.dungeon2.low":
+	{
+		"stream": true,
+		"preload": true,
+		"sounds":
+		[
+			"nostrummagica:music/dark_rythm_low"
+		]
+	},
+	"music.dungeon2.low_adv":
+	{
+		"stream": true,
+		"preload": true,
+		"sounds":
+		[
+			"nostrummagica:music/dark_rythm_low_adv"
+		]
+	},
+	"music.dungeon2.high":
+	{
+		"stream": true,
+		"preload": true,
+		"sounds":
+		[
+			"nostrummagica:music/dark_rythm_high_wrapped"
+		]
+	},
+	"music.dungeon2.high_adv":
+	{
+		"stream": true,
+		"preload": true,
+		"sounds":
+		[
+			"nostrummagica:music/dark_rythm_high_adv_wrapped"
+		]
+	},
+	
+	"music.dungeon2.battle.intro":
+	{
+		"stream": true,
+		"preload": true,
+		"sounds":
+		[
+			"nostrummagica:music/dark_rythm_battle_intro_full"
+		]
+	},
+	"music.dungeon2.battle.loop":
+	{
+		"stream": true,
+		"preload": true,
+		"sounds":
+		[
+			"nostrummagica:music/dark_rythm_battle_high_loop"
+		]
+	}
     
 }

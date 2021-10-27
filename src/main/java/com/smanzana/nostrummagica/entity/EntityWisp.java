@@ -126,6 +126,11 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 			this.targetTasks.addTask(priority++, new EntityAINearestAttackableTarget<EntityPlayer>(this, EntityPlayer.class, 10, true, false, null));
 		} else {
 			this.targetTasks.addTask(priority++, new EntityAINearestAttackableTarget<EntityMob>(this, EntityMob.class, 10, true, false, (mob) -> {
+				// Wisps spawned with no home will be neutral
+				if (this.getHome() == null) {
+					return false;
+				}
+				
 				return (mob instanceof IEntityTameable ? !((IEntityTameable) mob).isTamed()
 						: true);
 			}));

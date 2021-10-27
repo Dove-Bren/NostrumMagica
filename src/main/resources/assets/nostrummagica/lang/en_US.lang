@@ -444,6 +444,16 @@ config.nostrummagica.display.display_xp_text=XP Values
 config.nostrummagica.display.display_xp_bar=XP Bar Overlay
 config.nostrummagica.display.obelisk_list=Obelisk List
 config.nostrummagica.display.display_reagent_nums=Reagent Count
+config.nostrummagica.display.dragon_healthbar=Dragon Expanded Healthbars
+config.nostrummagica.display.hookshot_crosshair=Hookshot Crosshairs
+config.nostrummagica.display.overarmor_display=Over-Armor Display
+config.nostrummagica.display.pet_healthbar=Pet Healthbars
+config.nostrummagica.display.shield_display=Magical Shield Displays
+config.nostrummagica.display.display_mirror_quest_spoilers=Show Mirror Spoilers
+config.nostrummagica.display.display_login_text=Welcome Text
+
+config.nostrummagica.controls=Control Options
+config.nostrummagica.controls.ender_dash_double_press=EnderDash Double Press
 
 config.nostrummagica.server=Server Options
 

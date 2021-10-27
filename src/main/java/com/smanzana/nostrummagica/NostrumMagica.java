@@ -57,6 +57,7 @@ import com.smanzana.nostrummagica.integration.baubles.BaublesProxy;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble.ItemType;
 import com.smanzana.nostrummagica.integration.enderio.EnderIOProxy;
+import com.smanzana.nostrummagica.integration.musica.MusicaProxy;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
@@ -202,7 +203,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 
-@Mod(modid = NostrumMagica.MODID, version = NostrumMagica.VERSION, guiFactory = "com.smanzana.nostrummagica.config.ConfigGuiFactory", dependencies = "after:baubles")
+@Mod(modid = NostrumMagica.MODID, version = NostrumMagica.VERSION, guiFactory = "com.smanzana.nostrummagica.config.ConfigGuiFactory", dependencies = "after:baubles;after:musica")
 public class NostrumMagica
 {
     public static final String MODID = "nostrummagica";
@@ -218,6 +219,8 @@ public class NostrumMagica
     public static AetheriaProxy aetheria;
     @SidedProxy(clientSide="com.smanzana.nostrummagica.integration.enderio.EnderIOClientProxy", serverSide="com.smanzana.nostrummagica.integration.enderio.EnderIOProxy")
     public static EnderIOProxy enderIO;
+    @SidedProxy(clientSide="com.smanzana.nostrummagica.integration.musica.MusicaClientProxy", serverSide="com.smanzana.nostrummagica.integration.musica.MusicaProxy")
+    public static MusicaProxy musica;
     
     public static CreativeTabs creativeTab;
     public static CreativeTabs enhancementTab;
@@ -248,6 +251,7 @@ public class NostrumMagica
         aetheria.init();
         baubles.init();
         enderIO.init();
+        musica.init();
     }
     
     @EventHandler
@@ -282,6 +286,9 @@ public class NostrumMagica
 	    if (Loader.isModLoaded("enderio") || Loader.isModLoaded("EnderIO")) {
 	    	enderIO.enable();
 	    }
+	    if (Loader.isModLoaded("musica")) {
+	    	musica.enable();
+	    }
 	    
     	new ModConfig(new Configuration(event.getSuggestedConfigurationFile()));
     	
@@ -289,6 +296,7 @@ public class NostrumMagica
     	aetheria.preInit();
     	baubles.preInit();
     	enderIO.preInit();
+    	musica.preInit();
     	
     	RitualRegistry.instance();
 
@@ -304,6 +312,7 @@ public class NostrumMagica
     	aetheria.postInit();
     	baubles.postInit();
     	enderIO.postInit();
+    	musica.postInit();
     	
     	initFinished = true;
     	

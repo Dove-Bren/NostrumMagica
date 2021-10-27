@@ -55,7 +55,17 @@ public enum NostrumMagicaSounds {
 	WING_FLAP("entity.wing.flap", SoundCategory.PLAYERS),
 	LUX_HURT("mob.lux.hurt", SoundCategory.NEUTRAL),
 	LUX_DEATH("mob.lux.death", SoundCategory.NEUTRAL),
-	LUX_IDLE("mob.lux.idle", SoundCategory.NEUTRAL)
+	LUX_IDLE("mob.lux.idle", SoundCategory.NEUTRAL),
+	MUSIC_DUNGEON1_INTRO("music.dungeon1.intro", SoundCategory.MUSIC),
+	MUSIC_DUNGEON1_LOW("music.dungeon1.low", SoundCategory.MUSIC),
+	MUSIC_DUNGEON1_HIGH("music.dungeon1.high", SoundCategory.MUSIC),
+	MUSIC_DUNGEON2_INTRO("music.dungeon2.intro", SoundCategory.MUSIC),
+	MUSIC_DUNGEON2_LOW("music.dungeon2.low", SoundCategory.MUSIC),
+	MUSIC_DUNGEON2_LOW_ADV("music.dungeon2.low_adv", SoundCategory.MUSIC),
+	MUSIC_DUNGEON2_HIGH("music.dungeon2.high", SoundCategory.MUSIC),
+	MUSIC_DUNGEON2_HIGH_ADV("music.dungeon2.high_adv", SoundCategory.MUSIC),
+	MUSIC_DUNGEON2_BATTLE_INTRO("music.dungeon2.battle.intro", SoundCategory.MUSIC),
+	MUSIC_DUNGEON2_BATTLE_LOOP("music.dungeon2.battle.loop", SoundCategory.MUSIC)
 	;
 	
 	private ResourceLocation resource;

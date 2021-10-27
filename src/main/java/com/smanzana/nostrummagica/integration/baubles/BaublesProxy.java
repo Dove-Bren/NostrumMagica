@@ -89,7 +89,10 @@ public class BaublesProxy {
 		final IForgeRegistry<Item> registry = event.getRegistry();
 		
     	registry.register(ItemMagicBauble.instance());
-    	registry.register(ItemAetherCloak.instance());
+    	
+    	if (NostrumMagica.aetheria.isEnabled()) {
+    		registry.register(ItemAetherCloak.instance());
+    	}
 	}
 	
 	private void registerBaubleQuests() {
@@ -279,31 +282,33 @@ public class BaublesProxy {
 				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.ELUDE_CAPE_SMALL, 1)));
 		RitualRegistry.instance().addRitual(recipe);
 		
-		recipe = RitualRecipe.createTier3("aether_cloak",
-				new ItemStack(ItemAetherCloak.instance()),
-				EMagicElement.ICE,
-				new ReagentType[] {ReagentType.MANDRAKE_ROOT, ReagentType.SPIDER_SILK, ReagentType.BLACK_PEARL, ReagentType.SKY_ASH},
-				new ItemStack(APIProxy.AetherBatterySmallBlock),
-				new ItemStack[] {new ItemStack(APIProxy.AetherGemItem, 1, OreDictionary.WILDCARD_VALUE), ItemMagicBauble.getItem(ItemType.ELUDE_CAPE_SMALL, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), new ItemStack(APIProxy.AetherGemItem, 1, OreDictionary.WILDCARD_VALUE)},
-				new RRequirementResearch("aether_cloaks"),
-				new OutcomeSpawnItem(new ItemStack(ItemAetherCloak.instance())));
-		RitualRegistry.instance().addRitual(recipe);
-		
-		ItemStack casterCloak = new ItemStack(ItemAetherCloak.instance());
-		ItemAetherCloak.instance().setAetherCaster(casterCloak, true);
-		recipe = RitualRecipe.createTier3("aether_cloak_caster_upgrade",
-				casterCloak,
-				EMagicElement.FIRE,
-				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.CRYSTABLOOM},
-				new ItemStack(ItemAetherCloak.instance()),
-				new ItemStack[] {new ItemStack(APIProxy.PassivePendantItem, 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), ItemStack.EMPTY, new ItemStack(APIProxy.PassivePendantItem, 1, OreDictionary.WILDCARD_VALUE)},
-				new RRequirementResearch("aether_cloaks"),
-				new OutcomeModifyCenterItemGeneric((world, player, item, otherItems, centerPos, recipeIn) -> {
-					if (!item.isEmpty() && item.getItem() instanceof ItemAetherCloak) {
-						((ItemAetherCloak) item.getItem()).setAetherCaster(item, true);
-					}
-				}, Lists.newArrayList("Allows using aether from the cloak in place of reagents")));
-		RitualRegistry.instance().addRitual(recipe);
+		if (NostrumMagica.aetheria.isEnabled()) {
+			recipe = RitualRecipe.createTier3("aether_cloak",
+					new ItemStack(ItemAetherCloak.instance()),
+					EMagicElement.ICE,
+					new ReagentType[] {ReagentType.MANDRAKE_ROOT, ReagentType.SPIDER_SILK, ReagentType.BLACK_PEARL, ReagentType.SKY_ASH},
+					new ItemStack(APIProxy.AetherBatterySmallBlock),
+					new ItemStack[] {new ItemStack(APIProxy.AetherGemItem, 1, OreDictionary.WILDCARD_VALUE), ItemMagicBauble.getItem(ItemType.ELUDE_CAPE_SMALL, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), new ItemStack(APIProxy.AetherGemItem, 1, OreDictionary.WILDCARD_VALUE)},
+					new RRequirementResearch("aether_cloaks"),
+					new OutcomeSpawnItem(new ItemStack(ItemAetherCloak.instance())));
+			RitualRegistry.instance().addRitual(recipe);
+			
+			ItemStack casterCloak = new ItemStack(ItemAetherCloak.instance());
+			ItemAetherCloak.instance().setAetherCaster(casterCloak, true);
+			recipe = RitualRecipe.createTier3("aether_cloak_caster_upgrade",
+					casterCloak,
+					EMagicElement.FIRE,
+					new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.CRYSTABLOOM},
+					new ItemStack(ItemAetherCloak.instance()),
+					new ItemStack[] {new ItemStack(APIProxy.PassivePendantItem, 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), ItemStack.EMPTY, new ItemStack(APIProxy.PassivePendantItem, 1, OreDictionary.WILDCARD_VALUE)},
+					new RRequirementResearch("aether_cloaks"),
+					new OutcomeModifyCenterItemGeneric((world, player, item, otherItems, centerPos, recipeIn) -> {
+						if (!item.isEmpty() && item.getItem() instanceof ItemAetherCloak) {
+							((ItemAetherCloak) item.getItem()).setAetherCaster(item, true);
+						}
+					}, Lists.newArrayList("Allows using aether from the cloak in place of reagents")));
+			RitualRegistry.instance().addRitual(recipe);
+		}
 	}
 	
 	private void registerBaubleResearch() {

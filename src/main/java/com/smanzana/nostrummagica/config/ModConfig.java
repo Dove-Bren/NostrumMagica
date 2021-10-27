@@ -257,10 +257,11 @@ public class ModConfig {
 	
 	private void initConfig() {
 		for (Key key : Key.values())
-		if (!base.hasKey(key.getCategory(), key.getKey())) {
+		//if (!base.hasKey(key.getCategory(), key.getKey())) {
+		{
 			if (key.getDefault() instanceof Float) {
 				base.getFloat(key.getKey(), key.getCategory(), (Float) key.getDefault(),
-						Float.MIN_VALUE, Float.MAX_VALUE, "This if float",//key.getDescription(),
+						Float.MIN_VALUE, Float.MAX_VALUE, key.getDescription(),
 						"config.nostrummagica." + key.getCategory() + "." + key.getKey());
 			}
 			else if (key.getDefault() instanceof Boolean)

@@ -20,8 +20,7 @@ public class ConfigGuiFactory implements IModGuiFactory {
 
 	@Override
 	public boolean hasConfigGui() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override

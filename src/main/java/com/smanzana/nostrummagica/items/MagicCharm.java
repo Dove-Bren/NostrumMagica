@@ -311,7 +311,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 		} else if (player.dimension == ModConfig.config.sorceryDimensionIndex()) {
 			// In  sorcery dimension. Return to beginning
 			BlockPos spawn = NostrumMagica.getDimensionMapper(player.world).register(player.getUniqueID()).getCenterPos(NostrumEmptyDimension.SPAWN_Y);
-			player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 1, spawn.getZ() + .5);
+			player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 4, spawn.getZ() + .5);
 			// Allow this type of teleportation by updating last coords...
 			player.lastTickPosX = player.posX;
 			player.lastTickPosY = player.posY;

@@ -16,11 +16,13 @@ import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.SpellAction.MagicDamageSource;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
@@ -124,6 +126,7 @@ public class MagicEffectProxy {
 		CONTINGENCY_HEALTH, // Just visual. Actual effects are in trigger instance
 		CONTINGENCY_MANA, // Just visual. Actual effects are in trigger instance
 		CONTINGENCY_FOOD, // Just visual. Actual effects are in trigger instance
+		TARGETED, // Can key many things off. As of writing, used for battle music
 	}
 	
 	private Map<UUID, Map<SpecialEffect, EffectData>> effects;
@@ -179,6 +182,38 @@ public class MagicEffectProxy {
 		apply(SpecialEffect.CONTINGENCY_FOOD, new EffectData().amt(0).count(duration), entity);
 	}
 	
+	public void setTargetted(EntityLivingBase entity) {
+		final int start = entity.ticksExisted;
+		final int dimension = entity.dimension;
+		apply(SpecialEffect.TARGETED, new EffectData().count(start).amt(dimension), entity);
+		NostrumMagica.playerListener.registerTimer((type, ent, junk) -> {
+			boolean remove = false;
+			
+			// Find what the current data is
+			EffectData data = NostrumMagica.magicEffectProxy.getData(entity, SpecialEffect.TARGETED);
+			if (data != null && (int) data.getAmt() == dimension && data.getCount() == start) {
+				// Most recent is still us. Check if we should cancel
+				if (entity.world != null && !entity.isDead) {
+					if (entity.world.getEntities(EntityLiving.class, (e) -> {
+						return e != null
+								&& ((EntityLiving) e).getAttackTarget() != null
+								&& ((EntityLiving) e).getAttackTarget().equals(entity)
+								&& entity.getDistanceSq(e) < 400;
+					}).isEmpty()) {
+						NostrumMagica.magicEffectProxy.remove(SpecialEffect.TARGETED, entity);
+						remove = true;
+					} else {
+						// Check again
+					}
+				}
+			} else {
+				remove = true;
+			}
+			
+			return remove;
+		}, 20 * 5, 1);
+	}
+	
 	public void remove(SpecialEffect effect, EntityLivingBase entity) {
 		UUID id = entity.getPersistentID();
 		Map<SpecialEffect, EffectData> record = effects.get(id);
@@ -200,6 +235,46 @@ public class MagicEffectProxy {
 		
 	}
 	
+	protected float applyMagicShields(EntityLivingBase hurt, DamageSource source, float inAmt) {
+		if (source.isDamageAbsolute())
+			return inAmt;
+		
+		UUID id = hurt.getPersistentID();
+		if (!effects.containsKey(id))
+			return inAmt;
+		
+		SpecialEffect effect = SpecialEffect.SHIELD_PHYSICAL;
+		if (source instanceof SpellAction.MagicDamageSource
+				&& ((SpellAction.MagicDamageSource) source).getElement() != EMagicElement.PHYSICAL)
+			effect = SpecialEffect.SHIELD_MAGIC;
+		
+		Map<SpecialEffect, EffectData> record = effects.get(id);
+		EffectData left = record.get(effect);
+		if (left != null) {
+			left.amt -= inAmt;
+			if (left.amt < 0) {
+				inAmt = (float) -left.amt; // How much we couldn't shield
+			} else {
+				inAmt = 0f; // We shielded all so set to 0
+			}
+			
+			if (left.amt <= 0) {
+				removeEffect(hurt, effect);
+				record.remove(effect);
+				NostrumMagicaSounds.SHIELD_BREAK.play(hurt);
+			} else {
+				record.put(effect, left);
+				NostrumMagicaSounds.SHIELD_ABSORB.play(hurt);
+			}
+			
+			// Send a little bit of an update to the entity (if it's a player) to update UI
+			if (hurt instanceof EntityPlayerMP) {
+				NostrumMagica.proxy.updatePlayerEffect((EntityPlayerMP) hurt, effect, left.amt <= 0 ? null : left);
+			}
+		}
+		return inAmt;
+	}
+	
 	@SubscribeEvent
 	public void onAttack(LivingHurtEvent event) {
 		if (event.getEntity().world.isRemote) {
@@ -209,73 +284,39 @@ public class MagicEffectProxy {
 		if (effects.isEmpty())
 			return;
 		
-		if (event.getSource().isDamageAbsolute())
-			return;
-		
-		UUID id = event.getEntityLiving().getPersistentID();
-		if (!effects.containsKey(id))
-			return;
-		
-		SpecialEffect effect = SpecialEffect.SHIELD_PHYSICAL;
-		if (event.getSource() instanceof SpellAction.MagicDamageSource
-				&& ((SpellAction.MagicDamageSource) event.getSource()).getElement() != EMagicElement.PHYSICAL)
-			effect = SpecialEffect.SHIELD_MAGIC;
-		
-		Map<SpecialEffect, EffectData> record = effects.get(id);
-		EffectData left = record.get(effect);
-		if (left != null) {
-			left.amt -= event.getAmount();
-			if (left.amt < 0) {
-				event.setAmount((float) -left.amt);
-			} else {
+		float amt = applyMagicShields(event.getEntityLiving(), event.getSource(), event.getAmount());
+		if (amt != event.getAmount()) {
+			event.setAmount(amt);
+			if (amt <= 0.0) {
 				event.setCanceled(true);
-			}
-			
-			if (left.amt <= 0) {
-				removeEffect(event.getEntityLiving(), effect);
-				record.remove(effect);
-				NostrumMagicaSounds.SHIELD_BREAK.play(event.getEntityLiving());
-			} else {
-				record.put(effect, left);
-				NostrumMagicaSounds.SHIELD_ABSORB.play(event.getEntityLiving());
-			}
-			
-			// Send a little bit of an update to the entity (if it's a player) to update UI
-			if (event.getEntityLiving() instanceof EntityPlayerMP) {
-				NostrumMagica.proxy.updatePlayerEffect((EntityPlayerMP) event.getEntityLiving(), effect, left.amt <= 0 ? null : left);
 			}
 		}
 	}
 	
-	@SubscribeEvent
-	public void onAttackStart(LivingAttackEvent e) {
+	protected void applyMagicDamageBuffs(EntityLivingBase target, DamageSource source, float amt) {
 		if (effects.isEmpty()) {
 			return;
 		}
 		
-		if (e.getEntity().world.isRemote) {
-			return;
-		}
-		
-		if (e.getSource() instanceof MagicDamageSource) {
+		if (source instanceof MagicDamageSource) {
 			return; // Can't recurse!
 		}
 		
-		if (!(e.getSource() instanceof EntityDamageSource)) {
+		if (!(source instanceof EntityDamageSource)) {
 			return;
 		}
 		
-		if (((EntityDamageSource) e.getSource()).getIsThornsDamage()) {
+		if (((EntityDamageSource) source).getIsThornsDamage()) {
 			return;
 		}
 		
-		if (e.getAmount() <= 1f) {
+		if (amt <= 1f) {
 			return;
 		}
 		
-		Entity source = e.getSource().getTrueSource();
-		if (source != null && source instanceof EntityLivingBase) {
-			EntityLivingBase living = (EntityLivingBase) source;
+		Entity sourceEnt = source.getTrueSource();
+		if (source != null && sourceEnt instanceof EntityLivingBase) {
+			EntityLivingBase living = (EntityLivingBase) sourceEnt;
 			UUID id = living.getPersistentID();
 			if (!effects.containsKey(id)) {
 				return;
@@ -283,12 +324,12 @@ public class MagicEffectProxy {
 			
 			EffectData data = effects.get(id).get(SpecialEffect.MAGIC_BUFF);
 			if (data != null) {
-				e.getEntityLiving().attackEntityFrom(new SpellAction.MagicDamageSource(living, data.element), 
-						SpellAction.calcDamage(living, e.getEntityLiving(), (float) data.amt, data.element));
-				e.getEntityLiving().setEntityInvulnerable(false);
-				e.getEntityLiving().hurtResistantTime = 0;
+				target.attackEntityFrom(new SpellAction.MagicDamageSource(living, data.element), 
+						SpellAction.calcDamage(living, target, (float) data.amt, data.element));
+				target.setEntityInvulnerable(false);
+				target.hurtResistantTime = 0;
 				
-				NostrumMagicaSounds.MELT_METAL.play(e.getEntity());
+				NostrumMagicaSounds.MELT_METAL.play(target);
 				
 				// Reduce count of charges and maybe remove
 				data.count--;
@@ -301,6 +342,29 @@ public class MagicEffectProxy {
 					NostrumMagica.proxy.updatePlayerEffect((EntityPlayerMP) living, SpecialEffect.MAGIC_BUFF, data.count == 0 ? null : data);
 				}
 			}
+		}
+	}
+	
+	protected void applyTargetted(EntityLivingBase ent) {
+		if (getData(ent, SpecialEffect.TARGETED) == null) {
+			setTargetted(ent);
+		}
+	}
+	
+	@SubscribeEvent
+	public void onAttackStart(LivingAttackEvent e) {
+		if (e.getEntity().world.isRemote) {
+			return;
+		}
+		
+		if (e.isCanceled()) {
+			return;
+		}
+		
+		applyMagicDamageBuffs(e.getEntityLiving(), e.getSource(), e.getAmount());
+		
+		if (e.getSource().getTrueSource() != null && e.getSource().getTrueSource() instanceof EntityLivingBase) {
+			applyTargetted(e.getEntityLiving());
 		}
 	}
 	
