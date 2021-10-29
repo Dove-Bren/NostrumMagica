@@ -5,6 +5,8 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.blocks.ITriggeredBlock;
 import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.world.blueprints.IOrientedTileEntity;
+import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
@@ -12,10 +14,11 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 
-public class SwitchBlockTileEntity extends TileEntity implements ITickable {
+public class SwitchBlockTileEntity extends TileEntity implements ITickable, IOrientedTileEntity {
 	
 	public static enum SwitchType {
 		ANY,
@@ -166,5 +169,10 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickable {
 				NostrumMagicaSounds.CAST_FAIL.play(world, pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5);
 			}
 		}
+	}
+
+	@Override
+	public void setSpawnedFromRotation(EnumFacing rotation) {
+		this.setOffset(RoomBlueprint.applyRotation(this.getOffset(), rotation));
 	}
 }

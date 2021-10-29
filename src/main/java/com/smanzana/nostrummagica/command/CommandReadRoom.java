@@ -33,8 +33,8 @@ public class CommandReadRoom extends CommandBase {
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-		if (args.length != 1) {
-			throw new CommandException("Invalid number of arguments. Expected a room name");
+		if (args.length != 1 && args.length != 2) {
+			throw new CommandException("Invalid number of arguments. Expected a room name and maybe a direction");
 		}
 		
 		if (sender instanceof EntityPlayer && ((EntityPlayer) sender).isCreative()) {
@@ -69,7 +69,15 @@ public class CommandReadRoom extends CommandBase {
 					if (nbt != null) {
 						RoomBlueprint blueprint = RoomBlueprint.fromNBT((NBTTagCompound) nbt.getTag("blueprint"));
 						if (blueprint != null) {
-							blueprint.spawn(player.world, PositionCrystal.getBlockPosition(main), EnumFacing.EAST);
+							EnumFacing facing = EnumFacing.EAST;
+							if (args.length == 2) {
+								try {
+									facing = EnumFacing.valueOf(args[1].toUpperCase());
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}
+							blueprint.spawn(player.world, PositionCrystal.getBlockPosition(main), facing);
 						} else {
 							sender.sendMessage(new TextComponentString("Room failed to load"));
 						}

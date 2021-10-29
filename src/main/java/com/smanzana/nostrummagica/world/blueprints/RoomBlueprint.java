@@ -482,7 +482,7 @@ public class RoomBlueprint {
 		return out;
 	}
 	
-	private BlockPos applyRotation(BlockPos input, EnumFacing modDir) {
+	public static BlockPos applyRotation(BlockPos input, EnumFacing modDir) {
 		int x = 0;
 		int z = 0;
 		final int dx = input.getX();
@@ -548,6 +548,10 @@ public class RoomBlueprint {
 					
 					if (te != null) {
 						world.setTileEntity(at, te);
+						if (te instanceof IOrientedTileEntity) {
+							// Let tile ent respond to rotation
+							((IOrientedTileEntity) te).setSpawnedFromRotation(direction);
+						}
 					} else {
 						NostrumMagica.logger.error("Could not deserialize TileEntity with id \"" + tileEntityData.getString("id") + "\"");
 					}
@@ -632,7 +636,7 @@ public class RoomBlueprint {
 		List<BlockPos> secondPassPos = new ArrayList<>(16 * 4);
 		
 		// Data has inverse rotation
-		modDir = modDir.getHorizontalIndex() % 2 == 1 ? modDir.getOpposite() : modDir;
+		final EnumFacing dataDir = modDir.getHorizontalIndex() % 2 == 1 ? modDir.getOpposite() : modDir;
 		
 		// Loop over all chunks from <x to >x (and <z to >z)
 		for (int cx = 0; cx <= numChunkX; cx++)
@@ -659,8 +663,8 @@ public class RoomBlueprint {
 				cursor.setPos(chunkOffsetX + i, j + origin.getY(), chunkOffsetZ + k);
 				
 				// Find data position by applying rotation to transform x and z coords into u and v data coords
-				unit = applyRotation(new BlockPos(1, 0, 1), modDir);
-				BlockPos dataPos = applyRotation(cursor.toImmutable().subtract(origin), modDir);
+				unit = applyRotation(new BlockPos(1, 0, 1), dataDir);
+				BlockPos dataPos = applyRotation(cursor.toImmutable().subtract(origin), dataDir);
 				
 				// Negative values here, though, imply reflection. So make "-x" be "max - x"
 				if (unit.getX() < 0 || unit.getZ() < 0) {

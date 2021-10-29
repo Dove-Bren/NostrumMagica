@@ -2,15 +2,19 @@ package com.smanzana.nostrummagica.blocks.tiles;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.world.blueprints.IOrientedTileEntity;
+import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class TeleportRuneTileEntity extends TileEntity {
+public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileEntity {
 	
 	private static final String NBT_OFFSET = "offset";
 	
@@ -85,5 +89,11 @@ public class TeleportRuneTileEntity extends TileEntity {
 			IBlockState state = world.getBlockState(pos);
 			world.notifyBlockUpdate(pos, state, state, 2);
 		}
+	}
+	
+	@Override
+	public void setSpawnedFromRotation(EnumFacing rotation) {
+		BlockPos out = RoomBlueprint.applyRotation(this.getOffset(), rotation);
+		this.setOffset(out.getX(), out.getY(), out.getZ());
 	}
 }
