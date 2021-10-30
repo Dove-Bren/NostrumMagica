@@ -398,6 +398,7 @@ public class RoomBlueprint {
 		final int height = dimensions.getY();
 		final int length = dimensions.getZ();
 		this.blocks = new BlueprintBlock[width * height * length];
+		final List<DungeonExitPoint> doorsRaw = new ArrayList<>();
 		
 		int slot = 0;
 		for (int i = 0; i < width; i++)
@@ -409,7 +410,7 @@ public class RoomBlueprint {
 			// Maybe check for blocks th at actually indicate entries and exits
 			if (usePlaceholders) {
 				if (block.isDoorIndicator()) {
-					this.doors.add(new DungeonExitPoint(cursor.toImmutable().subtract(pos1), block.getFacing().getOpposite()));
+					doorsRaw.add(new DungeonExitPoint(cursor.toImmutable().subtract(pos1), block.getFacing().getOpposite()));
 					block = new BlueprintBlock((IBlockState) null, null); // Make block an air one
 				} else if (block.isEntry()) {
 					if (this.entry != null) {
@@ -433,6 +434,16 @@ public class RoomBlueprint {
 		
 		if (this.entry == null && !usePlaceholders) {
 			this.entry = new DungeonExitPoint(new BlockPos(width / 2, 0, length / 2), EnumFacing.NORTH);
+		}
+		
+		// Adjust found doors to be offsets from entry
+		if (entry != null) {
+			for (DungeonExitPoint door : doorsRaw) {
+				doors.add(new DungeonExitPoint(
+						door.getPos().subtract(entry.getPos()),
+						door.getFacing()
+						));
+			}
 		}
 		refreshPreview();
 	}
@@ -849,6 +860,27 @@ public class RoomBlueprint {
 	
 	public boolean shouldSplit() {
 		return dimensions.getX() * dimensions.getY() * dimensions.getZ() > MAX_BLUEPRINT_BLOCKS; 
+	}
+	
+	public static interface BlueprintScanner {
+		public void scan(BlockPos offset, BlueprintBlock block);
+	}
+	
+	public void scanBlocks(BlueprintScanner scanner) {
+		int slot = 0;
+		final int width = this.dimensions.getX();
+		final int height = this.dimensions.getY();
+		final int length = this.dimensions.getZ();
+		final BlockPos origin = this.entry.getPos();
+		for (int i = 0; i < width; i++)
+		for (int j = 0; j < height; j++)
+		for (int k = 0; k < length; k++) {
+			BlockPos offsetOrigOrient = new BlockPos(i, j, k).subtract(origin);
+			BlockPos offsetNorthOrient = applyRotation(offsetOrigOrient, 
+						getModDir(EnumFacing.NORTH, this.entry.getFacing())
+					); // rotate to north
+			scanner.scan(offsetNorthOrient, blocks[slot++]);
+		}
 	}
 	
 	private static class BlueprintSavedTE {

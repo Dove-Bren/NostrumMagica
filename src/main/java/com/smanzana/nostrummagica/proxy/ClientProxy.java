@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.ActiveHopper;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.CursedIce;
+import com.smanzana.nostrummagica.blocks.DungeonBars;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.blocks.EssenceOre;
 import com.smanzana.nostrummagica.blocks.ItemDuct;
@@ -606,6 +607,9 @@ public class ClientProxy extends CommonProxy {
 		registerModel(Item.getItemFromBlock(ItemDuct.instance),
 				0,
 				ItemDuct.ID);
+		registerModel(Item.getItemFromBlock(DungeonBars.instance()),
+				0,
+				DungeonBars.ID);
 		
 		registerEntityRenderers();
 	}

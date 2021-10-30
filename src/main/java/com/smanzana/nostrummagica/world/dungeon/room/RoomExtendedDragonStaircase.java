@@ -58,23 +58,11 @@ public class RoomExtendedDragonStaircase implements IDungeonRoom {
         BlockPos blockpos;
         BlockPos blockpos1;
         
-        {
-        	BlockPos testpos = new BlockPos(pos.getX(), chunk.getTopFilledSegment() + 16, pos.getZ());
-        	if (!world.isAirBlock(testpos)) {
-        		System.out.println("Starting block wasn't air! " + testpos.getX() + ", " + testpos.getY() + ", " + testpos.getZ());
-        	}
-        	else
-        	{
-        		System.out.println("Starting block WAS air! " + testpos.getX() + ", " + testpos.getY() + ", " + testpos.getZ());
-        	}
-        }
-
         for (blockpos = new BlockPos(pos.getX(), chunk.getTopFilledSegment() + 16, pos.getZ()); blockpos.getY() >= 0; blockpos = blockpos1) {
         	blockpos1 = blockpos.down();
         	IBlockState state = chunk.getBlockState(blockpos1);
             
             if (state.getMaterial().isLiquid() || (state.getMaterial().blocksMovement() && !state.getBlock().isLeaves(state, world, blockpos1) && !state.getBlock().isFoliage(world, blockpos1))) {
-            	System.out.println("Endblock iter: " + blockpos1.getX() + ", " + blockpos1.getY() + ", " + blockpos1.getZ());
             	break;
             }
         }

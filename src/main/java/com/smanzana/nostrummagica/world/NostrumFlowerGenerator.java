@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.world;
 
 import java.util.Random;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 
 import net.minecraft.block.state.IBlockState;
@@ -30,7 +31,7 @@ public class NostrumFlowerGenerator implements IWorldGenerator {
 	        {
 	            BlockPos blockpos = position.add(rand.nextInt(8) - rand.nextInt(8), rand.nextInt(4) - rand.nextInt(4), rand.nextInt(8) - rand.nextInt(8));
 
-	            if (worldIn.isAirBlock(blockpos) && (worldIn.provider.hasSkyLight() || blockpos.getY() < 255) && NostrumMagicaFlower.instance().canBlockStay(worldIn, blockpos, flowerState))
+	            if (NostrumMagica.isBlockLoaded(worldIn, blockpos) && worldIn.isAirBlock(blockpos) && (worldIn.provider.hasSkyLight() || blockpos.getY() < 255) && NostrumMagicaFlower.instance().canBlockStay(worldIn, blockpos, flowerState))
 	            {
 	                worldIn.setBlockState(blockpos, flowerState, 2);
 	            }

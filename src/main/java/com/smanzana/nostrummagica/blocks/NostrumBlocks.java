@@ -77,6 +77,7 @@ public class NostrumBlocks {
     	registerBlockItem(PutterBlock.instance(), PutterBlock.ID, registry);
     	registerBlockItem(ActiveHopper.instance, ActiveHopper.ID, registry);
     	registerBlockItem(ItemDuct.instance, ItemDuct.ID, registry);
+    	registerBlockItem(DungeonBars.instance(), DungeonBars.ID, registry);
     	
 
     	String[] variants = new String[DungeonBlock.Type.values().length];
@@ -149,6 +150,7 @@ public class NostrumBlocks {
     	registerBlock(PutterBlock.instance(), PutterBlock.ID, registry);
     	registerBlock(ActiveHopper.instance, ActiveHopper.ID, registry);
     	registerBlock(ItemDuct.instance, ItemDuct.ID, registry);
+    	registerBlock(DungeonBars.instance(), DungeonBars.ID, registry);
     	
     	
 //			GameRegistry.addRecipe(new ItemStack(MagicDirt.instance()), " D ", "DCD", " D ",
