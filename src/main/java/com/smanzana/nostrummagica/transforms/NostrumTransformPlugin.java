@@ -5,8 +5,9 @@ import java.util.Map;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 
-@MCVersion("1.10.2")
-@IFMLLoadingPlugin.SortingIndex(Integer.MAX_VALUE)
+@MCVersion("1.12.2")
+@IFMLLoadingPlugin.SortingIndex(Integer.MAX_VALUE-1)
+@IFMLLoadingPlugin.DependsOn({"EnderCorePlugin"})
 public class NostrumTransformPlugin implements IFMLLoadingPlugin {
 
 	@Override
