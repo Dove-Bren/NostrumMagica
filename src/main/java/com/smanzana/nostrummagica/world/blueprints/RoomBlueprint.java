@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.BlockLadder;
 import net.minecraft.block.BlockRedstoneComparator;
@@ -283,6 +284,11 @@ public class RoomBlueprint {
 						EnumFacing cur = placeState.getValue(BlockStairs.FACING);
 						cur = rotate(cur, facing);
 						placeState = placeState.withProperty(BlockStairs.FACING, cur);
+					} else if (block instanceof BlockDirectional) {
+						// Only want to rotate horizontally
+						EnumFacing cur = placeState.getValue(BlockDirectional.FACING);
+						cur = rotate(cur, facing);
+						placeState = placeState.withProperty(BlockDirectional.FACING, cur);
 					}
 				}
 				

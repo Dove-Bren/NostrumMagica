@@ -103,7 +103,6 @@ public class LoadedRoom implements IDungeonRoom {
 		
 		List<DungeonExitPoint> ret;
 		if (exits != null) {
-			System.out.println("For start: " + start);
 			ret = new ArrayList<>(exits.size());
 			for (DungeonExitPoint door : exits) {
 				EnumFacing doorDir = door.getFacing();
@@ -117,7 +116,6 @@ public class LoadedRoom implements IDungeonRoom {
 						);
 				final DungeonExitPoint relative = new DungeonExitPoint(start.getPos().add(fromEntry.getPos()), fromEntry.getFacing()); 
 				ret.add(relative);
-				System.out.println("Door at " + door + " -> " + relative);
 			}
 		} else {
 			ret = new LinkedList<>();
@@ -148,10 +146,8 @@ public class LoadedRoom implements IDungeonRoom {
 	@Override
 	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start) {
 		List<DungeonExitPoint> ret = new ArrayList<>();
-		System.out.println("For start: " + start);
 		for (DungeonExitPoint orig : chestsRelative) {
 			final DungeonExitPoint relative = NostrumDungeon.asRotated(start, orig.getPos(), orig.getFacing().getOpposite()); 
-			System.out.println("Chest at " + orig + " -> " + relative);
 			ret.add(relative);
 		}
 		return ret;

@@ -95,7 +95,7 @@ public interface INostrumMagic {
 	public List<SpellTrigger> getTriggers();
 	public void addTrigger(SpellTrigger trigger);
 	public Map<EMagicElement, Boolean> getKnownElements();
-	public void learnElement(EMagicElement element);
+	public boolean learnElement(EMagicElement element);
 	public Map<EMagicElement, Integer> getElementMastery();
 	public void setElementMastery(EMagicElement element, int level);
 	public Map<EAlteration, Boolean> getAlterations();

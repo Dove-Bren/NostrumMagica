@@ -388,6 +388,8 @@ tile.putter.name=Putter
 tile.active_hopper.name=Active Hopper
 tile.item_duct.name=Item Duct
 tile.dungeon_bars.name=Dungeon Bars
+tile.dungeon_air.single.name=Dungeon Air
+tile.dungeon_air.flood.name=Dungeon Air (Flood)
 
 entity.nostrummagica.physical_golem.name=Metal Golem
 entity.nostrummagica.lightning_golem.name=Lightining Golem

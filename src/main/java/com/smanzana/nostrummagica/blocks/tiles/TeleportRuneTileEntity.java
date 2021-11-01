@@ -93,7 +93,12 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 	
 	@Override
 	public void setSpawnedFromRotation(EnumFacing rotation) {
-		BlockPos out = RoomBlueprint.applyRotation(this.getOffset(), rotation);
-		this.setOffset(out.getX(), out.getY(), out.getZ());
+		BlockPos orig = this.getOffset();
+		if (orig != null) {
+			BlockPos out = RoomBlueprint.applyRotation(this.getOffset(), rotation);
+			this.setOffset(out.getX(), out.getY(), out.getZ());
+		} else {
+			System.out.println("Null offset?");
+		}
 	}
 }

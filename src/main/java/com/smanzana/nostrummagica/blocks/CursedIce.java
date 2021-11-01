@@ -62,8 +62,8 @@ public class CursedIce extends Block {
 	
 	@Override
 	public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
-        return false;
-    }
+		return false;
+	}
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
@@ -123,10 +123,10 @@ public class CursedIce extends Block {
 	@SideOnly(Side.CLIENT)
 	public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
 		IBlockState iblockstate = blockAccess.getBlockState(pos.offset(side));
-        Block block = iblockstate.getBlock();
-        
-        return !(block == Blocks.GLASS || block == Blocks.STAINED_GLASS
-        		|| block == Blocks.ICE || block == instance());
+		Block block = iblockstate.getBlock();
+		
+		return !(block == Blocks.GLASS || block == Blocks.STAINED_GLASS
+				|| block == Blocks.ICE || block == instance());
 	}
 	
 	@Override

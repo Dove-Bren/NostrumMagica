@@ -13,6 +13,8 @@ import com.google.common.collect.Multimap;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.IEntityTameable;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
@@ -48,6 +50,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -274,6 +277,18 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 		}
 	}
 	
+	public static void doEffect(EntityLivingBase entity, EMagicElement element) {
+		if (entity.world.isRemote) {
+			return;
+		}
+		
+		NostrumParticles.GLOW_ORB.spawn(entity.world, new SpawnParams(
+				3,
+				entity.posX, entity.posY + entity.height, entity.posZ, 1, 30, 5,
+				new Vec3d(0, -0.05, 0), false
+				).color(0x80000000 | (0x00FFFFFF & element.getColor())));
+	}
+	
 	@Override
 	public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
 		Map<EMagicElement, Float> levels = getLevels(stack);
@@ -284,6 +299,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 						SpellAction.calcDamage(attacker, target, (float) Math.floor(level), elem));
 				target.setEntityInvulnerable(false);
 				target.hurtResistantTime = 0;
+				doEffect(target, elem);
 			}
 		}
 		

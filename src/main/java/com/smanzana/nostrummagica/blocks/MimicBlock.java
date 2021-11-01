@@ -15,6 +15,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
@@ -112,7 +113,7 @@ public class MimicBlock extends BlockDirectional {
 		IExtendedBlockState ext = (IExtendedBlockState) state;
 		EnumFacing face = state.getValue(FACING);
 		
-		if (face == EnumFacing.DOWN) {
+		if (face == EnumFacing.DOWN || face == EnumFacing.UP) {
 			pos = pos.east();
 		} else {
 			pos = pos.down();
@@ -173,12 +174,26 @@ public class MimicBlock extends BlockDirectional {
 			
 			// XZ motion isn't stored on the server and is handled client-side
 			// Server also resets lastPos in an inconvenient way.
-			final double dx = worldIn.isRemote
-					? (entityIn.motionX)
-					: (entityIn.posX - NostrumMagica.playerListener.getLastTickPos(entityIn).x);
-			final double dz = worldIn.isRemote
-					? (entityIn.motionZ)
-					: (entityIn.posZ - NostrumMagica.playerListener.getLastTickPos(entityIn).z);
+			final double dx;
+			final double dz;
+			if (entityIn instanceof EntityPlayer) {
+				dx = worldIn.isRemote
+						? (entityIn.motionX)
+						: (entityIn.posX - NostrumMagica.playerListener.getLastTickPos(entityIn).x);
+				dz = worldIn.isRemote
+						? (entityIn.motionZ)
+						: (entityIn.posZ - NostrumMagica.playerListener.getLastTickPos(entityIn).z);
+			} else {
+				dx = entityIn.motionX;
+				dz = entityIn.motionZ;
+			}
+			
+//			final double dx = worldIn.isRemote
+//					? (entityIn.motionX)
+//					: (entityIn.posX - NostrumMagica.playerListener.getLastTickPos(entityIn).x);
+//			final double dz = worldIn.isRemote
+//					? (entityIn.motionZ)
+//					: (entityIn.posZ - NostrumMagica.playerListener.getLastTickPos(entityIn).z);
 			
 			// Offset center back to old position to prevent sneaking back inside!
 			center = center.addVector(-dx, 0, -dz);

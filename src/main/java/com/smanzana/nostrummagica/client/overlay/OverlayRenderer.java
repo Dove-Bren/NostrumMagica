@@ -12,6 +12,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.DungeonAir;
 import com.smanzana.nostrummagica.blocks.ModificationTable;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.effects.ClientEffect;
@@ -67,15 +68,18 @@ import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.event.RenderTooltipEvent;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -316,50 +320,79 @@ public class OverlayRenderer extends Gui {
 			}
 		} else if (event.getType() == ElementType.POTION_ICONS) {
 			// TODO config option
-						{
-							final int nowTicks = player.ticksExisted;
-							int offsetX = 0;
-							EffectData data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_DAMAGE);
-							if (data != null) {
-								if (data.getAmt() == 0) {
-									data.amt(player.ticksExisted);
-								}
-								float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
-								timer = 1f - timer;
-								renderContingencyShield(player, scaledRes, 0, offsetX, timer);
-								offsetX++;
-							}
-							data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_MANA);
-							if (data != null) {
-								if (data.getAmt() == 0) {
-									data.amt(player.ticksExisted);
-								}
-								float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
-								timer = 1f - timer;
-								renderContingencyShield(player, scaledRes, 1, offsetX, timer);
-								offsetX++;
-							}
-							data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_HEALTH);
-							if (data != null) {
-								if (data.getAmt() == 0) {
-									data.amt(player.ticksExisted);
-								}
-								float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
-								timer = 1f - timer;
-								renderContingencyShield(player, scaledRes, 2, offsetX, timer);
-								offsetX++;
-							}
-							data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_FOOD);
-							if (data != null) {
-								if (data.getAmt() == 0) {
-									data.amt(player.ticksExisted);
-								}
-								float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
-								timer = 1f - timer;
-								renderContingencyShield(player, scaledRes, 3, offsetX, timer);
-								offsetX++;
-							}
-						}
+			{
+				final int nowTicks = player.ticksExisted;
+				int offsetX = 0;
+				EffectData data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_DAMAGE);
+				if (data != null) {
+					if (data.getAmt() == 0) {
+						data.amt(player.ticksExisted);
+					}
+					float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
+					timer = 1f - timer;
+					renderContingencyShield(player, scaledRes, 0, offsetX, timer);
+					offsetX++;
+				}
+				data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_MANA);
+				if (data != null) {
+					if (data.getAmt() == 0) {
+						data.amt(player.ticksExisted);
+					}
+					float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
+					timer = 1f - timer;
+					renderContingencyShield(player, scaledRes, 1, offsetX, timer);
+					offsetX++;
+				}
+				data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_HEALTH);
+				if (data != null) {
+					if (data.getAmt() == 0) {
+						data.amt(player.ticksExisted);
+					}
+					float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
+					timer = 1f - timer;
+					renderContingencyShield(player, scaledRes, 2, offsetX, timer);
+					offsetX++;
+				}
+				data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_FOOD);
+				if (data != null) {
+					if (data.getAmt() == 0) {
+						data.amt(player.ticksExisted);
+					}
+					float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
+					timer = 1f - timer;
+					renderContingencyShield(player, scaledRes, 3, offsetX, timer);
+					offsetX++;
+				}
+			}
+		} else if (event.getType() == ElementType.VIGNETTE) {
+			if (player == null || player.world == null) {
+				return;
+			}
+			
+			final int h = (int) player.getEyeHeight();
+			IBlockState inBlock = player.world.getBlockState(new BlockPos(player.posX, player.posY + h, player.posZ));
+			if (inBlock.getBlock() == DungeonAir.instance()) {
+				// Render dungeon air overlay
+				Minecraft mc = Minecraft.getMinecraft();
+				{
+					Tessellator tessellator = Tessellator.getInstance();
+					BufferBuilder bufferbuilder = tessellator.getBuffer();
+					GlStateManager.enableBlend();
+					GlStateManager.disableTexture2D();
+					//GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+					GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+					GlStateManager.color(.3f, 0, .3f, .3f);
+					final double depth = -91D;
+					bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
+					bufferbuilder.pos(0, (double) mc.displayHeight, depth).endVertex();
+					bufferbuilder.pos((double) mc.displayWidth, (double) mc.displayHeight, depth).endVertex();
+					bufferbuilder.pos((double) mc.displayWidth, 0, depth).endVertex();
+					bufferbuilder.pos(0, 0, depth).endVertex();
+					tessellator.draw();
+					GlStateManager.enableTexture2D();
+					GlStateManager.color(1f, 1f, 1f, 1f);
+				}
+			}
 		}
 	}
 	
@@ -1257,6 +1290,41 @@ public class OverlayRenderer extends Gui {
 				((EnchantedArmor) equipStack.getItem()).onArmorTick(event.getEntityPlayer().world, event.getEntityPlayer(), equipStack);
 			}
 		}
+	}
+	
+	@SubscribeEvent
+	public void onBlockHighlight(DrawBlockHighlightEvent event) {
+		if (event.isCanceled() || event.getTarget().typeOfHit != RayTraceResult.Type.BLOCK) {
+			return;
+		}
+		
+		IBlockState state = event.getPlayer().world.getBlockState(event.getTarget().getBlockPos());
+		if (state == null) {
+			return;
+		}
+		
+		// Dungeon Air wants no overlay
+		if (!event.getPlayer().isCreative() && state.getBlock() instanceof DungeonAir) {
+			event.setCanceled(true);
+			return;
+		}
+	}
+	
+	@SubscribeEvent
+	public void onWorldRenderLast(RenderWorldLastEvent event) {
+//		final EntityPlayer player = NostrumMagica.proxy.getPlayer();
+//		if (player == null || player.world == null) {
+//			return;
+//		}
+//		
+//		final int h = (int) player.getEyeHeight();
+//		IBlockState inBlock = player.world.getBlockState(player.getPosition().add(0, h, 0));
+//		if (inBlock.getBlock() == DungeonAir.instance()) {
+//			System.out.print(".");
+//			// Render dungeon air overlay
+//			Minecraft mc = Minecraft.getMinecraft();
+//			Gui.drawRect(0, 0, mc.displayWidth, mc.displayHeight, 0x40200020);
+//		}
 	}
 	
 }

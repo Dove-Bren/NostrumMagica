@@ -20,7 +20,7 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 	private static final ResourceLocation TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/effects/filled_orb.png");
 	
 	protected final float maxAlpha;
-	protected Vec3d targetPos;
+	protected Vec3d targetPos; // Absolute position to move to (if targetEntity == null) or offset from entity to go to
 	protected Entity targetEntity;
 	
 	public ParticleFilledOrb(World worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
@@ -56,6 +56,13 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 	
 	public ParticleFilledOrb setTarget(Entity ent) {
 		targetEntity = ent;
+		if (this.targetPos == null && ent != null) {
+			final double wRad = ent.width * 2; // double width
+			final double hRad = ent.height;
+			this.targetPos = new Vec3d(wRad * (NostrumMagica.rand.nextDouble() - .5),
+					hRad * (NostrumMagica.rand.nextDouble() - .5),
+					wRad * (NostrumMagica.rand.nextDouble() - .5));
+		}
 		return this;
 	}
 	
@@ -115,11 +122,18 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 		
 		this.particleAlpha *= maxAlpha;
 		
-		if (targetEntity != null && !targetEntity.isDead) {
-			Vec3d curVelocity = new Vec3d(this.motionX, this.motionY, this.motionZ);
-			Vec3d posDelta = targetEntity.getPositionVector().addVector(0, targetEntity.height/2, 0).subtract(posX, posY, posZ);
-			Vec3d idealVelocity = posDelta.normalize().scale(.3);
-			this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
+		if (targetEntity != null) {
+			if (!targetEntity.isDead) {
+				final float period = 20f;
+				Vec3d offset = targetPos == null ? new Vec3d(0,0,0) : targetPos.rotateYaw((float) (Math.PI * 2 * ((float) particleAge % period) / period));
+				Vec3d curVelocity = new Vec3d(this.motionX, this.motionY, this.motionZ);
+				Vec3d posDelta = targetEntity.getPositionVector()
+						.addVector(offset.x, offset.y + targetEntity.height/2, offset.z)
+						.subtract(posX, posY, posZ);
+				Vec3d idealVelocity = posDelta.normalize().scale(.3);
+				this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
+			}
+			// Else just do nothing
 		} else if (targetPos != null) {
 			Vec3d curVelocity = new Vec3d(this.motionX, this.motionY, this.motionZ);
 			Vec3d posDelta = targetPos.subtract(posX, posY, posZ);

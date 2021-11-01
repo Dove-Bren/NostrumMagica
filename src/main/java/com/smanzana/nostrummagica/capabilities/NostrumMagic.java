@@ -480,7 +480,7 @@ public class NostrumMagic implements INostrumMagic {
 	}
 
 	@Override
-	public void learnElement(EMagicElement element) {
+	public boolean learnElement(EMagicElement element) {
 		Boolean old = knownElements.put(element, Boolean.TRUE);
 		if (old == null || !old) {
 			// Learned for the first time
@@ -497,6 +497,8 @@ public class NostrumMagic implements INostrumMagic {
 
 			doUnlockCheck();
 		}
+		
+		return old == null || !old;
 	}
 
 	@Override

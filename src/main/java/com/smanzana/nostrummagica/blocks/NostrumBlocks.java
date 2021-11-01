@@ -98,6 +98,10 @@ public class NostrumBlocks {
     			"unbreakable", // 1 meta
     		})).setRegistryName(MimicBlock.ID_FACADE).setCreativeTab(NostrumMagica.creativeTab));
     	
+    	registry.register((new ItemMultiTexture(DungeonAir.instance(), DungeonAir.instance(), new String[] {
+    			"single", // 0 meta
+    			"flood", // 1 meta
+    		})).setRegistryName(DungeonAir.ID).setCreativeTab(NostrumMagica.creativeTab));
     }
     
     private void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -151,6 +155,7 @@ public class NostrumBlocks {
     	registerBlock(ActiveHopper.instance, ActiveHopper.ID, registry);
     	registerBlock(ItemDuct.instance, ItemDuct.ID, registry);
     	registerBlock(DungeonBars.instance(), DungeonBars.ID, registry);
+    	registerBlock(DungeonAir.instance(), DungeonAir.ID, registry);
     	
     	
 //			GameRegistry.addRecipe(new ItemStack(MagicDirt.instance()), " D ", "DCD", " D ",

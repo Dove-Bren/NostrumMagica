@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.blocks;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.tiles.SymbolTileEntity;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
@@ -19,6 +21,7 @@ import com.smanzana.nostrummagica.trials.ShrineTrial;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -140,7 +143,12 @@ public class ShrineBlock extends SymbolBlock {
 		if (component.isElement()) {
 			// Elements either grant knowledge (if the player hasn't unlocked
 			// magic yet) OR start a trial/advance mastery
-			attr.learnElement(component.getElement());
+			if (attr.learnElement(component.getElement())) {
+				// Just learned!
+				final int color = 0x80000000 | (0x00FFFFFF & component.getElement().getColor());
+				DoEffect(pos, playerIn, color);
+			}
+			
 			if (!attr.isUnlocked()) {
 				return true;
 			}
@@ -176,6 +184,8 @@ public class ShrineBlock extends SymbolBlock {
 			}
 			
 			attr.addTrigger(component.getTrigger());
+			
+			DoEffect(pos, playerIn, 0x8080A0C0);
 			worldIn.setBlockState(pos, getExhaustedState(true));
 			SymbolTileEntity ent = (SymbolTileEntity) worldIn.getTileEntity(pos);
 			ent.setComponent(component);
@@ -257,6 +267,7 @@ public class ShrineBlock extends SymbolBlock {
 			
 			if (pass && !attr.getShapes().contains(component.getShape())) {
 				attr.addShape(component.getShape());
+				DoEffect(pos, playerIn, 0x8080C0A0);
 				if (playerIn.world.isRemote) {
 					playerIn.sendMessage(new TextComponentTranslation("info.shrine.shape", new Object[] {component.getShape().getDisplayName()}));
 				}
@@ -286,5 +297,17 @@ public class ShrineBlock extends SymbolBlock {
 		}
 		
 		return false;
+	}
+	
+	public static void DoEffect(BlockPos shrinePos, EntityLivingBase entity, int color) {
+		if (entity.world.isRemote) {
+			return;
+		}
+		
+		NostrumParticles.FILLED_ORB.spawn(entity.world, new SpawnParams(
+			50,
+			shrinePos.getX() + .5, shrinePos.getY() + 1.75, shrinePos.getZ() + .5, 1, 40, 10,
+			entity.getEntityId()
+			).color(color));
 	}
 }

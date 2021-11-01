@@ -489,7 +489,17 @@ public class DungeonRoomRegistry {
 	public void loadRegistryFromBuiltin() {
 		// TODO make this be dynamic. Eitehr add manifest at build time to jar, or do the gross iteration of the jar stuff.
 		
-		String[] fileNames = {"grand_hallway.gat", "portal_room.gat", "sorcery_lobby.gat", "dungeon_challenge_1.gat"};
+		String[] fileNames = {"grand_hallway.gat",
+				"portal_room.gat",
+				"sorcery_lobby.gat",
+				"dungeon_challenge_1.gat",
+				"dungeon_challenge_2.gat",
+				"dungeon_challenge_3.gat",
+				"dungeon_challenge_4.gat",
+				"dungeon_end_1.gat",
+				"dungeon_end_2.gat",
+			};
+		
 		String[] compNames = {"sorcery_dungeon"};
 		final int dungeon_piece_count = 260;
 		String[][] compSubnames = new String[1][dungeon_piece_count + 1];

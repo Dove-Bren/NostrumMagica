@@ -372,12 +372,12 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 			if (blockState.getMaterial().getCanBurn()) {
 				return true;
 			}
-			if (blockState.getBlock() instanceof BlockPane && blockState.getMaterial() == Material.IRON) {
-				return true;
-			}
 			// fall through
 		case WEAK:
 			if (blockState.getMaterial() == Material.WOOD) {
+				return true;
+			}
+			if (blockState.getBlock() instanceof BlockPane && blockState.getMaterial() == Material.IRON) {
 				return true;
 			}
 			break;
