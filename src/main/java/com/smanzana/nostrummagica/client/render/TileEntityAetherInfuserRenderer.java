@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
-import com.enderio.core.client.render.RenderUtil;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileEntity;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileEntity.EffectSpark;
@@ -18,6 +17,7 @@ import net.minecraft.client.renderer.GlStateManager.DestFactor;
 import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
@@ -227,7 +227,7 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(x + .5, y + 1, z + .5);
 		
-		RenderUtil.bindBlockTexture();
+		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		renderOrb(tessellator, buffer, orbOpacity, false);
 		renderOrb(tessellator, buffer, orbOpacity, true);
 		

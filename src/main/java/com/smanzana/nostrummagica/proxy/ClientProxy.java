@@ -60,6 +60,7 @@ import com.smanzana.nostrummagica.client.render.TileEntityObeliskRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityPortalRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntityProgressionDoorRenderer;
 import com.smanzana.nostrummagica.client.render.TileEntitySymbolRenderer;
+import com.smanzana.nostrummagica.command.CommandDebugClientEffect;
 import com.smanzana.nostrummagica.command.CommandInfoScreenGoto;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityHookShot;
@@ -259,6 +260,7 @@ public class ClientProxy extends CommonProxy {
 		
 		initDefaultEffects(this.effectRenderer);
 		ClientCommandHandler.instance.registerCommand(new CommandInfoScreenGoto());
+		ClientCommandHandler.instance.registerCommand(new CommandDebugClientEffect());
 		
 		super.postinit();
 	}

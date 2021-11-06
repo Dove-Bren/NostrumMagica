@@ -138,7 +138,7 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 	@Override
 	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
 		TileEntity te = worldIn.getTileEntity(pos);
-		if (te != null && te instanceof AltarTileEntity && ((AltarTileEntity) te).getItem() == null) {
+		if (te != null && te instanceof AltarTileEntity && ((AltarTileEntity) te).getItem().isEmpty()) {
 			AltarTileEntity altar = (AltarTileEntity) te;
 			List<EntityItem> items = worldIn.getEntitiesWithinAABB(EntityItem.class, Block.FULL_BLOCK_AABB.offset(pos).offset(0, 1, 0).expand(0, 1, 0));
 			if (items != null && !items.isEmpty()) {

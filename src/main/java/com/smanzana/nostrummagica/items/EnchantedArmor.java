@@ -189,7 +189,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		
 		switch (slot) {
 		case CHEST:
-			base = 8;
+			base = 8 + (ModConfig.config.usingAdvancedArmors() ? 4 : 0);
 			break;
 		case FEET:
 			base = 2;
@@ -206,6 +206,10 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		
 		if (base != 0)
 			base += Math.min(2, level) - 1;
+		
+		if (true) {//ModConfig.config.usingAdvancedArmors()) {
+			base += 1;
+		}
 		
 		return Math.max(1, (int) ((float) base * mod));
 	}
@@ -455,7 +459,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
         if (equipmentSlot == this.armorType)
         {
             multimap.put(SharedMonsterAttributes.ARMOR.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor modifier", (double)this.armor, 0));
-            multimap.put(SharedMonsterAttributes.ARMOR_TOUGHNESS.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor toughness", 1, 0));
+            multimap.put(SharedMonsterAttributes.ARMOR_TOUGHNESS.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor toughness", 4, 0));
             multimap.put(SharedMonsterAttributes.MOVEMENT_SPEED.getName(), new AttributeModifier(ARMOR_SPEED_MODS[equipmentSlot.getIndex()], "Armor speed boost", (double)this.speedBoost, 2));
             multimap.put(AttributeMagicResist.instance().getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Resist", (double)this.magicResistAmount, 0));
             multimap.put(AttributeMagicReduction.instance(this.element).getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Reduction", (double)this.magicReducAmount, 0));
@@ -930,7 +934,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 					} else {
 						if (level == 1 || NostrumMagica.rand.nextBoolean()) {
 							try {
-								Field fireField = ObfuscationReflectionHelper.findField(Entity.class, "fire");
+								Field fireField = ObfuscationReflectionHelper.findField(Entity.class, "field_190534_ay");
 								fireField.setAccessible(true);
 								
 								int val = fireField.getInt(entity);

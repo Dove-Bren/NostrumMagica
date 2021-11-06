@@ -39,6 +39,7 @@ public class ModConfig {
 		DISPLAY_HOOKSHOT_CROSSHAIR(Category.DISPLAY, "hookshot_crosshair", true, false, "Show special crosshair with the hookshot"),
 		DISPLAY_DRAGON_HEALTHBARS(Category.DISPLAY, "dragon_healthbar", true, false, "Display special healthbars for dragons"),
 		DISPLAY_PET_HEALTHBARS(Category.DISPLAY, "pet_healthbar", true, false, "Display healthbars for tamed pets"),
+		DISPLAY_MANA_HEIGHT(Category.DISPLAY, "mana_spheres_height", 0, false, "Extra space (in full rows) to move mana display up. Useful when other mods add info above the armor bar."),
 		
 		LOGIN_TEXT(Category.DISPLAY, "display_login_text", true, false, "On login, show Nostrum Magica welcome text"),
 		
@@ -48,6 +49,8 @@ public class ModConfig {
 		NOSTRUM_WORLDS(Category.SERVER, "nostrum_worlds", new int[]{0}, true, "Which worlds to generate Nostrum dungeons in"),
 		NOSTRUM_DIMENSION_ID(Category.SERVER, "nostrum_dimension_id", 244, true, "Dimension ID for Nostrum's Sorcery dimension. Change if other mods want to use the same id."),
 		NOSTRUM_OVERRIDE_ELYTRA(Category.SERVER, "nostrum_elytra_override", true, true, "If true, Nostrum will override (via ASM transformation) elytra flying."),
+		
+		HIGHER_BALANCED(Category.SERVER, "balance_armor_higher", false, true, "If true, set armor values to higher. Useful when other armor mods auto balance down armor values. I'm writing this while looking at First Aid and RLCraft.")
 		;
 		
 		
@@ -484,5 +487,13 @@ public class ModConfig {
 	
 	public boolean doubleEnderDash() {
 		return getBooleanValue(Key.CONTROL_DASH_DOUBLEPRESS, false);
+	}
+	
+	public boolean usingAdvancedArmors() {
+		return getBooleanValue(Key.HIGHER_BALANCED, true);
+	}
+	
+	public int getManaSphereOffset() {
+		return getIntValue(Key.DISPLAY_MANA_HEIGHT, false);
 	}
 }

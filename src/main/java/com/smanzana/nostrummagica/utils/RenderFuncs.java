@@ -175,6 +175,27 @@ public final class RenderFuncs {
 				// Uploading the difference back to the buffer. Have to use the helper function since the provided putX methods upload the data for a quad, not a vertex and this data is vertex-dependent.
 				putPositionForVertex(buffer, intBuf, vertexIndex, new Vector3f(vert.x - vertX, vert.y - vertY, vert.z - vertZ));
 				//putColor4ForVertex(buffer, intBuf, vertexIndex, color);
+				//buffer.putColor4(color);
+				{
+					for (int i = 0; i < 4; ++i) {
+						int idx = buffer.getColorIndex(i+1);
+						int r = color >> 16 & 255;
+						int g = color >> 8 & 255;
+						int b = color & 255;
+						int a = color >> 24 & 255;
+						{
+							IntBuffer rawIntBuffer = getIntBuffer(buffer);
+							if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
+								rawIntBuffer.put(idx, a << 24 | b << 16 | g << 8 | r);
+							} else {
+								rawIntBuffer.put(idx, r << 24 | g << 16 | b << 8 | a);
+							}
+							//System.out.print(",");
+						}
+						//buffer.putColorRGBA(idx, r, g, b);
+					}
+				}
+				//buffer.putColorRGBA(vertexIndex, red, green, blue, alpha);
 			}
 
 			// Uploading the origin position to the buffer. This is an addition operation.
@@ -188,7 +209,9 @@ public final class RenderFuncs {
 
 			// Uploading the color multiplier to the buffer
 			//buffer.putColor4(color); Vanilla sucks and now ignores the alpha bit
-			putColor4(buffer, intBuf,  color);
+			//buffer.putColor4(argb);
+			
+			//putColor4(buffer, intBuf,  color);
 		}
 	}
 	
@@ -238,7 +261,7 @@ public final class RenderFuncs {
 		intBuf.put(colorIdx, color);
 	}
 	
-	private static final Field bufferBuilder_rawIntBuffer = ObfuscationReflectionHelper.findField(BufferBuilder.class, "rawIntBuffer");
+	private static final Field bufferBuilder_rawIntBuffer = ObfuscationReflectionHelper.findField(BufferBuilder.class, "field_178999_b");
 	
 	/**
 	 * A getter for the rawIntBuffer field value of the BufferBuilder.
@@ -405,8 +428,8 @@ public final class RenderFuncs {
 			// Refresh cache
 			NostrumMagica.logger.info("Refreshing entity renderer cache");
 			cachedRenderer = cur;
-			cachedLightMapField = ObfuscationReflectionHelper.findField(EntityRenderer.class, "locationLightMap");
-			cachedRendererUpdateCountField = ObfuscationReflectionHelper.findField(EntityRenderer.class, "rendererUpdateCount");
+			cachedLightMapField = ObfuscationReflectionHelper.findField(EntityRenderer.class, "field_110922_T"); //"locationLightMap");
+			cachedRendererUpdateCountField = ObfuscationReflectionHelper.findField(EntityRenderer.class, "field_78529_t"); //"rendererUpdateCount");
 			//cachedLightMapField.setAccessible(true); // done for us in reflection helper
 		}
 		

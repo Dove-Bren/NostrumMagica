@@ -4,6 +4,7 @@ import com.smanzana.musica.music.IMusicTrack;
 import com.smanzana.musica.music.MusicSound;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
@@ -34,7 +35,9 @@ public class NostrumSorceryBattleTrack implements IMusicTrack {
 			return false;
 		}
 		
-		return NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.TARGETED) != null;
+		EffectData data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.TARGETED); 
+		
+		return data != null && data.getCount() > 0; // Clients stick with a non-null data with all 0's when it's over
 	}
 	
 	@Override

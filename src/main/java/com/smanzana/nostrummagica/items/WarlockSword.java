@@ -18,6 +18,8 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.IEntityTameable;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
+import com.smanzana.nostrummagica.integration.enderio.wrappers.IItemOfTravelWrapper;
+import com.smanzana.nostrummagica.integration.enderio.wrappers.TravelSourceWrapper;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -31,8 +33,6 @@ import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigge
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
-import crazypants.enderio.api.teleport.IItemOfTravel;
-import crazypants.enderio.api.teleport.TravelSource;
 import info.loenwind.autoconfig.factory.IValue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
@@ -52,10 +52,12 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor, IItemOfTravel, IRaytraceOverlay {
+@Optional.Interface(iface="com.smanzana.nostrummagica.integration.enderio.wrappers.IItemOfTravelWrapper",modid="enderio")
+public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor, IItemOfTravelWrapper, IRaytraceOverlay {
 
 	public static String ID = "warlock_sword";
 	private static final String NBT_LEVELS = "levels";
@@ -347,16 +349,19 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 				&& (NostrumMagica.getMagicWrapper(player).isUnlocked());
 	}
 
+	@Optional.Method(modid="enderio")
 	@Override
 	public void extractInternal(ItemStack item, int power) {
 		item.attemptDamageItem(1, NostrumMagica.rand, null);
 	}
 
+	@Optional.Method(modid="enderio")
 	@Override
 	public int getEnergyStored(ItemStack item) {
 		return 100000;
 	}
 
+	@Optional.Method(modid="enderio")
 	@Override
 	public boolean isActive(EntityPlayer player, ItemStack item) {
 		return player.isSneaking()
@@ -427,7 +432,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 				// else if nothign else, try client-side enderIO teleport?
 				if (canEnderTravel(stack, playerIn)) {
 					if (worldIn.isRemote) {
-						NostrumMagica.enderIO.AttemptEnderIOTravel(stack, hand, worldIn, playerIn, TravelSource.STAFF);
+						NostrumMagica.enderIO.AttemptEnderIOTravel(stack, hand, worldIn, playerIn, TravelSourceWrapper.STAFF);
 					}
 				}
 			}
@@ -451,6 +456,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 		return false;
 	}
 
+	@Optional.Method(modid="enderio")
 	@Override
 	public void extractInternal(ItemStack item, IValue<Integer> power) {
 		extractInternal(item, power.get());

@@ -58,6 +58,10 @@ public class ProgressionDoorTileEntity extends TileEntity {
 	public boolean meetsRequirements(EntityLivingBase entity, List<ITextComponent> missingDepStrings) {
 		boolean meets = true;
 		
+		if (!entity.world.isRemote) {
+			NostrumMagica.logger.info("Checking requirements: lvl [" + this.requiredLevel + "], components: " + this.requiredComponents.size());
+		}
+		
 		// Early out if no reqs, so we can have fluff doors!
 		if (this.requiredComponents.isEmpty() && this.requiredLevel <= 0) {
 			;

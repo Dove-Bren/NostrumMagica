@@ -156,11 +156,11 @@ public class LoreTableEntity extends TileEntity implements ITickable {
 	}
 	
 	private static final int PROGRESS_TO_INT(float progress) {
-		return (int) (progress * 1000);
+		return (int) (progress * 100);
 	}
 	
 	private static final float INT_TO_PROGRESS(int raw) {
-		return Math.min(1f, (float)raw / 1000f);
+		return Math.min(1f, (float)raw / 100f);
 	}
 	
 	@Override

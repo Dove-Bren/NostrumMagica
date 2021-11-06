@@ -287,7 +287,7 @@ public class ModificationTableGui {
 				// If we've changed float, check required item is set
 				if (hasFloat) {
 					if (hasChange) {
-						ItemStack required;
+						ItemStack required = ItemStack.EMPTY;
 						if (component.isTrigger())
 							required = component.getTrigger().supportedFloatCosts().get(floatIndex);
 						else
@@ -876,7 +876,7 @@ public class ModificationTableGui {
 	
 	private static class InputSlot extends Slot {
 		
-		private ItemStack required;
+		private ItemStack required = ItemStack.EMPTY;
 		private ModificationTableContainer container;
 
 		public InputSlot(ModificationTableContainer container, IInventory inventoryIn, int index, int x, int y) {

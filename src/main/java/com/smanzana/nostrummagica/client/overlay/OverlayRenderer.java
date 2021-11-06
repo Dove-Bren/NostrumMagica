@@ -423,6 +423,8 @@ public class OverlayRenderer extends Gui {
 		int hudXAnchor = scaledRes.getScaledWidth() / 2 + 89;
 		int hudYAnchor = scaledRes.getScaledHeight() - 49;
 		
+		hudYAnchor -= ModConfig.config.getManaSphereOffset() * 10;
+		
 		if (player.isInsideOfMaterial(Material.WATER)) {
 			hudYAnchor -= 10;
 		}
@@ -816,7 +818,7 @@ public class OverlayRenderer extends Gui {
 		final float vMin = ((float) (GUI_CONTINGENCY_ICON_OFFSETY - GUI_CONTINGENCY_ICON_LENGTH)) / 256f;
 		final float vMax = ((float) (GUI_CONTINGENCY_ICON_OFFSETY)) / 256f;
 		
-		final int fullTris = (int) (timer / .25f);
+		final int fullTris = Math.min(4, (int) (timer / .25f));
 		// x, y, z, u, v
 		final float[][] coords = new float[][] {
 			new float[]{0,		0, 		0, uMin, vMin}, // top left

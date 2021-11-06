@@ -280,7 +280,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 					ItemStack stack = this.getPollinatedItem();
 					if (!stack.isEmpty() && rand.nextInt(10) == 0) {
 						this.onPollinationComplete(stack);
-						this.setPollinatedItem(null);
+						this.setPollinatedItem(ItemStack.EMPTY);
 					}
 					
 					// Poll for nearby lux and update community score

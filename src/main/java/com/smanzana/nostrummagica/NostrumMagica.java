@@ -29,6 +29,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.command.CommandAllQuests;
 import com.smanzana.nostrummagica.command.CommandAllResearch;
 import com.smanzana.nostrummagica.command.CommandCreateGeotoken;
+import com.smanzana.nostrummagica.command.CommandDebugEffect;
 import com.smanzana.nostrummagica.command.CommandEnhanceTome;
 import com.smanzana.nostrummagica.command.CommandForceBind;
 import com.smanzana.nostrummagica.command.CommandGiveResearchpoint;
@@ -340,6 +341,7 @@ public class NostrumMagica
     	event.registerServerCommand(new CommandGiveResearchpoint());
     	event.registerServerCommand(new CommandReloadResearch());
     	event.registerServerCommand(new CommandRandomSpell());
+    	event.registerServerCommand(new CommandDebugEffect());
     }
     
     /**

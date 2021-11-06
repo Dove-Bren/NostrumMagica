@@ -21,9 +21,9 @@ public class SoundUtil {
 		// you crash. Remove from the internal playing map, too.
 		try {
 			SoundManager handler_sndManager =
-					ObfuscationReflectionHelper.getPrivateValue(SoundHandler.class, Minecraft.getMinecraft().getSoundHandler(), "sndManager");
+					ObfuscationReflectionHelper.getPrivateValue(SoundHandler.class, Minecraft.getMinecraft().getSoundHandler(), "field_147694_f");
 			Map<String, ISound> manager_playingSounds = 
-				ObfuscationReflectionHelper.getPrivateValue(SoundManager.class, handler_sndManager, "playingSounds");
+				ObfuscationReflectionHelper.getPrivateValue(SoundManager.class, handler_sndManager, "field_148629_h"); //"playingSounds");
 			
 			Iterator<Entry<String, ISound>> it = manager_playingSounds.entrySet().iterator();
 			while (it.hasNext()) {

@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.integration.enderio.wrappers.EnderIOItemType;
 import com.smanzana.nostrummagica.integration.enderio.wrappers.EnderIOItemWrapper;
 import com.smanzana.nostrummagica.integration.enderio.wrappers.TravelControllerWrapper;
+import com.smanzana.nostrummagica.integration.enderio.wrappers.TravelSourceWrapper;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
@@ -13,7 +14,6 @@ import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeModifyCenterItemGeneric;
 import com.smanzana.nostrummagica.rituals.requirements.RRequirementResearch;
 
-import crazypants.enderio.api.teleport.TravelSource;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -389,9 +389,9 @@ public class EnderIOProxy {
 		return this.enabled;
 	}
 	
-	public boolean AttemptEnderIOTravel(ItemStack equipped, EnumHand hand, World world, EntityPlayer player, TravelSource source) {
+	public boolean AttemptEnderIOTravel(ItemStack equipped, EnumHand hand, World world, EntityPlayer player, TravelSourceWrapper source) {
 		if (enabled) {
-			return TravelControllerWrapper.activateTravelAccessable(equipped, hand, world, player, source);
+			return TravelControllerWrapper.activateTravelAccessable(equipped, hand, world, player, source.getSource());
 		}
 		
 		return false;

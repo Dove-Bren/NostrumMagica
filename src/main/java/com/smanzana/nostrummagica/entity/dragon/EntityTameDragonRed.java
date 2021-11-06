@@ -587,7 +587,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		this.dataManager.set(HATCHED, hatched);
 		
 		if (world != null && !world.isRemote) {
-			ObfuscationReflectionHelper.setPrivateValue(EntityLiving.class, this, hatched, "persistenceRequired");
+			ObfuscationReflectionHelper.setPrivateValue(EntityLiving.class, this, hatched, "field_82179_bU");
 		}
 	}
 
@@ -811,7 +811,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		if (tamed) {
 			this.setupTamedAI();
 			if (world != null && !world.isRemote) {
-				ObfuscationReflectionHelper.setPrivateValue(EntityLiving.class, this, true, "persistenceRequired");
+				ObfuscationReflectionHelper.setPrivateValue(EntityLiving.class, this, true, "field_82179_bU");
 			}
 		}
 	}

@@ -273,7 +273,7 @@ public class ShrineBlock extends SymbolBlock {
 				}
 				
 				if (!(component.getShape() instanceof SingleShape)) {
-					playerIn.setHeldItem(hand, null);
+					playerIn.setHeldItem(hand, ItemStack.EMPTY);
 				}
 			} else if (!pass) {
 				// Shape that we haven't correctly unlocked yet

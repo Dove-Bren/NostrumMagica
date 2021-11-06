@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 
 import net.minecraft.block.BlockFire;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
@@ -181,6 +182,14 @@ public class NostrumEmptyDimension {
 			// TODO this even is fired before updating, sadly. That feels incorrect.
 			// Does it act weirdly?
 			for (EntityPlayer player : world.playerEntities) {
+				
+				// Make sure they aren't falling out of the world
+				if (player.posY < 1) {
+					NostrumMagica.logger.info("Respawning player " + player + " because they seem to have fallen out of the world");
+					DimensionEntryTeleporter.respawnPlayer(player);
+					continue; // skip rate limitting
+				}
+				
 				if (player.isCreative() || player.isSpectator()) {
 					continue;
 				}
@@ -194,7 +203,6 @@ public class NostrumEmptyDimension {
 				}
 			}
 		}
-		
 	}
 	
 	public static class ChunkGeneratorEmpty implements IChunkGenerator {
@@ -278,28 +286,41 @@ public class NostrumEmptyDimension {
 				this.makePortal(player);
 			}
 			
-			BlockPos spawn = NostrumMagica.getOrCreatePlayerDimensionSpawn(player);
-			
-			try {
-				Field field = ObfuscationReflectionHelper.findField(EntityPlayerMP.class, "invulnerableDimensionChange");
-				field.setAccessible(true);
-				FieldUtils.writeField(field, player, true);
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			if (!player.isCreative() && !player.isSpectator()) {
-				player.setGameType(GameType.ADVENTURE);
-			}
-			
-			spawn = spawn.north();
-			player.rotationYaw = EnumFacing.NORTH.getHorizontalAngle();
-			player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 2, spawn.getZ() + .5);
-			player.motionX = player.motionY = player.motionZ = 0;
-			player.setSpawnChunk(spawn.up(2), true, ModConfig.config.sorceryDimensionIndex());
+			respawnPlayer(player);
 			
 			return true;
+		}
+		
+		public static void respawnPlayer(EntityPlayer player) {
+			if (player.world.isRemote) {
+				return;
+			}
+			
+			BlockPos spawn = NostrumMagica.getOrCreatePlayerDimensionSpawn(player);
+			if (spawn == null) {
+				NostrumMagica.logger.warn("Unable to find player spawning location. Sending to overworld.");
+				player.changeDimension(0);
+			} else {
+				spawn = spawn.north();
+				player.rotationYaw = EnumFacing.NORTH.getHorizontalAngle();
+				player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 2, spawn.getZ() + .5);
+				player.motionX = player.motionY = player.motionZ = 0;
+				player.fallDistance = 0;
+				player.setSpawnChunk(spawn.up(2), true, ModConfig.config.sorceryDimensionIndex());
+				
+				try {
+					Field field = ObfuscationReflectionHelper.findField(EntityPlayerMP.class, "field_184851_cj"); //"invulnerableDimensionChange");
+					field.setAccessible(true);
+					FieldUtils.writeField(field, player, true);
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				if (!player.isCreative() && !player.isSpectator()) {
+					player.setGameType(GameType.ADVENTURE);
+				}
+			}
 		}
 		
 		@Override
@@ -378,7 +399,7 @@ public class NostrumEmptyDimension {
 			
 			if (entityIn instanceof EntityPlayerMP) {
 				try {
-					Field field = ObfuscationReflectionHelper.findField(EntityPlayerMP.class, "invulnerableDimensionChange");
+					Field field = ObfuscationReflectionHelper.findField(EntityPlayerMP.class, "field_184851_cj"); //"invulnerableDimensionChange");
 					field.setAccessible(true);
 					FieldUtils.writeField(field, ((EntityPlayerMP) entityIn), true);
 				} catch (IllegalAccessException e) {
@@ -491,9 +512,13 @@ public class NostrumEmptyDimension {
 		
 		@SubscribeEvent
 		public void onBlockPlace(@SuppressWarnings("deprecation") BlockEvent.PlaceEvent event) {
-			if (event.getWorld().provider.getDimension() == dim && event.getPlacedBlock().getBlock() instanceof BlockFire) {
+			if (event.getWorld().provider.getDimension() == dim && (
+					event.getPlacedBlock().getBlock() instanceof BlockFire
+					|| event.getPlacedBlock().getMaterial() == Material.FIRE
+				)) {
 				event.setCanceled(true);
 			}
+			
 		}
 	}
 	
