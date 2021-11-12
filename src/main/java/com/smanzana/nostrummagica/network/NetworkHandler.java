@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.network;
 
+import com.smanzana.nostrummagica.network.messages.BladeCastMessage;
 import com.smanzana.nostrummagica.network.messages.CandleIgniteMessage;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
 import com.smanzana.nostrummagica.network.messages.ClientCastReplyMessage;
@@ -89,6 +90,7 @@ public class NetworkHandler {
 		syncChannel.registerMessage(EnchantedArmorStateUpdate.Handler.class, EnchantedArmorStateUpdate.class, discriminator++, Side.SERVER);
 		syncChannel.registerMessage(ClientTomeDropSpellMessage.Handler.class, ClientTomeDropSpellMessage.class, discriminator++, Side.SERVER);
 		syncChannel.registerMessage(SpawnNostrumParticleMessage.Handler.class, SpawnNostrumParticleMessage.class, discriminator++, Side.CLIENT);
+		syncChannel.registerMessage(BladeCastMessage.Handler.class, BladeCastMessage.class, discriminator++, Side.SERVER);
 		
 	}
 	

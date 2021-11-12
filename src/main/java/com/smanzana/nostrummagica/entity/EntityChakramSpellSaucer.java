@@ -17,6 +17,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 	private Vec3d origin;
 	private Vec3d target;
 	private boolean returning;
+	private int trips = 0;
 	
 	private boolean piercing; // Configurable by the player 
 	
@@ -158,14 +159,25 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 			// Check for motion boundaries
 			if (this.returning) {
 				if (Math.abs(this.getPositionVector().distanceTo(this.origin)) <= 0.5) {
-					this.setDead();
+					if (trips >= 10) {
+						this.setDead();
+					} else {
+						returning = false;
+						// Capture motion to get boomerang-effect
+						Vec3d motion = new Vec3d(accel.x, accel.y, accel.z).normalize().scale(1);
+						motion = motion.rotateYaw(30f * (this.rand.nextBoolean() ? 1 : -1));
+						this.motionX += motion.x;
+						this.motionY += motion.y;
+						this.motionZ += motion.z;
+					}
 				}
 			} else {
 				if (Math.abs(this.getPositionVector().distanceTo(this.target)) <= 0.5) {
 					this.returning = true;
 					
 					// Capture motion to get boomerang-effect
-					Vec3d motion = new Vec3d(accel.x, accel.y, accel.z).normalize().scale(2);
+					Vec3d motion = new Vec3d(accel.x, accel.y, accel.z).normalize().scale(1);
+					motion = motion.rotateYaw(30f * (this.rand.nextBoolean() ? 1 : -1));
 					this.motionX += motion.x;
 					this.motionY += motion.y;
 					this.motionZ += motion.z;
@@ -175,8 +187,13 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 	}
 	
 	@Override
+	public boolean canImpact(BlockPos pos) {
+		return this.piercing;
+	}
+	
+	@Override
 	public boolean dieOnImpact(BlockPos pos) {
-		return !this.piercing;
+		return false; // !this.piercing; used to only be with piercing
 	}
 	
 	@Override

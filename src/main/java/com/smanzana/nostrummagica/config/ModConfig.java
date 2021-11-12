@@ -50,7 +50,8 @@ public class ModConfig {
 		NOSTRUM_DIMENSION_ID(Category.SERVER, "nostrum_dimension_id", 244, true, "Dimension ID for Nostrum's Sorcery dimension. Change if other mods want to use the same id."),
 		NOSTRUM_OVERRIDE_ELYTRA(Category.SERVER, "nostrum_elytra_override", true, true, "If true, Nostrum will override (via ASM transformation) elytra flying."),
 		
-		HIGHER_BALANCED(Category.SERVER, "balance_armor_higher", false, true, "If true, set armor values to higher. Useful when other armor mods auto balance down armor values. I'm writing this while looking at First Aid and RLCraft.")
+		HIGHER_BALANCED(Category.SERVER, "balance_armor_higher", false, true, "If true, set armor values to higher. Useful when other armor mods auto balance down armor values. I'm writing this while looking at First Aid and RLCraft."),
+		BAG_VACUUM_ON_SNEAK(Category.SERVER, "bag_sneak_vacuum", false, true, "If true, sneaking does NOT bypass the vacuum feature of rune and reagent bags. Useful when used with mods that change what sneaking means for EntityItems.")
 		;
 		
 		
@@ -495,5 +496,9 @@ public class ModConfig {
 	
 	public int getManaSphereOffset() {
 		return getIntValue(Key.DISPLAY_MANA_HEIGHT, false);
+	}
+	
+	public boolean vacuumWhileSneaking() {
+		return getBooleanValue(Key.BAG_VACUUM_ON_SNEAK, true);
 	}
 }

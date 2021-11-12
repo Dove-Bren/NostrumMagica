@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicReduction;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
@@ -18,6 +19,7 @@ import com.smanzana.nostrummagica.blocks.NostrumPortal;
 import com.smanzana.nostrummagica.blocks.TeleportRune;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.MirrorGui;
+import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
@@ -415,10 +417,14 @@ public class PlayerListener {
 					continue;
 				
 				BlockPos entpos = ent.getPosition();
-				for (BlockPos p : entry.getValue().blocks) {
+				// entry can be removed but block set cannot
+				List<BlockPos> blockListCopy = Lists.newArrayList(entry.getValue().blocks);
+				for (BlockPos p : blockListCopy) {
 					if (p.equals(entpos))
-						if (entry.getKey().onEvent(Event.POSITION, ent, null))
+						if (entry.getKey().onEvent(Event.POSITION, ent, null)) {
 							it2.remove();
+							break;
+						}
 				}	
 			}
 		}
@@ -820,6 +826,11 @@ public class PlayerListener {
 		}
 	}
 	
+	protected boolean shouldIgnoreVacuum(EntityPlayer player) {
+		return !ModConfig.config.vacuumWhileSneaking()
+				&& player.isSneaking();
+	}
+	
 	@SubscribeEvent
 	public void onPickup(EntityItemPickupEvent e) {
 		if (e.isCanceled())
@@ -842,13 +853,12 @@ public class PlayerListener {
 			}
 		}
 		
-		if (e.getItem().getItem().getItem() instanceof ReagentItem
-				&& !player.isSneaking()) {
+		if (e.getItem().getItem().getItem() instanceof ReagentItem) {
 			int originalSize = addedItem.getCount();
 			for (ItemStack item : player.inventory.offHandInventory) {
 				// Silly but prefer offhand
 				if (!item.isEmpty() && item.getItem() instanceof ReagentBag) {
-					if (ReagentBag.isVacuumEnabled(item)) {
+					if (!shouldIgnoreVacuum(player) && ReagentBag.isVacuumEnabled(item)) {
 						addedItem = ReagentBag.addItem(item, addedItem);
 						if (addedItem.isEmpty() || addedItem.getCount() < originalSize) {
 							NostrumMagicaSounds.UI_TICK.play(player.world, player.posX, player.posY, player.posZ);
@@ -864,7 +874,7 @@ public class PlayerListener {
 			}
 			for (ItemStack item : player.inventory.mainInventory) {
 				if (!item.isEmpty() && item.getItem() instanceof ReagentBag) {
-					if (ReagentBag.isVacuumEnabled(item)) {
+					if (!shouldIgnoreVacuum(player) && ReagentBag.isVacuumEnabled(item)) {
 						addedItem = ReagentBag.addItem(item, addedItem);
 						if (addedItem.isEmpty() || addedItem.getCount() < originalSize) {
 							NostrumMagicaSounds.UI_TICK.play(player.world, player.posX, player.posY, player.posZ);
@@ -886,13 +896,12 @@ public class PlayerListener {
 			
 		}
 		
-		if (e.getItem().getItem().getItem() instanceof SpellRune
-				&& !player.isSneaking()) {
+		if (e.getItem().getItem().getItem() instanceof SpellRune) {
 			int originalSize = addedItem.getCount();
 			for (ItemStack item : player.inventory.offHandInventory) {
 				// Silly but prefer offhand
 				if (!item.isEmpty() && item.getItem() instanceof RuneBag) {
-					if (RuneBag.isVacuumEnabled(item)) {
+					if (!shouldIgnoreVacuum(player) && RuneBag.isVacuumEnabled(item)) {
 						addedItem = RuneBag.addItem(item, addedItem);
 						if (addedItem.isEmpty() || addedItem.getCount() < originalSize) {
 							NostrumMagicaSounds.UI_TICK.play(player.world, player.posX, player.posY, player.posZ);
@@ -908,7 +917,7 @@ public class PlayerListener {
 			}
 			for (ItemStack item : player.inventory.mainInventory) {
 				if (!item.isEmpty() && item.getItem() instanceof RuneBag) {
-					if (RuneBag.isVacuumEnabled(item)) {
+					if (!shouldIgnoreVacuum(player) && RuneBag.isVacuumEnabled(item)) {
 						addedItem = RuneBag.addItem(item, addedItem);
 						if (addedItem.isEmpty() || addedItem.getCount() < originalSize) {
 							NostrumMagicaSounds.UI_TICK.play(player.world, player.posX, player.posY, player.posZ);

@@ -18,6 +18,7 @@ import com.smanzana.nostrummagica.spells.components.SpellAction.MagicDamageSourc
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
@@ -118,15 +119,26 @@ public class MagicEffectProxy {
 	}
 	
 	public static enum SpecialEffect {
-		SHIELD_PHYSICAL,
-		SHIELD_MAGIC,
-		MAGIC_BUFF,
-		ROOTED, // Just visual. Actual effects are in potion
-		CONTINGENCY_DAMAGE, // Just visual. Actual effects are in trigger instance
+		SHIELD_PHYSICAL(true),
+		SHIELD_MAGIC(true),
+		MAGIC_BUFF(true),
+		ROOTED(true), // Just visual. Actual effects are in potion
+		CONTINGENCY_DAMAGE(true), // Just visual. Actual effects are in trigger instance
 		CONTINGENCY_HEALTH, // Just visual. Actual effects are in trigger instance
 		CONTINGENCY_MANA, // Just visual. Actual effects are in trigger instance
 		CONTINGENCY_FOOD, // Just visual. Actual effects are in trigger instance
 		TARGETED, // Can key many things off. As of writing, used for battle music
+		;
+		
+		public final boolean isPublic; // Whether other entities should know about this effect data for the entity
+		
+		private SpecialEffect() {
+			this(false);
+		}
+		
+		private SpecialEffect(boolean isPublic) {
+			this.isPublic = isPublic;
+		}
 	}
 	
 	private Map<UUID, Map<SpecialEffect, EffectData>> effects;
@@ -145,9 +157,7 @@ public class MagicEffectProxy {
 		
 		effects.get(id).put(effect, value);
 		
-		if (entity instanceof EntityPlayerMP) {
-			NostrumMagica.proxy.updatePlayerEffect((EntityPlayerMP) entity, effect, value);
-		}
+		notify(entity, effect, value);
 	}
 	
 	public void applyPhysicalShield(EntityLivingBase entity, double value) {
@@ -221,10 +231,9 @@ public class MagicEffectProxy {
 			return;
 		
 		record.remove(effect);
+		
 		// Send a little bit of an update to the entity (if it's a player) to update UI
-		if (entity instanceof EntityPlayerMP) {
-			NostrumMagica.proxy.updatePlayerEffect((EntityPlayerMP) entity, effect, null);
-		}
+		notify(entity, effect, null);
 	}
 	
 	public void removeAll(EntityLivingBase entity) {
@@ -268,9 +277,7 @@ public class MagicEffectProxy {
 			}
 			
 			// Send a little bit of an update to the entity (if it's a player) to update UI
-			if (hurt instanceof EntityPlayerMP) {
-				NostrumMagica.proxy.updatePlayerEffect((EntityPlayerMP) hurt, effect, left.amt <= 0 ? null : left);
-			}
+			notify(hurt, effect, left.amt <= 0 ? null : left);
 		}
 		return inAmt;
 	}
@@ -338,9 +345,7 @@ public class MagicEffectProxy {
 					living.removePotionEffect(MagicBuffPotion.instance());
 				}
 				
-				if (living instanceof EntityPlayerMP) {
-					NostrumMagica.proxy.updatePlayerEffect((EntityPlayerMP) living, SpecialEffect.MAGIC_BUFF, data.count == 0 ? null : data);
-				}
+				notify(living, SpecialEffect.MAGIC_BUFF, data.count == 0 ? null : data);
 			}
 		}
 	}
@@ -409,11 +414,10 @@ public class MagicEffectProxy {
 		return data;
 	}
 	
-	public void setOverride(SpecialEffect effect, EffectData override) {
+	public void setOverride(UUID id, SpecialEffect effect, EffectData override) {
 		if (NostrumMagica.proxy.isServer()) {
 			NostrumMagica.logger.fatal("Got an effect override on the server!");
 		} else {
-			UUID id = NostrumMagica.proxy.getPlayer().getUniqueID();
 			Map<SpecialEffect, EffectData> map = effects.get(id);
 			if (map == null) {
 				map = new EnumMap<>(SpecialEffect.class);
@@ -435,5 +439,20 @@ public class MagicEffectProxy {
 	
 	public void clearAll() {
 		effects.clear();
+	}
+	
+	protected void notify(EntityLivingBase base, SpecialEffect type, EffectData value) {
+		if (base == null
+				|| !type.isPublic) {
+			return;
+		}
+		
+		for (EntityPlayer player : base.world.playerEntities) {
+			if (!(player instanceof EntityPlayerMP)) {
+				continue;
+			}
+			
+			NostrumMagica.proxy.updateEntityEffect((EntityPlayerMP) player, base, type, value);
+		}
 	}
 }

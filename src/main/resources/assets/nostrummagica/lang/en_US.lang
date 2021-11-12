@@ -87,6 +87,7 @@ item.nostrum_rune.trigger_mana.name=Mana Rune
 item.nostrum_rune.trigger_vortex_blade.name=Vortex Rune
 item.nostrum_rune.trigger_cutter.name=Magic Cutter Rune
 item.nostrum_rune.trigger_bullet.name=Seeking Bullet Rune
+item.nostrum_rune.trigger_wall.name=Wall Rune
 
 item.crystal_small.name=Mani Crystal
 item.crystal_medium.name=Kani Crystal
@@ -949,6 +950,7 @@ ritual.rune.trigger_touch.name=Touch Rune
 ritual.rune.trigger_cutter.name=Magic Cutter Rune
 ritual.rune.trigger_vortex_blade.name=Vortex Rune
 ritual.rune.trigger_bullet.name=Seeking Bullet Rune
+ritual.rune.trigger_wall.name=Wall Rune
 
 ritual.charm.fire.name=Fire Charm
 ritual.charm.ice.name=Ice Charm
@@ -1038,6 +1040,7 @@ reward.alteration.conjure=Unlocks the Conjure alteration
 reward.alteration.growth=Unlocks the Growth alteration
 reward.alteration.enchant=Unlocks the Enchant alteration
 reward.trigger.trigger_bullet=Unlocks Seeking Bullet Trigger
+reward.trigger.trigger_wall=Unlocks Wall Trigger
 
 objective.ritual.magic_token=Perform Barr's Enchantment
 objective.ritual.kani=Perform a Kani Infusion
@@ -1122,6 +1125,8 @@ quest.con1-tec2.name=Controlled Technique
 quest.con1-tec2.desc=As soon as you have more than 2 control, you're going to need some technique to use it
 quest.con1-tec3.name=Controlled Technique II
 quest.con1-tec3.desc=In order to advance, you must produce and cast a spell that contains 3 or more elements total, one of which is Lightning.
+quest.con2-tec3.name=Manifested Control
+quest.con2-tec3.desc=Control visits powerful effects all at once. But what if you used your control to sustain the effects for longer?
 quest.con1-tec5.name=Controlled Technique III
 quest.con1-tec5.desc=
 quest.tec3.name=Technique Apprentice
@@ -1218,6 +1223,9 @@ modification.delay.name=Delay (seconds)
 modification.cutter.name=Piercing
 modification.vortex_blade.bool.name=Hit Blocks
 modification.vortex_blade.float.name=Duration (Seconds)
+modification.projectile.bool.name=Hit Allies
+modification.wall.bool.name=Only Hit Once
+modification.wall.float.name=Radius
 
 modification.level.flip=Trigger When Above
 

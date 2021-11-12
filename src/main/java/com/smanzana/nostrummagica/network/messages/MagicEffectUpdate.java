@@ -1,10 +1,13 @@
 package com.smanzana.nostrummagica.network.messages;
 
+import java.util.UUID;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -23,12 +26,13 @@ public class MagicEffectUpdate implements IMessage {
 		@Override
 		public IMessage onMessage(MagicEffectUpdate message, MessageContext ctx) {
 			
+			final UUID entityID = message.tag.getUniqueId(NBT_ENT_ID);
 			String typeName = message.tag.getString(NBT_TYPE);
 			NBTTagCompound tag = message.tag.getCompoundTag(NBT_DATA);
 			EffectData data = tag == null ? null : EffectData.fromNBT(message.tag.getCompoundTag(NBT_DATA));
 			try {
 				SpecialEffect type = SpecialEffect.valueOf(typeName);
-				NostrumMagica.magicEffectProxy.setOverride(type, data);
+				NostrumMagica.magicEffectProxy.setOverride(entityID, type, data);
 			} catch (Exception e) {
 				NostrumMagica.logger.warn("Failed to apply special effect handler");
 			}
@@ -38,6 +42,7 @@ public class MagicEffectUpdate implements IMessage {
 		
 	}
 
+	private static final String NBT_ENT_ID = "id";
 	private static final String NBT_TYPE = "type";
 	private static final String NBT_DATA = "data";
 	
@@ -47,9 +52,10 @@ public class MagicEffectUpdate implements IMessage {
 		tag = new NBTTagCompound();
 	}
 	
-	public MagicEffectUpdate(SpecialEffect type, EffectData data) {
+	public MagicEffectUpdate(EntityLivingBase entity, SpecialEffect type, EffectData data) {
 		tag = new NBTTagCompound();
 		
+		tag.setUniqueId(NBT_ENT_ID, entity.getUniqueID());
 		tag.setString(NBT_TYPE, type.name());
 		if (data != null) {
 			tag.setTag(NBT_DATA, data.toNBT());

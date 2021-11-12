@@ -94,6 +94,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.ProximityTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.WallTrigger;
 import com.smanzana.nostrummagica.world.NostrumDungeonGenerator;
 import com.smanzana.nostrummagica.world.NostrumFlowerGenerator;
 import com.smanzana.nostrummagica.world.NostrumOreGenerator;
@@ -192,6 +193,7 @@ public class CommonProxy {
     	SpellTrigger.register(MagicCutterTrigger.instance());
     	SpellTrigger.register(MagicCyclerTrigger.instance());
     	SpellTrigger.register(SeekingBulletTrigger.instance());
+    	SpellTrigger.register(WallTrigger.instance());
     }
     
     @SubscribeEvent
@@ -417,9 +419,9 @@ public class CommonProxy {
     			player);
     }
     
-    public void updatePlayerEffect(EntityPlayerMP player, SpecialEffect effectType, EffectData data) {
+    public void updateEntityEffect(EntityPlayerMP player, EntityLivingBase entity, SpecialEffect effectType, EffectData data) {
     	NetworkHandler.getSyncChannel().sendTo(
-    			new MagicEffectUpdate(effectType, data),
+    			new MagicEffectUpdate(entity, effectType, data),
     			player);
     }
 

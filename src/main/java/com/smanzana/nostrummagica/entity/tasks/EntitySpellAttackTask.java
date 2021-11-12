@@ -91,12 +91,15 @@ public class EntitySpellAttackTask<T extends EntityLiving> extends EntityAIBase 
 		}
 		
 		EntityLivingBase target = getTarget();
+		@Nullable EntityLivingBase oldTarget = entity.getAttackTarget();
 		if (target != null) {
 			entity.faceEntity(target, 360f, 180f);
+			entity.setAttackTarget(target);
 		}
 		
 		spell.cast(entity, 1);
 		attackTicks = this.delay;
+		entity.setAttackTarget(oldTarget);
 	}
 	
 	@Override

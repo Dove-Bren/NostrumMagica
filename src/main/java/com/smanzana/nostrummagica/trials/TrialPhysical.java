@@ -28,7 +28,7 @@ public class TrialPhysical extends ShrineTrial {
 			
 			EntityPlayer player = (EntityPlayer) source.getTrueSource();
 			
-			if (player.getHeldItemMainhand() != null)
+			if (!player.getHeldItemMainhand().isEmpty())
 				return;
 			
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);

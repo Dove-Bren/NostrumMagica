@@ -89,7 +89,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 
         if (equipmentSlot == EntityEquipmentSlot.MAINHAND)
         {
-            multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 6, 0));
+            multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 7, 0));
             multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.7000000953674316D, 0));
         }
 
@@ -394,53 +394,21 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 		if (playerIn.getCooledAttackStrength(0.5F) > .95) {
 		
 			// Earlier right-click stuff here
-			if (!playerIn.isSneaking()) {
-				if (!worldIn.isRemote) {
-					// We have a target?
-					RayTraceResult result = RayTrace.raytraceApprox(worldIn, playerIn.getPositionVector().addVector(0, playerIn.eyeHeight, 0),
-							playerIn.rotationPitch, playerIn.rotationYaw, SeekingBulletTrigger.MAX_DIST, (ent) -> {
-								if (ent != null && playerIn != ent) {
-									if (ent instanceof IEntityTameable) {
-										if (playerIn.getUniqueID().equals(((IEntityTameable) ent).getOwnerId())) {
-											return false; // We own the target entity
-										}
-									}
-								}
-								
-								return true;
-							}, .5);
-					
-					if (result != null && result.entityHit != null) {
-						boolean any = false;
-						Map<EMagicElement, Float> power = getLevels(stack);
-						for (EMagicElement elem : EMagicElement.values()) {
-							Float val = power.get(elem);
-							if (val != null && val >= 1f) {
-								Spell missle = GetMissleSpell(elem);
-								missle.cast(playerIn, .5f * (int) (float) val);
-								any = true;
-							}
-						}
-						
-						if (any) {
-							stack.damageItem(1, playerIn);
-							NostrumMagicaSounds.DAMAGE_LIGHTNING.play(playerIn);
-						}
-					}
-				}
-			} else {
+			if (playerIn.isSneaking()) {
 				// else if nothign else, try client-side enderIO teleport?
 				if (canEnderTravel(stack, playerIn)) {
 					if (worldIn.isRemote) {
-						NostrumMagica.enderIO.AttemptEnderIOTravel(stack, hand, worldIn, playerIn, TravelSourceWrapper.STAFF);
+						if (NostrumMagica.enderIO.AttemptEnderIOTravel(stack, hand, worldIn, playerIn, TravelSourceWrapper.STAFF)) {
+							playerIn.resetCooldown();
+							playerIn.swingArm(hand);
+							return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+						}
 					}
 				}
 			}
 		}
 		
-		playerIn.resetCooldown();
-		playerIn.swingArm(hand);
-		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+		return new ActionResult<ItemStack>(EnumActionResult.PASS, stack);
 	}
 	
 	@Override
@@ -460,6 +428,74 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 	@Override
 	public void extractInternal(ItemStack item, IValue<Integer> power) {
 		extractInternal(item, power.get());
+	}
+	
+	protected boolean tryCast(World worldIn, EntityPlayer playerIn, EnumHand hand, ItemStack stack) {
+		boolean used = false;
+		if (playerIn.getCooledAttackStrength(0.5F) > .95) {
+			
+			// Earlier right-click stuff here
+			if (!worldIn.isRemote) {
+				// We have a target?
+				RayTraceResult result = RayTrace.raytraceApprox(worldIn, playerIn.getPositionVector().addVector(0, playerIn.eyeHeight, 0),
+						playerIn.rotationPitch, playerIn.rotationYaw, SeekingBulletTrigger.MAX_DIST, (ent) -> {
+							if (ent != null && playerIn != ent) {
+								if (ent instanceof IEntityTameable) {
+									if (playerIn.getUniqueID().equals(((IEntityTameable) ent).getOwnerId())) {
+										return false; // We own the target entity
+									}
+								}
+							}
+							
+							return true;
+						}, .5);
+				
+				if (result != null && result.entityHit != null) {
+					boolean any = false;
+					Map<EMagicElement, Float> power = getLevels(stack);
+					for (EMagicElement elem : EMagicElement.values()) {
+						Float val = power.get(elem);
+						if (val != null && val >= 1f) {
+							Spell missle = GetMissleSpell(elem);
+							missle.cast(playerIn, .5f * (int) (float) val);
+							any = true;
+						}
+					}
+					
+					if (any) {
+						stack.damageItem(1, playerIn);
+						NostrumMagicaSounds.DAMAGE_LIGHTNING.play(playerIn);
+						playerIn.resetCooldown();
+						playerIn.swingArm(hand);
+						used = true;
+					}
+				}
+			}
+		}
+		
+		return used;
+	}
+	
+	public static boolean DoCast(EntityPlayer player) {
+		// Try to find weapon
+		EnumHand hand = EnumHand.MAIN_HAND;
+		@Nonnull ItemStack stack = player.getHeldItem(hand);
+		if (stack.getItem() instanceof WarlockSword) {
+			if (instance().tryCast(player.world, player, hand, stack)) {
+				return true;
+			}
+		}
+		
+		// Try with offhand
+		hand = EnumHand.OFF_HAND;
+		stack = player.getHeldItem(hand);
+		if (stack.getItem() instanceof WarlockSword) {
+			if (instance().tryCast(player.world, player, hand, stack)) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 }

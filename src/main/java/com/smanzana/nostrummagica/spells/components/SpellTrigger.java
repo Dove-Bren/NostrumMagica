@@ -50,7 +50,11 @@ public abstract class SpellTrigger {
 		}
 				
 		protected void trigger(TriggerData data) {
-			state.trigger(data.targets, data.others, data.world, data.pos);
+			trigger(data, false);
+		}
+		
+		protected void trigger(TriggerData data, boolean forceSplit) {
+			state.trigger(data.targets, data.others, data.world, data.pos, forceSplit);
 		}
 		
 		protected SpellState getState() {

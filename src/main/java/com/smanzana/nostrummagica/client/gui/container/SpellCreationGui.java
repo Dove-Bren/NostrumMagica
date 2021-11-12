@@ -10,7 +10,6 @@ import javax.annotation.Nonnull;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.tiles.SpellTableEntity;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -383,7 +382,7 @@ public class SpellCreationGui {
 			String prefix = "";
 			
 			if (locked) {
-				prefix = ChatFormatting.OBFUSCATED + "";
+				//prefix = ChatFormatting.OBFUSCATED + "";
 				spellErrorStrings.add(prefix + "The runes on the board don't respond to your hands");
 				fail = true;
 			}

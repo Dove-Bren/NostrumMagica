@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.items;
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -16,24 +17,21 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumAction;
-import net.minecraft.item.IItemPropertyGetter;
-import net.minecraft.item.Item;
+import net.minecraft.item.ItemShield;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class MirrorShield extends Item implements ISpellActionListener, ILoreTagged {
+public class MirrorShield extends ItemShield implements ISpellActionListener, ILoreTagged {
 
 	private static MirrorShield instance = null;
 	
@@ -56,12 +54,12 @@ public class MirrorShield extends Item implements ISpellActionListener, ILoreTag
 		this.setMaxStackSize(1);
 		this.setMaxDamage(750);
 		
-		this.addPropertyOverride(new ResourceLocation("blocking"), new IItemPropertyGetter() {
-			@SideOnly(Side.CLIENT)
-			public float apply(ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn) {
-				return entityIn != null && entityIn.isHandActive() && entityIn.getActiveItemStack() == stack ? 1.0F : 0.0F;
-			}
-		});
+//		this.addPropertyOverride(new ResourceLocation("blocking"), new IItemPropertyGetter() {
+//			@SideOnly(Side.CLIENT)
+//			public float apply(ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn) {
+//				return entityIn != null && entityIn.isHandActive() && entityIn.getActiveItemStack() == stack ? 1.0F : 0.0F;
+//			}
+//		});
 		
 		NostrumMagica.playerListener.registerMagicEffect(this, null);
 	}
@@ -145,6 +143,11 @@ public class MirrorShield extends Item implements ISpellActionListener, ILoreTag
 	@Override
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_ITEMS;
+	}
+	
+	@Override
+	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+		return;
 	}
 
 }

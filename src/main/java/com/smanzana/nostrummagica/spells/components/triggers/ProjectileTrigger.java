@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.utils.Projectiles;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
@@ -39,14 +40,16 @@ public class ProjectileTrigger extends SpellTrigger {
 		private float pitch;
 		private float yaw;
 		private boolean atMax;
+		private boolean hitAllies;
 		
-		public ProjectileTriggerInstance(SpellState state, World world, Vec3d pos, float pitch, float yaw, boolean atMax) {
+		public ProjectileTriggerInstance(SpellState state, World world, Vec3d pos, float pitch, float yaw, boolean atMax, boolean hitAllies) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
 			this.pitch = pitch;
 			this.yaw = yaw;
 			this.atMax = atMax;
+			this.hitAllies = hitAllies;
 		}
 		
 		@Override
@@ -85,20 +88,22 @@ public class ProjectileTrigger extends SpellTrigger {
 							return false;
 						}
 						
-						if (ent instanceof IEntityTameable) {
-							if (getState().getSelf().getUniqueID().equals(((IEntityTameable) ent).getOwnerId())) {
-								return false; // We own the target entity
+						if (!hitAllies) {
+							if (ent instanceof IEntityTameable) {
+								if (getState().getSelf().getUniqueID().equals(((IEntityTameable) ent).getOwnerId())) {
+									return false; // We own the target entity
+								}
 							}
-						}
-						
-						if (getState().getSelf() instanceof IEntityTameable) {
-							if (ent.getUniqueID().equals(((IEntityTameable) getState().getSelf()).getOwnerId())) {
-								return false; // We own the target entity
+							
+							if (getState().getSelf() instanceof IEntityTameable) {
+								if (ent.getUniqueID().equals(((IEntityTameable) getState().getSelf()).getOwnerId())) {
+									return false; // We own the target entity
+								}
 							}
-						}
-						
-						if (Projectiles.getShooter(ent) == getState().getSelf()) {
-							return false;
+							
+							if (Projectiles.getShooter(ent) == getState().getSelf()) {
+								return false;
+							}
 						}
 						
 						return true;
@@ -162,14 +167,16 @@ public class ProjectileTrigger extends SpellTrigger {
 
 	@Override
 	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw, SpellPartParam params) {
-		// We use param's flip to indicate whether we should continue on max range
-		boolean atMax = false;
+		boolean atMax = false; // legacy
+		boolean hitAllies = false;
+		
+		// We use param's flip to indicate whether allies should be hit
 		if (params != null)
-			atMax = params.flip;
+			hitAllies = params.flip;
 		
 		// Add direction
 		pos = new Vec3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
-		return new ProjectileTriggerInstance(state, world, pos, pitch, yaw, atMax);
+		return new ProjectileTriggerInstance(state, world, pos, pitch, yaw, atMax, hitAllies);
 	}
 
 	// Copied from vanilla entity class
@@ -199,7 +206,7 @@ public class ProjectileTrigger extends SpellTrigger {
 
 	@Override
 	public boolean supportsBoolean() {
-		return false;
+		return true;
 	}
 
 	@Override
@@ -214,7 +221,7 @@ public class ProjectileTrigger extends SpellTrigger {
 
 	@Override
 	public String supportedBooleanName() {
-		return null;
+		return I18n.format("modification.projectile.bool", (Object[]) null);
 	}
 
 	@Override

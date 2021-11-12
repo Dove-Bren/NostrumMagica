@@ -141,6 +141,7 @@ import com.smanzana.nostrummagica.items.WarlockSword;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.network.NetworkHandler;
+import com.smanzana.nostrummagica.network.messages.BladeCastMessage;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
 import com.smanzana.nostrummagica.network.messages.ObeliskSelectMessage;
 import com.smanzana.nostrummagica.network.messages.ObeliskTeleportationRequestMessage;
@@ -214,6 +215,7 @@ public class ClientProxy extends CommonProxy {
 	private KeyBinding bindingCast;
 	private KeyBinding bindingScroll;
 	private KeyBinding bindingInfo;
+	private KeyBinding bindingBladeCast;
 	private OverlayRenderer overlayRenderer;
 	private ClientEffectRenderer effectRenderer;
 
@@ -231,6 +233,8 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.registerKeyBinding(bindingScroll);
 		bindingInfo = new KeyBinding("key.infoscreen.desc", Keyboard.KEY_HOME, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingInfo);
+		bindingBladeCast = new KeyBinding("key.bladecast.desc", Keyboard.KEY_R, "key.nostrummagica.desc");
+		ClientRegistry.registerKeyBinding(bindingBladeCast);
 		
 		
     	
@@ -766,7 +770,19 @@ public class ClientProxy extends CommonProxy {
 			if (player.isRiding() && player.getRidingEntity() instanceof EntityTameDragonRed) {
 				((EntityDragon) player.getRidingEntity()).dragonJump();
 			}
+		} else if (bindingBladeCast.isPressed()) {
+			EntityPlayer player = Minecraft.getMinecraft().player;
+			if (player.getCooledAttackStrength(0.5F) > .95) {
+				player.resetCooldown();
+				//player.swingArm(EnumHand.MAIN_HAND);
+				doBladeCast();
+			}
+			
 		}
+	}
+	
+	private void doBladeCast() {
+		NetworkHandler.getSyncChannel().sendToServer(new BladeCastMessage());
 	}
 	
 	private void doCast() {
@@ -1416,6 +1432,15 @@ public class ClientProxy extends CommonProxy {
 					return effect;
 				});
 		
+//		renderer.registerEffect(new SpellComponentWrapper(WallTrigger.instance()),
+//				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
+//					final boolean northsouth = (param >= 1000f);
+//					final int radius = (int) param - (northsouth ? 1000 : 0);
+//					
+//					
+//				}
+//				);
+		
 		// Alterations
 		renderer.registerEffect(new SpellComponentWrapper(EAlteration.INFLICT),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
@@ -1658,7 +1683,7 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public void updatePlayerEffect(EntityPlayerMP player, SpecialEffect effectType, EffectData data) {
+	public void updateEntityEffect(EntityPlayerMP player, EntityLivingBase entity, SpecialEffect effectType, EffectData data) {
 		return;
 	}
 	

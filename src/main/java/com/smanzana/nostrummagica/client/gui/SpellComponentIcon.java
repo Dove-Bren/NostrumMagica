@@ -28,6 +28,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.ProximityTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.WallTrigger;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -177,6 +178,9 @@ public class SpellComponentIcon {
 		} else if (trigger instanceof SeekingBulletTrigger) {
 			u = 6;
 			v = 1;
+		} else if (trigger instanceof WallTrigger) {
+			u = 3;
+			v = 2;
 		} else {
 			System.out.println("Trigger doesn't have set uv: " + trigger);
 		}

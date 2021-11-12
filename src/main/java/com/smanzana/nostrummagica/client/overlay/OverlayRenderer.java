@@ -1239,12 +1239,11 @@ public class OverlayRenderer extends Gui {
 //		renderLoreIcon(attr.hasFullLore(tag));
 	}
 	
-	@SubscribeEvent
-	public void onEntityRender(RenderLivingEvent.Post<EntityLivingBase> event) {
-		if (event.getEntity().ticksExisted % 4 == 0) {
-			EffectData data = NostrumMagica.magicEffectProxy.getData(event.getEntity(), SpecialEffect.ROOTED);
+	protected void renderRoots(EntityLivingBase entity) {
+		if (entity.ticksExisted % 4 == 0) {
+			EffectData data = NostrumMagica.magicEffectProxy.getData(entity, SpecialEffect.ROOTED);
 			if (data != null && data.getCount() != 0) {
-				final ClientEffect effect = new ClientEffectAnimated(event.getEntity().getPositionVector(), 1000L,
+				final ClientEffect effect = new ClientEffectAnimated(entity.getPositionVector(), 1000L,
 						new ClientEffect[] {
 							new ClientEffect(Vec3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_0, 0, 0, 0), 1500L),
 							new ClientEffect(Vec3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_1, 0, 0, 0), 1500L),
@@ -1265,6 +1264,25 @@ public class OverlayRenderer extends Gui {
 					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, .0f, .8f));
 				ClientEffectRenderer.instance().addEffect(effect);
 			}
+		}
+	}
+	
+	@SubscribeEvent
+	public void onEntityRender(RenderLivingEvent.Post<EntityLivingBase> event) {
+		renderRoots(event.getEntity());
+	}
+	
+	@SubscribeEvent
+	public void onRenderLast(RenderWorldLastEvent event) {
+		// Copy of what vanilla uses to figure out if it should render the render entity:
+		final boolean shouldRenderMe = (
+				Minecraft.getMinecraft().gameSettings.thirdPersonView != 0
+				|| (Minecraft.getMinecraft().getRenderViewEntity() instanceof EntityLivingBase && ((EntityLivingBase)Minecraft.getMinecraft().getRenderViewEntity()).isPlayerSleeping())
+				);
+		
+		if (!shouldRenderMe) {
+			// Normal render didn't happen. Do rooted render manually instead.
+			renderRoots(NostrumMagica.proxy.getPlayer());
 		}
 	}
 	
@@ -1310,23 +1328,6 @@ public class OverlayRenderer extends Gui {
 			event.setCanceled(true);
 			return;
 		}
-	}
-	
-	@SubscribeEvent
-	public void onWorldRenderLast(RenderWorldLastEvent event) {
-//		final EntityPlayer player = NostrumMagica.proxy.getPlayer();
-//		if (player == null || player.world == null) {
-//			return;
-//		}
-//		
-//		final int h = (int) player.getEyeHeight();
-//		IBlockState inBlock = player.world.getBlockState(player.getPosition().add(0, h, 0));
-//		if (inBlock.getBlock() == DungeonAir.instance()) {
-//			System.out.print(".");
-//			// Render dungeon air overlay
-//			Minecraft mc = Minecraft.getMinecraft();
-//			Gui.drawRect(0, 0, mc.displayWidth, mc.displayHeight, 0x40200020);
-//		}
 	}
 	
 }

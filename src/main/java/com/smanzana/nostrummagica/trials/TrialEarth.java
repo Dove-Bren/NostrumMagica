@@ -29,7 +29,7 @@ public class TrialEarth extends ShrineTrial {
 		if (e.getState().getBlock() != Blocks.OBSIDIAN)
 			return;
 		
-		if (e.getPlayer().getHeldItemMainhand() != null)
+		if (!e.getPlayer().getHeldItemMainhand().isEmpty())
 			return;
 		
 		this.complete(e.getPlayer());

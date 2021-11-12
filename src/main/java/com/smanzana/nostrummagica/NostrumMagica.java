@@ -152,6 +152,7 @@ import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.WallTrigger;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 import com.smanzana.nostrummagica.trials.ShrineTrial;
@@ -1631,6 +1632,13 @@ public class NostrumMagica
     			new String[]{"con1-tec2"},
     			null, new ObjectiveSpellCast().numElems(3).requiredElement(EMagicElement.LIGHTNING),
     			wrapAttribute(AwardType.MANA, 0.030f));
+    	new NostrumQuest("con2-tec3", QuestType.CHALLENGE, 0,
+    			2, // Control
+    			3, // Technique
+    			0, // Finesse
+    			new String[]{"con1-tec2"},
+    			null, null,
+    			new IReward[] {new TriggerReward(WallTrigger.instance())});
     	new NostrumQuest("con1-tec5", QuestType.REGULAR, 0,
     			1, // Control
     			5, // Technique
@@ -1710,6 +1718,13 @@ public class NostrumMagica
     			new String[]{"fin1-tec2"},
     			null, new ObjectiveKill(EntityKoid.class, "Koid", 5),
     			wrapAttribute(AwardType.MANA, 0.025f));
+//    	new NostrumQuest("fin2-tec3", QuestType.CHALLENGE, 0,
+//    			0, // Control
+//    			3, // Technique
+//    			2, // Finesse
+//    			new String[]{"con1-tec2", "fin1-tec2"},
+//    			null, null,
+//    			new IReward[] {new TriggerReward(WallTrigger.instance())});
     	new NostrumQuest("fin1-tec5", QuestType.REGULAR, 0,
     			0, // Control
     			5, // Technique
