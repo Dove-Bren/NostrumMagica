@@ -12,8 +12,8 @@ import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
 import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
-import com.smanzana.nostrummagica.spells.components.SpellAction.MagicDamageSource;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -253,8 +253,8 @@ public class MagicEffectProxy {
 			return inAmt;
 		
 		SpecialEffect effect = SpecialEffect.SHIELD_PHYSICAL;
-		if (source instanceof SpellAction.MagicDamageSource
-				&& ((SpellAction.MagicDamageSource) source).getElement() != EMagicElement.PHYSICAL)
+		if (source instanceof MagicDamageSource
+				&& ((MagicDamageSource) source).getElement() != EMagicElement.PHYSICAL)
 			effect = SpecialEffect.SHIELD_MAGIC;
 		
 		Map<SpecialEffect, EffectData> record = effects.get(id);
@@ -331,7 +331,7 @@ public class MagicEffectProxy {
 			
 			EffectData data = effects.get(id).get(SpecialEffect.MAGIC_BUFF);
 			if (data != null) {
-				target.attackEntityFrom(new SpellAction.MagicDamageSource(living, data.element), 
+				target.attackEntityFrom(new MagicDamageSource(living, data.element), 
 						SpellAction.calcDamage(living, target, (float) data.amt, data.element));
 				target.setEntityInvulnerable(false);
 				target.hurtResistantTime = 0;

@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.entity;
 
 
 import com.smanzana.nostrummagica.blocks.tiles.SwitchBlockTileEntity;
-import com.smanzana.nostrummagica.spells.components.SpellAction.MagicDamageSource;
+import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;

@@ -63,6 +63,9 @@ public class ModelAetherCloak extends ModelBase {
 			rot -= 30;
 		}
 		
+		GlStateManager.enableRescaleNormal();
+		GlStateManager.disableCull();
+		
 		GlStateManager.pushMatrix();
 		GlStateManager.scale(objScale, -objScale, objScale);
 		GlStateManager.translate(0, entityIn.isSneaking() ? -.3 : 0, hasChestpiece ? .15 : 0);

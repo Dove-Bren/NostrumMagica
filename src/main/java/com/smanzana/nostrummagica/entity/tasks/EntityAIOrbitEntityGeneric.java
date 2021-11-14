@@ -74,9 +74,9 @@ public class EntityAIOrbitEntityGeneric<T extends EntityLiving> extends EntityAI
 			return false;
 		} else if (entitylivingbase instanceof EntityPlayer && ((EntityPlayer)entitylivingbase).isSpectator()) {
 			return false;
-		} else if (this.ent.getMoveHelper().isUpdating()
-				&& ent.getDistanceSq(ent.getMoveHelper().getX(), ent.getMoveHelper().getY(), ent.getMoveHelper().getZ()) > 1.0) {
-			return false;
+//		} else if (this.ent.getMoveHelper().isUpdating()
+//				&& ent.getDistanceSq(ent.getMoveHelper().getX(), ent.getMoveHelper().getY(), ent.getMoveHelper().getZ()) > 1.0) {
+//			return false;
 		} else if (!ent.world.equals(entitylivingbase.getEntityWorld())) {
 			return false;
 		} else if (ent.getDistanceSq(entitylivingbase) > 1024) {

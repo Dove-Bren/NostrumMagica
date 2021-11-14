@@ -149,5 +149,10 @@ public class MirrorShield extends ItemShield implements ISpellActionListener, IL
 	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		return;
 	}
+	
+	@Override
+	public boolean isShield(ItemStack stack, @Nullable EntityLivingBase entity) {
+		return true;
+	}
 
 }

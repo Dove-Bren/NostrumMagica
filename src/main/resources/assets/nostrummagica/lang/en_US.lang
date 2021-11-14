@@ -416,6 +416,7 @@ entity.nostrummagica.nostrum_lightning.name=Lightning Bolt
 entity.nostrummagica.nostrum_hookshot.name=Hookshot Anchor
 entity.nostrummagica.entity_wisp.name=Wisp
 entity.nostrummagica.entity_lux.name=Lux
+entity.nostrummagica.entity_willo.name=Willo
 
 itemGroup.nostrummagica=Nostrum Magica
 itemGroup.nostrummagica_enhancements=Nostrum Enhancements

@@ -28,6 +28,7 @@ import com.smanzana.nostrummagica.entity.EntitySpellBullet;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
 import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
+import com.smanzana.nostrummagica.entity.EntityWillo;
 import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
@@ -72,6 +73,7 @@ import com.smanzana.nostrummagica.serializers.HookshotTypeDataSerializer;
 import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
 import com.smanzana.nostrummagica.serializers.OptionalDragonArmorMaterialSerializer;
 import com.smanzana.nostrummagica.serializers.PetJobSerializer;
+import com.smanzana.nostrummagica.serializers.WilloStatusSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
@@ -318,9 +320,9 @@ public class CommonProxy {
     			.id("entity_lux", entityID++)
     			.name(NostrumMagica.MODID + ".entity_lux")
     			.tracker(64, 1, false)
-    			.spawn(EnumCreatureType.CREATURE, 6, 1, 3, BiomeDictionary.getBiomes(BiomeDictionary.Type.MAGICAL))
-    			.spawn(EnumCreatureType.CREATURE, 6, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.FOREST))
-				.spawn(EnumCreatureType.CREATURE, 4, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.JUNGLE))
+    			.spawn(EnumCreatureType.CREATURE, 20, 1, 3, BiomeDictionary.getBiomes(BiomeDictionary.Type.MAGICAL))
+    			.spawn(EnumCreatureType.CREATURE, 15, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.FOREST))
+				.spawn(EnumCreatureType.CREATURE, 10, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.JUNGLE))
     		.build());
     	registry.register(EntityEntryBuilder.create()
     			.entity(EntityDragonEgg.class)
@@ -375,6 +377,18 @@ public class CommonProxy {
     			.name(NostrumMagica.MODID + ".entity_effect_cloud")
     			.tracker(64, 1, false)
     		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntityWillo.class)
+    			.id("entity_willo", entityID++)
+    			.name(NostrumMagica.MODID + ".entity_willo")
+    			.tracker(64, 1, false)
+    			.spawn(EnumCreatureType.MONSTER, 30, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.MAGICAL))
+    			.spawn(EnumCreatureType.MONSTER, 15, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.FOREST))
+    			.spawn(EnumCreatureType.MONSTER, 20, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.SNOWY))
+    			.spawn(EnumCreatureType.MONSTER, 30, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.SPOOKY))
+    			.spawn(EnumCreatureType.MONSTER, 20, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.DRY))
+    			.spawn(EnumCreatureType.MONSTER, 8, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER))
+    		.build());
     }
     
     @SubscribeEvent
@@ -406,6 +420,7 @@ public class CommonProxy {
     	registry.register(new DataSerializerEntry(MagicElementDataSerializer.instance).setRegistryName("nostrum.serial.element"));
     	registry.register(new DataSerializerEntry(HookshotTypeDataSerializer.instance).setRegistryName("nostrum.serial.hookshot_type"));
     	registry.register(new DataSerializerEntry(PetJobSerializer.instance).setRegistryName("nostrum.serial.pet_job"));
+    	registry.register(new DataSerializerEntry(WilloStatusSerializer.instance).setRegistryName("nostrum.serial.willo_status"));
     }
     
     public void syncPlayer(EntityPlayerMP player) {

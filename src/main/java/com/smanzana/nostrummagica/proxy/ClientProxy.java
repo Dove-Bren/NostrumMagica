@@ -69,6 +69,7 @@ import com.smanzana.nostrummagica.entity.EntityLux;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
 import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
+import com.smanzana.nostrummagica.entity.EntityWillo;
 import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
@@ -90,6 +91,7 @@ import com.smanzana.nostrummagica.entity.renderer.RenderShadowDragonRed;
 import com.smanzana.nostrummagica.entity.renderer.RenderSprite;
 import com.smanzana.nostrummagica.entity.renderer.RenderSwitchTrigger;
 import com.smanzana.nostrummagica.entity.renderer.RenderTameDragonRed;
+import com.smanzana.nostrummagica.entity.renderer.RenderWillo;
 import com.smanzana.nostrummagica.entity.renderer.RenderWisp;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
@@ -726,6 +728,13 @@ public class ClientProxy extends CommonProxy {
 			@Override
 			public Render<? super EntityLux> createRenderFor(RenderManager manager) {
 				return new RenderLux(manager, 1f);
+			}
+		});
+		
+		RenderingRegistry.registerEntityRenderingHandler(EntityWillo.class, new IRenderFactory<EntityWillo>() {
+			@Override
+			public Render<? super EntityWillo> createRenderFor(RenderManager manager) {
+				return new RenderWillo(manager, 1f);
 			}
 		});
 	}

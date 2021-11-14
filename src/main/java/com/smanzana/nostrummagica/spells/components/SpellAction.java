@@ -63,7 +63,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -71,37 +70,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeHell;
 import net.minecraftforge.oredict.OreDictionary;
 
 public class SpellAction {
 	
-	public static class MagicDamageSource extends EntityDamageSource {
-		
-		private EMagicElement element;
-		
-		public MagicDamageSource(Entity source, EMagicElement element) {
-			super("nostrummagic", source);
-			this.element = element;
-			
-			this.setDamageBypassesArmor();
-		}
-		
-		@Override
-		public ITextComponent getDeathMessage(EntityLivingBase entityLivingBaseIn) {
-			
-	        String untranslated = "death.attack.magic." + element.name();
-	        return new TextComponentTranslation(untranslated, new Object[] {entityLivingBaseIn.getDisplayName(), this.damageSourceEntity.getDisplayName()});
-	    }
-
-		public EMagicElement getElement() {
-			return element;
-		}
-	};
-
 	private static interface SpellEffect {
 		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float eff);
 		public boolean apply(EntityLivingBase caster, World world, BlockPos block, float eff);
@@ -198,12 +172,19 @@ public class SpellAction {
 		
 		@Override
 		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
-			entity.heal(amount * efficiency);
-			
-			if (entity instanceof EntityTameDragonRed) {
-				EntityTameDragonRed dragon = (EntityTameDragonRed) entity;
-				if (dragon.isTamed() && dragon.getOwner() == caster) {
-					dragon.addBond(1f);
+			if (entity.isEntityUndead()) {
+				source.setLastAttackedEntity(entity);
+				entity.setRevengeTarget(caster);
+				//entity.setHealth(Math.max(0f, entity.getHealth() - fin));
+				entity.hurtResistantTime = 0;
+				entity.attackEntityFrom(new MagicDamageSource(source, EMagicElement.ICE), amount * efficiency);
+			} else {
+				entity.heal(amount * efficiency);
+				if (entity instanceof EntityTameDragonRed) {
+					EntityTameDragonRed dragon = (EntityTameDragonRed) entity;
+					if (dragon.isTamed() && dragon.getOwner() == caster) {
+						dragon.addBond(1f);
+					}
 				}
 			}
 			
@@ -325,7 +306,7 @@ public class SpellAction {
 		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
 			NostrumMagicaSounds.STATUS_BUFF1.play(entity);
 			
-			if (number == -1 || effects.size() < number) {
+			if (number == -1 || entity.getActivePotionEffects().size() < number) {
 				entity.clearActivePotions();
 			} else {
 				// Remove #number effects. We do this by getting another list of effects and shuffling, and then
@@ -898,51 +879,65 @@ public class SpellAction {
 
 		@Override
 		public boolean apply(EntityLivingBase caster, World world, BlockPos block, float efficiency) {
-			if (NostrumMagica.getMagicWrapper(caster) == null) {
-				return false;
-			}
 			
-			NostrumMagica.getMagicWrapper(caster).clearFamiliars();
-			caster.removeActivePotionEffect(FamiliarPotion.instance());
-			for (int i = 0; i < power; i++) {
-				EntityGolem golem = spawnGolem(world);
-				golem.setPosition(block.getX() + .5, block.getY(), block.getZ() + .5);
-				world.spawnEntity(golem);
-				golem.setOwnerId(caster.getPersistentID());
-				NostrumMagica.getMagicWrapper(caster).addFamiliar(golem);
-			}
-			int time = (int) (20 * 60 * 2.5 * Math.pow(2, Math.max(0, power - 1)) * efficiency);
-			caster.addPotionEffect(new PotionEffect(FamiliarPotion.instance(), time, 0) {
-				@Override
-				public boolean onUpdate(EntityLivingBase entityIn) {
-					// heh snekky
-					boolean ret = super.onUpdate(entityIn);
-					if (ret) {
-						// we're not being removed. Check familiars
-						if (entityIn.world.isRemote) {
-							return true;
-						}
-						
-						INostrumMagic attr = NostrumMagica.getMagicWrapper(entityIn);
-						if (attr != null) {
-							boolean active = false;
-							if (!attr.getFamiliars().isEmpty()) {
-								for (EntityLivingBase fam : attr.getFamiliars()) {
-									if (fam.isEntityAlive()) {
-										active = true;
-										break;
+			// For non-player entities, just spawn some new golems.
+			// Else spawn player-bound golems
+			if (caster instanceof EntityPlayer) {
+				if (NostrumMagica.getMagicWrapper(caster) == null) {
+					return false;
+				}
+				
+				NostrumMagica.getMagicWrapper(caster).clearFamiliars();
+				caster.removeActivePotionEffect(FamiliarPotion.instance());
+				for (int i = 0; i < power; i++) {
+					EntityGolem golem = spawnGolem(world);
+					golem.setPosition(block.getX() + .5, block.getY(), block.getZ() + .5);
+					world.spawnEntity(golem);
+					golem.setOwnerId(caster.getPersistentID());
+					NostrumMagica.getMagicWrapper(caster).addFamiliar(golem);
+				}
+				int time = (int) (20 * 60 * 2.5 * Math.pow(2, Math.max(0, power - 1)) * efficiency);
+				caster.addPotionEffect(new PotionEffect(FamiliarPotion.instance(), time, 0) {
+					@Override
+					public boolean onUpdate(EntityLivingBase entityIn) {
+						// heh snekky
+						boolean ret = super.onUpdate(entityIn);
+						if (ret) {
+							// we're not being removed. Check familiars
+							if (entityIn.world.isRemote) {
+								return true;
+							}
+							
+							INostrumMagic attr = NostrumMagica.getMagicWrapper(entityIn);
+							if (attr != null) {
+								boolean active = false;
+								if (!attr.getFamiliars().isEmpty()) {
+									for (EntityLivingBase fam : attr.getFamiliars()) {
+										if (fam.isEntityAlive()) {
+											active = true;
+											break;
+										}
 									}
 								}
-							}
-							if (!active) {
-								ret = false;
+								if (!active) {
+									ret = false;
+								}
 							}
 						}
+						
+						return ret;
 					}
-					
-					return ret;
+				});
+			} else {
+				// Just summon some new golems
+				final int time = (int) (20f * (15f * efficiency));
+				for (int i = 0; i < power; i++) {
+					EntityGolem golem = spawnGolem(world);
+					golem.setPosition(block.getX() + .5, block.getY(), block.getZ() + .5);
+					golem.setExpiresAfterTicks(time);
+					world.spawnEntity(golem);
 				}
-			});
+			}
 			
 			NostrumMagicaSounds.CAST_CONTINUE.play(world,
 					block.getX() + .5, block.getY(), block.getZ() + .5);

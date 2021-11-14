@@ -27,6 +27,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.Spell.SpellPart;
+import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
@@ -297,7 +298,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 		for (EMagicElement elem : EMagicElement.values()) {
 			Float level = levels.get(elem);
 			if (level != null && level >= 1f) {
-				target.attackEntityFrom(new SpellAction.MagicDamageSource(attacker, elem), 
+				target.attackEntityFrom(new MagicDamageSource(attacker, elem), 
 						SpellAction.calcDamage(attacker, target, (float) Math.floor(level), elem));
 				target.setEntityInvulnerable(false);
 				target.hurtResistantTime = 0;

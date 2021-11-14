@@ -52,6 +52,8 @@ public abstract class EntityGolem extends EntityTameable implements ILoreTagged 
 	private int idleCooldown;
 	protected EMagicElement element;
 	
+	private int expireTicks;
+	
     protected EntityGolem(World worldIn, EMagicElement element, boolean melee, boolean range, boolean buff)
     {
         super(worldIn);
@@ -67,6 +69,10 @@ public abstract class EntityGolem extends EntityTameable implements ILoreTagged 
         
         idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
         this.element = element;
+    }
+    
+    public void setExpiresAfterTicks(int ticks) {
+    	this.expireTicks = this.ticksExisted + ticks;
     }
     
     /**
@@ -214,6 +220,10 @@ public abstract class EntityGolem extends EntityTameable implements ILoreTagged 
 					NostrumMagicaSounds.GOLEM_IDLE.play(this);
 				idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10); 
 			}
+		}
+		
+		if (!world.isRemote && expireTicks != 0 && expireTicks > this.ticksExisted) {
+			this.setDead();
 		}
 	}
 	
