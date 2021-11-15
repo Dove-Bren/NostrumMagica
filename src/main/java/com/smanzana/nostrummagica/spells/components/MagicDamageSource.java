@@ -17,6 +17,7 @@ public class MagicDamageSource extends EntityDamageSource {
 		this.element = element;
 		
 		this.setDamageBypassesArmor();
+		this.setDamageAllowedInCreativeMode();
 	}
 	
 	@Override

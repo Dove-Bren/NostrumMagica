@@ -2,10 +2,16 @@ package com.smanzana.nostrummagica.entity;
 
 import java.util.List;
 
+import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.spells.EMagicElement;
+
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 // Copy of vanilla with no fire
@@ -23,6 +29,17 @@ public class NostrumTameLightning extends EntityLightningBolt {
 		this.lightningState = 2;
 	}
 
+	public static void doEffect(EntityLivingBase entity) {
+		if (entity.world.isRemote) {
+			return;
+		}
+		
+		NostrumParticles.LIGHTNING_STATIC.spawn(entity.world, new SpawnParams(
+				3,
+				entity.posX, entity.posY + entity.height, entity.posZ, 1, 30, 5,
+				new Vec3d(0, -0.05, 0), false
+				).color(0x80000000 | (0x00FFFFFF & EMagicElement.LIGHTNING.getColor())));
+	}
 	
 	@Override
 	public void onUpdate() {
@@ -35,8 +52,11 @@ public class NostrumTameLightning extends EntityLightningBolt {
 
 			for (int i = 0; i < list.size(); ++i) {
 				Entity entity = (Entity)list.get(i);
-				if (!net.minecraftforge.event.ForgeEventFactory.onEntityStruckByLightning(entity, this))
+				if (!net.minecraftforge.event.ForgeEventFactory.onEntityStruckByLightning(entity, this)) { 
 					entity.onStruckByLightning(this);
+					entity.setEntityInvulnerable(false);
+					entity.hurtResistantTime = 0;
+				}
 			}
 		}
 	}

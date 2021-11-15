@@ -1119,6 +1119,8 @@ public class PlayerListener {
 					living.addPotionEffect(new PotionEffect(LightningChargePotion.instance(), 20 * 30, 0));
 				}
 			}
+			
+			e.setCanceled(true);
 		}
 		
 	}

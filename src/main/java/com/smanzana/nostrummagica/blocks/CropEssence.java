@@ -1,7 +1,5 @@
 package com.smanzana.nostrummagica.blocks;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -16,6 +14,7 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -70,8 +69,7 @@ public class CropEssence extends BlockCrops {
 	}
 
     @Override
-    public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-        List<ItemStack> ret = new LinkedList<>();
+    public void getDrops(NonNullList<ItemStack> ret, IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
         final int age = getAge(state);
         Random rand = world instanceof World ? ((World)world).rand : NostrumMagica.rand;
 
@@ -91,8 +89,6 @@ public class CropEssence extends BlockCrops {
         }
         
         ret.add(getSeeds(seedCount));
-        
-        return ret;
     }
 
     /**
