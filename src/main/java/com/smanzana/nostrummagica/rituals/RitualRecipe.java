@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.Validate;
 
@@ -17,6 +18,7 @@ import com.smanzana.nostrummagica.blocks.tiles.CandleTileEntity;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenIndexed;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.rituals.outcomes.IItemRitualOutcome;
 import com.smanzana.nostrummagica.rituals.outcomes.IRitualOutcome;
 import com.smanzana.nostrummagica.rituals.requirements.IRitualRequirement;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -31,6 +33,31 @@ import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
 
 public class RitualRecipe implements InfoScreenIndexed {
+	
+	public static final class RitualMatchInfo {
+		final boolean matched;
+		@Nonnull final ItemStack center;
+		@Nullable final NonNullList<ItemStack> extras;
+		@Nonnull final ItemStack output;
+		@Nullable final ReagentType reagents[];
+		final EMagicElement element;
+		
+		public RitualMatchInfo(boolean matched, EMagicElement element, 
+				ItemStack center, NonNullList<ItemStack> extras, ItemStack output,
+				ReagentType[] reagents) {
+			super();
+			this.matched = matched;
+			this.center = center;
+			this.extras = extras;
+			this.output = output;
+			this.reagents = reagents;
+			this.element = element;
+		}
+		
+		public static RitualMatchInfo Fail() {
+			return new RitualMatchInfo(false, EMagicElement.PHYSICAL, ItemStack.EMPTY, null, ItemStack.EMPTY, null);
+		}
+	}
 	
 	private static final int CHALK_XS[][] = new int[][] {
 		new int[]{-1, 0, 1, -1, 1, -1, 0, 1},
@@ -150,7 +177,7 @@ public class RitualRecipe implements InfoScreenIndexed {
 		}
 	}
 	
-	public boolean matches(EntityPlayer player, World world, BlockPos center, EMagicElement element) {
+	public RitualMatchInfo matches(EntityPlayer player, World world, BlockPos center, EMagicElement element) {
 		if (element == null) {
 			element = EMagicElement.PHYSICAL;
 		}
@@ -158,45 +185,53 @@ public class RitualRecipe implements InfoScreenIndexed {
 		// Do null matching with physical
 		if (element == EMagicElement.PHYSICAL) {
 			if (this.element != null && this.element != EMagicElement.PHYSICAL) {
-				return false;
+				return RitualMatchInfo.Fail();
 			}
 		} else if (element != this.element) {
-			return false;
+			return RitualMatchInfo.Fail();
 		}
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
-			return false;
+			return RitualMatchInfo.Fail();
 		
 		if (!attr.getCompletedResearches().contains("rituals"))
-			return false;
+			return RitualMatchInfo.Fail();
 		
 		if (this.req != null && !req.matches(player, attr))
-			return false;
+			return RitualMatchInfo.Fail();
 		
 		if (tier > 0 && !(world.getBlockState(center).getBlock() instanceof AltarBlock))
-			return false;
+			return RitualMatchInfo.Fail();
 		
 		if (tier == 0 && !(world.getBlockState(center).getBlock() instanceof Candle))
-			return false;
+			return RitualMatchInfo.Fail();
 		
 		TileEntity centerTE = world.getTileEntity(center);
 		if (centerTE == null)
-			return false;
+			return RitualMatchInfo.Fail();
 		
+		ReagentType typesOut[] = null;
+		ItemStack centerOut = ItemStack.EMPTY;
+		NonNullList<ItemStack> extrasOut = null;
 		if (tier == 0) {
 			CandleTileEntity candle = (CandleTileEntity) centerTE;
-			if (candle.getType() != types[0])
-				return false;
+			if (candle.getType() != types[0]) {
+				return RitualMatchInfo.Fail();
+			}
+			
+			typesOut = new ReagentType[] {candle.getType()};
 		} else {
 			// Check altars
 			AltarTileEntity altar = (AltarTileEntity) centerTE;
 			@Nonnull ItemStack stack = altar.getItem();
 			if (stack.isEmpty())
-				return false;
+				return RitualMatchInfo.Fail();
 			if (!OreDictionary.itemMatches(centerItem, stack, false)) {
-				return false;
+				return RitualMatchInfo.Fail();
 			}
+			centerOut = stack.copy();
+			
 			TileEntity te;
 			
 			if (tier == 2) {
@@ -206,13 +241,14 @@ public class RitualRecipe implements InfoScreenIndexed {
 					for (int z = -diff; z <= diff; z+=8) {
 						te = world.getTileEntity(center.add(x, 0, z));
 						if (te == null || !(te instanceof AltarTileEntity))
-							return false;
+							return RitualMatchInfo.Fail();
 						altar = (AltarTileEntity) te;
 						if (!altar.getItem().isEmpty())
 							items.add(altar.getItem());
 					}
 				}
 				
+				extrasOut = NonNullList.create();
 				for (ItemStack req : extraItems) {
 					if (req.isEmpty())
 						continue;
@@ -222,16 +258,17 @@ public class RitualRecipe implements InfoScreenIndexed {
 					while (it.hasNext()) {
 						ItemStack next = it.next();
 						if (OreDictionary.itemMatches(req, next, false)) {
+							extrasOut.add(next.copy());
 							it.remove();
 							found = true;
 							break;
 						}
 					}
 					if (!found)
-						return false;
+						return RitualMatchInfo.Fail();
 				}
 				if (items.size() > 0)
-					return false; // More items on altars than in recipe
+					return RitualMatchInfo.Fail(); // More items on altars than in recipe
 			}
 			
 			// get all candles. Must be a candle in all the spots.
@@ -241,12 +278,14 @@ public class RitualRecipe implements InfoScreenIndexed {
 			for (int z = -2; z <= 2; z += 4) {
 				te = world.getTileEntity(center.add(x, 0, z));
 				if (te == null || !(te instanceof CandleTileEntity))
-					return false;
+					return RitualMatchInfo.Fail();
 				
 				CandleTileEntity candle = (CandleTileEntity) te;
 				reagents.add(candle.getType());
 			}
 			
+			int i = 0;
+			typesOut = new ReagentType[types.length];
 			for (ReagentType req : types) {
 				Iterator<ReagentType> it = reagents.iterator();
 				boolean found = false;
@@ -259,12 +298,15 @@ public class RitualRecipe implements InfoScreenIndexed {
 					}
 				}
 				
-				if (!found)
-					return false;
+				if (!found) {
+					return RitualMatchInfo.Fail();
+				} else {
+					typesOut[i++] = req;
+				}
 			}
 			
 			if (reagents.size() > 0)
-				return false;
+				return RitualMatchInfo.Fail();
 		}
 		
 		// check chalk
@@ -274,10 +316,14 @@ public class RitualRecipe implements InfoScreenIndexed {
 			IBlockState state = world.getBlockState(center.add(xs[index], 0, ys[index]));
 			
 			if (state == null || !(state.getBlock() instanceof ChalkBlock))
-				return false;
+				return RitualMatchInfo.Fail();
 		}
 		
-		return true;
+		final ItemStack outputOut = (this.getOutcome() instanceof IItemRitualOutcome
+				? ((IItemRitualOutcome) this.getOutcome()).getResult().copy()
+				: ItemStack.EMPTY
+				);
+		return new RitualMatchInfo(true, this.element, centerOut, extrasOut, outputOut, typesOut);
 			
 	}
 	
@@ -286,7 +332,7 @@ public class RitualRecipe implements InfoScreenIndexed {
 		if (world.isRemote)
 			return;
 		
-		@Nonnull ItemStack centerItem = null;
+		@Nonnull ItemStack centerItem = ItemStack.EMPTY;
 		NonNullList<ItemStack> otherItems = null;
 		
 		// Do cleanup of altars and candles, etc

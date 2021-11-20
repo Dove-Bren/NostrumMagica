@@ -710,7 +710,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			//int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, 
 			//Vec3d velocity, boolean unused
 			NostrumParticles.LIGHTNING_STATIC.spawn(world, new SpawnParams(
-					1, player.posX, player.posY + 1, player.posZ, 1, 20 * 1, 0, new Vec3d(0, 0.01 * (NostrumMagica.rand.nextBoolean() ? 1 : -1), 0), false
+					1, player.posX, player.posY + 1, player.posZ, 1, 20 * 1, 0, new Vec3d(0, 0.01 * (NostrumMagica.rand.nextBoolean() ? 1 : -1), 0), null
 					).color(.8f, 1f, 1f, 0f));
 			break;
 		case PHYSICAL:

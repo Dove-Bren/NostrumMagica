@@ -27,10 +27,10 @@ public class TileEntityAltarRenderer extends TileEntitySpecialRenderer<AltarTile
 	public void render(AltarTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
 
 		ItemStack item = te.getItem();
-		if (item.isEmpty())
+		if (item.isEmpty() || te.isHidingItem())
 			return;
 		
-		float rot = 2.0f * (Minecraft.getSystemTime() / 50);
+		float rot = (float) (2.0 * ((double) Minecraft.getSystemTime() / 50.0)); // Copied into ClientEffectRitual
 		float scale = .75f;
 		float yoffset = (float) (.1f * (-.5f + Math.sin(((double) Minecraft.getSystemTime()) / 1000.0)));
 		

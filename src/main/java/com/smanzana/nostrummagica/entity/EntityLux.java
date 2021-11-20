@@ -253,7 +253,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 							posX, posY + height/2, posZ,
 							0.05, 40, 10,
 							new Vec3d(0, -.1, 0),
-							false
+							null
 							).color(.3f, .7f - darken, 1f - darken, .9f - darken));
 				}
 			} else {

@@ -102,7 +102,7 @@ public class DungeonAir extends Block {
 			NostrumParticles.GLOW_ORB.spawn(worldIn, new SpawnParams(
 					1,
 					pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, .5, 40, 20,
-					new Vec3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025), false
+					new Vec3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025), null
 					).color(color));
 		}
 	}

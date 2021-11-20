@@ -251,7 +251,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 			int color = element.getColor();
 			NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 					1, posX, posY + height/2f, posZ, 0, 40, 0,
-					new Vec3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025), false
+					new Vec3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025), null
 					).color(color));
 		}
 	}

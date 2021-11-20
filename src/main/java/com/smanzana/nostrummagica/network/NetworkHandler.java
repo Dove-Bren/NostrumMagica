@@ -19,6 +19,7 @@ import com.smanzana.nostrummagica.network.messages.ObeliskTeleportationRequestMe
 import com.smanzana.nostrummagica.network.messages.ReagentBagToggleMessage;
 import com.smanzana.nostrummagica.network.messages.RuneBagToggleMessage;
 import com.smanzana.nostrummagica.network.messages.SpawnNostrumParticleMessage;
+import com.smanzana.nostrummagica.network.messages.SpawnNostrumRitualEffectMessage;
 import com.smanzana.nostrummagica.network.messages.SpellCraftMessage;
 import com.smanzana.nostrummagica.network.messages.SpellDebugMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
@@ -91,6 +92,7 @@ public class NetworkHandler {
 		syncChannel.registerMessage(ClientTomeDropSpellMessage.Handler.class, ClientTomeDropSpellMessage.class, discriminator++, Side.SERVER);
 		syncChannel.registerMessage(SpawnNostrumParticleMessage.Handler.class, SpawnNostrumParticleMessage.class, discriminator++, Side.CLIENT);
 		syncChannel.registerMessage(BladeCastMessage.Handler.class, BladeCastMessage.class, discriminator++, Side.SERVER);
+		syncChannel.registerMessage(SpawnNostrumRitualEffectMessage.Handler.class, SpawnNostrumRitualEffectMessage.class, discriminator++, Side.CLIENT);
 		
 	}
 	

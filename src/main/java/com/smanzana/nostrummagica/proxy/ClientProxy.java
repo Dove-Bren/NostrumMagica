@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.Nullable;
+
 import org.lwjgl.input.Keyboard;
 
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -187,6 +189,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -1716,5 +1719,15 @@ public class ClientProxy extends CommonProxy {
 		}
 		
 		super.sendMana(player);
+	}
+	
+	@Override
+	public void playRitualEffect(World world, BlockPos pos, EMagicElement element,
+			ItemStack center, @Nullable NonNullList<ItemStack> extras, ReagentType[] types, ItemStack output) {
+		if (world.isRemote) {
+			return;
+		}
+		
+		super.playRitualEffect(world, pos, element, center, extras, types, output);
 	}
 }

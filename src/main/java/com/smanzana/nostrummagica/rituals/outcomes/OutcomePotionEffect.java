@@ -26,7 +26,7 @@ public class OutcomePotionEffect implements IRitualOutcome {
 	@Override
 	public void perform(World world, EntityPlayer player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
 		// Apply effect to the player
-		player.addPotionEffect(effect);
+		player.addPotionEffect(new PotionEffect(effect)); // copy
 	}
 	
 	@Override

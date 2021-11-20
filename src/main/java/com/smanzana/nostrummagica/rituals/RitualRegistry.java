@@ -5,8 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.AltarBlock;
 import com.smanzana.nostrummagica.blocks.Candle;
+import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
@@ -64,7 +66,8 @@ public class RitualRegistry {
 		
 		// else it's an altar or a candle
 		for (RitualRecipe ritual : instance().knownRituals) {
-			if (ritual.matches(player, world, pos, element)) {
+			final RitualMatchInfo result = ritual.matches(player, world, pos, element);
+			if (result.matched) {
 				ritual.perform(world, player, pos);
 				
 				if (!instance().ritualListeners.isEmpty()) {
@@ -75,6 +78,9 @@ public class RitualRegistry {
 				
 				NostrumMagicaSounds.AMBIENT_WOOSH2.play(world,
 						pos.getX(), pos.getY(), pos.getZ());
+
+				NostrumMagica.proxy.playRitualEffect(world, pos, result.element == null ? EMagicElement.PHYSICAL : result.element,
+						result.center, result.extras, result.reagents, result.output);
 				
 				return true;
 			}

@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
@@ -44,6 +46,7 @@ import com.smanzana.nostrummagica.entity.golem.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
 import com.smanzana.nostrummagica.items.NostrumItems;
+import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
@@ -52,6 +55,7 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientEffectRenderMessage;
 import com.smanzana.nostrummagica.network.messages.MagicEffectUpdate;
 import com.smanzana.nostrummagica.network.messages.ManaMessage;
+import com.smanzana.nostrummagica.network.messages.SpawnNostrumRitualEffectMessage;
 import com.smanzana.nostrummagica.network.messages.SpellDebugMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
@@ -75,6 +79,7 @@ import com.smanzana.nostrummagica.serializers.OptionalDragonArmorMaterialSeriali
 import com.smanzana.nostrummagica.serializers.PetJobSerializer;
 import com.smanzana.nostrummagica.serializers.WilloStatusSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
@@ -107,8 +112,10 @@ import net.minecraft.entity.EntityTracker;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.potion.Potion;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -588,5 +595,28 @@ public class CommonProxy {
 		
 		tracker.sendToTrackingAndSelf(player, NetworkHandler.getSyncChannel()
 				.getPacketFrom(new ManaMessage(player, mana)));
+	}
+	
+	public void playRitualEffect(World world, BlockPos pos, EMagicElement element,
+			ItemStack center, @Nullable NonNullList<ItemStack> extras, ReagentType[] types, ItemStack output) {
+		Set<EntityPlayer> players = new HashSet<>();
+		final double MAX_RANGE_SQR = 2500.0;
+		if (pos != null) {
+			for (EntityPlayer player : world.playerEntities) {
+				if (player.getDistanceSq(pos.getX(), pos.getY(), pos.getZ()) <= MAX_RANGE_SQR)
+					players.add(player);
+			}
+		}
+		
+		if (!players.isEmpty()) {
+			SpawnNostrumRitualEffectMessage message = new SpawnNostrumRitualEffectMessage(
+					//int dimension, BlockPos pos, ReagentType[] reagents, ItemStack center, @Nullable NonNullList<ItemStack> extras, ItemStack output
+					world.provider.getDimension(),
+					pos, element, types, center, extras, output
+					);
+			for (EntityPlayer player : players) {
+				NetworkHandler.getSyncChannel().sendTo(message, (EntityPlayerMP) player);
+			}
+		}
 	}
 }

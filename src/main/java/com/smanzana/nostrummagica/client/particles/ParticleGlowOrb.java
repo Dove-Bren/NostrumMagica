@@ -48,9 +48,18 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 	}
 	
 	public ParticleGlowOrb setMotion(double xVelocity, double yVelocity, double zVelocity) {
-		this.motionX = xVelocity;
-		this.motionY = yVelocity;
-		this.motionZ = zVelocity;
+		return this.setMotion(xVelocity, yVelocity, zVelocity, 0, 0, 0);
+	}
+	
+	public ParticleGlowOrb setMotion(Vec3d motion, Vec3d jitter) {
+		return this.setMotion(motion.x, motion.y, motion.z, jitter.x, jitter.y, jitter.z);
+	}
+	
+	public ParticleGlowOrb setMotion(double xVelocity, double yVelocity, double zVelocity,
+			double xJitter, double yJitter, double zJitter) {
+		this.motionX = xVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * xJitter; // +- jitter
+		this.motionY = yVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * yJitter;
+		this.motionZ = zVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * zJitter;
 		return this;
 	}
 	
@@ -164,7 +173,7 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 					particle.setTarget(params.targetPos);
 				}
 				if (params.velocity != null) {
-					particle.setMotion(params.velocity);
+					particle.setMotion(params.velocity, params.velocityJitter == null ? Vec3d.ZERO : params.velocityJitter);
 				}
 				Minecraft.getMinecraft().effectRenderer.addEffect(particle);
 			}

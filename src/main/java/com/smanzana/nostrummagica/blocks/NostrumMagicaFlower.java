@@ -289,7 +289,7 @@ public class NostrumMagicaFlower extends BlockBush {
 			NostrumParticles.GLOW_ORB.spawn(worldIn, new SpawnParams(
 					1,
 					pos.getX(), pos.getY(), pos.getZ(), 1, 40, 0,
-					new Vec3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), false
+					new Vec3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), null
 					).color(color));
 		}
 	}

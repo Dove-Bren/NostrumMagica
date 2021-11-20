@@ -193,7 +193,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 						NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 								num,
 								x, y, z, 0, 100, 20,
-								new Vec3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), false
+								new Vec3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), null
 							).color(.1f, .3f, 1f, .4f));
 					}
 				}

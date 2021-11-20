@@ -37,7 +37,7 @@ public class NostrumTameLightning extends EntityLightningBolt {
 		NostrumParticles.LIGHTNING_STATIC.spawn(entity.world, new SpawnParams(
 				3,
 				entity.posX, entity.posY + entity.height, entity.posZ, 1, 30, 5,
-				new Vec3d(0, -0.05, 0), false
+				new Vec3d(0, -0.05, 0), null
 				).color(0x80000000 | (0x00FFFFFF & EMagicElement.LIGHTNING.getColor())));
 	}
 	

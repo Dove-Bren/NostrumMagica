@@ -82,11 +82,14 @@ public enum NostrumParticles {
 		public final @Nullable Vec3d targetPos;
 		public final @Nullable Integer targetEntID;
 		
+		public final @Nullable Vec3d velocityJitter; // 0-1 where 1 is completely random
+		
 		// Rest is completely optional and may or may not be used
 		public @Nullable Integer color; // ARGB
+		public boolean dieOnTarget;
 		
 		public SpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, 
-				Vec3d velocity, boolean unused) {
+				Vec3d velocity, Vec3d velocityJitter) {
 			super();
 			this.count = count;
 			this.spawnX = spawnX;
@@ -96,8 +99,10 @@ public enum NostrumParticles {
 			this.lifetime = lifetime;
 			this.lifetimeJitter = lifetimeJitter;
 			this.velocity = velocity;
+			this.velocityJitter = velocityJitter;
 			this.targetPos = null;
 			this.targetEntID = null;
+			this.dieOnTarget = false;
 		}
 		
 		public SpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter,
@@ -113,6 +118,7 @@ public enum NostrumParticles {
 			this.velocity = null;
 			this.targetPos = targetPos;
 			this.targetEntID = null;
+			this.velocityJitter = null;
 		}
 		
 		public SpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter,
@@ -128,6 +134,7 @@ public enum NostrumParticles {
 			this.velocity = null;
 			this.targetPos = null;
 			this.targetEntID = targetEntID;
+			this.velocityJitter = null;
 		}
 		
 		public SpawnParams color(int color) {
@@ -139,6 +146,11 @@ public enum NostrumParticles {
 			return color(ColorUtil.colorToARGB(red, green, blue, alpha));
 		}
 		
+		public SpawnParams dieOnTarget(boolean die) {
+			this.dieOnTarget = die;
+			return this;
+		}
+		
 		private static final String NBT_COUNT = "count";
 		private static final String NBT_SPAWN_X = "spawn_x";
 		private static final String NBT_SPAWN_Y = "spawn_y";
@@ -147,8 +159,10 @@ public enum NostrumParticles {
 		private static final String NBT_LIFETIME = "lifetime";
 		private static final String NBT_LIFETIME_JITTER = "lifetime_jitter";
 		private static final String NBT_VELOCITY = "velocity";
+		private static final String NBT_VELOCITY_JITTER = "velocity_jitter";
 		private static final String NBT_TARGET_POS = "target_pos";
 		private static final String NBT_TARGET_ENT_ID = "target_ent_id";
+		private static final String NBT_DIE_ON_TARGET = "die_on_target";
 		
 		public static NBTTagCompound WriteNBT(SpawnParams params, @Nullable NBTTagCompound tag) {
 			if (tag == null) {
@@ -162,6 +176,7 @@ public enum NostrumParticles {
 			tag.setDouble(NBT_SPAWN_JITTER, params.spawnJitterRadius);
 			tag.setInteger(NBT_LIFETIME, params.lifetime);
 			tag.setInteger(NBT_LIFETIME_JITTER, params.lifetimeJitter);
+			tag.setBoolean(NBT_DIE_ON_TARGET, params.dieOnTarget);
 			
 			if (params.velocity != null) {
 				NBTTagCompound subtag = new NBTTagCompound();
@@ -169,6 +184,14 @@ public enum NostrumParticles {
 				subtag.setDouble("y", params.velocity.y);
 				subtag.setDouble("z", params.velocity.z);
 				tag.setTag(NBT_VELOCITY, subtag);
+			}
+			
+			if (params.velocityJitter != null) {
+				NBTTagCompound subtag = new NBTTagCompound();
+				subtag.setDouble("x", params.velocityJitter.x);
+				subtag.setDouble("y", params.velocityJitter.y);
+				subtag.setDouble("z", params.velocityJitter.z);
+				tag.setTag(NBT_VELOCITY_JITTER, subtag);
 			}
 			
 			if (params.targetPos != null) {
@@ -209,11 +232,21 @@ public enum NostrumParticles {
 				final double velocityX = subtag.getDouble("x");
 				final double velocityY = subtag.getDouble("y");
 				final double velocityZ = subtag.getDouble("z");
+				final Vec3d velocityJitter;
+				if (tag.hasKey(NBT_VELOCITY_JITTER)) {
+					velocityJitter = new Vec3d(
+							subtag.getDouble("x"),
+							subtag.getDouble("y"),
+							subtag.getDouble("z"));
+				} else {
+					velocityJitter = null;
+				}
 				params = new SpawnParams(
 						count,
 						spawnX, spawnY, spawnZ, spawnJitter,
 						lifetime, lifetimeJitter,
-						new Vec3d(velocityX, velocityY, velocityZ), false
+						new Vec3d(velocityX, velocityY, velocityZ),
+						velocityJitter
 						);
 			} else if (tag.hasKey(NBT_TARGET_POS, NBT.TAG_COMPOUND)) {
 				NBTTagCompound subtag = tag.getCompoundTag(NBT_TARGET_POS);
@@ -239,7 +272,7 @@ public enum NostrumParticles {
 						count,
 						spawnX, spawnY, spawnZ, spawnJitter,
 						lifetime, lifetimeJitter,
-						new Vec3d(0, .1, 0), false
+						new Vec3d(0, .1, 0), null
 						);
 			}
 			
@@ -247,7 +280,9 @@ public enum NostrumParticles {
 			if (tag.hasKey("color", NBT.TAG_INT)) {
 				params.color(tag.getInteger("color"));
 			}
-			
+			if (tag.hasKey(NBT_DIE_ON_TARGET, NBT.TAG_BYTE)) {
+				params.dieOnTarget(tag.getBoolean(NBT_DIE_ON_TARGET));
+			}
 			
 			return params;
 		}

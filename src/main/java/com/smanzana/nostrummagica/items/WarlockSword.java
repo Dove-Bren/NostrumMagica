@@ -288,21 +288,25 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 		NostrumParticles.GLOW_ORB.spawn(entity.world, new SpawnParams(
 				3,
 				entity.posX, entity.posY + entity.height, entity.posZ, 1, 30, 5,
-				new Vec3d(0, -0.05, 0), false
+				new Vec3d(0, -0.05, 0), null
 				).color(0x80000000 | (0x00FFFFFF & element.getColor())));
 	}
 	
 	@Override
 	public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
-		Map<EMagicElement, Float> levels = getLevels(stack);
-		for (EMagicElement elem : EMagicElement.values()) {
-			Float level = levels.get(elem);
-			if (level != null && level >= 1f) {
-				target.attackEntityFrom(new MagicDamageSource(attacker, elem), 
-						SpellAction.calcDamage(attacker, target, (float) Math.floor(level), elem));
-				target.setEntityInvulnerable(false);
-				target.hurtResistantTime = 0;
-				doEffect(target, elem);
+		
+		// Add magic damage, but only if weapon cooldown is recovered
+		if (!(attacker instanceof EntityPlayer) || ((EntityPlayer)attacker).getCooledAttackStrength(0.5F) > .95) {
+			Map<EMagicElement, Float> levels = getLevels(stack);
+			for (EMagicElement elem : EMagicElement.values()) {
+				Float level = levels.get(elem);
+				if (level != null && level >= 1f) {
+					target.attackEntityFrom(new MagicDamageSource(attacker, elem), 
+							SpellAction.calcDamage(attacker, target, (float) Math.floor(level), elem));
+					target.setEntityInvulnerable(false);
+					target.hurtResistantTime = 0;
+					doEffect(target, elem);
+				}
 			}
 		}
 		

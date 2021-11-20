@@ -59,16 +59,20 @@ public class ClientEffectRenderer {
 	
 	public void addEffect(ClientEffect effect) {
 		this.activeEffects.add(effect);
+		effect.onStart();
 	}
 	
 	public void clearEffects() {
+		for (ClientEffect effect : activeEffects) {
+			effect.onEnd();
+		}
 		this.activeEffects.clear();
 	}
 	
 	@SubscribeEvent
 	public void onRender(RenderWorldLastEvent event) {
 		if (!ModConfig.config.displayEffects() || activeEffects.isEmpty()) {
-			activeEffects.clear();
+			clearEffects();
 			return;
 		}
 		
@@ -83,8 +87,10 @@ public class ClientEffectRenderer {
 			Iterator<ClientEffect> it = activeEffects.iterator();
 			while (it.hasNext()) {
 				ClientEffect ef = it.next();
-				if (!ef.displayTick(mc, event.getPartialTicks()))
+				if (!ef.displayTick(mc, event.getPartialTicks())) {
+					ef.onEnd();
 					it.remove();
+				}
 			}
 		}
 		

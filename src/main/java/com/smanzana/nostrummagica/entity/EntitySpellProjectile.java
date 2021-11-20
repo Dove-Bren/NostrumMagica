@@ -111,7 +111,7 @@ public class EntitySpellProjectile extends EntityFireball {
 			NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 					2,
 					posX, posY + height/2f, posZ, 0, 40, 0,
-					new Vec3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), false
+					new Vec3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), null
 				).color(color));
 		}
 	}

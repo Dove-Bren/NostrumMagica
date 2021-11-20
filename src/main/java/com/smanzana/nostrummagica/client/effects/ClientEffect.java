@@ -116,4 +116,12 @@ public class ClientEffect {
 		GlStateManager.translate(origin.x, origin.y, origin.z);
 	}
 	
+	public void onStart() {
+		
+	}
+	
+	public void onEnd() {
+		
+	}
+	
 }

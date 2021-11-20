@@ -152,7 +152,7 @@ public class WallTrigger extends SpellTrigger {
 						minZ + NostrumMagica.rand.nextFloat() * diffZ,
 						0, // pos + posjitter
 						40, 10, // lifetime + jitter
-						new Vec3d(0, .05, 0), false
+						new Vec3d(0, .05, 0), null
 						).color(getState().getNextElement().getColor()));
 			}
 			

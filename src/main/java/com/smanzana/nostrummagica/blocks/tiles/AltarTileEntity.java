@@ -20,6 +20,9 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	
 	private @Nonnull ItemStack stack = ItemStack.EMPTY;
 	
+	// Transient display variables
+	private boolean hideItem;
+	
 	public AltarTileEntity() {
 		
 	}
@@ -31,6 +34,14 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	public void setItem(@Nonnull ItemStack stack) {
 		this.stack = stack;
 		dirty();
+	}
+	
+	public boolean isHidingItem() {
+		return hideItem;
+	}
+	
+	public void hideItem(boolean hide) {
+		this.hideItem = hide;
 	}
 	
 	private static final String NBT_ITEM = "item";

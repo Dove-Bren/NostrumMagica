@@ -249,7 +249,7 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 					0, 40, 0,
 					//offset.scale(rand.nextFloat() * .2f),
 					new Vec3d(0, -.05, 0),
-					false
+					null
 					).color(color));
 		}
 	}
