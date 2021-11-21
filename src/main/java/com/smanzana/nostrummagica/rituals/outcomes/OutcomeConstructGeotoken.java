@@ -3,20 +3,36 @@ package com.smanzana.nostrummagica.rituals.outcomes;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
+import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 
 public class OutcomeConstructGeotoken extends OutcomeSpawnItem {
 
 	public OutcomeConstructGeotoken() {
 		super(ItemStack.EMPTY);
+	}
+	
+	@Override
+	public boolean canPerform(World world, EntityPlayer player, BlockPos center, RitualMatchInfo ingredients) {
+		// Make sure geogem has a location in it
+		if (PositionCrystal.getBlockPosition(ingredients.center) == null) {
+			if (!world.isRemote) {
+				player.sendMessage(new TextComponentTranslation("info.create_geotoken.nopos", new Object[0]));
+			}
+			return false;
+		}
+		
+		return true;
 	}
 	
 	@Override

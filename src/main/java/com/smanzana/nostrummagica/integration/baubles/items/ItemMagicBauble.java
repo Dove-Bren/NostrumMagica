@@ -2,15 +2,19 @@ package com.smanzana.nostrummagica.integration.baubles.items;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.items.IDragonWingRenderItem;
 import com.smanzana.nostrummagica.items.ISpellArmor;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
 import baubles.api.BaubleType;
@@ -24,6 +28,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.NonNullList;
@@ -32,14 +37,17 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
+import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Optional.Interface(iface="baubles.api.IBauble", modid="baubles")
-public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, IBauble {
+public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, IBauble, IDragonWingRenderItem {
 
 	public static enum ItemType {
 		RIBBON_SMALL("ribbon_small"),
@@ -58,7 +66,8 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 		TRINKET_FLOAT_GUARD("float_guard"),
 		SHIELD_RING_SMALL("shield_ring_small"),
 		SHIELD_RING_LARGE("shield_ring_large"),
-		ELUDE_CAPE_SMALL("elude_cape_small");
+		ELUDE_CAPE_SMALL("elude_cape_small"),
+		DRAGON_WING_PENDANT("dragon_wing_pendant");
 		
 		private String key;
 		
@@ -188,6 +197,11 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 				tooltip.add(line);
 			}
 		}
+		
+		EMagicElement element = getEmbeddedElement(stack);
+		if (element != null) {
+			tooltip.add(TextFormatting.DARK_GRAY + I18n.format("item.bauble.info.element", element.getChatColor() + element.getName()) + TextFormatting.RESET);
+		}
 	}
 	
 	@Override
@@ -222,6 +236,9 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 			break;
 		case ELUDE_CAPE_SMALL:
 			btype = BaubleType.BODY;
+			break;
+		case DRAGON_WING_PENDANT:
+			btype = BaubleType.TRINKET;
 			break;
 		}
 		
@@ -289,6 +306,9 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 		case SHIELD_RING_LARGE:
 		case SHIELD_RING_SMALL:
 			; // Checked on equipped tick
+			break;
+		case DRAGON_WING_PENDANT:
+			; // No bonus
 			break;
 		}
 		
@@ -359,6 +379,9 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 		case SHIELD_RING_SMALL:
 			; // Checked on equipped tick
 			break;
+		case DRAGON_WING_PENDANT:
+			; // no bonus
+			break;
 		}
 	}
 
@@ -397,6 +420,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 		case ELUDE_CAPE_SMALL:
 		case SHIELD_RING_LARGE:
 		case SHIELD_RING_SMALL:
+		case DRAGON_WING_PENDANT:
 			; // Nothing to do
 			break;
 		case RING_GOLD:
@@ -441,6 +465,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 		case RING_GOLD_CORRUPTED:
 		case RING_GOLD_TRUE:
 		case RING_SILVER_CORRUPTED:
+		case DRAGON_WING_PENDANT:
 			break;
 		case TRINKET_FLOAT_GUARD:
 			player.removePotionEffect(Potion.getPotionFromResourceLocation("levitation"));
@@ -510,6 +535,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 					case RING_GOLD_CORRUPTED:
 					case RING_GOLD_TRUE:
 					case RING_SILVER_CORRUPTED:
+					case DRAGON_WING_PENDANT:
 						break;
 					case ELUDE_CAPE_SMALL:
 						
@@ -541,5 +567,201 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 				}
 			}
 		}
+	}
+	
+	@SubscribeEvent
+	public void onJump(LivingJumpEvent event) {
+		// Dragonwing Pendant gives boost
+		if (event.isCanceled()) {
+			return;
+		}
+
+		final EntityLivingBase ent = event.getEntityLiving();
+		if (!(ent instanceof EntityPlayer)) {
+			return;
+		}
+		
+		EntityPlayer player = (EntityPlayer) ent;
+		IInventory inv = NostrumMagica.baubles.getBaubles(player);
+		if (inv != null) {
+			for (int i = 0; i < inv.getSizeInventory(); i++) {
+				ItemStack stack = inv.getStackInSlot(i);
+				if (stack.isEmpty() || !(stack.getItem() instanceof ItemMagicBauble))
+					continue;
+				
+				ItemType type = getTypeFromMeta(stack.getMetadata());
+				switch (type) {
+				case BELT_ENDER:
+				case BELT_LIGHTNING:
+				case RIBBON_FIERCE:
+				case RIBBON_KIND:
+				case RIBBON_LARGE:
+				case RIBBON_MEDIUM:
+				case RIBBON_SMALL:
+				case RING_SILVER:
+				case RING_SILVER_TRUE:
+				case TRINKET_FLOAT_GUARD:
+				case SHIELD_RING_LARGE:
+				case SHIELD_RING_SMALL:
+				case RING_GOLD:
+				case RING_GOLD_CORRUPTED:
+				case RING_GOLD_TRUE:
+				case RING_SILVER_CORRUPTED:
+				case ELUDE_CAPE_SMALL:
+					break;
+				case DRAGON_WING_PENDANT:
+					// Jump-boost gives an extra .1 per level.
+					ent.motionY += .2;
+				}
+			}
+		}
+		
+	}
+	
+	@SubscribeEvent
+	public void onFall(LivingFallEvent event) {
+		// Dragonwing Pendant gives jump boost and reduces fall damage
+		if (event.isCanceled()) {
+			return;
+		}
+
+		final EntityLivingBase ent = event.getEntityLiving();
+		if (!(ent instanceof EntityPlayer)) {
+			return;
+		}
+		
+		EntityPlayer player = (EntityPlayer) ent;
+		IInventory inv = NostrumMagica.baubles.getBaubles(player);
+		if (inv != null) {
+			for (int i = 0; i < inv.getSizeInventory(); i++) {
+				ItemStack stack = inv.getStackInSlot(i);
+				if (stack.isEmpty() || !(stack.getItem() instanceof ItemMagicBauble))
+					continue;
+				
+				ItemType type = getTypeFromMeta(stack.getMetadata());
+				switch (type) {
+				case BELT_ENDER:
+				case BELT_LIGHTNING:
+				case RIBBON_FIERCE:
+				case RIBBON_KIND:
+				case RIBBON_LARGE:
+				case RIBBON_MEDIUM:
+				case RIBBON_SMALL:
+				case RING_SILVER:
+				case RING_SILVER_TRUE:
+				case TRINKET_FLOAT_GUARD:
+				case SHIELD_RING_LARGE:
+				case SHIELD_RING_SMALL:
+				case RING_GOLD:
+				case RING_GOLD_CORRUPTED:
+				case RING_GOLD_TRUE:
+				case RING_SILVER_CORRUPTED:
+				case ELUDE_CAPE_SMALL:
+					break;
+				case DRAGON_WING_PENDANT:
+					// Jump-boost gives an extra .1 per level.
+					final float reduc = 2f;
+					event.setDistance(Math.max(0f, event.getDistance() - reduc));
+				}
+			}
+		}
+	}
+
+	@Override
+	public boolean shouldRenderDragonWings(ItemStack stack, EntityPlayer player) {
+		if (stack.isEmpty()) {
+			return false;
+		}
+		
+		if (!(stack.getItem() instanceof ItemMagicBauble)) {
+			return false;
+		}
+		
+		ItemType type = getTypeFromMeta(stack.getMetadata());
+		boolean ret = false;
+		switch (type) {
+		case BELT_ENDER:
+		case BELT_LIGHTNING:
+		case RIBBON_FIERCE:
+		case RIBBON_KIND:
+		case RIBBON_LARGE:
+		case RIBBON_MEDIUM:
+		case RIBBON_SMALL:
+		case RING_SILVER:
+		case RING_SILVER_TRUE:
+		case RING_GOLD:
+		case RING_GOLD_CORRUPTED:
+		case RING_GOLD_TRUE:
+		case RING_SILVER_CORRUPTED:
+		case TRINKET_FLOAT_GUARD:
+		case ELUDE_CAPE_SMALL:
+		case SHIELD_RING_LARGE:
+		case SHIELD_RING_SMALL:
+			break;
+		case DRAGON_WING_PENDANT:
+			ret = true;
+		}
+		return ret;
+	}
+	
+	@Override
+	public int getDragonWingColor(ItemStack stack, EntityPlayer player) {
+		if (stack.isEmpty()) {
+			return 0xFFFFFFFF;
+		}
+		
+		if (!(stack.getItem() instanceof ItemMagicBauble)) {
+			return 0xFFFFFFFF;
+		}
+		
+		EMagicElement elem = this.getEmbeddedElement(stack);
+		if (elem == null) {
+			elem = EMagicElement.PHYSICAL;
+		}
+		
+		return elem.getColor();
+	}
+	
+	public @Nullable EMagicElement getEmbeddedElement(ItemStack stack) {
+		if (stack.isEmpty()) {
+			return null;
+		}
+		
+		if (!(stack.getItem() instanceof ItemMagicBauble)) {
+			return null;
+		}
+		
+		if (stack.getTagCompound() == null || !stack.getTagCompound().hasKey("element", NBT.TAG_STRING)) {
+			return null;
+		}
+		
+		String name = stack.getTagCompound().getString("element");
+		EMagicElement ret = null;
+		try {
+			ret = EMagicElement.valueOf(name.toUpperCase());
+		} catch (Exception e) {
+			ret = EMagicElement.PHYSICAL;
+		}
+		
+		return ret;
+	}
+	
+	public void setEmbeddedElement(ItemStack stack, EMagicElement element) {
+		if (stack.isEmpty()) {
+			return;
+		}
+		
+		if (!(stack.getItem() instanceof ItemMagicBauble)) {
+			return;
+		}
+		
+		NBTTagCompound nbt = stack.getTagCompound();
+		if (nbt == null) {
+			nbt = new NBTTagCompound();
+		}
+		
+		nbt.setString("element", element.name());
+		
+		stack.setTagCompound(nbt);
 	}
 }

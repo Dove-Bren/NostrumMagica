@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
+import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.client.resources.I18n;
@@ -24,6 +25,28 @@ public class OutcomeRecall implements IRitualOutcome {
 
 	public OutcomeRecall() {
 		;
+	}
+	
+	@Override
+	public boolean canPerform(World world, EntityPlayer player, BlockPos center, RitualMatchInfo ingredients) {
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		if (attr == null)
+			return false;
+		
+		BlockPos pos = attr.getMarkLocation();
+		if (pos == null) {
+			if (!world.isRemote)
+				player.sendMessage(new TextComponentTranslation("info.recall.fail", new Object[0]));
+			return false;
+		}
+		
+		if (player.dimension != attr.getMarkDimension()) {
+			if (!world.isRemote)
+				player.sendMessage(new TextComponentTranslation("info.recall.baddimension", new Object[0]));
+			return false;
+		}
+		
+		return true;
 	}
 	
 	@Override

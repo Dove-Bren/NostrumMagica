@@ -9,8 +9,8 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.Validate;
 
+import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.AltarBlock;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.ChalkBlock;
 import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
@@ -35,12 +35,12 @@ import net.minecraftforge.oredict.OreDictionary;
 public class RitualRecipe implements InfoScreenIndexed {
 	
 	public static final class RitualMatchInfo {
-		final boolean matched;
-		@Nonnull final ItemStack center;
-		@Nullable final NonNullList<ItemStack> extras;
-		@Nonnull final ItemStack output;
-		@Nullable final ReagentType reagents[];
-		final EMagicElement element;
+		public boolean matched;
+		@Nonnull public final ItemStack center;
+		@Nullable public final NonNullList<ItemStack> extras;
+		@Nonnull public final ItemStack output;
+		@Nullable public final ReagentType reagents[];
+		public final EMagicElement element;
 		
 		public RitualMatchInfo(boolean matched, EMagicElement element, 
 				ItemStack center, NonNullList<ItemStack> extras, ItemStack output,
@@ -177,6 +177,130 @@ public class RitualRecipe implements InfoScreenIndexed {
 		}
 	}
 	
+	protected static RitualMatchInfo Capture(World world, BlockPos center, RitualRecipe recipe) {
+		final ItemStack output;
+		final ItemStack centerItem;
+		final ReagentType[] reagents;
+		final NonNullList<ItemStack> extras;
+		
+		final TileEntity centerTE = world.getTileEntity(center);
+		
+		if (recipe.tier == 0) {
+			centerItem = ItemStack.EMPTY;
+			extras = null;
+			
+			ReagentType type = null;
+			if (world.getBlockState(center).getBlock() instanceof Candle
+					&& centerTE != null
+					&& centerTE instanceof CandleTileEntity) {
+				CandleTileEntity candle = (CandleTileEntity) centerTE;
+				type = candle.getType();
+			}
+			
+			reagents = (type == null ? null : new ReagentType[] {type});
+		} else {
+			// Tier 2 and 3 common: center + candles
+			{
+				// Center item
+				if (centerTE != null && centerTE instanceof AltarTileEntity) {
+					centerItem = ((AltarTileEntity) centerTE).getItem().copy();
+				} else {
+					centerItem = ItemStack.EMPTY;
+				}
+				
+				// get all candles. Must be a candle in all the spots.
+				// then try to match reagent types with required ones
+				TileEntity te;
+				List<ReagentType> reagentList = new ArrayList<>(4);
+				for (int x = -2; x <= 2; x += 4)
+				for (int z = -2; z <= 2; z += 4) {
+					te = world.getTileEntity(center.add(x, 0, z));
+					if (te == null || !(te instanceof CandleTileEntity))
+						return RitualMatchInfo.Fail();
+					
+					CandleTileEntity candle = (CandleTileEntity) te;
+					reagentList.add(candle.getType());
+				}
+				
+				if (reagentList.size() == 4) {
+					reagents = new ReagentType[4];
+					for (int i = 0; i < reagentList.size(); i++) {
+						reagents[i] = reagentList.get(i);
+					}
+				} else {
+					reagents = null;
+				}
+			}
+			
+			if (recipe.tier == 2) {
+				// Get extra altars
+				NonNullList<ItemStack> items = NonNullList.create();
+				TileEntity te;
+				boolean foundNonEmpty = false;
+				for (int x = -4; x <= 4; x+=4) {
+					int diff = 4 - Math.abs(x);
+					for (int z = -diff; z <= diff; z+=8) {
+						te = world.getTileEntity(center.add(x, 0, z));
+						if (te == null || !(te instanceof AltarTileEntity))
+							return RitualMatchInfo.Fail();
+						AltarTileEntity altar = (AltarTileEntity) te;
+						items.add(altar.getItem());
+						if (!altar.getItem().isEmpty()) {
+							foundNonEmpty = true;
+						}
+					}
+				}
+				if (!foundNonEmpty) {
+					extras = null;
+				} else {
+					extras = items;
+				}
+			} else {
+				extras = null;
+			}
+		}
+		
+		output = (recipe.getOutcome() instanceof IItemRitualOutcome
+				? ((IItemRitualOutcome) recipe.getOutcome()).getResult().copy()
+				: ItemStack.EMPTY
+				);
+		return new RitualMatchInfo(false, recipe.element, centerItem, extras, output, reagents);
+	}
+	
+	protected static void ClearRitual(World world, BlockPos center, RitualRecipe recipe) {
+		// Do cleanup of altars and candles, etc
+		if (recipe.tier == 0) {
+			// candle in center. extinguish
+			Candle.extinguish(world, center, world.getBlockState(center));
+		} else {
+			// candles at spots. extinguish.
+			for (int x = -2; x <= 2; x += 4)
+			for (int z = -2; z <= 2; z += 4) {
+				BlockPos pos = center.add(x, 0, z);
+				Candle.extinguish(world, pos, world.getBlockState(pos));
+			}
+			
+			// Clear off altars also
+			TileEntity te;
+			te = world.getTileEntity(center);
+			if (te != null && te instanceof AltarTileEntity) {
+				((AltarTileEntity) te).setItem(ItemStack.EMPTY);
+			}
+			
+			if (recipe.tier == 2) {
+				for (int x = -4; x <= 4; x+=4) {
+					int diff = 4 - Math.abs(x);
+					for (int z = -diff; z <= diff; z+=8) {
+						te = world.getTileEntity(center.add(x, 0, z));
+						if (te == null || !(te instanceof AltarTileEntity))
+							continue; // oh well, too late now!
+						((AltarTileEntity) te).setItem(ItemStack.EMPTY);
+					}
+				}
+			}
+		}
+	}
+	
 	public RitualMatchInfo matches(EntityPlayer player, World world, BlockPos center, EMagicElement element) {
 		if (element == null) {
 			element = EMagicElement.PHYSICAL;
@@ -201,114 +325,6 @@ public class RitualRecipe implements InfoScreenIndexed {
 		if (this.req != null && !req.matches(player, attr))
 			return RitualMatchInfo.Fail();
 		
-		if (tier > 0 && !(world.getBlockState(center).getBlock() instanceof AltarBlock))
-			return RitualMatchInfo.Fail();
-		
-		if (tier == 0 && !(world.getBlockState(center).getBlock() instanceof Candle))
-			return RitualMatchInfo.Fail();
-		
-		TileEntity centerTE = world.getTileEntity(center);
-		if (centerTE == null)
-			return RitualMatchInfo.Fail();
-		
-		ReagentType typesOut[] = null;
-		ItemStack centerOut = ItemStack.EMPTY;
-		NonNullList<ItemStack> extrasOut = null;
-		if (tier == 0) {
-			CandleTileEntity candle = (CandleTileEntity) centerTE;
-			if (candle.getType() != types[0]) {
-				return RitualMatchInfo.Fail();
-			}
-			
-			typesOut = new ReagentType[] {candle.getType()};
-		} else {
-			// Check altars
-			AltarTileEntity altar = (AltarTileEntity) centerTE;
-			@Nonnull ItemStack stack = altar.getItem();
-			if (stack.isEmpty())
-				return RitualMatchInfo.Fail();
-			if (!OreDictionary.itemMatches(centerItem, stack, false)) {
-				return RitualMatchInfo.Fail();
-			}
-			centerOut = stack.copy();
-			
-			TileEntity te;
-			
-			if (tier == 2) {
-				List<ItemStack> items = NonNullList.create();
-				for (int x = -4; x <= 4; x+=4) {
-					int diff = 4 - Math.abs(x);
-					for (int z = -diff; z <= diff; z+=8) {
-						te = world.getTileEntity(center.add(x, 0, z));
-						if (te == null || !(te instanceof AltarTileEntity))
-							return RitualMatchInfo.Fail();
-						altar = (AltarTileEntity) te;
-						if (!altar.getItem().isEmpty())
-							items.add(altar.getItem());
-					}
-				}
-				
-				extrasOut = NonNullList.create();
-				for (ItemStack req : extraItems) {
-					if (req.isEmpty())
-						continue;
-					
-					Iterator<ItemStack> it = items.iterator();
-					boolean found = false;
-					while (it.hasNext()) {
-						ItemStack next = it.next();
-						if (OreDictionary.itemMatches(req, next, false)) {
-							extrasOut.add(next.copy());
-							it.remove();
-							found = true;
-							break;
-						}
-					}
-					if (!found)
-						return RitualMatchInfo.Fail();
-				}
-				if (items.size() > 0)
-					return RitualMatchInfo.Fail(); // More items on altars than in recipe
-			}
-			
-			// get all candles. Must be a candle in all the spots.
-			// then try to match reagent types with required ones
-			List<ReagentType> reagents = new ArrayList<>(4);
-			for (int x = -2; x <= 2; x += 4)
-			for (int z = -2; z <= 2; z += 4) {
-				te = world.getTileEntity(center.add(x, 0, z));
-				if (te == null || !(te instanceof CandleTileEntity))
-					return RitualMatchInfo.Fail();
-				
-				CandleTileEntity candle = (CandleTileEntity) te;
-				reagents.add(candle.getType());
-			}
-			
-			int i = 0;
-			typesOut = new ReagentType[types.length];
-			for (ReagentType req : types) {
-				Iterator<ReagentType> it = reagents.iterator();
-				boolean found = false;
-				while (it.hasNext()) {
-					ReagentType next = it.next();
-					if (next == req) {
-						it.remove();
-						found = true;
-						break;
-					}
-				}
-				
-				if (!found) {
-					return RitualMatchInfo.Fail();
-				} else {
-					typesOut[i++] = req;
-				}
-			}
-			
-			if (reagents.size() > 0)
-				return RitualMatchInfo.Fail();
-		}
-		
 		// check chalk
 		int[] xs = CHALK_XS[tier];
 		int[] ys = CHALK_YS[tier];
@@ -319,58 +335,121 @@ public class RitualRecipe implements InfoScreenIndexed {
 				return RitualMatchInfo.Fail();
 		}
 		
-		final ItemStack outputOut = (this.getOutcome() instanceof IItemRitualOutcome
-				? ((IItemRitualOutcome) this.getOutcome()).getResult().copy()
-				: ItemStack.EMPTY
-				);
-		return new RitualMatchInfo(true, this.element, centerOut, extrasOut, outputOut, typesOut);
-			
-	}
-	
-	public void perform(World world, EntityPlayer player, BlockPos center) {
 		
-		if (world.isRemote)
-			return;
-		
-		@Nonnull ItemStack centerItem = ItemStack.EMPTY;
-		NonNullList<ItemStack> otherItems = null;
-		
-		// Do cleanup of altars and candles, etc
+		//// END early fail cases ////
+		final RitualMatchInfo capture = Capture(world, center, this);
 		if (tier == 0) {
-			// candle in center. extinguish
-			Candle.extinguish(world, center, world.getBlockState(center));
-		} else {
-			// candles at spots. extinguish.
-			for (int x = -2; x <= 2; x += 4)
-			for (int z = -2; z <= 2; z += 4) {
-				BlockPos pos = center.add(x, 0, z);
-				Candle.extinguish(world, pos, world.getBlockState(pos));
-			}
-			// Clear off altars also
-			TileEntity te;
-			te = world.getTileEntity(center);
-			if (te != null && te instanceof AltarTileEntity) {
-				centerItem = ((AltarTileEntity) te).getItem();
-				((AltarTileEntity) te).setItem(ItemStack.EMPTY);
-			}
-			
-			if (tier == 2) {
-				otherItems = NonNullList.create();
-				for (int x = -4; x <= 4; x+=4) {
-					int diff = 4 - Math.abs(x);
-					for (int z = -diff; z <= diff; z+=8) {
-						te = world.getTileEntity(center.add(x, 0, z));
-						if (te == null || !(te instanceof AltarTileEntity))
-							continue; // oh well, too late now!
-						otherItems.add(((AltarTileEntity) te).getItem());
-						((AltarTileEntity) te).setItem(ItemStack.EMPTY);
+			capture.matched = (capture.reagents != null && capture.reagents.length == 1 && capture.reagents[0] == types[0]);
+		} else if (tier == 1) {
+			capture.matched = (
+					capture.reagents != null && capture.reagents.length == this.types.length
+					&& !capture.center.isEmpty()
+					// && capture.extras == null 
+				);
+			if (capture.matched) {
+				// Deep check reagents
+				List<ReagentType> typePool = Lists.newArrayList(capture.reagents);
+				for (int i = 0; i < this.types.length; i++) {
+					ReagentType req = this.types[i];
+					if (!typePool.remove(req)) {
+						capture.matched = false;
+						break;
 					}
+				}
+				if (capture.matched && !typePool.isEmpty()) {
+					capture.matched = false;
+				}
+			}
+			if (capture.matched) {
+				// Deep check center
+				capture.matched = OreDictionary.itemMatches(this.centerItem, capture.center, false);
+			}
+		} else if (tier == 2) {
+			capture.matched = (
+					capture.reagents != null && capture.reagents.length == this.types.length
+					&& !capture.center.isEmpty()
+					&& capture.extras != null// && capture.extras.size() == 4
+				);
+			if (capture.matched) {
+				// Deep check reagents
+				List<ReagentType> typePool = Lists.newArrayList(capture.reagents);
+				for (int i = 0; i < this.types.length; i++) {
+					ReagentType req = this.types[i];
+					if (!typePool.remove(req)) {
+						capture.matched = false;
+						break;
+					}
+				}
+				if (capture.matched && !typePool.isEmpty()) {
+					capture.matched = false;
+				}
+			}
+			if (capture.matched) {
+				// Deep check center
+				capture.matched = OreDictionary.itemMatches(this.centerItem, capture.center, false);
+			}
+			if (capture.matched) {
+				// Deep check extras
+				NonNullList<ItemStack> items = NonNullList.create();
+				items.addAll(capture.extras);
+				items.removeIf((stack) -> {return stack.isEmpty();});
+				for (ItemStack req : this.extraItems) {
+					if (req.isEmpty()) {
+						continue;
+					}
+					
+					boolean found = false;
+					Iterator<ItemStack> it = items.iterator();
+					while (it.hasNext()) {
+						ItemStack avail = it.next();
+						if (OreDictionary.itemMatches(req, avail, false)) {
+							it.remove();
+							found = true;
+							break;
+						}
+					}
+					
+					if (!found) {
+						capture.matched = false;
+						break;
+					}
+				}
+				
+				if (capture.matched && !items.isEmpty()) {
+					capture.matched = false;
 				}
 			}
 		}
+		
+		return capture;
+			
+	}
+	
+	/**
+	 * Attempt to perform the ritual.
+	 * Returns whether the ritual was performed or not.
+	 * @param world
+	 * @param player
+	 * @param center
+	 * @return
+	 */
+	public boolean perform(World world, EntityPlayer player, BlockPos center) {
+		
+		if (world.isRemote)
+			return true;
+		
+		final RitualMatchInfo ingredients = Capture(world, center, this);
+		
+		if (hook != null && !hook.canPerform(world, player, center, ingredients)) {
+			return false;
+		}
+		
+		ClearRitual(world, center, this);
 
 		if (hook != null)
-			hook.perform(world, player, centerItem, otherItems, center, this);
+			hook.perform(world, player, ingredients.center, ingredients.extras, center, this);
+		
+		return true;
 	}
 
 	public EMagicElement getElement() {

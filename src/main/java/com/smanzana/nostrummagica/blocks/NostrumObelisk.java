@@ -297,17 +297,26 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 		return true;
 	}
 	
-	public static boolean spawnObelisk(World world, BlockPos center) {
+	protected static int xs[] = new int[] {-TILE_OFFSETH, -TILE_OFFSETH, TILE_OFFSETH, TILE_OFFSETH};
+	protected static int zs[] = new int[] {-TILE_OFFSETH, TILE_OFFSETH, -TILE_OFFSETH, TILE_OFFSETH};
+	protected static Corner corners[] = new Corner[] {Corner.SW, Corner.NW, Corner.SE, Corner.NE};
+	
+	public static boolean canSpawnObelisk(World world, BlockPos center) {
 		IBlockState state = world.getBlockState(center);
 		if (state == null || state.getBlockHardness(world, center) > 2.0f)
 			return false;
 		
-		int xs[] = new int[] {-TILE_OFFSETH, -TILE_OFFSETH, TILE_OFFSETH, TILE_OFFSETH};
-		int zs[] = new int[] {-TILE_OFFSETH, TILE_OFFSETH, -TILE_OFFSETH, TILE_OFFSETH};
-		Corner corners[] = new Corner[] {Corner.SW, Corner.NW, Corner.SE, Corner.NE};
 		for (int i = 0; i < xs.length; i++) {
 			if (!checkPillar(world, center.add(xs[i], 1, zs[i])))
 				return false;
+		}
+		
+		return true;
+	}
+	
+	public static boolean spawnObelisk(World world, BlockPos center) {
+		if (!canSpawnObelisk(world, center)) {
+			return false;
 		}
 		
 		for (int i = 0; i < xs.length; i++) {

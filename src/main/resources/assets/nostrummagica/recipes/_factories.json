@@ -2,6 +2,7 @@
 	"recipes": {
 		"ore_shaped_with_remaining": "com.smanzana.nostrummagica.crafting.RecipeFactoryShapedWithRemaining",
 		"aether_cloak_toggle": "com.smanzana.nostrummagica.crafting.RecipeFactoryAetherCloakToggle",
-		"aether_cloak_color": "com.smanzana.nostrummagica.crafting.RecipeFactoryAetherCloakColor"
+		"aether_cloak_color": "com.smanzana.nostrummagica.crafting.RecipeFactoryAetherCloakColor",
+		"bauble_color": "com.smanzana.nostrummagica.crafting.RecipeFactoryBaubleColor"
 	}
 }

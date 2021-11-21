@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
+import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -38,4 +39,15 @@ public interface IRitualOutcome {
 	 * @return
 	 */
 	public List<String> getDescription();
+	
+	/**
+	 * Check last minute if outcome agrees ritual can be performed.,
+	 * When this is called, ritual ingredients have already been checked. This is intended for
+	 * outcomes that have spacial requirements to do that check before consuming ingredients.
+	 * @param world
+	 * @param player
+	 * @param center
+	 * @return
+	 */
+	default public boolean canPerform(World world, EntityPlayer player, BlockPos center, RitualMatchInfo ingredients) { return true; }
 }

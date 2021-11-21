@@ -26,6 +26,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.model.ModelEnchantedArmorBase;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.client.render.LayerAetherCloak;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaEntityEffect;
@@ -97,7 +98,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISpecialArmor, IElytraProvider {
+public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISpecialArmor, IElytraProvider, IDragonWingRenderItem {
 
 	private static Map<EMagicElement, Map<EntityEquipmentSlot, Map<Integer, EnchantedArmor>>> items;
 	
@@ -1844,5 +1845,30 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			final float amt = (float) (armor.jumpBoost / .1f);
 			event.setDistance(Math.max(0f, event.getDistance() - amt));
 		}
+	}
+
+	@Override
+	public boolean shouldRenderDragonWings(ItemStack stack, EntityPlayer player) {
+		final boolean flying = player.isElytraFlying();
+		// Maybe should have an interface?
+		if (
+				EnchantedArmor.GetSetCount(player, EMagicElement.PHYSICAL, 3) == 4
+				|| EnchantedArmor.GetSetCount(player, EMagicElement.EARTH, 3) == 4
+				|| EnchantedArmor.GetSetCount(player, EMagicElement.FIRE, 3) == 4
+				|| EnchantedArmor.GetSetCount(player, EMagicElement.ENDER, 3) == 4
+				) {
+			if (flying) {
+				return true;
+			}
+			
+			ItemStack cape = LayerAetherCloak.ShouldRender(player);
+			return cape.isEmpty() || !((ICapeProvider) cape.getItem()).shouldPreventOtherRenders(player, cape);
+		}
+		return false;
+	}
+
+	@Override
+	public int getDragonWingColor(ItemStack stack, EntityPlayer player) {
+		return this.element.getColor();
 	}
 }

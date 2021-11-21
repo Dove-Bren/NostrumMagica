@@ -709,12 +709,14 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		
 		int capacity = SpellPlate.getCapacity(plate);
 		
-		for (ItemStack page : pages) {
-			if (pages.isEmpty() || !(page.getItem() instanceof SpellTomePage))
-				continue;
-			
-			enhancements.add(new SpellTomeEnhancementWrapper(SpellTomePage.getEnhancement(page),
-					SpellTomePage.getLevel(page)));
+		if (pages != null) {
+			for (ItemStack page : pages) {
+				if (pages.isEmpty() || !(page.getItem() instanceof SpellTomePage))
+					continue;
+				
+				enhancements.add(new SpellTomeEnhancementWrapper(SpellTomePage.getEnhancement(page),
+						SpellTomePage.getLevel(page)));
+			}
 		}
 		
 		if (!enhancements.isEmpty()) {
@@ -965,6 +967,18 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		return InfoScreenTabs.INFO_TOMES;
 	}
 	
+	/**
+	 * Check whether the tome has room for more spell scrolls to be bound
+	 * @param tome
+	 * @return
+	 */
+	public static boolean hasRoom(ItemStack tome) {
+		int capacity = SpellTome.getCapacity(tome);
+		List<Spell> spells = SpellTome.getSpells(tome);
+		int taken = spells == null ? 0 : spells.size();
+		return taken < capacity;
+	}
+	
 	public static boolean startBinding(EntityPlayer player, ItemStack tome, ItemStack scroll, boolean quick) {
 		if (tome.isEmpty() || scroll.isEmpty())
 			return false;
@@ -981,10 +995,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 			return false;
 		}
 		
-		int capacity = SpellTome.getCapacity(tome);
-		List<Spell> spells = SpellTome.getSpells(tome);
-		int taken = spells == null ? 0 : spells.size();
-		if (taken >= capacity) {
+		if (!hasRoom(tome)) {
 			if (!player.world.isRemote) {
 				player.sendMessage(new TextComponentTranslation("info.tome.full"));
 			}

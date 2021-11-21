@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.blocks.ChalkBlock;
 import com.smanzana.nostrummagica.blocks.NostrumObelisk;
 import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
+import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -26,11 +27,21 @@ public class OutcomeCreateObelisk implements IRitualOutcome {
 	}
 	
 	@Override
+	public boolean canPerform(World world, EntityPlayer player, BlockPos center, RitualMatchInfo ingredients) {
+		if (!NostrumObelisk.canSpawnObelisk(world, center.add(0, -1, 0))) {
+			if (!world.isRemote) {
+				player.sendMessage(new TextComponentTranslation("info.create_obelisk.fail", new Object[0]));
+			}
+			return false;
+		}
+		return true;
+	}
+	
+	@Override
 	public void perform(World world, EntityPlayer player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
 		// All logic contained in obelisk class
 		if (!NostrumObelisk.spawnObelisk(world, center.add(0, -1, 0))) {
-			if (world.isRemote)
-				player.sendMessage(new TextComponentTranslation("info.create_obelisk.fail", new Object[0]));
+			player.sendMessage(new TextComponentTranslation("info.create_obelisk.fail", new Object[0]));
 		} else if (!world.isRemote) {
 			// clear altar on server
 			TileEntity te = world.getTileEntity(center.add(0, 0, 0));
@@ -46,7 +57,7 @@ public class OutcomeCreateObelisk implements IRitualOutcome {
 				IBlockState state = world.getBlockState(pos);
 				if (state != null &&
 						(state.getBlock() instanceof Candle || state.getBlock() instanceof AltarBlock || state.getBlock() instanceof ChalkBlock)) {
-					world.destroyBlock(pos, false);
+					world.destroyBlock(pos, true);
 				}
 			}
 		}

@@ -7,18 +7,46 @@ import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
+import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 
 public class OutcomeBindSpell implements IRitualOutcome {
 
 	public OutcomeBindSpell() {
 		;
+	}
+	
+	@Override
+	public boolean canPerform(World world, EntityPlayer player, BlockPos center, RitualMatchInfo ingredients) {
+		ItemStack tome = ingredients.center;
+		ItemStack scroll = ItemStack.EMPTY;
+		if (ingredients.extras != null && ingredients.extras.size() > 0)
+		for (ItemStack other : ingredients.extras) {
+			if (!other.isEmpty() && other.getItem() instanceof SpellScroll) {
+				scroll = other;
+				break;
+			}
+		}
+		
+		if (tome.isEmpty() || !(tome.getItem() instanceof SpellTome)
+				|| scroll.isEmpty())
+			return false;
+		
+		if (!SpellTome.hasRoom(tome)) {
+			if (!player.world.isRemote) {
+				player.sendMessage(new TextComponentTranslation("info.tome.full"));
+			}
+			return false;
+		}
+		
+		return true;
 	}
 	
 	@Override

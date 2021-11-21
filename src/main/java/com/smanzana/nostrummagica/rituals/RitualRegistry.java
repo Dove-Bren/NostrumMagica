@@ -68,21 +68,22 @@ public class RitualRegistry {
 		for (RitualRecipe ritual : instance().knownRituals) {
 			final RitualMatchInfo result = ritual.matches(player, world, pos, element);
 			if (result.matched) {
-				ritual.perform(world, player, pos);
-				
-				if (!instance().ritualListeners.isEmpty()) {
-					for (IRitualListener listener : instance().ritualListeners) {
-						listener.onRitualPerformed(ritual, world, player, pos);
+					if (ritual.perform(world, player, pos)) {
+					
+					if (!instance().ritualListeners.isEmpty()) {
+						for (IRitualListener listener : instance().ritualListeners) {
+							listener.onRitualPerformed(ritual, world, player, pos);
+						}
 					}
+					
+					NostrumMagicaSounds.AMBIENT_WOOSH2.play(world,
+							pos.getX(), pos.getY(), pos.getZ());
+	
+					NostrumMagica.proxy.playRitualEffect(world, pos, result.element == null ? EMagicElement.PHYSICAL : result.element,
+							result.center, result.extras, result.reagents, result.output);
+					
+					return true;
 				}
-				
-				NostrumMagicaSounds.AMBIENT_WOOSH2.play(world,
-						pos.getX(), pos.getY(), pos.getZ());
-
-				NostrumMagica.proxy.playRitualEffect(world, pos, result.element == null ? EMagicElement.PHYSICAL : result.element,
-						result.center, result.extras, result.reagents, result.output);
-				
-				return true;
 			}
 		}
 		

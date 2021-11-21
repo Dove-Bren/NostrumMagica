@@ -4,9 +4,7 @@ import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.renderer.ModelDragonFlightWings;
-import com.smanzana.nostrummagica.items.EnchantedArmor;
-import com.smanzana.nostrummagica.items.ICapeProvider;
-import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.items.IDragonWingRenderItem;
 
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -15,6 +13,7 @@ import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -38,38 +37,61 @@ public class LayerDragonFlightWings implements LayerRenderer<AbstractClientPlaye
 	}
 	
 	public boolean shouldRender(AbstractClientPlayer player) {
-		final boolean flying = player.isElytraFlying();
-		// Maybe should have an interface?
-		if (
-				EnchantedArmor.GetSetCount(player, EMagicElement.PHYSICAL, 3) == 4
-				|| EnchantedArmor.GetSetCount(player, EMagicElement.EARTH, 3) == 4
-				|| EnchantedArmor.GetSetCount(player, EMagicElement.FIRE, 3) == 4
-				|| EnchantedArmor.GetSetCount(player, EMagicElement.ENDER, 3) == 4
-				) {
-			if (flying) {
-				return true;
+		for (ItemStack stack : player.getEquipmentAndArmor()) {
+			if (!stack.isEmpty() && stack.getItem() instanceof IDragonWingRenderItem) {
+				if (((IDragonWingRenderItem) stack.getItem()).shouldRenderDragonWings(stack, player)) {
+					return true;
+				}
 			}
-			
-			ItemStack cape = LayerAetherCloak.ShouldRender(player);
-			return cape.isEmpty() || !((ICapeProvider) cape.getItem()).shouldPreventOtherRenders(player, cape);
 		}
-				
+		
+		// Try bauables
+		IInventory baubles = NostrumMagica.baubles.getBaubles(player);
+		if (baubles != null) {
+			for (int i = 0; i < baubles.getSizeInventory(); i++) {
+				ItemStack stack = baubles.getStackInSlot(i);
+				if (!stack.isEmpty() && stack.getItem() instanceof IDragonWingRenderItem) {
+					if (((IDragonWingRenderItem) stack.getItem()).shouldRenderDragonWings(stack, player)) {
+						return true;
+					}
+				}
+			}
+		}
 		
 		return false;
 	}
 	
-	public void render(AbstractClientPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale, boolean enchanted) {
-		@Nonnull ItemStack stack = player.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
-		GlStateManager.color(1.0F, 1.0F, 1.0F, 0.9F);
-		if (!stack.isEmpty() && stack.getItem() instanceof EnchantedArmor) {
-			final int color = ((EnchantedArmor) stack.getItem()).getElement().getColor(); //ARBG
-			GlStateManager.color((float)((color >> 16) & 0xFF) / 255f,
-					(float)((color >> 8) & 0xFF) / 255f,
-					(float)((color >> 0) & 0xFF) / 255f,
-					(float)((color >> 24) & 0xFF) / 255f);
-		} else {
-			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+	public int getColor(AbstractClientPlayer player) {
+		for (ItemStack stack : player.getEquipmentAndArmor()) {
+			if (!stack.isEmpty() && stack.getItem() instanceof IDragonWingRenderItem) {
+				if (((IDragonWingRenderItem) stack.getItem()).shouldRenderDragonWings(stack, player)) {
+					return ((IDragonWingRenderItem) stack.getItem()).getDragonWingColor(stack, player);
+				}
+			}
 		}
+		
+		// Try bauables
+		IInventory baubles = NostrumMagica.baubles.getBaubles(player);
+		if (baubles != null) {
+			for (int i = 0; i < baubles.getSizeInventory(); i++) {
+				ItemStack stack = baubles.getStackInSlot(i);
+				if (!stack.isEmpty() && stack.getItem() instanceof IDragonWingRenderItem) {
+					if (((IDragonWingRenderItem) stack.getItem()).shouldRenderDragonWings(stack, player)) {
+						return ((IDragonWingRenderItem) stack.getItem()).getDragonWingColor(stack, player);
+					}
+				}
+			}
+		}
+		
+		return 0xFF000000;
+	}
+	
+	public void render(AbstractClientPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale, boolean enchanted) {
+		final int color = getColor(player);
+		GlStateManager.color((float)((color >> 16) & 0xFF) / 255f,
+				(float)((color >> 8) & 0xFF) / 255f,
+				(float)((color >> 0) & 0xFF) / 255f,
+					(float)((color >> 24) & 0xFF) / 255f);
 		
 		GlStateManager.disableBlend();
 		GlStateManager.disableAlpha();

@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble.ItemType;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
+import com.smanzana.nostrummagica.items.NostrumSkillItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellRune;
@@ -282,6 +283,18 @@ public class BaublesProxy {
 				new OutcomeSpawnItem(ItemMagicBauble.getItem(ItemType.ELUDE_CAPE_SMALL, 1)));
 		RitualRegistry.instance().addRitual(recipe);
 		
+		ItemStack dragonwings = ItemMagicBauble.getItem(ItemType.DRAGON_WING_PENDANT, 1);
+		((ItemMagicBauble) dragonwings.getItem()).setEmbeddedElement(dragonwings, EMagicElement.PHYSICAL);
+		recipe = RitualRecipe.createTier3("create_dragon_wing_pendant",
+				dragonwings,
+				EMagicElement.PHYSICAL,
+				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.CRYSTABLOOM},
+				new ItemStack(Items.GOLD_INGOT),
+				new ItemStack[] {NostrumSkillItem.getItem(NostrumSkillItem.SkillItemType.WING, 1), ItemMagicBauble.getItem(ItemType.RING_GOLD, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), NostrumSkillItem.getItem(NostrumSkillItem.SkillItemType.WING, 1)},
+				new RRequirementResearch("dragon_wing_pendants"),
+				new OutcomeSpawnItem(dragonwings));
+		RitualRegistry.instance().addRitual(recipe);
+		
 		if (NostrumMagica.aetheria.isEnabled()) {
 			recipe = RitualRecipe.createTier3("aether_cloak",
 					new ItemStack(ItemAetherCloak.instance()),
@@ -353,6 +366,13 @@ public class BaublesProxy {
 			.reference("ritual::belt_ender", "ritual.belt_ender.name")
 			.reference("ritual::belt_lightning", "ritual.belt_lightning.name")
 		.build("belts", NostrumResearchTab.OUTFITTING, Size.NORMAL, -5, 0, true, ItemMagicBauble.getItem(ItemType.BELT_ENDER, 1));
+		
+		NostrumResearch.startBuilding()
+			.parent("rings")
+			.parent("belts")
+			.hiddenParent("kani")
+			.reference("ritual::create_dragon_wing_pendant", "ritual.create_dragon_wing_pendant.name")
+		.build("dragon_wing_pendants", NostrumResearchTab.OUTFITTING, Size.NORMAL, -5, 1, true, ItemMagicBauble.getItem(ItemType.DRAGON_WING_PENDANT, 1));
 		
 		if (NostrumMagica.aetheria.isEnabled()) {
 			NostrumResearch.startBuilding()
