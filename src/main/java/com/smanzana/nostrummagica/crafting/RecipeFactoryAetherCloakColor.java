@@ -117,7 +117,7 @@ public class RecipeFactoryAetherCloakColor implements IRecipeFactory {
 			if (indColor != null) {
 				if (color == null) {
 					color = indColor;
-				} else {
+				} else if (color != indColor) {
 					color = null;
 					break;
 				}
