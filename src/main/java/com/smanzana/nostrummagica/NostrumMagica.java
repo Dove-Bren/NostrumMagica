@@ -2108,7 +2108,7 @@ public class NostrumMagica
 			.parent("enchanted_weapons")
 			.hiddenParent("vani")
 			.reference("ritual::spawn_warlock_sword", "ritual.spawn_warlock_sword.name")
-		.build("warlock_sword", NostrumResearchTab.OUTFITTING, Size.LARGE, 0, 2, true, new ItemStack(WarlockSword.instance()));
+		.build("warlock_sword", NostrumResearchTab.OUTFITTING, Size.LARGE, 1, 1, true, new ItemStack(WarlockSword.instance()));
 		
 		NostrumResearch.startBuilding()
 			.parent("enchanted_armor")

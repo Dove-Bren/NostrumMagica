@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.integration.baubles.inventory.BaubleInventoryH
 import com.smanzana.nostrummagica.integration.baubles.items.ItemAetherCloak;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble.ItemType;
+import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumSkillItem;
@@ -23,6 +24,7 @@ import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeModifyCenterItemGeneric;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
+import com.smanzana.nostrummagica.rituals.requirements.IRitualRequirement;
 import com.smanzana.nostrummagica.rituals.requirements.RRequirementResearch;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.triggers.DamagedTrigger;
@@ -31,6 +33,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -295,6 +298,31 @@ public class BaublesProxy {
 				new OutcomeSpawnItem(dragonwings));
 		RitualRegistry.instance().addRitual(recipe);
 		
+		//SetHasWingUpgrade
+		for (EMagicElement elem : new EMagicElement[] {EMagicElement.ICE, EMagicElement.WIND, EMagicElement.LIGHTNING}) {
+			EnchantedArmor armor = EnchantedArmor.get(elem, EntityEquipmentSlot.CHEST, 4);
+			ItemStack armorStack = new ItemStack(armor);
+			ItemStack upgradedStack = armorStack.copy();
+			EnchantedArmor.SetHasWingUpgrade(upgradedStack, true);
+			
+			recipe = RitualRecipe.createTier3("wing_upgrade_armor_" + elem.name().toLowerCase(),
+					upgradedStack,
+					elem,
+					new ReagentType[] {ReagentType.SKY_ASH, ReagentType.SKY_ASH, ReagentType.MANI_DUST, ReagentType.CRYSTABLOOM},
+					armorStack,
+					new ItemStack[] {NostrumSkillItem.getItem(NostrumSkillItem.SkillItemType.WING, 1), ItemMagicBauble.getItem(ItemType.RING_GOLD, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), NostrumSkillItem.getItem(NostrumSkillItem.SkillItemType.WING, 1)},
+					IRitualRequirement.AND(
+							new RRequirementResearch("dragon_wing_pendants"),
+							new RRequirementResearch("enchanted_armor_adv")
+					),
+					new OutcomeModifyCenterItemGeneric((world, player, item, otherItems, centerPos, recipeIn) -> {
+						if (!item.isEmpty() && item.getItem() instanceof EnchantedArmor) {
+							EnchantedArmor.SetHasWingUpgrade(item, true);
+						}
+					}, Lists.newArrayList("Upgrades the elytra on the Corrupted Armors to dragon wings")));
+			RitualRegistry.instance().addRitual(recipe);
+		}
+		
 		if (NostrumMagica.aetheria.isEnabled()) {
 			recipe = RitualRecipe.createTier3("aether_cloak",
 					new ItemStack(ItemAetherCloak.instance()),
@@ -368,11 +396,11 @@ public class BaublesProxy {
 		.build("belts", NostrumResearchTab.OUTFITTING, Size.NORMAL, -5, 0, true, ItemMagicBauble.getItem(ItemType.BELT_ENDER, 1));
 		
 		NostrumResearch.startBuilding()
-			.parent("rings")
-			.parent("belts")
-			.hiddenParent("kani")
+			.hiddenParent("rings")
+			.parent("enchanted_armor_adv")
 			.reference("ritual::create_dragon_wing_pendant", "ritual.create_dragon_wing_pendant.name")
-		.build("dragon_wing_pendants", NostrumResearchTab.OUTFITTING, Size.NORMAL, -5, 1, true, ItemMagicBauble.getItem(ItemType.DRAGON_WING_PENDANT, 1));
+			.reference("ritual::aether_cloak_caster_upgrade", "ritual.aether_cloak_caster_upgrade.name")
+		.build("dragon_wing_pendants", NostrumResearchTab.OUTFITTING, Size.LARGE, 0, 2, true, ItemMagicBauble.getItem(ItemType.DRAGON_WING_PENDANT, 1));
 		
 		if (NostrumMagica.aetheria.isEnabled()) {
 			NostrumResearch.startBuilding()

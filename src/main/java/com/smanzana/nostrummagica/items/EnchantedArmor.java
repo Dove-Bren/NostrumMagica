@@ -68,6 +68,7 @@ import net.minecraft.inventory.EntityEquipmentSlot.Type;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
@@ -1556,6 +1557,27 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return (val != null && val.booleanValue());
 	}
 	
+	private static final String NBT_WING_UPGRADE = "dragonwing_upgrade";
+	
+	public static final void SetHasWingUpgrade(ItemStack stack, boolean upgraded) {
+		NBTTagCompound nbt = stack.getTagCompound();
+		if (nbt == null) {
+			nbt = new NBTTagCompound();
+		}
+		
+		nbt.setBoolean(NBT_WING_UPGRADE, upgraded);
+		
+		stack.setTagCompound(nbt);
+	}
+	
+	public static final boolean GetHasWingUpgrade(ItemStack stack) {
+		return !stack.isEmpty()
+				&& stack.getItem() instanceof EnchantedArmor
+				&& ((EnchantedArmor) stack.getItem()).getEquipmentSlot() == EntityEquipmentSlot.CHEST
+				&& stack.hasTagCompound()
+				&& stack.getTagCompound().getBoolean(NBT_WING_UPGRADE);
+	}
+	
 	private static final boolean DoEnderDash(EntityLivingBase entity, Vec3d dir) {
 		final float dashDist = 4.0f;
 		final Vec3d idealVec = entity.getPositionVector().addVector(dashDist * dir.x, dashDist * dir.y, dashDist * dir.z);
@@ -1856,6 +1878,14 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 				|| EnchantedArmor.GetSetCount(player, EMagicElement.EARTH, 3) == 4
 				|| EnchantedArmor.GetSetCount(player, EMagicElement.FIRE, 3) == 4
 				|| EnchantedArmor.GetSetCount(player, EMagicElement.ENDER, 3) == 4
+				|| (
+					EnchantedArmor.GetHasWingUpgrade(stack) && (
+						EnchantedArmor.GetSetCount(player, EMagicElement.ICE, 3) == 4
+						|| EnchantedArmor.GetSetCount(player, EMagicElement.WIND, 3) == 4
+						|| EnchantedArmor.GetSetCount(player, EMagicElement.LIGHTNING, 3) == 4
+					)
+					
+				)
 				) {
 			if (flying) {
 				return true;
