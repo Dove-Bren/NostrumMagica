@@ -310,7 +310,7 @@ public class BaublesProxy {
 					elem,
 					new ReagentType[] {ReagentType.SKY_ASH, ReagentType.SKY_ASH, ReagentType.MANI_DUST, ReagentType.CRYSTABLOOM},
 					armorStack,
-					new ItemStack[] {NostrumSkillItem.getItem(NostrumSkillItem.SkillItemType.WING, 1), ItemMagicBauble.getItem(ItemType.RING_GOLD, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), NostrumSkillItem.getItem(NostrumSkillItem.SkillItemType.WING, 1)},
+					new ItemStack[] {ItemStack.EMPTY, ItemMagicBauble.getItem(ItemType.DRAGON_WING_PENDANT, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), ItemStack.EMPTY},
 					IRitualRequirement.AND(
 							new RRequirementResearch("dragon_wing_pendants"),
 							new RRequirementResearch("enchanted_armor_adv")

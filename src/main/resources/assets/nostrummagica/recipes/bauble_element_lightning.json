@@ -4,7 +4,7 @@
 	  "item": "nostrummagica:ribbon",
 	  "data": 17,
 	  "nbt": {
-		  "element": "FIRE"
+		  "element": "LIGHTNING"
 	  }
   },
   "ingredients": [
@@ -13,7 +13,7 @@
 	  "data": 17
     },
     {
-      "item": "#ESSENCE_ANY"
+      "item": "#ESSENCE_LIGHTNING"
     }
   ]
 }

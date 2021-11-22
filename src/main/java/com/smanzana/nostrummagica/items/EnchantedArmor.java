@@ -1086,6 +1086,10 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 				}
 			}
 		}
+		
+		if (EnchantedArmor.GetHasWingUpgrade(stack)) {
+			tooltip.add(ChatFormatting.GOLD + I18n.format("info.armor.wing_upgrade") + ChatFormatting.RESET);
+		}
 	}
 
 	@Override

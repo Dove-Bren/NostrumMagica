@@ -390,7 +390,10 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 	 */
 	@Override
 	@Optional.Method(modid="baubles")
-	public boolean canEquip(ItemStack itemstack, EntityLivingBase player) {		
+	public boolean canEquip(ItemStack itemstack, EntityLivingBase player) {
+		if (player.world.isRemote) {
+			return true;
+		}
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		return attr != null && attr.isUnlocked();
 	}
@@ -763,5 +766,10 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 		nbt.setString("element", element.name());
 		
 		stack.setTagCompound(nbt);
+	}
+	
+	@Override
+	public boolean willAutoSync(ItemStack stack, EntityLivingBase player) {
+		return true;
 	}
 }

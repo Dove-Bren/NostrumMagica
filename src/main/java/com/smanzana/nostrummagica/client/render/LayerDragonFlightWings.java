@@ -37,7 +37,7 @@ public class LayerDragonFlightWings implements LayerRenderer<AbstractClientPlaye
 	}
 	
 	public boolean shouldRender(AbstractClientPlayer player) {
-		for (ItemStack stack : player.getEquipmentAndArmor()) {
+		for (ItemStack stack : player.getArmorInventoryList()) {
 			if (!stack.isEmpty() && stack.getItem() instanceof IDragonWingRenderItem) {
 				if (((IDragonWingRenderItem) stack.getItem()).shouldRenderDragonWings(stack, player)) {
 					return true;
@@ -47,6 +47,7 @@ public class LayerDragonFlightWings implements LayerRenderer<AbstractClientPlaye
 		
 		// Try bauables
 		IInventory baubles = NostrumMagica.baubles.getBaubles(player);
+		
 		if (baubles != null) {
 			for (int i = 0; i < baubles.getSizeInventory(); i++) {
 				ItemStack stack = baubles.getStackInSlot(i);
@@ -62,7 +63,7 @@ public class LayerDragonFlightWings implements LayerRenderer<AbstractClientPlaye
 	}
 	
 	public int getColor(AbstractClientPlayer player) {
-		for (ItemStack stack : player.getEquipmentAndArmor()) {
+		for (ItemStack stack : player.getArmorInventoryList()) {
 			if (!stack.isEmpty() && stack.getItem() instanceof IDragonWingRenderItem) {
 				if (((IDragonWingRenderItem) stack.getItem()).shouldRenderDragonWings(stack, player)) {
 					return ((IDragonWingRenderItem) stack.getItem()).getDragonWingColor(stack, player);

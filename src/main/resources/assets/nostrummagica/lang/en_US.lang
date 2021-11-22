@@ -542,6 +542,8 @@ info.armor.set_bonus.ice.3=Snow Traveler|Blizzard Caller|Elytra Gliding|Mana Jum
 info.armor.set_bonus.lightning.3=Lightning Channeling|Elytra Gliding|Mana Jump
 info.armor.set_bonus.wind.3=Swift Sprint|Tornado Caller|Elytra Gliding|Mana Jump
 
+info.armor.wing_upgrade=Dragon Wing Upgrade
+
 info.discovery.name=Unlocking Magic
 info.stats.name=Stats
 info.growth.name=Growth
