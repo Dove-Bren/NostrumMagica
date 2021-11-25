@@ -76,6 +76,18 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 		}
 	}
 	
+	/**
+	 * Check if the passed item, spawner, world, etc. are allowed to spawn the soulbound entity.
+	 * This check should include sending messaging about why it failed, if appropriate. No messages will be sent
+	 * if this function is called and returns false.
+	 * @param world
+	 * @param spawner
+	 * @param pos
+	 * @param stack
+	 * @return
+	 */
+	public abstract boolean canSpawnEntity(World world, @Nullable EntityLivingBase spawner, Vec3d pos, ItemStack stack);
+	
 	protected abstract void setWorldID(EntityLivingBase pet, UUID worldID);
 	
 	protected abstract void beforePetRespawn(EntityLivingBase pet, World world, Vec3d pos, ItemStack stack);
@@ -114,6 +126,14 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 		}
 		
 		EntityLivingBase ent = (EntityLivingBase) rawEnt;
+		
+		// Check for other copies of the entity in the world, and remove them if so
+		for (Entity e : world.loadedEntityList) {
+			if (e.getUniqueID().equals(ent.getUniqueID())) {
+				e.setDead();
+				break;
+			}
+		}
 		
 		// Fix entity so it can respawn
 		ent.isDead = false;

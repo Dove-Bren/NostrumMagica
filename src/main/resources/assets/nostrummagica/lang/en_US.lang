@@ -425,6 +425,8 @@ entity.nostrummagica.entity_wisp.name=Wisp
 entity.nostrummagica.entity_lux.name=Lux
 entity.nostrummagica.entity_willo.name=Willo
 
+entity.nostrummagica.placeholder.soulbound.name=Soulbound Pet
+
 itemGroup.nostrummagica=Nostrum Magica
 itemGroup.nostrummagica_enhancements=Nostrum Enhancements
 
@@ -647,6 +649,12 @@ info.tamed_dragon.red_bond.full=The tamed dragon is now fully bonded with you!
 
 info.hookshot.bad_dim=The mechanisms seem to have trouble working in this atmosphere...
 info.endercharm.enhanced=Use while sneaking to only teleport yourself. Otherwise, creates a portal home.
+
+info.lore_tameddragon_soulbound.name=Soulbonded Dragons
+info.lore_tameddragon_soulbound.desc=  You've soulbonded with your dragon! Its soul is not intertwined with yours!|  As a symbol of this bond, you've received a Dragon Soul Ember with your dragon's soul in it.|  This special item can be used to revive your dragon if it perishes. Be sure not to lose it!
+
+info.respawn_soulbound_pet.fail.baditem=The soul item is missing a soul to respawn!
+info.respawn_soulbound_dragon.fail.mana=The Dragon Soul Ember must be charged with mana first!
 
 gambit.always.name=Always
 gambit.always.desc=Dragon will%1$s always%2$s try to use this spell.|Only passed if dragon doesn't have enough mana
@@ -1032,6 +1040,8 @@ ritual.make_lens_swiftness.name=Make Speed Lense
 ritual.make_lens_elevator.name=Make Elevator Lens
 ritual.make_lens_heal.name=Make Heal Lens
 ritual.make_lens_bore.name=Make Bore Lens
+
+ritual.revive_soulbound_pet.name=Revive Soulbound Pet
 
 enhancement.lower_reagent_cost.name=Lower Reagent Cost
 enhancement.lower_reagent_cost.desc=Reduces the amount of reagents used up when casting a spell
@@ -1458,3 +1468,6 @@ research.aether_cloaks.info=  Aether Gems are handy for taking aether with you, 
 research.aether_infusers.name=Aether Infusers
 research.aether_infusers.desc=Aether Tools
 research.aether_infusers.info=  Aether Infusers by themselves take a lot of aether and store them, creating a pure bubble of aether for quick charging players' inventories or items on altars above the infuser.|  If there's an altar above the Aether Infuser, all aether from the infuser will go to any item on the altar. For things that store Aether, this means they'll get charged quickly.|  If no altar is above the infuser, any players that step into the aether bubble will have all items in their inventory charged.||  Aether Infusers that have altars above them can also use Lenses to change their behavior. From growing nearby plants to granting swiftness, different lenses have different effects.|  Note that Master Lenses have to be placed on an altar above an Aether Infuser to work.|  Also note the Spread Lens allows nearby altars with lenses on them to work!
+research.soulbound_pets.name=Soulbound Pets
+research.soulbound_pets.desc=Always and Forever
+research.soulbound_pets.info=  Congratulations! You've soulbonded with one of your pets! Now, you can revive the pet even if it dies!|  To revive a pet that's died, use the soul item the pet dropped when you soulbonded with it. For example, Dragon Soul Embers. Be aware that soul items usually must be charged with mana before they can be used.

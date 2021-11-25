@@ -23,6 +23,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -279,5 +280,15 @@ public class DragonSoulItem extends PetSoulItem {
 		instance().setPet(stack, dragon);
 		
 		return stack;
+	}
+
+	@Override
+	public boolean canSpawnEntity(World world, EntityLivingBase spawner, Vec3d pos, ItemStack stack) {
+		if (this.getMana(stack) < this.getMaxMana(stack)) {
+			spawner.sendMessage(new TextComponentTranslation("info.respawn_soulbound_dragon.fail.mana", new Object[0]));
+			return false;
+		}
+		
+		return true;
 	}
 }

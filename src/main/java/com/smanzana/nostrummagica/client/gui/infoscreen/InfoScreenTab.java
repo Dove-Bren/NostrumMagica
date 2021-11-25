@@ -11,10 +11,12 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.ModificationTable;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed.TameRedDragonLore;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.DragonEgg;
+import com.smanzana.nostrummagica.items.DragonSoulItem;
 import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.MirrorItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
@@ -525,6 +527,12 @@ public abstract class InfoScreenTab {
 				buttons.add(new SubscreenInfoButton(offset++, "tamed_dragon.experience",
 						new PaginatedInfoSubScreen("tamed_dragon.experience"),
 						new ItemStack(Items.IRON_SWORD)));
+				
+				if (attr.hasLore(EntityTameDragonRed.SoulBoundDragonLore.instance())) {
+					buttons.add(new SubscreenInfoButton(offset++, EntityTameDragonRed.SoulBoundDragonLore.instance().getLoreKey(),
+							new PaginatedInfoSubScreen(EntityTameDragonRed.SoulBoundDragonLore.instance().getLoreKey()),
+							new ItemStack(DragonSoulItem.instance())));
+				}
 					
 				return buttons;
 			}

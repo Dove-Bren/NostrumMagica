@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.entity.EntityLux;
 import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
+import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed.TameRedDragonLore;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemPhysical;
 import com.smanzana.nostrummagica.items.AltarItem;
@@ -132,6 +133,7 @@ public class LoreRegistry {
 		register(WarlockSword.instance());
 		register(new EntityLux(null));
 		register(DragonSoulItem.instance());
+		register(EntityTameDragonRed.SoulBoundDragonLore.instance());
 		
 		
 		for (Preset preset : Preset.values()) {

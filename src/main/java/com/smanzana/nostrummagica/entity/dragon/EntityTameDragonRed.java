@@ -2219,6 +2219,44 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		
 	}
 	
+	public static final class SoulBoundDragonLore implements ILoreTagged {
+		
+		private static SoulBoundDragonLore instance = null;
+		public static SoulBoundDragonLore instance() {
+			if (instance == null) {
+				instance = new SoulBoundDragonLore();
+			}
+			return instance;
+		}
+
+		@Override
+		public String getLoreKey() {
+			return "lore_tamedragon_soulbound";
+		}
+
+		@Override
+		public String getLoreDisplayName() {
+			return "Soulbound Dragons";
+		}
+
+		@Override
+		public Lore getBasicLore() {
+			return new Lore().add("You've soulbonded with your dragon! Its soul is not intertwined with yours!", "As a symbol of this bond, you've received a Dragon Soul Ember with your dragon's soul in it.", "This special item can be used to revive your dragon if it perishes. Be sure not to lose it!");
+		}
+
+		@Override
+		public Lore getDeepLore() {
+			return new Lore().add("You've soulbonded with your dragon! Its soul is not intertwined with yours!", "As a symbol of this bond, you've received a Dragon Soul Ember with your dragon's soul in it.", "This special item can be used to revive your dragon if it perishes. Be sure not to lose it!");
+		}
+
+		@Override
+		public InfoScreenTabs getTab() {
+			// Don't actually display! We're going to show our own page!
+			return InfoScreenTabs.INFO_DRAGONS;
+		}
+		
+	}
+	
 	public static class RedDragonSpawnData extends IDragonSpawnData<EntityTameDragonRed> {
 
 		private static final String SPAWN_KEY = "RedDragon";
@@ -2410,7 +2448,12 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			if (!stack.isEmpty()) {
 				this.entityDropItem(stack, 1f);
 				this.attackEntityFrom(DamageSource.GENERIC, 1000000f);
-				this.setDead();
+			}
+			
+			// Award lore about soul bonding
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(stabber);
+			if (attr != null) {
+				attr.giveBasicLore(SoulBoundDragonLore.instance);
 			}
 			
 			return true;

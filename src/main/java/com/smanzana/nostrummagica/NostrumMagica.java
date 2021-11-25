@@ -66,6 +66,7 @@ import com.smanzana.nostrummagica.items.DragonArmor;
 import com.smanzana.nostrummagica.items.DragonArmor.DragonArmorMaterial;
 import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
 import com.smanzana.nostrummagica.items.DragonEggFragment;
+import com.smanzana.nostrummagica.items.DragonSoulItem;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
 import com.smanzana.nostrummagica.items.EssenceItem;
@@ -85,6 +86,7 @@ import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.NostrumRoseItem;
 import com.smanzana.nostrummagica.items.NostrumRoseItem.RoseType;
 import com.smanzana.nostrummagica.items.NostrumSkillItem;
+import com.smanzana.nostrummagica.items.PetSoulItem;
 import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
 import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.items.PositionToken;
@@ -124,6 +126,7 @@ import com.smanzana.nostrummagica.research.NostrumResearch.Size;
 import com.smanzana.nostrummagica.research.NostrumResearch.SpellSpec;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
+import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
 import com.smanzana.nostrummagica.rituals.outcomes.IRitualOutcome;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeBindSpell;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeConstructGeotoken;
@@ -188,6 +191,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
@@ -900,7 +904,7 @@ public class NostrumMagica
 					new RRequirementResearch("summonkoids"),
 					new OutcomeSpawnEntity(new IEntityFactory() {
 						@Override
-						public void spawn(World world, Vec3d pos, EntityPlayer invoker) {
+						public void spawn(World world, Vec3d pos, EntityPlayer invoker, ItemStack centerItem) {
 							EntityKoid koid = new EntityKoid(world);
 							koid.setPosition(pos.x, pos.y, pos.z);
 							world.spawnEntity(koid);
@@ -1472,6 +1476,53 @@ public class NostrumMagica
 				new ItemStack[] {new ItemStack(MimicBlock.facade()), new ItemStack(MimicBlock.facade()), new ItemStack(MimicBlock.facade()), new ItemStack(MimicBlock.facade())},
 				new RRequirementResearch("magicfacade"),
 				new OutcomeSpawnItem(new ItemStack(MimicBlock.door(), 1)))
+			);
+		
+		// Dragon revive
+		RitualRegistry.instance().addRitual(
+			RitualRecipe.createTier3("revive_soulbound_pet",
+					new ItemStack(DragonSoulItem.instance()),
+					null,
+					new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.MANDRAKE_ROOT, ReagentType.CRYSTABLOOM, ReagentType.MANI_DUST},
+					new ItemStack(DragonSoulItem.instance()),
+					new ItemStack[] {ItemStack.EMPTY, NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), new ItemStack(Items.EGG), ItemStack.EMPTY},
+					new RRequirementResearch("soulbound_pets"),
+					new OutcomeSpawnEntity(new IEntityFactory() {
+						@Override
+						public void spawn(World world, Vec3d pos, EntityPlayer invoker, ItemStack centerItem) {
+							PetSoulItem.SpawnPet(centerItem, world, pos.addVector(0, 1, 0));
+//							EntityKoid koid = new EntityKoid(world);
+//							koid.setPosition(pos.x, pos.y, pos.z);
+//							world.spawnEntity(koid);
+//							koid.setAttackTarget(invoker);
+						}
+
+						@Override
+						public String getEntityName() {
+							return "entity.nostrummagica.placeholder.soulbound.name";
+						}
+					}, 1) {
+					@Override
+					public boolean canPerform(World world, EntityPlayer player, BlockPos center, RitualMatchInfo ingredients) {
+						// Must have PetSoulItem in center, and must have valid soul.
+						if (ingredients.center.isEmpty() || !(ingredients.center.getItem() instanceof PetSoulItem)) {
+							player.sendMessage(new TextComponentTranslation("info.respawn_soulbound_pet.fail.baditem", new Object[0]));
+							return false;
+						}
+						
+						PetSoulItem item = (PetSoulItem) ingredients.center.getItem();
+						if (item.getPetSoulID(ingredients.center) == null) {
+							player.sendMessage(new TextComponentTranslation("info.respawn_soulbound_pet.fail.baditem", new Object[0]));
+							return false;
+						}
+						
+						if (!item.canSpawnEntity(world, player, new Vec3d(center), ingredients.center)) {
+							return false;
+						}
+						
+						return true;
+					}
+				})	
 			);
 		
 		
@@ -2294,6 +2345,12 @@ public class NostrumMagica
 			.hiddenParent("sorceryportal")
 			.reference("ritual::ender_pin", "ritual.ender_pin.name")
 		.build("ender_pin", NostrumResearchTab.ADVANCED_MAGICA, Size.LARGE, -3, 0, true, NostrumSkillItem.getItem(SkillItemType.ENDER_PIN, 1));
+		
+		NostrumResearch.startBuilding()
+			.hiddenParent("kani")
+			.lore(EntityTameDragonRed.SoulBoundDragonLore.instance())
+			.reference("ritual::revive_soulbound_pet", "ritual.revive_soulbound_pet.name")
+		.build("soulbound_pets", NostrumResearchTab.ADVANCED_MAGICA, Size.GIANT, 0, 1, true, new ItemStack(DragonSoulItem.instance()));
 		
 		//NostrumResearchTab tab, Size size, int x, int y, boolean hidden, ItemStack icon
     }

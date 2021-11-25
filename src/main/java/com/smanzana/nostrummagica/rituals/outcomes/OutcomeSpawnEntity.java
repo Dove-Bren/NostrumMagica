@@ -16,7 +16,7 @@ import net.minecraft.world.World;
 public class OutcomeSpawnEntity implements IRitualOutcome {
 
 	public static interface IEntityFactory {
-		public void spawn(World world, Vec3d pos, EntityPlayer invoker);
+		public void spawn(World world, Vec3d pos, EntityPlayer invoker, ItemStack centerItem);
 		
 		public String getEntityName();
 	}
@@ -42,7 +42,7 @@ public class OutcomeSpawnEntity implements IRitualOutcome {
 			Vec3d pos = new Vec3d(center.getX() + .5 + Math.cos(angle) * distance,
 					center.getY(),
 					center.getZ() + .5 + Math.sin(angle) * distance);
-			this.factory.spawn(world, pos, player);
+			this.factory.spawn(world, pos, player, centerItem);
 		}
 	}
 	
