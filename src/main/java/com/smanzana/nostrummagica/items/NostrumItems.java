@@ -172,6 +172,9 @@ public class NostrumItems {
     	
     	registry.register(MasteryOrb.instance());
     	
+    	registry.register(DragonSoulItem.instance());
+    	registry.register(SoulDagger.instance());
+    	
     	registerOreDict(); // Different func to make it easier to read
 	}
 	

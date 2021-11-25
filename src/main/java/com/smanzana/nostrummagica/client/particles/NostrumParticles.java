@@ -87,6 +87,7 @@ public enum NostrumParticles {
 		// Rest is completely optional and may or may not be used
 		public @Nullable Integer color; // ARGB
 		public boolean dieOnTarget;
+		public float gravityStrength;
 		
 		public SpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, 
 				Vec3d velocity, Vec3d velocityJitter) {
@@ -103,6 +104,7 @@ public enum NostrumParticles {
 			this.targetPos = null;
 			this.targetEntID = null;
 			this.dieOnTarget = false;
+			this.gravityStrength = 0f;
 		}
 		
 		public SpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter,
@@ -119,6 +121,8 @@ public enum NostrumParticles {
 			this.targetPos = targetPos;
 			this.targetEntID = null;
 			this.velocityJitter = null;
+			this.dieOnTarget = false;
+			this.gravityStrength = 0f;
 		}
 		
 		public SpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter,
@@ -135,6 +139,8 @@ public enum NostrumParticles {
 			this.targetPos = null;
 			this.targetEntID = targetEntID;
 			this.velocityJitter = null;
+			this.dieOnTarget = false;
+			this.gravityStrength = 0f;
 		}
 		
 		public SpawnParams color(int color) {
@@ -151,6 +157,15 @@ public enum NostrumParticles {
 			return this;
 		}
 		
+		public SpawnParams gravity(boolean gravity) {
+			return this.gravity(.2f);
+		}
+		
+		public SpawnParams gravity(float gravityStrength) {
+			this.gravityStrength = gravityStrength;
+			return this;
+		}
+		
 		private static final String NBT_COUNT = "count";
 		private static final String NBT_SPAWN_X = "spawn_x";
 		private static final String NBT_SPAWN_Y = "spawn_y";
@@ -163,6 +178,7 @@ public enum NostrumParticles {
 		private static final String NBT_TARGET_POS = "target_pos";
 		private static final String NBT_TARGET_ENT_ID = "target_ent_id";
 		private static final String NBT_DIE_ON_TARGET = "die_on_target";
+		private static final String NBT_GRAVITY_STRENGTH = "gravity_strength";
 		
 		public static NBTTagCompound WriteNBT(SpawnParams params, @Nullable NBTTagCompound tag) {
 			if (tag == null) {
@@ -210,6 +226,10 @@ public enum NostrumParticles {
 				tag.setInteger("color", params.color);
 			}
 			
+			if (params.gravityStrength != 0f) {
+				tag.setFloat(NBT_GRAVITY_STRENGTH, params.gravityStrength);
+			}
+			
 			return tag;
 		}
 		
@@ -234,6 +254,7 @@ public enum NostrumParticles {
 				final double velocityZ = subtag.getDouble("z");
 				final Vec3d velocityJitter;
 				if (tag.hasKey(NBT_VELOCITY_JITTER)) {
+					subtag = tag.getCompoundTag(NBT_VELOCITY_JITTER);
 					velocityJitter = new Vec3d(
 							subtag.getDouble("x"),
 							subtag.getDouble("y"),
@@ -282,6 +303,10 @@ public enum NostrumParticles {
 			}
 			if (tag.hasKey(NBT_DIE_ON_TARGET, NBT.TAG_BYTE)) {
 				params.dieOnTarget(tag.getBoolean(NBT_DIE_ON_TARGET));
+			}
+			
+			if (tag.hasKey(NBT_GRAVITY_STRENGTH, NBT.TAG_FLOAT)) {
+				params.gravity(tag.getFloat(NBT_GRAVITY_STRENGTH));
 			}
 			
 			return params;

@@ -1,0 +1,14 @@
+{
+    "parent": "item/handheld",
+    "textures": {
+        "layer0": "nostrummagica:items/dragon_soul_item"
+    },
+    "overrides": [
+        {
+            "predicate": {
+                "charging": 1
+            },
+            "model": "nostrummagica:item/dragon_soul_item_charging"
+        }
+    ]
+}

@@ -56,6 +56,8 @@ import com.smanzana.nostrummagica.network.messages.ClientEffectRenderMessage;
 import com.smanzana.nostrummagica.network.messages.MagicEffectUpdate;
 import com.smanzana.nostrummagica.network.messages.ManaMessage;
 import com.smanzana.nostrummagica.network.messages.SpawnNostrumRitualEffectMessage;
+import com.smanzana.nostrummagica.network.messages.SpawnPredefinedEffectMessage;
+import com.smanzana.nostrummagica.network.messages.SpawnPredefinedEffectMessage.PredefinedEffect;
 import com.smanzana.nostrummagica.network.messages.SpellDebugMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
@@ -107,6 +109,7 @@ import com.smanzana.nostrummagica.world.NostrumFlowerGenerator;
 import com.smanzana.nostrummagica.world.NostrumOreGenerator;
 
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EntityTracker;
 import net.minecraft.entity.EnumCreatureType;
@@ -614,6 +617,31 @@ public class CommonProxy {
 					world.provider.getDimension(),
 					pos, element, types, center, extras, output
 					);
+			for (EntityPlayer player : players) {
+				NetworkHandler.getSyncChannel().sendTo(message, (EntityPlayerMP) player);
+			}
+		}
+	}
+	
+	public void playPredefinedEffect(PredefinedEffect type, int duration, World world, Vec3d position) {
+		playPredefinedEffect(new SpawnPredefinedEffectMessage(type, duration, world.provider.getDimension(), position), world, position);
+	}
+	
+	public void playPredefinedEffect(PredefinedEffect type, int duration, World world, Entity entity) {
+		playPredefinedEffect(new SpawnPredefinedEffectMessage(type, duration, world.provider.getDimension(), entity.getEntityId()), world, entity.getPositionVector());
+	}
+	
+	private void playPredefinedEffect(SpawnPredefinedEffectMessage message, World world, Vec3d center) {
+		Set<EntityPlayer> players = new HashSet<>();
+		final double MAX_RANGE_SQR = 2500.0;
+		if (center != null) {
+			for (EntityPlayer player : world.playerEntities) {
+				if (player.getDistanceSq(center.x, center.y, center.z) <= MAX_RANGE_SQR)
+					players.add(player);
+			}
+		}
+		
+		if (!players.isEmpty()) {
 			for (EntityPlayer player : players) {
 				NetworkHandler.getSyncChannel().sendTo(message, (EntityPlayerMP) player);
 			}

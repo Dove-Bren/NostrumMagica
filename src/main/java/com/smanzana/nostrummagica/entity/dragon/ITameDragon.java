@@ -36,4 +36,6 @@ public interface ITameDragon extends IEntityPet {
 	public boolean sharesMana(EntityPlayer player);
 	
 	public PetAction getPetAction();
+	
+	public boolean isSoulBound();
 }

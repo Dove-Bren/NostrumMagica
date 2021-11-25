@@ -1,16 +1,14 @@
 package com.smanzana.nostrummagica.command;
 
-import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.items.PetSoulItem;
 
-import baubles.api.cap.BaublesCapabilities;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.WorldServer;
+import net.minecraft.util.EnumHand;
 
 public class CommandDebugEffect extends CommandBase {
 
@@ -63,30 +61,27 @@ public class CommandDebugEffect extends CommandBase {
 //			sender.sendMessage(new TextComponentString(result));
 //		}
 		
-		NostrumMagica.logger.warn("\\/\\/\\/\\/\\/\\/ Iterating players");
-		for (WorldServer world : server.worlds)
-		for (EntityPlayer player : world.playerEntities) {
-			if (player.equals(sender)) {
-				continue;
-			}
-			
-			final IInventory baubles = NostrumMagica.baubles.getBaubles(player);
-			
-			NostrumMagica.logger.warn("Player " + player);
-			NostrumMagica.logger.warn("  Baubles present: " + (baubles == null ? "NO" : "YES"));
-			if (baubles!=null) {
-				for (int i = 0; i < baubles.getSizeInventory(); i++) {
-					final ItemStack stack = baubles.getStackInSlot(i);
-					if (stack.isEmpty()) {
-						NostrumMagica.logger.warn("   1> EMPTY");
-					} else {
-						NostrumMagica.logger.warn("   1> " + stack.toString());
-						NostrumMagica.logger.warn("   2> " + (stack.hasCapability(BaublesCapabilities.CAPABILITY_ITEM_BAUBLE, null) ? "Bauble CAP" : "No Capability"));
-					}
-				}
-			}
+		if (!(sender.getCommandSenderEntity() instanceof EntityPlayer)) {
+			throw new CommandException("Command must be run by a creative player");
 		}
-		NostrumMagica.logger.warn("/\\/\\/\\/\\/\\/\\ Iterating players");
+		
+		final EntityPlayer player = (EntityPlayer) sender.getCommandSenderEntity();
+		if (!player.isCreative()) {
+			throw new CommandException("Command must be run by a creative player");
+		}
+		
+		ItemStack soulStack = player.getHeldItem(EnumHand.MAIN_HAND);
+		if (soulStack.isEmpty() || !(soulStack.getItem() instanceof PetSoulItem)) {
+			soulStack = player.getHeldItem(EnumHand.OFF_HAND);
+		}
+		
+		if (soulStack.isEmpty() || !(soulStack.getItem() instanceof PetSoulItem)) {
+			throw new CommandException("You must be holding a Pet Soul Item in one of your hands.");
+		}
+		
+		if (null == PetSoulItem.SpawnPet(soulStack, player.world, player.getPositionVector())) {
+			throw new CommandException("Failed to spawn entity");
+		}
 	}
 
 }

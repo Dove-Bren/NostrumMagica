@@ -22,6 +22,7 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 	protected final float maxAlpha;
 	protected Vec3d targetPos;
 	protected Entity targetEntity;
+	protected boolean dieOnTarget;
 	
 	public ParticleGlowOrb(World worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
 		super(worldIn, x, y, z, 0, 0, 0);
@@ -34,11 +35,11 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 		particleMaxAge = lifetime;
 	}
 	
-	public ParticleGlowOrb setFloats(boolean floats) {
-		return setFloatStrength(floats ? -.01f : 0);
+	public ParticleGlowOrb setGravity(boolean gravity) {
+		return setGravityStrength(gravity ? .01f : 0);
 	}
 	
-	public ParticleGlowOrb setFloatStrength(float strength) {
+	public ParticleGlowOrb setGravityStrength(float strength) {
 		particleGravity = strength;
 		return this;
 	}
@@ -78,6 +79,10 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 	public ParticleGlowOrb setTarget(Vec3d targetPos) {
 		this.targetPos = targetPos;
 		return this;
+	}
+	
+	public void dieOnTarget(boolean die) {
+		this.dieOnTarget = die;
 	}
 	
 	@Override
@@ -175,6 +180,10 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 				if (params.velocity != null) {
 					particle.setMotion(params.velocity, params.velocityJitter == null ? Vec3d.ZERO : params.velocityJitter);
 				}
+				if (params.gravityStrength != 0f) {
+					particle.setGravityStrength(params.gravityStrength);
+				}
+				particle.dieOnTarget(params.dieOnTarget);
 				Minecraft.getMinecraft().effectRenderer.addEffect(particle);
 			}
 			return particle;

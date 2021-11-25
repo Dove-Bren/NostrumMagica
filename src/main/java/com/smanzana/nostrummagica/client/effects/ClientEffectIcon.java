@@ -20,6 +20,7 @@ public enum ClientEffectIcon {
 	THORN_2("thorn2", true),
 	THORN_3("thorn3", true),
 	THORN_4("thorn4", true),
+	ARROW_SLASH("arrow_slash", false)
 	;
 	
 	private String key;

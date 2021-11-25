@@ -33,6 +33,7 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 	protected final float maxAlpha;
 	protected Vec3d targetPos;
 	protected Entity targetEntity;
+	protected boolean dieOnTarget;
 	
 	protected int type;
 	protected int ticksExisted;
@@ -50,11 +51,11 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 		type = NostrumMagica.rand.nextInt(2);
 	}
 	
-	public ParticleLightningStatic setFloats(boolean floats) {
-		return setFloatStrength(floats ? -.01f : 0);
+	public ParticleLightningStatic setGravity(boolean gravity) {
+		return setGravityStrength(gravity ? .01f : 0);
 	}
 	
-	public ParticleLightningStatic setFloatStrength(float strength) {
+	public ParticleLightningStatic setGravityStrength(float strength) {
 		particleGravity = strength;
 		return this;
 	}
@@ -87,6 +88,10 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 	public ParticleLightningStatic setTarget(Vec3d targetPos) {
 		this.targetPos = targetPos;
 		return this;
+	}
+	
+	public void dieOnTarget(boolean die) {
+		this.dieOnTarget = die;
 	}
 	
 	protected float getDisplayProgress() {
@@ -196,6 +201,10 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 				if (params.velocity != null) {
 					particle.setMotion(params.velocity, params.velocityJitter == null ? Vec3d.ZERO : params.velocityJitter);
 				}
+				if (params.gravityStrength != 0f) {
+					particle.setGravityStrength(params.gravityStrength);
+				}
+				particle.dieOnTarget(params.dieOnTarget);
 				Minecraft.getMinecraft().effectRenderer.addEffect(particle);
 			}
 			return particle;

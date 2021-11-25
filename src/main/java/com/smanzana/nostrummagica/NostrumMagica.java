@@ -106,6 +106,7 @@ import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
 import com.smanzana.nostrummagica.listeners.PlayerListener;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
+import com.smanzana.nostrummagica.pet.PetSoulRegistry;
 import com.smanzana.nostrummagica.proxy.CommonProxy;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.quests.NostrumQuest.QuestType;
@@ -233,6 +234,7 @@ public class NostrumMagica
     // Cached references that have sketchy access rules. See uses in this file.
     private static SpellRegistry spellRegistry;
     private static NostrumDimensionMapper serverDimensionMapper;
+    private static PetSoulRegistry petSoulRegistry;
     
     public static boolean initFinished = false;
     
@@ -2642,6 +2644,17 @@ public class NostrumMagica
     	return spellRegistry;
     }
     
+    public static PetSoulRegistry getPetSoulRegistry() {
+    	if (petSoulRegistry == null) {
+    		if (proxy.isServer()) {
+    			throw new RuntimeException("Accessing SpellRegistry before a world has been loaded!");
+    		} else {
+    			petSoulRegistry = new PetSoulRegistry();
+    		}
+    	}
+    	return petSoulRegistry;
+    }
+    
     /**
      * Finds (or creates) the offset for a player in the sorcery dimension
      * @param player
@@ -2681,6 +2694,16 @@ public class NostrumMagica
 		}
     }
     
+    private void initPetSoulRegistry(World world) {
+    	petSoulRegistry = (PetSoulRegistry) world.getMapStorage().getOrLoadData(
+    			PetSoulRegistry.class, PetSoulRegistry.DATA_NAME);
+    	
+    	if (petSoulRegistry == null) {
+    		petSoulRegistry = new PetSoulRegistry();
+			world.getMapStorage().setData(PetSoulRegistry.DATA_NAME, petSoulRegistry);
+    	}
+    }
+    
     @SubscribeEvent
     public void onWorldLoad(WorldEvent.Load event) {
     	// Keeping a static reference since some places want to access the registry that don't have world info.
@@ -2699,6 +2722,7 @@ public class NostrumMagica
     		// Do the correct initialization for persisted data
 			initSpellRegistry(event.getWorld());
 			getDimensionMapper(event.getWorld());
+			initPetSoulRegistry(event.getWorld());
 		}
     }
     

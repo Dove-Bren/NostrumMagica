@@ -1,0 +1,50 @@
+{
+	"parent": "item/generated",
+	"textures": {
+		"layer0": "nostrummagica:items/soul_dagger"
+	},
+	"display": {
+        "thirdperson_righthand": {
+            "rotation": [ 45, -90, 0 ],
+            "translation": [ 0, 3.75, 1.25 ],
+            "scale": [ 0.6, 0.6, 0.6 ]
+        },
+        "thirdperson_lefthand": {
+            "rotation": [ 45, 90, 0 ],
+            "translation": [ 0, 3.75, 1.25 ],
+            "scale": [ 0.6, 0.6, 0.6 ]
+        },
+        "firstperson_righthand": {
+            "rotation": [ 0, -60, -55 ],
+            "translation": [ 3.75, 2.25, 0 ],
+            "scale": [ 1.0, 1.0, 1.0 ]
+        },
+        "firstperson_lefthand": {
+            "rotation": [ 0, -60, 55 ],
+            "translation": [ 5.5, 2.25, 0 ],
+            "scale": [ 1.0, 1.0, 1.0 ]
+        }
+    },
+    "overrides": [
+        {
+            "predicate": {
+                "charging": 1
+            },
+            "model": "nostrummagica:item/soul_dagger_charging_0"
+        },
+        {
+            "predicate": {
+                "charging": 1,
+				"charge": 0.5
+            },
+            "model": "nostrummagica:item/soul_dagger_charging_1"
+        },
+        {
+            "predicate": {
+                "charging": 1,
+				"charge": 1
+            },
+            "model": "nostrummagica:item/soul_dagger_charging_2"
+        }
+    ]
+}

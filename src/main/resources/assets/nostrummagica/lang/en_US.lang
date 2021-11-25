@@ -344,6 +344,10 @@ item.lens_bore_reversed.desc=Digs up instead of down
 
 item.lens.master=Master Lens
 
+item.dragon_soul_item.name=Dragon Soul Ember
+item.soul_dagger.name=Soul Dagger
+item.soul_dagger.desc=Sneak + Right-Click to charge a stab attack
+
 potion.frostbite.name=Frostbite
 potion.shieldphysical.name=Physical Ward
 potion.shieldmagic.name=Magic Ward

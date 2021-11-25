@@ -19,6 +19,7 @@ import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonSpellSheet;
 import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonContainer;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.IEntityTameable;
+import com.smanzana.nostrummagica.entity.IStabbableEntity;
 import com.smanzana.nostrummagica.entity.PetInfo;
 import com.smanzana.nostrummagica.entity.PetInfo.PetAction;
 import com.smanzana.nostrummagica.entity.PetInfo.SecondaryFlavor;
@@ -34,10 +35,12 @@ import com.smanzana.nostrummagica.entity.tasks.EntityAIOwnerHurtTargetGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIPanicGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAISitGeneric;
 import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
+import com.smanzana.nostrummagica.items.DragonSoulItem;
 import com.smanzana.nostrummagica.items.NostrumRoseItem;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.pet.IPetWithSoul;
 import com.smanzana.nostrummagica.serializers.PetJobSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -84,7 +87,7 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityTameable, ITameDragon, IChangeListener {
+public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityTameable, ITameDragon, IChangeListener, IPetWithSoul, IStabbableEntity {
 
 	protected static final DataParameter<Boolean> HATCHED = EntityDataManager.<Boolean>createKey(EntityTameDragonRed.class, DataSerializers.BOOLEAN);
 	protected static final DataParameter<Boolean> TAMED = EntityDataManager.<Boolean>createKey(EntityTameDragonRed.class, DataSerializers.BOOLEAN);
@@ -92,6 +95,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
     protected static final DataParameter<Boolean> SITTING = EntityDataManager.<Boolean>createKey(EntityTameDragonRed.class, DataSerializers.BOOLEAN);
     protected static final DataParameter<Float> AGE = EntityDataManager.<Float>createKey(EntityTameDragonRed.class, DataSerializers.FLOAT);
     protected static final DataParameter<Optional<UUID>> EGG_UNIQUE_ID = EntityDataManager.<Optional<UUID>>createKey(EntityTameDragonRed.class, DataSerializers.OPTIONAL_UNIQUE_ID);
+    protected static final DataParameter<Boolean> SOULBOUND = EntityDataManager.<Boolean>createKey(EntityTameDragonRed.class, DataSerializers.BOOLEAN);
     
     protected static final DataParameter<Boolean> CAPABILITY_FLY = EntityDataManager.<Boolean>createKey(EntityTameDragonRed.class, DataSerializers.BOOLEAN);
     protected static final DataParameter<Byte> CAPABILITY_JUMP = EntityDataManager.<Byte>createKey(EntityTameDragonRed.class, DataSerializers.BYTE);
@@ -120,6 +124,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
     protected static final String NBT_SITTING = "Sitting";
     protected static final String NBT_AGE = "Age";
     protected static final String NBT_EGG_ID = "EggID";
+    protected static final String NBT_SOUL_BOUND = "SoulBound";
     protected static final String NBT_CAP_FLY = "CapableFly";
     protected static final String NBT_CAP_JUMP = "CapableJump";
     protected static final String NBT_CAP_JUMPBOOST = "CapableJumpBonus";
@@ -135,6 +140,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
     protected static final String NBT_INVENTORY = "DRInventory";
     protected static final String NBT_EQUIPMENT = "DREquipment";
     protected static final String NBT_SPELL_INVENTORY = "DRSpellInventory";
+    protected static final String NBT_SOUL_ID = "SoulID";
+    protected static final String NBT_SOUL_WORLDID = "SoulWorldID";
     
     public static final float BOND_LEVEL_FOLLOW = 0.05f;
     public static final float BOND_LEVEL_PLAYERS = 0.15f;
@@ -165,6 +172,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
     private IInventory inventory; // Full player-accessable inventory
     private final DragonEquipmentInventory equipment;
     private RedDragonSpellInventory spellInventory;
+    private UUID soulID;
+    private UUID worldID;
     
     // Internal timers for controlling while riding
     private int jumpCount; // How many times we've jumped
@@ -179,6 +188,9 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
         this.inventory = new InventoryBasic("Dragon Inventory", true, DRAGON_INV_SIZE);
         this.equipment = new DragonEquipmentInventory(this);
         this.spellInventory = new RedDragonSpellInventory("Dragon Spell Inventory", true);
+        
+        soulID = UUID.randomUUID();
+        worldID = null;
 	}
 	
 	protected void entityInit() {
@@ -203,6 +215,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		this.dataManager.register(SYNCED_MAX_HEALTH, 100.0f);
 		this.dataManager.register(DATA_PET_ACTION, PetAction.WAITING);
 		this.dataManager.register(HATCHED, false);
+		this.dataManager.register(SOULBOUND, false);
 		this.dataManager.register(DATA_ARMOR_BODY, ItemStack.EMPTY);
 		this.dataManager.register(DATA_ARMOR_HELM, ItemStack.EMPTY);
 		
@@ -590,6 +603,15 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			ObfuscationReflectionHelper.setPrivateValue(EntityLiving.class, this, hatched, "field_82179_bU");
 		}
 	}
+	
+	@Override
+	public boolean isSoulBound() {
+		return this.dataManager.get(SOULBOUND);
+	}
+	
+	public void setSoulBound(boolean soulBound) {
+		this.dataManager.set(SOULBOUND, soulBound);
+	}
 
 	@Nullable
 	public UUID getOwnerId() {
@@ -649,6 +671,11 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			compound.setString(NBT_OWNER_ID, this.getOwnerId().toString());
 		}
 		
+		compound.setUniqueId(NBT_SOUL_ID, soulID);
+		if (worldID != null) {
+			compound.setUniqueId(NBT_SOUL_WORLDID, worldID);
+		}
+		
 		compound.setBoolean(NBT_SITTING, this.isSitting());
 		compound.setFloat(NBT_AGE, this.getGrowingAge());
 		
@@ -656,6 +683,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		if (eggID != null) {
 			compound.setUniqueId(NBT_EGG_ID, eggID);
 		}
+		
+		compound.setBoolean(NBT_SOUL_BOUND, this.isSoulBound());
 		
 		compound.setBoolean(NBT_CAP_FLY, this.getCanFly());
 		compound.setByte(NBT_CAP_JUMP, (byte) this.getBonusJumps());
@@ -716,6 +745,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	/**
 	 * (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound compound) {
 		super.readEntityFromNBT(compound);
 		String s;
@@ -737,6 +767,19 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 				this.setTamed(false);
 			}
 		}
+		
+		// Summon command passes empty NBT to parse. Don't overwrite random UUID if not present.
+		if (compound.hasUniqueId(NBT_SOUL_ID)) {
+			this.soulID = compound.getUniqueId(NBT_SOUL_ID);
+		}
+		
+		if (compound.hasUniqueId(NBT_SOUL_WORLDID)) {
+			this.worldID = compound.getUniqueId(NBT_SOUL_WORLDID);
+		} else {
+			this.worldID = null;
+		}
+		
+		this.setSoulBound(compound.getBoolean(NBT_SOUL_BOUND));
 		
 		this.setSitting(compound.getBoolean(NBT_SITTING));
 		this.setGrowingAge(compound.getFloat(NBT_AGE));
@@ -1228,16 +1271,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 
 		return super.isOnSameTeam(entityIn);
 	}
-
-	/**
-	 * Called when the mob's health reaches 0.
-	 */
-	@Override
-	public void onDeath(DamageSource cause) {
-		if (this.getOwner() != null && !this.world.isRemote && this.world.getGameRules().getBoolean("showDeathMessages") && this.getOwner() instanceof EntityPlayerMP) {
-			this.getOwner().sendMessage(this.getCombatTracker().getDeathMessage());
-		}
-		
+	
+	protected void dropInventory() {
 		if (!this.world.isRemote) {
 			if (this.inventory != null) {
 				for (int i = 0; i < inventory.getSizeInventory(); i++) {
@@ -1256,7 +1291,21 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 					this.world.spawnEntity(item);
 				}
 			}
+			inventory.clear();
+			equipment.clear();
 		}
+	}
+
+	/**
+	 * Called when the mob's health reaches 0.
+	 */
+	@Override
+	public void onDeath(DamageSource cause) {
+		if (this.getOwner() != null && !this.world.isRemote && this.world.getGameRules().getBoolean("showDeathMessages") && this.getOwner() instanceof EntityPlayerMP) {
+			this.getOwner().sendMessage(this.getCombatTracker().getDeathMessage());
+		}
+		
+		dropInventory();
 
 		super.onDeath(cause);
 	}
@@ -1330,6 +1379,20 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	@Override
 	public void onUpdate() {
 		super.onUpdate();
+		
+		if (this.dead) {
+			return;
+		}
+		
+		// Check world ID (if soul is saved) and make sure our worldkey matches.
+		if (!world.isRemote && this.worldID != null && this.ticksExisted % 20 == 1) {
+			if (!NostrumMagica.getPetSoulRegistry().checkCurrentWorldID(this)) {
+				NostrumMagica.logger.info("Removing entity " + this + " as its world ID doesn't match: " + (this.worldID == null ? "NULL" : worldID));
+				this.setDead();
+				this.world.removeEntity(this);
+				return;
+			}
+		}
 		
 		EntityLivingBase target = this.getAttackTarget();
 		if (target != null) {
@@ -1619,6 +1682,9 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 
 	@Override
 	public float getBond() {
+		if (this.isSoulBound()) {
+			return 1f;
+		}
 		return this.dataManager.get(ATTRIBUTE_BOND);
 	}
 	
@@ -2314,5 +2380,41 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		} else {
 			return this.equipment.getStackInSlot(slot);
 		}
+	}
+
+	@Override
+	public UUID getPetSoulID() {
+		return soulID;
+	}
+
+	@Override
+	public UUID getWorldID() {
+		return worldID;
+	}
+
+	public void setWorldID(UUID worldID) {
+		this.worldID = worldID;
+	}
+
+	@Override
+	public boolean onSoulStab(EntityLivingBase stabber, ItemStack stabbingItem) {
+		
+		if (this.isOwner(stabber) && !isSoulBound() && this.getBond() >= 1f) {
+			// Die and scream and drop a soul ember
+			this.setSoulBound(true);
+			
+			// Drop inventory before snapshotting
+			dropInventory();
+			
+			final ItemStack stack = DragonSoulItem.MakeSoulItem(this, true);
+			if (!stack.isEmpty()) {
+				this.entityDropItem(stack, 1f);
+				this.attackEntityFrom(DamageSource.GENERIC, 1000000f);
+				this.setDead();
+			}
+			
+			return true;
+		}
+		return false;
 	}
 }

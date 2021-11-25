@@ -101,6 +101,7 @@ import com.smanzana.nostrummagica.items.ChalkItem;
 import com.smanzana.nostrummagica.items.DragonArmor;
 import com.smanzana.nostrummagica.items.DragonEgg;
 import com.smanzana.nostrummagica.items.DragonEggFragment;
+import com.smanzana.nostrummagica.items.DragonSoulItem;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
 import com.smanzana.nostrummagica.items.EssenceItem;
@@ -132,6 +133,7 @@ import com.smanzana.nostrummagica.items.ReagentSeed;
 import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.items.SeekerIdol;
 import com.smanzana.nostrummagica.items.ShrineSeekingGem;
+import com.smanzana.nostrummagica.items.SoulDagger;
 import com.smanzana.nostrummagica.items.SpellPlate;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
@@ -628,6 +630,13 @@ public class ClientProxy extends CommonProxy {
 		registerModel(Item.getItemFromBlock(DungeonAir.instance()),
 				1,
 				DungeonAir.ID);
+		
+		registerModel(DragonSoulItem.instance(),
+				0,
+				DragonSoulItem.ID);
+		registerModel(SoulDagger.instance(),
+				0,
+				SoulDagger.ID);
 		
 		registerEntityRenderers();
 	}
@@ -1166,6 +1175,8 @@ public class ClientProxy extends CommonProxy {
 				NostrumMagica.MODID, "effects/arrow_up"));
 		event.getMap().registerSprite(new ResourceLocation(
 				NostrumMagica.MODID, "effects/slate"));
+		event.getMap().registerSprite(new ResourceLocation(
+				NostrumMagica.MODID, "effects/arrow_slash"));
 		
 		/*
 		SHIELD("shield", false),

@@ -177,6 +177,12 @@
             "nostrummagica:spell/fail"
         ]
     },
+	"spell.heavy_strike":
+	{
+		"sounds": [
+			"nostrummagica:spell/heavy_strike"
+		]
+	},
     
     "player.levelup":
     {

@@ -384,11 +384,20 @@ public class TamedDragonGUI {
 					int prog = (int) ((float) (w - 2) * bond);
 					Gui.drawRect(x + 1, y + 1, x + 1 + prog, y + h - 1, 0xFFA020A0);
 					
-					this.drawCenteredString(fontRenderer,
-							String.format("%.2f%%", bond * 100f),
-							centerX,
-							y + (h / 2) - (fontRenderer.FONT_HEIGHT / 2),
-							bond == 1f ? 0xFFC0FFC0 : 0xFFC0C0C0);
+					if (container.dragon.isSoulBound()) {
+						this.drawCenteredString(fontRenderer,
+								"Soulbound",
+								centerX,
+								y + (h / 2) - (fontRenderer.FONT_HEIGHT / 2),
+								0xFF40FF40);
+					} else {
+						this.drawCenteredString(fontRenderer,
+								String.format("%.2f%%", bond * 100f),
+								centerX,
+								y + (h / 2) - (fontRenderer.FONT_HEIGHT / 2),
+								bond == 1f ? 0xFFC0FFC0 : 0xFFC0C0C0);
+					}
+					
 					
 					y += h + 10;
 				}

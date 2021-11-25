@@ -56,6 +56,7 @@ public enum NostrumMagicaSounds {
 	LUX_HURT("mob.lux.hurt", SoundCategory.NEUTRAL),
 	LUX_DEATH("mob.lux.death", SoundCategory.NEUTRAL),
 	LUX_IDLE("mob.lux.idle", SoundCategory.NEUTRAL),
+	HEAVY_STRIKE("spell.heavy_strike", SoundCategory.HOSTILE, .4f),
 	MUSIC_DUNGEON1_INTRO("music.dungeon1.intro", SoundCategory.MUSIC),
 	MUSIC_DUNGEON1_LOW("music.dungeon1.low", SoundCategory.MUSIC),
 	MUSIC_DUNGEON1_HIGH("music.dungeon1.high", SoundCategory.MUSIC),

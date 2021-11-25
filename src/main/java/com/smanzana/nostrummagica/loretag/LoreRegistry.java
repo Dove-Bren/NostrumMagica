@@ -16,6 +16,7 @@ import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
 import com.smanzana.nostrummagica.items.DragonEgg;
 import com.smanzana.nostrummagica.items.DragonEggFragment;
+import com.smanzana.nostrummagica.items.DragonSoulItem;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.HookshotItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
@@ -130,6 +131,7 @@ public class LoreRegistry {
 		register(new EntityWisp(null));
 		register(WarlockSword.instance());
 		register(new EntityLux(null));
+		register(DragonSoulItem.instance());
 		
 		
 		for (Preset preset : Preset.values()) {
