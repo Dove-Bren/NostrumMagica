@@ -1100,7 +1100,9 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	@SideOnly(Side.CLIENT)
 	@Override
 	public boolean shouldRenderElyta(EntityLivingBase entity, ItemStack stack) {
-		return hasElytra(entity) && (element == EMagicElement.ICE || element == EMagicElement.LIGHTNING || element == EMagicElement.WIND);
+		return hasElytra(entity)
+				&& (element == EMagicElement.ICE || element == EMagicElement.LIGHTNING || element == EMagicElement.WIND)
+				&& (!(entity instanceof EntityPlayer) || !(shouldRenderDragonWings(stack, (EntityPlayer) entity)));
 	}
 	
 	protected boolean hasElytra(EntityLivingBase entity) {
