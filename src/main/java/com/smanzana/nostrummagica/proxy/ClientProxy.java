@@ -65,6 +65,7 @@ import com.smanzana.nostrummagica.client.render.TileEntitySymbolRenderer;
 import com.smanzana.nostrummagica.command.CommandDebugClientEffect;
 import com.smanzana.nostrummagica.command.CommandInfoScreenGoto;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityHookShot;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityLux;
@@ -82,6 +83,7 @@ import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
 import com.smanzana.nostrummagica.entity.renderer.ModelGolem;
+import com.smanzana.nostrummagica.entity.renderer.RenderArcaneWolf;
 import com.smanzana.nostrummagica.entity.renderer.RenderDragonEgg;
 import com.smanzana.nostrummagica.entity.renderer.RenderDragonRed;
 import com.smanzana.nostrummagica.entity.renderer.RenderGolem;
@@ -749,6 +751,13 @@ public class ClientProxy extends CommonProxy {
 				return new RenderWillo(manager, 1f);
 			}
 		});
+		
+		RenderingRegistry.registerEntityRenderingHandler(EntityArcaneWolf.class, new IRenderFactory<EntityArcaneWolf>() {
+			@Override
+			public Render<? super EntityArcaneWolf> createRenderFor(RenderManager manager) {
+				return new RenderArcaneWolf(manager, 1f);
+			}
+		});
 	}
 	
 	@SubscribeEvent
@@ -790,6 +799,8 @@ public class ClientProxy extends CommonProxy {
 			EntityPlayer player = Minecraft.getMinecraft().player;
 			if (player.isRiding() && player.getRidingEntity() instanceof EntityTameDragonRed) {
 				((EntityDragon) player.getRidingEntity()).dragonJump();
+			} else if (player.isRiding() && player.getRidingEntity() instanceof EntityArcaneWolf) {
+				((EntityArcaneWolf) player.getRidingEntity()).wolfJump();
 			}
 		} else if (bindingBladeCast.isPressed()) {
 			EntityPlayer player = Minecraft.getMinecraft().player;

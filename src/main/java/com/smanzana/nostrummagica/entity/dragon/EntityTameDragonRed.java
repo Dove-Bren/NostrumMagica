@@ -1200,7 +1200,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		
 		// Health
 		// 50% 0, 37.5% 10, 12.5% 20
-		float health = (float) (rand.nextInt(1) * 10);
+		float health = (float) (rand.nextInt(2) * 10);
 		if (health > 0 && rand.nextBoolean() && rand.nextBoolean()) {
 			health += 10.0f;
 		}

@@ -20,6 +20,7 @@ import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.config.network.ServerConfigMessage;
 import com.smanzana.nostrummagica.crafting.SpellTomePageCombineRecipe;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
+import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect;
 import com.smanzana.nostrummagica.entity.EntityChakramSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntityCyclerSpellSaucer;
@@ -398,6 +399,12 @@ public class CommonProxy {
     			.spawn(EnumCreatureType.MONSTER, 30, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.SPOOKY))
     			.spawn(EnumCreatureType.MONSTER, 20, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.DRY))
     			.spawn(EnumCreatureType.MONSTER, 8, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER))
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntityArcaneWolf.class)
+    			.id("entity_arcane_wolf", entityID++)
+    			.name(NostrumMagica.MODID + ".entity_arcane_wolf")
+    			.tracker(64, 1, false)
     		.build());
     }
     

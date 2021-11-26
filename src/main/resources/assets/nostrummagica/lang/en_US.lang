@@ -424,6 +424,7 @@ entity.nostrummagica.nostrum_hookshot.name=Hookshot Anchor
 entity.nostrummagica.entity_wisp.name=Wisp
 entity.nostrummagica.entity_lux.name=Lux
 entity.nostrummagica.entity_willo.name=Willo
+entity.nostrummagica.entity_arcane_wolf.name=Arcane Wolf
 
 entity.nostrummagica.placeholder.soulbound.name=Soulbound Pet
 
@@ -614,6 +615,7 @@ info.tamed_dragon.bonding.desc=Tamed tamed dragons begin as completely wild. The
 info.tamed_dragon.experience.name=Experience
 info.tamed_dragon.experience.desc=Dragons gain experience as they battle. The more the battle, the more experience they will gain. After a while, they may even level up!||When a dragon levels up, its attributes increase. Not all attributes can increase, but most that you see can in some way grow.
 
+
 info.egg.place=You've placed the dragon egg down. Make sure it doesn't get too cold!
 info.egg.lay=%1$s has laid an egg! In doing so, it's lost some of its bond with you, and is now guarding its new egg!
 info.egg.hatch=The nearby dragon egg has hatched, spawning a new, wild, baby dragon!
@@ -646,6 +648,11 @@ info.tamed_dragon.red_bond.chest=The tamed dragon has started to trust you. It w
 info.tamed_dragon.red_bond.ride=Your bond with the tamed dragon has increased significantly! It is now comfortable with letting you ride it!
 info.tamed_dragon.red_bond.magic=The tamed dragon trusts you nearly completely. You now have the ability to manage how your dragon uses magic!
 info.tamed_dragon.red_bond.full=The tamed dragon is now fully bonded with you!
+
+info.tamed_arcane_wolf.hurt=%1$s is getting low on health!
+info.tamed_arcane_wolf.not_yours=%1$s refuses to listen to you
+info.tamed_arcane_wolf.low_health=%1$s is too low on health to ride
+info.tamed_arcane_wolf.no_ride=%1$s is too wild to ride
 
 info.hookshot.bad_dim=The mechanisms seem to have trouble working in this atmosphere...
 info.endercharm.enhanced=Use while sneaking to only teleport yourself. Otherwise, creates a portal home.
