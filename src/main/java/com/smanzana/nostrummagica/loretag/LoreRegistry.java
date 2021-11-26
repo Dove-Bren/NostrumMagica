@@ -39,6 +39,7 @@ import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.items.SeekerIdol;
 import com.smanzana.nostrummagica.items.ShrineSeekingGem;
+import com.smanzana.nostrummagica.items.SoulDagger;
 import com.smanzana.nostrummagica.items.SpellPlate;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
@@ -134,6 +135,7 @@ public class LoreRegistry {
 		register(new EntityLux(null));
 		register(DragonSoulItem.instance());
 		register(EntityTameDragonRed.SoulBoundDragonLore.instance());
+		register(SoulDagger.instance());
 		
 		
 		for (Preset preset : Preset.values()) {

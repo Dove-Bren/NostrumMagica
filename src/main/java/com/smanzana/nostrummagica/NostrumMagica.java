@@ -86,8 +86,8 @@ import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.NostrumRoseItem;
 import com.smanzana.nostrummagica.items.NostrumRoseItem.RoseType;
 import com.smanzana.nostrummagica.items.NostrumSkillItem;
-import com.smanzana.nostrummagica.items.PetSoulItem;
 import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
+import com.smanzana.nostrummagica.items.PetSoulItem;
 import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
@@ -96,6 +96,7 @@ import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.ReagentSeed;
 import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.items.ShrineSeekingGem;
+import com.smanzana.nostrummagica.items.SoulDagger;
 import com.smanzana.nostrummagica.items.SpellPlate;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
@@ -125,8 +126,8 @@ import com.smanzana.nostrummagica.research.NostrumResearch.NostrumResearchTab;
 import com.smanzana.nostrummagica.research.NostrumResearch.Size;
 import com.smanzana.nostrummagica.research.NostrumResearch.SpellSpec;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
-import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
+import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.rituals.outcomes.IRitualOutcome;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeBindSpell;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeConstructGeotoken;
@@ -1525,6 +1526,18 @@ public class NostrumMagica
 				})	
 			);
 		
+		// Soul dagger
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("spawn_soul_dagger",
+					new ItemStack(SoulDagger.instance()),
+					EMagicElement.FIRE,
+					new ReagentType[] {ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANDRAKE_ROOT},
+					new ItemStack(Items.END_CRYSTAL),
+					new ItemStack[] {new ItemStack(EnchantedWeapon.get(EMagicElement.WIND, 1)), new ItemStack(EnchantedWeapon.get(EMagicElement.LIGHTNING, 1)), NostrumResourceItem.getItem(ResourceType.SLAB_FIERCE, 1), new ItemStack(EnchantedWeapon.get(EMagicElement.ICE, 1))},
+					new RRequirementResearch("soul_daggers"),
+					new OutcomeSpawnItem(new ItemStack(SoulDagger.instance(), 1)))
+				);
+		
 		
 //		RitualRegistry.instance().addRitual(
 //				RitualRecipe.createTier2("ritual.form_obelisk.name", EMagicElement.ENDER,
@@ -2154,7 +2167,7 @@ public class NostrumMagica
 			.hiddenParent("thano_pendant")
 			.reference("ritual::thanos_staff", "ritual.thanos_staff.name")
 			.lore(ThanoPendant.instance())
-		.build("thanos_staff", NostrumResearchTab.OUTFITTING, Size.LARGE, 2, 1, true, new ItemStack(ThanosStaff.instance()));
+		.build("thanos_staff", NostrumResearchTab.OUTFITTING, Size.LARGE, 2, 0, true, new ItemStack(ThanosStaff.instance()));
 		
 		NostrumResearch.startBuilding()
 			.parent("mage_staff")
@@ -2162,6 +2175,13 @@ public class NostrumMagica
 			.hiddenParent("vani")
 			.reference("ritual::spawn_warlock_sword", "ritual.spawn_warlock_sword.name")
 		.build("warlock_sword", NostrumResearchTab.OUTFITTING, Size.LARGE, 1, 1, true, new ItemStack(WarlockSword.instance()));
+		
+		NostrumResearch.startBuilding()
+			.parent("thanos_staff")
+			.parent("warlock_sword")
+			.hiddenParent("vani")
+			.reference("ritual::spawn_soul_dagger", "ritual.spawn_soul_dagger.name")
+		.build("soul_daggers", NostrumResearchTab.OUTFITTING, Size.LARGE, 2, 1, true, new ItemStack(SoulDagger.instance()));
 		
 		NostrumResearch.startBuilding()
 			.parent("enchanted_armor")

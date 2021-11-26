@@ -1170,15 +1170,22 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 	
 	protected boolean hasDragonFlight(EntityLivingBase entity) {
-		if (this.level == 3 && this.armorType == EntityEquipmentSlot.CHEST
-				&& (element == EMagicElement.ENDER || element == EMagicElement.EARTH || element == EMagicElement.FIRE || element == EMagicElement.PHYSICAL)) {
-			// Check if full set is available and if we have enough mana
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
-			if (attr == null || attr.getMana() < MANA_DRAGON_FLIGHT) {
-				return false;
+		if (this.level == 3 && this.armorType == EntityEquipmentSlot.CHEST) {
+			boolean hasRightElement = element == EMagicElement.ENDER || element == EMagicElement.EARTH || element == EMagicElement.FIRE || element == EMagicElement.PHYSICAL;
+			if (!hasRightElement) {
+				ItemStack chest = entity.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
+				hasRightElement = EnchantedArmor.GetHasWingUpgrade(chest);
 			}
-			return (4 == getSetPieces(entity)); 
+			if (hasRightElement) {
+				// Check if full set is available and if we have enough mana
+				INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
+				if (attr == null || attr.getMana() < MANA_DRAGON_FLIGHT) {
+					return false;
+				}
+				return (4 == getSetPieces(entity)); 
+			}
 		}
+			
 		return false;
 	}
 	

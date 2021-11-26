@@ -650,8 +650,8 @@ info.tamed_dragon.red_bond.full=The tamed dragon is now fully bonded with you!
 info.hookshot.bad_dim=The mechanisms seem to have trouble working in this atmosphere...
 info.endercharm.enhanced=Use while sneaking to only teleport yourself. Otherwise, creates a portal home.
 
-info.lore_tameddragon_soulbound.name=Soulbonded Dragons
-info.lore_tameddragon_soulbound.desc=  You've soulbonded with your dragon! Its soul is not intertwined with yours!|  As a symbol of this bond, you've received a Dragon Soul Ember with your dragon's soul in it.|  This special item can be used to revive your dragon if it perishes. Be sure not to lose it!
+info.lore_tamedragon_soulbound.name=Soulbonded Dragons
+info.lore_tamedragon_soulbound.desc=  You've soulbonded with your dragon! Its soul is not intertwined with yours!|  As a symbol of this bond, you've received a Dragon Soul Ember with your dragon's soul in it.|  This special item can be used to revive your dragon if it perishes. Be sure not to lose it!
 
 info.respawn_soulbound_pet.fail.baditem=The soul item is missing a soul to respawn!
 info.respawn_soulbound_dragon.fail.mana=The Dragon Soul Ember must be charged with mana first!
@@ -1042,6 +1042,7 @@ ritual.make_lens_heal.name=Make Heal Lens
 ritual.make_lens_bore.name=Make Bore Lens
 
 ritual.revive_soulbound_pet.name=Revive Soulbound Pet
+ritual.spawn_soul_dagger.name=Construct Soul Dagger
 
 enhancement.lower_reagent_cost.name=Lower Reagent Cost
 enhancement.lower_reagent_cost.desc=Reduces the amount of reagents used up when casting a spell
@@ -1471,3 +1472,6 @@ research.aether_infusers.info=  Aether Infusers by themselves take a lot of aeth
 research.soulbound_pets.name=Soulbound Pets
 research.soulbound_pets.desc=Always and Forever
 research.soulbound_pets.info=  Congratulations! You've soulbonded with one of your pets! Now, you can revive the pet even if it dies!|  To revive a pet that's died, use the soul item the pet dropped when you soulbonded with it. For example, Dragon Soul Embers. Be aware that soul items usually must be charged with mana before they can be used.
+research.soul_daggers.name=Soul Daggers
+research.soul_daggers.desc=Piercing the soul
+research.soul_daggers.info=  Soul daggers are an especially curious weapon. They are difficult to craft, and don't boast impressive damage on their own.|  To get the most combat effectiveness out of them, one doesn't slash with them and instead stabs. The magical energies of the blade are such that they slide through the flesh and soul of the creature targetting.|  For most creatures, this means dealing decent damage (base damage + 2), applying a stun effect for a few moments, and even draining some of the creatures mana to absorb yourself.||  And yet, there are other uses of the blade as well. You are scared to think about it to much, but you can feel the capabilities of the blade in your hands. Rather than puncturing the soul for damage and mana, you wonder if there's a way to use the blade more carefully and more cleanly collect pieces of a creature's soul...|  You'll have to inspect the blade closer to find out.
