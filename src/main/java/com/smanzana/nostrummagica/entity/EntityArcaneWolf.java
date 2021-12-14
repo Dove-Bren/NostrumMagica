@@ -11,7 +11,10 @@ import com.smanzana.nostrummagica.pet.IPetWithSoul;
 import com.smanzana.nostrummagica.pet.PetInfo;
 import com.smanzana.nostrummagica.pet.PetInfo.PetAction;
 import com.smanzana.nostrummagica.pet.PetInfo.SecondaryFlavor;
+import com.smanzana.nostrummagica.serializers.ArcaneWolfElementalTypeSerializer;
+import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
 import com.smanzana.nostrummagica.serializers.PetJobSerializer;
+import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -37,6 +40,66 @@ import net.minecraft.world.World;
 
 public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEntityPet, IPetWithSoul, IStabbableEntity {
 	
+	public static enum ArcaneWolfElementalType {
+		NONELEMENTAL("nonelemental", null),
+		FIRE_ONLY("fire", EMagicElement.FIRE),
+		ICE_ONLY("ice", EMagicElement.ICE),
+		WIND_ONLY("wind", EMagicElement.WIND),
+		EARTH_ONLY("earth", EMagicElement.EARTH),
+		ENDER_ONLY("ender", EMagicElement.ENDER),
+		LIGHTNING_ONLY("lightning", EMagicElement.LIGHTNING),
+		
+		// Composites
+		BARRIER("barrier", EMagicElement.EARTH, EMagicElement.ICE), // Earth + Ice
+		STORM("storm", EMagicElement.WIND, EMagicElement.LIGHTNING), // Wind + Lightning
+		ELDRICH("eldrich", EMagicElement.ENDER, EMagicElement.FIRE), // Ender + Fire
+		MYSTIC("mystic", EMagicElement.ICE, EMagicElement.ENDER), // Ice + Ender
+		NATURE("nature", EMagicElement.LIGHTNING, EMagicElement.EARTH), // Lightning + Earth
+		HELL("hell", EMagicElement.FIRE, EMagicElement.WIND); // Fire + Wind
+		
+		private final String key;
+		private final @Nullable EMagicElement primary; // Only nonelemental has null though so we pretendit's not nullable
+		private final @Nullable EMagicElement secondary;
+		
+		private ArcaneWolfElementalType(String key, EMagicElement primary) {
+			this(key, primary, null);
+		}
+		
+		private ArcaneWolfElementalType(String key, EMagicElement primary, @Nullable EMagicElement secondary) {
+			this.primary = primary;
+			this.secondary = secondary;
+			this.key = key;
+		}
+		
+		public static @Nullable ArcaneWolfElementalType Match(EMagicElement first, EMagicElement second) {
+			for (ArcaneWolfElementalType type: values()) {
+				if (type.primary == first && type.secondary == second) {
+					return type;
+				}
+				if (type.secondary == first && type.primary == second) {
+					return type;
+				}
+			}
+			return null;
+		}
+		
+		public static ArcaneWolfElementalType Match(EMagicElement element) {
+			return Match(element, null);
+		}
+		
+		public @Nullable EMagicElement getPrimary() {
+			return this.primary;
+		}
+		
+		public @Nullable EMagicElement getSecondary() {
+			return this.secondary;
+		}
+		
+		public String getNameKey() {
+			return key;
+		}
+	}
+	
 	protected static final DataParameter<Boolean> SOULBOUND = EntityDataManager.<Boolean>createKey(EntityArcaneWolf.class, DataSerializers.BOOLEAN);
 	
 	protected static final DataParameter<Integer> ATTRIBUTE_XP  = EntityDataManager.<Integer>createKey(EntityArcaneWolf.class, DataSerializers.VARINT);
@@ -48,7 +111,11 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
     protected static final DataParameter<Integer> MAX_MANA  = EntityDataManager.<Integer>createKey(EntityArcaneWolf.class, DataSerializers.VARINT);
     protected static final DataParameter<PetAction> DATA_PET_ACTION = EntityDataManager.<PetAction>createKey(EntityArcaneWolf.class, PetJobSerializer.instance);
     protected static final DataParameter<Integer> RUNE_COLOR = EntityDataManager.<Integer>createKey(EntityArcaneWolf.class, DataSerializers.VARINT);
-
+    
+    protected static final DataParameter<ArcaneWolfElementalType> ELEMENTAL_TYPE = EntityDataManager.<ArcaneWolfElementalType>createKey(EntityArcaneWolf.class, ArcaneWolfElementalTypeSerializer.instance);
+    protected static final DataParameter<EMagicElement> TRAINING_ELEMENT = EntityDataManager.<EMagicElement>createKey(EntityArcaneWolf.class, MagicElementDataSerializer.instance);
+    protected static final DataParameter<Integer> TRAINING_XP  = EntityDataManager.<Integer>createKey(EntityArcaneWolf.class, DataSerializers.VARINT);
+    
     private static final String NBT_SOUL_BOUND = "SoulBound";
     private static final String NBT_ATTR_XP = "AttrXP";
     private static final String NBT_ATTR_LEVEL = "AttrLevel";
@@ -58,6 +125,9 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
     private static final String NBT_SOUL_ID = "SoulID";
     private static final String NBT_SOUL_WORLDID = "SoulWorldID";
     private static final String NBT_RUNE_COLOR = "RuneColor";
+    private static final String NBT_TRAINING_ELEMENT = "TrainingElement";
+    private static final String NBT_TRAINING_XP = "TrainingElement";
+    private static final String NBT_ELEMENTAL_TYPE = "ElementType";
     
     private static final float ARCANE_WOLF_WARN_HEALTH = 10.0f;
     private static final float BOND_LEVEL_ALLOW_RIDE = .75f;
@@ -87,7 +157,11 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		dataManager.register(MANA, 0);
 		dataManager.register(MAX_MANA, 1);
 		dataManager.register(RUNE_COLOR, 0xFFFF00FF);
+		dataManager.register(ELEMENTAL_TYPE, ArcaneWolfElementalType.NONELEMENTAL);
+		dataManager.register(TRAINING_ELEMENT, EMagicElement.PHYSICAL);
+		dataManager.register(TRAINING_XP, 0);
 	}
+		
 	
 	@Override
 	protected void applyEntityAttributes() {
@@ -479,7 +553,79 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 	public void setRuneColor(int ARGB) {
 		dataManager.set(RUNE_COLOR, ARGB);
 	}
-
+	
+	public ArcaneWolfElementalType getElementalType() {
+		return dataManager.get(ELEMENTAL_TYPE);
+	}
+	
+	protected void setElementalType(ArcaneWolfElementalType type) {
+		this.dataManager.set(ELEMENTAL_TYPE, type);
+	}
+	
+	public int getTrainingXP() {
+		return dataManager.get(TRAINING_XP);
+	}
+	
+	protected void setTrainingXP(int xp) {
+		dataManager.set(TRAINING_XP, xp);
+	}
+	
+	public void addTrainingXP(int xp) {
+		if (this.getTrainingElement() == null) {
+			return;
+		}
+		
+		xp += this.getTrainingXP();
+		if (xp >= getMaxTrainingXP()) {
+			xp = 0;
+			this.finishTrainingElement(this.getTrainingElement());
+		}
+		this.setTrainingXP(xp);
+	}
+	
+	public int getMaxTrainingXP() {
+		final ArcaneWolfElementalType type = this.getElementalType();
+		final int maxXP;
+		switch (type) {
+		case BARRIER:
+		case ELDRICH:
+		case HELL:
+		case MYSTIC:
+		case NATURE:
+		case STORM:
+			maxXP = 1000;
+			break;
+		case EARTH_ONLY:
+		case ENDER_ONLY:
+		case FIRE_ONLY:
+		case ICE_ONLY:
+		case LIGHTNING_ONLY:
+		case WIND_ONLY:
+			maxXP = 500;
+			break;
+		case NONELEMENTAL:
+		default:
+			maxXP = 250;
+			break;
+		}
+		return maxXP;
+	}
+	
+	public @Nullable EMagicElement getTrainingElement() {
+		final EMagicElement elem = dataManager.get(TRAINING_ELEMENT);
+		if (elem == EMagicElement.PHYSICAL) {
+			return null;
+		}
+		return elem;
+	}
+	
+	public void setTrainingElement(@Nullable EMagicElement element) {
+		if (element == null) {
+			element = EMagicElement.PHYSICAL;
+		}
+		dataManager.set(TRAINING_ELEMENT, element);
+	}
+	
 	public void setPetAction(PetAction action) {
 		dataManager.set(DATA_PET_ACTION, action);
 	}
@@ -534,6 +680,11 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 			compound.setUniqueId(NBT_SOUL_WORLDID, worldID);
 		}
 		compound.setInteger(NBT_RUNE_COLOR, this.getRuneColor());
+		if (this.getTrainingElement() != null) {
+			compound.setString(NBT_TRAINING_ELEMENT, this.getTrainingElement().name());
+		}
+		compound.setInteger(NBT_TRAINING_XP, this.getTrainingXP());
+		compound.setString(NBT_ELEMENTAL_TYPE, this.getElementalType().name());
 		
 		// TODO inventory...
 		int unused;
@@ -563,6 +714,21 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		}
 		
 		this.setRuneColor(compound.getInteger(NBT_RUNE_COLOR));
+		this.setTrainingElement(null);
+		if (compound.hasKey(NBT_TRAINING_ELEMENT)) {
+			try {
+				this.setTrainingElement(EMagicElement.valueOf(compound.getString(NBT_TRAINING_ELEMENT).toUpperCase()));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		this.setTrainingXP(compound.getInteger(NBT_TRAINING_XP));
+		try {
+			this.setElementalType(ArcaneWolfElementalType.valueOf(compound.getString(NBT_ELEMENTAL_TYPE).toUpperCase()));
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.setElementalType(ArcaneWolfElementalType.NONELEMENTAL);
+		}
 	}
 	
 	@Override
@@ -766,6 +932,61 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		if (owner != null) {
 			this.playSound(SoundEvents.ENTITY_WOLF_AMBIENT, 1f, 1f);
 			owner.sendMessage(new TextComponentString(this.getName() + " leveled up!"));
+		}
+	}
+	
+	/**
+	 * Checks whether this wolf can start training the provided element.
+	 * Returns false if an element is already training, pup is maxed out on elements, or elements are
+	 * incompatible.
+	 * @param element
+	 * @return
+	 */
+	public boolean canTrainElement(EMagicElement element) {
+		// Already training?
+		if (this.getTrainingElement() != null) {
+			return false;
+		}
+		
+		// Already full secondary type?
+		final ArcaneWolfElementalType currentType = this.getElementalType();
+		if (currentType.getSecondary() != null) {
+			return false;
+		}
+		
+		// Primary incompatible with new element?
+		if (currentType.getPrimary() != null
+				&& ArcaneWolfElementalType.Match(currentType.getPrimary(), element) == null) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	protected void playTrainingFinishEffects() {
+		int unused;
+	}
+	
+	protected void finishTrainingElement(EMagicElement element) {
+		if (element == null || element == EMagicElement.PHYSICAL) {
+			return;
+		}
+		
+		final ArcaneWolfElementalType currentType = this.getElementalType();
+		final @Nullable ArcaneWolfElementalType result;
+		if (currentType.getPrimary() != null) {
+			if (currentType.secondary != null) {
+				result = null;
+			} else {
+				result = ArcaneWolfElementalType.Match(currentType.primary, element);
+			}
+		} else {
+			result = ArcaneWolfElementalType.Match(element);
+		}
+		
+		if (result != null) {
+			this.setElementalType(result);
+			playTrainingFinishEffects();
 		}
 	}
 	
