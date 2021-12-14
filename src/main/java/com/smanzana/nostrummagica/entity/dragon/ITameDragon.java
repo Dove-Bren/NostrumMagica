@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.entity.dragon;
 
 import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI;
 import com.smanzana.nostrummagica.entity.IEntityPet;
-import com.smanzana.nostrummagica.entity.PetInfo.PetAction;
+import com.smanzana.nostrummagica.pet.PetInfo.PetAction;
 
 import net.minecraft.entity.player.EntityPlayer;
 

@@ -4,8 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.render.TileEntityAetherInfuserRenderer;
-import com.smanzana.nostrummagica.client.render.TileEntityWispBlockRenderer;
+import com.smanzana.nostrummagica.client.render.tile.TileEntityAetherInfuserRenderer;
+import com.smanzana.nostrummagica.client.render.tile.TileEntityWispBlockRenderer;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuser;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock;
 import com.smanzana.nostrummagica.integration.aetheria.items.AetherResourceType;

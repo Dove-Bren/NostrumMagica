@@ -7,7 +7,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.entity.renderer.ModelAetherCloak;
+import com.smanzana.nostrummagica.client.render.entity.ModelAetherCloak;
 import com.smanzana.nostrummagica.items.ICapeProvider;
 
 import net.minecraft.client.entity.AbstractClientPlayer;

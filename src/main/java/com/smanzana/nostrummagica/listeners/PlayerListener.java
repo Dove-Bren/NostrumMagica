@@ -1182,6 +1182,14 @@ public class PlayerListener {
 	}
 	
 	protected Map<Entity, Vec3d> lastPosCache = new HashMap<>();
+	protected Map<Entity, Vec3d> lastMoveCache = new HashMap<>();
+	
+	protected void addEntity(Entity ent) {
+		if (!lastPosCache.containsKey(ent)) {
+			lastPosCache.put(ent, ent.getPositionVector());
+			lastMoveCache.put(ent, ent.getLook(.5f));
+		}
+	}
 	
 	/**
 	 * Returns the position of an entity at the end of server ticking the last time it happened.
@@ -1191,12 +1199,13 @@ public class PlayerListener {
 	 * @return
 	 */
 	public Vec3d getLastTickPos(Entity ent) {
-		Vec3d ret = lastPosCache.get(ent);
-		if (ret == null) {
-			ret = ent.getPositionVector();
-			lastPosCache.put(ent, ret);
-		}
-		return ret;
+		addEntity(ent);
+		return lastPosCache.get(ent);
+	}
+	
+	public Vec3d getLastMove(Entity ent) {
+		addEntity(ent);
+		return lastMoveCache.get(ent);
 	}
 	
 	protected void updateTrackedEntities() {
@@ -1207,7 +1216,13 @@ public class PlayerListener {
 			if (entry.getKey() == null || entry.getKey().isDead) {
 				it.remove();
 			} else {
-				entry.setValue(entry.getKey().getPositionVector());
+				Vec3d last = entry.getValue();
+				Vec3d cur = entry.getKey().getPositionVector();
+				entry.setValue(cur);
+				if (last.squareDistanceTo(cur) > .025) {
+					// Update movement
+					lastMoveCache.put(entry.getKey(), cur.subtract(last));
+				}
 			}
 		}
 	}

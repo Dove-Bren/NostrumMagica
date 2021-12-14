@@ -56,12 +56,27 @@ import com.smanzana.nostrummagica.client.gui.MirrorGui;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
 import com.smanzana.nostrummagica.client.model.MimicBlockBakedModel;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
-import com.smanzana.nostrummagica.client.render.TileEntityAltarRenderer;
-import com.smanzana.nostrummagica.client.render.TileEntityCandleRenderer;
-import com.smanzana.nostrummagica.client.render.TileEntityObeliskRenderer;
-import com.smanzana.nostrummagica.client.render.TileEntityPortalRenderer;
-import com.smanzana.nostrummagica.client.render.TileEntityProgressionDoorRenderer;
-import com.smanzana.nostrummagica.client.render.TileEntitySymbolRenderer;
+import com.smanzana.nostrummagica.client.render.entity.ModelGolem;
+import com.smanzana.nostrummagica.client.render.entity.RenderArcaneWolf;
+import com.smanzana.nostrummagica.client.render.entity.RenderDragonEgg;
+import com.smanzana.nostrummagica.client.render.entity.RenderDragonRed;
+import com.smanzana.nostrummagica.client.render.entity.RenderGolem;
+import com.smanzana.nostrummagica.client.render.entity.RenderHookShot;
+import com.smanzana.nostrummagica.client.render.entity.RenderKoid;
+import com.smanzana.nostrummagica.client.render.entity.RenderLux;
+import com.smanzana.nostrummagica.client.render.entity.RenderMagicSaucer;
+import com.smanzana.nostrummagica.client.render.entity.RenderShadowDragonRed;
+import com.smanzana.nostrummagica.client.render.entity.RenderSprite;
+import com.smanzana.nostrummagica.client.render.entity.RenderSwitchTrigger;
+import com.smanzana.nostrummagica.client.render.entity.RenderTameDragonRed;
+import com.smanzana.nostrummagica.client.render.entity.RenderWillo;
+import com.smanzana.nostrummagica.client.render.entity.RenderWisp;
+import com.smanzana.nostrummagica.client.render.tile.TileEntityAltarRenderer;
+import com.smanzana.nostrummagica.client.render.tile.TileEntityCandleRenderer;
+import com.smanzana.nostrummagica.client.render.tile.TileEntityObeliskRenderer;
+import com.smanzana.nostrummagica.client.render.tile.TileEntityPortalRenderer;
+import com.smanzana.nostrummagica.client.render.tile.TileEntityProgressionDoorRenderer;
+import com.smanzana.nostrummagica.client.render.tile.TileEntitySymbolRenderer;
 import com.smanzana.nostrummagica.command.CommandDebugClientEffect;
 import com.smanzana.nostrummagica.command.CommandInfoScreenGoto;
 import com.smanzana.nostrummagica.config.ModConfig;
@@ -82,21 +97,6 @@ import com.smanzana.nostrummagica.entity.dragon.EntityShadowDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
-import com.smanzana.nostrummagica.entity.renderer.ModelGolem;
-import com.smanzana.nostrummagica.entity.renderer.RenderArcaneWolf;
-import com.smanzana.nostrummagica.entity.renderer.RenderDragonEgg;
-import com.smanzana.nostrummagica.entity.renderer.RenderDragonRed;
-import com.smanzana.nostrummagica.entity.renderer.RenderGolem;
-import com.smanzana.nostrummagica.entity.renderer.RenderHookShot;
-import com.smanzana.nostrummagica.entity.renderer.RenderKoid;
-import com.smanzana.nostrummagica.entity.renderer.RenderLux;
-import com.smanzana.nostrummagica.entity.renderer.RenderMagicSaucer;
-import com.smanzana.nostrummagica.entity.renderer.RenderShadowDragonRed;
-import com.smanzana.nostrummagica.entity.renderer.RenderSprite;
-import com.smanzana.nostrummagica.entity.renderer.RenderSwitchTrigger;
-import com.smanzana.nostrummagica.entity.renderer.RenderTameDragonRed;
-import com.smanzana.nostrummagica.entity.renderer.RenderWillo;
-import com.smanzana.nostrummagica.entity.renderer.RenderWisp;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
@@ -153,8 +153,11 @@ import com.smanzana.nostrummagica.network.messages.BladeCastMessage;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
 import com.smanzana.nostrummagica.network.messages.ObeliskSelectMessage;
 import com.smanzana.nostrummagica.network.messages.ObeliskTeleportationRequestMessage;
+import com.smanzana.nostrummagica.network.messages.PetCommandMessage;
 import com.smanzana.nostrummagica.network.messages.SpellTomeIncrementMessage;
 import com.smanzana.nostrummagica.network.messages.StatRequestMessage;
+import com.smanzana.nostrummagica.pet.PetPlacementMode;
+import com.smanzana.nostrummagica.pet.PetTargetMode;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -172,6 +175,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.OtherTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProximityTrigger;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
+import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.IBakedModel;
@@ -196,6 +200,7 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -225,8 +230,15 @@ public class ClientProxy extends CommonProxy {
 	private KeyBinding bindingScroll;
 	private KeyBinding bindingInfo;
 	private KeyBinding bindingBladeCast;
+	private KeyBinding bindingPetPlacementModeCycle;
+	private KeyBinding bindingPetTargetModeCycle;
+	private KeyBinding bindingPetAttackAll;
+	private KeyBinding bindingPetAttack;
+	private KeyBinding bindingPetAllStop;
 	private OverlayRenderer overlayRenderer;
 	private ClientEffectRenderer effectRenderer;
+	
+	private @Nullable EntityLivingBase selectedPet; // Used for directing pets to do actions on key releases
 
 	public ClientProxy() {
 		super();
@@ -244,6 +256,16 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.registerKeyBinding(bindingInfo);
 		bindingBladeCast = new KeyBinding("key.bladecast.desc", Keyboard.KEY_R, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingBladeCast);
+		bindingPetPlacementModeCycle = new KeyBinding("key.pet.placementmode.desc", Keyboard.KEY_G, "key.nostrummagica.desc");
+		ClientRegistry.registerKeyBinding(bindingPetPlacementModeCycle);
+		bindingPetTargetModeCycle = new KeyBinding("key.pet.targetmode.desc", Keyboard.KEY_H, "key.nostrummagica.desc");
+		ClientRegistry.registerKeyBinding(bindingPetTargetModeCycle);
+		bindingPetAttackAll = new KeyBinding("key.pet.attackall.desc", Keyboard.KEY_X, "key.nostrummagica.desc");
+		ClientRegistry.registerKeyBinding(bindingPetAttackAll);
+		bindingPetAttack = new KeyBinding("key.pet.attack.desc", Keyboard.KEY_C, "key.nostrummagica.desc");
+		ClientRegistry.registerKeyBinding(bindingPetAttack);
+		bindingPetAllStop = new KeyBinding("key.pet.stopall.desc", Keyboard.KEY_L, "key.nostrummagica.desc");
+		ClientRegistry.registerKeyBinding(bindingPetAllStop);
 		
 		
     	
@@ -810,7 +832,94 @@ public class ClientProxy extends CommonProxy {
 				doBladeCast();
 			}
 			
+		} else if (bindingPetPlacementModeCycle.isPressed()) {
+			// Cycle placement mode
+			final PetPlacementMode current = NostrumMagica.getPetCommandManager().getPlacementMode(this.getPlayer());
+			final PetPlacementMode next = PetPlacementMode.values()[(current.ordinal() + 1) % PetPlacementMode.values().length];
+			
+			// Set up client to have this locally
+			NostrumMagica.getPetCommandManager().setPlacementMode(getPlayer(), next);
+			
+			// Update client icon
+			this.overlayRenderer.changePetPlacementIcon();
+			
+			// Send change to server
+			NetworkHandler.getSyncChannel().sendToServer(PetCommandMessage.AllPlacementMode(next));
+		} else if (bindingPetTargetModeCycle.isPressed()) {
+			// Cycle target mode
+			final PetTargetMode current = NostrumMagica.getPetCommandManager().getTargetMode(this.getPlayer());
+			final PetTargetMode next = PetTargetMode.values()[(current.ordinal() + 1) % PetTargetMode.values().length];
+			
+			// Update client icon
+			this.overlayRenderer.changePetTargetIcon();
+			
+			// Set up client to have this locally
+			NostrumMagica.getPetCommandManager().setTargetMode(getPlayer(), next);
+			
+			// Send change to server
+			NetworkHandler.getSyncChannel().sendToServer(PetCommandMessage.AllTargetMode(next));
+		} else if (bindingPetAttackAll.isPressed()) {
+			// Raytrace, find tar get, and set all to attack
+			final EntityPlayer player = getPlayer();
+			if (player != null && player.world != null) {
+				final float partialTicks = Minecraft.getMinecraft().getRenderPartialTicks();
+				final List<EntityLivingBase> tames = NostrumMagica.getTamedEntities(player);
+				RayTraceResult result = RayTrace.raytraceApprox(
+						player.world,
+						player.getPositionEyes(partialTicks),
+						player.getLook(partialTicks),
+						100, (e) -> { return e != player && e instanceof EntityLivingBase && !player.isOnSameTeam(e) && !tames.contains(e);},
+						1);
+				if (result != null && result.entityHit != null) {
+					NetworkHandler.getSyncChannel().sendToServer(PetCommandMessage.AllAttack((EntityLivingBase) result.entityHit));
+				}
+			}
+		} else if (bindingPetAttack.isPressed()) {
+			// Raytrace, find target, and then make single one attack
+			// Probably could be same button but if raytrace is our pet,
+			// have them hold it down and release on an enemy? Or 'select' them
+			// and have them press again to select enemy?
+			final EntityPlayer player = getPlayer();
+			if (player != null && player.world != null) {
+				final float partialTicks = Minecraft.getMinecraft().getRenderPartialTicks();
+				final List<EntityLivingBase> tames = NostrumMagica.getTamedEntities(player);
+				if (selectedPet == null) {
+					// Try and select a pet
+					RayTraceResult result = RayTrace.raytraceApprox(
+							player.world,
+							player.getPositionEyes(partialTicks),
+							player.getLook(partialTicks),
+							100, (e) -> { return e != player && tames.contains(e);},
+							.1);
+					if (result != null && result.entityHit != null) {
+						selectedPet = (EntityLivingBase) result.entityHit;
+						if (selectedPet.world.isRemote) {
+							selectedPet.setGlowing(true);
+						}
+					}
+				} else {
+					// Find target
+					RayTraceResult result = RayTrace.raytraceApprox(
+							player.world,
+							player.getPositionEyes(partialTicks),
+							player.getLook(partialTicks),
+							100, (e) -> { return e != player && e instanceof EntityLivingBase && !player.isOnSameTeam(e) && !tames.contains(e);},
+							1);
+					if (result != null && result.entityHit != null) {
+						NetworkHandler.getSyncChannel().sendToServer(PetCommandMessage.PetAttack(selectedPet, (EntityLivingBase) result.entityHit));
+					}
+					
+					// Clear out pet
+					if (selectedPet.world.isRemote) {
+						selectedPet.setGlowing(false);
+					}
+					selectedPet = null;
+				}
+			}
+		} else if (bindingPetAllStop.isPressed()) {
+			NetworkHandler.getSyncChannel().sendToServer(PetCommandMessage.AllStop());
 		}
+		
 	}
 	
 	private void doBladeCast() {
@@ -1751,5 +1860,9 @@ public class ClientProxy extends CommonProxy {
 		}
 		
 		super.playRitualEffect(world, pos, element, center, extras, types, output);
+	}
+	
+	public @Nullable EntityLivingBase getCurrentPet() {
+		return this.selectedPet;
 	}
 }

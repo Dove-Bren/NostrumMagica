@@ -16,6 +16,7 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.EntityKoid;
+import com.smanzana.nostrummagica.entity.EntityWillo;
 import com.smanzana.nostrummagica.entity.IEntityTameable;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
 import com.smanzana.nostrummagica.integration.enderio.wrappers.IItemOfTravelWrapper;
@@ -317,6 +318,9 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 		} else if (target instanceof EntityKoid) {
 			EntityKoid koid = (EntityKoid) target;
 			awardExperience(stack, koid.getElement());
+		} else if (target instanceof EntityWillo) {
+			EntityWillo willo = (EntityWillo) target;
+			awardExperience(stack, willo.getElement());
 		}
 		
 		return super.hitEntity(stack, target, attacker);

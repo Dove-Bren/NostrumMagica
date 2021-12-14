@@ -456,4 +456,86 @@ public final class RenderFuncs {
 		
 		return 0;
 	}
+	
+//	private static @Nullable RenderGlobal cachedRenderGlobal = null;
+//	private static @Nullable Field cachedRenderGlobal_outlineFrameBuffer = null;
+//	private static @Nullable Field cachedRenderGlobal_outlineShader = null;
+//	
+//	private static final RenderGlobal getCachedRenderGlobal() {
+//		if (cachedRenderGlobal == null) {
+//			// Pull fields and methods from new Global
+//			try {
+//				cachedRenderGlobal_outlineFrameBuffer = ObfuscationReflectionHelper.findField(RenderGlobal.class, "field_175015_z"); // "entityOutlineFramebuffer"
+//				cachedRenderGlobal_outlineShader = ObfuscationReflectionHelper.findField(RenderGlobal.class, "field_174991_A"); // "entityOutlineShader"
+//			} catch (Exception e) {
+//				NostrumMagica.logger.error("Failed to get renderer fields. Highlighting will not work!");
+//				cachedRenderGlobal_outlineFrameBuffer = null;
+//				cachedRenderGlobal_outlineShader = null;
+//			}
+//		}
+//		cachedRenderGlobal = Minecraft.getMinecraft().renderGlobal;
+//			
+//		return cachedRenderGlobal;
+//	}
+	
+	public static final void renderEntityOutline(Entity e, float partialTicks) {
+		if (!e.world.isRemote) {
+			return;
+		}
+		
+		e.setGlowing(true); // Best we can do?
+		
+//		RenderGlobal global = getCachedRenderGlobal();
+//		
+//		if (global == null || cachedRenderGlobal_outlineFrameBuffer == null) {
+//			e.setGlowing(true);
+//			return; // Best we can do?
+//		}
+		
+//		final Minecraft mc = Minecraft.getMinecraft();
+//		
+//		GlStateManager.depthFunc(519);
+//		GlStateManager.disableFog();
+//		GlStateManager.color(1f, 1f, 0f, 1f);
+//		
+//		try {
+//			final RenderManager renderManager = ObfuscationReflectionHelper.getPrivateValue(RenderGlobal.class, global, "field_175010_j"); // "renderManager"
+//			
+//			//this.entityOutlineFramebuffer.bindFramebuffer(false);
+//			((Framebuffer)(cachedRenderGlobal_outlineFrameBuffer.get(global))).bindFramebuffer(false);
+//			RenderHelper.disableStandardItemLighting();
+//			//this.renderManager.setRenderOutlines(true);
+//			renderManager.setRenderOutlines(true);
+//			
+//			//this.renderManager.renderEntityStatic(list1.get(j), partialTicks, false);
+//			renderManager.renderEntityStatic(e, partialTicks, false);
+//			
+//			//this.renderManager.setRenderOutlines(false);
+//			renderManager.setRenderOutlines(false);
+//			RenderHelper.enableStandardItemLighting();
+//			GlStateManager.depthMask(false);
+//			//this.entityOutlineShader.render(partialTicks);
+//			((ShaderGroup)cachedRenderGlobal_outlineShader.get(global)).render(partialTicks);
+//			
+//			ObfuscationReflectionHelper.setPrivateValue(RenderGlobal.class, global, true, "field_184386_ad"); // entityOutlinesRendered
+//			
+//		} catch (Exception exception) {
+//			System.out.print(".");
+//		}
+//		
+//		GlStateManager.enableLighting();
+//		GlStateManager.depthMask(true);
+////		GlStateManager.enableFog();
+//		GlStateManager.enableBlend();
+//		GlStateManager.enableColorMaterial();
+//		GlStateManager.depthFunc(515);
+//		GlStateManager.enableDepth();
+//		GlStateManager.enableAlpha();
+//
+//		mc.getFramebuffer().bindFramebuffer(false);
+//		global.renderEntityOutlineFramebuffer();
+//		mc.getFramebuffer().bindFramebuffer(false);
+//		GlStateManager.enableBlend();
+//		GlStateManager.tryBlendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+	}
 }

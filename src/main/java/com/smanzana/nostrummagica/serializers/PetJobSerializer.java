@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.serializers;
 
 import java.io.IOException;
 
-import com.smanzana.nostrummagica.entity.PetInfo;
+import com.smanzana.nostrummagica.pet.PetInfo;
 
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;

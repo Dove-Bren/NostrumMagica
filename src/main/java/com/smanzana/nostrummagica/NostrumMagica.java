@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.blocks.ActiveHopper;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
@@ -53,6 +54,9 @@ import com.smanzana.nostrummagica.entity.IEntityTameable;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
+import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowOwnerAdvanced;
+import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowOwnerGeneric;
+import com.smanzana.nostrummagica.entity.tasks.EntityAIPetTargetTask;
 import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
 import com.smanzana.nostrummagica.integration.baubles.BaublesProxy;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
@@ -109,6 +113,7 @@ import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
 import com.smanzana.nostrummagica.listeners.PlayerListener;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
+import com.smanzana.nostrummagica.pet.PetCommandManager;
 import com.smanzana.nostrummagica.pet.PetSoulRegistry;
 import com.smanzana.nostrummagica.proxy.CommonProxy;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
@@ -178,8 +183,12 @@ import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IEntityOwnable;
+import net.minecraft.entity.ai.EntityAIFollowOwner;
+import net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
@@ -196,6 +205,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -240,6 +250,7 @@ public class NostrumMagica
     private static SpellRegistry spellRegistry;
     private static NostrumDimensionMapper serverDimensionMapper;
     private static PetSoulRegistry petSoulRegistry;
+    private static PetCommandManager petCommandManager;
     
     public static boolean initFinished = false;
     
@@ -2709,6 +2720,32 @@ public class NostrumMagica
     	return ents;
     }
     
+    public static @Nullable EntityLivingBase getOwner(EntityLiving entity) {
+    	EntityLivingBase ent = (EntityLivingBase) entity;
+		if (ent instanceof IEntityTameable) {
+			IEntityTameable tame = (IEntityTameable) ent;
+			return tame.getOwner();
+		} else if (ent instanceof EntityTameable) {
+			EntityTameable tame = (EntityTameable) ent;
+			return tame.getOwner();
+		} else if (ent instanceof IEntityOwnable) {
+			IEntityOwnable tame = (IEntityOwnable) ent;
+			if (tame.getOwner() instanceof EntityLivingBase) {
+				return (EntityLivingBase) tame.getOwner();
+			}
+		}
+		return null;
+    }
+    
+    public static @Nullable Entity getEntityByUUID(World world, UUID id) {
+    	for (Entity e : world.loadedEntityList) {
+    		if (e.getUniqueID().equals(id)) {
+    			return e;
+    		}
+    	}
+    	return null;
+    }
+    
     public static SpellRegistry getSpellRegistry() {
     	if (spellRegistry == null) {
     		if (proxy.isServer()) {
@@ -2724,7 +2761,7 @@ public class NostrumMagica
     public static PetSoulRegistry getPetSoulRegistry() {
     	if (petSoulRegistry == null) {
     		if (proxy.isServer()) {
-    			throw new RuntimeException("Accessing SpellRegistry before a world has been loaded!");
+    			throw new RuntimeException("Accessing PetSoulRegistry before a world has been loaded!");
     		} else {
     			petSoulRegistry = new PetSoulRegistry();
     		}
@@ -2732,6 +2769,17 @@ public class NostrumMagica
     	return petSoulRegistry;
     }
     
+    
+    public static PetCommandManager getPetCommandManager() {
+    	if (petCommandManager == null) {
+    		if (proxy.isServer()) {
+    			throw new RuntimeException("Accessing PetCommandManager before a world has been loaded!");
+    		} else {
+    			petCommandManager = new PetCommandManager();
+    		}
+    	}
+    	return petCommandManager;
+    }
     /**
      * Finds (or creates) the offset for a player in the sorcery dimension
      * @param player
@@ -2781,6 +2829,16 @@ public class NostrumMagica
     	}
     }
     
+    private void initPetCommandManager(World world) {
+    	petCommandManager = (PetCommandManager) world.getMapStorage().getOrLoadData(
+    			PetCommandManager.class, PetCommandManager.DATA_NAME);
+    	
+    	if (petCommandManager == null) {
+    		petCommandManager = new PetCommandManager();
+			world.getMapStorage().setData(PetCommandManager.DATA_NAME, petCommandManager);
+    	}
+    }
+    
     @SubscribeEvent
     public void onWorldLoad(WorldEvent.Load event) {
     	// Keeping a static reference since some places want to access the registry that don't have world info.
@@ -2800,6 +2858,7 @@ public class NostrumMagica
 			initSpellRegistry(event.getWorld());
 			getDimensionMapper(event.getWorld());
 			initPetSoulRegistry(event.getWorld());
+			initPetCommandManager(event.getWorld());
 		}
     }
     
@@ -2848,4 +2907,91 @@ public class NostrumMagica
 		// Assume mobs are on a different team than anything else
 		return (ent1 instanceof IMob == ent2 instanceof IMob);
 	}
+    
+    @SubscribeEvent
+    public void onEntitySpawn(EntityJoinWorldEvent e) {
+    	if (e.isCanceled()) {
+    		return;
+    	}
+    	
+    	if (!(e.getEntity() instanceof EntityLiving)) {
+    		return;
+    	}
+    	
+    	if (!(e.getEntity() instanceof EntityTameable)
+    			&& !(e.getEntity() instanceof IEntityTameable)
+    			&& !(e.getEntity() instanceof IEntityOwnable)) {
+    		return;
+    	}
+    	
+    	final EntityLiving living = (EntityLiving) e.getEntity();
+    	
+    	// Follow task for pets
+    	{
+	    	EntityAITaskEntry existingTask = null;
+	    	EntityAITaskEntry followTask = null;
+	    	
+	    	// Scan for existing task
+	    	for (EntityAITaskEntry entry : living.tasks.taskEntries) {
+	    		if (entry.action instanceof EntityAIFollowOwnerAdvanced) {
+	    			if (existingTask == null) {
+	    				existingTask = entry;
+	    			} else if (existingTask.priority > entry.priority) {
+	    				existingTask = entry; // cause > priority means less priority lol
+	    			}
+	    		} else if (entry.action instanceof EntityAIFollowOwner
+	    				|| entry.action instanceof EntityAIFollowOwnerGeneric) {
+	    			if (followTask == null) {
+	    				followTask = entry;
+	    			} else if (followTask.priority > entry.priority) {
+	    				followTask = entry;
+	    			}
+	    		}
+	    	}
+	    	
+	    	if (existingTask == null) {
+	    		// Gotta inject task. May have to make space for it.
+	    		EntityAIFollowOwnerAdvanced<EntityLiving> task = new EntityAIFollowOwnerAdvanced<EntityLiving>(living, 1.5f, 0f, .5f);
+	    		if (followTask == null) {
+	    			// Can just add at end
+	    			living.tasks.addTask(100, task);
+	    		} else {
+	    			List<EntityAITaskEntry> removes = Lists.newArrayList(living.tasks.taskEntries);
+	    			final int priority = followTask.priority;
+	    			removes.removeIf((entry) -> { return entry.priority < priority; });
+	    			
+	    			living.tasks.addTask(priority, task);
+	    			for (EntityAITaskEntry entry : removes) {
+	    				living.tasks.removeTask(entry.action);
+	    				living.tasks.addTask(entry.priority+1, entry.action);
+	    			}
+	    		}
+	    	}
+    	}
+    	
+    	// Target task for pets
+    	if (living instanceof EntityCreature)
+    	{
+    		EntityCreature creature = (EntityCreature) living;
+    		boolean hasTaskAlready = false;
+	    	
+	    	// Scan for existing task
+	    	for (EntityAITaskEntry entry : living.targetTasks.taskEntries) {
+	    		if (entry.action instanceof EntityAIPetTargetTask) {
+	    			hasTaskAlready = true;
+	    			break;
+	    		}
+	    	}
+	    	
+	    	if (!hasTaskAlready) {
+	    		List<EntityAITaskEntry> removes = Lists.newArrayList(living.targetTasks.taskEntries);
+    			
+    			living.targetTasks.addTask(1, new EntityAIPetTargetTask<EntityCreature>(creature));
+    			for (EntityAITaskEntry entry : removes) {
+    				living.targetTasks.removeTask(entry.action);
+    				living.targetTasks.addTask(entry.priority+1, entry.action);
+    			}
+	    	}
+    	}
+    }
 }

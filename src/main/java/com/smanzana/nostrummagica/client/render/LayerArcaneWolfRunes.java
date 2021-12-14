@@ -1,8 +1,8 @@
 package com.smanzana.nostrummagica.client.render;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.render.entity.RenderArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
-import com.smanzana.nostrummagica.entity.renderer.RenderArcaneWolf;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;

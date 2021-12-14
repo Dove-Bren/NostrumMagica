@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.client.render;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.entity.renderer.ModelDragonFlightWings;
+import com.smanzana.nostrummagica.client.render.entity.ModelDragonFlightWings;
 import com.smanzana.nostrummagica.items.IDragonWingRenderItem;
 
 import net.minecraft.client.entity.AbstractClientPlayer;

@@ -29,9 +29,6 @@ import com.smanzana.nostrummagica.client.render.LayerCustomElytra;
 import com.smanzana.nostrummagica.client.render.LayerDragonFlightWings;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.IEntityPet;
-import com.smanzana.nostrummagica.entity.PetInfo;
-import com.smanzana.nostrummagica.entity.PetInfo.PetAction;
-import com.smanzana.nostrummagica.entity.PetInfo.SecondaryFlavor;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.HookshotItem;
@@ -41,6 +38,12 @@ import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.pet.PetInfo;
+import com.smanzana.nostrummagica.pet.PetInfo.PetAction;
+import com.smanzana.nostrummagica.pet.PetInfo.SecondaryFlavor;
+import com.smanzana.nostrummagica.pet.PetPlacementMode;
+import com.smanzana.nostrummagica.pet.PetTargetMode;
+import com.smanzana.nostrummagica.proxy.ClientProxy;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
@@ -73,6 +76,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
@@ -152,16 +156,31 @@ public class OverlayRenderer extends Gui {
 	private static final int GUI_HEALTHBAR_ICON_ATTACK_VOFFSET = GUI_HEALTHBAR_ICON_STAY_VOFFSET + GUI_HEALTHBAR_ICON_LENGTH;
 	private static final int GUI_HEALTHBAR_ICON_WORK_VOFFSET = GUI_HEALTHBAR_ICON_ATTACK_VOFFSET + GUI_HEALTHBAR_ICON_LENGTH;
 	
+	private static final ResourceLocation GUI_PET_ICONS = new ResourceLocation(NostrumMagica.MODID, "textures/gui/pet_icons.png");
+	//private static final int GUI_PET_ICONS_DIMS = 256;
+	private static final int GUI_PET_ICON_DIMS = 32;
+	private static final int GUI_PET_ICON_TARGET_HOFFSET = 0;
+	private static final int GUI_PET_ICON_TARGET_VOFFSET = 0;
+	private static final int GUI_PET_ICON_PLACEMENT_HOFFSET = 0;
+	private static final int GUI_PET_ICON_PLACEMENT_VOFFSET = GUI_PET_ICON_DIMS;
+	
 	private int wiggleIndex; // set to multiples of 12 for each wiggle
 	private static final int wiggleOffsets[] = {0, 1, 1, 2, 1, 1, 0, -1, -1, -2, -1, -1};
 	
 	private int wingIndex; // Controls mana wing animation. Set to -wingAnimDur to play backwards.
-	private static final int wingAnimDur = 20; 
+	private static final int wingAnimDur = 20;
+	
+	private int petTargetIndex; // Controls displaying pet target icon (fade in/out 50%)
+	private int petTargetAnimDur = 80;
+	private int petPlacementIndex; // Controls displaying pet placement icon (fade in/out at 50%)
+	private int petPlacementAnimDur = 80;
 	
 	public OverlayRenderer() {
 		MinecraftForge.EVENT_BUS.register(this);
 		wiggleIndex = 0;
 		wingIndex = 0;
+		petTargetIndex = -1;
+		petPlacementIndex = -1;
 	}
 	
 	@SubscribeEvent
@@ -316,6 +335,25 @@ public class OverlayRenderer extends Gui {
 					if (result != null && result.entityHit != null) {
 						renderCrosshairTargetOverlay(player, scaledRes);
 					}
+				}
+			}
+			
+			final float ticks = player.ticksExisted + event.getPartialTicks();
+			if (petTargetIndex >= 0) {
+				PetTargetMode mode = NostrumMagica.getPetCommandManager().getTargetMode(player);
+				renderPetActionTargetMode(player, scaledRes, mode, (ticks - petTargetIndex) / (float) petTargetAnimDur);
+				
+				if (ticks >= petTargetIndex + petTargetAnimDur) {
+					petTargetIndex = -1;
+				}
+			}
+			
+			if (petPlacementIndex >= 0) {
+				PetPlacementMode mode = NostrumMagica.getPetCommandManager().getPlacementMode(player);
+				renderPetActionPlacementMode(player, scaledRes, mode, (ticks - petPlacementIndex) / (float) petPlacementAnimDur);
+				
+				if (ticks >= petPlacementIndex + petPlacementAnimDur) {
+					petPlacementIndex = -1;
 				}
 			}
 		} else if (event.getType() == ElementType.POTION_ICONS) {
@@ -788,6 +826,63 @@ public class OverlayRenderer extends Gui {
 		GlStateManager.popMatrix();
 	}
 	
+	private void renderPetActionTargetMode(EntityPlayerSP player, ScaledResolution scaledResolution, PetTargetMode mode, float prog) {
+		final float alpha;
+		if (prog < .2f) {
+			alpha = prog / .2f;
+		} else if (prog >= .8f) {
+			alpha = (1f-prog) / .2f;
+		} else {
+			alpha = 1f;
+		}
+		
+		final int u = GUI_PET_ICON_TARGET_HOFFSET + (mode.ordinal() * GUI_PET_ICON_DIMS);
+		final int v = GUI_PET_ICON_TARGET_VOFFSET; // + (mode.ordinal() * GUI_PET_ICON_DIMS);
+		
+		GlStateManager.pushMatrix();
+		GlStateManager.enableBlend();
+		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+		GlStateManager.color(1f, 1f, 1f, alpha * .6f);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_PET_ICONS);
+		
+		GlStateManager.translate(scaledResolution.getScaledWidth() / 2, scaledResolution.getScaledHeight() / 2, 0);
+		GlStateManager.scale(.5, .5, .5);
+		GlStateManager.translate(1, 1, 0);
+		
+		drawTexturedModalRect(0, 0, u, v, GUI_PET_ICON_DIMS, GUI_PET_ICON_DIMS);
+		
+		GlStateManager.disableBlend();
+		GlStateManager.popMatrix();
+	}
+	
+	private void renderPetActionPlacementMode(EntityPlayerSP player, ScaledResolution scaledResolution, PetPlacementMode mode, float prog) {
+		final float alpha;
+		if (prog < .2f) {
+			alpha = prog / .2f;
+		} else if (prog >= .8f) {
+			alpha = (1f-prog) / .2f;
+		} else {
+			alpha = 1f;
+		}
+		final int u = GUI_PET_ICON_PLACEMENT_HOFFSET + (mode.ordinal() * GUI_PET_ICON_DIMS);
+		final int v = GUI_PET_ICON_PLACEMENT_VOFFSET; // + (mode.ordinal() * GUI_PET_ICON_DIMS);
+		
+		GlStateManager.pushMatrix();
+		GlStateManager.enableBlend();
+		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+		GlStateManager.color(1f, 1f, 1f, alpha * .6f);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(GUI_PET_ICONS);
+		
+		GlStateManager.translate(scaledResolution.getScaledWidth() / 2, scaledResolution.getScaledHeight() / 2, 0);
+		GlStateManager.scale(.5, .5, .5);
+		GlStateManager.translate(-(GUI_PET_ICON_DIMS + 1), 1, 0);
+		
+		drawTexturedModalRect(0, 0, u, v, GUI_PET_ICON_DIMS, GUI_PET_ICON_DIMS);
+		
+		GlStateManager.disableBlend();
+		GlStateManager.popMatrix();
+	}
+	
 	private void renderContingencyShield(EntityPlayerSP player, ScaledResolution scaledResolution, int typeOffset, int xoffset, float timer) {
 		final int left = (scaledResolution.getScaledWidth() / 2 + 91) + 10 + (xoffset * GUI_CONTINGENCY_ICON_LENGTH);
 		final int top = scaledResolution.getScaledHeight() - (2 + GUI_CONTINGENCY_ICON_LENGTH);
@@ -1133,6 +1228,32 @@ public class OverlayRenderer extends Gui {
 		}
 	}
 	
+	public void changePetTargetIcon() {
+		final EntityPlayerSP player = Minecraft.getMinecraft().player;
+		if (petTargetIndex < 0) {
+			// Brand new animation
+			petTargetIndex = player.ticksExisted;
+		} else if (player.ticksExisted - petTargetIndex > petTargetAnimDur/2) {
+			// Reset to halfway point
+			petTargetIndex = player.ticksExisted - petTargetAnimDur/2;
+		} else {
+			; // Fading in, leave alone and just swap out the icon
+		}
+	}
+	
+	public void changePetPlacementIcon() {
+		final EntityPlayerSP player = Minecraft.getMinecraft().player;
+		if (petPlacementIndex < 0) {
+			// Brand new animation
+			petPlacementIndex = player.ticksExisted;
+		} else if (player.ticksExisted - petPlacementIndex > petPlacementAnimDur/2) {
+			// Reset to halfway point
+			petPlacementIndex = player.ticksExisted - petPlacementAnimDur/2;
+		} else {
+			; // Fading in, leave alone and just swap out the icon
+		}
+	}
+	
 	private void renderLoreIcon(Boolean loreIsDeep) {
 		
 		GlStateManager.enableBlend();
@@ -1267,9 +1388,32 @@ public class OverlayRenderer extends Gui {
 		}
 	}
 	
+	private boolean renderRecurseMarker = false;
+	
 	@SubscribeEvent
 	public void onEntityRender(RenderLivingEvent.Post<EntityLivingBase> event) {
-		renderRoots(event.getEntity());
+		if (!renderRecurseMarker) {
+			final EntityLivingBase entity = event.getEntity();
+			//final float partialTicks = event.getPartialRenderTick();
+			renderRecurseMarker = true;
+			{
+				renderRoots(event.getEntity());
+				
+				// If selected entity, render with outline
+				if (MinecraftForgeClient.getRenderPass() == 0)
+				if (((ClientProxy) NostrumMagica.proxy).getCurrentPet() == entity) {
+					
+//					GlStateManager.depthFunc(GL11.GL_ALWAYS); //519
+//					//event.getRenderer().setRenderOutlines(true);
+//					final float yaw = entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks;
+//					event.getRenderer().doRender(entity, event.getX(), event.getY(), event.getZ(), yaw, partialTicks);
+//					event.getRenderer().setRenderOutlines(false);
+					
+					//RenderFuncs.renderEntityOutline(entity, partialTicks); Want this to work so we can color and stuff :(
+				}
+			}
+			renderRecurseMarker = false;
+		}
 	}
 	
 	@SubscribeEvent

@@ -16,6 +16,8 @@ import com.smanzana.nostrummagica.network.messages.ManaMessage;
 import com.smanzana.nostrummagica.network.messages.ModifyMessage;
 import com.smanzana.nostrummagica.network.messages.ObeliskSelectMessage;
 import com.smanzana.nostrummagica.network.messages.ObeliskTeleportationRequestMessage;
+import com.smanzana.nostrummagica.network.messages.PetCommandMessage;
+import com.smanzana.nostrummagica.network.messages.PetCommandSettingsSyncMessage;
 import com.smanzana.nostrummagica.network.messages.ReagentBagToggleMessage;
 import com.smanzana.nostrummagica.network.messages.RuneBagToggleMessage;
 import com.smanzana.nostrummagica.network.messages.SpawnNostrumParticleMessage;
@@ -95,6 +97,8 @@ public class NetworkHandler {
 		syncChannel.registerMessage(BladeCastMessage.Handler.class, BladeCastMessage.class, discriminator++, Side.SERVER);
 		syncChannel.registerMessage(SpawnNostrumRitualEffectMessage.Handler.class, SpawnNostrumRitualEffectMessage.class, discriminator++, Side.CLIENT);
 		syncChannel.registerMessage(SpawnPredefinedEffectMessage.Handler.class, SpawnPredefinedEffectMessage.class, discriminator++, Side.CLIENT);
+		syncChannel.registerMessage(PetCommandMessage.Handler.class, PetCommandMessage.class, discriminator++, Side.SERVER);
+		syncChannel.registerMessage(PetCommandSettingsSyncMessage.Handler.class, PetCommandSettingsSyncMessage.class, discriminator++, Side.CLIENT);
 	}
 	
 }

@@ -7,9 +7,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
-import com.smanzana.nostrummagica.entity.PetInfo.PetAction;
-import com.smanzana.nostrummagica.entity.PetInfo.SecondaryFlavor;
 import com.smanzana.nostrummagica.pet.IPetWithSoul;
+import com.smanzana.nostrummagica.pet.PetInfo;
+import com.smanzana.nostrummagica.pet.PetInfo.PetAction;
+import com.smanzana.nostrummagica.pet.PetInfo.SecondaryFlavor;
 import com.smanzana.nostrummagica.serializers.PetJobSerializer;
 
 import net.minecraft.entity.Entity;
@@ -91,7 +92,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
-		//this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.2D);
+		this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.35D);
 		this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(50.0D);
 		this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(10.0D);
 		this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(60.0);
@@ -137,7 +138,6 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 	@Override
 	public void onUpdate() {
 		super.onUpdate();
-		
 	}
 	
 	@Override
@@ -768,5 +768,5 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 			owner.sendMessage(new TextComponentString(this.getName() + " leveled up!"));
 		}
 	}
-
+	
 }
