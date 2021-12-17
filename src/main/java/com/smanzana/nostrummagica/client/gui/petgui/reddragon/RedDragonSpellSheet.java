@@ -1,14 +1,15 @@
-package com.smanzana.nostrummagica.client.gui.dragongui;
+package com.smanzana.nostrummagica.client.gui.petgui.reddragon;
 
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
-import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonContainer;
+import com.smanzana.nostrummagica.client.gui.petgui.IPetGUISheet;
+import com.smanzana.nostrummagica.client.gui.petgui.PetGUI;
+import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonGambit;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed.RedDragonSpellInventory;
-import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -29,7 +30,7 @@ import net.minecraftforge.fml.client.config.GuiUtils;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class RedDragonSpellSheet implements IDragonGUISheet {
+public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	
 	// Position stuff.
 	private static final int cellWidth = 18;
@@ -39,14 +40,14 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 	private static final int dragonTopOffset = 10;
 	private static final int playerInvSize = 27 + 9;
 	private static final int rowMargin = 2;
-	private static final int rowHMargin = 8 + TamedDragonGUI.GUI_TEX_TOGGLE_LENGTH;
-	private static final int toggleSize = TamedDragonGUI.GUI_TEX_TOGGLE_LENGTH;
+	private static final int rowHMargin = 8 + PetGUI.GUI_TEX_TOGGLE_LENGTH;
+	private static final int toggleSize = PetGUI.GUI_TEX_TOGGLE_LENGTH;
 	private static final int rowIncr = cellWidth + toggleSize + rowMargin;
 	
 	private EntityTameDragonRed dragon;
 	private RedDragonSpellInventory dragonInv;
 	private IInventory playerInv;
-	private DragonContainer container;
+	private PetContainer<EntityTameDragonRed> container;
 	private int width;
 	private int height;
 	private int offsetX;
@@ -64,8 +65,8 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 //		final int dragonTopOffset = 10;
 //		final int playerInvSize = 27 + 9; // Chop off equipment slots!
 //		final int rowMargin = 2;
-//		final int rowHMargin = 8 + TamedDragonGUI.GUI_TEX_TOGGLE_LENGTH;
-//		final int toggleSize = TamedDragonGUI.GUI_TEX_TOGGLE_LENGTH;
+//		final int rowHMargin = 8 + PetGUI.GUI_TEX_TOGGLE_LENGTH;
+//		final int toggleSize = PetGUI.GUI_TEX_TOGGLE_LENGTH;
 //		final int rowIncr = cellWidth + toggleSize + rowMargin;
 		
 		int lastCount = 0;
@@ -113,7 +114,7 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 	}
 	
 	@Override
-	public void showSheet(ITameDragon dragon, EntityPlayer player, DragonContainer container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(EntityTameDragonRed dragon, EntityPlayer player, PetContainer<EntityTameDragonRed> container, int width, int height, int offsetX, int offsetY) {
 		this.container = container;
 		this.dragonInv = this.dragon.getSpellInventory();
 		this.playerInv = player.inventory;
@@ -131,7 +132,7 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 	}
 
 	@Override
-	public void hideSheet(ITameDragon dragon, EntityPlayer player, DragonContainer container) {
+	public void hideSheet(EntityTameDragonRed dragon, EntityPlayer player, PetContainer<EntityTameDragonRed> container) {
 		container.clearSlots();
 	}
 	
@@ -139,7 +140,7 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 		final int cellWidth = 18;
 		GlStateManager.color(1f, 1f, 1f, 1f);
 		Gui.drawModalRectWithCustomSizedTexture(x, y,
-				TamedDragonGUI.GUI_TEX_CELL_HOFFSET, TamedDragonGUI.GUI_TEX_CELL_VOFFSET,
+				PetGUI.GUI_TEX_CELL_HOFFSET, PetGUI.GUI_TEX_CELL_VOFFSET,
 				cellWidth, cellWidth,
 				256, 256);
 	}
@@ -155,18 +156,18 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 		
 		GlStateManager.color(1f, 1f, 1f, 1f);
 		Gui.drawModalRectWithCustomSizedTexture(x, y,
-				TamedDragonGUI.GUI_TEX_CELL_HOFFSET + cellWidth, TamedDragonGUI.GUI_TEX_CELL_VOFFSET,
+				PetGUI.GUI_TEX_CELL_HOFFSET + cellWidth, PetGUI.GUI_TEX_CELL_VOFFSET,
 				cellWidth, cellWidth,
 				256, 256);
 		
-		mc.getTextureManager().bindTexture(TamedDragonGUI.DragonGUI.TEXT);
+		mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
 	}
 	
 	private void drawShadowCell(Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
 		GlStateManager.color(.7f, .71f, .7f, .4f);
 		Gui.drawModalRectWithCustomSizedTexture(x, y,
-				TamedDragonGUI.GUI_TEX_CELL_HOFFSET, TamedDragonGUI.GUI_TEX_CELL_VOFFSET,
+				PetGUI.GUI_TEX_CELL_HOFFSET, PetGUI.GUI_TEX_CELL_VOFFSET,
 				cellWidth, cellWidth,
 				256, 256);
 	}
@@ -175,7 +176,7 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 		final int cellWidth = 18;
 		GlStateManager.color(.2f, .2f, .2f, .4f);
 		Gui.drawModalRectWithCustomSizedTexture(x, y,
-				TamedDragonGUI.GUI_TEX_CELL_HOFFSET, TamedDragonGUI.GUI_TEX_CELL_VOFFSET,
+				PetGUI.GUI_TEX_CELL_HOFFSET, PetGUI.GUI_TEX_CELL_VOFFSET,
 				cellWidth, cellWidth,
 				256, 256);
 	}
@@ -185,11 +186,11 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 		if (gambit != null) {
 			texOffset = gambit.getTexOffsetX();
 		}
-		mc.getTextureManager().bindTexture(TamedDragonGUI.DragonGUI.TEXT);
+		mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
 		GlStateManager.color(1f, 1f, 1f, 1f);
 		Gui.drawModalRectWithCustomSizedTexture(x, y,
-				TamedDragonGUI.GUI_TEX_TOGGLE_HOFFSET + texOffset,
-				TamedDragonGUI.GUI_TEX_TOGGLE_VOFFSET,
+				PetGUI.GUI_TEX_TOGGLE_HOFFSET + texOffset,
+				PetGUI.GUI_TEX_TOGGLE_VOFFSET,
 				toggleSize, toggleSize,
 				256, 256);
 	}
@@ -202,7 +203,7 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 		int ghostCount;
 		
 		mc.fontRenderer.drawString(title, 5, y + 1 + (cellWidth - mc.fontRenderer.FONT_HEIGHT) / 2, 0xFFFFFFFF);
-		mc.getTextureManager().bindTexture(TamedDragonGUI.DragonGUI.TEXT);
+		mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
 		
 		count = 0;
 		ghostCount = 0;
@@ -243,8 +244,8 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 //			final int dragonTopOffset = 10;
 //			final int playerInvSize = 27 + 9;
 //			final int rowMargin = 2;
-//			final int rowHMargin = 8 + TamedDragonGUI.GUI_TEX_TOGGLE_LENGTH;
-//			final int toggleSize = TamedDragonGUI.GUI_TEX_TOGGLE_LENGTH;
+//			final int rowHMargin = 8 + PetGUI.GUI_TEX_TOGGLE_LENGTH;
+//			final int toggleSize = PetGUI.GUI_TEX_TOGGLE_LENGTH;
 //			final int rowIncr = cellWidth + toggleSize + rowMargin;
 			
 			// Target slots
@@ -260,7 +261,7 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 			for (int i = 0; i < playerInvSize; i++) {
 				GlStateManager.color(1f, 1f, 1f, 1f);
 				Gui.drawModalRectWithCustomSizedTexture(leftOffset - 1 + (cellWidth * (i % invRow)), (i < 27 ? 0 : 10) + playerTopOffset - 1 + (cellWidth * (i / invRow)),
-						TamedDragonGUI.GUI_TEX_CELL_HOFFSET, TamedDragonGUI.GUI_TEX_CELL_VOFFSET,
+						PetGUI.GUI_TEX_CELL_HOFFSET, PetGUI.GUI_TEX_CELL_VOFFSET,
 						cellWidth, cellWidth,
 						256, 256);
 			}
@@ -626,7 +627,7 @@ public class RedDragonSpellSheet implements IDragonGUISheet {
 	}
 
 	@Override
-	public boolean shouldShow(ITameDragon dragon, DragonContainer container) {
+	public boolean shouldShow(EntityTameDragonRed dragon, PetContainer<EntityTameDragonRed> container) {
 		return this.dragon.canManageSpells();
 	}
 	

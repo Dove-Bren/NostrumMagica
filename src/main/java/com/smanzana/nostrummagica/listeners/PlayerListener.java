@@ -21,6 +21,8 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.MirrorGui;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
+import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
+import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfTypeCapability;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedEquipment;
@@ -45,7 +47,9 @@ import com.smanzana.nostrummagica.utils.Projectiles;
 
 import baubles.api.BaublesApi;
 import baubles.api.cap.IBaublesItemHandler;
+import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
@@ -63,7 +67,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
@@ -81,6 +87,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock
 import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
+import net.minecraftforge.event.world.GetCollisionBoxesEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
@@ -528,28 +535,43 @@ public class PlayerListener {
 		if (event.isCanceled())
 			return;
 		
+		final EntityLivingBase living = event.getEntityLiving();
+		
 		if (event.getSource().isFireDamage()) {
 			
 			// lava set ignores fire damage (but not lava). True lava set ignores lava as well
-			final boolean lavaSet = EnchantedArmor.GetSetCount(event.getEntityLiving(), EMagicElement.FIRE, 2) == 4;
-			final boolean trueSet = EnchantedArmor.GetSetCount(event.getEntityLiving(), EMagicElement.FIRE, 3) == 4;
+			final boolean lavaSet = EnchantedArmor.GetSetCount(living, EMagicElement.FIRE, 2) == 4;
+			final boolean trueSet = EnchantedArmor.GetSetCount(living, EMagicElement.FIRE, 3) == 4;
 			final boolean isLava = event.getSource() == DamageSource.LAVA || event.getSource().getDamageType().equalsIgnoreCase("lava");
 			if (lavaSet || trueSet) {
 				final int manaCost = 1; // / 4
-				final INostrumMagic attr = NostrumMagica.getMagicWrapper(event.getEntityLiving());
+				final INostrumMagic attr = NostrumMagica.getMagicWrapper(living);
 				if (attr != null) {
 					// true set requires mana to prevent lava damage, though
 					if (!isLava || attr.getMana() >= manaCost) {
 						event.setCanceled(true);
-						if (isLava && event.getEntityLiving().ticksExisted % 4 == 0) {
+						if (isLava && living.ticksExisted % 4 == 0) {
 							attr.addMana(-manaCost);
-							if (event.getEntityLiving() instanceof EntityPlayer) {
-								NostrumMagica.proxy.sendMana((EntityPlayer) event.getEntityLiving());
+							if (living instanceof EntityPlayer) {
+								NostrumMagica.proxy.sendMana((EntityPlayer) living);
 							}
 						}
 						return;
 					}
 				}
+			}
+			
+			// Fire arcane wolves also ignore fire damage
+			if (living instanceof EntityArcaneWolf
+					&& ((EntityArcaneWolf) living).hasWolfCapability(WolfTypeCapability.LAVA_WALK)) {
+				event.setCanceled(true);
+				living.extinguish();
+			}
+			// Same for entities riding the wolf
+			if (living.getRidingEntity() instanceof EntityArcaneWolf
+					&& ((EntityArcaneWolf) living.getRidingEntity()).hasWolfCapability(WolfTypeCapability.LAVA_WALK)) {
+				event.setCanceled(true);
+				living.extinguish();
 			}
 		}
 		
@@ -566,7 +588,7 @@ public class PlayerListener {
 			
 			if (source instanceof EntityLivingBase) {
 
-				EntityLivingBase livingTarget = event.getEntityLiving();
+				EntityLivingBase livingTarget = living;
 				EntityLivingBase livingSource = (EntityLivingBase) source;
 				
 				// Defense
@@ -1222,6 +1244,40 @@ public class PlayerListener {
 				if (last.squareDistanceTo(cur) > .025) {
 					// Update movement
 					lastMoveCache.put(entry.getKey(), cur.subtract(last));
+				}
+			}
+		}
+	}
+	
+	@SubscribeEvent
+	public void getCollisions(@Nonnull GetCollisionBoxesEvent event) {
+		if (event.isCanceled()) {
+			return;
+		}
+		
+		// Arcane Wolves have the ability to walk on water
+		if (event.getEntity() instanceof EntityArcaneWolf) {
+			EntityArcaneWolf wolf = (EntityArcaneWolf) event.getEntity();
+			if (wolf.hasWolfCapability(WolfTypeCapability.LAVA_WALK)) {
+				AxisAlignedBB entityBB = wolf.getEntityBoundingBox();
+				World world = event.getWorld();
+				for (MutableBlockPos pos : BlockPos.getAllInBoxMutable(
+						(int)Math.floor(entityBB.minX),
+						(int)Math.floor(entityBB.minY - 1),
+						(int)Math.floor(entityBB.minZ),
+						(int)Math.ceil(entityBB.maxX),
+						(int)Math.floor(entityBB.maxY),
+						(int)Math.ceil(entityBB.maxZ))) {
+					IBlockState state = world.getBlockState(pos);
+					if (state.getMaterial() == Material.LAVA) {
+						// Standing on lava. Check if the block this matched is within the BB the event is asking about
+						final float height = ((BlockLiquid) state.getBlock()).getBlockLiquidHeight(world, pos, state, state.getMaterial());
+						//final float height = BlockLiquid.getBlockLiquidHeight(state, world, pos);
+						AxisAlignedBB blockBB = new AxisAlignedBB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + height, pos.getZ() + 1);
+						if (event.getAabb().intersects(blockBB)) {
+							event.getCollisionBoxesList().add(blockBB);
+						}
+					}
 				}
 			}
 		}

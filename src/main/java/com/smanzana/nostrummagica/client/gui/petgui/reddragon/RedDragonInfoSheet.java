@@ -1,16 +1,16 @@
-package com.smanzana.nostrummagica.client.gui.dragongui;
+package com.smanzana.nostrummagica.client.gui.petgui.reddragon;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
-import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonContainer;
+import com.smanzana.nostrummagica.client.gui.petgui.IPetGUISheet;
+import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
-import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 
-public class RedDragonInfoSheet implements IDragonGUISheet {
+public class RedDragonInfoSheet implements IPetGUISheet<EntityTameDragonRed> {
 
 	private EntityTameDragonRed dragon;
 	
@@ -19,12 +19,12 @@ public class RedDragonInfoSheet implements IDragonGUISheet {
 	}
 	
 	@Override
-	public void showSheet(ITameDragon dragon, EntityPlayer player, DragonContainer container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(EntityTameDragonRed dragon, EntityPlayer player, PetContainer<EntityTameDragonRed> container, int width, int height, int offsetX, int offsetY) {
 		
 	}
 
 	@Override
-	public void hideSheet(ITameDragon dragon, EntityPlayer player, DragonContainer container) {
+	public void hideSheet(EntityTameDragonRed dragon, EntityPlayer player, PetContainer<EntityTameDragonRed> container) {
 		
 	}
 
@@ -206,7 +206,7 @@ public class RedDragonInfoSheet implements IDragonGUISheet {
 		return "Stats";
 	}
 	
-	public boolean shouldShow(ITameDragon dragon, TamedDragonGUI.DragonContainer container) {
+	public boolean shouldShow(EntityTameDragonRed dragon, PetContainer<EntityTameDragonRed> container) {
 		return true;
 	}
 

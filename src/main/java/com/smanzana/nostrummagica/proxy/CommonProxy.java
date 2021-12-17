@@ -15,7 +15,7 @@ import com.smanzana.nostrummagica.capabilities.NostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagicStorage;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
-import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonContainer;
+import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.config.network.ServerConfigMessage;
 import com.smanzana.nostrummagica.crafting.SpellTomePageCombineRecipe;
@@ -33,12 +33,12 @@ import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
 import com.smanzana.nostrummagica.entity.EntityWillo;
 import com.smanzana.nostrummagica.entity.EntityWisp;
+import com.smanzana.nostrummagica.entity.IEntityPet;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.EntityShadowDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
-import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemEarth;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemEnder;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemFire;
@@ -56,13 +56,13 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientEffectRenderMessage;
 import com.smanzana.nostrummagica.network.messages.MagicEffectUpdate;
 import com.smanzana.nostrummagica.network.messages.ManaMessage;
+import com.smanzana.nostrummagica.network.messages.PetGUIOpenMessage;
 import com.smanzana.nostrummagica.network.messages.SpawnNostrumRitualEffectMessage;
 import com.smanzana.nostrummagica.network.messages.SpawnPredefinedEffectMessage;
 import com.smanzana.nostrummagica.network.messages.SpawnPredefinedEffectMessage.PredefinedEffect;
 import com.smanzana.nostrummagica.network.messages.SpellDebugMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
-import com.smanzana.nostrummagica.network.messages.TamedDragonGUIOpenMessage;
 import com.smanzana.nostrummagica.potions.FamiliarPotion;
 import com.smanzana.nostrummagica.potions.FrostbitePotion;
 import com.smanzana.nostrummagica.potions.LightningAttackPotion;
@@ -479,10 +479,10 @@ public class CommonProxy {
 		; // Server does nothing
 	}
 	
-	public void openDragonGUI(EntityPlayer player, ITameDragon dragon) {
+	public <T extends IEntityPet> void openPetGUI(EntityPlayer player, T pet) {
 		// This code is largely taken from FMLNetworkHandler's openGui method, but we use our own message to open the GUI on the client
 		EntityPlayerMP mpPlayer = (EntityPlayerMP) player;
-		DragonContainer container = dragon.getGUIContainer(player);
+		PetContainer<?> container = pet.getGUIContainer(player);
 		mpPlayer.getNextWindowId();
 		mpPlayer.closeContainer();
         int windowId = mpPlayer.currentWindowId;
@@ -491,7 +491,7 @@ public class CommonProxy {
         mpPlayer.openContainer.addListener(mpPlayer);
         
         // Open GUI on client
-        TamedDragonGUIOpenMessage message = new TamedDragonGUIOpenMessage(dragon, windowId, container.getContainerID(), container.getSheetCount());
+        PetGUIOpenMessage message = new PetGUIOpenMessage(pet, windowId, container.getContainerID(), container.getSheetCount());
         NetworkHandler.getSyncChannel().sendTo(message, mpPlayer);
 	}
 

@@ -5,7 +5,9 @@ import com.smanzana.nostrummagica.entity.IEntityTameable;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -94,9 +96,44 @@ public class EntityAIFollowOwnerGeneric<T extends EntityCreature & IEntityTameab
 		this.thePet.setPathPriority(PathNodeType.WATER, this.oldWaterCost);
 	}
 
-	private boolean isEmptyBlock(BlockPos pos) {
-		IBlockState iblockstate = this.theWorld.getBlockState(pos);
+	protected boolean isEmptyBlock(BlockPos pos) {
+		return IsEmptyBlock(theWorld, pos);
+	}
+	
+	protected static boolean IsEmptyBlock(World world, BlockPos pos) {
+		IBlockState iblockstate = world.getBlockState(pos);
 		return iblockstate.getMaterial() == Material.AIR ? true : !iblockstate.isFullCube();
+	}
+	
+	public static boolean TeleportAroundEntity(Entity teleportingEntity, Entity targetEntity) {
+		if (teleportingEntity == null || targetEntity == null || teleportingEntity.world == null || teleportingEntity.world != targetEntity.world) {
+			return false;
+		}
+		
+		final World theWorld = targetEntity.world;
+		int i = MathHelper.floor(targetEntity.posX) - 2;
+		int j = MathHelper.floor(targetEntity.posZ) - 2;
+		int k = MathHelper.floor(targetEntity.getEntityBoundingBox().minY);
+		
+		MutableBlockPos pos1 = new MutableBlockPos();
+		MutableBlockPos pos2 = new MutableBlockPos();
+		MutableBlockPos pos3 = new MutableBlockPos();
+
+		for (int l = 0; l <= 4; ++l) {
+			for (int i1 = 0; i1 <= 4; ++i1) {
+				pos1.setPos(i + l, k - 1, j + i1);
+				pos2.setPos(i + l, k, j + i1);
+				pos3.setPos(i + l, k + 1, j + i1);
+				if ((l < 1 || i1 < 1 || l > 3 || i1 > 3) && theWorld.getBlockState(new BlockPos(pos1)).isSideSolid(theWorld, pos1, EnumFacing.UP) && IsEmptyBlock(theWorld, pos2) && IsEmptyBlock(theWorld, pos3)) {
+					teleportingEntity.setLocationAndAngles((double)((float)(i + l) + 0.5F), (double)k, (double)((float)(j + i1) + 0.5F), teleportingEntity.rotationYaw, teleportingEntity.rotationPitch);
+					if (teleportingEntity instanceof EntityLiving) {
+						((EntityLiving) teleportingEntity).getNavigator().clearPath();
+					}
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -112,26 +149,7 @@ public class EntityAIFollowOwnerGeneric<T extends EntityCreature & IEntityTameab
 				if (!this.petPathfinder.tryMoveToEntityLiving(this.theOwner, this.followSpeed)) {
 					if (!this.thePet.getLeashed()) {
 						if (this.thePet.getDistanceSq(this.theOwner) >= 144.0D) {
-							int i = MathHelper.floor(this.theOwner.posX) - 2;
-							int j = MathHelper.floor(this.theOwner.posZ) - 2;
-							int k = MathHelper.floor(this.theOwner.getEntityBoundingBox().minY);
-							
-							MutableBlockPos pos1 = new MutableBlockPos();
-							MutableBlockPos pos2 = new MutableBlockPos();
-							MutableBlockPos pos3 = new MutableBlockPos();
-
-							for (int l = 0; l <= 4; ++l) {
-								for (int i1 = 0; i1 <= 4; ++i1) {
-									pos1.setPos(i + l, k - 1, j + i1);
-									pos2.setPos(i + l, k, j + i1);
-									pos3.setPos(i + l, k + 1, j + i1);
-									if ((l < 1 || i1 < 1 || l > 3 || i1 > 3) && this.theWorld.getBlockState(new BlockPos(pos1)).isSideSolid(theWorld, pos1, EnumFacing.UP) && this.isEmptyBlock(pos2) && this.isEmptyBlock(pos3)) {
-										this.thePet.setLocationAndAngles((double)((float)(i + l) + 0.5F), (double)k, (double)((float)(j + i1) + 0.5F), this.thePet.rotationYaw, this.thePet.rotationPitch);
-										this.petPathfinder.clearPath();
-										return;
-									}
-								}
-							}
+							TeleportAroundEntity(thePet, theOwner);
 						}
 					}
 				}

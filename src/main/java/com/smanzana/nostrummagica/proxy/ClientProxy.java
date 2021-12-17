@@ -89,6 +89,7 @@ import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
 import com.smanzana.nostrummagica.entity.EntityWillo;
 import com.smanzana.nostrummagica.entity.EntityWisp;
+import com.smanzana.nostrummagica.entity.IEntityPet;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
@@ -1174,13 +1175,13 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public void openDragonGUI(EntityPlayer player, ITameDragon dragon) {
+	public void openPetGUI(EntityPlayer player, IEntityPet pet) {
 		// Integrated clients still need to open the gui...
 		//if (!player.world.isRemote) {
 //			DragonContainer container = dragon.getGUIContainer();
 //			DragonGUI gui = new DragonGUI(container);
 //			FMLCommonHandler.instance().showGuiScreen(gui);
-			super.openDragonGUI(player, dragon);
+			super.openPetGUI(player, pet);
 		//}
 	}
 	

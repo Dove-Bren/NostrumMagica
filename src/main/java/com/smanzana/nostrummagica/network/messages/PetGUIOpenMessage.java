@@ -3,9 +3,9 @@ package com.smanzana.nostrummagica.network.messages;
 import java.util.UUID;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonContainer;
-import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonGUI;
-import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
+import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
+import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetGUIContainer;
+import com.smanzana.nostrummagica.entity.IEntityPet;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
@@ -19,46 +19,47 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 /**
- * Server has opened a dragon GUI and is requesting the client open it, too
+ * Server has opened a pet GUI and is requesting the client open it, too
  * @author Skyler
  *
  */
-public class TamedDragonGUIOpenMessage implements IMessage {
+public class PetGUIOpenMessage implements IMessage {
 
-	public static class Handler implements IMessageHandler<TamedDragonGUIOpenMessage, IMessage> {
+	public static class Handler implements IMessageHandler<PetGUIOpenMessage, IMessage> {
 
 		@Override
-		public IMessage onMessage(TamedDragonGUIOpenMessage message, MessageContext ctx) {
+		public IMessage onMessage(PetGUIOpenMessage message, MessageContext ctx) {
 			final UUID uuid = message.tag.getUniqueId(NBT_UUID);
 			final int sheets = message.tag.getInteger(NBT_SHEETS);
 			final int id = message.tag.getInteger(NBT_CONTAINER_ID);
 			final int mcID = message.tag.getInteger(NBT_MC_CONTAINER_ID);
 			
 			Minecraft.getMinecraft().addScheduledTask(() -> {
-				ITameDragon dragon = null;
+				IEntityPet pet = null;
 				//for (Entity ent : Minecraft.getMinecraft().theWorld.getLoadedEntityList()) {
 				for (Entity ent : NostrumMagica.proxy.getPlayer().world.loadedEntityList) {
-					if (ent == null || !(ent instanceof ITameDragon)) {
+					if (ent == null || !(ent instanceof IEntityPet)) {
 						continue;
 					}
 					
 					if (ent.getUniqueID().equals(uuid)) {
-						dragon = (ITameDragon) ent;
+						pet = (IEntityPet) ent;
 						break;
 					}
 				}
 				
-				if (dragon != null) {
-					DragonContainer container = dragon.getGUIContainer(NostrumMagica.proxy.getPlayer());
+				if (pet != null) {
+					PetContainer<?> container = pet.getGUIContainer(NostrumMagica.proxy.getPlayer());
 					container.overrideID(id);
 					container.windowId = mcID;
 					
 					if (sheets != container.getSheetCount()) {
-						NostrumMagica.logger.error("Sheet count differs on client and server for " + dragon);
+						NostrumMagica.logger.error("Sheet count differs on client and server for " + pet);
 						return null;
 					}
 					
-					DragonGUI gui = new DragonGUI(container);
+					@SuppressWarnings({ "unchecked", "rawtypes" })
+					PetGUIContainer<?> gui = new PetGUIContainer(container, pet.getGUIAdapter());
 					FMLCommonHandler.instance().showGuiScreen(gui);
 				}
 				return null;
@@ -77,14 +78,14 @@ public class TamedDragonGUIOpenMessage implements IMessage {
 	
 	protected NBTTagCompound tag;
 	
-	public TamedDragonGUIOpenMessage() {
+	public PetGUIOpenMessage() {
 		tag = new NBTTagCompound();
 	}
 	
-	public TamedDragonGUIOpenMessage(ITameDragon dragon, int mcID, int id, int numSheets) {
+	public PetGUIOpenMessage(IEntityPet pet, int mcID, int id, int numSheets) {
 		this();
 		
-		tag.setUniqueId(NBT_UUID, ((EntityLivingBase) dragon).getUniqueID());
+		tag.setUniqueId(NBT_UUID, ((EntityLivingBase) pet).getUniqueID());
 		tag.setInteger(NBT_CONTAINER_ID, id);
 		tag.setInteger(NBT_SHEETS, numSheets);
 		tag.setInteger(NBT_MC_CONTAINER_ID, mcID);

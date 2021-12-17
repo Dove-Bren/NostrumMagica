@@ -67,19 +67,23 @@ public class EntitySpellAttackTask<T extends EntityLiving> extends EntityAIBase 
 		return false;
 	}
 	
-	public Spell pickSpell(Spell[] spells, T entity) {
+	protected Spell pickSpell(Spell[] spells, T entity) {
 		if (spells == null || spells.length == 0)
 			return null;
 		
 		return spells[entity.getRNG().nextInt(spells.length)];
 	}
 	
-	public @Nullable EntityLivingBase getTarget() {
+	protected @Nullable EntityLivingBase getTarget() {
 		if (needsTarget && null != entity.getAttackTarget()) {
 			return entity.getAttackTarget();
 		}
 		
 		return null;
+	}
+	
+	protected void deductMana(Spell spell, T entity) {
+		; // Usually, don't actually take mana
 	}
 
 	@Override
@@ -97,6 +101,7 @@ public class EntitySpellAttackTask<T extends EntityLiving> extends EntityAIBase 
 			entity.setAttackTarget(target);
 		}
 		
+		deductMana(spell, entity);
 		spell.cast(entity, 1);
 		attackTicks = this.delay;
 		entity.setAttackTarget(oldTarget);

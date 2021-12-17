@@ -1662,7 +1662,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 	
 	public static final boolean DoEarthDig(World world, EntityPlayer player, BlockPos pos, EnumFacing face) {
-		if (player.getHeldItemMainhand() != null) {
+		if (!player.getHeldItemMainhand().isEmpty()) {
 			return false;
 		}
 		

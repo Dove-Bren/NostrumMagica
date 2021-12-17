@@ -12,12 +12,13 @@ import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonBondInfoSheet;
-import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonInfoSheet;
-import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonInventorySheet;
-import com.smanzana.nostrummagica.client.gui.dragongui.RedDragonSpellSheet;
-import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI.DragonContainer;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
+import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetGUIStatAdapter;
+import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonBondInfoSheet;
+import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonInfoSheet;
+import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonInventorySheet;
+import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonSpellSheet;
 import com.smanzana.nostrummagica.entity.IEntityTameable;
 import com.smanzana.nostrummagica.entity.IStabbableEntity;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon.DragonEquipmentInventory.IChangeListener;
@@ -522,7 +523,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 				} else if (this.isSitting() && stack.isEmpty()) {
 					if (!this.world.isRemote) {
 						//player.openGui(NostrumMagica.instance, NostrumGui.dragonID, this.world, (int) this.posX, (int) this.posY, (int) this.posZ);
-						NostrumMagica.proxy.openDragonGUI(player, this);
+						NostrumMagica.proxy.openPetGUI(player, this);
 					}
 					return true;
 				} else if (isBreedingItem(stack) && this.getBond() > BOND_LEVEL_BREED && this.getEgg() == null) {
@@ -1170,7 +1171,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 				);
 	}
 	
-	public void rollStats() {
+	@Override
+	public void rerollStats() {
 		rollRandomStats().apply(this);
 	}
 	
@@ -1644,12 +1646,64 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	}
 
 	@Override
-	public DragonContainer getGUIContainer(EntityPlayer player) {
-		return new DragonContainer(this, player,
+	public PetContainer<EntityTameDragonRed> getGUIContainer(EntityPlayer player) {
+		return new PetContainer<>(this, player,
 				new RedDragonInfoSheet(this),
 				new RedDragonBondInfoSheet(this),
 				new RedDragonInventorySheet(this),
 				new RedDragonSpellSheet(this));
+	}
+
+	@Override
+	public PetGUIStatAdapter<EntityTameDragonRed> getGUIAdapter() {
+		return new PetGUIStatAdapter<EntityTameDragonRed>() {
+
+			@Override
+			public float getSecondaryAmt(EntityTameDragonRed pet) {
+				return pet.getMana();
+			}
+
+			@Override
+			public float getMaxSecondaryAmt(EntityTameDragonRed pet) {
+				return pet.getMaxMana();
+			}
+
+			@Override
+			public String getSecondaryLabel(EntityTameDragonRed pet) {
+				return "Mana";
+			}
+
+			@Override
+			public float getTertiaryAmt(EntityTameDragonRed pet) {
+				return pet.getBond();
+			}
+
+			@Override
+			public float getMaxTertiaryAmt(EntityTameDragonRed pet) {
+				return 1f;
+			}
+
+			@Override
+			public String getTertiaryLabel(EntityTameDragonRed pet) {
+				return "Bond";
+			}
+
+			@Override
+			public float getQuaternaryAmt(EntityTameDragonRed pet) {
+				return pet.getXP();
+			}
+
+			@Override
+			public float getMaxQuaternaryAmt(EntityTameDragonRed pet) {
+				return pet.getMaxXP();
+			}
+
+			@Override
+			public String getQuaternaryLabel(EntityTameDragonRed pet) {
+				return "XP";
+			}
+
+		};
 	}
 	
 	public int getLevel() {

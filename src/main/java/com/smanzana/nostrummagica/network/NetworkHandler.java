@@ -30,9 +30,9 @@ import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
 import com.smanzana.nostrummagica.network.messages.SpellTomeIncrementMessage;
 import com.smanzana.nostrummagica.network.messages.StatRequestMessage;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
-import com.smanzana.nostrummagica.network.messages.TamedDragonGUIControlMessage;
-import com.smanzana.nostrummagica.network.messages.TamedDragonGUIOpenMessage;
-import com.smanzana.nostrummagica.network.messages.TamedDragonGUISyncMessage;
+import com.smanzana.nostrummagica.network.messages.PetGUIControlMessage;
+import com.smanzana.nostrummagica.network.messages.PetGUIOpenMessage;
+import com.smanzana.nostrummagica.network.messages.PetGUISyncMessage;
 
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
@@ -84,9 +84,9 @@ public class NetworkHandler {
 		syncChannel.registerMessage(ModifyMessage.Handler.class, ModifyMessage.class, discriminator++, Side.SERVER);
 		syncChannel.registerMessage(LoreMessage.Handler.class, LoreMessage.class, discriminator++, Side.CLIENT);
 		syncChannel.registerMessage(RuneBagToggleMessage.Handler.class, RuneBagToggleMessage.class, discriminator++, Side.SERVER);
-		syncChannel.registerMessage(TamedDragonGUIControlMessage.Handler.class, TamedDragonGUIControlMessage.class, discriminator++, Side.SERVER);
-		syncChannel.registerMessage(TamedDragonGUIOpenMessage.Handler.class, TamedDragonGUIOpenMessage.class, discriminator++, Side.CLIENT);
-		syncChannel.registerMessage(TamedDragonGUISyncMessage.Handler.class, TamedDragonGUISyncMessage.class, discriminator++, Side.CLIENT);
+		syncChannel.registerMessage(PetGUIControlMessage.Handler.class, PetGUIControlMessage.class, discriminator++, Side.SERVER);
+		syncChannel.registerMessage(PetGUIOpenMessage.Handler.class, PetGUIOpenMessage.class, discriminator++, Side.CLIENT);
+		syncChannel.registerMessage(PetGUISyncMessage.Handler.class, PetGUISyncMessage.class, discriminator++, Side.CLIENT);
 		syncChannel.registerMessage(MagicEffectUpdate.Handler.class, MagicEffectUpdate.class, discriminator++, Side.CLIENT);
 		syncChannel.registerMessage(ClientPurchaseResearchMessage.Handler.class, ClientPurchaseResearchMessage.class, discriminator++, Side.SERVER);
 		syncChannel.registerMessage(CandleIgniteMessage.Handler.class, CandleIgniteMessage.class, discriminator++, Side.CLIENT);

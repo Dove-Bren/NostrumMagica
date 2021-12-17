@@ -1,6 +1,6 @@
-package com.smanzana.nostrummagica.client.gui.dragongui;
+package com.smanzana.nostrummagica.client.gui.petgui;
 
-import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
+import com.smanzana.nostrummagica.entity.IEntityPet;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -9,18 +9,18 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
- * A sheet on the dragon GUI.
- * That is, one of the tabbed pages when interacting with a tamed dragon.
+ * A sheet on the pet GUI.
+ * That is, one of the tabbed pages when interacting with a tamed pet.
  * @author Skyler
  *
  */
-public interface IDragonGUISheet {
+public interface IPetGUISheet<T extends IEntityPet> {
 	
 	// Called when the sheet is first shown. Set up anything that's needed.
-	public void showSheet(ITameDragon dragon, EntityPlayer player, TamedDragonGUI.DragonContainer container, int width, int height, int offsetX, int offsetY);
+	public void showSheet(T pet, EntityPlayer player, PetGUI.PetContainer<T> container, int width, int height, int offsetX, int offsetY);
 	
 	// Called when the sheet will no longer be shown.
-	public void hideSheet(ITameDragon dragon, EntityPlayer player, TamedDragonGUI.DragonContainer container);
+	public void hideSheet(T pet, EntityPlayer player, PetGUI.PetContainer<T> container);
 	
 	// Draw the sheet
 	@SideOnly(Side.CLIENT)
@@ -41,6 +41,6 @@ public interface IDragonGUISheet {
 	@SideOnly(Side.CLIENT)
 	public String getButtonText();
 	
-	public boolean shouldShow(ITameDragon dragon, TamedDragonGUI.DragonContainer container);
+	public boolean shouldShow(T pet, PetGUI.PetContainer<T> container);
 	
 }

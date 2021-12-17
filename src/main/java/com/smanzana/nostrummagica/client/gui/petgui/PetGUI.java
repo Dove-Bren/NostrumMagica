@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.client.gui.dragongui;
+package com.smanzana.nostrummagica.client.gui.petgui;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -12,11 +12,11 @@ import com.google.common.collect.Lists;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.container.AutoGuiContainer;
-import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
-import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
+import com.smanzana.nostrummagica.entity.IEntityPet;
+import com.smanzana.nostrummagica.entity.IRerollablePet;
 import com.smanzana.nostrummagica.network.NetworkHandler;
-import com.smanzana.nostrummagica.network.messages.TamedDragonGUIControlMessage;
-import com.smanzana.nostrummagica.network.messages.TamedDragonGUISyncMessage;
+import com.smanzana.nostrummagica.network.messages.PetGUIControlMessage;
+import com.smanzana.nostrummagica.network.messages.PetGUISyncMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.client.Minecraft;
@@ -28,6 +28,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -36,20 +37,20 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
- * A nice wrapped up dragon gui.
+ * A nice wrapped up pet gui.
  * 
- * Doesn't do a lot on its own. Instead, things can build it up using dragon sheets
+ * Doesn't do a lot on its own. Instead, things can build it up using pet sheets
  * 
  * @author Skyler
  */
-public class TamedDragonGUI {
+public class PetGUI {
 	
 	// Need a static registry of open containers for dispatching messages on the server
-	private static Map<Integer, DragonContainer> containers = new HashMap<>();
+	private static Map<Integer, PetContainer<?>> containers = new HashMap<>();
 	
 	private static int lastKey = 0;
 	
-	private static int register(DragonContainer container) {
+	private static int register(PetContainer<?> container) {
 		if (container.player.world.isRemote) {
 			throw new IllegalArgumentException("Can't register on the client!");
 		}
@@ -64,13 +65,13 @@ public class TamedDragonGUI {
 	}
 	
 	public static void updateServerContainer(int id, NBTTagCompound nbt) {
-		DragonContainer container = containers.get(id);
+		PetContainer<?> container = containers.get(id);
 		if (container != null) {
 			container.handle(nbt);
 		}
 	}
 	
-	private static DragonContainer clientContainer = null;
+	private static PetContainer<?> clientContainer = null;
 	
 	public static void updateClientContainer(NBTTagCompound nbt) {
 		if (clientContainer != null) {
@@ -78,34 +79,35 @@ public class TamedDragonGUI {
 		}
 	}
 
-	public static class DragonContainer extends Container {
+	public static class PetContainer<T extends IEntityPet> extends Container {
 
 		private EntityPlayer player;
 		
-		private ITameDragon dragon;
+		private T pet;
 		
-		private EntityLivingBase livingDragon;
+		private EntityLivingBase livingPet;
 		
 		private int currentSheet;
 		
-		protected List<IDragonGUISheet> sheetsAllInternal;
+		protected List<IPetGUISheet<T>> sheetsAllInternal;
 		
 		protected int id;
 		
 		private int guiOffsetX;
 		private int guiOffsetY;
 		
-		public DragonContainer(ITameDragon dragon, EntityPlayer player, IDragonGUISheet ... sheets) {
-			this.dragon = dragon;
-			this.livingDragon = (EntityLivingBase) dragon;
+		@SafeVarargs
+		public PetContainer(T pet, EntityPlayer player, IPetGUISheet<T> ... sheets) {
+			this.pet = pet;
+			this.livingPet= (EntityLivingBase) pet;
 			this.player = player;
 			this.currentSheet = 0;
 			this.sheetsAllInternal = Lists.newArrayList(sheets);
 			
-			if (!((EntityDragon) dragon).world.isRemote) {
-				this.id = TamedDragonGUI.register(this);				
+			if (!livingPet.world.isRemote) {
+				this.id = PetGUI.register(this);				
 			} else {
-				TamedDragonGUI.clientContainer = this;
+				PetGUI.clientContainer = this;
 			}
 		}
 		
@@ -125,16 +127,19 @@ public class TamedDragonGUI {
 		
 		@Override
 		public boolean canInteractWith(EntityPlayer playerIn) {
-			if (dragon == null) {
-				// Dragon hasn't been synced yet
+			if (pet == null) {
+				// Pet hasn't been synced yet
 				return false;
 			}
-			return playerIn.equals(dragon.getOwner());
+			return playerIn.equals(pet.getOwner());
 		}
 
 		// Caution: This assumes only one player has these open!
 		@Override
 		public void onContainerClosed(EntityPlayer playerIn) {
+			if (this.getCurrentSheet() != null) {
+				this.getCurrentSheet().hideSheet(pet, player, this);
+			}
 			revoke(this.id);
 		}
 		
@@ -148,24 +153,24 @@ public class TamedDragonGUI {
 		 * This is a collection that's filtered down to what should be shown
 		 * @return
 		 */
-		protected List<IDragonGUISheet> getSheets() {
-			final DragonContainer container = this;
+		protected List<IPetGUISheet<T>> getSheets() {
+			final PetContainer<T> container = this;
 			return sheetsAllInternal.parallelStream().filter((sheet) -> {
-				return sheet.shouldShow(container.dragon, container);
+				return sheet.shouldShow(container.pet, container);
 			}).collect(Collectors.toList());
 		}
 		
-		public IDragonGUISheet getCurrentSheet() {
+		public IPetGUISheet<T> getCurrentSheet() {
 			return getSheets().get(currentSheet);
 		}
 		
 		public void setSheet(int index) {
 			if (this.currentSheet < this.getSheetCount()) {
 				// If we changed the number of sheets, we may have an invalid one to close. So just don't close it.
-				this.getCurrentSheet().hideSheet(dragon, player, this);
+				this.getCurrentSheet().hideSheet(pet, player, this);
 			}
 			this.currentSheet = Math.min(Math.max(0, index), getSheets().size() - 1);
-			this.getCurrentSheet().showSheet(dragon, player, this, GUI_SHEET_WIDTH, GUI_SHEET_HEIGHT, guiOffsetX, guiOffsetY);
+			this.getCurrentSheet().showSheet(pet, player, this, GUI_SHEET_WIDTH, GUI_SHEET_HEIGHT, guiOffsetX, guiOffsetY);
 		}
 		
 		public int getSheetIndex() {
@@ -175,6 +180,10 @@ public class TamedDragonGUI {
 		public void clearSlots() {
 			this.inventorySlots.clear();
 			this.inventoryItemStacks.clear();
+		}
+		
+		public void dropContainerInventory(IInventory inv) {
+			this.clearContainer(player, player.world, inv);
 		}
 		
 		public void addSheetSlot(Slot slot) {
@@ -189,11 +198,15 @@ public class TamedDragonGUI {
 			return this.getSheets().size();
 		}
 		
+		protected boolean supportsReroll() {
+			return pet != null && pet instanceof IRerollablePet;
+		}
+		
 		// Handle a message sent from the client.
 		// Could be a button click to change sheets, some other control message,
 		// or a message for updating a sheet's contents.
 		protected void handle(NBTTagCompound nbt) {
-			DragonContainerMessageType type = NetworkHelper.GetType(nbt);
+			PetContainerMessageType type = NetworkHelper.GetType(nbt);
 			
 			if (type == null) {
 				return;
@@ -208,10 +221,13 @@ public class TamedDragonGUI {
 				this.getCurrentSheet().handleMessage(NetworkHelper.GetSendSheetData(nbt));
 				break;
 			case REROLL:
-				if (dragon != null && dragon.getOwner() instanceof EntityPlayer && ((EntityPlayer) dragon.getOwner()).isCreative()) {
+				if (pet != null
+					&& supportsReroll()
+					&& pet.getOwner() instanceof EntityPlayer
+					&& ((EntityPlayer) pet.getOwner()).isCreative()) {
 					// Reset container sheet. The client will send this as well later.
 					this.setSheet(0);
-					dragon.rollStats();
+					((IRerollablePet) pet).rerollStats();
 				}
 				break;
 			}
@@ -241,9 +257,9 @@ public class TamedDragonGUI {
 	
 	
 	@SideOnly(Side.CLIENT)
-	public static class DragonGUI extends AutoGuiContainer {
+	public static class PetGUIContainer<T extends IEntityPet> extends AutoGuiContainer {
 		
-		public static final ResourceLocation TEXT = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/container/tamed_dragon_gui.png");
+		public static final ResourceLocation TEXT = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/container/tamed_pet_gui.png");
 		
 		private static int GUI_LENGTH_PREVIEW = 48;
 		private static int GUI_INFO_HOFFSET = 12;
@@ -257,13 +273,15 @@ public class TamedDragonGUI {
 		
 		//private static int GUI_OPEN_ANIM_TIME = 20 * 1;
 		
-		private DragonContainer container;
+		private PetContainer<T> container;
+		private final PetGUIStatAdapter<T> adapter;
 		
 		//private int openTicks;
 		
-		public DragonGUI(DragonContainer container) {
+		public PetGUIContainer(PetContainer<T> container, PetGUIStatAdapter<T> adapter) {
 			super(container);
 			this.container = container;
+			this.adapter = adapter;
 			//this.openTicks = 0;
 		}
 		
@@ -291,7 +309,7 @@ public class TamedDragonGUI {
 			final int GUI_SHEET_HOFFSET = this.width - (GUI_SHEET_WIDTH + GUI_SHEET_NHOFFSET);
 			final int GUI_SHEET_BUTTON_HOFFSET = GUI_SHEET_HOFFSET;
 			
-			if (this.container.dragon == null) {
+			if (this.container.pet == null) {
 				this.drawCenteredString(fontRenderer, "Waiting for server...", this.width / 2, this.height / 2, 0XFFAAAAAA);
 				return;
 			}
@@ -303,13 +321,14 @@ public class TamedDragonGUI {
 				int xPosition = GUI_LENGTH_PREVIEW / 2;
 				int yPosition = GUI_LENGTH_PREVIEW / 2;
 				RenderHelper.disableStandardItemLighting();
+				GlStateManager.color(1f, 1f, 1f, 1f);
 				GuiInventory.drawEntityOnScreen(
 						xPosition,
 						(int) (GUI_LENGTH_PREVIEW * .75f),
 						(int) (GUI_LENGTH_PREVIEW * .2),
 						(float) (xPosition) - mouseX,
 						(float) (-yPosition) - mouseY,
-						(EntityLivingBase) container.dragon);
+						(EntityLivingBase) container.pet);
 			}
 			
 			// Move everything forward ahead of the drawn entity
@@ -336,16 +355,16 @@ public class TamedDragonGUI {
 				
 				// Health
 				{
-					this.drawCenteredString(this.fontRenderer, ChatFormatting.BOLD + "Health", centerX, y, 0xFFFFFFFF);
+					this.drawCenteredString(this.fontRenderer, ChatFormatting.BOLD + adapter.getHealthLabel(container.pet), centerX, y, 0xFFFFFFFF);
 					y += fontRenderer.FONT_HEIGHT + 5;
 					Gui.drawRect(x, y, x + w, y + h, 0xFFD0D0D0);
 					Gui.drawRect(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF201010);
 					
-					int prog = (int) ((float) (w - 2) * (container.livingDragon.getHealth() / container.livingDragon.getMaxHealth()));
+					int prog = (int) ((float) (w - 2) * (adapter.getHealth(container.pet) / adapter.getMaxHealth(container.pet)));
 					Gui.drawRect(x + 1, y + 1, x + 1 + prog, y + h - 1, 0xFFA02020);
 					
 					this.drawCenteredString(fontRenderer,
-							String.format("%d / %d", (int) container.livingDragon.getHealth(), (int) container.livingDragon.getMaxHealth()),
+							String.format("%d / %d", (int) adapter.getHealth(container.pet), (int) adapter.getMaxHealth(container.pet)),
 							centerX,
 							y + (h / 2) - (fontRenderer.FONT_HEIGHT / 2),
 							0xFFC0C0C0);
@@ -353,18 +372,18 @@ public class TamedDragonGUI {
 					y += h + 10;
 				}
 				
-				// Mana
-				if (container.dragon.getMaxMana() > 0) {
-					this.drawCenteredString(this.fontRenderer, ChatFormatting.BOLD + "Mana", centerX, y, 0xFFFFFFFF);
+				// Secondary
+				if (adapter.supportsSecondaryAmt(container.pet) && adapter.getMaxSecondaryAmt(container.pet) > 0) {
+					this.drawCenteredString(this.fontRenderer, ChatFormatting.BOLD + adapter.getSecondaryLabel(container.pet), centerX, y, 0xFFFFFFFF);
 					y += fontRenderer.FONT_HEIGHT + 5;
 					Gui.drawRect(x, y, x + w, y + h, 0xFFD0D0D0);
 					Gui.drawRect(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF101020);
 					
-					int prog = (int) ((float) (w - 2) * ((float) container.dragon.getMana() / (float) container.dragon.getMaxMana()));
+					int prog = (int) ((float) (w - 2) * (adapter.getSecondaryAmt(container.pet) / adapter.getMaxSecondaryAmt(container.pet)));
 					Gui.drawRect(x + 1, y + 1, x + 1 + prog, y + h - 1, 0xFF2020A0);
 					
 					this.drawCenteredString(fontRenderer,
-							String.format("%d / %d", (int) container.dragon.getMana(), (int) container.dragon.getMaxMana()),
+							String.format("%d / %d", (int) adapter.getSecondaryAmt(container.pet), (int) adapter.getMaxSecondaryAmt(container.pet)),
 							centerX,
 							y + (h / 2) - (fontRenderer.FONT_HEIGHT / 2),
 							0xFFC0C0C0);
@@ -372,48 +391,57 @@ public class TamedDragonGUI {
 					y += h + 10;
 				}
 				
-				// Bond
-				// TODO make optional?
-				{
-					float bond = container.dragon.getBond();
-					this.drawCenteredString(this.fontRenderer, ChatFormatting.BOLD + "Bond", centerX, y, 0xFFFFFFFF);
+				// Tertiary
+				if (adapter.supportsTertiaryAmt(container.pet) && adapter.getMaxTertiaryAmt(container.pet) > 0) {
+					final float cur = adapter.getTertiaryAmt(container.pet);
+					final float max = adapter.getMaxTertiaryAmt(container.pet);
+					
+					this.drawCenteredString(this.fontRenderer, ChatFormatting.BOLD + adapter.getTertiaryLabel(container.pet), centerX, y, 0xFFFFFFFF);
 					y += fontRenderer.FONT_HEIGHT + 5;
 					Gui.drawRect(x, y, x + w, y + h, 0xFFD0D0D0);
 					Gui.drawRect(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF201020);
 					
-					int prog = (int) ((float) (w - 2) * bond);
+					int prog = (int) ((float) (w - 2) * (cur/max));
 					Gui.drawRect(x + 1, y + 1, x + 1 + prog, y + h - 1, 0xFFA020A0);
 					
-					if (container.dragon.isSoulBound()) {
-						this.drawCenteredString(fontRenderer,
-								"Soulbound",
-								centerX,
-								y + (h / 2) - (fontRenderer.FONT_HEIGHT / 2),
-								0xFF40FF40);
-					} else {
-						this.drawCenteredString(fontRenderer,
-								String.format("%.2f%%", bond * 100f),
-								centerX,
-								y + (h / 2) - (fontRenderer.FONT_HEIGHT / 2),
-								bond == 1f ? 0xFFC0FFC0 : 0xFFC0C0C0);
-					}
+					this.drawCenteredString(fontRenderer,
+							String.format("%.2f%%", (cur/max) * 100f),
+							centerX,
+							y + (h / 2) - (fontRenderer.FONT_HEIGHT / 2),
+							cur >= max ? 0xFFC0FFC0 : 0xFFC0C0C0);
+					
+//					if (container.pet.isSoulBound()) {
+//						this.drawCenteredString(fontRenderer,
+//								"Soulbound",
+//								centerX,
+//								y + (h / 2) - (fontRenderer.FONT_HEIGHT / 2),
+//								0xFF40FF40);
+//					} else {
+//						this.drawCenteredString(fontRenderer,
+//								String.format("%.2f%%", bond * 100f),
+//								centerX,
+//								y + (h / 2) - (fontRenderer.FONT_HEIGHT / 2),
+//								bond == 1f ? 0xFFC0FFC0 : 0xFFC0C0C0);
+//					}
 					
 					
 					y += h + 10;
 				}
 				
 				// XP
-				if (container.dragon.getXP() > -1) {
-					this.drawCenteredString(this.fontRenderer, ChatFormatting.BOLD + "XP", centerX, y, 0xFFFFFFFF);
+				if (adapter.supportsQuaternaryAmt(container.pet) && adapter.getMaxQuaternaryAmt(container.pet) > 0) {
+					final float cur = adapter.getQuaternaryAmt(container.pet);
+					final float max = adapter.getMaxQuaternaryAmt(container.pet);
+					this.drawCenteredString(this.fontRenderer, ChatFormatting.BOLD + adapter.getQuaternaryLabel(container.pet), centerX, y, 0xFFFFFFFF);
 					y += fontRenderer.FONT_HEIGHT + 5;
 					Gui.drawRect(x, y, x + w, y + h, 0xFFD0D0D0);
 					Gui.drawRect(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF102010);
 					
-					int prog = (int) ((float) (w - 2) * ((float) container.dragon.getXP() / (float) container.dragon.getMaxXP()));
+					int prog = (int) ((float) (w - 2) * (cur / max));
 					Gui.drawRect(x + 1, y + 1, x + 1 + prog, y + h - 1, 0xFF20A020);
 					
 					this.drawCenteredString(fontRenderer,
-							String.format("%d / %d", (int) container.dragon.getXP(), (int) container.dragon.getMaxXP()),
+							String.format("%d / %d", (int) cur, (int) max),
 							centerX,
 							y + (h / 2) - (fontRenderer.FONT_HEIGHT / 2),
 							0xFFC0C0C0);
@@ -425,7 +453,7 @@ public class TamedDragonGUI {
 			if (container.getSheets().size() > 0) {
 				int x = GUI_SHEET_BUTTON_HOFFSET;
 				
-				for (IDragonGUISheet sheet : container.getSheets()) {
+				for (IPetGUISheet<T> sheet : container.getSheets()) {
 					Gui.drawRect(x, GUI_SHEET_BUTTON_VOFFSET, x + GUI_SHEET_BUTTON_WIDTH, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT, 0xFFFFFFFF);
 					Gui.drawRect(x + 1, GUI_SHEET_BUTTON_VOFFSET + 1, x + GUI_SHEET_BUTTON_WIDTH - 1, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT - 1, 0xFF202020);
 					
@@ -444,7 +472,7 @@ public class TamedDragonGUI {
 					x += GUI_SHEET_BUTTON_WIDTH;
 				}
 				
-				if (NostrumMagica.proxy.getPlayer().isCreative()) {
+				if (container.supportsReroll() && NostrumMagica.proxy.getPlayer().isCreative()) {
 					Gui.drawRect(x, GUI_SHEET_BUTTON_VOFFSET, x + GUI_SHEET_BUTTON_WIDTH, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT, 0xFFFFDDFF);
 					Gui.drawRect(x + 1, GUI_SHEET_BUTTON_VOFFSET + 1, x + GUI_SHEET_BUTTON_WIDTH - 1, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT - 1, 0xFF702070);
 					
@@ -463,7 +491,7 @@ public class TamedDragonGUI {
 			mc.getTextureManager().bindTexture(TEXT);
 			
 			// Draw sheet
-			IDragonGUISheet sheet = container.getCurrentSheet();
+			IPetGUISheet<T> sheet = container.getCurrentSheet();
 			if (sheet != null) {
 				GlStateManager.pushMatrix();
 				GlStateManager.translate(GUI_SHEET_HOFFSET, GUI_SHEET_VOFFSET, 0);
@@ -487,7 +515,7 @@ public class TamedDragonGUI {
 			
 			final int GUI_SHEET_HOFFSET = this.width - (GUI_SHEET_WIDTH + GUI_SHEET_NHOFFSET);
 			
-			IDragonGUISheet sheet = container.getCurrentSheet();
+			IPetGUISheet<T> sheet = container.getCurrentSheet();
 			if (sheet != null) {
 				GlStateManager.pushMatrix();
 				GlStateManager.translate(GUI_SHEET_HOFFSET, GUI_SHEET_VOFFSET, 0);
@@ -524,7 +552,9 @@ public class TamedDragonGUI {
 						this.container.setSheet(buttonIdx);
 						NetworkHelper.ClientSendSheet(container.id, buttonIdx);
 						return;
-					} else if (buttonIdx == container.getSheets().size() && NostrumMagica.proxy.getPlayer().isCreative()) {
+					} else if (container.supportsReroll()
+							&& buttonIdx == container.getSheets().size()
+							&& NostrumMagica.proxy.getPlayer().isCreative()) {
 						NetworkHelper.ClientSendReroll(container.id);
 						// Reset sheet index in case reroll removed a tab
 						this.container.setSheet(0);
@@ -535,7 +565,7 @@ public class TamedDragonGUI {
 				// Clicking on the sheet?
 				if (mouseX >= GUI_SHEET_HOFFSET && mouseX <= GUI_SHEET_HOFFSET + GUI_SHEET_WIDTH
 						&& mouseY >= GUI_SHEET_VOFFSET && mouseY <= GUI_SHEET_VOFFSET + GUI_SHEET_HEIGHT) {
-					IDragonGUISheet sheet = container.getCurrentSheet();
+					IPetGUISheet<T> sheet = container.getCurrentSheet();
 					if (sheet != null) {
 						sheet.mouseClicked(mouseX - GUI_SHEET_HOFFSET, mouseY - GUI_SHEET_VOFFSET, mouseButton);
 					}
@@ -547,9 +577,33 @@ public class TamedDragonGUI {
 		}
 	}
 	
-
+	public static interface PetGUIStatAdapter<T> {
+		
+		// Health/first bar
+		default public float getHealth(T pet) { return ((EntityLivingBase) pet).getHealth(); }
+		default public float getMaxHealth(T pet) { return ((EntityLivingBase) pet).getMaxHealth(); }
+		default public String getHealthLabel(T pet) { return "Health"; }
+		
+		// Second bar (mana?)
+		default public boolean supportsSecondaryAmt(T pet) { return true; }
+		public float getSecondaryAmt(T pet);
+		public float getMaxSecondaryAmt(T pet);
+		public String getSecondaryLabel(T pet);
+		
+		// Third bar (bond?)
+		default public boolean supportsTertiaryAmt(T pet) { return true; };
+		public float getTertiaryAmt(T pet);
+		public float getMaxTertiaryAmt(T pet);
+		public String getTertiaryLabel(T pet);
+		
+		// Fourth bar (xp?)
+		default public boolean supportsQuaternaryAmt(T pet) { return true; };
+		public float getQuaternaryAmt(T pet);
+		public float getMaxQuaternaryAmt(T pet);
+		public String getQuaternaryLabel(T pet);
+	}
 	
-	private static enum DragonContainerMessageType {
+	private static enum PetContainerMessageType {
 		
 		SET_SHEET("_SETSHEET"),
 		
@@ -559,7 +613,7 @@ public class TamedDragonGUI {
 		
 		private final String nbtKey;
 		
-		private DragonContainerMessageType(String key) {
+		private PetContainerMessageType(String key) {
 			this.nbtKey = key;
 		}
 		
@@ -575,58 +629,58 @@ public class TamedDragonGUI {
 	private static final class NetworkHelper {
 		
 		private static void clientSendInternal(int id, NBTTagCompound nbt) {
-			TamedDragonGUIControlMessage message = new TamedDragonGUIControlMessage(id, nbt);
+			PetGUIControlMessage message = new PetGUIControlMessage(id, nbt);
 			
 			NetworkHandler.getSyncChannel().sendToServer(message);
 		}
 		
 		private static void serverSendInternal(EntityPlayerMP player, NBTTagCompound nbt) {
-			TamedDragonGUISyncMessage message = new TamedDragonGUISyncMessage(nbt);
+			PetGUISyncMessage message = new PetGUISyncMessage(nbt);
 			
 			NetworkHandler.getSyncChannel().sendTo(message, player);
 		}
 		
-		private static NBTTagCompound base(DragonContainerMessageType type) {
+		private static NBTTagCompound base(PetContainerMessageType type) {
 			NBTTagCompound nbt = new NBTTagCompound();
 			nbt.setString(NBT_TYPE, type.getKey());
 			return nbt;
 		}
 		
 		public static void ClientSendSheet(int id, int sheet) {
-			NBTTagCompound nbt = base(DragonContainerMessageType.SET_SHEET);
+			NBTTagCompound nbt = base(PetContainerMessageType.SET_SHEET);
 			nbt.setInteger(NBT_INDEX, sheet);
 			
 			clientSendInternal(id, nbt);
 		}
 		
 		public static void ClientSendSheetData(int id, NBTTagCompound data) {
-			NBTTagCompound nbt = base(DragonContainerMessageType.SHEET_DATA);
+			NBTTagCompound nbt = base(PetContainerMessageType.SHEET_DATA);
 			nbt.setTag(NBT_USERDATA, data);
 			
 			clientSendInternal(id, nbt);
 		}
 		
 		public static void ClientSendReroll(int id) {
-			NBTTagCompound nbt = base(DragonContainerMessageType.REROLL);
+			NBTTagCompound nbt = base(PetContainerMessageType.REROLL);
 			
 			clientSendInternal(id, nbt);
 		}
 		
 		public static void ServerSendSheetData(EntityPlayerMP player, NBTTagCompound data) {
-			NBTTagCompound nbt = base(DragonContainerMessageType.SHEET_DATA);
+			NBTTagCompound nbt = base(PetContainerMessageType.SHEET_DATA);
 			nbt.setTag(NBT_USERDATA, data);
 			
 			serverSendInternal(player, nbt);
 		}
 		
 		
-		public static DragonContainerMessageType GetType(NBTTagCompound nbt) {
+		public static PetContainerMessageType GetType(NBTTagCompound nbt) {
 			String str = nbt.getString(NBT_TYPE);
 			if (str == null || str.isEmpty()) {
 				return null;
 			}
 			
-			for (DragonContainerMessageType type : DragonContainerMessageType.values()) {
+			for (PetContainerMessageType type : PetContainerMessageType.values()) {
 				if (type.getKey().equalsIgnoreCase(str)) {
 					return type;
 				}

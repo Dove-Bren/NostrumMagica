@@ -502,9 +502,10 @@ public class Spell {
 		this.iconIndex = index;
 	}
 	
-	public void addPart(SpellPart part) {
+	public Spell addPart(SpellPart part) {
 		this.parts.add(part);
 		manaCost = -1;
+		return this;
 	}
 	
 	public String getName() {

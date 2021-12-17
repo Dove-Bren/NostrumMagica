@@ -1165,6 +1165,16 @@ public class SpellAction {
 		
 		@Override
 		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+			// Different effect if non-player casts: just give magic buff
+			if (!(caster instanceof EntityPlayer)) {
+				int count = level + 1;
+				double amt = 2 + level;
+				caster.removeActivePotionEffect(MagicBuffPotion.instance());
+				NostrumMagica.magicEffectProxy.applyMagicBuff(entity, element, amt, count);
+				entity.addPotionEffect(new PotionEffect(MagicBuffPotion.instance(), 60 * 20, 0));
+				return true;
+			}
+			
 			ItemStack inhand = entity.getHeldItemMainhand();
 			boolean offhand = false;
 			if (!isEnchantable(inhand)) {

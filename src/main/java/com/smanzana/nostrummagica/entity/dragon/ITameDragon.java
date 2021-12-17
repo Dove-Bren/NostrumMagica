@@ -1,19 +1,24 @@
 package com.smanzana.nostrummagica.entity.dragon;
 
-import com.smanzana.nostrummagica.client.gui.dragongui.TamedDragonGUI;
+import com.smanzana.nostrummagica.client.gui.petgui.PetGUI;
 import com.smanzana.nostrummagica.entity.IEntityPet;
+import com.smanzana.nostrummagica.entity.IRerollablePet;
 import com.smanzana.nostrummagica.pet.PetInfo.PetAction;
 
 import net.minecraft.entity.player.EntityPlayer;
 
-public interface ITameDragon extends IEntityPet {
+public interface ITameDragon extends IEntityPet, IRerollablePet {
 
-	public TamedDragonGUI.DragonContainer getGUIContainer(EntityPlayer player);
+	@Override
+	public PetGUI.PetContainer<? extends ITameDragon> getGUIContainer(EntityPlayer player);
+	
+	@Override
+	public PetGUI.PetGUIStatAdapter<? extends ITameDragon> getGUIAdapter();
 	
 	//public UUID getUniqueID();
 	
 	// Reroll dragon stats!
-	public void rollStats();
+	public void rerollStats();
 	
 	//public float getHealth();
 	

@@ -438,6 +438,12 @@ key.dash.left.desc=Ender Dash Left
 key.dash.right.desc=Ender Dash Right
 key.dash.back.desc=Ender Dash Back
 key.armor.toggle.desc=Toggle Armor On-hit Effects
+key.bladecast.desc=Use Warlock Blade
+key.pet.attack.desc=Pet: Attack
+key.pet.attackall.desc=All Pets: Attack
+key.pet.placementmode.desc=Cycle Pet Placement Mode
+key.pet.stopall.desc=All Pets: Stop
+key.pet.targetmode.desc=Cycle Pet Target Mode
 
 key.nostrummagica.desc=Nostrum Magica
 
@@ -653,6 +659,51 @@ info.tamed_arcane_wolf.hurt=%1$s is getting low on health!
 info.tamed_arcane_wolf.not_yours=%1$s refuses to listen to you
 info.tamed_arcane_wolf.low_health=%1$s is too low on health to ride
 info.tamed_arcane_wolf.no_ride=%1$s is too wild to ride
+
+info.tamed_arcane_wolf.bond_summary.wild=The arcane wolf is completely wild!
+info.tamed_arcane_wolf.bond_summary.follows=The wolf is still recovering from its transformation, but trusts you enough to follow you around still.
+info.tamed_arcane_wolf.bond_summary.inventory=The wolf trusts you enough to carry items for you!
+info.tamed_arcane_wolf.bond_summary.trainable=The arcane wolf trusts you, and can be trained in elemental magic now.
+info.tamed_arcane_wolf.bond_summary.rideable=The arcane wolf strongly trusts you, even allowing you to ride on its back!
+
+info.tamed_arcane_wolf.capability.follows=Follows
+info.tamed_arcane_wolf.capability.inventory=Can Hold Items
+info.tamed_arcane_wolf.capability.trainable=Trainable
+info.tamed_arcane_wolf.capability.rideable=Rideable
+
+info.tamed_arcane_wolf.capability.bonus_inventory=Larger Inventory
+info.tamed_arcane_wolf.capability.lava_walk=Lava Walk
+info.tamed_arcane_wolf.capability.wind_jump=Wind Jump
+info.tamed_arcane_wolf.capabilitywolf_blink=Wolf Blink
+info.tamed_arcane_wolf.capability.magic_resist=Magic Resist +30%%
+info.tamed_arcane_wolf.capability.storm_jump=Storm Jump
+
+info.wolf_type.nonelemental.name=Non-Elemental
+info.wolf_type.nonelemental.desc=This wolf hasn't trained in any element yet
+info.wolf_type.fire.name=Fire
+info.wolf_type.fire.desc=
+info.wolf_type.ice.name=Ice
+info.wolf_type.ice.desc=
+info.wolf_type.wind.name=Wind
+info.wolf_type.wind.desc=
+info.wolf_type.earth.name=Earth
+info.wolf_type.earth.desc=
+info.wolf_type.ender.name=Ender
+info.wolf_type.ender.desc=
+info.wolf_type.lightning.name=Lightning
+info.wolf_type.lightning.desc=
+info.wolf_type.barrier.name=Barrier
+info.wolf_type.barrier.desc=
+info.wolf_type.storm.name=Storm
+info.wolf_type.storm.desc=
+info.wolf_type.eldrich.name=Eldrich
+info.wolf_type.eldrich.desc=
+info.wolf_type.mystic.name=Mystic
+info.wolf_type.mystic.desc=
+info.wolf_type.nature.name=Nature
+info.wolf_type.nature.desc=
+info.wolf_type.hell.name=Hell
+info.wolf_type.hell.desc=
 
 info.hookshot.bad_dim=The mechanisms seem to have trouble working in this atmosphere...
 info.endercharm.enhanced=Use while sneaking to only teleport yourself. Otherwise, creates a portal home.

@@ -189,16 +189,19 @@ public class Inventories {
 	}
 	
 	public static final boolean deserializeInventory(IInventory base, NBTBase nbt) {
-		if (base == null || nbt == null || !(nbt instanceof NBTTagList)) {
+		if (base == null) {
 			return false;
 		}
 		
 		base.clear();
-		NBTTagList list = (NBTTagList) nbt;
-		for (int i = 0; i < list.tagCount(); i++) {
-			NBTTagCompound tag = list.getCompoundTagAt(i);
-			@Nonnull ItemStack stack = new ItemStack(tag);
-			base.setInventorySlotContents(i, stack);
+		
+		if (nbt != null && nbt instanceof NBTTagList) {
+			NBTTagList list = (NBTTagList) nbt;
+			for (int i = 0; i < list.tagCount(); i++) {
+				NBTTagCompound tag = list.getCompoundTagAt(i);
+				@Nonnull ItemStack stack = new ItemStack(tag);
+				base.setInventorySlotContents(i, stack);
+			}
 		}
 		
 		return true;
