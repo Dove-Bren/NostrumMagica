@@ -1,8 +1,8 @@
 package com.smanzana.nostrummagica.entity.dragon;
 
-import com.smanzana.nostrummagica.entity.tasks.DragonAIFocusedTarget;
-import com.smanzana.nostrummagica.entity.tasks.DragonAINearestAttackableTarget;
-import com.smanzana.nostrummagica.entity.tasks.DragonMeleeAttackTask;
+import com.smanzana.nostrummagica.entity.tasks.dragon.DragonAIFocusedTarget;
+import com.smanzana.nostrummagica.entity.tasks.dragon.DragonAINearestAttackableTarget;
+import com.smanzana.nostrummagica.entity.tasks.dragon.DragonMeleeAttackTask;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.entity.EntityLivingBase;

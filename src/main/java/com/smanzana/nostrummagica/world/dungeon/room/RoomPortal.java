@@ -5,9 +5,9 @@ import java.util.List;
 
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.blocks.DungeonBlock.Type;
-import com.smanzana.nostrummagica.blocks.tiles.SwitchBlockTileEntity;
 import com.smanzana.nostrummagica.blocks.SorceryPortalSpawner;
 import com.smanzana.nostrummagica.blocks.SwitchBlock;
+import com.smanzana.nostrummagica.blocks.tiles.SwitchBlockTileEntity;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.init.Blocks;

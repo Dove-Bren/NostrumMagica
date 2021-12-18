@@ -24,6 +24,12 @@ import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowOwnerAdvanced;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowOwnerGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIPetTargetTask;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
+import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfAIBarrierTask;
+import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfAIEldrichTask;
+import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfAIHellTask;
+import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfAIMysticTask;
+import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfAINatureTask;
+import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfAIStormTask;
 import com.smanzana.nostrummagica.pet.IPetWithSoul;
 import com.smanzana.nostrummagica.pet.PetInfo;
 import com.smanzana.nostrummagica.pet.PetInfo.PetAction;
@@ -54,6 +60,7 @@ import net.minecraft.entity.IEntityOwnable;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIAttackMelee;
 import net.minecraft.entity.ai.EntityAIBeg;
+import net.minecraft.entity.ai.EntityAIFollowOwner;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAILeapAtTarget;
 import net.minecraft.entity.ai.EntityAILookIdle;
@@ -67,6 +74,7 @@ import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.AbstractSkeleton;
+import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -83,15 +91,19 @@ import net.minecraft.potion.Potion;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEntityPet, IPetWithSoul, IStabbableEntity {
 	
 	public static enum ArcaneWolfElementalType {
-		NONELEMENTAL("nonelemental", null),
+		NONELEMENTAL("nonelemental", 0x00000000, null),
 		FIRE_ONLY("fire", EMagicElement.FIRE),
 		ICE_ONLY("ice", EMagicElement.ICE),
 		WIND_ONLY("wind", EMagicElement.WIND),
@@ -100,25 +112,31 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		LIGHTNING_ONLY("lightning", EMagicElement.LIGHTNING),
 		
 		// Composites
-		BARRIER("barrier", EMagicElement.EARTH, EMagicElement.ICE), // Earth + Ice
-		STORM("storm", EMagicElement.WIND, EMagicElement.LIGHTNING), // Wind + Lightning
-		ELDRICH("eldrich", EMagicElement.ENDER, EMagicElement.FIRE), // Ender + Fire
-		MYSTIC("mystic", EMagicElement.ICE, EMagicElement.ENDER), // Ice + Ender
-		NATURE("nature", EMagicElement.LIGHTNING, EMagicElement.EARTH), // Lightning + Earth
-		HELL("hell", EMagicElement.FIRE, EMagicElement.WIND); // Fire + Wind
+		BARRIER("barrier", 0xFFA0BBE5, EMagicElement.EARTH, EMagicElement.ICE), // Earth + Ice
+		STORM("storm", 0xFFEFFF99, EMagicElement.WIND, EMagicElement.LIGHTNING), // Wind + Lightning
+		ELDRICH("eldrich", 0xFFE030B0, EMagicElement.ENDER, EMagicElement.FIRE), // Ender + Fire
+		MYSTIC("mystic", 0xFF1A21E0, EMagicElement.ICE, EMagicElement.ENDER), // Ice + Ender
+		NATURE("nature", 0xFFD89254, EMagicElement.LIGHTNING, EMagicElement.EARTH), // Lightning + Earth
+		HELL("hell", 0xFFD05000, EMagicElement.FIRE, EMagicElement.WIND); // Fire + Wind
 		
 		private final String key;
 		private final @Nullable EMagicElement primary; // Only nonelemental has null though so we pretendit's not nullable
 		private final @Nullable EMagicElement secondary;
+		private final int color; // ARGB
 		
-		private ArcaneWolfElementalType(String key, EMagicElement primary) {
-			this(key, primary, null);
+		private ArcaneWolfElementalType(String key, int ARGB, EMagicElement primary) {
+			this(key, ARGB, primary, null);
 		}
 		
-		private ArcaneWolfElementalType(String key, EMagicElement primary, @Nullable EMagicElement secondary) {
+		private ArcaneWolfElementalType(String key, EMagicElement primary) {
+			this(key, primary.getColor(), primary);
+		}
+		
+		private ArcaneWolfElementalType(String key, int ARGB, EMagicElement primary, @Nullable EMagicElement secondary) {
 			this.primary = primary;
 			this.secondary = secondary;
 			this.key = key;
+			this.color = ARGB;
 		}
 		
 		public static @Nullable ArcaneWolfElementalType Match(EMagicElement first, EMagicElement second) {
@@ -147,6 +165,10 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		
 		public String getNameKey() {
 			return key;
+		}
+
+		public int getColor() {
+			return color;
 		}
 	}
 	
@@ -246,7 +268,10 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		GROUP_SPEED(WolfSpellTargetGroup.SELF, 50,
 				(new Spell("WolfSpeed", true)).addPart(new SpellPart(SelfTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.WIND, 1, EAlteration.SUPPORT, new SpellPartParam(8, true))),
 				(wolf, target) -> {
-					return wolf.hasElementLevel(EMagicElement.WIND, 1);
+					return wolf.hasElementLevel(EMagicElement.WIND, 1)
+							&& wolf.getAttackTarget() == null // Not in battle
+							&& wolf.getMana() >= wolf.getMaxMana() * .30 // >= 30% mana
+							;
 				}),
 		WIND_CUTTER(WolfSpellTargetGroup.ENEMY, 20,
 				(new Spell("WolfWindCutter", true)).addPart(new SpellPart(MagicCutterTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.WIND, 2, EAlteration.RUIN)),
@@ -302,7 +327,9 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 				(new Spell("WolfMagicBoost", true)).addPart(new SpellPart(AITargetTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.FIRE, 1, EAlteration.SUPPORT)),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.FIRE, 3)
-							&& target.getActivePotionEffect(MagicBoostPotion.instance()) == null;
+							&& target.getActivePotionEffect(MagicBoostPotion.instance()) == null
+							&& (wolf.getAttackTarget() != null || wolf.getMana() >= wolf.getMaxMana() * .75) // in battle or >= 75% mana
+							;
 				}),
 		ENDER_SHROUD(WolfSpellTargetGroup.ENEMY, 20,
 				(new Spell("WolfEnderShroud", true)).addPart(new SpellPart(SeekingBulletTrigger.instance())).addPart(new SpellPart(AoEShape.instance(), EMagicElement.ENDER, 2, null, new SpellPartParam(3, true))).addPart(new SpellPart(SingleShape.instance(), EMagicElement.ENDER, 1, EAlteration.INFLICT)),
@@ -469,7 +496,12 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		int priority = 1;
 		this.tasks.addTask(priority++, new EntityAISwimming(this));
 		this.tasks.addTask(priority++, this.aiSit);
-		//this.tasks.addTask(3, new EntityWolf.AIAvoidEntity(this, EntityLlama.class, 24.0F, 1.5D, 1.5D));
+		this.tasks.addTask(priority++, new ArcaneWolfAIBarrierTask(this, 5));
+		this.tasks.addTask(priority++, new ArcaneWolfAIStormTask(this, 35));
+		this.tasks.addTask(priority++, new ArcaneWolfAIEldrichTask(this, 40));
+		this.tasks.addTask(priority++, new ArcaneWolfAIMysticTask(this, 10));
+		this.tasks.addTask(priority++, new ArcaneWolfAINatureTask(this, 25));
+		this.tasks.addTask(priority++, new ArcaneWolfAIHellTask(this, 40));
 		this.tasks.addTask(priority++, new EntityAILeapAtTarget(this, 0.4F));
 		this.tasks.addTask(priority++, new EntityAIAttackMelee(this, 1.0D, true) {
 			@Override
@@ -479,10 +511,15 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 					// Too far
 					if (EntityArcaneWolf.this.hasWolfCapability(WolfTypeCapability.WOLF_BLINK)
 							&& EntityArcaneWolf.this.rand.nextFloat() < .05) {
+						Vec3d currentPos = EntityArcaneWolf.this.getPositionVector();
 						if (EntityArcaneWolf.this.teleportToEnemy(target)) {
+							EntityArcaneWolf.this.world.playSound(null, currentPos.x, currentPos.y, currentPos.z,
+									SoundEvents.ENTITY_ENDERMEN_TELEPORT, SoundCategory.NEUTRAL, 1f, 1f);
+							EntityArcaneWolf.this.playSound(SoundEvents.ENTITY_ENDERMEN_TELEPORT, 1f, 1f);
+							
 							// If currently training ender, get some xp!
 							if (EntityArcaneWolf.this.getTrainingElement() == EMagicElement.ENDER) {
-								EntityArcaneWolf.this.addTrainingXP(2);
+								EntityArcaneWolf.this.addTrainingXP(1);
 							}
 						}
 					}
@@ -491,7 +528,6 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 				super.checkAndPerformAttack(target, dist);
 			}
 		});
-		//T entity, int delay, int odds, boolean needsTarget, Predicate<T> predicate, Spell ... spells
 		// Attack/Offensive spells
 		this.tasks.addTask(priority++, new EntitySpellAttackTask<EntityArcaneWolf>(this, 20 * 3, 4, true, (w) -> {return !w.isSitting();}) {
 			private List<Spell> spellList = new ArrayList<>();
@@ -508,11 +544,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 			protected void deductMana(Spell spell, EntityArcaneWolf wolf) {
 				final int cost = getWolfSpellCost(spell);
 				wolf.addMana(-cost);
-				
-				int unused; // pull to func
-				if (wolf.getTrainingElement() == spell.getPrimaryElement()) {
-					wolf.addTrainingXP(Math.max(1, (int)Math.ceil((float)cost/25f)));
-				}
+				wolf.onWolfCast(spell, cost);
 			}
 		});
 		// Ally spells
@@ -535,6 +567,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 				if (owner != null) {
 					List<EntityLivingBase> tames = NostrumMagica.getTamedEntities(owner);
 					tames.add(owner);
+					tames.removeIf((e) -> { return e.getDistance(entity) > 15;});
 					Collections.shuffle(tames, new Random(entity.ticksExisted));
 					return tames.get(0);
 				} else {
@@ -546,11 +579,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 			protected void deductMana(Spell spell, EntityArcaneWolf wolf) {
 				final int cost = getWolfSpellCost(spell);
 				wolf.addMana(-cost);
-				
-				int unused; // pull to func
-				if (wolf.getTrainingElement() == spell.getPrimaryElement()) {
-					wolf.addTrainingXP(Math.max(1, (int)Math.ceil((float)cost/25f)));
-				}
+				wolf.onWolfCast(spell, cost);
 			}
 		});
 		// Self spells (longer recast)
@@ -574,14 +603,11 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 			protected void deductMana(Spell spell, EntityArcaneWolf wolf) {
 				final int cost = getWolfSpellCost(spell);
 				wolf.addMana(-cost);
-				
-				int unused; // pull to func
-				if (wolf.getTrainingElement() == spell.getPrimaryElement()) {
-					wolf.addTrainingXP(Math.max(1, (int)Math.ceil((float)cost/25f)));
-				}
+				wolf.onWolfCast(spell, cost);
 			}
 		});
 		this.tasks.addTask(priority++, new EntityAIFollowOwnerAdvanced<EntityArcaneWolf>(this, 1.5f, 0f, .5f));
+		this.tasks.addTask(priority++, new EntityAIFollowOwner(this, 1.0D, 10.0F, 2.0F));
 		//this.tasks.addTask(7, new EntityAIMate(this, 1.0D));
 		this.tasks.addTask(priority++, new EntityAIWanderAvoidWater(this, 1.0D));
 		this.tasks.addTask(priority++, new EntityAIBeg(this, 8.0F));
@@ -731,6 +757,21 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 	@Override
 	public boolean isBreedingItem(@Nonnull ItemStack stack) {
 		return false;
+	}
+	
+	@Override
+	public boolean canMateWith(EntityAnimal otherAnimal) {
+		return false;
+	}
+	
+	@Override
+	public boolean isInLove() {
+		return false;
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public float getTailRotation() {
+		return (float) (Math.PI * (.35f + .2f * (this.getHealth() / this.getMaxHealth())));
 	}
 	
 	public boolean isHungerItem(@Nonnull ItemStack stack) {
@@ -1648,49 +1689,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		
 		// Set new rune color based on new type
 		ArcaneWolfElementalType type = this.getElementalType();
-		final int color; // = type.getRuneColor();
-		switch (type) {
-		case NONELEMENTAL:
-		default:
-			color = 0x00000000;
-			break;
-		case EARTH_ONLY:
-			color = EMagicElement.EARTH.getColor();
-			break;
-		case ENDER_ONLY:
-			color = EMagicElement.ENDER.getColor();
-			break;
-		case FIRE_ONLY:
-			color = EMagicElement.FIRE.getColor();
-			break;
-		case ICE_ONLY:
-			color = EMagicElement.ICE.getColor();
-			break;
-		case LIGHTNING_ONLY:
-			color = EMagicElement.LIGHTNING.getColor();
-			break;
-		case WIND_ONLY:
-			color = EMagicElement.WIND.getColor();
-			break;
-		case BARRIER:
-			color = 0xFFA0BBE5;
-			break;
-		case HELL:
-			color = 0xFFD05000;
-			break;
-		case ELDRICH:
-			color = 0xFFE030B0;
-			break;
-		case MYSTIC:
-			color = 0xFF1A21E0;
-			break;
-		case NATURE:
-			color = 0xFFD89254;
-			break;
-		case STORM:
-			color = 0xFFEFFF99;
-			break;
-		}
+		final int color = type.getColor();
 		this.setRuneColor(color);
 	}
 	
@@ -1862,5 +1861,11 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 			}
 		}
 		return 0;
+	}
+	
+	protected void onWolfCast(Spell spell, int cost) {
+		if (getTrainingElement() == spell.getPrimaryElement()) {
+			addTrainingXP(Math.max(1, (int)Math.ceil((float)cost/25f)));
+		}
 	}
 }

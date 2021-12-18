@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.entity.tasks;
+package com.smanzana.nostrummagica.entity.tasks.dragon;
 
 import java.util.HashSet;
 import java.util.Iterator;

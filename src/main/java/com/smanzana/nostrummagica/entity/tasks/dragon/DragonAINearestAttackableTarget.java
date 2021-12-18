@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.entity.tasks;
+package com.smanzana.nostrummagica.entity.tasks.dragon;
 
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonRedBase;

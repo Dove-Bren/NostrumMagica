@@ -2,7 +2,9 @@ package com.smanzana.nostrummagica.network.messages;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.effects.ClientEffect;
+import com.smanzana.nostrummagica.client.effects.ClientEffectEldrichBlast;
 import com.smanzana.nostrummagica.client.effects.ClientEffectFormBasic;
+import com.smanzana.nostrummagica.client.effects.ClientEffectHellBurn;
 import com.smanzana.nostrummagica.client.effects.ClientEffectIcon;
 import com.smanzana.nostrummagica.client.effects.ClientEffectMirrored;
 import com.smanzana.nostrummagica.client.effects.ClientEffectRenderer;
@@ -35,6 +37,8 @@ public class SpawnPredefinedEffectMessage implements IMessage {
 
 	public static enum PredefinedEffect {
 		SOUL_DAGGER_STAB,
+		HELL_BURN,
+		ELDRICH_BLAST,
 	}
 
 	public static class Handler implements IMessageHandler<SpawnPredefinedEffectMessage, IMessage> {
@@ -54,10 +58,9 @@ public class SpawnPredefinedEffectMessage implements IMessage {
 				offset = Vec3d.ZERO;
 			}
 			
-			final ClientEffect effect;
+			ClientEffect effect = null;
 			switch (message.type) {
 			case SOUL_DAGGER_STAB:
-			default:
 				effect = new ClientEffectMirrored(offset,
 						new ClientEffectFormBasic(ClientEffectIcon.ARROW_SLASH, (-8f/24f), (8f/24f), (-12f/24f)),
 						message.duration, 5);
@@ -80,11 +83,20 @@ public class SpawnPredefinedEffectMessage implements IMessage {
 				.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .75f))
 				;
 				break;
+			case HELL_BURN:
+				effect = new ClientEffectHellBurn(ent, message.duration);
+				break;
+			case ELDRICH_BLAST:
+				effect = new ClientEffectEldrichBlast(ent, message.duration);
+				break;
 			}
 			
-			Minecraft.getMinecraft().addScheduledTask(() -> {
-				ClientEffectRenderer.instance().addEffect(effect);
-			});
+			if (effect != null) {
+				final ClientEffect effectToAdd = effect;
+				Minecraft.getMinecraft().addScheduledTask(() -> {
+					ClientEffectRenderer.instance().addEffect(effectToAdd);
+				});
+			}
 			
 			return null;
 		}

@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
@@ -44,15 +45,17 @@ public class SeekingBulletTrigger extends SpellTrigger {
 		// Just initial parameters for setup
 		private float pitch;
 		private float yaw;
+		private final boolean ignoreAllies;
 		
 		private EntityLivingBase target;
 		
-		public SeekingBulletTriggerInstance(SpellState state, World world, Vec3d pos, float pitch, float yaw) {
+		public SeekingBulletTriggerInstance(SpellState state, World world, Vec3d pos, float pitch, float yaw, boolean ignoreAllies) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
 			this.pitch = pitch;
 			this.yaw = yaw;
+			this.ignoreAllies = ignoreAllies;
 		}
 		
 		@Override
@@ -83,15 +86,24 @@ public class SeekingBulletTrigger extends SpellTrigger {
 							}
 							
 							if (ent != null) {
-								if (ent instanceof IEntityTameable) {
-									if (getState().getSelf().getUniqueID().equals(((IEntityTameable) ent).getOwnerId())) {
-										return false; // We own the target entity
-									}
-								}
 								
-								if (getState().getSelf() instanceof IEntityTameable) {
-									if (ent.getUniqueID().equals(((IEntityTameable) getState().getSelf()).getOwnerId())) {
-										return false; // We own the target entity
+								if (ignoreAllies) {
+									// Too strong?
+									if (ent instanceof EntityLivingBase
+											&& NostrumMagica.IsSameTeam(getState().getSelf(), (EntityLivingBase) ent)) {
+										return false;
+									}
+									
+									if (ent instanceof IEntityTameable) {
+										if (getState().getSelf().getUniqueID().equals(((IEntityTameable) ent).getOwnerId())) {
+											return false; // We own the target entity
+										}
+									}
+									
+									if (getState().getSelf() instanceof IEntityTameable) {
+										if (ent.getUniqueID().equals(((IEntityTameable) getState().getSelf()).getOwnerId())) {
+											return false; // We own the target entity
+										}
 									}
 								}
 							}
@@ -187,7 +199,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw, SpellPartParam params) {
 		// Add direction
 		pos = new Vec3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
-		return new SeekingBulletTriggerInstance(state, world, pos, pitch, yaw);
+		return new SeekingBulletTriggerInstance(state, world, pos, pitch, yaw, params.flip);
 	}
 
 	// Copied from vanilla entity class
@@ -221,7 +233,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 
 	@Override
 	public boolean supportsBoolean() {
-		return false;
+		return true;
 	}
 
 	@Override
@@ -236,7 +248,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 
 	@Override
 	public String supportedBooleanName() {
-		return null;
+		return I18n.format("modification.seeking_bullet.bool.name");
 	}
 
 	@Override

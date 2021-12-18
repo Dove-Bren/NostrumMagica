@@ -358,6 +358,7 @@ potion.familiar.name=Soul Bond
 potion.magicbuff.name=Magic Strikes
 potion.lightningcharge.name=Lightning Charge
 potion.lightningattack.name=Lightning Fury
+potion.naturesblessing.name=Nature's Blessing
 
 tile.magic_wall.name=Magic Wall
 tile.mani_ore.name=Mani Ore
@@ -674,7 +675,7 @@ info.tamed_arcane_wolf.capability.rideable=Rideable
 info.tamed_arcane_wolf.capability.bonus_inventory=Larger Inventory
 info.tamed_arcane_wolf.capability.lava_walk=Lava Walk
 info.tamed_arcane_wolf.capability.wind_jump=Wind Jump
-info.tamed_arcane_wolf.capabilitywolf_blink=Wolf Blink
+info.tamed_arcane_wolf.capability.wolf_blink=Wolf Blink
 info.tamed_arcane_wolf.capability.magic_resist=Magic Resist +30%%
 info.tamed_arcane_wolf.capability.storm_jump=Storm Jump
 

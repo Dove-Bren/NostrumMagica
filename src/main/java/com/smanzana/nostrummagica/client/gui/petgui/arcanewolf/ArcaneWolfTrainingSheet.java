@@ -17,6 +17,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryBasic;
@@ -315,7 +316,8 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 		//final int invTopOffset = 10;
 		final int playerInvSize = 27 + 9;
 		final int playerTopOffset = 100;
-		final int upperHeight = (height-playerTopOffset);
+		final int upperOffset = 10;
+		final int upperHeight = ((height-upperOffset)-playerTopOffset);
 		
 		for (int i = 0; i < localInv.getSizeInventory(); i++) {
 			final int x = getSlotX(pet, i, width);
@@ -324,7 +326,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 				continue;
 			}
 			final int index = i;
-			Slot slotIn = new Slot(localInv, i, offsetX + x, offsetY + y) {
+			Slot slotIn = new Slot(localInv, i, offsetX + x, offsetY + upperOffset + y) {
 				
 				@Override
 				public void onSlotChanged() {
@@ -381,7 +383,8 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 			final int leftOffset = (width - invWidth) / 2;
 			final int playerInvSize = 27 + 9;
 			final int playerTopOffset = 100;
-			final int upperHeight = (height-playerTopOffset);
+			final int upperOffset = 10;
+			final int upperHeight = ((height-upperOffset)-playerTopOffset);
 			
 			// Draw glyphs first
 			if (pet.getTrainingElement() != null || pet.getElementalType().getPrimary() != null)
@@ -393,7 +396,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 				{
 					// Draw background
 					GlStateManager.color(1f, 1f, 1f, 1f);
-					Gui.drawModalRectWithCustomSizedTexture((width-GUI_CENTER_GEM_SOCKET_WIDTH)/2, (upperHeight-GUI_CENTER_GEM_SOCKET_HEIGHT)/2,
+					Gui.drawModalRectWithCustomSizedTexture((width-GUI_CENTER_GEM_SOCKET_WIDTH)/2, upperOffset + (upperHeight-GUI_CENTER_GEM_SOCKET_HEIGHT)/2,
 							GUI_CENTER_GEM_SOCKET_HOFFSET, GUI_CENTER_GEM_SOCKET_VOFFSET,
 							GUI_CENTER_GEM_SOCKET_WIDTH, GUI_CENTER_GEM_SOCKET_HEIGHT,
 							256, 256);
@@ -434,7 +437,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 					
 					GlStateManager.color(red, green, blue, 1f);
 					
-					Gui.drawModalRectWithCustomSizedTexture((width-GUI_CENTER_GEM_WIDTH)/2, (upperHeight-GUI_CENTER_GEM_HEIGHT)/2,
+					Gui.drawModalRectWithCustomSizedTexture((width-GUI_CENTER_GEM_WIDTH)/2, upperOffset + (upperHeight-GUI_CENTER_GEM_HEIGHT)/2,
 							GUI_CENTER_GEM_HOFFSET + ((level-1) * GUI_CENTER_GEM_WIDTH), GUI_CENTER_GEM_VOFFSET,
 							GUI_CENTER_GEM_WIDTH, GUI_CENTER_GEM_HEIGHT,
 							256, 256);
@@ -446,7 +449,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 							(float)((color >> 0) & 0xFF) / 255f,
 							1f
 							);
-					Gui.drawModalRectWithCustomSizedTexture((width-GUI_GEM_SPARK_WIDTH)/2, (upperHeight-GUI_GEM_SPARK_HEIGHT)/2,
+					Gui.drawModalRectWithCustomSizedTexture((width-GUI_GEM_SPARK_WIDTH)/2, upperOffset + (upperHeight-GUI_GEM_SPARK_HEIGHT)/2,
 							GUI_GEM_SPARK_HOFFSET, GUI_GEM_SPARK_VOFFSET,
 							GUI_GEM_SPARK_WIDTH, GUI_GEM_SPARK_HEIGHT,
 							256, 256);
@@ -494,7 +497,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 					// Level 1
 					{
 						Gui.drawModalRectWithCustomSizedTexture((width-GUI_GEM_EXTRAS_1_WIDTH)/2,
-								(upperHeight-GUI_GEM_EXTRAS_1_HEIGHT)/2,
+								upperOffset + (upperHeight-GUI_GEM_EXTRAS_1_HEIGHT)/2,
 								GUI_GEM_EXTRAS_1_HOFFSET, GUI_GEM_EXTRAS_1_VOFFSET,
 								GUI_GEM_EXTRAS_1_WIDTH, GUI_GEM_EXTRAS_1_HEIGHT,
 								256, 256);
@@ -502,7 +505,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 					
 					if (level >= 2) {
 						Gui.drawModalRectWithCustomSizedTexture((width-GUI_GEM_EXTRAS_2_WIDTH)/2,
-								(upperHeight-GUI_GEM_EXTRAS_2_HEIGHT)/2,
+								upperOffset + (upperHeight-GUI_GEM_EXTRAS_2_HEIGHT)/2,
 								GUI_GEM_EXTRAS_2_HOFFSET, GUI_GEM_EXTRAS_2_VOFFSET,
 								GUI_GEM_EXTRAS_2_WIDTH, GUI_GEM_EXTRAS_2_HEIGHT,
 								256, 256);
@@ -510,7 +513,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 					
 					if (level >= 3) {
 						Gui.drawModalRectWithCustomSizedTexture((width-GUI_GEM_EXTRAS_3_WIDTH)/2,
-								(upperHeight-GUI_GEM_EXTRAS_3_HEIGHT)/2 + 35,
+								upperOffset + (upperHeight-GUI_GEM_EXTRAS_3_HEIGHT)/2 + 35,
 								GUI_GEM_EXTRAS_3_HOFFSET, GUI_GEM_EXTRAS_3_VOFFSET,
 								GUI_GEM_EXTRAS_3_WIDTH, GUI_GEM_EXTRAS_3_HEIGHT,
 								256, 256);
@@ -530,18 +533,46 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 				if (i == 0) {
 					// Draw center slot
 					mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
-					Gui.drawModalRectWithCustomSizedTexture(x - 1, y - 1,
+					Gui.drawModalRectWithCustomSizedTexture(x - 1, upperOffset + y - 1,
 							PetGUI.GUI_TEX_CELL_HOFFSET, PetGUI.GUI_TEX_CELL_VOFFSET,
 							cellWidth, cellWidth,
 							256, 256);
 				} else {
 					// Draw bowl
 					mc.getTextureManager().bindTexture(TEX_LOC);
-					Gui.drawModalRectWithCustomSizedTexture(x + bowlHOffset, y + bowlVOffset,
+					Gui.drawModalRectWithCustomSizedTexture(x + bowlHOffset, upperOffset + y + bowlVOffset,
 							GUI_SLOT_ICON_HOFFSET, GUI_SLOT_ICON_VOFFSET,
 							bowlWidth, bowlHeight,
 							256, 256);
 				}
+			}
+			
+			// Draw title and stage
+			{
+				String str = I18n.format("info.wolf_type." + pet.getElementalType().getNameKey() + ".name");
+				int strWidth = mc.fontRenderer.getStringWidth(str);
+				mc.fontRenderer.drawStringWithShadow(str, 0 + (width/2) - (strWidth/2), 0 + 2, 0xFFFFFFFF);
+				
+				if (pet.getTrainingElement() != null) {
+					final String substr;
+					switch (pet.getTrainingLevel()) {
+					case 1:
+					default:
+						substr = "Novice";
+						break;
+					case 2:
+						substr = "Adept";
+						break;
+					case 3:
+						substr = "Master";
+						break;
+					}
+					str = pet.getTrainingElement().getName() + " " + substr;
+					strWidth = mc.fontRenderer.getStringWidth(str);
+					mc.fontRenderer.drawStringWithShadow(str, 0 + (width/2) - (strWidth/2), 0 + 2 + 2 + mc.fontRenderer.FONT_HEIGHT, pet.getTrainingElement().getColor());
+				}
+				
+				GlStateManager.color(1f, 1f, 1f, 1f);
 			}
 			
 

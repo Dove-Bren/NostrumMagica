@@ -71,6 +71,7 @@ import com.smanzana.nostrummagica.potions.MagicBoostPotion;
 import com.smanzana.nostrummagica.potions.MagicBuffPotion;
 import com.smanzana.nostrummagica.potions.MagicResistPotion;
 import com.smanzana.nostrummagica.potions.MagicShieldPotion;
+import com.smanzana.nostrummagica.potions.NaturesBlessingPotion;
 import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
 import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
@@ -224,6 +225,7 @@ public class CommonProxy {
     	registry.register(FamiliarPotion.instance());
     	registry.register(LightningChargePotion.instance());
     	registry.register(LightningAttackPotion.instance());
+    	registry.register(NaturesBlessingPotion.instance());
     }
     
    

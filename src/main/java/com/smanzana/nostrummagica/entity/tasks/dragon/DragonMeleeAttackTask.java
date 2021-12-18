@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.entity.tasks;
+package com.smanzana.nostrummagica.entity.tasks.dragon;
 
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonFlying;

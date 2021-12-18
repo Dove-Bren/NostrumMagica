@@ -1,14 +1,14 @@
 package com.smanzana.nostrummagica.entity.dragon;
 
-import com.smanzana.nostrummagica.entity.tasks.DragonAIAggroTable;
-import com.smanzana.nostrummagica.entity.tasks.DragonAINearestAttackableTarget;
-import com.smanzana.nostrummagica.entity.tasks.DragonFlyEvasionTask;
-import com.smanzana.nostrummagica.entity.tasks.DragonFlyRandomTask;
-import com.smanzana.nostrummagica.entity.tasks.DragonLandTask;
-import com.smanzana.nostrummagica.entity.tasks.DragonMeleeAttackTask;
-import com.smanzana.nostrummagica.entity.tasks.DragonSummonShadowAttack;
-import com.smanzana.nostrummagica.entity.tasks.DragonTakeoffLandTask;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
+import com.smanzana.nostrummagica.entity.tasks.dragon.DragonAIAggroTable;
+import com.smanzana.nostrummagica.entity.tasks.dragon.DragonAINearestAttackableTarget;
+import com.smanzana.nostrummagica.entity.tasks.dragon.DragonFlyEvasionTask;
+import com.smanzana.nostrummagica.entity.tasks.dragon.DragonFlyRandomTask;
+import com.smanzana.nostrummagica.entity.tasks.dragon.DragonLandTask;
+import com.smanzana.nostrummagica.entity.tasks.dragon.DragonMeleeAttackTask;
+import com.smanzana.nostrummagica.entity.tasks.dragon.DragonSummonShadowAttack;
+import com.smanzana.nostrummagica.entity.tasks.dragon.DragonTakeoffLandTask;
 import com.smanzana.nostrummagica.items.DragonEggFragment;
 import com.smanzana.nostrummagica.items.NostrumSkillItem;
 import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
