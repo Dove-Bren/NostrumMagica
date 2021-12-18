@@ -13,11 +13,13 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.IStabbableEntity;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.network.messages.SpawnPredefinedEffectMessage.PredefinedEffect;
+import com.smanzana.nostrummagica.potions.NostrumTransformationPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.utils.RayTrace;
@@ -29,7 +31,9 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.IItemPropertyGetter;
@@ -209,11 +213,30 @@ public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
 		}
 	}
 	
+	protected boolean doSpecialWolfStab(EntityLivingBase stabber, EntityWolf wolf, ItemStack dagger) {
+		if (wolf.getActivePotionEffect(NostrumTransformationPotion.instance()) != null
+				&& stabber instanceof EntityPlayer
+				&& wolf.isOwner(stabber)) {
+			// Wolves get transformed into arcane wolves!
+			wolf.playSound(SoundEvents.ENTITY_WOLF_HOWL, 1f, 1f);
+			EntityArcaneWolf.TransformWolf(wolf, (EntityPlayer) stabber);
+			return true;
+		}
+		
+		return false;
+	}
+	
 	protected boolean stabTarget(EntityLivingBase attacker, EntityLivingBase target, ItemStack dagger) {
 		
 		// First, check if its a special-stabbable entity
 		if (target instanceof IStabbableEntity) {
 			if (((IStabbableEntity) target).onSoulStab(attacker, dagger)) {
+				return true;
+			}
+		}
+		
+		if (target instanceof EntityWolf) {
+			if (doSpecialWolfStab(attacker, (EntityWolf) target, dagger)) {
 				return true;
 			}
 		}

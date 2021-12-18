@@ -2507,6 +2507,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			// Award lore about soul bonding
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(stabber);
 			if (attr != null) {
+				attr.giveFullLore(SoulBoundLore.instance());
 				attr.giveBasicLore(SoulBoundDragonLore.instance);
 			}
 			

@@ -345,6 +345,7 @@ item.lens_bore_reversed.desc=Digs up instead of down
 item.lens.master=Master Lens
 
 item.dragon_soul_item.name=Dragon Soul Ember
+item.arcane_wolf_soul_item.name=Arcane Wolf Soul Flower
 item.soul_dagger.name=Soul Dagger
 item.soul_dagger.desc=Sneak + Right-Click to charge a stab attack
 
@@ -359,6 +360,7 @@ potion.magicbuff.name=Magic Strikes
 potion.lightningcharge.name=Lightning Charge
 potion.lightningattack.name=Lightning Fury
 potion.naturesblessing.name=Nature's Blessing
+potion.transformation.name=Transformation  Ready
 
 tile.magic_wall.name=Magic Wall
 tile.mani_ore.name=Mani Ore
@@ -541,6 +543,7 @@ info.teleportrune.norune=The stored location does not point to a teleportation r
 info.teleportrune.toofar=The distant rune is too far away!
 info.screen.goto=Click to view
 info.create_geotoken.nopos=The geogem must have a location saved into it!
+info.transformation.noentity=The entity to transform must be close to the ritual!
 
 info.armor.set_status=%1$s Set Bonus %3$s(%2$d/4)%4$s
 info.armor.set_total=%1$s Set Bonus %2$s(Complete)%3$s
@@ -930,6 +933,9 @@ ritual.recall.desc=Teleport to your mark|location. Mark locations with|the Ritua
 ritual.teleport_obelisk.name=Teleport to Obelisk
 ritual.teleport_obelisk.desc=Teleport to the obelisk pointed to the the Geogem
 
+ritual.transform_wolf.name=Arcane Wolf Primer
+ritual.transform_wolf.desc=Begins the transformation|processon a nearby tamed wolf.
+
 ritual.outcome.teleport_obelisk.desc=Teleport to a distance obelisk.|The obelisk must be pointed to by the Geogem used|as the center item
 ritual.outcome.spawn_item.desc=Forms a %s
 ritual.outcome.construct_geotoken.desc=Solidifies a GeoGem into a GeoToken
@@ -943,6 +949,7 @@ ritual.outcome.bind_spell.desc=Starts binding a spell to a tome
 ritual.outcome.create_obelisk.desc=Creates an Obelisk at|the center of the ritual
 ritual.outcome.create_portal.desc=Spawns a portal to the|Sorcery Dimension
 ritual.outcome.create_aether_infuser.desc=Creates an Aether Infuser at|the center of the ritual
+ritual.outcome.transformation_effect.desc=Prepares the creatue for transformation
 
 ritual.kani.name=Kani Infusion
 ritual.kani.desc=Promotes a Mani Crystal to a Kani Crystal
@@ -1100,7 +1107,8 @@ ritual.make_lens_elevator.name=Make Elevator Lens
 ritual.make_lens_heal.name=Make Heal Lens
 ritual.make_lens_bore.name=Make Bore Lens
 
-ritual.revive_soulbound_pet.name=Revive Soulbound Pet
+ritual.revive_soulbound_pet_dragon.name=Revive Soulbound Pet
+ritual.revive_soulbound_pet_wolf.name=Revive Soulbound Pet
 ritual.spawn_soul_dagger.name=Construct Soul Dagger
 
 enhancement.lower_reagent_cost.name=Lower Reagent Cost
@@ -1312,6 +1320,7 @@ modification.vortex_blade.float.name=Duration (Seconds)
 modification.projectile.bool.name=Hit Allies
 modification.wall.bool.name=Only Hit Once
 modification.wall.float.name=Radius
+modification.seeking_bullet.bool.name=Ignore Allies
 
 modification.level.flip=Trigger When Above
 
@@ -1534,3 +1543,6 @@ research.soulbound_pets.info=  Congratulations! You've soulbonded with one of yo
 research.soul_daggers.name=Soul Daggers
 research.soul_daggers.desc=Piercing the soul
 research.soul_daggers.info=  Soul daggers are an especially curious weapon. They are difficult to craft, and don't boast impressive damage on their own.|  To get the most combat effectiveness out of them, one doesn't slash with them and instead stabs. The magical energies of the blade are such that they slide through the flesh and soul of the creature targetting.|  For most creatures, this means dealing decent damage (base damage + 2), applying a stun effect for a few moments, and even draining some of the creatures mana to absorb yourself.||  And yet, there are other uses of the blade as well. You are scared to think about it to much, but you can feel the capabilities of the blade in your hands. Rather than puncturing the soul for damage and mana, you wonder if there's a way to use the blade more carefully and more cleanly collect pieces of a creature's soul...|  You'll have to inspect the blade closer to find out.
+research.wolf_transformation.name=Arcane Wolves
+research.wolf_transformation.desc=Magical Good Boys
+research.wolf_transformation.info=  The soul-piercing capabilities of the soul dagger are scary, and it's hard imagining using it on anything you care about.|  And yet... you think you have devised a way to use it to help your lovable tamed wolf pet become stronger with the use of magic!||  To transform a tamed wolf into an Arcane Wolf, you must first perform bring your wolf to your ritual setup and perform the Arcane Wolf Primer ritual. After doing so, your wolf will begin the first part of transforming into a powerful Arcane Wolf. This process will likely be very painful for the wolf, so act quickly.|  After performing the ritual, the wolf's essence will begin to transform, but its body will not. To prevent your wolf from dying, you must ready your soul dagger and piece through the wolf's flesh and free its soul.

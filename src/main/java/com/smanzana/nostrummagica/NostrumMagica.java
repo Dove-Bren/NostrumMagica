@@ -48,8 +48,10 @@ import com.smanzana.nostrummagica.command.CommandUnlock;
 import com.smanzana.nostrummagica.command.CommandUnlockAll;
 import com.smanzana.nostrummagica.command.CommandWriteRoom;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfTameLore;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityWisp;
+import com.smanzana.nostrummagica.entity.IEntityPet;
 import com.smanzana.nostrummagica.entity.IEntityTameable;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
@@ -64,6 +66,7 @@ import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble.Item
 import com.smanzana.nostrummagica.integration.enderio.EnderIOProxy;
 import com.smanzana.nostrummagica.integration.musica.MusicaProxy;
 import com.smanzana.nostrummagica.items.AltarItem;
+import com.smanzana.nostrummagica.items.ArcaneWolfSoulItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
 import com.smanzana.nostrummagica.items.DragonArmor;
@@ -134,6 +137,7 @@ import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.rituals.outcomes.IRitualOutcome;
+import com.smanzana.nostrummagica.rituals.outcomes.OutcomeApplyTransformation;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeBindSpell;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeConstructGeotoken;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeCreateObelisk;
@@ -191,6 +195,7 @@ import net.minecraft.entity.ai.EntityAIFollowOwner;
 import net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.EntityTameable;
+import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -1492,11 +1497,58 @@ public class NostrumMagica
 		
 		// Dragon revive
 		RitualRegistry.instance().addRitual(
-			RitualRecipe.createTier3("revive_soulbound_pet",
+			RitualRecipe.createTier3("revive_soulbound_pet_dragon",
 					new ItemStack(DragonSoulItem.instance()),
 					null,
 					new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.MANDRAKE_ROOT, ReagentType.CRYSTABLOOM, ReagentType.MANI_DUST},
 					new ItemStack(DragonSoulItem.instance()),
+					new ItemStack[] {ItemStack.EMPTY, NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), new ItemStack(Items.EGG), ItemStack.EMPTY},
+					new RRequirementResearch("soulbound_pets"),
+					new OutcomeSpawnEntity(new IEntityFactory() {
+						@Override
+						public void spawn(World world, Vec3d pos, EntityPlayer invoker, ItemStack centerItem) {
+							PetSoulItem.SpawnPet(centerItem, world, pos.addVector(0, 1, 0));
+//							EntityKoid koid = new EntityKoid(world);
+//							koid.setPosition(pos.x, pos.y, pos.z);
+//							world.spawnEntity(koid);
+//							koid.setAttackTarget(invoker);
+						}
+
+						@Override
+						public String getEntityName() {
+							return "entity.nostrummagica.placeholder.soulbound.name";
+						}
+					}, 1) {
+					@Override
+					public boolean canPerform(World world, EntityPlayer player, BlockPos center, RitualMatchInfo ingredients) {
+						// Must have PetSoulItem in center, and must have valid soul.
+						if (ingredients.center.isEmpty() || !(ingredients.center.getItem() instanceof PetSoulItem)) {
+							player.sendMessage(new TextComponentTranslation("info.respawn_soulbound_pet.fail.baditem", new Object[0]));
+							return false;
+						}
+						
+						PetSoulItem item = (PetSoulItem) ingredients.center.getItem();
+						if (item.getPetSoulID(ingredients.center) == null) {
+							player.sendMessage(new TextComponentTranslation("info.respawn_soulbound_pet.fail.baditem", new Object[0]));
+							return false;
+						}
+						
+						if (!item.canSpawnEntity(world, player, new Vec3d(center), ingredients.center)) {
+							return false;
+						}
+						
+						return true;
+					}
+				})	
+			);
+		
+		// Wolf revive
+		RitualRegistry.instance().addRitual(
+			RitualRecipe.createTier3("revive_soulbound_pet_wolf",
+					new ItemStack(ArcaneWolfSoulItem.instance()),
+					null,
+					new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.MANDRAKE_ROOT, ReagentType.CRYSTABLOOM, ReagentType.MANI_DUST},
+					new ItemStack(ArcaneWolfSoulItem.instance()),
 					new ItemStack[] {ItemStack.EMPTY, NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), new ItemStack(Items.EGG), ItemStack.EMPTY},
 					new RRequirementResearch("soulbound_pets"),
 					new OutcomeSpawnEntity(new IEntityFactory() {
@@ -1547,6 +1599,18 @@ public class NostrumMagica
 					new ItemStack[] {new ItemStack(EnchantedWeapon.get(EMagicElement.WIND, 1)), new ItemStack(EnchantedWeapon.get(EMagicElement.LIGHTNING, 1)), NostrumResourceItem.getItem(ResourceType.SLAB_FIERCE, 1), new ItemStack(EnchantedWeapon.get(EMagicElement.ICE, 1))},
 					new RRequirementResearch("soul_daggers"),
 					new OutcomeSpawnItem(new ItemStack(SoulDagger.instance(), 1)))
+				);
+		
+		// Mark wolf for transformation
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("transform_wolf",
+					new ItemStack(Items.BONE),
+					null,
+					new ReagentType[] {ReagentType.MANI_DUST, ReagentType.CRYSTABLOOM, ReagentType.GRAVE_DUST, ReagentType.MANDRAKE_ROOT},
+					NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1),
+					new ItemStack[] {ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1), new ItemStack(Items.BONE), NostrumResourceItem.getItem(ResourceType.SLAB_KIND, 1), ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1)},
+					new RRequirementResearch("wolf_transformation"),
+					new OutcomeApplyTransformation(20 * 60, (e) -> { return e instanceof EntityWolf;}))
 				);
 		
 		
@@ -2379,9 +2443,17 @@ public class NostrumMagica
 		
 		NostrumResearch.startBuilding()
 			.hiddenParent("kani")
-			.lore(EntityTameDragonRed.SoulBoundDragonLore.instance())
+			.lore(IEntityPet.SoulBoundLore.instance())
 			.reference("ritual::revive_soulbound_pet", "ritual.revive_soulbound_pet.name")
 		.build("soulbound_pets", NostrumResearchTab.ADVANCED_MAGICA, Size.GIANT, 0, 1, true, new ItemStack(DragonSoulItem.instance()));
+		
+		NostrumResearch.startBuilding()
+			.parent("rituals")
+			.hiddenParent("soul_daggers")
+			.hiddenParent("kani")
+			.lore(WolfTameLore.instance())
+			.reference("ritual::transform_wolf", "ritual.transform_wolf.name")
+		.build("wolf_transformation", NostrumResearchTab.MAGICA, Size.GIANT, 4, 0, true, new ItemStack(Items.BONE));
 		
 		//NostrumResearchTab tab, Size size, int x, int y, boolean hidden, ItemStack icon
     }

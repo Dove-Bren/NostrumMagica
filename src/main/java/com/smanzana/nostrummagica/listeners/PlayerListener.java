@@ -56,6 +56,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntitySpider;
+import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityArrow;
@@ -76,6 +77,7 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
+import net.minecraftforge.event.entity.living.AnimalTameEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
@@ -844,6 +846,17 @@ public class PlayerListener {
 			} else if (e.crafting.getItem() instanceof ItemBlock &&
 					((ItemBlock)e.crafting.getItem()).getBlock() instanceof ILoreTagged) {
 				attr.giveBasicLore((ILoreTagged) ((ItemBlock) e.crafting.getItem()).getBlock());
+			}
+		}
+	}
+	
+	@SubscribeEvent
+	public void onTame(AnimalTameEvent e) {
+		if (e.getAnimal() instanceof EntityWolf) {
+			EntityPlayer player = e.getTamer();
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+			if (attr != null && !attr.hasLore(EntityArcaneWolf.WolfTameLore.instance())) {
+				attr.giveBasicLore(EntityArcaneWolf.WolfTameLore.instance());
 			}
 		}
 	}

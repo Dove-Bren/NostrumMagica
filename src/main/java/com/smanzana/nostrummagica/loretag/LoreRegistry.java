@@ -8,11 +8,14 @@ import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityLux;
 import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntityWisp;
+import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfTameLore;
+import com.smanzana.nostrummagica.entity.IEntityPet.SoulBoundLore;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed.TameRedDragonLore;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemPhysical;
 import com.smanzana.nostrummagica.items.AltarItem;
+import com.smanzana.nostrummagica.items.ArcaneWolfSoulItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
 import com.smanzana.nostrummagica.items.DragonEgg;
@@ -136,6 +139,9 @@ public class LoreRegistry {
 		register(DragonSoulItem.instance());
 		register(EntityTameDragonRed.SoulBoundDragonLore.instance());
 		register(SoulDagger.instance());
+		register(ArcaneWolfSoulItem.instance());
+		register(SoulBoundLore.instance());
+		register(WolfTameLore.instance());
 		
 		
 		for (Preset preset : Preset.values()) {

@@ -99,6 +99,7 @@ import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
 import com.smanzana.nostrummagica.items.AltarItem;
+import com.smanzana.nostrummagica.items.ArcaneWolfSoulItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ChalkItem;
 import com.smanzana.nostrummagica.items.DragonArmor;
@@ -662,6 +663,10 @@ public class ClientProxy extends CommonProxy {
 		registerModel(SoulDagger.instance(),
 				0,
 				SoulDagger.ID);
+		
+		registerModel(ArcaneWolfSoulItem.instance(),
+				0,
+				ArcaneWolfSoulItem.ID);
 		
 		registerEntityRenderers();
 	}

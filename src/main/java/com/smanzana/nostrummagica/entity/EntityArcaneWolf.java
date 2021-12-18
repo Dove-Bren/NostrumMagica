@@ -11,7 +11,9 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
 import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetGUIStatAdapter;
 import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfBondInfoSheet;
@@ -20,6 +22,7 @@ import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfInvento
 import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfTrainingSheet;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed.SoulBoundDragonLore;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowOwnerAdvanced;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowOwnerGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIPetTargetTask;
@@ -30,6 +33,9 @@ import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfAIHellTask;
 import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfAIMysticTask;
 import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfAINatureTask;
 import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfAIStormTask;
+import com.smanzana.nostrummagica.items.ArcaneWolfSoulItem;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.pet.IPetWithSoul;
 import com.smanzana.nostrummagica.pet.PetInfo;
 import com.smanzana.nostrummagica.pet.PetInfo.PetAction;
@@ -1495,17 +1501,17 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 			// Drop inventory before snapshotting
 			dropInventory();
 			
-//			final ItemStack stack = DragonSoulItem.MakeSoulItem(this, true);
-//			if (!stack.isEmpty()) {
-//				this.entityDropItem(stack, 1f);
-//				this.attackEntityFrom(DamageSource.GENERIC, 1000000f);
-//			}
-//			
-//			// Award lore about soul bonding
-//			INostrumMagic attr = NostrumMagica.getMagicWrapper(stabber);
-//			if (attr != null) {
-//				attr.giveBasicLore(SoulBoundDragonLore.instance);
-//			}
+			final ItemStack stack = ArcaneWolfSoulItem.MakeSoulItem(this, true);
+			if (!stack.isEmpty()) {
+				this.entityDropItem(stack, 1f);
+				this.attackEntityFrom(DamageSource.GENERIC, 1000000f);
+			}
+			
+			// Award lore about soul bonding
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(stabber);
+			if (attr != null) {
+				attr.giveFullLore(SoulBoundLore.instance());
+			}
 			
 			return true;
 		}
@@ -1867,5 +1873,53 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		if (getTrainingElement() == spell.getPrimaryElement()) {
 			addTrainingXP(Math.max(1, (int)Math.ceil((float)cost/25f)));
 		}
+	}
+	
+	public static EntityArcaneWolf TransformWolf(EntityWolf wolf, EntityPlayer player) {
+		EntityArcaneWolf newWolf = new EntityArcaneWolf(wolf.world);
+		newWolf.setPosition(wolf.posX, wolf.posY, wolf.posZ);
+		newWolf.setTamedBy(player);
+		newWolf.setHealth(5f);
+		wolf.setDead();
+		wolf.world.spawnEntity(newWolf);
+		return newWolf;
+	}
+	
+	public static final class WolfTameLore implements ILoreTagged {
+		
+		private static WolfTameLore instance = null;
+		public static WolfTameLore instance() {
+			if (instance == null) {
+				instance = new WolfTameLore();
+			}
+			return instance;
+		}
+
+		@Override
+		public String getLoreKey() {
+			return "lore_wolf_tame";
+		}
+
+		@Override
+		public String getLoreDisplayName() {
+			return "Tamed Wolves";
+		}
+
+		@Override
+		public Lore getBasicLore() {
+			return new Lore().add("Feeding a bone to this wild wolf tamed it!");
+		}
+
+		@Override
+		public Lore getDeepLore() {
+			return new Lore().add("Feeding a bone to this wild wolf tamed it!");
+		}
+
+		@Override
+		public InfoScreenTabs getTab() {
+			// Don't actually display! We're going to show our own page!
+			return InfoScreenTabs.INFO_ENTITY;
+		}
+		
 	}
 }
