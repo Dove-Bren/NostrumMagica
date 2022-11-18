@@ -2419,15 +2419,28 @@ public class NostrumMagica
 		
 		
 		// Advanced Magica
-		NostrumResearch.startBuilding()
-			.hiddenParent("vani")
-			.hiddenParent("reagent_bag")
-			.hiddenParent("mage_staff")
-			.lore(NostrumResourceItem.instance())
-			.lore(MasteryOrb.instance())
-			.lore(EssenceItem.instance())
-			.reference("ritual::thano_infusion", "ritual.thano_infusion.name")
-		.build("thano_pendant", NostrumResearchTab.ADVANCED_MAGICA, Size.GIANT, 2, -1, true, new ItemStack(ThanoPendant.instance()));
+		{
+			NostrumResearch.Builder builder = NostrumResearch.startBuilding();
+			builder.reference("ritual::thano_infusion", "ritual.thano_infusion.name");
+			if (!ModConfig.config.usingEasierThano()) {
+				builder
+				.hiddenParent("vani")
+				.hiddenParent("reagent_bag")
+				.hiddenParent("mage_staff")
+				.lore(NostrumResourceItem.instance())
+				.lore(MasteryOrb.instance())
+				.lore(EssenceItem.instance());
+			
+			} else {
+				builder
+				.hiddenParent("kani")
+				.hiddenParent("reagent_bag")
+				.lore(NostrumResourceItem.instance())
+				.lore(EssenceItem.instance());
+			}
+			
+			builder.build("thano_pendant", NostrumResearchTab.ADVANCED_MAGICA, Size.GIANT, 2, -1, true, new ItemStack(ThanoPendant.instance()));
+		}
 		
 		NostrumResearch.startBuilding()
 			.hiddenParent("vani")

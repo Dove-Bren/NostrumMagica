@@ -51,6 +51,7 @@ public class ModConfig {
 		NOSTRUM_OVERRIDE_ELYTRA(Category.SERVER, "nostrum_elytra_override", true, true, "If true, Nostrum will override (via ASM transformation) elytra flying."),
 		
 		HIGHER_BALANCED(Category.SERVER, "balance_armor_higher", false, true, "If true, set armor values to higher. Useful when other armor mods auto balance down armor values. I'm writing this while looking at First Aid and RLCraft."),
+		EASIER_THANO(Category.SERVER, "balance_easier_thano", false, true, "If true, make Thano pendants/staves/etc. easier to get. Good when using Aetheria and automation doesn't need to be late game. Changing requires a restart."),
 		BAG_VACUUM_ON_SNEAK(Category.SERVER, "bag_sneak_vacuum", false, true, "If true, sneaking does NOT bypass the vacuum feature of rune and reagent bags. Useful when used with mods that change what sneaking means for EntityItems.")
 		;
 		
@@ -500,5 +501,9 @@ public class ModConfig {
 	
 	public boolean vacuumWhileSneaking() {
 		return getBooleanValue(Key.BAG_VACUUM_ON_SNEAK, true);
+	}
+	
+	public boolean usingEasierThano() {
+		return getBooleanValue(Key.EASIER_THANO, true);
 	}
 }
