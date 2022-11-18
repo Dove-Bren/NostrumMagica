@@ -19,9 +19,11 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFlierDiveTask;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIOrbitEntityGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIStayHomeTask;
+import com.smanzana.nostrummagica.entity.tasks.EntityAITemptGeneric;
 import com.smanzana.nostrummagica.items.NostrumSkillItem;
 import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
 import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -33,6 +35,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
+import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -66,7 +69,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTameable {
 	
-	protected static final double MAX_WISP_DISTANCE_SQ = 144;
+	protected static final double LUX_HOME_DISTANCE_SQ = 144;
+	protected static final double LUX_HOME_FORGET_DISTANCE_SQ = 400;
 	protected static final DataParameter<Optional<BlockPos>> HOME  = EntityDataManager.<Optional<BlockPos>>createKey(EntityLux.class, DataSerializers.OPTIONAL_BLOCK_POS);
 	protected static final DataParameter<Optional<UUID>> OWNER = EntityDataManager.<Optional<UUID>>createKey(EntityLux.class, DataSerializers.OPTIONAL_UNIQUE_ID);
 	protected static final DataParameter<ItemStack> POLLINATED_ITEM = EntityDataManager.<ItemStack>createKey(EntityLux.class, DataSerializers.ITEM_STACK);
@@ -92,7 +96,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 	
 	public EntityLux(World worldIn, BlockPos homePos) {
 		this(worldIn);
-		this.setHomePosAndDistance(homePos, (int) MAX_WISP_DISTANCE_SQ);
+		this.setHomePosAndDistance(homePos, (int) LUX_HOME_DISTANCE_SQ);
 		this.setHome(homePos);
 	}
 	
@@ -139,8 +143,27 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		// At night, sleep in trees
 		this.tasks.addTask(priority++, new AIRoostTask(this, true));
 		
+		// If player nearby with a flower, be tempted!
+		this.tasks.addTask(priority++, new EntityAITemptGeneric(this, 1.1D, ReagentItem.instance(), false) {
+			@Override
+			protected boolean isTempting(ItemStack stack) {
+				ReagentType type = ReagentItem.findType(stack);
+				return type == ReagentType.BLACK_PEARL || type == ReagentType.CRYSTABLOOM;
+			}
+			
+			@Override
+			protected void moveToTemptingPlayer(EntityCreature tempted, EntityPlayer player) {
+				if (this.temptedEntity.getDistanceSq(this.temptingPlayer) < 6.25D) {
+					//this.temptedEntity.getMoveHelper(). no such thing as stop
+				} else {
+					this.temptedEntity.getMoveHelper().setMoveTo(player.posX, player.posY, player.posZ, 0.3D);
+				}
+			}
+		});
+		// TODO
+		
 		// If we go too far, go back home!
-		this.tasks.addTask(priority++, new EntityAIStayHomeTask<EntityLux>(this, 1D, (MAX_WISP_DISTANCE_SQ * .8)));
+		this.tasks.addTask(priority++, new EntityAIStayHomeTask<EntityLux>(this, 1D, (LUX_HOME_DISTANCE_SQ * .8)));
 		
 		// Daily idle tasks. First, look for interesting flowers
 		this.tasks.addTask(priority++, new AIFlyToRandomFeature(this, 20 * 10) {
@@ -269,6 +292,13 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 				}
 			}
 		} else {
+			// Check if we're far from home and forget it if so
+			if (this.getHome() != null) {
+				if (this.getDistanceSq(this.getHome()) > LUX_HOME_FORGET_DISTANCE_SQ) {
+					this.setHome(null);
+				}
+			}
+			
 			if (idleCooldown > 0) {
 				idleCooldown--;
 				if (idleCooldown == 0) {
@@ -331,7 +361,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 	
 	protected void setHome(BlockPos home) {
 		this.dataManager.set(HOME, Optional.fromNullable(home));
-		this.setHomePosAndDistance(home, (int) MAX_WISP_DISTANCE_SQ);
+		this.setHomePosAndDistance(home, (int) LUX_HOME_DISTANCE_SQ);
 	}
 	
 	public BlockPos getHome() {
