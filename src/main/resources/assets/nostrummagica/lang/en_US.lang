@@ -401,6 +401,7 @@ tile.item_duct.name=Item Duct
 tile.dungeon_bars.name=Dungeon Bars
 tile.dungeon_air.single.name=Dungeon Air
 tile.dungeon_air.flood.name=Dungeon Air (Flood)
+tile.paradox_mirror.name=Paradox Mirror
 
 entity.nostrummagica.physical_golem.name=Metal Golem
 entity.nostrummagica.lightning_golem.name=Lightining Golem
@@ -544,6 +545,7 @@ info.teleportrune.toofar=The distant rune is too far away!
 info.screen.goto=Click to view
 info.create_geotoken.nopos=The geogem must have a location saved into it!
 info.transformation.noentity=The entity to transform must be close to the ritual!
+info.generic.block_linked=Block linked!
 
 info.armor.set_status=%1$s Set Bonus %3$s(%2$d/4)%4$s
 info.armor.set_total=%1$s Set Bonus %2$s(Complete)%3$s
@@ -713,7 +715,7 @@ info.hookshot.bad_dim=The mechanisms seem to have trouble working in this atmosp
 info.endercharm.enhanced=Use while sneaking to only teleport yourself. Otherwise, creates a portal home.
 
 info.lore_tamedragon_soulbound.name=Soulbonded Dragons
-info.lore_tamedragon_soulbound.desc=  You've soulbonded with your dragon! Its soul is not intertwined with yours!|  As a symbol of this bond, you've received a Dragon Soul Ember with your dragon's soul in it.|  This special item can be used to revive your dragon if it perishes. Be sure not to lose it!
+info.lore_tamedragon_soulbound.desc=  You've soulbonded with your dragon! Its soul is now intertwined with yours!|  As a symbol of this bond, you've received a Dragon Soul Ember with your dragon's soul in it.|  This special item can be used to revive your dragon if it perishes. Be sure not to lose it!
 
 info.respawn_soulbound_pet.fail.baditem=The soul item is missing a soul to respawn!
 info.respawn_soulbound_dragon.fail.mana=The Dragon Soul Ember must be charged with mana first!
@@ -977,6 +979,7 @@ ritual.teleportrune.name=Create Teleport Runes
 ritual.putter.name=Construct Putter
 ritual.active_hopper.name=Construct Active Hoppers
 ritual.item_duct.name=Construct Item Ducts
+ritual.paradox_mirror.name=Make Paradox Mirror
 ritual.mimic_facade.name=Create Magic Facade
 ritual.mimic_door.name=Create Magic Door
 ritual.koid.name=Void Conjuration
@@ -1527,6 +1530,9 @@ research.essence_seeds.info=  In a feat of magic and inginuity, you've created s
 research.dragon_armor.name=Dragon Armor
 research.dragon_armor.desc=Protecting your new partner
 research.dragon_armor.info=  Dragons have natural armor from their thick dragon hide. However, a few trips into the nether with your companion was all it took to realize some extra padding wouldn't hurt.|  Dragon armor can be equipped on a dragon in the inventory tab, assuming you've gained enough dragon bond to access it. Dragons can wear body armor as well as helmets.
+research.paradox_mirrors.name=Paradox Mirrors
+research.paradox_mirrors.desc=A Pair O'Mirrors?
+research.paradox_mirrors.info=  Item ducts provide a magical means to move items through the world from block to block. Combining this idea with the teleportation energies of ender teleportation has provided an even more efficient means of transfering items around!|  Paradox Mirrors can be placed on a wall and then paired with another mirror with a GeoGem. After doing this, one can simply throw an item in the mirror and it'll come out at the other mirror!|  There's a limit to the speed that items can be transferred. Items are sent whole stacks at a time, but only one stack can go per interval. This may be sped up by providing magical energy somehow...||  To link a mirror to another, store the location of the other mirror in a GeoGem and then right-click the gem on the source mirror. A message will display when successfully linked.|  Items will only be sent if the marked location is loaded, and a mirror is present. If the destination mirror is moved, no items can be sent.
 
 research.wispblock.name=Wisp Summoning
 research.wispblock.desc=Wispful thinking?
@@ -1545,4 +1551,4 @@ research.soul_daggers.desc=Piercing the soul
 research.soul_daggers.info=  Soul daggers are an especially curious weapon. They are difficult to craft, and don't boast impressive damage on their own.|  To get the most combat effectiveness out of them, one doesn't slash with them and instead stabs. The magical energies of the blade are such that they slide through the flesh and soul of the creature targetting.|  For most creatures, this means dealing decent damage (base damage + 2), applying a stun effect for a few moments, and even draining some of the creatures mana to absorb yourself.||  And yet, there are other uses of the blade as well. You are scared to think about it to much, but you can feel the capabilities of the blade in your hands. Rather than puncturing the soul for damage and mana, you wonder if there's a way to use the blade more carefully and more cleanly collect pieces of a creature's soul...|  You'll have to inspect the blade closer to find out.
 research.wolf_transformation.name=Arcane Wolves
 research.wolf_transformation.desc=Magical Good Boys
-research.wolf_transformation.info=  The soul-piercing capabilities of the soul dagger are scary, and it's hard imagining using it on anything you care about.|  And yet... you think you have devised a way to use it to help your lovable tamed wolf pet become stronger with the use of magic!||  To transform a tamed wolf into an Arcane Wolf, you must first perform bring your wolf to your ritual setup and perform the Arcane Wolf Primer ritual. After doing so, your wolf will begin the first part of transforming into a powerful Arcane Wolf. This process will likely be very painful for the wolf, so act quickly.|  After performing the ritual, the wolf's essence will begin to transform, but its body will not. To prevent your wolf from dying, you must ready your soul dagger and piece through the wolf's flesh and free its soul.
+research.wolf_transformation.info=  The soul-piercing capabilities of the soul dagger are scary, and it's hard imagining using it on anything you care about.|  And yet... you think you have devised a way to use it to help your lovable tamed wolf pet become stronger with the use of magic!||  To transform a tamed wolf into an Arcane Wolf, you must first bring your wolf to your ritual setup and perform the Arcane Wolf Primer ritual. After doing so, your wolf will begin the first part of transforming into a powerful Arcane Wolf. This process will likely be very painful for the wolf, so act quickly.|  After performing the ritual, the wolf's essence will begin to transform, but its body will not. To prevent your wolf from dying, you must ready your soul dagger and piece through the wolf's flesh and free its soul.

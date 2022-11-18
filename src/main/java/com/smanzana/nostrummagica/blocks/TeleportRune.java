@@ -335,6 +335,7 @@ public class TeleportRune extends BlockContainer  {
 		}
 		
 		ent.setTargetPosition(heldPos);
+		playerIn.sendMessage(new TextComponentTranslation("info.generic.block_linked"));
 		
 		// If creative, can target tele tiles that are pointing to other ones. But, if it's not pointing anywhere, we'll conveniently hook them up.
 		// Non-creative placement forces them to be linked to eachother, though.

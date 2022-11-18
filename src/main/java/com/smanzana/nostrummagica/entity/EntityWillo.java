@@ -994,7 +994,6 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 	@Override
 	@Nullable
 	public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, @Nullable IEntityLivingData livingdata) {
-		System.out.println("Spawning Willo!");
 		final EMagicElement elem = EMagicElement.values()[NostrumMagica.rand.nextInt(EMagicElement.values().length)];
 		dataManager.set(ELEMENT, elem);
 		return super.onInitialSpawn(difficulty, livingdata);

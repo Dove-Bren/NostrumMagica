@@ -22,6 +22,7 @@ import com.smanzana.nostrummagica.blocks.LoreTable;
 import com.smanzana.nostrummagica.blocks.MimicBlock;
 import com.smanzana.nostrummagica.blocks.ModificationTable;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
+import com.smanzana.nostrummagica.blocks.ParadoxMirrorBlock;
 import com.smanzana.nostrummagica.blocks.PutterBlock;
 import com.smanzana.nostrummagica.blocks.SorceryPortal;
 import com.smanzana.nostrummagica.blocks.TeleportRune;
@@ -1459,7 +1460,7 @@ public class NostrumMagica
 					new OutcomeSpawnItem(new ItemStack(ActiveHopper.instance, 4)))
 				);
 		
-		// Active Hopper
+		// Item Duct
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("item_duct",
 					new ItemStack(ItemDuct.instance),
@@ -1611,6 +1612,18 @@ public class NostrumMagica
 					new ItemStack[] {ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1), new ItemStack(Items.BONE), NostrumResourceItem.getItem(ResourceType.SLAB_KIND, 1), ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1)},
 					new RRequirementResearch("wolf_transformation"),
 					new OutcomeApplyTransformation(20 * 60, (e) -> { return e instanceof EntityWolf;}))
+				);
+		
+		// Paradox Mirror
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("paradox_mirror",
+					new ItemStack(ParadoxMirrorBlock.instance()),
+					EMagicElement.ENDER,
+					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANDRAKE_ROOT, ReagentType.MANDRAKE_ROOT},
+					new ItemStack(Blocks.GLASS_PANE),
+					new ItemStack[] {new ItemStack(Items.GOLD_INGOT), NostrumResourceItem.getItem(ResourceType.ENDER_BRISTLE, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), new ItemStack(Items.EMERALD)},
+					new RRequirementResearch("paradox_mirrors"),
+					new OutcomeSpawnItem(new ItemStack(ParadoxMirrorBlock.instance(), 2)))
 				);
 		
 		
@@ -2342,13 +2355,13 @@ public class NostrumMagica
 			.parent("rituals")
 			.quest("lvl4")
 			.reference(PositionCrystal.instance())
-		.build("geogems", NostrumResearchTab.TINKERING, Size.NORMAL, 1, -1, false, new ItemStack(PositionCrystal.instance()));
+		.build("geogems", NostrumResearchTab.TINKERING, Size.LARGE, 1, -1, false, new ItemStack(PositionCrystal.instance()));
 		
 		NostrumResearch.startBuilding()
 			.parent("geogems")
 			.lore(PositionCrystal.instance())
 			.reference(PositionToken.instance())
-		.build("geotokens", NostrumResearchTab.TINKERING, Size.LARGE, 1, 0, true, new ItemStack(PositionToken.instance()));
+		.build("geotokens", NostrumResearchTab.TINKERING, Size.LARGE, 1, 1, true, new ItemStack(PositionToken.instance()));
 		
 		NostrumResearch.startBuilding()
 			.parent("geotokens")
@@ -2358,21 +2371,29 @@ public class NostrumMagica
 			.quest("lvl10")
 			.reference("builtin::guides::obelisks", "info.obelisks.name")
 			.reference("ritual::create_obelisk", "ritual.create_obelisk.name")
-		.build("obelisks", NostrumResearchTab.TINKERING, Size.GIANT, 2, 1, true, new ItemStack(DungeonBlock.instance(), 1, DungeonBlock.Type.DARK.ordinal()));
+		.build("obelisks", NostrumResearchTab.TINKERING, Size.GIANT, 2, 2, true, new ItemStack(DungeonBlock.instance(), 1, DungeonBlock.Type.DARK.ordinal()));
 		
 		NostrumResearch.startBuilding()
 			.hiddenParent("markrecall")
 			.parent("obelisks")
 			.reference("ritual::spawn_sorcery_portal", "ritual.spawn_sorcery_portal.name")
-		.build("sorceryportal", NostrumResearchTab.TINKERING, Size.NORMAL, 2, 2, true, new ItemStack(SorceryPortal.instance()));
+		.build("sorceryportal", NostrumResearchTab.TINKERING, Size.NORMAL, 2, 3, true, new ItemStack(SorceryPortal.instance()));
 		
 		NostrumResearch.startBuilding()
-			.parent("geotokens")
+			.parent("geogems")
 			.hiddenParent("markrecall")
-			.lore(PositionToken.instance())
+			.lore(PositionCrystal.instance())
 			.quest("lvly")
 			.reference("ritual::teleportrune", "ritual.teleportrune.name")
-		.build("teleportrune", NostrumResearchTab.TINKERING, Size.NORMAL, 2, -1, true, new ItemStack(TeleportRune.instance()));
+		.build("teleportrune", NostrumResearchTab.TINKERING, Size.NORMAL, 2, 0, true, new ItemStack(TeleportRune.instance()));
+		
+		NostrumResearch.startBuilding()
+			.parent("geogems")
+			.hiddenParent("item_duct")
+			.lore(PositionCrystal.instance())
+			.quest("lvly")
+			.reference("ritual::paradox_mirror", "ritual.paradox_mirror.name")
+		.build("paradox_mirrors", NostrumResearchTab.TINKERING, Size.NORMAL, 3, 0, true, new ItemStack(ParadoxMirrorBlock.instance()));
 		
 		NostrumResearch.startBuilding()
 			.hiddenParent("rituals")
@@ -2444,7 +2465,8 @@ public class NostrumMagica
 		NostrumResearch.startBuilding()
 			.hiddenParent("kani")
 			.lore(IEntityPet.SoulBoundLore.instance())
-			.reference("ritual::revive_soulbound_pet", "ritual.revive_soulbound_pet.name")
+			.reference("ritual::revive_soulbound_pet_dragon", "ritual.revive_soulbound_pet_dragon.name")
+			.reference("ritual::revive_soulbound_pet_wolf", "ritual.revive_soulbound_pet_wolf.name")
 		.build("soulbound_pets", NostrumResearchTab.ADVANCED_MAGICA, Size.GIANT, 0, 1, true, new ItemStack(DragonSoulItem.instance()));
 		
 		NostrumResearch.startBuilding()

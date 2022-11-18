@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.blocks.tiles.LoreTableEntity;
 import com.smanzana.nostrummagica.blocks.tiles.ModificationTableEntity;
 import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.blocks.tiles.ObeliskPortalTileEntity;
+import com.smanzana.nostrummagica.blocks.tiles.ParadoxMirrorTileEntity;
 import com.smanzana.nostrummagica.blocks.tiles.ProgressionDoorTileEntity;
 import com.smanzana.nostrummagica.blocks.tiles.PutterBlockTileEntity;
 import com.smanzana.nostrummagica.blocks.tiles.SingleSpawnerTileEntity;
@@ -78,6 +79,7 @@ public class NostrumBlocks {
     	registerBlockItem(ActiveHopper.instance, ActiveHopper.ID, registry);
     	registerBlockItem(ItemDuct.instance, ItemDuct.ID, registry);
     	registerBlockItem(DungeonBars.instance(), DungeonBars.ID, registry);
+    	registerBlockItem(ParadoxMirrorBlock.instance(), ParadoxMirrorBlock.ID, registry);
     	
 
     	String[] variants = new String[DungeonBlock.Type.values().length];
@@ -156,6 +158,7 @@ public class NostrumBlocks {
     	registerBlock(ItemDuct.instance, ItemDuct.ID, registry);
     	registerBlock(DungeonBars.instance(), DungeonBars.ID, registry);
     	registerBlock(DungeonAir.instance(), DungeonAir.ID, registry);
+    	registerBlock(ParadoxMirrorBlock.instance(), ParadoxMirrorBlock.ID, registry);
     	
     	
 //			GameRegistry.addRecipe(new ItemStack(MagicDirt.instance()), " D ", "DCD", " D ",
@@ -213,6 +216,7 @@ public class NostrumBlocks {
     	GameRegistry.registerTileEntity(PutterBlockTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "putter_entity"));
     	GameRegistry.registerTileEntity(ActiveHopperTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "active_hopper_te"));
     	GameRegistry.registerTileEntity(ItemDuctTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "item_duct_te"));
+    	GameRegistry.registerTileEntity(ParadoxMirrorTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "paradox_mirror_te"));
     }
 	
 }

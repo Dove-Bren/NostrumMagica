@@ -374,7 +374,7 @@ public class WispBlock extends BlockContainer {
 						if (getReagent().getCount() > 1) {
 							getReagent().shrink(1);
 						} else {
-							setReagent(null);
+							setReagent(ItemStack.EMPTY);
 						}
 					}
 				}

@@ -308,7 +308,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 	
 	@Override
 	public Lore getBasicLore() {
-		return new Lore().add("Simple floating chunks of magical energy.", "They seem docile, and only attack once attacked themselves.");
+		return new Lore().add("Simple floating chunks of magical energy.", "They seem docile, love flowers, and only attack once attacked themselves.");
 				
 	}
 	

@@ -30,6 +30,7 @@ import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.blocks.NostrumMirrorBlock;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.blocks.NostrumSpawnAndTrigger;
+import com.smanzana.nostrummagica.blocks.ParadoxMirrorBlock;
 import com.smanzana.nostrummagica.blocks.ProgressionDoor;
 import com.smanzana.nostrummagica.blocks.PutterBlock;
 import com.smanzana.nostrummagica.blocks.SorceryPortal;
@@ -66,6 +67,7 @@ import com.smanzana.nostrummagica.client.render.entity.RenderKoid;
 import com.smanzana.nostrummagica.client.render.entity.RenderLux;
 import com.smanzana.nostrummagica.client.render.entity.RenderMagicSaucer;
 import com.smanzana.nostrummagica.client.render.entity.RenderShadowDragonRed;
+import com.smanzana.nostrummagica.client.render.entity.RenderSpellProjectile;
 import com.smanzana.nostrummagica.client.render.entity.RenderSprite;
 import com.smanzana.nostrummagica.client.render.entity.RenderSwitchTrigger;
 import com.smanzana.nostrummagica.client.render.entity.RenderTameDragonRed;
@@ -84,6 +86,7 @@ import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityHookShot;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityLux;
+import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
 import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
@@ -656,6 +659,9 @@ public class ClientProxy extends CommonProxy {
 		registerModel(Item.getItemFromBlock(DungeonAir.instance()),
 				1,
 				DungeonAir.ID);
+		registerModel(Item.getItemFromBlock(ParadoxMirrorBlock.instance()),
+				0,
+				ParadoxMirrorBlock.ID);
 		
 		registerModel(DragonSoulItem.instance(),
 				0,
@@ -691,6 +697,13 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	private void registerEntityRenderers() {
+		
+		RenderingRegistry.registerEntityRenderingHandler(EntitySpellProjectile.class, new IRenderFactory<EntitySpellProjectile>() {
+			@Override
+			public Render<? super EntitySpellProjectile> createRenderFor(RenderManager manager) {
+				return new RenderSpellProjectile(manager, 1f);
+			}
+		});
 		RenderingRegistry.registerEntityRenderingHandler(EntityGolem.class, new IRenderFactory<EntityGolem>() {
 			@Override
 			public Render<? super EntityGolem> createRenderFor(RenderManager manager) {

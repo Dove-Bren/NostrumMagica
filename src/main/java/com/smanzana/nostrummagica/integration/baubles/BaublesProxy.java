@@ -399,7 +399,9 @@ public class BaublesProxy {
 			.hiddenParent("rings")
 			.parent("enchanted_armor_adv")
 			.reference("ritual::create_dragon_wing_pendant", "ritual.create_dragon_wing_pendant.name")
-			.reference("ritual::aether_cloak_caster_upgrade", "ritual.aether_cloak_caster_upgrade.name")
+			.reference("ritual::wing_upgrade_armor_ice", "ritual.wing_upgrade_armor_ice.name")
+			.reference("ritual::wing_upgrade_armor_wind", "ritual.wing_upgrade_armor_wind.name")
+			.reference("ritual::wing_upgrade_armor_lightning", "ritual.wing_upgrade_armor_lightning.name")
 		.build("dragon_wing_pendants", NostrumResearchTab.OUTFITTING, Size.LARGE, 0, 2, true, ItemMagicBauble.getItem(ItemType.DRAGON_WING_PENDANT, 1));
 		
 		if (NostrumMagica.aetheria.isEnabled()) {

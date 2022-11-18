@@ -22,7 +22,6 @@ import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfInvento
 import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfTrainingSheet;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed.SoulBoundDragonLore;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowOwnerAdvanced;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowOwnerGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIPetTargetTask;
@@ -551,6 +550,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 				final int cost = getWolfSpellCost(spell);
 				wolf.addMana(-cost);
 				wolf.onWolfCast(spell, cost);
+				wolf.playSound(SoundEvents.ENTITY_WOLF_GROWL, 1f, .8f);
 			}
 		});
 		// Ally spells
@@ -586,6 +586,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 				final int cost = getWolfSpellCost(spell);
 				wolf.addMana(-cost);
 				wolf.onWolfCast(spell, cost);
+				wolf.playSound(SoundEvents.ENTITY_WOLF_AMBIENT, 1f, .8f);
 			}
 		});
 		// Self spells (longer recast)
@@ -610,6 +611,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 				final int cost = getWolfSpellCost(spell);
 				wolf.addMana(-cost);
 				wolf.onWolfCast(spell, cost);
+				wolf.playSound(SoundEvents.ENTITY_WOLF_PANT, 1f, .8f);
 			}
 		});
 		this.tasks.addTask(priority++, new EntityAIFollowOwnerAdvanced<EntityArcaneWolf>(this, 1.5f, 0f, .5f));
@@ -831,10 +833,6 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 							player.sendMessage(new TextComponentTranslation("info.tamed_arcane_wolf.low_health", this.getName()));
 						} else {
 							player.startRiding(this);
-							
-							int unused; // Remove testing code
-							this.addTrainingXP(100);
-							this.addXP(100);
 						}
 					} else {
 						player.sendMessage(new TextComponentTranslation("info.tamed_arcane_wolf.no_ride", this.getName()));
@@ -852,13 +850,6 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 			return true;
 		} else {
 			// Someone other than the owner clicked
-			int unused; // Remove
-			if (player.isCreative() && hand == EnumHand.MAIN_HAND && player.isSneaking()) {
-				if (!world.isRemote) {
-					this.setTamedBy(player);
-				}
-				return true;
-			}
 			if (!this.world.isRemote) {
 				player.sendMessage(new TextComponentTranslation("info.tamed_arcane_wolf.not_yours", this.getName()));
 			}

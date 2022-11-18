@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.loretag;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.smanzana.nostrummagica.blocks.ParadoxMirrorBlock;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityLux;
@@ -142,6 +143,7 @@ public class LoreRegistry {
 		register(ArcaneWolfSoulItem.instance());
 		register(SoulBoundLore.instance());
 		register(WolfTameLore.instance());
+		register(ParadoxMirrorBlock.instance());
 		
 		
 		for (Preset preset : Preset.values()) {

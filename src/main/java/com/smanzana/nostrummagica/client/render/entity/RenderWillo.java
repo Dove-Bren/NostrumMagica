@@ -12,6 +12,8 @@ import net.minecraft.util.ResourceLocation;
 
 public class RenderWillo extends RenderLiving<EntityWillo> {
 
+	private static final ResourceLocation RES_TEXT = new ResourceLocation(NostrumMagica.MODID, "textures/entity/willo.png");
+	
 	public RenderWillo(RenderManager renderManagerIn, float scale) {
 		super(renderManagerIn, new ModelWillo(), .33f);
 	}
@@ -29,7 +31,7 @@ public class RenderWillo extends RenderLiving<EntityWillo> {
 
 	@Override
 	protected ResourceLocation getEntityTexture(EntityWillo entity) {
-		return new ResourceLocation(NostrumMagica.MODID, "textures/entity/willo.png");
+		return RES_TEXT;
 	}
 	
 }
