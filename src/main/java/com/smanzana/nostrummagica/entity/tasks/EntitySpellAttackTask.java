@@ -16,22 +16,29 @@ public class EntitySpellAttackTask<T extends EntityLiving> extends EntityAIBase 
 	protected T entity;
 	protected int delay;
 	protected int odds;
+	protected int castTime; // can be 0; how long to be 'casting' before casting the spell
 	protected boolean needsTarget;
 	protected Predicate<T> predicate;
 	
 	protected Spell spells[];
 	
 	protected int attackTicks;
+	protected int castTicks;
 	
 	public EntitySpellAttackTask(T entity, int delay, int odds, boolean needsTarget, Predicate<T> predicate, Spell ... spells) {
+		this(entity, delay, odds, needsTarget, predicate, 0, spells);
+	}
+	
+	public EntitySpellAttackTask(T entity, int delay, int odds, boolean needsTarget, Predicate<T> predicate, int castTime, Spell ... spells) {
 		this.entity = entity;
 		this.spells = spells;
 		this.delay = delay;
+		this.castTime = castTime;
 		this.odds = odds;
 		this.needsTarget = needsTarget;
 		this.predicate = predicate;
 		
-		this.setMutexBits(0);
+		this.setMutexBits(castTime > 0 ? 3 : 0);
 	}
 	
 	@Override
@@ -64,7 +71,7 @@ public class EntitySpellAttackTask<T extends EntityLiving> extends EntityAIBase 
 	
 	@Override
 	public boolean shouldContinueExecuting() {
-		return false;
+		return castTicks < castTime;
 	}
 	
 	protected Spell pickSpell(Spell[] spells, T entity) {
@@ -85,9 +92,8 @@ public class EntitySpellAttackTask<T extends EntityLiving> extends EntityAIBase 
 	protected void deductMana(Spell spell, T entity) {
 		; // Usually, don't actually take mana
 	}
-
-	@Override
-	public void startExecuting() {
+	
+	protected void castSpell() {
 		Spell spell = pickSpell(spells, entity);
 		
 		if (spell == null) {
@@ -106,9 +112,31 @@ public class EntitySpellAttackTask<T extends EntityLiving> extends EntityAIBase 
 		attackTicks = this.delay;
 		entity.setAttackTarget(oldTarget);
 	}
+
+	@Override
+	public void startExecuting() {
+		super.startExecuting();
+		castTicks = 0;
+	}
 	
 	@Override
 	public void updateTask() {
+		super.updateTask();
 		
+		EntityLivingBase target = getTarget();
+		if (target != null) {
+			this.entity.faceEntity(getTarget(), 360f, 180);
+		}
+		
+		castTicks++;
+		if (castTicks >= castTime) {
+			castSpell();
+		} else {
+			doCastTick(castTicks, castTime);
+		}
+	}
+	
+	protected void doCastTick(int ticksElapsed, int maxTicks) {
+		; // do nothing by default
 	}
 }

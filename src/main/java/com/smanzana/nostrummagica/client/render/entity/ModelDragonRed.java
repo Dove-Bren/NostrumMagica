@@ -376,6 +376,8 @@ public class ModelDragonRed extends ModelBase {
 			sitting = ((EntityTameDragonRed) dragon).isSitting();
 		}
 		
+		boolean casting = dragon.isCasting();
+		
 		if (flying) {
 			frac = dragon.getWingFlag(partialTicks);
 			weight = (float) Math.sin(frac * Math.PI * 2);
@@ -385,6 +387,9 @@ public class ModelDragonRed extends ModelBase {
 			wing_right.rotateAngleX = wing_right.rotateAngleY = 0f;
 			wing_right.rotateAngleZ = -(weight * .8f);
 			body.rotateAngleX = 0f;
+		} else if (casting) {
+			// Done in setRotationAngles because it's animated
+			//body.rotateAngleX = -.5f;
 		} else if (!dragon.onGround && dragon.motionY < -.62f) {
 			// Falling
 			float rotX = (float) (2 * Math.PI * 0.14);
@@ -460,6 +465,8 @@ public class ModelDragonRed extends ModelBase {
 		if (dragon instanceof EntityTameDragonRed) {
 			sitting = ((EntityTameDragonRed) dragon).isSitting();
 		}
+		
+		boolean casting = dragon.isCasting();
 //		
 //		if (flying) {
 //			if (dragon instanceof EntityTameDragonRed) {
@@ -516,10 +523,43 @@ public class ModelDragonRed extends ModelBase {
 		RenderObj frontleg_right = renderers.get(EDragonPart.LEG_FRONT_RIGHT);
 		RenderObj backleg_left = renderers.get(EDragonPart.LEG_BACK_LEFT);
 		RenderObj backleg_right = renderers.get(EDragonPart.LEG_BACK_RIGHT);
+		
+		RenderObj body = renderers.get(EDragonPart.BODY);
+		RenderObj wing_left = renderers.get(EDragonPart.WING_LEFT);
+		RenderObj wing_right = renderers.get(EDragonPart.WING_RIGHT);
 
 		backleg_left.offsetY = (float) EDragonPart.BODY.offsetY - (float) EDragonPart.LEG_BACK_LEFT.offsetY; 
 		backleg_right.offsetY = (float) EDragonPart.BODY.offsetY - (float) EDragonPart.LEG_BACK_RIGHT.offsetY;
-		if (sitting) {
+		if (casting) {
+			stateTime = now - dragon.getLastCastTime();
+			final float progress;
+			final long castDurationMS = 1000;
+			if (stateTime < castDurationMS) {
+				progress = (float) stateTime / (float) castDurationMS;
+			} else {
+				progress = 1f;
+			}
+			
+			head.rotateAngleX = progress * .2f;
+			frontleg_left.rotateAngleX = progress * .80f;
+			frontleg_right.rotateAngleX = progress * .8125f;
+			backleg_left.rotateAngleX = backleg_right.rotateAngleX = 0f;
+			backleg_left.offsetY = backleg_right.offsetY = progress * -.5f;
+			body.rotateAngleX = progress * -.5f;
+			
+			if (!flying) {
+				float invProgress = 1 - progress;
+				float rotX = (float) (2 * Math.PI * 0.168);
+				float rotY = (float) (2 * Math.PI * 0.2);
+				float rotZ = (float) (2 * Math.PI * 0.05);
+				wing_left.rotateAngleX = invProgress * rotX;
+				wing_left.rotateAngleY = invProgress * rotY;
+				wing_left.rotateAngleZ = invProgress * rotZ;
+				wing_right.rotateAngleX = invProgress * rotX;
+				wing_right.rotateAngleY = invProgress * -rotY;
+				wing_right.rotateAngleZ = invProgress * -rotZ;
+			}
+		} else if (sitting) {
 			frontleg_left.rotateAngleX = .45f;
 			frontleg_right.rotateAngleX = .45f;
 			backleg_left.rotateAngleX = backleg_right.rotateAngleX = 0f;

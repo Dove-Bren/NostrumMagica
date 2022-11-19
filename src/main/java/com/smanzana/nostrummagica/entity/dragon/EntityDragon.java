@@ -132,6 +132,8 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 	
 	public abstract boolean isTryingToLand();
 	
+	public abstract boolean isCasting();
+	
 	static class DragonFlyMoveHelper extends EntityMoveHelper
     {
         private final EntityDragon parentEntity;

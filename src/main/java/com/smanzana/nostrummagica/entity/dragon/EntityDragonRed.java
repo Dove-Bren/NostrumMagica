@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.entity.dragon;
 
+import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonAIAggroTable;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonAINearestAttackableTarget;
@@ -75,6 +76,8 @@ public class EntityDragonRed extends EntityDragonRedBase {
 	private static Spell DSPELL_Shield;
 	private static Spell DSPELL_Weaken;
 	private static Spell DSPELL_Curse;
+	
+	private static final int DRAGON_CAST_TIME = 20 * 3;
 	
 	private static Spell makeSpell(
 			String name,
@@ -234,8 +237,8 @@ public class EntityDragonRed extends EntityDragonRedBase {
 				shadowAttack,
         		new DragonLandTask(this),
         		new DragonMeleeAttackTask(this, 1.0D, true),
+        		new DragonSpellAttackTask(this, (5 * 5), 10, true, null, DRAGON_CAST_TIME, DSPELL_Fireball),
         		evasionTask,
-        		new EntitySpellAttackTask<EntityDragonRed>(this, (5 * 5), 10, true, null, DSPELL_Fireball),
         		//new DragonFlyStrafeTask<EntityDragonRed>(this, 20),
         		new DragonTakeoffLandTask(this),
         		new DragonFlyRandomTask(this),
@@ -245,11 +248,11 @@ public class EntityDragonRed extends EntityDragonRedBase {
 				new DragonLandTask(this),
         		new DragonMeleeAttackTask(this, 1.0D, true),
         		new DragonTakeoffLandTask(this),
+				new DragonSpellAttackTask(this, (5 * 5), 12, true, null, DRAGON_CAST_TIME, DSPELL_Fireball2),
+				new DragonSpellAttackTask(this, (5 * 12), 10, false, null, DRAGON_CAST_TIME, DSPELL_Speed, DSPELL_Shield),
+				new DragonSpellAttackTask(this, (5 * 10), 20, false, null, DRAGON_CAST_TIME, DSPELL_Weaken),
+				new DragonSpellAttackTask(this, (5 * 45), 20, true, null, DRAGON_CAST_TIME, DSPELL_Curse),
         		evasionTask,
-				new EntitySpellAttackTask<EntityDragonRed>(this, (5 * 5), 12, true, null, DSPELL_Fireball2),
-				new EntitySpellAttackTask<EntityDragonRed>(this, (5 * 12), 10, false, null, DSPELL_Speed, DSPELL_Shield),
-				new EntitySpellAttackTask<EntityDragonRed>(this, (5 * 10), 20, false, null, DSPELL_Weaken),
-				new EntitySpellAttackTask<EntityDragonRed>(this, (5 * 45), 20, true, null, DSPELL_Curse),
         		//new DragonFlyStrafeTask<EntityDragonRed>(this, 20),
         		new DragonFlyRandomTask(this),
 			}
@@ -262,7 +265,7 @@ public class EntityDragonRed extends EntityDragonRedBase {
         	},
         	new EntityAIBase[] {
     			shadowAttack,
-        		new EntitySpellAttackTask<EntityDragonRed>(this, (5 * 5), 20, true, null, DSPELL_Fireball),
+        		new DragonSpellAttackTask(this, (5 * 5), 20, true, null, DRAGON_CAST_TIME, DSPELL_Fireball),
         		new DragonTakeoffLandTask(this),
     			new DragonMeleeAttackTask(this, 1.0D, true),
         		new EntityAIWander(this, 1.0D, 30)
@@ -271,10 +274,10 @@ public class EntityDragonRed extends EntityDragonRedBase {
     			shadowAttack,
         		new DragonTakeoffLandTask(this),
     			new DragonMeleeAttackTask(this, 1.0D, true),
-    			new EntitySpellAttackTask<EntityDragonRed>(this, (5 * 5), 12, true, null, DSPELL_Fireball2),
-				new EntitySpellAttackTask<EntityDragonRed>(this, (5 * 12), 10, false, null, DSPELL_Speed, DSPELL_Shield),
-				new EntitySpellAttackTask<EntityDragonRed>(this, (5 * 10), 20, false, null, DSPELL_Weaken),
-				new EntitySpellAttackTask<EntityDragonRed>(this, (5 * 45), 20, true, null, DSPELL_Curse),
+    			new DragonSpellAttackTask(this, (5 * 5), 12, true, null, DRAGON_CAST_TIME, DSPELL_Fireball2),
+				new DragonSpellAttackTask(this, (5 * 12), 10, false, null, DRAGON_CAST_TIME, DSPELL_Speed, DSPELL_Shield),
+				new DragonSpellAttackTask(this, (5 * 10), 20, false, null, DRAGON_CAST_TIME, DSPELL_Weaken),
+				new DragonSpellAttackTask(this, (5 * 45), 20, true, null, DRAGON_CAST_TIME, DSPELL_Curse),
         		new EntityAIWander(this, 1.0D, 30)
         	}
         		
@@ -495,6 +498,26 @@ public class EntityDragonRed extends EntityDragonRedBase {
 		
 		if (!this.world.isRemote) {
 			this.evasionTask.reset();
+		}
+	}
+	
+	private class DragonSpellAttackTask extends EntitySpellAttackTask<EntityDragonRed> {
+
+		public DragonSpellAttackTask(EntityDragonRed entity, int delay, int odds, boolean needsTarget, Predicate<EntityDragonRed> predicate,
+				int castTime, Spell ... spells) {
+			super(entity, delay, odds, needsTarget, predicate, castTime, spells);
+		}
+		
+		@Override
+		public void resetTask() {
+			super.resetTask();
+			EntityDragonRed.this.setCasting(false);
+		}
+		
+		@Override
+		public void startExecuting() {
+			super.startExecuting();
+			EntityDragonRed.this.setCasting(true);
 		}
 	}
 

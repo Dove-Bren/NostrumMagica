@@ -20,6 +20,8 @@ public abstract class EntityDragonRedBase extends EntityDragonFlying {
 			EntityDataManager.<Boolean>createKey(EntityDragonRedBase.class, DataSerializers.BOOLEAN);
 	private static final DataParameter<Boolean> DRAGON_BITE =
 			EntityDataManager.<Boolean>createKey(EntityDragonRedBase.class, DataSerializers.BOOLEAN);
+	private static final DataParameter<Boolean> DRAGON_CASTING =
+			EntityDataManager.<Boolean>createKey(EntityDragonRed.class, DataSerializers.BOOLEAN);
 	
 	public static long ANIM_SLASH_DUR = 500;
 	
@@ -29,6 +31,8 @@ public abstract class EntityDragonRedBase extends EntityDragonFlying {
 	private long slashTime;
 	
 	private long biteTime;
+	
+	private long castTime;
 	
 	public EntityDragonRedBase(World worldIn) {
 		super(worldIn);
@@ -47,6 +51,10 @@ public abstract class EntityDragonRedBase extends EntityDragonFlying {
 			if (this.dataManager.get(DRAGON_BITE)) {
 				this.biteTime = System.currentTimeMillis();
 			}
+		} else if (key == DRAGON_CASTING) {
+			if (this.dataManager.get(DRAGON_CASTING)) {
+				castTime = System.currentTimeMillis();
+			}
 		}
 	}
 	
@@ -58,11 +66,25 @@ public abstract class EntityDragonRedBase extends EntityDragonFlying {
 		return this.biteTime;
 	}
 	
+	public long getLastCastTime() {
+		return this.castTime;
+	}
+	
 	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.dataManager.register(DRAGON_SLASH, false);
 		this.dataManager.register(DRAGON_BITE, false);
+		this.dataManager.register(DRAGON_CASTING, false);
+	}
+	
+	public boolean isCasting() {
+		return this.dataManager.get(DRAGON_CASTING).booleanValue();
+	}
+	
+	protected void setCasting(boolean isCasting) {
+		this.dataManager.set(DRAGON_CASTING, isCasting);
+		
 	}
 	
 	public void slash(EntityLivingBase target) {
