@@ -1,5 +1,10 @@
 package com.smanzana.nostrummagica.entity.dragon;
 
+import java.util.EnumMap;
+import java.util.Map;
+
+import javax.annotation.Nullable;
+
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonAIAggroTable;
@@ -32,6 +37,8 @@ import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.IEntityMultiPart;
+import net.minecraft.entity.MultiPartEntityPart;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
@@ -52,13 +59,53 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BossInfo;
 import net.minecraft.world.BossInfoServer;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class EntityDragonRed extends EntityDragonRedBase {
+public class EntityDragonRed extends EntityDragonRedBase implements IEntityMultiPart {
 
+	private static enum DragonBodyPartType {
+		BODY("body", 2.5f, 3f, Vec3d.ZERO),
+		REAR("rear", 2.5f, 3, new Vec3d(0, 0, -2.5f)),
+		HEAD("head", .5f, 2f, new Vec3d(0, 3.0, 1.5f)),
+		//TAIL("tail", .5f, .5f, new Vec3d(0, 0, 3.0)),
+		//WING_LEFT("wing_left", 1f, 1f, new Vec3d(-2, 0, 1.0)),
+		//WING_RIGHT("wing_right", 2f, .5f, new Vec3d(2, 0, 1.0)),
+		;
+		
+		private final String name;
+		private final float width;
+		private final float height;
+		private final Vec3d offset;
+		
+		private DragonBodyPartType(String name, float width, float height, Vec3d offset) {
+			this.name = name;
+			this.width = width;
+			this.height = height;
+			this.offset = offset;
+		}
+		
+		@Override
+		public String toString() {
+			return name;
+		}
+		
+		public float getWidth() {
+			return width;
+		}
+		
+		public float getHeight() {
+			return height;
+		}
+		
+		public Vec3d getPartOffset() {
+			return offset;
+		}
+	}
+	
 	private static enum DragonPhase {
 		GROUNDED_PHASE,
 		FLYING_PHASE,
@@ -175,14 +222,21 @@ public class EntityDragonRed extends EntityDragonRedBase {
 	private DragonFlyEvasionTask evasionTask;
 	private DragonAIAggroTable<EntityDragonRed, EntityLivingBase> aggroTable;
 	
+	private Map<DragonBodyPartType, DragonBodyPart> bodyParts;
+	
 	public EntityDragonRed(World worldIn) {
 		super(worldIn);
-        this.setSize(6F, 4.6F);
+        this.setSize(DragonBodyPartType.BODY.getWidth(), DragonBodyPartType.BODY.getHeight());
         this.stepHeight = 2;
         this.isImmuneToFire = true;
         this.ignoreFrustumCheck = true;
         this.experienceValue = 1000;
         this.noClip = false;
+        
+        bodyParts = new EnumMap<>(DragonBodyPartType.class);
+        for (DragonBodyPartType type : DragonBodyPartType.values()) {
+        	bodyParts.put(type, new DragonBodyPart(type, this));
+        }
 	}
 	
 	private DragonPhase getPhase() {
@@ -398,6 +452,22 @@ public class EntityDragonRed extends EntityDragonRedBase {
     	compound.setByte(DRAGON_SERIAL_PHASE_TOK, (byte)this.getPhase().ordinal());
 	}
 	
+	protected void updateParts() {
+		final float progress = getRotationYawHead();
+		final double rotRad = Math.PI * (progress / -180.0);
+		for (DragonBodyPartType type : DragonBodyPartType.values()) {
+			DragonBodyPart part = this.bodyParts.get(type);
+			
+			Vec3d offset = type.getPartOffset();
+			part.setLocationAndAngles(
+					this.posX + (Math.cos(rotRad) * offset.x) + (Math.sin(rotRad) * offset.z),
+					this.posY + offset.y,
+					this.posZ + (Math.sin(rotRad) * offset.x) + (Math.cos(rotRad) * offset.z),
+					this.rotationYaw, this.rotationPitch);
+			part.onUpdate();
+		}
+	}
+	
 	@Override
 	public void onUpdate() {
 		super.onUpdate();
@@ -422,6 +492,8 @@ public class EntityDragonRed extends EntityDragonRedBase {
 				}
 			}
 		}
+		
+		updateParts();
 	}
 	
 	@Override
@@ -454,7 +526,6 @@ public class EntityDragonRed extends EntityDragonRedBase {
 	@Override
 	public Lore getBasicLore() {
 		return new Lore().add("Red Dragons are greedy creatures. They often live in abandoned castles, and have a strong fondness to anything that's shiny.");
-				
 	}
 	
 	@Override
@@ -475,6 +546,12 @@ public class EntityDragonRed extends EntityDragonRedBase {
 		if (rand.nextInt(100) < chances) {
 			this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.RESEARCH_SCROLL_SMALL, 1), 0);
 		}
+	}
+
+	@Override
+	public boolean attackEntityFromPart(MultiPartEntityPart dragonPart, DamageSource source, float damage) {
+		// could take less or more damage from different sources in different parents
+		return this.attackEntityFrom(source, damage);
 	}
 	
 	@Override
@@ -500,6 +577,22 @@ public class EntityDragonRed extends EntityDragonRedBase {
 			this.evasionTask.reset();
 		}
 	}
+
+	@Override
+	public World getWorld() {
+		return this.world;
+	}
+	
+	@Override
+	@Nullable
+	public Entity[] getParts() {
+		return bodyParts.values().toArray(new Entity[0]);
+	}
+	
+	@Override
+	public boolean canBeCollidedWith() {
+		return super.canBeCollidedWith();
+	}
 	
 	private class DragonSpellAttackTask extends EntitySpellAttackTask<EntityDragonRed> {
 
@@ -518,6 +611,18 @@ public class EntityDragonRed extends EntityDragonRedBase {
 		public void startExecuting() {
 			super.startExecuting();
 			EntityDragonRed.this.setCasting(true);
+		}
+	}
+	
+	private class DragonBodyPart extends MultiPartEntityPart {
+		
+		private final DragonBodyPartType type;
+		private final EntityDragonRed parent;
+		
+		public DragonBodyPart(DragonBodyPartType type, EntityDragonRed parent) {
+			super(parent, type.name(), type.getWidth(), type.getHeight());
+			this.type = type;
+			this.parent = parent;
 		}
 	}
 

@@ -30,7 +30,7 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 	public EntityShadowDragonRed(World worldIn) {
 		super(worldIn);
 		
-		this.setSize(6F * .6F, 4.6F * .6F);
+		this.setSize(4F * .6F, 3F * .6F);
         this.stepHeight = 2;
         this.isImmuneToFire = true;
         this.targetInitted = false;
@@ -63,7 +63,7 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 	protected void initEntityAI() {
 		super.initEntityAI();
 		
-		this.tasks.addTask(1, new DragonMeleeAttackTask(this, 1.0D, true));
+		this.tasks.addTask(1, new DragonMeleeAttackTask(this, 1.0D, true, 4F * .6F * 4F * .6F * 1.2));
 		this.tasks.addTask(2, new EntityAIWander(this, 1.0D, 30));
 	}
 	
@@ -128,6 +128,9 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 		if (this.target != null) {
 			if (this.target.isDead) {
 				this.attackEntityFrom(DamageSource.OUT_OF_WORLD, (float) this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getAttributeValue());
+			}
+			else {
+				System.out.println("Dist is " + target.getDistanceSq(this));
 			}
 		} else {
 			// If target is null but we're a target-type, DIE

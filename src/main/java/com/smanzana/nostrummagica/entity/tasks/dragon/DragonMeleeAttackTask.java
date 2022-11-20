@@ -105,7 +105,7 @@ public class DragonMeleeAttackTask extends EntityAIAttackMelee {
 
 	@Override
 	protected double getAttackReachSqr(EntityLivingBase attackTarget) {
-		return reachSQR;
+		return reachSQR + attackTarget.width;
 	}
 	
 	@Override
