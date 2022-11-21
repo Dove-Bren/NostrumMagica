@@ -68,6 +68,12 @@ public enum NostrumParticles {
 	}
 	
 	public static class SpawnParams {
+		
+		public static enum EntityBehavior {
+			JOIN, // Fly towards and into the entity (x, y + h/2, z)
+			ORBIT, // Fly towards and then orbit the entity (r = w*2)
+		}
+		
 		// Required params
 		public final int count;
 		public final double spawnX;
@@ -88,6 +94,7 @@ public enum NostrumParticles {
 		public @Nullable Integer color; // ARGB
 		public boolean dieOnTarget;
 		public float gravityStrength;
+		public EntityBehavior entityBehavior;
 		
 		public SpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, 
 				Vec3d velocity, Vec3d velocityJitter) {
@@ -105,6 +112,7 @@ public enum NostrumParticles {
 			this.targetEntID = null;
 			this.dieOnTarget = false;
 			this.gravityStrength = 0f;
+			this.entityBehavior = EntityBehavior.JOIN;
 		}
 		
 		public SpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter,
@@ -123,6 +131,7 @@ public enum NostrumParticles {
 			this.velocityJitter = null;
 			this.dieOnTarget = false;
 			this.gravityStrength = 0f;
+			this.entityBehavior = EntityBehavior.JOIN;
 		}
 		
 		public SpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter,
@@ -141,6 +150,7 @@ public enum NostrumParticles {
 			this.velocityJitter = null;
 			this.dieOnTarget = false;
 			this.gravityStrength = 0f;
+			this.entityBehavior = EntityBehavior.JOIN;
 		}
 		
 		public SpawnParams color(int color) {
@@ -166,6 +176,11 @@ public enum NostrumParticles {
 			return this;
 		}
 		
+		public SpawnParams setEntityBehavior(EntityBehavior behavior) {
+			this.entityBehavior = behavior;
+			return this;
+		}
+		
 		private static final String NBT_COUNT = "count";
 		private static final String NBT_SPAWN_X = "spawn_x";
 		private static final String NBT_SPAWN_Y = "spawn_y";
@@ -179,6 +194,7 @@ public enum NostrumParticles {
 		private static final String NBT_TARGET_ENT_ID = "target_ent_id";
 		private static final String NBT_DIE_ON_TARGET = "die_on_target";
 		private static final String NBT_GRAVITY_STRENGTH = "gravity_strength";
+		private static final String NBT_ENTITY_BEHAVIOR = "entity_behavior";
 		
 		public static NBTTagCompound WriteNBT(SpawnParams params, @Nullable NBTTagCompound tag) {
 			if (tag == null) {
@@ -193,6 +209,7 @@ public enum NostrumParticles {
 			tag.setInteger(NBT_LIFETIME, params.lifetime);
 			tag.setInteger(NBT_LIFETIME_JITTER, params.lifetimeJitter);
 			tag.setBoolean(NBT_DIE_ON_TARGET, params.dieOnTarget);
+			tag.setInteger(NBT_ENTITY_BEHAVIOR, params.entityBehavior.ordinal());
 			
 			if (params.velocity != null) {
 				NBTTagCompound subtag = new NBTTagCompound();
@@ -307,6 +324,15 @@ public enum NostrumParticles {
 			
 			if (tag.hasKey(NBT_GRAVITY_STRENGTH, NBT.TAG_FLOAT)) {
 				params.gravity(tag.getFloat(NBT_GRAVITY_STRENGTH));
+			}
+			
+			if (tag.hasKey(NBT_ENTITY_BEHAVIOR, NBT.TAG_INT)) {
+				final int ord = tag.getInteger(NBT_ENTITY_BEHAVIOR);
+				if (ord < EntityBehavior.values().length) {
+					params.entityBehavior = EntityBehavior.values()[ord];
+				} else {
+					params.entityBehavior = EntityBehavior.JOIN;
+				}
 			}
 			
 			return params;

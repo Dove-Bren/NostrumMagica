@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.particles;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.EntityBehavior;
 import com.smanzana.nostrummagica.utils.ColorUtil;
 
 import net.minecraft.client.Minecraft;
@@ -23,6 +24,7 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 	protected Vec3d targetPos;
 	protected Entity targetEntity;
 	protected boolean dieOnTarget;
+	protected EntityBehavior entityBehavior;
 	
 	public ParticleGlowOrb(World worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
 		super(worldIn, x, y, z, 0, 0, 0);
@@ -85,6 +87,10 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 		this.dieOnTarget = die;
 	}
 	
+	public void setEntityBehavior(EntityBehavior behavior) {
+		this.entityBehavior = behavior;
+	}
+	
 	@Override
 	public ResourceLocation getTexture() {
 		return TEX_LOC;
@@ -139,11 +145,31 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 		
 		if (targetEntity != null) {
 			if (!targetEntity.isDead) {
-				final float period = 20f;
-				Vec3d offset = targetPos == null ? new Vec3d(0,0,0) : targetPos.rotateYaw((float) (Math.PI * 2 * ((float) particleAge % period) / period));
+				final float period;
+				Vec3d offset;
+				if (this.entityBehavior == EntityBehavior.JOIN) {
+					period = 20f;
+					offset = targetPos == null ? Vec3d.ZERO : targetPos.rotateYaw((float) (Math.PI * 2 * ((float) particleAge % period) / period))
+							.addVector(0, targetEntity.height/2, 0);
+				} else if (this.entityBehavior == EntityBehavior.ORBIT) {
+					period = 20f;
+					//randPeriodOffset = ?
+					offset = (new Vec3d(targetEntity.width * 2, 0, 0)).rotateYaw((float) (Math.PI * 2 * ((float) particleAge % period) / period))
+							.addVector(0, (targetEntity.height/2) + (targetPos == null ? 0 : targetPos.y), 0);
+					
+					// do this better
+					if (this.particleGravity != 0f) {
+						if (targetPos == null) {
+							targetPos = Vec3d.ZERO;
+						}
+						targetPos = targetPos.addVector(0, -this.particleGravity, 0);
+					}
+				} else {
+					throw new RuntimeException("Unsupported particle behavior");
+				}
 				Vec3d curVelocity = new Vec3d(this.motionX, this.motionY, this.motionZ);
 				Vec3d posDelta = targetEntity.getPositionVector()
-						.addVector(offset.x, offset.y + targetEntity.height/2, offset.z)
+						.addVector(offset.x, offset.y, offset.z)
 						.subtract(posX, posY, posZ);
 				Vec3d idealVelocity = posDelta.normalize().scale(.3);
 				this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
@@ -184,6 +210,7 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 					particle.setGravityStrength(params.gravityStrength);
 				}
 				particle.dieOnTarget(params.dieOnTarget);
+				particle.setEntityBehavior(params.entityBehavior);
 				Minecraft.getMinecraft().effectRenderer.addEffect(particle);
 			}
 			return particle;

@@ -36,6 +36,7 @@ import com.smanzana.nostrummagica.network.messages.EnchantedArmorStateUpdate.Arm
 import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.utils.NonNullEnumMap;
 import com.smanzana.nostrummagica.utils.Projectiles;
@@ -1771,7 +1772,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 				cloud.setOwner(ent);
 				
 				cloud.height = 5f;
-				cloud.setRadius(5f);
+				cloud.setRadius(7.5f);
 				cloud.setDuration(0);
 				cloud.setWaitTime(20 * 5 + 10);
 				cloud.setIgnoreRadius(true);
@@ -1779,11 +1780,10 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 					if (entity.noClip || entity.hasNoGravity()) {
 						return;
 					}
+					
+					// Never effect summoner
 					if (entity == ent) {
-						// Only affect caster if they jump
-						if (entity.onGround) {
-							return;
-						}
+						return;
 					}
 					
 					// Projectiles get turned downward
@@ -1801,23 +1801,59 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 						return;
 					}
 					
-					// upward effect
-					final int period = 20;
-					final float prog = ((float) (entity.ticksExisted % period) / (float) period);
-					final double dy = (Math.sin(prog * 2 * Math.PI) + 1) / 2;
-					final Vec3d target = new Vec3d(cloud.posX, cloud.posY + 2 + dy, cloud.posZ);
-					final Vec3d diff = target.subtract(entity.getPositionVector());
-					entity.motionX = 0;//diff.x/ 2;
-					entity.motionY = diff.y/ 2;
-					entity.motionZ = 0;//diff.z/ 2;
-					entity.velocityChanged = true;
-					//entity.posY = 2 + dy;
-					//entity.setPositionAndUpdate(cloud.posX, cloud.posY + 2 + dy, cloud.posZ);
+//					// upward effect
+//					final int period = 20;
+//					final float prog = ((float) (entity.ticksExisted % period) / (float) period);
+//					final double dy = (Math.sin(prog * 2 * Math.PI) + 1) / 2;
+//					final Vec3d target = new Vec3d(cloud.posX, cloud.posY + 2 + dy, cloud.posZ);
+//					final Vec3d diff = target.subtract(entity.getPositionVector());
+//					entity.motionX = 0;//diff.x/ 2;
+//					entity.motionY = diff.y/ 2;
+//					entity.motionZ = 0;//diff.z/ 2;
+//					entity.velocityChanged = true;
+//					//entity.posY = 2 + dy;
+//					//entity.setPositionAndUpdate(cloud.posX, cloud.posY + 2 + dy, cloud.posZ);
+					
+					// Downward suppresive effect
+					entity.motionX *= .2;
+					entity.motionZ *= .2;
+					entity.motionY -= 0.3;
+					
+					
+					// Hurt unfriendlies, too
+					if (entity.ticksExisted % 20 == 0) {
+						if (entity instanceof EntityLivingBase && !NostrumMagica.IsSameTeam((EntityLivingBase)entity, ent)) {
+							EntityLivingBase living = (EntityLivingBase) entity;
+							entity.hurtResistantTime = 0;
+							entity.attackEntityFrom(new MagicDamageSource(ent, EMagicElement.WIND),
+									SpellAction.calcDamage(ent, living, .25f, EMagicElement.WIND));
+							entity.hurtResistantTime = 0;
+							
+//							NostrumParticles.GLOW_ORB.spawn(living.getEntityWorld(), new NostrumParticles.SpawnParams(
+//									 10,
+//									 living.posX, entity.posY + entity.height/2f, entity.posZ, entity.width * 2,
+//									 10, 5,
+//									 living.getEntityId())
+//									 .color(EMagicElement.WIND.getColor()));
+						}
+					}
 				});
 				cloud.setEffectDelay(0);
+				
+				
+//				cloud.setCustomParticle(EnumParticleTypes.SWEEP_ATTACK);
+//				cloud.setCustomParticleParam1(10);
+//				cloud.setCustomParticleFrequency(.2f);
+				cloud.setParticle(EnumParticleTypes.SUSPENDED);
+				cloud.setIgnoreRadius(true);
+				cloud.addVFXFunc((worldIn, ticksExisted, cloudIn) -> {
+					final int count = 40;
+					EnchantedWeapon.spawnWhirlwindParticle(worldIn, count, cloudIn.getPositionVector(), cloudIn, 0xA0C0EEC0, .65f);
+				});
 				cloud.setCustomParticle(EnumParticleTypes.SWEEP_ATTACK);
 				cloud.setCustomParticleParam1(10);
-				cloud.setCustomParticleFrequency(.2f);
+				cloud.setCustomParticleFrequency(.05f);
+				
 				ent.world.spawnEntity(cloud);
 			}
 			break;

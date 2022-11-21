@@ -39,6 +39,10 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 		public void apply(World world, BlockPos pos);
 	}
 	
+	public static interface IAreaVFX {
+		public void apply(World world, int ticksExisted, EntityAreaEffect cloud);
+	}
+	
 	private static final DataParameter<Float> HEIGHT = EntityDataManager.<Float>createKey(EntityAreaEffect.class, DataSerializers.FLOAT);
 	private static final DataParameter<Integer> EXTRA_PARTICLE = EntityDataManager.<Integer>createKey(EntityAreaEffect.class, DataSerializers.VARINT);
 	private static final DataParameter<Integer> EXTRA_PARTICLE_PARAM_1 = EntityDataManager.<Integer>createKey(EntityAreaEffect.class, DataSerializers.VARINT);
@@ -64,6 +68,8 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 	private float prevHeight;
 	private Vec3d waddleDir;
 	private double waddleMagnitude;
+	
+	protected final List<IAreaVFX> manualVFX;
 
 	public EntityAreaEffect(World worldIn) {
 		super(worldIn);
@@ -74,6 +80,7 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 		verticalSteps = false;
 		gravity = false;
 		gravitySpeed = 0;
+		manualVFX = new LinkedList<>();
 	}
 	
 	public EntityAreaEffect(World worldIn, double x, double y, double z) {
@@ -82,6 +89,7 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 		locationEffects = new LinkedList<>();
 		effectDelays = new HashMap<>();
 		effectDelay = 20;
+		manualVFX = new LinkedList<>();
 	}
 	
 	public int getEffectDelay() {
@@ -200,6 +208,10 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 		this.dataManager.set(EXTRA_PARTICLE_FREQUENCY, frequency);
 	}
 	
+	public void addVFXFunc(IAreaVFX vfx) {
+		this.manualVFX.add(vfx);
+	}
+	
 	public void setIgnoreRadius(boolean ignore) {
 		super.setIgnoreRadius(ignore);
 	}
@@ -253,6 +265,10 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 				it.remove();
 			}
 		}
+	}
+	
+	public int getRemainingTicks() {
+		return (this.getDuration() + this.waitTime) - this.ticksExisted;
 	}
 	
 	protected void onFall(double prevY) {
@@ -442,6 +458,12 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 		}
 	}
 	
+	protected void serverVFXTick() {
+		for (IAreaVFX vfx : this.manualVFX) {
+			vfx.apply(world, this.ticksExisted, this);
+		}
+	}
+	
 	@Override
 	public void onUpdate() {
 		super.onUpdate();
@@ -490,6 +512,8 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 			if (this.ticksExisted % 100 == 0) {
 				this.cleanDelays();
 			}
+			
+			serverVFXTick();
 		} else {
 			clientUpdateTick();
 		}
