@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
+import com.smanzana.nostrummagica.entity.EntitySpellBullet;
 
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -13,23 +13,23 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderSpellProjectile extends Render<EntitySpellProjectile> {
+public class RenderSpellBullet extends Render<EntitySpellBullet> {
 	
 	private static final ResourceLocation LOC_TEXT = new ResourceLocation(NostrumMagica.MODID, "textures/effects/glow_orb.png");
 	
 	private final float scale;
 
-	public RenderSpellProjectile(RenderManager renderManager, float scale) {
+	public RenderSpellBullet(RenderManager renderManager, float scale) {
 		super(renderManager);
 		this.scale = scale;
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(EntitySpellProjectile entity) {
+	protected ResourceLocation getEntityTexture(EntitySpellBullet entity) {
 		return LOC_TEXT;
 	}
 	
-	public void doRender(EntitySpellProjectile entity, double x, double y, double z, float entityYaw, float partialTicks) {
+	public void doRender(EntitySpellBullet entity, double x, double y, double z, float entityYaw, float partialTicks) {
 		
 		final int color = entity.getElement().getColor();
 		final float brightness = 1f;
@@ -38,7 +38,7 @@ public class RenderSpellProjectile extends Render<EntitySpellProjectile> {
 		this.bindEntityTexture(entity);
 		GlStateManager.translate((float)x, (float)y, (float)z);
 		GlStateManager.enableRescaleNormal();
-		GlStateManager.scale(this.scale, this.scale, this.scale);
+		GlStateManager.scale(.5 * this.scale, .5 * this.scale, .5 * this.scale);
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferbuilder = tessellator.getBuffer();
 		GlStateManager.rotate(180.0F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);

@@ -67,6 +67,7 @@ import com.smanzana.nostrummagica.client.render.entity.RenderKoid;
 import com.smanzana.nostrummagica.client.render.entity.RenderLux;
 import com.smanzana.nostrummagica.client.render.entity.RenderMagicSaucer;
 import com.smanzana.nostrummagica.client.render.entity.RenderShadowDragonRed;
+import com.smanzana.nostrummagica.client.render.entity.RenderSpellBullet;
 import com.smanzana.nostrummagica.client.render.entity.RenderSpellProjectile;
 import com.smanzana.nostrummagica.client.render.entity.RenderSprite;
 import com.smanzana.nostrummagica.client.render.entity.RenderSwitchTrigger;
@@ -86,6 +87,7 @@ import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityHookShot;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityLux;
+import com.smanzana.nostrummagica.entity.EntitySpellBullet;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
 import com.smanzana.nostrummagica.entity.EntitySprite;
@@ -702,6 +704,12 @@ public class ClientProxy extends CommonProxy {
 			@Override
 			public Render<? super EntitySpellProjectile> createRenderFor(RenderManager manager) {
 				return new RenderSpellProjectile(manager, 1f);
+			}
+		});
+		RenderingRegistry.registerEntityRenderingHandler(EntitySpellBullet.class, new IRenderFactory<EntitySpellBullet>() {
+			@Override
+			public Render<? super EntitySpellBullet> createRenderFor(RenderManager manager) {
+				return new RenderSpellBullet(manager, 1f);
 			}
 		});
 		RenderingRegistry.registerEntityRenderingHandler(EntityGolem.class, new IRenderFactory<EntityGolem>() {

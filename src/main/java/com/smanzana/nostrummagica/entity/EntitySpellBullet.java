@@ -6,6 +6,8 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
+import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
+import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger.SeekingBulletTriggerInstance;
 
 import net.minecraft.entity.Entity;
@@ -14,6 +16,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityShulkerBullet;
 import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
@@ -26,6 +30,8 @@ import net.minecraft.world.World;
 // Like shulker bullets but have spells in them
 public class EntitySpellBullet extends EntityShulkerBullet {
 
+	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(EntitySpellProjectile.class, MagicElementDataSerializer.instance);
+	
 	private SeekingBulletTriggerInstance trigger;
 	private @Nullable Predicate<Entity> filter;
 	private EntityLivingBase target;
@@ -72,10 +78,27 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 		this.speed = speed;
 		this.particle = particle;
 		this.blockyPath = blockyPath;
+		
+		this.setElement(self.getElement());
+	}
+	
+	@Override
+	protected void entityInit() {
+		super.entityInit();
+		
+		this.dataManager.register(ELEMENT, EMagicElement.PHYSICAL);
 	}
 	
 	public void setFilter(@Nullable Predicate<Entity> filter) {
 		this.filter = filter;
+	}
+	
+	public void setElement(EMagicElement element) {
+		this.dataManager.set(ELEMENT, element);
+	}
+	
+	public EMagicElement getElement() {
+		return this.dataManager.get(ELEMENT);
 	}
 	
 	@Override

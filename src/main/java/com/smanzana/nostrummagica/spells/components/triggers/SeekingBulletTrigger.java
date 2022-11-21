@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.entity.EntitySpellBullet;
 import com.smanzana.nostrummagica.entity.IEntityTameable;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
@@ -173,6 +174,11 @@ public class SeekingBulletTrigger extends SpellTrigger {
 			} else {
 				getState().trigger(Lists.newArrayList((EntityLivingBase) entity), Lists.newArrayList(getState().getOther()), null, null);
 			}
+		}
+		
+		public EMagicElement getElement() {
+			// Return element on next shape
+			return getState().getNextElement();
 		}
 	}
 
