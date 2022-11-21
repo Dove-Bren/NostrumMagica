@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import com.google.common.base.Predicate;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonAIAggroTable;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonAINearestAttackableTarget;
@@ -494,6 +495,22 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 		}
 		
 		updateParts();
+		
+		if (this.world.isRemote && this.isCasting()) {
+//			NostrumParticles.FILLED_ORB.spawn(this.world, new NostrumParticles.SpawnParams(5,
+//					posX, posY + this.height / 2, posZ,
+//					5,
+//					30, 5,
+//					new Vec3d(0, .25, 0), Vec3d.ZERO)
+//					.color(0xFFFF0022));
+			NostrumParticles.FILLED_ORB.spawn(this.world, new NostrumParticles.SpawnParams(5,
+					posX, posY + this.height / 2, posZ,
+					5,
+					30, 5,
+					this.getEntityId())
+					.color(0xFFAA0022)
+					.dieOnTarget(true));
+		}
 	}
 	
 	@Override
@@ -551,6 +568,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 	@Override
 	public boolean attackEntityFromPart(MultiPartEntityPart dragonPart, DamageSource source, float damage) {
 		// could take less or more damage from different sources in different parents
+		System.out.println("Attack from " + dragonPart.partName);
 		return this.attackEntityFrom(source, damage);
 	}
 	
