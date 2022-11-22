@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -35,7 +36,8 @@ public class RayTrace {
 	public static class LivingOnly implements Predicate<Entity> {
 		@Override
 		public boolean apply(Entity input) {
-			return input != null && input instanceof EntityLivingBase;
+			EntityLivingBase living = NostrumMagica.resolveEntityLiving(input);
+			return living != null;
 		}
 	}
 	
@@ -53,7 +55,7 @@ public class RayTrace {
 		public boolean apply(Entity input) {
 			if (filterLiving.apply(input)) {
 				// is EntityLivingBase
-				return filterMe.apply((EntityLivingBase) input);
+				return filterMe.apply(NostrumMagica.resolveEntityLiving(input));
 			}
 			
 			return false;

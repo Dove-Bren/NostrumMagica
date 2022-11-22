@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.spells.components.triggers;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
@@ -53,10 +54,11 @@ public class TouchTrigger extends InstantTrigger {
 		}
 		
 		List<EntityLivingBase> others = Lists.newArrayList(state.getSelf());
-		if (trace.typeOfHit == RayTraceResult.Type.ENTITY && trace.entityHit != null
-				&& !trace.entityHit.isEntityEqual(state.getSelf())) {
+		if (trace.typeOfHit == RayTraceResult.Type.ENTITY
+				&& null != NostrumMagica.resolveEntityLiving(trace.entityHit)
+				&& !NostrumMagica.resolveEntityLiving(trace.entityHit).isEntityEqual(state.getSelf())) {
 			// Cast is safe from 'onlyLiving' option in trace
-			return new TriggerData(Lists.newArrayList((EntityLivingBase) trace.entityHit), others, world, null);
+			return new TriggerData(Lists.newArrayList(NostrumMagica.resolveEntityLiving(trace.entityHit)), others, world, null);
 		} else if (trace.typeOfHit == RayTraceResult.Type.BLOCK) {
 			Vec3d vec = trace.hitVec;
 			return new TriggerData(null, others, world,

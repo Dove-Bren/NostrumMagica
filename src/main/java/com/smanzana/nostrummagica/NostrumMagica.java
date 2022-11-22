@@ -192,6 +192,7 @@ import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IEntityOwnable;
+import net.minecraft.entity.MultiPartEntityPart;
 import net.minecraft.entity.ai.EntityAIFollowOwner;
 import net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry;
 import net.minecraft.entity.monster.IMob;
@@ -3014,6 +3015,25 @@ public class NostrumMagica
 		// Assume mobs are on a different team than anything else
 		return (ent1 instanceof IMob == ent2 instanceof IMob);
 	}
+    
+    public static @Nullable EntityLivingBase resolveEntityLiving(@Nullable Entity entityOrSubEntity) {
+    	if (entityOrSubEntity == null) {
+    		return null;
+    	}
+    	
+    	if (entityOrSubEntity instanceof EntityLivingBase) {
+    		return (EntityLivingBase) entityOrSubEntity;
+    	}
+    	
+    	// Multiparts aren't living but may have living parents!
+    	if (entityOrSubEntity instanceof MultiPartEntityPart) {
+    		if (((MultiPartEntityPart) entityOrSubEntity).parent instanceof EntityLivingBase) {
+    			return (EntityLivingBase) ((MultiPartEntityPart) entityOrSubEntity).parent;
+    		}
+    	}
+    	
+    	return null;
+    }
     
     @SubscribeEvent
     public void onEntitySpawn(EntityJoinWorldEvent e) {

@@ -380,7 +380,7 @@ public class EntityHookShot extends Entity {
 			wantsFetch = caster.isSneaking();
 		}
 		
-		if (result.typeOfHit == Type.ENTITY && result.entityHit != null && HookshotItem.CanBeHooked(getType(), result.entityHit) && (caster == null || caster != result.entityHit)) {
+		if (result.typeOfHit == Type.ENTITY && NostrumMagica.resolveEntityLiving(result.entityHit) != null && HookshotItem.CanBeHooked(getType(), result.entityHit) && (caster == null || caster != result.entityHit)) {
 			tickHooked = this.ticksExisted;
 			
 			// Large entities cannot be fetched, and instead we'll override and force the play er to go to them.

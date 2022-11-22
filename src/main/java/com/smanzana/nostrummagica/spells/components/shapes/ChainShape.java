@@ -83,7 +83,7 @@ public class ChainShape extends SpellShape {
 								center.posY + radius,
 								center.posZ + radius),
 					(ent) -> {
-						return ent != null && ent instanceof EntityLivingBase;
+						return ent != null && NostrumMagica.resolveEntityLiving(ent) != null;
 					});
 			Collections.sort(entities, (a, b) -> {
 				return (int) (a.getDistanceSq(center) - b.getDistanceSq(center));
@@ -92,15 +92,14 @@ public class ChainShape extends SpellShape {
 			// Note: Could do this filtering inside the entity iteration. Just filtering to living is probably okay.
 			final double radiusSq = radius * radius;
 			for (Entity ent : entities) {
-				if (!(ent instanceof EntityLivingBase)) {
+				EntityLivingBase living = NostrumMagica.resolveEntityLiving(ent);
+				if (living == null) {
 					continue;
 				}
 				
 				if (seen.contains(ent)) {
 					continue;
 				}
-				
-				EntityLivingBase living = (EntityLivingBase) ent;
 				
 				// Check actual distance
 				if (Math.abs(living.getDistanceSq(center)) > radiusSq) {

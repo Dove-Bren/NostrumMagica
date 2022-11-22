@@ -206,10 +206,10 @@ public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
 	protected List<EntityLivingBase> findStabTargets(World worldIn, EntityLivingBase wielder, ItemStack dagger) {
 		float extent = 3f;
 		RayTraceResult mop = RayTrace.raytrace(wielder.world, wielder.getPositionEyes(.5f), wielder.getLook(.5f), extent, new RayTrace.OtherLiving(wielder));
-		if (mop == null || mop.entityHit == null || !(mop.entityHit instanceof EntityLivingBase)) {
+		if (mop == null || NostrumMagica.resolveEntityLiving(mop.entityHit) == null) {
 			return new ArrayList<>();
 		} else {
-			return Lists.newArrayList((EntityLivingBase) mop.entityHit);
+			return Lists.newArrayList(NostrumMagica.resolveEntityLiving(mop.entityHit));
 		}
 	}
 	

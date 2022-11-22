@@ -90,8 +90,9 @@ public class SeekingBulletTrigger extends SpellTrigger {
 								
 								if (ignoreAllies) {
 									// Too strong?
-									if (ent instanceof EntityLivingBase
-											&& NostrumMagica.IsSameTeam(getState().getSelf(), (EntityLivingBase) ent)) {
+									EntityLivingBase living = NostrumMagica.resolveEntityLiving(ent);
+									if (living != null
+											&& NostrumMagica.IsSameTeam(getState().getSelf(), living)) {
 										return false;
 									}
 									
@@ -112,7 +113,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 							return true;
 						}, .5);
 						
-						target = (mop.entityHit == null ? null : (mop.entityHit instanceof EntityLivingBase ? (EntityLivingBase)mop.entityHit : null));
+						target = NostrumMagica.resolveEntityLiving(mop.entityHit);
 					}
 					
 					// Get axis from where target is
@@ -169,10 +170,10 @@ public class SeekingBulletTrigger extends SpellTrigger {
 			if (entity == null) {
 				onProjectileHit(new BlockPos(this.pos));
 			}
-			else if (!(entity instanceof EntityLivingBase)) {
+			else if (null == NostrumMagica.resolveEntityLiving(entity)) {
 				onProjectileHit(entity.getPosition());
 			} else {
-				getState().trigger(Lists.newArrayList((EntityLivingBase) entity), Lists.newArrayList(getState().getOther()), null, null);
+				getState().trigger(Lists.newArrayList(NostrumMagica.resolveEntityLiving(entity)), Lists.newArrayList(getState().getOther()), null, null);
 			}
 		}
 		

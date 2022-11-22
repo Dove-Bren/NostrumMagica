@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.spells.components.triggers;
 
 import com.google.common.collect.Lists;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
 import com.smanzana.nostrummagica.entity.IEntityTameable;
 import com.smanzana.nostrummagica.items.ReagentItem;
@@ -124,10 +125,10 @@ public class ProjectileTrigger extends SpellTrigger {
 			if (entity == null) {
 				onProjectileHit(new BlockPos(this.pos));
 			}
-			else if (!(entity instanceof EntityLivingBase)) {
+			else if (null == NostrumMagica.resolveEntityLiving(entity)) {
 				onProjectileHit(entity.getPosition());
 			} else {
-				getState().trigger(Lists.newArrayList((EntityLivingBase) entity), Lists.newArrayList(getState().getOther()), null, null);
+				getState().trigger(Lists.newArrayList(NostrumMagica.resolveEntityLiving(entity)), Lists.newArrayList(getState().getOther()), null, null);
 			}
 		}
 		

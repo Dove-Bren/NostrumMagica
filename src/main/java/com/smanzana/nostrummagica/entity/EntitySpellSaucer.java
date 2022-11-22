@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import com.smanzana.nostrummagica.NostrumMagica;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IProjectile;
@@ -105,10 +107,10 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 				}
 			}
 		} else if (result.typeOfHit == RayTraceResult.Type.ENTITY) {
-			if (result.entityHit instanceof EntitySpellSaucer || !(result.entityHit instanceof EntityLivingBase)) {
+			if (result.entityHit instanceof EntitySpellSaucer || null == NostrumMagica.resolveEntityLiving(result.entityHit)) {
 				
 			} else if (result.entityHit != shootingEntity && !shootingEntity.isRidingOrBeingRiddenBy(result.entityHit)) {
-				EntityLivingBase living = (EntityLivingBase) result.entityHit;
+				EntityLivingBase living = NostrumMagica.resolveEntityLiving(result.entityHit);
 				boolean dieOnImpact = this.dieOnImpact(living);
 				boolean canImpact = this.canImpact(living);
 				if (canImpact && (dieOnImpact || !this.hasBeenHit(living))) {

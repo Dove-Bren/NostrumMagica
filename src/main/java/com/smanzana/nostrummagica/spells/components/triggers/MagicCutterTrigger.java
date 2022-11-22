@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.spells.components.triggers;
 
 import com.google.common.collect.Lists;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityChakramSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer.ISpellSaucerTrigger;
@@ -89,10 +90,10 @@ public class MagicCutterTrigger extends SpellTrigger {
 			if (entity == null) {
 				onProjectileHit(new BlockPos(this.pos));
 			}
-			else if (!(entity instanceof EntityLivingBase)) {
+			else if (NostrumMagica.resolveEntityLiving(entity) == null) {
 				onProjectileHit(entity.getPosition());
 			} else {
-				getState().trigger(Lists.newArrayList((EntityLivingBase) entity), Lists.newArrayList(getState().getOther()), null, null, piercing);
+				getState().trigger(Lists.newArrayList(NostrumMagica.resolveEntityLiving(entity)), Lists.newArrayList(getState().getOther()), null, null, piercing);
 			}
 		}
 	}
