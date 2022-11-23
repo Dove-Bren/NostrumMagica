@@ -47,6 +47,9 @@ import com.smanzana.nostrummagica.entity.golem.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
+import com.smanzana.nostrummagica.fluids.FluidPoisonWater;
+import com.smanzana.nostrummagica.fluids.FluidPoisonWater.FluidPoisonWaterBlock;
+import com.smanzana.nostrummagica.fluids.NostrumFluids;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellRune;
@@ -113,6 +116,9 @@ import com.smanzana.nostrummagica.world.NostrumDungeonGenerator;
 import com.smanzana.nostrummagica.world.NostrumFlowerGenerator;
 import com.smanzana.nostrummagica.world.NostrumOreGenerator;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.material.MapColor;
+import net.minecraft.block.material.MaterialLiquid;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -135,6 +141,8 @@ import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.EntityEntry;
@@ -158,6 +166,9 @@ public class CommonProxy {
 		CapabilityManager.INSTANCE.register(INostrumMagic.class, new NostrumMagicStorage(), NostrumMagic::new);
 		capabilityHandler = new CapabilityHandler();
 		NetworkHandler.getInstance();
+		
+		// Fluids registered with blocks
+		//registerFluids();
 		
     	registerShapes();
     	registerTriggers();
@@ -451,6 +462,36 @@ public class CommonProxy {
     	registry.register(new DataSerializerEntry(PetJobSerializer.instance).setRegistryName("nostrum.serial.pet_job"));
     	registry.register(new DataSerializerEntry(WilloStatusSerializer.instance).setRegistryName("nostrum.serial.willo_status"));
     	registry.register(new DataSerializerEntry(ArcaneWolfElementalTypeSerializer.instance).setRegistryName("nostrum.serial.arcane_wolf_type"));
+    }
+    
+    @SubscribeEvent(priority = EventPriority.HIGH) // Register fluids before blocks so fluids will be there for blocks
+    public void registerFluids(RegistryEvent.Register<Block> event) {
+    	for (NostrumFluids fluid : NostrumFluids.values()) {
+    		FluidRegistry.registerFluid(fluid.getFluid());
+    	}
+    	
+    	NostrumFluids.POISON_WATER.getFluid().setBlock(new FluidPoisonWaterBlock((FluidPoisonWater) NostrumFluids.POISON_WATER.getFluid(), new MaterialLiquid(MapColor.GREEN_STAINED_HARDENED_CLAY) {
+			@Override
+			public boolean isReplaceable() {
+				return true;
+			}
+			
+			@Override
+			public boolean blocksMovement() {
+				return true; // so our liquids are not replaced by water
+			}
+		}, false));
+    	NostrumFluids.POISON_WATER_UNBREAKABLE.getFluid().setBlock(new FluidPoisonWaterBlock((FluidPoisonWater) NostrumFluids.POISON_WATER_UNBREAKABLE.getFluid(), new MaterialLiquid(MapColor.GREEN_STAINED_HARDENED_CLAY) {
+			@Override
+			public boolean isReplaceable() {
+				return false;
+			}
+			
+			@Override
+			public boolean blocksMovement() {
+				return true; // so our liquids are not replaced by water
+			}
+		}, true));
     }
     
     public void syncPlayer(EntityPlayerMP player) {

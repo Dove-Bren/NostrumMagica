@@ -1,0 +1,13 @@
+{
+	"forge_marker": 1,
+	"defaults": {
+		"model": "forge:fluid"
+	},
+	"variants": {
+		"normal": [{
+			"custom": {
+				"fluid": "poison_water"
+			}
+		}]
+	}
+}

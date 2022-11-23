@@ -23,6 +23,7 @@ import com.smanzana.nostrummagica.blocks.tiles.SymbolTileEntity;
 import com.smanzana.nostrummagica.blocks.tiles.TeleportRuneTileEntity;
 import com.smanzana.nostrummagica.blocks.tiles.TeleportationPortalTileEntity;
 import com.smanzana.nostrummagica.blocks.tiles.TemporaryPortalTileEntity;
+import com.smanzana.nostrummagica.fluids.NostrumFluids;
 
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
@@ -32,6 +33,7 @@ import net.minecraft.item.ItemMultiTexture;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -104,6 +106,10 @@ public class NostrumBlocks {
     			"single", // 0 meta
     			"flood", // 1 meta
     		})).setRegistryName(DungeonAir.ID).setCreativeTab(NostrumMagica.creativeTab));
+    	
+    	
+    	
+    	registerFluidItems(registry);
     }
     
     private void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -176,24 +182,11 @@ public class NostrumBlocks {
 //					'W', Items.STRING,
 //					'F', Items.ROTTEN_FLESH);
     	
+    	registerFluidBlocks(registry);
     	registerTileEntities();
     	
 
     	
-    	// These ItemBlocks were setting setHasSubtypes. I think it's useless tho and can beignored? Confirm. #TODO DONOTCHECKIN
-//	    	registry.register(MimicBlock.door(),
-//	    			new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_DOOR));
-//	    	registry.register(
-//	    			(new ItemBlock(MimicBlock.door()).setRegistryName(MimicBlock.ID_DOOR)
-//	    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(MimicBlock.ID_DOOR).setHasSubtypes(true))
-//	    			);
-//	    	
-//	    	registry.register(MimicBlock.facade(),
-//	    			new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_FACADE));
-//	    	registry.register(
-//	    			(new ItemBlock(MimicBlock.facade()).setRegistryName(MimicBlock.ID_FACADE)
-//	    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(MimicBlock.ID_FACADE).setHasSubtypes(true))
-//	    			);
     }
     
     private void registerTileEntities() {
@@ -217,6 +210,22 @@ public class NostrumBlocks {
     	GameRegistry.registerTileEntity(ActiveHopperTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "active_hopper_te"));
     	GameRegistry.registerTileEntity(ItemDuctTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "item_duct_te"));
     	GameRegistry.registerTileEntity(ParadoxMirrorTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "paradox_mirror_te"));
+    }
+    
+    private void registerFluidBlocks(IForgeRegistry<Block> registry) {
+    	for (NostrumFluids fluid : NostrumFluids.values()) {
+    		if (fluid.getFluid().getBlock() != null) {
+    			registry.register(fluid.getFluid().getBlock());
+    		}
+    	}
+    }
+    
+    private void registerFluidItems(IForgeRegistry<Item> registry) {
+    	for (NostrumFluids fluid : NostrumFluids.values()) {
+    		if (fluid.getFluid().getBlock() != null) {
+    			FluidRegistry.addBucketForFluid(fluid.getFluid());
+    		}
+    	}
     }
 	
 }

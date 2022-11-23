@@ -106,6 +106,7 @@ import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
+import com.smanzana.nostrummagica.fluids.NostrumFluids;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.ArcaneWolfSoulItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
@@ -187,10 +188,12 @@ import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderLightningBolt;
@@ -233,6 +236,8 @@ import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ClientProxy extends CommonProxy {
 	
@@ -680,6 +685,35 @@ public class ClientProxy extends CommonProxy {
 				ArcaneWolfSoulItem.ID);
 		
 		registerEntityRenderers();
+		
+		// Register fluid handlers which for some reason are required. Otherwise blockstate variants for each fluid level are needed.
+		for (NostrumFluids fluid : NostrumFluids.values()) {
+			if (fluid.getFluid().getBlock() == null) {
+				continue;
+			}
+			
+			final ModelResourceLocation locationIgnoringVariant = new ModelResourceLocation(
+					fluid.getFluid().getBlock().getRegistryName(),
+					"normal"
+					);
+			
+			ModelLoader.setCustomStateMapper(fluid.getFluid().getBlock(), new StateMapperBase() {
+				@Override
+				protected ModelResourceLocation getModelResourceLocation(final IBlockState state) {
+					return locationIgnoringVariant;
+				}
+			});
+		}
+	}
+	
+	@SideOnly(Side.CLIENT)
+	@SubscribeEvent
+	public static void onIconLoad(TextureStitchEvent.Pre event) {
+		// Maybe not needed. Copied from EnderIO when textures weren't showing up but found another issue (variants need [])
+		for (NostrumFluids fluid : NostrumFluids.values()) {
+			event.getMap().registerSprite(fluid.getFluid().getStill());
+			event.getMap().registerSprite(fluid.getFluid().getFlowing());
+		}
 	}
 	
 	@SubscribeEvent

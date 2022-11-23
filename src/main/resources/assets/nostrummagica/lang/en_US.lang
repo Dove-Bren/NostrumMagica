@@ -492,6 +492,10 @@ death.attack.magic.LIGHTNING=%1$s was electrocuted by %2$s
 death.attack.magic.ICE=%1$s was frozen by %2$s
 death.attack.magic.FIRE=%1$s was burnt to a crisp by %2$s
 death.attack.magic.ENDER=%1$s was slain by %2$s's Ender energies
+death.attack.nostrum_poison_water=%1$s died in poisonous water
+
+fluid.poison_water=Poison Water
+fluid.poison_water_unbreakable=Poison Water (Dungeon)
 
 info.recall.fail=A mark location must be set first
 info.recall.baddimension=Your mark location is in a different dimension

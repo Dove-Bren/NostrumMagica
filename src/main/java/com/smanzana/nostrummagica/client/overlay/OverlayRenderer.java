@@ -49,6 +49,7 @@ import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -68,6 +69,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -78,6 +80,8 @@ import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
+import net.minecraftforge.client.event.RenderBlockOverlayEvent;
+import net.minecraftforge.client.event.RenderBlockOverlayEvent.OverlayType;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.client.event.RenderLivingEvent;
@@ -86,6 +90,7 @@ import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class OverlayRenderer extends Gui {
@@ -1471,6 +1476,55 @@ public class OverlayRenderer extends Gui {
 		if (!event.getPlayer().isCreative() && state.getBlock() instanceof DungeonAir) {
 			event.setCanceled(true);
 			return;
+		}
+	}
+	
+	@SubscribeEvent
+	public void onBlockOverlay(RenderBlockOverlayEvent event) {
+		
+		// Forge overlays aren't set up. Have to do it manually. (Some copied from EnderIO)
+		if (!event.isCanceled() && event.getOverlayType() == OverlayType.WATER) {
+			final EntityPlayer player = event.getPlayer();
+			// the event has the wrong BlockPos (entity center instead of eyes)
+			final BlockPos blockpos = new BlockPos(player.posX, player.posY + player.getEyeHeight(), player.posZ);
+			final IBlockState state = player.world.getBlockState(blockpos);
+			final Block block = state.getBlock();
+
+			if (block instanceof BlockFluidBase && ((BlockFluidBase) block).getFluid() != null) {
+				BlockFluidBase fblock = (BlockFluidBase) block;
+				Vec3d fogColor = fblock.getFogColor(player.world, blockpos, state, player,
+						player.world.getFogColor(event.getRenderPartialTicks()),
+						event.getRenderPartialTicks());
+				float fogColorRed = (float) fogColor.x;
+				float fogColorGreen = (float) fogColor.y;
+				float fogColorBlue = (float) fogColor.z;
+				
+				final ResourceLocation r = fblock.getFluid().getOverlay();
+				Minecraft.getMinecraft().getTextureManager().bindTexture(
+						new ResourceLocation(r.getResourceDomain(), "textures/" + r.getResourcePath() + ".png")
+						);
+				Tessellator tessellator = Tessellator.getInstance();
+				BufferBuilder vertexbuffer = tessellator.getBuffer();
+				float f = player.getBrightness();
+				GlStateManager.color(f * fogColorRed, f * fogColorGreen, f * fogColorBlue, 0.5F);
+				GlStateManager.enableBlend();
+				GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
+						GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+				GlStateManager.pushMatrix();
+				float f7 = -player.rotationYaw / 64.0F;
+				float f8 = player.rotationPitch / 64.0F;
+				vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX);
+				vertexbuffer.pos(-1.0D, -1.0D, -0.5D).tex(4.0F + f7, 4.0F + f8).endVertex();
+				vertexbuffer.pos(1.0D, -1.0D, -0.5D).tex(0.0F + f7, 4.0F + f8).endVertex();
+				vertexbuffer.pos(1.0D, 1.0D, -0.5D).tex(0.0F + f7, 0.0F + f8).endVertex();
+				vertexbuffer.pos(-1.0D, 1.0D, -0.5D).tex(4.0F + f7, 0.0F + f8).endVertex();
+				tessellator.draw();
+				GlStateManager.popMatrix();
+				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+				GlStateManager.disableBlend();
+				
+				event.setCanceled(true);
+			}
 		}
 	}
 	
