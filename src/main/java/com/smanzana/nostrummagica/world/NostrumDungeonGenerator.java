@@ -10,7 +10,6 @@ import java.util.function.Function;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDragonDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumLoadedDungeon;
 import com.smanzana.nostrummagica.world.dungeon.room.DragonStartRoom;
@@ -54,9 +53,11 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 	    }
 	}
 	
-	public static NostrumDungeon DRAGON_DUNGEON = new NostrumDragonDungeon(
+	public static NostrumDungeon DRAGON_DUNGEON = new NostrumLoadedDungeon(
+			"dragon",
 			new DragonStartRoom(),
-			new RoomArena()
+			new RoomArena(),
+			4, 1
 			).add(new RoomGrandStaircase())
 			 .add(new RoomEnd1(false, true))
 			 .add(new RoomGrandHallway())

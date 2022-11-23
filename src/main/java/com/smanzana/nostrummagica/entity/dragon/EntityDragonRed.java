@@ -568,7 +568,6 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 	@Override
 	public boolean attackEntityFromPart(MultiPartEntityPart dragonPart, DamageSource source, float damage) {
 		// could take less or more damage from different sources in different parents
-		System.out.println("Attack from " + dragonPart.partName);
 		return this.attackEntityFrom(source, damage);
 	}
 	
