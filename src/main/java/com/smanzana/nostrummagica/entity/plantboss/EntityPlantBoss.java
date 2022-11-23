@@ -41,6 +41,7 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 		this.setSize(3, 3);
         this.ignoreFrustumCheck = true;
         this.experienceValue = 1250;
+        this.entityCollisionReduction = 1f;
 		
 		this.limbs = new PlantBossLeafLimb[NumberOfLeaves];
 		for (int i = 0; i < NumberOfLeaves; i++) {
@@ -109,7 +110,8 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 		for (PlantBossLeafLimb limb : limbs) {
 			final float yawProg = ((float) limb.index / (float) limbs.length); // 0 to 1
 			final double limbRot = Math.PI * 2 * yawProg
-								+ (this.rotationYawHead * Math.PI / 180.0);
+								//+ (this.rotationYawHead * Math.PI / 180.0) // don't rotate
+								;
 			final double radius = this.width * (limb.index % 2 == 0 ? 1.25 : 1.5);
 			
 			final double x = this.posX
@@ -248,6 +250,11 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 		return false;
 	}
 	
+	@Override
+	protected void collideWithEntity(Entity entityIn) {
+		return; // Don't push others away
+	}
+	
 	public @Nullable PlantBossLeafLimb getLeafLimb(int index) {
 		if (index < this.limbs.length) {
 			return limbs[index];
@@ -276,6 +283,10 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 			final float yawProg = ((float) index / (float) EntityPlantBoss.NumberOfLeaves); // 0 to 1
 			
 			return yawProg * 360f;
+		}
+		
+		public float getPitch() {
+			return this.rotationPitch;
 		}
 	}
 }
