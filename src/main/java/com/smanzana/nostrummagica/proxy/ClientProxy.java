@@ -66,6 +66,8 @@ import com.smanzana.nostrummagica.client.render.entity.RenderHookShot;
 import com.smanzana.nostrummagica.client.render.entity.RenderKoid;
 import com.smanzana.nostrummagica.client.render.entity.RenderLux;
 import com.smanzana.nostrummagica.client.render.entity.RenderMagicSaucer;
+import com.smanzana.nostrummagica.client.render.entity.RenderPlantBoss;
+import com.smanzana.nostrummagica.client.render.entity.RenderPlantBossLeaf;
 import com.smanzana.nostrummagica.client.render.entity.RenderShadowDragonRed;
 import com.smanzana.nostrummagica.client.render.entity.RenderSpellBullet;
 import com.smanzana.nostrummagica.client.render.entity.RenderSpellProjectile;
@@ -103,6 +105,7 @@ import com.smanzana.nostrummagica.entity.dragon.EntityShadowDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
+import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.ArcaneWolfSoulItem;
 import com.smanzana.nostrummagica.items.BlankScroll;
@@ -805,6 +808,20 @@ public class ClientProxy extends CommonProxy {
 			@Override
 			public Render<? super EntityArcaneWolf> createRenderFor(RenderManager manager) {
 				return new RenderArcaneWolf(manager, 1f);
+			}
+		});
+		
+		RenderingRegistry.registerEntityRenderingHandler(EntityPlantBoss.class, new IRenderFactory<EntityPlantBoss>() {
+			@Override
+			public Render<? super EntityPlantBoss> createRenderFor(RenderManager manager) {
+				return new RenderPlantBoss(manager, 1f);
+			}
+		});
+		
+		RenderingRegistry.registerEntityRenderingHandler(EntityPlantBoss.PlantBossLeafLimb.class, new IRenderFactory<EntityPlantBoss.PlantBossLeafLimb>() {
+			@Override
+			public Render<? super EntityPlantBoss.PlantBossLeafLimb> createRenderFor(RenderManager manager) {
+				return new RenderPlantBossLeaf(manager);
 			}
 		});
 	}

@@ -46,6 +46,7 @@ import com.smanzana.nostrummagica.entity.golem.EntityGolemIce;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
+import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellRune;
@@ -410,6 +411,12 @@ public class CommonProxy {
     			.id("entity_arcane_wolf", entityID++)
     			.name(NostrumMagica.MODID + ".entity_arcane_wolf")
     			.tracker(64, 1, false)
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntityPlantBoss.class)
+    			.id("entity_plant_boss", entityID++)
+    			.name(NostrumMagica.MODID + ".entity_plant_boss")
+    			.tracker(128, 1, false)
     		.build());
     }
     
