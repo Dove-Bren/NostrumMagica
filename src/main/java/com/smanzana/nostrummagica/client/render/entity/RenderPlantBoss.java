@@ -44,7 +44,7 @@ public class RenderPlantBoss extends RenderLiving<EntityPlantBoss> {
 	}
 	
 	@Override
-	public void doRender(EntityPlantBoss entity, double x, double y, double z, float entityYaw, float partialTicks) {
+	public void doRender(EntityPlantBoss plant, double x, double y, double z, float entityYaw, float partialTicks) {
 //		if (entity.isWolfWet()) {
 //			float f = entity.getBrightness() * entity.getShadingWhileWet(partialTicks);
 //			GlStateManager.color(f, f, f);
@@ -56,7 +56,7 @@ public class RenderPlantBoss extends RenderLiving<EntityPlantBoss> {
 //			leafModels[i] = new ModelPlantBossLeaf();
 //		}
 		
-		super.doRender(entity, x, y, z, entityYaw, partialTicks);
+		super.doRender(plant, x, y, z, entityYaw, partialTicks);
 	}
 	
 	protected void renderTrimming(EntityPlantBoss plant, float partialTicks) {
@@ -226,6 +226,8 @@ public class RenderPlantBoss extends RenderLiving<EntityPlantBoss> {
 		
 		// Also render leaf models. Do it here so I don't have to repeat all the rotations and scaling
 		GlStateManager.pushMatrix();
+		final float existingRotation = this.interpolateRotation(plant.prevRenderYawOffset, plant.renderYawOffset, ageInTicks % 1);
+		GlStateManager.rotate((180.0F - existingRotation), 0, 1, 0); // undo existing rotation
 		GlStateManager.translate(0, plant.height/2, 0);
 		for (int i = 0; i < leafModels.length; i++) {
 			PlantBossLeafLimb leaf = plant.getLeafLimb(i);
@@ -235,14 +237,11 @@ public class RenderPlantBoss extends RenderLiving<EntityPlantBoss> {
 			GlStateManager.pushMatrix();
 			GlStateManager.rotate(leaf.getYawOffset(), 0, 1, 0);
 			GlStateManager.translate(offset, -.001 * i, 0);
-			if (i != 3) {
-			GlStateManager.rotate(-60f, 0, 0, 1);
-			}
+			GlStateManager.rotate(-leaf.getPitch(), 0, 0, 1);
 			leafModels[i].render(leaf, 0f, 0f, ageInTicks, 0f, 0f, scaleFactor);
 			GlStateManager.popMatrix();
 		}
 		GlStateManager.popMatrix();
-		
 	}
 	
 	@Override
