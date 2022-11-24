@@ -19,7 +19,8 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 	private boolean returning;
 	private int trips = 0;
 	
-	private boolean piercing; // Configurable by the player 
+	private boolean piercing; // Configurable by the player\
+	private int maxTrips;
 	
 	public EntityChakramSpellSaucer(World world) {
 		super(world);
@@ -33,7 +34,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 	public EntityChakramSpellSaucer(MagicCutterTriggerInstance trigger, EntityLivingBase shooter,
 			World world,
 			double fromX, double fromY, double fromZ, Vec3d direction,
-			float speedFactor, double maxDistance, boolean piercing) {
+			float speedFactor, double maxDistance, boolean piercing, int maxTrips) {
 		this(world, shooter, trigger, speedFactor);
 		
 		this.origin = new Vec3d(fromX, fromY, fromZ);
@@ -68,13 +69,13 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 	}
 
 	public EntityChakramSpellSaucer(MagicCutterTriggerInstance trigger,
-			EntityLivingBase shooter, float speedFactor, double maxDistance, boolean piercing) {
+			EntityLivingBase shooter, float speedFactor, double maxDistance, boolean piercing, int maxTrips) {
 		this(trigger,
 				shooter,
 				shooter.world,
 				shooter.posX, shooter.posY + shooter.getEyeHeight(), shooter.posZ,
 				shooter.getLookVec(),
-				speedFactor, maxDistance, piercing
+				speedFactor, maxDistance, piercing, maxTrips
 				);
 	}
 	
@@ -159,7 +160,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 			// Check for motion boundaries
 			if (this.returning) {
 				if (Math.abs(this.getPositionVector().distanceTo(this.origin)) <= 0.5) {
-					if (trips >= 10) {
+					if (++trips >= maxTrips) {
 						this.setDead();
 					} else {
 						returning = false;

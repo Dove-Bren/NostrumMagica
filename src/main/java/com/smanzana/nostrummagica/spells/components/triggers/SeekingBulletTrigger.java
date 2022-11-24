@@ -128,7 +128,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 					// Start with motion ortho to forward
 					Vec3d startMotion = forwardDir
 							.rotateYaw(30f * (NostrumMagica.rand.nextBoolean() ? 1 : -1))
-							.rotatePitch(-15f + NostrumMagica.rand.nextFloat() * 30f);
+							.rotatePitch(/*-15f*/ + NostrumMagica.rand.nextFloat() * 30f);
 					startMotion = startMotion.scale(.4);
 					
 					EntitySpellBullet bullet = new EntitySpellBullet(self, getState().getSelf(), target, axis);

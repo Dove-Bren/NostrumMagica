@@ -23,6 +23,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.HealthTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.MagicCutterTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.MagicCyclerTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ManaTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.MortarTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.OtherTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProximityTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
@@ -180,6 +181,9 @@ public class SpellComponentIcon {
 			v = 1;
 		} else if (trigger instanceof WallTrigger) {
 			u = 3;
+			v = 2;
+		} else if (trigger instanceof MortarTrigger) {
+			u = 4;
 			v = 2;
 		} else {
 			System.out.println("Trigger doesn't have set uv: " + trigger);

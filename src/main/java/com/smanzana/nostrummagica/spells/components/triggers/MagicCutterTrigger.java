@@ -15,6 +15,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
@@ -33,14 +34,16 @@ public class MagicCutterTrigger extends SpellTrigger {
 		private float pitch;
 		private float yaw;
 		private boolean piercing;
+		private int trips;
 		
-		public MagicCutterTriggerInstance(SpellState state, World world, Vec3d pos, float pitch, float yaw, boolean piercing) {
+		public MagicCutterTriggerInstance(SpellState state, World world, Vec3d pos, float pitch, float yaw, boolean piercing, int trips) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
 			this.pitch = pitch;
 			this.yaw = yaw;
 			this.piercing = piercing;
+			this.trips = trips;
 		}
 		
 		@Override
@@ -67,7 +70,7 @@ public class MagicCutterTrigger extends SpellTrigger {
 							world,
 							pos.x, pos.y, pos.z,
 							dir,
-							5.0f, piercing ? PROJECTILE_RANGE/2 : PROJECTILE_RANGE, piercing);
+							5.0f, piercing ? PROJECTILE_RANGE/2 : PROJECTILE_RANGE, piercing, trips);
 					
 //					EntitySpellSaucer projectile = new EntityCyclerSpellSaucer(self,
 //							getState().getSelf(),
@@ -125,10 +128,13 @@ public class MagicCutterTrigger extends SpellTrigger {
 		boolean piercing = false;
 		if (params != null)
 			piercing = params.flip;
+		int trips = 1;
+		if (params != null)
+			trips = Math.max(1, (int) params.level);
 		
 		// Add direction
 		pos = new Vec3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
-		return new MagicCutterTriggerInstance(state, world, pos, pitch, yaw, piercing);
+		return new MagicCutterTriggerInstance(state, world, pos, pitch, yaw, piercing, trips);
 	}
 
 	// Copied from vanilla entity class
@@ -163,12 +169,20 @@ public class MagicCutterTrigger extends SpellTrigger {
 
 	@Override
 	public float[] supportedFloats() {
-		return null;
+		return new float[] { 1f, 2f, 5f};
 	}
 
+	public static NonNullList<ItemStack> costs = null;
 	@Override
 	public NonNullList<ItemStack> supportedFloatCosts() {
-		return null;
+		if (costs == null) {
+			costs = NonNullList.from(ItemStack.EMPTY,
+				ItemStack.EMPTY,
+				new ItemStack(Blocks.REDSTONE_BLOCK),
+				new ItemStack(Blocks.OBSIDIAN)
+			);
+		}
+		return costs;
 	}
 
 	@Override
@@ -178,7 +192,7 @@ public class MagicCutterTrigger extends SpellTrigger {
 
 	@Override
 	public String supportedFloatName() {
-		return null;
+		return I18n.format("modificaton.cutter.trips", (Object[]) null);
 	}
 	
 }

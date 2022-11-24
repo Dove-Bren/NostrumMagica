@@ -28,6 +28,7 @@ import com.smanzana.nostrummagica.entity.EntityHookShot;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityLux;
 import com.smanzana.nostrummagica.entity.EntitySpellBullet;
+import com.smanzana.nostrummagica.entity.EntitySpellMortar;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
 import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
@@ -105,6 +106,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.HealthTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.MagicCutterTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.MagicCyclerTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ManaTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.MortarTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.OtherTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProximityTrigger;
@@ -222,6 +224,7 @@ public class CommonProxy {
     	SpellTrigger.register(MagicCyclerTrigger.instance());
     	SpellTrigger.register(SeekingBulletTrigger.instance());
     	SpellTrigger.register(WallTrigger.instance());
+    	SpellTrigger.register(MortarTrigger.instance());
     }
     
     @SubscribeEvent
@@ -428,6 +431,12 @@ public class CommonProxy {
     			.id("entity_plant_boss", entityID++)
     			.name(NostrumMagica.MODID + ".entity_plant_boss")
     			.tracker(128, 1, false)
+    		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntitySpellMortar.class)
+    			.id("spell_mortar", entityID++)
+    			.name(NostrumMagica.MODID + ".spell_mortar")
+    			.tracker(64, 1, true)
     		.build());
     }
     

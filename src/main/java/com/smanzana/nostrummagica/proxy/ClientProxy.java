@@ -70,6 +70,7 @@ import com.smanzana.nostrummagica.client.render.entity.RenderPlantBoss;
 import com.smanzana.nostrummagica.client.render.entity.RenderPlantBossLeaf;
 import com.smanzana.nostrummagica.client.render.entity.RenderShadowDragonRed;
 import com.smanzana.nostrummagica.client.render.entity.RenderSpellBullet;
+import com.smanzana.nostrummagica.client.render.entity.RenderSpellMortar;
 import com.smanzana.nostrummagica.client.render.entity.RenderSpellProjectile;
 import com.smanzana.nostrummagica.client.render.entity.RenderSprite;
 import com.smanzana.nostrummagica.client.render.entity.RenderSwitchTrigger;
@@ -90,6 +91,7 @@ import com.smanzana.nostrummagica.entity.EntityHookShot;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityLux;
 import com.smanzana.nostrummagica.entity.EntitySpellBullet;
+import com.smanzana.nostrummagica.entity.EntitySpellMortar;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
 import com.smanzana.nostrummagica.entity.EntitySprite;
@@ -856,6 +858,12 @@ public class ClientProxy extends CommonProxy {
 			@Override
 			public Render<? super EntityPlantBoss.PlantBossLeafLimb> createRenderFor(RenderManager manager) {
 				return new RenderPlantBossLeaf(manager);
+			}
+		});
+		RenderingRegistry.registerEntityRenderingHandler(EntitySpellMortar.class, new IRenderFactory<EntitySpellMortar>() {
+			@Override
+			public Render<? super EntitySpellMortar> createRenderFor(RenderManager manager) {
+				return new RenderSpellMortar(manager, 1f);
 			}
 		});
 	}
