@@ -526,8 +526,13 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 	}
 	
 	protected BattleState[] pickStateSequence() {
-		BattleState[][] sequences = getCurrentPhase().stateSequences;
-		return sequences[rand.nextInt(sequences.length)];
+		// If no targets, only go to idle
+		if (this.getRandomTarget() == null) {
+			return null;
+		} else {
+			BattleState[][] sequences = getCurrentPhase().stateSequences;
+			return sequences[rand.nextInt(sequences.length)];
+		}
 	}
 	
 	protected @Nonnull BattleState getCurrentState() {
