@@ -154,5 +154,11 @@ public class MirrorShield extends ItemShield implements ISpellActionListener, IL
 	public boolean isShield(ItemStack stack, @Nullable EntityLivingBase entity) {
 		return true;
 	}
+	
+	@Override
+	public String getItemStackDisplayName(ItemStack stack) {
+		// ItemShield hardcodes item.shield.name lol
+		return I18n.format(this.getUnlocalizedNameInefficiently(stack) + ".name").trim();
+	}
 
 }
