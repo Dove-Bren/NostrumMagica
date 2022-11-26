@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.fluids;
 import java.util.Random;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
@@ -13,6 +14,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -112,6 +114,15 @@ public class FluidPoisonWater extends Fluid {
 							).color(color));
 				}
 			}
+		}
+		
+		@Override
+		public net.minecraft.pathfinding.PathNodeType getAiPathNodeType(IBlockState state, IBlockAccess world, BlockPos pos, @Nullable net.minecraft.entity.EntityLiving entity) {
+//			if (entity != null && entity.isEntityUndead()) {
+//				return super.getAiPathNodeType(state, world, pos, entity);
+//			}
+			
+			return PathNodeType.DAMAGE_OTHER;
 		}
 		
 		public static final DamageSource PoisonWaterDamageSource = (new DamageSource("nostrum_poison_water")).setDamageBypassesArmor();

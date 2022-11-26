@@ -18,6 +18,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.BeamTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.DamagedTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.DelayTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.FieldTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.FoodTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.HealthTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.MagicCutterTrigger;
@@ -184,6 +185,9 @@ public class SpellComponentIcon {
 			v = 2;
 		} else if (trigger instanceof MortarTrigger) {
 			u = 4;
+			v = 2;
+		} else if (trigger instanceof FieldTrigger) {
+			u = 5;
 			v = 2;
 		} else {
 			System.out.println("Trigger doesn't have set uv: " + trigger);

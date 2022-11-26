@@ -79,6 +79,11 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 		this.particle = particle;
 		this.blockyPath = blockyPath;
 		
+		// shulker shells move them to center of block. We want shooter pos + eye height
+		if (shooter != null) {
+			this.setLocationAndAngles(shooter.posX, shooter.posY + shooter.getEyeHeight(), shooter.posZ, this.rotationYaw, this.rotationPitch);
+		}
+		
 		this.setElement(self.getElement());
 	}
 	

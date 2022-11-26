@@ -67,6 +67,7 @@ import com.smanzana.nostrummagica.client.render.entity.RenderKoid;
 import com.smanzana.nostrummagica.client.render.entity.RenderLux;
 import com.smanzana.nostrummagica.client.render.entity.RenderMagicSaucer;
 import com.smanzana.nostrummagica.client.render.entity.RenderPlantBoss;
+import com.smanzana.nostrummagica.client.render.entity.RenderPlantBossBramble;
 import com.smanzana.nostrummagica.client.render.entity.RenderPlantBossLeaf;
 import com.smanzana.nostrummagica.client.render.entity.RenderShadowDragonRed;
 import com.smanzana.nostrummagica.client.render.entity.RenderSpellBullet;
@@ -108,6 +109,7 @@ import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
+import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBossBramble;
 import com.smanzana.nostrummagica.fluids.NostrumFluids;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.ArcaneWolfSoulItem;
@@ -864,6 +866,13 @@ public class ClientProxy extends CommonProxy {
 			@Override
 			public Render<? super EntitySpellMortar> createRenderFor(RenderManager manager) {
 				return new RenderSpellMortar(manager, 1f);
+			}
+		});
+		
+		RenderingRegistry.registerEntityRenderingHandler(EntityPlantBossBramble.class, new IRenderFactory<EntityPlantBossBramble>() {
+			@Override
+			public Render<? super EntityPlantBossBramble> createRenderFor(RenderManager manager) {
+				return new RenderPlantBossBramble(manager);
 			}
 		});
 	}

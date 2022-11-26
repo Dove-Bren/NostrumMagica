@@ -166,6 +166,8 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
+import com.smanzana.nostrummagica.spells.components.triggers.FieldTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.MortarTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.WallTrigger;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
@@ -1702,6 +1704,8 @@ public class NostrumMagica
     			null, null, wrapAttribute(AwardType.COST, -0.050f));
     	new NostrumQuest("lvl10", QuestType.REGULAR, 10, 0, 0, 0, new String[]{"lvl8-con3", "lvl8-fin3"},
     			null, null, wrapAttribute(AwardType.MANA, 0.100f));
+    	new NostrumQuest("lvl12", QuestType.REGULAR, 12, 0, 0, 0, new String[]{"lvl10"},
+    			null, null, new IReward[] {new TriggerReward(FieldTrigger.instance())});
     	
     	new NostrumQuest("con1", QuestType.REGULAR, 0,
     			1, // Control
@@ -1866,6 +1870,13 @@ public class NostrumMagica
     			new String[]{"fin1"},
     			null, null,
     			wrapAttribute(AwardType.REGEN, 0.010f));
+    	new NostrumQuest("fin2-tec2", QuestType.REGULAR, 0,
+    			0, // Control
+    			2, // Technique
+    			2, // Finesse
+    			new String[]{"fin1-tec2"},
+    			null, null,
+    			wrapAttribute(AwardType.COST, -0.010f));
     	new NostrumQuest("fin1-tec3", QuestType.CHALLENGE, 0,
     			0, // Control
     			3, // Technique
@@ -1893,7 +1904,7 @@ public class NostrumMagica
     			2, // Finesse
     			new String[]{"fin1-tec3", "fin2-tec5"},
     			null, null,
-    			wrapAttribute(AwardType.COST, -0.010f));
+    			new IReward[] {new TriggerReward(MortarTrigger.instance())});;
     	new NostrumQuest("fin3-tec3", QuestType.REGULAR, 0,
     			0, // Control
     			3, // Technique

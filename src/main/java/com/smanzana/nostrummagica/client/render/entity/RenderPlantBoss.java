@@ -63,7 +63,7 @@ public class RenderPlantBoss extends RenderLiving<EntityPlantBoss> {
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(0, -plant.height/2, 0);
+		GlStateManager.translate(0, -plant.getBody().height/2, 0);
 		GlStateManager.color(1f, 1f, 1f, 1f);
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
 		
@@ -126,7 +126,7 @@ public class RenderPlantBoss extends RenderLiving<EntityPlantBoss> {
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(0, -plant.height/2, 0);
+		GlStateManager.translate(0, -plant.getBody().height/2, 0);
 		GlStateManager.color(1f, 1f, 1f, 1f);
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
 		
@@ -228,14 +228,14 @@ public class RenderPlantBoss extends RenderLiving<EntityPlantBoss> {
 		GlStateManager.pushMatrix();
 		final float existingRotation = this.interpolateRotation(plant.prevRenderYawOffset, plant.renderYawOffset, ageInTicks % 1);
 		GlStateManager.rotate((180.0F - existingRotation), 0, 1, 0); // undo existing rotation
-		GlStateManager.translate(0, plant.height/2, 0);
+		GlStateManager.translate(0, plant.getBody().height/2, 0);
 		for (int i = 0; i < leafModels.length; i++) {
 			PlantBossLeafLimb leaf = plant.getLeafLimb(i);
-			final double offsetCenter = (i % 2 == 0 ? 1.25 : 1.5) * plant.width;
-			final double offset = offsetCenter - (leaf.width/2); // Model starts at 0, not center (for better rotation)
+			final double offsetCenter = (i % 2 == 0 ? 1.25 : 1.5) * plant.getBody().width;
+			final double offset = offsetCenter - (3f/2f); // Model starts at 0, not center (for better rotation)
 			
 			GlStateManager.pushMatrix();
-			GlStateManager.rotate(leaf.getYawOffset(), 0, 1, 0);
+			GlStateManager.rotate(180 + leaf.getYawOffset(), 0, 1, 0);
 			GlStateManager.translate(offset, -.001 * i, 0);
 			GlStateManager.rotate(-leaf.getPitch(), 0, 0, 1);
 			leafModels[i].render(leaf, 0f, 0f, ageInTicks, 0f, 0f, scaleFactor);

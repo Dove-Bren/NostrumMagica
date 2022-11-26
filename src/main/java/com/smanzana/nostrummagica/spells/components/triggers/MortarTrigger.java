@@ -88,7 +88,7 @@ public class MortarTrigger extends SpellTrigger {
 						dest = target.getPositionVector();
 					} else {
 						RayTraceResult mop = RayTrace.raytraceApprox(world, pos, dir, MaxHDist, (ent) -> {
-							if (getState().getSelf() == ent) {
+							if (getState().getSelf() == NostrumMagica.resolveEntityLiving(ent)) {
 								return false;
 							}
 							

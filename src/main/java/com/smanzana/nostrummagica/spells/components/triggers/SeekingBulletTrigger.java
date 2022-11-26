@@ -16,6 +16,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -125,10 +126,20 @@ public class SeekingBulletTrigger extends SpellTrigger {
 						axis = EnumFacing.getFacingFromVector((float) vec.x, (float) vec.y, (float) vec.z).getAxis();
 					}
 					
-					// Start with motion ortho to forward
-					Vec3d startMotion = forwardDir
-							.rotateYaw(30f * (NostrumMagica.rand.nextBoolean() ? 1 : -1))
-							.rotatePitch(/*-15f*/ + NostrumMagica.rand.nextFloat() * 30f);
+					Vec3d startMotion;
+					
+					// For players, start with motion ortho to forward
+					if (getState().getSelf() instanceof EntityPlayer) {
+						startMotion = forwardDir
+								.rotateYaw(30f * (NostrumMagica.rand.nextBoolean() ? 1 : -1))
+								.rotatePitch(/*-15f*/ + NostrumMagica.rand.nextFloat() * 30f);
+					}
+					// For non-players, fire mostly up
+					else {
+						startMotion = (new Vec3d(0, 1, 0)).normalize()
+								.rotateYaw(360f * NostrumMagica.rand.nextFloat());
+					}
+					
 					startMotion = startMotion.scale(.4);
 					
 					EntitySpellBullet bullet = new EntitySpellBullet(self, getState().getSelf(), target, axis);

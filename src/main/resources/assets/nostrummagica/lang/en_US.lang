@@ -89,6 +89,7 @@ item.nostrum_rune.trigger_cutter.name=Magic Cutter Rune
 item.nostrum_rune.trigger_bullet.name=Seeking Bullet Rune
 item.nostrum_rune.trigger_wall.name=Wall Rune
 item.nostrum_rune.trigger_mortar.name=Mortar Rune
+item.nostrum_rune.trigger_field.name=Field Rune
 
 item.crystal_small.name=Mani Crystal
 item.crystal_medium.name=Kani Crystal
@@ -1046,6 +1047,7 @@ ritual.rune.trigger_vortex_blade.name=Vortex Rune
 ritual.rune.trigger_bullet.name=Seeking Bullet Rune
 ritual.rune.trigger_wall.name=Wall Rune
 ritual.rune.trigger_mortar.name=Mortar Rune
+ritual.rune.trigger_field.name=Field Rune
 
 ritual.charm.fire.name=Fire Charm
 ritual.charm.ice.name=Ice Charm
@@ -1145,6 +1147,7 @@ reward.alteration.enchant=Unlocks the Enchant alteration
 reward.trigger.trigger_bullet=Unlocks Seeking Bullet Trigger
 reward.trigger.trigger_wall=Unlocks Wall Trigger
 reward.trigger.trigger_mortar=Unlocks Mortar Trigger
+reward.trigger.trigger_field=Unlocks Field Trigger
 
 objective.ritual.magic_token=Perform Barr's Enchantment
 objective.ritual.kani=Perform a Kani Infusion
@@ -1201,6 +1204,8 @@ quest.lvl10-con6.name=Control III
 quest.lvl10-con6.desc=
 quest.lvl10.name=Advanced Magery
 quest.lvl10.desc=
+quest.lvl12.name=Unbound Power
+quest.lvl12.desc=
 quest.tec1.name=Technique
 quest.tec1.desc=Technique increases the number of total components (shapes OR triggers) you can have in a spell.
 quest.con1.name=Control
@@ -1251,8 +1256,10 @@ quest.fin7.name=Finesse Master
 quest.fin7.desc=
 quest.fin5-tec2.name=Growing Mage
 quest.fin5-tec2.desc=Cast a spell that contains an AoE element (the shape) to unlock the Growth alteration
-quest.fin2-tec3.name=Putting It To Use
-quest.fin2-tec3.desc=
+quest.fin2-tec2.name=Putting It To Use
+quest.fin2-tec2.desc=
+quest.fin2-tec3.name=From Overhead
+quest.fin2-tec3.desc=Projectiles are fun and good, but they don't feel dramatic enough. What if you could lob the spell instead?
 quest.fin3-tec3.name=Balanced Finesse
 quest.fin3-tec3.desc=
 quest.fin2-tec5.name=Becoming Invested
@@ -1333,6 +1340,8 @@ modification.wall.bool.name=Only Hit Once
 modification.wall.float.name=Radius
 modification.seeking_bullet.bool.name=Ignore Allies
 modification.mortar.bool.name=Arcless
+modification.field.bool.name=Only Hit Once
+modification.field.float.name=Radius
 
 modification.level.flip=Trigger When Above
 

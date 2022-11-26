@@ -93,4 +93,12 @@ public class AggroTable<T extends EntityLivingBase> {
 			damageTable.remove(ent);
 		}
 	}
+	
+	public synchronized boolean tracking(T attacker) {
+		return damageTable.containsKey(attacker);
+	}
+	
+	public synchronized List<T> getAllTracked() {
+		return new ArrayList<>(damageTable.keySet());
+	}
 }

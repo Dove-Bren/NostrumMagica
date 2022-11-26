@@ -48,6 +48,7 @@ import com.smanzana.nostrummagica.entity.golem.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
+import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBossBramble;
 import com.smanzana.nostrummagica.fluids.FluidPoisonWater;
 import com.smanzana.nostrummagica.fluids.FluidPoisonWater.FluidPoisonWaterBlock;
 import com.smanzana.nostrummagica.fluids.NostrumFluids;
@@ -84,10 +85,13 @@ import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.research.NostrumResearch;
 import com.smanzana.nostrummagica.serializers.ArcaneWolfElementalTypeSerializer;
 import com.smanzana.nostrummagica.serializers.DragonArmorMaterialSerializer;
+import com.smanzana.nostrummagica.serializers.FloatArraySerializer;
 import com.smanzana.nostrummagica.serializers.HookshotTypeDataSerializer;
 import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
 import com.smanzana.nostrummagica.serializers.OptionalDragonArmorMaterialSerializer;
+import com.smanzana.nostrummagica.serializers.OptionalMagicElementDataSerializer;
 import com.smanzana.nostrummagica.serializers.PetJobSerializer;
+import com.smanzana.nostrummagica.serializers.PlantBossTreeTypeSerializer;
 import com.smanzana.nostrummagica.serializers.WilloStatusSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -101,6 +105,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.BeamTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.DamagedTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.DelayTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.FieldTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.FoodTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.HealthTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.MagicCutterTrigger;
@@ -225,6 +230,7 @@ public class CommonProxy {
     	SpellTrigger.register(SeekingBulletTrigger.instance());
     	SpellTrigger.register(WallTrigger.instance());
     	SpellTrigger.register(MortarTrigger.instance());
+    	SpellTrigger.register(FieldTrigger.instance());
     }
     
     @SubscribeEvent
@@ -438,6 +444,12 @@ public class CommonProxy {
     			.name(NostrumMagica.MODID + ".spell_mortar")
     			.tracker(64, 1, true)
     		.build());
+    	registry.register(EntityEntryBuilder.create()
+    			.entity(EntityPlantBossBramble.class)
+    			.id("entity_plant_boss.bramble", entityID++)
+    			.name(NostrumMagica.MODID + ".entity_plant_boss.bramble")
+    			.tracker(64, 1, true)
+    		.build());
     }
     
     @SubscribeEvent
@@ -471,6 +483,9 @@ public class CommonProxy {
     	registry.register(new DataSerializerEntry(PetJobSerializer.instance).setRegistryName("nostrum.serial.pet_job"));
     	registry.register(new DataSerializerEntry(WilloStatusSerializer.instance).setRegistryName("nostrum.serial.willo_status"));
     	registry.register(new DataSerializerEntry(ArcaneWolfElementalTypeSerializer.instance).setRegistryName("nostrum.serial.arcane_wolf_type"));
+    	registry.register(new DataSerializerEntry(FloatArraySerializer.instance).setRegistryName("nostrum.serial.float_array"));
+    	registry.register(new DataSerializerEntry(OptionalMagicElementDataSerializer.instance).setRegistryName("nostrum.serial.element_opt"));
+    	registry.register(new DataSerializerEntry(PlantBossTreeTypeSerializer.instance).setRegistryName("nostrum.serial.plantboss_tree_type"));
     }
     
     @SubscribeEvent(priority = EventPriority.HIGH) // Register fluids before blocks so fluids will be there for blocks
