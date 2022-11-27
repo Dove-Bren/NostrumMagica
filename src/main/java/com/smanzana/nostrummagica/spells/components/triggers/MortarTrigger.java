@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.spells.components.triggers;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.DungeonAir;
 import com.smanzana.nostrummagica.entity.EntitySpellMortar;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
@@ -12,6 +13,7 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.utils.Curves;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -115,7 +117,8 @@ public class MortarTrigger extends SpellTrigger {
 						
 						for (int i = 0; i < 7; i++) {
 							cursor.move(EnumFacing.UP);
-							if (world.isBlockNormalCube(cursor, false)) {
+							IBlockState state = world.getBlockState(cursor);
+							if (!(state.getBlock() instanceof DungeonAir) && world.isBlockNormalCube(cursor, false)) {
 								// can't go here. Go back down and bail
 								cursor.move(EnumFacing.DOWN);
 								break;
