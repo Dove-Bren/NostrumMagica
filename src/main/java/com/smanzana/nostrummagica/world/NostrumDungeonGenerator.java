@@ -90,6 +90,25 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 			 .add(new RoomEnd1(true, false))
 			 .add(new RoomEnd1(false, false));
 	
+	public static final String PLANTBOSS_ROOM_NAME = "plant_boss_room";
+	
+	public static NostrumDungeon PLANTBOSS_DUNGEON = new NostrumLoadedDungeon(
+			"plant_boss",
+			new DragonStartRoom(),
+			new LoadedRoom(DungeonRoomRegistry.instance().getRoom(PLANTBOSS_ROOM_NAME))
+			).add(new RoomGrandStaircase())
+			 .add(new RoomEnd1(false, true))
+			 .add(new RoomGrandHallway())
+			 .add(new RoomGrandHallway())
+			 .add(new RoomGrandHallway())
+			 .add(new RoomJail1())
+			 .add(new RoomJail1())
+			 .add(new RoomChallenge2())
+			 .add(new RoomChallenge2())
+			 .add(new RoomLectern())
+			 .add(new RoomEnd1(true, false))
+			 .add(new RoomEnd1(false, false));
+	
 //	public static NostrumDungeon PORTAL_DUNGEON = new NostrumDungeon(
 //			new DragonStartRoom(),
 //			new RoomPortal()
@@ -108,7 +127,9 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 	
 	public static enum DungeonGen {
 		PORTAL((i) -> { return new WorldGenNostrumShrine(PORTAL_DUNGEON);}, 20, 70),
-		DRAGON((i) -> { return new WorldGenNostrumShrine(DRAGON_DUNGEON);}, 30, 60);
+		DRAGON((i) -> { return new WorldGenNostrumShrine(DRAGON_DUNGEON);}, 30, 60),
+		PLANTBOSS((i) -> { return new WorldGenNostrumShrine(PLANTBOSS_DUNGEON);}, 30, 90),
+		;
 //		TEST(new WorldGenNostrumShrine(new NostrumLoadedDungeon("test", new StartRoom(), new RoomArena())), 30, 60);
 		
 		private WorldGenerator gen = null;

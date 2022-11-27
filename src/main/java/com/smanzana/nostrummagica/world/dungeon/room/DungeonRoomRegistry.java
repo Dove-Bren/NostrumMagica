@@ -492,10 +492,12 @@ public class DungeonRoomRegistry {
 		String[] fileNames = {"grand_hallway.gat",
 				"portal_room.gat",
 				"sorcery_lobby.gat",
+				"plant_boss_room.gat",
 				"dungeon_challenge_1.gat",
 				"dungeon_challenge_2.gat",
 				"dungeon_challenge_3.gat",
 				"dungeon_challenge_4.gat",
+				"dungeon_challenge_5.gat",
 				"dungeon_end_1.gat",
 				"dungeon_end_2.gat",
 			};

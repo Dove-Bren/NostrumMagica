@@ -346,7 +346,7 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
         this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.00D);
         this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(800.0D);
         this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10.0D);
-        this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(12.0D);
+        this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(18.0D);
         this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_SPEED);
         this.getEntityAttribute(SharedMonsterAttributes.ATTACK_SPEED).setBaseValue(0.5D);
         this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(8D);
@@ -412,7 +412,6 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 			// curling.
 			final int elapsedTicks = Math.abs(this.curlTicks);
 			final float prog = Math.max(0f, Math.min(1f, (float) elapsedTicks / (float) this.curlDuration));
-			//System.out.println("[" + limb.index + "] Pitch calced to: " + prog);
 			
 			pitch = 90f * prog;
 		}
@@ -1073,8 +1072,6 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 			} else {
 				runTicks = -1;
 			}
-			
-			System.out.println("Starting task for " + this.state.name());
 		}
 		
 		public void stopTask() {

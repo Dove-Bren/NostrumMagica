@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.entity.golem.EntityGolemIce;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
+import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.NostrumSkillItem;
 import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
@@ -26,6 +27,7 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -50,7 +52,9 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		GOLEM_LIGHTNING,
 		GOLEM_PHYSICAL,
 		GOLEM_WIND,
-		DRAGON_RED;
+		DRAGON_RED,
+		PLANT_BOSS,
+		;
 
 		@Override
 		public String getName() {
@@ -203,6 +207,9 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		case DRAGON_RED:
 			entity = new EntityDragonRed(world);
 			break;
+		case PLANT_BOSS:
+			entity = new EntityPlantBoss(world);
+			break;
 		}
 		
 		return entity;
@@ -278,6 +285,8 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 				if (NostrumSkillItem.getTypeFromMeta(heldItem.getMetadata()) == SkillItemType.WING) {
 					worldIn.setBlockState(pos, state.withProperty(MOB, Type.DRAGON_RED));
 				}
+			} else if (heldItem.getItem() == Items.REEDS) {
+				worldIn.setBlockState(pos, state.withProperty(MOB, Type.PLANT_BOSS));
 			}
 			return true;
 		}
