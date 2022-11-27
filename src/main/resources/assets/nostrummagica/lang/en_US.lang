@@ -431,6 +431,7 @@ entity.nostrummagica.entity_wisp.name=Wisp
 entity.nostrummagica.entity_lux.name=Lux
 entity.nostrummagica.entity_willo.name=Willo
 entity.nostrummagica.entity_arcane_wolf.name=Arcane Wolf
+entity.nostrummagica.entity_plant_boss.name=Thistle Lord
 
 entity.nostrummagica.placeholder.soulbound.name=Soulbound Pet
 
