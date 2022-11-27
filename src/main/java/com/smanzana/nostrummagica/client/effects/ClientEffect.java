@@ -10,7 +10,10 @@ import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class ClientEffect {
 	
 	public static class ClientEffectRenderDetail {

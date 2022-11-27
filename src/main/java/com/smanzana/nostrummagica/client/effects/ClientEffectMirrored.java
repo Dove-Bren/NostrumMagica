@@ -3,12 +3,15 @@ package com.smanzana.nostrummagica.client.effects;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * Effect made up of multiple copies of another effect
  * @author Skyler
  *
  */
+@SideOnly(Side.CLIENT)
 public class ClientEffectMirrored extends ClientEffect {
 
 	private int count;

@@ -2,6 +2,10 @@ package com.smanzana.nostrummagica.client.effects.modifiers;
 
 import com.smanzana.nostrummagica.client.effects.ClientEffect.ClientEffectRenderDetail;
 
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+@SideOnly(Side.CLIENT)
 public class ClientEffectModifierColor implements ClientEffectModifier {
 
 	private float startRed;

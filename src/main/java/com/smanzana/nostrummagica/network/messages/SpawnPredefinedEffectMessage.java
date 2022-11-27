@@ -1,23 +1,11 @@
 package com.smanzana.nostrummagica.network.messages;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.effects.ClientEffect;
-import com.smanzana.nostrummagica.client.effects.ClientEffectEldrichBlast;
-import com.smanzana.nostrummagica.client.effects.ClientEffectFormBasic;
-import com.smanzana.nostrummagica.client.effects.ClientEffectHellBurn;
-import com.smanzana.nostrummagica.client.effects.ClientEffectIcon;
-import com.smanzana.nostrummagica.client.effects.ClientEffectMirrored;
-import com.smanzana.nostrummagica.client.effects.ClientEffectRenderer;
-import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierColor;
-import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierFollow;
-import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierGrow;
-import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierMove;
-import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierShrink;
+import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect;
+import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect.PredefinedEffect;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.Vec3d;
@@ -34,12 +22,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
  *
  */
 public class SpawnPredefinedEffectMessage implements IMessage {
-
-	public static enum PredefinedEffect {
-		SOUL_DAGGER_STAB,
-		HELL_BURN,
-		ELDRICH_BLAST,
-	}
 
 	public static class Handler implements IMessageHandler<SpawnPredefinedEffectMessage, IMessage> {
 
@@ -58,45 +40,7 @@ public class SpawnPredefinedEffectMessage implements IMessage {
 				offset = Vec3d.ZERO;
 			}
 			
-			ClientEffect effect = null;
-			switch (message.type) {
-			case SOUL_DAGGER_STAB:
-				effect = new ClientEffectMirrored(offset,
-						new ClientEffectFormBasic(ClientEffectIcon.ARROW_SLASH, (-8f/24f), (8f/24f), (-12f/24f)),
-						message.duration, 5);
-				
-				final float scale;
-				if (ent != null && ent instanceof EntityLivingBase) {
-					effect.modify(new ClientEffectModifierFollow((EntityLivingBase) ent));
-					scale = ent.height / 1.8f;
-				} else {
-					scale = 1f;
-				}
-				
-				
-				effect
-				.modify(new ClientEffectModifierColor(0xFF80EEFF, 0xFF404060))
-				.modify(new ClientEffectModifierGrow(scale, 1f, scale, 1f, .1f))
-				//.modify(new ClientEffectModifierTranslate(0, 0, 0))
-				.modify(new ClientEffectModifierMove(new Vec3d(2, 2, 0), new Vec3d(0, 0, 0), 0f, .1f))
-				.modify(new ClientEffectModifierGrow(2f, 0f, 2f, 1f, .05f))
-				.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .75f))
-				;
-				break;
-			case HELL_BURN:
-				effect = new ClientEffectHellBurn(ent, message.duration);
-				break;
-			case ELDRICH_BLAST:
-				effect = new ClientEffectEldrichBlast(ent, message.duration);
-				break;
-			}
-			
-			if (effect != null) {
-				final ClientEffect effectToAdd = effect;
-				Minecraft.getMinecraft().addScheduledTask(() -> {
-					ClientEffectRenderer.instance().addEffect(effectToAdd);
-				});
-			}
+			ClientPredefinedEffect.Spawn(offset, message.type, message.duration, ent);
 			
 			return null;
 		}

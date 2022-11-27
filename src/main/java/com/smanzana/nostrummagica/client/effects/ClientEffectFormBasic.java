@@ -8,8 +8,11 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 // From made from loading a model and rendering it
+@SideOnly(Side.CLIENT)
 public class ClientEffectFormBasic implements ClientEffectForm {
 	
 	private IBakedModel model;

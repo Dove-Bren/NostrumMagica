@@ -5,7 +5,10 @@ import com.smanzana.nostrummagica.client.effects.ClientEffect.ClientEffectRender
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class ClientEffectModifierFollow implements ClientEffectModifier {
 
 	private EntityLivingBase entity;

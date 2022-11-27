@@ -3,20 +3,17 @@ package com.smanzana.nostrummagica.network.messages;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.effects.ClientEffectRenderer;
-import com.smanzana.nostrummagica.client.effects.ClientEffectRitual;
+import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -74,12 +71,13 @@ public class SpawnNostrumRitualEffectMessage implements IMessage {
 			final ItemStack outputF = output;
 			final NonNullList<ItemStack> extrasF = extras;
 			
-			Minecraft.getMinecraft().addScheduledTask(() -> {
-				ClientEffectRenderer.instance().addEffect(ClientEffectRitual.Create(
-						new Vec3d(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5),
-						element, centerF, extrasF, types, outputF
-						));
-			});
+//			Minecraft.getMinecraft().addScheduledTask(() -> {
+//				ClientEffectRenderer.instance().addEffect(ClientEffectRitual.Create(
+//						new Vec3d(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5),
+//						element, centerF, extrasF, types, outputF
+//						));
+//			});
+			ClientPredefinedEffect.SpawnRitualEffect(pos, element, centerF, extrasF, types, outputF);
 
 			return null;
 		}

@@ -3,7 +3,10 @@ package com.smanzana.nostrummagica.client.effects.modifiers;
 import com.smanzana.nostrummagica.client.effects.ClientEffect.ClientEffectRenderDetail;
 
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class ClientEffectModifierShrink implements ClientEffectModifier {
 
 	private float startScale;
