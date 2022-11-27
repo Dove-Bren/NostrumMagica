@@ -30,7 +30,7 @@ import net.minecraft.world.World;
 // Like shulker bullets but have spells in them
 public class EntitySpellBullet extends EntityShulkerBullet {
 
-	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(EntitySpellProjectile.class, MagicElementDataSerializer.instance);
+	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(EntitySpellBullet.class, MagicElementDataSerializer.instance);
 	
 	private SeekingBulletTriggerInstance trigger;
 	private @Nullable Predicate<Entity> filter;

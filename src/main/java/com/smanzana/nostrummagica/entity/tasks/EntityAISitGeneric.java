@@ -19,15 +19,15 @@ public class EntityAISitGeneric<T extends EntityCreature & IEntityTameable> exte
 	 * Returns whether the EntityAIBase should begin execution.
 	 */
 	public boolean shouldExecute() {
-		if (!this.entity.isTamed()) {
+		if (!this.entity.isEntityTamed()) {
 			return false;
 		} else if (this.entity.isInWater()) {
 			return false;
 		} else if (!this.entity.onGround) {
 			return false;
 		} else {
-			EntityLivingBase entitylivingbase = this.entity.getOwner();
-			return entitylivingbase == null ? this.entity.isSitting() : (this.entity.getDistanceSq(entitylivingbase) < 144.0D && entitylivingbase.getRevengeTarget() != null ? false : entity.isSitting());
+			EntityLivingBase entitylivingbase = this.entity.getLivingOwner();
+			return entitylivingbase == null ? this.entity.isEntitySitting() : (this.entity.getDistanceSq(entitylivingbase) < 144.0D && entitylivingbase.getRevengeTarget() != null ? false : entity.isEntitySitting());
 		}
 	}
 

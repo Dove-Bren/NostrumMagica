@@ -53,13 +53,13 @@ public class EntityAIFollowOwnerGeneric<T extends EntityCreature & IEntityTameab
 	 * Returns whether the EntityAIBase should begin execution.
 	 */
 	public boolean shouldExecute() {
-		EntityLivingBase entitylivingbase = this.thePet.getOwner();
+		EntityLivingBase entitylivingbase = this.thePet.getLivingOwner();
 
 		if (entitylivingbase == null) {
 			return false;
 		} else if (entitylivingbase instanceof EntityPlayer && ((EntityPlayer)entitylivingbase).isSpectator()) {
 			return false;
-		} else if (this.thePet.isSitting()) {
+		} else if (this.thePet.isEntitySitting()) {
 			return false;
 		} else if (this.thePet.getDistanceSq(entitylivingbase) < (double)(this.minDist * this.minDist)) {
 			return false;
@@ -75,7 +75,7 @@ public class EntityAIFollowOwnerGeneric<T extends EntityCreature & IEntityTameab
 	 * Returns whether an in-progress EntityAIBase should continue executing
 	 */
 	public boolean shouldContinueExecuting() {
-		return !this.petPathfinder.noPath() && this.thePet.getDistanceSq(this.theOwner) > (double)(this.maxDist * this.maxDist) && !this.thePet.isSitting();
+		return !this.petPathfinder.noPath() && this.thePet.getDistanceSq(this.theOwner) > (double)(this.maxDist * this.maxDist) && !this.thePet.isEntitySitting();
 	}
 
 	/**
@@ -142,7 +142,7 @@ public class EntityAIFollowOwnerGeneric<T extends EntityCreature & IEntityTameab
 	public void updateTask() {
 		this.thePet.getLookHelper().setLookPositionWithEntity(this.theOwner, 10.0F, (float)this.thePet.getVerticalFaceSpeed());
 
-		if (!this.thePet.isSitting()) {
+		if (!this.thePet.isEntitySitting()) {
 			if (--this.timeToRecalcPath <= 0) {
 				this.timeToRecalcPath = 10;
 

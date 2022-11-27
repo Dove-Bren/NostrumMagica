@@ -457,7 +457,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		super.onEntityUpdate();
 		
 		if (world != null && !world.isRemote) {
-			if (!this.isSitting()) {
+			if (!this.isEntitySitting()) {
 				if (this.getAttackTarget() == null) {
 					setPetAction(PetAction.WAITING);
 				} else {
@@ -504,7 +504,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 				
 				if (player.isSneaking()) {
 					if (!this.world.isRemote) {
-						this.setSitting(!this.isSitting());
+						this.setSitting(!this.isEntitySitting());
 						if (player.isCreative()) {
 							this.setBond(1f);
 						}
@@ -520,7 +520,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 						}
 					}
 					return true;
-				} else if (this.isSitting() && stack.isEmpty()) {
+				} else if (this.isEntitySitting() && stack.isEmpty()) {
 					if (!this.world.isRemote) {
 						//player.openGui(NostrumMagica.instance, NostrumGui.dragonID, this.world, (int) this.posX, (int) this.posY, (int) this.posZ);
 						NostrumMagica.proxy.openPetGUI(player, this);
@@ -590,7 +590,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	
 	@Override
 	 public boolean canBeLeashedTo(EntityPlayer player) {
-		return !isSitting() && player == getOwner();
+		return !isEntitySitting() && player == getOwner();
 	}
 	
 	public boolean wasHatched() {
@@ -677,7 +677,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			compound.setUniqueId(NBT_SOUL_WORLDID, worldID);
 		}
 		
-		compound.setBoolean(NBT_SITTING, this.isSitting());
+		compound.setBoolean(NBT_SITTING, this.isEntitySitting());
 		compound.setFloat(NBT_AGE, this.getGrowingAge());
 		
 		UUID eggID = this.getEggID();
@@ -1313,7 +1313,12 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	}
 
 	@Override
-	public boolean isSitting() {
+	public boolean isEntityTamed() {
+		return this.isTamed();
+	}
+
+	@Override
+	public boolean isEntitySitting() {
 		return this.dataManager.get(SITTING);
 	}
 	
@@ -2515,4 +2520,5 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 		}
 		return false;
 	}
+	
 }

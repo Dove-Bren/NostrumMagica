@@ -131,7 +131,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 					return false;
 				}
 				
-				return (mob instanceof IEntityTameable ? !((IEntityTameable) mob).isTamed()
+				return (mob instanceof IEntityTameable ? !((IEntityTameable) mob).isEntityTamed()
 						: true);
 			}));
 		}

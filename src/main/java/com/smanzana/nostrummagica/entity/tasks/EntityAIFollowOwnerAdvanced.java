@@ -64,7 +64,7 @@ public class EntityAIFollowOwnerAdvanced<T extends EntityLiving> extends EntityA
 		if (pet == null) {
 			sitting = false;
 		} else if (pet instanceof IEntityTameable) {
-			sitting = ((IEntityTameable) pet).isSitting();
+			sitting = ((IEntityTameable) pet).isEntitySitting();
 		} else if (pet instanceof EntityTameable) {
 			sitting = ((EntityTameable) pet).isSitting();
 		} else {

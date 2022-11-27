@@ -44,6 +44,7 @@ import net.minecraft.entity.MultiPartEntityPart;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -750,28 +751,28 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 		MutableBlockPos cursor = new MutableBlockPos();
 		int remaining;
 		
-		cursor.setPos(this).move(EnumFacing.DOWN);
+		cursor.setPos(this.posX, this.posY, this.posZ).move(EnumFacing.DOWN);
 		remaining = 20;
 		while (remaining-- > 0 && isArenaBlock(world.getBlockState(cursor))) {
 			cursor.move(EnumFacing.NORTH);
 		}
 		final int minZ = cursor.getZ() + 1;
 		
-		cursor.setPos(this).move(EnumFacing.DOWN);
+		cursor.setPos(this.posX, this.posY, this.posZ).move(EnumFacing.DOWN);
 		remaining = 20;
 		while (remaining-- > 0 && isArenaBlock(world.getBlockState(cursor))) {
 			cursor.move(EnumFacing.SOUTH);
 		}
 		final int maxZ = cursor.getZ() - 1;
 		
-		cursor.setPos(this).move(EnumFacing.DOWN);
+		cursor.setPos(this.posX, this.posY, this.posZ).move(EnumFacing.DOWN);
 		remaining = 20;
 		while (remaining-- > 0 && isArenaBlock(world.getBlockState(cursor))) {
 			cursor.move(EnumFacing.EAST);
 		}
 		final int maxX = cursor.getX() - 1;
 		
-		cursor.setPos(this).move(EnumFacing.DOWN);
+		cursor.setPos(this.posX, this.posY, this.posZ).move(EnumFacing.DOWN);
 		remaining = 20;
 		while (remaining-- > 0 && isArenaBlock(world.getBlockState(cursor))) {
 			cursor.move(EnumFacing.WEST);
@@ -798,11 +799,15 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 		return this.arenaMax;
 	}
 	
-	public BlockPos getRandomPillar() {
+	public @Nullable BlockPos getRandomPillar() {
 		detectArena();
 		
 		if (this.pillars == null) {
 			this.pillars = scanForPillars();
+		}
+		
+		if (this.pillars == null || this.pillars.length == 0) {
+			return null;
 		}
 		
 		return pillars[rand.nextInt(pillars.length)];
@@ -850,7 +855,8 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 	}
 	
 	protected boolean isPillarBlock(IBlockState state) {
-		return state.getBlock() instanceof DungeonBlock;
+		return state.getBlock() instanceof DungeonBlock
+				|| state.getBlock() == Blocks.GLOWSTONE;
 		//return !(state.getBlock() instanceof FluidPoisonWater.FluidPoisonWaterBlock);
 	}
 	
@@ -1234,21 +1240,22 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 			if (spell != null) {
 				// Pick a platform
 				BlockPos pillar = parent.getRandomPillar();
-				
-				// Face platform
-				{
-					double d0 = (pillar.getX() + .5) - parent.posX;
-					double d2 = (pillar.getZ() + .5) - parent.posZ;
-					double d1 = (pillar.getY() + 1) - (parent.posY + parent.getEyeHeight());
+				if (pillar != null) {
+					// Face platform
+					{
+						double d0 = (pillar.getX() + .5) - parent.posX;
+						double d2 = (pillar.getZ() + .5) - parent.posZ;
+						double d1 = (pillar.getY() + 1) - (parent.posY + parent.getEyeHeight());
+						
+						double d3 = (double)MathHelper.sqrt(d0 * d0 + d2 * d2);
+						float f = (float)(MathHelper.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
+						float f1 = (float)(-(MathHelper.atan2(d1, d3) * (180D / Math.PI)));
+						parent.rotationPitch = f1;
+						parent.rotationYaw = f;
+					}
 					
-					double d3 = (double)MathHelper.sqrt(d0 * d0 + d2 * d2);
-					float f = (float)(MathHelper.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
-					float f1 = (float)(-(MathHelper.atan2(d1, d3) * (180D / Math.PI)));
-					parent.rotationPitch = f1;
-					parent.rotationYaw = f;
+					doSpellCast(null, spell, -1);
 				}
-				
-				doSpellCast(null, spell, -1);
 			}
 		}
 		

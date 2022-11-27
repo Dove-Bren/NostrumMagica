@@ -2,11 +2,11 @@ package com.smanzana.nostrummagica.entity.tasks.arcanewolf;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect.PredefinedEffect;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.ArcaneWolfElementalType;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpawnPredefinedEffectMessage;
-import com.smanzana.nostrummagica.network.messages.SpawnPredefinedEffectMessage.PredefinedEffect;
 import com.smanzana.nostrummagica.potions.MagicBoostPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;

@@ -373,7 +373,7 @@ public class ModelDragonRed extends ModelBase {
 		
 		boolean sitting = false;
 		if (dragon instanceof EntityTameDragonRed) {
-			sitting = ((EntityTameDragonRed) dragon).isSitting();
+			sitting = ((EntityTameDragonRed) dragon).isEntitySitting();
 		}
 		
 		boolean casting = dragon.isCasting();
@@ -463,7 +463,7 @@ public class ModelDragonRed extends ModelBase {
 		
 		boolean sitting = false;
 		if (dragon instanceof EntityTameDragonRed) {
-			sitting = ((EntityTameDragonRed) dragon).isSitting();
+			sitting = ((EntityTameDragonRed) dragon).isEntitySitting();
 		}
 		
 		boolean casting = dragon.isCasting();

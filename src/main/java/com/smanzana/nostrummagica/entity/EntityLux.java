@@ -361,7 +361,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 	
 	protected void setHome(BlockPos home) {
 		this.dataManager.set(HOME, Optional.fromNullable(home));
-		this.setHomePosAndDistance(home, (int) LUX_HOME_DISTANCE_SQ);
+		this.setHomePosAndDistance(home == null ? BlockPos.ORIGIN : home, (int) LUX_HOME_DISTANCE_SQ);
 	}
 	
 	public BlockPos getHome() {
@@ -897,7 +897,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 	}
 
 	@Override
-	public boolean isTamed() {
+	public boolean isEntityTamed() {
 		return getOwner() != null;
 	}
 
@@ -917,7 +917,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 	}
 
 	@Override
-	public boolean isSitting() {
+	public boolean isEntitySitting() {
 		return false;
 	}
 	

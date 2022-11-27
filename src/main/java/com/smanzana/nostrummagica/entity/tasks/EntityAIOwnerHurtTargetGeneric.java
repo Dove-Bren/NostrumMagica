@@ -22,10 +22,10 @@ public class EntityAIOwnerHurtTargetGeneric<T extends EntityCreature & IEntityTa
 	 * Returns whether the EntityAIBase should begin execution.
 	 */
 	public boolean shouldExecute() {
-		if (!this.entityTameable.isTamed()) {
+		if (!this.entityTameable.isEntitySitting()) {
 			return false;
 		} else {
-			EntityLivingBase entitylivingbase = this.entityTameable.getOwner();
+			EntityLivingBase entitylivingbase = this.entityTameable.getLivingOwner();
 
 			if (entitylivingbase == null) {
 				return false;
@@ -42,7 +42,7 @@ public class EntityAIOwnerHurtTargetGeneric<T extends EntityCreature & IEntityTa
 	 */
 	public void startExecuting() {
 		this.taskOwner.setAttackTarget(this.theTarget);
-		EntityLivingBase entitylivingbase = this.entityTameable.getOwner();
+		EntityLivingBase entitylivingbase = this.entityTameable.getLivingOwner();
 
 		if (entitylivingbase != null) {
 			this.timestamp = entitylivingbase.getRevengeTimer();

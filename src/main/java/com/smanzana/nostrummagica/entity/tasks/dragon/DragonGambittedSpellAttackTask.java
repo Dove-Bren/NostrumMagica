@@ -55,7 +55,7 @@ public abstract class DragonGambittedSpellAttackTask<T extends EntityDragon & IT
 		if (dragon.isDead)
 			return false;
 		
-		if (dragon.isSitting())
+		if (dragon.isEntitySitting())
 			return false;
 		
 		currentTarget = getTarget(dragon);

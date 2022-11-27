@@ -629,6 +629,15 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		this.targetTasks.addTask(priority++, new EntityAIHurtByTarget(this, true, new Class[0]));
 		this.targetTasks.addTask(priority++, new EntityAINearestAttackableTarget<AbstractSkeleton>(this, AbstractSkeleton.class, false));
 	}
+	
+	@Override
+	public EntityLivingBase getLivingOwner() {
+		Entity owner = this.getOwner();
+		if (owner instanceof EntityLivingBase) {
+			return (EntityLivingBase) owner;
+		}
+		return null;
+	}
 
 	@Override
 	public void onEntityUpdate() {
@@ -1912,5 +1921,15 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 			return InfoScreenTabs.INFO_ENTITY;
 		}
 		
+	}
+
+	@Override
+	public boolean isEntityTamed() {
+		return this.isTamed();
+	}
+
+	@Override
+	public boolean isEntitySitting() {
+		return this.isSitting();
 	}
 }

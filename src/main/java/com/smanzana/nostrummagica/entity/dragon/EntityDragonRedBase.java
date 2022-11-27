@@ -21,7 +21,7 @@ public abstract class EntityDragonRedBase extends EntityDragonFlying {
 	private static final DataParameter<Boolean> DRAGON_BITE =
 			EntityDataManager.<Boolean>createKey(EntityDragonRedBase.class, DataSerializers.BOOLEAN);
 	private static final DataParameter<Boolean> DRAGON_CASTING =
-			EntityDataManager.<Boolean>createKey(EntityDragonRed.class, DataSerializers.BOOLEAN);
+			EntityDataManager.<Boolean>createKey(EntityDragonRedBase.class, DataSerializers.BOOLEAN);
 	
 	public static long ANIM_SLASH_DUR = 500;
 	

@@ -2798,7 +2798,7 @@ public class NostrumMagica
     		for (EntityTameDragonRed dragon : dragonList) {
     			ITameDragon tame = (ITameDragon) dragon;
     			
-    			if (onlyOwned && (!tame.isTamed() || tame.getOwner() != entity)) {
+    			if (onlyOwned && (!tame.isEntityTamed() || tame.getOwner() != entity)) {
     				continue;
     			}
     			
@@ -2820,7 +2820,7 @@ public class NostrumMagica
     		EntityLivingBase ent = (EntityLivingBase) e;
     		if (ent instanceof IEntityTameable) {
     			IEntityTameable tame = (IEntityTameable) ent;
-    			if (tame.isTamed() && tame.getOwnerId() != null && tame.getOwnerId().equals(id)) {
+    			if (tame.isEntityTamed() && tame.getOwnerId() != null && tame.getOwnerId().equals(id)) {
     				ents.add(ent);
     			}
     		} else if (ent instanceof EntityTameable) {
@@ -2843,7 +2843,7 @@ public class NostrumMagica
     	EntityLivingBase ent = (EntityLivingBase) entity;
 		if (ent instanceof IEntityTameable) {
 			IEntityTameable tame = (IEntityTameable) ent;
-			return tame.getOwner();
+			return tame.getLivingOwner();
 		} else if (ent instanceof EntityTameable) {
 			EntityTameable tame = (EntityTameable) ent;
 			return tame.getOwner();
