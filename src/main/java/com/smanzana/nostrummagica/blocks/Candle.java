@@ -362,9 +362,8 @@ public class Candle extends Block implements ITileEntityProvider {
 		if (te != null)
 			return false;
 		
-		heldItem.splitStack(1);
-		
 		ReagentType type = ReagentItem.findType(heldItem);
+		heldItem.splitStack(1);
 		
 		if (type == null)
 			return false;
