@@ -16,6 +16,8 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.entity.AggroTable;
 import com.smanzana.nostrummagica.fluids.FluidPoisonWater;
+import com.smanzana.nostrummagica.items.NostrumResourceItem;
+import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.serializers.FloatArraySerializer;
@@ -608,7 +610,13 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 	
 	@Override
 	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
+		int count = this.rand.nextInt(3) + 1;
+		count += lootingModifier;
 		
+		this.entityDropItem(NostrumResourceItem.getItem(ResourceType.EVIL_THISTLE, count), 0);
+		
+		count = 1 + lootingModifier / 2;
+		this.entityDropItem(NostrumResourceItem.getItem(ResourceType.MANA_LEAF, 1), 0);
 	}
 	
 	@Override

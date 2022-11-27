@@ -351,6 +351,9 @@ item.arcane_wolf_soul_item.name=Arcane Wolf Soul Flower
 item.soul_dagger.name=Soul Dagger
 item.soul_dagger.desc=Sneak + Right-Click to charge a stab attack
 
+item.mana_leaf.name=Mana Leaf
+item.evil_thistle.name=Evil Thistle
+
 potion.frostbite.name=Frostbite
 potion.shieldphysical.name=Physical Ward
 potion.shieldmagic.name=Magic Ward
