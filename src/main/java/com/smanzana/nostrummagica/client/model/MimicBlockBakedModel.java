@@ -48,6 +48,15 @@ public class MimicBlockBakedModel implements IBakedModel {
 		IBakedModel nestedModel = null;
 		
 		if (nestedState != null) {
+			
+			// Stupid CTM wraps up models and needs to be unwrapped
+			if (nestedState instanceof IExtendedBlockState) {
+				IBlockState trueState = ((IExtendedBlockState) nestedState).getClean();
+				if (trueState != null) {
+					nestedState = trueState;
+				}
+			}
+			
 			nestedModel = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(nestedState);
 		}
 		

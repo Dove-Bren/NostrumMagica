@@ -139,7 +139,6 @@ public class TeleportRune extends BlockContainer  {
 	}
 	
 	protected void teleportEntity(World worldIn, BlockPos portalPos, Entity entityIn) {
-		System.out.println("TELEPORT");
 		TileEntity te = worldIn.getTileEntity(portalPos);
 		if (te == null || !(te instanceof TeleportRuneTileEntity)) {
 			return;
@@ -211,7 +210,6 @@ public class TeleportRune extends BlockContainer  {
 		
 		
 		if (charge > TELEPORT_CHARGE_TIME * 20) {
-			System.out.println("Check?");
 			EntityTeleportCharge.put(entityIn.getUniqueID(), -(TELEPORT_CHARGE_TIME * 20));
 			if (!worldIn.isRemote) {
 				this.teleportEntity(worldIn, pos, entityIn);

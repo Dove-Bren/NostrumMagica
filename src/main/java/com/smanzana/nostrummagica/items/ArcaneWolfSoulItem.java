@@ -267,8 +267,6 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 	}
 	
 	public static ItemStack MakeSoulItem(EntityArcaneWolf wolf, boolean register) {
-		System.out.println("Making soul item for " + wolf.getPetSoulID());
-		
 		if (register) {
 			instance().setWorldID(wolf, NostrumMagica.getPetSoulRegistry().registerPet(wolf));
 			NostrumMagica.getPetSoulRegistry().snapshotPet(wolf);

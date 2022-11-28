@@ -288,7 +288,6 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 			return;
 		}
 		
-		System.out.println("Willo status changed to " + status.name());
 		this.dataManager.set(STATUS, status);
 	}
 	

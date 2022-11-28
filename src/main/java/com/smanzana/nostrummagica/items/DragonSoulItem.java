@@ -269,8 +269,6 @@ public class DragonSoulItem extends PetSoulItem {
 	}
 	
 	public static ItemStack MakeSoulItem(EntityTameDragonRed dragon, boolean register) {
-		System.out.println("Making soul item for " + dragon.getPetSoulID());
-		
 		if (register) {
 			instance().setWorldID(dragon, NostrumMagica.getPetSoulRegistry().registerPet(dragon));
 			NostrumMagica.getPetSoulRegistry().snapshotPet(dragon);
