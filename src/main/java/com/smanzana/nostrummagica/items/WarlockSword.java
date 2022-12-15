@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.items;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.annotation.Nonnull;
 
@@ -12,6 +13,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.attributes.AttributeMagicPotency;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
@@ -66,6 +68,8 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 	private static final String NBT_CAPACITY = "capacity";
 	private static final String NBT_ENDERIO_TRAVEL_CAP = "enderio_travel";
 	
+	private static final UUID WARLOCKBLADE_POTENCY_UUID = UUID.fromString("2d5dd2dc-3f5c-4dce-be8f-fa93627fe560");
+	
 	private static WarlockSword instance = null;
 
 	public static WarlockSword instance() {
@@ -87,15 +91,15 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 	
 	@Override
 	public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
-        Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
+		Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
 
-        if (equipmentSlot == EntityEquipmentSlot.MAINHAND)
-        {
-            multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 7, 0));
-            multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.7000000953674316D, 0));
-        }
+		if (equipmentSlot == EntityEquipmentSlot.MAINHAND) {
+			multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 7, 0));
+			multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.7000000953674316D, 0));
+			multimap.put(AttributeMagicPotency.instance().getName(), new AttributeModifier(WARLOCKBLADE_POTENCY_UUID, "Potency modifier", 10, 0));
+		}
 
-        return multimap;
+		return multimap;
     }
 	
 	@Override
@@ -133,14 +137,13 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 	@Override
 	public void apply(EntityLivingBase caster, SpellCastSummary summary, ItemStack stack) {
 		// +10% potency
-		summary.addEfficiency(.1f);
+		//summary.addEfficiency(.1f);
 	}
 	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		super.addInformation(stack, worldIn, tooltip, flagIn);
-		tooltip.add("Magic Potency Bonus: 10%");
 		
 		boolean extra = Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());
 		

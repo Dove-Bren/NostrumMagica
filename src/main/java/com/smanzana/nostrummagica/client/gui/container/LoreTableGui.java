@@ -61,6 +61,11 @@ public class LoreTableGui {
 				
 				@Override
 				public void putStack(@Nonnull ItemStack stack) {
+					// Swapping items does this instead of a take
+					if (!table.getItem().isEmpty()) {
+						table.onTakeItem(player);
+					}
+					
 					table.setItem(stack);
 					this.onSlotChanged();
 				}

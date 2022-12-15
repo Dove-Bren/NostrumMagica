@@ -17,6 +17,7 @@ import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
+import com.smanzana.nostrummagica.entity.dragon.EntityShadowDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemEarth;
@@ -1678,6 +1679,7 @@ public class SpellAction {
 			return amt;
 		
 		// Really, I should just make an attribute for magic potency (which could be the same that everyhting else has, too!)
+		// Attribute made. Should rework
 		PotionEffect boostEffect = caster.getActivePotionEffect(MagicBoostPotion.instance());
 		if (boostEffect != null) {
 			base *= Math.pow(1.5, boostEffect.getAmplifier() + 1);
@@ -1706,7 +1708,7 @@ public class SpellAction {
 				ender = false;
 			}
 			
-			if (target.height < 1.5f || target instanceof EntityEnderman) {
+			if (target.height < 1.5f || target instanceof EntityEnderman || target instanceof EntityShadowDragonRed) {
 				light = true;
 			} else {
 				light = false;

@@ -303,7 +303,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 					TemporaryTeleportationPortal.spawnNearby(world, pos, 4, true, portal, 20 * 30);
 				}
 			} else {
-				player.setPositionAndUpdate(pos.getX(), pos.getY(), pos.getZ());
+				player.setPositionAndUpdate(pos.getX() + .5, pos.getY() + .1, pos.getZ() + .5);
 			}
 			
 			NostrumMagicaSounds.DAMAGE_ENDER.play(world, player.posX, player.posY, player.posZ);

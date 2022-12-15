@@ -1,10 +1,12 @@
 package com.smanzana.nostrummagica.items;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.attributes.AttributeMagicPotency;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -25,6 +27,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class MageStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 
 	public static String ID = "mage_staff";
+	
+	protected static UUID MAGESTAFF_POTENCY_UUID = UUID.fromString("3c262e7c-237c-48fa-aaf7-7b4be23affb3");
 	
 	private static MageStaff instance = null;
 
@@ -47,13 +51,16 @@ public class MageStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 	
 	@Override
 	public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
-        Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
+		Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
 
-        if (equipmentSlot == EntityEquipmentSlot.MAINHAND)
-        {
+		if (equipmentSlot == EntityEquipmentSlot.MAINHAND) {
             multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 3, 0));
             multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4000000953674316D, 0));
-        }
+		}
+		
+		if (equipmentSlot == EntityEquipmentSlot.MAINHAND || equipmentSlot == EntityEquipmentSlot.OFFHAND) {
+			multimap.put(AttributeMagicPotency.instance().getName(), new AttributeModifier(MAGESTAFF_POTENCY_UUID, "Potency modifier", 20, 0));
+		}
 
         return multimap;
     }
@@ -94,7 +101,7 @@ public class MageStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 	public void apply(EntityLivingBase caster, SpellCastSummary summary, ItemStack stack) {
 		// We provide -10% reagent cost, +20% potency
 		summary.addReagentCost(-.1f);
-		summary.addEfficiency(.2f);
+		//summary.addEfficiency(.2f);
 		stack.damageItem(1, caster);
 	}
 	
@@ -102,7 +109,7 @@ public class MageStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		super.addInformation(stack, worldIn, tooltip, flagIn);
-		tooltip.add("Magic Potency Bonus: 20%");
+		//tooltip.add("Magic Potency Bonus: 20%");
 		tooltip.add("Reagent Cost Discount: 10%");
 	}
 

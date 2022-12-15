@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.items.ISpellArmor;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
@@ -472,6 +473,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 			break;
 		case TRINKET_FLOAT_GUARD:
 			player.removePotionEffect(Potion.getPotionFromResourceLocation("levitation"));
+			player.removePotionEffect(RootedPotion.instance());
 			break;
 		case ELUDE_CAPE_SMALL:
 			break;

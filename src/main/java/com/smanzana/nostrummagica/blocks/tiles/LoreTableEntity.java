@@ -62,9 +62,6 @@ public class LoreTableEntity extends TileEntity implements ITickable {
 	}
 	
 	public boolean setItem(@Nonnull ItemStack item) {
-		if (!item.isEmpty() && !this.item.isEmpty())
-			return false;
-		
 		if (!item.isEmpty()) {
 			// Make sure it has lore
 			if (!(item.getItem() instanceof ILoreTagged)) {

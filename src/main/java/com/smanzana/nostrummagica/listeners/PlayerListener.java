@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.attributes.AttributeMagicPotency;
 import com.smanzana.nostrummagica.attributes.AttributeMagicReduction;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
@@ -975,6 +976,7 @@ public class PlayerListener {
 		if (ent instanceof EntityLivingBase) {
 			EntityLivingBase living = (EntityLivingBase) ent;
 			living.getAttributeMap().registerAttribute(AttributeMagicResist.instance());
+			living.getAttributeMap().registerAttribute(AttributeMagicPotency.instance());
 			for (EMagicElement elem : EMagicElement.values()) {
 				living.getAttributeMap().registerAttribute(AttributeMagicReduction.instance(elem));
 			}

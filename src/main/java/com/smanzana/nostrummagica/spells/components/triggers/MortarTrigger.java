@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.utils.Curves;
+import com.smanzana.nostrummagica.utils.Projectiles;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.block.state.IBlockState;
@@ -162,9 +163,9 @@ public class MortarTrigger extends SpellTrigger {
 //								}
 //							}
 //							
-//							if (Projectiles.getShooter(ent) == getState().getSelf()) {
-//								return false;
-//							}
+						if (Projectiles.getShooter(ent) == getState().getSelf()) {
+							return false;
+						}
 //						}
 						
 						return true;

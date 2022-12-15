@@ -88,62 +88,62 @@ public class NostrumTransformer implements IClassTransformer {
 //				return cw.toByteArray();
 			}
 			
-			{
-				ClassReader classReader = new ClassReader(basicClass);
-				
-				boolean deObf = false;
-				ClassNode classNode = new ClassNode();
-				classReader.accept(classNode, 0);
-				Iterator<MethodNode> it = classNode.methods.iterator();
-				while (it.hasNext()) {
-					MethodNode method = it.next();
-					if ("onUpdate".equals(method.name)) {
-						deObf = true;
-					} else if ("hasPlayerInfo".equals(method.name)) { // AbstractClientPlayer has no onUpdate
-						deObf = true;
-					} else if (ElytraMethod.equals(method.name) || ElytraMethodObf.equals(method.name)) {
-						logger.warn("Found existing method in " + transformedName + " class for elytra overrides. Overwriting it. This may cause problems with other mods.");
-						it.remove();
-					}
-				}
-
-				ClassWriter cw = new ClassWriter(classReader, 0);
-				
-				MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, deObf ? "isElytraFlying" : "func_184613_cA", "()Z", null, null);
-				mv.visitCode();
-				Label l0 = new Label();
-				mv.visitLabel(l0);
-				mv.visitLineNumber(42000, l0);
-				mv.visitVarInsn(Opcodes.ALOAD, 0);
-				mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "net/minecraft/entity/EntityLivingBase", deObf ? "isElytraFlying" : "func_184613_cA", "()Z", false);
-				Label l1 = new Label();
-				mv.visitJumpInsn(Opcodes.IFNE, l1);
-				mv.visitVarInsn(Opcodes.ALOAD, 0);
-				mv.visitMethodInsn(Opcodes.INVOKESTATIC, "com/smanzana/nostrummagica/transforms/NostrumTransforms", "isElytraFlying", "(Lnet/minecraft/entity/EntityLivingBase;)Z",
-						false);
-				mv.visitJumpInsn(Opcodes.IFNE, l1);
-				mv.visitInsn(Opcodes.ICONST_0);
-				mv.visitInsn(Opcodes.IRETURN);
-				mv.visitLabel(l1);
-				mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-				mv.visitInsn(Opcodes.ICONST_1);
-				mv.visitInsn(Opcodes.IRETURN);
-				Label l2 = new Label();
-				mv.visitLabel(l2);
-				if (transformedName.equals(PlayerMPClass)) {
-					mv.visitLocalVariable("this", "L" + PlayerMPClassPath + ";", null, l0, l2, 0);
-				} else if (transformedName.equals(ClientPlayerClass)) {
-					mv.visitLocalVariable("this", "L" + ClientPlayerClassPath + ";", null, l0, l2, 0);
-				}
-				mv.visitMaxs(1, 1);
-				mv.visitEnd();
-				
-				classReader.accept(cw, 0);
-				
-				logger
-					.info("Transforming " + transformedName + " finished, added " + (deObf ? "isElytraFlying()" : "func_184613_cA()") + " overriding EntityLivingBase");
-				return cw.toByteArray();
-			}
+//			{
+//				ClassReader classReader = new ClassReader(basicClass);
+//				
+//				boolean deObf = false;
+//				ClassNode classNode = new ClassNode();
+//				classReader.accept(classNode, 0);
+//				Iterator<MethodNode> it = classNode.methods.iterator();
+//				while (it.hasNext()) {
+//					MethodNode method = it.next();
+//					if ("onUpdate".equals(method.name)) {
+//						deObf = true;
+//					} else if ("hasPlayerInfo".equals(method.name)) { // AbstractClientPlayer has no onUpdate
+//						deObf = true;
+//					} else if (ElytraMethod.equals(method.name) || ElytraMethodObf.equals(method.name)) {
+//						logger.warn("Found existing method in " + transformedName + " class for elytra overrides. Overwriting it. This may cause problems with other mods.");
+//						it.remove();
+//					}
+//				}
+//
+//				ClassWriter cw = new ClassWriter(classReader, 0);
+//				
+//				MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, deObf ? "isElytraFlying" : "func_184613_cA", "()Z", null, null);
+//				mv.visitCode();
+//				Label l0 = new Label();
+//				mv.visitLabel(l0);
+//				mv.visitLineNumber(42000, l0);
+//				mv.visitVarInsn(Opcodes.ALOAD, 0);
+//				mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "net/minecraft/entity/EntityLivingBase", deObf ? "isElytraFlying" : "func_184613_cA", "()Z", false);
+//				Label l1 = new Label();
+//				mv.visitJumpInsn(Opcodes.IFNE, l1);
+//				mv.visitVarInsn(Opcodes.ALOAD, 0);
+//				mv.visitMethodInsn(Opcodes.INVOKESTATIC, "com/smanzana/nostrummagica/transforms/NostrumTransforms", "isElytraFlying", "(Lnet/minecraft/entity/EntityLivingBase;)Z",
+//						false);
+//				mv.visitJumpInsn(Opcodes.IFNE, l1);
+//				mv.visitInsn(Opcodes.ICONST_0);
+//				mv.visitInsn(Opcodes.IRETURN);
+//				mv.visitLabel(l1);
+//				mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+//				mv.visitInsn(Opcodes.ICONST_1);
+//				mv.visitInsn(Opcodes.IRETURN);
+//				Label l2 = new Label();
+//				mv.visitLabel(l2);
+//				if (transformedName.equals(PlayerMPClass)) {
+//					mv.visitLocalVariable("this", "L" + PlayerMPClassPath + ";", null, l0, l2, 0);
+//				} else if (transformedName.equals(ClientPlayerClass)) {
+//					mv.visitLocalVariable("this", "L" + ClientPlayerClassPath + ";", null, l0, l2, 0);
+//				}
+//				mv.visitMaxs(1, 1);
+//				mv.visitEnd();
+//				
+//				classReader.accept(cw, 0);
+//				
+//				logger
+//					.info("Transforming " + transformedName + " finished, added " + (deObf ? "isElytraFlying()" : "func_184613_cA()") + " overriding EntityLivingBase");
+//				return cw.toByteArray();
+//			}
 		}
 		
 		return basicClass;

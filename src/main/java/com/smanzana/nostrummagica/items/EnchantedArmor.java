@@ -20,6 +20,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.attributes.AttributeMagicPotency;
 import com.smanzana.nostrummagica.attributes.AttributeMagicReduction;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -154,6 +155,9 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	// UUIDs for set-based modifiers.
 	// Each corresponds to a slot that's adding its bonus
 	private static final UUID[] SET_MODIFIERS = new UUID[] {UUID.fromString("29F29D77-7DC5-4B68-970F-853633662A72"), UUID.fromString("A84E2267-7D48-4943-9C1C-25A022E85930"), UUID.fromString("D48816AD-B00D-4098-B686-2FC24436CD56"), UUID.fromString("104C2D3C-3987-4D56-9727-FFBEE388F6AF")};
+	
+	// UUIDs for magic potency modifiers
+	private static final UUID[] ARMOR_MAGICPOT_MODS = new UUID[] {UUID.fromString("85c5a784-4ee6-4e2d-ae1b-dd6d006ab724"), UUID.fromString("12fd1eae-bb2f-4e80-89db-38bef660c664"), UUID.fromString("3eea62eb-b9c1-4859-a4d6-35e2edbd4c49"), UUID.fromString("471dd1cf-9ba1-44ce-bba9-3cf9315d784c")};
 	
 	private static int calcArmor(EntityEquipmentSlot slot, EMagicElement element, int level) {
 		
@@ -301,7 +305,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		
 		final double[] setTotalWind = {0, 0, 0, 1};
 		final double[] setTotalLightning = {0, 0, 0, 3};
-		final double[] setTotalIce = {0, 0, 0, .5};
+		final double[] setTotalIce = {0, 0, 0, 1.5};
 		
 		final double reduc;
 		
@@ -413,6 +417,35 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		}
 		
 		return 0;
+	}
+	
+	private static double calcArmorMagicBoostTotal(EMagicElement element, int setCount) {
+		if (setCount < 1 || setCount > 4) {
+			return 0;
+		}
+		
+		double total = 0;
+		switch (element) {
+		case EARTH:
+		case ICE:
+		case PHYSICAL:
+		case WIND:
+			total = 0;
+			break;
+		case FIRE:
+		case ENDER:
+			total = 10;
+			break;
+		case LIGHTNING:
+			total = 25;
+			break;
+		}
+		
+		return total;
+	}
+	
+	private static double calcArmorMagicBoost(EntityEquipmentSlot slot, EMagicElement element, int setCount) {
+		return calcArmorMagicBoostTotal(element, setCount) / setCount;
 	}
 	
 	private int level;
@@ -898,9 +931,13 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 					final double reduct = (setCount > 0 && armorElem != null)
 							? calcMagicSetReduct(slot, armorElem, setCount, elem)
 							: 0;
+					final double boost = (setCount > 0 && armorElem != null)
+							? calcArmorMagicBoost(slot, armorElem, setCount)
+							: 0;
 						
 					// Important to do this even with 0 to remove previous bonuses
 					attribMap.put(AttributeMagicReduction.instance(elem).getName(), new AttributeModifier(SET_MODIFIERS[slot.getIndex()], "Magic Reduction (Set)", reduct, 0));
+					attribMap.put(AttributeMagicPotency.instance().getName(), new AttributeModifier(ARMOR_MAGICPOT_MODS[slot.getIndex()], "Magic Potency (Set)", boost, 0));
 				}
 				
 				// Add captured value to map
@@ -1003,17 +1040,28 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			
 			for (EMagicElement elem : EMagicElement.values()) {
 				final double reduct = calcMagicSetReduct(slot, element, setCount, elem);
-				if (reduct == 0) {
-					continue;
+				if (reduct != 0) {
+					final AttributeMagicReduction inst = AttributeMagicReduction.instance(elem);
+					Double cur = map.get(inst);
+					if (cur == null) {
+						cur = 0.0;
+					}
+					
+					cur = cur + reduct;
+						
+					map.put(inst, cur);
 				}
-				
-				final AttributeMagicReduction inst = AttributeMagicReduction.instance(elem);
+			}
+
+			final double boost = calcArmorMagicBoost(slot, element, setCount);
+			if (boost != 0) {
+				final AttributeMagicPotency inst = AttributeMagicPotency.instance();
 				Double cur = map.get(inst);
 				if (cur == null) {
 					cur = 0.0;
 				}
 				
-				cur = cur + reduct;
+				cur = cur + boost;
 					
 				map.put(inst, cur);
 			}
@@ -1051,6 +1099,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 						final double reduc = calcMagicSetReductTotal(element, 4, targElem);
 						setMapInst.put(AttributeMagicReduction.instance(targElem), reduc);
 					}
+					final double boost = calcArmorMagicBoostTotal(element, 4);
+					setMapInst.put(AttributeMagicPotency.instance(), boost);
 				} else {
 					// Show current
 					FindCurrentSetBonus(setMapInst, player, element, level); // puts into setMapInst

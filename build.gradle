@@ -11,7 +11,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the nessasary things for Forge to be setup.
 
 
-version = "1.12.2-1.8.0"
+version = "1.12.2-1.8.3"
 group= "com.smanzana.nostrummagica" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "nostrummagica"
 
@@ -101,10 +101,6 @@ dependencies {
     }
 
     compile "baubles:baubles:1.12:1.5.2"
-	
-	provided files("CTM-MC1.12.2-1.0.2.31.jar")
-	runtime files("Chisel-MC1.12.2-1.0.2.45.jar")
-	
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"

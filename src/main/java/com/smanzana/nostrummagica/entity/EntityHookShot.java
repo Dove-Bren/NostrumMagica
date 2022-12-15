@@ -16,6 +16,7 @@ import com.smanzana.nostrummagica.utils.RayTrace;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MultiPartEntityPart;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.nbt.NBTTagCompound;
@@ -380,7 +381,7 @@ public class EntityHookShot extends Entity {
 			wantsFetch = caster.isSneaking();
 		}
 		
-		if (result.typeOfHit == Type.ENTITY && NostrumMagica.resolveEntityLiving(result.entityHit) != null && HookshotItem.CanBeHooked(getType(), result.entityHit) && (caster == null || caster != result.entityHit)) {
+		if (result.typeOfHit == Type.ENTITY && result.entityHit != null && HookshotItem.CanBeHooked(getType(), result.entityHit) && (caster == null || caster != result.entityHit)) {
 			tickHooked = this.ticksExisted;
 			
 			// Large entities cannot be fetched, and instead we'll override and force the play er to go to them.
@@ -390,6 +391,8 @@ public class EntityHookShot extends Entity {
 				this.setIsFetch(true);
 			} else if (!result.entityHit.canBeCollidedWith()) {
 				// ignore the entity for like arrows and stuff
+				return;
+			} else if (result.entityHit instanceof MultiPartEntityPart) {
 				return;
 			} else if (result.entityHit.width > 1.5 || result.entityHit.height > 2.5) {
 				this.setIsFetch(false);

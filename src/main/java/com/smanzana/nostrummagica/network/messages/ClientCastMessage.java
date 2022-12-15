@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.attributes.AttributeMagicPotency;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.items.ISpellArmor;
@@ -74,6 +75,9 @@ public class ClientCastMessage implements IMessage {
 				float xp = spell.getXP(seen);
 				int cost = spell.getManaCost();
 				SpellCastSummary summary = new SpellCastSummary(cost, xp);
+				
+				// Add player's base magic potency
+				summary.addEfficiency((float) sp.getEntityAttribute(AttributeMagicPotency.instance()).getAttributeValue() / 100f);
 				
 				// Add the player's personal bonuses
 				summary.addCostRate(att.getManaCostModifier());

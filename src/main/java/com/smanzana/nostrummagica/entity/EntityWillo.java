@@ -108,7 +108,7 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 	protected void initEntityAI() {
 		int priority = 1;
 		this.tasks.addTask(priority++, new EntitySpellAttackTask<EntityWillo>(this, 20, 4, true, (willo) -> {
-			return willo.getAttackTarget() != null;
+			return willo.getAttackTarget() != null && willo.getStatus() != WilloStatus.PANIC;
 		}, new Spell[0]){
 			@Override
 			public Spell pickSpell(Spell[] spells, EntityWillo wisp) {
@@ -117,7 +117,7 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 			}
 		});
 		this.tasks.addTask(priority++, new EntityAIPanicGeneric<EntityWillo>(this, 3.0, (e) -> {
-			return EntityWillo.this.getStatus() == WilloStatus.PANIC;
+			return EntityWillo.this.getStatus() == WilloStatus.PANIC && EntityWillo.this.ticksElytraFlying == 14;
 		}));
 		this.tasks.addTask(priority++, new EntityAIOrbitEntityGeneric<EntityWillo>(this, null, 3.0, 6 * 20, 2.0, 3 * 20, 2, (e) -> {
 			return e.getAttackTarget() != null
@@ -218,6 +218,13 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 		} else {
 			if (this.ticksExisted % 20 == 0 && this.getStatus() != WilloStatus.NEUTRAL) {
 				this.setStatus(WilloStatus.NEUTRAL);
+			}
+		}
+		
+		if (this.getStatus() == WilloStatus.PANIC && this.getRevengeTarget() != null) {
+			// Up the time so we panic forever unless target is gone or we can't see them
+			if (!this.getRevengeTarget().isDead && this.getEntitySenses().canSee(this.getRevengeTarget())) {
+				this.setRevengeTarget(this.getRevengeTarget()); // Refreshes timer to 100 ticks
 			}
 		}
 		
@@ -392,6 +399,12 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 			}
 			
 			this.playEffect(EnumParticleTypes.CRIT_MAGIC);
+			return super.attackEntityFrom(source, amount);
+		} else if (source == DamageSource.IN_WALL
+				|| source == DamageSource.CRAMMING
+				|| source == DamageSource.DROWN
+				|| source == DamageSource.OUT_OF_WORLD
+				) {
 			return super.attackEntityFrom(source, amount);
 		} else {
 			NostrumMagicaSounds.CAST_FAIL.play(this);
@@ -676,7 +689,7 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 					cursor.getZ() + (d2 % 1.0),
 					1D);
 			
-			delayTicks = random.nextInt(20 * 10) + 20 * 4;
+			delayTicks = parentEntity.getStatus() == WilloStatus.PANIC ? 5 : random.nextInt(20 * 10) + 20 * 4;
 		}
 	}
 	
@@ -725,7 +738,7 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 					ProjectileTrigger.instance(),
 					SingleShape.instance(),
 					EMagicElement.PHYSICAL,
-					3,
+					2,
 					null);
 			putSpell("Shield",
 					SelfTrigger.instance(),
@@ -775,7 +788,7 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 					ProjectileTrigger.instance(),
 					SingleShape.instance(),
 					EMagicElement.LIGHTNING,
-					2,
+					1,
 					EAlteration.RUIN);
 			putSpell("Shock",
 					SeekingBulletTrigger.instance(),
@@ -813,7 +826,7 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 					SeekingBulletTrigger.instance(),
 					SingleShape.instance(),
 					EMagicElement.FIRE,
-					3,
+					2,
 					EAlteration.CONJURE);
 			putSpell("Overheat",
 					SeekingBulletTrigger.instance(),
@@ -857,13 +870,13 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 					SeekingBulletTrigger.instance(),
 					SingleShape.instance(),
 					EMagicElement.ICE,
-					2,
+					1,
 					EAlteration.INFLICT);
 			putSpell("Heal",
 					SelfTrigger.instance(),
 					SingleShape.instance(),
 					EMagicElement.ICE,
-					3,
+					2,
 					EAlteration.GROWTH);
 			putSpell("Dispel",
 					SeekingBulletTrigger.instance(),
@@ -883,13 +896,13 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 					ProjectileTrigger.instance(),
 					SingleShape.instance(),
 					EMagicElement.EARTH,
-					2,
+					1,
 					EAlteration.RUIN);
 			putSpell("Roots",
 					SeekingBulletTrigger.instance(),
 					SingleShape.instance(),
 					EMagicElement.EARTH,
-					2,
+					1,
 					EAlteration.INFLICT);
 			putSpell("Earth Aegis",
 					SelfTrigger.instance(),
@@ -907,7 +920,7 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 					ProjectileTrigger.instance(),
 					SingleShape.instance(),
 					EMagicElement.EARTH,
-					3,
+					2,
 					EAlteration.RUIN);
 			putSpell("Summon Pets (Earth)",
 					SelfTrigger.instance(),
@@ -921,13 +934,13 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 					MagicCutterTrigger.instance(),
 					SingleShape.instance(),
 					EMagicElement.WIND,
-					3,
+					1,
 					EAlteration.RUIN);
 			putSpell("Poison",
 					SeekingBulletTrigger.instance(),
 					SingleShape.instance(),
 					EMagicElement.WIND,
-					2,
+					1,
 					EAlteration.INFLICT);
 			putSpell("Gust",
 					SelfTrigger.instance(),
@@ -946,13 +959,13 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 					ProjectileTrigger.instance(),
 					SingleShape.instance(),
 					EMagicElement.WIND,
-					2,
+					1,
 					EAlteration.RUIN);
 			putSpell("Wind Ball II",
 					ProjectileTrigger.instance(),
 					SingleShape.instance(),
 					EMagicElement.WIND,
-					3,
+					2,
 					EAlteration.RUIN);
 			
 			// Ender
@@ -960,13 +973,13 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 					BeamTrigger.instance(),
 					SingleShape.instance(),
 					EMagicElement.ENDER,
-					2,
+					1,
 					EAlteration.RUIN);
 			putSpell("Blindness",
 					ProjectileTrigger.instance(),
 					AoEShape.instance(),
 					EMagicElement.ENDER,
-					3,
+					1,
 					EAlteration.INFLICT);
 			spell = new Spell("Blinker", true);
 			spell.addPart(new SpellPart(SelfTrigger.instance()));
