@@ -593,6 +593,10 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 			return false;
 		}
 		
+		if (this.world.provider.getDimension() != 0 && this.world.provider.getDimension() != -1) {
+			return false;
+		}
+		
 		BlockPos blockpos = new BlockPos(this.posX, this.getEntityBoundingBox().minY, this.posZ);
 
 		if (this.world.getLightFor(EnumSkyBlock.SKY, blockpos) > this.rand.nextInt(32)) {

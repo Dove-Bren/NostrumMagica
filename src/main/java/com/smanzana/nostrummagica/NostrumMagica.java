@@ -182,7 +182,6 @@ import com.smanzana.nostrummagica.trials.TrialPhysical;
 import com.smanzana.nostrummagica.trials.TrialWind;
 import com.smanzana.nostrummagica.world.NostrumChunkLoader;
 import com.smanzana.nostrummagica.world.NostrumDungeonGenerator;
-import com.smanzana.nostrummagica.world.NostrumDungeonGenerator.DungeonGen;
 import com.smanzana.nostrummagica.world.NostrumLootHandler;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensionMapper;
 import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
@@ -900,7 +899,19 @@ public class NostrumMagica
 					new ItemStack(PositionCrystal.instance()),
 					new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), NostrumResourceItem.getItem(ResourceType.TOKEN, 1), InfusedGemItem.instance().getGem(EMagicElement.EARTH, 1), new ItemStack(BlankScroll.instance())},
 					new RRequirementResearch("geotokens"),
-					new OutcomeConstructGeotoken())
+					new OutcomeConstructGeotoken(1))
+				);
+		
+		// GeoToken clone -- tier 3. Geotoken center. Magic Tokens and mani crystal
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("geotoken",
+					new ItemStack(PositionToken.instance()),	
+					null,
+					new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.GINSENG, ReagentType.MANDRAKE_ROOT, ReagentType.GRAVE_DUST},
+					new ItemStack(PositionToken.instance()),
+					new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), NostrumResourceItem.getItem(ResourceType.TOKEN, 1), NostrumResourceItem.getItem(ResourceType.TOKEN, 1), NostrumResourceItem.getItem(ResourceType.TOKEN, 1)},
+					new RRequirementResearch("geotokens"),
+					new OutcomeConstructGeotoken(4))
 				);
 		
 		// Tele to obelisk -- tier 2. Position gem, reagents
@@ -1124,7 +1135,7 @@ public class NostrumMagica
 				RitualRecipe.createTier2("spawn_sorcery_portal",
 					new ItemStack(SorceryPortal.instance()), EMagicElement.ENDER,
 					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.BLACK_PEARL, ReagentType.MANDRAKE_ROOT, ReagentType.MANI_DUST},
-					ShrineSeekingGem.getItemstack(DungeonGen.PORTAL),
+					new ItemStack(ShrineSeekingGem.instance()),
 					new RRequirementResearch("sorceryportal"),
 					new OutcomeCreatePortal())
 				);

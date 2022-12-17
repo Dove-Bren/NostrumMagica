@@ -18,14 +18,18 @@ import net.minecraft.world.World;
 
 public class OutcomeConstructGeotoken extends OutcomeSpawnItem {
 
-	public OutcomeConstructGeotoken() {
+	final int tokenCount;
+	
+	public OutcomeConstructGeotoken(int tokenCount) {
 		super(ItemStack.EMPTY);
+		this.tokenCount = tokenCount;
 	}
 	
 	@Override
 	public boolean canPerform(World world, EntityPlayer player, BlockPos center, RitualMatchInfo ingredients) {
-		// Make sure geogem has a location in it
-		if (PositionCrystal.getBlockPosition(ingredients.center) == null) {
+		// Requires either a geogem or geotoken. Regardless of which, must contain a location!
+		if (PositionCrystal.getBlockPosition(ingredients.center) == null
+				&& PositionToken.getBlockPosition(ingredients.center) == null) {
 			if (!world.isRemote) {
 				player.sendMessage(new TextComponentTranslation("info.create_geotoken.nopos", new Object[0]));
 			}
@@ -38,7 +42,7 @@ public class OutcomeConstructGeotoken extends OutcomeSpawnItem {
 	@Override
 	public void perform(World world, EntityPlayer player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
 		// set up stack and then call super to spawn it
-		this.stack = PositionToken.constructFrom(centerItem);
+		this.stack = PositionToken.constructFrom(centerItem, tokenCount);
 		
 		super.perform(world, player, centerItem, otherItems, center, recipe);
 	}

@@ -90,15 +90,19 @@ public class PositionToken extends PositionCrystal {
 		return new Lore().add("By exposing a Geogem to strong earthern energies and providing a tablet for it to be set in, you can create a stable version.", "These tokens are used in rituals or structures that take location inputs.");
 	}
 
-	public static ItemStack constructFrom(ItemStack centerItem) {
-		if (centerItem.isEmpty() || !(centerItem.getItem() instanceof PositionCrystal))
+	public static ItemStack constructFrom(ItemStack centerItem, int tokenCount) {
+		if (centerItem.isEmpty())
 			return null;
 		
-		ItemStack ret = new ItemStack(instance());
+		BlockPos pos = getBlockPosition(centerItem);
+		int dim = getDimension(centerItem);
 		
-		setPosition(ret,
-				getDimension(centerItem),
-				getBlockPosition(centerItem));
+		if (pos == null)
+			return null;
+		
+		ItemStack ret = new ItemStack(instance(), tokenCount);
+		
+		setPosition(ret, dim, pos);
 		
 		return ret;
 	}

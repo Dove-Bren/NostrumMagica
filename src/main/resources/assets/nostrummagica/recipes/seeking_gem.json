@@ -1,0 +1,39 @@
+{
+  "type": "forge:ore_shaped",
+  "result": {
+    "item": "nostrummagica:seeking_gem"
+  },
+  "pattern": [
+    "SGM",
+    "BED",
+    "ACA"
+  ],
+  "key": {
+    "C": {
+      "item": "#RESOURCE_CRYSTALMEDIUM"
+    },
+    "A": {
+      "type": "forge:ore_dict",
+	  "ore": "ingotGold"
+    },
+    "E": {
+      "type": "forge:ore_dict",
+	  "ore": "pearlEnderEye"
+    },
+    "S": {
+      "type": "#REAGENT_SKYASH"
+    },
+    "G": {
+      "type": "#REAGENT_GINSENG"
+    },
+    "M": {
+      "type": "#REAGENT_MANDRAKE"
+    },
+    "B": {
+      "type": "#REAGENT_BLACKPEARL"
+    },
+    "D": {
+      "type": "#REAGENT_MANIDUST"
+    }
+  }
+}

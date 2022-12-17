@@ -177,6 +177,9 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 			else if (this == DRAGON) {
 				count = 1;
 				chance = 100*100;
+			} else if (this == PLANTBOSS) {
+				count = 1;
+				chance = 100 * 100;
 			}
 			
 			// Add bonus chance from bonus items
