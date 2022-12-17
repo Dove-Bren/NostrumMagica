@@ -541,21 +541,30 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 			return false;
 		}
 		
-		BlockPos blockpos = new BlockPos(this.posX, this.getEntityBoundingBox().minY, this.posZ);
-
-		if (this.world.getLightFor(EnumSkyBlock.SKY, blockpos) > this.rand.nextInt(32)) {
-			return false;
-		} else {
-			int i = this.world.getLightFromNeighbors(blockpos);
-
-			if (this.world.isThundering()) {
-				int j = this.world.getSkylightSubtracted();
-				this.world.setSkylightSubtracted(10);
-				i = this.world.getLightFromNeighbors(blockpos);
-				this.world.setSkylightSubtracted(j);
+		if (world.provider.getDimension() == 0) {
+			BlockPos blockpos = new BlockPos(this.posX, this.getEntityBoundingBox().minY, this.posZ);
+	
+			if (this.world.getLightFor(EnumSkyBlock.SKY, blockpos) > this.rand.nextInt(32)) {
+				return false;
+			} else {
+				int i = this.world.getLightFromNeighbors(blockpos);
+	
+				if (this.world.isThundering()) {
+					int j = this.world.getSkylightSubtracted();
+					this.world.setSkylightSubtracted(10);
+					i = this.world.getLightFromNeighbors(blockpos);
+					this.world.setSkylightSubtracted(j);
+				}
+	
+				return i <= this.rand.nextInt(12);
 			}
-
-			return i <= this.rand.nextInt(12);
+		} else {
+			// Other dimensions, just check nearby wisp count
+			List<EntityWisp> wisps = world.getEntitiesWithinAABB(EntityWisp.class, this.getEntityBoundingBox().grow(20, 20, 20), (w) -> {
+				return w !=  EntityWisp.this;
+			});
+			
+			return wisps.size() < 20;
 		}
 	}
 	
