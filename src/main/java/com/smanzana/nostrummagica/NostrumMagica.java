@@ -26,6 +26,7 @@ import com.smanzana.nostrummagica.blocks.ParadoxMirrorBlock;
 import com.smanzana.nostrummagica.blocks.PutterBlock;
 import com.smanzana.nostrummagica.blocks.SorceryPortal;
 import com.smanzana.nostrummagica.blocks.TeleportRune;
+import com.smanzana.nostrummagica.blocks.TemporaryTeleportationPortal;
 import com.smanzana.nostrummagica.capabilities.AttributeProvider;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.command.CommandAllQuests;
@@ -157,6 +158,7 @@ import com.smanzana.nostrummagica.rituals.requirements.RRequirementElementMaster
 import com.smanzana.nostrummagica.rituals.requirements.RRequirementResearch;
 import com.smanzana.nostrummagica.rituals.requirements.RRequirementShapeMastery;
 import com.smanzana.nostrummagica.rituals.requirements.RRequirementTriggerMastery;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -196,6 +198,7 @@ import net.minecraft.entity.IEntityOwnable;
 import net.minecraft.entity.MultiPartEntityPart;
 import net.minecraft.entity.ai.EntityAIFollowOwner;
 import net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.passive.EntityWolf;
@@ -2176,6 +2179,11 @@ public class NostrumMagica
 		.build("markrecall", NostrumResearchTab.MAGICA, Size.LARGE, 4, 2, true, new ItemStack(Items.COMPASS));
 		
 		NostrumResearch.startBuilding()
+			.parent("markrecall")
+			.lore(ShrineSeekingGem.instance())
+		.build("adv_markrecall", NostrumResearchTab.MAGICA, Size.LARGE, 4, 3, false, new ItemStack(PositionToken.instance()));
+		
+		NostrumResearch.startBuilding()
 			.parent("rituals")
 			.reference("ritual::buff.luck", "ritual.buff.luck.name")
 			.reference("ritual::buff.speed", "ritual.buff.speed.name")
@@ -3142,5 +3150,35 @@ public class NostrumMagica
     			}
 	    	}
     	}
+    }
+    
+    public static boolean attemptTeleport(World world, BlockPos target, EntityPlayer player, boolean allowPortal, boolean spawnBristle) {
+    	INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+    	boolean success = false;
+    	
+    	if (allowPortal && attr != null && attr.hasEnhancedTeleport()) {
+			BlockPos portal = TemporaryTeleportationPortal.spawnNearby(world, player.getPosition().up(), 4, true, target, 20 * 30);
+			if (portal != null) {
+				TemporaryTeleportationPortal.spawnNearby(world, target, 4, true, portal, 20 * 30);
+				success = true;
+			}
+		} else {
+			player.setPositionAndUpdate(target.getX() + .5, target.getY() + .1, target.getZ() + .5);
+			success = true;
+		}
+		
+		if (success && spawnBristle) {
+			float dist = 2 + NostrumMagica.rand.nextFloat() * 2;
+			float dir = NostrumMagica.rand.nextFloat();
+			double dirD = dir * 2 * Math.PI;
+			double dx = Math.cos(dirD) * dist;
+			double dz = Math.sin(dirD) * dist;
+			EntityItem drop = new EntityItem(world, target.getX() + .5 + dx, target.getY() + 2, target.getZ() + .5 + dz,
+					NostrumResourceItem.getItem(ResourceType.ENDER_BRISTLE, 1));
+			world.spawnEntity(drop);
+			NostrumMagicaSounds.CAST_FAIL.play(world, target.getX() + .5, target.getY() + 2, target.getZ() + .5);
+		}
+		
+		return success;
     }
 }

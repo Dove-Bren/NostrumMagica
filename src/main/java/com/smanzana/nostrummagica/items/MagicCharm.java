@@ -3,7 +3,6 @@ package com.smanzana.nostrummagica.items;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.TemporaryTeleportationPortal;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.config.ModConfig;
@@ -296,18 +295,25 @@ public class MagicCharm extends Item implements ILoreTagged {
 				}
 			}
 			
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-			if (attr != null && attr.hasEnhancedTeleport() && !player.isSneaking()) {
-				BlockPos portal = TemporaryTeleportationPortal.spawnNearby(world, player.getPosition(), 4, false, pos, 20 * 30);
-				if (portal != null) {
-					TemporaryTeleportationPortal.spawnNearby(world, pos, 4, true, portal, 20 * 30);
-				}
-			} else {
-				player.setPositionAndUpdate(pos.getX() + .5, pos.getY() + .1, pos.getZ() + .5);
+			if (NostrumMagica.attemptTeleport(world, pos, player, !player.isSneaking(), false)) {
+				NostrumMagicaSounds.DAMAGE_ENDER.play(world, player.posX, player.posY, player.posZ);
+				return true;
 			}
 			
-			NostrumMagicaSounds.DAMAGE_ENDER.play(world, player.posX, player.posY, player.posZ);
-			return true;
+			return false;
+			
+//			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+//			if (attr != null && attr.hasEnhancedTeleport() && !player.isSneaking()) {
+//				BlockPos portal = TemporaryTeleportationPortal.spawnNearby(world, player.getPosition(), 4, false, pos, 20 * 30);
+//				if (portal != null) {
+//					TemporaryTeleportationPortal.spawnNearby(world, pos, 4, true, portal, 20 * 30);
+//				}
+//			} else {
+//				player.setPositionAndUpdate(pos.getX() + .5, pos.getY() + .1, pos.getZ() + .5);
+//			}
+//			
+//			
+//			return true;
 		} else if (player.dimension == ModConfig.config.sorceryDimensionIndex()) {
 			// In  sorcery dimension. Return to beginning
 			BlockPos spawn = NostrumMagica.getDimensionMapper(player.world).register(player.getUniqueID()).getCenterPos(NostrumEmptyDimension.SPAWN_Y);

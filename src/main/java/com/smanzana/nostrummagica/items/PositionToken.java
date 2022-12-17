@@ -1,14 +1,20 @@
 package com.smanzana.nostrummagica.items;
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumObelisk;
 import com.smanzana.nostrummagica.blocks.ObeliskPortal;
 import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -19,6 +25,8 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * Solidified position crystal for obelisk linking
@@ -38,10 +46,56 @@ public class PositionToken extends PositionCrystal {
 		return instance;
 
 	}
-
+	
 	public PositionToken() {
 		super(ID);
 		this.setUnlocalizedName(ID);
+	}
+	
+	protected static boolean hasRecallUnlocked(EntityPlayer playerIn, World worldIn, ItemStack token) {
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
+		if (attr != null && attr.getCompletedResearches().contains("adv_markrecall")) {
+			return true;
+		}
+		return false;
+	}
+	
+	protected static boolean canAffordRecall(EntityPlayer playerIn, World worldIn, ItemStack token) {
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
+		if (attr != null && token.getItem() instanceof PositionToken) {
+			return attr.getMana() >= ((PositionToken)token.getItem()).getManaCost(playerIn, worldIn, token);
+		}
+		return false;
+	}
+	
+	protected int getManaCost(EntityPlayer playerIn, World worldIn, ItemStack token) {
+		return 50;
+	}
+	
+	protected static boolean canPerformRecall(EntityPlayer playerIn, World worldIn, ItemStack token) {
+		BlockPos pos = getBlockPosition(token);
+		int dim = getDimension(token);
+		return pos != null
+				&& hasRecallUnlocked(playerIn, worldIn, token)
+				&& canAffordRecall(playerIn, worldIn, token)
+				&& dim == playerIn.dimension;
+	}
+	
+	protected boolean doRecall(EntityPlayer playerIn, World worldIn, ItemStack token) {
+		if (canPerformRecall(playerIn, worldIn, token)) {
+			// Try to do actual recall
+			BlockPos pos = getBlockPosition(token);
+			if (NostrumMagica.attemptTeleport(worldIn, pos, playerIn, true, NostrumMagica.rand.nextInt(32) == 0)) {
+				// If success, take mana andreturn true
+				INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn); // assumption: not null!
+				attr.addMana(-getManaCost(playerIn, worldIn, token));
+				return true;
+			} else {
+				return false;
+			}
+		}
+		
+		return false;
 	}
 	
 	@Override
@@ -49,7 +103,7 @@ public class PositionToken extends PositionCrystal {
 		if (worldIn.isRemote)
 			return EnumActionResult.SUCCESS;
 		
-		if (pos == null || !playerIn.isCreative())
+		if (pos == null || playerIn.isSneaking() || !playerIn.isCreative())
 			return EnumActionResult.PASS;
 		
 		IBlockState state = worldIn.getBlockState(pos);
@@ -64,7 +118,10 @@ public class PositionToken extends PositionCrystal {
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
 		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
-		if (playerIn.isCreative()) {
+		if (PositionToken.hasRecallUnlocked(playerIn, worldIn, itemStackIn)) {
+			doRecall(playerIn, worldIn, itemStackIn);
+			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+		} else if (playerIn.isCreative()) {
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
 		}
 		return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
@@ -144,5 +201,22 @@ public class PositionToken extends PositionCrystal {
 		}
 		
 		return false;
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+		super.addInformation(stack, worldIn, tooltip, flagIn);
+		
+		if (hasRecallUnlocked(NostrumMagica.proxy.getPlayer(), worldIn, stack)) {
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(NostrumMagica.proxy.getPlayer());
+			if (attr != null && attr.hasEnhancedTeleport()) {
+				tooltip.add(I18n.format("info.geotoken.recall_enhanced", new Object[0]));
+			} else {
+				tooltip.add(I18n.format("info.geotoken.recall", new Object[0]));
+			}
+			
+			
+		}
 	}
 }

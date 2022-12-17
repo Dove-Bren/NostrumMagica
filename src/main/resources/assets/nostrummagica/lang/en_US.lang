@@ -725,6 +725,8 @@ info.wolf_type.hell.desc=
 
 info.hookshot.bad_dim=The mechanisms seem to have trouble working in this atmosphere...
 info.endercharm.enhanced=Use while sneaking to only teleport yourself. Otherwise, creates a portal home.
+info.geotoken.recall=Use on air to teleport back to the marked location.
+info.geotoken.recall_enhanced=Use on air to teleport to the marked location. Use while sneaking to only teleport yourself.
 
 info.lore_tamedragon_soulbound.name=Soulbonded Dragons
 info.lore_tamedragon_soulbound.desc=  You've soulbonded with your dragon! Its soul is now intertwined with yours!|  As a symbol of this bond, you've received a Dragon Soul Ember with your dragon's soul in it.|  This special item can be used to revive your dragon if it perishes. Be sure not to lose it!
@@ -1413,6 +1415,9 @@ research.geotokens.info=  Geogems are great for remembering locations, but are s
 research.markrecall.name=Mark and Recall
 research.markrecall.desc=The bread and butter of teleporation magic
 research.markrecall.info=  Your work with geogems has inspired you to investigate teleportation magics more directly. By combining your knowledge of enderpearls with the raw location-bound energies of a compass -- and with the stability of earth for anchoring and the freedom of wind for the travel -- you've managed to fine tune or Mark the location your own aether is drawn to. Similarly, you've created a way to tap into those energies and recall back to that location nearly instantly.
+research.adv_markrecall.name=Advanced Mark and Recall
+research.adv_markrecall.desc=The toast and jam of teleportation magic
+research.adv_markrecall.info=  The mark and recall rituals are great for moving back to one spot with some setup. But the ease of use of the charms of return leave you wanting more...|  And to that end, you've invented a way to do more with GeoTokens! Now if you have a geotoken, you can use it while sneaking to recall right to where it points -- at the cost of some mana!
 research.obelisks.name=Obelisks
 research.obelisks.desc=Waypoint teleporation
 research.obelisks.info=  Finally! You've found it!|  With the stability of the balanced slabs you've just discovered, the location storage of geotokens, and the power of vani crystals, you've discovered a way to create easy, permanent teleportation options!|  By performing the ritual and erecting an obelisk, you create a waypoint you can teleport to and from. You have found that linking two obelisks together is as simple as bringing a geotoken pointing to one obelisk in contact with another obelisk, and just like that, the obelisk will be able to send you to the other.|  You also have found a pretty basic ritual which can return you to an obelisk, provided you have a geogem that remembers where it's at.
