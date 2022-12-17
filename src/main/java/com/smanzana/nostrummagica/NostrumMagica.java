@@ -236,7 +236,7 @@ import net.minecraftforge.oredict.OreDictionary;
 public class NostrumMagica
 {
     public static final String MODID = "nostrummagica";
-    public static final String VERSION = "1.12.2-1.8.3";
+    public static final String VERSION = "1.12.2-1.8.4";
 	public static final Random rand = new Random();
     
     @SidedProxy(clientSide="com.smanzana.nostrummagica.proxy.ClientProxy", serverSide="com.smanzana.nostrummagica.proxy.CommonProxy")
