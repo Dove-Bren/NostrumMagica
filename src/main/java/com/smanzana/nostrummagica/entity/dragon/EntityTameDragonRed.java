@@ -1921,10 +1921,25 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	public RedDragonSpellInventory getSpellInventory() {
 		return this.spellInventory;
 	}
-
+	
 	@Override
-	public void addMana(int mana) {
-		this.dataManager.set(CAPABILITY_MANA, Math.max(0, Math.min(this.getCurrentMana() + mana, this.getDragonMana())));
+	public int addMana(int mana) {
+		int orig = this.getMana();
+		int cur = Math.max(0, Math.min(orig + mana, this.getMaxMana()));
+		
+		this.dataManager.set(CAPABILITY_MANA, cur);
+		return mana - (cur - orig);
+	}
+	
+	@Override
+	public boolean takeMana(int mana) {
+		final int cur = getMana();
+		if (cur >= mana) {
+			addMana(-mana);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@Override

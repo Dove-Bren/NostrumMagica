@@ -106,7 +106,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEntityPet, IPetWithSoul, IStabbableEntity {
+public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEntityPet, IPetWithSoul, IStabbableEntity, IMagicEntity {
 	
 	public static enum ArcaneWolfElementalType {
 		NONELEMENTAL("nonelemental", 0x00000000, null),
@@ -1044,8 +1044,24 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		this.dataManager.set(ATTRIBUTE_XP, xp);
 	}
 	
-	public void addMana(int mana) {
-		this.setMana(mana + this.getMana());
+	@Override
+	public int addMana(int mana) {
+		int orig = this.getMana();
+		int cur = Math.max(0, Math.min(orig + mana, this.getMaxMana()));
+		
+		this.setMana(cur);
+		return mana - (cur - orig);
+	}
+	
+	@Override
+	public boolean takeMana(int mana) {
+		final int cur = getMana();
+		if (cur >= mana) {
+			addMana(-mana);
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	protected void setMaxHealth(float maxHealth) {

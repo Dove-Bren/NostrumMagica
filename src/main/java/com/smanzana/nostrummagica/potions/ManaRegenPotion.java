@@ -26,8 +26,9 @@ public class ManaRegenPotion extends Potion {
 	}
 	
 	private ManaRegenPotion() {
-		super(true, 0xFFBB6DFF);
-		
+		super(false, 0xFFBB6DFF);
+
+		this.setBeneficial();
 		this.setPotionName("potion.mana-regen.name");
 		
 		this.registerPotionAttributeModifier(AttributeManaRegen.instance(),
