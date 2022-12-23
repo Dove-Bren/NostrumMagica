@@ -15,6 +15,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -29,7 +30,7 @@ public class FieldTrigger extends TriggerAreaTrigger {
 		private float radius;
 		
 		public FieldTriggerInstance(SpellState state, World world, Vec3d pos, float radius, boolean continuous) {
-			super(state, world, pos, TICK_RATE, NUM_TICKS, radius + .75f, continuous);
+			super(state, world, pos, TICK_RATE, NUM_TICKS, radius + .75f, continuous, true);
 			this.radius = radius;
 			this.origin = pos;
 		}
@@ -43,6 +44,13 @@ public class FieldTrigger extends TriggerAreaTrigger {
 		protected boolean isInArea(EntityLivingBase entity) {
 			return origin.distanceTo(new Vec3d(entity.posX, origin.y, entity.posZ)) <= radius; // compare against our y for horizontal distance.
 			// .75 wiggle room in listener means you can't be way below.
+		}
+
+		@Override
+		protected boolean isInArea(World world, BlockPos pos) {
+			return (Math.abs((Math.floor(origin.x) + .5) - (pos.getX() + .5))
+					+ Math.abs(origin.y - pos.getY())
+					+ Math.abs((Math.floor(origin.z) + .5) - (pos.getZ() + .5))) < radius;
 		}
 
 		@Override

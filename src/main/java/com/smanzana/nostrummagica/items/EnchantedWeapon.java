@@ -290,56 +290,50 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
 		} else if (element == EMagicElement.WIND) {
 			if (playerIn.getCooledAttackStrength(0.5F) > .95) {
-				
-				if (!worldIn.isRemote) {
-					final int hurricaneCount = EnchantedArmor.GetSetCount(playerIn, EMagicElement.WIND, 3);
-					if (hurricaneCount >= 4 && playerIn.isSneaking()) { // armor set only
-						final float maxDist = 30;
-						RayTraceResult mop = RayTrace.raytrace(worldIn, playerIn.getPositionVector().addVector(0, playerIn.eyeHeight, 0), playerIn.getLookVec(), maxDist, (ent) -> { return ent != playerIn;});
-						if (mop != null && mop.typeOfHit != RayTraceResult.Type.MISS) {
-							final Vec3d at = (mop.typeOfHit == RayTraceResult.Type.ENTITY ? mop.entityHit.getPositionVector() : mop.hitVec);
-							spawnJumpVortex(worldIn, playerIn, at, level);
-						}
-						
-					} else {
+				if (playerIn.isSneaking()) {
+					if (!worldIn.isRemote) {
 						spawnWalkingVortex(worldIn, playerIn, new Vec3d(playerIn.posX + dir.x, playerIn.posY + .75, playerIn.posZ + dir.z), dir, level);
+						itemStackIn.damageItem(1, playerIn);
 					}
-					
-					itemStackIn.damageItem(2, playerIn);
+					playerIn.resetCooldown();
+					return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
 				}
-				
-				playerIn.resetCooldown();
 			}
-			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+			
 		} else if (element == EMagicElement.LIGHTNING && EnchantedArmor.GetSetCount(playerIn, EMagicElement.LIGHTNING, 3) == 4) {
 			if (playerIn.getCooledAttackStrength(0.5F) > .95) {
 				// If full set, strike at targetting location (unless sneaking, then strike self)
-				if (!worldIn.isRemote) {
-					boolean used = false;
-					if (playerIn.isSneaking()) {
-						used = summonBoltOnSelf(playerIn);
-					} else if (playerIn.isPotionActive(LightningAttackPotion.instance())) {
-						// This should be client-side... TODO do it on client and send via armor message?
-						
-						// Do quick mana check prior to actually doing raytrace. Redone inside helper func.
-						INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
-						if (attr != null && attr.getMana() >= 30) {
+				boolean used = false;
+				if (playerIn.isSneaking()) {
+					if (!worldIn.isRemote) {
+						summonBoltOnSelf(playerIn);
+					}
+					used = true;
+				} else if (playerIn.isPotionActive(LightningAttackPotion.instance())) {
+					// This should be client-side... TODO do it on client and send via armor message?
+					
+					// Do quick mana check prior to actually doing raytrace. Redone inside helper func.
+					INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
+					if (attr != null && attr.getMana() >= 30) {
+						if (!worldIn.isRemote) {
 							final float maxDist = 50;
 							RayTraceResult mop = RayTrace.raytrace(worldIn, playerIn.getPositionVector().addVector(0, playerIn.eyeHeight, 0), playerIn.getLookVec(), maxDist, (ent) -> { return ent != playerIn;});
 							if (mop != null && mop.typeOfHit != RayTraceResult.Type.MISS) {
 								final Vec3d at = (mop.typeOfHit == RayTraceResult.Type.ENTITY ? mop.entityHit.getPositionVector() : mop.hitVec);
-								used = summonBoltAtTarget(playerIn, worldIn, at);
+								summonBoltAtTarget(playerIn, worldIn, at);
 							}
 						}
-					}
-					if (used) {
-						itemStackIn.damageItem(1, playerIn);
+						used = true;
 					}
 				}
-				
-				playerIn.resetCooldown();
+				if (used) {
+					if (!worldIn.isRemote) {
+						itemStackIn.damageItem(1, playerIn);
+					}
+					playerIn.resetCooldown();
+					return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+				}
 			}
-			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
 		}
 			
         return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
@@ -353,23 +347,14 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 			dir = dir.addVector(0, -dir.y, 0);
 			dir = dir.normalize();
 			if (element == EMagicElement.WIND) {
-				if (!worldIn.isRemote) {
-					final int hurricaneCount = EnchantedArmor.GetSetCount(playerIn, EMagicElement.WIND, 3);
-					if (hurricaneCount >= 4 && playerIn.isSneaking()) { // armor set only
-						final float maxDist = 20;
-						RayTraceResult mop = RayTrace.raytrace(worldIn, playerIn.getPositionVector().addVector(0, playerIn.eyeHeight, 0), playerIn.getLookVec(), maxDist, (ent) -> { return ent != playerIn;});
-						if (mop != null && mop.typeOfHit != RayTraceResult.Type.MISS) {
-							final Vec3d at = (mop.typeOfHit == RayTraceResult.Type.ENTITY ? mop.entityHit.getPositionVector() : mop.hitVec);
-							spawnJumpVortex(worldIn, playerIn, at, level);
-						}
-						
-					} else {
-						spawnWalkingVortex(worldIn, playerIn, new Vec3d(pos.getX() + hitX, pos.getY() + 1, pos.getZ() + hitZ), dir, level);
+				if (playerIn.isSneaking()) {
+					if (!worldIn.isRemote) {
+						spawnWalkingVortex(worldIn, playerIn, new Vec3d(playerIn.posX + dir.x, playerIn.posY + .75, playerIn.posZ + dir.z), dir, level);
+						stack.damageItem(1, playerIn);
 					}
-					stack.damageItem(2, playerIn);
+					playerIn.resetCooldown();
+					return EnumActionResult.SUCCESS;
 				}
-				playerIn.resetCooldown();
-				return EnumActionResult.SUCCESS;
 			} else if (element == EMagicElement.ICE) {
 				if (!worldIn.isRemote) { 
 					spawnIceCloud(worldIn, playerIn, new Vec3d(pos.getX() + hitX, pos.getY() + 1, pos.getZ() + hitZ), dir, level);
@@ -378,30 +363,37 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 				playerIn.resetCooldown();
 				return EnumActionResult.SUCCESS;
 			} else if (element == EMagicElement.LIGHTNING && EnchantedArmor.GetSetCount(playerIn, EMagicElement.LIGHTNING, 3) == 4) {
-				if (!worldIn.isRemote) {
-					boolean used = false;
-					if (playerIn.isSneaking()) {
-						used = summonBoltOnSelf(playerIn);
-					} else if (playerIn.isPotionActive(LightningAttackPotion.instance())) {
-						// This should be client-side... TODO do it on client and send via armor message?
-						
-						// Do quick mana check prior to actually doing raytrace. Redone inside helper func.
-						INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
-						if (attr != null && attr.getMana() >= 30) {
+				
+				boolean used = false;
+				if (playerIn.isSneaking()) {
+					if (!worldIn.isRemote) {
+						summonBoltOnSelf(playerIn);
+					}
+					used = true;
+				} else if (playerIn.isPotionActive(LightningAttackPotion.instance())) {
+					// This should be client-side... TODO do it on client and send via armor message?
+					
+					// Do quick mana check prior to actually doing raytrace. Redone inside helper func.
+					INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
+					if (attr != null && attr.getMana() >= 30) {
+						if (!worldIn.isRemote) {
 							final float maxDist = 50;
 							RayTraceResult mop = RayTrace.raytrace(worldIn, playerIn.getPositionVector().addVector(0, playerIn.eyeHeight, 0), playerIn.getLookVec(), maxDist, (ent) -> { return ent != playerIn;});
 							if (mop != null && mop.typeOfHit != RayTraceResult.Type.MISS) {
 								final Vec3d at = (mop.typeOfHit == RayTraceResult.Type.ENTITY ? mop.entityHit.getPositionVector() : mop.hitVec);
-								used = summonBoltAtTarget(playerIn, worldIn, at);
+								summonBoltAtTarget(playerIn, worldIn, at);
 							}
 						}
-					}
-					if (used) {
-						stack.damageItem(1, playerIn);
+						used = true;
 					}
 				}
-				playerIn.resetCooldown();
-				return EnumActionResult.SUCCESS;
+				if (used) {
+					if (!worldIn.isRemote) {
+						stack.damageItem(1, playerIn);
+					}
+					playerIn.resetCooldown();
+					return EnumActionResult.SUCCESS;
+				}
 			}
 		}
 		return EnumActionResult.PASS;
@@ -521,7 +513,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 		cloud.motionZ = direction.z;
 	}
 	
-	protected static void spawnJumpVortex(World world, EntityPlayer caster, Vec3d at, int level) {
+	public static void spawnJumpVortex(World world, EntityPlayer caster, Vec3d at, int level) {
 		EntityAreaEffect cloud = new EntityAreaEffect(world, at.x, at.y, at.z);
 		cloud.setOwner(caster);
 		cloud.setWaitTime(0);
@@ -662,5 +654,4 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 					.setEntityBehavior(EntityBehavior.ORBIT)
 			);
 	}
-	
 }

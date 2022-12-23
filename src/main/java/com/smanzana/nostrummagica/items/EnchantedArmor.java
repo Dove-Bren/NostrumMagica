@@ -1181,6 +1181,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	protected static final int MANA_JUMP_COST = 50;
 	protected static final int MANA_DRAGON_FLIGHT = 1;
 	protected static final int WIND_TORNADO_COST = 50;
+	protected static final int WIND_WHIRLWIND_COST = 20;
 	protected static final int ENDER_DASH_COST = 20;
 	protected static final int EARTH_GROW_COST = 5;
 	
@@ -1262,6 +1263,17 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		}
 	}
 	
+	protected void consumeWindJumpWhirlwind(EntityLivingBase entity) {
+		if (entity instanceof EntityPlayer && ((EntityPlayer) entity).isCreative()) {
+			return;
+		}
+		
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
+		if (attr != null) {
+			attr.addMana(-WIND_WHIRLWIND_COST);
+		}
+	}
+	
 	protected void consumeEnderDash(EntityLivingBase entity) {
 		if (entity instanceof EntityPlayer && ((EntityPlayer) entity).isCreative()) {
 			return;
@@ -1297,6 +1309,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	private static KeyBinding bindingEnderRight;
 	private static KeyBinding bindingEnderBack;
 	// private static KeyBinding bindingSummonTornado;
+	private static KeyBinding bindingSummonJumpWhirlwind;
 	private static KeyBinding bindingToggleArmorEffect;
 	
 	public static final void ClientInit() {
@@ -1308,6 +1321,9 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 
 		bindingEnderBack = new KeyBinding("key.dash.back.desc", Keyboard.KEY_NUMPAD2, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingEnderBack);
+
+		bindingSummonJumpWhirlwind = new KeyBinding("key.wind.jump.desc", Keyboard.KEY_M, "key.nostrummagica.desc");
+		ClientRegistry.registerKeyBinding(bindingSummonJumpWhirlwind);
 
 		bindingToggleArmorEffect = new KeyBinding("key.armor.toggle.desc", Keyboard.KEY_NUMPAD5, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingToggleArmorEffect);
@@ -1333,6 +1349,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			clientDashSide(player, true);
 		} else if (bindingEnderBack.isPressed()) {
 			clientDashBack(player);
+		} else if (bindingSummonJumpWhirlwind.isPressed()) {
+			NetworkHandler.getSyncChannel().sendToServer(new EnchantedArmorStateUpdate(ArmorState.WIND_JUMP_WHIRLWIND, false, 0));
 		} else if (bindingToggleArmorEffect.isPressed()) {
 			NostrumMagicaSounds.UI_TICK.playClient(player);
 			final boolean enabled = !GetArmorHitEffectsEnabled(player);
@@ -1923,6 +1941,18 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			break;
 		case EFFECT_TOGGLE:
 			SetArmorHitEffectsEnabled(ent, data);
+			break;
+		case WIND_JUMP_WHIRLWIND:
+			if (!ent.world.isRemote && armor.hasWindTornado(ent)) {
+				EntityPlayer playerIn = (EntityPlayer) ent;
+				armor.consumeWindJumpWhirlwind(ent);
+				final float maxDist = 20;
+				RayTraceResult mop = RayTrace.raytrace(playerIn.world, playerIn.getPositionVector().addVector(0, playerIn.eyeHeight, 0), playerIn.getLookVec(), maxDist, (e) -> { return e != playerIn;});
+				if (mop != null && mop.typeOfHit != RayTraceResult.Type.MISS) {
+					final Vec3d at = (mop.typeOfHit == RayTraceResult.Type.ENTITY ? mop.entityHit.getPositionVector() : mop.hitVec);
+					EnchantedWeapon.spawnJumpVortex(playerIn.world, playerIn, at, 3);
+				}
+			}
 			break;
 		}
 	}

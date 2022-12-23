@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.entity;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -20,6 +22,8 @@ public class NostrumTameLightning extends EntityLightningBolt {
 	/** Declares which state the lightning bolt is in. Whether it's in the air, hit the ground, etc. */
 	private int lightningState;
 	
+	private @Nullable EntityLivingBase ignoreEntity;
+	
 	public NostrumTameLightning(World worldIn) {
 		this(worldIn, 0, 0, 0);
 	}
@@ -27,6 +31,11 @@ public class NostrumTameLightning extends EntityLightningBolt {
 	public NostrumTameLightning(World worldIn, double x, double y, double z) {
 		super(worldIn, x, y, z, true);
 		this.lightningState = 2;
+	}
+	
+	public NostrumTameLightning setEntityToIgnore(@Nullable EntityLivingBase entity) {
+		this.ignoreEntity = entity;
+		return this;
 	}
 
 	public static void doEffect(EntityLivingBase entity) {
@@ -52,7 +61,7 @@ public class NostrumTameLightning extends EntityLightningBolt {
 
 			for (int i = 0; i < list.size(); ++i) {
 				Entity entity = (Entity)list.get(i);
-				if (!net.minecraftforge.event.ForgeEventFactory.onEntityStruckByLightning(entity, this)) { 
+				if (ignoreEntity != entity && !net.minecraftforge.event.ForgeEventFactory.onEntityStruckByLightning(entity, this)) { 
 					entity.onStruckByLightning(this);
 					entity.setEntityInvulnerable(false);
 					entity.hurtResistantTime = 0;

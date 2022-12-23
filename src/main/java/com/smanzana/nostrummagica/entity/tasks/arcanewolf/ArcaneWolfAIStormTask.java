@@ -75,11 +75,11 @@ public class ArcaneWolfAIStormTask extends EntityAIBase {
 	protected void blastEntity(EntityArcaneWolf wolf, EntityLivingBase target) {
 		for (int i = 0; i < 2; i++) {
 			target.world.addWeatherEffect(
-					new NostrumTameLightning(target.world,
+					(new NostrumTameLightning(target.world,
 							target.posX + (wolf.getRNG().nextFloat()-.5f),
 							target.posY,
 							target.posZ + (wolf.getRNG().nextFloat()-.5f))
-					);
+					).setEntityToIgnore(wolf));
 		}
 	}
 	

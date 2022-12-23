@@ -15,7 +15,10 @@ import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.AtFeetTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.AuraTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.BeamTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.CasterTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.DamagedTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.DelayTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.FieldTrigger;
@@ -189,6 +192,15 @@ public class SpellComponentIcon {
 		} else if (trigger instanceof FieldTrigger) {
 			u = 5;
 			v = 2;
+		} else if (trigger instanceof AtFeetTrigger) {
+			u = 6;
+			v = 2;
+		} else if (trigger instanceof AuraTrigger) {
+			u = 7;
+			v = 2;
+		} else if (trigger instanceof CasterTrigger) {
+			u = 7;
+			v = 1;
 		} else {
 			System.out.println("Trigger doesn't have set uv: " + trigger);
 		}

@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -828,7 +830,8 @@ public class SpellAction {
 				}
 				
 				world.addWeatherEffect(
-					new NostrumTameLightning(world, cursor.getX() + 0.5, cursor.getY(), cursor.getZ() + 0.5)
+					(new NostrumTameLightning(world, cursor.getX() + 0.5, cursor.getY(), cursor.getZ() + 0.5))
+					.setEntityToIgnore(caster)
 					);
 			}
 
@@ -1504,6 +1507,22 @@ public class SpellAction {
 		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float eff) {
 			return apply(caster, entity.world, entity.getPosition().add(0, -1, 0), eff);
 		}
+		
+		protected boolean isTool(@Nullable EntityPlayer player, ItemStack stack) {
+			if (stack.isEmpty()) {
+				return false;
+			}
+			
+			Set<String> classes = stack.getItem().getToolClasses(stack);
+			for (String cla : classes) {
+				// Required harvest level >= iron so throw-away levels like wood and stone don't count
+				if (stack.getItem().getHarvestLevel(stack, cla, player, null) >= 2) {
+					return true;
+				}
+			}
+			
+			return false;
+		}
 
 		@Override
 		public boolean apply(EntityLivingBase caster, World world, BlockPos block, float eff) {
@@ -1525,23 +1544,34 @@ public class SpellAction {
 				}
 			}
 			
+			boolean usePickaxe = (level >= 3);
 			float hardness = state.getBlockHardness(world, block);
-			
-			
-			if (this.level < 3) {
-				int harvestLevel = state.getBlock().getHarvestLevel(state);
-				if (harvestLevel > 1)
-					return false;
-				
-				if (hardness >= 10f || hardness < 0f)
-					return false;
-			}
 			
 			if (hardness >= 100f || hardness < 0f)
 				return false;
 			
 			if (caster instanceof EntityPlayerMP) {
-				((EntityPlayerMP) caster).interactionManager.tryHarvestBlock(block);
+				// This checks item harvest level >:(
+//				if (!state.getBlock().canHarvestBlock(world, block, (EntityPlayer) caster)) {
+//					return false;
+//				}
+				
+				if (usePickaxe) {
+					// Check if they have a pickaxe
+					ItemStack inHand = caster.getHeldItemMainhand();
+					if (!isTool((EntityPlayer) caster, inHand)) {
+						inHand = caster.getHeldItemOffhand();
+					}
+					if (!isTool((EntityPlayer) caster, inHand)) {
+						usePickaxe = false;
+					}
+				}
+				
+				if (usePickaxe) {
+					((EntityPlayerMP) caster).interactionManager.tryHarvestBlock(block);
+				} else {
+					world.destroyBlock(block, true);
+				}
 			} else {
 				world.destroyBlock(block, true);
 			}

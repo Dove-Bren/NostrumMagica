@@ -531,7 +531,11 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 		EnumDyeColor colorRunes = getRuneColor(stack);
 		EnumDyeColor colorOutside = getOutsideColor(stack);
 		EnumDyeColor colorInside = getInsideColor(stack);
-		
+		final boolean castUpgrade = isAetherCaster(stack);
+
+		if (castUpgrade) {
+			tooltip.add(TextFormatting.DARK_GREEN + I18n.format("item.aether_cloak.spender") + TextFormatting.RESET);
+		}
 		if (displayTrimmed) {
 			tooltip.add(TextFormatting.DARK_GRAY + I18n.format("item.aether_cloak.trimmed") + TextFormatting.RESET);
 		}
@@ -651,7 +655,10 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 			final int cost = (int) Math.ceil(100 * summary.getReagentCost());
 			if (this.getAether(stack) >= cost) {
 				if ((!(caster instanceof EntityPlayer) || !((EntityPlayer) caster).isCreative()) && !caster.world.isRemote) {
-					this.deductAether(stack, cost);
+					int taken = this.deductAether(stack, cost);
+					if (taken > 0) {
+						growFromAether(stack, -taken);
+					}
 				}
 				summary.addReagentCost(-summary.getReagentCost());
 			}

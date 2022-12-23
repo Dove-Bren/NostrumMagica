@@ -21,19 +21,19 @@
 	  "ore": "pearlEnderEye"
     },
     "S": {
-      "type": "#REAGENT_SKYASH"
+      "item": "#REAGENT_SKYASH"
     },
     "G": {
-      "type": "#REAGENT_GINSENG"
+      "item": "#REAGENT_GINSENG"
     },
     "M": {
-      "type": "#REAGENT_MANDRAKE"
+      "item": "#REAGENT_MANDRAKE"
     },
     "B": {
-      "type": "#REAGENT_BLACKPEARL"
+      "item": "#REAGENT_BLACKPEARL"
     },
     "D": {
-      "type": "#REAGENT_MANIDUST"
+      "item": "#REAGENT_MANIDUST"
     }
   }
 }

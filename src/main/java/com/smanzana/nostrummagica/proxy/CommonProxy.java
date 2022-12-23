@@ -102,7 +102,10 @@ import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.AtFeetTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.AuraTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.BeamTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.CasterTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.DamagedTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.DelayTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.FieldTrigger;
@@ -231,6 +234,9 @@ public class CommonProxy {
     	SpellTrigger.register(WallTrigger.instance());
     	SpellTrigger.register(MortarTrigger.instance());
     	SpellTrigger.register(FieldTrigger.instance());
+    	SpellTrigger.register(AtFeetTrigger.instance());
+    	SpellTrigger.register(AuraTrigger.instance());
+    	SpellTrigger.register(CasterTrigger.instance());
     }
     
     @SubscribeEvent

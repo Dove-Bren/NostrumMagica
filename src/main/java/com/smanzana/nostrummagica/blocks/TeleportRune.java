@@ -56,7 +56,7 @@ public class TeleportRune extends BlockContainer  {
 	}
 	
 	public TeleportRune() {
-		super(Material.CIRCUITS, MapColor.OBSIDIAN);
+		super(Material.CLOTH, MapColor.OBSIDIAN);
 		this.setUnlocalizedName(ID);
 		this.setHardness(5.0f);
 		this.setResistance(5.0f);

@@ -85,7 +85,7 @@ public class PositionToken extends PositionCrystal {
 		if (canPerformRecall(playerIn, worldIn, token)) {
 			// Try to do actual recall
 			BlockPos pos = getBlockPosition(token);
-			if (NostrumMagica.attemptTeleport(worldIn, pos, playerIn, true, NostrumMagica.rand.nextInt(32) == 0)) {
+			if (NostrumMagica.attemptTeleport(worldIn, pos, playerIn, !playerIn.isSneaking(), NostrumMagica.rand.nextInt(32) == 0)) {
 				// If success, take mana andreturn true
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn); // assumption: not null!
 				attr.addMana(-getManaCost(playerIn, worldIn, token));
@@ -119,7 +119,9 @@ public class PositionToken extends PositionCrystal {
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
 		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		if (PositionToken.hasRecallUnlocked(playerIn, worldIn, itemStackIn)) {
-			doRecall(playerIn, worldIn, itemStackIn);
+			if (!worldIn.isRemote) {
+				doRecall(playerIn, worldIn, itemStackIn);
+			}
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
 		} else if (playerIn.isCreative()) {
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);

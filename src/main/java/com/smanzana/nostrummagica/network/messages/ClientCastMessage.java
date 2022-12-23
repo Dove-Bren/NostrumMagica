@@ -108,7 +108,13 @@ public class ClientCastMessage implements IMessage {
 					}
 				}
 				
+				if (isScroll) {
+					// Scrolls cost no reagents
+					summary.addReagentCost(-summary.getReagentCost());
+				}
+				
 				// Cap enhancements at 80% LRC
+				if (!isScroll)
 				{
 					float lrc = summary.getReagentCost();
 					if (lrc < .2f)

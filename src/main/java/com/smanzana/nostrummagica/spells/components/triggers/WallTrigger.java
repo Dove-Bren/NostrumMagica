@@ -15,6 +15,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -34,7 +35,7 @@ public class WallTrigger extends TriggerAreaTrigger {
 		private double maxZ;
 		
 		public WallTriggerInstance(SpellState state, World world, Vec3d pos, boolean northsouth, float radius, boolean continuous) {
-			super(state, world, new Vec3d(Math.floor(pos.x) + .5, pos.y, Math.floor(pos.z) + .5), TICK_RATE, NUM_TICKS, radius + .75f, continuous);
+			super(state, world, new Vec3d(Math.floor(pos.x) + .5, pos.y, Math.floor(pos.z) + .5), TICK_RATE, NUM_TICKS, radius + .75f, continuous, false);
 			this.radius = radius;
 			this.northsouth = northsouth;
 		}
@@ -62,6 +63,11 @@ public class WallTrigger extends TriggerAreaTrigger {
 			return entity.posX >= this.minX && entity.posX <= this.maxX
 					&& entity.posZ >= this.minZ && entity.posZ <= this.maxZ
 					&& entity.posY >= Math.floor(this.pos.y) && entity.posY <= Math.floor(this.pos.y) + 2;
+		}
+
+		@Override
+		protected boolean isInArea(World world, BlockPos pos) {
+			return false;
 		}
 
 		@Override

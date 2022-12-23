@@ -285,6 +285,8 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.registerKeyBinding(bindingPetAttack);
 		bindingPetAllStop = new KeyBinding("key.pet.stopall.desc", Keyboard.KEY_L, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingPetAllStop);
+		bindingPetAllStop = new KeyBinding("key.pet.stopall.desc", Keyboard.KEY_L, "key.nostrummagica.desc");
+		ClientRegistry.registerKeyBinding(bindingPetAllStop);
 		
 		
     	

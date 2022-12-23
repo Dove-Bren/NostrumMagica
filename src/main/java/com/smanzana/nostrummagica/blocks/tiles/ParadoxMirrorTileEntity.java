@@ -211,7 +211,10 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickable, IA
 		Vec3d spawnLoc = getSpawnLocation();
 		Vec3d spawnVelocity = getSpawnVelocity();
 		EntityItem entity = new EntityItem(getWorld(), spawnLoc.x, spawnLoc.y, spawnLoc.z, stack);
-		entity.setVelocity(spawnVelocity.x, spawnVelocity.y, spawnVelocity.z);
+		entity.motionX = spawnVelocity.x;
+		entity.motionY = spawnVelocity.y;
+		entity.motionZ = spawnVelocity.z;
+		entity.velocityChanged = true;
 		
 		receivedEntities.add(entity);
 		getWorld().spawnEntity(entity);

@@ -168,6 +168,9 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
+import com.smanzana.nostrummagica.spells.components.triggers.AtFeetTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.AuraTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.CasterTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.FieldTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.MortarTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
@@ -199,7 +202,6 @@ import net.minecraft.entity.MultiPartEntityPart;
 import net.minecraft.entity.ai.EntityAIFollowOwner;
 import net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.entity.player.EntityPlayer;
@@ -236,7 +238,7 @@ import net.minecraftforge.oredict.OreDictionary;
 public class NostrumMagica
 {
     public static final String MODID = "nostrummagica";
-    public static final String VERSION = "1.12.2-1.8.4";
+    public static final String VERSION = "1.12.2-1.8.7";
 	public static final Random rand = new Random();
     
     @SidedProxy(clientSide="com.smanzana.nostrummagica.proxy.ClientProxy", serverSide="com.smanzana.nostrummagica.proxy.CommonProxy")
@@ -1153,6 +1155,17 @@ public class NostrumMagica
 					new OutcomeSpawnItem(WarlockSword.addCapacity(new ItemStack(WarlockSword.instance()), 10)))
 				);
 		
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("create_seeking_gem",
+						new ItemStack(ShrineSeekingGem.instance()),
+						null,
+						new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.GINSENG, ReagentType.GRAVE_DUST, ReagentType.BLACK_PEARL},
+						new ItemStack(Items.ENDER_EYE),
+						new ItemStack[] {new ItemStack(Items.GOLD_INGOT), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), new ItemStack(Items.GOLD_INGOT)},
+						new RRequirementResearch("seeking_gems"),
+						new OutcomeSpawnItem(new ItemStack(ShrineSeekingGem.instance())))
+				);
+		
 		// Rituals for base the magic armors and weapons
 		for (EMagicElement elem : EMagicElement.values())
 		for (int i = 0; i < 3; i++) // Note: only 3. True versions are below
@@ -1671,6 +1684,9 @@ public class NostrumMagica
     			null, null, wrapAttribute(AwardType.REGEN, 0.0050f));
     	new NostrumQuest("lvl2-con", QuestType.REGULAR, 3, 1, 0, 0, new String[]{"lvl1"},
     			null, null, wrapAttribute(AwardType.COST, -0.005f));
+    	new NostrumQuest("lvl2", QuestType.REGULAR, 3, 0, 0, 0, new String[]{"lvl2-fin", "lvl2-con"},
+    			null, null,
+    			new IReward[] {new TriggerReward(AtFeetTrigger.instance())});
     	new NostrumQuest("lvl3", QuestType.CHALLENGE, 4, 0, 0, 0, new String[]{"lvl2-fin", "lvl2-con"},
     			null, new ObjectiveRitual("magic_token"),
     			wrapAttribute(AwardType.MANA, 0.005f));
@@ -1704,6 +1720,9 @@ public class NostrumMagica
     	new NostrumQuest("lvl7", QuestType.CHALLENGE, 7, 0, 0, 0, new String[]{"lvl6-con", "lvl6-fin"},
     			null, new ObjectiveRitual("kani"),
     			wrapAttribute(AwardType.MANA, 0.020f));
+    	new NostrumQuest("lvl8", QuestType.CHALLENGE, 8, 0, 0, 0, new String[]{"lvl7"},
+    			null, null,
+    			new IReward[] {new TriggerReward(AuraTrigger.instance())});
     	new NostrumQuest("lvl8-fin3", QuestType.REGULAR, 8, 0, 0, 3, new String[]{"lvl7"},
     			null, null, wrapAttribute(AwardType.COST, -0.005f));
     	new NostrumQuest("lvl8-fin5", QuestType.REGULAR, 8, 0, 0, 5, new String[]{"lvl7"},
@@ -1870,6 +1889,13 @@ public class NostrumMagica
     			new String[]{"fin5"},
     			null, null,
     			wrapAttribute(AwardType.REGEN, 0.075f));
+    	new NostrumQuest("fin2-tec1", QuestType.CHALLENGE, 0,
+    			0, // Control
+    			1, // Technique
+    			2, // Finesse
+    			new String[]{"fin1"},
+    			null, null,
+    			new IReward[] {new TriggerReward(CasterTrigger.instance())});
     	new NostrumQuest("fin5-tec2", QuestType.CHALLENGE, 0,
     			0, // Control
     			2, // Technique
@@ -2244,6 +2270,11 @@ public class NostrumMagica
 			.lore(NostrumResourceItem.instance())
 			.reference("ritual::vani", "ritual.vani.name")
 		.build("vani", NostrumResearchTab.MYSTICISM, Size.LARGE, -1, 2, true, NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1));
+		
+		NostrumResearch.startBuilding()
+			.parent("kani")
+			.reference("ritual::create_seeking_gem", "ritual.create_seeking_gem.name")
+		.build("seeking_gems", NostrumResearchTab.MYSTICISM, Size.NORMAL, 0, 1, true, new ItemStack(ShrineSeekingGem.instance()));
 		
 		NostrumResearch.startBuilding()
 			.hiddenParent("magic_token")
@@ -3041,9 +3072,21 @@ public class NostrumMagica
 			}
 		}
 		
+		if (ent2 instanceof IEntityOwnable) {
+			IEntityOwnable tamed = (IEntityOwnable) ent2;
+			@Nullable Entity owner = tamed.getOwner();
+			if (owner != null && owner instanceof EntityLivingBase) {
+				// Are they on the same team as our owner?
+				return IsSameTeam(ent1, (EntityLivingBase) owner);
+			}
+		}
+		
 		// Non-ownable entities with no teams involved.
 		// Assume mobs are on a different team than anything else
-		return (ent1 instanceof IMob == ent2 instanceof IMob);
+		//return (ent1 instanceof IMob == ent2 instanceof IMob);
+		
+		// More hostile; assume anything here is not on same team
+		return false;
 	}
     
     public static @Nullable EntityLivingBase resolveEntityLiving(@Nullable Entity entityOrSubEntity) {

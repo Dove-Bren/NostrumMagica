@@ -20,7 +20,7 @@ public class SpellIcon {
 
 	public static final ResourceLocation TEX = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/spellicons.png");
 	
-	public static final int numIcons = 56;
+	public static final int numIcons = 59;
 	
 	private static final int TEX_WIDTH = 256;
 	private static final int TEX_ICON_WIDTH = 32;
