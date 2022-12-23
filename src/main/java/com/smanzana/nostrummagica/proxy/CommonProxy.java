@@ -53,7 +53,9 @@ import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBossBramble;
 import com.smanzana.nostrummagica.fluids.FluidPoisonWater;
 import com.smanzana.nostrummagica.fluids.FluidPoisonWater.FluidPoisonWaterBlock;
 import com.smanzana.nostrummagica.fluids.NostrumFluids;
+import com.smanzana.nostrummagica.integration.aetheria.items.AetherResourceType;
 import com.smanzana.nostrummagica.items.NostrumItems;
+import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
@@ -77,7 +79,9 @@ import com.smanzana.nostrummagica.potions.MagicBoostPotion;
 import com.smanzana.nostrummagica.potions.MagicBuffPotion;
 import com.smanzana.nostrummagica.potions.MagicResistPotion;
 import com.smanzana.nostrummagica.potions.MagicShieldPotion;
+import com.smanzana.nostrummagica.potions.ManaRegenPotion;
 import com.smanzana.nostrummagica.potions.NaturesBlessingPotion;
+import com.smanzana.nostrummagica.potions.NostrumPotionTypes;
 import com.smanzana.nostrummagica.potions.NostrumTransformationPotion;
 import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
 import com.smanzana.nostrummagica.potions.RootedPotion;
@@ -136,9 +140,14 @@ import net.minecraft.entity.EntityTracker;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Items;
+import net.minecraft.init.PotionTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionHelper;
+import net.minecraft.potion.PotionType;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
@@ -255,9 +264,37 @@ public class CommonProxy {
     	registry.register(LightningAttackPotion.instance());
     	registry.register(NaturesBlessingPotion.instance());
     	registry.register(NostrumTransformationPotion.instance());
+    	registry.register(ManaRegenPotion.instance());
     }
     
-   
+    @SubscribeEvent
+	public void registerPotionTypes(RegistryEvent.Register<PotionType> event) {
+    	final IForgeRegistry<PotionType> registry = event.getRegistry();
+		
+    	NostrumPotionTypes.register(registry);
+    	
+    	// Is this the right time to register brewing recipes?
+    	registerPotionMixes();
+    }
+    
+    private void registerPotionMixes() {
+    	
+    	// Mana regen potion
+    	ItemStack ingredStack = ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1);
+    	PotionHelper.addMix(PotionTypes.THICK, Ingredient.fromStacks(ingredStack), NostrumPotionTypes.MANAREGEN.getType());
+    	ingredStack = new ItemStack(Items.REDSTONE);
+    	PotionHelper.addMix(NostrumPotionTypes.MANAREGEN.getType(), Ingredient.fromStacks(ingredStack), NostrumPotionTypes.MANAREGEN_EXTENDED.getType());
+    	ingredStack = new ItemStack(Items.GLOWSTONE_DUST);
+    	PotionHelper.addMix(NostrumPotionTypes.MANAREGEN.getType(), Ingredient.fromStacks(ingredStack), NostrumPotionTypes.MANAREGEN_STRONG.getType());
+    	
+    	if (NostrumMagica.aetheria.isEnabled()) {
+    		ingredStack = NostrumMagica.aetheria.getResourceItem(AetherResourceType.FLOWER_MANDRAKE, 1);
+    		PotionHelper.addMix(NostrumPotionTypes.MANAREGEN_STRONG.getType(), Ingredient.fromStacks(ingredStack), NostrumPotionTypes.MANAREGEN_REALLY_STRONG.getType());
+    	
+    		ingredStack = NostrumMagica.aetheria.getResourceItem(AetherResourceType.FLOWER_GINSENG, 1);
+    		PotionHelper.addMix(NostrumPotionTypes.MANAREGEN_STRONG.getType(), Ingredient.fromStacks(ingredStack), NostrumPotionTypes.MANAREGEN_STRONG_AND_LONG.getType());
+    	}
+    }
     
     @SubscribeEvent
     public void registerEntities(RegistryEvent.Register<EntityEntry> event) {

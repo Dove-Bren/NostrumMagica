@@ -16,6 +16,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicPotency;
 import com.smanzana.nostrummagica.attributes.AttributeMagicReduction;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
+import com.smanzana.nostrummagica.attributes.AttributeManaRegen;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
 import com.smanzana.nostrummagica.blocks.TeleportRune;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -977,6 +978,7 @@ public class PlayerListener {
 			EntityLivingBase living = (EntityLivingBase) ent;
 			living.getAttributeMap().registerAttribute(AttributeMagicResist.instance());
 			living.getAttributeMap().registerAttribute(AttributeMagicPotency.instance());
+			living.getAttributeMap().registerAttribute(AttributeManaRegen.instance());
 			for (EMagicElement elem : EMagicElement.values()) {
 				living.getAttributeMap().registerAttribute(AttributeMagicReduction.instance(elem));
 			}
@@ -1060,6 +1062,7 @@ public class PlayerListener {
 		
 		// Pull in character regen bonus
 		bonus += (stats.getManaRegenModifier());
+		bonus += (player.getEntityAttribute(AttributeManaRegen.instance()).getAttributeValue()/100.0);
 		
 		int mana = 1 + (int) (bonus);
 		bonus = bonus - (int) bonus;

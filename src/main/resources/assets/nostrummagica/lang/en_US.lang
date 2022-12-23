@@ -368,7 +368,18 @@ potion.magicbuff.name=Magic Strikes
 potion.lightningcharge.name=Lightning Charge
 potion.lightningattack.name=Lightning Fury
 potion.naturesblessing.name=Nature's Blessing
-potion.transformation.name=Transformation  Ready
+potion.transformation.name=Transformation Ready
+potion.mana-regen.name=Mana Regen
+
+effect.mana-regen=Mana Regen
+
+tipped_arrow.effect.mana-regen=Arrow of Mana Regen
+
+potion.effect.mana-regen=Potion of Mana Regen
+
+splash_potion.effect.mana-regen=Splash Potion of Mana Regen
+
+lingering_potion.effect.mana-regen=Linger Potion of Mana Regen
 
 tile.magic_wall.name=Magic Wall
 tile.mani_ore.name=Mani Ore
@@ -470,6 +481,7 @@ attribute.name.nostrummagica.magic_reduct_ender=Ender Magic Reduction
 attribute.name.nostrummagica.magic_reduct_lightning=Lightning Magic Reduction
 attribute.name.nostrummagica.magic_reduct_physical=Physical Magic Reduction
 attribute.name.nostrummagica.magic_potency=Magic Potency
+attribute.name.nostrummagica.mana_regen=Mana Regen
 
 config.nostrummagica.display=Display Options
 config.nostrummagica.display.display_bar=Mana Bar

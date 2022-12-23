@@ -21,6 +21,7 @@ public enum PotionIcon {
 	LIGHTNINGMOVE(8, 0),
 	LIGHTNINGATTACK(9, 0),
 	NATURESBLESSING(10, 0),
+	MANAREGEN(11, 0),
 	;
 	
 	private static final ResourceLocation text = new ResourceLocation(
