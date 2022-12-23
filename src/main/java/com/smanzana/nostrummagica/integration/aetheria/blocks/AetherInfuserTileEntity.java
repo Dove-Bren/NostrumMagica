@@ -23,6 +23,8 @@ import com.smanzana.nostrummagica.utils.WorldUtil;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.IEntityOwnable;
+import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -35,9 +37,12 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.event.world.BlockEvent.EntityPlaceEvent;
 import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.fml.common.eventhandler.Event.Result;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -238,6 +243,8 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 								}
 							}
 						}
+					} else if (this.hasMobSpawnPrevention()) {
+						; // No work to do here but don't want to tick lens either
 					} else {
 						// Do whatever lense says to do
 						ItemStack lensItem = centerAltar.getItem();
@@ -489,6 +496,21 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 		}
 		
 		/**
+		 * Whether this infuser should prevent nearby mob spawns
+		 * @return
+		 */
+		public boolean hasMobSpawnPrevention() {
+			if (hasLens()) {
+				ItemStack held = centerAltar.getItem();
+				return !held.isEmpty()
+						&& held.getItem() instanceof ItemAetherLens
+						&& (ItemAetherLens.TypeFromMeta(held.getMetadata()) == LensType.NO_SPAWN);
+			}
+			
+			return false;
+		}
+		
+		/**
 		 * Area to remotely charge player's inventories
 		 * @return
 		 */
@@ -518,11 +540,67 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 			return 20; // Make upgradeable?
 		}
 		
+		public int getMobSpawnProtectionRadius() {
+			return 50; // Make upgradeable?
+		}
+		
 		protected void onInfuseAreaChange() {
 			if (!hasAreaInfuse()) {
 				this.nearbyChargeables.clear();
 			} else {
 				this.refreshNearbyBlocks();
+			}
+		}
+		
+		@SubscribeEvent(priority=EventPriority.LOWEST)
+		public void onMobSpawn(LivingSpawnEvent.CheckSpawn event) {
+			if (event.getResult() != Result.DEFAULT) {
+				return;
+			}
+			
+			if (!this.hasMobSpawnPrevention()
+					|| event.isSpawner()
+					|| event.getWorld() != this.world
+					|| event.getEntityLiving() == null
+					|| !event.getEntityLiving().isNonBoss()
+					) {
+				event.setResult(Result.DEFAULT);
+				return;
+			}
+			
+			// We have to have aether
+			if (this.getCharge() <= 0) {
+				event.setResult(Result.DEFAULT);
+				return;
+			}
+			
+			final EntityLivingBase entity = event.getEntityLiving();
+			
+			// Figure out what to not allow through
+			boolean isBad = false;
+			if (entity instanceof EntityMob) {
+				isBad = true;
+				
+				// But make an exception for 'tameable' mobs
+				if (entity instanceof IEntityOwnable) {
+					isBad = false;
+				}
+			}
+			
+			event.setResult(Result.DEFAULT);
+			
+			if (isBad) {
+				final double radius = this.getMobSpawnProtectionRadius();
+				if (entity.getDistance(pos.getX() + .5, pos.getY(), pos.getZ() + .5) < radius) {
+					event.setResult(Result.DENY);
+					
+					// Mob spawning happens a lot (and in bursts, or continuously if there's a spawner)
+					// so make most prevents free
+					if (NostrumMagica.rand.nextInt(20) == 0) {
+						this.getHandler().drawAether(null, 1);
+						AetherInfuserTileEntity.DoChargeEffect(world, pos.up().up(), 1, 0xFF807020);
+					}
+				}
 			}
 		}
 		

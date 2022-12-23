@@ -6,7 +6,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.entity.IMagicEntity;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileEntity;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.IAetherInfuserLens;
@@ -14,6 +16,7 @@ import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.potions.NostrumPotionTypes;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -53,6 +56,8 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 		HEAL("heal", false, 5, 0, PotionUtils.addPotionToItemStack(new ItemStack(Items.POTIONITEM), PotionTypes.HEALING)), // aether taken per entity
 		BORE("bore", false, 20, 50, new ItemStack(Items.DIAMOND_PICKAXE, 1, OreDictionary.WILDCARD_VALUE)),
 		BORE_REVERSED("bore_reversed", false, 20, 50, ItemStack.EMPTY),
+		MANA_REGEN("mana_regen", false, 20, 0, PotionUtils.addPotionToItemStack(new ItemStack(Items.POTIONITEM), NostrumPotionTypes.MANAREGEN.getType())),
+		NO_SPAWN("no_spawn", true, 1, 0, new ItemStack(Blocks.EMERALD_BLOCK)),
 		;
 		
 		private final String unlocName; // unlocalized name fragment
@@ -222,8 +227,13 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 		case SWIFTNESS:
 			cost = doSwiftness(world, pos, maxAether);
 			break;
+		case MANA_REGEN:
+			cost = doManaRegen(world, pos, maxAether);
+			break;
+		// Master lenses
 		case SPREAD:
 		case CHARGE:
+		case NO_SPAWN:
 			cost = 0;
 			break;
 		}
@@ -344,6 +354,35 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 	
 	protected int doBoreReversed(World world, BlockPos center, int maxAether) {
 		return doBoreInternal(world, center, maxAether, false) ? LensType.BORE_REVERSED.getAetherPerTick() : 0;
+	}
+	
+	protected int doManaRegen(World world, BlockPos center, int maxAether) {
+		final double MAX_DIST_SQ = 900;
+		final int MANA_PER_AETHER = 10;
+		int cost = 0;
+		for (EntityLivingBase ent : world.getEntities(EntityLivingBase.class, (e) -> {
+			return !e.isDead
+					&& (e instanceof EntityPlayer || (e instanceof IMagicEntity))
+					&& e.getDistanceSq(center) < MAX_DIST_SQ;
+		})) {
+			if (ent instanceof EntityPlayer) {
+				INostrumMagic attr = NostrumMagica.getMagicWrapper(ent);
+				if (attr.getMana() < attr.getMaxMana()) {
+					cost++;
+					attr.addMana(MANA_PER_AETHER);
+					AetherInfuserTileEntity.DoChargeEffect(ent, 1, 0xFFBB6DFF);
+				}
+			} else /* if (ent instanceof IMagicEntity) */ {
+				IMagicEntity ment = (IMagicEntity) ent;
+				if (ment.getMana() < ment.getMaxMana()) {
+					cost++;
+					ment.addMana(MANA_PER_AETHER);
+					AetherInfuserTileEntity.DoChargeEffect(ent, 1, 0xFFBB6DFF);
+				}
+			}
+			
+		}
+		return cost;
 	}
 
 }

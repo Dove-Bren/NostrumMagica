@@ -339,13 +339,17 @@ item.lens_grow.desc=Grows nearby crops
 item.lens_swiftness.name=Speed Lens
 item.lens_swiftness.desc=Gives a speed effect to nearby players
 item.lens_elevator.name=Elevator Lens
-item.lens_elevator.desc=Lifts any non-sneaking jumping players around the lense
-item.lens_heal.name=Heal Lense
+item.lens_elevator.desc=Lifts any non-sneaking jumping players around the lens
+item.lens_heal.name=Heal Lens
 item.lens_heal.desc=Heals nearby players
 item.lens_bore.name=Bore Lens
-item.lens_bore.desc=Digs a large hole under the lense
+item.lens_bore.desc=Digs a large hole under the lens
 item.lens_bore_reversed.name=Reversed Bore Lens
 item.lens_bore_reversed.desc=Digs up instead of down
+item.lens_mana_regen.name=Mana Regen Lens
+item.lens_mana_regen.desc=Restores mana to nearby magic entities
+item.lens_no_spawn.name=Anti-Spawn Lens
+item.lens_no_spawn.desc=Prevents mob spawning in a large area around the lens
 
 item.lens.master=Master Lens
 
@@ -1140,10 +1144,12 @@ ritual.construct_aether_infuser.name=Construct Aether Infuser
 ritual.make_lens_spread.name=Make Spread Lens
 ritual.make_lens_wide_charge.name=Make Charge Lens
 ritual.make_lens_grow.name=Make Growth Lens
-ritual.make_lens_swiftness.name=Make Speed Lense
+ritual.make_lens_swiftness.name=Make Speed Lens
 ritual.make_lens_elevator.name=Make Elevator Lens
 ritual.make_lens_heal.name=Make Heal Lens
 ritual.make_lens_bore.name=Make Bore Lens
+ritual.make_lens_mana_regen.name=Make Mana Regen Lens
+ritual.make_lens_no_spawn.name=Make Anti-Spawn Lens
 
 ritual.revive_soulbound_pet_dragon.name=Revive Soulbound Pet
 ritual.revive_soulbound_pet_wolf.name=Revive Soulbound Pet
