@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
+import com.smanzana.nostrummagica.attributes.AttributeManaRegen;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
@@ -675,6 +676,10 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		if (this.ticksExisted % 20 == 0) {
 			if (this.getMaxMana() > 0 && this.getMana() < this.getMaxMana()) {
 				float amt = this.getManaRegen();
+				
+				// Augment with bonuses
+				amt += this.getEntityAttribute(AttributeManaRegen.instance()).getAttributeValue() / 100.0;
+				
 				int mana = (int) (amt);
 				amt = amt - mana; // Get fraction
 				if (amt > 0f && NostrumMagica.rand.nextFloat() < amt)

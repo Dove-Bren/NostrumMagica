@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.attributes.AttributeManaRegen;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
@@ -1449,6 +1450,10 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			if (this.ticksExisted % 20 == 0) {
 				if (this.getDragonMana() > 0 && this.getCurrentMana() < this.getDragonMana()) {
 					float amt = this.getManaRegen();
+					
+					// Augment with bonuses
+					amt += this.getEntityAttribute(AttributeManaRegen.instance()).getAttributeValue() / 100.0;
+					
 					int mana = (int) (amt);
 					amt = amt - (int) amt;
 					if (amt > 0f && NostrumMagica.rand.nextFloat() < amt)
