@@ -138,7 +138,7 @@ public class MagicWall extends Block {
 	@Override
 	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
 			int decay = state.getValue(DECAY) + 1;
-			if (decay >= 4) {
+			if (decay >= 1) {
 				worldIn.setBlockToAir(pos);
 			} else {
 				worldIn.setBlockState(pos, state.withProperty(DECAY, decay));
@@ -163,5 +163,9 @@ public class MagicWall extends Block {
 		}
 		
     }
+	
+	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
+		super.onBlockAdded(worldIn, pos, state);
+	}
 
 }
