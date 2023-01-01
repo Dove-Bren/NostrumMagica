@@ -3016,6 +3016,11 @@ public class NostrumMagica
 		// Assume mobs are on a different team than anything else
 		//return (ent1 instanceof IMob == ent2 instanceof IMob);
 		
+		// If both are players and teams aren't involved, assume they can work together
+		if (ent1 instanceof EntityPlayer && ent2 instanceof EntityPlayer) {
+			return true;
+		}
+		
 		// More hostile; assume anything here is not on same team
 		return false;
 	}
