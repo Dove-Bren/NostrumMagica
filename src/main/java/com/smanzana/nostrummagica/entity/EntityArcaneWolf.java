@@ -1892,7 +1892,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 	
 	protected void onWolfCast(Spell spell, int cost) {
 		if (getTrainingElement() == spell.getPrimaryElement()) {
-			addTrainingXP(Math.max(1, (int)Math.ceil((float)cost/25f)));
+			addTrainingXP(2 * Math.max(1, (int)Math.ceil((float)cost/25f)));
 		}
 	}
 	

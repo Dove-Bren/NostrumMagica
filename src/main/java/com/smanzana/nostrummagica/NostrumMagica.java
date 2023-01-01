@@ -148,6 +148,7 @@ import com.smanzana.nostrummagica.rituals.outcomes.OutcomeCreateTome;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeMark;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomePotionEffect;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeRecall;
+import com.smanzana.nostrummagica.rituals.outcomes.OutcomeReviveSoulboundPet;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnEntity;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnEntity.IEntityFactory;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
@@ -1535,42 +1536,7 @@ public class NostrumMagica
 					new ItemStack(DragonSoulItem.instance()),
 					new ItemStack[] {ItemStack.EMPTY, NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), new ItemStack(Items.EGG), ItemStack.EMPTY},
 					new RRequirementResearch("soulbound_pets"),
-					new OutcomeSpawnEntity(new IEntityFactory() {
-						@Override
-						public void spawn(World world, Vec3d pos, EntityPlayer invoker, ItemStack centerItem) {
-							PetSoulItem.SpawnPet(centerItem, world, pos.addVector(0, 1, 0));
-//							EntityKoid koid = new EntityKoid(world);
-//							koid.setPosition(pos.x, pos.y, pos.z);
-//							world.spawnEntity(koid);
-//							koid.setAttackTarget(invoker);
-						}
-
-						@Override
-						public String getEntityName() {
-							return "entity.nostrummagica.placeholder.soulbound.name";
-						}
-					}, 1) {
-					@Override
-					public boolean canPerform(World world, EntityPlayer player, BlockPos center, RitualMatchInfo ingredients) {
-						// Must have PetSoulItem in center, and must have valid soul.
-						if (ingredients.center.isEmpty() || !(ingredients.center.getItem() instanceof PetSoulItem)) {
-							player.sendMessage(new TextComponentTranslation("info.respawn_soulbound_pet.fail.baditem", new Object[0]));
-							return false;
-						}
-						
-						PetSoulItem item = (PetSoulItem) ingredients.center.getItem();
-						if (item.getPetSoulID(ingredients.center) == null) {
-							player.sendMessage(new TextComponentTranslation("info.respawn_soulbound_pet.fail.baditem", new Object[0]));
-							return false;
-						}
-						
-						if (!item.canSpawnEntity(world, player, new Vec3d(center), ingredients.center)) {
-							return false;
-						}
-						
-						return true;
-					}
-				})	
+					new OutcomeReviveSoulboundPet())	
 			);
 		
 		// Wolf revive
@@ -1582,42 +1548,7 @@ public class NostrumMagica
 					new ItemStack(ArcaneWolfSoulItem.instance()),
 					new ItemStack[] {ItemStack.EMPTY, NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), new ItemStack(Items.EGG), ItemStack.EMPTY},
 					new RRequirementResearch("soulbound_pets"),
-					new OutcomeSpawnEntity(new IEntityFactory() {
-						@Override
-						public void spawn(World world, Vec3d pos, EntityPlayer invoker, ItemStack centerItem) {
-							PetSoulItem.SpawnPet(centerItem, world, pos.addVector(0, 1, 0));
-//							EntityKoid koid = new EntityKoid(world);
-//							koid.setPosition(pos.x, pos.y, pos.z);
-//							world.spawnEntity(koid);
-//							koid.setAttackTarget(invoker);
-						}
-
-						@Override
-						public String getEntityName() {
-							return "entity.nostrummagica.placeholder.soulbound.name";
-						}
-					}, 1) {
-					@Override
-					public boolean canPerform(World world, EntityPlayer player, BlockPos center, RitualMatchInfo ingredients) {
-						// Must have PetSoulItem in center, and must have valid soul.
-						if (ingredients.center.isEmpty() || !(ingredients.center.getItem() instanceof PetSoulItem)) {
-							player.sendMessage(new TextComponentTranslation("info.respawn_soulbound_pet.fail.baditem", new Object[0]));
-							return false;
-						}
-						
-						PetSoulItem item = (PetSoulItem) ingredients.center.getItem();
-						if (item.getPetSoulID(ingredients.center) == null) {
-							player.sendMessage(new TextComponentTranslation("info.respawn_soulbound_pet.fail.baditem", new Object[0]));
-							return false;
-						}
-						
-						if (!item.canSpawnEntity(world, player, new Vec3d(center), ingredients.center)) {
-							return false;
-						}
-						
-						return true;
-					}
-				})	
+					new OutcomeReviveSoulboundPet())
 			);
 		
 		// Soul dagger

@@ -97,6 +97,8 @@ public class DragonSoulItem extends PetSoulItem {
 			dragon.setHealth(Math.max(1, maxHP/2));
 			dragon.addMana(-mana);
 		}
+		
+		setMana(stack, 0);
 	}
 	
 	@Override

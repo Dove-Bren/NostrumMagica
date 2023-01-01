@@ -95,6 +95,8 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 			wolf.setHealth(Math.max(1, maxHP/2));
 			wolf.addMana(-mana);
 		}
+		
+		setMana(stack, 0);
 	}
 	
 	@Override
