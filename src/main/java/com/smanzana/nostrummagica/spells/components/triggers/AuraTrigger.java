@@ -176,13 +176,15 @@ public class AuraTrigger extends TriggerAreaTrigger {
 	
 	@Override
 	public int getManaCost() {
-		return 60;
+		return 300;
 	}
 
 	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return NonNullList.from(ItemStack.EMPTY,
 				ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1),
+				ReagentItem.instance().getReagent(ReagentType.BLACK_PEARL, 1),
+				ReagentItem.instance().getReagent(ReagentType.CRYSTABLOOM, 1),
 				ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1));
 	}
 

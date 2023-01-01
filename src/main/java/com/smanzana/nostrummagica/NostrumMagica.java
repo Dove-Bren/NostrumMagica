@@ -96,7 +96,6 @@ import com.smanzana.nostrummagica.items.NostrumRoseItem;
 import com.smanzana.nostrummagica.items.NostrumRoseItem.RoseType;
 import com.smanzana.nostrummagica.items.NostrumSkillItem;
 import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
-import com.smanzana.nostrummagica.items.PetSoulItem;
 import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
@@ -136,7 +135,6 @@ import com.smanzana.nostrummagica.research.NostrumResearch.NostrumResearchTab;
 import com.smanzana.nostrummagica.research.NostrumResearch.Size;
 import com.smanzana.nostrummagica.research.NostrumResearch.SpellSpec;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
-import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.rituals.outcomes.IRitualOutcome;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeApplyTransformation;
@@ -215,7 +213,6 @@ import net.minecraft.potion.Potion;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
@@ -1653,7 +1650,7 @@ public class NostrumMagica
     			wrapAttribute(AwardType.MANA, 0.020f));
     	new NostrumQuest("lvl8", QuestType.CHALLENGE, 8, 0, 0, 0, new String[]{"lvl7"},
     			null, null,
-    			new IReward[] {new TriggerReward(AuraTrigger.instance())});
+    			new IReward[] {new TriggerReward(FieldTrigger.instance())});
     	new NostrumQuest("lvl8-fin3", QuestType.REGULAR, 8, 0, 0, 3, new String[]{"lvl7"},
     			null, null, wrapAttribute(AwardType.COST, -0.005f));
     	new NostrumQuest("lvl8-fin5", QuestType.REGULAR, 8, 0, 0, 5, new String[]{"lvl7"},
@@ -1669,7 +1666,7 @@ public class NostrumMagica
     	new NostrumQuest("lvl10", QuestType.REGULAR, 10, 0, 0, 0, new String[]{"lvl8-con3", "lvl8-fin3"},
     			null, null, wrapAttribute(AwardType.MANA, 0.100f));
     	new NostrumQuest("lvl12", QuestType.REGULAR, 12, 0, 0, 0, new String[]{"lvl10"},
-    			null, null, new IReward[] {new TriggerReward(FieldTrigger.instance())});
+    			null, null, new IReward[] {new TriggerReward(AuraTrigger.instance())});
     	
     	new NostrumQuest("con1", QuestType.REGULAR, 0,
     			1, // Control
