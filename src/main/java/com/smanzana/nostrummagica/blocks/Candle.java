@@ -197,19 +197,8 @@ public class Candle extends Block implements ITileEntityProvider {
 					new NetworkRegistry.TargetPoint(world.provider.getDimension(), pos.getX(), pos.getY(), pos.getZ(), 64));
 		}
     	
-    	if (!force && world.getBlockState(pos.add(0, -1, 0)).getBlock()
-				.isFireSource(world, pos.add(0, -1, 0), EnumFacing.UP)) {
-			
-			if (!world.isUpdateScheduled(pos, state.getBlock())) {
-				world.scheduleUpdate(pos, state.getBlock(), TICK_DELAY);
-			}
-			return;
-    	}
-    	
-    	if (!force && world.getBlockState(pos.add(0, -2, 0)).getBlock()
-				.isFireSource(world, pos.add(0, -2, 0), EnumFacing.UP)) {
-			
-			if (!world.isUpdateScheduled(pos, state.getBlock())) {
+    	if (!force && Candle.IsCandleEnhanced(world, pos)) {
+    		if (!world.isUpdateScheduled(pos, state.getBlock())) {
 				world.scheduleUpdate(pos, state.getBlock(), TICK_DELAY);
 			}
 			return;
@@ -409,6 +398,26 @@ public class Candle extends Block implements ITileEntityProvider {
 			this.dropBlockAsItem(worldIn, pos, state, 0);
 			worldIn.setBlockToAir(pos);
 		}
+	}
+	
+	public static boolean IsCandleEnhancingBlock(World world, BlockPos pos, IBlockState state) {
+		return state.getBlock().isFireSource(world, pos, EnumFacing.UP);
+	}
+	
+	public static boolean IsCandleEnhanced(World world, BlockPos candlePos) {
+		BlockPos[] positions = {
+				candlePos.down(),
+				candlePos.down().down(),
+			};
+			
+		for (BlockPos cursor: positions) {
+			IBlockState state = world.getBlockState(cursor);
+			if (state != null && Candle.IsCandleEnhancingBlock(world, cursor, state)) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 }

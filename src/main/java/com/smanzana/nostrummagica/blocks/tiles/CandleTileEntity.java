@@ -92,7 +92,10 @@ public class CandleTileEntity extends TileEntity implements ITickable {
 	
 	@Override
 	public void update() {
-		this.lifeTicks = Math.max(-1, this.lifeTicks-1);
+		// If no enhancing block is present, tick down life ticks to eventually consume reagent
+		if (!isEnhanced()) {
+			this.lifeTicks = Math.max(-1, this.lifeTicks-1);
+		}
 		
 		if (this.lifeTicks == 0 && !world.isRemote) {
 			IBlockState state = world.getBlockState(this.pos);
@@ -106,5 +109,9 @@ public class CandleTileEntity extends TileEntity implements ITickable {
 	public void setReagentType(ReagentType type) {
 		this.type = type;
 		this.dirty();
+	}
+	
+	protected boolean isEnhanced() {
+		return Candle.IsCandleEnhanced(getWorld(), getPos());
 	}
 }
