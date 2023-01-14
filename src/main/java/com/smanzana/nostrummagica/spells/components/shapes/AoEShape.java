@@ -53,7 +53,7 @@ public class AoEShape extends SpellShape {
 							pos.getY() + radius,
 							pos.getZ() + radius))) {
 			EntityLivingBase living = NostrumMagica.resolveEntityLiving(entity);
-			if (living != null && (!ignoreAllies || !NostrumMagica.IsSameTeam(target, living)))
+			if (living != null && (!ignoreAllies || (target != null && !NostrumMagica.IsSameTeam(target, living))))
 				if (Math.abs(entity.getPositionVector().distanceTo(new Vec3d(pos.getX(), pos.getY(), pos.getZ()))) <= radius)
 					ret.add(living);
 		}

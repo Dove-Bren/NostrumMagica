@@ -2987,6 +2987,10 @@ public class NostrumMagica
 			return true;
 		}
 		
+		if (ent1 == null || ent2 == null) {
+			return false;
+		}
+		
 		if (ent1.getTeam() != null || ent2.getTeam() != null) { // If teams are at play, just use those.
 			return ent1.isOnSameTeam(ent2);
 		}
