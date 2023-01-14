@@ -634,7 +634,7 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 			return false;
 		}
 		
-		amount = Math.min(amount, 20f);
+		amount = Math.min(amount, 10f);
 		
 		if (this.getWeakElement() != null) {
 			// Only let attacks of the right element through
