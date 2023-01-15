@@ -124,9 +124,9 @@ public class MagicEffectProxy {
 		MAGIC_BUFF(true),
 		ROOTED(true), // Just visual. Actual effects are in potion
 		CONTINGENCY_DAMAGE(true), // Just visual. Actual effects are in trigger instance
-		CONTINGENCY_HEALTH, // Just visual. Actual effects are in trigger instance
-		CONTINGENCY_MANA, // Just visual. Actual effects are in trigger instance
-		CONTINGENCY_FOOD, // Just visual. Actual effects are in trigger instance
+		CONTINGENCY_HEALTH(true), // Just visual. Actual effects are in trigger instance
+		CONTINGENCY_MANA(true), // Just visual. Actual effects are in trigger instance
+		CONTINGENCY_FOOD(true), // Just visual. Actual effects are in trigger instance
 		TARGETED, // Can key many things off. As of writing, used for battle music
 		;
 		

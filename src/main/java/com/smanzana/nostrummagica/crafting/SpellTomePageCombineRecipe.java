@@ -94,7 +94,7 @@ public class SpellTomePageCombineRecipe extends IForgeRegistryEntry.Impl<IRecipe
 			return ItemStack.EMPTY;
 		
 		// Check level
-		int level = 1 + (int) (Math.log(sum) / Math.log(2)); // Log base 2, floored
+		int level = 1 + ((int) sum / 2); // f(x) = 1 + floor(x/2)
 		if (level > enhancement.getMaxLevel())
 			return ItemStack.EMPTY;
 		
