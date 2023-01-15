@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.items;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
@@ -450,6 +451,15 @@ public class SpellRune extends Item implements ILoreTagged {
     	return stack;
     }
     
+    /**
+     * Get [count] runes that matches the spell part handed in.
+     * Produces [count] copies of the part in a single rune. For example,
+     * if count is 5 and part is a single fire II rune, it'll make one itemstack
+     * with count 5 that is a single run with two fire runes embedded in it.
+     * @param part
+     * @param count
+     * @return
+     */
     public static ItemStack getRune(SpellPart part, int count) {
     	ItemStack stack;
     	if (part.isTrigger())
@@ -467,9 +477,49 @@ public class SpellRune extends Item implements ILoreTagged {
     	if (!part.isTrigger()) {
     		nbt.setString(NBT_SHAPE_ELEMENT, part.getElement().name());
     		nbt.setInteger(NBT_ELEMENT_COUNT, part.getElementCount());
+    		if (part.getAlteration() != null) {
+    			nbt.setString(NBT_SHAPE_ALTERATION, part.getAlteration().name());
+    		}
     	}
     	
     	return stack;
+    }
+    
+    /**
+     * Takes a rune and breaks it into all the runes that would be required to make it.
+     * So a single rune with fire II would produce a single rune an two fire runes.
+     * Each rune keeps its modifications.
+     * @param rune
+     * @param output
+     * @return
+     */
+    public static NonNullList<ItemStack> decomposeRune(ItemStack rune, @Nullable NonNullList<ItemStack> output) {
+    	if (output == null) {
+    		output = NonNullList.from(ItemStack.EMPTY);
+    	}
+    	
+    	if (isTrigger(rune)
+    			|| isElement(rune)
+    			|| isAlteration(rune)) {
+    		output.add(rune); // Nothing to do
+    	} else {
+    		// Is shape. Pop out and elements or alterations
+    		@Nullable EAlteration alt = getPieceShapeAlteration(rune);
+    		if (alt != null) {
+    			output.add(getRune(alt, 1));
+    			setPieceShapeAlteration(rune, null);
+    		}
+    		@Nullable EMagicElement elem = getPieceShapeElement(rune);
+    		if (elem != null) {
+    			int elemCount = getPieceElementCount(rune);
+    			output.add(getRune(elem, elemCount));
+    			setPieceShapeElement(rune, null);
+    			setPieceElementCount(rune, 0);
+    		}
+    		output.add(rune); // Elem and alt are stripped away at this point if they were present
+    	}
+    	
+    	return output;
     }
     
     private static String getPieceName(ItemStack piece) {
@@ -501,11 +551,15 @@ public class SpellRune extends Item implements ILoreTagged {
     	}
     }
     
-    private static void setPieceShapeElement(ItemStack piece, EMagicElement element) {
+    private static void setPieceShapeElement(ItemStack piece, @Nullable EMagicElement element) {
     	if (!piece.hasTagCompound())
     		return;
     	
-    	piece.getTagCompound().setString(NBT_SHAPE_ELEMENT, element.name());
+    	if (element != null) {
+    		piece.getTagCompound().setString(NBT_SHAPE_ELEMENT, element.name());
+    	} else {
+    		piece.getTagCompound().removeTag(NBT_SHAPE_ELEMENT);
+    	}
     }
     
     private static EAlteration getPieceShapeAlteration(ItemStack piece) {
@@ -523,11 +577,15 @@ public class SpellRune extends Item implements ILoreTagged {
     	}
     }
     
-    private static void setPieceShapeAlteration(ItemStack piece, EAlteration alteration) {
+    private static void setPieceShapeAlteration(ItemStack piece, @Nullable EAlteration alteration) {
     	if (!piece.hasTagCompound())
     		return;
     	
-    	piece.getTagCompound().setString(NBT_SHAPE_ALTERATION, alteration.name());
+    	if (alteration != null) {
+    		piece.getTagCompound().setString(NBT_SHAPE_ALTERATION, alteration.name());
+    	} else {
+    		piece.getTagCompound().removeTag(NBT_SHAPE_ALTERATION);
+    	}
     }
     
     private static int getPieceElementCount(ItemStack piece) {
@@ -541,7 +599,11 @@ public class SpellRune extends Item implements ILoreTagged {
     	if (!piece.hasTagCompound())
     		return;
     	
-    	piece.getTagCompound().setInteger(NBT_ELEMENT_COUNT, count);
+    	if (count > 0) {
+    		piece.getTagCompound().setInteger(NBT_ELEMENT_COUNT, count);
+    	} else {
+    		piece.getTagCompound().removeTag(NBT_ELEMENT_COUNT);
+    	}
     }
     
     public static SpellPartParam getPieceParam(ItemStack piece) {
