@@ -54,6 +54,7 @@ import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IProjectile;
@@ -485,6 +486,20 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 					armorModels[i] = new ModelEnchantedArmorBase(1f, i);
 				}
 			}
+		}
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+		super.getSubItems(tab, subItems); // Base armor
+		
+		// Corrupted armors should also present the upgraded flight version
+		final boolean hasFlight = element == EMagicElement.ENDER || element == EMagicElement.EARTH || element == EMagicElement.FIRE || element == EMagicElement.PHYSICAL; 
+		if (!hasFlight && this.getEquipmentSlot() == EntityEquipmentSlot.CHEST) {
+			ItemStack modStack = new ItemStack(this);
+			SetHasWingUpgrade(modStack, true);
+			subItems.add(modStack);
 		}
 	}
 	
