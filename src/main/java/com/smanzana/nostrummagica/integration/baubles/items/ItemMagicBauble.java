@@ -482,7 +482,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 			
 			if (!player.world.isRemote) {
 				double shield = (type == ItemType.SHIELD_RING_LARGE ? 4 : 2);
-				int cost = (int) (shield * 100);
+				int cost = (int) (shield * 10);
 				
 				// Check if we have enough aether and if the player is missing a shield
 				if (player.ticksExisted % 40 == 0 && NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.SHIELD_PHYSICAL) == null) {
