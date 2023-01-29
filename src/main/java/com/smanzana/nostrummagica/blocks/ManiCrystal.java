@@ -21,6 +21,7 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -246,4 +247,38 @@ public class ManiCrystal extends Block {
 			}
 		}
 	}
+	
+	/**
+	 * Get a useful offset for this crystal for things like effects to go to to go 'to' the crystal
+	 * @return
+	 */
+	public Vec3d getCrystalTipOffset(IBlockState state) {
+		EnumFacing facing = state.getValue(FACING);
+		Vec3d offset = Vec3d.ZERO;
+		if (facing != null) {
+			switch (facing) {
+			case DOWN:
+				offset = new Vec3d(.5, .55, .5);
+				break;
+			case UP:
+				offset = new Vec3d(.5, .8, .5);
+				break;
+			case EAST:
+				offset = new Vec3d(.16, .5, .5);
+				break;
+			case WEST:
+				offset = new Vec3d(1-.16, .5, .5);
+				break;
+			case NORTH:
+				offset = new Vec3d(.5, .5, 1-.16);
+				break;
+			case SOUTH:
+				offset = new Vec3d(.5, .5, .16);
+				break;
+			}
+		}
+		
+		return offset;
+	}
+	
 }

@@ -35,6 +35,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	private static final String NBT_TECH = "tech";
 	private static final String NBT_FINESSE = "finesse";
 	private static final String NBT_MANA = "mana";
+	private static final String NBT_RESERVED_MANA = "reserved_mana";
 	
 	private static final String NBT_MOD_MANA = "mod_mana";
 	private static final String NBT_MOD_MANA_COST = "mod_mana_cost";
@@ -85,6 +86,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		nbt.setInteger(NBT_TECH, instance.getTech());
 		nbt.setInteger(NBT_FINESSE, instance.getFinesse());
 		nbt.setInteger(NBT_MANA, instance.getMana());
+		nbt.setInteger(NBT_RESERVED_MANA, instance.getReservedMana());
 		nbt.setFloat(NBT_MOD_MANA, instance.getManaModifier());
 		nbt.setFloat(NBT_MOD_MANA_COST, instance.getManaCostModifier());
 		nbt.setFloat(NBT_MOD_MANA_REGEN, instance.getManaRegenModifier());
@@ -253,6 +255,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			tag.getInteger(NBT_TECH),
 			tag.getInteger(NBT_FINESSE),
 			tag.getInteger(NBT_MANA),
+			tag.getInteger(NBT_RESERVED_MANA),
 			tag.getFloat(NBT_MOD_MANA),
 			tag.getInteger(NBT_MOD_MANA_BONUS),
 			tag.getFloat(NBT_MOD_MANA_COST),

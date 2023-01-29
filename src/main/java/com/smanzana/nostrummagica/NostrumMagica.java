@@ -19,6 +19,7 @@ import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.blocks.ItemDuct;
 import com.smanzana.nostrummagica.blocks.LoreTable;
+import com.smanzana.nostrummagica.blocks.ManaArmorerBlock;
 import com.smanzana.nostrummagica.blocks.MimicBlock;
 import com.smanzana.nostrummagica.blocks.ModificationTable;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
@@ -27,8 +28,10 @@ import com.smanzana.nostrummagica.blocks.PutterBlock;
 import com.smanzana.nostrummagica.blocks.SorceryPortal;
 import com.smanzana.nostrummagica.blocks.TeleportRune;
 import com.smanzana.nostrummagica.blocks.TemporaryTeleportationPortal;
-import com.smanzana.nostrummagica.capabilities.AttributeProvider;
+import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.capabilities.ManaArmorAttributeProvider;
+import com.smanzana.nostrummagica.capabilities.NostrumMagicAttributeProvider;
 import com.smanzana.nostrummagica.command.CommandAllQuests;
 import com.smanzana.nostrummagica.command.CommandAllResearch;
 import com.smanzana.nostrummagica.command.CommandCreateGeotoken;
@@ -43,6 +46,7 @@ import com.smanzana.nostrummagica.command.CommandReadRoom;
 import com.smanzana.nostrummagica.command.CommandReloadResearch;
 import com.smanzana.nostrummagica.command.CommandSetDimension;
 import com.smanzana.nostrummagica.command.CommandSetLevel;
+import com.smanzana.nostrummagica.command.CommandSetManaArmor;
 import com.smanzana.nostrummagica.command.CommandSpawnDungeon;
 import com.smanzana.nostrummagica.command.CommandSpawnObelisk;
 import com.smanzana.nostrummagica.command.CommandTestConfig;
@@ -114,6 +118,7 @@ import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.items.ThanosStaff;
 import com.smanzana.nostrummagica.items.WarlockSword;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
+import com.smanzana.nostrummagica.listeners.ManaArmorListener;
 import com.smanzana.nostrummagica.listeners.PlayerListener;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
@@ -236,7 +241,7 @@ import net.minecraftforge.oredict.OreDictionary;
 public class NostrumMagica
 {
     public static final String MODID = "nostrummagica";
-    public static final String VERSION = "1.12.2-1.8.9";
+    public static final String VERSION = "1.12.2-1.9.0";
 	public static final Random rand = new Random();
     
     @SidedProxy(clientSide="com.smanzana.nostrummagica.proxy.ClientProxy", serverSide="com.smanzana.nostrummagica.proxy.CommonProxy")
@@ -256,6 +261,7 @@ public class NostrumMagica
     public static Logger logger = LogManager.getLogger(MODID);
     public static PlayerListener playerListener;
     public static MagicEffectProxy magicEffectProxy;
+    public static ManaArmorListener manaArmorListener;
     
     // Cached references that have sketchy access rules. See uses in this file.
     private static SpellRegistry spellRegistry;
@@ -290,6 +296,7 @@ public class NostrumMagica
     	instance = this;
     	playerListener = new PlayerListener();
     	magicEffectProxy = new MagicEffectProxy();
+    	manaArmorListener = new ManaArmorListener();
     	
     	NostrumMagica.creativeTab = new CreativeTabs(MODID){
 	    	@Override
@@ -372,6 +379,7 @@ public class NostrumMagica
     	event.registerServerCommand(new CommandReloadResearch());
     	event.registerServerCommand(new CommandRandomSpell());
     	event.registerServerCommand(new CommandDebugEffect());
+    	event.registerServerCommand(new CommandSetManaArmor());
     }
     
     /**
@@ -385,7 +393,14 @@ public class NostrumMagica
     	if (e == null)
     		return null;
     	
-    	return e.getCapability(AttributeProvider.CAPABILITY, null);
+    	return e.getCapability(NostrumMagicAttributeProvider.CAPABILITY, null);
+    }
+    
+    public static IManaArmor getManaArmor(Entity e) {
+    	if (e == null)
+    		return null;
+    	
+    	return e.getCapability(ManaArmorAttributeProvider.CAPABILITY, null);
     }
     
     public static ItemStack findTome(EntityPlayer entity, int tomeID) {
@@ -1584,6 +1599,17 @@ public class NostrumMagica
 					new OutcomeSpawnItem(new ItemStack(ParadoxMirrorBlock.instance(), 2)))
 				);
 		
+		// Mana Armorer
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("mana_armorer",
+					new ItemStack(ManaArmorerBlock.instance()),
+					EMagicElement.ICE,
+					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.CRYSTABLOOM, ReagentType.MANDRAKE_ROOT},
+					new ItemStack(Items.END_CRYSTAL),
+					new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), NostrumResourceItem.getItem(ResourceType.MANA_LEAF, 1), NostrumResourceItem.getItem(ResourceType.SLAB_BALANCED, 1), new ItemStack(DragonEggFragment.instance())},
+					new RRequirementResearch("mana_armor"),
+					new OutcomeSpawnItem(new ItemStack(ManaArmorerBlock.instance(), 1)))
+				);
 		
 //		RitualRegistry.instance().addRitual(
 //				RitualRecipe.createTier2("ritual.form_obelisk.name", EMagicElement.ENDER,
@@ -2479,6 +2505,13 @@ public class NostrumMagica
 			.lore(WolfTameLore.instance())
 			.reference("ritual::transform_wolf", "ritual.transform_wolf.name")
 		.build("wolf_transformation", NostrumResearchTab.MAGICA, Size.GIANT, 4, 0, true, new ItemStack(Items.BONE));
+		
+		NostrumResearch.startBuilding()
+			.hiddenParent("enchanted_armor_adv")
+			.hiddenParent("soul_daggers")
+			.quest("lvl10")
+			.reference("ritual::mana_armorer", "ritual.mana_armorer.name")
+		.build("mana_armor", NostrumResearchTab.ADVANCED_MAGICA, Size.GIANT, 1, 0, true, new ItemStack(ManaArmorerBlock.instance()));
 		
 		//NostrumResearchTab tab, Size size, int x, int y, boolean hidden, ItemStack icon
     }

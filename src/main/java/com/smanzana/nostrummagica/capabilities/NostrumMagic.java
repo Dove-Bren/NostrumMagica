@@ -95,6 +95,7 @@ public class NostrumMagic implements INostrumMagic {
 	private int finesse;
 	private int mana;
 	//private int maxMana; // We calculate max instead of storing it
+	private int reservedMana; // Mana deducted from max cause it's being actively used for an ongoing effect
 	private float modMana; // Additional % mana
 	private int modManaFlat; // Additiona mana (flat int value)
 	private float modManaCost;
@@ -296,8 +297,17 @@ public class NostrumMagic implements INostrumMagic {
 	}
 
 	@Override
+	public int getMaxMana(boolean includeReserved) {
+		int max = this.getManaBonus() + Math.round(baseMaxMana * (1f + this.getManaModifier()));
+		if (!includeReserved) {
+			max -= this.getReservedMana();
+		}
+		return max;
+	}
+	
+	@Override
 	public int getMaxMana() {
-		return this.getManaBonus() + Math.round(baseMaxMana * (1f + this.getManaModifier()));
+		return getMaxMana(false);
 	}
 
 	@Override
@@ -315,6 +325,23 @@ public class NostrumMagic implements INostrumMagic {
 		this.baseMaxMana = max;
 		if (this.mana > getMaxMana())
 			this.mana = getMaxMana();
+		if (this.reservedMana > this.getMaxMana())
+			this.reservedMana = this.getMaxMana();
+	}
+	
+	@Override
+	public int getReservedMana() {
+		return this.reservedMana;
+	}
+	
+	@Override
+	public void setReservedMana(int reserved) {
+	}
+	
+	@Override
+	public void addReservedMana(int reserved) {
+		// Bound between 0 and max mana
+		this.reservedMana = Math.max(0, Math.min(this.getMaxMana(), this.reservedMana + reserved));
 	}
 
 //	@Override
@@ -551,7 +578,7 @@ public class NostrumMagic implements INostrumMagic {
 
 	@Override
 	public void deserialize(boolean unlocked, int level, float xp, int skillpoints, int researchpoints, int control, int tech, int finesse,
-			int mana, float modMana, int manaBonus, float modManaCost, float modManaRegen) {
+			int mana, int reservedMana, float modMana, int manaBonus, float modManaCost, float modManaRegen) {
 		this.unlocked = unlocked;
 		this.level = level;
 		this.xp = xp;
@@ -562,6 +589,7 @@ public class NostrumMagic implements INostrumMagic {
 		this.tech = tech;
 		this.finesse = finesse;
 		this.mana = mana;
+		this.reservedMana = reservedMana;
 		this.baseMaxMana = LevelCurves.maxMana(this.level);
 		this.modMana = modMana;
 		this.modManaCost = modManaCost;
@@ -614,7 +642,7 @@ public class NostrumMagic implements INostrumMagic {
 		System.out.println("Overriding stats from" + this.mana + " to " + cap.getMana() + " mana");
 		this.deserialize(cap.isUnlocked(), cap.getLevel(), cap.getXP(),
 				cap.getSkillPoints(), cap.getResearchPoints(),
-				cap.getControl(), cap.getTech(), cap.getFinesse(), cap.getMana(),
+				cap.getControl(), cap.getTech(), cap.getFinesse(), cap.getMana(), cap.getReservedMana(),
 				cap.getManaModifier(), cap.getManaBonus(), cap.getManaCostModifier(), cap.getManaRegenModifier());
 		
 		this.loreLevels = cap.serializeLoreLevels();

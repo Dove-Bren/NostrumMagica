@@ -4,13 +4,17 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
+import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.capabilities.ManaArmor;
+import com.smanzana.nostrummagica.capabilities.ManaArmorStorage;
 import com.smanzana.nostrummagica.capabilities.NostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagicStorage;
 import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect.PredefinedEffect;
@@ -64,6 +68,7 @@ import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientEffectRenderMessage;
 import com.smanzana.nostrummagica.network.messages.MagicEffectUpdate;
+import com.smanzana.nostrummagica.network.messages.ManaArmorSyncMessage;
 import com.smanzana.nostrummagica.network.messages.ManaMessage;
 import com.smanzana.nostrummagica.network.messages.PetGUIOpenMessage;
 import com.smanzana.nostrummagica.network.messages.SpawnNostrumRitualEffectMessage;
@@ -183,6 +188,7 @@ public class CommonProxy {
 		//MinecraftForge.EVENT_BUS.register(this);
 		
 		CapabilityManager.INSTANCE.register(INostrumMagic.class, new NostrumMagicStorage(), NostrumMagic::new);
+		CapabilityManager.INSTANCE.register(IManaArmor.class, new ManaArmorStorage(), ManaArmor::new);
 		capabilityHandler = new CapabilityHandler();
 		NetworkHandler.getInstance();
 		
@@ -570,6 +576,9 @@ public class CommonProxy {
     	NetworkHandler.getSyncChannel().sendTo(
     			new SpellRequestReplyMessage(NostrumMagica.getSpellRegistry().getAllSpells(), true),
     			player);
+    	NetworkHandler.getSyncChannel().sendTo(
+    			new ManaArmorSyncMessage(player, NostrumMagica.getManaArmor(player)),
+    			player);
     }
     
     public void updateEntityEffect(EntityPlayerMP player, EntityLivingBase entity, SpecialEffect effectType, EffectData data) {
@@ -726,6 +735,21 @@ public class CommonProxy {
 		
 		tracker.sendToTrackingAndSelf(player, NetworkHandler.getSyncChannel()
 				.getPacketFrom(new ManaMessage(player, mana)));
+	}
+	
+	public void sendManaArmorCapability(EntityPlayer player) {
+		EntityTracker tracker = ((WorldServer) player.world).getEntityTracker();
+		if (tracker == null)
+			return;
+		
+		IManaArmor stats = NostrumMagica.getManaArmor(player);
+		
+		tracker.sendToTrackingAndSelf(player, NetworkHandler.getSyncChannel()
+				.getPacketFrom(new ManaArmorSyncMessage(player, stats)));
+	}
+	
+	public void receiveManaArmorOverride(@Nonnull Entity ent, IManaArmor override) {
+		; // Nothing to do on server
 	}
 	
 	public void playRitualEffect(World world, BlockPos pos, EMagicElement element,

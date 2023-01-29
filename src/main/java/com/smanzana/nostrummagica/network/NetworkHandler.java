@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.network.messages.ClientUpdateQuestMessage;
 import com.smanzana.nostrummagica.network.messages.EnchantedArmorStateUpdate;
 import com.smanzana.nostrummagica.network.messages.LoreMessage;
 import com.smanzana.nostrummagica.network.messages.MagicEffectUpdate;
+import com.smanzana.nostrummagica.network.messages.ManaArmorSyncMessage;
 import com.smanzana.nostrummagica.network.messages.ManaMessage;
 import com.smanzana.nostrummagica.network.messages.ModifyMessage;
 import com.smanzana.nostrummagica.network.messages.ObeliskSelectMessage;
@@ -99,6 +100,7 @@ public class NetworkHandler {
 		syncChannel.registerMessage(SpawnPredefinedEffectMessage.Handler.class, SpawnPredefinedEffectMessage.class, discriminator++, Side.CLIENT);
 		syncChannel.registerMessage(PetCommandMessage.Handler.class, PetCommandMessage.class, discriminator++, Side.SERVER);
 		syncChannel.registerMessage(PetCommandSettingsSyncMessage.Handler.class, PetCommandSettingsSyncMessage.class, discriminator++, Side.CLIENT);
+		syncChannel.registerMessage(ManaArmorSyncMessage.Handler.class, ManaArmorSyncMessage.class, discriminator++, Side.CLIENT);
 	}
 	
 }

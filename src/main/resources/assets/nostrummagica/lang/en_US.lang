@@ -425,6 +425,7 @@ tile.dungeon_bars.name=Dungeon Bars
 tile.dungeon_air.single.name=Dungeon Air
 tile.dungeon_air.flood.name=Dungeon Air (Flood)
 tile.paradox_mirror.name=Paradox Mirror
+tile.mana_armorer.name=Mana Armorer
 
 entity.nostrummagica.physical_golem.name=Metal Golem
 entity.nostrummagica.lightning_golem.name=Lightining Golem
@@ -577,6 +578,9 @@ info.screen.goto=Click to view
 info.create_geotoken.nopos=The geogem must have a location saved into it!
 info.transformation.noentity=The entity to transform must be close to the ritual!
 info.generic.block_linked=Block linked!
+info.mana_armorer.busy=The Mana Armorer is busy with another entity!
+info.mana_armorer.locked=You do not possess enough magic power to use the mana armorer at this time.
+info.mana_armorer.already_have=You already have mana armor
 
 info.armor.set_status=%1$s Set Bonus %3$s(%2$d/4)%4$s
 info.armor.set_total=%1$s Set Bonus %2$s(Complete)%3$s
@@ -1039,6 +1043,7 @@ ritual.modification_table.name=Create Modification Table
 ritual.wisp_crystal.name=Craft Wisp Crystal
 ritual.essence_seed.name=Create Essence Seed
 ritual.create_seeking_gem.name=Create Seeking Gem
+ritual.mana_armorer.name=Create Mana Armorer
 
 ritual.rune.physical.name=Physical Rune
 ritual.rune.fire.name=Fire Rune
@@ -1601,6 +1606,9 @@ research.dragon_armor.info=  Dragons have natural armor from their thick dragon 
 research.paradox_mirrors.name=Paradox Mirrors
 research.paradox_mirrors.desc=A Pair O'Mirrors?
 research.paradox_mirrors.info=  Item ducts provide a magical means to move items through the world from block to block. Combining this idea with the teleportation energies of ender teleportation has provided an even more efficient means of transfering items around!|  Paradox Mirrors can be placed on a wall and then paired with another mirror with a GeoGem. After doing this, one can simply throw an item in the mirror and it'll come out at the other mirror!|  There's a limit to the speed that items can be transferred. Items are sent whole stacks at a time, but only one stack can go per interval. This may be sped up by providing magical energy somehow...||  To link a mirror to another, store the location of the other mirror in a GeoGem and then right-click the gem on the source mirror. A message will display when successfully linked.|  Items will only be sent if the marked location is loaded, and a mirror is present. If the destination mirror is moved, no items can be sent.
+research.mana_armor.name=Mana Armor
+research.mana_armor.desc=An Extra Layer
+research.mana_armor.info=  Mana Armor is the physical manifestation of all of your excess mana used to protect you!|  With mana armor, your mana becomes an extra health pool. As you take damage, mana is spent to negate the damage instead of it damaging you. More mana is spent do negate larger attacks!|  To activate mana armor, you first have to create and use a Mana Armorer. This block is created through a ritual, and then can be placed in the world. On activation, it will start draining your mana to set up your mana armor. It takes 1000 mana to finish setting up your mana armor. The armorer block itself will draw this mana from you directly. If there are nearby mani or kani crystal blocks, they will help draw your mana out more quickly to hasten the process.|  Mana armor comes at a cost. While you have mana armor active, you will have reduced maximum mana to use. This maximum mana is returned to you once your mana armor is exhausted and fades.|  While you have mana armor activated, damage from most damage types will be negated. Some damage types will not be impacted and may kill you, including fall damage and falling out of the world.|  Your mana armor will stay activated until you run out of mana or die from damage that goes through your armor. Once it has been broken, you'll have to use a mana armorer again to activate it once more.|  Because mana armor covers your body and not your armor, your armor impacts how much damage the mana armor has to negate. Your armor will still lose durability. Additionally, effects that give you extra health pools (like Absorption) will not be covered by mana armor.
 
 research.wispblock.name=Wisp Summoning
 research.wispblock.desc=Wispful thinking?

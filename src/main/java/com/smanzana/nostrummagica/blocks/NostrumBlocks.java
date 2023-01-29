@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.blocks.tiles.CandleTileEntity;
 import com.smanzana.nostrummagica.blocks.tiles.ItemDuctTileEntity;
 import com.smanzana.nostrummagica.blocks.tiles.LoreTableEntity;
+import com.smanzana.nostrummagica.blocks.tiles.ManaArmorerTileEntity;
 import com.smanzana.nostrummagica.blocks.tiles.ModificationTableEntity;
 import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.blocks.tiles.ObeliskPortalTileEntity;
@@ -82,6 +83,7 @@ public class NostrumBlocks {
     	registerBlockItem(ItemDuct.instance, ItemDuct.ID, registry);
     	registerBlockItem(DungeonBars.instance(), DungeonBars.ID, registry);
     	registerBlockItem(ParadoxMirrorBlock.instance(), ParadoxMirrorBlock.ID, registry);
+    	registerBlockItem(ManaArmorerBlock.instance(), ManaArmorerBlock.ID, registry);
     	
 
     	String[] variants = new String[DungeonBlock.Type.values().length];
@@ -165,6 +167,7 @@ public class NostrumBlocks {
     	registerBlock(DungeonBars.instance(), DungeonBars.ID, registry);
     	registerBlock(DungeonAir.instance(), DungeonAir.ID, registry);
     	registerBlock(ParadoxMirrorBlock.instance(), ParadoxMirrorBlock.ID, registry);
+    	registerBlock(ManaArmorerBlock.instance(), ManaArmorerBlock.ID, registry);
     	
     	
 //			GameRegistry.addRecipe(new ItemStack(MagicDirt.instance()), " D ", "DCD", " D ",
@@ -210,6 +213,7 @@ public class NostrumBlocks {
     	GameRegistry.registerTileEntity(ActiveHopperTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "active_hopper_te"));
     	GameRegistry.registerTileEntity(ItemDuctTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "item_duct_te"));
     	GameRegistry.registerTileEntity(ParadoxMirrorTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "paradox_mirror_te"));
+    	GameRegistry.registerTileEntity(ManaArmorerTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "mana_armorer"));
     }
     
     private void registerFluidBlocks(IForgeRegistry<Block> registry) {

@@ -15,7 +15,8 @@ public enum NostrumParticles {
 
 	GLOW_ORB(1, ParticleGlowOrb.Factory.class),
 	LIGHTNING_STATIC(2, ParticleLightningStatic.Factory.class),
-	FILLED_ORB(3, ParticleFilledOrb.Factory.class)
+	FILLED_ORB(3, ParticleFilledOrb.Factory.class),
+	WARD(4, ParticleWard.Factory.class),
 	;
 	
 	private final int ID;

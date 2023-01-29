@@ -33,6 +33,7 @@ public class StatRequestMessage implements IMessage {
 				}
 				
 				NetworkHandler.getSyncChannel().sendTo(new StatSyncMessage(att), sp);
+				NetworkHandler.getSyncChannel().sendTo(new ManaArmorSyncMessage(sp, NostrumMagica.getManaArmor(sp)), sp);
 			});
 			
 			return null;

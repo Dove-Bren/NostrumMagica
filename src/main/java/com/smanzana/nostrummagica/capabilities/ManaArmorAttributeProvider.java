@@ -8,15 +8,15 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 
-public class AttributeProvider implements ICapabilitySerializable<NBTBase> {
+public class ManaArmorAttributeProvider implements ICapabilitySerializable<NBTBase> {
 
-	@CapabilityInject(INostrumMagic.class)
-	public static Capability<INostrumMagic> CAPABILITY = null;
+	@CapabilityInject(IManaArmor.class)
+	public static Capability<IManaArmor> CAPABILITY = null;
 	
-	private INostrumMagic instance = CAPABILITY.getDefaultInstance();
+	private IManaArmor instance = CAPABILITY.getDefaultInstance();
 	private Entity entity;
 	
-	public AttributeProvider(Entity object) {
+	public ManaArmorAttributeProvider(Entity object) {
 		this.entity = object;
 	}
 

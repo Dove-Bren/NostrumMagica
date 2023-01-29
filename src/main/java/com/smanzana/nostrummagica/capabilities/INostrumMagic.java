@@ -51,9 +51,13 @@ public interface INostrumMagic {
 	// Mana
 	public int getMana();
 	public int getMaxMana();
+	public int getMaxMana(boolean includeReserved);
 	public void setMana(int mana);
 	public void addMana(int mana);
 	public void setMaxMana(int max);
+	public int getReservedMana();
+	public void setReservedMana(int reserved);
+	public void addReservedMana(int reserved);
 	
 	// Modifiers
 	public float getManaModifier(); // % bonus
@@ -124,6 +128,7 @@ public interface INostrumMagic {
 			int tech,
 			int finesse,
 			int mana,
+			int reserved_mana,
 			float mod_mana,
 			int bonus_mana,
 			float mod_mana_cost,

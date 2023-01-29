@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.lwjgl.input.Keyboard;
@@ -23,6 +24,7 @@ import com.smanzana.nostrummagica.blocks.LogicDoor;
 import com.smanzana.nostrummagica.blocks.LoreTable;
 import com.smanzana.nostrummagica.blocks.MagicDirt;
 import com.smanzana.nostrummagica.blocks.MagicWall;
+import com.smanzana.nostrummagica.blocks.ManaArmorerBlock;
 import com.smanzana.nostrummagica.blocks.ManiOre;
 import com.smanzana.nostrummagica.blocks.MimicBlock;
 import com.smanzana.nostrummagica.blocks.ModificationTable;
@@ -36,6 +38,7 @@ import com.smanzana.nostrummagica.blocks.PutterBlock;
 import com.smanzana.nostrummagica.blocks.SorceryPortal;
 import com.smanzana.nostrummagica.blocks.SwitchBlock;
 import com.smanzana.nostrummagica.blocks.TeleportRune;
+import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.effects.ClientEffect;
 import com.smanzana.nostrummagica.client.effects.ClientEffectBeam;
@@ -80,6 +83,7 @@ import com.smanzana.nostrummagica.client.render.entity.RenderWillo;
 import com.smanzana.nostrummagica.client.render.entity.RenderWisp;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityAltarRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityCandleRenderer;
+import com.smanzana.nostrummagica.client.render.tile.TileEntityManaArmorerRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityObeliskRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityPortalRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityProgressionDoorRenderer;
@@ -205,6 +209,7 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -296,6 +301,7 @@ public class ClientProxy extends CommonProxy {
     	TileEntityObeliskRenderer.init();
     	TileEntityPortalRenderer.init();
     	TileEntityProgressionDoorRenderer.init();
+    	TileEntityManaArmorerRenderer.init();
     	
     	EnchantedArmor.ClientInit();
     	
@@ -678,6 +684,9 @@ public class ClientProxy extends CommonProxy {
 		registerModel(Item.getItemFromBlock(ParadoxMirrorBlock.instance()),
 				0,
 				ParadoxMirrorBlock.ID);
+		registerModel(Item.getItemFromBlock(ManaArmorerBlock.instance()),
+				0,
+				ManaArmorerBlock.ID);
 		
 		registerModel(DragonSoulItem.instance(),
 				0,
@@ -1947,6 +1956,23 @@ public class ClientProxy extends CommonProxy {
 		}
 		
 		super.sendMana(player);
+	}
+	
+	@Override
+	public void sendManaArmorCapability(EntityPlayer player) {
+		if (player.world.isRemote) {
+			return;
+		}
+		
+		super.sendManaArmorCapability(player);
+	}
+	
+	@Override
+	public void receiveManaArmorOverride(@Nonnull Entity ent, IManaArmor override) {
+		@Nullable IManaArmor existing = NostrumMagica.getManaArmor(ent);
+		if (existing != null) {
+			existing.copy(override);
+		}
 	}
 	
 	@Override
