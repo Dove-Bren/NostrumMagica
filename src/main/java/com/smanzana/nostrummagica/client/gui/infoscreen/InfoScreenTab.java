@@ -92,7 +92,7 @@ public abstract class InfoScreenTab {
 		};
 		
 		INFO_BLOCKS = new InfoScreenTab(InfoScreenTabs.INFO_BLOCKS,
-				new ItemStack(Item.getItemFromBlock(Blocks.GRASS))) {
+				new ItemStack(Item.getItemFromBlock(Blocks.GRASS_BLOCK))) {
 
 			private List<ILoreTagged> getAvailable(INostrumMagic attr) {
 				List<ILoreTagged> list = new LinkedList<>();

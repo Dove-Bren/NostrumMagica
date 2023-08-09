@@ -1,7 +1,7 @@
 {
     "forge_marker": 1,
     "defaults": {
-        "model": "nostrummagica:warlock_sword.obj",
+        "model": "nostrummagica:block/warlock_sword.obj",
         "transform": {
             "scale": 0.125,
             "thirdperson": {

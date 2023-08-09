@@ -1,8 +1,8 @@
 {
     "variants": {
-        "normal": { "model": "nostrummagica:infuser_multiblk" },
-        "master=false": { "model": "nostrummagica:infuser_multiblk" },
-        "master=true": { "model": "nostrummagica:infuser_multiblk" },
-        "inventory": { "model": "nostrummagica:infuser_multiblk" }
+        "normal": { "model": "nostrummagica:block/infuser_multiblk" },
+        "master=false": { "model": "nostrummagica:block/infuser_multiblk" },
+        "master=true": { "model": "nostrummagica:block/infuser_multiblk" },
+        "inventory": { "model": "nostrummagica:block/infuser_multiblk" }
     }
 }

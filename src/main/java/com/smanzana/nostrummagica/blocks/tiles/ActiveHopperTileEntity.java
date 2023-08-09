@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.utils.Inventories;
 import com.smanzana.nostrummagica.utils.ItemStacks;
 
 import net.minecraft.block.BlockChest;
+import net.minecraft.block.FurnaceBlock;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
@@ -17,11 +18,11 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.IHopper;
+import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -29,7 +30,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISidedInventory, ITickable {
+public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISidedInventory, ITickableTileEntity {
 	
 	private static final String NBT_SLOT = "slot";
 	private static final String NBT_CUSTOMNAME = "custom_name";
@@ -56,6 +57,8 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 		}
 		
 		nbt.setInteger(NBT_COOLDOWN, transferCooldown);
+		
+		FurnaceBlock a;
 		
 		return nbt;
 	}
@@ -208,7 +211,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	}
 
 	@Override
-	public void update() {
+	public void tick() {
 		if (world != null && !world.isRemote) {
 			this.transferCooldown--;
 			

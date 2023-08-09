@@ -9,11 +9,11 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ITickable;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class CandleTileEntity extends TileEntity implements ITickable {
+public class CandleTileEntity extends TileEntity implements ITickableTileEntity {
 	
 	private static final String NBT_TYPE = "type";
 	private static Random rand = new Random();
@@ -91,7 +91,7 @@ public class CandleTileEntity extends TileEntity implements ITickable {
 	}
 	
 	@Override
-	public void update() {
+	public void tick() {
 		// If no enhancing block is present, tick down life ticks to eventually consume reagent
 		if (!isEnhanced()) {
 			this.lifeTicks = Math.max(-1, this.lifeTicks-1);

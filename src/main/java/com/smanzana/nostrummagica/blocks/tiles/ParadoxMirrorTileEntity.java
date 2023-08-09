@@ -21,15 +21,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class ParadoxMirrorTileEntity extends TileEntity implements ITickable, IAetherInfusableTileEntity {
+public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTileEntity, IAetherInfusableTileEntity {
 	
 	private @Nullable BlockPos linkedPosition;
 	
@@ -138,7 +138,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickable, IA
 	}
 	
 	@Override
-	public void update() {
+	public void tick() {
 		if (world != null && !world.isRemote) {
 			checkItemEntityList(); // every tick
 			

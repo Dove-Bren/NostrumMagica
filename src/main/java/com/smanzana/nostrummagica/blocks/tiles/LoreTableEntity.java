@@ -11,11 +11,11 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ITickable;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class LoreTableEntity extends TileEntity implements ITickable {
+public class LoreTableEntity extends TileEntity implements ITickableTileEntity {
 
 	private @Nonnull ItemStack item;
 	private float progress;
@@ -131,7 +131,7 @@ public class LoreTableEntity extends TileEntity implements ITickable {
 	}
 
 	@Override
-	public void update() {
+	public void tick() {
 		ticksExisted++;
 		
 		if (world != null && !world.isRemote) {

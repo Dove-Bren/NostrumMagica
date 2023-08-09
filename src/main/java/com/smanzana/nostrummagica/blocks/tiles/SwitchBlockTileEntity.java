@@ -13,12 +13,12 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 
-public class SwitchBlockTileEntity extends TileEntity implements ITickable, IOrientedTileEntity {
+public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEntity, IOrientedTileEntity {
 	
 	public static enum SwitchType {
 		ANY,
@@ -131,7 +131,7 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickable, IOri
 	}
 	
 	@Override
-	public void update() {
+	public void tick() {
 		if (world.isRemote) {
 			return;
 		}

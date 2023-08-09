@@ -112,7 +112,7 @@ public final class Curves {
 		final double vVel = -((-diff.y / desiredTime) - (.5 * gravity * desiredTime));
 		
 		// Break hVel into x and z
-		return (new Vec3d(diff.x, 0, diff.z).normalize().scale(startHVelocity)).addVector(0, vVel, 0);
+		return (new Vec3d(diff.x, 0, diff.z).normalize().scale(startHVelocity)).add(0, vVel, 0);
 	}
 	
 	public static Vec2f solveQuadraticEquation(float a, float b, float c) {

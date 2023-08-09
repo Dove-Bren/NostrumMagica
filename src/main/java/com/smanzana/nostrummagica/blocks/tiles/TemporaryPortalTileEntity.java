@@ -5,12 +5,12 @@ import com.smanzana.nostrummagica.blocks.NostrumPortal;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ITickable;
+import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity implements ITickable  {
+public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity implements ITickableTileEntity {
 
 	private long endticks;
 	

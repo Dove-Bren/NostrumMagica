@@ -1,8 +1,8 @@
 {
     "variants": {
-        "facing=north": { "model": "nostrummagica:mirror.obj", "x": 270, "y": 180 },
-        "facing=east": { "model": "nostrummagica:mirror.obj", "x": 270, "y": 270 },
-        "facing=south": { "model": "nostrummagica:mirror.obj", "x": 270 },
-        "facing=west": { "model": "nostrummagica:mirror.obj", "x": 270, "y": 90 }
+        "facing=north": { "model": "nostrummagica:block/mirror.obj", "x": 270, "y": 180 },
+        "facing=east": { "model": "nostrummagica:block/mirror.obj", "x": 270, "y": 270 },
+        "facing=south": { "model": "nostrummagica:block/mirror.obj", "x": 270 },
+        "facing=west": { "model": "nostrummagica:block/mirror.obj", "x": 270, "y": 90 }
     }
 }

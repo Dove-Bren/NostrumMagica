@@ -21,18 +21,18 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.SoundEvents;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ITickable;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.Vec3d;
 
-public class ManaArmorerTileEntity extends TileEntity implements ITickable {
+public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEntity {
 	
 	private static final int MAX_CRYSTALS = 8;
 	private static final int MAX_CRYSTAL_RADIUS = 8;
@@ -364,7 +364,7 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickable {
 	}
 
 	@Override
-	public void update() {
+	public void tick() {
 		this.ticksExisted++;
 		
 		if (!world.isRemote) {

@@ -1,11 +1,11 @@
 {
     "variants": {
-        "facing=down":  { "model": "nostrummagica:putter_vertical", "x": 180 },
-        "facing=up":    { "model": "nostrummagica:putter_vertical" },
-        "facing=north": { "model": "nostrummagica:putter" },
-        "facing=south": { "model": "nostrummagica:putter", "y": 180 },
-        "facing=west":  { "model": "nostrummagica:putter", "y": 270 },
-        "facing=east":  { "model": "nostrummagica:putter", "y": 90 },
-        "inventory": { "model": "nostrummagica:putter" }
+        "facing=down":  { "model": "nostrummagica:block/putter_vertical", "x": 180 },
+        "facing=up":    { "model": "nostrummagica:block/putter_vertical" },
+        "facing=north": { "model": "nostrummagica:block/putter" },
+        "facing=south": { "model": "nostrummagica:block/putter", "y": 180 },
+        "facing=west":  { "model": "nostrummagica:block/putter", "y": 270 },
+        "facing=east":  { "model": "nostrummagica:block/putter", "y": 90 },
+        "inventory": { "model": "nostrummagica:block/putter" }
     }
 }

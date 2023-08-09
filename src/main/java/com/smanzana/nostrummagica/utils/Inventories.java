@@ -5,7 +5,7 @@ import javax.annotation.Nonnull;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.INBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.text.ITextComponent;
@@ -174,21 +174,21 @@ public class Inventories {
 		return remove(new ItemStackArrayWrapper(inventory), items);
 	}
 	
-	public static final NBTBase serializeInventory(IInventory inv) {
+	public static final INBTBase serializeInventory(IInventory inv) {
 		NBTTagList list = new NBTTagList();
 		for (int i = 0; i < inv.getSizeInventory(); i++) {
 			@Nonnull ItemStack stack = inv.getStackInSlot(i);
 			if (!stack.isEmpty()) {
-				list.appendTag(stack.serializeNBT());
+				list.add(stack.serializeNBT());
 			} else {
-				list.appendTag(new NBTTagCompound());
+				list.add(new NBTTagCompound());
 			}
 		}
 		
 		return list;
 	}
 	
-	public static final boolean deserializeInventory(IInventory base, NBTBase nbt) {
+	public static final boolean deserializeInventory(IInventory base, INBTBase nbt) {
 		if (base == null) {
 			return false;
 		}
@@ -197,9 +197,9 @@ public class Inventories {
 		
 		if (nbt != null && nbt instanceof NBTTagList) {
 			NBTTagList list = (NBTTagList) nbt;
-			for (int i = 0; i < list.tagCount(); i++) {
-				NBTTagCompound tag = list.getCompoundTagAt(i);
-				@Nonnull ItemStack stack = new ItemStack(tag);
+			for (int i = 0; i < list.size(); i++) {
+				NBTTagCompound tag = list.getCompound(i);
+				@Nonnull ItemStack stack = ItemStack.read(tag);
 				base.setInventorySlotContents(i, stack);
 			}
 		}
@@ -217,7 +217,12 @@ public class Inventories {
 		}
 		
 		@Override
-		public String getName() {
+		public ITextComponent getName() {
+			return null;
+		}
+		
+		@Override
+		public ITextComponent getCustomName() {
 			return null;
 		}
 
@@ -245,7 +250,7 @@ public class Inventories {
 		public @Nonnull ItemStack decrStackSize(int index, int count) {
 			ItemStack split = ItemStack.EMPTY;
 			if (index < array.length) {
-				split = array[index].splitStack(count);
+				split = array[index].split(count);
 			}
 			markDirty();
 			return split;

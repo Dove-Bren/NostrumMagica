@@ -1,6 +1,6 @@
 {
     "variants": {
-        "master=false": { "model": "nostrummagica:dungeon_dark" },
-        "master=true": { "model": "nostrummagica:dungeon_dark" }
+        "master=false": { "model": "nostrummagica:block/dungeon_dark" },
+        "master=true": { "model": "nostrummagica:block/dungeon_dark" }
     }
 }

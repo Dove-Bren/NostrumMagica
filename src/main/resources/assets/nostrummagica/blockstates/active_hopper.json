@@ -1,11 +1,11 @@
 {	
 	"forge_marker": 1,
     "defaults": {
-        "model": "nostrummagica:active_hopper_off"
+        "model": "nostrummagica:block/active_hopper_off"
     },
     "variants": {
         "enabled": {
-            "true": {"model": "nostrummagica:active_hopper_on"},
+            "true": {"model": "nostrummagica:block/active_hopper_on"},
             "false": {}
         },
         "facing": {

@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "nostrummagica:magic_dirt" }
+        "normal": { "model": "nostrummagica:block/magic_dirt" }
     }
 }

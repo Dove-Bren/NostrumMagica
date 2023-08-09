@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.lwjgl.input.Keyboard;
+import org.lwjgl.glfw.GLFW;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.ActiveHopper;
@@ -272,25 +272,25 @@ public class ClientProxy extends CommonProxy {
 	public void preinit() {
 		super.preinit();
 		
-		bindingCast = new KeyBinding("key.cast.desc", Keyboard.KEY_LCONTROL, "key.nostrummagica.desc");
+		bindingCast = new KeyBinding("key.cast.desc", GLFW.GLFW_KEY_LEFT_CONTROL, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingCast);
-		bindingScroll = new KeyBinding("key.spellscroll.desc", Keyboard.KEY_LSHIFT, "key.nostrummagica.desc");
+		bindingScroll = new KeyBinding("key.spellscroll.desc", GLFW.GLFW_KEY_LEFT_SHIFT, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingScroll);
-		bindingInfo = new KeyBinding("key.infoscreen.desc", Keyboard.KEY_HOME, "key.nostrummagica.desc");
+		bindingInfo = new KeyBinding("key.infoscreen.desc", GLFW.GLFW_KEY_HOME, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingInfo);
-		bindingBladeCast = new KeyBinding("key.bladecast.desc", Keyboard.KEY_R, "key.nostrummagica.desc");
+		bindingBladeCast = new KeyBinding("key.bladecast.desc", GLFW.GLFW_KEY_R, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingBladeCast);
-		bindingPetPlacementModeCycle = new KeyBinding("key.pet.placementmode.desc", Keyboard.KEY_G, "key.nostrummagica.desc");
+		bindingPetPlacementModeCycle = new KeyBinding("key.pet.placementmode.desc", GLFW.GLFW_KEY_G, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingPetPlacementModeCycle);
-		bindingPetTargetModeCycle = new KeyBinding("key.pet.targetmode.desc", Keyboard.KEY_H, "key.nostrummagica.desc");
+		bindingPetTargetModeCycle = new KeyBinding("key.pet.targetmode.desc", GLFW.GLFW_KEY_H, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingPetTargetModeCycle);
-		bindingPetAttackAll = new KeyBinding("key.pet.attackall.desc", Keyboard.KEY_X, "key.nostrummagica.desc");
+		bindingPetAttackAll = new KeyBinding("key.pet.attackall.desc", GLFW.GLFW_KEY_X, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingPetAttackAll);
-		bindingPetAttack = new KeyBinding("key.pet.attack.desc", Keyboard.KEY_C, "key.nostrummagica.desc");
+		bindingPetAttack = new KeyBinding("key.pet.attack.desc", GLFW.GLFW_KEY_C, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingPetAttack);
-		bindingPetAllStop = new KeyBinding("key.pet.stopall.desc", Keyboard.KEY_L, "key.nostrummagica.desc");
+		bindingPetAllStop = new KeyBinding("key.pet.stopall.desc", GLFW.GLFW_KEY_L, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingPetAllStop);
-		bindingPetAllStop = new KeyBinding("key.pet.stopall.desc", Keyboard.KEY_L, "key.nostrummagica.desc");
+		bindingPetAllStop = new KeyBinding("key.pet.stopall.desc", GLFW.GLFW_KEY_L, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingPetAllStop);
 		
 		

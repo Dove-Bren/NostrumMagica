@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "nostrummagica:modification_table" }
+        "normal": { "model": "nostrummagica:block/modification_table" }
     }
 }

@@ -5,7 +5,6 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class ItemStacks {
 
@@ -15,7 +14,7 @@ public class ItemStacks {
 		}
 		
 		if (stack1.getItem() == stack2.getItem()
-				&& Objects.equals(stack1.getTagCompound(), stack2.getTagCompound())) {
+				&& Objects.equals(stack1.getTag(), stack2.getTag())) {
 			if (stack1.getMetadata() == OreDictionary.WILDCARD_VALUE || stack2.getMetadata() == OreDictionary.WILDCARD_VALUE) {
 				return true;
 			}

@@ -1,12 +1,12 @@
 {
     "variants": {
-        "facing=north,master=false": {"model": "nostrummagica:progression_door"},
-        "facing=south,master=false": {"model": "nostrummagica:progression_door"},
-        "facing=east,master=false": {"model": "nostrummagica:progression_door", "y"=90},
-        "facing=west,master=false": {"model": "nostrummagica:progression_door", "y"=90},
-        "facing=north,master=true": {"model": "nostrummagica:progression_door"},
-        "facing=south,master=true": {"model": "nostrummagica:progression_door"},
-        "facing=east,master=true": {"model": "nostrummagica:progression_door", "y"=90},
-        "facing=west,master=true": {"model": "nostrummagica:progression_door", "y"=90}
+        "facing=north,master=false": {"model": "nostrummagica:block/progression_door"},
+        "facing=south,master=false": {"model": "nostrummagica:block/progression_door"},
+        "facing=east,master=false": {"model": "nostrummagica:block/progression_door", "y"=90},
+        "facing=west,master=false": {"model": "nostrummagica:block/progression_door", "y"=90},
+        "facing=north,master=true": {"model": "nostrummagica:block/progression_door"},
+        "facing=south,master=true": {"model": "nostrummagica:block/progression_door"},
+        "facing=east,master=true": {"model": "nostrummagica:block/progression_door", "y"=90},
+        "facing=west,master=true": {"model": "nostrummagica:block/progression_door", "y"=90}
     }
 }

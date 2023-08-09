@@ -1,8 +1,8 @@
 package com.smanzana.nostrummagica.enchantments;
 
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnumEnchantmentType;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.enchantment.EnchantmentType;
+import net.minecraft.inventory.EquipmentSlotType;
 
 public class EnchantmentManaRecovery extends Enchantment {
 
@@ -17,13 +17,12 @@ public class EnchantmentManaRecovery extends Enchantment {
 	}
 	
 	protected EnchantmentManaRecovery() {
-		super(Rarity.RARE, EnumEnchantmentType.ARMOR, 
-				new EntityEquipmentSlot[] {
-						EntityEquipmentSlot.FEET,
-						EntityEquipmentSlot.LEGS,
-						EntityEquipmentSlot.CHEST,
-						EntityEquipmentSlot.HEAD});
-		this.setName("mana_recovery");
+		super(Rarity.RARE, EnchantmentType.ARMOR, 
+				new EquipmentSlotType[] {
+						EquipmentSlotType.FEET,
+						EquipmentSlotType.LEGS,
+						EquipmentSlotType.CHEST,
+						EquipmentSlotType.HEAD});
 		this.setRegistryName(ID);
 	}
 

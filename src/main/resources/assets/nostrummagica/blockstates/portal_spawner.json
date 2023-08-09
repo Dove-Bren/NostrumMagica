@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "nostrummagica:dungeon_dark" }
+        "normal": { "model": "nostrummagica:block/dungeon_dark" }
     }
 }

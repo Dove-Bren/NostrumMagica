@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "nostrummagica:mani_ore" }
+        "normal": { "model": "nostrummagica:block/mani_ore" }
     }
 }

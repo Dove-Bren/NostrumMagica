@@ -1,12 +1,12 @@
 {
     "variants": {
-        "age=0": { "model": "nostrummagica:ginseng_stage0" },
-        "age=1": { "model": "nostrummagica:ginseng_stage1" },
-        "age=2": { "model": "nostrummagica:ginseng_stage1" },
-        "age=3": { "model": "nostrummagica:ginseng_stage1" },
-        "age=4": { "model": "nostrummagica:ginseng_stage2" },
-        "age=5": { "model": "nostrummagica:ginseng_stage2" },
-        "age=6": { "model": "nostrummagica:ginseng_stage2" },
-        "age=7": { "model": "nostrummagica:ginseng_stage3" }
+        "age=0": { "model": "nostrummagica:block/ginseng_stage0" },
+        "age=1": { "model": "nostrummagica:block/ginseng_stage1" },
+        "age=2": { "model": "nostrummagica:block/ginseng_stage1" },
+        "age=3": { "model": "nostrummagica:block/ginseng_stage1" },
+        "age=4": { "model": "nostrummagica:block/ginseng_stage2" },
+        "age=5": { "model": "nostrummagica:block/ginseng_stage2" },
+        "age=6": { "model": "nostrummagica:block/ginseng_stage2" },
+        "age=7": { "model": "nostrummagica:block/ginseng_stage3" }
     }
 }

@@ -4,10 +4,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ITickable;
 
-public class SingleSpawnerTileEntity extends TileEntity implements ITickable {
+public class SingleSpawnerTileEntity extends TileEntity implements ITickableTileEntity {
 	
 	protected int ticksExisted;
 	
@@ -20,7 +20,7 @@ public class SingleSpawnerTileEntity extends TileEntity implements ITickable {
 	}
 	
 	@Override
-	public void update() {
+	public void tick() {
 		if (!world.isRemote && ++ticksExisted % 32 == 0) {
 			IBlockState state = this.world.getBlockState(this.pos);
 			if (state == null || !(state.getBlock() instanceof NostrumSingleSpawner)) {

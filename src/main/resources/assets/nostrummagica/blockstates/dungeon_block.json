@@ -1,6 +1,6 @@
 {
     "variants": {
-        "type=dark": { "model": "nostrummagica:dungeon_dark" },
-        "type=light": { "model": "nostrummagica:dungeon_light" }
+        "type=dark": { "model": "nostrummagica:block/dungeon_dark" },
+        "type=light": { "model": "nostrummagica:block/dungeon_light" }
     }
 }
