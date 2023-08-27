@@ -19,14 +19,14 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -36,11 +36,11 @@ public class HealthTrigger extends SpellTrigger {
 
 		private float amount;
 		private boolean onHigh;
-		private EntityLivingBase entity;
+		private LivingEntity entity;
 		private int duration;
 		private boolean expired;
 		
-		public HealthTriggerInstance(SpellState state, EntityLivingBase entity, float amount, boolean higher, int duration) {
+		public HealthTriggerInstance(SpellState state, LivingEntity entity, float amount, boolean higher, int duration) {
 			super(state);
 			this.amount = amount;
 			this.onHigh = higher;
@@ -54,7 +54,7 @@ public class HealthTrigger extends SpellTrigger {
 		}
 		
 		@Override
-		public void init(EntityLivingBase caster) {
+		public void init(LivingEntity caster) {
 			// We are instant! Whoo!
 			NostrumMagica.playerListener.registerHealth(this, entity, amount, onHigh);
 			NostrumMagica.playerListener.registerTimer(this, 0, 20 * duration);
@@ -66,7 +66,7 @@ public class HealthTrigger extends SpellTrigger {
 		}
 
 		@Override
-		public boolean onEvent(Event type, EntityLivingBase entity, Object unused) {
+		public boolean onEvent(Event type, LivingEntity entity, Object unused) {
 			if (type == Event.HEALTH) {
 				if (!expired) {
 					TriggerData data = new TriggerData(
@@ -76,7 +76,7 @@ public class HealthTrigger extends SpellTrigger {
 							null
 							);
 					
-					this.entity.world.getMinecraftServer().addScheduledTask(() -> {
+					this.entity.world.getMinecraftServer().runAsync(() -> {
 						this.trigger(data);
 						NostrumMagica.proxy.spawnEffect(this.getState().getSelf().world,
 								new SpellComponentWrapper(instance()),
@@ -88,9 +88,9 @@ public class HealthTrigger extends SpellTrigger {
 			} else if (type == Event.TIME) {
 				if (!expired) {
 					expired = true;
-					if (this.entity instanceof EntityPlayer) {
-						EntityPlayer player = (EntityPlayer) this.entity;
-						player.sendMessage(new TextComponentTranslation("modification.damaged_duration.health"));
+					if (this.entity instanceof PlayerEntity) {
+						PlayerEntity player = (PlayerEntity) this.entity;
+						player.sendMessage(new TranslationTextComponent("modification.damaged_duration.health"));
 						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_HEALTH, this.entity);
 					}
 				}
@@ -112,7 +112,7 @@ public class HealthTrigger extends SpellTrigger {
 	
 	private static final Map<UUID, HealthTriggerInstance> ActiveMap = new HashMap<>();
 	
-	private static final boolean SetTrigger(EntityLivingBase entity, @Nullable HealthTriggerInstance trigger) {
+	private static final boolean SetTrigger(LivingEntity entity, @Nullable HealthTriggerInstance trigger) {
 		HealthTriggerInstance existing = ActiveMap.put(entity.getUniqueID(), trigger);
 		if (existing != null && existing != trigger) {
 			existing.expired = true;

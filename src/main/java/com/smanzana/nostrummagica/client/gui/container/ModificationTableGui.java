@@ -20,9 +20,9 @@ import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.gui.Button;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
@@ -31,8 +31,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.oredict.OreDictionary;
 
 public class ModificationTableGui {
@@ -73,7 +73,7 @@ public class ModificationTableGui {
 		
 		// Kept just to report to server which TE is doing crafting
 		protected BlockPos pos;
-		protected EntityPlayer player;
+		protected PlayerEntity player;
 		
 		// Actual container variables as well as a couple for keeping track
 		// of crafting state
@@ -90,7 +90,7 @@ public class ModificationTableGui {
 		protected boolean hasFloat;
 		protected SpellComponentWrapper component;
 		
-		public ModificationTableContainer(EntityPlayer player, IInventory playerInv, ModificationTableEntity tableInventory, BlockPos pos) {
+		public ModificationTableContainer(PlayerEntity player, IInventory playerInv, ModificationTableEntity tableInventory, BlockPos pos) {
 			this.inventory = tableInventory;
 			this.player = player;
 			this.pos = pos;
@@ -160,7 +160,7 @@ public class ModificationTableGui {
 				}
 				
 				@Override
-				public ItemStack onTake(EntityPlayer playerIn, ItemStack stack) {
+				public ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
 					validate();
 					floatIndex = 0;
 					return super.onTake(playerIn, stack);
@@ -185,7 +185,7 @@ public class ModificationTableGui {
 		}
 		
 		@Override
-		public @Nonnull ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
+		public @Nonnull ItemStack transferStackInSlot(PlayerEntity playerIn, int fromSlot) {
 			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
 			
 			if (slot != null && slot.getHasStack()) {
@@ -223,7 +223,7 @@ public class ModificationTableGui {
 		}
 		
 		@Override
-		public boolean canInteractWith(EntityPlayer playerIn) {
+		public boolean canInteractWith(PlayerEntity playerIn) {
 			return true;
 		}
 		
@@ -366,7 +366,7 @@ public class ModificationTableGui {
 
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public static class ModificationGui extends AutoGuiContainer {
 
 		private ModificationTableContainer container;
@@ -377,7 +377,7 @@ public class ModificationTableGui {
 		private NonNullList<ItemStack> shadows;
 		
 		private static int buttonID = -1;
-		private GuiButton submitButton;
+		private Button submitButton;
 		
 		public ModificationGui(ModificationTableContainer container) {
 			super(container);
@@ -401,8 +401,8 @@ public class ModificationTableGui {
 		}
 		
 		@Override
-		public void initGui() {
-			super.initGui();
+		public void init() {
+			super.init();
 			
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
@@ -424,16 +424,16 @@ public class ModificationTableGui {
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			
-			GlStateManager.color(1.0F,  1.0F, 1.0F, 1.0F);
+			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 			mc.getTextureManager().bindTexture(TEXT);
 			
-			Gui.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
+			RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			
 			if (container.runeMode) {
 				// Draw rune sliders or toggles
 				int x, y;
-				int len = mc.fontRenderer.getStringWidth("Rune Modification");
-				mc.fontRenderer.drawStringWithShadow("Rune Modification",
+				int len = mc.font.getStringWidth("Rune Modification");
+				mc.font.drawStringWithShadow("Rune Modification",
 						horizontalMargin + (PANEL_HOFFSET) + (PANEL_WIDTH / 2) - (len / 2),
 						verticalMargin + PANEL_VOFFSET + 5, 0xFFFFFFFF);
 				y = verticalMargin + PANEL_VOFFSET + 20;
@@ -444,7 +444,7 @@ public class ModificationTableGui {
 						boolTitle = container.component.getTrigger().supportedBooleanName();
 					else
 						boolTitle = container.component.getShape().supportedBooleanName();
-					mc.fontRenderer.drawStringWithShadow(boolTitle, x, y, 0xFFa0a0a0);
+					mc.font.drawStringWithShadow(boolTitle, x, y, 0xFFa0a0a0);
 					
 					y += 25;
 				}
@@ -455,7 +455,7 @@ public class ModificationTableGui {
 						floatTitle = container.component.getTrigger().supportedFloatName();
 					else
 						floatTitle = container.component.getShape().supportedFloatName();
-					mc.fontRenderer.drawStringWithShadow(floatTitle, x, y, 0xFFa0a0a0);
+					mc.font.drawStringWithShadow(floatTitle, x, y, 0xFFa0a0a0);
 					
 					y += 25;
 				}
@@ -470,9 +470,9 @@ public class ModificationTableGui {
 					String name = tome.getDisplayName();
 					if (name == null || name.length() == 0)
 						name = "Spell Tome";
-					int len = mc.fontRenderer.getStringWidth(name);
+					int len = mc.font.getStringWidth(name);
 					x = horizontalMargin + PANEL_HOFFSET + (PANEL_WIDTH / 2) - (len / 2);
-					mc.fontRenderer.drawStringWithShadow(name, x, y, 0xFFFFFFFF);
+					mc.font.drawStringWithShadow(name, x, y, 0xFFFFFFFF);
 					y += 20;
 					
 					x = horizontalMargin + PANEL_HOFFSET + 5;
@@ -485,37 +485,37 @@ public class ModificationTableGui {
 					}
 					
 					// Efficiency
-					mc.fontRenderer.drawStringWithShadow("Efficiency: ", x, y, 0xFFA0A0A0);
-					mc.fontRenderer.drawString(String.format("%+03.0f%%", (summary.getEfficiency() - 1f) * 100), valX, y, 0xFFFFFFFF);
-					y += 2 + mc.fontRenderer.FONT_HEIGHT;
+					mc.font.drawStringWithShadow("Efficiency: ", x, y, 0xFFA0A0A0);
+					mc.font.drawString(String.format("%+03.0f%%", (summary.getEfficiency() - 1f) * 100), valX, y, 0xFFFFFFFF);
+					y += 2 + mc.font.FONT_HEIGHT;
 					
 					// LMC
-					mc.fontRenderer.drawStringWithShadow("Mana Cost: ", x, y, 0xFFA0A0A0);
-					mc.fontRenderer.drawString(String.format("%+03.0f%%", (summary.getCostRate() - 1f) * 100), valX, y, 0xFFFFFFFF);
-					y += 2 + mc.fontRenderer.FONT_HEIGHT;
+					mc.font.drawStringWithShadow("Mana Cost: ", x, y, 0xFFA0A0A0);
+					mc.font.drawString(String.format("%+03.0f%%", (summary.getCostRate() - 1f) * 100), valX, y, 0xFFFFFFFF);
+					y += 2 + mc.font.FONT_HEIGHT;
 					
 					// LRC
-					mc.fontRenderer.drawStringWithShadow("Reagent Cost: ", x, y, 0xFFA0A0A0);
-					mc.fontRenderer.drawString(String.format("%+03.0f%%", (summary.getReagentCost() - 1f) * 100), valX, y, 0xFFFFFFFF);
-					y += 2 + mc.fontRenderer.FONT_HEIGHT;
+					mc.font.drawStringWithShadow("Reagent Cost: ", x, y, 0xFFA0A0A0);
+					mc.font.drawString(String.format("%+03.0f%%", (summary.getReagentCost() - 1f) * 100), valX, y, 0xFFFFFFFF);
+					y += 2 + mc.font.FONT_HEIGHT;
 					
 					// XP
-					mc.fontRenderer.drawStringWithShadow("Bonus XP: ", x, y, 0xFFA0A0A0);
-					mc.fontRenderer.drawString(String.format("%+03.0f%%", (summary.getXpRate() - 1f) * 100), valX, y, 0xFFFFFFFF);
-					y += 2 + mc.fontRenderer.FONT_HEIGHT;
+					mc.font.drawStringWithShadow("Bonus XP: ", x, y, 0xFFA0A0A0);
+					mc.font.drawString(String.format("%+03.0f%%", (summary.getXpRate() - 1f) * 100), valX, y, 0xFFFFFFFF);
+					y += 2 + mc.font.FONT_HEIGHT;
 					
 					y = topY;
 					x += 100;
 					valX += 100;
 					
 					// Level
-					mc.fontRenderer.drawStringWithShadow("Level: ", x, y, 0xFFA0A0A0);
-					mc.fontRenderer.drawString("" + SpellTome.getLevel(tome), valX, y, 0xFFFFFFFF);
-					y += 2 + mc.fontRenderer.FONT_HEIGHT;
+					mc.font.drawStringWithShadow("Level: ", x, y, 0xFFA0A0A0);
+					mc.font.drawString("" + SpellTome.getLevel(tome), valX, y, 0xFFFFFFFF);
+					y += 2 + mc.font.FONT_HEIGHT;
 					
 					// Modifications
-					mc.fontRenderer.drawStringWithShadow("Modifications: ", x, y, 0xFFA0A0A0);
-					mc.fontRenderer.drawString("" + SpellTome.getModifications(tome), valX, y, 0xFFFFFFFF);
+					mc.font.drawStringWithShadow("Modifications: ", x, y, 0xFFA0A0A0);
+					mc.font.drawString("" + SpellTome.getModifications(tome), valX, y, 0xFFFFFFFF);
 							
 				}
 			}
@@ -527,8 +527,8 @@ public class ModificationTableGui {
 				}
 				if (!shadow.isEmpty()) {
 					GlStateManager.pushMatrix();
-					GlStateManager.translate(0, 0, -100);
-					mc.getRenderItem().renderItemIntoGUI(shadow,
+					GlStateManager.translatef(0, 0, -100);
+					mc.getItemRenderer().renderItemIntoGUI(shadow,
 						horizontalMargin + container.inputSlot.xPos,
 						verticalMargin + container.inputSlot.yPos);
 					GlStateManager.popMatrix();
@@ -537,25 +537,25 @@ public class ModificationTableGui {
 			
 			if (container.inventory.getMainSlot().isEmpty()) {
 				ItemStack display;
-//				if ((Minecraft.getSystemTime() / 1000) % 2 == 0) {
+//				if ((System.currentTimeMillis() / 1000) % 2 == 0) {
 //					display = new ItemStack(SpellTome.instance());
 //				} else {
 //					display = SpellRune.getRune(AoEShape.instance());
 //				}
-				final int idx = Math.abs(((int) Minecraft.getSystemTime() / 1000) % shadows.size());
+				final int idx = Math.abs(((int) System.currentTimeMillis() / 1000) % shadows.size());
 				display = shadows.get(idx);
 				
 				GlStateManager.pushMatrix();
-				GlStateManager.translate(0, 0, -100);
-				mc.getRenderItem().renderItemIntoGUI(display,
+				GlStateManager.translatef(0, 0, -100);
+				mc.getItemRenderer().renderItemIntoGUI(display,
 						horizontalMargin + SLOT_MAIN_HOFFSET,
 						verticalMargin + SLOT_MAIN_VOFFSET);
 				GlStateManager.popMatrix();
 				
 				int color = 0x55FFFFFF;
 				GlStateManager.pushMatrix();
-				GlStateManager.translate(0, 0, 1);
-				Gui.drawRect(
+				GlStateManager.translatef(0, 0, 1);
+				RenderFuncs.drawRect(
 						horizontalMargin + SLOT_MAIN_HOFFSET,
 						verticalMargin + SLOT_MAIN_VOFFSET,
 						horizontalMargin + SLOT_MAIN_HOFFSET + 16,
@@ -570,8 +570,8 @@ public class ModificationTableGui {
 						|| (container.inputSlot.required.isEmpty() && container.inputSlot.getHasStack()))
 					color = 0x90FF5050;
 				GlStateManager.pushMatrix();
-				GlStateManager.translate(0, 0, 1);
-				Gui.drawRect(
+				GlStateManager.translatef(0, 0, 1);
+				RenderFuncs.drawRect(
 						horizontalMargin + container.inputSlot.xPos,
 						verticalMargin + container.inputSlot.yPos,
 						horizontalMargin + container.inputSlot.xPos + 16,
@@ -593,14 +593,14 @@ public class ModificationTableGui {
 				if (mouseX >= submitX && mouseY >= submitY
 						&& mouseX <= submitX + SUBMIT_WIDTH
 						&& mouseY <= submitY + SUBMIT_HEIGHT) {
-					Gui.drawRect(SUBMIT_HOFFSET, SUBMIT_VOFFSET, SUBMIT_HOFFSET + SUBMIT_WIDTH, SUBMIT_VOFFSET + SUBMIT_HEIGHT, 0x20FFFFFF);
+					RenderFuncs.drawRect(SUBMIT_HOFFSET, SUBMIT_VOFFSET, SUBMIT_HOFFSET + SUBMIT_WIDTH, SUBMIT_VOFFSET + SUBMIT_HEIGHT, 0x20FFFFFF);
 				}
 				
 //				if (!container.spellValid) {
 //					
 //					if (mouseX > horizontalMargin + STATUS_DISP_HOFFSET && mouseX <= horizontalMargin + STATUS_DISP_HOFFSET + STATUS_WIDTH
 //						 && mouseY > verticalMargin + STATUS_DISP_VOFFSET && mouseY <= verticalMargin + STATUS_DISP_VOFFSET + STATUS_HEIGHT) {
-//						GlStateManager.color(1.0F,  1.0F, 1.0F, 1.0F);
+//						GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 //						
 //						this.drawHoveringText(container.spellErrorStrings,
 //								mouseX - horizontalMargin, mouseY - verticalMargin);
@@ -609,12 +609,12 @@ public class ModificationTableGui {
 //				
 //				if (mouseX > horizontalMargin + NAME_HOFFSET && mouseX <= horizontalMargin + NAME_HOFFSET + NAME_WIDTH
 //						 && mouseY > verticalMargin + NAME_VOFFSET && mouseY <= verticalMargin + NAME_VOFFSET + NAME_HEIGHT) {
-//					Gui.drawRect(NAME_HOFFSET, NAME_VOFFSET, NAME_HOFFSET + NAME_WIDTH, NAME_VOFFSET + NAME_HEIGHT, 0x40000000);
+//					RenderFuncs.drawRect(NAME_HOFFSET, NAME_VOFFSET, NAME_HOFFSET + NAME_WIDTH, NAME_VOFFSET + NAME_HEIGHT, 0x40000000);
 //				}
 //				
 //				if (mouseX >= horizontalMargin + SUBMIT_HOFFSET && mouseX <= horizontalMargin + SUBMIT_HOFFSET + SUBMIT_WIDTH && 
 //						mouseY >= verticalMargin + SUBMIT_VOFFSET && mouseY <= verticalMargin + SUBMIT_VOFFSET + SUBMIT_HEIGHT) {
-//					Gui.drawRect(SUBMIT_HOFFSET, SUBMIT_VOFFSET, SUBMIT_HOFFSET + SUBMIT_WIDTH, SUBMIT_VOFFSET + SUBMIT_HEIGHT, 0x40000000);
+//					RenderFuncs.drawRect(SUBMIT_HOFFSET, SUBMIT_VOFFSET, SUBMIT_HOFFSET + SUBMIT_WIDTH, SUBMIT_VOFFSET + SUBMIT_HEIGHT, 0x40000000);
 //					this.drawHoveringText(container.reagentStrings,
 //							mouseX - horizontalMargin, mouseY - verticalMargin);
 //				}
@@ -623,7 +623,7 @@ public class ModificationTableGui {
 		}
 			
 		@Override
-		public void actionPerformed(GuiButton button) {
+		public void actionPerformed(Button button) {
 			if (button == this.submitButton && container.isValid) {
 				if (container.runeMode) {
 					SpellComponentWrapper component = SpellRune.toComponentWrapper(container.inventory.getMainSlot());
@@ -672,7 +672,7 @@ public class ModificationTableGui {
 		}
 		
 		protected void refreshButtons() {
-			this.buttonList.clear();
+			this.buttons.clear();
 			
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
@@ -726,7 +726,7 @@ public class ModificationTableGui {
 			this.addButton(submitButton);
 		}
 		
-		private static class ToggleButton extends GuiButton {
+		private static class ToggleButton extends Button {
 
 			private boolean val;
 			private ModificationTableContainer container;
@@ -740,7 +740,7 @@ public class ModificationTableGui {
 			}
 			
 			@Override
-			public void drawButton(Minecraft mc, int parX, int parY, float partialTicks) {
+			public void render(int parX, int parY, float partialTicks) {
 				if (visible) {
 					
 					float tint = 1f;
@@ -757,7 +757,7 @@ public class ModificationTableGui {
 					if (val != container.boolIndex)
 						x += BUTTON_WIDTH;
 					
-					GlStateManager.color(tint, tint, tint);
+					GlStateManager.color4f(tint, tint, tint);
 					this.drawTexturedModalRect(this.x, this.y,
 							BUTTON_TEXT_HOFFSET + x, BUTTON_TEXT_VOFFSET,
 							this.width, this.height);
@@ -765,7 +765,7 @@ public class ModificationTableGui {
 			}
 		}
 		
-		private static class FloatButton extends GuiButton {
+		private static class FloatButton extends Button {
 			private int val;
 			private float actualVal;
 			private ModificationTableContainer container;
@@ -780,7 +780,7 @@ public class ModificationTableGui {
 			}
 			
 			@Override
-			public void drawButton(Minecraft mc, int parX, int parY, float partialTicks) {
+			public void render(int parX, int parY, float partialTicks) {
 				if (visible) {
 					
 					// In rune mode, float buttons are buttons that display the number
@@ -799,14 +799,14 @@ public class ModificationTableGui {
 						
 						int len;
 						String text = String.format("%.1f", actualVal);
-						len = mc.fontRenderer.getStringWidth(text);
+						len = mc.font.getStringWidth(text);
 						
-						GlStateManager.color(tint, tint, tint);
+						GlStateManager.color4f(tint, tint, tint);
 						this.drawTexturedModalRect(this.x, this.y,
 								BUTTON_TEXT_HOFFSET + x, BUTTON_TEXT_VOFFSET + BUTTON_HEIGHT,
 								this.width, this.height);
 						
-						mc.fontRenderer.drawString(text,
+						mc.font.drawString(text,
 								this.x + (LARGE_BUTTON_WIDTH / 2) - (len / 2),
 								this.y + 1,
 								0xFF000000);
@@ -824,21 +824,21 @@ public class ModificationTableGui {
 						if (container.floatIndex != this.val)
 							x += LARGE_BUTTON_WIDTH;
 						
-						GlStateManager.color(tint, tint, tint);
+						GlStateManager.color4f(tint, tint, tint);
 						Gui.drawScaledCustomSizeModalRect(this.x, this.y, BUTTON_TEXT_HOFFSET + x, BUTTON_TEXT_VOFFSET + BUTTON_HEIGHT,
 								LARGE_BUTTON_WIDTH, LARGE_BUTTON_HEIGHT, this.width, this.height, 256, 256);
 //						this.drawTexturedModalRect(this.x, this.y,
 //								BUTTON_TEXT_HOFFSET + x, BUTTON_TEXT_VOFFSET + BUTTON_HEIGHT,
 //								this.width, this.height);
 						
-						GlStateManager.color(tint, tint, tint);
+						GlStateManager.color4f(tint, tint, tint);
 						SpellIcon.get(this.val).render(mc, this.x + 2, this.y + 2, this.width - 4, this.height - 4);
 					}
 				}
 			}
 		}
 		
-		private static class SubmitButton extends GuiButton {
+		private static class SubmitButton extends Button {
 			
 			private ModificationTableContainer container;
 			
@@ -850,7 +850,7 @@ public class ModificationTableGui {
 			}
 			
 			@Override
-			public void drawButton(Minecraft mc, int parX, int parY, float partialTicks) {
+			public void render(int parX, int parY, float partialTicks) {
 				if (visible) {
 					
 					float tint = 1f;
@@ -861,7 +861,7 @@ public class ModificationTableGui {
 					}
 					
 					mc.getTextureManager().bindTexture(TEXT);
-					GlStateManager.color(tint, tint, tint);
+					GlStateManager.color4f(tint, tint, tint);
 					int y = 0;
 					if (container.isValid)
 						y += SUBMIT_HEIGHT;
@@ -909,7 +909,7 @@ public class ModificationTableGui {
 		}
 		
 		@Override
-		public ItemStack onTake(EntityPlayer playerIn, ItemStack stack) {
+		public ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
 			container.validate();
 			return super.onTake(playerIn, stack);
 		}

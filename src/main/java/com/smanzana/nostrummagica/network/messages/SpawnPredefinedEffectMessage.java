@@ -6,8 +6,8 @@ import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect.Predefin
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -28,7 +28,7 @@ public class SpawnPredefinedEffectMessage implements IMessage {
 		@Override
 		public IMessage onMessage(SpawnPredefinedEffectMessage message, MessageContext ctx) {
 			
-			EntityPlayer player = NostrumMagica.proxy.getPlayer();
+			PlayerEntity player = NostrumMagica.proxy.getPlayer();
 			if (player.dimension != message.dimension) {
 				return null;
 			}
@@ -81,7 +81,7 @@ public class SpawnPredefinedEffectMessage implements IMessage {
 
 	@Override
 	public void fromBytes(ByteBuf buf) {
-		NBTTagCompound tag = ByteBufUtils.readTag(buf);
+		CompoundNBT tag = ByteBufUtils.readTag(buf);
 		try {
 			this.type = PredefinedEffect.valueOf(tag.getString(NBT_TYPE).toUpperCase()); 
 		} catch (Exception e) {
@@ -89,36 +89,36 @@ public class SpawnPredefinedEffectMessage implements IMessage {
 			this.type = PredefinedEffect.SOUL_DAGGER_STAB;
 		}
 		
-		this.duration = tag.getInteger(NBT_DURATION);
-		this.dimension = tag.getInteger(NBT_DIMENSION_ID);
-		if (tag.hasKey(NBT_POS, NBT.TAG_COMPOUND)) {
+		this.duration = tag.getInt(NBT_DURATION);
+		this.dimension = tag.getInt(NBT_DIMENSION_ID);
+		if (tag.contains(NBT_POS, NBT.TAG_COMPOUND)) {
 			this.entityID = 0;
-			final NBTTagCompound subtag = tag.getCompoundTag(NBT_POS);
+			final CompoundNBT subtag = tag.getCompound(NBT_POS);
 			final double x = subtag.getDouble("x");
 			final double y = subtag.getDouble("y");
 			final double z = subtag.getDouble("z");
 			this.position = new Vec3d(x, y, z);
 		} else {
 			this.position = null;
-			this.entityID = tag.getInteger(NBT_ENTITY);
+			this.entityID = tag.getInt(NBT_ENTITY);
 		}
 	}
 
 	@Override
 	public void toBytes(ByteBuf buf) {
-		NBTTagCompound tag = new NBTTagCompound();
+		CompoundNBT tag = new CompoundNBT();
 		
-		tag.setString(NBT_TYPE, type.name());
-		tag.setInteger(NBT_DIMENSION_ID, dimension);
-		tag.setInteger(NBT_DURATION, duration);
+		tag.putString(NBT_TYPE, type.name());
+		tag.putInt(NBT_DIMENSION_ID, dimension);
+		tag.putInt(NBT_DURATION, duration);
 		if (this.position != null) {
-			NBTTagCompound subtag = new NBTTagCompound();
+			CompoundNBT subtag = new CompoundNBT();
 			subtag.setDouble("x", position.x);
 			subtag.setDouble("y", position.y);
 			subtag.setDouble("z", position.z);
-			tag.setTag(NBT_POS, subtag);
+			tag.put(NBT_POS, subtag);
 		} else {
-			tag.setInteger(NBT_ENTITY, entityID);
+			tag.putInt(NBT_ENTITY, entityID);
 		}
 		
 		ByteBufUtils.writeTag(buf, tag);

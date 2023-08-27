@@ -3,8 +3,8 @@ package com.smanzana.nostrummagica.network.messages;
 import com.smanzana.nostrummagica.items.WarlockSword;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -24,9 +24,9 @@ public class BladeCastMessage implements IMessage {
 			// Attempt blade cast
 			// TODO make this more generic with an interface or something and move trying to find the hand
 			// into a helper on the interface instead of in warlock blade
-			final EntityPlayerMP sp = ctx.getServerHandler().player;
+			final ServerPlayerEntity sp = ctx.getServerHandler().player;
 			
-			sp.getServerWorld().addScheduledTask(() -> {
+			sp.getServerWorld().runAsync(() -> {
 				WarlockSword.DoCast(sp);
 			});
 			
@@ -34,10 +34,10 @@ public class BladeCastMessage implements IMessage {
 		}
 	}
 
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public BladeCastMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	@Override

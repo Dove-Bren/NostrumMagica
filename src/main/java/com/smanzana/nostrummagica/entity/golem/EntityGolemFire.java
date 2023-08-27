@@ -14,7 +14,7 @@ import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
@@ -67,16 +67,16 @@ public class EntityGolemFire extends EntityGolem {
 	}
 
 	@Override
-	public void doMeleeTask(EntityLivingBase target) {
+	public void doMeleeTask(LivingEntity target) {
 		; // Shouldn't happen. Can't.
 	}
 
 	@Override
-	public void doRangeTask(EntityLivingBase target) {
+	public void doRangeTask(LivingEntity target) {
 		EntityGolemFire.init();
 		
 		// Pick a spell to do
-		EntityLivingBase targ = this.getAttackTarget();
+		LivingEntity targ = this.getAttackTarget();
 		if (targ != target)
 			this.setAttackTarget(target);
 		
@@ -102,10 +102,10 @@ public class EntityGolemFire extends EntityGolem {
 	}
 
 	@Override
-	public void doBuffTask(EntityLivingBase target) {
+	public void doBuffTask(LivingEntity target) {
 		EntityGolemFire.init();
 		
-		EntityLivingBase targ = this.getAttackTarget();
+		LivingEntity targ = this.getAttackTarget();
 		if (targ != target)
 			this.setAttackTarget(target);
 		
@@ -116,7 +116,7 @@ public class EntityGolemFire extends EntityGolem {
 	}
 
 	@Override
-	public boolean shouldDoBuff(EntityLivingBase target) {
+	public boolean shouldDoBuff(LivingEntity target) {
 		return target.getActivePotionEffect(Potion.getPotionFromResourceLocation("fire_resistance")) == null;
 	}
 

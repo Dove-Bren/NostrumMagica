@@ -6,7 +6,7 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
@@ -16,7 +16,7 @@ import net.minecraft.world.World;
 public class OutcomeSpawnEntity implements IRitualOutcome {
 
 	public static interface IEntityFactory {
-		public void spawn(World world, Vec3d pos, EntityPlayer invoker, ItemStack centerItem);
+		public void spawn(World world, Vec3d pos, PlayerEntity invoker, ItemStack centerItem);
 		
 		public String getEntityName();
 	}
@@ -30,7 +30,7 @@ public class OutcomeSpawnEntity implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, EntityPlayer player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, PlayerEntity player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
 		if (world.isRemote)
 			return;
 		

@@ -46,8 +46,8 @@ import com.smanzana.nostrummagica.spells.SpellActionSummary;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IEntityOwnable;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.boss.EntityDragon;
@@ -55,8 +55,8 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.monster.EntityEndermite;
 import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
@@ -80,8 +80,8 @@ import net.minecraftforge.oredict.OreDictionary;
 public class SpellAction {
 	
 	private static interface SpellEffect {
-		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float eff);
-		public boolean apply(EntityLivingBase caster, World world, BlockPos block, float eff);
+		public boolean apply(LivingEntity caster, LivingEntity entity, float eff);
+		public boolean apply(LivingEntity caster, World world, BlockPos block, float eff);
 	}
 	
 	private static abstract class NegativeSpellEffect implements SpellEffect {
@@ -90,9 +90,9 @@ public class SpellAction {
 			return true;
 		}
 		
-		protected abstract boolean applyEffect(EntityLivingBase caster, EntityLivingBase entity, float eff);
+		protected abstract boolean applyEffect(LivingEntity caster, LivingEntity entity, float eff);
 		
-		public final boolean apply(EntityLivingBase caster, EntityLivingBase entity, float eff) {
+		public final boolean apply(LivingEntity caster, LivingEntity entity, float eff) {
 			if (entity != null && isHarmful() && caster != entity) {
 				if (entity instanceof IEntityOwnable) {
 					if (caster.getUniqueID().equals(((IEntityOwnable) entity).getOwnerId())) {
@@ -121,7 +121,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean applyEffect(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public boolean applyEffect(LivingEntity caster, LivingEntity entity, float efficiency) {
 			float fin = calcDamage(caster, entity, amount * efficiency, element);
 			source.setLastAttackedEntity(entity);
 			entity.setRevengeTarget(caster);
@@ -161,7 +161,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean apply(EntityLivingBase caster, World world, BlockPos pos, float efficiency) {
+		public boolean apply(LivingEntity caster, World world, BlockPos pos, float efficiency) {
 			return false; // Do nothing
 		}
 	}
@@ -174,7 +174,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public boolean apply(LivingEntity caster, LivingEntity entity, float efficiency) {
 			if (entity.isEntityUndead()) {
 				source.setLastAttackedEntity(entity);
 				entity.setRevengeTarget(caster);
@@ -196,7 +196,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean apply(EntityLivingBase caster, World world, BlockPos pos, float efficiency) {
+		public boolean apply(LivingEntity caster, World world, BlockPos pos, float efficiency) {
 			return false; // Do nothing
 		}
 	}
@@ -209,16 +209,16 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
-			if (entity instanceof EntityPlayer) {
-				EntityPlayer player = (EntityPlayer) entity;
+		public boolean apply(LivingEntity caster, LivingEntity entity, float efficiency) {
+			if (entity instanceof PlayerEntity) {
+				PlayerEntity player = (PlayerEntity) entity;
 				player.getFoodStats().addStats((int) (amount * efficiency), 2);
 				NostrumMagicaSounds.STATUS_BUFF2.play(entity);
 				return true;
 			} else if (entity instanceof EntityAnimal && caster != null && 
-					caster instanceof EntityPlayer) {
+					caster instanceof PlayerEntity) {
 				((EntityAnimal) entity)
-					.setInLove((EntityPlayer) caster);
+					.setInLove((PlayerEntity) caster);
 				NostrumMagicaSounds.STATUS_BUFF2.play(entity);
 				return true;
 			} else {
@@ -229,7 +229,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean apply(EntityLivingBase caster, World world, BlockPos pos, float efficiency) {
+		public boolean apply(LivingEntity caster, World world, BlockPos pos, float efficiency) {
 			return false; // Do nothing
 		}
 	}
@@ -242,7 +242,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public boolean apply(LivingEntity caster, LivingEntity entity, float efficiency) {
 			INostrumMagic magic = NostrumMagica.getMagicWrapper(entity);
 			if (magic == null) {
 				NostrumMagicaSounds.CAST_FAIL.play(entity);
@@ -256,7 +256,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean apply(EntityLivingBase caster, World world, BlockPos pos, float efficiency) {
+		public boolean apply(LivingEntity caster, World world, BlockPos pos, float efficiency) {
 			return false; // Do nothing
 		}
 	}
@@ -278,7 +278,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean applyEffect(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public boolean applyEffect(LivingEntity caster, LivingEntity entity, float efficiency) {
 			entity.addPotionEffect(new PotionEffect(effect, (int) (duration * efficiency), amp));
 			
 			if (effect.isBadEffect()) {
@@ -293,7 +293,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean apply(EntityLivingBase caster, World world, BlockPos pos, float efficiency) {
+		public boolean apply(LivingEntity caster, World world, BlockPos pos, float efficiency) {
 			return false; // Do nothing
 		}
 	}
@@ -306,7 +306,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public boolean apply(LivingEntity caster, LivingEntity entity, float efficiency) {
 			NostrumMagicaSounds.STATUS_BUFF1.play(entity);
 			
 			if (number == -1 || entity.getActivePotionEffects().size() < number) {
@@ -324,7 +324,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean apply(EntityLivingBase caster, World world, BlockPos pos, float efficiency) {
+		public boolean apply(LivingEntity caster, World world, BlockPos pos, float efficiency) {
 			return false; // Do nothing
 		}
 	}
@@ -337,12 +337,12 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public boolean apply(LivingEntity caster, LivingEntity entity, float efficiency) {
 			NostrumMagicaSounds.STATUS_BUFF1.play(entity);
 			
-			if (caster != null && caster instanceof EntityPlayer) {
+			if (caster != null && caster instanceof PlayerEntity) {
 				// Look for lightning belt
-				IInventory baubles = NostrumMagica.baubles.getBaubles((EntityPlayer) caster);
+				IInventory baubles = NostrumMagica.baubles.getBaubles((PlayerEntity) caster);
 				if (baubles != null) {
 					for (int i = 0; i < baubles.getSizeInventory(); i++) {
 						ItemStack stack = baubles.getStackInSlot(i);
@@ -370,7 +370,7 @@ public class SpellAction {
 			Vec3d dest;
 			Vec3d direction = entity.getLookVec().normalize();
 			Vec3d source = entity.getPositionVector();
-			source = source.addVector(0, entity.getEyeHeight(), 0);
+			source = source.add(0, entity.getEyeHeight(), 0);
 			BlockPos bpos;
 			Vec3d translation = new Vec3d(direction.x * dist,
 					direction.y * dist,
@@ -443,7 +443,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean apply(EntityLivingBase caster, World world, BlockPos pos, float efficiency) {
+		public boolean apply(LivingEntity caster, World world, BlockPos pos, float efficiency) {
 			return false; // Do nothing
 		}
 	}
@@ -458,12 +458,12 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean applyEffect(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public boolean applyEffect(LivingEntity caster, LivingEntity entity, float efficiency) {
 			return apply(caster, entity.world, entity.getPosition(), efficiency);
 		}
 		
 		@Override
-		public boolean apply(EntityLivingBase caster, World world, BlockPos pos, float efficiency) {
+		public boolean apply(LivingEntity caster, World world, BlockPos pos, float efficiency) {
 
 			// We abs the amp here, but check it belwo for pull and negate vector
 			float magnitude = .35f * (Math.abs(amp) + 1.0f) * (float) Math.min(2.0f, Math.max(0.0f, 1.0f + Math.log(efficiency)));
@@ -490,7 +490,7 @@ public class SpellAction {
 					if (amp < 0) {
 						// pull
 						// Cap force's magnitude at .2 dist
-						double mod = force.lengthVector();
+						double mod = force.length();
 						if (mod > dist * .2) {
 							mod = (dist * .4) / mod;
 							force = new Vec3d(
@@ -610,7 +610,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public boolean apply(LivingEntity caster, LivingEntity entity, float efficiency) {
 			ItemStack inhand = entity.getHeldItemMainhand();
 			boolean offhand = false;
 			if (inhand.isEmpty()) {
@@ -668,23 +668,23 @@ public class SpellAction {
 				NostrumMagicaSounds.CAST_CONTINUE.play(entity);
 			}
 			
-			if (entity instanceof EntityPlayer) {
-				EntityPlayer p = (EntityPlayer) entity;
+			if (entity instanceof PlayerEntity) {
+				PlayerEntity p = (PlayerEntity) entity;
 				if (inhand.getCount() == 1) {
 					if (offhand) {
 						p.inventory.removeStackFromSlot(40);
 					} else {
 						p.inventory.removeStackFromSlot(p.inventory.currentItem);
 					}
-					((EntityPlayer) entity).inventory.addItemStackToInventory(stack);
+					((PlayerEntity) entity).inventory.addItemStackToInventory(stack);
 				} else {
 					inhand.splitStack(1);
-					((EntityPlayer) entity).inventory.addItemStackToInventory(stack);
+					((PlayerEntity) entity).inventory.addItemStackToInventory(stack);
 				}
 				
 				
 			} else {
-				// EntityLiving has held item in slot 0
+				// MobEntity has held item in slot 0
 				entity.setHeldItem(EnumHand.MAIN_HAND, stack);
 			}
 			
@@ -692,7 +692,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean apply(EntityLivingBase caster, World world, BlockPos pos, float efficiency) {
+		public boolean apply(LivingEntity caster, World world, BlockPos pos, float efficiency) {
 			Block block = world.getBlockState(pos).getBlock();
 			if (!blocks.contains(block)) {
 				NostrumMagicaSounds.CAST_FAIL.play(world, pos.getX() + .5, pos.getY(), pos.getZ() + .5);
@@ -728,7 +728,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean applyEffect(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public boolean applyEffect(LivingEntity caster, LivingEntity entity, float efficiency) {
 			int duration = (int) (this.duration * efficiency);
 			if (duration == 0)
 				return false; // Nope
@@ -745,7 +745,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public boolean apply(EntityLivingBase caster, World world, BlockPos block, float efficiency) {
+		public boolean apply(LivingEntity caster, World world, BlockPos block, float efficiency) {
 			IBlockState state = world.getBlockState(block);
 			if (state != null && state.getBlock() instanceof Candle) {
 				Candle.light(world, block, state);
@@ -778,7 +778,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean applyEffect(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public boolean applyEffect(LivingEntity caster, LivingEntity entity, float efficiency) {
 			entity.setRevengeTarget(caster);
 			entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
 			entity.hurtResistantTime = 0;
@@ -786,13 +786,13 @@ public class SpellAction {
 		}
 
 		@Override
-		public boolean apply(EntityLivingBase caster, World world, BlockPos block, float efficiency) {
+		public boolean apply(LivingEntity caster, World world, BlockPos block, float efficiency) {
 			
 			int count = 1;
 			
-			if (caster != null && caster instanceof EntityPlayer) {
+			if (caster != null && caster instanceof PlayerEntity) {
 				// Look for lightning belt
-				IInventory baubles = NostrumMagica.baubles.getBaubles((EntityPlayer) caster);
+				IInventory baubles = NostrumMagica.baubles.getBaubles((PlayerEntity) caster);
 				if (baubles != null) {
 					for (int i = 0; i < baubles.getSizeInventory(); i++) {
 						ItemStack stack = baubles.getStackInSlot(i);
@@ -853,7 +853,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public boolean apply(LivingEntity caster, LivingEntity entity, float efficiency) {
 			// Pick a place to spawn it and then defer to location one
 			World world = caster.getEntityWorld();
 			BlockPos center = caster.getPosition();
@@ -882,11 +882,11 @@ public class SpellAction {
 		}
 
 		@Override
-		public boolean apply(EntityLivingBase caster, World world, BlockPos block, float efficiency) {
+		public boolean apply(LivingEntity caster, World world, BlockPos block, float efficiency) {
 			
 			// For non-player entities, just spawn some new golems.
 			// Else spawn player-bound golems
-			if (caster instanceof EntityPlayer) {
+			if (caster instanceof PlayerEntity) {
 				if (NostrumMagica.getMagicWrapper(caster) == null) {
 					return false;
 				}
@@ -903,7 +903,7 @@ public class SpellAction {
 				int time = (int) (20 * 60 * 2.5 * Math.pow(2, Math.max(0, power - 1)) * efficiency);
 				caster.addPotionEffect(new PotionEffect(FamiliarPotion.instance(), time, 0) {
 					@Override
-					public boolean onUpdate(EntityLivingBase entityIn) {
+					public boolean onUpdate(LivingEntity entityIn) {
 						// heh snekky
 						boolean ret = super.onUpdate(entityIn);
 						if (ret) {
@@ -916,7 +916,7 @@ public class SpellAction {
 							if (attr != null) {
 								boolean active = false;
 								if (!attr.getFamiliars().isEmpty()) {
-									for (EntityLivingBase fam : attr.getFamiliars()) {
+									for (LivingEntity fam : attr.getFamiliars()) {
 										if (fam.isEntityAlive()) {
 											active = true;
 											break;
@@ -988,7 +988,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean applyEffect(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public boolean applyEffect(LivingEntity caster, LivingEntity entity, float efficiency) {
 			if (caster == null || entity == null)
 				return false;
 			
@@ -996,7 +996,7 @@ public class SpellAction {
 			float pitch = caster.rotationPitch;
 			float yaw = caster.rotationYawHead;
 			
-			if (caster instanceof EntityPlayer) {
+			if (caster instanceof PlayerEntity) {
 				caster.setPositionAndRotation(caster.posX, caster.posY, caster.posZ, entity.rotationYawHead, entity.rotationPitch);
 				caster.setPositionAndUpdate(
 						entity.posX, entity.posY, entity.posZ);
@@ -1007,7 +1007,7 @@ public class SpellAction {
 						);
 			}
 			
-			if (entity instanceof EntityPlayer) {
+			if (entity instanceof PlayerEntity) {
 				entity.setPositionAndRotation(entity.posX, entity.posY, entity.posZ, yaw, pitch);
 				entity.setPositionAndUpdate(pos.x, pos.y, pos.z);
 			} else {
@@ -1020,7 +1020,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean apply(EntityLivingBase caster, World world, BlockPos pos, float efficiency) {
+		public boolean apply(LivingEntity caster, World world, BlockPos pos, float efficiency) {
 			caster.setPositionAndUpdate(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
 			caster.fallDistance = 0;
 			return true;
@@ -1036,16 +1036,16 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public boolean apply(LivingEntity caster, LivingEntity entity, float efficiency) {
 
 			Vec3d force = entity.getLookVec().addVector(0, 0.15, 0).normalize();
 			float scale = 1f * (.5f * (level + 1)) * (float) (Math.max(0.0, Math.min(2.0, 1.0 - Math.log(efficiency))));
 			
 			force = new Vec3d(force.x * scale, force.y * scale, force.z * scale);
 			
-			entity.motionX += force.x;
-			entity.motionY += force.y;
-			entity.motionZ += force.z;
+			entity.getMotion().x += force.x;
+			entity.getMotion().y += force.y;
+			entity.getMotion().z += force.z;
 			entity.velocityChanged = true;
 			
 			NostrumMagicaSounds.DAMAGE_WIND.play(entity);
@@ -1053,7 +1053,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean apply(EntityLivingBase caster, World world, BlockPos pos, float efficiency) {
+		public boolean apply(LivingEntity caster, World world, BlockPos pos, float efficiency) {
 			return false; // Doesn't mean anything
 		}
 	}
@@ -1067,8 +1067,8 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean applyEffect(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
-			if (caster != entity && entity instanceof EntityLiving) {
+		public boolean applyEffect(LivingEntity caster, LivingEntity entity, float efficiency) {
+			if (caster != entity && entity instanceof MobEntity) {
 				// Make sure they want to attack you if you do it
 				entity.setRevengeTarget(caster);
 				entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
@@ -1077,9 +1077,9 @@ public class SpellAction {
 			
 			double radius = (16 + (32.0 * level)) * efficiency;
 			
-			if (caster != null && caster instanceof EntityPlayer) {
+			if (caster != null && caster instanceof PlayerEntity) {
 				// Look for ender belt
-				IInventory baubles = NostrumMagica.baubles.getBaubles((EntityPlayer) caster);
+				IInventory baubles = NostrumMagica.baubles.getBaubles((PlayerEntity) caster);
 				if (baubles != null) {
 					for (int i = 0; i < baubles.getSizeInventory(); i++) {
 						ItemStack stack = baubles.getStackInSlot(i);
@@ -1118,7 +1118,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public boolean apply(EntityLivingBase caster, World world, BlockPos block, float efficiency) {
+		public boolean apply(LivingEntity caster, World world, BlockPos block, float efficiency) {
 			// Summon an entity
 			if (!world.isAirBlock(block))
 				block.add(0, 1, 0);
@@ -1168,9 +1168,9 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public boolean apply(LivingEntity caster, LivingEntity entity, float efficiency) {
 			// Different effect if non-player casts: just give magic buff
-			if (!(caster instanceof EntityPlayer)) {
+			if (!(caster instanceof PlayerEntity)) {
 				int count = level + 1;
 				double amt = 2 + level;
 				caster.removeActivePotionEffect(MagicBuffPotion.instance());
@@ -1211,8 +1211,8 @@ public class SpellAction {
 			if (addedItem.isEmpty() && !didEmpower) {
 				NostrumMagicaSounds.CAST_FAIL.play(entity);
 			} else {
-				if (entity instanceof EntityPlayer) {
-					EntityPlayer p = (EntityPlayer) entity;
+				if (entity instanceof PlayerEntity) {
+					PlayerEntity p = (PlayerEntity) entity;
 					if (inhand.getCount() == 1) {
 						if (offhand) {
 							p.inventory.removeStackFromSlot(40);
@@ -1223,12 +1223,12 @@ public class SpellAction {
 						inhand.splitStack(1);
 					}
 					if (!addedItem.isEmpty()) {
-						((EntityPlayer) entity).inventory.addItemStackToInventory(addedItem);
+						((PlayerEntity) entity).inventory.addItemStackToInventory(addedItem);
 					}
 					
 					
 				} else {
-					// EntityLiving has held item in slot 0
+					// MobEntity has held item in slot 0
 					if (!addedItem.isEmpty()) {
 						entity.setHeldItem(EnumHand.MAIN_HAND, addedItem);
 					}
@@ -1240,7 +1240,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public boolean apply(EntityLivingBase caster, World world, BlockPos block, float efficiency) {
+		public boolean apply(LivingEntity caster, World world, BlockPos block, float efficiency) {
 			return false;
 		}
 		
@@ -1255,7 +1255,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public boolean apply(LivingEntity caster, LivingEntity entity, float efficiency) {
 			if (entity instanceof EntityAnimal) {
 				EntityAnimal animal = (EntityAnimal) entity;
 				animal.addGrowth((int) (count * 500 * efficiency));
@@ -1267,7 +1267,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public boolean apply(EntityLivingBase caster, World world, BlockPos block, float efficiency) {
+		public boolean apply(LivingEntity caster, World world, BlockPos block, float efficiency) {
 			if (world.isAirBlock(block)) {
 				block = block.add(0, -1, 0);
 			}
@@ -1302,7 +1302,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean applyEffect(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public boolean applyEffect(LivingEntity caster, LivingEntity entity, float efficiency) {
 			int amount = (int) (20 * level * efficiency);
 			if (level > 2)
 				amount *= 2;
@@ -1331,7 +1331,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public boolean apply(EntityLivingBase caster, World world, BlockPos block, float efficiency) {
+		public boolean apply(LivingEntity caster, World world, BlockPos block, float efficiency) {
 			return false;
 		}
 		
@@ -1346,12 +1346,12 @@ public class SpellAction {
 		}
 
 		@Override
-		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public boolean apply(LivingEntity caster, LivingEntity entity, float efficiency) {
 			return apply(caster, entity.world, entity.getPosition().add(0, 1, 0), efficiency);
 		}
 
 		@Override
-		public boolean apply(EntityLivingBase caster, World world, BlockPos block, float efficiency) {
+		public boolean apply(LivingEntity caster, World world, BlockPos block, float efficiency) {
 			if (!world.isAirBlock(block))
 				block = block.add(0, 1, 0); // TODO don't move up one cause it messes up AoE effects and double-affects locations!
 			
@@ -1377,12 +1377,12 @@ public class SpellAction {
 		}
 
 		@Override
-		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public boolean apply(LivingEntity caster, LivingEntity entity, float efficiency) {
 			return apply(caster, entity.world, entity.getPosition().add(0, 1, 0), efficiency);
 		}
 
 		@Override
-		public boolean apply(EntityLivingBase caster, World world, BlockPos block, float efficiency) {
+		public boolean apply(LivingEntity caster, World world, BlockPos block, float efficiency) {
 			
 			world.setBlockState(block, com.smanzana.nostrummagica.blocks.CursedIce.instance().getState(level));
 			NostrumMagicaSounds.DAMAGE_ICE.play(world, block.getX(), block.getY(), block.getZ());
@@ -1400,12 +1400,12 @@ public class SpellAction {
 		}
 
 		@Override
-		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+		public boolean apply(LivingEntity caster, LivingEntity entity, float efficiency) {
 			return apply(caster, entity.world, entity.getPosition().add(0, -1, 0), efficiency);
 		}
 
 		@Override
-		public boolean apply(EntityLivingBase caster, World world, BlockPos block, float efficiency) {
+		public boolean apply(LivingEntity caster, World world, BlockPos block, float efficiency) {
 			
 			Block result;
 			float temp = world.getBiome(block).getTemperature(block);
@@ -1504,11 +1504,11 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float eff) {
+		public boolean apply(LivingEntity caster, LivingEntity entity, float eff) {
 			return apply(caster, entity.world, entity.getPosition().add(0, -1, 0), eff);
 		}
 		
-		protected boolean isTool(@Nullable EntityPlayer player, ItemStack stack) {
+		protected boolean isTool(@Nullable PlayerEntity player, ItemStack stack) {
 			if (stack.isEmpty()) {
 				return false;
 			}
@@ -1525,7 +1525,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public boolean apply(EntityLivingBase caster, World world, BlockPos block, float eff) {
+		public boolean apply(LivingEntity caster, World world, BlockPos block, float eff) {
 			if (world.isAirBlock(block))
 				return false;
 			
@@ -1538,8 +1538,8 @@ public class SpellAction {
 				return false;
 			
 			boolean onlyStone = (level <= 1);
-			if (onlyStone && caster instanceof EntityPlayer) {
-				if (!OreDictionary.containsMatch(false, GetStone(), state.getBlock().getPickBlock(state, null, world, block, (EntityPlayer) caster))) {
+			if (onlyStone && caster instanceof PlayerEntity) {
+				if (!OreDictionary.containsMatch(false, GetStone(), state.getBlock().getPickBlock(state, null, world, block, (PlayerEntity) caster))) {
 					return false;
 				}
 			}
@@ -1550,25 +1550,25 @@ public class SpellAction {
 			if (hardness >= 100f || hardness < 0f)
 				return false;
 			
-			if (caster instanceof EntityPlayerMP) {
+			if (caster instanceof ServerPlayerEntity) {
 				// This checks item harvest level >:(
-//				if (!state.getBlock().canHarvestBlock(world, block, (EntityPlayer) caster)) {
+//				if (!state.getBlock().canHarvestBlock(world, block, (PlayerEntity) caster)) {
 //					return false;
 //				}
 				
 				if (usePickaxe) {
 					// Check if they have a pickaxe
 					ItemStack inHand = caster.getHeldItemMainhand();
-					if (!isTool((EntityPlayer) caster, inHand)) {
+					if (!isTool((PlayerEntity) caster, inHand)) {
 						inHand = caster.getHeldItemOffhand();
 					}
-					if (!isTool((EntityPlayer) caster, inHand)) {
+					if (!isTool((PlayerEntity) caster, inHand)) {
 						usePickaxe = false;
 					}
 				}
 				
 				if (usePickaxe) {
-					((EntityPlayerMP) caster).interactionManager.tryHarvestBlock(block);
+					((ServerPlayerEntity) caster).interactionManager.tryHarvestBlock(block);
 				} else {
 					world.destroyBlock(block, true);
 				}
@@ -1592,7 +1592,7 @@ public class SpellAction {
 //		}
 //
 //		@Override
-//		public boolean apply(EntityLivingBase caster, EntityLivingBase entity, float efficiency) {
+//		public boolean apply(LivingEntity caster, LivingEntity entity, float efficiency) {
 //			ItemStack inhand = entity.getHeldItemMainhand();
 //			boolean offhand = false;
 //			if (inhand.isEmpty()) {
@@ -1610,17 +1610,17 @@ public class SpellAction {
 //		}
 //
 //		@Override
-//		public boolean apply(EntityLivingBase caster, World world, BlockPos block, float efficiency) {
+//		public boolean apply(LivingEntity caster, World world, BlockPos block, float efficiency) {
 //			; // No effect
 //		}
 //		
 //	}
 	
-	private EntityLivingBase source;
+	private LivingEntity source;
 	private List<SpellEffect> effects;
 	private String nameKey;
 	
-	public SpellAction(EntityLivingBase source) {
+	public SpellAction(LivingEntity source) {
 		this.source = source;
 		effects = new LinkedList<>();
 	}
@@ -1632,11 +1632,11 @@ public class SpellAction {
 	 * @param efficiency
 	 * @return
 	 */
-	public boolean apply(EntityLivingBase entity, float efficiency) {
+	public boolean apply(LivingEntity entity, float efficiency) {
 		if (entity.world.isRemote)
 			return false;
 		
-		final EntityLivingBase ent = entity;
+		final LivingEntity ent = entity;
 		boolean affected = false;
 		
 		SpellActionSummary summary = new SpellActionSummary(this, efficiency);
@@ -1648,7 +1648,7 @@ public class SpellAction {
 				if (!entity.getServer().isCallingFromMinecraftThread()) {
 					throw new RuntimeException("Wrong thread for spell effects!");
 				}
-				//entity.getServer().addScheduledTask(() -> {
+				//entity.getServer().runAsync(() -> {
 				affected = effect.apply(source, ent, summary.getEfficiency()) || affected;
 				//});
 			}
@@ -1680,7 +1680,7 @@ public class SpellAction {
 				throw new RuntimeException("Wrong thread for spell effects!");
 			}
 			
-			//world.getMinecraftServer().addScheduledTask(() -> {
+			//world.getMinecraftServer().runAsync(() -> {
 				affected = effect.apply(source, w, b, efficiency) || affected;
 			//});
 		}
@@ -1702,7 +1702,7 @@ public class SpellAction {
 		return false;
 	}
 	
-	public static final float calcDamage(EntityLivingBase caster, EntityLivingBase target, float base, EMagicElement element) {
+	public static final float calcDamage(LivingEntity caster, LivingEntity target, float base, EMagicElement element) {
 		float amt = 0f;
 		
 		if (target == null)
@@ -1798,7 +1798,7 @@ public class SpellAction {
 		return base;
 	}
 	
-	public static final float applyArmor(EntityLivingBase target, float damage) {
+	public static final float applyArmor(LivingEntity target, float damage) {
             int i = 25 - target.getTotalArmorValue();
             float f = damage * (float)i;
             return f / 25.0F;

@@ -20,9 +20,9 @@ import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint.INBTGenerator;
 
 import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagString;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.StringNBT;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.fml.common.ProgressManager.ProgressBar;
@@ -185,30 +185,30 @@ public class DungeonRoomRegistry {
 	private static final String NBT_WEIGHT = "weight";
 	private static final String NBT_NAME = "name";
 	
-	protected static final NBTTagCompound toNBT(NBTTagCompound blueprintTag, String name, int weight, List<String> tags) {
-		NBTTagCompound nbt = new NBTTagCompound();
-		nbt.setString(NBT_NAME, name);
-		nbt.setInteger(NBT_WEIGHT, weight);
-		nbt.setTag(NBT_BLUEPRINT, blueprintTag);
+	protected static final CompoundNBT toNBT(CompoundNBT blueprintTag, String name, int weight, List<String> tags) {
+		CompoundNBT nbt = new CompoundNBT();
+		nbt.putString(NBT_NAME, name);
+		nbt.putInt(NBT_WEIGHT, weight);
+		nbt.put(NBT_BLUEPRINT, blueprintTag);
 		
-		NBTTagList list = new NBTTagList();
+		ListNBT list = new ListNBT();
 		for (String tag : tags) {
-			list.appendTag(new NBTTagString(tag));
+			list.add(new StringNBT(tag));
 		}
-		nbt.setTag(NBT_TAGS, list);
+		nbt.put(NBT_TAGS, list);
 		
 		return nbt;
 	}
 	
-	private final RoomBlueprint loadFromNBT(NBTTagCompound nbt, boolean doRegister) {
+	private final RoomBlueprint loadFromNBT(CompoundNBT nbt, boolean doRegister) {
 		String name = nbt.getString(NBT_NAME);
-		int weight = nbt.getInteger(NBT_WEIGHT);
+		int weight = nbt.getInt(NBT_WEIGHT);
 		
 		if (name.isEmpty() || weight <= 0) {
 			return null;
 		}
 		
-		RoomBlueprint blueprint = RoomBlueprint.fromNBT(nbt.getCompoundTag(NBT_BLUEPRINT));
+		RoomBlueprint blueprint = RoomBlueprint.fromNBT(nbt.getCompound(NBT_BLUEPRINT));
 		if (blueprint == null) {
 			return null;
 		}
@@ -216,11 +216,11 @@ public class DungeonRoomRegistry {
 		// TODO join to master if this is a piece?
 		
 		List<String> tags = new LinkedList<>();
-		NBTTagList list = nbt.getTagList(NBT_TAGS, NBT.TAG_STRING);
+		ListNBT list = nbt.getList(NBT_TAGS, NBT.TAG_STRING);
 		
-		int tagCount = list.tagCount();
+		int tagCount = list.size();
 		for (int i = 0; i < tagCount; i++) {
-			tags.add(list.getStringTagAt(i));
+			tags.add(list.getString(i));
 		}
 		
 		if (doRegister) {
@@ -234,7 +234,7 @@ public class DungeonRoomRegistry {
 		return blueprint;
 	}
 	
-	public final RoomBlueprint loadFromNBT(NBTTagCompound nbt) {
+	public final RoomBlueprint loadFromNBT(CompoundNBT nbt) {
 		return this.loadFromNBT(nbt, false);
 	}
 	
@@ -271,7 +271,7 @@ public class DungeonRoomRegistry {
 			
 			ProgressBar bar = ProgressManager.push("Reading Room", 1);
 			bar.step(file.getName());
-			NBTTagCompound nbt;
+			CompoundNBT nbt;
 			if (file.getName().endsWith(ROOM_COMPRESSED_EXT)) {
 				nbt = CompressedStreamTools.readCompressed(new FileInputStream(file));
 			} else {
@@ -309,7 +309,7 @@ public class DungeonRoomRegistry {
 			
 			ProgressBar bar = ProgressManager.push("Reading Room", 1);
 			bar.step(name);
-			NBTTagCompound nbt;
+			CompoundNBT nbt;
 			if (name.endsWith(ROOM_COMPRESSED_EXT)) {
 				nbt = CompressedStreamTools.readCompressed(stream);
 			} else {
@@ -355,7 +355,7 @@ public class DungeonRoomRegistry {
 			for (File subfile : subfiles) {
 				if (subfile.getName().equalsIgnoreCase(ROOM_ROOT_NAME) || subfile.getName().equalsIgnoreCase(ROOM_ROOT_NAME_COMP)) {
 					rootFile = subfile;
-					NBTTagCompound nbt;
+					CompoundNBT nbt;
 					if (subfile.getName().endsWith(ROOM_COMPRESSED_EXT)) {
 						nbt = CompressedStreamTools.readCompressed(new FileInputStream(subfile));
 					} else {
@@ -391,7 +391,7 @@ public class DungeonRoomRegistry {
 					continue;
 				}
 				
-				NBTTagCompound nbt;
+				CompoundNBT nbt;
 				if (subfile.getName().endsWith(ROOM_COMPRESSED_EXT)) {
 					nbt = CompressedStreamTools.readCompressed(new FileInputStream(subfile));
 				} else {
@@ -438,7 +438,7 @@ public class DungeonRoomRegistry {
 			RoomBlueprint root = null;
 			ProgressBar bar = ProgressManager.push("Reading Room", streams.length);
 			
-			NBTTagCompound nbt;
+			CompoundNBT nbt;
 			
 			if (fileNames.length != streams.length) {
 				throw new RuntimeException("Number of streams doesn't match number of files");
@@ -599,7 +599,7 @@ public class DungeonRoomRegistry {
 		NostrumMagica.logger.info("Loaded " + count + " room overrides (" + (((double)(System.currentTimeMillis() - startTime) / 1000D)) + " seconds)");
 	}
 	
-	private final boolean writeRoomAsFileInternal(File saveFile, NBTTagCompound blueprintTag, String name, int weight, List<String> tags) {
+	private final boolean writeRoomAsFileInternal(File saveFile, CompoundNBT blueprintTag, String name, int weight, List<String> tags) {
 		boolean success = true;
 		
 		try {
@@ -631,7 +631,7 @@ public class DungeonRoomRegistry {
 			
 			for (int i = 0; gen.hasNext(); i++) {
 				String fileName;
-				NBTTagCompound nbt = gen.next();
+				CompoundNBT nbt = gen.next();
 				if (i == 0) {
 					// Root room has extra info and needs to be identified
 					fileName = ROOM_ROOT_NAME;

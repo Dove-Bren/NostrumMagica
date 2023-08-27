@@ -17,13 +17,13 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class SpellPlate extends Item implements ILoreTagged {
 
@@ -61,22 +61,22 @@ public class SpellPlate extends Item implements ILoreTagged {
 		type = type % SpellTome.MAX_TOME_COUNT;
 		ItemStack stack = new ItemStack(instance, 1, type);
 		
-		NBTTagCompound nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTagCompound();
 		
 		if (nbt == null)
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		
-		nbt.setInteger(NBT_CAPACITY, capacity);
+		nbt.putInt(NBT_CAPACITY, capacity);
 		if (enhancements != null && enhancements.length > 0) {
-			NBTTagList list = new NBTTagList();
+			ListNBT list = new ListNBT();
 			for (SpellTomeEnhancementWrapper enhance : enhancements) {
-				NBTTagCompound tag = new NBTTagCompound();
-				tag.setString(NBT_ENHANCEMENT_TYPE, enhance.getEnhancement().getTitleKey());
-				tag.setInteger(NBT_ENHANCEMENT_LEVEL, enhance.getLevel());
-				list.appendTag(tag);
+				CompoundNBT tag = new CompoundNBT();
+				tag.putString(NBT_ENHANCEMENT_TYPE, enhance.getEnhancement().getTitleKey());
+				tag.putInt(NBT_ENHANCEMENT_LEVEL, enhance.getLevel());
+				list.add(tag);
 			}
 			
-			nbt.setTag(NBT_ENHANCEMENTS, list);
+			nbt.put(NBT_ENHANCEMENTS, list);
 		}
 		
 		stack.setTagCompound(nbt);
@@ -84,7 +84,7 @@ public class SpellPlate extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
 		if (this.isInCreativeTab(tab)) {
 			for (int i = 0; i < SpellTome.MAX_TOME_COUNT; i++) {
@@ -114,7 +114,7 @@ public class SpellPlate extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		int capacity = getCapacity(stack);
 		tooltip.add(I18n.format("info.tome.capacity", new Object[] {capacity}));
@@ -218,17 +218,17 @@ public class SpellPlate extends Item implements ILoreTagged {
 			return null;
 		
 		List<SpellTomeEnhancementWrapper> enhancements = new LinkedList<>();
-		NBTTagList list = stack.getTagCompound().getTagList(NBT_ENHANCEMENTS, NBT.TAG_COMPOUND);
+		ListNBT list = stack.getTagCompound().getTagList(NBT_ENHANCEMENTS, NBT.TAG_COMPOUND);
 		if (list == null || list.hasNoTags())
 			return enhancements;
 		
-		for (int i = 0; i < list.tagCount(); i++) {
-			NBTTagCompound tag = list.getCompoundTagAt(i);
+		for (int i = 0; i < list.size(); i++) {
+			CompoundNBT tag = list.getCompoundTagAt(i);
 			String key = tag.getString(NBT_ENHANCEMENT_TYPE);
 			SpellTomeEnhancement enhance = SpellTomeEnhancement.lookupEnhancement(key);
 			if (enhance == null)
 				continue;
-			int level = tag.getInteger(NBT_ENHANCEMENT_LEVEL);
+			int level = tag.getInt(NBT_ENHANCEMENT_LEVEL);
 			if (level == 0)
 				continue;
 			enhancements.add(new SpellTomeEnhancementWrapper(enhance, level));

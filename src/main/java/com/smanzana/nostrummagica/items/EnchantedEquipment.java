@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 
 public interface EnchantedEquipment {
@@ -23,7 +23,7 @@ public interface EnchantedEquipment {
 	 * @param offense Are WE the ones attacking? (this is a weapon)
 	 * @return null to issue no action, or the action to issue
 	 */
-	public SpellAction getTriggerAction(EntityLivingBase user, boolean offense, @Nonnull ItemStack stack);
+	public SpellAction getTriggerAction(LivingEntity user, boolean offense, @Nonnull ItemStack stack);
 	
 	/**
 	 * Should we trigger?

@@ -10,11 +10,11 @@ import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.ResourceLocation;
 
 public class ModelSwitchTrigger extends ModelBase {
@@ -37,11 +37,11 @@ public class ModelSwitchTrigger extends ModelBase {
 		
 		GlStateManager.pushMatrix();
 		
-		GlStateManager.translate(0, .6, 0);
+		GlStateManager.translatef(0, .6, 0);
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GlStateManager.enableBlend();
 		GlStateManager.disableLighting();
-		GlStateManager.enableAlpha();
+		GlStateManager.enableAlphaTest();
 		//GlStateManager.disableCull();
 		
 		boolean magic = (te != null && te.getType() == SwitchType.MAGIC);
@@ -51,11 +51,11 @@ public class ModelSwitchTrigger extends ModelBase {
 		}
 		
 		if (magic) {
-			GlStateManager.color(sat * .2f, sat * .4f, sat * 1f, .8f);
+			GlStateManager.color4f(sat * .2f, sat * .4f, sat * 1f, .8f);
 		} else {
-			GlStateManager.color(sat * 1f, sat * 1f, sat * 0f, .8f);
+			GlStateManager.color4f(sat * 1f, sat * 1f, sat * 0f, .8f);
 		}
-		Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation(NostrumMagica.MODID,
+		Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(NostrumMagica.MODID,
 				"textures/entity/golem_ice.png"
 				));
 		
@@ -88,8 +88,8 @@ public class ModelSwitchTrigger extends ModelBase {
 		
 		
 		
-		GlStateManager.color(1f, 1f, 1f, 1f);
-		Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation(NostrumMagica.MODID,
+		GlStateManager.color4f(1f, 1f, 1f, 1f);
+		Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(NostrumMagica.MODID,
 				"textures/blocks/spawner.png"
 				));
 		
@@ -123,7 +123,7 @@ public class ModelSwitchTrigger extends ModelBase {
 	}
 	
 	@Override
-	public void setLivingAnimations(EntityLivingBase entitylivingbaseIn, float p_78086_2_, float age, float partialTickTime) {
+	public void setLivingAnimations(LivingEntity entitylivingbaseIn, float p_78086_2_, float age, float partialTickTime) {
 		EntitySwitchTrigger trigger = (EntitySwitchTrigger) entitylivingbaseIn;
 		SwitchBlockTileEntity te = trigger.getLinkedTileEntity();
 		
@@ -139,10 +139,10 @@ public class ModelSwitchTrigger extends ModelBase {
 		final float time = entitylivingbaseIn.world.getTotalWorldTime() + partialTickTime;
 		final float period = (float) (20 * (fast ? spinActivated : spinIdle));
 		float angle = 360f * ((time % period) / period);
-		GlStateManager.rotate(angle, 0, 1, 0);
+		GlStateManager.rotatef(angle, 0, 1, 0);
 		
 		// also bob up and down
 		angle = (float) (2 * Math.PI * (time % 60 / 60));
-		GlStateManager.translate(0, Math.sin(angle) * .1, 0);
+		GlStateManager.translatef(0, Math.sin(angle) * .1, 0);
 	}
 }

@@ -11,8 +11,8 @@ import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoom;
 
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -20,15 +20,15 @@ import net.minecraft.world.World;
 public class NostrumDungeon {
 	
 	public static class DungeonExitPoint {
-		private EnumFacing facing;
+		private Direction facing;
 		private BlockPos pos;
 		
-		public DungeonExitPoint(BlockPos pos, EnumFacing facing) {
+		public DungeonExitPoint(BlockPos pos, Direction facing) {
 			this.pos = pos;
 			this.facing = facing;
 		}
 
-		public EnumFacing getFacing() {
+		public Direction getFacing() {
 			return facing;
 		}
 
@@ -45,16 +45,16 @@ public class NostrumDungeon {
 		private static final String NBT_DIR = "facing";
 		
 		
-		public NBTTagCompound toNBT() {
-			NBTTagCompound tag = new NBTTagCompound();
-			tag.setLong(NBT_POS, this.pos.toLong());
+		public CompoundNBT toNBT() {
+			CompoundNBT tag = new CompoundNBT();
+			tag.putLong(NBT_POS, this.pos.toLong());
 			tag.setByte(NBT_DIR, (byte) facing.getHorizontalIndex());
 			return tag;
 		}
 		
-		public static DungeonExitPoint fromNBT(NBTTagCompound nbt) {
+		public static DungeonExitPoint fromNBT(CompoundNBT nbt) {
 			BlockPos pos = BlockPos.fromLong(nbt.getLong(NBT_POS));
-			EnumFacing facing = EnumFacing.getHorizontal(nbt.getByte(NBT_DIR));
+			Direction facing = Direction.getHorizontal(nbt.getByte(NBT_DIR));
 			return new DungeonExitPoint(pos, facing);
 		}
 		
@@ -181,7 +181,7 @@ public class NostrumDungeon {
 				Path path = new Path(null, pathLen + rand.nextInt(pathRand));
 				if (key == 0) {
 					if (!keyRooms.isEmpty() && !doorRooms.isEmpty())
-						path.hasKey();
+						path.contains();
 				}
 				
 				path.spawn(world, exit, inEnd);
@@ -222,12 +222,12 @@ public class NostrumDungeon {
 			this.remaining = remaining;
 //			this.parent = parent;
 //			this.firstRoom = room;
-			this.hasKey = false;
+			this.contains = false;
 			this.hasDoor = false;
 		}
 		
 		public void hasKey() {
-			this.hasKey = true;
+			this.contains = true;
 		}
 		
 		public void hasDoor() {
@@ -356,7 +356,7 @@ public class NostrumDungeon {
 						inEnd = ending; // just set to null again if we don't have one 
 					}
 					if (keyI == 0) {
-						path.hasKey();
+						path.contains();
 					}
 					
 					path.spawn(world, exit, inEnd);
@@ -388,7 +388,7 @@ public class NostrumDungeon {
 		}
 	}
 	
-	public static DungeonExitPoint asRotated(DungeonExitPoint start, BlockPos offset, EnumFacing facing) {
+	public static DungeonExitPoint asRotated(DungeonExitPoint start, BlockPos offset, Direction facing) {
 		int modX = 1;
 		int modZ = 1;
 		boolean swap = false;
@@ -425,7 +425,7 @@ public class NostrumDungeon {
 		pos = new BlockPos(pos.getX() + x, pos.getY() + offset.getY(), pos.getZ() + z);
 		
 		int rot;
-		EnumFacing out = start.facing;
+		Direction out = start.facing;
 		switch (facing) {
 		case NORTH:
 		default:

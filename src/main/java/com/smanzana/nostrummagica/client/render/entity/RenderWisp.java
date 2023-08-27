@@ -6,7 +6,7 @@ import java.util.Map;
 import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.ResourceLocation;
@@ -33,7 +33,7 @@ public class RenderWisp extends Render<EntityWisp> {
 		super.doRender(entity, x, y, z, entityYaw, partialTicks);
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(x, y, z);
+		GlStateManager.translatef(x, y, z);
 		model.render(entity, partialTicks, 0, 0, 0, 0, this.scale);
 		GlStateManager.popMatrix();
 	}

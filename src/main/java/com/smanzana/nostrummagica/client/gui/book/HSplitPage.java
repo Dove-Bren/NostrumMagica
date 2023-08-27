@@ -1,10 +1,10 @@
 package com.smanzana.nostrummagica.client.gui.book;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.util.ResourceLocation;
 
 public class HSplitPage implements IClickableBookPage {
@@ -44,8 +44,8 @@ public class HSplitPage implements IClickableBookPage {
 		
 		//draw dividing line on bottom (if applicable)
 		if (drawSplit) {
-			Minecraft.getMinecraft().getTextureManager().bindTexture(divide);
-			Gui.drawModalRectWithCustomSizedTexture(xoffset, yoffset + (subheight + (divideSize / 2)),
+			Minecraft.getInstance().getTextureManager().bindTexture(divide);
+			RenderFuncs.drawModalRectWithCustomSizedTexture(xoffset, yoffset + (subheight + (divideSize / 2)),
 					0, 0, width, divideSize, TEXT_WIDTH, TEXT_HEIGHT);
 		}
 		
@@ -71,7 +71,7 @@ public class HSplitPage implements IClickableBookPage {
 	}
 
 	@Override
-	public boolean onClick(BookScreen parent, int mouseX, int mouseY, int button) {
+	public boolean onClick(BookScreen parent, double mouseX, double mouseY, int button) {
 		int divideSize = 10; //amount in middle as seperation.
 		if (!drawSplit)
 			divideSize = 0;

@@ -14,8 +14,8 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 
@@ -70,8 +70,8 @@ public interface INostrumMagic {
 	public void addManaBonus(int bonus);
 	
 	// Familiars
-	public List<EntityLivingBase> getFamiliars();
-	public void addFamiliar(EntityLivingBase familiar);
+	public List<LivingEntity> getFamiliars();
+	public void addFamiliar(LivingEntity familiar);
 	public void clearFamiliars();
 	
 	// Binding
@@ -145,7 +145,7 @@ public interface INostrumMagic {
 	public void deserializeSpells(String crc);
 	// Copy fields out of
 	public void copy(INostrumMagic cap);
-	public void provideEntity(EntityLivingBase entity);
+	public void provideEntity(LivingEntity entity);
 	
 	// Quests
 	public List<String> getCompletedQuests();
@@ -173,5 +173,5 @@ public interface INostrumMagic {
 	public void setSorceryPortalLocation(int dimension, BlockPos pos);
 	
 	// Refresh attributes and rescan for them
-	public void refresh(EntityPlayerMP player);
+	public void refresh(ServerPlayerEntity player);
 }

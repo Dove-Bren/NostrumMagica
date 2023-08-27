@@ -4,7 +4,7 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 
 public class CommandTestConfig extends CommandBase {
 
@@ -25,7 +25,7 @@ public class CommandTestConfig extends CommandBase {
 		try {
 			level = Integer.parseInt(args[0]);
 		} catch (NumberFormatException e) {
-			sender.sendMessage(new TextComponentString("Failed to parse level"));
+			sender.sendMessage(new StringTextComponent("Failed to parse level"));
 		}
 	}
 

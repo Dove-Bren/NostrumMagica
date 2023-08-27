@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.network.messages;
 import com.smanzana.nostrummagica.client.gui.petgui.PetGUI;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -21,10 +21,10 @@ public class PetGUIControlMessage implements IMessage {
 		@Override
 		public IMessage onMessage(PetGUIControlMessage message, MessageContext ctx) {
 			// Get ID
-			int id = message.tag.getInteger(NBT_KEY);
-			NBTTagCompound nbt = message.tag.getCompoundTag(NBT_MESSAGE);
+			int id = message.tag.getInt(NBT_KEY);
+			CompoundNBT nbt = message.tag.getCompound(NBT_MESSAGE);
 			
-			ctx.getServerHandler().player.getServerWorld().addScheduledTask(() -> {
+			ctx.getServerHandler().player.getServerWorld().runAsync(() -> {
 				PetGUI.updateServerContainer(id, nbt);
 			});
 			
@@ -36,17 +36,17 @@ public class PetGUIControlMessage implements IMessage {
 	private static final String NBT_KEY = "key";
 	private static final String NBT_MESSAGE = "message";
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public PetGUIControlMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
-	public PetGUIControlMessage(int id, NBTTagCompound data) {
+	public PetGUIControlMessage(int id, CompoundNBT data) {
 		this();
 		
-		tag.setInteger(NBT_KEY, id);
-		tag.setTag(NBT_MESSAGE, data);
+		tag.putInt(NBT_KEY, id);
+		tag.put(NBT_MESSAGE, data);
 	}
 
 	@Override

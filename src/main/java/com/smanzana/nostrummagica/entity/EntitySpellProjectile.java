@@ -10,9 +10,9 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger.ProjectileTriggerInstance;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.EntityFireball;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.EnumParticleTypes;
@@ -32,7 +32,7 @@ public class EntitySpellProjectile extends EntityFireball {
 	private @Nullable Predicate<Entity> filter;
 
 	public EntitySpellProjectile(ProjectileTriggerInstance trigger,
-			EntityLivingBase shooter, float speedFactor, double maxDistance) {
+			LivingEntity shooter, float speedFactor, double maxDistance) {
 		this(trigger,
 				shooter,
 				shooter.world,
@@ -47,7 +47,7 @@ public class EntitySpellProjectile extends EntityFireball {
         this.setSize(0.3125F, 0.3125F);
 	}
 	
-	public EntitySpellProjectile(ProjectileTriggerInstance trigger, EntityLivingBase shooter,
+	public EntitySpellProjectile(ProjectileTriggerInstance trigger, LivingEntity shooter,
 			World world,
 			double fromX, double fromY, double fromZ, Vec3d direction,
 			float speedFactor, double maxDistance) {
@@ -138,7 +138,7 @@ public class EntitySpellProjectile extends EntityFireball {
 	}
 	
 	@Override
-	public boolean writeToNBTOptional(NBTTagCompound compound) {
+	public boolean writeToNBTOptional(CompoundNBT compound) {
 		// Returning false means we won't be saved. That's what we want.
 		return false;
     }

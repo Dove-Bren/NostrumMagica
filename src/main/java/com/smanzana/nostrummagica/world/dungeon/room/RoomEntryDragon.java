@@ -12,7 +12,7 @@ import net.minecraft.block.BlockLadder;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockTorch;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -206,13 +206,13 @@ public class RoomEntryDragon extends StaticRoom {
 				"BBBBBBBBBBB",
 				"BBBBBBBBBBB",
 				'B', DungeonBlock.instance(),
-				'N', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.NORTH)),
-				'S', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.SOUTH)),
-				'W', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.WEST)),
-				'E', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.EAST)),
-				'l', new BlockState(Blocks.LADDER, Blocks.LADDER.getDefaultState().withProperty(BlockLadder.FACING, EnumFacing.SOUTH)),
+				'N', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.NORTH)),
+				'S', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.SOUTH)),
+				'W', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.WEST)),
+				'E', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.EAST)),
+				'l', new BlockState(Blocks.LADDER, Blocks.LADDER.getDefaultState().withProperty(BlockLadder.FACING, Direction.SOUTH)),
 				' ', null,
-				'U', new BlockState(Blocks.STONE_BRICK_STAIRS, Blocks.STONE_BRICK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.NORTH).withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.BOTTOM).withProperty(BlockStairs.SHAPE, BlockStairs.EnumShape.STRAIGHT)),
+				'U', new BlockState(Blocks.STONE_BRICK_STAIRS, Blocks.STONE_BRICK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, Direction.NORTH).withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.BOTTOM).withProperty(BlockStairs.SHAPE, BlockStairs.EnumShape.STRAIGHT)),
 				'F', new BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.GOLEM_FIRE.ordinal()),
 				'M', new BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.GOLEM_PHYSICAL.ordinal()),
 				'G', new BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.GOLEM_WIND.ordinal()),
@@ -264,10 +264,10 @@ public class RoomEntryDragon extends StaticRoom {
 		List<DungeonExitPoint> list = new LinkedList<>();
 		
 		BlockPos pos = new BlockPos(-1, 11, 1);
-		list.add(NostrumDungeon.asRotated(start, pos, EnumFacing.SOUTH));
+		list.add(NostrumDungeon.asRotated(start, pos, Direction.SOUTH));
 		
 		pos = new BlockPos(1, 11, 1);
-		list.add(NostrumDungeon.asRotated(start, pos, EnumFacing.SOUTH));
+		list.add(NostrumDungeon.asRotated(start, pos, Direction.SOUTH));
 		
 		return list;
 	}

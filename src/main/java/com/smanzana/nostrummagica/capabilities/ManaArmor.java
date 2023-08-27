@@ -8,8 +8,8 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.Vec3d;
 
@@ -23,7 +23,7 @@ public class ManaArmor implements IManaArmor {
 	private boolean hasArmor;
 	private int manaCost;
 	
-	private EntityLivingBase entity;
+	private LivingEntity entity;
 	
 	public ManaArmor() {
 		hasArmor = false;
@@ -68,7 +68,7 @@ public class ManaArmor implements IManaArmor {
 	}
 	
 	@Override
-	public void provideEntity(EntityLivingBase entity) {
+	public void provideEntity(LivingEntity entity) {
 		this.entity = entity;
 	}
 
@@ -116,7 +116,7 @@ public class ManaArmor implements IManaArmor {
 	
 	protected void spawnEffects(Entity hurtEntity, DamageSource source, float originalAmount, float finalAmount) {
 		NostrumParticles.WARD.spawn(hurtEntity.world, new NostrumParticles.SpawnParams(
-				4, hurtEntity.posX, hurtEntity.posY + (hurtEntity.height/2), hurtEntity.posZ, .75, 30, 0,
+				4, hurtEntity.posX, hurtEntity.posY + (hurtEntity.getHeight()/2), hurtEntity.posZ, .75, 30, 0,
 				Vec3d.ZERO, new Vec3d(.0, -.01, .0)
 				//hurtEntity.getEntityId()
 				)
@@ -137,7 +137,7 @@ public class ManaArmor implements IManaArmor {
 	protected void spawnBreakEffects(Entity hurtEntity) {
 		NostrumMagicaSounds.SHIELD_BREAK.play(hurtEntity);
 		NostrumParticles.WARD.spawn(hurtEntity.world, new NostrumParticles.SpawnParams(
-				20, hurtEntity.posX, hurtEntity.posY + (hurtEntity.height/2), hurtEntity.posZ, .75, 30, 0,
+				20, hurtEntity.posX, hurtEntity.posY + (hurtEntity.getHeight()/2), hurtEntity.posZ, .75, 30, 0,
 				new Vec3d(.0, -.01, .0), new Vec3d(.01, 0, .01) 
 				//hurtEntity.getEntityId()
 				)
@@ -148,8 +148,8 @@ public class ManaArmor implements IManaArmor {
 	protected void removeArmor(Entity exhaustedEntity) {
 		this.setHasArmor(false, 0);
 		spawnBreakEffects(exhaustedEntity);
-		if (exhaustedEntity instanceof EntityPlayerMP) {
-			NostrumMagica.proxy.syncPlayer((EntityPlayerMP) exhaustedEntity);
+		if (exhaustedEntity instanceof ServerPlayerEntity) {
+			NostrumMagica.proxy.syncPlayer((ServerPlayerEntity) exhaustedEntity);
 		}
 	}
 	

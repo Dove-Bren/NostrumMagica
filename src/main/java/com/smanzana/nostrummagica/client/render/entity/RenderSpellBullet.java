@@ -4,9 +4,9 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntitySpellBullet;
 
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.GlStateManager.DestFactor;
-import net.minecraft.client.renderer.GlStateManager.SourceFactor;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -36,13 +36,13 @@ public class RenderSpellBullet extends Render<EntitySpellBullet> {
 		
 		GlStateManager.pushMatrix();
 		this.bindEntityTexture(entity);
-		GlStateManager.translate((float)x, (float)y, (float)z);
+		GlStateManager.translatef((float)x, (float)y, (float)z);
 		GlStateManager.enableRescaleNormal();
-		GlStateManager.scale(.5 * this.scale, .5 * this.scale, .5 * this.scale);
+		GlStateManager.scalef(.5 * this.scale, .5 * this.scale, .5 * this.scale);
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferbuilder = tessellator.getBuffer();
-		GlStateManager.rotate(180.0F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-		GlStateManager.rotate((float)(this.renderManager.options.thirdPersonView == 2 ? -1 : 1) * -this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+		GlStateManager.rotatef(180.0F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
+		GlStateManager.rotatef((float)(this.renderManager.options.thirdPersonView == 2 ? -1 : 1) * -this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
 
 		if (this.renderOutlines) {
 			GlStateManager.enableColorMaterial();
@@ -51,11 +51,11 @@ public class RenderSpellBullet extends Render<EntitySpellBullet> {
 		GlStateManager.enableBlend();
 		GlStateManager.alphaFunc(516, 0);
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		GlStateManager.enableAlpha();
-		GlStateManager.disableTexture2D();
-		GlStateManager.enableTexture2D();
+		GlStateManager.enableAlphaTest();
+		GlStateManager.disableTexture();
+		GlStateManager.enableTexture();
 		GlStateManager.depthMask(false);
-		GlStateManager.color(
+		GlStateManager.color4f(
 				brightness * (float)((color >> 16) & 0xFF) / 255f,
 				brightness * (float)((color >> 8) & 0xFF) / 255f,
 				brightness * (float)((color >> 0) & 0xFF) / 255f,
@@ -76,7 +76,7 @@ public class RenderSpellBullet extends Render<EntitySpellBullet> {
 
 		GlStateManager.depthMask(true);
 		GlStateManager.disableBlend();
-		GlStateManager.color(1f, 1f, 1f, 1f);
+		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		GlStateManager.disableRescaleNormal();
 		GlStateManager.popMatrix();
 		super.doRender(entity, x, y, z, entityYaw, partialTicks);

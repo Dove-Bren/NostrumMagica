@@ -8,14 +8,14 @@ import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 public class ProgressionDoor extends NostrumMagicDoor {
@@ -50,7 +50,7 @@ public class ProgressionDoor extends NostrumMagicDoor {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
 		if (worldIn.isRemote)
 			return true;
 		
@@ -73,7 +73,7 @@ public class ProgressionDoor extends NostrumMagicDoor {
 			
 			List<ITextComponent> missingDepStrings = new LinkedList<>();
 			if (!((ProgressionDoorTileEntity) worldIn.getTileEntity(master)).meetsRequirements(playerIn, missingDepStrings)) {
-				playerIn.sendMessage(new TextComponentTranslation("info.door.missing.intro"));
+				playerIn.sendMessage(new TranslationTextComponent("info.door.missing.intro"));
 				for (ITextComponent text : missingDepStrings) {
 					playerIn.sendMessage(text);
 				}

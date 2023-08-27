@@ -17,18 +17,18 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ManaArmorerBlock extends Block {
 
@@ -65,7 +65,7 @@ protected static final AxisAlignedBB BASE_AABB = new AxisAlignedBB(.5 - AABB_RAD
 		addCollisionBoxToList(pos, entityBox, collidingBoxes, BASE_AABB);
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public EnumBlockRenderType getRenderType(IBlockState state) {
 		return EnumBlockRenderType.INVISIBLE;
@@ -103,7 +103,7 @@ protected static final AxisAlignedBB BASE_AABB = new AxisAlignedBB(.5 - AABB_RAD
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
 		if (!worldIn.isRemote) {
 			TileEntity te = worldIn.getTileEntity(pos);
 			if (te != null && te instanceof ManaArmorerTileEntity) {
@@ -113,7 +113,7 @@ protected static final AxisAlignedBB BASE_AABB = new AxisAlignedBB(.5 - AABB_RAD
 				if (playerArmor != null && playerArmor.hasArmor()) {
 					// Already have armor?
 					NostrumMagicaSounds.CAST_FAIL.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
-					playerIn.sendMessage(new TextComponentTranslation("info.mana_armorer.already_have"));
+					playerIn.sendMessage(new TranslationTextComponent("info.mana_armorer.already_have"));
 				} else if (armorer.isActive()) {
 					// If we're the active entity, stop it
 					// Otherwise, it's busy
@@ -121,7 +121,7 @@ protected static final AxisAlignedBB BASE_AABB = new AxisAlignedBB(.5 - AABB_RAD
 						armorer.stop();
 					} else {
 						NostrumMagicaSounds.CAST_FAIL.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
-						playerIn.sendMessage(new TextComponentTranslation("info.mana_armorer.busy"));
+						playerIn.sendMessage(new TranslationTextComponent("info.mana_armorer.busy"));
 					}
 				} else {
 					// Else become active with us
@@ -133,7 +133,7 @@ protected static final AxisAlignedBB BASE_AABB = new AxisAlignedBB(.5 - AABB_RAD
 						armorer.startEntity(playerIn);
 					} else {
 						NostrumMagicaSounds.CAST_FAIL.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
-						playerIn.sendMessage(new TextComponentTranslation("info.mana_armorer.locked"));
+						playerIn.sendMessage(new TranslationTextComponent("info.mana_armorer.locked"));
 					}
 				}
 			}
@@ -142,7 +142,7 @@ protected static final AxisAlignedBB BASE_AABB = new AxisAlignedBB(.5 - AABB_RAD
 		return true;
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
 		

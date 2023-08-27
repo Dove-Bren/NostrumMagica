@@ -18,10 +18,10 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.ITickableTileEntity;
@@ -41,7 +41,7 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 	private static final int MANA_DRAIN_PER_TICK = 1;
 	private static final int MAX_ENTITY_RADIUS = 8;
 	
-	private @Nullable EntityLivingBase activeEntity;
+	private @Nullable LivingEntity activeEntity;
 	private int currentMana;
 	private int targetMana;
 	private List<BlockPos> activeCrystals;
@@ -64,7 +64,7 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 		return getActiveEntity() != null;
 	}
 	
-	public @Nullable EntityLivingBase getActiveEntity() {
+	public @Nullable LivingEntity getActiveEntity() {
 		return this.activeEntity;
 	}
 	
@@ -104,7 +104,7 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	// Tick and mechanics
-	public void startEntity(EntityLivingBase entity) {
+	public void startEntity(LivingEntity entity) {
 		refreshCrystals();
 		this.targetMana = calcTargetMana(entity);
 		// Note: don't reset current mana in case the entity is returning
@@ -115,19 +115,19 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 		this.activeEntity = null;
 	}
 	
-	protected void onLoseEntity(EntityLivingBase oldEntity) {
+	protected void onLoseEntity(LivingEntity oldEntity) {
 		
 		this.dirty();
 	}
 	
-	protected void onFinish(EntityLivingBase entity, int mana) {
+	protected void onFinish(LivingEntity entity, int mana) {
 		this.currentMana = 0;
 		
 		IManaArmor armor = NostrumMagica.getManaArmor(entity);
 		if (armor != null) {
 			armor.setHasArmor(true, calcManaBurnAmt(entity));
-			if (entity instanceof EntityPlayerMP) {
-				NostrumMagica.proxy.syncPlayer((EntityPlayerMP)entity);
+			if (entity instanceof ServerPlayerEntity) {
+				NostrumMagica.proxy.syncPlayer((ServerPlayerEntity)entity);
 			}
 		}
 		
@@ -139,24 +139,24 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 		this.dirty();
 	}
 	
-	public int calcTargetMana(EntityLivingBase entity) {
+	public int calcTargetMana(LivingEntity entity) {
 		// Could look for ritual augments like special crystals and blocks
 		return 500 * 2;
 	}
 	
-	public int calcManaBurnAmt(EntityLivingBase entity) {
+	public int calcManaBurnAmt(LivingEntity entity) {
 		// Could look at surrounding blocks for augments that make this cheaper
 		return 500;
 	}
 	
-	protected boolean entityIsValid(EntityLivingBase entity) {
+	protected boolean entityIsValid(LivingEntity entity) {
 		return entity != null
 				&& !entity.isDead
 				&& entity.getDistanceSqToCenter(getPos()) <= (MAX_ENTITY_RADIUS * MAX_ENTITY_RADIUS)
 				;
 	}
 	
-	protected int drainEntity(EntityLivingBase entity, int desiredMana) {
+	protected int drainEntity(LivingEntity entity, int desiredMana) {
 		int drained = 0;
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
@@ -173,7 +173,7 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 		return drained;
 	}
 	
-	protected int getManaDrainAmt(EntityLivingBase entity) {
+	protected int getManaDrainAmt(LivingEntity entity) {
 		final int draw = MANA_PER_DIRECT
 				+ MANA_PER_CRYSTAL * this.getLinkedCrystals().size();
 		final int room = this.getTargetMana() - this.getCurrentMana();
@@ -230,7 +230,7 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 		}
 	}
 	
-	protected void doManaEffectDirect(EntityLivingBase entity) {
+	protected void doManaEffectDirect(LivingEntity entity) {
 		NostrumParticles.FILLED_ORB.spawn(entity.world, new SpawnParams(
 				1,
 				entity.posX, entity.posY + entity.getEyeHeight() / 2f, entity.posZ, .25,
@@ -239,7 +239,7 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 				).color(0xFF5511FF));
 	}
 	
-	protected void doManaEffectCrystal(EntityLivingBase entity, BlockPos crystal) {
+	protected void doManaEffectCrystal(LivingEntity entity, BlockPos crystal) {
 		IBlockState state = entity.world.getBlockState(crystal);
 		Vec3d offset = ManiCrystal.instance().getCrystalTipOffset(state);
 		Vec3d crystalPos = new Vec3d(crystal.getX() + offset.x, crystal.getY() + offset.y, crystal.getZ() + offset.z);
@@ -259,7 +259,7 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 				).color(0xFF5511FF));
 	}
 	
-	protected void doFinishEffect(EntityLivingBase entity, int manaUsed) {
+	protected void doFinishEffect(LivingEntity entity, int manaUsed) {
 		NostrumMagicaSounds.AMBIENT_WOOSH2.play(this.world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
 		
 		NostrumParticles.FILLED_ORB.spawn(entity.world, new SpawnParams(
@@ -281,7 +281,7 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 	protected void checkEntity() {
 		if (this.activeEntity != null) {
 			if (!entityIsValid(this.activeEntity)) {
-				EntityLivingBase old = this.activeEntity;
+				LivingEntity old = this.activeEntity;
 				this.activeEntity = null;
 				this.onLoseEntity(old);
 			}
@@ -392,33 +392,33 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 	private static final String NBT_TARGET_MANA = "target_mana";
 	
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt = super.writeToNBT(nbt);
 		
 		if (this.getActiveEntity() != null) {
 			nbt.setUniqueId(NBT_ENTITY_ID, this.getActiveEntity().getUniqueID());
 		}
 		
-		nbt.setInteger(NBT_MANA, this.getCurrentMana());
-		nbt.setInteger(NBT_TARGET_MANA, this.getTargetMana());
+		nbt.putInt(NBT_MANA, this.getCurrentMana());
+		nbt.putInt(NBT_TARGET_MANA, this.getTargetMana());
 		
 		return nbt;
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(CompoundNBT nbt) {
 		super.readFromNBT(nbt);
 		
 		if (nbt == null)
 			return;
 		
-		this.targetMana = nbt.getInteger(NBT_TARGET_MANA);
-		this.currentMana = nbt.getInteger(NBT_MANA);
+		this.targetMana = nbt.getInt(NBT_TARGET_MANA);
+		this.currentMana = nbt.getInt(NBT_MANA);
 		
-		if (nbt.hasKey(NBT_ENTITY_ID)) {
+		if (nbt.contains(NBT_ENTITY_ID)) {
 			UUID id = nbt.getUniqueId(NBT_ENTITY_ID);
 			if (id != null && this.world != null) {
-				EntityPlayer player = this.world.getPlayerEntityByUUID(id);
+				PlayerEntity player = this.world.getPlayerEntityByUUID(id);
 				this.activeEntity = player;
 			}
 		}
@@ -430,8 +430,8 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 	}
 
 	@Override
-	public NBTTagCompound getUpdateTag() {
-		return this.writeToNBT(new NBTTagCompound());
+	public CompoundNBT getUpdateTag() {
+		return this.writeToNBT(new CompoundNBT());
 	}
 	
 	@Override

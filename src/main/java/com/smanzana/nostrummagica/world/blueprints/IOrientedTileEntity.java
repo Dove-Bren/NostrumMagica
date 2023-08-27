@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.world.blueprints;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 
 /**
  * Marks a tile entity that stores information that depends on rotation (like block offsets) that
@@ -19,6 +19,6 @@ public interface IOrientedTileEntity {
 	 * Consider using RoomBlueprint.applyRotation to transform offsets.
 	 * @param rotation
 	 */
-	public void setSpawnedFromRotation(EnumFacing rotation);
+	public void setSpawnedFromRotation(Direction rotation);
 	
 }

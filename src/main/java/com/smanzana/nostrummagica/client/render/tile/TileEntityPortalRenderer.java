@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.blocks.NostrumPortal.NostrumPortalTileEntityBa
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
@@ -41,21 +41,21 @@ public class TileEntityPortalRenderer extends TileEntitySpecialRenderer<NostrumP
 		
 		GlStateManager.pushMatrix();
 		
-		GlStateManager.translate(x + .5, y + 1.2, z + .5);
-		GlStateManager.rotate((float)rotY, 0, 1, 0);
+		GlStateManager.translatef(x + .5, y + 1.2, z + .5);
+		GlStateManager.rotatef((float)rotY, 0, 1, 0);
 		
 		
 		BufferBuilder wr = Tessellator.getInstance().getBuffer();
-		Minecraft.getMinecraft().getTextureManager().bindTexture(TEX_LOC);
+		Minecraft.getInstance().getTextureManager().bindTexture(TEX_LOC);
 		
 		GlStateManager.enableBlend();
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GlStateManager.disableLighting();
-		GlStateManager.enableAlpha();
+		GlStateManager.enableAlphaTest();
 		GlStateManager.disableCull();
 		GlStateManager.depthMask(false);
 		int color = te.getColor();
-		GlStateManager.color(
+		GlStateManager.color4f(
 				((color >> 16) & 255) / 255f,
 				((color >> 8) & 255) / 255f,
 				(color & 255) / 255f,

@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.rituals.requirements;
 
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 
 public class RRequirementResearch implements IRitualRequirement{
 
@@ -13,7 +13,7 @@ public class RRequirementResearch implements IRitualRequirement{
 	}
 
 	@Override
-	public boolean matches(EntityPlayer player, INostrumMagic attr) {
+	public boolean matches(PlayerEntity player, INostrumMagic attr) {
 		return attr.getCompletedResearches().contains(researchKey);
 	}
 }

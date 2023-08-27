@@ -39,11 +39,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 // Nice wrapper to rendering spell component icons
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class SpellComponentIcon {
 
 	private static Map<EMagicElement, SpellComponentIcon> elementCache = new EnumMap<>(EMagicElement.class);
@@ -238,7 +238,7 @@ public class SpellComponentIcon {
 	public void draw(Gui parent, FontRenderer fonter, int xOffset, int yOffset, int width, int height) {
 		GL11.glPushMatrix();
 
-		//GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+		//GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 		float scaleU = (float) width / (float) this.width;
 		float scaleV = (float) height / (float) this.height;
 		
@@ -246,9 +246,9 @@ public class SpellComponentIcon {
 		yOffset *= 1f / scaleV;
 		
 		GL11.glScalef(scaleU, scaleV, 0f); // Idk which it is!
-		//GlStateManager.color(1f, 1f, 1f, 1f);
+		//GlStateManager.color4f(1f, 1f, 1f, 1f);
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(iconSheet);
+		Minecraft.getInstance().getTextureManager().bindTexture(iconSheet);
 		
 		parent.drawTexturedModalRect(xOffset, yOffset, offsetU, offsetV,
 				this.width, this.height);

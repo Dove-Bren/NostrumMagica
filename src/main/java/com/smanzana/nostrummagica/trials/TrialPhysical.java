@@ -5,11 +5,11 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.entity.monster.EntityIronGolem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class TrialPhysical extends ShrineTrial {
 
@@ -23,10 +23,10 @@ public class TrialPhysical extends ShrineTrial {
 		if (e.getEntityLiving() instanceof EntityIronGolem) {
 			DamageSource source = e.getSource();
 			if (source.getTrueSource() == null ||
-					!(source.getTrueSource() instanceof EntityPlayer))
+					!(source.getTrueSource() instanceof PlayerEntity))
 				return;
 			
-			EntityPlayer player = (EntityPlayer) source.getTrueSource();
+			PlayerEntity player = (PlayerEntity) source.getTrueSource();
 			
 			if (!player.getHeldItemMainhand().isEmpty())
 				return;

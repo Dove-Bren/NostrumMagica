@@ -13,7 +13,7 @@ import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -41,9 +41,9 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 		minecraft.getTextureManager().bindTexture(RITUAL_TEXTURE);
 		ItemStack item = fetchItem(ingredient.getOutcome());
 		GlStateManager.enableBlend();
-		GlStateManager.color(1f, 1f, 1f, 1f);
+		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		if (item != null) {
-			Gui.drawModalRectWithCustomSizedTexture(xPosition, yPosition,
+			RenderFuncs.drawModalRectWithCustomSizedTexture(xPosition, yPosition,
 					RITUAL_TEXT_TABLET_WIDTH,
 					RITUAL_TEXT_TABLET_VOFFSET,
 					RITUAL_TEXT_TABLET_WIDTH,
@@ -51,9 +51,9 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 					RITUAL_TEXT_WIDTH,
 					RITUAL_TEXT_HEIGHT);
 			
-			minecraft.getRenderItem().renderItemIntoGUI(item, xPosition + 1, yPosition + 1);
+			minecraft.getItemRenderer().renderItemIntoGUI(item, xPosition + 1, yPosition + 1);
 		} else {
-			Gui.drawModalRectWithCustomSizedTexture(xPosition, yPosition,
+			RenderFuncs.drawModalRectWithCustomSizedTexture(xPosition, yPosition,
 					0,
 					RITUAL_TEXT_TABLET_VOFFSET,
 					RITUAL_TEXT_TABLET_WIDTH,
@@ -76,17 +76,17 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 	}
 
 	@Override
-	public FontRenderer getFontRenderer(Minecraft minecraft, RitualOutcomeWrapper ingredient) {
+	public font getFontRenderer(Minecraft minecraft, RitualOutcomeWrapper ingredient) {
 		if (ingredient == null)
-			return minecraft.fontRenderer;
+			return minecraft.font;
 		
-		FontRenderer render = null;
+		font render = null;
 		ItemStack stack = fetchItem(ingredient.getOutcome());
 		if (stack != null)
 			render = stack.getItem().getFontRenderer(stack);
 		
 		if (render == null)
-			render = minecraft.fontRenderer;
+			render = minecraft.font;
 		
 		return render;
 	}

@@ -2,11 +2,11 @@ package com.smanzana.nostrummagica.client.effects.modifiers;
 
 import com.smanzana.nostrummagica.client.effects.ClientEffect.ClientEffectRenderDetail;
 
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class ClientEffectModifierShrink implements ClientEffectModifier {
 
 	private float startScale;
@@ -36,10 +36,10 @@ public class ClientEffectModifierShrink implements ClientEffectModifier {
 			final float frac = Math.min(1f, (progress - plateau) / (1f - plateau));
 			final float scale = startScale + ((endScale - startScale) * frac);
 			final float alpha = startAlpha + ((endAlpha - startAlpha) * frac);
-			GlStateManager.scale(scale, scale, scale);
+			GlStateManager.scalef(scale, scale, scale);
 			detail.alpha *= alpha;
 		} else {
-			GlStateManager.scale(startScale, startScale, startScale);
+			GlStateManager.scalef(startScale, startScale, startScale);
 			detail.alpha *= startAlpha;
 			
 		}

@@ -19,12 +19,12 @@ import com.smanzana.nostrummagica.spells.components.triggers.BeamTrigger;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -46,11 +46,11 @@ public class ClientCastMessage implements IMessage {
 			// Figure out what spell they have
 			// cast it if they can
 			
-			final EntityPlayerMP sp = ctx.getServerHandler().player;
+			final ServerPlayerEntity sp = ctx.getServerHandler().player;
 			
 			// What spell?
 			Spell spell = NostrumMagica.getSpellRegistry().lookup(
-					message.tag.getInteger(NBT_ID)
+					message.tag.getInt(NBT_ID)
 					);
 			
 			if (spell == null) {
@@ -59,9 +59,9 @@ public class ClientCastMessage implements IMessage {
 			}
 			
 			boolean isScroll = message.tag.getBoolean(NBT_SCROLL);
-			int tomeID = message.tag.getInteger(NBT_TOME_ID);
+			int tomeID = message.tag.getInt(NBT_TOME_ID);
 			
-			sp.getServerWorld().addScheduledTask(() -> {
+			sp.getServerWorld().runAsync(() -> {
 				
 				INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
 				
@@ -193,7 +193,7 @@ public class ClientCastMessage implements IMessage {
 					for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
 						int count = NostrumMagica.getReagentCount(sp, row.getKey());
 						if (count < row.getValue()) {
-							sp.sendMessage(new TextComponentTranslation("info.spell.bad_reagent", row.getKey().prettyName()));
+							sp.sendMessage(new TranslationTextComponent("info.spell.bad_reagent", row.getKey().prettyName()));
 							NetworkHandler.getSyncChannel().sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
 									ctx.getServerHandler().player);
 							return;
@@ -217,7 +217,7 @@ public class ClientCastMessage implements IMessage {
 					
 					if (cost > 0 && dragons != null) {
 						for (ITameDragon dragon : dragons) {
-							EntityLivingBase ent = (EntityLivingBase) dragon;
+							LivingEntity ent = (LivingEntity) dragon;
 							NostrumMagica.proxy.spawnEffect(sp.world, new SpellComponentWrapper(BeamTrigger.instance()),
 									null, sp.getPositionVector().addVector(0, sp.getEyeHeight(), 0),
 									null, ent.getPositionVector().addVector(0, ent.getEyeHeight(), 0),
@@ -290,10 +290,10 @@ public class ClientCastMessage implements IMessage {
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public ClientCastMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	public ClientCastMessage(Spell spell, boolean scroll, int tomeID) {
@@ -301,11 +301,11 @@ public class ClientCastMessage implements IMessage {
 	}
 	
 	public ClientCastMessage(int id, boolean scroll, int tomeID) {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 		
-		tag.setInteger(NBT_ID, id);
-		tag.setInteger(NBT_TOME_ID, tomeID);
-		tag.setBoolean(NBT_SCROLL, scroll);
+		tag.putInt(NBT_ID, id);
+		tag.putInt(NBT_TOME_ID, tomeID);
+		tag.putBoolean(NBT_SCROLL, scroll);
 	}
 
 	@Override

@@ -11,14 +11,14 @@ import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * Thano Pendant. Stores XP, makes casting reagentless
@@ -75,7 +75,7 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellArmor {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		tooltip.add(I18n.format("item.info.thanos.desc", (Object[]) null));
 		int charges = thanosGetWholeCharges(stack);
@@ -130,11 +130,11 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellArmor {
 		if (stack.isEmpty())
 			return;
 		
-		NBTTagCompound nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTagCompound();
 		if (nbt == null)
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		
-		nbt.setInteger(NBT_THANOS_XP, xp);
+		nbt.putInt(NBT_THANOS_XP, xp);
 		stack.setTagCompound(nbt);
 		
 		int count = thanosGetWholeCharges(stack);
@@ -146,12 +146,12 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellArmor {
 		if (stack.isEmpty() || !stack.hasTagCompound())
 			return 0;
 		
-		NBTTagCompound nbt = stack.getTagCompound();
-		return nbt.getInteger(NBT_THANOS_XP);
+		CompoundNBT nbt = stack.getTagCompound();
+		return nbt.getInt(NBT_THANOS_XP);
 	}
 
 	@Override
-	public void apply(EntityLivingBase caster, SpellCastSummary summary, ItemStack stack) {
+	public void apply(LivingEntity caster, SpellCastSummary summary, ItemStack stack) {
 		if (stack.isEmpty())
 			return;
 		
@@ -161,7 +161,7 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellArmor {
 		
 		int charges = thanosGetWholeCharges(stack);
 		if (charges > 0) {
-			if (!(caster instanceof EntityPlayer) || !((EntityPlayer) caster).isCreative()) {
+			if (!(caster instanceof PlayerEntity) || !((PlayerEntity) caster).isCreative()) {
 				thanosSpendCharge(stack);
 			}
 			summary.addReagentCost(-1f);

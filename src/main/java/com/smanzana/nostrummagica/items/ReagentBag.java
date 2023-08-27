@@ -9,11 +9,11 @@ import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
@@ -70,19 +70,19 @@ public class ReagentBag extends Item implements ILoreTagged {
 		
 		if (!bag.isEmpty() && bag.getItem() instanceof ReagentBag) {
 			if (!bag.hasTagCompound())
-				bag.setTagCompound(new NBTTagCompound());
+				bag.setTagCompound(new CompoundNBT());
 			
-			NBTTagCompound nbt = bag.getTagCompound();
-			NBTTagCompound items = nbt.getCompoundTag(NBT_ITEMS);
+			CompoundNBT nbt = bag.getTagCompound();
+			CompoundNBT items = nbt.getCompound(NBT_ITEMS);
 			if (item.isEmpty())
 				items.removeTag(pos + "");
 			else {
-				NBTTagCompound compound = new NBTTagCompound();
+				CompoundNBT compound = new CompoundNBT();
 				item.writeToNBT(compound);
-				items.setTag(pos + "", compound);
+				items.put(pos + "", compound);
 			}
 			
-			nbt.setTag(NBT_ITEMS, items);
+			nbt.put(NBT_ITEMS, items);
 			bag.setTagCompound(nbt);
 		}
 	}
@@ -144,9 +144,9 @@ public class ReagentBag extends Item implements ILoreTagged {
 			if (!bag.hasTagCompound())
 				return ItemStack.EMPTY;
 			
-			NBTTagCompound items = bag.getTagCompound().getCompoundTag(NBT_ITEMS);
-			if (items.hasKey(pos + "", NBT.TAG_COMPOUND))
-				return new ItemStack(items.getCompoundTag(pos + ""));
+			CompoundNBT items = bag.getTagCompound().getCompoundTag(NBT_ITEMS);
+			if (items.contains(pos + "", NBT.TAG_COMPOUND))
+				return new ItemStack(items.getCompound(pos + ""));
 			else
 				return ItemStack.EMPTY;
 		}
@@ -175,7 +175,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 	public static boolean isVacuumEnabled(ItemStack stack) {
 		if (!stack.isEmpty() && stack.getItem() instanceof ReagentBag) {
 			if (!stack.hasTagCompound())
-				stack.setTagCompound(new NBTTagCompound());
+				stack.setTagCompound(new CompoundNBT());
 			
 			return stack.getTagCompound().getBoolean(NBT_VACUUM);
 		}
@@ -204,7 +204,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
 		playerIn.openGui(NostrumMagica.instance, NostrumGui.reagentBagID, worldIn,
 				(int) playerIn.posX, (int) playerIn.posY, (int) playerIn.posZ);
 		

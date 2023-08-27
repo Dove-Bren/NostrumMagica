@@ -10,15 +10,15 @@ import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.EntityPlayer;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class WispBlockGui {
 	
@@ -48,7 +48,7 @@ public class WispBlockGui {
 		
 		// Kept just to report to server which TE is doing crafting
 		protected BlockPos pos;
-		protected EntityPlayer player;
+		protected PlayerEntity player;
 		
 		// Actual container variables as well as a couple for keeping track
 		// of crafting state
@@ -56,7 +56,7 @@ public class WispBlockGui {
 		protected Slot scrollSlot;
 		protected Slot reagentSlot;
 		
-		public WispBlockContainer(EntityPlayer player, IInventory playerInv, WispBlockTileEntity table, BlockPos pos) {
+		public WispBlockContainer(PlayerEntity player, IInventory playerInv, WispBlockTileEntity table, BlockPos pos) {
 			super(table);
 			this.player = player;
 			this.pos = pos;
@@ -107,7 +107,7 @@ public class WispBlockGui {
 //					return false;
 //				}
 //				
-//				public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack) {
+//				public void onPickupFromSlot(PlayerEntity playerIn, ItemStack stack) {
 //					//table.onTakeItem(playerIn);
 //					super.onPickupFromSlot(playerIn, stack);
 //				}
@@ -160,7 +160,7 @@ public class WispBlockGui {
 //					return false;
 //				}
 //				
-//				public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack) {
+//				public void onPickupFromSlot(PlayerEntity playerIn, ItemStack stack) {
 //					//table.onTakeItem(playerIn);
 //					super.onPickupFromSlot(playerIn, stack);
 //				}
@@ -183,7 +183,7 @@ public class WispBlockGui {
 		}
 		
 		@Override
-		public ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
+		public ItemStack transferStackInSlot(PlayerEntity playerIn, int fromSlot) {
 			ItemStack prev = ItemStack.EMPTY;	
 			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
 			
@@ -233,7 +233,7 @@ public class WispBlockGui {
 		}
 		
 		@Override
-		public boolean canInteractWith(EntityPlayer playerIn) {
+		public boolean canInteractWith(PlayerEntity playerIn) {
 			return true;
 		}
 		
@@ -247,7 +247,7 @@ public class WispBlockGui {
 
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public static class WispBlockGuiContainer extends AutoGuiContainer {
 
 		private WispBlockContainer container;
@@ -261,8 +261,8 @@ public class WispBlockGui {
 		}
 		
 		@Override
-		public void initGui() {
-			super.initGui();
+		public void init() {
+			super.init();
 		}
 		
 		@Override
@@ -282,20 +282,20 @@ public class WispBlockGui {
 			float G = (float) ((color & 0x0000FF00) >> 8) / 256f;
 			float B = (float) ((color & 0x000000FF) >> 0) / 256f;
 			
-			GlStateManager.color(1.0F,  1.0F, 1.0F, 1.0F);
+			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 			mc.getTextureManager().bindTexture(TEXT);
 			
-			Gui.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
+			RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			
 			float fuel = container.table.getPartialReagent();
 			if (fuel > 0f) {
 				int x = (int) (fuel * PROGRESS_WIDTH);
-				GlStateManager.color(R, G, B, 1f);
-				Gui.drawModalRectWithCustomSizedTexture(
+				GlStateManager.color4f(R, G, B, 1f);
+				RenderFuncs.drawModalRectWithCustomSizedTexture(
 						horizontalMargin + PROGRESS_GUI_HOFFSET,
 						verticalMargin + PROGRESS_GUI_VOFFSET,
 						0, GUI_HEIGHT, x, PROGRESS_HEIGHT, 256, 256);
-				GlStateManager.color(1f, 1f, 1f, 1f);
+				GlStateManager.color4f(1f, 1f, 1f, 1f);
 			}
 			
 			int max = container.table.getMaxWisps();
@@ -306,21 +306,21 @@ public class WispBlockGui {
 				final int leftx = centerx - ((xspace / 2) * (max - 1));
 				final int x = leftx + (xspace * i) - (WISP_SOCKET_LENGTH / 2);
 				final int y = verticalMargin + PROGRESS_GUI_VOFFSET + 7;
-				Gui.drawModalRectWithCustomSizedTexture(x, y,
+				RenderFuncs.drawModalRectWithCustomSizedTexture(x, y,
 						WISP_SOCKET_HOFFSET,
 						WISP_SOCKET_VOFFSET,
 						WISP_SOCKET_LENGTH,
 						WISP_SOCKET_LENGTH,
 						256, 256);
 				if (i < filled) {
-					GlStateManager.color(R, G, B, 1f);
-					Gui.drawModalRectWithCustomSizedTexture(x + 2, y + 2,
+					GlStateManager.color4f(R, G, B, 1f);
+					RenderFuncs.drawModalRectWithCustomSizedTexture(x + 2, y + 2,
 							WISP_SOCKET_HOFFSET,
 							WISP_SOCKET_VOFFSET + WISP_SOCKET_LENGTH,
 							5,
 							5,
 							256, 256);
-					GlStateManager.color(1f, 1f, 1f, 1f); 
+					GlStateManager.color4f(1f, 1f, 1f, 1f); 
 				}
 			}
 			

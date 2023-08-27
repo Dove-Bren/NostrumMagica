@@ -13,8 +13,8 @@ import com.smanzana.nostrummagica.network.messages.RuneBagToggleMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.EntityPlayer;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
@@ -23,8 +23,8 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.config.GuiUtils;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class RuneBagGui {
 	
@@ -82,7 +82,7 @@ public class RuneBagGui {
 		}
 		
 		@Override
-		public ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
+		public ItemStack transferStackInSlot(PlayerEntity playerIn, int fromSlot) {
 			ItemStack prev = ItemStack.EMPTY;	
 			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
 			IInventory inv = slot.inventory;
@@ -139,12 +139,12 @@ public class RuneBagGui {
 		}
 		
 		@Override
-		public boolean canInteractWith(EntityPlayer playerIn) {
+		public boolean canInteractWith(PlayerEntity playerIn) {
 			return true;
 		}
 		
 		@Override
-		public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, EntityPlayer player) {
+		public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
 			if (slotId < bagIDStart) {
 				if (slotId == bagPos) {
 					return ItemStack.EMPTY;
@@ -258,7 +258,7 @@ public class RuneBagGui {
 
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public static class BagGui extends AutoGuiContainer {
 
 		private BagContainer bag;
@@ -275,17 +275,17 @@ public class RuneBagGui {
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			
-			GlStateManager.color(1.0F,  1.0F, 1.0F, 1.0F);
+			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 			mc.getTextureManager().bindTexture(TEXT);
 			
-			Gui.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
+			RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			
 			int guiU = 0;
 			if (RuneBag.isVacuumEnabled(bag.stack)) {
 				guiU += BUTTON_WIDTH;
 			}
 			
-			Gui.drawModalRectWithCustomSizedTexture(horizontalMargin + BUTTON_HOFFSET,
+			RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin + BUTTON_HOFFSET,
 					verticalMargin + BUTTON_VOFFSET,
 					guiU,
 					BUTTON_TEXT_VOFFSET,
@@ -301,7 +301,7 @@ public class RuneBagGui {
 			if (mouseX >= left && mouseX <= left + BUTTON_WIDTH && 
 					mouseY >= top && mouseY <= top + BUTTON_WIDTH) {
 				GuiUtils.drawHoveringText(Lists.newArrayList(RuneBag.isVacuumEnabled(bag.stack) ? "Disable Vacuum" : "Enable Vacuum"),
-						mouseX, mouseY, width, height, 200, this.fontRenderer);
+						mouseX, mouseY, width, height, 200, this.font);
 			}
 		}
 			

@@ -10,7 +10,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -36,12 +36,12 @@ public class FieldTrigger extends TriggerAreaTrigger {
 		}
 		
 		@Override
-		public void init(EntityLivingBase caster) {
+		public void init(LivingEntity caster) {
 			super.init(caster); // Inits listening and stuff
 		}
 		
 		@Override
-		protected boolean isInArea(EntityLivingBase entity) {
+		protected boolean isInArea(LivingEntity entity) {
 			return origin.distanceTo(new Vec3d(entity.posX, origin.y, entity.posZ)) <= radius; // compare against our y for horizontal distance.
 			// .75 wiggle room in listener means you can't be way below.
 		}

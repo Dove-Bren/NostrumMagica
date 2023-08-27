@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.proxy.ClientProxy;
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 //
 public class BaublesClientProxy extends BaublesProxy {

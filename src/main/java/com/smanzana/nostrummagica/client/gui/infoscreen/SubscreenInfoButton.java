@@ -7,11 +7,11 @@ import javax.annotation.Nonnull;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 
@@ -21,8 +21,8 @@ public class SubscreenInfoButton extends InfoButton {
 	private @Nonnull ItemStack icon;
 	private String descKey;
 	
-	public SubscreenInfoButton(int buttonId, String key, IInfoSubScreen screen, @Nonnull ItemStack icon) {
-		super(buttonId, 0, 0);
+	public SubscreenInfoButton(InfoScreen mainScreen, String key, IInfoSubScreen screen, @Nonnull ItemStack icon) {
+		super(mainScreen, 0, 0);
 		this.screen = screen;
 		this.icon = icon;
 		this.descKey = key;
@@ -34,7 +34,7 @@ public class SubscreenInfoButton extends InfoButton {
 	}
 
 	@Override
-	public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
+	public void render(int mouseX, int mouseY, float partialTicks) {
 		float tint = 1f;
 		if (mouseX >= this.x
 			&& mouseY >= this.y 
@@ -44,9 +44,9 @@ public class SubscreenInfoButton extends InfoButton {
 		}
 		
 		GL11.glColor4f(tint, tint, tint, 1f);
-		mc.getTextureManager().bindTexture(InfoScreen.background);
+		Minecraft.getInstance().getTextureManager().bindTexture(InfoScreen.background);
 		GlStateManager.enableBlend();
-		Gui.drawModalRectWithCustomSizedTexture(this.x, this.y, 0, 0,
+		RenderFuncs.drawModalRectWithCustomSizedTexture(this.x, this.y, 0, 0,
 				width, height,
 				InfoScreen.TEXT_WHOLE_WIDTH, InfoScreen.TEXT_WHOLE_HEIGHT);
 		GlStateManager.disableBlend();
@@ -56,7 +56,7 @@ public class SubscreenInfoButton extends InfoButton {
 		if (!icon.isEmpty()) {
 			int x = this.x + (width - itemLength) / 2;
 			int y = this.y + (height - itemLength) / 2;
-			mc.getRenderItem().renderItemIntoGUI(icon, x, y);
+			Minecraft.getInstance().getItemRenderer().renderItemIntoGUI(icon, x, y);
 		}
 	}
 	

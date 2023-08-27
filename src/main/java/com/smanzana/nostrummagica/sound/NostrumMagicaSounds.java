@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.sound;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
@@ -94,11 +94,11 @@ public enum NostrumMagicaSounds {
 		play(null, at.world, at.getPositionVector());
 	}
 	
-	public void play(EntityPlayer at) {
+	public void play(PlayerEntity at) {
 		play(at, at.world, at.getPositionVector());
 	}
 	
-	public void play(EntityPlayer player, World world, Vec3d at) {
+	public void play(PlayerEntity player, World world, Vec3d at) {
 		play(player, world, at.x, at.y, at.z);
 	}
 	
@@ -114,7 +114,7 @@ public enum NostrumMagicaSounds {
 		world.playSound(x, y, z, event, category, volume, .8f + (NostrumMagica.rand.nextFloat() * 0.4f), false);
 	}
 	
-	public void play(EntityPlayer player, World world, double x, double y, double z) {
+	public void play(PlayerEntity player, World world, double x, double y, double z) {
 		world.playSound(player, x, y, z,
 				event, category,
 				volume, 0.8f + (NostrumMagica.rand.nextFloat() * 0.4f));

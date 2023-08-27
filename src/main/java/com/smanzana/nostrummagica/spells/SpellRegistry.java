@@ -10,7 +10,7 @@ import java.util.Random;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.world.storage.WorldSavedData;
 
 /**
@@ -147,12 +147,12 @@ public class SpellRegistry extends WorldSavedData {
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(CompoundNBT nbt) {
 		synchronized(this) {
 			this.registry.clear();
 			this.transients.clear();
 			
-			for (String key : nbt.getKeySet()) {
+			for (String key : nbt.keySet()) {
 				int id;
 				try {
 					id = Integer.parseInt(key);
@@ -163,7 +163,7 @@ public class SpellRegistry extends WorldSavedData {
 				}
 				
 				registry.put(id,
-						Spell.fromNBT(nbt.getCompoundTag(key), id));
+						Spell.fromNBT(nbt.getCompound(key), id));
 			}
 			
 			NostrumMagica.logger.info("Loaded spell registry (" + registry.size() + " spells)");
@@ -171,7 +171,7 @@ public class SpellRegistry extends WorldSavedData {
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		
 		NostrumMagica.logger.info("Saving Spell registry");
 		
@@ -179,7 +179,7 @@ public class SpellRegistry extends WorldSavedData {
 			for (Entry<Integer, Spell> entry : registry.entrySet()) {
 				if (transients.isEmpty() || !transients.contains(entry.getKey()))
 					if (!entry.getValue().isEmpty())
-						nbt.setTag(entry.getKey() + "", entry.getValue().toNBT());
+						nbt.put(entry.getKey() + "", entry.getValue().toNBT());
 			}
 		}
 		

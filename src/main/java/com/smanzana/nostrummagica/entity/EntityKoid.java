@@ -16,7 +16,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
@@ -25,10 +25,10 @@ import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -38,8 +38,8 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class EntityKoid extends EntityMob implements ILoreTagged {
 
@@ -65,9 +65,9 @@ public class EntityKoid extends EntityMob implements ILoreTagged {
     protected void initEntityAI() {
         this.tasks.addTask(1, new EntityAISwimming(this));
         this.tasks.addTask(4, new EntityAIWander(this, 1.0D));
-        this.tasks.addTask(5, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
+        this.tasks.addTask(5, new EntityAIWatchClosest(this, PlayerEntity.class, 8.0F));
         this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, false, new Class[0]));
-        this.targetTasks.addTask(2, new EntityAINearestAttackableTarget<EntityPlayer>(this, EntityPlayer.class, true));
+        this.targetTasks.addTask(2, new EntityAINearestAttackableTarget<PlayerEntity>(this, PlayerEntity.class, true));
     }
     
     protected void applyEntityAttributes()
@@ -104,7 +104,7 @@ public class EntityKoid extends EntityMob implements ILoreTagged {
 
     public float getEyeHeight()
     {
-        return this.height * 0.8F;
+        return this.getHeight() * 0.8F;
     }
 
     public boolean attackEntityAsMob(Entity entityIn)
@@ -119,7 +119,7 @@ public class EntityKoid extends EntityMob implements ILoreTagged {
         return flag;
     }
 
-    public boolean processInteract(EntityPlayer player, EnumHand hand, @Nonnull ItemStack stack)
+    public boolean processInteract(PlayerEntity player, EnumHand hand, @Nonnull ItemStack stack)
     {
         return false;
     }
@@ -141,12 +141,12 @@ public class EntityKoid extends EntityMob implements ILoreTagged {
         return false;
     }
 
-    public boolean shouldAttackEntity(EntityLivingBase target, EntityLivingBase owner)
+    public boolean shouldAttackEntity(LivingEntity target, LivingEntity owner)
     {
         return target != this;
     }
 
-    public boolean canBeLeashedTo(EntityPlayer player)
+    public boolean canBeLeashedTo(PlayerEntity player)
     {
         return false;
     }
@@ -214,10 +214,10 @@ public class EntityKoid extends EntityMob implements ILoreTagged {
 		}
 	}
 	
-	public void readEntityFromNBT(NBTTagCompound compound) {
+	public void readEntityFromNBT(CompoundNBT compound) {
 		super.readEntityFromNBT(compound);
 
-        if (compound.hasKey("KoidType", NBT.TAG_ANY_NUMERIC)) {
+        if (compound.contains("KoidType", NBT.TAG_ANY_NUMERIC)) {
         	int i = compound.getByte("KoidType");
             this.setElement(EMagicElement.values()[i]);
         }
@@ -225,7 +225,7 @@ public class EntityKoid extends EntityMob implements ILoreTagged {
         this.setCombatTask();
 	}
 	
-	public void writeEntityToNBT(NBTTagCompound compound) {
+	public void writeEntityToNBT(CompoundNBT compound) {
     	super.writeEntityToNBT(compound);
         compound.setByte("KoidType", (byte)this.getElement().ordinal());
 	}
@@ -240,7 +240,7 @@ public class EntityKoid extends EntityMob implements ILoreTagged {
 		
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
     public int getBrightnessForRender(float partialTicks)
     {
         return 15728880;

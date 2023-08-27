@@ -7,13 +7,13 @@ import javax.annotation.Nonnull;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 
@@ -21,8 +21,8 @@ public class RitualInfoButton extends InfoButton {
 
 	private RitualRecipe ritual;
 	
-	public RitualInfoButton(int buttonId, RitualRecipe ritual) {
-		super(buttonId, 0, 0);
+	public RitualInfoButton(InfoScreen screen, RitualRecipe ritual) {
+		super(screen, 0, 0);
 		this.ritual = ritual;
 	}
 
@@ -32,7 +32,7 @@ public class RitualInfoButton extends InfoButton {
 	}
 
 	@Override
-	public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
+	public void render(int mouseX, int mouseY, float partialTicks) {
 		float tint = 1f;
 		if (mouseX >= this.x 
 			&& mouseY >= this.y 
@@ -41,10 +41,11 @@ public class RitualInfoButton extends InfoButton {
 			tint = .75f;
 		}
 		
+		Minecraft mc = Minecraft.getInstance();
 		GL11.glColor4f(tint, tint, tint, 1f);
 		mc.getTextureManager().bindTexture(InfoScreen.background);
 		GlStateManager.enableBlend();
-		Gui.drawModalRectWithCustomSizedTexture(this.x, this.y, 0, 0,
+		RenderFuncs.drawModalRectWithCustomSizedTexture(this.x, this.y, 0, 0,
 				width, height,
 				InfoScreen.TEXT_WHOLE_WIDTH, InfoScreen.TEXT_WHOLE_HEIGHT);
 		GlStateManager.disableBlend();
@@ -53,11 +54,11 @@ public class RitualInfoButton extends InfoButton {
 		
 		@Nonnull ItemStack iconStack = ritual.getIcon();
 		if (!iconStack.isEmpty()) {
-			RenderItem renderItem = mc.getRenderItem();
+			ItemRenderer ItemRenderer = mc.getItemRenderer();
 			int x = this.x + (width - itemLength) / 2;
 			int y = this.y + (height - itemLength) / 2;
 			
-			renderItem.renderItemIntoGUI(iconStack, x, y);
+			ItemRenderer.renderItemIntoGUI(iconStack, x, y);
 		}
 	}
 	

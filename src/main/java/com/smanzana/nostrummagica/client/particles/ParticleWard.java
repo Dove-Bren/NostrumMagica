@@ -7,9 +7,9 @@ import com.smanzana.nostrummagica.utils.ColorUtil;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.GlStateManager.DestFactor;
-import net.minecraft.client.renderer.GlStateManager.SourceFactor;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
@@ -60,9 +60,9 @@ public class ParticleWard extends BatchRenderParticle {
 	
 	public ParticleWard setMotion(double xVelocity, double yVelocity, double zVelocity,
 			double xJitter, double yJitter, double zJitter) {
-		this.motionX = xVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * xJitter; // +- jitter
-		this.motionY = yVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * yJitter;
-		this.motionZ = zVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * zJitter;
+		this.getMotion().x = xVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * xJitter; // +- jitter
+		this.getMotion().y = yVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * yJitter;
+		this.getMotion().z = zVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * zJitter;
 		return this;
 	}
 	
@@ -101,12 +101,12 @@ public class ParticleWard extends BatchRenderParticle {
 		GlStateManager.disableBlend();
 		GlStateManager.enableBlend();
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		GlStateManager.disableAlpha();
-		GlStateManager.enableAlpha();
+		GlStateManager.disableAlphaTest();
+		GlStateManager.enableAlphaTest();
 		GlStateManager.enableLighting();
 		GlStateManager.disableLighting();
 		GlStateManager.alphaFunc(516, 0);
-		GlStateManager.color(1f, 1f, 1f, .75f);
+		GlStateManager.color4f(1f, 1f, 1f, .75f);
 		GlStateManager.depthMask(false);
 		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 	}
@@ -150,32 +150,32 @@ public class ParticleWard extends BatchRenderParticle {
 				if (this.entityBehavior == EntityBehavior.JOIN) {
 					period = 20f;
 					offset = targetPos == null ? Vec3d.ZERO : targetPos.rotateYaw((float) (Math.PI * 2 * ((float) particleAge % period) / period))
-							.addVector(0, targetEntity.height/2, 0);
+							.add(0, targetEntity.height/2, 0);
 				} else if (this.entityBehavior == EntityBehavior.ORBIT) {
 					period = 20f;
 					//randPeriodOffset = ?
 					offset = (new Vec3d(targetEntity.width * 2, 0, 0)).rotateYaw((float) (Math.PI * 2 * ((float) particleAge % period) / period))
-							.addVector(0, (targetEntity.height/2) + (targetPos == null ? 0 : targetPos.y), 0);
+							.add(0, (targetEntity.height/2) + (targetPos == null ? 0 : targetPos.y), 0);
 					
 					// do this better
 					if (this.particleGravity != 0f) {
 						if (targetPos == null) {
 							targetPos = Vec3d.ZERO;
 						}
-						targetPos = targetPos.addVector(0, -this.particleGravity, 0);
+						targetPos = targetPos.add(0, -this.particleGravity, 0);
 					}
 				} else {
 					throw new RuntimeException("Unsupported particle behavior");
 				}
-				Vec3d curVelocity = new Vec3d(this.motionX, this.motionY, this.motionZ);
+				Vec3d curVelocity = new Vec3d(this.getMotion().x, this.getMotion().y, this.getMotion().z);
 				Vec3d posDelta = targetEntity.getPositionVector()
-						.addVector(offset.x, offset.y, offset.z)
+						.add(offset.x, offset.y, offset.z)
 						.subtract(posX, posY, posZ);
 				Vec3d idealVelocity = posDelta.normalize().scale(.3);
 				this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
 			}
 		} else if (targetPos != null) {
-			Vec3d curVelocity = new Vec3d(this.motionX, this.motionY, this.motionZ);
+			Vec3d curVelocity = new Vec3d(this.getMotion().x, this.getMotion().y, this.getMotion().z);
 			Vec3d posDelta = targetPos.subtract(posX, posY, posZ);
 			Vec3d idealVelocity = posDelta.normalize().scale(.3);
 			this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
@@ -211,7 +211,7 @@ public class ParticleWard extends BatchRenderParticle {
 				}
 				particle.dieOnTarget(params.dieOnTarget);
 				particle.setEntityBehavior(params.entityBehavior);
-				Minecraft.getMinecraft().effectRenderer.addEffect(particle);
+				Minecraft.getInstance().effectRenderer.addEffect(particle);
 			}
 			return particle;
 		}

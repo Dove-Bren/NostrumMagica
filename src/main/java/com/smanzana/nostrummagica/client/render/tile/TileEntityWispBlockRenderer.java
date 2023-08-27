@@ -12,9 +12,9 @@ import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.GlStateManager.DestFactor;
-import net.minecraft.client.renderer.GlStateManager.SourceFactor;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
@@ -194,13 +194,13 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 //		final int aether = te.getHandler().getAether(null);
 //		final int maxAether = te.getHandler().getMaxAether(null);
 //		final String str = aether + " / " + maxAether;
-//		final FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
+//		final font fonter = Minecraft.getInstance().fontRendererObj;
 //		
 //		GlStateManager.pushMatrix();
 //		
-//		GlStateManager.rotate(180, 1, 0, 0);
+//		GlStateManager.rotatef(180, 1, 0, 0);
 //		// Make billboard
-//		GlStateManager.color(1f, 1f, 1f, 1f);
+//		GlStateManager.color4f(1f, 1f, 1f, 1f);
 //		GlStateManager.disableBlend();
 //		GlStateManager.disableLighting();
 //		fonter.drawString(str, -(fonter.getStringWidth(str) / 2), 0, 0xFF000000);
@@ -236,74 +236,74 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder buffer = tessellator.getBuffer();
-		GlStateManager.pushAttrib();
+		GlStateManager.pushLightingAttributes();
 		GlStateManager.enableBlend();
 		
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		GlStateManager.enableAlpha();
+		GlStateManager.enableAlphaTest();
 		GlStateManager.enableLighting();
 		GlStateManager.disableRescaleNormal();
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(x + .5, y, z + .5);
+		GlStateManager.translatef(x + .5, y, z + .5);
 		
 		// Base
-		Minecraft.getMinecraft().getTextureManager().bindTexture(BASE_TEX_LOC);
-		GlStateManager.color(.99f, .99f, .99f, 1f);
+		Minecraft.getInstance().getTextureManager().bindTexture(BASE_TEX_LOC);
+		GlStateManager.color4f(.99f, .99f, .99f, 1f);
 		GlStateManager.pushMatrix();
 		renderBase(tessellator, buffer);
 		GlStateManager.popMatrix();
 		
 		double platOffset = progShortOffset * .01;
 		// Platform
-		Minecraft.getMinecraft().getTextureManager().bindTexture(PLATFORM_TEX_LOC);
-		GlStateManager.color(.99f, .99f, .99f, 1f);
+		Minecraft.getInstance().getTextureManager().bindTexture(PLATFORM_TEX_LOC);
+		GlStateManager.color4f(.99f, .99f, .99f, 1f);
 		GlStateManager.enableColorMaterial();
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(0, .8 + platOffset, 0);
-		GlStateManager.scale(.5, .5, .5);
-		GlStateManager.rotate(360f * progressLong, 0, 1, 0);
+		GlStateManager.translatef(0, .8 + platOffset, 0);
+		GlStateManager.scalef(.5, .5, .5);
+		GlStateManager.rotatef(360f * progressLong, 0, 1, 0);
 		renderPlatform(tessellator, buffer);
 		GlStateManager.popMatrix();
 		
 		// Scroll
 		if (!scroll.isEmpty()) {
 			GlStateManager.pushMatrix();
-			GlStateManager.translate(0, 1.31 + platOffset, 0);
-			GlStateManager.rotate(360f * progressLong, 0, 1, 0);
-			GlStateManager.translate(0, 0, .1);
-			GlStateManager.rotate(90f, 1, 0, 0);
+			GlStateManager.translatef(0, 1.31 + platOffset, 0);
+			GlStateManager.rotatef(360f * progressLong, 0, 1, 0);
+			GlStateManager.translatef(0, 0, .1);
+			GlStateManager.rotatef(90f, 1, 0, 0);
 			
-			GlStateManager.scale(.25f, .25f, .25f);
+			GlStateManager.scalef(.25f, .25f, .25f);
 			GlStateManager.enableBlend();
 			GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 			GlStateManager.disableLighting();
-			GlStateManager.enableAlpha();
-			GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+			GlStateManager.enableAlphaTest();
+			GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 			//OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 			
-			Minecraft.getMinecraft().getRenderItem()
-				.renderItem(scroll, TransformType.GROUND);
+			Minecraft.getInstance().getItemRenderer()
+				.ItemRenderer(scroll, TransformType.GROUND);
 			GlStateManager.popMatrix();
 		}
 		
 		// Reagent
 		if (!reagents.isEmpty()) {
 			GlStateManager.pushMatrix();
-			GlStateManager.translate(0, 1.31 + platOffset, 0);
-			GlStateManager.rotate(360f * progressLong, 0, 1, 0);
-			GlStateManager.translate(0, 0, -.15);
-			GlStateManager.rotate(90f, 1, 0, 0);
+			GlStateManager.translatef(0, 1.31 + platOffset, 0);
+			GlStateManager.rotatef(360f * progressLong, 0, 1, 0);
+			GlStateManager.translatef(0, 0, -.15);
+			GlStateManager.rotatef(90f, 1, 0, 0);
 			
-			GlStateManager.scale(.25f, .25f, .25f);
+			GlStateManager.scalef(.25f, .25f, .25f);
 			GlStateManager.enableBlend();
 			GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 			GlStateManager.disableLighting();
-			GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+			GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 			//OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 			
-			Minecraft.getMinecraft().getRenderItem()
-				.renderItem(reagents, TransformType.GROUND);
+			Minecraft.getInstance().getItemRenderer()
+				.ItemRenderer(reagents, TransformType.GROUND);
 			GlStateManager.popMatrix();
 		}
 		
@@ -313,15 +313,15 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 			// Draw spell icon
 			if (!scroll.isEmpty()) {
 				GlStateManager.pushMatrix();
-				GlStateManager.translate(0, 2 + platOffset, 0);
-				GlStateManager.scale(.5, .5, .5);
-				GlStateManager.rotate(90f + (float) (360.0 * (Math.atan2(z, x) / (2 * Math.PI))), 0, -1, 0);
-				GlStateManager.translate(.5, 0, 0);
-				GlStateManager.rotate(180, 0, 0, 1);
+				GlStateManager.translatef(0, 2 + platOffset, 0);
+				GlStateManager.scalef(.5, .5, .5);
+				GlStateManager.rotatef(90f + (float) (360.0 * (Math.atan2(z, x) / (2 * Math.PI))), 0, -1, 0);
+				GlStateManager.translatef(.5, 0, 0);
+				GlStateManager.rotatef(180, 0, 0, 1);
 				// Make billboard
-				GlStateManager.color(1f, 1f, 1f, .4f);
+				GlStateManager.color4f(1f, 1f, 1f, .4f);
 				GlStateManager.disableCull();
-				SpellIcon.get(spellIcon).render(Minecraft.getMinecraft(), 0, 0, 1, 1);
+				SpellIcon.get(spellIcon).render(Minecraft.getInstance(), 0, 0, 1, 1);
 				GlStateManager.enableCull();
 				GlStateManager.popMatrix();
 			}
@@ -344,61 +344,61 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 				}
 				
 				GlStateManager.pushMatrix();
-				Minecraft.getMinecraft().getTextureManager().bindTexture(GEM_TEX_LOC);
+				Minecraft.getInstance().getTextureManager().bindTexture(GEM_TEX_LOC);
 				GlStateManager.enableBlend();
-				GlStateManager.tryBlendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA,
+				GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA,
 						SourceFactor.ONE, DestFactor.ZERO);
-				GlStateManager.color(
+				GlStateManager.color4f(
 						(float) ((color >> 16) & 0xFF) / 256f,
 						(float) ((color >> 8) & 0xFF) / 256f,
 						(float) ((color >> 0) & 0xFF) / 256f,
 						.8f);
-				GlStateManager.translate(0, .8, 0);
-				GlStateManager.rotate(rotoffset + (360f * ((float) i / (float) count)), 0, -1, 0);
-				GlStateManager.translate(0, voffset, .3);
-				GlStateManager.scale(.05, .05, .05);
+				GlStateManager.translatef(0, .8, 0);
+				GlStateManager.rotatef(rotoffset + (360f * ((float) i / (float) count)), 0, -1, 0);
+				GlStateManager.translatef(0, voffset, .3);
+				GlStateManager.scalef(.05, .05, .05);
 				
 				renderGem(tessellator, buffer, false);
-				GlStateManager.color(0f, 0f, 0f, 1f);
-				GlStateManager.glLineWidth(2f);
+				GlStateManager.color4f(0f, 0f, 0f, 1f);
+				GlStateManager.lineWidth(2f);
 				renderGem(tessellator, buffer, true);
-				GlStateManager.color(1f, 1f, 1f, 1f);
+				GlStateManager.color4f(1f, 1f, 1f, 1f);
 				GlStateManager.popMatrix();
 				
 				// Single bouncing ring
 				/*
 				GlStateManager.pushMatrix();
-				Minecraft.getMinecraft().getTextureManager().bindTexture(GEM_TEX_LOC);
+				Minecraft.getInstance().getTextureManager().bindTexture(GEM_TEX_LOC);
 				GlStateManager.enableBlend();
-				GlStateManager.color(
+				GlStateManager.color4f(
 						(float) ((color >> 16) & 0xFF) / 256f,
 						(float) ((color >> 8) & 0xFF) / 256f,
 						(float) ((color >> 0) & 0xFF) / 256f,
 						.4f);
-				GlStateManager.translate(0, .8, 0);
-				GlStateManager.rotate(360f * progressShort, 0, 1, 0);
-				GlStateManager.rotate(360f * ((float) i / (float) count), 0, -1, 0);
-				GlStateManager.translate(0, voffset, .3);
-				GlStateManager.scale(.05, .05, .05);
+				GlStateManager.translatef(0, .8, 0);
+				GlStateManager.rotatef(360f * progressShort, 0, 1, 0);
+				GlStateManager.rotatef(360f * ((float) i / (float) count), 0, -1, 0);
+				GlStateManager.translatef(0, voffset, .3);
+				GlStateManager.scalef(.05, .05, .05);
 				
 				renderGem(tessellator, buffer);
-				GlStateManager.color(1f, 1f, 1f, 1f);
+				GlStateManager.color4f(1f, 1f, 1f, 1f);
 				GlStateManager.popMatrix();
 				 */
 			}
 		}
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(0, 2.5, 0);
-		GlStateManager.scale(.05, .05, .05);
-		GlStateManager.rotate(90f + (float) (360.0 * (Math.atan2(z, x) / (2 * Math.PI))), 0, -1, 0);
+		GlStateManager.translatef(0, 2.5, 0);
+		GlStateManager.scalef(.05, .05, .05);
+		GlStateManager.rotatef(90f + (float) (360.0 * (Math.atan2(z, x) / (2 * Math.PI))), 0, -1, 0);
 		renderAetherDebug(te);
 		GlStateManager.popMatrix();
 		
 		
-		GlStateManager.color(1f, 1f, 1f, 1f);
+		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		GlStateManager.popMatrix();
-		GlStateManager.popAttrib();
+		GlStateManager.popAttributes();
 		GlStateManager.disableBlend();
 	}
 	

@@ -3,8 +3,8 @@ package com.smanzana.nostrummagica.network.messages;
 import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -27,13 +27,13 @@ public class ObeliskSelectMessage implements IMessage {
 			// Get from and to
 			// Validate to is an obelisk and then try to update it
 			
-			if (message.tag.hasKey(NBT_OBELISK, NBT.TAG_LONG)
-					&& message.tag.hasKey(NBT_INDEX, NBT.TAG_INT)) {
+			if (message.tag.contains(NBT_OBELISK, NBT.TAG_LONG)
+					&& message.tag.contains(NBT_INDEX, NBT.TAG_INT)) {
 				final BlockPos obeliskPos = BlockPos.fromLong(message.tag.getLong(NBT_OBELISK));
-				final int index = message.tag.getInteger(NBT_INDEX);
+				final int index = message.tag.getInt(NBT_INDEX);
 				
-				EntityPlayerMP player = ctx.getServerHandler().player;
-				player.getServerWorld().addScheduledTask(() -> {
+				ServerPlayerEntity player = ctx.getServerHandler().player;
+				player.getServerWorld().runAsync(() -> {
 					TileEntity te = player.world.getTileEntity(obeliskPos);
 					if (te != null && te instanceof NostrumObeliskEntity) {
 						((NostrumObeliskEntity) te).setTargetIndex(index);
@@ -51,10 +51,10 @@ public class ObeliskSelectMessage implements IMessage {
 	//@CapabilityInject(INostrumMagic.class)
 	//public static Capability<INostrumMagic> CAPABILITY = null;
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public ObeliskSelectMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	/**
@@ -63,10 +63,10 @@ public class ObeliskSelectMessage implements IMessage {
 	 * @param to
 	 */
 	public ObeliskSelectMessage(BlockPos obeliskPos, int index) {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 		
-		tag.setInteger(NBT_INDEX, index);
-		tag.setLong(NBT_OBELISK, obeliskPos.toLong());
+		tag.putInt(NBT_INDEX, index);
+		tag.putLong(NBT_OBELISK, obeliskPos.toLong());
 	}
 
 	@Override

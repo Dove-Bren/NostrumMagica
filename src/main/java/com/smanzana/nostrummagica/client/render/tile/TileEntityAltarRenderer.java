@@ -5,7 +5,7 @@ import org.lwjgl.opengl.GL11;
 import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
@@ -30,24 +30,24 @@ public class TileEntityAltarRenderer extends TileEntitySpecialRenderer<AltarTile
 		if (item.isEmpty() || te.isHidingItem())
 			return;
 		
-		float rot = (float) (2.0 * ((double) Minecraft.getSystemTime() / 50.0)); // Copied into ClientEffectRitual
+		float rot = (float) (2.0 * ((double) System.currentTimeMillis() / 50.0)); // Copied into ClientEffectRitual
 		float scale = .75f;
-		float yoffset = (float) (.1f * (-.5f + Math.sin(((double) Minecraft.getSystemTime()) / 1000.0)));
+		float yoffset = (float) (.1f * (-.5f + Math.sin(((double) System.currentTimeMillis()) / 1000.0)));
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(x + .5, y + 1.25 + yoffset, z + .5);
-		GlStateManager.rotate(rot, 0, 1f, 0);
+		GlStateManager.translatef(x + .5, y + 1.25 + yoffset, z + .5);
+		GlStateManager.rotatef(rot, 0, 1f, 0);
 		
-		GlStateManager.scale(scale, scale, scale);
+		GlStateManager.scalef(scale, scale, scale);
 		GlStateManager.enableBlend();
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GlStateManager.disableLighting();
-		GlStateManager.enableAlpha();
-		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+		GlStateManager.enableAlphaTest();
+		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 		
-		Minecraft.getMinecraft().getRenderItem()
-			.renderItem(item, TransformType.GROUND);
+		Minecraft.getInstance().getItemRenderer()
+			.ItemRenderer(item, TransformType.GROUND);
 		
 		GlStateManager.popMatrix();
 		

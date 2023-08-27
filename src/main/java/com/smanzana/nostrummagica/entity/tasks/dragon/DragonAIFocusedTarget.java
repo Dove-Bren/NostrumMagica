@@ -2,10 +2,10 @@ package com.smanzana.nostrummagica.entity.tasks.dragon;
 
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
 
-public class DragonAIFocusedTarget<T extends EntityLivingBase> extends EntityAIBase {
+public class DragonAIFocusedTarget<T extends LivingEntity> extends EntityAIBase {
 
 	private T target;
 	private EntityDragon dragon;

@@ -25,21 +25,21 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 	
@@ -117,7 +117,7 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public boolean canSilkHarvest(World world, BlockPos pos, IBlockState state, EntityPlayer player) {
+	public boolean canSilkHarvest(World world, BlockPos pos, IBlockState state, PlayerEntity player) {
 		return false;
 	}
 	
@@ -146,7 +146,7 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		return false;
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
     public BlockRenderLayer getBlockLayer() {
         return BlockRenderLayer.CUTOUT;
     }
@@ -155,7 +155,7 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
 		super.updateTick(worldIn, pos, state, rand);
 		
-		for (EntityPlayer player : worldIn.playerEntities) {
+		for (PlayerEntity player : worldIn.playerEntities) {
 			if (!player.isSpectator() && !player.isCreative() && player.getDistanceSq(pos) < SPAWN_DIST_SQ) {
 				this.spawn(worldIn, pos, state, rand);
 				
@@ -165,9 +165,9 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		}
 	}
 	
-	public EntityLiving spawn(World world, BlockPos pos, IBlockState state, Random rand) {
+	public MobEntity spawn(World world, BlockPos pos, IBlockState state, Random rand) {
 		Type type = state.getValue(MOB);
-		EntityLiving entity = getEntity(type, world, pos);
+		MobEntity entity = getEntity(type, world, pos);
 		
 		entity.enablePersistence();
 		entity.setPosition(pos.getX() + 0.5, pos.getY(), pos.getZ() + .5);
@@ -176,11 +176,11 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		return entity;
 	}
 	
-	protected static EntityLiving getEntity(Type type, World world, BlockPos pos) {
+	protected static MobEntity getEntity(Type type, World world, BlockPos pos) {
 		if (type == null)
 			return null;
 		
-		EntityLiving entity = null;
+		MobEntity entity = null;
 		
 		switch (type) {
 		case GOLEM_EARTH:
@@ -236,7 +236,7 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 	}
 
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
 		if (worldIn.isRemote) {
 			return true;
 		}
@@ -253,7 +253,7 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		if (playerIn.isCreative()) {
 			ItemStack heldItem = playerIn.getHeldItem(hand);
 			if (heldItem.isEmpty()) {
-				playerIn.sendMessage(new TextComponentString("Currently set to " + state.getValue(MOB).getName()));
+				playerIn.sendMessage(new StringTextComponent("Currently set to " + state.getValue(MOB).getName()));
 			} else if (heldItem.getItem() instanceof EssenceItem) {
 				Type type = null;
 				switch (EssenceItem.findType(heldItem)) {

@@ -12,12 +12,12 @@ import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileE
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.GlStateManager.DestFactor;
-import net.minecraft.client.renderer.GlStateManager.SourceFactor;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
@@ -49,12 +49,12 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 		
 		GlStateManager.disableBlend();
 		GlStateManager.enableBlend();
-		GlStateManager.disableAlpha();
-		GlStateManager.enableAlpha();
-		GlStateManager.disableTexture2D();
-		GlStateManager.enableTexture2D();
-		GlStateManager.color(0f, 0f, 0f, 0f);
-		GlStateManager.color(1f, 1f, 1f, 1f);
+		GlStateManager.disableAlphaTest();
+		GlStateManager.enableAlphaTest();
+		GlStateManager.disableTexture();
+		GlStateManager.enableTexture();
+		GlStateManager.color4f(0f, 0f, 0f, 0f);
+		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		//GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0f);
 		GlStateManager.disableLighting();
 		GlStateManager.enableCull();
@@ -64,14 +64,14 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 		
 		// outside
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(0, ORB_RADIUS - .5f, 0);
-		GlStateManager.scale(mult, mult, mult);
+		GlStateManager.translatef(0, ORB_RADIUS - .5f, 0);
+		GlStateManager.scalef(mult, mult, mult);
 //		
 //		{
 //			final int color = 0x0033BB88 | (((int) (opacity * 255f) << 24) & 0xFF000000);
 //			//if (MODEL_ORB == null) {
-//				//MODEL_ORB = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getModel(ORB_MODEL_LOC);
-//				IBakedModel MODEL_ORB = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getModel(new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, "effects/orb_pure"), "normal"));
+//				//MODEL_ORB = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getModel(ORB_MODEL_LOC);
+//				IBakedModel MODEL_ORB = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getModel(new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, "effects/orb_pure"), "normal"));
 //			//}
 //			
 //			ClientEffectForm.drawModel(MODEL_ORB, color);
@@ -89,7 +89,7 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 			//GlStateManager.disableCull();
 			//GlStateManager.disableDepth();
 			GlStateManager.alphaFunc(516, 0);
-			Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation(NostrumMagica.MODID, "textures/effects/slate.png"));
+			Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(NostrumMagica.MODID, "textures/effects/slate.png"));
 			final int rows = 10;
 			final int cols = 10;
 			final double radius = 1;
@@ -136,7 +136,7 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 		final float offsetY = (float) (ORB_RADIUS * -Math.cos(pitchRad)) + ORB_RADIUS -.5f;
 		
 		// Rotation
-//		camera = camera.addVector(offsetX, offsetY, offsetZ);
+//		camera = camera.add(offsetX, offsetY, offsetZ);
 //		double rotY = (Math.atan2(camera.zCoord, camera.xCoord) / (2 * Math.PI));
 //		final double hDist = Math.sqrt(Math.pow(camera.xCoord, 2) + Math.pow(camera.zCoord, 2)); 
 //		double rotX = (Math.atan2(camera.yCoord, hDist) / (2 * Math.PI));
@@ -166,10 +166,10 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 		final float alphaInner = .01f + .2f * brightness;
 		final float alphaOuter = .01f + .2f * brightness;
 		
-		//GlStateManager.translate(offsetX, offsetY, offsetZ);
-		//GlStateManager.rotate((float)rotY, 0, 1, 0);
-		//GlStateManager.rotate((float)rotX, 1, 0, 0);
-		//GlStateManager.scale(scale, scale, scale);
+		//GlStateManager.translatef(offsetX, offsetY, offsetZ);
+		//GlStateManager.rotatef((float)rotY, 0, 1, 0);
+		//GlStateManager.rotatef((float)rotX, 1, 0, 0);
+		//GlStateManager.scalef(scale, scale, scale);
 		
 		buffer.pos(offsetX - (rX * radius) - (rYZ * radius), offsetY - (rXZ * radius), offsetZ - (rZ * radius) - (rXY * radius))
 			.tex(0, 0).color(red, green, blue, alphaOuter).normal(0, 0, 1).endVertex();
@@ -219,23 +219,23 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 		
 		GlStateManager.enableBlend();
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		GlStateManager.enableAlpha();
+		GlStateManager.enableAlphaTest();
 		GlStateManager.disableLighting();
 		GlStateManager.enableLighting();
 		//GlStateManager.disableRescaleNormal();
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(x + .5, y + 1, z + .5);
+		GlStateManager.translatef(x + .5, y + 1, z + .5);
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+		Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 		renderOrb(tessellator, buffer, orbOpacity, false);
 		renderOrb(tessellator, buffer, orbOpacity, true);
 		
 		//GlStateManager.clearDepth(100000);
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(SPARK_TEX_LOC);
+		Minecraft.getInstance().getTextureManager().bindTexture(SPARK_TEX_LOC);
 		GlStateManager.alphaFunc(516, 0);
-		GlStateManager.color(1f, 1f, 1f, .75f);
+		GlStateManager.color4f(1f, 1f, 1f, .75f);
 		GlStateManager.disableLighting();
 		GlStateManager.depthMask(false);
 		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
@@ -246,7 +246,7 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 		tessellator.draw();
 		GlStateManager.depthMask(true);
 		
-//		Minecraft.getMinecraft().getTextureManager().bindTexture(SPARK_TEX_LOC);
+//		Minecraft.getInstance().getTextureManager().bindTexture(SPARK_TEX_LOC);
 //		renderSpark(tessellator, buffer, camOffset, ticks, partialTicks, null);
 		
 		

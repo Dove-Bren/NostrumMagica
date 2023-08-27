@@ -22,26 +22,26 @@ import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * Magic mirror that links to another and transports items!
@@ -79,9 +79,9 @@ public class ParadoxMirrorBlock extends BlockContainer implements ILoreTagged {
 	}
 	
 	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+	public IBlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer) {
 		//return this.getDefaultState().withProperty(FACING, placer.getHorizontalFacing().getOpposite());
-		EnumFacing side = placer.getHorizontalFacing().getOpposite();
+		Direction side = placer.getHorizontalFacing().getOpposite();
 		if (!this.canPlaceAt(world, pos, side)) {
 			// Rotate and find it
 			for (int i = 0; i < 3; i++) {
@@ -96,7 +96,7 @@ public class ParadoxMirrorBlock extends BlockContainer implements ILoreTagged {
 				.withProperty(FACING, side);
 	}
 	
-	protected boolean canPlaceAt(World worldIn, BlockPos pos, EnumFacing side) {
+	protected boolean canPlaceAt(World worldIn, BlockPos pos, Direction side) {
 		IBlockState state = worldIn.getBlockState(pos.offset(side.getOpposite()));
 		if (state == null || !(state.isSideSolid(worldIn, pos.offset(side.getOpposite()), side.getOpposite()))) {
 			return false;
@@ -107,7 +107,7 @@ public class ParadoxMirrorBlock extends BlockContainer implements ILoreTagged {
 	
 	@Override
 	public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
-		for (EnumFacing side : EnumFacing.HORIZONTALS) {
+		for (Direction side : Direction.HORIZONTALS) {
 			if (canPlaceAt(worldIn, pos, side)) {
 				return true;
 			}
@@ -119,7 +119,7 @@ public class ParadoxMirrorBlock extends BlockContainer implements ILoreTagged {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos posFrom) {
-		EnumFacing face = state.getValue(FACING);
+		Direction face = state.getValue(FACING);
 		if (!canPlaceAt(worldIn, pos, face)) {
 			this.dropBlockAsItem(worldIn, pos, state, 0);
 			worldIn.setBlockToAir(pos);
@@ -135,7 +135,7 @@ public class ParadoxMirrorBlock extends BlockContainer implements ILoreTagged {
 	
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
-		return getDefaultState().withProperty(FACING, EnumFacing.getHorizontal(meta));
+		return getDefaultState().withProperty(FACING, Direction.getHorizontal(meta));
 	}
 	
 	@Override
@@ -144,7 +144,7 @@ public class ParadoxMirrorBlock extends BlockContainer implements ILoreTagged {
 	}
 	
 	@Override
-	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
 		return false;
 	}
 	
@@ -190,7 +190,7 @@ public class ParadoxMirrorBlock extends BlockContainer implements ILoreTagged {
     }
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
 		
 		if (worldIn.isRemote) {
 			return true;
@@ -224,7 +224,7 @@ public class ParadoxMirrorBlock extends BlockContainer implements ILoreTagged {
 					BlockPos heldPos = PositionCrystal.getBlockPosition(held);
 					if (heldPos != null && !heldPos.equals(pos)) {
 						mirror.setLinkedPosition(heldPos);
-						playerIn.sendMessage(new TextComponentTranslation("info.generic.block_linked"));
+						playerIn.sendMessage(new TranslationTextComponent("info.generic.block_linked"));
 					}
 					return true; // true even if crystal doesn't have position
 				}
@@ -292,7 +292,7 @@ public class ParadoxMirrorBlock extends BlockContainer implements ILoreTagged {
 	}
 	
 	@Override
-	public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
+	public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest) {
 		if (willHarvest) return true; // Hack to not remove block and tile entity until after getDrops() is called. See BlockFlowerPot for
 		// forge patch that does this, too.
 		return super.removedByPlayer(state, world, pos, player, willHarvest);
@@ -301,7 +301,7 @@ public class ParadoxMirrorBlock extends BlockContainer implements ILoreTagged {
 	}
 	
 	@Override
-	public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te, ItemStack stack) {
+	public void harvestBlock(World worldIn, PlayerEntity player, BlockPos pos, IBlockState state, @Nullable TileEntity te, ItemStack stack) {
 		super.harvestBlock(worldIn, player, pos, state, te, stack);
 		
 		// Have to manually set block to air since we overrode removedByPlayer to not remove the block
@@ -315,12 +315,12 @@ public class ParadoxMirrorBlock extends BlockContainer implements ILoreTagged {
 		
 		BlockPos linkedPos = getLinkedPosition(world, pos);
 		if (linkedPos != null) {
-			NBTTagCompound tag = drop.getTagCompound();
+			CompoundNBT tag = drop.getTagCompound();
 			if (tag == null) {
-				tag = new NBTTagCompound();
+				tag = new CompoundNBT();
 			}
 			
-			tag.setLong(NBT_LINKED_POS, linkedPos.toLong());
+			tag.putLong(NBT_LINKED_POS, linkedPos.toLong());
 			drop.setTagCompound(tag);
 		}
 		
@@ -328,12 +328,12 @@ public class ParadoxMirrorBlock extends BlockContainer implements ILoreTagged {
 	}
 	
 	@Override
-	public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+	public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, LivingEntity placer, ItemStack stack) {
 		super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
 		
 		// Read linked position off of item stack, if present
-		NBTTagCompound tag = stack.getTagCompound();
-		if (tag != null && tag.hasKey(NBT_LINKED_POS, NBT.TAG_LONG)) {
+		CompoundNBT tag = stack.getTagCompound();
+		if (tag != null && tag.contains(NBT_LINKED_POS, NBT.TAG_LONG)) {
 			this.setLinkedPosition(worldIn, pos, BlockPos.fromLong(tag.getLong(NBT_LINKED_POS)));
 		}
 	}
@@ -363,7 +363,7 @@ public class ParadoxMirrorBlock extends BlockContainer implements ILoreTagged {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		if (stack.isEmpty() || !stack.hasTagCompound() || !stack.getTagCompound().hasKey(NBT_LINKED_POS, NBT.TAG_LONG))
 			return;

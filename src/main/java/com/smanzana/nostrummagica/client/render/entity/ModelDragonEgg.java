@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.Entity;
 
 public class ModelDragonEgg extends ModelBase {
@@ -54,7 +54,7 @@ public class ModelDragonEgg extends ModelBase {
 			coldScale = 1f - (egg.getHeat() / EntityDragonEgg.HEAT_MAX);
 		}
 		
-		GlStateManager.color(1f - (coldScale * .4f), 1f - (coldScale * .1f), 1f - (coldScale * .1f), 1f);
+		GlStateManager.color4f(1f - (coldScale * .4f), 1f - (coldScale * .1f), 1f - (coldScale * .1f), 1f);
 		
 		main.render(scale);
 		

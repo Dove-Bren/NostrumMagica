@@ -286,7 +286,7 @@ public class ModConfig {
 	
 	private void initConfig() {
 //		for (Key key : Key.values())
-//		//if (!base.hasKey(key.getCategory(), key.getKey())) {
+//		//if (!base.contains(key.getCategory(), key.getKey())) {
 //		{
 //			if (key.getDefault() instanceof Float) {
 //				base.getFloat(key.getKey(), key.getCategory(), (Float) key.getDefault(),

@@ -4,10 +4,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class TrialLightning extends ShrineTrial {
 
@@ -19,7 +19,7 @@ public class TrialLightning extends ShrineTrial {
 	@SubscribeEvent
 	public void onLightning(EntityStruckByLightningEvent e) {
 		
-		if (e.getEntity() instanceof EntityPlayer) {
+		if (e.getEntity() instanceof PlayerEntity) {
 		
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(e.getEntity());
 			if (attr == null || !attr.isUnlocked())
@@ -28,7 +28,7 @@ public class TrialLightning extends ShrineTrial {
 			if (!attr.hasTrial(this.element))
 				return;
 			
-			this.complete((EntityPlayer) e.getEntity());
+			this.complete((PlayerEntity) e.getEntity());
 		}
 	}
 	

@@ -27,17 +27,17 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.util.text.event.HoverEvent.Action;
@@ -64,12 +64,12 @@ public class Spell {
 	public class SpellState {
 		private int index;
 		private float efficiency;
-		private EntityLivingBase caster;
-		private EntityLivingBase self;
-		private EntityLivingBase other;
+		private LivingEntity caster;
+		private LivingEntity self;
+		private LivingEntity other;
 		private SpellTrigger.SpellTriggerInstance triggerInstance;
 		
-		public SpellState(EntityLivingBase caster, float efficiency) {
+		public SpellState(LivingEntity caster, float efficiency) {
 			index = -1;
 			this.caster = this.self = this.other = caster;
 			this.efficiency = efficiency;
@@ -80,11 +80,11 @@ public class Spell {
 		 * Indicates the current trigger has been done and the spell
 		 * should move forward
 		 */
-		public void trigger(List<EntityLivingBase> targets, List<EntityLivingBase> others, World world, List<BlockPos> locations) {
+		public void trigger(List<LivingEntity> targets, List<LivingEntity> others, World world, List<BlockPos> locations) {
 			this.trigger(targets, others, world, locations, false);
 		}
 		
-		public void trigger(List<EntityLivingBase> targets, List<EntityLivingBase> others, World world, List<BlockPos> locations, boolean forceSplit) {
+		public void trigger(List<LivingEntity> targets, List<LivingEntity> others, World world, List<BlockPos> locations, boolean forceSplit) {
 			//for each target/other pair (if more than one), break into multiple spellstates
 			// persist index++ and set self/other, then start doing shapes or next trigger
 			
@@ -98,14 +98,14 @@ public class Spell {
 				this.split().trigger(targets, others, world, locations, false);
 			} else {
 			
-				if (ModConfig.config.spellDebug() && this.caster instanceof EntityPlayer) {
-					ITextComponent comp = new TextComponentString(""),
+				if (ModConfig.config.spellDebug() && this.caster instanceof PlayerEntity) {
+					ITextComponent comp = new StringTextComponent(""),
 							sib;
 					
-					sib = new TextComponentString(name +  "> ");
+					sib = new StringTextComponent(name +  "> ");
 					sib.setStyle((new Style()).setBold(true).setColor(TextFormatting.GOLD));
 					comp.appendSibling(sib);
-					sib = new TextComponentString("");
+					sib = new StringTextComponent("");
 					
 					// Get current trigger
 					if (index == -1) {
@@ -124,36 +124,36 @@ public class Spell {
 								buf += String.format("Level %02.1f", part.param.level);
 							}
 							style.setHoverEvent(new HoverEvent(Action.SHOW_TEXT,
-									new TextComponentString(buf)));
+									new StringTextComponent(buf)));
 							sib.setStyle(style);
 						}
 					}
 					
 					if (targets != null && targets.size() > 0) {
 						String buf = "";
-						for (EntityLivingBase ent : targets) {
+						for (LivingEntity ent : targets) {
 							buf += ent.getName() + " ";
 						}
 						sib.appendText("on ");
 						sib.setStyle((new Style()).setColor(TextFormatting.AQUA).setBold(false));
 						comp.appendSibling(sib);
-						sib = new TextComponentString(targets.size() + " entities");
+						sib = new StringTextComponent(targets.size() + " entities");
 						sib.setStyle((new Style()).setColor(TextFormatting.RED)
 								.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, 
-										new TextComponentString(buf))));
+										new StringTextComponent(buf))));
 						comp.appendSibling(sib);
 	
-						sib = new TextComponentString(" (others)");
+						sib = new StringTextComponent(" (others)");
 						Style style = new Style();
 						style.setColor(TextFormatting.DARK_PURPLE);
 						buf = "";
 						if (others.size() > 0) {
-							for (EntityLivingBase ent : others)
+							for (LivingEntity ent : others)
 								buf += ent.getName() + " ";
 						} else {
 							buf += this.getSelf().getName();
 						}
-						style.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, new TextComponentString(buf)));
+						style.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, new StringTextComponent(buf)));
 						sib.setStyle(style);
 						
 						comp.appendSibling(sib);
@@ -161,14 +161,14 @@ public class Spell {
 						sib.appendText("on ");
 						sib.setStyle((new Style()).setColor(TextFormatting.AQUA).setBold(false));
 						comp.appendSibling(sib);
-						sib = new TextComponentString(locations.size() + " location(s)");
+						sib = new StringTextComponent(locations.size() + " location(s)");
 						String buf = "";
 						for (BlockPos pos : locations) {
 							buf += "(" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") ";
 						}
 						
 						sib.setStyle(new Style().setColor(TextFormatting.DARK_GREEN).setHoverEvent(
-								new HoverEvent(Action.SHOW_TEXT, new TextComponentString(buf))));
+								new HoverEvent(Action.SHOW_TEXT, new StringTextComponent(buf))));
 						comp.appendSibling(sib);
 					} else {
 						sib.appendText("no targets");
@@ -177,7 +177,7 @@ public class Spell {
 					}
 					
 					//caster.addChatMessage(comp);
-					NostrumMagica.proxy.sendSpellDebug((EntityPlayer) this.caster, comp);
+					NostrumMagica.proxy.sendSpellDebug((PlayerEntity) this.caster, comp);
 				}
 			
 				boolean first = true;
@@ -193,11 +193,11 @@ public class Spell {
 						attr.setKnowledge(next.getElement(), next.getAlteration());
 					}
 					
-					final List<EntityLivingBase> affectedEnts = new ArrayList<>();
+					final List<LivingEntity> affectedEnts = new ArrayList<>();
 					final List<BlockPos> affectedPos = new ArrayList<>();
 					
 					if (targets != null && !targets.isEmpty()) {
-						for (EntityLivingBase targ : targets) {
+						for (LivingEntity targ : targets) {
 							shape.perform(action, param, targ, null, null, this.efficiency, affectedEnts, affectedPos);
 						}
 					} else if (locations != null && !locations.isEmpty()) {
@@ -215,7 +215,7 @@ public class Spell {
 						final boolean harmful = action.isHarmful();
 						
 						if (!affectedEnts.isEmpty())
-						for (EntityLivingBase affected : affectedEnts) {
+						for (LivingEntity affected : affectedEnts) {
 							SpellComponentWrapper comp;
 							if (next.getAlteration() == null)
 								comp = new SpellComponentWrapper(next.getElement());
@@ -241,7 +241,7 @@ public class Spell {
 						}
 						
 						// One more for the shape itself
-						final @Nullable EntityLivingBase centerEnt = (targets == null || targets.isEmpty() ? null : targets.get(0));
+						final @Nullable LivingEntity centerEnt = (targets == null || targets.isEmpty() ? null : targets.get(0));
 						final @Nullable BlockPos centerBP = (locations == null || locations.isEmpty() ? null : locations.get(0));
 						if (centerEnt != null || centerBP != null) {
 							@SuppressWarnings("null")
@@ -287,8 +287,8 @@ public class Spell {
 						} else {
 							index--; // Make splits have same trigger as we're performing now
 							for (int i = 0; i < targets.size(); i++) {
-								EntityLivingBase targ = targets.get(i);
-								EntityLivingBase other;
+								LivingEntity targ = targets.get(i);
+								LivingEntity other;
 								if (others.size() >= i)
 									other = others.get(i);
 								else
@@ -320,7 +320,7 @@ public class Spell {
 			}
 		}
 		
-		private void spawnTrigger(SpellTrigger trigger, EntityLivingBase targ, World world, BlockPos targpos, SpellPartParam param) {
+		private void spawnTrigger(SpellTrigger trigger, LivingEntity targ, World world, BlockPos targpos, SpellPartParam param) {
 			// instantiate trigger in world
 			Vec3d pos;
 			if (world == null)
@@ -346,15 +346,15 @@ public class Spell {
 			return spawn;
 		}
 
-		public EntityLivingBase getSelf() {
+		public LivingEntity getSelf() {
 			return self;
 		}
 
-		public EntityLivingBase getOther() {
+		public LivingEntity getOther() {
 			return other;
 		}
 
-		public EntityLivingBase getCaster() {
+		public LivingEntity getCaster() {
 			return caster;
 		}
 
@@ -520,7 +520,7 @@ public class Spell {
 		return this.iconIndex;
 	}
 	
-	public void cast(EntityLivingBase caster, float efficiency) {
+	public void cast(LivingEntity caster, float efficiency) {
 		SpellState state = new SpellState(caster, efficiency);
 		Spell.onCast(caster, this);
 		state.trigger(Lists.newArrayList(caster), null, null, null);
@@ -647,7 +647,7 @@ public class Spell {
 		return total;
 	}
 	
-	public static final SpellAction solveAction(EntityLivingBase caster, EAlteration alteration,
+	public static final SpellAction solveAction(LivingEntity caster, EAlteration alteration,
 			EMagicElement element, int elementCount) {
 		
 		// Could do a registry with hooks here, if wanted it to be extensible
@@ -680,7 +680,7 @@ public class Spell {
 		}
 	}
 	
-	private static final SpellAction solveRuin(EntityLivingBase caster, EMagicElement element,
+	private static final SpellAction solveRuin(LivingEntity caster, EMagicElement element,
 			int elementCount) {
 		switch (element) {
 		case PHYSICAL:
@@ -698,7 +698,7 @@ public class Spell {
 		return null;
 	}
 	
-	private static final SpellAction solveInflict(EntityLivingBase caster, EMagicElement element,
+	private static final SpellAction solveInflict(LivingEntity caster, EMagicElement element,
 			int elementCount) {
 		int duration = 20 * 15 * elementCount;
 		int amp = elementCount - 1;
@@ -722,7 +722,7 @@ public class Spell {
 		return null;
 	}
 	
-	private static final SpellAction solveResist(EntityLivingBase caster, EMagicElement element,
+	private static final SpellAction solveResist(LivingEntity caster, EMagicElement element,
 			int elementCount) {
 		int duration = 20 * 15 * elementCount;
 		int amp = elementCount - 1;
@@ -746,7 +746,7 @@ public class Spell {
 		return null;
 	}
 	
-	private static final SpellAction solveSupport(EntityLivingBase caster, EMagicElement element,
+	private static final SpellAction solveSupport(LivingEntity caster, EMagicElement element,
 			int elementCount) {
 		int duration = 20 * 15 * elementCount;
 		int amp = elementCount - 1;
@@ -770,7 +770,7 @@ public class Spell {
 		return null;
 	}
 	
-	private static final SpellAction solveGrowth(EntityLivingBase caster, EMagicElement element,
+	private static final SpellAction solveGrowth(LivingEntity caster, EMagicElement element,
 			int elementCount) {
 		int duration = 20 * 15 * elementCount;
 		int amp = elementCount - 1;
@@ -794,12 +794,12 @@ public class Spell {
 		return null;
 	}
 	
-	private static final SpellAction solveEnchant(EntityLivingBase caster, EMagicElement element,
+	private static final SpellAction solveEnchant(LivingEntity caster, EMagicElement element,
 			int elementCount) {
 		return new SpellAction(caster).enchant(element, elementCount).name("enchant." + element.name().toLowerCase());
 	}
 	
-	private static final SpellAction solveConjure(EntityLivingBase caster, EMagicElement element,
+	private static final SpellAction solveConjure(LivingEntity caster, EMagicElement element,
 			int elementCount) {
 		switch (element) {
 		case PHYSICAL:
@@ -821,7 +821,7 @@ public class Spell {
 		return null;
 	}
 	
-	private static final SpellAction solveSummon(EntityLivingBase caster, EMagicElement element,
+	private static final SpellAction solveSummon(LivingEntity caster, EMagicElement element,
 			int elementCount) {
 		return new SpellAction(caster).summon(element, elementCount).name("summon." + element.name().toLowerCase());
 	}
@@ -838,32 +838,32 @@ public class Spell {
 	private static final String NBT_ALTERATION = "alteration";
 	private static final String NBT_COUNT = "count";
 	
-	public NBTTagCompound toNBT() {
-		NBTTagList list = new NBTTagList();
+	public CompoundNBT toNBT() {
+		ListNBT list = new ListNBT();
 		
-		NBTTagCompound compound;
+		CompoundNBT compound;
 		for (SpellPart part : parts) {
-			compound = new NBTTagCompound();
+			compound = new CompoundNBT();
 			if (part.isTrigger()) {
-				compound.setString(NBT_KEY, part.getTrigger().getTriggerKey());
+				compound.putString(NBT_KEY, part.getTrigger().getTriggerKey());
 			} else {
-				compound.setString(NBT_KEY, part.getShape().getShapeKey());
-				compound.setString(NBT_ELEMENT, part.getElement().name());
-				compound.setInteger(NBT_COUNT, part.getElementCount());
+				compound.putString(NBT_KEY, part.getShape().getShapeKey());
+				compound.putString(NBT_ELEMENT, part.getElement().name());
+				compound.putInt(NBT_COUNT, part.getElementCount());
 				if (part.getAlteration() != null)
-					compound.setString(NBT_ALTERATION, part.getAlteration().name());
+					compound.putString(NBT_ALTERATION, part.getAlteration().name());
 			}
 			
-			compound.setFloat(NBT_PARAM_LEVEL, part.getParam().level);
-			compound.setBoolean(NBT_PARAM_FLIP, part.getParam().flip);
+			compound.putFloat(NBT_PARAM_LEVEL, part.getParam().level);
+			compound.putBoolean(NBT_PARAM_FLIP, part.getParam().flip);
 			
-			list.appendTag(compound);
+			list.add(compound);
 		}
 		
-		compound = new NBTTagCompound();
-		compound.setString(NBT_SPELL_NAME, name);
-		compound.setInteger(NBT_ICON_INDEX, iconIndex);
-		compound.setTag(NBT_LIST, list);
+		compound = new CompoundNBT();
+		compound.putString(NBT_SPELL_NAME, name);
+		compound.putInt(NBT_ICON_INDEX, iconIndex);
+		compound.put(NBT_LIST, list);
 		return compound;
 	}
 	
@@ -874,26 +874,26 @@ public class Spell {
 	 * @param id
 	 * @return
 	 */
-	public static Spell fromNBT(NBTTagCompound nbt, int id) {
+	public static Spell fromNBT(CompoundNBT nbt, int id) {
 		if (nbt == null)
 			return null;
 		
 		String name = nbt.getString(NBT_SPELL_NAME); 
-		int index = nbt.getInteger(NBT_ICON_INDEX);
+		int index = nbt.getInt(NBT_ICON_INDEX);
 		Spell spell = new Spell();
 		spell.name = name;
 		spell.registryID = id;
 		spell.iconIndex = index;
 		
-		NBTTagList list = nbt.getTagList(NBT_LIST, NBT.TAG_COMPOUND);
-		NBTTagCompound tag;
+		ListNBT list = nbt.getList(NBT_LIST, NBT.TAG_COMPOUND);
+		CompoundNBT tag;
 		String key;
 		EMagicElement element;
 		EAlteration alteration;
 		int count;
 		SpellPartParam param;
 		
-		for (int i = 0; i < list.tagCount(); i++) {
+		for (int i = 0; i < list.size(); i++) {
 			tag = list.getCompoundTagAt(i);
 			key = tag.getString(NBT_KEY);
 			if (key == null || key.isEmpty())
@@ -904,13 +904,13 @@ public class Spell {
 					tag.getBoolean(NBT_PARAM_FLIP)
 					);
 			
-			if (tag.hasKey(NBT_ELEMENT, NBT.TAG_STRING)) {
+			if (tag.contains(NBT_ELEMENT, NBT.TAG_STRING)) {
 				SpellShape shape = SpellShape.get(key);
 				
 				if (shape == null)
 					continue;
 				
-				count = tag.getInteger(NBT_COUNT);
+				count = tag.getInt(NBT_COUNT);
 				try {
 					element = EMagicElement.valueOf(tag.getString(NBT_ELEMENT));
 				} catch (Exception e) {
@@ -919,7 +919,7 @@ public class Spell {
 				}
 				
 				alteration = null;
-				if (tag.hasKey(NBT_ALTERATION, NBT.TAG_STRING))
+				if (tag.contains(NBT_ALTERATION, NBT.TAG_STRING))
 				try {
 					alteration = EAlteration.valueOf(tag.getString(NBT_ALTERATION));
 				} catch (Exception e) {
@@ -1064,7 +1064,7 @@ public class Spell {
 	
 	public static interface ICastListener {
 		
-		public void onCast(EntityLivingBase entity, Spell spell);
+		public void onCast(LivingEntity entity, Spell spell);
 	}
 	
 	private static List<ICastListener> castListeners = new LinkedList<>();
@@ -1072,7 +1072,7 @@ public class Spell {
 		castListeners.add(listener);
 	}
 	
-	private static void onCast(EntityLivingBase entity, Spell spell) {
+	private static void onCast(LivingEntity entity, Spell spell) {
 		if (castListeners.isEmpty())
 			return;
 		

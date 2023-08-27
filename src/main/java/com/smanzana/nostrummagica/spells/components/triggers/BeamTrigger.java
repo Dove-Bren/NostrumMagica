@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
@@ -50,11 +50,11 @@ public class BeamTrigger extends InstantTrigger {
 				Vec3d pos, float pitch, float yaw) {
 		
 		// Cast from eyes
-		pos = pos.addVector(0, state.getCaster().getEyeHeight(), 0);
+		pos = pos.add(0, state.getCaster().getEyeHeight(), 0);
 		
 		Collection<RayTraceResult> traces = RayTrace.allInPath(world, pos, pitch, yaw, BEAM_RANGE, new RayTrace.OtherLiving(state.getCaster()));
-		List<EntityLivingBase> others = null;
-		List<EntityLivingBase> targs = null;
+		List<LivingEntity> others = null;
+		List<LivingEntity> targs = null;
 		List<BlockPos> blocks = null;
 		
 		Vec3d end = null;

@@ -4,7 +4,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -21,7 +21,7 @@ public class PetCommandSettingsSyncMessage implements IMessage {
 
 		@Override
 		public IMessage onMessage(PetCommandSettingsSyncMessage message, MessageContext ctx) {
-			Minecraft.getMinecraft().addScheduledTask(() -> {
+			Minecraft.getInstance().runAsync(() -> {
 				NostrumMagica.getPetCommandManager().overrideClientSettings(message.tag);
 			});
 			
@@ -30,13 +30,13 @@ public class PetCommandSettingsSyncMessage implements IMessage {
 		
 	}
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public PetCommandSettingsSyncMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
-	public PetCommandSettingsSyncMessage(NBTTagCompound nbt) {
+	public PetCommandSettingsSyncMessage(CompoundNBT nbt) {
 		tag = nbt;
 	}
 

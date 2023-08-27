@@ -11,7 +11,7 @@ import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.potion.Potion;
 import net.minecraft.world.World;
@@ -45,17 +45,17 @@ public class EntityGolemPhysical extends EntityGolem {
 	}
 
 	@Override
-	public void doMeleeTask(EntityLivingBase target) {
+	public void doMeleeTask(LivingEntity target) {
 		this.attackEntityAsMob(target);
 	}
 
 	@Override
-	public void doRangeTask(EntityLivingBase target) {
+	public void doRangeTask(LivingEntity target) {
 		EntityGolemPhysical.init();
 		
 		// Either do debuff or damage
 		if (target.getActivePotionEffect(Potion.getPotionFromResourceLocation("weakness")) == null) {
-			EntityLivingBase targ = this.getAttackTarget();
+			LivingEntity targ = this.getAttackTarget();
 			if (targ != target)
 				this.setAttackTarget(target);
 			spellDebuff.cast(this, 1.0f);
@@ -67,12 +67,12 @@ public class EntityGolemPhysical extends EntityGolem {
 	}
 
 	@Override
-	public void doBuffTask(EntityLivingBase target) {
+	public void doBuffTask(LivingEntity target) {
 		; // shouldn't happen
 	}
 
 	@Override
-	public boolean shouldDoBuff(EntityLivingBase target) {
+	public boolean shouldDoBuff(LivingEntity target) {
 		return true;
 	}
 

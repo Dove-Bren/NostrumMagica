@@ -7,8 +7,8 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -37,17 +37,17 @@ public class ManaMessage implements IMessage {
 				return null; // Just drop it
 			}
 			
-			int mana = message.tag.getInteger(NBT_MANA);
+			int mana = message.tag.getInt(NBT_MANA);
 			
-			EntityPlayer player = NostrumMagica.proxy.getPlayer();
+			PlayerEntity player = NostrumMagica.proxy.getPlayer();
 			
 			if (player == null) {
 				// Haven't finished loading. Just drop it
 				return null;
 			}
 			
-			Minecraft.getMinecraft().addScheduledTask(() -> {
-				EntityPlayer realPlayer = player.world.getPlayerEntityByUUID(id);
+			Minecraft.getInstance().runAsync(() -> {
+				PlayerEntity realPlayer = player.world.getPlayerEntityByUUID(id);
 			
 				if (realPlayer == null) {
 					// Not in this world. Who cares
@@ -75,17 +75,17 @@ public class ManaMessage implements IMessage {
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public ManaMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
-	public ManaMessage(EntityPlayer player, int mana) {
-		tag = new NBTTagCompound();
+	public ManaMessage(PlayerEntity player, int mana) {
+		tag = new CompoundNBT();
 		
-		tag.setInteger(NBT_MANA, mana);
-		tag.setString(NBT_UUID, player.getPersistentID().toString());
+		tag.putInt(NBT_MANA, mana);
+		tag.putString(NBT_UUID, player.getPersistentID().toString());
 	}
 
 	@Override

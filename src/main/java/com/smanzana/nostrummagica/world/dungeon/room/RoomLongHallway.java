@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.block.BlockTorch;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 public class RoomLongHallway extends StaticRoom {
@@ -128,8 +128,8 @@ public class RoomLongHallway extends StaticRoom {
 				"XXXXX",
 				"XXXXX",
 				'X', DungeonBlock.instance(),
-				'W', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.WEST)),
-				'E', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.EAST)),
+				'W', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.WEST)),
+				'E', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.EAST)),
 				'C', new BlockState(Blocks.CARPET, 14),
 				' ', null);
 	}
@@ -145,7 +145,7 @@ public class RoomLongHallway extends StaticRoom {
 		
 		BlockPos exit = new BlockPos(0, 0, 20);
 		
-		list.add(NostrumDungeon.asRotated(start, exit, EnumFacing.NORTH));
+		list.add(NostrumDungeon.asRotated(start, exit, Direction.NORTH));
 		
 		return list;
 	}

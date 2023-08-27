@@ -10,8 +10,8 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class EssenceItem extends Item implements ILoreTagged {
 
@@ -47,7 +47,7 @@ public class EssenceItem extends Item implements ILoreTagged {
 	/**
      * returns a list of items with the same ID, but different meta (eg: dye returns 16 items)
      */
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
     	if (this.isInCreativeTab(tab)) {

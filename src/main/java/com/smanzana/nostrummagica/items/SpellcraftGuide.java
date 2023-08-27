@@ -14,7 +14,7 @@ import com.smanzana.nostrummagica.client.gui.book.ImagePage;
 import com.smanzana.nostrummagica.client.gui.book.TitlePage;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
@@ -22,8 +22,8 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * Guide book
@@ -52,7 +52,7 @@ public class SpellcraftGuide extends Item implements GuiBook {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
 		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		if (worldIn.isRemote) {
 			NostrumMagica.proxy.openBook(playerIn, this, itemStackIn);
@@ -61,13 +61,13 @@ public class SpellcraftGuide extends Item implements GuiBook {
 		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
     }
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public String T(String key) {
 		return I18n.format("spellcraft." + key, new Object[0]);
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public BookScreen getScreen(Object userdata) {
 		
 		List<IBookPage> pages = new LinkedList<>();

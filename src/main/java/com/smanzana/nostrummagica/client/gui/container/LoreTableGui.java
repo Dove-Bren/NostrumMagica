@@ -8,16 +8,16 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.EntityPlayer;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class LoreTableGui {
 	
@@ -41,14 +41,14 @@ public class LoreTableGui {
 		
 		// Kept just to report to server which TE is doing crafting
 		protected BlockPos pos;
-		protected EntityPlayer player;
+		protected PlayerEntity player;
 		
 		// Actual container variables as well as a couple for keeping track
 		// of crafting state
 		protected LoreTableEntity table;
 		protected Slot inputSlot;
 		
-		public LoreTableContainer(EntityPlayer player, IInventory playerInv, LoreTableEntity table, BlockPos pos) {
+		public LoreTableContainer(PlayerEntity player, IInventory playerInv, LoreTableEntity table, BlockPos pos) {
 			this.player = player;
 			this.pos = pos;
 			this.table = table;
@@ -102,7 +102,7 @@ public class LoreTableGui {
 					return false;
 				}
 				
-				public ItemStack onTake(EntityPlayer playerIn, ItemStack stack) {
+				public ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
 					table.onTakeItem(playerIn);
 					return super.onTake(playerIn, stack);
 				}
@@ -125,7 +125,7 @@ public class LoreTableGui {
 		}
 		
 		@Override
-		public ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
+		public ItemStack transferStackInSlot(PlayerEntity playerIn, int fromSlot) {
 			@Nonnull ItemStack prev = ItemStack.EMPTY;	
 			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
 			
@@ -163,7 +163,7 @@ public class LoreTableGui {
 		}
 		
 		@Override
-		public boolean canInteractWith(EntityPlayer playerIn) {
+		public boolean canInteractWith(PlayerEntity playerIn) {
 			return true;
 		}
 		
@@ -173,7 +173,7 @@ public class LoreTableGui {
 
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public static class LoreTableGuiContainer extends AutoGuiContainer {
 
 		private LoreTableContainer container;
@@ -187,8 +187,8 @@ public class LoreTableGui {
 		}
 		
 		@Override
-		public void initGui() {
-			super.initGui();
+		public void init() {
+			super.init();
 		}
 		
 		@Override
@@ -196,15 +196,15 @@ public class LoreTableGui {
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			
-			GlStateManager.color(1.0F,  1.0F, 1.0F, 1.0F);
+			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 			mc.getTextureManager().bindTexture(TEXT);
 			
-			Gui.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
+			RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			
 			float progress = container.table.getProgress();
 			if (progress > 0f) {
 				int y = (int) ((1f - progress) * PROGRESS_HEIGHT);
-				Gui.drawModalRectWithCustomSizedTexture(
+				RenderFuncs.drawModalRectWithCustomSizedTexture(
 						horizontalMargin + PROGRESS_GUI_HOFFSET,
 						verticalMargin + PROGRESS_GUI_VOFFSET + y,
 						0, GUI_HEIGHT + y, PROGRESS_WIDTH, PROGRESS_HEIGHT - y, 256, 256);
@@ -219,21 +219,21 @@ public class LoreTableGui {
 				int u, v;
 				v = GUI_HEIGHT;
 				u = PROGRESS_WIDTH;
-				long time = Minecraft.getSystemTime();
+				long time = System.currentTimeMillis();
 				u += ((time % 3000) / 1000) * SHINE_LENGTH;
 				float alpha = 1f - .5f * ((float) (time % 1000) / 1000f);
 				
 				mc.getTextureManager().bindTexture(TEXT);
 				
-				GlStateManager.color(0, 1, 1, alpha);
+				GlStateManager.color4f(0, 1, 1, alpha);
 				GlStateManager.enableBlend();
-				Gui.drawModalRectWithCustomSizedTexture(
+				RenderFuncs.drawModalRectWithCustomSizedTexture(
 						SLOT_INPUT_HOFFSET,
 						SLOT_INPUT_VOFFSET - 20,
 						u, v,
 						SHINE_LENGTH, SHINE_LENGTH, 256, 256);
 				
-				GlStateManager.color(1f, 1f, 1f, 1f);
+				GlStateManager.color4f(1f, 1f, 1f, 1f);
 			}
 			
 		}

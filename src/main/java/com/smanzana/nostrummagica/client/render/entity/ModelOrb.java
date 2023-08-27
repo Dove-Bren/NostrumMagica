@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.client.render.entity;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
@@ -33,8 +33,8 @@ public class ModelOrb extends ModelOBJ {
 	@Override
 	protected boolean preRender(Entity entity, int model, BufferBuilder buffer, double x, double y, double z,
 			float entityYaw, float partialTicks) {
-		GlStateManager.scale(scale, scale, scale);
-		GlStateManager.rotate(-90f, 1f, 0f, 0f);
+		GlStateManager.scalef(scale, scale, scale);
+		GlStateManager.rotatef(-90f, 1f, 0f, 0f);
 		return true;
 	}
 	

@@ -24,7 +24,7 @@ import com.smanzana.nostrummagica.rituals.requirements.IRitualRequirement;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.NonNullList;
@@ -301,7 +301,7 @@ public class RitualRecipe implements InfoScreenIndexed {
 		}
 	}
 	
-	public RitualMatchInfo matches(EntityPlayer player, World world, BlockPos center, EMagicElement element) {
+	public RitualMatchInfo matches(PlayerEntity player, World world, BlockPos center, EMagicElement element) {
 		if (element == null) {
 			element = EMagicElement.PHYSICAL;
 		}
@@ -433,7 +433,7 @@ public class RitualRecipe implements InfoScreenIndexed {
 	 * @param center
 	 * @return
 	 */
-	public boolean perform(World world, EntityPlayer player, BlockPos center) {
+	public boolean perform(World world, PlayerEntity player, BlockPos center) {
 		
 		if (world.isRemote)
 			return true;

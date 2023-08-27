@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.potion.PotionEffect;
@@ -27,7 +27,7 @@ public class ArcaneWolfAIHellTask extends EntityAIBase {
 	protected final int manaCost;
 	
 	protected int activeTicks;
-	protected @Nullable EntityLivingBase activeTarget;
+	protected @Nullable LivingEntity activeTarget;
 	
 	public ArcaneWolfAIHellTask(EntityArcaneWolf wolf, int manaCost) {
 		this.wolf = wolf;
@@ -69,11 +69,11 @@ public class ArcaneWolfAIHellTask extends EntityAIBase {
 		activeTarget = null;
 	}
 	
-	protected void poisonEntity(EntityArcaneWolf wolf, EntityLivingBase target) {
+	protected void poisonEntity(EntityArcaneWolf wolf, LivingEntity target) {
 		// Capture velocity before attack
-		double velX = target.motionX;
-		double velY = target.motionY;
-		double velZ = target.motionZ;
+		double velX = target.getMotion().x;
+		double velY = target.getMotion().y;
+		double velZ = target.getMotion().z;
 		
 		wolf.setLastAttackedEntity(target);
 		target.setRevengeTarget(wolf);
@@ -81,17 +81,17 @@ public class ArcaneWolfAIHellTask extends EntityAIBase {
 		target.attackEntityFrom(DamageSource.causeMobDamage(wolf), .5f);
 		
 		// Reset motion; we don't want knockback!
-		target.motionX = velX;
-		target.motionY = velY;
-		target.motionZ = velZ;
+		target.getMotion().x = velX;
+		target.getMotion().y = velY;
+		target.getMotion().z = velZ;
 		target.velocityChanged = true;
 	}
 	
-	protected void burnEntity(EntityArcaneWolf wolf, EntityLivingBase target) {
+	protected void burnEntity(EntityArcaneWolf wolf, LivingEntity target) {
 		// Capture velocity before attack
-		double velX = target.motionX;
-		double velY = target.motionY;
-		double velZ = target.motionZ;
+		double velX = target.getMotion().x;
+		double velY = target.getMotion().y;
+		double velZ = target.getMotion().z;
 		
 		wolf.setLastAttackedEntity(target);
 		target.setRevengeTarget(wolf);
@@ -100,13 +100,13 @@ public class ArcaneWolfAIHellTask extends EntityAIBase {
 		NostrumMagicaSounds.DAMAGE_FIRE.play(target);
 		
 		// Reset motion; we don't want knockback!
-		target.motionX = velX;
-		target.motionY = velY;
-		target.motionZ = velZ;
+		target.getMotion().x = velX;
+		target.getMotion().y = velY;
+		target.getMotion().z = velZ;
 		target.velocityChanged = true;
 	}
 	
-	protected void startBurnEffect(EntityArcaneWolf wolf, EntityLivingBase target, int duration) {
+	protected void startBurnEffect(EntityArcaneWolf wolf, LivingEntity target, int duration) {
 		NetworkHandler.getSyncChannel().sendToAllTracking(
 				new SpawnPredefinedEffectMessage(PredefinedEffect.HELL_BURN, duration, target.dimension, target.getEntityId()),
 				target);

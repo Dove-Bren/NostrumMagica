@@ -14,15 +14,15 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class MageStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 
@@ -98,7 +98,7 @@ public class MageStaff extends ItemSword implements ILoreTagged, ISpellArmor {
     }
 
 	@Override
-	public void apply(EntityLivingBase caster, SpellCastSummary summary, ItemStack stack) {
+	public void apply(LivingEntity caster, SpellCastSummary summary, ItemStack stack) {
 		// We provide -10% reagent cost, +20% potency
 		summary.addReagentCost(-.1f);
 		//summary.addEfficiency(.2f);
@@ -106,7 +106,7 @@ public class MageStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		super.addInformation(stack, worldIn, tooltip, flagIn);
 		//tooltip.add("Magic Potency Bonus: 20%");

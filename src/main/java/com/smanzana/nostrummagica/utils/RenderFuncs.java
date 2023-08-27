@@ -6,69 +6,80 @@ import java.nio.IntBuffer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
 
-import org.lwjgl.util.vector.Matrix4f;
-import org.lwjgl.util.vector.Vector3f;
-import org.lwjgl.util.vector.Vector4f;
+import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.EntityRenderer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.model.BakedQuad;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.crash.CrashReport;
+import net.minecraft.crash.ReportedException;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ReportedException;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biome.RainType;
+import net.minecraft.world.gen.Heightmap;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.pipeline.LightUtil;
 import net.minecraftforge.client.model.pipeline.VertexBufferConsumer;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-@SideOnly(Side.CLIENT)
+@SuppressWarnings("deprecation")
+@OnlyIn(Dist.CLIENT)
 public final class RenderFuncs {
 	
 	private static final MutableBlockPos cursor = new MutableBlockPos(); // If there are ever threads at play, this will not work
 	
-	public static final void RenderBlockOutline(EntityPlayer player, World world, Vec3d pos, IBlockState blockState, float partialTicks) {
+	public static final void RenderBlockOutline(PlayerEntity player, World world, Vec3d pos, BlockState blockState, float partialTicks) {
 		GlStateManager.enableBlend();
-		GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-		GlStateManager.glLineWidth(2.0F);
-		GlStateManager.disableTexture2D();
+		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+		GlStateManager.lineWidth(2.0F);
+		GlStateManager.disableTexture();
 		GlStateManager.depthMask(false);
 
 		if (blockState.getMaterial() != Material.AIR) {
 			double d0 = player.lastTickPosX + (player.posX - player.lastTickPosX) * (double)partialTicks;
 			double d1 = player.lastTickPosY + (player.posY - player.lastTickPosY) * (double)partialTicks;
 			double d2 = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * (double)partialTicks;
-			RenderGlobal.drawSelectionBoundingBox(blockState.getSelectedBoundingBox(world, new BlockPos(pos)).grow(0.0020000000949949026D).offset(-d0, -d1, -d2), 0.0F, 0.0F, 0.0F, 0.4F);
+			
+			WorldRenderer.drawVoxelShapeParts(blockState.getShape(world, new BlockPos(pos), ISelectionContext.forEntity(player)), -d0, -d1, -d2, 0.0F, 0.0F, 0.0F, 0.4F);
+			
 		}
 
 		GlStateManager.depthMask(true);
-		GlStateManager.enableTexture2D();
+		GlStateManager.enableTexture();
 		GlStateManager.disableBlend();
 	}
 	
-	public static final void RenderBlockOutline(EntityPlayer player, World world, BlockPos pos, IBlockState blockState, float partialTicks) {
+	public static final void RenderBlockOutline(PlayerEntity player, World world, BlockPos pos, BlockState blockState, float partialTicks) {
 		RenderBlockOutline(player, world, new Vec3d(pos), blockState, partialTicks);
 	}
 	
@@ -96,15 +107,15 @@ public final class RenderFuncs {
 	public static void RenderModelWithColor(IBakedModel model, int color, BufferBuilder buffer, Vector3f offset, Matrix4f transform) {
 		GlStateManager.pushMatrix();
 
-		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+		Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 
 		// TODO provide blockstate?
-		for (EnumFacing enumfacing : EnumFacing.values()) {
-			renderQuads(model.getQuads((IBlockState) null, enumfacing, 0L), offset, new VertexBufferConsumer(buffer), buffer,
+		for (Direction enumfacing : Direction.values()) {
+			renderQuads(model.getQuads((BlockState) null, enumfacing, NostrumMagica.rand, EmptyModelData.INSTANCE), offset, new VertexBufferConsumer(buffer), buffer,
 					transform, 1f, color);
 		}
 		
-		renderQuads(model.getQuads((IBlockState) null, null, 0L), offset, new VertexBufferConsumer(buffer), buffer,
+		renderQuads(model.getQuads((BlockState) null, null, NostrumMagica.rand, EmptyModelData.INSTANCE), offset, new VertexBufferConsumer(buffer), buffer,
 				transform, 1f, color);
 
 		GlStateManager.popMatrix();
@@ -170,7 +181,8 @@ public final class RenderFuncs {
 				Vector4f vert = new Vector4f(vertX, vertY, vertZ, 1);
 
 				// Transforming it by the model matrix.
-				vert = Matrix4f.transform(transform, vert, new Vector4f());
+				Vector4f copy = new Vector4f(vert);
+				transform.transform(copy, vert);
 
 				// Uploading the difference back to the buffer. Have to use the helper function since the provided putX methods upload the data for a quad, not a vertex and this data is vertex-dependent.
 				putPositionForVertex(buffer, intBuf, vertexIndex, new Vector3f(vert.x - vertX, vert.y - vertY, vert.z - vertZ));
@@ -283,7 +295,7 @@ public final class RenderFuncs {
 	
 	public static void renderWeather(BlockPos at, float partialTicks, boolean snow) {
 		//throw new RuntimeException("Not finished implementing");
-		final Minecraft mc = Minecraft.getMinecraft();
+		final Minecraft mc = Minecraft.getInstance();
 		//enableLightmap();
 		disableLightmap();
 		Entity entity = mc.getRenderViewEntity();
@@ -294,13 +306,13 @@ public final class RenderFuncs {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder vertexbuffer = tessellator.getBuffer();
 		GlStateManager.disableCull();
-		GlStateManager.glNormal3f(0.0F, 1.0F, 0.0F);
+		GlStateManager.normal3f(0.0F, 1.0F, 0.0F);
 		GlStateManager.enableBlend();
-		GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 		GlStateManager.alphaFunc(516, 0.1F);
-		GlStateManager.color(1f, 1f, 1f, 1f);
-		GlStateManager.disableTexture2D();
-		GlStateManager.enableTexture2D();
+		GlStateManager.color4f(1f, 1f, 1f, 1f);
+		GlStateManager.disableTexture();
+		GlStateManager.enableTexture();
 		double entPosDX = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * (double)partialTicks;
 		double entPosDY = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * (double)partialTicks;
 		double entPosDZ = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * (double)partialTicks;
@@ -314,13 +326,13 @@ public final class RenderFuncs {
 
 		float f1 = (float)getRendererUpdateCount() + partialTicks;
 		vertexbuffer.setTranslation(-entPosDX, -entPosDY, -entPosDZ);
-		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
 		Biome biome = world.getBiome(at);
 
-		if (biome.canRain() || biome.getEnableSnow())
+		if (biome.getPrecipitation() != RainType.NONE)
 		{
-			int percipWorldY = world.getPrecipitationHeight(at).getY();
+			int percipWorldY = world.getHeight(Heightmap.Type.MOTION_BLOCKING, at).getY();
 			int percipMinY = entPosY - radius;
 			int percipMaxY = entPosY + radius;
 
@@ -394,60 +406,65 @@ public final class RenderFuncs {
 	}
 	
 	public static void disableLightmap() {
-		GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
-		GlStateManager.disableTexture2D();
-		GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
+		Minecraft mc = Minecraft.getInstance();
+		mc.gameRenderer.disableLightmap();
+//		GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
+//		GlStateManager.disableTexture();
+//		GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
 	}
 
 	public static void enableLightmap() {
-		GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
-		GlStateManager.matrixMode(5890);
-		GlStateManager.loadIdentity();
-		GlStateManager.scale(0.00390625F, 0.00390625F, 0.00390625F);
-		GlStateManager.translate(8.0F, 8.0F, 8.0F);
-		GlStateManager.matrixMode(5888);
-		Minecraft.getMinecraft().getTextureManager().bindTexture(getLocationLightMap());
-		GlStateManager.glTexParameteri(3553, 10241, 9729);
-		GlStateManager.glTexParameteri(3553, 10240, 9729);
-		GlStateManager.glTexParameteri(3553, 10242, 10496);
-		GlStateManager.glTexParameteri(3553, 10243, 10496);
-		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-		GlStateManager.enableTexture2D();
-		GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
+		Minecraft mc = Minecraft.getInstance();
+		mc.gameRenderer.enableLightmap();
+//		GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
+//		GlStateManager.matrixMode(5890);
+//		GlStateManager.loadIdentity();
+//		GlStateManager.scalef(0.00390625F, 0.00390625F, 0.00390625F);
+//		GlStateManager.translatef(8.0F, 8.0F, 8.0F);
+//		GlStateManager.matrixMode(5888);
+//		Minecraft.getInstance().getTextureManager().bindTexture(getLocationLightMap());
+//		GlStateManager.glTexParameteri(3553, 10241, 9729);
+//		GlStateManager.glTexParameteri(3553, 10240, 9729);
+//		GlStateManager.glTexParameteri(3553, 10242, 10496);
+//		GlStateManager.glTexParameteri(3553, 10243, 10496);
+//		GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+//		GlStateManager.enableTexture();
+//		GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
     }
 	
-	private static @Nullable EntityRenderer cachedRenderer; // Renderer pulled and modified to expose internal maps and resources
-	private static @Nullable Field cachedLightMapField; // Pulled from renderer above
+	private static @Nullable GameRenderer cachedRenderer; // Renderer pulled and modified to expose internal maps and resources
+//	private static @Nullable Field cachedLightMapField; // Pulled from renderer above
 	private static @Nullable Field cachedRendererUpdateCountField; // Pulled from renderer above
 	private static final ResourceLocation RAIN_TEXTURES = new ResourceLocation("textures/environment/rain.png");
 	private static final ResourceLocation SNOW_TEXTURES = new ResourceLocation("textures/environment/snow.png");
 	
-	private static final EntityRenderer getCachedRenderer() {
-		final EntityRenderer cur = Minecraft.getMinecraft().entityRenderer;
+	private static final GameRenderer getCachedRenderer() {
+		Minecraft mc = Minecraft.getInstance();
+		final GameRenderer cur = mc.gameRenderer;
 		if (cur != cachedRenderer) {
 			// Refresh cache
 			NostrumMagica.logger.info("Refreshing entity renderer cache");
 			cachedRenderer = cur;
-			cachedLightMapField = ObfuscationReflectionHelper.findField(EntityRenderer.class, "field_110922_T"); //"locationLightMap");
-			cachedRendererUpdateCountField = ObfuscationReflectionHelper.findField(EntityRenderer.class, "field_78529_t"); //"rendererUpdateCount");
+			//cachedLightMapField = ObfuscationReflectionHelper.findField(EntityRenderer.class, "field_110922_T"); //"locationLightMap");
+			cachedRendererUpdateCountField = ObfuscationReflectionHelper.findField(GameRenderer.class, "field_78529_t"); //"rendererUpdateCount");
 			//cachedLightMapField.setAccessible(true); // done for us in reflection helper
 		}
 		
 		return cachedRenderer;
 	}
-	
-	private static final @Nullable ResourceLocation getLocationLightMap() {
-		final EntityRenderer renderer = getCachedRenderer(); // Also sets up field
-		try {
-			return (ResourceLocation) cachedLightMapField.get(renderer);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+//	
+//	private static final @Nullable ResourceLocation getLocationLightMap() {
+//		final EntityRenderer renderer = getCachedRenderer(); // Also sets up field
+//		try {
+//			return (ResourceLocation) cachedLightMapField.get(renderer);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		return null;
+//	}
 	
 	private static final int getRendererUpdateCount() {
-		final EntityRenderer renderer = getCachedRenderer(); // Also sets up field
+		final GameRenderer renderer = getCachedRenderer(); // Also sets up field
 		try {
 			return (int) cachedRendererUpdateCountField.get(renderer);
 		} catch (Exception e) {
@@ -473,7 +490,7 @@ public final class RenderFuncs {
 //				cachedRenderGlobal_outlineShader = null;
 //			}
 //		}
-//		cachedRenderGlobal = Minecraft.getMinecraft().renderGlobal;
+//		cachedRenderGlobal = Minecraft.getInstance().renderGlobal;
 //			
 //		return cachedRenderGlobal;
 //	}
@@ -492,11 +509,11 @@ public final class RenderFuncs {
 //			return; // Best we can do?
 //		}
 		
-//		final Minecraft mc = Minecraft.getMinecraft();
+//		final Minecraft mc = Minecraft.getInstance();
 //		
 //		GlStateManager.depthFunc(519);
 //		GlStateManager.disableFog();
-//		GlStateManager.color(1f, 1f, 0f, 1f);
+//		GlStateManager.color4f(1f, 1f, 0f, 1f);
 //		
 //		try {
 //			final RenderManager renderManager = ObfuscationReflectionHelper.getPrivateValue(RenderGlobal.class, global, "field_175010_j"); // "renderManager"
@@ -530,12 +547,57 @@ public final class RenderFuncs {
 //		GlStateManager.enableColorMaterial();
 //		GlStateManager.depthFunc(515);
 //		GlStateManager.enableDepth();
-//		GlStateManager.enableAlpha();
+//		GlStateManager.enableAlphaTest();
 //
 //		mc.getFramebuffer().bindFramebuffer(false);
 //		global.renderEntityOutlineFramebuffer();
 //		mc.getFramebuffer().bindFramebuffer(false);
 //		GlStateManager.enableBlend();
-//		GlStateManager.tryBlendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+//		GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+	}
+	
+	/**
+	 * Renders an item. Basically a wrapper for rendering classes.
+	 * Making now because transform type is deprecated but required :P and I'd rather have one warning than a bunch.
+	 * @param world
+	 * @param stack
+	 */
+	public static void ItemRenderer(ItemStack stack) {
+		Minecraft.getInstance().getItemRenderer()
+			.renderItem(stack, TransformType.GROUND);
+	}
+	
+	/**
+	 * Render an item with default blending and lighting.
+	 * @param world
+	 * @param stack
+	 */
+	public static void renderItemStandard(ItemStack stack) {
+		GlStateManager.enableBlend();
+		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GlStateManager.disableLighting();
+		GlStateManager.enableAlphaTest();
+		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+		RenderHelper.enableStandardItemLighting();
+		
+		ItemRenderer(stack);
+	}
+	
+	public static void drawModalRectWithCustomSizedTexture(int x, int y, float u, float v, int width, int height, float textureWidth, float textureHeight) {
+		float f = 1.0F / textureWidth;
+		float f1 = 1.0F / textureHeight;
+		Tessellator tessellator = Tessellator.getInstance();
+		BufferBuilder bufferbuilder = tessellator.getBuffer();
+		bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
+		bufferbuilder.pos((double)x, (double)(y + height), 0.0D).tex((double)(u * f), (double)((v + (float)height) * f1)).endVertex();
+		bufferbuilder.pos((double)(x + width), (double)(y + height), 0.0D).tex((double)((u + (float)width) * f), (double)((v + (float)height) * f1)).endVertex();
+		bufferbuilder.pos((double)(x + width), (double)y, 0.0D).tex((double)((u + (float)width) * f), (double)(v * f1)).endVertex();
+		bufferbuilder.pos((double)x, (double)y, 0.0D).tex((double)(u * f), (double)(v * f1)).endVertex();
+		tessellator.draw();
+	}
+	
+	public static void drawRect(int minX, int minY, int maxX, int maxY, int colorRGBA) {
+		AbstractGui.fill(minX, minY, maxX, maxY, colorRGBA);
 	}
 }

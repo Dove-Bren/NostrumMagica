@@ -55,12 +55,12 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntitySpider;
 import net.minecraft.entity.passive.EntityWolf;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.entity.projectile.EntityThrowable;
@@ -93,7 +93,7 @@ import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import net.minecraftforge.event.world.GetCollisionBoxesEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
@@ -129,7 +129,7 @@ public class PlayerListener {
 		 * set this to the entity that did the damaging.
 		 * @return true to remove this listener so it doesn't receive anymore updates
 		 */
-		public boolean onEvent(Event type, EntityLivingBase entity, T data);
+		public boolean onEvent(Event type, LivingEntity entity, T data);
 	}
 	
 	/**
@@ -141,20 +141,20 @@ public class PlayerListener {
 		/**
 		 * Entity being affected
 		 */
-		public EntityLivingBase entity;
+		public LivingEntity entity;
 		
 		/**
 		 * Entity that cast the spell. Can be empty.
 		 */
 		@Nullable
-		public EntityLivingBase caster;
+		public LivingEntity caster;
 		
 		/**
 		 * Information about the spell being applied
 		 */
 		public SpellActionSummary summary;
 		
-		public SpellActionListenerData(EntityLivingBase entity, @Nullable EntityLivingBase caster, SpellActionSummary summary) {
+		public SpellActionListenerData(LivingEntity entity, @Nullable LivingEntity caster, SpellActionSummary summary) {
 			this.entity = entity;
 			this.caster = caster;
 			this.summary = summary;
@@ -205,18 +205,18 @@ public class PlayerListener {
 	}
 	
 	private class DamagedInfo {
-		public EntityLivingBase entity;
+		public LivingEntity entity;
 		
-		public DamagedInfo(EntityLivingBase entity) {
+		public DamagedInfo(LivingEntity entity) {
 			this.entity = entity;
 		}
 	}
 	
 	private class HealthInfo {
-		public EntityLivingBase entity;
+		public LivingEntity entity;
 		public float threshold; // percentage out of 1
 		public boolean higher;
-		public HealthInfo(EntityLivingBase entity, float threshold, boolean higher) {
+		public HealthInfo(LivingEntity entity, float threshold, boolean higher) {
 			this.entity = entity;
 			this.threshold = threshold;
 			this.higher = higher;
@@ -224,10 +224,10 @@ public class PlayerListener {
 	}
 	
 	private class FoodInfo {
-		public EntityLivingBase entity;
+		public LivingEntity entity;
 		public int threshold;
 		public boolean higher;
-		public FoodInfo(EntityLivingBase entity, int threshold, boolean higher) {
+		public FoodInfo(LivingEntity entity, int threshold, boolean higher) {
 			this.entity = entity;
 			this.threshold = threshold;
 			this.higher = higher;
@@ -235,10 +235,10 @@ public class PlayerListener {
 	}
 	
 	private class ManaInfo {
-		public EntityLivingBase entity;
+		public LivingEntity entity;
 		public float threshold;
 		public boolean higher;
-		public ManaInfo(EntityLivingBase entity, float threshold, boolean higher) {
+		public ManaInfo(LivingEntity entity, float threshold, boolean higher) {
 			this.entity = entity;
 			this.threshold = threshold;
 			this.higher = higher;
@@ -246,8 +246,8 @@ public class PlayerListener {
 	}
 	
 	private class MagicEffectInfo {
-		public EntityLivingBase entity;
-		public MagicEffectInfo(@Nullable EntityLivingBase entity) {
+		public LivingEntity entity;
+		public MagicEffectInfo(@Nullable LivingEntity entity) {
 			this.entity = entity;
 		}
 	}
@@ -337,7 +337,7 @@ public class PlayerListener {
 	 * @param entity
 	 */
 	public void registerHit(IGenericListener listener,
-			EntityLivingBase entity) {
+			LivingEntity entity) {
 		damagedInfos.put(listener,
 				new DamagedInfo(entity));
 	}
@@ -350,7 +350,7 @@ public class PlayerListener {
 	 * @param higher if true, triggers when health is >=. Otherwise, triggers when health <=
 	 */
 	public void registerHealth(IGenericListener listener,
-			EntityLivingBase entity, float level, boolean higher) {
+			LivingEntity entity, float level, boolean higher) {
 		healthInfos.put(listener,
 				new HealthInfo(entity, level, higher));
 	}
@@ -363,7 +363,7 @@ public class PlayerListener {
 	 * @param higher If true, triggers when food is greater than or equal to. Otherwise, LTE
 	 */
 	public void registerFood(IGenericListener listener,
-			EntityPlayer player, int level, boolean higher) {
+			PlayerEntity player, int level, boolean higher) {
 		foodInfos.put(listener,
 				new FoodInfo(player, level, higher));
 	}
@@ -377,7 +377,7 @@ public class PlayerListener {
 	 * @param higher If true, triggers when actual >= level. Otherwise, <=
 	 */
 	public void registerMana(IGenericListener listener,
-			EntityLivingBase entity, float level, boolean higher) {
+			LivingEntity entity, float level, boolean higher) {
 		manaInfos.put(listener,
 				new ManaInfo(entity, level, higher));
 	}
@@ -388,7 +388,7 @@ public class PlayerListener {
 	 * @param entity If provided, the entity to fire when effects are applied to. If left null, fired every time an effect is applied.
 	 */
 	public void registerMagicEffect(ISpellActionListener listener,
-			@Nullable EntityLivingBase entity) {
+			@Nullable LivingEntity entity) {
 		magicEffectInfos.put(listener,
 				new MagicEffectInfo(entity));
 	}
@@ -396,10 +396,10 @@ public class PlayerListener {
 	@SubscribeEvent
 	public void onLivingUpdate(LivingUpdateEvent event) {
 		
-		EntityLivingBase ent = event.getEntityLiving(); // convenience
-		if (Math.abs(ent.motionX) >= 0.01f
-				|| Math.abs(ent.motionY) >= 0.01f
-				|| Math.abs(ent.motionZ) >= 0.01f) {
+		LivingEntity ent = event.getEntityLiving(); // convenience
+		if (Math.abs(ent.getMotion().x) >= 0.01f
+				|| Math.abs(ent.getMotion().y) >= 0.01f
+				|| Math.abs(ent.getMotion().z) >= 0.01f) {
 			// Moved
 			Iterator<Entry<IGenericListener, ProximityInfo>> it = proximityInfos.entrySet().iterator();
 			while (it.hasNext()) {
@@ -440,7 +440,7 @@ public class PlayerListener {
 			}
 		}
 		
-		if (ent instanceof EntityPlayer) {
+		if (ent instanceof PlayerEntity) {
 			Iterator<Entry<IGenericListener, FoodInfo>> it = foodInfos.entrySet().iterator();
 			while (it.hasNext()) {
 				Entry<IGenericListener, FoodInfo> entry = it.next();
@@ -450,7 +450,7 @@ public class PlayerListener {
 				if (entry.getValue().entity.getPersistentID() != ent.getPersistentID())
 					continue;
 				
-				int level = ((EntityPlayer) ent).getFoodStats().getFoodLevel();
+				int level = ((PlayerEntity) ent).getFoodStats().getFoodLevel();
 				int thresh = entry.getValue().threshold;
 				
 				if (entry.getValue().higher) {
@@ -504,7 +504,7 @@ public class PlayerListener {
 		}
 	}
 	
-	private void onHealth(EntityLivingBase ent) {
+	private void onHealth(LivingEntity ent) {
 		Iterator<Entry<IGenericListener, HealthInfo>> it = healthInfos.entrySet().iterator();
 		while (it.hasNext()) {
 			Entry<IGenericListener, HealthInfo> entry = it.next();
@@ -539,7 +539,7 @@ public class PlayerListener {
 		if (event.isCanceled())
 			return;
 		
-		final EntityLivingBase living = event.getEntityLiving();
+		final LivingEntity living = event.getEntityLiving();
 		
 		if (event.getSource().isFireDamage()) {
 			
@@ -556,8 +556,8 @@ public class PlayerListener {
 						event.setCanceled(true);
 						if (isLava && living.ticksExisted % 4 == 0) {
 							attr.addMana(-manaCost);
-							if (living instanceof EntityPlayer) {
-								NostrumMagica.proxy.sendMana((EntityPlayer) living);
+							if (living instanceof PlayerEntity) {
+								NostrumMagica.proxy.sendMana((PlayerEntity) living);
 							}
 						}
 						return;
@@ -590,10 +590,10 @@ public class PlayerListener {
 				source = ((EntityThrowable) source).getThrower();
 			}
 			
-			if (source instanceof EntityLivingBase) {
+			if (source instanceof LivingEntity) {
 
-				EntityLivingBase livingTarget = living;
-				EntityLivingBase livingSource = (EntityLivingBase) source;
+				LivingEntity livingTarget = living;
+				LivingEntity livingSource = (LivingEntity) source;
 				
 				// Defense
 				if (event.getAmount() > 0 && livingTarget != livingSource) {
@@ -608,8 +608,8 @@ public class PlayerListener {
 								action.apply(livingSource, 1.0f);
 						}
 					}
-					if (NostrumMagica.baubles.isEnabled() && livingTarget instanceof EntityPlayer) {
-						IInventory inv = NostrumMagica.baubles.getBaubles((EntityPlayer) livingTarget);
+					if (NostrumMagica.baubles.isEnabled() && livingTarget instanceof PlayerEntity) {
+						IInventory inv = NostrumMagica.baubles.getBaubles((PlayerEntity) livingTarget);
 						if (inv != null) {
 							for (int i = 0; i < inv.getSizeInventory(); i++) {
 								ItemStack stack = inv.getStackInSlot(i);
@@ -639,8 +639,8 @@ public class PlayerListener {
 							action.apply(livingTarget, 1.0f);
 					}
 				}
-				if (NostrumMagica.baubles.isEnabled() && livingSource instanceof EntityPlayer) {
-					IInventory inv = NostrumMagica.baubles.getBaubles((EntityPlayer) livingSource);
+				if (NostrumMagica.baubles.isEnabled() && livingSource instanceof PlayerEntity) {
+					IInventory inv = NostrumMagica.baubles.getBaubles((PlayerEntity) livingSource);
 					if (inv != null) {
 						for (int i = 0; i < inv.getSizeInventory(); i++) {
 							ItemStack stack = inv.getStackInSlot(i);
@@ -664,7 +664,7 @@ public class PlayerListener {
 	public void onDamage(LivingHurtEvent event) {
 		// Make hookshots not damage someone if you reach the wall
 		if (event.getSource() == DamageSource.FLY_INTO_WALL) {
-			EntityLivingBase ent = event.getEntityLiving();
+			LivingEntity ent = event.getEntityLiving();
 			for (@Nonnull ItemStack held : new ItemStack[] {ent.getHeldItemMainhand(), ent.getHeldItemOffhand()}) {
 				if (held.isEmpty()) {
 					continue;
@@ -681,7 +681,7 @@ public class PlayerListener {
 		}
 		
 		if (event.getSource().getTrueSource() != null) {
-			EntityLivingBase source = null;
+			LivingEntity source = null;
 			
 			// Projectiles can be from no entity
 			if (event.getSource().isProjectile()) {
@@ -690,15 +690,15 @@ public class PlayerListener {
 //				Entity shooter;
 //				if (proj instanceof EntityArrow) {
 //					shooter = ((EntityArrow) proj).shootingEntity;
-//					if (shooter != null && shooter instanceof EntityLivingBase)
-//						source = (EntityLivingBase) shooter;
+//					if (shooter != null && shooter instanceof LivingEntity)
+//						source = (LivingEntity) shooter;
 //				} else if (proj instanceof EntityFireball) {
 //					source = ((EntityFireball) proj).shootingEntity;
 //				} else if (proj instanceof EntityThrowable) {
 //					source = ((EntityThrowable) proj).getThrower();
 //				}
-			} else if (event.getSource().getTrueSource() instanceof EntityLivingBase) {
-				source = (EntityLivingBase) event.getSource().getTrueSource();
+			} else if (event.getSource().getTrueSource() instanceof LivingEntity) {
+				source = (LivingEntity) event.getSource().getTrueSource();
 			}
 			
 			if (source != null) {
@@ -778,7 +778,7 @@ public class PlayerListener {
 		if (event.isCanceled())
 			return;
 
-		if (event.getSource() != null && event.getSource().getTrueSource() != null && event.getSource().getTrueSource() instanceof EntityPlayer) {
+		if (event.getSource() != null && event.getSource().getTrueSource() != null && event.getSource().getTrueSource() instanceof PlayerEntity) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(event.getSource().getTrueSource());
 			
 			if (attr != null && attr.isUnlocked()) {
@@ -791,10 +791,10 @@ public class PlayerListener {
 			
 		}
 		
-		if (event.getEntityLiving() instanceof EntityPlayer && !event.getEntityLiving().world.isRemote) {
+		if (event.getEntityLiving() instanceof PlayerEntity && !event.getEntityLiving().world.isRemote) {
 			if (NostrumMagica.baubles.isEnabled() && !event.getEntityLiving().world.getGameRules().getBoolean("keepInventory")) {
 				// Scan for baubles, since Baubles doesn't call onUnequip when you die....
-				IBaublesItemHandler baubles = BaublesApi.getBaublesHandler((EntityPlayer) event.getEntityLiving());
+				IBaublesItemHandler baubles = BaublesApi.getBaublesHandler((PlayerEntity) event.getEntityLiving());
 				for (int i = 0; i < baubles.getSlots(); i++) {
 					ItemStack stack = baubles.getStackInSlot(i);
 					if (!stack.isEmpty() && stack.getItem() instanceof ItemMagicBauble) {
@@ -839,7 +839,7 @@ public class PlayerListener {
 		if (e.isCanceled())
 			return;
 		
-		EntityPlayer player = e.player;
+		PlayerEntity player = e.player;
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		
 		if (attr != null && attr.isUnlocked()) {
@@ -855,7 +855,7 @@ public class PlayerListener {
 	@SubscribeEvent
 	public void onTame(AnimalTameEvent e) {
 		if (e.getAnimal() instanceof EntityWolf) {
-			EntityPlayer player = e.getTamer();
+			PlayerEntity player = e.getTamer();
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			if (attr != null && !attr.hasLore(EntityArcaneWolf.WolfTameLore.instance())) {
 				attr.giveBasicLore(EntityArcaneWolf.WolfTameLore.instance());
@@ -863,7 +863,7 @@ public class PlayerListener {
 		}
 	}
 	
-	protected boolean shouldIgnoreVacuum(EntityPlayer player) {
+	protected boolean shouldIgnoreVacuum(PlayerEntity player) {
 		return !ModConfig.config.vacuumWhileSneaking()
 				&& player.isSneaking();
 	}
@@ -873,10 +873,10 @@ public class PlayerListener {
 		if (e.isCanceled())
 			return;
 		
-		if (!(e.getEntityLiving() instanceof EntityPlayer))
+		if (!(e.getEntityLiving() instanceof PlayerEntity))
 			return; // It SAYS EntityItemPickup, so just in case...
 		
-		EntityPlayer player = e.getEntityPlayer();
+		PlayerEntity player = e.getEntityPlayer();
 		ItemStack addedItem = e.getItem().getItem();
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
@@ -974,8 +974,8 @@ public class PlayerListener {
 	@SubscribeEvent
 	public void onConstruct(EntityConstructing event) {
 		Entity ent = event.getEntity();
-		if (ent instanceof EntityLivingBase) {
-			EntityLivingBase living = (EntityLivingBase) ent;
+		if (ent instanceof LivingEntity) {
+			LivingEntity living = (LivingEntity) ent;
 			living.getAttributeMap().registerAttribute(AttributeMagicResist.instance());
 			living.getAttributeMap().registerAttribute(AttributeMagicPotency.instance());
 			living.getAttributeMap().registerAttribute(AttributeManaRegen.instance());
@@ -997,7 +997,7 @@ public class PlayerListener {
 						continue;
 					}
 					
-					for (EntityPlayer player : world.playerEntities) {
+					for (PlayerEntity player : world.playerEntities) {
 						regenMana(player);
 					}
 				}
@@ -1041,14 +1041,14 @@ public class PlayerListener {
 	@SubscribeEvent
 	public void onTick(ClientTickEvent event) {
 		if (event.phase == Phase.START) {
-			if (!Minecraft.getMinecraft().isIntegratedServerRunning() && Minecraft.getMinecraft().player != null) {
+			if (!Minecraft.getInstance().isIntegratedServerRunning() && Minecraft.getInstance().player != null) {
 				NostrumPortal.tick();
 				TeleportRune.tick();
 			}
 		}
 	}
 	
-	private void regenMana(EntityPlayer player) {
+	private void regenMana(PlayerEntity player) {
 		// Called 2 times a second
 		INostrumMagic stats = NostrumMagica.getMagicWrapper(player);
 		
@@ -1079,7 +1079,7 @@ public class PlayerListener {
 			return;
 		}
 		
-		NostrumMagica.proxy.syncPlayer((EntityPlayerMP) event.player);
+		NostrumMagica.proxy.syncPlayer((ServerPlayerEntity) event.player);
 	}
 	
 	@SubscribeEvent
@@ -1096,7 +1096,7 @@ public class PlayerListener {
 	
 	@SubscribeEvent
 	public void onXPPickup(PlayerPickupXpEvent event) {
-		EntityPlayer player = event.getEntityPlayer();
+		PlayerEntity player = event.getEntityPlayer();
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		int xp = event.getOrb().xpValue;
 		if (attr != null) {
@@ -1134,11 +1134,11 @@ public class PlayerListener {
 			return;
 		}
 		
-		if (!(e.getEntity() instanceof EntityLivingBase)) {
+		if (!(e.getEntity() instanceof LivingEntity)) {
 			return;
 		}
 		
-		EntityLivingBase living = (EntityLivingBase) e.getEntity();
+		LivingEntity living = (LivingEntity) e.getEntity();
 		
 		final boolean hasLightningSet = EnchantedArmor.GetSetCount(living, EMagicElement.LIGHTNING, 3) == 4;
 		if (hasLightningSet) {
@@ -1171,7 +1171,7 @@ public class PlayerListener {
 			return;
 		}
 		
-		EntityPlayer player = e.getEntityPlayer();
+		PlayerEntity player = e.getEntityPlayer();
 		if (player.world.isRemote) {
 			return;
 		}
@@ -1192,7 +1192,7 @@ public class PlayerListener {
 		}
 	}
 	
-	private int tryThanos(EntityPlayer player, ItemStack item, int xp) {
+	private int tryThanos(PlayerEntity player, ItemStack item, int xp) {
 		if (item.getItem() instanceof ThanosStaff) {
 			return ThanosStaff.addXP(item, xp);
 		} else if (item.getItem() instanceof ThanoPendant) {
@@ -1208,7 +1208,7 @@ public class PlayerListener {
 	 * @param caster
 	 * @param summary
 	 */
-	public void onMagicEffect(EntityLivingBase entity, @Nullable EntityLivingBase caster, SpellActionSummary summary) {
+	public void onMagicEffect(LivingEntity entity, @Nullable LivingEntity caster, SpellActionSummary summary) {
 		Iterator<Entry<ISpellActionListener, MagicEffectInfo>> it = magicEffectInfos.entrySet().iterator();
 		while (it.hasNext()) {
 			Entry<ISpellActionListener, MagicEffectInfo> entry = it.next();
@@ -1277,7 +1277,7 @@ public class PlayerListener {
 		if (event.getEntity() instanceof EntityArcaneWolf) {
 			EntityArcaneWolf wolf = (EntityArcaneWolf) event.getEntity();
 			if (wolf.hasWolfCapability(WolfTypeCapability.LAVA_WALK)) {
-				AxisAlignedBB entityBB = wolf.getEntityBoundingBox();
+				AxisAlignedBB entityBB = wolf.getBoundingBox();
 				World world = event.getWorld();
 				for (MutableBlockPos pos : BlockPos.getAllInBoxMutable(
 						(int)Math.floor(entityBB.minX),

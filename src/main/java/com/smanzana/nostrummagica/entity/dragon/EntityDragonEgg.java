@@ -12,20 +12,20 @@ import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.block.BlockHay;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
-public class EntityDragonEgg extends EntityLiving implements ILoreTagged {
+public class EntityDragonEgg extends MobEntity implements ILoreTagged {
 	
 	protected static final DataParameter<Float> HEAT  = EntityDataManager.<Float>createKey(EntityDragonEgg.class, DataSerializers.FLOAT);
 	protected static final DataParameter<Optional<UUID>> PLAYER  = EntityDataManager.<Optional<UUID>>createKey(EntityDragonEgg.class, DataSerializers.OPTIONAL_UNIQUE_ID);
@@ -47,7 +47,7 @@ public class EntityDragonEgg extends EntityLiving implements ILoreTagged {
 		ageTimer = 20 * 60 * 5; // Base hatching time. Can be overriden by saved NBT
 	}
 	
-	public EntityDragonEgg(World worldIn, EntityPlayer player, IDragonSpawnData<? extends ITameDragon> spawnData) {
+	public EntityDragonEgg(World worldIn, PlayerEntity player, IDragonSpawnData<? extends ITameDragon> spawnData) {
 		this(worldIn);
 		this.spawnData = spawnData;
 		
@@ -95,7 +95,7 @@ public class EntityDragonEgg extends EntityLiving implements ILoreTagged {
 	
 	@Override
 	protected void collideWithEntity(Entity entity) {
-		if (entity instanceof ITameDragon || entity instanceof EntityPlayer) {
+		if (entity instanceof ITameDragon || entity instanceof PlayerEntity) {
 			
 		} else {
 			super.collideWithEntity(entity);
@@ -113,11 +113,11 @@ public class EntityDragonEgg extends EntityLiving implements ILoreTagged {
 	}
 	
 	@Override
-	public void writeEntityToNBT(NBTTagCompound compound) {
+	public void writeEntityToNBT(CompoundNBT compound) {
 		super.writeEntityToNBT(compound);
 		
-		compound.setFloat(NBT_HEAT, this.getHeat());
-		compound.setInteger(NBT_AGE_TIMER, ageTimer);
+		compound.putFloat(NBT_HEAT, this.getHeat());
+		compound.putInt(NBT_AGE_TIMER, ageTimer);
 		
 		UUID playerID = getPlayerID();
 		if (playerID != null) {
@@ -125,32 +125,32 @@ public class EntityDragonEgg extends EntityLiving implements ILoreTagged {
 		}
 		
 		if (this.spawnData != null) {
-			NBTTagCompound dataTag = new NBTTagCompound();
+			CompoundNBT dataTag = new CompoundNBT();
 			this.spawnData.writeToNBT(dataTag);
-			compound.setTag(NBT_DRAGON_DATA, dataTag);
-			compound.setString(NBT_DRAGON_TYPE, spawnData.getKey());
+			compound.put(NBT_DRAGON_DATA, dataTag);
+			compound.putString(NBT_DRAGON_TYPE, spawnData.getKey());
 		}
 	}
 	
 	@Override
-	public void readEntityFromNBT(NBTTagCompound compound) {
+	public void readEntityFromNBT(CompoundNBT compound) {
 		super.readEntityFromNBT(compound);
 		
-		if (compound.hasKey(NBT_HEAT)) {
+		if (compound.contains(NBT_HEAT)) {
 			this.setHeat(compound.getFloat(NBT_HEAT));
 		}
 		
-		if (compound.hasKey(NBT_AGE_TIMER)) {
-			this.ageTimer = compound.getInteger(NBT_AGE_TIMER);
+		if (compound.contains(NBT_AGE_TIMER)) {
+			this.ageTimer = compound.getInt(NBT_AGE_TIMER);
 		}
 		
-		if (compound.hasKey(NBT_PLAYER)) {
+		if (compound.contains(NBT_PLAYER)) {
 			this.setPlayerUUID(compound.getUniqueId(NBT_PLAYER));
 		}
 		
-		if (compound.hasKey(NBT_DRAGON_TYPE)) {
+		if (compound.contains(NBT_DRAGON_TYPE)) {
 			IDragonSpawnFactory factory = IDragonSpawnData.lookupFactory(compound.getString(NBT_DRAGON_TYPE));
-			this.spawnData = factory.create(compound.getCompoundTag(NBT_DRAGON_DATA));
+			this.spawnData = factory.create(compound.getCompound(NBT_DRAGON_DATA));
 		}
 	}
 	
@@ -173,9 +173,9 @@ public class EntityDragonEgg extends EntityLiving implements ILoreTagged {
 				this.setHeat(this.getHeat() - heatLoss);
 				
 				if (this.getHeat() <= 0f) {
-					EntityPlayer player = this.getPlayer();
+					PlayerEntity player = this.getPlayer();
 					if (player != null) {
-						player.sendMessage(new TextComponentTranslation("info.egg.death.cold"));
+						player.sendMessage(new TranslationTextComponent("info.egg.death.cold"));
 					}
 					
 					this.attackEntityFrom(DamageSource.STARVE, 9999f);
@@ -187,9 +187,9 @@ public class EntityDragonEgg extends EntityLiving implements ILoreTagged {
 		}
 	}
 	
-	protected EntityPlayer getPlayer() {
+	protected PlayerEntity getPlayer() {
 		UUID id = getPlayerID();
-		EntityPlayer player = null;
+		PlayerEntity player = null;
 		
 		if (id != null) {
 			player = this.world.getPlayerEntityByUUID(id);
@@ -225,11 +225,11 @@ public class EntityDragonEgg extends EntityLiving implements ILoreTagged {
 	private void hatch() {
 		
 		if (this.spawnData != null) {
-			this.world.spawnEntity((EntityLivingBase) this.spawnData.spawnDragon(world, posX, posY, posZ));
+			this.world.spawnEntity((LivingEntity) this.spawnData.spawnDragon(world, posX, posY, posZ));
 			
-			EntityPlayer player = this.getPlayer();
+			PlayerEntity player = this.getPlayer();
 			if (player != null) {
-				player.sendMessage(new TextComponentTranslation("info.egg.hatch"));
+				player.sendMessage(new TranslationTextComponent("info.egg.hatch"));
 			}
 		}
 		

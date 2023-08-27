@@ -5,8 +5,8 @@ import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -25,7 +25,7 @@ public class EnchantedArmorStateUpdate implements IMessage {
 		@Override
 		public IMessage onMessage(EnchantedArmorStateUpdate message, MessageContext ctx) {
 			
-			final int id = message.tag.getInteger(NBT_ID);
+			final int id = message.tag.getInt(NBT_ID);
 			ArmorState state;
 			try {
 				state = ArmorState.valueOf(message.tag.getString(NBT_TYPE).toUpperCase());
@@ -34,12 +34,12 @@ public class EnchantedArmorStateUpdate implements IMessage {
 			}
 			final boolean data = message.tag.getBoolean(NBT_DATA);
 			
-			EntityLivingBase ent = (ctx.side.isClient() ? (EntityLivingBase) NostrumMagica.proxy.getPlayer().world.getEntityByID(id) : ctx.getServerHandler().player);
+			LivingEntity ent = (ctx.side.isClient() ? (LivingEntity) NostrumMagica.proxy.getPlayer().world.getEntityByID(id) : ctx.getServerHandler().player);
 			if (ent != null) {
 				EnchantedArmor.HandleStateUpdate(state, ent, data);
 				if (ctx.side.isServer()) {
 					// Bounce this update to everyone else
-					message.tag.setInteger(NBT_ID, ent.getEntityId());
+					message.tag.putInt(NBT_ID, ent.getEntityId());
 					NetworkHandler.getSyncChannel().sendToDimension(message, ent.dimension);
 				}
 			}
@@ -64,10 +64,10 @@ public class EnchantedArmorStateUpdate implements IMessage {
 	private static final String NBT_TYPE = "type";
 	private static final String NBT_DATA = "data";
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public EnchantedArmorStateUpdate() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	public EnchantedArmorStateUpdate(ArmorState state, boolean data) {
@@ -76,9 +76,9 @@ public class EnchantedArmorStateUpdate implements IMessage {
 	
 	public EnchantedArmorStateUpdate(ArmorState state, boolean data, int entityID) {
 		this();
-		tag.setString(NBT_TYPE, state.name().toLowerCase());
-		tag.setBoolean(NBT_DATA, data);
-		tag.setInteger(NBT_ID, entityID);
+		tag.putString(NBT_TYPE, state.name().toLowerCase());
+		tag.putBoolean(NBT_DATA, data);
+		tag.putInt(NBT_ID, entityID);
 	}
 
 	@Override

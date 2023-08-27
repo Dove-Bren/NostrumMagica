@@ -4,9 +4,9 @@ import com.smanzana.nostrummagica.items.EnchantedArmor;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.MathHelper;
 
 public class ModelDragonFlightWings extends ModelBase {
@@ -79,14 +79,14 @@ public class ModelDragonFlightWings extends ModelBase {
 		// -1f - 1f (sin)
 		final float livingJitterMod = MathHelper.sin(3.1415f * 2 * livingJitterPerc);
 		
-		final float wingFlapPerc = EnchantedArmor.GetWingFlap((EntityLivingBase) entityIn, ageInTicks - (int) ageInTicks);
+		final float wingFlapPerc = EnchantedArmor.GetWingFlap((LivingEntity) entityIn, ageInTicks - (int) ageInTicks);
 		final float wingFlapMod = MathHelper.sin(3.1415f * 2 * wingFlapPerc);
 		
 		rightWing.rotateAngleX = rightWing.rotateAngleZ = 0;
 		rightWing.offsetY = entityIn.height * .3f;
 		rightWing.offsetX = -entityIn.width * .25f;
 		rightWing.offsetZ = entityIn.width * .3f;
-		if (entityIn instanceof EntityLivingBase && ((EntityLivingBase)entityIn).isElytraFlying()) {
+		if (entityIn instanceof LivingEntity && ((LivingEntity)entityIn).isElytraFlying()) {
 			rightWing.rotateAngleY = (float) (Math.PI * (.20 + livingJitterMod * .005 + wingFlapMod * .25));
 		} else {
 			// Standing still
@@ -107,13 +107,13 @@ public class ModelDragonFlightWings extends ModelBase {
 //		float f2 = 0.0F;
 //		float f3 = 0.0F;
 //
-//		if (entityIn instanceof EntityLivingBase && ((EntityLivingBase)entityIn).isElytraFlying())
+//		if (entityIn instanceof LivingEntity && ((LivingEntity)entityIn).isElytraFlying())
 //		{
 //			float f4 = 1.0F;
 //
-//			if (entityIn.motionY < 0.0D)
+//			if (entityIn.getMotion().y < 0.0D)
 //			{
-//				Vec3d vec3d = (new Vec3d(entityIn.motionX, entityIn.motionY, entityIn.motionZ)).normalize();
+//				Vec3d vec3d = (new Vec3d(entityIn.getMotion().x, entityIn.getMotion().y, entityIn.getMotion().z)).normalize();
 //				f4 = 1.0F - (float)Math.pow(-vec3d.yCoord, 1.5D);
 //			}
 //
@@ -159,7 +159,7 @@ public class ModelDragonFlightWings extends ModelBase {
 	 * Used for easily adding entity-dependent animations. The second and third float params here are the same second
 	 * and third as in the setRotationAngles method.
 	 */
-	public void setLivingAnimations(EntityLivingBase entitylivingbaseIn, float p_78086_2_, float p_78086_3_, float partialTickTime)
+	public void setLivingAnimations(LivingEntity entitylivingbaseIn, float p_78086_2_, float p_78086_3_, float partialTickTime)
 	{
 		super.setLivingAnimations(entitylivingbaseIn, p_78086_2_, p_78086_3_, partialTickTime);
 	}

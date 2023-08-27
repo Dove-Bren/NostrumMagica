@@ -13,7 +13,7 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -37,7 +37,7 @@ public class LoadedRoom implements IDungeonRoom {
 		// Find and save chest locations
 		chestsRelative = new ArrayList<>();
 		blueprint.scanBlocks((offset, block) -> {
-			IBlockState state = block.getSpawnState(EnumFacing.NORTH); 
+			IBlockState state = block.getSpawnState(Direction.NORTH); 
 			if (state != null && state.getBlock() == Blocks.CHEST) {
 				chestsRelative.add(new DungeonExitPoint(offset, state.getValue(BlockChest.FACING)));
 			}
@@ -98,14 +98,14 @@ public class LoadedRoom implements IDungeonRoom {
 		// Blueprint wants your facing as you go in the door. That's there the 'opposite' comes from.
 		
 		// Blueprint exits are rotated to the entry entry direction (and have their own rotation too).
-		final EnumFacing modDir = RoomBlueprint.getModDir(blueprint.getEntry().getFacing(), start.getFacing());
+		final Direction modDir = RoomBlueprint.getModDir(blueprint.getEntry().getFacing(), start.getFacing());
 		// Door offset and final rotation is what's in exits rotated modDir times
 		
 		List<DungeonExitPoint> ret;
 		if (exits != null) {
 			ret = new ArrayList<>(exits.size());
 			for (DungeonExitPoint door : exits) {
-				EnumFacing doorDir = door.getFacing();
+				Direction doorDir = door.getFacing();
 				int times = (modDir.getHorizontalIndex() + 2) % 4;
 				while (times-- > 0) {
 					doorDir = doorDir.rotateY();

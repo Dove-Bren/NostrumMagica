@@ -1,17 +1,18 @@
 package com.smanzana.nostrummagica.client.gui.book;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import net.minecraft.client.Minecraft;
+import com.mojang.blaze3d.platform.GlStateManager;
+
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderItem;
-import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
+import net.minecraft.tags.Tag;
 
 public class ItemPage implements IBookPage {
 	
@@ -21,22 +22,18 @@ public class ItemPage implements IBookPage {
 	
 	private ItemStack[] itemImages;
 	
-	public ItemPage(@Nonnull ItemStack item) {
-		if (item.getMetadata() == OreDictionary.WILDCARD_VALUE) {
-			List<ItemStack> items = new LinkedList<>();
-			int i;
-			ItemStack image;
-			for (i = 0; i < 16; i++) {
-				image = new ItemStack(item.getItem(), 1, i);
-				IBakedModel model = Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getItemModel(image);
-				if (model == null || model == Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getModelManager().getMissingModel())
-					break;
-				items.add(image);
-			}
-			itemImages = items.toArray(new ItemStack[items.size()]);
-		} else {
-			itemImages = new ItemStack[]{item};
+	public ItemPage(Tag<Item> itemTag) {
+		Collection<Item> items = itemTag.getAllElements();
+		List<ItemStack> stacks = new ArrayList<>(items.size());
+		
+		for (Item item : items) {
+			stacks.add(new ItemStack(item));
 		}
+		itemImages = items.toArray(new ItemStack[items.size()]);
+	}
+	
+	public ItemPage(@Nonnull ItemStack item) {
+		itemImages = new ItemStack[]{item};
 	}
 	
 	@Override
@@ -49,16 +46,16 @@ public class ItemPage implements IBookPage {
 		centerx -= 8; //offset for 16x16 item icon
 		centery -= 8;
 
-		int displayIndex = (int) (Minecraft.getSystemTime() / 1500);
+		int displayIndex = (int) (System.currentTimeMillis() / 1500);
 		displayIndex %= itemImages.length;
 		ItemStack item = itemImages[displayIndex];
 		
 		GlStateManager.pushMatrix();
 		
-		RenderItem itemRender = parent.getRenderItem();
-		GlStateManager.translate(0.0F, 0.0F, 32.0F);
+		ItemRenderer itemRender = parent.getItemRenderer();
+		GlStateManager.translatef(0.0F, 0.0F, 32.0F);
         itemRender.zLevel = 200.0F;
-        net.minecraft.client.gui.FontRenderer font = null;
+        FontRenderer font = null;
         if (!item.isEmpty()) font = item.getItem().getFontRenderer(item);
         if (font == null) font = fonter;
         itemRender.renderItemAndEffectIntoGUI(item, centerx, centery);
@@ -69,7 +66,7 @@ public class ItemPage implements IBookPage {
 
 	@Override
 	public void overlay(BookScreen parent, FontRenderer fonter, int mouseX, int mouseY, int trueX, int trueY) {
-		int displayIndex = (int) (Minecraft.getSystemTime() / 1500);
+		int displayIndex = (int) (System.currentTimeMillis() / 1500);
 		displayIndex %= itemImages.length;
 		ItemStack item = itemImages[displayIndex];
 		if (!item.isEmpty()) {

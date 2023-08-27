@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.entity.dragon;
 
 import net.minecraft.entity.ai.EntityMoveHelper;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -125,10 +125,10 @@ public abstract class EntityDragonFlying extends EntityDragon {
 		this.dataManager.register(DRAGON_FLYING, FlyState.LANDED.ordinal());
 	}
 	
-	public void readEntityFromNBT(NBTTagCompound compound) {
+	public void readEntityFromNBT(CompoundNBT compound) {
 		super.readEntityFromNBT(compound);
 
-        if (compound.hasKey(DRAGON_SERIAL_FLYING_TOK, NBT.TAG_ANY_NUMERIC)) {
+        if (compound.contains(DRAGON_SERIAL_FLYING_TOK, NBT.TAG_ANY_NUMERIC)) {
         	int i = compound.getByte(DRAGON_SERIAL_FLYING_TOK);
         	FlyState state = FlyState.values()[i];
         	if (state == FlyState.LANDING) {
@@ -142,7 +142,7 @@ public abstract class EntityDragonFlying extends EntityDragon {
         }
 	}
 	
-	public void writeEntityToNBT(NBTTagCompound compound) {
+	public void writeEntityToNBT(CompoundNBT compound) {
     	super.writeEntityToNBT(compound);
         compound.setByte(DRAGON_SERIAL_FLYING_TOK, (byte)this.getFlyState().ordinal());
 	}

@@ -3,10 +3,10 @@ package com.smanzana.nostrummagica.client.effects;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.texture.TextureMap;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 
@@ -51,23 +51,23 @@ public class ClientEffectMajorSphere extends ClientEffect {
 			
 			GlStateManager.disableBlend();
 			GlStateManager.enableBlend();
-			GlStateManager.disableAlpha();
-			GlStateManager.enableAlpha();
-			GlStateManager.disableTexture2D();
-			GlStateManager.enableTexture2D();
-			GlStateManager.color(0f, 0f, 0f, 0f);
-			GlStateManager.color(1f, 1f, 1f, 1f);
-			Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+			GlStateManager.disableAlphaTest();
+			GlStateManager.enableAlphaTest();
+			GlStateManager.disableTexture();
+			GlStateManager.enableTexture();
+			GlStateManager.color4f(0f, 0f, 0f, 0f);
+			GlStateManager.color4f(1f, 1f, 1f, 1f);
+			Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 			
 			// outside
 			GlStateManager.pushMatrix();
-			GlStateManager.scale(scale * 2, scale * 2, scale * 2); // input scale is 'blocks radius' vs model is default to .5 blocks.
+			GlStateManager.scalef(scale * 2, scale * 2, scale * 2); // input scale is 'blocks radius' vs model is default to .5 blocks.
 			ClientEffectForm.drawModel(model, color);
 			GlStateManager.popMatrix();
 			
 			// inside
 			GlStateManager.pushMatrix();
-			GlStateManager.scale(scale * -2, scale * -2, scale * -2); // input scale is 'blocks radius' vs model is default to .5 blocks.
+			GlStateManager.scalef(scale * -2, scale * -2, scale * -2); // input scale is 'blocks radius' vs model is default to .5 blocks.
 			ClientEffectForm.drawModel(model, color);
 			GlStateManager.popMatrix();
 			

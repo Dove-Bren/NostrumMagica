@@ -10,7 +10,7 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.block.BlockTorch;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 public class RoomEnd1 extends StaticRoom {
@@ -67,8 +67,8 @@ public class RoomEnd1 extends StaticRoom {
 				"XXXXXXXXX",
 				'X', DungeonBlock.instance(),
 				'C', new BlockState(Blocks.CARPET, 14),
-				'N', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.NORTH)),
-				'E', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.EAST)),
+				'N', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.NORTH)),
+				'E', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.EAST)),
 				'B', Blocks.BOOKSHELF,
 				' ', null,
 				'M', (withChest ? null : (withEnemy ? new BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.GOLEM_PHYSICAL.ordinal()) : null)));
@@ -115,7 +115,7 @@ public class RoomEnd1 extends StaticRoom {
 	@Override
 	public DungeonExitPoint getKeyLocation(DungeonExitPoint start) {
 		return NostrumDungeon.asRotated(start,
-				new BlockPos(-3, 0, 1), EnumFacing.SOUTH);
+				new BlockPos(-3, 0, 1), Direction.SOUTH);
 	}
 
 	@Override
@@ -123,11 +123,11 @@ public class RoomEnd1 extends StaticRoom {
 		List<DungeonExitPoint> list = new LinkedList<>();
 		
 		list.add(NostrumDungeon.asRotated(start,
-				new BlockPos(-3, 0, 5), EnumFacing.EAST));
+				new BlockPos(-3, 0, 5), Direction.EAST));
 		
 		if (withChest)
 			list.add(NostrumDungeon.asRotated(start,
-					new BlockPos(-3, 0, 1), EnumFacing.SOUTH)
+					new BlockPos(-3, 0, 1), Direction.SOUTH)
 				);
 		
 		return list;

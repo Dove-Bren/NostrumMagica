@@ -11,7 +11,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
@@ -30,14 +30,14 @@ public class DelayTrigger extends SpellTrigger {
 		}
 		
 		@Override
-		public void init(EntityLivingBase caster) {
+		public void init(LivingEntity caster) {
 			// We are instant! Whoo!
 			NostrumMagica.playerListener.registerTimer(this, 0, delayTicks);
 			
 		}
 
 		@Override
-		public boolean onEvent(Event type, EntityLivingBase entity, Object unused) {
+		public boolean onEvent(Event type, LivingEntity entity, Object unused) {
 			// We only registered for time, so don't bother checking
 			
 			TriggerData data = new TriggerData(

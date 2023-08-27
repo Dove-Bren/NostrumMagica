@@ -4,7 +4,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 
 public class AttributeReward implements IReward {
 
@@ -23,7 +23,7 @@ public class AttributeReward implements IReward {
 	}
 	
 	@Override
-	public void award(EntityPlayer player) {
+	public void award(PlayerEntity player) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
 			return;

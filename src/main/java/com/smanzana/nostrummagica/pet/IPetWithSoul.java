@@ -6,7 +6,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
@@ -17,7 +17,7 @@ public interface IPetWithSoul {
 	
 	public @Nonnull UUID getWorldID();
 	
-	public NBTTagCompound serializeNBT();
+	public CompoundNBT serializeNBT();
 
 	
 	/**
@@ -29,7 +29,7 @@ public interface IPetWithSoul {
 	 * @param snapshot
 	 * @return
 	 */
-	public static @Nullable Entity SpawnPetFromSnapshot(World world, Vec3d pos, NBTTagCompound snapshot, boolean worldSpawn) {
+	public static @Nullable Entity SpawnPetFromSnapshot(World world, Vec3d pos, CompoundNBT snapshot, boolean worldSpawn) {
 		return AnvilChunkLoader.readWorldEntityPos(snapshot, world, pos.x, pos.y, pos.z, worldSpawn);
 	}
 }

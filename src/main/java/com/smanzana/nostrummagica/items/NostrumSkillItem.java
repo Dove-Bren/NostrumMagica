@@ -14,19 +14,19 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class NostrumSkillItem extends Item implements ILoreTagged {
 
@@ -101,7 +101,7 @@ public class NostrumSkillItem extends Item implements ILoreTagged {
 		return new ItemStack(instance(), count, meta);
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
     @Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
 		if (this.isInCreativeTab(tab)) {
@@ -137,7 +137,7 @@ public class NostrumSkillItem extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
 		final @Nonnull ItemStack stack = playerIn.getHeldItem(hand);
 		if (playerIn.isSneaking())
 			return new ActionResult<ItemStack>(EnumActionResult.PASS, stack);
@@ -147,7 +147,7 @@ public class NostrumSkillItem extends Item implements ILoreTagged {
 		if (attr != null && attr.isUnlocked() && type != SkillItemType.WING) {
 			
 			if (type == SkillItemType.ENDER_PIN  && attr.hasEnhancedTeleport()) {
-				playerIn.sendMessage(new TextComponentTranslation("info.skillitem.advtele.unlocked", new Object[0]));
+				playerIn.sendMessage(new TranslationTextComponent("info.skillitem.advtele.unlocked", new Object[0]));
 				return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
 			}
 			
@@ -190,12 +190,12 @@ public class NostrumSkillItem extends Item implements ILoreTagged {
 			
 			if (worldIn.isRemote) {
 				// Display message but don't do anything
-				playerIn.sendMessage(new TextComponentTranslation("info.skillitem." + suffix, new Object[0]));
+				playerIn.sendMessage(new TranslationTextComponent("info.skillitem." + suffix, new Object[0]));
 			} else {
 				// Server side
 				NostrumMagicaSounds.LORE.play(null, playerIn.world, playerIn.posX, playerIn.posY, playerIn.posZ);
 				stack.shrink(1);
-				NostrumMagica.proxy.syncPlayer((EntityPlayerMP) playerIn);
+				NostrumMagica.proxy.syncPlayer((ServerPlayerEntity) playerIn);
 			}
 			
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
@@ -208,13 +208,13 @@ public class NostrumSkillItem extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		SkillItemType type = getTypeFromMeta(stack.getMetadata());
 		if (type == null)
 			return;
 		
-		if (I18n.hasKey(type.getDescKey())) {
+		if (I18n.contains(type.getDescKey())) {
 			String translation = I18n.format(type.getDescKey(), new Object[0]);
 			if (translation.trim().isEmpty())
 				return;

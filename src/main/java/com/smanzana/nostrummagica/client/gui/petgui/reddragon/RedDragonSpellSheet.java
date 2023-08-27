@@ -16,19 +16,19 @@ import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.EntityPlayer;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagString;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.client.config.GuiUtils;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	
@@ -114,7 +114,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	}
 	
 	@Override
-	public void showSheet(EntityTameDragonRed dragon, EntityPlayer player, PetContainer<EntityTameDragonRed> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(EntityTameDragonRed dragon, PlayerEntity player, PetContainer<EntityTameDragonRed> container, int width, int height, int offsetX, int offsetY) {
 		this.container = container;
 		this.dragonInv = this.dragon.getSpellInventory();
 		this.playerInv = player.inventory;
@@ -132,14 +132,14 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	}
 
 	@Override
-	public void hideSheet(EntityTameDragonRed dragon, EntityPlayer player, PetContainer<EntityTameDragonRed> container) {
+	public void hideSheet(EntityTameDragonRed dragon, PlayerEntity player, PetContainer<EntityTameDragonRed> container) {
 		container.clearSlots();
 	}
 	
 	private void drawCell(Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
-		GlStateManager.color(1f, 1f, 1f, 1f);
-		Gui.drawModalRectWithCustomSizedTexture(x, y,
+		GlStateManager.color4f(1f, 1f, 1f, 1f);
+		RenderFuncs.drawModalRectWithCustomSizedTexture(x, y,
 				PetGUI.GUI_TEX_CELL_HOFFSET, PetGUI.GUI_TEX_CELL_VOFFSET,
 				cellWidth, cellWidth,
 				256, 256);
@@ -154,8 +154,8 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 			scrollShadow = new ItemStack(SpellScroll.instance());
 		}
 		
-		GlStateManager.color(1f, 1f, 1f, 1f);
-		Gui.drawModalRectWithCustomSizedTexture(x, y,
+		GlStateManager.color4f(1f, 1f, 1f, 1f);
+		RenderFuncs.drawModalRectWithCustomSizedTexture(x, y,
 				PetGUI.GUI_TEX_CELL_HOFFSET + cellWidth, PetGUI.GUI_TEX_CELL_VOFFSET,
 				cellWidth, cellWidth,
 				256, 256);
@@ -165,8 +165,8 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	
 	private void drawShadowCell(Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
-		GlStateManager.color(.7f, .71f, .7f, .4f);
-		Gui.drawModalRectWithCustomSizedTexture(x, y,
+		GlStateManager.color4f(.7f, .71f, .7f, .4f);
+		RenderFuncs.drawModalRectWithCustomSizedTexture(x, y,
 				PetGUI.GUI_TEX_CELL_HOFFSET, PetGUI.GUI_TEX_CELL_VOFFSET,
 				cellWidth, cellWidth,
 				256, 256);
@@ -174,8 +174,8 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	
 	private void drawFadedCell(Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
-		GlStateManager.color(.2f, .2f, .2f, .4f);
-		Gui.drawModalRectWithCustomSizedTexture(x, y,
+		GlStateManager.color4f(.2f, .2f, .2f, .4f);
+		RenderFuncs.drawModalRectWithCustomSizedTexture(x, y,
 				PetGUI.GUI_TEX_CELL_HOFFSET, PetGUI.GUI_TEX_CELL_VOFFSET,
 				cellWidth, cellWidth,
 				256, 256);
@@ -187,8 +187,8 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 			texOffset = gambit.getTexOffsetX();
 		}
 		mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
-		GlStateManager.color(1f, 1f, 1f, 1f);
-		Gui.drawModalRectWithCustomSizedTexture(x, y,
+		GlStateManager.color4f(1f, 1f, 1f, 1f);
+		RenderFuncs.drawModalRectWithCustomSizedTexture(x, y,
 				PetGUI.GUI_TEX_TOGGLE_HOFFSET + texOffset,
 				PetGUI.GUI_TEX_TOGGLE_VOFFSET,
 				toggleSize, toggleSize,
@@ -202,7 +202,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		int count;
 		int ghostCount;
 		
-		mc.fontRenderer.drawString(title, 5, y + 1 + (cellWidth - mc.fontRenderer.FONT_HEIGHT) / 2, 0xFFFFFFFF);
+		mc.font.drawString(title, 5, y + 1 + (cellWidth - mc.font.FONT_HEIGHT) / 2, 0xFFFFFFFF);
 		mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
 		
 		count = 0;
@@ -232,7 +232,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 
 	@Override
 	public void draw(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
-		GlStateManager.color(1.0F,  1.0F, 1.0F, 1.0F);
+		GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 		
 		// Draw sheet
 		GlStateManager.pushMatrix();
@@ -259,8 +259,8 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 			
 			final int playerTopOffset = dragonTopOffset + (rowIncr * 3) + 10;
 			for (int i = 0; i < playerInvSize; i++) {
-				GlStateManager.color(1f, 1f, 1f, 1f);
-				Gui.drawModalRectWithCustomSizedTexture(leftOffset - 1 + (cellWidth * (i % invRow)), (i < 27 ? 0 : 10) + playerTopOffset - 1 + (cellWidth * (i / invRow)),
+				GlStateManager.color4f(1f, 1f, 1f, 1f);
+				RenderFuncs.drawModalRectWithCustomSizedTexture(leftOffset - 1 + (cellWidth * (i % invRow)), (i < 27 ? 0 : 10) + playerTopOffset - 1 + (cellWidth * (i / invRow)),
 						PetGUI.GUI_TEX_CELL_HOFFSET, PetGUI.GUI_TEX_CELL_VOFFSET,
 						cellWidth, cellWidth,
 						256, 256);
@@ -271,7 +271,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void overlay(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		
 		// Draw spell icon overlays
@@ -291,10 +291,10 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 			int y;
 			final int innerCellWidth = RedDragonSpellSheet.cellWidth - 2;
 			final long period = 2000;
-			final float alpha = .85f + .1f * (float) Math.sin(Math.PI * 2 * (float) (Minecraft.getSystemTime() % period) / period);
+			final float alpha = .85f + .1f * (float) Math.sin(Math.PI * 2 * (float) (System.currentTimeMillis() % period) / period);
 			
 			GlStateManager.pushMatrix();
-			GlStateManager.translate(0, 0, 251);
+			GlStateManager.translatef(0, 0, 251);
 			
 			// Target
 			scrolls = dragonInv.getTargetSpells();
@@ -310,7 +310,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 					Spell spell = SpellScroll.getSpell(scroll);
 					if (spell != null) {
 						final SpellIcon icon = SpellIcon.get(spell.getIconIndex());
-						GlStateManager.color(1f, 1f, 1f, alpha);
+						GlStateManager.color4f(1f, 1f, 1f, alpha);
 						icon.render(mc, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth);
 					}
 				}
@@ -330,7 +330,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 					Spell spell = SpellScroll.getSpell(scroll);
 					if (spell != null) {
 						final SpellIcon icon = SpellIcon.get(spell.getIconIndex());
-						GlStateManager.color(1f, 1f, 1f, alpha);
+						GlStateManager.color4f(1f, 1f, 1f, alpha);
 						icon.render(mc, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth);
 					}
 				}
@@ -350,7 +350,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 					Spell spell = SpellScroll.getSpell(scroll);
 					if (spell != null) {
 						final SpellIcon icon = SpellIcon.get(spell.getIconIndex());
-						GlStateManager.color(1f, 1f, 1f, alpha);
+						GlStateManager.color4f(1f, 1f, 1f, alpha);
 						icon.render(mc, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth);
 					}
 				}
@@ -409,12 +409,12 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 			}
 			
 			GlStateManager.pushMatrix();
-			GlStateManager.translate(0, 0, 201);
-			Gui.drawRect(cellX, cellY, cellX + toggleSize, cellY + toggleSize, 0x50FFFFFF);
+			GlStateManager.translatef(0, 0, 201);
+			RenderFuncs.drawRect(cellX, cellY, cellX + toggleSize, cellY + toggleSize, 0x50FFFFFF);
 			
 			EntityDragonGambit gambit = dragonInv.getAllGambits()[index];
 			if (gambit != null) {
-				GuiUtils.drawHoveringText(gambit.getDesc(), mouseX, mouseY, this.width, this.height, 150, mc.fontRenderer);
+				GuiUtils.drawHoveringText(gambit.getDesc(), mouseX, mouseY, this.width, this.height, 150, mc.font);
 			}
 			
 			GlStateManager.popMatrix();
@@ -483,58 +483,58 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	}
 	
 //	private void sendGambitReq(boolean all, int index) {
-//		NBTTagCompound nbt = new NBTTagCompound();
-//		nbt.setString("type", SheetMessageType.REQ_GAMBITS.name());
-//		nbt.setBoolean("all", all);
-//		nbt.setInteger("index", index);
+//		CompoundNBT nbt = new CompoundNBT();
+//		nbt.putString("type", SheetMessageType.REQ_GAMBITS.name());
+//		nbt.putBoolean("all", all);
+//		nbt.putInt("index", index);
 //		this.container.sendSheetMessageToServer(nbt);
 //	}
 	
 	private void sendGambitCycle(int index, boolean forward) {
-		NBTTagCompound nbt = new NBTTagCompound();
-		nbt.setString("type", SheetMessageType.GAMBIT_CYCLE.name());
-		nbt.setInteger("index", index);
-		nbt.setBoolean("forward", forward);
+		CompoundNBT nbt = new CompoundNBT();
+		nbt.putString("type", SheetMessageType.GAMBIT_CYCLE.name());
+		nbt.putInt("index", index);
+		nbt.putBoolean("forward", forward);
 		this.container.sendSheetMessageToServer(nbt);
 	}
 	
 	private void sendGambit(int index, EntityDragonGambit gambit) {
-		NBTTagCompound nbt = new NBTTagCompound();
-		nbt.setString("type", SheetMessageType.REV_GAMBIT.name());
-		nbt.setInteger("index", index);
-		nbt.setString("gambit", gambit.name());
+		CompoundNBT nbt = new CompoundNBT();
+		nbt.putString("type", SheetMessageType.REV_GAMBIT.name());
+		nbt.putInt("index", index);
+		nbt.putString("gambit", gambit.name());
 		this.container.sendSheetMessageToClient(nbt);
 	}
 	
 	private void sendAllGambits(EntityDragonGambit gambits[]) {
-		NBTTagCompound nbt = new NBTTagCompound();
-		nbt.setString("type", SheetMessageType.REV_ALL_GAMBITS.name());
+		CompoundNBT nbt = new CompoundNBT();
+		nbt.putString("type", SheetMessageType.REV_ALL_GAMBITS.name());
 		
-		NBTTagList list = new NBTTagList();
+		ListNBT list = new ListNBT();
 		for (int i = 0; i < gambits.length; i++) {
-			NBTTagString tag = new NBTTagString(gambits[i].name());
-			list.appendTag(tag);
+			StringNBT tag = new StringNBT(gambits[i].name());
+			list.add(tag);
 		}
 		
-		nbt.setTag("gambits", list);
+		nbt.put("gambits", list);
 		this.container.sendSheetMessageToClient(nbt);
 	}
 	
 	// Client has requested information about 1 or all gambits
-	private void receiveGambitReq(NBTTagCompound nbt) {
+	private void receiveGambitReq(CompoundNBT nbt) {
 		boolean all = nbt.getBoolean("all");
 		
 		if (all) {
 			sendAllGambits(this.dragonInv.getAllGambits());
 		} else {
-			int index = nbt.getInteger("index");
+			int index = nbt.getInt("index");
 			sendGambit(index, this.dragonInv.getAllGambits()[index]);
 		}
 	}
 	
 	// Client has requested we cycle a gambit
-	private void receiveGambitCycle(NBTTagCompound nbt) {
-		int index = nbt.getInteger("index");
+	private void receiveGambitCycle(CompoundNBT nbt) {
+		int index = nbt.getInt("index");
 		boolean forward = nbt.getBoolean("forward");
 		
 		EntityDragonGambit gambit = this.dragonInv.getAllGambits()[index];
@@ -564,8 +564,8 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	}
 	
 	// Server has sent info about a gambit
-	private void receiveGambit(NBTTagCompound nbt) {
-		int index = nbt.getInteger("index");
+	private void receiveGambit(CompoundNBT nbt) {
+		int index = nbt.getInt("index");
 		String name = nbt.getString("gambit");
 		EntityDragonGambit gambit;
 		try {
@@ -578,11 +578,11 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	}
 	
 	// Server has sent information about all gambits
-	private void receiveAllGambits(NBTTagCompound nbt) {
-		NBTTagList list = nbt.getTagList("gambits", NBT.TAG_STRING);
+	private void receiveAllGambits(CompoundNBT nbt) {
+		ListNBT list = nbt.getList("gambits", NBT.TAG_STRING);
 		if (list != null) {
-			for (int i = 0; i < dragonInv.getSizeInventory() && i < list.tagCount(); i++) {
-				String name = list.getStringTagAt(i);
+			for (int i = 0; i < dragonInv.getSizeInventory() && i < list.size(); i++) {
+				String name = list.getString(i);
 				EntityDragonGambit gambit;
 				try {
 					gambit = EntityDragonGambit.valueOf(name.toUpperCase());
@@ -596,7 +596,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	}
 
 	@Override
-	public void handleMessage(NBTTagCompound data) {
+	public void handleMessage(CompoundNBT data) {
 		String typeKey = data.getString("type");
 		SheetMessageType type;
 		try {
@@ -690,7 +690,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		}
 		
 		@Override
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		public boolean isEnabled() {
 			if (subIndex >= RedDragonSpellInventory.MaxSpellsPerCategory) {
 				return false;

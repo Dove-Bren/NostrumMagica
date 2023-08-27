@@ -20,16 +20,16 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EnumCreatureAttribute;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class DragonArmor extends Item {
@@ -234,7 +234,7 @@ public class DragonArmor extends Item {
 		defaultArmorToughness = CalcArmorToughness(slot, material);
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public String getResourceLocation() {
 		return resourceLocation;
 	}
@@ -282,20 +282,20 @@ public class DragonArmor extends Item {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		// Disable vanilla's so we can do our own
 		if (!stack.hasTagCompound() || !stack.getTagCompound().hasKey("HideFlags", 99)) {
-			NBTTagCompound tag = stack.getTagCompound();
+			CompoundNBT tag = stack.getTagCompound();
 			if (tag == null) {
-				tag = new NBTTagCompound();
+				tag = new CompoundNBT();
 			}
 			
-			tag.setInteger("HideFlags", 2);
+			tag.putInt("HideFlags", 2);
 			stack.setTagCompound(tag);
 		}
 		
-		EntityPlayer player = NostrumMagica.proxy.getPlayer();
+		PlayerEntity player = NostrumMagica.proxy.getPlayer();
 		
 		// Copied from vanilla's ItemStack
 		for (DragonEquipmentSlot dragonSlot : DragonEquipmentSlot.values())

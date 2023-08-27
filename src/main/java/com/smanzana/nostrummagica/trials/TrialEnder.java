@@ -4,11 +4,11 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.EnderTeleportEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class TrialEnder extends ShrineTrial {
 
@@ -20,7 +20,7 @@ public class TrialEnder extends ShrineTrial {
 	@SubscribeEvent
 	public void onTeleport(EnderTeleportEvent e) {
 		
-		if (e.getEntityLiving() instanceof EntityPlayer) {
+		if (e.getEntityLiving() instanceof PlayerEntity) {
 
 			Vec3d pos = e.getEntityLiving().getPositionVector();
 			if (pos.squareDistanceTo(e.getTargetX(), e.getTargetY(), e.getTargetZ())
@@ -34,7 +34,7 @@ public class TrialEnder extends ShrineTrial {
 			if (!attr.hasTrial(this.element))
 				return;
 			
-			this.complete((EntityPlayer) e.getEntityLiving());
+			this.complete((PlayerEntity) e.getEntityLiving());
 		}
 	}
 	

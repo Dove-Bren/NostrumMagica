@@ -4,7 +4,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.render.entity.RenderArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.util.ResourceLocation;
 
@@ -28,7 +28,7 @@ public class LayerArcaneWolfRunes implements LayerRenderer<EntityArcaneWolf> {
 			final float red = (float)((ARGB >> 16) & 0xFF) / 255f;
 			final float green = (float)((ARGB >> 8) & 0xFF) / 255f;
 			final float blue = (float)((ARGB >> 0) & 0xFF) / 255f;
-			GlStateManager.color(red * brightness, green * brightness, blue * brightness, alpha);
+			GlStateManager.color4f(red * brightness, green * brightness, blue * brightness, alpha);
 			wolfRenderer.getMainModel().render(wolf, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
 		}
 	}

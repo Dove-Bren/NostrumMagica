@@ -198,9 +198,9 @@ import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelBakery;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.entity.Render;
@@ -210,14 +210,14 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
@@ -225,7 +225,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.ColorHandlerEvent;
@@ -243,10 +243,10 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ClientProxy extends CommonProxy {
 	
@@ -262,7 +262,7 @@ public class ClientProxy extends CommonProxy {
 	private OverlayRenderer overlayRenderer;
 	private ClientEffectRenderer effectRenderer;
 	
-	private @Nullable EntityLivingBase selectedPet; // Used for directing pets to do actions on key releases
+	private @Nullable LivingEntity selectedPet; // Used for directing pets to do actions on key releases
 
 	public ClientProxy() {
 		super();
@@ -721,7 +721,7 @@ public class ClientProxy extends CommonProxy {
 		}
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public static void onIconLoad(TextureStitchEvent.Pre event) {
 		// Maybe not needed. Copied from EnderIO when textures weren't showing up but found another issue (variants need [])
@@ -893,10 +893,10 @@ public class ClientProxy extends CommonProxy {
 		int wheel = event.getDwheel();
 		if (wheel != 0) {
 			
-			if (!NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().player)
+			if (!NostrumMagica.getMagicWrapper(Minecraft.getInstance().player)
 					.isUnlocked())
 				return;
-			ItemStack tome = NostrumMagica.getCurrentTome(Minecraft.getMinecraft().player);
+			ItemStack tome = NostrumMagica.getCurrentTome(Minecraft.getInstance().player);
 			if (!tome.isEmpty()) {
 				if (bindingScroll.isKeyDown()) {
 					wheel = (wheel > 0 ? -1 : 1);
@@ -916,22 +916,22 @@ public class ClientProxy extends CommonProxy {
 		if (bindingCast.isPressed())
 			doCast();
 		else if (bindingInfo.isPressed()) {
-			EntityPlayer player = Minecraft.getMinecraft().player;
+			PlayerEntity player = Minecraft.getInstance().player;
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			if (attr == null)
 				return;
-			Minecraft.getMinecraft().displayGuiScreen(new InfoScreen(attr, (String) null));
+			Minecraft.getInstance().displayGuiScreen(new InfoScreen(attr, (String) null));
 //			player.openGui(NostrumMagica.instance,
 //					NostrumGui.infoscreenID, player.world, 0, 0, 0);
-		} else if (Minecraft.getMinecraft().gameSettings.keyBindJump.isPressed()) {
-			EntityPlayer player = Minecraft.getMinecraft().player;
+		} else if (Minecraft.getInstance().gameSettings.keyBindJump.isPressed()) {
+			PlayerEntity player = Minecraft.getInstance().player;
 			if (player.isRiding() && player.getRidingEntity() instanceof EntityTameDragonRed) {
 				((EntityDragon) player.getRidingEntity()).dragonJump();
 			} else if (player.isRiding() && player.getRidingEntity() instanceof EntityArcaneWolf) {
 				((EntityArcaneWolf) player.getRidingEntity()).wolfJump();
 			}
 		} else if (bindingBladeCast.isPressed()) {
-			EntityPlayer player = Minecraft.getMinecraft().player;
+			PlayerEntity player = Minecraft.getInstance().player;
 			if (player.getCooledAttackStrength(0.5F) > .95) {
 				player.resetCooldown();
 				//player.swingArm(EnumHand.MAIN_HAND);
@@ -966,18 +966,18 @@ public class ClientProxy extends CommonProxy {
 			NetworkHandler.getSyncChannel().sendToServer(PetCommandMessage.AllTargetMode(next));
 		} else if (bindingPetAttackAll.isPressed()) {
 			// Raytrace, find tar get, and set all to attack
-			final EntityPlayer player = getPlayer();
+			final PlayerEntity player = getPlayer();
 			if (player != null && player.world != null) {
-				final float partialTicks = Minecraft.getMinecraft().getRenderPartialTicks();
-				final List<EntityLivingBase> tames = NostrumMagica.getTamedEntities(player);
+				final float partialTicks = Minecraft.getInstance().getRenderPartialTicks();
+				final List<LivingEntity> tames = NostrumMagica.getTamedEntities(player);
 				RayTraceResult result = RayTrace.raytraceApprox(
 						player.world,
-						player.getPositionEyes(partialTicks),
+						player.getEyePosition(partialTicks),
 						player.getLook(partialTicks),
-						100, (e) -> { return e != player && e instanceof EntityLivingBase && !player.isOnSameTeam(e) && !tames.contains(e);},
+						100, (e) -> { return e != player && e instanceof LivingEntity && !player.isOnSameTeam(e) && !tames.contains(e);},
 						1);
 				if (result != null && result.entityHit != null) {
-					NetworkHandler.getSyncChannel().sendToServer(PetCommandMessage.AllAttack((EntityLivingBase) result.entityHit));
+					NetworkHandler.getSyncChannel().sendToServer(PetCommandMessage.AllAttack((LivingEntity) result.entityHit));
 				}
 			}
 		} else if (bindingPetAttack.isPressed()) {
@@ -985,20 +985,20 @@ public class ClientProxy extends CommonProxy {
 			// Probably could be same button but if raytrace is our pet,
 			// have them hold it down and release on an enemy? Or 'select' them
 			// and have them press again to select enemy?
-			final EntityPlayer player = getPlayer();
+			final PlayerEntity player = getPlayer();
 			if (player != null && player.world != null) {
-				final float partialTicks = Minecraft.getMinecraft().getRenderPartialTicks();
-				final List<EntityLivingBase> tames = NostrumMagica.getTamedEntities(player);
+				final float partialTicks = Minecraft.getInstance().getRenderPartialTicks();
+				final List<LivingEntity> tames = NostrumMagica.getTamedEntities(player);
 				if (selectedPet == null) {
 					// Try and select a pet
 					RayTraceResult result = RayTrace.raytraceApprox(
 							player.world,
-							player.getPositionEyes(partialTicks),
+							player.getEyePosition(partialTicks),
 							player.getLook(partialTicks),
 							100, (e) -> { return e != player && tames.contains(e);},
 							.1);
 					if (result != null && result.entityHit != null) {
-						selectedPet = (EntityLivingBase) result.entityHit;
+						selectedPet = (LivingEntity) result.entityHit;
 						if (selectedPet.world.isRemote) {
 							selectedPet.setGlowing(true);
 						}
@@ -1007,12 +1007,12 @@ public class ClientProxy extends CommonProxy {
 					// Find target
 					RayTraceResult result = RayTrace.raytraceApprox(
 							player.world,
-							player.getPositionEyes(partialTicks),
+							player.getEyePosition(partialTicks),
 							player.getLook(partialTicks),
-							100, (e) -> { return e != player && e instanceof EntityLivingBase && !player.isOnSameTeam(e) && !tames.contains(e);},
+							100, (e) -> { return e != player && e instanceof LivingEntity && !player.isOnSameTeam(e) && !tames.contains(e);},
 							1);
 					if (result != null && result.entityHit != null) {
-						NetworkHandler.getSyncChannel().sendToServer(PetCommandMessage.PetAttack(selectedPet, (EntityLivingBase) result.entityHit));
+						NetworkHandler.getSyncChannel().sendToServer(PetCommandMessage.PetAttack(selectedPet, (LivingEntity) result.entityHit));
 					}
 					
 					// Clear out pet
@@ -1034,7 +1034,7 @@ public class ClientProxy extends CommonProxy {
 	
 	private void doCast() {
 		
-		Spell spell = NostrumMagica.getCurrentSpell(Minecraft.getMinecraft().player);
+		Spell spell = NostrumMagica.getCurrentSpell(Minecraft.getInstance().player);
 		if (spell == null) {
 			System.out.println("LOUD NULL SPELL"); // TODO remove
 			return;
@@ -1043,7 +1043,7 @@ public class ClientProxy extends CommonProxy {
 		// Do mana check here (it's also done on server)
 		// to stop redundant checks and get mana looking good
 		// on client side immediately
-		EntityPlayer player = Minecraft.getMinecraft().player;
+		PlayerEntity player = Minecraft.getInstance().player;
 		INostrumMagic att = NostrumMagica.getMagicWrapper(player);
 		int mana = att.getMana();
 		int cost = spell.getManaCost();
@@ -1060,7 +1060,7 @@ public class ClientProxy extends CommonProxy {
 			// Make sure it isn't too hard for the tome
 			int cap = SpellTome.getMaxMana(tome);
 			if (cap < cost) {
-				player.sendMessage(new TextComponentTranslation(
+				player.sendMessage(new TranslationTextComponent(
 						"info.spell.tome_weak", new Object[0]));
 				NostrumMagicaSounds.CAST_FAIL.play(player);
 				System.out.println("LOUD tome weak"); // TODO remove
@@ -1114,13 +1114,13 @@ public class ClientProxy extends CommonProxy {
 		Collection<ITameDragon> dragons = NostrumMagica.getNearbyTamedDragons(player, 32, true);
 		if (dragons != null && !dragons.isEmpty()) {
 			for (ITameDragon dragon : dragons) {
-				if (dragon.sharesMana(Minecraft.getMinecraft().player)) {
+				if (dragon.sharesMana(Minecraft.getInstance().player)) {
 					mana += dragon.getMana();
 				}
 			}
 		}
 		
-		if (!Minecraft.getMinecraft().player.isCreative()) {
+		if (!Minecraft.getInstance().player.isCreative()) {
 			// Check mana
 			if (mana < cost) {
 				
@@ -1146,19 +1146,19 @@ public class ClientProxy extends CommonProxy {
 			int maxTriggers = 1 + (att.getFinesse());
 			int maxElems = 1 + (3 * att.getControl());
 			if (spell.getComponentCount() > maxComps) {
-				player.sendMessage(new TextComponentTranslation(
+				player.sendMessage(new TranslationTextComponent(
 						"info.spell.low_tech", new Object[0]));
 				System.out.println("LOUD LOW TECH"); // TODO remove
 				NostrumMagicaSounds.CAST_FAIL.play(player);
 				return;
 			} else if (spell.getElementCount() > maxElems) {
-				player.sendMessage(new TextComponentTranslation(
+				player.sendMessage(new TranslationTextComponent(
 						"info.spell.low_control", new Object[0]));
 				System.out.println("LOUD LOW CONTROL"); // TODO remove
 				NostrumMagicaSounds.CAST_FAIL.play(player);
 				return;
 			} else if (spell.getTriggerCount() > maxTriggers) {
-				player.sendMessage(new TextComponentTranslation(
+				player.sendMessage(new TranslationTextComponent(
 						"info.spell.low_finesse", new Object[0]));
 				System.out.println("LOUD LOW FINESSE"); // TODO remove
 				NostrumMagicaSounds.CAST_FAIL.play(player);
@@ -1177,7 +1177,7 @@ public class ClientProxy extends CommonProxy {
 	    		if (level == 1) {
 	    			Boolean know = att.getKnownElements().get(elem);
 	    			if (know == null || !know) {
-	    				player.sendMessage(new TextComponentTranslation(
+	    				player.sendMessage(new TranslationTextComponent(
 								"info.spell.no_mastery", new Object[] {elem.getName()}));
 	    				System.out.println("LOUD NO MASTERY"); // TODO remove
 						NostrumMagicaSounds.CAST_FAIL.play(player);
@@ -1187,7 +1187,7 @@ public class ClientProxy extends CommonProxy {
 		    		Integer mast = att.getElementMastery().get(elem);
 		    		int mastery = (mast == null ? 0 : mast);
 		    		if (mastery < level) {
-		    			player.sendMessage(new TextComponentTranslation(
+		    			player.sendMessage(new TranslationTextComponent(
 							"info.spell.low_mastery", new Object[] {elem.getName(), level, mastery}));
 						NostrumMagicaSounds.CAST_FAIL.play(player);
 						return;
@@ -1202,7 +1202,7 @@ public class ClientProxy extends CommonProxy {
 				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
 					int count = NostrumMagica.getReagentCount(player, row.getKey());
 					if (count < row.getValue()) {
-						player.sendMessage(new TextComponentTranslation("info.spell.bad_reagent", row.getKey().prettyName()));
+						player.sendMessage(new TranslationTextComponent("info.spell.bad_reagent", row.getKey().prettyName()));
 						System.out.println("LOUD BAD REAGENT"); // TODO remove
 						return;
 					}
@@ -1212,7 +1212,7 @@ public class ClientProxy extends CommonProxy {
 				// Response from server will result in deduct if it goes through
 			}
 			
-			NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().player)
+			NostrumMagica.getMagicWrapper(Minecraft.getInstance().player)
 				.addMana(-cost);
 		}
 		
@@ -1221,7 +1221,7 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public void syncPlayer(EntityPlayerMP player) {
+	public void syncPlayer(ServerPlayerEntity player) {
 		if (player.world.isRemote)
 			return;
 		
@@ -1229,8 +1229,8 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public EntityPlayer getPlayer() {
-		return Minecraft.getMinecraft().player;
+	public PlayerEntity getPlayer() {
+		return Minecraft.getInstance().player;
 	}
 	
 	private INostrumMagic overrides = null;
@@ -1238,15 +1238,15 @@ public class ClientProxy extends CommonProxy {
 	public void receiveStatOverrides(INostrumMagic override) {
 		// If we can look up stats, apply them.
 		// Otherwise, stash them for loading when we apply attributes
-		EntityPlayer player = Minecraft.getMinecraft().player;
+		PlayerEntity player = Minecraft.getInstance().player;
 		INostrumMagic existing = NostrumMagica.getMagicWrapper(player);
 		if (existing != null && !player.isDead) {
 			// apply them
 			existing.copy(override);
 			
 			// If we're on a screen that cares, refresh it
-			if (Minecraft.getMinecraft().currentScreen instanceof MirrorGui) {
-				((MirrorGui) Minecraft.getMinecraft().currentScreen).refresh();
+			if (Minecraft.getInstance().currentScreen instanceof MirrorGui) {
+				((MirrorGui) Minecraft.getInstance().currentScreen).refresh();
 			}
 		} else {
 			// Stash them
@@ -1259,7 +1259,7 @@ public class ClientProxy extends CommonProxy {
 		if (overrides == null)
 			return;
 		
-		INostrumMagic existing = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().player);
+		INostrumMagic existing = NostrumMagica.getMagicWrapper(Minecraft.getInstance().player);
 		
 		if (existing == null)
 			return; // Mana got here before we attached
@@ -1275,12 +1275,12 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public void openBook(EntityPlayer player, GuiBook book, Object userdata) {
-		Minecraft.getMinecraft().displayGuiScreen(book.getScreen(userdata));
+	public void openBook(PlayerEntity player, GuiBook book, Object userdata) {
+		Minecraft.getInstance().displayGuiScreen(book.getScreen(userdata));
 	}
 	
 	@Override
-	public void openPetGUI(EntityPlayer player, IEntityPet pet) {
+	public void openPetGUI(PlayerEntity player, IEntityPet pet) {
 		// Integrated clients still need to open the gui...
 		//if (!player.world.isRemote) {
 //			DragonContainer container = dragon.getGUIContainer();
@@ -1291,12 +1291,12 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public void sendServerConfig(EntityPlayerMP player) {
+	public void sendServerConfig(ServerPlayerEntity player) {
 		; //do nothing on client side
 	}
 	
 	@Override
-	public void sendSpellDebug(EntityPlayer player, ITextComponent comp) {
+	public void sendSpellDebug(PlayerEntity player, ITextComponent comp) {
 		if (!player.world.isRemote) {
 			super.sendSpellDebug(player, comp);
 		}
@@ -1325,7 +1325,7 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public void requestStats(EntityLivingBase entity) {
+	public void requestStats(LivingEntity entity) {
 		NetworkHandler.getSyncChannel().sendToServer(
 				new StatRequestMessage()
 				);
@@ -1454,7 +1454,7 @@ public class ClientProxy extends CommonProxy {
 //						NostrumMagica.MODID, "effect/" + key + ".obj"
 //						));
 //				IBakedModel bakedModel = model.bake(TRSRTransformation.identity(), DefaultVertexFormats.ITEM, 
-//	    				(location) -> {return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString());});
+//	    				(location) -> {return Minecraft.getInstance().getTextureMapBlocks().getAtlasSprite(location.toString());});
 //	    		event.getModelRegistry().putObject(
 //	    				new ModelResourceLocation(NostrumMagica.MODID + ":effects/" + key, "normal"),
 //	    				bakedModel);
@@ -1465,7 +1465,7 @@ public class ClientProxy extends CommonProxy {
 //    	}
     	
     	MimicBlockBakedModel model = new MimicBlockBakedModel();
-    	for (EnumFacing facing : EnumFacing.values()) {
+    	for (Direction facing : Direction.values()) {
     		event.getModelRegistry().putObject(new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_DOOR), "facing=" + facing.name().toLowerCase() + ",unbreakable=false"),
     				model);
     		event.getModelRegistry().putObject(new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_DOOR), "facing=" + facing.name().toLowerCase() + ",unbreakable=true"),
@@ -1909,8 +1909,8 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public void spawnEffect(World world, SpellComponentWrapper comp,
-			EntityLivingBase caster, Vec3d casterPos,
-			EntityLivingBase target, Vec3d targetPos,
+			LivingEntity caster, Vec3d casterPos,
+			LivingEntity target, Vec3d targetPos,
 			SpellComponentWrapper flavor, boolean isNegative, float compParam) {
 		if (world == null && target != null) {
 			world = target.world;
@@ -1932,7 +1932,7 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public void updateEntityEffect(EntityPlayerMP player, EntityLivingBase entity, SpecialEffect effectType, EffectData data) {
+	public void updateEntityEffect(ServerPlayerEntity player, LivingEntity entity, SpecialEffect effectType, EffectData data) {
 		return;
 	}
 	
@@ -1940,9 +1940,9 @@ public class ClientProxy extends CommonProxy {
 	@SubscribeEvent
 	public void onClientConnect(EntityJoinWorldEvent event) {
 		if (ClientProxy.shownText == false && ModConfig.config.displayLoginText()
-				&& event.getEntity() == Minecraft.getMinecraft().player) {
-			Minecraft.getMinecraft().player.sendMessage(
-					new TextComponentTranslation("info.nostrumwelcome.text", new Object[]{
+				&& event.getEntity() == Minecraft.getInstance().player) {
+			Minecraft.getInstance().player.sendMessage(
+					new TranslationTextComponent("info.nostrumwelcome.text", new Object[]{
 							this.bindingInfo.getDisplayName()
 					}));
 			ClientProxy.shownText = true;
@@ -1950,7 +1950,7 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public void sendMana(EntityPlayer player) {
+	public void sendMana(PlayerEntity player) {
 		if (player.world.isRemote) {
 			return;
 		}
@@ -1959,7 +1959,7 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public void sendManaArmorCapability(EntityPlayer player) {
+	public void sendManaArmorCapability(PlayerEntity player) {
 		if (player.world.isRemote) {
 			return;
 		}
@@ -1985,7 +1985,7 @@ public class ClientProxy extends CommonProxy {
 		super.playRitualEffect(world, pos, element, center, extras, types, output);
 	}
 	
-	public @Nullable EntityLivingBase getCurrentPet() {
+	public @Nullable LivingEntity getCurrentPet() {
 		return this.selectedPet;
 	}
 }

@@ -1,15 +1,16 @@
 package com.smanzana.nostrummagica.client.gui.infoscreen;
 
-import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import net.minecraft.client.gui.widget.button.AbstractButton;
 
-import net.minecraft.client.gui.GuiButton;
+public abstract class ISubScreenButton extends AbstractButton {
 
-public abstract class ISubScreenButton extends GuiButton {
-
-	public ISubScreenButton(int buttonId, int x, int y) {
-		super(buttonId, x, y, "");
+	protected final InfoScreen screen;
+	
+	public ISubScreenButton(InfoScreen screen, int x, int y) {
+		super(x, y, 200, 20, "");
+		this.screen = screen;
 	}
 
-	public abstract void onClick(INostrumMagic attr);
+	public abstract void onPress();
 	
 }

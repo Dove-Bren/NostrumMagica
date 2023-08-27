@@ -19,12 +19,12 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * Represents a piece of research a player can complete.
@@ -215,7 +215,7 @@ public class NostrumResearch {
 	 * Note: This doesn't deduct research points from the player.
 	 * @param research
 	 */
-	public static void unlockResearch(EntityPlayer player, NostrumResearch research) {
+	public static void unlockResearch(PlayerEntity player, NostrumResearch research) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
 			return;
@@ -230,7 +230,7 @@ public class NostrumResearch {
 			NostrumMagicaSounds.SUCCESS_RESEARCH.play(player.world, player.posX, player.posY, player.posZ);
 			NostrumMagicaSounds.UI_RESEARCH.play(player.world, player.posX, player.posY, player.posZ);
 		} else {
-			NostrumMagica.proxy.syncPlayer((EntityPlayerMP) player);
+			NostrumMagica.proxy.syncPlayer((ServerPlayerEntity) player);
 		}
 	}
 
@@ -300,9 +300,9 @@ public class NostrumResearch {
 		
 		public Builder reference(Item item) {
 			if (item instanceof InfoScreenIndexed) {
-				return this.reference((InfoScreenIndexed) item, item.getUnlocalizedName() + ".name");
+				return this.reference((InfoScreenIndexed) item, item.getTranslationKey() + ".name");
 			} else if (item instanceof ILoreTagged) {
-				return this.reference(ILoreTagged.GetInfoKey((ILoreTagged) item), item.getUnlocalizedName() + ".name");
+				return this.reference(ILoreTagged.GetInfoKey((ILoreTagged) item), item.getTranslationKey() + ".name");
 			} else {
 				NostrumMagica.logger.error("Provided item reference does not extend the required interfaces (ILoreTagged or InfoScreenIndexed) and cannot be a reference");
 				return this;
@@ -517,17 +517,17 @@ public class NostrumResearch {
 			return "research.tab." + key + ".name";
 		}
 		
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		public void markHasNew() {
 			hasNew = true;
 		}
 		
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		public void clearNew() {
 			hasNew = false;
 		}
 		
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		public boolean hasNew() {
 			return hasNew;
 		}

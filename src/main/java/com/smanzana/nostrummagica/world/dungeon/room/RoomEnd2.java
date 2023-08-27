@@ -10,7 +10,7 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.block.BlockTorch;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 public class RoomEnd2 extends StaticRoom {
@@ -66,8 +66,8 @@ public class RoomEnd2 extends StaticRoom {
 				"XXXXXXXXXX",
 				'X', DungeonBlock.instance(),
 				'C', new BlockState(Blocks.CARPET, 14),
-				'N', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.NORTH)),
-				'S', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.SOUTH)),
+				'N', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.NORTH)),
+				'S', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.SOUTH)),
 				' ', null,
 				'M', new BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.GOLEM_PHYSICAL.ordinal()),
 				'O', withChest ? null : DungeonBlock.instance());
@@ -120,11 +120,11 @@ public class RoomEnd2 extends StaticRoom {
 		List<DungeonExitPoint> list = new LinkedList<>();
 		
 		list.add(NostrumDungeon.asRotated(start,
-				new BlockPos(5, 0, 6), EnumFacing.NORTH));
+				new BlockPos(5, 0, 6), Direction.NORTH));
 		
 		if (withChest)
 			list.add(NostrumDungeon.asRotated(start,
-					new BlockPos(2, 0, 4), EnumFacing.WEST)
+					new BlockPos(2, 0, 4), Direction.WEST)
 				);
 		
 		return list;

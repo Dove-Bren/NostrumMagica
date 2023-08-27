@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.config.ModConfig;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -38,7 +38,7 @@ public class SpellDebugMessage implements IMessage {
 			
 			final ITextComponent text = ITextComponent.Serializer.jsonToComponent(chat);
 			
-			Minecraft.getMinecraft().addScheduledTask(() -> {
+			Minecraft.getInstance().runAsync(() -> {
 				NostrumMagica.proxy.getPlayer().sendMessage(text);
 			});
 			
@@ -52,16 +52,16 @@ public class SpellDebugMessage implements IMessage {
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public SpellDebugMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	public SpellDebugMessage(ITextComponent comp) {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 		
-		tag.setString(NBT_CHAT, ITextComponent.Serializer.componentToJson(comp));
+		tag.putString(NBT_CHAT, ITextComponent.Serializer.componentToJson(comp));
 	}
 
 	@Override

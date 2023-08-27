@@ -14,15 +14,15 @@ import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -53,12 +53,12 @@ public class ItemDuct extends BlockContainer {
 	protected static final AxisAlignedBB EAST_AABB = new AxisAlignedBB(.5 + INNER_RADIUS, .5 - INNER_RADIUS, .5 - INNER_RADIUS, 1, .5 + INNER_RADIUS, .5 + INNER_RADIUS);
 	protected static final AxisAlignedBB UP_AABB = new AxisAlignedBB(.5 - INNER_RADIUS, .5 - INNER_RADIUS, .5 + INNER_RADIUS, .5 + INNER_RADIUS, .5 + INNER_RADIUS, 1);
 	protected static final AxisAlignedBB DOWN_AABB = new AxisAlignedBB(.5 + INNER_RADIUS, .5 - INNER_RADIUS, 0, 1, .5 + INNER_RADIUS, .5 - INNER_RADIUS);
-	protected static final AxisAlignedBB SIDE_AABBs[] = {DOWN_AABB, UP_AABB, NORTH_AABB, SOUTH_AABB, WEST_AABB, EAST_AABB}; // EnumFacing 'index' is index
+	protected static final AxisAlignedBB SIDE_AABBs[] = {DOWN_AABB, UP_AABB, NORTH_AABB, SOUTH_AABB, WEST_AABB, EAST_AABB}; // Direction 'index' is index
 	
 	// Large static pre-made set of selection AABBs.
 	// This is an array like fence has where index is bit field of different options.
 	// these are:
-	// D U N S W E (the EnumFacing 'index's)
+	// D U N S W E (the Direction 'index's)
 	// so the BB for a duct with north and east is [001001] (9)
 	protected static final AxisAlignedBB SELECTION_AABS[] = {
 			new AxisAlignedBB(0.3125, 0.3125, 0.3125, 0.6875, 0.6875, 0.6875),
@@ -145,7 +145,7 @@ public class ItemDuct extends BlockContainer {
 				.withProperty(DOWN, false));
 	}
 	
-	public static boolean GetFacingActive(IBlockState state, EnumFacing face) {
+	public static boolean GetFacingActive(IBlockState state, Direction face) {
 		switch (face) {
 		case DOWN:
 			return state.getValue(DOWN);
@@ -185,22 +185,22 @@ public class ItemDuct extends BlockContainer {
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+	public IBlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer) {
 		return super.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, placer);
 	}
 	
 	@Override
 	public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
 		return state
-				.withProperty(NORTH, canConnect(worldIn, pos, EnumFacing.NORTH))
-				.withProperty(SOUTH, canConnect(worldIn, pos, EnumFacing.SOUTH))
-				.withProperty(EAST, canConnect(worldIn, pos, EnumFacing.EAST))
-				.withProperty(WEST, canConnect(worldIn, pos, EnumFacing.WEST))
-				.withProperty(UP, canConnect(worldIn, pos, EnumFacing.UP))
-				.withProperty(DOWN, canConnect(worldIn, pos, EnumFacing.DOWN));
+				.withProperty(NORTH, canConnect(worldIn, pos, Direction.NORTH))
+				.withProperty(SOUTH, canConnect(worldIn, pos, Direction.SOUTH))
+				.withProperty(EAST, canConnect(worldIn, pos, Direction.EAST))
+				.withProperty(WEST, canConnect(worldIn, pos, Direction.WEST))
+				.withProperty(UP, canConnect(worldIn, pos, Direction.UP))
+				.withProperty(DOWN, canConnect(worldIn, pos, Direction.DOWN));
 	}
 	
-	protected boolean canConnect(IBlockAccess world, BlockPos centerPos, EnumFacing direction) {
+	protected boolean canConnect(IBlockAccess world, BlockPos centerPos, Direction direction) {
 		// Should be whether there's another pipe or anything else with an inventory?
 		final BlockPos atPos = centerPos.offset(direction);
 		@Nullable TileEntity te = world.getTileEntity(atPos);
@@ -226,7 +226,7 @@ public class ItemDuct extends BlockContainer {
 		final IBlockState actualState = state.getActualState(source, pos);
 		
 		int index = 0;
-		for (EnumFacing face : EnumFacing.VALUES) {
+		for (Direction face : Direction.VALUES) {
 			if (GetFacingActive(actualState, face)) {
 				index |= (1 << (5 - face.getIndex()));
 			}
@@ -238,7 +238,7 @@ public class ItemDuct extends BlockContainer {
 	@Override
 	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
 		addCollisionBoxToList(pos, entityBox, collidingBoxes, BASE_AABB);
-		for (EnumFacing dir : EnumFacing.VALUES) {
+		for (Direction dir : Direction.VALUES) {
 			if (GetFacingActive(state.getActualState(worldIn, pos), dir)) {
 				addCollisionBoxToList(pos, entityBox, collidingBoxes, SIDE_AABBs[dir.getIndex()]);
 			}
@@ -291,7 +291,7 @@ public class ItemDuct extends BlockContainer {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
 //		playerIn.openGui(NostrumMagica.instance,
 //				NostrumGui.activeHopperID, worldIn,
 //				pos.getX(), pos.getY(), pos.getZ());

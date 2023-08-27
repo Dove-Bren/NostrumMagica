@@ -17,11 +17,11 @@ import com.smanzana.nostrummagica.utils.RayTrace;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
@@ -62,14 +62,14 @@ public class MortarTrigger extends SpellTrigger {
 		}
 		
 		@Override
-		public void init(EntityLivingBase caster) {
+		public void init(LivingEntity caster) {
 			
 			// Do a little more work of getting a good vector for things
 			// that aren't players
 			final Vec3d dir;
-			final EntityLivingBase target;
-			if (caster instanceof EntityLiving && ((EntityLiving) caster).getAttackTarget() != null) {
-				EntityLiving ent = (EntityLiving) caster  ;
+			final LivingEntity target;
+			if (caster instanceof MobEntity && ((MobEntity) caster).getAttackTarget() != null) {
+				MobEntity ent = (MobEntity) caster  ;
 				target = ent.getAttackTarget(); // We already know target
 				dir = null;
 			} else {
@@ -80,7 +80,7 @@ public class MortarTrigger extends SpellTrigger {
 			
 			final MortarTriggerInstance self = this;
 			
-			caster.getServer().addScheduledTask(new Runnable() {
+			caster.getServer().runAsync(new Runnable() {
 			
 				@Override
 				public void run() {
@@ -117,11 +117,11 @@ public class MortarTrigger extends SpellTrigger {
 						cursor.setPos(dest.x, dest.y + 3, dest.z); // start 3 above; best we can do
 						
 						for (int i = 0; i < 7; i++) {
-							cursor.move(EnumFacing.UP);
+							cursor.move(Direction.UP);
 							IBlockState state = world.getBlockState(cursor);
 							if (!(state.getBlock() instanceof DungeonAir) && world.isBlockNormalCube(cursor, false)) {
 								// can't go here. Go back down and bail
-								cursor.move(EnumFacing.DOWN);
+								cursor.move(Direction.DOWN);
 								break;
 							}
 						}

@@ -5,13 +5,13 @@ import com.smanzana.nostrummagica.items.PetSoulItem;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 public class OutcomeReviveSoulboundPet extends OutcomeSpawnEntity {
@@ -19,8 +19,8 @@ public class OutcomeReviveSoulboundPet extends OutcomeSpawnEntity {
 	public OutcomeReviveSoulboundPet() {
 		super(new IEntityFactory() {
 			@Override
-			public void spawn(World world, Vec3d pos, EntityPlayer invoker, ItemStack centerItem) {
-				PetSoulItem.SpawnPet(centerItem, world, pos.addVector(0, 1, 0));
+			public void spawn(World world, Vec3d pos, PlayerEntity invoker, ItemStack centerItem) {
+				PetSoulItem.SpawnPet(centerItem, world, pos.add(0, 1, 0));
 //				EntityKoid koid = new EntityKoid(world);
 //				koid.setPosition(pos.x, pos.y, pos.z);
 //				world.spawnEntity(koid);
@@ -35,7 +35,7 @@ public class OutcomeReviveSoulboundPet extends OutcomeSpawnEntity {
 	}
 	
 	@Override
-	public void perform(World world, EntityPlayer player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, PlayerEntity player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
 		if (world.isRemote)
 			return;
 		
@@ -50,16 +50,16 @@ public class OutcomeReviveSoulboundPet extends OutcomeSpawnEntity {
 	}
 	
 	@Override
-	public boolean canPerform(World world, EntityPlayer player, BlockPos center, RitualMatchInfo ingredients) {
+	public boolean canPerform(World world, PlayerEntity player, BlockPos center, RitualMatchInfo ingredients) {
 		// Must have PetSoulItem in center, and must have valid soul.
 		if (ingredients.center.isEmpty() || !(ingredients.center.getItem() instanceof PetSoulItem)) {
-			player.sendMessage(new TextComponentTranslation("info.respawn_soulbound_pet.fail.baditem", new Object[0]));
+			player.sendMessage(new TranslationTextComponent("info.respawn_soulbound_pet.fail.baditem", new Object[0]));
 			return false;
 		}
 		
 		PetSoulItem item = (PetSoulItem) ingredients.center.getItem();
 		if (item.getPetSoulID(ingredients.center) == null) {
-			player.sendMessage(new TextComponentTranslation("info.respawn_soulbound_pet.fail.baditem", new Object[0]));
+			player.sendMessage(new TranslationTextComponent("info.respawn_soulbound_pet.fail.baditem", new Object[0]));
 			return false;
 		}
 		

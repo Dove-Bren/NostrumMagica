@@ -15,16 +15,16 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.PetCommandSettingsSyncMessage;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IEntityOwnable;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.world.storage.WorldSavedData;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * Pet command and settings manager.
@@ -51,18 +51,18 @@ public class PetCommandManager extends WorldSavedData {
 			targetMode = PetTargetMode.FREE;
 		}
 		
-		public NBTTagCompound writeToNBT(@Nullable NBTTagCompound nbt) {
+		public CompoundNBT writeToNBT(@Nullable CompoundNBT nbt) {
 			if (nbt == null) {
-				nbt = new NBTTagCompound();
+				nbt = new CompoundNBT();
 			}
 			
-			nbt.setString(NBT_ENTRY_PLACEMENT, placementMode.name());
-			nbt.setString(NBT_ENTRY_TARGET, targetMode.name());
+			nbt.putString(NBT_ENTRY_PLACEMENT, placementMode.name());
+			nbt.putString(NBT_ENTRY_TARGET, targetMode.name());
 			
 			return nbt;
 		}
 		
-		public static PetCommandSettings FromNBT(NBTTagCompound nbt) {
+		public static PetCommandSettings FromNBT(CompoundNBT nbt) {
 			PetCommandSettings settings = new PetCommandSettings();
 			
 			try {
@@ -97,12 +97,12 @@ public class PetCommandManager extends WorldSavedData {
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(CompoundNBT nbt) {
 		synchronized(playerSettings) {
 			playerSettings.clear();
 			
-			NBTTagCompound subtag = nbt.getCompoundTag(NBT_SETTINGS);
-			for (String key : subtag.getKeySet()) {
+			CompoundNBT subtag = nbt.getCompound(NBT_SETTINGS);
+			for (String key : subtag.keySet()) {
 				UUID uuid = null;
 				try {
 					uuid = UUID.fromString(key);
@@ -115,26 +115,26 @@ public class PetCommandManager extends WorldSavedData {
 					continue;
 				}
 				
-				playerSettings.put(uuid, PetCommandSettings.FromNBT(subtag.getCompoundTag(key)));
+				playerSettings.put(uuid, PetCommandSettings.FromNBT(subtag.getCompound(key)));
 			}
 		}
 	}
 	
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+	public CompoundNBT writeToNBT(CompoundNBT compound) {
 		synchronized(playerSettings) {
-			NBTTagCompound subtag = new NBTTagCompound();
+			CompoundNBT subtag = new CompoundNBT();
 			for (Entry<UUID, PetCommandSettings> entry : playerSettings.entrySet()) {
-				subtag.setTag(entry.getKey().toString(), entry.getValue().writeToNBT(null));
+				subtag.put(entry.getKey().toString(), entry.getValue().writeToNBT(null));
 			}
-			compound.setTag(NBT_SETTINGS, subtag);
+			compound.put(NBT_SETTINGS, subtag);
 		}
 		
 		return compound;
 	}
 	
-	@SideOnly(Side.CLIENT)
-	public void overrideClientSettings(NBTTagCompound settingsNBT) {
+	@OnlyIn(Dist.CLIENT)
+	public void overrideClientSettings(CompoundNBT settingsNBT) {
 		PetCommandSettings settings = PetCommandSettings.FromNBT(settingsNBT);
 		final UUID ID = NostrumMagica.proxy.getPlayer().getUniqueID();
 		synchronized(playerSettings) {
@@ -142,8 +142,8 @@ public class PetCommandManager extends WorldSavedData {
 		}
 	}
 	
-	protected NBTTagCompound generateClientSettings(UUID clientID) {
-		NBTTagCompound nbt = new NBTTagCompound();
+	protected CompoundNBT generateClientSettings(UUID clientID) {
+		CompoundNBT nbt = new CompoundNBT();
 		
 		PetCommandSettings settings = getSettings(clientID);
 		nbt = settings.writeToNBT(nbt);
@@ -159,9 +159,9 @@ public class PetCommandManager extends WorldSavedData {
 		
 		NetworkHandler.getSyncChannel().sendTo(
 				new PetCommandSettingsSyncMessage(generateClientSettings(event.player.getUniqueID())),
-				(EntityPlayerMP) event.player);
+				(ServerPlayerEntity) event.player);
 		
-		NostrumMagica.proxy.syncPlayer((EntityPlayerMP) event.player);
+		NostrumMagica.proxy.syncPlayer((ServerPlayerEntity) event.player);
 	}
 	
 	protected @Nonnull PetCommandSettings getSettings(@Nonnull UUID uuid) {
@@ -173,7 +173,7 @@ public class PetCommandManager extends WorldSavedData {
 		return settings == null ? PetCommandSettings.Empty : settings;
 	}
 	
-	public PetPlacementMode getPlacementMode(EntityLivingBase entity) {
+	public PetPlacementMode getPlacementMode(LivingEntity entity) {
 		return getPlacementMode(entity.getUniqueID());
 	}
 	
@@ -182,7 +182,7 @@ public class PetCommandManager extends WorldSavedData {
 		return settings.placementMode;
 	}
 	
-	public PetTargetMode getTargetMode(EntityLivingBase entity) {
+	public PetTargetMode getTargetMode(LivingEntity entity) {
 		return getTargetMode(entity.getUniqueID());
 	}
 	
@@ -191,7 +191,7 @@ public class PetCommandManager extends WorldSavedData {
 		return settings.targetMode;
 	}
 	
-	public void setPlacementMode(EntityLivingBase entity, PetPlacementMode mode) {
+	public void setPlacementMode(LivingEntity entity, PetPlacementMode mode) {
 		setPlacementMode(entity.getUniqueID(), mode);
 	}
 	
@@ -209,7 +209,7 @@ public class PetCommandManager extends WorldSavedData {
 		this.markDirty();
 	}
 	
-	public void setTargetMode(EntityLivingBase entity, PetTargetMode mode) {
+	public void setTargetMode(LivingEntity entity, PetTargetMode mode) {
 		setTargetMode(entity.getUniqueID(), mode);
 	}
 	
@@ -227,7 +227,7 @@ public class PetCommandManager extends WorldSavedData {
 		this.markDirty();
 	}
 	
-	public void commandToAttack(EntityLivingBase owner, IEntityPet pet, EntityLivingBase target) {
+	public void commandToAttack(LivingEntity owner, IEntityPet pet, LivingEntity target) {
 		if (!owner.equals(pet.getOwner())) {
 			return;
 		}
@@ -235,7 +235,7 @@ public class PetCommandManager extends WorldSavedData {
 		pet.onAttackCommand(target);
 	}
 	
-	public void commandToAttack(EntityLivingBase owner, EntityLiving pet, EntityLivingBase target) {
+	public void commandToAttack(LivingEntity owner, MobEntity pet, LivingEntity target) {
 		if (pet instanceof IEntityPet) {
 			commandToAttack(owner, (IEntityPet) pet, target);
 			return;
@@ -250,8 +250,8 @@ public class PetCommandManager extends WorldSavedData {
 		pet.setAttackTarget(target);
 	}
 	
-	protected void forAllOwned(EntityLivingBase owner, Function<Entity, Integer> petAction) {
-		for (EntityLivingBase e : NostrumMagica.getTamedEntities(owner)) {
+	protected void forAllOwned(LivingEntity owner, Function<Entity, Integer> petAction) {
+		for (LivingEntity e : NostrumMagica.getTamedEntities(owner)) {
 			if (owner.getDistance(e) > 100) {
 				continue;
 			}
@@ -260,23 +260,23 @@ public class PetCommandManager extends WorldSavedData {
 		}
 	}
 	
-	public void commandAllToAttack(EntityLivingBase owner, EntityLivingBase target) {
+	public void commandAllToAttack(LivingEntity owner, LivingEntity target) {
 		forAllOwned(owner, (e) -> {
 			if (e instanceof IEntityPet) {
 				((IEntityPet) e).onAttackCommand(target);
-			} else if (e instanceof EntityLiving) {
-				((EntityLiving) e).setAttackTarget(target);
+			} else if (e instanceof MobEntity) {
+				((MobEntity) e).setAttackTarget(target);
 			}
 			return 0;
 		});
 	}
 	
-	public void commandAllStopAttacking(EntityLivingBase owner) {
+	public void commandAllStopAttacking(LivingEntity owner) {
 		forAllOwned(owner, (e) -> {
 			if (e instanceof IEntityPet) {
 				((IEntityPet) e).onStopCommand();
-			} else if (e instanceof EntityLiving) {
-				((EntityLiving) e).setAttackTarget(null);
+			} else if (e instanceof MobEntity) {
+				((MobEntity) e).setAttackTarget(null);
 			}
 			return 0;
 		});

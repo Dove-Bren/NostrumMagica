@@ -6,7 +6,7 @@ import com.google.common.collect.Sets;
 
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.ai.EntityAITempt;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.PathNavigateGround;
@@ -28,7 +28,7 @@ public class EntityAITemptGeneric extends EntityAITempt
 	/** Tempting player's yaw */
 	protected double yaw;
 	/** The player that is tempting the entity that is using this AI. */
-	protected EntityPlayer temptingPlayer;
+	protected PlayerEntity temptingPlayer;
 	/**
 	 * A counter that is decremented each time the shouldExecute method is called. The shouldExecute method will always
 	 * return false if delayTemptCounter is greater than 0.
@@ -125,7 +125,7 @@ public class EntityAITemptGeneric extends EntityAITempt
 		this.isRunning = false;
 	}
 	
-	protected void moveToTemptingPlayer(EntityCreature tempted, EntityPlayer player) {
+	protected void moveToTemptingPlayer(EntityCreature tempted, PlayerEntity player) {
 		if (this.temptedEntity.getDistanceSq(this.temptingPlayer) < 6.25D) {
 			this.temptedEntity.getNavigator().clearPath();
 		} else {

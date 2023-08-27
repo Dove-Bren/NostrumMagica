@@ -17,10 +17,10 @@ import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 
 public class ObjectiveSpellCast implements IObjective, ICastListener {
 	
@@ -34,14 +34,14 @@ public class ObjectiveSpellCast implements IObjective, ICastListener {
 		}
 		
 		@Override
-		public NBTTagCompound toNBT() {
-			NBTTagCompound tag = new NBTTagCompound();
-			tag.setBoolean(KEY, state);
+		public CompoundNBT toNBT() {
+			CompoundNBT tag = new CompoundNBT();
+			tag.putBoolean(KEY, state);
 			return tag;
 		}
 
 		@Override
-		public void fromNBT(NBTTagCompound nbt) {
+		public void fromNBT(CompoundNBT nbt) {
 			this.state = nbt.getBoolean(KEY);
 		}
 	}
@@ -135,9 +135,9 @@ public class ObjectiveSpellCast implements IObjective, ICastListener {
 	}
 
 	@Override
-	public void onCast(EntityLivingBase entity, Spell spell) {
+	public void onCast(LivingEntity entity, Spell spell) {
 		
-		if (entity instanceof EntityPlayer) {
+		if (entity instanceof PlayerEntity) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
 			if (attr == null)
 				return;
@@ -163,7 +163,7 @@ public class ObjectiveSpellCast implements IObjective, ICastListener {
 				if (changed && !entity.world.isRemote) {
 					// Spells are cast on the server, so sync to client quest state
 					NetworkHandler.getSyncChannel().sendTo(
-							new StatSyncMessage(attr), (EntityPlayerMP) entity);
+							new StatSyncMessage(attr), (ServerPlayerEntity) entity);
 				}
 					
 			}

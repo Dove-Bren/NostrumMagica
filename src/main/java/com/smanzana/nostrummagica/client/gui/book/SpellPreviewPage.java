@@ -4,26 +4,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.lwjgl.input.Keyboard;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
+import com.smanzana.nostrummagica.client.gui.ScrollScreen;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientTomeDropSpellMessage;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.util.InputMappings;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.client.config.GuiUtils;
 
@@ -60,22 +61,23 @@ public class SpellPreviewPage implements IClickableBookPage {
 		yoffset += 5;
 		height -= 5;
 		
-		INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().player);
+		Minecraft mc = Minecraft.getInstance();
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(mc.player);
 		
 		GL11.glPushMatrix();
-		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-		Gui.drawRect(xoffset, yoffset, xoffset + width, yoffset + height, 0x40000000);
+		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+		RenderFuncs.drawRect(xoffset, yoffset, xoffset + width, yoffset + height, 0x40000000);
 		
 		// Draw element icon
 		//SpellComponentIcon elementIcon = SpellComponentIcon.get(spell.getPrimaryElement());
 		SpellIcon icon = SpellIcon.get(spell.getIconIndex());
 		int icony = yoffset + (height / 2) + (-12);
-		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-		icon.render(Minecraft.getMinecraft(), xoffset + 4, icony, 24, 24);
+		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+		icon.render(Minecraft.getInstance(), xoffset + 4, icony, 24, 24);
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(xoffset + 32, yoffset + 2, 0);
-		GlStateManager.scale(.7, .7, 1);
+		GlStateManager.translatef(xoffset + 32, yoffset + 2, 0);
+		GlStateManager.scalef(.7f, .7f, 1);
 		
 		fonter.drawString(spell.getName(), 0, 0, spell.getPrimaryElement().getColor());
 		yoffset = fonter.FONT_HEIGHT + 3;
@@ -98,19 +100,17 @@ public class SpellPreviewPage implements IClickableBookPage {
 
 	@Override
 	public void overlay(BookScreen parent, FontRenderer fonter, int mouseX, int mouseY, int trueX, int trueY) {
-		ScaledResolution res = new ScaledResolution(Minecraft.getMinecraft());
-		GuiUtils.drawHoveringText(tooltip, trueX, trueY, res.getScaledWidth(), res.getScaledHeight(), 200, fonter);
+		Minecraft mc = Minecraft.getInstance();
+		GuiUtils.drawHoveringText(tooltip, trueX, trueY, mc.mainWindow.getScaledWidth(), mc.mainWindow.getScaledHeight(), 200, fonter);
 	}
 
 	@Override
-	public boolean onClick(BookScreen parent, int mouseX, int mouseY, int button) {
-		EntityPlayer player = NostrumMagica.proxy.getPlayer();
+	public boolean onClick(BookScreen parent, double mouseX, double mouseY, int button) {
+		PlayerEntity player = NostrumMagica.proxy.getPlayer();
 		
 		if (button == 0) {
-			player.openGui(NostrumMagica.instance,
-					NostrumGui.scrollID, player.world,
-					spell.getRegistryID(), (int) player.posY, (int) player.posZ);
-		} else if (button == 1 && Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
+			Minecraft.getInstance().displayGuiScreen(new ScrollScreen(spell));
+		} else if (button == 1 && InputMappings.isKeyDown(Minecraft.getInstance().mainWindow.getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT)) {
 			// Fake on client
 			SpellTome.removeSpell(tome, spell.getRegistryID());
 			NostrumMagica.proxy.openBook(player, (SpellTome) tome.getItem(), tome);

@@ -4,7 +4,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -35,11 +35,11 @@ public class ServerConfigMessage implements IMessage {
 		
 	}
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	
 	public ServerConfigMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	public ServerConfigMessage(ModConfig config) {

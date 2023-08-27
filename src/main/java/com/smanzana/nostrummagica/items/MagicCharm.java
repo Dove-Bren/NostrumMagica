@@ -19,10 +19,10 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -30,15 +30,15 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class MagicCharm extends Item implements ILoreTagged {
 
@@ -93,7 +93,7 @@ public class MagicCharm extends Item implements ILoreTagged {
     	return ret;
     }
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
     @Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
 		if (this.isInCreativeTab(tab)) {
@@ -134,7 +134,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
 		
 		final ItemStack stack = playerIn.getHeldItem(hand);
 		
@@ -175,7 +175,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
 	}
 	
-	private boolean doEarth(EntityPlayer player, World world) {
+	private boolean doEarth(PlayerEntity player, World world) {
 		
 		if (world.provider.getDimension() == ModConfig.config.sorceryDimensionIndex()) {
 			return false;
@@ -214,7 +214,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 		return true;
 	}
 	
-	private boolean doFire(EntityPlayer player, World world) {
+	private boolean doFire(PlayerEntity player, World world) {
 		
 		if (world.provider.getDimension() == ModConfig.config.sorceryDimensionIndex()) {
 			return false;
@@ -237,7 +237,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 					break; // Skip whole column
 				
 				IBlockState state = world.getBlockState(pos);
-				if (!state.isSideSolid(world, pos, EnumFacing.UP))
+				if (!state.isSideSolid(world, pos, Direction.UP))
 					break; // Same if it's not a solid block
 				
 				continue;
@@ -256,7 +256,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 		return true;
 	}
 	
-	private boolean doIce(EntityPlayer player, World world) {
+	private boolean doIce(PlayerEntity player, World world) {
 		player.addPotionEffect(new PotionEffect(MagicShieldPotion.instance(), 20 * 60 * 2, 0));
 		player.addPotionEffect(new PotionEffect(PhysicalShieldPotion.instance(), 20 * 60 * 2, 0));
 		
@@ -264,7 +264,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 		return true;
 	}
 	
-	private boolean doWind(EntityPlayer player, World world) {
+	private boolean doWind(PlayerEntity player, World world) {
 		AxisAlignedBB bb = new AxisAlignedBB(
 				player.posX - 3,
 				player.posY - 1,
@@ -285,7 +285,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 		return true;
 	}
 	
-	private boolean doEnder(EntityPlayer player, World world) { 
+	private boolean doEnder(PlayerEntity player, World world) { 
 		if (player.dimension == 0) {
 			BlockPos pos = player.getBedLocation(player.dimension);
 			if (pos == null) {
@@ -329,7 +329,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 		return false;
 	}
 	
-	private boolean doPhysical(EntityPlayer player, World world) {
+	private boolean doPhysical(PlayerEntity player, World world) {
 		player.addPotionEffect(new PotionEffect(
 				Potion.getPotionFromResourceLocation("speed"),
 				20 * 30,
@@ -341,7 +341,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 		return true;
 	}
 	
-	private boolean doLightning(EntityPlayer player, World world) {
+	private boolean doLightning(PlayerEntity player, World world) {
 		if (world.isRaining()) {
 			AxisAlignedBB bb = new AxisAlignedBB(
 					player.posX - 5,
@@ -350,7 +350,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 					player.posX + 5,
 					player.posY + 10,
 					player.posZ + 5);
-			List<Entity> entities = world.getEntitiesWithinAABB(EntityLivingBase.class, bb);
+			List<Entity> entities = world.getEntitiesWithinAABB(LivingEntity.class, bb);
 			if (entities != null && !entities.isEmpty())
 				for (Entity e : entities) {
 					world.spawnEntity(new EntityLightningBolt(world, e.posX, e.posY, e.posZ, false));
@@ -372,7 +372,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		EMagicElement element = MagicCharm.getTypeFromMeta(stack.getMetadata());
 		if (element == EMagicElement.ENDER) {

@@ -9,15 +9,15 @@ import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 // Queued the next shrine to be a certain type
 public class ShrineSeekingGem extends Item implements ILoreTagged {
@@ -46,9 +46,9 @@ public class ShrineSeekingGem extends Item implements ILoreTagged {
 //		DungeonGen type = DungeonGen.PORTAL;
 //		
 //		if (stack.hasTagCompound()) {
-//			NBTTagCompound nbt = stack.getTagCompound();
+//			CompoundNBT nbt = stack.getTagCompound();
 //			
-//			if (nbt.hasKey(NBT_TYPE, NBT.TAG_STRING)) {
+//			if (nbt.contains(NBT_TYPE, NBT.TAG_STRING)) {
 //				try {
 //					type = DungeonGen.valueOf(nbt.getString(NBT_TYPE).toUpperCase());
 //				} catch (Exception e) {
@@ -66,7 +66,7 @@ public class ShrineSeekingGem extends Item implements ILoreTagged {
 //	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 
 		if (stack.isEmpty()) {
@@ -79,7 +79,7 @@ public class ShrineSeekingGem extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
 		super.getSubItems(tab, subItems);
 //		if (this.isInCreativeTab(tab)) {
@@ -90,7 +90,7 @@ public class ShrineSeekingGem extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
 //		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
 //		if (worldIn.isRemote) {
 //			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
@@ -107,9 +107,9 @@ public class ShrineSeekingGem extends Item implements ILoreTagged {
 //		
 //		if (NostrumDungeonGenerator.boostOdds(type)) {
 //			itemStackIn.shrink(1);
-//			playerIn.sendMessage(new TextComponentTranslation("info.shrinegem.success"));
+//			playerIn.sendMessage(new TranslationTextComponent("info.shrinegem.success"));
 //		} else {
-//			playerIn.sendMessage(new TextComponentTranslation("info.shrinegem.failure"));
+//			playerIn.sendMessage(new TranslationTextComponent("info.shrinegem.failure"));
 //		}
 //		
 //		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
@@ -122,10 +122,10 @@ public class ShrineSeekingGem extends Item implements ILoreTagged {
 //			return;
 //		
 //		if (!stack.hasTagCompound())
-//			stack.setTagCompound(new NBTTagCompound());
+//			stack.setTagCompound(new CompoundNBT());
 //		
-//		NBTTagCompound nbt = stack.getTagCompound();
-//		nbt.setString(NBT_TYPE, type.name());
+//		CompoundNBT nbt = stack.getTagCompound();
+//		nbt.putString(NBT_TYPE, type.name());
 //	}
 	
 //	public static ItemStack getItemstack(DungeonGen type) {

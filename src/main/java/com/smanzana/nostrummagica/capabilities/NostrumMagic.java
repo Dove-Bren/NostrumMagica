@@ -34,13 +34,13 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import baubles.api.BaublesApi;
 import baubles.api.cap.IBaublesItemHandler;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 
 /**
  * Default implementation of the INostrumMagic interface
@@ -103,7 +103,7 @@ public class NostrumMagic implements INostrumMagic {
 	
 	private int baseMaxMana; // Max mana without mana bonuses
 	
-	private List<EntityLivingBase> familiars;
+	private List<LivingEntity> familiars;
 	private SpellComponentWrapper bindingComponent;
 	private Spell bindingSpell;
 	private int bindingTomeID;
@@ -127,7 +127,7 @@ public class NostrumMagic implements INostrumMagic {
 	private int sorceryPortalDim;
 	private BlockPos sorceryPortalPos;
 	
-	private EntityLivingBase entity;
+	private LivingEntity entity;
 	
 	public NostrumMagic() {
 		unlocked = false;
@@ -429,10 +429,10 @@ public class NostrumMagic implements INostrumMagic {
 //			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
 //		}
 		
-		if (entity != null && entity instanceof EntityPlayer && !entity.world.isRemote) {
+		if (entity != null && entity instanceof PlayerEntity && !entity.world.isRemote) {
 			NetworkHandler.getSyncChannel().sendTo(
 					new LoreMessage(tagged, this),
-					(EntityPlayerMP) entity);
+					(ServerPlayerEntity) entity);
 			
 		}
 	}
@@ -450,10 +450,10 @@ public class NostrumMagic implements INostrumMagic {
 //			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
 //		}
 		
-		if (entity != null && entity instanceof EntityPlayer && !entity.world.isRemote) {
+		if (entity != null && entity instanceof PlayerEntity && !entity.world.isRemote) {
 			NetworkHandler.getSyncChannel().sendTo(
 					new LoreMessage(tagged, this),
-					(EntityPlayerMP) entity);
+					(ServerPlayerEntity) entity);
 			
 		}
 		
@@ -513,9 +513,9 @@ public class NostrumMagic implements INostrumMagic {
 			// Learned for the first time
 			// TODO effect
 			if (this.entity != null && !this.entity.world.isRemote
-					&& this.entity instanceof EntityPlayer) {
-				EntityPlayer player = (EntityPlayer) this.entity;
-				player.sendMessage(new TextComponentString("The forces of "
+					&& this.entity instanceof PlayerEntity) {
+				PlayerEntity player = (PlayerEntity) this.entity;
+				player.sendMessage(new StringTextComponent("The forces of "
 						+ element.getName() + " have been unlocked!"));
 			}
 			
@@ -568,9 +568,9 @@ public class NostrumMagic implements INostrumMagic {
 		unlock();
 		// TODO effects
 		if (this.entity != null && !this.entity.world.isRemote
-				&& this.entity instanceof EntityPlayer) {
-			EntityPlayer player = (EntityPlayer) this.entity;
-			player.sendMessage(new TextComponentString(
+				&& this.entity instanceof PlayerEntity) {
+			PlayerEntity player = (PlayerEntity) this.entity;
+			player.sendMessage(new StringTextComponent(
 					"Magic Unlocked"));
 		}
 		
@@ -667,7 +667,7 @@ public class NostrumMagic implements INostrumMagic {
 	}
 	
 	@Override
-	public void provideEntity(EntityLivingBase entity) {
+	public void provideEntity(LivingEntity entity) {
 		this.entity = entity;
 	}
 
@@ -805,13 +805,13 @@ public class NostrumMagic implements INostrumMagic {
 	@Override
 	public void completeBinding(ItemStack tome) {
 		
-		if (this.entity != null && this.entity instanceof EntityPlayer) {
-			EntityPlayer player = (EntityPlayer) entity;
+		if (this.entity != null && this.entity instanceof PlayerEntity) {
+			PlayerEntity player = (PlayerEntity) entity;
 			
 			if (tome.isEmpty()) {
 				tome = NostrumMagica.findTome(player, bindingTomeID);
 				if (tome.isEmpty()) {
-					player.sendMessage(new TextComponentTranslation(
+					player.sendMessage(new TranslationTextComponent(
 							"info.tome.bind_missing", new Object[] {bindingSpell.getName()}));
 					return;
 				}
@@ -819,7 +819,7 @@ public class NostrumMagic implements INostrumMagic {
 			
 			if (!this.entity.world.isRemote) {
 				NostrumMagicaSounds.LEVELUP.play(player);
-				player.sendMessage(new TextComponentTranslation(
+				player.sendMessage(new TranslationTextComponent(
 						"info.tome.bind_finish", new Object[] {bindingSpell.getName()}));
 			}
 			
@@ -848,12 +848,12 @@ public class NostrumMagic implements INostrumMagic {
 	}
 
 	@Override
-	public List<EntityLivingBase> getFamiliars() {
+	public List<LivingEntity> getFamiliars() {
 		return familiars;
 	}
 
 	@Override
-	public void addFamiliar(EntityLivingBase familiar) {
+	public void addFamiliar(LivingEntity familiar) {
 		familiars.add(familiar);
 	}
 
@@ -862,8 +862,8 @@ public class NostrumMagic implements INostrumMagic {
 		if (familiars.isEmpty())
 			return;
 		
-		for (EntityLivingBase entity : familiars) {
-			entity.setDead();
+		for (LivingEntity entity : familiars) {
+			entity.remove();
 		}
 		
 		familiars.clear();
@@ -904,8 +904,8 @@ public class NostrumMagic implements INostrumMagic {
 		}
 		
 		Boolean old = map.put(alteration, true);
-		if ((old == null || !old) && entity != null && entity instanceof EntityPlayer) {
-			NostrumMagica.proxy.syncPlayer((EntityPlayerMP) entity);
+		if ((old == null || !old) && entity != null && entity instanceof PlayerEntity) {
+			NostrumMagica.proxy.syncPlayer((ServerPlayerEntity) entity);
 		}
 	}
 	
@@ -956,7 +956,7 @@ public class NostrumMagic implements INostrumMagic {
 	}
 
 	@Override
-	public void refresh(EntityPlayerMP player) {
+	public void refresh(ServerPlayerEntity player) {
 		if (NostrumMagica.baubles.isEnabled()) {
 			IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);
 			for (int i = 0; i < baubles.getSlots(); i++) {

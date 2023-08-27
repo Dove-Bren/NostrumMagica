@@ -6,8 +6,8 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -27,12 +27,12 @@ public class ClientUpdateQuestMessage implements IMessage {
 
 		@Override
 		public StatSyncMessage onMessage(ClientUpdateQuestMessage message, MessageContext ctx) {
-			if (!message.tag.hasKey(NBT_QUEST, NBT.TAG_STRING))
+			if (!message.tag.contains(NBT_QUEST, NBT.TAG_STRING))
 				return null;
 			
-			final EntityPlayerMP sp = ctx.getServerHandler().player;
+			final ServerPlayerEntity sp = ctx.getServerHandler().player;
 			
-			sp.getServerWorld().addScheduledTask(() -> {
+			sp.getServerWorld().runAsync(() -> {
 				INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
 				
 				if (att == null) {
@@ -66,16 +66,16 @@ public class ClientUpdateQuestMessage implements IMessage {
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public ClientUpdateQuestMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	public ClientUpdateQuestMessage(NostrumQuest quest) {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 		
-		tag.setString(NBT_QUEST, quest.getKey());
+		tag.putString(NBT_QUEST, quest.getKey());
 	}
 
 	@Override

@@ -5,8 +5,8 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -32,11 +32,11 @@ public class ClientSkillUpMessage implements IMessage {
 
 		@Override
 		public StatSyncMessage onMessage(ClientSkillUpMessage message, MessageContext ctx) {
-			if (!message.tag.hasKey(NBT_TYPE, NBT.TAG_INT))
+			if (!message.tag.contains(NBT_TYPE, NBT.TAG_INT))
 				return null;
 			
-			ctx.getServerHandler().player.getServerWorld().addScheduledTask(() -> {
-				EntityPlayer sp = ctx.getServerHandler().player;
+			ctx.getServerHandler().player.getServerWorld().runAsync(() -> {
+				PlayerEntity sp = ctx.getServerHandler().player;
 				INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
 				
 				if (att == null) {
@@ -44,7 +44,7 @@ public class ClientSkillUpMessage implements IMessage {
 					return;
 				}
 				
-				int ord = message.tag.getInteger(NBT_TYPE);
+				int ord = message.tag.getInt(NBT_TYPE);
 				
 				Type type = Type.values()[ord];
 				
@@ -77,16 +77,16 @@ public class ClientSkillUpMessage implements IMessage {
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public ClientSkillUpMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	public ClientSkillUpMessage(Type type) {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 		
-		tag.setInteger(NBT_TYPE, type.ordinal());
+		tag.putInt(NBT_TYPE, type.ordinal());
 	}
 
 	@Override

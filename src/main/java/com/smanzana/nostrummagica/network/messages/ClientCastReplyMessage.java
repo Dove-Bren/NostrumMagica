@@ -8,8 +8,8 @@ import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -31,12 +31,12 @@ public class ClientCastReplyMessage implements IMessage {
 		@Override
 		public IMessage onMessage(ClientCastReplyMessage message, MessageContext ctx) {
 
-			Minecraft.getMinecraft().addScheduledTask(() -> {
-				EntityPlayer player = NostrumMagica.proxy.getPlayer();
+			Minecraft.getInstance().runAsync(() -> {
+				PlayerEntity player = NostrumMagica.proxy.getPlayer();
 				INostrumMagic att = NostrumMagica.getMagicWrapper(
 						player);
 				// Regardless of success, server has synced mana with us.
-				int mana = message.tag.getInteger(NBT_MANA);
+				int mana = message.tag.getInt(NBT_MANA);
 				float xp = message.tag.getFloat(NBT_XP);
 				boolean success = message.tag.getBoolean(NBT_STATUS);
 				
@@ -49,11 +49,11 @@ public class ClientCastReplyMessage implements IMessage {
 					
 				}
 				
-//				if (message.tag.hasKey(NBT_REAGENTS, NBT.TAG_COMPOUND)) {
-//					NBTTagCompound regs = message.tag.getCompoundTag(NBT_REAGENTS);
-//					if (!regs.getKeySet().isEmpty())
-//					for (String key : regs.getKeySet()) {
-//						int cost = regs.getInteger(key);
+//				if (message.tag.contains(NBT_REAGENTS, NBT.TAG_COMPOUND)) {
+//					CompoundNBT regs = message.tag.getCompound(NBT_REAGENTS);
+//					if (!regs.keySet().isEmpty())
+//					for (String key : regs.keySet()) {
+//						int cost = regs.getInt(key);
 //						if (cost == 0)
 //							continue;
 //						
@@ -81,22 +81,22 @@ public class ClientCastReplyMessage implements IMessage {
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public ClientCastReplyMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	public ClientCastReplyMessage(boolean success, int mana, float xp,
 			Map<ReagentType, Integer> reagentCost) {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 		
-		tag.setInteger(NBT_MANA, mana);
-		tag.setFloat(NBT_XP, xp);
-		tag.setBoolean(NBT_STATUS, success);
+		tag.putInt(NBT_MANA, mana);
+		tag.putFloat(NBT_XP, xp);
+		tag.putBoolean(NBT_STATUS, success);
 		
 		if (reagentCost != null) {
-			NBTTagCompound nbt = new NBTTagCompound();
+			CompoundNBT nbt = new CompoundNBT();
 			for (ReagentType type : reagentCost.keySet()) {
 				if (type == null)
 					continue;
@@ -105,9 +105,9 @@ public class ClientCastReplyMessage implements IMessage {
 				if (cost == null || cost == 0)
 					continue;
 				
-				nbt.setInteger(type.name(), cost);
+				nbt.putInt(type.name(), cost);
 			}
-			tag.setTag(NBT_REAGENTS, nbt);
+			tag.put(NBT_REAGENTS, nbt);
 		}
 	}
 

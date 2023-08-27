@@ -19,17 +19,17 @@ import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigge
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 
@@ -77,7 +77,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
 		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		
 		if (playerIn.isSneaking()) {
@@ -95,9 +95,9 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 		if (!itemStackIn.hasTagCompound())
 			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
 		
-		NBTTagCompound nbt = itemStackIn.getTagCompound();
+		CompoundNBT nbt = itemStackIn.getTagCompound();
 		
-		if (!nbt.hasKey(NBT_SPELL, NBT.TAG_INT))
+		if (!nbt.contains(NBT_SPELL, NBT.TAG_INT))
 			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
 		
 		Spell spell = getSpell(itemStackIn);
@@ -127,13 +127,13 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellScroll))
 			return;
 		
-		NBTTagCompound nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTagCompound();
 		
 		if (nbt == null)
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		
-		nbt.setInteger(NBT_SPELL, spell.getRegistryID());
-		nbt.setInteger(NBT_DURABILITY, GetMaxUses(spell));
+		nbt.putInt(NBT_SPELL, spell.getRegistryID());
+		nbt.putInt(NBT_DURABILITY, GetMaxUses(spell));
 		
 		itemStack.setTagCompound(nbt);
 		itemStack.setStackDisplayName(spell.getName());
@@ -144,11 +144,11 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellScroll))
 			return null;
 		
-		NBTTagCompound nbt = itemStack.getTagCompound();		
+		CompoundNBT nbt = itemStack.getTagCompound();		
 		if (nbt == null)
 			return null;
 		
-		int id = nbt.getInteger(NBT_SPELL);
+		int id = nbt.getInt(NBT_SPELL);
 		Spell spell = NostrumMagica.getSpellRegistry().lookup(id);
 		
 		if (spell == null) {
@@ -169,18 +169,18 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellScroll))
 			return 1;
 		
-		NBTTagCompound nbt = itemStack.getTagCompound();		
-		if (nbt == null || !nbt.hasKey(NBT_DURABILITY, NBT.TAG_INT))
+		CompoundNBT nbt = itemStack.getTagCompound();		
+		if (nbt == null || !nbt.contains(NBT_DURABILITY, NBT.TAG_INT))
 			return 15; // old default
 		
-		return Math.max(1, nbt.getInteger(NBT_DURABILITY));
+		return Math.max(1, nbt.getInt(NBT_DURABILITY));
 	}
 	
 //	public static int getNestedScrollMeta(ItemStack scroll) {
 //		byte ret = 0;
 //		
 //		if (!scroll.isEmpty() && scroll.hasTagCompound()) {
-//			NBTTagCompound nbt = scroll.getTagCompound();
+//			CompoundNBT nbt = scroll.getTagCompound();
 //			ret = nbt.getByte(NBT_TYPE);
 //		}
 //		
@@ -191,9 +191,9 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 //		if (scroll.isEmpty())
 //			return;
 //		
-//		NBTTagCompound nbt = scroll.getTagCompound();
+//		CompoundNBT nbt = scroll.getTagCompound();
 //		if (nbt == null)
-//			nbt = new NBTTagCompound();
+//			nbt = new CompoundNBT();
 //		
 //		nbt.setByte(NBT_TYPE, meta);
 //	}
@@ -247,7 +247,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		;
 	}
@@ -259,16 +259,16 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 //			if (stack.isRemote() || getNestedScrollMeta(stack) != 1)
 //				return;
 //			
-//			NBTTagCompound nbt;
+//			CompoundNBT nbt;
 //			if (!stack.hasTagCompound())
-//				nbt = new NBTTagCompound();
+//				nbt = new CompoundNBT();
 //			else
 //				nbt = stack.getTagCompound();
 //			
 //			long start = nbt.getLong(NBT_WAKE_START);
 //			long worldtime = worldIn.getMinecraftServer().getTickCounter();
 //			if (start == 0) {
-//				nbt.setLong(NBT_WAKE_START, worldtime);
+//				nbt.putLong(NBT_WAKE_START, worldtime);
 //				stack.setTagCompound(nbt);
 //				return;
 //			}
@@ -283,7 +283,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 	}
 
 	@Override
-	public boolean shouldTrace(World world, EntityPlayer player, ItemStack stack) {
+	public boolean shouldTrace(World world, PlayerEntity player, ItemStack stack) {
 		Spell spell = getSpell(stack);
 		SpellTrigger firstTrigger = null;
 		if (spell != null && !spell.getSpellParts().isEmpty()) {

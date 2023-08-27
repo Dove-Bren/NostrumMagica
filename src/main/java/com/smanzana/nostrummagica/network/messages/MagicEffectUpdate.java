@@ -7,8 +7,8 @@ import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -28,8 +28,8 @@ public class MagicEffectUpdate implements IMessage {
 			
 			final UUID entityID = message.tag.getUniqueId(NBT_ENT_ID);
 			String typeName = message.tag.getString(NBT_TYPE);
-			NBTTagCompound tag = message.tag.getCompoundTag(NBT_DATA);
-			EffectData data = tag == null ? null : EffectData.fromNBT(message.tag.getCompoundTag(NBT_DATA));
+			CompoundNBT tag = message.tag.getCompound(NBT_DATA);
+			EffectData data = tag == null ? null : EffectData.fromNBT(message.tag.getCompound(NBT_DATA));
 			try {
 				SpecialEffect type = SpecialEffect.valueOf(typeName);
 				NostrumMagica.magicEffectProxy.setOverride(entityID, type, data);
@@ -46,19 +46,19 @@ public class MagicEffectUpdate implements IMessage {
 	private static final String NBT_TYPE = "type";
 	private static final String NBT_DATA = "data";
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public MagicEffectUpdate() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
-	public MagicEffectUpdate(EntityLivingBase entity, SpecialEffect type, EffectData data) {
-		tag = new NBTTagCompound();
+	public MagicEffectUpdate(LivingEntity entity, SpecialEffect type, EffectData data) {
+		tag = new CompoundNBT();
 		
 		tag.setUniqueId(NBT_ENT_ID, entity.getUniqueID());
-		tag.setString(NBT_TYPE, type.name());
+		tag.putString(NBT_TYPE, type.name());
 		if (data != null) {
-			tag.setTag(NBT_DATA, data.toNBT());
+			tag.put(NBT_DATA, data.toNBT());
 		}
 	}
 

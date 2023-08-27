@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 import net.minecraft.block.BlockTorch;
 import net.minecraft.block.BlockVine;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 public class RoomGrandHallway extends StaticRoom {
@@ -484,8 +484,8 @@ public class RoomGrandHallway extends StaticRoom {
 				"XXXXXXXXXXXXXXX",
 				'X', DungeonBlock.instance(),
 				')', new BlockState(Blocks.VINE, Blocks.VINE.getDefaultState().withProperty(BlockVine.EAST, true)),
-				'L', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.WEST)),
-				'R', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.EAST)),
+				'L', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.WEST)),
+				'R', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.EAST)),
 				'C', new BlockState(Blocks.CARPET, 14),
 				'1', new BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.GOLEM_ENDER.ordinal()),
 				'2', new BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.GOLEM_LIGHTNING.ordinal()),
@@ -503,7 +503,7 @@ public class RoomGrandHallway extends StaticRoom {
 		
 		BlockPos exit = new BlockPos(0, 0, 41);
 		
-		list.add(NostrumDungeon.asRotated(start, exit, EnumFacing.NORTH));
+		list.add(NostrumDungeon.asRotated(start, exit, Direction.NORTH));
 		
 		return list;
 	}
@@ -541,6 +541,6 @@ public class RoomGrandHallway extends StaticRoom {
 	@Override
 	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start) {
 		return Lists.newArrayList(NostrumDungeon.asRotated(start,
-				new BlockPos(-4, 4, 4), EnumFacing.WEST));
+				new BlockPos(-4, 4, 4), Direction.WEST));
 	}
 }

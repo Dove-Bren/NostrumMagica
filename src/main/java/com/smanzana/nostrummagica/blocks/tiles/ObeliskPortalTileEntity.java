@@ -5,11 +5,11 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ObeliskPortalTileEntity extends TeleportationPortalTileEntity {
 	
@@ -28,7 +28,7 @@ public class ObeliskPortalTileEntity extends TeleportationPortalTileEntity {
 		return null;
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public int getColor() {
 		TileEntity te = world.getTileEntity(pos.down());
@@ -38,16 +38,16 @@ public class ObeliskPortalTileEntity extends TeleportationPortalTileEntity {
 		return 0x004000FF;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public float getRotationPeriod() {
 		return 3;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public float getOpacity() {
-		EntityPlayer player = NostrumMagica.proxy.getPlayer();
+		PlayerEntity player = NostrumMagica.proxy.getPlayer();
 		if (NostrumPortal.getCooldownTime(player) > 0) {
 			return 0.5f;
 		}

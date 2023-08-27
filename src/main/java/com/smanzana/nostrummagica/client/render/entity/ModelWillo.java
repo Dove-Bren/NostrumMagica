@@ -10,11 +10,11 @@ import com.smanzana.nostrummagica.entity.EntityWillo;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 
 public class ModelWillo extends ModelBase {
 	
@@ -57,7 +57,7 @@ public class ModelWillo extends ModelBase {
 	}
 	
 	@Override
-	public void setLivingAnimations(EntityLivingBase entity, float limbSwing, float limbSwingAmount, float partialTickTime) {
+	public void setLivingAnimations(LivingEntity entity, float limbSwing, float limbSwingAmount, float partialTickTime) {
 		super.setLivingAnimations(entity, limbSwing, limbSwingAmount, partialTickTime);
 		
 		float progress = ((float) entity.ticksExisted + partialTickTime) / PERIOD;
@@ -165,11 +165,11 @@ public class ModelWillo extends ModelBase {
 		final float rotPeriod = 6f;
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(0, 1.5, 0);
-		GlStateManager.translate(0, -entity.height / 2, 0);
+		GlStateManager.translatef(0, 1.5, 0);
+		GlStateManager.translatef(0, -entity.height / 2, 0);
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.scale(.25, .25, .25);
+		GlStateManager.scalef(.25, .25, .25);
 		main.render(scale);
 		GlStateManager.popMatrix();
 		
@@ -177,7 +177,7 @@ public class ModelWillo extends ModelBase {
 		
 		GlStateManager.pushMatrix();
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
-		GlStateManager.scale(.4, .4, .4);
+		GlStateManager.scalef(.4, .4, .4);
 		renderFace(buffer, willo, partialTicks);
 		Tessellator.getInstance().draw();
 		GlStateManager.popMatrix();
@@ -185,14 +185,14 @@ public class ModelWillo extends ModelBase {
 		final float rotY = 360f * (time % rotPeriod) / rotPeriod;
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
 		GlStateManager.pushMatrix();
-		GlStateManager.scale(.5, .5, .5);
-		GlStateManager.rotate(rotY, 1, 0, 0);
+		GlStateManager.scalef(.5, .5, .5);
+		GlStateManager.rotatef(rotY, 1, 0, 0);
 		renderCube(buffer, willo, partialTicks);
 		Tessellator.getInstance().draw();
 		GlStateManager.popMatrix();
 		GlStateManager.popMatrix();
 		
-		GlStateManager.color(1f, 1f, 1f, 1f);
+		GlStateManager.color4f(1f, 1f, 1f, 1f);
 	}
 	
 }

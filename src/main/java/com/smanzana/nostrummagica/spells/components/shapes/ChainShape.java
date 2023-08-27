@@ -15,7 +15,7 @@ import com.smanzana.nostrummagica.spells.components.SpellShape;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
@@ -40,8 +40,8 @@ public class ChainShape extends SpellShape {
 	}
 	
 	@Override
-	protected List<EntityLivingBase> getTargets(SpellPartParam param, EntityLivingBase target, World world, BlockPos pos) {
-		List<EntityLivingBase> ret = new LinkedList<>();
+	protected List<LivingEntity> getTargets(SpellPartParam param, LivingEntity target, World world, BlockPos pos) {
+		List<LivingEntity> ret = new LinkedList<>();
 		
 		if (target == null) {
 			return ret;
@@ -55,12 +55,12 @@ public class ChainShape extends SpellShape {
 		final boolean teamLock = param.flip;
 		
 		final Set<Entity> seen = new HashSet<>();
-		final List<EntityLivingBase> next = new ArrayList<>(arc * 2);
+		final List<LivingEntity> next = new ArrayList<>(arc * 2);
 		
 		next.add(target);
 		
 		while (!next.isEmpty() && arc > 0) {
-			final EntityLivingBase center = next.remove(0);
+			final LivingEntity center = next.remove(0);
 			
 			if (seen.contains(center)) {
 				continue;
@@ -92,7 +92,7 @@ public class ChainShape extends SpellShape {
 			// Note: Could do this filtering inside the entity iteration. Just filtering to living is probably okay.
 			final double radiusSq = radius * radius;
 			for (Entity ent : entities) {
-				EntityLivingBase living = NostrumMagica.resolveEntityLiving(ent);
+				LivingEntity living = NostrumMagica.resolveEntityLiving(ent);
 				if (living == null) {
 					continue;
 				}
@@ -121,7 +121,7 @@ public class ChainShape extends SpellShape {
 	}
 
 	@Override
-	protected List<BlockPos> getTargetLocations(SpellPartParam param, EntityLivingBase target, World world,
+	protected List<BlockPos> getTargetLocations(SpellPartParam param, LivingEntity target, World world,
 			BlockPos pos) {
 		List<BlockPos> list = new LinkedList<>();
 		

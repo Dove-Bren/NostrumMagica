@@ -8,12 +8,12 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class ParticleBatchRenderer {
 
@@ -51,7 +51,7 @@ public class ParticleBatchRenderer {
 			Tessellator tessellator = Tessellator.getInstance();
 			BufferBuilder buffer = tessellator.getBuffer();
 			
-			GlStateManager.pushAttrib();
+			GlStateManager.pushLightingAttributes();
 			
 			for (BatchRenderParticle next : batch) {
 				if (last == null || next.compareTo(last) != 0) {
@@ -60,7 +60,7 @@ public class ParticleBatchRenderer {
 						tessellator.draw();
 					}
 					
-					Minecraft.getMinecraft().getTextureManager().bindTexture(next.getTexture());
+					Minecraft.getInstance().getTextureManager().bindTexture(next.getTexture());
 					next.setupRender();
 					buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL);
 				}
@@ -71,14 +71,14 @@ public class ParticleBatchRenderer {
 			
 			tessellator.draw();
 
-			GlStateManager.popAttrib();
+			GlStateManager.popAttributes();
 			GlStateManager.depthMask(true);
 			GlStateManager.enableLighting();
 			GlStateManager.disableBlend();
-			GlStateManager.enableAlpha();
+			GlStateManager.enableAlphaTest();
 			GlStateManager.alphaFunc(516, .1f);
-			GlStateManager.color(1f, 1f, 1f, 1f);
-			GlStateManager.enableTexture2D();
+			GlStateManager.color4f(1f, 1f, 1f, 1f);
+			GlStateManager.enableTexture();
 			GlStateManager.enableColorMaterial();
 			
 			batch.clear();

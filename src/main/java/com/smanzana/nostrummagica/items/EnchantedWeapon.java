@@ -31,10 +31,10 @@ import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.IInventory;
@@ -44,7 +44,7 @@ import net.minecraft.item.ItemSword;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
@@ -191,7 +191,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
     }
 
 	@Override
-	public SpellAction getTriggerAction(EntityLivingBase user, boolean offense, @Nonnull ItemStack stack) {
+	public SpellAction getTriggerAction(LivingEntity user, boolean offense, @Nonnull ItemStack stack) {
 		if (!offense)
 			return null;
 		
@@ -252,9 +252,9 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
 		Vec3d dir = playerIn.getLookVec();
-		dir = dir.addVector(0, -dir.y, 0).normalize();
+		dir = dir.add(0, -dir.y, 0).normalize();
 		
 		ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		
@@ -275,9 +275,9 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 //					//cloud.setParticle(EnumParticleTypes.SPELL);
 //					cloud.addEffect(new PotionEffect(FrostbitePotion.instance(), 20 * 10));
 //					worldIn.spawnEntityInWorld(cloud);
-//					cloud.motionX = dir.x;
-//					cloud.motionY = dir.y;
-//					cloud.motionZ = dir.z;
+//					cloud.getMotion().x = dir.x;
+//					cloud.getMotion().y = dir.y;
+//					cloud.getMotion().z = dir.z;
 					
 					spawnIceCloud(worldIn, playerIn, new Vec3d(playerIn.posX + dir.x, playerIn.posY + .75, playerIn.posZ + dir.z), dir, level);
 					
@@ -340,11 +340,11 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 	}
 	
 	@Override
-	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, EnumHand hand, Direction facing, float hitX, float hitY, float hitZ) {
 		ItemStack stack = playerIn.getHeldItem(hand);
 		if (playerIn.getCooledAttackStrength(0.5F) > .95) {
 			Vec3d dir = new Vec3d(pos).addVector(hitX, 0, hitZ).subtract(playerIn.getPositionVector());
-			dir = dir.addVector(0, -dir.y, 0);
+			dir = dir.add(0, -dir.y, 0);
 			dir = dir.normalize();
 			if (element == EMagicElement.WIND) {
 				if (playerIn.isSneaking()) {
@@ -400,7 +400,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 		
 	}
 	
-	protected static void spawnIceCloud(World world, EntityPlayer caster, Vec3d at, Vec3d direction, int level) {
+	protected static void spawnIceCloud(World world, PlayerEntity caster, Vec3d at, Vec3d direction, int level) {
 		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 3 seconds
 		EntityAreaEffect cloud = new EntityAreaEffect(world, at.x, at.y, at.z);
 		cloud.setOwner(caster);
@@ -420,12 +420,12 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 		cloud.setGravity(true, .1);
 		//cloud.setWalksWater();
 		world.spawnEntity(cloud);
-		cloud.motionX = direction.x;
-		cloud.motionY = direction.y;
-		cloud.motionZ = direction.z;
+		cloud.getMotion().x = direction.x;
+		cloud.getMotion().y = direction.y;
+		cloud.getMotion().z = direction.z;
 	}
 	
-	protected static void spawnWalkingVortex(World world, EntityPlayer caster, Vec3d at, Vec3d direction, int level) {
+	protected static void spawnWalkingVortex(World world, PlayerEntity caster, Vec3d at, Vec3d direction, int level) {
 		final int hurricaneCount = EnchantedArmor.GetSetCount(caster, EMagicElement.WIND, 3);
 		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 10 seconds
 		EntityAreaEffect cloud = new EntityAreaEffect(world, at.x, at.y, at.z);
@@ -463,17 +463,17 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 			final double dy = (Math.sin(prog * 2 * Math.PI) + 1) / 2;
 			final Vec3d target = new Vec3d(cloud.posX, cloud.posY + 2 + dy, cloud.posZ);
 			final Vec3d diff = target.subtract(entity.getPositionVector());
-			entity.motionX = diff.x / 2;
-			entity.motionY = diff.y / 2;
-			entity.motionZ = diff.z / 2;
+			entity.getMotion().x = diff.x / 2;
+			entity.getMotion().y = diff.y / 2;
+			entity.getMotion().z = diff.z / 2;
 			entity.velocityChanged = true;
 			//entity.posY = 2 + dy;
 			//entity.setPositionAndUpdate(cloud.posX, cloud.posY + 2 + dy, cloud.posZ);
 			
 			// Hurricane vortexes also deal damage to non-friendlies!
 			if (hurricaneCount >= 4 && entity.ticksExisted % 15 == 0) {
-				if (entity instanceof EntityLivingBase && !NostrumMagica.IsSameTeam((EntityLivingBase)entity, caster)) {
-					EntityLivingBase living = (EntityLivingBase) entity;
+				if (entity instanceof LivingEntity && !NostrumMagica.IsSameTeam((LivingEntity)entity, caster)) {
+					LivingEntity living = (LivingEntity) entity;
 					entity.hurtResistantTime = 0;
 					entity.attackEntityFrom(new MagicDamageSource(caster, EMagicElement.WIND),
 							SpellAction.calcDamage(caster, living, .5f, EMagicElement.WIND));
@@ -508,12 +508,12 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 			cloud.setCustomParticleFrequency(.4f);
 		}
 		world.spawnEntity(cloud);
-		cloud.motionX = direction.x;
-		cloud.motionY = direction.y;
-		cloud.motionZ = direction.z;
+		cloud.getMotion().x = direction.x;
+		cloud.getMotion().y = direction.y;
+		cloud.getMotion().z = direction.z;
 	}
 	
-	public static void spawnJumpVortex(World world, EntityPlayer caster, Vec3d at, int level) {
+	public static void spawnJumpVortex(World world, PlayerEntity caster, Vec3d at, int level) {
 		EntityAreaEffect cloud = new EntityAreaEffect(world, at.x, at.y, at.z);
 		cloud.setOwner(caster);
 		cloud.setWaitTime(0);
@@ -528,10 +528,10 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 			// Try and only affect jumping or falling entities
 			final float minY = .1f;
 			final float maxY = 2f;
-			if (!entity.onGround && entity.motionY > minY && entity.motionY < maxY) {
-				entity.motionY = Math.min(maxY, entity.motionY + .5f);
+			if (!entity.onGround && entity.getMotion().y > minY && entity.getMotion().y < maxY) {
+				entity.getMotion().y = Math.min(maxY, entity.getMotion().y + .5f);
 				entity.velocityChanged = true;
-			} else if (entity.motionY < 0) {
+			} else if (entity.getMotion().y < 0) {
 				entity.fallDistance = 0;
 			}
 		});
@@ -545,12 +545,12 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 			//}
 		});
 		world.spawnEntity(cloud);
-		//cloud.motionX = direction.x;
-		//cloud.motionY = direction.y;
-		//cloud.motionZ = direction.z;
+		//cloud.getMotion().x = direction.x;
+		//cloud.getMotion().y = direction.y;
+		//cloud.getMotion().z = direction.z;
 	}
 	
-	protected static boolean summonBoltOnSelf(EntityLivingBase entity) {
+	protected static boolean summonBoltOnSelf(LivingEntity entity) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
 		if (attr == null || attr.getMana() < 30) {
 			return false;
@@ -560,22 +560,22 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 				new NostrumTameLightning(entity.world, entity.posX, entity.posY, entity.posZ)
 				);
 		attr.addMana(-30);
-		if (entity instanceof EntityPlayer) {
-			NostrumMagica.proxy.sendMana((EntityPlayer) entity);
+		if (entity instanceof PlayerEntity) {
+			NostrumMagica.proxy.sendMana((PlayerEntity) entity);
 		}
 		return true;
 	}
 	
-	protected static boolean summonBoltAtTarget(EntityLivingBase caster, World world, Vec3d pos) {
+	protected static boolean summonBoltAtTarget(LivingEntity caster, World world, Vec3d pos) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 		if (attr == null || attr.getMana() < 30) {
 			return false;
 		}
 		
 		int count = 1;
-		if (caster != null && caster instanceof EntityPlayer) {
+		if (caster != null && caster instanceof PlayerEntity) {
 			// Look for lightning belt
-			IInventory baubles = NostrumMagica.baubles.getBaubles((EntityPlayer) caster);
+			IInventory baubles = NostrumMagica.baubles.getBaubles((PlayerEntity) caster);
 			if (baubles != null) {
 				for (int i = 0; i < baubles.getSizeInventory(); i++) {
 					ItemStack stack = baubles.getStackInSlot(i);
@@ -622,14 +622,14 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 		}
 		
 		attr.addMana(-30);
-		if (caster instanceof EntityPlayer) {
-			NostrumMagica.proxy.sendMana((EntityPlayer) caster);
+		if (caster instanceof PlayerEntity) {
+			NostrumMagica.proxy.sendMana((PlayerEntity) caster);
 		}
 		return true;
 	}
 	
 	@Override
-	public boolean itemInteractionForEntity(ItemStack stack, EntityPlayer playerIn, EntityLivingBase target, EnumHand hand) {
+	public boolean itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, EnumHand hand) {
 		if (element == EMagicElement.WIND) {
 			SpellAction fly = new SpellAction(playerIn);
 			fly.push(5.0f, level);

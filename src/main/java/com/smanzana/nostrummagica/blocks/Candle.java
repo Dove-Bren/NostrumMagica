@@ -21,14 +21,14 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemFlintAndSteel;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -37,8 +37,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.BlockStateContainer;
 import net.minecraftforge.fml.network.NetworkRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class Candle extends Block implements ITileEntityProvider {
 
@@ -50,9 +50,9 @@ public class Candle extends Block implements ITileEntityProvider {
 	protected static final AxisAlignedBB CANDLE_W_AABB = new AxisAlignedBB(0.75D, 0.35D, 0.4375D, 1D, 0.85D, 0.5625D);
 	protected static final AxisAlignedBB CANDLE_S_AABB = new AxisAlignedBB(0.4375D, 0.35D, 0D, 0.5625D, 0.85D, 0.25D);
 	
-	public static final PropertyDirection FACING = PropertyDirection.create("facing", new Predicate<EnumFacing>() {
-		public boolean apply(@Nullable EnumFacing facing) {
-			return facing != EnumFacing.DOWN;
+	public static final PropertyDirection FACING = PropertyDirection.create("facing", new Predicate<Direction>() {
+		public boolean apply(@Nullable Direction facing) {
+			return facing != Direction.DOWN;
 		}
 	});
 	private static final int TICK_DELAY = 5;
@@ -80,13 +80,13 @@ public class Candle extends Block implements ITileEntityProvider {
 		this.setTickRandomly(true);
 	}
 	
-	protected boolean canPlaceAt(World worldIn, BlockPos pos, EnumFacing facing) {
+	protected boolean canPlaceAt(World worldIn, BlockPos pos, Direction facing) {
 		return (worldIn.getBlockState(pos.offset(facing.getOpposite())).isSideSolid(worldIn, pos.offset(facing), facing));
 	}
 	
 	@Override
 	public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
-		for (EnumFacing enumfacing : FACING.getAllowedValues()) {
+		for (Direction enumfacing : FACING.getAllowedValues()) {
 			if (canPlaceAt(worldIn, pos, enumfacing)) {
 				return true;
 			}
@@ -96,13 +96,13 @@ public class Candle extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+	public IBlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer) {
 		return this.getDefaultState().withProperty(FACING, facing);
 	}
 	
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-		EnumFacing facing = state.getValue(FACING);
+		Direction facing = state.getValue(FACING);
 		switch (facing) {
 		case EAST:
 			return CANDLE_E_AABB;
@@ -135,7 +135,7 @@ public class Candle extends Block implements ITileEntityProvider {
 		return false;
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
     public BlockRenderLayer getBlockLayer() {
         return BlockRenderLayer.CUTOUT;
     }
@@ -153,7 +153,7 @@ public class Candle extends Block implements ITileEntityProvider {
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
 		boolean lit = ((meta & 0x1) == 1);
-		EnumFacing facing = EnumFacing.VALUES[(meta >> 1) & 7];
+		Direction facing = Direction.VALUES[(meta >> 1) & 7];
 		return getDefaultState().withProperty(LIT, lit).withProperty(FACING, facing);
 	}
 	
@@ -238,14 +238,14 @@ public class Candle extends Block implements ITileEntityProvider {
         return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
 		
 		if (null == stateIn || !stateIn.getValue(LIT))
 			return;
 		
-		EnumFacing facing = stateIn.getValue(FACING);
+		Direction facing = stateIn.getValue(FACING);
 		double d0 = (double)pos.getX() + 0.5D;
 		double d1 = (double)pos.getY() + 0.6D;
 		double d2 = (double)pos.getZ() + 0.5D;
@@ -310,7 +310,7 @@ public class Candle extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
 
 //		if (worldIn.isRemote)
 //			return true;
@@ -401,7 +401,7 @@ public class Candle extends Block implements ITileEntityProvider {
 	}
 	
 	public static boolean IsCandleEnhancingBlock(World world, BlockPos pos, IBlockState state) {
-		return state.getBlock().isFireSource(world, pos, EnumFacing.UP);
+		return state.getBlock().isFireSource(world, pos, Direction.UP);
 	}
 	
 	public static boolean IsCandleEnhanced(World world, BlockPos candlePos) {

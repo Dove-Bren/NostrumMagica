@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.rituals.requirements;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spells.EAlteration;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 
 public class RRequirementAlterationMastery implements IRitualRequirement{
 
@@ -14,7 +14,7 @@ public class RRequirementAlterationMastery implements IRitualRequirement{
 	}
 
 	@Override
-	public boolean matches(EntityPlayer player, INostrumMagic attr) {
+	public boolean matches(PlayerEntity player, INostrumMagic attr) {
 		Boolean bool = attr.getAlterations().get(alteration);
 		return (bool != null && bool);
 	}

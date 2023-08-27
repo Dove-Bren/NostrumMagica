@@ -5,9 +5,9 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.SpellTome;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -25,14 +25,14 @@ public class ClientTomeDropSpellMessage implements IMessage {
 
 		@Override
 		public IMessage onMessage(ClientTomeDropSpellMessage message, MessageContext ctx) {
-			if (!message.tag.hasKey(NBT_TOME, NBT.TAG_INT) || !message.tag.hasKey(NBT_SPELL, NBT.TAG_INT))
+			if (!message.tag.contains(NBT_TOME, NBT.TAG_INT) || !message.tag.contains(NBT_SPELL, NBT.TAG_INT))
 				return null;
 			
-			final EntityPlayerMP sp = ctx.getServerHandler().player;
-			final int tomeID = message.tag.getInteger(NBT_TOME);
-			final int spellID = message.tag.getInteger(NBT_SPELL);
+			final ServerPlayerEntity sp = ctx.getServerHandler().player;
+			final int tomeID = message.tag.getInt(NBT_TOME);
+			final int spellID = message.tag.getInt(NBT_SPELL);
 			
-			sp.getServerWorld().addScheduledTask(() -> {
+			sp.getServerWorld().runAsync(() -> {
 				INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
 				
 				if (att == null) {
@@ -58,19 +58,19 @@ public class ClientTomeDropSpellMessage implements IMessage {
 	private static final String NBT_TOME = "tome_id";
 	private static final String NBT_SPELL = "spell_id";
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public ClientTomeDropSpellMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	public ClientTomeDropSpellMessage(ItemStack spellTome, int spellID) {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 		
 		final int tomeID = SpellTome.getTomeID(spellTome);
 		
-		tag.setInteger(NBT_TOME, tomeID);
-		tag.setInteger(NBT_SPELL, spellID);
+		tag.putInt(NBT_TOME, tomeID);
+		tag.putInt(NBT_SPELL, spellID);
 	}
 
 	@Override

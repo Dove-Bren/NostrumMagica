@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
@@ -31,7 +31,7 @@ public class SingleShape extends SpellShape {
 	}
 
 	@Override
-	protected List<EntityLivingBase> getTargets(SpellPartParam param, EntityLivingBase target, World world, BlockPos pos) {
+	protected List<LivingEntity> getTargets(SpellPartParam param, LivingEntity target, World world, BlockPos pos) {
 		if (target != null)
 			return Lists.newArrayList(target);
 		
@@ -39,7 +39,7 @@ public class SingleShape extends SpellShape {
 	}
 
 	@Override
-	protected List<BlockPos> getTargetLocations(SpellPartParam param, EntityLivingBase target, World world,
+	protected List<BlockPos> getTargetLocations(SpellPartParam param, LivingEntity target, World world,
 			BlockPos pos) {
 		if (target != null)
 			return null;

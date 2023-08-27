@@ -16,11 +16,11 @@ import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
@@ -29,7 +29,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 /**
  * Does all the listening and tweaking for special effects
@@ -63,15 +63,15 @@ public class MagicEffectProxy {
 			return this;
 		}
 		
-		public NBTTagCompound toNBT() {
-			NBTTagCompound tag = new NBTTagCompound();
+		public CompoundNBT toNBT() {
+			CompoundNBT tag = new CompoundNBT();
 			
 			if (element != null) {
-				tag.setString(NBT_ELEMENT, element.name().toLowerCase());
+				tag.putString(NBT_ELEMENT, element.name().toLowerCase());
 			}
 			
 			if (count != 0) {
-				tag.setInteger(NBT_COUNT, count);
+				tag.putInt(NBT_COUNT, count);
 			}
 			
 			if (amt != 0.0) {
@@ -81,10 +81,10 @@ public class MagicEffectProxy {
 			return tag;
 		}
 		
-		public static EffectData fromNBT(NBTTagCompound nbt) {
+		public static EffectData fromNBT(CompoundNBT nbt) {
 			EffectData data = new EffectData();
 			
-			if (nbt.hasKey(NBT_ELEMENT)) {
+			if (nbt.contains(NBT_ELEMENT)) {
 				String key = nbt.getString(NBT_ELEMENT);
 				try {
 					EMagicElement elem = EMagicElement.valueOf(key.toUpperCase());
@@ -94,11 +94,11 @@ public class MagicEffectProxy {
 				}
 			}
 			
-			if (nbt.hasKey(NBT_COUNT)) {
-				data.count(nbt.getInteger(NBT_COUNT));
+			if (nbt.contains(NBT_COUNT)) {
+				data.count(nbt.getInt(NBT_COUNT));
 			}
 			
-			if (nbt.hasKey(NBT_AMT)) {
+			if (nbt.contains(NBT_AMT)) {
 				data.amt(nbt.getDouble(NBT_AMT));
 			}
 			
@@ -148,7 +148,7 @@ public class MagicEffectProxy {
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
-	private void apply(SpecialEffect effect, EffectData value, EntityLivingBase entity) {
+	private void apply(SpecialEffect effect, EffectData value, LivingEntity entity) {
 		UUID id = entity.getPersistentID();
 		
 		if (!effects.containsKey(id)) {
@@ -160,39 +160,39 @@ public class MagicEffectProxy {
 		notify(entity, effect, value);
 	}
 	
-	public void applyPhysicalShield(EntityLivingBase entity, double value) {
+	public void applyPhysicalShield(LivingEntity entity, double value) {
 		apply(SpecialEffect.SHIELD_PHYSICAL, new EffectData().amt(value), entity);
 	}
 	
-	public void applyMagicalShield(EntityLivingBase entity, double value) {
+	public void applyMagicalShield(LivingEntity entity, double value) {
 		apply(SpecialEffect.SHIELD_MAGIC, new EffectData().amt(value), entity);
 	}
 	
-	public void applyMagicBuff(EntityLivingBase entity, EMagicElement element, double value, int count) {
+	public void applyMagicBuff(LivingEntity entity, EMagicElement element, double value, int count) {
 		apply(SpecialEffect.MAGIC_BUFF, new EffectData().element(element).amt(value).count(count), entity);
 	}
 	
-	public void applyRootedEffect(EntityLivingBase entity) {
+	public void applyRootedEffect(LivingEntity entity) {
 		apply(SpecialEffect.ROOTED, new EffectData().count(1), entity);
 	}
 	
-	public void applyOnHitEffect(EntityLivingBase entity, double startTicks, int duration) {
+	public void applyOnHitEffect(LivingEntity entity, double startTicks, int duration) {
 		apply(SpecialEffect.CONTINGENCY_DAMAGE, new EffectData().amt(0).count(duration), entity);
 	}
 	
-	public void applyOnHealthEffect(EntityLivingBase entity, double startTicks, int duration) {
+	public void applyOnHealthEffect(LivingEntity entity, double startTicks, int duration) {
 		apply(SpecialEffect.CONTINGENCY_HEALTH, new EffectData().amt(0).count(duration), entity);
 	}
 	
-	public void applyOnManaEffect(EntityLivingBase entity, double startTicks, int duration) {
+	public void applyOnManaEffect(LivingEntity entity, double startTicks, int duration) {
 		apply(SpecialEffect.CONTINGENCY_MANA, new EffectData().amt(0).count(duration), entity);
 	}
 	
-	public void applyOnFoodEffect(EntityLivingBase entity, double startTicks, int duration) {
+	public void applyOnFoodEffect(LivingEntity entity, double startTicks, int duration) {
 		apply(SpecialEffect.CONTINGENCY_FOOD, new EffectData().amt(0).count(duration), entity);
 	}
 	
-	public void setTargetted(EntityLivingBase entity) {
+	public void setTargetted(LivingEntity entity) {
 		final int start = entity.ticksExisted;
 		final int dimension = entity.dimension;
 		apply(SpecialEffect.TARGETED, new EffectData().count(start).amt(dimension), entity);
@@ -204,10 +204,10 @@ public class MagicEffectProxy {
 			if (data != null && (int) data.getAmt() == dimension && data.getCount() == start) {
 				// Most recent is still us. Check if we should cancel
 				if (entity.world != null && !entity.isDead) {
-					if (entity.world.getEntities(EntityLiving.class, (e) -> {
+					if (entity.world.getEntities(MobEntity.class, (e) -> {
 						return e != null
-								&& ((EntityLiving) e).getAttackTarget() != null
-								&& ((EntityLiving) e).getAttackTarget().equals(entity)
+								&& ((MobEntity) e).getAttackTarget() != null
+								&& ((MobEntity) e).getAttackTarget().equals(entity)
 								&& entity.getDistanceSq(e) < 400;
 					}).isEmpty()) {
 						NostrumMagica.magicEffectProxy.remove(SpecialEffect.TARGETED, entity);
@@ -224,7 +224,7 @@ public class MagicEffectProxy {
 		}, 20 * 5, 1);
 	}
 	
-	public void remove(SpecialEffect effect, EntityLivingBase entity) {
+	public void remove(SpecialEffect effect, LivingEntity entity) {
 		UUID id = entity.getPersistentID();
 		Map<SpecialEffect, EffectData> record = effects.get(id);
 		if (record == null)
@@ -236,7 +236,7 @@ public class MagicEffectProxy {
 		notify(entity, effect, null);
 	}
 	
-	public void removeAll(EntityLivingBase entity) {
+	public void removeAll(LivingEntity entity) {
 		for (SpecialEffect eff : SpecialEffect.values()) {
 			remove(eff, entity);
 		}
@@ -244,7 +244,7 @@ public class MagicEffectProxy {
 		
 	}
 	
-	protected float applyMagicShields(EntityLivingBase hurt, DamageSource source, float inAmt) {
+	protected float applyMagicShields(LivingEntity hurt, DamageSource source, float inAmt) {
 		if (source.isDamageAbsolute())
 			return inAmt;
 		
@@ -300,7 +300,7 @@ public class MagicEffectProxy {
 		}
 	}
 	
-	protected void applyMagicDamageBuffs(EntityLivingBase target, DamageSource source, float amt) {
+	protected void applyMagicDamageBuffs(LivingEntity target, DamageSource source, float amt) {
 		if (effects.isEmpty()) {
 			return;
 		}
@@ -322,8 +322,8 @@ public class MagicEffectProxy {
 		}
 		
 		Entity sourceEnt = source.getTrueSource();
-		if (source != null && sourceEnt instanceof EntityLivingBase) {
-			EntityLivingBase living = (EntityLivingBase) sourceEnt;
+		if (source != null && sourceEnt instanceof LivingEntity) {
+			LivingEntity living = (LivingEntity) sourceEnt;
 			UUID id = living.getPersistentID();
 			if (!effects.containsKey(id)) {
 				return;
@@ -350,7 +350,7 @@ public class MagicEffectProxy {
 		}
 	}
 	
-	protected void applyTargetted(EntityLivingBase ent) {
+	protected void applyTargetted(LivingEntity ent) {
 		if (getData(ent, SpecialEffect.TARGETED) == null) {
 			setTargetted(ent);
 		}
@@ -368,7 +368,7 @@ public class MagicEffectProxy {
 		
 		applyMagicDamageBuffs(e.getEntityLiving(), e.getSource(), e.getAmount());
 		
-		if (e.getSource().getTrueSource() != null && e.getSource().getTrueSource() instanceof EntityLivingBase) {
+		if (e.getSource().getTrueSource() != null && e.getSource().getTrueSource() instanceof LivingEntity) {
 			applyTargetted(e.getEntityLiving());
 		}
 	}
@@ -378,7 +378,7 @@ public class MagicEffectProxy {
 		this.removeAll(e.getEntityLiving());
 	}
 	
-	private void removeEffect(EntityLivingBase entity, SpecialEffect effect) {
+	private void removeEffect(LivingEntity entity, SpecialEffect effect) {
 		Potion potion = null;
 		switch (effect) {
 		case SHIELD_PHYSICAL:
@@ -402,7 +402,7 @@ public class MagicEffectProxy {
 		}
 	}
 	
-	public EffectData getData(EntityLivingBase entity, SpecialEffect effectType) {
+	public EffectData getData(LivingEntity entity, SpecialEffect effectType) {
 		UUID id = entity.getUniqueID();
 		Map<SpecialEffect, EffectData> map = effects.get(id);
 		EffectData data = null;
@@ -441,18 +441,18 @@ public class MagicEffectProxy {
 		effects.clear();
 	}
 	
-	protected void notify(EntityLivingBase base, SpecialEffect type, EffectData value) {
+	protected void notify(LivingEntity base, SpecialEffect type, EffectData value) {
 		if (base == null
 				|| !type.isPublic) {
 			return;
 		}
 		
-		for (EntityPlayer player : base.world.playerEntities) {
-			if (!(player instanceof EntityPlayerMP)) {
+		for (PlayerEntity player : base.world.playerEntities) {
+			if (!(player instanceof ServerPlayerEntity)) {
 				continue;
 			}
 			
-			NostrumMagica.proxy.updateEntityEffect((EntityPlayerMP) player, base, type, value);
+			NostrumMagica.proxy.updateEntityEffect((ServerPlayerEntity) player, base, type, value);
 		}
 	}
 }

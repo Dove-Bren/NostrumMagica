@@ -3,13 +3,13 @@ package com.smanzana.nostrummagica.potions;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * Way to mark entities for later transformation.
@@ -44,19 +44,19 @@ public class NostrumTransformationPotion extends Potion {
 	}
 
 	@Override
-	public void performEffect(EntityLivingBase entity, int amp) {
+	public void performEffect(LivingEntity entity, int amp) {
 		if (entity.getHealth() > 1f) {
 			entity.attackEntityFrom(DamageSource.MAGIC, 1f);
 		}
     }
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
     public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
 		; //PotionIcon.NATURESBLESSING.draw(mc, x + 6, y + 7);
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
     public void renderHUDEffect(int x, int y, PotionEffect effect, net.minecraft.client.Minecraft mc, float alpha) {
 		; //PotionIcon.NATURESBLESSING.draw(mc, x + 3, y + 3);

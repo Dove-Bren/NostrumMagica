@@ -5,8 +5,8 @@ import javax.annotation.Nullable;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.IInventory;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * Container that automatically detects changes in backing inventory's fields and syncs them.
@@ -50,7 +50,7 @@ public abstract class AutoContainer extends Container {
 	}
 
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void updateProgressBar(int id, int data) {
 		if (inventory != null) {
 			inventory.setField(id, data);

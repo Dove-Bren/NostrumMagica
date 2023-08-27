@@ -9,8 +9,8 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -36,16 +36,16 @@ public class SpellCraftMessage implements IMessage {
 			// Call 'craft' method on it
 			// boom
 			
-			int x = message.tag.getInteger(NBT_POS_X);
-			int y = message.tag.getInteger(NBT_POS_Y);
-			int z = message.tag.getInteger(NBT_POS_Z);
+			int x = message.tag.getInt(NBT_POS_X);
+			int y = message.tag.getInt(NBT_POS_Y);
+			int z = message.tag.getInt(NBT_POS_Z);
 			BlockPos pos = new BlockPos(x, y, z);
 			String name = message.tag.getString(NBT_NAME);
-			int iconIdx = message.tag.getInteger(NBT_ICON_IDX);
+			int iconIdx = message.tag.getInt(NBT_ICON_IDX);
 			
-			final EntityPlayerMP sp = ctx.getServerHandler().player;
+			final ServerPlayerEntity sp = ctx.getServerHandler().player;
 			
-			sp.getServerWorld().addScheduledTask(() -> {
+			sp.getServerWorld().runAsync(() -> {
 				World world = sp.world;
 				
 				// Get the TE
@@ -85,20 +85,20 @@ public class SpellCraftMessage implements IMessage {
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public SpellCraftMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	public SpellCraftMessage(String name, BlockPos pos, int iconIndex) {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 		
-		tag.setString(NBT_NAME, name);
-		tag.setInteger(NBT_POS_X, pos.getX());
-		tag.setInteger(NBT_POS_Y, pos.getY());
-		tag.setInteger(NBT_POS_Z, pos.getZ());
-		tag.setInteger(NBT_ICON_IDX, iconIndex);
+		tag.putString(NBT_NAME, name);
+		tag.putInt(NBT_POS_X, pos.getX());
+		tag.putInt(NBT_POS_Y, pos.getY());
+		tag.putInt(NBT_POS_Z, pos.getZ());
+		tag.putInt(NBT_ICON_IDX, iconIndex);
 	}
 
 	@Override

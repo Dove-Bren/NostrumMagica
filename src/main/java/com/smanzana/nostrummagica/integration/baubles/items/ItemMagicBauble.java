@@ -24,12 +24,12 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.NonNullList;
@@ -43,9 +43,9 @@ import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.fml.common.Optional;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 @Optional.Interface(iface="baubles.api.IBauble", modid="baubles")
 public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, IBauble, IDragonWingRenderItem {
@@ -138,7 +138,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 		return "item." + type.getUnlocalizedKey();
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
     @Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
 		if (this.isInCreativeTab(tab)) {
@@ -182,13 +182,13 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		ItemType type = getTypeFromMeta(stack.getMetadata());
 		if (type == null)
 			return;
 		
-		if (I18n.hasKey(type.getDescKey())) {
+		if (I18n.contains(type.getDescKey())) {
 			// Format with placeholders for blue and red formatting
 			String translation = I18n.format(type.getDescKey(), TextFormatting.GRAY, TextFormatting.BLUE, TextFormatting.DARK_RED);
 			if (translation.trim().isEmpty())
@@ -248,7 +248,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 	
 	@Override
 	@Optional.Method(modid="baubles")
-	public void onEquipped(ItemStack itemstack, EntityLivingBase player) {
+	public void onEquipped(ItemStack itemstack, LivingEntity player) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null) {
 			return;
@@ -320,7 +320,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 	 */
 	@Override
 	@Optional.Method(modid="baubles")
-	public void onUnequipped(ItemStack itemstack, EntityLivingBase player) {	
+	public void onUnequipped(ItemStack itemstack, LivingEntity player) {	
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null) {
 			return;
@@ -391,7 +391,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 	 */
 	@Override
 	@Optional.Method(modid="baubles")
-	public boolean canEquip(ItemStack itemstack, EntityLivingBase player) {
+	public boolean canEquip(ItemStack itemstack, LivingEntity player) {
 		if (player.world.isRemote) {
 			return true;
 		}
@@ -400,7 +400,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 	}
 
 	@Override
-	public void apply(EntityLivingBase caster, SpellCastSummary summary, ItemStack stack) {
+	public void apply(LivingEntity caster, SpellCastSummary summary, ItemStack stack) {
 		if (stack.isEmpty()) {
 			return;
 		}
@@ -445,7 +445,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 	
 	@Override
 	@Optional.Method(modid="baubles")
-	public void onWornTick(ItemStack stack, EntityLivingBase player) {
+	public void onWornTick(ItemStack stack, LivingEntity player) {
 		if (stack.isEmpty()) {
 			return;
 		}
@@ -487,8 +487,8 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 				// Check if we have enough aether and if the player is missing a shield
 				if (player.ticksExisted % 40 == 0 && NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.SHIELD_PHYSICAL) == null) {
 					IInventory inv = null;
-					if (player instanceof EntityPlayer) {
-						inv = ((EntityPlayer) player).inventory;
+					if (player instanceof PlayerEntity) {
+						inv = ((PlayerEntity) player).inventory;
 					}
 					
 					if (inv != null) {
@@ -512,9 +512,9 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 			return;
 		}
 		
-		if (event.getAmount() > 0f && event.getEntityLiving() instanceof EntityPlayer && event.getSource() instanceof EntityDamageSource) {
+		if (event.getAmount() > 0f && event.getEntityLiving() instanceof PlayerEntity && event.getSource() instanceof EntityDamageSource) {
 			Entity source = ((EntityDamageSource) event.getSource()).getTrueSource();
-			EntityPlayer player = (EntityPlayer) event.getEntityLiving();
+			PlayerEntity player = (PlayerEntity) event.getEntityLiving();
 			IInventory inv = NostrumMagica.baubles.getBaubles(player);
 			if (inv != null) {
 				for (int i = 0; i < inv.getSizeInventory(); i++) {
@@ -561,8 +561,8 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 									NostrumMagicaSounds.DAMAGE_WIND.play(player.world, player.posX, player.posY, player.posZ);
 									float dir = player.rotationYaw + (NostrumMagica.rand.nextBoolean() ? -1 : 1) * 90f;
 									float velocity = .5f;
-									player.motionX = velocity * MathHelper.cos(dir);
-									player.motionZ = velocity * MathHelper.sin(dir);
+									player.getMotion().x = velocity * MathHelper.cos(dir);
+									player.getMotion().z = velocity * MathHelper.sin(dir);
 									player.velocityChanged = true;
 								}
 							}
@@ -581,12 +581,12 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 			return;
 		}
 
-		final EntityLivingBase ent = event.getEntityLiving();
-		if (!(ent instanceof EntityPlayer)) {
+		final LivingEntity ent = event.getEntityLiving();
+		if (!(ent instanceof PlayerEntity)) {
 			return;
 		}
 		
-		EntityPlayer player = (EntityPlayer) ent;
+		PlayerEntity player = (PlayerEntity) ent;
 		IInventory inv = NostrumMagica.baubles.getBaubles(player);
 		if (inv != null) {
 			for (int i = 0; i < inv.getSizeInventory(); i++) {
@@ -616,7 +616,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 					break;
 				case DRAGON_WING_PENDANT:
 					// Jump-boost gives an extra .1 per level.
-					ent.motionY += .2;
+					ent.getMotion().y += .2;
 				}
 			}
 		}
@@ -630,12 +630,12 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 			return;
 		}
 
-		final EntityLivingBase ent = event.getEntityLiving();
-		if (!(ent instanceof EntityPlayer)) {
+		final LivingEntity ent = event.getEntityLiving();
+		if (!(ent instanceof PlayerEntity)) {
 			return;
 		}
 		
-		EntityPlayer player = (EntityPlayer) ent;
+		PlayerEntity player = (PlayerEntity) ent;
 		IInventory inv = NostrumMagica.baubles.getBaubles(player);
 		if (inv != null) {
 			for (int i = 0; i < inv.getSizeInventory(); i++) {
@@ -673,7 +673,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 	}
 
 	@Override
-	public boolean shouldRenderDragonWings(ItemStack stack, EntityPlayer player) {
+	public boolean shouldRenderDragonWings(ItemStack stack, PlayerEntity player) {
 		if (stack.isEmpty()) {
 			return false;
 		}
@@ -710,7 +710,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 	}
 	
 	@Override
-	public int getDragonWingColor(ItemStack stack, EntityPlayer player) {
+	public int getDragonWingColor(ItemStack stack, PlayerEntity player) {
 		if (stack.isEmpty()) {
 			return 0xFFFFFFFF;
 		}
@@ -760,18 +760,18 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 			return;
 		}
 		
-		NBTTagCompound nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTagCompound();
 		if (nbt == null) {
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		}
 		
-		nbt.setString("element", element.name());
+		nbt.putString("element", element.name());
 		
 		stack.setTagCompound(nbt);
 	}
 	
 	@Override
-	public boolean willAutoSync(ItemStack stack, EntityLivingBase player) {
+	public boolean willAutoSync(ItemStack stack, LivingEntity player) {
 		return true;
 	}
 }

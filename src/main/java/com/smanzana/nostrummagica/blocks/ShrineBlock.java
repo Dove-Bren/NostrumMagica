@@ -21,20 +21,20 @@ import com.smanzana.nostrummagica.trials.ShrineTrial;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ShrineBlock extends SymbolBlock {
 	
@@ -79,7 +79,7 @@ public class ShrineBlock extends SymbolBlock {
 	}
 	
 	@Override
-	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
 		return true;
 	}
 	
@@ -96,13 +96,13 @@ public class ShrineBlock extends SymbolBlock {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public EnumBlockRenderType getRenderType(IBlockState state) {
 		return EnumBlockRenderType.MODEL;
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
 		
 		if (hand != EnumHand.MAIN_HAND) {
 			return true;
@@ -178,7 +178,7 @@ public class ShrineBlock extends SymbolBlock {
 			
 			if (isExhausted(state)) {
 				if (playerIn.world.isRemote) {
-					playerIn.sendMessage(new TextComponentTranslation("info.shrine.exhausted", new Object[0]));
+					playerIn.sendMessage(new TranslationTextComponent("info.shrine.exhausted", new Object[0]));
 				}
 				return true;
 			}
@@ -191,7 +191,7 @@ public class ShrineBlock extends SymbolBlock {
 			ent.setComponent(component);
 			
 			if (playerIn.world.isRemote) {
-				playerIn.sendMessage(new TextComponentTranslation("info.shrine.trigger", new Object[] {component.getTrigger().getDisplayName()}));
+				playerIn.sendMessage(new TranslationTextComponent("info.shrine.trigger", new Object[] {component.getTrigger().getDisplayName()}));
 			}
 		}
 		
@@ -269,7 +269,7 @@ public class ShrineBlock extends SymbolBlock {
 				attr.addShape(component.getShape());
 				DoEffect(pos, playerIn, 0x8080C0A0);
 				if (playerIn.world.isRemote) {
-					playerIn.sendMessage(new TextComponentTranslation("info.shrine.shape", new Object[] {component.getShape().getDisplayName()}));
+					playerIn.sendMessage(new TranslationTextComponent("info.shrine.shape", new Object[] {component.getShape().getDisplayName()}));
 				}
 				
 				if (!(component.getShape() instanceof SingleShape)) {
@@ -285,11 +285,11 @@ public class ShrineBlock extends SymbolBlock {
 						suffix = "chain";
 					}
 					
-					TextComponentTranslation trans = new TextComponentTranslation("info.shapehint.preamble", new Object[0]);
+					TranslationTextComponent trans = new TranslationTextComponent("info.shapehint.preamble", new Object[0]);
 					trans.getStyle().setColor(TextFormatting.DARK_GRAY);
 					playerIn.sendMessage(trans);
 					
-					trans = new TextComponentTranslation("info.shapehint." + suffix, new Object[0]);
+					trans = new TranslationTextComponent("info.shapehint." + suffix, new Object[0]);
 					trans.getStyle().setColor(TextFormatting.LIGHT_PURPLE);
 					playerIn.sendMessage(trans);
 				}
@@ -299,7 +299,7 @@ public class ShrineBlock extends SymbolBlock {
 		return false;
 	}
 	
-	public static void DoEffect(BlockPos shrinePos, EntityLivingBase entity, int color) {
+	public static void DoEffect(BlockPos shrinePos, LivingEntity entity, int color) {
 		if (entity.world.isRemote) {
 			return;
 		}

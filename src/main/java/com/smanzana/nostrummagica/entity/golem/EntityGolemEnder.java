@@ -13,7 +13,7 @@ import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.potion.Potion;
 import net.minecraft.world.World;
@@ -55,15 +55,15 @@ public class EntityGolemEnder extends EntityGolem {
 	}
 
 	@Override
-	public void doMeleeTask(EntityLivingBase target) {
+	public void doMeleeTask(LivingEntity target) {
 		;
 	}
 
 	@Override
-	public void doRangeTask(EntityLivingBase target) {
+	public void doRangeTask(LivingEntity target) {
 		EntityGolemEnder.init();
 		
-		EntityLivingBase targ = this.getAttackTarget();
+		LivingEntity targ = this.getAttackTarget();
 		if (targ != target)
 			this.setAttackTarget(target);
 		
@@ -78,10 +78,10 @@ public class EntityGolemEnder extends EntityGolem {
 	}
 
 	@Override
-	public void doBuffTask(EntityLivingBase target) {
+	public void doBuffTask(LivingEntity target) {
 		EntityGolemEnder.init();
 		
-		EntityLivingBase targ = this.getAttackTarget();
+		LivingEntity targ = this.getAttackTarget();
 		if (targ != target)
 			this.setAttackTarget(target);
 		
@@ -92,7 +92,7 @@ public class EntityGolemEnder extends EntityGolem {
 	}
 
 	@Override
-	public boolean shouldDoBuff(EntityLivingBase target) {
+	public boolean shouldDoBuff(LivingEntity target) {
 		return target.getActivePotionEffect(Potion.getPotionFromResourceLocation("invisibility")) == null;
 	}
 

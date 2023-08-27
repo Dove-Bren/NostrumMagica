@@ -8,9 +8,9 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.text.TranslationTextComponent;
 
 public abstract class ShrineTrial {
 
@@ -30,7 +30,7 @@ public abstract class ShrineTrial {
 		this.element = element;
 	}
 	
-	public boolean canTake(EntityPlayer entityPlayer, INostrumMagic attr) {
+	public boolean canTake(PlayerEntity entityPlayer, INostrumMagic attr) {
 		Boolean bool = attr.getKnownElements().get(this.element);
 		if (bool == null || !bool)
 			return false;
@@ -42,21 +42,21 @@ public abstract class ShrineTrial {
 		return !attr.hasTrial(this.element);
 	}
 	
-	public void start(EntityPlayer player, INostrumMagic attr) {
+	public void start(PlayerEntity player, INostrumMagic attr) {
 		attr.startTrial(this.element);
 		
 		Integer mastery = attr.getElementMastery().get(this.element);
 		if (mastery == null || mastery == 1) {
 			if (!player.world.isRemote) {
 				NostrumMagicaSounds.STATUS_DEBUFF3.play(player);
-				player.sendMessage(new TextComponentTranslation("info.element.starttrial", new Object[] {this.element.getName()}));
+				player.sendMessage(new TranslationTextComponent("info.element.starttrial", new Object[] {this.element.getName()}));
 			}
 		} else {
 			complete(player);
 		}
 	}
 	
-	protected void complete(EntityPlayer player) {
+	protected void complete(PlayerEntity player) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
 			return;
@@ -72,8 +72,8 @@ public abstract class ShrineTrial {
 		
 		if (!player.world.isRemote) {
 			NostrumMagicaSounds.LEVELUP.play(player);
-			player.sendMessage(new TextComponentTranslation("info.element.mastery" + mastery.intValue(), new Object[] {this.element.getName()}));
-			NostrumMagica.proxy.syncPlayer((EntityPlayerMP) player);
+			player.sendMessage(new TranslationTextComponent("info.element.mastery" + mastery.intValue(), new Object[] {this.element.getName()}));
+			NostrumMagica.proxy.syncPlayer((ServerPlayerEntity) player);
 		}
 			
 	}

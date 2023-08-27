@@ -40,18 +40,18 @@ import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigge
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IEntityMultiPart;
 import net.minecraft.entity.MultiPartEntityPart;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.init.Blocks;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
@@ -265,7 +265,7 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 	private BlockPos[] pillars;
 	
 	// State machine
-	private AggroTable<EntityLivingBase> aggroTable;
+	private AggroTable<LivingEntity> aggroTable;
 	private @Nullable BattleState[] currentSequence;
 	private int currentSequenceIndex;
 	
@@ -300,7 +300,7 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 		this.stateTasks = new EnumMap<>(BattleState.class);
 		fillStateTasks(this.stateTasks);
 		
-		this.eyeHeight = this.height * .85f;
+		this.eyeHeight = this.getHeight() * .85f;
 	}
 	
 	protected void fillStateTasks(Map<BattleState, BattleStateTask> map) {
@@ -366,7 +366,7 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 		return false;
 	}
 	
-	public boolean canAttackClass(Class <? extends EntityLivingBase > cls) {
+	public boolean canAttackClass(Class <? extends LivingEntity > cls) {
 		return true;
 	}
 	
@@ -375,12 +375,12 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 	}
 	
 	@Override
-	public void readEntityFromNBT(NBTTagCompound compound) {
+	public void readEntityFromNBT(CompoundNBT compound) {
 		super.readEntityFromNBT(compound);
 	}
 	
 	@Override
-	public void writeEntityToNBT(NBTTagCompound compound) {
+	public void writeEntityToNBT(CompoundNBT compound) {
     	super.writeEntityToNBT(compound);
 	}
 	
@@ -425,21 +425,21 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 	protected void spawnTreeParticles() {
 		//		NostrumParticles.GLOW_ORB.spawn(this.world, new NostrumParticles.SpawnParams(
 		//		1,
-		//		this.posX, this.posY + this.height + 4, this.posZ, 3,
+		//		this.posX, this.posY + this.getHeight() + 4, this.posZ, 3,
 		//		30, 10,
-		//		this.getPositionVector().addVector(0, this.height + 1.7, 0)
+		//		this.getPositionVector().addVector(0, this.getHeight() + 1.7, 0)
 		//		).color(this.getTreeElement().getColor()));
 		
 		//NostrumParticles.GLOW_ORB.spawn(this.world, new NostrumParticles.SpawnParams(
 		//		1,
-		//		this.posX, this.posY + this.height + 1.70, this.posZ, .25,
+		//		this.posX, this.posY + this.getHeight() + 1.70, this.posZ, .25,
 		//		40, 20,
 		//		new Vec3d(0, .2, 0), new Vec3d(.2, .1, .2)
 		//		).gravity(true).color(this.getTreeElement().getColor()));
 		
 		NostrumParticles.LIGHTNING_STATIC.spawn(this.world, new NostrumParticles.SpawnParams(
 				1,
-				this.posX, this.posY + this.height + 1, this.posZ, 1,
+				this.posX, this.posY + this.getHeight() + 1, this.posZ, 1,
 				40, 20,
 				new Vec3d(0, .05, 0), Vec3d.ZERO
 				).color(this.getTreeElement().getColor()));
@@ -558,13 +558,13 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 	}
 	
 	@Override
-	public void addTrackingPlayer(EntityPlayerMP player) {
+	public void addTrackingPlayer(ServerPlayerEntity player) {
 		super.addTrackingPlayer(player);
 		this.bossInfo.addPlayer(player);
 	}
 
 	@Override
-	public void removeTrackingPlayer(EntityPlayerMP player) {
+	public void removeTrackingPlayer(ServerPlayerEntity player) {
 		super.removeTrackingPlayer(player);
 		this.bossInfo.removePlayer(player);
 	}
@@ -652,8 +652,8 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 		
 		if (!this.world.isRemote && source.getTrueSource() != null) {
 			Entity ent = source.getTrueSource();
-			if (ent instanceof EntityLivingBase && ent != this) {
-				this.aggroTable.addDamage((EntityLivingBase) ent, amount);
+			if (ent instanceof LivingEntity && ent != this) {
+				this.aggroTable.addDamage((LivingEntity) ent, amount);
 			}
 		}
 		
@@ -731,15 +731,15 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 		this.dataManager.set(TREE_TYPE, type);
 	}
 	
-	protected @Nullable EntityLivingBase getRandomTarget() {
+	protected @Nullable LivingEntity getRandomTarget() {
 		return aggroTable.getMainTarget();
 	}
 	
-	protected List<EntityLivingBase> getAllTargets() {
+	protected List<LivingEntity> getAllTargets() {
 		return aggroTable.getAllTracked();
 	}
 	
-	protected boolean isStillTargetable(@Nonnull EntityLivingBase target) {
+	protected boolean isStillTargetable(@Nonnull LivingEntity target) {
 		return this.getEntitySenses().canSee(target);
 	}
 	
@@ -759,31 +759,31 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 		MutableBlockPos cursor = new MutableBlockPos();
 		int remaining;
 		
-		cursor.setPos(this.posX, this.posY, this.posZ).move(EnumFacing.DOWN);
+		cursor.setPos(this.posX, this.posY, this.posZ).move(Direction.DOWN);
 		remaining = 20;
 		while (remaining-- > 0 && isArenaBlock(world.getBlockState(cursor))) {
-			cursor.move(EnumFacing.NORTH);
+			cursor.move(Direction.NORTH);
 		}
 		final int minZ = cursor.getZ() + 1;
 		
-		cursor.setPos(this.posX, this.posY, this.posZ).move(EnumFacing.DOWN);
+		cursor.setPos(this.posX, this.posY, this.posZ).move(Direction.DOWN);
 		remaining = 20;
 		while (remaining-- > 0 && isArenaBlock(world.getBlockState(cursor))) {
-			cursor.move(EnumFacing.SOUTH);
+			cursor.move(Direction.SOUTH);
 		}
 		final int maxZ = cursor.getZ() - 1;
 		
-		cursor.setPos(this.posX, this.posY, this.posZ).move(EnumFacing.DOWN);
+		cursor.setPos(this.posX, this.posY, this.posZ).move(Direction.DOWN);
 		remaining = 20;
 		while (remaining-- > 0 && isArenaBlock(world.getBlockState(cursor))) {
-			cursor.move(EnumFacing.EAST);
+			cursor.move(Direction.EAST);
 		}
 		final int maxX = cursor.getX() - 1;
 		
-		cursor.setPos(this.posX, this.posY, this.posZ).move(EnumFacing.DOWN);
+		cursor.setPos(this.posX, this.posY, this.posZ).move(Direction.DOWN);
 		remaining = 20;
 		while (remaining-- > 0 && isArenaBlock(world.getBlockState(cursor))) {
-			cursor.move(EnumFacing.WEST);
+			cursor.move(Direction.WEST);
 		}
 		final int minX = cursor.getX() + 1;
 		
@@ -880,7 +880,7 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 	
 	protected void setEyeHeight(float height) {
 		if (height <= 0) {
-			height = this.height * .85f;
+			height = this.getHeight() * .85f;
 		}
 		
 		this.eyeHeight = height;
@@ -919,7 +919,7 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 		}
 	}
 	
-	protected void spawnBramble(EnumFacing side) {
+	protected void spawnBramble(Direction side) {
 		this.detectArena();
 		
 		final BlockPos start;
@@ -999,12 +999,12 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 		private float heightCache = 0;
 		@Override
 		public AxisAlignedBB getEntityBoundingBox() {
-			if (this.width != widthCache || this.height != heightCache) {
+			if (this.getWidth != widthCache || this.getHeight() != heightCache) {
 				this.widthCache = width;
 				this.heightCache = height;
 				
 				// change BB to match pitch...
-				AxisAlignedBB bb = this.getEntityBoundingBox();
+				AxisAlignedBB bb = this.getBoundingBox();
 				final double centerZ = (bb.minZ + bb.maxZ) / 2;
 				this.setEntityBoundingBox(new AxisAlignedBB(
 						bb.minX, bb.minY, centerZ - 2,
@@ -1012,7 +1012,7 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 						));
 			}
 			
-			return super.getEntityBoundingBox();
+			return super.getBoundingBox();
 		}
 		
 		@Override
@@ -1092,8 +1092,8 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 			;
 		}
 		
-		protected final void doSpellCast(@Nonnull EntityLivingBase target, @Nonnull Spell spell, float castHeight) {
-			@Nullable EntityLivingBase oldTarget = parent.getAttackTarget();
+		protected final void doSpellCast(@Nonnull LivingEntity target, @Nonnull Spell spell, float castHeight) {
+			@Nullable LivingEntity oldTarget = parent.getAttackTarget();
 			if (target != null) {
 				parent.faceEntity(target, 360f, 180f);
 				parent.setAttackTarget(target);
@@ -1120,7 +1120,7 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 		private final int castCooldown;
 		
 		protected @Nullable Spell castingSpell;
-		protected @Nullable EntityLivingBase castingTarget;
+		protected @Nullable LivingEntity castingTarget;
 		protected int castTicks; // 0 means nothing. 1-castDuration means casting. -castCooldown to -1 is cooling down.
 		
 		public BattleStateTaskIdle(EntityPlantBoss parent, int duration, int durationJitter, float castChance, int castDuration, int castCooldown, Spell ... spells) {
@@ -1159,7 +1159,7 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 			if (this.castTicks == 0
 					&& parent.rand.nextFloat() < castChance) {
 				Spell spell = chooseSpell();
-				EntityLivingBase target = parent.getRandomTarget();
+				LivingEntity target = parent.getRandomTarget();
 				if (spell != null && target != null) {
 					startCastingSpell(spell, target);
 				}
@@ -1170,7 +1170,7 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 //			int todo;
 //			{
 //				if (!world.isRemote && this.elapsedTicks % 20 == 0) {
-//					parent.spawnBramble(EnumFacing.EAST);
+//					parent.spawnBramble(Direction.EAST);
 //				}
 //			}
 		}
@@ -1181,7 +1181,7 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 					: null;
 		}
 		
-		protected void startCastingSpell(@Nonnull Spell spell, @Nonnull EntityLivingBase target) {
+		protected void startCastingSpell(@Nonnull Spell spell, @Nonnull LivingEntity target) {
 			this.castingSpell = spell;
 			this.castingTarget = target;
 			
@@ -1190,7 +1190,7 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 			parent.setCasting(spell);
 		}
 		
-		protected void finishCastingSpell(@Nonnull Spell spell, @Nonnull EntityLivingBase target, @Nullable EntityLivingBase altTarget) {
+		protected void finishCastingSpell(@Nonnull Spell spell, @Nonnull LivingEntity target, @Nullable LivingEntity altTarget) {
 			
 			if (target.isDead || !parent.isStillTargetable(target)) {
 				target = altTarget;
@@ -1314,10 +1314,10 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 		
 		protected void firePollen() {
 			Spell spell = this.getPollenSpell();
-			List<EntityLivingBase> targets = parent.getAllTargets();
+			List<LivingEntity> targets = parent.getAllTargets();
 			if (spell != null && targets != null && !targets.isEmpty()) {
 				
-				for (EntityLivingBase target : targets) {
+				for (LivingEntity target : targets) {
 					doSpellCast(target, spell, -1);
 				}
 			}
@@ -1474,13 +1474,13 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 			this.spawnDelay = spawnDelay;
 		}
 		
-		protected EnumFacing getSpawnDirection() {
+		protected Direction getSpawnDirection() {
 			// Could remember which we did and not do the same again...
 			// but for now, just random
-			return EnumFacing.HORIZONTALS[parent.rand.nextInt(EnumFacing.HORIZONTALS.length)];
+			return Direction.HORIZONTALS[parent.rand.nextInt(Direction.HORIZONTALS.length)];
 		}
 		
-		protected void spawnBramble(EnumFacing direction) {
+		protected void spawnBramble(Direction direction) {
 			parent.spawnBramble(direction);
 		}
 		

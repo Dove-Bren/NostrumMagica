@@ -5,8 +5,8 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public abstract class ModelOBJ extends ModelBase {
 
@@ -68,7 +68,7 @@ public abstract class ModelOBJ extends ModelBase {
 			return ModelOBJ.this.getColor(this.modelIdx, ent); 
 		}
 		
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		public void render(float scale, Entity entity, int i) {
 			this.ent = entity;
 			this.modelIdx = i;

@@ -5,7 +5,7 @@ import java.util.Random;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonFlying;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.util.math.BlockPos;
 
@@ -32,7 +32,7 @@ public class DragonFlyEvasionTask extends EntityAIBase {
 		}
 		
 		boolean flying = false;
-		EntityLivingBase target;
+		LivingEntity target;
 		
 		if (this.dragon instanceof EntityDragonFlying) {
 			flying = ((EntityDragonFlying) this.dragon).isFlying();
@@ -97,7 +97,7 @@ public class DragonFlyEvasionTask extends EntityAIBase {
     		// Next, find a place to path to a bit above the ground
     		// note: pos here instead is the top of the dragon, so we shift it up and look
     		// for a place that will fit the dragon
-    		pos.setY(pos.getY() + (int) Math.ceil(dragon.height));
+    		pos.setY(pos.getY() + (int) Math.ceil(dragon.getHeight()));
         	
     		int height = 15 + (random.nextInt(6) - 3);
         	for (int i = 0; i < height; i++) {
@@ -109,7 +109,7 @@ public class DragonFlyEvasionTask extends EntityAIBase {
         		}
         	}
         	
-        	y = pos.getY() - (int) Math.ceil(dragon.height);
+        	y = pos.getY() - (int) Math.ceil(dragon.getHeight());
         }
         
         if (!dragon.getNavigator().tryMoveToXYZ(x, y, z, 1.0D)) {

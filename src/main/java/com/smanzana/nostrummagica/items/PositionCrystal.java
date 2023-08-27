@@ -12,21 +12,21 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * Crystal that stores the location of a position in a world
@@ -62,7 +62,7 @@ public class PositionCrystal extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		int dim = getDimension(stack);
 		BlockPos pos = getBlockPosition(stack);
@@ -82,19 +82,19 @@ public class PositionCrystal extends Item implements ILoreTagged {
 		if (stack.isEmpty() || !(stack.getItem() instanceof PositionCrystal))
 			return null;
 		
-		NBTTagCompound nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTagCompound();
 		if (nbt == null)
 			return null;
 		
-		if (!nbt.hasKey(NBT_X)
-				|| !nbt.hasKey(NBT_Y)
-				|| !nbt.hasKey(NBT_Z))
+		if (!nbt.contains(NBT_X)
+				|| !nbt.contains(NBT_Y)
+				|| !nbt.contains(NBT_Z))
 			return null;
 		
 		return new BlockPos(
-				nbt.getInteger(NBT_X),
-				nbt.getInteger(NBT_Y),
-				nbt.getInteger(NBT_Z)
+				nbt.getInt(NBT_X),
+				nbt.getInt(NBT_Y),
+				nbt.getInt(NBT_Z)
 				);
 	}
 	
@@ -107,11 +107,11 @@ public class PositionCrystal extends Item implements ILoreTagged {
 		if (stack.isEmpty() || !(stack.getItem() instanceof PositionCrystal))
 			return 0;
 		
-		NBTTagCompound nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTagCompound();
 		if (nbt == null)
 			return 0;
 		
-		return nbt.getInteger(NBT_DIMENSION);
+		return nbt.getInt(NBT_DIMENSION);
 	}
 	
 	public static void setPosition(ItemStack stack, int dimension, BlockPos pos) {
@@ -121,16 +121,16 @@ public class PositionCrystal extends Item implements ILoreTagged {
 		if (pos == null)
 			return;
 		
-		NBTTagCompound tag;
+		CompoundNBT tag;
 		if (!stack.hasTagCompound())
-			tag = new NBTTagCompound();
+			tag = new CompoundNBT();
 		else
 			tag = stack.getTagCompound();
 		
-		tag.setInteger(NBT_DIMENSION, dimension);
-		tag.setInteger(NBT_X, pos.getX());
-		tag.setInteger(NBT_Y, pos.getY());
-		tag.setInteger(NBT_Z, pos.getZ());
+		tag.putInt(NBT_DIMENSION, dimension);
+		tag.putInt(NBT_X, pos.getX());
+		tag.putInt(NBT_Y, pos.getY());
+		tag.putInt(NBT_Z, pos.getZ());
 		
 		stack.setTagCompound(tag);
 	}
@@ -139,7 +139,7 @@ public class PositionCrystal extends Item implements ILoreTagged {
 		if (stack.isEmpty() || !(stack.getItem() instanceof PositionCrystal))
 			return;
 		
-		NBTTagCompound tag;
+		CompoundNBT tag;
 		if (!stack.hasTagCompound())
 			return;
 		
@@ -153,7 +153,7 @@ public class PositionCrystal extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, EnumHand hand, Direction facing, float hitX, float hitY, float hitZ) {
 		final @Nonnull ItemStack stack = playerIn.getHeldItem(hand);
 		
 		if (worldIn.isRemote)
@@ -167,7 +167,7 @@ public class PositionCrystal extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
 		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		
 		if (playerIn.isSneaking()) {

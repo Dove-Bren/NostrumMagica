@@ -14,7 +14,7 @@ import com.smanzana.nostrummagica.utils.MemoryPool;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 
@@ -158,29 +158,29 @@ public class ModelDragonRed extends ModelBase {
 	
 	/*
 	 * if (model == EDragonPart.LEG_BACK_LEFT.ordinal()) {
-			GlStateManager.translate(.54, -1, 1.78);
+			GlStateManager.translatef(.54, -1, 1.78);
 		} else if (model == EDragonPart.LEG_BACK_RIGHT.ordinal()) {
-			GlStateManager.translate(-.593, -1, 1.64);
+			GlStateManager.translatef(-.593, -1, 1.64);
 		} else if (model == EDragonPart.BODY.ordinal()) {
-			GlStateManager.translate(0, -.889, 0);
+			GlStateManager.translatef(0, -.889, 0);
 		} else if (model == EDragonPart.LEG_FRONT_LEFT.ordinal()) {
-			GlStateManager.translate(.75, -.45, -.76);
+			GlStateManager.translatef(.75, -.45, -.76);
 		} else if (model == EDragonPart.LEG_FRONT_RIGHT.ordinal()) {
-			GlStateManager.translate(-.725, -.45, -.82);
+			GlStateManager.translatef(-.725, -.45, -.82);
 		} else if (model == EDragonPart.NECK.ordinal()) {
-			GlStateManager.translate(0, -.975, -1.6);
+			GlStateManager.translatef(0, -.975, -1.6);
 		} else if (model == EDragonPart.HEAD.ordinal()) {
-			GlStateManager.translate(0, -2.05, -1.575);
+			GlStateManager.translatef(0, -2.05, -1.575);
 		} else if (model == EDragonPart.WING_LEFT.ordinal()) {
-			GlStateManager.translate(.35, -1.4, -.75);
+			GlStateManager.translatef(.35, -1.4, -.75);
 		} else if (model == EDragonPart.WING_RIGHT.ordinal()) {
-			GlStateManager.translate(-.35, -1.4, -.75);
+			GlStateManager.translatef(-.35, -1.4, -.75);
 		} else if (model == EDragonPart.TAIL1.ordinal()) {
-			GlStateManager.translate(0, -.95, 2.9);
+			GlStateManager.translatef(0, -.95, 2.9);
 		} else if (model == EDragonPart.TAIL2.ordinal()) {
-			GlStateManager.translate(0, .2245, 6.67);
+			GlStateManager.translatef(0, .2245, 6.67);
 		} else if (model == EDragonPart.TAIL3.ordinal()) {
-			GlStateManager.translate(0, .85, 9.9);
+			GlStateManager.translatef(0, .85, 9.9);
 		}
 	 * 
 	 * 
@@ -346,7 +346,7 @@ public class ModelDragonRed extends ModelBase {
 	}
 	
 	@Override
-	public void setLivingAnimations(EntityLivingBase entityIn, float limbSwing, float limbSwingAmount, float partialTicks) {
+	public void setLivingAnimations(LivingEntity entityIn, float limbSwing, float limbSwingAmount, float partialTicks) {
 		super.setLivingAnimations(entityIn, limbSwing, limbSwingAmount, partialTicks);
 		float frac;
 		float weight;
@@ -390,7 +390,7 @@ public class ModelDragonRed extends ModelBase {
 		} else if (casting) {
 			// Done in setRotationAngles because it's animated
 			//body.rotateAngleX = -.5f;
-		} else if (!dragon.onGround && dragon.motionY < -.62f) {
+		} else if (!dragon.onGround && dragon.getMotion().y < -.62f) {
 			// Falling
 			float rotX = (float) (2 * Math.PI * 0.14);
 			float rotY = (float) (2 * Math.PI * 0.12);

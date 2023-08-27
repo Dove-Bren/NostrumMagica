@@ -5,8 +5,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public enum PotionIcon {
 
@@ -39,11 +39,11 @@ public enum PotionIcon {
 		this.v = v;
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void draw(Minecraft mc, int posX, int posY) {
 		mc.renderEngine.bindTexture(text);
 		
-		Gui.drawModalRectWithCustomSizedTexture(posX, posY,
+		RenderFuncs.drawModalRectWithCustomSizedTexture(posX, posY,
 				TEXT_OFFSETU + (u * 18), TEXT_OFFSETV + (v * 18),
 				18, 18, TEXT_WIDTH, TEXT_HEIGHT);
 	}

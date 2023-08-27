@@ -20,23 +20,23 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * Obelisk block. If tile, has tile entity (and is master or slave).
@@ -218,7 +218,7 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 		// We will be destroyed
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
     public BlockRenderLayer getBlockLayer() {
 		return BlockRenderLayer.SOLID;
 	}
@@ -244,7 +244,7 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, PlayerEntity player) {
 		return ItemStack.EMPTY;
 	}
 
@@ -273,7 +273,7 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
 		
 		if (state.getValue(MASTER) == false) {
 			return false;
@@ -282,7 +282,7 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
 		if (!ModConfig.config.obeliskReqMagic() && (attr == null || !attr.isUnlocked())) {
 			if (worldIn.isRemote) {
-				playerIn.sendMessage(new TextComponentTranslation("info.obelisk.nomagic"));
+				playerIn.sendMessage(new TranslationTextComponent("info.obelisk.nomagic"));
 			}
 			return false;
 		}

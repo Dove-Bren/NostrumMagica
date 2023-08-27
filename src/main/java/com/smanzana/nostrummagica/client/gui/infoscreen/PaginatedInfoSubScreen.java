@@ -10,15 +10,15 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.book.BookScreen;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.resources.I18n;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class PaginatedInfoSubScreen implements IInfoSubScreen {
 
@@ -28,11 +28,13 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 	private String desc;
 	private String pages[][];
 	private int page;
+	private final InfoScreen screen;
 	
-	public PaginatedInfoSubScreen(String key) {
+	public PaginatedInfoSubScreen(InfoScreen screen, String key) {
 		desc = I18n.format("info." + key + ".name", (Object[]) null);
 		this.key = key;
 		this.page = 0;
+		this.screen = screen;
 	}
 	
 	@Override
@@ -62,7 +64,8 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 	}
 	
 	private void paginate(String input, int pageWidth, int pageHeight) {
-		FontRenderer fonter = Minecraft.getMinecraft().fontRenderer;
+		Minecraft mc = Minecraft.getInstance();
+		FontRenderer fonter = mc.fontRenderer;
 		final int maxLines = (pageHeight / (LINE_HEIGHT_EXTRA + fonter.FONT_HEIGHT)) - 1;
 		int count;
 		List<String[]> pages = new LinkedList<>();
@@ -122,30 +125,31 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 	@Override
 	public Collection<ISubScreenButton> getButtons() {
 		return Lists.newArrayList(
-				new NextPageButton(90, 0, 0, false),
-				new NextPageButton(91, 0, 0, true),
-				new HomeButton(92, 0, 0)
+				new NextPageButton(this.screen, 0, 0, false),
+				new NextPageButton(this.screen, 0, 0, true),
+				new HomeButton(this.screen, 0, 0)
 		);
 	}
 	
 	class NextPageButton extends ISubScreenButton {
 		private final boolean isNextButton;
 
-		public NextPageButton(int parButtonId, int parPosX, int parPosY, boolean parIsNextButton) {
-			super(parButtonId, parPosX, parPosY);
+		public NextPageButton(InfoScreen screen, int parPosX, int parPosY, boolean parIsNextButton) {
+			super(screen, parPosX, parPosY);
 			this.width = 23;
 			this.height = 13;
 			isNextButton = parIsNextButton;
 		}
 
 		@Override
-		public void drawButton(Minecraft mc, int parX, int parY, float partialTicks) {
+		public void render(int parX, int parY, float partialTicks) {
 			if (visible) {
 				boolean isButtonPressed = (parX >= this.x 
 						&& parY >= this.y 
 						&& parX < this.x + width 
 						&& parY < this.y + height);
 
+				Minecraft mc = Minecraft.getInstance();
 				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 				mc.getTextureManager().bindTexture(BookScreen.background);
 				int textureX = 0;
@@ -159,14 +163,14 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 					textureY += 13;
 				}
 
-				Gui.drawModalRectWithCustomSizedTexture(this.x, this.y, textureX, textureY,
+				RenderFuncs.drawModalRectWithCustomSizedTexture(this.x, this.y, textureX, textureY,
 						23, 13, BookScreen.TEXT_WHOLE_WIDTH, BookScreen.TEXT_WHOLE_HEIGHT);
 
 			}
 		}
 		
 		@Override
-		public void onClick(INostrumMagic attr) {
+		public void onPress() {
 			if (this.isNextButton)
 				page = Math.min(pages.length - 1, page+1);
 			else
@@ -174,22 +178,23 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
     class HomeButton extends ISubScreenButton {
-		public HomeButton(int parButtonId, int parPosX, int parPosY) {
-            super(parButtonId, parPosX, parPosY);
+		public HomeButton(InfoScreen screen, int parPosX, int parPosY) {
+            super(screen, parPosX, parPosY);
             this.width = 23; 
             this.height = 13;
 		}
 
         @Override
-        public void drawButton(Minecraft mc, int parX, int parY, float partialTicks) {
+        public void render(int parX, int parY, float partialTicks) {
         	if (visible) {
         		boolean isButtonPressed = (parX >= this.x 
         				&& parY >= this.y 
                       && parX < this.x + width 
                       && parY < this.y + height);
 
+        		Minecraft mc = Minecraft.getInstance();
         		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
                 mc.getTextureManager().bindTexture(BookScreen.background);
                 int textureX = 48;
@@ -199,18 +204,18 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
                 	textureX += 16;
                 }
 
-                Gui.drawModalRectWithCustomSizedTexture(this.x, this.y, textureX, textureY,
+                RenderFuncs.drawModalRectWithCustomSizedTexture(this.x, this.y, textureX, textureY,
                 		16, 16, BookScreen.TEXT_WHOLE_WIDTH, BookScreen.TEXT_WHOLE_HEIGHT);
                 
             }
         }
         
         public void playPressSound(SoundHandler soundHandlerIn) {
-        	soundHandlerIn.playSound(PositionedSoundRecord.getMasterRecord(NostrumMagicaSounds.UI_TICK.getEvent(), 1.0F));
+        	soundHandlerIn.play(SimpleSound.master(NostrumMagicaSounds.UI_TICK.getEvent(), 1.0F));
         }
 		
 		@Override
-		public void onClick(INostrumMagic attr) {
+		public void onPress() {
 			page = 0;
 		}
     }

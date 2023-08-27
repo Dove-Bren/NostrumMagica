@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.ArcaneWolfElementalType;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.init.SoundEvents;
@@ -20,7 +20,7 @@ public class ArcaneWolfAIStormTask extends EntityAIBase {
 	protected final int manaCost;
 
 	protected boolean active;
-	protected @Nullable EntityLivingBase activeTarget;
+	protected @Nullable LivingEntity activeTarget;
 	
 	public ArcaneWolfAIStormTask(EntityArcaneWolf wolf, int manaCost) {
 		this.wolf = wolf;
@@ -62,17 +62,17 @@ public class ArcaneWolfAIStormTask extends EntityAIBase {
 		activeTarget = null;
 	}
 	
-	protected void launchEntity(EntityArcaneWolf wolf, EntityLivingBase target) {
+	protected void launchEntity(EntityArcaneWolf wolf, LivingEntity target) {
 		target.setVelocity(0, 1.5, 0);
 	}
 	
-	protected boolean shouldBlastEntity(EntityArcaneWolf wolf, EntityLivingBase target) {
+	protected boolean shouldBlastEntity(EntityArcaneWolf wolf, LivingEntity target) {
 		return target != null
 				&& !target.isDead
-				&& target.motionY < 0;
+				&& target.getMotion().y < 0;
 	}
 	
-	protected void blastEntity(EntityArcaneWolf wolf, EntityLivingBase target) {
+	protected void blastEntity(EntityArcaneWolf wolf, LivingEntity target) {
 		for (int i = 0; i < 2; i++) {
 			target.world.addWeatherEffect(
 					(new NostrumTameLightning(target.world,

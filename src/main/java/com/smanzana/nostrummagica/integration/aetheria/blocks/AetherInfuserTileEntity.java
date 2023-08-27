@@ -22,13 +22,13 @@ import com.smanzana.nostrummagica.utils.Inventories.ItemStackArrayWrapper;
 import com.smanzana.nostrummagica.utils.WorldUtil;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IEntityOwnable;
 import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -43,9 +43,9 @@ import net.minecraftforge.event.world.BlockEvent.EntityPlaceEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 
@@ -66,7 +66,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 		
 		// Client-only + transient
 		private int effectTime; // forever-growing at rate dependent on 'active'
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		private List<AetherInfuserTileEntity.EffectSpark> sparks;
 		
 		public AetherInfuserTileEntity() {
@@ -78,7 +78,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 			MinecraftForge.EVENT_BUS.register(this);
 		}
 		
-		public static final void DoChargeEffect(EntityLivingBase entity, int count, int color) {
+		public static final void DoChargeEffect(LivingEntity entity, int count, int color) {
 			NostrumParticles.GLOW_ORB.spawn(entity.getEntityWorld(), new SpawnParams(
 					count,
 					entity.posX, entity.posY + entity.height/2f, entity.posZ, 2.0,
@@ -109,7 +109,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 					).color(color));
 		}
 		
-		protected void chargePlayer(EntityPlayer player) {
+		protected void chargePlayer(PlayerEntity player) {
 			int chargeAmount = Math.min(CHARGE_PER_TICK, this.getCharge());
 			final int startAmount = chargeAmount;
 			// Try both regular inventory and bauble inventory
@@ -277,18 +277,18 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 				final int radius = this.hasAreaCharge() ? this.getChargeAreaRadius() : 4; // 4 is size of bubble
 				final BlockPos min = (pos.add(-radius, -radius, -radius));
 				final BlockPos max = (pos.add(radius, radius, radius));
-				List<Entity> candidates = world.getEntitiesWithinAABB(EntityPlayer.class, new AxisAlignedBB(
+				List<Entity> candidates = world.getEntitiesWithinAABB(PlayerEntity.class, new AxisAlignedBB(
 						min, max
 						));
-				EntityPlayer minPlayer = null;
+				PlayerEntity minPlayer = null;
 				double minDist = Double.MAX_VALUE;
 				final double radiusSq = radius * radius;
 				for (Entity candidate : candidates) {
-					if (!(candidate instanceof EntityPlayer)) {
+					if (!(candidate instanceof PlayerEntity)) {
 						continue;
 					}
 					
-					EntityPlayer player = (EntityPlayer) candidate;
+					PlayerEntity player = (PlayerEntity) candidate;
 					final double dist = player.getDistanceSq(pos.getX() + .5, pos.getY() + .5 + 2, pos.getZ() + .5);
 					if (dist < radiusSq && dist < minDist) {
 						minDist = dist;
@@ -304,25 +304,25 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 		}
 		
 		@Override
-		public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+		public CompoundNBT writeToNBT(CompoundNBT nbt) {
 			nbt = super.writeToNBT(nbt);
 			
 			if (nbt == null)
-				nbt = new NBTTagCompound();
+				nbt = new CompoundNBT();
 			
-			nbt.setInteger(NBT_CHARGE, charge);
+			nbt.putInt(NBT_CHARGE, charge);
 			
 			return nbt;
 		}
 		
 		@Override
-		public void readFromNBT(NBTTagCompound nbt) {
+		public void readFromNBT(CompoundNBT nbt) {
 			super.readFromNBT(nbt);
 			
 			if (nbt == null)
 				return;
 			
-			this.charge = nbt.getInteger(NBT_CHARGE);
+			this.charge = nbt.getInt(NBT_CHARGE);
 		}
 		
 		@Override
@@ -336,7 +336,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 			}
 			
 			NostrumMagica.playerListener.registerTimer((type, entity, data)->{
-				//Event type, EntityLivingBase entity, Object data
+				//Event type, LivingEntity entity, Object data
 				refreshNearbyBlocks();
 				return true;
 			}, 1, 0);
@@ -383,12 +383,12 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 			return active;
 		}
 		
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		public int getEffectTicks() {
 			return effectTime;
 		}
 		
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		public void spawnSpark() {
 			synchronized(sparks) {
 				sparks.add(new EffectSpark(
@@ -403,7 +403,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 			}
 		}
 		
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		public void removeSpark() {
 			synchronized(sparks) {
 				if (sparks.isEmpty()) {
@@ -414,7 +414,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 			}
 		}
 		
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		public List<AetherInfuserTileEntity.EffectSpark> getSparks(@Nullable List<AetherInfuserTileEntity.EffectSpark> storage) {
 			if (storage == null) {
 				storage = new ArrayList<>();
@@ -429,7 +429,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 			return storage;
 		}
 		
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		public void updateSparks() {
 			// Spawn or despawn sparks, and adjust brightness if necessary
 			float chargePerc = getChargePerc();
@@ -449,7 +449,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 			}
 		}
 		
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		public net.minecraft.util.math.AxisAlignedBB getRenderBoundingBox() {
 			return TileEntity.INFINITE_EXTENT_AABB;
 		}
@@ -574,7 +574,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 				return;
 			}
 			
-			final EntityLivingBase entity = event.getEntityLiving();
+			final LivingEntity entity = event.getEntityLiving();
 			
 			// Figure out what to not allow through
 			boolean isBad = false;
@@ -754,7 +754,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 			}
 		}
 		
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		public static class EffectSpark {
 			
 			public static final int BLINK_PERIOD = (20 * 4);

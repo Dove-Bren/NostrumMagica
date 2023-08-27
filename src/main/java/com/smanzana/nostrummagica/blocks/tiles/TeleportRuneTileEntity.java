@@ -6,11 +6,11 @@ import com.smanzana.nostrummagica.world.blueprints.IOrientedTileEntity;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants.NBT;
 
@@ -55,8 +55,8 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 	}
 
 	@Override
-	public NBTTagCompound getUpdateTag() {
-		return this.writeToNBT(new NBTTagCompound());
+	public CompoundNBT getUpdateTag() {
+		return this.writeToNBT(new CompoundNBT());
 	}
 	
 	@Override
@@ -65,21 +65,21 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 		handleUpdateTag(pkt.getNbtCompound());
 	}
 	
-	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+	public CompoundNBT writeToNBT(CompoundNBT compound) {
 		super.writeToNBT(compound);
 		
 		if (teleOffset != null) {
-			compound.setLong(NBT_OFFSET, teleOffset.toLong());
+			compound.putLong(NBT_OFFSET, teleOffset.toLong());
 		}
 		
 		return compound;
 	}
 	
-	public void readFromNBT(NBTTagCompound compound) {
+	public void readFromNBT(CompoundNBT compound) {
 		super.readFromNBT(compound);
 		
 		teleOffset = null;
-		if (compound.hasKey(NBT_OFFSET, NBT.TAG_LONG)) {
+		if (compound.contains(NBT_OFFSET, NBT.TAG_LONG)) {
 			teleOffset = BlockPos.fromLong(compound.getLong(NBT_OFFSET));
 		}
 	}
@@ -92,7 +92,7 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 	}
 	
 	@Override
-	public void setSpawnedFromRotation(EnumFacing rotation) {
+	public void setSpawnedFromRotation(Direction rotation) {
 		BlockPos orig = this.getOffset();
 		if (orig != null) {
 			BlockPos out = RoomBlueprint.applyRotation(this.getOffset(), rotation);

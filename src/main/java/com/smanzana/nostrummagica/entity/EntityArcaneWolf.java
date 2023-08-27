@@ -61,7 +61,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 import com.smanzana.nostrummagica.utils.Inventories;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IEntityOwnable;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIAttackMelee;
@@ -82,14 +82,14 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.AbstractSkeleton;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.passive.EntityWolf;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -100,11 +100,11 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEntityPet, IPetWithSoul, IStabbableEntity, IMagicEntity {
 	
@@ -362,7 +362,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		;
 		
 		private static interface ISpellPredicate {
-			public boolean apply(EntityArcaneWolf wolf, EntityLivingBase target);
+			public boolean apply(EntityArcaneWolf wolf, LivingEntity target);
 		}
 		
 		private final @Nullable WolfSpellTargetGroup group;
@@ -381,7 +381,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 			return spell;
 		}
 		
-		public boolean matches(WolfSpellTargetGroup group, EntityArcaneWolf wolf, EntityLivingBase target) {
+		public boolean matches(WolfSpellTargetGroup group, EntityArcaneWolf wolf, LivingEntity target) {
 			return (this.group == null || this.group == group) && predicate.apply(wolf, target);
 		}
 		
@@ -511,7 +511,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		this.tasks.addTask(priority++, new EntityAILeapAtTarget(this, 0.4F));
 		this.tasks.addTask(priority++, new EntityAIAttackMelee(this, 1.0D, true) {
 			@Override
-			protected void checkAndPerformAttack(EntityLivingBase target, double dist) {
+			protected void checkAndPerformAttack(LivingEntity target, double dist) {
 
 				if (this.attackTick <= 0 && dist > this.getAttackReachSqr(target)) {
 					// Too far
@@ -567,12 +567,12 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 			}
 			
 			@Override
-			protected @Nullable EntityLivingBase getTarget() {
+			protected @Nullable LivingEntity getTarget() {
 				// Want to make sure to be stable so that multiple calls when finding spell etc.
 				// return the same answer
-				EntityLivingBase owner = entity.getOwner();
+				LivingEntity owner = entity.getOwner();
 				if (owner != null) {
-					List<EntityLivingBase> tames = NostrumMagica.getTamedEntities(owner);
+					List<LivingEntity> tames = NostrumMagica.getTamedEntities(owner);
 					tames.add(owner);
 					tames.removeIf((e) -> { return e.getDistance(entity) > 15;});
 					Collections.shuffle(tames, new Random(entity.ticksExisted));
@@ -603,7 +603,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 			}
 			
 			@Override
-			protected @Nullable EntityLivingBase getTarget() {
+			protected @Nullable LivingEntity getTarget() {
 				return entity;
 			}
 			
@@ -620,7 +620,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		//this.tasks.addTask(7, new EntityAIMate(this, 1.0D));
 		this.tasks.addTask(priority++, new EntityAIWanderAvoidWater(this, 1.0D));
 		this.tasks.addTask(priority++, new EntityAIBeg(this, 8.0F));
-		this.tasks.addTask(priority++, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
+		this.tasks.addTask(priority++, new EntityAIWatchClosest(this, PlayerEntity.class, 8.0F));
 		this.tasks.addTask(priority++, new EntityAILookIdle(this));
 		
 		priority = 1;
@@ -632,10 +632,10 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 	}
 	
 	@Override
-	public EntityLivingBase getLivingOwner() {
+	public LivingEntity getLivingOwner() {
 		Entity owner = this.getOwner();
-		if (owner instanceof EntityLivingBase) {
-			return (EntityLivingBase) owner;
+		if (owner instanceof LivingEntity) {
+			return (LivingEntity) owner;
 		}
 		return null;
 	}
@@ -694,12 +694,12 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 	public void travel(float strafe, float vertical, float forward) {
 		//super.travel(strafe, vertical, forward);
 		
-		if (this.onGround && this.motionY <= 0) {
+		if (this.onGround && this.getMotion().y <= 0) {
 			this.jumpCount = 0;
 		}
 		
 		if (this.isBeingRidden() && this.canBeSteered()) {
-			EntityLivingBase entitylivingbase = (EntityLivingBase)this.getControllingPassenger();
+			LivingEntity entitylivingbase = (LivingEntity)this.getControllingPassenger();
 			this.rotationYaw = entitylivingbase.rotationYaw;
 			this.prevRotationYaw = this.rotationYaw;
 			this.rotationPitch = entitylivingbase.rotationPitch * 0.5F;
@@ -720,10 +720,10 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 			{
 //				if (this.setJump) {
 //					this.setJump = false;
-//					this.motionY = (double)this.getJumpUpwardsMotion();
+//					this.getMotion().y = (double)this.getJumpUpwardsMotion();
 //					
 //					if (this.isPotionActive(MobEffects.JUMP_BOOST)) {
-//						this.motionY += (double)((float)(this.getActivePotionEffect(MobEffects.JUMP_BOOST).getAmplifier() + 1) * 0.1F);
+//						this.getMotion().y += (double)((float)(this.getActivePotionEffect(MobEffects.JUMP_BOOST).getAmplifier() + 1) * 0.1F);
 //					}
 //					
 //					this.isAirBorne = true;
@@ -733,11 +733,11 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 				this.setAIMoveSpeed((float)this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue());
 				super.travel(strafe, vertical, forward);
 			}
-			else if (entitylivingbase instanceof EntityPlayer)
+			else if (entitylivingbase instanceof PlayerEntity)
 			{
-				this.motionX = 0.0D;
-				this.motionY = 0.0D;
-				this.motionZ = 0.0D;
+				this.getMotion().x = 0.0D;
+				this.getMotion().y = 0.0D;
+				this.getMotion().z = 0.0D;
 			}
 
 			this.prevLimbSwingAmount = this.limbSwingAmount;
@@ -791,7 +791,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		return false;
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public float getTailRotation() {
 		return (float) (Math.PI * (.35f + .2f * (this.getHealth() / this.getMaxHealth())));
 	}
@@ -810,7 +810,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 	}
 	
 	@Override
-	public boolean processInteract(EntityPlayer player, EnumHand hand) {
+	public boolean processInteract(PlayerEntity player, EnumHand hand) {
 		// Shift-right click toggles sitting.
 		// When not sitting, right-click mounts the wolf
 		// When sitting, will eventually open a GUI
@@ -844,12 +844,12 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 				if (!this.world.isRemote) {
 					if (this.hasWolfCapability(WolfBondCapability.RIDEABLE)) {
 						if (this.getHealth() < ARCANE_WOLF_WARN_HEALTH) {
-							player.sendMessage(new TextComponentTranslation("info.tamed_arcane_wolf.low_health", this.getName()));
+							player.sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.low_health", this.getName()));
 						} else {
 							player.startRiding(this);
 						}
 					} else {
-						player.sendMessage(new TextComponentTranslation("info.tamed_arcane_wolf.no_ride", this.getName()));
+						player.sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.no_ride", this.getName()));
 					}
 				}
 				return true;
@@ -865,7 +865,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		} else {
 			// Someone other than the owner clicked
 			if (!this.world.isRemote) {
-				player.sendMessage(new TextComponentTranslation("info.tamed_arcane_wolf.not_yours", this.getName()));
+				player.sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.not_yours", this.getName()));
 			}
 			return true;
 		}
@@ -881,14 +881,14 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 	@Override
 	public boolean canBeSteered() {
 		Entity entity = this.getControllingPassenger();
-		return entity instanceof EntityLivingBase;
+		return entity instanceof LivingEntity;
 	}
 	
 	@Override
 	public double getMountedYOffset() {
 		// Dragons go from 60% to 100% height.
 		// This is synced with the rendering code.
-		return (this.height * 0.6D) - ((0.4f * this.height) * (1f-getGrowingAge()));
+		return (this.getHeight() * 0.6D) - ((0.4f * this.getHeight()) * (1f-getGrowingAge()));
 	}
 	
 	@Override
@@ -902,7 +902,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 	}
 	
 	@Override
-	 public boolean canBeLeashedTo(EntityPlayer player) {
+	 public boolean canBeLeashedTo(PlayerEntity player) {
 		return !isSitting() && player == getOwner();
 	}
 	
@@ -1289,44 +1289,44 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		this.jumpCount = 0;
 	}
 	
-	public void writeEntityToNBT(NBTTagCompound compound) {
+	public void writeEntityToNBT(CompoundNBT compound) {
 		super.writeEntityToNBT(compound);
 		
-		compound.setBoolean(NBT_SOUL_BOUND, this.isSoulBound());
-		compound.setInteger(NBT_ATTR_XP, this.getXP());
-		compound.setInteger(NBT_ATTR_LEVEL, this.getLevel());
-		compound.setFloat(NBT_ATTR_BOND, this.getBond());
-		compound.setFloat(NBT_MANA_REGEN, this.getManaRegen());
+		compound.putBoolean(NBT_SOUL_BOUND, this.isSoulBound());
+		compound.putInt(NBT_ATTR_XP, this.getXP());
+		compound.putInt(NBT_ATTR_LEVEL, this.getLevel());
+		compound.putFloat(NBT_ATTR_BOND, this.getBond());
+		compound.putFloat(NBT_MANA_REGEN, this.getManaRegen());
 		// Ignore max health; already saved
-		compound.setInteger(NBT_MANA, this.getMana());
-		compound.setInteger(NBT_MAX_MANA, this.getMaxMana());
+		compound.putInt(NBT_MANA, this.getMana());
+		compound.putInt(NBT_MAX_MANA, this.getMaxMana());
 		compound.setUniqueId(NBT_SOUL_ID, soulID);
 		if (worldID != null) {
 			compound.setUniqueId(NBT_SOUL_WORLDID, worldID);
 		}
-		compound.setInteger(NBT_RUNE_COLOR, this.getRuneColor());
+		compound.putInt(NBT_RUNE_COLOR, this.getRuneColor());
 		if (this.getTrainingElement() != null) {
-			compound.setString(NBT_TRAINING_ELEMENT, this.getTrainingElement().name());
-			compound.setInteger(NBT_TRAINING_LEVEL, this.getTrainingLevel());
+			compound.putString(NBT_TRAINING_ELEMENT, this.getTrainingElement().name());
+			compound.putInt(NBT_TRAINING_LEVEL, this.getTrainingLevel());
 		}
-		compound.setInteger(NBT_TRAINING_XP, this.getTrainingXP());
-		compound.setString(NBT_ELEMENTAL_TYPE, this.getElementalType().name());
+		compound.putInt(NBT_TRAINING_XP, this.getTrainingXP());
+		compound.putString(NBT_ELEMENTAL_TYPE, this.getElementalType().name());
 		
-		compound.setTag(NBT_INVENTORY, Inventories.serializeInventory(inventory));
+		compound.put(NBT_INVENTORY, Inventories.serializeInventory(inventory));
 	}
 	
 	@Override
-	public void readEntityFromNBT(NBTTagCompound compound) {
+	public void readEntityFromNBT(CompoundNBT compound) {
 		super.readEntityFromNBT(compound);
 		
 		this.setSoulBound(compound.getBoolean(NBT_SOUL_BOUND));
-		this.setXP(compound.getInteger(NBT_ATTR_XP));
-		this.setLevel(compound.getInteger(NBT_ATTR_LEVEL));
+		this.setXP(compound.getInt(NBT_ATTR_XP));
+		this.setLevel(compound.getInt(NBT_ATTR_LEVEL));
 		this.setBond(compound.getFloat(NBT_ATTR_BOND));
 		this.setManaRegen(compound.getFloat(NBT_MANA_REGEN));
 		// Continue ignoring max health
-		this.setMaxMana(compound.getInteger(NBT_MAX_MANA)); // before setting mana
-		this.setMana(compound.getInteger(NBT_MANA));
+		this.setMaxMana(compound.getInt(NBT_MAX_MANA)); // before setting mana
+		this.setMana(compound.getInt(NBT_MANA));
 		
 		// Summon command passes empty NBT to parse. Don't overwrite random UUID if not present.
 		if (compound.hasUniqueId(NBT_SOUL_ID)) {
@@ -1339,17 +1339,17 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 			this.worldID = null;
 		}
 		
-		this.setRuneColor(compound.getInteger(NBT_RUNE_COLOR));
+		this.setRuneColor(compound.getInt(NBT_RUNE_COLOR));
 		this.setTrainingElement(null);
-		if (compound.hasKey(NBT_TRAINING_ELEMENT)) {
+		if (compound.contains(NBT_TRAINING_ELEMENT)) {
 			try {
 				this.setTrainingElement(EMagicElement.valueOf(compound.getString(NBT_TRAINING_ELEMENT).toUpperCase()));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			this.setTrainingLevel(compound.getInteger(NBT_TRAINING_LEVEL));
+			this.setTrainingLevel(compound.getInt(NBT_TRAINING_LEVEL));
 		}
-		this.setTrainingXP(compound.getInteger(NBT_TRAINING_XP));
+		this.setTrainingXP(compound.getInt(NBT_TRAINING_XP));
 		try {
 			this.setElementalType(ArcaneWolfElementalType.valueOf(compound.getString(NBT_ELEMENTAL_TYPE).toUpperCase()));
 		} catch (Exception e) {
@@ -1364,7 +1364,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 	@Override
 	public Team getTeam() {
 		if (this.isTamed()) {
-			EntityLivingBase entitylivingbase = this.getOwner();
+			LivingEntity entitylivingbase = this.getOwner();
 
 			if (entitylivingbase != null) {
 				return entitylivingbase.getTeam();
@@ -1380,7 +1380,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 	@Override
 	public boolean isOnSameTeam(Entity entityIn) {
 		if (this.isTamed()) {
-			EntityLivingBase myOwner = this.getOwner();
+			LivingEntity myOwner = this.getOwner();
 
 			if (entityIn == myOwner) {
 				return true;
@@ -1457,11 +1457,11 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		}
 		
 		if (hurt && this.isTamed()) {
-			EntityLivingBase owner = this.getOwner();
+			LivingEntity owner = this.getOwner();
 			float health = this.getHealth();
 			if (health > 0f && health < ARCANE_WOLF_WARN_HEALTH) {
-				if (owner != null && owner instanceof EntityPlayer) {
-					((EntityPlayer) this.getOwner()).sendMessage(new TextComponentTranslation("info.tamed_arcane_wolf.hurt", this.getName()));
+				if (owner != null && owner instanceof PlayerEntity) {
+					((PlayerEntity) this.getOwner()).sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.hurt", this.getName()));
 				}
 				this.dismountRidingEntity();
 			} else if (health > 0f) {
@@ -1483,7 +1483,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		boolean hit = super.attackEntityAsMob(entityIn);
 		
 		if (hit && !world.isRemote) {
-			EntityLivingBase owner = this.getOwner();
+			LivingEntity owner = this.getOwner();
 			if (owner != null) {
 				final double dist = owner.getDistance(owner);
 				if (dist <= 10) {
@@ -1513,7 +1513,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 	}
 	
 	@Override
-	public boolean onSoulStab(EntityLivingBase stabber, ItemStack stabbingItem) {
+	public boolean onSoulStab(LivingEntity stabber, ItemStack stabbingItem) {
 		
 		if (this.isOwner(stabber) && !isSoulBound() && this.getBond() >= 1f) {
 			// Die and scream and drop a soul ember
@@ -1621,10 +1621,10 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		this.addManaRegen(regen);
 		this.setLevel(level + 1);
 		
-		EntityLivingBase owner = this.getOwner();
+		LivingEntity owner = this.getOwner();
 		if (owner != null) {
 			this.playSound(SoundEvents.ENTITY_WOLF_AMBIENT, 1f, 1f);
-			owner.sendMessage(new TextComponentString(this.getName() + " leveled up!"));
+			owner.sendMessage(new StringTextComponent(this.getName() + " leveled up!"));
 		}
 	}
 	
@@ -1768,7 +1768,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 	}
 	
 	@Override
-	public PetContainer<EntityArcaneWolf> getGUIContainer(EntityPlayer player) {
+	public PetContainer<EntityArcaneWolf> getGUIContainer(PlayerEntity player) {
 		return new PetContainer<>(this, player,
 				new ArcaneWolfInfoSheet(this),
 				new ArcaneWolfBondInfoSheet(this),
@@ -1840,7 +1840,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		return this.hasElementLevel(capability.getSubType(), capability.getSubTypeLevel());
 	}
 	
-	protected boolean teleportToEnemy(EntityLivingBase target) {
+	protected boolean teleportToEnemy(LivingEntity target) {
 		if (target == null || target.isDead) {
 			return false;
 		}
@@ -1848,7 +1848,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		return EntityAIFollowOwnerGeneric.TeleportAroundEntity(this, target);
 	}
 	
-	protected List<Spell> getTargetSpells(EntityLivingBase target, List<Spell> listToAddTo) {
+	protected List<Spell> getTargetSpells(LivingEntity target, List<Spell> listToAddTo) {
 		listToAddTo.clear();
 		for (WolfSpell spell : WolfSpell.values()) {
 			if (this.getMana() >= spell.getCost()
@@ -1859,7 +1859,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		return listToAddTo;
 	}
 	
-	protected List<Spell> getSelfSpells(EntityLivingBase target, List<Spell> listToAddTo) {
+	protected List<Spell> getSelfSpells(LivingEntity target, List<Spell> listToAddTo) {
 		listToAddTo.clear();
 		for (WolfSpell spell : WolfSpell.values()) {
 			if (this.getMana() >= spell.getCost()
@@ -1870,7 +1870,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		return listToAddTo;
 	}
 	
-	protected List<Spell> getAllySpells(EntityLivingBase target, List<Spell> listToAddTo) {
+	protected List<Spell> getAllySpells(LivingEntity target, List<Spell> listToAddTo) {
 		listToAddTo.clear();
 		for (WolfSpell spell : WolfSpell.values()) {
 			if (this.getMana() >= spell.getCost()
@@ -1896,7 +1896,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 		}
 	}
 	
-	public static EntityArcaneWolf TransformWolf(EntityWolf wolf, EntityPlayer player) {
+	public static EntityArcaneWolf TransformWolf(EntityWolf wolf, PlayerEntity player) {
 		EntityArcaneWolf newWolf = new EntityArcaneWolf(wolf.world);
 		newWolf.setPosition(wolf.posX, wolf.posY, wolf.posZ);
 		newWolf.setTamedBy(player);

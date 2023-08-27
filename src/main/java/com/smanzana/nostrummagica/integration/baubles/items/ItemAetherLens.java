@@ -22,10 +22,10 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IEntityOwnable;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.init.PotionTypes;
@@ -34,15 +34,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.potion.PotionUtils;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.oredict.OreDictionary;
 
 public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserLens {
@@ -133,7 +133,7 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 		return "item." + UNLOC_PREFIX + TypeFromMeta(stack.getMetadata()).getUnlocSuffix();
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
     @Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
 		if (this.isInCreativeTab(tab)) {
@@ -170,13 +170,13 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		super.addInformation(stack, worldIn, tooltip, flagIn);
 		
 		final LensType type = TypeFromMeta(stack.getMetadata()); 
 		
-		if (I18n.hasKey("item." + UNLOC_PREFIX + type.getUnlocSuffix() + ".desc")) {
+		if (I18n.contains("item." + UNLOC_PREFIX + type.getUnlocSuffix() + ".desc")) {
 			// Format with placeholders for blue and red formatting
 			String translation = I18n.format("item." + UNLOC_PREFIX + type.getUnlocSuffix() + ".desc", TextFormatting.GRAY, TextFormatting.BLUE, TextFormatting.DARK_RED);
 			if (translation.trim().isEmpty())
@@ -257,7 +257,7 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 	protected int doSwiftness(World world, BlockPos center, int maxAether) {
 		final double MAX_DIST_SQ = 900;
 		int cost = 0;
-		for (EntityLivingBase ent : world.getEntities(EntityLivingBase.class, (e) -> {
+		for (LivingEntity ent : world.getEntities(LivingEntity.class, (e) -> {
 			return !e.isDead
 					&& e.getDistanceSq(center) < MAX_DIST_SQ
 					&& (e.getActivePotionEffect(Potion.getPotionFromResourceLocation("speed")) == null
@@ -274,7 +274,7 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 		final double HORZ_DIST_RADIUS = 2.5;
 		final double MAX_HEIGHT = 30;
 		int cost = 0;
-		for (EntityLivingBase ent : world.getEntities(EntityLivingBase.class, (e) -> {
+		for (LivingEntity ent : world.getEntities(LivingEntity.class, (e) -> {
 			return !e.isDead
 					&& e.posY >= center.getY() && e.posY < center.getY() + MAX_HEIGHT
 					&& Math.abs(e.posX - (center.getX() + .5)) < HORZ_DIST_RADIUS
@@ -282,7 +282,7 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 		})) {
 			if (!ent.isSneaking() && !ent.onGround) {
 				cost += 1;
-				ent.motionY = Math.min(.3, ent.motionY + .1);
+				ent.getMotion().y = Math.min(.3, ent.getMotion().y + .1);
 				ent.velocityChanged = true;
 				AetherInfuserTileEntity.DoChargeEffect(ent, 1, 0xFF77AA22);
 			}
@@ -294,9 +294,9 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 	protected int doHeal(World world, BlockPos center, int maxAether) {
 		final double MAX_DIST_SQ = 900;
 		int cost = 0;
-		for (EntityLivingBase ent : world.getEntities(EntityLivingBase.class, (e) -> {
+		for (LivingEntity ent : world.getEntities(LivingEntity.class, (e) -> {
 			return !e.isDead
-					&& (e instanceof EntityPlayer || (e instanceof IEntityOwnable && ((IEntityOwnable) e).getOwnerId() != null))
+					&& (e instanceof PlayerEntity || (e instanceof IEntityOwnable && ((IEntityOwnable) e).getOwnerId() != null))
 					&& e.getDistanceSq(center) < MAX_DIST_SQ
 					&& e.getHealth() < e.getMaxHealth();
 		})) {
@@ -313,13 +313,13 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 				);
 		while (cursor.getY() >= 0 && cursor.getY() < world.getHeight()) {
 			if (world.isAirBlock(cursor)) {
-				cursor.move(down ? EnumFacing.DOWN : EnumFacing.UP);
+				cursor.move(down ? Direction.DOWN : Direction.UP);
 				continue;
 			}
 			
 			final IBlockState blockstate = world.getBlockState(cursor);
 			if (blockstate.getBlockHardness(world, cursor) < 0 || blockstate.getMaterial().isLiquid()) {
-				cursor.move(down ? EnumFacing.DOWN : EnumFacing.UP);
+				cursor.move(down ? Direction.DOWN : Direction.UP);
 				continue;
 			}
 			
@@ -360,12 +360,12 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 		final double MAX_DIST_SQ = 900;
 		final int MANA_PER_AETHER = 10;
 		int cost = 0;
-		for (EntityLivingBase ent : world.getEntities(EntityLivingBase.class, (e) -> {
+		for (LivingEntity ent : world.getEntities(LivingEntity.class, (e) -> {
 			return !e.isDead
-					&& (e instanceof EntityPlayer || (e instanceof IMagicEntity))
+					&& (e instanceof PlayerEntity || (e instanceof IMagicEntity))
 					&& e.getDistanceSq(center) < MAX_DIST_SQ;
 		})) {
-			if (ent instanceof EntityPlayer) {
+			if (ent instanceof PlayerEntity) {
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(ent);
 				if (attr.getMana() < attr.getMaxMana()) {
 					cost++;

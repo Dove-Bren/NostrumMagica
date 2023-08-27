@@ -23,7 +23,7 @@ import com.smanzana.nostrummagica.world.dungeon.room.RoomGrandStaircase;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomJail1;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomLectern;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkProvider;
@@ -46,7 +46,7 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 	    {
 	        dungeon.spawn(worldIn,
 	        		new NostrumDungeon.DungeonExitPoint(position, 
-	        				EnumFacing.HORIZONTALS[rand.nextInt(4)]
+	        				Direction.HORIZONTALS[rand.nextInt(4)]
 	        				));
 	        
 	        return true;

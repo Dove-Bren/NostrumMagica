@@ -3,14 +3,14 @@ package com.smanzana.nostrummagica.potions;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class NaturesBlessingPotion extends Potion {
 
@@ -44,7 +44,7 @@ public class NaturesBlessingPotion extends Potion {
 	}
 
 	@Override
-	public void performEffect(EntityLivingBase entity, int amp) {
+	public void performEffect(LivingEntity entity, int amp) {
 		if (!entity.world.isRemote) {
 			final float amt = 1; // Doesn't depend on amp
 			
@@ -53,8 +53,8 @@ public class NaturesBlessingPotion extends Potion {
 				entity.heal(amt);
 			} else {
 				// Food
-				if (entity instanceof EntityPlayer) {
-					EntityPlayer player = (EntityPlayer) entity;
+				if (entity instanceof PlayerEntity) {
+					PlayerEntity player = (PlayerEntity) entity;
 					player.getFoodStats().addStats((int) amt, 0);
 				} else if (entity instanceof EntityAnimal) {
 					((EntityAnimal) entity).setInLove(null);
@@ -63,13 +63,13 @@ public class NaturesBlessingPotion extends Potion {
 		}
     }
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
     public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
 		PotionIcon.NATURESBLESSING.draw(mc, x + 6, y + 7);
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
     public void renderHUDEffect(int x, int y, PotionEffect effect, net.minecraft.client.Minecraft mc, float alpha) {
 		PotionIcon.NATURESBLESSING.draw(mc, x + 3, y + 3);

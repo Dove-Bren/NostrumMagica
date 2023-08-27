@@ -12,28 +12,28 @@ import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.EntityLivingBase;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * Displays effects in the world
  * @author Skyler
  *
  */
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class ClientEffectRenderer {
 	
 	public static interface ClientEffectFactory {
 		
-		public ClientEffect build(EntityLivingBase caster,
+		public ClientEffect build(LivingEntity caster,
 			Vec3d sourcePosition,
-			EntityLivingBase target,
+			LivingEntity target,
 			Vec3d destPosition,
 			SpellComponentWrapper flavor,
 			boolean isNegative,
@@ -77,11 +77,11 @@ public class ClientEffectRenderer {
 		}
 		
 		GlStateManager.pushMatrix();
-		Minecraft mc = Minecraft.getMinecraft();
+		Minecraft mc = Minecraft.getInstance();
 		
-		Vec3d playerOffset = mc.player.getPositionEyes(event.getPartialTicks()).addVector(0, -mc.player.eyeHeight, 0);
+		Vec3d playerOffset = mc.player.getEyePosition(event.getPartialTicks()).add(0, -mc.player.getEyeHeight(), 0);
 		//Vec3d playerOffset = mc.thePlayer.getPositionVector();
-		GlStateManager.translate(-playerOffset.x, -playerOffset.y, -playerOffset.z);
+		GlStateManager.translated(-playerOffset.x, -playerOffset.y, -playerOffset.z);
 		
 		synchronized(activeEffects) {
 			Iterator<ClientEffect> it = activeEffects.iterator();
@@ -104,9 +104,9 @@ public class ClientEffectRenderer {
 	private static boolean DidWarned = false;
 	
 	public void spawnEffect(SpellComponentWrapper component,
-			EntityLivingBase caster,
+			LivingEntity caster,
 			Vec3d sourcePosition,
-			EntityLivingBase target,
+			LivingEntity target,
 			Vec3d destPosition,
 			SpellComponentWrapper flavor,
 			boolean isNegative,

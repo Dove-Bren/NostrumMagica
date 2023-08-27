@@ -14,19 +14,19 @@ import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ArcaneWolfSoulItem extends PetSoulItem {
 	
@@ -78,14 +78,14 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 	}
 
 	@Override
-	protected void setWorldID(EntityLivingBase pet, UUID worldID) {
+	protected void setWorldID(LivingEntity pet, UUID worldID) {
 		if (pet instanceof EntityArcaneWolf) {
 			((EntityArcaneWolf) pet).setWorldID(worldID);
 		}
 	}
 
 	@Override
-	protected void beforePetRespawn(EntityLivingBase pet, World world, Vec3d pos, ItemStack stack) {
+	protected void beforePetRespawn(LivingEntity pet, World world, Vec3d pos, ItemStack stack) {
 		// Wolves spawn at 50% health and 0% mana
 		if (pet instanceof EntityArcaneWolf) {
 			EntityArcaneWolf wolf = ((EntityArcaneWolf) pet);
@@ -100,7 +100,7 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 	}
 	
 	@Override
-	public boolean itemInteractionForEntity(ItemStack stack, EntityPlayer playerIn, EntityLivingBase target, EnumHand hand) {
+	public boolean itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, EnumHand hand) {
 		if (!playerIn.isCreative()) {
 			return false;
 		}
@@ -119,7 +119,7 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
 		final ItemStack held = playerIn.getHeldItem(hand);
 		if (getMana(held) >= getMaxMana(held)) {
 			return new ActionResult<ItemStack>(EnumActionResult.PASS, held);
@@ -140,7 +140,7 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 	}
 	
 	@Override
-	public ItemStack onItemUseFinish(ItemStack stack, World worldIn, EntityLivingBase entityLiving) {
+	public ItemStack onItemUseFinish(ItemStack stack, World worldIn, LivingEntity entityLiving) {
 		if (worldIn.isRemote) {
 			return stack;
 		}
@@ -159,13 +159,13 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 	}
 	
 	@Override
-	public void onUsingTick(ItemStack stack, EntityLivingBase player, int count) {
+	public void onUsingTick(ItemStack stack, LivingEntity player, int count) {
 		if (player.world.isRemote) {
 			// On client, spawn particles
 			if (NostrumMagica.rand.nextBoolean()) {
 				Vec3d offset;
 				final float rotation;
-				if (player == NostrumMagica.proxy.getPlayer() && Minecraft.getMinecraft().gameSettings.thirdPersonView == 0) {
+				if (player == NostrumMagica.proxy.getPlayer() && Minecraft.getInstance().gameSettings.thirdPersonView == 0) {
 					offset = new Vec3d(-.1, player.getEyeHeight() -.05, .2);
 					rotation = -player.rotationYaw % 360f;
 				} else {
@@ -190,7 +190,7 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 	}
 
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		super.addInformation(stack, worldIn, tooltip, flagIn);
 		
@@ -218,25 +218,25 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 	}
 	
 	public int getMana(ItemStack stack) {
-		NBTTagCompound nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTagCompound();
 		if (nbt == null) {
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 			stack.setTagCompound(nbt);
 		}
 		
-		return nbt.getInteger(NBT_MANA);
+		return nbt.getInt(NBT_MANA);
 	}
 	
 	public void setMana(ItemStack stack, int mana) {
 		mana = Math.min(mana, getMaxMana(stack));
 		
-		NBTTagCompound nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTagCompound();
 		if (nbt == null) {
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 			stack.setTagCompound(nbt);
 		}
 		
-		nbt.setInteger(NBT_MANA, mana);
+		nbt.putInt(NBT_MANA, mana);
 	}
 	
 	/**
@@ -281,9 +281,9 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 	}
 
 	@Override
-	public boolean canSpawnEntity(World world, EntityLivingBase spawner, Vec3d pos, ItemStack stack) {
+	public boolean canSpawnEntity(World world, LivingEntity spawner, Vec3d pos, ItemStack stack) {
 		if (this.getMana(stack) < this.getMaxMana(stack)) {
-			spawner.sendMessage(new TextComponentTranslation("info.respawn_soulbound_dragon.fail.mana", new Object[0]));
+			spawner.sendMessage(new TranslationTextComponent("info.respawn_soulbound_dragon.fail.mana", new Object[0]));
 			return false;
 		}
 		

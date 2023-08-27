@@ -3,13 +3,13 @@ package com.smanzana.nostrummagica.entity.plantboss;
 import java.util.List;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.EntityDamageSource;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -21,7 +21,7 @@ public class EntityPlantBossBramble extends Entity {
 	protected static final DataParameter<Float> WIDTH = EntityDataManager.<Float>createKey(EntityPlantBossBramble.class, DataSerializers.FLOAT);
 	protected static final DataParameter<Float> DEPTH = EntityDataManager.<Float>createKey(EntityPlantBossBramble.class, DataSerializers.FLOAT);
 	protected static final DataParameter<Float> HEIGHT = EntityDataManager.<Float>createKey(EntityPlantBossBramble.class, DataSerializers.FLOAT);
-	protected static final DataParameter<EnumFacing> FACING = EntityDataManager.<EnumFacing>createKey(EntityPlantBossBramble.class, DataSerializers.FACING);
+	protected static final DataParameter<Direction> FACING = EntityDataManager.<Direction>createKey(EntityPlantBossBramble.class, DataSerializers.FACING);
 	
 	protected EntityPlantBoss plant;
 	protected float distance;
@@ -51,7 +51,7 @@ public class EntityPlantBossBramble extends Entity {
 		this.dataManager.register(WIDTH, 5f);
 		this.dataManager.register(DEPTH, .5f);
 		this.dataManager.register(HEIGHT, 5f);
-		this.dataManager.register(FACING, EnumFacing.SOUTH);
+		this.dataManager.register(FACING, Direction.SOUTH);
 	}
 	
 	public float getWidth() {
@@ -66,7 +66,7 @@ public class EntityPlantBossBramble extends Entity {
 		return this.dataManager.get(HEIGHT);
 	}
 	
-	public EnumFacing getFacing() {
+	public Direction getFacing() {
 		return this.dataManager.get(FACING);
 	}
 	
@@ -95,7 +95,7 @@ public class EntityPlantBossBramble extends Entity {
 		}
 		
 		if (change) {
-//			AxisAlignedBB old = this.getEntityBoundingBox();
+//			AxisAlignedBB old = this.getBoundingBox();
 //			this.setEntityBoundingBox(new AxisAlignedBB(
 //					old.minX, old.minY, old.minZ,
 //					old.minX + width,
@@ -105,7 +105,7 @@ public class EntityPlantBossBramble extends Entity {
 		}
 	}
 	
-	public void setMotion(EnumFacing direction, float distance) {
+	public void setMotion(Direction direction, float distance) {
 		this.dataManager.set(FACING, direction);
 		this.distance = distance;
 		
@@ -122,8 +122,8 @@ public class EntityPlantBossBramble extends Entity {
 				this.setDims(this.getWidth(), this.getDepth(), this.getHeight());
 			} else if (key == FACING && this.world.isRemote) {
 				// Adjust width/depth to rotate if not moving n/s
-				final EnumFacing dir = this.dataManager.get(FACING);
-				if (dir == EnumFacing.WEST || dir == EnumFacing.EAST) {
+				final Direction dir = this.dataManager.get(FACING);
+				if (dir == Direction.WEST || dir == Direction.EAST) {
 					final float w = this.getWidth();
 					final float d = this.getDepth();
 					this.setDims(d, w, this.getHeight());
@@ -133,17 +133,17 @@ public class EntityPlantBossBramble extends Entity {
 	}
 	
 	@Override
-	public boolean writeToNBTOptional(NBTTagCompound compound) {
+	public boolean writeToNBTOptional(CompoundNBT compound) {
 		return false;
 	}
 	
 	@Override
-	public void readEntityFromNBT(NBTTagCompound compound) {
+	public void readEntityFromNBT(CompoundNBT compound) {
 		//super.readEntityFromNBT(compound);
 	}
 	
 	@Override
-	public void writeEntityToNBT(NBTTagCompound compound) {
+	public void writeEntityToNBT(CompoundNBT compound) {
     	//super.writeEntityToNBT(compound);
 	}
 	
@@ -157,7 +157,7 @@ public class EntityPlantBossBramble extends Entity {
 		return 1f;
 	}
 	
-	protected void onImpact(EntityLivingBase entity) {
+	protected void onImpact(LivingEntity entity) {
 		if (entity != this.plant && !entity.equals(this.plant)) {
 			entity.attackEntityAsMob(this);
 			entity.attackEntityFrom(new EntityDamageSource("mob", this), 6f);
@@ -186,19 +186,19 @@ public class EntityPlantBossBramble extends Entity {
 				this.setPositionAndUpdate(posX + motion.x, posY + motion.y, posZ + motion.z);
 			}
 			
-			List<Entity> collidedEnts = world.getEntitiesInAABBexcluding(this, this.getEntityBoundingBox(), (ent) -> {
-				return ent instanceof EntityLivingBase;
+			List<Entity> collidedEnts = world.getEntitiesInAABBexcluding(this, this.getBoundingBox(), (ent) -> {
+				return ent instanceof LivingEntity;
 			});
 			
 			for (Entity ent : collidedEnts) {
-				onImpact((EntityLivingBase) ent);
+				onImpact((LivingEntity) ent);
 			}
 		}
 	}
 	
 	protected void checkBoundingBox() {
 		// When moving E/W, w should be d
-		final boolean turned = this.getFacing() == EnumFacing.EAST || this.getFacing() == EnumFacing.WEST;
+		final boolean turned = this.getFacing() == Direction.EAST || this.getFacing() == Direction.WEST;
 		
 		final float w = turned ? this.getDepth() : this.getWidth();
 		final float h = this.getHeight();

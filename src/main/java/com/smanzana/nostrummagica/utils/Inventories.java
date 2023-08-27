@@ -2,12 +2,12 @@ package com.smanzana.nostrummagica.utils;
 
 import javax.annotation.Nonnull;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.INBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.items.IItemHandler;
 
@@ -175,13 +175,13 @@ public class Inventories {
 	}
 	
 	public static final INBTBase serializeInventory(IInventory inv) {
-		NBTTagList list = new NBTTagList();
+		ListNBT list = new ListNBT();
 		for (int i = 0; i < inv.getSizeInventory(); i++) {
 			@Nonnull ItemStack stack = inv.getStackInSlot(i);
 			if (!stack.isEmpty()) {
 				list.add(stack.serializeNBT());
 			} else {
-				list.add(new NBTTagCompound());
+				list.add(new CompoundNBT());
 			}
 		}
 		
@@ -195,10 +195,10 @@ public class Inventories {
 		
 		base.clear();
 		
-		if (nbt != null && nbt instanceof NBTTagList) {
-			NBTTagList list = (NBTTagList) nbt;
+		if (nbt != null && nbt instanceof ListNBT) {
+			ListNBT list = (ListNBT) nbt;
 			for (int i = 0; i < list.size(); i++) {
-				NBTTagCompound tag = list.getCompound(i);
+				CompoundNBT tag = list.getCompound(i);
 				@Nonnull ItemStack stack = ItemStack.read(tag);
 				base.setInventorySlotContents(i, stack);
 			}
@@ -281,12 +281,12 @@ public class Inventories {
 		}
 
 		@Override
-		public void openInventory(EntityPlayer player) {
+		public void openInventory(PlayerEntity player) {
 			;
 		}
 
 		@Override
-		public void closeInventory(EntityPlayer player) {
+		public void closeInventory(PlayerEntity player) {
 			;
 		}
 
@@ -330,7 +330,7 @@ public class Inventories {
 		}
 
 		@Override
-		public boolean isUsableByPlayer(EntityPlayer player) {
+		public boolean isUsableByPlayer(PlayerEntity player) {
 			return true;
 		}
 		

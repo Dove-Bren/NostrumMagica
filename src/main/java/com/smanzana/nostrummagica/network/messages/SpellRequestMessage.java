@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -55,14 +55,14 @@ public class SpellRequestMessage implements IMessage {
 	}
 
 	private static final String NBT_IDS = "ids";
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public SpellRequestMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	public SpellRequestMessage(int ids[]) {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 		
 		tag.setIntArray(NBT_IDS, ids);
 	}

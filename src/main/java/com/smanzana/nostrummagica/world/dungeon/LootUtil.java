@@ -8,7 +8,7 @@ import net.minecraft.block.BlockChest;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityChest;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -25,11 +25,11 @@ public final class LootUtil {
 	 * @param pos
 	 * @param facing
 	 */
-	public static final void generateLoot(World world, BlockPos pos, EnumFacing facing) {
+	public static final void generateLoot(World world, BlockPos pos, Direction facing) {
 		generateLoot(world, pos, facing, NostrumMagica.MODID + ":nostrum_shrine_room");
 	}
 	
-	public static final void generateLoot(World world, BlockPos pos, EnumFacing facing,
+	public static final void generateLoot(World world, BlockPos pos, Direction facing,
 			String loottable) {
 		world.setBlockState(pos, Blocks.CHEST.getDefaultState().withProperty(BlockChest.FACING, facing));
 		
@@ -50,7 +50,7 @@ public final class LootUtil {
 	 * @param facing
 	 * @param loot
 	 */
-	public static final void createLoot(World world, BlockPos pos, EnumFacing facing,
+	public static final void createLoot(World world, BlockPos pos, Direction facing,
 			NonNullList<ItemStack> loot) {
 		world.setBlockState(pos, Blocks.CHEST.getDefaultState().withProperty(BlockChest.FACING, facing));
 		

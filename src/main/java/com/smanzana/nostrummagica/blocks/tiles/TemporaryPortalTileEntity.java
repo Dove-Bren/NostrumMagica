@@ -3,12 +3,12 @@ package com.smanzana.nostrummagica.blocks.tiles;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity implements ITickableTileEntity {
 
@@ -35,23 +35,23 @@ public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity imp
 		}
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public int getColor() {
-		EntityPlayer player = NostrumMagica.proxy.getPlayer();
+		PlayerEntity player = NostrumMagica.proxy.getPlayer();
 		if (NostrumPortal.getRemainingCharge(player) > 0) {
 			return 0x00400000;
 		}
 		return 0x003030FF;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public float getRotationPeriod() {
 		return 2;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public float getOpacity() {
 		float opacity = .9f;
@@ -65,7 +65,7 @@ public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity imp
 			}
 		}
 		
-		EntityPlayer player = NostrumMagica.proxy.getPlayer();
+		PlayerEntity player = NostrumMagica.proxy.getPlayer();
 		if (NostrumPortal.getCooldownTime(player) > 0) {
 			opacity *= 0.5f;
 		}
@@ -74,17 +74,17 @@ public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity imp
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound compound) {
+	public void readFromNBT(CompoundNBT compound) {
 		super.readFromNBT(compound);
 		
 		endticks = compound.getLong("EXPIRE");
 	}
 	
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt = super.writeToNBT(nbt);
 		
-		nbt.setLong("EXPIRE", endticks);
+		nbt.putLong("EXPIRE", endticks);
 		
 		return nbt;
 	}

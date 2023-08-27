@@ -5,9 +5,9 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.RuneBag;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -29,12 +29,12 @@ public class RuneBagToggleMessage implements IMessage {
 			// Is it on?
 			
 			
-			EntityPlayerMP sp = ctx.getServerHandler().player;
+			ServerPlayerEntity sp = ctx.getServerHandler().player;
 			
 			boolean main = message.tag.getBoolean(NBT_MAIN);
 			boolean value = message.tag.getBoolean(NBT_VALUE);
 
-			sp.getServerWorld().addScheduledTask(()-> {
+			sp.getServerWorld().runAsync(()-> {
 				ItemStack bag;
 				if (main)
 					bag = sp.getHeldItemMainhand();
@@ -57,17 +57,17 @@ public class RuneBagToggleMessage implements IMessage {
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public RuneBagToggleMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	public RuneBagToggleMessage(boolean isMainHand, boolean isOn) {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 		
-		tag.setBoolean(NBT_VALUE, isOn);
-		tag.setBoolean(NBT_MAIN, isMainHand);
+		tag.putBoolean(NBT_VALUE, isOn);
+		tag.putBoolean(NBT_MAIN, isMainHand);
 	}
 
 	@Override

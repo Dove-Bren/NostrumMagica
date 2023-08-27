@@ -28,9 +28,9 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.gui.Button;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
@@ -38,8 +38,8 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class SpellCreationGui {
 	
@@ -99,7 +99,7 @@ public class SpellCreationGui {
 		// Actual container variables as well as a couple for keeping track
 		// of crafting state
 		protected final SpellTableEntity inventory;
-		protected final EntityPlayer player;
+		protected final PlayerEntity player;
 		protected boolean isValid; // has an acceptable scroll
 		protected boolean spellValid; // grammer checks out
 		protected List<String> spellErrorStrings; // Updated on validate(); what's wrong?
@@ -108,7 +108,7 @@ public class SpellCreationGui {
 		protected int iconIndex; // -1 indicates none has been selected yet
 		protected int lastManaCost;
 		
-		public SpellCreationContainer(EntityPlayer crafter, IInventory playerInv, SpellTableEntity tableInventory, BlockPos pos) {
+		public SpellCreationContainer(PlayerEntity crafter, IInventory playerInv, SpellTableEntity tableInventory, BlockPos pos) {
 			this.inventory = tableInventory;
 			this.player = crafter;
 			this.pos = pos;
@@ -136,7 +136,7 @@ public class SpellCreationGui {
 				}
 				
 				@Override
-				public ItemStack onTake(EntityPlayer playerIn, ItemStack stack) {
+				public ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
 					validate();
 					
 					return super.onTake(playerIn, stack);
@@ -177,7 +177,7 @@ public class SpellCreationGui {
 					}
 					
 					@Override
-					public @Nonnull ItemStack onTake(EntityPlayer playerIn, ItemStack stack) {
+					public @Nonnull ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
 						validate();
 						
 						return super.onTake(playerIn, stack);
@@ -208,7 +208,7 @@ public class SpellCreationGui {
 		}
 		
 		@Override
-		public ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
+		public ItemStack transferStackInSlot(PlayerEntity playerIn, int fromSlot) {
 			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
 			
 			if (slot != null && slot.getHasStack()) {
@@ -322,12 +322,12 @@ public class SpellCreationGui {
 		}
 		
 		@Override
-		public boolean canInteractWith(EntityPlayer playerIn) {
+		public boolean canInteractWith(PlayerEntity playerIn) {
 			return true;
 		}
 		
 		@Override
-		public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, EntityPlayer player) {
+		public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
 			ItemStack ret = super.slotClick(slotId, dragType, clickTypeIn, player);
 			
 			isValid = false;
@@ -370,7 +370,7 @@ public class SpellCreationGui {
 			return spell;
 		}
 		
-		public static Spell craftSpell(String name, int iconIdx, SpellTableEntity inventory, EntityPlayer crafter,
+		public static Spell craftSpell(String name, int iconIdx, SpellTableEntity inventory, PlayerEntity crafter,
 				List<String> spellErrorStrings, List<String> reagentStrings,
 				boolean isValid, boolean deductReagents) {
 			boolean fail = false;
@@ -535,10 +535,10 @@ public class SpellCreationGui {
 	
 	private static final int NAME_MAX = 20;
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public static class SpellGui extends AutoGuiContainer {
 		
-		private static class SpellIconButton extends GuiButton {
+		private static class SpellIconButton extends Button {
 			
 			private int value;
 			private SpellCreationContainer container;
@@ -552,7 +552,7 @@ public class SpellCreationGui {
 			}
 			
 			@Override
-			public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
+			public void render(int mouseX, int mouseY, float partialTicks) {
 				float tint = 1f;
 				mc.getTextureManager().bindTexture(TEXT);
 				if (mouseX >= this.x && mouseY >= this.y
@@ -565,11 +565,11 @@ public class SpellCreationGui {
 				if (container.iconIndex != this.value)
 					x += 20;
 				
-				GlStateManager.color(tint, tint, tint);
+				GlStateManager.color4f(tint, tint, tint);
 				Gui.drawScaledCustomSizeModalRect(this.x, this.y, ICON_LBUTTON_HOFFSET + x, ICON_LBUTTON_VOFFSET,
 						20, 20, this.width, this.height, 256, 256);
 				
-				GlStateManager.color(tint, tint, tint);
+				GlStateManager.color4f(tint, tint, tint);
 				SpellIcon.get(this.value).render(mc, this.x + 2, this.y + 2, this.width - 4, this.height - 4);
 			}
 			
@@ -591,10 +591,10 @@ public class SpellCreationGui {
 		}
 		
 		@Override
-		public void initGui() {
+		public void init() {
 			buttons.clear();
 			
-			super.initGui();
+			super.init();
 			
 			int extraMargin = 3;
 			final int spaceWidth = ((width - xSize) / 2) - (2 * extraMargin); // amount of space to draw in
@@ -621,10 +621,10 @@ public class SpellCreationGui {
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			
-			GlStateManager.color(1.0F,  1.0F, 1.0F, 1.0F);
+			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 			mc.getTextureManager().bindTexture(TEXT);
 			
-			Gui.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
+			RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			
 			int x = (width - MESSAGE_WIDTH) / 2;
 			int y = verticalMargin + MESSAGE_DISPLAY_VOFFSET;
@@ -639,12 +639,12 @@ public class SpellCreationGui {
 					u += STATUS_WIDTH;
 				}
 				
-				Gui.drawModalRectWithCustomSizedTexture(x, y, u, v,
+				RenderFuncs.drawModalRectWithCustomSizedTexture(x, y, u, v,
 						STATUS_WIDTH, STATUS_HEIGHT,
 						256, 256);
 				
 				GL11.glPushMatrix();
-				mc.fontRenderer.drawString(container.name.toString(), 
+				mc.font.drawString(container.name.toString(), 
 						horizontalMargin + NAME_HOFFSET + 2,
 						verticalMargin + NAME_VOFFSET + 2, 
 						0xFF000000);
@@ -652,11 +652,11 @@ public class SpellCreationGui {
 					
 					x = horizontalMargin + NAME_HOFFSET + 2;
 					for (int i = 0; i < nameSelectedPos; i++) {
-						x += mc.fontRenderer.getCharWidth(container.name.charAt(i));
+						x += mc.font.getCharWidth(container.name.charAt(i));
 					}
 					
-					Gui.drawRect(x, verticalMargin + NAME_VOFFSET + 1,
-							x + 1, verticalMargin + NAME_VOFFSET + 3 + mc.fontRenderer.FONT_HEIGHT,
+					RenderFuncs.drawRect(x, verticalMargin + NAME_VOFFSET + 1,
+							x + 1, verticalMargin + NAME_VOFFSET + 3 + mc.font.FONT_HEIGHT,
 							0xFF000000);
 					
 					if (counter > 60)
@@ -666,8 +666,8 @@ public class SpellCreationGui {
 				if (container.spellValid) {
 					String str = "Spell Cost: " + container.lastManaCost;
 					x = this.width / 2;
-					x -= mc.fontRenderer.getStringWidth(str) / 2;
-					mc.fontRenderer.drawString(str, x, verticalMargin + MANA_VOFFSET, 0xFFD3D3D3);
+					x -= mc.font.getStringWidth(str) / 2;
+					mc.font.drawString(str, x, verticalMargin + MANA_VOFFSET, 0xFFD3D3D3);
 				}
 				
 				GL11.glPopMatrix();
@@ -687,7 +687,7 @@ public class SpellCreationGui {
 					
 					if (mouseX > horizontalMargin + STATUS_DISP_HOFFSET && mouseX <= horizontalMargin + STATUS_DISP_HOFFSET + STATUS_WIDTH
 						 && mouseY > verticalMargin + STATUS_DISP_VOFFSET && mouseY <= verticalMargin + STATUS_DISP_VOFFSET + STATUS_HEIGHT) {
-						GlStateManager.color(1.0F,  1.0F, 1.0F, 1.0F);
+						GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 						
 						this.drawHoveringText(container.spellErrorStrings,
 								mouseX - horizontalMargin, mouseY - verticalMargin);
@@ -696,12 +696,12 @@ public class SpellCreationGui {
 				
 				if (mouseX > horizontalMargin + NAME_HOFFSET && mouseX <= horizontalMargin + NAME_HOFFSET + NAME_WIDTH
 						 && mouseY > verticalMargin + NAME_VOFFSET && mouseY <= verticalMargin + NAME_VOFFSET + NAME_HEIGHT) {
-					Gui.drawRect(NAME_HOFFSET, NAME_VOFFSET, NAME_HOFFSET + NAME_WIDTH, NAME_VOFFSET + NAME_HEIGHT, 0x40000000);
+					RenderFuncs.drawRect(NAME_HOFFSET, NAME_VOFFSET, NAME_HOFFSET + NAME_WIDTH, NAME_VOFFSET + NAME_HEIGHT, 0x40000000);
 				}
 				
 				if (mouseX >= horizontalMargin + SUBMIT_HOFFSET && mouseX <= horizontalMargin + SUBMIT_HOFFSET + SUBMIT_WIDTH && 
 						mouseY >= verticalMargin + SUBMIT_VOFFSET && mouseY <= verticalMargin + SUBMIT_VOFFSET + SUBMIT_HEIGHT) {
-					Gui.drawRect(SUBMIT_HOFFSET, SUBMIT_VOFFSET, SUBMIT_HOFFSET + SUBMIT_WIDTH, SUBMIT_VOFFSET + SUBMIT_HEIGHT, 0x40000000);
+					RenderFuncs.drawRect(SUBMIT_HOFFSET, SUBMIT_VOFFSET, SUBMIT_HOFFSET + SUBMIT_WIDTH, SUBMIT_VOFFSET + SUBMIT_HEIGHT, 0x40000000);
 					this.drawHoveringText(container.reagentStrings,
 							mouseX - horizontalMargin, mouseY - verticalMargin);
 				}
@@ -709,11 +709,11 @@ public class SpellCreationGui {
 			
 			if (!container.isValid) {
 				GlStateManager.pushMatrix();
-				GlStateManager.translate(0, 0, 500);
+				GlStateManager.translatef(0, 0, 500);
 				mc.getTextureManager().bindTexture(TEXT);
-				GlStateManager.enableAlpha();
+				GlStateManager.enableAlphaTest();
 				GlStateManager.enableBlend();
-				Gui.drawModalRectWithCustomSizedTexture((GUI_WIDTH - MESSAGE_WIDTH) / 2,
+				RenderFuncs.drawModalRectWithCustomSizedTexture((GUI_WIDTH - MESSAGE_WIDTH) / 2,
 						MESSAGE_DISPLAY_VOFFSET,
 						MESSAGE_VALID_HOFFSET, MESSAGE_VALID_VOFFSET,
 						MESSAGE_WIDTH, MESSAGE_HEIGHT,
@@ -724,7 +724,7 @@ public class SpellCreationGui {
 		}
 		
 		@Override
-		protected void actionPerformed(GuiButton buttonIn) {
+		protected void actionPerformed(Button buttonIn) {
 			// Only type of button we have are icon buttons
 			SpellIconButton button = (SpellIconButton) buttonIn;
 			
@@ -750,8 +750,8 @@ public class SpellCreationGui {
 							int offset = mouseX - left;
 							offset -= 5; // offset of drawn text
 							int index = 0;
-							while (index < container.name.length() && offset >= mc.fontRenderer.getCharWidth(container.name.charAt(index))) {
-								offset -= mc.fontRenderer.getCharWidth(container.name.charAt(index));
+							while (index < container.name.length() && offset >= mc.font.getCharWidth(container.name.charAt(index))) {
+								offset -= mc.font.getCharWidth(container.name.charAt(index));
 								index++;
 							}
 							nameSelectedPos = Math.min(container.name.length(), index + 1);
@@ -778,7 +778,7 @@ public class SpellCreationGui {
 									ItemStack scroll = new ItemStack(SpellScroll.instance(), 1);
 									SpellScroll.setSpell(scroll, spell);
 									container.setScroll(scroll);
-									//NostrumMagicaSounds.AMBIENT_WOOSH.play(Minecraft.getMinecraft().thePlayer);
+									//NostrumMagicaSounds.AMBIENT_WOOSH.play(Minecraft.getInstance().thePlayer);
 									
 									NetworkHandler.getSyncChannel().sendToServer(new SpellCraftMessage(
 											container.name.toString(),
@@ -903,7 +903,7 @@ public class SpellCreationGui {
 		}
 		
 		@Override
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		public boolean isEnabled() {
 			return (prev == null ||
 					prev.getHasStack());
@@ -917,7 +917,7 @@ public class SpellCreationGui {
 		}
 		
 		@Override
-		public @Nonnull ItemStack onTake(EntityPlayer playerIn, ItemStack stack) {
+		public @Nonnull ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
 			// This is called AFTER things have been changed or swapped
 			// Which means we just look to see if we have an item.
 			// If not, take item from next

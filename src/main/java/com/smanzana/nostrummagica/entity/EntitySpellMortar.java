@@ -10,9 +10,9 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.triggers.MortarTrigger.MortarTriggerInstance;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.EntityFireball;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.EnumParticleTypes;
@@ -37,7 +37,7 @@ public class EntitySpellMortar extends EntityFireball {
         this.setSize(0.75F, 0.75F);
 	}
 	
-	public EntitySpellMortar(MortarTriggerInstance trigger, EntityLivingBase shooter,
+	public EntitySpellMortar(MortarTriggerInstance trigger, LivingEntity shooter,
 			World world, Vec3d start, Vec3d velocity,
 			float speedFactor, double gravity) {
 		super(world, start.x, start.y, start.z, 0, 0, 0);
@@ -45,9 +45,9 @@ public class EntitySpellMortar extends EntityFireball {
 		this.accelerationX = 0; // have no be non-zero or they're NAN lol
 		this.accelerationY = 0;
 		this.accelerationZ = 0;
-        this.motionX = velocity.x;
-        this.motionY = velocity.y;
-        this.motionZ = velocity.z;
+        this.getMotion().x = velocity.x;
+        this.getMotion().y = velocity.y;
+        this.getMotion().z = velocity.z;
 		this.shootingEntity = shooter;
 		
 		this.trigger = trigger;
@@ -57,7 +57,7 @@ public class EntitySpellMortar extends EntityFireball {
 		this.setElement(trigger.getElement());
 		
 //		System.out.println("Starting at [" + this.posX + ", " + this.posY + ", " + this.posZ + "] -> ("
-//					+ this.motionX + ", " + this.motionY + ", " + this.motionZ + ")");
+//					+ this.getMotion().x + ", " + this.getMotion().y + ", " + this.getMotion().z + ")");
 	}
 	
 	@Override
@@ -89,10 +89,10 @@ public class EntitySpellMortar extends EntityFireball {
 			}
 			
 			// Gravity!
-			this.motionY -= gravity;
+			this.getMotion().y -= gravity;
 			
 //			System.out.println("[" + this.posX + ", " + this.posY + ", " + this.posZ + "] -> ("
-//					+ this.motionX + ", " + this.motionY + ", " + this.motionZ + ")"
+//					+ this.getMotion().x + ", " + this.getMotion().y + ", " + this.getMotion().z + ")"
 //					);
 		} else {
 			int color = getElement().getColor();
@@ -132,7 +132,7 @@ public class EntitySpellMortar extends EntityFireball {
 	}
 	
 	@Override
-	public boolean writeToNBTOptional(NBTTagCompound compound) {
+	public boolean writeToNBTOptional(CompoundNBT compound) {
 		// Returning false means we won't be saved. That's what we want.
 		return false;
     }

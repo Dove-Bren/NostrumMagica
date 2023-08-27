@@ -10,20 +10,20 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemEnderEye;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * Houses a switch that has to be interacted iwth in order to proc other mechanisms
@@ -90,7 +90,7 @@ public class SwitchBlock extends Block {
 	}
 	
 	@Override
-	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
 		return false;
 	}
 	
@@ -99,7 +99,7 @@ public class SwitchBlock extends Block {
 		return NULL_AABB;
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public EnumBlockRenderType getRenderType(IBlockState state) {
 		return EnumBlockRenderType.INVISIBLE;
@@ -122,7 +122,7 @@ public class SwitchBlock extends Block {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
 		if (worldIn.isRemote || !playerIn.isCreative()) {
 			return false;
 		}
@@ -149,7 +149,7 @@ public class SwitchBlock extends Block {
 				if (atState != null && atState.getBlock() instanceof ITriggeredBlock) {
 					playerIn.setPositionAndUpdate(loc.getX(), loc.getY(), loc.getZ());
 				} else {
-					playerIn.sendMessage(new TextComponentString("Not pointed at valid triggered block!"));
+					playerIn.sendMessage(new StringTextComponent("Not pointed at valid triggered block!"));
 				}
 			}
 		} else if (heldItem.isEmpty() && hand == EnumHand.MAIN_HAND) {

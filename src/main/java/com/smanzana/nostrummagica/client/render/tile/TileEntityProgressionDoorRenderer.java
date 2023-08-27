@@ -10,7 +10,7 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
@@ -38,21 +38,21 @@ public class TileEntityProgressionDoorRenderer extends TileEntitySpecialRenderer
 	public void render(ProgressionDoorTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
 		
 		double time = (double)te.getWorld().getTotalWorldTime() + partialTicks;
-		INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getMinecraft().player);
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getInstance().player);
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(x + .5, y + 1.2, z + .5);
+		GlStateManager.translatef(x + .5, y + 1.2, z + .5);
 		
 		// Render centered on bottom-center of door, not TE (in case they're different)
 		{
 			BlockPos pos = te.getPos();
 			BlockPos targ = te.getBottomCenterPos();
-			GlStateManager.translate(targ.getX() - pos.getX(), targ.getY() - pos.getY(), targ.getZ() - pos.getZ());
+			GlStateManager.translatef(targ.getX() - pos.getX(), targ.getY() - pos.getY(), targ.getZ() - pos.getZ());
 		}
 		
 		float rotY = te.getFace().getOpposite().getHorizontalAngle();
 		
-		GlStateManager.rotate((float) rotY, 0, -1, 0);
+		GlStateManager.rotatef((float) rotY, 0, -1, 0);
 		
 		
 		BufferBuilder wr = Tessellator.getInstance().getBuffer();
@@ -60,7 +60,7 @@ public class TileEntityProgressionDoorRenderer extends TileEntitySpecialRenderer
 		GlStateManager.enableBlend();
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GlStateManager.disableLighting();
-		GlStateManager.enableAlpha();
+		GlStateManager.enableAlphaTest();
 		
 		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 		
@@ -75,16 +75,16 @@ public class TileEntityProgressionDoorRenderer extends TileEntitySpecialRenderer
 			final double depth = .2;
 			final double spinRate = 60.0;
 
-			GlStateManager.translate(0, 0.25, -.3);
-			GlStateManager.rotate((float) (360.0 * (time % spinRate) / spinRate),
+			GlStateManager.translatef(0, 0.25, -.3);
+			GlStateManager.rotatef((float) (360.0 * (time % spinRate) / spinRate),
 					0, 1, 0);
 			
-			if (te.meetsRequirements(Minecraft.getMinecraft().player, null))
-				GlStateManager.color(0f, 1f, 1f, .8f);
+			if (te.meetsRequirements(Minecraft.getInstance().player, null))
+				GlStateManager.color4f(0f, 1f, 1f, .8f);
 			else
-				GlStateManager.color(1f, .3f, .6f, .8f);
+				GlStateManager.color4f(1f, .3f, .6f, .8f);
 			
-			Minecraft.getMinecraft().getTextureManager().bindTexture(TEX_GEM_LOC);
+			Minecraft.getInstance().getTextureManager().bindTexture(TEX_GEM_LOC);
 			
 			wr.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_TEX);
 			wr.pos(0, 0, -depth).tex(.5, .5).endVertex();
@@ -119,7 +119,7 @@ public class TileEntityProgressionDoorRenderer extends TileEntitySpecialRenderer
 		// Draw requirement icons
 		if (!te.getRequiredComponents().isEmpty()) {
 			GlStateManager.pushMatrix();
-			GlStateManager.translate(0, 0, -.2);
+			GlStateManager.translatef(0, 0, -.2);
 			
 			final float angleDiff = (float) (Math.PI/(float)te.getRequiredComponents().size());
 			float angle = (float) (Math.PI + angleDiff/2);
@@ -144,11 +144,11 @@ public class TileEntityProgressionDoorRenderer extends TileEntitySpecialRenderer
 				
 				if (icon != null && icon.getModelLocation() != null) {
 					// Draw background
-					Minecraft.getMinecraft().getTextureManager().bindTexture(TEX_PLATE_LOC);
+					Minecraft.getInstance().getTextureManager().bindTexture(TEX_PLATE_LOC);
 					if (has)
-						GlStateManager.color(.4f, .4f, .4f, .4f);
+						GlStateManager.color4f(.4f, .4f, .4f, .4f);
 					else
-						GlStateManager.color(.8f, .6f, .6f, .8f);
+						GlStateManager.color4f(.8f, .6f, .6f, .8f);
 					
 					wr.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
 					
@@ -171,11 +171,11 @@ public class TileEntityProgressionDoorRenderer extends TileEntitySpecialRenderer
 					Tessellator.getInstance().draw();
 					
 					// Draw icon
-					Minecraft.getMinecraft().getTextureManager().bindTexture(icon.getModelLocation());
+					Minecraft.getInstance().getTextureManager().bindTexture(icon.getModelLocation());
 					if (has)
-						GlStateManager.color(1, 1, 1, .2f);
+						GlStateManager.color4f(1, 1, 1, .2f);
 					else
-						GlStateManager.color(1, 1, 1, .8f);
+						GlStateManager.color4f(1, 1, 1, .8f);
 					
 					wr.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
 					
@@ -199,10 +199,10 @@ public class TileEntityProgressionDoorRenderer extends TileEntitySpecialRenderer
 			GlStateManager.pushMatrix();
 			double drawZ = -.5;
 			
-			GlStateManager.translate(0, 1, drawZ);
+			GlStateManager.translatef(0, 1, drawZ);
 			final float VANILLA_FONT_SCALE = 0.010416667f;
 			
-			GlStateManager.scale(-VANILLA_FONT_SCALE * 2, -VANILLA_FONT_SCALE * 2, VANILLA_FONT_SCALE * 2);
+			GlStateManager.scalef(-VANILLA_FONT_SCALE * 2, -VANILLA_FONT_SCALE * 2, VANILLA_FONT_SCALE * 2);
 			
 			String val = "Level: " + te.getRequiredLevel();
 			

@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.entity;
 import com.smanzana.nostrummagica.spells.components.triggers.MagicCutterTrigger.MagicCutterTriggerInstance;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -26,12 +26,12 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 		super(world);
 	}
 	
-	public EntityChakramSpellSaucer(World world, EntityLivingBase shooter, MagicCutterTriggerInstance trigger, float speed) {
+	public EntityChakramSpellSaucer(World world, LivingEntity shooter, MagicCutterTriggerInstance trigger, float speed) {
 		super(world, shooter, trigger, speed);
         this.returning = false;
 	}
 	
-	public EntityChakramSpellSaucer(MagicCutterTriggerInstance trigger, EntityLivingBase shooter,
+	public EntityChakramSpellSaucer(MagicCutterTriggerInstance trigger, LivingEntity shooter,
 			World world,
 			double fromX, double fromY, double fromZ, Vec3d direction,
 			float speedFactor, double maxDistance, boolean piercing, int maxTrips) {
@@ -45,9 +45,9 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
         
         // Set initial motion perpendicular to where we're going to add some cross
         Vec3d tilt = direction.rotateYaw(90f * (this.rand.nextBoolean() ? 1 : -1)).scale(2);
-        this.motionX = tilt.x;
-        this.motionY = tilt.y;
-        this.motionZ = tilt.z;
+        this.getMotion().x = tilt.x;
+        this.getMotion().y = tilt.y;
+        this.getMotion().z = tilt.z;
         
         // Raytrace at hit point, or just go max distance.
         // If piercing, only cap to raytrace if we hit an entity
@@ -55,7 +55,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
         RayTraceResult trace = RayTrace.raytrace(world, this.getPositionVector(), direction, (float) maxDistance, new RayTrace.OtherLiving(shootingEntity));
         if (trace != null && trace.typeOfHit != RayTraceResult.Type.MISS) {
         	if (trace.typeOfHit == RayTraceResult.Type.ENTITY) {
-        		this.target = trace.hitVec.addVector(0D, trace.entityHit.height / 2.0, 0D);
+        		this.target = trace.hitVec.add(0D, trace.entityHit.getHeight() / 2.0, 0D);
         	} else if (!piercing) { // !piercing cause piercing just wants max dist if no entity being looked at
         		this.target = trace.hitVec;
         	}
@@ -69,7 +69,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 	}
 
 	public EntityChakramSpellSaucer(MagicCutterTriggerInstance trigger,
-			EntityLivingBase shooter, float speedFactor, double maxDistance, boolean piercing, int maxTrips) {
+			LivingEntity shooter, float speedFactor, double maxDistance, boolean piercing, int maxTrips) {
 		this(trigger,
 				shooter,
 				shooter.world,
@@ -117,9 +117,9 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 			Vector accel = this.getInstantVelocity();
 	        
 	        // Add accel to motionX for raytracing
-	        this.motionX += accel.x;
-	        this.motionY += accel.y;
-	        this.motionZ += accel.z;
+	        this.getMotion().x += accel.x;
+	        this.getMotion().y += accel.y;
+	        this.getMotion().z += accel.z;
 	        
 			RayTraceResult raytraceresult = ProjectileHelper.forwardsRaycast(this, true, this.ticksInAir >= 25, this.shootingEntity);
 			
@@ -128,26 +128,26 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
             this.rotationPitch = (float)(MathHelper.atan2(motionY, (double)f) * (180D / Math.PI));
             this.rotationYaw = (float)(MathHelper.atan2(motionX, motionZ) * (180D / Math.PI));
 			
-			this.motionX -= accel.x;
-	        this.motionY -= accel.y;
-	        this.motionZ -= accel.z;
+			this.getMotion().x -= accel.x;
+	        this.getMotion().y -= accel.y;
+	        this.getMotion().z -= accel.z;
 
 	        if (raytraceresult != null)
 	        {
 	            this.onImpact(raytraceresult);
 	        }
 	        
-	        this.posX += this.motionX;
-	        this.posY += this.motionY;
-	        this.posZ += this.motionZ;
+	        this.posX += this.getMotion().x;
+	        this.posY += this.getMotion().y;
+	        this.posZ += this.getMotion().z;
 	        this.posX += accel.x;
 	        this.posY += accel.y;
 	        this.posZ += accel.z;
 	        
 	        // Apply air-friction, making motion's sort-of our initial motion
-	        this.motionX *= 0.8;
-	        this.motionY *= 0.8;
-	        this.motionZ *= 0.8;
+	        this.getMotion().x *= 0.8;
+	        this.getMotion().y *= 0.8;
+	        this.getMotion().z *= 0.8;
 			
 //				// Can't avoid a SQR; tracking motion would require SQR, too to get path length
 //				if (this.getPositionVector().squareDistanceTo(origin) > maxDistance) {
@@ -167,9 +167,9 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 						// Capture motion to get boomerang-effect
 						Vec3d motion = new Vec3d(accel.x, accel.y, accel.z).normalize().scale(1);
 						motion = motion.rotateYaw(30f * (this.rand.nextBoolean() ? 1 : -1));
-						this.motionX += motion.x;
-						this.motionY += motion.y;
-						this.motionZ += motion.z;
+						this.getMotion().x += motion.x;
+						this.getMotion().y += motion.y;
+						this.getMotion().z += motion.z;
 					}
 				}
 			} else {
@@ -179,9 +179,9 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 					// Capture motion to get boomerang-effect
 					Vec3d motion = new Vec3d(accel.x, accel.y, accel.z).normalize().scale(1);
 					motion = motion.rotateYaw(30f * (this.rand.nextBoolean() ? 1 : -1));
-					this.motionX += motion.x;
-					this.motionY += motion.y;
-					this.motionZ += motion.z;
+					this.getMotion().x += motion.x;
+					this.getMotion().y += motion.y;
+					this.getMotion().z += motion.z;
 				}
 			}
 		}
@@ -198,7 +198,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 	}
 	
 	@Override
-	public boolean dieOnImpact(EntityLivingBase entity) {
+	public boolean dieOnImpact(LivingEntity entity) {
 		return !this.piercing;
 	}
 

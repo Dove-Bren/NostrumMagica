@@ -200,7 +200,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -213,7 +214,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
@@ -280,7 +280,7 @@ public class NostrumMagica {
 
 		NostrumMagica.creativeTab = new CreativeTabs(MODID) {
 			@Override
-			@SideOnly(Side.CLIENT)
+			@OnlyIn(Dist.CLIENT)
 			public ItemStack getTabIconItem() {
 				return new ItemStack(SpellTome.instance());
 			}
@@ -288,7 +288,7 @@ public class NostrumMagica {
 		SpellTome.instance().setCreativeTab(NostrumMagica.creativeTab);
 		NostrumMagica.enhancementTab = new CreativeTabs(MODID + "_enhancements") {
 			@Override
-			@SideOnly(Side.CLIENT)
+			@OnlyIn(Dist.CLIENT)
 			public ItemStack getTabIconItem() {
 				return new ItemStack(SpellTomePage.instance());
 			}
@@ -385,7 +385,7 @@ public class NostrumMagica {
 		return e.getCapability(ManaArmorAttributeProvider.CAPABILITY, null);
 	}
 
-	public static ItemStack findTome(EntityPlayer entity, int tomeID) {
+	public static ItemStack findTome(PlayerEntity entity, int tomeID) {
 		// We look in mainhand first, then offhand, then just down
 		// hotbar.
 		for (ItemStack item : entity.inventory.mainInventory) {
@@ -403,7 +403,7 @@ public class NostrumMagica {
 		return ItemStack.EMPTY;
 	}
 
-	public static @Nonnull ItemStack getCurrentTome(EntityPlayer entity) {
+	public static @Nonnull ItemStack getCurrentTome(PlayerEntity entity) {
 		// We look in mainhand first, then offhand, then just down
 		// hotbar.
 		ItemStack tome = ItemStack.EMPTY;
@@ -431,7 +431,7 @@ public class NostrumMagica {
 		return tome;
 	}
 
-	public static Spell getCurrentSpell(EntityPlayer player) {
+	public static Spell getCurrentSpell(PlayerEntity player) {
 		List<Spell> spells = getSpells(player);
 		if (spells == null || spells.isEmpty())
 			return null;
@@ -439,7 +439,7 @@ public class NostrumMagica {
 		return spells.get(0);
 	}
 
-	public static int getReagentCount(EntityPlayer player, ReagentType type) {
+	public static int getReagentCount(PlayerEntity player, ReagentType type) {
 		int count = 0;
 		for (ItemStack item : player.inventory.mainInventory) {
 			if (!item.isEmpty() && item.getItem() instanceof ReagentBag) {
@@ -465,7 +465,7 @@ public class NostrumMagica {
 		return count;
 	}
 
-	public static boolean removeReagents(EntityPlayer player, ReagentType type, int count) {
+	public static boolean removeReagents(PlayerEntity player, ReagentType type, int count) {
 		if (getReagentCount(player, type) < count)
 			return false;
 
@@ -496,7 +496,7 @@ public class NostrumMagica {
 		return count == 0;
 	}
 
-	public static List<Spell> getSpells(EntityPlayer entity) {
+	public static List<Spell> getSpells(PlayerEntity entity) {
 		if (entity == null)
 			return null;
 
@@ -510,7 +510,7 @@ public class NostrumMagica {
 
 	}
 
-	public static List<NostrumQuest> getActiveQuests(EntityPlayer player) {
+	public static List<NostrumQuest> getActiveQuests(PlayerEntity player) {
 		return getActiveQuests(getMagicWrapper(player));
 	}
 
@@ -528,7 +528,7 @@ public class NostrumMagica {
 		return list;
 	}
 
-	public static List<NostrumQuest> getCompletedQuests(EntityPlayer player) {
+	public static List<NostrumQuest> getCompletedQuests(PlayerEntity player) {
 		return getCompletedQuests(getMagicWrapper(player));
 	}
 
@@ -546,7 +546,7 @@ public class NostrumMagica {
 		return list;
 	}
 
-	public static List<NostrumResearch> getCompletedResearch(EntityPlayer player) {
+	public static List<NostrumResearch> getCompletedResearch(PlayerEntity player) {
 		return getCompletedResearch(getMagicWrapper(player));
 	}
 
@@ -880,7 +880,7 @@ public class NostrumMagica {
 						new ItemStack(Items.GOLD_INGOT, 1) },
 				new RRequirementResearch("summonkoids"), new OutcomeSpawnEntity(new IEntityFactory() {
 					@Override
-					public void spawn(World world, Vec3d pos, EntityPlayer invoker, ItemStack centerItem) {
+					public void spawn(World world, Vec3d pos, PlayerEntity invoker, ItemStack centerItem) {
 						EntityKoid koid = new EntityKoid(world);
 						koid.setPosition(pos.x, pos.y, pos.z);
 						world.spawnEntity(koid);
@@ -2258,7 +2258,7 @@ public class NostrumMagica {
 	 * @param quest
 	 * @return
 	 */
-	public static boolean getQuestAvailable(EntityPlayer player, NostrumQuest quest) {
+	public static boolean getQuestAvailable(PlayerEntity player, NostrumQuest quest) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 
 		if (attr == null)
@@ -2296,7 +2296,7 @@ public class NostrumMagica {
 	 * @param quest
 	 * @return
 	 */
-	public static boolean canTakeQuest(EntityPlayer player, NostrumQuest quest) {
+	public static boolean canTakeQuest(PlayerEntity player, NostrumQuest quest) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
 			return false;
@@ -2339,7 +2339,7 @@ public class NostrumMagica {
 				&& quest.getReqTechnique() <= attr.getTech() && quest.getReqFinesse() <= attr.getFinesse();
 	}
 
-	public static boolean getResearchVisible(EntityPlayer player, NostrumResearch research) {
+	public static boolean getResearchVisible(PlayerEntity player, NostrumResearch research) {
 		// Visible if any of parents is finished (unless hidden)
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
@@ -2372,7 +2372,7 @@ public class NostrumMagica {
 		return false;
 	}
 
-	public static boolean canPurchaseResearch(EntityPlayer player, NostrumResearch research) {
+	public static boolean canPurchaseResearch(PlayerEntity player, NostrumResearch research) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
 			return false;
@@ -2499,7 +2499,7 @@ public class NostrumMagica {
 		return true;
 	}
 
-	public static List<ITameDragon> getNearbyTamedDragons(EntityLivingBase entity, double blockRadius,
+	public static List<ITameDragon> getNearbyTamedDragons(LivingEntity entity, double blockRadius,
 			boolean onlyOwned) {
 		List<ITameDragon> list = new LinkedList<>();
 
@@ -2527,15 +2527,15 @@ public class NostrumMagica {
 		return list;
 	}
 
-	public static List<EntityLivingBase> getTamedEntities(EntityLivingBase owner) {
-		List<EntityLivingBase> ents = new ArrayList<>();
+	public static List<LivingEntity> getTamedEntities(LivingEntity owner) {
+		List<LivingEntity> ents = new ArrayList<>();
 		final UUID id = owner.getUniqueID();
 		for (Entity e : owner.world.loadedEntityList) {
-			if (!(e instanceof EntityLivingBase)) {
+			if (!(e instanceof LivingEntity)) {
 				continue;
 			}
 
-			EntityLivingBase ent = (EntityLivingBase) e;
+			LivingEntity ent = (LivingEntity) e;
 			if (ent instanceof IEntityTameable) {
 				IEntityTameable tame = (IEntityTameable) ent;
 				if (tame.isEntityTamed() && tame.getOwnerId() != null && tame.getOwnerId().equals(id)) {
@@ -2557,8 +2557,8 @@ public class NostrumMagica {
 		return ents;
 	}
 
-	public static @Nullable EntityLivingBase getOwner(EntityLiving entity) {
-		EntityLivingBase ent = (EntityLivingBase) entity;
+	public static @Nullable LivingEntity getOwner(MobEntity entity) {
+		LivingEntity ent = (LivingEntity) entity;
 		if (ent instanceof IEntityTameable) {
 			IEntityTameable tame = (IEntityTameable) ent;
 			return tame.getLivingOwner();
@@ -2567,8 +2567,8 @@ public class NostrumMagica {
 			return tame.getOwner();
 		} else if (ent instanceof IEntityOwnable) {
 			IEntityOwnable tame = (IEntityOwnable) ent;
-			if (tame.getOwner() instanceof EntityLivingBase) {
-				return (EntityLivingBase) tame.getOwner();
+			if (tame.getOwner() instanceof LivingEntity) {
+				return (LivingEntity) tame.getOwner();
 			}
 		}
 		return null;
@@ -2623,7 +2623,7 @@ public class NostrumMagica {
 	 * @param player
 	 * @return
 	 */
-	public static BlockPos getOrCreatePlayerDimensionSpawn(EntityPlayer player) {
+	public static BlockPos getOrCreatePlayerDimensionSpawn(PlayerEntity player) {
 		NostrumDimensionMapper mapper = getDimensionMapper(player.world);
 
 		// Either register or fetch existing mapping
@@ -2727,7 +2727,7 @@ public class NostrumMagica {
 		return (world.getChunkProvider().getLoadedChunk(pos.getX() >> 4, pos.getZ() >> 4) != null);
 	}
 
-	public static boolean IsSameTeam(EntityLivingBase ent1, EntityLivingBase ent2) {
+	public static boolean IsSameTeam(LivingEntity ent1, LivingEntity ent2) {
 		if (ent1 == ent2) {
 			return true;
 		}
@@ -2744,9 +2744,9 @@ public class NostrumMagica {
 			IEntityOwnable tamed = (IEntityOwnable) ent1;
 			@Nullable
 			Entity owner = tamed.getOwner();
-			if (owner != null && owner instanceof EntityLivingBase) {
+			if (owner != null && owner instanceof LivingEntity) {
 				// Are they on the same team as our owner?
-				return IsSameTeam((EntityLivingBase) owner, ent2);
+				return IsSameTeam((LivingEntity) owner, ent2);
 			}
 		}
 
@@ -2754,9 +2754,9 @@ public class NostrumMagica {
 			IEntityOwnable tamed = (IEntityOwnable) ent2;
 			@Nullable
 			Entity owner = tamed.getOwner();
-			if (owner != null && owner instanceof EntityLivingBase) {
+			if (owner != null && owner instanceof LivingEntity) {
 				// Are they on the same team as our owner?
-				return IsSameTeam(ent1, (EntityLivingBase) owner);
+				return IsSameTeam(ent1, (LivingEntity) owner);
 			}
 		}
 
@@ -2765,7 +2765,7 @@ public class NostrumMagica {
 		// return (ent1 instanceof IMob == ent2 instanceof IMob);
 
 		// If both are players and teams aren't involved, assume they can work together
-		if (ent1 instanceof EntityPlayer && ent2 instanceof EntityPlayer) {
+		if (ent1 instanceof PlayerEntity && ent2 instanceof PlayerEntity) {
 			return true;
 		}
 
@@ -2773,19 +2773,19 @@ public class NostrumMagica {
 		return false;
 	}
 
-	public static @Nullable EntityLivingBase resolveEntityLiving(@Nullable Entity entityOrSubEntity) {
+	public static @Nullable LivingEntity resolveEntityLiving(@Nullable Entity entityOrSubEntity) {
 		if (entityOrSubEntity == null) {
 			return null;
 		}
 
-		if (entityOrSubEntity instanceof EntityLivingBase) {
-			return (EntityLivingBase) entityOrSubEntity;
+		if (entityOrSubEntity instanceof LivingEntity) {
+			return (LivingEntity) entityOrSubEntity;
 		}
 
 		// Multiparts aren't living but may have living parents!
 		if (entityOrSubEntity instanceof MultiPartEntityPart) {
-			if (((MultiPartEntityPart) entityOrSubEntity).parent instanceof EntityLivingBase) {
-				return (EntityLivingBase) ((MultiPartEntityPart) entityOrSubEntity).parent;
+			if (((MultiPartEntityPart) entityOrSubEntity).parent instanceof LivingEntity) {
+				return (LivingEntity) ((MultiPartEntityPart) entityOrSubEntity).parent;
 			}
 		}
 
@@ -2798,7 +2798,7 @@ public class NostrumMagica {
 			return;
 		}
 
-		if (!(e.getEntity() instanceof EntityLiving)) {
+		if (!(e.getEntity() instanceof MobEntity)) {
 			return;
 		}
 
@@ -2807,7 +2807,7 @@ public class NostrumMagica {
 			return;
 		}
 
-		final EntityLiving living = (EntityLiving) e.getEntity();
+		final MobEntity living = (MobEntity) e.getEntity();
 
 		// Follow task for pets
 		{
@@ -2834,7 +2834,7 @@ public class NostrumMagica {
 
 			if (existingTask == null) {
 				// Gotta inject task. May have to make space for it.
-				EntityAIFollowOwnerAdvanced<EntityLiving> task = new EntityAIFollowOwnerAdvanced<EntityLiving>(living,
+				EntityAIFollowOwnerAdvanced<MobEntity> task = new EntityAIFollowOwnerAdvanced<MobEntity>(living,
 						1.5f, 0f, .5f);
 				if (followTask == null) {
 					// Can just add at end
@@ -2880,7 +2880,7 @@ public class NostrumMagica {
 		}
 	}
 
-	public static boolean attemptTeleport(World world, BlockPos target, EntityPlayer player, boolean allowPortal,
+	public static boolean attemptTeleport(World world, BlockPos target, PlayerEntity player, boolean allowPortal,
 			boolean spawnBristle) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		boolean success = false;

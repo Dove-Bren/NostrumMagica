@@ -3,13 +3,13 @@ package com.smanzana.nostrummagica.entity.tasks;
 import com.smanzana.nostrummagica.entity.IEntityTameable;
 
 import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAITarget;
 
 public class EntityAIOwnerHurtByTargetGeneric<T extends EntityCreature & IEntityTameable> extends EntityAITarget {
 	
 	protected T theDefendingTameable;
-	protected EntityLivingBase theOwnerAttacker;
+	protected LivingEntity theOwnerAttacker;
 	private int timestamp;
 
 	public EntityAIOwnerHurtByTargetGeneric(T theDefendingTameableIn) {
@@ -25,7 +25,7 @@ public class EntityAIOwnerHurtByTargetGeneric<T extends EntityCreature & IEntity
 		if (!this.theDefendingTameable.isEntitySitting()) {
 			return false;
 		} else {
-			EntityLivingBase entitylivingbase = this.theDefendingTameable.getLivingOwner();
+			LivingEntity entitylivingbase = this.theDefendingTameable.getLivingOwner();
 
 			if (entitylivingbase == null) {
 				return false;
@@ -42,7 +42,7 @@ public class EntityAIOwnerHurtByTargetGeneric<T extends EntityCreature & IEntity
 	 */
 	public void startExecuting() {
 		this.taskOwner.setAttackTarget(this.theOwnerAttacker);
-		EntityLivingBase entitylivingbase = this.theDefendingTameable.getLivingOwner();
+		LivingEntity entitylivingbase = this.theDefendingTameable.getLivingOwner();
 
 		if (entitylivingbase != null) {
 			this.timestamp = entitylivingbase.getRevengeTimer();

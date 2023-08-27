@@ -6,8 +6,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -28,7 +28,7 @@ public class SpellRequestReplyMessage implements IMessage {
 			// Note: This handler is not done on the game thread since the spell registry is thread safe.
 			
 			// What spells?
-			NBTTagList list = message.tag.getTagList(NBT_SPELLS, NBT.TAG_COMPOUND);
+			ListNBT list = message.tag.getList(NBT_SPELLS, NBT.TAG_COMPOUND);
 			if (list == null)
 				return null;
 			
@@ -38,10 +38,10 @@ public class SpellRequestReplyMessage implements IMessage {
 				NostrumMagica.getSpellRegistry().clear();
 			}
 			
-			for (int i = 0; i < list.tagCount(); i++) {
-				NBTTagCompound nbt = list.getCompoundTagAt(i);
-				int id = nbt.getInteger(NBT_ID);
-				nbt = nbt.getCompoundTag(NBT_SPELL);
+			for (int i = 0; i < list.size(); i++) {
+				CompoundNBT nbt = list.getCompoundTagAt(i);
+				int id = nbt.getInt(NBT_ID);
+				nbt = nbt.getCompound(NBT_SPELL);
 				Spell spell = Spell.fromNBT(nbt, id);
 				
 				if (spell != null)
@@ -57,10 +57,10 @@ public class SpellRequestReplyMessage implements IMessage {
 	private static final String NBT_SPELL = "spell";
 	private static final String NBT_ID = "id";
 	private static final String NBT_CLEAN = "clean";
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public SpellRequestReplyMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	public SpellRequestReplyMessage(List<Spell> spells) {
@@ -68,18 +68,18 @@ public class SpellRequestReplyMessage implements IMessage {
 	}
 	
 	public SpellRequestReplyMessage(List<Spell> spells, boolean clean) {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 		
-		NBTTagList list = new NBTTagList();
+		ListNBT list = new ListNBT();
 		for (Spell spell : spells) {
-			NBTTagCompound nbt = new NBTTagCompound();
-			nbt.setInteger(NBT_ID, spell.getRegistryID());
-			nbt.setTag(NBT_SPELL, spell.toNBT());
-			list.appendTag(nbt);
+			CompoundNBT nbt = new CompoundNBT();
+			nbt.putInt(NBT_ID, spell.getRegistryID());
+			nbt.put(NBT_SPELL, spell.toNBT());
+			list.add(nbt);
 		}
 		
-		tag.setTag(NBT_SPELLS, list);
-		tag.setBoolean(NBT_CLEAN, clean);
+		tag.put(NBT_SPELLS, list);
+		tag.putBoolean(NBT_CLEAN, clean);
 	}
 
 	@Override

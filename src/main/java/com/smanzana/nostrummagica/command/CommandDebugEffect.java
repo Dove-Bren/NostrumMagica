@@ -5,7 +5,7 @@ import com.smanzana.nostrummagica.items.PetSoulItem;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumHand;
@@ -24,11 +24,11 @@ public class CommandDebugEffect extends CommandBase {
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-//		if (!(sender.getCommandSenderEntity() instanceof EntityPlayer)) {
+//		if (!(sender.getCommandSenderEntity() instanceof PlayerEntity)) {
 //			throw new CommandException("Command must be run by a creative player");
 //		}
 //		
-//		final EntityPlayer player = (EntityPlayer) sender.getCommandSenderEntity();
+//		final PlayerEntity player = (PlayerEntity) sender.getCommandSenderEntity();
 //		if (!player.isCreative()) {
 //			throw new CommandException("Command must be run by a creative player");
 //		}
@@ -49,7 +49,7 @@ public class CommandDebugEffect extends CommandBase {
 //		
 //		EffectData data = NostrumMagica.magicEffectProxy.getData(player, effect);
 //		if (data == null) {
-//			sender.sendMessage(new TextComponentString("Player is not under that effect"));
+//			sender.sendMessage(new StringTextComponent("Player is not under that effect"));
 //		} else {
 //			String result = "Effect found with element {"
 //					+ (data.getElement() == null ? "NULL" : data.getElement().getName())
@@ -58,14 +58,14 @@ public class CommandDebugEffect extends CommandBase {
 //					+ "}, and count {"
 //					+ data.getCount()
 //					+ "}";
-//			sender.sendMessage(new TextComponentString(result));
+//			sender.sendMessage(new StringTextComponent(result));
 //		}
 		
-		if (!(sender.getCommandSenderEntity() instanceof EntityPlayer)) {
+		if (!(sender.getCommandSenderEntity() instanceof PlayerEntity)) {
 			throw new CommandException("Command must be run by a creative player");
 		}
 		
-		final EntityPlayer player = (EntityPlayer) sender.getCommandSenderEntity();
+		final PlayerEntity player = (PlayerEntity) sender.getCommandSenderEntity();
 		if (!player.isCreative()) {
 			throw new CommandException("Command must be run by a creative player");
 		}

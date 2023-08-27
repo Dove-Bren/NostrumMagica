@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.NonNullList;
@@ -21,7 +21,7 @@ public class OutcomeCreatePortal implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, EntityPlayer player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, PlayerEntity player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
 		
 		world.setBlockState(center.down(), SorceryPortalSpawner.instance().getDefaultState());
 		TileEntity te = world.getTileEntity(center.add(0, 0, 0));

@@ -8,14 +8,14 @@ import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 /**
@@ -47,7 +47,7 @@ public class DragonEgg extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, EnumHand hand, Direction facing, float hitX, float hitY, float hitZ) {
 		
 		if (worldIn.isRemote)
 			return EnumActionResult.SUCCESS;
@@ -81,7 +81,7 @@ public class DragonEgg extends Item implements ILoreTagged {
 			attr.giveFullLore(egg);
 		}
 		
-		playerIn.sendMessage(new TextComponentTranslation("info.egg.place"));
+		playerIn.sendMessage(new TranslationTextComponent("info.egg.place"));
 		
 		if (!playerIn.isCreative()) {
 			playerIn.getHeldItem(hand).shrink(1);

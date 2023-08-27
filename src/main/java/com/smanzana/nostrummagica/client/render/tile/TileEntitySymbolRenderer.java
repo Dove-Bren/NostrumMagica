@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
@@ -42,21 +42,21 @@ public class TileEntitySymbolRenderer extends TileEntitySpecialRenderer<SymbolTi
 		else
 			icon = SpellComponentIcon.get(comp.getElement());
 		ResourceLocation textLoc = icon.getModelLocation();
-		float rot = 2.0f * (Minecraft.getSystemTime() / 50);
+		float rot = 2.0f * (System.currentTimeMillis() / 50);
 		float scale = te.getScale();
 		BufferBuilder wr = Tessellator.getInstance().getBuffer();
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(textLoc);
+		Minecraft.getInstance().getTextureManager().bindTexture(textLoc);
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(x + .5, y + 1.25, z + .5);
-		GlStateManager.rotate(rot, 0, 10, 0);
+		GlStateManager.translatef(x + .5, y + 1.25, z + .5);
+		GlStateManager.rotatef(rot, 0, 10, 0);
 		
-		GlStateManager.scale(scale, scale, scale);
+		GlStateManager.scalef(scale, scale, scale);
 		GlStateManager.enableBlend();
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GlStateManager.disableLighting();
-		GlStateManager.enableAlpha();
-		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+		GlStateManager.enableAlphaTest();
+		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 		
 		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 		wr.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);

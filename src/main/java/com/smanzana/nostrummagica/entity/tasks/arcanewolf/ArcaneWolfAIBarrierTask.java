@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.potions.MagicShieldPotion;
 import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.potion.PotionEffect;
 
@@ -41,15 +41,15 @@ public class ArcaneWolfAIBarrierTask extends EntityAIBase {
 				&& wolf.getElementalType() == ArcaneWolfElementalType.BARRIER;
 	}
 	
-	protected List<EntityLivingBase> getTargets(EntityArcaneWolf wolf) {
-		EntityLivingBase owner = wolf.getOwner();
-		List<EntityLivingBase> tames = NostrumMagica.getTamedEntities(owner);
+	protected List<LivingEntity> getTargets(EntityArcaneWolf wolf) {
+		LivingEntity owner = wolf.getOwner();
+		List<LivingEntity> tames = NostrumMagica.getTamedEntities(owner);
 		tames.add(owner);
 		tames.removeIf((e) -> { return e.getDistance(wolf) > 15;});
 		return tames;
 	}
 	
-	protected boolean applyTo(EntityArcaneWolf wolf, EntityLivingBase target) {
+	protected boolean applyTo(EntityArcaneWolf wolf, LivingEntity target) {
 		// Barrier buffs up their physical and magical armor, adding some if they have none
 		final double amtToAdd = 1;
 		final double maxAmt = 4;
@@ -111,12 +111,12 @@ public class ArcaneWolfAIBarrierTask extends EntityAIBase {
 	public void startExecuting() {
 		boolean applied = false;
 		int backoff = 5;
-		List<EntityLivingBase> targets = this.getTargets(wolf);
-		for (EntityLivingBase target : targets) {
+		List<LivingEntity> targets = this.getTargets(wolf);
+		for (LivingEntity target : targets) {
 			if (applyTo(wolf, target)) {
 				applied = true;
 				NostrumParticles.FILLED_ORB.spawn(wolf.world, new SpawnParams(
-						1, wolf.posX, wolf.posY + wolf.height/2, wolf.posZ, 0, 40, 0, target.getEntityId()
+						1, wolf.posX, wolf.posY + wolf.getHeight()/2, wolf.posZ, 0, 40, 0, target.getEntityId()
 						).color(ArcaneWolfElementalType.BARRIER.getColor()));
 			}
 		}

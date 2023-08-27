@@ -3,10 +3,10 @@ package com.smanzana.nostrummagica.entity.tasks.dragon;
 import com.smanzana.nostrummagica.entity.AggroTable;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
 
-public class DragonAIAggroTable<E extends EntityDragon, T extends EntityLivingBase> extends EntityAIBase {
+public class DragonAIAggroTable<E extends EntityDragon, T extends LivingEntity> extends EntityAIBase {
 
 	private final E dragon;
 	private AggroTable<T> aggroTable;
@@ -29,7 +29,7 @@ public class DragonAIAggroTable<E extends EntityDragon, T extends EntityLivingBa
 		// not a great place for this
 		aggroTable.decayTick();
 		
-		EntityLivingBase current = dragon.getAttackTarget();
+		LivingEntity current = dragon.getAttackTarget();
 		T targ = this.getTarget();
 		
 		return (targ != null && targ != current);

@@ -23,11 +23,11 @@ import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockTorch;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.World;
@@ -85,7 +85,7 @@ public class RoomBlueprint {
 			BLUEPRINT_CACHE.put(state, block);
 		}
 		
-		public static BlueprintBlock getBlueprintBlock(IBlockState state, NBTTagCompound teData) {
+		public static BlueprintBlock getBlueprintBlock(IBlockState state, CompoundNBT teData) {
 			BlueprintBlock block = null;
 			if (teData == null) {
 				block = CHECK_BLUEPRINT_CACHE(state);
@@ -102,9 +102,9 @@ public class RoomBlueprint {
 		}
 		
 		private IBlockState state;
-		private NBTTagCompound tileEntityData;
+		private CompoundNBT tileEntityData;
 		
-		private BlueprintBlock(IBlockState state, NBTTagCompound teData) {
+		private BlueprintBlock(IBlockState state, CompoundNBT teData) {
 			this.state = state;
 			this.tileEntityData = teData;
 			
@@ -122,14 +122,14 @@ public class RoomBlueprint {
 				this.state = world.getBlockState(pos);
 				TileEntity te = world.getTileEntity(pos);
 				if (te != null) {
-					this.tileEntityData = new NBTTagCompound();
+					this.tileEntityData = new CompoundNBT();
 					te.writeToNBT(this.tileEntityData);
 				}
 			}
 		}
 		
 		protected void fixupOldTEs(String newID) {
-			tileEntityData.setString("id", newID);
+			tileEntityData.putString("id", newID);
 		}
 		
 		public static final String NBT_BLOCK = "block_id";
@@ -138,20 +138,20 @@ public class RoomBlueprint {
 		public static final String NBT_TILE_ENTITY = "te_data";
 		
 		@SuppressWarnings("deprecation")
-		public static BlueprintBlock fromNBT(byte version, NBTTagCompound nbt) {
+		public static BlueprintBlock fromNBT(byte version, CompoundNBT nbt) {
 			IBlockState state = null;
-			NBTTagCompound teData = null;
+			CompoundNBT teData = null;
 			switch (version) {
 			case 0:
-				state = Block.getStateById(nbt.getInteger(NBT_BLOCK));
+				state = Block.getStateById(nbt.getInt(NBT_BLOCK));
 				
 				// Block.getStateById defaults to air. Remove it!
 				if (state != null && state.getBlock() == Blocks.AIR) {
 					state = null;
 				}
 				
-				if (state != null && nbt.hasKey(NBT_TILE_ENTITY)) {
-					teData = nbt.getCompoundTag(NBT_TILE_ENTITY);
+				if (state != null && nbt.contains(NBT_TILE_ENTITY)) {
+					teData = nbt.getCompound(NBT_TILE_ENTITY);
 				}
 				break;
 			case 1:
@@ -165,7 +165,7 @@ public class RoomBlueprint {
 						SET_CACHE(type, block);
 					}
 					if (block != null) {
-						Integer meta = nbt.getInteger(NBT_BLOCK_STATE);
+						Integer meta = nbt.getInt(NBT_BLOCK_STATE);
 						state = CHECK_BLOCKSTATE_CACHE(block, meta);
 						if (state == null) {
 							state = block.getStateFromMeta(meta);
@@ -179,8 +179,8 @@ public class RoomBlueprint {
 					state = null;
 				}
 				
-				if (state != null && nbt.hasKey(NBT_TILE_ENTITY)) {
-					teData = nbt.getCompoundTag(NBT_TILE_ENTITY);
+				if (state != null && nbt.contains(NBT_TILE_ENTITY)) {
+					teData = nbt.getCompound(NBT_TILE_ENTITY);
 				}
 				break;
 			default:
@@ -190,23 +190,23 @@ public class RoomBlueprint {
 			return BlueprintBlock.getBlueprintBlock(state, teData);
 		}
 		
-		public NBTTagCompound toNBT() {
-			NBTTagCompound tag = new NBTTagCompound();
+		public CompoundNBT toNBT() {
+			CompoundNBT tag = new CompoundNBT();
 			
 			// Version 0
 //			if (state != null) {
-//				tag.setInteger(NBT_BLOCK, Block.getStateId(state));
+//				tag.putInt(NBT_BLOCK, Block.getStateId(state));
 //				if (tileEntityData != null) {
-//					tag.setTag(NBT_TILE_ENTITY, tileEntityData);
+//					tag.put(NBT_TILE_ENTITY, tileEntityData);
 //				}
 //			}
 			
 			// Version 2
 			if (state != null) {
-				tag.setString(NBT_BLOCK_TYPE, state.getBlock().getRegistryName().toString());
-				tag.setInteger(NBT_BLOCK_STATE, state.getBlock().getMetaFromState(state));
+				tag.putString(NBT_BLOCK_TYPE, state.getBlock().getRegistryName().toString());
+				tag.putInt(NBT_BLOCK_STATE, state.getBlock().getMetaFromState(state));
 				if (tileEntityData != null) {
-					tag.setTag(NBT_TILE_ENTITY, tileEntityData);
+					tag.put(NBT_TILE_ENTITY, tileEntityData);
 				}
 			}
 			
@@ -214,8 +214,8 @@ public class RoomBlueprint {
 			return tag;
 		}
 		
-		private static EnumFacing rotate(EnumFacing in, EnumFacing mod) {
-			if (in != EnumFacing.UP && in != EnumFacing.DOWN) {
+		private static Direction rotate(Direction in, Direction mod) {
+			if (in != Direction.UP && in != Direction.DOWN) {
 				int count = mod.getOpposite().getHorizontalIndex();
 				while (count > 0) {
 					count--;
@@ -226,7 +226,7 @@ public class RoomBlueprint {
 			return in;
 		}
 		
-		public IBlockState getSpawnState(EnumFacing facing) {
+		public IBlockState getSpawnState(Direction facing) {
 //			if (state != null) {
 //				IBlockState placeState = state;
 //				
@@ -234,19 +234,19 @@ public class RoomBlueprint {
 //					
 //					Block block = placeState.getBlock();
 //					if (block instanceof BlockHorizontal) {
-//						EnumFacing cur = placeState.getValue(BlockHorizontal.FACING);
+//						Direction cur = placeState.getValue(BlockHorizontal.FACING);
 //						cur = rotate(cur, facing);
 //						placeState = placeState.withProperty(BlockHorizontal.FACING, cur);
 //					} else if (block instanceof BlockTorch) {
-//						EnumFacing cur = placeState.getValue(BlockTorch.FACING);
+//						Direction cur = placeState.getValue(BlockTorch.FACING);
 //						cur = rotate(cur, facing);
 //						placeState = placeState.withProperty(BlockTorch.FACING, cur);
 //					} else if (block instanceof BlockLadder) {
-//						EnumFacing cur = placeState.getValue(BlockLadder.FACING);
+//						Direction cur = placeState.getValue(BlockLadder.FACING);
 //						cur = rotate(cur, facing);
 //						placeState = placeState.withProperty(BlockLadder.FACING, cur);
 //					} else if (block instanceof BlockStairs) {
-//						EnumFacing cur = placeState.getValue(BlockStairs.FACING);
+//						Direction cur = placeState.getValue(BlockStairs.FACING);
 //						cur = rotate(cur, facing);
 //						placeState = placeState.withProperty(BlockStairs.FACING, cur);
 //					}
@@ -269,24 +269,24 @@ public class RoomBlueprint {
 					
 					Block block = placeState.getBlock();
 					if (block instanceof BlockHorizontal) {
-						EnumFacing cur = placeState.getValue(BlockHorizontal.FACING);
+						Direction cur = placeState.getValue(BlockHorizontal.FACING);
 						cur = rotate(cur, facing);
 						placeState = placeState.withProperty(BlockHorizontal.FACING, cur);
 					} else if (block instanceof BlockTorch) {
-						EnumFacing cur = placeState.getValue(BlockTorch.FACING);
+						Direction cur = placeState.getValue(BlockTorch.FACING);
 						cur = rotate(cur, facing);
 						placeState = placeState.withProperty(BlockTorch.FACING, cur);
 					} else if (block instanceof BlockLadder) {
-						EnumFacing cur = placeState.getValue(BlockLadder.FACING);
+						Direction cur = placeState.getValue(BlockLadder.FACING);
 						cur = rotate(cur, facing);
 						placeState = placeState.withProperty(BlockLadder.FACING, cur);
 					} else if (block instanceof BlockStairs) {
-						EnumFacing cur = placeState.getValue(BlockStairs.FACING);
+						Direction cur = placeState.getValue(BlockStairs.FACING);
 						cur = rotate(cur, facing);
 						placeState = placeState.withProperty(BlockStairs.FACING, cur);
 					} else if (block instanceof BlockDirectional) {
 						// Only want to rotate horizontally
-						EnumFacing cur = placeState.getValue(BlockDirectional.FACING);
+						Direction cur = placeState.getValue(BlockDirectional.FACING);
 						cur = rotate(cur, facing);
 						placeState = placeState.withProperty(BlockDirectional.FACING, cur);
 					}
@@ -298,7 +298,7 @@ public class RoomBlueprint {
 			}
 		}
 		
-		public NBTTagCompound getTileEntityData() {
+		public CompoundNBT getTileEntityData() {
 			return tileEntityData;
 		}
 		
@@ -310,8 +310,8 @@ public class RoomBlueprint {
 			return state != null && state.getBlock() instanceof BlockRedstoneComparator;
 		}
 		
-		public EnumFacing getFacing() {
-			EnumFacing ret = null;
+		public Direction getFacing() {
+			Direction ret = null;
 			Block block = state.getBlock();
 			if (block instanceof BlockHorizontal) {
 				ret = state.getValue(BlockHorizontal.FACING);
@@ -381,7 +381,7 @@ public class RoomBlueprint {
 		this(world, pos1, pos2, usePlaceholders, null, null);
 	}
 	
-	public RoomBlueprint(World world, BlockPos pos1, BlockPos pos2, boolean usePlaceholders, BlockPos origin, EnumFacing originDir) {
+	public RoomBlueprint(World world, BlockPos pos1, BlockPos pos2, boolean usePlaceholders, BlockPos origin, Direction originDir) {
 		this(null, null, null, null);
 		
 		BlockPos low = new BlockPos(pos1.getX() < pos2.getX() ? pos1.getX() : pos2.getX(),
@@ -439,7 +439,7 @@ public class RoomBlueprint {
 		}
 		
 		if (this.entry == null && !usePlaceholders) {
-			this.entry = new DungeonExitPoint(new BlockPos(width / 2, 0, length / 2), EnumFacing.NORTH);
+			this.entry = new DungeonExitPoint(new BlockPos(width / 2, 0, length / 2), Direction.NORTH);
 		}
 		
 		// Adjust found doors to be offsets from entry
@@ -490,8 +490,8 @@ public class RoomBlueprint {
 		this.spawnerFunc = spawner;
 	}
 	
-	public static EnumFacing getModDir(EnumFacing original, EnumFacing newFacing) {
-		EnumFacing out = EnumFacing.NORTH;
+	public static Direction getModDir(Direction original, Direction newFacing) {
+		Direction out = Direction.NORTH;
 		int rotCount = (4 + newFacing.getHorizontalIndex() - original.getHorizontalIndex()) % 4;
 		while (rotCount-- > 0) {
 			out = out.rotateY();
@@ -499,7 +499,7 @@ public class RoomBlueprint {
 		return out;
 	}
 	
-	public static BlockPos applyRotation(BlockPos input, EnumFacing modDir) {
+	public static BlockPos applyRotation(BlockPos input, Direction modDir) {
 		int x = 0;
 		int z = 0;
 		final int dx = input.getX();
@@ -540,7 +540,7 @@ public class RoomBlueprint {
 		return false;
 	}
 	
-	protected void placeBlock(World world, BlockPos at, EnumFacing direction, BlueprintBlock block) {
+	protected void placeBlock(World world, BlockPos at, Direction direction, BlueprintBlock block) {
 		
 		if (spawnerFunc != null) {
 			spawnerFunc.spawnBlock(world, at, direction, block);
@@ -549,14 +549,14 @@ public class RoomBlueprint {
 			if (placeState != null) {
 				world.setBlockState(at, placeState, 2);
 				
-				NBTTagCompound tileEntityData = block.getTileEntityData();
+				CompoundNBT tileEntityData = block.getTileEntityData();
 				if (tileEntityData != null) {
 					TileEntity te = TileEntity.create(world, tileEntityData.copy());
 					if (te == null) {
 						// Before 1.12.2 ids weren't namespaced. Now they are. Check if it's an old Nostrum TE
-						final NBTTagCompound copy = tileEntityData.copy();
+						final CompoundNBT copy = tileEntityData.copy();
 						final String newID = NostrumMagica.MODID + ":" + copy.getString("id");
-						copy.setString("id", newID);
+						copy.putString("id", newID);
 						te = TileEntity.create(world, copy);
 						if (te != null) {
 							block.fixupOldTEs(newID);
@@ -581,16 +581,16 @@ public class RoomBlueprint {
 	}
 	
 	public void spawn(World world, BlockPos at) {
-		this.spawn(world, at, EnumFacing.NORTH);
+		this.spawn(world, at, Direction.NORTH);
 	}
 	
-	public void spawn(World world, BlockPos at, EnumFacing direction) {
+	public void spawn(World world, BlockPos at, Direction direction) {
 		
 		final int width = dimensions.getX();
 		final int height = dimensions.getY();
 		final int length = dimensions.getZ();
 		MutableBlockPos cursor = new MutableBlockPos();
-		EnumFacing modDir = EnumFacing.NORTH; // 0
+		Direction modDir = Direction.NORTH; // 0
 		
 		// Apply rotation changes
 		if (this.entry != null) {
@@ -653,7 +653,7 @@ public class RoomBlueprint {
 		List<BlockPos> secondPassPos = new ArrayList<>(16 * 4);
 		
 		// Data has inverse rotation
-		final EnumFacing dataDir = modDir.getHorizontalIndex() % 2 == 1 ? modDir.getOpposite() : modDir;
+		final Direction dataDir = modDir.getHorizontalIndex() % 2 == 1 ? modDir.getOpposite() : modDir;
 		
 		// Loop over all chunks from <x to >x (and <z to >z)
 		for (int cx = 0; cx <= numChunkX; cx++)
@@ -737,8 +737,8 @@ public class RoomBlueprint {
 	 * @param facing The desired facing for the entry way, if there is one.
 	 * @return
 	 */
-	public BlockPos getAdjustedDimensions(EnumFacing facing) {
-		EnumFacing mod = getModDir(entry == null ? EnumFacing.NORTH : entry.getFacing(), facing);
+	public BlockPos getAdjustedDimensions(Direction facing) {
+		Direction mod = getModDir(entry == null ? Direction.NORTH : entry.getFacing(), facing);
 		int width = dimensions.getX();
 		int height = dimensions.getY();
 		int length = dimensions.getZ();
@@ -773,9 +773,9 @@ public class RoomBlueprint {
 	 * @param facing
 	 * @return
 	 */
-	public BlockPos getAdjustedOffset(EnumFacing facing) {
+	public BlockPos getAdjustedOffset(Direction facing) {
 		BlockPos offset = entry == null ? new BlockPos(0,0,0) : entry.getPos().toImmutable();
-		EnumFacing mod = getModDir(entry == null ? EnumFacing.NORTH : entry.getFacing(), facing);
+		Direction mod = getModDir(entry == null ? Direction.NORTH : entry.getFacing(), facing);
 		
 		int x = offset.getX();
 		int y = offset.getY();
@@ -883,7 +883,7 @@ public class RoomBlueprint {
 		for (int k = 0; k < length; k++) {
 			BlockPos offsetOrigOrient = new BlockPos(i, j, k).subtract(origin);
 			BlockPos offsetNorthOrient = applyRotation(offsetOrigOrient, 
-						getModDir(EnumFacing.NORTH, this.entry.getFacing())
+						getModDir(Direction.NORTH, this.entry.getFacing())
 					); // rotate to north
 			scanner.scan(offsetNorthOrient, blocks[slot++]);
 		}
@@ -894,33 +894,33 @@ public class RoomBlueprint {
 		public static final String NBT_DATA = "te_data";
 		public static final String NBT_POS = "pos";
 		
-		public NBTTagCompound nbtTagData;
+		public CompoundNBT nbtTagData;
 		public BlockPos pos;
 		
-		public BlueprintSavedTE(NBTTagCompound data, BlockPos pos) {
+		public BlueprintSavedTE(CompoundNBT data, BlockPos pos) {
 			this.nbtTagData = data;
 			this.pos = pos;
 		}
 		
 		@SuppressWarnings("unused")
-		public NBTTagCompound toNBT() {
-			NBTTagCompound tag = new NBTTagCompound();
-			tag.setTag(NBT_DATA, nbtTagData);
-			tag.setLong(NBT_POS, pos.toLong());
+		public CompoundNBT toNBT() {
+			CompoundNBT tag = new CompoundNBT();
+			tag.put(NBT_DATA, nbtTagData);
+			tag.putLong(NBT_POS, pos.toLong());
 			return tag;
 		}
 		
-		public static BlueprintSavedTE fromNBT(NBTTagCompound nbt) {
+		public static BlueprintSavedTE fromNBT(CompoundNBT nbt) {
 			long pos = nbt.getLong(NBT_POS);
-			return new BlueprintSavedTE(nbt.getCompoundTag(NBT_DATA), BlockPos.fromLong(pos));
+			return new BlueprintSavedTE(nbt.getCompound(NBT_DATA), BlockPos.fromLong(pos));
 		}
 	}
 	
-	private static RoomBlueprint deserializeNBTStyleInternal(NBTTagCompound nbt, byte version) {
-		BlockPos dims = NBTUtil.getPosFromTag(nbt.getCompoundTag(NBT_DIMS));
+	private static RoomBlueprint deserializeNBTStyleInternal(CompoundNBT nbt, byte version) {
+		BlockPos dims = NBTUtil.getPosFromTag(nbt.getCompound(NBT_DIMS));
 		// When breaking blueprints into pieces, the first one has an actual copy of the real size of the whole thing.
 		// If we have one of those, allocate the FULL array size instead of the small one
-		BlockPos masterDims = NBTUtil.getPosFromTag(nbt.getCompoundTag(NBT_WHOLE_DIMS));
+		BlockPos masterDims = NBTUtil.getPosFromTag(nbt.getCompound(NBT_WHOLE_DIMS));
 		BlueprintBlock[] blocks = null;
 		Set<DungeonExitPoint> doors = null;
 		DungeonExitPoint entry = null;
@@ -928,10 +928,10 @@ public class RoomBlueprint {
 		if (dims.distanceSq(0, 0, 0) == 0) {
 			return null;
 		} else {
-			NBTTagList list = nbt.getTagList(NBT_BLOCK_LIST, NBT.TAG_COMPOUND);
+			ListNBT list = nbt.getList(NBT_BLOCK_LIST, NBT.TAG_COMPOUND);
 			
 			final int count = dims.getX() * dims.getY() * dims.getZ();
-			if (count != list.tagCount()) {
+			if (count != list.size()) {
 				return null;
 			}
 			
@@ -948,7 +948,7 @@ public class RoomBlueprint {
 			}
 			
 			for (int i = 0; i < count; i++) {
-				NBTTagCompound tag = (NBTTagCompound) list.get(i);
+				CompoundNBT tag = (CompoundNBT) list.get(i);
 				blocks[i] = BlueprintBlock.fromNBT((byte)version, tag);
 			}
 			
@@ -956,16 +956,16 @@ public class RoomBlueprint {
 				bar.step("Doors and Exits");
 			}
 			
-			list = nbt.getTagList(NBT_DOOR_LIST, NBT.TAG_COMPOUND);
+			list = nbt.getList(NBT_DOOR_LIST, NBT.TAG_COMPOUND);
 			doors = new HashSet<>();
-			int listCount = list.tagCount();
+			int listCount = list.size();
 			for (int i = 0; i < listCount; i++) {
-				NBTTagCompound tag = (NBTTagCompound) list.getCompoundTagAt(i);
+				CompoundNBT tag = (CompoundNBT) list.getCompoundTagAt(i);
 				doors.add(DungeonExitPoint.fromNBT(tag));
 			}
 			
-			if (nbt.hasKey(NBT_ENTRY)) {
-				entry = DungeonExitPoint.fromNBT(nbt.getCompoundTag(NBT_ENTRY));
+			if (nbt.contains(NBT_ENTRY)) {
+				entry = DungeonExitPoint.fromNBT(nbt.getCompound(NBT_ENTRY));
 			}
 			
 			if (!NostrumMagica.initFinished) {
@@ -976,18 +976,18 @@ public class RoomBlueprint {
 		return new RoomBlueprint(masterDims.distanceSq(0, 0, 0) == 0 ? dims : masterDims, blocks, doors, entry);
 	}
 	
-	private static RoomBlueprint deserializeVersion1(NBTTagCompound nbt) {
+	private static RoomBlueprint deserializeVersion1(CompoundNBT nbt) {
 		return deserializeNBTStyleInternal(nbt, (byte)0);
 	}
 	
-	private static RoomBlueprint deserializeVersion2(NBTTagCompound nbt) {
+	private static RoomBlueprint deserializeVersion2(CompoundNBT nbt) {
 		// Store blocks as int array
 		// Store TileEntities separately since there are likely few of them
 		
-		BlockPos dims = NBTUtil.getPosFromTag(nbt.getCompoundTag(NBT_DIMS));
+		BlockPos dims = NBTUtil.getPosFromTag(nbt.getCompound(NBT_DIMS));
 		// When breaking blueprints into pieces, the first one has an actual copy of the real size of the whole thing.
 		// If we have one of those, allocate the FULL array size instead of the small one
-		BlockPos masterDims = NBTUtil.getPosFromTag(nbt.getCompoundTag(NBT_WHOLE_DIMS));
+		BlockPos masterDims = NBTUtil.getPosFromTag(nbt.getCompound(NBT_WHOLE_DIMS));
 		BlueprintBlock[] blocks = null;
 		Set<DungeonExitPoint> doors = null;
 		DungeonExitPoint entry = null;
@@ -1019,9 +1019,9 @@ public class RoomBlueprint {
 				blocks[i] = new BlueprintBlock(id == 0 ? null : Block.getStateById(list[i]), null);
 			}
 			
-			if (nbt.hasKey(NBT_ENTITIES)) {
-				NBTTagList entities = nbt.getTagList(NBT_ENTITIES, NBT.TAG_COMPOUND);
-				int entCount = entities.tagCount();
+			if (nbt.contains(NBT_ENTITIES)) {
+				ListNBT entities = nbt.getList(NBT_ENTITIES, NBT.TAG_COMPOUND);
+				int entCount = entities.size();
 				for (int i = 0; i < entCount; i++) {
 					BlueprintSavedTE te = BlueprintSavedTE.fromNBT(entities.getCompoundTagAt(i));
 					
@@ -1038,17 +1038,17 @@ public class RoomBlueprint {
 				bar.step("Doors and Exits");
 			}
 			
-			NBTTagList doorList = nbt.getTagList(NBT_DOOR_LIST, NBT.TAG_COMPOUND);
+			ListNBT doorList = nbt.getList(NBT_DOOR_LIST, NBT.TAG_COMPOUND);
 			doors = new HashSet<>();
 			
-			int listCount = doorList.tagCount();
+			int listCount = doorList.size();
 			for (int i = 0; i < listCount; i++) {
-				NBTTagCompound tag = doorList.getCompoundTagAt(i);
+				CompoundNBT tag = doorList.getCompoundTagAt(i);
 				doors.add(DungeonExitPoint.fromNBT(tag));
 			}
 			
-			if (nbt.hasKey(NBT_ENTRY)) {
-				entry = DungeonExitPoint.fromNBT(nbt.getCompoundTag(NBT_ENTRY));
+			if (nbt.contains(NBT_ENTRY)) {
+				entry = DungeonExitPoint.fromNBT(nbt.getCompound(NBT_ENTRY));
 			}
 			
 			if (!NostrumMagica.initFinished) {
@@ -1059,17 +1059,17 @@ public class RoomBlueprint {
 		return new RoomBlueprint(masterDims.distanceSq(0, 0, 0) == 0 ? dims : masterDims, blocks, doors, entry);
 	}
 	
-	private static RoomBlueprint deserializeVersion3(NBTTagCompound nbt) {
+	private static RoomBlueprint deserializeVersion3(CompoundNBT nbt) {
 		RoomBlueprint blueprint = deserializeNBTStyleInternal(nbt, (byte) 2);
 		
-		if (nbt.hasKey(NBT_PIECE_OFFSET)) {
-			blueprint.partOffset = nbt.getInteger(NBT_PIECE_OFFSET);
+		if (nbt.contains(NBT_PIECE_OFFSET)) {
+			blueprint.partOffset = nbt.getInt(NBT_PIECE_OFFSET);
 		}
 		
 		return blueprint;
 	}
 	
-	public static RoomBlueprint fromNBT(NBTTagCompound nbt) {
+	public static RoomBlueprint fromNBT(CompoundNBT nbt) {
 		byte version = nbt.getByte(NBT_VERSION);
 		switch (version) {
 		case 0:
@@ -1084,9 +1084,9 @@ public class RoomBlueprint {
 		}
 	}
 	
-//	public NBTTagCompound toNBT() {
-//		NBTTagCompound nbt = new NBTTagCompound();
-//		NBTTagList entList = new NBTTagList();
+//	public CompoundNBT toNBT() {
+//		CompoundNBT nbt = new CompoundNBT();
+//		ListNBT entList = new ListNBT();
 //		int[] blockList = new int[this.blocks.length];
 //		
 //		for (int i = 0; i < blocks.length; i++) {
@@ -1102,22 +1102,22 @@ public class RoomBlueprint {
 //						new BlockPos(i / (dimensions.getZ() * dimensions.getY()),
 //								((i / dimensions.getZ()) % dimensions.getY()),
 //								(i % dimensions.getZ())));
-//				entList.appendTag(te.toNBT());
+//				entList.add(te.toNBT());
 //			}
 //		}
 //		
 //		nbt.setIntArray(NBT_BLOCK_LIST, blockList);
-//		nbt.setTag(NBT_ENTITIES, entList);
-//		nbt.setTag(NBT_DIMS, NBTUtil.createPosTag(dimensions));
+//		nbt.put(NBT_ENTITIES, entList);
+//		nbt.put(NBT_DIMS, NBTUtil.createPosTag(dimensions));
 //		if (this.entry != null) {
-//			nbt.setTag(NBT_ENTRY, entry.toNBT());
+//			nbt.put(NBT_ENTRY, entry.toNBT());
 //		}
 //		if (this.doors != null && !this.doors.isEmpty()) {
-//			NBTTagList doorList = new NBTTagList();
+//			ListNBT doorList = new ListNBT();
 //			for (DungeonExitPoint door : doors) {
-//				doorList.appendTag(door.toNBT());
+//				doorList.add(door.toNBT());
 //			}
-//			nbt.setTag(NBT_DOOR_LIST, doorList);
+//			nbt.put(NBT_DOOR_LIST, doorList);
 //		}
 //		
 //		nbt.setByte(NBT_VERSION, (byte)1);
@@ -1125,27 +1125,27 @@ public class RoomBlueprint {
 //	}
 	
 	// Version 1
-//	public NBTTagCompound toNBT() {
-//		NBTTagCompound nbt = new NBTTagCompound();
-//		NBTTagList list = new NBTTagList();
+//	public CompoundNBT toNBT() {
+//		CompoundNBT nbt = new CompoundNBT();
+//		ListNBT list = new ListNBT();
 //		
 //		if (blocks != null) {
 //			for (int i = 0; i < blocks.length; i++) {
-//				list.appendTag(blocks[i].toNBT());
+//				list.add(blocks[i].toNBT());
 //			}
 //		}
 //		
-//		nbt.setTag(NBT_BLOCK_LIST, list);
-//		nbt.setTag(NBT_DIMS, NBTUtil.createPosTag(dimensions));
+//		nbt.put(NBT_BLOCK_LIST, list);
+//		nbt.put(NBT_DIMS, NBTUtil.createPosTag(dimensions));
 //		if (this.entry != null) {
-//			nbt.setTag(NBT_ENTRY, entry.toNBT());
+//			nbt.put(NBT_ENTRY, entry.toNBT());
 //		}
 //		if (this.doors != null && !this.doors.isEmpty()) {
-//			list = new NBTTagList();
+//			list = new ListNBT();
 //			for (DungeonExitPoint door : doors) {
-//				list.appendTag(door.toNBT());
+//				list.add(door.toNBT());
 //			}
-//			nbt.setTag(NBT_DOOR_LIST, list);
+//			nbt.put(NBT_DOOR_LIST, list);
 //		}
 //		
 //		nbt.setByte(NBT_VERSION, (byte)0);
@@ -1153,7 +1153,7 @@ public class RoomBlueprint {
 //		return nbt;
 //	}
 	
-	public NBTTagCompound toNBT() {
+	public CompoundNBT toNBT() {
 		if (shouldSplit()) {
 			// Too big! Use toNBTWithBreakdown() instead!
 			throw new RuntimeException("Blueprint too large to be written as single blob!");
@@ -1168,7 +1168,7 @@ public class RoomBlueprint {
 				boolean used = false;
 				
 				@Override
-				public NBTTagCompound next() {
+				public CompoundNBT next() {
 					used = true;
 					return toNBT();
 				}
@@ -1183,7 +1183,7 @@ public class RoomBlueprint {
 					return !used;
 				}
 			};
-			//return new NBTTagCompound[]{toNBT()};
+			//return new CompoundNBT[]{toNBT()};
 		}
 		
 		// Need to be writing out whole blocks. Get number of blocks based on whole dimensions and whatever fits within the block limit.
@@ -1201,7 +1201,7 @@ public class RoomBlueprint {
 			int i = 0;
 			
 			@Override
-			public NBTTagCompound next() {
+			public CompoundNBT next() {
 				if (i >= xSlices) {
 					return null;
 				}
@@ -1222,49 +1222,49 @@ public class RoomBlueprint {
 	}
 	
 	// Version 3
-	protected NBTTagCompound toNBTInternal(int startIdx, int count) {
+	protected CompoundNBT toNBTInternal(int startIdx, int count) {
 		
-		NBTTagCompound nbt = new NBTTagCompound();
-		NBTTagList list = new NBTTagList();
+		CompoundNBT nbt = new CompoundNBT();
+		ListNBT list = new ListNBT();
 		final int endIdx = Math.min(blocks.length, startIdx + count);
 		
 		if (blocks != null) {
 			for (int i = startIdx; i < endIdx; i++) {
-				list.appendTag(blocks[i].toNBT());
+				list.add(blocks[i].toNBT());
 			}
 		}
 		
-		nbt.setTag(NBT_BLOCK_LIST, list);
+		nbt.put(NBT_BLOCK_LIST, list);
 		{
 			// If whole struct, just dump dims
 			if (startIdx == 0 && endIdx == blocks.length) {
-				nbt.setTag(NBT_DIMS, NBTUtil.createPosTag(dimensions));
+				nbt.put(NBT_DIMS, NBTUtil.createPosTag(dimensions));
 			} else {
 				// Else figure out how big it was
 				final int numBlocks = endIdx - startIdx;
 				final int base = dimensions.getY() * dimensions.getZ();
-				nbt.setTag(NBT_DIMS, NBTUtil.createPosTag(new BlockPos(numBlocks / base, dimensions.getY(), dimensions.getZ())));
+				nbt.put(NBT_DIMS, NBTUtil.createPosTag(new BlockPos(numBlocks / base, dimensions.getY(), dimensions.getZ())));
 			}
 		}
 		if (this.entry != null) {
-			nbt.setTag(NBT_ENTRY, entry.toNBT());
+			nbt.put(NBT_ENTRY, entry.toNBT());
 		}
 		
 		// First blueprint (when splitting) has all the extra pieces
 		if (startIdx == 0) {
 			if (this.doors != null && !this.doors.isEmpty()) {
-				list = new NBTTagList();
+				list = new ListNBT();
 				for (DungeonExitPoint door : doors) {
-					list.appendTag(door.toNBT());
+					list.add(door.toNBT());
 				}
-				nbt.setTag(NBT_DOOR_LIST, list);
+				nbt.put(NBT_DOOR_LIST, list);
 			}
 			
 			// Master ALSO has the REAL size, so we can allocate all the space up front instead of resizing
-			nbt.setTag(NBT_WHOLE_DIMS, NBTUtil.createPosTag(dimensions));
+			nbt.put(NBT_WHOLE_DIMS, NBTUtil.createPosTag(dimensions));
 		} else {
 			// Others have their row offset recorded
-			nbt.setInteger(NBT_PIECE_OFFSET, startIdx / (dimensions.getY() * dimensions.getZ()));
+			nbt.putInt(NBT_PIECE_OFFSET, startIdx / (dimensions.getY() * dimensions.getZ()));
 		}
 		
 		nbt.setByte(NBT_VERSION, (byte)2);
@@ -1274,7 +1274,7 @@ public class RoomBlueprint {
 	
 	public static interface INBTGenerator {
 		
-		public NBTTagCompound next();
+		public CompoundNBT next();
 		
 		public int getTotal();
 		
@@ -1284,7 +1284,7 @@ public class RoomBlueprint {
 	
 	public static interface IBlueprintSpawner {
 		
-		public void spawnBlock(World world, BlockPos pos, EnumFacing direction, BlueprintBlock block);
+		public void spawnBlock(World world, BlockPos pos, Direction direction, BlueprintBlock block);
 	}
 	
 }

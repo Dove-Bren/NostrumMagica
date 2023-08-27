@@ -18,12 +18,12 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -63,7 +63,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 		this.cooldownTicks = ticks;
 	}
 	
-	public EnumFacing getFacing() {
+	public Direction getFacing() {
 		IBlockState state = getWorld().getBlockState(getPos());
 		return state.getValue(ParadoxMirrorBlock.FACING);
 	}
@@ -71,11 +71,11 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	private static final String NBT_LINKED_POS = "linked_pos";
 	
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt = super.writeToNBT(nbt);
 		
 		if (linkedPosition != null) {
-			nbt.setLong(NBT_LINKED_POS, linkedPosition.toLong());
+			nbt.putLong(NBT_LINKED_POS, linkedPosition.toLong());
 		}
 		
 		// Could save and load cooldown but client won't use it and I don't care if people save/load over and over to transfer fast
@@ -84,13 +84,13 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(CompoundNBT nbt) {
 		super.readFromNBT(nbt);
 		
 		if (nbt == null)
 			return;
 			
-		if (!nbt.hasKey(NBT_LINKED_POS, NBT.TAG_LONG)) {
+		if (!nbt.contains(NBT_LINKED_POS, NBT.TAG_LONG)) {
 			linkedPosition = null;
 		} else {
 			linkedPosition = BlockPos.fromLong(nbt.getLong(NBT_LINKED_POS));
@@ -103,8 +103,8 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	}
 
 	@Override
-	public NBTTagCompound getUpdateTag() {
-		return this.writeToNBT(new NBTTagCompound());
+	public CompoundNBT getUpdateTag() {
+		return this.writeToNBT(new CompoundNBT());
 	}
 	
 	@Override
@@ -211,9 +211,9 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 		Vec3d spawnLoc = getSpawnLocation();
 		Vec3d spawnVelocity = getSpawnVelocity();
 		EntityItem entity = new EntityItem(getWorld(), spawnLoc.x, spawnLoc.y, spawnLoc.z, stack);
-		entity.motionX = spawnVelocity.x;
-		entity.motionY = spawnVelocity.y;
-		entity.motionZ = spawnVelocity.z;
+		entity.getMotion().x = spawnVelocity.x;
+		entity.getMotion().y = spawnVelocity.y;
+		entity.getMotion().z = spawnVelocity.z;
 		entity.velocityChanged = true;
 		
 		receivedEntities.add(entity);

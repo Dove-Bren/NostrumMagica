@@ -18,11 +18,11 @@ import net.minecraft.block.BlockFire;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EnumCreatureType;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.init.Biomes;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DimensionType;
@@ -42,9 +42,9 @@ import net.minecraftforge.event.entity.living.EnderTeleportEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class NostrumEmptyDimension {
 	
@@ -123,23 +123,23 @@ public class NostrumEmptyDimension {
 		}
 		
 		@Override
-		public int getRespawnDimension(EntityPlayerMP player) {
+		public int getRespawnDimension(ServerPlayerEntity player) {
 			return this.getDimension();
 		}
 		
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		@Override
 		public double getVoidFogYFactor() {
 			return 0.8D;
 		}
 		
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		@Override
 		public boolean doesXZShowFog(int x, int z) {
 			return true;
 		}
 		
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		@Override
 		public Vec3d getSkyColor(Entity cameraEntity, float partialTicks) {
 			return skyColor;
@@ -169,7 +169,7 @@ public class NostrumEmptyDimension {
 			return super.getLightBrightnessTable();
 		}
 		
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		@Override
 		public Vec3d getFogColor(float p_76562_1_, float p_76562_2_) {
 			fogColor = new Vec3d(.1, 0, .1);
@@ -181,7 +181,7 @@ public class NostrumEmptyDimension {
 			// Make sure players aren't teleporting.
 			// TODO this even is fired before updating, sadly. That feels incorrect.
 			// Does it act weirdly?
-			for (EntityPlayer player : world.playerEntities) {
+			for (PlayerEntity player : world.playerEntities) {
 				
 				// Make sure they aren't falling out of the world
 				if (player.posY < 1) {
@@ -276,11 +276,11 @@ public class NostrumEmptyDimension {
 		
 		@Override
 		public boolean placeInExistingPortal(Entity entityIn, float yaw) {
-			if (!(entityIn instanceof EntityPlayer)) {
+			if (!(entityIn instanceof PlayerEntity)) {
 				return false;
 			}
 			
-			EntityPlayer player = (EntityPlayer) entityIn;
+			PlayerEntity player = (PlayerEntity) entityIn;
 			
 			if (!portalExists(player)) {
 				this.makePortal(player);
@@ -291,7 +291,7 @@ public class NostrumEmptyDimension {
 			return true;
 		}
 		
-		public static void respawnPlayer(EntityPlayer player) {
+		public static void respawnPlayer(PlayerEntity player) {
 			if (player.world.isRemote) {
 				return;
 			}
@@ -302,14 +302,14 @@ public class NostrumEmptyDimension {
 				player.changeDimension(0);
 			} else {
 				spawn = spawn.north();
-				player.rotationYaw = EnumFacing.NORTH.getHorizontalAngle();
+				player.rotationYaw = Direction.NORTH.getHorizontalAngle();
 				player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 2, spawn.getZ() + .5);
-				player.motionX = player.motionY = player.motionZ = 0;
+				player.getMotion().x = player.getMotion().y = player.getMotion().z = 0;
 				player.fallDistance = 0;
 				player.setSpawnChunk(spawn.up(2), true, ModConfig.config.sorceryDimensionIndex());
 				
 				try {
-					Field field = ObfuscationReflectionHelper.findField(EntityPlayerMP.class, "field_184851_cj"); //"invulnerableDimensionChange");
+					Field field = ObfuscationReflectionHelper.findField(ServerPlayerEntity.class, "field_184851_cj"); //"invulnerableDimensionChange");
 					field.setAccessible(true);
 					FieldUtils.writeField(field, player, true);
 				} catch (IllegalAccessException e) {
@@ -328,18 +328,18 @@ public class NostrumEmptyDimension {
 			super.placeInPortal(entityIn, yaw);
 		}
 		
-		public boolean portalExists(EntityPlayer player) {
+		public boolean portalExists(PlayerEntity player) {
 			BlockPos spawn = NostrumMagica.getOrCreatePlayerDimensionSpawn(player);
 			return !world.isAirBlock(spawn.up());
 		}
 		
 		@Override
 		public boolean makePortal(Entity entityIn) {
-			if (!(entityIn instanceof EntityPlayer)) {
+			if (!(entityIn instanceof PlayerEntity)) {
 				return false;
 			}
 			
-			BlockPos spawn = NostrumMagica.getOrCreatePlayerDimensionSpawn((EntityPlayer) entityIn);
+			BlockPos spawn = NostrumMagica.getOrCreatePlayerDimensionSpawn((PlayerEntity) entityIn);
 			
 //			for (int i = -5; i <= 5; i++) {
 //				for (int j = -5; j <= 5; j++) {
@@ -384,8 +384,8 @@ public class NostrumEmptyDimension {
 				attr.clearSorceryPortal();
 			}
 			
-			if (pos == null && entityIn instanceof EntityPlayer) {
-				EntityPlayer player = (EntityPlayer) entityIn;
+			if (pos == null && entityIn instanceof PlayerEntity) {
+				PlayerEntity player = (PlayerEntity) entityIn;
 				pos = player.getBedLocation(world.provider.getDimension());
 			}
 			
@@ -397,21 +397,21 @@ public class NostrumEmptyDimension {
 				pos = pos.up();
 			}
 			
-			if (entityIn instanceof EntityPlayerMP) {
+			if (entityIn instanceof ServerPlayerEntity) {
 				try {
-					Field field = ObfuscationReflectionHelper.findField(EntityPlayerMP.class, "field_184851_cj"); //"invulnerableDimensionChange");
+					Field field = ObfuscationReflectionHelper.findField(ServerPlayerEntity.class, "field_184851_cj"); //"invulnerableDimensionChange");
 					field.setAccessible(true);
-					FieldUtils.writeField(field, ((EntityPlayerMP) entityIn), true);
+					FieldUtils.writeField(field, ((ServerPlayerEntity) entityIn), true);
 				} catch (IllegalAccessException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				
-				if (((EntityPlayerMP) entityIn).interactionManager.getGameType() == GameType.ADVENTURE) {
-					((EntityPlayerMP) entityIn).setGameType(GameType.SURVIVAL);
+				if (((ServerPlayerEntity) entityIn).interactionManager.getGameType() == GameType.ADVENTURE) {
+					((ServerPlayerEntity) entityIn).setGameType(GameType.SURVIVAL);
 				}
 				
-				((EntityPlayerMP)entityIn).connection.setPlayerLocation(pos.getX() + .5, pos.getY(), pos.getZ() + .5, entityIn.rotationYaw, entityIn.rotationPitch);
+				((ServerPlayerEntity)entityIn).connection.setPlayerLocation(pos.getX() + .5, pos.getY(), pos.getZ() + .5, entityIn.rotationYaw, entityIn.rotationPitch);
 			} else {
 				entityIn.setPositionAndUpdate(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
 			}
@@ -446,7 +446,7 @@ public class NostrumEmptyDimension {
 		
 		@SubscribeEvent
 		public void onEnderTeleport(EnderTeleportEvent event) {
-			if (event.getEntityLiving() != null && event.getEntityLiving().dimension == dim && event.getEntityLiving() instanceof EntityPlayer) {
+			if (event.getEntityLiving() != null && event.getEntityLiving().dimension == dim && event.getEntityLiving() instanceof PlayerEntity) {
 				event.setCanceled(true);
 			}
 		}
@@ -464,8 +464,8 @@ public class NostrumEmptyDimension {
 				
 				event.setCanceled(true);
 				
-				if (ent instanceof EntityPlayerMP) {
-					EntityPlayerMP player = (EntityPlayerMP) ent;
+				if (ent instanceof ServerPlayerEntity) {
+					ServerPlayerEntity player = (ServerPlayerEntity) ent;
 					MinecraftServer server = player.getServer();
 					teleportingMarker.put(player.getPersistentID(), true);
 					server.getPlayerList().transferPlayerToDimension(
@@ -484,8 +484,8 @@ public class NostrumEmptyDimension {
 				
 				event.setCanceled(true);
 
-				if (ent instanceof EntityPlayerMP) {
-					EntityPlayerMP player = (EntityPlayerMP) ent;
+				if (ent instanceof ServerPlayerEntity) {
+					ServerPlayerEntity player = (ServerPlayerEntity) ent;
 					MinecraftServer server = player.getServer();
 					teleportingMarker.put(player.getPersistentID(), true);
 					

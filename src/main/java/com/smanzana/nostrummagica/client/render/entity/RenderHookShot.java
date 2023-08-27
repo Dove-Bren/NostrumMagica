@@ -8,13 +8,13 @@ import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 
@@ -88,14 +88,14 @@ public class RenderHookShot extends Render<EntityHookShot> {
 		BufferBuilder wr = Tessellator.getInstance().getBuffer();
 		GlStateManager.pushMatrix();
 		
-		GlStateManager.translate(x, y, z);
-		//GlStateManager.enableAlpha();
+		GlStateManager.translatef(x, y, z);
+		//GlStateManager.enableAlphaTest();
 		
 		// First, render chain
-		EntityLivingBase shooter = entity.getCaster();
+		LivingEntity shooter = entity.getCaster();
 		if (shooter != null) {
 			Vec3d offset = ProjectileTrigger.getVectorForRotation(shooter.rotationPitch - 90f, shooter.rotationYawHead + 90f).scale(.1);
-			final Vec3d diff = shooter.getPositionEyes(partialTicks).add(offset).subtract(entity.getPositionEyes(partialTicks));
+			final Vec3d diff = shooter.getEyePosition(partialTicks).add(offset).subtract(entity.getEyePosition(partialTicks));
 			final double totalLength = diff.distanceTo(new Vec3d(0,0,0));
 			final double segments = totalLength / texLen;
 			final Vec3d perSeg = diff.scale(1.0/segments);
@@ -108,12 +108,12 @@ public class RenderHookShot extends Render<EntityHookShot> {
 			// Our texture is symmetric up and down, so we'll cheat and use a quad strip and just flip
 			// UVs depending on where we're at in the chain
 		
-			Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation(NostrumMagica.MODID,
+			Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(NostrumMagica.MODID,
 					"textures/blocks/spawner.png"
 					));
 			
 			//GlStateManager.disableDepth();
-			GlStateManager.color(1f, 1f, 1f, 1f);
+			GlStateManager.color4f(1f, 1f, 1f, 1f);
 			GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 			GlStateManager.enableBlend();
 			GlStateManager.disableCull();
@@ -123,10 +123,10 @@ public class RenderHookShot extends Render<EntityHookShot> {
 			
 			GlStateManager.enableLighting();
 			GlStateManager.enableCull();
-			Minecraft.getMinecraft().getTextureManager().bindTexture(getEntityTexture(entity));
+			Minecraft.getInstance().getTextureManager().bindTexture(getEntityTexture(entity));
 		}
 		
-		GlStateManager.translate(0, -.5, 0);
+		GlStateManager.translatef(0, -.5, 0);
 		// then, render hook
 		model.render(entity, partialTicks, 0f, 0f, 0f, 0f, 1f);
 		

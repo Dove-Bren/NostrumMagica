@@ -4,7 +4,7 @@ import com.smanzana.nostrummagica.client.gui.petgui.PetGUI;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -22,9 +22,9 @@ public class PetGUISyncMessage implements IMessage {
 		@Override
 		public IMessage onMessage(PetGUISyncMessage message, MessageContext ctx) {
 			// Get ID
-			NBTTagCompound nbt = message.tag.getCompoundTag(NBT_MESSAGE);
+			CompoundNBT nbt = message.tag.getCompound(NBT_MESSAGE);
 			
-			Minecraft.getMinecraft().addScheduledTask(() -> {
+			Minecraft.getInstance().runAsync(() -> {
 				PetGUI.updateClientContainer(nbt);
 			});
 			
@@ -35,16 +35,16 @@ public class PetGUISyncMessage implements IMessage {
 
 	private static final String NBT_MESSAGE = "message";
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public PetGUISyncMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
-	public PetGUISyncMessage(NBTTagCompound data) {
+	public PetGUISyncMessage(CompoundNBT data) {
 		this();
 		
-		tag.setTag(NBT_MESSAGE, data);
+		tag.put(NBT_MESSAGE, data);
 	}
 
 	@Override

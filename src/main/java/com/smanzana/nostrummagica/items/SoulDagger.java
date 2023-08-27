@@ -27,12 +27,12 @@ import com.smanzana.nostrummagica.utils.RayTrace;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.passive.EntityWolf;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumAction;
@@ -49,8 +49,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
 
@@ -76,8 +76,8 @@ public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
 		this.setRegistryName(NostrumMagica.MODID, ID);
 		
 		this.addPropertyOverride(new ResourceLocation("charge"), new IItemPropertyGetter() {
-			@SideOnly(Side.CLIENT)
-			public float apply(ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn) {
+			@OnlyIn(Dist.CLIENT)
+			public float apply(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
 				if (entityIn == null) {
 					return 0.0F;
 				} else {
@@ -86,8 +86,8 @@ public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
 			}
 		});
 		this.addPropertyOverride(new ResourceLocation("charging"), new IItemPropertyGetter() {
-			@SideOnly(Side.CLIENT)
-			public float apply(ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn) {
+			@OnlyIn(Dist.CLIENT)
+			public float apply(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
 				return entityIn != null && entityIn.isHandActive() && entityIn.getActiveItemStack() == stack ? 1.0F : 0.0F;
 			}
 		});
@@ -139,14 +139,14 @@ public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
     }
 
 	@Override
-	public void apply(EntityLivingBase caster, SpellCastSummary summary, ItemStack stack) {
+	public void apply(LivingEntity caster, SpellCastSummary summary, ItemStack stack) {
 		// We provide -5% mana cost
 		summary.addCostRate(-.05f);
 //		stack.damageItem(1, caster);
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		super.addInformation(stack, worldIn, tooltip, flagIn);
 //		tooltip.add("Magic Potency Bonus: 20%");
@@ -155,7 +155,7 @@ public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
 		final ItemStack held = playerIn.getHeldItem(hand);
 		if (playerIn.isSneaking()) {
 			playerIn.setActiveHand(hand);
@@ -176,7 +176,7 @@ public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
 	}
 	
 	@Override
-	public void onPlayerStoppedUsing(ItemStack stack, World worldIn, EntityLivingBase entityLiving, int timeLeft) {
+	public void onPlayerStoppedUsing(ItemStack stack, World worldIn, LivingEntity entityLiving, int timeLeft) {
 		
 		// Only do something if enough time has passed
 		final int duration = stack.getMaxItemUseDuration() - timeLeft;
@@ -191,8 +191,8 @@ public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
 		}
 		// actual effects
 		{
-			List<EntityLivingBase> targets = findStabTargets(worldIn, entityLiving, stack);
-			for (EntityLivingBase target : targets) {
+			List<LivingEntity> targets = findStabTargets(worldIn, entityLiving, stack);
+			for (LivingEntity target : targets) {
 				// Just find and stab first
 				if (target != null) {
 					stabTarget(entityLiving, target, stack);
@@ -203,9 +203,9 @@ public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
 		}
 	}
 	
-	protected List<EntityLivingBase> findStabTargets(World worldIn, EntityLivingBase wielder, ItemStack dagger) {
+	protected List<LivingEntity> findStabTargets(World worldIn, LivingEntity wielder, ItemStack dagger) {
 		float extent = 3f;
-		RayTraceResult mop = RayTrace.raytrace(wielder.world, wielder.getPositionEyes(.5f), wielder.getLook(.5f), extent, new RayTrace.OtherLiving(wielder));
+		RayTraceResult mop = RayTrace.raytrace(wielder.world, wielder.getEyePosition(.5f), wielder.getLook(.5f), extent, new RayTrace.OtherLiving(wielder));
 		if (mop == null || NostrumMagica.resolveEntityLiving(mop.entityHit) == null) {
 			return new ArrayList<>();
 		} else {
@@ -213,20 +213,20 @@ public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
 		}
 	}
 	
-	protected boolean doSpecialWolfStab(EntityLivingBase stabber, EntityWolf wolf, ItemStack dagger) {
+	protected boolean doSpecialWolfStab(LivingEntity stabber, EntityWolf wolf, ItemStack dagger) {
 		if (wolf.getActivePotionEffect(NostrumTransformationPotion.instance()) != null
-				&& stabber instanceof EntityPlayer
+				&& stabber instanceof PlayerEntity
 				&& wolf.isOwner(stabber)) {
 			// Wolves get transformed into arcane wolves!
 			wolf.playSound(SoundEvents.ENTITY_WOLF_HOWL, 1f, 1f);
-			EntityArcaneWolf.TransformWolf(wolf, (EntityPlayer) stabber);
+			EntityArcaneWolf.TransformWolf(wolf, (PlayerEntity) stabber);
 			return true;
 		}
 		
 		return false;
 	}
 	
-	protected boolean stabTarget(EntityLivingBase attacker, EntityLivingBase target, ItemStack dagger) {
+	protected boolean stabTarget(LivingEntity attacker, LivingEntity target, ItemStack dagger) {
 		
 		// First, check if its a special-stabbable entity
 		if (target instanceof IStabbableEntity) {
@@ -241,7 +241,7 @@ public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
 			}
 		}
 		
-		int durationTicks = (target instanceof EntityPlayer ? 20 : 60);
+		int durationTicks = (target instanceof PlayerEntity ? 20 : 60);
 		
 //		//TODO testing code; remove!
 //		{
@@ -278,8 +278,8 @@ public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
 		float damage = 6.0f + EnchantmentHelper.getModifierForCreature(dagger, target.getCreatureAttribute());
 		
 		final boolean hit;
-		if (attacker instanceof EntityPlayer) {
-			hit = target.attackEntityFrom(DamageSource.causePlayerDamage((EntityPlayer)attacker), damage);
+		if (attacker instanceof PlayerEntity) {
+			hit = target.attackEntityFrom(DamageSource.causePlayerDamage((PlayerEntity)attacker), damage);
 		} else {
 			hit = target.attackEntityFrom(DamageSource.causeMobDamage(attacker), damage);
 		}
@@ -302,9 +302,9 @@ public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
 				final int manaDrawn;
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(target);
 				INostrumMagic attrSelf = NostrumMagica.getMagicWrapper(attacker);
-				if (attrSelf == null || (attr == null && target instanceof EntityPlayer)) {
+				if (attrSelf == null || (attr == null && target instanceof PlayerEntity)) {
 					manaDrawn = 0;
-				} else if (attrSelf != null && attr == null && target instanceof EntityLiving) {
+				} else if (attrSelf != null && attr == null && target instanceof MobEntity) {
 					// Just fudge some mana to steal
 					manaDrawn = NostrumMagica.rand.nextInt(50) + 50;
 				} else {

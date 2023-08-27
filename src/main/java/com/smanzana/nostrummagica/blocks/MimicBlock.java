@@ -14,11 +14,11 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -30,9 +30,9 @@ import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class MimicBlock extends BlockDirectional {
 	
@@ -111,9 +111,9 @@ public class MimicBlock extends BlockDirectional {
 	@Override
 	public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
 		IExtendedBlockState ext = (IExtendedBlockState) state;
-		EnumFacing face = state.getValue(FACING);
+		Direction face = state.getValue(FACING);
 		
-		if (face == EnumFacing.DOWN || face == EnumFacing.UP) {
+		if (face == Direction.DOWN || face == Direction.UP) {
 			pos = pos.east();
 		} else {
 			pos = pos.down();
@@ -128,7 +128,7 @@ public class MimicBlock extends BlockDirectional {
 	public IBlockState getStateFromMeta(int meta) {
 		int faceMeta = meta & 0x7;
 		int unbreakableMeta = (meta >> 3) & 1;
-		return getDefaultState().withProperty(FACING, EnumFacing.values()[faceMeta]).withProperty(UNBREAKABLE, unbreakableMeta == 1);
+		return getDefaultState().withProperty(FACING, Direction.values()[faceMeta]).withProperty(UNBREAKABLE, unbreakableMeta == 1);
 	}
 	
 	@Override
@@ -150,12 +150,12 @@ public class MimicBlock extends BlockDirectional {
 	}
 	
 	@Override
-	public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+	public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, Direction side) {
 		return false;
 	}
 	
 //	@Override
-//	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+//	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, Direction side) {
 //		return false;
 //	}
 	
@@ -167,7 +167,7 @@ public class MimicBlock extends BlockDirectional {
 		if (!isDoor) {
 			solid = false;
 		} else if (entityIn != null) {
-			EnumFacing side = state.getValue(FACING);
+			Direction side = state.getValue(FACING);
 			// cant use getCenter cause it's client-side only
 			//Vec3d center = entityBox.getCenter();
 			Vec3d center = new Vec3d(entityBox.minX + (entityBox.maxX - entityBox.minX) * 0.5D, entityBox.minY + (entityBox.maxY - entityBox.minY) * 0.5D, entityBox.minZ + (entityBox.maxZ - entityBox.minZ) * 0.5D);
@@ -176,31 +176,31 @@ public class MimicBlock extends BlockDirectional {
 			// Server also resets lastPos in an inconvenient way.
 			final double dx;
 			final double dz;
-			if (entityIn instanceof EntityPlayer) {
+			if (entityIn instanceof PlayerEntity) {
 				dx = worldIn.isRemote
-						? (entityIn.motionX)
+						? (entityIn.getMotion().x)
 						: (entityIn.posX - NostrumMagica.playerListener.getLastTickPos(entityIn).x);
 				dz = worldIn.isRemote
-						? (entityIn.motionZ)
+						? (entityIn.getMotion().z)
 						: (entityIn.posZ - NostrumMagica.playerListener.getLastTickPos(entityIn).z);
 			} else {
-				dx = entityIn.motionX;
-				dz = entityIn.motionZ;
+				dx = entityIn.getMotion().x;
+				dz = entityIn.getMotion().z;
 			}
 			
 //			final double dx = worldIn.isRemote
-//					? (entityIn.motionX)
+//					? (entityIn.getMotion().x)
 //					: (entityIn.posX - NostrumMagica.playerListener.getLastTickPos(entityIn).x);
 //			final double dz = worldIn.isRemote
-//					? (entityIn.motionZ)
+//					? (entityIn.getMotion().z)
 //					: (entityIn.posZ - NostrumMagica.playerListener.getLastTickPos(entityIn).z);
 			
 			// Offset center back to old position to prevent sneaking back inside!
-			center = center.addVector(-dx, 0, -dz);
+			center = center.add(-dx, 0, -dz);
 			
 			switch (side) {
 			case DOWN:
-				solid = center.y < pos.getY() && entityIn.motionY >= 0;
+				solid = center.y < pos.getY() && entityIn.getMotion().y >= 0;
 				break;
 			case EAST:
 				solid = center.x > pos.getX() + 1 && dx <= 0;
@@ -213,7 +213,7 @@ public class MimicBlock extends BlockDirectional {
 				break;
 			case UP:
 			default:
-				solid = center.y > pos.getY() + 1 && entityIn.motionY <= 0;
+				solid = center.y > pos.getY() + 1 && entityIn.getMotion().y <= 0;
 				break;
 			case WEST:
 				solid = center.x < pos.getX() && dx >= 0;
@@ -234,10 +234,10 @@ public class MimicBlock extends BlockDirectional {
 	}
 	
 	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-		//EnumFacing enumfacing = EnumFacing.getHorizontal(MathHelper.floor_double((double)(placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3).getOpposite();
+	public IBlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer) {
+		//Direction enumfacing = Direction.getHorizontal(MathHelper.floor_double((double)(placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3).getOpposite();
 		return this.getDefaultState()
-				.withProperty(FACING, EnumFacing.getDirectionFromEntityLiving(pos, placer))
+				.withProperty(FACING, Direction.getDirectionFromEntityLiving(pos, placer))
 				.withProperty(UNBREAKABLE, meta == 1);
 	}
 	
@@ -262,30 +262,30 @@ public class MimicBlock extends BlockDirectional {
     }
 	
 	@Override
-	public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing face) {
+	public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos, Direction face) {
 		return false;
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
-	public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+	@OnlyIn(Dist.CLIENT)
+	public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, Direction side) {
 		return side == blockState.getValue(FACING);
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public BlockRenderLayer getBlockLayer() {
 		return BlockRenderLayer.CUTOUT;
 	}
 	
 	@SubscribeEvent
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void onBlockHighlight(DrawBlockHighlightEvent event) {
 		if (event.getTarget().typeOfHit == RayTraceResult.Type.BLOCK) {
 			BlockPos pos = event.getTarget().getBlockPos();
 			IBlockState hit = event.getPlayer().world.getBlockState(pos);
 			if (hit != null && hit.getBlock() == this) {
-				EnumFacing face = hit.getValue(FACING);
+				Direction face = hit.getValue(FACING);
 				boolean outside = false;
 				
 				switch (face) {

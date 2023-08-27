@@ -2,18 +2,18 @@ package com.smanzana.nostrummagica.client.effects.modifiers;
 
 import com.smanzana.nostrummagica.client.effects.ClientEffect.ClientEffectRenderDetail;
 
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.EntityLivingBase;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class ClientEffectModifierFollow implements ClientEffectModifier {
 
-	private EntityLivingBase entity;
+	private LivingEntity entity;
 	
-	public ClientEffectModifierFollow(EntityLivingBase entity) {
+	public ClientEffectModifierFollow(LivingEntity entity) {
 		this.entity = entity;
 	}
 	
@@ -24,7 +24,7 @@ public class ClientEffectModifierFollow implements ClientEffectModifier {
 
 	@Override
 	public void earlyApply(ClientEffectRenderDetail detail, float progress, float partialTicks) {
-		Vec3d pos = entity.getPositionEyes(partialTicks).subtract(0, entity.getEyeHeight(), 0);
-		GlStateManager.translate(pos.x, pos.y, pos.z);
+		Vec3d pos = entity.getEyePosition(partialTicks).subtract(0, entity.getEyeHeight(), 0);
+		GlStateManager.translated(pos.x, pos.y, pos.z);
 	}
 }

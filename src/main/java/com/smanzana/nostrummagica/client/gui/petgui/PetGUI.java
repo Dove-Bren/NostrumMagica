@@ -22,19 +22,19 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * A nice wrapped up pet gui.
@@ -64,7 +64,7 @@ public class PetGUI {
 		containers.remove(id);
 	}
 	
-	public static void updateServerContainer(int id, NBTTagCompound nbt) {
+	public static void updateServerContainer(int id, CompoundNBT nbt) {
 		PetContainer<?> container = containers.get(id);
 		if (container != null) {
 			container.handle(nbt);
@@ -73,7 +73,7 @@ public class PetGUI {
 	
 	private static PetContainer<?> clientContainer = null;
 	
-	public static void updateClientContainer(NBTTagCompound nbt) {
+	public static void updateClientContainer(CompoundNBT nbt) {
 		if (clientContainer != null) {
 			clientContainer.handle(nbt);
 		}
@@ -81,11 +81,11 @@ public class PetGUI {
 
 	public static class PetContainer<T extends IEntityPet> extends Container {
 
-		private EntityPlayer player;
+		private PlayerEntity player;
 		
 		private T pet;
 		
-		private EntityLivingBase livingPet;
+		private LivingEntity livingPet;
 		
 		private int currentSheet;
 		
@@ -97,9 +97,9 @@ public class PetGUI {
 		private int guiOffsetY;
 		
 		@SafeVarargs
-		public PetContainer(T pet, EntityPlayer player, IPetGUISheet<T> ... sheets) {
+		public PetContainer(T pet, PlayerEntity player, IPetGUISheet<T> ... sheets) {
 			this.pet = pet;
-			this.livingPet= (EntityLivingBase) pet;
+			this.livingPet= (LivingEntity) pet;
 			this.player = player;
 			this.currentSheet = 0;
 			this.sheetsAllInternal = Lists.newArrayList(sheets);
@@ -126,7 +126,7 @@ public class PetGUI {
 		}
 		
 		@Override
-		public boolean canInteractWith(EntityPlayer playerIn) {
+		public boolean canInteractWith(PlayerEntity playerIn) {
 			if (pet == null) {
 				// Pet hasn't been synced yet
 				return false;
@@ -136,7 +136,7 @@ public class PetGUI {
 
 		// Caution: This assumes only one player has these open!
 		@Override
-		public void onContainerClosed(EntityPlayer playerIn) {
+		public void onContainerClosed(PlayerEntity playerIn) {
 			if (this.getCurrentSheet() != null) {
 				this.getCurrentSheet().hideSheet(pet, player, this);
 			}
@@ -144,7 +144,7 @@ public class PetGUI {
 		}
 		
 		@Override
-		public @Nonnull ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
+		public @Nonnull ItemStack transferStackInSlot(PlayerEntity playerIn, int fromSlot) {
 			return ItemStack.EMPTY;
 		}
 		
@@ -205,7 +205,7 @@ public class PetGUI {
 		// Handle a message sent from the client.
 		// Could be a button click to change sheets, some other control message,
 		// or a message for updating a sheet's contents.
-		protected void handle(NBTTagCompound nbt) {
+		protected void handle(CompoundNBT nbt) {
 			PetContainerMessageType type = NetworkHelper.GetType(nbt);
 			
 			if (type == null) {
@@ -223,8 +223,8 @@ public class PetGUI {
 			case REROLL:
 				if (pet != null
 					&& supportsReroll()
-					&& pet.getOwner() instanceof EntityPlayer
-					&& ((EntityPlayer) pet.getOwner()).isCreative()) {
+					&& pet.getOwner() instanceof PlayerEntity
+					&& ((PlayerEntity) pet.getOwner()).isCreative()) {
 					// Reset container sheet. The client will send this as well later.
 					this.setSheet(0);
 					((IRerollablePet) pet).rerollStats();
@@ -235,12 +235,12 @@ public class PetGUI {
 		
 		// Sheets can call on their handle to the container to sync with the server.
 		// This call doesn't check if it's on the server. It'll just 'send' it. Know what you're doing!
-		public void sendSheetMessageToServer(NBTTagCompound data) {
+		public void sendSheetMessageToServer(CompoundNBT data) {
 			NetworkHelper.ClientSendSheetData(id, data);
 		}
 		
-		public void sendSheetMessageToClient(NBTTagCompound data) {
-			NetworkHelper.ServerSendSheetData((EntityPlayerMP) this.player, data);
+		public void sendSheetMessageToClient(CompoundNBT data) {
+			NetworkHelper.ServerSendSheetData((ServerPlayerEntity) this.player, data);
 		}
 		
 	}
@@ -256,7 +256,7 @@ public class PetGUI {
 	public static int GUI_TEX_TOGGLE_LENGTH = 10;
 	
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public static class PetGUIContainer<T extends IEntityPet> extends AutoGuiContainer {
 		
 		public static final ResourceLocation TEXT = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/container/tamed_pet_gui.png");
@@ -286,17 +286,17 @@ public class PetGUI {
 		}
 		
 		@Override
-		public void initGui() {
+		public void init() {
 			this.xSize = this.width;
 			this.ySize = this.height;
-			super.initGui();
+			super.init();
 			
 			final int GUI_SHEET_HOFFSET = this.width - (GUI_SHEET_WIDTH + GUI_SHEET_NHOFFSET);
 			this.container.setGUIOffets(GUI_SHEET_HOFFSET, GUI_SHEET_VOFFSET);
 		}
 		
 //		@Override
-//		public void updateScreen() {
+//		public void tick() {
 //			super.updateScreen();
 //			
 //			this.openTicks++;
@@ -304,47 +304,47 @@ public class PetGUI {
 
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-			GlStateManager.color(1.0F,  1.0F, 1.0F, 1.0F);
+			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 			
 			final int GUI_SHEET_HOFFSET = this.width - (GUI_SHEET_WIDTH + GUI_SHEET_NHOFFSET);
 			final int GUI_SHEET_BUTTON_HOFFSET = GUI_SHEET_HOFFSET;
 			
 			if (this.container.pet == null) {
-				this.drawCenteredString(fontRenderer, "Waiting for server...", this.width / 2, this.height / 2, 0XFFAAAAAA);
+				this.drawCenteredString(font, "Waiting for server...", this.width / 2, this.height / 2, 0XFFAAAAAA);
 				return;
 			}
 			
 			// Draw top-left preview
 			{
-				Gui.drawRect(0, 0, GUI_LENGTH_PREVIEW, GUI_LENGTH_PREVIEW, 0xFF283D2A);
+				RenderFuncs.drawRect(0, 0, GUI_LENGTH_PREVIEW, GUI_LENGTH_PREVIEW, 0xFF283D2A);
 				
 				int xPosition = GUI_LENGTH_PREVIEW / 2;
 				int yPosition = GUI_LENGTH_PREVIEW / 2;
 				RenderHelper.disableStandardItemLighting();
-				GlStateManager.color(1f, 1f, 1f, 1f);
+				GlStateManager.color4f(1f, 1f, 1f, 1f);
 				GuiInventory.drawEntityOnScreen(
 						xPosition,
 						(int) (GUI_LENGTH_PREVIEW * .75f),
 						(int) (GUI_LENGTH_PREVIEW * .2),
 						(float) (xPosition) - mouseX,
 						(float) (-yPosition) - mouseY,
-						(EntityLivingBase) container.pet);
+						(LivingEntity) container.pet);
 			}
 			
 			// Move everything forward ahead of the drawn entity
 			// Can't just move entity back cause there's a GRAY plane drawn at just below 0 Z
 			GlStateManager.pushMatrix();
-			GlStateManager.translate(0, 0, 51);
+			GlStateManager.translatef(0, 0, 51);
 			
 			// Black background (not overlapping preview)
 			{
-				Gui.drawRect(0, GUI_LENGTH_PREVIEW, width, height, 0xFF000000);
-				Gui.drawRect(GUI_LENGTH_PREVIEW, 0, width, GUI_LENGTH_PREVIEW, 0xFF000000);
+				RenderFuncs.drawRect(0, GUI_LENGTH_PREVIEW, width, height, 0xFF000000);
+				RenderFuncs.drawRect(GUI_LENGTH_PREVIEW, 0, width, GUI_LENGTH_PREVIEW, 0xFF000000);
 			}
 			
 			// Draw stats and stuff
 			{
-				//Gui.drawRect(GUI_INFO_HOFFSET, GUI_INFO_VOFFSET, GUI_SHEET_HOFFSET - 10, height - 10, 0xFF00FFFF);
+				//RenderFuncs.drawRect(GUI_INFO_HOFFSET, GUI_INFO_VOFFSET, GUI_SHEET_HOFFSET - 10, height - 10, 0xFF00FFFF);
 				
 				final int w = (GUI_SHEET_HOFFSET - GUI_SHEET_MARGIN) - (GUI_INFO_HOFFSET * 2);
 				int x = GUI_INFO_HOFFSET;
@@ -355,18 +355,18 @@ public class PetGUI {
 				
 				// Health
 				{
-					this.drawCenteredString(this.fontRenderer, ChatFormatting.BOLD + adapter.getHealthLabel(container.pet), centerX, y, 0xFFFFFFFF);
-					y += fontRenderer.FONT_HEIGHT + 5;
-					Gui.drawRect(x, y, x + w, y + h, 0xFFD0D0D0);
-					Gui.drawRect(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF201010);
+					this.drawCenteredString(this.font, ChatFormatting.BOLD + adapter.getHealthLabel(container.pet), centerX, y, 0xFFFFFFFF);
+					y += font.FONT_HEIGHT + 5;
+					RenderFuncs.drawRect(x, y, x + w, y + h, 0xFFD0D0D0);
+					RenderFuncs.drawRect(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF201010);
 					
 					int prog = (int) ((float) (w - 2) * (adapter.getHealth(container.pet) / adapter.getMaxHealth(container.pet)));
-					Gui.drawRect(x + 1, y + 1, x + 1 + prog, y + h - 1, 0xFFA02020);
+					RenderFuncs.drawRect(x + 1, y + 1, x + 1 + prog, y + h - 1, 0xFFA02020);
 					
-					this.drawCenteredString(fontRenderer,
+					this.drawCenteredString(font,
 							String.format("%d / %d", (int) adapter.getHealth(container.pet), (int) adapter.getMaxHealth(container.pet)),
 							centerX,
-							y + (h / 2) - (fontRenderer.FONT_HEIGHT / 2),
+							y + (h / 2) - (font.FONT_HEIGHT / 2),
 							0xFFC0C0C0);
 					
 					y += h + 10;
@@ -374,18 +374,18 @@ public class PetGUI {
 				
 				// Secondary
 				if (adapter.supportsSecondaryAmt(container.pet) && adapter.getMaxSecondaryAmt(container.pet) > 0) {
-					this.drawCenteredString(this.fontRenderer, ChatFormatting.BOLD + adapter.getSecondaryLabel(container.pet), centerX, y, 0xFFFFFFFF);
-					y += fontRenderer.FONT_HEIGHT + 5;
-					Gui.drawRect(x, y, x + w, y + h, 0xFFD0D0D0);
-					Gui.drawRect(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF101020);
+					this.drawCenteredString(this.font, ChatFormatting.BOLD + adapter.getSecondaryLabel(container.pet), centerX, y, 0xFFFFFFFF);
+					y += font.FONT_HEIGHT + 5;
+					RenderFuncs.drawRect(x, y, x + w, y + h, 0xFFD0D0D0);
+					RenderFuncs.drawRect(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF101020);
 					
 					int prog = (int) ((float) (w - 2) * (adapter.getSecondaryAmt(container.pet) / adapter.getMaxSecondaryAmt(container.pet)));
-					Gui.drawRect(x + 1, y + 1, x + 1 + prog, y + h - 1, 0xFF2020A0);
+					RenderFuncs.drawRect(x + 1, y + 1, x + 1 + prog, y + h - 1, 0xFF2020A0);
 					
-					this.drawCenteredString(fontRenderer,
+					this.drawCenteredString(font,
 							String.format("%d / %d", (int) adapter.getSecondaryAmt(container.pet), (int) adapter.getMaxSecondaryAmt(container.pet)),
 							centerX,
-							y + (h / 2) - (fontRenderer.FONT_HEIGHT / 2),
+							y + (h / 2) - (font.FONT_HEIGHT / 2),
 							0xFFC0C0C0);
 					
 					y += h + 10;
@@ -396,31 +396,31 @@ public class PetGUI {
 					final float cur = adapter.getTertiaryAmt(container.pet);
 					final float max = adapter.getMaxTertiaryAmt(container.pet);
 					
-					this.drawCenteredString(this.fontRenderer, ChatFormatting.BOLD + adapter.getTertiaryLabel(container.pet), centerX, y, 0xFFFFFFFF);
-					y += fontRenderer.FONT_HEIGHT + 5;
-					Gui.drawRect(x, y, x + w, y + h, 0xFFD0D0D0);
-					Gui.drawRect(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF201020);
+					this.drawCenteredString(this.font, ChatFormatting.BOLD + adapter.getTertiaryLabel(container.pet), centerX, y, 0xFFFFFFFF);
+					y += font.FONT_HEIGHT + 5;
+					RenderFuncs.drawRect(x, y, x + w, y + h, 0xFFD0D0D0);
+					RenderFuncs.drawRect(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF201020);
 					
 					int prog = (int) ((float) (w - 2) * (cur/max));
-					Gui.drawRect(x + 1, y + 1, x + 1 + prog, y + h - 1, 0xFFA020A0);
+					RenderFuncs.drawRect(x + 1, y + 1, x + 1 + prog, y + h - 1, 0xFFA020A0);
 					
-					this.drawCenteredString(fontRenderer,
+					this.drawCenteredString(font,
 							String.format("%.2f%%", (cur/max) * 100f),
 							centerX,
-							y + (h / 2) - (fontRenderer.FONT_HEIGHT / 2),
+							y + (h / 2) - (font.FONT_HEIGHT / 2),
 							cur >= max ? 0xFFC0FFC0 : 0xFFC0C0C0);
 					
 //					if (container.pet.isSoulBound()) {
-//						this.drawCenteredString(fontRenderer,
+//						this.drawCenteredString(font,
 //								"Soulbound",
 //								centerX,
-//								y + (h / 2) - (fontRenderer.FONT_HEIGHT / 2),
+//								y + (h / 2) - (font.FONT_HEIGHT / 2),
 //								0xFF40FF40);
 //					} else {
-//						this.drawCenteredString(fontRenderer,
+//						this.drawCenteredString(font,
 //								String.format("%.2f%%", bond * 100f),
 //								centerX,
-//								y + (h / 2) - (fontRenderer.FONT_HEIGHT / 2),
+//								y + (h / 2) - (font.FONT_HEIGHT / 2),
 //								bond == 1f ? 0xFFC0FFC0 : 0xFFC0C0C0);
 //					}
 					
@@ -432,18 +432,18 @@ public class PetGUI {
 				if (adapter.supportsQuaternaryAmt(container.pet) && adapter.getMaxQuaternaryAmt(container.pet) > 0) {
 					final float cur = adapter.getQuaternaryAmt(container.pet);
 					final float max = adapter.getMaxQuaternaryAmt(container.pet);
-					this.drawCenteredString(this.fontRenderer, ChatFormatting.BOLD + adapter.getQuaternaryLabel(container.pet), centerX, y, 0xFFFFFFFF);
-					y += fontRenderer.FONT_HEIGHT + 5;
-					Gui.drawRect(x, y, x + w, y + h, 0xFFD0D0D0);
-					Gui.drawRect(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF102010);
+					this.drawCenteredString(this.font, ChatFormatting.BOLD + adapter.getQuaternaryLabel(container.pet), centerX, y, 0xFFFFFFFF);
+					y += font.FONT_HEIGHT + 5;
+					RenderFuncs.drawRect(x, y, x + w, y + h, 0xFFD0D0D0);
+					RenderFuncs.drawRect(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF102010);
 					
 					int prog = (int) ((float) (w - 2) * (cur / max));
-					Gui.drawRect(x + 1, y + 1, x + 1 + prog, y + h - 1, 0xFF20A020);
+					RenderFuncs.drawRect(x + 1, y + 1, x + 1 + prog, y + h - 1, 0xFF20A020);
 					
-					this.drawCenteredString(fontRenderer,
+					this.drawCenteredString(font,
 							String.format("%d / %d", (int) cur, (int) max),
 							centerX,
-							y + (h / 2) - (fontRenderer.FONT_HEIGHT / 2),
+							y + (h / 2) - (font.FONT_HEIGHT / 2),
 							0xFFC0C0C0);
 					
 					y += h + 10;
@@ -454,36 +454,36 @@ public class PetGUI {
 				int x = GUI_SHEET_BUTTON_HOFFSET;
 				
 				for (IPetGUISheet<T> sheet : container.getSheets()) {
-					Gui.drawRect(x, GUI_SHEET_BUTTON_VOFFSET, x + GUI_SHEET_BUTTON_WIDTH, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT, 0xFFFFFFFF);
-					Gui.drawRect(x + 1, GUI_SHEET_BUTTON_VOFFSET + 1, x + GUI_SHEET_BUTTON_WIDTH - 1, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT - 1, 0xFF202020);
+					RenderFuncs.drawRect(x, GUI_SHEET_BUTTON_VOFFSET, x + GUI_SHEET_BUTTON_WIDTH, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT, 0xFFFFFFFF);
+					RenderFuncs.drawRect(x + 1, GUI_SHEET_BUTTON_VOFFSET + 1, x + GUI_SHEET_BUTTON_WIDTH - 1, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT - 1, 0xFF202020);
 					
 					if (sheet == container.getCurrentSheet()) {
-						Gui.drawRect(x, GUI_SHEET_BUTTON_VOFFSET, x + GUI_SHEET_BUTTON_WIDTH, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT, 0x40FFFFFF);
+						RenderFuncs.drawRect(x, GUI_SHEET_BUTTON_VOFFSET, x + GUI_SHEET_BUTTON_WIDTH, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT, 0x40FFFFFF);
 					}
 					
 					if (mouseX >= x && mouseX <= x + GUI_SHEET_BUTTON_WIDTH && mouseY >= GUI_SHEET_BUTTON_VOFFSET && mouseY <= GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT) {
-						Gui.drawRect(x, GUI_SHEET_BUTTON_VOFFSET, x + GUI_SHEET_BUTTON_WIDTH, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT, 0x40FFFFFF);
+						RenderFuncs.drawRect(x, GUI_SHEET_BUTTON_VOFFSET, x + GUI_SHEET_BUTTON_WIDTH, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT, 0x40FFFFFF);
 					}
 					
 					String text = sheet.getButtonText();
-					int strLen = fontRenderer.getStringWidth(text);
-					int strHeight = fontRenderer.FONT_HEIGHT;
-					fontRenderer.drawString(text, x + (GUI_SHEET_BUTTON_WIDTH / 2) - (strLen / 2), GUI_SHEET_BUTTON_VOFFSET + (GUI_SHEET_BUTTON_HEIGHT / 2) - (strHeight / 2), 0xFFFFFFFF);
+					int strLen = font.getStringWidth(text);
+					int strHeight = font.FONT_HEIGHT;
+					font.drawString(text, x + (GUI_SHEET_BUTTON_WIDTH / 2) - (strLen / 2), GUI_SHEET_BUTTON_VOFFSET + (GUI_SHEET_BUTTON_HEIGHT / 2) - (strHeight / 2), 0xFFFFFFFF);
 					x += GUI_SHEET_BUTTON_WIDTH;
 				}
 				
 				if (container.supportsReroll() && NostrumMagica.proxy.getPlayer().isCreative()) {
-					Gui.drawRect(x, GUI_SHEET_BUTTON_VOFFSET, x + GUI_SHEET_BUTTON_WIDTH, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT, 0xFFFFDDFF);
-					Gui.drawRect(x + 1, GUI_SHEET_BUTTON_VOFFSET + 1, x + GUI_SHEET_BUTTON_WIDTH - 1, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT - 1, 0xFF702070);
+					RenderFuncs.drawRect(x, GUI_SHEET_BUTTON_VOFFSET, x + GUI_SHEET_BUTTON_WIDTH, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT, 0xFFFFDDFF);
+					RenderFuncs.drawRect(x + 1, GUI_SHEET_BUTTON_VOFFSET + 1, x + GUI_SHEET_BUTTON_WIDTH - 1, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT - 1, 0xFF702070);
 					
 					if (mouseX >= x && mouseX <= x + GUI_SHEET_BUTTON_WIDTH && mouseY >= GUI_SHEET_BUTTON_VOFFSET && mouseY <= GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT) {
-						Gui.drawRect(x, GUI_SHEET_BUTTON_VOFFSET, x + GUI_SHEET_BUTTON_WIDTH, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT, 0x40FFFFFF);
+						RenderFuncs.drawRect(x, GUI_SHEET_BUTTON_VOFFSET, x + GUI_SHEET_BUTTON_WIDTH, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT, 0x40FFFFFF);
 					}
 					
 					String text = "Reroll";
-					int strLen = fontRenderer.getStringWidth(text);
-					int strHeight = fontRenderer.FONT_HEIGHT;
-					fontRenderer.drawString(text, x + (GUI_SHEET_BUTTON_WIDTH / 2) - (strLen / 2), GUI_SHEET_BUTTON_VOFFSET + (GUI_SHEET_BUTTON_HEIGHT / 2) - (strHeight / 2), 0xFFFFFFFF);
+					int strLen = font.getStringWidth(text);
+					int strHeight = font.FONT_HEIGHT;
+					font.drawString(text, x + (GUI_SHEET_BUTTON_WIDTH / 2) - (strLen / 2), GUI_SHEET_BUTTON_VOFFSET + (GUI_SHEET_BUTTON_HEIGHT / 2) - (strHeight / 2), 0xFFFFFFFF);
 					x += GUI_SHEET_BUTTON_WIDTH;
 				}
 			}
@@ -494,14 +494,14 @@ public class PetGUI {
 			IPetGUISheet<T> sheet = container.getCurrentSheet();
 			if (sheet != null) {
 				GlStateManager.pushMatrix();
-				GlStateManager.translate(GUI_SHEET_HOFFSET, GUI_SHEET_VOFFSET, 0);
+				GlStateManager.translatef(GUI_SHEET_HOFFSET, GUI_SHEET_VOFFSET, 0);
 				
-				GlStateManager.enableAlpha();
+				GlStateManager.enableAlphaTest();
 				GlStateManager.enableBlend();
-				GlStateManager.color(1f, 1f, 1f, 1f);
+				GlStateManager.color4f(1f, 1f, 1f, 1f);
 				drawModalRectWithCustomSizedTexture(-GUI_SHEET_MARGIN, -GUI_SHEET_MARGIN, 0, 0, GUI_SHEET_WIDTH + (GUI_SHEET_MARGIN * 2), GUI_SHEET_HEIGHT + (GUI_SHEET_MARGIN * 2), GUI_TEX_WIDTH, GUI_TEX_HEIGHT);
 				
-				sheet.draw(Minecraft.getMinecraft(), partialTicks, GUI_SHEET_WIDTH, GUI_SHEET_HEIGHT,
+				sheet.draw(Minecraft.getInstance(), partialTicks, GUI_SHEET_WIDTH, GUI_SHEET_HEIGHT,
 						mouseX - GUI_SHEET_HOFFSET, mouseY - GUI_SHEET_VOFFSET);
 				GlStateManager.popMatrix();
 			}
@@ -518,12 +518,12 @@ public class PetGUI {
 			IPetGUISheet<T> sheet = container.getCurrentSheet();
 			if (sheet != null) {
 				GlStateManager.pushMatrix();
-				GlStateManager.translate(GUI_SHEET_HOFFSET, GUI_SHEET_VOFFSET, 0);
+				GlStateManager.translatef(GUI_SHEET_HOFFSET, GUI_SHEET_VOFFSET, 0);
 				
-				GlStateManager.enableAlpha();
+				GlStateManager.enableAlphaTest();
 				GlStateManager.enableBlend();
 				
-				sheet.overlay(Minecraft.getMinecraft(), 0f, GUI_SHEET_WIDTH, GUI_SHEET_HEIGHT,
+				sheet.overlay(Minecraft.getInstance(), 0f, GUI_SHEET_WIDTH, GUI_SHEET_HEIGHT,
 						mouseX - GUI_SHEET_HOFFSET, mouseY - GUI_SHEET_VOFFSET);
 				GlStateManager.popMatrix();
 			}
@@ -580,8 +580,8 @@ public class PetGUI {
 	public static interface PetGUIStatAdapter<T> {
 		
 		// Health/first bar
-		default public float getHealth(T pet) { return ((EntityLivingBase) pet).getHealth(); }
-		default public float getMaxHealth(T pet) { return ((EntityLivingBase) pet).getMaxHealth(); }
+		default public float getHealth(T pet) { return ((LivingEntity) pet).getHealth(); }
+		default public float getMaxHealth(T pet) { return ((LivingEntity) pet).getMaxHealth(); }
 		default public String getHealthLabel(T pet) { return "Health"; }
 		
 		// Second bar (mana?)
@@ -628,53 +628,53 @@ public class PetGUI {
 	
 	private static final class NetworkHelper {
 		
-		private static void clientSendInternal(int id, NBTTagCompound nbt) {
+		private static void clientSendInternal(int id, CompoundNBT nbt) {
 			PetGUIControlMessage message = new PetGUIControlMessage(id, nbt);
 			
 			NetworkHandler.getSyncChannel().sendToServer(message);
 		}
 		
-		private static void serverSendInternal(EntityPlayerMP player, NBTTagCompound nbt) {
+		private static void serverSendInternal(ServerPlayerEntity player, CompoundNBT nbt) {
 			PetGUISyncMessage message = new PetGUISyncMessage(nbt);
 			
 			NetworkHandler.getSyncChannel().sendTo(message, player);
 		}
 		
-		private static NBTTagCompound base(PetContainerMessageType type) {
-			NBTTagCompound nbt = new NBTTagCompound();
-			nbt.setString(NBT_TYPE, type.getKey());
+		private static CompoundNBT base(PetContainerMessageType type) {
+			CompoundNBT nbt = new CompoundNBT();
+			nbt.putString(NBT_TYPE, type.getKey());
 			return nbt;
 		}
 		
 		public static void ClientSendSheet(int id, int sheet) {
-			NBTTagCompound nbt = base(PetContainerMessageType.SET_SHEET);
-			nbt.setInteger(NBT_INDEX, sheet);
+			CompoundNBT nbt = base(PetContainerMessageType.SET_SHEET);
+			nbt.putInt(NBT_INDEX, sheet);
 			
 			clientSendInternal(id, nbt);
 		}
 		
-		public static void ClientSendSheetData(int id, NBTTagCompound data) {
-			NBTTagCompound nbt = base(PetContainerMessageType.SHEET_DATA);
-			nbt.setTag(NBT_USERDATA, data);
+		public static void ClientSendSheetData(int id, CompoundNBT data) {
+			CompoundNBT nbt = base(PetContainerMessageType.SHEET_DATA);
+			nbt.put(NBT_USERDATA, data);
 			
 			clientSendInternal(id, nbt);
 		}
 		
 		public static void ClientSendReroll(int id) {
-			NBTTagCompound nbt = base(PetContainerMessageType.REROLL);
+			CompoundNBT nbt = base(PetContainerMessageType.REROLL);
 			
 			clientSendInternal(id, nbt);
 		}
 		
-		public static void ServerSendSheetData(EntityPlayerMP player, NBTTagCompound data) {
-			NBTTagCompound nbt = base(PetContainerMessageType.SHEET_DATA);
-			nbt.setTag(NBT_USERDATA, data);
+		public static void ServerSendSheetData(ServerPlayerEntity player, CompoundNBT data) {
+			CompoundNBT nbt = base(PetContainerMessageType.SHEET_DATA);
+			nbt.put(NBT_USERDATA, data);
 			
 			serverSendInternal(player, nbt);
 		}
 		
 		
-		public static PetContainerMessageType GetType(NBTTagCompound nbt) {
+		public static PetContainerMessageType GetType(CompoundNBT nbt) {
 			String str = nbt.getString(NBT_TYPE);
 			if (str == null || str.isEmpty()) {
 				return null;
@@ -689,12 +689,12 @@ public class PetGUI {
 			return null;
 		}
 		
-		public static int GetSendSheetIndex(NBTTagCompound nbt) {
-			return nbt.getInteger(NBT_INDEX);
+		public static int GetSendSheetIndex(CompoundNBT nbt) {
+			return nbt.getInt(NBT_INDEX);
 		}
 		
-		public static NBTTagCompound GetSendSheetData(NBTTagCompound nbt) {
-			return nbt.getCompoundTag(NBT_USERDATA);
+		public static CompoundNBT GetSendSheetData(CompoundNBT nbt) {
+			return nbt.getCompound(NBT_USERDATA);
 		}
 		
 	}

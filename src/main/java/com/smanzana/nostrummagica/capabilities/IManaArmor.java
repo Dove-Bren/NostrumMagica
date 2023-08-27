@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.capabilities;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.DamageSource;
 
 public interface IManaArmor {
@@ -42,5 +42,5 @@ public interface IManaArmor {
 	
 	// Copy fields out of an existing armor capability
 	public void copy(IManaArmor cap);
-	public void provideEntity(EntityLivingBase entity);
+	public void provideEntity(LivingEntity entity);
 }

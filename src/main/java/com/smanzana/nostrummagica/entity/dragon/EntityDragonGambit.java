@@ -6,8 +6,8 @@ import com.google.common.collect.Lists;
 import com.mojang.realmsclient.gui.ChatFormatting;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 // Very stripped down 'AI' predicates.
 // Tamed dragons may use these to allow players to set up when they cast stuff!
@@ -47,7 +47,7 @@ public enum EntityDragonGambit {
 		return texOffsetX;
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public List<String> getDesc() {
 		if (this.desc == null) {
 			String raw = I18n.format("gambit." + getUnlocName() + ".desc", "" + ChatFormatting.DARK_GREEN + ChatFormatting.BOLD, ChatFormatting.RESET);
@@ -60,7 +60,7 @@ public enum EntityDragonGambit {
 		return this.desc;
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public String getName() {
 		if (this.transName == null) {
 			this.transName = I18n.format("gambit." + getUnlocName() + ".name");

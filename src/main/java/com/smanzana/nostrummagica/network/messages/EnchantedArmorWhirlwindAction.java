@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.network.messages;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -18,12 +18,12 @@ public class EnchantedArmorWhirlwindAction implements IMessage {
 
 		@Override
 		public IMessage onMessage(EnchantedArmorWhirlwindAction message, MessageContext ctx) {
-			//EntityLivingBase ent = ctx.getServerHandler().player;
+			//LivingEntity ent = ctx.getServerHandler().player;
 //			if (ent != null) {
 //				EnchantedArmor.HandleStateUpdate(state, ent, data);
 //				if (ctx.side.isServer()) {
 //					// Bounce this update to everyone else
-//					message.tag.setInteger(NBT_ID, ent.getEntityId());
+//					message.tag.putInt(NBT_ID, ent.getEntityId());
 //					NetworkHandler.getSyncChannel().sendToDimension(message, ent.dimension);
 //				}
 //			}
@@ -37,10 +37,10 @@ public class EnchantedArmorWhirlwindAction implements IMessage {
 //	private static final String NBT_TYPE = "type";
 //	private static final String NBT_DATA = "data";
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public EnchantedArmorWhirlwindAction() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	@Override

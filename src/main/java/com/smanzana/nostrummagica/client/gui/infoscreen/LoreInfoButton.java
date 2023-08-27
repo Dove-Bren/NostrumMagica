@@ -7,20 +7,20 @@ import javax.annotation.Nonnull;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
@@ -32,8 +32,8 @@ public class LoreInfoButton extends InfoButton {
 	private @Nonnull ItemStack iconStack = ItemStack.EMPTY;
 	private Entity iconEntity = null;
 	
-	public LoreInfoButton(int buttonId, ILoreTagged lore) {
-		super(buttonId, 0, 0);
+	public LoreInfoButton(InfoScreen screen, ILoreTagged lore) {
+		super(screen, 0, 0);
 		this.lore = lore;
 	}
 
@@ -43,7 +43,8 @@ public class LoreInfoButton extends InfoButton {
 	}
 
 	@Override
-	public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
+	public void render(int mouseX, int mouseY, float partialTicks) {
+		final Minecraft mc = Minecraft.getInstance();
 		float tint = 1f;
 		if (mouseX >= this.x 
 			&& mouseY >= this.y 
@@ -55,7 +56,7 @@ public class LoreInfoButton extends InfoButton {
 		GL11.glColor4f(tint, tint, tint, 1f);
 		mc.getTextureManager().bindTexture(InfoScreen.background);
 		GlStateManager.enableBlend();
-		Gui.drawModalRectWithCustomSizedTexture(this.x, this.y, 0, 0,
+		RenderFuncs.drawModalRectWithCustomSizedTexture(this.x, this.y, 0, 0,
 				width, height,
 				InfoScreen.TEXT_WHOLE_WIDTH, InfoScreen.TEXT_WHOLE_HEIGHT);
 		GlStateManager.disableBlend();
@@ -70,17 +71,17 @@ public class LoreInfoButton extends InfoButton {
 					iconStack = new ItemStack((Item) lore, 1);
 				}
 			} else if (lore instanceof Block) {
-				Item item = Item.getItemFromBlock((Block) lore);
+				Item item = ((Block) lore).asItem();
 				if (item != null)
 					iconStack = new ItemStack(item, 1);
-			} else if (lore instanceof EntityLivingBase) {
+			} else if (lore instanceof LivingEntity) {
 				iconEntity = (Entity) lore;
 				if (iconEntity.world == null)
 					iconEntity.world = mc.world;
 			} else if (lore instanceof LoreRegistry.Preset) {
 				LoreRegistry.Preset preset = (LoreRegistry.Preset) lore;
 				if (preset.getBlock() != null) {
-					Item item = Item.getItemFromBlock(preset.getBlock());
+					Item item = ((Block) preset.getBlock()).asItem();
 					if (item != null)
 						iconStack = new ItemStack(item, 1);
 				} else if (preset.getEntity(mc.world) != null) {
@@ -93,13 +94,13 @@ public class LoreInfoButton extends InfoButton {
 		if (!iconStack.isEmpty()) {
 			int x = this.x + (width - itemLength) / 2;
 			int y = this.y + (height - itemLength) / 2;
-			mc.getRenderItem().renderItemIntoGUI(iconStack, x, y);
+			Minecraft.getInstance().getItemRenderer().renderItemIntoGUI(iconStack, x, y);
 		} else if (iconEntity != null) {
 			int x = this.x + (width / 2);
 			int y = this.y + (width - 1);
 			RenderHelper.disableStandardItemLighting();
-			GuiInventory.drawEntityOnScreen(x, y,
-					(int) (width * .4), (float)(this.x) - mouseX, (float)(this.y) - mouseY, (EntityLivingBase)iconEntity);
+			InventoryScreen.drawEntityOnScreen(x, y,
+					(int) (width * .4), (float)(this.x) - mouseX, (float)(this.y) - mouseY, (LivingEntity)iconEntity);
 		}
 	}
 

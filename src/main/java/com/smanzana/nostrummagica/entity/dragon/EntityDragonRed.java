@@ -37,7 +37,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IEntityMultiPart;
 import net.minecraft.entity.MultiPartEntityPart;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -52,10 +52,10 @@ import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.entity.passive.EntityPig;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.entity.passive.EntityVillager;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -84,8 +84,8 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 		
 		private DragonBodyPartType(String name, float width, float height, Vec3d offset) {
 			this.name = name;
-			this.width = width;
-			this.height = height;
+			this.getWidth = width;
+			this.getHeight() = height;
 			this.offset = offset;
 		}
 		
@@ -221,7 +221,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 	
 	private DragonSummonShadowAttack<EntityDragonRed> shadowAttack;
 	private DragonFlyEvasionTask evasionTask;
-	private DragonAIAggroTable<EntityDragonRed, EntityLivingBase> aggroTable;
+	private DragonAIAggroTable<EntityDragonRed, LivingEntity> aggroTable;
 	
 	private Map<DragonBodyPartType, DragonBodyPart> bodyParts;
 	
@@ -342,7 +342,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 //		this.tasks.addTask(4, new EntityAIWander(this, 1.0D, 30));
         this.targetTasks.addTask(1, aggroTable);
         this.targetTasks.addTask(2, new EntityAIHurtByTarget(this, false, new Class[0]));
-		this.targetTasks.addTask(3, new DragonAINearestAttackableTarget<EntityPlayer>(this, EntityPlayer.class, true));
+		this.targetTasks.addTask(3, new DragonAINearestAttackableTarget<PlayerEntity>(this, PlayerEntity.class, true));
 		this.targetTasks.addTask(4, new DragonAINearestAttackableTarget<EntityZombie>(this, EntityZombie.class, true));
 		this.targetTasks.addTask(5, new DragonAINearestAttackableTarget<EntitySheep>(this, EntitySheep.class, true));
 		this.targetTasks.addTask(6, new DragonAINearestAttackableTarget<EntityCow>(this, EntityCow.class, true));
@@ -427,7 +427,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 		return false;
 	}
 	
-	public boolean canAttackClass(Class <? extends EntityLivingBase > cls) {
+	public boolean canAttackClass(Class <? extends LivingEntity > cls) {
 		return true;
 	}
 	
@@ -435,10 +435,10 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 		return false;
 	}
 	
-	public void readEntityFromNBT(NBTTagCompound compound) {
+	public void readEntityFromNBT(CompoundNBT compound) {
 		super.readEntityFromNBT(compound);
 
-		if (compound.hasKey(DRAGON_SERIAL_PHASE_TOK, NBT.TAG_ANY_NUMERIC)) {
+		if (compound.contains(DRAGON_SERIAL_PHASE_TOK, NBT.TAG_ANY_NUMERIC)) {
         	int i = compound.getByte(DRAGON_SERIAL_PHASE_TOK);
             this.setPhase(DragonPhase.values()[i]);
         }
@@ -448,7 +448,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 		}
 	}
 	
-	public void writeEntityToNBT(NBTTagCompound compound) {
+	public void writeEntityToNBT(CompoundNBT compound) {
     	super.writeEntityToNBT(compound);
     	compound.setByte(DRAGON_SERIAL_PHASE_TOK, (byte)this.getPhase().ordinal());
 	}
@@ -488,8 +488,8 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 		
 		if (world.isRemote) {
 			if (this.isFlying() && !this.getWingFlapping()) {
-				if ((this.posY > this.prevPosY) || (this.motionX + this.motionZ < .2)) {
-					this.flapWing(this.motionX + this.motionZ < .2 ? .5f : 1f);
+				if ((this.posY > this.prevPosY) || (this.getMotion().x + this.getMotion().z < .2)) {
+					this.flapWing(this.getMotion().x + this.getMotion().z < .2 ? .5f : 1f);
 				}
 			}
 		}
@@ -498,13 +498,13 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 		
 		if (this.world.isRemote && this.isCasting()) {
 //			NostrumParticles.FILLED_ORB.spawn(this.world, new NostrumParticles.SpawnParams(5,
-//					posX, posY + this.height / 2, posZ,
+//					posX, posY + this.getHeight() / 2, posZ,
 //					5,
 //					30, 5,
 //					new Vec3d(0, .25, 0), Vec3d.ZERO)
 //					.color(0xFFFF0022));
 			NostrumParticles.FILLED_ORB.spawn(this.world, new NostrumParticles.SpawnParams(5,
-					posX, posY + this.height / 2, posZ,
+					posX, posY + this.getHeight() / 2, posZ,
 					5,
 					30, 5,
 					this.getEntityId())
@@ -520,12 +520,12 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 		this.bossInfo.setPercent(this.getHealth() / this.getMaxHealth());
 	}
 	
-	public void addTrackingPlayer(EntityPlayerMP player) {
+	public void addTrackingPlayer(ServerPlayerEntity player) {
 		super.addTrackingPlayer(player);
 		this.bossInfo.addPlayer(player);
 	}
 
-	public void removeTrackingPlayer(EntityPlayerMP player) {
+	public void removeTrackingPlayer(ServerPlayerEntity player) {
 		super.removeTrackingPlayer(player);
 		this.bossInfo.removePlayer(player);
 	}
@@ -575,9 +575,9 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 	public boolean attackEntityFrom(DamageSource source, float amount) {
 		if (!this.world.isRemote && source.getTrueSource() != null) {
 			Entity ent = source.getTrueSource();
-			if (ent instanceof EntityLivingBase && ent != this) {
-				this.shadowAttack.addToPool((EntityLivingBase) ent);
-				this.aggroTable.addDamage((EntityLivingBase) ent, amount);
+			if (ent instanceof LivingEntity && ent != this) {
+				this.shadowAttack.addToPool((LivingEntity) ent);
+				this.aggroTable.addDamage((LivingEntity) ent, amount);
 			}
 			
 			this.evasionTask.reset();
@@ -587,7 +587,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 	}
 	
 	@Override
-	public void bite(EntityLivingBase target) {
+	public void bite(LivingEntity target) {
 		super.bite(target);
 		
 		if (!this.world.isRemote) {

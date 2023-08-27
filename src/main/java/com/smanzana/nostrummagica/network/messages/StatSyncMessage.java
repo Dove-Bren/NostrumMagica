@@ -5,7 +5,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -28,7 +28,7 @@ public class StatSyncMessage implements IMessage {
 			
 			NostrumMagica.logger.info("Recieved Nostrum Magica sync message from server");
 			
-			Minecraft.getMinecraft().addScheduledTask(() -> {
+			Minecraft.getInstance().runAsync(() -> {
 				INostrumMagic override = CAPABILITY.getDefaultInstance();
 				CAPABILITY.getStorage().readNBT(CAPABILITY, override, null, message.tag);
 				NostrumMagica.proxy.receiveStatOverrides(override);
@@ -43,14 +43,14 @@ public class StatSyncMessage implements IMessage {
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public StatSyncMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	public StatSyncMessage(INostrumMagic stats) {
-		tag = (NBTTagCompound) CAPABILITY.getStorage().writeNBT(CAPABILITY, stats, null);
+		tag = (CompoundNBT) CAPABILITY.getStorage().writeNBT(CAPABILITY, stats, null);
 	}
 
 	@Override

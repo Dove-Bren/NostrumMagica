@@ -5,7 +5,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -22,9 +22,9 @@ public class StatRequestMessage implements IMessage {
 		@Override
 		public StatSyncMessage onMessage(StatRequestMessage message, MessageContext ctx) {
 			
-			final EntityPlayerMP sp = ctx.getServerHandler().player;
+			final ServerPlayerEntity sp = ctx.getServerHandler().player;
 			
-			sp.getServerWorld().addScheduledTask(() -> {
+			sp.getServerWorld().runAsync(() -> {
 				INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
 				
 				if (att == null) {

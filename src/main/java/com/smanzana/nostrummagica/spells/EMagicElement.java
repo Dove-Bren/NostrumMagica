@@ -4,8 +4,8 @@ import javax.annotation.Nullable;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public enum EMagicElement {
 
@@ -34,7 +34,7 @@ public enum EMagicElement {
 		return color;
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public ChatFormatting getChatColor() {
 		switch(this) {
 		case EARTH:

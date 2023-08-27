@@ -36,25 +36,25 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTTagInt;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOverlay {
 	
@@ -145,9 +145,9 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		ItemStack item = new ItemStack(instance(), 1, type) ;
 		setCapacity(item, capacity);
 		if (enhancements != null && !enhancements.isEmpty()) {
-			NBTTagCompound tag = item.getTagCompound();
+			CompoundNBT tag = item.getTagCompound();
 			if (tag == null)
-				tag = new NBTTagCompound();
+				tag = new CompoundNBT();
 			
 			writeEnhancements(enhancements, tag);
 				
@@ -159,7 +159,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
 		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		if (worldIn.isRemote)
 			NostrumMagica.proxy.openBook(playerIn, this, itemStackIn);
@@ -171,18 +171,18 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return;
 		
-		NBTTagCompound nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTagCompound();
 		
 		if (nbt == null)
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		
-		NBTTagList tags = nbt.getTagList(NBT_SPELLS, NBT.TAG_INT);
+		ListNBT tags = nbt.getList(NBT_SPELLS, NBT.TAG_INT);
 		
 		if (tags == null)
-			tags = new NBTTagList();
+			tags = new ListNBT();
 		
-		tags.appendTag(new NBTTagInt(spell.getRegistryID()));
-		nbt.setTag(NBT_SPELLS, tags);
+		tags.add(new NBTTagInt(spell.getRegistryID()));
+		nbt.put(NBT_SPELLS, tags);
 		
 		itemStack.setTagCompound(nbt);
 	}
@@ -191,18 +191,18 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
 			return false;
 		
-		NBTTagCompound nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTagCompound();
 		
 		if (nbt == null)
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		
-		NBTTagList tags = nbt.getTagList(NBT_SPELLS, NBT.TAG_INT);
+		ListNBT tags = nbt.getList(NBT_SPELLS, NBT.TAG_INT);
 		boolean found = false;
 		
 		if (tags == null)
-			tags = new NBTTagList();
+			tags = new ListNBT();
 		
-		for (int i = 0; i < tags.tagCount(); i++) {
+		for (int i = 0; i < tags.size(); i++) {
 			if (tags.getIntAt(i) == spellID) {
 				tags.removeTag(i);
 				found = true;
@@ -214,7 +214,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		}
 		
 		if (found) {
-			nbt.setTag(NBT_SPELLS, tags);
+			nbt.put(NBT_SPELLS, tags);
 			itemStack.setTagCompound(nbt);
 		}
 		
@@ -225,13 +225,13 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome))
 			return;
 		
-		NBTTagCompound nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTagCompound();
 		
 		if (nbt == null)
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		
-		NBTTagList tags = new NBTTagList(); // new list to replace old
-		nbt.setTag(NBT_SPELLS, tags);
+		ListNBT tags = new ListNBT(); // new list to replace old
+		nbt.put(NBT_SPELLS, tags);
 		
 		itemStack.setTagCompound(nbt);
 	}
@@ -240,19 +240,19 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return null;
 		
-		NBTTagCompound nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTagCompound();
 		
 		if (nbt == null)
 			return null;
 		
-		NBTTagList tags = nbt.getTagList(NBT_SPELLS, NBT.TAG_INT);
+		ListNBT tags = nbt.getList(NBT_SPELLS, NBT.TAG_INT);
 		
-		if (tags == null || tags.tagCount() == 0)
+		if (tags == null || tags.size() == 0)
 			return null;
 		
-		int ids[] = new int[tags.tagCount()];
+		int ids[] = new int[tags.size()];
 		
-		for (int i = 0; i < tags.tagCount(); i++) {
+		for (int i = 0; i < tags.size(); i++) {
 			ids[i] = tags.getIntAt(i);
 		}
 
@@ -263,9 +263,9 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return 0;
 
-		NBTTagCompound nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTagCompound();
 		
-		return nbt.getInteger(NBT_INDEX);
+		return nbt.getInt(NBT_INDEX);
 	}
 	
 	// Returns resultant index, or -1 on no change
@@ -273,9 +273,9 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return -1;
 		
-		NBTTagCompound nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTagCompound();
 		
-		int index = nbt.getInteger(NBT_INDEX);
+		int index = nbt.getInt(NBT_INDEX);
 		int initial = index;
 		
 		int indices[] = getSpellIDs(itemStack);
@@ -284,7 +284,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		
 		index = Math.max(0, Math.min(index + amount, indices.length - 1));
 		
-		nbt.setInteger(NBT_INDEX, index);
+		nbt.putInt(NBT_INDEX, index);
 		
 		if (initial != index && !NostrumMagica.proxy.isServer()) {
 			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
@@ -304,30 +304,30 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		
 		index = Math.max(0, Math.min(index, indices.length - 1));
 		
-		NBTTagCompound nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTagCompound();
 		
-		nbt.setInteger(NBT_INDEX, index);
+		nbt.putInt(NBT_INDEX, index);
 	}
 	
 	public static int getXP(ItemStack itemStack) {
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return 0;
 
-		NBTTagCompound nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTagCompound();
 		if (nbt == null)
 			return 0;
 		
-			return nbt.getInteger(NBT_XP);
+			return nbt.getInt(NBT_XP);
 	}
 	
 	public static void setXP(ItemStack itemStack, int xp) {
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return;
 
-		NBTTagCompound nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTagCompound();
 		if (nbt == null)
-			nbt = new NBTTagCompound();
-		nbt.setInteger(NBT_XP, xp);
+			nbt = new CompoundNBT();
+		nbt.putInt(NBT_XP, xp);
 		itemStack.setTagCompound(nbt);
 	}
 	
@@ -335,21 +335,21 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return 0;
 
-		NBTTagCompound nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTagCompound();
 		if (nbt == null)
 			return 0;
 		
-			return nbt.getInteger(NBT_CAPACITY);
+			return nbt.getInt(NBT_CAPACITY);
 	}
 	
 	public static void setCapacity(ItemStack itemStack, int capacity) {
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return;
 
-		NBTTagCompound nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTagCompound();
 		if (nbt == null)
-			nbt = new NBTTagCompound();
-		nbt.setInteger(NBT_CAPACITY, capacity);
+			nbt = new CompoundNBT();
+		nbt.putInt(NBT_CAPACITY, capacity);
 		itemStack.setTagCompound(nbt);
 	}
 	
@@ -357,11 +357,11 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return 0;
 
-		NBTTagCompound nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTagCompound();
 		if (nbt == null)
 			return 1;
 		
-		int level = nbt.getInteger(NBT_LEVEL);
+		int level = nbt.getInt(NBT_LEVEL);
 		if (level <= 0) {
 			setLevel(itemStack, 1);
 			level = 1;
@@ -374,10 +374,10 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return;
 
-		NBTTagCompound nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTagCompound();
 		if (nbt == null)
-			nbt = new NBTTagCompound();
-		nbt.setInteger(NBT_LEVEL, level);
+			nbt = new CompoundNBT();
+		nbt.putInt(NBT_LEVEL, level);
 		itemStack.setTagCompound(nbt);
 	}
 	
@@ -385,21 +385,21 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return 0;
 
-		NBTTagCompound nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTagCompound();
 		if (nbt == null)
 			return 0;
 		
-		return nbt.getInteger(NBT_MODIFICATIONS);
+		return nbt.getInt(NBT_MODIFICATIONS);
 	}
 	
 	public static void setModifications(ItemStack itemStack, int mods) {
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return;
 
-		NBTTagCompound nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTagCompound();
 		if (nbt == null)
-			nbt = new NBTTagCompound();
-		nbt.setInteger(NBT_MODIFICATIONS, mods);
+			nbt = new CompoundNBT();
+		nbt.putInt(NBT_MODIFICATIONS, mods);
 		itemStack.setTagCompound(nbt);
 	}
 	
@@ -407,7 +407,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return null;
 
-		NBTTagCompound nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTagCompound();
 		if (nbt == null)
 			return null;
 		
@@ -422,13 +422,13 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return null;
 
-		NBTTagCompound nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTagCompound();
 		if (nbt == null)
 			return null;
 		return nbt.getString(NBT_PLAYER_NAME);
 	}
 	
-	public static void setPlayer(ItemStack itemStack, EntityPlayer player) {
+	public static void setPlayer(ItemStack itemStack, PlayerEntity player) {
 		setPlayer(itemStack, player.getDisplayNameString(), player.getUniqueID());
 	}
 	
@@ -436,21 +436,21 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return;
 
-		NBTTagCompound nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTagCompound();
 		if (nbt == null)
-			nbt = new NBTTagCompound();
-		nbt.setString(NBT_PLAYER, id.toString());
-		nbt.setString(NBT_PLAYER_NAME, name);
+			nbt = new CompoundNBT();
+		nbt.putString(NBT_PLAYER, id.toString());
+		nbt.putString(NBT_PLAYER_NAME, name);
 		itemStack.setTagCompound(nbt);
 	}
 	
 	private static int genID(ItemStack tome) {
 		int id = NostrumMagica.rand.nextInt();
-		NBTTagCompound nbt = tome.getTagCompound();
+		CompoundNBT nbt = tome.getTagCompound();
 		if (nbt == null)
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		
-		nbt.setInteger(NBT_ID, id);
+		nbt.putInt(NBT_ID, id);
 		return id;
 	}
 	
@@ -459,11 +459,11 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 			return 0;
 
 		int id;
-		NBTTagCompound nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTagCompound();
 		if (nbt == null)
 			id = genID(itemStack);
 		else
-			id = nbt.getInteger(NBT_ID);
+			id = nbt.getInt(NBT_ID);
 		
 		if (id == 0)
 			id = genID(itemStack);
@@ -474,7 +474,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return 0;
 
-		NBTTagCompound nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTagCompound();
 		if (nbt == null)
 			return 0;
 		return nbt.getLong(NBT_FINISH_TIME);
@@ -484,10 +484,10 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return;
 
-		NBTTagCompound nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTagCompound();
 		if (nbt == null)
-			nbt = new NBTTagCompound();
-		nbt.setLong(NBT_FINISH_TIME, time);
+			nbt = new CompoundNBT();
+		nbt.putLong(NBT_FINISH_TIME, time);
 		itemStack.setTagCompound(nbt);
 	}
 	
@@ -569,7 +569,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	}
 
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public BookScreen getScreen(Object userdata) {
 		if (userdata == null || !(userdata instanceof ItemStack) || ((ItemStack) userdata).isEmpty())
 			return null;
@@ -678,14 +678,14 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 			enhances = new LinkedList<>();
 		
 		enhances.add(enhancement);
-		NBTTagCompound tag = stack.getTagCompound();
+		CompoundNBT tag = stack.getTagCompound();
 		if (tag == null)
-			tag = new NBTTagCompound();
+			tag = new CompoundNBT();
 		writeEnhancements(enhances, tag);
 		stack.setTagCompound(tag);
 	}
 	
-	public static void applyEnhancements(ItemStack stack, SpellCastSummary summary, EntityLivingBase caster) {
+	public static void applyEnhancements(ItemStack stack, SpellCastSummary summary, LivingEntity caster) {
 		List<SpellTomeEnhancementWrapper> list = getEnhancements(stack);
 		if (list == null)
 			return;
@@ -720,9 +720,9 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		}
 		
 		if (!enhancements.isEmpty()) {
-			NBTTagCompound tag = stack.getTagCompound();
+			CompoundNBT tag = stack.getTagCompound();
 			if (tag == null)
-				tag = new NBTTagCompound();
+				tag = new CompoundNBT();
 			
 			writeEnhancements(enhancements, tag);
 				
@@ -736,28 +736,28 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		return stack;
 	}
 	
-	private static void writeEnhancements(List<SpellTomeEnhancementWrapper> enhancements, NBTTagCompound nbt) {
+	private static void writeEnhancements(List<SpellTomeEnhancementWrapper> enhancements, CompoundNBT nbt) {
 		if (enhancements == null || enhancements.isEmpty())
 			return;
 		
-		NBTTagList list = new NBTTagList();
+		ListNBT list = new ListNBT();
 		for (SpellTomeEnhancementWrapper enhance : enhancements) {
-			NBTTagCompound tag = new NBTTagCompound();
-			tag.setString(NBT_ENHANCEMENT_KEY, enhance.getEnhancement().getTitleKey());
-			tag.setInteger(NBT_ENHANCEMENT_LEVEL, enhance.getLevel());
-			list.appendTag(tag);
+			CompoundNBT tag = new CompoundNBT();
+			tag.putString(NBT_ENHANCEMENT_KEY, enhance.getEnhancement().getTitleKey());
+			tag.putInt(NBT_ENHANCEMENT_LEVEL, enhance.getLevel());
+			list.add(tag);
 		}
 		
-		nbt.setTag(NBT_ENHANCEMENTS, list);
+		nbt.put(NBT_ENHANCEMENTS, list);
 	}
 	
-	private static List<SpellTomeEnhancementWrapper> readEnhancements(NBTTagCompound nbt) {
+	private static List<SpellTomeEnhancementWrapper> readEnhancements(CompoundNBT nbt) {
 		List<SpellTomeEnhancementWrapper> list = new LinkedList<>();
 		
-		if (nbt != null && nbt.hasKey(NBT_ENHANCEMENTS, NBT.TAG_LIST)) {
-			NBTTagList tags = nbt.getTagList(NBT_ENHANCEMENTS, NBT.TAG_COMPOUND);
-			for (int i = 0; i < tags.tagCount(); i++) {
-				NBTTagCompound tag = tags.getCompoundTagAt(i);
+		if (nbt != null && nbt.contains(NBT_ENHANCEMENTS, NBT.TAG_LIST)) {
+			ListNBT tags = nbt.getList(NBT_ENHANCEMENTS, NBT.TAG_COMPOUND);
+			for (int i = 0; i < tags.size(); i++) {
+				CompoundNBT tag = tags.getCompoundTagAt(i);
 				String key = tag.getString(NBT_ENHANCEMENT_KEY);
 				SpellTomeEnhancement enhance = SpellTomeEnhancement.lookupEnhancement(key);
 				if (enhance == null) {
@@ -765,7 +765,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 					continue;
 				}
 				
-				list.add(new SpellTomeEnhancementWrapper(enhance, tag.getInteger(NBT_ENHANCEMENT_LEVEL)));
+				list.add(new SpellTomeEnhancementWrapper(enhance, tag.getInt(NBT_ENHANCEMENT_LEVEL)));
 			}
 		}
 		
@@ -773,7 +773,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		List<SpellTomeEnhancementWrapper> enhances = getEnhancements(stack);
 		if (enhances != null && !enhances.isEmpty()) {
@@ -800,7 +800,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (owner != null)
 			return;
 		
-		if (!(entityIn instanceof EntityPlayer) || ((EntityPlayer) entityIn).isCreative()) {
+		if (!(entityIn instanceof PlayerEntity) || ((PlayerEntity) entityIn).isCreative()) {
 			return;
 		}
 		
@@ -813,13 +813,13 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		long current = System.currentTimeMillis();
 		if (current >= time) {
 			// Bond!
-			bond(stack, worldIn, (EntityPlayer) entityIn);
+			bond(stack, worldIn, (PlayerEntity) entityIn);
 		}
 		
 		
 	}
 	
-	public boolean onDroppedByPlayer(ItemStack item, EntityPlayer player) {
+	public boolean onDroppedByPlayer(ItemStack item, PlayerEntity player) {
 		boolean ret = super.onDroppedByPlayer(item, player);
 		if (ret)
 			setBondTime(item, 0);
@@ -831,15 +831,15 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		return 1000L * 10;//60L * 10L;
 	}
 	
-	public static void bond(ItemStack tome, World world, EntityPlayer player) {
+	public static void bond(ItemStack tome, World world, PlayerEntity player) {
 		setPlayer(tome, player);
 		NostrumMagicaSounds.SHIELD_APPLY.play(player);
 		if (!world.isRemote) {
-			player.sendMessage(new TextComponentTranslation("info.tome.bond"));
+			player.sendMessage(new TranslationTextComponent("info.tome.bond"));
 		}
 	}
 	
-	public static boolean isOwner(ItemStack tome, EntityPlayer player) {
+	public static boolean isOwner(ItemStack tome, PlayerEntity player) {
 		UUID owner = getPlayerID(tome);
 		if (owner == null)
 			return false;
@@ -852,7 +852,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	 * @param tome
 	 * @param sp
 	 */
-	public static void doSpecialCastEffects(ItemStack tome, EntityPlayer sp) {
+	public static void doSpecialCastEffects(ItemStack tome, PlayerEntity sp) {
 		if (sp.world.isRemote)
 			return;
 		
@@ -861,7 +861,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 			UUID id = getPlayerID(tome);
 			if (id == null)
 				return;
-			EntityPlayer player = 
+			PlayerEntity player = 
 					sp.world.getMinecraftServer().getPlayerList().getPlayerByUUID(id);
 			if (player != null && !player.isDead) {
 				switch (NostrumMagica.rand.nextInt(4)) {
@@ -940,8 +940,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		// Could hook up some special effects here
 	}
 	
-	private static void doLevelup(ItemStack tome, EntityPlayer player) {
-		player.sendMessage(new TextComponentTranslation("info.tome.levelup", new Object[0]));
+	private static void doLevelup(ItemStack tome, PlayerEntity player) {
+		player.sendMessage(new TranslationTextComponent("info.tome.levelup", new Object[0]));
 		int mods = getModifications(tome);
 		setModifications(tome, ++mods);
 		int level = getLevel(tome);
@@ -953,7 +953,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
 		if (this.isInCreativeTab(tab)) {
 			for (int i = 0; i < SpellTome.MAX_TOME_COUNT; i++) {
@@ -979,7 +979,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		return taken < capacity;
 	}
 	
-	public static boolean startBinding(EntityPlayer player, ItemStack tome, ItemStack scroll, boolean quick) {
+	public static boolean startBinding(PlayerEntity player, ItemStack tome, ItemStack scroll, boolean quick) {
 		if (tome.isEmpty() || scroll.isEmpty())
 			return false;
 		
@@ -989,7 +989,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		
 		if (!SpellTome.isOwner(tome, player)) {
 			if (!player.world.isRemote) {
-				player.sendMessage(new TextComponentTranslation("info.tome.noowner"));
+				player.sendMessage(new TranslationTextComponent("info.tome.noowner"));
 				
 			}
 			return false;
@@ -997,7 +997,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		
 		if (!hasRoom(tome)) {
 			if (!player.world.isRemote) {
-				player.sendMessage(new TextComponentTranslation("info.tome.full"));
+				player.sendMessage(new TranslationTextComponent("info.tome.full"));
 			}
 			return false;
 		}
@@ -1028,14 +1028,14 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (quick) {
 			attr.completeBinding(tome);
 		} else if (!player.world.isRemote) {
-				player.sendMessage(new TextComponentTranslation("info.tome.bind_start", new Object[] {spell.getName(), compName}));
+				player.sendMessage(new TranslationTextComponent("info.tome.bind_start", new Object[] {spell.getName(), compName}));
 		}
 		
 		return true;
 	}
 
 	@Override
-	public boolean shouldTrace(World world, EntityPlayer player, ItemStack stack) {
+	public boolean shouldTrace(World world, PlayerEntity player, ItemStack stack) {
 		Spell spell = NostrumMagica.getCurrentSpell(player);
 		if (spell != null && spell.getSpellParts() != null && spell.getSpellParts().get(0).isTrigger()) {
 			SpellTrigger trigger = spell.getSpellParts().get(0).getTrigger();

@@ -2,10 +2,11 @@ package com.smanzana.nostrummagica.client.gui.book;
 
 import java.util.List;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 
 public class ImagePage implements IBookPage {
@@ -59,19 +60,19 @@ public class ImagePage implements IBookPage {
 		widthCache = width;
 		heightCache = height;
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(image);
+		Minecraft.getInstance().getTextureManager().bindTexture(image);
 		
 		int centerx = xoffset + (width / 2);
 		int centery = yoffset + (height / 2);
 		int x = centerx - (this.width / 2);
 		int y = centery - (this.height / 2);
 		
-		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 		GlStateManager.enableBlend();
 		if (textWidth == -1 || textHeight == -1)
-			parent.drawTexturedModalRect(x, y, uoffset, voffset, this.width, this.height);
+			RenderFuncs.drawModalRectWithCustomSizedTexture(x, y, uoffset, voffset, this.width, this.height, 256, 256);
 		else
-			Gui.drawModalRectWithCustomSizedTexture(x, y, uoffset, voffset, this.width, this.height, textWidth, textHeight);
+			RenderFuncs.drawModalRectWithCustomSizedTexture(x, y, uoffset, voffset, this.width, this.height, textWidth, textHeight);
 		GlStateManager.disableBlend();
 	}
 

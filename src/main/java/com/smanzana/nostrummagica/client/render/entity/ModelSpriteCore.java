@@ -4,7 +4,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntitySprite;
 
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
@@ -38,9 +38,9 @@ public class ModelSpriteCore extends ModelOBJ {
 	@Override
 	protected boolean preRender(Entity entity, int model, BufferBuilder buffer, double x, double y, double z,
 			float entityYaw, float partialTicks) {
-		GlStateManager.scale(.5, .5, .5);
-		GlStateManager.translate(0, entity.height, 0);
-		GlStateManager.rotate(-90f, 1f, 0f, 0f);
+		GlStateManager.scalef(.5, .5, .5);
+		GlStateManager.translatef(0, entity.height, 0);
+		GlStateManager.rotatef(-90f, 1f, 0f, 0f);
 		
 		if (model > 0) {
 			final int intervalsPer = 2;
@@ -74,12 +74,12 @@ public class ModelSpriteCore extends ModelOBJ {
 			}
 			
 			final float frac = 360f / 8;
-			GlStateManager.rotate(frac * (interval), 0f, 0f, 1f);
+			GlStateManager.rotatef(frac * (interval), 0f, 0f, 1f);
 		}
 		//frac = (entity.ticksExisted + partialTicks) / (20f * 10f);
-		//GlStateManager.rotate(360f * frac, 1f, 0, 0);
+		//GlStateManager.rotatef(360f * frac, 1f, 0, 0);
 		
-		GlStateManager.color(1f, 0, 0);
+		GlStateManager.color4f(1f, 0, 0);
 		
 		return true;
 	}

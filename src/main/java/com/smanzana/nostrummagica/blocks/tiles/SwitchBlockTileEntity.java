@@ -9,13 +9,13 @@ import com.smanzana.nostrummagica.world.blueprints.IOrientedTileEntity;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEntity, IOrientedTileEntity {
@@ -28,7 +28,7 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 	private SwitchBlockTileEntity.SwitchType type;
 	private BlockPos triggerOffset;
 	private boolean triggered;
-	private EntityLivingBase triggerEntity;
+	private LivingEntity triggerEntity;
 	
 	public SwitchBlockTileEntity() {
 		super();
@@ -51,21 +51,21 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 	private static final String NBT_TRIGGERED = "triggered";
 	
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt = super.writeToNBT(nbt);
 		
-		nbt.setInteger(NBT_TYPE, this.type.ordinal());
-		nbt.setLong(NBT_OFFSET, this.triggerOffset.toLong());
-		nbt.setBoolean(NBT_TRIGGERED, this.triggered);
+		nbt.putInt(NBT_TYPE, this.type.ordinal());
+		nbt.putLong(NBT_OFFSET, this.triggerOffset.toLong());
+		nbt.putBoolean(NBT_TRIGGERED, this.triggered);
 		
 		return nbt;
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(CompoundNBT nbt) {
 		super.readFromNBT(nbt);
 		
-		int ord = nbt.getInteger(NBT_TYPE);
+		int ord = nbt.getInt(NBT_TYPE);
 		for (SwitchBlockTileEntity.SwitchType type : SwitchType.values()) {
 			if (type.ordinal() == ord) {
 				this.type = type;
@@ -82,8 +82,8 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 	}
 
 	@Override
-	public NBTTagCompound getUpdateTag() {
-		return this.writeToNBT(new NBTTagCompound());
+	public CompoundNBT getUpdateTag() {
+		return this.writeToNBT(new CompoundNBT());
 	}
 	
 	@Override
@@ -122,7 +122,7 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	@Nullable
-	public EntityLivingBase getTriggerEntity() {
+	public LivingEntity getTriggerEntity() {
 		return this.triggerEntity;
 	}
 	
@@ -172,7 +172,7 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 	}
 
 	@Override
-	public void setSpawnedFromRotation(EnumFacing rotation) {
+	public void setSpawnedFromRotation(Direction rotation) {
 		this.setOffset(RoomBlueprint.applyRotation(this.getOffset(), rotation));
 	}
 }

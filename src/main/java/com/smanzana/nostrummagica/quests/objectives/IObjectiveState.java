@@ -1,10 +1,10 @@
 package com.smanzana.nostrummagica.quests.objectives;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 
 public interface IObjectiveState {
 	
-	public NBTTagCompound toNBT();
-	public void fromNBT(NBTTagCompound nbt);
+	public CompoundNBT toNBT();
+	public void fromNBT(CompoundNBT nbt);
 	
 }

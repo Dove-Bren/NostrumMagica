@@ -18,10 +18,10 @@ import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemShield;
@@ -55,8 +55,8 @@ public class MirrorShield extends ItemShield implements ISpellActionListener, IL
 		this.setMaxDamage(750);
 		
 //		this.addPropertyOverride(new ResourceLocation("blocking"), new IItemPropertyGetter() {
-//			@SideOnly(Side.CLIENT)
-//			public float apply(ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn) {
+//			@OnlyIn(Dist.CLIENT)
+//			public float apply(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
 //				return entityIn != null && entityIn.isHandActive() && entityIn.getActiveItemStack() == stack ? 1.0F : 0.0F;
 //			}
 //		});
@@ -92,7 +92,7 @@ public class MirrorShield extends ItemShield implements ISpellActionListener, IL
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
 		playerIn.setActiveHand(hand);
 		
 		NostrumMagica.playerListener.registerMagicEffect(this, null);
@@ -101,7 +101,7 @@ public class MirrorShield extends ItemShield implements ISpellActionListener, IL
 	}
 
 	@Override
-	public boolean onEvent(Event type, EntityLivingBase entity, SpellActionListenerData data) {
+	public boolean onEvent(Event type, LivingEntity entity, SpellActionListenerData data) {
 		
 		if (type == Event.MAGIC_EFFECT) {
 			if (entity.isActiveItemStackBlocking() && entity.getActiveItemStack().getItem() instanceof MirrorShield) {
@@ -151,7 +151,7 @@ public class MirrorShield extends ItemShield implements ISpellActionListener, IL
 	}
 	
 	@Override
-	public boolean isShield(ItemStack stack, @Nullable EntityLivingBase entity) {
+	public boolean isShield(ItemStack stack, @Nullable LivingEntity entity) {
 		return true;
 	}
 	

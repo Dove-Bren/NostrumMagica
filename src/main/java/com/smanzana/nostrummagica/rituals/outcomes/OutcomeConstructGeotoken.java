@@ -9,11 +9,11 @@ import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 public class OutcomeConstructGeotoken extends OutcomeSpawnItem {
@@ -26,12 +26,12 @@ public class OutcomeConstructGeotoken extends OutcomeSpawnItem {
 	}
 	
 	@Override
-	public boolean canPerform(World world, EntityPlayer player, BlockPos center, RitualMatchInfo ingredients) {
+	public boolean canPerform(World world, PlayerEntity player, BlockPos center, RitualMatchInfo ingredients) {
 		// Requires either a geogem or geotoken. Regardless of which, must contain a location!
 		if (PositionCrystal.getBlockPosition(ingredients.center) == null
 				&& PositionToken.getBlockPosition(ingredients.center) == null) {
 			if (!world.isRemote) {
-				player.sendMessage(new TextComponentTranslation("info.create_geotoken.nopos", new Object[0]));
+				player.sendMessage(new TranslationTextComponent("info.create_geotoken.nopos", new Object[0]));
 			}
 			return false;
 		}
@@ -40,7 +40,7 @@ public class OutcomeConstructGeotoken extends OutcomeSpawnItem {
 	}
 	
 	@Override
-	public void perform(World world, EntityPlayer player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, PlayerEntity player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
 		// set up stack and then call super to spawn it
 		this.stack = PositionToken.constructFrom(centerItem, tokenCount);
 		

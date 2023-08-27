@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.ForgeChunkManager.LoadingCallback;
@@ -35,10 +35,10 @@ public class NostrumChunkLoader implements LoadingCallback {
 	@Override
 	public void ticketsLoaded(List<Ticket> tickets, World world) {
 		for (Ticket ticket : tickets) {
-			NBTTagCompound nbt = ticket.getModData();
-			if (nbt.hasKey(NBT_TICKET_BASE, NBT.TAG_BYTE)
+			CompoundNBT nbt = ticket.getModData();
+			if (nbt.contains(NBT_TICKET_BASE, NBT.TAG_BYTE)
 					&& nbt.getBoolean(NBT_TICKET_BASE)
-					&& nbt.hasKey(NBT_TICKET_REGKEY, NBT.TAG_STRING))
+					&& nbt.contains(NBT_TICKET_REGKEY, NBT.TAG_STRING))
 				this.tickets.put(nbt.getString(NBT_TICKET_REGKEY), ticket);
 		}
 	}

@@ -10,7 +10,7 @@ import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.ArcaneWolfElementalType;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.Vec3d;
@@ -40,9 +40,9 @@ public class ArcaneWolfAIMysticTask extends EntityAIBase {
 				&& wolf.getElementalType() == ArcaneWolfElementalType.MYSTIC;
 	}
 	
-	protected List<EntityLivingBase> getTargets(EntityArcaneWolf wolf) {
-		EntityLivingBase owner = wolf.getOwner();
-		List<EntityLivingBase> tames = NostrumMagica.getTamedEntities(owner);
+	protected List<LivingEntity> getTargets(EntityArcaneWolf wolf) {
+		LivingEntity owner = wolf.getOwner();
+		List<LivingEntity> tames = NostrumMagica.getTamedEntities(owner);
 		tames.add(owner);
 		tames.removeIf((e) -> { return e.getDistance(wolf) > 15;});
 		return tames;
@@ -52,7 +52,7 @@ public class ArcaneWolfAIMysticTask extends EntityAIBase {
 		return effect.getPotion().isBadEffect();
 	}
 	
-	protected boolean applyTo(EntityArcaneWolf wolf, EntityLivingBase target) {
+	protected boolean applyTo(EntityArcaneWolf wolf, LivingEntity target) {
 		// Mystic removes negative status effects from allies
 		List<PotionEffect> removeList = new ArrayList<>();
 		for (PotionEffect effect : target.getActivePotionEffects()) {
@@ -71,8 +71,8 @@ public class ArcaneWolfAIMysticTask extends EntityAIBase {
 	@Override
 	public void startExecuting() {
 		boolean applied = false;
-		List<EntityLivingBase> targets = this.getTargets(wolf);
-		for (EntityLivingBase target : targets) {
+		List<LivingEntity> targets = this.getTargets(wolf);
+		for (LivingEntity target : targets) {
 			if (applyTo(wolf, target)) {
 				applied = true;
 				NostrumMagicaSounds.SHIELD_ABSORB.play(target);

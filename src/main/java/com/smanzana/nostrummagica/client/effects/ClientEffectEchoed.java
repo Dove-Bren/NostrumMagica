@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.client.effects;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.util.math.Vec3d;
 
 /**

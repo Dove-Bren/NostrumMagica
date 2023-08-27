@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.config.ModConfig;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -94,7 +94,7 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 	
 	@Override
 	protected boolean canTeleport(World worldIn, BlockPos portalPos, Entity entityIn) {
-		return entityIn instanceof EntityPlayer;
+		return entityIn instanceof PlayerEntity;
 	}
 	
 }

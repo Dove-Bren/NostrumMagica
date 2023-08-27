@@ -5,8 +5,8 @@ import com.smanzana.nostrummagica.blocks.tiles.ModificationTableEntity;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -32,15 +32,15 @@ public class ModifyMessage implements IMessage {
 			// Call 'modify' method on it
 			// boom
 			
-			int x = message.tag.getInteger(NBT_POS_X);
-			int y = message.tag.getInteger(NBT_POS_Y);
-			int z = message.tag.getInteger(NBT_POS_Z);
+			int x = message.tag.getInt(NBT_POS_X);
+			int y = message.tag.getInt(NBT_POS_Y);
+			int z = message.tag.getInt(NBT_POS_Z);
 			BlockPos pos = new BlockPos(x, y, z);
 			boolean bool = message.tag.getBoolean(NBT_VAL_B);
 			float flt = message.tag.getFloat(NBT_VAL_F);
 			
-			ctx.getServerHandler().player.getServerWorld().addScheduledTask(() -> {
-				EntityPlayer sp = ctx.getServerHandler().player;
+			ctx.getServerHandler().player.getServerWorld().runAsync(() -> {
+				PlayerEntity sp = ctx.getServerHandler().player;
 				World world = sp.world;
 				
 				// Get the TE
@@ -67,20 +67,20 @@ public class ModifyMessage implements IMessage {
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public ModifyMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	public ModifyMessage(BlockPos pos, boolean bool, float flt) {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 		
-		tag.setInteger(NBT_POS_X, pos.getX());
-		tag.setInteger(NBT_POS_Y, pos.getY());
-		tag.setInteger(NBT_POS_Z, pos.getZ());
-		tag.setBoolean(NBT_VAL_B, bool);
-		tag.setFloat(NBT_VAL_F, flt);
+		tag.putInt(NBT_POS_X, pos.getX());
+		tag.putInt(NBT_POS_Y, pos.getY());
+		tag.putInt(NBT_POS_Z, pos.getZ());
+		tag.putBoolean(NBT_VAL_B, bool);
+		tag.putFloat(NBT_VAL_F, flt);
 	}
 
 	@Override

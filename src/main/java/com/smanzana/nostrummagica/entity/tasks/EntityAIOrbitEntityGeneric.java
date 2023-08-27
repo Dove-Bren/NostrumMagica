@@ -3,11 +3,11 @@ package com.smanzana.nostrummagica.entity.tasks;
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityMoveHelper;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 
 /**
@@ -17,13 +17,13 @@ import net.minecraft.world.World;
  *
  * @param <T>
  */
-public class EntityAIOrbitEntityGeneric<T extends EntityLiving> extends EntityAIBase {
+public class EntityAIOrbitEntityGeneric<T extends MobEntity> extends EntityAIBase {
 	
 	private static final double DEFAULT_WOBBLE = 5 * 20;
 	private static final int DEFAULT_BUMPS = 1;
 	
 	protected final T ent;
-	protected EntityLivingBase orbitTarget;
+	protected LivingEntity orbitTarget;
 	protected World theWorld;
 	protected final double orbitDistance;
 	protected final double assembleSpeed;
@@ -37,11 +37,11 @@ public class EntityAIOrbitEntityGeneric<T extends EntityLiving> extends EntityAI
 	private double offsetYaw;
 	private final MutableVec3d cursor;
 
-	public EntityAIOrbitEntityGeneric(T orbiter, EntityLivingBase target, double orbitDistance, double orbitPeriod) {
+	public EntityAIOrbitEntityGeneric(T orbiter, LivingEntity target, double orbitDistance, double orbitPeriod) {
 		this(orbiter, target, orbitDistance, orbitPeriod, 1.0, DEFAULT_WOBBLE, DEFAULT_BUMPS, null, null);
 	}
 	
-	public EntityAIOrbitEntityGeneric(T orbiter, EntityLivingBase target, double orbitDistance, double orbitPeriod, double assembleSpeed,
+	public EntityAIOrbitEntityGeneric(T orbiter, LivingEntity target, double orbitDistance, double orbitPeriod, double assembleSpeed,
 			double ringWobbleSpeed, int ringWobbleBumps, Predicate<? super T> startFilter, Predicate<? super T> continueFilter) {
 		this.ent = orbiter;
 		this.theWorld = orbiter.world;
@@ -60,7 +60,7 @@ public class EntityAIOrbitEntityGeneric<T extends EntityLiving> extends EntityAI
 		this.setMutexBits(4);
 	}
 	
-	protected EntityLivingBase getOrbitTarget() {
+	protected LivingEntity getOrbitTarget() {
 		return this.orbitTarget;
 	}
 
@@ -68,11 +68,11 @@ public class EntityAIOrbitEntityGeneric<T extends EntityLiving> extends EntityAI
 	 * Returns whether the EntityAIBase should begin execution.
 	 */
 	public boolean shouldExecute() {
-		EntityLivingBase entitylivingbase = this.getOrbitTarget();
+		LivingEntity entitylivingbase = this.getOrbitTarget();
 
 		if (entitylivingbase == null) {
 			return false;
-		} else if (entitylivingbase instanceof EntityPlayer && ((EntityPlayer)entitylivingbase).isSpectator()) {
+		} else if (entitylivingbase instanceof PlayerEntity && ((PlayerEntity)entitylivingbase).isSpectator()) {
 			return false;
 //		} else if (this.ent.getMoveHelper().isUpdating()
 //				&& ent.getDistanceSq(ent.getMoveHelper().getX(), ent.getMoveHelper().getY(), ent.getMoveHelper().getZ()) > 1.0) {

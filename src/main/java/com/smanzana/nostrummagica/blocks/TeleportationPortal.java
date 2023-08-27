@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
@@ -81,8 +81,8 @@ public class TeleportationPortal extends NostrumPortal implements ITileEntityPro
 					entityIn.lastTickPosY = entityIn.prevPosY = target.getY() + .1;
 					entityIn.lastTickPosZ = entityIn.prevPosZ = target.getZ() + .5;
 					if (!worldIn.isRemote) {
-						if (entityIn instanceof EntityPlayerMP) {
-							((EntityPlayerMP) entityIn).connection.setPlayerLocation(target.getX() + .5, target.getY() + .1, target.getZ() + .5, entityIn.rotationYaw, entityIn.rotationPitch);
+						if (entityIn instanceof ServerPlayerEntity) {
+							((ServerPlayerEntity) entityIn).connection.setPlayerLocation(target.getX() + .5, target.getY() + .1, target.getZ() + .5, entityIn.rotationYaw, entityIn.rotationPitch);
 						} else {
 							entityIn.setPositionAndUpdate(target.getX() + .5, target.getY() + .1, target.getZ() + .5);
 						}

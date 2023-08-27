@@ -3,9 +3,9 @@ package com.smanzana.nostrummagica.command;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.common.DimensionManager;
 
 public class CommandSetDimension extends CommandBase {
@@ -28,8 +28,8 @@ public class CommandSetDimension extends CommandBase {
 			dimension = Integer.parseInt(args[0]);
 		}
 		
-		if (sender instanceof EntityPlayer) {
-			EntityPlayer player = (EntityPlayer) sender;
+		if (sender instanceof PlayerEntity) {
+			PlayerEntity player = (PlayerEntity) sender;
 			
 			if (player.isCreative()) {
 				if (DimensionManager.isDimensionRegistered(dimension)) {
@@ -37,10 +37,10 @@ public class CommandSetDimension extends CommandBase {
 					player.setPortal(player.getPosition());
 					player.changeDimension(dimension);
 				} else {
-					sender.sendMessage(new TextComponentString("That dimension doesn't seem to exist!"));
+					sender.sendMessage(new StringTextComponent("That dimension doesn't seem to exist!"));
 				}
 			} else {
-				sender.sendMessage(new TextComponentString("You must be in creative to execute this command!"));
+				sender.sendMessage(new StringTextComponent("You must be in creative to execute this command!"));
 			}
 		}
 	}

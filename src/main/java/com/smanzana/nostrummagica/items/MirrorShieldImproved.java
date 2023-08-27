@@ -10,19 +10,19 @@ import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
 import com.smanzana.nostrummagica.listeners.PlayerListener.SpellActionListenerData;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 // Dumb name to keep it sorted. Worth?
 public class MirrorShieldImproved extends MirrorShield {
@@ -47,8 +47,8 @@ public class MirrorShieldImproved extends MirrorShield {
 		this.setMaxDamage(1250);
 		
 		this.addPropertyOverride(new ResourceLocation("charged"), new IItemPropertyGetter() {
-			@SideOnly(Side.CLIENT)
-			public float apply(ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn) {
+			@OnlyIn(Dist.CLIENT)
+			public float apply(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
 				return getBlockCharged(stack) ? 1.0F : 0.0F;
 			}
 		});
@@ -71,12 +71,12 @@ public class MirrorShieldImproved extends MirrorShield {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
 		return super.onItemRightClick(worldIn, playerIn, hand);
 	}
 
 	@Override
-	public boolean onEvent(Event type, EntityLivingBase entity, SpellActionListenerData data) {
+	public boolean onEvent(Event type, LivingEntity entity, SpellActionListenerData data) {
 		
 		if (type == Event.MAGIC_EFFECT) {
 			if (entity.isActiveItemStackBlocking() && entity.getActiveItemStack().getItem() instanceof MirrorShieldImproved) {
@@ -133,8 +133,8 @@ public class MirrorShieldImproved extends MirrorShield {
 			return false;
 		}
 		
-		NBTTagCompound nbt = stack.getTagCompound();
-		if (nbt != null && nbt.hasKey(NBT_CHARGED)) {
+		CompoundNBT nbt = stack.getTagCompound();
+		if (nbt != null && nbt.contains(NBT_CHARGED)) {
 			return nbt.getBoolean(NBT_CHARGED);
 		}
 		
@@ -146,12 +146,12 @@ public class MirrorShieldImproved extends MirrorShield {
 			return;
 		}
 		
-		NBTTagCompound nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTagCompound();
 		if (nbt == null) {
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		}
 		
-		nbt.setBoolean(NBT_CHARGED, charged);
+		nbt.putBoolean(NBT_CHARGED, charged);
 		stack.setTagCompound(nbt);
 	}
 

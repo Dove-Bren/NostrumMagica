@@ -18,7 +18,7 @@ import net.minecraft.block.BlockLadder;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockTorch;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -46,7 +46,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 		}
 		
 		@SuppressWarnings("deprecation")
-		public void set(World world, BlockPos pos, EnumFacing rotation) {
+		public void set(World world, BlockPos pos, Direction rotation) {
 			IBlockState state;
 			if (actualState != null) {
 				state = actualState;
@@ -55,26 +55,26 @@ public abstract class StaticRoom implements IDungeonRoom {
 			}
 			
 			if (block instanceof BlockHorizontal) {
-				EnumFacing cur = state.getValue(BlockHorizontal.FACING);
+				Direction cur = state.getValue(BlockHorizontal.FACING);
 				cur = rotate(cur, rotation);
 				state = state.withProperty(BlockHorizontal.FACING, cur);
 			} else if (block instanceof BlockTorch) {
-				EnumFacing cur = state.getValue(BlockTorch.FACING);
+				Direction cur = state.getValue(BlockTorch.FACING);
 				cur = rotate(cur, rotation);
 				state = state.withProperty(BlockTorch.FACING, cur);
 			} else if (block instanceof BlockLadder) {
-				EnumFacing cur = state.getValue(BlockLadder.FACING);
+				Direction cur = state.getValue(BlockLadder.FACING);
 				cur = rotate(cur, rotation);
 				state = state.withProperty(BlockLadder.FACING, cur);
 			} else if (block instanceof BlockStairs) {
-				EnumFacing cur = state.getValue(BlockStairs.FACING);
+				Direction cur = state.getValue(BlockStairs.FACING);
 				cur = rotate(cur, rotation);
 				state = state.withProperty(BlockStairs.FACING, cur);
 			}
 			world.setBlockState(pos, state);
 		}
 		
-		private static EnumFacing rotate(EnumFacing in, EnumFacing rotation) {
+		private static Direction rotate(Direction in, Direction rotation) {
 			int count;
 			switch (rotation) {
 			case NORTH:

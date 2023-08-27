@@ -13,12 +13,12 @@ import com.smanzana.nostrummagica.spells.Spell.SpellPart;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.gui.screen.Screen;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-public class ScrollScreen extends GuiScreen {
+public class ScrollScreen extends Screen {
 
 	protected static final ResourceLocation background = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/container/scrollback.png");
 	
@@ -65,12 +65,12 @@ public class ScrollScreen extends GuiScreen {
 	}
 	
 	@Override	
-	public void updateScreen() {
+	public void tick() {
 		;
 	}
 	
 	@Override
-	public void drawScreen(int parWidth, int parHeight, float p_73863_3_) {
+	public void render(int parWidth, int parHeight, float p_73863_3_) {
 		
 		final int leftOffset = (this.width - TEXT_BACK_WIDTH) / 2; //distance from left
 		final int topOffset = (this.height - TEXT_BACK_HEIGHT) / 2;
@@ -80,34 +80,34 @@ public class ScrollScreen extends GuiScreen {
 		final int listYOffset = 90;
 		final int listXOffset = 30;
 		
-		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-		Minecraft.getMinecraft().getTextureManager().bindTexture(background);
+		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+		Minecraft.getInstance().getTextureManager().bindTexture(background);
 		
 		Gui.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
 		
-		final int nameWidth = this.fontRenderer.getStringWidth(this.name);
-		this.fontRenderer.drawString(this.name, leftOffset + (TEXT_BACK_WIDTH / 2) - (nameWidth / 2), topOffset + titleYOffset, color);
+		final int nameWidth = this.font.getStringWidth(this.name);
+		this.font.drawString(this.name, leftOffset + (TEXT_BACK_WIDTH / 2) - (nameWidth / 2), topOffset + titleYOffset, color);
 		
 		if (this.icon != null) {
 			final int iconLen = 32;
 			final int left = leftOffset + ((TEXT_BACK_WIDTH - iconLen) / 2);
-			Gui.drawRect(left - 2, iconYOffset - 2, left + iconLen + 2, iconYOffset + iconLen + 2, 0xFF000000);
-			Gui.drawRect(left, iconYOffset, left + iconLen, iconYOffset + iconLen, 0xFFE2DDCC);
-			GlStateManager.color(1f, 1f, 1f, 1f);
-			icon.render(Minecraft.getMinecraft(), left, iconYOffset, iconLen, iconLen);
+			RenderFuncs.drawRect(left - 2, iconYOffset - 2, left + iconLen + 2, iconYOffset + iconLen + 2, 0xFF000000);
+			RenderFuncs.drawRect(left, iconYOffset, left + iconLen, iconYOffset + iconLen, 0xFFE2DDCC);
+			GlStateManager.color4f(1f, 1f, 1f, 1f);
+			icon.render(Minecraft.getInstance(), left, iconYOffset, iconLen, iconLen);
 		}
 		
 		int i = 0;
 		for (String line : this.components) {
-			this.fontRenderer.drawString(line, leftOffset + listXOffset, 10 + topOffset + listYOffset + (i * this.fontRenderer.FONT_HEIGHT + 2), 0xFF000000);
+			this.font.drawString(line, leftOffset + listXOffset, 10 + topOffset + listYOffset + (i * this.font.FONT_HEIGHT + 2), 0xFF000000);
 			i++;
 		}
 		
-		super.drawScreen(parWidth, parHeight, p_73863_3_);
+		super.render(parWidth, parHeight, p_73863_3_);
 	}
 	
 	@Override
-	public boolean doesGuiPauseGame() {
+	public boolean isPauseScreen() {
 		return true;
 	}
 }

@@ -4,15 +4,15 @@ import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 // From made from loading a model and rendering it
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class ClientEffectFormBasic implements ClientEffectForm {
 	
 	private IBakedModel model;
@@ -28,7 +28,7 @@ public class ClientEffectFormBasic implements ClientEffectForm {
 		else
 			this.offset = null;
 		
-		BlockRendererDispatcher renderer = Minecraft.getMinecraft().getBlockRendererDispatcher();
+		BlockRendererDispatcher renderer = Minecraft.getInstance().getBlockRendererDispatcher();
 		
 		this.model = renderer.getBlockModelShapes().getModelManager()
 				.getModel(new ModelResourceLocation(
@@ -42,7 +42,7 @@ public class ClientEffectFormBasic implements ClientEffectForm {
 	@Override
 	public void draw(Minecraft mc, float partialTicks, int color) {
 		if (this.offset != null) {
-			GlStateManager.translate(offset.x, offset.y, offset.z);
+			GlStateManager.translatef(offset.x, offset.y, offset.z);
 		}
 		
 		GlStateManager.enableBlend();

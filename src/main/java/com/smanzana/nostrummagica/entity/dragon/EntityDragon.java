@@ -14,24 +14,24 @@ import com.smanzana.nostrummagica.utils.NonNullEnumMap;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityMoveHelper;
 import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.pathfinding.NodeProcessor;
 import net.minecraft.pathfinding.PathFinder;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.pathfinding.PathPoint;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -51,15 +51,15 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
     }
 	
 	protected void setSize(float width, float length, float height) {
-		if (width != this.width || height != this.height) {
-			float f = this.width;
-			this.width = width;
-			this.height = height;
-			AxisAlignedBB axisalignedbb = this.getEntityBoundingBox();
-			this.setEntityBoundingBox(new AxisAlignedBB(axisalignedbb.minX, axisalignedbb.minY, axisalignedbb.minZ, axisalignedbb.minX + (double)this.width, axisalignedbb.minY + (double)this.height, axisalignedbb.minZ + (double)length));
+		if (width != this.getWidth || height != this.getHeight()) {
+			float f = this.getWidth;
+			this.getWidth = width;
+			this.getHeight() = height;
+			AxisAlignedBB axisalignedbb = this.getBoundingBox();
+			this.setEntityBoundingBox(new AxisAlignedBB(axisalignedbb.minX, axisalignedbb.minY, axisalignedbb.minZ, axisalignedbb.minX + (double)this.getWidth, axisalignedbb.minY + (double)this.getHeight(), axisalignedbb.minZ + (double)length));
 
-			if (this.width > f && !this.firstUpdate && !this.world.isRemote) {
-				this.move(MoverType.SELF, (double)(f - this.width), 0.0D, (double)(f - length));
+			if (this.getWidth > f && !this.firstUpdate && !this.world.isRemote) {
+				this.move(MoverType.SELF, (double)(f - this.getWidth), 0.0D, (double)(f - length));
 			}
 		}
 	}
@@ -68,8 +68,8 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 	 * TODO: Make a 'FlyingDragon' abstract class. Move bite and slash data things to this class.
 	 * Rething how to diversify.
 	 */
-	public abstract void slash(EntityLivingBase target);
-	public abstract void bite(EntityLivingBase target);
+	public abstract void slash(LivingEntity target);
+	public abstract void bite(LivingEntity target);
 	
 	public void dragonJump() {
 		; // Default, do nothing
@@ -102,15 +102,15 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 
     public float getEyeHeight()
     {
-        return this.height * 0.95F;
+        return this.getHeight() * 0.95F;
     }
 
     @Override
-    public boolean processInteract(EntityPlayer player, EnumHand hand) {
+    public boolean processInteract(PlayerEntity player, EnumHand hand) {
         return false;
     }
 
-    public boolean canBeLeashedTo(EntityPlayer player)
+    public boolean canBeLeashedTo(PlayerEntity player)
     {
         return false;
     }
@@ -212,9 +212,9 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
                 } else {
                 	float speed = (float) this.parentEntity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
                 	speed *= 3f;
-	                this.parentEntity.motionX = (d0 / d3) * speed;
-	                this.parentEntity.motionY = (d1 / d3) * speed;
-	                this.parentEntity.motionZ = (d2 / d3) * speed;
+	                this.parentEntity.getMotion().x = (d0 / d3) * speed;
+	                this.parentEntity.getMotion().y = (d1 / d3) * speed;
+	                this.parentEntity.getMotion().z = (d2 / d3) * speed;
 	                
 	                lastDist = d3;
 	                
@@ -229,7 +229,7 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 	{
 	    public PathPoint getStart()
 	    {
-	        return this.openPoint(MathHelper.floor(this.entity.getEntityBoundingBox().minX), MathHelper.floor(this.entity.getEntityBoundingBox().minY + 0.5D), MathHelper.floor(this.entity.getEntityBoundingBox().minZ));
+	        return this.openPoint(MathHelper.floor(this.entity.getBoundingBox().minX), MathHelper.floor(this.entity.getBoundingBox().minY + 0.5D), MathHelper.floor(this.entity.getBoundingBox().minZ));
 	    }
 
 	    /**
@@ -237,14 +237,14 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 	     */
 	    public PathPoint getPathPointToCoords(double x, double y, double z)
 	    {
-	        return this.openPoint(MathHelper.floor(x - (double)(this.entity.width / 2.0F)), MathHelper.floor(y + 0.5D), MathHelper.floor(z - (double)(this.entity.width / 2.0F)));
+	        return this.openPoint(MathHelper.floor(x - (double)(this.entity.getWidth / 2.0F)), MathHelper.floor(y + 0.5D), MathHelper.floor(z - (double)(this.entity.getWidth / 2.0F)));
 	    }
 
 	    public int findPathOptions(PathPoint[] pathOptions, PathPoint currentPoint, PathPoint targetPoint, float maxDistance)
 	    {
 	        int i = 0;
 
-	        for (EnumFacing enumfacing : EnumFacing.values())
+	        for (Direction enumfacing : Direction.values())
 	        {
 	            PathPoint pathpoint = this.getAirNode(currentPoint.x + enumfacing.getFrontOffsetX(), currentPoint.y + enumfacing.getFrontOffsetY(), currentPoint.z + enumfacing.getFrontOffsetZ());
 
@@ -257,7 +257,7 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 	        return i;
 	    }
 
-	    public PathNodeType getPathNodeType(IBlockAccess blockaccessIn, int x, int y, int z, EntityLiving entitylivingIn, int xSize, int ySize, int zSize, boolean canBreakDoorsIn, boolean canEnterDoorsIn)
+	    public PathNodeType getPathNodeType(IBlockAccess blockaccessIn, int x, int y, int z, MobEntity entitylivingIn, int xSize, int ySize, int zSize, boolean canBreakDoorsIn, boolean canEnterDoorsIn)
 	    {
 	        return PathNodeType.OPEN;
 	    }
@@ -300,7 +300,7 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 	
 	static public class PathNavigateDragonFlier extends PathNavigate
 	{
-	    public PathNavigateDragonFlier(EntityLiving entitylivingIn, World worldIn)
+	    public PathNavigateDragonFlier(MobEntity entitylivingIn, World worldIn)
 	    {
 	        super(entitylivingIn, worldIn);
 	    }
@@ -320,13 +320,13 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 	
 	    protected Vec3d getEntityPosition()
 	    {
-	        return new Vec3d(this.entity.posX, this.entity.posY + (double)this.entity.height * 0.5D, this.entity.posZ);
+	        return new Vec3d(this.entity.posX, this.entity.posY + (double)this.entity.getHeight() * 0.5D, this.entity.posZ);
 	    }
 	
 	    protected void pathFollow()
 	    {
 	        Vec3d vec3d = this.getEntityPosition();
-	        float f = this.entity.width * this.entity.width;
+	        float f = this.entity.getWidth * this.entity.getWidth;
 	
 	        if (vec3d.squareDistanceTo(this.currentPath.getVectorFromIndex(this.entity, this.currentPath.getCurrentPathIndex())) < (double)f)
 	        {
@@ -360,7 +360,7 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 	     */
 	    protected boolean isDirectPathBetweenPoints(Vec3d posVec31, Vec3d posVec32, int sizeX, int sizeY, int sizeZ)
 	    {
-	        RayTraceResult raytraceresult = this.world.rayTraceBlocks(posVec31, new Vec3d(posVec32.x, posVec32.y + (double)this.entity.height * 0.5D, posVec32.z), false, true, false);
+	        RayTraceResult raytraceresult = this.world.rayTraceBlocks(posVec31, new Vec3d(posVec32.x, posVec32.y + (double)this.entity.getHeight() * 0.5D, posVec32.z), false, true, false);
 	        return raytraceresult == null || raytraceresult.typeOfHit == RayTraceResult.Type.MISS;
 	    }
 	
@@ -424,36 +424,36 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 			}
 		}
 		
-		public NBTTagCompound serializeNBT() {
-			NBTTagCompound tag = new NBTTagCompound();
+		public CompoundNBT serializeNBT() {
+			CompoundNBT tag = new CompoundNBT();
 			writeToNBT(tag);
 			return tag;
 		}
 		
-		public void writeToNBT(NBTTagCompound nbt) {
-			NBTTagList list = new NBTTagList();
+		public void writeToNBT(CompoundNBT nbt) {
+			ListNBT list = new ListNBT();
 			for (DragonEquipmentSlot slot : DragonEquipmentSlot.values()) {
 				@Nonnull ItemStack stack = getStackInSlot(slot);
 				if (!stack.isEmpty()) {
-					NBTTagCompound wrapper = new NBTTagCompound();
-					wrapper.setString(NBT_SLOT, slot.name().toLowerCase());
-					wrapper.setTag(NBT_ITEM, stack.serializeNBT());
-					list.appendTag(wrapper);
+					CompoundNBT wrapper = new CompoundNBT();
+					wrapper.putString(NBT_SLOT, slot.name().toLowerCase());
+					wrapper.put(NBT_ITEM, stack.serializeNBT());
+					list.add(wrapper);
 				}
 			}
 			
-			nbt.setTag(NBT_LIST, list);
+			nbt.put(NBT_LIST, list);
 		}
 		
-		public void readFromNBT(NBTTagCompound nbt) {
+		public void readFromNBT(CompoundNBT nbt) {
 			this.clear();
 			
-			NBTTagList list = nbt.getTagList(NBT_LIST, NBT.TAG_COMPOUND);
-			for (int i = 0; i < list.tagCount(); i++) {
-				NBTTagCompound wrapper = list.getCompoundTagAt(i);
+			ListNBT list = nbt.getList(NBT_LIST, NBT.TAG_COMPOUND);
+			for (int i = 0; i < list.size(); i++) {
+				CompoundNBT wrapper = list.getCompoundTagAt(i);
 				try {
 					DragonEquipmentSlot slot = DragonEquipmentSlot.valueOf(wrapper.getString(NBT_SLOT).toUpperCase());
-					ItemStack stack = new ItemStack(wrapper.getCompoundTag(NBT_ITEM));
+					ItemStack stack = new ItemStack(wrapper.getCompound(NBT_ITEM));
 					//this.setStackInSlot(slot, stack); Don't want to send updates to listener for each item
 					slots.put(slot, stack);
 				} catch (Exception e) {
@@ -466,7 +466,7 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 			}
 		}
 		
-		public static DragonEquipmentInventory FromNBT(NBTTagCompound nbt) {
+		public static DragonEquipmentInventory FromNBT(CompoundNBT nbt) {
 			DragonEquipmentInventory inventory = new DragonEquipmentInventory();
 			inventory.readFromNBT(nbt);
 			return inventory;
@@ -538,17 +538,17 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 		}
 
 		@Override
-		public boolean isUsableByPlayer(EntityPlayer player) {
+		public boolean isUsableByPlayer(PlayerEntity player) {
 			return true;
 		}
 
 		@Override
-		public void openInventory(EntityPlayer player) {
+		public void openInventory(PlayerEntity player) {
 			;
 		}
 
 		@Override
-		public void closeInventory(EntityPlayer player) {
+		public void closeInventory(PlayerEntity player) {
 			;
 		}
 

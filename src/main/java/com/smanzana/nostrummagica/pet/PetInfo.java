@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.pet;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 
 public class PetInfo {
 	
@@ -253,7 +253,7 @@ public class PetInfo {
 		}
 	}
 	
-	public static PetInfo Wrap(EntityLivingBase entity) {
+	public static PetInfo Wrap(LivingEntity entity) {
 		return claim(entity.getHealth(), entity.getMaxHealth());
 	}
 	

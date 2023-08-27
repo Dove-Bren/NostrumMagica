@@ -35,11 +35,11 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 
 public abstract class InfoScreenTab {
 	private static InfoScreenTab PERSONAL;
@@ -78,11 +78,11 @@ public abstract class InfoScreenTab {
 			}
 
 			@Override
-			public List<InfoButton> getButtons(int offset, INostrumMagic attr) {
+			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
 				List<ILoreTagged> lore = getAvailable(attr);
 				List<InfoButton> buttons = new LinkedList<>();
 				for (ILoreTagged tag : lore) {
-					InfoButton button = new LoreInfoButton(offset++, tag);
+					InfoButton button = new LoreInfoButton(screen, tag);
 					buttons.add(button);
 					index(ILoreTagged.GetInfoKey(tag), button);
 				}
@@ -92,7 +92,7 @@ public abstract class InfoScreenTab {
 		};
 		
 		INFO_BLOCKS = new InfoScreenTab(InfoScreenTabs.INFO_BLOCKS,
-				new ItemStack(Item.getItemFromBlock(Blocks.GRASS_BLOCK))) {
+				new ItemStack(Blocks.GRASS_BLOCK.asItem())) {
 
 			private List<ILoreTagged> getAvailable(INostrumMagic attr) {
 				List<ILoreTagged> list = new LinkedList<>();
@@ -111,11 +111,11 @@ public abstract class InfoScreenTab {
 			}
 
 			@Override
-			public List<InfoButton> getButtons(int offset, INostrumMagic attr) {
+			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
 				List<ILoreTagged> lore = getAvailable(attr);
 				List<InfoButton> buttons = new LinkedList<>();
 				for (ILoreTagged tag : lore) {
-					InfoButton button = new LoreInfoButton(offset++, tag);
+					InfoButton button = new LoreInfoButton(screen, tag);
 					buttons.add(button);
 					index(ILoreTagged.GetInfoKey(tag), button);
 				}
@@ -144,11 +144,11 @@ public abstract class InfoScreenTab {
 			}
 
 			@Override
-			public List<InfoButton> getButtons(int offset, INostrumMagic attr) {
+			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
 				List<ILoreTagged> lore = getAvailable(attr);
 				List<InfoButton> buttons = new LinkedList<>();
 				for (ILoreTagged tag : lore) {
-					InfoButton button = new LoreInfoButton(offset++, tag);
+					InfoButton button = new LoreInfoButton(screen, tag);
 					buttons.add(button);
 					index(ILoreTagged.GetInfoKey(tag), button);
 				}
@@ -177,11 +177,11 @@ public abstract class InfoScreenTab {
 			}
 
 			@Override
-			public List<InfoButton> getButtons(int offset, INostrumMagic attr) {
+			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
 				List<ILoreTagged> lore = getAvailable(attr);
 				List<InfoButton> buttons = new LinkedList<>();
 				for (ILoreTagged tag : lore) {
-					InfoButton button = new LoreInfoButton(offset++, tag);
+					InfoButton button = new LoreInfoButton(screen, tag);
 					buttons.add(button);
 					index(ILoreTagged.GetInfoKey(tag), button);
 				}
@@ -191,7 +191,7 @@ public abstract class InfoScreenTab {
 		};
 		
 		INFO_ENTITY = new InfoScreenTab(InfoScreenTabs.INFO_ENTITY,
-				new ItemStack(Items.SKULL)) {
+				new ItemStack(Items.SKELETON_SKULL)) {
 
 			private List<ILoreTagged> getAvailable(INostrumMagic attr) {
 				List<ILoreTagged> list = new LinkedList<>();
@@ -210,11 +210,11 @@ public abstract class InfoScreenTab {
 			}
 
 			@Override
-			public List<InfoButton> getButtons(int offset, INostrumMagic attr) {
+			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
 				List<ILoreTagged> lore = getAvailable(attr);
 				List<InfoButton> buttons = new LinkedList<>();
 				for (ILoreTagged tag : lore) {
-					InfoButton button = new LoreInfoButton(offset++, tag);
+					InfoButton button = new LoreInfoButton(screen, tag);
 					buttons.add(button);
 					index(ILoreTagged.GetInfoKey(tag), button);
 				}
@@ -243,11 +243,11 @@ public abstract class InfoScreenTab {
 			}
 
 			@Override
-			public List<InfoButton> getButtons(int offset, INostrumMagic attr) {
+			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
 				List<ILoreTagged> lore = getAvailable(attr);
 				List<InfoButton> buttons = new LinkedList<>();
 				for (ILoreTagged tag : lore) {
-					InfoButton button = new LoreInfoButton(offset++, tag);
+					InfoButton button = new LoreInfoButton(screen, tag);
 					buttons.add(button);
 					index(ILoreTagged.GetInfoKey(tag), button);
 				}
@@ -262,7 +262,7 @@ public abstract class InfoScreenTab {
 			private List<RitualRecipe> getAvailable(INostrumMagic attr) {
 				List<RitualRecipe> list = new LinkedList<>();
 				for (RitualRecipe ritual : RitualRegistry.instance().getRegisteredRituals()) {
-					if (ritual.getRequirement() == null || ritual.getRequirement().matches(Minecraft.getMinecraft().player, attr))
+					if (ritual.getRequirement() == null || ritual.getRequirement().matches(Minecraft.getInstance().player, attr))
 						list.add(ritual);
 				}
 				
@@ -275,11 +275,11 @@ public abstract class InfoScreenTab {
 			}
 
 			@Override
-			public List<InfoButton> getButtons(int offset, INostrumMagic attr) {
+			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
 				List<RitualRecipe> rituals = getAvailable(attr);
 				List<InfoButton> buttons = new LinkedList<>();
 				for (RitualRecipe tag : rituals) {
-					RitualInfoButton button = new RitualInfoButton(offset++, tag);
+					RitualInfoButton button = new RitualInfoButton(screen, tag);
 					buttons.add(button);
 					index(tag.getInfoScreenKey(), button);
 				}
@@ -289,7 +289,7 @@ public abstract class InfoScreenTab {
 		};
 		
 		PERSONAL = new InfoScreenTab(InfoScreenTabs.PERSONAL,
-				new ItemStack(Items.SKULL, 1, 3)) {
+				new ItemStack(Items.PLAYER_HEAD, 1)) {
 
 			@Override
 			public boolean isVisible(INostrumMagic attr) {
@@ -297,24 +297,24 @@ public abstract class InfoScreenTab {
 			}
 
 			@Override
-			public List<InfoButton> getButtons(int offset, INostrumMagic attr) {
+			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
 				List<InfoButton> buttons = new LinkedList<>();
 				
-				buttons.add(new SubscreenInfoButton(offset++, "discovery",
+				buttons.add(new SubscreenInfoButton(screen, "discovery",
 						new PersonalSubScreen.PersonalDiscoveryScreen(attr),
 						new ItemStack(SpellTome.instance())));
 				
 				if (attr.isUnlocked()) {
 					
-					buttons.add(new SubscreenInfoButton(offset++, "stats",
+					buttons.add(new SubscreenInfoButton(screen, "stats",
 							new PersonalSubScreen.PersonalStatsScreen(attr),
 							new ItemStack(SpellTomePage.instance())));
 					
-					buttons.add(new SubscreenInfoButton(offset++, "growth",
+					buttons.add(new SubscreenInfoButton(screen, "growth",
 							new PersonalSubScreen.PersonalGrowthScreen(attr),
 							new ItemStack(Items.COMPASS)));
 					
-					buttons.add(new SubscreenInfoButton(offset++, "exploration",
+					buttons.add(new SubscreenInfoButton(screen, "exploration",
 							new PersonalSubScreen.PersonalExplorationScreen(attr),
 							new ItemStack(Items.MAP)));
 				}
@@ -333,100 +333,100 @@ public abstract class InfoScreenTab {
 			}
 
 			@Override
-			public List<InfoButton> getButtons(int offset, INostrumMagic attr) {
+			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
 				List<InfoButton> buttons = new LinkedList<>();
 				InfoButton button;
 				
-				button = new SubscreenInfoButton(offset++, "shrines",
+				button = new SubscreenInfoButton(screen, "shrines",
 						new PaginatedInfoSubScreen("shrines"),
 						new ItemStack(MirrorItem.instance()));
 				buttons.add(button);
 				index("builtin::guides::shrines", button);
 				
-				button = new SubscreenInfoButton(offset++, "spells",
+				button = new SubscreenInfoButton(screen, "spells",
 						new PaginatedInfoSubScreen("spells"),
 						new ItemStack(SpellScroll.instance()));
 				buttons.add(button);
 				index("builtin::guides::spells", button);
 				
-				button = new SubscreenInfoButton(offset++, "trigger",
+				button = new SubscreenInfoButton(screen, "trigger",
 						new PaginatedInfoSubScreen("trigger"),
 						SpellRune.getRune(SelfTrigger.instance()));
 				buttons.add(button);
 				index("builtin::guides::trigger", button);
 				
-				button = new SubscreenInfoButton(offset++, "shape",
+				button = new SubscreenInfoButton(screen, "shape",
 						new PaginatedInfoSubScreen("shape"),
 						SpellRune.getRune(SingleShape.instance()));
 				buttons.add(button);
 				index("builtin::guides::shape", button);
 				
-				button = new SubscreenInfoButton(offset++, "element",
+				button = new SubscreenInfoButton(screen, "element",
 						new PaginatedInfoSubScreen("element"),
 						SpellRune.getRune(EMagicElement.FIRE, 1));
 				buttons.add(button);
 				index("builtin::guides::element", button);
 				
-				button = new SubscreenInfoButton(offset++, "alteration",
+				button = new SubscreenInfoButton(screen, "alteration",
 						new PaginatedInfoSubScreen("alteration"),
 						SpellRune.getRune(EAlteration.INFLICT));
 				buttons.add(button);
 				index("builtin::guides::alteration", button);
 				
-				button = new SubscreenInfoButton(offset++, "spellmaking",
+				button = new SubscreenInfoButton(screen, "spellmaking",
 						new PaginatedInfoSubScreen("spellmaking"),
 						new ItemStack(BlankScroll.instance()));
 				buttons.add(button);
 				index("builtin::guides::spellmaking", button);
 				
 				if (attr.getCompletedResearches().contains("spelltomes")) {
-					button = new SubscreenInfoButton(offset++, "spellbinding",
+					button = new SubscreenInfoButton(screen, "spellbinding",
 							new PaginatedInfoSubScreen("spellbinding"),
 							new ItemStack(Items.WRITABLE_BOOK));
 					buttons.add(button);
 					index("builtin::guides::spellbinding", button);
 					
-					button = new SubscreenInfoButton(offset++, "tomes",
+					button = new SubscreenInfoButton(screen, "tomes",
 							new PaginatedInfoSubScreen("tomes"),
 							new ItemStack(SpellTome.instance(), 1, 4));
 					buttons.add(button);
 					index("builtin::guides::tomes", button);
 				}
 				
-				button = new SubscreenInfoButton(offset++, "levelup",
+				button = new SubscreenInfoButton(screen, "levelup",
 						new PaginatedInfoSubScreen("levelup"),
 						new ItemStack(Items.SKULL, 1, 3));
 				buttons.add(button);
 				index("builtin::guides::levelup", button);
 				
 				if (attr.getCompletedResearches().contains("rituals")) {
-					button = new SubscreenInfoButton(offset++, "rituals",
+					button = new SubscreenInfoButton(screen, "rituals",
 							new PaginatedInfoSubScreen("rituals"),
 							new ItemStack(AltarItem.instance()));
 					buttons.add(button);
 					index("builtin::guides::rituals", button);
 				}
 				
-				button = new SubscreenInfoButton(offset++, "modification",
+				button = new SubscreenInfoButton(screen, "modification",
 						new PaginatedInfoSubScreen("modification"),
 						new ItemStack(ModificationTable.instance()));
 				buttons.add(button);
 				index("builtin::guides::modification", button);
 				
-				button = new SubscreenInfoButton(offset++, "elementdamage",
+				button = new SubscreenInfoButton(screen, "elementdamage",
 						new PaginatedInfoSubScreen("elementdamage"),
 						new ItemStack(Items.DIAMOND_SWORD));
 				buttons.add(button);
 				index("builtin::guides::elementdamage", button);
 				
-				button = new SubscreenInfoButton(offset++, "reagents",
+				button = new SubscreenInfoButton(screen, "reagents",
 						new PaginatedInfoSubScreen("reagents"),
 						ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1));
 				buttons.add(button);
 				index("builtin::guides::reagents", button);
 				
 				if (attr.getCompletedResearches().contains("obelisks")) {
-					button = new SubscreenInfoButton(offset++, "obelisks",
+					button = new SubscreenInfoButton(screen, "obelisks",
 							new PaginatedInfoSubScreen("obelisks"),
 							new ItemStack(Items.ENDER_PEARL));
 					buttons.add(button);
@@ -448,47 +448,47 @@ public abstract class InfoScreenTab {
 			}
 
 			@Override
-			public List<InfoButton> getButtons(int offset, INostrumMagic attr) {
+			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
 				List<InfoButton> buttons = new LinkedList<>();
 				InfoButton button;
 				
-				button = new SubscreenInfoButton(offset++, "trial.fire",
+				button = new SubscreenInfoButton(screen, "trial.fire",
 						new PaginatedInfoSubScreen("trial.fire"),
 						SpellRune.getRune(EMagicElement.FIRE, 1));
 				buttons.add(button);
 				this.index("builtin::trials::fire", button);
 				
-				button = new SubscreenInfoButton(offset++, "trial.ice",
+				button = new SubscreenInfoButton(screen, "trial.ice",
 						new PaginatedInfoSubScreen("trial.ice"),
 						SpellRune.getRune(EMagicElement.ICE, 1));
 				buttons.add(button);
 				this.index("builtin::trials::ice", button);
 				
-				button = new SubscreenInfoButton(offset++, "trial.earth",
+				button = new SubscreenInfoButton(screen, "trial.earth",
 						new PaginatedInfoSubScreen("trial.earth"),
 						SpellRune.getRune(EMagicElement.EARTH, 1));
 				buttons.add(button);
 				this.index("builtin::trials::earth", button);
 				
-				button = new SubscreenInfoButton(offset++, "trial.wind",
+				button = new SubscreenInfoButton(screen, "trial.wind",
 						new PaginatedInfoSubScreen("trial.wind"),
 						SpellRune.getRune(EMagicElement.WIND, 1));
 				buttons.add(button);
 				this.index("builtin::trials::wind", button);
 				
-				button = new SubscreenInfoButton(offset++, "trial.ender",
+				button = new SubscreenInfoButton(screen, "trial.ender",
 						new PaginatedInfoSubScreen("trial.ender"),
 						SpellRune.getRune(EMagicElement.ENDER, 1));
 				buttons.add(button);
 				this.index("builtin::trials::ender", button);
 				
-				button = new SubscreenInfoButton(offset++, "trial.lightning",
+				button = new SubscreenInfoButton(screen, "trial.lightning",
 						new PaginatedInfoSubScreen("trial.lightning"),
 						SpellRune.getRune(EMagicElement.LIGHTNING, 1));
 				buttons.add(button);
 				this.index("builtin::trials::lightning", button);
 				
-				button = new SubscreenInfoButton(offset++, "trial.physical",
+				button = new SubscreenInfoButton(screen, "trial.physical",
 						new PaginatedInfoSubScreen("trial.physical"),
 						SpellRune.getRune(EMagicElement.PHYSICAL, 1));
 				buttons.add(button);
@@ -509,27 +509,27 @@ public abstract class InfoScreenTab {
 			}
 
 			@Override
-			public List<InfoButton> getButtons(int offset, INostrumMagic attr) {
+			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
 				List<InfoButton> buttons = new LinkedList<>();
 				
-				buttons.add(new SubscreenInfoButton(offset++, "tamed_dragon.intro",
+				buttons.add(new SubscreenInfoButton(screen, "tamed_dragon.intro",
 						new PaginatedInfoSubScreen("tamed_dragon.intro"),
 						new ItemStack(Items.BOOK)));
 				
-				buttons.add(new SubscreenInfoButton(offset++, "tamed_dragon.attributes",
+				buttons.add(new SubscreenInfoButton(screen, "tamed_dragon.attributes",
 						new PaginatedInfoSubScreen("tamed_dragon.attributes"),
 						new ItemStack(Items.PAPER)));
 				
-				buttons.add(new SubscreenInfoButton(offset++, "tamed_dragon.bonding",
+				buttons.add(new SubscreenInfoButton(screen, "tamed_dragon.bonding",
 						new PaginatedInfoSubScreen("tamed_dragon.bonding"),
-						new ItemStack(Items.SKULL, 1, 3)));
+						new ItemStack(Items.PLAYER_HEAD, 1)));
 				
-				buttons.add(new SubscreenInfoButton(offset++, "tamed_dragon.experience",
+				buttons.add(new SubscreenInfoButton(screen, "tamed_dragon.experience",
 						new PaginatedInfoSubScreen("tamed_dragon.experience"),
 						new ItemStack(Items.IRON_SWORD)));
 				
 				if (attr.hasLore(EntityTameDragonRed.SoulBoundDragonLore.instance())) {
-					buttons.add(new SubscreenInfoButton(offset++, EntityTameDragonRed.SoulBoundDragonLore.instance().getLoreKey(),
+					buttons.add(new SubscreenInfoButton(screen, EntityTameDragonRed.SoulBoundDragonLore.instance().getLoreKey(),
 							new PaginatedInfoSubScreen(EntityTameDragonRed.SoulBoundDragonLore.instance().getLoreKey()),
 							new ItemStack(DragonSoulItem.instance())));
 				}
@@ -595,7 +595,7 @@ public abstract class InfoScreenTab {
 	
 	public abstract boolean isVisible(INostrumMagic attr);
 	
-	public abstract List<InfoButton> getButtons(int IDOffset, INostrumMagic attr);
+	public abstract List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr);
 	
 	public @Nonnull ItemStack getIcon() {
 		return this.icon;

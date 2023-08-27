@@ -1,7 +1,6 @@
 package com.smanzana.nostrummagica.utils;
 
-import net.minecraft.entity.passive.EntitySheep;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.DyeColor;
 
 public class ColorUtil {
 	public static final int colorToARGB(float red, float green, float blue, float alpha) {
@@ -24,8 +23,8 @@ public class ColorUtil {
 		}
 	}
 	
-	public static final int dyeToARGB(EnumDyeColor color) {
-		return colorToARGB(EntitySheep.getDyeRgb(color));
+	public static final int dyeToARGB(DyeColor color) {
+		return 0xFF000000 | color.func_218388_g();
 	}
 	
 	public static final float[] ARGBToColor(int ARGB) {

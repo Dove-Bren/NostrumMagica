@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.world.NostrumDungeonGenerator.DungeonGen;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 
 public class CommandSpawnDungeon extends CommandBase {
@@ -30,7 +30,7 @@ public class CommandSpawnDungeon extends CommandBase {
 			CommandSpawnDungeon.rand = new Random();
 		}
 		
-		if (!(sender instanceof EntityPlayer)) {
+		if (!(sender instanceof PlayerEntity)) {
 			throw new CommandException("This command must be run as a player");
 		}
 		
@@ -51,7 +51,7 @@ public class CommandSpawnDungeon extends CommandBase {
 				throw new CommandException("Unknown type: " + (args.length == 1 ? args[0] : "AUTOGEN"));
 			}
 			
-			EntityPlayer player = ((EntityPlayer) sender);
+			PlayerEntity player = ((PlayerEntity) sender);
 			type.getGenerator().generate(player.world, rand, player.getPosition());
 		}
 		else {

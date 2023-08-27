@@ -14,8 +14,8 @@ import com.smanzana.nostrummagica.utils.Projectiles;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
@@ -54,12 +54,12 @@ public class ProjectileTrigger extends SpellTrigger {
 		}
 		
 		@Override
-		public void init(EntityLivingBase caster) {
+		public void init(LivingEntity caster) {
 			// Do a little more work of getting a good vector for things
 			// that aren't players
 			final Vec3d dir;
-			if (caster instanceof EntityLiving && ((EntityLiving) caster).getAttackTarget() != null) {
-				EntityLiving ent = (EntityLiving) caster  ;
+			if (caster instanceof MobEntity && ((MobEntity) caster).getAttackTarget() != null) {
+				MobEntity ent = (MobEntity) caster  ;
 				dir = ent.getAttackTarget().getPositionVector().addVector(0.0, ent.height / 2.0, 0.0)
 						.subtract(caster.posX, caster.posY + caster.getEyeHeight(), caster.posZ);
 			} else {
@@ -68,7 +68,7 @@ public class ProjectileTrigger extends SpellTrigger {
 			
 			final ProjectileTriggerInstance self = this;
 			
-			caster.getServer().addScheduledTask(new Runnable() {
+			caster.getServer().runAsync(new Runnable() {
 
 				@Override
 				public void run() {

@@ -11,11 +11,11 @@ import com.smanzana.nostrummagica.spells.Spell;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 
 public class CommandForceBind extends CommandBase {
 
@@ -35,17 +35,17 @@ public class CommandForceBind extends CommandBase {
 		if (args.length != 0)
 			throw new CommandException("Invalid number of arguments. Expected no arguments");
 		
-		if (sender instanceof EntityPlayer) {
-			EntityPlayer player = (EntityPlayer) sender;
+		if (sender instanceof PlayerEntity) {
+			PlayerEntity player = (PlayerEntity) sender;
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			if (attr == null) {
-				sender.sendMessage(new TextComponentString("Could not find magic wrapper"));
+				sender.sendMessage(new StringTextComponent("Could not find magic wrapper"));
 				return;
 			}
 			
 			ItemStack stack = player.getHeldItemMainhand();
 			if (stack.isEmpty() || !(stack.getItem() instanceof SpellTome)) {
-				sender.sendMessage(new TextComponentString("To force a bind, hold the tome that's being binded to in your main hand"));
+				sender.sendMessage(new StringTextComponent("To force a bind, hold the tome that's being binded to in your main hand"));
 				return;
 			}
 			if (attr.isBinding()) {
@@ -54,7 +54,7 @@ public class CommandForceBind extends CommandBase {
 				ItemStack offhand = player.getHeldItemOffhand();
 				if (offhand.isEmpty() || !(offhand.getItem() instanceof SpellScroll)
 						|| SpellScroll.getSpell(offhand) == null) {
-					sender.sendMessage(new TextComponentString("Either use while holding a tome that's currently binding OR hold a spell scroll in your offhand"));
+					sender.sendMessage(new StringTextComponent("Either use while holding a tome that's currently binding OR hold a spell scroll in your offhand"));
 				} else {
 					Spell spell = SpellScroll.getSpell(offhand);
 					attr.startBinding(spell, null, SpellTome.getTomeID(stack));
@@ -63,9 +63,9 @@ public class CommandForceBind extends CommandBase {
 			}
 			NetworkHandler.getSyncChannel().sendTo(
 					new StatSyncMessage(attr)
-					, (EntityPlayerMP) player);
+					, (ServerPlayerEntity) player);
 		} else {
-			sender.sendMessage(new TextComponentString("This command must be run as a player"));
+			sender.sendMessage(new StringTextComponent("This command must be run as a player"));
 		}
 	}
 

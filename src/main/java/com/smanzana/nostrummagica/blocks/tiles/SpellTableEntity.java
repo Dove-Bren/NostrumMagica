@@ -13,10 +13,10 @@ import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spells.Spell;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.Constants.NBT;
 
@@ -126,16 +126,16 @@ public class SpellTableEntity extends TileEntity implements IInventory {
 	}
 
 	@Override
-	public boolean isUsableByPlayer(EntityPlayer player) {
+	public boolean isUsableByPlayer(PlayerEntity player) {
 		return true;
 	}
 
 	@Override
-	public void openInventory(EntityPlayer player) {
+	public void openInventory(PlayerEntity player) {
 	}
 
 	@Override
-	public void closeInventory(EntityPlayer player) {
+	public void closeInventory(PlayerEntity player) {
 	}
 
 	@Override
@@ -195,34 +195,34 @@ public class SpellTableEntity extends TileEntity implements IInventory {
 	}
 	
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt = super.writeToNBT(nbt);
-		NBTTagCompound compound = new NBTTagCompound();
+		CompoundNBT compound = new CompoundNBT();
 		
 		for (int i = 0; i < getSizeInventory(); i++) {
 			if (getStackInSlot(i).isEmpty())
 				continue;
 			
-			NBTTagCompound tag = new NBTTagCompound();
-			compound.setTag(i + "", getStackInSlot(i).writeToNBT(tag));
+			CompoundNBT tag = new CompoundNBT();
+			compound.put(i + "", getStackInSlot(i).writeToNBT(tag));
 		}
 		
 		if (nbt == null)
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		
-		nbt.setTag(NBT_INV, compound);
+		nbt.put(NBT_INV, compound);
 		return nbt;
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(CompoundNBT nbt) {
 		super.readFromNBT(nbt);
 		
-		if (nbt == null || !nbt.hasKey(NBT_INV, NBT.TAG_COMPOUND))
+		if (nbt == null || !nbt.contains(NBT_INV, NBT.TAG_COMPOUND))
 			return;
 		
-		NBTTagCompound items = nbt.getCompoundTag(NBT_INV);
-		for (String key : items.getKeySet()) {
+		CompoundNBT items = nbt.getCompound(NBT_INV);
+		for (String key : items.keySet()) {
 			int id;
 			try {
 				id = Integer.parseInt(key);
@@ -231,12 +231,12 @@ public class SpellTableEntity extends TileEntity implements IInventory {
 				continue;
 			}
 			
-			ItemStack stack = new ItemStack(items.getCompoundTag(key));
+			ItemStack stack = new ItemStack(items.getCompound(key));
 			this.setInventorySlotContents(id, stack);
 		}
 	}
 	
-	public Spell craft(EntityPlayer crafter, String name, int iconIndex) {
+	public Spell craft(PlayerEntity crafter, String name, int iconIndex) {
 		ItemStack stack = this.getStackInSlot(0);
 		if (stack.isEmpty() || !(stack.getItem() instanceof BlankScroll)) {
 			return null;

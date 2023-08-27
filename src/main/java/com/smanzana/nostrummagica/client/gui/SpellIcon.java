@@ -9,13 +9,13 @@ import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 // Wrapper that makes it easy to render the little icon the user has selected for a spell
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class SpellIcon {
 
 	public static final ResourceLocation TEX = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/spellicons.png");
@@ -38,10 +38,10 @@ public class SpellIcon {
 	public void render(Minecraft mc, int x, int y, int width, int height) {
 		GL11.glPushMatrix();
 
-		Minecraft.getMinecraft().getTextureManager().bindTexture(TEX);
+		Minecraft.getInstance().getTextureManager().bindTexture(TEX);
 		
 		GlStateManager.enableBlend();
-		GlStateManager.enableAlpha();
+		GlStateManager.enableAlphaTest();
 		Gui.drawScaledCustomSizeModalRect(x, y, u, v, TEX_ICON_WIDTH, TEX_ICON_WIDTH, width, height, TEX_WIDTH, TEX_WIDTH);
 		
 		GL11.glPopMatrix();

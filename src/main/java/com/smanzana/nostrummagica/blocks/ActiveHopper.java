@@ -19,14 +19,14 @@ import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -44,7 +44,7 @@ import net.minecraft.world.World;
 public class ActiveHopper extends BlockContainer {
 	
 	public static final PropertyDirection FACING = PropertyDirection.create("facing", (facing) -> {
-		return facing != null && facing != EnumFacing.UP;
+		return facing != null && facing != Direction.UP;
 	});
 	
 	public static final PropertyBool ENABLED = PropertyBool.create("enabled");
@@ -67,10 +67,10 @@ public class ActiveHopper extends BlockContainer {
 		this.setSoundType(SoundType.METAL);
 		this.setUnlocalizedName(ID);
 		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.DOWN).withProperty(ENABLED, true));
+		this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, Direction.DOWN).withProperty(ENABLED, true));
 	}
 	
-	public static EnumFacing GetFacing(IBlockState state) {
+	public static Direction GetFacing(IBlockState state) {
 		return state.getValue(FACING);
 	}
 	
@@ -89,7 +89,7 @@ public class ActiveHopper extends BlockContainer {
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
 		boolean enabled = ((meta & 0x1) == 1);
-		EnumFacing facing = EnumFacing.VALUES[(meta >> 1) & 7];
+		Direction facing = Direction.VALUES[(meta >> 1) & 7];
 		return getDefaultState().withProperty(ENABLED, enabled).withProperty(FACING, facing);
 	}
 	
@@ -114,9 +114,9 @@ public class ActiveHopper extends BlockContainer {
 	}
 	
 	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
-		if (facing == EnumFacing.UP) {
-			facing = EnumFacing.DOWN;
+	public IBlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer, EnumHand hand) {
+		if (facing == Direction.UP) {
+			facing = Direction.DOWN;
 		}
 		return this.getDefaultState().withProperty(FACING, facing);
 	}
@@ -133,7 +133,7 @@ public class ActiveHopper extends BlockContainer {
 	
 	@Override
 	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
-		if (GetFacing(state) == EnumFacing.DOWN) {
+		if (GetFacing(state) == Direction.DOWN) {
 			addCollisionBoxToList(pos, entityBox, collidingBoxes, BASE_AABB);
 			addCollisionBoxToList(pos, entityBox, collidingBoxes, SOUTH_AABB);
 			addCollisionBoxToList(pos, entityBox, collidingBoxes, NORTH_AABB);
@@ -185,7 +185,7 @@ public class ActiveHopper extends BlockContainer {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
 		playerIn.openGui(NostrumMagica.instance,
 				NostrumGui.activeHopperID, worldIn,
 				pos.getX(), pos.getY(), pos.getZ());
@@ -214,7 +214,7 @@ public class ActiveHopper extends BlockContainer {
 	}
 	
 	@Override
-	public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
-		return face == EnumFacing.UP ? BlockFaceShape.BOWL : BlockFaceShape.UNDEFINED;
+	public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, Direction face) {
+		return face == Direction.UP ? BlockFaceShape.BOWL : BlockFaceShape.UNDEFINED;
 	}
 }

@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -42,14 +42,14 @@ public class ProximityTrigger extends SpellTrigger {
 		}
 		
 		@Override
-		public void init(EntityLivingBase caster) {
+		public void init(LivingEntity caster) {
 			// We are instant! Whoo!
 			NostrumMagica.playerListener.registerTimer(this, 20, 100);
 			
 		}
 
 		@Override
-		public boolean onEvent(Event type, EntityLivingBase entity, Object empty) {
+		public boolean onEvent(Event type, LivingEntity entity, Object empty) {
 			// We first wait 20 ticks to allow people to move around.
 			if (type == Event.TIME) {
 				if (dead)

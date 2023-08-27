@@ -10,11 +10,11 @@ import com.smanzana.nostrummagica.blocks.MimicBlock;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.property.IExtendedBlockState;
 
@@ -23,7 +23,7 @@ public class MimicBlockBakedModel implements IBakedModel {
 	private final TextureAtlasSprite particle;
 	
 	public MimicBlockBakedModel() {
-		particle = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(new ResourceLocation(NostrumMagica.MODID, "blocks/mimic_facade").toString());
+		particle = Minecraft.getInstance().getTextureMapBlocks().getAtlasSprite(new ResourceLocation(NostrumMagica.MODID, "blocks/mimic_facade").toString());
 	}
 	
 	protected IBlockState getNestedState(@Nullable IBlockState state) {
@@ -44,7 +44,7 @@ public class MimicBlockBakedModel implements IBakedModel {
 	}
 	
 	protected IBakedModel getModelToRender(@Nullable IBlockState nestedState) {
-		IBakedModel missing = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getMissingModel();
+		IBakedModel missing = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getMissingModel();
 		IBakedModel nestedModel = null;
 		
 		if (nestedState != null) {
@@ -57,14 +57,14 @@ public class MimicBlockBakedModel implements IBakedModel {
 				}
 			}
 			
-			nestedModel = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(nestedState);
+			nestedModel = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(nestedState);
 		}
 		
 		return nestedModel == null ? missing : nestedModel;
 	}
 	
 	@Override
-	public List<BakedQuad> getQuads(@Nullable IBlockState state, EnumFacing side, long rand) {
+	public List<BakedQuad> getQuads(@Nullable IBlockState state, Direction side, long rand) {
 		IBlockState nested = getNestedState(state);
 		return getModelToRender(nested).getQuads(nested, side, rand);
 	}

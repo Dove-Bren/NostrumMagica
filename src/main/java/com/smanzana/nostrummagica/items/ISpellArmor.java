@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.items;
 
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -17,6 +17,6 @@ import net.minecraft.item.ItemStack;
  */
 public interface ISpellArmor {
 
-	public void apply(EntityLivingBase caster, SpellCastSummary summary, ItemStack stack);
+	public void apply(LivingEntity caster, SpellCastSummary summary, ItemStack stack);
 	
 }

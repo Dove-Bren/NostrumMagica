@@ -6,9 +6,9 @@ import com.smanzana.nostrummagica.utils.ColorUtil;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.GlStateManager.DestFactor;
-import net.minecraft.client.renderer.GlStateManager.SourceFactor;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
@@ -58,17 +58,17 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 	
 	public ParticleFilledOrb setMotion(double xVelocity, double yVelocity, double zVelocity,
 			double xJitter, double yJitter, double zJitter) {
-		this.motionX = xVelocity * (1.0 + (NostrumMagica.rand.nextDouble() * 2 - 1) * xJitter); // 1 +- jitter
-		this.motionY = yVelocity * (1.0 + (NostrumMagica.rand.nextDouble() * 2 - 1) * yJitter);
-		this.motionZ = zVelocity * (1.0 + (NostrumMagica.rand.nextDouble() * 2 - 1) * zJitter);
+		this.getMotion().x = xVelocity * (1.0 + (NostrumMagica.rand.nextDouble() * 2 - 1) * xJitter); // 1 +- jitter
+		this.getMotion().y = yVelocity * (1.0 + (NostrumMagica.rand.nextDouble() * 2 - 1) * yJitter);
+		this.getMotion().z = zVelocity * (1.0 + (NostrumMagica.rand.nextDouble() * 2 - 1) * zJitter);
 		return this;
 	}
 	
 	public ParticleFilledOrb setTarget(Entity ent) {
 		targetEntity = ent;
 		if (this.targetPos == null && ent != null) {
-			final double wRad = ent.width * 2; // double width
-			final double hRad = ent.height;
+			final double wRad = ent.getWidth() * 2; // double width
+			final double hRad = ent.getHeight();
 			this.targetPos = new Vec3d(wRad * (NostrumMagica.rand.nextDouble() - .5),
 					hRad * (NostrumMagica.rand.nextDouble() - .5),
 					wRad * (NostrumMagica.rand.nextDouble() - .5));
@@ -95,12 +95,12 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 		GlStateManager.disableBlend();
 		GlStateManager.enableBlend();
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		GlStateManager.disableAlpha();
-		GlStateManager.enableAlpha();
+		GlStateManager.disableAlphaTest();
+		GlStateManager.enableAlphaTest();
 		GlStateManager.enableLighting();
 		GlStateManager.disableLighting();
 		GlStateManager.alphaFunc(516, 0);
-		GlStateManager.color(1f, 1f, 1f, .75f);
+		GlStateManager.color4f(1f, 1f, 1f, .75f);
 		GlStateManager.depthMask(false);
 		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 	}
@@ -140,16 +140,16 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 			if (!targetEntity.isDead) {
 				final float period = 20f;
 				Vec3d offset = targetPos == null ? new Vec3d(0,0,0) : targetPos.rotateYaw((float) (Math.PI * 2 * ((float) particleAge % period) / period));
-				Vec3d curVelocity = new Vec3d(this.motionX, this.motionY, this.motionZ);
+				Vec3d curVelocity = new Vec3d(this.getMotion().x, this.getMotion().y, this.getMotion().z);
 				Vec3d posDelta = targetEntity.getPositionVector()
-						.addVector(offset.x, offset.y + targetEntity.height/2, offset.z)
+						.add(offset.x, offset.y + targetEntity.getHeight()/2, offset.z)
 						.subtract(posX, posY, posZ);
 				Vec3d idealVelocity = posDelta.normalize().scale(.3);
 				this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
 			}
 			// Else just do nothing
 		} else if (targetPos != null) {
-			Vec3d curVelocity = new Vec3d(this.motionX, this.motionY, this.motionZ);
+			Vec3d curVelocity = new Vec3d(this.getMotion().x, this.getMotion().y, this.getMotion().z);
 			Vec3d posDelta = targetPos.subtract(posX, posY, posZ);
 			Vec3d idealVelocity = posDelta.normalize().scale(.3);
 			this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
@@ -184,7 +184,7 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 					particle.setGravityStrength(params.gravityStrength);
 				}
 				particle.dieOnTarget(params.dieOnTarget);
-				Minecraft.getMinecraft().effectRenderer.addEffect(particle);
+				Minecraft.getInstance().effectRenderer.addEffect(particle);
 			}
 			return particle;
 		}

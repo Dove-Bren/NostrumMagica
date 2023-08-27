@@ -10,8 +10,8 @@ import com.smanzana.nostrummagica.entity.IEntityPet;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -30,13 +30,13 @@ public class PetGUIOpenMessage implements IMessage {
 		@Override
 		public IMessage onMessage(PetGUIOpenMessage message, MessageContext ctx) {
 			final UUID uuid = message.tag.getUniqueId(NBT_UUID);
-			final int sheets = message.tag.getInteger(NBT_SHEETS);
-			final int id = message.tag.getInteger(NBT_CONTAINER_ID);
-			final int mcID = message.tag.getInteger(NBT_MC_CONTAINER_ID);
+			final int sheets = message.tag.getInt(NBT_SHEETS);
+			final int id = message.tag.getInt(NBT_CONTAINER_ID);
+			final int mcID = message.tag.getInt(NBT_MC_CONTAINER_ID);
 			
-			Minecraft.getMinecraft().addScheduledTask(() -> {
+			Minecraft.getInstance().runAsync(() -> {
 				IEntityPet pet = null;
-				//for (Entity ent : Minecraft.getMinecraft().theWorld.getLoadedEntityList()) {
+				//for (Entity ent : Minecraft.getInstance().theWorld.getLoadedEntityList()) {
 				for (Entity ent : NostrumMagica.proxy.getPlayer().world.loadedEntityList) {
 					if (ent == null || !(ent instanceof IEntityPet)) {
 						continue;
@@ -76,19 +76,19 @@ public class PetGUIOpenMessage implements IMessage {
 	private static final String NBT_CONTAINER_ID = "id";
 	private static final String NBT_MC_CONTAINER_ID = "minecraftScreenID";
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public PetGUIOpenMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	public PetGUIOpenMessage(IEntityPet pet, int mcID, int id, int numSheets) {
 		this();
 		
-		tag.setUniqueId(NBT_UUID, ((EntityLivingBase) pet).getUniqueID());
-		tag.setInteger(NBT_CONTAINER_ID, id);
-		tag.setInteger(NBT_SHEETS, numSheets);
-		tag.setInteger(NBT_MC_CONTAINER_ID, mcID);
+		tag.setUniqueId(NBT_UUID, ((LivingEntity) pet).getUniqueID());
+		tag.putInt(NBT_CONTAINER_ID, id);
+		tag.putInt(NBT_SHEETS, numSheets);
+		tag.putInt(NBT_MC_CONTAINER_ID, mcID);
 	}
 
 	@Override

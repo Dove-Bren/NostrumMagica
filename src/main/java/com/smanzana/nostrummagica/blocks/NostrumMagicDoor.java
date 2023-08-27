@@ -15,10 +15,10 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -42,7 +42,7 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setSoundType(SoundType.STONE);
 		
-		this.setDefaultState(this.blockState.getBaseState().withProperty(MASTER, false).withProperty(FACING, EnumFacing.NORTH));
+		this.setDefaultState(this.blockState.getBaseState().withProperty(MASTER, false).withProperty(FACING, Direction.NORTH));
 	}
 	
 	@Override
@@ -54,7 +54,7 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 	public IBlockState getStateFromMeta(int meta) {
 		return getDefaultState()
 				.withProperty(MASTER, (meta & 1) == 1)
-				.withProperty(FACING, EnumFacing.getHorizontal((meta >> 1) & 3));
+				.withProperty(FACING, Direction.getHorizontal((meta >> 1) & 3));
 	}
 	
 	@Override
@@ -153,7 +153,7 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 		return null;
 	}
 	
-	public IBlockState getSlaveState(EnumFacing facing) {
+	public IBlockState getSlaveState(Direction facing) {
 		return this.getDefaultState().withProperty(MASTER, false).withProperty(FACING, facing);
 	}
 	
@@ -162,7 +162,7 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 	}
 
 
-	public IBlockState getMaster(EnumFacing facing) {
+	public IBlockState getMaster(Direction facing) {
 		return this.getDefaultState().withProperty(MASTER, true).withProperty(FACING, facing);
 	}
 	
@@ -199,7 +199,7 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 	}
 	
 	@Override
-	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
 		return true;
 	}
 	
@@ -218,13 +218,13 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 	}
 	
 	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-		EnumFacing enumfacing = EnumFacing.getHorizontal(MathHelper.floor((double)(placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3).getOpposite();
+	public IBlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer) {
+		Direction enumfacing = Direction.getHorizontal(MathHelper.floor((double)(placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3).getOpposite();
 		return getMaster(enumfacing);
 	}
 	
 	@Override
-	public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+	public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, LivingEntity placer, ItemStack stack) {
 		this.spawnDoor(worldIn, pos, state);
 	}
 	
@@ -272,7 +272,7 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 		}
 	}
 	
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
 		return false;
 	}
 	

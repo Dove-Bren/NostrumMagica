@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.storage.WorldSavedData;
 
@@ -65,16 +65,16 @@ public class NostrumDimensionMapper extends WorldSavedData {
 			this.offsetZ += 5;
 		}
 		
-		private NBTTagCompound asNBT() {
-			NBTTagCompound nbt = new NBTTagCompound();
-			nbt.setInteger(NBT_X, this.offsetX);
-			nbt.setInteger(NBT_Z, this.offsetZ);
+		private CompoundNBT asNBT() {
+			CompoundNBT nbt = new CompoundNBT();
+			nbt.putInt(NBT_X, this.offsetX);
+			nbt.putInt(NBT_Z, this.offsetZ);
 			return nbt;
 		}
 		
-		private static NostrumDimensionOffset fromNBT(NBTTagCompound nbt) {
-			int x = nbt.getInteger(NBT_X);
-			int z = nbt.getInteger(NBT_Z);
+		private static NostrumDimensionOffset fromNBT(CompoundNBT nbt) {
+			int x = nbt.getInt(NBT_X);
+			int z = nbt.getInt(NBT_Z);
 			return new NostrumDimensionOffset(x, z);
 		}
 		
@@ -138,8 +138,8 @@ public class NostrumDimensionMapper extends WorldSavedData {
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
-		for (String key : nbt.getKeySet()) {
+	public void readFromNBT(CompoundNBT nbt) {
+		for (String key : nbt.keySet()) {
 			UUID id;
 			
 			try {
@@ -153,7 +153,7 @@ public class NostrumDimensionMapper extends WorldSavedData {
 				continue;
 			}
 			
-			NBTTagCompound tag = nbt.getCompoundTag(key);
+			CompoundNBT tag = nbt.getCompound(key);
 			this.map.put(id, NostrumDimensionOffset.fromNBT(tag));
 		}
 		
@@ -161,11 +161,11 @@ public class NostrumDimensionMapper extends WorldSavedData {
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+	public CompoundNBT writeToNBT(CompoundNBT compound) {
 		int count = 0;
 		for (Entry<UUID, NostrumDimensionOffset> row : map.entrySet()) {
-			NBTTagCompound tag = row.getValue().asNBT();
-			compound.setTag(row.getKey().toString(), tag);
+			CompoundNBT tag = row.getValue().asNBT();
+			compound.put(row.getKey().toString(), tag);
 			count++;
 		}
 		

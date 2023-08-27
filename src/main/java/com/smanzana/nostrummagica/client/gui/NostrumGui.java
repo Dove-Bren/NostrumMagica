@@ -27,7 +27,7 @@ import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.entity.boss.EntityDragon;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -51,7 +51,7 @@ public class NostrumGui implements IGuiHandler {
 	public static final int activeHopperID = 11;
 	
 	@Override
-	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object getServerGuiElement(int ID, PlayerEntity player, World world, int x, int y, int z) {
 //		TileEntity activatedEntity = world.getTileEntity(new BlockPos(x,y,z));
 //		if (activatedEntity != null) {
 //			// Check for the GUI type
@@ -196,7 +196,7 @@ public class NostrumGui implements IGuiHandler {
 
 	
 	@Override
-	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object getClientGuiElement(int ID, PlayerEntity player, World world, int x, int y, int z) {
 		
 		if (ID == spellTableID) {
 			TileEntity ent = world.getTileEntity(new BlockPos(x, y, z));

@@ -16,18 +16,18 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * Misc. resource items for delayed progression
@@ -111,7 +111,7 @@ public class NostrumResourceItem extends Item implements ILoreTagged {
 	/**
      * returns a list of items with the same ID, but different meta (eg: dye returns 16 items)
      */
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
     	if (this.isInCreativeTab(tab)) {
@@ -159,13 +159,13 @@ public class NostrumResourceItem extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		ResourceType type = getTypeFromMeta(stack.getMetadata());
 		if (type == null)
 			return;
 		
-		if (I18n.hasKey(type.getDescKey())) {
+		if (I18n.contains(type.getDescKey())) {
 			String translation = I18n.format(type.getDescKey(), new Object[0]);
 			if (translation.trim().isEmpty())
 				return;
@@ -179,7 +179,7 @@ public class NostrumResourceItem extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, EnumHand hand, Direction facing, float hitX, float hitY, float hitZ) {
 		final @Nonnull ItemStack stack = playerIn.getHeldItem(hand);
 		
 		// Copied from ItemBed (vanilla) with some modifications
@@ -200,9 +200,9 @@ public class NostrumResourceItem extends Item implements ILoreTagged {
 			}
 			
 			// If setting on the side of a non-full block, promote to a regular standing one
-			if (facing != EnumFacing.UP) {
+			if (facing != Direction.UP) {
 				if (!worldIn.getBlockState(pos.offset(facing.getOpposite())).isFullBlock()) {
-					facing = EnumFacing.UP;
+					facing = Direction.UP;
 				}
 			}
 
@@ -214,7 +214,7 @@ public class NostrumResourceItem extends Item implements ILoreTagged {
 				worldIn.setBlockState(pos, iblockstate1, 11);
 
 				SoundType soundtype = iblockstate1.getBlock().getSoundType(iblockstate1, worldIn, pos, playerIn);
-				worldIn.playSound((EntityPlayer)null, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
+				worldIn.playSound((PlayerEntity)null, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
 				stack.shrink(1);
 				return EnumActionResult.SUCCESS;
 			} else {

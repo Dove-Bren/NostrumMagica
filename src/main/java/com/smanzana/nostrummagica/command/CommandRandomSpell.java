@@ -19,10 +19,10 @@ import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 
 public class CommandRandomSpell extends CommandBase {
 
@@ -38,7 +38,7 @@ public class CommandRandomSpell extends CommandBase {
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-		if (sender instanceof EntityPlayer) {
+		if (sender instanceof PlayerEntity) {
 			final String name;
 			if (args.length > 0) {
 				name = args[0];
@@ -47,11 +47,11 @@ public class CommandRandomSpell extends CommandBase {
 			}
 			
 			final Spell spell = CreateRandomSpell(name, null);
-			EntityPlayer player = (EntityPlayer) sender;
+			PlayerEntity player = (PlayerEntity) sender;
 			ItemStack stack = SpellScroll.create(spell);
 			player.inventory.addItemStackToInventory(stack);
 		} else {
-			sender.sendMessage(new TextComponentString("This command must be run as a player"));
+			sender.sendMessage(new StringTextComponent("This command must be run as a player"));
 		}
 	}
 	

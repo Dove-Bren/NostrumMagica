@@ -2,9 +2,9 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelWolf;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class ModelArcaneWolf extends ModelWolf {
@@ -83,14 +83,14 @@ public class ModelArcaneWolf extends ModelWolf {
 	public void render(Entity entity, float time, float swingProgress,
 			float swing, float headAngleY, float headAngleX, float scale) {
 		GlStateManager.pushMatrix();
-		GlStateManager.scale(1.25f, 1.25f, 1.25f);
-		GlStateManager.translate(0, (-8f) / 24f, 0);
+		GlStateManager.scalef(1.25f, 1.25f, 1.25f);
+		GlStateManager.translatef(0, (-8f) / 24f, 0);
 		super.render(entity, time, swingProgress, swing, headAngleY, headAngleX, scale);
 		GlStateManager.popMatrix();
 	}
 	
 	@Override
-	public void setLivingAnimations(EntityLivingBase entityIn, float limbSwing, float limbSwingAmount, float partialTicks) {
+	public void setLivingAnimations(LivingEntity entityIn, float limbSwing, float limbSwingAmount, float partialTicks) {
 		super.setLivingAnimations(entityIn, limbSwing, limbSwingAmount, partialTicks);
 	}
 	

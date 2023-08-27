@@ -5,8 +5,8 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.entity.player.PlayerEntity;
 
 public class ReferencePage extends TableOfContentsPage {
 	
@@ -19,20 +19,21 @@ public class ReferencePage extends TableOfContentsPage {
 	
 	protected boolean onElementClick(BookScreen parent, int index, int button) {
 		if (index < references.length) {
-			EntityPlayer player = (EntityPlayer) NostrumMagica.proxy.getPlayer();
+			PlayerEntity player = (PlayerEntity) NostrumMagica.proxy.getPlayer();
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			if (attr == null)
 				return false;
 			
 			// If we're nested in another screen, set up prev links
-			GuiScreen holdingScreen = Minecraft.getMinecraft().currentScreen;
+			Minecraft mc = Minecraft.getInstance();
+			Screen holdingScreen = mc.currentScreen;
 			if (holdingScreen == parent) {
 				holdingScreen = null;
 			}
 			
 			InfoScreen screen = new InfoScreen(attr, references[index]);
 			screen.setPrevScreen(holdingScreen);
-			Minecraft.getMinecraft().displayGuiScreen(screen);
+			Minecraft.getInstance().displayGuiScreen(screen);
 			
 			return true;
 		}

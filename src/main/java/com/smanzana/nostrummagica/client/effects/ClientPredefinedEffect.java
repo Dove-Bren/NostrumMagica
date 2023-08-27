@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
@@ -35,9 +35,9 @@ public class ClientPredefinedEffect {
 					duration, 5);
 			
 			final float scale;
-			if (ent != null && ent instanceof EntityLivingBase) {
-				effect.modify(new ClientEffectModifierFollow((EntityLivingBase) ent));
-				scale = ent.height / 1.8f;
+			if (ent != null && ent instanceof LivingEntity) {
+				effect.modify(new ClientEffectModifierFollow((LivingEntity) ent));
+				scale = ent.getHeight() / 1.8f;
 			} else {
 				scale = 1f;
 			}
@@ -62,14 +62,14 @@ public class ClientPredefinedEffect {
 		
 		if (effect != null) {
 			final ClientEffect effectToAdd = effect;
-			Minecraft.getMinecraft().addScheduledTask(() -> {
+			Minecraft.getInstance().runAsync(() -> {
 				ClientEffectRenderer.instance().addEffect(effectToAdd);
 			});
 		}
 	}
 	
 	public static void SpawnRitualEffect(BlockPos pos, EMagicElement element, ItemStack center, @Nullable NonNullList<ItemStack> extras, ReagentType[] reagents, ItemStack output) {
-		Minecraft.getMinecraft().addScheduledTask(() -> {
+		Minecraft.getInstance().runAsync(() -> {
 			ClientEffectRenderer.instance().addEffect(ClientEffectRitual.Create(
 					new Vec3d(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5),
 					element, center, extras, reagents, output

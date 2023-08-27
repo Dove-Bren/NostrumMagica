@@ -17,20 +17,20 @@ import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public abstract class NostrumPortal extends Block  {
 	
@@ -79,7 +79,7 @@ public abstract class NostrumPortal extends Block  {
 	}
 	
 	@Override
-	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
 		return false;
 	}
 	
@@ -115,7 +115,7 @@ public abstract class NostrumPortal extends Block  {
 	}
 	
 	protected static BlockPos getPaired(IBlockState state, BlockPos pos) {
-		return pos.offset(state.getValue(MASTER) ? EnumFacing.UP : EnumFacing.DOWN);
+		return pos.offset(state.getValue(MASTER) ? Direction.UP : Direction.DOWN);
 	}
 	
 	protected static BlockPos getMaster(IBlockState state, BlockPos pos) {
@@ -126,7 +126,7 @@ public abstract class NostrumPortal extends Block  {
 		return pos;
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public EnumBlockRenderType getRenderType(IBlockState state) {
 		return EnumBlockRenderType.INVISIBLE;
@@ -167,7 +167,7 @@ public abstract class NostrumPortal extends Block  {
 	}
 	
 	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+	public IBlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer) {
 		return getMaster();
 	}
 	
@@ -176,13 +176,13 @@ public abstract class NostrumPortal extends Block  {
 	}
 	
 	@Override
-	public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+	public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, LivingEntity placer, ItemStack stack) {
 		// This method hopefully is ONLY called when placed manually in the world.
 		// Auto-create slave state
 		createPaired(worldIn, pos);
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
 		if (!isMaster(stateIn)) {
@@ -363,7 +363,7 @@ public abstract class NostrumPortal extends Block  {
 		 * Return color the portal should be rendered as. Only 3 least-sig bytes used as 0RGB.
 		 * @return
 		 */
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		public abstract int getColor();
 		
 		/**
@@ -371,14 +371,14 @@ public abstract class NostrumPortal extends Block  {
 		 * This is in seconds.
 		 * @return
 		 */
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		public abstract float getRotationPeriod();
 		
 		/**
 		 * Opacity of the portal. This is expresses as 0 to 1.
 		 * @return
 		 */
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		public abstract float getOpacity();
 		
 	}

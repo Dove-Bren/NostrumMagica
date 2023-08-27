@@ -7,13 +7,13 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -22,7 +22,7 @@ import net.minecraft.world.World;
 public class EntityAIFollowOwnerGeneric<T extends EntityCreature & IEntityTameable> extends EntityAIBase {
 	
 	private final T thePet;
-	private EntityLivingBase theOwner;
+	private LivingEntity theOwner;
 	private World theWorld;
 	private final double followSpeed;
 	private final PathNavigate petPathfinder;
@@ -53,11 +53,11 @@ public class EntityAIFollowOwnerGeneric<T extends EntityCreature & IEntityTameab
 	 * Returns whether the EntityAIBase should begin execution.
 	 */
 	public boolean shouldExecute() {
-		EntityLivingBase entitylivingbase = this.thePet.getLivingOwner();
+		LivingEntity entitylivingbase = this.thePet.getLivingOwner();
 
 		if (entitylivingbase == null) {
 			return false;
-		} else if (entitylivingbase instanceof EntityPlayer && ((EntityPlayer)entitylivingbase).isSpectator()) {
+		} else if (entitylivingbase instanceof PlayerEntity && ((PlayerEntity)entitylivingbase).isSpectator()) {
 			return false;
 		} else if (this.thePet.isEntitySitting()) {
 			return false;
@@ -113,7 +113,7 @@ public class EntityAIFollowOwnerGeneric<T extends EntityCreature & IEntityTameab
 		final World theWorld = targetEntity.world;
 		int i = MathHelper.floor(targetEntity.posX) - 2;
 		int j = MathHelper.floor(targetEntity.posZ) - 2;
-		int k = MathHelper.floor(targetEntity.getEntityBoundingBox().minY);
+		int k = MathHelper.floor(targetEntity.getBoundingBox().minY);
 		
 		MutableBlockPos pos1 = new MutableBlockPos();
 		MutableBlockPos pos2 = new MutableBlockPos();
@@ -124,10 +124,10 @@ public class EntityAIFollowOwnerGeneric<T extends EntityCreature & IEntityTameab
 				pos1.setPos(i + l, k - 1, j + i1);
 				pos2.setPos(i + l, k, j + i1);
 				pos3.setPos(i + l, k + 1, j + i1);
-				if ((l < 1 || i1 < 1 || l > 3 || i1 > 3) && theWorld.getBlockState(new BlockPos(pos1)).isSideSolid(theWorld, pos1, EnumFacing.UP) && IsEmptyBlock(theWorld, pos2) && IsEmptyBlock(theWorld, pos3)) {
+				if ((l < 1 || i1 < 1 || l > 3 || i1 > 3) && theWorld.getBlockState(new BlockPos(pos1)).isSideSolid(theWorld, pos1, Direction.UP) && IsEmptyBlock(theWorld, pos2) && IsEmptyBlock(theWorld, pos3)) {
 					teleportingEntity.setLocationAndAngles((double)((float)(i + l) + 0.5F), (double)k, (double)((float)(j + i1) + 0.5F), teleportingEntity.rotationYaw, teleportingEntity.rotationPitch);
-					if (teleportingEntity instanceof EntityLiving) {
-						((EntityLiving) teleportingEntity).getNavigator().clearPath();
+					if (teleportingEntity instanceof MobEntity) {
+						((MobEntity) teleportingEntity).getNavigator().clearPath();
 					}
 					return true;
 				}

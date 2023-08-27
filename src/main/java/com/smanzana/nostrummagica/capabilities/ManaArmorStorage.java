@@ -1,8 +1,8 @@
 package com.smanzana.nostrummagica.capabilities;
 
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
 
@@ -12,20 +12,20 @@ public class ManaArmorStorage implements IStorage<IManaArmor> {
 	private static final String NBT_MANA_COST = "mana_cost";
 	
 	@Override
-	public NBTBase writeNBT(Capability<IManaArmor> capability, IManaArmor instance, EnumFacing side) {
-		NBTTagCompound nbt = new NBTTagCompound();
+	public INBT writeNBT(Capability<IManaArmor> capability, IManaArmor instance, Direction side) {
+		CompoundNBT nbt = new CompoundNBT();
 		
-		nbt.setBoolean(NBT_HAS_ARMOR, instance.hasArmor());
-		nbt.setInteger(NBT_MANA_COST, instance.getManaCost());
+		nbt.putBoolean(NBT_HAS_ARMOR, instance.hasArmor());
+		nbt.putInt(NBT_MANA_COST, instance.getManaCost());
 		
 		return nbt;
 	}
 
 	@Override
-	public void readNBT(Capability<IManaArmor> capability, IManaArmor instance, EnumFacing side, NBTBase nbt) {
-		NBTTagCompound tag = (NBTTagCompound) nbt;
+	public void readNBT(Capability<IManaArmor> capability, IManaArmor instance, Direction side, INBT nbt) {
+		CompoundNBT tag = (CompoundNBT) nbt;
 		instance.deserialize(tag.getBoolean(NBT_HAS_ARMOR),
-			tag.getInteger(NBT_MANA_COST));
+			tag.getInt(NBT_MANA_COST));
 	}
 
 }

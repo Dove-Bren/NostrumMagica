@@ -2,8 +2,8 @@ package com.smanzana.nostrummagica.entity.tasks;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
 
 /**
@@ -12,7 +12,7 @@ import net.minecraft.entity.ai.EntityAIBase;
  *
  * @param <T>
  */
-public class EntityAIFlierDiveTask<T extends EntityLiving> extends EntityAIBase
+public class EntityAIFlierDiveTask<T extends MobEntity> extends EntityAIBase
 {
 	protected final T entity;
 	private final double moveSpeedAmp;
@@ -46,7 +46,7 @@ public class EntityAIFlierDiveTask<T extends EntityLiving> extends EntityAIBase
 			return false;
 		}
 		
-		EntityLivingBase target = entity.getAttackTarget();
+		LivingEntity target = entity.getAttackTarget();
 		if (entity.getDistanceSq(target) > maxAttackDistance) {
 			return false;
 		}
@@ -90,7 +90,7 @@ public class EntityAIFlierDiveTask<T extends EntityLiving> extends EntityAIBase
 		//this.lastAttackTicks = 0;
 	}
 	
-	public void attackTarget(T entity, EntityLivingBase target) {
+	public void attackTarget(T entity, LivingEntity target) {
 		entity.attackEntityAsMob(entity.getAttackTarget());		
 	}
 
@@ -98,19 +98,19 @@ public class EntityAIFlierDiveTask<T extends EntityLiving> extends EntityAIBase
 	 * Updates the task
 	 */
 	public void updateTask() {
-		EntityLivingBase target = this.entity.getAttackTarget();
+		LivingEntity target = this.entity.getAttackTarget();
 
 		if (target != null) {
 			
 			// If close enough, attack!
-			if (entity.getDistanceSq(target.posX, target.posY + (target.height / 2), target.posZ) < Math.max(entity.width * entity.width, 1.5)) {
+			if (entity.getDistanceSq(target.posX, target.posY + (target.getHeight() / 2), target.posZ) < Math.max(entity.getWidth * entity.getWidth, 1.5)) {
 				this.attackTarget(entity, target);
 				this.lastAttackTicks = entity.world.getTotalWorldTime();
 				entity.getMoveHelper().strafe(1f, 0f);
 			} else {
 			
 				// Attempt to move towards the target
-				entity.getMoveHelper().setMoveTo(target.posX, target.posY + (target.height / 2), target.posZ, moveSpeedAmp);
+				entity.getMoveHelper().setMoveTo(target.posX, target.posY + (target.getHeight() / 2), target.posZ, moveSpeedAmp);
 				
 				if (Math.abs(entity.prevPosX - entity.posX)
 						+ Math.abs(entity.prevPosY - entity.posY)

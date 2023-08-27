@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 import net.minecraft.block.BlockLadder;
 import net.minecraft.block.BlockTorch;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 public class RoomTee1 extends StaticRoom {
@@ -211,11 +211,11 @@ public class RoomTee1 extends StaticRoom {
 				"XXXXXXXXX",
 				'X', DungeonBlock.instance(),
 				' ', null,
-				'L', new BlockState(Blocks.LADDER, Blocks.LADDER.getDefaultState().withProperty(BlockLadder.FACING, EnumFacing.NORTH)),
+				'L', new BlockState(Blocks.LADDER, Blocks.LADDER.getDefaultState().withProperty(BlockLadder.FACING, Direction.NORTH)),
 				'B', Blocks.IRON_BARS,
-				'W', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.WEST)),
-				'E', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.EAST)),
-				'S', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.SOUTH)),
+				'W', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.WEST)),
+				'E', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.EAST)),
+				'S', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.SOUTH)),
 				'C', new BlockState(Blocks.CARPET, 14),
 				'G', new BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.GOLEM_LIGHTNING.ordinal()));
 	}
@@ -231,11 +231,11 @@ public class RoomTee1 extends StaticRoom {
 		
 		list.add(NostrumDungeon.asRotated(start,
 						new BlockPos(-4, 0, 16),
-						EnumFacing.EAST));
+						Direction.EAST));
 		
 		list.add(NostrumDungeon.asRotated(start,
 				new BlockPos(4, 0, 16),
-				EnumFacing.WEST));
+				Direction.WEST));
 		
 		return list;
 	}
@@ -269,7 +269,7 @@ public class RoomTee1 extends StaticRoom {
 	public DungeonExitPoint getKeyLocation(DungeonExitPoint start) {
 		return NostrumDungeon.asRotated(start,
 				new BlockPos(-3, 4, 18),
-				EnumFacing.EAST);
+				Direction.EAST);
 	}
 
 	@Override
@@ -277,7 +277,7 @@ public class RoomTee1 extends StaticRoom {
 		return Lists.newArrayList(
 				NostrumDungeon.asRotated(start,
 						new BlockPos(-3, 4, 16),
-						EnumFacing.EAST));
+						Direction.EAST));
 	}
 	
 }

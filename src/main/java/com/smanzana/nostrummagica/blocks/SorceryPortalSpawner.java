@@ -7,7 +7,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -38,7 +38,7 @@ public class SorceryPortalSpawner extends Block implements ITriggeredBlock {
 	}
 	
 	protected void activatePortal(World world, BlockPos pos, IBlockState state) {
-		world.setBlockState(pos.up(), SorceryPortal.instance().getStateForPlacement(world, pos, EnumFacing.UP, 0f, 0f, 0f, 0, null, null));
+		world.setBlockState(pos.up(), SorceryPortal.instance().getStateForPlacement(world, pos, Direction.UP, 0f, 0f, 0f, 0, null, null));
 	}
 	
 	private void destroy(World world, BlockPos pos, IBlockState state) {

@@ -13,9 +13,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
@@ -25,8 +25,8 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class FrostbitePotion extends Potion {
 
@@ -61,7 +61,7 @@ public class FrostbitePotion extends Potion {
 	}
 
 	@Override
-	public void performEffect(EntityLivingBase entity, int amp) {
+	public void performEffect(LivingEntity entity, int amp) {
 		// If entity has blizzard set, heal instead of harm
 		final int blizzardCount = EnchantedArmor.GetSetCount(entity, EMagicElement.ICE, 3);
 		if (blizzardCount == 4) {
@@ -75,8 +75,8 @@ public class FrostbitePotion extends Potion {
 					return;
 				}
 				attr.addMana(-manaCost);
-				if (entity instanceof EntityPlayer) {
-					NostrumMagica.proxy.sendMana((EntityPlayer) entity);
+				if (entity instanceof PlayerEntity) {
+					NostrumMagica.proxy.sendMana((PlayerEntity) entity);
 				}
 				
 				EntityAreaEffect cloud = new EntityAreaEffect(entity.world, entity.posX, entity.posY, entity.posZ);
@@ -102,8 +102,8 @@ public class FrostbitePotion extends Potion {
 						if (effect.doesShowParticles()) {
 							effect.getEffectName();
 						}
-						if (ent instanceof EntityLivingBase) {
-							((EntityLivingBase) ent).addPotionEffect(new PotionEffect(FrostbitePotion.instance(), 20 * 3, 2));
+						if (ent instanceof LivingEntity) {
+							((LivingEntity) ent).addPotionEffect(new PotionEffect(FrostbitePotion.instance(), 20 * 3, 2));
 						}
 					}
 				});
@@ -126,13 +126,13 @@ public class FrostbitePotion extends Potion {
 		}
     }
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
     public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
 		PotionIcon.FROSTBITE.draw(mc, x + 6, y + 7);
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
     public void renderHUDEffect(int x, int y, PotionEffect effect, net.minecraft.client.Minecraft mc, float alpha) {
 		PotionIcon.FROSTBITE.draw(mc, x + 3, y + 3);

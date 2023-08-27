@@ -11,7 +11,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellPart;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.world.World;
 
@@ -43,15 +43,15 @@ public class EntityGolemIce extends EntityGolem {
 	}
 
 	@Override
-	public void doMeleeTask(EntityLivingBase target) {
+	public void doMeleeTask(LivingEntity target) {
 		this.attackEntityAsMob(target);
 	}
 
 	@Override
-	public void doRangeTask(EntityLivingBase target) {
+	public void doRangeTask(LivingEntity target) {
 		EntityGolemIce.init();
 		
-		EntityLivingBase targ = this.getAttackTarget();
+		LivingEntity targ = this.getAttackTarget();
 		if (targ != target)
 			this.setAttackTarget(target);
 		
@@ -62,10 +62,10 @@ public class EntityGolemIce extends EntityGolem {
 	}
 
 	@Override
-	public void doBuffTask(EntityLivingBase target) {
+	public void doBuffTask(LivingEntity target) {
 		EntityGolemIce.init();
 		
-		EntityLivingBase targ = this.getAttackTarget();
+		LivingEntity targ = this.getAttackTarget();
 		if (targ != target)
 			this.setAttackTarget(target);
 		
@@ -76,7 +76,7 @@ public class EntityGolemIce extends EntityGolem {
 	}
 
 	@Override
-	public boolean shouldDoBuff(EntityLivingBase target) {
+	public boolean shouldDoBuff(LivingEntity target) {
 		return target.getActivePotionEffect(MagicShieldPotion.instance()) == null;
 	}
 

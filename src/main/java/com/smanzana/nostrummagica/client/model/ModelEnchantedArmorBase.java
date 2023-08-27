@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.model;
 
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelRenderer;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.inventory.EntityEquipmentSlot;
 
@@ -305,16 +305,16 @@ public class ModelEnchantedArmorBase extends ModelBiped {
 
 		if (this.isChild)
 		{
-			GlStateManager.scale(0.75F, 0.75F, 0.75F);
-			GlStateManager.translate(0.0F, 16.0F * scale, 0.0F);
+			GlStateManager.scalef(0.75F, 0.75F, 0.75F);
+			GlStateManager.translatef(0.0F, 16.0F * scale, 0.0F);
 			if (head.showModel) {
 				copyOffsetAndRots(head, bipedHead);
 				this.head.render(scale);
 			}
 			GlStateManager.popMatrix();
 			GlStateManager.pushMatrix();
-			GlStateManager.scale(0.5F, 0.5F, 0.5F);
-			GlStateManager.translate(0.0F, 24.0F * scale, 0.0F);
+			GlStateManager.scalef(0.5F, 0.5F, 0.5F);
+			GlStateManager.translatef(0.0F, 24.0F * scale, 0.0F);
 			if (body.showModel) {
 				copyOffsetAndRots(body, bipedBody);
 				this.body.render(scale);
@@ -355,7 +355,7 @@ public class ModelEnchantedArmorBase extends ModelBiped {
 		{
 			if (entityIn.isSneaking())
 			{
-				GlStateManager.translate(0.0F, 0.2F, 0.0F);
+				GlStateManager.translatef(0.0F, 0.2F, 0.0F);
 			}
 			
 			if (head.showModel) {

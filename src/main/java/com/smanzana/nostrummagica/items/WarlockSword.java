@@ -41,14 +41,14 @@ import info.loenwind.autoconfig.factory.IValue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
@@ -57,8 +57,8 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Optional;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 @Optional.Interface(iface="com.smanzana.nostrummagica.integration.enderio.wrappers.IItemOfTravelWrapper",modid="enderio")
 public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor, IItemOfTravelWrapper, IRaytraceOverlay {
@@ -135,17 +135,17 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
     }
 
 	@Override
-	public void apply(EntityLivingBase caster, SpellCastSummary summary, ItemStack stack) {
+	public void apply(LivingEntity caster, SpellCastSummary summary, ItemStack stack) {
 		// +10% potency
 		//summary.addEfficiency(.1f);
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		super.addInformation(stack, worldIn, tooltip, flagIn);
 		
-		boolean extra = Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());
+		boolean extra = Keyboard.isKeyDown(Minecraft.getInstance().gameSettings.keyBindSneak.getKeyCode());
 		
 		Map<EMagicElement, Float> levels = getLevels(stack);
 		for (EMagicElement elem : EMagicElement.values()) {
@@ -181,67 +181,67 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 	}
 	
 	public static Float getLevel(ItemStack stack, EMagicElement element) {
-		NBTTagCompound nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTagCompound();
 		if (nbt == null) {
 			return 0f;
 		}
 		
-		return nbt.getCompoundTag(NBT_LEVELS).getFloat(element.name().toLowerCase());
+		return nbt.getCompound(NBT_LEVELS).getFloat(element.name().toLowerCase());
 	}
 	
 	public static ItemStack setLevel(ItemStack stack, EMagicElement element, float level) {
-		NBTTagCompound nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTagCompound();
 		if (nbt == null) {
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		}
 		
-		NBTTagCompound tag = nbt.getCompoundTag(NBT_LEVELS);
-		tag.setFloat(element.name().toLowerCase(), Math.max(0, level));
-		nbt.setTag(NBT_LEVELS, tag);
+		CompoundNBT tag = nbt.getCompound(NBT_LEVELS);
+		tag.putFloat(element.name().toLowerCase(), Math.max(0, level));
+		nbt.put(NBT_LEVELS, tag);
 		stack.setTagCompound(nbt);
 		return stack;
 	}
 	
 	public static ItemStack addLevel(ItemStack stack, EMagicElement element, float diff) {
-		NBTTagCompound nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTagCompound();
 		if (nbt == null) {
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		}
 		
-		NBTTagCompound tag = nbt.getCompoundTag(NBT_LEVELS);
+		CompoundNBT tag = nbt.getCompound(NBT_LEVELS);
 		float amt = tag.getFloat(element.name().toLowerCase());
 		
-		tag.setFloat(element.name().toLowerCase(), Math.max(0, amt + diff));
-		nbt.setTag(NBT_LEVELS, tag);
+		tag.putFloat(element.name().toLowerCase(), Math.max(0, amt + diff));
+		nbt.put(NBT_LEVELS, tag);
 		
 		stack.setTagCompound(nbt);
 		return stack;
 	}
 	
 	public static int getCapacity(ItemStack stack) {
-		NBTTagCompound nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTagCompound();
 		if (nbt == null) {
 			return 0;
 		}
 		
-		return nbt.getInteger(NBT_CAPACITY);
+		return nbt.getInt(NBT_CAPACITY);
 	}
 	
 	public static ItemStack addCapacity(ItemStack stack, int diff) {
-		NBTTagCompound nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTagCompound();
 		if (nbt == null) {
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		}
 		
-		int amt = nbt.getInteger(NBT_CAPACITY);
-		nbt.setInteger(NBT_CAPACITY, Math.max(0, amt+ diff));
+		int amt = nbt.getInt(NBT_CAPACITY);
+		nbt.putInt(NBT_CAPACITY, Math.max(0, amt+ diff));
 		
 		stack.setTagCompound(nbt);
 		return stack;
 	}
 	
 	public static boolean hasEnderIOTravel(ItemStack stack) {
-		NBTTagCompound nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTagCompound();
 		if (nbt == null) {
 			return false;
 		}
@@ -250,18 +250,18 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 	}
 	
 	public static ItemStack setEnderIOTravel(ItemStack stack, boolean hasTravel) {
-		NBTTagCompound nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTagCompound();
 		if (nbt == null) {
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		}
 		
-		nbt.setBoolean(NBT_ENDERIO_TRAVEL_CAP, hasTravel);
+		nbt.putBoolean(NBT_ENDERIO_TRAVEL_CAP, hasTravel);
 		stack.setTagCompound(nbt);
 		return stack;
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
 		if (this.isInCreativeTab(tab)) {
 			subItems.add(addCapacity(new ItemStack(this), 10));
@@ -284,7 +284,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 		}
 	}
 	
-	public static void doEffect(EntityLivingBase entity, EMagicElement element) {
+	public static void doEffect(LivingEntity entity, EMagicElement element) {
 		if (entity.world.isRemote) {
 			return;
 		}
@@ -297,10 +297,10 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 	}
 	
 	@Override
-	public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
+	public boolean hitEntity(ItemStack stack, LivingEntity target, LivingEntity attacker) {
 		
 		// Add magic damage, but only if weapon cooldown is recovered
-		if (!(attacker instanceof EntityPlayer) || ((EntityPlayer)attacker).getCooledAttackStrength(0.5F) > .95) {
+		if (!(attacker instanceof PlayerEntity) || ((PlayerEntity)attacker).getCooledAttackStrength(0.5F) > .95) {
 			Map<EMagicElement, Float> levels = getLevels(stack);
 			for (EMagicElement elem : EMagicElement.values()) {
 				Float level = levels.get(elem);
@@ -355,7 +355,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 		}
 	}
 	
-	private boolean canEnderTravel(ItemStack item, EntityPlayer player) {
+	private boolean canEnderTravel(ItemStack item, PlayerEntity player) {
 		return hasEnderIOTravel(item)//getLevel(item, EMagicElement.ENDER) > 0
 				&& (NostrumMagica.getMagicWrapper(player) != null)
 				&& (NostrumMagica.getMagicWrapper(player).isUnlocked());
@@ -375,7 +375,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 
 	@Optional.Method(modid="enderio")
 	@Override
-	public boolean isActive(EntityPlayer player, ItemStack item) {
+	public boolean isActive(PlayerEntity player, ItemStack item) {
 		return player.isSneaking()
 				&& canEnderTravel(item, player);
 	}
@@ -400,7 +400,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
 
 		final @Nonnull ItemStack stack = playerIn.getHeldItem(hand);
 		if (playerIn.getCooledAttackStrength(0.5F) > .95) {
@@ -424,7 +424,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 	}
 	
 	@Override
-	public boolean shouldTrace(World world, EntityPlayer player, ItemStack stack) {
+	public boolean shouldTrace(World world, PlayerEntity player, ItemStack stack) {
 		Map<EMagicElement, Float> power = getLevels(stack);
 		for (EMagicElement elem : EMagicElement.values()) {
 			Float val = power.get(elem);
@@ -442,7 +442,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 		extractInternal(item, power.get());
 	}
 	
-	protected boolean tryCast(World worldIn, EntityPlayer playerIn, EnumHand hand, ItemStack stack) {
+	protected boolean tryCast(World worldIn, PlayerEntity playerIn, EnumHand hand, ItemStack stack) {
 		boolean used = false;
 		if (playerIn.getCooledAttackStrength(0.5F) > .95) {
 			
@@ -488,7 +488,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 		return used;
 	}
 	
-	public static boolean DoCast(EntityPlayer player) {
+	public static boolean DoCast(PlayerEntity player) {
 		// Try to find weapon
 		EnumHand hand = EnumHand.MAIN_HAND;
 		@Nonnull ItemStack stack = player.getHeldItem(hand);

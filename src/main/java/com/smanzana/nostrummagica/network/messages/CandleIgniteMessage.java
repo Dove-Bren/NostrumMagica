@@ -7,8 +7,8 @@ import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -26,14 +26,14 @@ public class CandleIgniteMessage implements IMessage {
 
 		@Override
 		public IMessage onMessage(CandleIgniteMessage message, MessageContext ctx) {
-			Minecraft.getMinecraft().addScheduledTask(() -> {
-				final int dim = message.tag.getInteger(NBT_DIM);
+			Minecraft.getInstance().runAsync(() -> {
+				final int dim = message.tag.getInt(NBT_DIM);
 				final BlockPos pos = BlockPos.fromLong(message.tag.getLong(NBT_POS));
-				final ReagentType type = message.tag.hasKey(NBT_REAGENT)
-						? ReagentType.values()[message.tag.getInteger(NBT_REAGENT) % ReagentType.values().length]
+				final ReagentType type = message.tag.contains(NBT_REAGENT)
+						? ReagentType.values()[message.tag.getInt(NBT_REAGENT) % ReagentType.values().length]
 						: null;
 				
-				EntityPlayer player = NostrumMagica.proxy.getPlayer();
+				PlayerEntity player = NostrumMagica.proxy.getPlayer();
 				if (player.dimension != dim) {
 					return;
 				}
@@ -55,18 +55,18 @@ public class CandleIgniteMessage implements IMessage {
 	private static final String NBT_POS = "pos";
 	private static final String NBT_REAGENT = "reagent_type";
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public CandleIgniteMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	public CandleIgniteMessage(int dimension, BlockPos pos, ReagentType type) {
-		tag = new NBTTagCompound();
-		tag.setInteger(NBT_DIM, dimension);
-		tag.setLong(NBT_POS, pos.toLong());
+		tag = new CompoundNBT();
+		tag.putInt(NBT_DIM, dimension);
+		tag.putLong(NBT_POS, pos.toLong());
 		if (type != null) {
-			tag.setInteger(NBT_REAGENT, type.ordinal());
+			tag.putInt(NBT_REAGENT, type.ordinal());
 		}
 	}
 

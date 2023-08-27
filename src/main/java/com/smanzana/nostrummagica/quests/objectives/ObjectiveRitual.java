@@ -8,8 +8,8 @@ import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -25,14 +25,14 @@ public class ObjectiveRitual implements IObjective, IRitualListener {
 		}
 		
 		@Override
-		public NBTTagCompound toNBT() {
-			NBTTagCompound tag = new NBTTagCompound();
-			tag.setBoolean(KEY, state);
+		public CompoundNBT toNBT() {
+			CompoundNBT tag = new CompoundNBT();
+			tag.putBoolean(KEY, state);
 			return tag;
 		}
 
 		@Override
-		public void fromNBT(NBTTagCompound nbt) {
+		public void fromNBT(CompoundNBT nbt) {
 			this.state = nbt.getBoolean(KEY);
 		}
 	}
@@ -56,7 +56,7 @@ public class ObjectiveRitual implements IObjective, IRitualListener {
 	}
 
 	@Override
-	public void onRitualPerformed(RitualRecipe ritual, World world, EntityPlayer player, BlockPos center) {
+	public void onRitualPerformed(RitualRecipe ritual, World world, PlayerEntity player, BlockPos center) {
 		if (ritual.getTitleKey().equalsIgnoreCase(ritualKey)) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			if (attr == null)

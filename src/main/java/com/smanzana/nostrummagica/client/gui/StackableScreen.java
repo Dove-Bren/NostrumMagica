@@ -1,40 +1,39 @@
 package com.smanzana.nostrummagica.client.gui;
 
-import java.io.IOException;
-
 import javax.annotation.Nullable;
 
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.util.text.StringTextComponent;
 
-public class StackableScreen extends GuiScreen {
+public class StackableScreen extends Screen {
 
-	private @Nullable GuiScreen prevScreen;
+	private @Nullable Screen prevScreen;
 	
 	public StackableScreen() {
-		super();
+		super(new StringTextComponent("StableSceenParent"));
 	}
 	
-	public StackableScreen(GuiScreen prevScreen) {
+	public StackableScreen(Screen prevScreen) {
 		this();
 		this.setPrevScreen(prevScreen);
 	}
 	
-	public @Nullable GuiScreen getPrevScreen() {
+	public @Nullable Screen getPrevScreen() {
 		return this.prevScreen;
 	}
 	
-	public void setPrevScreen(@Nullable GuiScreen prevScreen) {
+	public void setPrevScreen(@Nullable Screen prevScreen) {
 		this.prevScreen = prevScreen;
 	}
 	
 	@Override
-	protected void keyTyped(char typedChar, int keyCode) throws IOException {
-		if (keyCode == 1 && prevScreen != null) {
-			this.mc.displayGuiScreen(prevScreen);
+	public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
+		if (p_keyPressed_1_ == 256 && prevScreen != null) {
+			this.minecraft.displayGuiScreen(prevScreen);
 			this.setPrevScreen(null);
-			return;
+			return true;
 		}
 		
-		super.keyTyped(typedChar, keyCode);
+		return super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
 	}
 }

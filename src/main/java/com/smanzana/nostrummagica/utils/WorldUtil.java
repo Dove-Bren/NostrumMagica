@@ -5,7 +5,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
 public class WorldUtil {
@@ -17,7 +17,7 @@ public class WorldUtil {
 		 * @param pos
 		 * @return
 		 */
-		public boolean scan(IBlockAccess access, BlockPos pos);
+		public boolean scan(IBlockReader access, BlockPos pos);
 	}
 	
 	/**
@@ -80,8 +80,7 @@ public class WorldUtil {
 				final int z = (baseZ + iterZ);
 				final int y = iterY;
 				
-				
-				if (y < 0 || y > world.provider.getHeight()) {
+				if (y < 0 || y > world.getHeight()) {
 					continue;
 				}
 				

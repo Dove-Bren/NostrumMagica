@@ -8,10 +8,10 @@ import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -33,11 +33,11 @@ public class SpawnNostrumRitualEffectMessage implements IMessage {
 		@Override
 		public IMessage onMessage(SpawnNostrumRitualEffectMessage message, MessageContext ctx) {
 			
-			final int dimID = message.tag.getInteger(NBT_DIMENSION_ID);
+			final int dimID = message.tag.getInt(NBT_DIMENSION_ID);
 			final BlockPos pos = BlockPos.fromLong(message.tag.getLong(NBT_POS));
 			final EMagicElement element = EMagicElement.valueOf(message.tag.getString(NBT_ELEMENT).toUpperCase());
 			
-			EntityPlayer player = NostrumMagica.proxy.getPlayer();
+			PlayerEntity player = NostrumMagica.proxy.getPlayer();
 			if (player.dimension != dimID) {
 				return null;
 			}
@@ -49,20 +49,20 @@ public class SpawnNostrumRitualEffectMessage implements IMessage {
 			}
 			
 			ItemStack center = ItemStack.EMPTY;
-			if (message.tag.hasKey(NBT_CENTER_ITEM)) {
-				center = new ItemStack(message.tag.getCompoundTag(NBT_CENTER_ITEM));
+			if (message.tag.contains(NBT_CENTER_ITEM)) {
+				center = new ItemStack(message.tag.getCompound(NBT_CENTER_ITEM));
 			}
 			
 			ItemStack output = ItemStack.EMPTY;
-			if (message.tag.hasKey(NBT_OUTPUT)) {
-				output = new ItemStack(message.tag.getCompoundTag(NBT_OUTPUT));
+			if (message.tag.contains(NBT_OUTPUT)) {
+				output = new ItemStack(message.tag.getCompound(NBT_OUTPUT));
 			}
 			
 			@Nullable NonNullList<ItemStack> extras = null;
-			if (message.tag.hasKey(NBT_EXTRA_ITEMS)) {
-				NBTTagList list = message.tag.getTagList(NBT_EXTRA_ITEMS, NBT.TAG_COMPOUND);
+			if (message.tag.contains(NBT_EXTRA_ITEMS)) {
+				ListNBT list = message.tag.getList(NBT_EXTRA_ITEMS, NBT.TAG_COMPOUND);
 				extras = NonNullList.create();
-				for (int i = 0; i < list.tagCount(); i++) {
+				for (int i = 0; i < list.size(); i++) {
 					 extras.add(new ItemStack(list.getCompoundTagAt(i)));
 				}
 			}
@@ -71,7 +71,7 @@ public class SpawnNostrumRitualEffectMessage implements IMessage {
 			final ItemStack outputF = output;
 			final NonNullList<ItemStack> extrasF = extras;
 			
-//			Minecraft.getMinecraft().addScheduledTask(() -> {
+//			Minecraft.getInstance().runAsync(() -> {
 //				ClientEffectRenderer.instance().addEffect(ClientEffectRitual.Create(
 //						new Vec3d(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5),
 //						element, centerF, extrasF, types, outputF
@@ -92,19 +92,19 @@ public class SpawnNostrumRitualEffectMessage implements IMessage {
 	private static final String NBT_OUTPUT = "output";
 	private static final String NBT_ELEMENT = "element";
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public SpawnNostrumRitualEffectMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	public SpawnNostrumRitualEffectMessage(int dimension, BlockPos pos, EMagicElement element, ReagentType[] reagents,
 			ItemStack center, @Nullable NonNullList<ItemStack> extras, ItemStack output) {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 		
-		tag.setInteger(NBT_DIMENSION_ID, dimension);
-		tag.setLong(NBT_POS, pos.toLong());
-		tag.setString(NBT_ELEMENT, element.name());
+		tag.putInt(NBT_DIMENSION_ID, dimension);
+		tag.putLong(NBT_POS, pos.toLong());
+		tag.putString(NBT_ELEMENT, element.name());
 		
 		int[] intArr = new int[reagents.length];
 		for (int i = 0; i < reagents.length; i++) {
@@ -112,19 +112,19 @@ public class SpawnNostrumRitualEffectMessage implements IMessage {
 		}
 		tag.setIntArray(NBT_REAGENTS, intArr);
 		if (!center.isEmpty()) {
-			tag.setTag(NBT_CENTER_ITEM, center.serializeNBT());
+			tag.put(NBT_CENTER_ITEM, center.serializeNBT());
 		}
 		if (extras != null) {
-			NBTTagList list = new NBTTagList();
+			ListNBT list = new ListNBT();
 			
 			for (ItemStack stack : extras) {
-				list.appendTag(stack.serializeNBT());
+				list.add(stack.serializeNBT());
 			}
 			
-			tag.setTag(NBT_EXTRA_ITEMS, list);
+			tag.put(NBT_EXTRA_ITEMS, list);
 		}
 		if (!output.isEmpty()) {
-			tag.setTag(NBT_OUTPUT, output.serializeNBT());
+			tag.put(NBT_OUTPUT, output.serializeNBT());
 		}
 	}
 

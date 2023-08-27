@@ -6,7 +6,7 @@ import java.util.List;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig.Key;
 
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Property;
@@ -15,7 +15,7 @@ import net.minecraftforge.fml.client.config.IConfigElement;
 
 public class ModConfigGui extends GuiConfig {
 
-	public ModConfigGui(GuiScreen parent) {
+	public ModConfigGui(Screen parent) {
 		super(parent,
 		fetchComponents(),
 		NostrumMagica.MODID, false, false, GuiConfig.getAbridgedConfigPath(ModConfig.config.base.toString()));

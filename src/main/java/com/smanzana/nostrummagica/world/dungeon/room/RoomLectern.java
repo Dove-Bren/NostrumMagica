@@ -30,11 +30,11 @@ import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockTorch;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagString;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.StringNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -92,12 +92,12 @@ public class RoomLectern extends StaticRoom {
 				"XXXXXXXXXXXXXXXXXXXXX",
 				"XXXXXXXXXXXXXXXXXXXXX",
 				'X', DungeonBlock.instance(),
-				'W', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.WEST)),
-				'E', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.EAST)),
-				'N', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.NORTH)),
-				'W', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.SOUTH)),
+				'W', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.WEST)),
+				'E', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.EAST)),
+				'N', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.NORTH)),
+				'W', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.SOUTH)),
 				'C', new BlockState(Blocks.CARPET, 14),
-				'T', new BlockState(Blocks.QUARTZ_STAIRS, Blocks.STONE_BRICK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.WEST).withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.BOTTOM).withProperty(BlockStairs.SHAPE, BlockStairs.EnumShape.STRAIGHT)),
+				'T', new BlockState(Blocks.QUARTZ_STAIRS, Blocks.STONE_BRICK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, Direction.WEST).withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.BOTTOM).withProperty(BlockStairs.SHAPE, BlockStairs.EnumShape.STRAIGHT)),
 				'Q', Blocks.QUARTZ_BLOCK,
 				'G', new BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.GOLEM_FIRE.ordinal()),
 				'L', AltarBlock.instance(),
@@ -116,7 +116,7 @@ public class RoomLectern extends StaticRoom {
 		
 		BlockPos exit = new BlockPos(0, 0, 6);
 		
-		list.add(NostrumDungeon.asRotated(start, exit, EnumFacing.NORTH));
+		list.add(NostrumDungeon.asRotated(start, exit, Direction.NORTH));
 		
 		return list;
 	}
@@ -357,13 +357,13 @@ public class RoomLectern extends StaticRoom {
 			scroll.setItemDamage(NostrumMagica.rand.nextInt(10));
 			
 			// Set description
-			NBTTagCompound nbt = scroll.getTagCompound();
-			NBTTagList list = nbt.getTagList("Lore", NBT.TAG_STRING);
+			CompoundNBT nbt = scroll.getTagCompound();
+			ListNBT list = nbt.getList("Lore", NBT.TAG_STRING);
 			if (null == list)
-				list = new NBTTagList();
+				list = new ListNBT();
 			
-			list.appendTag(new NBTTagString(spell.getDescription()));
-			nbt.setTag("Lore", list);
+			list.add(new StringNBT(spell.getDescription()));
+			nbt.put("Lore", list);
 			scroll.setTagCompound(nbt);
 			
 			te.setItem(scroll);

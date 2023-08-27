@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss.PlantBossTree
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -47,7 +47,7 @@ public class RenderPlantBoss extends RenderLiving<EntityPlantBoss> {
 	public void doRender(EntityPlantBoss plant, double x, double y, double z, float entityYaw, float partialTicks) {
 //		if (entity.isWolfWet()) {
 //			float f = entity.getBrightness() * entity.getShadingWhileWet(partialTicks);
-//			GlStateManager.color(f, f, f);
+//			GlStateManager.color4f(f, f, f);
 //		}
 		
 		//this.mainModel = new ModelPlantBoss();
@@ -63,8 +63,8 @@ public class RenderPlantBoss extends RenderLiving<EntityPlantBoss> {
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(0, -plant.getBody().height/2, 0);
-		GlStateManager.color(1f, 1f, 1f, 1f);
+		GlStateManager.translatef(0, -plant.getBody().height/2, 0);
+		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
 		
 		// 4 faces
@@ -126,8 +126,8 @@ public class RenderPlantBoss extends RenderLiving<EntityPlantBoss> {
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(0, -plant.getBody().height/2, 0);
-		GlStateManager.color(1f, 1f, 1f, 1f);
+		GlStateManager.translatef(0, -plant.getBody().height/2, 0);
+		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
 		
 		final double uBase = (192f / 256f);
@@ -182,7 +182,7 @@ public class RenderPlantBoss extends RenderLiving<EntityPlantBoss> {
 			final EMagicElement element = plant.getTreeElement();
 			final int color = element.getColor();
 			final float brightness = 1f;
-			GlStateManager.color(
+			GlStateManager.color4f(
 					brightness * (float)((color >> 16) & 0xFF) / 255f,
 					brightness * (float)((color >> 8) & 0xFF) / 255f,
 					brightness * (float)((color >> 0) & 0xFF) / 255f,
@@ -208,7 +208,7 @@ public class RenderPlantBoss extends RenderLiving<EntityPlantBoss> {
 			buffer.pos(0, yMax, hMax).tex(umax,vmax).normal(1, 0, 0).endVertex();
 
 			Tessellator.getInstance().draw();
-			GlStateManager.color(1f, 1f, 1f, 1f);
+			GlStateManager.color4f(1f, 1f, 1f, 1f);
 		}
 		
 		GlStateManager.popMatrix();
@@ -227,17 +227,17 @@ public class RenderPlantBoss extends RenderLiving<EntityPlantBoss> {
 		// Also render leaf models. Do it here so I don't have to repeat all the rotations and scaling
 		GlStateManager.pushMatrix();
 		final float existingRotation = this.interpolateRotation(plant.prevRenderYawOffset, plant.renderYawOffset, ageInTicks % 1);
-		GlStateManager.rotate((180.0F - existingRotation), 0, 1, 0); // undo existing rotation
-		GlStateManager.translate(0, plant.getBody().height/2, 0);
+		GlStateManager.rotatef((180.0F - existingRotation), 0, 1, 0); // undo existing rotation
+		GlStateManager.translatef(0, plant.getBody().height/2, 0);
 		for (int i = 0; i < leafModels.length; i++) {
 			PlantBossLeafLimb leaf = plant.getLeafLimb(i);
 			final double offsetCenter = (i % 2 == 0 ? 1.25 : 1.5) * plant.getBody().width;
 			final double offset = offsetCenter - (3f/2f); // Model starts at 0, not center (for better rotation)
 			
 			GlStateManager.pushMatrix();
-			GlStateManager.rotate(180 + leaf.getYawOffset(), 0, 1, 0);
-			GlStateManager.translate(offset, -.001 * i, 0);
-			GlStateManager.rotate(-leaf.getPitch(), 0, 0, 1);
+			GlStateManager.rotatef(180 + leaf.getYawOffset(), 0, 1, 0);
+			GlStateManager.translatef(offset, -.001 * i, 0);
+			GlStateManager.rotatef(-leaf.getPitch(), 0, 0, 1);
 			leafModels[i].render(leaf, 0f, 0f, ageInTicks, 0f, 0f, scaleFactor);
 			GlStateManager.popMatrix();
 		}

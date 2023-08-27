@@ -10,11 +10,11 @@ import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 public class OutcomeBindSpell implements IRitualOutcome {
@@ -24,7 +24,7 @@ public class OutcomeBindSpell implements IRitualOutcome {
 	}
 	
 	@Override
-	public boolean canPerform(World world, EntityPlayer player, BlockPos center, RitualMatchInfo ingredients) {
+	public boolean canPerform(World world, PlayerEntity player, BlockPos center, RitualMatchInfo ingredients) {
 		ItemStack tome = ingredients.center;
 		ItemStack scroll = ItemStack.EMPTY;
 		if (ingredients.extras != null && ingredients.extras.size() > 0)
@@ -41,7 +41,7 @@ public class OutcomeBindSpell implements IRitualOutcome {
 		
 		if (!SpellTome.hasRoom(tome)) {
 			if (!player.world.isRemote) {
-				player.sendMessage(new TextComponentTranslation("info.tome.full"));
+				player.sendMessage(new TranslationTextComponent("info.tome.full"));
 			}
 			return false;
 		}
@@ -50,7 +50,7 @@ public class OutcomeBindSpell implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, EntityPlayer player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, PlayerEntity player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
 		// Take the spell and tome and begin the player binding
 		
 		// Tome has to be center.

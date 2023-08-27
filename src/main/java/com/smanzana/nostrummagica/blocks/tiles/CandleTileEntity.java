@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.ITickableTileEntity;
@@ -49,19 +49,19 @@ public class CandleTileEntity extends TileEntity implements ITickableTileEntity 
 	}
 	
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt = super.writeToNBT(nbt);
 		
-		nbt.setString(NBT_TYPE, serializeType(type));
+		nbt.putString(NBT_TYPE, serializeType(type));
 		
 		return nbt;
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(CompoundNBT nbt) {
 		super.readFromNBT(nbt);
 		
-		if (nbt == null || !nbt.hasKey(NBT_TYPE, NBT.TAG_STRING))
+		if (nbt == null || !nbt.contains(NBT_TYPE, NBT.TAG_STRING))
 			return;
 		
 		this.type = parseType(nbt.getString(NBT_TYPE));
@@ -73,8 +73,8 @@ public class CandleTileEntity extends TileEntity implements ITickableTileEntity 
 	}
 
 	@Override
-	public NBTTagCompound getUpdateTag() {
-		return this.writeToNBT(new NBTTagCompound());
+	public CompoundNBT getUpdateTag() {
+		return this.writeToNBT(new CompoundNBT());
 	}
 	
 	@Override

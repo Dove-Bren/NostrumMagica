@@ -11,7 +11,7 @@ import com.smanzana.nostrummagica.listeners.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -42,7 +42,7 @@ public abstract class TriggerAreaTrigger extends SpellTrigger {
 		
 		private int aliveCycles;
 		private boolean dead;
-		private Map<EntityLivingBase, Integer> affected; // maps to time last effect visited
+		private Map<LivingEntity, Integer> affected; // maps to time last effect visited
 		
 		public TriggerAreaTriggerInstance(SpellState state, World world, Vec3d pos, int tickRate, int duration, float radiusHint, boolean continuous, boolean affectsGround) {
 			super(state);
@@ -59,11 +59,11 @@ public abstract class TriggerAreaTrigger extends SpellTrigger {
 			aliveCycles = 0;
 		}
 		
-		protected abstract boolean isInArea(EntityLivingBase entity);
+		protected abstract boolean isInArea(LivingEntity entity);
 		protected abstract boolean isInArea(World world, BlockPos pos);
 		
 		@Override
-		public void init(EntityLivingBase caster) {
+		public void init(LivingEntity caster) {
 			// We are instant! Whoo!
 			
 			NostrumMagica.playerListener.registerProximity(this, world, pos, radiusHint);
@@ -75,7 +75,7 @@ public abstract class TriggerAreaTrigger extends SpellTrigger {
 		}
 
 		@Override
-		public boolean onEvent(Event type, EntityLivingBase entity, Object empty) {
+		public boolean onEvent(Event type, LivingEntity entity, Object empty) {
 			if (dead)
 				return true;
 			
@@ -137,7 +137,7 @@ public abstract class TriggerAreaTrigger extends SpellTrigger {
 		 * @param entity
 		 * @return
 		 */
-		protected boolean visitEntity(EntityLivingBase entity) {
+		protected boolean visitEntity(LivingEntity entity) {
 			if (entity == null) {
 				return false;
 			}

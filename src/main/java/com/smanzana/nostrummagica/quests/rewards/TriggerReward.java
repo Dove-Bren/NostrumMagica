@@ -5,7 +5,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 
 public class TriggerReward implements IReward {
 
@@ -16,7 +16,7 @@ public class TriggerReward implements IReward {
 	}
 	
 	@Override
-	public void award(EntityPlayer player) {
+	public void award(PlayerEntity player) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr != null)
 			attr.addTrigger(trigger);

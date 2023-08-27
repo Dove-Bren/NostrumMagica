@@ -20,24 +20,24 @@ import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagString;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 // TODO remove; no longer have these types of shrines spawning.
 // Remove, or convert like ShrineSeekingGem
@@ -73,9 +73,9 @@ public class SeekerIdol extends Item implements ILoreTagged {
 		if (itemStackIn.isEmpty() || !(itemStackIn.getItem() instanceof SeekerIdol))
 			return null;
 		
-		NBTTagCompound nbt = itemStackIn.getTagCompound();
+		CompoundNBT nbt = itemStackIn.getTagCompound();
 		
-		if (nbt == null || !nbt.hasKey(NBT_TYPE, NBT.TAG_STRING) || !nbt.hasKey(NBT_KEY, NBT.TAG_STRING))
+		if (nbt == null || !nbt.contains(NBT_TYPE, NBT.TAG_STRING) || !nbt.contains(NBT_KEY, NBT.TAG_STRING))
 			return new SpellComponentWrapper(EMagicElement.PHYSICAL);
 		
 		String type = nbt.getString(NBT_TYPE).toLowerCase();
@@ -122,7 +122,7 @@ public class SeekerIdol extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
 		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		if (worldIn.isRemote)
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
@@ -134,7 +134,7 @@ public class SeekerIdol extends Item implements ILoreTagged {
 		
 		Vec3d dir = findShrineDir(worldIn, playerIn.getPositionVector(), component);
 		if (dir == null) {
-			playerIn.sendMessage(new TextComponentString("Could not find a shrine of that type! Explore the world more."));
+			playerIn.sendMessage(new StringTextComponent("Could not find a shrine of that type! Explore the world more."));
 		} else {
 			playerIn.addVelocity(dir.x* 1, 0, dir.z* 1);
 			playerIn.velocityChanged = true;
@@ -189,10 +189,10 @@ public class SeekerIdol extends Item implements ILoreTagged {
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SeekerIdol))
 			return;
 		
-		NBTTagCompound nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTagCompound();
 		
 		if (nbt == null)
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		String type = "";
 		String key = "";
 		if (component.isElement()) {
@@ -209,14 +209,14 @@ public class SeekerIdol extends Item implements ILoreTagged {
 			key = component.getTrigger().getTriggerKey();
 		}
 		
-		nbt.setString(NBT_TYPE, type);
-		nbt.setString(NBT_KEY, key);
+		nbt.putString(NBT_TYPE, type);
+		nbt.putString(NBT_KEY, key);
 		
 		itemStack.setTagCompound(nbt);
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		SpellComponentWrapper component = getNestedComponent(stack);
 		if (component == null)
@@ -317,15 +317,15 @@ public class SeekerIdol extends Item implements ILoreTagged {
 		}
 
 		@Override
-		public void readFromNBT(NBTTagCompound nbt) {
+		public void readFromNBT(CompoundNBT nbt) {
 			knownDungeons.clear();
 			
-			for (String key : nbt.getKeySet()) {
+			for (String key : nbt.keySet()) {
 				SpellComponentWrapper comp = SpellComponentWrapper.fromKeyString(key);
 				List<BlockPos> list = new LinkedList<>();
-				NBTTagList tags = nbt.getTagList(key, NBT.TAG_STRING);
-				for (int i = 0; i < tags.tagCount(); i++) {
-					String serial = tags.getStringTagAt(i);
+				ListNBT tags = nbt.getList(key, NBT.TAG_STRING);
+				for (int i = 0; i < tags.size(); i++) {
+					String serial = tags.getString(i);
 					int x = 0, y = 0, z = 0;
 					try {
 						int pos = serial.indexOf(' ');
@@ -347,15 +347,15 @@ public class SeekerIdol extends Item implements ILoreTagged {
 		}
 
 		@Override
-		public NBTTagCompound writeToNBT(NBTTagCompound base) {
+		public CompoundNBT writeToNBT(CompoundNBT base) {
 			for (Entry<SpellComponentWrapper, List<BlockPos>> row : knownDungeons.entrySet()) {
-				NBTTagList list = new NBTTagList();
+				ListNBT list = new ListNBT();
 				
 				for (BlockPos pos : row.getValue()) {
-					list.appendTag(new NBTTagString(pos.getX() + " " + pos.getY() + " " + pos.getZ()));
+					list.add(new StringNBT(pos.getX() + " " + pos.getY() + " " + pos.getZ()));
 				}
 				
-				base.setTag(row.getKey().getKeyString(), list);
+				base.put(row.getKey().getKeyString(), list);
 			}
 			
 			return base;

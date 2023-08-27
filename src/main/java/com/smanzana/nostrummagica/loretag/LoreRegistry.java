@@ -55,7 +55,7 @@ import com.smanzana.nostrummagica.items.ThanosStaff;
 import com.smanzana.nostrummagica.items.WarlockSword;
 
 import net.minecraft.block.Block;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
@@ -151,7 +151,7 @@ public class LoreRegistry {
 		}
 	}
 	
-	public static ILoreTagged getPreset(EntityLivingBase entityLiving) {
+	public static ILoreTagged getPreset(LivingEntity entityLiving) {
 		if (entityLiving == null)
 			return null;
 		
@@ -179,7 +179,7 @@ public class LoreRegistry {
 	
 	public static enum Preset implements ILoreTagged {
 		
-		UNDEAD(new Filter() {public boolean matches(EntityLivingBase base) {
+		UNDEAD(new Filter() {public boolean matches(LivingEntity base) {
 				return base.isEntityUndead();
 			}
 			
@@ -187,17 +187,17 @@ public class LoreRegistry {
 		LEAVES(Blocks.LEAVES, "Leaves", new String[] {"What's up there in the leaves?", "It looks like some sort of dust..."}, "Leaves catch the small amount of Sky Ash that falls during the day.");
 		
 		protected static interface Filter {
-			public boolean matches(EntityLivingBase base);
+			public boolean matches(LivingEntity base);
 		}
 		
 		private Filter filter;
-		private Class<? extends EntityLivingBase> clazz;
+		private Class<? extends LivingEntity> clazz;
 		private Block block;
 		private Lore basic;
 		private Lore deep;
 		private String key;
 		
-		private Preset(Class<? extends EntityLivingBase> clazz, String key, String lore[], String ... deep) {
+		private Preset(Class<? extends LivingEntity> clazz, String key, String lore[], String ... deep) {
 			this.clazz = clazz;
 			this.key = key;
 			this.basic = new Lore();
@@ -206,7 +206,7 @@ public class LoreRegistry {
 			this.deep.add(deep);
 		}
 		
-		private Preset(Filter filter, Class<? extends EntityLivingBase> icon, String key, String lore[], String ... deep) {
+		private Preset(Filter filter, Class<? extends LivingEntity> icon, String key, String lore[], String ... deep) {
 			this.filter = filter;
 			this.key = key;
 			this.basic = new Lore();
@@ -245,7 +245,7 @@ public class LoreRegistry {
 			return deep;
 		}
 		
-		public boolean matches(EntityLivingBase base) {
+		public boolean matches(LivingEntity base) {
 			if (clazz != null && clazz.isAssignableFrom(base.getClass()))
 				return true;
 			
@@ -274,7 +274,7 @@ public class LoreRegistry {
 			return this.block;
 		}
 		
-		public EntityLivingBase getEntity(World world) {
+		public LivingEntity getEntity(World world) {
 			try {
 				return this.clazz.getConstructor(World.class)
 						.newInstance(world);

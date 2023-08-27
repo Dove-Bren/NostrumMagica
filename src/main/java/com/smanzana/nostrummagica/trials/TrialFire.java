@@ -4,11 +4,11 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class TrialFire extends ShrineTrial {
 
@@ -19,7 +19,7 @@ public class TrialFire extends ShrineTrial {
 
 	@SubscribeEvent
 	public void onDeath(LivingDeathEvent e) {
-		if (e.getEntityLiving() instanceof EntityPlayer) {
+		if (e.getEntityLiving() instanceof PlayerEntity) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(e.getEntityLiving());
 			if (attr == null || !attr.isUnlocked())
 				return;
@@ -30,7 +30,7 @@ public class TrialFire extends ShrineTrial {
 			if (e.getSource() != DamageSource.LAVA)
 				return;
 			
-			this.complete((EntityPlayer) e.getEntityLiving());
+			this.complete((PlayerEntity) e.getEntityLiving());
 		}
 	}
 	

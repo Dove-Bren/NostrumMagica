@@ -9,11 +9,11 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
@@ -42,7 +42,7 @@ public class MirrorItem extends Item implements ILoreTagged {
 		this.setCreativeTab(NostrumMagica.creativeTab);
 	}
 	
-	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
+	public EnumActionResult onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, EnumHand hand, Direction facing, float hitX, float hitY, float hitZ)
 	{
 		
 		// Copied from ItemBed (vanilla) with some modifications
@@ -51,7 +51,7 @@ public class MirrorItem extends Item implements ILoreTagged {
 		{
 			return EnumActionResult.SUCCESS;
 		}
-		else if (facing != EnumFacing.UP)
+		else if (facing != Direction.UP)
 		{
 			return EnumActionResult.FAIL;
 		}
@@ -68,7 +68,7 @@ public class MirrorItem extends Item implements ILoreTagged {
 			}
 
 			int i = MathHelper.floor((double)(playerIn.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
-			EnumFacing enumfacing = EnumFacing.getHorizontal(i + 2);
+			Direction enumfacing = Direction.getHorizontal(i + 2);
 			//BlockPos blockpos = pos.offset(enumfacing);
 
 			if (playerIn.canPlayerEdit(pos, facing, stack))
@@ -77,14 +77,14 @@ public class MirrorItem extends Item implements ILoreTagged {
 				boolean flag2 = flag || worldIn.isAirBlock(pos);
 				//boolean flag3 = flag1 || worldIn.isAirBlock(blockpos);
 
-				if (flag2 && worldIn.getBlockState(pos.down()).isSideSolid(worldIn, pos.down(), EnumFacing.UP))
+				if (flag2 && worldIn.getBlockState(pos.down()).isSideSolid(worldIn, pos.down(), Direction.UP))
 				{
 					IBlockState iblockstate1 = NostrumMirrorBlock.instance().getDefaultState().withProperty(NostrumMirrorBlock.FACING, enumfacing);
 
 					worldIn.setBlockState(pos, iblockstate1, 11);
 
 					SoundType soundtype = iblockstate1.getBlock().getSoundType(iblockstate1, worldIn, pos, playerIn);
-					worldIn.playSound((EntityPlayer)null, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
+					worldIn.playSound((PlayerEntity)null, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
 					stack.shrink(1);
 					return EnumActionResult.SUCCESS;
 				}

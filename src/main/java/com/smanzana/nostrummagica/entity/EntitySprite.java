@@ -26,7 +26,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
@@ -35,10 +35,10 @@ import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -51,8 +51,8 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class EntitySprite extends EntityMob implements ILoreTagged {
 
@@ -92,7 +92,7 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
         this.tasks.addTask(priority++, new EntityAISwimming(this));
         this.tasks.addTask(priority++, new EntityAIFollowEntityGeneric<EntitySprite>(this, 1D, 2f, 4f, false, null) {
         	@Override
-        	protected EntityLivingBase getTarget(EntitySprite entity) {
+        	protected LivingEntity getTarget(EntitySprite entity) {
         		return entity.getAttackTarget();
         	}
         	
@@ -103,14 +103,14 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
         });
         this.tasks.addTask(priority++, new EntityAIFollowEntityGeneric<EntitySprite>(this, 1D, 6f, 10f, false, null) {
         	@Override
-        	protected EntityLivingBase getTarget(EntitySprite entity) {
+        	protected LivingEntity getTarget(EntitySprite entity) {
         		return entity.getAttackTarget();
         	}
         });
         this.tasks.addTask(priority++, new EntityAIWander(this, 1.0D));
-        this.tasks.addTask(priority++, new EntityAIWatchClosest(this, EntityPlayer.class, 24.0F));
+        this.tasks.addTask(priority++, new EntityAIWatchClosest(this, PlayerEntity.class, 24.0F));
         this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, false, new Class[0]));
-        this.targetTasks.addTask(2, new EntityAINearestAttackableTarget<EntityPlayer>(this, EntityPlayer.class, true));
+        this.targetTasks.addTask(2, new EntityAINearestAttackableTarget<PlayerEntity>(this, PlayerEntity.class, true));
     }
     
     protected void applyEntityAttributes()
@@ -147,7 +147,7 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
 
     public float getEyeHeight()
     {
-        return this.height * 0.4F;
+        return this.getHeight() * 0.4F;
     }
 
     public boolean attackEntityAsMob(Entity entityIn)
@@ -162,7 +162,7 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
         return flag;
     }
 
-    public boolean processInteract(EntityPlayer player, EnumHand hand, @Nonnull ItemStack stack)
+    public boolean processInteract(PlayerEntity player, EnumHand hand, @Nonnull ItemStack stack)
     {
         return false;
     }
@@ -184,17 +184,17 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
         return false;
     }
 
-    public boolean shouldAttackEntity(EntityLivingBase target, EntityLivingBase owner)
+    public boolean shouldAttackEntity(LivingEntity target, LivingEntity owner)
     {
         return target != this;
     }
 
-    public boolean canBeLeashedTo(EntityPlayer player)
+    public boolean canBeLeashedTo(PlayerEntity player)
     {
         return false;
     }
     
-    private void applyEffect(EntityLivingBase entity) {
+    private void applyEffect(LivingEntity entity) {
     	entity.removePotionEffect(Potion.getPotionFromResourceLocation("levitation"));
     	entity.removePotionEffect(RootedPotion.instance());
     	if (this.isAngry()) {
@@ -209,7 +209,7 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
 			entity.addPotionEffect(
 				new PotionEffect(Potion.getPotionFromResourceLocation("levitation"), dur)
 				);
-			if (entity instanceof EntityPlayer) {
+			if (entity instanceof PlayerEntity) {
 				this.addPotionEffect(
 						new PotionEffect(Potion.getPotionFromResourceLocation("glowing"), finalDur)
 					);
@@ -242,18 +242,18 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
 				List<Entity> entities = world.getEntitiesWithinAABBExcludingEntity(this, bb);
 				
 				for (Entity entity : entities) {
-					if (entity instanceof EntityLivingBase && !(entity instanceof EntitySprite)) {
+					if (entity instanceof LivingEntity && !(entity instanceof EntitySprite)) {
 						
-						if (entity instanceof EntityPlayer) {
+						if (entity instanceof PlayerEntity) {
 							continue;
 						}
 						
-						applyEffect((EntityLivingBase) entity);
+						applyEffect((LivingEntity) entity);
 					}
 				}
 				
 				// Players
-				for (EntityPlayer player : world.playerEntities) {
+				for (PlayerEntity player : world.playerEntities) {
 					if (player.isCreative() || player.isSpectator()) {
 						continue;
 					}
@@ -297,16 +297,16 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
 		this.dataManager.register(SPRITE_ANGRY, false);
 	}
 	
-	public void readEntityFromNBT(NBTTagCompound compound) {
+	public void readEntityFromNBT(CompoundNBT compound) {
 		super.readEntityFromNBT(compound);
 		
 		this.dataManager.set(SPRITE_ANGRY, compound.getBoolean("angry"));
 	}
 	
-	public void writeEntityToNBT(NBTTagCompound compound) {
+	public void writeEntityToNBT(CompoundNBT compound) {
     	super.writeEntityToNBT(compound);
     	
-    	compound.setBoolean("angry", this.isAngry());
+    	compound.putBoolean("angry", this.isAngry());
 	}
 	
 	@Override
@@ -319,7 +319,7 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
 		
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
     public int getBrightnessForRender(float partialTicks)
     {
         return 15728880;
@@ -389,11 +389,11 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
 			double d0 = this.rand.nextGaussian() * 0.02D;
 			double d1 = this.rand.nextGaussian() * 0.02D;
 			double d2 = this.rand.nextGaussian() * 0.02D;
-			this.world.spawnParticle(enumparticletypes, this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.height), this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, d0, d1, d2, new int[0]);
+			this.world.spawnParticle(enumparticletypes, this.posX + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.posZ + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, d0, d1, d2, new int[0]);
 		}
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void handleStatusUpdate(byte id) {
 		if (id == 6) {
@@ -411,7 +411,7 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
 	
 	@Override
 	protected boolean isValidLightLevel() {
-		BlockPos blockpos = new BlockPos(this.posX, this.getEntityBoundingBox().minY, this.posZ);
+		BlockPos blockpos = new BlockPos(this.posX, this.getBoundingBox().minY, this.posZ);
 		
 		if (world.getBlockState(blockpos).getMaterial() == Material.GRASS) {
 			return world.getLightFromNeighbors(blockpos) <= this.getRNG().nextInt(12);

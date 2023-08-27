@@ -4,7 +4,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.render.LayerArcaneWolfRunes;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.ResourceLocation;
@@ -33,7 +33,7 @@ public class RenderArcaneWolf extends RenderLiving<EntityArcaneWolf> {
 	public void doRender(EntityArcaneWolf entity, double x, double y, double z, float entityYaw, float partialTicks) {
 		if (entity.isWolfWet()) {
 			float f = entity.getBrightness() * entity.getShadingWhileWet(partialTicks);
-			GlStateManager.color(f, f, f);
+			GlStateManager.color4f(f, f, f);
 		}
 		
 		//this.mainModel = new ModelArcaneWolf();

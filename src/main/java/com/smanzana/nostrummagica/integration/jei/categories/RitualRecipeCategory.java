@@ -27,9 +27,9 @@ import mezz.jei.api.ingredients.VanillaTypes;
 import mezz.jei.api.recipe.IRecipeCategory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -98,7 +98,7 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipeWrapper
 		if (recipeFlavor == null)
 			recipeFlavor = EMagicElement.PHYSICAL;
 		
-		float frac = (float) (Minecraft.getSystemTime() % 3000L) / 3000f;
+		float frac = (float) (System.currentTimeMillis() % 3000L) / 3000f;
 		angle = frac * 360f;
 		alpha = .8f + .2f * (float) Math.sin(frac * 2 * Math.PI);
 		
@@ -106,26 +106,26 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipeWrapper
 		red = ((float) ((color >> 16) & 0xFF) / 255f);
 		green = ((float) ((color >> 8) & 0xFF) / 255f);
 		blue = ((float) (color & 0xFF) / 255f);
-		GlStateManager.translate(48, 70, 0);
-		GlStateManager.rotate(angle, 0, 0, 1f);
-		GlStateManager.translate(-RING_WIDTH / 2, -RING_HEIGHT/2, 0);
+		GlStateManager.translatef(48, 70, 0);
+		GlStateManager.rotatef(angle, 0, 0, 1f);
+		GlStateManager.translatef(-RING_WIDTH / 2, -RING_HEIGHT/2, 0);
 		
-		GlStateManager.color(red, green, blue, alpha);
+		GlStateManager.color4f(red, green, blue, alpha);
 		GlStateManager.enableBlend();
 		minecraft.getTextureManager().bindTexture(TEXT_RING);
-		Gui.drawModalRectWithCustomSizedTexture(0, 0, 0, 0,
+		RenderFuncs.drawModalRectWithCustomSizedTexture(0, 0, 0, 0,
 				RING_WIDTH, RING_HEIGHT, RING_WIDTH, RING_HEIGHT);
 		
 		GlStateManager.popMatrix();
 		
 		if (!canPerform) {
-			minecraft.fontRenderer.drawString(ChatFormatting.BOLD + "x" + ChatFormatting.RESET, 108, 70, 0xFFAA0000);
+			minecraft.font.drawString(ChatFormatting.BOLD + "x" + ChatFormatting.RESET, 108, 70, 0xFFAA0000);
 		}
 		
 		
 		String title = recipeName;
-		int len = minecraft.fontRenderer.getStringWidth(title);
-		minecraft.fontRenderer.drawString(title, (BACK_WIDTH - len) / 2, 2, 0xFF000000);
+		int len = minecraft.font.getStringWidth(title);
+		minecraft.font.drawString(title, (BACK_WIDTH - len) / 2, 2, 0xFF000000);
 	}
 
 	@Override
@@ -191,7 +191,7 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipeWrapper
 		
 		// Check whether this ritual can be performed
 		canPerform = true;
-		EntityPlayer player = NostrumMagica.proxy.getPlayer();
+		PlayerEntity player = NostrumMagica.proxy.getPlayer();
 		if (player != null) {
 			// Client side, so check if player has unlocked the ritual
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);

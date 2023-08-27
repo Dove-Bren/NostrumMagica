@@ -20,22 +20,22 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 	
@@ -69,8 +69,8 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 		this.hasSubtypes = true;
 		
 		this.addPropertyOverride(new ResourceLocation("extended"), new IItemPropertyGetter() {
-			@SideOnly(Side.CLIENT)
-			public float apply(ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn) {
+			@OnlyIn(Dist.CLIENT)
+			public float apply(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
 				return entityIn != null
 						&& (IsExtended(stack)
 						&& (entityIn.getHeldItem(EnumHand.MAIN_HAND) == stack || entityIn.getHeldItem(EnumHand.OFF_HAND) == stack))
@@ -121,7 +121,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 	}
 
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
 		final ItemStack itemStackIn = playerIn.getHeldItem(hand); 
 		final HookshotType type = GetType(itemStackIn);
 		if (true) {
@@ -167,7 +167,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 			} else {
 				if (!worldIn.isRemote) {
 					if (playerIn.dimension == ModConfig.config.sorceryDimensionIndex()) {
-						playerIn.sendMessage(new TextComponentTranslation("info.hookshot.bad_dim"));
+						playerIn.sendMessage(new TranslationTextComponent("info.hookshot.bad_dim"));
 					} else {
 						EntityHookShot hook = new EntityHookShot(worldIn, playerIn, getMaxDistance(itemStackIn), 
 								ProjectileTrigger.getVectorForRotation(playerIn.rotationPitch, playerIn.rotationYaw).scale(getVelocity(itemStackIn)),
@@ -229,9 +229,9 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 	}
 	
 	public static void SetHook(ItemStack stack, EntityHookShot entity) {
-		NBTTagCompound tag = stack.getTagCompound();
+		CompoundNBT tag = stack.getTagCompound();
 		if (tag == null) {
-			tag = new NBTTagCompound();
+			tag = new CompoundNBT();
 		}
 		
 		if (entity == null) {
@@ -261,7 +261,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 	}
 	
 	protected static UUID GetHookID(ItemStack stack) {
-		NBTTagCompound tag = stack.getTagCompound();
+		CompoundNBT tag = stack.getTagCompound();
 		UUID id = null;
 		if (tag != null) {
 			id = tag.getUniqueId(NBT_HOOK_ID);
@@ -289,10 +289,10 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 		
 		if (IsExtended(stack)) {
 			// Clear extended if we can't find the anchor entity or it's not in our hand anymore
-			if (entityIn instanceof EntityLivingBase)  {
-				EntityLivingBase holder = (EntityLivingBase) entityIn;
+			if (entityIn instanceof LivingEntity)  {
+				LivingEntity holder = (LivingEntity) entityIn;
 				if (!(holder.getHeldItem(EnumHand.MAIN_HAND) == stack || holder.getHeldItem(EnumHand.OFF_HAND) == stack)) {
-					if (entityIn instanceof EntityPlayer) {
+					if (entityIn instanceof PlayerEntity) {
 					}
 					ClearHookEntity(worldIn, stack);
 					return;
@@ -302,15 +302,15 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 			EntityHookShot anchor = GetHookEntity(worldIn, stack);
 			if (anchor == null) {
 				ClearHookEntity(worldIn, stack);
-				if (entityIn instanceof EntityPlayer) {
+				if (entityIn instanceof PlayerEntity) {
 				}
 				return;
 			}
 			
 			// Detect two active hookshots (since claw bypass) and clear if we're older
 			// 4 is mainhand //0 is offhand
-			if (entityIn instanceof EntityLivingBase) {
-				EntityLivingBase living = (EntityLivingBase) entityIn;
+			if (entityIn instanceof LivingEntity) {
+				LivingEntity living = (LivingEntity) entityIn;
 				final EnumHand hand = (itemSlot == 0 ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND);
 				@Nonnull final ItemStack otherHand = living.getHeldItem(hand == EnumHand.MAIN_HAND ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND);
 				if (!otherHand.isEmpty() && otherHand.getItem() instanceof HookshotItem && IsExtended(otherHand)) {
@@ -350,7 +350,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
 		if (this.isInCreativeTab(tab)) {
 			for (HookshotType type : HookshotType.values()) {
@@ -387,17 +387,17 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 	}
 	
 	public static boolean CanBeHooked(HookshotType type, Entity entity) {
-		return entity instanceof EntityItem || entity instanceof EntityLivingBase;
+		return entity instanceof EntityItem || entity instanceof LivingEntity;
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public String getItemStackDisplayName(ItemStack stack) {
 		return I18n.format(this.getUnlocalizedName() + "_" + GetTypeSuffix(TypeFromMeta(stack.getMetadata())) + ".name", (Object[])null);
 	}
 
 	@Override
-	public boolean isElytraFlying(EntityLivingBase entityIn, ItemStack stack) {
+	public boolean isElytraFlying(LivingEntity entityIn, ItemStack stack) {
 		if (IsExtended(stack)) {
 			// See if we're being pulled
 			EntityHookShot anchor = GetHookEntity(entityIn.world, stack);
@@ -407,9 +407,9 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 		return false;
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
-	public boolean shouldRenderElyta(EntityLivingBase entity, ItemStack stack) {
+	public boolean shouldRenderElyta(LivingEntity entity, ItemStack stack) {
 		return false;
 	}
 	

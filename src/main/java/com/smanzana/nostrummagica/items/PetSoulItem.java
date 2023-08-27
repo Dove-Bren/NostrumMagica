@@ -9,10 +9,10 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.pet.IPetWithSoul;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -34,7 +34,7 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 	}
 	
 	public @Nullable UUID getPetSoulID(ItemStack stack) {
-		NBTTagCompound tag = stack.getTagCompound();
+		CompoundNBT tag = stack.getTagCompound();
 		if (tag != null) {
 			return tag.getUniqueId(NBT_PETID);
 		} else {
@@ -43,16 +43,16 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 	}
 	
 	public void setPetSoulID(ItemStack stack, UUID rawSoulID) {
-		NBTTagCompound nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTagCompound();
 		if (nbt == null) {
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		}
 		nbt.setUniqueId(NBT_PETID, rawSoulID);
 		stack.setTagCompound(nbt);
 	}
 	
 	public @Nullable String getPetName(ItemStack stack) {
-		NBTTagCompound tag = stack.getTagCompound();
+		CompoundNBT tag = stack.getTagCompound();
 		if (tag != null) {
 			return tag.getString(NBT_PETNAME);
 		} else {
@@ -61,18 +61,18 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 	}
 	
 	public void setPetName(ItemStack stack, String name) {
-		NBTTagCompound nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTagCompound();
 		if (nbt == null) {
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		}
-		nbt.setString(NBT_PETNAME, name);
+		nbt.putString(NBT_PETNAME, name);
 		stack.setTagCompound(nbt);
 	}
 	
 	public void setPet(ItemStack stack, IPetWithSoul pet) {
 		this.setPetSoulID(stack, pet.getPetSoulID());
-		if (pet instanceof EntityLivingBase) {
-			this.setPetName(stack, ((EntityLivingBase) pet).getName());
+		if (pet instanceof LivingEntity) {
+			this.setPetName(stack, ((LivingEntity) pet).getName());
 		}
 	}
 	
@@ -86,11 +86,11 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 	 * @param stack
 	 * @return
 	 */
-	public abstract boolean canSpawnEntity(World world, @Nullable EntityLivingBase spawner, Vec3d pos, ItemStack stack);
+	public abstract boolean canSpawnEntity(World world, @Nullable LivingEntity spawner, Vec3d pos, ItemStack stack);
 	
-	protected abstract void setWorldID(EntityLivingBase pet, UUID worldID);
+	protected abstract void setWorldID(LivingEntity pet, UUID worldID);
 	
-	protected abstract void beforePetRespawn(EntityLivingBase pet, World world, Vec3d pos, ItemStack stack);
+	protected abstract void beforePetRespawn(LivingEntity pet, World world, Vec3d pos, ItemStack stack);
 	
 	@Override
 	public int getEntityLifespan(ItemStack itemStack, World world) {
@@ -98,7 +98,7 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 		return 18000;
 	}
 	
-	public static @Nullable EntityLivingBase SpawnPet(ItemStack stack, World world, Vec3d pos) {
+	public static @Nullable LivingEntity SpawnPet(ItemStack stack, World world, Vec3d pos) {
 		if (stack == null || stack.isEmpty() || !(stack.getItem() instanceof PetSoulItem)) {
 			return null;
 		}
@@ -109,7 +109,7 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 			return null;
 		}
 		
-		NBTTagCompound snapshot = NostrumMagica.getPetSoulRegistry().getPetSnapshot(soulID);
+		CompoundNBT snapshot = NostrumMagica.getPetSoulRegistry().getPetSnapshot(soulID);
 		if (snapshot == null) {
 			return null;
 		}
@@ -119,13 +119,13 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 		Entity rawEnt = IPetWithSoul.SpawnPetFromSnapshot(world, pos, snapshot, false);
 		if (rawEnt == null) {
 			return null;
-		} else if (!(rawEnt instanceof EntityLivingBase)) {
+		} else if (!(rawEnt instanceof LivingEntity)) {
 			rawEnt.isDead = true;
 			//world.removeEntity(rawEnt);
 			return null;
 		}
 		
-		EntityLivingBase ent = (EntityLivingBase) rawEnt;
+		LivingEntity ent = (LivingEntity) rawEnt;
 		
 		// Check for other copies of the entity in the world, and remove them if so
 		for (Entity e : world.loadedEntityList) {

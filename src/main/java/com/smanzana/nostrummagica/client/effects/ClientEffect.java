@@ -8,12 +8,12 @@ import org.lwjgl.opengl.GL11;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class ClientEffect {
 	
 	public static class ClientEffectRenderDetail {
@@ -66,7 +66,7 @@ public class ClientEffect {
 	}
 	
 	public boolean displayTick(Minecraft mc, float partialTicks) {
-		long sysTime = Minecraft.getSystemTime();
+		long sysTime = System.currentTimeMillis();
 		if (startTime == 0)
 			startTime = sysTime;
 		else {
@@ -87,14 +87,14 @@ public class ClientEffect {
 		preModHook(detail, progress, partialTicks);
 		
 		GlStateManager.disableBlend();
-		GlStateManager.disableAlpha();
+		GlStateManager.disableAlphaTest();
 		GlStateManager.enableBlend();
-		GlStateManager.enableAlpha();
+		GlStateManager.enableAlphaTest();
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GlStateManager.disableLighting();
 		drawForm(detail, mc, progress, partialTicks);
 		GlStateManager.enableBlend();
-		GlStateManager.enableAlpha();
+		GlStateManager.enableAlphaTest();
 		GlStateManager.enableColorMaterial();
 		
 		GlStateManager.popMatrix();
@@ -116,7 +116,7 @@ public class ClientEffect {
 		for (ClientEffectModifier mod : modifiers) {
 			mod.earlyApply(detail, progress, partialTicks);
 		}
-		GlStateManager.translate(origin.x, origin.y, origin.z);
+		GlStateManager.translated(origin.x, origin.y, origin.z);
 	}
 	
 	public void onStart() {

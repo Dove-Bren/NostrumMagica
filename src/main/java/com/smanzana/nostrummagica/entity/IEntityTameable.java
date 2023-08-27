@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.entity;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IEntityOwnable;
 
 /**
@@ -18,12 +18,12 @@ public interface IEntityTameable extends IEntityOwnable {
 	public boolean isEntityTamed();
 	
 	/**
-	 * Updated getOwner call. We must be owned by an EntityLivingBase
+	 * Updated getOwner call. We must be owned by an LivingEntity
 	 */
-	default public EntityLivingBase getLivingOwner() {
+	default public LivingEntity getLivingOwner() {
 		Entity owner = this.getOwner();
-		if (owner instanceof EntityLivingBase) {
-			return (EntityLivingBase) owner;
+		if (owner instanceof LivingEntity) {
+			return (LivingEntity) owner;
 		}
 		return null;
 	}

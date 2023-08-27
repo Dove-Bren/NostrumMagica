@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.entity.tasks.dragon;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonFlying;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIAttackMelee;
 
@@ -104,12 +104,12 @@ public class DragonMeleeAttackTask extends EntityAIAttackMelee {
 	}
 
 	@Override
-	protected double getAttackReachSqr(EntityLivingBase attackTarget) {
-		return reachSQR + attackTarget.width;
+	protected double getAttackReachSqr(LivingEntity attackTarget) {
+		return reachSQR + attackTarget.getWidth;
 	}
 	
 	@Override
-	protected void checkAndPerformAttack(EntityLivingBase entity, double dist) {
+	protected void checkAndPerformAttack(LivingEntity entity, double dist) {
 		double reach = this.getAttackReachSqr(entity);
 		boolean flying = false;
 		

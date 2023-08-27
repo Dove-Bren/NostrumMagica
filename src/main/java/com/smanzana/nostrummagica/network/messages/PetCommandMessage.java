@@ -10,10 +10,10 @@ import com.smanzana.nostrummagica.pet.PetTargetMode;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -31,18 +31,18 @@ public class PetCommandMessage implements IMessage {
 
 		@Override
 		public IMessage onMessage(PetCommandMessage message, MessageContext ctx) {
-			final EntityPlayerMP sp = ctx.getServerHandler().player;
+			final ServerPlayerEntity sp = ctx.getServerHandler().player;
 			
 			// Can't call from network threads because manager doesn't sync entity target modification
 			
-			sp.getServerWorld().addScheduledTask(() -> {
-				final @Nullable EntityLivingBase target;
-				final @Nullable EntityLiving pet;
+			sp.getServerWorld().runAsync(() -> {
+				final @Nullable LivingEntity target;
+				final @Nullable MobEntity pet;
 				
 				if (message.targetUUID != null) {
 					Entity e = NostrumMagica.getEntityByUUID(sp.world, message.targetUUID);
-					if (e instanceof EntityLivingBase) {
-						target = (EntityLivingBase) e;
+					if (e instanceof LivingEntity) {
+						target = (LivingEntity) e;
 					} else {
 						target = null;
 					}
@@ -52,8 +52,8 @@ public class PetCommandMessage implements IMessage {
 				
 				if (message.petUUID != null) {
 					Entity e = NostrumMagica.getEntityByUUID(sp.world, message.petUUID);
-					if (e instanceof EntityLiving) {
-						pet = (EntityLiving) e;
+					if (e instanceof MobEntity) {
+						pet = (MobEntity) e;
 					} else {
 						pet = null;
 					}
@@ -136,15 +136,15 @@ public class PetCommandMessage implements IMessage {
 		return new PetCommandMessage(PetCommandMessageType.STOP, null, null, null, null);
 	}
 	
-	public static PetCommandMessage PetStop(EntityLivingBase pet) {
+	public static PetCommandMessage PetStop(LivingEntity pet) {
 		return new PetCommandMessage(PetCommandMessageType.STOP, pet.getUniqueID(), null, null, null);
 	}
 	
-	public static PetCommandMessage AllAttack(EntityLivingBase target) {
+	public static PetCommandMessage AllAttack(LivingEntity target) {
 		return new PetCommandMessage(PetCommandMessageType.ATTACK, null, target.getUniqueID(), null, null);
 	}
 	
-	public static PetCommandMessage PetAttack(EntityLivingBase pet, EntityLivingBase target) {
+	public static PetCommandMessage PetAttack(LivingEntity pet, LivingEntity target) {
 		return new PetCommandMessage(PetCommandMessageType.ATTACK, pet.getUniqueID(), target.getUniqueID(), null, null);
 	}
 	
@@ -164,7 +164,7 @@ public class PetCommandMessage implements IMessage {
 	
 	@Override
 	public void fromBytes(ByteBuf buf) {
-		NBTTagCompound tag = ByteBufUtils.readTag(buf);
+		CompoundNBT tag = ByteBufUtils.readTag(buf);
 		try {
 			this.type = PetCommandMessageType.valueOf(tag.getString(NBT_TYPE).toUpperCase());
 		} catch (Exception e) {
@@ -187,7 +187,7 @@ public class PetCommandMessage implements IMessage {
 			this.targetUUID = null;
 		}
 		
-		if (tag.hasKey(NBT_PLACEMENT_MODE)) {
+		if (tag.contains(NBT_PLACEMENT_MODE)) {
 			try {
 				this.placementMode = PetPlacementMode.valueOf(tag.getString(NBT_PLACEMENT_MODE).toUpperCase());
 			} catch (Exception e) {
@@ -198,7 +198,7 @@ public class PetCommandMessage implements IMessage {
 			this.placementMode = PetPlacementMode.FREE;
 		}
 		
-		if (tag.hasKey(NBT_TARGET_MODE)) {
+		if (tag.contains(NBT_TARGET_MODE)) {
 			try {
 				this.targetMode = PetTargetMode.valueOf(tag.getString(NBT_TARGET_MODE).toUpperCase());
 			} catch (Exception e) {
@@ -212,9 +212,9 @@ public class PetCommandMessage implements IMessage {
 
 	@Override
 	public void toBytes(ByteBuf buf) {
-		NBTTagCompound tag = new NBTTagCompound();
+		CompoundNBT tag = new CompoundNBT();
 		
-		tag.setString(NBT_TYPE, this.type.name());
+		tag.putString(NBT_TYPE, this.type.name());
 		if (petUUID != null) {
 			tag.setUniqueId(NBT_PET_ID, petUUID);
 		}
@@ -222,10 +222,10 @@ public class PetCommandMessage implements IMessage {
 			tag.setUniqueId(NBT_TARGET_ID, targetUUID);
 		}
 		if (placementMode != null) {
-			tag.setString(NBT_PLACEMENT_MODE, this.placementMode.name());
+			tag.putString(NBT_PLACEMENT_MODE, this.placementMode.name());
 		}
 		if (targetMode != null) {
-			tag.setString(NBT_TARGET_MODE, this.targetMode.name());
+			tag.putString(NBT_TARGET_MODE, this.targetMode.name());
 		}
 		
 		ByteBufUtils.writeTag(buf, tag);

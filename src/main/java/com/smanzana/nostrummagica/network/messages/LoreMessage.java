@@ -9,11 +9,11 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
 import net.minecraftforge.common.capabilities.Capability;
@@ -41,7 +41,7 @@ public class LoreMessage implements IMessage {
 			INostrumMagic override = CAPABILITY.getDefaultInstance();
 			CAPABILITY.getStorage().readNBT(CAPABILITY, override, null, message.tag.getTag(NBT_ATTRIBUTES));
 			
-			Minecraft.getMinecraft().addScheduledTask(() -> {
+			Minecraft.getInstance().runAsync(() -> {
 				NostrumMagica.proxy.receiveStatOverrides(override);
 				
 				ILoreTagged lore = LoreRegistry.instance().lookup(message.tag.getString(NBT_LORE_KEY));
@@ -51,10 +51,10 @@ public class LoreMessage implements IMessage {
 					// Register it with LoreRegistry.register
 				} else {
 					String name = lore.getLoreDisplayName();
-					EntityPlayer player = NostrumMagica.proxy.getPlayer();
-					ITextComponent comp = new TextComponentTranslation("info.lore.get", name);
+					PlayerEntity player = NostrumMagica.proxy.getPlayer();
+					ITextComponent comp = new TranslationTextComponent("info.lore.get", name);
 					Style style = new Style()
-							.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentTranslation("info.screen.goto")))
+							.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslationTextComponent("info.screen.goto")))
 							.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, CommandInfoScreenGoto.Command + " " + ILoreTagged.GetInfoKey(lore)));
 					comp = comp.setStyle(style);
 					
@@ -73,16 +73,16 @@ public class LoreMessage implements IMessage {
 	private static final String NBT_LORE_KEY = "lore_key";
 	private static final String NBT_ATTRIBUTES = "attr";
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public LoreMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	public LoreMessage(ILoreTagged lore, INostrumMagic stats) {
-		tag = new NBTTagCompound();
-		tag.setTag(NBT_ATTRIBUTES, (NBTTagCompound) CAPABILITY.getStorage().writeNBT(CAPABILITY, stats, null));
-		tag.setString(NBT_LORE_KEY, lore.getLoreKey());
+		tag = new CompoundNBT();
+		tag.put(NBT_ATTRIBUTES, (CompoundNBT) CAPABILITY.getStorage().writeNBT(CAPABILITY, stats, null));
+		tag.putString(NBT_LORE_KEY, lore.getLoreKey());
 	}
 
 	@Override

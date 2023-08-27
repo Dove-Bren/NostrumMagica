@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
@@ -24,7 +24,7 @@ public interface IRitualOutcome {
 	 * @param center
 	 * @param recipe
 	 */
-	public void perform(World world, EntityPlayer player, ItemStack centerItem, @Nullable NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe);
+	public void perform(World world, PlayerEntity player, ItemStack centerItem, @Nullable NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe);
 	
 	/**
 	 * Returns a unique identifier for this type of ritual outcome.
@@ -49,5 +49,5 @@ public interface IRitualOutcome {
 	 * @param center
 	 * @return
 	 */
-	default public boolean canPerform(World world, EntityPlayer player, BlockPos center, RitualMatchInfo ingredients) { return true; }
+	default public boolean canPerform(World world, PlayerEntity player, BlockPos center, RitualMatchInfo ingredients) { return true; }
 }

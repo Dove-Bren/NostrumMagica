@@ -16,19 +16,19 @@ import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 	
@@ -54,7 +54,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 		this.setHarvestLevel("axe", 1);
 		
 		this.setDefaultState(this.blockState.getBaseState().withProperty(MASTER, true)
-				.withProperty(FACING, EnumFacing.NORTH));
+				.withProperty(FACING, Direction.NORTH));
 	}
 	
 	@Override
@@ -84,7 +84,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 	
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
-		EnumFacing enumfacing = EnumFacing.getHorizontal(meta);
+		Direction enumfacing = Direction.getHorizontal(meta);
 		return getDefaultState().withProperty(FACING, enumfacing)
 				.withProperty(MASTER, ((meta >> 2) & 1) == 1);
 	}
@@ -130,18 +130,18 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 //		return pos.offset(state.getValue(FACING));
 //	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
     public BlockRenderLayer getBlockLayer() {
 		return BlockRenderLayer.CUTOUT;
 	}
 	
-	public IBlockState getSlaveState(EnumFacing direction) {
+	public IBlockState getSlaveState(Direction direction) {
 		return this.getDefaultState().withProperty(MASTER, false)
 				.withProperty(FACING, direction);
 	}
 
 
-	public IBlockState getMaster(EnumFacing enumfacing) {
+	public IBlockState getMaster(Direction enumfacing) {
 		return this.getDefaultState().withProperty(MASTER, true)
 				.withProperty(FACING, enumfacing);
 	}
@@ -152,7 +152,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 	}
 	
 	@Override
-	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, PlayerEntity player) {
 		return new ItemStack(SpellTableItem.instance(), 1);
 	}
 
@@ -183,7 +183,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
 		
 		if (state.getValue(MASTER) == false) {
 			pos = pos.offset(state.getValue(FACING));

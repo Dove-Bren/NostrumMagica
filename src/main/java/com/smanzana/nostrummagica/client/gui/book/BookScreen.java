@@ -1,6 +1,5 @@
 package com.smanzana.nostrummagica.client.gui.book;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,24 +7,25 @@ import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.button.AbstractButton;
+import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class BookScreen extends GuiScreen {
+public class BookScreen extends Screen {
 	
 	private static Map<String, Integer> lastPage;
 	private static int getLastPage(String key) {
@@ -87,7 +87,8 @@ public class BookScreen extends GuiScreen {
 		this(screenKey, pages, true);
 	}
 	
-	public BookScreen(String screenKey, List<IBookPage> pages, boolean tableOfContents){
+	public BookScreen(String screenKey, List<IBookPage> pages, boolean tableOfContents) {
+		super(new StringTextComponent("NostrumBookScreen"));
 		this.pages = pages;
 		this.currentPage = 0;
 		this.maxPage = (pages.size() - 1) / 2;
@@ -130,7 +131,7 @@ public class BookScreen extends GuiScreen {
 	}
 
 	@Override
-	public void initGui() {
+	public void init() {
 		currentPage = getLastPage(screenKey);
 		if (currentPage > maxPage) {
 			// This is probably a different book
@@ -139,54 +140,54 @@ public class BookScreen extends GuiScreen {
 		}
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - TEXT_HEIGHT) / 2;
-		backButton = new NextPageButton(0, leftOffset + 30, topOffset + PAGE_HEIGHT + 5, false);
-		this.buttonList.add(backButton);
-		nextButton = new NextPageButton(1, leftOffset + TEXT_WIDTH - (35 + 23), topOffset + PAGE_HEIGHT + 5, true);
-		this.buttonList.add(nextButton);
-		homeButton = new HomeButton(2, leftOffset + 30 + 24, topOffset + PAGE_HEIGHT + 3);
-		this.buttonList.add(homeButton);
+		backButton = new NextPageButton(this, leftOffset + 30, topOffset + PAGE_HEIGHT + 5, false);
+		this.buttons.add(backButton);
+		nextButton = new NextPageButton(this, leftOffset + TEXT_WIDTH - (35 + 23), topOffset + PAGE_HEIGHT + 5, true);
+		this.buttons.add(nextButton);
+		homeButton = new HomeButton(this, leftOffset + 30 + 24, topOffset + PAGE_HEIGHT + 3);
+		this.buttons.add(homeButton);
 	}
 	
 	@Override	
-	public void updateScreen() {
+	public void tick() {
 		backButton.visible = currentPage > 0;
 		nextButton.visible = currentPage < maxPage;
 		homeButton.visible = currentPage > 0;
 	}
 	
 	@Override
-	public void drawScreen(int parWidth, int parHeight, float p_73863_3_) {
+	public void render(int parWidth, int parHeight, float p_73863_3_) {
 
-		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-		Minecraft.getMinecraft().getTextureManager().bindTexture(background);
+		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+		Minecraft.getInstance().getTextureManager().bindTexture(background);
 		
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - TEXT_HEIGHT) / 2;
 		//float hscale = ((float) this.width / (float) TEXT_WIDTH);
 		//float vscale = ((float) this.height / (float) TEXT_HEIGHT);
 		
-		Gui.drawModalRectWithCustomSizedTexture(leftOffset, topOffset, 0, 0,
+		RenderFuncs.drawModalRectWithCustomSizedTexture(leftOffset, topOffset, 0, 0,
 				TEXT_WIDTH, TEXT_HEIGHT, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
 		
-		pages.get(currentPage * 2).draw(this, fontRenderer, leftOffset + PAGE_HOFFSET, topOffset + PAGE_VOFFSET,
+		pages.get(currentPage * 2).draw(this, font, leftOffset + PAGE_HOFFSET, topOffset + PAGE_VOFFSET,
 				PAGE_WIDTH, PAGE_HEIGHT);
 		
 		if (pages.size() > (currentPage * 2) + 1)
-			pages.get((currentPage * 2) + 1).draw(this, fontRenderer, leftOffset + PAGE_HOFFSET + PAGE_WIDTH + PAGE_DISTANCE, topOffset + PAGE_VOFFSET,
+			pages.get((currentPage * 2) + 1).draw(this, font, leftOffset + PAGE_HOFFSET + PAGE_WIDTH + PAGE_DISTANCE, topOffset + PAGE_VOFFSET,
 					PAGE_WIDTH, PAGE_HEIGHT);
 		
 		// Do buttons and other parent stuff
-		super.drawScreen(parWidth, parHeight, p_73863_3_);
+		super.render(parWidth, parHeight, p_73863_3_);
 		
 		//now do overlays
 		if (parWidth > (leftOffset + PAGE_HOFFSET) && parWidth < (leftOffset + TEXT_WIDTH) - PAGE_HOFFSET
 				&& parHeight > topOffset + PAGE_VOFFSET && parHeight < (topOffset + TEXT_HEIGHT) + PAGE_VOFFSET) {
 			//in bounds. Now figure out which it is
 			if (parWidth < (width/2) - PAGE_HOFFSET) {
-				pages.get(currentPage * 2).overlay(this, fontRenderer,
+				pages.get(currentPage * 2).overlay(this, font,
 						parWidth - (leftOffset + PAGE_HOFFSET), parHeight - (topOffset + PAGE_VOFFSET), parWidth, parHeight);
 			} else if (pages.size() > (currentPage * 2) + 1 && parWidth > (width / 2) + PAGE_HOFFSET) {
-				pages.get((currentPage * 2) + 1).overlay(this, fontRenderer,
+				pages.get((currentPage * 2) + 1).overlay(this, font,
 						parWidth - (leftOffset + PAGE_HOFFSET + PAGE_WIDTH + PAGE_DISTANCE), parHeight - (topOffset + PAGE_VOFFSET), parWidth, parHeight); 
 			}
 		}
@@ -194,42 +195,45 @@ public class BookScreen extends GuiScreen {
 	}
 	
 	@Override
-	public boolean doesGuiPauseGame() {
+	public boolean isPauseScreen() {
 		return true;
 	}
 	
-	@Override
-	public void actionPerformed(GuiButton button) {
-		//knotty button got pressed
-		if (button == backButton) {
+	protected void changePage(boolean forward) {
+		if (forward) {
+			// next button
+			if (currentPage < maxPage)
+				currentPage++;
+		} else {
 			//previous button
 			if (currentPage > 0)
 				currentPage--;
-		} else if (button == nextButton) {
-			if (currentPage < maxPage)
-				currentPage++;
-		} else if (button == homeButton) {
-			currentPage = 0;
 		}
-		
 		setLastPage(screenKey, currentPage);
 	}
 	
-	public RenderItem getRenderItem() {
-		return this.itemRender;
+	protected void gotoHome() {
+		currentPage = 0;
+		setLastPage(screenKey, currentPage);
 	}
 	
+	public ItemRenderer getItemRenderer() {
+		return this.itemRenderer;
+	}
+	
+	@Override
 	public void renderTooltip(ItemStack item, int x, int y) {
-		GlStateManager.pushAttrib();
-		this.renderToolTip(item, x, y);
-		GlStateManager.popAttrib();
+		GlStateManager.pushLightingAttributes();
+		super.renderTooltip(item, x, y);
+		GlStateManager.popAttributes();
 		GlStateManager.enableBlend();
 	}
 	
+	@Override
 	public void renderTooltip(List<String> lines, int x, int y) {
-		GlStateManager.pushAttrib();
-		this.drawHoveringText(lines, x, y, this.fontRenderer);
-		GlStateManager.popAttrib();
+		GlStateManager.pushLightingAttributes();
+		super.renderTooltip(lines, x, y, this.font);
+		GlStateManager.popAttributes();
 		GlStateManager.enableBlend();
 	}
 	
@@ -240,12 +244,12 @@ public class BookScreen extends GuiScreen {
 	}
 	
 	@Override
-	public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
 		
 		// going to be checked twice, but oh well. Check our buttons
-		if (backButton.mousePressed(Minecraft.getMinecraft(), mouseX, mouseY)
-				|| nextButton.mousePressed(Minecraft.getMinecraft(), mouseX, mouseY)) {
-			;
+		if (backButton.mouseClicked(mouseX, mouseY, mouseButton)
+				|| nextButton.mouseClicked(mouseX, mouseY, mouseButton)) {
+			return true;
 		} else {
 			int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 			int topOffset = (this.height - TEXT_HEIGHT) / 2;
@@ -258,17 +262,19 @@ public class BookScreen extends GuiScreen {
 					page = pages.get(currentPage * 2);
 					if (page instanceof IClickableBookPage) {
 						((IClickableBookPage) page).onClick(this, mouseX - (leftOffset + PAGE_HOFFSET), mouseY - (topOffset + PAGE_VOFFSET), mouseButton);
+						return true;
 					}
 				} else if (pages.size() > (currentPage * 2) + 1 && mouseX > (width / 2) + PAGE_HOFFSET) {
 					page = pages.get((currentPage * 2) + 1);
 					if (page instanceof IClickableBookPage) {
 						((IClickableBookPage) page).onClick(this, mouseX - (leftOffset + PAGE_HOFFSET + PAGE_WIDTH + PAGE_DISTANCE), mouseY - (topOffset + PAGE_VOFFSET), mouseButton);
+						return true;
 					}
 				}
 			}
 		}
 		
-		super.mouseClicked(mouseX, mouseY, mouseButton);
+		return super.mouseClicked(mouseX, mouseY, mouseButton);
 	}
 	
 	/**
@@ -277,24 +283,25 @@ public class BookScreen extends GuiScreen {
 	 * @author Skyler
 	 *
 	 */
-	@SideOnly(Side.CLIENT)
-    static class NextPageButton extends GuiButton
+	@OnlyIn(Dist.CLIENT)
+    static class NextPageButton extends AbstractButton
     {
         private final boolean isNextButton;
+        
+        private final BookScreen screen;
 
-        public NextPageButton(int parButtonId, int parPosX, int parPosY, 
-
-              boolean parIsNextButton)
+        public NextPageButton(BookScreen screen, int parPosX, int parPosY, boolean parIsNextButton)
         {
-            super(parButtonId, parPosX, parPosY, 23, 13, "");
+            super(parPosX, parPosY, 23, 13, "");
             isNextButton = parIsNextButton;
+            this.screen = screen;
         }
 
         /**
          * Draws this button to the screen.
          */
         @Override
-        public void drawButton(Minecraft mc, int parX, int parY, float partialTicks)
+        public void render(int parX, int parY, float partialTicks)
         {
             if (visible)
             {
@@ -307,7 +314,7 @@ public class BookScreen extends GuiScreen {
                       && parY < y + height);
 
                 GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-                mc.getTextureManager().bindTexture(background);
+                Minecraft.getInstance().getTextureManager().bindTexture(background);
                 int textureX = 0;
                 int textureY = 223;
 
@@ -321,24 +328,33 @@ public class BookScreen extends GuiScreen {
                     textureY += 13;
                 }
                 
-                Gui.drawModalRectWithCustomSizedTexture(x, y, textureX, textureY,
+                RenderFuncs.drawModalRectWithCustomSizedTexture(x, y, textureX, textureY,
         				23, 13, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
                 
             }
         }
+
+		@Override
+		public void onPress() {
+			screen.changePage(this.isNextButton);
+		}
     }
 
-	@SideOnly(Side.CLIENT)
-    static class HomeButton extends GuiButton {
-		public HomeButton(int parButtonId, int parPosX, int parPosY) {
-            super(parButtonId, parPosX, parPosY, 23, 13, "");
+	@OnlyIn(Dist.CLIENT)
+    static class HomeButton extends AbstractButton {
+		
+		 private final BookScreen screen;
+		
+		public HomeButton(BookScreen screen, int parPosX, int parPosY) {
+            super(parPosX, parPosY, 23, 13, "");
+            this.screen = screen;
 		}
 
 		/**
 		 *Draws this button to the screen.
 		 */
         @Override
-        public void drawButton(Minecraft mc, int parX, int parY, float partialTicks) {
+        public void render(int parX, int parY, float partialTicks) {
         	if (visible) {
         		boolean isButtonPressed = (parX >= x 
         				&& parY >= y 
@@ -346,7 +362,7 @@ public class BookScreen extends GuiScreen {
                       && parY < y + height);
 
         		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-                mc.getTextureManager().bindTexture(background);
+                Minecraft.getInstance().getTextureManager().bindTexture(background);
                 int textureX = 48;
                 int textureY = 221;
 
@@ -354,15 +370,20 @@ public class BookScreen extends GuiScreen {
                 	textureX += 16;
                 }
 
-                Gui.drawModalRectWithCustomSizedTexture(x, y, textureX, textureY,
+                RenderFuncs.drawModalRectWithCustomSizedTexture(x, y, textureX, textureY,
                 		16, 16, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
                 
             }
         }
         
         public void playPressSound(SoundHandler soundHandlerIn) {
-        	soundHandlerIn.playSound(PositionedSoundRecord.getMasterRecord(NostrumMagicaSounds.UI_TICK.getEvent(), 1.0F));
+        	soundHandlerIn.play(SimpleSound.master(NostrumMagicaSounds.UI_TICK.getEvent(), 1.0F));
         }
+
+		@Override
+		public void onPress() {
+			screen.gotoHome();
+		}
     }
 	
 	/**
@@ -372,7 +393,8 @@ public class BookScreen extends GuiScreen {
 	 * @param input
 	 */
 	public static void makePagesFrom(List<IBookPage> pages, String input) {
-		FontRenderer fonter = Minecraft.getMinecraft().fontRenderer;
+		Minecraft mc = Minecraft.getInstance();
+		FontRenderer fonter = mc.fontRenderer;
 		final int maxLines = (PAGE_HEIGHT / (LinedTextPage.LINE_HEIGHT_EXTRA + fonter.FONT_HEIGHT)) - 1;
 		String lines[];
 		int count;

@@ -11,8 +11,8 @@ import javax.annotation.Nullable;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAreaEffectCloud;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -243,7 +243,7 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 	
 	public boolean canApply(Entity ent) {
 		if (getIgnoreOwner()) {
-			EntityLivingBase owner = this.getOwner();
+			LivingEntity owner = this.getOwner();
 			if (ent == owner) {
 				return false;
 			}
@@ -302,9 +302,9 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 		
 		// Motion
 		this.waddle();
-		this.posX += this.motionX;
-        this.posY += this.motionY;
-        this.posZ += this.motionZ;
+		this.posX += this.getMotion().x;
+        this.posY += this.getMotion().y;
+        this.posZ += this.getMotion().z;
         
         boolean elevated = false;
         MutableBlockPos pos = new MutableBlockPos();
@@ -365,12 +365,12 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
         }
         
         if (world.isRemote) {
-        	prevHeight = this.height;
-        	this.height = dataManager.get(HEIGHT);
+        	prevHeight = this.getHeight();
+        	this.getHeight() = dataManager.get(HEIGHT);
         } else {
-	        if (this.height != prevHeight) {
-	        	this.dataManager.set(HEIGHT, this.height);
-	        	prevHeight = this.height;
+	        if (this.getHeight() != prevHeight) {
+	        	this.dataManager.set(HEIGHT, this.getHeight());
+	        	prevHeight = this.getHeight();
 	        }
         }
         this.setPosition(posX, posY, posZ);
@@ -391,7 +391,7 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 	protected void clientUpdateTick() {
 		
 		// Augment vanilla particles for tall areas
-		if (this.height > 2 && !this.shouldIgnoreRadius()) {
+		if (this.getHeight() > 2 && !this.shouldIgnoreRadius()) {
 			float radius = this.getRadius();
 			float area = (float)Math.PI * radius * radius;
 			EnumParticleTypes enumparticletypes = this.getParticle();
@@ -410,7 +410,7 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 				float f7 = MathHelper.sqrt(this.rand.nextFloat()) * radius;
 				float f8 = MathHelper.cos(f6) * f7;
 				float f9 = MathHelper.sin(f6) * f7;
-				double y = rand.nextDouble() * (this.height - .5) + .5;
+				double y = rand.nextDouble() * (this.getHeight() - .5) + .5;
 	
 				if (this.getParticle() == EnumParticleTypes.SPELL_MOB) {
 					int l1 = this.getColor();
@@ -451,7 +451,7 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 				float f7 = MathHelper.sqrt(this.rand.nextFloat()) * radius;
 				float f8 = MathHelper.cos(f6) * f7;
 				float f9 = MathHelper.sin(f6) * f7;
-				double y = rand.nextDouble() * (this.height - .5) + .5;
+				double y = rand.nextDouble() * (this.getHeight() - .5) + .5;
 	
 				this.world.spawnParticle(particle, this.posX + (double)f8, this.posY + y + yOffset, this.posZ + (double)f9, (0.5D - this.rand.nextDouble()) * 0.15D, 0.009999999776482582D, (0.5D - this.rand.nextDouble()) * 0.15D, aint);
 			}
@@ -474,7 +474,7 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 			
 			if (this.effectDelay < 5 || this.ticksExisted % 5 == 0) {
 				// Entities...
-				List<Entity> list = this.world.<Entity>getEntitiesWithinAABB(Entity.class, this.getEntityBoundingBox(), (ent) -> { return ent != this;});
+				List<Entity> list = this.world.<Entity>getEntitiesWithinAABB(Entity.class, this.getBoundingBox(), (ent) -> { return ent != this;});
 				if (list != null && !list.isEmpty()) {
 					for (Entity ent : list) {
 						double dx = ent.posX - this.posX;
@@ -495,7 +495,7 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 			
 			if (this.ticksExisted % 5 == 0) {
 				// Blocks
-				AxisAlignedBB box = this.getEntityBoundingBox();
+				AxisAlignedBB box = this.getBoundingBox();
 				for (BlockPos pos : BlockPos.getAllInBox(new BlockPos(box.minX, box.minY - 1, box.minZ), new BlockPos(box.maxX, box.maxY, box.maxZ))) {
 					double dx = (pos.getX() + .5) - this.posX;
 					double dz = (pos.getZ() + .5) - this.posZ;
@@ -521,9 +521,9 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 	
 	@Override
 	public void setRadius(float radiusIn) {
-		float height = this.height;
+		float height = this.getHeight();
 		super.setRadius(radiusIn);
-		this.height = height;
+		this.getHeight() = height;
 		super.setPosition(posX, posY, posZ);
 	}
 	
@@ -542,7 +542,7 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 	@Override
 	public void notifyDataManagerChange(DataParameter<?> key) {
 		if (key == HEIGHT) {
-			this.height = this.dataManager.get(HEIGHT);
+			this.getHeight() = this.dataManager.get(HEIGHT);
 			super.setPosition(posX, posY, posZ);
 		}
 		
@@ -550,29 +550,29 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
 	}
 	
 	@Override
-	protected void readEntityFromNBT(NBTTagCompound compound) {
+	protected void readEntityFromNBT(CompoundNBT compound) {
 		super.readEntityFromNBT(compound);
 		
-		if (compound.hasKey("Particle", 8)) {
+		if (compound.contains("Particle", 8)) {
 			@Nullable EnumParticleTypes enumparticletypes = EnumParticleTypes.getByName(compound.getString("Particle"));
 			this.setCustomParticle(enumparticletypes);
 		}
-		this.setCustomParticleParam1(compound.getInteger("ParticleParam1"));
-		this.setCustomParticleParam2(compound.getInteger("ParticleParam2"));
+		this.setCustomParticleParam1(compound.getInt("ParticleParam1"));
+		this.setCustomParticleParam2(compound.getInt("ParticleParam2"));
 		this.setCustomParticleYOffset(compound.getFloat("ParticleYOffset"));
 		this.setCustomParticleFrequency(compound.getFloat("ParticleFreq"));
 	}
 	
 	@Override
-	protected void writeEntityToNBT(NBTTagCompound compound) {
+	protected void writeEntityToNBT(CompoundNBT compound) {
 		super.writeEntityToNBT(compound);
 		
 		if (this.getCustomParticle() != null) {
-			compound.setString("Particle", this.getCustomParticle().getParticleName());
+			compound.putString("Particle", this.getCustomParticle().getParticleName());
 		}
-        compound.setInteger("ParticleParam1", this.getCustomParticleParam1());
-        compound.setInteger("ParticleParam2", this.getCustomParticleParam2());
-        compound.setFloat("ParticleYOffset", this.getCustomParticleYOffset());
-        compound.setFloat("ParticleFreq", this.getCustomParticleFrequency());
+        compound.putInt("ParticleParam1", this.getCustomParticleParam1());
+        compound.putInt("ParticleParam2", this.getCustomParticleParam2());
+        compound.putFloat("ParticleYOffset", this.getCustomParticleYOffset());
+        compound.putFloat("ParticleFreq", this.getCustomParticleFrequency());
 	}
 }

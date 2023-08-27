@@ -18,7 +18,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
@@ -32,16 +32,16 @@ public class AuraTrigger extends TriggerAreaTrigger {
 		private static final int TICK_RATE = 5;
 		private static final int NUM_TICKS = (20 * 20) / TICK_RATE; // 20 seconds
 
-		private EntityLivingBase origin;
+		private LivingEntity origin;
 		private float radius;
 		private World world;
 		private boolean includeAllies;
 		
 		private int aliveCycles;
 		private boolean dead;
-		private Map<EntityLivingBase, Integer> affected;
+		private Map<LivingEntity, Integer> affected;
 		
-		public AuraTriggerInstance(SpellState state, World world, EntityLivingBase entity, float radius, boolean includeAllies) {
+		public AuraTriggerInstance(SpellState state, World world, LivingEntity entity, float radius, boolean includeAllies) {
 			super(state);
 			this.radius = radius;
 			this.origin = entity;
@@ -54,14 +54,14 @@ public class AuraTrigger extends TriggerAreaTrigger {
 		}
 		
 		@Override
-		public void init(EntityLivingBase caster) {
+		public void init(LivingEntity caster) {
 			// Register timer for life and for effects
 			NostrumMagica.playerListener.registerTimer(this, 0, TICK_RATE);
 			
 			doEffect();
 		}
 		
-		protected boolean canAffect(EntityLivingBase entity) {
+		protected boolean canAffect(LivingEntity entity) {
 			return entity != null
 					&& !entity.isDead
 					&& (
@@ -70,7 +70,7 @@ public class AuraTrigger extends TriggerAreaTrigger {
 							);
 		}
 		
-		protected boolean isInArea(EntityLivingBase entity) {
+		protected boolean isInArea(LivingEntity entity) {
 			return origin.getDistance(entity) <= radius;
 		}
 
@@ -100,7 +100,7 @@ public class AuraTrigger extends TriggerAreaTrigger {
 		}
 
 		@Override
-		public boolean onEvent(Event type, EntityLivingBase entity, Object empty) {
+		public boolean onEvent(Event type, LivingEntity entity, Object empty) {
 			if (dead)
 				return true;
 			
@@ -120,7 +120,7 @@ public class AuraTrigger extends TriggerAreaTrigger {
 				}
 				
 				// Check all entities in the world
-				for (EntityLivingBase e : world.getEntities(EntityLivingBase.class, (e) -> {return canAffect(e) && isInArea(e);})) {
+				for (LivingEntity e : world.getEntities(LivingEntity.class, (e) -> {return canAffect(e) && isInArea(e);})) {
 					if (visitEntity(e)) {
 						TriggerData data = new TriggerData(
 								Lists.newArrayList(e),
@@ -144,7 +144,7 @@ public class AuraTrigger extends TriggerAreaTrigger {
 		 * @param entity
 		 * @return
 		 */
-		protected boolean visitEntity(EntityLivingBase entity) {
+		protected boolean visitEntity(LivingEntity entity) {
 			if (entity == null || entity.isDead) {
 				return false;
 			}

@@ -12,18 +12,18 @@ import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ReagentItem extends Item implements ILoreTagged, IAetherBurnable {
 
@@ -115,7 +115,7 @@ public class ReagentItem extends Item implements ILoreTagged, IAetherBurnable {
 	/**
      * returns a list of items with the same ID, but different meta (eg: dye returns 16 items)
      */
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
     	if (this.isInCreativeTab(tab)) {
@@ -165,7 +165,7 @@ public class ReagentItem extends Item implements ILoreTagged, IAetherBurnable {
     }
     
     @Override
-    public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, EnumHand hand, Direction facing, float hitX, float hitY, float hitZ) {
     	final @Nonnull ItemStack stack = playerIn.getHeldItem(hand);
     	ReagentType type = getTypeFromMeta(stack.getMetadata());
     	
@@ -180,7 +180,7 @@ public class ReagentItem extends Item implements ILoreTagged, IAetherBurnable {
     	
     	if (type == ReagentType.CRYSTABLOOM) {
     		IBlockState state = worldIn.getBlockState(pos);
-	        if (facing == EnumFacing.UP && playerIn.canPlayerEdit(pos.offset(facing), facing, stack) && state.getBlock().canSustainPlant(state, worldIn, pos, EnumFacing.UP, NostrumMagicaFlower.instance()) && worldIn.isAirBlock(pos.up())) {
+	        if (facing == Direction.UP && playerIn.canPlayerEdit(pos.offset(facing), facing, stack) && state.getBlock().canSustainPlant(state, worldIn, pos, Direction.UP, NostrumMagicaFlower.instance()) && worldIn.isAirBlock(pos.up())) {
 	        	worldIn.setBlockState(pos.up(), NostrumMagicaFlower.instance().getState(Type.CRYSTABLOOM));
 	            stack.shrink(1);
 	            return EnumActionResult.SUCCESS;

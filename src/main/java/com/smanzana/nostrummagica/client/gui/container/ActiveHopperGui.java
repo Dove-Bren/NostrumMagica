@@ -7,15 +7,15 @@ import com.smanzana.nostrummagica.blocks.tiles.ActiveHopperTileEntity;
 import com.smanzana.nostrummagica.utils.Inventories;
 
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.EntityPlayer;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ActiveHopperGui {
 	
@@ -52,7 +52,7 @@ public class ActiveHopperGui {
 		
 		@Override
 		@Nonnull
-		public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
+		public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
 			Slot slot = (Slot)this.inventorySlots.get(index);
 			ItemStack prev = ItemStack.EMPTY;
 
@@ -91,12 +91,12 @@ public class ActiveHopperGui {
 		}
 		
 		@Override
-		public boolean canInteractWith(EntityPlayer playerIn) {
+		public boolean canInteractWith(PlayerEntity playerIn) {
 			return true;
 		}
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public static class ActiveHopperGuiContainer extends AutoGuiContainer {
 
 		public ActiveHopperGuiContainer(ActiveHopperContainer container) {
@@ -107,8 +107,8 @@ public class ActiveHopperGui {
 		}
 		
 		@Override
-		public void initGui() {
-			super.initGui();
+		public void init() {
+			super.init();
 		}
 		
 		@Override
@@ -116,10 +116,10 @@ public class ActiveHopperGui {
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			
-			GlStateManager.color(1.0F,  1.0F, 1.0F, 1.0F);
+			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 			mc.getTextureManager().bindTexture(TEXT);
 			
-			Gui.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
+			RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 		}
 		
 		@Override

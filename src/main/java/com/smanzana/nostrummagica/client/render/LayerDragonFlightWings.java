@@ -7,9 +7,9 @@ import com.smanzana.nostrummagica.client.render.entity.ModelDragonFlightWings;
 import com.smanzana.nostrummagica.items.IDragonWingRenderItem;
 
 import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.GlStateManager.DestFactor;
-import net.minecraft.client.renderer.GlStateManager.SourceFactor;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -89,17 +89,17 @@ public class LayerDragonFlightWings implements LayerRenderer<AbstractClientPlaye
 	
 	public void render(AbstractClientPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale, boolean enchanted) {
 		final int color = getColor(player);
-		GlStateManager.color((float)((color >> 16) & 0xFF) / 255f,
+		GlStateManager.color4f((float)((color >> 16) & 0xFF) / 255f,
 				(float)((color >> 8) & 0xFF) / 255f,
 				(float)((color >> 0) & 0xFF) / 255f,
 					(float)((color >> 24) & 0xFF) / 255f);
 		
 		GlStateManager.disableBlend();
-		GlStateManager.disableAlpha();
+		GlStateManager.disableAlphaTest();
 		GlStateManager.enableBlend();
-		GlStateManager.enableAlpha();
-		GlStateManager.disableTexture2D();
-		GlStateManager.enableTexture2D();
+		GlStateManager.enableAlphaTest();
+		GlStateManager.disableTexture();
+		GlStateManager.enableTexture();
 		GlStateManager.enableLighting();
 		GlStateManager.disableLighting();
 		GlStateManager.disableColorLogic();
@@ -109,11 +109,11 @@ public class LayerDragonFlightWings implements LayerRenderer<AbstractClientPlaye
 		this.renderPlayer.bindTexture(TEXTURE_WINGS);
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(0.0F, 0.0F, 0.125F);
+		GlStateManager.translatef(0.0F, 0.0F, 0.125F);
 		model.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale, player);
 		model.render(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
 
-		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 //		if (enchanted) {
 //			LayerArmorBase.renderEnchantedGlint(this.renderPlayer, player, model, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
 //		}

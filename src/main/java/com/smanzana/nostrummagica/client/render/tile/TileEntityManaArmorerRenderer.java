@@ -8,16 +8,16 @@ import com.smanzana.nostrummagica.blocks.tiles.ManaArmorerTileEntity;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.GlStateManager.DestFactor;
-import net.minecraft.client.renderer.GlStateManager.SourceFactor;
+import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraftforge.client.model.pipeline.LightUtil;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
@@ -36,7 +36,7 @@ public class TileEntityManaArmorerRenderer extends TileEntitySpecialRenderer<Man
 	
 	@Override
 	public void render(ManaArmorerTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-		Minecraft mc = Minecraft.getMinecraft();
+		Minecraft mc = Minecraft.getInstance();
 		IBlockState state = ManaArmorerBlock.instance().getDefaultState();
 		
 		if (model == null) {
@@ -57,23 +57,23 @@ public class TileEntityManaArmorerRenderer extends TileEntitySpecialRenderer<Man
 			final float rProg = te.getRenderRotation(partialTicks) * 360f;
 			
 			
-			GlStateManager.color(1f, 1f, 1f, 1f);
+			GlStateManager.color4f(1f, 1f, 1f, 1f);
 			GlStateManager.enableBlend();
 			GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 			
 			GlStateManager.pushMatrix();
 
 			// Offset by .5 around rotate to adjust rotation center
-			GlStateManager.translate(x + .5, y, z + .5);
-			GlStateManager.rotate(rProg, 0, 1, 0);
-			GlStateManager.translate(-.5, 0, -.5);
+			GlStateManager.translatef(x + .5, y, z + .5);
+			GlStateManager.rotatef(rProg, 0, 1, 0);
+			GlStateManager.translatef(-.5, 0, -.5);
 			
-			GlStateManager.translate(0, vAmt, 0);
+			GlStateManager.translatef(0, vAmt, 0);
 			
-			mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+			mc.getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 			BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
-			for (EnumFacing facing : EnumFacing.values()) {
+			for (Direction facing : Direction.values()) {
 				for (BakedQuad quad : model.getQuads(state, facing, 0L)) {
 					LightUtil.renderQuadColor(buffer, quad, -1);
 				}

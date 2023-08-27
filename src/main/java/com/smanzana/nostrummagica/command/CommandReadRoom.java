@@ -11,13 +11,13 @@ import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.Direction;
+import net.minecraft.util.text.StringTextComponent;
 
 public class CommandReadRoom extends CommandBase {
 
@@ -37,13 +37,13 @@ public class CommandReadRoom extends CommandBase {
 			throw new CommandException("Invalid number of arguments. Expected a room name and maybe a direction");
 		}
 		
-		if (sender instanceof EntityPlayer && ((EntityPlayer) sender).isCreative()) {
-			EntityPlayer player = (EntityPlayer) sender;
+		if (sender instanceof PlayerEntity && ((PlayerEntity) sender).isCreative()) {
+			PlayerEntity player = (PlayerEntity) sender;
 			
 			// Must be a position crystals in hand with low corner selected
 			ItemStack main = player.getHeldItemMainhand();
 			if ((main.isEmpty() || !(main.getItem() instanceof PositionCrystal) || PositionCrystal.getBlockPosition(main) == null)) {
-				sender.sendMessage(new TextComponentString("You must be holding a filled geogem in your main hand"));
+				sender.sendMessage(new StringTextComponent("You must be holding a filled geogem in your main hand"));
 			} else {
 				
 				File file = new File(ModConfig.config.base.getConfigFile().getParentFile(), "NostrumMagica/dungeon_room_captures/" + args[0] + ".dat");
@@ -51,43 +51,43 @@ public class CommandReadRoom extends CommandBase {
 					file = new File(ModConfig.config.base.getConfigFile().getParentFile(), "NostrumMagica/dungeon_room_captures/" + args[0] + ".gat");
 				}
 				if (file.exists()) {
-					NBTTagCompound nbt = null;
+					CompoundNBT nbt = null;
 					try {
 						if (file.getName().endsWith(".gat")) {
 							nbt = CompressedStreamTools.readCompressed(new FileInputStream(file));
 						} else {
 							nbt = CompressedStreamTools.read(file);
 						}
-						sender.sendMessage(new TextComponentString("Room read from " + file.getPath()));
+						sender.sendMessage(new StringTextComponent("Room read from " + file.getPath()));
 					} catch (IOException e) {
 						e.printStackTrace();
 						
 						System.out.println("Failed to read out serialized file " + file.toString());
-						sender.sendMessage(new TextComponentString("Failed to read room"));
+						sender.sendMessage(new StringTextComponent("Failed to read room"));
 					}
 					
 					if (nbt != null) {
-						RoomBlueprint blueprint = RoomBlueprint.fromNBT((NBTTagCompound) nbt.getTag("blueprint"));
+						RoomBlueprint blueprint = RoomBlueprint.fromNBT((CompoundNBT) nbt.getTag("blueprint"));
 						if (blueprint != null) {
-							EnumFacing facing = EnumFacing.EAST;
+							Direction facing = Direction.EAST;
 							if (args.length == 2) {
 								try {
-									facing = EnumFacing.valueOf(args[1].toUpperCase());
+									facing = Direction.valueOf(args[1].toUpperCase());
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
 							}
 							blueprint.spawn(player.world, PositionCrystal.getBlockPosition(main), facing);
 						} else {
-							sender.sendMessage(new TextComponentString("Room failed to load"));
+							sender.sendMessage(new StringTextComponent("Room failed to load"));
 						}
 					}
 				} else {
-					sender.sendMessage(new TextComponentString("Room not found"));
+					sender.sendMessage(new StringTextComponent("Room not found"));
 				}
 			}
 		} else {
-			sender.sendMessage(new TextComponentString("This command must be run as a creative player"));
+			sender.sendMessage(new StringTextComponent("This command must be run as a creative player"));
 		}
 	}
 

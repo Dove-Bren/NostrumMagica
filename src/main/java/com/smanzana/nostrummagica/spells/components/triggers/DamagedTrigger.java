@@ -18,26 +18,26 @@ import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 public class DamagedTrigger extends SpellTrigger {
 	
 	public class DamagedTriggerInstance extends SpellTrigger.SpellTriggerInstance implements IGenericListener {
 
-		private EntityLivingBase entity;
+		private LivingEntity entity;
 		private int duration;
 		private boolean expired;
 		
-		public DamagedTriggerInstance(SpellState state, EntityLivingBase entity, int duration) {
+		public DamagedTriggerInstance(SpellState state, LivingEntity entity, int duration) {
 			super(state);
 			this.entity = entity;
 			this.duration = duration == 0 ? 20 : duration;
@@ -45,7 +45,7 @@ public class DamagedTrigger extends SpellTrigger {
 		}
 		
 		@Override
-		public void init(EntityLivingBase caster) {
+		public void init(LivingEntity caster) {
 			// We are instant! Whoo!
 			NostrumMagica.playerListener.registerHit(this, entity);
 			NostrumMagica.playerListener.registerTimer(this, 0, 20 * duration);
@@ -56,7 +56,7 @@ public class DamagedTrigger extends SpellTrigger {
 		}
 
 		@Override
-		public boolean onEvent(Event type, EntityLivingBase entity, Object unused) {
+		public boolean onEvent(Event type, LivingEntity entity, Object unused) {
 			if (type == Event.DAMAGED) {
 				if (!expired) {
 					TriggerData data = new TriggerData(
@@ -66,7 +66,7 @@ public class DamagedTrigger extends SpellTrigger {
 							null
 							);
 					
-					entity.world.getMinecraftServer().addScheduledTask(() -> {
+					entity.world.getMinecraftServer().runAsync(() -> {
 						this.trigger(data);
 						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_DAMAGE, this.entity);
 					});
@@ -75,9 +75,9 @@ public class DamagedTrigger extends SpellTrigger {
 			} else if (type == Event.TIME) {
 				if (!expired) {
 					expired = true;
-					if (this.entity instanceof EntityPlayer) {
-						EntityPlayer player = (EntityPlayer) this.entity;
-						player.sendMessage(new TextComponentTranslation("modification.damaged_duration.expire"));
+					if (this.entity instanceof PlayerEntity) {
+						PlayerEntity player = (PlayerEntity) this.entity;
+						player.sendMessage(new TranslationTextComponent("modification.damaged_duration.expire"));
 						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_DAMAGE, this.entity);
 					}
 				}
@@ -99,7 +99,7 @@ public class DamagedTrigger extends SpellTrigger {
 	
 	private static final Map<UUID, DamagedTriggerInstance> ActiveMap = new HashMap<>();
 	
-	private static final boolean SetTrigger(EntityLivingBase entity, @Nullable DamagedTriggerInstance trigger) {
+	private static final boolean SetTrigger(LivingEntity entity, @Nullable DamagedTriggerInstance trigger) {
 		DamagedTriggerInstance existing = ActiveMap.put(entity.getUniqueID(), trigger);
 		if (existing != null && existing != trigger) {
 			existing.expired = true;

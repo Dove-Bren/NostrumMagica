@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
@@ -60,11 +60,11 @@ public abstract class SpellShape {
 	 */
 	public void perform(SpellAction action,
 						SpellPartParam param,
-						EntityLivingBase target,
+						LivingEntity target,
 						World world,
 						BlockPos pos,
 						float efficiency,
-						List<EntityLivingBase> affectedEnts,
+						List<LivingEntity> affectedEnts,
 						List<BlockPos> affectedPos) {
 		
 		if (target != null && (world == null || pos == null)) {
@@ -73,9 +73,9 @@ public abstract class SpellShape {
 			pos = new BlockPos(vec.x, vec.y, vec.z);
 		}
 		
-		List<EntityLivingBase> entTargets = getTargets(param, target, world, pos);
+		List<LivingEntity> entTargets = getTargets(param, target, world, pos);
 		if (entTargets != null && !entTargets.isEmpty())
-		for (EntityLivingBase ent : entTargets) {
+		for (LivingEntity ent : entTargets) {
 			if (ent != null) {
 				if (action.apply(ent, efficiency)) {
 					affectedEnts.add(ent);
@@ -103,7 +103,7 @@ public abstract class SpellShape {
 	 * @param pos
 	 * @return
 	 */
-	protected abstract List<EntityLivingBase> getTargets(SpellPartParam param, EntityLivingBase target, World world, BlockPos pos);
+	protected abstract List<LivingEntity> getTargets(SpellPartParam param, LivingEntity target, World world, BlockPos pos);
 	
 	/**
 	 * Returns all blockPOS that are affected when using this shape.
@@ -115,7 +115,7 @@ public abstract class SpellShape {
 	 * @param pos
 	 * @return
 	 */
-	protected abstract List<BlockPos> getTargetLocations(SpellPartParam param, EntityLivingBase target, World world, BlockPos pos);
+	protected abstract List<BlockPos> getTargetLocations(SpellPartParam param, LivingEntity target, World world, BlockPos pos);
 	
 	/**
 	 * Return a list of reagents required.

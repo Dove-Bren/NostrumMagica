@@ -13,7 +13,7 @@ import net.minecraft.block.BlockLadder;
 import net.minecraft.block.BlockTorch;
 import net.minecraft.block.BlockVine;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 public class RoomChallenge2 extends StaticRoom {
@@ -265,15 +265,15 @@ public class RoomChallenge2 extends StaticRoom {
 				"XXXXXXXXXXXXXXXXXXXXX",
 				'X', DungeonBlock.instance(),
 				' ', null,
-				'(', new BlockState(Blocks.LADDER, Blocks.LADDER.getDefaultState().withProperty(BlockLadder.FACING, EnumFacing.EAST)), // EAST
-				')', new BlockState(Blocks.LADDER, Blocks.LADDER.getDefaultState().withProperty(BlockLadder.FACING, EnumFacing.WEST)), // NORTH 
+				'(', new BlockState(Blocks.LADDER, Blocks.LADDER.getDefaultState().withProperty(BlockLadder.FACING, Direction.EAST)), // EAST
+				')', new BlockState(Blocks.LADDER, Blocks.LADDER.getDefaultState().withProperty(BlockLadder.FACING, Direction.WEST)), // NORTH 
 				'B', Blocks.IRON_BARS,
 				'V', new BlockState(Blocks.VINE, Blocks.VINE.getDefaultState().withProperty(BlockVine.NORTH, true)),
 				'C', new BlockState(Blocks.CARPET, 14),
-				'U', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.NORTH)),
-				'R', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.EAST)),
-				'D', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.SOUTH)),
-				'L', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.WEST)),
+				'U', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.NORTH)),
+				'R', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.EAST)),
+				'D', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.SOUTH)),
+				'L', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.WEST)),
 				'1', new BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.GOLEM_WIND.ordinal()),
 				'2', new BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.GOLEM_ENDER.ordinal()),
 				'3', new BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.GOLEM_EARTH.ordinal()),
@@ -292,7 +292,7 @@ public class RoomChallenge2 extends StaticRoom {
 		
 		BlockPos exit = new BlockPos(-16, 6, 17);
 		
-		list.add(NostrumDungeon.asRotated(start, exit, EnumFacing.EAST));
+		list.add(NostrumDungeon.asRotated(start, exit, Direction.EAST));
 		
 		return list;
 	}
@@ -332,10 +332,10 @@ public class RoomChallenge2 extends StaticRoom {
 		return Lists.newArrayList(
 				NostrumDungeon.asRotated(start,
 						new BlockPos(-5, 0, 2),
-						EnumFacing.WEST),
+						Direction.WEST),
 				NostrumDungeon.asRotated(start,
 						new BlockPos(-6, 0, 15),
-						EnumFacing.SOUTH));
+						Direction.SOUTH));
 	}
 	
 }

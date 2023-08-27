@@ -3,8 +3,8 @@ package com.smanzana.nostrummagica.spells.components.triggers;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -36,9 +36,9 @@ public class AITargetTrigger extends InstantTrigger {
 	
 	@Override
 	protected TriggerData getTargetData(SpellState state, World world, Vec3d pos, float pitch, float yaw) {
-		EntityLivingBase target = state.getCaster(); // defult to caster. That's what you get for using a trigger for AI!
-		if (state.getCaster() instanceof EntityLiving) {
-			target = ((EntityLiving) state.getCaster()).getAttackTarget();
+		LivingEntity target = state.getCaster(); // defult to caster. That's what you get for using a trigger for AI!
+		if (state.getCaster() instanceof MobEntity) {
+			target = ((MobEntity) state.getCaster()).getAttackTarget();
 		}
 		return new TriggerData(Lists.newArrayList(target), null, world, null);
 	}

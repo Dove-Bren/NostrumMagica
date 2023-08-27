@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.potion.Potion;
 import net.minecraft.world.World;
@@ -45,7 +45,7 @@ public class EntityGolemWind extends EntityGolem {
 	}
 
 	@Override
-	public void doMeleeTask(EntityLivingBase target) {
+	public void doMeleeTask(LivingEntity target) {
 		EntityGolemWind.init();
 		
 		float level = .1f;
@@ -59,15 +59,15 @@ public class EntityGolemWind extends EntityGolem {
 	}
 
 	@Override
-	public void doRangeTask(EntityLivingBase target) {
+	public void doRangeTask(LivingEntity target) {
 		;
 	}
 
 	@Override
-	public void doBuffTask(EntityLivingBase target) {
+	public void doBuffTask(LivingEntity target) {
 		EntityGolemWind.init();
 		
-		EntityLivingBase targ = this.getAttackTarget();
+		LivingEntity targ = this.getAttackTarget();
 		if (targ != target)
 			this.setAttackTarget(target);
 		
@@ -78,7 +78,7 @@ public class EntityGolemWind extends EntityGolem {
 	}
 
 	@Override
-	public boolean shouldDoBuff(EntityLivingBase target) {
+	public boolean shouldDoBuff(LivingEntity target) {
 		return target.getActivePotionEffect(Potion.getPotionFromResourceLocation("speed")) == null;
 	}
 

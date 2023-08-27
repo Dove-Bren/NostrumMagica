@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.entity;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -16,6 +16,6 @@ public interface IStabbableEntity {
 	 * @param stabbingItem
 	 * @return
 	 */
-	public boolean onSoulStab(EntityLivingBase stabber, ItemStack stabbingItem);
+	public boolean onSoulStab(LivingEntity stabber, ItemStack stabbingItem);
 	
 }

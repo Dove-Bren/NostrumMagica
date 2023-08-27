@@ -11,15 +11,15 @@ import com.smanzana.nostrummagica.client.render.entity.ModelAetherCloak;
 import com.smanzana.nostrummagica.items.ICapeProvider;
 
 import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.GlStateManager.DestFactor;
-import net.minecraft.client.renderer.GlStateManager.SourceFactor;
-import net.minecraft.client.renderer.block.model.IBakedModel;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
+import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -63,7 +63,7 @@ public class LayerAetherCloak implements LayerRenderer<AbstractClientPlayer> {
 		}
 	}
 	
-	public static @Nonnull ItemStack ShouldRender(EntityLivingBase player) {
+	public static @Nonnull ItemStack ShouldRender(LivingEntity player) {
 		Iterable<ItemStack> equipment = player.getArmorInventoryList();
 		for (ItemStack stack : equipment) {
 			if (!stack.isEmpty() && stack.getItem() instanceof ICapeProvider) {
@@ -74,8 +74,8 @@ public class LayerAetherCloak implements LayerRenderer<AbstractClientPlayer> {
 		}
 		
 		// Nothing so far. Check baubles if there're there.
-		if (player instanceof EntityPlayer) {
-			IInventory inventory = NostrumMagica.baubles.getBaubles((EntityPlayer) player);
+		if (player instanceof PlayerEntity) {
+			IInventory inventory = NostrumMagica.baubles.getBaubles((PlayerEntity) player);
 			if (inventory != null) {
 				for (int i = 0; i < inventory.getSizeInventory(); i++) {
 					ItemStack stack = inventory.getStackInSlot(i);
@@ -91,7 +91,7 @@ public class LayerAetherCloak implements LayerRenderer<AbstractClientPlayer> {
 		return ItemStack.EMPTY;
 	}
 	
-	public @Nonnull ItemStack shouldRender(EntityLivingBase player) {
+	public @Nonnull ItemStack shouldRender(LivingEntity player) {
 		return ShouldRender(player);
 	}
 	
@@ -99,16 +99,16 @@ public class LayerAetherCloak implements LayerRenderer<AbstractClientPlayer> {
 		final ICapeProvider provider = ((ICapeProvider)stack.getItem());
 		final ModelAetherCloak model = GetModel(provider.getCapeModels(player, stack));
 		
-		GlStateManager.color(1.0F, 1.0F, 1.0F, 0.9F);
+		GlStateManager.color4f(1.0F, 1.0F, 1.0F, 0.9F);
 		
 		// Could dim as it gets less aether? Other effects?
 		
 		GlStateManager.disableBlend();
-		GlStateManager.disableAlpha();
+		GlStateManager.disableAlphaTest();
 		GlStateManager.enableBlend();
-		GlStateManager.enableAlpha();
-		GlStateManager.disableTexture2D();
-		GlStateManager.enableTexture2D();
+		GlStateManager.enableAlphaTest();
+		GlStateManager.disableTexture();
+		GlStateManager.enableTexture();
 		GlStateManager.enableLighting();
 		GlStateManager.disableLighting();
 		GlStateManager.disableColorLogic();
@@ -116,7 +116,7 @@ public class LayerAetherCloak implements LayerRenderer<AbstractClientPlayer> {
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(0.0F, 0.0F, 0.125F);
+		GlStateManager.translatef(0.0F, 0.0F, 0.125F);
 		model.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale, player);
 		model.renderEx(player, provider, stack, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
 

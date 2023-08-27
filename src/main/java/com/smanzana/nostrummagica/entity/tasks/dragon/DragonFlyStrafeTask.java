@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.entity.tasks.dragon;
 
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
 
 public class DragonFlyStrafeTask<T extends EntityDragon> extends EntityAIBase {
@@ -42,11 +42,11 @@ public class DragonFlyStrafeTask<T extends EntityDragon> extends EntityAIBase {
 	
 	@Override
 	public void updateTask() {
-		EntityLivingBase entitylivingbase = this.dragon.getAttackTarget();
+		LivingEntity entitylivingbase = this.dragon.getAttackTarget();
 
         if (entitylivingbase != null)
         {
-            double d0 = this.dragon.getDistanceSq(entitylivingbase.posX, entitylivingbase.getEntityBoundingBox().minY, entitylivingbase.posZ);
+            double d0 = this.dragon.getDistanceSq(entitylivingbase.posX, entitylivingbase.getBoundingBox().minY, entitylivingbase.posZ);
             boolean flag = this.dragon.getEntitySenses().canSee(entitylivingbase);
             boolean flag1 = this.seeTime > 0;
 

@@ -7,14 +7,14 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -41,15 +41,15 @@ public class ObeliskTeleportationRequestMessage implements IMessage {
 			
 			BlockPos from, to;
 			from = null;
-			if (message.tag.hasKey(NBT_FROM, NBT.TAG_COMPOUND)) {
-				from = NBTUtil.getPosFromTag(message.tag.getCompoundTag(NBT_FROM));
+			if (message.tag.contains(NBT_FROM, NBT.TAG_COMPOUND)) {
+				from = NBTUtil.getPosFromTag(message.tag.getCompound(NBT_FROM));
 			}
-			to = NBTUtil.getPosFromTag(message.tag.getCompoundTag(NBT_TO));
+			to = NBTUtil.getPosFromTag(message.tag.getCompound(NBT_TO));
 			
-			EntityPlayerMP sp = ctx.getServerHandler().player;
+			ServerPlayerEntity sp = ctx.getServerHandler().player;
 			
 			final BlockPos fromFinal = from;
-			sp.getServerWorld().addScheduledTask(() -> {
+			sp.getServerWorld().runAsync(() -> {
 				serverDoRequest(sp.world, sp, fromFinal, to);				
 			});
 			
@@ -63,10 +63,10 @@ public class ObeliskTeleportationRequestMessage implements IMessage {
 	//@CapabilityInject(INostrumMagic.class)
 	//public static Capability<INostrumMagic> CAPABILITY = null;
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public ObeliskTeleportationRequestMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	/**
@@ -75,11 +75,11 @@ public class ObeliskTeleportationRequestMessage implements IMessage {
 	 * @param to
 	 */
 	public ObeliskTeleportationRequestMessage(BlockPos from, BlockPos to) {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 		
 		if (from != null)
-			tag.setTag(NBT_FROM, NBTUtil.createPosTag(from));
-		tag.setTag(NBT_TO, NBTUtil.createPosTag(to));
+			tag.put(NBT_FROM, NBTUtil.createPosTag(from));
+		tag.put(NBT_TO, NBTUtil.createPosTag(to));
 	}
 
 	@Override
@@ -92,7 +92,7 @@ public class ObeliskTeleportationRequestMessage implements IMessage {
 		ByteBufUtils.writeTag(buf, tag);
 	}
 
-	public static boolean serverDoRequest(World world, EntityPlayer player, BlockPos from, BlockPos to) {
+	public static boolean serverDoRequest(World world, PlayerEntity player, BlockPos from, BlockPos to) {
 		INostrumMagic att = NostrumMagica.getMagicWrapper(player);
 		
 		if (att == null || !att.isUnlocked()) {
@@ -102,7 +102,7 @@ public class ObeliskTeleportationRequestMessage implements IMessage {
 		
 		// Validate obelisks
 		if (NostrumObelisk.isValidTarget(world, from, to)) {
-			player.sendMessage(new TextComponentTranslation("info.obelisk.dne"));
+			player.sendMessage(new TranslationTextComponent("info.obelisk.dne"));
 			return false;
 		}
 		
@@ -111,14 +111,14 @@ public class ObeliskTeleportationRequestMessage implements IMessage {
 			TileEntity te = world.getTileEntity(from);
 			if (te == null || !(te instanceof NostrumObeliskEntity)) {
 				NostrumMagica.logger.error("Something went wrong! Source obelisk does not seem to exist or have the provided target obelisk...");
-				player.sendMessage(new TextComponentTranslation("info.obelisk.dne"));
+				player.sendMessage(new TranslationTextComponent("info.obelisk.dne"));
 				return false;
 			}
 			
 			NostrumObeliskEntity obelisk = (NostrumObeliskEntity) te;
 			if (!obelisk.deductForTeleport(to)) {
 				NostrumMagica.logger.error("Something went wrong! Source obelisk does not seem to exist or have the provided target obelisk...");
-				player.sendMessage(new TextComponentTranslation("info.obelisk.aetherfail"));
+				player.sendMessage(new TranslationTextComponent("info.obelisk.aetherfail"));
 				return false;
 			}
 		}
@@ -136,7 +136,7 @@ public class ObeliskTeleportationRequestMessage implements IMessage {
 				
 			doEffects(world, to);
 		} else {
-			player.sendMessage(new TextComponentTranslation("info.obelisk.noroom"));
+			player.sendMessage(new TranslationTextComponent("info.obelisk.noroom"));
 		}
 		
 		return true;

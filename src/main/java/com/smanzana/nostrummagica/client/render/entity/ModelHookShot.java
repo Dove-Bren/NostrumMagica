@@ -7,11 +7,11 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.ResourceLocation;
 
 public class ModelHookShot extends ModelBase {
@@ -30,13 +30,13 @@ public class ModelHookShot extends ModelBase {
 		
 		GlStateManager.pushMatrix();
 		
-		GlStateManager.translate(0, .6, 0);
+		GlStateManager.translatef(0, .6, 0);
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GlStateManager.enableBlend();
 		GlStateManager.disableLighting();
-		GlStateManager.enableAlpha();
+		GlStateManager.enableAlphaTest();
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation(NostrumMagica.MODID,
+		Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(NostrumMagica.MODID,
 				"textures/blocks/dungeon_dark.png"
 				));
 		
@@ -71,7 +71,7 @@ public class ModelHookShot extends ModelBase {
 	}
 	
 	@Override
-	public void setLivingAnimations(EntityLivingBase entitylivingbaseIn, float p_78086_2_, float age, float partialTickTime) {
+	public void setLivingAnimations(LivingEntity entitylivingbaseIn, float p_78086_2_, float age, float partialTickTime) {
 		
 	}
 }

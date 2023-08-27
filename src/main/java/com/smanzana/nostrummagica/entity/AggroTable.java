@@ -11,7 +11,7 @@ import java.util.function.Predicate;
 
 import com.google.common.collect.Lists;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 
 /**
  * Generic aggro table
@@ -20,7 +20,7 @@ import net.minecraft.entity.EntityLivingBase;
  * @param <E>
  * @param <T>
  */
-public class AggroTable<T extends EntityLivingBase> {
+public class AggroTable<T extends LivingEntity> {
 
 	private final Map<T, Float> damageTable;
 	

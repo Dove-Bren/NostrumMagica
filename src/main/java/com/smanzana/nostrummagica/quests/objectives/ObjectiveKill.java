@@ -9,15 +9,15 @@ import com.smanzana.nostrummagica.quests.NostrumQuest;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.entity.projectile.EntityFireball;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class ObjectiveKill implements IObjective {
 	
@@ -31,24 +31,24 @@ public class ObjectiveKill implements IObjective {
 		}
 		
 		@Override
-		public NBTTagCompound toNBT() {
-			NBTTagCompound tag = new NBTTagCompound();
-			tag.setInteger(KEY, count);
+		public CompoundNBT toNBT() {
+			CompoundNBT tag = new CompoundNBT();
+			tag.putInt(KEY, count);
 			return tag;
 		}
 
 		@Override
-		public void fromNBT(NBTTagCompound nbt) {
-			this.count = nbt.getInteger(KEY);
+		public void fromNBT(CompoundNBT nbt) {
+			this.count = nbt.getInt(KEY);
 		}
 	}
 	
 	private NostrumQuest quest;
-	private Class<? extends EntityLivingBase> entityClass;
+	private Class<? extends LivingEntity> entityClass;
 	private String className;
 	private int count;
 	
-	public ObjectiveKill(Class<? extends EntityLivingBase> clazz, String display, int count) {
+	public ObjectiveKill(Class<? extends LivingEntity> clazz, String display, int count) {
 		this.entityClass = clazz;
 		this.className = display;
 		this.count = count;
@@ -81,26 +81,26 @@ public class ObjectiveKill implements IObjective {
 
 	@SubscribeEvent
 	public void onDeath(LivingDeathEvent event) {
-		EntityLivingBase dead = event.getEntityLiving();
+		LivingEntity dead = event.getEntityLiving();
 		if (entityClass.isInstance(dead)) {
 			Entity source = event.getSource().getTrueSource();
-			EntityPlayer player = null;
-			if (source instanceof EntityPlayer) {
-				player = (EntityPlayer) source;
+			PlayerEntity player = null;
+			if (source instanceof PlayerEntity) {
+				player = (PlayerEntity) source;
 			} else if (source instanceof EntityArrow) {
 				EntityArrow arrow = (EntityArrow) source;
-				if (arrow.shootingEntity instanceof EntityPlayer) {
-					player = (EntityPlayer) arrow.shootingEntity;
+				if (arrow.shootingEntity instanceof PlayerEntity) {
+					player = (PlayerEntity) arrow.shootingEntity;
 				}
 			} else if (source instanceof EntitySpellProjectile) {
 				EntitySpellProjectile proj = (EntitySpellProjectile) source;
-				if (proj.shootingEntity instanceof EntityPlayer) {
-					player = (EntityPlayer) proj.shootingEntity;
+				if (proj.shootingEntity instanceof PlayerEntity) {
+					player = (PlayerEntity) proj.shootingEntity;
 				}
 			} else if (source instanceof EntityFireball) {
 				EntityFireball proj = (EntityFireball) source;
-				if (proj.shootingEntity instanceof EntityPlayer) {
-					player = (EntityPlayer) proj.shootingEntity;
+				if (proj.shootingEntity instanceof PlayerEntity) {
+					player = (PlayerEntity) proj.shootingEntity;
 				}
 			}
 			
@@ -129,7 +129,7 @@ public class ObjectiveKill implements IObjective {
 			if (!player.world.isRemote) {
 				// Spells are cast on the server, so sync to client quest state
 				NetworkHandler.getSyncChannel().sendTo(
-						new StatSyncMessage(attr), (EntityPlayerMP) player);
+						new StatSyncMessage(attr), (ServerPlayerEntity) player);
 			}
 		}
 	}

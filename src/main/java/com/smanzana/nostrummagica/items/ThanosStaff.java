@@ -12,20 +12,20 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
 import net.minecraft.client.renderer.ItemMeshDefinition;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 
@@ -97,7 +97,7 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
     }
 
 	@Override
-	public void apply(EntityLivingBase caster, SpellCastSummary summary, ItemStack stack) {
+	public void apply(LivingEntity caster, SpellCastSummary summary, ItemStack stack) {
 		// We provide -5% reagent cost, +15% potency
 		summary.addReagentCost(-.05f);
 		summary.addEfficiency(.15f);
@@ -109,14 +109,14 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 		
 		if (hasFreeCast(stack)) {
 			summary.addReagentCost(-1f);
-			if (!(caster instanceof EntityPlayer) || !((EntityPlayer) caster).isCreative()) {
+			if (!(caster instanceof PlayerEntity) || !((PlayerEntity) caster).isCreative()) {
 				removeFreeCast(stack);
 			}
 		}
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		super.addInformation(stack, worldIn, tooltip, flagIn);
 		tooltip.add("Magic Potency Bonus: 15%");
@@ -141,7 +141,7 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 		if (staff.isEmpty() || !staff.hasTagCompound())
 			return 0;
 		
-		NBTTagCompound nbt = staff.getTagCompound();
+		CompoundNBT nbt = staff.getTagCompound();
 		return nbt.getByte(NBT_XP);
 	}
 	
@@ -149,9 +149,9 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 		if (staff.isEmpty())
 			return;
 		
-		NBTTagCompound nbt = staff.getTagCompound();
+		CompoundNBT nbt = staff.getTagCompound();
 		if (nbt == null)
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		
 		nbt.setByte(NBT_XP, xp);
 		staff.setTagCompound(nbt);
@@ -177,7 +177,7 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 		return remaining;
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public static class ModelMesher implements ItemMeshDefinition {
 
 		@Override

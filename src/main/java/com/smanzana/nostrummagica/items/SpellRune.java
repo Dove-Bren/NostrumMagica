@@ -18,17 +18,17 @@ import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.client.renderer.ItemMeshDefinition;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
@@ -36,13 +36,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
 public class SpellRune extends Item implements ILoreTagged {
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public static class ModelMesher implements ItemMeshDefinition {
 
 		@Override
@@ -317,7 +317,7 @@ public class SpellRune extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		if (isElement(stack)) {
 			tooltip.add(TextFormatting.DARK_GRAY + "Element" + TextFormatting.RESET);
@@ -370,7 +370,7 @@ public class SpellRune extends Item implements ILoreTagged {
 	/**
      * returns a list of items with the same ID, but different meta (eg: dye returns 16 items)
      */
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
     	if (this.isInCreativeTab(tab)) {
@@ -396,11 +396,11 @@ public class SpellRune extends Item implements ILoreTagged {
     
     public static ItemStack getRune(EMagicElement element, int power, int count) {
     	ItemStack stack = new ItemStack(instance, count);
-    	NBTTagCompound nbt = new NBTTagCompound();
+    	CompoundNBT nbt = new CompoundNBT();
     	
-    	nbt.setString(NBT_TYPE, "element");
-    	nbt.setString(NBT_NAME, element.name());
-    	nbt.setInteger(NBT_ELEMENT_COUNT, power);
+    	nbt.putString(NBT_TYPE, "element");
+    	nbt.putString(NBT_NAME, element.name());
+    	nbt.putInt(NBT_ELEMENT_COUNT, power);
     	
     	stack.setTagCompound(nbt);
     	return stack;
@@ -412,10 +412,10 @@ public class SpellRune extends Item implements ILoreTagged {
     
     public static ItemStack getRune(EAlteration alteration, int count) {
     	ItemStack stack = new ItemStack(instance, count);
-    	NBTTagCompound nbt = new NBTTagCompound();
+    	CompoundNBT nbt = new CompoundNBT();
     	
-    	nbt.setString(NBT_TYPE, "alteration");
-    	nbt.setString(NBT_NAME, alteration.name());
+    	nbt.putString(NBT_TYPE, "alteration");
+    	nbt.putString(NBT_NAME, alteration.name());
     	
     	stack.setTagCompound(nbt);
     	return stack;
@@ -427,10 +427,10 @@ public class SpellRune extends Item implements ILoreTagged {
     
     public static ItemStack getRune(SpellShape shape, int count) {
     	ItemStack stack = new ItemStack(instance, count);
-    	NBTTagCompound nbt = new NBTTagCompound();
+    	CompoundNBT nbt = new CompoundNBT();
     	
-    	nbt.setString(NBT_TYPE, "shape");
-    	nbt.setString(NBT_NAME, shape.getShapeKey());
+    	nbt.putString(NBT_TYPE, "shape");
+    	nbt.putString(NBT_NAME, shape.getShapeKey());
     	
     	stack.setTagCompound(nbt);
     	return stack;
@@ -442,10 +442,10 @@ public class SpellRune extends Item implements ILoreTagged {
     
     public static ItemStack getRune(SpellTrigger trigger, int count) {
     	ItemStack stack = new ItemStack(instance, count);
-    	NBTTagCompound nbt = new NBTTagCompound();
+    	CompoundNBT nbt = new CompoundNBT();
     	
-    	nbt.setString(NBT_TYPE, "trigger");
-    	nbt.setString(NBT_NAME, trigger.getTriggerKey());
+    	nbt.putString(NBT_TYPE, "trigger");
+    	nbt.putString(NBT_NAME, trigger.getTriggerKey());
     	
     	stack.setTagCompound(nbt);
     	return stack;
@@ -467,18 +467,18 @@ public class SpellRune extends Item implements ILoreTagged {
     	else
     		stack = getRune(part.getShape());
     	
-    	NBTTagCompound nbt = stack.getTagCompound();
+    	CompoundNBT nbt = stack.getTagCompound();
     	
     	if (part.getParam() != null) {
-    		nbt.setFloat(NBT_PARAM_VAL, part.getParam().level);
-    		nbt.setBoolean(NBT_PARAM_FLIP, part.getParam().flip);
+    		nbt.putFloat(NBT_PARAM_VAL, part.getParam().level);
+    		nbt.putBoolean(NBT_PARAM_FLIP, part.getParam().flip);
     	}
     	
     	if (!part.isTrigger()) {
-    		nbt.setString(NBT_SHAPE_ELEMENT, part.getElement().name());
-    		nbt.setInteger(NBT_ELEMENT_COUNT, part.getElementCount());
+    		nbt.putString(NBT_SHAPE_ELEMENT, part.getElement().name());
+    		nbt.putInt(NBT_ELEMENT_COUNT, part.getElementCount());
     		if (part.getAlteration() != null) {
-    			nbt.setString(NBT_SHAPE_ALTERATION, part.getAlteration().name());
+    			nbt.putString(NBT_SHAPE_ALTERATION, part.getAlteration().name());
     		}
     	}
     	
@@ -623,7 +623,7 @@ public class SpellRune extends Item implements ILoreTagged {
     	piece.getTagCompound().setBoolean(NBT_PARAM_FLIP, params.flip);
     }
     
-    public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
+    public EnumActionResult onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, EnumHand hand, Direction facing, float hitX, float hitY, float hitZ)
     {
     	// Probably wnat this later
     	return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ);

@@ -8,8 +8,8 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -30,8 +30,8 @@ public class ClientEffectRenderMessage implements IMessage {
 		@Override
 		public IMessage onMessage(ClientEffectRenderMessage message, MessageContext ctx) {
 
-			Minecraft.getMinecraft().addScheduledTask(() -> {
-				EntityLivingBase caster, target;
+			Minecraft.getInstance().runAsync(() -> {
+				LivingEntity caster, target;
 				Vec3d casterPos, targetPos;
 				SpellComponentWrapper component, flavor;
 				
@@ -39,7 +39,7 @@ public class ClientEffectRenderMessage implements IMessage {
 				casterPos = targetPos = null;
 				flavor = null;
 				
-				if (message.tag.hasKey(NBT_CASTER_ID, NBT.TAG_STRING)) {
+				if (message.tag.contains(NBT_CASTER_ID, NBT.TAG_STRING)) {
 					try {
 						UUID id = UUID.fromString(message.tag.getString(NBT_CASTER_ID));
 						caster = NostrumMagica.proxy.getPlayer().world.getPlayerEntityByUUID(id);
@@ -48,8 +48,8 @@ public class ClientEffectRenderMessage implements IMessage {
 					}
 				}
 				
-				if (message.tag.hasKey(NBT_CASTER_POS, NBT.TAG_COMPOUND)) {
-					NBTTagCompound nbt = message.tag.getCompoundTag(NBT_CASTER_POS);
+				if (message.tag.contains(NBT_CASTER_POS, NBT.TAG_COMPOUND)) {
+					CompoundNBT nbt = message.tag.getCompound(NBT_CASTER_POS);
 					casterPos = new Vec3d(
 							nbt.getDouble("x"),
 							nbt.getDouble("y"),
@@ -57,12 +57,12 @@ public class ClientEffectRenderMessage implements IMessage {
 							);
 				}
 				
-				if (message.tag.hasKey(NBT_TARGET_ID, NBT.TAG_STRING)) {
+				if (message.tag.contains(NBT_TARGET_ID, NBT.TAG_STRING)) {
 					try {
 						UUID id = UUID.fromString(message.tag.getString(NBT_TARGET_ID));
 						for (Entity e : NostrumMagica.proxy.getPlayer().world.loadedEntityList) {
 							if (e.getPersistentID().equals(id)) {
-								target = (EntityLivingBase) e;
+								target = (LivingEntity) e;
 								break;
 							}
 						}
@@ -71,8 +71,8 @@ public class ClientEffectRenderMessage implements IMessage {
 					}
 				}
 				
-				if (message.tag.hasKey(NBT_TARGET_POS, NBT.TAG_COMPOUND)) {
-					NBTTagCompound nbt = message.tag.getCompoundTag(NBT_TARGET_POS);
+				if (message.tag.contains(NBT_TARGET_POS, NBT.TAG_COMPOUND)) {
+					CompoundNBT nbt = message.tag.getCompound(NBT_TARGET_POS);
 					targetPos = new Vec3d(
 							nbt.getDouble("x"),
 							nbt.getDouble("y"),
@@ -80,7 +80,7 @@ public class ClientEffectRenderMessage implements IMessage {
 							);
 				}
 				
-				if (message.tag.hasKey(NBT_FLAVOR, NBT.TAG_STRING)) {
+				if (message.tag.contains(NBT_FLAVOR, NBT.TAG_STRING)) {
 					String key = message.tag.getString(NBT_FLAVOR);
 					flavor = SpellComponentWrapper.fromKeyString(key);
 				}
@@ -115,47 +115,47 @@ public class ClientEffectRenderMessage implements IMessage {
 	private static final String NBT_NEGATIVE = "negative";
 	private static final String NBT_PARAM = "param";
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public ClientEffectRenderMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	public ClientEffectRenderMessage(
-			EntityLivingBase caster, Vec3d casterPos,
-			EntityLivingBase target, Vec3d targetPos,
+			LivingEntity caster, Vec3d casterPos,
+			LivingEntity target, Vec3d targetPos,
 			SpellComponentWrapper component,
 			SpellComponentWrapper flavor,
 			boolean negative,
 			float param) {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 		
 		if (caster != null)
-			tag.setString(NBT_CASTER_ID, caster.getPersistentID().toString());
+			tag.putString(NBT_CASTER_ID, caster.getPersistentID().toString());
 		if (casterPos != null) {
-			NBTTagCompound nbt = new NBTTagCompound();
+			CompoundNBT nbt = new CompoundNBT();
 			nbt.setDouble("x", casterPos.x);
 			nbt.setDouble("y", casterPos.y);
 			nbt.setDouble("z", casterPos.z);
-			tag.setTag(NBT_CASTER_POS, nbt);
+			tag.put(NBT_CASTER_POS, nbt);
 		}
 			
 		if (target != null)
-			tag.setString(NBT_TARGET_ID, target.getPersistentID().toString());
+			tag.putString(NBT_TARGET_ID, target.getPersistentID().toString());
 		if (targetPos != null) {
-			NBTTagCompound nbt = new NBTTagCompound();
+			CompoundNBT nbt = new CompoundNBT();
 			nbt.setDouble("x", targetPos.x);
 			nbt.setDouble("y", targetPos.y);
 			nbt.setDouble("z", targetPos.z);
-			tag.setTag(NBT_TARGET_POS, nbt);
+			tag.put(NBT_TARGET_POS, nbt);
 		}
 		
-		tag.setString(NBT_COMPONENT, component.getKeyString());
+		tag.putString(NBT_COMPONENT, component.getKeyString());
 		if (flavor != null)
-			tag.setString(NBT_FLAVOR, flavor.getKeyString());
+			tag.putString(NBT_FLAVOR, flavor.getKeyString());
 		
-		tag.setBoolean(NBT_NEGATIVE, negative);
-		tag.setFloat(NBT_PARAM, param);
+		tag.putBoolean(NBT_NEGATIVE, negative);
+		tag.putFloat(NBT_PARAM, param);
 	}
 
 	@Override

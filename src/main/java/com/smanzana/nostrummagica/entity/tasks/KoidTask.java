@@ -22,7 +22,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.DamagedTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -381,7 +381,7 @@ public class KoidTask extends EntityAIBase {
 		
 		boolean inMelee = false;
 		boolean inRange = false;
-		EntityLivingBase target = koid.getAttackTarget();
+		LivingEntity target = koid.getAttackTarget();
 
 		boolean done = false;
 		boolean again = true;
@@ -412,7 +412,7 @@ public class KoidTask extends EntityAIBase {
 		if (target != null && !target.isDead) {
 			double distTarget = target.getPositionVector().distanceTo(koid.getPositionVector());
 			
-			double meleeRange = (double)(koid.width * 2.0F * koid.width * 2.0F + koid.width);
+			double meleeRange = (double)(koid.getWidth * 2.0F * koid.getWidth * 2.0F + koid.getWidth);
 			if (distTarget < meleeRange) {
 				inMelee = true;
 			}
@@ -441,7 +441,7 @@ public class KoidTask extends EntityAIBase {
 		return again;
 	}
 	
-	private boolean pathTo(EntityLivingBase target) {
+	private boolean pathTo(LivingEntity target) {
 		if (target == null || target.isDead)
 			return false;
 		
@@ -470,7 +470,7 @@ public class KoidTask extends EntityAIBase {
 		} else if (hasRange) {
 			
 			success = true;
-			double dist = koid.getDistanceSq(target.posX, target.getEntityBoundingBox().minY, target.posZ);
+			double dist = koid.getDistanceSq(target.posX, target.getBoundingBox().minY, target.posZ);
 
             if (dist <= RANGE_SQR - 64.0 && koid.canEntityBeSeen(target))
             {
@@ -621,12 +621,12 @@ public class KoidTask extends EntityAIBase {
 		return buffSkills.get(rand.nextInt(buffSkills.size()));
 	}
 	
-	private static Vec2f getPitchYaw(EntityLivingBase entity){
+	private static Vec2f getPitchYaw(LivingEntity entity){
 		Vec2f vec2f = new Vec2f(entity.rotationPitch, entity.rotationYaw);
 		return vec2f;
 	}
 
-	private static Vec3d getForward(EntityLivingBase entity) {
+	private static Vec3d getForward(LivingEntity entity) {
 		return fromPitchYawVector(getPitchYaw(entity));
 	}
 	

@@ -8,10 +8,10 @@ import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 
 public class CommandGiveResearchpoint extends CommandBase {
 
@@ -28,20 +28,20 @@ public class CommandGiveResearchpoint extends CommandBase {
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		
-		if (sender instanceof EntityPlayer) {
-			EntityPlayer player = (EntityPlayer) sender;
+		if (sender instanceof PlayerEntity) {
+			PlayerEntity player = (PlayerEntity) sender;
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			if (attr == null) {
-				sender.sendMessage(new TextComponentString("Could not find magic wrapper"));
+				sender.sendMessage(new StringTextComponent("Could not find magic wrapper"));
 				return;
 			}
 			
 			attr.addResearchPoint();
 			NetworkHandler.getSyncChannel().sendTo(
 					new StatSyncMessage(attr)
-					, (EntityPlayerMP) player);
+					, (ServerPlayerEntity) player);
 		} else {
-			sender.sendMessage(new TextComponentString("This command must be run as a player"));
+			sender.sendMessage(new StringTextComponent("This command must be run as a player"));
 		}
 	}
 

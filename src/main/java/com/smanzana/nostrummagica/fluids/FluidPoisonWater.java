@@ -13,7 +13,7 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
@@ -23,8 +23,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.BlockFluidClassic;
 import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class FluidPoisonWater extends Fluid {
 
@@ -79,9 +79,9 @@ public class FluidPoisonWater extends Fluid {
 		@Override
 		public void onEntityCollidedWithBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull Entity entity) {
 			if (!world.isRemote
-					&& entity instanceof EntityLivingBase) {
+					&& entity instanceof LivingEntity) {
 				if (entity.ticksExisted % 10 == 0) {
-					EntityLivingBase living = (EntityLivingBase) entity;
+					LivingEntity living = (LivingEntity) entity;
 					living.attackEntityFrom(PoisonWaterDamageSource, .25f);
 				}
 			}
@@ -89,7 +89,7 @@ public class FluidPoisonWater extends Fluid {
 			super.onEntityCollidedWithBlock(world, pos, state, entity);
 		}
 		
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		@Override
 		public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
 			super.randomDisplayTick(stateIn, worldIn, pos, rand);
@@ -117,7 +117,7 @@ public class FluidPoisonWater extends Fluid {
 		}
 		
 		@Override
-		public net.minecraft.pathfinding.PathNodeType getAiPathNodeType(IBlockState state, IBlockAccess world, BlockPos pos, @Nullable net.minecraft.entity.EntityLiving entity) {
+		public net.minecraft.pathfinding.PathNodeType getAiPathNodeType(IBlockState state, IBlockAccess world, BlockPos pos, @Nullable net.minecraft.entity.MobEntity entity) {
 //			if (entity != null && entity.isEntityUndead()) {
 //				return super.getAiPathNodeType(state, world, pos, entity);
 //			}

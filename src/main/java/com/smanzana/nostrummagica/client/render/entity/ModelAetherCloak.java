@@ -7,11 +7,11 @@ import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.texture.TextureMap;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -37,11 +37,11 @@ public class ModelAetherCloak extends ModelBase {
 	public void renderEx(Entity entityIn, @Nullable ICapeProvider provider, @Nullable ItemStack stack,
 			float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch,
 			float scale) {
-		if (!(entityIn instanceof EntityLivingBase)) {
+		if (!(entityIn instanceof LivingEntity)) {
 			return;
 		}
 		
-		final EntityLivingBase living = (EntityLivingBase) entityIn;
+		final LivingEntity living = (LivingEntity) entityIn;
 		final float objScale = .425f;
 		final boolean isFlying = living.isElytraFlying();
 		final boolean hasChestpiece = (!living.getItemStackFromSlot(EntityEquipmentSlot.CHEST).isEmpty());
@@ -51,13 +51,13 @@ public class ModelAetherCloak extends ModelBase {
 		Vec3d look = entityIn.getLook(ageInTicks % 1f);
 		double motionForward = look
 				.subtract(0, look.y, 0)
-				.dotProduct(new Vec3d(entityIn.motionX, 0, entityIn.motionZ));
+				.dotProduct(new Vec3d(entityIn.getMotion().x, 0, entityIn.getMotion().z));
 		float rot = -10f;
 		final float moveMaxRot = (!isFlying && motionForward > 0 ? -20f : 10f);
 		//final double yVelOverride = .25;
 		final float cloakAffectVelocity = limbSwingAmount;
 				// Imagine your cape moving realisitically depending on if you were going up or down 
-				//(entityIn.motionY < -yVelOverride ? -1f : (entityIn.motionY > yVelOverride ? 1f : limbSwingAmount));
+				//(entityIn.getMotion().y < -yVelOverride ? -1f : (entityIn.getMotion().y > yVelOverride ? 1f : limbSwingAmount));
 		rot += (cloakAffectVelocity * moveMaxRot); // Add amount for how fast we're moving
 		if (entityIn.isSneaking()) {
 			rot -= 30;
@@ -67,11 +67,11 @@ public class ModelAetherCloak extends ModelBase {
 		GlStateManager.disableCull();
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.scale(objScale, -objScale, objScale);
-		GlStateManager.translate(0, entityIn.isSneaking() ? -.3 : 0, hasChestpiece ? .15 : 0);
-		GlStateManager.rotate(rot, 1, 0, 0);
-		//GlStateManager.rotate(180f, 1, 0, 0);
-		//GlStateManager.rotate(180f, 0, 1, 0);
+		GlStateManager.scalef(objScale, -objScale, objScale);
+		GlStateManager.translatef(0, entityIn.isSneaking() ? -.3 : 0, hasChestpiece ? .15 : 0);
+		GlStateManager.rotatef(rot, 1, 0, 0);
+		//GlStateManager.rotatef(180f, 1, 0, 0);
+		//GlStateManager.rotatef(180f, 0, 1, 0);
 		int index = 0;
 		for (IBakedModel model : models) {
 			GlStateManager.pushMatrix();
@@ -79,10 +79,10 @@ public class ModelAetherCloak extends ModelBase {
 			final int color = provider.getColor(living, stack, index);
 			final ResourceLocation texture = textures == null ? null : textures[index];
 			if (texture != null) {
-				Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
+				Minecraft.getInstance().getTextureManager().bindTexture(texture);
 			} else {
 				// Default main texture -- for blocks and .objs
-				Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+				Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 			}
 			
 			if (provider != null) {
@@ -111,7 +111,7 @@ public class ModelAetherCloak extends ModelBase {
 	 * Used for easily adding entity-dependent animations. The second and third float params here are the same second
 	 * and third as in the setRotationAngles method.
 	 */
-	public void setLivingAnimations(EntityLivingBase entitylivingbaseIn, float p_78086_2_, float p_78086_3_, float partialTickTime) {
+	public void setLivingAnimations(LivingEntity entitylivingbaseIn, float p_78086_2_, float p_78086_3_, float partialTickTime) {
 		super.setLivingAnimations(entitylivingbaseIn, p_78086_2_, p_78086_3_, partialTickTime);
 		//model.setLivingAnimations(entitylivingbaseIn, p_78086_2_, p_78086_3_, partialTickTime);
 	}

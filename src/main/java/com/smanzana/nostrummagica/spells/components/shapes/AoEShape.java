@@ -13,7 +13,7 @@ import com.smanzana.nostrummagica.spells.components.SpellShape;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
@@ -39,8 +39,8 @@ public class AoEShape extends SpellShape {
 	}
 
 	@Override
-	protected List<EntityLivingBase> getTargets(SpellPartParam param, EntityLivingBase target, World world, BlockPos pos) {
-		List<EntityLivingBase> ret = new LinkedList<>();
+	protected List<LivingEntity> getTargets(SpellPartParam param, LivingEntity target, World world, BlockPos pos) {
+		List<LivingEntity> ret = new LinkedList<>();
 		
 		double radius = Math.max(supportedFloats()[0], (double) param.level) + .5;
 		final boolean ignoreAllies = param.flip;
@@ -52,7 +52,7 @@ public class AoEShape extends SpellShape {
 							pos.getX() + radius,
 							pos.getY() + radius,
 							pos.getZ() + radius))) {
-			EntityLivingBase living = NostrumMagica.resolveEntityLiving(entity);
+			LivingEntity living = NostrumMagica.resolveEntityLiving(entity);
 			if (living != null && (!ignoreAllies || (target != null && !NostrumMagica.IsSameTeam(target, living))))
 				if (Math.abs(entity.getPositionVector().distanceTo(new Vec3d(pos.getX(), pos.getY(), pos.getZ()))) <= radius)
 					ret.add(living);
@@ -62,7 +62,7 @@ public class AoEShape extends SpellShape {
 	}
 
 	@Override
-	protected List<BlockPos> getTargetLocations(SpellPartParam param, EntityLivingBase target, World world,
+	protected List<BlockPos> getTargetLocations(SpellPartParam param, LivingEntity target, World world,
 			BlockPos pos) {
 		List<BlockPos> list = new LinkedList<>();
 		

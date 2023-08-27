@@ -36,22 +36,22 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityMoveHelper;
 import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundEvent;
@@ -64,8 +64,8 @@ import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTameable {
 	
@@ -100,7 +100,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		this.setHome(homePos);
 	}
 	
-	public EntityLux(World worldIn, EntityLivingBase owner) {
+	public EntityLux(World worldIn, LivingEntity owner) {
 		this(worldIn);
 		this.setOwner(owner);
 	}
@@ -119,14 +119,14 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 			}
 			
 			@Override
-			protected EntityLivingBase getOrbitTarget() {
+			protected LivingEntity getOrbitTarget() {
 				return this.ent.getAttackTarget();
 			}
 		});
 		this.tasks.addTask(priority++, new EntityAIOrbitEntityGeneric<EntityLux>(this, null, 3, 20 * 10) {
 			@Override
 			public boolean shouldExecute() {
-				EntityLivingBase owner = getOwner();
+				LivingEntity owner = getOwner();
 				if (owner == null) {
 					return false;
 				}
@@ -135,7 +135,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 			}
 			
 			@Override
-			protected EntityLivingBase getOrbitTarget() {
+			protected LivingEntity getOrbitTarget() {
 				return getOwner();
 			}
 		});
@@ -152,7 +152,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 			}
 			
 			@Override
-			protected void moveToTemptingPlayer(EntityCreature tempted, EntityPlayer player) {
+			protected void moveToTemptingPlayer(EntityCreature tempted, PlayerEntity player) {
 				if (this.temptedEntity.getDistanceSq(this.temptingPlayer) < 6.25D) {
 					//this.temptedEntity.getMoveHelper(). no such thing as stop
 				} else {
@@ -234,7 +234,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 
 	public float getEyeHeight()
 	{
-		return this.height * 0.5F;
+		return this.getHeight() * 0.5F;
 	}
 
 	public boolean attackEntityAsMob(Entity entityIn)
@@ -249,12 +249,12 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		return flag;
 	}
 
-	public boolean processInteract(EntityPlayer player, EnumHand hand, @Nonnull ItemStack stack)
+	public boolean processInteract(PlayerEntity player, EnumHand hand, @Nonnull ItemStack stack)
 	{
 		return false;
 	}
 
-	public boolean canBeLeashedTo(EntityPlayer player)
+	public boolean canBeLeashedTo(PlayerEntity player)
 	{
 		return false;
 	}
@@ -369,50 +369,50 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 	}
 	
 	@Override
-	public void readEntityFromNBT(NBTTagCompound compound) {
+	public void readEntityFromNBT(CompoundNBT compound) {
 		super.readEntityFromNBT(compound);
-		if (compound.hasKey("home", NBT.TAG_LONG)) {
+		if (compound.contains("home", NBT.TAG_LONG)) {
 			setHome(BlockPos.fromLong(compound.getLong("home")));
 		} else {
 			setHome(null);
 		}
 		
-		if (compound.hasKey("owner", NBT.TAG_COMPOUND)) {
+		if (compound.contains("owner", NBT.TAG_COMPOUND)) {
 			setOwner(compound.getUniqueId("owner"));
 		} else {
 			setOwner((UUID)null);
 		}
 		
-		if (compound.hasKey("pollinated_item", NBT.TAG_COMPOUND)) {
-			setPollinatedItem(new ItemStack(compound.getCompoundTag("pollinated_item")));
+		if (compound.contains("pollinated_item", NBT.TAG_COMPOUND)) {
+			setPollinatedItem(new ItemStack(compound.getCompound("pollinated_item")));
 		} else {
 			setPollinatedItem(ItemStack.EMPTY);
 		}
 		
-		setCommunityScore(compound.getInteger("community"));
+		setCommunityScore(compound.getInt("community"));
 		
 		// Note: roosting is not persisted
 	}
 	
 	@Override
-	public void writeEntityToNBT(NBTTagCompound compound) {
+	public void writeEntityToNBT(CompoundNBT compound) {
 		super.writeEntityToNBT(compound);
 		
 		BlockPos homePos = this.getHome();
 		if (homePos != null) {
-			compound.setLong("home", homePos.toLong());
+			compound.putLong("home", homePos.toLong());
 		}
 		if (getOwnerId() != null) {
 			compound.setUniqueId("owner", getOwnerId());
 		}
 		if (!getPollinatedItem().isEmpty()) {
-			compound.setTag("pollinated_item", getPollinatedItem().serializeNBT());
+			compound.put("pollinated_item", getPollinatedItem().serializeNBT());
 		}
-		compound.setInteger("community", getCommunityScore());
+		compound.putInt("community", getCommunityScore());
 	}
 	
 	@Override
-	public boolean writeToNBTOptional(NBTTagCompound compound) {
+	public boolean writeToNBTOptional(CompoundNBT compound) {
 		return super.writeToNBTOptional(compound);
 	}
 	
@@ -426,7 +426,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public int getBrightnessForRender(float partialTicks)
 	{
 		return 15728880;
@@ -467,7 +467,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 			double d0 = this.rand.nextGaussian() * 0.02D;
 			double d1 = this.rand.nextGaussian() * 0.02D;
 			double d2 = this.rand.nextGaussian() * 0.02D;
-			this.world.spawnParticle(enumparticletypes, this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.height), this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, d0, d1, d2, new int[0]);
+			this.world.spawnParticle(enumparticletypes, this.posX + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.posZ + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, d0, d1, d2, new int[0]);
 		}
 	}
 	
@@ -491,18 +491,18 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 				d3 = (double)MathHelper.sqrt(d3);
 				
 				if (Math.abs(d3) < .01) {
-					this.parentEntity.motionX = 0;
-					this.parentEntity.motionY = 0;
-					this.parentEntity.motionZ = 0;
+					this.parentEntity.getMotion().x = 0;
+					this.parentEntity.getMotion().y = 0;
+					this.parentEntity.getMotion().z = 0;
 					this.action = EntityMoveHelper.Action.WAIT;
 					return;
 				} else if (courseChangeCooldown-- <= 0) {
 					courseChangeCooldown = this.parentEntity.getRNG().nextInt(5) + 10;
 					float basespeed = (float) this.parentEntity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
 					//speed *= 3f;
-					this.parentEntity.motionX = (d0 / d3) * basespeed * speed;
-					this.parentEntity.motionY = (d1 / d3) * basespeed  * speed;
-					this.parentEntity.motionZ = (d2 / d3) * basespeed  * speed;
+					this.parentEntity.getMotion().x = (d0 / d3) * basespeed * speed;
+					this.parentEntity.getMotion().y = (d1 / d3) * basespeed  * speed;
+					this.parentEntity.getMotion().z = (d2 / d3) * basespeed  * speed;
 					
 					float f9 = (float)(MathHelper.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
 					this.entity.rotationYaw = this.limitAngle(this.entity.rotationYaw, f9, 90.0F);
@@ -516,21 +516,21 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 	public void travel(float strafe, float vertical, float forward) {
 		if (this.isInWater()) {
 			this.moveRelative(strafe, vertical, forward, 0.02F);
-			this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
-			this.motionX *= 0.800000011920929D;
-			this.motionY *= 0.800000011920929D;
-			this.motionZ *= 0.800000011920929D;
+			this.move(MoverType.SELF, this.getMotion().x, this.getMotion().y, this.getMotion().z);
+			this.getMotion().x *= 0.800000011920929D;
+			this.getMotion().y *= 0.800000011920929D;
+			this.getMotion().z *= 0.800000011920929D;
 		} else if (this.isInLava()) {
 			this.moveRelative(strafe, vertical, forward, 0.02F);
-			this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
-			this.motionX *= 0.5D;
-			this.motionY *= 0.5D;
-			this.motionZ *= 0.5D;
+			this.move(MoverType.SELF, this.getMotion().x, this.getMotion().y, this.getMotion().z);
+			this.getMotion().x *= 0.5D;
+			this.getMotion().y *= 0.5D;
+			this.getMotion().z *= 0.5D;
 		} else {
 			float f = 0.91F;
 
 			if (this.onGround) {
-				final BlockPos pos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getEntityBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
+				final BlockPos pos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
 				final IBlockState state = world.getBlockState(pos);
 				f = state.getBlock().getSlipperiness(state, world, pos, this) * 0.91F;
 			}
@@ -540,15 +540,15 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 			f = 0.91F;
 
 			if (this.onGround) {
-				final BlockPos pos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getEntityBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
+				final BlockPos pos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
 				final IBlockState state = world.getBlockState(pos);
 				f = state.getBlock().getSlipperiness(state, world, pos, this) * 0.91F;
 			}
 
-			this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
-			this.motionX *= (double)f;
-			this.motionY *= (double)f;
-			this.motionZ *= (double)f;
+			this.move(MoverType.SELF, this.getMotion().x, this.getMotion().y, this.getMotion().z);
+			this.getMotion().x *= (double)f;
+			this.getMotion().y *= (double)f;
+			this.getMotion().z *= (double)f;
 		}
 
 		this.prevLimbSwingAmount = this.limbSwingAmount;
@@ -574,7 +574,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 	
 	@Override
 	public boolean getCanSpawnHere() {
-		BlockPos blockpos = new BlockPos(this.posX, this.getEntityBoundingBox().minY, this.posZ);
+		BlockPos blockpos = new BlockPos(this.posX, this.getBoundingBox().minY, this.posZ);
 
 		return this.world.getLightFor(EnumSkyBlock.SKY, blockpos) >= 8;
 	}
@@ -640,9 +640,9 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 				
 				// Check how high above ground that is, and retry if too far up
 				int yDiff = 1;
-				cursor.move(EnumFacing.DOWN);
+				cursor.move(Direction.DOWN);
 				while (cursor.getY() > 0 && parentEntity.world.isAirBlock(cursor)) {
-					cursor.move(EnumFacing.DOWN);
+					cursor.move(Direction.DOWN);
 					yDiff++;
 				}
 				
@@ -738,18 +738,18 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 				}
 				
 				// If already roosting, snap to right position and hold there with no jitter
-				final double dist = parentEntity.getPositionVector().squareDistanceTo(roostPos.getX() + .5, roostPos.getY() - (parentEntity.height), roostPos.getZ() + .5);
+				final double dist = parentEntity.getPositionVector().squareDistanceTo(roostPos.getX() + .5, roostPos.getY() - (parentEntity.getHeight()), roostPos.getZ() + .5);
 				if (dist < .015) {
 					if (dist > 0.0) {
-						parentEntity.setPosition(roostPos.getX() + .5, roostPos.getY() - (parentEntity.height), roostPos.getZ() + .5);
+						parentEntity.setPosition(roostPos.getX() + .5, roostPos.getY() - (parentEntity.getHeight()), roostPos.getZ() + .5);
 					}
 					
-					parentEntity.motionX = parentEntity.motionY = parentEntity.motionZ = 0;
+					parentEntity.getMotion().x = parentEntity.getMotion().y = parentEntity.getMotion().z = 0;
 					parentEntity.startRoosting();
 				} else if (!parentEntity.getMoveHelper().isUpdating()) {
 					this.parentEntity.getMoveHelper().setMoveTo(
 							roostPos.getX() + .5,
-							roostPos.getY() - (parentEntity.height),
+							roostPos.getY() - (parentEntity.getHeight()),
 							roostPos.getZ() + .5,
 							0.3D);
 				}
@@ -771,7 +771,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 			if (roostPos != null) {
 				this.parentEntity.getMoveHelper().setMoveTo(
 						roostPos.getX() + .5,
-						roostPos.getY() - (parentEntity.height),
+						roostPos.getY() - (parentEntity.getHeight()),
 						roostPos.getZ() + .5,
 						0.3D);
 			}
@@ -902,11 +902,11 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 	}
 
 	@Override
-	public EntityLivingBase getOwner() {
+	public LivingEntity getOwner() {
 		UUID ownerID = getOwnerId();
-		EntityLivingBase owner = null;
+		LivingEntity owner = null;
 		if (ownerID != null) {
-			List<EntityLivingBase> ids = this.world.getEntities(EntityLivingBase.class, (ent) -> {
+			List<LivingEntity> ids = this.world.getEntities(LivingEntity.class, (ent) -> {
 				return ent != null && ent.getUniqueID().equals(ownerID);
 			});
 			if (ids != null && ids.size() > 0) {
@@ -921,7 +921,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		return false;
 	}
 	
-	public void setOwner(@Nullable EntityLivingBase owner) {
+	public void setOwner(@Nullable LivingEntity owner) {
 		setOwner(owner == null ? null : owner.getUniqueID());
 	}
 	
@@ -1139,13 +1139,13 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 				|| !state.isOpaqueCube()
 				|| state.getMaterial() == Material.LEAVES
 				) {
-				cursor.move(EnumFacing.DOWN);
+				cursor.move(Direction.DOWN);
 			} else {
 				break;
 			}
 		}
 		
-		cursor.move(EnumFacing.UP);
+		cursor.move(Direction.UP);
 		
 		final IBlockState flowerState = resolvePlantable(stack);
 		

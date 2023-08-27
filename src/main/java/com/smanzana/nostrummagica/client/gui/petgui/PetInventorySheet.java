@@ -1,15 +1,15 @@
 package com.smanzana.nostrummagica.client.gui.petgui;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
 import com.smanzana.nostrummagica.entity.IEntityPet;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.inventory.container.Slot;
+import net.minecraft.nbt.CompoundNBT;
 
 public abstract class PetInventorySheet<T extends IEntityPet> implements IPetGUISheet<T> {
 	
@@ -22,7 +22,7 @@ public abstract class PetInventorySheet<T extends IEntityPet> implements IPetGUI
 	}
 	
 	@Override
-	public void showSheet(T pet, EntityPlayer player, PetContainer<T> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(T pet, PlayerEntity player, PetContainer<T> container, int width, int height, int offsetX, int offsetY) {
 		final int cellWidth = 18;
 		final int invRow = 9;
 		final int invWidth = cellWidth * invRow;
@@ -45,13 +45,13 @@ public abstract class PetInventorySheet<T extends IEntityPet> implements IPetGUI
 	}
 
 	@Override
-	public void hideSheet(T pet, EntityPlayer player, PetContainer<T> container) {
+	public void hideSheet(T pet, PlayerEntity player, PetContainer<T> container) {
 		container.clearSlots();
 	}
 
 	@Override
 	public void draw(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
-		GlStateManager.color(1.0F,  1.0F, 1.0F, 1.0F);
+		GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 		
 		mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
 		
@@ -66,8 +66,8 @@ public abstract class PetInventorySheet<T extends IEntityPet> implements IPetGUI
 			final int playerInvSize = 27 + 9;
 			
 			for (int i = 0; i < petInv.getSizeInventory(); i++) {
-				GlStateManager.color(1f, 1f, 1f, 1f);
-				Gui.drawModalRectWithCustomSizedTexture(leftOffset - 1 + (cellWidth * (i % invRow)), dragonTopOffset - 1 + (cellWidth * (i / invRow)),
+				GlStateManager.color4f(1f, 1f, 1f, 1f);
+				RenderFuncs.drawModalRectWithCustomSizedTexture(leftOffset - 1 + (cellWidth * (i % invRow)), dragonTopOffset - 1 + (cellWidth * (i / invRow)),
 						PetGUI.GUI_TEX_CELL_HOFFSET, PetGUI.GUI_TEX_CELL_VOFFSET,
 						cellWidth, cellWidth,
 						256, 256);
@@ -75,8 +75,8 @@ public abstract class PetInventorySheet<T extends IEntityPet> implements IPetGUI
 			
 			final int playerTopOffset = 100;
 			for (int i = 0; i < playerInvSize; i++) {
-				GlStateManager.color(1f, 1f, 1f, 1f);
-				Gui.drawModalRectWithCustomSizedTexture(leftOffset - 1 + (cellWidth * (i % invRow)), (i < 27 ? 0 : 10) + playerTopOffset - 1 + (cellWidth * (i / invRow)),
+				GlStateManager.color4f(1f, 1f, 1f, 1f);
+				RenderFuncs.drawModalRectWithCustomSizedTexture(leftOffset - 1 + (cellWidth * (i % invRow)), (i < 27 ? 0 : 10) + playerTopOffset - 1 + (cellWidth * (i / invRow)),
 						PetGUI.GUI_TEX_CELL_HOFFSET, PetGUI.GUI_TEX_CELL_VOFFSET,
 						cellWidth, cellWidth,
 						256, 256);
@@ -92,7 +92,7 @@ public abstract class PetInventorySheet<T extends IEntityPet> implements IPetGUI
 	}
 
 	@Override
-	public void handleMessage(NBTTagCompound data) {
+	public void handleMessage(CompoundNBT data) {
 		
 	}
 

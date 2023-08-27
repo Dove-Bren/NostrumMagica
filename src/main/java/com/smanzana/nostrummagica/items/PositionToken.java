@@ -16,17 +16,17 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * Solidified position crystal for obelisk linking
@@ -52,7 +52,7 @@ public class PositionToken extends PositionCrystal {
 		this.setUnlocalizedName(ID);
 	}
 	
-	protected static boolean hasRecallUnlocked(EntityPlayer playerIn, World worldIn, ItemStack token) {
+	protected static boolean hasRecallUnlocked(PlayerEntity playerIn, World worldIn, ItemStack token) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
 		if (attr != null && attr.getCompletedResearches().contains("adv_markrecall")) {
 			return true;
@@ -60,7 +60,7 @@ public class PositionToken extends PositionCrystal {
 		return false;
 	}
 	
-	protected static boolean canAffordRecall(EntityPlayer playerIn, World worldIn, ItemStack token) {
+	protected static boolean canAffordRecall(PlayerEntity playerIn, World worldIn, ItemStack token) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
 		if (attr != null && token.getItem() instanceof PositionToken) {
 			return attr.getMana() >= ((PositionToken)token.getItem()).getManaCost(playerIn, worldIn, token);
@@ -68,11 +68,11 @@ public class PositionToken extends PositionCrystal {
 		return false;
 	}
 	
-	protected int getManaCost(EntityPlayer playerIn, World worldIn, ItemStack token) {
+	protected int getManaCost(PlayerEntity playerIn, World worldIn, ItemStack token) {
 		return 50;
 	}
 	
-	protected static boolean canPerformRecall(EntityPlayer playerIn, World worldIn, ItemStack token) {
+	protected static boolean canPerformRecall(PlayerEntity playerIn, World worldIn, ItemStack token) {
 		BlockPos pos = getBlockPosition(token);
 		int dim = getDimension(token);
 		return pos != null
@@ -81,7 +81,7 @@ public class PositionToken extends PositionCrystal {
 				&& dim == playerIn.dimension;
 	}
 	
-	protected boolean doRecall(EntityPlayer playerIn, World worldIn, ItemStack token) {
+	protected boolean doRecall(PlayerEntity playerIn, World worldIn, ItemStack token) {
 		if (canPerformRecall(playerIn, worldIn, token)) {
 			// Try to do actual recall
 			BlockPos pos = getBlockPosition(token);
@@ -99,7 +99,7 @@ public class PositionToken extends PositionCrystal {
 	}
 	
 	@Override
-	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, EnumHand hand, Direction facing, float hitX, float hitY, float hitZ) {
 		if (worldIn.isRemote)
 			return EnumActionResult.SUCCESS;
 		
@@ -116,7 +116,7 @@ public class PositionToken extends PositionCrystal {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
 		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		if (PositionToken.hasRecallUnlocked(playerIn, worldIn, itemStackIn)) {
 			if (!worldIn.isRemote) {
@@ -206,7 +206,7 @@ public class PositionToken extends PositionCrystal {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		super.addInformation(stack, worldIn, tooltip, flagIn);
 		

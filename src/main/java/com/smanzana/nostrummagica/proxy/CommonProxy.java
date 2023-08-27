@@ -140,11 +140,11 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.MaterialLiquid;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.EntityTracker;
 import net.minecraft.entity.EnumCreatureType;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.init.Items;
 import net.minecraft.init.PotionTypes;
 import net.minecraft.item.ItemStack;
@@ -167,7 +167,7 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
@@ -567,7 +567,7 @@ public class CommonProxy {
 		}, true));
     }
     
-    public void syncPlayer(EntityPlayerMP player) {
+    public void syncPlayer(ServerPlayerEntity player) {
     	INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
     	attr.refresh(player);
     	NetworkHandler.getSyncChannel().sendTo(
@@ -581,13 +581,13 @@ public class CommonProxy {
     			player);
     }
     
-    public void updateEntityEffect(EntityPlayerMP player, EntityLivingBase entity, SpecialEffect effectType, EffectData data) {
+    public void updateEntityEffect(ServerPlayerEntity player, LivingEntity entity, SpecialEffect effectType, EffectData data) {
     	NetworkHandler.getSyncChannel().sendTo(
     			new MagicEffectUpdate(entity, effectType, data),
     			player);
     }
 
-	public EntityPlayer getPlayer() {
+	public PlayerEntity getPlayer() {
 		return null; // Doesn't mean anything on the server
 	}
 	
@@ -603,13 +603,13 @@ public class CommonProxy {
 		return true;
 	}
 	
-	public void openBook(EntityPlayer player, GuiBook book, Object userdata) {
+	public void openBook(PlayerEntity player, GuiBook book, Object userdata) {
 		; // Server does nothing
 	}
 	
-	public <T extends IEntityPet> void openPetGUI(EntityPlayer player, T pet) {
+	public <T extends IEntityPet> void openPetGUI(PlayerEntity player, T pet) {
 		// This code is largely taken from FMLNetworkHandler's openGui method, but we use our own message to open the GUI on the client
-		EntityPlayerMP mpPlayer = (EntityPlayerMP) player;
+		ServerPlayerEntity mpPlayer = (ServerPlayerEntity) player;
 		PetContainer<?> container = pet.getGUIContainer(player);
 		mpPlayer.getNextWindowId();
 		mpPlayer.closeContainer();
@@ -623,12 +623,12 @@ public class CommonProxy {
         NetworkHandler.getSyncChannel().sendTo(message, mpPlayer);
 	}
 
-	public void sendServerConfig(EntityPlayerMP player) {
+	public void sendServerConfig(ServerPlayerEntity player) {
 		ModConfig.channel.sendTo(new ServerConfigMessage(ModConfig.config), player);
 	}
 	
-	public void sendSpellDebug(EntityPlayer player, ITextComponent comp) {
-		NetworkHandler.getSyncChannel().sendTo(new SpellDebugMessage(comp), (EntityPlayerMP) player);
+	public void sendSpellDebug(PlayerEntity player, ITextComponent comp) {
+		NetworkHandler.getSyncChannel().sendTo(new SpellDebugMessage(comp), (ServerPlayerEntity) player);
 	}
 	
 	public String getTranslation(String key) {
@@ -643,7 +643,7 @@ public class CommonProxy {
 		; // server does nothing
 	}
 	
-	public void requestStats(EntityLivingBase entity) {
+	public void requestStats(LivingEntity entity) {
 		;
 	}
 	
@@ -660,8 +660,8 @@ public class CommonProxy {
 	 * @param param optional extra float param for display
 	 */
 	public void spawnEffect(World world, SpellComponentWrapper comp,
-			EntityLivingBase caster, Vec3d casterPos,
-			EntityLivingBase target, Vec3d targetPos,
+			LivingEntity caster, Vec3d casterPos,
+			LivingEntity target, Vec3d targetPos,
 			SpellComponentWrapper flavor, boolean isNegative, float compParam) {
 		if (world == null) {
 			if (caster == null)
@@ -672,7 +672,7 @@ public class CommonProxy {
 		
 		final double MAX_RANGE_SQR = 2500.0;
 		
-		Set<EntityPlayer> players = new HashSet<>();
+		Set<PlayerEntity> players = new HashSet<>();
 		
 		if (caster != null) {
 			//caster.addTrackingPlayer(player);
@@ -686,22 +686,22 @@ public class CommonProxy {
 				.getTrackingPlayers(target));
 		}
 		
-		if (caster != null && caster == target && caster instanceof EntityPlayer) {
+		if (caster != null && caster == target && caster instanceof PlayerEntity) {
 			// Very specific case here
-			players.add((EntityPlayer) caster);
+			players.add((PlayerEntity) caster);
 		}
 		
 		if (players.isEmpty()) {
 			// Fall back to distance check against locations
 			if (casterPos != null) {
-				for (EntityPlayer player : world.playerEntities) {
+				for (PlayerEntity player : world.playerEntities) {
 					if (player.getDistanceSq(casterPos.x, casterPos.y, casterPos.z) <= MAX_RANGE_SQR)
 						players.add(player);
 				}
 			}
 			
 			if (targetPos != null) {
-				for (EntityPlayer player : world.playerEntities) {
+				for (PlayerEntity player : world.playerEntities) {
 					if (player.getDistanceSq(targetPos.x, targetPos.y, targetPos.z) <= MAX_RANGE_SQR)
 						players.add(player);
 				}
@@ -714,13 +714,13 @@ public class CommonProxy {
 					target, targetPos,
 					comp, flavor,
 					isNegative, compParam);
-			for (EntityPlayer player : players) {
-				NetworkHandler.getSyncChannel().sendTo(message, (EntityPlayerMP) player);
+			for (PlayerEntity player : players) {
+				NetworkHandler.getSyncChannel().sendTo(message, (ServerPlayerEntity) player);
 			}
 		}
 	}
 	
-	public void sendMana(EntityPlayer player) {
+	public void sendMana(PlayerEntity player) {
 		EntityTracker tracker = ((WorldServer) player.world).getEntityTracker();
 		if (tracker == null)
 			return;
@@ -737,7 +737,7 @@ public class CommonProxy {
 				.getPacketFrom(new ManaMessage(player, mana)));
 	}
 	
-	public void sendManaArmorCapability(EntityPlayer player) {
+	public void sendManaArmorCapability(PlayerEntity player) {
 		EntityTracker tracker = ((WorldServer) player.world).getEntityTracker();
 		if (tracker == null)
 			return;
@@ -754,10 +754,10 @@ public class CommonProxy {
 	
 	public void playRitualEffect(World world, BlockPos pos, EMagicElement element,
 			ItemStack center, @Nullable NonNullList<ItemStack> extras, ReagentType[] types, ItemStack output) {
-		Set<EntityPlayer> players = new HashSet<>();
+		Set<PlayerEntity> players = new HashSet<>();
 		final double MAX_RANGE_SQR = 2500.0;
 		if (pos != null) {
-			for (EntityPlayer player : world.playerEntities) {
+			for (PlayerEntity player : world.playerEntities) {
 				if (player.getDistanceSq(pos.getX(), pos.getY(), pos.getZ()) <= MAX_RANGE_SQR)
 					players.add(player);
 			}
@@ -769,8 +769,8 @@ public class CommonProxy {
 					world.provider.getDimension(),
 					pos, element, types, center, extras, output
 					);
-			for (EntityPlayer player : players) {
-				NetworkHandler.getSyncChannel().sendTo(message, (EntityPlayerMP) player);
+			for (PlayerEntity player : players) {
+				NetworkHandler.getSyncChannel().sendTo(message, (ServerPlayerEntity) player);
 			}
 		}
 	}
@@ -784,18 +784,18 @@ public class CommonProxy {
 	}
 	
 	private void playPredefinedEffect(SpawnPredefinedEffectMessage message, World world, Vec3d center) {
-		Set<EntityPlayer> players = new HashSet<>();
+		Set<PlayerEntity> players = new HashSet<>();
 		final double MAX_RANGE_SQR = 2500.0;
 		if (center != null) {
-			for (EntityPlayer player : world.playerEntities) {
+			for (PlayerEntity player : world.playerEntities) {
 				if (player.getDistanceSq(center.x, center.y, center.z) <= MAX_RANGE_SQR)
 					players.add(player);
 			}
 		}
 		
 		if (!players.isEmpty()) {
-			for (EntityPlayer player : players) {
-				NetworkHandler.getSyncChannel().sendTo(message, (EntityPlayerMP) player);
+			for (PlayerEntity player : players) {
+				NetworkHandler.getSyncChannel().sendTo(message, (ServerPlayerEntity) player);
 			}
 		}
 	}

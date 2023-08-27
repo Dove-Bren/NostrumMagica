@@ -46,7 +46,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.WallTrigger;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -57,14 +57,14 @@ import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.ai.EntityMoveHelper;
 import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundEvent;
@@ -77,8 +77,8 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class EntityWillo extends EntityMob implements ILoreTagged {
 	
@@ -127,17 +127,17 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 					&& EntityWillo.this.getStatus() == WilloStatus.AGGRO;
 		}) {
 			@Override
-			protected EntityLivingBase getOrbitTarget() {
+			protected LivingEntity getOrbitTarget() {
 				return EntityWillo.this.getAttackTarget();
 			}
 		});
 		this.tasks.addTask(priority++, new AIRandomFly(this));
-		this.tasks.addTask(priority++, new EntityAIWatchClosest(this, EntityPlayer.class, 60f));
+		this.tasks.addTask(priority++, new EntityAIWatchClosest(this, PlayerEntity.class, 60f));
 		this.tasks.addTask(priority++, new EntityAILookIdle(this));
 		
 		priority = 1;
 		this.targetTasks.addTask(priority++, new EntityAIHurtByTarget(this, true, new Class[] {EntityWillo.class}));
-		this.targetTasks.addTask(priority++, new EntityAINearestAttackableTarget<EntityPlayer>(this, EntityPlayer.class, 10, true, false, null));
+		this.targetTasks.addTask(priority++, new EntityAINearestAttackableTarget<PlayerEntity>(this, PlayerEntity.class, 10, true, false, null));
 	}
 	
 	protected void applyEntityAttributes() {
@@ -174,7 +174,7 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 
 	public float getEyeHeight()
 	{
-		return this.height * 0.5F;
+		return this.getHeight() * 0.5F;
 	}
 
 	public boolean attackEntityAsMob(Entity entityIn)
@@ -189,12 +189,12 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 		return flag;
 	}
 
-	public boolean processInteract(EntityPlayer player, EnumHand hand, @Nonnull ItemStack stack)
+	public boolean processInteract(PlayerEntity player, EnumHand hand, @Nonnull ItemStack stack)
 	{
 		return false;
 	}
 
-	public boolean canBeLeashedTo(EntityPlayer player)
+	public boolean canBeLeashedTo(PlayerEntity player)
 	{
 		return false;
 	}
@@ -303,16 +303,16 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 	}
 	
 	@Override
-	public void readEntityFromNBT(NBTTagCompound compound) {
+	public void readEntityFromNBT(CompoundNBT compound) {
 		super.readEntityFromNBT(compound);
-		if (compound.hasKey("element", NBT.TAG_STRING)) {
+		if (compound.contains("element", NBT.TAG_STRING)) {
 			try {
 				this.dataManager.set(ELEMENT, EMagicElement.valueOf(compound.getString("element").toUpperCase()));
 			} catch (Exception e) {
 				this.dataManager.set(ELEMENT, EMagicElement.ICE);
 			}
 		}
-//		if (compound.hasKey("status", NBT.TAG_STRING)) {
+//		if (compound.contains("status", NBT.TAG_STRING)) {
 //			try {
 //				this.dataManager.set(STATUS, WilloStatus.valueOf(compound.getString("status").toUpperCase()));
 //			} catch (Exception e) {
@@ -322,15 +322,15 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 	}
 	
 	@Override
-	public void writeEntityToNBT(NBTTagCompound compound) {
+	public void writeEntityToNBT(CompoundNBT compound) {
 		super.writeEntityToNBT(compound);
 		
-		compound.setString("element", this.getElement().name());
-		//compound.setString("status", this.getStatus().name());
+		compound.putString("element", this.getElement().name());
+		//compound.putString("status", this.getStatus().name());
 	}
 	
 	@Override
-	public boolean writeToNBTOptional(NBTTagCompound compound) {
+	public boolean writeToNBTOptional(CompoundNBT compound) {
 		return super.writeToNBTOptional(compound);
 	}
 	
@@ -344,7 +344,7 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 		
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public int getBrightnessForRender(float partialTicks)
 	{
 		return 15728880;
@@ -422,7 +422,7 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 			double d0 = this.rand.nextGaussian() * 0.02D;
 			double d1 = this.rand.nextGaussian() * 0.02D;
 			double d2 = this.rand.nextGaussian() * 0.02D;
-			this.world.spawnParticle(enumparticletypes, this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.height), this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, d0, d1, d2, new int[0]);
+			this.world.spawnParticle(enumparticletypes, this.posX + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.posZ + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, d0, d1, d2, new int[0]);
 		}
 	}
 	
@@ -459,9 +459,9 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 				d3 = (double)MathHelper.sqrt(d3);
 				
 //				if (Math.abs(d3) < .5) {
-//					this.parentEntity.motionX = 0;
-//					this.parentEntity.motionY = 0;
-//					this.parentEntity.motionZ = 0;
+//					this.parentEntity.getMotion().x = 0;
+//					this.parentEntity.getMotion().y = 0;
+//					this.parentEntity.getMotion().z = 0;
 //					this.action = EntityMoveHelper.Action.WAIT;
 //					return;
 //				} else if (courseChangeCooldown-- <= 0) {
@@ -470,9 +470,9 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 //					if (this.isNotColliding(this.posX, this.posY, this.posZ, d3)) {
 //						float basespeed = (float) this.parentEntity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
 //						//speed *= 3f;
-//						this.parentEntity.motionX = (d0 / d3) * basespeed * speed;
-//						this.parentEntity.motionY = (d1 / d3) * basespeed  * speed;
-//						this.parentEntity.motionZ = (d2 / d3) * basespeed  * speed;
+//						this.parentEntity.getMotion().x = (d0 / d3) * basespeed * speed;
+//						this.parentEntity.getMotion().y = (d1 / d3) * basespeed  * speed;
+//						this.parentEntity.getMotion().z = (d2 / d3) * basespeed  * speed;
 //						
 //						float f9 = (float)(MathHelper.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
 //						this.entity.rotationYaw = this.limitAngle(this.entity.rotationYaw, f9, 90.0F);
@@ -482,17 +482,17 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 //				}
 				
 				if (Math.abs(d3) < .5) {
-					this.parentEntity.motionX = 0;
-					this.parentEntity.motionY = 0;
-					this.parentEntity.motionZ = 0;
+					this.parentEntity.getMotion().x = 0;
+					this.parentEntity.getMotion().y = 0;
+					this.parentEntity.getMotion().z = 0;
 					this.action = EntityMoveHelper.Action.WAIT;
 					return;
 				} else if (this.isNotColliding(this.posX, this.posY, this.posZ, d3)) {
 					float basespeed = (float) this.parentEntity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
 					//speed *= 3f;
-					this.parentEntity.motionX = (d0 / d3) * basespeed * speed;
-					this.parentEntity.motionY = (d1 / d3) * basespeed  * speed;
-					this.parentEntity.motionZ = (d2 / d3) * basespeed  * speed;
+					this.parentEntity.getMotion().x = (d0 / d3) * basespeed * speed;
+					this.parentEntity.getMotion().y = (d1 / d3) * basespeed  * speed;
+					this.parentEntity.getMotion().z = (d2 / d3) * basespeed  * speed;
 					
 					float f9 = (float)(MathHelper.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
 					this.entity.rotationYaw = this.limitAngle(this.entity.rotationYaw, f9, 90.0F);
@@ -510,7 +510,7 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 			double d0 = (x - this.parentEntity.posX) / p_179926_7_;
 			double d1 = (y - this.parentEntity.posY) / p_179926_7_;
 			double d2 = (z - this.parentEntity.posZ) / p_179926_7_;
-			AxisAlignedBB axisalignedbb = this.parentEntity.getEntityBoundingBox();
+			AxisAlignedBB axisalignedbb = this.parentEntity.getBoundingBox();
 
 			for (int i = 1; (double)i < p_179926_7_; ++i) {
 				axisalignedbb = axisalignedbb.offset(d0, d1, d2);
@@ -529,22 +529,22 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 	public void travel(float strafe, float vertical, float forward) {
 		if (this.isInWater()) {
 			this.moveRelative(strafe, vertical, forward, 0.02F);
-			this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
-			this.motionX *= 0.800000011920929D;
-			this.motionY *= 0.800000011920929D;
-			this.motionZ *= 0.800000011920929D;
+			this.move(MoverType.SELF, this.getMotion().x, this.getMotion().y, this.getMotion().z);
+			this.getMotion().x *= 0.800000011920929D;
+			this.getMotion().y *= 0.800000011920929D;
+			this.getMotion().z *= 0.800000011920929D;
 		} else if (this.isInLava()) {
 			this.moveRelative(strafe, vertical, forward, 0.02F);
-			this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
-			this.motionX *= 0.5D;
-			this.motionY *= 0.5D;
-			this.motionZ *= 0.5D;
+			this.move(MoverType.SELF, this.getMotion().x, this.getMotion().y, this.getMotion().z);
+			this.getMotion().x *= 0.5D;
+			this.getMotion().y *= 0.5D;
+			this.getMotion().z *= 0.5D;
 		} else {
 			float f = 0.91F;
 
 			if (this.onGround) {
-				//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getEntityBoundingBox().minY) - 1, MathHelper.floor(this.posZ))).getBlock().slipperiness * 0.91F;
-				BlockPos underPos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getEntityBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
+				//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ))).getBlock().slipperiness * 0.91F;
+				BlockPos underPos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
 				IBlockState underState = this.world.getBlockState(underPos);
 				f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.91F;
 			}
@@ -554,16 +554,16 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 			f = 0.91F;
 
 			if (this.onGround) {
-				//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getEntityBoundingBox().minY) - 1, MathHelper.floor(this.posZ))).getBlock().slipperiness * 0.91F;
-				BlockPos underPos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getEntityBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
+				//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ))).getBlock().slipperiness * 0.91F;
+				BlockPos underPos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
 				IBlockState underState = this.world.getBlockState(underPos);
 				f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.91F;
 			}
 
-			this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
-			this.motionX *= (double)f;
-			this.motionY *= (double)f;
-			this.motionZ *= (double)f;
+			this.move(MoverType.SELF, this.getMotion().x, this.getMotion().y, this.getMotion().z);
+			this.getMotion().x *= (double)f;
+			this.getMotion().y *= (double)f;
+			this.getMotion().z *= (double)f;
 		}
 
 		this.prevLimbSwingAmount = this.limbSwingAmount;
@@ -597,7 +597,7 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 			return false;
 		}
 		
-		BlockPos blockpos = new BlockPos(this.posX, this.getEntityBoundingBox().minY, this.posZ);
+		BlockPos blockpos = new BlockPos(this.posX, this.getBoundingBox().minY, this.posZ);
 
 		if (this.world.getLightFor(EnumSkyBlock.SKY, blockpos) > this.rand.nextInt(32)) {
 			return false;
@@ -671,17 +671,17 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 			cursor.setPos(d0, d1, d2);
 			
 			while (cursor.getY() > 0 && parentEntity.world.isAirBlock(cursor)) {
-				cursor.move(EnumFacing.DOWN);
+				cursor.move(Direction.DOWN);
 			}
 			
 			while (cursor.getY() < 255 && !parentEntity.world.isAirBlock(cursor)) {
-				cursor.move(EnumFacing.UP);
+				cursor.move(Direction.UP);
 			}
 			
 			// Try and move `height` up
 			for (int i = 0; i < height; i++) {
 				if (parentEntity.world.isAirBlock(cursor.up())) {
-					cursor.move(EnumFacing.UP);
+					cursor.move(Direction.UP);
 				} else {
 					break;
 				}

@@ -11,8 +11,8 @@ import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.EntityPlayer;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
@@ -23,7 +23,7 @@ public class RedDragonInventorySheet extends PetInventorySheet<EntityTameDragonR
 	}
 	
 	@Override
-	public void showSheet(EntityTameDragonRed dragon, EntityPlayer player, PetContainer<EntityTameDragonRed> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(EntityTameDragonRed dragon, PlayerEntity player, PetContainer<EntityTameDragonRed> container, int width, int height, int offsetX, int offsetY) {
 		super.showSheet(dragon, player, container, width, height, offsetX, offsetY);
 		
 		final int cellWidth = 18;
@@ -56,7 +56,7 @@ public class RedDragonInventorySheet extends PetInventorySheet<EntityTameDragonR
 	public void draw(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		super.draw(mc, partialTicks, width, height, mouseX, mouseY);
 		
-		GlStateManager.color(1.0F,  1.0F, 1.0F, 1.0F);
+		GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 		
 		mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
 		
@@ -79,8 +79,8 @@ public class RedDragonInventorySheet extends PetInventorySheet<EntityTameDragonR
 				// NOT IMPLEMENTED TODO
 				
 				final int i = slot.ordinal();
-				GlStateManager.color(1f, 1f, 1f, 1f);
-				Gui.drawModalRectWithCustomSizedTexture(leftOffset - 1 - (cellWidth + 4), dragonTopOffset - 1 + (cellWidth * (i * 2)),
+				GlStateManager.color4f(1f, 1f, 1f, 1f);
+				RenderFuncs.drawModalRectWithCustomSizedTexture(leftOffset - 1 - (cellWidth + 4), dragonTopOffset - 1 + (cellWidth * (i * 2)),
 						PetGUI.GUI_TEX_CELL_HOFFSET, PetGUI.GUI_TEX_CELL_VOFFSET,
 						cellWidth, cellWidth,
 						256, 256);

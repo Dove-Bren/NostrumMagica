@@ -13,12 +13,12 @@ import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 public class OutcomeCreateObelisk implements IRitualOutcome {
@@ -27,10 +27,10 @@ public class OutcomeCreateObelisk implements IRitualOutcome {
 	}
 	
 	@Override
-	public boolean canPerform(World world, EntityPlayer player, BlockPos center, RitualMatchInfo ingredients) {
+	public boolean canPerform(World world, PlayerEntity player, BlockPos center, RitualMatchInfo ingredients) {
 		if (!NostrumObelisk.canSpawnObelisk(world, center.add(0, -1, 0))) {
 			if (!world.isRemote) {
-				player.sendMessage(new TextComponentTranslation("info.create_obelisk.fail", new Object[0]));
+				player.sendMessage(new TranslationTextComponent("info.create_obelisk.fail", new Object[0]));
 			}
 			return false;
 		}
@@ -38,10 +38,10 @@ public class OutcomeCreateObelisk implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, EntityPlayer player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, PlayerEntity player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
 		// All logic contained in obelisk class
 		if (!NostrumObelisk.spawnObelisk(world, center.add(0, -1, 0))) {
-			player.sendMessage(new TextComponentTranslation("info.create_obelisk.fail", new Object[0]));
+			player.sendMessage(new TranslationTextComponent("info.create_obelisk.fail", new Object[0]));
 		} else if (!world.isRemote) {
 			// clear altar on server
 			TileEntity te = world.getTileEntity(center.add(0, 0, 0));

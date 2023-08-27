@@ -3,10 +3,10 @@ package com.smanzana.nostrummagica.spells.components;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 
 public class MagicDamageSource extends EntityDamageSource {
 	
@@ -21,10 +21,10 @@ public class MagicDamageSource extends EntityDamageSource {
 	}
 	
 	@Override
-	public ITextComponent getDeathMessage(EntityLivingBase entityLivingBaseIn) {
+	public ITextComponent getDeathMessage(LivingEntity entityLivingBaseIn) {
 		
         String untranslated = "death.attack.magic." + element.name();
-        return new TextComponentTranslation(untranslated, new Object[] {entityLivingBaseIn.getDisplayName(), this.damageSourceEntity.getDisplayName()});
+        return new TranslationTextComponent(untranslated, new Object[] {entityLivingBaseIn.getDisplayName(), this.damageSourceEntity.getDisplayName()});
     }
 
 	public EMagicElement getElement() {

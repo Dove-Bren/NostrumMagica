@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.effects.modifiers;
 
 import com.smanzana.nostrummagica.client.effects.ClientEffect.ClientEffectRenderDetail;
 
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 
 public class ClientEffectModifierRotate implements ClientEffectModifier {
 
@@ -23,9 +23,9 @@ public class ClientEffectModifierRotate implements ClientEffectModifier {
 		float rotX = progress * rotationsX * 360f;
 		float rotY = progress * rotationsY * 360f;
 		float rotZ = progress * rotationsZ * 360f;
-		GlStateManager.rotate(rotX % 360f, 1f, 0f, 0f);
-		GlStateManager.rotate(rotY % 360f, 0f, 1f, 0f);
-		GlStateManager.rotate(rotZ % 360f, 0f, 0f, 1f);
+		GlStateManager.rotatef(rotX % 360f, 1f, 0f, 0f);
+		GlStateManager.rotatef(rotY % 360f, 0f, 1f, 0f);
+		GlStateManager.rotatef(rotZ % 360f, 0f, 0f, 1f);
 	}
 
 	@Override

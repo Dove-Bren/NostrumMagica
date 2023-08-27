@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -24,14 +24,14 @@ public class SpawnNostrumParticleMessage implements IMessage {
 		@Override
 		public IMessage onMessage(SpawnNostrumParticleMessage message, MessageContext ctx) {
 			
-			final int particleID = message.tag.getInteger(NBT_PARTICLE_ID);
-			final SpawnParams params = SpawnParams.FromNBT(message.tag.getCompoundTag(NBT_PARAMS));
+			final int particleID = message.tag.getInt(NBT_PARTICLE_ID);
+			final SpawnParams params = SpawnParams.FromNBT(message.tag.getCompound(NBT_PARAMS));
 			final NostrumParticles type = NostrumParticles.FromID(particleID);
 			
 			if (type == null) {
 				NostrumMagica.logger.warn("Got particle spawn message with unknown ID");
 			} else {
-				Minecraft.getMinecraft().addScheduledTask(() -> {
+				Minecraft.getInstance().runAsync(() -> {
 					type.spawn(NostrumMagica.proxy.getPlayer().getEntityWorld(), params);
 				});
 			}
@@ -44,17 +44,17 @@ public class SpawnNostrumParticleMessage implements IMessage {
 	private static final String NBT_PARTICLE_ID = "particle_id";
 	private static final String NBT_PARAMS = "params";
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public SpawnNostrumParticleMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	public SpawnNostrumParticleMessage(NostrumParticles type, SpawnParams params) {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 		
-		tag.setInteger(NBT_PARTICLE_ID, type.getID());
-		tag.setTag(NBT_PARAMS, params.toNBT(null));
+		tag.putInt(NBT_PARTICLE_ID, type.getID());
+		tag.put(NBT_PARAMS, params.toNBT(null));
 	}
 
 	@Override

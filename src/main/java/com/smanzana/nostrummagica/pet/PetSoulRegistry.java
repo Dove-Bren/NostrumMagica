@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.world.storage.WorldSavedData;
 
 /**
@@ -31,7 +31,7 @@ public class PetSoulRegistry extends WorldSavedData {
 		private static final String NBT_ENTRY_SNAPSHOT = "snapshot";
 		
 		protected UUID worldID;
-		protected @Nullable NBTTagCompound snapshot;
+		protected @Nullable CompoundNBT snapshot;
 		
 		public SoulEntry() {
 			this(UUID.randomUUID());
@@ -41,7 +41,7 @@ public class PetSoulRegistry extends WorldSavedData {
 			this(worldID, null);
 		}
 		
-		protected SoulEntry(UUID worldID, @Nullable NBTTagCompound snapshot) {
+		protected SoulEntry(UUID worldID, @Nullable CompoundNBT snapshot) {
 			setWorldID(worldID);
 			setSnapshot(snapshot);
 		}
@@ -54,7 +54,7 @@ public class PetSoulRegistry extends WorldSavedData {
 			return this.worldID;
 		}
 		
-		public void setSnapshot(NBTTagCompound nbt) {
+		public void setSnapshot(CompoundNBT nbt) {
 			if (nbt != null) {
 				this.snapshot = nbt.copy();
 			} else {
@@ -62,31 +62,31 @@ public class PetSoulRegistry extends WorldSavedData {
 			}
 		}
 		
-		public @Nullable NBTTagCompound getSnapshot() {
+		public @Nullable CompoundNBT getSnapshot() {
 			return snapshot;
 		}
 		
-		public NBTTagCompound writeToNBT(@Nullable NBTTagCompound nbt) {
+		public CompoundNBT writeToNBT(@Nullable CompoundNBT nbt) {
 			if (nbt == null) {
-				nbt = new NBTTagCompound();
+				nbt = new CompoundNBT();
 			}
 			
 			nbt.setUniqueId(NBT_ENTRY_WORLDID, worldID);
 			if (this.snapshot != null) {
-				nbt.setTag(NBT_ENTRY_SNAPSHOT, snapshot);
+				nbt.put(NBT_ENTRY_SNAPSHOT, snapshot);
 			}
 			
 			return nbt;
 		}
 		
-		public static SoulEntry FromNBT(NBTTagCompound nbt) {
+		public static SoulEntry FromNBT(CompoundNBT nbt) {
 			UUID worldID = nbt.getUniqueId(NBT_ENTRY_WORLDID);
 			if (worldID == null) {
 				NostrumMagica.logger.warn("Failed to deserialize PetSoul key UUID!");
 				worldID = UUID.randomUUID();
 			}
 			
-			@Nullable NBTTagCompound snapshot = nbt.getCompoundTag(NBT_ENTRY_SNAPSHOT);
+			@Nullable CompoundNBT snapshot = nbt.getCompound(NBT_ENTRY_SNAPSHOT);
 			
 			return new SoulEntry(worldID, snapshot);
 		}
@@ -107,13 +107,13 @@ public class PetSoulRegistry extends WorldSavedData {
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(CompoundNBT nbt) {
 		synchronized(soulMap) {
 			soulMap.clear();
 			
 			// NBT has each entry in the map as a single element, where the key name
 			// is the stringified UUID key and the value is nbt-ified SoulEntries.
-			for (String key : nbt.getKeySet()) {
+			for (String key : nbt.keySet()) {
 				UUID id = null;
 				try {
 					id = UUID.fromString(key);
@@ -127,7 +127,7 @@ public class PetSoulRegistry extends WorldSavedData {
 					continue;
 				}
 				
-				SoulEntry entry = SoulEntry.FromNBT(nbt.getCompoundTag(key));
+				SoulEntry entry = SoulEntry.FromNBT(nbt.getCompound(key));
 				if (entry == null) {
 					NostrumMagica.logger.warn("Ignoring entry for key " + key);
 					continue;
@@ -139,10 +139,10 @@ public class PetSoulRegistry extends WorldSavedData {
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+	public CompoundNBT writeToNBT(CompoundNBT compound) {
 		synchronized(soulMap) {
 			for (Entry<UUID, SoulEntry> entry : soulMap.entrySet()) {
-				compound.setTag(
+				compound.put(
 						entry.getKey().toString(),
 						entry.getValue().writeToNBT(null)
 					);
@@ -242,7 +242,7 @@ public class PetSoulRegistry extends WorldSavedData {
 	
 	public void snapshotPet(IPetWithSoul pet) {
 		final UUID key = pet.getPetSoulID();
-		final NBTTagCompound snapshot = pet.serializeNBT();
+		final CompoundNBT snapshot = pet.serializeNBT();
 		synchronized(soulMap) {
 			SoulEntry entry = soulMap.get(key);
 			if (entry == null) {
@@ -254,12 +254,12 @@ public class PetSoulRegistry extends WorldSavedData {
 		this.markDirty();
 	}
 	
-	public @Nullable NBTTagCompound getPetSnapshot(IPetWithSoul pet) {
+	public @Nullable CompoundNBT getPetSnapshot(IPetWithSoul pet) {
 		return this.getPetSnapshot(pet.getPetSoulID());
 	}
 	
-	public @Nullable NBTTagCompound getPetSnapshot(UUID rawPetID) {
-		NBTTagCompound ret = null;
+	public @Nullable CompoundNBT getPetSnapshot(UUID rawPetID) {
+		CompoundNBT ret = null;
 		synchronized(soulMap) {
 			SoulEntry entry = soulMap.get(rawPetID);
 			if (entry != null) {

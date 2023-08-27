@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpawnNostrumParticleMessage;
 import com.smanzana.nostrummagica.utils.ColorUtil;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -197,82 +197,82 @@ public enum NostrumParticles {
 		private static final String NBT_GRAVITY_STRENGTH = "gravity_strength";
 		private static final String NBT_ENTITY_BEHAVIOR = "entity_behavior";
 		
-		public static NBTTagCompound WriteNBT(SpawnParams params, @Nullable NBTTagCompound tag) {
+		public static CompoundNBT WriteNBT(SpawnParams params, @Nullable CompoundNBT tag) {
 			if (tag == null) {
-				tag = new NBTTagCompound();
+				tag = new CompoundNBT();
 			}
 			
-			tag.setInteger(NBT_COUNT, params.count);
+			tag.putInt(NBT_COUNT, params.count);
 			tag.setDouble(NBT_SPAWN_X, params.spawnX);
 			tag.setDouble(NBT_SPAWN_Y, params.spawnY);
 			tag.setDouble(NBT_SPAWN_Z, params.spawnZ);
 			tag.setDouble(NBT_SPAWN_JITTER, params.spawnJitterRadius);
-			tag.setInteger(NBT_LIFETIME, params.lifetime);
-			tag.setInteger(NBT_LIFETIME_JITTER, params.lifetimeJitter);
-			tag.setBoolean(NBT_DIE_ON_TARGET, params.dieOnTarget);
-			tag.setInteger(NBT_ENTITY_BEHAVIOR, params.entityBehavior.ordinal());
+			tag.putInt(NBT_LIFETIME, params.lifetime);
+			tag.putInt(NBT_LIFETIME_JITTER, params.lifetimeJitter);
+			tag.putBoolean(NBT_DIE_ON_TARGET, params.dieOnTarget);
+			tag.putInt(NBT_ENTITY_BEHAVIOR, params.entityBehavior.ordinal());
 			
 			if (params.velocity != null) {
-				NBTTagCompound subtag = new NBTTagCompound();
+				CompoundNBT subtag = new CompoundNBT();
 				subtag.setDouble("x", params.velocity.x);
 				subtag.setDouble("y", params.velocity.y);
 				subtag.setDouble("z", params.velocity.z);
-				tag.setTag(NBT_VELOCITY, subtag);
+				tag.put(NBT_VELOCITY, subtag);
 			}
 			
 			if (params.velocityJitter != null) {
-				NBTTagCompound subtag = new NBTTagCompound();
+				CompoundNBT subtag = new CompoundNBT();
 				subtag.setDouble("x", params.velocityJitter.x);
 				subtag.setDouble("y", params.velocityJitter.y);
 				subtag.setDouble("z", params.velocityJitter.z);
-				tag.setTag(NBT_VELOCITY_JITTER, subtag);
+				tag.put(NBT_VELOCITY_JITTER, subtag);
 			}
 			
 			if (params.targetPos != null) {
-				NBTTagCompound subtag = new NBTTagCompound();
+				CompoundNBT subtag = new CompoundNBT();
 				subtag.setDouble("x", params.targetPos.x);
 				subtag.setDouble("y", params.targetPos.y);
 				subtag.setDouble("z", params.targetPos.z);
-				tag.setTag(NBT_TARGET_POS, subtag);
+				tag.put(NBT_TARGET_POS, subtag);
 			}
 			
 			if (params.targetEntID != null) {
-				tag.setInteger(NBT_TARGET_ENT_ID, params.targetEntID);
+				tag.putInt(NBT_TARGET_ENT_ID, params.targetEntID);
 			}
 			
 			if (params.color != null) {
-				tag.setInteger("color", params.color);
+				tag.putInt("color", params.color);
 			}
 			
 			if (params.gravityStrength != 0f) {
-				tag.setFloat(NBT_GRAVITY_STRENGTH, params.gravityStrength);
+				tag.putFloat(NBT_GRAVITY_STRENGTH, params.gravityStrength);
 			}
 			
 			return tag;
 		}
 		
-		public NBTTagCompound toNBT(@Nullable NBTTagCompound tag) {
+		public CompoundNBT toNBT(@Nullable CompoundNBT tag) {
 			return WriteNBT(this, tag);
 		}
 		
-		public static SpawnParams FromNBT(NBTTagCompound tag) {
-			final int count = tag.getInteger(NBT_COUNT);
+		public static SpawnParams FromNBT(CompoundNBT tag) {
+			final int count = tag.getInt(NBT_COUNT);
 			final double spawnX = tag.getDouble(NBT_SPAWN_X);
 			final double spawnY = tag.getDouble(NBT_SPAWN_Y);
 			final double spawnZ = tag.getDouble(NBT_SPAWN_Z);
 			final double spawnJitter = tag.getDouble(NBT_SPAWN_JITTER);
-			final int lifetime = tag.getInteger(NBT_LIFETIME);
-			final int lifetimeJitter = tag.getInteger(NBT_LIFETIME_JITTER);
+			final int lifetime = tag.getInt(NBT_LIFETIME);
+			final int lifetimeJitter = tag.getInt(NBT_LIFETIME_JITTER);
 			
 			final SpawnParams params;
-			if (tag.hasKey(NBT_VELOCITY, NBT.TAG_COMPOUND)) {
-				NBTTagCompound subtag = tag.getCompoundTag(NBT_VELOCITY);
+			if (tag.contains(NBT_VELOCITY, NBT.TAG_COMPOUND)) {
+				CompoundNBT subtag = tag.getCompound(NBT_VELOCITY);
 				final double velocityX = subtag.getDouble("x");
 				final double velocityY = subtag.getDouble("y");
 				final double velocityZ = subtag.getDouble("z");
 				final Vec3d velocityJitter;
-				if (tag.hasKey(NBT_VELOCITY_JITTER)) {
-					subtag = tag.getCompoundTag(NBT_VELOCITY_JITTER);
+				if (tag.contains(NBT_VELOCITY_JITTER)) {
+					subtag = tag.getCompound(NBT_VELOCITY_JITTER);
 					velocityJitter = new Vec3d(
 							subtag.getDouble("x"),
 							subtag.getDouble("y"),
@@ -287,8 +287,8 @@ public enum NostrumParticles {
 						new Vec3d(velocityX, velocityY, velocityZ),
 						velocityJitter
 						);
-			} else if (tag.hasKey(NBT_TARGET_POS, NBT.TAG_COMPOUND)) {
-				NBTTagCompound subtag = tag.getCompoundTag(NBT_TARGET_POS);
+			} else if (tag.contains(NBT_TARGET_POS, NBT.TAG_COMPOUND)) {
+				CompoundNBT subtag = tag.getCompound(NBT_TARGET_POS);
 				final double targetX = subtag.getDouble("x");
 				final double targetY = subtag.getDouble("y");
 				final double targetZ = subtag.getDouble("z");
@@ -298,8 +298,8 @@ public enum NostrumParticles {
 						lifetime, lifetimeJitter,
 						new Vec3d(targetX, targetY, targetZ)
 						);
-			} else if (tag.hasKey(NBT_TARGET_ENT_ID, NBT.TAG_INT)) {
-				final int ID = tag.getInteger(NBT_TARGET_ENT_ID);
+			} else if (tag.contains(NBT_TARGET_ENT_ID, NBT.TAG_INT)) {
+				final int ID = tag.getInt(NBT_TARGET_ENT_ID);
 				params = new SpawnParams(
 						count,
 						spawnX, spawnY, spawnZ, spawnJitter,
@@ -316,19 +316,19 @@ public enum NostrumParticles {
 			}
 			
 			// Extra optional data
-			if (tag.hasKey("color", NBT.TAG_INT)) {
-				params.color(tag.getInteger("color"));
+			if (tag.contains("color", NBT.TAG_INT)) {
+				params.color(tag.getInt("color"));
 			}
-			if (tag.hasKey(NBT_DIE_ON_TARGET, NBT.TAG_BYTE)) {
+			if (tag.contains(NBT_DIE_ON_TARGET, NBT.TAG_BYTE)) {
 				params.dieOnTarget(tag.getBoolean(NBT_DIE_ON_TARGET));
 			}
 			
-			if (tag.hasKey(NBT_GRAVITY_STRENGTH, NBT.TAG_FLOAT)) {
+			if (tag.contains(NBT_GRAVITY_STRENGTH, NBT.TAG_FLOAT)) {
 				params.gravity(tag.getFloat(NBT_GRAVITY_STRENGTH));
 			}
 			
-			if (tag.hasKey(NBT_ENTITY_BEHAVIOR, NBT.TAG_INT)) {
-				final int ord = tag.getInteger(NBT_ENTITY_BEHAVIOR);
+			if (tag.contains(NBT_ENTITY_BEHAVIOR, NBT.TAG_INT)) {
+				final int ord = tag.getInt(NBT_ENTITY_BEHAVIOR);
 				if (ord < EntityBehavior.values().length) {
 					params.entityBehavior = EntityBehavior.values()[ord];
 				} else {

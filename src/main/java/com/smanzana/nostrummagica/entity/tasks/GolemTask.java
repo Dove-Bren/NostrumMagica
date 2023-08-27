@@ -5,7 +5,7 @@ import java.util.Random;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
 
 public class GolemTask extends EntityAIBase {
@@ -51,7 +51,7 @@ public class GolemTask extends EntityAIBase {
 		if (golem.getAttackTarget() == null)
 			return false;
 		
-		EntityLivingBase owner = golem.getOwner();
+		LivingEntity owner = golem.getOwner();
 		if (owner == null)
 			return true;
 		
@@ -119,7 +119,7 @@ public class GolemTask extends EntityAIBase {
 			return false;
 		}
 		
-		EntityLivingBase owner = golem.getOwner();
+		LivingEntity owner = golem.getOwner();
 		if (owner == null)
 			owner = golem;
 		double distOwner = 0;
@@ -134,7 +134,7 @@ public class GolemTask extends EntityAIBase {
 		
 		boolean inMelee = false;
 		boolean inRange = false;
-		EntityLivingBase target = golem.getAttackTarget();
+		LivingEntity target = golem.getAttackTarget();
 
 		boolean done = false;
 		boolean again = true;
@@ -161,8 +161,8 @@ public class GolemTask extends EntityAIBase {
 			if (!inMelee || ownerCritical) {
 				// Figure out who to do it to.
 				// Usually do ourselves, but have a chance to aid master first
-				EntityLivingBase first = golem;
-				EntityLivingBase second = owner;
+				LivingEntity first = golem;
+				LivingEntity second = owner;
 				if (ownerCritical) {
 					first = owner;
 					second = golem;
@@ -196,7 +196,7 @@ public class GolemTask extends EntityAIBase {
 		if (target != null && !target.isDead) {
 			double distTarget = target.getPositionVector().distanceTo(golem.getPositionVector());
 			
-			double meleeRange = (double)(golem.width * 2.0F * golem.width * 2.0F);
+			double meleeRange = (double)(golem.getWidth * 2.0F * golem.getWidth * 2.0F);
 			if (distTarget < meleeRange) {
 				inMelee = true;
 			}
@@ -223,7 +223,7 @@ public class GolemTask extends EntityAIBase {
 		return again;
 	}
 	
-	private boolean pathTo(EntityLivingBase target) {
+	private boolean pathTo(LivingEntity target) {
 		if (target == null || target.isDead)
 			return false;
 		
@@ -248,7 +248,7 @@ public class GolemTask extends EntityAIBase {
 		} else if (range) {
 			
 			success = true;
-			double dist = golem.getDistanceSq(target.posX, target.getEntityBoundingBox().minY, target.posZ);
+			double dist = golem.getDistanceSq(target.posX, target.getBoundingBox().minY, target.posZ);
 
             if (dist <= RANGE_SQR - 25.0 && golem.canEntityBeSeen(target))
             {

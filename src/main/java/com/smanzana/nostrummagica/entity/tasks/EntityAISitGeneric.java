@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.entity.tasks;
 import com.smanzana.nostrummagica.entity.IEntityTameable;
 
 import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
 
 public class EntityAISitGeneric<T extends EntityCreature & IEntityTameable> extends EntityAIBase {
@@ -26,7 +26,7 @@ public class EntityAISitGeneric<T extends EntityCreature & IEntityTameable> exte
 		} else if (!this.entity.onGround) {
 			return false;
 		} else {
-			EntityLivingBase entitylivingbase = this.entity.getLivingOwner();
+			LivingEntity entitylivingbase = this.entity.getLivingOwner();
 			return entitylivingbase == null ? this.entity.isEntitySitting() : (this.entity.getDistanceSq(entitylivingbase) < 144.0D && entitylivingbase.getRevengeTarget() != null ? false : entity.isEntitySitting());
 		}
 	}

@@ -11,7 +11,7 @@ import com.smanzana.nostrummagica.rituals.RitualRecipe;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
@@ -32,7 +32,7 @@ public class OutcomeSpawnItem implements IItemRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, EntityPlayer player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, PlayerEntity player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
 		// If there's an altar, we'll place item in altar
 		// Otherwise, we'll place it on the ground
 		

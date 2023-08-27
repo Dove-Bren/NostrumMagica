@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.client.render.entity;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.Entity;
 
 public class ModelWisp extends ModelBase {
@@ -33,14 +33,14 @@ public class ModelWisp extends ModelBase {
 		float adjustedScale = (float) (Math.sin(frac * Math.PI * 2) * .1) + 1f;
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(0, entity.height / 2, 0);
+		GlStateManager.translatef(0, entity.height / 2, 0);
 		core.render(entity, time, swingProgress, swing, headAngleY, headAngleX, scale);
-		GlStateManager.scale(adjustedScale, adjustedScale, adjustedScale);
+		GlStateManager.scalef(adjustedScale, adjustedScale, adjustedScale);
 		GlStateManager.depthMask(false);
 		fringe.render(entity, time, swingProgress, swing, headAngleY, headAngleX, scale);
 		GlStateManager.depthMask(true);
 		GlStateManager.popMatrix();
-		GlStateManager.color(1f, 1f, 1f, 1f);
+		GlStateManager.color4f(1f, 1f, 1f, 1f);
 	}
 	
 }

@@ -1,7 +1,8 @@
 package com.smanzana.nostrummagica.client.gui.book;
 
+import com.smanzana.nostrummagica.utils.RenderFuncs;
+
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
 
 public class TableOfContentsPage implements IClickableBookPage {
 
@@ -48,7 +49,7 @@ public class TableOfContentsPage implements IClickableBookPage {
 		}
 		int index = mouseY / (fonter.FONT_HEIGHT + 2);
 		if (index < pages.length && index >= 0)
-			Gui.drawRect(xCache, yCache + (index * (fonter.FONT_HEIGHT + 2)) - 1, xCache + widthCache, yCache + (index * (fonter.FONT_HEIGHT + 2) + fonter.FONT_HEIGHT) - 1, 0x30000000);
+			RenderFuncs.drawRect(xCache, yCache + (index * (fonter.FONT_HEIGHT + 2)) - 1, xCache + widthCache, yCache + (index * (fonter.FONT_HEIGHT + 2) + fonter.FONT_HEIGHT) - 1, 0x30000000);
 	}
 	
 	protected boolean onElementClick(BookScreen parent, int index, int button) {
@@ -60,12 +61,12 @@ public class TableOfContentsPage implements IClickableBookPage {
 	}
 
 	@Override
-	public boolean onClick(BookScreen parent, int mouseX, int mouseY, int button) {
+	public boolean onClick(BookScreen parent, double mouseX, double mouseY, int button) {
 		if (title) {
 			mouseY -= fontHeightCache + 10;
 		}
 		if (button == 0) {
-			int index = mouseY / (fontHeightCache + 2);
+			int index = (int) mouseY / (fontHeightCache + 2);
 			if (onElementClick(parent, index, button)) {
 				return true;
 			}

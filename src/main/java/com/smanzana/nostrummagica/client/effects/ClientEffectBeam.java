@@ -6,10 +6,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.texture.TextureMap;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.util.math.Vec3d;
 
 /**
@@ -33,14 +33,14 @@ public class ClientEffectBeam extends ClientEffect {
 					? 20
 					: 3;
 			final float alphaMax = .15f;
-			Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+			Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 			GlStateManager.disableBlend();
-			GlStateManager.disableAlpha();
+			GlStateManager.disableAlphaTest();
 			GlStateManager.enableBlend();
-			GlStateManager.enableAlpha();
+			GlStateManager.enableAlphaTest();
 			GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-			GlStateManager.enableTexture2D();
-			GlStateManager.disableTexture2D();
+			GlStateManager.enableTexture();
+			GlStateManager.disableTexture();
 			for (int i = 0; i < detailCount; i++) {
 				float frac = (float) i / (float) detailCount;
 				float alpha = alphaMax;
@@ -51,32 +51,32 @@ public class ClientEffectBeam extends ClientEffect {
 				float green = (float) ((color >> 8) & 255) / 255f;
 				alpha *= (float) ((color >> 24) & 255) / 255f;
 				
-				BlockRendererDispatcher renderer = Minecraft.getMinecraft().getBlockRendererDispatcher();
+				BlockRendererDispatcher renderer = Minecraft.getInstance().getBlockRendererDispatcher();
 				
 				IBakedModel model = renderer.getBlockModelShapes().getModelManager()
 						.getModel(new ModelResourceLocation(
 						NostrumMagica.MODID + ":effects/cyl", "normal"));
 				GlStateManager.pushMatrix();
 				
-				//GlStateManager.translate(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ);
+				//GlStateManager.translatef(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ);
 				// Model is length 1 and points y+
-				double len = end.lengthVector();
+				double len = end.length();
 				Vec3d norm = end.normalize();
 				double xzdist = Math.min(1.0, Math.max(-1.0, Math.sqrt(norm.x * norm.x + norm.z * norm.z)));
 				float angle = (float) (Math.asin(xzdist) / (2.0 * Math.PI));
 				float x = (float) (Math.asin(norm.x) / (2.0 * Math.PI));
 				float z = (float) (Math.asin(norm.z) / (2.0 * Math.PI));
-				GlStateManager.rotate((norm.y > 0 ? 1 : -1f) * 360f * angle, z, 0, -x);
+				GlStateManager.rotatef((norm.y > 0 ? 1 : -1f) * 360f * angle, z, 0, -x);
 				if (norm.y < 0) {
-					GlStateManager.rotate(180f, 1, 0, 1);
+					GlStateManager.rotatef(180f, 1, 0, 1);
 				}
-				GlStateManager.scale(.2 * radius, len, .2 * radius);
+				GlStateManager.scaled(.2 * radius, len, .2 * radius);
 
 				// Model is centered on 0. Shift
-				GlStateManager.translate(0f, .5f, 0f);
+				GlStateManager.translatef(0f, .5f, 0f);
 				
 				// Avoid z fighting by shifting up just a tiiiiiiny but
-				GlStateManager.translate(0f, (float) -i / 10000f, 0f);
+				GlStateManager.translatef(0f, (float) -i / 10000f, 0f);
 
 				int newcolor =   ((int) (red * 255) << 16)
 						| ((int) (green * 255) << 8)
@@ -85,12 +85,12 @@ public class ClientEffectBeam extends ClientEffect {
 				
 				ClientEffectForm.drawModel(model, newcolor);
 				
-				//GlStateManager.color(.5f, 0f, 0f, .5f); // WHY DOESNT THIS WORK??
+				//GlStateManager.color4f(.5f, 0f, 0f, .5f); // WHY DOESNT THIS WORK??
 				//draw(model.getQuads(null, null, 0), color);
 				GlStateManager.popMatrix();
 				
 			}
-			GlStateManager.enableTexture2D();
+			GlStateManager.enableTexture();
 			GlStateManager.disableBlend();
 		}
 		

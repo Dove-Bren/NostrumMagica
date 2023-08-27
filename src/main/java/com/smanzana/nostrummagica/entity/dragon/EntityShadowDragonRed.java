@@ -5,12 +5,12 @@ import com.smanzana.nostrummagica.entity.tasks.dragon.DragonAINearestAttackableT
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonMeleeAttackTask;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAIWander;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -24,7 +24,7 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 			EntityDataManager.<Boolean>createKey(EntityDragonRed.class, DataSerializers.BOOLEAN);
 	private static final String DRAGON_SERIAL_HASTARGET_TOK = "DragonShadowTarget";
 	
-	private EntityLivingBase target;
+	private LivingEntity target;
 	private boolean targetInitted;
 	
 	public EntityShadowDragonRed(World worldIn) {
@@ -36,7 +36,7 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
         this.targetInitted = false;
 	}
 	
-	public EntityShadowDragonRed(World worldIn, EntityLivingBase target) {
+	public EntityShadowDragonRed(World worldIn, LivingEntity target) {
 		this(worldIn);
 		this.target = target;
 		this.dataManager.set(HASTARGET, true);
@@ -50,10 +50,10 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 	private void setTargetTasks() {
 		if (!targetInitted) {
 			if (this.target != null) {
-				this.targetTasks.addTask(1, new DragonAIFocusedTarget<EntityLivingBase>(this, this.target, true));
+				this.targetTasks.addTask(1, new DragonAIFocusedTarget<LivingEntity>(this, this.target, true));
 			} else {
 				this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, true, new Class[0]));
-				this.targetTasks.addTask(2, new DragonAINearestAttackableTarget<EntityPlayer>(this, EntityPlayer.class, true));
+				this.targetTasks.addTask(2, new DragonAINearestAttackableTarget<PlayerEntity>(this, PlayerEntity.class, true));
 			}
 			targetInitted = true;
 		}
@@ -137,17 +137,17 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 		}
 	}
 	
-	public void readEntityFromNBT(NBTTagCompound compound) {
+	public void readEntityFromNBT(CompoundNBT compound) {
 		super.readEntityFromNBT(compound);
 
-		if (compound.hasKey(DRAGON_SERIAL_HASTARGET_TOK, NBT.TAG_ANY_NUMERIC)) {
+		if (compound.contains(DRAGON_SERIAL_HASTARGET_TOK, NBT.TAG_ANY_NUMERIC)) {
         	this.dataManager.set(HASTARGET, compound.getBoolean(DRAGON_SERIAL_HASTARGET_TOK));
         }
 	}
 	
-	public void writeEntityToNBT(NBTTagCompound compound) {
+	public void writeEntityToNBT(CompoundNBT compound) {
     	super.writeEntityToNBT(compound);
-    	compound.setBoolean(DRAGON_SERIAL_HASTARGET_TOK, this.dataManager.get(HASTARGET));
+    	compound.putBoolean(DRAGON_SERIAL_HASTARGET_TOK, this.dataManager.get(HASTARGET));
 	}
 
 }

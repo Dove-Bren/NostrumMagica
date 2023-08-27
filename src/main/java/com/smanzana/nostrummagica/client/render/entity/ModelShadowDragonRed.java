@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.Entity;
 
 public class ModelShadowDragonRed extends ModelDragonRed {
@@ -16,9 +16,9 @@ public class ModelShadowDragonRed extends ModelDragonRed {
 			float swing, float headAngleY, float headAngleX, float scale) {
 		GlStateManager.pushMatrix();
 		GlStateManager.enableBlend();
-		GlStateManager.enableAlpha();
-		GlStateManager.scale(.5, .5, .5);
-		GlStateManager.translate(0f, 1.2f, 0f);
+		GlStateManager.enableAlphaTest();
+		GlStateManager.scalef(.5, .5, .5);
+		GlStateManager.translatef(0f, 1.2f, 0f);
 		
 		super.render(entity, time, swingProgress, swing, headAngleY, headAngleX, scale);
 		

@@ -3,13 +3,13 @@ package com.smanzana.nostrummagica.entity.dragon;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.world.World;
 
 public abstract class IDragonSpawnData<T extends ITameDragon> {
 	
 	public static interface IDragonSpawnFactory {
-		public IDragonSpawnData<?> create(NBTTagCompound nbt);
+		public IDragonSpawnData<?> create(CompoundNBT nbt);
 	}
 	
 	private static Map<String, IDragonSpawnFactory> spawnMap = null;
@@ -30,7 +30,7 @@ public abstract class IDragonSpawnData<T extends ITameDragon> {
 		return spawnMap.get(key);
 	}
 	
-	public abstract void writeToNBT(NBTTagCompound nbt);
+	public abstract void writeToNBT(CompoundNBT nbt);
 	public abstract T spawnDragon(World world, double x, double y, double z);
 	public abstract String getKey();
 }

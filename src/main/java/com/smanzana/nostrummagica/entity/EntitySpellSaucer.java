@@ -7,16 +7,16 @@ import java.util.UUID;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IProjectile;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 	
@@ -28,14 +28,14 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 		
 	}
 	
-	protected EntityLivingBase shootingEntity;
+	protected LivingEntity shootingEntity;
 	protected ISpellSaucerTrigger trigger;
 	
 	protected float speed;
 	protected int ticksInAir;
 	
 	// TODO support not hitting blocks
-	private Set<EntityLivingBase> hitEntities;
+	private Set<LivingEntity> hitEntities;
 	private Set<Vector> hitBlocks;
 	
 	protected EntitySpellSaucer(World world) {
@@ -45,7 +45,7 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 		this.hitBlocks = new HashSet<>();
 	}
 	
-	public EntitySpellSaucer(World world, EntityLivingBase shooter, ISpellSaucerTrigger trigger, float speed) {
+	public EntitySpellSaucer(World world, LivingEntity shooter, ISpellSaucerTrigger trigger, float speed) {
 		this(world);
         this.speed = speed;
         this.shootingEntity = shooter;
@@ -53,7 +53,7 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public boolean isInRangeToRenderDist(double distance) {
 		return distance <= 64 * 64 * 64;
 	}
@@ -70,11 +70,11 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 		}
 	}
 	
-	protected void addHit(EntityLivingBase entity) {
+	protected void addHit(LivingEntity entity) {
 		this.hitEntities.add(entity);
 	}
 	
-	protected boolean hasBeenHit(EntityLivingBase entity) {
+	protected boolean hasBeenHit(LivingEntity entity) {
 		return this.hitEntities.contains(entity);
 	}
 	
@@ -110,7 +110,7 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 			if (result.entityHit instanceof EntitySpellSaucer || null == NostrumMagica.resolveEntityLiving(result.entityHit)) {
 				
 			} else if (result.entityHit != shootingEntity && !shootingEntity.isRidingOrBeingRiddenBy(result.entityHit)) {
-				EntityLivingBase living = NostrumMagica.resolveEntityLiving(result.entityHit);
+				LivingEntity living = NostrumMagica.resolveEntityLiving(result.entityHit);
 				boolean dieOnImpact = this.dieOnImpact(living);
 				boolean canImpact = this.canImpact(living);
 				if (canImpact && (dieOnImpact || !this.hasBeenHit(living))) {
@@ -141,20 +141,20 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 	}
 	
 	@Override
-	public boolean writeToNBTOptional(NBTTagCompound compound) {
+	public boolean writeToNBTOptional(CompoundNBT compound) {
 		return false; // This makes us not save and persist!!
 	}
 
 	@Override
-	protected void readEntityFromNBT(NBTTagCompound compound) {
+	protected void readEntityFromNBT(CompoundNBT compound) {
 		this.speed = compound.getFloat("speed");
 		UUID uuid = compound.getUniqueId("shooterID");
-		this.shootingEntity = (EntityLivingBase) world.loadedEntityList.stream().filter((ent) -> { return ent.getUniqueID().equals(uuid);}).findFirst().orElse(null);
+		this.shootingEntity = (LivingEntity) world.loadedEntityList.stream().filter((ent) -> { return ent.getUniqueID().equals(uuid);}).findFirst().orElse(null);
 	}
 
 	@Override
-	protected void writeEntityToNBT(NBTTagCompound compound) {
-		compound.setFloat("speed", this.speed);
+	protected void writeEntityToNBT(CompoundNBT compound) {
+		compound.putFloat("speed", this.speed);
 		compound.setUniqueId("shooterID", shootingEntity.getUniqueID());
 	}
 	
@@ -172,7 +172,7 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 		return true;
 	}
 	
-	public boolean dieOnImpact(EntityLivingBase entity) {
+	public boolean dieOnImpact(LivingEntity entity) {
 		return true;
 	}
 	
@@ -180,7 +180,7 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 		return true;
 	}
 	
-	public boolean canImpact(EntityLivingBase entity) {
+	public boolean canImpact(LivingEntity entity) {
 		return true;
 	}
 	

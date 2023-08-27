@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 import net.minecraft.block.BlockLadder;
 import net.minecraft.block.BlockTorch;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 public class RoomJail1 extends StaticRoom {
@@ -308,13 +308,13 @@ public class RoomJail1 extends StaticRoom {
 				"XXXXXXXXXXXXXXXXXXX",
 				'X', DungeonBlock.instance(),
 				' ', null,
-				'L', new BlockState(Blocks.LADDER, Blocks.LADDER.getDefaultState().withProperty(BlockLadder.FACING, EnumFacing.SOUTH)),
+				'L', new BlockState(Blocks.LADDER, Blocks.LADDER.getDefaultState().withProperty(BlockLadder.FACING, Direction.SOUTH)),
 				'B', Blocks.BOOKSHELF,
 				'I', Blocks.IRON_BARS,
-				'E', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.EAST)),
-				'S', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.SOUTH)),
-				'W', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.WEST)),
-				'N', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.NORTH)),
+				'E', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.EAST)),
+				'S', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.SOUTH)),
+				'W', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.WEST)),
+				'N', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.NORTH)),
 				'C', new BlockState(Blocks.CARPET, 14),
 				'G', new BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.GOLEM_EARTH.ordinal()),
 				'H', new BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.GOLEM_ICE.ordinal()));
@@ -331,11 +331,11 @@ public class RoomJail1 extends StaticRoom {
 		
 		list.add(NostrumDungeon.asRotated(start,
 						new BlockPos(0, 0, 24),
-						EnumFacing.NORTH));
+						Direction.NORTH));
 		
 		list.add(NostrumDungeon.asRotated(start,
 				new BlockPos(14, 0, 21),
-				EnumFacing.WEST));
+				Direction.WEST));
 		
 		return list;
 	}
@@ -375,10 +375,10 @@ public class RoomJail1 extends StaticRoom {
 		return Lists.newArrayList(
 				NostrumDungeon.asRotated(start,
 						new BlockPos(5, 0, 12),
-						EnumFacing.EAST),
+						Direction.EAST),
 				NostrumDungeon.asRotated(start,
 						new BlockPos(6, 4, 11),
-						EnumFacing.SOUTH));
+						Direction.SOUTH));
 	}
 	
 }

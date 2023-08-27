@@ -6,19 +6,19 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.pet.PetInfo;
 
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 
 public interface IEntityPet extends IEntityTameable {
 
 	public PetInfo getPetSummary();
 	
-	default public void onAttackCommand(EntityLivingBase target) { if (this instanceof EntityLiving) ((EntityLiving) this).setAttackTarget(target); };
+	default public void onAttackCommand(LivingEntity target) { if (this instanceof MobEntity) ((MobEntity) this).setAttackTarget(target); };
 	
-	default public void onStopCommand() { if (this instanceof EntityLiving) ((EntityLiving) this).setAttackTarget(null); };
+	default public void onStopCommand() { if (this instanceof MobEntity) ((MobEntity) this).setAttackTarget(null); };
 	
-	public PetGUI.PetContainer<? extends IEntityPet> getGUIContainer(EntityPlayer player);
+	public PetGUI.PetContainer<? extends IEntityPet> getGUIContainer(PlayerEntity player);
 	
 	public PetGUI.PetGUIStatAdapter<? extends IEntityPet> getGUIAdapter();
 	

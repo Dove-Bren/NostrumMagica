@@ -2,9 +2,9 @@ package com.smanzana.nostrummagica.entity.dragon;
 
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.datasync.DataParameter;
@@ -87,13 +87,13 @@ public abstract class EntityDragonRedBase extends EntityDragonFlying {
 		
 	}
 	
-	public void slash(EntityLivingBase target) {
+	public void slash(LivingEntity target) {
 		this.dataManager.set(DRAGON_SLASH, Boolean.TRUE);
 		
 		this.attackEntityAsMob(target);
 	}
 	
-	public void bite(EntityLivingBase target) {
+	public void bite(LivingEntity target) {
 		this.dataManager.set(DRAGON_BITE, Boolean.TRUE);
 		
 		NostrumMagicaSounds.DRAGON_BITE.play(this);
@@ -101,7 +101,7 @@ public abstract class EntityDragonRedBase extends EntityDragonFlying {
 		this.biteDamageInternal(target);
 	}
 	
-	private void biteDamageInternal(EntityLivingBase target) {
+	private void biteDamageInternal(LivingEntity target) {
 		float f = (float)this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
 		
 		// Dragons do 20 damage while on the ground, and 16 when flying
@@ -122,13 +122,13 @@ public abstract class EntityDragonRedBase extends EntityDragonFlying {
 			if (i > 0)
 			{
 				target.knockBack(this, (float)i * 0.5F, (double)MathHelper.sin(this.rotationYaw * 0.017453292F), (double)(-MathHelper.cos(this.rotationYaw * 0.017453292F)));
-				this.motionX *= 0.6D;
-				this.motionZ *= 0.6D;
+				this.getMotion().x *= 0.6D;
+				this.getMotion().z *= 0.6D;
 			}
 
-			if (target instanceof EntityPlayer)
+			if (target instanceof PlayerEntity)
 			{
-				EntityPlayer entityplayer = (EntityPlayer)target;
+				PlayerEntity entityplayer = (PlayerEntity)target;
 				ItemStack itemstack1 = entityplayer.isHandActive() ? entityplayer.getActiveItemStack() : ItemStack.EMPTY;
 
 				if (!itemstack1.isEmpty() && itemstack1.getItem() == Items.SHIELD)

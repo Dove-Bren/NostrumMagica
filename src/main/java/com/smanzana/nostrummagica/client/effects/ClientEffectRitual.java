@@ -14,20 +14,21 @@ import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.utils.NonNullEnumMap;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
+import net.minecraft.client.renderer.RenderHelper;
+
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class ClientEffectRitual extends ClientEffect {
 
 	private static final int DURATION_TIER3 = 20 * 6;
@@ -54,7 +55,8 @@ public class ClientEffectRitual extends ClientEffect {
 	
 	@Override
 	public void onStart() {
-		TileEntity te = Minecraft.getMinecraft().world.getTileEntity(new BlockPos(origin).down());
+		Minecraft mc = Minecraft.getInstance();
+		TileEntity te = mc.world.getTileEntity(new BlockPos(origin).down());
 		if (te != null && te instanceof AltarTileEntity) {
 			((AltarTileEntity) te).hideItem(true);
 		}
@@ -69,7 +71,8 @@ public class ClientEffectRitual extends ClientEffect {
 	
 	@Override
 	public void onEnd() {
-		TileEntity te = Minecraft.getMinecraft().world.getTileEntity(new BlockPos(origin).down());
+		Minecraft mc = Minecraft.getInstance();
+		TileEntity te = mc.world.getTileEntity(new BlockPos(origin).down());
 		if (te != null && te instanceof AltarTileEntity) {
 			((AltarTileEntity) te).hideItem(false);
 		}
@@ -118,22 +121,22 @@ public class ClientEffectRitual extends ClientEffect {
 		final float scale = .75f;
 		//final float rotPeriod = .5f;
 		//final float rot = 360f * ((adjProgress % rotPeriod) / rotPeriod); // make rotate?
-		final float rot = (float) (2.0 * ((double) Minecraft.getSystemTime() / 50.0));
+		final float rot = (float) (2.0 * ((double) System.currentTimeMillis() / 50.0));
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(pos.x, pos.y, pos.z);
-		GlStateManager.rotate(rot, 0, 1f, 0);
+		GlStateManager.translated(pos.x, pos.y, pos.z);
+		GlStateManager.rotatef(rot, 0, 1f, 0);
 		
-		GlStateManager.scale(scale, scale, scale);
+		GlStateManager.scalef(scale, scale, scale);
 		GlStateManager.enableBlend();
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GlStateManager.disableLighting();
-		GlStateManager.enableAlpha();
-		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
+		GlStateManager.enableAlphaTest();
+		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+		RenderHelper.enableStandardItemLighting();
 		
-		Minecraft.getMinecraft().getRenderItem()
-			.renderItem(stack, TransformType.GROUND);
+		RenderFuncs.ItemRenderer(stack);
 		
 		GlStateManager.popMatrix();
 		
@@ -157,19 +160,19 @@ public class ClientEffectRitual extends ClientEffect {
 			final float rot = 360f * ((adjProgress % rotPeriod) / rotPeriod); // make rotate?
 			
 			GlStateManager.pushMatrix();
-			GlStateManager.translate(pos.x, pos.y, pos.z);
-			GlStateManager.rotate(rot, 0, 1f, 0);
+			GlStateManager.translated(pos.x, pos.y, pos.z);
+			GlStateManager.rotatef(rot, 0, 1f, 0);
 			
-			GlStateManager.scale(scale, scale, scale);
+			GlStateManager.scalef(scale, scale, scale);
 			GlStateManager.enableBlend();
 			GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 			GlStateManager.disableLighting();
-			GlStateManager.enableAlpha();
-			GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-			OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
+			GlStateManager.enableAlphaTest();
+			GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+			RenderHelper.enableStandardItemLighting();
 			
-			Minecraft.getMinecraft().getRenderItem()
-				.renderItem(getReagentItem(type), TransformType.GROUND);
+			RenderFuncs.ItemRenderer(getReagentItem(type));
+			// TODO 1.14 check
 			
 			GlStateManager.popMatrix();
 		}
@@ -297,7 +300,7 @@ public class ClientEffectRitual extends ClientEffect {
 					final double yDiff = .35 + .5;
 					NostrumParticles.FILLED_ORB.spawn(mc.player.world, (new SpawnParams(
 							4, origin.x + pos.x, origin.y + pos.y, origin.z + pos.z, range, 20, 0,
-							origin.addVector(0, yDiff, 0)
+							origin.add(0, yDiff, 0)
 							)).color(0x40000000 | (this.element.getColor() & 0x00FFFFFF)).dieOnTarget(true));
 				}
 				
@@ -348,7 +351,7 @@ public class ClientEffectRitual extends ClientEffect {
 				final Vec3d pos = Vec3d.ZERO;
 				NostrumParticles.FILLED_ORB.spawn(mc.player.world, (new SpawnParams(
 						4, origin.x + pos.x, origin.y + pos.y, origin.z + pos.z, range, 30, 20,
-						origin.addVector(0, .35, 0)
+						origin.add(0, .35, 0)
 						)).color(0x40000000 | (this.element.getColor() & 0x00FFFFFF)));
 			}
 		}

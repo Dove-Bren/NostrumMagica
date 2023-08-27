@@ -11,15 +11,15 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger.SeekingBulletTriggerInstance;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.EntityShulkerBullet;
 import net.minecraft.entity.projectile.ProjectileHelper;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -34,15 +34,15 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 	
 	private SeekingBulletTriggerInstance trigger;
 	private @Nullable Predicate<Entity> filter;
-	private EntityLivingBase target;
-	private EntityLivingBase shooter;
+	private LivingEntity target;
+	private LivingEntity shooter;
 	private double speed; // Vanilla shulkers use .15
 	private EnumParticleTypes particle;
 	
 	private boolean blockyPath; // Shulker-style pathing? Else smooth curve style.
 	
 	// Mostly copied from vanilla for movement :(
-	private EnumFacing direction;
+	private Direction direction;
 	private int steps;
 	private double targetDeltaX;
 	private double targetDeltaY;
@@ -56,17 +56,17 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 	}
 	
 	public EntitySpellBullet(SeekingBulletTriggerInstance self,
-			EntityLivingBase shooter,
-			EntityLivingBase target,
-			EnumFacing.Axis axis) {
+			LivingEntity shooter,
+			LivingEntity target,
+			Direction.Axis axis) {
 		this(self, shooter, target, axis, .8, EnumParticleTypes.CRIT, false);
 	}
 	
 	public EntitySpellBullet(
 			SeekingBulletTriggerInstance self,
-			EntityLivingBase shooter,
-			EntityLivingBase target,
-			EnumFacing.Axis axis,
+			LivingEntity shooter,
+			LivingEntity target,
+			Direction.Axis axis,
 			double speed,
 			EnumParticleTypes particle,
 			boolean blockyPath) {
@@ -127,18 +127,18 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 	}
 	
 	@Override
-	public boolean writeToNBTOptional(NBTTagCompound compound) {
+	public boolean writeToNBTOptional(CompoundNBT compound) {
 		// Returning false means we won't be saved. That's what we want.
 		return false;
     }
 	
-	private void setDirection(@Nullable EnumFacing directionIn)
+	private void setDirection(@Nullable Direction directionIn)
 	{
 		this.direction = directionIn;
 	}
 
 	// Sets up targetDelta[] to figure out ideal motion vector
-	protected void selectNextMoveDirection(@Nullable EnumFacing.Axis currentAxis) {
+	protected void selectNextMoveDirection(@Nullable Direction.Axis currentAxis) {
 		double targetHeight = 0.5D;
 		BlockPos targetPos;
 
@@ -148,69 +148,69 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 		}
 		else
 		{
-			targetHeight = (double)this.target.height * 0.5D;
+			targetHeight = (double)this.target.getHeight() * 0.5D;
 			targetPos = new BlockPos(this.target.posX, this.target.posY, this.target.posZ);
 		}
 
 		double targetX = (double)targetPos.getX() + 0.5D;
 		double targetY = (double)targetPos.getY() + targetHeight;
 		double targetZ = (double)targetPos.getZ() + 0.5D;
-		EnumFacing enumfacing = null;
+		Direction enumfacing = null;
 
 		// Blocky movement looks for next block and tries to move to that one, using random if multiple spots still
 		// move in the right direction.
 		if (blockyPath && targetPos.distanceSqToCenter(this.posX, this.posY, this.posZ) >= 4.0D) {
 			BlockPos blockpos1 = new BlockPos(this);
-			List<EnumFacing> list = Lists.<EnumFacing>newArrayList();
+			List<Direction> list = Lists.<Direction>newArrayList();
 
-			if (currentAxis != EnumFacing.Axis.X)
+			if (currentAxis != Direction.Axis.X)
 			{
 				if (blockpos1.getX() < targetPos.getX() && this.world.isAirBlock(blockpos1.east()))
 				{
-					list.add(EnumFacing.EAST);
+					list.add(Direction.EAST);
 				}
 				else if (blockpos1.getX() > targetPos.getX() && this.world.isAirBlock(blockpos1.west()))
 				{
-					list.add(EnumFacing.WEST);
+					list.add(Direction.WEST);
 				}
 			}
 
-			if (currentAxis != EnumFacing.Axis.Y)
+			if (currentAxis != Direction.Axis.Y)
 			{
 				if (blockpos1.getY() < targetPos.getY() && this.world.isAirBlock(blockpos1.up()))
 				{
-					list.add(EnumFacing.UP);
+					list.add(Direction.UP);
 				}
 				else if (blockpos1.getY() > targetPos.getY() && this.world.isAirBlock(blockpos1.down()))
 				{
-					list.add(EnumFacing.DOWN);
+					list.add(Direction.DOWN);
 				}
 			}
 
-			if (currentAxis != EnumFacing.Axis.Z)
+			if (currentAxis != Direction.Axis.Z)
 			{
 				if (blockpos1.getZ() < targetPos.getZ() && this.world.isAirBlock(blockpos1.south()))
 				{
-					list.add(EnumFacing.SOUTH);
+					list.add(Direction.SOUTH);
 				}
 				else if (blockpos1.getZ() > targetPos.getZ() && this.world.isAirBlock(blockpos1.north()))
 				{
-					list.add(EnumFacing.NORTH);
+					list.add(Direction.NORTH);
 				}
 			}
 
-			enumfacing = EnumFacing.random(this.rand);
+			enumfacing = Direction.random(this.rand);
 
 			if (list.isEmpty())
 			{
 				for (int i = 5; !this.world.isAirBlock(blockpos1.offset(enumfacing)) && i > 0; --i)
 				{
-					enumfacing = EnumFacing.random(this.rand);
+					enumfacing = Direction.random(this.rand);
 				}
 			}
 			else
 			{
-				enumfacing = (EnumFacing)list.get(this.rand.nextInt(list.size()));
+				enumfacing = (Direction)list.get(this.rand.nextInt(list.size()));
 			}
 
 			targetX = this.posX + (double)enumfacing.getFrontOffsetX();
@@ -258,23 +258,23 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 			if (!this.world.isRemote)
 			{
 				double dist = Double.MAX_VALUE;
-				if (this.target == null || !this.target.isEntityAlive() || this.target instanceof EntityPlayer && ((EntityPlayer)this.target).isSpectator())
+				if (this.target == null || !this.target.isEntityAlive() || this.target instanceof PlayerEntity && ((PlayerEntity)this.target).isSpectator())
 				{
 					if (!this.hasNoGravity())
 					{
-						this.motionY -= 0.04D;
+						this.getMotion().y -= 0.04D;
 					}
 				}
 				else
 				{
-					dist = target.getPositionVector().addVector(0, target.height / 2, 0).distanceTo(this.getPositionVector());
+					dist = target.getPositionVector().addVector(0, target.getHeight() / 2, 0).distanceTo(this.getPositionVector());
 					this.targetDeltaX = MathHelper.clamp(this.targetDeltaX * 1.025D, -1.0D, 1.0D);
 					this.targetDeltaY = MathHelper.clamp(this.targetDeltaY * 1.025D, -1.0D, 1.0D);
 					this.targetDeltaZ = MathHelper.clamp(this.targetDeltaZ * 1.025D, -1.0D, 1.0D);
 					final double adj = (this.blockyPath ? .2 : (dist < 2 ? .3 : .05));
-					this.motionX += (this.targetDeltaX - this.motionX) * adj;
-					this.motionY += (this.targetDeltaY - this.motionY) * adj;
-					this.motionZ += (this.targetDeltaZ - this.motionZ) * adj;
+					this.getMotion().x += (this.targetDeltaX - this.getMotion().x) * adj;
+					this.getMotion().y += (this.targetDeltaY - this.getMotion().y) * adj;
+					this.getMotion().z += (this.targetDeltaZ - this.getMotion().z) * adj;
 				}
 				
 				if (dist < .5) {
@@ -288,12 +288,12 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 				}
 			}
 
-			this.setPosition(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+			this.setPosition(this.posX + this.getMotion().x, this.posY + this.getMotion().y, this.posZ + this.getMotion().z);
 			ProjectileHelper.rotateTowardsMovement(this, 0.5F);
 
 			if (this.world.isRemote)
 			{
-				this.world.spawnParticle(particle, this.posX - this.motionX, this.posY - this.motionY + 0.15D, this.posZ - this.motionZ, 0.0D, 0.0D, 0.0D, new int[0]);
+				this.world.spawnParticle(particle, this.posX - this.getMotion().x, this.posY - this.getMotion().y + 0.15D, this.posZ - this.getMotion().z, 0.0D, 0.0D, 0.0D, new int[0]);
 			}
 			else if (this.target != null && !this.target.isDead)
 			{
@@ -310,7 +310,7 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 				if (this.direction != null)
 				{
 					BlockPos blockpos = new BlockPos(this);
-					EnumFacing.Axis enumfacing$axis = this.direction.getAxis();
+					Direction.Axis enumfacing$axis = this.direction.getAxis();
 
 					if (this.world.isBlockNormalCube(blockpos.offset(this.direction), false))
 					{
@@ -320,7 +320,7 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 					{
 						BlockPos blockpos1 = new BlockPos(this.target);
 
-						if (enumfacing$axis == EnumFacing.Axis.X && blockpos.getX() == blockpos1.getX() || enumfacing$axis == EnumFacing.Axis.Z && blockpos.getZ() == blockpos1.getZ() || enumfacing$axis == EnumFacing.Axis.Y && blockpos.getY() == blockpos1.getY())
+						if (enumfacing$axis == Direction.Axis.X && blockpos.getX() == blockpos1.getX() || enumfacing$axis == Direction.Axis.Z && blockpos.getZ() == blockpos1.getZ() || enumfacing$axis == Direction.Axis.Y && blockpos.getY() == blockpos1.getY())
 						{
 							this.selectNextMoveDirection(enumfacing$axis);
 						}

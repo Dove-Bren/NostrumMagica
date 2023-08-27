@@ -5,14 +5,14 @@ import com.smanzana.nostrummagica.blocks.tiles.SwitchBlockTileEntity;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class EntitySwitchTrigger extends EntityLiving {
+public class EntitySwitchTrigger extends MobEntity {
 	
 	private BlockPos cachePos;
 	private SwitchBlockTileEntity cacheEntity;

@@ -12,17 +12,17 @@ import net.minecraft.block.FurnaceBlock;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.IHopper;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.EntitySelectors;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -45,18 +45,18 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	}
 	
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt = super.writeToNBT(nbt);
 		
 		if (!slot.isEmpty()) {
-			nbt.setTag(NBT_SLOT, slot.serializeNBT());
+			nbt.put(NBT_SLOT, slot.serializeNBT());
 		}
 		
 		if (customName != null) {
-			nbt.setString(NBT_CUSTOMNAME, customName);
+			nbt.putString(NBT_CUSTOMNAME, customName);
 		}
 		
-		nbt.setInteger(NBT_COOLDOWN, transferCooldown);
+		nbt.putInt(NBT_COOLDOWN, transferCooldown);
 		
 		FurnaceBlock a;
 		
@@ -64,12 +64,12 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(CompoundNBT nbt) {
 		super.readFromNBT(nbt);
 		
-		slot = (nbt.hasKey(NBT_SLOT) ? new ItemStack(nbt.getCompoundTag(NBT_SLOT)) : ItemStack.EMPTY); // nulls if empty
-		customName = (nbt.hasKey(NBT_CUSTOMNAME) ? nbt.getString(NBT_CUSTOMNAME) : null);
-		transferCooldown = nbt.getInteger(NBT_COOLDOWN);
+		slot = (nbt.contains(NBT_SLOT) ? new ItemStack(nbt.getCompound(NBT_SLOT)) : ItemStack.EMPTY); // nulls if empty
+		customName = (nbt.contains(NBT_CUSTOMNAME) ? nbt.getString(NBT_CUSTOMNAME) : null);
+		transferCooldown = nbt.getInt(NBT_COOLDOWN);
 	}
 	
 	@Override
@@ -139,17 +139,17 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	}
 
 	@Override
-	public boolean isUsableByPlayer(EntityPlayer player) {
+	public boolean isUsableByPlayer(PlayerEntity player) {
 		return true;
 	}
 
 	@Override
-	public void openInventory(EntityPlayer player) {
+	public void openInventory(PlayerEntity player) {
 		;
 	}
 
 	@Override
-	public void closeInventory(EntityPlayer player) {
+	public void closeInventory(PlayerEntity player) {
 		;
 	}
 
@@ -293,7 +293,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	
 	private boolean pushItems() {
 		// Inventory we want to push into is in direction FACING
-		final EnumFacing direction = ActiveHopper.GetFacing(world.getBlockState(pos));
+		final Direction direction = ActiveHopper.GetFacing(world.getBlockState(pos));
 		@Nullable TileEntity te = world.getTileEntity(pos.offset(direction));
 		
 		if (te != null) {
@@ -327,7 +327,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 		return false;
 	}
 	
-	private boolean pushInto(IInventory inventory, EnumFacing direction) {
+	private boolean pushInto(IInventory inventory, Direction direction) {
 		ItemStack copyToInsert = slot.copy();
 		copyToInsert.setCount(1);
 		if (inventory instanceof ISidedInventory) {
@@ -372,7 +372,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 		return false;
 	}
 	
-	private boolean pushInto(IItemHandler handler, EnumFacing direction) {
+	private boolean pushInto(IItemHandler handler, Direction direction) {
 		ItemStack copyToInsert = slot.copy();
 		copyToInsert.setCount(1);
 		
@@ -388,7 +388,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	
 	private boolean pullItems() {
 		// We want to pull from opposite(FACING)
-		final EnumFacing direction = ActiveHopper.GetFacing(world.getBlockState(pos)).getOpposite();
+		final Direction direction = ActiveHopper.GetFacing(world.getBlockState(pos)).getOpposite();
 		@Nullable TileEntity te = world.getTileEntity(pos.offset(direction));
 		
 		if (te != null) {
@@ -421,7 +421,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 		return false;
 	}
 	
-	private boolean pullFrom(IInventory inventory, EnumFacing direction) {
+	private boolean pullFrom(IInventory inventory, Direction direction) {
 		if (inventory instanceof ISidedInventory) {
 			ISidedInventory sided = (ISidedInventory) inventory;
 			for (int i : sided.getSlotsForFace(direction)) {
@@ -462,7 +462,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 		return false;
 	}
 	
-	private boolean pullFrom(IItemHandler handler, EnumFacing direction) {
+	private boolean pullFrom(IItemHandler handler, Direction direction) {
 		for (int i = 0; i < handler.getSlots(); i++) {
 			
 			@Nonnull ItemStack inSlot = handler.getStackInSlot(i);
@@ -499,9 +499,9 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	}
 	
 	private AxisAlignedBB getCaptureBB(boolean forPull) {
-		final EnumFacing direction = ActiveHopper.GetFacing(world.getBlockState(pos));
+		final Direction direction = ActiveHopper.GetFacing(world.getBlockState(pos));
 		
-		if (direction == EnumFacing.DOWN) {
+		if (direction == Direction.DOWN) {
 			// Down has different collision so do a custom box
 			return new AxisAlignedBB(0, 0, 0, 1, 1, 1).offset(pos).expand(0, 1, 0);
 		}
@@ -511,13 +511,13 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	}
 	
 	@Override
-	public int[] getSlotsForFace(EnumFacing side) {
+	public int[] getSlotsForFace(Direction side) {
 		return SLOTS_ARR;
 	}
 
 	@Override
-	public boolean canInsertItem(int index, ItemStack itemStackIn, EnumFacing side) {
-		final EnumFacing direction = ActiveHopper.GetFacing(world.getBlockState(pos));
+	public boolean canInsertItem(int index, ItemStack itemStackIn, Direction side) {
+		final Direction direction = ActiveHopper.GetFacing(world.getBlockState(pos));
 		if (side == direction) {
 			// Coming in our output
 			return false;
@@ -527,8 +527,8 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	}
 
 	@Override
-	public boolean canExtractItem(int index, ItemStack stack, EnumFacing side) {
-		final EnumFacing direction = ActiveHopper.GetFacing(world.getBlockState(pos));
+	public boolean canExtractItem(int index, ItemStack stack, Direction side) {
+		final Direction direction = ActiveHopper.GetFacing(world.getBlockState(pos));
 		if (side == direction.getOpposite()) {
 			// pulling from our mouth?
 			return false;

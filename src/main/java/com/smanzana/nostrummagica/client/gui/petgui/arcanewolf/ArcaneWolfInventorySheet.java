@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfBondCapability;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 
 public class ArcaneWolfInventorySheet extends PetInventorySheet<EntityArcaneWolf> {
 	
@@ -15,7 +15,7 @@ public class ArcaneWolfInventorySheet extends PetInventorySheet<EntityArcaneWolf
 	}
 	
 	@Override
-	public void showSheet(EntityArcaneWolf wolf, EntityPlayer player, PetContainer<EntityArcaneWolf> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(EntityArcaneWolf wolf, PlayerEntity player, PetContainer<EntityArcaneWolf> container, int width, int height, int offsetX, int offsetY) {
 		super.showSheet(wolf, player, container, width, height, offsetX, offsetY);
 		
 //		final int cellWidth = 18;
@@ -48,7 +48,7 @@ public class ArcaneWolfInventorySheet extends PetInventorySheet<EntityArcaneWolf
 	public void draw(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		super.draw(mc, partialTicks, width, height, mouseX, mouseY);
 		
-//		GlStateManager.color(1.0F,  1.0F, 1.0F, 1.0F);
+//		GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 //		
 //		mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
 //		
@@ -71,8 +71,8 @@ public class ArcaneWolfInventorySheet extends PetInventorySheet<EntityArcaneWolf
 //				// NOT IMPLEMENTED TODO
 //				
 //				final int i = slot.ordinal();
-//				GlStateManager.color(1f, 1f, 1f, 1f);
-//				Gui.drawModalRectWithCustomSizedTexture(leftOffset - 1 - (cellWidth + 4), dragonTopOffset - 1 + (cellWidth * (i * 2)),
+//				GlStateManager.color4f(1f, 1f, 1f, 1f);
+//				RenderFuncs.drawModalRectWithCustomSizedTexture(leftOffset - 1 - (cellWidth + 4), dragonTopOffset - 1 + (cellWidth * (i * 2)),
 //						PetGUI.GUI_TEX_CELL_HOFFSET, PetGUI.GUI_TEX_CELL_VOFFSET,
 //						cellWidth, cellWidth,
 //						256, 256);

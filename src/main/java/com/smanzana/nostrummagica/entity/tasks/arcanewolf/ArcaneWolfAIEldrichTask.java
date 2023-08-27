@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.potion.PotionEffect;
@@ -26,7 +26,7 @@ public class ArcaneWolfAIEldrichTask extends EntityAIBase {
 	protected final int manaCost;
 	
 	protected int activeTicks;
-	protected @Nullable EntityLivingBase activeTarget;
+	protected @Nullable LivingEntity activeTarget;
 	
 	public ArcaneWolfAIEldrichTask(EntityArcaneWolf wolf, int manaCost) {
 		this.wolf = wolf;
@@ -68,11 +68,11 @@ public class ArcaneWolfAIEldrichTask extends EntityAIBase {
 		activeTarget = null;
 	}
 	
-	protected void strikeEntity(EntityArcaneWolf wolf, EntityLivingBase target) {
+	protected void strikeEntity(EntityArcaneWolf wolf, LivingEntity target) {
 //		// Capture velocity before attack
-//		double velX = target.motionX;
-//		double velY = target.motionY;
-//		double velZ = target.motionZ;
+//		double velX = target.getMotion().x;
+//		double velY = target.getMotion().y;
+//		double velZ = target.getMotion().z;
 		
 		wolf.setLastAttackedEntity(target);
 		target.setRevengeTarget(wolf);
@@ -81,13 +81,13 @@ public class ArcaneWolfAIEldrichTask extends EntityAIBase {
 		NostrumMagicaSounds.STATUS_DEBUFF3.play(target);
 		
 //		// Reset motion; we don't want knockback!
-//		target.motionX = velX;
-//		target.motionY = velY;
-//		target.motionZ = velZ;
+//		target.getMotion().x = velX;
+//		target.getMotion().y = velY;
+//		target.getMotion().z = velZ;
 //		target.velocityChanged = true;
 	}
 	
-	protected void startEffect(EntityArcaneWolf wolf, EntityLivingBase target, int duration) {
+	protected void startEffect(EntityArcaneWolf wolf, LivingEntity target, int duration) {
 		NetworkHandler.getSyncChannel().sendToAllTracking(
 				new SpawnPredefinedEffectMessage(PredefinedEffect.ELDRICH_BLAST, duration, target.dimension, target.getEntityId()),
 				target);

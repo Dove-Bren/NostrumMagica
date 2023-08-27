@@ -11,18 +11,18 @@ import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemEnderEye;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * Like the single spawner, but spawns and then (once the entity is dead) triggers a triggerable block
@@ -48,8 +48,8 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
-	public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+	@OnlyIn(Dist.CLIENT)
+	public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, Direction side) {
 		if (NostrumMagica.proxy.getPlayer().isCreative()) {
 			TileEntity te = blockAccess.getTileEntity(pos);
 			if (te != null && te instanceof SpawnerTriggerTileEntity) {
@@ -72,7 +72,7 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
 		if (worldIn.isRemote) {
 			return true;
 		}
@@ -91,7 +91,7 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 		if (playerIn.isCreative()) {
 			ItemStack heldItem = playerIn.getHeldItem(hand);
 			if (heldItem.isEmpty()) {
-				playerIn.sendMessage(new TextComponentString("Currently set to " + state.getValue(MOB).getName()));
+				playerIn.sendMessage(new StringTextComponent("Currently set to " + state.getValue(MOB).getName()));
 			} else if (heldItem.getItem() instanceof EssenceItem) {
 				Type type = null;
 				switch (EssenceItem.findType(heldItem)) {
@@ -137,7 +137,7 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 					if (atState != null && atState.getBlock() instanceof ITriggeredBlock) {
 						playerIn.setPositionAndUpdate(loc.getX(), loc.getY(), loc.getZ());
 					} else {
-						playerIn.sendMessage(new TextComponentString("Not pointed at valid triggered block!"));
+						playerIn.sendMessage(new StringTextComponent("Not pointed at valid triggered block!"));
 					}
 				}
 			}

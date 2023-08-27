@@ -13,10 +13,10 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -45,16 +45,16 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt = super.writeToNBT(nbt);
 		
-		nbt.setTag(NBT_INVENTORY, Inventories.serializeInventory(inventory));
+		nbt.put(NBT_INVENTORY, Inventories.serializeInventory(inventory));
 		
 		return nbt;
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(CompoundNBT nbt) {
 		super.readFromNBT(nbt);
 		
 		if (nbt == null)
@@ -87,7 +87,7 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 		
 		// Search for item if cache is busted
 		if (itemEntCache == null) {
-			EnumFacing direction = world.getBlockState(this.pos).getValue(PutterBlock.FACING);
+			Direction direction = world.getBlockState(this.pos).getValue(PutterBlock.FACING);
 			int dx = 0;
 			int dy = 0;
 			int dz = 0;
@@ -146,7 +146,7 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 				double dx = 0;
 				double dy = 0;
 				double dz = 0;
-				EnumFacing direction = world.getBlockState(this.pos).getValue(PutterBlock.FACING);
+				Direction direction = world.getBlockState(this.pos).getValue(PutterBlock.FACING);
 				switch (direction) {
 				case DOWN:
 					dy = -.75;
@@ -169,7 +169,7 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 					break;
 				}
 				itemEntCache = new EntityItem(world, this.pos.getX() + .5 + dx, this.pos.getY() + .5 + dy, this.pos.getZ() + .5 + dz, toSpawn);
-				itemEntCache.motionX = itemEntCache.motionY = itemEntCache.motionZ = 0;
+				itemEntCache.getMotion().x = itemEntCache.getMotion().y = itemEntCache.getMotion().z = 0;
 				world.spawnEntity(itemEntCache);
 			}
 		}
@@ -177,9 +177,9 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 	
 	private EntityItem refreshEntityItem(EntityItem oldItem) {
 		EntityItem newItem = new EntityItem(oldItem.world, oldItem.posX, oldItem.posY, oldItem.posZ, oldItem.getItem().copy());
-		newItem.motionX = oldItem.motionX;
-		newItem.motionY = oldItem.motionY;
-		newItem.motionZ = oldItem.motionZ;
+		newItem.getMotion().x = oldItem.getMotion().x;
+		newItem.getMotion().y = oldItem.getMotion().y;
+		newItem.getMotion().z = oldItem.getMotion().z;
 		newItem.lifespan = oldItem.lifespan;
 		oldItem.world.spawnEntity(newItem);
 		oldItem.setDead();
@@ -187,7 +187,7 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	@Override
-	public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+	public boolean hasCapability(Capability<?> capability, Direction facing) {
 		return (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
 	}
 	
@@ -195,7 +195,7 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+	public <T> T getCapability(Capability<T> capability, Direction facing) {
 		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
 			if (handlerProxy == null) {
 				handlerProxy = new IItemHandler() {

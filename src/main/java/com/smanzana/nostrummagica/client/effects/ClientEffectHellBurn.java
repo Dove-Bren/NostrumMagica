@@ -7,10 +7,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class ClientEffectHellBurn extends ClientEffect {
 
 	protected final Entity entity;
@@ -35,7 +35,7 @@ public class ClientEffectHellBurn extends ClientEffect {
 		final Vec3d offset = new Vec3d(Math.cos(angleRad) * .5, .25, Math.sin(angleRad) * .5);
 		entity.world.spawnParticle(EnumParticleTypes.FLAME,
 				entity.posX + offset.x,
-				entity.posY + entity.height + offset.y,
+				entity.posY + entity.getHeight() + offset.y,
 				entity.posZ + offset.z,
 				-offset.x * .1,
 				-offset.y * .1,
@@ -49,7 +49,7 @@ public class ClientEffectHellBurn extends ClientEffect {
 		final Vec3d offset = new Vec3d(Math.cos(angleRad) * .5, .25, Math.sin(angleRad) * .5);
 		entity.world.spawnParticle(EnumParticleTypes.CRIT_MAGIC,
 				entity.posX + offset.x,
-				entity.posY + entity.height + offset.y,
+				entity.posY + entity.getHeight() + offset.y,
 				entity.posZ + offset.z,
 				0, 0, 0,
 				new int[0]
@@ -61,7 +61,7 @@ public class ClientEffectHellBurn extends ClientEffect {
 		final Vec3d dir = new Vec3d(Math.cos(angleRad) * .5, .25, Math.sin(angleRad) * .5);
 		entity.world.spawnParticle(EnumParticleTypes.LAVA,
 				entity.posX,
-				entity.posY + entity.height - .1,
+				entity.posY + entity.getHeight() - .1,
 				entity.posZ,
 				dir.x,
 				dir.y,
@@ -77,7 +77,7 @@ public class ClientEffectHellBurn extends ClientEffect {
 				mod.apply(detail, progress, partialTicks);
 			}
 		
-		if (!this.entity.isDead) {
+		if (this.entity.isAlive()) {
 			if (this.existedTicks % 10 == 0) {
 				spawnFireEffect();
 			}

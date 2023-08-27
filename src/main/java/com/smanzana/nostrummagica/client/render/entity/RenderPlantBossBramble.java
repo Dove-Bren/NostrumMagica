@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.client.render.entity;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBossBramble;
 
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.ResourceLocation;
@@ -26,7 +26,7 @@ public class RenderPlantBossBramble extends Render<EntityPlantBossBramble> {
 	public void doRender(EntityPlantBossBramble entity, double x, double y, double z, float entityYaw, float partialTicks) {
 //		if (entity.isWolfWet()) {
 //			float f = entity.getBrightness() * entity.getShadingWhileWet(partialTicks);
-//			GlStateManager.color(f, f, f);
+//			GlStateManager.color4f(f, f, f);
 //		}
 		
 		this.mainModel = new ModelPlantBossBramble();
@@ -38,17 +38,17 @@ public class RenderPlantBossBramble extends Render<EntityPlantBossBramble> {
 		GlStateManager.pushMatrix();
 		
 		// Copied from renderliving
-		GlStateManager.translate(x, y, z);
+		GlStateManager.translatef(x, y, z);
 
 		// yaw 0 is south, z+
-		GlStateManager.rotate(180.0F - entity.rotationYaw, 0.0F, 1.0F, 0.0F);
+		GlStateManager.rotatef(180.0F - entity.rotationYaw, 0.0F, 1.0F, 0.0F);
 		
 		GlStateManager.enableRescaleNormal();
-		GlStateManager.scale(-1.0F, -1.0F, 1.0F);
+		GlStateManager.scalef(-1.0F, -1.0F, 1.0F);
 
-		GlStateManager.scale(scale, 1, 1);
-		GlStateManager.translate(0, - 1.5, 0);
-		GlStateManager.scale((1f / 16f), (1f / 16f) * 1, (1f / 16f) * 1);
+		GlStateManager.scalef(scale, 1, 1);
+		GlStateManager.translatef(0, - 1.5, 0);
+		GlStateManager.scalef((1f / 16f), (1f / 16f) * 1, (1f / 16f) * 1);
 		mainModel.render(entity, partialTicks, 0f, 0f, entityYaw, 0f, 1f);
 		GlStateManager.popMatrix();
 		

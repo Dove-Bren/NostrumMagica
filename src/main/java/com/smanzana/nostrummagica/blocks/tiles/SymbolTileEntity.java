@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
@@ -98,34 +98,34 @@ public class SymbolTileEntity extends TileEntity {
 	private static final String NBT_SCALE = "scale";
 	
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt = super.writeToNBT(nbt);
 		
 		if (element != null) {
-			nbt.setString(NBT_TYPE, "element");
-			nbt.setString(NBT_KEY, element.name());
+			nbt.putString(NBT_TYPE, "element");
+			nbt.putString(NBT_KEY, element.name());
 		} else if (alteration != null) {
-			nbt.setString(NBT_TYPE, "alteration");
-			nbt.setString(NBT_KEY, alteration.name());
+			nbt.putString(NBT_TYPE, "alteration");
+			nbt.putString(NBT_KEY, alteration.name());
 		} else if (shape != null) {
-			nbt.setString(NBT_TYPE, "shape");
-			nbt.setString(NBT_KEY, shape.getShapeKey());
+			nbt.putString(NBT_TYPE, "shape");
+			nbt.putString(NBT_KEY, shape.getShapeKey());
 		} else if (trigger != null) {
-			nbt.setString(NBT_TYPE, "trigger");
-			nbt.setString(NBT_KEY, trigger.getTriggerKey());
+			nbt.putString(NBT_TYPE, "trigger");
+			nbt.putString(NBT_KEY, trigger.getTriggerKey());
 		}
 		
-		nbt.setFloat(NBT_SCALE, scale);
+		nbt.putFloat(NBT_SCALE, scale);
 		
 		return nbt;
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(CompoundNBT nbt) {
 		super.readFromNBT(nbt);
 		
-		if (nbt == null || !nbt.hasKey(NBT_TYPE, NBT.TAG_STRING)
-				|| !nbt.hasKey(NBT_KEY, NBT.TAG_STRING))
+		if (nbt == null || !nbt.contains(NBT_TYPE, NBT.TAG_STRING)
+				|| !nbt.contains(NBT_KEY, NBT.TAG_STRING))
 			return;
 		
 		String type = nbt.getString(NBT_TYPE).toLowerCase();
@@ -178,8 +178,8 @@ public class SymbolTileEntity extends TileEntity {
 	}
 
 	@Override
-	public NBTTagCompound getUpdateTag() {
-		return this.writeToNBT(new NBTTagCompound());
+	public CompoundNBT getUpdateTag() {
+		return this.writeToNBT(new CompoundNBT());
 	}
 	
 	@Override

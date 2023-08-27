@@ -12,11 +12,11 @@ import com.smanzana.nostrummagica.pet.PetPlacementMode;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.passive.EntityTameable;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.util.math.BlockPos;
@@ -24,10 +24,10 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public class EntityAIFollowOwnerAdvanced<T extends EntityLiving> extends EntityAIBase {
+public class EntityAIFollowOwnerAdvanced<T extends MobEntity> extends EntityAIBase {
 	
 	private final T thePet;
-	private EntityLivingBase theOwner;
+	private LivingEntity theOwner;
 	private World theWorld;
 	private final double followSpeed;
 	private final PathNavigate petPathfinder;
@@ -59,7 +59,7 @@ public class EntityAIFollowOwnerAdvanced<T extends EntityLiving> extends EntityA
 		this.filter = filter;
 	}
 	
-	public static final boolean IsPetSittingGeneric(EntityLivingBase pet) {
+	public static final boolean IsPetSittingGeneric(LivingEntity pet) {
 		final boolean sitting;
 		if (pet == null) {
 			sitting = false;
@@ -87,8 +87,8 @@ public class EntityAIFollowOwnerAdvanced<T extends EntityLiving> extends EntityA
 	 * @param owner
 	 * @return
 	 */
-	protected int getPetPositionIndex(T pet, EntityLivingBase owner) {
-		List<EntityLivingBase> pets = NostrumMagica.getTamedEntities(owner);
+	protected int getPetPositionIndex(T pet, LivingEntity owner) {
+		List<LivingEntity> pets = NostrumMagica.getTamedEntities(owner);
 		pets.removeIf((p) -> {
 			return p == null
 					|| IsPetSittingGeneric(p)
@@ -115,7 +115,7 @@ public class EntityAIFollowOwnerAdvanced<T extends EntityLiving> extends EntityA
 	 * @param mode
 	 * @return
 	 */
-	protected Vec3d getIdealTargetPosition(T pet, EntityLivingBase owner, PetPlacementMode mode) {
+	protected Vec3d getIdealTargetPosition(T pet, LivingEntity owner, PetPlacementMode mode) {
 		final int index = getPetPositionIndex(pet, owner);
 		final Vec3d target;
 		
@@ -199,7 +199,7 @@ public class EntityAIFollowOwnerAdvanced<T extends EntityLiving> extends EntityA
 		return target;
 	}
 	
-	protected Vec3d getTargetPosition(T pet, EntityLivingBase owner, PetPlacementMode mode) {
+	protected Vec3d getTargetPosition(T pet, LivingEntity owner, PetPlacementMode mode) {
 		if (timeToRecalcPosition == 0 || timeToRecalcPosition < pet.ticksExisted) {
 			timeToRecalcPosition = pet.ticksExisted + 20;
 			lastPosition = getIdealTargetPosition(pet, owner, mode);
@@ -208,9 +208,9 @@ public class EntityAIFollowOwnerAdvanced<T extends EntityLiving> extends EntityA
 			cursor.setPos(lastPosition.x, lastPosition.y, lastPosition.z);
 			if (!isEmptyBlock(cursor) || isEmptyBlock(cursor.down())) {
 				if (isEmptyBlock(cursor.down()) && !isEmptyBlock(cursor.down().down())) {
-					lastPosition = lastPosition.addVector(0, -1, 0);
+					lastPosition = lastPosition.add(0, -1, 0);
 				} else if (isEmptyBlock(cursor.up()) && !isEmptyBlock(cursor)) {
-					lastPosition = lastPosition.addVector(0, 1, 0);
+					lastPosition = lastPosition.add(0, 1, 0);
 				}
 			}
 		}
@@ -227,7 +227,7 @@ public class EntityAIFollowOwnerAdvanced<T extends EntityLiving> extends EntityA
 	 * Returns whether the EntityAIBase should begin execution.
 	 */
 	public boolean shouldExecute() {
-		final EntityLivingBase entitylivingbase = NostrumMagica.getOwner(thePet);
+		final LivingEntity entitylivingbase = NostrumMagica.getOwner(thePet);
 		
 		if (entitylivingbase == null) {
 			return false;
@@ -246,7 +246,7 @@ public class EntityAIFollowOwnerAdvanced<T extends EntityLiving> extends EntityA
 		final boolean sitting = this.isPetSitting(thePet);
 		final Vec3d targetPos = getTargetPosition(thePet, entitylivingbase, mode);
 
-		if (entitylivingbase instanceof EntityPlayer && ((EntityPlayer)entitylivingbase).isSpectator()) {
+		if (entitylivingbase instanceof PlayerEntity && ((PlayerEntity)entitylivingbase).isSpectator()) {
 			return false;
 		} else if (sitting) {
 			return false;

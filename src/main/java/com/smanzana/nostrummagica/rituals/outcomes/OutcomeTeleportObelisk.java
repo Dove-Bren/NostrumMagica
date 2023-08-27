@@ -18,12 +18,12 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 public class OutcomeTeleportObelisk implements IRitualOutcome {
@@ -33,7 +33,7 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, EntityPlayer player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, PlayerEntity player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
 		// Teleport the player to the obelisk pointed at by the center item
 		// Must have magic unlocked, maybe?
 		
@@ -49,7 +49,7 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 		
 		BlockPos pos = PositionCrystal.getBlockPosition(centerItem);
 		if (pos == null) {
-			player.sendMessage(new TextComponentTranslation("info.teleport_obelisk.fail", new Object[0]));
+			player.sendMessage(new TranslationTextComponent("info.teleport_obelisk.fail", new Object[0]));
 			return;
 		}
 		
@@ -58,7 +58,7 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 				TileEntity te = world.getTileEntity(pos);
 				if (te == null || !(te instanceof NostrumObeliskEntity)) {
 					NostrumMagica.logger.error("Something went wrong! Source obelisk does not seem to exist or have the provided target obelisk...");
-					player.sendMessage(new TextComponentTranslation("info.teleport_obelisk.fail"));
+					player.sendMessage(new TranslationTextComponent("info.teleport_obelisk.fail"));
 					return;
 				}
 				

@@ -18,14 +18,14 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ManiCrystal extends Block {
 
@@ -60,7 +60,7 @@ public class ManiCrystal extends Block {
 		this.setTickRandomly(true);
 		this.setLightOpacity(0);
 		
-		this.setDefaultState(this.blockState.getBaseState().withProperty(LEVEL, 0).withProperty(FACING, EnumFacing.UP));
+		this.setDefaultState(this.blockState.getBaseState().withProperty(LEVEL, 0).withProperty(FACING, Direction.UP));
 	}
 	
 	@Override
@@ -79,11 +79,11 @@ public class ManiCrystal extends Block {
 		}
 	}
 	
-	protected EnumFacing facingFromMeta(int meta) {
-		return EnumFacing.getFront(meta & 0x7);
+	protected Direction facingFromMeta(int meta) {
+		return Direction.getFront(meta & 0x7);
 	}
 	
-	protected int metaFromFacing(EnumFacing facing) {
+	protected int metaFromFacing(Direction facing) {
 		return facing.getIndex();
 	}
 	
@@ -189,9 +189,9 @@ public class ManiCrystal extends Block {
 	
 	@Override
 	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-		EnumFacing facing = blockState.getValue(FACING);
+		Direction facing = blockState.getValue(FACING);
 		if (facing == null) {
-			facing = EnumFacing.UP;
+			facing = Direction.UP;
 		}
 		
 		switch (facing) {
@@ -219,13 +219,13 @@ public class ManiCrystal extends Block {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public BlockRenderLayer getBlockLayer() {
 		return BlockRenderLayer.TRANSLUCENT;
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public boolean isTranslucent(IBlockState state) {
 		return true;
 	}
@@ -236,8 +236,8 @@ public class ManiCrystal extends Block {
 		
 		if (world instanceof World && !((World) world).isRemote) {
 			IBlockState state = world.getBlockState(pos);
-			EnumFacing facing = state.getValue(FACING);
-			if (facing == EnumFacing.UP || facing == EnumFacing.DOWN) {
+			Direction facing = state.getValue(FACING);
+			if (facing == Direction.UP || facing == Direction.DOWN) {
 				return;
 			}
 			
@@ -253,7 +253,7 @@ public class ManiCrystal extends Block {
 	 * @return
 	 */
 	public Vec3d getCrystalTipOffset(IBlockState state) {
-		EnumFacing facing = state.getValue(FACING);
+		Direction facing = state.getValue(FACING);
 		Vec3d offset = Vec3d.ZERO;
 		if (facing != null) {
 			switch (facing) {

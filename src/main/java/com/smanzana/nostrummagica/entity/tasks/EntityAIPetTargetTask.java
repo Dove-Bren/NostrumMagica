@@ -11,14 +11,14 @@ import com.smanzana.nostrummagica.pet.PetTargetMode;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAITarget;
 
 public class EntityAIPetTargetTask<T extends EntityCreature> extends EntityAITarget {
 	
 	protected T thePet;
-	protected EntityLivingBase theOwner;
+	protected LivingEntity theOwner;
 	protected int targetTicks;
 	
 	public EntityAIPetTargetTask(T petIn) {
@@ -31,7 +31,7 @@ public class EntityAIPetTargetTask<T extends EntityCreature> extends EntityAITar
 	 * Returns whether the EntityAIBase should begin execution.
 	 */
 	public boolean shouldExecute() {
-		final EntityLivingBase entitylivingbase = NostrumMagica.getOwner(thePet);
+		final LivingEntity entitylivingbase = NostrumMagica.getOwner(thePet);
 		
 		if (entitylivingbase == null) {
 			return false;
@@ -52,24 +52,24 @@ public class EntityAIPetTargetTask<T extends EntityCreature> extends EntityAITar
 		return this.shouldExecute();
 	}
 	
-	protected static @Nullable EntityLivingBase FindAggressiveTarget(EntityLiving attacker, double range) {
-		EntityLivingBase owner = NostrumMagica.getOwner(attacker);
-		List<EntityLivingBase> tamed = (owner == null ? Lists.newArrayList() : NostrumMagica.getTamedEntities(owner));
-		List<Entity> entities = attacker.world.getEntitiesInAABBexcluding(attacker, attacker.getEntityBoundingBox().grow(range), (e) -> {
-			return e instanceof EntityLivingBase
+	protected static @Nullable LivingEntity FindAggressiveTarget(MobEntity attacker, double range) {
+		LivingEntity owner = NostrumMagica.getOwner(attacker);
+		List<LivingEntity> tamed = (owner == null ? Lists.newArrayList() : NostrumMagica.getTamedEntities(owner));
+		List<Entity> entities = attacker.world.getEntitiesInAABBexcluding(attacker, attacker.getBoundingBox().grow(range), (e) -> {
+			return e instanceof LivingEntity
 					&& e != attacker
 					&& e != owner
 					&& !tamed.contains(e)
-					&& EntityAITarget.isSuitableTarget(attacker, (EntityLivingBase) e, false, true)
-					&& !NostrumMagica.IsSameTeam(attacker, (EntityLivingBase) e);
+					&& EntityAITarget.isSuitableTarget(attacker, (LivingEntity) e, false, true)
+					&& !NostrumMagica.IsSameTeam(attacker, (LivingEntity) e);
 		});
 		Collections.sort(entities, (a, b) -> {
 			return (int) (a.getDistanceSq(attacker) - b.getDistanceSq(attacker));
 		});
-		return entities.isEmpty() ? null : (EntityLivingBase)entities.get(0);
+		return entities.isEmpty() ? null : (LivingEntity)entities.get(0);
 	}
 	
-	protected @Nullable EntityLivingBase findAggressiveTarget(T thePet) {
+	protected @Nullable LivingEntity findAggressiveTarget(T thePet) {
 		return FindAggressiveTarget(thePet, 10);
 	}
 	

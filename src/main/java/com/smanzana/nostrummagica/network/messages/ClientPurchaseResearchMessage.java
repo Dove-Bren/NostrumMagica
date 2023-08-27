@@ -6,8 +6,8 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.research.NostrumResearch;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -25,12 +25,12 @@ public class ClientPurchaseResearchMessage implements IMessage {
 
 		@Override
 		public StatSyncMessage onMessage(ClientPurchaseResearchMessage message, MessageContext ctx) {
-			if (!message.tag.hasKey(NBT_RESEARCH, NBT.TAG_STRING))
+			if (!message.tag.contains(NBT_RESEARCH, NBT.TAG_STRING))
 				return null;
 			
-			final EntityPlayerMP sp = ctx.getServerHandler().player;
+			final ServerPlayerEntity sp = ctx.getServerHandler().player;
 			
-			sp.getServerWorld().addScheduledTask(() -> {
+			sp.getServerWorld().runAsync(() -> {
 				INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
 				
 				if (att == null) {
@@ -59,16 +59,16 @@ public class ClientPurchaseResearchMessage implements IMessage {
 
 	private static final String NBT_RESEARCH = "research";
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public ClientPurchaseResearchMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	public ClientPurchaseResearchMessage(NostrumResearch research) {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 		
-		tag.setString(NBT_RESEARCH, research.getKey());
+		tag.putString(NBT_RESEARCH, research.getKey());
 	}
 
 	@Override

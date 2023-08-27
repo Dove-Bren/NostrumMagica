@@ -15,19 +15,19 @@ import com.smanzana.nostrummagica.config.ModConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.Button;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class ObeliskScreen extends GuiScreen {
+public class ObeliskScreen extends Screen {
 	
 	protected static final ResourceLocation background = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/container/obelisk.png");
 	
@@ -83,7 +83,7 @@ public class ObeliskScreen extends GuiScreen {
 	}
 	
 	@Override
-	public void initGui() {
+	public void init() {
 		if (tileEntity.getTargets().isEmpty())
 			return;
 		
@@ -110,9 +110,9 @@ public class ObeliskScreen extends GuiScreen {
 			index++;
 		}
 		
-		this.buttonList.add(centralButton);
-		this.buttonList.addAll(floatingButtons);
-		this.buttonList.addAll(listButtons);
+		this.buttons.add(centralButton);
+		this.buttons.addAll(floatingButtons);
+		this.buttons.addAll(listButtons);
 		
 		for (DestinationButton butt : listButtons) {
 			butt.visible = drawList;
@@ -122,24 +122,24 @@ public class ObeliskScreen extends GuiScreen {
 	}
 	
 	@Override	
-	public void updateScreen() {
+	public void tick() {
 		;
 	}
 	
 	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+	public void render(int mouseX, int mouseY, float partialTicks) {
 
-		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-		Minecraft.getMinecraft().getTextureManager().bindTexture(background);
+		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+		Minecraft.getInstance().getTextureManager().bindTexture(background);
 		
-		double time = (float) ((double) Minecraft.getSystemTime() / 15000);
+		double time = (float) ((double) System.currentTimeMillis() / 15000);
 		int panX = (int) (Math.sin(time) * TEXT_BACK_PAN);
 		
 		Gui.drawScaledCustomSizeModalRect(0, 0, (TEXT_BACK_PAN / 2) + panX, 0, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, width, height, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
 		
 		if (this.centralButton == null) {
 			// No targets. Draw error string
-			this.fontRenderer.drawSplitString(errorString, (this.width - (this.width / 2)) / 2, this.height / 2 - 100, this.width / 2, 0xFFFFFF);
+			this.font.drawSplitString(errorString, (this.width - (this.width / 2)) / 2, this.height / 2 - 100, this.width / 2, 0xFFFFFF);
 			return;
 		}
 		
@@ -155,26 +155,26 @@ public class ObeliskScreen extends GuiScreen {
 		}
 		
 		if (drawList) {
-			GlStateManager.pushAttrib();
+			GlStateManager.pushLightingAttributes();
 			drawRect(0, 0, this.width / 3, this.height, 0xFF304060);
-			GlStateManager.popAttrib();
+			GlStateManager.popAttributes();
 			
 			int left = (this.width / 3) - 14;
 			boolean mouseover = (mouseX >= left && mouseX <= left + 14 && mouseY <= 14);
-			Minecraft.getMinecraft().getTextureManager().bindTexture(background);
+			Minecraft.getInstance().getTextureManager().bindTexture(background);
 			Gui.drawScaledCustomSizeModalRect(left, 0, 42 + (mouseover ? 14 : 0), 78, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
 		} else {
 			int left = 0;
 			boolean mouseover = (mouseX >= left && mouseX <= left + 14 && mouseY <= 14);
-			Minecraft.getMinecraft().getTextureManager().bindTexture(background);
+			Minecraft.getInstance().getTextureManager().bindTexture(background);
 			Gui.drawScaledCustomSizeModalRect(left, 0, 42 + (mouseover ? 14 : 0), 64, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
 		}
 		
-		GlStateManager.color(1f, 1f, 1f, 1f);
+		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		GlStateManager.enableBlend();
 		GlStateManager.disableLighting();
-		this.fontRenderer.drawString("<" + xOffset + "," + yOffset + ">", 35, 5, 0xFFFFFFFF);
-		this.fontRenderer.drawString("Scale: " + this.scale, 35, 20, 0xFFFFFFFF);
+		this.font.drawString("<" + xOffset + "," + yOffset + ">", 35, 5, 0xFFFFFFFF);
+		this.font.drawString("Scale: " + this.scale, 35, 20, 0xFFFFFFFF);
 		
 		for (DestinationButton butt : listButtons) {
 			butt.drawButton(mc, mouseX, mouseY, partialTicks);
@@ -183,7 +183,7 @@ public class ObeliskScreen extends GuiScreen {
 	}
 	
 	@Override
-	public boolean doesGuiPauseGame() {
+	public boolean isPauseScreen() {
 		return true;
 	}
 	
@@ -286,26 +286,26 @@ public class ObeliskScreen extends GuiScreen {
 	
 	private void renderLine(DestinationButton center, DestinationButton other) {
 		GlStateManager.pushMatrix();
-		GlStateManager.pushAttrib();
-		GlStateManager.translate(TEXT_ICON_LENGTH / 2, TEXT_ICON_LENGTH / 2, 0);
+		GlStateManager.pushLightingAttributes();
+		GlStateManager.translatef(TEXT_ICON_LENGTH / 2, TEXT_ICON_LENGTH / 2, 0);
 		BufferBuilder buf = Tessellator.getInstance().getBuffer();
 		//GlStateManager.enableBlend();
-        GlStateManager.disableTexture2D();
-        //GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-        GlStateManager.color(1.0f, 1.0f, 1.0f, 0.6f);
+        GlStateManager.disableTexture();
+        //GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        GlStateManager.color4f(1.0f, 1.0f, 1.0f, 0.6f);
         buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
         buf.pos(center.x, center.y, 0).endVertex();
         buf.pos(other.x, other.y, 0).endVertex();
         Tessellator.getInstance().draw();
-        GlStateManager.enableTexture2D();
+        GlStateManager.enableTexture();
         //GlStateManager.disableBlend();
 		
-        GlStateManager.popAttrib();
+        GlStateManager.popAttributes();
 		GlStateManager.popMatrix();
 	}
 	
 	@Override
-	public void actionPerformed(GuiButton button) {
+	public void actionPerformed(Button button) {
 		if (!button.visible)
 			return;
 		
@@ -317,11 +317,11 @@ public class ObeliskScreen extends GuiScreen {
 			return;
 		
 		NostrumMagica.proxy.setObeliskIndex(tileEntity.getPos(), butt.obeliskIndex);
-		Minecraft.getMinecraft().displayGuiScreen(null);
+		Minecraft.getInstance().displayGuiScreen(null);
 	}
 	
-	@SideOnly(Side.CLIENT)
-    static class DestinationButton extends GuiButton
+	@OnlyIn(Dist.CLIENT)
+    static class DestinationButton extends Button
     {
         private final BlockPos pos;
         private final int obeliskIndex;
@@ -346,7 +346,7 @@ public class ObeliskScreen extends GuiScreen {
          * Draws this button to the screen.
          */
         @Override
-        public void drawButton(Minecraft mc, int parX, int parY, float partialTicks) {
+        public void render(int parX, int parY, float partialTicks) {
             if (visible) {
                 int textureX = 0;
                 int textureY = TEXT_BACK_HEIGHT;
@@ -368,13 +368,13 @@ public class ObeliskScreen extends GuiScreen {
                 GL11.glColor4f(val, 1.0f, val, val);
                 mc.getTextureManager().bindTexture(background);
                 GlStateManager.enableBlend();
-                Gui.drawModalRectWithCustomSizedTexture(x, y, textureX, textureY,
+                RenderFuncs.drawModalRectWithCustomSizedTexture(x, y, textureX, textureY,
         				TEXT_ICON_LENGTH, TEXT_ICON_LENGTH, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
                 GlStateManager.disableBlend();
                 
                 if (!isCenter) {
                 	// Draw the name below
-                	FontRenderer fonter = mc.fontRenderer;
+                	font fonter = mc.font;
                 	int textWidth = fonter.getStringWidth(title);
                 	int buttonWidth = TEXT_ICON_LENGTH;
                 	int color = isValid ? 0xB0B0B0 : 0xB05050;

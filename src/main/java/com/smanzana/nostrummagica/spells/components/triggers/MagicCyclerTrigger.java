@@ -13,7 +13,7 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -41,11 +41,11 @@ public class MagicCyclerTrigger extends SpellTrigger {
 		}
 		
 		@Override
-		public void init(EntityLivingBase caster) {
+		public void init(LivingEntity caster) {
 			
 			final MagicCyclerTriggerInstance self = this;
 			
-			caster.getServer().addScheduledTask(new Runnable() {
+			caster.getServer().runAsync(new Runnable() {
 
 				@Override
 				public void run() {

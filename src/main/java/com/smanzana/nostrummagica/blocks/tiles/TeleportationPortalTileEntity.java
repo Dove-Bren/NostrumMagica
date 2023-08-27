@@ -6,14 +6,14 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class TeleportationPortalTileEntity extends NostrumPortal.NostrumPortalTileEntityBase  {
 
@@ -44,26 +44,26 @@ public class TeleportationPortalTileEntity extends NostrumPortal.NostrumPortalTi
 		}
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public int getColor() {
-		EntityPlayer player = NostrumMagica.proxy.getPlayer();
+		PlayerEntity player = NostrumMagica.proxy.getPlayer();
 		if (NostrumPortal.getRemainingCharge(player) > 0) {
 			return 0x00A00050;
 		}
 		return 0x00500050;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public float getRotationPeriod() {
 		return 3;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public float getOpacity() {
-		EntityPlayer player = NostrumMagica.proxy.getPlayer();
+		PlayerEntity player = NostrumMagica.proxy.getPlayer();
 		if (NostrumPortal.getRemainingCharge(player) > 0) {
 			return 0.5f;
 		}
@@ -71,10 +71,10 @@ public class TeleportationPortalTileEntity extends NostrumPortal.NostrumPortalTi
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound compound) {
+	public void readFromNBT(CompoundNBT compound) {
 		super.readFromNBT(compound);
 		
-		if (compound.hasKey(NBT_TARGET, NBT.TAG_LONG)) {
+		if (compound.contains(NBT_TARGET, NBT.TAG_LONG)) {
 			target = BlockPos.fromLong(compound.getLong(NBT_TARGET));
 		} else {
 			target = null;
@@ -82,11 +82,11 @@ public class TeleportationPortalTileEntity extends NostrumPortal.NostrumPortalTi
 	}
 	
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt = super.writeToNBT(nbt);
 		
 		if (target != null) {
-			nbt.setLong(NBT_TARGET, target.toLong());
+			nbt.putLong(NBT_TARGET, target.toLong());
 		}
 		
 		return nbt;
@@ -98,8 +98,8 @@ public class TeleportationPortalTileEntity extends NostrumPortal.NostrumPortalTi
 	}
 
 	@Override
-	public NBTTagCompound getUpdateTag() {
-		return this.writeToNBT(new NBTTagCompound());
+	public CompoundNBT getUpdateTag() {
+		return this.writeToNBT(new CompoundNBT());
 	}
 	
 	@Override

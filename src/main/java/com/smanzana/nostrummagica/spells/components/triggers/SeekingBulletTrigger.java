@@ -14,12 +14,12 @@ import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -49,7 +49,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 		private float yaw;
 		private final boolean ignoreAllies;
 		
-		private EntityLivingBase target;
+		private LivingEntity target;
 		
 		public SeekingBulletTriggerInstance(SpellState state, World world, Vec3d pos, float pitch, float yaw, boolean ignoreAllies) {
 			super(state);
@@ -61,12 +61,12 @@ public class SeekingBulletTrigger extends SpellTrigger {
 		}
 		
 		@Override
-		public void init(EntityLivingBase caster) {
+		public void init(LivingEntity caster) {
 			// Do a little more work of getting a good vector for things
 			// that aren't players
 			final Vec3d dir;
-			if (caster instanceof EntityLiving && ((EntityLiving) caster).getAttackTarget() != null) {
-				EntityLiving ent = (EntityLiving) caster  ;
+			if (caster instanceof MobEntity && ((MobEntity) caster).getAttackTarget() != null) {
+				MobEntity ent = (MobEntity) caster  ;
 				target = ent.getAttackTarget(); // We already know target
 				dir = null;
 			} else {
@@ -76,7 +76,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 			
 			final SeekingBulletTriggerInstance self = this;
 			
-			caster.getServer().addScheduledTask(new Runnable() {
+			caster.getServer().runAsync(new Runnable() {
 
 				@Override
 				public void run() {
@@ -91,7 +91,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 								
 								if (ignoreAllies) {
 									// Too strong?
-									EntityLivingBase living = NostrumMagica.resolveEntityLiving(ent);
+									LivingEntity living = NostrumMagica.resolveEntityLiving(ent);
 									if (living != null
 											&& NostrumMagica.IsSameTeam(getState().getSelf(), living)) {
 										return false;
@@ -118,18 +118,18 @@ public class SeekingBulletTrigger extends SpellTrigger {
 					}
 					
 					// Get axis from where target is
-					EnumFacing.Axis axis = EnumFacing.Axis.Y;
+					Direction.Axis axis = Direction.Axis.Y;
 					Vec3d forwardDir = dir;
 					if (target != null) {
 						Vec3d vec = target.getPositionVector().subtract(caster.getPositionVector());
 						forwardDir = vec.normalize();
-						axis = EnumFacing.getFacingFromVector((float) vec.x, (float) vec.y, (float) vec.z).getAxis();
+						axis = Direction.getFacingFromVector((float) vec.x, (float) vec.y, (float) vec.z).getAxis();
 					}
 					
 					Vec3d startMotion;
 					
 					// For players, start with motion ortho to forward
-					if (getState().getSelf() instanceof EntityPlayer) {
+					if (getState().getSelf() instanceof PlayerEntity) {
 						startMotion = forwardDir
 								.rotateYaw(30f * (NostrumMagica.rand.nextBoolean() ? 1 : -1))
 								.rotatePitch(/*-15f*/ + NostrumMagica.rand.nextFloat() * 30f);
@@ -143,9 +143,9 @@ public class SeekingBulletTrigger extends SpellTrigger {
 					startMotion = startMotion.scale(.4);
 					
 					EntitySpellBullet bullet = new EntitySpellBullet(self, getState().getSelf(), target, axis);
-					bullet.motionX = startMotion.x;
-					bullet.motionY = startMotion.y;
-					bullet.motionZ = startMotion.z;
+					bullet.getMotion().x = startMotion.x;
+					bullet.getMotion().y = startMotion.y;
+					bullet.getMotion().z = startMotion.z;
 					//bullet.setVelocity(startMotion.x, startMotion.y, startMotion.z); client only :(
 					
 					bullet.setFilter((ent) -> {

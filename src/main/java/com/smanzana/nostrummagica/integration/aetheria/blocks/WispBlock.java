@@ -20,21 +20,21 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class WispBlock extends BlockContainer {
 	
@@ -61,12 +61,12 @@ public class WispBlock extends BlockContainer {
 	}
 	
 	@Override
-	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
 		return true;
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
 		
 		ItemStack heldItem = playerIn.getHeldItem(hand);
 		
@@ -135,7 +135,7 @@ public class WispBlock extends BlockContainer {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public boolean isTranslucent(IBlockState state) {
 		return true;
 	}
@@ -416,35 +416,35 @@ public class WispBlock extends BlockContainer {
 		}
 		
 		@Override
-		public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+		public CompoundNBT writeToNBT(CompoundNBT nbt) {
 			nbt = super.writeToNBT(nbt);
 			
 			if (nbt == null)
-				nbt = new NBTTagCompound();
+				nbt = new CompoundNBT();
 			
 			if (reagentPartial != 0f)
-				nbt.setFloat(NBT_PARTIAL, reagentPartial);
+				nbt.putFloat(NBT_PARTIAL, reagentPartial);
 			
-			nbt.setTag(NBT_INVENTORY, Inventories.serializeInventory(this));
+			nbt.put(NBT_INVENTORY, Inventories.serializeInventory(this));
 			
 //			if (scroll != null)
-//				nbt.setTag("scroll", scroll.serializeNBT());
+//				nbt.put("scroll", scroll.serializeNBT());
 //			
 //			if (reagent != null)
-//				nbt.setTag("reagent", reagent.serializeNBT());
+//				nbt.put("reagent", reagent.serializeNBT());
 //			
 //			
 //			
 //			if (activated) {
-//				nbt.setBoolean("active", activated);
-//				nbt.setInteger("wisps", wisps.size());
+//				nbt.putBoolean("active", activated);
+//				nbt.putInt("wisps", wisps.size());
 //			}
 			
 			return nbt;
 		}
 		
 		@Override
-		public void readFromNBT(NBTTagCompound nbt) {
+		public void readFromNBT(CompoundNBT nbt) {
 			super.readFromNBT(nbt);
 			
 			if (nbt == null)
@@ -453,10 +453,10 @@ public class WispBlock extends BlockContainer {
 			Inventories.deserializeInventory(this, nbt.getTag(NBT_INVENTORY));
 			this.reagentPartial = nbt.getFloat(NBT_PARTIAL);
 			
-//			this.scroll = ItemStack.loadItemStackFromNBT(nbt.getCompoundTag("scroll"));
-//			this.reagent = ItemStack.loadItemStackFromNBT(nbt.getCompoundTag("reagent"));
+//			this.scroll = ItemStack.loadItemStackFromNBT(nbt.getCompound("scroll"));
+//			this.reagent = ItemStack.loadItemStackFromNBT(nbt.getCompound("reagent"));
 //			this.activated = nbt.getBoolean("active");
-//			this.numWisps = nbt.getInteger("wisps");
+//			this.numWisps = nbt.getInt("wisps");
 		}
 		
 		@Override
@@ -552,16 +552,16 @@ public class WispBlock extends BlockContainer {
 		}
 
 		@Override
-		public boolean isUsableByPlayer(EntityPlayer player) {
+		public boolean isUsableByPlayer(PlayerEntity player) {
 			return true;
 		}
 
 		@Override
-		public void openInventory(EntityPlayer player) {
+		public void openInventory(PlayerEntity player) {
 		}
 
 		@Override
-		public void closeInventory(EntityPlayer player) {
+		public void closeInventory(PlayerEntity player) {
 		}
 
 		@Override

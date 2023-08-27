@@ -8,11 +8,11 @@ import com.google.common.base.Optional;
 import com.smanzana.nostrummagica.spells.components.triggers.MagicCyclerTrigger.MagicCyclerTriggerInstance;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -30,7 +30,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 		super(world);
 	}
 	
-	public EntityCyclerSpellSaucer(World world, EntityLivingBase shooter, MagicCyclerTriggerInstance trigger, float speed) {
+	public EntityCyclerSpellSaucer(World world, LivingEntity shooter, MagicCyclerTriggerInstance trigger, float speed) {
 		super(world, shooter, trigger, speed);
         this.duration = 10; // Long neough to flash so I know things are going on
         this.onBlocks = true;
@@ -39,7 +39,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
         this.dataManager.set(SHOOTER, Optional.fromNullable(shooter.getUniqueID()));
 	}
 	
-	public EntityCyclerSpellSaucer(MagicCyclerTriggerInstance trigger, EntityLivingBase shooter,
+	public EntityCyclerSpellSaucer(MagicCyclerTriggerInstance trigger, LivingEntity shooter,
 			World world,
 			double fromX, double fromY, double fromZ,
 			float speedFactor, int durationTicks, boolean onBlocks) {
@@ -53,7 +53,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 	}
 
 	public EntityCyclerSpellSaucer(MagicCyclerTriggerInstance trigger,
-			EntityLivingBase shooter, float speedFactor, int durationTicks, boolean onBlocks) {
+			LivingEntity shooter, float speedFactor, int durationTicks, boolean onBlocks) {
 		this(trigger,
 				shooter,
 				shooter.world,
@@ -84,7 +84,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 						.findAny().orElse(null);
 				
 				if (entity != null) {
-					this.shootingEntity = (EntityLivingBase) entity;
+					this.shootingEntity = (LivingEntity) entity;
 				}
 			}
 		}
@@ -122,7 +122,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 						.findAny().orElse(null);
 				
 				if (entity != null) {
-					this.shootingEntity = (EntityLivingBase) entity;
+					this.shootingEntity = (LivingEntity) entity;
 				}
 			}
 		}
@@ -165,12 +165,12 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 //			Vector accel = this.getInstantVelocity();
 //	        
 //	        // Add accel to motionX for raytracing
-//	        this.motionX += accel.x;
-//	        this.motionY += accel.y;
-//	        this.motionZ += accel.z;
+//	        this.getMotion().x += accel.x;
+//	        this.getMotion().y += accel.y;
+//	        this.getMotion().z += accel.z;
 			
-			List<Entity> collidedEnts = world.getEntitiesInAABBexcluding(this, this.getEntityBoundingBox(), (ent) -> {
-				return ent instanceof EntityLivingBase;
+			List<Entity> collidedEnts = world.getEntitiesInAABBexcluding(this, this.getBoundingBox(), (ent) -> {
+				return ent instanceof LivingEntity;
 			});
 			if (!collidedEnts.isEmpty()) {
 				Entity ent = null;
@@ -205,7 +205,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 					BlockPos blockPos = new BlockPos(posX, posY, posZ); // not using getPosition() since it adds .5 y 
 					if (this.canImpact(blockPos)) {
 						RayTraceResult bundledResult = new RayTraceResult(
-								RayTraceResult.Type.BLOCK, this.getPositionVector(), EnumFacing.UP, blockPos);
+								RayTraceResult.Type.BLOCK, this.getPositionVector(), Direction.UP, blockPos);
 						
 						if (_lastBlockVector == null) {
 							_lastBlockVector = new Vector();
@@ -223,26 +223,26 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 //            this.rotationPitch = (float)(MathHelper.atan2(motionY, (double)f) * (180D / Math.PI));
 //            this.rotationYaw = (float)(MathHelper.atan2(motionX, motionZ) * (180D / Math.PI));
 //			
-//			this.motionX -= accel.x;
-//	        this.motionY -= accel.y;
-//	        this.motionZ -= accel.z;
+//			this.getMotion().x -= accel.x;
+//	        this.getMotion().y -= accel.y;
+//	        this.getMotion().z -= accel.z;
 
 //	        if (raytraceresult != null)
 //	        {
 //	            this.onImpact(raytraceresult);
 //	        }
 	        
-//	        this.posX += this.motionX;
-//	        this.posY += this.motionY;
-//	        this.posZ += this.motionZ;
+//	        this.posX += this.getMotion().x;
+//	        this.posY += this.getMotion().y;
+//	        this.posZ += this.getMotion().z;
 //	        this.posX += accel.x;
 //	        this.posY += accel.y;
 //	        this.posZ += accel.z;
 //	        
 //	        // Apply air-friction, making motion's sort-of our initial motion
-//	        this.motionX *= 0.8;
-//	        this.motionY *= 0.8;
-//	        this.motionZ *= 0.8;
+//	        this.getMotion().x *= 0.8;
+//	        this.getMotion().y *= 0.8;
+//	        this.getMotion().z *= 0.8;
 //			
 ////				// Can't avoid a SQR; tracking motion would require SQR, too to get path length
 ////				if (this.getPositionVector().squareDistanceTo(origin) > maxDistance) {

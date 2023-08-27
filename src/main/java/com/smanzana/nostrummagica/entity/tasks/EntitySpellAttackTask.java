@@ -5,12 +5,12 @@ import javax.annotation.Nullable;
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.spells.Spell;
 
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 
-public class EntitySpellAttackTask<T extends EntityLiving> extends EntityAIBase {
+public class EntitySpellAttackTask<T extends MobEntity> extends EntityAIBase {
 	
 	
 	protected T entity;
@@ -59,8 +59,8 @@ public class EntitySpellAttackTask<T extends EntityLiving> extends EntityAIBase 
 			return false;
 		}
 		
-		if (needsTarget && entity.getAttackTarget() instanceof EntityPlayer) {
-			EntityPlayer player = (EntityPlayer) entity.getAttackTarget();
+		if (needsTarget && entity.getAttackTarget() instanceof PlayerEntity) {
+			PlayerEntity player = (PlayerEntity) entity.getAttackTarget();
 			if (player.isCreative() || player.isSpectator()) {
 				return false;
 			}
@@ -81,7 +81,7 @@ public class EntitySpellAttackTask<T extends EntityLiving> extends EntityAIBase 
 		return spells[entity.getRNG().nextInt(spells.length)];
 	}
 	
-	protected @Nullable EntityLivingBase getTarget() {
+	protected @Nullable LivingEntity getTarget() {
 		if (needsTarget && null != entity.getAttackTarget()) {
 			return entity.getAttackTarget();
 		}
@@ -100,8 +100,8 @@ public class EntitySpellAttackTask<T extends EntityLiving> extends EntityAIBase 
 			return;
 		}
 		
-		EntityLivingBase target = getTarget();
-		@Nullable EntityLivingBase oldTarget = entity.getAttackTarget();
+		LivingEntity target = getTarget();
+		@Nullable LivingEntity oldTarget = entity.getAttackTarget();
 		if (target != null) {
 			entity.faceEntity(target, 360f, 180f);
 			entity.setAttackTarget(target);
@@ -123,7 +123,7 @@ public class EntitySpellAttackTask<T extends EntityLiving> extends EntityAIBase 
 	public void updateTask() {
 		super.updateTask();
 		
-		EntityLivingBase target = getTarget();
+		LivingEntity target = getTarget();
 		if (target != null) {
 			this.entity.faceEntity(getTarget(), 360f, 180);
 		}

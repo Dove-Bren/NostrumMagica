@@ -6,14 +6,14 @@ import com.smanzana.nostrummagica.blocks.IAetherInfusableTileEntity;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileEntity;
 import com.smanzana.nostrummagica.items.IAetherInfuserLens;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class AltarTileEntity extends TileEntity implements ISidedInventory, IAetherInfusableTileEntity {
@@ -47,29 +47,29 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	private static final String NBT_ITEM = "item";
 	
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt = super.writeToNBT(nbt);
 		
 		if (stack != ItemStack.EMPTY) {
-			NBTTagCompound tag = new NBTTagCompound();
+			CompoundNBT tag = new CompoundNBT();
 			tag = stack.writeToNBT(tag);
-			nbt.setTag(NBT_ITEM, tag);
+			nbt.put(NBT_ITEM, tag);
 		}
 		
 		return nbt;
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(CompoundNBT nbt) {
 		super.readFromNBT(nbt);
 		
 		if (nbt == null)
 			return;
 			
-		if (!nbt.hasKey(NBT_ITEM, NBT.TAG_COMPOUND)) {
+		if (!nbt.contains(NBT_ITEM, NBT.TAG_COMPOUND)) {
 			stack = ItemStack.EMPTY;
 		} else {
-			NBTTagCompound tag = nbt.getCompoundTag(NBT_ITEM);
+			CompoundNBT tag = nbt.getCompound(NBT_ITEM);
 			stack = new ItemStack(tag);
 		}
 	}
@@ -80,8 +80,8 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	}
 
 	@Override
-	public NBTTagCompound getUpdateTag() {
-		return this.writeToNBT(new NBTTagCompound());
+	public CompoundNBT getUpdateTag() {
+		return this.writeToNBT(new CompoundNBT());
 	}
 	
 	@Override
@@ -144,17 +144,17 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	}
 
 	@Override
-	public boolean isUsableByPlayer(EntityPlayer player) {
+	public boolean isUsableByPlayer(PlayerEntity player) {
 		return true;
 	}
 
 	@Override
-	public void openInventory(EntityPlayer player) {
+	public void openInventory(PlayerEntity player) {
 		;
 	}
 
 	@Override
-	public void closeInventory(EntityPlayer player) {
+	public void closeInventory(PlayerEntity player) {
 		;
 	}
 
@@ -195,12 +195,12 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	}
 
 	@Override
-	public int[] getSlotsForFace(EnumFacing side) {
+	public int[] getSlotsForFace(Direction side) {
 		return new int[] {0};
 	}
 
 	@Override
-	public boolean canInsertItem(int index, ItemStack itemStackIn, EnumFacing direction) {
+	public boolean canInsertItem(int index, ItemStack itemStackIn, Direction direction) {
 		if (index != 0)
 			return false;
 		
@@ -208,7 +208,7 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	}
 
 	@Override
-	public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
+	public boolean canExtractItem(int index, ItemStack stack, Direction direction) {
 		return index == 0 && !stack.isEmpty();
 	}
 

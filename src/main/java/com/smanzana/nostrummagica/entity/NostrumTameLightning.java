@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -22,7 +22,7 @@ public class NostrumTameLightning extends EntityLightningBolt {
 	/** Declares which state the lightning bolt is in. Whether it's in the air, hit the ground, etc. */
 	private int lightningState;
 	
-	private @Nullable EntityLivingBase ignoreEntity;
+	private @Nullable LivingEntity ignoreEntity;
 	
 	public NostrumTameLightning(World worldIn) {
 		this(worldIn, 0, 0, 0);
@@ -33,19 +33,19 @@ public class NostrumTameLightning extends EntityLightningBolt {
 		this.lightningState = 2;
 	}
 	
-	public NostrumTameLightning setEntityToIgnore(@Nullable EntityLivingBase entity) {
+	public NostrumTameLightning setEntityToIgnore(@Nullable LivingEntity entity) {
 		this.ignoreEntity = entity;
 		return this;
 	}
 
-	public static void doEffect(EntityLivingBase entity) {
+	public static void doEffect(LivingEntity entity) {
 		if (entity.world.isRemote) {
 			return;
 		}
 		
 		NostrumParticles.LIGHTNING_STATIC.spawn(entity.world, new SpawnParams(
 				3,
-				entity.posX, entity.posY + entity.height, entity.posZ, 1, 30, 5,
+				entity.posX, entity.posY + entity.getHeight(), entity.posZ, 1, 30, 5,
 				new Vec3d(0, -0.05, 0), null
 				).color(0x80000000 | (0x00FFFFFF & EMagicElement.LIGHTNING.getColor())));
 	}

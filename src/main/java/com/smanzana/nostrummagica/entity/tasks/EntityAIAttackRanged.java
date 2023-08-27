@@ -2,15 +2,15 @@ package com.smanzana.nostrummagica.entity.tasks;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IRangedAttackMob;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBow;
 import net.minecraft.util.EnumHand;
 
-public class EntityAIAttackRanged<T extends EntityLiving> extends EntityAIBase
+public class EntityAIAttackRanged<T extends MobEntity> extends EntityAIBase
 {
 	protected final T entity;
 	private final double moveSpeedAmp;
@@ -113,7 +113,7 @@ public class EntityAIAttackRanged<T extends EntityLiving> extends EntityAIBase
 		resetAllAnimation(entity);
 	}
 	
-	public void attackTarget(T entity, EntityLivingBase target, int chargeCount) {
+	public void attackTarget(T entity, LivingEntity target, int chargeCount) {
 		if (entity instanceof IRangedAttackMob) {
 			IRangedAttackMob mob = (IRangedAttackMob) this.entity;
 			mob.attackEntityWithRangedAttack(target, ItemBow.getArrowVelocity(chargeCount));
@@ -127,10 +127,10 @@ public class EntityAIAttackRanged<T extends EntityLiving> extends EntityAIBase
 	 * Updates the task
 	 */
 	public void updateTask() {
-		EntityLivingBase entitylivingbase = this.entity.getAttackTarget();
+		LivingEntity entitylivingbase = this.entity.getAttackTarget();
 
 		if (entitylivingbase != null) {
-			double d0 = this.entity.getDistanceSq(entitylivingbase.posX, entitylivingbase.getEntityBoundingBox().minY, entitylivingbase.posZ);
+			double d0 = this.entity.getDistanceSq(entitylivingbase.posX, entitylivingbase.getBoundingBox().minY, entitylivingbase.posZ);
 			boolean flag = this.entity.getEntitySenses().canSee(entitylivingbase);
 			boolean flag1 = this.seeTime > 0;
 

@@ -13,11 +13,11 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class SpellTomePage extends Item implements ILoreTagged {
 
@@ -45,20 +45,20 @@ public class SpellTomePage extends Item implements ILoreTagged {
 	public static ItemStack getItemstack(SpellTomeEnhancement enhancement, int level) {
 		ItemStack stack = new ItemStack(instance);
 		
-		NBTTagCompound nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTagCompound();
 		
 		if (nbt == null)
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		
-		nbt.setInteger(NBT_LEVEL, level);
-		nbt.setString(NBT_TYPE, enhancement.getTitleKey());
+		nbt.putInt(NBT_LEVEL, level);
+		nbt.putString(NBT_TYPE, enhancement.getTitleKey());
 		
 		stack.setTagCompound(nbt);
 		return stack;
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
 		if (this.isInCreativeTab(tab)) {
 			// For all registered enhancements, create an item in the creative tab
@@ -89,7 +89,7 @@ public class SpellTomePage extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		SpellTomeEnhancement enhance = getEnhancement(stack);
 		if (enhance == null)

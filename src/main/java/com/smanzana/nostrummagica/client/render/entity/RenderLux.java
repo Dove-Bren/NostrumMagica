@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.client.render.entity;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityLux;
 
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.ResourceLocation;
@@ -16,9 +16,9 @@ public class RenderLux extends RenderLiving<EntityLux> {
 	
 	@Override
 	public void doRender(EntityLux entity, double x, double y, double z, float entityYaw, float partialTicks) {
-		GlStateManager.color(.65f, 1f, .7f);
+		GlStateManager.color4f(.65f, 1f, .7f);
 		super.doRender(entity, x, y, z, entityYaw, partialTicks);
-		GlStateManager.color(1f, 1f, 1f);
+		GlStateManager.color4f(1f, 1f, 1f);
 	}
 
 	@Override

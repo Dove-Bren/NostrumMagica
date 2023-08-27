@@ -19,12 +19,12 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
@@ -43,36 +43,36 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 		
 		public final long addTick;
 		public final ItemStack stack;
-		public final EnumFacing inputDirection;
+		public final Direction inputDirection;
 		
-		public ItemEntry(long addTick, ItemStack stack, EnumFacing inputDirection) {
+		public ItemEntry(long addTick, ItemStack stack, Direction inputDirection) {
 			this.addTick = addTick;
 			this.stack = stack;
 			this.inputDirection = inputDirection;
 		}
 		
-		public NBTTagCompound toNBT() {
-			NBTTagCompound tag = new NBTTagCompound();
-			tag.setLong(NBT_TICK, addTick);
-			tag.setTag(NBT_ITEM, stack.serializeNBT());
-			tag.setInteger(NBT_DIRECTION, inputDirection.getIndex());
+		public CompoundNBT toNBT() {
+			CompoundNBT tag = new CompoundNBT();
+			tag.putLong(NBT_TICK, addTick);
+			tag.put(NBT_ITEM, stack.serializeNBT());
+			tag.putInt(NBT_DIRECTION, inputDirection.getIndex());
 			return tag;
 		}
 		
-		public static final ItemDuctTileEntity.ItemEntry fromNBT(NBTTagCompound tag) {
+		public static final ItemDuctTileEntity.ItemEntry fromNBT(CompoundNBT tag) {
 			final long tick = tag.getLong(NBT_TICK);
-			final ItemStack stack = new ItemStack(tag.getCompoundTag(NBT_ITEM));
-			final EnumFacing dir = EnumFacing.VALUES[tag.getInteger(NBT_DIRECTION)];
+			final ItemStack stack = new ItemStack(tag.getCompound(NBT_ITEM));
+			final Direction dir = Direction.VALUES[tag.getInt(NBT_DIRECTION)];
 			return new ItemEntry(tick, stack, dir);
 		}
 	}
 	
 	private static final class SidedItemHandler implements IItemHandler {
 
-		public final EnumFacing side;
+		public final Direction side;
 		private final ItemDuctTileEntity entity;
 		
-		public SidedItemHandler(ItemDuctTileEntity entity, EnumFacing side) {
+		public SidedItemHandler(ItemDuctTileEntity entity, Direction side) {
 			this.entity = entity;
 			this.side = side;
 		}
@@ -136,38 +136,38 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 		itemQueue = new LinkedList<>();
 		ticks = 0;
 		handlers = new ItemDuctTileEntity.SidedItemHandler[] { // D U N S W E
-			new SidedItemHandler(this, EnumFacing.DOWN),
-			new SidedItemHandler(this, EnumFacing.UP),
-			new SidedItemHandler(this, EnumFacing.NORTH),
-			new SidedItemHandler(this, EnumFacing.SOUTH),
-			new SidedItemHandler(this, EnumFacing.WEST),
-			new SidedItemHandler(this, EnumFacing.EAST),
+			new SidedItemHandler(this, Direction.DOWN),
+			new SidedItemHandler(this, Direction.UP),
+			new SidedItemHandler(this, Direction.NORTH),
+			new SidedItemHandler(this, Direction.SOUTH),
+			new SidedItemHandler(this, Direction.WEST),
+			new SidedItemHandler(this, Direction.EAST),
 		};
 	}
 	
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt = super.writeToNBT(nbt);
 		
-		NBTTagList list = new NBTTagList();
+		ListNBT list = new ListNBT();
 		for (ItemDuctTileEntity.ItemEntry entry : itemQueue) {
-			list.appendTag(entry.toNBT());
+			list.add(entry.toNBT());
 		}
-		nbt.setTag(NBT_SORTED, list);
+		nbt.put(NBT_SORTED, list);
 		
-		nbt.setLong(NBT_TICKS, ticks);
+		nbt.putLong(NBT_TICKS, ticks);
 		
 		return nbt;
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(CompoundNBT nbt) {
 		super.readFromNBT(nbt);
 		
 		itemQueue.clear();
-		NBTTagList list = nbt.getTagList(NBT_SORTED, NBT.TAG_COMPOUND);
-		for (int i = 0; i < list.tagCount(); i++) {
-			NBTTagCompound tag = list.getCompoundTagAt(i);
+		ListNBT list = nbt.getList(NBT_SORTED, NBT.TAG_COMPOUND);
+		for (int i = 0; i < list.size(); i++) {
+			CompoundNBT tag = list.getCompoundTagAt(i);
 			itemQueue.add(ItemEntry.fromNBT(tag));
 		}
 		
@@ -198,7 +198,7 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 		this.markDirty();
 	}
 	
-	protected ItemDuctTileEntity.ItemEntry addItem(@Nonnull ItemStack stack, EnumFacing dir) {
+	protected ItemDuctTileEntity.ItemEntry addItem(@Nonnull ItemStack stack, Direction dir) {
 		ItemDuctTileEntity.ItemEntry entry = new ItemEntry(ticks, stack, dir);
 		this.itemQueue.add(entry);
 		this.markDirty();
@@ -209,7 +209,7 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 		return itemQueue.size() >= MAX_STACKS;
 	}
 	
-	protected boolean tryAdd(@Nullable ItemStack stack, EnumFacing dir) {
+	protected boolean tryAdd(@Nullable ItemStack stack, Direction dir) {
 		if (stack.isEmpty()) {
 			return false;
 		}
@@ -226,21 +226,21 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 	}
 	
 	@Override
-	public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+	public boolean hasCapability(Capability<?> capability, Direction facing) {
 		// Maybe this should check if we're connected?
 		return (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+	public <T> T getCapability(Capability<T> capability, Direction facing) {
 		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
 			return (T) handlers[facing.getIndex()];
 		}
 		return super.getCapability(capability, facing);
 	}
 	
-	public ItemStack insertItem(ItemStack stack, EnumFacing side, boolean simulate) {
+	public ItemStack insertItem(ItemStack stack, Direction side, boolean simulate) {
 		if (!simulate) {
 			tryAdd(stack, side);
 		}
@@ -248,7 +248,7 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 		return ItemStack.EMPTY; // Always 'take' it
 	}
 
-	public ItemStack extractItem(int amount, EnumFacing side, boolean simulate) {
+	public ItemStack extractItem(int amount, Direction side, boolean simulate) {
 		// No extraction at all!
 		return ItemStack.EMPTY;
 	}
@@ -305,9 +305,9 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 		
 		if (!stack.isEmpty()) {
 			// Push in random directions
-			List<EnumFacing> rand = Lists.newArrayList(EnumFacing.VALUES);
+			List<Direction> rand = Lists.newArrayList(Direction.VALUES);
 			Collections.shuffle(rand);
-			for (EnumFacing dir : rand) {
+			for (Direction dir : rand) {
 				// Don't go backwards and skip forwards since we just tried that
 				if (dir == entry.inputDirection || dir == entry.inputDirection.getOpposite()) {
 					continue;
@@ -336,7 +336,7 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 	 * @param direction
 	 * @return
 	 */
-	private @Nonnull ItemStack attemptPush(ItemStack stack, EnumFacing direction) {
+	private @Nonnull ItemStack attemptPush(ItemStack stack, Direction direction) {
 		@Nullable TileEntity te = world.getTileEntity(pos.offset(direction));
 		
 		if (te != null) {
@@ -364,7 +364,7 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 		return stack;
 	}
 	
-	private @Nonnull ItemStack pushInto(ItemStack stack, IInventory inventory, EnumFacing direction) {
+	private @Nonnull ItemStack pushInto(ItemStack stack, IInventory inventory, Direction direction) {
 		if (inventory instanceof ISidedInventory) {
 			ISidedInventory sided = (ISidedInventory) inventory;
 			for (int insertIndex : sided.getSlotsForFace(direction.getOpposite())) {
@@ -404,7 +404,7 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 		return stack;
 	}
 	
-	private @Nonnull ItemStack pushInto(ItemStack stack, IItemHandler handler, EnumFacing direction) {
+	private @Nonnull ItemStack pushInto(ItemStack stack, IItemHandler handler, Direction direction) {
 		// TODO safe to always run with false?
 		return ItemHandlerHelper.insertItem(handler, stack, false);
 	}

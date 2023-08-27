@@ -1,17 +1,17 @@
 package com.smanzana.nostrummagica.client.effects;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * Effect made up of multiple copies of another effect
  * @author Skyler
  *
  */
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class ClientEffectMirrored extends ClientEffect {
 
 	private int count;
@@ -52,7 +52,7 @@ public class ClientEffectMirrored extends ClientEffect {
 			newDetail.blue = detail.blue;
 			
 			GlStateManager.pushMatrix();
-			GlStateManager.rotate(dAngle * (float) i, (float) eulers.x, (float) eulers.y, (float) eulers.z);
+			GlStateManager.rotatef(dAngle * (float) i, (float) eulers.x, (float) eulers.y, (float) eulers.z);
 			super.drawForm(newDetail, mc, progress, partialTicks);
 			GlStateManager.popMatrix();
 		}

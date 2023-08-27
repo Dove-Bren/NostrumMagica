@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
@@ -45,7 +45,7 @@ public class TouchTrigger extends InstantTrigger {
 	@Override
 	protected TriggerData getTargetData(SpellState state, World world,
 				Vec3d pos, float pitch, float yaw) {
-		pos = pos.addVector(0, state.getSelf().getEyeHeight(), 0);
+		pos = pos.add(0, state.getSelf().getEyeHeight(), 0);
 		
 		RayTraceResult trace = RayTrace.raytrace(world, pos, pitch, yaw, TOUCH_RANGE, new RayTrace.OtherLiving(state.getCaster()));
 		
@@ -53,7 +53,7 @@ public class TouchTrigger extends InstantTrigger {
 			return new TriggerData(null, null, null, null);
 		}
 		
-		List<EntityLivingBase> others = Lists.newArrayList(state.getSelf());
+		List<LivingEntity> others = Lists.newArrayList(state.getSelf());
 		if (trace.typeOfHit == RayTraceResult.Type.ENTITY
 				&& null != NostrumMagica.resolveEntityLiving(trace.entityHit)
 				&& !NostrumMagica.resolveEntityLiving(trace.entityHit).isEntityEqual(state.getSelf())) {

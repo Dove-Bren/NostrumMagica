@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 
 public abstract class SpellTomeEnhancement {
 	
@@ -90,7 +90,7 @@ public abstract class SpellTomeEnhancement {
 	 * @param source
 	 * @param attributes
 	 */
-	public abstract void onCast(int level, SpellCastSummary summaryIn, EntityLivingBase source, INostrumMagic attributes);
+	public abstract void onCast(int level, SpellCastSummary summaryIn, LivingEntity source, INostrumMagic attributes);
 	
 	public static void initDefaultEnhancements() {
 		LOWER_REAGENT_COST = new EnhancementLowerReagentCost();

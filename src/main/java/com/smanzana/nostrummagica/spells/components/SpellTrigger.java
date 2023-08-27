@@ -8,7 +8,7 @@ import java.util.Map;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
@@ -65,16 +65,16 @@ public abstract class SpellTrigger {
 		 * Called after trigger stuff is set up in owning spell.
 		 * @param caster
 		 */
-		public abstract void init(EntityLivingBase caster);
+		public abstract void init(LivingEntity caster);
 	}
 	
 	protected static class TriggerData {
-		public List<EntityLivingBase> targets;
-		public List<EntityLivingBase> others;
+		public List<LivingEntity> targets;
+		public List<LivingEntity> others;
 		public World world;
 		public List<BlockPos> pos;
 		
-		public TriggerData(List<EntityLivingBase> targets, List<EntityLivingBase> others, World world, List<BlockPos> pos) {
+		public TriggerData(List<LivingEntity> targets, List<LivingEntity> others, World world, List<BlockPos> pos) {
 			this.targets = targets;
 			this.others = others;
 			this.pos = pos;

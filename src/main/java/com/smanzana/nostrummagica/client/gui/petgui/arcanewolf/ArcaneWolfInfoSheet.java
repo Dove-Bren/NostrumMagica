@@ -10,8 +10,8 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 
 public class ArcaneWolfInfoSheet implements IPetGUISheet<EntityArcaneWolf> {
 
@@ -22,18 +22,18 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<EntityArcaneWolf> {
 	}
 	
 	@Override
-	public void showSheet(EntityArcaneWolf wolf, EntityPlayer player, PetContainer<EntityArcaneWolf> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(EntityArcaneWolf wolf, PlayerEntity player, PetContainer<EntityArcaneWolf> container, int width, int height, int offsetX, int offsetY) {
 		
 	}
 
 	@Override
-	public void hideSheet(EntityArcaneWolf wolf, EntityPlayer player, PetContainer<EntityArcaneWolf> container) {
+	public void hideSheet(EntityArcaneWolf wolf, PlayerEntity player, PetContainer<EntityArcaneWolf> container) {
 		
 	}
 
 	@Override
 	public void draw(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
-		FontRenderer fonter = mc.fontRenderer;
+		font fonter = mc.font;
 		int x = 0;
 		int y = 5;
 		int w;
@@ -221,7 +221,7 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<EntityArcaneWolf> {
 	}
 
 	@Override
-	public void handleMessage(NBTTagCompound data) {
+	public void handleMessage(CompoundNBT data) {
 		
 	}
 

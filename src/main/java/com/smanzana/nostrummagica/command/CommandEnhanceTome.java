@@ -7,10 +7,10 @@ import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrap
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 
 public class CommandEnhanceTome extends CommandBase {
 
@@ -30,11 +30,11 @@ public class CommandEnhanceTome extends CommandBase {
 		if (args.length != 2)
 			throw new CommandException("Not enough arguments", new Object[0]);
 		
-		if (sender instanceof EntityPlayer) {
-			EntityPlayer player = (EntityPlayer) sender;
+		if (sender instanceof PlayerEntity) {
+			PlayerEntity player = (PlayerEntity) sender;
 			ItemStack tome = player.getHeldItemMainhand();
 			if (tome.isEmpty() || !(tome.getItem() instanceof SpellTome)) {
-				sender.sendMessage(new TextComponentString("Did not find a spelltome in your mainhand!"));
+				sender.sendMessage(new StringTextComponent("Did not find a spelltome in your mainhand!"));
 				return;
 			}
 			
@@ -51,7 +51,7 @@ public class CommandEnhanceTome extends CommandBase {
 			
 			SpellTome.addEnhancement(tome, new SpellTomeEnhancementWrapper(enhancement, level));
 		} else {
-			sender.sendMessage(new TextComponentString("This command must be run as a player"));
+			sender.sendMessage(new StringTextComponent("This command must be run as a player"));
 		}
 	}
 

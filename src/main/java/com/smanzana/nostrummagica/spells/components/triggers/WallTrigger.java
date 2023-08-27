@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -41,7 +41,7 @@ public class WallTrigger extends TriggerAreaTrigger {
 		}
 		
 		@Override
-		public void init(EntityLivingBase caster) {
+		public void init(LivingEntity caster) {
 			// Figure out bounds
 			if (this.northsouth) {
 				this.minX = Math.floor(pos.x) -.25;
@@ -59,7 +59,7 @@ public class WallTrigger extends TriggerAreaTrigger {
 		}
 		
 		@Override
-		protected boolean isInArea(EntityLivingBase entity) {
+		protected boolean isInArea(LivingEntity entity) {
 			return entity.posX >= this.minX && entity.posX <= this.maxX
 					&& entity.posZ >= this.minZ && entity.posZ <= this.maxZ
 					&& entity.posY >= Math.floor(this.pos.y) && entity.posY <= Math.floor(this.pos.y) + 2;

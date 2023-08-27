@@ -1,6 +1,5 @@
 package com.smanzana.nostrummagica.client.gui.infoscreen;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -8,23 +7,21 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.StackableScreen;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiLabel;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.gui.widget.button.AbstractButton;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.client.config.GuiUtils;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class InfoScreen extends StackableScreen {
 	
@@ -40,7 +37,7 @@ public class InfoScreen extends StackableScreen {
 	
 	private INostrumMagic attribute;
 	private List<TabButton> tabs;
-	private List<InfoButton> buttons;
+	private List<InfoButton> infoButtons;
 	private IInfoSubScreen subscreen;
 	private List<ISubScreenButton> subscreenButtons;
 	
@@ -75,7 +72,7 @@ public class InfoScreen extends StackableScreen {
 //			if (butt.buttons == null || butt.buttons.isEmpty())
 //				continue;
 //			tabs.add(butt);
-//			this.buttonList.add(butt);
+//			this.buttons.add(butt);
 //		}
 //		
 //		// Open up startup location, if one was provided
@@ -97,9 +94,9 @@ public class InfoScreen extends StackableScreen {
 	}
 	
 	@Override
-	public void initGui() {
+	public void init() {
 		tabs = new LinkedList<>();
-		buttons = new LinkedList<>();
+		infoButtons = new LinkedList<>();
 		subscreenButtons = new LinkedList<>();
 		subscreen = null;
 		scrollY = 0;
@@ -111,13 +108,13 @@ public class InfoScreen extends StackableScreen {
 			InfoScreenTab inst = InfoScreenTab.get(tab);
 			if (inst == null || !inst.isVisible(this.attribute))
 				continue;
-			TabButton butt = new TabButton(globButtonID++,
+			TabButton butt = new TabButton(
 					2 + (tabs.size() * (2 + TabButton.TEXT_BUTTON_TAB_WIDTH)), 2,
 					this.attribute, inst);
 			if (butt.buttons == null || butt.buttons.isEmpty())
 				continue;
 			tabs.add(butt);
-			this.buttonList.add(butt);
+			this.buttons.add(butt);
 		}
 		
 		// Open up startup location, if one was provided
@@ -134,21 +131,21 @@ public class InfoScreen extends StackableScreen {
 	}
 	
 	@Override
-	public void onResize(Minecraft mcIn, int w, int h) {
+	public void resize(Minecraft mcIn, int w, int h) {
 		// Save our current spot
 		
-		super.onResize(mcIn, w, h);
+		super.resize(mcIn, w, h);
 	}
 	
 	@Override	
-	public void updateScreen() {
+	public void tick() {
 		;
 	}
 	
 	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+	public void render(int mouseX, int mouseY, float partialTicks) {
 
-		Gui.drawRect(0, 0, width, height, 0xFF000000);
+		RenderFuncs.drawRect(0, 0, width, height, 0xFF000000);
 		
 		if (this.subscreen != null) {
 			
@@ -156,53 +153,53 @@ public class InfoScreen extends StackableScreen {
 			final int maxHorizontal = this.width / (InfoButton.BUTTON_WIDTH + 2);
 			int xOffset = 0;
 			int yOffset = POS_BUTTONS_HEIGHT + POS_BUTTONS_HEIGHT;
-			if (buttons.size() > maxHorizontal * 2) {
+			if (infoButtons.size() > maxHorizontal * 2) {
 				xOffset = (2 + InfoButton.BUTTON_WIDTH) * 5;
 				yOffset = 10;
 			}
 			
 			yOffset += POS_SUBSCREEN_VOFFSET;
 			
-			this.subscreen.draw(attribute, mc, xOffset, yOffset, width - xOffset, height - yOffset, mouseX, mouseY);
+			this.subscreen.draw(attribute, minecraft, xOffset, yOffset, width - xOffset, height - yOffset, mouseX, mouseY);
 		}
 		
 		// Do buttons and other parent stuff
-		for (int i = 0; i < this.buttonList.size(); ++i) {
-			((GuiButton)this.buttonList.get(i)).drawButton(this.mc, mouseX, mouseY, partialTicks);
+		for (int i = 0; i < this.buttons.size(); ++i) {
+			((AbstractButton)this.buttons.get(i)).render(mouseX, mouseY, partialTicks);
 		}
 		
 		// Mask out any partial buttons or buttons that are above button line, since we support scrolling
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(0, 0, 500);
+		GlStateManager.translatef(0, 0, 500);
 		if (scrollY > 0) {
-			Gui.drawRect(0, 0, width, POS_SUBSCREEN_VOFFSET, 0xFF000000);
+			RenderFuncs.drawRect(0, 0, width, POS_SUBSCREEN_VOFFSET, 0xFF000000);
 		}
 		
 		for (int i = 0; i < this.tabs.size(); ++i) {
-			((GuiButton)this.tabs.get(i)).drawButton(this.mc, mouseX, mouseY, partialTicks);
+			((AbstractButton)this.tabs.get(i)).render(mouseX, mouseY, partialTicks);
 		}
 		GlStateManager.popMatrix();
 
-		for (int j = 0; j < this.labelList.size(); ++j) {
-			((GuiLabel)this.labelList.get(j)).drawLabel(this.mc, mouseX, mouseY);
-		}
+//		for (int j = 0; j < this.labelList.size(); ++j) {
+//			((GuiLabel)this.labelList.get(j)).drawLabel(this.minecraft, mouseX, mouseY);
+//		}
 		
-		// Only show sub buttons if mouseY is lower than button  vertical offset
-		if (mouseY > POS_SUBSCREEN_VOFFSET) {
-			for (int i = 0; i < this.buttonList.size(); ++i) {
-				((GuiButton)this.buttonList.get(i)).drawButtonForegroundLayer(mouseX, mouseY);
-				//this.buttonList.get(0).drawButtonForegroundLayer(mouseX, mouseY);
-			}
-		}
-		
-		for (int i = 0; i < this.tabs.size(); ++i) {
-			((GuiButton)this.tabs.get(i)).drawButtonForegroundLayer(mouseX, mouseY);
-		}
+//		// Only show sub buttons if mouseY is lower than button  vertical offset
+//		if (mouseY > POS_SUBSCREEN_VOFFSET) {
+//			for (int i = 0; i < this.buttons.size(); ++i) {
+//				((AbstractButton)this.buttons.get(i)).drawButtonForegroundLayer(mouseX, mouseY);
+//			}
+//		}
+//		
+//		for (int i = 0; i < this.tabs.size(); ++i) {
+//			((AbstractButton)this.tabs.get(i)).drawButtonForegroundLayer(mouseX, mouseY);
+//		}
+		// TODO ?
 		
 	}
 	
 	@Override
-	public boolean doesGuiPauseGame() {
+	public boolean isPauseScreen() {
 		return true;
 	}
 	
@@ -212,7 +209,7 @@ public class InfoScreen extends StackableScreen {
 		activateButtons(tabButton.getButtons());
 	}
 	
-	private void selectScreen(InfoButton button) {
+	public void selectScreen(InfoButton button) {
 		// Since we allow scrolling, disallow clicks that are above the button location
 		this.subscreen = ((InfoButton) button).getScreen(attribute);
 		this.subscreenButtons.clear();
@@ -224,43 +221,28 @@ public class InfoScreen extends StackableScreen {
 			int i = 0;
 			for (ISubScreenButton butt : subscreenButtons) {
 				butt.x = i;
-				i += butt.width + 2;
+				i += butt.getWidth() + 2;
 				butt.y = this.height - 15;
 			}
 		}
 		
-		this.buttonList.clear();
-		this.buttonList.addAll(this.tabs);
-		this.buttonList.addAll(this.buttons);
-		this.buttonList.addAll(this.subscreenButtons);
-	}
-	
-	@Override
-	public void actionPerformed(GuiButton button) {
-		if (!button.visible)
-			return;
-		
-		if (button instanceof InfoButton) {
-			selectScreen((InfoButton) button);
-		} else if (button instanceof TabButton) {
-			selectTab((TabButton) button);
-		} else if (button instanceof ISubScreenButton) {
-			((ISubScreenButton) button).onClick(attribute);
-		}
-
+		this.buttons.clear();
+		this.buttons.addAll(this.tabs);
+		this.buttons.addAll(this.infoButtons);
+		this.buttons.addAll(this.subscreenButtons);
 	}
 	
 	private void activateButtons(List<InfoButton> buttons) {
-		if (this.buttons != null) {
-			for (InfoButton button : this.buttons) {
+		if (this.infoButtons != null) {
+			for (InfoButton button : this.infoButtons) {
 				button.visible = false;
 			}
 		}
-		this.buttons = buttons;
-		this.buttonList.clear();
-		this.buttonList.addAll(this.tabs);
-		this.buttonList.addAll(this.buttons);
-		this.buttonList.addAll(this.subscreenButtons);
+		this.infoButtons = buttons;
+		this.buttons.clear();
+		this.buttons.addAll(this.tabs);
+		this.buttons.addAll(this.infoButtons);
+		this.buttons.addAll(this.subscreenButtons);
 		int i = 0;
 		int j = 0;
 		
@@ -272,7 +254,7 @@ public class InfoScreen extends StackableScreen {
 		} else {
 			cutoff = 5;
 		}
-		for (InfoButton button : this.buttons) {
+		for (InfoButton button : this.infoButtons) {
 			button.visible = true;
 			button.x = i++ * (InfoButton.BUTTON_WIDTH + 2);
 			button.y = (j * (InfoButton.BUTTON_WIDTH + 2)) + (POS_TABS_HEIGHT + 2);
@@ -287,14 +269,9 @@ public class InfoScreen extends StackableScreen {
 	}
 	
 	@Override
-	public void handleMouseInput() throws IOException {
-		int dWheel = Mouse.getDWheel();
-		if (dWheel != 0) {
-			int mx = Mouse.getEventX() * this.width / this.mc.displayWidth;
-	        int my = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
-			handleMouseScroll(dWheel > 0 ? 1 : -1, mx, my);
-		} else
-			super.handleMouseInput();
+	public boolean mouseScrolled(double mouseX, double mouseY, double dx) {
+		this.handleMouseScroll(dx > 0 ? 1 : 0, (int) mouseX, (int) mouseY);
+		return true;
 	}
 	
 	protected void handleMouseScroll(int dx, int mouseX, int mouseY) {
@@ -318,25 +295,25 @@ public class InfoScreen extends StackableScreen {
 		}
 		
 		if (lastScroll != scrollY) {
-			for (InfoButton button : this.buttons) {
+			for (InfoButton button : this.infoButtons) {
 				button.y -= (scrollY - lastScroll);
 			}
 		}
 	}
 	
-	@SideOnly(Side.CLIENT)
-	class TabButton extends GuiButton {
+	@OnlyIn(Dist.CLIENT)
+	class TabButton extends AbstractButton {
 		
 		private static final int TEXT_BUTTON_TAB_WIDTH = 32;
         private InfoScreenTab tab;
         private List<InfoButton> buttons;
         private List<String> desc;
 
-        public TabButton(int parButtonId, int parPosX, int parPosY, 
+        public TabButton(int parPosX, int parPosY, 
         		INostrumMagic attr, InfoScreenTab tab) {
-            super(parButtonId, parPosX, parPosY, TEXT_BUTTON_TAB_WIDTH, TEXT_BUTTON_TAB_WIDTH, "");
+            super(parPosX, parPosY, TEXT_BUTTON_TAB_WIDTH, TEXT_BUTTON_TAB_WIDTH, "");
             this.tab = tab;
-            this.buttons = tab.getButtons(globButtonID++, attr);
+            this.buttons = tab.getButtons(InfoScreen.this, attr);
             
             if (this.buttons == null || this.buttons.isEmpty() || !tab.isVisible(attr))
             	this.visible = false;
@@ -357,7 +334,7 @@ public class InfoScreen extends StackableScreen {
          * Draws this button to the screen.
          */
         @Override
-        public void drawButton(Minecraft mc, int parX, int parY, float partialTicks) {
+        public void render(int parX, int parY, float partialTicks) {
             if (visible)
             {
             	final int itemLength = 18;
@@ -370,34 +347,40 @@ public class InfoScreen extends StackableScreen {
             	}
                 
                 GL11.glColor4f(tint, tint, tint, 1f);
-                mc.getTextureManager().bindTexture(background);
+                minecraft.getTextureManager().bindTexture(background);
                 GlStateManager.enableBlend();
-                Gui.drawModalRectWithCustomSizedTexture(this.x, this.y, 0, TEXT_BUTTON_TAB_VOFFSET,
+                RenderFuncs.drawModalRectWithCustomSizedTexture(this.x, this.y, 0, TEXT_BUTTON_TAB_VOFFSET,
                 		TEXT_BUTTON_TAB_WIDTH, TEXT_BUTTON_TAB_WIDTH, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
                 GlStateManager.disableBlend();
                 
                 RenderHelper.enableGUIStandardItemLighting();
                 int x = this.x + (TEXT_BUTTON_TAB_WIDTH - itemLength) / 2;
                 int y = this.y + (TEXT_BUTTON_TAB_WIDTH - itemLength) / 2;
-                mc.getRenderItem().renderItemIntoGUI(tab.getIcon(), x, y);
+                minecraft.getItemRenderer().renderItemIntoGUI(tab.getIcon(), x, y);
+                
+                drawButtonForegroundLayer(parX, parY);
             }
         }
         
-        @Override
     	public void drawButtonForegroundLayer(int mouseX, int mouseY) {
     		if (mouseX >= this.x && mouseY > this.y
     			&& mouseX <= this.x + this.width
     			&& mouseY <= this.y + this.height) {
-    			Minecraft mc = Minecraft.getMinecraft();
+    			Minecraft minecraft = Minecraft.getInstance();
     			GuiUtils.drawHoveringText(desc,
     					mouseX,
     					mouseY,
-    					mc.displayWidth,
-    					mc.displayHeight,
+    					minecraft.mainWindow.getWidth(),
+    					minecraft.mainWindow.getHeight(),
     					100,
-    					mc.fontRenderer);
+    					minecraft.fontRenderer);
     		}
     	}
+
+		@Override
+		public void onPress() {
+			InfoScreen.this.selectTab(this);
+		}
     }
 	
 }

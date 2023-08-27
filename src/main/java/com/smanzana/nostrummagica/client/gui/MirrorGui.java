@@ -41,28 +41,28 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.utils.Curves;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.Button;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.GlStateManager.DestFactor;
-import net.minecraft.client.renderer.GlStateManager.SourceFactor;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.text.TextFormatting;
 
-public class MirrorGui extends GuiScreen {
+public class MirrorGui extends Screen {
 	
 	private static final int TEXT_WIDTH = 300;
 	private static final int TEXT_HEIGHT = 300;
@@ -131,7 +131,7 @@ public class MirrorGui extends GuiScreen {
 	private final static float fontScale = 0.75f;
 	
 	//private INostrumMagic attr;
-	private EntityPlayer player;
+	private PlayerEntity player;
 	
 	// Cache attributes. Don't be dumb
 	private float xp, maxXP;
@@ -175,7 +175,7 @@ public class MirrorGui extends GuiScreen {
 	private Map<NostrumResearch, ResearchButton> researchButtons;
 	private int buttonIDs;
 	
-	public MirrorGui(EntityPlayer player) {
+	public MirrorGui(PlayerEntity player) {
 		this.width = TEXT_WIDTH + BUTTON_MAJOR_WIDTH;
 		//this.height = GUI_HEIGHT;
 		this.height = 242;
@@ -247,8 +247,8 @@ public class MirrorGui extends GuiScreen {
 	}
 	
 	@Override
-	public void initGui() {
-		super.initGui();
+	public void init() {
+		super.init();
 		
 		int GUI_HEIGHT = 242;
 		int KEY_HEIGHT = 15 + 5;
@@ -261,7 +261,7 @@ public class MirrorGui extends GuiScreen {
 			MirrorGui.guiY = topOffset + TEXT_CONTENT_VOFFSET + (int) ((float) TEXT_CONTENT_HEIGHT / 2f);
 		}
 		
-		tabCharacter = new MajorTabButton("character", new ItemStack(Items.SKULL, 1, 3), buttonIDs++, leftOffset - BUTTON_MAJOR_WIDTH, topOffset);
+		tabCharacter = new MajorTabButton("character", new ItemStack(Items.PLAYER_HEAD, 1), buttonIDs++, leftOffset - BUTTON_MAJOR_WIDTH, topOffset);
 		tabResearch = new MajorTabButton("research", new ItemStack(SpellTomePage.instance()), buttonIDs++, leftOffset - BUTTON_MAJOR_WIDTH, topOffset + TEXT_ICON_MAJORBUTTON_HEIGHT);
 		buttonControl = new ImproveButton(buttonIDs++, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (KEY_WIDTH + TEXT_ICON_BUTTON_LENGTH),
 				topOffset + TEXT_BOTTOM_VOFFSET + KEY_VOFFSET);
@@ -277,19 +277,19 @@ public class MirrorGui extends GuiScreen {
 		int GUI_HEIGHT = 242;
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - GUI_HEIGHT) / 2;
-		float extra = .2f * (float) Math.sin((double) Minecraft.getSystemTime() / 1500.0);
+		float extra = .2f * (float) Math.sin((double) System.currentTimeMillis() / 1500.0);
 		float inv = .2f - extra;
-		GlStateManager.color(.8f + extra, 1f, .8f + inv, 1f);
-		Minecraft.getMinecraft().getTextureManager().bindTexture(RES_BACK_CLEAR);
+		GlStateManager.color4f(.8f + extra, 1f, .8f + inv, 1f);
+		Minecraft.getInstance().getTextureManager().bindTexture(RES_BACK_CLEAR);
 		Gui.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT);
 		
-		for (int i = 0; i < this.buttonList.size(); ++i) {
-			GuiButton button = (GuiButton)this.buttonList.get(i);
+		for (int i = 0; i < this.buttons.size(); ++i) {
+			Button button = (Button)this.buttons.get(i);
 			if (button instanceof QuestButton)
 				((QuestButton) button).drawTreeLines(mc);
 		}
-		for (int i = 0; i < this.buttonList.size(); ++i) {
-			GuiButton button = (GuiButton)this.buttonList.get(i);
+		for (int i = 0; i < this.buttons.size(); ++i) {
+			Button button = (Button)this.buttons.get(i);
 			if (button instanceof QuestButton)
 				button.drawButton(this.mc, mouseX, mouseY, partialTicks);
 		}
@@ -301,8 +301,8 @@ public class MirrorGui extends GuiScreen {
 		int KEY_VOFFSET = 9;
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - GUI_HEIGHT) / 2;
-		Minecraft.getMinecraft().getTextureManager().bindTexture(RES_FORE);
-		GlStateManager.color(1f, 1f, 1f, 1f);
+		Minecraft.getInstance().getTextureManager().bindTexture(RES_FORE);
+		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		GlStateManager.disableBlend();
 		GlStateManager.disableLighting();
 		Gui.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
@@ -315,55 +315,55 @@ public class MirrorGui extends GuiScreen {
 		String str;
 		
 		str = "Level " + level;
-		len = fontRenderer.getStringWidth(str);
-		this.fontRenderer.drawString(str, (this.width - len) / 2, topOffset + TEXT_BOTTOM_VOFFSET, 0xFFFFFFFF, true);
-		y += fontRenderer.FONT_HEIGHT + 10;
+		len = font.getStringWidth(str);
+		this.font.drawString(str, (this.width - len) / 2, topOffset + TEXT_BOTTOM_VOFFSET, 0xFFFFFFFF, true);
+		y += font.FONT_HEIGHT + 10;
 		int yTop = y = KEY_VOFFSET + topOffset + TEXT_BOTTOM_VOFFSET;
 		
 		//leftOffset + TEXT_BOTTOM_HOFFSET, y + topOffset + TEXT_BOTTOM_VOFFSET, colorKey
 		// XP, points
-		Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET - 2, y, leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
+		RenderFuncs.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET - 2, y, leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
 		str = "XP: ";
-		len = fontRenderer.getStringWidth(String.format("%.02f%%", 100f * xp/maxXP));
-		this.fontRenderer.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET, y + (KEY_HEIGHT - fontRenderer.FONT_HEIGHT) / 2 + 1, colorKey);
-		this.fontRenderer.drawString(String.format("%.02f%%", 100f * xp/maxXP), leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH - (len), y + (KEY_HEIGHT - fontRenderer.FONT_HEIGHT) / 2 + 1, colorVal);
+		len = font.getStringWidth(String.format("%.02f%%", 100f * xp/maxXP));
+		this.font.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET, y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorKey);
+		this.font.drawString(String.format("%.02f%%", 100f * xp/maxXP), leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH - (len), y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorVal);
 		y += KEY_HEIGHT + 5;
 		
-//					Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET - 2, topOffset + TEXT_BOTTOM_VOFFSET + y - 2, leftOffset + TEXT_BOTTOM_HOFFSET + keyWidth + 2, topOffset + TEXT_BOTTOM_VOFFSET + y + this.fontRenderer.FONT_HEIGHT, 0xD0000000);
+//					RenderFuncs.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET - 2, topOffset + TEXT_BOTTOM_VOFFSET + y - 2, leftOffset + TEXT_BOTTOM_HOFFSET + keyWidth + 2, topOffset + TEXT_BOTTOM_VOFFSET + y + this.font.FONT_HEIGHT, 0xD0000000);
 //					str = "Technique: ";
-//					len = fontRenderer.getStringWidth("" + attr.getTech());
-//					this.fontRenderer.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET, y + topOffset + TEXT_BOTTOM_VOFFSET, colorKey);
-//					this.fontRenderer.drawString("" + attr.getTech(), leftOffset + TEXT_BOTTOM_HOFFSET + keyWidth - (len), y + topOffset + TEXT_BOTTOM_VOFFSET, colorVal);
+//					len = font.getStringWidth("" + attr.getTech());
+//					this.font.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET, y + topOffset + TEXT_BOTTOM_VOFFSET, colorKey);
+//					this.font.drawString("" + attr.getTech(), leftOffset + TEXT_BOTTOM_HOFFSET + keyWidth - (len), y + topOffset + TEXT_BOTTOM_VOFFSET, colorVal);
 		y += KEY_HEIGHT + 5;
 		
-		Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET - 2, y, leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
+		RenderFuncs.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET - 2, y, leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
 		str = "Skill Points: ";
-		len = fontRenderer.getStringWidth("" + skillPoints);
-		this.fontRenderer.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET, y + (KEY_HEIGHT - fontRenderer.FONT_HEIGHT) / 2 + 1, colorKey);
-		this.fontRenderer.drawString("" + skillPoints, leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH - (len), y + (KEY_HEIGHT - fontRenderer.FONT_HEIGHT) / 2 + 1, colorVal);
+		len = font.getStringWidth("" + skillPoints);
+		this.font.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET, y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorKey);
+		this.font.drawString("" + skillPoints, leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH - (len), y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorVal);
 		y += KEY_HEIGHT + 5;
 		
 		// stats
 		y = yTop;
-		Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (2 + KEY_WIDTH), y, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
+		RenderFuncs.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (2 + KEY_WIDTH), y, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
 		str = "Control: ";
-		len = fontRenderer.getStringWidth("" + control);
-		this.fontRenderer.drawString(str, leftOffset + TEXT_BOTTOM_WIDTH + TEXT_BOTTOM_HOFFSET - (KEY_WIDTH), y + (KEY_HEIGHT - fontRenderer.FONT_HEIGHT) / 2 + 1, colorKey);
-		this.fontRenderer.drawString("" + control, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - fontRenderer.FONT_HEIGHT) / 2 + 1, colorVal);
+		len = font.getStringWidth("" + control);
+		this.font.drawString(str, leftOffset + TEXT_BOTTOM_WIDTH + TEXT_BOTTOM_HOFFSET - (KEY_WIDTH), y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorKey);
+		this.font.drawString("" + control, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorVal);
 		y += KEY_HEIGHT + 5;
 		
-		Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (2 + KEY_WIDTH), y, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
+		RenderFuncs.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (2 + KEY_WIDTH), y, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
 		str = "Technique: ";
-		len = fontRenderer.getStringWidth("" + technique);
-		this.fontRenderer.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - KEY_WIDTH, y + (KEY_HEIGHT - fontRenderer.FONT_HEIGHT) / 2 + 1, colorKey);
-		this.fontRenderer.drawString("" + technique, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - fontRenderer.FONT_HEIGHT) / 2 + 1, colorVal);
+		len = font.getStringWidth("" + technique);
+		this.font.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - KEY_WIDTH, y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorKey);
+		this.font.drawString("" + technique, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorVal);
 		y += KEY_HEIGHT + 5;
 		
-		Gui.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (2 + KEY_WIDTH), y, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
+		RenderFuncs.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (2 + KEY_WIDTH), y, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
 		str = "Finess: ";
-		len = fontRenderer.getStringWidth("" + finesse);
-		this.fontRenderer.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - KEY_WIDTH, y + (KEY_HEIGHT - fontRenderer.FONT_HEIGHT) / 2 + 1, colorKey);
-		this.fontRenderer.drawString("" + finesse, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - fontRenderer.FONT_HEIGHT) / 2 + 1, colorVal);
+		len = font.getStringWidth("" + finesse);
+		this.font.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - KEY_WIDTH, y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorKey);
+		this.font.drawString("" + finesse, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorVal);
 		y += KEY_HEIGHT + 5;
 		
 		buttonControl.drawButton(mc, mouseX, mouseY, partialTicks);
@@ -376,31 +376,31 @@ public class MirrorGui extends GuiScreen {
 		float bonusMana = attr.getManaModifier();
 		float bonusManaRegen = attr.getManaRegenModifier();
 		float bonusManaCost = attr.getManaCostModifier();
-		int fh = fontRenderer.FONT_HEIGHT;
-		this.fontRenderer.drawString("Mana:",
+		int fh = font.FONT_HEIGHT;
+		this.font.drawString("Mana:",
 				leftOffset + TEXT_WIDTH, topOffset + 5, 0xFFFFFFFF);
-		this.fontRenderer.drawString(" " + mana + "/" + maxMana,
+		this.font.drawString(" " + mana + "/" + maxMana,
 				leftOffset + TEXT_WIDTH, topOffset + 5 + fh, 0xFFFFFFFF);
 		
-		this.fontRenderer.drawString("Bonus Mana:",
+		this.font.drawString("Bonus Mana:",
 				leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 4, 0xFFFFFFFF);
-		this.fontRenderer.drawString(String.format("%+.1f%%", bonusMana * 100f),
+		this.font.drawString(String.format("%+.1f%%", bonusMana * 100f),
 				leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 5, 0xFFFFFFFF);
 
-		this.fontRenderer.drawString("Mana Regen:",
+		this.font.drawString("Mana Regen:",
 				leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 6, 0xFFFFFFFF);
-		this.fontRenderer.drawString(String.format("%+.1f%%", bonusManaRegen * 100f),
+		this.font.drawString(String.format("%+.1f%%", bonusManaRegen * 100f),
 				leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 7, 0xFFFFFFFF);
 
-		this.fontRenderer.drawString("Mana Cost:",
+		this.font.drawString("Mana Cost:",
 				leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 8, 0xFFFFFFFF);
-		this.fontRenderer.drawString(String.format("%+.1f%%", bonusManaCost * 100f),
+		this.font.drawString(String.format("%+.1f%%", bonusManaCost * 100f),
 				leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 9, 0xFFFFFFFF);
 		
 		if (mouseX >= leftOffset + TEXT_CONTENT_HOFFSET && mouseX <= leftOffset + TEXT_CONTENT_HOFFSET + TEXT_CONTENT_WIDTH
 				&& mouseY >= topOffset + TEXT_CONTENT_VOFFSET && mouseY <= topOffset + TEXT_CONTENT_VOFFSET + TEXT_CONTENT_HEIGHT) {
-			for (int i = 0; i < this.buttonList.size(); ++i) {
-				GuiButton button = (GuiButton)this.buttonList.get(i);
+			for (int i = 0; i < this.buttons.size(); ++i) {
+				Button button = (Button)this.buttons.get(i);
 				if (button instanceof QuestButton)
 					((QuestButton) button).drawOverlay(mc, mouseX, mouseY);
 			}
@@ -411,19 +411,19 @@ public class MirrorGui extends GuiScreen {
 		int GUI_HEIGHT = 242;
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - GUI_HEIGHT) / 2;
-		float extra = .2f * (float) Math.sin((double) Minecraft.getSystemTime() / 1500.0);
+		float extra = .2f * (float) Math.sin((double) System.currentTimeMillis() / 1500.0);
 		float inv = .2f - extra;
-		GlStateManager.color(.8f + extra, 1f, .8f + inv, 1f);
-		Minecraft.getMinecraft().getTextureManager().bindTexture(RES_BACK_CLEAR);
+		GlStateManager.color4f(.8f + extra, 1f, .8f + inv, 1f);
+		Minecraft.getInstance().getTextureManager().bindTexture(RES_BACK_CLEAR);
 		Gui.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT);
 		
-		for (int i = 0; i < this.buttonList.size(); ++i) {
-			GuiButton button = (GuiButton)this.buttonList.get(i);
+		for (int i = 0; i < this.buttons.size(); ++i) {
+			Button button = (Button)this.buttons.get(i);
 			if (button instanceof ResearchButton)
 				button.drawButton(this.mc, mouseX, mouseY, partialTicks);
 		}
-		for (int i = 0; i < this.buttonList.size(); ++i) {
-			GuiButton button = (GuiButton)this.buttonList.get(i);
+		for (int i = 0; i < this.buttons.size(); ++i) {
+			Button button = (Button)this.buttons.get(i);
 			if (button instanceof ResearchButton)
 				((ResearchButton) button).drawTreeLines(mc);
 		}
@@ -433,15 +433,15 @@ public class MirrorGui extends GuiScreen {
 		int GUI_HEIGHT = 242;
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - GUI_HEIGHT) / 2;
-		Minecraft.getMinecraft().getTextureManager().bindTexture(RES_FORE);
-		GlStateManager.color(1f, 1f, 1f, 1f);
+		Minecraft.getInstance().getTextureManager().bindTexture(RES_FORE);
+		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		GlStateManager.disableBlend();
-    	GlStateManager.enableAlpha();
+    	GlStateManager.enableAlphaTest();
 		GlStateManager.disableLighting();
 		Gui.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
 		
-		for (int i = 0; i < this.buttonList.size(); ++i) {
-			GuiButton button = (GuiButton)this.buttonList.get(i);
+		for (int i = 0; i < this.buttons.size(); ++i) {
+			Button button = (Button)this.buttons.get(i);
 			if (button instanceof ResearchTabButton) {
 				button.drawButton(mc, mouseX, mouseY, partialTicks);
 			}
@@ -450,23 +450,23 @@ public class MirrorGui extends GuiScreen {
 		int y = topOffset + TEXT_BOTTOM_VOFFSET + BUTTON_MINOR_HEIGHT + 10;
 		int centerX = leftOffset + (TEXT_WIDTH / 2);
 		int width = 200;
-		Gui.drawRect(centerX - (width/2), y - 4, centerX + (width / 2), y + fontRenderer.FONT_HEIGHT + 2, 0xD0000000);
+		RenderFuncs.drawRect(centerX - (width/2), y - 4, centerX + (width / 2), y + font.FONT_HEIGHT + 2, 0xD0000000);
 		String str = "Points: " + researchPoints;
-		width = fontRenderer.getStringWidth(str);
-		this.fontRenderer.drawString(str, centerX - (width/2), y, 0xFFFFFFFF);
+		width = font.getStringWidth(str);
+		this.font.drawString(str, centerX - (width/2), y, 0xFFFFFFFF);
 		
 		width = 200;
 		int knowledgeHeight = 4;
-		y += fontRenderer.FONT_HEIGHT + 2;
+		y += font.FONT_HEIGHT + 2;
 		final int x = Math.round(((float) knowledge / (float) maxKnowledge) * (float) width);
-		Gui.drawRect(centerX - (width/2), y, centerX + (width / 2), y + 2 + knowledgeHeight, 0xFF555555);
-		Gui.drawRect(centerX - (width/2) + 1, y + 1, centerX + (width / 2) - 1, y + 1 + knowledgeHeight, 0xFF000000);
-		Gui.drawRect(centerX - (width/2) + 1, y + 1, centerX - (width/2) + 1 + x, y + 1 + knowledgeHeight, 0xFFFFFF00);
+		RenderFuncs.drawRect(centerX - (width/2), y, centerX + (width / 2), y + 2 + knowledgeHeight, 0xFF555555);
+		RenderFuncs.drawRect(centerX - (width/2) + 1, y + 1, centerX + (width / 2) - 1, y + 1 + knowledgeHeight, 0xFF000000);
+		RenderFuncs.drawRect(centerX - (width/2) + 1, y + 1, centerX - (width/2) + 1 + x, y + 1 + knowledgeHeight, 0xFFFFFF00);
 		
 		boolean mouseContent =  (mouseX >= leftOffset + TEXT_CONTENT_HOFFSET && mouseX <= leftOffset + TEXT_CONTENT_HOFFSET + TEXT_CONTENT_WIDTH
 				&& mouseY >= topOffset + TEXT_CONTENT_VOFFSET && mouseY <= topOffset + TEXT_CONTENT_VOFFSET + TEXT_CONTENT_HEIGHT);
-		for (int i = 0; i < this.buttonList.size(); ++i) {
-			GuiButton button = (GuiButton)this.buttonList.get(i);
+		for (int i = 0; i < this.buttons.size(); ++i) {
+			Button button = (Button)this.buttons.get(i);
 			if (button instanceof ResearchButton) {
 				if (mouseContent) {
 					((ResearchButton) button).drawOverlay(mc, mouseX, mouseY);
@@ -481,19 +481,19 @@ public class MirrorGui extends GuiScreen {
 		int GUI_HEIGHT = 242;
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - GUI_HEIGHT) / 2;
-		GlStateManager.color(1f, 1f, 1f, 1f);
-		Minecraft.getMinecraft().getTextureManager().bindTexture(RES_BACK_CLOUD);
+		GlStateManager.color4f(1f, 1f, 1f, 1f);
+		Minecraft.getInstance().getTextureManager().bindTexture(RES_BACK_CLOUD);
 		Gui.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT);
 		
 		int y = 0;
 		String str = "Magic Not Yet Unlocked";
-		int len = this.fontRenderer.getStringWidth(str);
-		this.fontRenderer.drawString(str, (this.width - len) / 2, topOffset + (TEXT_CONTENT_HEIGHT / 2), 0xFFFFFFFF, true);
+		int len = this.font.getStringWidth(str);
+		this.font.drawString(str, (this.width - len) / 2, topOffset + (TEXT_CONTENT_HEIGHT / 2), 0xFFFFFFFF, true);
 		
-		y = fontRenderer.FONT_HEIGHT + 2;
+		y = font.FONT_HEIGHT + 2;
 		
-		len = this.fontRenderer.getStringWidth(unlockPrompt);
-		this.fontRenderer.drawString(unlockPrompt, (this.width - len) / 2, y + topOffset + (TEXT_CONTENT_HEIGHT / 2), 0xFFDFD000, false);
+		len = this.font.getStringWidth(unlockPrompt);
+		this.font.drawString(unlockPrompt, (this.width - len) / 2, y + topOffset + (TEXT_CONTENT_HEIGHT / 2), 0xFFDFD000, false);
 	}
 	
 	private void drawLockedScreenForeground(int mouseX, int mouseY, float partialTicks) {
@@ -501,8 +501,8 @@ public class MirrorGui extends GuiScreen {
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - GUI_HEIGHT) / 2;
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(RES_FORE);
-		GlStateManager.color(1f, 1f, 1f, 1f);
+		Minecraft.getInstance().getTextureManager().bindTexture(RES_FORE);
+		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		GlStateManager.disableBlend();
 		GlStateManager.disableLighting();
 		Gui.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
@@ -538,65 +538,65 @@ public class MirrorGui extends GuiScreen {
 		String str;
 
 		GlStateManager.enableBlend();
-		drawRect(x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
+		RenderFuncs.drawRect(x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
 		if (element != null)
-			GlStateManager.color(1f, 1f, 1f, 1f);
+			GlStateManager.color4f(1f, 1f, 1f, 1f);
 		else {
-			GlStateManager.color(.8f, .5f, .5f, .5f);
+			GlStateManager.color4f(.8f, .5f, .5f, .5f);
 			element = EMagicElement.values()[
-                  (int) (Minecraft.getSystemTime() / cycle) % EMagicElement.values().length
+                  (int) (System.currentTimeMillis() / cycle) % EMagicElement.values().length
 			      ];
 		}
-		SpellComponentIcon.get(element).draw(this, this.fontRenderer, x, y, width, width);
+		SpellComponentIcon.get(element).draw(this, this.font, x, y, width, width);
 		str = I18n.format("element.name", new Object[0]);
-		strLen = this.fontRenderer.getStringWidth(str);
-		this.fontRenderer.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.fontRenderer.FONT_HEIGHT), 0xFFFFFF);
+		strLen = this.font.getStringWidth(str);
+		this.font.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.font.FONT_HEIGHT), 0xFFFFFF);
 		
 		x += width + space;
-		drawRect(x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
+		RenderFuncs.drawRect(x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
 		if (trigger != null)
-			GlStateManager.color(1f, 1f, 1f, 1f);
+			GlStateManager.color4f(1f, 1f, 1f, 1f);
 		else {
-			GlStateManager.color(.8f, .5f, .5f, .5f);
+			GlStateManager.color4f(.8f, .5f, .5f, .5f);
 			Collection<SpellTrigger> triggers = SpellTrigger.getAllTriggers();
 			SpellTrigger[] trigArray = triggers.toArray(new SpellTrigger[0]);
 			trigger = trigArray[
-                  (int) (Minecraft.getSystemTime() / cycle) % trigArray.length
+                  (int) (System.currentTimeMillis() / cycle) % trigArray.length
 			      ];
 		}
-		SpellComponentIcon.get(trigger).draw(this, this.fontRenderer, x, y, width, width);
+		SpellComponentIcon.get(trigger).draw(this, this.font, x, y, width, width);
 		str = I18n.format("trigger.name", new Object[0]);
-		strLen = this.fontRenderer.getStringWidth(str);
-		this.fontRenderer.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.fontRenderer.FONT_HEIGHT), 0xFFFFFF);
+		strLen = this.font.getStringWidth(str);
+		this.font.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.font.FONT_HEIGHT), 0xFFFFFF);
 		
 		x += width + space;
-		drawRect(x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
+		RenderFuncs.drawRect(x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
 		if (shape != null)
-			GlStateManager.color(1f, 1f, 1f, 1f);
+			GlStateManager.color4f(1f, 1f, 1f, 1f);
 		else {
-			GlStateManager.color(.8f, .5f, .5f, .5f);
+			GlStateManager.color4f(.8f, .5f, .5f, .5f);
 			Collection<SpellShape> shapes = SpellShape.getAllShapes();
 			SpellShape[] shapeArray = shapes.toArray(new SpellShape[0]);
 			shape = shapeArray[
-                  (int) (Minecraft.getSystemTime() / cycle) % shapeArray.length
+                  (int) (System.currentTimeMillis() / cycle) % shapeArray.length
 			      ];
 		}
-		SpellComponentIcon.get(shape).draw(this, this.fontRenderer, x, y, width, width);
+		SpellComponentIcon.get(shape).draw(this, this.font, x, y, width, width);
 		str = I18n.format("shape.name", new Object[0]);
-		strLen = this.fontRenderer.getStringWidth(str);
-		this.fontRenderer.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.fontRenderer.FONT_HEIGHT), 0xFFFFFF);
+		strLen = this.font.getStringWidth(str);
+		this.font.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.font.FONT_HEIGHT), 0xFFFFFF);
 	}
 	
 	private void drawResearchPages(int mouseX, int mouseY, float partialTicks) {
-		GlStateManager.enableAlpha();
+		GlStateManager.enableAlphaTest();
 		GlStateManager.enableBlend();
 		GlStateManager.disableLighting();
-		Gui.drawRect(0, 0, this.width, this.height, 0x60000000);
-		currentInfoScreen.drawScreen(mouseX, mouseY, partialTicks);
+		RenderFuncs.drawRect(0, 0, this.width, this.height, 0x60000000);
+		currentInfoScreen.render(mouseX, mouseY, partialTicks);
 	}
 	
 	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+	public void render(int mouseX, int mouseY, float partialTicks) {
 		int GUI_HEIGHT = 242;
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - GUI_HEIGHT) / 2;
@@ -612,14 +612,14 @@ public class MirrorGui extends GuiScreen {
 		}
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(0, 0, 50);
+		GlStateManager.translatef(0, 0, 50);
 		
 		// Black out surrounding screen
 		int color = 0xFF000000;
-		Gui.drawRect(0, 0, this.width, topOffset, color);
-		Gui.drawRect(0, topOffset + GUI_HEIGHT, this.width, this.height, color);
-		Gui.drawRect(0, 0, leftOffset, this.height, color);
-		Gui.drawRect(leftOffset + TEXT_WIDTH - 1, 0, this.width, this.height, color);
+		RenderFuncs.drawRect(0, 0, this.width, topOffset, color);
+		RenderFuncs.drawRect(0, topOffset + GUI_HEIGHT, this.width, this.height, color);
+		RenderFuncs.drawRect(0, 0, leftOffset, this.height, color);
+		RenderFuncs.drawRect(leftOffset + TEXT_WIDTH - 1, 0, this.width, this.height, color);
 		
 		if (unlocked) {
 			if (isCharacter) {
@@ -643,7 +643,7 @@ public class MirrorGui extends GuiScreen {
 			
 			if (MirrorGui.currentInfoScreen != null) {
 				GlStateManager.pushMatrix();
-				GlStateManager.translate(0, 0, 500);
+				GlStateManager.translatef(0, 0, 500);
 				drawResearchPages(mouseX, mouseY, partialTicks);
 				GlStateManager.popMatrix();
 			}
@@ -651,7 +651,7 @@ public class MirrorGui extends GuiScreen {
 
 		GlStateManager.popMatrix();
 		
-		//super.drawScreen(mouseX, mouseY, partialTicks);
+		//super.render(mouseX, mouseY, partialTicks);
 	}
 	
 	private static String getUnlockPrompt(INostrumMagic attr) {
@@ -676,7 +676,7 @@ public class MirrorGui extends GuiScreen {
 	}
 	
 	@Override
-	public void actionPerformed(GuiButton button) {
+	public void actionPerformed(Button button) {
 		if (!button.visible)
 			return;
 		
@@ -759,10 +759,10 @@ public class MirrorGui extends GuiScreen {
 		int GUI_HEIGHT = 242;
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - GUI_HEIGHT) / 2;
-//		for (GuiButton button : buttonList) {
+//		for (Button button : buttons) {
 //			button.visible = false;
 //		}
-		this.buttonList.clear();
+		this.buttons.clear();
 		questButtons.clear();
 		researchButtons.clear();
 		
@@ -876,7 +876,7 @@ public class MirrorGui extends GuiScreen {
 				ResearchTabButton button = tabButtons.get(tab);
 				button.x = x;
 				button.y = topOffset + TEXT_BOTTOM_VOFFSET - 1;
-				this.buttonList.add(button);
+				this.buttons.add(button);
 				x += TEXT_ICON_MINORBUTTON_WIDTH;
 			}
 		}
@@ -945,7 +945,7 @@ public class MirrorGui extends GuiScreen {
 		super.keyTyped(typedChar, keyCode);
 	}
 	
-	private class MajorTabButton extends GuiButton {
+	private class MajorTabButton extends Button {
 		
 		private final ItemStack icon;
 		private boolean mouseOver;
@@ -958,7 +958,7 @@ public class MirrorGui extends GuiScreen {
 		}
 		
 		@Override
-        public void drawButton(Minecraft mc, int parX, int parY, float partialTicks) {
+        public void render(int parX, int parY, float partialTicks) {
 			if (visible) {
 				int textureX = TEXT_ICON_MAJORBUTTON_HOFFSET;
 				int textureY = TEXT_ICON_MAJORBUTTON_VOFFSET;
@@ -972,8 +972,8 @@ public class MirrorGui extends GuiScreen {
             	}
             	RenderHelper.disableStandardItemLighting();
             	GlStateManager.disableLighting();
-            	GlStateManager.enableAlpha();
-            	GlStateManager.color(1f, 1f, 1f, 1f);
+            	GlStateManager.enableAlphaTest();
+            	GlStateManager.color4f(1f, 1f, 1f, 1f);
                 mc.getTextureManager().bindTexture(RES_ICONS);
                 Gui.drawScaledCustomSizeModalRect(x, y, textureX, textureY,
         				TEXT_ICON_MAJORBUTTON_WIDTH, TEXT_ICON_MAJORBUTTON_HEIGHT, this.width, this.height, 256, 256);
@@ -981,8 +981,8 @@ public class MirrorGui extends GuiScreen {
                 // Now draw icon
                 GlStateManager.pushMatrix();
                 RenderHelper.enableGUIStandardItemLighting();
-                GlStateManager.translate(0, 0, -50);
-                mc.getRenderItem().renderItemIntoGUI(icon, x + (width - 16) / 2, y + (height - 16) / 2);
+                GlStateManager.translatef(0, 0, -50);
+                mc.getItemRenderer().renderItemIntoGUI(icon, x + (width - 16) / 2, y + (height - 16) / 2);
                 RenderHelper.disableStandardItemLighting();
                 GlStateManager.popMatrix();
             }
@@ -997,14 +997,14 @@ public class MirrorGui extends GuiScreen {
 		}
 	}
 	
-    static class ImproveButton extends GuiButton {
+    static class ImproveButton extends Button {
 		
 		public ImproveButton(int parButtonId, int parPosX, int parPosY) {
 			super(parButtonId, parPosX, parPosY, 12, 12, "");
 		}
 		
 		@Override
-        public void drawButton(Minecraft mc, int parX, int parY, float partialTicks) {
+        public void render(int parX, int parY, float partialTicks) {
 			if (visible) {
 				int textureX = 0;
 				int textureY = TEXT_ICON_BUTTON_VOFFSET;
@@ -1015,7 +1015,7 @@ public class MirrorGui extends GuiScreen {
             		textureX += TEXT_ICON_BUTTON_LENGTH;
             	}
                 
-            	GlStateManager.color(1f, 1f, 1f, 1f);
+            	GlStateManager.color4f(1f, 1f, 1f, 1f);
                 mc.getTextureManager().bindTexture(RES_ICONS);
                 Gui.drawScaledCustomSizeModalRect(x, y, textureX, textureY,
         				TEXT_ICON_BUTTON_LENGTH, TEXT_ICON_BUTTON_LENGTH, this.width, this.height, 256, 256);
@@ -1030,7 +1030,7 @@ public class MirrorGui extends GuiScreen {
 		COMPLETED
 	}
     
-    private static abstract class GuiObscuredButton extends GuiButton {
+    private static abstract class GuiObscuredButton extends Button {
 
 		public GuiObscuredButton(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText) {
 			super(buttonId, x, y, widthIn, heightIn, buttonText);
@@ -1103,26 +1103,26 @@ public class MirrorGui extends GuiScreen {
 		
 		private void renderLine(QuestButton other) {
 			GlStateManager.pushMatrix();
-			GlStateManager.pushAttrib();
-			GlStateManager.translate(width / 2, height / 2, 0);
+			GlStateManager.pushLightingAttributes();
+			GlStateManager.translatef(width / 2, height / 2, 0);
 			BufferBuilder buf = Tessellator.getInstance().getBuffer();
 			//GlStateManager.enableBlend();
-	        GlStateManager.disableTexture2D();
-	        //GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-	        GlStateManager.color(1.0f, 1.0f, 1.0f, 0.6f);
+	        GlStateManager.disableTexture();
+	        //GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+	        GlStateManager.color4f(1.0f, 1.0f, 1.0f, 0.6f);
 	        buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
 	        buf.pos(x - 1, y, 0).endVertex();
 	        buf.pos(other.x - 1, other.y, 0).endVertex();
 	        Tessellator.getInstance().draw();
-	        GlStateManager.enableTexture2D();
+	        GlStateManager.enableTexture();
 	        //GlStateManager.disableBlend();
 			
-	        GlStateManager.popAttrib();
+	        GlStateManager.popAttributes();
 			GlStateManager.popMatrix();
 		}
 		
 		@Override
-        public void drawButton(Minecraft mc, int parX, int parY, float partialTicks) {
+        public void render(int parX, int parY, float partialTicks) {
 			mouseOver = false;
 			if (visible) {
 				int textureX = 0;
@@ -1145,22 +1145,22 @@ public class MirrorGui extends GuiScreen {
                 
             	switch (state) {
 				case COMPLETED:
-					GlStateManager.color(.2f, 2f/3f, .2f, 1f);
+					GlStateManager.color4f(.2f, 2f/3f, .2f, 1f);
 					break;
 				case INACTIVE:
-					GlStateManager.color(2f/3f, 0f, 2f/3f, .8f);
+					GlStateManager.color4f(2f/3f, 0f, 2f/3f, .8f);
 					break;
 				case TAKEN: {
 					float amt = 0f;
 					if (canTurnin) {
-						amt = (float) Math.sin(2.0 * Math.PI * (double) (Minecraft.getSystemTime() % 1000) / 1000.0);
+						amt = (float) Math.sin(2.0 * Math.PI * (double) (System.currentTimeMillis() % 1000) / 1000.0);
 						amt *= .1f;
 					}
-					GlStateManager.color(1f/3f + amt, .2f + amt, 2f/3f + amt, 1f);
+					GlStateManager.color4f(1f/3f + amt, .2f + amt, 2f/3f + amt, 1f);
 					break;
 				}
 				case UNAVAILABLE:
-					GlStateManager.color(.8f, .0f, .0f, .6f);
+					GlStateManager.color4f(.8f, .0f, .0f, .6f);
 					break;
             	}
                 
@@ -1171,10 +1171,10 @@ public class MirrorGui extends GuiScreen {
                 		TEXT_ICON_QUEST_LENGTH, TEXT_ICON_QUEST_LENGTH, this.width, this.height, 256, 256);
                 
                 if (icon != null) {
-                	icon.draw(this, fontRenderer, x + 2, y + 3, 12, 12);
+                	icon.draw(this, font, x + 2, y + 3, 12, 12);
                 } else {
                 	GlStateManager.enableBlend();
-                	GlStateManager.color(1f, 1f, 1f, .8f);
+                	GlStateManager.color4f(1f, 1f, 1f, .8f);
                 	Gui.drawScaledCustomSizeModalRect(x + 4, y + 5, iconOffset, TEXT_ICON_BUTTON_VOFFSET,
                 		TEXT_ICON_REWARD_WIDTH, TEXT_ICON_REWARD_WIDTH, 8, 8, 256, 256);
                 }
@@ -1184,8 +1184,8 @@ public class MirrorGui extends GuiScreen {
 		public void drawOverlay(Minecraft mc, int parX, int parY) {
 			if (mouseOver) {
 				GlStateManager.pushMatrix();
-				GlStateManager.scale(fontScale, fontScale, 1f);
-				GlStateManager.translate((int) (parX / fontScale) - parX, (int) (parY / fontScale) - parY, 0);
+				GlStateManager.scalef(fontScale, fontScale, 1f);
+				GlStateManager.translatef((int) (parX / fontScale) - parX, (int) (parY / fontScale) - parY, 0);
 				drawHoveringText(tooltip, parX, parY);
 				GlStateManager.popMatrix();
 			}
@@ -1262,7 +1262,7 @@ public class MirrorGui extends GuiScreen {
             
             if (this.state == QuestState.TAKEN || this.state == QuestState.COMPLETED) {
 	            for (String line : tooltip) {
-	            	int width = fontRenderer.getStringWidth(line);
+	            	int width = font.getStringWidth(line);
 	            	if (width > maxWidth)
 	            		maxWidth = width;
 	            }
@@ -1277,8 +1277,8 @@ public class MirrorGui extends GuiScreen {
 	            			tooltip.add(buf.toString());
 	            			buf = new StringBuffer();
 	            		} else {
-		            		int oldlen = fontRenderer.getStringWidth(buf.toString());
-		            		if (oldlen + fontRenderer.getCharWidth(desc.charAt(index)) > maxWidth) {
+		            		int oldlen = font.getStringWidth(buf.toString());
+		            		if (oldlen + font.getCharWidth(desc.charAt(index)) > maxWidth) {
 		            			// Go back until we find a space
 		            			boolean isSpace = desc.charAt(index) == ' ';
 		            			if (!isSpace) {
@@ -1317,7 +1317,7 @@ public class MirrorGui extends GuiScreen {
 		}
 	}
     
-    private class ResearchTabButton extends GuiButton {
+    private class ResearchTabButton extends Button {
 		
 		private final NostrumResearchTab tab;
 		private boolean mouseOver;
@@ -1330,7 +1330,7 @@ public class MirrorGui extends GuiScreen {
 		}
 		
 		@Override
-        public void drawButton(Minecraft mc, int parX, int parY, float partialTicks) {
+        public void render(int parX, int parY, float partialTicks) {
 			if (visible) {
 				int textureX = TEXT_ICON_MINORBUTTON_HOFFSET;
 				int textureY = TEXT_ICON_MINORBUTTON_VOFFSET;
@@ -1345,9 +1345,9 @@ public class MirrorGui extends GuiScreen {
             		mouseOver = true;
             	}
                 
-            	GlStateManager.color(1f, 1f, 1f, 1f);
+            	GlStateManager.color4f(1f, 1f, 1f, 1f);
             	RenderHelper.disableStandardItemLighting();
-            	GlStateManager.enableAlpha();
+            	GlStateManager.enableAlphaTest();
                 mc.getTextureManager().bindTexture(RES_ICONS);
                 Gui.drawScaledCustomSizeModalRect(x, y, textureX, textureY,
                 		TEXT_ICON_MINORBUTTON_WIDTH, TEXT_ICON_MINORBUTTON_HEIGHT, this.width, this.height, 256, 256);
@@ -1355,14 +1355,14 @@ public class MirrorGui extends GuiScreen {
                 // Now draw icon
                 GlStateManager.pushMatrix();
                 RenderHelper.enableGUIStandardItemLighting();
-                GlStateManager.translate(0, 0, -50);
-                mc.getRenderItem().renderItemIntoGUI(tab.getIcon(), x + (width - 16) / 2, y + (height - 16) / 2);
+                GlStateManager.translatef(0, 0, -50);
+                mc.getItemRenderer().renderItemIntoGUI(tab.getIcon(), x + (width - 16) / 2, y + (height - 16) / 2);
                 RenderHelper.disableStandardItemLighting();
                 GlStateManager.popMatrix();
                 
                 // Draw new tab if there's something new
                 if (tab.hasNew()) {
-                	GlStateManager.color(1f, 1f, 1f, 1f);
+                	GlStateManager.color4f(1f, 1f, 1f, 1f);
                 	RenderHelper.disableStandardItemLighting();
                     mc.getTextureManager().bindTexture(RES_ICONS);
                     Gui.drawScaledCustomSizeModalRect(x, y, TEXT_ICON_MINORBUTTON_HOFFSET + TEXT_ICON_MINORBUTTON_WIDTH, TEXT_ICON_MINORBUTTON_VOFFSET,
@@ -1437,15 +1437,15 @@ public class MirrorGui extends GuiScreen {
 			GlStateManager.pushMatrix();
 			BufferBuilder buf = Tessellator.getInstance().getBuffer();
 	        GlStateManager.enableBlend();
-	        GlStateManager.enableAlpha();
+	        GlStateManager.enableAlphaTest();
 	        GlStateManager.disableColorMaterial();
 	        GlStateManager.disableColorLogic();
-	        GlStateManager.disableTexture2D();
+	        GlStateManager.disableTexture();
 	        GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 			GlStateManager.disableLighting();
 	        //GlStateManager.disableDepth();
-	        GlStateManager.glLineWidth(3.5f);
-	        GlStateManager.color(.8f, .8f, .8f, alpha);
+	        GlStateManager.lineWidth(3.5f);
+	        GlStateManager.color4f(.8f, .8f, .8f, alpha);
 	        
 	        Vec2f child = new Vec2f(x + ((float) width / 2f), y + ((float) height / 2f));
 	        Vec2f parent = new Vec2f(other.x + ((float) other.width / 2f), other.y + ((float) other.height / 2f));
@@ -1510,7 +1510,7 @@ public class MirrorGui extends GuiScreen {
 		        // Draw inside curve
 		        int points = 30;
 		        GlStateManager.pushMatrix();
-		        GlStateManager.translate(parentTo.x, parentTo.y, 0);
+		        GlStateManager.translatef(parentTo.x, parentTo.y, 0);
 		        float rotate = 0f;
 		        boolean flip = false;
 		        if (!vertical) {
@@ -1530,7 +1530,7 @@ public class MirrorGui extends GuiScreen {
 		        		flip = (diff.x >= 0);
 		        	}
 		        }
-		        GlStateManager.rotate(rotate, 0, 0, 1);
+		        GlStateManager.rotatef(rotate, 0, 0, 1);
 		        buf.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
 		        for (int i = 0; i <= points; i++) {
 		        	float progress = (float) i / (float) points;
@@ -1541,21 +1541,21 @@ public class MirrorGui extends GuiScreen {
 		        GlStateManager.popMatrix();
 	        }
 	        
-	        GlStateManager.translate(child.x, child.y, .1);
+	        GlStateManager.translatef(child.x, child.y, .1);
 	        if (child.x < myCenter.x) {
 	        	// from left
-	        	GlStateManager.rotate(-90f, 0, 0, 1);
+	        	GlStateManager.rotatef(-90f, 0, 0, 1);
 	        } else if (child.x > myCenter.x) {
 	        	// from right
-	        	GlStateManager.rotate(90f, 0, 0, 1);
+	        	GlStateManager.rotatef(90f, 0, 0, 1);
 	        } else if (child.y > myCenter.y) {
 	        	// from bottom
-	        	GlStateManager.rotate(180f, 0, 0, 1);
+	        	GlStateManager.rotatef(180f, 0, 0, 1);
 	        }
 	        GlStateManager.disableLighting();
-            GlStateManager.enableTexture2D();
+            GlStateManager.enableTexture();
             GlStateManager.enableBlend();
-            GlStateManager.color(1f, 1f, 1f, alpha);
+            GlStateManager.color4f(1f, 1f, 1f, alpha);
             mc.getTextureManager().bindTexture(RES_ICONS);
             Gui.drawScaledCustomSizeModalRect(-(TEXT_ICON_ARROW_WIDTH/2) - 1, -(TEXT_ICON_ARROW_HEIGHT/2), TEXT_ICON_ARROW_HOFFSET, TEXT_ICON_ARROW_VOFFSET,
             		TEXT_ICON_ARROW_WIDTH, TEXT_ICON_ARROW_HEIGHT, 14, 7, 256, 256);
@@ -1564,7 +1564,7 @@ public class MirrorGui extends GuiScreen {
 		}
 		
 		@Override
-        public void drawButton(Minecraft mc, int parX, int parY, float partialTicks) {
+        public void render(int parX, int parY, float partialTicks) {
 			mouseOver = false;
 			if (visible) {
 				float alpha = (float) (this.animStartMS == 0 ? 1 : ((double)(System.currentTimeMillis() - animStartMS) / 500.0));
@@ -1618,35 +1618,35 @@ public class MirrorGui extends GuiScreen {
                 GlStateManager.pushMatrix();
             	switch (state) {
 				case COMPLETED:
-					GlStateManager.color(.2f, 2f/3f, .2f, alpha);
+					GlStateManager.color4f(.2f, 2f/3f, .2f, alpha);
 					break;
 				case INACTIVE:
-					GlStateManager.color(2f/3f, 0f, 2f/3f, alpha);
+					GlStateManager.color4f(2f/3f, 0f, 2f/3f, alpha);
 					break;
 				case UNAVAILABLE:
-					GlStateManager.color(.8f, .0f, .0f, alpha);
+					GlStateManager.color4f(.8f, .0f, .0f, alpha);
 					break;
             	}
                 
             	GlStateManager.disableLighting();
-                GlStateManager.enableTexture2D();
+                GlStateManager.enableTexture();
                 GlStateManager.enableBlend();
-                GlStateManager.enableAlpha();
+                GlStateManager.enableAlphaTest();
                 mc.getTextureManager().bindTexture(RES_ICONS);
                 Gui.drawScaledCustomSizeModalRect(x, y, textureX, textureY,
                 		textureW, textureH, this.width, this.height, 256, 256);
                 
                 // Now draw icon
                 RenderHelper.enableGUIStandardItemLighting();
-                GlStateManager.translate(0, 0, -140.5);
-                mc.getRenderItem().renderItemAndEffectIntoGUI(research.getIconItem(), x + (width - 16) / 2, y + (height - 16) / 2);
-                mc.getRenderItem().renderItemOverlayIntoGUI(fontRenderer, research.getIconItem(), x + (width - 16) / 2, y + (height - 16) / 2, null);
+                GlStateManager.translatef(0, 0, -140.5);
+                mc.getItemRenderer().renderItemAndEffectIntoGUI(research.getIconItem(), x + (width - 16) / 2, y + (height - 16) / 2);
+                mc.getItemRenderer().renderItemOverlayIntoGUI(font, research.getIconItem(), x + (width - 16) / 2, y + (height - 16) / 2, null);
                 RenderHelper.disableStandardItemLighting();
                 GlStateManager.enableDepth();
                 GlStateManager.enableBlend();
                 
 //                RenderHelper.enableGUIStandardItemLighting();
-//                mc.getRenderItem().renderItemIntoGUI(research.getIconItem(), x + (width -16) / 2, y + (height -16) / 2);
+//                mc.getItemRenderer().renderItemIntoGUI(research.getIconItem(), x + (width -16) / 2, y + (height -16) / 2);
 //                RenderHelper.disableStandardItemLighting();
 //            	GlStateManager.enableBlend();
                 
@@ -1657,10 +1657,10 @@ public class MirrorGui extends GuiScreen {
 		public void drawOverlay(Minecraft mc, int parX, int parY) {
 			if (mouseOver) {
 		        GlStateManager.enableBlend();
-		        GlStateManager.enableAlpha();
+		        GlStateManager.enableAlphaTest();
 				GlStateManager.pushMatrix();
-				GlStateManager.scale(fontScale, fontScale, 1f);
-				GlStateManager.translate((int) (parX / fontScale) - parX, (int) (parY / fontScale) - parY, 0);
+				GlStateManager.scalef(fontScale, fontScale, 1f);
+				GlStateManager.translatef((int) (parX / fontScale) - parX, (int) (parY / fontScale) - parY, 0);
 				drawHoveringText(tooltip, parX, parY);
 				GlStateManager.popMatrix();
 			}

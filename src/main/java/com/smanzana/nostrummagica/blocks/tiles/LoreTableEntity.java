@@ -8,9 +8,9 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -44,7 +44,7 @@ public class LoreTableEntity extends TileEntity implements ITickableTileEntity {
 		return (this.lorekey != null);
 	}
 	
-	public void onTakeItem(EntityPlayer player) {
+	public void onTakeItem(PlayerEntity player) {
 		if (hasLore()) {
 			String lore = takeLore();
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
@@ -94,37 +94,37 @@ public class LoreTableEntity extends TileEntity implements ITickableTileEntity {
 	}
 	
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt = super.writeToNBT(nbt);
 		
 		if (nbt == null)
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		
 		if (!item.isEmpty())
-			nbt.setTag("item", item.serializeNBT());
+			nbt.put("item", item.serializeNBT());
 		
 		if (lorekey != null)
-			nbt.setString("lore", lorekey);
+			nbt.putString("lore", lorekey);
 		
-		nbt.setFloat("progress", progress);
+		nbt.putFloat("progress", progress);
 		
 		return nbt;
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(CompoundNBT nbt) {
 		super.readFromNBT(nbt);
 		
 		if (nbt == null)
 			return;
 		
 		this.progress = nbt.getFloat("progress");
-		if (nbt.hasKey("item", NBT.TAG_COMPOUND))
-			this.item = new ItemStack(nbt.getCompoundTag("item"));
+		if (nbt.contains("item", NBT.TAG_COMPOUND))
+			this.item = new ItemStack(nbt.getCompound("item"));
 		else
 			this.item = ItemStack.EMPTY;
 		
-		if (nbt.hasKey("lore", NBT.TAG_STRING))
+		if (nbt.contains("lore", NBT.TAG_STRING))
 			this.lorekey = nbt.getString("lore");
 			
 		

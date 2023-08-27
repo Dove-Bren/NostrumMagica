@@ -9,10 +9,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class ClientEffectEldrichBlast extends ClientEffect {
 
 	protected final Entity entity;
@@ -39,7 +39,7 @@ public class ClientEffectEldrichBlast extends ClientEffect {
 		final Vec3d offset = new Vec3d(Math.cos(angleRad) * .5, .25 + .1 * Math.sin(angleRad), Math.sin(angleRad) * .5);
 		entity.world.spawnParticle(EnumParticleTypes.PORTAL,
 				entity.posX + offset.x,
-				entity.posY + entity.height + offset.y,
+				entity.posY + entity.getHeight() + offset.y,
 				entity.posZ + offset.z,
 				0, -.1, 0,
 				new int[0]
@@ -50,7 +50,7 @@ public class ClientEffectEldrichBlast extends ClientEffect {
 		//int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, 
 		//Vec3d velocity, Vec3d velocityJitter
 		NostrumParticles.LIGHTNING_STATIC.spawn(entity.world, new SpawnParams(
-				30, entity.posX, entity.posY + (entity.height / 2), entity.posZ, entity.height/2, 30, 5,
+				30, entity.posX, entity.posY + (entity.getHeight() / 2), entity.posZ, entity.getHeight()/2, 30, 5,
 				Vec3d.ZERO, null
 				).color(ArcaneWolfElementalType.ELDRICH.getColor()));
 	}
@@ -62,7 +62,7 @@ public class ClientEffectEldrichBlast extends ClientEffect {
 				mod.apply(detail, progress, partialTicks);
 			}
 		
-		if (!this.entity.isDead) {
+		if (this.entity.isAlive()) {
 			final int ticksLeft = this.durationTicks - existedTicks;
 			if (ticksLeft % 30 == 0) {
 				spawnActiveEffect();

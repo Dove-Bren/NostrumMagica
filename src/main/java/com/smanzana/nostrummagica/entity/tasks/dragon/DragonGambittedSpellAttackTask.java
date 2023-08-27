@@ -10,7 +10,7 @@ import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
 
 // Extend with some way to get gambits and spells, silly!
@@ -21,7 +21,7 @@ public abstract class DragonGambittedSpellAttackTask<T extends EntityDragon & IT
 	protected int odds;
 	
 	protected int attackTicks;
-	protected EntityLivingBase currentTarget;
+	protected LivingEntity currentTarget;
 	protected int[] tickStorage;
 	
 	public DragonGambittedSpellAttackTask(T dragon, int delay, int odds) {
@@ -46,7 +46,7 @@ public abstract class DragonGambittedSpellAttackTask<T extends EntityDragon & IT
 	 */
 	public abstract Spell[] getSpells();
 	
-	public abstract EntityLivingBase getTarget(T dragon);
+	public abstract LivingEntity getTarget(T dragon);
 	
 	@Override
 	public boolean shouldExecute() {

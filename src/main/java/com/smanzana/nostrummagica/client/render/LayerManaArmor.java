@@ -8,9 +8,9 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 
 import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.GlStateManager.DestFactor;
-import net.minecraft.client.renderer.GlStateManager.SourceFactor;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.util.ResourceLocation;
@@ -49,7 +49,7 @@ public class LayerManaArmor implements LayerRenderer<AbstractClientPlayer> {
 			recurseMarker = true;
 		
 			final int color = getColor(player);
-			GlStateManager.color((float)((color >> 16) & 0xFF) / 255f,
+			GlStateManager.color4f((float)((color >> 16) & 0xFF) / 255f,
 					(float)((color >> 8) & 0xFF) / 255f,
 					(float)((color >> 0) & 0xFF) / 255f,
 						(float)((color >> 24) & 0xFF) / 255f);
@@ -62,11 +62,11 @@ public class LayerManaArmor implements LayerRenderer<AbstractClientPlayer> {
 			final float growAmt = (MathHelper.sin(progAdj * 3.1415f * 2) * growScale) + growScale;
 			
 			GlStateManager.disableBlend();
-			GlStateManager.disableAlpha();
+			GlStateManager.disableAlphaTest();
 			GlStateManager.enableBlend();
-			GlStateManager.enableAlpha();
-			GlStateManager.disableTexture2D();
-			GlStateManager.enableTexture2D();
+			GlStateManager.enableAlphaTest();
+			GlStateManager.disableTexture();
+			GlStateManager.enableTexture();
 			GlStateManager.enableLighting();
 			GlStateManager.disableLighting();
 			GlStateManager.disableColorLogic();
@@ -76,12 +76,12 @@ public class LayerManaArmor implements LayerRenderer<AbstractClientPlayer> {
 			this.renderPlayer.bindTexture(TEXTURE_ARMOR);
 			
 			GlStateManager.pushMatrix();
-			GlStateManager.scale(1.0 + growAmt, 1.0 + growAmt, 1.0 + growAmt);
+			GlStateManager.scalef(1.0 + growAmt, 1.0 + growAmt, 1.0 + growAmt);
 			
 			GlStateManager.matrixMode(GL11.GL_TEXTURE);
 			GlStateManager.pushMatrix();
 			GlStateManager.loadIdentity();
-			GlStateManager.translate(0 + (ageInTicks + partialTicks) * .001, 0, 0);
+			GlStateManager.translatef(0 + (ageInTicks + partialTicks) * .001, 0, 0);
 			
 			GlStateManager.matrixMode(GL11.GL_MODELVIEW);
 			
@@ -94,11 +94,11 @@ public class LayerManaArmor implements LayerRenderer<AbstractClientPlayer> {
 			GlStateManager.matrixMode(GL11.GL_TEXTURE);
 			GlStateManager.popMatrix();
 			GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-	//		GlStateManager.translate(0.0F, 0.0F, 0.125F);
+	//		GlStateManager.translatef(0.0F, 0.0F, 0.125F);
 	//		model.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale, player);
 	//		model.render(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
 	
-			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+			GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 	//		if (enchanted) {
 	//			LayerArmorBase.renderEnchantedGlint(this.renderPlayer, player, model, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
 	//		}

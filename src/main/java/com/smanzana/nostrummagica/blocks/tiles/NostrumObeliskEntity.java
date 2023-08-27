@@ -13,13 +13,13 @@ import com.smanzana.nostrummagica.blocks.ObeliskPortal;
 import com.smanzana.nostrummagica.world.NostrumChunkLoader;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -129,28 +129,28 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	}
 	
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt = super.writeToNBT(nbt);
 		
-		NBTTagList list = new NBTTagList();
+		ListNBT list = new ListNBT();
 		
 		if (master && targets.size() > 0)
 		for (NostrumObeliskTarget target : targets) {
 			if (target == null)
 				continue;
 			
-			NBTTagCompound tag = new NBTTagCompound();
-			tag.setInteger(NBT_TARGET_X, target.pos.getX());
-			tag.setInteger(NBT_TARGET_Y, target.pos.getY());
-			tag.setInteger(NBT_TARGET_Z, target.pos.getZ());
-			tag.setString(NBT_TARGET_TITLE, target.title);
-			//tag.setInteger(NBT_TARGET_DIMENSION, target.dimension);
+			CompoundNBT tag = new CompoundNBT();
+			tag.putInt(NBT_TARGET_X, target.pos.getX());
+			tag.putInt(NBT_TARGET_Y, target.pos.getY());
+			tag.putInt(NBT_TARGET_Z, target.pos.getZ());
+			tag.putString(NBT_TARGET_TITLE, target.title);
+			//tag.putInt(NBT_TARGET_DIMENSION, target.dimension);
 			
-			list.appendTag(tag);
+			list.add(tag);
 		}
 		
-		nbt.setTag(NBT_TARGETS, list);
-		nbt.setBoolean(NBT_MASTER, master);
+		nbt.put(NBT_TARGETS, list);
+		nbt.putBoolean(NBT_MASTER, master);
 		if (!master && corner != null) {
 			nbt.setByte(NBT_CORNER, (byte) corner.ordinal());
 		}
@@ -158,24 +158,24 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(CompoundNBT nbt) {
 		super.readFromNBT(nbt);
 		
-		if (nbt == null || !nbt.hasKey(NBT_MASTER, NBT.TAG_BYTE))
+		if (nbt == null || !nbt.contains(NBT_MASTER, NBT.TAG_BYTE))
 			return;
 
 		this.master = nbt.getBoolean(NBT_MASTER);
-		NBTTagList list = nbt.getTagList(NBT_TARGETS, NBT.TAG_COMPOUND);
-		if (list != null && list.tagCount() > 0) {
-			this.targets = new ArrayList<>(list.tagCount());
-			for (int i = 0; i < list.tagCount(); i++) {
-				NBTTagCompound tag = list.getCompoundTagAt(i);
+		ListNBT list = nbt.getList(NBT_TARGETS, NBT.TAG_COMPOUND);
+		if (list != null && list.size() > 0) {
+			this.targets = new ArrayList<>(list.size());
+			for (int i = 0; i < list.size(); i++) {
+				CompoundNBT tag = list.getCompoundTagAt(i);
 				targets.add(new NostrumObeliskTarget(
-						//tag.getInteger(NBT_TARGET_DIMENSION),
+						//tag.getInt(NBT_TARGET_DIMENSION),
 						new BlockPos(
-								tag.getInteger(NBT_TARGET_X),
-								tag.getInteger(NBT_TARGET_Y),
-								tag.getInteger(NBT_TARGET_Z)
+								tag.getInt(NBT_TARGET_X),
+								tag.getInt(NBT_TARGET_Y),
+								tag.getInt(NBT_TARGET_Z)
 						),
 						tag.getString(NBT_TARGET_TITLE)));
 			}
@@ -302,7 +302,7 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	}
 	
 	protected void activatePortal() {
-		world.setBlockState(pos.up(), ObeliskPortal.instance().getStateForPlacement(world, pos, EnumFacing.UP, 0f, 0f, 0f, 0, null));
+		world.setBlockState(pos.up(), ObeliskPortal.instance().getStateForPlacement(world, pos, Direction.UP, 0f, 0f, 0f, 0, null));
 		ObeliskPortal.instance().createPaired(world, pos.up());
 	}
 	
@@ -343,8 +343,8 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	}
 
 	@Override
-	public NBTTagCompound getUpdateTag() {
-		return this.writeToNBT(new NBTTagCompound());
+	public CompoundNBT getUpdateTag() {
+		return this.writeToNBT(new CompoundNBT());
 	}
 	
 	@Override

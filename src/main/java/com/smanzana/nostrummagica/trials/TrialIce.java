@@ -4,7 +4,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -13,7 +13,7 @@ import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class TrialIce extends ShrineTrial {
 
@@ -24,7 +24,7 @@ public class TrialIce extends ShrineTrial {
 
 	@SubscribeEvent
 	public void onDeath(LivingDeathEvent e) {
-		if (e.getEntityLiving() instanceof EntityPlayer) {
+		if (e.getEntityLiving() instanceof PlayerEntity) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(e.getEntityLiving());
 			if (attr == null || !attr.isUnlocked())
 				return;
@@ -42,7 +42,7 @@ public class TrialIce extends ShrineTrial {
 			if (!BiomeDictionary.hasType(biome, Type.COLD))
 				return;
 			
-			this.complete((EntityPlayer) e.getEntityLiving());
+			this.complete((PlayerEntity) e.getEntityLiving());
 		}
 	}
 	

@@ -5,8 +5,8 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.SpellTome;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -27,11 +27,11 @@ public class SpellTomeIncrementMessage implements IMessage {
 		public IMessage onMessage(SpellTomeIncrementMessage message, MessageContext ctx) {
 			// Is it on?
 			
-			final EntityPlayerMP sp = ctx.getServerHandler().player;
+			final ServerPlayerEntity sp = ctx.getServerHandler().player;
 			
-			int value = message.tag.getInteger(NBT_VALUE);
+			int value = message.tag.getInt(NBT_VALUE);
 			
-			sp.getServerWorld().addScheduledTask(() -> {
+			sp.getServerWorld().runAsync(() -> {
 				SpellTome.setIndex(NostrumMagica.getCurrentTome(sp),
 						value);
 			});
@@ -45,16 +45,16 @@ public class SpellTomeIncrementMessage implements IMessage {
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public SpellTomeIncrementMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	public SpellTomeIncrementMessage(int index) {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 		
-		tag.setInteger(NBT_VALUE, index);
+		tag.putInt(NBT_VALUE, index);
 	}
 
 	@Override

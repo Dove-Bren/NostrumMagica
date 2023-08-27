@@ -7,11 +7,11 @@ import com.smanzana.nostrummagica.items.IElytraProvider;
 
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.model.ModelElytra;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.layers.LayerArmorBase;
 import net.minecraft.client.renderer.entity.layers.LayerElytra;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.EnumPlayerModelParts;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
@@ -29,14 +29,14 @@ public class LayerCustomElytra extends LayerElytra {
 	}
 	
 	@Override
-	public void doRenderLayer(EntityLivingBase player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+	public void doRenderLayer(LivingEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 		if (shouldRender(player)) {
 			@Nonnull ItemStack chestpiece = player.getItemStackFromSlot(EntityEquipmentSlot.CHEST); 
 			render(player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale, (!chestpiece.isEmpty() && chestpiece.isItemEnchanted()));
 		}
 	}
 	
-	public boolean shouldRender(EntityLivingBase player) {
+	public boolean shouldRender(LivingEntity player) {
 		final boolean flying = player.isElytraFlying();
 		ItemStack cape = LayerAetherCloak.ShouldRender(player);
 		if (!flying && !cape.isEmpty() && ((ICapeProvider) cape.getItem()).shouldPreventOtherRenders(player, cape)) {
@@ -54,8 +54,8 @@ public class LayerCustomElytra extends LayerElytra {
 		return false;
 	}
 	
-	public void render(EntityLivingBase player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale, boolean enchanted) {
-		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+	public void render(LivingEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale, boolean enchanted) {
+		GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		GlStateManager.enableBlend();
 
 		if (player instanceof AbstractClientPlayer) {
@@ -72,7 +72,7 @@ public class LayerCustomElytra extends LayerElytra {
 		}
 
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(0.0F, 0.0F, 0.125F);
+		GlStateManager.translatef(0.0F, 0.0F, 0.125F);
 		this.modelElytra.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale, player);
 		this.modelElytra.render(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
 

@@ -116,7 +116,7 @@ public class TemporaryTeleportationPortal extends TeleportationPortal  {
 			// Check that it's on ground
 			IBlockState ground = world.getBlockState(loc.down());
 			if (!ground.getMaterial().blocksMovement()) {
-			//if (!ground.isSideSolid(world, loc.down(), EnumFacing.UP)) {
+			//if (!ground.isSideSolid(world, loc.down(), Direction.UP)) {
 				continue;
 			}
 			

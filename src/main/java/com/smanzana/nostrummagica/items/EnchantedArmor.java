@@ -56,14 +56,14 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -71,11 +71,11 @@ import net.minecraft.inventory.EntityEquipmentSlot.Type;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
@@ -95,11 +95,11 @@ import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISpecialArmor, IElytraProvider, IDragonWingRenderItem {
@@ -459,7 +459,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	
 	private String modelID;
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	private static ModelEnchantedArmorBase armorModels[];
 	
 	public EnchantedArmor(String modelID, EntityEquipmentSlot type, EMagicElement element, int level) {
@@ -490,7 +490,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
 		super.getSubItems(tab, subItems); // Base armor
 		
@@ -530,7 +530,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
     }
 
 	@Override
-	public SpellAction getTriggerAction(EntityLivingBase user, boolean offense, @Nonnull ItemStack stack) {
+	public SpellAction getTriggerAction(LivingEntity user, boolean offense, @Nonnull ItemStack stack) {
 		if (offense)
 			return null;
 		
@@ -586,7 +586,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type) {
 		if (!(stack.getItem() instanceof EnchantedArmor)) {
 			return null;
@@ -602,8 +602,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
-	public ModelBiped getArmorModel(EntityLivingBase entity, ItemStack stack, EntityEquipmentSlot slot, ModelBiped defaultModel) {
+	@OnlyIn(Dist.CLIENT)
+	public ModelBiped getArmorModel(LivingEntity entity, ItemStack stack, EntityEquipmentSlot slot, ModelBiped defaultModel) {
 		final int setCount = getSetPieces(entity);
 		final int index = (setCount - 1) + (this.level >= 3 ? 1 : 0); // Boost 1 if ultimate armor
 		ModelEnchantedArmorBase model = armorModels[index % armorModels.length];
@@ -612,7 +612,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return model;
 	}
 	
-	public static int GetSetCount(EntityLivingBase entity, EMagicElement element, int level) {
+	public static int GetSetCount(LivingEntity entity, EMagicElement element, int level) {
 		int count = 0;
 		
 		if (entity != null) {
@@ -632,13 +632,13 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return count;
 	}
 	
-	public static int GetSetPieces(EntityLivingBase entity, EnchantedArmor armor) {
+	public static int GetSetPieces(LivingEntity entity, EnchantedArmor armor) {
 		final EMagicElement myElem = armor.getElement();
 		final int myLevel = armor.getLevel();
 		return GetSetCount(entity, myElem, myLevel);
 	}
 	
-	public int getSetPieces(EntityLivingBase entity) {
+	public int getSetPieces(LivingEntity entity) {
 		return GetSetPieces(entity, this);
 	}
 	
@@ -680,7 +680,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 
 	@Override
-	public ArmorProperties getProperties(EntityLivingBase player, ItemStack armor, DamageSource source, double damage,
+	public ArmorProperties getProperties(LivingEntity player, ItemStack armor, DamageSource source, double damage,
 			int slot) {
 		if (source.isDamageAbsolute() || source.isUnblockable()) {
 			return new ArmorProperties(1, 0.0, 0);
@@ -693,20 +693,20 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 
 	@Override
-	public int getArmorDisplay(EntityPlayer player, ItemStack armor, int slot) {
+	public int getArmorDisplay(PlayerEntity player, ItemStack armor, int slot) {
 		return 0; // this.armor; this is now "extra" on top of attributes
 	}
 
 	@Override
-	public void damageArmor(EntityLivingBase entity, ItemStack stack, DamageSource source, int damage, int slot) {
+	public void damageArmor(LivingEntity entity, ItemStack stack, DamageSource source, int damage, int slot) {
 		stack.damageItem(damage, entity);
 	}
 	
-	protected void onArmorDisplayTick(World world, EntityPlayer player, ItemStack itemStack, int setCount) {
+	protected void onArmorDisplayTick(World world, PlayerEntity player, ItemStack itemStack, int setCount) {
 		final int displayLevel = (Math.min(2, level) + 1) * (setCount * setCount);
 		
 //		if (setCount == 4 && element == EMagicElement.ICE && level == 3) {
-//			RenderFuncs.renderWeather(player.getPosition(), Minecraft.getMinecraft().getRenderPartialTicks(), true);
+//			RenderFuncs.renderWeather(player.getPosition(), Minecraft.getInstance().getRenderPartialTicks(), true);
 //		}
 		
 		if (NostrumMagica.rand.nextInt(400) > displayLevel) {
@@ -788,7 +788,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		}
 	}
 	
-	protected void onServerTick(World world, EntityPlayer player, ItemStack stack, int setCount) {
+	protected void onServerTick(World world, PlayerEntity player, ItemStack stack, int setCount) {
 		if (setCount == 4 && this.level == 3 && this.armorType == EntityEquipmentSlot.CHEST) {
 			if (element == EMagicElement.ICE) {
 				if (player.onGround && !ArmorCheckFlying(player)) {
@@ -842,7 +842,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 	
 	@Override
-	public void onArmorTick(World world, EntityPlayer player, ItemStack itemStack) {
+	public void onArmorTick(World world, PlayerEntity player, ItemStack itemStack) {
 		super.onArmorTick(world, player, itemStack);
 		
 		final int setCount = getSetPieces(player);
@@ -854,9 +854,9 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 	
 	// hacky little map to avoid thrashing attributes every tick
-	protected static final Map<EntityLivingBase, Map<EntityEquipmentSlot, ItemStack>> LastEquipState = new HashMap<>();
+	protected static final Map<LivingEntity, Map<EntityEquipmentSlot, ItemStack>> LastEquipState = new HashMap<>();
 	
-	protected static Map<EntityEquipmentSlot, ItemStack> GetLastTickState(EntityLivingBase entity) {
+	protected static Map<EntityEquipmentSlot, ItemStack> GetLastTickState(LivingEntity entity) {
 		Map<EntityEquipmentSlot, ItemStack> map = LastEquipState.get(entity);
 		if (map == null) {
 			map = new NonNullEnumMap<>(EntityEquipmentSlot.class, ItemStack.EMPTY);
@@ -865,7 +865,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return map;
 	}
 	
-	protected static boolean EntityChangedEquipment(EntityLivingBase entity) {
+	protected static boolean EntityChangedEquipment(LivingEntity entity) {
 		Map<EntityEquipmentSlot, ItemStack> map = GetLastTickState(entity);
 		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
 			if (slot.getSlotType() != Type.ARMOR) {
@@ -883,7 +883,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return false;
 	}
 	
-	public static final boolean EntityHasEnchantedArmor(EntityLivingBase entity) {
+	public static final boolean EntityHasEnchantedArmor(LivingEntity entity) {
 		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
 			if (slot.getSlotType() != Type.ARMOR) {
 				continue;
@@ -898,7 +898,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return false;
 	}
 	
-	protected static void UpdateEntity(EntityLivingBase entity) {
+	protected static void UpdateEntity(LivingEntity entity) {
 		
 		if (entity.isDead) {
 			LastEquipState.remove(entity);
@@ -1023,13 +1023,13 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	// Updates all entities' current set bonuses (or lack there-of) from enchanted armor
 	public static void ServerWorldTick(World world) {
 		for (Entity ent : world.loadedEntityList) {
-			if (ent instanceof EntityLivingBase) {
-				UpdateEntity((EntityLivingBase) ent);
+			if (ent instanceof LivingEntity) {
+				UpdateEntity((LivingEntity) ent);
 			}
 		}
 	}
 	
-	public static Map<IAttribute, Double> FindCurrentSetBonus(@Nullable Map<IAttribute, Double> map, EntityLivingBase entity, EMagicElement element, int level) {
+	public static Map<IAttribute, Double> FindCurrentSetBonus(@Nullable Map<IAttribute, Double> map, LivingEntity entity, EMagicElement element, int level) {
 		if (map == null) {
 			map = new HashMap<>();
 		}
@@ -1088,10 +1088,10 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	private Map<IAttribute, Double> setMapInst = new HashMap<>();
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-		final boolean showFull = Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());
-		final @Nullable EntityPlayer player = NostrumMagica.proxy.getPlayer();
+		final boolean showFull = Keyboard.isKeyDown(Minecraft.getInstance().gameSettings.keyBindSneak.getKeyCode());
+		final @Nullable PlayerEntity player = NostrumMagica.proxy.getPlayer();
 		final int setCount = this.getSetPieces(player);
 		
 		final String setName = I18n.format("item.armor.set." + element.name().toLowerCase() + "." + level + ".name", new Object[0]);
@@ -1143,7 +1143,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			// TODO make this a bit more... extensible?
 			if (showFull || setCount == 4) {
 				final String key = "info.armor.set_bonus." + element.name().toLowerCase() + "." + level;
-				if (I18n.hasKey(key)) {
+				if (I18n.contains(key)) {
 					final String full = I18n.format(key, new Object[0]);
 					for (String line : full.split("\\|"))
 					tooltip.add(ChatFormatting.DARK_PURPLE + " "
@@ -1159,19 +1159,19 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 
 	@Override
-	public boolean isElytraFlying(EntityLivingBase entity, ItemStack stack) {
+	public boolean isElytraFlying(LivingEntity entity, ItemStack stack) {
 		return ArmorCheckFlying(entity);
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
-	public boolean shouldRenderElyta(EntityLivingBase entity, ItemStack stack) {
+	public boolean shouldRenderElyta(LivingEntity entity, ItemStack stack) {
 		return hasElytra(entity)
 				&& (element == EMagicElement.ICE || element == EMagicElement.LIGHTNING || element == EMagicElement.WIND)
-				&& (!(entity instanceof EntityPlayer) || !(shouldRenderDragonWings(stack, (EntityPlayer) entity)));
+				&& (!(entity instanceof PlayerEntity) || !(shouldRenderDragonWings(stack, (PlayerEntity) entity)));
 	}
 	
-	protected boolean hasElytra(EntityLivingBase entity) {
+	protected boolean hasElytra(LivingEntity entity) {
 		if (this.level == 3 && this.armorType == EntityEquipmentSlot.CHEST) {
 			// Check if full set is available
 			return (4 == getSetPieces(entity)); 
@@ -1200,7 +1200,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	protected static final int ENDER_DASH_COST = 20;
 	protected static final int EARTH_GROW_COST = 5;
 	
-	protected boolean hasManaJump(EntityLivingBase entity) {
+	protected boolean hasManaJump(LivingEntity entity) {
 		if (this.level == 3 && this.armorType == EntityEquipmentSlot.CHEST) {
 			// Check if full set is available and if we have enough mana
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
@@ -1212,7 +1212,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return false;
 	}
 	
-	protected boolean hasWindTornado(EntityLivingBase entity) {
+	protected boolean hasWindTornado(LivingEntity entity) {
 		if (this.level == 3 && this.armorType == EntityEquipmentSlot.CHEST && this.element == EMagicElement.WIND) {
 			// Check if full set is available and if we have enough mana
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
@@ -1224,7 +1224,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return false;
 	}
 	
-	protected boolean hasEnderDash(EntityLivingBase entity) {
+	protected boolean hasEnderDash(LivingEntity entity) {
 		if (this.level == 3 && this.armorType == EntityEquipmentSlot.CHEST && this.element == EMagicElement.ENDER) {
 			// Check if full set is available and if we have enough mana
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
@@ -1236,7 +1236,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return false;
 	}
 	
-	protected boolean hasDragonFlight(EntityLivingBase entity) {
+	protected boolean hasDragonFlight(LivingEntity entity) {
 		if (this.level == 3 && this.armorType == EntityEquipmentSlot.CHEST) {
 			boolean hasRightElement = element == EMagicElement.ENDER || element == EMagicElement.EARTH || element == EMagicElement.FIRE || element == EMagicElement.PHYSICAL;
 			if (!hasRightElement) {
@@ -1256,8 +1256,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return false;
 	}
 	
-	protected void consumeManaJump(EntityLivingBase entity) {
-		if (entity instanceof EntityPlayer && ((EntityPlayer) entity).isCreative()) {
+	protected void consumeManaJump(LivingEntity entity) {
+		if (entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative()) {
 			return;
 		}
 		
@@ -1267,8 +1267,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		}
 	}
 	
-	protected void consumeWindTornado(EntityLivingBase entity) {
-		if (entity instanceof EntityPlayer && ((EntityPlayer) entity).isCreative()) {
+	protected void consumeWindTornado(LivingEntity entity) {
+		if (entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative()) {
 			return;
 		}
 		
@@ -1278,8 +1278,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		}
 	}
 	
-	protected void consumeWindJumpWhirlwind(EntityLivingBase entity) {
-		if (entity instanceof EntityPlayer && ((EntityPlayer) entity).isCreative()) {
+	protected void consumeWindJumpWhirlwind(LivingEntity entity) {
+		if (entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative()) {
 			return;
 		}
 		
@@ -1289,8 +1289,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		}
 	}
 	
-	protected void consumeEnderDash(EntityLivingBase entity) {
-		if (entity instanceof EntityPlayer && ((EntityPlayer) entity).isCreative()) {
+	protected void consumeEnderDash(LivingEntity entity) {
+		if (entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative()) {
 			return;
 		}
 		
@@ -1300,8 +1300,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		}
 	}
 	
-	protected void consumeDragonFlight(EntityLivingBase entity) {
-		if (entity instanceof EntityPlayer && ((EntityPlayer) entity).isCreative()) {
+	protected void consumeDragonFlight(LivingEntity entity) {
+		if (entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative()) {
 			return;
 		}
 		
@@ -1345,19 +1345,19 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		
 	}
 	
-	protected void clientDashSide(EntityLivingBase ent, boolean right) {
+	protected void clientDashSide(LivingEntity ent, boolean right) {
 		this.consumeEnderDash(ent);
 		NetworkHandler.getSyncChannel().sendToServer(new EnchantedArmorStateUpdate(ArmorState.ENDER_DASH_SIDE, right, 0));
 	}
 	
-	protected void clientDashBack(EntityLivingBase ent) {
+	protected void clientDashBack(LivingEntity ent) {
 		this.consumeEnderDash(ent);
 		NetworkHandler.getSyncChannel().sendToServer(new EnchantedArmorStateUpdate(ArmorState.ENDER_DASH_BACK, false, 0));
 	}
 	
 	@SubscribeEvent
 	public void onKey(KeyInputEvent event) {
-		EntityPlayer player = NostrumMagica.proxy.getPlayer();
+		PlayerEntity player = NostrumMagica.proxy.getPlayer();
 		if (bindingEnderLeft.isPressed()) {
 			clientDashSide(player, false);
 		} else if (bindingEnderRight.isPressed()) {
@@ -1374,10 +1374,10 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		}
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public void onClientTick(TickEvent.ClientTickEvent event) {
-		final EntityPlayerSP player = Minecraft.getMinecraft().player;
+		final EntityPlayerSP player = Minecraft.getInstance().player;
 		if (player == null) {
 			return;
 		}
@@ -1439,7 +1439,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		boolean hasJump = player.movementInput.jump && !jumpPressedEarly;
 		
 		// Start flying
-		if (!flying && hasJump && !player.onGround && player.motionY < 0 && !player.capabilities.isFlying) {
+		if (!flying && hasJump && !player.onGround && player.getMotion().y < 0 && !player.capabilities.isFlying) {
 			// Does this armor support flying?
 			if (this.hasElytra(player)) {
 				SetArmorFlying(player, true);
@@ -1450,11 +1450,11 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		
 		// Mana jump
 		final double MANA_JUMP_AMT = flying ? .6 : .4;
-		if (hasJump && flying && !player.onGround && !lastTickGround && !player.capabilities.isFlying && player.motionY < MANA_JUMP_AMT) {
+		if (hasJump && flying && !player.onGround && !lastTickGround && !player.capabilities.isFlying && player.getMotion().y < MANA_JUMP_AMT) {
 			// Does this armor have mana jump?
 			if (this.hasManaJump(player)) {
 				this.consumeManaJump(player);
-				player.motionY += MANA_JUMP_AMT;
+				player.getMotion().y += MANA_JUMP_AMT;
 				hasJump = false; // Consumed
 				NetworkHandler.getSyncChannel().sendToServer(new EnchantedArmorStateUpdate(ArmorState.JUMP, true, 0));
 			}
@@ -1465,22 +1465,22 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			// Does this armor have dragon flying?
 			if (this.hasDragonFlight(player)) {
 				// Check if magnitude of flying is low and if so, boost it with magic
-				final double curMagnitudeSq = (player.motionX * player.motionX + player.motionY * player.motionY + player.motionZ * player.motionZ);
+				final double curMagnitudeSq = (player.getMotion().x * player.getMotion().x + player.getMotion().y * player.getMotion().y + player.getMotion().z * player.getMotion().z);
 				if (curMagnitudeSq < .4) {
 					// How much should we scale?
 					final double curMagnitude = Math.sqrt(curMagnitudeSq);
 					final double target = 0.63;
 					final double scale = target / curMagnitude;
-					final double origX = player.motionX;
-					final double origY = player.motionY;
-					final double origZ = player.motionZ;
-					player.motionX *= scale;
-					player.motionY *= scale;
-					player.motionZ *= scale;
+					final double origX = player.getMotion().x;
+					final double origY = player.getMotion().y;
+					final double origZ = player.getMotion().z;
+					player.getMotion().x *= scale;
+					player.getMotion().y *= scale;
+					player.getMotion().z *= scale;
 					
-					final double dx = Math.abs(player.motionX - origX);
-					final double dy = Math.abs(player.motionY - origY);
-					final double dz = Math.abs(player.motionZ - origZ);
+					final double dx = Math.abs(player.getMotion().x - origX);
+					final double dy = Math.abs(player.getMotion().y - origY);
+					final double dz = Math.abs(player.getMotion().z - origZ);
 					
 					// We take mana depending on how 'up' we're being propeled
 					final float vertScale = (dx == 0 && dy == 0 && dz == 0 ? 0f : (float) (dy / (dx + dy + dz)));
@@ -1533,21 +1533,21 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		// TODO if there was more than flying, we'd want to iterate every possible type and send updates for each
 		// (which would clear an entity's old state if something was active when they left and they just came back)
 		
-		if (event.getTarget() instanceof EntityLivingBase) {
-			SendUpdates((EntityLivingBase) event.getTarget(), event.getEntityPlayer());
+		if (event.getTarget() instanceof LivingEntity) {
+			SendUpdates((LivingEntity) event.getTarget(), event.getEntityPlayer());
 		}
 	}
 	
-	protected static final void SendUpdates(EntityLivingBase entity, @Nullable EntityPlayer toPlayer) {
+	protected static final void SendUpdates(LivingEntity entity, @Nullable PlayerEntity toPlayer) {
 		// Note: We only do players for now
-		if (entity instanceof EntityPlayer) {
-			final EntityPlayer player = (EntityPlayer) entity;
+		if (entity instanceof PlayerEntity) {
+			final PlayerEntity player = (PlayerEntity) entity;
 			final EnchantedArmorStateUpdate message = new EnchantedArmorStateUpdate(ArmorState.FLYING, ArmorCheckFlying(player), player.getEntityId());
 			if (player.world.isRemote) {
 				assert(player == NostrumMagica.proxy.getPlayer());
 				NetworkHandler.getSyncChannel().sendToServer(message);
 			} else if (toPlayer != null) {
-				NetworkHandler.getSyncChannel().sendTo(message, (EntityPlayerMP) toPlayer);
+				NetworkHandler.getSyncChannel().sendTo(message, (ServerPlayerEntity) toPlayer);
 			} else {
 				NetworkHandler.getSyncChannel().sendToDimension(message, player.dimension);
 			}
@@ -1571,7 +1571,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	
 	private static final Map<UUID, Boolean> ArmorHitEffectMap = new HashMap<>();
 	
-	protected static boolean ArmorCheckFlying(EntityLivingBase ent) {
+	protected static boolean ArmorCheckFlying(LivingEntity ent) {
 		final UUID id = ent.getUniqueID();
 		boolean ret = false;
 		synchronized(ArmorFlyingMap) {
@@ -1583,7 +1583,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return ret;
 	}
 	
-	public static void SetArmorFlying(EntityLivingBase ent, boolean flying) {
+	public static void SetArmorFlying(LivingEntity ent, boolean flying) {
 		synchronized(ArmorFlyingMap) {
 			if (!flying) {
 				ArmorFlyingMap.remove(ent.getUniqueID());
@@ -1596,7 +1596,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		}
 	}
 	
-	protected static int ArmorGetLastFlapTick(EntityLivingBase ent) {
+	protected static int ArmorGetLastFlapTick(LivingEntity ent) {
 		final UUID id = ent.getUniqueID();
 		synchronized(ArmorFlyingMap) {
 			Map<FlyingTrackedData, Integer> map = ArmorFlyingMap.get(id);
@@ -1609,7 +1609,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return 0;
 	}
 	
-	public static boolean SetArmorWingFlap(EntityLivingBase ent) {
+	public static boolean SetArmorWingFlap(LivingEntity ent) {
 		// Only actually update if no flap is ongoing
 		final UUID id = ent.getUniqueID();
 		final int curTicks = ent.ticksExisted;
@@ -1634,13 +1634,13 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return changed;
 	}
 	
-	public static float GetWingFlap(EntityLivingBase ent, float partialTicks) {
+	public static float GetWingFlap(LivingEntity ent, float partialTicks) {
 		double curTicks = ent.ticksExisted + partialTicks; // Expand to double
 		double flapStartTicks = ArmorGetLastFlapTick(ent);
 		return Math.max(0.0f, Math.min(1.0f, (float) (curTicks - flapStartTicks) / WING_FLAP_DURATION));
 	}
 	
-	public static final void SetArmorHitEffectsEnabled(EntityLivingBase ent, boolean enabled) {
+	public static final void SetArmorHitEffectsEnabled(LivingEntity ent, boolean enabled) {
 		final UUID key = ent.getUniqueID();
 		if (enabled) {
 			ArmorHitEffectMap.put(key, enabled);
@@ -1649,7 +1649,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		}
 	}
 	
-	public static final boolean GetArmorHitEffectsEnabled(EntityLivingBase ent) {
+	public static final boolean GetArmorHitEffectsEnabled(LivingEntity ent) {
 		Boolean val = ArmorHitEffectMap.get(ent.getUniqueID());
 		return (val != null && val.booleanValue());
 	}
@@ -1657,12 +1657,12 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	private static final String NBT_WING_UPGRADE = "dragonwing_upgrade";
 	
 	public static final void SetHasWingUpgrade(ItemStack stack, boolean upgraded) {
-		NBTTagCompound nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTagCompound();
 		if (nbt == null) {
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		}
 		
-		nbt.setBoolean(NBT_WING_UPGRADE, upgraded);
+		nbt.putBoolean(NBT_WING_UPGRADE, upgraded);
 		
 		stack.setTagCompound(nbt);
 	}
@@ -1675,7 +1675,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 				&& stack.getTagCompound().getBoolean(NBT_WING_UPGRADE);
 	}
 	
-	private static final boolean DoEnderDash(EntityLivingBase entity, Vec3d dir) {
+	private static final boolean DoEnderDash(LivingEntity entity, Vec3d dir) {
 		final float dashDist = 4.0f;
 		final Vec3d idealVec = entity.getPositionVector().addVector(dashDist * dir.x, dashDist * dir.y, dashDist * dir.z);
 		
@@ -1684,8 +1684,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		double bestDist = -1;
 		final Vec3d startPos = entity.getPositionVector();
 		for (int y = -1; y <= 4; y++) {
-			final Vec3d end = idealVec.addVector(0, y, 0);
-			RayTraceResult mop = RayTrace.raytrace(entity.world, startPos.addVector(0, y, 0), end, (ent) -> {
+			final Vec3d end = idealVec.add(0, y, 0);
+			RayTraceResult mop = RayTrace.raytrace(entity.world, startPos.add(0, y, 0), end, (ent) -> {
 				return false;
 			});
 			
@@ -1697,7 +1697,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 				spot = end;
 			}
 			
-			final double dist = startPos.addVector(0, y, 0).distanceTo(spot);
+			final double dist = startPos.add(0, y, 0).distanceTo(spot);
 			if (dist > bestDist) {
 				bestDist = dist;
 				bestResult = spot;
@@ -1745,7 +1745,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return null;
 	}
 	
-	public static final boolean DoEarthDig(World world, EntityPlayer player, BlockPos pos, EnumFacing face) {
+	public static final boolean DoEarthDig(World world, PlayerEntity player, BlockPos pos, Direction face) {
 		if (!player.getHeldItemMainhand().isEmpty()) {
 			return false;
 		}
@@ -1766,17 +1766,17 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		
 		// Can break. Break neighbors, too
 		final BlockPos[] positions = (
-					face == EnumFacing.UP || face == EnumFacing.DOWN ? new BlockPos[] {
+					face == Direction.UP || face == Direction.DOWN ? new BlockPos[] {
 							pos.north().east(), pos.north(), pos.north().west(),
 							pos.east(), pos, pos.west(),
 							pos.south().east(), pos.south(), pos.south().west()
 					}
-					: face == EnumFacing.NORTH || face == EnumFacing.SOUTH ? new BlockPos[] {
+					: face == Direction.NORTH || face == Direction.SOUTH ? new BlockPos[] {
 							pos.up().east(), pos.up(), pos.up().west(),
 							pos.east(), pos, pos.west(),
 							pos.down().east(), pos.down(), pos.down().west()
 					}
-					: /* face == EnumFacing.EAST || face == EnumFacing.WEST*/ new BlockPos[] {
+					: /* face == Direction.EAST || face == Direction.WEST*/ new BlockPos[] {
 							pos.up().north(), pos.up(), pos.up().south(),
 							pos.north(), pos, pos.south(),
 							pos.down().north(), pos.down(), pos.down().south()
@@ -1805,7 +1805,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return true;
 	}
 	
-	public static final void HandleStateUpdate(ArmorState state, EntityLivingBase ent, boolean data) {
+	public static final void HandleStateUpdate(ArmorState state, LivingEntity ent, boolean data) {
 		ItemStack chest = ent.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
 		if (chest.isEmpty() || !(chest.getItem() instanceof EnchantedArmor)) {
 			return;
@@ -1832,8 +1832,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 				if (DoEnderDash(ent, dir)) {
 					armor.consumeEnderDash(ent);
 				} else {
-					if (ent instanceof EntityPlayer) {
-						NostrumMagica.proxy.sendMana((EntityPlayer) ent);
+					if (ent instanceof PlayerEntity) {
+						NostrumMagica.proxy.sendMana((PlayerEntity) ent);
 					}
 				}
 			}
@@ -1871,15 +1871,15 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 					
 					// Projectiles get turned downward
 					if (entity instanceof IProjectile) {
-						EntityLivingBase shooter = Projectiles.getShooter(entity);
+						LivingEntity shooter = Projectiles.getShooter(entity);
 						if (shooter == ent) {
 							// Let summoner's projectiles go unharmed
 							return;
 						}
 						
-						entity.motionY -= 0.3;
-						entity.motionX *= .2;
-						entity.motionZ *= .2;
+						entity.getMotion().y -= 0.3;
+						entity.getMotion().x *= .2;
+						entity.getMotion().z *= .2;
 						entity.velocityChanged = true;
 						return;
 					}
@@ -1890,23 +1890,23 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 //					final double dy = (Math.sin(prog * 2 * Math.PI) + 1) / 2;
 //					final Vec3d target = new Vec3d(cloud.posX, cloud.posY + 2 + dy, cloud.posZ);
 //					final Vec3d diff = target.subtract(entity.getPositionVector());
-//					entity.motionX = 0;//diff.x/ 2;
-//					entity.motionY = diff.y/ 2;
-//					entity.motionZ = 0;//diff.z/ 2;
+//					entity.getMotion().x = 0;//diff.x/ 2;
+//					entity.getMotion().y = diff.y/ 2;
+//					entity.getMotion().z = 0;//diff.z/ 2;
 //					entity.velocityChanged = true;
 //					//entity.posY = 2 + dy;
 //					//entity.setPositionAndUpdate(cloud.posX, cloud.posY + 2 + dy, cloud.posZ);
 					
 					// Downward suppresive effect
-					entity.motionX *= .2;
-					entity.motionZ *= .2;
-					entity.motionY -= 0.3;
+					entity.getMotion().x *= .2;
+					entity.getMotion().z *= .2;
+					entity.getMotion().y -= 0.3;
 					
 					
 					// Hurt unfriendlies, too
 					if (entity.ticksExisted % 20 == 0) {
-						if (entity instanceof EntityLivingBase && !NostrumMagica.IsSameTeam((EntityLivingBase)entity, ent)) {
-							EntityLivingBase living = (EntityLivingBase) entity;
+						if (entity instanceof LivingEntity && !NostrumMagica.IsSameTeam((LivingEntity)entity, ent)) {
+							LivingEntity living = (LivingEntity) entity;
 							entity.hurtResistantTime = 0;
 							entity.attackEntityFrom(new MagicDamageSource(ent, EMagicElement.WIND),
 									SpellAction.calcDamage(ent, living, .25f, EMagicElement.WIND));
@@ -1947,8 +1947,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 					armor.consumeDragonFlight(ent);
 				} else {
 					if (SetArmorWingFlap(ent)) {
-						if (ent instanceof EntityPlayer) {
-							NostrumMagicaSounds.WING_FLAP.playClient((EntityPlayer) ent);
+						if (ent instanceof PlayerEntity) {
+							NostrumMagicaSounds.WING_FLAP.playClient((PlayerEntity) ent);
 						}
 					}
 				}
@@ -1959,7 +1959,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			break;
 		case WIND_JUMP_WHIRLWIND:
 			if (!ent.world.isRemote && armor.hasWindTornado(ent)) {
-				EntityPlayer playerIn = (EntityPlayer) ent;
+				PlayerEntity playerIn = (PlayerEntity) ent;
 				armor.consumeWindJumpWhirlwind(ent);
 				final float maxDist = 20;
 				RayTraceResult mop = RayTrace.raytrace(playerIn.world, playerIn.getPositionVector().addVector(0, playerIn.eyeHeight, 0), playerIn.getLookVec(), maxDist, (e) -> { return e != playerIn;});
@@ -1979,7 +1979,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			return;
 		}
 
-		EntityLivingBase ent = event.getEntityLiving();
+		LivingEntity ent = event.getEntityLiving();
 		@Nonnull ItemStack chestplate = ent.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
 		if (chestplate.isEmpty() || !(chestplate.getItem() instanceof EnchantedArmor)) {
 			return;
@@ -1988,7 +1988,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		EnchantedArmor armor = (EnchantedArmor) chestplate.getItem();
 		if (armor.level >= 3 && armor == this && armor.getSetPieces(ent) == 4) {
 			// Jump-boost gives an extra .1 per level. We want 2-block height so we do .2
-			ent.motionY += armor.jumpBoost;
+			ent.getMotion().y += armor.jumpBoost;
 		}
 	}
 	
@@ -1999,7 +1999,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			return;
 		}
 
-		EntityLivingBase ent = event.getEntityLiving();
+		LivingEntity ent = event.getEntityLiving();
 		@Nonnull ItemStack chestplate = ent.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
 		if (chestplate.isEmpty() || !(chestplate.getItem() instanceof EnchantedArmor)) {
 			return;
@@ -2014,7 +2014,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 
 	@Override
-	public boolean shouldRenderDragonWings(ItemStack stack, EntityPlayer player) {
+	public boolean shouldRenderDragonWings(ItemStack stack, PlayerEntity player) {
 		final boolean flying = player.isElytraFlying();
 		// Maybe should have an interface?
 		if (
@@ -2042,7 +2042,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 
 	@Override
-	public int getDragonWingColor(ItemStack stack, EntityPlayer player) {
+	public int getDragonWingColor(ItemStack stack, PlayerEntity player) {
 		return this.element.getColor();
 	}
 }

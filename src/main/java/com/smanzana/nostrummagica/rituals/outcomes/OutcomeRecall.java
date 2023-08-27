@@ -9,11 +9,11 @@ import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 public class OutcomeRecall implements IRitualOutcome {
@@ -23,7 +23,7 @@ public class OutcomeRecall implements IRitualOutcome {
 	}
 	
 	@Override
-	public boolean canPerform(World world, EntityPlayer player, BlockPos center, RitualMatchInfo ingredients) {
+	public boolean canPerform(World world, PlayerEntity player, BlockPos center, RitualMatchInfo ingredients) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
 			return false;
@@ -31,13 +31,13 @@ public class OutcomeRecall implements IRitualOutcome {
 		BlockPos pos = attr.getMarkLocation();
 		if (pos == null) {
 			if (!world.isRemote)
-				player.sendMessage(new TextComponentTranslation("info.recall.fail", new Object[0]));
+				player.sendMessage(new TranslationTextComponent("info.recall.fail", new Object[0]));
 			return false;
 		}
 		
 		if (player.dimension != attr.getMarkDimension()) {
 			if (!world.isRemote)
-				player.sendMessage(new TextComponentTranslation("info.recall.baddimension", new Object[0]));
+				player.sendMessage(new TranslationTextComponent("info.recall.baddimension", new Object[0]));
 			return false;
 		}
 		
@@ -45,7 +45,7 @@ public class OutcomeRecall implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, EntityPlayer player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, PlayerEntity player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
 		// Return the player to their marked location, if they have one
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
@@ -54,7 +54,7 @@ public class OutcomeRecall implements IRitualOutcome {
 		BlockPos pos = attr.getMarkLocation();
 		if (pos == null) {
 			if (world.isRemote)
-				player.sendMessage(new TextComponentTranslation("info.recall.fail", new Object[0]));
+				player.sendMessage(new TranslationTextComponent("info.recall.fail", new Object[0]));
 			return;
 		}
 		
@@ -85,7 +85,7 @@ public class OutcomeRecall implements IRitualOutcome {
 //				}
 			}
 		} else {
-			player.sendMessage(new TextComponentTranslation("info.recall.baddimension", new Object[0]));
+			player.sendMessage(new TranslationTextComponent("info.recall.baddimension", new Object[0]));
 		}
 	}
 	
