@@ -5,7 +5,7 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.util.ResourceLocation;
 
@@ -18,35 +18,35 @@ public class MagicArmorBase extends ItemArmor implements ILoreTagged {
 	
 	public static MagicArmorBase helm() {
 		if (helm == null) {
-			helm = new MagicArmorBase("magichelmbase", EntityEquipmentSlot.HEAD); 
+			helm = new MagicArmorBase("magichelmbase", EquipmentSlotType.HEAD); 
 		}
 		return helm;
 	}
 	
 	public static MagicArmorBase chest() {
 		if (chest == null) {
-			chest = new MagicArmorBase("magicchestbase", EntityEquipmentSlot.CHEST); 
+			chest = new MagicArmorBase("magicchestbase", EquipmentSlotType.CHEST); 
 		}
 		return chest;
 	}
 	
 	public static MagicArmorBase legs() {
 		if (legs == null) {
-			legs = new MagicArmorBase("magicleggingsbase", EntityEquipmentSlot.LEGS); 
+			legs = new MagicArmorBase("magicleggingsbase", EquipmentSlotType.LEGS); 
 		}
 		return legs;
 	}
 	
 	public static MagicArmorBase feet() {
 		if (feet == null) {
-			feet = new MagicArmorBase("magicfeetbase", EntityEquipmentSlot.FEET); 
+			feet = new MagicArmorBase("magicfeetbase", EquipmentSlotType.FEET); 
 		}
 		return feet;
 	}
 	
 	private String id;
 
-	public MagicArmorBase(String id, EntityEquipmentSlot slot) {
+	public MagicArmorBase(String id, EquipmentSlotType slot) {
 		super(ArmorMaterial.LEATHER, 0, slot);
 		this.setUnlocalizedName(id);
 		this.setRegistryName(new ResourceLocation(NostrumMagica.MODID, id));
@@ -85,7 +85,7 @@ public class MagicArmorBase extends ItemArmor implements ILoreTagged {
 		return InfoScreenTabs.INFO_ITEMS;
 	}
 	
-	public static MagicArmorBase get(EntityEquipmentSlot slot) {
+	public static MagicArmorBase get(EquipmentSlotType slot) {
 		switch (slot) {
 		case CHEST:
 			return chest;

@@ -15,15 +15,15 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -56,22 +56,22 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
 		return ALTAR_AABB;
 	}
 	
 	@Override
-	public boolean isOpaqueCube(IBlockState state) {
+	public boolean isOpaqueCube(BlockState state) {
 		return false;
 	}
 	
 	@Override
-	public boolean isFullCube(IBlockState state) {
+	public boolean isFullCube(BlockState state) {
         return false;
     }
 	
 	@Override
-	public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, Direction face) {
+	public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, BlockState state, BlockPos pos, Direction face) {
 		return BlockFaceShape.SOLID;
 	}
 	
@@ -88,8 +88,8 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, IBlockState state) {
-		EntityItem item = new EntityItem(world,
+	public void breakBlock(World world, BlockPos pos, BlockState state) {
+		ItemEntity item = new ItemEntity(world,
 				pos.getX() + .5,
 				pos.getY() + .5,
 				pos.getZ() + .5,
@@ -100,7 +100,7 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 		if (te != null) {
 			AltarTileEntity altar = (AltarTileEntity) te;
 			if (altar.getItem() != null) {
-				item = new EntityItem(world,
+				item = new ItemEntity(world,
 						pos.getX() + .5,
 						pos.getY() + .5,
 						pos.getZ() + .5,
@@ -114,20 +114,20 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+	public Item getItemDropped(BlockState state, Random rand, int fortune) {
 		return super.getItemDropped(state, rand, fortune);
 	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int eventID, int eventParam) {
+	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int eventID, int eventParam) {
 		super.eventReceived(state, worldIn, pos, eventID, eventParam);
 		TileEntity tileentity = worldIn.getTileEntity(pos);
         return tileentity == null ? false : tileentity.receiveClientEvent(eventID, eventParam);
 	}
 	
 	@Override
-	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
+	public void onBlockAdded(World worldIn, BlockPos pos, BlockState state) {
 		if (!worldIn.isUpdateScheduled(pos, this)) {
 			worldIn.scheduleUpdate(pos, this, TICK_DELAY);
 		}
@@ -136,13 +136,13 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+	public void updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) {
 		TileEntity te = worldIn.getTileEntity(pos);
 		if (te != null && te instanceof AltarTileEntity && ((AltarTileEntity) te).getItem().isEmpty()) {
 			AltarTileEntity altar = (AltarTileEntity) te;
-			List<EntityItem> items = worldIn.getEntitiesWithinAABB(EntityItem.class, Block.FULL_BLOCK_AABB.offset(pos).offset(0, 1, 0).expand(0, 1, 0));
+			List<ItemEntity> items = worldIn.getEntitiesWithinAABB(ItemEntity.class, Block.FULL_BLOCK_AABB.offset(pos).offset(0, 1, 0).expand(0, 1, 0));
 			if (items != null && !items.isEmpty()) {
-				EntityItem first = items.get(0);
+				ItemEntity first = items.get(0);
 				ItemStack stack = first.getItem();
 				
 				altar.setItem(stack.splitStack(1));
@@ -160,7 +160,7 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
 		TileEntity te = worldIn.getTileEntity(pos);
 		if (te == null)
 			return false;
@@ -181,7 +181,7 @@ public class AltarBlock extends Block implements ITileEntityProvider {
 				final ItemStack altarItem = altar.getItem();
 				if (!playerIn.inventory.addItemStackToInventory(altarItem)) {
 					worldIn.spawnEntity(
-							new EntityItem(worldIn,
+							new ItemEntity(worldIn,
 									pos.getX() + .5, pos.getY() + 1.2, pos.getZ() + .5,
 									altar.getItem())
 							);

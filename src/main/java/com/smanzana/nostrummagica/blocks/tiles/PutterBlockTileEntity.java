@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.blocks.PutterBlock;
 import com.smanzana.nostrummagica.utils.Inventories;
 
 import net.minecraft.block.Block;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.ItemStack;
@@ -27,7 +27,7 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 	
 	private final InventoryBasic inventory;
 	
-	private EntityItem itemEntCache = null;
+	private ItemEntity itemEntCache = null;
 	private int ticksExisted;
 	
 	public PutterBlockTileEntity() {
@@ -112,7 +112,7 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 				dx = -1;
 				break;
 			}
-			List<EntityItem> items = world.getEntitiesWithinAABB(EntityItem.class, Block.FULL_BLOCK_AABB.offset(pos).offset(dx, dy, dz));
+			List<ItemEntity> items = world.getEntitiesWithinAABB(ItemEntity.class, Block.FULL_BLOCK_AABB.offset(pos).offset(dx, dy, dz));
 			if (items != null && !items.isEmpty()) {
 				itemEntCache = items.get(0);
 			}
@@ -168,15 +168,15 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 					dx = -.75;
 					break;
 				}
-				itemEntCache = new EntityItem(world, this.pos.getX() + .5 + dx, this.pos.getY() + .5 + dy, this.pos.getZ() + .5 + dz, toSpawn);
+				itemEntCache = new ItemEntity(world, this.pos.getX() + .5 + dx, this.pos.getY() + .5 + dy, this.pos.getZ() + .5 + dz, toSpawn);
 				itemEntCache.getMotion().x = itemEntCache.getMotion().y = itemEntCache.getMotion().z = 0;
 				world.spawnEntity(itemEntCache);
 			}
 		}
 	}
 	
-	private EntityItem refreshEntityItem(EntityItem oldItem) {
-		EntityItem newItem = new EntityItem(oldItem.world, oldItem.posX, oldItem.posY, oldItem.posZ, oldItem.getItem().copy());
+	private ItemEntity refreshEntityItem(ItemEntity oldItem) {
+		ItemEntity newItem = new ItemEntity(oldItem.world, oldItem.posX, oldItem.posY, oldItem.posZ, oldItem.getItem().copy());
 		newItem.getMotion().x = oldItem.getMotion().x;
 		newItem.getMotion().y = oldItem.getMotion().y;
 		newItem.getMotion().z = oldItem.getMotion().z;

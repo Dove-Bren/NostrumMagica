@@ -14,7 +14,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -33,7 +33,7 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -119,7 +119,7 @@ public class EntityKoid extends EntityMob implements ILoreTagged {
         return flag;
     }
 
-    public boolean processInteract(PlayerEntity player, EnumHand hand, @Nonnull ItemStack stack)
+    public boolean processInteract(PlayerEntity player, Hand hand, @Nonnull ItemStack stack)
     {
         return false;
     }
@@ -236,7 +236,7 @@ public class EntityKoid extends EntityMob implements ILoreTagged {
 	}
 	
 	@Override
-	protected void updateFallState(double y, boolean onGround, IBlockState stae, BlockPos pos) {
+	protected void updateFallState(double y, boolean onGround, BlockState stae, BlockPos pos) {
 		
 	}
 	

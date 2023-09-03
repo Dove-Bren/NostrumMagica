@@ -15,14 +15,19 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Rarity;
+import net.minecraft.item.UseAction;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -33,21 +38,8 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 	public static final String ID = "arcane_wolf_soul_item";
 	private static final String NBT_MANA = "mana";
 	
-	private static ArcaneWolfSoulItem instance = null;
-	public static ArcaneWolfSoulItem instance() {
-		if (instance == null)
-			instance = new ArcaneWolfSoulItem();
-		
-		return instance;
-	}
-	
 	private ArcaneWolfSoulItem() {
-		super();
-		this.setUnlocalizedName(ID);
-		this.setRegistryName(NostrumMagica.MODID, ID);
-		this.setMaxDamage(0);
-		this.setMaxStackSize(1);
-		this.setCreativeTab(NostrumMagica.creativeTab);
+		super(NostrumItems.PropUnstackable().rarity(Rarity.EPIC));
 	}
 
 	@Override
@@ -100,7 +92,7 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 	}
 	
 	@Override
-	public boolean itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, EnumHand hand) {
+	public boolean itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
 		if (!playerIn.isCreative()) {
 			return false;
 		}
@@ -119,23 +111,23 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
 		final ItemStack held = playerIn.getHeldItem(hand);
 		if (getMana(held) >= getMaxMana(held)) {
-			return new ActionResult<ItemStack>(EnumActionResult.PASS, held);
+			return new ActionResult<ItemStack>(ActionResultType.PASS, held);
 		}
 		
 		playerIn.setActiveHand(hand);
-		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, held);
+		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, held);
 	}
 	
 	@Override
-	public EnumAction getItemUseAction(ItemStack stack) {
-		return EnumAction.BOW;
+	public UseAction getUseAction(ItemStack stack) {
+		return UseAction.BOW;
 	}
 	
 	@Override
-	public int getMaxItemUseDuration(ItemStack stack) {
+	public int getUseDuration(ItemStack stack) {
 		return 20;
 	}
 	
@@ -191,19 +183,19 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		super.addInformation(stack, worldIn, tooltip, flagIn);
 		
 		String name = getPetName(stack);
 		if (name == null || name.isEmpty()) {
 			name = "Unknown Pet";
 		}
-		tooltip.add(ChatFormatting.DARK_RED + name + ChatFormatting.RESET);
-		tooltip.add("" + ChatFormatting.BLUE + getMana(stack) + " / " + getMaxMana(stack));
+		tooltip.add(new StringTextComponent(name).applyTextStyle(TextFormatting.DARK_RED));
+		tooltip.add(new StringTextComponent(getMana(stack) + " / " + getMaxMana(stack)).applyTextStyle(TextFormatting.BLUE));
 	}
 	
 	@Override
-	public boolean onEntityItemUpdate(net.minecraft.entity.item.EntityItem entityItem) {
+	public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entityItem) {
 		if (entityItem.world.isRemote) {
 			// Particles!
 			if (NostrumMagica.rand.nextBoolean()) {
@@ -218,10 +210,10 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 	}
 	
 	public int getMana(ItemStack stack) {
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null) {
 			nbt = new CompoundNBT();
-			stack.setTagCompound(nbt);
+			stack.setTag(nbt);
 		}
 		
 		return nbt.getInt(NBT_MANA);
@@ -230,10 +222,10 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 	public void setMana(ItemStack stack, int mana) {
 		mana = Math.min(mana, getMaxMana(stack));
 		
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null) {
 			nbt = new CompoundNBT();
-			stack.setTagCompound(nbt);
+			stack.setTag(nbt);
 		}
 		
 		nbt.putInt(NBT_MANA, mana);
@@ -270,12 +262,12 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 	
 	public static ItemStack MakeSoulItem(EntityArcaneWolf wolf, boolean register) {
 		if (register) {
-			instance().setWorldID(wolf, NostrumMagica.getPetSoulRegistry().registerPet(wolf));
+			NostrumItems.arcaneWolfSoulItem.setWorldID(wolf, NostrumMagica.getPetSoulRegistry().registerPet(wolf));
 			NostrumMagica.getPetSoulRegistry().snapshotPet(wolf);
 		}
 		
-		ItemStack stack = new ItemStack(instance());
-		instance().setPet(stack, wolf);
+		ItemStack stack = new ItemStack(NostrumItems.arcaneWolfSoulItem);
+		NostrumItems.arcaneWolfSoulItem.setPet(stack, wolf);
 		
 		return stack;
 	}

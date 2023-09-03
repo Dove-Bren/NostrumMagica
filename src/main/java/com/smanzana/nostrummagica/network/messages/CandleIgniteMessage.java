@@ -5,7 +5,7 @@ import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -38,7 +38,7 @@ public class CandleIgniteMessage implements IMessage {
 					return;
 				}
 				
-				IBlockState state = player.world.getBlockState(pos);
+				BlockState state = player.world.getBlockState(pos);
 				if (state == null || !(state.getBlock() instanceof Candle)) {
 					return;
 				}

@@ -4,7 +4,7 @@ import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.entity.IEntityTameable;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.MobEntity;
@@ -101,7 +101,7 @@ public class EntityAIFollowOwnerGeneric<T extends EntityCreature & IEntityTameab
 	}
 	
 	protected static boolean IsEmptyBlock(World world, BlockPos pos) {
-		IBlockState iblockstate = world.getBlockState(pos);
+		BlockState iblockstate = world.getBlockState(pos);
 		return iblockstate.getMaterial() == Material.AIR ? true : !iblockstate.isFullCube();
 	}
 	

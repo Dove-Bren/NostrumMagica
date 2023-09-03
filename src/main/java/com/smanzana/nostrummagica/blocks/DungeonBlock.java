@@ -10,7 +10,7 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -65,12 +65,12 @@ public class DungeonBlock extends Block {
 		return new BlockStateContainer(this, TYPE);
 	}
 	
-	public IBlockState getState(Type type) {
+	public BlockState getState(Type type) {
 		return getDefaultState().withProperty(TYPE, type);
 	}
 	
 	@Override
-	public IBlockState getStateFromMeta(int meta) {
+	public BlockState getStateFromMeta(int meta) {
 		if (meta < 0)
 			meta = 0;
 		else if (meta > Type.values().length)
@@ -80,12 +80,12 @@ public class DungeonBlock extends Block {
 	}
 	
 	@Override
-	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+	public Item getItemDropped(BlockState state, Random rand, int fortune) {
         return null;
     }
 	
 	@Override
-	public int getMetaFromState(IBlockState state) {
+	public int getMetaFromState(BlockState state) {
 		return state.getValue(TYPE).ordinal();
 	}
 	

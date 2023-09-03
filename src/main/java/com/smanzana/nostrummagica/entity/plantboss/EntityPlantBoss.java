@@ -38,7 +38,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.MortarTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IEntityMultiPart;
@@ -853,7 +853,7 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 					pos.getY(), 
 					pos.getZ() + (z)
 					);
-			IBlockState state = world.getBlockState(cursor);
+			BlockState state = world.getBlockState(cursor);
 			if (!isPillarBlock(state)) {
 				return false;
 			}
@@ -862,13 +862,13 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 		return true;
 	}
 	
-	protected boolean isPillarBlock(IBlockState state) {
+	protected boolean isPillarBlock(BlockState state) {
 		return state.getBlock() instanceof DungeonBlock
 				|| state.getBlock() == Blocks.GLOWSTONE;
 		//return !(state.getBlock() instanceof FluidPoisonWater.FluidPoisonWaterBlock);
 	}
 	
-	protected boolean isArenaBlock(IBlockState state) {
+	protected boolean isArenaBlock(BlockState state) {
 		return isPillarBlock(state)
 				|| state.getBlock() instanceof FluidPoisonWater.FluidPoisonWaterBlock;
 	}

@@ -13,9 +13,9 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -65,7 +65,7 @@ public class MagicWall extends Block {
     }
 	
 	@Override
-	public boolean isOpaqueCube(IBlockState state) {
+	public boolean isOpaqueCube(BlockState state) {
 		return false;
 	}
 	
@@ -84,34 +84,34 @@ public class MagicWall extends Block {
 	 * @param level
 	 * @return
 	 */
-	public IBlockState getState(int level) {
+	public BlockState getState(int level) {
 		return getDefaultState().withProperty(DECAY, 0)
 				.withProperty(LEVEL, Math.max(Math.min(2, level - 1), 0));
 	}
 	
 	@Override
-	public IBlockState getStateFromMeta(int meta) {
+	public BlockState getStateFromMeta(int meta) {
 		return getDefaultState().withProperty(DECAY, meta & 0x3)
 				.withProperty(LEVEL, Math.min(2, (meta >> 2) & 0x3));
 	}
 	
 	@Override
-	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+	public Item getItemDropped(BlockState state, Random rand, int fortune) {
         return null;
     }
 	
 	@Override
-	public int getMetaFromState(IBlockState state) {
+	public int getMetaFromState(BlockState state) {
 		return (state.getValue(LEVEL) << 2) | (state.getValue(DECAY));
 	}
 	
 	@Override
-	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, PlayerEntity player) {
+	public ItemStack getPickBlock(BlockState state, RayTraceResult target, World world, BlockPos pos, PlayerEntity player) {
 		return new ItemStack(Item.getItemFromBlock(this), 1, 0);
 	}
 	
 	@Override
-	public boolean canSilkHarvest(World world, BlockPos pos, IBlockState state, PlayerEntity player) {
+	public boolean canSilkHarvest(World world, BlockPos pos, BlockState state, PlayerEntity player) {
 		return false;
 	}
 	
@@ -121,14 +121,14 @@ public class MagicWall extends Block {
     }
 	
 	@Override
-	public boolean isFullCube(IBlockState state) {
+	public boolean isFullCube(BlockState state) {
         return false;
     }
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, Direction side) {
-		IBlockState iblockstate = blockAccess.getBlockState(pos.offset(side));
+    public boolean shouldSideBeRendered(BlockState blockState, IBlockAccess blockAccess, BlockPos pos, Direction side) {
+		BlockState iblockstate = blockAccess.getBlockState(pos.offset(side));
         Block block = iblockstate.getBlock();
         
         return !(block == Blocks.GLASS || block == Blocks.STAINED_GLASS
@@ -136,7 +136,7 @@ public class MagicWall extends Block {
 	}
 	
 	@Override
-	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+	public void updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) {
 			int decay = state.getValue(DECAY) + 1;
 			if (decay >= 1) {
 				worldIn.setBlockToAir(pos);
@@ -146,25 +146,25 @@ public class MagicWall extends Block {
     }
 	
 	@Override
-	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
+	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
 		return false;
     }
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
+	public void addCollisionBoxToList(BlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
 		
 		int level = state.getValue(LEVEL);
 		
 		if (level <= 0
 				|| (level >= 2 && !(entityIn instanceof PlayerEntity))
-				|| (level == 1 && !(entityIn instanceof EntityItem))) {
+				|| (level == 1 && !(entityIn instanceof ItemEntity))) {
 			super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
 		}
 		
     }
 	
-	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
+	public void onBlockAdded(World worldIn, BlockPos pos, BlockState state) {
 		super.onBlockAdded(worldIn, pos, state);
 	}
 

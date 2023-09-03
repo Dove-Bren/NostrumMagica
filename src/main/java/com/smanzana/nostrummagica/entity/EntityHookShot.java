@@ -13,11 +13,11 @@ import com.smanzana.nostrummagica.serializers.HookshotTypeDataSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MultiPartEntityPart;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
@@ -290,7 +290,7 @@ public class EntityHookShot extends Entity {
 			this.posY += velocity.y;
 			this.posZ += velocity.z;
 			
-			if (attachedEntity instanceof EntityItem) {
+			if (attachedEntity instanceof ItemEntity) {
 				attachedEntity.getMotion().x = velocity.x;
 				attachedEntity.getMotion().y = velocity.y;
 				attachedEntity.getMotion().z = velocity.z;
@@ -386,8 +386,8 @@ public class EntityHookShot extends Entity {
 			
 			// Large entities cannot be fetched, and instead we'll override and force the play er to go to them.
 			// So if you try to pull a large enemy, you get pulled to them instead hilariously.
-			// Non-living entities are ignored... except for EntityItem which are always fetched.
-			if (result.entityHit instanceof EntityItem) {
+			// Non-living entities are ignored... except for ItemEntity which are always fetched.
+			if (result.entityHit instanceof ItemEntity) {
 				this.setIsFetch(true);
 			} else if (!result.entityHit.canBeCollidedWith()) {
 				// ignore the entity for like arrows and stuff
@@ -411,7 +411,7 @@ public class EntityHookShot extends Entity {
 			// If shooter wants fetch, don't hook to blocks
 			
 			// Make sure type of hookshot supports material
-			IBlockState state = world.getBlockState(result.getBlockPos());
+			BlockState state = world.getBlockState(result.getBlockPos());
 			if (wantsFetch || state == null || !HookshotItem.CanBeHooked(getType(), state)) {
 				this.setDead();
 				return;

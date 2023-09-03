@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.items;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.NostrumRoseItem.RoseType;
@@ -12,90 +13,179 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.ObjectHolder;
 
+@Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@ObjectHolder(NostrumMagica.MODID)
 public class NostrumItems {
 	
-	private static final String OREDICT_RUNE_ANY = "runeAny";
-//	private static final String OREDICT_RUNE_SHAPE_SINGLE = "runeShapeSingle";
-//	private static final String OREDICT_RUNE_SHAPE_CHAIN = "runeShapeChain";
-//	private static final String OREDICT_RUNE_SHAPE_AOE = "runeShapeAOE";
+	// Not sure where to put these...
+	public static final String ID_EARTH = "earth";
+	public static final String ID_ENDER = "ender";
+	public static final String ID_FIRE = "fire";
+	public static final String ID_ICE = "ice";
+	public static final String ID_LIGHTNING = "lightning";
+	public static final String ID_PHYSICAL = "physical";
+	public static final String ID_WIND = "wind";
 	
-	private static final String OREDICT_REAGENT_ANY = "reagentAny";
-	private static final String OREDICT_REAGENT_MANDRAKEROOT = "reagentMandrakeRoot";
-	private static final String OREDICT_REAGENT_GINSENG = "reagentGinseng";
-	private static final String OREDICT_REAGENT_SPIDERSILK = "reagentSpiderSilk";
-	private static final String OREDICT_REAGENT_BLACKPEARL = "reagentBlackPearl";
-	private static final String OREDICT_REAGENT_SKYASH = "reagentSkyAsh";
-	private static final String OREDICT_REAGENT_GRAVEDUST = "reagentGraveDust";
-	private static final String OREDICT_REAGENT_MANIDUST = "reagentManiDust";
-	private static final String OREDICT_REAGENT_CRYSTABLOOM = "reagentCrystabloom";
+	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem; // TODO could clean up; is just a BlockItem
+	@ObjectHolder(ArcaneWolfSoulItem.ID) public static ArcaneWolfSoulItem arcaneWolfSoulItem;
+	@ObjectHolder(BlankScroll.ID) public static BlankScroll blankScroll;
+	@ObjectHolder(ChalkItem.ID) public static ChalkItem chalkItem;
+	//@ObjectHolder(DragonArmor.ID_) public static DragonArmor dragonArmor_Helm; // TODO decide? Enumerate?
+	@ObjectHolder(DragonEgg.ID) public static DragonEgg dragonEgg;
+	@ObjectHolder(DragonEggFragment.ID) public static DragonEggFragment dragonEggFragment;
+	@ObjectHolder(DragonSoulItem.ID) public static DragonSoulItem dragonSoulItem;
+	//@ObjectHolder(EnchantedArmor.ID_ ) public static AltarItem altarItem;  // TODO decide? Enumerate?
+	//@ObjectHolder(EnchantedWeapon.ID) public static AltarItem altarItem;  // TODO decide? Enumerate?
+	@ObjectHolder(EssenceItem.ID_PREFIX + ID_EARTH) public static EssenceItem essenceEarth;
+	@ObjectHolder(EssenceItem.ID_PREFIX + ID_FIRE) public static EssenceItem essenceFire;
+	@ObjectHolder(EssenceItem.ID_PREFIX + ID_ICE) public static EssenceItem essenceIce;
+	@ObjectHolder(EssenceItem.ID_PREFIX + ID_ENDER) public static EssenceItem essenceEnder;
+	@ObjectHolder(EssenceItem.ID_PREFIX + ID_LIGHTNING) public static EssenceItem essenceLightning;
+	@ObjectHolder(EssenceItem.ID_PREFIX + ID_PHYSICAL) public static EssenceItem essencePhysical;
+	@ObjectHolder(EssenceItem.ID_PREFIX + ID_WIND) public static EssenceItem essenceWind;
+	@ObjectHolder(HookshotItem.ID_PREFIX + "weak") public static AltarItem hookshotWeak;
+	@ObjectHolder(HookshotItem.ID_PREFIX + "medium") public static HookshotItem hookshotMedium;
+	@ObjectHolder(HookshotItem.ID_PREFIX + "strong") public static HookshotItem hookshotStrong;
+	@ObjectHolder(HookshotItem.ID_PREFIX + "claw") public static HookshotItem hookshotClaw;
+	@ObjectHolder(InfusedGemItem.ID_PREFIX + "unattuned") public static InfusedGemItem infusedGemUnattuned;
+	@ObjectHolder(InfusedGemItem.ID_PREFIX + ID_EARTH) public static InfusedGemItem infusedGemEarth;
+	@ObjectHolder(InfusedGemItem.ID_PREFIX + ID_ENDER) public static InfusedGemItem infusedGemEnder;
+	@ObjectHolder(InfusedGemItem.ID_PREFIX + ID_FIRE) public static InfusedGemItem infusedGemFire;
+	@ObjectHolder(InfusedGemItem.ID_PREFIX + ID_ICE) public static InfusedGemItem infusedGemIce;
+	@ObjectHolder(InfusedGemItem.ID_PREFIX + ID_LIGHTNING) public static InfusedGemItem infusedGemLightning;
+	@ObjectHolder(InfusedGemItem.ID_PREFIX + ID_WIND) public static InfusedGemItem infusedGemWind;
+	@ObjectHolder(MageStaff.ID) public static MageStaff mageStaff;
+	@ObjectHolder(MagicCharm.ID_PREFIX + ID_EARTH) public static MagicCharm magicCharmEarth;
+	@ObjectHolder(MagicCharm.ID_PREFIX + ID_ENDER) public static MagicCharm magicCharmEnder;
+	@ObjectHolder(MagicCharm.ID_PREFIX + ID_FIRE) public static MagicCharm magicCharmFire;
+	@ObjectHolder(MagicCharm.ID_PREFIX + ID_ICE) public static MagicCharm magicCharmIce;
+	@ObjectHolder(MagicCharm.ID_PREFIX + ID_LIGHTNING) public static MagicCharm magicCharmLightning;
+	@ObjectHolder(MagicCharm.ID_PREFIX + ID_PHYSICAL) public static MagicCharm magicCharmPhysical;
+	@ObjectHolder(MagicCharm.ID_PREFIX + ID_WIND) public static MagicCharm magicCharmWind;
+	@ObjectHolder(MagicSwordBase.ID) public static MagicSwordBase magicSwordBase;
+	@ObjectHolder(MasteryOrb.ID) public static MasteryOrb masteryOrb;
+	@ObjectHolder(MirrorItem.ID) public static MirrorItem mirrorItem; // TODO could clean up; is just a BlockItem
+	@ObjectHolder(MirrorShield.ID) public static MirrorShield mirrorShield;
+	@ObjectHolder(MirrorShieldImproved.ID) public static MirrorShieldImproved mirrorShieldImproved;
+	@ObjectHolder(NostrumGuide.ID) public static NostrumGuide nostrumGuide;
+	@ObjectHolder(NostrumResourceItem.ID_TOKEN) public static NostrumResourceItem resourceToken;
+	@ObjectHolder(NostrumResourceItem.ID_PENDANT_LEFT) public static NostrumResourceItem resourcePendantLeft;
+	@ObjectHolder(NostrumResourceItem.ID_PENDANT_RIGHT) public static NostrumResourceItem resourcePendantRight;
+	@ObjectHolder(NostrumResourceItem.ID_SLAB_FIERCE) public static NostrumResourceItem resourceSlabFierce;
+	@ObjectHolder(NostrumResourceItem.ID_SLAB_KIND) public static NostrumResourceItem resourceSlabKind;
+	@ObjectHolder(NostrumResourceItem.ID_SLAB_BALANCED) public static NostrumResourceItem resourceSlabBalanced;
+	@ObjectHolder(NostrumResourceItem.ID_SPRITE_CORE) public static NostrumResourceItem resourceSpriteCore;
+	@ObjectHolder(NostrumResourceItem.ID_ENDER_BRISTLE) public static NostrumResourceItem resourceEnderBristle;
+	@ObjectHolder(NostrumResourceItem.ID_WISP_PEBBLE) public static NostrumResourceItem resourceWispPebble;
+	@ObjectHolder(NostrumResourceItem.ID_MANA_LEAF) public static NostrumResourceItem resourceManaLeaf;
+	@ObjectHolder(NostrumResourceItem.ID_EVIL_THISTLE) public static NostrumResourceItem resourceEvilThistle;
+	@ObjectHolder(NostrumResourceItem.ID_DRAGON_WING) public static NostrumResourceItem resourceDragonWing;
+	@ObjectHolder(NostrumResourceItem.ID_SEEKING_GEM) public static NostrumResourceItem resourceSeekingGem;
+	@ObjectHolder(NostrumResourceCrystal.ID_CRYSTAL_SMALL) public static NostrumResourceCrystal crystalSmall;
+	@ObjectHolder(NostrumResourceCrystal.ID_CRYSTAL_MEDIUM) public static NostrumResourceCrystal crystalMedium;
+	@ObjectHolder(NostrumResourceCrystal.ID_CRYSTAL_LARGE) public static NostrumResourceCrystal crystalLarge;
+	@ObjectHolder(NostrumRoseItem.ID_BLOOD_ROSE) public static NostrumRoseItem roseBlood;
+	@ObjectHolder(NostrumRoseItem.ID_ELDRICH_ROSE) public static NostrumRoseItem roseEldrich;
+	@ObjectHolder(NostrumRoseItem.ID_PALE_ROSE) public static NostrumRoseItem rosePale;
+	@ObjectHolder(NostrumSkillItem.ID_SKILL_MIRROR) public static NostrumSkillItem skillMirror;
+	@ObjectHolder(NostrumSkillItem.ID_SKILL_OOZE) public static NostrumSkillItem skillOoze;
+	@ObjectHolder(NostrumSkillItem.ID_SKILL_PENDANT) public static NostrumSkillItem skillPendant;
+	@ObjectHolder(NostrumSkillItem.ID_SKILL_FLUTE) public static NostrumSkillItem skillFlute;
+	@ObjectHolder(NostrumSkillItem.ID_SKILL_ENDER_PIN) public static NostrumSkillItem skillEnderPin;
+	@ObjectHolder(NostrumSkillItem.ID_SKILL_SCROLL_SMALL) public static NostrumSkillItem skillScrollSmall;
+	@ObjectHolder(NostrumSkillItem.ID_SKILL_SCROLL_LARGE) public static NostrumSkillItem skillScrollLarge;
+	@ObjectHolder(PositionCrystal.ID) public static PositionCrystal positionCrystal;
+	@ObjectHolder(PositionToken.ID) public static PositionToken positionToken;
+	@ObjectHolder(ReagentItem.ID_MANDRAKE_ROOT) public static ReagentItem reagentMandrakeRoot;
+	@ObjectHolder(ReagentItem.ID_SPIDER_SILK) public static ReagentItem reagentSpiderSilk;
+	@ObjectHolder(ReagentItem.ID_BLACK_PEARL) public static ReagentItem reagentBlackPearl;
+	@ObjectHolder(ReagentItem.ID_SKY_ASH) public static ReagentItem reagentSkyAsh;
+	@ObjectHolder(ReagentItem.ID_GINSENG) public static ReagentItem reagentGinseng;
+	@ObjectHolder(ReagentItem.ID_GRAVE_DUST) public static ReagentItem reagentGraveDust;
+	@ObjectHolder(ReagentItem.ID_CRYSTABLOOM) public static ReagentItem reagentCrystabloom;
+	@ObjectHolder(ReagentItem.ID_MANI_DUST) public static ReagentItem reagentManiDust;
+	@ObjectHolder(ReagentBag.ID) public static ReagentBag reagentBag;
+	@ObjectHolder(ReagentSeed.ID_MANDRAKE_SEED) public static ReagentSeed reagentSeedMandrake;
+	@ObjectHolder(ReagentSeed.ID_GINSENG_SEED) public static ReagentSeed reagentSeedGinseng;
+	@ObjectHolder(ReagentSeed.ID_ESSENCE_SEED) public static ReagentSeed reagentSeedEssence;
+	@ObjectHolder(RuneBag.ID) public static RuneBag runeBag;
+	@ObjectHolder(SoulDagger.ID) public static SoulDagger soulDagger;
+	@ObjectHolder(SpellcraftGuide.ID) public static SpellcraftGuide spellcraftGuide;
+	@ObjectHolder(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_NOVICE) public static SpellPlate spellPlateNovice;
+	@ObjectHolder(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_ADVANCED) public static SpellPlate spellPlateAdvanced;
+	@ObjectHolder(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_COMBAT) public static SpellPlate spellPlateCombat;
+	@ObjectHolder(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_DEATH) public static SpellPlate spellPlateDeath;
+	@ObjectHolder(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_SPOOKY) public static SpellPlate spellPlateSpooky;
+	@ObjectHolder(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_MUTED) public static SpellPlate spellPlateMuted;
+	@ObjectHolder(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_LIVING) public static SpellPlate spellPlateLiving;
+	@ObjectHolder(SpellScroll.ID) public static SpellScroll spellScroll;
+	@ObjectHolder(SpellTableItem.ID) public static SpellTableItem spellTableItem;
+//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
+//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
+//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
+//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
+//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
+//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
+//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
+//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
+//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
+//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
+//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
+//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
+//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
+//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
+//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
+//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
+//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
+//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
+//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
 	
-	private static final String OREDICT_INFGEM_ANY = "infgemAny";
-	private static final String OREDICT_INFGEM_VOID = "infgemVoid";
-	private static final String OREDICT_INFGEM_FIRE = "infgemFire";
-	private static final String OREDICT_INFGEM_ICE = "infgemIce";
-	private static final String OREDICT_INFGEM_WIND = "infgemWind";
-	private static final String OREDICT_INFGEM_EARTH = "infgemEarth";
-	private static final String OREDICT_INFGEM_LIGHTNING = "infgemLightning";
-	private static final String OREDICT_INFGEM_ENDER = "infgemEnder";
-	
-	private static final String OREDICT_TOKEN = "nrToken";
-	private static final String OREDICT_CRYSTALSMALL = "nrCrystalSmall";
-	private static final String OREDICT_CRYSTALMEDIUM = "nrCrystalMedium";
-	private static final String OREDICT_CRYSTALLARGE = "nrCrystalLarge";
-	private static final String OREDICT_PENDANTLEFT = "nrPendantLeft";
-	private static final String OREDICT_PENDANTRIGHT = "nrPendantRight";
-	private static final String OREDICT_SLABFIERCE = "nrSlabFierce";
-	private static final String OREDICT_SLABKIND = "nrSlabKind";
-	private static final String OREDICT_SLABBALANCED = "nrSlabBalanced";
-	private static final String OREDICT_SPRITECORE = "nrSpriteCore";
-	private static final String OREDICT_ENDERBRISTLE = "nrEnderBristle";
-	private static final String OREDICT_WISPPEBBLE = "nrWispPebble";
-	
-	private static final String OREDICT_SPELLPAGE_ANY = "spellpageAny";
-	
-	private static final String OREDICT_ESSENCE_ANY = "nessenceAny";
-	private static final String OREDICT_ESSENCE_VOID = "nessenceVoid";
-	private static final String OREDICT_ESSENCE_FIRE = "nessenceFire";
-	private static final String OREDICT_ESSENCE_ICE = "nessenceIce";
-	private static final String OREDICT_ESSENCE_WIND = "nessenceWind";
-	private static final String OREDICT_ESSENCE_EARTH = "nessenceEarth";
-	private static final String OREDICT_ESSENCE_LIGHTNING = "nessenceLightning";
-	private static final String OREDICT_ESSENCE_ENDER = "nessenceEnder";
-	
-	private static final String OREDICT_SKILLITEM_ANY = "nsiAny";
-	private static final String OREDICT_SKILLITEM_MIRROR = "nsiMirror";
-	private static final String OREDICT_SKILLITEM_OOZE = "nsiOoze";
-	private static final String OREDICT_SKILLITEM_PENDANT = "nsiPendant";
-	private static final String OREDICT_SKILLITEM_FLUTE = "nsiFlute";
-	private static final String OREDICT_SKILLITEM_WING = "nsiWing";
-	private static final String OREDICT_SKILLITEM_ENDERPIN = "nsiEnderPin";
-	private static final String OREDICT_SKILLITEM_RESEARCHSMALL = "nsiResearchSmall";
-	private static final String OREDICT_SKILLITEM_RESEARCHLARGE = "nsiResearchLarge";
-	
-	private static final String OREDICT_ROSE_ANY = "roseAny";
-	private static final String OREDICT_ROSE_BLOOD = "roseBlood";
-	private static final String OREDICT_ROSE_ELDRICH = "roseEldrich";
-	private static final String OREDICT_ROSE_PALE = "rosePale";
-	
-	private static final String OREDICT_HOOKSHOT_ANY = "nhookshotAny";
-	private static final String OREDICT_HOOKSHOT_WEAK = "nhookshotWeak";
-	private static final String OREDICT_HOOKSHOT_MEDIUM = "nhookshotMedium";
-	private static final String OREDICT_HOOKSHOT_STRONG = "nhookshotStrong";
-	private static final String OREDICT_HOOKSHOT_CLAW = "nhookshotClaw";
-	
-	private static final String OREDICT_REAGENTSEED_MANDRAKE = "nrseedMandrake";
-	private static final String OREDICT_REAGENTSEED_GINSENG = "nrseedGinseng";
-	private static final String OREDICT_REAGENTSEED_ESSENCE = "nrseedEssence";
 	
 	public NostrumItems() {
 		MinecraftForge.EVENT_BUS.register(this);
 	}
+	
+	public static Item.Properties PropBase() {
+		return new Item.Properties()
+				.group(NostrumMagica.creativeTab)
+				;
+	}
+	
+	public static Item.Properties PropLowStack() {
+		return PropBase()
+				.maxStackSize(16);
+	}
+	
+	public static Item.Properties PropUnstackable() {
+		return PropBase()
+				.maxStackSize(1);
+	}
+	
+	public static Item.Properties PropEquipment() {
+		return PropUnstackable()
+				;
+	}
+	
+	public static Item.Properties PropTomeBase() {
+		return new Item.Properties()
+				.group(NostrumMagica.enhancementTab);
+	}
+	
+	public static Item.Properties PropTomeUnstackable() {
+		return PropTomeBase()
+				.maxStackSize(1);
+	}
 
 	@SubscribeEvent
 	public void registerItems(RegistryEvent.Register<Item> event) {
+		broke() {
+			// I removed all these items doing a setRegistryName() but they need it?
+		};
+		
     	final IForgeRegistry<Item> registry = event.getRegistry();
     	registry.register(NostrumGuide.instance());
     	registry.register(SpellcraftGuide.instance());

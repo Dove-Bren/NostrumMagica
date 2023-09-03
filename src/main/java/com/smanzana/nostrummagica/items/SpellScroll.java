@@ -15,21 +15,26 @@ import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
+import com.smanzana.nostrummagica.utils.ItemStacks;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Rarity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.util.Constants.NBT;
 
 public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 
@@ -38,25 +43,10 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 	//private static final String NBT_WAKE_START = "nostrum_timer";
 	//private static final String NBT_TYPE = "nostrum_type";
 	//private static final int WAKE_TIME = 20 * 60 * 5;
-	private static SpellScroll instance = null;
-	
-	public static SpellScroll instance() {
-		if (instance == null)
-			instance = new SpellScroll();
-		
-		return instance;
-	}
-	
-	public static final String id = "spell_scroll";
+	public static final String ID = "spell_scroll";
 	
 	private SpellScroll() {
-		super();
-		this.setUnlocalizedName(id);
-		this.setRegistryName(NostrumMagica.MODID, SpellScroll.id);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setMaxStackSize(1);
-		this.setHasSubtypes(true);
-		this.setMaxDamage(100);
+		super(NostrumItems.PropUnstackable().rarity(Rarity.UNCOMMON).maxDamage(100));
 	}
 	
 	public boolean isEnchantable(ItemStack stack) {
@@ -64,49 +54,36 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 	}
 	
 	@Override
-	public String getUnlocalizedName(ItemStack stack) {
-//		int i = getNestedScrollMeta(stack);
-//		
-//		switch (i) {
-//		case 1: return "item.spell_scroll_activated";
-//		case 2: return "item.spell_scroll_awakened";
-//		}
-//		
-		
-		return this.getUnlocalizedName();
-	}
-	
-	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
 		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		
 		if (playerIn.isSneaking()) {
 			// Open scroll screen
-			final int spellId = itemStackIn.getTagCompound() == null ? 0 : itemStackIn.getTagCompound().getInteger(NBT_SPELL);
+			final int spellId = itemStackIn.getTag() == null ? 0 : itemStackIn.getTag().getInt(NBT_SPELL);
 			playerIn.openGui(NostrumMagica.instance,
 					NostrumGui.scrollID, worldIn,
 					spellId, (int) playerIn.posY, (int) playerIn.posZ);
-			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 		}
 		
 		if (itemStackIn.isEmpty())
-			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
+			return new ActionResult<ItemStack>(ActionResultType.PASS, itemStackIn);
 		
-		if (!itemStackIn.hasTagCompound())
-			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
+		if (!itemStackIn.hasTag())
+			return new ActionResult<ItemStack>(ActionResultType.PASS, itemStackIn);
 		
-		CompoundNBT nbt = itemStackIn.getTagCompound();
+		CompoundNBT nbt = itemStackIn.getTag();
 		
 		if (!nbt.contains(NBT_SPELL, NBT.TAG_INT))
-			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
+			return new ActionResult<ItemStack>(ActionResultType.PASS, itemStackIn);
 		
 		Spell spell = getSpell(itemStackIn);
 		if (spell == null)
-			return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
+			return new ActionResult<ItemStack>(ActionResultType.PASS, itemStackIn);
 		
 		if (!playerIn.isCreative()) {
 			//itemStackIn.stackSize--;
-			itemStackIn.damageItem(1, playerIn);
+			ItemStacks.damageItem(itemStackIn, playerIn, hand, 1);
 		}
 
 		if (worldIn.isRemote) {
@@ -114,12 +91,13 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 	    			new ClientCastMessage(spell, true, 0));
 		}
 		
-		if (itemStackIn.getItemDamage() > itemStackIn.getMaxDamage()) {
+		if (itemStackIn.getDamage() > itemStackIn.getMaxDamage() // Old way, I think never happens?
+				|| itemStackIn.isEmpty()) {
 			// Going to break
 			NostrumMagica.getSpellRegistry().evict(spell);
 		}
 		
-		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 		
     }
 	
@@ -127,7 +105,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellScroll))
 			return;
 		
-		CompoundNBT nbt = itemStack.getTagCompound();
+		CompoundNBT nbt = itemStack.getTag();
 		
 		if (nbt == null)
 			nbt = new CompoundNBT();
@@ -135,16 +113,16 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 		nbt.putInt(NBT_SPELL, spell.getRegistryID());
 		nbt.putInt(NBT_DURABILITY, GetMaxUses(spell));
 		
-		itemStack.setTagCompound(nbt);
-		itemStack.setStackDisplayName(spell.getName());
-		itemStack.addEnchantment(Enchantment.getEnchantmentByLocation("power"), 1);
+		itemStack.setTag(nbt);
+		itemStack.setDisplayName(new StringTextComponent(spell.getName()));
+		itemStack.addEnchantment(Enchantments.POWER, 1);
 	}
 	
 	public static Spell getSpell(ItemStack itemStack) {
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellScroll))
 			return null;
 		
-		CompoundNBT nbt = itemStack.getTagCompound();		
+		CompoundNBT nbt = itemStack.getTag();		
 		if (nbt == null)
 			return null;
 		
@@ -169,7 +147,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellScroll))
 			return 1;
 		
-		CompoundNBT nbt = itemStack.getTagCompound();		
+		CompoundNBT nbt = itemStack.getTag();		
 		if (nbt == null || !nbt.contains(NBT_DURABILITY, NBT.TAG_INT))
 			return 15; // old default
 		
@@ -179,8 +157,8 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 //	public static int getNestedScrollMeta(ItemStack scroll) {
 //		byte ret = 0;
 //		
-//		if (!scroll.isEmpty() && scroll.hasTagCompound()) {
-//			CompoundNBT nbt = scroll.getTagCompound();
+//		if (!scroll.isEmpty() && scroll.hasTag()) {
+//			CompoundNBT nbt = scroll.getTag();
 //			ret = nbt.getByte(NBT_TYPE);
 //		}
 //		
@@ -191,7 +169,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 //		if (scroll.isEmpty())
 //			return;
 //		
-//		CompoundNBT nbt = scroll.getTagCompound();
+//		CompoundNBT nbt = scroll.getTag();
 //		if (nbt == null)
 //			nbt = new CompoundNBT();
 //		
@@ -199,7 +177,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 //	}
 	
 	public static ItemStack create(Spell spell) {
-		ItemStack scroll = new ItemStack(instance(), 1);
+		ItemStack scroll = new ItemStack(NostrumItems.spellScroll, 1);
 		setSpell(scroll, spell);
 		return scroll;
 	}
@@ -248,39 +226,39 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		;
 	}
 	
-	public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
-		super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
-		
-//		if (!worldIn.isRemote) {
-//			if (stack.isRemote() || getNestedScrollMeta(stack) != 1)
-//				return;
-//			
-//			CompoundNBT nbt;
-//			if (!stack.hasTagCompound())
-//				nbt = new CompoundNBT();
-//			else
-//				nbt = stack.getTagCompound();
-//			
-//			long start = nbt.getLong(NBT_WAKE_START);
-//			long worldtime = worldIn.getMinecraftServer().getTickCounter();
-//			if (start == 0) {
-//				nbt.putLong(NBT_WAKE_START, worldtime);
-//				stack.setTagCompound(nbt);
-//				return;
-//			}
-//			
-//			if (worldtime > start + WAKE_TIME) {
-//				setNestedScrollMeta(stack, (byte) 2);
-//				if (!worldIn.isRemote) {
-//					NostrumMagicaSounds.DAMAGE_ENDER.play(worldIn, entityIn.posX, entityIn.posY, entityIn.posZ);
-//				}
-//			}
-//		}
-	}
+//	public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
+//		super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
+//		
+////		if (!worldIn.isRemote) {
+////			if (stack.isRemote() || getNestedScrollMeta(stack) != 1)
+////				return;
+////			
+////			CompoundNBT nbt;
+////			if (!stack.hasTag())
+////				nbt = new CompoundNBT();
+////			else
+////				nbt = stack.getTag();
+////			
+////			long start = nbt.getLong(NBT_WAKE_START);
+////			long worldtime = worldIn.getMinecraftServer().getTickCounter();
+////			if (start == 0) {
+////				nbt.putLong(NBT_WAKE_START, worldtime);
+////				stack.setTag(nbt);
+////				return;
+////			}
+////			
+////			if (worldtime > start + WAKE_TIME) {
+////				setNestedScrollMeta(stack, (byte) 2);
+////				if (!worldIn.isRemote) {
+////					NostrumMagicaSounds.DAMAGE_ENDER.play(worldIn, entityIn.posX, entityIn.posY, entityIn.posZ);
+////				}
+////			}
+////		}
+//	}
 
 	@Override
 	public boolean shouldTrace(World world, PlayerEntity player, ItemStack stack) {

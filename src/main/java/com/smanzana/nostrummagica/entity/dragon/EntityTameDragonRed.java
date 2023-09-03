@@ -55,7 +55,7 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAISwimming;
 import net.minecraft.entity.ai.EntityAIWander;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityCow;
 import net.minecraft.entity.passive.EntityPig;
@@ -76,7 +76,7 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.management.PreYggdrasilConverter;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -495,13 +495,13 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 	}
 	
 	@Override
-	public boolean processInteract(PlayerEntity player, EnumHand hand) {
+	public boolean processInteract(PlayerEntity player, Hand hand) {
 		// Shift-right click toggles the dragon sitting.
 		// When not sitting, right-click mounts the dragon.
 		// When sitting, right-click opens the GUI
 		final @Nonnull ItemStack stack = player.getHeldItem(hand);
 		if (this.isTamed() && player == this.getOwner()) {
-			if (hand == EnumHand.MAIN_HAND) {
+			if (hand == Hand.MAIN_HAND) {
 				
 				if (player.isSneaking()) {
 					if (!this.world.isRemote) {
@@ -555,19 +555,19 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 				
 			}
 		} else if (!this.isTamed()) {
-			if (hand == EnumHand.MAIN_HAND) {
+			if (hand == Hand.MAIN_HAND) {
 				if (!this.world.isRemote) {
 					this.tame(player, player.isCreative());
 				}
 				return true;
 			}
-		} else if (this.isTamed() && player.isCreative() && hand == EnumHand.MAIN_HAND && player.isSneaking()) {
+		} else if (this.isTamed() && player.isCreative() && hand == Hand.MAIN_HAND && player.isSneaking()) {
 			if (!this.world.isRemote) {
 				this.tame(player, true);
 				this.setBond(1f);
 			}
 			return true;
-		} else if (this.isTamed() && hand == EnumHand.MAIN_HAND) {
+		} else if (this.isTamed() && hand == Hand.MAIN_HAND) {
 			// Someone other than the owner clicked
 			if (!this.world.isRemote) {
 				player.sendMessage(new TranslationTextComponent("info.tamed_dragon.not_yours", this.getName()));
@@ -1279,7 +1279,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 				for (int i = 0; i < inventory.getSizeInventory(); i++) {
 					ItemStack stack = inventory.getStackInSlot(i);
 					if (!stack.isEmpty()) {
-						EntityItem item = new EntityItem(this.world, this.posX, this.posY, this.posZ, stack);
+						ItemEntity item = new ItemEntity(this.world, this.posX, this.posY, this.posZ, stack);
 						this.world.spawnEntity(item);
 					}
 				}
@@ -1288,7 +1288,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityT
 			for (DragonEquipmentSlot slot : DragonEquipmentSlot.values()) {
 				ItemStack stack = equipment.getStackInSlot(slot);
 				if (!stack.isEmpty()) {
-					EntityItem item = new EntityItem(this.world, this.posX, this.posY, this.posZ, stack);
+					ItemEntity item = new ItemEntity(this.world, this.posX, this.posY, this.posZ, stack);
 					this.world.spawnEntity(item);
 				}
 			}

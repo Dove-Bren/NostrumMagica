@@ -1106,14 +1106,14 @@ public class NostrumMagica {
 		// Rituals for base the magic armors and weapons
 		for (EMagicElement elem : EMagicElement.values())
 			for (int i = 0; i < 3; i++) // Note: only 3. True versions are below
-				for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
+				for (EquipmentSlotType slot : EquipmentSlotType.values()) {
 
 					if (EnchantedArmor.isArmorElement(elem)) {
-						if (slot == EntityEquipmentSlot.OFFHAND || slot == EntityEquipmentSlot.MAINHAND) {
+						if (slot == EquipmentSlotType.OFFHAND || slot == EquipmentSlotType.MAINHAND) {
 							continue;
 						}
 					} else {
-						if (slot != EntityEquipmentSlot.MAINHAND) {
+						if (slot != EquipmentSlotType.MAINHAND) {
 							continue;
 						}
 					}
@@ -1162,8 +1162,8 @@ public class NostrumMagica {
 
 		// True and corrupted elemental armors
 		for (EMagicElement elem : EMagicElement.values())
-			for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
-				if (slot == EntityEquipmentSlot.OFFHAND || slot == EntityEquipmentSlot.MAINHAND) {
+			for (EquipmentSlotType slot : EquipmentSlotType.values()) {
+				if (slot == EquipmentSlotType.OFFHAND || slot == EquipmentSlotType.MAINHAND) {
 					continue;
 				}
 
@@ -2050,13 +2050,13 @@ public class NostrumMagica {
 		NostrumResearch.startBuilding().hiddenParent("rituals").quest("lvl4")
 				.reference("ritual::spawn_enchanted_armor", "ritual.spawn_enchanted_armor.name")
 				.build("enchanted_armor", NostrumResearchTab.OUTFITTING, Size.GIANT, -2, 0, true,
-						new ItemStack(EnchantedArmor.get(EMagicElement.FIRE, EntityEquipmentSlot.CHEST, 2)));
+						new ItemStack(EnchantedArmor.get(EMagicElement.FIRE, EquipmentSlotType.CHEST, 2)));
 
 		NostrumResearch.startBuilding().parent("enchanted_armor").hiddenParent("kind_infusion")
 				.hiddenParent("fierce_infusion")
 				.reference("ritual::spawn_enchanted_armor", "ritual.spawn_enchanted_armor.name")
 				.build("enchanted_armor_adv", NostrumResearchTab.OUTFITTING, Size.LARGE, -1, 2, true,
-						new ItemStack(EnchantedArmor.get(EMagicElement.ENDER, EntityEquipmentSlot.CHEST, 3)));
+						new ItemStack(EnchantedArmor.get(EMagicElement.ENDER, EquipmentSlotType.CHEST, 3)));
 
 		NostrumResearch.startBuilding().parent("enchanted_armor").lore(EntityTameDragonRed.TameRedDragonLore.instance())
 				.reference("ritual::craft_dragonarmor_body_iron", "ritual.craft_dragonarmor_body_iron.name")
@@ -2903,7 +2903,7 @@ public class NostrumMagica {
 			double dirD = dir * 2 * Math.PI;
 			double dx = Math.cos(dirD) * dist;
 			double dz = Math.sin(dirD) * dist;
-			EntityItem drop = new EntityItem(world, target.getX() + .5 + dx, target.getY() + 2, target.getZ() + .5 + dz,
+			ItemEntity drop = new ItemEntity(world, target.getX() + .5 + dx, target.getY() + 2, target.getZ() + .5 + dz,
 					NostrumResourceItem.getItem(ResourceType.ENDER_BRISTLE, 1));
 			world.spawnEntity(drop);
 			NostrumMagicaSounds.CAST_FAIL.play(world, target.getX() + .5, target.getY() + 2, target.getZ() + .5);

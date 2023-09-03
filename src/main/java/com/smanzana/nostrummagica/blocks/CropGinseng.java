@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.ReagentSeed;
 
 import net.minecraft.block.BlockCrops;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
@@ -50,7 +50,7 @@ public class CropGinseng extends BlockCrops {
 	}
 
     @Override
-    public void getDrops(NonNullList<ItemStack> ret, IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
+    public void getDrops(NonNullList<ItemStack> ret, IBlockAccess world, BlockPos pos, BlockState state, int fortune) {
         int age = getAge(state);
         Random rand = world instanceof World ? ((World)world).rand : new Random();
 
@@ -80,21 +80,21 @@ public class CropGinseng extends BlockCrops {
      * Get the Item that this Block should drop when harvested.
      */
     @Override
-    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+    public Item getItemDropped(BlockState state, Random rand, int fortune) {
         return ReagentItem.instance();
     }
     
     @Override
-    public int damageDropped(IBlockState state) {
+    public int damageDropped(BlockState state) {
     	return ReagentType.GINSENG.getMeta();
     }
     
     @Override
-    public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state) {
+    public ItemStack getItem(World worldIn, BlockPos pos, BlockState state) {
         return getCrops(1);
     }
 
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+    public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
         return AABB[((Integer)state.getValue(this.getAgeProperty())).intValue()];
     }
     
@@ -104,7 +104,7 @@ public class CropGinseng extends BlockCrops {
 	}
 
 	@Override
-	public IBlockState getPlant(IBlockAccess world, BlockPos pos) {
+	public BlockState getPlant(IBlockAccess world, BlockPos pos) {
 		return getDefaultState();
 	}
 	

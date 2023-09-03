@@ -4,7 +4,10 @@ import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Hand;
 
 public class ItemStacks {
 
@@ -23,6 +26,11 @@ public class ItemStacks {
 		}
 		
 		return false;
+	}
+	
+	public static final <T extends LivingEntity> ItemStack damageItem(@Nonnull ItemStack stack, T entity, Hand hand, int damage) {
+		stack.damageItem(damage, entity, playerIn -> playerIn.sendBreakAnimation(hand));
+		return stack.isEmpty() ? ItemStack.EMPTY : stack;
 	}
 
 }

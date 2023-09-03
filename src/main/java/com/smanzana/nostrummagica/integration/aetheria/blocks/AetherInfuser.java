@@ -10,7 +10,7 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
@@ -49,7 +49,7 @@ public class AetherInfuser extends BlockContainer {
 	}
 	
 	@Override
-	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
+	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
 		return true;
 	}
 	
@@ -63,7 +63,7 @@ public class AetherInfuser extends BlockContainer {
 	}
 	
 	@Override
-	public EnumBlockRenderType getRenderType(IBlockState state) {
+	public EnumBlockRenderType getRenderType(BlockState state) {
 		return EnumBlockRenderType.MODEL;
 	}
 	
@@ -73,18 +73,18 @@ public class AetherInfuser extends BlockContainer {
     }
 	
 	@Override
-	public boolean isOpaqueCube(IBlockState state) {
+	public boolean isOpaqueCube(BlockState state) {
 		return true;
 	}
 	
 	@Override
-	public boolean isFullCube(IBlockState state) {
+	public boolean isFullCube(BlockState state) {
 		return true;
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public boolean isTranslucent(IBlockState state) {
+	public boolean isTranslucent(BlockState state) {
 		return false;
 	}
 	
@@ -94,26 +94,26 @@ public class AetherInfuser extends BlockContainer {
 	}
 	
 	@Override
-	public IBlockState getStateFromMeta(int meta) {
+	public BlockState getStateFromMeta(int meta) {
 		return getDefaultState().withProperty(MASTER, meta != 0);
 	}
 	
 	@Override
-	public int getMetaFromState(IBlockState state) {
+	public int getMetaFromState(BlockState state) {
 		return state.getValue(MASTER) ? 1 : 0;
 	}
 	
 	@Override
-	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+	public Item getItemDropped(BlockState state, Random rand, int fortune) {
         return null;
     }
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, IBlockState state) {
+	public void breakBlock(World world, BlockPos pos, BlockState state) {
 		super.breakBlock(world, pos, state);
 	}
 	
-	public static boolean IsMaster(IBlockState state) {
+	public static boolean IsMaster(BlockState state) {
 		return state != null && state.getBlock() instanceof AetherInfuser && state.getValue(MASTER);
 	}
 	

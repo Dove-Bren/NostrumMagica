@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.world.blueprints.IOrientedTileEntity;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
@@ -86,7 +86,7 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 	
 	protected void flush() {
 		if (world != null && !world.isRemote) {
-			IBlockState state = world.getBlockState(pos);
+			BlockState state = world.getBlockState(pos);
 			world.notifyBlockUpdate(pos, state, state, 2);
 		}
 	}

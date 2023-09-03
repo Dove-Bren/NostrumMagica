@@ -10,13 +10,13 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.InventoryBasic;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
@@ -24,29 +24,17 @@ public class ReagentBag extends Item implements ILoreTagged {
 
 	private static final String NBT_VACUUM = "vacuum";
 	private static final String NBT_ITEMS = "items";
-	private static ReagentBag instance = null;
 	
 	public static final int SLOTS = 9;
 	
-	public static ReagentBag instance() {
-		if (instance == null)
-			instance = new ReagentBag();
-		
-		return instance;
-	}
-	
-	public static final String id = "reagent_bag";
+	public static final String ID = "reagent_bag";
 	
 	private ReagentBag() {
-		super();
-		this.setUnlocalizedName(id);
-		this.setRegistryName(NostrumMagica.MODID, ReagentBag.id);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setMaxStackSize(1);
+		super(NostrumItems.PropUnstackable());
 	}
 	
 	public static int getReagentCount(ItemStack bag, ReagentType type) {
-		if (bag.isEmpty() || !bag.hasTagCompound())
+		if (bag.isEmpty() || !bag.hasTag())
 			return 0;
 		
 		int count = 0;
@@ -56,8 +44,8 @@ public class ReagentBag extends Item implements ILoreTagged {
 			if (!(item.getItem() instanceof ReagentItem))
 				continue;
 			
-			if (ReagentItem.getTypeFromMeta(item.getMetadata())
-					== type)
+			ReagentItem reagentItem = (ReagentItem) item.getItem();
+			if (reagentItem.getType() == type)
 				count += item.getCount();
 		}
 		
@@ -69,21 +57,21 @@ public class ReagentBag extends Item implements ILoreTagged {
 			return;
 		
 		if (!bag.isEmpty() && bag.getItem() instanceof ReagentBag) {
-			if (!bag.hasTagCompound())
-				bag.setTagCompound(new CompoundNBT());
+			if (!bag.hasTag())
+				bag.setTag(new CompoundNBT());
 			
-			CompoundNBT nbt = bag.getTagCompound();
+			CompoundNBT nbt = bag.getTag();
 			CompoundNBT items = nbt.getCompound(NBT_ITEMS);
 			if (item.isEmpty())
-				items.removeTag(pos + "");
+				items.remove(pos + "");
 			else {
 				CompoundNBT compound = new CompoundNBT();
-				item.writeToNBT(compound);
+				item.write(compound);
 				items.put(pos + "", compound);
 			}
 			
 			nbt.put(NBT_ITEMS, items);
-			bag.setTagCompound(nbt);
+			bag.setTag(nbt);
 		}
 	}
 
@@ -92,7 +80,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 		if (inputItem.isEmpty())
 			return inputItem;
 		
-		ReagentInventory inv = (ReagentInventory) ReagentBag.instance().asInventory(bag);
+		ReagentInventory inv = (ReagentInventory) NostrumItems.reagentBag.asInventory(bag);
 		return inv.addItem(inputItem);
 	}
 	
@@ -110,11 +98,11 @@ public class ReagentBag extends Item implements ILoreTagged {
 		
 		for (int i = 0; i < SLOTS; i++) {
 			ItemStack item = existing[i];
-			if (item.isEmpty())
+			ReagentType existingType = ReagentItem.FindType(item);
+			if (item.isEmpty() || null == existingType)
 				continue;
-			
-			if (ReagentItem.getTypeFromMeta(item.getMetadata())
-					== type) {
+				
+			if (existingType == type) {
 				if (item.getCount() > remaining) {
 					item.shrink(remaining);
 					remaining = 0;
@@ -141,12 +129,12 @@ public class ReagentBag extends Item implements ILoreTagged {
 			return ItemStack.EMPTY;
 		
 		if (!bag.isEmpty() && bag.getItem() instanceof ReagentBag) {
-			if (!bag.hasTagCompound())
+			if (!bag.hasTag())
 				return ItemStack.EMPTY;
 			
-			CompoundNBT items = bag.getTagCompound().getCompoundTag(NBT_ITEMS);
+			CompoundNBT items = bag.getTag().getCompound(NBT_ITEMS);
 			if (items.contains(pos + "", NBT.TAG_COMPOUND))
-				return new ItemStack(items.getCompound(pos + ""));
+				return ItemStack.read(items.getCompound(pos + ""));
 			else
 				return ItemStack.EMPTY;
 		}
@@ -174,10 +162,10 @@ public class ReagentBag extends Item implements ILoreTagged {
 	
 	public static boolean isVacuumEnabled(ItemStack stack) {
 		if (!stack.isEmpty() && stack.getItem() instanceof ReagentBag) {
-			if (!stack.hasTagCompound())
-				stack.setTagCompound(new CompoundNBT());
+			if (!stack.hasTag())
+				stack.setTag(new CompoundNBT());
 			
-			return stack.getTagCompound().getBoolean(NBT_VACUUM);
+			return stack.getTag().getBoolean(NBT_VACUUM);
 		}
 		
 		return false;
@@ -186,7 +174,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 	public static boolean toggleVacuumEnabled(ItemStack stack) {
 		if (!stack.isEmpty() && stack.getItem() instanceof ReagentBag) {
 			boolean enabled = isVacuumEnabled(stack);
-			stack.getTagCompound().setBoolean(NBT_VACUUM, !enabled);
+			stack.getTag().putBoolean(NBT_VACUUM, !enabled);
 			return !enabled;
 		}
 		
@@ -195,7 +183,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 	
 	public static void setVacuumEnabled(ItemStack stack, boolean set) {
 		if (!stack.isEmpty() && stack.getItem() instanceof ReagentBag) {
-			stack.getTagCompound().setBoolean(NBT_VACUUM, set);
+			stack.getTag().putBoolean(NBT_VACUUM, set);
 		}
 	}
 	
@@ -204,14 +192,14 @@ public class ReagentBag extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
 		playerIn.openGui(NostrumMagica.instance, NostrumGui.reagentBagID, worldIn,
 				(int) playerIn.posX, (int) playerIn.posY, (int) playerIn.posZ);
 		
-		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, playerIn.getHeldItem(hand));
+		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, playerIn.getHeldItem(hand));
     }
 	
-	public static class ReagentInventory extends InventoryBasic {
+	public static class ReagentInventory extends Inventory {
 
 		private static final int MAX_COUNT = 127;
 		
@@ -219,7 +207,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 		//private ItemStack[] inventory;
 		
 		public ReagentInventory(ItemStack stack) {
-			super("Reagent Bag", false, SLOTS);
+			super(SLOTS);
 			
 			this.stack = stack;
 			

@@ -9,14 +9,14 @@ import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemEnderEye;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
@@ -60,22 +60,22 @@ public class SwitchBlock extends Block {
     }
 	
 	@Override
-	public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
+	public int getLightValue(BlockState state, IBlockAccess world, BlockPos pos) {
 		return 8;
 	}
 	
 	@Override
-	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
 		return SWITCH_BLOCK_AABB;
 	}
 	
 	@Override
-	public boolean isOpaqueCube(IBlockState state) {
+	public boolean isOpaqueCube(BlockState state) {
 		return false;
 	}
 	
 	@Override
-	public boolean isFullCube(IBlockState state) {
+	public boolean isFullCube(BlockState state) {
 		return false;
 	}
 	
@@ -85,44 +85,44 @@ public class SwitchBlock extends Block {
     }
 	
 	@Override
-	public int getLightOpacity(IBlockState state, IBlockAccess world, BlockPos pos) {
+	public int getLightOpacity(BlockState state, IBlockAccess world, BlockPos pos) {
 		return 0;
 	}
 	
 	@Override
-	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
+	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
 		return false;
 	}
 	
 	@Override
-	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+	public AxisAlignedBB getCollisionBoundingBox(BlockState blockState, IBlockAccess worldIn, BlockPos pos) {
 		return NULL_AABB;
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public EnumBlockRenderType getRenderType(IBlockState state) {
+	public EnumBlockRenderType getRenderType(BlockState state) {
 		return EnumBlockRenderType.INVISIBLE;
 	}
 	
 	@Override
-	public boolean hasTileEntity(IBlockState state) {
+	public boolean hasTileEntity(BlockState state) {
 		return true;
 	}
 	
 	@Override
-	public TileEntity createTileEntity(World world, IBlockState state) {
+	public TileEntity createTileEntity(World world, BlockState state) {
 		return new SwitchBlockTileEntity();
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, IBlockState state) {
+	public void breakBlock(World world, BlockPos pos, BlockState state) {
 		super.breakBlock(world, pos, state);
 		world.removeTileEntity(pos);
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
 		if (worldIn.isRemote || !playerIn.isCreative()) {
 			return false;
 		}
@@ -145,14 +145,14 @@ public class SwitchBlock extends Block {
 			if (te != null) {
 				SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;
 				BlockPos loc = ent.getOffset().toImmutable().add(pos);
-				IBlockState atState = worldIn.getBlockState(loc);
+				BlockState atState = worldIn.getBlockState(loc);
 				if (atState != null && atState.getBlock() instanceof ITriggeredBlock) {
 					playerIn.setPositionAndUpdate(loc.getX(), loc.getY(), loc.getZ());
 				} else {
 					playerIn.sendMessage(new StringTextComponent("Not pointed at valid triggered block!"));
 				}
 			}
-		} else if (heldItem.isEmpty() && hand == EnumHand.MAIN_HAND) {
+		} else if (heldItem.isEmpty() && hand == Hand.MAIN_HAND) {
 			TileEntity te = worldIn.getTileEntity(pos);
 			if (te != null) {
 				SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;

@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.ITriggeredBlock;
 import com.smanzana.nostrummagica.blocks.NostrumSpawnAndTrigger;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -42,7 +42,7 @@ public class SpawnerTriggerTileEntity extends SingleSpawnerTileEntity {
 		return triggerOffset;
 	}
 	
-	protected void trigger(IBlockState state) {
+	protected void trigger(BlockState state) {
 		
 		if (triggerOffset != null) {
 			state = world.getBlockState(pos.add(this.triggerOffset));
@@ -54,7 +54,7 @@ public class SpawnerTriggerTileEntity extends SingleSpawnerTileEntity {
 	}
 	
 	@Override
-	protected void majorTick(IBlockState state) {
+	protected void majorTick(BlockState state) {
 		if (unlinkedEntID != null) {
 			// Need to find our entity!
 			for (LivingEntity ent : world.getEntities(LivingEntity.class, (ent) -> { return ent.getPersistentID().equals(unlinkedEntID);})) {

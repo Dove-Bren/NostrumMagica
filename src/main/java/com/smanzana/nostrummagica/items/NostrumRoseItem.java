@@ -1,90 +1,29 @@
 package com.smanzana.nostrummagica.items;
 
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.item.Rarity;
 
 public class NostrumRoseItem extends Item implements ILoreTagged {
 
-	public static enum RoseType {
-		BLOOD("rose_blood"),
-		ELDRICH("rose_eldrich"),
-		PALE("rose_pale");
-		
-		private String key;
-		
-		private RoseType(String key) {
-			this.key = key;
-		}
-		
-		public String getUnlocalizedKey() {
-			return key;
-		}
-	}
-	
-	public static final String ID = "RoseItem";
-	
-	private static NostrumRoseItem instance = null;
-	public static NostrumRoseItem instance() {
-		if (instance == null)
-			instance = new NostrumRoseItem();
-		
-		return instance;
-	}
+	public static final String ID_BLOOD_ROSE = "rose_blood";
+	public static final String ID_ELDRICH_ROSE = "rose_eldrich";
+	public static final String ID_PALE_ROSE = "rose_pale";
 	
 	public NostrumRoseItem() {
-		super();
-		this.setUnlocalizedName(ID);
-		this.setRegistryName(NostrumMagica.MODID, ID);
-		this.setMaxDamage(0);
-		this.setMaxStackSize(16);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setHasSubtypes(true);
+		super(NostrumItems.PropLowStack().rarity(Rarity.RARE));
 	}
 	
-	@Override
-	public String getUnlocalizedName(ItemStack stack) {
-		int i = stack.getMetadata();
-		
-		RoseType type = getTypeFromMeta(i);
-		return "item." + type.getUnlocalizedKey();
-	}
-	
-	public static RoseType getTypeFromMeta(int meta) {
-		RoseType ret = null;
-    	for (RoseType type : RoseType.values()) {
-			if (type.ordinal() == meta) {
-				ret = type;
-				break;
-			}
-		}
-    	
-    	return ret;
-    }
-	
-	public static ItemStack getItem(RoseType type, int count) {
-		int meta = getMetaFromType(type);
-		
-		return new ItemStack(instance(), count, meta);
-	}
-	
-	@OnlyIn(Dist.CLIENT)
-    @Override
-	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-		if (this.isInCreativeTab(tab)) {
-	    	for (RoseType type: RoseType.values()) {
-	    		subItems.add(new ItemStack(this, 1, getMetaFromType(type)));
-	    	}
-		}
-	}
+//	@Override
+//	public String getUnlocalizedName(ItemStack stack) {
+//		int i = stack.getMetadata();
+//		
+//		RoseType type = getTypeFromMeta(i);
+//		return "item." + type.getUnlocalizedKey();
+//	}
 	
 	@Override
 	public String getLoreKey() {
@@ -110,12 +49,4 @@ public class NostrumRoseItem extends Item implements ILoreTagged {
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_ITEMS;
 	}
-	
-	public static int getMetaFromType(RoseType type) {
-		if (type == null)
-			return 0;
-		
-		return type.ordinal();
-	}
-	
 }

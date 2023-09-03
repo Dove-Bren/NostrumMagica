@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
@@ -39,7 +39,7 @@ public class TeleportationPortalTileEntity extends NostrumPortal.NostrumPortalTi
 		this.markDirty();
 		
 		if (world != null) {
-			IBlockState state = world.getBlockState(pos);
+			BlockState state = world.getBlockState(pos);
 			world.notifyBlockUpdate(pos, state, state, 2);
 		}
 	}

@@ -33,7 +33,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -300,7 +300,7 @@ public class BaublesProxy {
 		
 		//SetHasWingUpgrade
 		for (EMagicElement elem : new EMagicElement[] {EMagicElement.ICE, EMagicElement.WIND, EMagicElement.LIGHTNING}) {
-			EnchantedArmor armor = EnchantedArmor.get(elem, EntityEquipmentSlot.CHEST, 4);
+			EnchantedArmor armor = EnchantedArmor.get(elem, EquipmentSlotType.CHEST, 4);
 			ItemStack armorStack = new ItemStack(armor);
 			ItemStack upgradedStack = armorStack.copy();
 			EnchantedArmor.SetHasWingUpgrade(upgradedStack, true);

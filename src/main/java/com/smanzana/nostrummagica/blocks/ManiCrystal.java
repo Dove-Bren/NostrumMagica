@@ -15,7 +15,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
@@ -69,7 +69,7 @@ public class ManiCrystal extends Block {
 	}
 	
 	@Override
-	public int getLightValue(IBlockState state) {
+	public int getLightValue(BlockState state) {
 		switch (state.getValue(LEVEL)) {
 		case 0:
 		default:
@@ -96,12 +96,12 @@ public class ManiCrystal extends Block {
 	}
 	
 	@Override
-	public IBlockState getStateFromMeta(int meta) {
+	public BlockState getStateFromMeta(int meta) {
 		return getDefaultState().withProperty(LEVEL, levelFromMeta(meta)).withProperty(FACING, facingFromMeta(meta));
 	}
 	
 	@Override
-	public int getMetaFromState(IBlockState state) {
+	public int getMetaFromState(BlockState state) {
 		return metaFromFacing(state.getValue(FACING)) | metaFromLevel(state.getValue(LEVEL));
 	}
 	
@@ -111,12 +111,12 @@ public class ManiCrystal extends Block {
 	}
 	
 	@Override
-	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+	public Item getItemDropped(BlockState state, Random rand, int fortune) {
 		return NostrumResourceItem.instance();
 	}
 	
 	@Override
-	public int damageDropped(IBlockState state) {
+	public int damageDropped(BlockState state) {
 		switch (state.getValue(LEVEL)) {
 		case 0:
 		default:
@@ -127,12 +127,12 @@ public class ManiCrystal extends Block {
 	}
 	
 	@Override
-	public int getExpDrop(IBlockState state, net.minecraft.world.IBlockAccess world, BlockPos pos, int fortune) {
+	public int getExpDrop(BlockState state, net.minecraft.world.IBlockAccess world, BlockPos pos, int fortune) {
 		return 0;
 	}
 	
 	@Override
-	public void randomTick(World worldIn, BlockPos pos, IBlockState state, Random random) {
+	public void randomTick(World worldIn, BlockPos pos, BlockState state, Random random) {
 		if (worldIn.isRemote) {
 			return;
 		}
@@ -168,7 +168,7 @@ public class ManiCrystal extends Block {
 	}
 	
 	@Override
-	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
 		switch (state.getValue(FACING)) {
 		case DOWN:
 			return new AxisAlignedBB(.5-(.16), .55, .5-.16, .5+.16, 1.0, .5+.16);
@@ -188,7 +188,7 @@ public class ManiCrystal extends Block {
 	}
 	
 	@Override
-	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+	public AxisAlignedBB getCollisionBoundingBox(BlockState blockState, IBlockAccess worldIn, BlockPos pos) {
 		Direction facing = blockState.getValue(FACING);
 		if (facing == null) {
 			facing = Direction.UP;
@@ -209,12 +209,12 @@ public class ManiCrystal extends Block {
 	}
 	
 	@Override
-	public boolean isOpaqueCube(IBlockState state) {
+	public boolean isOpaqueCube(BlockState state) {
 		return false;
 	}
 	
 	@Override
-	public boolean isFullCube(IBlockState state) {
+	public boolean isFullCube(BlockState state) {
 		return false;
 	}
 	
@@ -226,7 +226,7 @@ public class ManiCrystal extends Block {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public boolean isTranslucent(IBlockState state) {
+	public boolean isTranslucent(BlockState state) {
 		return true;
 	}
 	
@@ -235,7 +235,7 @@ public class ManiCrystal extends Block {
 		super.onNeighborChange(world, pos, neighbor);
 		
 		if (world instanceof World && !((World) world).isRemote) {
-			IBlockState state = world.getBlockState(pos);
+			BlockState state = world.getBlockState(pos);
 			Direction facing = state.getValue(FACING);
 			if (facing == Direction.UP || facing == Direction.DOWN) {
 				return;
@@ -252,7 +252,7 @@ public class ManiCrystal extends Block {
 	 * Get a useful offset for this crystal for things like effects to go to to go 'to' the crystal
 	 * @return
 	 */
-	public Vec3d getCrystalTipOffset(IBlockState state) {
+	public Vec3d getCrystalTipOffset(BlockState state) {
 		Direction facing = state.getValue(FACING);
 		Vec3d offset = Vec3d.ZERO;
 		if (facing != null) {

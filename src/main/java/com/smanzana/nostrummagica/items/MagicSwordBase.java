@@ -1,33 +1,18 @@
 package com.smanzana.nostrummagica.items;
 
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.item.ItemSword;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.item.ItemTier;
+import net.minecraft.item.SwordItem;
 
-public class MagicSwordBase extends ItemSword implements ILoreTagged {
+public class MagicSwordBase extends SwordItem implements ILoreTagged {
 
 	public static final String ID = "magicswordbase";
 	
-	private static MagicSwordBase instance = null;
-
-	public static MagicSwordBase instance() {
-		if (instance == null)
-			instance = new MagicSwordBase();
-	
-		return instance;
-
-	}
-
 	public MagicSwordBase() {
-		super(ToolMaterial.WOOD);
-		this.setMaxDamage(5);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setUnlocalizedName(ID);
-		this.setRegistryName(new ResourceLocation(NostrumMagica.MODID, ID));
+		super(ItemTier.WOOD, 1, -2.4F, NostrumItems.PropEquipment().maxDamage(5));
 	}
 	
 	public String getModelID() {

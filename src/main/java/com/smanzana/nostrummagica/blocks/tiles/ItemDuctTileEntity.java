@@ -14,7 +14,7 @@ import com.smanzana.nostrummagica.utils.Inventories;
 import com.smanzana.nostrummagica.utils.ItemStacks;
 
 import net.minecraft.block.BlockChest;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.InventoryHelper;
@@ -175,7 +175,7 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 	}
 	
 	@Override
-	public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState) {
+	public boolean shouldRefresh(World world, BlockPos pos, BlockState oldState, BlockState newState) {
 		return !(newState.getBlock() instanceof ItemDuct);
 	}
 	
@@ -351,7 +351,7 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 				
 				// Special cast for stupid chests :P
 				if (te instanceof TileEntityChest) {
-					IBlockState state = world.getBlockState(pos.offset(direction));
+					BlockState state = world.getBlockState(pos.offset(direction));
 					if (state != null && state.getBlock() instanceof BlockChest) {
 						inv = ((BlockChest)state.getBlock()).getContainer(world, pos.offset(direction), true);
 					}

@@ -17,7 +17,7 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -66,7 +66,7 @@ public class CursedIce extends Block {
 	}
 	
 	@Override
-	public boolean isOpaqueCube(IBlockState state) {
+	public boolean isOpaqueCube(BlockState state) {
 		return false;
 	}
 	
@@ -85,27 +85,27 @@ public class CursedIce extends Block {
 	 * @param level
 	 * @return
 	 */
-	public IBlockState getState(int level) {
+	public BlockState getState(int level) {
 		return getDefaultState().withProperty(LEVEL, Math.max(Math.min(2, level - 1), 0));
 	}
 	
 	@Override
-	public IBlockState getStateFromMeta(int meta) {
+	public BlockState getStateFromMeta(int meta) {
 		return getDefaultState().withProperty(LEVEL, Math.min(2, meta & 0x3));
 	}
 	
 	@Override
-	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+	public Item getItemDropped(BlockState state, Random rand, int fortune) {
         return null;
     }
 	
 	@Override
-	public int getMetaFromState(IBlockState state) {
+	public int getMetaFromState(BlockState state) {
 		return (state.getValue(LEVEL));
 	}
 	
 	@Override
-	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, PlayerEntity player) {
+	public ItemStack getPickBlock(BlockState state, RayTraceResult target, World world, BlockPos pos, PlayerEntity player) {
 		return new ItemStack(Item.getItemFromBlock(this), 1, 0);
 	}
 	
@@ -115,14 +115,14 @@ public class CursedIce extends Block {
     }
 	
 	@Override
-	public boolean isFullCube(IBlockState state) {
+	public boolean isFullCube(BlockState state) {
         return false;
     }
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, Direction side) {
-		IBlockState iblockstate = blockAccess.getBlockState(pos.offset(side));
+	public boolean shouldSideBeRendered(BlockState blockState, IBlockAccess blockAccess, BlockPos pos, Direction side) {
+		BlockState iblockstate = blockAccess.getBlockState(pos.offset(side));
 		Block block = iblockstate.getBlock();
 		
 		return !(block == Blocks.GLASS || block == Blocks.STAINED_GLASS
@@ -130,7 +130,7 @@ public class CursedIce extends Block {
 	}
 	
 	@Override
-	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+	public void updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) {
 		int level = state.getValue(LEVEL);
 		
 		// Don't grow is in Sorcery dim
@@ -149,7 +149,7 @@ public class CursedIce extends Block {
 			
 			for (BlockPos target : targets)
 			if (!worldIn.isAirBlock(target)) {
-				IBlockState bs = worldIn.getBlockState(target);
+				BlockState bs = worldIn.getBlockState(target);
 				Block b = bs.getBlock();
 				if (!(b instanceof BlockIce) && !(b instanceof CursedIce)) {
 					if (bs.getBlockHardness(worldIn, target) >= 0.0f &&

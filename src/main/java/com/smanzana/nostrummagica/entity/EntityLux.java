@@ -32,7 +32,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.BlockFlower;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.EntityCreature;
@@ -52,7 +52,7 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -185,7 +185,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 
 			@Override
 			protected void onArrive(EntityLux lux, BlockPos pos) {
-				IBlockState state = lux.world.getBlockState(pos);
+				BlockState state = lux.world.getBlockState(pos);
 				lux.onFlowerVisit(pos, state);
 			}
 			
@@ -249,7 +249,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		return flag;
 	}
 
-	public boolean processInteract(PlayerEntity player, EnumHand hand, @Nonnull ItemStack stack)
+	public boolean processInteract(PlayerEntity player, Hand hand, @Nonnull ItemStack stack)
 	{
 		return false;
 	}
@@ -422,7 +422,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 	}
 	
 	@Override
-	protected void updateFallState(double y, boolean onGround, IBlockState stae, BlockPos pos) {
+	protected void updateFallState(double y, boolean onGround, BlockState stae, BlockPos pos) {
 		
 	}
 	
@@ -531,7 +531,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 
 			if (this.onGround) {
 				final BlockPos pos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
-				final IBlockState state = world.getBlockState(pos);
+				final BlockState state = world.getBlockState(pos);
 				f = state.getBlock().getSlipperiness(state, world, pos, this) * 0.91F;
 			}
 
@@ -541,7 +541,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 
 			if (this.onGround) {
 				final BlockPos pos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
-				final IBlockState state = world.getBlockState(pos);
+				final BlockState state = world.getBlockState(pos);
 				f = state.getBlock().getSlipperiness(state, world, pos, this) * 0.91F;
 			}
 
@@ -976,11 +976,11 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		return (float) (curTicks / (double) SWING_TICKS);
 	}
 	
-	protected boolean isLeavesBlock(IBlockState state) {
+	protected boolean isLeavesBlock(BlockState state) {
 		return state.getMaterial().equals(Material.LEAVES);
 	}
 	
-	protected boolean isGoodLeavesBlock(IBlockState state, BlockPos pos) {
+	protected boolean isGoodLeavesBlock(BlockState state, BlockPos pos) {
 		return isLeavesBlock(state)
 				&& world.isAirBlock(pos.down());
 	}
@@ -1017,7 +1017,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 				continue;
 			}
 			
-			IBlockState state = world.getBlockState(cursor);
+			BlockState state = world.getBlockState(cursor);
 			if (isGoodLeavesBlock(state, cursor)) {
 				leaves.add(cursor.toImmutable());
 			}
@@ -1030,7 +1030,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		return leaves.get(rand.nextInt(leaves.size()));
 	}
 	
-	protected boolean isFlowersBlock(IBlockState state) {
+	protected boolean isFlowersBlock(BlockState state) {
 		// We only care about nostrum flowers
 		return (state != null
 				&& (state.getBlock() instanceof NostrumMagicaFlower
@@ -1063,7 +1063,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 				continue;
 			}
 			
-			IBlockState state = world.getBlockState(cursor);
+			BlockState state = world.getBlockState(cursor);
 			if (isFlowersBlock(state)) {
 				flowers.add(cursor.toImmutable());
 			}
@@ -1076,7 +1076,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		return flowers.get(rand.nextInt(flowers.size()));
 	}
 	
-	protected void onFlowerVisit(BlockPos pos, IBlockState state) {
+	protected void onFlowerVisit(BlockPos pos, BlockState state) {
 		// Check what kind of flower, and possible become 'pollinated' (possibly)
 		if (rand.nextBoolean() && rand.nextBoolean()) {
 			if (state != null && state.getBlock() instanceof NostrumMagicaFlower) {
@@ -1102,7 +1102,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 	}
 	
 	@Nullable
-	protected static final IBlockState resolvePlantable(ItemStack stack) {
+	protected static final BlockState resolvePlantable(ItemStack stack) {
 		if (stack.isEmpty()) {
 			return null;
 		}
@@ -1132,7 +1132,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		MutableBlockPos cursor = new MutableBlockPos();
 		cursor.setPos(this.getPosition());
 		while (cursor.getY() > 0) {
-			IBlockState state = world.getBlockState(cursor);
+			BlockState state = world.getBlockState(cursor);
 			if (
 				state == null
 				|| state.getBlock().isAir(state, world, cursor)
@@ -1147,7 +1147,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTamea
 		
 		cursor.move(Direction.UP);
 		
-		final IBlockState flowerState = resolvePlantable(stack);
+		final BlockState flowerState = resolvePlantable(stack);
 		
 		if (flowerState != null
 				&& flowerState.getBlock() instanceof BlockBush

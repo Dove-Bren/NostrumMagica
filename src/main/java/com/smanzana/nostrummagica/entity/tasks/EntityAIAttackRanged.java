@@ -8,7 +8,7 @@ import net.minecraft.entity.IRangedAttackMob;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBow;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 
 public class EntityAIAttackRanged<T extends MobEntity> extends EntityAIBase
 {
@@ -64,7 +64,7 @@ public class EntityAIAttackRanged<T extends MobEntity> extends EntityAIBase
 	 * Called when the target can attack if animation allowed. For skeleton's, this is 'using the bow' item
 	 */
 	protected void startAttackAnimation(T entity) {
-		entity.setActiveHand(EnumHand.MAIN_HAND);
+		entity.setActiveHand(Hand.MAIN_HAND);
 	}
 	
 	/**

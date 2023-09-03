@@ -9,16 +9,18 @@ import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
 import com.smanzana.nostrummagica.listeners.PlayerListener.SpellActionListenerData;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.utils.ItemStacks;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Rarity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -27,51 +29,41 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 // Dumb name to keep it sorted. Worth?
 public class MirrorShieldImproved extends MirrorShield {
 
-	private static MirrorShieldImproved instance = null;
-	
-	public static MirrorShieldImproved instance() {
-		if (instance == null)
-			instance = new MirrorShieldImproved();
-		
-		return instance;
-	}
-	
-	public static final String id = "true_mirror_shield";
+	public static final String ID = "true_mirror_shield";
 	private static final String NBT_CHARGED = "charged";
 	
 	public static final float CHARGE_CHANCE = 0.25f;
 	
 	private MirrorShieldImproved() {
-		super(MirrorShieldImproved.id);
-		this.setUnlocalizedName(id);
-		this.setMaxDamage(1250);
+		super(NostrumItems.PropEquipment().rarity(Rarity.UNCOMMON).maxDamage(1250));
 		
 		this.addPropertyOverride(new ResourceLocation("charged"), new IItemPropertyGetter() {
 			@OnlyIn(Dist.CLIENT)
-			public float apply(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
+			@Override
+			public float call(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
 				return getBlockCharged(stack) ? 1.0F : 0.0F;
 			}
 		});
 	}
 	
 	@Override
-	public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
+	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
 		Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
 
-		if (equipmentSlot == EntityEquipmentSlot.OFFHAND) {
-			multimap.put(AttributeMagicResist.instance().getName(), new AttributeModifier(MOD_RESIST_UUID, "Magic Shield Resist", 20, 0));
+		if (equipmentSlot == EquipmentSlotType.OFFHAND) {
+			multimap.put(AttributeMagicResist.instance().getName(), new AttributeModifier(MOD_RESIST_UUID, "Magic Shield Resist", 20, AttributeModifier.Operation.ADDITION));
 		}
 
 		return multimap;
 	}
 	
 	@Override
-	public int getMaxItemUseDuration(ItemStack stack) {
+	public int getUseDuration(ItemStack stack) {
 		return 72000; // Maybe make longer/shorter?
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
 		return super.onItemRightClick(worldIn, playerIn, hand);
 	}
 
@@ -80,7 +72,8 @@ public class MirrorShieldImproved extends MirrorShield {
 		
 		if (type == Event.MAGIC_EFFECT) {
 			if (entity.isActiveItemStackBlocking() && entity.getActiveItemStack().getItem() instanceof MirrorShieldImproved) {
-				entity.getActiveItemStack().damageItem(NostrumMagica.rand.nextInt(2) + 1, entity);
+				ItemStacks.damageItem(entity.getActiveItemStack(), entity, entity.getActiveHand(), NostrumMagica.rand.nextInt(2) + 1);
+				//entity.getActiveItemStack().damageItem(NostrumMagica.rand.nextInt(2) + 1, entity);
 				
 				float reduc = 0.3f;
 				
@@ -102,7 +95,7 @@ public class MirrorShieldImproved extends MirrorShield {
 			} else {
 				if (!entity.getHeldItemOffhand().isEmpty() && entity.getHeldItemOffhand().getItem() instanceof MirrorShieldImproved) {
 					// If holding mirror shield in offhand but not actively blocking, have chance of charging
-					if (!getBlockCharged(entity.getHeldItemOffhand()) && itemRand.nextFloat() < CHARGE_CHANCE)
+					if (!getBlockCharged(entity.getHeldItemOffhand()) && random.nextFloat() < CHARGE_CHANCE)
 						markBlockCharged(entity.getHeldItemOffhand(), true);
 				}
 			}
@@ -133,7 +126,7 @@ public class MirrorShieldImproved extends MirrorShield {
 			return false;
 		}
 		
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt != null && nbt.contains(NBT_CHARGED)) {
 			return nbt.getBoolean(NBT_CHARGED);
 		}
@@ -146,13 +139,13 @@ public class MirrorShieldImproved extends MirrorShield {
 			return;
 		}
 		
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null) {
 			nbt = new CompoundNBT();
 		}
 		
 		nbt.putBoolean(NBT_CHARGED, charged);
-		stack.setTagCompound(nbt);
+		stack.setTag(nbt);
 	}
 
 }

@@ -40,7 +40,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -59,7 +59,7 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -187,7 +187,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 		return flag;
 	}
 
-	public boolean processInteract(PlayerEntity player, EnumHand hand, @Nonnull ItemStack stack)
+	public boolean processInteract(PlayerEntity player, Hand hand, @Nonnull ItemStack stack)
 	{
 		return false;
 	}
@@ -324,7 +324,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 	}
 	
 	@Override
-	protected void updateFallState(double y, boolean onGround, IBlockState stae, BlockPos pos) {
+	protected void updateFallState(double y, boolean onGround, BlockState stae, BlockPos pos) {
 		
 	}
 	
@@ -493,7 +493,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 			if (this.onGround) {
 				//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ))).getBlock().slipperiness * 0.91F;
 				BlockPos underPos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
-				IBlockState underState = this.world.getBlockState(underPos);
+				BlockState underState = this.world.getBlockState(underPos);
 				f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.91F;
 			}
 
@@ -504,7 +504,7 @@ public class EntityWisp extends EntityGolem implements ILoreTagged {
 			if (this.onGround) {
 				//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ))).getBlock().slipperiness * 0.91F;
 				BlockPos underPos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
-				IBlockState underState = this.world.getBlockState(underPos);
+				BlockState underState = this.world.getBlockState(underPos);
 				f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.91F;
 			}
 

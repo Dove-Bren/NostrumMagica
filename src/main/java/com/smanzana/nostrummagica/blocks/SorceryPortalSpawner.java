@@ -6,7 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -32,16 +32,16 @@ public class SorceryPortalSpawner extends Block implements ITriggeredBlock {
 		this.setSoundType(SoundType.STONE);
 	}
 	
-	protected void deactivatePortal(World world, BlockPos pos, IBlockState state) {
+	protected void deactivatePortal(World world, BlockPos pos, BlockState state) {
 		// Remove portal above us
 		world.setBlockToAir(pos.up());
 	}
 	
-	protected void activatePortal(World world, BlockPos pos, IBlockState state) {
+	protected void activatePortal(World world, BlockPos pos, BlockState state) {
 		world.setBlockState(pos.up(), SorceryPortal.instance().getStateForPlacement(world, pos, Direction.UP, 0f, 0f, 0f, 0, null, null));
 	}
 	
-	private void destroy(World world, BlockPos pos, IBlockState state) {
+	private void destroy(World world, BlockPos pos, BlockState state) {
 		if (state == null)
 			state = world.getBlockState(pos);
 		
@@ -52,7 +52,7 @@ public class SorceryPortalSpawner extends Block implements ITriggeredBlock {
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, IBlockState state) {
+	public void breakBlock(World world, BlockPos pos, BlockState state) {
 		this.destroy(world, pos, state);
 		
 		super.breakBlock(world, pos, state);
@@ -64,13 +64,13 @@ public class SorceryPortalSpawner extends Block implements ITriggeredBlock {
 	}
 	
 	@Override
-	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
+	public void onBlockAdded(World worldIn, BlockPos pos, BlockState state) {
 		activatePortal(worldIn, pos, state);
 	}
 
 	@Override
-	public void trigger(World world, BlockPos blockPos, IBlockState state, BlockPos triggerPos) {
-		IBlockState aboveState = world.getBlockState(blockPos.up());
+	public void trigger(World world, BlockPos blockPos, BlockState state, BlockPos triggerPos) {
+		BlockState aboveState = world.getBlockState(blockPos.up());
 		SorceryPortal.instance();
 		if (aboveState == null || !(aboveState.getBlock() instanceof SorceryPortal)) {
 			this.activatePortal(world, blockPos, state);

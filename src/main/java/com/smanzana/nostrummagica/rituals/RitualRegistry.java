@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -59,7 +59,7 @@ public class RitualRegistry {
 	public static boolean attemptRitual(World world, BlockPos pos, PlayerEntity player, EMagicElement element) {
 		// All rituals have a candle or an altar in the center
 		// For all candles and altars around the player, check if recipes match
-		IBlockState state = world.getBlockState(pos);
+		BlockState state = world.getBlockState(pos);
 		if (state == null ||
 			(!(state.getBlock() instanceof Candle) && !(state.getBlock() instanceof AltarBlock)))
 			return false;

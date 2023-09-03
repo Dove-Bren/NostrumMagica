@@ -15,7 +15,7 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.init.SoundEvents;
@@ -54,12 +54,12 @@ public abstract class NostrumPortal extends Block  {
     }
 	
 	@Override
-	public boolean isFullCube(IBlockState state) {
+	public boolean isFullCube(BlockState state) {
 		return false;
 	}
 	
 	@Override
-	public boolean isOpaqueCube(IBlockState state) {
+	public boolean isOpaqueCube(BlockState state) {
 		return false;
 	}
 	
@@ -69,22 +69,22 @@ public abstract class NostrumPortal extends Block  {
     }
 	
 	@Override
-	public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
+	public int getLightValue(BlockState state, IBlockAccess world, BlockPos pos) {
 		return 14;
 	}
 	
 	@Override
-	public int getLightOpacity(IBlockState state, IBlockAccess world, BlockPos pos) {
+	public int getLightOpacity(BlockState state, IBlockAccess world, BlockPos pos) {
 		return 0;
 	}
 	
 	@Override
-	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
+	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
 		return false;
 	}
 	
 	@Override
-	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+	public AxisAlignedBB getCollisionBoundingBox(BlockState blockState, IBlockAccess worldIn, BlockPos pos) {
 		return NULL_AABB;
 		//return super.getCollisionBoundingBox(blockState, worldIn, pos);
 	}
@@ -95,16 +95,16 @@ public abstract class NostrumPortal extends Block  {
 	}
 	
 	@Override
-	public IBlockState getStateFromMeta(int meta) {
+	public BlockState getStateFromMeta(int meta) {
 		return getDefaultState().withProperty(MASTER, (meta & 1) == 1);
 	}
 	
 	@Override
-	public int getMetaFromState(IBlockState state) {
+	public int getMetaFromState(BlockState state) {
 		return state.getValue(MASTER) ? 1 : 0;
 	}
 	
-	private void destroy(World world, BlockPos pos, IBlockState state) {
+	private void destroy(World world, BlockPos pos, BlockState state) {
 		if (state == null)
 			state = world.getBlockState(pos);
 		
@@ -114,11 +114,11 @@ public abstract class NostrumPortal extends Block  {
 		world.setBlockToAir(getPaired(state, pos));
 	}
 	
-	protected static BlockPos getPaired(IBlockState state, BlockPos pos) {
+	protected static BlockPos getPaired(BlockState state, BlockPos pos) {
 		return pos.offset(state.getValue(MASTER) ? Direction.UP : Direction.DOWN);
 	}
 	
-	protected static BlockPos getMaster(IBlockState state, BlockPos pos) {
+	protected static BlockPos getMaster(BlockState state, BlockPos pos) {
 		if (!isMaster(state)) {
 			pos = getPaired(state, pos);
 		}
@@ -128,25 +128,25 @@ public abstract class NostrumPortal extends Block  {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public EnumBlockRenderType getRenderType(IBlockState state) {
+	public EnumBlockRenderType getRenderType(BlockState state) {
 		return EnumBlockRenderType.INVISIBLE;
 	}
 	
-	public IBlockState getSlaveState() {
+	public BlockState getSlaveState() {
 		return this.getDefaultState().withProperty(MASTER, false);
 	}
 
 
-	public IBlockState getMaster() {
+	public BlockState getMaster() {
 		return this.getDefaultState().withProperty(MASTER, true);
 	}
 	
-	public static boolean isMaster(IBlockState state) {
+	public static boolean isMaster(BlockState state) {
 		return state.getValue(MASTER);
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, IBlockState state) {
+	public void breakBlock(World world, BlockPos pos, BlockState state) {
 		this.destroy(world, pos, state);
 		world.removeTileEntity(pos);
 		super.breakBlock(world, pos, state);
@@ -167,7 +167,7 @@ public abstract class NostrumPortal extends Block  {
 	}
 	
 	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer) {
+	public BlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer) {
 		return getMaster();
 	}
 	
@@ -176,7 +176,7 @@ public abstract class NostrumPortal extends Block  {
 	}
 	
 	@Override
-	public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, LivingEntity placer, ItemStack stack) {
+	public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
 		// This method hopefully is ONLY called when placed manually in the world.
 		// Auto-create slave state
 		createPaired(worldIn, pos);
@@ -184,7 +184,7 @@ public abstract class NostrumPortal extends Block  {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+	public void randomDisplayTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
 		if (!isMaster(stateIn)) {
 			return;
 		}
@@ -244,7 +244,7 @@ public abstract class NostrumPortal extends Block  {
 	private static boolean DumbIntegratedGuard = false;
 	
 	@Override
-	public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
+	public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, BlockState state, Entity entityIn) {
 		Integer charge = EntityTeleportCharge.get(entityIn.getUniqueID());
 		if (charge == null) {
 			charge = 0;
@@ -327,7 +327,7 @@ public abstract class NostrumPortal extends Block  {
 //	public static final int TELEPORT_COOLDOWN = 10;
 //	
 //	@Override
-//	public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
+//	public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, BlockState state, Entity entityIn) {
 //
 //		if (!worldIn.isRemote) {
 //			// Check if player teleported too recently

@@ -196,7 +196,7 @@ import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelBakery;
@@ -714,7 +714,7 @@ public class ClientProxy extends CommonProxy {
 			
 			ModelLoader.setCustomStateMapper(fluid.getFluid().getBlock(), new StateMapperBase() {
 				@Override
-				protected ModelResourceLocation getModelResourceLocation(final IBlockState state) {
+				protected ModelResourceLocation getModelResourceLocation(final BlockState state) {
 					return locationIgnoringVariant;
 				}
 			});
@@ -934,7 +934,7 @@ public class ClientProxy extends CommonProxy {
 			PlayerEntity player = Minecraft.getInstance().player;
 			if (player.getCooledAttackStrength(0.5F) > .95) {
 				player.resetCooldown();
-				//player.swingArm(EnumHand.MAIN_HAND);
+				//player.swingArm(Hand.MAIN_HAND);
 				doBladeCast();
 			}
 			

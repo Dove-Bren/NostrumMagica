@@ -12,7 +12,7 @@ import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -31,7 +31,7 @@ public class LayerDragonFlightWings implements LayerRenderer<AbstractClientPlaye
 	@Override
 	public void doRenderLayer(AbstractClientPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 		if (shouldRender(player)) {
-			@Nonnull ItemStack chestpiece = player.getItemStackFromSlot(EntityEquipmentSlot.CHEST); 
+			@Nonnull ItemStack chestpiece = player.getItemStackFromSlot(EquipmentSlotType.CHEST); 
 			render(player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale, (!chestpiece.isEmpty() && chestpiece.isItemEnchanted()));
 		}
 	}

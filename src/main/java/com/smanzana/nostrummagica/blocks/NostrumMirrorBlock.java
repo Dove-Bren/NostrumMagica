@@ -6,24 +6,24 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.items.MirrorItem;
 
-import net.minecraft.block.BlockHorizontal;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.HorizontalBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.BlockStateContainer;
 
-public class NostrumMirrorBlock extends BlockHorizontal {
+public class NostrumMirrorBlock extends HorizontalBlock {
 	
 	public static final String ID = "mirror_block";
 	protected static final AxisAlignedBB MIRROR_AABB_EW = new AxisAlignedBB(0.4D, 0.0D, 0.1D, 0.6D, 1.05D, 0.9D);
@@ -55,22 +55,22 @@ public class NostrumMirrorBlock extends BlockHorizontal {
 	}
 	
 	@Override
-	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+	public Item getItemDropped(BlockState state, Random rand, int fortune) {
 		return MirrorItem.instance();
 	}
 	
 	@Override
-	public int damageDropped(IBlockState state) {
+	public int damageDropped(BlockState state) {
 		return 0;
 	}
 	
 	@Override
-	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, PlayerEntity player) {
+	public ItemStack getPickBlock(BlockState state, RayTraceResult target, World world, BlockPos pos, PlayerEntity player) {
 		return new ItemStack(MirrorItem.instance());
 	}
 	
 	@Override
-	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
+	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
 		return true;
 	}
 	
@@ -85,12 +85,12 @@ public class NostrumMirrorBlock extends BlockHorizontal {
 //	}
 	
 	@Override
-	public boolean isOpaqueCube(IBlockState state) {
+	public boolean isOpaqueCube(BlockState state) {
 		return false;
 	}
 	
 	@Override
-	public boolean isFullCube(IBlockState state) {
+	public boolean isFullCube(BlockState state) {
         return false;
     }
 	
@@ -100,18 +100,18 @@ public class NostrumMirrorBlock extends BlockHorizontal {
 	}
 	
 	@Override
-	public IBlockState getStateFromMeta(int meta) {
+	public BlockState getStateFromMeta(int meta) {
 		Direction enumfacing = Direction.getHorizontal(meta);
 		return getDefaultState().withProperty(FACING, enumfacing);
 	}
 	
 	@Override
-	public int getMetaFromState(IBlockState state) {
+	public int getMetaFromState(BlockState state) {
 		return state.getValue(FACING).getHorizontalIndex();
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
 		
 		playerIn.openGui(NostrumMagica.instance,
 				NostrumGui.mirrorID, worldIn,
@@ -122,7 +122,7 @@ public class NostrumMirrorBlock extends BlockHorizontal {
 	}
 	
 	@Override
-	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
 		if (state.getValue(FACING).getHorizontalIndex() % 2 != 0)
 			return MIRROR_AABB_EW;
 		return MIRROR_AABB_NS;

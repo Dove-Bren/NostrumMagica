@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.blocks.ProgressionDoor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -178,7 +178,7 @@ public class ProgressionDoorTileEntity extends TileEntity {
 	private Direction faceStash = null;
 	public Direction getFace() {
 		if (faceStash == null) {
-			IBlockState state = world.getBlockState(getPos());
+			BlockState state = world.getBlockState(getPos());
 			faceStash = Direction.NORTH;
 			if (state != null) {
 				try {
@@ -202,7 +202,7 @@ public class ProgressionDoorTileEntity extends TileEntity {
 			cursor.move(Direction.DOWN, 1);
 			
 			while (cursor.getY() >= 0) {
-				IBlockState state = world.getBlockState(cursor);
+				BlockState state = world.getBlockState(cursor);
 				if (state == null || !(state.getBlock() instanceof ProgressionDoor))
 					break;
 				
@@ -217,7 +217,7 @@ public class ProgressionDoorTileEntity extends TileEntity {
 			// Right:
 			while (true) {
 				cursor.move(getFace().rotateY());
-				IBlockState state = world.getBlockState(cursor);
+				BlockState state = world.getBlockState(cursor);
 				if (state == null || !(state.getBlock() instanceof ProgressionDoor))
 					break;
 			}
@@ -230,7 +230,7 @@ public class ProgressionDoorTileEntity extends TileEntity {
 			// Left
 			while (true) {
 				cursor.move(getFace().rotateYCCW());
-				IBlockState state = world.getBlockState(cursor);
+				BlockState state = world.getBlockState(cursor);
 				if (state == null || !(state.getBlock() instanceof ProgressionDoor))
 					break;
 			}

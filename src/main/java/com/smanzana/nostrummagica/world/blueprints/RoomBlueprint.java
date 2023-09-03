@@ -21,7 +21,7 @@ import net.minecraft.block.BlockRedstoneComparator;
 import net.minecraft.block.BlockRedstoneRepeater;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockTorch;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -54,10 +54,10 @@ public class RoomBlueprint {
 			BLOCK_CACHE.put(name.toLowerCase(), block);
 		}
 		
-		private static Map<Block, Map<Integer, IBlockState>> BLOCKSTATE_CACHE = new HashMap<>();
+		private static Map<Block, Map<Integer, BlockState>> BLOCKSTATE_CACHE = new HashMap<>();
 		
-		private static IBlockState CHECK_BLOCKSTATE_CACHE(Block block, Integer meta) {
-			Map<Integer, IBlockState> map = BLOCKSTATE_CACHE.get(block);
+		private static BlockState CHECK_BLOCKSTATE_CACHE(Block block, Integer meta) {
+			Map<Integer, BlockState> map = BLOCKSTATE_CACHE.get(block);
 			if (map != null) {
 				return map.get(meta);
 			}
@@ -65,8 +65,8 @@ public class RoomBlueprint {
 			return null; 
 		}
 		
-		private static void SET_BLOCKSTATE_CACHE(Block block, Integer meta, IBlockState state) {
-			Map<Integer, IBlockState> map = BLOCKSTATE_CACHE.get(block);
+		private static void SET_BLOCKSTATE_CACHE(Block block, Integer meta, BlockState state) {
+			Map<Integer, BlockState> map = BLOCKSTATE_CACHE.get(block);
 			if (map == null) {
 				map = new HashMap<>();
 			}
@@ -75,17 +75,17 @@ public class RoomBlueprint {
 			BLOCKSTATE_CACHE.put(block, map);
 		}
 		
-		private static Map<IBlockState, BlueprintBlock> BLUEPRINT_CACHE = new HashMap<>();
+		private static Map<BlockState, BlueprintBlock> BLUEPRINT_CACHE = new HashMap<>();
 		
-		private static BlueprintBlock CHECK_BLUEPRINT_CACHE(IBlockState state) {
+		private static BlueprintBlock CHECK_BLUEPRINT_CACHE(BlockState state) {
 			return BLUEPRINT_CACHE.get(state);
 		}
 		
-		private static void SET_BLUEPRINT_CACHE(IBlockState state, BlueprintBlock block) {
+		private static void SET_BLUEPRINT_CACHE(BlockState state, BlueprintBlock block) {
 			BLUEPRINT_CACHE.put(state, block);
 		}
 		
-		public static BlueprintBlock getBlueprintBlock(IBlockState state, CompoundNBT teData) {
+		public static BlueprintBlock getBlueprintBlock(BlockState state, CompoundNBT teData) {
 			BlueprintBlock block = null;
 			if (teData == null) {
 				block = CHECK_BLUEPRINT_CACHE(state);
@@ -101,10 +101,10 @@ public class RoomBlueprint {
 			return block;
 		}
 		
-		private IBlockState state;
+		private BlockState state;
 		private CompoundNBT tileEntityData;
 		
-		private BlueprintBlock(IBlockState state, CompoundNBT teData) {
+		private BlueprintBlock(BlockState state, CompoundNBT teData) {
 			this.state = state;
 			this.tileEntityData = teData;
 			
@@ -139,7 +139,7 @@ public class RoomBlueprint {
 		
 		@SuppressWarnings("deprecation")
 		public static BlueprintBlock fromNBT(byte version, CompoundNBT nbt) {
-			IBlockState state = null;
+			BlockState state = null;
 			CompoundNBT teData = null;
 			switch (version) {
 			case 0:
@@ -226,9 +226,9 @@ public class RoomBlueprint {
 			return in;
 		}
 		
-		public IBlockState getSpawnState(Direction facing) {
+		public BlockState getSpawnState(Direction facing) {
 //			if (state != null) {
-//				IBlockState placeState = state;
+//				BlockState placeState = state;
 //				
 //				if (facing != null && facing.getOpposite().getHorizontalIndex() != 0) {
 //					
@@ -263,7 +263,7 @@ public class RoomBlueprint {
 //			}
 			
 			if (state != null) {
-				IBlockState placeState = state;
+				BlockState placeState = state;
 				
 				if (facing != null && facing.getOpposite().getHorizontalIndex() != 0) {
 					
@@ -417,13 +417,13 @@ public class RoomBlueprint {
 			if (usePlaceholders) {
 				if (block.isDoorIndicator()) {
 					doorsRaw.add(new DungeonExitPoint(cursor.toImmutable().subtract(pos1), block.getFacing().getOpposite()));
-					block = new BlueprintBlock((IBlockState) null, null); // Make block an air one
+					block = new BlueprintBlock((BlockState) null, null); // Make block an air one
 				} else if (block.isEntry()) {
 					if (this.entry != null) {
 						NostrumMagica.logger.error("Found multiple entry points to room while creating blueprint!");
 					}
 					this.entry = new DungeonExitPoint(cursor.toImmutable().subtract(pos1), block.getFacing());
-					block = new BlueprintBlock((IBlockState) null, null); // Make block an air one
+					block = new BlueprintBlock((BlockState) null, null); // Make block an air one
 				}
 			}
 			
@@ -545,7 +545,7 @@ public class RoomBlueprint {
 		if (spawnerFunc != null) {
 			spawnerFunc.spawnBlock(world, at, direction, block);
 		} else {
-			IBlockState placeState = block.getSpawnState(direction);
+			BlockState placeState = block.getSpawnState(direction);
 			if (placeState != null) {
 				world.setBlockState(at, placeState, 2);
 				
@@ -1090,7 +1090,7 @@ public class RoomBlueprint {
 //		int[] blockList = new int[this.blocks.length];
 //		
 //		for (int i = 0; i < blocks.length; i++) {
-//			IBlockState state = this.blocks[i].state;
+//			BlockState state = this.blocks[i].state;
 //			if (state == null) {
 //				blockList[i] = 0;
 //			} else {

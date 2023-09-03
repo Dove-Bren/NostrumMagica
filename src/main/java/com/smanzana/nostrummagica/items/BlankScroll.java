@@ -1,6 +1,5 @@
 package com.smanzana.nostrummagica.items;
 
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -18,14 +17,10 @@ public class BlankScroll extends Item implements ILoreTagged {
 		return instance;
 	}
 	
-	public static final String id = "blank_scroll";
+	public static final String ID = "blank_scroll";
 	
 	private BlankScroll() {
-		super();
-		this.setUnlocalizedName(id);
-		this.setRegistryName(NostrumMagica.MODID, BlankScroll.id);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setMaxStackSize(64);
+		super(NostrumItems.PropBase());
 	}
 	
 	@Override

@@ -576,7 +576,7 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 			return 0;
 		}
 		
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null) {
 			return 0;
 		}
@@ -589,13 +589,13 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 			return;
 		}
 		
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null) {
 			nbt = new CompoundNBT();
 		}
 		
 		nbt.putFloat(NBT_AETHER_PROGRESS, progress);
-		stack.setTagCompound(nbt);
+		stack.setTag(nbt);
 	}
 	
 	@Override
@@ -692,7 +692,7 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 						if (stack.isEmpty() || stack.getItem() != this)
 							continue;
 						
-						CompoundNBT nbt = stack.getTagCompound();
+						CompoundNBT nbt = stack.getTag();
 						if (nbt != null) {
 							final int taken = this.deductAether(stack, event.getAmtRemaining());
 							
@@ -722,19 +722,19 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 			
 			IAetherHandlerComponent comp = this.getAetherHandler(stack);
 			int currentMax = Math.min(comp.getMaxAether(null) + whole, MAX_AETHER_MAX);
-			CompoundNBT nbt = stack.getTagCompound();
+			CompoundNBT nbt = stack.getTag();
 			if (nbt == null) {
 				nbt = new CompoundNBT();
 			}
 			nbt.putFloat(NBT_AETHER_PROGRESS, adv);
-			stack.setTagCompound(nbt);
+			stack.setTag(nbt);
 			comp.setMaxAether(currentMax);
 			AetherItem.SaveItem(stack);
 		}
 	}
 	
 	public EnumDyeColor getRuneColor(ItemStack stack) {
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null || !nbt.contains(NBT_DISPLAY_COLOR_RUNES)) {
 			return COLOR_DEFAULT_RUNES;
 		}
@@ -744,17 +744,17 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 	}
 	
 	public void setRuneColor(ItemStack stack, EnumDyeColor color) {
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null) {
 			nbt = new CompoundNBT();
 		}
 		
 		nbt.putInt(NBT_DISPLAY_COLOR_RUNES, color.ordinal());
-		stack.setTagCompound(nbt);
+		stack.setTag(nbt);
 	}
 	
 	public EnumDyeColor getOutsideColor(ItemStack stack) {
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null || !nbt.contains(NBT_DISPLAY_COLOR_OUTSIDE)) {
 			return COLOR_DEFAULT_OUTSIDE;
 		}
@@ -764,17 +764,17 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 	}
 	
 	public void setOutsideColor(ItemStack stack, EnumDyeColor color) {
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null) {
 			nbt = new CompoundNBT();
 		}
 		
 		nbt.putInt(NBT_DISPLAY_COLOR_OUTSIDE, color.ordinal());
-		stack.setTagCompound(nbt);
+		stack.setTag(nbt);
 	}
 
 	public EnumDyeColor getInsideColor(ItemStack stack) {
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null || !nbt.contains(NBT_DISPLAY_COLOR_INSIDE)) {
 			return COLOR_DEFAULT_INSIDE;
 		}
@@ -784,17 +784,17 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 	}
 	
 	public void setInsideColor(ItemStack stack, EnumDyeColor color) {
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null) {
 			nbt = new CompoundNBT();
 		}
 		
 		nbt.putInt(NBT_DISPLAY_COLOR_INSIDE, color.ordinal());
-		stack.setTagCompound(nbt);
+		stack.setTag(nbt);
 	}
 	
 	public boolean getDisplayWings(ItemStack stack) {
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null || !nbt.contains(NBT_DISPLAY_WINGS)) {
 			return false;
 		}
@@ -802,17 +802,17 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 	}
 	
 	public void setDisplayWings(ItemStack stack, boolean display) {
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null) {
 			nbt = new CompoundNBT();
 		}
 		
 		nbt.putBoolean(NBT_DISPLAY_WINGS, display);
-		stack.setTagCompound(nbt);
+		stack.setTag(nbt);
 	}
 	
 	public boolean getDisplayTrimmed(ItemStack stack) {
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null || !nbt.contains(NBT_DISPLAY_TRIMMED)) {
 			return false;
 		}
@@ -820,17 +820,17 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 	}
 	
 	public void setDisplayTrimmed(ItemStack stack, boolean trimmed) {
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null) {
 			nbt = new CompoundNBT();
 		}
 		
 		nbt.putBoolean(NBT_DISPLAY_TRIMMED, trimmed);
-		stack.setTagCompound(nbt);
+		stack.setTag(nbt);
 	}
 	
 	public boolean getDisplayRunes(ItemStack stack) {
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null || !nbt.contains(NBT_DISPLAY_RUNES)) {
 			return false;
 		}
@@ -838,17 +838,17 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 	}
 	
 	public void setDisplayRunes(ItemStack stack, boolean display) {
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null) {
 			nbt = new CompoundNBT();
 		}
 		
 		nbt.putBoolean(NBT_DISPLAY_RUNES, display);
-		stack.setTagCompound(nbt);
+		stack.setTag(nbt);
 	}
 	
 	public boolean isAetherCaster(ItemStack stack) {
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null || !nbt.contains(NBT_AETHER_SPENDER)) {
 			return false;
 		}
@@ -856,13 +856,13 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 	}
 	
 	public void setAetherCaster(ItemStack stack, boolean caster) {
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null) {
 			nbt = new CompoundNBT();
 		}
 		
 		nbt.putBoolean(NBT_AETHER_SPENDER, caster);
-		stack.setTagCompound(nbt);
+		stack.setTag(nbt);
 	}
 
 	@Override

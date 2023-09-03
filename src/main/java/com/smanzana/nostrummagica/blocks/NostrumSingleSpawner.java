@@ -24,7 +24,7 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Items;
@@ -33,7 +33,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
@@ -98,12 +98,12 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		return new BlockStateContainer(this, MOB);
 	}
 	
-	public IBlockState getState(NostrumSingleSpawner.Type type) {
+	public BlockState getState(NostrumSingleSpawner.Type type) {
 		return getDefaultState().withProperty(MOB, type);
 	}
 	
 	@Override
-	public IBlockState getStateFromMeta(int meta) {
+	public BlockState getStateFromMeta(int meta) {
 		if (meta > Type.values().length || meta < 0)
 			meta = 0;
 		Type type = Type.values()[meta];
@@ -112,12 +112,12 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public int getMetaFromState(IBlockState state) {
+	public int getMetaFromState(BlockState state) {
 		return state.getValue(MOB).ordinal();
 	}
 	
 	@Override
-	public boolean canSilkHarvest(World world, BlockPos pos, IBlockState state, PlayerEntity player) {
+	public boolean canSilkHarvest(World world, BlockPos pos, BlockState state, PlayerEntity player) {
 		return false;
 	}
 	
@@ -127,22 +127,22 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+	public Item getItemDropped(BlockState state, Random rand, int fortune) {
 		return null;
 	}
 	
 	@Override
-	public int getExpDrop(IBlockState state, net.minecraft.world.IBlockAccess world, BlockPos pos, int fortune) {
+	public int getExpDrop(BlockState state, net.minecraft.world.IBlockAccess world, BlockPos pos, int fortune) {
 		return 0;
 	}
 	
 	@Override
-	public boolean isFullCube(IBlockState state) {
+	public boolean isFullCube(BlockState state) {
 		return false;
 	}
 	
 	@Override
-	public boolean isOpaqueCube(IBlockState state) {
+	public boolean isOpaqueCube(BlockState state) {
 		return false;
 	}
 	
@@ -152,7 +152,7 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
     }
 	
 	@Override
-	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+	public void updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) {
 		super.updateTick(worldIn, pos, state, rand);
 		
 		for (PlayerEntity player : worldIn.playerEntities) {
@@ -165,7 +165,7 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		}
 	}
 	
-	public MobEntity spawn(World world, BlockPos pos, IBlockState state, Random rand) {
+	public MobEntity spawn(World world, BlockPos pos, BlockState state, Random rand) {
 		Type type = state.getValue(MOB);
 		MobEntity entity = getEntity(type, world, pos);
 		
@@ -222,26 +222,26 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, IBlockState state) {
+	public void breakBlock(World world, BlockPos pos, BlockState state) {
 		super.breakBlock(world, pos, state);
         world.removeTileEntity(pos);
 	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int eventID, int eventParam) {
+	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int eventID, int eventParam) {
 		super.eventReceived(state, worldIn, pos, eventID, eventParam);
 		TileEntity tileentity = worldIn.getTileEntity(pos);
         return tileentity == null ? false : tileentity.receiveClientEvent(eventID, eventParam);
 	}
 
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
 		if (worldIn.isRemote) {
 			return true;
 		}
 		
-		if (hand != EnumHand.MAIN_HAND) {
+		if (hand != Hand.MAIN_HAND) {
 			return true;
 		}
 		

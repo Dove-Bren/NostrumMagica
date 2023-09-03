@@ -5,7 +5,7 @@ import org.lwjgl.opengl.GL11;
 import com.smanzana.nostrummagica.blocks.ManaArmorerBlock;
 import com.smanzana.nostrummagica.blocks.tiles.ManaArmorerTileEntity;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -37,7 +37,7 @@ public class TileEntityManaArmorerRenderer extends TileEntitySpecialRenderer<Man
 	@Override
 	public void render(ManaArmorerTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
 		Minecraft mc = Minecraft.getInstance();
-		IBlockState state = ManaArmorerBlock.instance().getDefaultState();
+		BlockState state = ManaArmorerBlock.instance().getDefaultState();
 		
 		if (model == null) {
 			model = mc.getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state);

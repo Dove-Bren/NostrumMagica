@@ -19,7 +19,7 @@ import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -30,7 +30,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -71,12 +71,12 @@ public class TeleportRune extends BlockContainer  {
     }
 	
 	@Override
-	public boolean isFullCube(IBlockState state) {
+	public boolean isFullCube(BlockState state) {
 		return false;
 	}
 	
 	@Override
-	public boolean isOpaqueCube(IBlockState state) {
+	public boolean isOpaqueCube(BlockState state) {
 		return false;
 	}
 	
@@ -86,34 +86,34 @@ public class TeleportRune extends BlockContainer  {
     }
 	
 	@Override
-	public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
+	public int getLightValue(BlockState state, IBlockAccess world, BlockPos pos) {
 		return 0;
 	}
 	
 	@Override
-	public int getLightOpacity(IBlockState state, IBlockAccess world, BlockPos pos) {
+	public int getLightOpacity(BlockState state, IBlockAccess world, BlockPos pos) {
 		return 0;
 	}
 	
 	@Override
-	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
+	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
 		return false;
 	}
 	
 	@Override
-	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+	public AxisAlignedBB getCollisionBoundingBox(BlockState blockState, IBlockAccess worldIn, BlockPos pos) {
 		return NULL_AABB;
 		//return super.getCollisionBoundingBox(blockState, worldIn, pos);
 	}
 	
 	@Override
-	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
 		return RUNE_AABB;
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public EnumBlockRenderType getRenderType(IBlockState state) {
+	public EnumBlockRenderType getRenderType(BlockState state) {
 		return EnumBlockRenderType.MODEL;
 	}
 	
@@ -124,7 +124,7 @@ public class TeleportRune extends BlockContainer  {
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, IBlockState state) {
+	public void breakBlock(World world, BlockPos pos, BlockState state) {
 		super.breakBlock(world, pos, state);
 	}
 	
@@ -134,7 +134,7 @@ public class TeleportRune extends BlockContainer  {
 	}
 	
 	@Override
-	public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, LivingEntity placer, ItemStack stack) {
+	public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
 		super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
 	}
 	
@@ -193,7 +193,7 @@ public class TeleportRune extends BlockContainer  {
 	private static boolean DumbIntegratedGuard = false;
 	
 	@Override
-	public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
+	public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, BlockState state, Entity entityIn) {
 		Integer charge = EntityTeleportCharge.get(entityIn.getUniqueID());
 		if (charge == null) {
 			charge = 0;
@@ -260,7 +260,7 @@ public class TeleportRune extends BlockContainer  {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
 		if (worldIn.isRemote) {
 			return true;
 		}
@@ -289,7 +289,7 @@ public class TeleportRune extends BlockContainer  {
 				return true;
 			}
 			
-			IBlockState targetState = worldIn.getBlockState(heldPos);
+			BlockState targetState = worldIn.getBlockState(heldPos);
 			if (targetState == null || !(targetState.getBlock() instanceof TeleportRune)) {
 				playerIn.sendMessage(new TranslationTextComponent("info.teleportrune.norune"));
 				return true;
@@ -325,7 +325,7 @@ public class TeleportRune extends BlockContainer  {
 			}
 		}
 		
-		IBlockState targetState = worldIn.getBlockState(heldPos);
+		BlockState targetState = worldIn.getBlockState(heldPos);
 		if (targetState != null && targetState.getBlock() instanceof TeleportRune) {
 			;
 		} else {
@@ -375,7 +375,7 @@ public class TeleportRune extends BlockContainer  {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+	public void randomDisplayTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
 		TileEntity te = worldIn.getTileEntity(pos);
 		if (te == null || !(te instanceof TeleportRuneTileEntity)) {
 			return;

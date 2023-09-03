@@ -130,12 +130,12 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellArmor {
 		if (stack.isEmpty())
 			return;
 		
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null)
 			nbt = new CompoundNBT();
 		
 		nbt.putInt(NBT_THANOS_XP, xp);
-		stack.setTagCompound(nbt);
+		stack.setTag(nbt);
 		
 		int count = thanosGetWholeCharges(stack);
 		int max = MAX_THANOS_XP / THANOS_XP_PER;
@@ -143,10 +143,10 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellArmor {
 	}
 	
 	public static int thanosGetXP(ItemStack stack) {
-		if (stack.isEmpty() || !stack.hasTagCompound())
+		if (stack.isEmpty() || !stack.hasTag())
 			return 0;
 		
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		return nbt.getInt(NBT_THANOS_XP);
 	}
 

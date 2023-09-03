@@ -14,19 +14,22 @@ import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.EnumCreatureAttribute;
+import net.minecraft.entity.CreatureAttribute;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Rarity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -35,22 +38,22 @@ import net.minecraftforge.registries.IForgeRegistry;
 public class DragonArmor extends Item {
 
 	public static enum DragonEquipmentSlot {
-		HELM(EntityEquipmentSlot.HEAD),
-		BODY(EntityEquipmentSlot.CHEST),
-		WINGS(EntityEquipmentSlot.LEGS),
-		CREST(EntityEquipmentSlot.FEET);
+		HELM(EquipmentSlotType.HEAD),
+		BODY(EquipmentSlotType.CHEST),
+		WINGS(EquipmentSlotType.LEGS),
+		CREST(EquipmentSlotType.FEET);
 		
-		private final EntityEquipmentSlot mirrorSlot;
+		private final EquipmentSlotType mirrorSlot;
 		
-		private DragonEquipmentSlot(EntityEquipmentSlot mirrorSlot) {
+		private DragonEquipmentSlot(EquipmentSlotType mirrorSlot) {
 			this.mirrorSlot = mirrorSlot;
 		}
 		
-		public EntityEquipmentSlot getMirrorSlot() {
+		public EquipmentSlotType getMirrorSlot() {
 			return mirrorSlot;
 		}
 		
-		public static final @Nullable DragonEquipmentSlot FindForSlot(EntityEquipmentSlot vanillaSlot) {
+		public static final @Nullable DragonEquipmentSlot FindForSlot(EquipmentSlotType vanillaSlot) {
 			for (DragonEquipmentSlot slot : DragonEquipmentSlot.values()) {
 				if (slot.mirrorSlot == vanillaSlot) {
 					return slot;
@@ -88,8 +91,7 @@ public class DragonArmor extends Item {
 				// NOT IMPLEMENTED TODO
 				
 				ResourceLocation location = new ResourceLocation(NostrumMagica.MODID, "dragonarmor_" + slot.name().toLowerCase() + "_" + material.name().toLowerCase());
-				DragonArmor armor = new DragonArmor(location.getResourcePath(), slot, material);
-				armor.setUnlocalizedName(location.getResourcePath());
+				DragonArmor armor = new DragonArmor(location.getPath(), slot, material);
 				armor.setRegistryName(location);
 				registry.register(armor);
 				items.get(material).put(slot, armor);
@@ -210,6 +212,18 @@ public class DragonArmor extends Item {
 		}
 	}
 	
+	protected static final Rarity CalcVanillaRarity(DragonEquipmentSlot slot, DragonArmorMaterial material) {
+		// Iron and Gold will be uncommon, diamond will be rare
+		switch (material) {
+		case GOLD:
+		case IRON:
+		default:
+			return Rarity.UNCOMMON;
+		case DIAMOND:
+			return Rarity.RARE;
+		}
+	}
+	
 	private final String resourceLocation;
 	protected final DragonEquipmentSlot slot;
 	protected final DragonArmorMaterial material;
@@ -219,15 +233,10 @@ public class DragonArmor extends Item {
 	protected final int defaultArmorToughness;
 	
 	public DragonArmor(String resourceLocation, DragonEquipmentSlot slot, DragonArmorMaterial material) {
-		super();
+		super(NostrumItems.PropEquipment().rarity(CalcVanillaRarity(slot, material)));
 		this.resourceLocation = resourceLocation;
 		this.slot = slot;
 		this.material = material;
-		this.setMaxStackSize(1);
-		this.setMaxDamage(0);
-		this.setHasSubtypes(false);
-		
-		this.setCreativeTab(NostrumMagica.creativeTab);
 		
 		defaultArmor = CalcArmor(slot, material);
 		defaultMagicResist = CalcMagicResist(slot, material);
@@ -263,16 +272,16 @@ public class DragonArmor extends Item {
 		Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();	
 
 		if (equipmentSlot == this.slot) {
-			multimap.put(SharedMonsterAttributes.ARMOR.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.ordinal()], "Armor modifier", (double)this.getArmorValue(), 0));
-			multimap.put(SharedMonsterAttributes.ARMOR_TOUGHNESS.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.ordinal()], "Armor toughness", this.getArmorToughness(), 0));
-			multimap.put(AttributeMagicResist.instance().getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.ordinal()], "Magic Resist", (double)this.getMagicResistance(), 0));
+			multimap.put(SharedMonsterAttributes.ARMOR.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.ordinal()], "Armor modifier", (double)this.getArmorValue(), AttributeModifier.Operation.ADDITION));
+			multimap.put(SharedMonsterAttributes.ARMOR_TOUGHNESS.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.ordinal()], "Armor toughness", this.getArmorToughness(), AttributeModifier.Operation.ADDITION));
+			multimap.put(AttributeMagicResist.instance().getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.ordinal()], "Magic Resist", (double)this.getMagicResistance(), AttributeModifier.Operation.ADDITION));
 		}
 
 		return multimap;
 	}
 	
 	@Override
-	public Multimap<String, AttributeModifier> getAttributeModifiers(EntityEquipmentSlot equipmentSlot, ItemStack stack) {
+	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot, ItemStack stack) {
 		final @Nullable DragonEquipmentSlot dragonSlot = DragonEquipmentSlot.FindForSlot(equipmentSlot);
 		if (dragonSlot != null) {
 			return getAttributeModifiers(dragonSlot, stack);
@@ -283,16 +292,16 @@ public class DragonArmor extends Item {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		// Disable vanilla's so we can do our own
-		if (!stack.hasTagCompound() || !stack.getTagCompound().hasKey("HideFlags", 99)) {
-			CompoundNBT tag = stack.getTagCompound();
+		if (!stack.hasTag() || !stack.getTag().contains("HideFlags", 99)) {
+			CompoundNBT tag = stack.getTag();
 			if (tag == null) {
 				tag = new CompoundNBT();
 			}
 			
 			tag.putInt("HideFlags", 2);
-			stack.setTagCompound(tag);
+			stack.setTag(tag);
 		}
 		
 		PlayerEntity player = NostrumMagica.proxy.getPlayer();
@@ -304,8 +313,8 @@ public class DragonArmor extends Item {
 
 			if (!multimap.isEmpty())
 			{
-				tooltip.add("");
-				tooltip.add(I18n.format("item.modifiers.dragonslot." + dragonSlot.getName()));
+				tooltip.add(new StringTextComponent(""));
+				tooltip.add(new TranslationTextComponent("item.modifiers.dragonslot." + dragonSlot.getName()));
 
 				for (Entry<String, AttributeModifier> entry : multimap.entries())
 				{
@@ -315,19 +324,19 @@ public class DragonArmor extends Item {
 
 					if (attributemodifier.getID() == Item.ATTACK_DAMAGE_MODIFIER)
 					{
-						d0 = d0 + player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getBaseValue();
-						d0 = d0 + (double)EnchantmentHelper.getModifierForCreature(stack, EnumCreatureAttribute.UNDEFINED);
+						d0 = d0 + player.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getBaseValue();
+						d0 = d0 + (double)EnchantmentHelper.getModifierForCreature(stack, CreatureAttribute.UNDEFINED);
 						flag = true;
 					}
 					else if (attributemodifier.getID() == Item.ATTACK_SPEED_MODIFIER)
 					{
-						d0 += player.getEntityAttribute(SharedMonsterAttributes.ATTACK_SPEED).getBaseValue();
+						d0 += player.getAttribute(SharedMonsterAttributes.ATTACK_SPEED).getBaseValue();
 						flag = true;
 					}
 
 					double d1;
 
-					if (attributemodifier.getOperation() != 1 && attributemodifier.getOperation() != 2)
+					if (attributemodifier.getOperation() != AttributeModifier.Operation.MULTIPLY_BASE && attributemodifier.getOperation() != AttributeModifier.Operation.MULTIPLY_TOTAL)
 					{
 						d1 = d0;
 					}
@@ -335,19 +344,19 @@ public class DragonArmor extends Item {
 					{
 						d1 = d0 * 100.0D;
 					}
-
+					
 					if (flag)
 					{
-						tooltip.add(" " + I18n.format("attribute.modifier.equals." + attributemodifier.getOperation(), new Object[] {String.format("%.0f", d1), I18n.format("attribute.name." + (String)entry.getKey())}));
+						tooltip.add((new StringTextComponent(" ")).appendSibling(new TranslationTextComponent("attribute.modifier.equals." + attributemodifier.getOperation().getId(), ItemStack.DECIMALFORMAT.format(d1), new TranslationTextComponent("attribute.name." + (String)entry.getKey()))).applyTextStyle(TextFormatting.DARK_GREEN));
 					}
 					else if (d0 > 0.0D)
 					{
-						tooltip.add(TextFormatting.BLUE + " " + I18n.format("attribute.modifier.plus." + attributemodifier.getOperation(), new Object[] {String.format("%.0f", d1), I18n.format("attribute.name." + (String)entry.getKey())}));
+						tooltip.add((new TranslationTextComponent("attribute.modifier.plus." + attributemodifier.getOperation().getId(), ItemStack.DECIMALFORMAT.format(d1), new TranslationTextComponent("attribute.name." + (String)entry.getKey()))).applyTextStyle(TextFormatting.BLUE));
 					}
 					else if (d0 < 0.0D)
 					{
 						d1 = d1 * -1.0D;
-						tooltip.add(TextFormatting.RED + " " + I18n.format("attribute.modifier.take." + attributemodifier.getOperation(), new Object[] {String.format("%.0f", d1), I18n.format("attribute.name." + (String)entry.getKey())}));
+						tooltip.add((new TranslationTextComponent("attribute.modifier.take." + attributemodifier.getOperation().getId(), ItemStack.DECIMALFORMAT.format(d1), new TranslationTextComponent("attribute.name." + (String)entry.getKey()))).applyTextStyle(TextFormatting.RED));
 					}
 				}
 			}

@@ -13,7 +13,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.utils.NonNullEnumMap;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MoverType;
@@ -21,7 +21,7 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityMoveHelper;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -32,7 +32,7 @@ import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -106,7 +106,7 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
     }
 
     @Override
-    public boolean processInteract(PlayerEntity player, EnumHand hand) {
+    public boolean processInteract(PlayerEntity player, Hand hand) {
         return false;
     }
 
@@ -121,7 +121,7 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 	}
 	
 	@Override
-	protected void updateFallState(double y, boolean onGround, IBlockState stae, BlockPos pos) {
+	protected void updateFallState(double y, boolean onGround, BlockState stae, BlockPos pos) {
 		
 	}
 	
@@ -284,7 +284,7 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 	            {
 	                for (int k = p_186327_3_; k < p_186327_3_ + this.entitySizeZ; ++k)
 	                {
-	                    IBlockState iblockstate = this.blockaccess.getBlockState(blockpos$mutableblockpos.setPos(i, j, k));
+	                    BlockState iblockstate = this.blockaccess.getBlockState(blockpos$mutableblockpos.setPos(i, j, k));
 
 	                    if (iblockstate.getMaterial() != Material.AIR)
 	                    {
@@ -604,7 +604,7 @@ public abstract class EntityDragon extends EntityMob implements ILoreTagged {
 	}
 	
 	@Override
-	public @Nonnull ItemStack getItemStackFromSlot(EntityEquipmentSlot slot) {
+	public @Nonnull ItemStack getItemStackFromSlot(EquipmentSlotType slot) {
 		// Adapt to dragon equipment slot system to take advantage of vanilla's equipment tracking
 		// and attribute system
 		final DragonEquipmentSlot dragonSlot = DragonEquipmentSlot.FindForSlot(slot);

@@ -1,40 +1,18 @@
 package com.smanzana.nostrummagica.items;
 
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.AltarBlock;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.item.BlockItem;
 
-public class AltarItem extends Item implements ILoreTagged {
+public class AltarItem extends BlockItem implements ILoreTagged {
 
-	private static AltarItem instance = null;
-
-	public static AltarItem instance() {
-		if (instance == null)
-			instance = new AltarItem();
-	
-		return instance;
-
-	}
-	
 	public static final String ID = "altar_item";
 
 	public AltarItem() {
-		this.setUnlocalizedName(ID);
-		this.setRegistryName(NostrumMagica.MODID, AltarItem.ID);
-		this.setMaxStackSize(8);
-		this.setCreativeTab(NostrumMagica.creativeTab);
+		super(AltarBlock.instance(), NostrumItems.PropLowStack());
 	}
 	
 	@Override
@@ -56,19 +34,6 @@ public class AltarItem extends Item implements ILoreTagged {
 	@Override
 	public Lore getDeepLore() {
 		return new Lore().add("Ritual Altars hold items for display or use in a ritual.", "Only tier III rituals use altars.", "Up to 5 altars can be used in a single ritual.");
-	}
-
-	@Override
-	public EnumActionResult onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, EnumHand hand, Direction facing, float hitX, float hitY, float hitZ) {
-		IBlockState state = worldIn.getBlockState(pos);
-		ItemStack stack = playerIn.getHeldItem(hand);
-        if (facing == Direction.UP && playerIn.canPlayerEdit(pos.offset(facing), facing, stack) && state.isFullBlock() && worldIn.isAirBlock(pos.up())) {
-        	worldIn.setBlockState(pos.up(), AltarBlock.instance().getDefaultState());
-            stack.shrink(1);
-            return EnumActionResult.SUCCESS;
-        } else {
-        	return EnumActionResult.FAIL;
-        }
 	}
 
 	@Override

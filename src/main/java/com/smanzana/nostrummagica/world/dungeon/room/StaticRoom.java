@@ -17,7 +17,7 @@ import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.BlockLadder;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockTorch;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -33,21 +33,21 @@ public abstract class StaticRoom implements IDungeonRoom {
 	protected static class BlockState {
 		public Block block;
 		public int meta;
-		private IBlockState actualState;
+		private BlockState actualState;
 		
 		public BlockState(Block block, int meta) {
 			this.meta = meta;
 			this.block = block;
 		}
 		
-		public BlockState(Block block, IBlockState actual) {
+		public BlockState(Block block, BlockState actual) {
 			this.block = block;
 			this.actualState = actual;
 		}
 		
 		@SuppressWarnings("deprecation")
 		public void set(World world, BlockPos pos, Direction rotation) {
-			IBlockState state;
+			BlockState state;
 			if (actualState != null) {
 				state = actualState;
 			} else {
@@ -207,7 +207,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 		for (int j = minY; j <= maxY; j++)
 		for (int k = minZ; k <= maxZ; k++) {
 			BlockPos pos = new BlockPos(i, j, k);
-			IBlockState cur = world.getBlockState(pos);
+			BlockState cur = world.getBlockState(pos);
 		
 			// Check if unbreakable...
 			if (cur != null && cur.getBlockHardness(world, pos) == -1)
@@ -305,8 +305,8 @@ public abstract class StaticRoom implements IDungeonRoom {
 				// last has character. This should be Block or Blockstate
 				if (o instanceof Block) {
 					states.put(last, new BlockState((Block) o, 0));
-				} else if (o instanceof IBlockState) {
-					IBlockState s = (IBlockState) o;
+				} else if (o instanceof BlockState) {
+					BlockState s = (BlockState) o;
 					states.put(last, new BlockState(
 							s.getBlock(),
 							s.getBlock().getMetaFromState(s)

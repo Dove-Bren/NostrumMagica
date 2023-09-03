@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.world.blueprints.IOrientedTileEntity;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
@@ -158,7 +158,7 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 				this.dirty();
 				
 				BlockPos triggerPos = this.getPos().add(this.getOffset());
-				IBlockState state = world.getBlockState(triggerPos);
+				BlockState state = world.getBlockState(triggerPos);
 				if (state == null || !(state.getBlock() instanceof ITriggeredBlock)) {
 					return;
 				}

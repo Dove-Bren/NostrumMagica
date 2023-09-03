@@ -12,7 +12,7 @@ import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
@@ -44,7 +44,7 @@ public class ModelAetherCloak extends ModelBase {
 		final LivingEntity living = (LivingEntity) entityIn;
 		final float objScale = .425f;
 		final boolean isFlying = living.isElytraFlying();
-		final boolean hasChestpiece = (!living.getItemStackFromSlot(EntityEquipmentSlot.CHEST).isEmpty());
+		final boolean hasChestpiece = (!living.getItemStackFromSlot(EquipmentSlotType.CHEST).isEmpty());
 		final @Nullable ResourceLocation[] textures = provider.getCapeTextures(living, stack);
 		
 		// Get how 'forward' we're moving for cape rotation

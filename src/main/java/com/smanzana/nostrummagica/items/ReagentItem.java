@@ -10,14 +10,14 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumActionResult;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
@@ -29,14 +29,14 @@ public class ReagentItem extends Item implements ILoreTagged, IAetherBurnable {
 
 	public static enum ReagentType implements IStringSerializable {
 		// Do not rearrange.
-		MANDRAKE_ROOT("mandrake_root"),
-		SPIDER_SILK("spider_silk"),
-		BLACK_PEARL("black_pearl"),
-		SKY_ASH("sky_ash"),
-		GINSENG("ginseng"),
-		GRAVE_DUST("grave_dust"),
-		CRYSTABLOOM("crystabloom"),
-		MANI_DUST("mani_dust");
+		MANDRAKE_ROOT(ID_SUFFIX_MANDRAKE_ROOT),
+		SPIDER_SILK(ID_SUFFIX_SPIDER_SILK),
+		BLACK_PEARL(ID_SUFFIX_BLACK_PEARL),
+		SKY_ASH(ID_SUFFIX_SKY_ASH),
+		GINSENG(ID_SUFFIX_GINSENG),
+		GRAVE_DUST(ID_SUFFIX_GRAVE_DUST),
+		CRYSTABLOOM(ID_SUFFIX_CRYSTABLOOM),
+		MANI_DUST(ID_SUFFIX_MANI_DUST);
 		
 		private String tag;
 		private int meta;
@@ -50,10 +50,6 @@ public class ReagentItem extends Item implements ILoreTagged, IAetherBurnable {
 			return tag;
 		}
 		
-		public int getMeta() {
-			return meta;
-		}
-
 		public String prettyName() {
 			String name = this.name();
 			String out = "";
@@ -83,113 +79,108 @@ public class ReagentItem extends Item implements ILoreTagged, IAetherBurnable {
 		}
 	}
 	
-	public static final String ID = "nostrum_reagent";
+	public static final String ID_PREFIX = "reagent_";
+	public static final String ID_SUFFIX_MANDRAKE_ROOT = "mandrake_root";
+	public static final String ID_SUFFIX_SPIDER_SILK = "spider_silk";
+	public static final String ID_SUFFIX_BLACK_PEARL = "black_pearl";
+	public static final String ID_SUFFIX_SKY_ASH = "sky_ash";
+	public static final String ID_SUFFIX_GINSENG = "ginseng";
+	public static final String ID_SUFFIX_GRAVE_DUST = "grave_dust";
+	public static final String ID_SUFFIX_CRYSTABLOOM = "crystabloom";
+	public static final String ID_SUFFIX_MANI_DUST = "mani_dust";
+	public static final String ID_MANDRAKE_ROOT = ID_PREFIX + ID_SUFFIX_MANDRAKE_ROOT;
+	public static final String ID_SPIDER_SILK = ID_PREFIX + ID_SUFFIX_SPIDER_SILK;
+	public static final String ID_BLACK_PEARL = ID_PREFIX + ID_SUFFIX_BLACK_PEARL;
+	public static final String ID_SKY_ASH = ID_PREFIX + ID_SUFFIX_SKY_ASH;
+	public static final String ID_GINSENG = ID_PREFIX + ID_SUFFIX_GINSENG;
+	public static final String ID_GRAVE_DUST = ID_PREFIX + ID_SUFFIX_GRAVE_DUST;
+	public static final String ID_CRYSTABLOOM = ID_PREFIX + ID_SUFFIX_CRYSTABLOOM;
+	public static final String ID_MANI_DUST = ID_PREFIX + ID_SUFFIX_MANI_DUST;
 	
-	private static ReagentItem instance = null;
-	public static ReagentItem instance() {
-		if (instance == null)
-			instance = new ReagentItem();
-		
-		return instance;
+	
+	private final ReagentType type;
+	
+	public ReagentItem(ReagentType type) {
+		super(NostrumItems.PropBase());
 	}
 	
-	public ReagentItem() {
-		super();
-		this.setUnlocalizedName(ID);
-		this.setRegistryName(NostrumMagica.MODID, ReagentItem.ID);
-		this.setMaxDamage(0);
-		this.setMaxStackSize(64);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setHasSubtypes(true);
+	public ReagentType getType() {
+		return type;
 	}
 	
-	@Override
-	public String getUnlocalizedName(ItemStack stack) {
-		int i = stack.getMetadata();
-		
-		String suffix = getNameFromMeta(i);
-		
-		return this.getUnlocalizedName() + "." + suffix;
-	}
-	
-	/**
-     * returns a list of items with the same ID, but different meta (eg: dye returns 16 items)
-     */
-    @OnlyIn(Dist.CLIENT)
-    @Override
-	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-    	if (this.isInCreativeTab(tab)) {
-	    	for (ReagentType type : ReagentType.values()) {
-	    		subItems.add(new ItemStack(this, 1, type.getMeta()));
-	    	}
-    	}
-	}
-    
-    public static ReagentType findType(ItemStack reagent) {
+    public static ReagentType FindType(ItemStack reagent) {
     	if (reagent.isEmpty() || !(reagent.getItem() instanceof ReagentItem))
     		return null;
     	
-    	for (ReagentType type : ReagentType.values()) {
-    		if (type == getTypeFromMeta(reagent.getMetadata()))
-    			return type;
+    	return ((ReagentItem) reagent.getItem()).getType();
+    }
+    
+    public static ReagentItem GetItem(ReagentType type) {
+    	ReagentItem item = null;
+    	switch (type) {
+		case BLACK_PEARL:
+			item = NostrumItems.reagentBlackPearl;
+			break;
+		case CRYSTABLOOM:
+			item = NostrumItems.reagentCrystabloom;
+			break;
+		case GINSENG:
+			item = NostrumItems.reagentGinseng;
+			break;
+		case GRAVE_DUST:
+			item = NostrumItems.reagentGraveDust;
+			break;
+		case MANDRAKE_ROOT:
+			item = NostrumItems.reagentMandrakeRoot;
+			break;
+		case MANI_DUST:
+			item = NostrumItems.reagentManiDust;
+			break;
+		case SKY_ASH:
+			item = NostrumItems.reagentSkyAsh;
+			break;
+		case SPIDER_SILK:
+			item = NostrumItems.reagentSpiderSilk;
+			break;
     	}
     	
-    	return null;
+    	return item;
     }
     
-    public static String getNameFromMeta(int meta) {
-    	String suffix = "unknown";
-		
-    	ReagentType type = getTypeFromMeta(meta);
-    	if (type != null)
-    		suffix = type.getTag();
-    	
-		return suffix;
-    }
-    
-    public static ReagentType getTypeFromMeta(int meta) {
-    	ReagentType ret = null;
-    	for (ReagentType type : ReagentType.values()) {
-			if (type.getMeta() == meta) {
-				ret = type;
-				break;
-			}
-		}
-    	
-    	return ret;
-    }
-    
-    public ItemStack getReagent(ReagentType type, int count) {
-    	int meta = type.getMeta();
-    	return new ItemStack(this, count, meta);
+    public static ItemStack CreateStack(ReagentType type, int count) {
+    	return new ItemStack(GetItem(type), count);
     }
     
     @Override
-    public EnumActionResult onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, EnumHand hand, Direction facing, float hitX, float hitY, float hitZ) {
-    	final @Nonnull ItemStack stack = playerIn.getHeldItem(hand);
-    	ReagentType type = getTypeFromMeta(stack.getMetadata());
+    public ActionResultType onItemUse(ItemUseContext context) {
+    	final @Nonnull ItemStack stack = context.getItem();
+    	ReagentType type = FindType(stack);
     	
     	if (type == ReagentType.MANDRAKE_ROOT) {
     		// Try to plant as seed. Convenient!
-    		return ReagentSeed.mandrake.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ);
+    		return ReagentSeed.mandrake.onItemUse(context);
     	}
     	
     	if (type == ReagentType.GINSENG) {
-	    	return ReagentSeed.ginseng.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ);
+	    	return ReagentSeed.ginseng.onItemUse(context);
     	}
     	
     	if (type == ReagentType.CRYSTABLOOM) {
-    		IBlockState state = worldIn.getBlockState(pos);
+    		final World worldIn = context.getWorld();
+    		final BlockPos pos = context.getPos();
+    		final PlayerEntity playerIn = context.getPlayer();
+    		final Direction facing = context.getFace();
+    		BlockState state = worldIn.getBlockState(pos);
 	        if (facing == Direction.UP && playerIn.canPlayerEdit(pos.offset(facing), facing, stack) && state.getBlock().canSustainPlant(state, worldIn, pos, Direction.UP, NostrumMagicaFlower.instance()) && worldIn.isAirBlock(pos.up())) {
 	        	worldIn.setBlockState(pos.up(), NostrumMagicaFlower.instance().getState(Type.CRYSTABLOOM));
 	            stack.shrink(1);
-	            return EnumActionResult.SUCCESS;
+	            return ActionResultType.SUCCESS;
 	        } else {
-	        	return EnumActionResult.FAIL;
+	        	return ActionResultType.FAIL;
 	        }
     	}
     	
-    	return EnumActionResult.PASS;
+    	return ActionResultType.PASS;
 	}
 
 	@Override

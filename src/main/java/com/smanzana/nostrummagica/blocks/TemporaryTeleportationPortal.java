@@ -7,7 +7,7 @@ import java.util.Set;
 
 import com.smanzana.nostrummagica.blocks.tiles.TemporaryPortalTileEntity;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -37,7 +37,7 @@ public class TemporaryTeleportationPortal extends TeleportationPortal  {
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
 		if (worldIn.isRemote) {
-			IBlockState state = this.getStateFromMeta(meta);
+			BlockState state = this.getStateFromMeta(meta);
 			if (isMaster(state)) {
 				return new TemporaryPortalTileEntity();
 			}
@@ -52,7 +52,7 @@ public class TemporaryTeleportationPortal extends TeleportationPortal  {
 	}
 	
 	public static void spawn(World world, BlockPos at, BlockPos target, int duration) {
-		IBlockState state = instance().getMaster();
+		BlockState state = instance().getMaster();
 		world.setBlockState(at, state);
 		instance().createPaired(world, at);
 		
@@ -101,7 +101,7 @@ public class TemporaryTeleportationPortal extends TeleportationPortal  {
 			boolean pass = true;
 			for (BlockPos pos : new BlockPos[]{loc, loc.up()}) {
 				if (!world.isAirBlock(pos)) {
-					IBlockState state = world.getBlockState(loc);
+					BlockState state = world.getBlockState(loc);
 					if (!state.getBlock().isReplaceable(world, loc)) {
 						pass = false;
 						break;
@@ -114,7 +114,7 @@ public class TemporaryTeleportationPortal extends TeleportationPortal  {
 			}
 			
 			// Check that it's on ground
-			IBlockState ground = world.getBlockState(loc.down());
+			BlockState ground = world.getBlockState(loc.down());
 			if (!ground.getMaterial().blocksMovement()) {
 			//if (!ground.isSideSolid(world, loc.down(), Direction.UP)) {
 				continue;

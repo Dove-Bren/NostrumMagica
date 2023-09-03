@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.blocks.NostrumObelisk;
 import com.smanzana.nostrummagica.blocks.ObeliskPortal;
 import com.smanzana.nostrummagica.world.NostrumChunkLoader;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
@@ -202,7 +202,7 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 			for (int i = 0; i < xs.length; i++)
 			for (int j = 1; j <= NostrumObelisk.TILE_HEIGHT; j++) { // j starts at one cause the first block is above the base block
 				BlockPos bp = pos.add(xs[i], j, zs[i]);
-				IBlockState state = world.getBlockState(bp);
+				BlockState state = world.getBlockState(bp);
 				if (state.getBlock() instanceof NostrumObelisk) {
 					world.destroyBlock(bp, false);
 				}
@@ -262,7 +262,7 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 		}
 		
 		if (!this.world.isRemote) {
-			IBlockState state = world.getBlockState(pos);
+			BlockState state = world.getBlockState(pos);
 			if (state == null || !(state.getBlock() instanceof NostrumObelisk)
 					|| !NostrumObelisk.blockIsMaster(state))
 				return false;
@@ -326,7 +326,7 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	}
 	
 	public static boolean IsValidObelisk(World world, BlockPos pos) {
-		IBlockState state = world.getBlockState(pos);
+		BlockState state = world.getBlockState(pos);
 		return !(state == null || !(state.getBlock() instanceof NostrumObelisk)
 				|| !NostrumObelisk.blockIsMaster(state));
 	}

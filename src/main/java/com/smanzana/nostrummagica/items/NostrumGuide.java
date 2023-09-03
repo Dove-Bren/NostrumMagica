@@ -17,8 +17,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -31,34 +31,21 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  */
 public class NostrumGuide extends Item implements GuiBook {
 
-	private static NostrumGuide instance = null;
-	
-	public static NostrumGuide instance() {
-		if (instance == null)
-			instance = new NostrumGuide();
-		
-		return instance;
-	}
-	
-	public static final String id = "nostrum_guide";
+	public static final String ID = "nostrum_guide";
 	
 	private NostrumGuide() {
-		super();
-		this.setUnlocalizedName(id);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setMaxStackSize(1);
-		setRegistryName(NostrumMagica.MODID, NostrumGuide.id);
+		super(NostrumItems.PropUnstackable());
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
 		final ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		
 		if (worldIn.isRemote) {
 			NostrumMagica.proxy.openBook(playerIn, this, itemStackIn);
 		}
 		
-		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
     }
 	
 	@OnlyIn(Dist.CLIENT)

@@ -11,7 +11,7 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.block.BlockChest;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -37,7 +37,7 @@ public class LoadedRoom implements IDungeonRoom {
 		// Find and save chest locations
 		chestsRelative = new ArrayList<>();
 		blueprint.scanBlocks((offset, block) -> {
-			IBlockState state = block.getSpawnState(Direction.NORTH); 
+			BlockState state = block.getSpawnState(Direction.NORTH); 
 			if (state != null && state.getBlock() == Blocks.CHEST) {
 				chestsRelative.add(new DungeonExitPoint(offset, state.getValue(BlockChest.FACING)));
 			}
@@ -61,7 +61,7 @@ public class LoadedRoom implements IDungeonRoom {
 		for (int j = minY; j <= maxY; j++)
 		for (int k = minZ; k <= maxZ; k++) {
 			BlockPos pos = new BlockPos(i, j, k);
-			IBlockState cur = world.getBlockState(pos);
+			BlockState cur = world.getBlockState(pos);
 		
 			// Check if unbreakable...
 			if (cur != null && cur.getBlockHardness(world, pos) == -1)

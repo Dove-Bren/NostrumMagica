@@ -9,9 +9,9 @@ import com.smanzana.nostrummagica.utils.ItemStacks;
 
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.FurnaceBlock;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -73,7 +73,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	}
 	
 	@Override
-	public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState) {
+	public boolean shouldRefresh(World world, BlockPos pos, BlockState oldState, BlockState newState) {
 		return !(newState.getBlock() instanceof ActiveHopper);
 	}
 	
@@ -308,7 +308,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 				
 				// Special cast for stupid chests :P
 				if (te instanceof TileEntityChest) {
-					IBlockState state = world.getBlockState(pos.offset(direction));
+					BlockState state = world.getBlockState(pos.offset(direction));
 					if (state != null && state.getBlock() instanceof BlockChest) {
 						inv = ((BlockChest)state.getBlock()).getContainer(world, pos.offset(direction), true);
 					}
@@ -403,7 +403,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 				
 				// Special cast for stupid chests :P
 				if (te instanceof TileEntityChest) {
-					IBlockState state = world.getBlockState(pos.offset(direction));
+					BlockState state = world.getBlockState(pos.offset(direction));
 					if (state != null && state.getBlock() instanceof BlockChest) {
 						inv = ((BlockChest)state.getBlock()).getContainer(world, pos.offset(direction), true);
 					}
@@ -485,7 +485,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	}
 	
 	private boolean captureNearbyItems() {
-		for (EntityItem entity : world.getEntitiesWithinAABB(EntityItem.class, getCaptureBB(true))) {
+		for (ItemEntity entity : world.getEntitiesWithinAABB(ItemEntity.class, getCaptureBB(true))) {
 			// try and pull from the stack
 			@Nonnull ItemStack stack = entity.getItem();
 			if (canPull(stack)) {

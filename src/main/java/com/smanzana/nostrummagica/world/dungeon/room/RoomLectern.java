@@ -357,14 +357,14 @@ public class RoomLectern extends StaticRoom {
 			scroll.setItemDamage(NostrumMagica.rand.nextInt(10));
 			
 			// Set description
-			CompoundNBT nbt = scroll.getTagCompound();
+			CompoundNBT nbt = scroll.getTag();
 			ListNBT list = nbt.getList("Lore", NBT.TAG_STRING);
 			if (null == list)
 				list = new ListNBT();
 			
 			list.add(new StringNBT(spell.getDescription()));
 			nbt.put("Lore", list);
-			scroll.setTagCompound(nbt);
+			scroll.setTag(nbt);
 			
 			te.setItem(scroll);
 		}

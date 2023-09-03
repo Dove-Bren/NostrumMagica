@@ -45,7 +45,7 @@ public class SpellTomePage extends Item implements ILoreTagged {
 	public static ItemStack getItemstack(SpellTomeEnhancement enhancement, int level) {
 		ItemStack stack = new ItemStack(instance);
 		
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		
 		if (nbt == null)
 			nbt = new CompoundNBT();
@@ -53,7 +53,7 @@ public class SpellTomePage extends Item implements ILoreTagged {
 		nbt.putInt(NBT_LEVEL, level);
 		nbt.putString(NBT_TYPE, enhancement.getTitleKey());
 		
-		stack.setTagCompound(nbt);
+		stack.setTag(nbt);
 		return stack;
 	}
 	
@@ -178,20 +178,20 @@ public class SpellTomePage extends Item implements ILoreTagged {
 		if (stack.isEmpty() || !(stack.getItem() instanceof SpellTomePage))
 			return 0;
 		
-		if (!stack.hasTagCompound())
+		if (!stack.hasTag())
 			return 0;
 		
-		return stack.getTagCompound().getInteger(NBT_LEVEL);
+		return stack.getTag().getInteger(NBT_LEVEL);
 	}
 	
 	public static SpellTomeEnhancement getEnhancement(ItemStack stack) {
 		if (stack.isEmpty() || !(stack.getItem() instanceof SpellTomePage))
 			return null;
 		
-		if (!stack.hasTagCompound())
+		if (!stack.hasTag())
 			return null;
 		
-		String key = stack.getTagCompound().getString(NBT_TYPE);
+		String key = stack.getTag().getString(NBT_TYPE);
 		SpellTomeEnhancement enhance = SpellTomeEnhancement.lookupEnhancement(key);
 		return enhance;
 	}

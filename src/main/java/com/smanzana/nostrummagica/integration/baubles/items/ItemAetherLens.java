@@ -18,13 +18,13 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.potions.NostrumPotionTypes;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IEntityOwnable;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -317,7 +317,7 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 				continue;
 			}
 			
-			final IBlockState blockstate = world.getBlockState(cursor);
+			final BlockState blockstate = world.getBlockState(cursor);
 			if (blockstate.getBlockHardness(world, cursor) < 0 || blockstate.getMaterial().isLiquid()) {
 				cursor.move(down ? Direction.DOWN : Direction.UP);
 				continue;
@@ -334,7 +334,7 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 		for (int x = -2; x <= 2; x++)
 		for (int z = -2; z <= 2; z++) {
 			final BlockPos pos = cursor.toImmutable().add(x, 0, z);
-			final IBlockState state = world.getBlockState(pos);
+			final BlockState state = world.getBlockState(pos);
 			state.getBlock().getDrops(drops, world, pos, state, 0);
 			world.destroyBlock(pos, false);
 			AetherInfuserTileEntity.DoChargeEffect(world, pos, 1, 0xFF664400);
@@ -342,7 +342,7 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 		
 		for (ItemStack stack : drops) {
 			// put drops right above bore altar
-			world.spawnEntity(new EntityItem(world, center.getX() + .5, center.getY() + 1.2, center.getZ() + .5, stack));
+			world.spawnEntity(new ItemEntity(world, center.getX() + .5, center.getY() + 1.2, center.getZ() + .5, stack));
 		}
 		
 		return true;

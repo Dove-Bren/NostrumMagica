@@ -63,7 +63,7 @@ public class NostrumTameLightning extends EntityLightningBolt {
 				Entity entity = (Entity)list.get(i);
 				if (ignoreEntity != entity && !net.minecraftforge.event.ForgeEventFactory.onEntityStruckByLightning(entity, this)) { 
 					entity.onStruckByLightning(this);
-					entity.setEntityInvulnerable(false);
+					entity.setInvulnerable(false);
 					entity.hurtResistantTime = 0;
 				}
 			}

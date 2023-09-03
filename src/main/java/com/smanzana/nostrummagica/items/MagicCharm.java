@@ -14,98 +14,75 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.EntityLightningBolt;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.effect.LightningBoltEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class MagicCharm extends Item implements ILoreTagged {
 
-	public static final String ID = "charm";
-	
-	private static MagicCharm instance = null;
-	public static MagicCharm instance() {
-		if (instance == null)
-			instance = new MagicCharm();
-		
-		return instance;
+	public static final String ID_PREFIX = "charm_";
+	public static final String MakeID(EMagicElement element) {
+		return ID_PREFIX + element.name().toLowerCase();
 	}
 	
-	public MagicCharm() {
-		super();
-		this.setUnlocalizedName(ID);
-		this.setRegistryName(NostrumMagica.MODID, ID);
-		this.setMaxDamage(0);
-		this.setMaxStackSize(16);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setHasSubtypes(true);
+	protected final EMagicElement element;
+	
+	public MagicCharm(EMagicElement element) {
+		super(NostrumItems.PropLowStack());
+		this.element = element;
 	}
 	
-	@Override
-	public String getUnlocalizedName(ItemStack stack) {
-		int i = stack.getMetadata();
-		
-		String suffix = getNameFromMeta(i);
-		
-		return this.getUnlocalizedName() + "." + suffix;
-	}
-	
-	public static String getNameFromMeta(int meta) {
-    	String suffix = "unknown";
-		
-    	EMagicElement type = getTypeFromMeta(meta);
-    	if (type != null)
-    		suffix = type.name().toLowerCase();
-    	
-		return suffix;
-    }
-	
-	public static EMagicElement getTypeFromMeta(int meta) {
-    	EMagicElement ret = null;
-    	for (EMagicElement type : EMagicElement.values()) {
-			if (type.ordinal() == meta) {
-				ret = type;
-				break;
-			}
-		}
-    	
-    	return ret;
-    }
-	
-	@OnlyIn(Dist.CLIENT)
-    @Override
-	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-		if (this.isInCreativeTab(tab)) {
-	    	for (EMagicElement element: EMagicElement.values()) {
-	    		subItems.add(new ItemStack(this, 1, element.ordinal()));
-	    	}
-		}
-	}
 	
 	public static ItemStack getCharm(EMagicElement element, int count) {
-		int meta = element.ordinal();
-		return new ItemStack(instance(), count, meta);
+		MagicCharm item = null;
+		switch (element) {
+		case EARTH:
+			item = NostrumItems.magicCharmEarth;
+			break;
+		case ENDER:
+			item = NostrumItems.magicCharmEnder;
+			break;
+		case FIRE:
+			item = NostrumItems.magicCharmFire;
+			break;
+		case ICE:
+			item = NostrumItems.magicCharmIce;
+			break;
+		case LIGHTNING:
+			item = NostrumItems.magicCharmLightning;
+			break;
+		case PHYSICAL:
+			item = NostrumItems.magicCharmPhysical;
+			break;
+		case WIND:
+			item = NostrumItems.magicCharmWind;
+			break;
+		}
+		
+		return new ItemStack(item, count);
 	}
 	
 	@Override
@@ -134,37 +111,36 @@ public class MagicCharm extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
 		
 		final ItemStack stack = playerIn.getHeldItem(hand);
 		
 		if (worldIn.isRemote)
-			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);
 		
-		EMagicElement element = MagicCharm.getTypeFromMeta(stack.getMetadata());
 		boolean used = false;
 		
 		switch (element) {
 		case EARTH:
-			used = doEarth(playerIn, worldIn);
+			used = doEarth(playerIn, (ServerWorld) worldIn);
 			break;
 		case ENDER:
-			used = doEnder(playerIn, worldIn);
+			used = doEnder(playerIn, (ServerWorld) worldIn);
 			break;
 		case FIRE:
-			used = doFire(playerIn, worldIn);
+			used = doFire(playerIn, (ServerWorld) worldIn);
 			break;
 		case ICE:
-			used = doIce(playerIn, worldIn);
+			used = doIce(playerIn, (ServerWorld) worldIn);
 			break;
 		case LIGHTNING:
-			used = doLightning(playerIn, worldIn);
+			used = doLightning(playerIn, (ServerWorld) worldIn);
 			break;
 		case PHYSICAL:
-			used = doPhysical(playerIn, worldIn);
+			used = doPhysical(playerIn, (ServerWorld) worldIn);
 			break;
 		case WIND:
-			used = doWind(playerIn, worldIn);
+			used = doWind(playerIn, (ServerWorld) worldIn);
 			break;
 		}
 		
@@ -172,12 +148,12 @@ public class MagicCharm extends Item implements ILoreTagged {
 			stack.shrink(1);			
 		}
 		
-		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);
 	}
 	
-	private boolean doEarth(PlayerEntity player, World world) {
+	private boolean doEarth(PlayerEntity player, ServerWorld world) {
 		
-		if (world.provider.getDimension() == ModConfig.config.sorceryDimensionIndex()) {
+		if (world.getDimension().getType().getId() == ModConfig.config.sorceryDimensionIndex()) {
 			return false;
 		}
 		
@@ -189,7 +165,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 			if (world.isAirBlock(pos))
 				continue;
 
-			IBlockState state = world.getBlockState(pos);
+			BlockState state = world.getBlockState(pos);
 			if (state == null || state.getMaterial().isLiquid())
 				continue;
 			
@@ -199,24 +175,23 @@ public class MagicCharm extends Item implements ILoreTagged {
 			if (hardness > 10 || harvestLevel > 1 || hardness < 0)
 				continue;
 			
-			NonNullList<ItemStack> drops = NonNullList.create();
-			state.getBlock().getDrops(drops, world, pos, state, 0);
-			if (!drops.isEmpty())
+			List<ItemStack> drops = Block.getDrops(state, world, pos, world.getTileEntity(pos));
+			if (!drops.isEmpty()) {
 				for (ItemStack drop : drops) {
-					EntityItem item = new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), drop);
-					world.spawnEntity(item);
+					Block.spawnAsEntity(world, pos, drop);
 				}
+			}
 			
-			world.setBlockToAir(pos);
+			world.removeBlock(pos, false);
 		}
 		
 		NostrumMagicaSounds.DAMAGE_EARTH.play(world, player.posX, player.posY, player.posZ);
 		return true;
 	}
 	
-	private boolean doFire(PlayerEntity player, World world) {
+	private boolean doFire(PlayerEntity player, ServerWorld world) {
 		
-		if (world.provider.getDimension() == ModConfig.config.sorceryDimensionIndex()) {
+		if (world.getDimension().getType().getId() == ModConfig.config.sorceryDimensionIndex()) {
 			return false;
 		}
 		
@@ -236,8 +211,8 @@ public class MagicCharm extends Item implements ILoreTagged {
 				if (world.isAirBlock(pos))
 					break; // Skip whole column
 				
-				IBlockState state = world.getBlockState(pos);
-				if (!state.isSideSolid(world, pos, Direction.UP))
+				BlockState state = world.getBlockState(pos);
+				if (!Block.hasSolidSide(state, world, pos, Direction.UP))
 					break; // Same if it's not a solid block
 				
 				continue;
@@ -256,15 +231,15 @@ public class MagicCharm extends Item implements ILoreTagged {
 		return true;
 	}
 	
-	private boolean doIce(PlayerEntity player, World world) {
-		player.addPotionEffect(new PotionEffect(MagicShieldPotion.instance(), 20 * 60 * 2, 0));
-		player.addPotionEffect(new PotionEffect(PhysicalShieldPotion.instance(), 20 * 60 * 2, 0));
+	private boolean doIce(PlayerEntity player, ServerWorld world) {
+		player.addPotionEffect(new EffectInstance(MagicShieldPotion.instance(), 20 * 60 * 2, 0));
+		player.addPotionEffect(new EffectInstance(PhysicalShieldPotion.instance(), 20 * 60 * 2, 0));
 		
 		NostrumMagicaSounds.DAMAGE_ICE.play(world, player.posX, player.posY, player.posZ);
 		return true;
 	}
 	
-	private boolean doWind(PlayerEntity player, World world) {
+	private boolean doWind(PlayerEntity player, ServerWorld world) {
 		AxisAlignedBB bb = new AxisAlignedBB(
 				player.posX - 3,
 				player.posY - 1,
@@ -275,7 +250,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 		List<Entity> entities = world.getEntitiesWithinAABBExcludingEntity(player, bb);
 		if (entities != null && !entities.isEmpty())
 			for (Entity e : entities) {
-				Vec3d vec = e.getPositionVector().subtract(player.getPositionVector().addVector(0, -1, 0));
+				Vec3d vec = e.getPositionVector().subtract(player.getPositionVector().add(0, -1, 0));
 				vec = vec.normalize();
 				vec = vec.scale(2);
 				e.setVelocity(vec.x, vec.y, vec.z);
@@ -285,9 +260,9 @@ public class MagicCharm extends Item implements ILoreTagged {
 		return true;
 	}
 	
-	private boolean doEnder(PlayerEntity player, World world) { 
-		if (player.dimension == 0) {
-			BlockPos pos = player.getBedLocation(player.dimension);
+	private boolean doEnder(PlayerEntity player, ServerWorld world) { 
+		if (world.getDimension().getType().getId() == 0) {
+			BlockPos pos = player.getBedLocation(world.getDimension().getType());
 			if (pos == null) {
 				pos = world.getSpawnPoint();
 				while (!world.isAirBlock(pos)) {
@@ -314,7 +289,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 //			
 //			
 //			return true;
-		} else if (player.dimension == ModConfig.config.sorceryDimensionIndex()) {
+		} else if (world.getDimension().getType().getId() == ModConfig.config.sorceryDimensionIndex()) {
 			// In  sorcery dimension. Return to beginning
 			BlockPos spawn = NostrumMagica.getDimensionMapper(player.world).register(player.getUniqueID()).getCenterPos(NostrumEmptyDimension.SPAWN_Y);
 			player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 4, spawn.getZ() + .5);
@@ -329,9 +304,9 @@ public class MagicCharm extends Item implements ILoreTagged {
 		return false;
 	}
 	
-	private boolean doPhysical(PlayerEntity player, World world) {
-		player.addPotionEffect(new PotionEffect(
-				Potion.getPotionFromResourceLocation("speed"),
+	private boolean doPhysical(PlayerEntity player, ServerWorld world) {
+		player.addPotionEffect(new EffectInstance(
+				Effects.SPEED,
 				20 * 30,
 				1
 				));
@@ -341,7 +316,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 		return true;
 	}
 	
-	private boolean doLightning(PlayerEntity player, World world) {
+	private boolean doLightning(PlayerEntity player, ServerWorld world) {
 		if (world.isRaining()) {
 			AxisAlignedBB bb = new AxisAlignedBB(
 					player.posX - 5,
@@ -353,7 +328,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 			List<Entity> entities = world.getEntitiesWithinAABB(LivingEntity.class, bb);
 			if (entities != null && !entities.isEmpty())
 				for (Entity e : entities) {
-					world.spawnEntity(new EntityLightningBolt(world, e.posX, e.posY, e.posZ, false));
+					world.addLightningBolt(new LightningBoltEntity(world, e.posX, e.posY, e.posZ, false)); // TODO nostrum lightning?
 				}
 		} else {
 			world.getWorldInfo().setRaining(true);
@@ -373,12 +348,11 @@ public class MagicCharm extends Item implements ILoreTagged {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-		EMagicElement element = MagicCharm.getTypeFromMeta(stack.getMetadata());
+	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		if (element == EMagicElement.ENDER) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(NostrumMagica.proxy.getPlayer());
 			if (attr != null && attr.hasEnhancedTeleport()) {
-				tooltip.add(I18n.format("info.endercharm.enhanced", new Object[0]));
+				tooltip.add(new TranslationTextComponent("info.endercharm.enhanced"));
 			}
 		}
 	}

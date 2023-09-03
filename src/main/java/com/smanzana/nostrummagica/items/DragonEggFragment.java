@@ -1,31 +1,18 @@
 package com.smanzana.nostrummagica.items;
 
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.item.Item;
+import net.minecraft.item.Rarity;
 
 public class DragonEggFragment extends Item implements ILoreTagged {
 
-	private static DragonEggFragment instance = null;
-	
-	public static DragonEggFragment instance() {
-		if (instance == null)
-			instance = new DragonEggFragment();
-		
-		return instance;
-	}
-	
-	public static final String id = "dragon_egg_part";
+	public static final String ID = "dragon_egg_part";
 	
 	private DragonEggFragment() {
-		super();
-		this.setUnlocalizedName(id);
-		this.setRegistryName(NostrumMagica.MODID, id);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setMaxStackSize(3);
+		super(NostrumItems.PropBase().maxStackSize(3).rarity(Rarity.RARE));
 	}
 	
 	@Override

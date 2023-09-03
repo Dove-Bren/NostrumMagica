@@ -34,7 +34,7 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -170,7 +170,7 @@ public abstract class EntityGolem extends EntityTameable implements ILoreTagged 
         return flag;
     }
 
-    public boolean processInteract(PlayerEntity player, EnumHand hand, @Nonnull ItemStack stack)
+    public boolean processInteract(PlayerEntity player, Hand hand, @Nonnull ItemStack stack)
     {
         return false;
     }

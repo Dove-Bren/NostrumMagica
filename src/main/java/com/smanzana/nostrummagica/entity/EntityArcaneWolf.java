@@ -78,7 +78,7 @@ import net.minecraft.entity.ai.EntityAISwimming;
 import net.minecraft.entity.ai.EntityAIWanderAvoidWater;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.AbstractSkeleton;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.passive.EntityWolf;
@@ -96,7 +96,7 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.Potion;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -810,7 +810,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 	}
 	
 	@Override
-	public boolean processInteract(PlayerEntity player, EnumHand hand) {
+	public boolean processInteract(PlayerEntity player, Hand hand) {
 		// Shift-right click toggles sitting.
 		// When not sitting, right-click mounts the wolf
 		// When sitting, will eventually open a GUI
@@ -857,7 +857,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 			else {
 				; // fall through; we didn't handle it
 			}
-		} else if (!this.isTamed() && player.isCreative() && hand == EnumHand.MAIN_HAND && player.isSneaking()) {
+		} else if (!this.isTamed() && player.isCreative() && hand == Hand.MAIN_HAND && player.isSneaking()) {
 			if (!world.isRemote) {
 				this.setTamedBy(player);
 			}
@@ -1407,7 +1407,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 				for (int i = 0; i < inventory.getSizeInventory(); i++) {
 					ItemStack stack = inventory.getStackInSlot(i);
 					if (!stack.isEmpty()) {
-						EntityItem item = new EntityItem(this.world, this.posX, this.posY, this.posZ, stack);
+						ItemEntity item = new ItemEntity(this.world, this.posX, this.posY, this.posZ, stack);
 						this.world.spawnEntity(item);
 					}
 				}
@@ -1416,7 +1416,7 @@ public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEn
 //			for (DragonEquipmentSlot slot : DragonEquipmentSlot.values()) {
 //				ItemStack stack = equipment.getStackInSlot(slot);
 //				if (!stack.isEmpty()) {
-//					EntityItem item = new EntityItem(this.world, this.posX, this.posY, this.posZ, stack);
+//					ItemEntity item = new ItemEntity(this.world, this.posX, this.posY, this.posZ, stack);
 //					this.world.spawnEntity(item);
 //				}
 //			}

@@ -6,7 +6,6 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -15,16 +14,17 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldProvider;
-import net.minecraftforge.common.DimensionManager;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -41,29 +41,15 @@ public class PositionCrystal extends Item implements ILoreTagged {
 	private static final String NBT_Y = "y";
 	private static final String NBT_Z = "z";
 
-	private static PositionCrystal instance = null;
 	private static Map<Integer, String> DimensionNames = new HashMap<>();
 
-	public static PositionCrystal instance() {
-		if (instance == null)
-			instance = new PositionCrystal(ID);
-	
-		return instance;
-
-	}
-
-	public PositionCrystal(final String id) {
-		super();
-		this.setMaxStackSize(1);
-		this.setUnlocalizedName(id);
-		this.setRegistryName(NostrumMagica.MODID, id);
-		this.setMaxDamage(0);
-		this.setCreativeTab(NostrumMagica.creativeTab);
+	public PositionCrystal() {
+		super(NostrumItems.PropUnstackable());
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		int dim = getDimension(stack);
 		BlockPos pos = getBlockPosition(stack);
 		
@@ -74,15 +60,15 @@ public class PositionCrystal extends Item implements ILoreTagged {
 		if (dimName == null)
 			dimName = "An Unknown Dimension";
 		
-		tooltip.add(TextFormatting.GREEN + "<" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ">" + TextFormatting.RESET);
-		tooltip.add(TextFormatting.DARK_GREEN + dimName + TextFormatting.RESET);
+		tooltip.add(new StringTextComponent("<" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ">").applyTextStyle(TextFormatting.GREEN));
+		tooltip.add(new StringTextComponent(dimName).applyTextStyle(TextFormatting.DARK_GREEN));
 	}
 	
 	public static BlockPos getBlockPosition(ItemStack stack) {
 		if (stack.isEmpty() || !(stack.getItem() instanceof PositionCrystal))
 			return null;
 		
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null)
 			return null;
 		
@@ -107,7 +93,7 @@ public class PositionCrystal extends Item implements ILoreTagged {
 		if (stack.isEmpty() || !(stack.getItem() instanceof PositionCrystal))
 			return 0;
 		
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null)
 			return 0;
 		
@@ -122,17 +108,17 @@ public class PositionCrystal extends Item implements ILoreTagged {
 			return;
 		
 		CompoundNBT tag;
-		if (!stack.hasTagCompound())
+		if (!stack.hasTag())
 			tag = new CompoundNBT();
 		else
-			tag = stack.getTagCompound();
+			tag = stack.getTag();
 		
 		tag.putInt(NBT_DIMENSION, dimension);
 		tag.putInt(NBT_X, pos.getX());
 		tag.putInt(NBT_Y, pos.getY());
 		tag.putInt(NBT_Z, pos.getZ());
 		
-		stack.setTagCompound(tag);
+		stack.setTag(tag);
 	}
 	
 	public static void clearPosition(ItemStack stack) {
@@ -140,42 +126,45 @@ public class PositionCrystal extends Item implements ILoreTagged {
 			return;
 		
 		CompoundNBT tag;
-		if (!stack.hasTagCompound())
+		if (!stack.hasTag())
 			return;
 		
-		tag = stack.getTagCompound();
-		tag.removeTag(NBT_DIMENSION);
-		tag.removeTag(NBT_X);
-		tag.removeTag(NBT_Y);
-		tag.removeTag(NBT_Z);
+		tag = stack.getTag();
+		tag.remove(NBT_DIMENSION);
+		tag.remove(NBT_X);
+		tag.remove(NBT_Y);
+		tag.remove(NBT_Z);
 		
-		stack.setTagCompound(tag);
+		stack.setTag(tag);
 	}
 	
 	@Override
-	public EnumActionResult onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, EnumHand hand, Direction facing, float hitX, float hitY, float hitZ) {
-		final @Nonnull ItemStack stack = playerIn.getHeldItem(hand);
+	public ActionResultType onItemUse(ItemUseContext context) {
+		final World worldIn = context.getWorld();
+		final BlockPos pos = context.getPos();
+		final PlayerEntity playerIn = context.getPlayer();
+		final @Nonnull ItemStack stack = context.getItem();
 		
 		if (worldIn.isRemote)
-			return EnumActionResult.SUCCESS;
+			return ActionResultType.SUCCESS;
 		
 		if (pos == null)
-			return EnumActionResult.PASS;
+			return ActionResultType.PASS;
 		
-		setPosition(stack, playerIn.dimension, pos);
-		return EnumActionResult.SUCCESS;
+		setPosition(stack, playerIn.dimension.getId(), pos);
+		return ActionResultType.SUCCESS;
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
 		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		
 		if (playerIn.isSneaking()) {
 			clearPosition(itemStackIn);
-			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 		}
 		
-		return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
+		return new ActionResult<ItemStack>(ActionResultType.PASS, itemStackIn);
 	}
 
 	@Override
@@ -208,12 +197,21 @@ public class PositionCrystal extends Item implements ILoreTagged {
 		if (!DimensionNames.isEmpty())
 			return;
 		
-		for (Integer id : DimensionManager.getStaticDimensionIDs()) {
-			WorldProvider provider = DimensionManager.createProviderFor(id);
-			if (provider == null)
-				continue;
+		for (DimensionType dimType : DimensionType.getAll()) {
+			final String name;
+			if (dimType == DimensionType.OVERWORLD) {
+				name = "Overworld";
+			} else if (dimType == DimensionType.THE_NETHER) {
+				name = "Nether";
+			} else if (dimType == DimensionType.THE_END) {
+				name = "The End";
+			//} else if (dimType == NostrumEmptyDimension.SorceryDimension) {
+			//	name = "Sorcery Dimension";
+			} else {
+				name = dimType.toString();
+			}
 			
-			DimensionNames.put(id, provider.getDimensionType().getName());
+			DimensionNames.put(dimType.getId(), name);
 		}
 	}
 

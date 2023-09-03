@@ -11,7 +11,7 @@ import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -54,7 +54,7 @@ public class OutcomeCreateObelisk implements IRitualOutcome {
 			for (int i = -radius; i <= radius; i++)
 			for (int j = -radius; j <= radius; j++) {
 				BlockPos pos = center.add(i, 0, j);
-				IBlockState state = world.getBlockState(pos);
+				BlockState state = world.getBlockState(pos);
 				if (state != null &&
 						(state.getBlock() instanceof Candle || state.getBlock() instanceof AltarBlock || state.getBlock() instanceof ChalkBlock)) {
 					world.destroyBlock(pos, true);

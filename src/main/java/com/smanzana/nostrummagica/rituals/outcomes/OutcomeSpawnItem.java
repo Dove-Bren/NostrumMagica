@@ -10,7 +10,7 @@ import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
@@ -38,7 +38,7 @@ public class OutcomeSpawnItem implements IItemRitualOutcome {
 		
 		if (recipe.getTier() == 0) {
 			// spawn on ground
-			EntityItem entity = new EntityItem(world,
+			ItemEntity entity = new ItemEntity(world,
 					center.getX() + .5, center.getY() + 1, center.getZ() + .5,
 					stack.copy());
 			world.spawnEntity(entity);
@@ -49,7 +49,7 @@ public class OutcomeSpawnItem implements IItemRitualOutcome {
 		
 		// repeat for any leftover stack
 		if (!leftoverStack.isEmpty()) {
-			EntityItem entity = new EntityItem(world,
+			ItemEntity entity = new ItemEntity(world,
 					center.getX() + .5, center.getY() + 1, center.getZ() + .5,
 					leftoverStack.copy());
 			world.spawnEntity(entity);

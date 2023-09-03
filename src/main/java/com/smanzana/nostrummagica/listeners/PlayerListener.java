@@ -51,12 +51,12 @@ import baubles.api.BaublesApi;
 import baubles.api.cap.IBaublesItemHandler;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.EntitySpider;
 import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.entity.player.PlayerEntity;
@@ -754,7 +754,7 @@ public class PlayerListener {
 		
 //		if (event.getState().getBlock() instanceof BlockTallGrass
 //				&& NostrumMagica.rand.nextFloat() <= 0.05f) {
-//			EntityItem entity = new EntityItem(event.getWorld(),
+//			ItemEntity entity = new ItemEntity(event.getWorld(),
 //					event.getPos().getX() + 0.5,
 //					event.getPos().getY() + 0.5,
 //					event.getPos().getZ() + 0.5,
@@ -764,7 +764,7 @@ public class PlayerListener {
 //		
 //		if (event.getState().getBlock() instanceof BlockTallGrass
 //				&& NostrumMagica.rand.nextFloat() <= 0.05f) {
-//			EntityItem entity = new EntityItem(event.getWorld(),
+//			ItemEntity entity = new ItemEntity(event.getWorld(),
 //					event.getPos().getX() + 0.5,
 //					event.getPos().getY() + 0.5,
 //					event.getPos().getZ() + 0.5,
@@ -810,7 +810,7 @@ public class PlayerListener {
 		if (event.getEntityLiving().isEntityUndead()) {
 			for (int i = 0; i <= event.getLootingLevel(); i++) {
 				if (NostrumMagica.rand.nextFloat() <= 0.3f) {
-					EntityItem entity = new EntityItem(event.getEntity().world,
+					ItemEntity entity = new ItemEntity(event.getEntity().world,
 							event.getEntity().posX,
 							event.getEntity().posY,
 							event.getEntity().posZ,
@@ -823,7 +823,7 @@ public class PlayerListener {
 		if (event.getEntityLiving() instanceof EntitySpider) {
 			for (int i = 0; i <= event.getLootingLevel(); i++) {
 				if (NostrumMagica.rand.nextFloat() <= 0.4f) {
-					EntityItem entity = new EntityItem(event.getEntity().world,
+					ItemEntity entity = new ItemEntity(event.getEntity().world,
 							event.getEntity().posX,
 							event.getEntity().posY,
 							event.getEntity().posZ,
@@ -1286,7 +1286,7 @@ public class PlayerListener {
 						(int)Math.ceil(entityBB.maxX),
 						(int)Math.floor(entityBB.maxY),
 						(int)Math.ceil(entityBB.maxZ))) {
-					IBlockState state = world.getBlockState(pos);
+					BlockState state = world.getBlockState(pos);
 					if (state.getMaterial() == Material.LAVA) {
 						// Standing on lava. Check if the block this matched is within the BB the event is asking about
 						final float height = ((BlockLiquid) state.getBlock()).getBlockLiquidHeight(world, pos, state, state.getMaterial());

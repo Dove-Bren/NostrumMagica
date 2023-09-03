@@ -17,7 +17,7 @@ import com.smanzana.nostrummagica.rituals.requirements.RRequirementResearch;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -389,7 +389,7 @@ public class EnderIOProxy {
 		return this.enabled;
 	}
 	
-	public boolean AttemptEnderIOTravel(ItemStack equipped, EnumHand hand, World world, PlayerEntity player, TravelSourceWrapper source) {
+	public boolean AttemptEnderIOTravel(ItemStack equipped, Hand hand, World world, PlayerEntity player, TravelSourceWrapper source) {
 		if (enabled) {
 			return TravelControllerWrapper.activateTravelAccessable(equipped, hand, world, player, source.getSource());
 		}

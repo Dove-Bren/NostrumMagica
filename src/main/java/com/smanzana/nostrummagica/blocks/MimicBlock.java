@@ -11,7 +11,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -36,7 +36,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class MimicBlock extends BlockDirectional {
 	
-	public static IUnlistedProperty<IBlockState> NESTED_STATE = new IUnlistedProperty<IBlockState>() {
+	public static IUnlistedProperty<BlockState> NESTED_STATE = new IUnlistedProperty<BlockState>() {
 
 		@Override
 		public String getName() {
@@ -44,17 +44,17 @@ public class MimicBlock extends BlockDirectional {
 		}
 
 		@Override
-		public boolean isValid(IBlockState value) {
+		public boolean isValid(BlockState value) {
 			return value != null;
 		}
 
 		@Override
-		public Class<IBlockState> getType() {
-			return IBlockState.class;
+		public Class<BlockState> getType() {
+			return BlockState.class;
 		}
 
 		@Override
-		public String valueToString(IBlockState value) {
+		public String valueToString(BlockState value) {
 			return value.toString();
 		}
 		
@@ -109,7 +109,7 @@ public class MimicBlock extends BlockDirectional {
 	}
 	
 	@Override
-	public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+	public BlockState getExtendedState(BlockState state, IBlockAccess world, BlockPos pos) {
 		IExtendedBlockState ext = (IExtendedBlockState) state;
 		Direction face = state.getValue(FACING);
 		
@@ -125,32 +125,32 @@ public class MimicBlock extends BlockDirectional {
 	}
 	
 	@Override
-	public IBlockState getStateFromMeta(int meta) {
+	public BlockState getStateFromMeta(int meta) {
 		int faceMeta = meta & 0x7;
 		int unbreakableMeta = (meta >> 3) & 1;
 		return getDefaultState().withProperty(FACING, Direction.values()[faceMeta]).withProperty(UNBREAKABLE, unbreakableMeta == 1);
 	}
 	
 	@Override
-	public int getMetaFromState(IBlockState state) {
+	public int getMetaFromState(BlockState state) {
 		return (state.getValue(FACING).ordinal()) | ((state.getValue(UNBREAKABLE) ? 1 : 0) << 3);
 	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
+	public BlockState getActualState(BlockState state, IBlockAccess worldIn, BlockPos pos) {
 		return super.getActualState(state, worldIn, pos);
 		//return worldIn.getBlockState(pos.down()).getActualState(worldIn, pos.down());
 	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public float getBlockHardness(IBlockState blockState, World worldIn, BlockPos pos) {
+	public float getBlockHardness(BlockState blockState, World worldIn, BlockPos pos) {
 		return blockState.getValue(UNBREAKABLE) ? -1f : super.getBlockHardness(blockState, worldIn, pos);
 	}
 	
 	@Override
-	public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, Direction side) {
+	public boolean isSideSolid(BlockState base_state, IBlockAccess world, BlockPos pos, Direction side) {
 		return false;
 	}
 	
@@ -161,7 +161,7 @@ public class MimicBlock extends BlockDirectional {
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
+	public void addCollisionBoxToList(BlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
 		boolean solid = false;
 		
 		if (!isDoor) {
@@ -227,14 +227,14 @@ public class MimicBlock extends BlockDirectional {
     }
 	
 	@Override
-	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
 		pos = pos.down();
 		state = source.getBlockState(pos);
 		return state.getBlock().getExtendedState(state, source, pos).getBoundingBox(source, pos);
 	}
 	
 	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer) {
+	public BlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer) {
 		//Direction enumfacing = Direction.getHorizontal(MathHelper.floor_double((double)(placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3).getOpposite();
 		return this.getDefaultState()
 				.withProperty(FACING, Direction.getDirectionFromEntityLiving(pos, placer))
@@ -247,12 +247,12 @@ public class MimicBlock extends BlockDirectional {
     }
 	
 	@Override
-	public boolean isFullCube(IBlockState state) {
+	public boolean isFullCube(BlockState state) {
 		return false;
 	}
 	
 	@Override
-	public boolean isOpaqueCube(IBlockState state) {
+	public boolean isOpaqueCube(BlockState state) {
 		return false;
 	}
 	
@@ -262,13 +262,13 @@ public class MimicBlock extends BlockDirectional {
     }
 	
 	@Override
-	public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos, Direction face) {
+	public boolean doesSideBlockRendering(BlockState state, IBlockAccess world, BlockPos pos, Direction face) {
 		return false;
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, Direction side) {
+	public boolean shouldSideBeRendered(BlockState blockState, IBlockAccess blockAccess, BlockPos pos, Direction side) {
 		return side == blockState.getValue(FACING);
 	}
 	
@@ -283,7 +283,7 @@ public class MimicBlock extends BlockDirectional {
 	public void onBlockHighlight(DrawBlockHighlightEvent event) {
 		if (event.getTarget().typeOfHit == RayTraceResult.Type.BLOCK) {
 			BlockPos pos = event.getTarget().getBlockPos();
-			IBlockState hit = event.getPlayer().world.getBlockState(pos);
+			BlockState hit = event.getPlayer().world.getBlockState(pos);
 			if (hit != null && hit.getBlock() == this) {
 				Direction face = hit.getValue(FACING);
 				boolean outside = false;

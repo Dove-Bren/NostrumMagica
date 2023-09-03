@@ -12,7 +12,7 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -23,7 +23,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -145,7 +145,7 @@ public class ItemDuct extends BlockContainer {
 				.withProperty(DOWN, false));
 	}
 	
-	public static boolean GetFacingActive(IBlockState state, Direction face) {
+	public static boolean GetFacingActive(BlockState state, Direction face) {
 		switch (face) {
 		case DOWN:
 			return state.getValue(DOWN);
@@ -169,12 +169,12 @@ public class ItemDuct extends BlockContainer {
 	}
 	
 	@Override
-	public IBlockState getStateFromMeta(int meta) {
+	public BlockState getStateFromMeta(int meta) {
 		return this.getDefaultState();
 	}
 	
 	@Override
-	public int getMetaFromState(IBlockState state) {
+	public int getMetaFromState(BlockState state) {
 		return 0;
 	}
 	
@@ -185,12 +185,12 @@ public class ItemDuct extends BlockContainer {
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer) {
+	public BlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer) {
 		return super.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, placer);
 	}
 	
 	@Override
-	public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
+	public BlockState getActualState(BlockState state, IBlockAccess worldIn, BlockPos pos) {
 		return state
 				.withProperty(NORTH, canConnect(worldIn, pos, Direction.NORTH))
 				.withProperty(SOUTH, canConnect(worldIn, pos, Direction.SOUTH))
@@ -222,8 +222,8 @@ public class ItemDuct extends BlockContainer {
 	}
 	
 	@Override
-	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-		final IBlockState actualState = state.getActualState(source, pos);
+	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
+		final BlockState actualState = state.getActualState(source, pos);
 		
 		int index = 0;
 		for (Direction face : Direction.VALUES) {
@@ -236,7 +236,7 @@ public class ItemDuct extends BlockContainer {
 	}
 	
 	@Override
-	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
+	public void addCollisionBoxToList(BlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
 		addCollisionBoxToList(pos, entityBox, collidingBoxes, BASE_AABB);
 		for (Direction dir : Direction.VALUES) {
 			if (GetFacingActive(state.getActualState(worldIn, pos), dir)) {
@@ -246,17 +246,17 @@ public class ItemDuct extends BlockContainer {
 	}
 	
 	@Override
-	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
+	public void onBlockAdded(World worldIn, BlockPos pos, BlockState state) {
 		super.onBlockAdded(worldIn, pos, state);
 	}
 	
 	@Override
-	public boolean hasComparatorInputOverride(IBlockState state) {
+	public boolean hasComparatorInputOverride(BlockState state) {
 		return true;
 	}
 	
 	@Override
-	public int getComparatorInputOverride(IBlockState blockState, World worldIn, BlockPos pos) {
+	public int getComparatorInputOverride(BlockState blockState, World worldIn, BlockPos pos) {
 		final TileEntity tileentity = worldIn.getTileEntity(pos);
 		final int output;
 
@@ -277,7 +277,7 @@ public class ItemDuct extends BlockContainer {
 	}
 	
 	@Override
-	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+	public void breakBlock(World worldIn, BlockPos pos, BlockState state) {
 		TileEntity tileentity = worldIn.getTileEntity(pos);
 
 		if (tileentity instanceof ItemDuctTileEntity) {
@@ -291,7 +291,7 @@ public class ItemDuct extends BlockContainer {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
 //		playerIn.openGui(NostrumMagica.instance,
 //				NostrumGui.activeHopperID, worldIn,
 //				pos.getX(), pos.getY(), pos.getZ());
@@ -302,22 +302,22 @@ public class ItemDuct extends BlockContainer {
 	}
 	
 //	@Override
-//	public boolean isFullyOpaque(IBlockState state) {
+//	public boolean isFullyOpaque(BlockState state) {
 //		return true; // Copying vanilla
 //	}
 	
 	@Override
-	public EnumBlockRenderType getRenderType(IBlockState state) {
+	public EnumBlockRenderType getRenderType(BlockState state) {
 		return EnumBlockRenderType.MODEL;
 	}
 	
 	@Override
-	public boolean isFullCube(IBlockState state) {
+	public boolean isFullCube(BlockState state) {
 		return false;
 	}
 	
 	@Override
-	public boolean isOpaqueCube(IBlockState state) {
+	public boolean isOpaqueCube(BlockState state) {
 		return false;
 	}
 	

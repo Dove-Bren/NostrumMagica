@@ -5,7 +5,7 @@ import com.smanzana.nostrummagica.blocks.tiles.TeleportationPortalTileEntity;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.tileentity.TileEntity;
@@ -38,7 +38,7 @@ public class TeleportationPortal extends NostrumPortal implements ITileEntityPro
 	
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		IBlockState state = this.getStateFromMeta(meta);
+		BlockState state = this.getStateFromMeta(meta);
 		if (isMaster(state)) {
 			return new TeleportationPortalTileEntity();
 		}
@@ -48,7 +48,7 @@ public class TeleportationPortal extends NostrumPortal implements ITileEntityPro
 	
 //	@SuppressWarnings("deprecation")
 //	@Override
-//	public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param) {
+//	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
 //		super.eventReceived(state, worldIn, pos, id, param);
 //        TileEntity tileentity = worldIn.getTileEntity(pos);
 //        return tileentity == null ? false : tileentity.receiveClientEvent(id, param);

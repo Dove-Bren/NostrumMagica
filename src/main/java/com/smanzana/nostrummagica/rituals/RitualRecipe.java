@@ -23,7 +23,7 @@ import com.smanzana.nostrummagica.rituals.outcomes.IRitualOutcome;
 import com.smanzana.nostrummagica.rituals.requirements.IRitualRequirement;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -329,7 +329,7 @@ public class RitualRecipe implements InfoScreenIndexed {
 		int[] xs = CHALK_XS[tier];
 		int[] ys = CHALK_YS[tier];
 		for (int index = 0; index < xs.length; index++) {
-			IBlockState state = world.getBlockState(center.add(xs[index], 0, ys[index]));
+			BlockState state = world.getBlockState(center.add(xs[index], 0, ys[index]));
 			
 			if (state == null || !(state.getBlock() instanceof ChalkBlock))
 				return RitualMatchInfo.Fail();

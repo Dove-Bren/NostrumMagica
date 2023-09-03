@@ -18,8 +18,8 @@ import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -27,7 +27,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -61,12 +61,12 @@ public class WispBlock extends BlockContainer {
 	}
 	
 	@Override
-	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
+	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
 		return true;
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
 		
 		ItemStack heldItem = playerIn.getHeldItem(hand);
 		
@@ -110,43 +110,43 @@ public class WispBlock extends BlockContainer {
 	}
 	
 	@Override
-	public EnumBlockRenderType getRenderType(IBlockState state) {
+	public EnumBlockRenderType getRenderType(BlockState state) {
 		return EnumBlockRenderType.INVISIBLE;
 	}
 	
 	@Override
-	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
 		return SELECT_AABB;
 	}
 	
 	@Override
-	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+	public AxisAlignedBB getCollisionBoundingBox(BlockState blockState, IBlockAccess worldIn, BlockPos pos) {
 		return COLLIDE_AABB;
 	}
 	
 	@Override
-	public boolean isOpaqueCube(IBlockState state) {
+	public boolean isOpaqueCube(BlockState state) {
 		return false;
 	}
 	
 	@Override
-	public boolean isFullCube(IBlockState state) {
+	public boolean isFullCube(BlockState state) {
 		return false;
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public boolean isTranslucent(IBlockState state) {
+	public boolean isTranslucent(BlockState state) {
 		return true;
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, IBlockState state) {
+	public void breakBlock(World world, BlockPos pos, BlockState state) {
 		destroy(world, pos, state);
 		super.breakBlock(world, pos, state);
 	}
 	
-	private void destroy(World world, BlockPos pos, IBlockState state) {
+	private void destroy(World world, BlockPos pos, BlockState state) {
 		TileEntity ent = world.getTileEntity(pos);
 		if (ent == null || !(ent instanceof WispBlockTileEntity))
 			return;
@@ -158,7 +158,7 @@ public class WispBlock extends BlockContainer {
 			x = pos.getX() + .5;
 			y = pos.getY() + .5;
 			z = pos.getZ() + .5;
-			world.spawnEntity(new EntityItem(world, x, y, z, item.copy()));
+			world.spawnEntity(new ItemEntity(world, x, y, z, item.copy()));
 		}
 		
 		item = table.getReagent();
@@ -167,7 +167,7 @@ public class WispBlock extends BlockContainer {
 			x = pos.getX() + .5;
 			y = pos.getY() + .5;
 			z = pos.getZ() + .5;
-			world.spawnEntity(new EntityItem(world, x, y, z, item.copy()));
+			world.spawnEntity(new ItemEntity(world, x, y, z, item.copy()));
 		}
 		
 		table.deactivate();

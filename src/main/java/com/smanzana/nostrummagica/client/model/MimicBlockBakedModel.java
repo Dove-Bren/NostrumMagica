@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.MimicBlock;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
@@ -26,10 +26,10 @@ public class MimicBlockBakedModel implements IBakedModel {
 		particle = Minecraft.getInstance().getTextureMapBlocks().getAtlasSprite(new ResourceLocation(NostrumMagica.MODID, "blocks/mimic_facade").toString());
 	}
 	
-	protected IBlockState getNestedState(@Nullable IBlockState state) {
+	protected BlockState getNestedState(@Nullable BlockState state) {
 		if (state != null) {
 			IExtendedBlockState ex = (IExtendedBlockState) state;
-			IBlockState nestedState = ex.getValue(MimicBlock.NESTED_STATE);
+			BlockState nestedState = ex.getValue(MimicBlock.NESTED_STATE);
 			
 			while (nestedState instanceof IExtendedBlockState && nestedState.getBlock() instanceof MimicBlock) {
 				nestedState = ((IExtendedBlockState)nestedState).getValue(MimicBlock.NESTED_STATE);
@@ -43,7 +43,7 @@ public class MimicBlockBakedModel implements IBakedModel {
 		return null;
 	}
 	
-	protected IBakedModel getModelToRender(@Nullable IBlockState nestedState) {
+	protected IBakedModel getModelToRender(@Nullable BlockState nestedState) {
 		IBakedModel missing = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getMissingModel();
 		IBakedModel nestedModel = null;
 		
@@ -51,7 +51,7 @@ public class MimicBlockBakedModel implements IBakedModel {
 			
 			// Stupid CTM wraps up models and needs to be unwrapped
 			if (nestedState instanceof IExtendedBlockState) {
-				IBlockState trueState = ((IExtendedBlockState) nestedState).getClean();
+				BlockState trueState = ((IExtendedBlockState) nestedState).getClean();
 				if (trueState != null) {
 					nestedState = trueState;
 				}
@@ -64,8 +64,8 @@ public class MimicBlockBakedModel implements IBakedModel {
 	}
 	
 	@Override
-	public List<BakedQuad> getQuads(@Nullable IBlockState state, Direction side, long rand) {
-		IBlockState nested = getNestedState(state);
+	public List<BakedQuad> getQuads(@Nullable BlockState state, Direction side, long rand) {
+		BlockState nested = getNestedState(state);
 		return getModelToRender(nested).getQuads(nested, side, rand);
 	}
 

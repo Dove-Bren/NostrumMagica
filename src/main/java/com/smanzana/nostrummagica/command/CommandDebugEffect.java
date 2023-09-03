@@ -8,7 +8,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 
 public class CommandDebugEffect extends CommandBase {
 
@@ -70,9 +70,9 @@ public class CommandDebugEffect extends CommandBase {
 			throw new CommandException("Command must be run by a creative player");
 		}
 		
-		ItemStack soulStack = player.getHeldItem(EnumHand.MAIN_HAND);
+		ItemStack soulStack = player.getHeldItem(Hand.MAIN_HAND);
 		if (soulStack.isEmpty() || !(soulStack.getItem() instanceof PetSoulItem)) {
-			soulStack = player.getHeldItem(EnumHand.OFF_HAND);
+			soulStack = player.getHeldItem(Hand.OFF_HAND);
 		}
 		
 		if (soulStack.isEmpty() || !(soulStack.getItem() instanceof PetSoulItem)) {

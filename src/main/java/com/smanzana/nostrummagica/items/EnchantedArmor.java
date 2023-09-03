@@ -47,7 +47,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.block.BlockSapling;
 import net.minecraft.block.IGrowable;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.model.ModelBiped;
@@ -61,13 +61,14 @@ import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttribute;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.inventory.EntityEquipmentSlot.Type;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.inventory.EquipmentSlotType.Type;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
@@ -102,16 +103,16 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISpecialArmor, IElytraProvider, IDragonWingRenderItem {
+public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, ISpecialArmor, IElytraProvider, IDragonWingRenderItem {
 
-	private static Map<EMagicElement, Map<EntityEquipmentSlot, Map<Integer, EnchantedArmor>>> items;
+	private static Map<EMagicElement, Map<EquipmentSlotType, Map<Integer, EnchantedArmor>>> items;
 	
 	public static final void registerArmors(final IForgeRegistry<Item> registry) {
-		items = new EnumMap<EMagicElement, Map<EntityEquipmentSlot, Map<Integer, EnchantedArmor>>>(EMagicElement.class);
+		items = new EnumMap<EMagicElement, Map<EquipmentSlotType, Map<Integer, EnchantedArmor>>>(EMagicElement.class);
 		for (EMagicElement element : EMagicElement.values()) {
-			items.put(element, new EnumMap<EntityEquipmentSlot, Map<Integer, EnchantedArmor>>(EntityEquipmentSlot.class));
-			for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
-				if (slot.getSlotType() == EntityEquipmentSlot.Type.ARMOR) {
+			items.put(element, new EnumMap<EquipmentSlotType, Map<Integer, EnchantedArmor>>(EquipmentSlotType.class));
+			for (EquipmentSlotType slot : EquipmentSlotType.values()) {
+				if (slot.getSlotType() == EquipmentSlotType.Type.ARMOR) {
 				items.get(element).put(slot, new HashMap<Integer, EnchantedArmor>());
 					for (int i = 0; i < 4; i++) {
 						if (!isArmorElement(element) && i != 3) {
@@ -160,7 +161,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	// UUIDs for magic potency modifiers
 	private static final UUID[] ARMOR_MAGICPOT_MODS = new UUID[] {UUID.fromString("85c5a784-4ee6-4e2d-ae1b-dd6d006ab724"), UUID.fromString("12fd1eae-bb2f-4e80-89db-38bef660c664"), UUID.fromString("3eea62eb-b9c1-4859-a4d6-35e2edbd4c49"), UUID.fromString("471dd1cf-9ba1-44ce-bba9-3cf9315d784c")};
 	
-	private static int calcArmor(EntityEquipmentSlot slot, EMagicElement element, int level) {
+	private static int calcArmor(EquipmentSlotType slot, EMagicElement element, int level) {
 		
 		// Ratio compared to BASE
 		// BASE is 14, 18, 22 for the whole set (with rounding errors)
@@ -223,7 +224,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 	
 	// Calcs magic resist, but as if it were armor which is base 20/25
-	private static float calcMagicResistBase(EntityEquipmentSlot slot, EMagicElement element, int level) {
+	private static float calcMagicResistBase(EquipmentSlotType slot, EMagicElement element, int level) {
 		
 		float mod;
 		// 14, 18, 22  BASE
@@ -282,7 +283,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return Math.max(1f, ((float) base * mod));
 	}
 	
-	private static final double calcMagicReduct(EntityEquipmentSlot slot, EMagicElement element, int level) {
+	private static final double calcMagicReduct(EquipmentSlotType slot, EMagicElement element, int level) {
 		// each piece will give (.1, .15, .25) of their type depending on level.
 		return (level == 0 ? .1 : (level == 1 ? .15 : .25));
 	}
@@ -350,12 +351,12 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return reduc;
 	}
 	
-	private static final double calcMagicSetReduct(EntityEquipmentSlot slot, EMagicElement armorElement, int setCount, EMagicElement targetElement) {
+	private static final double calcMagicSetReduct(EquipmentSlotType slot, EMagicElement armorElement, int setCount, EMagicElement targetElement) {
 		return calcMagicSetReductTotal(armorElement, setCount, targetElement) / setCount; // split evenly amonst all [setCount] pieces.
 		// COULD make different pieces make up bigger chunks of the pie but ehh
 	}
 	
-	private static int calcArmorDurability(EntityEquipmentSlot slot, EMagicElement element, int level) {
+	private static int calcArmorDurability(EquipmentSlotType slot, EMagicElement element, int level) {
 		float mod = 1f;
 		switch (element) {
 		case EARTH:
@@ -380,7 +381,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return (int) Math.floor(amt * mod);
 	}
 	
-	private static double calcArmorSpeedBoost(EntityEquipmentSlot slot, EMagicElement element, int level) {
+	private static double calcArmorSpeedBoost(EquipmentSlotType slot, EMagicElement element, int level) {
 		if (level < 3) {
 			return 0;
 		}
@@ -400,7 +401,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return 0;
 	}
 	
-	private static double calcArmorJumpBoost(EntityEquipmentSlot slot, EMagicElement element, int level) {
+	private static double calcArmorJumpBoost(EquipmentSlotType slot, EMagicElement element, int level) {
 		if (level < 3) {
 			return 0;
 		}
@@ -445,7 +446,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return total;
 	}
 	
-	private static double calcArmorMagicBoost(EntityEquipmentSlot slot, EMagicElement element, int setCount) {
+	private static double calcArmorMagicBoost(EquipmentSlotType slot, EMagicElement element, int setCount) {
 		return calcArmorMagicBoostTotal(element, setCount) / setCount;
 	}
 	
@@ -462,7 +463,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	@OnlyIn(Dist.CLIENT)
 	private static ModelEnchantedArmorBase armorModels[];
 	
-	public EnchantedArmor(String modelID, EntityEquipmentSlot type, EMagicElement element, int level) {
+	public EnchantedArmor(String modelID, EquipmentSlotType type, EMagicElement element, int level) {
 		super(ArmorMaterial.IRON, 0, type);
 		
 		this.level = level;
@@ -496,7 +497,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		
 		// Corrupted armors should also present the upgraded flight version
 		final boolean hasFlight = element == EMagicElement.ENDER || element == EMagicElement.EARTH || element == EMagicElement.FIRE || element == EMagicElement.PHYSICAL; 
-		if (!hasFlight && this.getEquipmentSlot() == EntityEquipmentSlot.CHEST) {
+		if (!hasFlight && this.getEquipmentSlot() == EquipmentSlotType.CHEST) {
 			ItemStack modStack = new ItemStack(this);
 			SetHasWingUpgrade(modStack, true);
 			subItems.add(modStack);
@@ -504,7 +505,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 	
 	@Override
-    public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
+    public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
         Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();	
 
         if (equipmentSlot == this.armorType)
@@ -570,7 +571,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		return !offense && NostrumMagica.rand.nextFloat() <= chancePer * (float) (Math.min(2, level) + 1);
 	}
 	
-	public static EnchantedArmor get(EMagicElement element, EntityEquipmentSlot slot, int level) {
+	public static EnchantedArmor get(EMagicElement element, EquipmentSlotType slot, int level) {
 		if (items.containsKey(element) && items.get(element).containsKey(slot))
 			return items.get(element).get(slot).get(level);
 		
@@ -587,7 +588,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type) {
+	public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlotType slot, String type) {
 		if (!(stack.getItem() instanceof EnchantedArmor)) {
 			return null;
 		}
@@ -603,7 +604,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public ModelBiped getArmorModel(LivingEntity entity, ItemStack stack, EntityEquipmentSlot slot, ModelBiped defaultModel) {
+	public ModelBiped getArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlotType slot, ModelBiped defaultModel) {
 		final int setCount = getSetPieces(entity);
 		final int index = (setCount - 1) + (this.level >= 3 ? 1 : 0); // Boost 1 if ultimate armor
 		ModelEnchantedArmorBase model = armorModels[index % armorModels.length];
@@ -616,7 +617,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		int count = 0;
 		
 		if (entity != null) {
-			for (EntityEquipmentSlot slot : new EntityEquipmentSlot[]{EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET}) {
+			for (EquipmentSlotType slot : new EquipmentSlotType[]{EquipmentSlotType.HEAD, EquipmentSlotType.CHEST, EquipmentSlotType.LEGS, EquipmentSlotType.FEET}) {
 				ItemStack inSlot = entity.getItemStackFromSlot(slot);
 				if (inSlot.isEmpty() || !(inSlot.getItem() instanceof EnchantedArmor)) {
 					continue;
@@ -666,8 +667,8 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		List<EnchantedArmor> list = new LinkedList<>();
 		
 		for (EMagicElement element : EMagicElement.values()) {
-			for (EntityEquipmentSlot slot : EntityEquipmentSlot.values())
-			if (slot.getSlotType() == EntityEquipmentSlot.Type.ARMOR) {
+			for (EquipmentSlotType slot : EquipmentSlotType.values())
+			if (slot.getSlotType() == EquipmentSlotType.Type.ARMOR) {
 				list.addAll(items.get(element).get(slot).values());
 			}
 		}
@@ -789,12 +790,12 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 	
 	protected void onServerTick(World world, PlayerEntity player, ItemStack stack, int setCount) {
-		if (setCount == 4 && this.level == 3 && this.armorType == EntityEquipmentSlot.CHEST) {
+		if (setCount == 4 && this.level == 3 && this.armorType == EquipmentSlotType.CHEST) {
 			if (element == EMagicElement.ICE) {
 				if (player.onGround && !ArmorCheckFlying(player)) {
 					final BlockPos pos = player.getPosition();
 					if (world.isAirBlock(pos)) {
-						IBlockState belowState = world.getBlockState(pos.down());
+						BlockState belowState = world.getBlockState(pos.down());
 						if (belowState.getMaterial().blocksMovement()) {
 							world.setBlockState(pos, Blocks.SNOW_LAYER.getDefaultState());
 						}
@@ -854,20 +855,20 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 	
 	// hacky little map to avoid thrashing attributes every tick
-	protected static final Map<LivingEntity, Map<EntityEquipmentSlot, ItemStack>> LastEquipState = new HashMap<>();
+	protected static final Map<LivingEntity, Map<EquipmentSlotType, ItemStack>> LastEquipState = new HashMap<>();
 	
-	protected static Map<EntityEquipmentSlot, ItemStack> GetLastTickState(LivingEntity entity) {
-		Map<EntityEquipmentSlot, ItemStack> map = LastEquipState.get(entity);
+	protected static Map<EquipmentSlotType, ItemStack> GetLastTickState(LivingEntity entity) {
+		Map<EquipmentSlotType, ItemStack> map = LastEquipState.get(entity);
 		if (map == null) {
-			map = new NonNullEnumMap<>(EntityEquipmentSlot.class, ItemStack.EMPTY);
+			map = new NonNullEnumMap<>(EquipmentSlotType.class, ItemStack.EMPTY);
 			LastEquipState.put(entity, map);
 		}
 		return map;
 	}
 	
 	protected static boolean EntityChangedEquipment(LivingEntity entity) {
-		Map<EntityEquipmentSlot, ItemStack> map = GetLastTickState(entity);
-		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
+		Map<EquipmentSlotType, ItemStack> map = GetLastTickState(entity);
+		for (EquipmentSlotType slot : EquipmentSlotType.values()) {
 			if (slot.getSlotType() != Type.ARMOR) {
 				continue;
 			}
@@ -884,7 +885,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 	
 	public static final boolean EntityHasEnchantedArmor(LivingEntity entity) {
-		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
+		for (EquipmentSlotType slot : EquipmentSlotType.values()) {
 			if (slot.getSlotType() != Type.ARMOR) {
 				continue;
 			}
@@ -914,10 +915,10 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		if (EntityChangedEquipment(entity)) {
 			// Figure out attributes and set.
 			// Also capture current armor status and cache it.
-			Map<EntityEquipmentSlot, ItemStack> cacheMap = new EnumMap<>(EntityEquipmentSlot.class);
+			Map<EquipmentSlotType, ItemStack> cacheMap = new EnumMap<>(EquipmentSlotType.class);
 			Multimap<String, AttributeModifier> attribMap = HashMultimap.<String, AttributeModifier>create();	
 
-			for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
+			for (EquipmentSlotType slot : EquipmentSlotType.values()) {
 				if (slot.getSlotType() != Type.ARMOR) {
 					continue;
 				}
@@ -968,7 +969,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		
 		// Check for world-changing full set bonuses
 		// Note: Cheat and just look at helm. if helm isn't right, full set isn't set anyways
-		@Nonnull ItemStack helm = entity.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
+		@Nonnull ItemStack helm = entity.getItemStackFromSlot(EquipmentSlotType.HEAD);
 		if (!helm.isEmpty() && helm.getItem() instanceof EnchantedArmor) {
 			EnchantedArmor type = (EnchantedArmor) helm.getItem();
 			final int setCount = GetSetPieces(entity, type);
@@ -1036,7 +1037,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		
 		final int setCount = GetSetCount(entity, element, level);
 		
-		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
+		for (EquipmentSlotType slot : EquipmentSlotType.values()) {
 			if (slot.getSlotType() != Type.ARMOR) {
 				continue;
 			}
@@ -1172,7 +1173,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 	
 	protected boolean hasElytra(LivingEntity entity) {
-		if (this.level == 3 && this.armorType == EntityEquipmentSlot.CHEST) {
+		if (this.level == 3 && this.armorType == EquipmentSlotType.CHEST) {
 			// Check if full set is available
 			return (4 == getSetPieces(entity)); 
 		}
@@ -1201,7 +1202,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	protected static final int EARTH_GROW_COST = 5;
 	
 	protected boolean hasManaJump(LivingEntity entity) {
-		if (this.level == 3 && this.armorType == EntityEquipmentSlot.CHEST) {
+		if (this.level == 3 && this.armorType == EquipmentSlotType.CHEST) {
 			// Check if full set is available and if we have enough mana
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
 			if (attr == null || attr.getMana() < MANA_JUMP_COST) {
@@ -1213,7 +1214,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 	
 	protected boolean hasWindTornado(LivingEntity entity) {
-		if (this.level == 3 && this.armorType == EntityEquipmentSlot.CHEST && this.element == EMagicElement.WIND) {
+		if (this.level == 3 && this.armorType == EquipmentSlotType.CHEST && this.element == EMagicElement.WIND) {
 			// Check if full set is available and if we have enough mana
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
 			if (attr == null || attr.getMana() < WIND_TORNADO_COST) {
@@ -1225,7 +1226,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 	
 	protected boolean hasEnderDash(LivingEntity entity) {
-		if (this.level == 3 && this.armorType == EntityEquipmentSlot.CHEST && this.element == EMagicElement.ENDER) {
+		if (this.level == 3 && this.armorType == EquipmentSlotType.CHEST && this.element == EMagicElement.ENDER) {
 			// Check if full set is available and if we have enough mana
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
 			if (attr == null || attr.getMana() < ENDER_DASH_COST) {
@@ -1237,10 +1238,10 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 	
 	protected boolean hasDragonFlight(LivingEntity entity) {
-		if (this.level == 3 && this.armorType == EntityEquipmentSlot.CHEST) {
+		if (this.level == 3 && this.armorType == EquipmentSlotType.CHEST) {
 			boolean hasRightElement = element == EMagicElement.ENDER || element == EMagicElement.EARTH || element == EMagicElement.FIRE || element == EMagicElement.PHYSICAL;
 			if (!hasRightElement) {
-				ItemStack chest = entity.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
+				ItemStack chest = entity.getItemStackFromSlot(EquipmentSlotType.CHEST);
 				hasRightElement = EnchantedArmor.GetHasWingUpgrade(chest);
 			}
 			if (hasRightElement) {
@@ -1657,22 +1658,22 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	private static final String NBT_WING_UPGRADE = "dragonwing_upgrade";
 	
 	public static final void SetHasWingUpgrade(ItemStack stack, boolean upgraded) {
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null) {
 			nbt = new CompoundNBT();
 		}
 		
 		nbt.putBoolean(NBT_WING_UPGRADE, upgraded);
 		
-		stack.setTagCompound(nbt);
+		stack.setTag(nbt);
 	}
 	
 	public static final boolean GetHasWingUpgrade(ItemStack stack) {
 		return !stack.isEmpty()
 				&& stack.getItem() instanceof EnchantedArmor
-				&& ((EnchantedArmor) stack.getItem()).getEquipmentSlot() == EntityEquipmentSlot.CHEST
-				&& stack.hasTagCompound()
-				&& stack.getTagCompound().getBoolean(NBT_WING_UPGRADE);
+				&& ((EnchantedArmor) stack.getItem()).getEquipmentSlot() == EquipmentSlotType.CHEST
+				&& stack.hasTag()
+				&& stack.getTag().getBoolean(NBT_WING_UPGRADE);
 	}
 	
 	private static final boolean DoEnderDash(LivingEntity entity, Vec3d dir) {
@@ -1719,7 +1720,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		MutableBlockPos cursor = new MutableBlockPos();
 		for (BlockPos offset : EARTH_SCAN_POS) {
 			cursor.setPos(center.getX() + offset.getX(), center.getY() + offset.getY(), center.getZ() + offset.getZ());
-			IBlockState state = world.getBlockState(cursor);
+			BlockState state = world.getBlockState(cursor);
 			if (state != null && state.getBlock() instanceof IGrowable) {
 				IGrowable growable = (IGrowable) state.getBlock();
 				if (!(growable instanceof BlockCrops) && !(growable instanceof BlockSapling)) {
@@ -1754,7 +1755,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			return false;
 		}
 		
-		IBlockState state = world.getBlockState(pos);
+		BlockState state = world.getBlockState(pos);
 		if (state == null) {
 			return false;
 		}
@@ -1798,7 +1799,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 			state.getBlock().getDrops(drops, world, at, state, 0); // Fortune?
 			world.destroyBlock(at, false);
 			for (ItemStack stack : drops) {
-				world.spawnEntity(new EntityItem(world, at.getX() + .5, at.getY() + .5, at.getZ() + .5, stack));
+				world.spawnEntity(new ItemEntity(world, at.getX() + .5, at.getY() + .5, at.getZ() + .5, stack));
 			}
 		}
 		
@@ -1806,7 +1807,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 	}
 	
 	public static final void HandleStateUpdate(ArmorState state, LivingEntity ent, boolean data) {
-		ItemStack chest = ent.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
+		ItemStack chest = ent.getItemStackFromSlot(EquipmentSlotType.CHEST);
 		if (chest.isEmpty() || !(chest.getItem() instanceof EnchantedArmor)) {
 			return;
 		}
@@ -1980,7 +1981,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		}
 
 		LivingEntity ent = event.getEntityLiving();
-		@Nonnull ItemStack chestplate = ent.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
+		@Nonnull ItemStack chestplate = ent.getItemStackFromSlot(EquipmentSlotType.CHEST);
 		if (chestplate.isEmpty() || !(chestplate.getItem() instanceof EnchantedArmor)) {
 			return;
 		}
@@ -2000,7 +2001,7 @@ public class EnchantedArmor extends ItemArmor implements EnchantedEquipment, ISp
 		}
 
 		LivingEntity ent = event.getEntityLiving();
-		@Nonnull ItemStack chestplate = ent.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
+		@Nonnull ItemStack chestplate = ent.getItemStackFromSlot(EquipmentSlotType.CHEST);
 		if (chestplate.isEmpty() || !(chestplate.getItem() instanceof EnchantedArmor)) {
 			return;
 		}

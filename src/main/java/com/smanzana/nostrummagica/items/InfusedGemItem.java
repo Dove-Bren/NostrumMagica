@@ -2,7 +2,6 @@ package com.smanzana.nostrummagica.items;
 
 import javax.annotation.Nonnull;
 
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.AltarBlock;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
@@ -13,20 +12,15 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * One for each element, except physical
@@ -35,33 +29,16 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  */
 public class InfusedGemItem extends Item implements ILoreTagged {
 
-	public static final String ID = "nostrum_gem";
-	
-	private static InfusedGemItem instance = null;
-	public static InfusedGemItem instance() {
-		if (instance == null)
-			instance = new InfusedGemItem();
-		
-		return instance;
+	public static final String ID_PREFIX = "nostrum_gem_";
+	public static final String MakeID(EMagicElement element) {
+		return ID_PREFIX + element.getName().toLowerCase();
 	}
 	
-	public InfusedGemItem() {
-		super();
-		this.setUnlocalizedName(ID);
-		this.setRegistryName(NostrumMagica.MODID, InfusedGemItem.ID);
-		this.setMaxDamage(0);
-		this.setMaxStackSize(16);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setHasSubtypes(true);
-	}
+	protected final EMagicElement element;
 	
-	@Override
-	public String getUnlocalizedName(ItemStack stack) {
-		int i = stack.getMetadata();
-		
-		String suffix = getNameFromMeta(i);
-		
-		return this.getUnlocalizedName() + "." + suffix;
+	public InfusedGemItem(EMagicElement element) {
+		super(NostrumItems.PropLowStack());
+		this.element = element;
 	}
 	
 	/**
@@ -71,55 +48,48 @@ public class InfusedGemItem extends Item implements ILoreTagged {
 	 * @param count
 	 * @return
 	 */
-	public ItemStack getGem(EMagicElement element, int count) {
-		int meta = 0;
-		if (element != null && element != EMagicElement.PHYSICAL)
-			meta = element.ordinal() + 1;
+	public static ItemStack getGem(EMagicElement element, int count) {
+		if (element == null) {
+			element = EMagicElement.PHYSICAL;
+		}
 		
-		return new ItemStack(this, count, meta);
+		InfusedGemItem gem = null;
+		switch (element) {
+		case EARTH:
+			gem = NostrumItems.infusedGemEarth;
+			break;
+		case ENDER:
+			gem = NostrumItems.infusedGemEnder;
+			break;
+		case FIRE:
+			gem = NostrumItems.infusedGemFire;
+			break;
+		case ICE:
+			gem = NostrumItems.infusedGemIce;
+			break;
+		case LIGHTNING:
+			gem = NostrumItems.infusedGemLightning;
+			break;
+		case PHYSICAL:
+			gem = NostrumItems.infusedGemUnattuned;
+			break;
+		case WIND:
+			gem = NostrumItems.infusedGemWind;
+			break;
+		}
+		
+		return new ItemStack(gem, count);
 	}
 	
-	/**
-     * returns a list of items with the same ID, but different meta (eg: dye returns 16 items)
-     */
-    @OnlyIn(Dist.CLIENT)
-    @Override
-	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-    	if (this.isInCreativeTab(tab)) {
-	    	subItems.add(new ItemStack(this, 1, 0));
-	    	for (EMagicElement type : EMagicElement.values()) {
-	    		if (type == EMagicElement.PHYSICAL)
-	    			continue;
-	    		subItems.add(new ItemStack(this, 1, type.ordinal() + 1));
-	    	}
-    	}
-	}
-    
-    public int getMetaFromElement(EMagicElement element) {
-    	return element.ordinal() + 1;
-    }
-    
-    public String getNameFromMeta(int meta) {
-    	String suffix = "basic";
-		
-    	EMagicElement type = getTypeFromMeta(meta);
-    	if (type != null)
-    		suffix = type.name().toLowerCase();
-    	
-		return suffix;
-    }
-    
-    public EMagicElement getTypeFromMeta(int meta) {
-    	EMagicElement ret = null;
-    	for (EMagicElement type : EMagicElement.values()) {
-			if (type.ordinal() + 1 == meta) {
-				ret = type;
-				break;
-			}
-		}
-    	
-    	return ret;
-    }
+//    public String getNameFromMeta(int meta) {
+//    	String suffix = "basic";
+//		
+//    	EMagicElement type = getTypeFromMeta(meta);
+//    	if (type != null)
+//    		suffix = type.name().toLowerCase();
+//    	
+//		return suffix;
+//    }
     
     @Override
 	public String getLoreKey() {
@@ -143,39 +113,40 @@ public class InfusedGemItem extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public EnumActionResult onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, EnumHand hand, Direction facing, float hitX, float hitY, float hitZ) {
+	public ActionResultType onItemUse(ItemUseContext context) {
 		//if (worldIn.isRemote)
-			//return EnumActionResult.SUCCESS;
+			//return ActionResultType.SUCCESS;
 		
-		final @Nonnull ItemStack stack = playerIn.getHeldItem(hand);
-		IBlockState state = worldIn.getBlockState(pos);
+		final PlayerEntity playerIn = context.getPlayer();
+		final BlockPos pos = context.getPos();
+		final @Nonnull ItemStack stack = context.getItem();
+		final World worldIn = context.getWorld();
+		BlockState state = worldIn.getBlockState(pos);
 		if (state.getBlock() == null)
-			return EnumActionResult.PASS;
-		
-		EMagicElement element = getTypeFromMeta(stack.getMetadata());
+			return ActionResultType.PASS;
 		
 		TileEntity te = worldIn.getTileEntity(pos);
 		if (state.getBlock() instanceof Candle) {
 			if (!(te instanceof CandleTileEntity))
-				return EnumActionResult.PASS;
+				return ActionResultType.PASS;
 			
  			if (RitualRegistry.attemptRitual(worldIn, pos, playerIn, element)) {
  				stack.shrink(1);
  			}
  			
-			return EnumActionResult.SUCCESS;
+			return ActionResultType.SUCCESS;
 		} else if (state.getBlock() instanceof AltarBlock) {
 			if (!(te instanceof AltarTileEntity))
-				return EnumActionResult.PASS;
+				return ActionResultType.PASS;
 			
 			if (RitualRegistry.attemptRitual(worldIn, pos, playerIn, element)) {
 				stack.shrink(1);
 			}
 			
-			return EnumActionResult.SUCCESS;
+			return ActionResultType.SUCCESS;
 		}
 		
-        return EnumActionResult.PASS;
+        return ActionResultType.PASS;
 	}
 
 	@Override

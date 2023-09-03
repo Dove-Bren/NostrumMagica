@@ -5,7 +5,7 @@ import java.util.Random;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -18,7 +18,7 @@ public class NostrumFlowerGenerator implements IWorldGenerator {
 
 	private static class WorldGenNostrumFlowers extends WorldGenerator {
 		
-		private IBlockState flowerState;
+		private BlockState flowerState;
 		
 		public WorldGenNostrumFlowers(NostrumMagicaFlower.Type type) {
 			flowerState = NostrumMagicaFlower.instance().getState(type);

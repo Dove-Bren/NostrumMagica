@@ -8,7 +8,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAreaEffectCloud;
 import net.minecraft.entity.LivingEntity;
@@ -314,7 +314,7 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
         if (this.doesVerticalSteps()) {
         	while (true) {
         		pos.setPos(this.getPosition());
-        		IBlockState state = world.getBlockState(pos);
+        		BlockState state = world.getBlockState(pos);
 	        	if (state == null || !state.getMaterial().blocksMovement()) {
 	        		
 	        		if (state == null || !this.getWalksWater() || !state.getMaterial().isLiquid()) {
@@ -338,7 +338,7 @@ public class EntityAreaEffect extends EntityAreaEffectCloud {
         	double left = this.gravitySpeed;
         	while (posY > 1 && left > 0) {
         		pos.setPos(posX, posY - 1, posZ);
-        		IBlockState state = world.getBlockState(pos);
+        		BlockState state = world.getBlockState(pos);
 	        	if (state != null && state.getMaterial().blocksMovement()) {
 	        		// Done
 	        		break;

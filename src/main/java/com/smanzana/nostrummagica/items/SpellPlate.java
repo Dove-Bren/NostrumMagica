@@ -3,27 +3,25 @@ package com.smanzana.nostrummagica.items;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Rarity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.util.Constants.NBT;
 
 public class SpellPlate extends Item implements ILoreTagged {
 
@@ -37,62 +35,47 @@ public class SpellPlate extends Item implements ILoreTagged {
 	private static final String NBT_ENHANCEMENT_LEVEL = "";
 	private static final String NBT_ENHANCEMENT_TYPE = "";
 	
-	private static SpellPlate instance = null;
+	public static final String ID_PREFIX = "spelltomeplate_";
 	
-	public static SpellPlate instance() {
-		if (instance == null)
-			instance = new SpellPlate();
-		
-		return instance;
+	private final SpellTome.TomeStyle style;
+	
+	private SpellPlate(SpellTome.TomeStyle style) {
+		super(NostrumItems.PropTomeUnstackable().rarity(Rarity.UNCOMMON));
+		this.style = style;
 	}
 	
-	public static final String id = "spelltomeplate";
-	
-	private SpellPlate() {
-		super();
-		this.setUnlocalizedName(id);
-		this.setRegistryName(NostrumMagica.MODID, SpellPlate.id);
-		this.setCreativeTab(NostrumMagica.enhancementTab); // set as icon for tab
-		this.setMaxStackSize(1);
+	public SpellTome.TomeStyle getStyle() {
+		return style;
 	}
 	
-	public static @Nonnull ItemStack getItemstack(int type, int capacity,
-			SpellTomeEnhancementWrapper ... enhancements) {
-		type = type % SpellTome.MAX_TOME_COUNT;
-		ItemStack stack = new ItemStack(instance, 1, type);
-		
-		CompoundNBT nbt = stack.getTagCompound();
-		
-		if (nbt == null)
-			nbt = new CompoundNBT();
-		
-		nbt.putInt(NBT_CAPACITY, capacity);
-		if (enhancements != null && enhancements.length > 0) {
-			ListNBT list = new ListNBT();
-			for (SpellTomeEnhancementWrapper enhance : enhancements) {
-				CompoundNBT tag = new CompoundNBT();
-				tag.putString(NBT_ENHANCEMENT_TYPE, enhance.getEnhancement().getTitleKey());
-				tag.putInt(NBT_ENHANCEMENT_LEVEL, enhance.getLevel());
-				list.add(tag);
-			}
-			
-			nbt.put(NBT_ENHANCEMENTS, list);
+	public static SpellPlate GetPlateForStyle(SpellTome.TomeStyle style) {
+		SpellPlate plate = null;
+		switch (style) {
+		case ADVANCED:
+			plate = NostrumItems.spellPlateAdvanced;
+			break;
+		case COMBAT:
+			plate = NostrumItems.spellPlateCombat;
+			break;
+		case DEATH:
+			plate = NostrumItems.spellPlateDeath;
+			break;
+		case LIVING:
+			plate = NostrumItems.spellPlateLiving;
+			break;
+		case MUTED:
+			plate = NostrumItems.spellPlateMuted;
+			break;
+		case NOVICE:
+			plate = NostrumItems.spellPlateNovice;
+			break;
+		case SPOOKY:
+			plate = NostrumItems.spellPlateSpooky;
+			break;
 		}
-		
-		stack.setTagCompound(nbt);
-		return stack;
+		return plate;
 	}
 	
-	@Override
-	@OnlyIn(Dist.CLIENT)
-	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-		if (this.isInCreativeTab(tab)) {
-			for (int i = 0; i < SpellTome.MAX_TOME_COUNT; i++) {
-				subItems.add(getItemstack(i, 10));
-			}
-		}
-	}
-
 	@Override
 	public String getLoreKey() {
 		return "nostrum_spelltome_plate";
@@ -115,17 +98,18 @@ public class SpellPlate extends Item implements ILoreTagged {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		int capacity = getCapacity(stack);
-		tooltip.add(I18n.format("info.tome.capacity", new Object[] {capacity}));
+		tooltip.add(new TranslationTextComponent("info.tome.capacity", capacity));
 		
 		List<SpellTomeEnhancementWrapper> enhancements = getEnhancements(stack);
 		if (enhancements != null && !enhancements.isEmpty()) {
-			tooltip.add("");
+			tooltip.add(new StringTextComponent(""));
 			for (SpellTomeEnhancementWrapper enhance : enhancements) {
-				tooltip.add(I18n.format(
-						enhance.getEnhancement().getNameFormat(), new Object[0])
-						+ " " + toRoman(enhance.getLevel()));
+				tooltip.add(
+						new TranslationTextComponent(enhance.getEnhancement().getNameFormat())
+						.appendSibling(new StringTextComponent(" " + toRoman(enhance.getLevel())))
+				);
 			}
 		}
 	}
@@ -204,26 +188,26 @@ public class SpellPlate extends Item implements ILoreTagged {
 		if (stack .isEmpty() || !(stack.getItem() instanceof SpellPlate))
 			return 0;
 		
-		if (!stack.hasTagCompound())
+		if (!stack.hasTag())
 			return 0;
 		
-		return stack.getTagCompound().getInteger(NBT_CAPACITY);
+		return stack.getTag().getInt(NBT_CAPACITY);
 	}
 	
 	public static List<SpellTomeEnhancementWrapper> getEnhancements(ItemStack stack) {
 		if (stack.isEmpty() || !(stack.getItem() instanceof SpellPlate))
 			return null;
 		
-		if (!stack.hasTagCompound())
+		if (!stack.hasTag())
 			return null;
 		
 		List<SpellTomeEnhancementWrapper> enhancements = new LinkedList<>();
-		ListNBT list = stack.getTagCompound().getTagList(NBT_ENHANCEMENTS, NBT.TAG_COMPOUND);
-		if (list == null || list.hasNoTags())
+		ListNBT list = stack.getTag().getList(NBT_ENHANCEMENTS, NBT.TAG_COMPOUND);
+		if (list == null || list.isEmpty())
 			return enhancements;
 		
 		for (int i = 0; i < list.size(); i++) {
-			CompoundNBT tag = list.getCompoundTagAt(i);
+			CompoundNBT tag = list.getCompound(i);
 			String key = tag.getString(NBT_ENHANCEMENT_TYPE);
 			SpellTomeEnhancement enhance = SpellTomeEnhancement.lookupEnhancement(key);
 			if (enhance == null)

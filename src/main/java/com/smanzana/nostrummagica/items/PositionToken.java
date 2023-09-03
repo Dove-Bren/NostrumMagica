@@ -12,18 +12,20 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -36,20 +38,9 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class PositionToken extends PositionCrystal {
 
 	public static final String ID = "nostrum_pos_token";
-
-	private static PositionToken instance = null;
-
-	public static PositionToken instance() {
-		if (instance == null)
-			instance = new PositionToken();
-	
-		return instance;
-
-	}
 	
 	public PositionToken() {
-		super(ID);
-		this.setUnlocalizedName(ID);
+		super();
 	}
 	
 	protected static boolean hasRecallUnlocked(PlayerEntity playerIn, World worldIn, ItemStack token) {
@@ -78,7 +69,7 @@ public class PositionToken extends PositionCrystal {
 		return pos != null
 				&& hasRecallUnlocked(playerIn, worldIn, token)
 				&& canAffordRecall(playerIn, worldIn, token)
-				&& dim == playerIn.dimension;
+				&& dim == playerIn.dimension.getId();
 	}
 	
 	protected boolean doRecall(PlayerEntity playerIn, World worldIn, ItemStack token) {
@@ -99,34 +90,38 @@ public class PositionToken extends PositionCrystal {
 	}
 	
 	@Override
-	public EnumActionResult onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, EnumHand hand, Direction facing, float hitX, float hitY, float hitZ) {
+	public ActionResultType onItemUse(ItemUseContext context) {
+		final World worldIn = context.getWorld();
+		BlockPos pos = context.getPos();
+		final PlayerEntity playerIn = context.getPlayer();
+		
 		if (worldIn.isRemote)
-			return EnumActionResult.SUCCESS;
+			return ActionResultType.SUCCESS;
 		
 		if (pos == null || playerIn.isSneaking() || !playerIn.isCreative())
-			return EnumActionResult.PASS;
+			return ActionResultType.PASS;
 		
-		IBlockState state = worldIn.getBlockState(pos);
+		BlockState state = worldIn.getBlockState(pos);
 		while (state.getBlock() instanceof ObeliskPortal) {
 			pos = pos.down();
 			state = worldIn.getBlockState(pos);
 		}
-		setPosition(playerIn.getHeldItem(hand), playerIn.dimension, pos);
-		return EnumActionResult.SUCCESS;
+		setPosition(context.getItem(), playerIn.dimension.getId(), pos);
+		return ActionResultType.SUCCESS;
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
 		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		if (PositionToken.hasRecallUnlocked(playerIn, worldIn, itemStackIn)) {
 			if (!worldIn.isRemote) {
 				doRecall(playerIn, worldIn, itemStackIn);
 			}
-			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 		} else if (playerIn.isCreative()) {
-			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 		}
-		return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
+		return new ActionResult<ItemStack>(ActionResultType.PASS, itemStackIn);
 	}
 
 	@Override
@@ -159,7 +154,7 @@ public class PositionToken extends PositionCrystal {
 		if (pos == null)
 			return null;
 		
-		ItemStack ret = new ItemStack(instance(), tokenCount);
+		ItemStack ret = new ItemStack(NostrumItems.positionToken, tokenCount);
 		
 		setPosition(ret, dim, pos);
 		
@@ -167,7 +162,7 @@ public class PositionToken extends PositionCrystal {
 	}
 	
 	@Override
-	public boolean onEntityItemUpdate(EntityItem entityItem) {
+	public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entityItem) {
 		if (entityItem.world.isRemote)
 			return false;
 			
@@ -178,14 +173,14 @@ public class PositionToken extends PositionCrystal {
 			if (pos.equals(storedPos))
 				return false;
 			
-			IBlockState state = entityItem.world.getBlockState(pos);
+			BlockState state = entityItem.world.getBlockState(pos);
 			if (state != null && state.getBlock() instanceof NostrumObelisk && NostrumObelisk.blockIsMaster(state)) {
 				TileEntity ent = entityItem.world.getTileEntity(pos);
 				if (ent != null && ent instanceof NostrumObeliskEntity) {
 					NostrumObeliskEntity obelisk = ((NostrumObeliskEntity) ent);
 					if (obelisk.canAcceptTarget(storedPos)) {
 						if (entityItem.getItem().hasDisplayName()) {
-							obelisk.addTarget(storedPos, entityItem.getItem().getDisplayName());
+							obelisk.addTarget(storedPos, entityItem.getItem().getDisplayName().getFormattedText());
 						} else {
 							obelisk.addTarget(storedPos);
 						}
@@ -195,7 +190,7 @@ public class PositionToken extends PositionCrystal {
 								pos.getY(),
 								pos.getZ()
 								);
-						entityItem.setDead();
+						entityItem.remove();
 						return true;
 					}
 				}
@@ -207,15 +202,15 @@ public class PositionToken extends PositionCrystal {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		super.addInformation(stack, worldIn, tooltip, flagIn);
 		
 		if (hasRecallUnlocked(NostrumMagica.proxy.getPlayer(), worldIn, stack)) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(NostrumMagica.proxy.getPlayer());
 			if (attr != null && attr.hasEnhancedTeleport()) {
-				tooltip.add(I18n.format("info.geotoken.recall_enhanced", new Object[0]));
+				tooltip.add(new TranslationTextComponent("info.geotoken.recall_enhanced"));
 			} else {
-				tooltip.add(I18n.format("info.geotoken.recall", new Object[0]));
+				tooltip.add(new TranslationTextComponent("info.geotoken.recall"));
 			}
 			
 			

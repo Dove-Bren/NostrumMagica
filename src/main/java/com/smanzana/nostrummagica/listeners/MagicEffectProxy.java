@@ -333,7 +333,7 @@ public class MagicEffectProxy {
 			if (data != null) {
 				target.attackEntityFrom(new MagicDamageSource(living, data.element), 
 						SpellAction.calcDamage(living, target, (float) data.amt, data.element));
-				target.setEntityInvulnerable(false);
+				target.setInvulnerable(false);
 				target.hurtResistantTime = 0;
 				
 				NostrumMagicaSounds.MELT_METAL.play(target);

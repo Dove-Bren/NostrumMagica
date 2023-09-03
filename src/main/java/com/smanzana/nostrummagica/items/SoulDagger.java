@@ -16,91 +16,81 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.IStabbableEntity;
-import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.potions.NostrumTransformationPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
+import com.smanzana.nostrummagica.utils.ItemStacks;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.passive.EntityWolf;
+import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.EnumAction;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemSword;
+import net.minecraft.item.ItemTier;
+import net.minecraft.item.SwordItem;
+import net.minecraft.item.UseAction;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvents;
+import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
+public class SoulDagger extends SwordItem implements ILoreTagged, ISpellArmor {
 
-	public static String ID = "soul_dagger";
+	public static final String ID = "soul_dagger";
 	private static final int USE_DURATION = 30; // In ticks
 	
-	private static SoulDagger instance = null;
-
-	public static SoulDagger instance() {
-		if (instance == null)
-			instance = new SoulDagger();
-	
-		return instance;
-
-	}
-
 	public SoulDagger() {
-		super(ToolMaterial.IRON);
-		this.setMaxDamage(500);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setMaxStackSize(1);
-		this.setUnlocalizedName(ID);
-		this.setRegistryName(NostrumMagica.MODID, ID);
+		super(ItemTier.IRON, 3, -2.4F, NostrumItems.PropEquipment().maxDamage(500));
 		
 		this.addPropertyOverride(new ResourceLocation("charge"), new IItemPropertyGetter() {
 			@OnlyIn(Dist.CLIENT)
-			public float apply(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
+			public float call(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
 				if (entityIn == null) {
 					return 0.0F;
 				} else {
-					return !(entityIn.getActiveItemStack().getItem() instanceof SoulDagger) ? 0.0F : (float)(stack.getMaxItemUseDuration() - entityIn.getItemInUseCount()) / USE_DURATION;
+					return !(entityIn.getActiveItemStack().getItem() instanceof SoulDagger) ? 0.0F : (float)(stack.getUseDuration() - entityIn.getItemInUseCount()) / USE_DURATION;
 				}
 			}
 		});
 		this.addPropertyOverride(new ResourceLocation("charging"), new IItemPropertyGetter() {
 			@OnlyIn(Dist.CLIENT)
-			public float apply(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
+			public float call(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
 				return entityIn != null && entityIn.isHandActive() && entityIn.getActiveItemStack() == stack ? 1.0F : 0.0F;
 			}
 		});
 	}
 	
 	@Override
-	public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
+	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
         Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
 
-        if (equipmentSlot == EntityEquipmentSlot.MAINHAND)
+        if (equipmentSlot == EquipmentSlotType.MAINHAND)
         {
-            multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 3, 0));
-            multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2D, 0));
+            multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 3, AttributeModifier.Operation.ADDITION));
+            multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2D, AttributeModifier.Operation.ADDITION));
         }
 
         return multimap;
@@ -134,8 +124,7 @@ public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
 	
 	@Override
 	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return !repair.isEmpty() && repair.getItem() == NostrumResourceItem.instance()
-        		&& NostrumResourceItem.getTypeFromMeta(repair.getMetadata()) == ResourceType.CRYSTAL_SMALL;
+        return !repair.isEmpty() && repair.getItem() == NostrumItems.crystalSmall;
     }
 
 	@Override
@@ -147,31 +136,31 @@ public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		super.addInformation(stack, worldIn, tooltip, flagIn);
 //		tooltip.add("Magic Potency Bonus: 20%");
-		tooltip.add("Mana Cost Reduction: 5%");
-		tooltip.add(I18n.format("item.soul_dagger.desc"));
+		tooltip.add(new StringTextComponent("Mana Cost Reduction: 5%"));
+		tooltip.add(new TranslationTextComponent("item.soul_dagger.desc"));
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
 		final ItemStack held = playerIn.getHeldItem(hand);
 		if (playerIn.isSneaking()) {
 			playerIn.setActiveHand(hand);
-			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, held);
+			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, held);
 		}
 			
-		return new ActionResult<ItemStack>(EnumActionResult.PASS, held);
+		return new ActionResult<ItemStack>(ActionResultType.PASS, held);
 	}
 	
 	@Override
-	public EnumAction getItemUseAction(ItemStack stack) {
-		return EnumAction.BOW;
+	public UseAction getUseAction(ItemStack stack) {
+		return UseAction.BOW;
 	}
 	
 	@Override
-	public int getMaxItemUseDuration(ItemStack stack) {
+	public int getUseDuration(ItemStack stack) {
 		return 270000;
 	}
 	
@@ -179,7 +168,7 @@ public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
 	public void onPlayerStoppedUsing(ItemStack stack, World worldIn, LivingEntity entityLiving, int timeLeft) {
 		
 		// Only do something if enough time has passed
-		final int duration = stack.getMaxItemUseDuration() - timeLeft;
+		final int duration = stack.getUseDuration() - timeLeft;
 		if (worldIn.isRemote || duration < USE_DURATION) {
 			return;
 		}
@@ -187,7 +176,7 @@ public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
 		// Do forward attack
 		//vfx
 		{
-			NostrumMagicaSounds.HEAVY_STRIKE.play(null, entityLiving.world, entityLiving.getPositionVector().addVector(0f, entityLiving.getEyeHeight(), 0).add(entityLiving.getLook(.5f)));
+			NostrumMagicaSounds.HEAVY_STRIKE.play(null, entityLiving.world, entityLiving.getPositionVector().add(0f, entityLiving.getEyeHeight(), 0).add(entityLiving.getLook(.5f)));
 		}
 		// actual effects
 		{
@@ -196,7 +185,7 @@ public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
 				// Just find and stab first
 				if (target != null) {
 					stabTarget(entityLiving, target, stack);
-					stack.damageItem(1, entityLiving);
+					ItemStacks.damageItem(stack, entityLiving, entityLiving.getHeldItemMainhand() == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
 					return;
 				}
 			}
@@ -205,15 +194,21 @@ public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
 	
 	protected List<LivingEntity> findStabTargets(World worldIn, LivingEntity wielder, ItemStack dagger) {
 		float extent = 3f;
-		RayTraceResult mop = RayTrace.raytrace(wielder.world, wielder.getEyePosition(.5f), wielder.getLook(.5f), extent, new RayTrace.OtherLiving(wielder));
-		if (mop == null || NostrumMagica.resolveEntityLiving(mop.entityHit) == null) {
+		RayTraceResult mop = RayTrace.raytrace(wielder.world, wielder, wielder.getEyePosition(.5f), wielder.getLook(.5f), extent, new RayTrace.OtherLiving(wielder));
+		if (mop == null || mop.getType() != RayTraceResult.Type.ENTITY) {
 			return new ArrayList<>();
 		} else {
-			return Lists.newArrayList(NostrumMagica.resolveEntityLiving(mop.entityHit));
+			EntityRayTraceResult entResult = (EntityRayTraceResult) mop;
+			LivingEntity living = NostrumMagica.resolveEntityLiving(entResult.getEntity());
+			if (living == null) {
+				return new ArrayList<>();
+			} else {
+				return Lists.newArrayList(living);
+			}
 		}
 	}
 	
-	protected boolean doSpecialWolfStab(LivingEntity stabber, EntityWolf wolf, ItemStack dagger) {
+	protected boolean doSpecialWolfStab(LivingEntity stabber, WolfEntity wolf, ItemStack dagger) {
 		if (wolf.getActivePotionEffect(NostrumTransformationPotion.instance()) != null
 				&& stabber instanceof PlayerEntity
 				&& wolf.isOwner(stabber)) {
@@ -235,8 +230,8 @@ public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
 			}
 		}
 		
-		if (target instanceof EntityWolf) {
-			if (doSpecialWolfStab(attacker, (EntityWolf) target, dagger)) {
+		if (target instanceof WolfEntity) {
+			if (doSpecialWolfStab(attacker, (WolfEntity) target, dagger)) {
 				return true;
 			}
 		}
@@ -286,13 +281,13 @@ public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
 		
 		if (hit) {
 			target.hurtResistantTime = 0;
-			target.setEntityInvulnerable(false);
+			target.setInvulnerable(false);
 			
-			target.addPotionEffect(new PotionEffect(Potion.getPotionFromResourceLocation("slowness"), durationTicks, 6));
+			target.addPotionEffect(new EffectInstance(Effects.SLOWNESS, durationTicks, 6));
 			// Effects:
 			{
 				NostrumParticles.GLOW_ORB.spawn(attacker.world, new SpawnParams(
-						30, target.posX, target.posY + target.height, target.posZ, .5, 60, 20,
+						30, target.posX, target.posY + target.getHeight(), target.posZ, .5, 60, 20,
 						new Vec3d(0, .05, 0), new Vec3d(.1, 0, .1)
 						).color(.6f, .6f, 0f, 0f).dieOnTarget(true).gravity(.1f));
 			}
@@ -320,7 +315,7 @@ public class SoulDagger extends ItemSword implements ILoreTagged, ISpellArmor {
 					attrSelf.addMana(manaDrawn);
 					
 					NostrumParticles.FILLED_ORB.spawn(attacker.world, new SpawnParams(
-							50, target.posX, target.posY + target.height, target.posZ, .5, 60, 0,
+							50, target.posX, target.posY + target.getHeight(), target.posZ, .5, 60, 0,
 							attacker.getEntityId()
 							).color(1f, .4f, .8f, 1f).dieOnTarget(true));
 				}

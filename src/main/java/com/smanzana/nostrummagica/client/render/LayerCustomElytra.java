@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.entity.layers.LayerArmorBase;
 import net.minecraft.client.renderer.entity.layers.LayerElytra;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.EnumPlayerModelParts;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -31,7 +31,7 @@ public class LayerCustomElytra extends LayerElytra {
 	@Override
 	public void doRenderLayer(LivingEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 		if (shouldRender(player)) {
-			@Nonnull ItemStack chestpiece = player.getItemStackFromSlot(EntityEquipmentSlot.CHEST); 
+			@Nonnull ItemStack chestpiece = player.getItemStackFromSlot(EquipmentSlotType.CHEST); 
 			render(player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale, (!chestpiece.isEmpty() && chestpiece.isItemEnchanted()));
 		}
 	}

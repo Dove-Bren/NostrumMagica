@@ -1,31 +1,18 @@
 package com.smanzana.nostrummagica.items;
 
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.item.Item;
+import net.minecraft.item.Rarity;
 
 public class MasteryOrb extends Item implements ILoreTagged {
 
-	private static MasteryOrb instance = null;
-	
-	public static MasteryOrb instance() {
-		if (instance == null)
-			instance = new MasteryOrb();
-		
-		return instance;
-	}
-	
-	public static final String id = "mastery_orb";
+	public static final String ID = "mastery_orb";
 	
 	private MasteryOrb() {
-		super();
-		this.setUnlocalizedName(id);
-		this.setRegistryName(NostrumMagica.MODID, id);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setMaxStackSize(8);
+		super(NostrumItems.PropLowStack().rarity(Rarity.RARE));
 	}
 	
 	@Override

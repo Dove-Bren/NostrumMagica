@@ -17,7 +17,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.EntityBehavior;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -180,7 +180,7 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 		return Math.min(draw, room);
 	}
 	
-	protected boolean isCrystal(@Nullable IBlockState state) {
+	protected boolean isCrystal(@Nullable BlockState state) {
 		return state != null
 				&& state.getBlock() instanceof ManiCrystal;
 	}
@@ -206,7 +206,7 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 				continue;
 			}
 					
-			IBlockState state = world.getBlockState(pos);
+			BlockState state = world.getBlockState(pos);
 			if (isCrystal(state)) {
 				positions.add(pos.toImmutable());
 			}
@@ -240,7 +240,7 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	protected void doManaEffectCrystal(LivingEntity entity, BlockPos crystal) {
-		IBlockState state = entity.world.getBlockState(crystal);
+		BlockState state = entity.world.getBlockState(crystal);
 		Vec3d offset = ManiCrystal.instance().getCrystalTipOffset(state);
 		Vec3d crystalPos = new Vec3d(crystal.getX() + offset.x, crystal.getY() + offset.y, crystal.getZ() + offset.z);
 		

@@ -15,7 +15,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -55,17 +55,17 @@ public class DungeonAir extends Block {
 	}
 	
 	@Override
-	public boolean isOpaqueCube(IBlockState state) {
+	public boolean isOpaqueCube(BlockState state) {
 		return false;
 	}
 	
 	@Override
-	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
 		return Block.FULL_BLOCK_AABB;
 	}
 	
 	@Override
-	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+	public AxisAlignedBB getCollisionBoundingBox(BlockState blockState, IBlockAccess worldIn, BlockPos pos) {
 		return NULL_AABB;
 	}
 	
@@ -75,7 +75,7 @@ public class DungeonAir extends Block {
     }
 	
 	@Override
-	public boolean isFullCube(IBlockState state) {
+	public boolean isFullCube(BlockState state) {
 		return false;
 	}
 	
@@ -86,7 +86,7 @@ public class DungeonAir extends Block {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+	public void randomDisplayTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
 		super.randomDisplayTick(stateIn, worldIn, pos, rand);
 		
 		if (rand.nextBoolean() && rand.nextBoolean()
@@ -109,8 +109,8 @@ public class DungeonAir extends Block {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, Direction side) {
-		IBlockState iblockstate = blockAccess.getBlockState(pos.offset(side));
+	public boolean shouldSideBeRendered(BlockState blockState, IBlockAccess blockAccess, BlockPos pos, Direction side) {
+		BlockState iblockstate = blockAccess.getBlockState(pos.offset(side));
 		Block block = iblockstate.getBlock();
 		
 		return !(block == instance());
@@ -127,7 +127,7 @@ public class DungeonAir extends Block {
 	}
 	
 	@Override
-	public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, LivingEntity placer, ItemStack stack) {
+	public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
 		if (stack.getMetadata() == 1) {
 			this.spawnDoor(worldIn, pos);
 		} else {
@@ -184,12 +184,12 @@ public class DungeonAir extends Block {
 	}
 	
 	@Override
-	public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, Direction face) {
+	public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, BlockState state, BlockPos pos, Direction face) {
 		return BlockFaceShape.UNDEFINED;
 	}
 	
 	@Override
-	public boolean canCollideCheck(IBlockState state, boolean hitIfLiquid) {
+	public boolean canCollideCheck(BlockState state, boolean hitIfLiquid) {
 		final PlayerEntity player = NostrumMagica.proxy.getPlayer();
 		if (player == null || player.world == null || !player.isCreative()) {
 			return false;

@@ -1,41 +1,26 @@
 package com.smanzana.nostrummagica.items;
 
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.ChalkBlock;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.utils.ItemStacks;
 
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumActionResult;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class ChalkItem extends Item implements ILoreTagged {
 
-	private static ChalkItem instance = null;
-
-	public static ChalkItem instance() {
-		if (instance == null)
-			instance = new ChalkItem();
-	
-		return instance;
-
-	}
-	
 	public static final String ID = "nostrum_chalk";
 
 	public ChalkItem() {
-		this.setUnlocalizedName(ID);
-		this.setRegistryName(NostrumMagica.MODID, ChalkItem.ID);
-		this.setMaxStackSize(1);
-		this.setMaxDamage(20);
-		this.setCreativeTab(NostrumMagica.creativeTab);
+		super(NostrumItems.PropEquipment().maxDamage(25));
 	}
 	
 	public boolean isEnchantable(ItemStack stack) {
@@ -64,15 +49,19 @@ public class ChalkItem extends Item implements ILoreTagged {
 	}
 
 	@Override
-	public EnumActionResult onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, EnumHand hand, Direction facing, float hitX, float hitY, float hitZ) {
-		IBlockState state = worldIn.getBlockState(pos);
-		ItemStack stack = playerIn.getHeldItem(hand);
-        if (facing == Direction.UP && playerIn.canPlayerEdit(pos.offset(facing), facing, stack) && state.isFullBlock() && worldIn.isAirBlock(pos.up())) {
-        	worldIn.setBlockState(pos.up(), ChalkBlock.instance().getDefaultState());
-            stack.damageItem(1, playerIn);
-            return EnumActionResult.SUCCESS;
+	public ActionResultType onItemUse(ItemUseContext context) {
+		final BlockPos pos = context.getPos();
+		final PlayerEntity player = context.getPlayer();
+		final World world = context.getWorld();
+		final Direction facing = context.getFace();
+		
+		ItemStack stack = context.getItem();
+        if (facing == Direction.UP && player.canPlayerEdit(pos.offset(facing), facing, stack) && Block.func_220064_c(world, pos.down()) && world.isAirBlock(pos.up())) {
+        	world.setBlockState(pos.up(), ChalkBlock.instance().getDefaultState());
+        	ItemStacks.damageItem(stack, player, context.getHand(), 1);
+            return ActionResultType.SUCCESS;
         } else {
-        	return EnumActionResult.FAIL;
+        	return ActionResultType.FAIL;
         }
 	}
 

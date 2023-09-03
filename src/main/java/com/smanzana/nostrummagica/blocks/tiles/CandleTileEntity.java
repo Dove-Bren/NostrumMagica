@@ -5,7 +5,7 @@ import java.util.Random;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
@@ -98,7 +98,7 @@ public class CandleTileEntity extends TileEntity implements ITickableTileEntity 
 		}
 		
 		if (this.lifeTicks == 0 && !world.isRemote) {
-			IBlockState state = world.getBlockState(this.pos);
+			BlockState state = world.getBlockState(this.pos);
 			if (state == null)
 				return;
 			

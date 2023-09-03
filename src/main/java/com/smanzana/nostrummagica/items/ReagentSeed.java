@@ -1,80 +1,80 @@
 package com.smanzana.nostrummagica.items;
 
-import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.CropEssence;
-import com.smanzana.nostrummagica.blocks.CropGinseng;
-import com.smanzana.nostrummagica.blocks.CropMandrakeRoot;
-
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemSeeds;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.common.EnumPlantType;
+import net.minecraft.block.Block;
+import net.minecraft.item.BlockNamedItem;
+import net.minecraft.item.Item;
 
 /**
  * Seeds for ginseng, mandrake, and essence, which can be planted and grown
  * @author Skyler
  *
  */
-public class ReagentSeed extends ItemSeeds {
+public class ReagentSeed extends BlockNamedItem {
 	
-	static enum SeedType {
-		MANDRAKE("mandrake", CropMandrakeRoot.instance().getDefaultState()),
-		GINSENG("ginseng", CropGinseng.instance().getDefaultState()),
-		ESSENCE("essence", CropEssence.instance().getDefaultState());
-		
-		private final String id;
-		private final IBlockState state;
-		
-		private SeedType(String id, IBlockState state) {
-			this.id = id;
-			this.state = state;
-		}
-		
-		public String getRawID() {
-			return id;
-		}
-		
-		public String getItemID() {
-			return "reagentseed_" + id;
-		}
-		
-		public String getUnlocName() {
-			return "reagentseed." + id;
-		}
-		
-		public IBlockState getCropState() {
-			return state;
-		}
+	public static final String ID_MANDRAKE_SEED = "reagentseed_mandrake";
+	public static final String ID_GINSENG_SEED = "reagentseed_ginseng";
+	public static final String ID_ESSENCE_SEED = "reagentseed_essence";
+	
+	public ReagentSeed(Block block, Item.Properties properties) {
+		super(block, properties);
 	}
 	
-	public static final ReagentSeed mandrake = new ReagentSeed(SeedType.MANDRAKE);
-	public static final ReagentSeed ginseng = new ReagentSeed(SeedType.GINSENG);
-	public static final ReagentSeed essence = new ReagentSeed(SeedType.ESSENCE);
-	
-	private final SeedType type;
-	
-	private ReagentSeed(SeedType type) {
-		super(type.getCropState().getBlock(), Blocks.FARMLAND);
-		
-		this.type = type;
-		
-		this.setUnlocalizedName(type.getUnlocName());
-		this.setRegistryName(NostrumMagica.MODID, this.getItemID());
-		this.setCreativeTab(NostrumMagica.creativeTab);
-	}
-	
-	 public EnumPlantType getPlantType(IBlockAccess world, BlockPos pos) {
-		 return EnumPlantType.Crop;
-	 }
-	 
-	 public IBlockState getPlant(IBlockAccess world, BlockPos pos) {
-		 return type.getCropState();
-	 }
-	 
-	 public String getItemID() {
-		 return type.getItemID();
-	 }
+//	static enum SeedType {
+//		MANDRAKE("mandrake", CropMandrakeRoot.instance().getDefaultState()),
+//		GINSENG("ginseng", CropGinseng.instance().getDefaultState()),
+//		ESSENCE("essence", CropEssence.instance().getDefaultState());
+//		
+//		private final String id;
+//		private final BlockState state;
+//		
+//		private SeedType(String id, BlockState state) {
+//			this.id = id;
+//			this.state = state;
+//		}
+//		
+//		public String getRawID() {
+//			return id;
+//		}
+//		
+//		public String getItemID() {
+//			return "reagentseed_" + id;
+//		}
+//		
+//		public String getUnlocName() {
+//			return "reagentseed." + id;
+//		}
+//		
+//		public BlockState getCropState() {
+//			return state;
+//		}
+//	}
+//	
+//	public static final ReagentSeed mandrake = new ReagentSeed(SeedType.MANDRAKE);
+//	public static final ReagentSeed ginseng = new ReagentSeed(SeedType.GINSENG);
+//	public static final ReagentSeed essence = new ReagentSeed(SeedType.ESSENCE);
+//	
+//	private final SeedType type;
+//	
+//	private ReagentSeed(SeedType type) {
+//		super(type.getCropState().getBlock(), Blocks.FARMLAND);
+//		
+//		this.type = type;
+//		
+//		this.setUnlocalizedName(type.getUnlocName());
+//		this.setRegistryName(NostrumMagica.MODID, this.getItemID());
+//		this.setCreativeTab(NostrumMagica.creativeTab);
+//	}
+//	
+//	 public EnumPlantType getPlantType(IBlockAccess world, BlockPos pos) {
+//		 return EnumPlantType.Crop;
+//	 }
+//	 
+//	 public BlockState getPlant(IBlockAccess world, BlockPos pos) {
+//		 return type.getCropState();
+//	 }
+//	 
+//	 public String getItemID() {
+//		 return type.getItemID();
+//	 }
 
 }

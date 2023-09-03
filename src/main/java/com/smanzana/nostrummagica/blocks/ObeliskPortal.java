@@ -3,13 +3,13 @@ package com.smanzana.nostrummagica.blocks;
 import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.blocks.tiles.ObeliskPortalTileEntity;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -33,7 +33,7 @@ public class ObeliskPortal extends TeleportationPortal {
 	
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		IBlockState state = this.getStateFromMeta(meta);
+		BlockState state = this.getStateFromMeta(meta);
 		if (isMaster(state)) {
 			return new ObeliskPortalTileEntity();
 		}
@@ -59,7 +59,7 @@ public class ObeliskPortal extends TeleportationPortal {
 	@Override
 	protected boolean canTeleport(World worldIn, BlockPos portalPos, Entity entityIn) {
 		// Specifically disallow EntityItems so that we can stuck suck up position crystals
-		if (entityIn == null || entityIn instanceof EntityItem) {
+		if (entityIn == null || entityIn instanceof ItemEntity) {
 			return false;
 		}
 		
@@ -77,10 +77,10 @@ public class ObeliskPortal extends TeleportationPortal {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
 		pos = getMaster(state, pos); // find master
 		
-		IBlockState parentState = worldIn.getBlockState(pos.down());
+		BlockState parentState = worldIn.getBlockState(pos.down());
 		if (parentState != null && parentState.getBlock() instanceof NostrumObelisk) {
 			parentState.getBlock().onBlockActivated(worldIn, pos.down(), parentState, playerIn, hand, side, hitX, hitY, hitZ);
 		}

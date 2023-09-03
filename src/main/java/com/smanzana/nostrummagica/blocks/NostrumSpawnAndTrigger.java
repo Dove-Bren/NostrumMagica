@@ -10,13 +10,13 @@ import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
 import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemEnderEye;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IBlockAccess;
@@ -49,7 +49,7 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, Direction side) {
+	public boolean shouldSideBeRendered(BlockState blockState, IBlockAccess blockAccess, BlockPos pos, Direction side) {
 		if (NostrumMagica.proxy.getPlayer().isCreative()) {
 			TileEntity te = blockAccess.getTileEntity(pos);
 			if (te != null && te instanceof SpawnerTriggerTileEntity) {
@@ -62,7 +62,7 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 	
 	
 	@Override
-	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+	public void updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) {
 		;//super.updateTick(worldIn, pos, state, rand);
 	}
 	
@@ -72,12 +72,12 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
 		if (worldIn.isRemote) {
 			return true;
 		}
 		
-		if (hand != EnumHand.MAIN_HAND) {
+		if (hand != Hand.MAIN_HAND) {
 			return true;
 		}
 		
@@ -133,7 +133,7 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 			} else if (heldItem.getItem() instanceof ItemEnderEye) {
 				BlockPos loc = (ent.getTriggerOffset() == null ? null : ent.getTriggerOffset().toImmutable().add(pos));
 				if (loc != null) {
-					IBlockState atState = worldIn.getBlockState(loc);
+					BlockState atState = worldIn.getBlockState(loc);
 					if (atState != null && atState.getBlock() instanceof ITriggeredBlock) {
 						playerIn.setPositionAndUpdate(loc.getX(), loc.getY(), loc.getZ());
 					} else {

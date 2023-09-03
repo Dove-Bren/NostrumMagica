@@ -20,14 +20,14 @@ import com.smanzana.nostrummagica.trials.ShrineTrial;
 
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -54,11 +54,11 @@ public class ShrineBlock extends SymbolBlock {
 		this.setDefaultState(this.blockState.getBaseState().withProperty(EXHAUSTED, false));
 	}
 	
-	public boolean isExhausted(IBlockState state) {
+	public boolean isExhausted(BlockState state) {
 		return state.getValue(EXHAUSTED);
 	}
 	
-	public IBlockState getExhaustedState(boolean exhausted) {
+	public BlockState getExhaustedState(boolean exhausted) {
 		return this.getDefaultState().withProperty(EXHAUSTED, true);
 	}
 	
@@ -68,18 +68,18 @@ public class ShrineBlock extends SymbolBlock {
 	}
 	
 	@Override
-	public IBlockState getStateFromMeta(int meta) {
+	public BlockState getStateFromMeta(int meta) {
 		boolean bool = ((meta & 0x1) == 1);
 		return getDefaultState().withProperty(EXHAUSTED, bool);
 	}
 	
 	@Override
-	public int getMetaFromState(IBlockState state) {
+	public int getMetaFromState(BlockState state) {
 		return (state.getValue(EXHAUSTED) ? 1 : 0);
 	}
 	
 	@Override
-	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
+	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
 		return true;
 	}
 	
@@ -97,14 +97,14 @@ public class ShrineBlock extends SymbolBlock {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public EnumBlockRenderType getRenderType(IBlockState state) {
+	public EnumBlockRenderType getRenderType(BlockState state) {
 		return EnumBlockRenderType.MODEL;
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
 		
-		if (hand != EnumHand.MAIN_HAND) {
+		if (hand != Hand.MAIN_HAND) {
 			return true;
 		}
 		

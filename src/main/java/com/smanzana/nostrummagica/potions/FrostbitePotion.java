@@ -10,7 +10,7 @@ import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -111,7 +111,7 @@ public class FrostbitePotion extends Potion {
 					@Override
 					public void apply(World world, BlockPos pos) {
 						if (world.isAirBlock(pos)) {
-							IBlockState belowState = world.getBlockState(pos.down());
+							BlockState belowState = world.getBlockState(pos.down());
 							if (belowState.getMaterial().blocksMovement()) {
 								world.setBlockState(pos, Blocks.SNOW_LAYER.getDefaultState());
 							}

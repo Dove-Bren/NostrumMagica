@@ -5,61 +5,49 @@ import java.util.UUID;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicPotency;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
+import com.smanzana.nostrummagica.utils.ItemStacks;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemSword;
+import net.minecraft.item.ItemTier;
+import net.minecraft.item.SwordItem;
+import net.minecraft.util.Hand;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class MageStaff extends ItemSword implements ILoreTagged, ISpellArmor {
+public class MageStaff extends SwordItem implements ILoreTagged, ISpellArmor {
 
-	public static String ID = "mage_staff";
+	public static final String ID = "mage_staff";
 	
 	protected static UUID MAGESTAFF_POTENCY_UUID = UUID.fromString("3c262e7c-237c-48fa-aaf7-7b4be23affb3");
 	
-	private static MageStaff instance = null;
-
-	public static MageStaff instance() {
-		if (instance == null)
-			instance = new MageStaff();
-	
-		return instance;
-
-	}
-
 	public MageStaff() {
-		super(ToolMaterial.WOOD);
-		this.setMaxDamage(200);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setMaxStackSize(1);
-		this.setUnlocalizedName(ID);
-		this.setRegistryName(NostrumMagica.MODID, ID);
+		super(ItemTier.WOOD, 3, -2.4F, NostrumItems.PropEquipment().maxDamage(200));
 	}
 	
 	@Override
-	public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
+	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
 		Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
 
-		if (equipmentSlot == EntityEquipmentSlot.MAINHAND) {
-            multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 3, 0));
-            multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4000000953674316D, 0));
+		if (equipmentSlot == EquipmentSlotType.MAINHAND) {
+            multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 3, AttributeModifier.Operation.ADDITION));
+            multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4000000953674316D, AttributeModifier.Operation.ADDITION));
 		}
 		
-		if (equipmentSlot == EntityEquipmentSlot.MAINHAND || equipmentSlot == EntityEquipmentSlot.OFFHAND) {
-			multimap.put(AttributeMagicPotency.instance().getName(), new AttributeModifier(MAGESTAFF_POTENCY_UUID, "Potency modifier", 20, 0));
+		if (equipmentSlot == EquipmentSlotType.MAINHAND || equipmentSlot == EquipmentSlotType.OFFHAND) {
+			multimap.put(AttributeMagicPotency.instance().getName(), new AttributeModifier(MAGESTAFF_POTENCY_UUID, "Potency modifier", 20, AttributeModifier.Operation.ADDITION));
 		}
 
         return multimap;
@@ -93,8 +81,11 @@ public class MageStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 	
 	@Override
 	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return !repair.isEmpty() && repair.getItem() == NostrumResourceItem.instance()
-        		&& NostrumResourceItem.getTypeFromMeta(repair.getMetadata()) == ResourceType.CRYSTAL_SMALL;
+		if (repair.isEmpty()) {
+			return false;
+		} else {
+			return NostrumItemTags.CrystalSmall.contains(repair.getItem());
+		}
     }
 
 	@Override
@@ -102,15 +93,15 @@ public class MageStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 		// We provide -10% reagent cost, +20% potency
 		summary.addReagentCost(-.1f);
 		//summary.addEfficiency(.2f);
-		stack.damageItem(1, caster);
+		ItemStacks.damageItem(stack, caster, caster.getHeldItem(Hand.MAIN_HAND) == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		super.addInformation(stack, worldIn, tooltip, flagIn);
 		//tooltip.add("Magic Potency Bonus: 20%");
-		tooltip.add("Reagent Cost Discount: 10%");
+		tooltip.add(new StringTextComponent("Reagent Cost Discount: 10%"));
 	}
 
 }

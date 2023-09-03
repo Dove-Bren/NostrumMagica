@@ -20,16 +20,16 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemFlintAndSteel;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -96,12 +96,12 @@ public class Candle extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer) {
+	public BlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer) {
 		return this.getDefaultState().withProperty(FACING, facing);
 	}
 	
 	@Override
-	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
 		Direction facing = state.getValue(FACING);
 		switch (facing) {
 		case EAST:
@@ -121,7 +121,7 @@ public class Candle extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
+	public int getLightValue(BlockState state, IBlockAccess world, BlockPos pos) {
 		if (state == null)
 			return 0;
 		if (!state.getValue(LIT))
@@ -131,7 +131,7 @@ public class Candle extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public boolean isOpaqueCube(IBlockState state) {
+	public boolean isOpaqueCube(BlockState state) {
 		return false;
 	}
 	
@@ -141,7 +141,7 @@ public class Candle extends Block implements ITileEntityProvider {
     }
 	
 	@Override
-	public boolean isFullCube(IBlockState state) {
+	public boolean isFullCube(BlockState state) {
 		return false;
 	}
 	
@@ -151,19 +151,19 @@ public class Candle extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public IBlockState getStateFromMeta(int meta) {
+	public BlockState getStateFromMeta(int meta) {
 		boolean lit = ((meta & 0x1) == 1);
 		Direction facing = Direction.VALUES[(meta >> 1) & 7];
 		return getDefaultState().withProperty(LIT, lit).withProperty(FACING, facing);
 	}
 	
 	@Override
-	public int getMetaFromState(IBlockState state) {
+	public int getMetaFromState(BlockState state) {
 		return (state.getValue(LIT) ? 1 : 0) | (state.getValue(FACING).ordinal() << 1);
 	}
 	
 //    @Override
-//    public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+//    public void updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) {
 //    	if (state.getValue(LIT)) {
 //    		if (rand.nextInt(10) == 0) {
 //    			extinguish(worldIn, pos, state);
@@ -171,7 +171,7 @@ public class Candle extends Block implements ITileEntityProvider {
 //    	}
 //    }
     
-    public static void light(World world, BlockPos pos, IBlockState state) {
+    public static void light(World world, BlockPos pos, BlockState state) {
     	if (!state.getValue(LIT)) {
 	    	world.setBlockState(pos, state.withProperty(LIT, true));
 			
@@ -181,11 +181,11 @@ public class Candle extends Block implements ITileEntityProvider {
     	}
     }
     
-    public static void extinguish(World world, BlockPos pos, IBlockState state) {
+    public static void extinguish(World world, BlockPos pos, BlockState state) {
     	extinguish(world, pos, state, false);
     }
     
-    public static void extinguish(World world, BlockPos pos, IBlockState state, boolean force) {
+    public static void extinguish(World world, BlockPos pos, BlockState state, boolean force) {
     	
     	if (world.getTileEntity(pos) != null) {
     		world.removeTileEntity(pos);
@@ -215,12 +215,12 @@ public class Candle extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
+	public void onBlockAdded(World worldIn, BlockPos pos, BlockState state) {
 		super.onBlockAdded(worldIn, pos, state);
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, IBlockState state) {
+	public void breakBlock(World world, BlockPos pos, BlockState state) {
 		super.breakBlock(world, pos, state);
 		
 		TileEntity ent = world.getTileEntity(pos);
@@ -232,7 +232,7 @@ public class Candle extends Block implements ITileEntityProvider {
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param) {
+	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
 		super.eventReceived(state, worldIn, pos, id, param);
         TileEntity tileentity = worldIn.getTileEntity(pos);
         return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
@@ -240,7 +240,7 @@ public class Candle extends Block implements ITileEntityProvider {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+	public void randomDisplayTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
 		
 		if (null == stateIn || !stateIn.getValue(LIT))
 			return;
@@ -280,12 +280,12 @@ public class Candle extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+	public void updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) {
 		// Check for a reagent item over the candle
 		if (state.getValue(LIT) && worldIn.getTileEntity(pos) == null) {
-			List<EntityItem> items = worldIn.getEntitiesWithinAABB(EntityItem.class, Block.FULL_BLOCK_AABB.offset(pos).expand(0, 1, 0));
+			List<ItemEntity> items = worldIn.getEntitiesWithinAABB(ItemEntity.class, Block.FULL_BLOCK_AABB.offset(pos).expand(0, 1, 0));
 			if (items != null && !items.isEmpty()) {
-				for (EntityItem item : items) {
+				for (ItemEntity item : items) {
 					ItemStack stack = item.getItem();
 					if (stack.getItem() instanceof ReagentItem) {
 						ReagentType type = ReagentItem.findType(stack.splitStack(1));
@@ -310,7 +310,7 @@ public class Candle extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
 
 //		if (worldIn.isRemote)
 //			return true;
@@ -335,7 +335,7 @@ public class Candle extends Block implements ITileEntityProvider {
 			// only if mainhand or mainhand is null. Otherwise if offhand is
 			// empty, will still put out. Dumb!
 			
-			if (hand == EnumHand.MAIN_HAND && (playerIn.getHeldItemMainhand().isEmpty())) {
+			if (hand == Hand.MAIN_HAND && (playerIn.getHeldItemMainhand().isEmpty())) {
 				// putting it out
 				extinguish(worldIn, pos, state, true);
 				return true;
@@ -362,7 +362,7 @@ public class Candle extends Block implements ITileEntityProvider {
 		return true;
 	}
 	
-	public static void setReagent(World world, BlockPos pos, IBlockState state, ReagentType type) {
+	public static void setReagent(World world, BlockPos pos, BlockState state, ReagentType type) {
 		if (world.isRemote && type == null) {
 			extinguish(world, pos, state, false);
 			return;
@@ -393,14 +393,14 @@ public class Candle extends Block implements ITileEntityProvider {
 		}
 	}
 	
-	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn) {
+	public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn) {
 		if (!canPlaceAt(worldIn, pos, state.getValue(FACING))) {
 			this.dropBlockAsItem(worldIn, pos, state, 0);
 			worldIn.setBlockToAir(pos);
 		}
 	}
 	
-	public static boolean IsCandleEnhancingBlock(World world, BlockPos pos, IBlockState state) {
+	public static boolean IsCandleEnhancingBlock(World world, BlockPos pos, BlockState state) {
 		return state.getBlock().isFireSource(world, pos, Direction.UP);
 	}
 	
@@ -411,7 +411,7 @@ public class Candle extends Block implements ITileEntityProvider {
 			};
 			
 		for (BlockPos cursor: positions) {
-			IBlockState state = world.getBlockState(cursor);
+			BlockState state = world.getBlockState(cursor);
 			if (state != null && Candle.IsCandleEnhancingBlock(world, cursor, state)) {
 				return true;
 			}

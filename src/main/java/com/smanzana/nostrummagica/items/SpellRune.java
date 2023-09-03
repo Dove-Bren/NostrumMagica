@@ -27,9 +27,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -402,7 +402,7 @@ public class SpellRune extends Item implements ILoreTagged {
     	nbt.putString(NBT_NAME, element.name());
     	nbt.putInt(NBT_ELEMENT_COUNT, power);
     	
-    	stack.setTagCompound(nbt);
+    	stack.setTag(nbt);
     	return stack;
     }
     
@@ -417,7 +417,7 @@ public class SpellRune extends Item implements ILoreTagged {
     	nbt.putString(NBT_TYPE, "alteration");
     	nbt.putString(NBT_NAME, alteration.name());
     	
-    	stack.setTagCompound(nbt);
+    	stack.setTag(nbt);
     	return stack;
     }
     
@@ -432,7 +432,7 @@ public class SpellRune extends Item implements ILoreTagged {
     	nbt.putString(NBT_TYPE, "shape");
     	nbt.putString(NBT_NAME, shape.getShapeKey());
     	
-    	stack.setTagCompound(nbt);
+    	stack.setTag(nbt);
     	return stack;
     }
     
@@ -447,7 +447,7 @@ public class SpellRune extends Item implements ILoreTagged {
     	nbt.putString(NBT_TYPE, "trigger");
     	nbt.putString(NBT_NAME, trigger.getTriggerKey());
     	
-    	stack.setTagCompound(nbt);
+    	stack.setTag(nbt);
     	return stack;
     }
     
@@ -467,7 +467,7 @@ public class SpellRune extends Item implements ILoreTagged {
     	else
     		stack = getRune(part.getShape());
     	
-    	CompoundNBT nbt = stack.getTagCompound();
+    	CompoundNBT nbt = stack.getTag();
     	
     	if (part.getParam() != null) {
     		nbt.putFloat(NBT_PARAM_VAL, part.getParam().level);
@@ -523,28 +523,28 @@ public class SpellRune extends Item implements ILoreTagged {
     }
     
     private static String getPieceName(ItemStack piece) {
-    	if (!piece.hasTagCompound())
+    	if (!piece.hasTag())
     		return "";
     	
-    	return piece.getTagCompound().getString(NBT_NAME);
+    	return piece.getTag().getString(NBT_NAME);
     }
     
     private static String getPieceType(ItemStack piece) {
-    	if (!piece.hasTagCompound())
+    	if (!piece.hasTag())
     		return "";
     	
-    	return piece.getTagCompound().getString(NBT_TYPE);
+    	return piece.getTag().getString(NBT_TYPE);
     }
     
     private static EMagicElement getPieceShapeElement(ItemStack piece) {
-    	if (!piece.hasTagCompound())
+    	if (!piece.hasTag())
     		return null;
     	
-    	if (!piece.getTagCompound().hasKey(NBT_SHAPE_ELEMENT, NBT.TAG_STRING))
+    	if (!piece.getTag().hasKey(NBT_SHAPE_ELEMENT, NBT.TAG_STRING))
     		return null;
     	
     	try {
-    		return EMagicElement.valueOf(piece.getTagCompound().getString(NBT_SHAPE_ELEMENT));
+    		return EMagicElement.valueOf(piece.getTag().getString(NBT_SHAPE_ELEMENT));
     	} catch (IllegalArgumentException e) {
     		NostrumMagica.logger.error("Failed to get element from rune");
     		return EMagicElement.PHYSICAL;
@@ -552,25 +552,25 @@ public class SpellRune extends Item implements ILoreTagged {
     }
     
     private static void setPieceShapeElement(ItemStack piece, @Nullable EMagicElement element) {
-    	if (!piece.hasTagCompound())
+    	if (!piece.hasTag())
     		return;
     	
     	if (element != null) {
-    		piece.getTagCompound().setString(NBT_SHAPE_ELEMENT, element.name());
+    		piece.getTag().setString(NBT_SHAPE_ELEMENT, element.name());
     	} else {
-    		piece.getTagCompound().removeTag(NBT_SHAPE_ELEMENT);
+    		piece.getTag().removeTag(NBT_SHAPE_ELEMENT);
     	}
     }
     
     private static EAlteration getPieceShapeAlteration(ItemStack piece) {
-    	if (!piece.hasTagCompound())
+    	if (!piece.hasTag())
     		return null;
     	
-    	if (!piece.getTagCompound().hasKey(NBT_SHAPE_ALTERATION, NBT.TAG_STRING))
+    	if (!piece.getTag().hasKey(NBT_SHAPE_ALTERATION, NBT.TAG_STRING))
     		return null;
     	
     	try {
-    		return EAlteration.valueOf(piece.getTagCompound().getString(NBT_SHAPE_ALTERATION));
+    		return EAlteration.valueOf(piece.getTag().getString(NBT_SHAPE_ALTERATION));
     	} catch (IllegalArgumentException e) {
     		NostrumMagica.logger.error("Failed to get alteration from rune");
     		return null;
@@ -578,52 +578,52 @@ public class SpellRune extends Item implements ILoreTagged {
     }
     
     private static void setPieceShapeAlteration(ItemStack piece, @Nullable EAlteration alteration) {
-    	if (!piece.hasTagCompound())
+    	if (!piece.hasTag())
     		return;
     	
     	if (alteration != null) {
-    		piece.getTagCompound().setString(NBT_SHAPE_ALTERATION, alteration.name());
+    		piece.getTag().setString(NBT_SHAPE_ALTERATION, alteration.name());
     	} else {
-    		piece.getTagCompound().removeTag(NBT_SHAPE_ALTERATION);
+    		piece.getTag().removeTag(NBT_SHAPE_ALTERATION);
     	}
     }
     
     private static int getPieceElementCount(ItemStack piece) {
-    	if (!piece.hasTagCompound())
+    	if (!piece.hasTag())
     		return 0;
     	
-    	return piece.getTagCompound().getInteger(NBT_ELEMENT_COUNT);
+    	return piece.getTag().getInteger(NBT_ELEMENT_COUNT);
     }
     
     private static void setPieceElementCount(ItemStack piece, int count) {
-    	if (!piece.hasTagCompound())
+    	if (!piece.hasTag())
     		return;
     	
     	if (count > 0) {
-    		piece.getTagCompound().setInteger(NBT_ELEMENT_COUNT, count);
+    		piece.getTag().setInteger(NBT_ELEMENT_COUNT, count);
     	} else {
-    		piece.getTagCompound().removeTag(NBT_ELEMENT_COUNT);
+    		piece.getTag().removeTag(NBT_ELEMENT_COUNT);
     	}
     }
     
     public static SpellPartParam getPieceParam(ItemStack piece) {
-    	if (!piece.hasTagCompound())
+    	if (!piece.hasTag())
     		return new SpellPartParam(0f, false);
     	
-    	float level = piece.getTagCompound().getFloat(NBT_PARAM_VAL);
-    	boolean flip = piece.getTagCompound().getBoolean(NBT_PARAM_FLIP);
+    	float level = piece.getTag().getFloat(NBT_PARAM_VAL);
+    	boolean flip = piece.getTag().getBoolean(NBT_PARAM_FLIP);
     	return new SpellPartParam(level, flip);
     }
     
     public static void setPieceParam(ItemStack piece, SpellPartParam params) {
-    	if (!piece.hasTagCompound())
+    	if (!piece.hasTag())
     		return;
     	
-    	piece.getTagCompound().setFloat(NBT_PARAM_VAL, params.level);
-    	piece.getTagCompound().setBoolean(NBT_PARAM_FLIP, params.flip);
+    	piece.getTag().setFloat(NBT_PARAM_VAL, params.level);
+    	piece.getTag().setBoolean(NBT_PARAM_FLIP, params.flip);
     }
     
-    public EnumActionResult onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, EnumHand hand, Direction facing, float hitX, float hitY, float hitZ)
+    public ActionResultType onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, Hand hand, Direction facing, float hitX, float hitY, float hitZ)
     {
     	// Probably wnat this later
     	return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ);

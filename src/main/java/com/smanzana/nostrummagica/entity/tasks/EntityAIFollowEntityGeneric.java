@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.entity.tasks;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
@@ -99,7 +99,7 @@ public class EntityAIFollowEntityGeneric<T extends MobEntity> extends EntityAIBa
 	}
 
 	private boolean isEmptyBlock(BlockPos pos) {
-		IBlockState iblockstate = this.theWorld.getBlockState(pos);
+		BlockState iblockstate = this.theWorld.getBlockState(pos);
 		return iblockstate.getMaterial() == Material.AIR ? true : !iblockstate.isFullCube();
 	}
 

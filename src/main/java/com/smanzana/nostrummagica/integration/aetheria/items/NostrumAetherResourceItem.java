@@ -14,9 +14,9 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -141,19 +141,19 @@ public class NostrumAetherResourceItem extends Item implements ILoreTagged, IAet
 	}
 	
 	@Override
-	public EnumActionResult onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, EnumHand hand, Direction facing, float hitX, float hitY, float hitZ) {
+	public ActionResultType onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, Hand hand, Direction facing, float hitX, float hitY, float hitZ) {
 		
 //		// Copied from ItemBed (vanilla) with some modifications
 //		AetherResourceType type = getTypeFromMeta(stack.getMetadata()); 
 //		
 //		if (type != AetherResourceType.CRYSTAL_SMALL && type != AetherResourceType.CRYSTAL_MEDIUM) {
-//			return EnumActionResult.PASS;
+//			return ActionResultType.PASS;
 //		}
 //		
 //		if (worldIn.isRemote) {
-//			return EnumActionResult.SUCCESS;
+//			return ActionResultType.SUCCESS;
 //		} else {
-//			IBlockState iblockstate = worldIn.getBlockState(pos);
+//			BlockState iblockstate = worldIn.getBlockState(pos);
 //			Block block = iblockstate.getBlock();
 //
 //			if (!block.isReplaceable(worldIn, pos)) {
@@ -168,7 +168,7 @@ public class NostrumAetherResourceItem extends Item implements ILoreTagged, IAet
 //			}
 //
 //			if (playerIn.canPlayerEdit(pos, facing, stack) && (block.isReplaceable(worldIn, pos) || worldIn.isAirBlock(pos))) {
-//				IBlockState iblockstate1 = ManiCrystal.instance().getDefaultState()
+//				BlockState iblockstate1 = ManiCrystal.instance().getDefaultState()
 //						.withProperty(ManiCrystal.FACING, facing)
 //						.withProperty(ManiCrystal.LEVEL, type == AetherResourceType.CRYSTAL_MEDIUM ? 1 : 0);
 //
@@ -177,13 +177,13 @@ public class NostrumAetherResourceItem extends Item implements ILoreTagged, IAet
 //				SoundType soundtype = iblockstate1.getBlock().getSoundType(iblockstate1, worldIn, pos, playerIn);
 //				worldIn.playSound((PlayerEntity)null, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
 //				--stack.stackSize;
-//				return EnumActionResult.SUCCESS;
+//				return ActionResultType.SUCCESS;
 //			} else {
-//				return EnumActionResult.FAIL;
+//				return ActionResultType.FAIL;
 //			}
 //		}
 		
-		return EnumActionResult.PASS;
+		return ActionResultType.PASS;
 	}
 
 	@Override

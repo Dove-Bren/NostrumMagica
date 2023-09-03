@@ -17,7 +17,7 @@ import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -77,7 +77,7 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 				double dirD = dir * 2 * Math.PI;
 				double dx = Math.cos(dirD) * dist;
 				double dz = Math.sin(dirD) * dist;
-				EntityItem drop = new EntityItem(world, pos.getX() + .5 + dx, pos.getY() + 2, pos.getZ() + .5 + dz,
+				ItemEntity drop = new ItemEntity(world, pos.getX() + .5 + dx, pos.getY() + 2, pos.getZ() + .5 + dz,
 						NostrumResourceItem.getItem(ResourceType.ENDER_BRISTLE, 1));
 				world.spawnEntity(drop);
 				NostrumMagicaSounds.CAST_FAIL.play(world, pos.getX() + .5, pos.getY() + 2, pos.getZ() + .5);

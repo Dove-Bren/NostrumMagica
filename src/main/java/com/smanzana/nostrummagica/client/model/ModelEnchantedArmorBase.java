@@ -4,7 +4,7 @@ import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelRenderer;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.EquipmentSlotType;
 
 public class ModelEnchantedArmorBase extends ModelBiped {
 	
@@ -419,10 +419,10 @@ public class ModelEnchantedArmorBase extends ModelBiped {
 	 * Sets all parts but the related ones invisible for rendering.
 	 * @param slot The slot we're about to render
 	 */
-	public void setVisibleFrom(EntityEquipmentSlot slot) {
-		bootLeft.showModel = bootRight.showModel = (slot == EntityEquipmentSlot.FEET);
-		legLeft.showModel = legRight.showModel = (slot == EntityEquipmentSlot.LEGS);
-		body.showModel = armLeft.showModel = armRight.showModel = (slot == EntityEquipmentSlot.CHEST);
-		head.showModel = (slot == EntityEquipmentSlot.HEAD);
+	public void setVisibleFrom(EquipmentSlotType slot) {
+		bootLeft.showModel = bootRight.showModel = (slot == EquipmentSlotType.FEET);
+		legLeft.showModel = legRight.showModel = (slot == EquipmentSlotType.LEGS);
+		body.showModel = armLeft.showModel = armRight.showModel = (slot == EquipmentSlotType.CHEST);
+		head.showModel = (slot == EquipmentSlotType.HEAD);
 	}
 }

@@ -11,7 +11,7 @@ import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
@@ -49,17 +49,17 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public boolean isOpaqueCube(IBlockState state) {
+	public boolean isOpaqueCube(BlockState state) {
 		return false;
 	}
 	
 	@Override
-	public boolean isFullCube(IBlockState state) {
+	public boolean isFullCube(BlockState state) {
         return false;
     }
 	
 	@Override
-	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
+	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
 		return false;
 	}
 	
@@ -70,12 +70,12 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public EnumBlockRenderType getRenderType(IBlockState state) {
+	public EnumBlockRenderType getRenderType(BlockState state) {
 		return EnumBlockRenderType.INVISIBLE;
 	}
 	
 	@Override
-	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+	public Item getItemDropped(BlockState state, Random rand, int fortune) {
         return null;
     }
 
@@ -87,14 +87,14 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, IBlockState state) {
+	public void breakBlock(World world, BlockPos pos, BlockState state) {
 		super.breakBlock(world, pos, state);
         world.removeTileEntity(pos);
 	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int eventID, int eventParam) {
+	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int eventID, int eventParam) {
 		super.eventReceived(state, worldIn, pos, eventID, eventParam);
 		TileEntity tileentity = worldIn.getTileEntity(pos);
         return tileentity == null ? false : tileentity.receiveClientEvent(eventID, eventParam);

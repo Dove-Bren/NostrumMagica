@@ -7,12 +7,12 @@ import com.smanzana.nostrummagica.blocks.tiles.ProgressionDoorTileEntity;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -37,12 +37,12 @@ public class ProgressionDoor extends NostrumMagicDoor {
 	}
 	
 	@Override
-	public boolean hasTileEntity(IBlockState state) {
+	public boolean hasTileEntity(BlockState state) {
 		return this.isMaster(state);
 	}
 	
 	@Override
-	public TileEntity createTileEntity(World world, IBlockState state) {
+	public TileEntity createTileEntity(World world, BlockState state) {
 		if (!this.isMaster(state))
 			return null;
 		
@@ -50,7 +50,7 @@ public class ProgressionDoor extends NostrumMagicDoor {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
 		if (worldIn.isRemote)
 			return true;
 		
@@ -65,7 +65,7 @@ public class ProgressionDoor extends NostrumMagicDoor {
 					te.require(SpellRune.toComponentWrapper(heldItem));
 					return true;
 				}
-				if (heldItem.isEmpty() && hand == EnumHand.MAIN_HAND) {
+				if (heldItem.isEmpty() && hand == Hand.MAIN_HAND) {
 					te.level((te.getRequiredLevel() + 1) % 15);
 					return true;
 				}

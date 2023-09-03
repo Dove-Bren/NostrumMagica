@@ -13,103 +13,49 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Rarity;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class NostrumSkillItem extends Item implements ILoreTagged {
+public abstract class NostrumSkillItem extends Item implements ILoreTagged {
 
-	public static enum SkillItemType {
-		MIRROR("primordial_mirror"),
-		OOZE("essential_ooze"),
-		PENDANT("eldrich_pendant"),
-		FLUTE("living_flute"),
-		WING("dragon_wing"),
-		ENDER_PIN("ender_pin"),
-		RESEARCH_SCROLL_SMALL("research_scroll_small"),
-		RESEARCH_SCROLL_LARGE("research_scroll_large");
-		
-		private String key;
-		
-		private SkillItemType(String key) {
-			this.key = key;
-		}
-		
-		public String getUnlocalizedKey() {
-			return key;
-		}
-		
-		private String getDescKey() {
-			return "item." + key + ".desc";
-		}
+	public static final String ID_SKILL_MIRROR = "primordial_mirror";
+	public static final String ID_SKILL_OOZE = "essential_ooze";
+	public static final String ID_SKILL_PENDANT = "eldrich_pendant";
+	public static final String ID_SKILL_FLUTE = "living_flute";
+	public static final String ID_SKILL_ENDER_PIN = "ender_pin";
+	public static final String ID_SKILL_SCROLL_SMALL = "research_scroll_small";
+	public static final String ID_SKILL_SCROLL_LARGE = "research_scroll_large";
+	
+	private static interface SkillFunc {
+		public boolean award(PlayerEntity player, INostrumMagic attr, ItemStack stack);
 	}
 	
-	public static final String ID = "SkillItem";
+	private final SkillFunc func;
 	
-	private static NostrumSkillItem instance = null;
-	public static NostrumSkillItem instance() {
-		if (instance == null)
-			instance = new NostrumSkillItem();
-		
-		return instance;
+	public NostrumSkillItem(Item.Properties properties, SkillFunc func) {
+		super(properties.maxStackSize(1));
+		this.func = func;
 	}
 	
-	public NostrumSkillItem() {
-		super();
-		this.setUnlocalizedName(ID);
-		this.setRegistryName(NostrumMagica.MODID, ID);
-		this.setMaxDamage(0);
-		this.setMaxStackSize(1);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setHasSubtypes(true);
-	}
-	
-	@Override
-	public String getUnlocalizedName(ItemStack stack) {
-		int i = stack.getMetadata();
-		
-		SkillItemType type = getTypeFromMeta(i);
-		return "item." + type.getUnlocalizedKey();
-	}
-	
-	public static SkillItemType getTypeFromMeta(int meta) {
-		SkillItemType ret = null;
-    	for (SkillItemType type : SkillItemType.values()) {
-			if (type.ordinal() == meta) {
-				ret = type;
-				break;
-			}
-		}
-    	
-    	return ret;
-    }
-	
-	public static ItemStack getItem(SkillItemType type, int count) {
-		int meta = getMetaFromType(type);
-		
-		return new ItemStack(instance(), count, meta);
-	}
-	
-	@OnlyIn(Dist.CLIENT)
-    @Override
-	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-		if (this.isInCreativeTab(tab)) {
-	    	for (SkillItemType type: SkillItemType.values()) {
-	    		subItems.add(new ItemStack(this, 1, getMetaFromType(type)));
-	    	}
-		}
-	}
+//	@Override
+//	public String getUnlocalizedName(ItemStack stack) {
+//		int i = stack.getMetadata();
+//		
+//		SkillItemType type = getTypeFromMeta(i);
+//		return "item." + type.getUnlocalizedKey();
+//	}
 	
 	@Override
 	public String getLoreKey() {
@@ -136,97 +82,112 @@ public class NostrumSkillItem extends Item implements ILoreTagged {
 		return InfoScreenTabs.INFO_ITEMS;
 	}
 	
+	protected String getDescKey() {
+		return "item." + this.getRegistryName().getPath() + ".desc"; 
+	}
+	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
 		final @Nonnull ItemStack stack = playerIn.getHeldItem(hand);
-		if (playerIn.isSneaking())
-			return new ActionResult<ItemStack>(EnumActionResult.PASS, stack);
+		if (playerIn.isSneaking()) {
+			return new ActionResult<ItemStack>(ActionResultType.PASS, stack);
+		}
 		
-		SkillItemType type = getTypeFromMeta(stack.getMetadata());
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
-		if (attr != null && attr.isUnlocked() && type != SkillItemType.WING) {
-			
-			if (type == SkillItemType.ENDER_PIN  && attr.hasEnhancedTeleport()) {
-				playerIn.sendMessage(new TranslationTextComponent("info.skillitem.advtele.unlocked", new Object[0]));
-				return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
-			}
-			
-			String suffix = null;
-			switch (type) {
-			case FLUTE:
-				attr.addFinesse();
-				suffix = "finesse";
-				break;
-			case MIRROR:
-				attr.addSkillPoint();
-				suffix = "point";
-				break;
-			case OOZE:
-				attr.addControl();
-				suffix = "control";
-				break;
-			case PENDANT:
-				attr.addTech();
-				suffix = "technique";
-				break;
-			case WING:
-				// Wings don't do anything
-				break;
-			case ENDER_PIN:
-				attr.unlockEnhancedTeleport();;
-				suffix = "advtele";
-				break;
-			case RESEARCH_SCROLL_LARGE:
-				attr.addResearchPoint();
-				attr.addResearchPoint();
-				attr.addResearchPoint();
-				suffix = "research";
-				break;
-			case RESEARCH_SCROLL_SMALL:
-				attr.addResearchPoint();
-				suffix = "research";
-				break;
-			}
-			
-			if (worldIn.isRemote) {
-				// Display message but don't do anything
-				playerIn.sendMessage(new TranslationTextComponent("info.skillitem." + suffix, new Object[0]));
-			} else {
-				// Server side
+		if (!worldIn.isRemote && attr != null && attr.isUnlocked()) {
+			if (this.func.award(playerIn, attr, stack)) {
 				NostrumMagicaSounds.LORE.play(null, playerIn.world, playerIn.posX, playerIn.posY, playerIn.posZ);
 				stack.shrink(1);
 				NostrumMagica.proxy.syncPlayer((ServerPlayerEntity) playerIn);
 			}
-			
-			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);
 		}
 		
-		
-		
-		return new ActionResult<ItemStack>(EnumActionResult.PASS, stack);
-		
+		return new ActionResult<ItemStack>(ActionResultType.PASS, stack);
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-		SkillItemType type = getTypeFromMeta(stack.getMetadata());
-		if (type == null)
-			return;
-		
-		if (I18n.contains(type.getDescKey())) {
-			String translation = I18n.format(type.getDescKey(), new Object[0]);
-			if (translation.trim().isEmpty())
-				return;
-			tooltip.add(TextFormatting.BLUE + translation);
+	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		if (I18n.hasKey(getDescKey())) {
+			tooltip.add(new TranslationTextComponent(getDescKey()).applyTextStyle(TextFormatting.BLUE));
 		}
 	}
 	
-	public static int getMetaFromType(SkillItemType element) {
-		if (element == null)
-			return 0;
-		
-		return element.ordinal();
+	public static class Mirror extends NostrumSkillItem {
+		public Mirror() {
+			super(NostrumItems.PropUnstackable().rarity(Rarity.RARE), (player, attr, stack) -> {
+				attr.addSkillPoint();
+				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_MIRROR));
+				return true;
+			});
+		}
 	}
 	
+	public static class Ooze extends NostrumSkillItem {
+		public Ooze() {
+			super(NostrumItems.PropUnstackable().rarity(Rarity.RARE), (player, attr, stack) -> {
+				attr.addControl();
+				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_OOZE));
+				return true;
+			});
+		}
+	}
+	
+	public static class Pendant extends NostrumSkillItem {
+		public Pendant() {
+			super(NostrumItems.PropUnstackable().rarity(Rarity.RARE), (player, attr, stack) -> {
+				attr.addTech();
+				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_PENDANT));
+				return true;
+			});
+		}
+	}
+	
+	public static class Flute extends NostrumSkillItem {
+		public Flute() {
+			super(NostrumItems.PropUnstackable().rarity(Rarity.RARE), (player, attr, stack) -> {
+				attr.addFinesse();
+				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_FLUTE));
+				return true;
+			});
+		}
+	}
+	
+	public static class EnderPin extends NostrumSkillItem {
+		public EnderPin() {
+			super(NostrumItems.PropUnstackable().rarity(Rarity.RARE), (player, attr, stack) -> {
+				if (attr.hasEnhancedTeleport()) {
+					player.sendMessage(new TranslationTextComponent("info.skillitem.advtele.unlocked", new Object[0]));
+					return false;
+				} else {
+					attr.unlockEnhancedTeleport();
+					player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_ENDER_PIN));
+					return true;
+				}
+			});
+		}
+	}
+	
+	public static class SmallScroll extends NostrumSkillItem {
+		public SmallScroll() {
+			super(NostrumItems.PropUnstackable().rarity(Rarity.RARE), (player, attr, stack) -> {
+				attr.addResearchPoint();
+				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_SCROLL_SMALL));
+				return true;
+			});
+		}
+	}
+	
+	public static class LargeScroll extends NostrumSkillItem {
+		public LargeScroll() {
+			super(NostrumItems.PropUnstackable().rarity(Rarity.RARE), (player, attr, stack) -> {
+				attr.addResearchPoint();
+				attr.addResearchPoint();
+				attr.addResearchPoint();
+				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_SCROLL_LARGE));
+				return true;
+			});
+		}
+	}
 }

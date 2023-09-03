@@ -736,11 +736,11 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 			return null;
 		}
 		
-		if (stack.getTagCompound() == null || !stack.getTagCompound().hasKey("element", NBT.TAG_STRING)) {
+		if (stack.getTag() == null || !stack.getTag().hasKey("element", NBT.TAG_STRING)) {
 			return null;
 		}
 		
-		String name = stack.getTagCompound().getString("element");
+		String name = stack.getTag().getString("element");
 		EMagicElement ret = null;
 		try {
 			ret = EMagicElement.valueOf(name.toUpperCase());
@@ -760,14 +760,14 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 			return;
 		}
 		
-		CompoundNBT nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTag();
 		if (nbt == null) {
 			nbt = new CompoundNBT();
 		}
 		
 		nbt.putString("element", element.name());
 		
-		stack.setTagCompound(nbt);
+		stack.setTag(nbt);
 	}
 	
 	@Override

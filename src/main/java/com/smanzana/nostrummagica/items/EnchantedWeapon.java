@@ -30,22 +30,22 @@ import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Blocks;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -137,10 +137,10 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 	}
 	
 	@Override
-	public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot slot) {
+	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType slot) {
 		Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
 
-		if (slot == EntityEquipmentSlot.MAINHAND) {
+		if (slot == EquipmentSlotType.MAINHAND) {
 			multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", damage, 0));
 			
 			final double amt;
@@ -177,7 +177,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 			}
 			
 			multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -amt, 0));
-		} else if (slot == EntityEquipmentSlot.OFFHAND && element == EMagicElement.WIND) {
+		} else if (slot == EquipmentSlotType.OFFHAND && element == EMagicElement.WIND) {
 			final double amt = level * 0.1;
 			multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(OFFHAND_ATTACK_SPEED_MODIFIER, "Weapon modifier", amt, 0));
 		}
@@ -252,7 +252,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
 		Vec3d dir = playerIn.getLookVec();
 		dir = dir.add(0, -dir.y, 0).normalize();
 		
@@ -287,7 +287,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 				playerIn.resetCooldown();
 			}
 			
-			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 		} else if (element == EMagicElement.WIND) {
 			if (playerIn.getCooledAttackStrength(0.5F) > .95) {
 				if (playerIn.isSneaking()) {
@@ -296,7 +296,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 						itemStackIn.damageItem(1, playerIn);
 					}
 					playerIn.resetCooldown();
-					return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+					return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 				}
 			}
 			
@@ -331,16 +331,16 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 						itemStackIn.damageItem(1, playerIn);
 					}
 					playerIn.resetCooldown();
-					return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+					return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 				}
 			}
 		}
 			
-        return new ActionResult<ItemStack>(EnumActionResult.PASS, itemStackIn);
+        return new ActionResult<ItemStack>(ActionResultType.PASS, itemStackIn);
 	}
 	
 	@Override
-	public EnumActionResult onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, EnumHand hand, Direction facing, float hitX, float hitY, float hitZ) {
+	public ActionResultType onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, Hand hand, Direction facing, float hitX, float hitY, float hitZ) {
 		ItemStack stack = playerIn.getHeldItem(hand);
 		if (playerIn.getCooledAttackStrength(0.5F) > .95) {
 			Vec3d dir = new Vec3d(pos).addVector(hitX, 0, hitZ).subtract(playerIn.getPositionVector());
@@ -353,7 +353,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 						stack.damageItem(1, playerIn);
 					}
 					playerIn.resetCooldown();
-					return EnumActionResult.SUCCESS;
+					return ActionResultType.SUCCESS;
 				}
 			} else if (element == EMagicElement.ICE) {
 				if (!worldIn.isRemote) { 
@@ -361,7 +361,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 					stack.damageItem(2, playerIn);
 				}
 				playerIn.resetCooldown();
-				return EnumActionResult.SUCCESS;
+				return ActionResultType.SUCCESS;
 			} else if (element == EMagicElement.LIGHTNING && EnchantedArmor.GetSetCount(playerIn, EMagicElement.LIGHTNING, 3) == 4) {
 				
 				boolean used = false;
@@ -392,11 +392,11 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 						stack.damageItem(1, playerIn);
 					}
 					playerIn.resetCooldown();
-					return EnumActionResult.SUCCESS;
+					return ActionResultType.SUCCESS;
 				}
 			}
 		}
-		return EnumActionResult.PASS;
+		return ActionResultType.PASS;
 		
 	}
 	
@@ -410,7 +410,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 		cloud.setDuration((int) (20 * (3 + level * .5f))); // 3 seconds + a half a second per extra level
 		cloud.addEffect(new PotionEffect(FrostbitePotion.instance(), 20 * 10));
 		cloud.addEffect((IAreaLocationEffect)(worldIn, pos) -> {
-			IBlockState state = worldIn.getBlockState(pos);
+			BlockState state = worldIn.getBlockState(pos);
 			if (state.getMaterial() == Material.WATER
 					&& (state.getBlock() == Blocks.WATER || state.getBlock() == Blocks.FLOWING_WATER)) {
 				worldIn.setBlockState(pos, Blocks.ICE.getDefaultState());
@@ -629,7 +629,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 	}
 	
 	@Override
-	public boolean itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, EnumHand hand) {
+	public boolean itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
 		if (element == EMagicElement.WIND) {
 			SpellAction fly = new SpellAction(playerIn);
 			fly.push(5.0f, level);

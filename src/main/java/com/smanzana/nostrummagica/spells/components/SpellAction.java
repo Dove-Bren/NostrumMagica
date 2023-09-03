@@ -44,14 +44,14 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.SpellActionSummary;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IEntityOwnable;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.boss.EntityDragon;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.monster.EntityEndermite;
 import net.minecraft.entity.passive.EntityAnimal;
@@ -66,7 +66,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -430,7 +430,7 @@ public class SpellAction {
 			if (world.isAirBlock(pos))
 				return true;
 			
-			IBlockState state = world.getBlockState(pos);
+			BlockState state = world.getBlockState(pos);
 			
 			if (state == null)
 				return true;
@@ -685,7 +685,7 @@ public class SpellAction {
 				
 			} else {
 				// MobEntity has held item in slot 0
-				entity.setHeldItem(EnumHand.MAIN_HAND, stack);
+				entity.setHeldItem(Hand.MAIN_HAND, stack);
 			}
 			
 			return true;
@@ -746,7 +746,7 @@ public class SpellAction {
 
 		@Override
 		public boolean apply(LivingEntity caster, World world, BlockPos block, float efficiency) {
-			IBlockState state = world.getBlockState(block);
+			BlockState state = world.getBlockState(block);
 			if (state != null && state.getBlock() instanceof Candle) {
 				Candle.light(world, block, state);
 				NostrumMagicaSounds.DAMAGE_FIRE.play(world,
@@ -1135,7 +1135,7 @@ public class SpellAction {
 			for (int i = 0; i < count; i++) {
 				Entity entity;
 				if (NostrumMagica.rand.nextFloat() <= .1f) {
-					entity = new EntityItem(world,
+					entity = new ItemEntity(world,
 							x, y, z,
 							new ItemStack(Items.ENDER_PEARL));
 				} else if (NostrumMagica.rand.nextFloat() <= .3) {
@@ -1230,7 +1230,7 @@ public class SpellAction {
 				} else {
 					// MobEntity has held item in slot 0
 					if (!addedItem.isEmpty()) {
-						entity.setHeldItem(EnumHand.MAIN_HAND, addedItem);
+						entity.setHeldItem(Hand.MAIN_HAND, addedItem);
 					}
 				}
 				NostrumMagicaSounds.CAST_CONTINUE.play(entity);
@@ -1533,7 +1533,7 @@ public class SpellAction {
 				return false;
 			}
 			
-			IBlockState state = world.getBlockState(block);
+			BlockState state = world.getBlockState(block);
 			if (state == null || state.getMaterial().isLiquid())
 				return false;
 			

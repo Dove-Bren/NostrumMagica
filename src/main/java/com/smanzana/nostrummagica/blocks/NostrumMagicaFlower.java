@@ -14,7 +14,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Blocks;
@@ -100,7 +100,7 @@ public class NostrumMagicaFlower extends BlockBush {
     }
 	
 	@Override
-	public boolean isOpaqueCube(IBlockState state) {
+	public boolean isOpaqueCube(BlockState state) {
 		return false;
 	}
 	
@@ -114,16 +114,16 @@ public class NostrumMagicaFlower extends BlockBush {
 		return new BlockStateContainer(this, TYPE);
 	}
 	
-	public IBlockState getState(Type type) {
+	public BlockState getState(Type type) {
 		return getDefaultState().withProperty(TYPE, type);
 	}
 	
-	public Type getType(IBlockState state) {
+	public Type getType(BlockState state) {
 		return state.getValue(TYPE);
 	}
 	
 	@Override
-	public IBlockState getStateFromMeta(int meta) {
+	public BlockState getStateFromMeta(int meta) {
 		
 		if (meta == 0)
 			return getDefaultState().withProperty(TYPE, Type.MIDNIGHT_IRIS);
@@ -134,7 +134,7 @@ public class NostrumMagicaFlower extends BlockBush {
 	}
 	
 	@Override
-	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+	public Item getItemDropped(BlockState state, Random rand, int fortune) {
 //        switch (state.getValue(TYPE)) {
 //		case CRYSTABLOOM:
 //		case MIDNIGHT_IRIS:
@@ -148,7 +148,7 @@ public class NostrumMagicaFlower extends BlockBush {
     }
 	
 	@Override
-	public int quantityDropped(IBlockState state, int fortune, Random random) {
+	public int quantityDropped(BlockState state, int fortune, Random random) {
 		int count = 1;
 		
 		if (state.getValue(TYPE) == Type.MIDNIGHT_IRIS) {
@@ -166,7 +166,7 @@ public class NostrumMagicaFlower extends BlockBush {
 	}
 	
 	@Override
-	public int damageDropped(IBlockState state) {
+	public int damageDropped(BlockState state) {
 		return getReagentMetaFromType(state.getValue(TYPE));
 	}
 	
@@ -175,26 +175,26 @@ public class NostrumMagicaFlower extends BlockBush {
 	}
 	
 	@Override
-	public int getMetaFromState(IBlockState state) {
+	public int getMetaFromState(BlockState state) {
 		return state.getValue(TYPE).getMeta();
 	}
 	
 	@Override
-	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, PlayerEntity player) {
+	public ItemStack getPickBlock(BlockState state, RayTraceResult target, World world, BlockPos pos, PlayerEntity player) {
 		return new ItemStack(Item.getItemFromBlock(this), 1, getMetaFromState(state));
 	}
 	
 	@Override
-	public boolean canSilkHarvest(World world, BlockPos pos, IBlockState state, PlayerEntity player) {
+	public boolean canSilkHarvest(World world, BlockPos pos, BlockState state, PlayerEntity player) {
 		return false;
 	}
 	
 	@Override
-	public void randomTick(World worldIn, BlockPos pos, IBlockState state, Random random) {
+	public void randomTick(World worldIn, BlockPos pos, BlockState state, Random random) {
 		if (random.nextBoolean()) {
 			// Check if we're on crystadirt and maybe spread
 			BlockPos groundPos = new BlockPos(pos.getX(), pos.getY() - 1, pos.getZ());
-			IBlockState ground = worldIn.getBlockState(groundPos);
+			BlockState ground = worldIn.getBlockState(groundPos);
 			
 			if (ground != null && ground.getBlock() instanceof MagicDirt) {
 				// Spread!
@@ -260,7 +260,7 @@ public class NostrumMagicaFlower extends BlockBush {
 	}
 	
 	@Override
-	protected boolean canSustainBush(IBlockState state) {
+	protected boolean canSustainBush(BlockState state) {
 		boolean ret = super.canSustainBush(state);
 		if (!ret && state.getBlock() instanceof MagicDirt) {
 			ret = true;
@@ -270,7 +270,7 @@ public class NostrumMagicaFlower extends BlockBush {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+	public void randomDisplayTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
 		super.randomDisplayTick(stateIn, worldIn, pos, rand);
 		
 		if (rand.nextBoolean()) {

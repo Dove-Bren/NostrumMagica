@@ -18,7 +18,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.nbt.CompoundNBT;
@@ -52,10 +52,10 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 	}
 	
 	@Override
-	public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
+	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
         Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
 
-        if (equipmentSlot == EntityEquipmentSlot.MAINHAND)
+        if (equipmentSlot == EquipmentSlotType.MAINHAND)
         {
             multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 4, 0));
             multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4000000953674316D, 0));
@@ -124,24 +124,24 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 	}
 	
 	public static boolean hasFreeCast(ItemStack staff) {
-		if (staff.isEmpty() || !staff.hasTagCompound())
+		if (staff.isEmpty() || !staff.hasTag())
 			return false;
 		int xp = getXP(staff);
 		return xp >= 10;
 	}
 	
 	public static void removeFreeCast(ItemStack staff) {
-		if (staff.isEmpty() || !staff.hasTagCompound())
+		if (staff.isEmpty() || !staff.hasTag())
 			return;
 		
 		setXP(staff, (byte) 0);
 	}
 	
 	public static int getXP(ItemStack staff) {
-		if (staff.isEmpty() || !staff.hasTagCompound())
+		if (staff.isEmpty() || !staff.hasTag())
 			return 0;
 		
-		CompoundNBT nbt = staff.getTagCompound();
+		CompoundNBT nbt = staff.getTag();
 		return nbt.getByte(NBT_XP);
 	}
 	
@@ -149,12 +149,12 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 		if (staff.isEmpty())
 			return;
 		
-		CompoundNBT nbt = staff.getTagCompound();
+		CompoundNBT nbt = staff.getTag();
 		if (nbt == null)
 			nbt = new CompoundNBT();
 		
 		nbt.setByte(NBT_XP, xp);
-		staff.setTagCompound(nbt);
+		staff.setTag(nbt);
 	}
 	
 	public static int addXP(ItemStack staff, int xp) {
