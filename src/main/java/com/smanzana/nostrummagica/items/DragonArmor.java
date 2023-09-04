@@ -1,9 +1,7 @@
 package com.smanzana.nostrummagica.items;
 
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
@@ -25,7 +23,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Rarity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -33,7 +30,6 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.registries.IForgeRegistry;
 
 public class DragonArmor extends Item {
 
@@ -74,36 +70,61 @@ public class DragonArmor extends Item {
 		DIAMOND;
 	}
 	
-	private static Map<DragonArmorMaterial, Map<DragonEquipmentSlot, DragonArmor>> items;
+	//private static Map<DragonArmorMaterial, Map<DragonEquipmentSlot, DragonArmor>> items;
 	
-	public static final void registerArmors(final IForgeRegistry<Item> registry) {
-		items = new EnumMap<DragonArmorMaterial, Map<DragonEquipmentSlot, DragonArmor>>(DragonArmorMaterial.class);
-		for (DragonArmorMaterial material : DragonArmorMaterial.values()) {
-			items.put(material, new EnumMap<DragonEquipmentSlot, DragonArmor>(DragonEquipmentSlot.class));
-			for (DragonEquipmentSlot slot : DragonEquipmentSlot.values()) {
-				
-				// NOT IMPLEMENTED TODO
-				{
-					if (slot == DragonEquipmentSlot.CREST || slot == DragonEquipmentSlot.WINGS) {
-						continue;
-					}
-				}
-				// NOT IMPLEMENTED TODO
-				
-				ResourceLocation location = new ResourceLocation(NostrumMagica.MODID, "dragonarmor_" + slot.name().toLowerCase() + "_" + material.name().toLowerCase());
-				DragonArmor armor = new DragonArmor(location.getPath(), slot, material);
-				armor.setRegistryName(location);
-				registry.register(armor);
-				items.get(material).put(slot, armor);
-			}
-		}
-	}
+	protected static final String ID_PREFIX = "dragonarmor_";
+	protected static final String ID_MIDFIX_HELM = "helm_";
+	protected static final String ID_MIDFIX_BODY = "body_";
+	protected static final String ID_MIDFIX_WINGS = "wings_";
+	protected static final String ID_MIDFIX_CREST = "crest_";
+	protected static final String ID_SUFFIX_GOLD = "gold";
+	protected static final String ID_SUFFIX_IRON = "iron";
+	protected static final String ID_SUFFIX_DIAMOND = "diamond";
+	
+	public static final String ID_HELM_GOLD = ID_PREFIX + ID_MIDFIX_HELM + ID_SUFFIX_GOLD;
+	public static final String ID_HELM_IRON = ID_PREFIX + ID_MIDFIX_HELM + ID_SUFFIX_IRON;
+	public static final String ID_HELM_DIAMOND = ID_PREFIX + ID_MIDFIX_HELM + ID_SUFFIX_DIAMOND;
+	
+	public static final String ID_BODY_GOLD = ID_PREFIX + ID_MIDFIX_BODY + ID_SUFFIX_GOLD;
+	public static final String ID_BODY_IRON = ID_PREFIX + ID_MIDFIX_BODY + ID_SUFFIX_IRON;
+	public static final String ID_BODY_DIAMOND = ID_PREFIX + ID_MIDFIX_BODY + ID_SUFFIX_DIAMOND;
+	
+	public static final String ID_WINGS_GOLD = ID_PREFIX + ID_MIDFIX_WINGS + ID_SUFFIX_GOLD;
+	public static final String ID_WINGS_IRON = ID_PREFIX + ID_MIDFIX_WINGS + ID_SUFFIX_IRON;
+	public static final String ID_WINGS_DIAMOND = ID_PREFIX + ID_MIDFIX_WINGS + ID_SUFFIX_DIAMOND;
+	
+	public static final String ID_CREST_GOLD = ID_PREFIX + ID_MIDFIX_CREST + ID_SUFFIX_GOLD;
+	public static final String ID_CREST_IRON = ID_PREFIX + ID_MIDFIX_CREST + ID_SUFFIX_IRON;
+	public static final String ID_CREST_DIAMOND = ID_PREFIX + ID_MIDFIX_CREST + ID_SUFFIX_DIAMOND;
+	
+//	public static final void registerArmors(final IForgeRegistry<Item> registry) {
+//		items = new EnumMap<DragonArmorMaterial, Map<DragonEquipmentSlot, DragonArmor>>(DragonArmorMaterial.class);
+//		for (DragonArmorMaterial material : DragonArmorMaterial.values()) {
+//			items.put(material, new EnumMap<DragonEquipmentSlot, DragonArmor>(DragonEquipmentSlot.class));
+//			for (DragonEquipmentSlot slot : DragonEquipmentSlot.values()) {
+//				
+//				// NOT IMPLEMENTED TODO
+//				{
+//					if (slot == DragonEquipmentSlot.CREST || slot == DragonEquipmentSlot.WINGS) {
+//						continue;
+//					}
+//				}
+//				// NOT IMPLEMENTED TODO
+//				
+//				ResourceLocation location = new ResourceLocation(NostrumMagica.MODID, "dragonarmor_" + slot.name().toLowerCase() + "_" + material.name().toLowerCase());
+//				DragonArmor armor = new DragonArmor(location.getPath(), slot, material);
+//				armor.setRegistryName(location);
+//				registry.register(armor);
+//				items.get(material).put(slot, armor);
+//			}
+//		}
+//	}
 	
 	public static final List<DragonArmor> GetAllArmors() {
 		List<DragonArmor> list = new ArrayList<>();
 		for (DragonArmorMaterial material : DragonArmorMaterial.values()) {
 			for (DragonEquipmentSlot slot : DragonEquipmentSlot.values()) {
-				DragonArmor armor = items.get(material).get(slot);
+				DragonArmor armor = GetArmor(slot, material);
 				if (armor != null) {
 					list.add(armor);
 				}
@@ -113,7 +134,50 @@ public class DragonArmor extends Item {
 	}
 	
 	public static final DragonArmor GetArmor(DragonEquipmentSlot slot, DragonArmorMaterial material) {
-		return items.get(material).get(slot);
+		switch (slot) {
+		case HELM:
+			switch (material) {
+			case IRON:
+				return NostrumItems.dragonArmorHelmIron;
+			case GOLD:
+				return NostrumItems.dragonArmorHelmGold;
+			case DIAMOND:
+				return NostrumItems.dragonArmorHelmDiamond;
+			}
+			break;
+		case BODY:
+			switch (material) {
+			case IRON:
+				return NostrumItems.dragonArmorBodyIron;
+			case GOLD:
+				return NostrumItems.dragonArmorBodyGold;
+			case DIAMOND:
+				return NostrumItems.dragonArmorBodyDiamond;
+			}
+			break;
+		case WINGS:
+			switch (material) {
+			case IRON:
+				return NostrumItems.dragonArmorWingsIron;
+			case GOLD:
+				return NostrumItems.dragonArmorWingsGold;
+			case DIAMOND:
+				return NostrumItems.dragonArmorWingsDiamond;
+			}
+			break;
+		case CREST:
+			switch (material) {
+			case IRON:
+				return NostrumItems.dragonArmorCrestIron;
+			case GOLD:
+				return NostrumItems.dragonArmorCrestGold;
+			case DIAMOND:
+				return NostrumItems.dragonArmorCrestDiamond;
+			}
+			break;
+		}
+		
+		return null;
 	}
 	
 	// UUIDs for modifiers for base attributes from armor (index is slot enum's ordinal)

@@ -34,7 +34,18 @@ public class NostrumItems {
 	@ObjectHolder(ArcaneWolfSoulItem.ID) public static ArcaneWolfSoulItem arcaneWolfSoulItem;
 	@ObjectHolder(BlankScroll.ID) public static BlankScroll blankScroll;
 	@ObjectHolder(ChalkItem.ID) public static ChalkItem chalkItem;
-	//@ObjectHolder(DragonArmor.ID_) public static DragonArmor dragonArmor_Helm; // TODO decide? Enumerate?
+	@ObjectHolder(DragonArmor.ID_HELM_GOLD) public static DragonArmor dragonArmorHelmGold;
+	@ObjectHolder(DragonArmor.ID_HELM_IRON) public static DragonArmor dragonArmorHelmIron;
+	@ObjectHolder(DragonArmor.ID_HELM_DIAMOND) public static DragonArmor dragonArmorHelmDiamond;
+	@ObjectHolder(DragonArmor.ID_BODY_GOLD) public static DragonArmor dragonArmorBodyGold;
+	@ObjectHolder(DragonArmor.ID_BODY_IRON) public static DragonArmor dragonArmorBodyIron;
+	@ObjectHolder(DragonArmor.ID_BODY_DIAMOND) public static DragonArmor dragonArmorBodyDiamond;
+	@ObjectHolder(DragonArmor.ID_WINGS_GOLD) public static DragonArmor dragonArmorWingsGold;
+	@ObjectHolder(DragonArmor.ID_WINGS_IRON) public static DragonArmor dragonArmorWingsIron;
+	@ObjectHolder(DragonArmor.ID_WINGS_DIAMOND) public static DragonArmor dragonArmorWingsDiamond;
+	@ObjectHolder(DragonArmor.ID_CREST_GOLD) public static DragonArmor dragonArmorCrestGold;
+	@ObjectHolder(DragonArmor.ID_CREST_IRON) public static DragonArmor dragonArmorCrestIron;
+	@ObjectHolder(DragonArmor.ID_CREST_DIAMOND) public static DragonArmor dragonArmorCrestDiamond;
 	@ObjectHolder(DragonEgg.ID) public static DragonEgg dragonEgg;
 	@ObjectHolder(DragonEggFragment.ID) public static DragonEggFragment dragonEggFragment;
 	@ObjectHolder(DragonSoulItem.ID) public static DragonSoulItem dragonSoulItem;
@@ -122,27 +133,20 @@ public class NostrumItems {
 	@ObjectHolder(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_SPOOKY) public static SpellPlate spellPlateSpooky;
 	@ObjectHolder(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_MUTED) public static SpellPlate spellPlateMuted;
 	@ObjectHolder(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_LIVING) public static SpellPlate spellPlateLiving;
+	@ObjectHolder(SpellRune.ID) public static SpellRune spellRune;
 	@ObjectHolder(SpellScroll.ID) public static SpellScroll spellScroll;
 	@ObjectHolder(SpellTableItem.ID) public static SpellTableItem spellTableItem;
-//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
-//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
-//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
-//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
-//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
-//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
-//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
-//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
-//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
-//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
-//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
-//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
-//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
-//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
-//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
-//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
-//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
-//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
-//	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem;
+	@ObjectHolder(SpellTome.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_NOVICE) public static SpellTome spellTomeNovice;
+	@ObjectHolder(SpellTome.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_ADVANCED) public static SpellTome spellTomeAdvanced;
+	@ObjectHolder(SpellTome.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_COMBAT) public static SpellTome spellTomeCombat;
+	@ObjectHolder(SpellTome.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_DEATH) public static SpellTome spellTomeDeath;
+	@ObjectHolder(SpellTome.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_SPOOKY) public static SpellTome spellTomeSpooky;
+	@ObjectHolder(SpellTome.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_MUTED) public static SpellTome spellTomeMuted;
+	@ObjectHolder(SpellTome.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_LIVING) public static SpellTome spellTomeLiving;
+	@ObjectHolder(SpellTomePage.ID) public static SpellTomePage spellTomePage;
+	@ObjectHolder(ThanoPendant.ID) public static ThanoPendant thanoPendant;
+	@ObjectHolder(ThanosStaff.ID) public static ThanosStaff thanosStaff;
+	@ObjectHolder(WarlockSword.ID) public static WarlockSword warlockSword;
 	
 	
 	public NostrumItems() {

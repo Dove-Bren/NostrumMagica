@@ -1,0 +1,19 @@
+{
+  "type": "nostrummagica:bauble_color",
+  "display": {
+	  "item": "nostrummagica:ribbon",
+	  "data": 17,
+	  "nbt": {
+		  "element": "LIGHTNING"
+	  }
+  },
+  "ingredients": [
+    {
+      "item": "nostrummagica:ribbon",
+	  "data": 17
+    },
+    {
+      "item": "#ESSENCE_LIGHTNING"
+    }
+  ]
+}

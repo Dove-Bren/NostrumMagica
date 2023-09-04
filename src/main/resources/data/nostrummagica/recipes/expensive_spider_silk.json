@@ -1,0 +1,18 @@
+{
+  "type": "forge:ore_shapeless",
+  "result": {
+    "item": "nostrum_reagent",
+	"data": 1
+  },
+  "ingredients": [
+    {
+      "item": "minecraft:string"
+    },
+    {
+      "item": "minecraft:string"
+    },
+    {
+      "item": "minecraft:sugar"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "type": "forge:ore_shapeless",
+  "result": {
+    "item": "nostrum_essence",
+	"data": 1
+  },
+  "ingredients": [
+    {
+      "item": "#ESSENCE_VOID"
+    },
+    {
+      "item": "#ESSENCE_VOID"
+    }
+  ]
+}

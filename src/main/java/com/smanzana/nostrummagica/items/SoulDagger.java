@@ -124,7 +124,7 @@ public class SoulDagger extends SwordItem implements ILoreTagged, ISpellArmor {
 	
 	@Override
 	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return !repair.isEmpty() && repair.getItem() == NostrumItems.crystalSmall;
+        return !repair.isEmpty() && NostrumItemTags.CrystalSmall.contains(repair.getItem());
     }
 
 	@Override

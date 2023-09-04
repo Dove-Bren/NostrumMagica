@@ -2,20 +2,21 @@ package com.smanzana.nostrummagica.items;
 
 import java.util.List;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Rarity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -32,23 +33,13 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellArmor {
 	private static final int THANOS_XP_PER = 10;
 	private static final int MAX_THANOS_XP = 5 * THANOS_XP_PER;
 	
-	private static ThanoPendant instance = null;
-	public static ThanoPendant instance() {
-		if (instance == null)
-			instance = new ThanoPendant();
-		
-		return instance;
-	}
-	
 	public ThanoPendant() {
-		super();
-		this.setUnlocalizedName(ID);
-		this.setRegistryName(NostrumMagica.MODID, ID);
-		this.setMaxDamage(MAX_THANOS_XP / THANOS_XP_PER);
-		this.setMaxStackSize(1);
-		this.setCreativeTab(NostrumMagica.creativeTab);
+		super(NostrumItems.PropUnstackable()
+				.rarity(Rarity.UNCOMMON)
+				.maxDamage(MAX_THANOS_XP / THANOS_XP_PER));
 	}
 	
+	@Override
 	public boolean isEnchantable(ItemStack stack) {
 		return false;
 	}
@@ -76,10 +67,10 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellArmor {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-		tooltip.add(I18n.format("item.info.thanos.desc", (Object[]) null));
+	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		tooltip.add(new TranslationTextComponent("item.info.thanos.desc"));
 		int charges = thanosGetWholeCharges(stack);
-		tooltip.add(ChatFormatting.GREEN + I18n.format("item.info.thanos.charges", new Object[] {charges}));
+		tooltip.add(new TranslationTextComponent("item.info.thanos.charges", charges).applyTextStyle(TextFormatting.GREEN));
 	}
 
 	@Override
@@ -139,7 +130,7 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellArmor {
 		
 		int count = thanosGetWholeCharges(stack);
 		int max = MAX_THANOS_XP / THANOS_XP_PER;
-		stack.setItemDamage(max - count);
+		stack.setDamage(max - count);
 	}
 	
 	public static int thanosGetXP(ItemStack stack) {

@@ -1,0 +1,21 @@
+{
+  "type": "nostrummagica:aether_cloak_toggle",
+  "key": "trimmed",
+  "display": {
+	  "item": "nostrummagica:aether_cloak",
+	  "nbt": {
+		  "display_trimmed": true
+	  }
+  },
+  "ingredients": [
+    {
+      "item": "#AETHER_CLOAK"
+    },
+    {
+      "item": "minecraft:shears"
+    },
+    {
+      "item": "minecraft:shears"
+    }
+  ]
+}

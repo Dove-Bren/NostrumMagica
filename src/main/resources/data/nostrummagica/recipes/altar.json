@@ -1,0 +1,24 @@
+{
+  "type": "forge:ore_shaped",
+  "result": {
+    "item": "nostrummagica:altar_item"
+  },
+  "pattern": [
+    "SSS",
+    " T ",
+    "TRT"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:stone_slab",
+	  "data": 0
+    },
+    "T": {
+      "type": "forge:ore_dict",
+	  "ore": "stone"
+    },
+    "R": {
+      "item": "#RESOURCE_CRYSTALMEDIUM"
+    }
+  }
+}

@@ -7,8 +7,6 @@ import java.util.UUID;
 
 import javax.annotation.Nonnull;
 
-import org.lwjgl.input.Keyboard;
-
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.realmsclient.gui.ChatFormatting;
@@ -23,7 +21,6 @@ import com.smanzana.nostrummagica.entity.IEntityTameable;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
 import com.smanzana.nostrummagica.integration.enderio.wrappers.IItemOfTravelWrapper;
 import com.smanzana.nostrummagica.integration.enderio.wrappers.TravelSourceWrapper;
-import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -35,19 +32,22 @@ import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
+import com.smanzana.nostrummagica.utils.ItemStacks;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
-import info.loenwind.autoconfig.factory.IValue;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemSword;
+import net.minecraft.item.ItemTier;
+import net.minecraft.item.Items;
+import net.minecraft.item.Rarity;
+import net.minecraft.item.SwordItem;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
@@ -55,38 +55,25 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-@Optional.Interface(iface="com.smanzana.nostrummagica.integration.enderio.wrappers.IItemOfTravelWrapper",modid="enderio")
-public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor, IItemOfTravelWrapper, IRaytraceOverlay {
+//@Optional.Interface(iface="com.smanzana.nostrummagica.integration.enderio.wrappers.IItemOfTravelWrapper",modid="enderio")
+public class WarlockSword extends SwordItem implements ILoreTagged, ISpellArmor, /*IItemOfTravelWrapper,*/ IRaytraceOverlay {
 
-	public static String ID = "warlock_sword";
+	public static final String ID = "warlock_sword";
 	private static final String NBT_LEVELS = "levels";
 	private static final String NBT_CAPACITY = "capacity";
 	private static final String NBT_ENDERIO_TRAVEL_CAP = "enderio_travel";
 	
 	private static final UUID WARLOCKBLADE_POTENCY_UUID = UUID.fromString("2d5dd2dc-3f5c-4dce-be8f-fa93627fe560");
 	
-	private static WarlockSword instance = null;
-
-	public static WarlockSword instance() {
-		if (instance == null)
-			instance = new WarlockSword();
-	
-		return instance;
-
-	}
-
 	public WarlockSword() {
-		super(ToolMaterial.DIAMOND);
-		this.setMaxDamage(1200);
-		this.setUnlocalizedName(ID);
-		this.setRegistryName(NostrumMagica.MODID, ID);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setMaxStackSize(1);
+		super(ItemTier.DIAMOND, 3, -2.4F, NostrumItems.PropEquipment().maxDamage(1200).rarity(Rarity.UNCOMMON));
 	}
 	
 	@Override
@@ -94,9 +81,9 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 		Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
 
 		if (equipmentSlot == EquipmentSlotType.MAINHAND) {
-			multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 7, 0));
-			multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.7000000953674316D, 0));
-			multimap.put(AttributeMagicPotency.instance().getName(), new AttributeModifier(WARLOCKBLADE_POTENCY_UUID, "Potency modifier", 10, 0));
+			multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 7, AttributeModifier.Operation.ADDITION));
+			multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.7000000953674316D, AttributeModifier.Operation.ADDITION));
+			multimap.put(AttributeMagicPotency.instance().getName(), new AttributeModifier(WARLOCKBLADE_POTENCY_UUID, "Potency modifier", 10, AttributeModifier.Operation.ADDITION));
 		}
 
 		return multimap;
@@ -130,8 +117,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 	
 	@Override
 	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return !repair.isEmpty() && repair.getItem() == NostrumResourceItem.instance()
-        		&& NostrumResourceItem.getTypeFromMeta(repair.getMetadata()) == ResourceType.CRYSTAL_MEDIUM;
+        return !repair.isEmpty() && NostrumItemTags.CrystalMedium.contains(repair.getItem());
     }
 
 	@Override
@@ -142,10 +128,10 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		super.addInformation(stack, worldIn, tooltip, flagIn);
 		
-		boolean extra = Keyboard.isKeyDown(Minecraft.getInstance().gameSettings.keyBindSneak.getKeyCode());
+		boolean extra = Screen.hasShiftDown();
 		
 		Map<EMagicElement, Float> levels = getLevels(stack);
 		for (EMagicElement elem : EMagicElement.values()) {
@@ -158,16 +144,16 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 			if (extra) {
 				str += " (" + Math.floor(100 * (f - Math.floor(f))) + "%)";
 			}
-			tooltip.add(str);
+			tooltip.add(new StringTextComponent(str));
 		}
 		
 		if (extra) {
-			tooltip.add("Capacity: " + getCapacity(stack));
+			tooltip.add(new StringTextComponent("Capacity: " + getCapacity(stack)));
 			if (hasEnderIOTravel(stack)) {
-				tooltip.add(ChatFormatting.DARK_PURPLE + "EnderIO Travel Anchor Support" + ChatFormatting.RESET);
+				tooltip.add(new StringTextComponent("EnderIO Travel Anchor Support").applyTextStyle(TextFormatting.DARK_PURPLE));
 			}
 		} else {
-			tooltip.add("[Hold Shift]");			
+			tooltip.add(new StringTextComponent("[Hold Shift]"));			
 		}
 	}
 	
@@ -260,29 +246,29 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 		return stack;
 	}
 	
-	@Override
-	@OnlyIn(Dist.CLIENT)
-	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-		if (this.isInCreativeTab(tab)) {
-			subItems.add(addCapacity(new ItemStack(this), 10));
-			subItems.add(setLevel(setLevel(setLevel(setLevel(
-					new ItemStack(this),
-					EMagicElement.PHYSICAL, 1),
-					EMagicElement.FIRE, 2),
-					EMagicElement.WIND, 2),
-					EMagicElement.ENDER, 2));
-			subItems.add(setLevel(setLevel(setLevel(setLevel(
-					new ItemStack(this),
-					EMagicElement.PHYSICAL, 1),
-					EMagicElement.ICE, 2),
-					EMagicElement.EARTH, 2),
-					EMagicElement.LIGHTNING, 2));
-			
-			if (NostrumMagica.enderIO.isEnabled()) {
-				subItems.add(setEnderIOTravel(addCapacity(new ItemStack(this), 10), true));
-			}
-		}
-	}
+//	@Override
+//	@OnlyIn(Dist.CLIENT)
+//	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+//		if (this.isInCreativeTab(tab)) {
+//			subItems.add(addCapacity(new ItemStack(this), 10));
+//			subItems.add(setLevel(setLevel(setLevel(setLevel(
+//					new ItemStack(this),
+//					EMagicElement.PHYSICAL, 1),
+//					EMagicElement.FIRE, 2),
+//					EMagicElement.WIND, 2),
+//					EMagicElement.ENDER, 2));
+//			subItems.add(setLevel(setLevel(setLevel(setLevel(
+//					new ItemStack(this),
+//					EMagicElement.PHYSICAL, 1),
+//					EMagicElement.ICE, 2),
+//					EMagicElement.EARTH, 2),
+//					EMagicElement.LIGHTNING, 2));
+//			
+//			if (NostrumMagica.enderIO.isEnabled()) {
+//				subItems.add(setEnderIOTravel(addCapacity(new ItemStack(this), 10), true));
+//			}
+//		}
+//	}
 	
 	public static void doEffect(LivingEntity entity, EMagicElement element) {
 		if (entity.world.isRemote) {
@@ -291,7 +277,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 		
 		NostrumParticles.GLOW_ORB.spawn(entity.world, new SpawnParams(
 				3,
-				entity.posX, entity.posY + entity.height, entity.posZ, 1, 30, 5,
+				entity.posX, entity.posY + entity.getHeight(), entity.posZ, 1, 30, 5,
 				new Vec3d(0, -0.05, 0), null
 				).color(0x80000000 | (0x00FFFFFF & element.getColor())));
 	}
@@ -462,7 +448,8 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 							return true;
 						}, .5);
 				
-				if (result != null && result.entityHit != null) {
+				
+				if (RayTrace.entFromRaytrace(result) != null) {
 					boolean any = false;
 					Map<EMagicElement, Float> power = getLevels(stack);
 					for (EMagicElement elem : EMagicElement.values()) {
@@ -475,7 +462,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 					}
 					
 					if (any) {
-						stack.damageItem(1, playerIn);
+						ItemStacks.damageItem(stack, playerIn, hand, 1);
 						NostrumMagicaSounds.DAMAGE_LIGHTNING.play(playerIn);
 						playerIn.resetCooldown();
 						playerIn.swingArm(hand);
@@ -493,7 +480,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 		Hand hand = Hand.MAIN_HAND;
 		@Nonnull ItemStack stack = player.getHeldItem(hand);
 		if (stack.getItem() instanceof WarlockSword) {
-			if (instance().tryCast(player.world, player, hand, stack)) {
+			if (((WarlockSword) stack.getItem()).tryCast(player.world, player, hand, stack)) {
 				return true;
 			}
 		}
@@ -502,7 +489,7 @@ public class WarlockSword extends ItemSword implements ILoreTagged, ISpellArmor,
 		hand = Hand.OFF_HAND;
 		stack = player.getHeldItem(hand);
 		if (stack.getItem() instanceof WarlockSword) {
-			if (instance().tryCast(player.world, player, hand, stack)) {
+			if (((WarlockSword) stack.getItem()).tryCast(player.world, player, hand, stack)) {
 				return true;
 			}
 		}

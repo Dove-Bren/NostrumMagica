@@ -7,12 +7,12 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.util.Direction;
 import net.minecraft.util.EntityPredicates;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -61,7 +61,7 @@ public class RayTrace {
 		
 		@Override
 		public boolean test(Entity input) {
-			if (filterLiving.apply(input)) {
+			if (filterLiving.test(input)) {
 				// is LivingEntity
 				return filterMe.apply(NostrumMagica.resolveEntityLiving(input));
 			}
@@ -82,6 +82,23 @@ public class RayTrace {
 	public static RayTraceResult miss(Vec3d fromPos, Vec3d toPos) {
 		Vec3d rayVec = toPos.subtract(fromPos);
     	return BlockRayTraceResult.createMiss(fromPos, Direction.getFacingFromVector(rayVec.x, rayVec.y, rayVec.z), new BlockPos(fromPos));
+	}
+	
+	public static @Nullable Entity entFromRaytrace(RayTraceResult result) {
+		if (result == null
+				|| result.getType() != RayTraceResult.Type.ENTITY) {
+			return null;
+		}
+		
+		return ((EntityRayTraceResult) result).getEntity();
+	}
+	
+	public static @Nullable LivingEntity livingFromRaytrace(RayTraceResult result) {
+		@Nullable Entity ent = entFromRaytrace(result);
+		if (ent != null && ent instanceof LivingEntity) {
+			return (LivingEntity) ent;
+		}
+		return null;
 	}
 	
 	public static RayTraceResult raytrace(World world, @Nonnull Entity tracingEntity, Vec3d fromPos, float pitch,

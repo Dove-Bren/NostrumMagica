@@ -1,0 +1,14 @@
+{
+  "type": "forge:ore_shapeless",
+  "result": {
+    "item": "nostrummagica:"
+  },
+  "ingredients": [
+    {
+      "item": "nostrummagica:"
+    },
+    {
+      "item": "nostrummagica:"
+    }
+  ]
+}

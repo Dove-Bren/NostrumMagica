@@ -1,0 +1,30 @@
+{
+  "type": "forge:ore_shapeless",
+  "result": {
+    "item": "nostrum_gem",
+	"data": 0
+  },
+  "ingredients": [
+    {
+      "item": "#ESSENCE_VOID"
+    },
+    {
+      "item": "#ESSENCE_EARTH"
+    },
+    {
+      "item": "#ESSENCE_ENDER"
+    },
+    {
+      "item": "#ESSENCE_FIRE"
+    },
+    {
+      "item": "#ESSENCE_ICE"
+    },
+    {
+      "item": "#ESSENCE_LIGHTNING"
+    },
+    {
+      "item": "#ESSENCE_WIND"
+    }
+  ]
+}

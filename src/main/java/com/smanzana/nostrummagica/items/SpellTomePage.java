@@ -2,19 +2,19 @@ package com.smanzana.nostrummagica.items;
 
 import java.util.List;
 
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Rarity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -23,27 +23,15 @@ public class SpellTomePage extends Item implements ILoreTagged {
 
 	private static final String NBT_LEVEL = "nostrum_level";
 	private static final String NBT_TYPE = "nostrum_type";
-	private static SpellTomePage instance = null;
 	
-	public static SpellTomePage instance() {
-		if (instance == null)
-			instance = new SpellTomePage();
-		
-		return instance;
-	}
-	
-	public static final String id = "spelltome_page";
+	public static final String ID = "spelltome_page";
 	
 	private SpellTomePage() {
-		super();
-		this.setUnlocalizedName(id);
-		this.setRegistryName(NostrumMagica.MODID, SpellTomePage.id);
-		//this.setCreativeTab(NostrumMagica.creativeTab); // set as icon for tab
-		this.setMaxStackSize(1);
+		super(NostrumItems.PropTomeUnstackable().rarity(Rarity.UNCOMMON));
 	}
 	
-	public static ItemStack getItemstack(SpellTomeEnhancement enhancement, int level) {
-		ItemStack stack = new ItemStack(instance);
+	public static ItemStack Create(SpellTomeEnhancement enhancement, int level) {
+		ItemStack stack = new ItemStack(NostrumItems.spellTomePage);
 		
 		CompoundNBT nbt = stack.getTag();
 		
@@ -57,17 +45,6 @@ public class SpellTomePage extends Item implements ILoreTagged {
 		return stack;
 	}
 	
-	@Override
-	@OnlyIn(Dist.CLIENT)
-	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-		if (this.isInCreativeTab(tab)) {
-			// For all registered enhancements, create an item in the creative tab
-			for (SpellTomeEnhancement enhancement : SpellTomeEnhancement.getEnhancements()) {
-				subItems.add(getItemstack(enhancement, enhancement.getMaxLevel()));
-			}
-		}
-	}
-
 	@Override
 	public String getLoreKey() {
 		return "nostrum_spelltome_page";
@@ -90,13 +67,14 @@ public class SpellTomePage extends Item implements ILoreTagged {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		SpellTomeEnhancement enhance = getEnhancement(stack);
 		if (enhance == null)
 			return;
 		int level = getLevel(stack);
 		
-		tooltip.add(I18n.format(enhance.getNameFormat(), new Object[0]) + " " + toRoman(level));
+		tooltip.add(new TranslationTextComponent(enhance.getNameFormat())
+				.appendSibling(new StringTextComponent(" " + toRoman(level))));
 	}
 	
 	public static String toRoman(int num) {
@@ -181,7 +159,7 @@ public class SpellTomePage extends Item implements ILoreTagged {
 		if (!stack.hasTag())
 			return 0;
 		
-		return stack.getTag().getInteger(NBT_LEVEL);
+		return stack.getTag().getInt(NBT_LEVEL);
 	}
 	
 	public static SpellTomeEnhancement getEnhancement(ItemStack stack) {

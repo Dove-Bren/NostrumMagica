@@ -6,12 +6,11 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
+import com.smanzana.nostrummagica.utils.ItemStacks;
 
-import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
@@ -20,35 +19,24 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemSword;
+import net.minecraft.item.ItemTier;
+import net.minecraft.item.SwordItem;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
+public class ThanosStaff extends SwordItem implements ILoreTagged, ISpellArmor {
 
-	public static String ID = "thanos_staff";
+	public static final String ID = "thanos_staff";
 	private static final String NBT_XP = "absorbed_xp";
 	
-	private static ThanosStaff instance = null;
-
-	public static ThanosStaff instance() {
-		if (instance == null)
-			instance = new ThanosStaff();
-	
-		return instance;
-
-	}
-
 	public ThanosStaff() {
-		super(ToolMaterial.WOOD);
-		this.setMaxDamage(500);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setMaxStackSize(1);
-		this.setUnlocalizedName(ID);
-		this.setRegistryName(NostrumMagica.MODID, ID);
+		super(ItemTier.WOOD, 3, -2.4F, NostrumItems.PropEquipment().maxDamage(500));
 	}
 	
 	@Override
@@ -57,8 +45,8 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 
         if (equipmentSlot == EquipmentSlotType.MAINHAND)
         {
-            multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 4, 0));
-            multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4000000953674316D, 0));
+            multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 4, AttributeModifier.Operation.ADDITION));
+            multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4000000953674316D, AttributeModifier.Operation.ADDITION));
         }
 
         return multimap;
@@ -92,8 +80,7 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 	
 	@Override
 	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return !repair.isEmpty() && repair.getItem() == NostrumResourceItem.instance()
-        		&& NostrumResourceItem.getTypeFromMeta(repair.getMetadata()) == ResourceType.CRYSTAL_SMALL;
+        return !repair.isEmpty() && NostrumItemTags.CrystalSmall.contains(repair.getItem());
     }
 
 	@Override
@@ -101,7 +88,7 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 		// We provide -5% reagent cost, +15% potency
 		summary.addReagentCost(-.05f);
 		summary.addEfficiency(.15f);
-		stack.damageItem(1, caster);
+		ItemStacks.damageItem(stack, caster, caster.getHeldItemMainhand() == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
 
 		if (summary.getReagentCost() <= 0) {
 			return;
@@ -117,10 +104,10 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		super.addInformation(stack, worldIn, tooltip, flagIn);
-		tooltip.add("Magic Potency Bonus: 15%");
-		tooltip.add("Reagent Cost Discount: 5%");
+		tooltip.add(new StringTextComponent("Magic Potency Bonus: 15%"));
+		tooltip.add(new StringTextComponent("Reagent Cost Discount: 5%"));
 	}
 	
 	public static boolean hasFreeCast(ItemStack staff) {
@@ -153,7 +140,7 @@ public class ThanosStaff extends ItemSword implements ILoreTagged, ISpellArmor {
 		if (nbt == null)
 			nbt = new CompoundNBT();
 		
-		nbt.setByte(NBT_XP, xp);
+		nbt.putByte(NBT_XP, xp);
 		staff.setTag(nbt);
 	}
 	

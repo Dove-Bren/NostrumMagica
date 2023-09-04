@@ -17,28 +17,26 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
-import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.item.crafting.IRecipeSerializer;
+import net.minecraft.item.crafting.SpecialRecipe;
+import net.minecraft.item.crafting.SpecialRecipeSerializer;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.registries.IForgeRegistryEntry;
+import net.minecraftforge.common.util.Constants.NBT;
 
 public class SpellRune extends Item implements ILoreTagged {
 	
@@ -79,14 +77,20 @@ public class SpellRune extends Item implements ILoreTagged {
 
 	}
 	
-	public static class RuneRecipe extends IForgeRegistryEntry.Impl<IRecipe> implements IRecipe {
+	public static class RuneRecipe extends SpecialRecipe {
+		
+		protected static final SpecialRecipeSerializer<RuneRecipe> Serializer = IRecipeSerializer.register("crafting_special_nostrum_rune", new SpecialRecipeSerializer<>(RuneRecipe::new));
 		
 		public RuneRecipe() {
-			this.setRegistryName("nostrum.recipe.rune");
+			this(new ResourceLocation(NostrumMagica.MODID, "nostrum.recipe.rune"));
+		}
+		
+		public RuneRecipe(ResourceLocation idIn) {
+			super(idIn);
 		}
 
 		@Override
-		public boolean matches(InventoryCrafting inv, World worldIn) {
+		public boolean matches(CraftingInventory inv, World worldIn) {
 			boolean foundTwo = false; // Found at least two runes
 			boolean shape = false;
 			EMagicElement element = null;
@@ -170,7 +174,7 @@ public class SpellRune extends Item implements ILoreTagged {
 		}
 
 		@Override
-		public @Nonnull ItemStack getCraftingResult(InventoryCrafting inv) {
+		public @Nonnull ItemStack getCraftingResult(CraftingInventory inv) {
 			SpellShape shape = null;
 			EMagicElement element = null;
 			EAlteration alteration = null;
@@ -267,13 +271,13 @@ public class SpellRune extends Item implements ILoreTagged {
 			}
 		}
 
-		@Override
-		public ItemStack getRecipeOutput() {
-			return SpellRune.getRune(EMagicElement.FIRE, 1);
-		}
+//		@Override
+//		public ItemStack getRecipeOutput() {
+//			return SpellRune.getRune(EMagicElement.FIRE, 1);
+//		}
 
 		@Override
-		public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
+		public NonNullList<ItemStack> getRemainingItems(CraftingInventory inv) {
 			return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
 		}
 
@@ -281,9 +285,14 @@ public class SpellRune extends Item implements ILoreTagged {
 		public boolean canFit(int width, int height) {
 			return width * height >= 4;
 		}
+
+		@Override
+		public IRecipeSerializer<?> getSerializer() {
+			return Serializer;
+		}
 		
 	}
-
+	
 	public static final String ID = "nostrum_rune";
 	private static final String NBT_TYPE = "type"; // all
 	private static final String NBT_NAME = "name"; // all
@@ -293,109 +302,99 @@ public class SpellRune extends Item implements ILoreTagged {
 	private static final String NBT_SHAPE_ELEMENT = "shape_element"; // shapes
 	private static final String NBT_ELEMENT_COUNT = "e_count"; // shapes
 	
-	private static SpellRune instance = null;
-	public static SpellRune instance() {
-		if (instance == null)
-			instance = new SpellRune();
-		
-		return instance;
-	}
-
 	public SpellRune() {
-		super();
-		this.setUnlocalizedName(ID);
-		this.setRegistryName(NostrumMagica.MODID, SpellRune.ID);
-		this.setMaxDamage(0);
-		this.setMaxStackSize(1);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setHasSubtypes(true);
+		super(NostrumItems.PropUnstackable());
 	}
 	
+	// TODO decide about this
 	@Override
-	public String getUnlocalizedName(ItemStack stack) {
-		return this.getUnlocalizedName() + "." + getPieceName(stack).toLowerCase();
+	public String getTranslationKey(ItemStack stack) {
+		return this.getDefaultTranslationKey() + "." + getPieceName(stack).toLowerCase();
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		if (isElement(stack)) {
-			tooltip.add(TextFormatting.DARK_GRAY + "Element" + TextFormatting.RESET);
+			tooltip.add(new StringTextComponent("Element").applyTextStyle(TextFormatting.DARK_GRAY));
 			int count = getPieceElementCount(stack);
 			if (count != 0)
-				tooltip.add(TextFormatting.DARK_GREEN + "Power " + count + TextFormatting.RESET);
+				tooltip.add(new StringTextComponent("Power " + count).applyTextStyle(TextFormatting.DARK_GREEN));
 		} else if (isAlteration(stack)) {
-			tooltip.add(TextFormatting.AQUA + "Alteration" + TextFormatting.RESET);
+			tooltip.add(new StringTextComponent("Alteration").applyTextStyle(TextFormatting.AQUA));
 		} else if (isTrigger(stack)) {
-			tooltip.add(TextFormatting.DARK_BLUE + "Trigger" + TextFormatting.RESET);
+			tooltip.add(new StringTextComponent("Trigger").applyTextStyle(TextFormatting.DARK_BLUE));
 			
 			SpellPartParam params = getPieceParam(stack);
 			SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
 			
 			if (comp.getTrigger().supportsBoolean() && params.flip) {
-				tooltip.add(comp.getTrigger().supportedBooleanName() + ": On");
+				tooltip.add(new StringTextComponent(comp.getTrigger().supportedBooleanName() + ": On"));
 			}
 			if (comp.getTrigger().supportedFloats() != null) {
 				float[] vals = comp.getTrigger().supportedFloats();
 				if (params.level != 0f && params.level != vals[0])
-					tooltip.add(comp.getTrigger().getDisplayName() + ": " + params.level);
+					tooltip.add(new StringTextComponent(comp.getTrigger().getDisplayName() + ": " + params.level));
 			}
 			
 		} else {
-			tooltip.add(TextFormatting.DARK_RED + "Shape" + TextFormatting.RESET);
+			tooltip.add(new StringTextComponent("Shape").applyTextStyle(TextFormatting.DARK_RED));
 			EMagicElement elem = getPieceShapeElement(stack);
-			if (elem != null)
-				tooltip.add(TextFormatting.DARK_GRAY + elem.getName() + TextFormatting.RESET);
+			if (elem != null) {
+				tooltip.add(new StringTextComponent(elem.getName()).applyTextStyle(TextFormatting.DARK_GRAY));
+			}
 			int count = getPieceElementCount(stack);
-			if (count != 0)
-				tooltip.add(TextFormatting.DARK_GREEN + "Power " + count + TextFormatting.RESET);
+			if (count != 0) {
+				tooltip.add(new StringTextComponent("Power ").applyTextStyle(TextFormatting.DARK_GREEN));
+			}
 			EAlteration alteration = getPieceShapeAlteration(stack);
-			if (alteration != null)
-				tooltip.add(TextFormatting.AQUA + alteration.getName() + TextFormatting.RESET);
+			if (alteration != null) {
+				tooltip.add(new StringTextComponent(alteration.getName()).applyTextStyle(TextFormatting.AQUA));
+			}
 			
 			SpellPartParam params = getPieceParam(stack);
 			SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
 			if (comp.getShape().supportsBoolean() && params.flip) {
-				tooltip.add(comp.getShape().supportedBooleanName() + ": On");
+				tooltip.add(new StringTextComponent(comp.getShape().supportedBooleanName() + ": On"));
 			}
 			if (comp.getShape().supportedFloats() != null) {
 				float[] vals = comp.getShape().supportedFloats();
 				if (params.level != 0f && params.level != vals[0])
-					tooltip.add(comp.getShape().getDisplayName() + ": " + params.level);
+					tooltip.add(new StringTextComponent(comp.getShape().getDisplayName() + ": " + params.level));
 			}
 		}
 		
 	}
 	
-	/**
-     * returns a list of items with the same ID, but different meta (eg: dye returns 16 items)
-     */
-    @OnlyIn(Dist.CLIENT)
-    @Override
-	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-    	if (this.isInCreativeTab(tab)) {
-	    	// Should be synced to client proxy registering variants
-	    	for (EMagicElement type : EMagicElement.values()) {
-	    		subItems.add(getRune(type, 1));
-	    	}
-	    	for (EAlteration type : EAlteration.values()) {
-	    		subItems.add(getRune(type));
-	    	}
-	    	for (SpellShape type : SpellShape.getAllShapes()) {
-	    		subItems.add(getRune(type));
-	    	}
-	    	for (SpellTrigger type : SpellTrigger.getAllTriggers()) {
-	    		subItems.add(getRune(type));
-	    	}
-    	}
-	}
+//	/**
+//     * returns a list of items with the same ID, but different meta (eg: dye returns 16 items)
+//     */
+//    @OnlyIn(Dist.CLIENT)
+//    @Override
+//	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+//    	if (this.isInCreativeTab(tab)) {
+//	    	// Should be synced to client proxy registering variants
+//	    	for (EMagicElement type : EMagicElement.values()) {
+//	    		subItems.add(getRune(type, 1));
+//	    	}
+//	    	for (EAlteration type : EAlteration.values()) {
+//	    		subItems.add(getRune(type));
+//	    	}
+//	    	for (SpellShape type : SpellShape.getAllShapes()) {
+//	    		subItems.add(getRune(type));
+//	    	}
+//	    	for (SpellTrigger type : SpellTrigger.getAllTriggers()) {
+//	    		subItems.add(getRune(type));
+//	    	}
+//    	}
+//	}
     
     public static ItemStack getRune(EMagicElement element, int power) {
     	return getRune(element, power, 1);
     }
     
     public static ItemStack getRune(EMagicElement element, int power, int count) {
-    	ItemStack stack = new ItemStack(instance, count);
+    	ItemStack stack = new ItemStack(NostrumItems.spellRune, count);
     	CompoundNBT nbt = new CompoundNBT();
     	
     	nbt.putString(NBT_TYPE, "element");
@@ -411,7 +410,7 @@ public class SpellRune extends Item implements ILoreTagged {
     }
     
     public static ItemStack getRune(EAlteration alteration, int count) {
-    	ItemStack stack = new ItemStack(instance, count);
+    	ItemStack stack = new ItemStack(NostrumItems.spellRune, count);
     	CompoundNBT nbt = new CompoundNBT();
     	
     	nbt.putString(NBT_TYPE, "alteration");
@@ -426,7 +425,7 @@ public class SpellRune extends Item implements ILoreTagged {
     }
     
     public static ItemStack getRune(SpellShape shape, int count) {
-    	ItemStack stack = new ItemStack(instance, count);
+    	ItemStack stack = new ItemStack(NostrumItems.spellRune, count);
     	CompoundNBT nbt = new CompoundNBT();
     	
     	nbt.putString(NBT_TYPE, "shape");
@@ -441,7 +440,7 @@ public class SpellRune extends Item implements ILoreTagged {
     }
     
     public static ItemStack getRune(SpellTrigger trigger, int count) {
-    	ItemStack stack = new ItemStack(instance, count);
+    	ItemStack stack = new ItemStack(NostrumItems.spellRune, count);
     	CompoundNBT nbt = new CompoundNBT();
     	
     	nbt.putString(NBT_TYPE, "trigger");
@@ -540,7 +539,7 @@ public class SpellRune extends Item implements ILoreTagged {
     	if (!piece.hasTag())
     		return null;
     	
-    	if (!piece.getTag().hasKey(NBT_SHAPE_ELEMENT, NBT.TAG_STRING))
+    	if (!piece.getTag().contains(NBT_SHAPE_ELEMENT, NBT.TAG_STRING))
     		return null;
     	
     	try {
@@ -556,9 +555,9 @@ public class SpellRune extends Item implements ILoreTagged {
     		return;
     	
     	if (element != null) {
-    		piece.getTag().setString(NBT_SHAPE_ELEMENT, element.name());
+    		piece.getTag().putString(NBT_SHAPE_ELEMENT, element.name());
     	} else {
-    		piece.getTag().removeTag(NBT_SHAPE_ELEMENT);
+    		piece.getTag().remove(NBT_SHAPE_ELEMENT);
     	}
     }
     
@@ -566,7 +565,7 @@ public class SpellRune extends Item implements ILoreTagged {
     	if (!piece.hasTag())
     		return null;
     	
-    	if (!piece.getTag().hasKey(NBT_SHAPE_ALTERATION, NBT.TAG_STRING))
+    	if (!piece.getTag().contains(NBT_SHAPE_ALTERATION, NBT.TAG_STRING))
     		return null;
     	
     	try {
@@ -582,9 +581,9 @@ public class SpellRune extends Item implements ILoreTagged {
     		return;
     	
     	if (alteration != null) {
-    		piece.getTag().setString(NBT_SHAPE_ALTERATION, alteration.name());
+    		piece.getTag().putString(NBT_SHAPE_ALTERATION, alteration.name());
     	} else {
-    		piece.getTag().removeTag(NBT_SHAPE_ALTERATION);
+    		piece.getTag().remove(NBT_SHAPE_ALTERATION);
     	}
     }
     
@@ -592,7 +591,7 @@ public class SpellRune extends Item implements ILoreTagged {
     	if (!piece.hasTag())
     		return 0;
     	
-    	return piece.getTag().getInteger(NBT_ELEMENT_COUNT);
+    	return piece.getTag().getInt(NBT_ELEMENT_COUNT);
     }
     
     private static void setPieceElementCount(ItemStack piece, int count) {
@@ -600,9 +599,9 @@ public class SpellRune extends Item implements ILoreTagged {
     		return;
     	
     	if (count > 0) {
-    		piece.getTag().setInteger(NBT_ELEMENT_COUNT, count);
+    		piece.getTag().putInt(NBT_ELEMENT_COUNT, count);
     	} else {
-    		piece.getTag().removeTag(NBT_ELEMENT_COUNT);
+    		piece.getTag().remove(NBT_ELEMENT_COUNT);
     	}
     }
     
@@ -619,14 +618,14 @@ public class SpellRune extends Item implements ILoreTagged {
     	if (!piece.hasTag())
     		return;
     	
-    	piece.getTag().setFloat(NBT_PARAM_VAL, params.level);
-    	piece.getTag().setBoolean(NBT_PARAM_FLIP, params.flip);
+    	piece.getTag().putFloat(NBT_PARAM_VAL, params.level);
+    	piece.getTag().putBoolean(NBT_PARAM_FLIP, params.flip);
     }
     
-    public ActionResultType onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, Hand hand, Direction facing, float hitX, float hitY, float hitZ)
-    {
+    @Override
+    public ActionResultType onItemUse(ItemUseContext context) {
     	// Probably wnat this later
-    	return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ);
+    	return super.onItemUse(context);
 	}
     
     public static boolean isShape(ItemStack stack) {

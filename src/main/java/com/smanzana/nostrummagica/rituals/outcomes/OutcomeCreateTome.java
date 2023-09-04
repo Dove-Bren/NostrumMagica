@@ -23,7 +23,7 @@ public class OutcomeCreateTome implements IRitualOutcome {
 	@Override
 	public void perform(World world, PlayerEntity player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
 		// Take plates and pages from the altars.
-		ItemStack tome = SpellTome.createTome(centerItem, otherItems);
+		ItemStack tome = SpellTome.Create(centerItem, otherItems);
 		if (tome.isEmpty())
 			return;
 		
