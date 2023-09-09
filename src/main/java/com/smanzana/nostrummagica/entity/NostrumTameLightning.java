@@ -11,13 +11,14 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.EntityLightningBolt;
+import net.minecraft.entity.effect.LightningBoltEntity;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 // Copy of vanilla with no fire
-public class NostrumTameLightning extends EntityLightningBolt {
+public class NostrumTameLightning extends LightningBoltEntity {
 	
 	/** Declares which state the lightning bolt is in. Whether it's in the air, hit the ground, etc. */
 	private int lightningState;

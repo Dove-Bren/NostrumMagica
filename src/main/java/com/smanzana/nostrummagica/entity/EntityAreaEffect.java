@@ -9,14 +9,13 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityAreaEffectCloud;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
@@ -29,7 +28,7 @@ import net.minecraft.world.World;
  * @author Skyler
  *
  */
-public class EntityAreaEffect extends EntityAreaEffectCloud {
+public class EntityAreaEffect extends AreaEffectCloudEntity {
 	
 	public static interface IAreaEntityEffect {
 		public void apply(World world, Entity ent);

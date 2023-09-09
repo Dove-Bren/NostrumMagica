@@ -1,16 +1,10 @@
 package com.smanzana.nostrummagica.items;
 
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
 import javax.annotation.Nonnull;
 
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -27,56 +21,60 @@ import com.smanzana.nostrummagica.potions.LightningAttackPotion;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
+import com.smanzana.nostrummagica.utils.ItemStacks;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
-import net.minecraft.block.material.Material;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.Blocks;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemSword;
+import net.minecraft.item.ItemTier;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.item.SwordItem;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraft.world.server.ServerWorld;
 
-public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
-
-	private static Map<EMagicElement, Map<Integer, EnchantedWeapon>> items;
+public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 	
-	public static final void registerWeapons(final IForgeRegistry<Item> registry) {
-		items = new EnumMap<EMagicElement, Map<Integer, EnchantedWeapon>>(EMagicElement.class);
-		
-		for (EMagicElement element : EMagicElement.values()) {
-			if (isWeaponElement(element)) {
-				items.put(element, new HashMap<Integer, EnchantedWeapon>());
-				for (int i = 0; i < 3; i++) {
-					ResourceLocation location = new ResourceLocation(NostrumMagica.MODID, "sword_" + element.name().toLowerCase() + (i + 1));
-					EnchantedWeapon weapon =  new EnchantedWeapon(location.getResourcePath(), element, i + 1);
-					weapon.setUnlocalizedName(location.getResourcePath());
-					weapon.setRegistryName(location);
-					registry.register(weapon);
-					items.get(element).put(i + 1, weapon);
-				}
-			}
-		}
+	public static enum Type {
+		NOVICE,
+		ADEPT,
+		MASTER
 	}
 	
+	protected static final String ID_PREFIX = "sword_";
+	protected static final String ID_SUFFIX_NOVICE = "novice";
+	protected static final String ID_SUFFIX_ADEPT = "adept";
+	protected static final String ID_SUFFIX_MASTER = "master";
+	
+	public static final String ID_ICE_NOVICE = ID_PREFIX + "ice_" + ID_SUFFIX_NOVICE;
+	public static final String ID_ICE_ADEPT = ID_PREFIX + "ice_" + ID_SUFFIX_ADEPT;
+	public static final String ID_ICE_MASTER = ID_PREFIX + "ice_" + ID_SUFFIX_MASTER;
+	
+	public static final String ID_WIND_NOVICE = ID_PREFIX + "wind_" + ID_SUFFIX_NOVICE;
+	public static final String ID_WIND_ADEPT = ID_PREFIX + "wind_" + ID_SUFFIX_ADEPT;
+	public static final String ID_WIND_MASTER = ID_PREFIX + "wind_" + ID_SUFFIX_MASTER;
+	
+	public static final String ID_LIGHTNING_NOVICE = ID_PREFIX + "lighting_" + ID_SUFFIX_NOVICE;
+	public static final String ID_LIGHTNING_ADEPT = ID_PREFIX + "lightning_" + ID_SUFFIX_ADEPT;
+	public static final String ID_LIGHTNING_MASTER = ID_PREFIX + "lightning_" + ID_SUFFIX_MASTER;
+	
+
 	public static boolean isWeaponElement(EMagicElement element) {
 		switch (element) {
 		case EARTH:
@@ -92,7 +90,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 		}
 	}
 	
-	private static int calcDamage(EMagicElement element, int level) {
+	private static int calcDamage(EMagicElement element, Type type) {
 		
 		float mod;
 		
@@ -110,76 +108,114 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 			mod = 1.0f;
 		}
 		
-		int base = 5 + (level * 2);
+		int bonus = 0;
+		switch (type) {
+		case NOVICE:
+			bonus = 1;
+			break;
+		case ADEPT:
+			bonus = 2;
+			break;
+		case MASTER:
+			bonus = 3;
+			break;
+		}
+		
+		int base = 5 + (bonus * 2);
 		
 		return (int) ((float) base * mod);
 	}
 	
+	private static float calcSwingSpeed(EMagicElement element, Type type) {
+		final float amt;
+		switch (element) {
+		case ICE:
+			if (type == Type.NOVICE) {
+				amt = 2.6f; // Mace only slightly slower than sword
+			} else if (type == Type.ADEPT) {
+				amt = 3.3f; // Morning star slower than vanilla axe!
+			} else {
+				amt = 2.8f; // Scepter slower than mace, but not TOO slow
+			}
+			break;
+		case LIGHTNING:
+			if (type == Type.NOVICE) {
+				amt = 1.5f; // Knife is very fast! 2.5 attacks per second (vanilla sword is 1.6)
+			} else if (type == Type.ADEPT) {
+				amt = 2.0f; // Dagger slower, but still faster than sword
+			} else {
+				amt = 1.6f; // Stiletto very fast! Lightning fast, even! lol
+			}
+			break;
+		case WIND:
+			if (type == Type.NOVICE) {
+				amt = 2.4f; // Slasher is same as vanilla sword. Heavier, but powered by wind!
+			} else if (type == Type.ADEPT) {
+				amt = 2.6f; // Slave is a tad slower
+			} else {
+				amt = 2.1f; // Striker is very fast :)
+			}
+			break;
+		default:
+			amt = 2.4f;
+		}
+		
+		return -amt;
+	}
+	
+	private static int calcDurability(EMagicElement element, Type type) {
+		int durability = 250; // Base
+		switch (type) {
+		case MASTER:
+			durability *= 2;
+			// fall through
+		case ADEPT:
+			durability *= 2;
+			// fall through
+		case NOVICE:
+			; // No bonus above base
+			// fall through
+		default:
+			break;
+		}
+		return 200;
+	}
+	
+	private static int typeScale(Type type) {
+		switch (type) {
+		case NOVICE:
+			return 1;
+		case ADEPT:
+			return 2;
+		case MASTER:
+			return 3;
+		}
+		
+		return 1;
+	}
+	
 	protected static final UUID OFFHAND_ATTACK_SPEED_MODIFIER = UUID.fromString("B2879ABC-4180-1234-B01B-487954A3BAC4");
 	
-	private int level;
-	private int damage;
+	private Type type;
 	private EMagicElement element;
 	
-	private String modelID;
-	
-	public EnchantedWeapon(String modelID, EMagicElement element, int level) {
-		super(ToolMaterial.DIAMOND);
+	public EnchantedWeapon(EMagicElement element, Type type) {
+		super(ItemTier.DIAMOND,
+				(int) (calcDamage(element, type) - ItemTier.DIAMOND.getAttackDamage()), // Calc desired damage, and subtrace the amt diamond tier is gonna give
+				calcSwingSpeed(element, type),
+				NostrumItems.PropEquipment().maxDamage(calcDurability(element, type)));
 		
-		this.level = level;
+		this.type = type;
 		this.element = element;
-		this.modelID = modelID;
-		
-		this.setMaxDamage(400);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		
-		this.damage = calcDamage(element, level);
 	}
 	
 	@Override
 	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType slot) {
-		Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
+		Multimap<String, AttributeModifier> multimap = super.getAttributeModifiers(slot);
 
-		if (slot == EquipmentSlotType.MAINHAND) {
-			multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", damage, 0));
-			
-			final double amt;
-			switch (element) {
-			case ICE:
-				if (level == 1) {
-					amt = 2.6; // Mace only slightly slower than sword
-				} else if (level == 2) {
-					amt = 3.3; // Morning star slower than vanilla axe!
-				} else {
-					amt = 2.8; // Scepter slower than mace, but not TOO slow
-				}
-				break;
-			case LIGHTNING:
-				if (level == 1) {
-					amt = 1.5; // Knife is very fast! 2.5 attacks per second (vanilla sword is 1.6)
-				} else if (level == 2) {
-					amt = 2.0; // Dagger slower, but still faster than sword
-				} else {
-					amt = 1.6; // Stiletto very fast! Lightning fast, even! lol
-				}
-				break;
-			case WIND:
-				if (level == 1) {
-					amt = 2.4; // Slasher is same as vanilla sword. Heavier, but powered by wind!
-				} else if (level == 2) {
-					amt = 2.6; // Slave is a tad slower
-				} else {
-					amt = 2.1; // Striker is very fast :)
-				}
-				break;
-			default:
-				amt = 2.4;
-			}
-			
-			multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -amt, 0));
-		} else if (slot == EquipmentSlotType.OFFHAND && element == EMagicElement.WIND) {
-			final double amt = level * 0.1;
-			multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(OFFHAND_ATTACK_SPEED_MODIFIER, "Weapon modifier", amt, 0));
+		if (slot == EquipmentSlotType.OFFHAND && element == EMagicElement.WIND) {
+			double amt = typeScale(this.type)* .1;
+			multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(OFFHAND_ATTACK_SPEED_MODIFIER, "Weapon modifier", amt, AttributeModifier.Operation.ADDITION));
 		}
 
 		return multimap;
@@ -208,13 +244,13 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 //				action = new SpellAction(user).push(5f, level);
 			break;
 		case LIGHTNING:
-			if (NostrumMagica.rand.nextFloat() < 0.1f * level)
+			if (NostrumMagica.rand.nextFloat() < 0.1f * typeScale(this.type))
 				action = new SpellAction(user).lightning();
 			break;
 		case ICE:
-			if (NostrumMagica.rand.nextFloat() < 0.5f * level)
+			if (NostrumMagica.rand.nextFloat() < 0.5f * typeScale(this.type))
 				action = new SpellAction(user).status(
-						FrostbitePotion.instance(), 5 * 20, level > 2 ? level - 2 : 0);
+						FrostbitePotion.instance(), 5 * 20, typeScale(this.type) > 2 ? typeScale(this.type) - 2 : 0);
 			break;
 		default:
 			break;
@@ -229,26 +265,60 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 		return offense;
 	}
 	
-	public static EnchantedWeapon get(EMagicElement element, int level) {
-		if (items.containsKey(element))
-			return items.get(element).get(level);
+	public static EnchantedWeapon get(EMagicElement element, Type type) {
+		EnchantedWeapon item = null;
 		
-		return null;
-	}
-	
-	public static List<EnchantedWeapon> getAll() {
-		List<EnchantedWeapon> list = new LinkedList<>();
+		switch (element) {
+		case EARTH:
+		case ENDER:
+		case FIRE:
+		case PHYSICAL:
+			; // No weapon
+			break;
+		case ICE:
+			switch (type) {
+			case NOVICE:
+				item = NostrumItems.enchantedWeaponIceNovice;
+				break;
+			case ADEPT:
+				item = NostrumItems.enchantedWeaponIceAdept;
+				break;
+			case MASTER:
+				item = NostrumItems.enchantedWeaponIceMaster;
+				break;
+			}
+		case LIGHTNING:
+			switch (type) {
+			case NOVICE:
+				item = NostrumItems.enchantedWeaponLightningNovice;
+				break;
+			case ADEPT:
+				item = NostrumItems.enchantedWeaponLightningAdept;
+				break;
+			case MASTER:
+				item = NostrumItems.enchantedWeaponLightningMaster;
+				break;
+			}
+			break;
+		case WIND:
+			switch (type) {
+			case NOVICE:
+				item = NostrumItems.enchantedWeaponWindNovice;
+				break;
+			case ADEPT:
+				item = NostrumItems.enchantedWeaponWindAdept;
+				break;
+			case MASTER:
+				item = NostrumItems.enchantedWeaponWindMaster;
+				break;
+			}
+			break;
+		default:
+			break;
 		
-		for (EMagicElement element : EMagicElement.values())
-		if (isWeaponElement(element)) {
-			list.addAll(items.get(element).values());
 		}
 		
-		return list;
-	}
-	
-	public String getModelID() {
-		return modelID;
+		return item;
 	}
 	
 	@Override
@@ -279,9 +349,9 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 //					cloud.getMotion().y = dir.y;
 //					cloud.getMotion().z = dir.z;
 					
-					spawnIceCloud(worldIn, playerIn, new Vec3d(playerIn.posX + dir.x, playerIn.posY + .75, playerIn.posZ + dir.z), dir, level);
+					spawnIceCloud(worldIn, playerIn, new Vec3d(playerIn.posX + dir.x, playerIn.posY + .75, playerIn.posZ + dir.z), dir, this.type);
 					
-					itemStackIn.damageItem(2, playerIn);
+					ItemStacks.damageItem(itemStackIn, playerIn, hand, 2);
 				}
 				
 				playerIn.resetCooldown();
@@ -292,8 +362,8 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 			if (playerIn.getCooledAttackStrength(0.5F) > .95) {
 				if (playerIn.isSneaking()) {
 					if (!worldIn.isRemote) {
-						spawnWalkingVortex(worldIn, playerIn, new Vec3d(playerIn.posX + dir.x, playerIn.posY + .75, playerIn.posZ + dir.z), dir, level);
-						itemStackIn.damageItem(1, playerIn);
+						spawnWalkingVortex(worldIn, playerIn, new Vec3d(playerIn.posX + dir.x, playerIn.posY + .75, playerIn.posZ + dir.z), dir, this.type);
+						ItemStacks.damageItem(itemStackIn, playerIn, hand, 1);
 					}
 					playerIn.resetCooldown();
 					return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
@@ -317,9 +387,9 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 					if (attr != null && attr.getMana() >= 30) {
 						if (!worldIn.isRemote) {
 							final float maxDist = 50;
-							RayTraceResult mop = RayTrace.raytrace(worldIn, playerIn.getPositionVector().addVector(0, playerIn.eyeHeight, 0), playerIn.getLookVec(), maxDist, (ent) -> { return ent != playerIn;});
-							if (mop != null && mop.typeOfHit != RayTraceResult.Type.MISS) {
-								final Vec3d at = (mop.typeOfHit == RayTraceResult.Type.ENTITY ? mop.entityHit.getPositionVector() : mop.hitVec);
+							RayTraceResult mop = RayTrace.raytrace(worldIn, playerIn, playerIn.getPositionVector().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookVec(), maxDist, (ent) -> { return ent != playerIn;});
+							if (mop != null && mop.getType() != RayTraceResult.Type.MISS) {
+								final Vec3d at = (mop.getType() == RayTraceResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop).getPositionVector() : mop.getHitVec());
 								summonBoltAtTarget(playerIn, worldIn, at);
 							}
 						}
@@ -328,7 +398,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 				}
 				if (used) {
 					if (!worldIn.isRemote) {
-						itemStackIn.damageItem(1, playerIn);
+						ItemStacks.damageItem(itemStackIn, playerIn, hand, 1);
 					}
 					playerIn.resetCooldown();
 					return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
@@ -340,25 +410,30 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 	}
 	
 	@Override
-	public ActionResultType onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, Hand hand, Direction facing, float hitX, float hitY, float hitZ) {
-		ItemStack stack = playerIn.getHeldItem(hand);
+	public ActionResultType onItemUse(ItemUseContext context) {
+		final World worldIn = context.getWorld();
+		final PlayerEntity playerIn = context.getPlayer();
+		final BlockPos pos = context.getPos();
+		Vec3d hitVec = context.getHitVec();
+		ItemStack stack = context.getItem();
+		final Hand hand = context.getHand();
 		if (playerIn.getCooledAttackStrength(0.5F) > .95) {
-			Vec3d dir = new Vec3d(pos).addVector(hitX, 0, hitZ).subtract(playerIn.getPositionVector());
+			Vec3d dir = new Vec3d(pos).add(hitVec.x, 0, hitVec.z).subtract(playerIn.getPositionVector());
 			dir = dir.add(0, -dir.y, 0);
 			dir = dir.normalize();
 			if (element == EMagicElement.WIND) {
 				if (playerIn.isSneaking()) {
 					if (!worldIn.isRemote) {
-						spawnWalkingVortex(worldIn, playerIn, new Vec3d(playerIn.posX + dir.x, playerIn.posY + .75, playerIn.posZ + dir.z), dir, level);
-						stack.damageItem(1, playerIn);
+						spawnWalkingVortex(worldIn, playerIn, new Vec3d(playerIn.posX + dir.x, playerIn.posY + .75, playerIn.posZ + dir.z), dir, this.type);
+						ItemStacks.damageItem(stack, playerIn, hand, 1);
 					}
 					playerIn.resetCooldown();
 					return ActionResultType.SUCCESS;
 				}
 			} else if (element == EMagicElement.ICE) {
 				if (!worldIn.isRemote) { 
-					spawnIceCloud(worldIn, playerIn, new Vec3d(pos.getX() + hitX, pos.getY() + 1, pos.getZ() + hitZ), dir, level);
-					stack.damageItem(2, playerIn);
+					spawnIceCloud(worldIn, playerIn, new Vec3d(pos.getX() + hitVec.x, pos.getY() + 1, pos.getZ() + hitVec.z), dir, this.type);
+					ItemStacks.damageItem(stack, playerIn, hand, 2);
 				}
 				playerIn.resetCooldown();
 				return ActionResultType.SUCCESS;
@@ -378,9 +453,9 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 					if (attr != null && attr.getMana() >= 30) {
 						if (!worldIn.isRemote) {
 							final float maxDist = 50;
-							RayTraceResult mop = RayTrace.raytrace(worldIn, playerIn.getPositionVector().addVector(0, playerIn.eyeHeight, 0), playerIn.getLookVec(), maxDist, (ent) -> { return ent != playerIn;});
-							if (mop != null && mop.typeOfHit != RayTraceResult.Type.MISS) {
-								final Vec3d at = (mop.typeOfHit == RayTraceResult.Type.ENTITY ? mop.entityHit.getPositionVector() : mop.hitVec);
+							RayTraceResult mop = RayTrace.raytrace(worldIn, playerIn, playerIn.getPositionVector().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookVec(), maxDist, (ent) -> { return ent != playerIn;});
+							if (mop != null && mop.getType() != RayTraceResult.Type.MISS) {
+								final Vec3d at = (mop.getType() == RayTraceResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop).getPositionVector() : mop.getHitVec());
 								summonBoltAtTarget(playerIn, worldIn, at);
 							}
 						}
@@ -389,7 +464,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 				}
 				if (used) {
 					if (!worldIn.isRemote) {
-						stack.damageItem(1, playerIn);
+						ItemStacks.damageItem(stack, playerIn, hand, 1);
 					}
 					playerIn.resetCooldown();
 					return ActionResultType.SUCCESS;
@@ -400,32 +475,32 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 		
 	}
 	
-	protected static void spawnIceCloud(World world, PlayerEntity caster, Vec3d at, Vec3d direction, int level) {
+	protected static void spawnIceCloud(World world, PlayerEntity caster, Vec3d at, Vec3d direction, Type weaponType) {
 		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 3 seconds
 		EntityAreaEffect cloud = new EntityAreaEffect(world, at.x, at.y, at.z);
 		cloud.setOwner(caster);
 		cloud.setWaitTime(5);
 		cloud.setRadius(0.5f);
-		cloud.setRadiusPerTick((1f + level * .75f) / (20f * 3)); // 1 (+ .75 per extra level) extra radius per 3 seconds
-		cloud.setDuration((int) (20 * (3 + level * .5f))); // 3 seconds + a half a second per extra level
+		cloud.setRadiusPerTick((1f + typeScale(weaponType) * .75f) / (20f * 3)); // 1 (+ .75 per extra level) extra radius per 3 seconds
+		cloud.setDuration((int) (20 * (3 + typeScale(weaponType) * .5f))); // 3 seconds + a half a second per extra level
 		cloud.addEffect(new PotionEffect(FrostbitePotion.instance(), 20 * 10));
 		cloud.addEffect((IAreaLocationEffect)(worldIn, pos) -> {
 			BlockState state = worldIn.getBlockState(pos);
 			if (state.getMaterial() == Material.WATER
-					&& (state.getBlock() == Blocks.WATER || state.getBlock() == Blocks.FLOWING_WATER)) {
+					&& (state.getBlock() == Blocks.WATER)) {
 				worldIn.setBlockState(pos, Blocks.ICE.getDefaultState());
 			}
 		});
 		cloud.setVerticleStepping(true);
 		cloud.setGravity(true, .1);
 		//cloud.setWalksWater();
-		world.spawnEntity(cloud);
+		world.addEntity(cloud);
 		cloud.getMotion().x = direction.x;
 		cloud.getMotion().y = direction.y;
 		cloud.getMotion().z = direction.z;
 	}
 	
-	protected static void spawnWalkingVortex(World world, PlayerEntity caster, Vec3d at, Vec3d direction, int level) {
+	protected static void spawnWalkingVortex(World world, PlayerEntity caster, Vec3d at, Vec3d direction, Type weaponType) {
 		final int hurricaneCount = EnchantedArmor.GetSetCount(caster, EMagicElement.WIND, 3);
 		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 10 seconds
 		EntityAreaEffect cloud = new EntityAreaEffect(world, at.x, at.y, at.z);
@@ -433,7 +508,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 		cloud.setWaitTime(10);
 		cloud.setRadius(.75f);
 		//cloud.setRadiusPerTick((.25f + level * .5f) / (20f * 10));
-		cloud.setDuration((int) (20 * (3 + level * .5f))); // 3 seconds + a half a second per extra level
+		cloud.setDuration((int) (20 * (3 + typeScale(weaponType) * .5f))); // 3 seconds + a half a second per extra level
 		cloud.addEffect((IAreaEntityEffect)(worldIn, entity) -> {
 			if (entity.noClip || entity.hasNoGravity()) {
 				return;
@@ -481,7 +556,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 					
 					 NostrumParticles.GLOW_ORB.spawn(living.getEntityWorld(), new NostrumParticles.SpawnParams(
 							 10,
-							 living.posX, entity.posY + entity.height/2f, entity.posZ, entity.width * 2,
+							 living.posX, entity.posY + entity.getHeight()/2f, entity.posZ, entity.getWidth() * 2,
 							 10, 5,
 							 living.getEntityId())
 							 .color(EMagicElement.WIND.getColor()));
@@ -507,19 +582,19 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 			cloud.setCustomParticleParam1(10);
 			cloud.setCustomParticleFrequency(.4f);
 		}
-		world.spawnEntity(cloud);
+		world.addEntity(cloud);
 		cloud.getMotion().x = direction.x;
 		cloud.getMotion().y = direction.y;
 		cloud.getMotion().z = direction.z;
 	}
 	
-	public static void spawnJumpVortex(World world, PlayerEntity caster, Vec3d at, int level) {
+	public static void spawnJumpVortex(World world, PlayerEntity caster, Vec3d at, Type weaponType) {
 		EntityAreaEffect cloud = new EntityAreaEffect(world, at.x, at.y, at.z);
 		cloud.setOwner(caster);
 		cloud.setWaitTime(0);
 		cloud.setRadius(1f);
 		//cloud.setRadiusPerTick((.25f + level * .5f) / (20f * 10));
-		cloud.setDuration((int) (20 * (6 + level))); // 6 seconds + a second per extra level
+		cloud.setDuration((int) (20 * (6 + typeScale(weaponType)))); // 6 seconds + a second per extra level
 		cloud.addEffect((IAreaEntityEffect)(worldIn, entity) -> {
 			if (entity.noClip || entity.hasNoGravity()) {
 				return;
@@ -544,7 +619,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 				EnchantedWeapon.spawnWhirlwindParticle(worldIn, count, cloudIn.getPositionVector(), cloudIn, 0xA090EE90, -.1f);
 			//}
 		});
-		world.spawnEntity(cloud);
+		world.addEntity(cloud);
 		//cloud.getMotion().x = direction.x;
 		//cloud.getMotion().y = direction.y;
 		//cloud.getMotion().z = direction.z;
@@ -556,7 +631,11 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 			return false;
 		}
 		
-		entity.world.addWeatherEffect(
+		if (!(entity.world instanceof ServerWorld)) {
+			return false;
+		}
+		
+		((ServerWorld)entity.world).addLightningBolt(
 				new NostrumTameLightning(entity.world, entity.posX, entity.posY, entity.posZ)
 				);
 		attr.addMana(-30);
@@ -572,6 +651,10 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 			return false;
 		}
 		
+		if (!(world instanceof ServerWorld)) {
+			return false;
+		}
+		
 		int count = 1;
 		if (caster != null && caster instanceof PlayerEntity) {
 			// Look for lightning belt
@@ -583,7 +666,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 						continue;
 					}
 					
-					ItemType type = ItemMagicBauble.getTypeFromMeta(stack.getMetadata());
+					ItemType type = ((ItemMagicBauble) stack.getItem()).getType();
 					if (type == ItemType.BELT_LIGHTNING) {
 						count = caster.getRNG().nextInt(3) + 3;
 						break;
@@ -597,7 +680,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 		for (int i = 0; i < count; i++) {
 			
 			if (i == 0) {
-				world.addWeatherEffect(
+				((ServerWorld) world).addLightningBolt(
 						new NostrumTameLightning(world, pos.x, pos.y, pos.z)
 						);
 			} else {
@@ -614,7 +697,7 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 				}
 				
 				if (world.isAirBlock(cursor)) {
-					world.addWeatherEffect(
+					((ServerWorld) world).addLightningBolt(
 						new NostrumTameLightning(world, cursor.getX() + 0.5, cursor.getY(), cursor.getZ() + 0.5)
 						);
 				}
@@ -632,9 +715,9 @@ public class EnchantedWeapon extends ItemSword implements EnchantedEquipment {
 	public boolean itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
 		if (element == EMagicElement.WIND) {
 			SpellAction fly = new SpellAction(playerIn);
-			fly.push(5.0f, level);
+			fly.push(5.0f, typeScale(this.type));
 			fly.apply(target, 1.0f);
-			stack.damageItem(2, playerIn);
+			ItemStacks.damageItem(stack, playerIn, hand, 2);
 			return true;
 		}
 

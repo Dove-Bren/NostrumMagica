@@ -70,8 +70,6 @@ public class DragonArmor extends Item {
 		DIAMOND;
 	}
 	
-	//private static Map<DragonArmorMaterial, Map<DragonEquipmentSlot, DragonArmor>> items;
-	
 	protected static final String ID_PREFIX = "dragonarmor_";
 	protected static final String ID_MIDFIX_HELM = "helm_";
 	protected static final String ID_MIDFIX_BODY = "body_";
@@ -96,29 +94,6 @@ public class DragonArmor extends Item {
 	public static final String ID_CREST_GOLD = ID_PREFIX + ID_MIDFIX_CREST + ID_SUFFIX_GOLD;
 	public static final String ID_CREST_IRON = ID_PREFIX + ID_MIDFIX_CREST + ID_SUFFIX_IRON;
 	public static final String ID_CREST_DIAMOND = ID_PREFIX + ID_MIDFIX_CREST + ID_SUFFIX_DIAMOND;
-	
-//	public static final void registerArmors(final IForgeRegistry<Item> registry) {
-//		items = new EnumMap<DragonArmorMaterial, Map<DragonEquipmentSlot, DragonArmor>>(DragonArmorMaterial.class);
-//		for (DragonArmorMaterial material : DragonArmorMaterial.values()) {
-//			items.put(material, new EnumMap<DragonEquipmentSlot, DragonArmor>(DragonEquipmentSlot.class));
-//			for (DragonEquipmentSlot slot : DragonEquipmentSlot.values()) {
-//				
-//				// NOT IMPLEMENTED TODO
-//				{
-//					if (slot == DragonEquipmentSlot.CREST || slot == DragonEquipmentSlot.WINGS) {
-//						continue;
-//					}
-//				}
-//				// NOT IMPLEMENTED TODO
-//				
-//				ResourceLocation location = new ResourceLocation(NostrumMagica.MODID, "dragonarmor_" + slot.name().toLowerCase() + "_" + material.name().toLowerCase());
-//				DragonArmor armor = new DragonArmor(location.getPath(), slot, material);
-//				armor.setRegistryName(location);
-//				registry.register(armor);
-//				items.get(material).put(slot, armor);
-//			}
-//		}
-//	}
 	
 	public static final List<DragonArmor> GetAllArmors() {
 		List<DragonArmor> list = new ArrayList<>();
