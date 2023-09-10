@@ -1,10 +1,10 @@
 buildscript {
     repositories {
-        maven { url = 'https://maven.minecraftforge.net/' }
-        mavenCentral()
+		mavenCentral()
+		maven { url = 'https://maven.minecraftforge.net/' }
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.0.+'
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
@@ -12,7 +12,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = "1.12.2-1.9.0"
+version = "1.14.4-1.10.0"
 group= "com.smanzana.nostrummagica" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "nostrummagica"
 
@@ -22,7 +22,7 @@ compileJava {
 }
 
 minecraft {
-	mappings channel: 'snapshot', version: '20190719-1.14.3'
+	mappings channel: 'snapshot', version: '20191111-1.14.3'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 	
 	// accessTransformer = file('build/resources/main/META-INF/accesstransformer.cfg')
@@ -50,20 +50,24 @@ minecraft {
     }
 }
 
-repositories {  
+repositories { 
+	mavenCentral()
+	maven {
+        url = "https://maven.blamejared.com"
+    }
     maven {
         // location of the maven that hosts JEI files
         name = "Progwml6 maven"
-        url = "http://dvs1.progwml6.com/files/maven"
+        url = "https://dvs1.progwml6.com/files/maven"
     }
     maven {
         // location of a maven mirror for JEI files, as a fallback
         name = "ModMaven"
-        url = "modmaven.k-4u.nl"
+        url = "https://modmaven.dev"
     }
     maven {
     	name = "CurseForge"
-        url = "http://minecraft.curseforge.com/api/maven/"
+        url = "https://minecraft.curseforge.com/api/maven/"
     }
     maven {
         name = "thiakil"
@@ -74,25 +78,29 @@ repositories {
         name 'tterrag maven'
         url "https://maven.tterrag.com/"
     }
+	
+    maven {
+		name "curios"
+        url = "https://maven.theillusivec4.top/"
+    }
 }
 
 dependencies {
-    
-	//implementation fileTree(dir: "${project.rootDir}/libs", include: '*.jar')
+	minecraft 'net.minecraftforge:forge:1.14.4-28.1.92'
 	
-	minecraft 'net.minecraftforge:forge:1.14.4-28.2.26'
-	
-    fg.deobf "mezz.jei:jei_${mc_version}:${jei_version}:api"
-    runtime "mezz.jei:jei_${mc_version}:${jei_version}"
+    compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
 	
 	//compile "com.enderio:EnderIO:1.12.2-5.3.70"
-	fg.deobf "com.enderio.core:EnderCore:1.12.2-0.5.76"
-    fg.deobf("com.enderio:EnderIO:1.12.2-5.3.68") {
-        exclude group: 'com.enderio', module: 'ap'
-        exclude group: "deobf.com.enderio.core"
-    }
+	//fg.deobf "com.enderio.core:EnderCore:1.12.2-0.5.76"
+    //fg.deobf("com.enderio:EnderIO:1.12.2-5.3.68") {
+    //    exclude group: 'com.enderio', module: 'ap'
+    //    exclude group: "deobf.com.enderio.core"
+    //}
 
-    compile "baubles:baubles:1.12:1.5.2"
+    //compile "baubles:baubles:1.12:1.5.2"
+	runtimeOnly fg.deobf("top.theillusivec4.curios:curios:${curios_version}")
+    compileOnly fg.deobf("top.theillusivec4.curios:curios:${curios_version}:api")
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"
@@ -115,7 +123,6 @@ dependencies {
 
 }
 
-
 processResources
 {
     // this will ensure that this task is redone when the versions change.
@@ -123,46 +130,52 @@ processResources
     //inputs.property "mcversion", project.minecraft.version
 
     // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-                
-        // replace version and mcversion
-       // expand 'version':version, 'mcversion':project.minecraft.version
-    }
+    //from(sourceSets.main.resources.srcDirs) {
+    //    include 'mcmod.info'
+    //            
+    //    // replace version and mcversion
+    //   // expand 'version':version, 'mcversion':project.minecraft.version
+    //}
         
     // copy everything else, thats not the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
+    //from(sourceSets.main.resources.srcDirs) {
+    //    exclude 'mcmod.info'
+    //}
+}
+
+task srcJar(type: Jar) {
+    from(sourceSets.main.java)
+    classifier = 'sources'
+    archiveName = "${baseName} ${version}-sources.${extension}"
 }
 
 
-task coreJar(type: Jar) {
-	from(sourceSets.main.output) {
-		include 'com/smanzana/nostrummagica/transforms/**'
-		include 'com/smanzana/nostrummagica/config/**'
-	}
-	manifest {
-		attributes 'FMLCorePlugin': 'com.smanzana.nostrummagica.transforms.NostrumTransformPlugin'
-		attributes 'FMLCorePluginContainsFMLMod': 'true'
-	}
-	classifier = 'core'
-}
+//task coreJar(type: Jar) {
+//	from(sourceSets.main.output) {
+//		include 'com/smanzana/nostrummagica/transforms/**'
+//		include 'com/smanzana/nostrummagica/config/**'
+//	}
+//	manifest {
+//		attributes 'FMLCorePlugin': 'com.smanzana.nostrummagica.transforms.NostrumTransformPlugin'
+//		attributes 'FMLCorePluginContainsFMLMod': 'true'
+//	}
+//	classifier = 'core'
+//}
 
-task deobfJar(type: Jar) {
-	from sourceSets.main.output
-	classifier = 'deobf'
-}
+//task deobfJar(type: Jar) {
+//	from sourceSets.main.output
+//	classifier = 'deobf'
+//}
 
 jar {
 	exclude 'com/smanzana/nostrummagica/transforms/**'
-	from(coreJar.archivePath.absolutePath) {
-		include '*'
-		into ("META-INF/libraries")
-	}
+	//from(coreJar.archivePath.absolutePath) {
+	//	include '*'
+	//	into ("META-INF/libraries")
+	//}
 	manifest {
 		attributes ([
-			"ContainedDeps": coreJar.archivePath.name,
+			//"ContainedDeps": coreJar.archivePath.name,
 			"Specification-Title": "examplemod",
             "Specification-Vendor": "examplemodsareus",
             "Specification-Version": "1", // We are version 1 of ourselves
@@ -179,11 +192,11 @@ jar {
 //	coreJar { mappingType = 'SEARGE' }
 //}
 
-def reobfFile = file("$buildDir/reobfJar/output.jar")
-def reobfArtifact = artifacts.add('default', reobfFile) {
-    type 'jar'
-    builtBy 'reobfJar'
-}
+//def reobfFile = file("$buildDir/reobfJar/output.jar")
+//def reobfArtifact = artifacts.add('default', reobfFile) {
+//    type 'jar'
+//    builtBy 'reobfJar'
+//}
 
 
 
@@ -192,4 +205,4 @@ def reobfArtifact = artifacts.add('default', reobfFile) {
 //}	
 
 
-build.dependsOn coreJar, deobfJar, jar
+//build.dependsOn coreJar, deobfJar, jar

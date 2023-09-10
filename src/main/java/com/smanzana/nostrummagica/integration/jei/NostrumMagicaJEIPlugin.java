@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeJEIHe
 import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeJEIRenderer;
 import com.smanzana.nostrummagica.integration.jei.wrappers.RitualRecipeWrapper;
 import com.smanzana.nostrummagica.items.AltarItem;
+import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
@@ -34,7 +35,7 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 	
 	@Override
 	public void registerItemSubtypes(@Nonnull ISubtypeRegistry subtypeRegistry) {
-		subtypeRegistry.registerSubtypeInterpreter(SpellRune.instance(), new ISubtypeRegistry.ISubtypeInterpreter() {
+		subtypeRegistry.registerSubtypeInterpreter(NostrumItems.spellRune, new ISubtypeRegistry.ISubtypeInterpreter() {
 			
 			@Override
 			@Nullable
@@ -48,7 +49,7 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 			}
 		});
 		
-		subtypeRegistry.useNbtForSubtypes(SpellTomePage.instance());
+		subtypeRegistry.useNbtForSubtypes(NostrumItems.spellTomePage);
 	}
 
 	@Override
@@ -82,7 +83,7 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 		
 		NostrumMagica.logger.info("Registered " + RitualRegistry.instance().getRegisteredRituals().size() + " rituals");
 		
-		registry.addRecipeCatalyst(new ItemStack(AltarItem.instance()), RitualRecipeCategory.UID);
+		registry.addRecipeCatalyst(new ItemStack(NostrumItems.altarItem), RitualRecipeCategory.UID);
 		
 		
 		// Hide our cool wrapper to outputs

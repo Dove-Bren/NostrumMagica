@@ -27,14 +27,14 @@ public class RitualRecipeWrapper implements IRecipeWrapper {
 		inputs = new ArrayList<>();
 
 		// Add flavor gem
-		inputs.add(InfusedGemItem.instance().getGem(ritual.getElement(), 1));
+		inputs.add(InfusedGemItem.getGem(ritual.getElement(), 1));
 		ItemStack reagent2, reagent3, reagent4;
 		ReagentType reagents[] = ritual.getTypes();
-		inputs.add(ReagentItem.instance().getReagent(reagents[0], 1));
+		inputs.add(ReagentItem.CreateStack(reagents[0], 1));
 		if (reagents.length > 1) {
-			reagent2 = ReagentItem.instance().getReagent(reagents[1], 1);
-			reagent3 = ReagentItem.instance().getReagent(reagents[2], 1);
-			reagent4 = ReagentItem.instance().getReagent(reagents[3], 1);
+			reagent2 = ReagentItem.CreateStack(reagents[1], 1);
+			reagent3 = ReagentItem.CreateStack(reagents[2], 1);
+			reagent4 = ReagentItem.CreateStack(reagents[3], 1);
 		} else {
 			reagent2 = reagent3 = reagent4 = null;
 		}

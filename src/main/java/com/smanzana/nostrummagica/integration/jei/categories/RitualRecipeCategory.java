@@ -16,6 +16,7 @@ import com.smanzana.nostrummagica.integration.jei.wrappers.RitualRecipeWrapper;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.requirements.IRitualRequirement;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import mezz.jei.api.IGuiHelper;
 import mezz.jei.api.gui.IDrawable;
@@ -26,7 +27,6 @@ import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.ingredients.VanillaTypes;
 import mezz.jei.api.recipe.IRecipeCategory;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
@@ -119,13 +119,13 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipeWrapper
 		GlStateManager.popMatrix();
 		
 		if (!canPerform) {
-			minecraft.font.drawString(ChatFormatting.BOLD + "x" + ChatFormatting.RESET, 108, 70, 0xFFAA0000);
+			minecraft.fontRenderer.drawString(ChatFormatting.BOLD + "x" + ChatFormatting.RESET, 108, 70, 0xFFAA0000);
 		}
 		
 		
 		String title = recipeName;
-		int len = minecraft.font.getStringWidth(title);
-		minecraft.font.drawString(title, (BACK_WIDTH - len) / 2, 2, 0xFF000000);
+		int len = minecraft.fontRenderer.getStringWidth(title);
+		minecraft.fontRenderer.drawString(title, (BACK_WIDTH - len) / 2, 2, 0xFF000000);
 	}
 
 	@Override

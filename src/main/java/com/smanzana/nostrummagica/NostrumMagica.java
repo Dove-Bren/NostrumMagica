@@ -65,11 +65,15 @@ import com.smanzana.nostrummagica.entity.golem.EntityGolem;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowOwnerAdvanced;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowOwnerGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIPetTargetTask;
+import com.smanzana.nostrummagica.integration.aetheria.AetheriaClientProxy;
 import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
+import com.smanzana.nostrummagica.integration.baubles.BaublesClientProxy;
 import com.smanzana.nostrummagica.integration.baubles.BaublesProxy;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble.ItemType;
+import com.smanzana.nostrummagica.integration.enderio.EnderIOClientProxy;
 import com.smanzana.nostrummagica.integration.enderio.EnderIOProxy;
+import com.smanzana.nostrummagica.integration.musica.MusicaClientProxy;
 import com.smanzana.nostrummagica.integration.musica.MusicaProxy;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.ArcaneWolfSoulItem;
@@ -96,11 +100,8 @@ import com.smanzana.nostrummagica.items.MirrorShield;
 import com.smanzana.nostrummagica.items.MirrorShieldImproved;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
-import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.NostrumRoseItem;
-import com.smanzana.nostrummagica.items.NostrumRoseItem.RoseType;
 import com.smanzana.nostrummagica.items.NostrumSkillItem;
-import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
 import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
@@ -108,7 +109,6 @@ import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.ReagentSeed;
 import com.smanzana.nostrummagica.items.RuneBag;
-import com.smanzana.nostrummagica.items.ShrineSeekingGem;
 import com.smanzana.nostrummagica.items.SoulDagger;
 import com.smanzana.nostrummagica.items.SpellPlate;
 import com.smanzana.nostrummagica.items.SpellRune;
@@ -125,6 +125,7 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.pet.PetCommandManager;
 import com.smanzana.nostrummagica.pet.PetSoulRegistry;
+import com.smanzana.nostrummagica.proxy.ClientProxy;
 import com.smanzana.nostrummagica.proxy.CommonProxy;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.quests.NostrumQuest.QuestType;
@@ -216,27 +217,26 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-@Mod(modid = NostrumMagica.MODID, version = NostrumMagica.VERSION, guiFactory = "com.smanzana.nostrummagica.config.ConfigGuiFactory", dependencies = "after:baubles;after:musica")
+@Mod(NostrumMagica.MODID)
 public class NostrumMagica {
 	public static final String MODID = "nostrummagica";
-	public static final String VERSION = "1.12.2-1.9.0";
+	public static final String VERSION = "1.14.4-1.10.0";
 	public static final Random rand = new Random();
 
-	@SidedProxy(clientSide = "com.smanzana.nostrummagica.proxy.ClientProxy", serverSide = "com.smanzana.nostrummagica.proxy.CommonProxy")
-	public static CommonProxy proxy;
-	public static NostrumMagica instance;
-	@SidedProxy(clientSide = "com.smanzana.nostrummagica.integration.baubles.BaublesClientProxy", serverSide = "com.smanzana.nostrummagica.integration.baubles.BaublesProxy")
-	public static BaublesProxy baubles;
-	@SidedProxy(clientSide = "com.smanzana.nostrummagica.integration.aetheria.AetheriaClientProxy", serverSide = "com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy")
-	public static AetheriaProxy aetheria;
-	@SidedProxy(clientSide = "com.smanzana.nostrummagica.integration.enderio.EnderIOClientProxy", serverSide = "com.smanzana.nostrummagica.integration.enderio.EnderIOProxy")
-	public static EnderIOProxy enderIO;
-	@SidedProxy(clientSide = "com.smanzana.nostrummagica.integration.musica.MusicaClientProxy", serverSide = "com.smanzana.nostrummagica.integration.musica.MusicaProxy")
-	public static MusicaProxy musica;
+	public final static CommonProxy proxy;
+	public final static NostrumMagica instance;
+	public final static BaublesProxy baubles;
+	public final static AetheriaProxy aetheria;
+	public final static EnderIOProxy enderIO;
+	public final static MusicaProxy musica;
 
 	public static ItemGroup creativeTab;
 	public static ItemGroup enhancementTab;
@@ -252,30 +252,16 @@ public class NostrumMagica {
 	private static PetCommandManager petCommandManager;
 
 	public static boolean initFinished = false;
-
-	@EventHandler
-	public void init(FMLInitializationEvent event) {
-		// Register rituals, quests, etc. after item and block init
-		registerDefaultRituals();
-		registerDefaultQuests();
-		registerDefaultTrials();
-		registerDefaultResearch();
-
-		new NostrumLootHandler();
-		DungeonRoomRegistry.instance().loadRegistryFromDisk();
-		NostrumDimensionMapper.registerDimensions();
-		NostrumDungeonGenerator.initGens();
-
-		proxy.init();
-		aetheria.init();
-		baubles.init();
-		enderIO.init();
-		musica.init();
-	}
-
-	@EventHandler
-	public void preinit(FMLPreInitializationEvent event) {
+	
+	public NostrumMagica() {
 		instance = this;
+		
+		proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> CommonProxy::new);
+		baubles = DistExecutor.runForDist(() -> BaublesClientProxy::new, () -> BaublesProxy::new);
+		aetheria = DistExecutor.runForDist(() -> AetheriaClientProxy::new, () -> AetheriaProxy::new);
+		enderIO = DistExecutor.runForDist(() -> EnderIOClientProxy::new, () -> EnderIOProxy::new);
+		musica = DistExecutor.runForDist(() -> MusicaClientProxy::new, () -> MusicaProxy::new);
+		
 		playerListener = new PlayerListener();
 		magicEffectProxy = new MagicEffectProxy();
 		manaArmorListener = new ManaArmorListener();
@@ -287,7 +273,7 @@ public class NostrumMagica {
 				return new ItemStack(NostrumItems.spellTomeNovice);
 			}
 		};
-		SpellTome.instance().setCreativeTab(NostrumMagica.creativeTab);
+		// SpellTome.instance().setCreativeTab(NostrumMagica.creativeTab); TODO still need this?
 		NostrumMagica.enhancementTab = new ItemGroup(MODID + "_enhancements") {
 			@Override
 			@OnlyIn(Dist.CLIENT)
@@ -295,18 +281,18 @@ public class NostrumMagica {
 				return new ItemStack(NostrumItems.spellTomePage);
 			}
 		};
-		SpellTomePage.instance().setCreativeTab(NostrumMagica.enhancementTab);
+		//SpellTomePage.instance().setCreativeTab(NostrumMagica.enhancementTab); // TODO still need this?
 
-		if (Loader.isModLoaded("baubles")) {
+		if (ModList.get().isLoaded("baubles")) {
 			baubles.enable();
 		}
-		if (Loader.isModLoaded("nostrumaetheria")) {
+		if (ModList.get().isLoaded("nostrumaetheria")) {
 			aetheria.enable();
 		}
-		if (Loader.isModLoaded("enderio") || Loader.isModLoaded("EnderIO")) {
+		if (ModList.get().isLoaded("enderio") || ModList.get().isLoaded("enderio")) {
 			enderIO.enable();
 		}
-		if (Loader.isModLoaded("musica")) {
+		if (ModList.get().isLoaded("musica")) {
 			musica.enable();
 		}
 		
@@ -323,25 +309,39 @@ public class NostrumMagica {
 		NostrumChunkLoader.instance();
 
 		SpellTomeEnhancement.initDefaultEnhancements();
-
+		
+		FMLJavaModLoadingContext.get().getModEventBus().register(this);
 	}
 
-	@EventHandler
-	public void postinit(FMLPostInitializationEvent event) {
-		proxy.postinit();
-		aetheria.postInit();
-		baubles.postInit();
-		enderIO.postInit();
-		musica.postInit();
+	@SubscribeEvent
+	public void commonSetup(FMLCommonSetupEvent event) {
+		// Register rituals, quests, etc. after item and block init
+		registerDefaultRituals();
+		registerDefaultQuests();
+		registerDefaultTrials();
+		registerDefaultResearch();
+
+		new NostrumLootHandler();
+		DungeonRoomRegistry.instance().loadRegistryFromDisk();
+		NostrumDimensionMapper.registerDimensions();
+		NostrumDungeonGenerator.initGens();
+
+		proxy.init();
+		aetheria.init();
+		baubles.init();
+		enderIO.init();
+		musica.init();
+	
+		// Used to be two different mod init steps!
 
 		initFinished = true;
 
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 
-	@EventHandler
+	@SubscribeEvent
 	public void startup(FMLServerStartingEvent event) {
-		event.registerServerCommand(new CommandGotoDungeon());
+		event.getCommandDispatcher().register(new CommandGotoDungeon());
 		event.registerServerCommand(new CommandTestConfig());
 		event.registerServerCommand(new CommandSpawnObelisk());
 		event.registerServerCommand(new CommandEnhanceTome());

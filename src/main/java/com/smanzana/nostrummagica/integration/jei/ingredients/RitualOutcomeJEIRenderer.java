@@ -4,16 +4,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.jei.RitualOutcomeWrapper;
 import com.smanzana.nostrummagica.rituals.outcomes.IItemRitualOutcome;
 import com.smanzana.nostrummagica.rituals.outcomes.IRitualOutcome;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -72,21 +72,21 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 		if (item == null)
 			return ingredient.getOutcome().getDescription();
 		else
-			return Lists.newArrayList(item.getDisplayName());
+			return Lists.newArrayList(item.getDisplayName().toString());
 	}
 
 	@Override
-	public font getFontRenderer(Minecraft minecraft, RitualOutcomeWrapper ingredient) {
+	public FontRenderer getFontRenderer(Minecraft minecraft, RitualOutcomeWrapper ingredient) {
 		if (ingredient == null)
-			return minecraft.font;
+			return minecraft.fontRenderer;
 		
-		font render = null;
+		FontRenderer render = null;
 		ItemStack stack = fetchItem(ingredient.getOutcome());
 		if (stack != null)
 			render = stack.getItem().getFontRenderer(stack);
 		
 		if (render == null)
-			render = minecraft.font;
+			render = minecraft.fontRenderer;
 		
 		return render;
 	}
