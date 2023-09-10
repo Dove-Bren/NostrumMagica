@@ -1,0 +1,16 @@
+{
+	"replace": false,
+	"values": [
+		"#nostrummagica:skill_item/any",
+		"#nostrummagica:skill_item/mirror",
+		"#nostrummagica:skill_item/ooze",
+		"#nostrummagica:skill_item/pendant",
+		"#nostrummagica:skill_item/flute",
+		"#nostrummagica:skill_item/ender_pin",
+		"#nostrummagica:skill_item/small_research",
+		"#nostrummagica:skill_item/large_research"
+	]
+}
+
+
+

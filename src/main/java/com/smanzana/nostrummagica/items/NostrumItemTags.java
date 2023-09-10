@@ -1,165 +1,161 @@
 package com.smanzana.nostrummagica.items;
 
-import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
-import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraft.util.ResourceLocation;
 
 public class NostrumItemTags {
 
-	private static final String OREDICT_RUNE_ANY = "runeAny";
-//	private static final String OREDICT_RUNE_SHAPE_SINGLE = "runeShapeSingle";
-//	private static final String OREDICT_RUNE_SHAPE_CHAIN = "runeShapeChain";
-//	private static final String OREDICT_RUNE_SHAPE_AOE = "runeShapeAOE";
-	
-	private static final String OREDICT_REAGENT_ANY = "reagentAny";
-	private static final String OREDICT_REAGENT_MANDRAKEROOT = "reagentMandrakeRoot";
-	private static final String OREDICT_REAGENT_GINSENG = "reagentGinseng";
-	private static final String OREDICT_REAGENT_SPIDERSILK = "reagentSpiderSilk";
-	private static final String OREDICT_REAGENT_BLACKPEARL = "reagentBlackPearl";
-	private static final String OREDICT_REAGENT_SKYASH = "reagentSkyAsh";
-	private static final String OREDICT_REAGENT_GRAVEDUST = "reagentGraveDust";
-	private static final String OREDICT_REAGENT_MANIDUST = "reagentManiDust";
-	private static final String OREDICT_REAGENT_CRYSTABLOOM = "reagentCrystabloom";
-	
-	private static final String OREDICT_INFGEM_ANY = "infgemAny";
-	private static final String OREDICT_INFGEM_VOID = "infgemVoid";
-	private static final String OREDICT_INFGEM_FIRE = "infgemFire";
-	private static final String OREDICT_INFGEM_ICE = "infgemIce";
-	private static final String OREDICT_INFGEM_WIND = "infgemWind";
-	private static final String OREDICT_INFGEM_EARTH = "infgemEarth";
-	private static final String OREDICT_INFGEM_LIGHTNING = "infgemLightning";
-	private static final String OREDICT_INFGEM_ENDER = "infgemEnder";
-	
-	private static final String OREDICT_TOKEN = "nrToken";
-	private static final String OREDICT_CRYSTALSMALL = "nrCrystalSmall";
-	private static final String OREDICT_CRYSTALMEDIUM = "nrCrystalMedium";
-	private static final String OREDICT_CRYSTALLARGE = "nrCrystalLarge";
-	private static final String OREDICT_PENDANTLEFT = "nrPendantLeft";
-	private static final String OREDICT_PENDANTRIGHT = "nrPendantRight";
-	private static final String OREDICT_SLABFIERCE = "nrSlabFierce";
-	private static final String OREDICT_SLABKIND = "nrSlabKind";
-	private static final String OREDICT_SLABBALANCED = "nrSlabBalanced";
-	private static final String OREDICT_SPRITECORE = "nrSpriteCore";
-	private static final String OREDICT_ENDERBRISTLE = "nrEnderBristle";
-	private static final String OREDICT_WISPPEBBLE = "nrWispPebble";
-	
-	private static final String OREDICT_SPELLPAGE_ANY = "spellpageAny";
-	
-	private static final String OREDICT_ESSENCE_ANY = "nessenceAny";
-	private static final String OREDICT_ESSENCE_VOID = "nessenceVoid";
-	private static final String OREDICT_ESSENCE_FIRE = "nessenceFire";
-	private static final String OREDICT_ESSENCE_ICE = "nessenceIce";
-	private static final String OREDICT_ESSENCE_WIND = "nessenceWind";
-	private static final String OREDICT_ESSENCE_EARTH = "nessenceEarth";
-	private static final String OREDICT_ESSENCE_LIGHTNING = "nessenceLightning";
-	private static final String OREDICT_ESSENCE_ENDER = "nessenceEnder";
-	
-	private static final String OREDICT_SKILLITEM_ANY = "nsiAny";
-	private static final String OREDICT_SKILLITEM_MIRROR = "nsiMirror";
-	private static final String OREDICT_SKILLITEM_OOZE = "nsiOoze";
-	private static final String OREDICT_SKILLITEM_PENDANT = "nsiPendant";
-	private static final String OREDICT_SKILLITEM_FLUTE = "nsiFlute";
-	private static final String OREDICT_SKILLITEM_WING = "nsiWing";
-	private static final String OREDICT_SKILLITEM_ENDERPIN = "nsiEnderPin";
-	private static final String OREDICT_SKILLITEM_RESEARCHSMALL = "nsiResearchSmall";
-	private static final String OREDICT_SKILLITEM_RESEARCHLARGE = "nsiResearchLarge";
-	
-	private static final String OREDICT_ROSE_ANY = "roseAny";
-	private static final String OREDICT_ROSE_BLOOD = "roseBlood";
-	private static final String OREDICT_ROSE_ELDRICH = "roseEldrich";
-	private static final String OREDICT_ROSE_PALE = "rosePale";
-	
-	private static final String OREDICT_HOOKSHOT_ANY = "nhookshotAny";
-	private static final String OREDICT_HOOKSHOT_WEAK = "nhookshotWeak";
-	private static final String OREDICT_HOOKSHOT_MEDIUM = "nhookshotMedium";
-	private static final String OREDICT_HOOKSHOT_STRONG = "nhookshotStrong";
-	private static final String OREDICT_HOOKSHOT_CLAW = "nhookshotClaw";
-	
-	private static final String OREDICT_REAGENTSEED_MANDRAKE = "nrseedMandrake";
-	private static final String OREDICT_REAGENTSEED_GINSENG = "nrseedGinseng";
-	private static final String OREDICT_REAGENTSEED_ESSENCE = "nrseedEssence";
-	
-	public static Tag<Item> CrystalSmall;
-	public static Tag<Item> CrystalMedium;
-	public static Tag<Item> CrystalLarge;
-	
-	public static final void blah() {
-OreDictionary.registerOre(OREDICT_RUNE_ANY, new ItemStack(SpellRune.instance(), 1, OreDictionary.WILDCARD_VALUE));
+	public static final class Items {
+		private static final String TAG_RUNE_ANY = "rune_any";
+//		private static final String TAG_RUNE_SHAPE_SINGLE = "runeShapeSingle";
+//		private static final String TAG_RUNE_SHAPE_CHAIN = "runeShapeChain";
+//		private static final String TAG_RUNE_SHAPE_AOE = "runeShapeAOE";
 		
-		OreDictionary.registerOre(OREDICT_REAGENT_ANY, new ItemStack(ReagentItem.instance(), 1, OreDictionary.WILDCARD_VALUE));
-		OreDictionary.registerOre(OREDICT_REAGENT_MANDRAKEROOT, ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1));
-		OreDictionary.registerOre(OREDICT_REAGENT_GINSENG, ReagentItem.instance().getReagent(ReagentType.GINSENG, 1));
-		OreDictionary.registerOre(OREDICT_REAGENT_SPIDERSILK, ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1));
-		OreDictionary.registerOre(OREDICT_REAGENT_BLACKPEARL, ReagentItem.instance().getReagent(ReagentType.BLACK_PEARL, 1));
-		OreDictionary.registerOre(OREDICT_REAGENT_SKYASH, ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1));
-		OreDictionary.registerOre(OREDICT_REAGENT_GRAVEDUST, ReagentItem.instance().getReagent(ReagentType.GRAVE_DUST, 1));
-		OreDictionary.registerOre(OREDICT_REAGENT_MANIDUST, ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1));
-		OreDictionary.registerOre(OREDICT_REAGENT_CRYSTABLOOM, ReagentItem.instance().getReagent(ReagentType.CRYSTABLOOM, 1));
+		private static final String TAG_REAGENT_ANY = "reagent/any";
+		private static final String TAG_REAGENT_MANDRAKEROOT = "reagent/mandrake_root";
+		private static final String TAG_REAGENT_GINSENG = "reagent/ginseng";
+		private static final String TAG_REAGENT_SPIDERSILK = "reagent/spider_silk";
+		private static final String TAG_REAGENT_BLACKPEARL = "reagent/black_pearl";
+		private static final String TAG_REAGENT_SKYASH = "reagent/sky_ash";
+		private static final String TAG_REAGENT_GRAVEDUST = "reagent/grave_dust";
+		private static final String TAG_REAGENT_MANIDUST = "reagent/mani_dust";
+		private static final String TAG_REAGENT_CRYSTABLOOM = "reagent/crystabloom";
 		
-		OreDictionary.registerOre(OREDICT_INFGEM_ANY, new ItemStack(InfusedGemItem.instance(), 1, OreDictionary.WILDCARD_VALUE));
-		OreDictionary.registerOre(OREDICT_INFGEM_VOID, InfusedGemItem.instance().getGem(null, 1));
-		OreDictionary.registerOre(OREDICT_INFGEM_FIRE, InfusedGemItem.instance().getGem(EMagicElement.FIRE, 1));
-		OreDictionary.registerOre(OREDICT_INFGEM_ICE, InfusedGemItem.instance().getGem(EMagicElement.ICE, 1));
-		OreDictionary.registerOre(OREDICT_INFGEM_WIND, InfusedGemItem.instance().getGem(EMagicElement.WIND, 1));
-		OreDictionary.registerOre(OREDICT_INFGEM_EARTH, InfusedGemItem.instance().getGem(EMagicElement.EARTH, 1));
-		OreDictionary.registerOre(OREDICT_INFGEM_LIGHTNING, InfusedGemItem.instance().getGem(EMagicElement.LIGHTNING, 1));
-		OreDictionary.registerOre(OREDICT_INFGEM_ENDER, InfusedGemItem.instance().getGem(EMagicElement.ENDER, 1));
+		private static final String TAG_INFGEM_ANY = "infusedgem/any";
+		private static final String TAG_INFGEM_VOID = "infusedgem/void";
+		private static final String TAG_INFGEM_FIRE = "infusedgem/fire";
+		private static final String TAG_INFGEM_ICE = "infusedgem/ice";
+		private static final String TAG_INFGEM_WIND = "infusedgem/wind";
+		private static final String TAG_INFGEM_EARTH = "infusedgem/earth";
+		private static final String TAG_INFGEM_LIGHTNING = "infusedgem/lightning";
+		private static final String TAG_INFGEM_ENDER = "infusedgem/ender";
 		
-		OreDictionary.registerOre(OREDICT_TOKEN, NostrumResourceItem.getItem(ResourceType.TOKEN, 1));
-		OreDictionary.registerOre(OREDICT_CRYSTALSMALL, NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1));
-		OreDictionary.registerOre(OREDICT_CRYSTALMEDIUM, NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1));
-		OreDictionary.registerOre(OREDICT_CRYSTALLARGE, NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1));
-		OreDictionary.registerOre(OREDICT_PENDANTLEFT, NostrumResourceItem.getItem(ResourceType.PENDANT_LEFT, 1));
-		OreDictionary.registerOre(OREDICT_PENDANTRIGHT, NostrumResourceItem.getItem(ResourceType.PENDANT_RIGHT, 1));
-		OreDictionary.registerOre(OREDICT_SLABFIERCE, NostrumResourceItem.getItem(ResourceType.SLAB_FIERCE, 1));
-		OreDictionary.registerOre(OREDICT_SLABKIND, NostrumResourceItem.getItem(ResourceType.SLAB_KIND, 1));
-		OreDictionary.registerOre(OREDICT_SLABBALANCED, NostrumResourceItem.getItem(ResourceType.SLAB_BALANCED, 1));
-		OreDictionary.registerOre(OREDICT_SPRITECORE, NostrumResourceItem.getItem(ResourceType.SPRITE_CORE, 1));
-		OreDictionary.registerOre(OREDICT_ENDERBRISTLE, NostrumResourceItem.getItem(ResourceType.ENDER_BRISTLE, 1));
-		OreDictionary.registerOre(OREDICT_WISPPEBBLE, NostrumResourceItem.getItem(ResourceType.WISP_PEBBLE, 1));
+		private static final String TAG_TOKEN = "magic_token";
+		private static final String TAG_CRYSTALSMALL = "crystal_small";
+		private static final String TAG_CRYSTALMEDIUM = "crystal_medium";
+		private static final String TAG_CRYSTALLARGE = "crystal_large";
+		private static final String TAG_PENDANTLEFT = "pendant_left";
+		private static final String TAG_PENDANTRIGHT = "pendant_right";
+		private static final String TAG_SLABFIERCE = "slab_fierce";
+		private static final String TAG_SLABKIND = "slab_kind";
+		private static final String TAG_SLABBALANCED = "slab_balanced";
+		private static final String TAG_SPRITECORE = "sprite_core";
+		private static final String TAG_ENDERBRISTLE = "ender_bristle";
+		private static final String TAG_WISPPEBBLE = "wisp_pebble";
+		private static final String TAG_DRAGON_WING = "dragon_wing";
 		
-		OreDictionary.registerOre(OREDICT_SPELLPAGE_ANY, new ItemStack(SpellTomePage.instance(), 1, OreDictionary.WILDCARD_VALUE));
+		private static final String TAG_SPELLPAGE_ANY = "spellpage_any";
 		
-		OreDictionary.registerOre(OREDICT_ESSENCE_ANY, new ItemStack(EssenceItem.instance(), 1, OreDictionary.WILDCARD_VALUE));
-		OreDictionary.registerOre(OREDICT_ESSENCE_VOID, EssenceItem.getEssence(EMagicElement.PHYSICAL, 1));
-		OreDictionary.registerOre(OREDICT_ESSENCE_FIRE, EssenceItem.getEssence(EMagicElement.FIRE, 1));
-		OreDictionary.registerOre(OREDICT_ESSENCE_ICE, EssenceItem.getEssence(EMagicElement.ICE, 1));
-		OreDictionary.registerOre(OREDICT_ESSENCE_WIND, EssenceItem.getEssence(EMagicElement.WIND, 1));
-		OreDictionary.registerOre(OREDICT_ESSENCE_EARTH, EssenceItem.getEssence(EMagicElement.EARTH, 1));
-		OreDictionary.registerOre(OREDICT_ESSENCE_LIGHTNING, EssenceItem.getEssence(EMagicElement.LIGHTNING, 1));
-		OreDictionary.registerOre(OREDICT_ESSENCE_ENDER, EssenceItem.getEssence(EMagicElement.ENDER, 1));
+		private static final String TAG_ESSENCE_ANY = "essence/any";
+		private static final String TAG_ESSENCE_VOID = "essence/void";
+		private static final String TAG_ESSENCE_FIRE = "essence/fire";
+		private static final String TAG_ESSENCE_ICE = "essence/ice";
+		private static final String TAG_ESSENCE_WIND = "essence/wind";
+		private static final String TAG_ESSENCE_EARTH = "essence/earth";
+		private static final String TAG_ESSENCE_LIGHTNING = "essence/lightning";
+		private static final String TAG_ESSENCE_ENDER = "essence/ender";
 		
-		OreDictionary.registerOre(OREDICT_SKILLITEM_ANY, new ItemStack(NostrumSkillItem.instance(), 1, OreDictionary.WILDCARD_VALUE));
-		OreDictionary.registerOre(OREDICT_SKILLITEM_MIRROR, NostrumSkillItem.getItem(SkillItemType.MIRROR, 1));
-		OreDictionary.registerOre(OREDICT_SKILLITEM_OOZE, NostrumSkillItem.getItem(SkillItemType.OOZE, 1));
-		OreDictionary.registerOre(OREDICT_SKILLITEM_PENDANT, NostrumSkillItem.getItem(SkillItemType.PENDANT, 1));
-		OreDictionary.registerOre(OREDICT_SKILLITEM_FLUTE, NostrumSkillItem.getItem(SkillItemType.FLUTE, 1));
-		OreDictionary.registerOre(OREDICT_SKILLITEM_WING, NostrumSkillItem.getItem(SkillItemType.WING, 1));
-		OreDictionary.registerOre(OREDICT_SKILLITEM_ENDERPIN, NostrumSkillItem.getItem(SkillItemType.ENDER_PIN, 1));
-		OreDictionary.registerOre(OREDICT_SKILLITEM_RESEARCHSMALL, NostrumSkillItem.getItem(SkillItemType.RESEARCH_SCROLL_SMALL, 1));
-		OreDictionary.registerOre(OREDICT_SKILLITEM_RESEARCHLARGE, NostrumSkillItem.getItem(SkillItemType.RESEARCH_SCROLL_LARGE, 1));
+		private static final String TAG_SKILLITEM_ANY = "skill_item/any";
+		private static final String TAG_SKILLITEM_MIRROR = "skill_item/mirror";
+		private static final String TAG_SKILLITEM_OOZE = "skill_item/ooze";
+		private static final String TAG_SKILLITEM_PENDANT = "skill_item/pendant";
+		private static final String TAG_SKILLITEM_FLUTE = "skill_item/flute";
+		private static final String TAG_SKILLITEM_ENDERPIN = "skill_item/ender_pin";
+		private static final String TAG_SKILLITEM_RESEARCHSMALL = "skill_item/small_research";
+		private static final String TAG_SKILLITEM_RESEARCHLARGE = "skill_item/large_research";
 		
-		OreDictionary.registerOre(OREDICT_ROSE_ANY, new ItemStack(NostrumRoseItem.instance(), 1, OreDictionary.WILDCARD_VALUE));
-		OreDictionary.registerOre(OREDICT_ROSE_BLOOD, NostrumRoseItem.getItem(RoseType.BLOOD, 1));
-		OreDictionary.registerOre(OREDICT_ROSE_ELDRICH, NostrumRoseItem.getItem(RoseType.ELDRICH, 1));
-		OreDictionary.registerOre(OREDICT_ROSE_PALE, NostrumRoseItem.getItem(RoseType.PALE, 1));
+		private static final String TAG_ROSE_ANY = "rose/any";
+		private static final String TAG_ROSE_BLOOD = "rose/blood";
+		private static final String TAG_ROSE_ELDRICH = "rose/eldrich";
+		private static final String TAG_ROSE_PALE = "rose/pale";
 		
-		OreDictionary.registerOre(OREDICT_HOOKSHOT_ANY, new ItemStack(HookshotItem.instance(), 1, OreDictionary.WILDCARD_VALUE));
-		OreDictionary.registerOre(OREDICT_HOOKSHOT_WEAK, new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.WEAK, false)));
-		OreDictionary.registerOre(OREDICT_HOOKSHOT_MEDIUM, new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.MEDIUM, false)));
-		OreDictionary.registerOre(OREDICT_HOOKSHOT_STRONG, new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.STRONG, false)));
-		OreDictionary.registerOre(OREDICT_HOOKSHOT_CLAW, new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.CLAW, false)));
+		private static final String TAG_HOOKSHOT_ANY = "hookshot/any";
+		private static final String TAG_HOOKSHOT_WEAK = "hookshot/weak";
+		private static final String TAG_HOOKSHOT_MEDIUM = "hookshot/medium";
+		private static final String TAG_HOOKSHOT_STRONG = "hookshot/strong";
+		private static final String TAG_HOOKSHOT_CLAW = "hookshot/claw";
 		
-		OreDictionary.registerOre(OREDICT_REAGENTSEED_MANDRAKE, new ItemStack(ReagentSeed.mandrake, 1));
-		OreDictionary.registerOre(OREDICT_REAGENTSEED_GINSENG, new ItemStack(ReagentSeed.ginseng, 1));
-		OreDictionary.registerOre(OREDICT_REAGENTSEED_ESSENCE, new ItemStack(ReagentSeed.essence, 1));
-    	
-    	
+		private static final String TAG_REAGENTSEED_MANDRAKE = "seed/mandrake";
+		private static final String TAG_REAGENTSEED_GINSENG = "seed/ginseng";
+		private static final String TAG_REAGENTSEED_ESSENCE = "seed/essence";
+		
+		public static final Tag<Item> RuneAny = tag(TAG_RUNE_ANY);
+		
+		public static final Tag<Item> ReagentAny = tag(TAG_REAGENT_ANY);
+		public static final Tag<Item> ReagentMandrakeRoot = tag(TAG_REAGENT_MANDRAKEROOT);
+		public static final Tag<Item> ReagentGinseng = tag(TAG_REAGENT_GINSENG);
+		public static final Tag<Item> ReagentSpiderSilk = tag(TAG_REAGENT_SPIDERSILK);
+		public static final Tag<Item> ReagentBlackPearl = tag(TAG_REAGENT_BLACKPEARL);
+		public static final Tag<Item> ReagentSkyAsh = tag(TAG_REAGENT_SKYASH);
+		public static final Tag<Item> ReagentGraveDust = tag(TAG_REAGENT_GRAVEDUST);
+		public static final Tag<Item> ReagentManiDust = tag(TAG_REAGENT_MANIDUST);
+		public static final Tag<Item> ReagentCrystabloom = tag(TAG_REAGENT_CRYSTABLOOM);
+		
+		public static final Tag<Item> InfusedGemAny = tag(TAG_INFGEM_ANY);
+		public static final Tag<Item> InfusedGemVoid = tag(TAG_INFGEM_VOID);
+		public static final Tag<Item> InfusedGemFire = tag(TAG_INFGEM_FIRE);
+		public static final Tag<Item> InfusedGemIce = tag(TAG_INFGEM_ICE);
+		public static final Tag<Item> InfusedGemWind = tag(TAG_INFGEM_WIND);
+		public static final Tag<Item> InfusedGemEarth = tag(TAG_INFGEM_EARTH);
+		public static final Tag<Item> InfusedGemLightning = tag(TAG_INFGEM_LIGHTNING);
+		public static final Tag<Item> InfusedGemEnder = tag(TAG_INFGEM_ENDER);
+
+		public static final Tag<Item> CrystalSmall = tag(TAG_CRYSTALSMALL);
+		public static final Tag<Item> CrystalMedium = tag(TAG_CRYSTALMEDIUM);
+		public static final Tag<Item> CrystalLarge = tag(TAG_CRYSTALLARGE);
+		
+		public static final Tag<Item> MagicToken = tag(TAG_TOKEN);
+		public static final Tag<Item> PendantLeft = tag(TAG_PENDANTLEFT);
+		public static final Tag<Item> PendantRight = tag(TAG_PENDANTRIGHT);
+		public static final Tag<Item> SlabFierce = tag(TAG_SLABFIERCE);
+		public static final Tag<Item> SlabKind = tag(TAG_SLABKIND);
+		public static final Tag<Item> SlabBalanced = tag(TAG_SLABBALANCED);
+		public static final Tag<Item> SpriteCore = tag(TAG_SPRITECORE);
+		public static final Tag<Item> EnderBristle = tag(TAG_ENDERBRISTLE);
+		public static final Tag<Item> WispPebble = tag(TAG_WISPPEBBLE);
+		public static final Tag<Item> DragonWing = tag(TAG_DRAGON_WING);
+		
+		public static final Tag<Item> SpellpageAny = tag(TAG_SPELLPAGE_ANY);
+		
+		public static final Tag<Item> EssenceAny = tag(TAG_ESSENCE_ANY);
+		public static final Tag<Item> EssenceVoid = tag(TAG_ESSENCE_VOID);
+		public static final Tag<Item> EssenceFire = tag(TAG_ESSENCE_FIRE);
+		public static final Tag<Item> EssenceIce = tag(TAG_ESSENCE_ICE);
+		public static final Tag<Item> EssenceWind = tag(TAG_ESSENCE_WIND);
+		public static final Tag<Item> EssenceEarth = tag(TAG_ESSENCE_EARTH);
+		public static final Tag<Item> EssenceLightning = tag(TAG_ESSENCE_LIGHTNING);
+		public static final Tag<Item> EssenceEnder = tag(TAG_ESSENCE_ENDER);
+		
+		public static final Tag<Item> SkillItemAny = tag(TAG_SKILLITEM_ANY);
+		public static final Tag<Item> SkillItemMirror = tag(TAG_SKILLITEM_MIRROR);
+		public static final Tag<Item> SkillItemOoze = tag(TAG_SKILLITEM_OOZE);
+		public static final Tag<Item> SkillItemPendant = tag(TAG_SKILLITEM_PENDANT);
+		public static final Tag<Item> SkillItemFlute = tag(TAG_SKILLITEM_FLUTE);
+		public static final Tag<Item> SkillItemEnderPin = tag(TAG_SKILLITEM_ENDERPIN);
+		public static final Tag<Item> SkillItemSmallResearch = tag(TAG_SKILLITEM_RESEARCHSMALL);
+		public static final Tag<Item> SkillItemLargeResearch = tag(TAG_SKILLITEM_RESEARCHLARGE);
+		
+		public static final Tag<Item> RoseAny = tag(TAG_ROSE_ANY);
+		public static final Tag<Item> RoseBlood = tag(TAG_ROSE_BLOOD);
+		public static final Tag<Item> RoseEldrich = tag(TAG_ROSE_ELDRICH);
+		public static final Tag<Item> RosePale = tag(TAG_ROSE_PALE);
+		
+		public static final Tag<Item> HookshotAny = tag(TAG_HOOKSHOT_ANY);
+		public static final Tag<Item> HookshotWeak = tag(TAG_HOOKSHOT_WEAK);
+		public static final Tag<Item> HookshotMedium = tag(TAG_HOOKSHOT_MEDIUM);
+		public static final Tag<Item> HookshotStrong = tag(TAG_HOOKSHOT_STRONG);
+		public static final Tag<Item> HookshotClaw = tag(TAG_HOOKSHOT_CLAW);
+		
+		public static final Tag<Item> SeedMandrake = tag(TAG_REAGENTSEED_MANDRAKE);
+		public static final Tag<Item> SeedGinseng = tag(TAG_REAGENTSEED_GINSENG);
+		public static final Tag<Item> SeedEssence = tag(TAG_REAGENTSEED_ESSENCE);
+		
+		private static Tag<Item> tag(String path) {
+			return new ItemTags.Wrapper(new ResourceLocation(NostrumMagica.MODID, path));
+		}
 	}
-	
 }

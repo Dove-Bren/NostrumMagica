@@ -1,0 +1,14 @@
+{
+	"replace": false,
+	"values": [
+		"#nostrummagica:reagent/any",
+		"#nostrummagica:reagent/mandrake_root",
+		"#nostrummagica:reagent/ginseng",
+		"#nostrummagica:reagent/spider_silk",
+		"#nostrummagica:reagent/black_pearl",
+		"#nostrummagica:reagent/sky_ash",
+		"#nostrummagica:reagent/grave_dust",
+		"#nostrummagica:reagent/mani_dust",
+		"#nostrummagica:reagent/crystabloom"
+	]
+}

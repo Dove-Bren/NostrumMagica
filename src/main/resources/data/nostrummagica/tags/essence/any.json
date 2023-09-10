@@ -1,0 +1,12 @@
+{
+	"replace": false,
+	"values": [
+		"nostrummagica:nostrum_essence_earth",
+		"nostrummagica:nostrum_essence_ender",
+		"nostrummagica:nostrum_essence_fire",
+		"nostrummagica:nostrum_essence_ice",
+		"nostrummagica:nostrum_essence_lightning",
+		"nostrummagica:nostrum_essence_physical",
+		"nostrummagica:nostrum_essence_wind"
+	]
+}

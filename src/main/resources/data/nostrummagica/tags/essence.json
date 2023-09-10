@@ -1,0 +1,13 @@
+{
+	"replace": false,
+	"values": [
+		"#nostrummagica:essence/any",
+		"#nostrummagica:essence/void",
+		"#nostrummagica:essence/earth",
+		"#nostrummagica:essence/fire",
+		"#nostrummagica:essence/ender",
+		"#nostrummagica:essence/ice",
+		"#nostrummagica:essence/lightning",
+		"#nostrummagica:essence/wind"
+	]
+}

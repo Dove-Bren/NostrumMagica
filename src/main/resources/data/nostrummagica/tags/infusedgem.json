@@ -1,0 +1,13 @@
+{
+	"replace": false,
+	"values": [
+		"#nostrummagica:infusedgem/any",
+		"#nostrummagica:infusedgem/void",
+		"#nostrummagica:infusedgem/earth",
+		"#nostrummagica:infusedgem/fire",
+		"#nostrummagica:infusedgem/ender",
+		"#nostrummagica:infusedgem/ice",
+		"#nostrummagica:infusedgem/lightning",
+		"#nostrummagica:infusedgem/wind"
+	]
+}

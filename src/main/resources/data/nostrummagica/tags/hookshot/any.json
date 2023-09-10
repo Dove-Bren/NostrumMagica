@@ -1,0 +1,9 @@
+{
+	"replace": false,
+	"values": [
+		"nostrummagica:hookshot_weak",
+		"nostrummagica:hookshot_medium",
+		"nostrummagica:hookshot_strong",
+		"nostrummagica:hookshot_claw"
+	]
+}
