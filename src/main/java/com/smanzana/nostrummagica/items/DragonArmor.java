@@ -263,7 +263,6 @@ public class DragonArmor extends Item {
 		}
 	}
 	
-	private final String resourceLocation;
 	protected final DragonEquipmentSlot slot;
 	protected final DragonArmorMaterial material;
 	
@@ -271,20 +270,14 @@ public class DragonArmor extends Item {
 	protected final double defaultMagicResist;
 	protected final int defaultArmorToughness;
 	
-	public DragonArmor(String resourceLocation, DragonEquipmentSlot slot, DragonArmorMaterial material) {
+	public DragonArmor(DragonEquipmentSlot slot, DragonArmorMaterial material) {
 		super(NostrumItems.PropEquipment().rarity(CalcVanillaRarity(slot, material)));
-		this.resourceLocation = resourceLocation;
 		this.slot = slot;
 		this.material = material;
 		
 		defaultArmor = CalcArmor(slot, material);
 		defaultMagicResist = CalcMagicResist(slot, material);
 		defaultArmorToughness = CalcArmorToughness(slot, material);
-	}
-	
-	@OnlyIn(Dist.CLIENT)
-	public String getResourceLocation() {
-		return resourceLocation;
 	}
 	
 	public DragonArmorMaterial getMaterial() {

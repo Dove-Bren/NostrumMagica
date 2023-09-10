@@ -45,7 +45,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 	//private static final int WAKE_TIME = 20 * 60 * 5;
 	public static final String ID = "spell_scroll";
 	
-	private SpellScroll() {
+	public SpellScroll() {
 		super(NostrumItems.PropUnstackable().rarity(Rarity.UNCOMMON).maxDamage(100));
 	}
 	

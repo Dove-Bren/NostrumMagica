@@ -138,7 +138,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	
 	public static final String ID_PREFIX = "spelltome_";
 	
-	private SpellTome() {
+	public SpellTome() {
 		super(NostrumItems.PropTomeUnstackable().rarity(Rarity.UNCOMMON));
 	}
 	

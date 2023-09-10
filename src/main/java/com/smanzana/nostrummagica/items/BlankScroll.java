@@ -19,7 +19,7 @@ public class BlankScroll extends Item implements ILoreTagged {
 	
 	public static final String ID = "blank_scroll";
 	
-	private BlankScroll() {
+	public BlankScroll() {
 		super(NostrumItems.PropBase());
 	}
 	

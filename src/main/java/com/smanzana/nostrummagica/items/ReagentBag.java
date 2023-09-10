@@ -29,7 +29,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 	
 	public static final String ID = "reagent_bag";
 	
-	private ReagentBag() {
+	public ReagentBag() {
 		super(NostrumItems.PropUnstackable());
 	}
 	

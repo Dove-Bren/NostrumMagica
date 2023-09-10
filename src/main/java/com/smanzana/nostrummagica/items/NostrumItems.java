@@ -1,12 +1,18 @@
 package com.smanzana.nostrummagica.items;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
+import com.smanzana.nostrummagica.blocks.CropEssence;
+import com.smanzana.nostrummagica.blocks.CropGinseng;
+import com.smanzana.nostrummagica.blocks.CropMandrakeRoot;
+import com.smanzana.nostrummagica.blocks.ManiCrystal;
+import com.smanzana.nostrummagica.items.DragonArmor.DragonArmorMaterial;
+import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.Rarity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -226,13 +232,13 @@ public class NostrumItems {
 	@ObjectHolder(NostrumRoseItem.ID_BLOOD_ROSE) public static NostrumRoseItem roseBlood;
 	@ObjectHolder(NostrumRoseItem.ID_ELDRICH_ROSE) public static NostrumRoseItem roseEldrich;
 	@ObjectHolder(NostrumRoseItem.ID_PALE_ROSE) public static NostrumRoseItem rosePale;
-	@ObjectHolder(NostrumSkillItem.ID_SKILL_MIRROR) public static NostrumSkillItem skillMirror;
-	@ObjectHolder(NostrumSkillItem.ID_SKILL_OOZE) public static NostrumSkillItem skillOoze;
-	@ObjectHolder(NostrumSkillItem.ID_SKILL_PENDANT) public static NostrumSkillItem skillPendant;
-	@ObjectHolder(NostrumSkillItem.ID_SKILL_FLUTE) public static NostrumSkillItem skillFlute;
-	@ObjectHolder(NostrumSkillItem.ID_SKILL_ENDER_PIN) public static NostrumSkillItem skillEnderPin;
-	@ObjectHolder(NostrumSkillItem.ID_SKILL_SCROLL_SMALL) public static NostrumSkillItem skillScrollSmall;
-	@ObjectHolder(NostrumSkillItem.ID_SKILL_SCROLL_LARGE) public static NostrumSkillItem skillScrollLarge;
+	@ObjectHolder(NostrumSkillItem.ID_SKILL_MIRROR) public static NostrumSkillItem.Mirror skillMirror;
+	@ObjectHolder(NostrumSkillItem.ID_SKILL_OOZE) public static NostrumSkillItem.Ooze skillOoze;
+	@ObjectHolder(NostrumSkillItem.ID_SKILL_PENDANT) public static NostrumSkillItem.Pendant skillPendant;
+	@ObjectHolder(NostrumSkillItem.ID_SKILL_FLUTE) public static NostrumSkillItem.Flute skillFlute;
+	@ObjectHolder(NostrumSkillItem.ID_SKILL_ENDER_PIN) public static NostrumSkillItem.EnderPin skillEnderPin;
+	@ObjectHolder(NostrumSkillItem.ID_SKILL_SCROLL_SMALL) public static NostrumSkillItem.SmallScroll skillScrollSmall;
+	@ObjectHolder(NostrumSkillItem.ID_SKILL_SCROLL_LARGE) public static NostrumSkillItem.LargeScroll skillScrollLarge;
 	@ObjectHolder(PositionCrystal.ID) public static PositionCrystal positionCrystal;
 	@ObjectHolder(PositionToken.ID) public static PositionToken positionToken;
 	@ObjectHolder(ReagentItem.ID_MANDRAKE_ROOT) public static ReagentItem reagentMandrakeRoot;
@@ -310,163 +316,252 @@ public class NostrumItems {
 
 	@SubscribeEvent
 	public void registerItems(RegistryEvent.Register<Item> event) {
-		broke() {
-			// I removed all these items doing a setRegistryName() but they need it?
-		};
-		
-    	final IForgeRegistry<Item> registry = event.getRegistry();
-    	registry.register(NostrumGuide.instance());
-    	registry.register(SpellcraftGuide.instance());
-    	registry.register(SpellTome.instance());
-    	registry.register(SpellPlate.instance());
-    	registry.register(BlankScroll.instance());
-    	registry.register(SpellScroll.instance());
-    	registry.register(SpellTableItem.instance());
-    	registry.register(MirrorItem.instance());
-    	registry.register(MagicSwordBase.instance());
-    	registry.register(MagicArmorBase.helm());
-    	registry.register(MagicArmorBase.chest());
-    	registry.register(MagicArmorBase.legs());
-		registry.register(MagicArmorBase.feet());
-		
-    	EnchantedWeapon.registerWeapons(registry);
-    	EnchantedArmor.registerArmors(registry);
-    	DragonArmor.registerArmors(registry);
+		final IForgeRegistry<Item> registry = event.getRegistry();
+		registry.register(new AltarItem().setRegistryName(AltarItem.ID));
+    	registry.register(new ArcaneWolfSoulItem().setRegistryName(ArcaneWolfSoulItem.ID));
+    	registry.register(new BlankScroll().setRegistryName(BlankScroll.ID));
+    	registry.register(new ChalkItem().setRegistryName(ChalkItem.ID));
+    	registry.register(new DragonArmor(DragonEquipmentSlot.HELM, DragonArmorMaterial.GOLD).setRegistryName(DragonArmor.ID_HELM_GOLD));
+    	registry.register(new DragonArmor(DragonEquipmentSlot.HELM, DragonArmorMaterial.IRON).setRegistryName(DragonArmor.ID_HELM_IRON));
+    	registry.register(new DragonArmor(DragonEquipmentSlot.HELM, DragonArmorMaterial.DIAMOND).setRegistryName(DragonArmor.ID_HELM_DIAMOND));
+    	registry.register(new DragonArmor(DragonEquipmentSlot.BODY, DragonArmorMaterial.GOLD).setRegistryName(DragonArmor.ID_BODY_GOLD));
+    	registry.register(new DragonArmor(DragonEquipmentSlot.BODY, DragonArmorMaterial.IRON).setRegistryName(DragonArmor.ID_BODY_IRON));
+    	registry.register(new DragonArmor(DragonEquipmentSlot.BODY, DragonArmorMaterial.DIAMOND).setRegistryName(DragonArmor.ID_BODY_DIAMOND));
+    	registry.register(new DragonArmor(DragonEquipmentSlot.WINGS, DragonArmorMaterial.GOLD).setRegistryName(DragonArmor.ID_WINGS_GOLD));
+    	registry.register(new DragonArmor(DragonEquipmentSlot.WINGS, DragonArmorMaterial.IRON).setRegistryName(DragonArmor.ID_WINGS_IRON));
+    	registry.register(new DragonArmor(DragonEquipmentSlot.WINGS, DragonArmorMaterial.DIAMOND).setRegistryName(DragonArmor.ID_WINGS_DIAMOND));
+    	registry.register(new DragonArmor(DragonEquipmentSlot.CREST, DragonArmorMaterial.GOLD).setRegistryName(DragonArmor.ID_CREST_GOLD));
+    	registry.register(new DragonArmor(DragonEquipmentSlot.CREST, DragonArmorMaterial.IRON).setRegistryName(DragonArmor.ID_CREST_IRON));
+    	registry.register(new DragonArmor(DragonEquipmentSlot.CREST, DragonArmorMaterial.DIAMOND).setRegistryName(DragonArmor.ID_CREST_DIAMOND));
+    	registry.register(new DragonEgg().setRegistryName(DragonEgg.ID));
+    	registry.register(new DragonEggFragment().setRegistryName(DragonEggFragment.ID));
+    	registry.register(new DragonSoulItem().setRegistryName(DragonSoulItem.ID));
     	
-    	registry.register(MirrorShield.instance());
-    	registry.register(MirrorShieldImproved.instance());
+    	registry.register(new EnchantedEarthArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedEarthArmor.ID_HELM_NOVICE));
+    	registry.register(new EnchantedEarthArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedEarthArmor.ID_HELM_ADEPT));
+    	registry.register(new EnchantedEarthArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedEarthArmor.ID_HELM_MASTER));
+    	registry.register(new EnchantedEarthArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedEarthArmor.ID_HELM_TRUE));
+    	registry.register(new EnchantedEarthArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedEarthArmor.ID_CHEST_NOVICE));
+    	registry.register(new EnchantedEarthArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedEarthArmor.ID_CHEST_ADEPT));
+    	registry.register(new EnchantedEarthArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedEarthArmor.ID_CHEST_MASTER));
+    	registry.register(new EnchantedEarthArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedEarthArmor.ID_CHEST_TRUE));
+    	registry.register(new EnchantedEarthArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedEarthArmor.ID_LEGS_NOVICE));
+    	registry.register(new EnchantedEarthArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedEarthArmor.ID_LEGS_ADEPT));
+    	registry.register(new EnchantedEarthArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedEarthArmor.ID_LEGS_MASTER));
+    	registry.register(new EnchantedEarthArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedEarthArmor.ID_LEGS_TRUE));
+    	registry.register(new EnchantedEarthArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedEarthArmor.ID_FEET_NOVICE));
+    	registry.register(new EnchantedEarthArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedEarthArmor.ID_FEET_ADEPT));
+    	registry.register(new EnchantedEarthArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedEarthArmor.ID_FEET_MASTER));
+    	registry.register(new EnchantedEarthArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedEarthArmor.ID_FEET_TRUE));
     	
-    	registry.register(ReagentItem.instance());
-		
-		MinecraftForge.addGrassSeed(ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1), 6);
-		MinecraftForge.addGrassSeed(ReagentItem.instance().getReagent(ReagentType.GINSENG, 1), 5);
+    	registry.register(new EnchantedEnderArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedEnderArmor.ID_HELM_NOVICE));
+    	registry.register(new EnchantedEnderArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedEnderArmor.ID_HELM_ADEPT));
+    	registry.register(new EnchantedEnderArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedEnderArmor.ID_HELM_MASTER));
+    	registry.register(new EnchantedEnderArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedEnderArmor.ID_HELM_TRUE));
+    	registry.register(new EnchantedEnderArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedEnderArmor.ID_CHEST_NOVICE));
+    	registry.register(new EnchantedEnderArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedEnderArmor.ID_CHEST_ADEPT));
+    	registry.register(new EnchantedEnderArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedEnderArmor.ID_CHEST_MASTER));
+    	registry.register(new EnchantedEnderArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedEnderArmor.ID_CHEST_TRUE));
+    	registry.register(new EnchantedEnderArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedEnderArmor.ID_LEGS_NOVICE));
+    	registry.register(new EnchantedEnderArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedEnderArmor.ID_LEGS_ADEPT));
+    	registry.register(new EnchantedEnderArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedEnderArmor.ID_LEGS_MASTER));
+    	registry.register(new EnchantedEnderArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedEnderArmor.ID_LEGS_TRUE));
+    	registry.register(new EnchantedEnderArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedEnderArmor.ID_FEET_NOVICE));
+    	registry.register(new EnchantedEnderArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedEnderArmor.ID_FEET_ADEPT));
+    	registry.register(new EnchantedEnderArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedEnderArmor.ID_FEET_MASTER));
+    	registry.register(new EnchantedEnderArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedEnderArmor.ID_FEET_TRUE));
     	
-    	registry.register(InfusedGemItem.instance());
+    	registry.register(new EnchantedFireArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedFireArmor.ID_HELM_NOVICE));
+    	registry.register(new EnchantedFireArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedFireArmor.ID_HELM_ADEPT));
+    	registry.register(new EnchantedFireArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedFireArmor.ID_HELM_MASTER));
+    	registry.register(new EnchantedFireArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedFireArmor.ID_HELM_TRUE));
+    	registry.register(new EnchantedFireArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedFireArmor.ID_CHEST_NOVICE));
+    	registry.register(new EnchantedFireArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedFireArmor.ID_CHEST_ADEPT));
+    	registry.register(new EnchantedFireArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedFireArmor.ID_CHEST_MASTER));
+    	registry.register(new EnchantedFireArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedFireArmor.ID_CHEST_TRUE));
+    	registry.register(new EnchantedFireArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedFireArmor.ID_LEGS_NOVICE));
+    	registry.register(new EnchantedFireArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedFireArmor.ID_LEGS_ADEPT));
+    	registry.register(new EnchantedFireArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedFireArmor.ID_LEGS_MASTER));
+    	registry.register(new EnchantedFireArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedFireArmor.ID_LEGS_TRUE));
+    	registry.register(new EnchantedFireArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedFireArmor.ID_FEET_NOVICE));
+    	registry.register(new EnchantedFireArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedFireArmor.ID_FEET_ADEPT));
+    	registry.register(new EnchantedFireArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedFireArmor.ID_FEET_MASTER));
+    	registry.register(new EnchantedFireArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedFireArmor.ID_FEET_TRUE));
     	
-    	registry.register(SpellRune.instance());
+    	registry.register(new EnchantedIceArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedIceArmor.ID_HELM_NOVICE));
+    	registry.register(new EnchantedIceArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedIceArmor.ID_HELM_ADEPT));
+    	registry.register(new EnchantedIceArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedIceArmor.ID_HELM_MASTER));
+    	registry.register(new EnchantedIceArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedIceArmor.ID_HELM_TRUE));
+    	registry.register(new EnchantedIceArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedIceArmor.ID_CHEST_NOVICE));
+    	registry.register(new EnchantedIceArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedIceArmor.ID_CHEST_ADEPT));
+    	registry.register(new EnchantedIceArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedIceArmor.ID_CHEST_MASTER));
+    	registry.register(new EnchantedIceArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedIceArmor.ID_CHEST_TRUE));
+    	registry.register(new EnchantedIceArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedIceArmor.ID_LEGS_NOVICE));
+    	registry.register(new EnchantedIceArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedIceArmor.ID_LEGS_ADEPT));
+    	registry.register(new EnchantedIceArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedIceArmor.ID_LEGS_MASTER));
+    	registry.register(new EnchantedIceArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedIceArmor.ID_LEGS_TRUE));
+    	registry.register(new EnchantedIceArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedIceArmor.ID_FEET_NOVICE));
+    	registry.register(new EnchantedIceArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedIceArmor.ID_FEET_ADEPT));
+    	registry.register(new EnchantedIceArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedIceArmor.ID_FEET_MASTER));
+    	registry.register(new EnchantedIceArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedIceArmor.ID_FEET_TRUE));
     	
-    	registry.register(NostrumResourceItem.instance());
+    	registry.register(new EnchantedLightningArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedLightningArmor.ID_HELM_NOVICE));
+    	registry.register(new EnchantedLightningArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedLightningArmor.ID_HELM_ADEPT));
+    	registry.register(new EnchantedLightningArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedLightningArmor.ID_HELM_MASTER));
+    	registry.register(new EnchantedLightningArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedLightningArmor.ID_HELM_TRUE));
+    	registry.register(new EnchantedLightningArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedLightningArmor.ID_CHEST_NOVICE));
+    	registry.register(new EnchantedLightningArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedLightningArmor.ID_CHEST_ADEPT));
+    	registry.register(new EnchantedLightningArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedLightningArmor.ID_CHEST_MASTER));
+    	registry.register(new EnchantedLightningArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedLightningArmor.ID_CHEST_TRUE));
+    	registry.register(new EnchantedLightningArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedLightningArmor.ID_LEGS_NOVICE));
+    	registry.register(new EnchantedLightningArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedLightningArmor.ID_LEGS_ADEPT));
+    	registry.register(new EnchantedLightningArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedLightningArmor.ID_LEGS_MASTER));
+    	registry.register(new EnchantedLightningArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedLightningArmor.ID_LEGS_TRUE));
+    	registry.register(new EnchantedLightningArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedLightningArmor.ID_FEET_NOVICE));
+    	registry.register(new EnchantedLightningArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedLightningArmor.ID_FEET_ADEPT));
+    	registry.register(new EnchantedLightningArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedLightningArmor.ID_FEET_MASTER));
+    	registry.register(new EnchantedLightningArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedLightningArmor.ID_FEET_TRUE));
     	
-    	registry.register(ReagentBag.instance());
+    	registry.register(new EnchantedPhysicalArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedPhysicalArmor.ID_HELM_NOVICE));
+    	registry.register(new EnchantedPhysicalArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedPhysicalArmor.ID_HELM_ADEPT));
+    	registry.register(new EnchantedPhysicalArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedPhysicalArmor.ID_HELM_MASTER));
+    	registry.register(new EnchantedPhysicalArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedPhysicalArmor.ID_HELM_TRUE));
+    	registry.register(new EnchantedPhysicalArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedPhysicalArmor.ID_CHEST_NOVICE));
+    	registry.register(new EnchantedPhysicalArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedPhysicalArmor.ID_CHEST_ADEPT));
+    	registry.register(new EnchantedPhysicalArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedPhysicalArmor.ID_CHEST_MASTER));
+    	registry.register(new EnchantedPhysicalArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedPhysicalArmor.ID_CHEST_TRUE));
+    	registry.register(new EnchantedPhysicalArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedPhysicalArmor.ID_LEGS_NOVICE));
+    	registry.register(new EnchantedPhysicalArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedPhysicalArmor.ID_LEGS_ADEPT));
+    	registry.register(new EnchantedPhysicalArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedPhysicalArmor.ID_LEGS_MASTER));
+    	registry.register(new EnchantedPhysicalArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedPhysicalArmor.ID_LEGS_TRUE));
+    	registry.register(new EnchantedPhysicalArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedPhysicalArmor.ID_FEET_NOVICE));
+    	registry.register(new EnchantedPhysicalArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedPhysicalArmor.ID_FEET_ADEPT));
+    	registry.register(new EnchantedPhysicalArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedPhysicalArmor.ID_FEET_MASTER));
+    	registry.register(new EnchantedPhysicalArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedPhysicalArmor.ID_FEET_TRUE));
     	
-    	registry.register(SeekerIdol.instance());
+    	registry.register(new EnchantedWindArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedWindArmor.ID_HELM_NOVICE));
+    	registry.register(new EnchantedWindArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedWindArmor.ID_HELM_ADEPT));
+    	registry.register(new EnchantedWindArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedWindArmor.ID_HELM_MASTER));
+    	registry.register(new EnchantedWindArmor(EquipmentSlotType.HEAD, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedWindArmor.ID_HELM_TRUE));
+    	registry.register(new EnchantedWindArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedWindArmor.ID_CHEST_NOVICE));
+    	registry.register(new EnchantedWindArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedWindArmor.ID_CHEST_ADEPT));
+    	registry.register(new EnchantedWindArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedWindArmor.ID_CHEST_MASTER));
+    	registry.register(new EnchantedWindArmor(EquipmentSlotType.CHEST, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedWindArmor.ID_CHEST_TRUE));
+    	registry.register(new EnchantedWindArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedWindArmor.ID_LEGS_NOVICE));
+    	registry.register(new EnchantedWindArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedWindArmor.ID_LEGS_ADEPT));
+    	registry.register(new EnchantedWindArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedWindArmor.ID_LEGS_MASTER));
+    	registry.register(new EnchantedWindArmor(EquipmentSlotType.LEGS, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedWindArmor.ID_LEGS_TRUE));
+    	registry.register(new EnchantedWindArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.NOVICE, PropEquipment()).setRegistryName(EnchantedWindArmor.ID_FEET_NOVICE));
+    	registry.register(new EnchantedWindArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.ADEPT, PropEquipment()).setRegistryName(EnchantedWindArmor.ID_FEET_ADEPT));
+    	registry.register(new EnchantedWindArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.MASTER, PropEquipment()).setRegistryName(EnchantedWindArmor.ID_FEET_MASTER));
+    	registry.register(new EnchantedWindArmor(EquipmentSlotType.FEET, EnchantedArmor.Type.TRUE, PropEquipment()).setRegistryName(EnchantedWindArmor.ID_FEET_TRUE));
     	
-    	registry.register(ShrineSeekingGem.instance());
+    	registry.register(new EnchantedWeapon(EMagicElement.ICE, EnchantedWeapon.Type.NOVICE).setRegistryName(EnchantedWeapon.ID_ICE_NOVICE));
+    	registry.register(new EnchantedWeapon(EMagicElement.ICE, EnchantedWeapon.Type.ADEPT).setRegistryName(EnchantedWeapon.ID_ICE_ADEPT));
+    	registry.register(new EnchantedWeapon(EMagicElement.ICE, EnchantedWeapon.Type.MASTER).setRegistryName(EnchantedWeapon.ID_ICE_MASTER));
+    	registry.register(new EnchantedWeapon(EMagicElement.LIGHTNING, EnchantedWeapon.Type.NOVICE).setRegistryName(EnchantedWeapon.ID_LIGHTNING_NOVICE));
+    	registry.register(new EnchantedWeapon(EMagicElement.LIGHTNING, EnchantedWeapon.Type.ADEPT).setRegistryName(EnchantedWeapon.ID_LIGHTNING_ADEPT));
+    	registry.register(new EnchantedWeapon(EMagicElement.LIGHTNING, EnchantedWeapon.Type.MASTER).setRegistryName(EnchantedWeapon.ID_LIGHTNING_MASTER));
+    	registry.register(new EnchantedWeapon(EMagicElement.WIND, EnchantedWeapon.Type.NOVICE).setRegistryName(EnchantedWeapon.ID_WIND_NOVICE));
+    	registry.register(new EnchantedWeapon(EMagicElement.WIND, EnchantedWeapon.Type.ADEPT).setRegistryName(EnchantedWeapon.ID_WIND_ADEPT));
+    	registry.register(new EnchantedWeapon(EMagicElement.WIND, EnchantedWeapon.Type.MASTER).setRegistryName(EnchantedWeapon.ID_WIND_MASTER));
+    	registry.register(new EssenceItem(EMagicElement.EARTH).setRegistryName(EssenceItem.ID_PREFIX + ID_EARTH));
+    	registry.register(new EssenceItem(EMagicElement.FIRE).setRegistryName(EssenceItem.ID_PREFIX + ID_FIRE));
+    	registry.register(new EssenceItem(EMagicElement.ICE).setRegistryName(EssenceItem.ID_PREFIX + ID_ICE));
+    	registry.register(new EssenceItem(EMagicElement.ENDER).setRegistryName(EssenceItem.ID_PREFIX + ID_ENDER));
+    	registry.register(new EssenceItem(EMagicElement.LIGHTNING).setRegistryName(EssenceItem.ID_PREFIX + ID_LIGHTNING));
+    	registry.register(new EssenceItem(EMagicElement.PHYSICAL).setRegistryName(EssenceItem.ID_PREFIX + ID_PHYSICAL));
+    	registry.register(new EssenceItem(EMagicElement.WIND).setRegistryName(EssenceItem.ID_PREFIX + ID_WIND));
+    	registry.register(new HookshotItem(HookshotItem.HookshotType.WEAK).setRegistryName(HookshotItem.ID_PREFIX + "weak"));
+    	registry.register(new HookshotItem(HookshotItem.HookshotType.MEDIUM).setRegistryName(HookshotItem.ID_PREFIX + "medium"));
+    	registry.register(new HookshotItem(HookshotItem.HookshotType.STRONG).setRegistryName(HookshotItem.ID_PREFIX + "strong"));
+    	registry.register(new HookshotItem(HookshotItem.HookshotType.CLAW).setRegistryName(HookshotItem.ID_PREFIX + "claw"));
+    	registry.register(new InfusedGemItem(EMagicElement.PHYSICAL).setRegistryName(InfusedGemItem.ID_PREFIX + "unattuned"));
+    	registry.register(new InfusedGemItem(EMagicElement.EARTH).setRegistryName(InfusedGemItem.ID_PREFIX + ID_EARTH));
+    	registry.register(new InfusedGemItem(EMagicElement.ENDER).setRegistryName(InfusedGemItem.ID_PREFIX + ID_ENDER));
+    	registry.register(new InfusedGemItem(EMagicElement.FIRE).setRegistryName(InfusedGemItem.ID_PREFIX + ID_FIRE));
+    	registry.register(new InfusedGemItem(EMagicElement.ICE).setRegistryName(InfusedGemItem.ID_PREFIX + ID_ICE));
+    	registry.register(new InfusedGemItem(EMagicElement.LIGHTNING).setRegistryName(InfusedGemItem.ID_PREFIX + ID_LIGHTNING));
+    	registry.register(new InfusedGemItem(EMagicElement.WIND).setRegistryName(InfusedGemItem.ID_PREFIX + ID_WIND));
+    	registry.register(new MageStaff().setRegistryName(MageStaff.ID));
+    	registry.register(new MagicCharm(EMagicElement.EARTH).setRegistryName(MagicCharm.ID_PREFIX + ID_EARTH));
+    	registry.register(new MagicCharm(EMagicElement.ENDER).setRegistryName(MagicCharm.ID_PREFIX + ID_ENDER));
+    	registry.register(new MagicCharm(EMagicElement.FIRE).setRegistryName(MagicCharm.ID_PREFIX + ID_FIRE));
+    	registry.register(new MagicCharm(EMagicElement.ICE).setRegistryName(MagicCharm.ID_PREFIX + ID_ICE));
+    	registry.register(new MagicCharm(EMagicElement.LIGHTNING).setRegistryName(MagicCharm.ID_PREFIX + ID_LIGHTNING));
+    	registry.register(new MagicCharm(EMagicElement.PHYSICAL).setRegistryName(MagicCharm.ID_PREFIX + ID_PHYSICAL));
+    	registry.register(new MagicCharm(EMagicElement.WIND).setRegistryName(MagicCharm.ID_PREFIX + ID_WIND));
+    	registry.register(new MagicSwordBase().setRegistryName(MagicSwordBase.ID));
+    	registry.register(new MasteryOrb().setRegistryName(MasteryOrb.ID));
+    	registry.register(new MirrorItem().setRegistryName(MirrorItem.ID));
+    	registry.register(new MirrorShield().setRegistryName(MirrorShield.ID));
+    	registry.register(new MirrorShieldImproved().setRegistryName(MirrorShieldImproved.ID));
+    	registry.register(new NostrumGuide().setRegistryName(NostrumGuide.ID));
+    	registry.register(new NostrumResourceItem().setRegistryName(NostrumResourceItem.ID_TOKEN));
+    	registry.register(new NostrumResourceItem().setRegistryName(NostrumResourceItem.ID_PENDANT_LEFT));
+    	registry.register(new NostrumResourceItem().setRegistryName(NostrumResourceItem.ID_PENDANT_RIGHT));
+    	registry.register(new NostrumResourceItem().setRegistryName(NostrumResourceItem.ID_SLAB_FIERCE));
+    	registry.register(new NostrumResourceItem().setRegistryName(NostrumResourceItem.ID_SLAB_KIND));
+    	registry.register(new NostrumResourceItem().setRegistryName(NostrumResourceItem.ID_SLAB_BALANCED));
+    	registry.register(new NostrumResourceItem().setRegistryName(NostrumResourceItem.ID_SPRITE_CORE));
+    	registry.register(new NostrumResourceItem().setRegistryName(NostrumResourceItem.ID_ENDER_BRISTLE));
+    	registry.register(new NostrumResourceItem().setRegistryName(NostrumResourceItem.ID_WISP_PEBBLE));
+    	registry.register(new NostrumResourceItem().setRegistryName(NostrumResourceItem.ID_MANA_LEAF));
+    	registry.register(new NostrumResourceItem().setRegistryName(NostrumResourceItem.ID_EVIL_THISTLE));
+    	registry.register(new NostrumResourceItem().setRegistryName(NostrumResourceItem.ID_DRAGON_WING));
+    	registry.register(new NostrumResourceItem().setRegistryName(NostrumResourceItem.ID_SEEKING_GEM));
+    	registry.register(new NostrumResourceCrystal(ManiCrystal.smallInstance(), PropBase()).setRegistryName(NostrumResourceCrystal.ID_CRYSTAL_SMALL));
+    	registry.register(new NostrumResourceCrystal(ManiCrystal.smallInstance(), PropBase().rarity(Rarity.UNCOMMON)).setRegistryName(NostrumResourceCrystal.ID_CRYSTAL_MEDIUM));
+    	registry.register(new NostrumResourceCrystal(ManiCrystal.smallInstance(), PropBase().rarity(Rarity.RARE)).setRegistryName(NostrumResourceCrystal.ID_CRYSTAL_LARGE));
+    	registry.register(new NostrumRoseItem().setRegistryName(NostrumRoseItem.ID_BLOOD_ROSE));
+    	registry.register(new NostrumRoseItem().setRegistryName(NostrumRoseItem.ID_ELDRICH_ROSE));
+    	registry.register(new NostrumRoseItem().setRegistryName(NostrumRoseItem.ID_PALE_ROSE));
+    	registry.register(new NostrumSkillItem.Mirror().setRegistryName(NostrumSkillItem.ID_SKILL_MIRROR));
+    	registry.register(new NostrumSkillItem.Ooze().setRegistryName(NostrumSkillItem.ID_SKILL_OOZE));
+    	registry.register(new NostrumSkillItem.Pendant().setRegistryName(NostrumSkillItem.ID_SKILL_PENDANT));
+    	registry.register(new NostrumSkillItem.Flute().setRegistryName(NostrumSkillItem.ID_SKILL_FLUTE));
+    	registry.register(new NostrumSkillItem.EnderPin().setRegistryName(NostrumSkillItem.ID_SKILL_ENDER_PIN));
+    	registry.register(new NostrumSkillItem.SmallScroll().setRegistryName(NostrumSkillItem.ID_SKILL_SCROLL_SMALL));
+    	registry.register(new NostrumSkillItem.LargeScroll().setRegistryName(NostrumSkillItem.ID_SKILL_SCROLL_LARGE));
+    	registry.register(new PositionCrystal().setRegistryName(PositionCrystal.ID));
+    	registry.register(new PositionToken().setRegistryName(PositionToken.ID));
+    	registry.register(new ReagentItem(ReagentType.MANDRAKE_ROOT).setRegistryName(ReagentItem.ID_MANDRAKE_ROOT));
+    	registry.register(new ReagentItem(ReagentType.SPIDER_SILK).setRegistryName(ReagentItem.ID_SPIDER_SILK));
+    	registry.register(new ReagentItem(ReagentType.BLACK_PEARL).setRegistryName(ReagentItem.ID_BLACK_PEARL));
+    	registry.register(new ReagentItem(ReagentType.SKY_ASH).setRegistryName(ReagentItem.ID_SKY_ASH));
+    	registry.register(new ReagentItem(ReagentType.GINSENG).setRegistryName(ReagentItem.ID_GINSENG));
+    	registry.register(new ReagentItem(ReagentType.GRAVE_DUST).setRegistryName(ReagentItem.ID_GRAVE_DUST));
+    	registry.register(new ReagentItem(ReagentType.CRYSTABLOOM).setRegistryName(ReagentItem.ID_CRYSTABLOOM));
+    	registry.register(new ReagentItem(ReagentType.MANI_DUST).setRegistryName(ReagentItem.ID_MANI_DUST));
+    	registry.register(new ReagentBag().setRegistryName(ReagentBag.ID));
+    	registry.register(new ReagentSeed(CropMandrakeRoot.instance(), PropBase()).setRegistryName(ReagentSeed.ID_MANDRAKE_SEED));
+    	registry.register(new ReagentSeed(CropGinseng.instance(), PropBase()).setRegistryName(ReagentSeed.ID_GINSENG_SEED));
+    	registry.register(new ReagentSeed(CropEssence.instance(), PropBase()).setRegistryName(ReagentSeed.ID_ESSENCE_SEED));
+    	registry.register(new RuneBag().setRegistryName(RuneBag.ID));
+    	registry.register(new SoulDagger().setRegistryName(SoulDagger.ID));
+    	registry.register(new SpellcraftGuide().setRegistryName(SpellcraftGuide.ID));
+    	registry.register(new SpellPlate(SpellTome.TomeStyle.NOVICE).setRegistryName(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_NOVICE));
+    	registry.register(new SpellPlate(SpellTome.TomeStyle.ADVANCED).setRegistryName(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_ADVANCED));
+    	registry.register(new SpellPlate(SpellTome.TomeStyle.COMBAT).setRegistryName(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_COMBAT));
+    	registry.register(new SpellPlate(SpellTome.TomeStyle.DEATH).setRegistryName(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_DEATH));
+    	registry.register(new SpellPlate(SpellTome.TomeStyle.SPOOKY).setRegistryName(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_SPOOKY));
+    	registry.register(new SpellPlate(SpellTome.TomeStyle.MUTED).setRegistryName(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_MUTED));
+    	registry.register(new SpellPlate(SpellTome.TomeStyle.LIVING).setRegistryName(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_LIVING));
+    	registry.register(new SpellRune().setRegistryName(SpellRune.ID));
+    	registry.register(new SpellScroll().setRegistryName(SpellScroll.ID));
+    	registry.register(new SpellTableItem().setRegistryName(SpellTableItem.ID));
+    	registry.register(new SpellTome().setRegistryName(SpellTome.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_NOVICE));
+    	registry.register(new SpellTome().setRegistryName(SpellTome.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_ADVANCED));
+    	registry.register(new SpellTome().setRegistryName(SpellTome.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_COMBAT));
+    	registry.register(new SpellTome().setRegistryName(SpellTome.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_DEATH));
+    	registry.register(new SpellTome().setRegistryName(SpellTome.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_SPOOKY));
+    	registry.register(new SpellTome().setRegistryName(SpellTome.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_MUTED));
+    	registry.register(new SpellTome().setRegistryName(SpellTome.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_LIVING));
+    	registry.register(new SpellTomePage().setRegistryName(SpellTomePage.ID));
+    	registry.register(new ThanoPendant().setRegistryName(ThanoPendant.ID));
+    	registry.register(new ThanosStaff().setRegistryName(ThanosStaff.ID));
+    	registry.register(new WarlockSword().setRegistryName(WarlockSword.ID));
     	
-    	registry.register(ChalkItem.instance());
-    	
-    	registry.register(AltarItem.instance());
-    	
-    	registry.register(PositionCrystal.instance());
-    	
-    	registry.register(PositionToken.instance());
-    	
-    	registry.register(SpellTomePage.instance());
-
-    	registry.register(EssenceItem.instance());
-    	
-    	registry.register(MageStaff.instance());
-    	registry.register(ThanoPendant.instance());
-    	registry.register(ThanosStaff.instance());
-    	registry.register(MagicCharm.instance());
-    	
-    	registry.register(RuneBag.instance());
-    	
-    	registry.register(DragonEggFragment.instance());
-    	
-    	registry.register(DragonEgg.instance());
-    	
-    	registry.register(NostrumSkillItem.instance());
-    	
-    	registry.register(NostrumRoseItem.instance());
-    	
-    	registry.register(WarlockSword.instance());
-    	
-    	registry.register(HookshotItem.instance());
-
-    	registry.register(ReagentSeed.mandrake);
-    	registry.register(ReagentSeed.ginseng);
-    	registry.register(ReagentSeed.essence);
-    	
-    	registry.register(MasteryOrb.instance());
-    	
-    	registry.register(DragonSoulItem.instance());
-    	registry.register(SoulDagger.instance());
-    	registry.register(ArcaneWolfSoulItem.instance());
-    	
-    	registerOreDict(); // Different func to make it easier to read
-	}
-	
-	private void registerOreDict() {
-		OreDictionary.registerOre(OREDICT_RUNE_ANY, new ItemStack(SpellRune.instance(), 1, OreDictionary.WILDCARD_VALUE));
-		
-		OreDictionary.registerOre(OREDICT_REAGENT_ANY, new ItemStack(ReagentItem.instance(), 1, OreDictionary.WILDCARD_VALUE));
-		OreDictionary.registerOre(OREDICT_REAGENT_MANDRAKEROOT, ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1));
-		OreDictionary.registerOre(OREDICT_REAGENT_GINSENG, ReagentItem.instance().getReagent(ReagentType.GINSENG, 1));
-		OreDictionary.registerOre(OREDICT_REAGENT_SPIDERSILK, ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1));
-		OreDictionary.registerOre(OREDICT_REAGENT_BLACKPEARL, ReagentItem.instance().getReagent(ReagentType.BLACK_PEARL, 1));
-		OreDictionary.registerOre(OREDICT_REAGENT_SKYASH, ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1));
-		OreDictionary.registerOre(OREDICT_REAGENT_GRAVEDUST, ReagentItem.instance().getReagent(ReagentType.GRAVE_DUST, 1));
-		OreDictionary.registerOre(OREDICT_REAGENT_MANIDUST, ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1));
-		OreDictionary.registerOre(OREDICT_REAGENT_CRYSTABLOOM, ReagentItem.instance().getReagent(ReagentType.CRYSTABLOOM, 1));
-		
-		OreDictionary.registerOre(OREDICT_INFGEM_ANY, new ItemStack(InfusedGemItem.instance(), 1, OreDictionary.WILDCARD_VALUE));
-		OreDictionary.registerOre(OREDICT_INFGEM_VOID, InfusedGemItem.instance().getGem(null, 1));
-		OreDictionary.registerOre(OREDICT_INFGEM_FIRE, InfusedGemItem.instance().getGem(EMagicElement.FIRE, 1));
-		OreDictionary.registerOre(OREDICT_INFGEM_ICE, InfusedGemItem.instance().getGem(EMagicElement.ICE, 1));
-		OreDictionary.registerOre(OREDICT_INFGEM_WIND, InfusedGemItem.instance().getGem(EMagicElement.WIND, 1));
-		OreDictionary.registerOre(OREDICT_INFGEM_EARTH, InfusedGemItem.instance().getGem(EMagicElement.EARTH, 1));
-		OreDictionary.registerOre(OREDICT_INFGEM_LIGHTNING, InfusedGemItem.instance().getGem(EMagicElement.LIGHTNING, 1));
-		OreDictionary.registerOre(OREDICT_INFGEM_ENDER, InfusedGemItem.instance().getGem(EMagicElement.ENDER, 1));
-		
-		OreDictionary.registerOre(OREDICT_TOKEN, NostrumResourceItem.getItem(ResourceType.TOKEN, 1));
-		OreDictionary.registerOre(OREDICT_CRYSTALSMALL, NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1));
-		OreDictionary.registerOre(OREDICT_CRYSTALMEDIUM, NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1));
-		OreDictionary.registerOre(OREDICT_CRYSTALLARGE, NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1));
-		OreDictionary.registerOre(OREDICT_PENDANTLEFT, NostrumResourceItem.getItem(ResourceType.PENDANT_LEFT, 1));
-		OreDictionary.registerOre(OREDICT_PENDANTRIGHT, NostrumResourceItem.getItem(ResourceType.PENDANT_RIGHT, 1));
-		OreDictionary.registerOre(OREDICT_SLABFIERCE, NostrumResourceItem.getItem(ResourceType.SLAB_FIERCE, 1));
-		OreDictionary.registerOre(OREDICT_SLABKIND, NostrumResourceItem.getItem(ResourceType.SLAB_KIND, 1));
-		OreDictionary.registerOre(OREDICT_SLABBALANCED, NostrumResourceItem.getItem(ResourceType.SLAB_BALANCED, 1));
-		OreDictionary.registerOre(OREDICT_SPRITECORE, NostrumResourceItem.getItem(ResourceType.SPRITE_CORE, 1));
-		OreDictionary.registerOre(OREDICT_ENDERBRISTLE, NostrumResourceItem.getItem(ResourceType.ENDER_BRISTLE, 1));
-		OreDictionary.registerOre(OREDICT_WISPPEBBLE, NostrumResourceItem.getItem(ResourceType.WISP_PEBBLE, 1));
-		
-		OreDictionary.registerOre(OREDICT_SPELLPAGE_ANY, new ItemStack(SpellTomePage.instance(), 1, OreDictionary.WILDCARD_VALUE));
-		
-		OreDictionary.registerOre(OREDICT_ESSENCE_ANY, new ItemStack(EssenceItem.instance(), 1, OreDictionary.WILDCARD_VALUE));
-		OreDictionary.registerOre(OREDICT_ESSENCE_VOID, EssenceItem.getEssence(EMagicElement.PHYSICAL, 1));
-		OreDictionary.registerOre(OREDICT_ESSENCE_FIRE, EssenceItem.getEssence(EMagicElement.FIRE, 1));
-		OreDictionary.registerOre(OREDICT_ESSENCE_ICE, EssenceItem.getEssence(EMagicElement.ICE, 1));
-		OreDictionary.registerOre(OREDICT_ESSENCE_WIND, EssenceItem.getEssence(EMagicElement.WIND, 1));
-		OreDictionary.registerOre(OREDICT_ESSENCE_EARTH, EssenceItem.getEssence(EMagicElement.EARTH, 1));
-		OreDictionary.registerOre(OREDICT_ESSENCE_LIGHTNING, EssenceItem.getEssence(EMagicElement.LIGHTNING, 1));
-		OreDictionary.registerOre(OREDICT_ESSENCE_ENDER, EssenceItem.getEssence(EMagicElement.ENDER, 1));
-		
-		OreDictionary.registerOre(OREDICT_SKILLITEM_ANY, new ItemStack(NostrumSkillItem.instance(), 1, OreDictionary.WILDCARD_VALUE));
-		OreDictionary.registerOre(OREDICT_SKILLITEM_MIRROR, NostrumSkillItem.getItem(SkillItemType.MIRROR, 1));
-		OreDictionary.registerOre(OREDICT_SKILLITEM_OOZE, NostrumSkillItem.getItem(SkillItemType.OOZE, 1));
-		OreDictionary.registerOre(OREDICT_SKILLITEM_PENDANT, NostrumSkillItem.getItem(SkillItemType.PENDANT, 1));
-		OreDictionary.registerOre(OREDICT_SKILLITEM_FLUTE, NostrumSkillItem.getItem(SkillItemType.FLUTE, 1));
-		OreDictionary.registerOre(OREDICT_SKILLITEM_WING, NostrumSkillItem.getItem(SkillItemType.WING, 1));
-		OreDictionary.registerOre(OREDICT_SKILLITEM_ENDERPIN, NostrumSkillItem.getItem(SkillItemType.ENDER_PIN, 1));
-		OreDictionary.registerOre(OREDICT_SKILLITEM_RESEARCHSMALL, NostrumSkillItem.getItem(SkillItemType.RESEARCH_SCROLL_SMALL, 1));
-		OreDictionary.registerOre(OREDICT_SKILLITEM_RESEARCHLARGE, NostrumSkillItem.getItem(SkillItemType.RESEARCH_SCROLL_LARGE, 1));
-		
-		OreDictionary.registerOre(OREDICT_ROSE_ANY, new ItemStack(NostrumRoseItem.instance(), 1, OreDictionary.WILDCARD_VALUE));
-		OreDictionary.registerOre(OREDICT_ROSE_BLOOD, NostrumRoseItem.getItem(RoseType.BLOOD, 1));
-		OreDictionary.registerOre(OREDICT_ROSE_ELDRICH, NostrumRoseItem.getItem(RoseType.ELDRICH, 1));
-		OreDictionary.registerOre(OREDICT_ROSE_PALE, NostrumRoseItem.getItem(RoseType.PALE, 1));
-		
-		OreDictionary.registerOre(OREDICT_HOOKSHOT_ANY, new ItemStack(HookshotItem.instance(), 1, OreDictionary.WILDCARD_VALUE));
-		OreDictionary.registerOre(OREDICT_HOOKSHOT_WEAK, new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.WEAK, false)));
-		OreDictionary.registerOre(OREDICT_HOOKSHOT_MEDIUM, new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.MEDIUM, false)));
-		OreDictionary.registerOre(OREDICT_HOOKSHOT_STRONG, new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.STRONG, false)));
-		OreDictionary.registerOre(OREDICT_HOOKSHOT_CLAW, new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.CLAW, false)));
-		
-		OreDictionary.registerOre(OREDICT_REAGENTSEED_MANDRAKE, new ItemStack(ReagentSeed.mandrake, 1));
-		OreDictionary.registerOre(OREDICT_REAGENTSEED_GINSENG, new ItemStack(ReagentSeed.ginseng, 1));
-		OreDictionary.registerOre(OREDICT_REAGENTSEED_ESSENCE, new ItemStack(ReagentSeed.essence, 1));
 	}
 	
 }

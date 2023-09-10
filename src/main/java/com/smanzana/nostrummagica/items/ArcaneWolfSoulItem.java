@@ -38,7 +38,7 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 	public static final String ID = "arcane_wolf_soul_item";
 	private static final String NBT_MANA = "mana";
 	
-	private ArcaneWolfSoulItem() {
+	public ArcaneWolfSoulItem() {
 		super(NostrumItems.PropUnstackable().rarity(Rarity.EPIC));
 	}
 

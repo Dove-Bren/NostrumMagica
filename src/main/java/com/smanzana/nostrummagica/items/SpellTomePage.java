@@ -26,7 +26,7 @@ public class SpellTomePage extends Item implements ILoreTagged {
 	
 	public static final String ID = "spelltome_page";
 	
-	private SpellTomePage() {
+	public SpellTomePage() {
 		super(NostrumItems.PropTomeUnstackable().rarity(Rarity.UNCOMMON));
 	}
 	

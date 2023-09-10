@@ -11,7 +11,7 @@ public class MasteryOrb extends Item implements ILoreTagged {
 
 	public static final String ID = "mastery_orb";
 	
-	private MasteryOrb() {
+	public MasteryOrb() {
 		super(NostrumItems.PropLowStack().rarity(Rarity.RARE));
 	}
 	

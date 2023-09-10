@@ -33,7 +33,7 @@ public class NostrumGuide extends Item implements GuiBook {
 
 	public static final String ID = "nostrum_guide";
 	
-	private NostrumGuide() {
+	public NostrumGuide() {
 		super(NostrumItems.PropUnstackable());
 	}
 	

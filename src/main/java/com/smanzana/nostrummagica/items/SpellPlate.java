@@ -39,7 +39,7 @@ public class SpellPlate extends Item implements ILoreTagged {
 	
 	private final SpellTome.TomeStyle style;
 	
-	private SpellPlate(SpellTome.TomeStyle style) {
+	public SpellPlate(SpellTome.TomeStyle style) {
 		super(NostrumItems.PropTomeUnstackable().rarity(Rarity.UNCOMMON));
 		this.style = style;
 	}

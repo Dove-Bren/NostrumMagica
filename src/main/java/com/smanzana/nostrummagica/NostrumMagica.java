@@ -94,6 +94,7 @@ import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.MirrorItem;
 import com.smanzana.nostrummagica.items.MirrorShield;
 import com.smanzana.nostrummagica.items.MirrorShieldImproved;
+import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.NostrumRoseItem;
@@ -197,12 +198,11 @@ import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
 import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.potion.Potion;
@@ -210,6 +210,8 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -236,8 +238,8 @@ public class NostrumMagica {
 	@SidedProxy(clientSide = "com.smanzana.nostrummagica.integration.musica.MusicaClientProxy", serverSide = "com.smanzana.nostrummagica.integration.musica.MusicaProxy")
 	public static MusicaProxy musica;
 
-	public static CreativeTabs creativeTab;
-	public static CreativeTabs enhancementTab;
+	public static ItemGroup creativeTab;
+	public static ItemGroup enhancementTab;
 	public static Logger logger = LogManager.getLogger(MODID);
 	public static PlayerListener playerListener;
 	public static MagicEffectProxy magicEffectProxy;
@@ -278,19 +280,19 @@ public class NostrumMagica {
 		magicEffectProxy = new MagicEffectProxy();
 		manaArmorListener = new ManaArmorListener();
 
-		NostrumMagica.creativeTab = new CreativeTabs(MODID) {
+		NostrumMagica.creativeTab = new ItemGroup(MODID) {
 			@Override
 			@OnlyIn(Dist.CLIENT)
-			public ItemStack getTabIconItem() {
-				return new ItemStack(SpellTome.instance());
+			public ItemStack createIcon() {
+				return new ItemStack(NostrumItems.spellTomeNovice);
 			}
 		};
 		SpellTome.instance().setCreativeTab(NostrumMagica.creativeTab);
-		NostrumMagica.enhancementTab = new CreativeTabs(MODID + "_enhancements") {
+		NostrumMagica.enhancementTab = new ItemGroup(MODID + "_enhancements") {
 			@Override
 			@OnlyIn(Dist.CLIENT)
-			public ItemStack getTabIconItem() {
-				return new ItemStack(SpellTomePage.instance());
+			public ItemStack createIcon() {
+				return new ItemStack(NostrumItems.spellTomePage);
 			}
 		};
 		SpellTomePage.instance().setCreativeTab(NostrumMagica.enhancementTab);

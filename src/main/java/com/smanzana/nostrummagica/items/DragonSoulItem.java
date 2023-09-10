@@ -45,7 +45,7 @@ public class DragonSoulItem extends PetSoulItem {
 		return instance;
 	}
 	
-	private DragonSoulItem() {
+	public DragonSoulItem() {
 		super(NostrumItems.PropUnstackable().rarity(Rarity.EPIC));
 	}
 

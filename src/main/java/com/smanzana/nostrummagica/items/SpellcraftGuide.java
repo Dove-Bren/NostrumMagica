@@ -34,7 +34,7 @@ public class SpellcraftGuide extends Item implements GuiBook {
 
 	public static final String ID = "spellcraft_book";
 	
-	private SpellcraftGuide() {
+	public SpellcraftGuide() {
 		super(NostrumItems.PropUnstackable());
 	}
 	
