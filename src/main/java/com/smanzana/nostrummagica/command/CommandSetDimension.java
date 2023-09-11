@@ -1,48 +1,53 @@
 package com.smanzana.nostrummagica.command;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.MinecraftServer;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraftforge.common.DimensionManager;
+import net.minecraft.world.dimension.DimensionType;
 
-public class CommandSetDimension extends CommandBase {
-
-	@Override
-	public String getName() {
-		return "tpdm";
+public class CommandSetDimension {
+	
+	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
+		dispatcher.register(
+				Commands.literal("tpdm")
+					.requires(s -> s.hasPermissionLevel(2))
+					.then(Commands.argument("dimension", IntegerArgumentType.integer())
+							.executes(ctx -> execute(ctx, IntegerArgumentType.getInteger(ctx, "dimension")))
+							)
+				);
 	}
 
-	@Override
-	public String getUsage(ICommandSender sender) {
-		return "/tpdm [dimension]";
-	}
-
-	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+	private static final int execute(CommandContext<CommandSource> context, int dimensionID) throws CommandSyntaxException {
+		ServerPlayerEntity player = context.getSource().asPlayer();
 		
-		int dimension = 0;
-		if (args.length >= 1) {
-			dimension = Integer.parseInt(args[0]);
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		if (attr == null) {
+			context.getSource().sendFeedback(new StringTextComponent("Could not find magic wrapper for player"), true);
+			return 1;
 		}
 		
-		if (sender instanceof PlayerEntity) {
-			PlayerEntity player = (PlayerEntity) sender;
-			
-			if (player.isCreative()) {
-				if (DimensionManager.isDimensionRegistered(dimension)) {
-					System.out.println("Teleport Command!");
-					player.setPortal(player.getPosition());
-					player.changeDimension(dimension);
-				} else {
-					sender.sendMessage(new StringTextComponent("That dimension doesn't seem to exist!"));
-				}
+		if (player.isCreative()) {
+			DimensionType dimension = DimensionType.getById(dimensionID);
+			if (dimension != null) {
+				System.out.println("Teleport Command!");
+				player.setPortal(player.getPosition());
+				player.changeDimension(dimension);
 			} else {
-				sender.sendMessage(new StringTextComponent("You must be in creative to execute this command!"));
+				context.getSource().sendFeedback(new StringTextComponent("That dimension doesn't seem to exist!"), true);
 			}
+		} else {
+			context.getSource().sendFeedback(new StringTextComponent("You must be in creative to execute this command!"), true);
 		}
+		
+		return 0;
 	}
 
 }

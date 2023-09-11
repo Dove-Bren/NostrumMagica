@@ -1,5 +1,8 @@
 package com.smanzana.nostrummagica.command;
 
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.network.NetworkHandler;
@@ -9,59 +12,49 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.StringTextComponent;
 
-public class CommandUnlockAll extends CommandBase {
-
-	@Override
-	public String getName() {
-		return "nostrumunlockall";
+public class CommandUnlockAll {
+	
+	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
+		dispatcher.register(
+				Commands.literal("nostrumunlockall")
+					.requires(s -> s.hasPermissionLevel(2))
+					.executes(ctx -> execute(ctx))
+				);
 	}
 
-	@Override
-	public String getUsage(ICommandSender sender) {
-		return "/nostrumunlockall";
-	}
-
-	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+	private static final int execute(CommandContext<CommandSource> context) throws CommandSyntaxException {
+		ServerPlayerEntity player = context.getSource().asPlayer();
 		
-		if (sender instanceof PlayerEntity) {
-			PlayerEntity player = (PlayerEntity) sender;
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-			if (attr == null) {
-				sender.sendMessage(new StringTextComponent("Could not find magic wrapper"));
-				return;
-			}
-			
-			attr.unlock();
-			
-			for (SpellShape shape : SpellShape.getAllShapes()) {
-				attr.addShape(shape);
-			}
-			for (SpellTrigger trigger : SpellTrigger.getAllTriggers()) {
-				attr.addTrigger(trigger);
-			}
-			for (EAlteration alt : EAlteration.values()) {
-				attr.unlockAlteration(alt);
-			}
-			for (EMagicElement elem : EMagicElement.values()) {
-				attr.learnElement(elem);
-				attr.setElementMastery(elem, 3);
-			}
-			
-			NetworkHandler.getSyncChannel().sendTo(
-					new StatSyncMessage(attr)
-					, (ServerPlayerEntity) player);
-		} else {
-			sender.sendMessage(new StringTextComponent("This command must be run as a player"));
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		if (attr == null) {
+			context.getSource().sendFeedback(new StringTextComponent("Could not find magic wrapper for player"), true);
+			return 1;
 		}
+		
+		attr.unlock();
+		
+		for (SpellShape shape : SpellShape.getAllShapes()) {
+			attr.addShape(shape);
+		}
+		for (SpellTrigger trigger : SpellTrigger.getAllTriggers()) {
+			attr.addTrigger(trigger);
+		}
+		for (EAlteration alt : EAlteration.values()) {
+			attr.unlockAlteration(alt);
+		}
+		for (EMagicElement elem : EMagicElement.values()) {
+			attr.learnElement(elem);
+			attr.setElementMastery(elem, 3);
+		}
+		NetworkHandler.getSyncChannel().sendTo(
+				new StatSyncMessage(attr)
+				, (ServerPlayerEntity) player);
+		
+		return 0;
 	}
-
 }

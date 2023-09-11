@@ -100,6 +100,10 @@ public class PositionCrystal extends Item implements ILoreTagged {
 		return nbt.getInt(NBT_DIMENSION);
 	}
 	
+	public static void setPosition(ItemStack stack, DimensionType dimension, BlockPos pos) {
+		setPosition(stack, dimension.getId(), pos);
+	}
+	
 	public static void setPosition(ItemStack stack, int dimension, BlockPos pos) {
 		if (stack.isEmpty() || !(stack.getItem() instanceof PositionCrystal))
 			return;

@@ -1,32 +1,29 @@
 package com.smanzana.nostrummagica.command;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.StringTextComponent;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-public class CommandTestConfig extends CommandBase {
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
+
+public class CommandTestConfig {
 
 	public static int level = 0;
 	
-	@Override
-	public String getName() {
-		return "testconfig";
+	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
+		dispatcher.register(
+				Commands.literal("testconfig")
+					.requires(s -> s.hasPermissionLevel(2))
+					.then(Commands.argument("level", IntegerArgumentType.integer())
+							.executes(ctx -> execute(ctx, IntegerArgumentType.getInteger(ctx, "level")))
+							)
+				);
 	}
 
-	@Override
-	public String getUsage(ICommandSender sender) {
-		return "/testconfig [level]";
+	private static final int execute(CommandContext<CommandSource> context, int level) throws CommandSyntaxException {
+		CommandTestConfig.level = level;
+		return 0;
 	}
-
-	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-		try {
-			level = Integer.parseInt(args[0]);
-		} catch (NumberFormatException e) {
-			sender.sendMessage(new StringTextComponent("Failed to parse level"));
-		}
-	}
-
 }

@@ -6,6 +6,10 @@ import java.util.Random;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spells.EAlteration;
@@ -16,45 +20,38 @@ import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.StringTextComponent;
 
-public class CommandRandomSpell extends CommandBase {
-
-	@Override
-	public String getName() {
-		return "randomspell";
-	}
-
-	@Override
-	public String getUsage(ICommandSender sender) {
-		return "/randomspell [name]";
-	}
-
-	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-		if (sender instanceof PlayerEntity) {
-			final String name;
-			if (args.length > 0) {
-				name = args[0];
-			} else {
-				name = "Random Spell";
-			}
-			
-			final Spell spell = CreateRandomSpell(name, null);
-			PlayerEntity player = (PlayerEntity) sender;
-			ItemStack stack = SpellScroll.create(spell);
-			player.inventory.addItemStackToInventory(stack);
-		} else {
-			sender.sendMessage(new StringTextComponent("This command must be run as a player"));
-		}
-	}
+public class CommandRandomSpell {
 	
+	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
+		dispatcher.register(
+				Commands.literal("randomspell")
+					.requires(s -> s.hasPermissionLevel(2))
+					.then(Commands.argument("name", StringArgumentType.greedyString())
+						.executes(ctx -> execute(ctx, StringArgumentType.getString(ctx, "name")))
+						)
+					.executes(ctx -> execute(ctx, ""))
+				);
+	}
+
+	private static final int execute(CommandContext<CommandSource> context, String name) throws CommandSyntaxException {
+		ServerPlayerEntity player = context.getSource().asPlayer();
+		
+		if (name == null || name.isEmpty()) {
+			name = "Random Spell";
+		}
+		
+		final Spell spell = CreateRandomSpell(name, null);
+		ItemStack stack = SpellScroll.create(spell);
+		player.inventory.addItemStackToInventory(stack);
+		
+		return 0;
+	}
+
 	public static Spell CreateRandomSpell(String name, @Nullable Random rand) {
 		if (rand == null) {
 			rand = NostrumMagica.rand;

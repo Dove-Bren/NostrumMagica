@@ -98,8 +98,8 @@ public class DungeonRoomRegistry {
 	private DungeonRoomRegistry() {
 		this.map = new HashMap<>();
 		
-		this.roomSaveFolder = new File(ModConfig.config.base.getConfigFile().getParentFile(), "NostrumMagica/dungeon_room_captures/");
-		this.roomLoadFolder = new File(ModConfig.config.base.getConfigFile().getParentFile(), "NostrumMagica/dungeon_rooms/");
+		this.roomSaveFolder = new File("./NostrumMagicaData/dungeon_room_captures/");
+		this.roomLoadFolder = new File("./NostrumMagicaData/dungeon_room_captures/");
 	}
 	
 	private void add(String tag, DungeonRoomRecord record) {

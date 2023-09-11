@@ -14,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.Lists;
+import com.mojang.brigadier.CommandDispatcher;
 import com.smanzana.nostrummagica.blocks.ActiveHopper;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
@@ -199,6 +200,7 @@ import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
 import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 
 import net.minecraft.block.Blocks;
+import net.minecraft.command.CommandSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -341,27 +343,29 @@ public class NostrumMagica {
 
 	@SubscribeEvent
 	public void startup(FMLServerStartingEvent event) {
-		event.getCommandDispatcher().register(new CommandGotoDungeon());
-		event.registerServerCommand(new CommandTestConfig());
-		event.registerServerCommand(new CommandSpawnObelisk());
-		event.registerServerCommand(new CommandEnhanceTome());
-		event.registerServerCommand(new CommandSetLevel());
-		event.registerServerCommand(new CommandUnlock());
-		event.registerServerCommand(new CommandGiveSkillpoint());
-		event.registerServerCommand(new CommandAllQuests());
-		event.registerServerCommand(new CommandAllResearch());
-		event.registerServerCommand(new CommandCreateGeotoken());
-		event.registerServerCommand(new CommandForceBind());
-		event.registerServerCommand(new CommandSpawnDungeon());
-		event.registerServerCommand(new CommandUnlockAll());
-		event.registerServerCommand(new CommandSetDimension());
-		event.registerServerCommand(new CommandWriteRoom());
-		event.registerServerCommand(new CommandReadRoom());
-		event.registerServerCommand(new CommandGiveResearchpoint());
-		event.registerServerCommand(new CommandReloadResearch());
-		event.registerServerCommand(new CommandRandomSpell());
-		event.registerServerCommand(new CommandDebugEffect());
-		event.registerServerCommand(new CommandSetManaArmor());
+		final CommandDispatcher<CommandSource> dispatcher = event.getCommandDispatcher();
+		
+		CommandTestConfig.register(dispatcher);
+		CommandTestConfig.register(dispatcher);
+		CommandSpawnObelisk.register(dispatcher);
+		CommandEnhanceTome.register(dispatcher);
+		CommandSetLevel.register(dispatcher);
+		CommandUnlock.register(dispatcher);
+		CommandGiveSkillpoint.register(dispatcher);
+		CommandAllQuests.register(dispatcher);
+		CommandAllResearch.register(dispatcher);
+		CommandCreateGeotoken.register(dispatcher);
+		CommandForceBind.register(dispatcher);
+		CommandSpawnDungeon.register(dispatcher);
+		CommandUnlockAll.register(dispatcher);
+		CommandSetDimension.register(dispatcher);
+		CommandWriteRoom.register(dispatcher);
+		CommandReadRoom.register(dispatcher);
+		CommandGiveResearchpoint.register(dispatcher);
+		CommandReloadResearch.register(dispatcher);
+		CommandRandomSpell.register(dispatcher);
+		CommandDebugEffect.register(dispatcher);
+		CommandSetManaArmor.register(dispatcher);
 	}
 
 	/**

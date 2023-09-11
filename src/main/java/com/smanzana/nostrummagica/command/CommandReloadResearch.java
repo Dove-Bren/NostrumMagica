@@ -1,34 +1,25 @@
 package com.smanzana.nostrummagica.command;
 
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
 
-public class CommandReloadResearch extends CommandBase {
-
-	@Override
-	public String getName() {
-		return "RReload";
+public class CommandReloadResearch {
+	
+	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
+		dispatcher.register(
+				Commands.literal("RReload")
+					.requires(s -> s.hasPermissionLevel(2))
+					.executes(ctx -> execute(ctx))
+				);
 	}
 
-	@Override
-	public String getUsage(ICommandSender sender) {
-		return "/RReload";
+	private static final int execute(CommandContext<CommandSource> context) throws CommandSyntaxException {
+		NostrumMagica.instance.reloadDefaultResearch();
+		return 0;
 	}
-
-	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-		
-		if (sender instanceof PlayerEntity) {
-			NostrumMagica.instance.reloadDefaultResearch();
-		} else {
-			sender.sendMessage(new StringTextComponent("This command must be run as a player"));
-		}
-	}
-
 }

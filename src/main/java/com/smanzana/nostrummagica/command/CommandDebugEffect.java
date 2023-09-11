@@ -1,29 +1,63 @@
 package com.smanzana.nostrummagica.command;
 
-import com.smanzana.nostrummagica.items.PetSoulItem;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
+import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Hand;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 
-public class CommandDebugEffect extends CommandBase {
-
-	@Override
-	public String getName() {
-		return "nostrumdebugeffect";
+public class CommandDebugEffect {
+	
+	public static final SimpleCommandExceptionType EFFECT_NOT_FOUND = new SimpleCommandExceptionType(new TranslationTextComponent("argument.nostrummagica.effect.unknown"));
+	
+	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
+		dispatcher.register(
+				Commands.literal("nostrumdebugeffect")
+					.requires(s -> s.hasPermissionLevel(2))
+					.then(Commands.argument("effect", StringArgumentType.string())
+						.executes(ctx -> execute(ctx, StringArgumentType.getString(ctx, "effect")))
+						)
+					
+				);
 	}
 
-	@Override
-	public String getUsage(ICommandSender sender) {
-		return "/nostrumdebugeffect [effect]";
-	}
-
-	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+	private static final int execute(CommandContext<CommandSource> context, final String effectName) throws CommandSyntaxException {
+		ServerPlayerEntity player = context.getSource().asPlayer();
+		
+		SpecialEffect effect;
+		try {
+			effect = SpecialEffect.valueOf(effectName.toUpperCase());
+		} catch (Exception e) {
+			effect = null;
+		}
+		
+		if (effect == null) {
+			throw EFFECT_NOT_FOUND.create();
+		}
+		
+		EffectData data = NostrumMagica.magicEffectProxy.getData(player, effect);
+		if (data == null) {
+			context.getSource().sendFeedback(new StringTextComponent("Player is not under that effect"), true);
+		} else {
+			String result = "Effect found with element {"
+					+ (data.getElement() == null ? "NULL" : data.getElement().getName())
+					+ "}, amount {"
+					+ data.getAmt()
+					+ "}, and count {"
+					+ data.getCount()
+					+ "}";
+			context.getSource().sendFeedback(new StringTextComponent(result), true);
+		}
+		
 //		if (!(sender.getCommandSenderEntity() instanceof PlayerEntity)) {
 //			throw new CommandException("Command must be run by a creative player");
 //		}
@@ -33,55 +67,19 @@ public class CommandDebugEffect extends CommandBase {
 //			throw new CommandException("Command must be run by a creative player");
 //		}
 //		
-//		if (args.length != 1)
-//			throw new CommandException("Invalid number of arguments. Only the effect name is expected.");
-//		
-//		SpecialEffect effect;
-//		try {
-//			effect = SpecialEffect.valueOf(args[0].toUpperCase());
-//		} catch (Exception e) {
-//			effect = null;
+//		ItemStack soulStack = player.getHeldItem(Hand.MAIN_HAND);
+//		if (soulStack.isEmpty() || !(soulStack.getItem() instanceof PetSoulItem)) {
+//			soulStack = player.getHeldItem(Hand.OFF_HAND);
 //		}
 //		
-//		if (effect == null) {
-//			throw new CommandException("Could not lookup effect with name \"" + args[0] + "\"");
+//		if (soulStack.isEmpty() || !(soulStack.getItem() instanceof PetSoulItem)) {
+//			throw new CommandException("You must be holding a Pet Soul Item in one of your hands.");
 //		}
 //		
-//		EffectData data = NostrumMagica.magicEffectProxy.getData(player, effect);
-//		if (data == null) {
-//			sender.sendMessage(new StringTextComponent("Player is not under that effect"));
-//		} else {
-//			String result = "Effect found with element {"
-//					+ (data.getElement() == null ? "NULL" : data.getElement().getName())
-//					+ "}, amount {"
-//					+ data.getAmt()
-//					+ "}, and count {"
-//					+ data.getCount()
-//					+ "}";
-//			sender.sendMessage(new StringTextComponent(result));
+//		if (null == PetSoulItem.SpawnPet(soulStack, player.world, player.getPositionVector())) {
+//			throw new CommandException("Failed to spawn entity");
 //		}
 		
-		if (!(sender.getCommandSenderEntity() instanceof PlayerEntity)) {
-			throw new CommandException("Command must be run by a creative player");
-		}
-		
-		final PlayerEntity player = (PlayerEntity) sender.getCommandSenderEntity();
-		if (!player.isCreative()) {
-			throw new CommandException("Command must be run by a creative player");
-		}
-		
-		ItemStack soulStack = player.getHeldItem(Hand.MAIN_HAND);
-		if (soulStack.isEmpty() || !(soulStack.getItem() instanceof PetSoulItem)) {
-			soulStack = player.getHeldItem(Hand.OFF_HAND);
-		}
-		
-		if (soulStack.isEmpty() || !(soulStack.getItem() instanceof PetSoulItem)) {
-			throw new CommandException("You must be holding a Pet Soul Item in one of your hands.");
-		}
-		
-		if (null == PetSoulItem.SpawnPet(soulStack, player.world, player.getPositionVector())) {
-			throw new CommandException("Failed to spawn entity");
-		}
+		return 0;
 	}
-
 }

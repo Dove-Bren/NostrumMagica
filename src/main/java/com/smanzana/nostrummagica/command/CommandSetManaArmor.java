@@ -1,58 +1,44 @@
 package com.smanzana.nostrummagica.command;
 
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.StringTextComponent;
 
-public class CommandSetManaArmor extends CommandBase {
-
-	@Override
-	public String getName() {
-		return "NostrumManaArmor";
+public class CommandSetManaArmor {
+	
+	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
+		dispatcher.register(
+				Commands.literal("NostrumManaArmor")
+					.requires(s -> s.hasPermissionLevel(2))
+						.then(Commands.argument("engaged", BoolArgumentType.bool())
+								.then(Commands.argument("cost", IntegerArgumentType.integer(0))
+										.executes(ctx -> execute(ctx, BoolArgumentType.getBool(ctx, "engaged"), IntegerArgumentType.getInteger(ctx, "cost")))
+										)
+								)
+					
+				);
 	}
 
-	@Override
-	public String getUsage(ICommandSender sender) {
-		return "/NostrumManaArmor {on/off} {cost}";
-	}
-
-	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+	private static final int execute(CommandContext<CommandSource> context, boolean engaged, int cost) throws CommandSyntaxException {
+		ServerPlayerEntity player = context.getSource().asPlayer();
 		
-		if (!(sender instanceof PlayerEntity)) {
-			sender.sendMessage(new StringTextComponent("This command must be run as a player"));
-		} else if (args.length != 2) {
-			sender.sendMessage(new StringTextComponent("Two arguments are required"));
-		} else {
-			boolean on;
-			if (args[0].equalsIgnoreCase("on") || args[0].equalsIgnoreCase("1")) {
-				on = true;
-			} else if (args[0].equalsIgnoreCase("off") || args[0].equalsIgnoreCase("0")) {
-				on = false;
-			} else {
-				sender.sendMessage(new StringTextComponent("Could not parse [" + args[0] + "]. Should be \"on\" or \"off\""));
-				return;
-			}
-			
-			int cost = 0;
-			cost = Integer.parseInt(args[1]);
-			
-			PlayerEntity player = (PlayerEntity) sender;
-			IManaArmor attr = NostrumMagica.getManaArmor(player);
-			if (attr == null) {
-				sender.sendMessage(new StringTextComponent("Could not find mana armor wrapper"));
-				return;
-			}
-			
-			attr.setHasArmor(on, cost);
-			NostrumMagica.proxy.sendManaArmorCapability(player);
+		IManaArmor attr = NostrumMagica.getManaArmor(player);
+		if (attr == null) {
+			context.getSource().sendFeedback(new StringTextComponent("Could not find mana armor wrapper"), true);
+			return 1;
 		}
+		
+		attr.setHasArmor(engaged, cost);
+		NostrumMagica.proxy.sendManaArmorCapability(player);
+		return 0;
 	}
-
 }
