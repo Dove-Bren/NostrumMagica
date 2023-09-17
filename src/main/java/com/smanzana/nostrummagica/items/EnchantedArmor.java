@@ -115,6 +115,36 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 		private Type(int scale) {
 			this.scale = scale;
 		}
+		
+		public final @Nullable Type getNext() {
+			switch (this) {
+			case NOVICE:
+				return ADEPT;
+			case ADEPT:
+				return MASTER;
+			case MASTER:
+				return TRUE;
+			case TRUE:
+				return null;
+			}
+			
+			return null;
+		}
+		
+		public final @Nullable Type getPrev() {
+			switch (this) {
+			case NOVICE:
+				return null;
+			case ADEPT:
+				return NOVICE;
+			case MASTER:
+				return ADEPT;
+			case TRUE:
+				return MASTER;
+			}
+			
+			return null;
+		}
 	}
 
 	public static boolean isArmorElement(EMagicElement element) {

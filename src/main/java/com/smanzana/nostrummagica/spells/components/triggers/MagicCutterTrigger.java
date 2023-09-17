@@ -93,10 +93,10 @@ public class MagicCutterTrigger extends SpellTrigger {
 			if (entity == null) {
 				onProjectileHit(new BlockPos(this.pos));
 			}
-			else if (NostrumMagica.resolveEntityLiving(entity) == null) {
+			else if (NostrumMagica.resolveLivingEntity(entity) == null) {
 				onProjectileHit(entity.getPosition());
 			} else {
-				getState().trigger(Lists.newArrayList(NostrumMagica.resolveEntityLiving(entity)), Lists.newArrayList(getState().getOther()), null, null, piercing);
+				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), Lists.newArrayList(getState().getOther()), null, null, piercing);
 			}
 		}
 	}

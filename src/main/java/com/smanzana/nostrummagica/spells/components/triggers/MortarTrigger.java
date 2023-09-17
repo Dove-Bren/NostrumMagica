@@ -91,7 +91,7 @@ public class MortarTrigger extends SpellTrigger {
 						dest = target.getPositionVector();
 					} else {
 						RayTraceResult mop = RayTrace.raytraceApprox(world, pos, dir, MaxHDist, (ent) -> {
-							if (getState().getSelf() == NostrumMagica.resolveEntityLiving(ent)) {
+							if (getState().getSelf() == NostrumMagica.resolveLivingEntity(ent)) {
 								return false;
 							}
 							
@@ -186,10 +186,10 @@ public class MortarTrigger extends SpellTrigger {
 			if (entity == null) {
 				onProjectileHit(new BlockPos(this.pos));
 			}
-			else if (null == NostrumMagica.resolveEntityLiving(entity)) {
+			else if (null == NostrumMagica.resolveLivingEntity(entity)) {
 				onProjectileHit(entity.getPosition());
 			} else {
-				getState().trigger(Lists.newArrayList(NostrumMagica.resolveEntityLiving(entity)), Lists.newArrayList(getState().getOther()), null, null);
+				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), Lists.newArrayList(getState().getOther()), null, null);
 			}
 		}
 		

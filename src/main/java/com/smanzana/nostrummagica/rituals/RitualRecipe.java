@@ -26,11 +26,11 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class RitualRecipe implements InfoScreenIndexed {
 	
@@ -73,8 +73,8 @@ public class RitualRecipe implements InfoScreenIndexed {
 	private final EMagicElement element;
 	private final int tier;
 	private ReagentType types[];
-	private @Nonnull ItemStack centerItem;
-	private NonNullList<ItemStack> extraItems;
+	private @Nonnull Ingredient centerItem;
+	private NonNullList<Ingredient> extraItems;
 	private IRitualOutcome hook;
 	private IRitualRequirement req;
 	private final String titleKey;
@@ -103,10 +103,10 @@ public class RitualRecipe implements InfoScreenIndexed {
 			@Nonnull ItemStack icon,
 			EMagicElement element,
 			ReagentType[] reagents,
-			@Nonnull ItemStack center, 
+			@Nonnull Ingredient center, 
 			IRitualRequirement requirement,
 			IRitualOutcome outcome) {
-		if (center == null || center.isEmpty()) {
+		if (center == null || center == Ingredient.EMPTY) {
 			throw new RuntimeException("Center item of tier 2 ritual cannot be empty!");
 		}
 		
@@ -127,15 +127,32 @@ public class RitualRecipe implements InfoScreenIndexed {
 		return recipe;
 	}
 	
+	public static RitualRecipe createTier2(String titleKey,
+			@Nonnull ItemStack icon,
+			EMagicElement element,
+			ReagentType[] reagents,
+			@Nonnull ItemStack center, 
+			IRitualRequirement requirement,
+			IRitualOutcome outcome) {
+		return createTier2(titleKey,
+				icon,
+				element,
+				reagents,
+				Ingredient.fromStacks(center),
+				requirement,
+				outcome
+				);
+	}
+	
 	public static RitualRecipe createTier3(String titleKey,
 			@Nonnull ItemStack icon,
 			EMagicElement element,
 			ReagentType[] reagents,
-			@Nonnull ItemStack center,
-			@Nonnull ItemStack extras[],
+			@Nonnull Ingredient center,
+			@Nonnull Ingredient extras[],
 			IRitualRequirement requirement,
 			IRitualOutcome outcome) {
-		if (center == null || center.isEmpty()) {
+		if (center == null || center == Ingredient.EMPTY) {
 			throw new RuntimeException("Center item of tier 3 ritual cannot be empty!");
 		}
 		
@@ -162,6 +179,32 @@ public class RitualRecipe implements InfoScreenIndexed {
 		return recipe;
 	}
 	
+	public static RitualRecipe createTier3(String titleKey,
+			@Nonnull ItemStack icon,
+			EMagicElement element,
+			ReagentType[] reagents,
+			@Nonnull ItemStack center,
+			@Nonnull ItemStack extras[],
+			IRitualRequirement requirement,
+			IRitualOutcome outcome) {
+		
+		Ingredient[] extraTags;
+		extraTags = new Ingredient[extras.length];
+		for (int i = 0; i < extras.length; i++) {
+			extraTags[i] = extras[i].isEmpty() ? Ingredient.EMPTY : Ingredient.fromStacks(extras[i]);
+		}
+		
+		return createTier3(titleKey,
+				icon,
+				element,
+				reagents,
+				Ingredient.fromStacks(center),
+				extraTags,
+				requirement,
+				outcome
+				);
+	}
+	
 	private RitualRecipe(String nameKey, EMagicElement element, int tier) {
 		this.tier = tier;
 		this.element = element;
@@ -173,7 +216,7 @@ public class RitualRecipe implements InfoScreenIndexed {
 		}
 		
 		if (tier == 2) {
-			this.extraItems = NonNullList.withSize(4, ItemStack.EMPTY);
+			this.extraItems = NonNullList.withSize(4, Ingredient.EMPTY);
 		}
 	}
 	
@@ -362,7 +405,7 @@ public class RitualRecipe implements InfoScreenIndexed {
 			}
 			if (capture.matched) {
 				// Deep check center
-				capture.matched = OreDictionary.itemMatches(this.centerItem, capture.center, false);
+				capture.matched = this.centerItem.test(capture.center);
 			}
 		} else if (tier == 2) {
 			capture.matched = (
@@ -386,15 +429,15 @@ public class RitualRecipe implements InfoScreenIndexed {
 			}
 			if (capture.matched) {
 				// Deep check center
-				capture.matched = OreDictionary.itemMatches(this.centerItem, capture.center, false);
+				capture.matched = this.centerItem.test(capture.center);
 			}
 			if (capture.matched) {
 				// Deep check extras
 				NonNullList<ItemStack> items = NonNullList.create();
 				items.addAll(capture.extras);
 				items.removeIf((stack) -> {return stack.isEmpty();});
-				for (ItemStack req : this.extraItems) {
-					if (req.isEmpty()) {
+				for (Ingredient req : this.extraItems) {
+					if (req == null || req == Ingredient.EMPTY) {
 						continue;
 					}
 					
@@ -402,7 +445,7 @@ public class RitualRecipe implements InfoScreenIndexed {
 					Iterator<ItemStack> it = items.iterator();
 					while (it.hasNext()) {
 						ItemStack avail = it.next();
-						if (OreDictionary.itemMatches(req, avail, false)) {
+						if (req.test(avail)) {
 							it.remove();
 							found = true;
 							break;
@@ -464,11 +507,11 @@ public class RitualRecipe implements InfoScreenIndexed {
 		return types;
 	}
 
-	public @Nonnull ItemStack getCenterItem() {
+	public @Nonnull Ingredient getCenterItem() {
 		return centerItem;
 	}
 
-	public NonNullList<ItemStack> getExtraItems() {
+	public NonNullList<Ingredient> getExtraItems() {
 		return extraItems;
 	}
 	

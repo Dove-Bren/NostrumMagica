@@ -17,7 +17,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityWillo;
-import com.smanzana.nostrummagica.entity.IEntityTameable;
+import com.smanzana.nostrummagica.entity.ITameableEntity;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
 import com.smanzana.nostrummagica.integration.enderio.wrappers.IItemOfTravelWrapper;
 import com.smanzana.nostrummagica.integration.enderio.wrappers.TravelSourceWrapper;
@@ -438,8 +438,8 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellArmor,
 				RayTraceResult result = RayTrace.raytraceApprox(worldIn, playerIn.getPositionVector().addVector(0, playerIn.eyeHeight, 0),
 						playerIn.rotationPitch, playerIn.rotationYaw, SeekingBulletTrigger.MAX_DIST, (ent) -> {
 							if (ent != null && playerIn != ent) {
-								if (ent instanceof IEntityTameable) {
-									if (playerIn.getUniqueID().equals(((IEntityTameable) ent).getOwnerId())) {
+								if (ent instanceof ITameableEntity) {
+									if (playerIn.getUniqueID().equals(((ITameableEntity) ent).getOwnerId())) {
 										return false; // We own the target entity
 									}
 								}

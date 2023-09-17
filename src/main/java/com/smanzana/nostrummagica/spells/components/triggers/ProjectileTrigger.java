@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.spells.components.triggers;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
-import com.smanzana.nostrummagica.entity.IEntityTameable;
+import com.smanzana.nostrummagica.entity.ITameableEntity;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -90,14 +90,14 @@ public class ProjectileTrigger extends SpellTrigger {
 						}
 						
 						if (!hitAllies) {
-							if (ent instanceof IEntityTameable) {
-								if (getState().getSelf().getUniqueID().equals(((IEntityTameable) ent).getOwnerId())) {
+							if (ent instanceof ITameableEntity) {
+								if (getState().getSelf().getUniqueID().equals(((ITameableEntity) ent).getOwnerId())) {
 									return false; // We own the target entity
 								}
 							}
 							
-							if (getState().getSelf() instanceof IEntityTameable) {
-								if (ent.getUniqueID().equals(((IEntityTameable) getState().getSelf()).getOwnerId())) {
+							if (getState().getSelf() instanceof ITameableEntity) {
+								if (ent.getUniqueID().equals(((ITameableEntity) getState().getSelf()).getOwnerId())) {
 									return false; // We own the target entity
 								}
 							}
@@ -125,10 +125,10 @@ public class ProjectileTrigger extends SpellTrigger {
 			if (entity == null) {
 				onProjectileHit(new BlockPos(this.pos));
 			}
-			else if (null == NostrumMagica.resolveEntityLiving(entity)) {
+			else if (null == NostrumMagica.resolveLivingEntity(entity)) {
 				onProjectileHit(entity.getPosition());
 			} else {
-				getState().trigger(Lists.newArrayList(NostrumMagica.resolveEntityLiving(entity)), Lists.newArrayList(getState().getOther()), null, null);
+				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), Lists.newArrayList(getState().getOther()), null, null);
 			}
 		}
 		

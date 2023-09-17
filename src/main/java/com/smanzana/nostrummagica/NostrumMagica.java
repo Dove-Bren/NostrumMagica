@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -41,7 +42,6 @@ import com.smanzana.nostrummagica.command.CommandEnhanceTome;
 import com.smanzana.nostrummagica.command.CommandForceBind;
 import com.smanzana.nostrummagica.command.CommandGiveResearchpoint;
 import com.smanzana.nostrummagica.command.CommandGiveSkillpoint;
-import com.smanzana.nostrummagica.command.CommandGotoDungeon;
 import com.smanzana.nostrummagica.command.CommandRandomSpell;
 import com.smanzana.nostrummagica.command.CommandReadRoom;
 import com.smanzana.nostrummagica.command.CommandReloadResearch;
@@ -59,7 +59,8 @@ import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfTameLore;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.entity.IEntityPet;
-import com.smanzana.nostrummagica.entity.IEntityTameable;
+import com.smanzana.nostrummagica.entity.IMultiPartEntityPart;
+import com.smanzana.nostrummagica.entity.ITameableEntity;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
@@ -71,53 +72,26 @@ import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
 import com.smanzana.nostrummagica.integration.baubles.BaublesClientProxy;
 import com.smanzana.nostrummagica.integration.baubles.BaublesProxy;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
-import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble.ItemType;
 import com.smanzana.nostrummagica.integration.enderio.EnderIOClientProxy;
 import com.smanzana.nostrummagica.integration.enderio.EnderIOProxy;
 import com.smanzana.nostrummagica.integration.musica.MusicaClientProxy;
 import com.smanzana.nostrummagica.integration.musica.MusicaProxy;
-import com.smanzana.nostrummagica.items.AltarItem;
-import com.smanzana.nostrummagica.items.ArcaneWolfSoulItem;
-import com.smanzana.nostrummagica.items.BlankScroll;
-import com.smanzana.nostrummagica.items.ChalkItem;
 import com.smanzana.nostrummagica.items.DragonArmor;
 import com.smanzana.nostrummagica.items.DragonArmor.DragonArmorMaterial;
 import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
-import com.smanzana.nostrummagica.items.DragonEggFragment;
-import com.smanzana.nostrummagica.items.DragonSoulItem;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
 import com.smanzana.nostrummagica.items.EssenceItem;
-import com.smanzana.nostrummagica.items.HookshotItem;
-import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
-import com.smanzana.nostrummagica.items.InfusedGemItem;
-import com.smanzana.nostrummagica.items.MageStaff;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicCharm;
-import com.smanzana.nostrummagica.items.MagicSwordBase;
-import com.smanzana.nostrummagica.items.MasteryOrb;
-import com.smanzana.nostrummagica.items.MirrorItem;
-import com.smanzana.nostrummagica.items.MirrorShield;
-import com.smanzana.nostrummagica.items.MirrorShieldImproved;
+import com.smanzana.nostrummagica.items.NostrumItemTags;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
-import com.smanzana.nostrummagica.items.NostrumRoseItem;
-import com.smanzana.nostrummagica.items.NostrumSkillItem;
-import com.smanzana.nostrummagica.items.PositionCrystal;
-import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.items.ReagentSeed;
-import com.smanzana.nostrummagica.items.RuneBag;
-import com.smanzana.nostrummagica.items.SoulDagger;
-import com.smanzana.nostrummagica.items.SpellPlate;
 import com.smanzana.nostrummagica.items.SpellRune;
-import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
-import com.smanzana.nostrummagica.items.SpellTomePage;
-import com.smanzana.nostrummagica.items.ThanoPendant;
-import com.smanzana.nostrummagica.items.ThanosStaff;
 import com.smanzana.nostrummagica.items.WarlockSword;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
 import com.smanzana.nostrummagica.listeners.ManaArmorListener;
@@ -183,7 +157,6 @@ import com.smanzana.nostrummagica.spells.components.triggers.MortarTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.WallTrigger;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
-import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 import com.smanzana.nostrummagica.trials.ShrineTrial;
 import com.smanzana.nostrummagica.trials.TrialEarth;
 import com.smanzana.nostrummagica.trials.TrialEnder;
@@ -200,28 +173,43 @@ import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
 import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 
 import net.minecraft.block.Blocks;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.command.CommandSource;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.ai.goal.GoalSelector;
+import net.minecraft.entity.ai.goal.PrioritizedGoal;
+import net.minecraft.entity.boss.dragon.EnderDragonPartEntity;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.passive.TameableEntity;
+import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.potion.Potion;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.potion.Effects;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
@@ -233,12 +221,13 @@ public class NostrumMagica {
 	public static final String VERSION = "1.14.4-1.10.0";
 	public static final Random rand = new Random();
 
-	public final static CommonProxy proxy;
-	public final static NostrumMagica instance;
-	public final static BaublesProxy baubles;
-	public final static AetheriaProxy aetheria;
-	public final static EnderIOProxy enderIO;
-	public final static MusicaProxy musica;
+	public static NostrumMagica instance;
+	
+	public final CommonProxy proxy;
+	public final BaublesProxy baubles;
+	public final AetheriaProxy aetheria;
+	public final EnderIOProxy enderIO;
+	public final MusicaProxy musica;
 
 	public static ItemGroup creativeTab;
 	public static ItemGroup enhancementTab;
@@ -275,7 +264,7 @@ public class NostrumMagica {
 				return new ItemStack(NostrumItems.spellTomeNovice);
 			}
 		};
-		// SpellTome.instance().setCreativeTab(NostrumMagica.creativeTab); TODO still need this?
+		// NostrumItems.spellTomeNovice.setCreativeTab(NostrumMagica.creativeTab); TODO still need this?
 		NostrumMagica.enhancementTab = new ItemGroup(MODID + "_enhancements") {
 			@Override
 			@OnlyIn(Dist.CLIENT)
@@ -283,7 +272,7 @@ public class NostrumMagica {
 				return new ItemStack(NostrumItems.spellTomePage);
 			}
 		};
-		//SpellTomePage.instance().setCreativeTab(NostrumMagica.enhancementTab); // TODO still need this?
+		//NostrumItems.spellTomePage.setCreativeTab(NostrumMagica.enhancementTab); // TODO still need this?
 
 		if (ModList.get().isLoaded("baubles")) {
 			baubles.enable();
@@ -380,15 +369,15 @@ public class NostrumMagica {
 	public static INostrumMagic getMagicWrapper(Entity e) {
 		if (e == null)
 			return null;
-
-		return e.getCapability(NostrumMagicAttributeProvider.CAPABILITY, null);
+		
+		return e.getCapability(NostrumMagicAttributeProvider.CAPABILITY).orElse(null);
 	}
 
 	public static IManaArmor getManaArmor(Entity e) {
 		if (e == null)
 			return null;
 
-		return e.getCapability(ManaArmorAttributeProvider.CAPABILITY, null);
+		return e.getCapability(ManaArmorAttributeProvider.CAPABILITY).orElse(null);
 	}
 
 	public static ItemStack findTome(PlayerEntity entity, int tomeID) {
@@ -458,12 +447,12 @@ public class NostrumMagica {
 			}
 		}
 		for (ItemStack item : player.inventory.mainInventory) {
-			if (!item.isEmpty() && item.getItem() instanceof ReagentItem && ReagentItem.findType(item) == type) {
+			if (!item.isEmpty() && item.getItem() instanceof ReagentItem && ReagentItem.FindType(item) == type) {
 				count += item.getCount();
 			}
 		}
 		for (ItemStack item : player.inventory.offHandInventory) {
-			if (!item.isEmpty() && item.getItem() instanceof ReagentBag && ReagentItem.findType(item) == type) {
+			if (!item.isEmpty() && item.getItem() instanceof ReagentBag && ReagentItem.FindType(item) == type) {
 				count += item.getCount();
 			}
 		}
@@ -483,7 +472,7 @@ public class NostrumMagica {
 			if (item.getItem() instanceof ReagentBag) {
 				count = ReagentBag.removeCount(item, type, count);
 			} else if (item.getItem() instanceof ReagentItem) {
-				if (ReagentItem.getTypeFromMeta(item.getMetadata()) == type) {
+				if (ReagentItem.FindType(item) == type) {
 					if (item.getCount() > count) {
 						item.shrink(count);
 						count = 0;
@@ -578,7 +567,7 @@ public class NostrumMagica {
 					.createTier2("rune." + element.name().toLowerCase(), SpellRune.getRune(element, 1), null,
 							new ReagentType[] { ReagentType.CRYSTABLOOM, ReagentType.MANDRAKE_ROOT,
 									ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST },
-							EssenceItem.getEssence(element, 1),
+							Ingredient.fromStacks(EssenceItem.getEssence(element, 1)),
 							IRitualRequirement.AND(new RRequirementElementMastery(element),
 									new RRequirementResearch("spellrunes")),
 							new OutcomeSpawnItem(SpellRune.getRune(element, 1)));
@@ -589,7 +578,7 @@ public class NostrumMagica {
 		recipe = RitualRecipe.createTier2("rune.single", SpellRune.getRune(SingleShape.instance()), null,
 				new ReagentType[] {
 						ReagentType.GINSENG, ReagentType.GINSENG, ReagentType.SPIDER_SILK, ReagentType.SKY_ASH },
-				NostrumResourceItem.getItem(ResourceType.TOKEN, 1),
+				Ingredient.fromTag(NostrumItemTags.Items.MagicToken),
 				IRitualRequirement.AND(new RRequirementShapeMastery(SingleShape.instance()),
 						new RRequirementResearch("spellrunes")),
 				new OutcomeSpawnItem(SpellRune.getRune(SingleShape.instance())));
@@ -598,9 +587,9 @@ public class NostrumMagica {
 		recipe = RitualRecipe.createTier3("rune.chain", SpellRune.getRune(ChainShape.instance()), null,
 				new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK,
 						ReagentType.MANDRAKE_ROOT },
-				SpellRune.getRune(SingleShape.instance()),
-				new ItemStack[] { SpellRune.getRune(SingleShape.instance()), new ItemStack(Items.GOLD_INGOT, 1),
-						SpellRune.getRune(SingleShape.instance()), SpellRune.getRune(SingleShape.instance()) },
+				Ingredient.fromStacks(SpellRune.getRune(SingleShape.instance())),
+				new Ingredient[] { Ingredient.fromStacks(SpellRune.getRune(SingleShape.instance())), Ingredient.fromTag(Tags.Items.INGOTS_GOLD),
+						Ingredient.fromStacks(SpellRune.getRune(SingleShape.instance())), Ingredient.fromStacks(SpellRune.getRune(SingleShape.instance())) },
 				IRitualRequirement.AND(new RRequirementShapeMastery(ChainShape.instance()),
 						new RRequirementResearch("spellrunes")),
 				new OutcomeSpawnItem(SpellRune.getRune(ChainShape.instance())));
@@ -609,9 +598,9 @@ public class NostrumMagica {
 		recipe = RitualRecipe.createTier3(
 				"rune.aoe", SpellRune.getRune(AoEShape.instance()), null, new ReagentType[] { ReagentType.MANI_DUST,
 						ReagentType.GRAVE_DUST, ReagentType.SPIDER_SILK, ReagentType.MANDRAKE_ROOT },
-				SpellRune.getRune(ChainShape.instance()),
-				new ItemStack[] { SpellRune.getRune(ChainShape.instance()), new ItemStack(Items.DIAMOND, 1),
-						SpellRune.getRune(SingleShape.instance()), SpellRune.getRune(ChainShape.instance()) },
+				Ingredient.fromStacks(SpellRune.getRune(ChainShape.instance())),
+				new Ingredient[] { Ingredient.fromStacks(SpellRune.getRune(ChainShape.instance())), Ingredient.fromTag(Tags.Items.GEMS_DIAMOND),
+						Ingredient.fromStacks(SpellRune.getRune(SingleShape.instance())), Ingredient.fromStacks(SpellRune.getRune(ChainShape.instance())) },
 				IRitualRequirement.AND(new RRequirementShapeMastery(AoEShape.instance()),
 						new RRequirementResearch("spellrunes")),
 				new OutcomeSpawnItem(SpellRune.getRune(AoEShape.instance())));
@@ -622,7 +611,7 @@ public class NostrumMagica {
 					null,
 					new ReagentType[] {
 							ReagentType.GINSENG, ReagentType.GRAVE_DUST, ReagentType.SKY_ASH, ReagentType.GRAVE_DUST },
-					alteration.getReagents().get(0),
+					Ingredient.fromStacks(alteration.getReagents().get(0)),
 					IRitualRequirement.AND(new RRequirementAlterationMastery(alteration),
 							new RRequirementResearch("spellrunes")),
 					new OutcomeSpawnItem(SpellRune.getRune(alteration, 1)));
@@ -634,9 +623,9 @@ public class NostrumMagica {
 					SpellRune.getRune(trigger), null,
 					new ReagentType[] {
 							ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.GINSENG, ReagentType.GINSENG },
-					NostrumResourceItem.getItem(ResourceType.TOKEN, 1),
-					new ItemStack[] { new ItemStack(Items.GOLD_NUGGET), trigger.getCraftItem(), ItemStack.EMPTY,
-							new ItemStack(Items.GOLD_NUGGET, 1) },
+					Ingredient.fromTag(NostrumItemTags.Items.MagicToken),
+					new Ingredient[] { Ingredient.fromTag(Tags.Items.NUGGETS_GOLD), Ingredient.fromStacks(trigger.getCraftItem()), Ingredient.EMPTY,
+							Ingredient.fromTag(Tags.Items.NUGGETS_GOLD) },
 					IRitualRequirement.AND(new RRequirementTriggerMastery(trigger),
 							new RRequirementResearch("spellrunes")),
 					new OutcomeSpawnItem(SpellRune.getRune(trigger, 1)));
@@ -647,48 +636,48 @@ public class NostrumMagica {
 		{
 			recipe = RitualRecipe.createTier1("buff.luck", new ItemStack(Items.RABBIT_FOOT), EMagicElement.PHYSICAL,
 					ReagentType.SPIDER_SILK, new RRequirementResearch("boon"),
-					new OutcomePotionEffect(Potion.getPotionFromResourceLocation("luck"), 0, 120 * 20));
+					new OutcomePotionEffect(Effects.LUCK, 0, 120 * 20));
 			RitualRegistry.instance().addRitual(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.speed", new ItemStack(Items.ARROW), EMagicElement.WIND,
 					ReagentType.SKY_ASH, new RRequirementResearch("boon"),
-					new OutcomePotionEffect(Potion.getPotionFromResourceLocation("speed"), 0, 120 * 20));
+					new OutcomePotionEffect(Effects.SPEED, 0, 120 * 20));
 			RitualRegistry.instance().addRitual(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.strength", new ItemStack(Items.IRON_SWORD), EMagicElement.FIRE,
 					ReagentType.MANDRAKE_ROOT, new RRequirementResearch("boon"),
-					new OutcomePotionEffect(Potion.getPotionFromResourceLocation("strength"), 0, 120 * 20));
+					new OutcomePotionEffect(Effects.STRENGTH, 0, 120 * 20));
 			RitualRegistry.instance().addRitual(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.leaping",
-					new ItemStack(Item.getItemFromBlock(Blocks.QUARTZ_STAIRS)), EMagicElement.LIGHTNING,
+					new ItemStack(Blocks.QUARTZ_STAIRS), EMagicElement.LIGHTNING,
 					ReagentType.MANI_DUST, new RRequirementResearch("boon"),
-					new OutcomePotionEffect(Potion.getPotionFromResourceLocation("jump_boost"), 0, 120 * 20));
+					new OutcomePotionEffect(Effects.JUMP_BOOST, 0, 120 * 20));
 			RitualRegistry.instance().addRitual(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.regen", new ItemStack(Items.GOLDEN_APPLE), EMagicElement.EARTH,
 					ReagentType.GINSENG, new RRequirementResearch("boon"),
-					new OutcomePotionEffect(Potion.getPotionFromResourceLocation("regeneration"), 0, 120 * 20));
+					new OutcomePotionEffect(Effects.REGENERATION, 0, 120 * 20));
 			RitualRegistry.instance().addRitual(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.fireresist", new ItemStack(Items.MAGMA_CREAM), EMagicElement.FIRE,
 					ReagentType.CRYSTABLOOM, new RRequirementResearch("boon"),
-					new OutcomePotionEffect(Potion.getPotionFromResourceLocation("fire_resistance"), 0, 120 * 20));
+					new OutcomePotionEffect(Effects.FIRE_RESISTANCE, 0, 120 * 20));
 			RitualRegistry.instance().addRitual(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.invisibility", new ItemStack(Items.ENDER_EYE), EMagicElement.ENDER,
 					ReagentType.GRAVE_DUST, new RRequirementResearch("boon"),
-					new OutcomePotionEffect(Potion.getPotionFromResourceLocation("invisibility"), 0, 120 * 20));
+					new OutcomePotionEffect(Effects.INVISIBILITY, 0, 120 * 20));
 			RitualRegistry.instance().addRitual(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.nightvision", new ItemStack(Items.GOLDEN_CARROT),
 					EMagicElement.PHYSICAL, ReagentType.BLACK_PEARL, new RRequirementResearch("boon"),
-					new OutcomePotionEffect(Potion.getPotionFromResourceLocation("night_vision"), 0, 120 * 20));
+					new OutcomePotionEffect(Effects.NIGHT_VISION, 0, 120 * 20));
 			RitualRegistry.instance().addRitual(recipe);
 
-			recipe = RitualRecipe.createTier1("buff.waterbreathing", new ItemStack(Items.FISH), EMagicElement.ICE,
+			recipe = RitualRecipe.createTier1("buff.waterbreathing", new ItemStack(Items.SALMON), EMagicElement.ICE,
 					ReagentType.MANI_DUST, new RRequirementResearch("boon"),
-					new OutcomePotionEffect(Potion.getPotionFromResourceLocation("water_breathing"), 0, 120 * 20));
+					new OutcomePotionEffect(Effects.WATER_BREATHING, 0, 120 * 20));
 			RitualRegistry.instance().addRitual(recipe);
 		}
 
@@ -702,13 +691,13 @@ public class NostrumMagica {
 //			RitualRegistry.instance().addRitual(recipe);
 //		}
 
-		ItemStack enderpearl = new ItemStack(Items.ENDER_PEARL);
+		Ingredient enderpearl = Ingredient.fromTag(Tags.Items.ENDER_PEARLS);
 		recipe = RitualRecipe.createTier3("mark", new ItemStack(Items.WRITABLE_BOOK), EMagicElement.WIND,
 				new ReagentType[] {
 						ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.CRYSTABLOOM },
-				InfusedGemItem.instance().getGem(EMagicElement.EARTH, 1),
-				new ItemStack[] { enderpearl, new ItemStack(Items.COMPASS),
-						new ItemStack(Items.MAP, 1, OreDictionary.WILDCARD_VALUE), enderpearl },
+				Ingredient.fromTag(NostrumItemTags.Items.InfusedGemEarth),
+				new Ingredient[] { enderpearl, Ingredient.fromStacks(new ItemStack(Items.COMPASS)),
+						Ingredient.fromStacks(new ItemStack(Items.MAP)), enderpearl },
 				new RRequirementResearch("markrecall"), new OutcomeMark());
 		RitualRegistry.instance().addRitual(recipe);
 
@@ -717,153 +706,153 @@ public class NostrumMagica {
 		RitualRegistry.instance().addRitual(recipe);
 
 		// medium crystal -- tier 2. Small crystal, reagents, basic crystal
-		ItemStack crystal = NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1);
+		Ingredient crystal = Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium);
 		RitualRegistry.instance()
-				.addRitual(RitualRecipe.createTier2("kani", crystal, null,
+				.addRitual(RitualRecipe.createTier2("kani", new ItemStack(NostrumItems.crystalMedium), null,
 						new ReagentType[] { ReagentType.MANDRAKE_ROOT, ReagentType.MANI_DUST, ReagentType.GINSENG,
 								ReagentType.GRAVE_DUST },
-						NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), new RRequirementResearch("kani"),
-						new OutcomeSpawnItem(crystal)));
+						Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), new RRequirementResearch("kani"),
+						new OutcomeSpawnItem(new ItemStack(NostrumItems.crystalMedium))));
 
 		// large crystal -- tier 3. Medium crystal, 4 medium crystals, reagents, basic
 		// crystal
 
 		RitualRegistry.instance()
-				.addRitual(RitualRecipe.createTier3("vani", NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
+				.addRitual(RitualRecipe.createTier3("vani", new ItemStack(NostrumItems.crystalLarge),
 						null,
 						new ReagentType[] { ReagentType.MANDRAKE_ROOT, ReagentType.MANI_DUST, ReagentType.BLACK_PEARL,
 								ReagentType.CRYSTABLOOM },
-						crystal, new ItemStack[] { crystal, crystal, crystal, crystal },
+						crystal, new Ingredient[] { crystal, crystal, crystal, crystal },
 						new RRequirementResearch("vani"),
-						new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1))));
+						new OutcomeSpawnItem( new ItemStack(NostrumItems.crystalLarge))));
 
 		// magic token -- tier 1. Mani dust.
 		RitualRegistry.instance()
-				.addRitual(RitualRecipe.createTier1("magic_token", NostrumResourceItem.getItem(ResourceType.TOKEN, 1),
+				.addRitual(RitualRecipe.createTier1("magic_token", new ItemStack(NostrumItems.resourceToken),
 						null, ReagentType.MANI_DUST, new RRequirementResearch("magic_token"),
-						new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.TOKEN, 1))));
+						new OutcomeSpawnItem(new ItemStack(NostrumItems.resourceToken))));
 
 		// magic token x 3 -- tier 3. 9 reagents.
 		RitualRegistry.instance()
 				.addRitual(RitualRecipe
-						.createTier3("magic_token_3", NostrumResourceItem.getItem(ResourceType.TOKEN, 3), null,
+						.createTier3("magic_token_3", new ItemStack(NostrumItems.resourceToken, 3), null,
 								new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.CRYSTABLOOM,
 										ReagentType.GINSENG, ReagentType.GRAVE_DUST },
-								ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1),
-								new ItemStack[] { ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1),
-										ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1),
-										ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1),
-										ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1) },
+								Ingredient.fromTag(NostrumItemTags.Items.ReagentManiDust),
+								new Ingredient[] { Ingredient.fromTag(NostrumItemTags.Items.ReagentMandrakeRoot),
+										Ingredient.fromTag(NostrumItemTags.Items.ReagentManiDust),
+										Ingredient.fromTag(NostrumItemTags.Items.ReagentSkyAsh),
+										Ingredient.fromTag(NostrumItemTags.Items.ReagentSpiderSilk) },
 								new RRequirementResearch("magic_token_3"),
-								new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.TOKEN, 3))));
+								new OutcomeSpawnItem(new ItemStack(NostrumItems.resourceToken, 3))));
 
 		// essence plant seed
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3(
-				"essence_seed", new ItemStack(ReagentSeed.essence), null, new ReagentType[] { ReagentType.SPIDER_SILK,
+				"essence_seed", new ItemStack(NostrumItems.reagentSeedEssence), null, new ReagentType[] { ReagentType.SPIDER_SILK,
 						ReagentType.MANDRAKE_ROOT, ReagentType.GINSENG, ReagentType.MANI_DUST },
-				NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1),
-				new ItemStack[] { new ItemStack(ReagentSeed.mandrake),
-						new ItemStack(EssenceItem.instance(), 1, OreDictionary.WILDCARD_VALUE),
-						new ItemStack(EssenceItem.instance(), 1, OreDictionary.WILDCARD_VALUE),
-						new ItemStack(ReagentSeed.ginseng) },
-				new RRequirementResearch("essence_seeds"), new OutcomeSpawnItem(new ItemStack(ReagentSeed.essence))));
-
+				new ItemStack(NostrumItems.crystalSmall),
+				new ItemStack[] { new ItemStack(NostrumItems.reagentSeedMandrake),
+						new ItemStack(NostrumItems.reagentSeedEssence),
+						new ItemStack(NostrumItems.reagentSeedEssence),
+						new ItemStack(NostrumItems.reagentSeedGinseng) },
+				new RRequirementResearch("essence_seeds"), new OutcomeSpawnItem(new ItemStack(NostrumItems.reagentSeedEssence))));
+		
 		// fierce slab -- tier 3. Kani crystal. Fire + Wind gems
 		RitualRegistry.instance()
-				.addRitual(RitualRecipe.createTier3("fierce_infusion",
-						NostrumResourceItem.getItem(ResourceType.SLAB_FIERCE, 1), EMagicElement.LIGHTNING,
+				.addRitual(RitualRecipe.createTier3("fierce_infusion", new ItemStack(NostrumItems.resourceSlabFierce),
+						EMagicElement.LIGHTNING,
 						new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANDRAKE_ROOT,
 								ReagentType.SPIDER_SILK },
 						crystal,
-						new ItemStack[] { InfusedGemItem.instance().getGem(EMagicElement.FIRE, 1), ItemStack.EMPTY,
-								ItemStack.EMPTY, InfusedGemItem.instance().getGem(EMagicElement.WIND, 1) },
+						new Ingredient[] { Ingredient.fromTag(NostrumItemTags.Items.InfusedGemFire), Ingredient.EMPTY,
+								Ingredient.EMPTY, Ingredient.fromTag(NostrumItemTags.Items.InfusedGemWind) },
 						new RRequirementResearch("fierce_infusion"),
-						new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.SLAB_FIERCE, 1))));
+						new OutcomeSpawnItem(new ItemStack(NostrumItems.resourceSlabFierce))));
 
 		// kind slab -- tier 3. Kani crystal. Ice + Earth gems
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("kind_infusion",
-				NostrumResourceItem.getItem(ResourceType.SLAB_KIND, 1), EMagicElement.ENDER,
+				new ItemStack(NostrumItems.resourceSlabKind), EMagicElement.ENDER,
 				new ReagentType[] {
 						ReagentType.CRYSTABLOOM, ReagentType.GINSENG, ReagentType.MANI_DUST, ReagentType.SKY_ASH },
 				crystal,
-				new ItemStack[] { InfusedGemItem.instance().getGem(EMagicElement.ICE, 1), ItemStack.EMPTY,
-						ItemStack.EMPTY, InfusedGemItem.instance().getGem(EMagicElement.EARTH, 1) },
+				new Ingredient[] { Ingredient.fromTag(NostrumItemTags.Items.InfusedGemIce), Ingredient.EMPTY,
+						Ingredient.EMPTY, Ingredient.fromTag(NostrumItemTags.Items.InfusedGemEarth) },
 				new RRequirementResearch("kind_infusion"),
-				new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.SLAB_KIND, 1))));
+				new OutcomeSpawnItem(new ItemStack(NostrumItems.resourceSlabKind))));
 
 		// balanced slab -- tier 3. Vani crystal. Fierce and Kind slabs, + ender and
 		// lightning gems
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("balanced_infusion",
-				NostrumResourceItem.getItem(ResourceType.SLAB_BALANCED, 1), null,
+				new ItemStack(NostrumItems.resourceSlabBalanced), null,
 				new ReagentType[] {
 						ReagentType.GINSENG, ReagentType.CRYSTABLOOM, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK },
-				NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
-				new ItemStack[] { NostrumResourceItem.getItem(ResourceType.SLAB_KIND, 1),
-						InfusedGemItem.instance().getGem(EMagicElement.ENDER, 1),
-						InfusedGemItem.instance().getGem(EMagicElement.LIGHTNING, 1),
-						NostrumResourceItem.getItem(ResourceType.SLAB_FIERCE, 1) },
+				Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge),
+				new Ingredient[] { Ingredient.fromTag(NostrumItemTags.Items.SlabKind),
+						Ingredient.fromTag(NostrumItemTags.Items.InfusedGemEnder),
+						Ingredient.fromTag(NostrumItemTags.Items.InfusedGemLightning),
+						Ingredient.fromTag(NostrumItemTags.Items.SlabFierce) },
 				new RRequirementResearch("balanced_infusion"),
-				new OutcomeSpawnItem(NostrumResourceItem.getItem(ResourceType.SLAB_BALANCED, 1))));
+				new OutcomeSpawnItem(new ItemStack(NostrumItems.resourceSlabBalanced))));
 
 		// Thano Pendant -- tier 3. gold ingot. Paliv + Cerci fragments + 2 mani
 		// crystals.
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("thano_infusion",
-				new ItemStack(ThanoPendant.instance()), null, new ReagentType[] { ReagentType.MANI_DUST,
+				new ItemStack(NostrumItems.thanoPendant), null, new ReagentType[] { ReagentType.MANI_DUST,
 						ReagentType.SKY_ASH, ReagentType.MANDRAKE_ROOT, ReagentType.SPIDER_SILK },
-				new ItemStack(Items.GOLD_INGOT),
-				new ItemStack[] { NostrumResourceItem.getItem(ResourceType.PENDANT_LEFT, 1),
-						NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1),
-						NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1),
-						NostrumResourceItem.getItem(ResourceType.PENDANT_RIGHT, 1) },
+				Ingredient.fromTag(Tags.Items.INGOTS_GOLD),
+				new Ingredient[] { Ingredient.fromStacks(new ItemStack(NostrumItems.resourcePendantLeft)),
+						Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall),
+						Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall),
+						Ingredient.fromStacks(new ItemStack(NostrumItems.resourcePendantRight)) },
 				new RRequirementResearch("thano_pendant"),
-				new OutcomeSpawnItem(new ItemStack(ThanoPendant.instance()))));
+				new OutcomeSpawnItem(new ItemStack(NostrumItems.thanoPendant))));
 
 		// Obelisk -- tier 3. Vani crystal. Balanced slab, 2 eyes of ender, compass.
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("create_obelisk",
-				new ItemStack(MirrorItem.instance()), EMagicElement.ENDER,
+				new ItemStack(NostrumItems.mirrorItem), EMagicElement.ENDER,
 				new ReagentType[] {
 						ReagentType.BLACK_PEARL, ReagentType.SKY_ASH, ReagentType.MANDRAKE_ROOT, ReagentType.GINSENG },
-				NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
-				new ItemStack[] { NostrumResourceItem.getItem(ResourceType.SLAB_BALANCED, 1),
-						new ItemStack(Items.ENDER_EYE), new ItemStack(Items.ENDER_EYE), new ItemStack(Items.COMPASS) },
+				Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge),
+				new Ingredient[] { Ingredient.fromTag(NostrumItemTags.Items.SlabBalanced),
+						Ingredient.fromItems(Items.ENDER_EYE), Ingredient.fromItems(Items.ENDER_EYE), Ingredient.fromItems(Items.COMPASS) },
 				new RRequirementResearch("obelisks"), new OutcomeCreateObelisk()));
 
 		// GeoGem -- tier 3. Compass center. 2x Crystal, 2x reagent, Earth Crystal
 		RitualRegistry.instance()
 				.addRitual(
-						RitualRecipe.createTier3("geogem", new ItemStack(PositionCrystal.instance()),
+						RitualRecipe.createTier3("geogem", new ItemStack(NostrumItems.positionCrystal),
 								EMagicElement.EARTH, new ReagentType[] { ReagentType.GRAVE_DUST,
 										ReagentType.MANDRAKE_ROOT, ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST },
-								new ItemStack(Items.COMPASS),
-								new ItemStack[] { NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1),
-										new ItemStack(ReagentItem.instance(), 1, OreDictionary.WILDCARD_VALUE),
-										new ItemStack(ReagentItem.instance(), 1, OreDictionary.WILDCARD_VALUE),
-										NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1) },
+								Ingredient.fromItems(Items.COMPASS),
+								new Ingredient[] { Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+										Ingredient.fromTag(NostrumItemTags.Items.Reagent),
+										Ingredient.fromTag(NostrumItemTags.Items.Reagent),
+										Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium) },
 								new RRequirementResearch("geogems"),
-								new OutcomeSpawnItem(new ItemStack(PositionCrystal.instance(), 4))));
+								new OutcomeSpawnItem(new ItemStack(NostrumItems.positionCrystal, 4))));
 
 		// GeoToken -- tier 3. Geogem center. Magic Token, earth crystal, blank scroll,
 		// diamond
 		RitualRegistry.instance()
-				.addRitual(RitualRecipe.createTier3("geotoken", new ItemStack(PositionToken.instance()),
+				.addRitual(RitualRecipe.createTier3("geotoken", new ItemStack(NostrumItems.positionToken),
 						EMagicElement.EARTH, new ReagentType[] { ReagentType.GRAVE_DUST, ReagentType.GINSENG,
 								ReagentType.MANDRAKE_ROOT, ReagentType.GRAVE_DUST },
-						new ItemStack(PositionCrystal.instance()),
-						new ItemStack[] { NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1),
-								NostrumResourceItem.getItem(ResourceType.TOKEN, 1),
-								InfusedGemItem.instance().getGem(EMagicElement.EARTH, 1),
-								new ItemStack(BlankScroll.instance()) },
+						Ingredient.fromItems(NostrumItems.positionCrystal),
+						new Ingredient[] { Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+								Ingredient.fromItems(NostrumItems.resourceToken),
+								Ingredient.fromTag(NostrumItemTags.Items.InfusedGemEarth),
+								Ingredient.fromItems(NostrumItems.blankScroll) },
 						new RRequirementResearch("geotokens"), new OutcomeConstructGeotoken(1)));
 
 		// GeoToken clone -- tier 3. Geotoken center. Magic Tokens and mani crystal
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("geotoken",
-				new ItemStack(PositionToken.instance()), null, new ReagentType[] { ReagentType.GRAVE_DUST,
+				new ItemStack(NostrumItems.positionToken), null, new ReagentType[] { ReagentType.GRAVE_DUST,
 						ReagentType.GINSENG, ReagentType.MANDRAKE_ROOT, ReagentType.GRAVE_DUST },
-				new ItemStack(PositionToken.instance()),
-				new ItemStack[] { NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1),
-						NostrumResourceItem.getItem(ResourceType.TOKEN, 1),
-						NostrumResourceItem.getItem(ResourceType.TOKEN, 1),
-						NostrumResourceItem.getItem(ResourceType.TOKEN, 1) },
+				Ingredient.fromItems(NostrumItems.positionToken),
+				new Ingredient[] { Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall),
+						Ingredient.fromItems(NostrumItems.resourceToken),
+						Ingredient.fromItems(NostrumItems.resourceToken),
+						Ingredient.fromItems(NostrumItems.resourceToken) },
 				new RRequirementResearch("geotokens"), new OutcomeConstructGeotoken(4)));
 
 		// Tele to obelisk -- tier 2. Position gem, reagents
@@ -872,7 +861,7 @@ public class NostrumMagica {
 						EMagicElement.ENDER,
 						new ReagentType[] { ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.SKY_ASH,
 								ReagentType.SPIDER_SILK },
-						new ItemStack(PositionCrystal.instance()), new RRequirementResearch("obelisks"),
+						new ItemStack(NostrumItems.positionCrystal), new RRequirementResearch("obelisks"),
 						new OutcomeTeleportObelisk()));
 
 		// Spawn Koids -- tier 3. Kani center. Magic Token, gold, gold, essence
@@ -880,16 +869,16 @@ public class NostrumMagica {
 				EssenceItem.getEssence(EMagicElement.ENDER, 1), null,
 				new ReagentType[] {
 						ReagentType.BLACK_PEARL, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.GRAVE_DUST },
-				NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1),
-				new ItemStack[] { new ItemStack(Items.GOLD_INGOT), NostrumResourceItem.getItem(ResourceType.TOKEN, 1),
-						new ItemStack(EssenceItem.instance(), 1, OreDictionary.WILDCARD_VALUE),
-						new ItemStack(Items.GOLD_INGOT, 1) },
+				Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+				new Ingredient[] { Ingredient.fromTag(Tags.Items.INGOTS_GOLD), Ingredient.fromTag(NostrumItemTags.Items.MagicToken),
+						Ingredient.fromTag(NostrumItemTags.Items.Essence),
+						Ingredient.fromTag(Tags.Items.INGOTS_GOLD) },
 				new RRequirementResearch("summonkoids"), new OutcomeSpawnEntity(new IEntityFactory() {
 					@Override
 					public void spawn(World world, Vec3d pos, PlayerEntity invoker, ItemStack centerItem) {
 						EntityKoid koid = new EntityKoid(world);
 						koid.setPosition(pos.x, pos.y, pos.z);
-						world.spawnEntity(koid);
+						world.addEntity(koid);
 						koid.setAttackTarget(invoker);
 					}
 
@@ -901,62 +890,63 @@ public class NostrumMagica {
 
 		// Mastery Orb
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("mastery_orb",
-				new ItemStack(MasteryOrb.instance()), null, new ReagentType[] { ReagentType.SPIDER_SILK,
+				new ItemStack(NostrumItems.masteryOrb), null, new ReagentType[] { ReagentType.SPIDER_SILK,
 						ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK },
-				new ItemStack(ThanoPendant.instance()),
-				new ItemStack[] { new ItemStack(Items.GOLD_INGOT, 1, OreDictionary.WILDCARD_VALUE),
-						new ItemStack(Items.ENDER_PEARL, 1, OreDictionary.WILDCARD_VALUE),
-						new ItemStack(Items.BLAZE_POWDER, 1, OreDictionary.WILDCARD_VALUE),
-						new ItemStack(Items.GOLD_INGOT, 1, OreDictionary.WILDCARD_VALUE) },
+				Ingredient.fromItems(NostrumItems.thanoPendant),
+				new Ingredient[] { Ingredient.fromTag(Tags.Items.INGOTS_GOLD),
+						Ingredient.fromTag(Tags.Items.ENDER_PEARLS),
+						Ingredient.fromItems(Items.BLAZE_POWDER),
+						Ingredient.fromTag(Tags.Items.INGOTS_GOLD) },
 				new RRequirementResearch("elemental_trials"),
-				new OutcomeSpawnItem(new ItemStack(MasteryOrb.instance()))));
+				new OutcomeSpawnItem(new ItemStack(NostrumItems.masteryOrb))));
 
 		// Spell Tome Creation
-		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("tome", new ItemStack(SpellTome.instance()), null,
+		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("tome", new ItemStack(NostrumItems.spellTomeNovice), null,
 				new ReagentType[] {
 						ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST },
-				new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
-				new ItemStack[] { new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance()),
-						new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance()) },
+				Ingredient.fromTag(NostrumItemTags.Items.TomePlate),
+				new Ingredient[] { Ingredient.fromItems(NostrumItems.spellTomePage), Ingredient.fromItems(NostrumItems.spellTomePage),
+						Ingredient.fromItems(NostrumItems.spellTomePage), Ingredient.fromItems(NostrumItems.spellTomePage) },
 				new RRequirementResearch("spelltomes_advanced"), new OutcomeCreateTome()));
-		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("tome", new ItemStack(SpellTome.instance()), null,
+		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("tome", new ItemStack(NostrumItems.spellTomeNovice), null,
 				new ReagentType[] {
 						ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST },
-				new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
-				new ItemStack[] { new ItemStack(SpellTomePage.instance()), new ItemStack(SpellTomePage.instance()),
-						ItemStack.EMPTY, new ItemStack(SpellTomePage.instance()) },
+				Ingredient.fromTag(NostrumItemTags.Items.TomePlate),
+				new Ingredient[] { Ingredient.fromItems(NostrumItems.spellTomePage), Ingredient.fromItems(NostrumItems.spellTomePage),
+						Ingredient.EMPTY, Ingredient.fromItems(NostrumItems.spellTomePage) },
 				new RRequirementResearch("spelltomes_advanced"), new OutcomeCreateTome()));
 		RitualRegistry.instance()
-				.addRitual(RitualRecipe.createTier3("tome", new ItemStack(SpellTome.instance()), null,
+				.addRitual(RitualRecipe.createTier3("tome", new ItemStack(NostrumItems.spellTomeNovice), null,
 						new ReagentType[] { ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK,
 								ReagentType.MANI_DUST },
-						new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
-						new ItemStack[] { new ItemStack(SpellTomePage.instance()), ItemStack.EMPTY, ItemStack.EMPTY,
-								new ItemStack(SpellTomePage.instance()) },
+						Ingredient.fromTag(NostrumItemTags.Items.TomePlate),
+						new Ingredient[] { Ingredient.fromItems(NostrumItems.spellTomePage), Ingredient.EMPTY, Ingredient.EMPTY,
+								Ingredient.fromItems(NostrumItems.spellTomePage) },
 						new RRequirementResearch("spelltomes_advanced"), new OutcomeCreateTome()));
 		RitualRegistry.instance()
-				.addRitual(RitualRecipe.createTier3("tome", new ItemStack(SpellTome.instance()), null,
+				.addRitual(RitualRecipe.createTier3("tome", new ItemStack(NostrumItems.spellTomeNovice), null,
 						new ReagentType[] { ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK,
 								ReagentType.MANI_DUST },
-						new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
-						new ItemStack[] { new ItemStack(SpellTomePage.instance()), ItemStack.EMPTY, ItemStack.EMPTY,
-								ItemStack.EMPTY },
+						Ingredient.fromTag(NostrumItemTags.Items.TomePlate),
+						new Ingredient[] { Ingredient.fromItems(NostrumItems.spellTomePage), Ingredient.EMPTY, Ingredient.EMPTY,
+								Ingredient.EMPTY },
 						new RRequirementResearch("spelltomes_advanced"), new OutcomeCreateTome()));
-		RitualRegistry.instance().addRitual(RitualRecipe.createTier2("tome", new ItemStack(SpellTome.instance()), null,
+		RitualRegistry.instance().addRitual(RitualRecipe.createTier2("tome", new ItemStack(NostrumItems.spellTomeNovice), null,
 				new ReagentType[] { ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK,
 						ReagentType.MANI_DUST },
-				new ItemStack(SpellPlate.instance(), 1, OreDictionary.WILDCARD_VALUE),
+				Ingredient.fromTag(NostrumItemTags.Items.TomePlate),
 				new RRequirementResearch("spelltomes"), new OutcomeCreateTome()));
 
 		// Spell Binding
 		RitualRegistry.instance()
-				.addRitual(RitualRecipe.createTier3("spell_binding", new ItemStack(SpellTomePage.instance()), null,
+				.addRitual(RitualRecipe.createTier3("spell_binding", new ItemStack(NostrumItems.spellTomePage), null,
 						new ReagentType[] { ReagentType.SPIDER_SILK, ReagentType.MANI_DUST, ReagentType.SKY_ASH,
 								ReagentType.BLACK_PEARL },
-						new ItemStack(SpellTome.instance(), 1, OreDictionary.WILDCARD_VALUE),
-						new ItemStack[] { new ItemStack(Items.GOLD_NUGGET),
-								new ItemStack(SpellScroll.instance(), 1, OreDictionary.WILDCARD_VALUE),
-								NostrumResourceItem.getItem(ResourceType.TOKEN, 1), new ItemStack(Items.GOLD_NUGGET) },
+						Ingredient.fromTag(NostrumItemTags.Items.SpellTome),
+						new Ingredient[] { Ingredient.fromTag(Tags.Items.NUGGETS_GOLD),
+								Ingredient.fromItems(NostrumItems.spellScroll),
+								Ingredient.fromTag(NostrumItemTags.Items.MagicToken),
+								Ingredient.fromTag(Tags.Items.NUGGETS_GOLD) },
 						new RRequirementResearch("spellbinding"), new OutcomeBindSpell()));
 
 		// Magic Charms
@@ -973,198 +963,220 @@ public class NostrumMagica {
 		// Mirror from wing
 		RitualRegistry.instance()
 				.addRitual(RitualRecipe.createTier3("form_primordial_mirror",
-						NostrumSkillItem.getItem(SkillItemType.MIRROR, 1), null,
+						new ItemStack(NostrumItems.skillMirror), null,
 						new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH,
 								ReagentType.SPIDER_SILK },
-						new ItemStack(Item.getItemFromBlock(Blocks.GLASS_PANE), 1, OreDictionary.WILDCARD_VALUE),
-						new ItemStack[] { NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1),
-								NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
-								NostrumSkillItem.getItem(SkillItemType.WING, 1),
-								NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1) },
+						Ingredient.fromTag(Tags.Items.GLASS_PANES),
+						new Ingredient[] { Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+								Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge),
+								Ingredient.fromTag(NostrumItemTags.Items.DragonWing),
+								Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium)
+								},
 						new RRequirementResearch("stat_items_wing"),
-						new OutcomeSpawnItem(NostrumSkillItem.getItem(SkillItemType.MIRROR, 1))));
+						new OutcomeSpawnItem(new ItemStack(NostrumItems.skillMirror))));
 
 		// Mirror from roses
-		for (RoseType type : RoseType.values()) {
-			RitualRegistry.instance()
-					.addRitual(RitualRecipe.createTier3("form_primordial_mirror",
-							NostrumSkillItem.getItem(SkillItemType.MIRROR, 1), null,
-							new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH,
-									ReagentType.SPIDER_SILK },
-							new ItemStack(Item.getItemFromBlock(Blocks.GLASS_PANE), 1, OreDictionary.WILDCARD_VALUE),
-							new ItemStack[] { NostrumRoseItem.getItem(type, 1),
-									NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
-									NostrumRoseItem.getItem(type, 1), NostrumRoseItem.getItem(type, 1) },
-							new RRequirementResearch("stat_items_adv"),
-							new OutcomeSpawnItem(NostrumSkillItem.getItem(SkillItemType.MIRROR, 1))));
-		}
+		RitualRegistry.instance()
+				.addRitual(RitualRecipe.createTier3("form_primordial_mirror",
+						new ItemStack(NostrumItems.skillMirror), null,
+						new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH,
+								ReagentType.SPIDER_SILK },
+						Ingredient.fromTag(Tags.Items.GLASS_PANES),
+						new Ingredient[] { Ingredient.fromTag(NostrumItemTags.Items.RoseBlood),
+								Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge),
+								Ingredient.fromTag(NostrumItemTags.Items.RoseBlood),
+								Ingredient.fromTag(NostrumItemTags.Items.RoseBlood)
+								},
+						new RRequirementResearch("stat_items_adv"),
+						new OutcomeSpawnItem(new ItemStack(NostrumItems.skillMirror))));
+		RitualRegistry.instance()
+		.addRitual(RitualRecipe.createTier3("form_primordial_mirror",
+				new ItemStack(NostrumItems.skillMirror), null,
+				new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH,
+						ReagentType.SPIDER_SILK },
+				Ingredient.fromTag(Tags.Items.GLASS_PANES),
+				new Ingredient[] { Ingredient.fromTag(NostrumItemTags.Items.RosePale),
+						Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge),
+						Ingredient.fromTag(NostrumItemTags.Items.RosePale),
+						Ingredient.fromTag(NostrumItemTags.Items.RosePale)
+						},
+				new RRequirementResearch("stat_items_adv"),
+				new OutcomeSpawnItem(new ItemStack(NostrumItems.skillMirror))));
+		RitualRegistry.instance()
+		.addRitual(RitualRecipe.createTier3("form_primordial_mirror",
+				new ItemStack(NostrumItems.skillMirror), null,
+				new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH,
+						ReagentType.SPIDER_SILK },
+				Ingredient.fromTag(Tags.Items.GLASS_PANES),
+				new Ingredient[] { Ingredient.fromTag(NostrumItemTags.Items.RoseEldrich),
+						Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge),
+						Ingredient.fromTag(NostrumItemTags.Items.RoseEldrich),
+						Ingredient.fromTag(NostrumItemTags.Items.RoseEldrich)
+						},
+				new RRequirementResearch("stat_items_adv"),
+				new OutcomeSpawnItem(new ItemStack(NostrumItems.skillMirror))));
 
 		// Ooze
 		RitualRegistry.instance()
 				.addRitual(RitualRecipe.createTier3("form_essential_ooze",
-						NostrumSkillItem.getItem(SkillItemType.OOZE, 1), null,
-						new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH,
-								ReagentType.SPIDER_SILK },
-						new ItemStack(Items.SLIME_BALL, 1, OreDictionary.WILDCARD_VALUE),
-						new ItemStack[] { NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1),
-								NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
-								NostrumRoseItem.getItem(RoseType.PALE, 1),
-								NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1) },
+						new ItemStack(NostrumItems.skillOoze), null,
+						new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK },
+						Ingredient.fromTag(Tags.Items.SLIMEBALLS),
+						new Ingredient[] { Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+								Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge),
+								Ingredient.fromTag(NostrumItemTags.Items.RosePale),
+								Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium) },
 						new RRequirementResearch("stat_items"),
-						new OutcomeSpawnItem(NostrumSkillItem.getItem(SkillItemType.OOZE, 1))));
+						new OutcomeSpawnItem(new ItemStack(NostrumItems.skillOoze))));
 
 		// Flute
 		RitualRegistry.instance()
 				.addRitual(RitualRecipe
-						.createTier3("form_living_flute", NostrumSkillItem.getItem(SkillItemType.FLUTE, 1), null,
+						.createTier3("form_living_flute", new ItemStack(NostrumItems.skillFlute), null,
 								new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH,
 										ReagentType.SPIDER_SILK },
-								new ItemStack(Items.REEDS, 1, OreDictionary.WILDCARD_VALUE),
-								new ItemStack[] { NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1),
-										NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
-										NostrumRoseItem.getItem(RoseType.BLOOD, 1),
-										NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1) },
+								Ingredient.fromItems(Items.SUGAR_CANE),
+								new Ingredient[] { Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+										Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge),
+										Ingredient.fromTag(NostrumItemTags.Items.RoseBlood),
+										Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium) },
 								new RRequirementResearch("stat_items"),
-								new OutcomeSpawnItem(NostrumSkillItem.getItem(SkillItemType.FLUTE, 1))));
+								new OutcomeSpawnItem(new ItemStack(NostrumItems.skillFlute))));
 
 		// Pendant
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("form_eldrich_pendant",
-				NostrumSkillItem.getItem(SkillItemType.PENDANT, 1), null,
+				new ItemStack(NostrumItems.skillPendant), null,
 				new ReagentType[] {
 						ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK },
-				new ItemStack(Items.ENDER_PEARL, 1),
-				new ItemStack[] { NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1),
-						NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
-						NostrumRoseItem.getItem(RoseType.ELDRICH, 1),
-						NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1) },
+				Ingredient.fromTag(Tags.Items.ENDER_PEARLS),
+				new Ingredient[] { Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+						Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge),
+						Ingredient.fromTag(NostrumItemTags.Items.RoseEldrich),
+						Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium) },
 				new RRequirementResearch("stat_items"),
-				new OutcomeSpawnItem(NostrumSkillItem.getItem(SkillItemType.PENDANT, 1))));
+				new OutcomeSpawnItem(new ItemStack(NostrumItems.skillPendant))));
 
 		// Ender pin
 		RitualRegistry.instance()
-				.addRitual(RitualRecipe.createTier3("ender_pin", NostrumSkillItem.getItem(SkillItemType.ENDER_PIN, 1),
+				.addRitual(RitualRecipe.createTier3("ender_pin", new ItemStack(NostrumItems.skillEnderPin),
 						EMagicElement.ENDER, new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST,
 								ReagentType.MANDRAKE_ROOT, ReagentType.SPIDER_SILK },
-						NostrumResourceItem.getItem(ResourceType.WISP_PEBBLE, 1),
-						new ItemStack[] { NostrumResourceItem.getItem(ResourceType.ENDER_BRISTLE, 1),
-								NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
-								NostrumResourceItem.getItem(ResourceType.ENDER_BRISTLE, 1),
-								NostrumResourceItem.getItem(ResourceType.ENDER_BRISTLE, 1) },
+						Ingredient.fromTag(NostrumItemTags.Items.WispPebble),
+						new Ingredient[] { Ingredient.fromTag(NostrumItemTags.Items.EnderBristle),
+								Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge),
+								Ingredient.fromTag(NostrumItemTags.Items.EnderBristle),
+										Ingredient.fromTag(NostrumItemTags.Items.EnderBristle) },
 						new RRequirementResearch("ender_pin"),
-						new OutcomeSpawnItem(NostrumSkillItem.getItem(SkillItemType.ENDER_PIN, 1))));
+						new OutcomeSpawnItem(new ItemStack(NostrumItems.skillEnderPin))));
 
 		// Mirror Shield
-		ItemStack extra = (baubles.isEnabled() ? ItemMagicBauble.getItem(ItemType.RIBBON_SMALL, 1)
-				: NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1));
+		Ingredient extra = (baubles.isEnabled() ? Ingredient.fromItems(ItemMagicBauble.smallRibbon)
+				: Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall));
 
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("mirror_shield",
-				new ItemStack(MirrorShield.instance()), null, new ReagentType[] { ReagentType.MANI_DUST,
+				new ItemStack(NostrumItems.mirrorShield), null, new ReagentType[] { ReagentType.MANI_DUST,
 						ReagentType.MANDRAKE_ROOT, ReagentType.SPIDER_SILK, ReagentType.BLACK_PEARL },
-				new ItemStack(Items.SHIELD, 1),
-				new ItemStack[] { extra, NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
-						new ItemStack(Blocks.GLASS_PANE, 1, OreDictionary.WILDCARD_VALUE), extra },
+				Ingredient.fromItems(Items.SHIELD),
+				new Ingredient[] { extra, Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge),
+						Ingredient.fromTag(Tags.Items.GLASS_PANES), extra },
 				new RRequirementResearch("mirror_shield"),
-				new OutcomeSpawnItem(new ItemStack(MirrorShield.instance()))));
+				new OutcomeSpawnItem(new ItemStack(NostrumItems.mirrorShield))));
 
-		extra = (baubles.isEnabled() ? ItemMagicBauble.getItem(ItemType.RIBBON_MEDIUM, 1)
-				: NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1));
+		extra = (baubles.isEnabled() ? Ingredient.fromItems(ItemMagicBauble.mediumRibbon)
+				: Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium));
 		RitualRegistry.instance()
 				.addRitual(RitualRecipe.createTier3("true_mirror_shield",
-						new ItemStack(MirrorShieldImproved.instance()), null, new ReagentType[] { ReagentType.MANI_DUST,
+						new ItemStack(NostrumItems.mirrorShieldImproved), null, new ReagentType[] { ReagentType.MANI_DUST,
 								ReagentType.BLACK_PEARL, ReagentType.BLACK_PEARL, ReagentType.MANI_DUST },
-						new ItemStack(MirrorShield.instance()),
-						new ItemStack[] { NostrumResourceItem.getItem(ResourceType.PENDANT_LEFT, 1),
-								NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), extra,
-								NostrumResourceItem.getItem(ResourceType.PENDANT_RIGHT, 1) },
+						Ingredient.fromItems(NostrumItems.mirrorShield),
+						new Ingredient[] { Ingredient.fromTag(NostrumItemTags.Items.PendantLeft),
+								Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge), extra,
+								Ingredient.fromTag(NostrumItemTags.Items.PendantRight) },
 						new RRequirementResearch("true_mirror_shield"),
-						new OutcomeSpawnItem(new ItemStack(MirrorShieldImproved.instance()))));
+						new OutcomeSpawnItem(new ItemStack(NostrumItems.mirrorShieldImproved))));
 
 		RitualRegistry.instance()
 				.addRitual(RitualRecipe.createTier2("spawn_sorcery_portal", new ItemStack(SorceryPortal.instance()),
 						EMagicElement.ENDER,
 						new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.BLACK_PEARL, ReagentType.MANDRAKE_ROOT,
 								ReagentType.MANI_DUST },
-						new ItemStack(ShrineSeekingGem.instance()), new RRequirementResearch("sorceryportal"),
+						new ItemStack(NostrumItems.resourceSeekingGem), new RRequirementResearch("sorceryportal"),
 						new OutcomeCreatePortal()));
 
 		RitualRegistry.instance()
-				.addRitual(RitualRecipe.createTier3("spawn_warlock_sword", new ItemStack(WarlockSword.instance()),
+				.addRitual(RitualRecipe.createTier3("spawn_warlock_sword", new ItemStack(NostrumItems.warlockSword),
 						EMagicElement.FIRE, new ReagentType[] { ReagentType.MANDRAKE_ROOT, ReagentType.SKY_ASH,
 								ReagentType.SPIDER_SILK, ReagentType.MANI_DUST },
-						new ItemStack(MagicSwordBase.instance()),
-						new ItemStack[] { new ItemStack(MageStaff.instance()),
-								NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
-								NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1),
-								new ItemStack(MageStaff.instance()) },
+						Ingredient.fromItems(NostrumItems.magicSwordBase),
+						new Ingredient[] { Ingredient.fromItems(NostrumItems.mageStaff),
+								Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge),
+								Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+								Ingredient.fromItems(NostrumItems.mageStaff) },
 						new RRequirementResearch("warlock_sword"),
-						new OutcomeSpawnItem(WarlockSword.addCapacity(new ItemStack(WarlockSword.instance()), 10))));
+						new OutcomeSpawnItem(WarlockSword.addCapacity(new ItemStack(NostrumItems.warlockSword), 10))));
 
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("create_seeking_gem",
-				new ItemStack(ShrineSeekingGem.instance()), null,
+				new ItemStack(NostrumItems.resourceSeekingGem), null,
 				new ReagentType[] {
 						ReagentType.GRAVE_DUST, ReagentType.GINSENG, ReagentType.GRAVE_DUST, ReagentType.BLACK_PEARL },
-				new ItemStack(Items.ENDER_EYE),
-				new ItemStack[] { new ItemStack(Items.GOLD_INGOT),
-						NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), new ItemStack(Items.GOLD_INGOT) },
+				Ingredient.fromItems(Items.ENDER_EYE),
+				new Ingredient[] { Ingredient.fromTag(Tags.Items.INGOTS_GOLD),
+						Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+						Ingredient.fromTag(Tags.Items.INGOTS_GOLD),
+						Ingredient.EMPTY
+						},
 				new RRequirementResearch("seeking_gems"),
-				new OutcomeSpawnItem(new ItemStack(ShrineSeekingGem.instance()))));
+				new OutcomeSpawnItem(new ItemStack(NostrumItems.resourceSeekingGem))));
 
-		// Rituals for base the magic armors and weapons
-		for (EMagicElement elem : EMagicElement.values())
-			for (int i = 0; i < 3; i++) // Note: only 3. True versions are below
+		// Rituals for base the magic armors
+		for (EMagicElement elem : EMagicElement.values()) {
+			if (!EnchantedArmor.isArmorElement(elem)) {
+				continue;
+			}
+			
+			for (EnchantedArmor.Type type : EnchantedArmor.Type.values()) {
+				if (type == EnchantedArmor.Type.TRUE) {
+					continue; // True armors below
+				}
+				
 				for (EquipmentSlotType slot : EquipmentSlotType.values()) {
-
-					if (EnchantedArmor.isArmorElement(elem)) {
-						if (slot == EquipmentSlotType.OFFHAND || slot == EquipmentSlotType.MAINHAND) {
-							continue;
-						}
-					} else {
-						if (slot != EquipmentSlotType.MAINHAND) {
-							continue;
-						}
+					if (slot == EquipmentSlotType.OFFHAND || slot == EquipmentSlotType.MAINHAND) {
+						continue;
 					}
 
 					ItemStack outcome;
-					ItemStack input;
-					ItemStack gem;
-					ItemStack essence;
+					Ingredient input;
+					Ingredient gem;
+					Ingredient essence;
 					String name;
 					String research;
-					if (EnchantedArmor.isArmorElement(elem)) {
-						outcome = new ItemStack(EnchantedArmor.get(elem, slot, i + 1));
-						name = "spawn_enchanted_armor";
-						research = "enchanted_armor";
-						if (i == 0) {
-							input = new ItemStack(MagicArmorBase.get(slot));
-						} else {
-							input = new ItemStack(EnchantedArmor.get(elem, slot, i));
-						}
+					outcome = new ItemStack(EnchantedArmor.get(elem, slot, type));
+					name = "spawn_enchanted_armor";
+					research = "enchanted_armor";
+					if (type == EnchantedArmor.Type.NOVICE) {
+						input = Ingredient.fromItems(MagicArmorBase.get(slot));
 					} else {
-						outcome = new ItemStack(EnchantedWeapon.get(elem, i + 1));
-						name = "spawn_enchanted_weapon";
-						research = "enchanted_weapons";
-						if (i == 0) {
-							input = new ItemStack(MagicSwordBase.instance());
-						} else {
-							input = new ItemStack(EnchantedWeapon.get(elem, i));
-						}
+						input = Ingredient.fromItems(EnchantedArmor.get(elem, slot, type.getPrev()));
 					}
-					essence = EssenceItem.getEssence(elem, 1);
-					if (i == 0) {
-						gem = NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1);
-					} else if (i == 1) {
-						gem = NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1);
+					
+					essence = Ingredient.fromStacks(EssenceItem.getEssence(elem, 1)); // Would be cool to make this tag...
+					if (type == EnchantedArmor.Type.NOVICE) {
+						gem = Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall);
+					} else if (type == EnchantedArmor.Type.ADEPT) {
+						gem = Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium);
 					} else {
-						gem = NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1);
+						gem = Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge);
 					}
 
 					RitualRegistry.instance().addRitual(RitualRecipe.createTier3(name, outcome,
 							elem == EMagicElement.PHYSICAL ? null : elem,
 							new ReagentType[] { ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.MANI_DUST,
 									ReagentType.MANI_DUST },
-							input, new ItemStack[] { essence, gem, essence, essence },
+							input, new Ingredient[] { essence, gem, essence, essence },
 							new RRequirementResearch(research), new OutcomeSpawnItem(outcome.copy())));
 				}
+			}
+		}
 
 		// True and corrupted elemental armors
 		for (EMagicElement elem : EMagicElement.values())
@@ -1174,50 +1186,91 @@ public class NostrumMagica {
 				}
 
 				final boolean isTrue = EnchantedArmor.isArmorElement(elem);
-				final ItemStack augment = (isTrue ? NostrumResourceItem.getItem(ResourceType.SLAB_KIND, 1)
-						: NostrumResourceItem.getItem(ResourceType.SLAB_FIERCE, 1));
+				final Ingredient augment = (isTrue ? Ingredient.fromTag(NostrumItemTags.Items.SlabKind)
+						: Ingredient.fromTag(NostrumItemTags.Items.SlabFierce));
 
-				final ItemStack input = new ItemStack(EnchantedArmor.get(isTrue ? elem : elem.getOpposite(), slot, 3));
+				final Ingredient input = Ingredient.fromItems(EnchantedArmor.get(isTrue ? elem : elem.getOpposite(), slot, EnchantedArmor.Type.MASTER));
 				final String name = "spawn_enchanted_armor";
 				final String research = "enchanted_armor_adv";
-				final ItemStack wings = (isTrue ? NostrumSkillItem.getItem(SkillItemType.WING, 1)
-						: new ItemStack(Items.ELYTRA));
+				final Ingredient wings = (isTrue ? Ingredient.fromTag(NostrumItemTags.Items.DragonWing)
+						: Ingredient.fromStacks(new ItemStack(Items.ELYTRA)));
 				final IRitualOutcome outcome = (isTrue
-						? new OutcomeSpawnItem(new ItemStack(EnchantedArmor.get(elem, slot, 4)))
-						: new OutcomeSpawnItem(new ItemStack(EnchantedArmor.get(elem, slot, 4)),
+						? new OutcomeSpawnItem(new ItemStack(EnchantedArmor.get(elem, slot, EnchantedArmor.Type.TRUE)))
+						: new OutcomeSpawnItem(new ItemStack(EnchantedArmor.get(elem, slot, EnchantedArmor.Type.TRUE)),
 								new ItemStack(Items.ELYTRA)));
 
 				RitualRegistry.instance()
-						.addRitual(RitualRecipe.createTier3(name, new ItemStack(EnchantedArmor.get(elem, slot, 4)),
+						.addRitual(RitualRecipe.createTier3(name, new ItemStack(EnchantedArmor.get(elem, slot, EnchantedArmor.Type.TRUE)),
 								elem == EMagicElement.PHYSICAL ? null : elem,
 								new ReagentType[] { ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.MANI_DUST,
 										ReagentType.MANI_DUST },
 								input,
-								new ItemStack[] { new ItemStack(Blocks.OBSIDIAN, 1, OreDictionary.WILDCARD_VALUE),
-										wings, augment, NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1) },
+								new Ingredient[] { Ingredient.fromTag(Tags.Items.OBSIDIAN),
+										wings, augment, Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge) },
 								new RRequirementResearch(research), outcome));
 			}
+		
+		// Rituals for base the magic weapons
+		for (EMagicElement elem : EMagicElement.values()) {
+			if (!EnchantedWeapon.isWeaponElement(elem)) {
+				continue;
+			}
+			
+			for (EnchantedWeapon.Type type : EnchantedWeapon.Type.values()) {
+				ItemStack outcome;
+				Ingredient input;
+				Ingredient gem;
+				Ingredient essence;
+				String name;
+				String research;
+				
+				outcome = new ItemStack(EnchantedWeapon.get(elem, type));
+				name = "spawn_enchanted_weapon";
+				research = "enchanted_weapons";
+				if (type == EnchantedWeapon.Type.NOVICE) {
+					input = Ingredient.fromItems(NostrumItems.magicSwordBase);
+				} else {
+					input = Ingredient.fromItems(EnchantedWeapon.get(elem, type.getPrev()));
+				}
+				
+				essence = Ingredient.fromStacks(EssenceItem.getEssence(elem, 1)); // Would be cool to make this tag...
+				if (type == EnchantedWeapon.Type.NOVICE) {
+					gem = Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall);
+				} else if (type == EnchantedWeapon.Type.ADEPT) {
+					gem = Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium);
+				} else {
+					gem = Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge);
+				}
+
+				RitualRegistry.instance().addRitual(RitualRecipe.createTier3(name, outcome,
+						elem == EMagicElement.PHYSICAL ? null : elem,
+						new ReagentType[] { ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.MANI_DUST,
+								ReagentType.MANI_DUST },
+						input, new Ingredient[] { essence, gem, essence, essence },
+						new RRequirementResearch(research), new OutcomeSpawnItem(outcome.copy())));
+			}
+		}
 
 		// Dragon armors
 		for (DragonArmorMaterial material : DragonArmorMaterial.values()) {
-			final ItemStack augment;
-			final ItemStack cost;
+			final Ingredient augment;
+			final Ingredient cost;
 			final @Nullable DragonArmorMaterial prevMat;
 			switch (material) {
 			case DIAMOND:
 			default:
-				augment = new ItemStack(Blocks.DIAMOND_BLOCK);
-				cost = NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1);
+				augment = Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_DIAMOND);
+				cost = Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium);
 				prevMat = DragonArmorMaterial.GOLD;
 				break;
 			case GOLD:
-				augment = new ItemStack(Blocks.GOLD_BLOCK);
-				cost = NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1);
+				augment = Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_GOLD);
+				cost = Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium);
 				prevMat = DragonArmorMaterial.IRON;
 				break;
 			case IRON:
-				augment = new ItemStack(Blocks.IRON_BLOCK);
-				cost = NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1);
+				augment = Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_IRON);
+				cost = Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium);
 				prevMat = null;
 				break;
 			}
@@ -1235,9 +1288,9 @@ public class NostrumMagica {
 				// NOT IMPLEMENTED TODO
 
 				final ItemStack result = new ItemStack(DragonArmor.GetArmor(slot, material));
-				final ItemStack base;
-				final @Nonnull ItemStack prev = (prevMat == null ? ItemStack.EMPTY
-						: new ItemStack(DragonArmor.GetArmor(slot, prevMat)));
+				final Ingredient base;
+				final @Nonnull Ingredient prev = (prevMat == null ? Ingredient.EMPTY
+						: Ingredient.fromItems(DragonArmor.GetArmor(slot, prevMat)));
 
 				// Craft from horse armor
 				switch (slot) {
@@ -1246,20 +1299,20 @@ public class NostrumMagica {
 				case CREST:
 				default:
 					if (DragonArmorMaterial.IRON == material)
-						base = new ItemStack(Items.IRON_HORSE_ARMOR);
+						base = Ingredient.fromItems(Items.IRON_HORSE_ARMOR);
 					else if (DragonArmorMaterial.GOLD == material)
-						base = new ItemStack(Items.GOLDEN_HORSE_ARMOR);
+						base = Ingredient.fromItems(Items.GOLDEN_HORSE_ARMOR);
 					else
-						/* if (DragonArmorMaterial.DIAMOND == material) */ base = new ItemStack(
+						/* if (DragonArmorMaterial.DIAMOND == material) */ base = Ingredient.fromItems(
 								Items.DIAMOND_HORSE_ARMOR);
 					break;
 				case HELM:
 					if (DragonArmorMaterial.IRON == material)
-						base = new ItemStack(Items.IRON_HELMET);
+						base = Ingredient.fromItems(Items.IRON_HELMET);
 					else if (DragonArmorMaterial.GOLD == material)
-						base = new ItemStack(Items.GOLDEN_HELMET);
+						base = Ingredient.fromItems(Items.GOLDEN_HELMET);
 					else
-						/* if (DragonArmorMaterial.DIAMOND == material) */ base = new ItemStack(Items.DIAMOND_HELMET);
+						/* if (DragonArmorMaterial.DIAMOND == material) */ base = Ingredient.fromItems(Items.DIAMOND_HELMET);
 					break;
 				}
 
@@ -1269,10 +1322,10 @@ public class NostrumMagica {
 								EMagicElement.PHYSICAL,
 								new ReagentType[] { ReagentType.MANDRAKE_ROOT, ReagentType.SKY_ASH,
 										ReagentType.BLACK_PEARL, ReagentType.MANI_DUST },
-								base, new ItemStack[] { ItemStack.EMPTY, base, cost, ItemStack.EMPTY },
+								base, new Ingredient[] { Ingredient.EMPTY, base, cost, Ingredient.EMPTY },
 								new RRequirementResearch("dragon_armor"), new OutcomeSpawnItem(result.copy())));
 
-				if (!prev.isEmpty()) {
+				if (prev != Ingredient.EMPTY) {
 					// Upgrade ritual
 					RitualRegistry.instance()
 							.addRitual(RitualRecipe.createTier3(
@@ -1280,97 +1333,105 @@ public class NostrumMagica {
 									result, EMagicElement.PHYSICAL,
 									new ReagentType[] { ReagentType.MANDRAKE_ROOT, ReagentType.SKY_ASH,
 											ReagentType.BLACK_PEARL, ReagentType.MANI_DUST },
-									prev, new ItemStack[] { ItemStack.EMPTY, augment, cost, ItemStack.EMPTY },
+									prev, new Ingredient[] { Ingredient.EMPTY, augment, cost, Ingredient.EMPTY },
 									new RRequirementResearch("dragon_armor"), new OutcomeSpawnItem(result.copy())));
 				}
 			}
 		}
 
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("improve_hookshot_medium",
-				new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.MEDIUM, false)),
+				new ItemStack(NostrumItems.hookshotMedium),
 				EMagicElement.PHYSICAL,
 				new ReagentType[] { ReagentType.SPIDER_SILK, ReagentType.SPIDER_SILK, ReagentType.SKY_ASH,
 						ReagentType.MANI_DUST },
-				new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.WEAK, false)),
-				new ItemStack[] { new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE),
-						NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), ItemStack.EMPTY,
-						new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE) },
+				Ingredient.fromTag(NostrumItemTags.Items.HookshotWeak),
+				new Ingredient[] { Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_IRON),
+						Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+						Ingredient.EMPTY,
+						Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_IRON) },
 				new RRequirementResearch("hookshot_medium"), new OutcomeSpawnItem(
-						new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.MEDIUM, false)))));
+						new ItemStack(NostrumItems.hookshotMedium))));
 
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("improve_hookshot_strong",
-				new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.STRONG, false)), null,
+				new ItemStack(NostrumItems.hookshotStrong), null,
 				new ReagentType[] { ReagentType.MANI_DUST, ReagentType.BLACK_PEARL, ReagentType.SKY_ASH,
 						ReagentType.SPIDER_SILK },
-				new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.MEDIUM, false)),
-				new ItemStack[] { new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE),
-						NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
-						new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE),
-						new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE) },
+				Ingredient.fromTag(NostrumItemTags.Items.HookshotMedium),
+				new Ingredient[] { Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_IRON),
+						Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge),
+						Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_IRON),
+						Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_IRON) },
 				new RRequirementResearch("hookshot_strong"), new OutcomeSpawnItem(
-						new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.STRONG, false)))));
+						new ItemStack(NostrumItems.hookshotStrong))));
 
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("improve_hookshot_claw",
-				new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.CLAW, false)), null,
+				new ItemStack(NostrumItems.hookshotClaw), null,
 				new ReagentType[] { ReagentType.MANI_DUST, ReagentType.BLACK_PEARL, ReagentType.SKY_ASH,
 						ReagentType.SPIDER_SILK },
-				new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.STRONG, false)),
-				new ItemStack[] { new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE),
-						NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1),
-						new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE),
-						new ItemStack(Blocks.IRON_BLOCK, 1, OreDictionary.WILDCARD_VALUE) },
+				Ingredient.fromTag(NostrumItemTags.Items.HookshotStrong),
+				new Ingredient[] { Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_IRON),
+						Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+						Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_IRON),
+						Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_IRON) },
 				new RRequirementResearch("hookshot_claw"), new OutcomeSpawnItem(
-						new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.CLAW, false)))));
+						new ItemStack(NostrumItems.hookshotClaw))));
 
 		// Reagent bag
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("reagent_bag",
-				new ItemStack(ReagentBag.instance()), null, new ReagentType[] { ReagentType.SPIDER_SILK,
+				new ItemStack(NostrumItems.reagentBag), null, new ReagentType[] { ReagentType.SPIDER_SILK,
 						ReagentType.MANDRAKE_ROOT, ReagentType.GINSENG, ReagentType.SPIDER_SILK },
-				NostrumResourceItem.getItem(ResourceType.TOKEN, 1),
-				new ItemStack[] { new ItemStack(Items.LEATHER), new ItemStack(Items.GOLD_INGOT),
-						new ItemStack(Items.LEATHER), new ItemStack(Items.LEATHER) },
-				new RRequirementResearch("reagent_bag"), new OutcomeSpawnItem(new ItemStack(ReagentBag.instance()))));
+				Ingredient.fromTag(NostrumItemTags.Items.MagicToken),
+				new Ingredient[] { Ingredient.fromTag(Tags.Items.LEATHER),
+						Ingredient.fromTag(Tags.Items.INGOTS_GOLD),
+						Ingredient.fromTag(Tags.Items.LEATHER),
+						Ingredient.fromTag(Tags.Items.LEATHER),
+						},
+				new RRequirementResearch("reagent_bag"), new OutcomeSpawnItem(new ItemStack(NostrumItems.reagentBag))));
 
 		// Rune bag
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3(
-				"rune_bag", new ItemStack(RuneBag.instance()), null, new ReagentType[] { ReagentType.SPIDER_SILK,
+				"rune_bag", new ItemStack(NostrumItems.runeBag), null, new ReagentType[] { ReagentType.SPIDER_SILK,
 						ReagentType.MANDRAKE_ROOT, ReagentType.GINSENG, ReagentType.SPIDER_SILK },
-				new ItemStack(ReagentBag.instance()),
-				new ItemStack[] { new ItemStack(Items.LEATHER), new ItemStack(Items.GOLD_INGOT),
-						SpellRune.getRune(EMagicElement.FIRE, 1), new ItemStack(Items.LEATHER) },
-				new RRequirementResearch("rune_bag"), new OutcomeSpawnItem(new ItemStack(RuneBag.instance()))));
+				Ingredient.fromItems(NostrumItems.reagentBag),
+				new Ingredient[] { Ingredient.fromTag(Tags.Items.LEATHER),
+						Ingredient.fromTag(Tags.Items.INGOTS_GOLD),
+						Ingredient.fromTag(NostrumItemTags.Items.RuneAny),
+						Ingredient.fromTag(Tags.Items.LEATHER)
+						},
+				new RRequirementResearch("rune_bag"), new OutcomeSpawnItem(new ItemStack(NostrumItems.runeBag))));
 
 		// Mage Staff
-		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("mage_staff", new ItemStack(MageStaff.instance()),
+		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("mage_staff", new ItemStack(NostrumItems.mageStaff),
 				null,
 				new ReagentType[] {
 						ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.GINSENG, ReagentType.MANI_DUST },
-				NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1),
-				new ItemStack[] { new ItemStack(Items.LEATHER),
-						new ItemStack(Blocks.PLANKS, 1, OreDictionary.WILDCARD_VALUE),
-						new ItemStack(Blocks.PLANKS, 1, OreDictionary.WILDCARD_VALUE), new ItemStack(Items.LEATHER) },
-				new RRequirementResearch("mage_staff"), new OutcomeSpawnItem(new ItemStack(MageStaff.instance()))));
+				Ingredient.fromItems(NostrumItems.crystalSmall),
+				new Ingredient[] { Ingredient.fromTag(Tags.Items.LEATHER),
+						Ingredient.fromTag(ItemTags.PLANKS),
+						Ingredient.fromTag(ItemTags.PLANKS),
+						Ingredient.fromTag(Tags.Items.LEATHER) },
+				new RRequirementResearch("mage_staff"), new OutcomeSpawnItem(new ItemStack(NostrumItems.mageStaff))));
 
 		// Thanos Staff
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("thanos_staff",
-				new ItemStack(ThanosStaff.instance()), null,
+				new ItemStack(NostrumItems.thanosStaff), null,
 				new ReagentType[] {
 						ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST },
-				new ItemStack(ThanoPendant.instance()),
-				new ItemStack[] { NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1),
-						new ItemStack(MageStaff.instance()), new ItemStack(MageStaff.instance()),
-						NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1) },
-				new RRequirementResearch("thanos_staff"), new OutcomeSpawnItem(new ItemStack(ThanosStaff.instance()))));
+				Ingredient.fromItems(NostrumItems.thanoPendant),
+				new Ingredient[] { Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall),
+						Ingredient.fromItems(NostrumItems.mageStaff), Ingredient.fromItems(NostrumItems.mageStaff),
+						Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall) },
+				new RRequirementResearch("thanos_staff"), new OutcomeSpawnItem(new ItemStack(NostrumItems.thanosStaff))));
 
 		// Lore Table
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("lore_table", new ItemStack(LoreTable.instance()),
 				null,
 				new ReagentType[] {
 						ReagentType.MANI_DUST, ReagentType.GINSENG, ReagentType.CRYSTABLOOM, ReagentType.MANI_DUST },
-				NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1),
-				new ItemStack[] { new ItemStack(Blocks.PLANKS, 1, OreDictionary.WILDCARD_VALUE),
-						new ItemStack(Items.PAPER), new ItemStack(Blocks.CRAFTING_TABLE),
-						new ItemStack(Blocks.PLANKS, 1, OreDictionary.WILDCARD_VALUE) },
+				Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall),
+				new Ingredient[] { Ingredient.fromTag(ItemTags.PLANKS),
+						Ingredient.fromItems(Items.PAPER), Ingredient.fromItems(Blocks.CRAFTING_TABLE),
+						Ingredient.fromTag(ItemTags.PLANKS) },
 				new RRequirementResearch("loretable"), new OutcomeSpawnItem(new ItemStack(LoreTable.instance()))));
 
 		// Modification Table
@@ -1378,10 +1439,10 @@ public class NostrumMagica {
 				.addRitual(RitualRecipe.createTier3("modification_table", new ItemStack(ModificationTable.instance()),
 						null, new ReagentType[] { ReagentType.MANI_DUST, ReagentType.BLACK_PEARL,
 								ReagentType.CRYSTABLOOM, ReagentType.BLACK_PEARL },
-						NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
-						new ItemStack[] { new ItemStack(Blocks.PLANKS, 1, OreDictionary.WILDCARD_VALUE),
-								new ItemStack(Items.PAPER), new ItemStack(LoreTable.instance()),
-								new ItemStack(Blocks.PLANKS, 1, OreDictionary.WILDCARD_VALUE) },
+						Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge),
+						new Ingredient[] { Ingredient.fromTag(ItemTags.PLANKS),
+								Ingredient.fromItems(Items.PAPER), Ingredient.fromItems(LoreTable.instance()),
+								Ingredient.fromTag(ItemTags.PLANKS) },
 						new RRequirementResearch("modification_table"),
 						new OutcomeSpawnItem(new ItemStack(ModificationTable.instance()))));
 
@@ -1391,11 +1452,11 @@ public class NostrumMagica {
 						EMagicElement.ENDER,
 						new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.SKY_ASH, ReagentType.MANDRAKE_ROOT,
 								ReagentType.BLACK_PEARL },
-						new ItemStack(Blocks.CARPET, 1, OreDictionary.WILDCARD_VALUE),
-						new ItemStack[] { NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1),
-								new ItemStack(Items.ENDER_PEARL),
-								new ItemStack(ChalkItem.instance(), 1, OreDictionary.WILDCARD_VALUE),
-								NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1) },
+						Ingredient.fromTag(ItemTags.CARPETS),
+						new Ingredient[] { Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall),
+								Ingredient.fromTag(Tags.Items.ENDER_PEARLS),
+								Ingredient.fromItems(NostrumItems.chalkItem),
+								Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall) },
 						new RRequirementResearch("teleportrune"),
 						new OutcomeSpawnItem(new ItemStack(TeleportRune.instance(), 2))));
 
@@ -1411,9 +1472,9 @@ public class NostrumMagica {
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("active_hopper",
 				new ItemStack(ActiveHopper.instance), null, new ReagentType[] { ReagentType.MANDRAKE_ROOT,
 						ReagentType.SPIDER_SILK, ReagentType.GINSENG, ReagentType.CRYSTABLOOM },
-				new ItemStack(Blocks.HOPPER),
-				new ItemStack[] { new ItemStack(Blocks.HOPPER), new ItemStack(Blocks.REDSTONE_BLOCK),
-						new ItemStack(Blocks.HOPPER), new ItemStack(Blocks.HOPPER) },
+				Ingredient.fromItems(Blocks.HOPPER),
+				new Ingredient[] { Ingredient.fromStacks(new ItemStack(Blocks.HOPPER)), Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_REDSTONE),
+						Ingredient.fromStacks(new ItemStack(Blocks.HOPPER)), Ingredient.fromStacks(new ItemStack(Blocks.HOPPER)) },
 				new RRequirementResearch("active_hopper"),
 				new OutcomeSpawnItem(new ItemStack(ActiveHopper.instance, 4))));
 
@@ -1421,9 +1482,12 @@ public class NostrumMagica {
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3(
 				"item_duct", new ItemStack(ItemDuct.instance), null, new ReagentType[] { ReagentType.SPIDER_SILK,
 						ReagentType.SPIDER_SILK, ReagentType.GINSENG, ReagentType.MANDRAKE_ROOT },
-				new ItemStack(Blocks.HOPPER),
-				new ItemStack[] { new ItemStack(Items.IRON_INGOT), new ItemStack(Blocks.IRON_BLOCK),
-						new ItemStack(Items.IRON_INGOT), new ItemStack(Blocks.REDSTONE_BLOCK) },
+				Ingredient.fromItems(Blocks.HOPPER),
+				new Ingredient[] { Ingredient.fromTag(Tags.Items.INGOTS_IRON),
+						Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_IRON),
+						Ingredient.fromTag(Tags.Items.INGOTS_IRON),
+						Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_REDSTONE),
+						},
 				new RRequirementResearch("item_duct"), new OutcomeSpawnItem(new ItemStack(ItemDuct.instance, 16))));
 
 		// Facade
@@ -1431,11 +1495,12 @@ public class NostrumMagica {
 				null,
 				new ReagentType[] {
 						ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.GRAVE_DUST, ReagentType.GINSENG },
-				new ItemStack(Blocks.GLASS, 1, OreDictionary.WILDCARD_VALUE),
-				new ItemStack[] { new ItemStack(Blocks.PLANKS, 1, OreDictionary.WILDCARD_VALUE),
-						NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1),
-						ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1),
-						new ItemStack(Blocks.GLOWSTONE, 1, OreDictionary.WILDCARD_VALUE) },
+				Ingredient.fromTag(Tags.Items.GLASS),
+				new Ingredient[] { Ingredient.fromTag(ItemTags.PLANKS),
+						Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall),
+						Ingredient.fromItems(NostrumItems.reagentManiDust),
+						Ingredient.fromItems(Items.GLOWSTONE)
+						},
 				new RRequirementResearch("magicfacade"), new OutcomeSpawnItem(new ItemStack(MimicBlock.facade(), 8))));
 
 		// Door
@@ -1443,53 +1508,58 @@ public class NostrumMagica {
 				null,
 				new ReagentType[] {
 						ReagentType.GRAVE_DUST, ReagentType.CRYSTABLOOM, ReagentType.GRAVE_DUST, ReagentType.GINSENG },
-				new ItemStack(Items.IRON_DOOR, 1, OreDictionary.WILDCARD_VALUE),
-				new ItemStack[] { new ItemStack(MimicBlock.facade()), new ItemStack(MimicBlock.facade()),
-						new ItemStack(MimicBlock.facade()), new ItemStack(MimicBlock.facade()) },
+				Ingredient.fromItems(Items.IRON_DOOR),
+				new Ingredient[] { Ingredient.fromStacks(new ItemStack(MimicBlock.facade())),
+						Ingredient.fromStacks(new ItemStack(MimicBlock.facade())),
+						Ingredient.fromStacks(new ItemStack(MimicBlock.facade())),
+						Ingredient.fromStacks(new ItemStack(MimicBlock.facade()))
+						},
 				new RRequirementResearch("magicfacade"), new OutcomeSpawnItem(new ItemStack(MimicBlock.door(), 1))));
 
 		// Dragon revive
 		RitualRegistry.instance()
 				.addRitual(RitualRecipe.createTier3("revive_soulbound_pet_dragon",
-						new ItemStack(DragonSoulItem.instance()), null, new ReagentType[] { ReagentType.GRAVE_DUST,
+						new ItemStack(NostrumItems.dragonSoulItem), null, new ReagentType[] { ReagentType.GRAVE_DUST,
 								ReagentType.MANDRAKE_ROOT, ReagentType.CRYSTABLOOM, ReagentType.MANI_DUST },
-						new ItemStack(DragonSoulItem.instance()),
-						new ItemStack[] { ItemStack.EMPTY, NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1),
-								new ItemStack(Items.EGG), ItemStack.EMPTY },
+						Ingredient.fromItems(NostrumItems.dragonSoulItem),
+						new Ingredient[] { Ingredient.EMPTY, Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+								Ingredient.fromTag(Tags.Items.EGGS), Ingredient.EMPTY },
 						new RRequirementResearch("soulbound_pets"), new OutcomeReviveSoulboundPet()));
 
 		// Wolf revive
 		RitualRegistry.instance()
 				.addRitual(RitualRecipe.createTier3("revive_soulbound_pet_wolf",
-						new ItemStack(ArcaneWolfSoulItem.instance()), null, new ReagentType[] { ReagentType.GRAVE_DUST,
+						new ItemStack(NostrumItems.arcaneWolfSoulItem), null, new ReagentType[] { ReagentType.GRAVE_DUST,
 								ReagentType.MANDRAKE_ROOT, ReagentType.CRYSTABLOOM, ReagentType.MANI_DUST },
-						new ItemStack(ArcaneWolfSoulItem.instance()),
-						new ItemStack[] { ItemStack.EMPTY, NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1),
-								new ItemStack(Items.EGG), ItemStack.EMPTY },
+						Ingredient.fromItems(NostrumItems.arcaneWolfSoulItem),
+						new Ingredient[] { Ingredient.EMPTY, Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+								Ingredient.fromTag(Tags.Items.EGGS), Ingredient.EMPTY },
 						new RRequirementResearch("soulbound_pets"), new OutcomeReviveSoulboundPet()));
 
 		// Soul dagger
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("spawn_soul_dagger",
-				new ItemStack(SoulDagger.instance()), EMagicElement.FIRE, new ReagentType[] { ReagentType.SKY_ASH,
+				new ItemStack(NostrumItems.soulDagger), EMagicElement.FIRE, new ReagentType[] { ReagentType.SKY_ASH,
 						ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANDRAKE_ROOT },
-				new ItemStack(Items.END_CRYSTAL),
-				new ItemStack[] { new ItemStack(EnchantedWeapon.get(EMagicElement.WIND, 1)),
-						new ItemStack(EnchantedWeapon.get(EMagicElement.LIGHTNING, 1)),
-						NostrumResourceItem.getItem(ResourceType.SLAB_FIERCE, 1),
-						new ItemStack(EnchantedWeapon.get(EMagicElement.ICE, 1)) },
+				Ingredient.fromItems(Items.END_CRYSTAL),
+				new Ingredient[] { Ingredient.fromItems(EnchantedWeapon.get(EMagicElement.WIND, EnchantedWeapon.Type.NOVICE)),
+						Ingredient.fromItems(EnchantedWeapon.get(EMagicElement.LIGHTNING, EnchantedWeapon.Type.NOVICE)),
+						Ingredient.fromTag(NostrumItemTags.Items.SlabFierce),
+						Ingredient.fromItems(EnchantedWeapon.get(EMagicElement.ICE, EnchantedWeapon.Type.NOVICE)) },
 				new RRequirementResearch("soul_daggers"),
-				new OutcomeSpawnItem(new ItemStack(SoulDagger.instance(), 1))));
+				new OutcomeSpawnItem(new ItemStack(NostrumItems.soulDagger))));
 
 		// Mark wolf for transformation
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3(
 				"transform_wolf", new ItemStack(Items.BONE), null, new ReagentType[] { ReagentType.MANI_DUST,
 						ReagentType.CRYSTABLOOM, ReagentType.GRAVE_DUST, ReagentType.MANDRAKE_ROOT },
-				NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1),
-				new ItemStack[] { ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1),
-						new ItemStack(Items.BONE), NostrumResourceItem.getItem(ResourceType.SLAB_KIND, 1),
-						ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1) },
+				Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+				new Ingredient[] {
+						Ingredient.fromTag(NostrumItemTags.Items.ReagentManiDust),
+						Ingredient.fromTag(Tags.Items.BONES),
+						Ingredient.fromTag(NostrumItemTags.Items.SlabKind),
+						Ingredient.fromTag(NostrumItemTags.Items.ReagentManiDust) },
 				new RRequirementResearch("wolf_transformation"), new OutcomeApplyTransformation(20 * 60, (e) -> {
-					return e instanceof EntityWolf;
+					return e instanceof WolfEntity;
 				})));
 
 		// Paradox Mirror
@@ -1497,11 +1567,12 @@ public class NostrumMagica {
 				.addRitual(RitualRecipe.createTier3("paradox_mirror", new ItemStack(ParadoxMirrorBlock.instance()),
 						EMagicElement.ENDER, new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST,
 								ReagentType.MANDRAKE_ROOT, ReagentType.MANDRAKE_ROOT },
-						new ItemStack(Blocks.GLASS_PANE),
-						new ItemStack[] { new ItemStack(Items.GOLD_INGOT),
-								NostrumResourceItem.getItem(ResourceType.ENDER_BRISTLE, 1),
-								NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1),
-								new ItemStack(Items.EMERALD) },
+						Ingredient.fromTag(Tags.Items.GLASS_PANES),
+						new Ingredient[] { Ingredient.fromTag(Tags.Items.INGOTS_GOLD),
+								Ingredient.fromTag(NostrumItemTags.Items.EnderBristle),
+								Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+								Ingredient.fromTag(Tags.Items.GEMS_EMERALD)
+								},
 						new RRequirementResearch("paradox_mirrors"),
 						new OutcomeSpawnItem(new ItemStack(ParadoxMirrorBlock.instance(), 2))));
 
@@ -1511,11 +1582,11 @@ public class NostrumMagica {
 						.createTier3("mana_armorer", new ItemStack(ManaArmorerBlock.instance()), EMagicElement.ICE,
 								new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANI_DUST,
 										ReagentType.CRYSTABLOOM, ReagentType.MANDRAKE_ROOT },
-								new ItemStack(Items.END_CRYSTAL),
-								new ItemStack[] { NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
-										NostrumResourceItem.getItem(ResourceType.MANA_LEAF, 1),
-										NostrumResourceItem.getItem(ResourceType.SLAB_BALANCED, 1),
-										new ItemStack(DragonEggFragment.instance()) },
+								Ingredient.fromItems(Items.END_CRYSTAL),
+								new Ingredient[] { Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge),
+										Ingredient.fromItems(NostrumItems.resourceManaLeaf),
+										Ingredient.fromTag(NostrumItemTags.Items.SlabBalanced),
+										Ingredient.fromItems(NostrumItems.dragonEggFragment) },
 								new RRequirementResearch("mana_armor"),
 								new OutcomeSpawnItem(new ItemStack(ManaArmorerBlock.instance(), 1))));
 
@@ -1857,7 +1928,7 @@ public class NostrumMagica {
 //    			0, // Technique
 //    			1, // Finesse
 //    			new String[] {"mirror_shield"},
-//    			new String[] {MirrorShield.instance().getLoreKey()},
+//    			new String[] {NostrumItems.mirrorShield.getLoreKey()},
 //    			null,
 //    			new IReward[]{new AttributeReward(AwardType.MANA, 0.025f)})
 //    		.offset(4, 6);
@@ -1866,7 +1937,7 @@ public class NostrumMagica {
 //    			0,
 //    			0,
 //    			null,
-//    			new String[] {MageStaff.instance().getLoreKey()},
+//    			new String[] {NostrumItems.mageStaff.getLoreKey()},
 //    			null,
 //    			new IReward[]{new AttributeReward(AwardType.MANA, 0.025f)})
 //    		.offset(-4, 3);
@@ -1891,46 +1962,43 @@ public class NostrumMagica {
 		ShrineTrial.setTrial(EMagicElement.PHYSICAL, new TrialPhysical());
 	}
 
-	private static void registerDefaultResearch() {
+	private void registerDefaultResearch() {
 		// Init tabs first
-		NostrumResearchTab.MAGICA = new NostrumResearchTab("magica",
-				SpellTome.getItemstack(3, 1, (List<SpellTomeEnhancementWrapper>) null));
-		NostrumResearchTab.MYSTICISM = new NostrumResearchTab("mysticism",
-				NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1));
-		NostrumResearchTab.OUTFITTING = new NostrumResearchTab("outfitting", new ItemStack(MageStaff.instance()));
+		NostrumResearchTab.MAGICA = new NostrumResearchTab("magica", new ItemStack(NostrumItems.spellTomeCombat));
+		NostrumResearchTab.MYSTICISM = new NostrumResearchTab("mysticism", new ItemStack(NostrumItems.crystalSmall));
+		NostrumResearchTab.OUTFITTING = new NostrumResearchTab("outfitting", new ItemStack(NostrumItems.mageStaff));
 		NostrumResearchTab.TINKERING = new NostrumResearchTab("tinkering", new ItemStack(PutterBlock.instance()));
-		NostrumResearchTab.ADVANCED_MAGICA = new NostrumResearchTab("advanced_magica",
-				new ItemStack(ThanoPendant.instance()));
+		NostrumResearchTab.ADVANCED_MAGICA = new NostrumResearchTab("advanced_magica", new ItemStack(NostrumItems.thanoPendant));
 
 		// Then register researches
 
 		// Magica Tab
 		NostrumResearch.startBuilding().build("origin", NostrumResearchTab.MAGICA, Size.LARGE, 0, 0, false,
-				new ItemStack(SpellTome.instance()));
+				new ItemStack(NostrumItems.spellTomeNovice));
 
 		NostrumResearch.startBuilding().parent("origin")
-				.reference("builtin::guides::spellmaking", "info.spellmaking.name").reference(SpellRune.instance())
-				.reference(BlankScroll.instance()).reference(SpellScroll.instance()).reference(ReagentItem.instance())
+				.reference("builtin::guides::spellmaking", "info.spellmaking.name").reference(NostrumItems.spellRune)
+				.reference(NostrumItems.blankScroll).reference(NostrumItems.spellScroll).reference(NostrumItems.reagentMandrakeRoot)
 				.build("spellcraft", NostrumResearchTab.MAGICA, Size.GIANT, -1, 1, false,
-						new ItemStack(SpellScroll.instance()));
+						new ItemStack(NostrumItems.spellScroll));
 
-		NostrumResearch.startBuilding().parent("spellcraft").hiddenParent("rituals").lore(SpellPlate.instance())
+		NostrumResearch.startBuilding().parent("spellcraft").hiddenParent("rituals").lore(NostrumItems.spellPlateNovice)
 				.reference("builtin::guides::tomes", "info.tomes.name").reference("ritual::tome", "ritual.tome.name")
-				.reference(SpellTome.instance()).reference(SpellPlate.instance()).reference(SpellScroll.instance())
+				.reference(NostrumItems.spellTomeNovice).reference(NostrumItems.spellPlateNovice).reference(NostrumItems.spellScroll)
 				.build("spelltomes", NostrumResearchTab.MAGICA, Size.NORMAL, -2, 2, false,
-						new ItemStack(SpellPlate.instance()));
+						new ItemStack(NostrumItems.spellPlateNovice));
 
-		NostrumResearch.startBuilding().parent("spelltomes").lore(SpellTomePage.instance())
+		NostrumResearch.startBuilding().parent("spelltomes").lore(NostrumItems.spellTomePage)
 				.reference("builtin::guides::tomes", "info.tomes.name").reference("ritual::tome", "ritual.tome.name")
-				.reference(SpellTomePage.instance()).build("spelltomes_advanced", NostrumResearchTab.MAGICA,
-						Size.NORMAL, -1, 2, true, new ItemStack(SpellTomePage.instance()));
+				.reference(NostrumItems.spellTomePage).build("spelltomes_advanced", NostrumResearchTab.MAGICA,
+						Size.NORMAL, -1, 2, true, new ItemStack(NostrumItems.spellTomePage));
 
 		NostrumResearch.startBuilding().parent("spelltomes")
 				.reference("builtin::guides::spellmaking", "info.spellbinding.name")
 				.reference("ritual::spell_binding", "ritual.spell_binding.name").build("spellbinding",
-						NostrumResearchTab.MAGICA, Size.NORMAL, -2, 3, false, new ItemStack(SpellTome.instance()));
+						NostrumResearchTab.MAGICA, Size.NORMAL, -2, 3, false, new ItemStack(NostrumItems.spellTomeNovice));
 
-		NostrumResearch.startBuilding().parent("spellcraft").quest("lvl7").reference(MasteryOrb.instance())
+		NostrumResearch.startBuilding().parent("spellcraft").quest("lvl7").reference(NostrumItems.masteryOrb)
 				.reference("builtin::trials::fire", "info.trial.fire.name")
 				.reference("builtin::trials::ice", "info.trial.ice.name")
 				.reference("builtin::trials::earth", "info.trial.earth.name")
@@ -1938,24 +2006,24 @@ public class NostrumMagica {
 				.reference("builtin::trials::ender", "info.trial.ender.name")
 				.reference("builtin::trials::lightning", "info.trial.lightning.name")
 				.reference("builtin::trials::physical", "info.trial.physical.name").build("elemental_trials",
-						NostrumResearchTab.MAGICA, Size.NORMAL, -3, 2, true, new ItemStack(MasteryOrb.instance()));
+						NostrumResearchTab.MAGICA, Size.NORMAL, -3, 2, true, new ItemStack(NostrumItems.masteryOrb));
 
 		NostrumResearch.startBuilding().parent("origin").reference("builtin::guides::rituals", "info.rituals.name")
-				.reference(AltarItem.instance()).reference(ChalkItem.instance()).reference(ReagentItem.instance())
-				.reference(InfusedGemItem.instance()).build("rituals", NostrumResearchTab.MAGICA, Size.GIANT, 1, 1,
-						false, new ItemStack(InfusedGemItem.instance()));
+				.reference(NostrumItems.altarItem).reference(NostrumItems.chalkItem).reference(NostrumItems.reagentMandrakeRoot)
+				.reference(NostrumItems.infusedGemUnattuned).build("rituals", NostrumResearchTab.MAGICA, Size.GIANT, 1, 1,
+						false, new ItemStack(NostrumItems.infusedGemUnattuned));
 
 		NostrumResearch.startBuilding().parent("rituals").build("candles", NostrumResearchTab.MAGICA, Size.NORMAL, 2, 2,
 				false, new ItemStack(Candle.instance()));
 
-		NostrumResearch.startBuilding().hiddenParent("geotokens").parent("rituals").lore(PositionToken.instance())
+		NostrumResearch.startBuilding().hiddenParent("geotokens").parent("rituals").lore(NostrumItems.positionToken)
 				.spellComponent(EMagicElement.ENDER, EAlteration.GROWTH)
 				.spellComponent(EMagicElement.ENDER, EAlteration.SUPPORT).reference("ritual::mark", "ritual.mark.name")
 				.reference("ritual::recall", "ritual.recall.name")
 				.build("markrecall", NostrumResearchTab.MAGICA, Size.LARGE, 4, 2, true, new ItemStack(Items.COMPASS));
 
-		NostrumResearch.startBuilding().parent("markrecall").lore(ShrineSeekingGem.instance()).build("adv_markrecall",
-				NostrumResearchTab.MAGICA, Size.LARGE, 4, 3, false, new ItemStack(PositionToken.instance()));
+		NostrumResearch.startBuilding().parent("markrecall").lore(NostrumItems.resourceSeekingGem).build("adv_markrecall",
+				NostrumResearchTab.MAGICA, Size.LARGE, 4, 3, false, new ItemStack(NostrumItems.positionToken));
 
 		NostrumResearch.startBuilding().parent("rituals").reference("ritual::buff.luck", "ritual.buff.luck.name")
 				.reference("ritual::buff.speed", "ritual.buff.speed.name")
@@ -1970,43 +2038,43 @@ public class NostrumMagica {
 
 		NostrumResearch.startBuilding().parent("rituals").hiddenParent("magic_token").lore(EntityKoid.LoreKey)
 				.reference("ritual::koid", "ritual.koid.name").build("summonkoids", NostrumResearchTab.MAGICA,
-						Size.NORMAL, 3, 2, true, new ItemStack(EssenceItem.instance()));
+						Size.NORMAL, 3, 2, true, new ItemStack(NostrumItems.essencePhysical));
 
 		NostrumResearch.startBuilding().hiddenParent("spellcraft").parent("rituals")
 				.reference("ritual::lore_table", "ritual.lore_table.name").build("loretable", NostrumResearchTab.MAGICA,
 						Size.NORMAL, 2, 0, true, new ItemStack(LoreTable.instance()));
 
 		// Mysticism Tab (Resources)
-		NostrumResearch.startBuilding().hiddenParent("rituals").lore(ReagentItem.instance())
+		NostrumResearch.startBuilding().hiddenParent("rituals").lore(NostrumItems.reagentMandrakeRoot)
 				.reference("ritual::magic_token", "ritual.magic_token.name").build("magic_token",
 						NostrumResearchTab.MYSTICISM, Size.NORMAL, -1, 0, true,
-						NostrumResourceItem.getItem(ResourceType.TOKEN, 1));
+						new ItemStack(NostrumItems.resourceToken));
 
 		NostrumResearch.startBuilding().parent("magic_token").quest("lvl3")
 				.reference("ritual::magic_token_3", "ritual.magic_token_3.name").build("magic_token_3",
 						NostrumResearchTab.MYSTICISM, Size.NORMAL, -2, 0, true,
-						NostrumResourceItem.getItem(ResourceType.TOKEN, 1));
+						new ItemStack(NostrumItems.resourceToken));
 
-		NostrumResearch.startBuilding().hiddenParent("magic_token").lore(EssenceItem.instance())
+		NostrumResearch.startBuilding().hiddenParent("magic_token").lore(NostrumItems.essencePhysical)
 				.lore(EntityKoid.LoreKey).lore(EntityWisp.LoreKey)
 				.reference("ritual::essence_seed", "ritual.essence_seed.name").build("essence_seeds",
-						NostrumResearchTab.MYSTICISM, Size.NORMAL, -3, 0, false, new ItemStack(ReagentSeed.essence));
+						NostrumResearchTab.MYSTICISM, Size.NORMAL, -3, 0, false, new ItemStack(NostrumItems.reagentSeedEssence));
 
-		NostrumResearch.startBuilding().parent("magic_token").lore(NostrumResourceItem.instance()).quest("lvl3")
+		NostrumResearch.startBuilding().parent("magic_token").lore(NostrumItems.resourceToken).quest("lvl3")
 				.reference("ritual::kani", "ritual.kani.name").build("kani", NostrumResearchTab.MYSTICISM, Size.NORMAL,
-						-1, 1, true, NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1));
+						-1, 1, true, new ItemStack(NostrumItems.crystalMedium));
 
-		NostrumResearch.startBuilding().parent("kani").quest("lvl7").lore(NostrumResourceItem.instance())
+		NostrumResearch.startBuilding().parent("kani").quest("lvl7").lore(NostrumItems.resourceToken)
 				.reference("ritual::vani", "ritual.vani.name").build("vani", NostrumResearchTab.MYSTICISM, Size.LARGE,
-						-1, 2, true, NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1));
+						-1, 2, true, new ItemStack(NostrumItems.crystalLarge));
 
 		NostrumResearch.startBuilding().parent("kani")
 				.reference("ritual::create_seeking_gem", "ritual.create_seeking_gem.name").build("seeking_gems",
 						NostrumResearchTab.MYSTICISM, Size.NORMAL, 0, 1, true,
-						new ItemStack(ShrineSeekingGem.instance()));
+						new ItemStack(NostrumItems.resourceSeekingGem));
 
 		NostrumResearch.startBuilding().hiddenParent("magic_token").hiddenParent("spellcraft")
-				.lore(SpellRune.instance()).reference("ritual::rune.physical", "ritual.rune.physical.name")
+				.lore(NostrumItems.spellRune).reference("ritual::rune.physical", "ritual.rune.physical.name")
 				.reference("ritual::rune.single", "ritual.rune.single.name")
 				.reference("ritual::rune.inflict", "ritual.rune.inflict.name")
 				.reference("ritual::rune.trigger_touch", "ritual.rune.trigger_touch.name")
@@ -2017,52 +2085,52 @@ public class NostrumMagica {
 		NostrumResearch.startBuilding().hiddenParent("kani")
 				.reference("ritual::fierce_infusion", "ritual.fierce_infusion.name").build("fierce_infusion",
 						NostrumResearchTab.MYSTICISM, Size.NORMAL, 1, 0, true,
-						NostrumResourceItem.getItem(ResourceType.SLAB_FIERCE, 1));
+						new ItemStack(NostrumItems.resourceSlabFierce));
 
 		NostrumResearch.startBuilding().hiddenParent("kani")
 				.reference("ritual::kind_infusion", "ritual.kind_infusion.name").build("kind_infusion",
 						NostrumResearchTab.MYSTICISM, Size.NORMAL, 3, 0, true,
-						NostrumResourceItem.getItem(ResourceType.SLAB_KIND, 1));
+						new ItemStack(NostrumItems.resourceSlabKind));
 
 		NostrumResearch.startBuilding().hiddenParent("vani").parent("fierce_infusion").parent("kind_infusion")
 				.reference("ritual::balanced_infusion", "ritual.balanced_infusion.name").build("balanced_infusion",
 						NostrumResearchTab.MYSTICISM, Size.LARGE, 2, 1, true,
-						NostrumResourceItem.getItem(ResourceType.SLAB_BALANCED, 1));
+						new ItemStack(NostrumItems.resourceSlabBalanced));
 
 		// Outfitting (weapon/armor)
 		NostrumResearch.startBuilding().hiddenParent("rituals")
-				.reference("ritual::mage_staff", "ritual.mage_staff.name").lore(NostrumResourceItem.instance())
+				.reference("ritual::mage_staff", "ritual.mage_staff.name").lore(NostrumItems.resourceToken)
 				.build("mage_staff", NostrumResearchTab.OUTFITTING, Size.NORMAL, 1, 0, true,
-						new ItemStack(MageStaff.instance()));
+						new ItemStack(NostrumItems.mageStaff));
 
 		NostrumResearch.startBuilding().parent("mage_staff").hiddenParent("thano_pendant")
-				.reference("ritual::thanos_staff", "ritual.thanos_staff.name").lore(ThanoPendant.instance())
+				.reference("ritual::thanos_staff", "ritual.thanos_staff.name").lore(NostrumItems.thanoPendant)
 				.build("thanos_staff", NostrumResearchTab.OUTFITTING, Size.LARGE, 2, 0, true,
-						new ItemStack(ThanosStaff.instance()));
+						new ItemStack(NostrumItems.thanosStaff));
 
 		NostrumResearch.startBuilding().parent("mage_staff").parent("enchanted_weapons").hiddenParent("vani")
 				.reference("ritual::spawn_warlock_sword", "ritual.spawn_warlock_sword.name").build("warlock_sword",
-						NostrumResearchTab.OUTFITTING, Size.LARGE, 1, 1, true, new ItemStack(WarlockSword.instance()));
+						NostrumResearchTab.OUTFITTING, Size.LARGE, 1, 1, true, new ItemStack(NostrumItems.warlockSword));
 
 		NostrumResearch.startBuilding().parent("thanos_staff").parent("warlock_sword").hiddenParent("vani")
 				.reference("ritual::spawn_soul_dagger", "ritual.spawn_soul_dagger.name").build("soul_daggers",
-						NostrumResearchTab.OUTFITTING, Size.LARGE, 2, 1, true, new ItemStack(SoulDagger.instance()));
+						NostrumResearchTab.OUTFITTING, Size.LARGE, 2, 1, true, new ItemStack(NostrumItems.soulDagger));
 
 		NostrumResearch.startBuilding().parent("enchanted_armor")
 				.reference("ritual::spawn_enchanted_weapon", "ritual.spawn_enchanted_weapon.name")
 				.build("enchanted_weapons", NostrumResearchTab.OUTFITTING, Size.LARGE, -1, 1, true,
-						new ItemStack(EnchantedWeapon.get(EMagicElement.WIND, 2)));
+						new ItemStack(EnchantedWeapon.get(EMagicElement.WIND, EnchantedWeapon.Type.MASTER)));
 
 		NostrumResearch.startBuilding().hiddenParent("rituals").quest("lvl4")
 				.reference("ritual::spawn_enchanted_armor", "ritual.spawn_enchanted_armor.name")
 				.build("enchanted_armor", NostrumResearchTab.OUTFITTING, Size.GIANT, -2, 0, true,
-						new ItemStack(EnchantedArmor.get(EMagicElement.FIRE, EquipmentSlotType.CHEST, 2)));
+						new ItemStack(EnchantedArmor.get(EMagicElement.FIRE, EquipmentSlotType.CHEST, EnchantedArmor.Type.MASTER)));
 
 		NostrumResearch.startBuilding().parent("enchanted_armor").hiddenParent("kind_infusion")
 				.hiddenParent("fierce_infusion")
 				.reference("ritual::spawn_enchanted_armor", "ritual.spawn_enchanted_armor.name")
 				.build("enchanted_armor_adv", NostrumResearchTab.OUTFITTING, Size.LARGE, -1, 2, true,
-						new ItemStack(EnchantedArmor.get(EMagicElement.ENDER, EquipmentSlotType.CHEST, 3)));
+						new ItemStack(EnchantedArmor.get(EMagicElement.ENDER, EquipmentSlotType.CHEST, EnchantedArmor.Type.MASTER)));
 
 		NostrumResearch.startBuilding().parent("enchanted_armor").lore(EntityTameDragonRed.TameRedDragonLore.instance())
 				.reference("ritual::craft_dragonarmor_body_iron", "ritual.craft_dragonarmor_body_iron.name")
@@ -2071,37 +2139,37 @@ public class NostrumMagica {
 
 		NostrumResearch.startBuilding().parent("enchanted_armor").parent(baubles.isEnabled() ? "belts" : "origin")
 				.reference("ritual::mirror_shield", "ritual.mirror_shield.name").build("mirror_shield",
-						NostrumResearchTab.OUTFITTING, Size.LARGE, -3, 3, true, new ItemStack(MirrorShield.instance()));
+						NostrumResearchTab.OUTFITTING, Size.LARGE, -3, 3, true, new ItemStack(NostrumItems.mirrorShield));
 
-		NostrumResearch.startBuilding().parent("mirror_shield").lore(MirrorShield.instance())
+		NostrumResearch.startBuilding().parent("mirror_shield").lore(NostrumItems.mirrorShield)
 				.reference("ritual::true_mirror_shield", "ritual.true_mirror_shield.name").build("true_mirror_shield",
 						NostrumResearchTab.OUTFITTING, Size.NORMAL, -3, 4, false,
-						new ItemStack(MirrorShieldImproved.instance()));
+						new ItemStack(NostrumItems.mirrorShieldImproved));
 
-		NostrumResearch.startBuilding().hiddenParent("rituals").lore(ReagentItem.instance())
+		NostrumResearch.startBuilding().hiddenParent("rituals").lore(NostrumItems.reagentMandrakeRoot)
 				.reference("ritual::reagent_bag", "ritual.reagent_bag.name").build("reagent_bag",
-						NostrumResearchTab.OUTFITTING, Size.NORMAL, -2, -1, true, new ItemStack(ReagentBag.instance()));
+						NostrumResearchTab.OUTFITTING, Size.NORMAL, -2, -1, true, new ItemStack(NostrumItems.reagentBag));
 
-		NostrumResearch.startBuilding().parent("reagent_bag").lore(SpellRune.instance())
+		NostrumResearch.startBuilding().parent("reagent_bag").lore(NostrumItems.spellRune)
 				.reference("ritual::rune_bag", "ritual.rune_bag.name").build("rune_bag", NostrumResearchTab.OUTFITTING,
-						Size.NORMAL, -3, -1, true, new ItemStack(RuneBag.instance()));
+						Size.NORMAL, -3, -1, true, new ItemStack(NostrumItems.runeBag));
 
-		NostrumResearch.startBuilding().hiddenParent("rituals").hiddenParent("kani").lore(HookshotItem.instance())
+		NostrumResearch.startBuilding().hiddenParent("rituals").hiddenParent("kani").lore(NostrumItems.hookshotWeak)
 				.reference("ritual::improve_hookshot_medium", "ritual.improve_hookshot_medium.name")
 				.build("hookshot_medium", NostrumResearchTab.OUTFITTING, Size.NORMAL, 1, -1, true,
-						new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.MEDIUM, false)));
+						new ItemStack(NostrumItems.hookshotMedium));
 
 		NostrumResearch.startBuilding().parent("hookshot_medium").hiddenParent("vani")
 				.reference("ritual::improve_hookshot_strong", "ritual.improve_hookshot_strong.name")
 				.build("hookshot_strong", NostrumResearchTab.OUTFITTING, Size.NORMAL, 2, -1, false,
-						new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.STRONG, false)));
+						new ItemStack(NostrumItems.hookshotStrong));
 
 		NostrumResearch.startBuilding().parent("hookshot_strong")
 				.reference("ritual::improve_hookshot_claw", "ritual.improve_hookshot_claw.name").build("hookshot_claw",
 						NostrumResearchTab.OUTFITTING, Size.NORMAL, 3, -1, false,
-						new ItemStack(HookshotItem.instance(), 1, HookshotItem.MakeMeta(HookshotType.CLAW, false)));
+						new ItemStack(NostrumItems.hookshotClaw));
 
-		NostrumResearch.startBuilding().hiddenParent("magic_token").lore(EssenceItem.instance())
+		NostrumResearch.startBuilding().hiddenParent("magic_token").lore(NostrumItems.essencePhysical)
 				.reference("ritual::charm.physical", "ritual.charm.physical.name")
 				.reference("ritual::charm.fire", "ritual.charm.fire.name")
 				.reference("ritual::charm.ice", "ritual.charm.ice.name")
@@ -2113,30 +2181,30 @@ public class NostrumMagica {
 						MagicCharm.getCharm(EMagicElement.ENDER, 1));
 
 		// Tinkering
-		NostrumResearch.startBuilding().parent("rituals").quest("lvl4").reference(PositionCrystal.instance()).build(
+		NostrumResearch.startBuilding().parent("rituals").quest("lvl4").reference(NostrumItems.positionCrystal).build(
 				"geogems", NostrumResearchTab.TINKERING, Size.LARGE, 1, -1, false,
-				new ItemStack(PositionCrystal.instance()));
+				new ItemStack(NostrumItems.positionCrystal));
 
-		NostrumResearch.startBuilding().parent("geogems").lore(PositionCrystal.instance())
-				.reference(PositionToken.instance()).build("geotokens", NostrumResearchTab.TINKERING, Size.LARGE, 1, 1,
-						true, new ItemStack(PositionToken.instance()));
+		NostrumResearch.startBuilding().parent("geogems").lore(NostrumItems.positionCrystal)
+				.reference(NostrumItems.positionToken).build("geotokens", NostrumResearchTab.TINKERING, Size.LARGE, 1, 1,
+						true, new ItemStack(NostrumItems.positionToken));
 
 		NostrumResearch.startBuilding().parent("geotokens").hiddenParent("markrecall").hiddenParent("balanced_infusion")
-				// .lore(PositionToken.instance())
+				// .lore(NostrumItems.positionToken)
 				.quest("lvl10").reference("builtin::guides::obelisks", "info.obelisks.name")
 				.reference("ritual::create_obelisk", "ritual.create_obelisk.name").build("obelisks",
 						NostrumResearchTab.TINKERING, Size.GIANT, 2, 2, true,
-						new ItemStack(DungeonBlock.instance(), 1, DungeonBlock.Type.DARK.ordinal()));
+						new ItemStack(DungeonBlock.instance()));
 
 		NostrumResearch.startBuilding().hiddenParent("markrecall").parent("obelisks")
 				.reference("ritual::spawn_sorcery_portal", "ritual.spawn_sorcery_portal.name").build("sorceryportal",
 						NostrumResearchTab.TINKERING, Size.NORMAL, 2, 3, true, new ItemStack(SorceryPortal.instance()));
 
-		NostrumResearch.startBuilding().parent("geogems").hiddenParent("markrecall").lore(PositionCrystal.instance())
+		NostrumResearch.startBuilding().parent("geogems").hiddenParent("markrecall").lore(NostrumItems.positionCrystal)
 				.quest("lvly").reference("ritual::teleportrune", "ritual.teleportrune.name").build("teleportrune",
 						NostrumResearchTab.TINKERING, Size.NORMAL, 2, 0, true, new ItemStack(TeleportRune.instance()));
 
-		NostrumResearch.startBuilding().parent("geogems").hiddenParent("item_duct").lore(PositionCrystal.instance())
+		NostrumResearch.startBuilding().parent("geogems").hiddenParent("item_duct").lore(NostrumItems.positionCrystal)
 				.quest("lvly").reference("ritual::paradox_mirror", "ritual.paradox_mirror.name")
 				.build("paradox_mirrors", NostrumResearchTab.TINKERING, Size.NORMAL, 3, 0, true,
 						new ItemStack(ParadoxMirrorBlock.instance()));
@@ -2164,15 +2232,15 @@ public class NostrumMagica {
 			builder.reference("ritual::thano_infusion", "ritual.thano_infusion.name");
 			if (!ModConfig.config.usingEasierThano()) {
 				builder.hiddenParent("vani").hiddenParent("reagent_bag").hiddenParent("mage_staff")
-						.lore(NostrumResourceItem.instance()).lore(MasteryOrb.instance()).lore(EssenceItem.instance());
+						.lore(NostrumItems.resourceToken).lore(NostrumItems.masteryOrb).lore(NostrumItems.essencePhysical);
 
 			} else {
-				builder.hiddenParent("kani").hiddenParent("reagent_bag").lore(NostrumResourceItem.instance())
-						.lore(EssenceItem.instance());
+				builder.hiddenParent("kani").hiddenParent("reagent_bag").lore(NostrumItems.resourceToken)
+						.lore(NostrumItems.essencePhysical);
 			}
 
 			builder.build("thano_pendant", NostrumResearchTab.ADVANCED_MAGICA, Size.GIANT, 2, -1, true,
-					new ItemStack(ThanoPendant.instance()));
+					new ItemStack(NostrumItems.thanoPendant));
 		}
 
 		NostrumResearch.startBuilding().hiddenParent("vani").hiddenParent("loretable")
@@ -2181,34 +2249,34 @@ public class NostrumMagica {
 						NostrumResearchTab.ADVANCED_MAGICA, Size.GIANT, 0, -1, true,
 						new ItemStack(ModificationTable.instance()));
 
-		NostrumResearch.startBuilding().hiddenParent("vani").lore(NostrumRoseItem.instance())
+		NostrumResearch.startBuilding().hiddenParent("vani").lore(NostrumItems.roseBlood)
 				.reference("ritual::form_essential_ooze", "ritual.form_essential_ooze.name")
 				.reference("ritual::form_living_flute", "ritual.form_living_flute.name")
 				.reference("ritual::form_eldrich_pendant", "ritual.form_eldrich_pendant.name").build("stat_items",
 						NostrumResearchTab.ADVANCED_MAGICA, Size.GIANT, -2, -1, true,
-						NostrumSkillItem.getItem(SkillItemType.PENDANT, 1));
+						new ItemStack(NostrumItems.skillPendant));
 
 		NostrumResearch.startBuilding().parent("stat_items")
 				.reference("ritual::form_primordial_mirror", "ritual.form_primordial_mirror.name")
 				.build("stat_items_adv", NostrumResearchTab.ADVANCED_MAGICA, Size.NORMAL, -2, 0, true,
-						NostrumSkillItem.getItem(SkillItemType.MIRROR, 1));
+						new ItemStack(NostrumItems.skillMirror));
 
-		NostrumResearch.startBuilding().parent("stat_items_adv").lore(DragonEggFragment.instance())
-				.lore(NostrumSkillItem.instance())
+		NostrumResearch.startBuilding().parent("stat_items_adv").lore(NostrumItems.dragonEggFragment)
+				.lore(NostrumItems.skillPendant)
 				.reference("ritual::form_primordial_mirror", "ritual.form_primordial_mirror.name")
 				.build("stat_items_wing", NostrumResearchTab.ADVANCED_MAGICA, Size.NORMAL, -2, 1, true,
-						NostrumSkillItem.getItem(SkillItemType.WING, 1));
+						new ItemStack(NostrumItems.resourceDragonWing));
 
 		NostrumResearch.startBuilding().parent("stat_items").hiddenParent("sorceryportal")
 				.reference("ritual::ender_pin", "ritual.ender_pin.name").build("ender_pin",
 						NostrumResearchTab.ADVANCED_MAGICA, Size.LARGE, -3, 0, true,
-						NostrumSkillItem.getItem(SkillItemType.ENDER_PIN, 1));
+						new ItemStack(NostrumItems.skillEnderPin));
 
 		NostrumResearch.startBuilding().hiddenParent("kani").lore(IEntityPet.SoulBoundLore.instance())
 				.reference("ritual::revive_soulbound_pet_dragon", "ritual.revive_soulbound_pet_dragon.name")
 				.reference("ritual::revive_soulbound_pet_wolf", "ritual.revive_soulbound_pet_wolf.name")
 				.build("soulbound_pets", NostrumResearchTab.ADVANCED_MAGICA, Size.GIANT, 0, 1, true,
-						new ItemStack(DragonSoulItem.instance()));
+						new ItemStack(NostrumItems.dragonSoulItem));
 
 		NostrumResearch.startBuilding().parent("rituals").hiddenParent("soul_daggers").hiddenParent("kani")
 				.lore(WolfTameLore.instance()).reference("ritual::transform_wolf", "ritual.transform_wolf.name")
@@ -2522,7 +2590,7 @@ public class NostrumMagica {
 			for (EntityTameDragonRed dragon : dragonList) {
 				ITameDragon tame = (ITameDragon) dragon;
 
-				if (onlyOwned && (!tame.isEntityTamed() || tame.getOwner() != entity)) {
+				if (onlyOwned && (!tame.isEntityTamed() || tame.getLivingOwner() != entity)) {
 					continue;
 				}
 
@@ -2535,53 +2603,62 @@ public class NostrumMagica {
 
 	public static List<LivingEntity> getTamedEntities(LivingEntity owner) {
 		List<LivingEntity> ents = new ArrayList<>();
-		final UUID id = owner.getUniqueID();
-		for (Entity e : owner.world.loadedEntityList) {
+		
+		Iterable<Entity> entities;
+		
+		if (owner.world instanceof ServerWorld) {
+			entities = ((ServerWorld) owner.world).getEntities().collect(Collectors.toList());
+		} else {
+			entities = ((ClientWorld) owner.world).getAllEntities();
+		}
+		
+		for (Entity e : entities) {
 			if (!(e instanceof LivingEntity)) {
 				continue;
 			}
 
 			LivingEntity ent = (LivingEntity) e;
-			if (ent instanceof IEntityTameable) {
-				IEntityTameable tame = (IEntityTameable) ent;
-				if (tame.isEntityTamed() && tame.getOwnerId() != null && tame.getOwnerId().equals(id)) {
+			if (ent instanceof ITameableEntity) {
+				ITameableEntity tame = (ITameableEntity) ent;
+				if (tame.isEntityTamed() && tame.getLivingOwner() != null && tame.getLivingOwner().equals(owner)) {
 					ents.add(ent);
 				}
-			} else if (ent instanceof EntityTameable) {
-				EntityTameable tame = (EntityTameable) ent;
+			} else if (ent instanceof TameableEntity) {
+				TameableEntity tame = (TameableEntity) ent;
 				if (tame.isTamed() && tame.isOwner(owner)) {
 					ents.add(ent);
 				}
-			} else if (ent instanceof IEntityOwnable) {
-				IEntityOwnable tame = (IEntityOwnable) ent;
-				if (tame.getOwnerId() != null && tame.getOwnerId().equals(id)) {
-					ents.add(ent);
-				}
 			}
-
 		}
 		return ents;
 	}
 
 	public static @Nullable LivingEntity getOwner(MobEntity entity) {
 		LivingEntity ent = (LivingEntity) entity;
-		if (ent instanceof IEntityTameable) {
-			IEntityTameable tame = (IEntityTameable) ent;
+		if (ent instanceof ITameableEntity) {
+			ITameableEntity tame = (ITameableEntity) ent;
 			return tame.getLivingOwner();
-		} else if (ent instanceof EntityTameable) {
-			EntityTameable tame = (EntityTameable) ent;
+		} else if (ent instanceof TameableEntity) {
+			TameableEntity tame = (TameableEntity) ent;
 			return tame.getOwner();
-		} else if (ent instanceof IEntityOwnable) {
-			IEntityOwnable tame = (IEntityOwnable) ent;
-			if (tame.getOwner() instanceof LivingEntity) {
-				return (LivingEntity) tame.getOwner();
-			}
 		}
+		return null;
+	}
+	
+	public static @Nullable LivingEntity getOwner(Entity entity) {
+		if (entity instanceof MobEntity) {
+			return getOwner((MobEntity) entity);
+		}
+		
 		return null;
 	}
 
 	public static @Nullable Entity getEntityByUUID(World world, UUID id) {
-		for (Entity e : world.loadedEntityList) {
+		if (world instanceof ServerWorld) {
+			return ((ServerWorld) world).getEntityByUuid(id);
+		}
+		
+		for (Entity e : ((ClientWorld) world).getAllEntities()) {
 			if (e.getUniqueID().equals(id)) {
 				return e;
 			}
@@ -2589,7 +2666,7 @@ public class NostrumMagica {
 		return null;
 	}
 
-	public static SpellRegistry getSpellRegistry() {
+	public SpellRegistry getSpellRegistry() {
 		if (spellRegistry == null) {
 			if (proxy.isServer()) {
 				throw new RuntimeException("Accessing SpellRegistry before a world has been loaded!");
@@ -2601,7 +2678,7 @@ public class NostrumMagica {
 		return spellRegistry;
 	}
 
-	public static PetSoulRegistry getPetSoulRegistry() {
+	public PetSoulRegistry getPetSoulRegistry() {
 		if (petSoulRegistry == null) {
 			if (proxy.isServer()) {
 				throw new RuntimeException("Accessing PetSoulRegistry before a world has been loaded!");
@@ -2612,7 +2689,7 @@ public class NostrumMagica {
 		return petSoulRegistry;
 	}
 
-	public static PetCommandManager getPetCommandManager() {
+	public PetCommandManager getPetCommandManager() {
 		if (petCommandManager == null) {
 			if (proxy.isServer()) {
 				throw new RuntimeException("Accessing PetCommandManager before a world has been loaded!");
@@ -2641,46 +2718,50 @@ public class NostrumMagica {
 			throw new RuntimeException("Accessing dimension mapper before a world has been loaded!");
 		}
 
-		NostrumDimensionMapper mapper = (NostrumDimensionMapper) worldAccess.getMapStorage()
-				.getOrLoadData(NostrumDimensionMapper.class, NostrumDimensionMapper.DATA_NAME);
+		NostrumDimensionMapper mapper = (NostrumDimensionMapper) ((ServerWorld) worldAccess).getSavedData()
+				.getOrCreate(NostrumDimensionMapper::new, NostrumDimensionMapper.DATA_NAME);
 
-		if (mapper == null) { // still
-			mapper = new NostrumDimensionMapper();
-			worldAccess.getMapStorage().setData(NostrumDimensionMapper.DATA_NAME, mapper);
-		}
+		// TODO I think this is automatic now?
+//		if (mapper == null) { // still
+//			mapper = new NostrumDimensionMapper();
+//			worldAccess.getMapStorage().setData(NostrumDimensionMapper.DATA_NAME, mapper);
+//		}
 
 		serverDimensionMapper = mapper;
 		return mapper;
 	}
 
 	private void initSpellRegistry(World world) {
-		spellRegistry = (SpellRegistry) world.getMapStorage().getOrLoadData(SpellRegistry.class,
+		spellRegistry = (SpellRegistry) ((ServerWorld) world).getSavedData().getOrCreate(SpellRegistry::new,
 				SpellRegistry.DATA_NAME);
 
-		if (spellRegistry == null) { // still
-			spellRegistry = new SpellRegistry();
-			world.getMapStorage().setData(SpellRegistry.DATA_NAME, spellRegistry);
-		}
+		// TODO I think this is automatic now?
+//		if (spellRegistry == null) { // still
+//			spellRegistry = new SpellRegistry();
+//			world.getMapStorage().setData(SpellRegistry.DATA_NAME, spellRegistry);
+//		}
 	}
 
 	private void initPetSoulRegistry(World world) {
-		petSoulRegistry = (PetSoulRegistry) world.getMapStorage().getOrLoadData(PetSoulRegistry.class,
+		petSoulRegistry = (PetSoulRegistry) ((ServerWorld) world).getSavedData().getOrCreate(PetSoulRegistry::new,
 				PetSoulRegistry.DATA_NAME);
 
-		if (petSoulRegistry == null) {
-			petSoulRegistry = new PetSoulRegistry();
-			world.getMapStorage().setData(PetSoulRegistry.DATA_NAME, petSoulRegistry);
-		}
+		// TODO I think this is automatic now?
+//		if (petSoulRegistry == null) {
+//			petSoulRegistry = new PetSoulRegistry();
+//			world.getMapStorage().setData(PetSoulRegistry.DATA_NAME, petSoulRegistry);
+//		}
 	}
 
 	private void initPetCommandManager(World world) {
-		petCommandManager = (PetCommandManager) world.getMapStorage().getOrLoadData(PetCommandManager.class,
+		petCommandManager = (PetCommandManager) ((ServerWorld) world).getSavedData().getOrCreate(PetCommandManager::new,
 				PetCommandManager.DATA_NAME);
 
-		if (petCommandManager == null) {
-			petCommandManager = new PetCommandManager();
-			world.getMapStorage().setData(PetCommandManager.DATA_NAME, petCommandManager);
-		}
+		// TODO I think this is automatic now?
+//		if (petCommandManager == null) {
+//			petCommandManager = new PetCommandManager();
+//			world.getMapStorage().setData(PetCommandManager.DATA_NAME, petCommandManager);
+//		}
 	}
 
 	@SubscribeEvent
@@ -2690,7 +2771,7 @@ public class NostrumMagica {
 		// But registry should be global anyways, so we're going to try and allow it.
 		// I'm not sure the 'right' way to use global save data like this.
 
-		if (event.getWorld().isRemote) {
+		if (event.getWorld().isRemote()) {
 			// Clients just get a spell registry that's empty that is constantly synced with
 			// the server's
 			// Create one if this is our first world.
@@ -2701,15 +2782,18 @@ public class NostrumMagica {
 			}
 
 		} else {
+			// force an exception here if this is wrong
+			ServerWorld world = (ServerWorld) event.getWorld();
+			
 			// Do the correct initialization for persisted data
-			initSpellRegistry(event.getWorld());
-			getDimensionMapper(event.getWorld());
-			initPetSoulRegistry(event.getWorld());
-			initPetCommandManager(event.getWorld());
+			initSpellRegistry(world);
+			getDimensionMapper(world);
+			initPetSoulRegistry(world);
+			initPetCommandManager(world);
 		}
 	}
 
-	@EventHandler
+	@SubscribeEvent
 	public void onServerShutdown(FMLServerStoppedEvent event) {
 		// Clean up dimension mapping info.
 		// For standalones, this is sort-of meaningless.
@@ -2728,9 +2812,8 @@ public class NostrumMagica {
 	}
 
 	public static final boolean isBlockLoaded(World world, BlockPos pos) {
-		// world's method is stupid and always returns true. Internal func always
-		// returns true OR generates chunk. lol.
-		return (world.getChunkProvider().getLoadedChunk(pos.getX() >> 4, pos.getZ() >> 4) != null);
+		// TODO in the past, this didn't actually work. Does it now??
+		return world.getChunkProvider().isChunkLoaded(new ChunkPos(pos));
 	}
 
 	public static boolean IsSameTeam(LivingEntity ent1, LivingEntity ent2) {
@@ -2745,28 +2828,20 @@ public class NostrumMagica {
 		if (ent1.getTeam() != null || ent2.getTeam() != null) { // If teams are at play, just use those.
 			return ent1.isOnSameTeam(ent2);
 		}
-
-		if (ent1 instanceof IEntityOwnable) {
-			IEntityOwnable tamed = (IEntityOwnable) ent1;
-			@Nullable
-			Entity owner = tamed.getOwner();
-			if (owner != null && owner instanceof LivingEntity) {
-				// Are they on the same team as our owner?
-				return IsSameTeam((LivingEntity) owner, ent2);
-			}
+		
+		LivingEntity ent1Owner = getOwner(ent1);
+		if (ent1Owner != null) {
+			// Are they on the same team as our owner?
+			return IsSameTeam((LivingEntity) ent1Owner, ent2);
+		}
+		
+		LivingEntity ent2Owner = getOwner(ent2);
+		if (ent2Owner != null) {
+			// Are we on the same team as their owner?
+			return IsSameTeam(ent1, ent2Owner);
 		}
 
-		if (ent2 instanceof IEntityOwnable) {
-			IEntityOwnable tamed = (IEntityOwnable) ent2;
-			@Nullable
-			Entity owner = tamed.getOwner();
-			if (owner != null && owner instanceof LivingEntity) {
-				// Are they on the same team as our owner?
-				return IsSameTeam(ent1, (LivingEntity) owner);
-			}
-		}
-
-		// Non-ownable entities with no teams involved.
+		// Non-owned entities with no teams involved.
 		// Assume mobs are on a different team than anything else
 		// return (ent1 instanceof IMob == ent2 instanceof IMob);
 
@@ -2779,7 +2854,7 @@ public class NostrumMagica {
 		return false;
 	}
 
-	public static @Nullable LivingEntity resolveEntityLiving(@Nullable Entity entityOrSubEntity) {
+	public static @Nullable LivingEntity resolveLivingEntity(@Nullable Entity entityOrSubEntity) {
 		if (entityOrSubEntity == null) {
 			return null;
 		}
@@ -2787,11 +2862,18 @@ public class NostrumMagica {
 		if (entityOrSubEntity instanceof LivingEntity) {
 			return (LivingEntity) entityOrSubEntity;
 		}
-
+		
 		// Multiparts aren't living but may have living parents!
-		if (entityOrSubEntity instanceof MultiPartEntityPart) {
-			if (((MultiPartEntityPart) entityOrSubEntity).parent instanceof LivingEntity) {
-				return (LivingEntity) ((MultiPartEntityPart) entityOrSubEntity).parent;
+		if (entityOrSubEntity instanceof IMultiPartEntityPart) {
+			if (((IMultiPartEntityPart) entityOrSubEntity).getParent() instanceof LivingEntity) {
+				return (LivingEntity) ((IMultiPartEntityPart) entityOrSubEntity).getParent();
+			}
+		}
+		
+		// EnderDragons are multipart but with no interface anymore
+		if (entityOrSubEntity instanceof EnderDragonPartEntity) {
+			if (((EnderDragonPartEntity) entityOrSubEntity).dragon instanceof LivingEntity) {
+				return (LivingEntity) ((EnderDragonPartEntity) entityOrSubEntity).dragon;
 			}
 		}
 
@@ -2807,9 +2889,8 @@ public class NostrumMagica {
 		if (!(e.getEntity() instanceof MobEntity)) {
 			return;
 		}
-
-		if (!(e.getEntity() instanceof EntityTameable) && !(e.getEntity() instanceof IEntityTameable)
-				&& !(e.getEntity() instanceof IEntityOwnable)) {
+		
+		if (!(e.getEntity() instanceof TameableEntity) && !(e.getEntity() instanceof ITameableEntity)) {
 			return;
 		}
 
@@ -2817,22 +2898,25 @@ public class NostrumMagica {
 
 		// Follow task for pets
 		{
-			EntityAITaskEntry existingTask = null;
-			EntityAITaskEntry followTask = null;
+			PrioritizedGoal existingTask = null;
+			PrioritizedGoal followTask = null;
+			
+			// Get private goal list
+			List<PrioritizedGoal> goals = ObfuscationReflectionHelper.getPrivateValue(GoalSelector.class, living.goalSelector, "field_220892_d"); 
 
 			// Scan for existing task
-			for (EntityAITaskEntry entry : living.tasks.taskEntries) {
-				if (entry.action instanceof EntityAIFollowOwnerAdvanced) {
+			for (PrioritizedGoal entry : goals) {
+				if (entry.getGoal() instanceof EntityAIFollowOwnerAdvanced) {
 					if (existingTask == null) {
 						existingTask = entry;
-					} else if (existingTask.priority > entry.priority) {
+					} else if (existingTask.getPriority() > entry.getPriority()) {
 						existingTask = entry; // cause > priority means less priority lol
 					}
-				} else if (entry.action instanceof EntityAIFollowOwner
-						|| entry.action instanceof EntityAIFollowOwnerGeneric) {
+				} else if (entry.getGoal() instanceof EntityAIFollowOwner
+						|| entry.getGoal() instanceof EntityAIFollowOwnerGeneric) {
 					if (followTask == null) {
 						followTask = entry;
-					} else if (followTask.priority > entry.priority) {
+					} else if (followTask.getPriority() > entry.getPriority()) {
 						followTask = entry;
 					}
 				}
@@ -2844,43 +2928,46 @@ public class NostrumMagica {
 						1.5f, 0f, .5f);
 				if (followTask == null) {
 					// Can just add at end
-					living.tasks.addTask(100, task);
+					living.goalSelector.addGoal(100, task);
 				} else {
-					List<EntityAITaskEntry> removes = Lists.newArrayList(living.tasks.taskEntries);
-					final int priority = followTask.priority;
+					List<PrioritizedGoal> removes = Lists.newArrayList(goals);
+					final int priority = followTask.getPriority();
 					removes.removeIf((entry) -> {
-						return entry.priority < priority;
+						return entry.getPriority() < priority;
 					});
 
-					living.tasks.addTask(priority, task);
-					for (EntityAITaskEntry entry : removes) {
-						living.tasks.removeTask(entry.action);
-						living.tasks.addTask(entry.priority + 1, entry.action);
+					living.goalSelector.addGoal(priority, task);
+					for (PrioritizedGoal entry : removes) {
+						living.goalSelector.removeGoal(entry.getGoal());
+						living.goalSelector.addGoal(entry.getPriority() + 1, entry.getGoal());
 					}
 				}
 			}
 		}
 
 		// Target task for pets
-		if (living instanceof EntityCreature) {
-			EntityCreature creature = (EntityCreature) living;
+		if (living instanceof CreatureEntity) {
+			CreatureEntity creature = (CreatureEntity) living;
 			boolean hasTaskAlready = false;
+			
+			// Get private goal list
+			List<PrioritizedGoal> targetGoals = ObfuscationReflectionHelper.getPrivateValue(GoalSelector.class, living.targetSelector, "field_220892_d"); 
 
 			// Scan for existing task
-			for (EntityAITaskEntry entry : living.targetTasks.taskEntries) {
-				if (entry.action instanceof EntityAIPetTargetTask) {
+			for (PrioritizedGoal entry : targetGoals) {
+				if (entry.getGoal() instanceof EntityAIPetTargetTask) {
 					hasTaskAlready = true;
 					break;
 				}
 			}
 
 			if (!hasTaskAlready) {
-				List<EntityAITaskEntry> removes = Lists.newArrayList(living.targetTasks.taskEntries);
+				List<PrioritizedGoal> removes = Lists.newArrayList(targetGoals);
 
-				living.targetTasks.addTask(1, new EntityAIPetTargetTask<EntityCreature>(creature));
-				for (EntityAITaskEntry entry : removes) {
-					living.targetTasks.removeTask(entry.action);
-					living.targetTasks.addTask(entry.priority + 1, entry.action);
+				living.targetSelector.addGoal(1, new EntityAIPetTargetTask<EntityCreature>(creature));
+				for (PrioritizedGoal entry : removes) {
+					living.targetSelector.removeGoal(entry.getGoal());
+					living.targetSelector.addGoal(entry.getPriority() + 1, entry.getGoal());
 				}
 			}
 		}
@@ -2910,8 +2997,8 @@ public class NostrumMagica {
 			double dx = Math.cos(dirD) * dist;
 			double dz = Math.sin(dirD) * dist;
 			ItemEntity drop = new ItemEntity(world, target.getX() + .5 + dx, target.getY() + 2, target.getZ() + .5 + dz,
-					NostrumResourceItem.getItem(ResourceType.ENDER_BRISTLE, 1));
-			world.spawnEntity(drop);
+					new ItemStack(NostrumItems.resourceEnderBristle));
+			world.addEntity(drop);
 			NostrumMagicaSounds.CAST_FAIL.play(world, target.getX() + .5, target.getY() + 2, target.getZ() + .5);
 		}
 

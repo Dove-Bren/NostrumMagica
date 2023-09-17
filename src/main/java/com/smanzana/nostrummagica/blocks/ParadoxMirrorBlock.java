@@ -13,14 +13,13 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.BlockHorizontal;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -29,24 +28,25 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.world.chunk.BlockStateContainer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.util.Constants.NBT;
 
 /**
  * Magic mirror that links to another and transports items!
  */
-public class ParadoxMirrorBlock extends BlockContainer implements ILoreTagged {
+public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 	
 	public static final PropertyDirection FACING = BlockHorizontal.FACING;
 	private static final double BB_DEPTH = 2.0 / 16.0;

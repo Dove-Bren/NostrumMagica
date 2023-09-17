@@ -1,0 +1,13 @@
+{
+	"replace": false,
+	"values": [
+		"#nostrummagica:spell_tome/any",
+		"#nostrummagica:spell_tome/novice",
+		"#nostrummagica:spell_tome/advanced",
+		"#nostrummagica:spell_tome/combat",
+		"#nostrummagica:spell_tome/death",
+		"#nostrummagica:spell_tome/spooky",
+		"#nostrummagica:spell_tome/muted",
+		"#nostrummagica:spell_tome/living"
+	]
+}

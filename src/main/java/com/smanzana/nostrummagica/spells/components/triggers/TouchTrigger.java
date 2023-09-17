@@ -55,10 +55,10 @@ public class TouchTrigger extends InstantTrigger {
 		
 		List<LivingEntity> others = Lists.newArrayList(state.getSelf());
 		if (trace.typeOfHit == RayTraceResult.Type.ENTITY
-				&& null != NostrumMagica.resolveEntityLiving(trace.entityHit)
-				&& !NostrumMagica.resolveEntityLiving(trace.entityHit).isEntityEqual(state.getSelf())) {
+				&& null != NostrumMagica.resolveLivingEntity(trace.entityHit)
+				&& !NostrumMagica.resolveLivingEntity(trace.entityHit).isEntityEqual(state.getSelf())) {
 			// Cast is safe from 'onlyLiving' option in trace
-			return new TriggerData(Lists.newArrayList(NostrumMagica.resolveEntityLiving(trace.entityHit)), others, world, null);
+			return new TriggerData(Lists.newArrayList(NostrumMagica.resolveLivingEntity(trace.entityHit)), others, world, null);
 		} else if (trace.typeOfHit == RayTraceResult.Type.BLOCK) {
 			Vec3d vec = trace.hitVec;
 			return new TriggerData(null, others, world,

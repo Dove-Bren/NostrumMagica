@@ -4,6 +4,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -16,6 +17,7 @@ import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaLocationEffect;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble.ItemType;
+import com.smanzana.nostrummagica.items.EnchantedArmor.Type;
 import com.smanzana.nostrummagica.potions.FrostbitePotion;
 import com.smanzana.nostrummagica.potions.LightningAttackPotion;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -37,7 +39,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTier;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.item.SwordItem;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.EnumParticleTypes;
@@ -54,7 +55,33 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 	public static enum Type {
 		NOVICE,
 		ADEPT,
-		MASTER
+		MASTER;
+		
+		public final @Nullable Type getNext() {
+			switch (this) {
+			case NOVICE:
+				return ADEPT;
+			case ADEPT:
+				return MASTER;
+			case MASTER:
+				return null;
+			}
+			
+			return null;
+		}
+		
+		public final @Nullable Type getPrev() {
+			switch (this) {
+			case NOVICE:
+				return null;
+			case ADEPT:
+				return NOVICE;
+			case MASTER:
+				return ADEPT;
+			}
+			
+			return null;
+		}
 	}
 	
 	protected static final String ID_PREFIX = "sword_";

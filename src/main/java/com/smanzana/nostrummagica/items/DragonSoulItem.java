@@ -37,14 +37,6 @@ public class DragonSoulItem extends PetSoulItem {
 	public static final String ID = "dragon_soul_item";
 	private static final String NBT_MANA = "mana";
 	
-	private static DragonSoulItem instance = null;
-	public static DragonSoulItem instance() {
-		if (instance == null)
-			instance = new DragonSoulItem();
-		
-		return instance;
-	}
-	
 	public DragonSoulItem() {
 		super(NostrumItems.PropUnstackable().rarity(Rarity.EPIC));
 	}
@@ -275,7 +267,7 @@ public class DragonSoulItem extends PetSoulItem {
 			NostrumMagica.getPetSoulRegistry().snapshotPet(dragon);
 		}
 		
-		ItemStack stack = new ItemStack(instance());
+		ItemStack stack = new ItemStack(NostrumItems.dragonSoulItem);
 		NostrumItems.dragonSoulItem.setPet(stack, dragon);
 		
 		return stack;

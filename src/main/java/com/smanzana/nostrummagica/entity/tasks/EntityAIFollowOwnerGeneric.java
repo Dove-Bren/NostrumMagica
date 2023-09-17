@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.entity.tasks;
 
 import com.google.common.base.Predicate;
-import com.smanzana.nostrummagica.entity.IEntityTameable;
+import com.smanzana.nostrummagica.entity.ITameableEntity;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.BlockState;
@@ -19,7 +19,7 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
-public class EntityAIFollowOwnerGeneric<T extends EntityCreature & IEntityTameable> extends EntityAIBase {
+public class EntityAIFollowOwnerGeneric<T extends EntityCreature & ITameableEntity> extends EntityAIBase {
 	
 	private final T thePet;
 	private LivingEntity theOwner;

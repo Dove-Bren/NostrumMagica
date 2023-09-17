@@ -9,24 +9,24 @@ import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.WarlockSword;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 
-import net.minecraft.block.BlockContainer;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public class ModificationTable extends BlockContainer {
+public class ModificationTable extends ContainerBlock {
 	
 	public static final String ID = "modification_table";
 	

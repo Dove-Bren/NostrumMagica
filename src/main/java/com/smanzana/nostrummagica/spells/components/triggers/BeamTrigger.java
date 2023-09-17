@@ -73,8 +73,8 @@ public class BeamTrigger extends InstantTrigger {
 					continue;
 				
 				if (trace.typeOfHit == RayTraceResult.Type.ENTITY
-						&& NostrumMagica.resolveEntityLiving(trace.entityHit) != null) {
-					targs.add(NostrumMagica.resolveEntityLiving(trace.entityHit));
+						&& NostrumMagica.resolveLivingEntity(trace.entityHit) != null) {
+					targs.add(NostrumMagica.resolveLivingEntity(trace.entityHit));
 				} else {
 					blocks.add(new BlockPos(trace.hitVec.x, trace.hitVec.y, trace.hitVec.z));
 					end = trace.hitVec;

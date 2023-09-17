@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.spells.components.triggers;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntitySpellBullet;
-import com.smanzana.nostrummagica.entity.IEntityTameable;
+import com.smanzana.nostrummagica.entity.ITameableEntity;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -91,20 +91,20 @@ public class SeekingBulletTrigger extends SpellTrigger {
 								
 								if (ignoreAllies) {
 									// Too strong?
-									LivingEntity living = NostrumMagica.resolveEntityLiving(ent);
+									LivingEntity living = NostrumMagica.resolveLivingEntity(ent);
 									if (living != null
 											&& NostrumMagica.IsSameTeam(getState().getSelf(), living)) {
 										return false;
 									}
 									
-									if (ent instanceof IEntityTameable) {
-										if (getState().getSelf().getUniqueID().equals(((IEntityTameable) ent).getOwnerId())) {
+									if (ent instanceof ITameableEntity) {
+										if (getState().getSelf().getUniqueID().equals(((ITameableEntity) ent).getOwnerId())) {
 											return false; // We own the target entity
 										}
 									}
 									
-									if (getState().getSelf() instanceof IEntityTameable) {
-										if (ent.getUniqueID().equals(((IEntityTameable) getState().getSelf()).getOwnerId())) {
+									if (getState().getSelf() instanceof ITameableEntity) {
+										if (ent.getUniqueID().equals(((ITameableEntity) getState().getSelf()).getOwnerId())) {
 											return false; // We own the target entity
 										}
 									}
@@ -114,7 +114,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 							return true;
 						}, .5);
 						
-						target = NostrumMagica.resolveEntityLiving(mop.entityHit);
+						target = NostrumMagica.resolveLivingEntity(mop.entityHit);
 					}
 					
 					// Get axis from where target is
@@ -150,14 +150,14 @@ public class SeekingBulletTrigger extends SpellTrigger {
 					
 					bullet.setFilter((ent) -> {
 						if (ent != null && getState().getSelf() != ent) {
-							if (ent instanceof IEntityTameable) {
-								if (getState().getSelf().getUniqueID().equals(((IEntityTameable) ent).getOwnerId())) {
+							if (ent instanceof ITameableEntity) {
+								if (getState().getSelf().getUniqueID().equals(((ITameableEntity) ent).getOwnerId())) {
 									return false; // We own the target entity
 								}
 							}
 							
-							if (getState().getSelf() instanceof IEntityTameable) {
-								if (ent.getUniqueID().equals(((IEntityTameable) getState().getSelf()).getOwnerId())) {
+							if (getState().getSelf() instanceof ITameableEntity) {
+								if (ent.getUniqueID().equals(((ITameableEntity) getState().getSelf()).getOwnerId())) {
 									return false; // We own the target entity
 								}
 							}
@@ -181,10 +181,10 @@ public class SeekingBulletTrigger extends SpellTrigger {
 			if (entity == null) {
 				onProjectileHit(new BlockPos(this.pos));
 			}
-			else if (null == NostrumMagica.resolveEntityLiving(entity)) {
+			else if (null == NostrumMagica.resolveLivingEntity(entity)) {
 				onProjectileHit(entity.getPosition());
 			} else {
-				getState().trigger(Lists.newArrayList(NostrumMagica.resolveEntityLiving(entity)), Lists.newArrayList(getState().getOther()), null, null);
+				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), Lists.newArrayList(getState().getOther()), null, null);
 			}
 		}
 		

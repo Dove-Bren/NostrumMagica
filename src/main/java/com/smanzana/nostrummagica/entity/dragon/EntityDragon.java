@@ -12,14 +12,14 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.utils.NonNullEnumMap;
 
-import net.minecraft.block.material.Material;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.MobEntity;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityMoveHelper;
-import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
@@ -44,7 +44,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public abstract class EntityDragon extends EntityMob implements ILoreTagged {
+public abstract class EntityDragon extends MonsterEntity implements ILoreTagged {
 	
 	public EntityDragon(World worldIn) {
         super(worldIn);

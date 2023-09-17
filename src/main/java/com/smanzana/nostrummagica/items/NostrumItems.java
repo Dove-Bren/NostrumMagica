@@ -199,6 +199,10 @@ public class NostrumItems {
 	@ObjectHolder(InfusedGemItem.ID_PREFIX + ID_ICE) public static InfusedGemItem infusedGemIce;
 	@ObjectHolder(InfusedGemItem.ID_PREFIX + ID_LIGHTNING) public static InfusedGemItem infusedGemLightning;
 	@ObjectHolder(InfusedGemItem.ID_PREFIX + ID_WIND) public static InfusedGemItem infusedGemWind;
+	@ObjectHolder(MagicArmorBase.ID_HELM) public static MagicArmorBase magicArmorBaseHelm;
+	@ObjectHolder(MagicArmorBase.ID_CHEST) public static MagicArmorBase magicArmorBaseChest;
+	@ObjectHolder(MagicArmorBase.ID_LEGS) public static MagicArmorBase magicArmorBaseLegs;
+	@ObjectHolder(MagicArmorBase.ID_FEET) public static MagicArmorBase magicArmorBaseFeet;
 	@ObjectHolder(MageStaff.ID) public static MageStaff mageStaff;
 	@ObjectHolder(MagicCharm.ID_PREFIX + ID_EARTH) public static MagicCharm magicCharmEarth;
 	@ObjectHolder(MagicCharm.ID_PREFIX + ID_ENDER) public static MagicCharm magicCharmEnder;

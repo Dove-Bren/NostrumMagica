@@ -1,16 +1,19 @@
 package com.smanzana.nostrummagica.entity;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.IEntityOwnable;
 
 /**
  * Like Vanilla's EntityTameable, but an interface instead
  * @author Skyler
  *
  */
-public interface IEntityTameable extends IEntityOwnable {
+public interface ITameableEntity {
 
+	public @Nullable Entity getOwner();
+	
 	/**
 	 * Returns whether this entity has been tamed and, thus, has an owner.
 	 * @return

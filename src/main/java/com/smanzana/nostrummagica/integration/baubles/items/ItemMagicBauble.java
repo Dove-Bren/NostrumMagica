@@ -49,6 +49,26 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @Optional.Interface(iface="baubles.api.IBauble", modid="baubles")
 public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, IBauble, IDragonWingRenderItem {
+	
+	// TODO
+	public static final Item smallRibbon;
+	public static final Item mediumRibbon;
+	public static final Item largeRibbon;
+	public static final Item fierceRibbon;
+	public static final Item kindRibbon;
+	public static final Item lightningBelt;
+	public static final Item enderBelt;
+	public static final Item ringGold;
+	public static final Item ringTrueGold;
+	public static final Item ringCorruptedGold;
+	public static final Item ringSilver;
+	public static final Item ringTrueSilver;
+	public static final Item ringCorruptedSilver;
+	public static final Item floatGuard;
+	public static final Item ringShieldSmall;
+	public static final Item ringShieldLarge;
+	public static final Item eludeCape;
+	public static final Item dragonWingPendant;
 
 	public static enum ItemType {
 		RIBBON_SMALL("ribbon_small"),

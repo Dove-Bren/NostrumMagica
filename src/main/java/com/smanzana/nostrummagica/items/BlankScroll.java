@@ -8,15 +8,6 @@ import net.minecraft.item.Item;
 
 public class BlankScroll extends Item implements ILoreTagged {
 
-	private static BlankScroll instance = null;
-	
-	public static BlankScroll instance() {
-		if (instance == null)
-			instance = new BlankScroll();
-		
-		return instance;
-	}
-	
 	public static final String ID = "blank_scroll";
 	
 	public BlankScroll() {

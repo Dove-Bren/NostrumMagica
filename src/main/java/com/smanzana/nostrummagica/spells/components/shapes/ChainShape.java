@@ -83,7 +83,7 @@ public class ChainShape extends SpellShape {
 								center.posY + radius,
 								center.posZ + radius),
 					(ent) -> {
-						return ent != null && NostrumMagica.resolveEntityLiving(ent) != null;
+						return ent != null && NostrumMagica.resolveLivingEntity(ent) != null;
 					});
 			Collections.sort(entities, (a, b) -> {
 				return (int) (a.getDistanceSq(center) - b.getDistanceSq(center));
@@ -92,7 +92,7 @@ public class ChainShape extends SpellShape {
 			// Note: Could do this filtering inside the entity iteration. Just filtering to living is probably okay.
 			final double radiusSq = radius * radius;
 			for (Entity ent : entities) {
-				LivingEntity living = NostrumMagica.resolveEntityLiving(ent);
+				LivingEntity living = NostrumMagica.resolveLivingEntity(ent);
 				if (living == null) {
 					continue;
 				}

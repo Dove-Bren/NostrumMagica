@@ -44,7 +44,7 @@ public class RayTrace {
 	public static class LivingOnly implements Predicate<Entity> {
 		@Override
 		public boolean test(Entity input) {
-			LivingEntity living = NostrumMagica.resolveEntityLiving(input);
+			LivingEntity living = NostrumMagica.resolveLivingEntity(input);
 			return living != null;
 		}
 	}
@@ -63,7 +63,7 @@ public class RayTrace {
 		public boolean test(Entity input) {
 			if (filterLiving.test(input)) {
 				// is LivingEntity
-				return filterMe.apply(NostrumMagica.resolveEntityLiving(input));
+				return filterMe.apply(NostrumMagica.resolveLivingEntity(input));
 			}
 			
 			return false;

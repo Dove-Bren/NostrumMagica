@@ -107,10 +107,10 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 				}
 			}
 		} else if (result.typeOfHit == RayTraceResult.Type.ENTITY) {
-			if (result.entityHit instanceof EntitySpellSaucer || null == NostrumMagica.resolveEntityLiving(result.entityHit)) {
+			if (result.entityHit instanceof EntitySpellSaucer || null == NostrumMagica.resolveLivingEntity(result.entityHit)) {
 				
 			} else if (result.entityHit != shootingEntity && !shootingEntity.isRidingOrBeingRiddenBy(result.entityHit)) {
-				LivingEntity living = NostrumMagica.resolveEntityLiving(result.entityHit);
+				LivingEntity living = NostrumMagica.resolveLivingEntity(result.entityHit);
 				boolean dieOnImpact = this.dieOnImpact(living);
 				boolean canImpact = this.canImpact(living);
 				if (canImpact && (dieOnImpact || !this.hasBeenHit(living))) {

@@ -4,23 +4,23 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.tiles.LoreTableEntity;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
 
-import net.minecraft.block.BlockContainer;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public class LoreTable extends BlockContainer {
+public class LoreTable extends ContainerBlock {
 	
 	public static final String ID = "lore_table";
 	

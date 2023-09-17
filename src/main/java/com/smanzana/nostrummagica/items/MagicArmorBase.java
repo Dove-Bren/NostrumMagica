@@ -1,63 +1,57 @@
 package com.smanzana.nostrummagica.items;
 
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemArmor;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.ArmorMaterial;
+import net.minecraft.item.Item;
 
-public class MagicArmorBase extends ItemArmor implements ILoreTagged {
+public class MagicArmorBase extends ArmorItem implements ILoreTagged {
 
-	private static MagicArmorBase helm;
-	private static MagicArmorBase chest;
-	private static MagicArmorBase legs;
-	private static MagicArmorBase feet;
+//	public static MagicArmorBase helm() {
+//		if (helm == null) {
+//			helm = new MagicArmorBase("magichelmbase", EquipmentSlotType.HEAD); 
+//		}
+//		return helm;
+//	}
+//	
+//	public static MagicArmorBase chest() {
+//		if (chest == null) {
+//			chest = new MagicArmorBase("magicchestbase", EquipmentSlotType.CHEST); 
+//		}
+//		return chest;
+//	}
+//	
+//	public static MagicArmorBase legs() {
+//		if (legs == null) {
+//			legs = new MagicArmorBase("magicleggingsbase", EquipmentSlotType.LEGS); 
+//		}
+//		return legs;
+//	}
+//	
+//	public static MagicArmorBase feet() {
+//		if (feet == null) {
+//			feet = new MagicArmorBase("magicfeetbase", EquipmentSlotType.FEET); 
+//		}
+//		return feet;
+//	}
 	
-	public static MagicArmorBase helm() {
-		if (helm == null) {
-			helm = new MagicArmorBase("magichelmbase", EquipmentSlotType.HEAD); 
-		}
-		return helm;
-	}
-	
-	public static MagicArmorBase chest() {
-		if (chest == null) {
-			chest = new MagicArmorBase("magicchestbase", EquipmentSlotType.CHEST); 
-		}
-		return chest;
-	}
-	
-	public static MagicArmorBase legs() {
-		if (legs == null) {
-			legs = new MagicArmorBase("magicleggingsbase", EquipmentSlotType.LEGS); 
-		}
-		return legs;
-	}
-	
-	public static MagicArmorBase feet() {
-		if (feet == null) {
-			feet = new MagicArmorBase("magicfeetbase", EquipmentSlotType.FEET); 
-		}
-		return feet;
-	}
-	
-	private String id;
+	private static final String ID_PREFIX = "magicarmor_";
+	public static final String ID_HELM = ID_PREFIX + "helm";
+	public static final String ID_CHEST = ID_PREFIX + "chest";
+	public static final String ID_LEGS = ID_PREFIX + "legs";
+	public static final String ID_FEET = ID_PREFIX + "feet";
 
-	public MagicArmorBase(String id, EquipmentSlotType slot) {
-		super(ArmorMaterial.LEATHER, 0, slot);
-		this.setUnlocalizedName(id);
-		this.setRegistryName(new ResourceLocation(NostrumMagica.MODID, id));
-		this.setMaxDamage(5);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.id = id;
+	public MagicArmorBase(EquipmentSlotType slot, Item.Properties properties) {
+		super(ArmorMaterial.LEATHER, slot, properties.maxDamage(5));
 	}
 	
-	public String getModelID() {
-		return id;
-	}
+//	public String getModelID() {
+//		return id;
+//	}
 	
 	@Override
 	public String getLoreKey() {
@@ -88,13 +82,13 @@ public class MagicArmorBase extends ItemArmor implements ILoreTagged {
 	public static MagicArmorBase get(EquipmentSlotType slot) {
 		switch (slot) {
 		case CHEST:
-			return chest;
+			return NostrumItems.magicArmorBaseChest;
 		case FEET:
-			return feet;
+			return NostrumItems.magicArmorBaseFeet;
 		case HEAD:
-			return helm;
+			return NostrumItems.magicArmorBaseHelm;
 		case LEGS:
-			return legs;
+			return NostrumItems.magicArmorBaseLegs;
 		default:
 			break;
 		}

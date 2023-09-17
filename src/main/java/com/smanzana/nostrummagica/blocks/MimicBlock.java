@@ -12,6 +12,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.DirectionalBlock;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -34,7 +35,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class MimicBlock extends BlockDirectional {
+public class MimicBlock extends DirectionalBlock {
 	
 	public static IUnlistedProperty<BlockState> NESTED_STATE = new IUnlistedProperty<BlockState>() {
 

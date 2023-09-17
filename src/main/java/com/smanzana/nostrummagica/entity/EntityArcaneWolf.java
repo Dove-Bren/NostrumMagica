@@ -106,7 +106,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class EntityArcaneWolf extends EntityWolf implements IEntityTameable, IEntityPet, IPetWithSoul, IStabbableEntity, IMagicEntity {
+public class EntityArcaneWolf extends EntityWolf implements ITameableEntity, IEntityPet, IPetWithSoul, IStabbableEntity, IMagicEntity {
 	
 	public static enum ArcaneWolfElementalType {
 		NONELEMENTAL("nonelemental", 0x00000000, null),

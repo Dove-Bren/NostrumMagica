@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.entity.IEntityTameable;
+import com.smanzana.nostrummagica.entity.ITameableEntity;
 import com.smanzana.nostrummagica.pet.PetPlacementMode;
 
 import net.minecraft.block.material.Material;
@@ -63,8 +63,8 @@ public class EntityAIFollowOwnerAdvanced<T extends MobEntity> extends EntityAIBa
 		final boolean sitting;
 		if (pet == null) {
 			sitting = false;
-		} else if (pet instanceof IEntityTameable) {
-			sitting = ((IEntityTameable) pet).isEntitySitting();
+		} else if (pet instanceof ITameableEntity) {
+			sitting = ((ITameableEntity) pet).isEntitySitting();
 		} else if (pet instanceof EntityTameable) {
 			sitting = ((EntityTameable) pet).isSitting();
 		} else {

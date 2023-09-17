@@ -4,27 +4,23 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.tiles.PutterBlockTileEntity;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
 
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.ContainerBlock;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.BlockStateContainer;
 
-public class PutterBlock extends BlockContainer {
+public class PutterBlock extends ContainerBlock {
 	
 	public static final PropertyDirection FACING = PropertyDirection.create("facing");
 	

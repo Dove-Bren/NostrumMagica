@@ -70,10 +70,10 @@ public class MagicCyclerTrigger extends SpellTrigger {
 			if (entity == null) {
 				onProjectileHit(new BlockPos(this.pos));
 			}
-			else if (null == NostrumMagica.resolveEntityLiving(entity)) {
+			else if (null == NostrumMagica.resolveLivingEntity(entity)) {
 				onProjectileHit(entity.getPosition());
 			} else {
-				getState().trigger(Lists.newArrayList(NostrumMagica.resolveEntityLiving(entity)), Lists.newArrayList(getState().getOther()), null, null);
+				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), Lists.newArrayList(getState().getOther()), null, null);
 			}
 		}
 	}

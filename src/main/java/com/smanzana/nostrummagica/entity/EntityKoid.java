@@ -24,6 +24,7 @@ import net.minecraft.entity.ai.EntityAISwimming;
 import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.SoundEvents;
@@ -41,7 +42,7 @@ import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class EntityKoid extends EntityMob implements ILoreTagged {
+public class EntityKoid extends MonsterEntity implements ILoreTagged {
 
 	private static final DataParameter<Integer> KOID_VARIANT =
 			EntityDataManager.<Integer>createKey(EntityKoid.class, DataSerializers.VARINT);

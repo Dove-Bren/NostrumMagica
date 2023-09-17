@@ -15,23 +15,23 @@ import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
-import net.minecraft.block.BlockContainer;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.Hand;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -41,7 +41,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class TeleportRune extends BlockContainer  {
+public class TeleportRune extends ContainerBlock  {
 	
 	public static final String ID = "teleport_rune";
 	protected static final AxisAlignedBB RUNE_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.125D, 1.0D);

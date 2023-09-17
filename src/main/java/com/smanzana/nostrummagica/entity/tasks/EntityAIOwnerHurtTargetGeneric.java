@@ -1,12 +1,12 @@
 package com.smanzana.nostrummagica.entity.tasks;
 
-import com.smanzana.nostrummagica.entity.IEntityTameable;
+import com.smanzana.nostrummagica.entity.ITameableEntity;
 
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAITarget;
 
-public class EntityAIOwnerHurtTargetGeneric<T extends EntityCreature & IEntityTameable> extends EntityAITarget {
+public class EntityAIOwnerHurtTargetGeneric<T extends EntityCreature & ITameableEntity> extends EntityAITarget {
 	
 	T entityTameable;
 	LivingEntity theTarget;

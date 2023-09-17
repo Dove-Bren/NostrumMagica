@@ -7,12 +7,11 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.tiles.ItemDuctTileEntity;
 
-import net.minecraft.block.BlockContainer;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -21,14 +20,15 @@ import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.BlockStateContainer;
 import net.minecraftforge.items.CapabilityItemHandler;
 
 /**
@@ -36,7 +36,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
  * @author Skyler
  *
  */
-public class ItemDuct extends BlockContainer {
+public class ItemDuct extends ContainerBlock {
 	
 	public static final PropertyBool NORTH = PropertyBool.create("north");
 	public static final PropertyBool SOUTH = PropertyBool.create("south");

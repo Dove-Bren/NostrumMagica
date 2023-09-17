@@ -20,7 +20,7 @@ import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonBondInfoS
 import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonInfoSheet;
 import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonInventorySheet;
 import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonSpellSheet;
-import com.smanzana.nostrummagica.entity.IEntityTameable;
+import com.smanzana.nostrummagica.entity.ITameableEntity;
 import com.smanzana.nostrummagica.entity.IStabbableEntity;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon.DragonEquipmentInventory.IChangeListener;
 import com.smanzana.nostrummagica.entity.dragon.IDragonSpawnData.IDragonSpawnFactory;
@@ -89,7 +89,7 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class EntityTameDragonRed extends EntityDragonRedBase implements IEntityTameable, ITameDragon, IChangeListener, IPetWithSoul, IStabbableEntity {
+public class EntityTameDragonRed extends EntityDragonRedBase implements ITameableEntity, ITameDragon, IChangeListener, IPetWithSoul, IStabbableEntity {
 
 	protected static final DataParameter<Boolean> HATCHED = EntityDataManager.<Boolean>createKey(EntityTameDragonRed.class, DataSerializers.BOOLEAN);
 	protected static final DataParameter<Boolean> TAMED = EntityDataManager.<Boolean>createKey(EntityTameDragonRed.class, DataSerializers.BOOLEAN);

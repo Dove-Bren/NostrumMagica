@@ -10,7 +10,7 @@ import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 
-public interface IEntityPet extends IEntityTameable {
+public interface IEntityPet extends ITameableEntity {
 
 	public PetInfo getPetSummary();
 	

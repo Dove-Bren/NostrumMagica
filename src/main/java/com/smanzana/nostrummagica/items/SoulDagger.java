@@ -199,7 +199,7 @@ public class SoulDagger extends SwordItem implements ILoreTagged, ISpellArmor {
 			return new ArrayList<>();
 		} else {
 			EntityRayTraceResult entResult = (EntityRayTraceResult) mop;
-			LivingEntity living = NostrumMagica.resolveEntityLiving(entResult.getEntity());
+			LivingEntity living = NostrumMagica.resolveLivingEntity(entResult.getEntity());
 			if (living == null) {
 				return new ArrayList<>();
 			} else {

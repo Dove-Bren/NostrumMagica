@@ -67,7 +67,7 @@ import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class EntityLux extends EntityAnimal implements ILoreTagged, IEntityTameable {
+public class EntityLux extends EntityAnimal implements ILoreTagged, ITameableEntity {
 	
 	protected static final double LUX_HOME_DISTANCE_SQ = 144;
 	protected static final double LUX_HOME_FORGET_DISTANCE_SQ = 400;

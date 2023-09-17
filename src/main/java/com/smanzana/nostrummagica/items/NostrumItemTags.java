@@ -10,12 +10,12 @@ import net.minecraft.util.ResourceLocation;
 public class NostrumItemTags {
 
 	public static final class Items {
-		private static final String TAG_RUNE_ANY = "rune_any";
+		private static final String TAG_RUNE = "rune";
 //		private static final String TAG_RUNE_SHAPE_SINGLE = "runeShapeSingle";
 //		private static final String TAG_RUNE_SHAPE_CHAIN = "runeShapeChain";
 //		private static final String TAG_RUNE_SHAPE_AOE = "runeShapeAOE";
 		
-		private static final String TAG_REAGENT_ANY = "reagent/any";
+		private static final String TAG_REAGENT = "reagent";
 		private static final String TAG_REAGENT_MANDRAKEROOT = "reagent/mandrake_root";
 		private static final String TAG_REAGENT_GINSENG = "reagent/ginseng";
 		private static final String TAG_REAGENT_SPIDERSILK = "reagent/spider_silk";
@@ -25,7 +25,7 @@ public class NostrumItemTags {
 		private static final String TAG_REAGENT_MANIDUST = "reagent/mani_dust";
 		private static final String TAG_REAGENT_CRYSTABLOOM = "reagent/crystabloom";
 		
-		private static final String TAG_INFGEM_ANY = "infusedgem/any";
+		private static final String TAG_INFGEM = "infusedgem";
 		private static final String TAG_INFGEM_VOID = "infusedgem/void";
 		private static final String TAG_INFGEM_FIRE = "infusedgem/fire";
 		private static final String TAG_INFGEM_ICE = "infusedgem/ice";
@@ -48,9 +48,9 @@ public class NostrumItemTags {
 		private static final String TAG_WISPPEBBLE = "wisp_pebble";
 		private static final String TAG_DRAGON_WING = "dragon_wing";
 		
-		private static final String TAG_SPELLPAGE_ANY = "spellpage_any";
+		private static final String TAG_SPELLPAGE = "spellpage";
 		
-		private static final String TAG_ESSENCE_ANY = "essence/any";
+		private static final String TAG_ESSENCE = "essence";
 		private static final String TAG_ESSENCE_VOID = "essence/void";
 		private static final String TAG_ESSENCE_FIRE = "essence/fire";
 		private static final String TAG_ESSENCE_ICE = "essence/ice";
@@ -59,7 +59,7 @@ public class NostrumItemTags {
 		private static final String TAG_ESSENCE_LIGHTNING = "essence/lightning";
 		private static final String TAG_ESSENCE_ENDER = "essence/ender";
 		
-		private static final String TAG_SKILLITEM_ANY = "skill_item/any";
+		private static final String TAG_SKILLITEM = "skill_item";
 		private static final String TAG_SKILLITEM_MIRROR = "skill_item/mirror";
 		private static final String TAG_SKILLITEM_OOZE = "skill_item/ooze";
 		private static final String TAG_SKILLITEM_PENDANT = "skill_item/pendant";
@@ -68,24 +68,43 @@ public class NostrumItemTags {
 		private static final String TAG_SKILLITEM_RESEARCHSMALL = "skill_item/small_research";
 		private static final String TAG_SKILLITEM_RESEARCHLARGE = "skill_item/large_research";
 		
-		private static final String TAG_ROSE_ANY = "rose/any";
+		private static final String TAG_ROSE = "rose";
 		private static final String TAG_ROSE_BLOOD = "rose/blood";
 		private static final String TAG_ROSE_ELDRICH = "rose/eldrich";
 		private static final String TAG_ROSE_PALE = "rose/pale";
 		
-		private static final String TAG_HOOKSHOT_ANY = "hookshot/any";
+		private static final String TAG_HOOKSHOT = "hookshot";
 		private static final String TAG_HOOKSHOT_WEAK = "hookshot/weak";
 		private static final String TAG_HOOKSHOT_MEDIUM = "hookshot/medium";
 		private static final String TAG_HOOKSHOT_STRONG = "hookshot/strong";
 		private static final String TAG_HOOKSHOT_CLAW = "hookshot/claw";
 		
+		private static final String TAG_REAGENTSEED = "seed";
 		private static final String TAG_REAGENTSEED_MANDRAKE = "seed/mandrake";
 		private static final String TAG_REAGENTSEED_GINSENG = "seed/ginseng";
 		private static final String TAG_REAGENTSEED_ESSENCE = "seed/essence";
 		
-		public static final Tag<Item> RuneAny = tag(TAG_RUNE_ANY);
+		private static final String TAG_TOMEPLATE = "tome_plate";
+		private static final String TAG_TOMEPLATE_NOVICE = "tome_plate/novice";
+		private static final String TAG_TOMEPLATE_ADVANCED = "tome_plate/advanced";
+		private static final String TAG_TOMEPLATE_COMBAT = "tome_plate/combat";
+		private static final String TAG_TOMEPLATE_DEATH = "tome_plate/death";
+		private static final String TAG_TOMEPLATE_SPOOKY = "tome_plate/spooky";
+		private static final String TAG_TOMEPLATE_MUTED = "tome_plate/muted";
+		private static final String TAG_TOMEPLATE_LIVING = "tome_plate/living";
 		
-		public static final Tag<Item> ReagentAny = tag(TAG_REAGENT_ANY);
+		private static final String TAG_SPELLTOME = "spell_tome";
+		private static final String TAG_SPELLTOME_NOVICE = "spell_tome/novice";
+		private static final String TAG_SPELLTOME_ADVANCED = "spell_tome/advanced";
+		private static final String TAG_SPELLTOME_COMBAT = "spell_tome/combat";
+		private static final String TAG_SPELLTOME_DEATH = "spell_tome/death";
+		private static final String TAG_SPELLTOME_SPOOKY = "spell_tome/spooky";
+		private static final String TAG_SPELLTOME_MUTED = "spell_tome/muted";
+		private static final String TAG_SPELLTOME_LIVING = "spell_tome/living";
+		
+		public static final Tag<Item> RuneAny = tag(TAG_RUNE);
+		
+		public static final Tag<Item> Reagent = tag(TAG_REAGENT);
 		public static final Tag<Item> ReagentMandrakeRoot = tag(TAG_REAGENT_MANDRAKEROOT);
 		public static final Tag<Item> ReagentGinseng = tag(TAG_REAGENT_GINSENG);
 		public static final Tag<Item> ReagentSpiderSilk = tag(TAG_REAGENT_SPIDERSILK);
@@ -95,7 +114,7 @@ public class NostrumItemTags {
 		public static final Tag<Item> ReagentManiDust = tag(TAG_REAGENT_MANIDUST);
 		public static final Tag<Item> ReagentCrystabloom = tag(TAG_REAGENT_CRYSTABLOOM);
 		
-		public static final Tag<Item> InfusedGemAny = tag(TAG_INFGEM_ANY);
+		public static final Tag<Item> InfusedGem = tag(TAG_INFGEM);
 		public static final Tag<Item> InfusedGemVoid = tag(TAG_INFGEM_VOID);
 		public static final Tag<Item> InfusedGemFire = tag(TAG_INFGEM_FIRE);
 		public static final Tag<Item> InfusedGemIce = tag(TAG_INFGEM_ICE);
@@ -119,9 +138,9 @@ public class NostrumItemTags {
 		public static final Tag<Item> WispPebble = tag(TAG_WISPPEBBLE);
 		public static final Tag<Item> DragonWing = tag(TAG_DRAGON_WING);
 		
-		public static final Tag<Item> SpellpageAny = tag(TAG_SPELLPAGE_ANY);
+		public static final Tag<Item> Spellpage = tag(TAG_SPELLPAGE);
 		
-		public static final Tag<Item> EssenceAny = tag(TAG_ESSENCE_ANY);
+		public static final Tag<Item> Essence = tag(TAG_ESSENCE);
 		public static final Tag<Item> EssenceVoid = tag(TAG_ESSENCE_VOID);
 		public static final Tag<Item> EssenceFire = tag(TAG_ESSENCE_FIRE);
 		public static final Tag<Item> EssenceIce = tag(TAG_ESSENCE_ICE);
@@ -130,7 +149,7 @@ public class NostrumItemTags {
 		public static final Tag<Item> EssenceLightning = tag(TAG_ESSENCE_LIGHTNING);
 		public static final Tag<Item> EssenceEnder = tag(TAG_ESSENCE_ENDER);
 		
-		public static final Tag<Item> SkillItemAny = tag(TAG_SKILLITEM_ANY);
+		public static final Tag<Item> SkillItem = tag(TAG_SKILLITEM);
 		public static final Tag<Item> SkillItemMirror = tag(TAG_SKILLITEM_MIRROR);
 		public static final Tag<Item> SkillItemOoze = tag(TAG_SKILLITEM_OOZE);
 		public static final Tag<Item> SkillItemPendant = tag(TAG_SKILLITEM_PENDANT);
@@ -139,20 +158,39 @@ public class NostrumItemTags {
 		public static final Tag<Item> SkillItemSmallResearch = tag(TAG_SKILLITEM_RESEARCHSMALL);
 		public static final Tag<Item> SkillItemLargeResearch = tag(TAG_SKILLITEM_RESEARCHLARGE);
 		
-		public static final Tag<Item> RoseAny = tag(TAG_ROSE_ANY);
+		public static final Tag<Item> Rose = tag(TAG_ROSE);
 		public static final Tag<Item> RoseBlood = tag(TAG_ROSE_BLOOD);
 		public static final Tag<Item> RoseEldrich = tag(TAG_ROSE_ELDRICH);
 		public static final Tag<Item> RosePale = tag(TAG_ROSE_PALE);
 		
-		public static final Tag<Item> HookshotAny = tag(TAG_HOOKSHOT_ANY);
+		public static final Tag<Item> Hookshot = tag(TAG_HOOKSHOT);
 		public static final Tag<Item> HookshotWeak = tag(TAG_HOOKSHOT_WEAK);
 		public static final Tag<Item> HookshotMedium = tag(TAG_HOOKSHOT_MEDIUM);
 		public static final Tag<Item> HookshotStrong = tag(TAG_HOOKSHOT_STRONG);
 		public static final Tag<Item> HookshotClaw = tag(TAG_HOOKSHOT_CLAW);
 		
+		public static final Tag<Item> Seed = tag(TAG_REAGENTSEED);
 		public static final Tag<Item> SeedMandrake = tag(TAG_REAGENTSEED_MANDRAKE);
 		public static final Tag<Item> SeedGinseng = tag(TAG_REAGENTSEED_GINSENG);
 		public static final Tag<Item> SeedEssence = tag(TAG_REAGENTSEED_ESSENCE);
+		
+		public static final Tag<Item> TomePlate = tag(TAG_TOMEPLATE);
+		public static final Tag<Item> TomePlateNovice = tag(TAG_TOMEPLATE_NOVICE);
+		public static final Tag<Item> TomePlateAdvanced = tag(TAG_TOMEPLATE_ADVANCED);
+		public static final Tag<Item> TomePlateCombat = tag(TAG_TOMEPLATE_COMBAT);
+		public static final Tag<Item> TomePlateDeath = tag(TAG_TOMEPLATE_DEATH);
+		public static final Tag<Item> TomePlateSpooky = tag(TAG_TOMEPLATE_SPOOKY);
+		public static final Tag<Item> TomePlateMuted = tag(TAG_TOMEPLATE_MUTED);
+		public static final Tag<Item> TomePlateLiving = tag(TAG_TOMEPLATE_LIVING);
+		
+		public static final Tag<Item> SpellTome = tag(TAG_SPELLTOME);
+		public static final Tag<Item> SpellTomeNovice = tag(TAG_SPELLTOME_NOVICE);
+		public static final Tag<Item> SpellTomeAdvanced = tag(TAG_SPELLTOME_ADVANCED);
+		public static final Tag<Item> SpellTomeCombat = tag(TAG_SPELLTOME_COMBAT);
+		public static final Tag<Item> SpellTomeDeath = tag(TAG_SPELLTOME_DEATH);
+		public static final Tag<Item> SpellTomeSpooky = tag(TAG_SPELLTOME_SPOOKY);
+		public static final Tag<Item> SpellTomeMuted = tag(TAG_SPELLTOME_MUTED);
+		public static final Tag<Item> SpellTomeLiving = tag(TAG_SPELLTOME_LIVING);
 		
 		private static Tag<Item> tag(String path) {
 			return new ItemTags.Wrapper(new ResourceLocation(NostrumMagica.MODID, path));
