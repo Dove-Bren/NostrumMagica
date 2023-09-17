@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.potions;
+package com.smanzana.nostrummagica.effects;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -11,45 +11,34 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.AbstractGui;
+import net.minecraft.client.gui.DisplayEffectsScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.Blocks;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.potion.Effect;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.EffectType;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class FrostbitePotion extends Potion {
+public class FrostbiteEffect extends Effect {
 
-	private static final ResourceLocation Resource = new ResourceLocation(
-			NostrumMagica.MODID, "potions-frostbite");
+	public static final String ID = "potions-frostbite";
 	
-	private static FrostbitePotion instance;
-	public static FrostbitePotion instance() {
-		if (instance == null)
-			instance = new FrostbitePotion();
+	public FrostbiteEffect() {
+		super(EffectType.HARMFUL, 0xFF93E0FF);
 		
-		return instance;
-	}
-	
-	private FrostbitePotion() {
-		super(true, 0xFF93E0FF);
-		
-		this.setPotionName("potion.frostbite.name");
-		
-		this.registerPotionAttributeModifier(SharedMonsterAttributes.MOVEMENT_SPEED,
-				"60A6EF27-8A11-2213-A734-30A4B0CC4E90", -0.1D, 2);
-
-		this.setRegistryName(Resource);
+		this.addAttributesModifier(SharedMonsterAttributes.MOVEMENT_SPEED,
+				"60A6EF27-8A11-2213-A734-30A4B0CC4E90", -0.1D, AttributeModifier.Operation.MULTIPLY_TOTAL);
 	}
 	
 	public boolean isReady(int duration, int amp) {
@@ -63,7 +52,7 @@ public class FrostbitePotion extends Potion {
 	@Override
 	public void performEffect(LivingEntity entity, int amp) {
 		// If entity has blizzard set, heal instead of harm
-		final int blizzardCount = EnchantedArmor.GetSetCount(entity, EMagicElement.ICE, 3);
+		final int blizzardCount = EnchantedArmor.GetSetCount(entity, EMagicElement.ICE, EnchantedArmor.Type.TRUE);
 		if (blizzardCount == 4) {
 			entity.heal(1);
 			if (!entity.world.isRemote) {
@@ -76,7 +65,7 @@ public class FrostbitePotion extends Potion {
 				}
 				attr.addMana(-manaCost);
 				if (entity instanceof PlayerEntity) {
-					NostrumMagica.proxy.sendMana((PlayerEntity) entity);
+					NostrumMagica.instance.proxy.sendMana((PlayerEntity) entity);
 				}
 				
 				EntityAreaEffect cloud = new EntityAreaEffect(entity.world, entity.posX, entity.posY, entity.posZ);
@@ -87,9 +76,9 @@ public class FrostbitePotion extends Potion {
 				cloud.setVerticleStepping(false);
 				cloud.setDuration(0);
 				cloud.setWaitTime(interval); // Turn off vanilla effects completely by putting all time in 'wait'
-				final PotionEffect effect = new PotionEffect(FrostbitePotion.instance(), 20 * 3, 2);
+				final EffectInstance effect = new EffectInstance(NostrumEffects.frostbite, 20 * 3, 2);
 				cloud.setParticle(EnumParticleTypes.SPELL_MOB);
-				cloud.setColor(Integer.valueOf(PotionUtils.getPotionColorFromEffectList(Lists.newArrayList(new PotionEffect(FrostbitePotion.instance(), 20 * 3, 2)))));
+				cloud.setColor(Integer.valueOf(PotionUtils.getPotionColorFromEffectList(Lists.newArrayList(new EffectInstance(NostrumEffects.frostbite, 20 * 3, 2)))));
 				cloud.setIgnoreRadius(true);
 				cloud.setCustomParticle(EnumParticleTypes.FALLING_DUST);
 				cloud.setCustomParticleParam1(Block.getStateId(Blocks.SNOW.getDefaultState()));
@@ -103,7 +92,7 @@ public class FrostbitePotion extends Potion {
 							effect.getEffectName();
 						}
 						if (ent instanceof LivingEntity) {
-							((LivingEntity) ent).addPotionEffect(new PotionEffect(FrostbitePotion.instance(), 20 * 3, 2));
+							((LivingEntity) ent).addPotionEffect(new EffectInstance(NostrumEffects.frostbite, 20 * 3, 2));
 						}
 					}
 				});
@@ -113,12 +102,12 @@ public class FrostbitePotion extends Potion {
 						if (world.isAirBlock(pos)) {
 							BlockState belowState = world.getBlockState(pos.down());
 							if (belowState.getMaterial().blocksMovement()) {
-								world.setBlockState(pos, Blocks.SNOW_LAYER.getDefaultState());
+								world.setBlockState(pos, Blocks.SNOW.getDefaultState());
 							}
 						}
 					}
 				});
-				entity.world.spawnEntity(cloud);
+				entity.world.addEntity(cloud);
 			}
 		} else {
 			float damage = 1.0f;
@@ -128,14 +117,13 @@ public class FrostbitePotion extends Potion {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-    public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
-		PotionIcon.FROSTBITE.draw(mc, x + 6, y + 7);
+    public void renderInventoryEffect(EffectInstance effect, DisplayEffectsScreen<?> gui, int x, int y, float z) {
+		PotionIcon.FROSTBITE.draw(gui.getMinecraft(), x + 6, y + 7);
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-    public void renderHUDEffect(int x, int y, PotionEffect effect, net.minecraft.client.Minecraft mc, float alpha) {
-		PotionIcon.FROSTBITE.draw(mc, x + 3, y + 3);
+    public void renderHUDEffect(EffectInstance effect, AbstractGui gui, int x, int y, float z, float alpha) {
+		PotionIcon.FROSTBITE.draw(Minecraft.getInstance(), x + 3, y + 3);
 	}
-	
 }

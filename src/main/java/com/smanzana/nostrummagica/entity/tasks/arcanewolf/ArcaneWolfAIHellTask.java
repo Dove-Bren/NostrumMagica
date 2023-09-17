@@ -3,11 +3,11 @@ package com.smanzana.nostrummagica.entity.tasks.arcanewolf;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect.PredefinedEffect;
+import com.smanzana.nostrummagica.effects.MagicBoostEffect;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.ArcaneWolfElementalType;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpawnPredefinedEffectMessage;
-import com.smanzana.nostrummagica.potions.MagicBoostPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
@@ -119,7 +119,7 @@ public class ArcaneWolfAIHellTask extends EntityAIBase {
 		// to that. Then, each tick, maybe do damage or update effect.
 		// Effect is actually going to be 'predefined' client effect to avoid spamming packets.
 		float base = 20 * 5;
-		PotionEffect boostEffect = wolf.getActivePotionEffect(MagicBoostPotion.instance());
+		PotionEffect boostEffect = wolf.getActivePotionEffect(MagicBoostEffect.instance());
 		if (boostEffect != null) {
 			base *= Math.pow(1.5, boostEffect.getAmplifier() + 1);
 		}

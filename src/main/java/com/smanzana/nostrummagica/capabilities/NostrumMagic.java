@@ -12,6 +12,7 @@ import java.util.Set;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.items.BlankScroll;
+import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
@@ -174,10 +175,10 @@ public class NostrumMagic implements INostrumMagic {
 			this.completeResearch("origin");
 			this.addResearchPoint();
 			//this.completeResearch("spellcraft");
-			this.giveBasicLore(SpellRune.instance());
-			this.giveBasicLore(BlankScroll.instance());
-			this.giveBasicLore(SpellScroll.instance());
-			this.giveBasicLore(ReagentItem.instance());
+			this.giveBasicLore(NostrumItems.spellRune);
+			this.giveBasicLore(NostrumItems.blankScroll);
+			this.giveBasicLore(NostrumItems.spellScroll);
+			this.giveBasicLore(NostrumItems.reagentMandrakeRoot);
 			
 			NostrumMagicaSounds.LEVELUP.play(entity);
 		}
@@ -905,7 +906,7 @@ public class NostrumMagic implements INostrumMagic {
 		
 		Boolean old = map.put(alteration, true);
 		if ((old == null || !old) && entity != null && entity instanceof PlayerEntity) {
-			NostrumMagica.proxy.syncPlayer((ServerPlayerEntity) entity);
+			NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) entity);
 		}
 	}
 	
@@ -957,7 +958,7 @@ public class NostrumMagic implements INostrumMagic {
 
 	@Override
 	public void refresh(ServerPlayerEntity player) {
-		if (NostrumMagica.baubles.isEnabled()) {
+		if (NostrumMagica.instance.baubles.isEnabled()) {
 			IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);
 			for (int i = 0; i < baubles.getSlots(); i++) {
 				ItemStack stack = baubles.getStackInSlot(i);

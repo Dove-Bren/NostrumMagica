@@ -24,6 +24,20 @@ import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.config.network.ServerConfigMessage;
 import com.smanzana.nostrummagica.crafting.SpellTomePageCombineRecipe;
+import com.smanzana.nostrummagica.effects.FamiliarEffect;
+import com.smanzana.nostrummagica.effects.FrostbitePotion;
+import com.smanzana.nostrummagica.effects.LightningAttackEffect;
+import com.smanzana.nostrummagica.effects.LightningChargeEffect;
+import com.smanzana.nostrummagica.effects.MagicBoostEffect;
+import com.smanzana.nostrummagica.effects.MagicBuffEffect;
+import com.smanzana.nostrummagica.effects.MagicResistEffect;
+import com.smanzana.nostrummagica.effects.MagicShieldEffect;
+import com.smanzana.nostrummagica.effects.ManaRegenEffect;
+import com.smanzana.nostrummagica.effects.NaturesBlessingEffect;
+import com.smanzana.nostrummagica.effects.NostrumPotionTypes;
+import com.smanzana.nostrummagica.effects.NostrumTransformationEffect;
+import com.smanzana.nostrummagica.effects.PhysicalShieldEffect;
+import com.smanzana.nostrummagica.effects.RootedEffect;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect;
@@ -76,20 +90,6 @@ import com.smanzana.nostrummagica.network.messages.SpawnPredefinedEffectMessage;
 import com.smanzana.nostrummagica.network.messages.SpellDebugMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
-import com.smanzana.nostrummagica.potions.FamiliarPotion;
-import com.smanzana.nostrummagica.potions.FrostbitePotion;
-import com.smanzana.nostrummagica.potions.LightningAttackPotion;
-import com.smanzana.nostrummagica.potions.LightningChargePotion;
-import com.smanzana.nostrummagica.potions.MagicBoostPotion;
-import com.smanzana.nostrummagica.potions.MagicBuffPotion;
-import com.smanzana.nostrummagica.potions.MagicResistPotion;
-import com.smanzana.nostrummagica.potions.MagicShieldPotion;
-import com.smanzana.nostrummagica.potions.ManaRegenPotion;
-import com.smanzana.nostrummagica.potions.NaturesBlessingPotion;
-import com.smanzana.nostrummagica.potions.NostrumPotionTypes;
-import com.smanzana.nostrummagica.potions.NostrumTransformationPotion;
-import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
-import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.research.NostrumResearch;
 import com.smanzana.nostrummagica.serializers.ArcaneWolfElementalTypeSerializer;
@@ -252,54 +252,6 @@ public class CommonProxy {
     	SpellTrigger.register(AtFeetTrigger.instance());
     	SpellTrigger.register(AuraTrigger.instance());
     	SpellTrigger.register(CasterTrigger.instance());
-    }
-    
-    @SubscribeEvent
-    public void registerPotions(RegistryEvent.Register<Potion> event) {
-    	final IForgeRegistry<Potion> registry = event.getRegistry();
-    	
-    	registry.register(RootedPotion.instance());
-    	registry.register(MagicResistPotion.instance());
-    	registry.register(PhysicalShieldPotion.instance());
-    	registry.register(MagicShieldPotion.instance());
-    	registry.register(FrostbitePotion.instance());
-    	registry.register(MagicBoostPotion.instance());
-    	registry.register(MagicBuffPotion.instance());
-    	registry.register(FamiliarPotion.instance());
-    	registry.register(LightningChargePotion.instance());
-    	registry.register(LightningAttackPotion.instance());
-    	registry.register(NaturesBlessingPotion.instance());
-    	registry.register(NostrumTransformationPotion.instance());
-    	registry.register(ManaRegenPotion.instance());
-    }
-    
-    @SubscribeEvent
-	public void registerPotionTypes(RegistryEvent.Register<PotionType> event) {
-    	final IForgeRegistry<PotionType> registry = event.getRegistry();
-		
-    	NostrumPotionTypes.register(registry);
-    	
-    	// Is this the right time to register brewing recipes?
-    	registerPotionMixes();
-    }
-    
-    private void registerPotionMixes() {
-    	
-    	// Mana regen potion
-    	ItemStack ingredStack = ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1);
-    	PotionHelper.addMix(PotionTypes.THICK, Ingredient.fromStacks(ingredStack), NostrumPotionTypes.MANAREGEN.getType());
-    	ingredStack = new ItemStack(Items.REDSTONE);
-    	PotionHelper.addMix(NostrumPotionTypes.MANAREGEN.getType(), Ingredient.fromStacks(ingredStack), NostrumPotionTypes.MANAREGEN_EXTENDED.getType());
-    	ingredStack = new ItemStack(Items.GLOWSTONE_DUST);
-    	PotionHelper.addMix(NostrumPotionTypes.MANAREGEN.getType(), Ingredient.fromStacks(ingredStack), NostrumPotionTypes.MANAREGEN_STRONG.getType());
-    	
-    	if (NostrumMagica.aetheria.isEnabled()) {
-    		ingredStack = NostrumMagica.aetheria.getResourceItem(AetherResourceType.FLOWER_MANDRAKE, 1);
-    		PotionHelper.addMix(NostrumPotionTypes.MANAREGEN_STRONG.getType(), Ingredient.fromStacks(ingredStack), NostrumPotionTypes.MANAREGEN_REALLY_STRONG.getType());
-    	
-    		ingredStack = NostrumMagica.aetheria.getResourceItem(AetherResourceType.FLOWER_GINSENG, 1);
-    		PotionHelper.addMix(NostrumPotionTypes.MANAREGEN_STRONG.getType(), Ingredient.fromStacks(ingredStack), NostrumPotionTypes.MANAREGEN_STRONG_AND_LONG.getType());
-    	}
     }
     
     @SubscribeEvent

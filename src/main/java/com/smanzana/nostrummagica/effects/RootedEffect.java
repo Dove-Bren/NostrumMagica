@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.potions;
+package com.smanzana.nostrummagica.effects;
 
 import java.awt.Color;
 
@@ -6,32 +6,23 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.AbstractGui;
+import net.minecraft.client.gui.DisplayEffectsScreen;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.potion.Effect;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.EffectType;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class RootedPotion extends Potion {
+public class RootedEffect extends Effect {
 
-	private static final ResourceLocation Resource = new ResourceLocation(
-			NostrumMagica.MODID, "potions-rooted");
+	public static final String ID = "potions-rooted";
 	
-	private static RootedPotion instance;
-	public static RootedPotion instance() {
-		if (instance == null)
-			instance = new RootedPotion();
-		
-		return instance;
-	}
-	
-	private RootedPotion() {
-		super(true, (new Color(100, 60, 25)).getRGB());
-
-		this.setPotionName("potion.rooted.name");
-		this.setRegistryName(Resource);
+	public RootedEffect() {
+		super(EffectType.HARMFUL, (new Color(100, 60, 25)).getRGB());
 	}
 	
 	public boolean isReady(int duration, int amp) {
@@ -41,15 +32,13 @@ public class RootedPotion extends Potion {
 	@Override
 	public void performEffect(LivingEntity entity, int amp)
     {
-        if (entity.isRiding()) {
-        	entity.dismountRidingEntity();
+        if (entity.isPassenger()) {
+        	entity.stopRiding();
         }
         
-        if (entity.getMotion().y > 0) {
-        	entity.getMotion().y = 0;
-        }
-        entity.getMotion().x = 0.0;
-        entity.getMotion().z = 0.0;
+        final Vec3d motion = entity.getMotion();
+        final double y = (motion.y > 0 ? 0 : motion.y);
+        entity.setMotion(0, y, 0);
     }
 	
 	@Override
@@ -67,14 +56,14 @@ public class RootedPotion extends Potion {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-    public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
-		PotionIcon.ROOTED.draw(mc, x + 6, y + 7);
+    public void renderInventoryEffect(EffectInstance effect, DisplayEffectsScreen<?> gui, int x, int y, float z) {
+		PotionIcon.ROOTED.draw(gui.getMinecraft(), x + 6, y + 7);
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-    public void renderHUDEffect(int x, int y, PotionEffect effect, net.minecraft.client.Minecraft mc, float alpha) {
-		PotionIcon.ROOTED.draw(mc, x + 3, y + 3);
+    public void renderHUDEffect(EffectInstance effect, AbstractGui gui, int x, int y, float z, float alpha) {
+		PotionIcon.ROOTED.draw(Minecraft.getInstance(), x + 3, y + 3);
 	}
 	
 }

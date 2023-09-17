@@ -13,14 +13,14 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.effects.FrostbiteEffect;
+import com.smanzana.nostrummagica.effects.MagicBoostEffect;
+import com.smanzana.nostrummagica.effects.MagicResistEffect;
+import com.smanzana.nostrummagica.effects.MagicShieldEffect;
+import com.smanzana.nostrummagica.effects.PhysicalShieldEffect;
+import com.smanzana.nostrummagica.effects.RootedEffect;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.potions.FrostbitePotion;
-import com.smanzana.nostrummagica.potions.MagicBoostPotion;
-import com.smanzana.nostrummagica.potions.MagicResistPotion;
-import com.smanzana.nostrummagica.potions.MagicShieldPotion;
-import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
-import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
@@ -706,13 +706,13 @@ public class Spell {
 		case PHYSICAL:
 			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("weakness"), duration, amp).name("weakness");
 		case EARTH:
-			return new SpellAction(caster).status(RootedPotion.instance(), duration, amp).name("rooted");
+			return new SpellAction(caster).status(RootedEffect.instance(), duration, amp).name("rooted");
 		case ENDER:
 			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("blindness"), duration, amp).name("blindness");
 		case FIRE:
 			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("nausea"), duration / 2, amp).damage(EMagicElement.FIRE, 1 + (amp / 2)).name("overheat");
 		case ICE:
-			return new SpellAction(caster).status(FrostbitePotion.instance(), duration, amp).name("frostbite");
+			return new SpellAction(caster).status(FrostbiteEffect.instance(), duration, amp).name("frostbite");
 		case LIGHTNING:
 			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("slowness"), (int) (duration * .7), amp + 1).name("slowness");
 		case WIND:
@@ -738,7 +738,7 @@ public class Spell {
 		case ICE:
 			return new SpellAction(caster).dispel(elementCount * (int) (Math.pow(3, elementCount - 1))).name("dispel");
 		case LIGHTNING:
-			return new SpellAction(caster).status(MagicResistPotion.instance(), duration, amp).name("magicresist");
+			return new SpellAction(caster).status(MagicResistEffect.instance(), duration, amp).name("magicresist");
 		case WIND:
 			return new SpellAction(caster).push(5f + (2 * amp), elementCount).name("push");
 		}
@@ -754,13 +754,13 @@ public class Spell {
 		case PHYSICAL:
 			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("absorption"), duration * 5, amp).name("lifeboost");
 		case EARTH:
-			return new SpellAction(caster).status(PhysicalShieldPotion.instance(), duration, amp + 1).name("shield.physical");
+			return new SpellAction(caster).status(PhysicalShieldEffect.instance(), duration, amp + 1).name("shield.physical");
 		case ENDER:
 			return new SpellAction(caster).blink(15.0f * elementCount).name("blink");
 		case FIRE:
-			return new SpellAction(caster).status(MagicBoostPotion.instance(), duration, amp).name("magicboost");
+			return new SpellAction(caster).status(MagicBoostEffect.instance(), duration, amp).name("magicboost");
 		case ICE:
-			return new SpellAction(caster).status(MagicShieldPotion.instance(), duration, amp + 1).name("shield.magic");
+			return new SpellAction(caster).status(MagicShieldEffect.instance(), duration, amp + 1).name("shield.magic");
 		case LIGHTNING:
 			return new SpellAction(caster).pull(5 * elementCount, elementCount).name("pull");
 		case WIND:

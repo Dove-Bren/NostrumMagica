@@ -1,14 +1,16 @@
-package com.smanzana.nostrummagica.potions;
+package com.smanzana.nostrummagica.effects;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.AbstractGui;
+import net.minecraft.client.gui.DisplayEffectsScreen;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.potion.Effect;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.EffectType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -17,25 +19,15 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  * @author Skyler
  *
  */
-public class FamiliarPotion extends Potion {
-
-	private static final ResourceLocation Resource = new ResourceLocation(
-			NostrumMagica.MODID, "potions-familiar-shadow");
+public class FamiliarEffect extends Effect {
 	
-	private static FamiliarPotion instance;
-	public static FamiliarPotion instance() {
-		if (instance == null)
-			instance = new FamiliarPotion();
-		
-		return instance;
-	}
-	
-	private FamiliarPotion() {
-		super(false, 0xFF310033);
+	public static final String ID = "potions-familiar-shadow";
 
-		this.setBeneficial();
-		this.setPotionName("potion.familiar.name");
-		this.setRegistryName(Resource);
+	public FamiliarEffect() {
+		super(EffectType.BENEFICIAL, 0xFF310033);
+
+		//this.setPotionName("potion.familiar.name");
+		//this.setRegistryName(Resource);
 	}
 	
 	@Override
@@ -59,13 +51,13 @@ public class FamiliarPotion extends Potion {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-    public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
-		PotionIcon.FAMILIAR.draw(mc, x + 6, y + 7);
+    public void renderInventoryEffect(EffectInstance effect, DisplayEffectsScreen<?> gui, int x, int y, float z) {
+		PotionIcon.FAMILIAR.draw(gui.getMinecraft(), x + 6, y + 7);
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-    public void renderHUDEffect(int x, int y, PotionEffect effect, net.minecraft.client.Minecraft mc, float alpha) {
-		PotionIcon.FAMILIAR.draw(mc, x + 3, y + 3);
+    public void renderHUDEffect(EffectInstance effect, AbstractGui gui, int x, int y, float z, float alpha) {
+		PotionIcon.FAMILIAR.draw(Minecraft.getInstance(), x + 3, y + 3);
 	}
 }

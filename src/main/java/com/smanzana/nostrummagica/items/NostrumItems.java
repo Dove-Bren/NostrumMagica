@@ -319,7 +319,7 @@ public class NostrumItems {
 	}
 
 	@SubscribeEvent
-	public void registerItems(RegistryEvent.Register<Item> event) {
+	public static void registerItems(RegistryEvent.Register<Item> event) {
 		final IForgeRegistry<Item> registry = event.getRegistry();
 		registry.register(new AltarItem().setRegistryName(AltarItem.ID));
     	registry.register(new ArcaneWolfSoulItem().setRegistryName(ArcaneWolfSoulItem.ID));

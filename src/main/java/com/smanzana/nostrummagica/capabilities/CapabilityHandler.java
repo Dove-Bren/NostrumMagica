@@ -30,7 +30,7 @@ public class CapabilityHandler {
 			event.addCapability(CAPABILITY_MANARMOR_LOC, new ManaArmorAttributeProvider(event.getObject()));
 			
 			if (event.getObject().world != null && event.getObject().world.isRemote) {
-				NostrumMagica.proxy.requestStats((PlayerEntity) event.getObject());
+				NostrumMagica.instance.proxy.requestStats((PlayerEntity) event.getObject());
 			}
 		}
 	}

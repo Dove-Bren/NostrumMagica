@@ -7,8 +7,8 @@ import java.util.Random;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig;
-import com.smanzana.nostrummagica.potions.FrostbitePotion;
-import com.smanzana.nostrummagica.potions.MagicResistPotion;
+import com.smanzana.nostrummagica.effects.FrostbiteEffect;
+import com.smanzana.nostrummagica.effects.MagicResistEffect;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockIce;
@@ -174,9 +174,9 @@ public class CursedIce extends Block {
 			if (worldIn.getBlockState(pos).getValue(LEVEL) == 2)
 				amp = 1;
 			
-			if (entityIn instanceof LivingEntity && ((LivingEntity) entityIn).getActivePotionEffect(MagicResistPotion.instance()) == null) {
+			if (entityIn instanceof LivingEntity && ((LivingEntity) entityIn).getActivePotionEffect(MagicResistEffect.instance()) == null) {
 				LivingEntity living = (LivingEntity) entityIn;
-				living.addPotionEffect(new PotionEffect(FrostbitePotion.instance(),
+				living.addPotionEffect(new PotionEffect(FrostbiteEffect.instance(),
 						45, amp));
 			}
 		}

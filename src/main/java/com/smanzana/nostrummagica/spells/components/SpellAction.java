@@ -18,6 +18,11 @@ import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.MagicWall;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.effects.FamiliarEffect;
+import com.smanzana.nostrummagica.effects.LightningChargeEffect;
+import com.smanzana.nostrummagica.effects.MagicBoostEffect;
+import com.smanzana.nostrummagica.effects.MagicBuffEffect;
+import com.smanzana.nostrummagica.effects.MagicResistEffect;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.entity.dragon.EntityShadowDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
@@ -34,11 +39,6 @@ import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble.Item
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
-import com.smanzana.nostrummagica.potions.FamiliarPotion;
-import com.smanzana.nostrummagica.potions.LightningChargePotion;
-import com.smanzana.nostrummagica.potions.MagicBoostPotion;
-import com.smanzana.nostrummagica.potions.MagicBuffPotion;
-import com.smanzana.nostrummagica.potions.MagicResistPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.SpellActionSummary;
@@ -892,7 +892,7 @@ public class SpellAction {
 				}
 				
 				NostrumMagica.getMagicWrapper(caster).clearFamiliars();
-				caster.removeActivePotionEffect(FamiliarPotion.instance());
+				caster.removeActivePotionEffect(FamiliarEffect.instance());
 				for (int i = 0; i < power; i++) {
 					EntityGolem golem = spawnGolem(world);
 					golem.setPosition(block.getX() + .5, block.getY(), block.getZ() + .5);
@@ -901,7 +901,7 @@ public class SpellAction {
 					NostrumMagica.getMagicWrapper(caster).addFamiliar(golem);
 				}
 				int time = (int) (20 * 60 * 2.5 * Math.pow(2, Math.max(0, power - 1)) * efficiency);
-				caster.addPotionEffect(new PotionEffect(FamiliarPotion.instance(), time, 0) {
+				caster.addPotionEffect(new PotionEffect(FamiliarEffect.instance(), time, 0) {
 					@Override
 					public boolean onUpdate(LivingEntity entityIn) {
 						// heh snekky
@@ -1173,9 +1173,9 @@ public class SpellAction {
 			if (!(caster instanceof PlayerEntity)) {
 				int count = level + 1;
 				double amt = 2 + level;
-				caster.removeActivePotionEffect(MagicBuffPotion.instance());
+				caster.removeActivePotionEffect(MagicBuffEffect.instance());
 				NostrumMagica.magicEffectProxy.applyMagicBuff(entity, element, amt, count);
-				entity.addPotionEffect(new PotionEffect(MagicBuffPotion.instance(), 60 * 20, 0));
+				entity.addPotionEffect(new PotionEffect(MagicBuffEffect.instance(), 60 * 20, 0));
 				return true;
 			}
 			
@@ -1202,9 +1202,9 @@ public class SpellAction {
 					int count = level + 1;
 					double amt = 2 + level;
 					didEmpower = true;
-					caster.removeActivePotionEffect(MagicBuffPotion.instance());
+					caster.removeActivePotionEffect(MagicBuffEffect.instance());
 					NostrumMagica.magicEffectProxy.applyMagicBuff(entity, element, amt, count);
-					entity.addPotionEffect(new PotionEffect(MagicBuffPotion.instance(), 60 * 20, 0));
+					entity.addPotionEffect(new PotionEffect(MagicBuffEffect.instance(), 60 * 20, 0));
 				}
 			}
 			
@@ -1710,11 +1710,11 @@ public class SpellAction {
 		
 		// Really, I should just make an attribute for magic potency (which could be the same that everyhting else has, too!)
 		// Attribute made. Should rework
-		PotionEffect boostEffect = caster.getActivePotionEffect(MagicBoostPotion.instance());
+		PotionEffect boostEffect = caster.getActivePotionEffect(MagicBoostEffect.instance());
 		if (boostEffect != null) {
 			base *= Math.pow(1.5, boostEffect.getAmplifier() + 1);
 		}
-		boostEffect = caster.getActivePotionEffect(LightningChargePotion.instance());
+		boostEffect = caster.getActivePotionEffect(LightningChargeEffect.instance());
 		if (boostEffect != null) {
 			base *= 2.0;
 		}
@@ -1750,7 +1750,7 @@ public class SpellAction {
 				flamy = false;
 			}
 			
-			PotionEffect resEffect = target.getActivePotionEffect(MagicResistPotion.instance());
+			PotionEffect resEffect = target.getActivePotionEffect(MagicResistEffect.instance());
 			if (resEffect != null) {
 				base *= Math.pow(.75, resEffect.getAmplifier() + 1);
 			}

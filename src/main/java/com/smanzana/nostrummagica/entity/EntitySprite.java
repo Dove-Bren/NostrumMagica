@@ -6,6 +6,7 @@ import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.effects.RootedEffect;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowEntityGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
@@ -14,7 +15,6 @@ import com.smanzana.nostrummagica.items.NostrumSkillItem;
 import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
-import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -196,9 +196,9 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
     
     private void applyEffect(LivingEntity entity) {
     	entity.removePotionEffect(Potion.getPotionFromResourceLocation("levitation"));
-    	entity.removePotionEffect(RootedPotion.instance());
+    	entity.removePotionEffect(RootedEffect.instance());
     	if (this.isAngry()) {
-    		entity.addPotionEffect(new PotionEffect(RootedPotion.instance(), 20 * 10));
+    		entity.addPotionEffect(new PotionEffect(RootedEffect.instance(), 20 * 10));
 		} else {
 			final int finalDur = 20*10;
 			int dur = 20 * 1;

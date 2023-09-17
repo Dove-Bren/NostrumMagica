@@ -1,9 +1,9 @@
 package com.smanzana.nostrummagica.entity.golem;
 
+import com.smanzana.nostrummagica.effects.MagicShieldEffect;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.NostrumRoseItem;
 import com.smanzana.nostrummagica.items.NostrumRoseItem.RoseType;
-import com.smanzana.nostrummagica.potions.MagicShieldPotion;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -77,7 +77,7 @@ public class EntityGolemIce extends EntityGolem {
 
 	@Override
 	public boolean shouldDoBuff(LivingEntity target) {
-		return target.getActivePotionEffect(MagicShieldPotion.instance()) == null;
+		return target.getActivePotionEffect(MagicShieldEffect.instance()) == null;
 	}
 
 	@Override

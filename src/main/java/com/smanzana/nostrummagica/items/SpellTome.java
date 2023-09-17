@@ -18,11 +18,11 @@ import com.smanzana.nostrummagica.client.gui.book.PlainTextPage;
 import com.smanzana.nostrummagica.client.gui.book.SpellPreviewPage;
 import com.smanzana.nostrummagica.client.gui.book.TitlePage;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.effects.FrostbiteEffect;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
-import com.smanzana.nostrummagica.potions.FrostbitePotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
@@ -924,7 +924,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 				case 1:
 					// Frostbite
 					player.addPotionEffect(new EffectInstance(
-							FrostbitePotion.instance(),
+							FrostbiteEffect.instance(),
 							20 * 10,
 							0
 							));

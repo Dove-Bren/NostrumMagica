@@ -1,10 +1,10 @@
 package com.smanzana.nostrummagica.entity.golem;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.effects.PhysicalShieldEffect;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.NostrumRoseItem;
 import com.smanzana.nostrummagica.items.NostrumRoseItem.RoseType;
-import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -63,7 +63,7 @@ public class EntityGolemEarth extends EntityGolem {
 			this.setAttackTarget(target);
 		
 		boolean canStrength = target.getActivePotionEffect(Potion.getPotionFromResourceLocation("strength")) == null;
-		boolean canShield = target.getActivePotionEffect(PhysicalShieldPotion.instance()) == null;
+		boolean canShield = target.getActivePotionEffect(PhysicalShieldEffect.instance()) == null;
 		
 		Spell spell;
 		if (canStrength && canShield) {
@@ -85,7 +85,7 @@ public class EntityGolemEarth extends EntityGolem {
 	@Override
 	public boolean shouldDoBuff(LivingEntity target) {
 		return target.getActivePotionEffect(Potion.getPotionFromResourceLocation("strength")) == null
-				|| target.getActivePotionEffect(PhysicalShieldPotion.instance()) == null;
+				|| target.getActivePotionEffect(PhysicalShieldEffect.instance()) == null;
 	}
 
 	@Override

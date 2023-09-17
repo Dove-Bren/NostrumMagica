@@ -5,12 +5,12 @@ import java.util.List;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.effects.MagicShieldEffect;
+import com.smanzana.nostrummagica.effects.PhysicalShieldEffect;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.ArcaneWolfElementalType;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
-import com.smanzana.nostrummagica.potions.MagicShieldPotion;
-import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
@@ -67,7 +67,7 @@ public class ArcaneWolfAIBarrierTask extends EntityAIBase {
 		}
 		
 		if (doPhysical) {
-			PotionEffect effect = new PotionEffect(PhysicalShieldPotion.instance(), 20 * 15, 0);
+			PotionEffect effect = new PotionEffect(PhysicalShieldEffect.instance(), 20 * 15, 0);
 			if (!hasPhysical) {
 				// Re-apply potion effect
 				target.addPotionEffect(effect);
@@ -76,7 +76,7 @@ public class ArcaneWolfAIBarrierTask extends EntityAIBase {
 				applied = true;
 			} else {
 				// Refresh potion effect
-				target.getActivePotionEffect(PhysicalShieldPotion.instance()).combine(effect);
+				target.getActivePotionEffect(PhysicalShieldEffect.instance()).combine(effect);
 				
 				if (currentPhysical.getAmt() < maxAmt) {
 					// Add 1 to current amount
@@ -85,7 +85,7 @@ public class ArcaneWolfAIBarrierTask extends EntityAIBase {
 				}
 			}
 		} else {
-			PotionEffect effect = new PotionEffect(MagicShieldPotion.instance(), 20 * 15, 0);
+			PotionEffect effect = new PotionEffect(MagicShieldEffect.instance(), 20 * 15, 0);
 			if (!hasMagical) {
 				// Re-apply potion effect
 				target.addPotionEffect(effect);
@@ -94,7 +94,7 @@ public class ArcaneWolfAIBarrierTask extends EntityAIBase {
 				applied = true;
 			} else {
 				// Refresh potion effect
-				target.getActivePotionEffect(MagicShieldPotion.instance()).combine(effect);
+				target.getActivePotionEffect(MagicShieldEffect.instance()).combine(effect);
 				
 				if (currentMagical.getAmt() < maxAmt) {
 					// Add 1 to current amount

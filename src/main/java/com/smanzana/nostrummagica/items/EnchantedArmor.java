@@ -28,12 +28,12 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.render.LayerAetherCloak;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.effects.RootedEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaEntityEffect;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.EnchantedArmorStateUpdate;
 import com.smanzana.nostrummagica.network.messages.EnchantedArmorStateUpdate.ArmorState;
-import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
@@ -553,7 +553,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 		switch (element) {
 		case EARTH:
 //			if (NostrumMagica.rand.nextFloat() <= 0.15f * (float) (Math.min(2, level) + 1))
-			action = new SpellAction(user).status(RootedPotion.instance(), 20 * 5 * (Math.min(2, type.scale) + 1), 0);
+			action = new SpellAction(user).status(RootedEffect.instance(), 20 * 5 * (Math.min(2, type.scale) + 1), 0);
 			break;
 		case ENDER:
 //			if (NostrumMagica.rand.nextFloat() <= 0.15f * (float) (Math.min(2, level) + 1))

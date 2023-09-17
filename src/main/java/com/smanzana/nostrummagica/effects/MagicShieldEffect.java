@@ -1,37 +1,26 @@
-package com.smanzana.nostrummagica.potions;
+package com.smanzana.nostrummagica.effects;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.AbstractGui;
+import net.minecraft.client.gui.DisplayEffectsScreen;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.potion.Effect;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.EffectType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class MagicShieldPotion extends Potion {
+public class MagicShieldEffect extends Effect {
 
-	private static final ResourceLocation Resource = new ResourceLocation(
-			NostrumMagica.MODID, "potions-shieldm");
+	public static final String ID = "potions-shieldm";
 	
-	private static MagicShieldPotion instance;
-	public static MagicShieldPotion instance() {
-		if (instance == null)
-			instance = new MagicShieldPotion();
-		
-		return instance;
-	}
-	
-	private MagicShieldPotion() {
-		super(false, 0xFF559496);
-		
-		this.setBeneficial();
-		this.setPotionName("potion.shieldmagic.name");
-		this.setRegistryName(Resource);
+	public MagicShieldEffect() {
+		super(EffectType.BENEFICIAL, 0xFF559496);
 	}
 	
 	@Override
@@ -59,13 +48,13 @@ public class MagicShieldPotion extends Potion {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-    public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
-		PotionIcon.MAGICSHIELD.draw(mc, x + 6, y + 7);
+    public void renderInventoryEffect(EffectInstance effect, DisplayEffectsScreen<?> gui, int x, int y, float z) {
+		PotionIcon.MAGICSHIELD.draw(gui.getMinecraft(), x + 6, y + 7);
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-    public void renderHUDEffect(int x, int y, PotionEffect effect, net.minecraft.client.Minecraft mc, float alpha) {
-		PotionIcon.MAGICSHIELD.draw(mc, x + 3, y + 3);
+    public void renderHUDEffect(EffectInstance effect, AbstractGui gui, int x, int y, float z, float alpha) {
+		PotionIcon.MAGICSHIELD.draw(Minecraft.getInstance(), x + 3, y + 3);
 	}
 }

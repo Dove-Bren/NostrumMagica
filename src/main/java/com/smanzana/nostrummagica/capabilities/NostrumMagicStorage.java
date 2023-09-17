@@ -400,7 +400,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		if (tag.contains(NBT_BINDING_COMPONENT, NBT.TAG_STRING)
 				&& tag.contains(NBT_BINDING_SPELL, NBT.TAG_INT)
 				&& tag.contains(NBT_BINDING_TOME_ID, NBT.TAG_INT)) {
-			Spell spell = NostrumMagica.getSpellRegistry().lookup(tag.getInt(NBT_BINDING_SPELL));
+			Spell spell = NostrumMagica.instance.getSpellRegistry().lookup(tag.getInt(NBT_BINDING_SPELL));
 			if (spell != null) {
 				SpellComponentWrapper comp = SpellComponentWrapper.fromKeyString(tag.getString(NBT_BINDING_COMPONENT));
 				int tomeID = tag.getInt(NBT_BINDING_TOME_ID);

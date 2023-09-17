@@ -14,11 +14,11 @@ import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect.Predefin
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.effects.NostrumTransformationEffect;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.IStabbableEntity;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
-import com.smanzana.nostrummagica.potions.NostrumTransformationPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.utils.ItemStacks;
@@ -209,7 +209,7 @@ public class SoulDagger extends SwordItem implements ILoreTagged, ISpellArmor {
 	}
 	
 	protected boolean doSpecialWolfStab(LivingEntity stabber, WolfEntity wolf, ItemStack dagger) {
-		if (wolf.getActivePotionEffect(NostrumTransformationPotion.instance()) != null
+		if (wolf.getActivePotionEffect(NostrumTransformationEffect.instance()) != null
 				&& stabber instanceof PlayerEntity
 				&& wolf.isOwner(stabber)) {
 			// Wolves get transformed into arcane wolves!

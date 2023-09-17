@@ -5,9 +5,9 @@ import java.util.List;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.effects.NaturesBlessingEffect;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.ArcaneWolfElementalType;
-import com.smanzana.nostrummagica.potions.NaturesBlessingPotion;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
@@ -48,9 +48,9 @@ public class ArcaneWolfAINatureTask extends EntityAIBase {
 	
 	protected boolean applyTo(EntityArcaneWolf wolf, LivingEntity target) {
 		// Nature keeps the "Nature's blessing" status effect constant
-		PotionEffect effect = target.getActivePotionEffect(NaturesBlessingPotion.instance());
+		PotionEffect effect = target.getActivePotionEffect(NaturesBlessingEffect.instance());
 		if (effect == null || effect.getDuration() < 11 * 20) {
-			target.addPotionEffect(new PotionEffect(NaturesBlessingPotion.instance(), 20 * 30, 0));
+			target.addPotionEffect(new PotionEffect(NaturesBlessingEffect.instance(), 20 * 30, 0));
 		}
 		
 		return effect == null; // Only charge for applying the first time

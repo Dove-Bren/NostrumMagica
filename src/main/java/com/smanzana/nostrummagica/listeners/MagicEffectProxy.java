@@ -6,10 +6,10 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.potions.MagicBuffPotion;
-import com.smanzana.nostrummagica.potions.MagicShieldPotion;
-import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
-import com.smanzana.nostrummagica.potions.RootedPotion;
+import com.smanzana.nostrummagica.effects.MagicBuffEffect;
+import com.smanzana.nostrummagica.effects.MagicShieldEffect;
+import com.smanzana.nostrummagica.effects.PhysicalShieldEffect;
+import com.smanzana.nostrummagica.effects.RootedEffect;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
@@ -342,7 +342,7 @@ public class MagicEffectProxy {
 				data.count--;
 				if (data.count <= 0) {
 					remove(SpecialEffect.MAGIC_BUFF, living);
-					living.removePotionEffect(MagicBuffPotion.instance());
+					living.removePotionEffect(MagicBuffEffect.instance());
 				}
 				
 				notify(living, SpecialEffect.MAGIC_BUFF, data.count == 0 ? null : data);
@@ -382,13 +382,13 @@ public class MagicEffectProxy {
 		Potion potion = null;
 		switch (effect) {
 		case SHIELD_PHYSICAL:
-			potion = PhysicalShieldPotion.instance();
+			potion = PhysicalShieldEffect.instance();
 			break;
 		case SHIELD_MAGIC:
-			potion = MagicShieldPotion.instance();
+			potion = MagicShieldEffect.instance();
 			break;
 		case ROOTED:
-			potion = RootedPotion.instance();
+			potion = RootedEffect.instance();
 			break;
 		default:
 			;

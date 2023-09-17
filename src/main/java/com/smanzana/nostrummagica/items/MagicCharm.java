@@ -6,10 +6,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.effects.MagicShieldEffect;
+import com.smanzana.nostrummagica.effects.PhysicalShieldEffect;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
-import com.smanzana.nostrummagica.potions.MagicShieldPotion;
-import com.smanzana.nostrummagica.potions.PhysicalShieldPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
@@ -232,8 +232,8 @@ public class MagicCharm extends Item implements ILoreTagged {
 	}
 	
 	private boolean doIce(PlayerEntity player, ServerWorld world) {
-		player.addPotionEffect(new EffectInstance(MagicShieldPotion.instance(), 20 * 60 * 2, 0));
-		player.addPotionEffect(new EffectInstance(PhysicalShieldPotion.instance(), 20 * 60 * 2, 0));
+		player.addPotionEffect(new EffectInstance(MagicShieldEffect.instance(), 20 * 60 * 2, 0));
+		player.addPotionEffect(new EffectInstance(PhysicalShieldEffect.instance(), 20 * 60 * 2, 0));
 		
 		NostrumMagicaSounds.DAMAGE_ICE.play(world, player.posX, player.posY, player.posZ);
 		return true;

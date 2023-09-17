@@ -1,10 +1,10 @@
 package com.smanzana.nostrummagica.entity.golem;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.effects.MagicResistEffect;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.NostrumRoseItem;
 import com.smanzana.nostrummagica.items.NostrumRoseItem.RoseType;
-import com.smanzana.nostrummagica.potions.MagicResistPotion;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -99,7 +99,7 @@ public class EntityGolemLightning extends EntityGolem {
 
 	@Override
 	public boolean shouldDoBuff(LivingEntity target) {
-		return target.getActivePotionEffect(MagicResistPotion.instance()) == null;
+		return target.getActivePotionEffect(MagicResistEffect.instance()) == null;
 	}
 
 	@Override

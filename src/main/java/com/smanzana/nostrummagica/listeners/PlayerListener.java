@@ -22,6 +22,9 @@ import com.smanzana.nostrummagica.blocks.TeleportRune;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.MirrorGui;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.effects.LightningAttackEffect;
+import com.smanzana.nostrummagica.effects.LightningChargeEffect;
+import com.smanzana.nostrummagica.effects.RootedEffect;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfTypeCapability;
@@ -38,9 +41,6 @@ import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.items.ThanosStaff;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
-import com.smanzana.nostrummagica.potions.LightningAttackPotion;
-import com.smanzana.nostrummagica.potions.LightningChargePotion;
-import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.SpellActionSummary;
@@ -494,12 +494,12 @@ public class PlayerListener {
 			}
 		}
 		
-		if (ent.getActivePotionEffect(RootedPotion.instance()) != null) {
-			if (ent.getActivePotionEffect(LightningChargePotion.instance()) != null
-					|| ent.getActivePotionEffect(LightningAttackPotion.instance()) != null) {
-				ent.removePotionEffect(LightningChargePotion.instance());
-				ent.removePotionEffect(LightningAttackPotion.instance());
-				ent.removePotionEffect(RootedPotion.instance());
+		if (ent.getActivePotionEffect(RootedEffect.instance()) != null) {
+			if (ent.getActivePotionEffect(LightningChargeEffect.instance()) != null
+					|| ent.getActivePotionEffect(LightningAttackEffect.instance()) != null) {
+				ent.removePotionEffect(LightningChargeEffect.instance());
+				ent.removePotionEffect(LightningAttackEffect.instance());
+				ent.removePotionEffect(RootedEffect.instance());
 			}
 		}
 	}
@@ -1143,20 +1143,20 @@ public class PlayerListener {
 		final boolean hasLightningSet = EnchantedArmor.GetSetCount(living, EMagicElement.LIGHTNING, 3) == 4;
 		if (hasLightningSet) {
 			// Alternate between buff and attack modes
-			PotionEffect boostEffect = living.getActivePotionEffect(LightningChargePotion.instance());
-			PotionEffect attackEffect = living.getActivePotionEffect(LightningAttackPotion.instance());
+			PotionEffect boostEffect = living.getActivePotionEffect(LightningChargeEffect.instance());
+			PotionEffect attackEffect = living.getActivePotionEffect(LightningAttackEffect.instance());
 			boolean tooSoon = (boostEffect == null ? (attackEffect == null ? 0 : attackEffect.getDuration()) : boostEffect.getDuration())
 					> (20 * 30 - 5);
 			
 			if (!tooSoon) {
 				if (boostEffect != null) {
-					living.removePotionEffect(LightningChargePotion.instance());
-					living.addPotionEffect(new PotionEffect(LightningAttackPotion.instance(), 20 * 30, 0));
+					living.removePotionEffect(LightningChargeEffect.instance());
+					living.addPotionEffect(new PotionEffect(LightningAttackEffect.instance(), 20 * 30, 0));
 				} else {
 					if (attackEffect != null) {
-						living.removePotionEffect(LightningAttackPotion.instance());
+						living.removePotionEffect(LightningAttackEffect.instance());
 					}
-					living.addPotionEffect(new PotionEffect(LightningChargePotion.instance(), 20 * 30, 0));
+					living.addPotionEffect(new PotionEffect(LightningChargeEffect.instance(), 20 * 30, 0));
 				}
 			}
 			

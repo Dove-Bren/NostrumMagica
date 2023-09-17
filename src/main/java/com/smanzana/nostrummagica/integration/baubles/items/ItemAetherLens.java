@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.effects.NostrumPotionTypes;
 import com.smanzana.nostrummagica.entity.IMagicEntity;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileEntity;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
@@ -16,7 +17,6 @@ import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
-import com.smanzana.nostrummagica.potions.NostrumPotionTypes;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.resources.I18n;

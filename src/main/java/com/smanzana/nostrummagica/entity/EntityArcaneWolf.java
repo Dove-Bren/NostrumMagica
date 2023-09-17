@@ -23,6 +23,8 @@ import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfInvento
 import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfTrainingSheet;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.effects.MagicBoostEffect;
+import com.smanzana.nostrummagica.effects.RootedEffect;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowOwnerAdvanced;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowOwnerGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIPetTargetTask;
@@ -40,8 +42,6 @@ import com.smanzana.nostrummagica.pet.IPetWithSoul;
 import com.smanzana.nostrummagica.pet.PetInfo;
 import com.smanzana.nostrummagica.pet.PetInfo.PetAction;
 import com.smanzana.nostrummagica.pet.PetInfo.SecondaryFlavor;
-import com.smanzana.nostrummagica.potions.MagicBoostPotion;
-import com.smanzana.nostrummagica.potions.RootedPotion;
 import com.smanzana.nostrummagica.serializers.ArcaneWolfElementalTypeSerializer;
 import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
 import com.smanzana.nostrummagica.serializers.PetJobSerializer;
@@ -288,7 +288,7 @@ public class EntityArcaneWolf extends EntityWolf implements ITameableEntity, IEn
 				(new Spell("WolfRoots", true)).addPart(new SpellPart(SeekingBulletTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.EARTH, 2, EAlteration.INFLICT)),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.EARTH, 1)
-							&& target.getActivePotionEffect(RootedPotion.instance()) == null;
+							&& target.getActivePotionEffect(RootedEffect.instance()) == null;
 				}),
 		REGEN(WolfSpellTargetGroup.ALLY, 50,
 				(new Spell("WolfRegen", true)).addPart(new SpellPart(AITargetTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.EARTH, 2, EAlteration.GROWTH)),
@@ -333,7 +333,7 @@ public class EntityArcaneWolf extends EntityWolf implements ITameableEntity, IEn
 				(new Spell("WolfMagicBoost", true)).addPart(new SpellPart(AITargetTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.FIRE, 1, EAlteration.SUPPORT)),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.FIRE, 3)
-							&& target.getActivePotionEffect(MagicBoostPotion.instance()) == null
+							&& target.getActivePotionEffect(MagicBoostEffect.instance()) == null
 							&& (wolf.getAttackTarget() != null || wolf.getMana() >= wolf.getMaxMana() * .75) // in battle or >= 75% mana
 							;
 				}),

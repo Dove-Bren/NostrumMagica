@@ -6,7 +6,7 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import com.smanzana.nostrummagica.potions.NostrumTransformationPotion;
+import com.smanzana.nostrummagica.effects.NostrumTransformationEffect;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
 
@@ -47,7 +47,7 @@ public class OutcomeApplyTransformation implements IRitualOutcome {
 		@Nullable LivingEntity target = findEntity(world, player, center);
 		if (target != null) {
 			// Apply effect to the selected entity
-			target.addPotionEffect(new PotionEffect(NostrumTransformationPotion.instance(), duration, 0, true, true));
+			target.addPotionEffect(new PotionEffect(NostrumTransformationEffect.instance(), duration, 0, true, true));
 		}
 	}
 	

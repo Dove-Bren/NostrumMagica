@@ -1,37 +1,26 @@
-package com.smanzana.nostrummagica.potions;
+package com.smanzana.nostrummagica.effects;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.AbstractGui;
+import net.minecraft.client.gui.DisplayEffectsScreen;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.potion.Effect;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.EffectType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class MagicBuffPotion extends Potion {
+public class MagicBuffEffect extends Effect {
 
-	private static final ResourceLocation Resource = new ResourceLocation(
-			NostrumMagica.MODID, "potions-magicbuff");
+	public static final String ID = "potions-magicbuff";
 	
-	private static MagicBuffPotion instance;
-	public static MagicBuffPotion instance() {
-		if (instance == null)
-			instance = new MagicBuffPotion();
-		
-		return instance;
-	}
-	
-	private MagicBuffPotion() {
-		super(false, 0xFF80805D);
-
-		this.setBeneficial();
-		this.setPotionName("potion.magicbuff.name");
-		this.setRegistryName(Resource);
+	public MagicBuffEffect() {
+		super(EffectType.BENEFICIAL, 0xFF80805D);
 	}
 	
 	@Override
@@ -52,30 +41,32 @@ public class MagicBuffPotion extends Potion {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-    public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
+    public void renderInventoryEffect(EffectInstance effect, DisplayEffectsScreen<?> gui, int x, int y, float z) {
+		final Minecraft mc = gui.getMinecraft();
 		PotionIcon.ENCHANT.draw(mc, x + 6, y + 7);
 		
 		EffectData data = NostrumMagica.magicEffectProxy.getData(mc.player, SpecialEffect.MAGIC_BUFF);
 		int count = data == null ? 0 : data.getCount();
 		if (count > 0) {
 			String display = "" + count;
-			int width = mc.font.getStringWidth(display);
-			mc.font.drawString("" + count, x + 6 + (20 - width), y + 7 + (20 - mc.font.FONT_HEIGHT), 0xFFFFFFFF);
+			int width = mc.fontRenderer.getStringWidth(display);
+			mc.fontRenderer.drawString("" + count, x + 6 + (20 - width), y + 7 + (20 - mc.fontRenderer.FONT_HEIGHT), 0xFFFFFFFF);
 		}
 		
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-    public void renderHUDEffect(int x, int y, PotionEffect effect, net.minecraft.client.Minecraft mc, float alpha) {
+    public void renderHUDEffect(EffectInstance effect, AbstractGui gui, int x, int y, float z, float alpha) {
+		Minecraft mc = Minecraft.getInstance();
 		PotionIcon.ENCHANT.draw(mc, x + 3, y + 3);
 		
 		EffectData data = NostrumMagica.magicEffectProxy.getData(mc.player, SpecialEffect.MAGIC_BUFF);
 		int count = data == null ? 0 : data.getCount();
 		if (count > 0) {
 			String display = "" + count;
-			int width = mc.font.getStringWidth(display);
-			mc.font.drawString("" + count, x + 6 + (16 - width), y + 7 + (16 - mc.font.FONT_HEIGHT), 0xFFFFFFFF);
+			int width = mc.fontRenderer.getStringWidth(display);
+			mc.fontRenderer.drawString("" + count, x + 6 + (16 - width), y + 7 + (16 - mc.fontRenderer.FONT_HEIGHT), 0xFFFFFFFF);
 		}
 		
 	}

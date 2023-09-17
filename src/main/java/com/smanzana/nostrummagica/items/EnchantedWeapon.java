@@ -11,6 +11,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.EntityBehavior;
+import com.smanzana.nostrummagica.effects.FrostbiteEffect;
+import com.smanzana.nostrummagica.effects.LightningAttackEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaEntityEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaLocationEffect;
@@ -18,8 +20,6 @@ import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble.ItemType;
 import com.smanzana.nostrummagica.items.EnchantedArmor.Type;
-import com.smanzana.nostrummagica.potions.FrostbitePotion;
-import com.smanzana.nostrummagica.potions.LightningAttackPotion;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
@@ -277,7 +277,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 		case ICE:
 			if (NostrumMagica.rand.nextFloat() < 0.5f * typeScale(this.type))
 				action = new SpellAction(user).status(
-						FrostbitePotion.instance(), 5 * 20, typeScale(this.type) > 2 ? typeScale(this.type) - 2 : 0);
+						FrostbiteEffect.instance(), 5 * 20, typeScale(this.type) > 2 ? typeScale(this.type) - 2 : 0);
 			break;
 		default:
 			break;
@@ -406,7 +406,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 						summonBoltOnSelf(playerIn);
 					}
 					used = true;
-				} else if (playerIn.isPotionActive(LightningAttackPotion.instance())) {
+				} else if (playerIn.isPotionActive(LightningAttackEffect.instance())) {
 					// This should be client-side... TODO do it on client and send via armor message?
 					
 					// Do quick mana check prior to actually doing raytrace. Redone inside helper func.
@@ -472,7 +472,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 						summonBoltOnSelf(playerIn);
 					}
 					used = true;
-				} else if (playerIn.isPotionActive(LightningAttackPotion.instance())) {
+				} else if (playerIn.isPotionActive(LightningAttackEffect.instance())) {
 					// This should be client-side... TODO do it on client and send via armor message?
 					
 					// Do quick mana check prior to actually doing raytrace. Redone inside helper func.
@@ -510,7 +510,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 		cloud.setRadius(0.5f);
 		cloud.setRadiusPerTick((1f + typeScale(weaponType) * .75f) / (20f * 3)); // 1 (+ .75 per extra level) extra radius per 3 seconds
 		cloud.setDuration((int) (20 * (3 + typeScale(weaponType) * .5f))); // 3 seconds + a half a second per extra level
-		cloud.addEffect(new PotionEffect(FrostbitePotion.instance(), 20 * 10));
+		cloud.addEffect(new PotionEffect(FrostbiteEffect.instance(), 20 * 10));
 		cloud.addEffect((IAreaLocationEffect)(worldIn, pos) -> {
 			BlockState state = worldIn.getBlockState(pos);
 			if (state.getMaterial() == Material.WATER
