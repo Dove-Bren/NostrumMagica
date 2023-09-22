@@ -1,11 +1,16 @@
 package com.smanzana.nostrummagica.utils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
@@ -24,6 +29,18 @@ public class Entities {
 		}
 		
 		return null;
+	}
+	
+	public static List<LivingEntity> GetEntities(ServerWorld world, Predicate<LivingEntity> predicate) {
+		List<Entity> entities = world.getEntities()
+				.filter((e) -> {return e instanceof LivingEntity;})
+				.filter((e) -> {return predicate.test((LivingEntity) e);})
+				.collect(Collectors.toList());
+		List<LivingEntity> livingList = new ArrayList<LivingEntity>();
+		for (Entity e : entities) {
+			livingList.add((LivingEntity) e);
+		}
+		return livingList;
 	}
 	
 }

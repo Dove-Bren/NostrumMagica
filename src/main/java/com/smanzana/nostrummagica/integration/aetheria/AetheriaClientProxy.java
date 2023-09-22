@@ -9,9 +9,9 @@ import com.smanzana.nostrummagica.client.render.tile.TileEntityWispBlockRenderer
 import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuser;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock;
 import com.smanzana.nostrummagica.integration.aetheria.items.AetherResourceType;
+import com.smanzana.nostrummagica.integration.aetheria.items.ItemAetherLens;
 import com.smanzana.nostrummagica.integration.aetheria.items.NostrumAetherResourceItem;
-import com.smanzana.nostrummagica.integration.baubles.items.ItemAetherLens;
-import com.smanzana.nostrummagica.integration.baubles.items.ItemAetherLens.LensType;
+import com.smanzana.nostrummagica.integration.aetheria.items.ItemAetherLens.LensType;
 import com.smanzana.nostrummagica.proxy.ClientProxy;
 
 import net.minecraft.client.renderer.block.model.ModelBakery;

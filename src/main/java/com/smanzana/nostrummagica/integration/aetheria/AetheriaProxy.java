@@ -13,12 +13,11 @@ import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileE
 import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock.WispBlockTileEntity;
 import com.smanzana.nostrummagica.integration.aetheria.items.AetherResourceType;
+import com.smanzana.nostrummagica.integration.aetheria.items.ItemAetherLens;
+import com.smanzana.nostrummagica.integration.aetheria.items.ItemAetherLens.LensType;
 import com.smanzana.nostrummagica.integration.aetheria.items.NostrumAetherResourceItem;
-import com.smanzana.nostrummagica.integration.baubles.items.ItemAetherLens;
-import com.smanzana.nostrummagica.integration.baubles.items.ItemAetherLens.LensType;
-import com.smanzana.nostrummagica.items.AltarItem;
-import com.smanzana.nostrummagica.items.NostrumResourceItem;
-import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
+import com.smanzana.nostrummagica.items.NostrumItemTags;
+import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
@@ -35,21 +34,23 @@ import com.smanzana.nostrummagica.rituals.requirements.RRequirementResearch;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.ObjectHolder;
 
+@ObjectHolder(NostrumMagica.MODID)
 public class AetheriaProxy {
 	private boolean enabled;
 	
@@ -61,7 +62,19 @@ public class AetheriaProxy {
 		this.enabled = true;
 	}
 	
-	public static Item ItemResources = null;
+	@ObjectHolder(NostrumAetherResourceItem.ID_GINSENG_FLOWER) public static Item ginsengFlower;
+	@ObjectHolder(NostrumAetherResourceItem.ID_MANDRAKE_FLOWER) public static Item mandrakeFlower;
+	@ObjectHolder(ItemAetherLens.ID_SPREAD) public static Item spreadAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_CHARGE) public static Item chargeAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_GROW) public static Item growAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_SWIFTNESS) public static Item swiftnessAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_ELEVATOR) public static Item elevatorAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_HEAL) public static Item healAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_BORE) public static Item boreAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_BORE_REVERSED) public static Item reversedBoreAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_MANA_REGEN) public static Item manaRegenAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_NO_SPAWN) public static Item noSpawnAetherLens;
+	
 	public static Item ItemLens = null;
 	public static Block BlockWisp = null;
 	public static Block BlockerInfuser = null;
@@ -105,17 +118,25 @@ public class AetheriaProxy {
 	public void registerItems(RegistryEvent.Register<Item> event) {
     	final IForgeRegistry<Item> registry = event.getRegistry();
     	
-    	ItemResources = NostrumAetherResourceItem.instance();
-    	registry.register(ItemResources);
-    	ItemLens = ItemAetherLens.instance();
-    	registry.register(ItemLens);
+    	registry.register(new NostrumAetherResourceItem(300, 450, NostrumItems.PropBase()).setRegistryName(NostrumAetherResourceItem.ID_GINSENG_FLOWER));
+		registry.register(new NostrumAetherResourceItem(300, 350, NostrumItems.PropBase()).setRegistryName(NostrumAetherResourceItem.ID_MANDRAKE_FLOWER));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.SPREAD, NostrumItems.PropBase()).setRegistryName(ItemAetherLens.ID_SPREAD));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.CHARGE, NostrumItems.PropBase()).setRegistryName(ItemAetherLens.ID_CHARGE));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.GROW, NostrumItems.PropBase()).setRegistryName(ItemAetherLens.ID_GROW));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.SWIFTNESS, NostrumItems.PropBase()).setRegistryName(ItemAetherLens.ID_SWIFTNESS));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.ELEVATOR, NostrumItems.PropBase()).setRegistryName(ItemAetherLens.ID_ELEVATOR));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.HEAL, NostrumItems.PropBase()).setRegistryName(ItemAetherLens.ID_HEAL));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.BORE, NostrumItems.PropBase()).setRegistryName(ItemAetherLens.ID_BORE));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.BORE_REVERSED, NostrumItems.PropBase()).setRegistryName(ItemAetherLens.ID_BORE_REVERSED));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.MANA_REGEN, NostrumItems.PropBase()).setRegistryName(ItemAetherLens.ID_MANA_REGEN));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.NO_SPAWN, NostrumItems.PropBase()).setRegistryName(ItemAetherLens.ID_NO_SPAWN));
     	
     	registry.register(
-    			(new ItemBlock(WispBlock.instance()).setRegistryName(WispBlock.ID)
+    			(new BlockItem(WispBlock.instance()).setRegistryName(WispBlock.ID)
     					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(WispBlock.ID))
     	);
     	registry.register(
-    			(new ItemBlock(AetherInfuser.instance()).setRegistryName(AetherInfuser.ID)
+    			(new BlockItem(AetherInfuser.instance()).setRegistryName(AetherInfuser.ID)
     					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(AetherInfuser.ID))
     	);
 	}
@@ -143,8 +164,13 @@ public class AetheriaProxy {
 						new ItemStack(WispBlock.instance()),
 						null,
 						new ReagentType[] {ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST},
-						new ItemStack(AltarItem.instance()),
-						new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), new ItemStack(APIProxy.AetherBatterySmallBlock), new ItemStack(Blocks.OBSIDIAN, 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1)},
+						Ingredient.fromItems(NostrumItems.altarItem),
+						new Ingredient[] {
+								Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+								Ingredient.fromStacks(APIProxy.AetherBatterySmallBlock),
+								Ingredient.fromTag(Tags.Items.OBSIDIAN),
+								Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+								},
 						new RRequirementResearch("wispblock"),
 						new OutcomeSpawnItem(new ItemStack(WispBlock.instance()))
 						)
@@ -155,28 +181,32 @@ public class AetheriaProxy {
 						new ItemStack(BlockerInfuser),
 						null,
 						new ReagentType[] {ReagentType.GINSENG, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK},
-						new ItemStack(Blocks.OBSIDIAN),
-						new ItemStack[] {new ItemStack(APIProxy.AetherBatterySmallBlock), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), new ItemStack(APIProxy.AetherBatterySmallBlock), new ItemStack(APIProxy.AetherBatterySmallBlock)},
+						Ingredient.fromTag(Tags.Items.OBSIDIAN),
+						new Ingredient[] {
+								Ingredient.fromStacks(new ItemStack(APIProxy.AetherBatterySmallBlock)),
+								Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+								Ingredient.fromStacks(new ItemStack(APIProxy.AetherBatterySmallBlock)),
+								Ingredient.fromStacks(new ItemStack(APIProxy.AetherBatterySmallBlock))},
 						new RRequirementResearch("aether_infusers"),
 						new OutcomeCreateAetherInfuser()
 						)
 				);
 		
 		for (LensType type : LensType.values()) {
-			final @Nonnull ItemStack ingredient = type.getIngredient();
-			if (ingredient.isEmpty()) {
+			Ingredient ingredient = type.getIngredient();
+			if (ingredient == Ingredient.EMPTY) {
 				continue;
 			}
 			
 			RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("make_lens_" + type.getUnlocSuffix(),
-						ItemAetherLens.Create(type, 1),
+						new ItemStack(ItemAetherLens.GetLens(type)),
 						null,
 						new ReagentType[] {ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK},
-						new ItemStack(Blocks.GLASS_PANE),
-						new ItemStack[] {ItemStack.EMPTY, ingredient.copy(), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), ItemStack.EMPTY},
+						Ingredient.fromTag(Tags.Items.GLASS_PANES),
+						new Ingredient[] {Ingredient.EMPTY, ingredient, Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredient.EMPTY},
 						new RRequirementResearch("aether_infusers"),
-						new OutcomeSpawnItem(ItemAetherLens.Create(type, 1))
+						new OutcomeSpawnItem(new ItemStack(ItemAetherLens.GetLens(type)))
 				)
 			);
 		}
@@ -215,7 +245,23 @@ public class AetheriaProxy {
 	}
 	
 	public ItemStack getResourceItem(AetherResourceType type, int count) {
-		return NostrumAetherResourceItem.getItem(type, count);
+		Item item = null;
+		switch (type) {
+		case FLOWER_GINSENG:
+			item = ginsengFlower;
+			break;
+		case FLOWER_MANDRAKE:
+			item = mandrakeFlower;
+			break;
+		default:
+			break;
+		}
+		
+		if (item == null) {
+			return ItemStack.EMPTY;
+		} else {
+			return new ItemStack(item, count);
+		}
 	}
 
 	public boolean CreateAetherInfuser(World world, BlockPos pos) {

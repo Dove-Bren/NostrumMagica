@@ -5,15 +5,15 @@ import java.util.List;
 import com.smanzana.nostrumaetheria.api.item.IAetherBurnable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.items.ChalkItem;
+import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.client.resources.I18n;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -22,6 +22,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.ObjectHolder;
 
 /**
  * Misc. resource items for aether-related progression
@@ -30,75 +35,19 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  */
 public class NostrumAetherResourceItem extends Item implements ILoreTagged, IAetherBurnable {
 
-	public static final String ID = "nostrum_aether_resource";
+	private static final String ID_PREFIX = "aether_resource_";
+	public static final String ID_GINSENG_FLOWER = ID_PREFIX + "ginseng_flower";
+	public static final String ID_MANDRAKE_FLOWER = ID_PREFIX + "mandrake_flower";
 	
-	private static NostrumAetherResourceItem instance = null;
-	public static NostrumAetherResourceItem instance() {
-		if (instance == null)
-			instance = new NostrumAetherResourceItem();
-		
-		return instance;
+	private final int burnTicks;
+	private final int aetherYield;
+	
+	public NostrumAetherResourceItem(int burnTicks, int aetherYield, Item.Properties builder) {
+		super(builder);
+		this.burnTicks = burnTicks;
+		this.aetherYield = aetherYield;
 	}
 	
-	public NostrumAetherResourceItem() {
-		super();
-		this.setUnlocalizedName(ID);
-		this.setRegistryName(NostrumMagica.MODID, ID);
-		this.setMaxDamage(0);
-		this.setMaxStackSize(64);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setHasSubtypes(true);
-	}
-	
-	@Override
-	public String getUnlocalizedName(ItemStack stack) {
-		int i = stack.getMetadata();
-		
-		AetherResourceType type = getTypeFromMeta(i);
-		return "item." + type.getUnlocalizedKey();
-	}
-	
-	/**
-	 * Returns an itemstack of the specified type
-	 * @param type
-	 * @param count
-	 * @return
-	 */
-	public static ItemStack getItem(AetherResourceType type, int count) {
-		int meta = getMetaFromType(type);
-		
-		return new ItemStack(instance(), count, meta);
-	}
-	
-	/**
-     * returns a list of items with the same ID, but different meta (eg: dye returns 16 items)
-     */
-    @OnlyIn(Dist.CLIENT)
-    @Override
-	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-    	if (this.isInCreativeTab(tab)) {
-	    	for (AetherResourceType type : AetherResourceType.values()) {
-	    		subItems.add(new ItemStack(this, 1, getMetaFromType(type)));
-	    	}
-    	}
-	}
-    
-    public static int getMetaFromType(AetherResourceType type) {
-    	return type.ordinal();
-    }
-    
-    public static AetherResourceType getTypeFromMeta(int meta) {
-    	AetherResourceType ret = null;
-    	for (AetherResourceType type : AetherResourceType.values()) {
-			if (type.ordinal() == meta) {
-				ret = type;
-				break;
-			}
-		}
-    	
-    	return ret;
-    }
-    
     @Override
 	public String getLoreKey() {
 		return "nostrum_aether_resource";
@@ -121,93 +70,17 @@ public class NostrumAetherResourceItem extends Item implements ILoreTagged, IAet
 	}
 	
 	@Override
-	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-		AetherResourceType type = getTypeFromMeta(stack.getMetadata());
-		if (type == null)
-			return;
-		
-		if (I18n.contains(type.getDescKey())) {
-			String translation = I18n.format(type.getDescKey(), new Object[0]);
-			if (translation.trim().isEmpty())
-				return;
-			tooltip.add(translation);
-		}
-	}
-
-	@Override
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_ITEMS;
 	}
 	
 	@Override
-	public ActionResultType onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, Hand hand, Direction facing, float hitX, float hitY, float hitZ) {
-		
-//		// Copied from ItemBed (vanilla) with some modifications
-//		AetherResourceType type = getTypeFromMeta(stack.getMetadata()); 
-//		
-//		if (type != AetherResourceType.CRYSTAL_SMALL && type != AetherResourceType.CRYSTAL_MEDIUM) {
-//			return ActionResultType.PASS;
-//		}
-//		
-//		if (worldIn.isRemote) {
-//			return ActionResultType.SUCCESS;
-//		} else {
-//			BlockState iblockstate = worldIn.getBlockState(pos);
-//			Block block = iblockstate.getBlock();
-//
-//			if (!block.isReplaceable(worldIn, pos)) {
-//				pos = pos.offset(facing);
-//			}
-//			
-//			// If setting on the side of a non-full block, promote to a regular standing one
-//			if (facing != Direction.UP) {
-//				if (!worldIn.getBlockState(pos.offset(facing.getOpposite())).isFullBlock()) {
-//					facing = Direction.UP;
-//				}
-//			}
-//
-//			if (playerIn.canPlayerEdit(pos, facing, stack) && (block.isReplaceable(worldIn, pos) || worldIn.isAirBlock(pos))) {
-//				BlockState iblockstate1 = ManiCrystal.instance().getDefaultState()
-//						.withProperty(ManiCrystal.FACING, facing)
-//						.withProperty(ManiCrystal.LEVEL, type == AetherResourceType.CRYSTAL_MEDIUM ? 1 : 0);
-//
-//				worldIn.setBlockState(pos, iblockstate1, 11);
-//
-//				SoundType soundtype = iblockstate1.getBlock().getSoundType(iblockstate1, worldIn, pos, playerIn);
-//				worldIn.playSound((PlayerEntity)null, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
-//				--stack.stackSize;
-//				return ActionResultType.SUCCESS;
-//			} else {
-//				return ActionResultType.FAIL;
-//			}
-//		}
-		
-		return ActionResultType.PASS;
-	}
-
-	@Override
 	public int getBurnTicks(ItemStack stack) {
-		AetherResourceType type = getTypeFromMeta(stack.getMetadata());
-		switch (type) {
-		case FLOWER_GINSENG:
-		case FLOWER_MANDRAKE:
-			return 300;
-		}
-		
-		return 0;
+		return this.burnTicks;
 	}
 
 	@Override
 	public float getAetherYield(ItemStack stack) {
-		AetherResourceType type = getTypeFromMeta(stack.getMetadata());
-		switch (type) {
-		case FLOWER_GINSENG:
-			return 450;
-		case FLOWER_MANDRAKE:
-			return 350;
-		}
-		
-		return 0;
+		return this.aetherYield;
 	}
 }

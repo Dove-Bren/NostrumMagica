@@ -165,6 +165,7 @@ import com.smanzana.nostrummagica.trials.TrialIce;
 import com.smanzana.nostrummagica.trials.TrialLightning;
 import com.smanzana.nostrummagica.trials.TrialPhysical;
 import com.smanzana.nostrummagica.trials.TrialWind;
+import com.smanzana.nostrummagica.utils.Entities;
 import com.smanzana.nostrummagica.world.NostrumChunkLoader;
 import com.smanzana.nostrummagica.world.NostrumDungeonGenerator;
 import com.smanzana.nostrummagica.world.NostrumLootHandler;
@@ -2654,16 +2655,7 @@ public class NostrumMagica {
 	}
 
 	public static @Nullable Entity getEntityByUUID(World world, UUID id) {
-		if (world instanceof ServerWorld) {
-			return ((ServerWorld) world).getEntityByUuid(id);
-		}
-		
-		for (Entity e : ((ClientWorld) world).getAllEntities()) {
-			if (e.getUniqueID().equals(id)) {
-				return e;
-			}
-		}
-		return null;
+		return Entities.FindEntity(world, id);
 	}
 
 	public SpellRegistry getSpellRegistry() {

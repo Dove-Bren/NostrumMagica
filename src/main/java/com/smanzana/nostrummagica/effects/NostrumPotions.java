@@ -78,9 +78,9 @@ public enum NostrumPotions {
 		return PotionUtils.addPotionToItemStack(new ItemStack(Items.POTION), potion);
 	}
 	
-	protected static class PotionIngredient extends IngredientNBT {
+	public static class PotionIngredient extends IngredientNBT {
 
-		protected PotionIngredient(Potion potion) {
+		public PotionIngredient(Potion potion) {
 			super(MakePotion(potion));
 		}
 		
