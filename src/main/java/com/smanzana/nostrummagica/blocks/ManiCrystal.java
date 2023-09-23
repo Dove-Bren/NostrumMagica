@@ -12,8 +12,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.state.DirectionProperty;
+import net.minecraft.state.IntegerProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
@@ -30,8 +30,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class ManiCrystal extends Block {
 
 	public static final String ID = "mani_crystal";
-	public static final PropertyInteger LEVEL = PropertyInteger.create("level", 0, 1);
-	public static final PropertyDirection FACING = PropertyDirection.create("facing");
+	public static final IntegerProperty LEVEL = IntegerProperty.create("level", 0, 1);
+	public static final DirectionProperty FACING = DirectionProperty.create("facing");
 	
 	protected static final AxisAlignedBB STANDING_AABB = new AxisAlignedBB(.5-(.16), 0.1D, .5-.16, .5+.16, 0.8D, .5+.16);
 	protected static final AxisAlignedBB HANGING_AABB = new AxisAlignedBB(.5-(.16), 0.1D, .5-.16, .5+.16, 0.8D, .5+.16);
@@ -60,17 +60,17 @@ public class ManiCrystal extends Block {
 		this.setTickRandomly(true);
 		this.setLightOpacity(0);
 		
-		this.setDefaultState(this.blockState.getBaseState().withProperty(LEVEL, 0).withProperty(FACING, Direction.UP));
+		this.setDefaultState(this.stateContainer.getBaseState().with(LEVEL, 0).with(FACING, Direction.UP));
 	}
 	
 	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, LEVEL, FACING);
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(LEVEL, FACING);
 	}
 	
 	@Override
 	public int getLightValue(BlockState state) {
-		switch (state.getValue(LEVEL)) {
+		switch (state.get(LEVEL)) {
 		case 0:
 		default:
 			return 8;
@@ -97,12 +97,12 @@ public class ManiCrystal extends Block {
 	
 	@Override
 	public BlockState getStateFromMeta(int meta) {
-		return getDefaultState().withProperty(LEVEL, levelFromMeta(meta)).withProperty(FACING, facingFromMeta(meta));
+		return getDefaultState().with(LEVEL, levelFromMeta(meta)).with(FACING, facingFromMeta(meta));
 	}
 	
 	@Override
 	public int getMetaFromState(BlockState state) {
-		return metaFromFacing(state.getValue(FACING)) | metaFromLevel(state.getValue(LEVEL));
+		return metaFromFacing(state.get(FACING)) | metaFromLevel(state.get(LEVEL));
 	}
 	
 	@Override
@@ -117,7 +117,7 @@ public class ManiCrystal extends Block {
 	
 	@Override
 	public int damageDropped(BlockState state) {
-		switch (state.getValue(LEVEL)) {
+		switch (state.get(LEVEL)) {
 		case 0:
 		default:
 			return NostrumResourceItem.getMetaFromType(ResourceType.CRYSTAL_SMALL);
@@ -141,7 +141,7 @@ public class ManiCrystal extends Block {
 			return;
 		}
 		
-		if (random.nextInt(2) <= state.getValue(LEVEL)) {
+		if (random.nextInt(2) <= state.get(LEVEL)) {
 			
 			// Check if there are too many already
 			if (worldIn.getEntitiesWithinAABB(EntityWisp.class, this.getBoundingBox(state, worldIn, pos).offset(pos).grow(20)).size() > 5) {
@@ -162,14 +162,14 @@ public class ManiCrystal extends Block {
 			if (worldIn.isAirBlock(spawnPos)) {
 				EntityWisp wisp = new EntityWisp(worldIn, pos);
 				wisp.setPosition(spawnPos.getX() + .5, spawnPos.getY(), spawnPos.getZ() + .5);
-				worldIn.spawnEntity(wisp);
+				worldIn.addEntity(wisp);
 			}
 		}
 	}
 	
 	@Override
 	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
-		switch (state.getValue(FACING)) {
+		switch (state.get(FACING)) {
 		case DOWN:
 			return new AxisAlignedBB(.5-(.16), .55, .5-.16, .5+.16, 1.0, .5+.16);
 			//return HANGING_AABB;
@@ -189,7 +189,7 @@ public class ManiCrystal extends Block {
 	
 	@Override
 	public AxisAlignedBB getCollisionBoundingBox(BlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-		Direction facing = blockState.getValue(FACING);
+		Direction facing = blockState.get(FACING);
 		if (facing == null) {
 			facing = Direction.UP;
 		}
@@ -220,7 +220,7 @@ public class ManiCrystal extends Block {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public BlockRenderLayer getBlockLayer() {
+	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.TRANSLUCENT;
 	}
 	
@@ -236,7 +236,7 @@ public class ManiCrystal extends Block {
 		
 		if (world instanceof World && !((World) world).isRemote) {
 			BlockState state = world.getBlockState(pos);
-			Direction facing = state.getValue(FACING);
+			Direction facing = state.get(FACING);
 			if (facing == Direction.UP || facing == Direction.DOWN) {
 				return;
 			}
@@ -253,7 +253,7 @@ public class ManiCrystal extends Block {
 	 * @return
 	 */
 	public Vec3d getCrystalTipOffset(BlockState state) {
-		Direction facing = state.getValue(FACING);
+		Direction facing = state.get(FACING);
 		Vec3d offset = Vec3d.ZERO;
 		if (facing != null) {
 			switch (facing) {

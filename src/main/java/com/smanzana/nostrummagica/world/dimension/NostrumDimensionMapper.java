@@ -164,7 +164,7 @@ public class NostrumDimensionMapper extends WorldSavedData {
 	public CompoundNBT writeToNBT(CompoundNBT compound) {
 		int count = 0;
 		for (Entry<UUID, NostrumDimensionOffset> row : map.entrySet()) {
-			CompoundNBT tag = row.getValue().asNBT();
+			CompoundNBT tag = row.get().asNBT();
 			compound.put(row.getKey().toString(), tag);
 			count++;
 		}

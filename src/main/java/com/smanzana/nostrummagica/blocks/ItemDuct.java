@@ -11,7 +11,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.state.BooleanProperty;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -27,6 +27,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.BlockStateContainer;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -38,12 +39,12 @@ import net.minecraftforge.items.CapabilityItemHandler;
  */
 public class ItemDuct extends ContainerBlock {
 	
-	public static final PropertyBool NORTH = PropertyBool.create("north");
-	public static final PropertyBool SOUTH = PropertyBool.create("south");
-	public static final PropertyBool EAST = PropertyBool.create("east");
-	public static final PropertyBool WEST = PropertyBool.create("west");
-	public static final PropertyBool UP = PropertyBool.create("up");
-	public static final PropertyBool DOWN = PropertyBool.create("down");
+	public static final BooleanProperty NORTH = BooleanProperty.create("north");
+	public static final BooleanProperty SOUTH = BooleanProperty.create("south");
+	public static final BooleanProperty EAST = BooleanProperty.create("east");
+	public static final BooleanProperty WEST = BooleanProperty.create("west");
+	public static final BooleanProperty UP = BooleanProperty.create("up");
+	public static final BooleanProperty DOWN = BooleanProperty.create("down");
 	
 	private static final double INNER_RADIUS = (3.0 / 16.0);
 	protected static final AxisAlignedBB BASE_AABB = new AxisAlignedBB(.5 - INNER_RADIUS, .5 - INNER_RADIUS, .5 - INNER_RADIUS, .5 + INNER_RADIUS, .5 + INNER_RADIUS, .5 + INNER_RADIUS);
@@ -136,36 +137,36 @@ public class ItemDuct extends ContainerBlock {
 		super(Material.IRON, MapColor.STONE);
 		this.setUnlocalizedName(ID);
 		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setDefaultState(this.blockState.getBaseState()
-				.withProperty(NORTH, false)
-				.withProperty(SOUTH, false)
-				.withProperty(EAST, false)
-				.withProperty(WEST, false)
-				.withProperty(UP, false)
-				.withProperty(DOWN, false));
+		this.setDefaultState(this.stateContainer.getBaseState()
+				.with(NORTH, false)
+				.with(SOUTH, false)
+				.with(EAST, false)
+				.with(WEST, false)
+				.with(UP, false)
+				.with(DOWN, false));
 	}
 	
 	public static boolean GetFacingActive(BlockState state, Direction face) {
 		switch (face) {
 		case DOWN:
-			return state.getValue(DOWN);
+			return state.get(DOWN);
 		case EAST:
-			return state.getValue(EAST);
+			return state.get(EAST);
 		case NORTH:
 		default:
-			return state.getValue(NORTH);
+			return state.get(NORTH);
 		case SOUTH:
-			return state.getValue(SOUTH);
+			return state.get(SOUTH);
 		case UP:
-			return state.getValue(UP);
+			return state.get(UP);
 		case WEST:
-			return state.getValue(WEST);
+			return state.get(WEST);
 		}
 	}
 	
 	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, NORTH, SOUTH, EAST, WEST, UP, DOWN);
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(NORTH, SOUTH, EAST, WEST, UP, DOWN);
 	}
 	
 	@Override
@@ -179,7 +180,12 @@ public class ItemDuct extends ContainerBlock {
 	}
 	
 	@Override
-	public TileEntity createNewTileEntity(World world, int meta) {
+	public boolean hasTileEntity() {
+		return true;
+	}
+	
+	@Override
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		return new ItemDuctTileEntity();
 	}
 	
@@ -192,12 +198,12 @@ public class ItemDuct extends ContainerBlock {
 	@Override
 	public BlockState getActualState(BlockState state, IBlockAccess worldIn, BlockPos pos) {
 		return state
-				.withProperty(NORTH, canConnect(worldIn, pos, Direction.NORTH))
-				.withProperty(SOUTH, canConnect(worldIn, pos, Direction.SOUTH))
-				.withProperty(EAST, canConnect(worldIn, pos, Direction.EAST))
-				.withProperty(WEST, canConnect(worldIn, pos, Direction.WEST))
-				.withProperty(UP, canConnect(worldIn, pos, Direction.UP))
-				.withProperty(DOWN, canConnect(worldIn, pos, Direction.DOWN));
+				.with(NORTH, canConnect(worldIn, pos, Direction.NORTH))
+				.with(SOUTH, canConnect(worldIn, pos, Direction.SOUTH))
+				.with(EAST, canConnect(worldIn, pos, Direction.EAST))
+				.with(WEST, canConnect(worldIn, pos, Direction.WEST))
+				.with(UP, canConnect(worldIn, pos, Direction.UP))
+				.with(DOWN, canConnect(worldIn, pos, Direction.DOWN));
 	}
 	
 	protected boolean canConnect(IBlockAccess world, BlockPos centerPos, Direction direction) {
@@ -246,7 +252,7 @@ public class ItemDuct extends ContainerBlock {
 	}
 	
 	@Override
-	public void onBlockAdded(World worldIn, BlockPos pos, BlockState state) {
+	public void onBlockAdded(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
 		super.onBlockAdded(worldIn, pos, state);
 	}
 	
@@ -291,7 +297,7 @@ public class ItemDuct extends ContainerBlock {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 //		playerIn.openGui(NostrumMagica.instance,
 //				NostrumGui.activeHopperID, worldIn,
 //				pos.getX(), pos.getY(), pos.getZ());
@@ -322,7 +328,7 @@ public class ItemDuct extends ContainerBlock {
 	}
 	
 	@Override
-	public BlockRenderLayer getBlockLayer() {
+	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.CUTOUT_MIPPED;
 	}
 }

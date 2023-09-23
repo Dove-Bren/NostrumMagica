@@ -58,7 +58,7 @@ public class MirrorItem extends BlockItem implements ILoreTagged {
 //
 //				if (flag2 && worldIn.getBlockState(pos.down()).isSideSolid(worldIn, pos.down(), Direction.UP))
 //				{
-//					BlockState iblockstate1 = NostrumMirrorBlock.instance().getDefaultState().withProperty(NostrumMirrorBlock.FACING, enumfacing);
+//					BlockState iblockstate1 = NostrumMirrorBlock.instance().getDefaultState().with(NostrumMirrorBlock.FACING, enumfacing);
 //
 //					worldIn.setBlockState(pos, iblockstate1, 11);
 //

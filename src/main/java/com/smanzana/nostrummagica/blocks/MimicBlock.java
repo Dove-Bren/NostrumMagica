@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.state.BooleanProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.DirectionalBlock;
@@ -61,7 +61,7 @@ public class MimicBlock extends DirectionalBlock {
 		
 	};
 	
-	public static PropertyBool UNBREAKABLE = PropertyBool.create("unbreakable");
+	public static BooleanProperty UNBREAKABLE = BooleanProperty.create("unbreakable");
 
 	public static String ID_DOOR = "mimic_door";
 	public static String ID_FACADE = "mimic_facade";
@@ -105,14 +105,14 @@ public class MimicBlock extends DirectionalBlock {
 	}
 	
 	@Override
-	protected BlockStateContainer createBlockState() {
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
 		return new BlockStateContainer.Builder(this).add(FACING).add(UNBREAKABLE).add(NESTED_STATE).build();
 	}
 	
 	@Override
 	public BlockState getExtendedState(BlockState state, IBlockAccess world, BlockPos pos) {
 		IExtendedBlockState ext = (IExtendedBlockState) state;
-		Direction face = state.getValue(FACING);
+		Direction face = state.get(FACING);
 		
 		if (face == Direction.DOWN || face == Direction.UP) {
 			pos = pos.east();
@@ -120,7 +120,7 @@ public class MimicBlock extends DirectionalBlock {
 			pos = pos.down();
 		}
 		state = world.getBlockState(pos);
-		ext = ext.withProperty(NESTED_STATE, state.getBlock().getExtendedState(state, world, pos));
+		ext = ext.with(NESTED_STATE, state.getBlock().getExtendedState(state, world, pos));
 		
 		return ext;
 	}
@@ -129,12 +129,12 @@ public class MimicBlock extends DirectionalBlock {
 	public BlockState getStateFromMeta(int meta) {
 		int faceMeta = meta & 0x7;
 		int unbreakableMeta = (meta >> 3) & 1;
-		return getDefaultState().withProperty(FACING, Direction.values()[faceMeta]).withProperty(UNBREAKABLE, unbreakableMeta == 1);
+		return getDefaultState().with(FACING, Direction.values()[faceMeta]).with(UNBREAKABLE, unbreakableMeta == 1);
 	}
 	
 	@Override
 	public int getMetaFromState(BlockState state) {
-		return (state.getValue(FACING).ordinal()) | ((state.getValue(UNBREAKABLE) ? 1 : 0) << 3);
+		return (state.get(FACING).ordinal()) | ((state.get(UNBREAKABLE) ? 1 : 0) << 3);
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -147,7 +147,7 @@ public class MimicBlock extends DirectionalBlock {
 	@SuppressWarnings("deprecation")
 	@Override
 	public float getBlockHardness(BlockState blockState, World worldIn, BlockPos pos) {
-		return blockState.getValue(UNBREAKABLE) ? -1f : super.getBlockHardness(blockState, worldIn, pos);
+		return blockState.get(UNBREAKABLE) ? -1f : super.getBlockHardness(blockState, worldIn, pos);
 	}
 	
 	@Override
@@ -168,7 +168,7 @@ public class MimicBlock extends DirectionalBlock {
 		if (!isDoor) {
 			solid = false;
 		} else if (entityIn != null) {
-			Direction side = state.getValue(FACING);
+			Direction side = state.get(FACING);
 			// cant use getCenter cause it's client-side only
 			//Vec3d center = entityBox.getCenter();
 			Vec3d center = new Vec3d(entityBox.minX + (entityBox.maxX - entityBox.minX) * 0.5D, entityBox.minY + (entityBox.maxY - entityBox.minY) * 0.5D, entityBox.minZ + (entityBox.maxZ - entityBox.minZ) * 0.5D);
@@ -238,8 +238,8 @@ public class MimicBlock extends DirectionalBlock {
 	public BlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer) {
 		//Direction enumfacing = Direction.getHorizontal(MathHelper.floor_double((double)(placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3).getOpposite();
 		return this.getDefaultState()
-				.withProperty(FACING, Direction.getDirectionFromEntityLiving(pos, placer))
-				.withProperty(UNBREAKABLE, meta == 1);
+				.with(FACING, Direction.getDirectionFromEntityLiving(pos, placer))
+				.with(UNBREAKABLE, meta == 1);
 	}
 	
 	@Override
@@ -270,12 +270,12 @@ public class MimicBlock extends DirectionalBlock {
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public boolean shouldSideBeRendered(BlockState blockState, IBlockAccess blockAccess, BlockPos pos, Direction side) {
-		return side == blockState.getValue(FACING);
+		return side == blockState.get(FACING);
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public BlockRenderLayer getBlockLayer() {
+	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.CUTOUT;
 	}
 	
@@ -286,7 +286,7 @@ public class MimicBlock extends DirectionalBlock {
 			BlockPos pos = event.getTarget().getBlockPos();
 			BlockState hit = event.getPlayer().world.getBlockState(pos);
 			if (hit != null && hit.getBlock() == this) {
-				Direction face = hit.getValue(FACING);
+				Direction face = hit.get(FACING);
 				boolean outside = false;
 				
 				switch (face) {

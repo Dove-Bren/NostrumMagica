@@ -25,40 +25,72 @@ import com.smanzana.nostrummagica.blocks.tiles.TeleportRuneTileEntity;
 import com.smanzana.nostrummagica.blocks.tiles.TeleportationPortalTileEntity;
 import com.smanzana.nostrummagica.blocks.tiles.TemporaryPortalTileEntity;
 import com.smanzana.nostrummagica.fluids.NostrumFluids;
+import com.smanzana.nostrummagica.items.AltarItem;
 
 import net.minecraft.block.Block;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemMultiTexture;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.ObjectHolder;
 
+@Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@ObjectHolder(NostrumMagica.MODID)
 public class NostrumBlocks {
 	
-	public NostrumBlocks() {
-		MinecraftForge.EVENT_BUS.register(this);
-	}
+	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
+	@ObjectHolder(AltarBlock.ID) public static AltarBlock altar;
+	@ObjectHolder(Candle.ID) public static Candle candle;
+	@ObjectHolder(ChalkBlock.ID) public static ChalkBlock chalk;
+	@ObjectHolder(CropEssence.ID) public static CropEssence essenceCrop;
+	@ObjectHolder(CropGinseng.ID) public static CropGinseng ginsengCrop;
+	@ObjectHolder(CropMandrakeRoot.ID) public static CropMandrakeRoot mandrakeCrop;
+	@ObjectHolder(CursedIce.ID) public static CursedIce cursedIce;
+	@ObjectHolder(DungeonAir.ID) public static DungeonAir dungeonAir;
+	@ObjectHolder(DungeonBars.ID) public static DungeonBars dungeonBars;
+	@ObjectHolder(DungeonBlock.ID_LIGHT) public static DungeonBlock lightDungeonBlock;
+	@ObjectHolder(DungeonBlock.ID_DARK) public static DungeonBlock dungeonBlock;
+	@ObjectHolder(EssenceOre.ID) public static EssenceOre essenceOre;
+//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
+//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
+//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
+//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
+//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
+//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
+//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
+//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
+//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
+//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
+//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
+//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
+//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
+//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
+//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
+//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
+//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
+//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
+//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
+//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
+//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
 	
-	private void registerBlockItem(Block block, String registryName, @Nullable CreativeTabs tab, IForgeRegistry<Item> registry) {
-		ItemBlock item = new ItemBlock(block);
+	private static void registerBlockItem(Block block, String registryName, @Nullable CreativeTabs tab, IForgeRegistry<Item> registry) {
+		BlockItem item = new BlockItem(block);
     	item.setRegistryName(registryName);
     	item.setUnlocalizedName(registryName);
     	item.setCreativeTab(tab == null ? NostrumMagica.creativeTab : tab);
     	registry.register(item);
 	}
 	
-	private void registerBlockItem(Block block, String registryName, IForgeRegistry<Item> registry) {
+	private static void registerBlockItem(Block block, String registryName, IForgeRegistry<Item> registry) {
 		registerBlockItem(block, registryName, null, registry);
 	}
 	
     @SubscribeEvent
-    public void registerItems(RegistryEvent.Register<Item> event) {
+    public static void registerItems(RegistryEvent.Register<Item> event) {
     	final IForgeRegistry<Item> registry = event.getRegistry();
     	
     	registerBlockItem(MagicWall.instance(), MagicWall.ID, registry);
@@ -114,13 +146,13 @@ public class NostrumBlocks {
     	registerFluidItems(registry);
     }
     
-    private void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
+    private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
     	block.setRegistryName(registryName);
     	registry.register(block);
     }
     
     @SubscribeEvent
-    public void registerBlocks(RegistryEvent.Register<Block> event) {
+    public static void registerBlocks(RegistryEvent.Register<Block> event) {
     	final IForgeRegistry<Block> registry = event.getRegistry();
     	
     	registerBlock(SpellTable.instance(), SpellTable.ID, registry);
@@ -216,7 +248,7 @@ public class NostrumBlocks {
     	GameRegistry.registerTileEntity(ManaArmorerTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "mana_armorer"));
     }
     
-    private void registerFluidBlocks(IForgeRegistry<Block> registry) {
+    private static void registerFluidBlocks(IForgeRegistry<Block> registry) {
     	for (NostrumFluids fluid : NostrumFluids.values()) {
     		if (fluid.getFluid().getBlock() != null) {
     			registry.register(fluid.getFluid().getBlock());
@@ -224,7 +256,7 @@ public class NostrumBlocks {
     	}
     }
     
-    private void registerFluidItems(IForgeRegistry<Item> registry) {
+    private static void registerFluidItems(IForgeRegistry<Item> registry) {
     	for (NostrumFluids fluid : NostrumFluids.values()) {
     		if (fluid.getFluid().getBlock() != null) {
     			FluidRegistry.addBucketForFluid(fluid.getFluid());

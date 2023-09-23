@@ -110,7 +110,7 @@ public class ProjectileTrigger extends SpellTrigger {
 						return true;
 					});
 					
-					world.spawnEntity(projectile);
+					world.addEntity(projectile);
 			
 				}
 			

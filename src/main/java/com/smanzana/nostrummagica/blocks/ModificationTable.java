@@ -54,7 +54,7 @@ public class ModificationTable extends ContainerBlock {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		
 		playerIn.openGui(NostrumMagica.instance,
 				NostrumGui.modtableID, worldIn,
@@ -64,7 +64,12 @@ public class ModificationTable extends ContainerBlock {
 	}
 	
 	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
+	public boolean hasTileEntity() {
+		return true;
+	}
+	
+	@Override
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		return new ModificationTableEntity();
 	}
 	
@@ -74,7 +79,7 @@ public class ModificationTable extends ContainerBlock {
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, BlockState state) {
+	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) { broke();
 		destroy(world, pos, state);
 		super.breakBlock(world, pos, state);
 	}
@@ -90,7 +95,7 @@ public class ModificationTable extends ContainerBlock {
 				ItemEntity item = new ItemEntity(
 						world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
 						table.removeStackFromSlot(i));
-				world.spawnEntity(item);
+				world.addEntity(item);
 			}
 		}
 		

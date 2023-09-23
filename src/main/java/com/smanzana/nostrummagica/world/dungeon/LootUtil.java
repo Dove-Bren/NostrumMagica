@@ -31,7 +31,7 @@ public final class LootUtil {
 	
 	public static final void generateLoot(World world, BlockPos pos, Direction facing,
 			String loottable) {
-		world.setBlockState(pos, Blocks.CHEST.getDefaultState().withProperty(BlockChest.FACING, facing));
+		world.setBlockState(pos, Blocks.CHEST.getDefaultState().with(BlockChest.FACING, facing));
 		
 		TileEntityChest chest = (TileEntityChest) world.getTileEntity(pos);
 		
@@ -52,7 +52,7 @@ public final class LootUtil {
 	 */
 	public static final void createLoot(World world, BlockPos pos, Direction facing,
 			NonNullList<ItemStack> loot) {
-		world.setBlockState(pos, Blocks.CHEST.getDefaultState().withProperty(BlockChest.FACING, facing));
+		world.setBlockState(pos, Blocks.CHEST.getDefaultState().with(BlockChest.FACING, facing));
 		
 		TileEntityChest chest = (TileEntityChest) world.getTileEntity(pos);
 		int len = Math.min(27, loot.size());

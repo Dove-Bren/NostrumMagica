@@ -1,112 +1,65 @@
 package com.smanzana.nostrummagica.blocks;
 
-import java.util.Random;
+import com.smanzana.nostrummagica.items.NostrumItems;
 
-import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.integration.aetheria.items.AetherResourceType;
-import com.smanzana.nostrummagica.items.ReagentItem;
-import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.items.ReagentSeed;
-
-import net.minecraft.block.BlockCrops;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.CropsBlock;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import net.minecraftforge.common.EnumPlantType;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.world.IBlockReader;
 
-public class CropMandrakeRoot extends BlockCrops {
+public class CropMandrakeRoot extends CropsBlock {
 
-	private static final AxisAlignedBB[] AABB = new AxisAlignedBB[] {new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.125D, 1.0D), new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.1875D, 1.0D), new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.25D, 1.0D), new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.3125D, 1.0D), new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.375D, 1.0D), new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.4375D, 1.0D), new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.5D, 1.0D), new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.5625D, 1.0D)};
+	private static final VoxelShape[] AABB = new VoxelShape[] {Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 1.0D, 0.125D, 1.0D), Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 1.0D, 0.1875D, 1.0D), Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 1.0D, 0.25D, 1.0D), Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 1.0D, 0.3125D, 1.0D), Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 1.0D, 0.375D, 1.0D), Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 1.0D, 0.4375D, 1.0D), Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 1.0D, 0.5D, 1.0D), Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 1.0D, 0.5625D, 1.0D)};
 
-	public static String ID = "mandrake_crop";
-	
-	private static CropMandrakeRoot instance = null;
-	public static CropMandrakeRoot instance() {
-			if (instance == null)
-				instance = new CropMandrakeRoot();
-			
-			return instance;
-	}
+	public static final String ID = "mandrake_crop";
 	
 	public CropMandrakeRoot() {
-		
+		super(Block.Properties.create(Material.PLANTS)
+				.doesNotBlockMovement().tickRandomly().hardnessAndResistance(0f).sound(SoundType.CROP));
 	}
 	
-	protected ItemStack getCrops(int count) {
-        return ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, count);
-    }
-	
-	protected Item getSeed() {
-		return ReagentSeed.mandrake;
-	}
-	
-	protected ItemStack getSeeds(int count) {
-		return new ItemStack(getSeed(), count);
-	}
-
-    @Override
-    public void getDrops(NonNullList<ItemStack> ret, IBlockAccess world, BlockPos pos, BlockState state, int fortune) {
-        int age = getAge(state);
-        Random rand = world instanceof World ? ((World)world).rand : new Random();
-
-        int cropCount = 0;
-        if (age >= getMaxAge()){
-        	cropCount = 2 + rand.nextInt(2) + fortune;
-        }
-        
-        if (cropCount != 0) {
-        	ret.add(getCrops(cropCount));
-        }
-        
-        int seedCount = 1;
-        if (age >= getMaxAge()) {
-        	seedCount += rand.nextInt(2) + fortune;
-        }
-        
-        ret.add(getSeeds(seedCount));
-        
-        if (NostrumMagica.aetheria.isEnabled()) {
-        	if (rand.nextInt(10) + fortune >= 9) {
-        		ret.add(NostrumMagica.aetheria.getResourceItem(AetherResourceType.FLOWER_MANDRAKE, 1));
-        	}
-        }
-    }
-
-    /**
-     * Get the Item that this Block should drop when harvested.
-     */
-    @Override
-    public Item getItemDropped(BlockState state, Random rand, int fortune) {
-        return ReagentItem.instance();
-    }
-    
-    @Override
-    public int damageDropped(BlockState state) {
-    	return ReagentType.MANDRAKE_ROOT.getMeta();
-    }
-    
-    @Override
-    public ItemStack getItem(World worldIn, BlockPos pos, BlockState state) {
-        return getCrops(1);
-    }
-
-    public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
-        return AABB[((Integer)state.getValue(this.getAgeProperty())).intValue()];
-    }
-    
 	@Override
-	public EnumPlantType getPlantType(net.minecraft.world.IBlockAccess world, BlockPos pos) {
-		return EnumPlantType.Crop;
-	}
-
-	@Override
-	public BlockState getPlant(IBlockAccess world, BlockPos pos) {
-		return getDefaultState();
+	protected Item getSeedsItem() {
+		return NostrumItems.reagentSeedMandrake;
 	}
 	
+	@Override
+	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+		return AABB[((Integer)state.get(this.getAgeProperty())).intValue()];
+	}
+
+//    @Override
+//    public void getDrops(NonNullList<ItemStack> ret, IBlockAccess world, BlockPos pos, BlockState state, int fortune) {
+//        int age = getAge(state);
+//        Random rand = world instanceof World ? ((World)world).rand : new Random();
+//
+//        int cropCount = 0;
+//        if (age >= getMaxAge()){
+//        	cropCount = 2 + rand.nextInt(2) + fortune;
+//        }
+//        
+//        if (cropCount != 0) {
+//        	ret.add(getCrops(cropCount));
+//        }
+//        
+//        int seedCount = 1;
+//        if (age >= getMaxAge()) {
+//        	seedCount += rand.nextInt(2) + fortune;
+//        }
+//        
+//        ret.add(getSeeds(seedCount));
+//        
+//        if (NostrumMagica.aetheria.isEnabled()) {
+//        	if (rand.nextInt(10) + fortune >= 9) {
+//        		ret.add(NostrumMagica.aetheria.getResourceItem(AetherResourceType.FLOWER_MANDRAKE, 1));
+//        	}
+//        }
+//    }
+
 }

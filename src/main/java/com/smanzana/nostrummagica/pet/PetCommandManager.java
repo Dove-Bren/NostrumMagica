@@ -125,7 +125,7 @@ public class PetCommandManager extends WorldSavedData {
 		synchronized(playerSettings) {
 			CompoundNBT subtag = new CompoundNBT();
 			for (Entry<UUID, PetCommandSettings> entry : playerSettings.entrySet()) {
-				subtag.put(entry.getKey().toString(), entry.getValue().writeToNBT(null));
+				subtag.put(entry.getKey().toString(), entry.get().writeToNBT(null));
 			}
 			compound.put(NBT_SETTINGS, subtag);
 		}

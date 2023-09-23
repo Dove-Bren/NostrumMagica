@@ -192,7 +192,7 @@ public class ClientCastMessage implements IMessage {
 					applyReagentRate(reagents, reagentCost);
 					for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
 						int count = NostrumMagica.getReagentCount(sp, row.getKey());
-						if (count < row.getValue()) {
+						if (count < row.get()) {
 							sp.sendMessage(new TranslationTextComponent("info.spell.bad_reagent", row.getKey().prettyName()));
 							NetworkHandler.getSyncChannel().sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
 									ctx.getServerHandler().player);
@@ -201,7 +201,7 @@ public class ClientCastMessage implements IMessage {
 					}
 					// actually deduct
 					for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
-						NostrumMagica.removeReagents(sp, row.getKey(), row.getValue());
+						NostrumMagica.removeReagents(sp, row.getKey(), row.get());
 					}
 					
 					

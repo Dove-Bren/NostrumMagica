@@ -119,12 +119,12 @@ public class TeleportRune extends ContainerBlock  {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public BlockRenderLayer getBlockLayer() {
+	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.CUTOUT;
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, BlockState state) {
+	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) { broke();
 		super.breakBlock(world, pos, state);
 	}
 	
@@ -260,7 +260,7 @@ public class TeleportRune extends ContainerBlock  {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		if (worldIn.isRemote) {
 			return true;
 		}
@@ -369,13 +369,18 @@ public class TeleportRune extends ContainerBlock  {
 	}
 
 	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
+	public boolean hasTileEntity() {
+		return true;
+	}
+	
+	@Override
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		return new TeleportRuneTileEntity();
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void randomDisplayTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+	public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
 		TileEntity te = worldIn.getTileEntity(pos);
 		if (te == null || !(te instanceof TeleportRuneTileEntity)) {
 			return;

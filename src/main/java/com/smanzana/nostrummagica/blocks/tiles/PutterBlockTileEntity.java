@@ -87,7 +87,7 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 		
 		// Search for item if cache is busted
 		if (itemEntCache == null) {
-			Direction direction = world.getBlockState(this.pos).getValue(PutterBlock.FACING);
+			Direction direction = world.getBlockState(this.pos).get(PutterBlock.FACING);
 			int dx = 0;
 			int dy = 0;
 			int dz = 0;
@@ -146,7 +146,7 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 				double dx = 0;
 				double dy = 0;
 				double dz = 0;
-				Direction direction = world.getBlockState(this.pos).getValue(PutterBlock.FACING);
+				Direction direction = world.getBlockState(this.pos).get(PutterBlock.FACING);
 				switch (direction) {
 				case DOWN:
 					dy = -.75;
@@ -170,7 +170,7 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 				}
 				itemEntCache = new ItemEntity(world, this.pos.getX() + .5 + dx, this.pos.getY() + .5 + dy, this.pos.getZ() + .5 + dz, toSpawn);
 				itemEntCache.getMotion().x = itemEntCache.getMotion().y = itemEntCache.getMotion().z = 0;
-				world.spawnEntity(itemEntCache);
+				world.addEntity(itemEntCache);
 			}
 		}
 	}
@@ -181,7 +181,7 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 		newItem.getMotion().y = oldItem.getMotion().y;
 		newItem.getMotion().z = oldItem.getMotion().z;
 		newItem.lifespan = oldItem.lifespan;
-		oldItem.world.spawnEntity(newItem);
+		oldItem.world.addEntity(newItem);
 		oldItem.setDead();
 		return newItem;
 	}
@@ -227,7 +227,7 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 						}
 						
 						stack = stack.copy();
-						ItemStack taken = stack.splitStack(amount);
+						ItemStack taken = stack.split(amount);
 						if (!simulate) {
 							inventory.setInventorySlotContents(slot, stack); // Set it back to dirty the inventory
 						}

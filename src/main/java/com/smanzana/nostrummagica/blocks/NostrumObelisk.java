@@ -17,7 +17,7 @@ import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.state.BooleanProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -53,8 +53,8 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 	
 	
 
-	private static final PropertyBool MASTER = PropertyBool.create("master");
-	private static final PropertyBool TILE = PropertyBool.create("tile");
+	private static final BooleanProperty MASTER = BooleanProperty.create("master");
+	private static final BooleanProperty TILE = BooleanProperty.create("tile");
 	
 	public static final int TILE_OFFSETY = 3; // height diff between TE in pillars and master TE
 	public static final int TILE_OFFSETH = 3; // horizontal distance between master and pillars
@@ -79,9 +79,9 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 		this.setSoundType(SoundType.STONE);
 		this.setHarvestLevel("pickaxe", 2);
 		
-		this.setDefaultState(this.blockState.getBaseState()
-				.withProperty(MASTER, false)
-				.withProperty(TILE, false));
+		this.setDefaultState(this.stateContainer.getBaseState()
+				.with(MASTER, false)
+				.with(TILE, false));
 	}
 	
 	@Override
@@ -93,10 +93,10 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 	public int getLightValue(BlockState state, IBlockAccess world, BlockPos pos) {
 		if (state == null)
 			return 0;
-		if (!state.getValue(TILE))
+		if (!state.get(TILE))
 			return 0;
 		
-		if (!state.getValue(MASTER))
+		if (!state.get(MASTER))
 			return 8;
 		
 		return 12;
@@ -106,7 +106,7 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 	public int getLightOpacity(BlockState state, IBlockAccess world, BlockPos pos) {
 		if (state == null)
 			return 15;
-		if (!state.getValue(TILE))
+		if (!state.get(TILE))
 			return 15;
 		
 		return 0;
@@ -115,7 +115,7 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 	@SuppressWarnings("deprecation")
 	@Override
 	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
-		if (state.getValue(TILE) && !state.getValue(MASTER)) {
+		if (state.get(TILE) && !state.get(MASTER)) {
 			return new AxisAlignedBB(0.3D, 0.3D, 0.3D, 0.7D, 0.7D, 0.7D);
 		} else {
 			return super.getBoundingBox(state, source, pos);
@@ -123,7 +123,7 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public void updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) {
+	public void tick(BlockState state, World worldIn, BlockPos pos, Random rand) {
 		super.updateTick(worldIn, pos, state, rand);
 	}
 	
@@ -134,7 +134,7 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 	
 	@Override
 	public boolean isOpaqueCube(BlockState state) {
-		return !state.getValue(TILE) || state.getValue(MASTER);
+		return !state.get(TILE) || state.get(MASTER);
 	}
 	
 	@Override
@@ -143,23 +143,23 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
     }
 	
 	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, MASTER, TILE);
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(MASTER, TILE);
 	}
 	
 	@Override
 	public BlockState getStateFromMeta(int meta) {
 		return getDefaultState()
-				.withProperty(MASTER, (meta & 0x1) == 1)
-				.withProperty(TILE, ((meta >> 1) & 0x1) == 1);
+				.with(MASTER, (meta & 0x1) == 1)
+				.with(TILE, ((meta >> 1) & 0x1) == 1);
 	}
 	
 	@Override
 	public int getMetaFromState(BlockState state) {
 		int meta = 0x0;
-		if (state.getValue(TILE))
+		if (state.get(TILE))
 			meta = 0x2;
-		if (state.getValue(MASTER))
+		if (state.get(MASTER))
 			meta |= 0x1;
 		
 		return meta;
@@ -188,7 +188,7 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 		// If we're a tile, get TE and call destroy
 		// Else, search up and down to find a tile
 		// If none are found, exit; we'll be destroyed
-		if (state.getValue(TILE)) {
+		if (state.get(TILE)) {
 			TileEntity ent = world.getTileEntity(pos);
 			if (ent == null || !(ent instanceof NostrumObeliskEntity))
 				return;
@@ -219,23 +219,23 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-    public BlockRenderLayer getBlockLayer() {
+    public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.SOLID;
 	}
 	
 	public static boolean blockIsMaster(BlockState state) {
-		return state.getValue(TILE) && state.getValue(MASTER);
+		return state.get(TILE) && state.get(MASTER);
 	}
 	
 	public BlockState getMasterState() {
-		return this.getDefaultState().withProperty(MASTER, true)
-				.withProperty(TILE, true);
+		return this.getDefaultState().with(MASTER, true)
+				.with(TILE, true);
 	}
 
 
 	public BlockState getTileState() {
-		return this.getDefaultState().withProperty(MASTER, false)
-				.withProperty(TILE, true);
+		return this.getDefaultState().with(MASTER, false)
+				.with(TILE, true);
 	}
 	
 	@Override
@@ -249,16 +249,21 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 	}
 
 	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
+	public boolean hasTileEntity() {
+		return true;
+	}
+	
+	@Override
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		BlockState state = this.getStateFromMeta(meta);
-		if (state.getValue(TILE))
-			return new NostrumObeliskEntity(state.getValue(MASTER));
+		if (state.get(TILE))
+			return new NostrumObeliskEntity(state.get(MASTER));
 		
 		return null;
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, BlockState state) {
+	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) { broke();
 		destroy(world, pos, state);
 		super.breakBlock(world, pos, state);
 		world.removeTileEntity(pos);
@@ -273,9 +278,9 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		
-		if (state.getValue(MASTER) == false) {
+		if (state.get(MASTER) == false) {
 			return false;
 		}
 		

@@ -956,7 +956,7 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 		EntityPlantBossBramble bramble = new EntityPlantBossBramble(world, this, width);
 		bramble.setPosition(start.getX() + .5, start.getY(), start.getZ() + .5);
 		bramble.setMotion(side, dist);
-		world.spawnEntity(bramble);
+		world.addEntity(bramble);
 	}
 	
 	public static class PlantBossLeafLimb extends MultiPartEntityPart {

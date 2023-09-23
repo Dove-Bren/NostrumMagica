@@ -29,10 +29,10 @@ public class MimicBlockBakedModel implements IBakedModel {
 	protected BlockState getNestedState(@Nullable BlockState state) {
 		if (state != null) {
 			IExtendedBlockState ex = (IExtendedBlockState) state;
-			BlockState nestedState = ex.getValue(MimicBlock.NESTED_STATE);
+			BlockState nestedState = ex.get(MimicBlock.NESTED_STATE);
 			
 			while (nestedState instanceof IExtendedBlockState && nestedState.getBlock() instanceof MimicBlock) {
-				nestedState = ((IExtendedBlockState)nestedState).getValue(MimicBlock.NESTED_STATE);
+				nestedState = ((IExtendedBlockState)nestedState).get(MimicBlock.NESTED_STATE);
 			}
 			
 			if (nestedState != null) {

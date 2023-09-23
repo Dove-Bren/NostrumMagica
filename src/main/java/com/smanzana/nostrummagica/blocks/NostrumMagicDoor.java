@@ -12,7 +12,7 @@ import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.state.BooleanProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
@@ -30,7 +30,7 @@ import net.minecraft.world.WorldServer;
 
 public abstract class NostrumMagicDoor extends BlockHorizontal {
 	
-	protected static final PropertyBool MASTER = PropertyBool.create("master");
+	protected static final BooleanProperty MASTER = BooleanProperty.create("master");
 	protected static final AxisAlignedBB MIRROR_AABB_EW = new AxisAlignedBB(0.4D, 0.0D, 0D, 0.6D, 1.0D, 1D);
 	protected static final AxisAlignedBB MIRROR_AABB_NS = new AxisAlignedBB(0D, 0.0D, 0.4D, 1D, 1D, 0.6D);
 
@@ -42,25 +42,25 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setSoundType(SoundType.STONE);
 		
-		this.setDefaultState(this.blockState.getBaseState().withProperty(MASTER, false).withProperty(FACING, Direction.NORTH));
+		this.setDefaultState(this.stateContainer.getBaseState().with(MASTER, false).with(FACING, Direction.NORTH));
 	}
 	
 	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, MASTER, FACING);
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(MASTER, FACING);
 	}
 	
 	@Override
 	public BlockState getStateFromMeta(int meta) {
 		return getDefaultState()
-				.withProperty(MASTER, (meta & 1) == 1)
-				.withProperty(FACING, Direction.getHorizontal((meta >> 1) & 3));
+				.with(MASTER, (meta & 1) == 1)
+				.with(FACING, Direction.getHorizontal((meta >> 1) & 3));
 	}
 	
 	@Override
 	public int getMetaFromState(BlockState state) {
-		int meta = (state.getValue(MASTER) ? 1 : 0)
-				| (state.getValue(FACING).getHorizontalIndex() << 1);
+		int meta = (state.get(MASTER) ? 1 : 0)
+				| (state.get(FACING).getHorizontalIndex() << 1);
 			
 		return meta;
 	}
@@ -75,7 +75,7 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 		if (state == null)
 			return;
 		
-		if (state.getValue(MASTER)) {
+		if (state.get(MASTER)) {
 			
 		} else {
 			BlockPos master = getMasterPos(world, state, pos);
@@ -137,7 +137,7 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 			
 			next.add(cur.up());
 			next.add(cur.down());
-			if (state.getValue(FACING).getHorizontalIndex() % 2 != 0) {
+			if (state.get(FACING).getHorizontalIndex() % 2 != 0) {
 				next.add(cur.north());
 				next.add(cur.south());
 			} else {
@@ -154,20 +154,20 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 	}
 	
 	public BlockState getSlaveState(Direction facing) {
-		return this.getDefaultState().withProperty(MASTER, false).withProperty(FACING, facing);
+		return this.getDefaultState().with(MASTER, false).with(FACING, facing);
 	}
 	
 	public boolean isMaster(BlockState state) {
-		return state.getValue(MASTER);
+		return state.get(MASTER);
 	}
 
 
 	public BlockState getMaster(Direction facing) {
-		return this.getDefaultState().withProperty(MASTER, true).withProperty(FACING, facing);
+		return this.getDefaultState().with(MASTER, true).with(FACING, facing);
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, BlockState state) {
+	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) { broke();
 		this.destroy(world, pos, state);
 		world.removeTileEntity(pos);
 		super.breakBlock(world, pos, state);
@@ -205,14 +205,14 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 	
 	@Override
 	public AxisAlignedBB getCollisionBoundingBox(BlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-		if (blockState.getValue(FACING).getHorizontalIndex() % 2 != 0)
+		if (blockState.get(FACING).getHorizontalIndex() % 2 != 0)
 			return MIRROR_AABB_EW;
 		return MIRROR_AABB_NS;
 	}
 	
 	@Override
 	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
-		if (state.getValue(FACING).getHorizontalIndex() % 2 != 0)
+		if (state.get(FACING).getHorizontalIndex() % 2 != 0)
 			return MIRROR_AABB_EW;
 		return MIRROR_AABB_NS;
 	}
@@ -238,7 +238,7 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 		visited.add(masterBlock);
 		next.add(masterBlock.up());
 		next.add(masterBlock.down());
-		if (masterState.getValue(FACING).getHorizontalIndex() % 2 != 0) {
+		if (masterState.get(FACING).getHorizontalIndex() % 2 != 0) {
 			next.add(masterBlock.north());
 			next.add(masterBlock.south());
 		} else {
@@ -258,11 +258,11 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 			blocksLeft--;
 			
 			visited.add(cur);
-			world.setBlockState(cur, getSlaveState(masterState.getValue(FACING)));
+			world.setBlockState(cur, getSlaveState(masterState.get(FACING)));
 			
 			next.add(cur.up());
 			next.add(cur.down());
-			if (masterState.getValue(FACING).getHorizontalIndex() % 2 != 0) {
+			if (masterState.get(FACING).getHorizontalIndex() % 2 != 0) {
 				next.add(cur.north());
 				next.add(cur.south());
 			} else {
@@ -272,7 +272,7 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 		}
 	}
 	
-	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		return false;
 	}
 	

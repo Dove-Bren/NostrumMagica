@@ -1280,7 +1280,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 					ItemStack stack = inventory.getStackInSlot(i);
 					if (!stack.isEmpty()) {
 						ItemEntity item = new ItemEntity(this.world, this.posX, this.posY, this.posZ, stack);
-						this.world.spawnEntity(item);
+						this.world.addEntity(item);
 					}
 				}
 			}
@@ -1289,7 +1289,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 				ItemStack stack = equipment.getStackInSlot(slot);
 				if (!stack.isEmpty()) {
 					ItemEntity item = new ItemEntity(this.world, this.posX, this.posY, this.posZ, stack);
-					this.world.spawnEntity(item);
+					this.world.addEntity(item);
 				}
 			}
 			inventory.clear();
@@ -1895,7 +1895,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		}
 		EntityDragonEgg egg = new EntityDragonEgg(world, player, this.rollInheritedStats());
 		egg.setPosition((int) posX + .5, (int) posY, (int) posZ + .5);
-		if (world.spawnEntity(egg)) {
+		if (world.addEntity(egg)) {
 			this.setEggId(egg.getUniqueID());
 			
 			if (player != null) {

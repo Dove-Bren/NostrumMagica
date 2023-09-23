@@ -65,7 +65,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	
 	public Direction getFacing() {
 		BlockState state = getWorld().getBlockState(getPos());
-		return state.getValue(ParadoxMirrorBlock.FACING);
+		return state.get(ParadoxMirrorBlock.FACING);
 	}
 	
 	private static final String NBT_LINKED_POS = "linked_pos";
@@ -217,7 +217,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 		entity.velocityChanged = true;
 		
 		receivedEntities.add(entity);
-		getWorld().spawnEntity(entity);
+		getWorld().addEntity(entity);
 		
 		playReceiveEffect(entity, fromPos);
 	}

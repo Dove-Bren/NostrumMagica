@@ -144,7 +144,7 @@ public class PetSoulRegistry extends WorldSavedData {
 			for (Entry<UUID, SoulEntry> entry : soulMap.entrySet()) {
 				compound.put(
 						entry.getKey().toString(),
-						entry.getValue().writeToNBT(null)
+						entry.get().writeToNBT(null)
 					);
 			}
 		}

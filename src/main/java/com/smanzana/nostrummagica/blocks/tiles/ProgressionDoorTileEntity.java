@@ -182,7 +182,7 @@ public class ProgressionDoorTileEntity extends TileEntity {
 			faceStash = Direction.NORTH;
 			if (state != null) {
 				try {
-					faceStash = state.getValue(ProgressionDoor.FACING);
+					faceStash = state.get(ProgressionDoor.FACING);
 				} catch (Exception e) {
 					NostrumMagica.logger.warn("Failed to get face for progression tile entity");
 				}

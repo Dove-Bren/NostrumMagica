@@ -91,7 +91,7 @@ public class FluidPoisonWater extends Fluid {
 		
 		@OnlyIn(Dist.CLIENT)
 		@Override
-		public void randomDisplayTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+		public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
 			super.randomDisplayTick(stateIn, worldIn, pos, rand);
 			
 			if (worldIn.isAirBlock(pos.up())) {

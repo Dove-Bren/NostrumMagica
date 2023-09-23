@@ -13,7 +13,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.state.BooleanProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -34,7 +34,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public abstract class NostrumPortal extends Block  {
 	
-	protected static final PropertyBool MASTER = PropertyBool.create("master");
+	protected static final BooleanProperty MASTER = BooleanProperty.create("master");
 	
 	public NostrumPortal() {
 		super(Material.LEAVES, MapColor.OBSIDIAN);
@@ -45,7 +45,7 @@ public abstract class NostrumPortal extends Block  {
 		this.setSoundType(SoundType.STONE);
 		this.setTickRandomly(true);
 		
-		this.setDefaultState(this.blockState.getBaseState().withProperty(MASTER, false));
+		this.setDefaultState(this.stateContainer.getBaseState().with(MASTER, false));
 	}
 	
 	@Override
@@ -90,18 +90,18 @@ public abstract class NostrumPortal extends Block  {
 	}
 	
 	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, MASTER);
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(MASTER);
 	}
 	
 	@Override
 	public BlockState getStateFromMeta(int meta) {
-		return getDefaultState().withProperty(MASTER, (meta & 1) == 1);
+		return getDefaultState().with(MASTER, (meta & 1) == 1);
 	}
 	
 	@Override
 	public int getMetaFromState(BlockState state) {
-		return state.getValue(MASTER) ? 1 : 0;
+		return state.get(MASTER) ? 1 : 0;
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {
@@ -115,7 +115,7 @@ public abstract class NostrumPortal extends Block  {
 	}
 	
 	protected static BlockPos getPaired(BlockState state, BlockPos pos) {
-		return pos.offset(state.getValue(MASTER) ? Direction.UP : Direction.DOWN);
+		return pos.offset(state.get(MASTER) ? Direction.UP : Direction.DOWN);
 	}
 	
 	protected static BlockPos getMaster(BlockState state, BlockPos pos) {
@@ -133,20 +133,20 @@ public abstract class NostrumPortal extends Block  {
 	}
 	
 	public BlockState getSlaveState() {
-		return this.getDefaultState().withProperty(MASTER, false);
+		return this.getDefaultState().with(MASTER, false);
 	}
 
 
 	public BlockState getMaster() {
-		return this.getDefaultState().withProperty(MASTER, true);
+		return this.getDefaultState().with(MASTER, true);
 	}
 	
 	public static boolean isMaster(BlockState state) {
-		return state.getValue(MASTER);
+		return state.get(MASTER);
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, BlockState state) {
+	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) { broke();
 		this.destroy(world, pos, state);
 		world.removeTileEntity(pos);
 		super.breakBlock(world, pos, state);
@@ -184,7 +184,7 @@ public abstract class NostrumPortal extends Block  {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public void randomDisplayTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+	public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
 		if (!isMaster(stateIn)) {
 			return;
 		}

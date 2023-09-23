@@ -202,10 +202,10 @@ public class ModificationTableGui {
 					Slot mainSlot = this.getSlot(0);
 					if (!mainSlot.getHasStack()) {
 						if (mainSlot.isItemValid(cur))
-							mainSlot.putStack(cur.splitStack(1));
+							mainSlot.putStack(cur.split(1));
 					} else if (!inputSlot.getHasStack()) {
 						if (inputSlot.isItemValid(cur))
-							inputSlot.putStack(cur.splitStack(1));
+							inputSlot.putStack(cur.split(1));
 					}
 				}
 				

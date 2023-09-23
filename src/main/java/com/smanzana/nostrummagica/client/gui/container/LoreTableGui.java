@@ -145,7 +145,7 @@ public class LoreTableGui {
 					// Trying to add an item
 					if (!inputSlot.getHasStack()
 							&& inputSlot.isItemValid(cur)) {
-						ItemStack stack = cur.splitStack(1);
+						ItemStack stack = cur.split(1);
 						inputSlot.putStack(stack);
 					} else {
 						prev = ItemStack.EMPTY;

@@ -378,11 +378,11 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 				final int taken;
 				if (inSlot.isEmpty()) {
 					taken = Math.min(maxStack, stack.getCount());
-					inSlot = stack.splitStack(maxStack);
+					inSlot = stack.split(maxStack);
 				} else if (ItemStacks.stacksMatch(stack, inSlot)) {
 					taken = Math.min(maxStack - inSlot.getCount(), stack.getCount());
 					if (taken > 0) {
-						stack.splitStack(taken);
+						stack.split(taken);
 						inSlot.setCount(inSlot.getCount() + taken);
 					}
 				} else {

@@ -90,16 +90,16 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		this.setHarvestLevel("pickaxe", 4);
 		this.setBlockUnbreakable();
 		
-		this.setDefaultState(this.blockState.getBaseState().withProperty(MOB, Type.GOLEM_PHYSICAL));
+		this.setDefaultState(this.stateContainer.getBaseState().with(MOB, Type.GOLEM_PHYSICAL));
 	}
 	
 	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, MOB);
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(MOB);
 	}
 	
 	public BlockState getState(NostrumSingleSpawner.Type type) {
-		return getDefaultState().withProperty(MOB, type);
+		return getDefaultState().with(MOB, type);
 	}
 	
 	@Override
@@ -108,12 +108,12 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 			meta = 0;
 		Type type = Type.values()[meta];
 		
-		return getDefaultState().withProperty(MOB, type);
+		return getDefaultState().with(MOB, type);
 	}
 	
 	@Override
 	public int getMetaFromState(BlockState state) {
-		return state.getValue(MOB).ordinal();
+		return state.get(MOB).ordinal();
 	}
 	
 	@Override
@@ -147,12 +147,12 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-    public BlockRenderLayer getBlockLayer() {
+    public BlockRenderLayer getRenderLayer() {
         return BlockRenderLayer.CUTOUT;
     }
 	
 	@Override
-	public void updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) {
+	public void tick(BlockState state, World worldIn, BlockPos pos, Random rand) {
 		super.updateTick(worldIn, pos, state, rand);
 		
 		for (PlayerEntity player : worldIn.playerEntities) {
@@ -166,13 +166,13 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 	}
 	
 	public MobEntity spawn(World world, BlockPos pos, BlockState state, Random rand) {
-		Type type = state.getValue(MOB);
+		Type type = state.get(MOB);
 		MobEntity entity = getEntity(type, world, pos);
 		
 		entity.enablePersistence();
 		entity.setPosition(pos.getX() + 0.5, pos.getY(), pos.getZ() + .5);
 		
-		world.spawnEntity(entity);
+		world.addEntity(entity);
 		return entity;
 	}
 	
@@ -217,12 +217,17 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 
 
 	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
+	public boolean hasTileEntity() {
+		return true;
+	}
+	
+	@Override
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		return new SingleSpawnerTileEntity();
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, BlockState state) {
+	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) { broke();
 		super.breakBlock(world, pos, state);
         world.removeTileEntity(pos);
 	}
@@ -236,7 +241,7 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 	}
 
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		if (worldIn.isRemote) {
 			return true;
 		}
@@ -253,7 +258,7 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 		if (playerIn.isCreative()) {
 			ItemStack heldItem = playerIn.getHeldItem(hand);
 			if (heldItem.isEmpty()) {
-				playerIn.sendMessage(new StringTextComponent("Currently set to " + state.getValue(MOB).getName()));
+				playerIn.sendMessage(new StringTextComponent("Currently set to " + state.get(MOB).getName()));
 			} else if (heldItem.getItem() instanceof EssenceItem) {
 				Type type = null;
 				switch (EssenceItem.findType(heldItem)) {
@@ -280,13 +285,13 @@ public class NostrumSingleSpawner extends Block implements ITileEntityProvider {
 					break;
 				}
 				
-				worldIn.setBlockState(pos, state.withProperty(MOB, type));
+				worldIn.setBlockState(pos, state.with(MOB, type));
 			} else if (heldItem.getItem() instanceof NostrumSkillItem) {
 				if (NostrumSkillItem.getTypeFromMeta(heldItem.getMetadata()) == SkillItemType.WING) {
-					worldIn.setBlockState(pos, state.withProperty(MOB, Type.DRAGON_RED));
+					worldIn.setBlockState(pos, state.with(MOB, Type.DRAGON_RED));
 				}
 			} else if (heldItem.getItem() == Items.REEDS) {
-				worldIn.setBlockState(pos, state.withProperty(MOB, Type.PLANT_BOSS));
+				worldIn.setBlockState(pos, state.with(MOB, Type.PLANT_BOSS));
 			}
 			return true;
 		}

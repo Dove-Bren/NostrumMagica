@@ -234,21 +234,21 @@ public class RoomBlueprint {
 //					
 //					Block block = placeState.getBlock();
 //					if (block instanceof BlockHorizontal) {
-//						Direction cur = placeState.getValue(BlockHorizontal.FACING);
+//						Direction cur = placeState.get(BlockHorizontal.FACING);
 //						cur = rotate(cur, facing);
-//						placeState = placeState.withProperty(BlockHorizontal.FACING, cur);
+//						placeState = placeState.with(BlockHorizontal.FACING, cur);
 //					} else if (block instanceof BlockTorch) {
-//						Direction cur = placeState.getValue(BlockTorch.FACING);
+//						Direction cur = placeState.get(BlockTorch.FACING);
 //						cur = rotate(cur, facing);
-//						placeState = placeState.withProperty(BlockTorch.FACING, cur);
+//						placeState = placeState.with(BlockTorch.FACING, cur);
 //					} else if (block instanceof BlockLadder) {
-//						Direction cur = placeState.getValue(BlockLadder.FACING);
+//						Direction cur = placeState.get(BlockLadder.FACING);
 //						cur = rotate(cur, facing);
-//						placeState = placeState.withProperty(BlockLadder.FACING, cur);
+//						placeState = placeState.with(BlockLadder.FACING, cur);
 //					} else if (block instanceof BlockStairs) {
-//						Direction cur = placeState.getValue(BlockStairs.FACING);
+//						Direction cur = placeState.get(BlockStairs.FACING);
 //						cur = rotate(cur, facing);
-//						placeState = placeState.withProperty(BlockStairs.FACING, cur);
+//						placeState = placeState.with(BlockStairs.FACING, cur);
 //					}
 //				}
 //				
@@ -269,26 +269,26 @@ public class RoomBlueprint {
 					
 					Block block = placeState.getBlock();
 					if (block instanceof BlockHorizontal) {
-						Direction cur = placeState.getValue(BlockHorizontal.FACING);
+						Direction cur = placeState.get(BlockHorizontal.FACING);
 						cur = rotate(cur, facing);
-						placeState = placeState.withProperty(BlockHorizontal.FACING, cur);
+						placeState = placeState.with(BlockHorizontal.FACING, cur);
 					} else if (block instanceof BlockTorch) {
-						Direction cur = placeState.getValue(BlockTorch.FACING);
+						Direction cur = placeState.get(BlockTorch.FACING);
 						cur = rotate(cur, facing);
-						placeState = placeState.withProperty(BlockTorch.FACING, cur);
+						placeState = placeState.with(BlockTorch.FACING, cur);
 					} else if (block instanceof BlockLadder) {
-						Direction cur = placeState.getValue(BlockLadder.FACING);
+						Direction cur = placeState.get(BlockLadder.FACING);
 						cur = rotate(cur, facing);
-						placeState = placeState.withProperty(BlockLadder.FACING, cur);
+						placeState = placeState.with(BlockLadder.FACING, cur);
 					} else if (block instanceof BlockStairs) {
-						Direction cur = placeState.getValue(BlockStairs.FACING);
+						Direction cur = placeState.get(BlockStairs.FACING);
 						cur = rotate(cur, facing);
-						placeState = placeState.withProperty(BlockStairs.FACING, cur);
+						placeState = placeState.with(BlockStairs.FACING, cur);
 					} else if (block instanceof BlockDirectional) {
 						// Only want to rotate horizontally
-						Direction cur = placeState.getValue(BlockDirectional.FACING);
+						Direction cur = placeState.get(BlockDirectional.FACING);
 						cur = rotate(cur, facing);
-						placeState = placeState.withProperty(BlockDirectional.FACING, cur);
+						placeState = placeState.with(BlockDirectional.FACING, cur);
 					}
 				}
 				
@@ -314,7 +314,7 @@ public class RoomBlueprint {
 			Direction ret = null;
 			Block block = state.getBlock();
 			if (block instanceof BlockHorizontal) {
-				ret = state.getValue(BlockHorizontal.FACING);
+				ret = state.get(BlockHorizontal.FACING);
 				
 				// HACK: Reverse if special enterance block cause they're backwards LOL
 				if (block instanceof BlockRedstoneRepeater || block instanceof BlockRedstoneComparator) {
@@ -322,11 +322,11 @@ public class RoomBlueprint {
 				}
 				
 			} else if (block instanceof BlockTorch) {
-				ret = state.getValue(BlockTorch.FACING);
+				ret = state.get(BlockTorch.FACING);
 			} else if (block instanceof BlockLadder) {
-				ret = state.getValue(BlockLadder.FACING);
+				ret = state.get(BlockLadder.FACING);
 			} else if (block instanceof BlockStairs) {
-				ret = state.getValue(BlockStairs.FACING);
+				ret = state.get(BlockStairs.FACING);
 			}
 			return ret;
 		}

@@ -37,7 +37,12 @@ public class TeleportationPortal extends NostrumPortal implements ITileEntityPro
 	}
 	
 	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
+	public boolean hasTileEntity() {
+		return true;
+	}
+	
+	@Override
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		BlockState state = this.getStateFromMeta(meta);
 		if (isMaster(state)) {
 			return new TeleportationPortalTileEntity();

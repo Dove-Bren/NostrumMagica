@@ -678,7 +678,7 @@ public class SpellAction {
 					}
 					((PlayerEntity) entity).inventory.addItemStackToInventory(stack);
 				} else {
-					inhand.splitStack(1);
+					inhand.split(1);
 					((PlayerEntity) entity).inventory.addItemStackToInventory(stack);
 				}
 				
@@ -896,7 +896,7 @@ public class SpellAction {
 				for (int i = 0; i < power; i++) {
 					EntityGolem golem = spawnGolem(world);
 					golem.setPosition(block.getX() + .5, block.getY(), block.getZ() + .5);
-					world.spawnEntity(golem);
+					world.addEntity(golem);
 					golem.setOwnerId(caster.getPersistentID());
 					NostrumMagica.getMagicWrapper(caster).addFamiliar(golem);
 				}
@@ -939,7 +939,7 @@ public class SpellAction {
 					EntityGolem golem = spawnGolem(world);
 					golem.setPosition(block.getX() + .5, block.getY(), block.getZ() + .5);
 					golem.setExpiresAfterTicks(time);
-					world.spawnEntity(golem);
+					world.addEntity(golem);
 				}
 			}
 			
@@ -1148,7 +1148,7 @@ public class SpellAction {
 									y,
 									z + (NostrumMagica.rand.nextFloat() - .5));
 				
-				world.spawnEntity(entity);
+				world.addEntity(entity);
 			}
 			
 			NostrumMagicaSounds.DAMAGE_ENDER.play(world, block.getX(), block.getY(), block.getZ());
@@ -1220,7 +1220,7 @@ public class SpellAction {
 							p.inventory.removeStackFromSlot(p.inventory.currentItem);
 						}
 					} else {
-						inhand.splitStack(1);
+						inhand.split(1);
 					}
 					if (!addedItem.isEmpty()) {
 						((PlayerEntity) entity).inventory.addItemStackToInventory(addedItem);

@@ -87,8 +87,8 @@ public class NostrumResourceCrystal extends BlockItem implements ILoreTagged {
 //
 //			if (playerIn.canPlayerEdit(pos, facing, stack) && (block.isReplaceable(worldIn, pos) || worldIn.isAirBlock(pos))) {
 //				BlockState iblockstate1 = ManiCrystal.instance().getDefaultState()
-//						.withProperty(ManiCrystal.FACING, facing)
-//						.withProperty(ManiCrystal.LEVEL, type == ResourceType.CRYSTAL_MEDIUM ? 1 : 0);
+//						.with(ManiCrystal.FACING, facing)
+//						.with(ManiCrystal.LEVEL, type == ResourceType.CRYSTAL_MEDIUM ? 1 : 0);
 //
 //				worldIn.setBlockState(pos, iblockstate1, 11);
 //

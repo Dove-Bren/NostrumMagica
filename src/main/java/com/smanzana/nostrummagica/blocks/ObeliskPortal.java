@@ -32,7 +32,12 @@ public class ObeliskPortal extends TeleportationPortal {
 	}
 	
 	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
+	public boolean hasTileEntity() {
+		return true;
+	}
+	
+	@Override
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		BlockState state = this.getStateFromMeta(meta);
 		if (isMaster(state)) {
 			return new ObeliskPortalTileEntity();
@@ -77,7 +82,7 @@ public class ObeliskPortal extends TeleportationPortal {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		pos = getMaster(state, pos); // find master
 		
 		BlockState parentState = worldIn.getBlockState(pos.down());

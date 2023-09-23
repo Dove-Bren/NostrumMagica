@@ -53,7 +53,7 @@ public class MagicCyclerTrigger extends SpellTrigger {
 							getState().getSelf(),
 							5.0f, (int) duration * 20, onBlocks);
 					
-					world.spawnEntity(projectile);
+					world.addEntity(projectile);
 			
 				}
 			

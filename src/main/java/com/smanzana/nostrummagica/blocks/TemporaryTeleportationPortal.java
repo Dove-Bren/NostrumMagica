@@ -35,7 +35,12 @@ public class TemporaryTeleportationPortal extends TeleportationPortal  {
 	}
 	
 	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
+	public boolean hasTileEntity() {
+		return true;
+	}
+	
+	@Override
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		if (worldIn.isRemote) {
 			BlockState state = this.getStateFromMeta(meta);
 			if (isMaster(state)) {

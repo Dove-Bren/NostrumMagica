@@ -215,7 +215,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.EnumParticleTypes;
@@ -501,11 +501,11 @@ public class ClientProxy extends CommonProxy {
 		ModelLoader.setCustomMeshDefinition(SpellRune.instance(), new SpellRune.ModelMesher());
 		ModelLoader.setCustomMeshDefinition(ThanosStaff.instance(), new ThanosStaff.ModelMesher());
 		
-		registerModel(new ItemBlock(NostrumMagicaFlower.instance()), 
+		registerModel(new BlockItem(NostrumMagicaFlower.instance()), 
 				NostrumMagicaFlower.Type.CRYSTABLOOM.getMeta(),
 				NostrumMagicaFlower.Type.CRYSTABLOOM.getName()
 				);
-		registerModel(new ItemBlock(NostrumMagicaFlower.instance()), 
+		registerModel(new BlockItem(NostrumMagicaFlower.instance()), 
 				NostrumMagicaFlower.Type.MIDNIGHT_IRIS.getMeta(),
 				NostrumMagicaFlower.Type.MIDNIGHT_IRIS.getName()
 				);
@@ -565,7 +565,7 @@ public class ClientProxy extends CommonProxy {
 				DungeonBlock.ID + "_" + DungeonBlock.Type.LIGHT.getName()
 				);
 		
-		registerModel(new ItemBlock(NostrumMirrorBlock.instance()),
+		registerModel(new BlockItem(NostrumMirrorBlock.instance()),
 				0,
 				NostrumMirrorBlock.ID);
 		
@@ -1201,7 +1201,7 @@ public class ClientProxy extends CommonProxy {
 				Map<ReagentType, Integer> reagents = spell.getRequiredReagents();
 				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
 					int count = NostrumMagica.getReagentCount(player, row.getKey());
-					if (count < row.getValue()) {
+					if (count < row.get()) {
 						player.sendMessage(new TranslationTextComponent("info.spell.bad_reagent", row.getKey().prettyName()));
 						System.out.println("LOUD BAD REAGENT"); // TODO remove
 						return;

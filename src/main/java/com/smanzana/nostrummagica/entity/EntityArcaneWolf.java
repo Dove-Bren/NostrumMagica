@@ -1408,7 +1408,7 @@ public class EntityArcaneWolf extends EntityWolf implements ITameableEntity, IEn
 					ItemStack stack = inventory.getStackInSlot(i);
 					if (!stack.isEmpty()) {
 						ItemEntity item = new ItemEntity(this.world, this.posX, this.posY, this.posZ, stack);
-						this.world.spawnEntity(item);
+						this.world.addEntity(item);
 					}
 				}
 			}
@@ -1417,7 +1417,7 @@ public class EntityArcaneWolf extends EntityWolf implements ITameableEntity, IEn
 //				ItemStack stack = equipment.getStackInSlot(slot);
 //				if (!stack.isEmpty()) {
 //					ItemEntity item = new ItemEntity(this.world, this.posX, this.posY, this.posZ, stack);
-//					this.world.spawnEntity(item);
+//					this.world.addEntity(item);
 //				}
 //			}
 //			equipment.clear();
@@ -1902,7 +1902,7 @@ public class EntityArcaneWolf extends EntityWolf implements ITameableEntity, IEn
 		newWolf.setTamedBy(player);
 		newWolf.setHealth(5f);
 		wolf.setDead();
-		wolf.world.spawnEntity(newWolf);
+		wolf.world.addEntity(newWolf);
 		return newWolf;
 	}
 	

@@ -52,7 +52,7 @@ public class SorceryPortalSpawner extends Block implements ITriggeredBlock {
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, BlockState state) {
+	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) { broke();
 		this.destroy(world, pos, state);
 		
 		super.breakBlock(world, pos, state);
@@ -64,7 +64,7 @@ public class SorceryPortalSpawner extends Block implements ITriggeredBlock {
 	}
 	
 	@Override
-	public void onBlockAdded(World worldIn, BlockPos pos, BlockState state) {
+	public void onBlockAdded(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
 		activatePortal(worldIn, pos, state);
 	}
 

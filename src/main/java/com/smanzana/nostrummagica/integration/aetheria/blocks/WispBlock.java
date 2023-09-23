@@ -66,7 +66,7 @@ public class WispBlock extends BlockContainer {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		
 		ItemStack heldItem = playerIn.getHeldItem(hand);
 		
@@ -83,7 +83,7 @@ public class WispBlock extends BlockContainer {
 			} else if (heldItem.getItem() instanceof ReagentItem) {
 				
 				if (te.getReagent().isEmpty()) {
-					te.setReagent(heldItem.splitStack(heldItem.getCount()));
+					te.setReagent(heldItem.split(heldItem.getCount()));
 					return true;
 				} else if (ReagentItem.findType(heldItem) == ReagentItem.findType(te.getReagent())) {
 					int avail = Math.max(0, Math.min(64, 64 - te.getReagent().getCount()));
@@ -105,7 +105,12 @@ public class WispBlock extends BlockContainer {
 	}
 	
 	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
+	public boolean hasTileEntity() {
+		return true;
+	}
+	
+	@Override
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		return new WispBlockTileEntity();
 	}
 	
@@ -141,7 +146,7 @@ public class WispBlock extends BlockContainer {
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, BlockState state) {
+	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) { broke();
 		destroy(world, pos, state);
 		super.breakBlock(world, pos, state);
 	}
@@ -158,7 +163,7 @@ public class WispBlock extends BlockContainer {
 			x = pos.getX() + .5;
 			y = pos.getY() + .5;
 			z = pos.getZ() + .5;
-			world.spawnEntity(new ItemEntity(world, x, y, z, item.copy()));
+			world.addEntity(new ItemEntity(world, x, y, z, item.copy()));
 		}
 		
 		item = table.getReagent();
@@ -167,7 +172,7 @@ public class WispBlock extends BlockContainer {
 			x = pos.getX() + .5;
 			y = pos.getY() + .5;
 			z = pos.getZ() + .5;
-			world.spawnEntity(new ItemEntity(world, x, y, z, item.copy()));
+			world.addEntity(new ItemEntity(world, x, y, z, item.copy()));
 		}
 		
 		table.deactivate();
@@ -323,7 +328,7 @@ public class WispBlock extends BlockContainer {
 				EntityWisp wisp = new EntityWisp(this.world, this.pos);
 				wisp.setPosition(spawnPos.getX() + .5, spawnPos.getY(), spawnPos.getZ() + .5);
 				this.wisps.add(wisp);
-				this.world.spawnEntity(wisp);
+				this.world.addEntity(wisp);
 				//this.dirtyAndUpdate();
 			}
 		}

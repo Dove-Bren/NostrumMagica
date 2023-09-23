@@ -437,98 +437,98 @@ public class ModConfig {
 //	}	
 	
 	public boolean spellDebug() {
-		return (Boolean) common.getValue(ModConfigCommon.Key.SPELL_DEBUG);
+		return (Boolean) common.get(ModConfigCommon.Key.SPELL_DEBUG);
 	}
 	
 	public boolean getObeliskList() {
-		return (Boolean) client.getValue(ModConfigClient.Key.OBELISK_LIST);
+		return (Boolean) client.get(ModConfigClient.Key.OBELISK_LIST);
 	}
 	
 	public boolean obeliskReqMagic() {
-		return (Boolean) common.getValue(ModConfigCommon.Key.OBELISK_REQ_MAGIC);
+		return (Boolean) common.get(ModConfigCommon.Key.OBELISK_REQ_MAGIC);
 	}
 	
 	public boolean displayManaOrbs() {
-		return (Boolean) client.getValue(ModConfigClient.Key.MP_DISPLAY_SPHERES);
+		return (Boolean) client.get(ModConfigClient.Key.MP_DISPLAY_SPHERES);
 	}
 	
 	public boolean displayManaBar() {
-		return (Boolean) client.getValue(ModConfigClient.Key.MP_DISPLAY_BAR);
+		return (Boolean) client.get(ModConfigClient.Key.MP_DISPLAY_BAR);
 	}
 	
 	public boolean displayManaText() {
-		return (Boolean) client.getValue(ModConfigClient.Key.MP_DISPLAY_TEXT);
+		return (Boolean) client.get(ModConfigClient.Key.MP_DISPLAY_TEXT);
 	}
 	
 	public boolean displayXPText() {
-		return (Boolean) client.getValue(ModConfigClient.Key.XP_DISPLAY_TEXT);
+		return (Boolean) client.get(ModConfigClient.Key.XP_DISPLAY_TEXT);
 	}
 	
 	public boolean displayXPBar() {
-		return (Boolean) client.getValue(ModConfigClient.Key.XP_DISPLAY_BAR);
+		return (Boolean) client.get(ModConfigClient.Key.XP_DISPLAY_BAR);
 	}
 
 	public boolean displayEffects() {
-		return (Boolean) client.getValue(ModConfigClient.Key.EFFECT_DISPLAY);
+		return (Boolean) client.get(ModConfigClient.Key.EFFECT_DISPLAY);
 	}
 	
 	public boolean displayLoginText() {
-		return (Boolean) client.getValue(ModConfigClient.Key.LOGIN_TEXT);
+		return (Boolean) client.get(ModConfigClient.Key.LOGIN_TEXT);
 	}
 	
 	public int[] getDimensionList() {
-		return new int[] {(int)(common.getValue(ModConfigCommon.Key.NOSTRUM_WORLDS))};
+		return new int[] {(int)(common.get(ModConfigCommon.Key.NOSTRUM_WORLDS))};
 	}
 	
 	public boolean displayAllMirrorQuestNodes() {
-		return (Boolean) client.getValue(ModConfigClient.Key.MIRROR_QUEST_NODE_SPOILERS);
+		return (Boolean) client.get(ModConfigClient.Key.MIRROR_QUEST_NODE_SPOILERS);
 	}
 	
 	public boolean displayArmorOverlay() {
-		return (Boolean) client.getValue(ModConfigClient.Key.ARMOR_DISPLAY);
+		return (Boolean) client.get(ModConfigClient.Key.ARMOR_DISPLAY);
 	}
 	
 	public int sorceryDimensionIndex() {
-		return (Integer) common.getValue(ModConfigCommon.Key.NOSTRUM_DIMENSION_ID);
+		return (Integer) common.get(ModConfigCommon.Key.NOSTRUM_DIMENSION_ID);
 	}
 
 	public boolean displayShieldHearts() {
-		return (Boolean) client.getValue(ModConfigClient.Key.DISPLAY_SHIELDS);
+		return (Boolean) client.get(ModConfigClient.Key.DISPLAY_SHIELDS);
 	}
 	
 	public boolean displayHookshotCrosshair() {
-		return (Boolean) client.getValue(ModConfigClient.Key.DISPLAY_HOOKSHOT_CROSSHAIR);
+		return (Boolean) client.get(ModConfigClient.Key.DISPLAY_HOOKSHOT_CROSSHAIR);
 	}
 	
 	public boolean displayDragonHealthbars() {
-		return (Boolean) client.getValue(ModConfigClient.Key.DISPLAY_DRAGON_HEALTHBARS);
+		return (Boolean) client.get(ModConfigClient.Key.DISPLAY_DRAGON_HEALTHBARS);
 	}
 	
 	public boolean displayPetHealthbars() {
-		return (Boolean) client.getValue(ModConfigClient.Key.DISPLAY_PET_HEALTHBARS);
+		return (Boolean) client.get(ModConfigClient.Key.DISPLAY_PET_HEALTHBARS);
 	}
 	
 	public boolean overrideElytraCode() {
-		return (Boolean) common.getValue(ModConfigCommon.Key.NOSTRUM_OVERRIDE_ELYTRA);
+		return (Boolean) common.get(ModConfigCommon.Key.NOSTRUM_OVERRIDE_ELYTRA);
 	}
 	
 	public boolean doubleEnderDash() {
-		return (Boolean) client.getValue(ModConfigClient.Key.CONTROL_DASH_DOUBLEPRESS);
+		return (Boolean) client.get(ModConfigClient.Key.CONTROL_DASH_DOUBLEPRESS);
 	}
 	
 	public boolean usingAdvancedArmors() {
-		return (Boolean) common.getValue(ModConfigCommon.Key.HIGHER_BALANCED);
+		return (Boolean) common.get(ModConfigCommon.Key.HIGHER_BALANCED);
 	}
 	
 	public int getManaSphereOffset() {
-		return (Integer) client.getValue(ModConfigClient.Key.DISPLAY_MANA_HEIGHT);
+		return (Integer) client.get(ModConfigClient.Key.DISPLAY_MANA_HEIGHT);
 	}
 	
 	public boolean vacuumWhileSneaking() {
-		return (Boolean) common.getValue(ModConfigCommon.Key.BAG_VACUUM_ON_SNEAK);
+		return (Boolean) common.get(ModConfigCommon.Key.BAG_VACUUM_ON_SNEAK);
 	}
 	
 	public boolean usingEasierThano() {
-		return (Boolean) common.getValue(ModConfigCommon.Key.EASIER_THANO);
+		return (Boolean) common.get(ModConfigCommon.Key.EASIER_THANO);
 	}
 }

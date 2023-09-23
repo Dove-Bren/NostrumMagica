@@ -1303,11 +1303,11 @@ public class OverlayRenderer extends AbstractGui {
 		
 		// Lore icon
 		final ILoreTagged tag;
-		if (stack.getItem() instanceof ItemBlock) {
-			if (!(((ItemBlock) stack.getItem()).getBlock() instanceof ILoreTagged)) {
+		if (stack.getItem() instanceof BlockItem) {
+			if (!(((BlockItem) stack.getItem()).getBlock() instanceof ILoreTagged)) {
 				tag = null;
 			} else {
-				tag = (ILoreTagged) ((ItemBlock) stack.getItem()).getBlock();
+				tag = (ILoreTagged) ((BlockItem) stack.getItem()).getBlock();
 			}
 		} else if (!(stack.getItem() instanceof ILoreTagged)) {
 			tag = null;

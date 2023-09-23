@@ -11,7 +11,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.state.IntegerProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -33,8 +33,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class MagicWall extends Block {
 
 	public static final String ID = "magic_wall";
-	private static final PropertyInteger DECAY = PropertyInteger.create("decay", 0, 3);
-	private static final PropertyInteger LEVEL = PropertyInteger.create("level", 0, 2);
+	private static final IntegerProperty DECAY = IntegerProperty.create("decay", 0, 3);
+	private static final IntegerProperty LEVEL = IntegerProperty.create("level", 0, 2);
 	
 	private static MagicWall instance = null;
 	public static MagicWall instance() {
@@ -55,8 +55,8 @@ public class MagicWall extends Block {
 		this.setLightOpacity(2);
 		this.setTickRandomly(true);
 		
-		this.setDefaultState(this.blockState.getBaseState().withProperty(DECAY, 0)
-				.withProperty(LEVEL, 0));
+		this.setDefaultState(this.stateContainer.getBaseState().with(DECAY, 0)
+				.with(LEVEL, 0));
 	}
 	
 	@Override
@@ -75,8 +75,8 @@ public class MagicWall extends Block {
     }
 	
 	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, DECAY, LEVEL);
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(DECAY, LEVEL);
 	}
 	
 	/**
@@ -85,14 +85,14 @@ public class MagicWall extends Block {
 	 * @return
 	 */
 	public BlockState getState(int level) {
-		return getDefaultState().withProperty(DECAY, 0)
-				.withProperty(LEVEL, Math.max(Math.min(2, level - 1), 0));
+		return getDefaultState().with(DECAY, 0)
+				.with(LEVEL, Math.max(Math.min(2, level - 1), 0));
 	}
 	
 	@Override
 	public BlockState getStateFromMeta(int meta) {
-		return getDefaultState().withProperty(DECAY, meta & 0x3)
-				.withProperty(LEVEL, Math.min(2, (meta >> 2) & 0x3));
+		return getDefaultState().with(DECAY, meta & 0x3)
+				.with(LEVEL, Math.min(2, (meta >> 2) & 0x3));
 	}
 	
 	@Override
@@ -102,7 +102,7 @@ public class MagicWall extends Block {
 	
 	@Override
 	public int getMetaFromState(BlockState state) {
-		return (state.getValue(LEVEL) << 2) | (state.getValue(DECAY));
+		return (state.get(LEVEL) << 2) | (state.get(DECAY));
 	}
 	
 	@Override
@@ -116,7 +116,7 @@ public class MagicWall extends Block {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-    public BlockRenderLayer getBlockLayer() {
+    public BlockRenderLayer getRenderLayer() {
         return BlockRenderLayer.TRANSLUCENT;
     }
 	
@@ -136,12 +136,12 @@ public class MagicWall extends Block {
 	}
 	
 	@Override
-	public void updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) {
-			int decay = state.getValue(DECAY) + 1;
+	public void tick(BlockState state, World worldIn, BlockPos pos, Random rand) {
+			int decay = state.get(DECAY) + 1;
 			if (decay >= 1) {
 				worldIn.setBlockToAir(pos);
 			} else {
-				worldIn.setBlockState(pos, state.withProperty(DECAY, decay));
+				worldIn.setBlockState(pos, state.with(DECAY, decay));
 			}
     }
 	
@@ -154,7 +154,7 @@ public class MagicWall extends Block {
 	@Override
 	public void addCollisionBoxToList(BlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
 		
-		int level = state.getValue(LEVEL);
+		int level = state.get(LEVEL);
 		
 		if (level <= 0
 				|| (level >= 2 && !(entityIn instanceof PlayerEntity))
@@ -164,7 +164,7 @@ public class MagicWall extends Block {
 		
     }
 	
-	public void onBlockAdded(World worldIn, BlockPos pos, BlockState state) {
+	public void onBlockAdded(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
 		super.onBlockAdded(worldIn, pos, state);
 	}
 

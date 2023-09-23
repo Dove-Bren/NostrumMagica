@@ -7,77 +7,49 @@ import java.util.Random;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig;
-import com.smanzana.nostrummagica.effects.FrostbiteEffect;
-import com.smanzana.nostrummagica.effects.MagicResistEffect;
+import com.smanzana.nostrummagica.effects.NostrumEffects;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockIce;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.BreakableBlock;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.state.IntegerProperty;
+import net.minecraft.state.StateContainer;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.Tags;
 
-public class CursedIce extends Block {
+public class CursedIce extends BreakableBlock {
 
 	public static final String ID = "cursed_ice";
-	private static final PropertyInteger LEVEL = PropertyInteger.create("level", 0, 2);
-	
-	private static CursedIce instance = null;
-	public static CursedIce instance() {
-		if (instance == null)
-			instance = new CursedIce();
-		
-		return instance;
-	}
-	
+	private static final IntegerProperty LEVEL = IntegerProperty.create("level", 0, 2);
 	
 	public CursedIce() {
-		super(Material.ICE, MapColor.ICE);
-		this.setUnlocalizedName(ID);
-		this.setHardness(3.0f);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setSoundType(SoundType.GLASS);
-		this.setLightOpacity(14);
-		this.setTickRandomly(true);
+		super(Block.Properties.create(Material.ICE)
+				.hardnessAndResistance(3.0f)
+				.slipperiness(0.68F)
+				.sound(SoundType.GLASS)
+				.tickRandomly()
+				.noDrops()
+				);
+		//this.setLightOpacity(14);
 		
-		this.setDefaultState(this.blockState.getBaseState().withProperty(LEVEL, 0));
+		this.setDefaultState(this.stateContainer.getBaseState().with(LEVEL, 0));
 	}
 	
 	@Override
-	public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
-		return false;
-	}
-	
-	@Override
-	public boolean isOpaqueCube(BlockState state) {
-		return false;
-	}
-	
-	@Override
-	public boolean isReplaceable(IBlockAccess worldIn, BlockPos pos) {
-        return false;
-    }
-	
-	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, LEVEL);
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(LEVEL);
 	}
 	
 	/**
@@ -86,55 +58,29 @@ public class CursedIce extends Block {
 	 * @return
 	 */
 	public BlockState getState(int level) {
-		return getDefaultState().withProperty(LEVEL, Math.max(Math.min(2, level - 1), 0));
-	}
-	
-	@Override
-	public BlockState getStateFromMeta(int meta) {
-		return getDefaultState().withProperty(LEVEL, Math.min(2, meta & 0x3));
-	}
-	
-	@Override
-	public Item getItemDropped(BlockState state, Random rand, int fortune) {
-        return null;
-    }
-	
-	@Override
-	public int getMetaFromState(BlockState state) {
-		return (state.getValue(LEVEL));
-	}
-	
-	@Override
-	public ItemStack getPickBlock(BlockState state, RayTraceResult target, World world, BlockPos pos, PlayerEntity player) {
-		return new ItemStack(Item.getItemFromBlock(this), 1, 0);
+		return getDefaultState().with(LEVEL, Math.max(Math.min(2, level - 1), 0));
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-    public BlockRenderLayer getBlockLayer() {
+    public BlockRenderLayer getRenderLayer() {
         return BlockRenderLayer.TRANSLUCENT;
     }
 	
 	@Override
-	public boolean isFullCube(BlockState state) {
-        return false;
-    }
-	
-	@Override
 	@OnlyIn(Dist.CLIENT)
-	public boolean shouldSideBeRendered(BlockState blockState, IBlockAccess blockAccess, BlockPos pos, Direction side) {
-		BlockState iblockstate = blockAccess.getBlockState(pos.offset(side));
-		Block block = iblockstate.getBlock();
+	public boolean isSideInvisible(BlockState state, BlockState adjacentBlockState, Direction side) {
+		final Block adjacentBlock = adjacentBlockState.getBlock();
 		
-		return !(block == Blocks.GLASS || block == Blocks.STAINED_GLASS
-				|| block == Blocks.ICE || block == instance());
+		return !(Tags.Blocks.GLASS.contains(adjacentBlock) || Tags.Blocks.STAINED_GLASS.contains(adjacentBlock)
+				|| BlockTags.ICE.contains(adjacentBlock) || adjacentBlock == this);
 	}
 	
 	@Override
-	public void updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) {
-		int level = state.getValue(LEVEL);
+	public void tick(BlockState state, World worldIn, BlockPos pos, Random rand) {
+		int level = state.get(LEVEL);
 		
 		// Don't grow is in Sorcery dim
-		if (worldIn.provider.getDimension() == ModConfig.config.sorceryDimensionIndex()) {
+		if (worldIn.getDimension().getType().getId() == ModConfig.config.sorceryDimensionIndex()) {
 			return;
 		}
 		
@@ -151,14 +97,14 @@ public class CursedIce extends Block {
 			if (!worldIn.isAirBlock(target)) {
 				BlockState bs = worldIn.getBlockState(target);
 				Block b = bs.getBlock();
-				if (!(b instanceof BlockIce) && !(b instanceof CursedIce)) {
+				if (!BlockTags.ICE.contains(b) && !(b == this)) {
 					if (bs.getBlockHardness(worldIn, target) >= 0.0f &&
 							bs.getBlockHardness(worldIn, target) <= Math.pow(2.0f, level)) {
 						worldIn.setBlockState(target, Blocks.ICE.getDefaultState());
 						return;
 					}
 					
-				} else if (b instanceof BlockIce) {
+				} else if (BlockTags.ICE.contains(b)) {
 					// It's ice. Convert to cursed ice
 					worldIn.setBlockState(target, getDefaultState());
 					return;
@@ -171,12 +117,12 @@ public class CursedIce extends Block {
 		
 		if (!worldIn.isRemote) {
 			int amp = 0;
-			if (worldIn.getBlockState(pos).getValue(LEVEL) == 2)
+			if (worldIn.getBlockState(pos).get(LEVEL) == 2)
 				amp = 1;
 			
-			if (entityIn instanceof LivingEntity && ((LivingEntity) entityIn).getActivePotionEffect(MagicResistEffect.instance()) == null) {
+			if (entityIn instanceof LivingEntity && ((LivingEntity) entityIn).getActivePotionEffect(NostrumEffects.magicResist) == null) {
 				LivingEntity living = (LivingEntity) entityIn;
-				living.addPotionEffect(new PotionEffect(FrostbiteEffect.instance(),
+				living.addPotionEffect(new EffectInstance(NostrumEffects.frostbite,
 						45, amp));
 			}
 		}

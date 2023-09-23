@@ -507,7 +507,7 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
 			ItemStack inSlot = slots.get(slot);
 			ItemStack taken = ItemStack.EMPTY;
 			if (!inSlot.isEmpty()) {
-				taken = inSlot.splitStack(count);
+				taken = inSlot.split(count);
 				if (inSlot.getCount() <= 0) {
 					inSlot = ItemStack.EMPTY;
 				}

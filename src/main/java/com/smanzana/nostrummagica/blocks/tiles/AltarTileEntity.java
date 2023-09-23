@@ -113,7 +113,7 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	public ItemStack decrStackSize(int index, int count) {
 		if (index > 0)
 			return ItemStack.EMPTY;
-		ItemStack ret = this.stack.splitStack(count);
+		ItemStack ret = this.stack.split(count);
 		if (this.stack.getCount() == 0)
 			this.stack = ItemStack.EMPTY;
 		this.dirty();

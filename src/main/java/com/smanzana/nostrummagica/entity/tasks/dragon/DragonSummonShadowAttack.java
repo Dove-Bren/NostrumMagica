@@ -91,7 +91,7 @@ public class DragonSummonShadowAttack<T extends EntityDragon> extends EntityAIBa
 		for (LivingEntity targ : this.pool) {
 			EntityShadowDragonRed ent = new EntityShadowDragonRed(targ.world, targ);
 			ent.setPosition(targ.posX + 5.0 * (rand.nextDouble() - .5D), targ.posY, targ.posZ + 5.0 * (rand.nextDouble() - .5D));
-			targ.world.spawnEntity(ent);
+			targ.world.addEntity(ent);
 		}
 		
 		NostrumMagicaSounds.DRAGON_DEATH.play(dragon.world, dragon.posX, dragon.posY, dragon.posZ);

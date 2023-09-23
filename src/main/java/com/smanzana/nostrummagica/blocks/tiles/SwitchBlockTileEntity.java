@@ -146,7 +146,7 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 			
 			triggerEntity = new EntitySwitchTrigger(this.world);
 			triggerEntity.setPosition(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
-			world.spawnEntity(triggerEntity);
+			world.addEntity(triggerEntity);
 		}
 	}
 	

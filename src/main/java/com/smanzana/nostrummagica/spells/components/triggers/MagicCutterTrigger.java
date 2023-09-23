@@ -76,7 +76,7 @@ public class MagicCutterTrigger extends SpellTrigger {
 //							getState().getSelf(),
 //							5.0f, 500);
 					
-					world.spawnEntity(projectile);
+					world.addEntity(projectile);
 			
 				}
 			

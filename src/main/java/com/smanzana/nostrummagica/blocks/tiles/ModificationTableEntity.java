@@ -82,7 +82,7 @@ public class ModificationTableEntity extends TileEntity implements IInventory {
 			stack = slots[index];
 			slots[index] = ItemStack.EMPTY;
 		} else {
-			stack = slots[index].splitStack(count);
+			stack = slots[index].split(count);
 		}
 		
 		this.markDirty();

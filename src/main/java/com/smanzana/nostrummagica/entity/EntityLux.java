@@ -1188,7 +1188,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, ITameableEnt
 	}
 	
 	protected void doBreed() {
-		world.spawnEntity(new EntityLux(world));
+		world.addEntity(new EntityLux(world));
 	}
 	
 	protected void attemptBreed() {

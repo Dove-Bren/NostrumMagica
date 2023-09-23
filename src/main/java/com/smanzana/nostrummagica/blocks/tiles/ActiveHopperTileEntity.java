@@ -105,7 +105,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 			return ItemStack.EMPTY;
 		}
 		
-		ItemStack ret = slot.splitStack(count);
+		ItemStack ret = slot.split(count);
 		if (slot.getCount() <= 0) {
 			slot = ItemStack.EMPTY;
 		}
@@ -489,7 +489,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 			// try and pull from the stack
 			@Nonnull ItemStack stack = entity.getItem();
 			if (canPull(stack)) {
-				this.addStack(stack.splitStack(1)); // reduces stack size by 1
+				this.addStack(stack.split(1)); // reduces stack size by 1
 				entity.setItem(stack); // Try and force an update
 				return true;
 			}

@@ -166,7 +166,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 						return true;
 					});
 					
-					world.spawnEntity(bullet);
+					world.addEntity(bullet);
 			
 				}
 			

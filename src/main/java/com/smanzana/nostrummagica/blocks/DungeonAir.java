@@ -1,93 +1,76 @@
 package com.smanzana.nostrummagica.blocks;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.BlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.block.BreakableBlock;
+import net.minecraft.block.material.Material;
+import net.minecraft.entity.EntityType;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class DungeonAir extends Block {
+public class DungeonAir extends BreakableBlock {
 
 	public static final String ID = "dungeon_air";
 	
-	private static DungeonAir instance = null;
-	public static DungeonAir instance() {
-		if (instance == null)
-			instance = new DungeonAir();
-		
-		return instance;
+	public DungeonAir() {
+		super(Block.Properties.create(Material.BARRIER)
+				.hardnessAndResistance(-1.0F, 3600000.8F)
+				.noDrops()
+				);
 	}
 	
-	public DungeonAir() {
-		super(Material.BARRIER, MapColor.AIR);
-		this.setUnlocalizedName(ID);
-		this.setHardness(500.0f);
-		this.setResistance(900.0f);
-		this.setBlockUnbreakable();
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setSoundType(SoundType.STONE);
-		this.setLightOpacity(0);
+	// GetHowMuchLightGoesThrough?? Not sure.
+	@Override
+	@OnlyIn(Dist.CLIENT)
+	public float func_220080_a(BlockState state, IBlockReader worldIn, BlockPos pos) {
+		return 1.0F;
 	}
 	
 	@Override
-	public boolean isOpaqueCube(BlockState state) {
+	public boolean isSolid(BlockState state) {
+		return false;
+	}
+
+	@Override
+	public boolean propagatesSkylightDown(BlockState state, IBlockReader reader, BlockPos pos) {
+		return true;
+	}
+
+	@Override
+	public boolean causesSuffocation(BlockState state, IBlockReader worldIn, BlockPos pos) {
+		return false;
+	}
+
+	@Override
+	public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos) {
+		return false;
+	}
+
+	@Override
+	public boolean canEntitySpawn(BlockState state, IBlockReader worldIn, BlockPos pos, EntityType<?> type) {
 		return false;
 	}
 	
-	@Override
-	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
-		return Block.FULL_BLOCK_AABB;
-	}
-	
-	@Override
-	public AxisAlignedBB getCollisionBoundingBox(BlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-		return NULL_AABB;
-	}
-	
 	@OnlyIn(Dist.CLIENT)
-    public BlockRenderLayer getBlockLayer() {
+    public BlockRenderLayer getRenderLayer() {
         return BlockRenderLayer.TRANSLUCENT;
     }
 	
-	@Override
-	public boolean isFullCube(BlockState state) {
-		return false;
-	}
-	
-	@Override
-	public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
-		return true;
-	}
-	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public void randomDisplayTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
-		super.randomDisplayTick(stateIn, worldIn, pos, rand);
+	public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+		super.animateTick(stateIn, worldIn, pos, rand);
 		
 		if (rand.nextBoolean() && rand.nextBoolean()
 				&& rand.nextBoolean() && rand.nextBoolean()
@@ -107,99 +90,70 @@ public class DungeonAir extends Block {
 		}
 	}
 	
-	@Override
-	@OnlyIn(Dist.CLIENT)
-	public boolean shouldSideBeRendered(BlockState blockState, IBlockAccess blockAccess, BlockPos pos, Direction side) {
-		BlockState iblockstate = blockAccess.getBlockState(pos.offset(side));
-		Block block = iblockstate.getBlock();
-		
-		return !(block == instance());
-	}
+//	@Override
+//	public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+//		final Item item = stack.getItem();
+//		if (item == fillItem) {
+//			this.spawnDoor(worldIn, pos);
+//		} else {
+//			super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
+//		}
+//	}
+	
+//	private void spawnDoor(World world, BlockPos center) {
+//		// Fill all air blocks around the start up to a maximum. Flood!
+//		Set<BlockPos> visited = new HashSet<>();
+//		List<BlockPos> next = new LinkedList<>();
+//		int blocksLeft = 256;
+//		
+//		// Center already placed so ignore it
+//		next.add(center.up());
+//		next.add(center.down());
+//		next.add(center.north());
+//		next.add(center.south());
+//		next.add(center.east());
+//		next.add(center.west());
+//		
+//		while (!next.isEmpty() && blocksLeft > 0) {
+//			BlockPos cur = next.remove(0);
+//			
+//			if (visited.contains(cur))
+//				continue;
+//			
+//			if (!world.isAirBlock(cur))
+//				continue;
+//			
+//			blocksLeft--;
+//			
+//			visited.add(cur);
+//			world.setBlockState(cur, this.getDefaultState());
+//			
+//			next.add(cur.up());
+//			next.add(cur.down());
+//			next.add(cur.north());
+//			next.add(cur.south());
+//			next.add(cur.east());
+//			next.add(cur.west());
+//		}
+//	}
 	
 	@Override
-	public boolean isReplaceable(IBlockAccess worldIn, BlockPos pos) {
+	public boolean canBeConnectedTo(BlockState state, IBlockReader world, BlockPos pos, Direction facing) {
 		return false;
 	}
 	
-	@Override
-	public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
-		return true;
-	}
-	
-	@Override
-	public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-		if (stack.getMetadata() == 1) {
-			this.spawnDoor(worldIn, pos);
-		} else {
-			super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
-		}
-	}
-	
-	private void spawnDoor(World world, BlockPos center) {
-		// Fill all air blocks around the start up to a maximum. Flood!
-		Set<BlockPos> visited = new HashSet<>();
-		List<BlockPos> next = new LinkedList<>();
-		int blocksLeft = 256;
-		
-		// Center already placed so ignore it
-		next.add(center.up());
-		next.add(center.down());
-		next.add(center.north());
-		next.add(center.south());
-		next.add(center.east());
-		next.add(center.west());
-		
-		while (!next.isEmpty() && blocksLeft > 0) {
-			BlockPos cur = next.remove(0);
-			
-			if (visited.contains(cur))
-				continue;
-			
-			if (!world.isAirBlock(cur))
-				continue;
-			
-			blocksLeft--;
-			
-			visited.add(cur);
-			world.setBlockState(cur, this.getDefaultState());
-			
-			next.add(cur.up());
-			next.add(cur.down());
-			next.add(cur.north());
-			next.add(cur.south());
-			next.add(cur.east());
-			next.add(cur.west());
-		}
-	}
-	
-	@Override
-	public void getSubBlocks(CreativeTabs itemIn, NonNullList<ItemStack> items) {
-		items.add(new ItemStack(this, 1, 0));
-		items.add(new ItemStack(this, 1, 1));
-	}
-	
-	@Override
-	public boolean canBeConnectedTo(IBlockAccess world, BlockPos pos, Direction facing) {
-		return false;
-	}
-	
-	@Override
-	public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, BlockState state, BlockPos pos, Direction face) {
-		return BlockFaceShape.UNDEFINED;
-	}
-	
-	@Override
-	public boolean canCollideCheck(BlockState state, boolean hitIfLiquid) {
-		final PlayerEntity player = NostrumMagica.proxy.getPlayer();
-		if (player == null || player.world == null || !player.isCreative()) {
-			return false;
-		}
-		return true;
-	}
-	
-	@Override
-	public boolean isCollidable()
-    {
-        return false;
-    }
+//	@Override
+//	public boolean canCollideCheck(BlockState state, boolean hitIfLiquid) {
+//		final PlayerEntity player = NostrumMagica.proxy.getPlayer();
+//		if (player == null || player.world == null || !player.isCreative()) {
+//			return false;
+//		}
+//		return true;
+//	}
+//	
+//	@Override
+//	public boolean isCollidable()
+//    {
+//        return false;
+//    }
 }

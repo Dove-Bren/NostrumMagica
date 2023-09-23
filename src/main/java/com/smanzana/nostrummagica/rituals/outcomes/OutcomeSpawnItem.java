@@ -41,7 +41,7 @@ public class OutcomeSpawnItem implements IItemRitualOutcome {
 			ItemEntity entity = new ItemEntity(world,
 					center.getX() + .5, center.getY() + 1, center.getZ() + .5,
 					stack.copy());
-			world.spawnEntity(entity);
+			world.addEntity(entity);
 		} else {
 			AltarTileEntity altar = (AltarTileEntity) world.getTileEntity(center);
 			altar.setItem(stack.copy());
@@ -52,7 +52,7 @@ public class OutcomeSpawnItem implements IItemRitualOutcome {
 			ItemEntity entity = new ItemEntity(world,
 					center.getX() + .5, center.getY() + 1, center.getZ() + .5,
 					leftoverStack.copy());
-			world.spawnEntity(entity);
+			world.addEntity(entity);
 		}
 	}
 

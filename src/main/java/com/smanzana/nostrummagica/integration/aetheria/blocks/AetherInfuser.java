@@ -8,7 +8,7 @@ import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.state.BooleanProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
@@ -26,7 +26,7 @@ public class AetherInfuser extends BlockContainer {
 	
 	public static final String ID = "infuser_multiblk";
 	
-	private static final PropertyBool MASTER = PropertyBool.create("master");
+	private static final BooleanProperty MASTER = BooleanProperty.create("master");
 	
 	private static AetherInfuser instance = null;
 	public static AetherInfuser instance() {
@@ -45,7 +45,7 @@ public class AetherInfuser extends BlockContainer {
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		this.setSoundType(SoundType.STONE);
 		
-		this.setDefaultState(this.blockState.getBaseState().withProperty(MASTER, false));
+		this.setDefaultState(this.stateContainer.getBaseState().with(MASTER, false));
 	}
 	
 	@Override
@@ -54,7 +54,12 @@ public class AetherInfuser extends BlockContainer {
 	}
 	
 	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
+	public boolean hasTileEntity() {
+		return true;
+	}
+	
+	@Override
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		if (meta != 0) {
 			return new AetherInfuserTileEntity();
 		}
@@ -68,7 +73,7 @@ public class AetherInfuser extends BlockContainer {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-    public BlockRenderLayer getBlockLayer() {
+    public BlockRenderLayer getRenderLayer() {
         return BlockRenderLayer.SOLID;
     }
 	
@@ -89,18 +94,18 @@ public class AetherInfuser extends BlockContainer {
 	}
 	
 	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, MASTER);
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(MASTER);
 	}
 	
 	@Override
 	public BlockState getStateFromMeta(int meta) {
-		return getDefaultState().withProperty(MASTER, meta != 0);
+		return getDefaultState().with(MASTER, meta != 0);
 	}
 	
 	@Override
 	public int getMetaFromState(BlockState state) {
-		return state.getValue(MASTER) ? 1 : 0;
+		return state.get(MASTER) ? 1 : 0;
 	}
 	
 	@Override
@@ -109,15 +114,15 @@ public class AetherInfuser extends BlockContainer {
     }
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, BlockState state) {
+	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) { broke();
 		super.breakBlock(world, pos, state);
 	}
 	
 	public static boolean IsMaster(BlockState state) {
-		return state != null && state.getBlock() instanceof AetherInfuser && state.getValue(MASTER);
+		return state != null && state.getBlock() instanceof AetherInfuser && state.get(MASTER);
 	}
 	
 	public static void SetBlock(World world, BlockPos pos, boolean master) {
-		world.setBlockState(pos, instance().getDefaultState().withProperty(MASTER, master));
+		world.setBlockState(pos, instance().getDefaultState().with(MASTER, master));
 	}
 }

@@ -50,7 +50,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		this.ritual = ritual;
 		
 		chalk = ChalkBlock.instance().getDefaultState();
-		candle = Candle.instance().getDefaultState().withProperty(
+		candle = Candle.instance().getDefaultState().with(
 				Candle.LIT, true);
 		altar = AltarBlock.instance().getDefaultState();
 		

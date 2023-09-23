@@ -175,7 +175,7 @@ public class ReagentBagGui {
 								l2 = slot7.getItemStackLimit(itemstack12);
 							}
 
-							slot7.putStack(itemstack12.splitStack(l2));
+							slot7.putStack(itemstack12.split(l2));
 
 							if (itemstack12.isEmpty()) {
 								inventoryplayer.setItemStack(ItemStack.EMPTY);
@@ -208,7 +208,7 @@ public class ReagentBagGui {
 								//	j2 = itemstack12.getMaxStackSize() - itemstack9.getCount();
 								//}
 
-								itemstack12.splitStack(j2);
+								itemstack12.split(j2);
 
 								if (itemstack12.isEmpty()) {
 									inventoryplayer.setItemStack(ItemStack.EMPTY);

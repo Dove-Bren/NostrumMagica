@@ -55,21 +55,21 @@ public abstract class StaticRoom implements IDungeonRoom {
 			}
 			
 			if (block instanceof BlockHorizontal) {
-				Direction cur = state.getValue(BlockHorizontal.FACING);
+				Direction cur = state.get(BlockHorizontal.FACING);
 				cur = rotate(cur, rotation);
-				state = state.withProperty(BlockHorizontal.FACING, cur);
+				state = state.with(BlockHorizontal.FACING, cur);
 			} else if (block instanceof BlockTorch) {
-				Direction cur = state.getValue(BlockTorch.FACING);
+				Direction cur = state.get(BlockTorch.FACING);
 				cur = rotate(cur, rotation);
-				state = state.withProperty(BlockTorch.FACING, cur);
+				state = state.with(BlockTorch.FACING, cur);
 			} else if (block instanceof BlockLadder) {
-				Direction cur = state.getValue(BlockLadder.FACING);
+				Direction cur = state.get(BlockLadder.FACING);
 				cur = rotate(cur, rotation);
-				state = state.withProperty(BlockLadder.FACING, cur);
+				state = state.with(BlockLadder.FACING, cur);
 			} else if (block instanceof BlockStairs) {
-				Direction cur = state.getValue(BlockStairs.FACING);
+				Direction cur = state.get(BlockStairs.FACING);
 				cur = rotate(cur, rotation);
-				state = state.withProperty(BlockStairs.FACING, cur);
+				state = state.with(BlockStairs.FACING, cur);
 			}
 			world.setBlockState(pos, state);
 		}

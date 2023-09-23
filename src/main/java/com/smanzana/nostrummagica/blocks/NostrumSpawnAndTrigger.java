@@ -62,17 +62,22 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 	
 	
 	@Override
-	public void updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) {
+	public void tick(BlockState state, World worldIn, BlockPos pos, Random rand) {
 		;//super.updateTick(worldIn, pos, state, rand);
 	}
 	
 	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
+	public boolean hasTileEntity() {
+		return true;
+	}
+	
+	@Override
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		return new SpawnerTriggerTileEntity();
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		if (worldIn.isRemote) {
 			return true;
 		}
@@ -91,7 +96,7 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 		if (playerIn.isCreative()) {
 			ItemStack heldItem = playerIn.getHeldItem(hand);
 			if (heldItem.isEmpty()) {
-				playerIn.sendMessage(new StringTextComponent("Currently set to " + state.getValue(MOB).getName()));
+				playerIn.sendMessage(new StringTextComponent("Currently set to " + state.get(MOB).getName()));
 			} else if (heldItem.getItem() instanceof EssenceItem) {
 				Type type = null;
 				switch (EssenceItem.findType(heldItem)) {
@@ -118,10 +123,10 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 					break;
 				}
 				
-				worldIn.setBlockState(pos, state.withProperty(MOB, type));
+				worldIn.setBlockState(pos, state.with(MOB, type));
 			} else if (heldItem.getItem() instanceof NostrumSkillItem) {
 				if (NostrumSkillItem.getTypeFromMeta(heldItem.getMetadata()) == SkillItemType.WING) {
-					worldIn.setBlockState(pos, state.withProperty(MOB, Type.DRAGON_RED));
+					worldIn.setBlockState(pos, state.with(MOB, Type.DRAGON_RED));
 				}
 			} if (heldItem.getItem() instanceof PositionCrystal) {
 				BlockPos heldPos = PositionCrystal.getBlockPosition(heldItem);

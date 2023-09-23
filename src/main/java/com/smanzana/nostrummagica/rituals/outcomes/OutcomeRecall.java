@@ -80,7 +80,7 @@ public class OutcomeRecall implements IRitualOutcome {
 //					double dz = Math.sin(dirD) * dist;
 //					ItemEntity drop = new ItemEntity(world, pos.getX() + .5 + dx, pos.getY() + 2, pos.getZ() + .5 + dz,
 //							NostrumResourceItem.getItem(ResourceType.ENDER_BRISTLE, 1));
-//					world.spawnEntity(drop);
+//					world.addEntity(drop);
 //					NostrumMagicaSounds.CAST_FAIL.play(world, pos.getX() + .5, pos.getY() + 2, pos.getZ() + .5);
 //				}
 			}

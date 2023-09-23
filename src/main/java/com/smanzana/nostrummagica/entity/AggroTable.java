@@ -47,7 +47,7 @@ public class AggroTable<T extends LivingEntity> {
 					return arg0 == arg1 ? 0 : -1;
 				}
 				
-				return (int) ((arg1.getValue() * 100.0f) - (arg0.getValue() * 100.0f)); 
+				return (int) ((arg1.get() * 100.0f) - (arg0.get() * 100.0f)); 
 			}
 		});
 		
@@ -81,9 +81,9 @@ public class AggroTable<T extends LivingEntity> {
 			T ent = row.getKey();
 			if (!this.filter.test(ent)) {
 				// Reduce contribution
-				float amt = Math.max(.25f, row.getValue() / (20 * 10f)); // 10 seconds of not seeing you
-				row.setValue(row.getValue() - amt);
-				if (row.getValue() <= 0) {
+				float amt = Math.max(.25f, row.get() / (20 * 10f)); // 10 seconds of not seeing you
+				row.setValue(row.get() - amt);
+				if (row.get() <= 0) {
 					removeList.add(ent);
 				}
 			}

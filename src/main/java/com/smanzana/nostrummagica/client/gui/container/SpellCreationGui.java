@@ -261,7 +261,7 @@ public class SpellCreationGui {
 								reagentSlot.putStack(cur.copy());
 								cur.setCount(0);
 							} else {
-								reagentSlot.putStack(cur.splitStack(maxsize));
+								reagentSlot.putStack(cur.split(maxsize));
 							}
 							
 							if (cur.isEmpty())
@@ -271,7 +271,7 @@ public class SpellCreationGui {
 						ItemStack existing = inventory.getStackInSlot(inventory.getScrollSlotIndex());
 						if (existing.isEmpty()) {
 							inventory.setInventorySlotContents(inventory.getScrollSlotIndex(),
-									cur.splitStack(1));
+									cur.split(1));
 							this.validate();
 						}
 					} else if (cur.getItem() instanceof SpellRune) {

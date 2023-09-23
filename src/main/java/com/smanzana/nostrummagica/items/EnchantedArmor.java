@@ -1594,7 +1594,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 				
 				if (!setMapInst.isEmpty()) {
 					for (Entry<IAttribute, Double> entry : setMapInst.entrySet()) {
-						Double val = entry.getValue();
+						Double val = entry.get();
 						if (val == null || val == 0) {
 							continue;
 						}

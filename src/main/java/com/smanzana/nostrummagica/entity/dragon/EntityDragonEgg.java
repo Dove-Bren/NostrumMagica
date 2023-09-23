@@ -225,7 +225,7 @@ public class EntityDragonEgg extends MobEntity implements ILoreTagged {
 	private void hatch() {
 		
 		if (this.spawnData != null) {
-			this.world.spawnEntity((LivingEntity) this.spawnData.spawnDragon(world, posX, posY, posZ));
+			this.world.addEntity((LivingEntity) this.spawnData.spawnDragon(world, posX, posY, posZ));
 			
 			PlayerEntity player = this.getPlayer();
 			if (player != null) {

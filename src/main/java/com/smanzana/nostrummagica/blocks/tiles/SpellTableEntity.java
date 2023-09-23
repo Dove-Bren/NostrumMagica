@@ -93,7 +93,7 @@ public class SpellTableEntity extends TileEntity implements IInventory {
 		if (index < 0 || index >= getSizeInventory() || slots[index].isEmpty())
 			return ItemStack.EMPTY;
 		
-		ItemStack stack = slots[index].splitStack(count);
+		ItemStack stack = slots[index].split(count);
 		this.markDirty();
 		
 		return stack;

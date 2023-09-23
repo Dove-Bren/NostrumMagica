@@ -211,11 +211,11 @@ public class WispBlockGui {
 					// Trying to add an item
 					if (!scrollSlot.getHasStack()
 							&& scrollSlot.isItemValid(cur)) {
-						ItemStack stack = cur.splitStack(1);
+						ItemStack stack = cur.split(1);
 						scrollSlot.putStack(stack);
 					} else if (!reagentSlot.getHasStack()
 							&& reagentSlot.isItemValid(cur)) {
-						ItemStack stack = cur.splitStack(cur.getMaxStackSize());
+						ItemStack stack = cur.split(cur.getMaxStackSize());
 						reagentSlot.putStack(stack);
 					} else {
 						prev = ItemStack.EMPTY;

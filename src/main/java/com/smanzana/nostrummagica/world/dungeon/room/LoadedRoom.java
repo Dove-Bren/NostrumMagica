@@ -39,7 +39,7 @@ public class LoadedRoom implements IDungeonRoom {
 		blueprint.scanBlocks((offset, block) -> {
 			BlockState state = block.getSpawnState(Direction.NORTH); 
 			if (state != null && state.getBlock() == Blocks.CHEST) {
-				chestsRelative.add(new DungeonExitPoint(offset, state.getValue(BlockChest.FACING)));
+				chestsRelative.add(new DungeonExitPoint(offset, state.get(BlockChest.FACING)));
 			}
 		});
 	}

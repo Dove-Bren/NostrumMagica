@@ -12,7 +12,7 @@ import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.state.BooleanProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.item.ItemEntity;
@@ -32,7 +32,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 	
-	private static final PropertyBool MASTER = PropertyBool.create("master");
+	private static final BooleanProperty MASTER = BooleanProperty.create("master");
 	
 	public static final String ID = "spell_table";
 	
@@ -53,8 +53,8 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 		this.setSoundType(SoundType.WOOD);
 		this.setHarvestLevel("axe", 1);
 		
-		this.setDefaultState(this.blockState.getBaseState().withProperty(MASTER, true)
-				.withProperty(FACING, Direction.NORTH));
+		this.setDefaultState(this.stateContainer.getBaseState().with(MASTER, true)
+				.with(FACING, Direction.NORTH));
 	}
 	
 	@Override
@@ -78,20 +78,20 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
     }
 	
 	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, MASTER, FACING);
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(MASTER, FACING);
 	}
 	
 	@Override
 	public BlockState getStateFromMeta(int meta) {
 		Direction enumfacing = Direction.getHorizontal(meta);
-		return getDefaultState().withProperty(FACING, enumfacing)
-				.withProperty(MASTER, ((meta >> 2) & 1) == 1);
+		return getDefaultState().with(FACING, enumfacing)
+				.with(MASTER, ((meta >> 2) & 1) == 1);
 	}
 	
 	@Override
 	public int getMetaFromState(BlockState state) {
-		return ((state.getValue(MASTER) ? 1 : 0) << 2) | (state.getValue(FACING).getHorizontalIndex());
+		return ((state.get(MASTER) ? 1 : 0) << 2) | (state.get(FACING).getHorizontalIndex());
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {
@@ -101,7 +101,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 		if (state == null)
 			return;
 		
-		if (state.getValue(MASTER)) {
+		if (state.get(MASTER)) {
 			TileEntity ent = world.getTileEntity(pos);
 			if (!world.isRemote && ent != null) {
 				SpellTableEntity table = (SpellTableEntity) ent;
@@ -110,7 +110,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 						ItemEntity item = new ItemEntity(
 								world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
 								table.removeStackFromSlot(i));
-						world.spawnEntity(item);
+						world.addEntity(item);
 					}
 				}
 			}
@@ -120,35 +120,35 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 	}
 	
 	private BlockPos getPaired(BlockState state, BlockPos pos) {
-		return pos.offset(state.getValue(FACING));
+		return pos.offset(state.get(FACING));
 	}
 	
 //	private BlockPos getMaster(BlockState state, BlockPos pos) {
-//		if (state.getValue(MASTER))
+//		if (state.get(MASTER))
 //			return pos;
 //		
-//		return pos.offset(state.getValue(FACING));
+//		return pos.offset(state.get(FACING));
 //	}
 	
 	@OnlyIn(Dist.CLIENT)
-    public BlockRenderLayer getBlockLayer() {
+    public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.CUTOUT;
 	}
 	
 	public BlockState getSlaveState(Direction direction) {
-		return this.getDefaultState().withProperty(MASTER, false)
-				.withProperty(FACING, direction);
+		return this.getDefaultState().with(MASTER, false)
+				.with(FACING, direction);
 	}
 
 
 	public BlockState getMaster(Direction enumfacing) {
-		return this.getDefaultState().withProperty(MASTER, true)
-				.withProperty(FACING, enumfacing);
+		return this.getDefaultState().with(MASTER, true)
+				.with(FACING, enumfacing);
 	}
 	
 	@Override
 	public Item getItemDropped(BlockState state, Random rand, int fortune) {
-		return SpellTableItem.instance();//state.getValue(MASTER) ? SpellTableItem.instance() : null;
+		return SpellTableItem.instance();//state.get(MASTER) ? SpellTableItem.instance() : null;
 	}
 	
 	@Override
@@ -158,16 +158,21 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 
 
 	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
+	public boolean hasTileEntity() {
+		return true;
+	}
+	
+	@Override
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		BlockState state = this.getStateFromMeta(meta);
-		if (state.getValue(MASTER))
+		if (state.get(MASTER))
 			return new SpellTableEntity();
 		
 		return null;
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, BlockState state) {
+	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) { broke();
 		this.destroy(world, pos, state);
 		
 		world.removeTileEntity(pos);
@@ -183,10 +188,10 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		
-		if (state.getValue(MASTER) == false) {
-			pos = pos.offset(state.getValue(FACING));
+		if (state.get(MASTER) == false) {
+			pos = pos.offset(state.get(FACING));
 		}
 		
 		playerIn.openGui(NostrumMagica.instance,

@@ -265,15 +265,15 @@ public class RoomChallenge2 extends StaticRoom {
 				"XXXXXXXXXXXXXXXXXXXXX",
 				'X', DungeonBlock.instance(),
 				' ', null,
-				'(', new BlockState(Blocks.LADDER, Blocks.LADDER.getDefaultState().withProperty(BlockLadder.FACING, Direction.EAST)), // EAST
-				')', new BlockState(Blocks.LADDER, Blocks.LADDER.getDefaultState().withProperty(BlockLadder.FACING, Direction.WEST)), // NORTH 
+				'(', new BlockState(Blocks.LADDER, Blocks.LADDER.getDefaultState().with(BlockLadder.FACING, Direction.EAST)), // EAST
+				')', new BlockState(Blocks.LADDER, Blocks.LADDER.getDefaultState().with(BlockLadder.FACING, Direction.WEST)), // NORTH 
 				'B', Blocks.IRON_BARS,
-				'V', new BlockState(Blocks.VINE, Blocks.VINE.getDefaultState().withProperty(BlockVine.NORTH, true)),
+				'V', new BlockState(Blocks.VINE, Blocks.VINE.getDefaultState().with(BlockVine.NORTH, true)),
 				'C', new BlockState(Blocks.CARPET, 14),
-				'U', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.NORTH)),
-				'R', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.EAST)),
-				'D', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.SOUTH)),
-				'L', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().withProperty(BlockTorch.FACING, Direction.WEST)),
+				'U', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().with(BlockTorch.FACING, Direction.NORTH)),
+				'R', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().with(BlockTorch.FACING, Direction.EAST)),
+				'D', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().with(BlockTorch.FACING, Direction.SOUTH)),
+				'L', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().with(BlockTorch.FACING, Direction.WEST)),
 				'1', new BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.GOLEM_WIND.ordinal()),
 				'2', new BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.GOLEM_ENDER.ordinal()),
 				'3', new BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.GOLEM_EARTH.ordinal()),

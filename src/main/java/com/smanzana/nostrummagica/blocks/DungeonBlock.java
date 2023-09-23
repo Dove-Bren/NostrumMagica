@@ -1,31 +1,15 @@
 package com.smanzana.nostrummagica.blocks;
 
-import java.util.Random;
-
-import com.smanzana.nostrummagica.NostrumMagica;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.BlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.NonNullList;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class DungeonBlock extends Block {
 	
-	public static enum Type implements IStringSerializable {
+	public static enum Type {
 		LIGHT,
 		DARK;
 
-		@Override
 		public String getName() {
 			return name().toLowerCase();
 		}
@@ -36,64 +20,18 @@ public class DungeonBlock extends Block {
 		}
 	}
 	
-	public static PropertyEnum<Type> TYPE = PropertyEnum.create("type", Type.class);
-
-	public static final String ID = "dungeon_block";
+	private static final String ID_PREFIX = "dungeon_block_";
+	public static final String ID_LIGHT = ID_PREFIX + "light";
+	public static final String ID_DARK = ID_PREFIX + "dark";
 	
-	private static DungeonBlock instance = null;
-	public static DungeonBlock instance() {
-		if (instance == null)
-			instance = new DungeonBlock();
-		
-		return instance;
-	}
+	public final Type type;
 	
-	public DungeonBlock() {
-		super(Material.ROCK, MapColor.DIAMOND);
-		this.setUnlocalizedName(ID);
-		this.setHardness(500.0f);
-		this.setResistance(900.0f);
-		this.setBlockUnbreakable();
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setSoundType(SoundType.STONE);
-		
-		this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE,Type.LIGHT));
-	}
-	
-	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, TYPE);
-	}
-	
-	public BlockState getState(Type type) {
-		return getDefaultState().withProperty(TYPE, type);
-	}
-	
-	@Override
-	public BlockState getStateFromMeta(int meta) {
-		if (meta < 0)
-			meta = 0;
-		else if (meta > Type.values().length)
-			meta = Type.values().length - 1;
-		
-		return getDefaultState().withProperty(TYPE, Type.values()[meta]);
-	}
-	
-	@Override
-	public Item getItemDropped(BlockState state, Random rand, int fortune) {
-        return null;
-    }
-	
-	@Override
-	public int getMetaFromState(BlockState state) {
-		return state.getValue(TYPE).ordinal();
-	}
-	
-	@Override
-	@OnlyIn(Dist.CLIENT)
-	public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
-		for (Type type : Type.values()) {
-			list.add(new ItemStack(this, 1, type.ordinal()));
-		}
+	public DungeonBlock(Type type) {
+		super(Block.Properties.create(Material.ROCK)
+				.hardnessAndResistance(-1.0F, 3600000.8F)
+				.noDrops()
+				.sound(SoundType.STONE)
+				);
+		this.type = type;
 	}
 }

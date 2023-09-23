@@ -18,7 +18,7 @@ import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.trials.ShrineTrial;
 
-import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.state.BooleanProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
@@ -39,7 +39,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class ShrineBlock extends SymbolBlock {
 	
 	public static final String ID = "shrine_block";
-	private static final PropertyBool EXHAUSTED = PropertyBool.create("exhausted");
+	private static final BooleanProperty EXHAUSTED = BooleanProperty.create("exhausted");
 	
 	private static ShrineBlock instance = null;
 	public static ShrineBlock instance() {
@@ -51,31 +51,31 @@ public class ShrineBlock extends SymbolBlock {
 	
 	public ShrineBlock() {
 		super();
-		this.setDefaultState(this.blockState.getBaseState().withProperty(EXHAUSTED, false));
+		this.setDefaultState(this.stateContainer.getBaseState().with(EXHAUSTED, false));
 	}
 	
 	public boolean isExhausted(BlockState state) {
-		return state.getValue(EXHAUSTED);
+		return state.get(EXHAUSTED);
 	}
 	
 	public BlockState getExhaustedState(boolean exhausted) {
-		return this.getDefaultState().withProperty(EXHAUSTED, true);
+		return this.getDefaultState().with(EXHAUSTED, true);
 	}
 	
 	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, EXHAUSTED);
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(EXHAUSTED);
 	}
 	
 	@Override
 	public BlockState getStateFromMeta(int meta) {
 		boolean bool = ((meta & 0x1) == 1);
-		return getDefaultState().withProperty(EXHAUSTED, bool);
+		return getDefaultState().with(EXHAUSTED, bool);
 	}
 	
 	@Override
 	public int getMetaFromState(BlockState state) {
-		return (state.getValue(EXHAUSTED) ? 1 : 0);
+		return (state.get(EXHAUSTED) ? 1 : 0);
 	}
 	
 	@Override
@@ -89,7 +89,12 @@ public class ShrineBlock extends SymbolBlock {
 	}
 	
 	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
+	public boolean hasTileEntity() {
+		return true;
+	}
+	
+	@Override
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		SymbolTileEntity ent = new SymbolTileEntity(1.0f);
 		
 		return ent;
@@ -102,7 +107,7 @@ public class ShrineBlock extends SymbolBlock {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		
 		if (hand != Hand.MAIN_HAND) {
 			return true;
@@ -165,7 +170,7 @@ public class ShrineBlock extends SymbolBlock {
 			} else {
 				if (trial.canTake(playerIn, attr)) {
 					trial.start(playerIn, attr);
-					heldItem.splitStack(1);
+					heldItem.split(1);
 				}
 				
 				return true;

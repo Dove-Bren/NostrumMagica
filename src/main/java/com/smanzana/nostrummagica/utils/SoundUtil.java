@@ -21,7 +21,7 @@ public class SoundUtil {
 //			Iterator<Entry<String, ISound>> it = manager_playingSounds.entrySet().iterator();
 //			while (it.hasNext()) {
 //				Entry<String, ISound> entry = it.next();
-//				if (entry.getValue().equals(sound)) {
+//				if (entry.get().equals(sound)) {
 //					it.remove();
 //				}
 //			}

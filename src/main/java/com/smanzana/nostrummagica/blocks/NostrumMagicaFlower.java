@@ -91,7 +91,7 @@ public class NostrumMagicaFlower extends BlockBush {
 		this.setUnlocalizedName(ID);
 		this.setCreativeTab(NostrumMagica.creativeTab);
 		
-		this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, Type.MIDNIGHT_IRIS));
+		this.setDefaultState(this.stateContainer.getBaseState().with(TYPE, Type.MIDNIGHT_IRIS));
 	}
 	
 	@Override
@@ -110,32 +110,32 @@ public class NostrumMagicaFlower extends BlockBush {
     }
 	
 	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, TYPE);
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(TYPE);
 	}
 	
 	public BlockState getState(Type type) {
-		return getDefaultState().withProperty(TYPE, type);
+		return getDefaultState().with(TYPE, type);
 	}
 	
 	public Type getType(BlockState state) {
-		return state.getValue(TYPE);
+		return state.get(TYPE);
 	}
 	
 	@Override
 	public BlockState getStateFromMeta(int meta) {
 		
 		if (meta == 0)
-			return getDefaultState().withProperty(TYPE, Type.MIDNIGHT_IRIS);
+			return getDefaultState().with(TYPE, Type.MIDNIGHT_IRIS);
 		if (meta == 1)
-			return getDefaultState().withProperty(TYPE, Type.CRYSTABLOOM);
+			return getDefaultState().with(TYPE, Type.CRYSTABLOOM);
 		
 		return getDefaultState();
 	}
 	
 	@Override
 	public Item getItemDropped(BlockState state, Random rand, int fortune) {
-//        switch (state.getValue(TYPE)) {
+//        switch (state.get(TYPE)) {
 //		case CRYSTABLOOM:
 //		case MIDNIGHT_IRIS:
 //			return ReagentItem.instance();
@@ -151,7 +151,7 @@ public class NostrumMagicaFlower extends BlockBush {
 	public int quantityDropped(BlockState state, int fortune, Random random) {
 		int count = 1;
 		
-		if (state.getValue(TYPE) == Type.MIDNIGHT_IRIS) {
+		if (state.get(TYPE) == Type.MIDNIGHT_IRIS) {
 			count = 1 + fortune + random.nextInt(2);
 		}
         
@@ -167,7 +167,7 @@ public class NostrumMagicaFlower extends BlockBush {
 	
 	@Override
 	public int damageDropped(BlockState state) {
-		return getReagentMetaFromType(state.getValue(TYPE));
+		return getReagentMetaFromType(state.get(TYPE));
 	}
 	
 	public int getReagentMetaFromType(Type type) {
@@ -176,7 +176,7 @@ public class NostrumMagicaFlower extends BlockBush {
 	
 	@Override
 	public int getMetaFromState(BlockState state) {
-		return state.getValue(TYPE).getMeta();
+		return state.get(TYPE).getMeta();
 	}
 	
 	@Override
@@ -270,12 +270,12 @@ public class NostrumMagicaFlower extends BlockBush {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public void randomDisplayTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+	public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
 		super.randomDisplayTick(stateIn, worldIn, pos, rand);
 		
 		if (rand.nextBoolean()) {
 			final int color;
-			if (stateIn.getValue(TYPE) == Type.MIDNIGHT_IRIS) {
+			if (stateIn.get(TYPE) == Type.MIDNIGHT_IRIS) {
 				color = 0x4D601099;
 			} else {
 				//color = 0xFFF5FF3D;

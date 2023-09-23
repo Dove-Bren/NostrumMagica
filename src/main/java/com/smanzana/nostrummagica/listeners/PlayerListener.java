@@ -65,7 +65,7 @@ import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemBlock;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
@@ -404,14 +404,14 @@ public class PlayerListener {
 			Iterator<Entry<IGenericListener, ProximityInfo>> it = proximityInfos.entrySet().iterator();
 			while (it.hasNext()) {
 				Entry<IGenericListener, ProximityInfo> entry = it.next();
-				if (entry.getValue() == null)
+				if (entry.get() == null)
 					continue;
 				
-				if (entry.getValue().world != ent.world)
+				if (entry.get().world != ent.world)
 					continue;
 				
-				double dist = Math.abs(ent.getPositionVector().subtract(entry.getValue().position).lengthVector());
-				if (dist <= entry.getValue().proximity) {
+				double dist = Math.abs(ent.getPositionVector().subtract(entry.get().position).lengthVector());
+				if (dist <= entry.get().proximity) {
 					if (entry.getKey().onEvent(Event.PROXIMITY, ent, null))
 						it.remove();
 				}
@@ -421,15 +421,15 @@ public class PlayerListener {
 			Iterator<Entry<IGenericListener, PositionInfo>> it2 = positionInfos.entrySet().iterator();
 			while (it2.hasNext()) {
 				Entry<IGenericListener, PositionInfo> entry = it2.next();
-				if (entry.getValue() == null)
+				if (entry.get() == null)
 					continue;
 				
-				if (entry.getValue().world != ent.world)
+				if (entry.get().world != ent.world)
 					continue;
 				
 				BlockPos entpos = ent.getPosition();
 				// entry can be removed but block set cannot
-				List<BlockPos> blockListCopy = Lists.newArrayList(entry.getValue().blocks);
+				List<BlockPos> blockListCopy = Lists.newArrayList(entry.get().blocks);
 				for (BlockPos p : blockListCopy) {
 					if (p.equals(entpos))
 						if (entry.getKey().onEvent(Event.POSITION, ent, null)) {
@@ -444,16 +444,16 @@ public class PlayerListener {
 			Iterator<Entry<IGenericListener, FoodInfo>> it = foodInfos.entrySet().iterator();
 			while (it.hasNext()) {
 				Entry<IGenericListener, FoodInfo> entry = it.next();
-				if (entry.getValue() == null)
+				if (entry.get() == null)
 					continue;
 				
-				if (entry.getValue().entity.getPersistentID() != ent.getPersistentID())
+				if (entry.get().entity.getPersistentID() != ent.getPersistentID())
 					continue;
 				
 				int level = ((PlayerEntity) ent).getFoodStats().getFoodLevel();
-				int thresh = entry.getValue().threshold;
+				int thresh = entry.get().threshold;
 				
-				if (entry.getValue().higher) {
+				if (entry.get().higher) {
 					if (level >= thresh)
 						if (entry.getKey().onEvent(Event.FOOD, ent, null))
 							it.remove();
@@ -470,19 +470,19 @@ public class PlayerListener {
 			Iterator<Entry<IGenericListener, ManaInfo>> it = manaInfos.entrySet().iterator();
 			while (it.hasNext()) {
 				Entry<IGenericListener, ManaInfo> entry = it.next();
-				if (entry.getValue() == null)
+				if (entry.get() == null)
 					continue;
 				
 				if (attr.getMaxMana() == 0)
 					continue;
 
-				if (entry.getValue().entity.getPersistentID() != ent.getPersistentID())
+				if (entry.get().entity.getPersistentID() != ent.getPersistentID())
 					continue;
 				
 				float level = (float) attr.getMana() / (float) attr.getMaxMana();
-				float thresh = entry.getValue().threshold;
+				float thresh = entry.get().threshold;
 				
-				if (entry.getValue().higher) {
+				if (entry.get().higher) {
 					if (level >= thresh)
 						if (entry.getKey().onEvent(Event.MANA, ent, null))
 							it.remove();
@@ -508,16 +508,16 @@ public class PlayerListener {
 		Iterator<Entry<IGenericListener, HealthInfo>> it = healthInfos.entrySet().iterator();
 		while (it.hasNext()) {
 			Entry<IGenericListener, HealthInfo> entry = it.next();
-			if (entry.getValue() == null)
+			if (entry.get() == null)
 				continue;
 
-			if (entry.getValue().entity.getPersistentID() != ent.getPersistentID())
+			if (entry.get().entity.getPersistentID() != ent.getPersistentID())
 				continue;
 			
 			float level = ent.getHealth() / ent.getMaxHealth();
-			float thresh = entry.getValue().threshold;
+			float thresh = entry.get().threshold;
 			
-			if (entry.getValue().higher) {
+			if (entry.get().higher) {
 				if (level >= thresh)
 					if (entry.getKey().onEvent(Event.HEALTH, ent, null))
 						it.remove();
@@ -705,10 +705,10 @@ public class PlayerListener {
 				Iterator<Entry<IGenericListener, DamagedInfo>> it = damagedInfos.entrySet().iterator();
 				while (it.hasNext()) {
 					Entry<IGenericListener, DamagedInfo> entry = it.next();
-					if (entry.getValue() == null)
+					if (entry.get() == null)
 						continue;
 					
-					if (entry.getValue().entity.getPersistentID() != event.getEntityLiving().getPersistentID()) {
+					if (entry.get().entity.getPersistentID() != event.getEntityLiving().getPersistentID()) {
 						continue;
 					}
 					
@@ -845,9 +845,9 @@ public class PlayerListener {
 		if (attr != null && attr.isUnlocked()) {
 			if (e.crafting.getItem() instanceof ILoreTagged) {
 				attr.giveBasicLore((ILoreTagged) e.crafting.getItem());
-			} else if (e.crafting.getItem() instanceof ItemBlock &&
-					((ItemBlock)e.crafting.getItem()).getBlock() instanceof ILoreTagged) {
-				attr.giveBasicLore((ILoreTagged) ((ItemBlock) e.crafting.getItem()).getBlock());
+			} else if (e.crafting.getItem() instanceof BlockItem &&
+					((BlockItem)e.crafting.getItem()).getBlock() instanceof ILoreTagged) {
+				attr.giveBasicLore((ILoreTagged) ((BlockItem) e.crafting.getItem()).getBlock());
 			}
 		}
 	}
@@ -884,9 +884,9 @@ public class PlayerListener {
 		if (attr != null && attr.isUnlocked()) {
 			if (addedItem.getItem() instanceof ILoreTagged) {
 				attr.giveBasicLore((ILoreTagged) addedItem.getItem());
-			} else if (addedItem.getItem() instanceof ItemBlock &&
-					((ItemBlock)addedItem.getItem()).getBlock() instanceof ILoreTagged) {
-				attr.giveBasicLore((ILoreTagged) ((ItemBlock) addedItem.getItem()).getBlock());
+			} else if (addedItem.getItem() instanceof BlockItem &&
+					((BlockItem)addedItem.getItem()).getBlock() instanceof ILoreTagged) {
+				attr.giveBasicLore((ILoreTagged) ((BlockItem) addedItem.getItem()).getBlock());
 			}
 		}
 		
@@ -1006,7 +1006,7 @@ public class PlayerListener {
 			Iterator<Entry<IGenericListener, TimeInfo>> it = timeInfos.entrySet().iterator();
 			while (it.hasNext()) {
 				Entry<IGenericListener, TimeInfo> entry = it.next();
-				TimeInfo info = entry.getValue();
+				TimeInfo info = entry.get();
 				if (info.delay > 0) {
 					info.delay--;
 					if (info.delay == 0) {
@@ -1212,7 +1212,7 @@ public class PlayerListener {
 		Iterator<Entry<ISpellActionListener, MagicEffectInfo>> it = magicEffectInfos.entrySet().iterator();
 		while (it.hasNext()) {
 			Entry<ISpellActionListener, MagicEffectInfo> entry = it.next();
-			MagicEffectInfo info = entry.getValue();
+			MagicEffectInfo info = entry.get();
 			
 			if (info.entity == null || info.entity.equals(entity)) {
 				if (entry.getKey().onEvent(Event.MAGIC_EFFECT, entity, new SpellActionListenerData(entity, caster, summary)))
@@ -1256,7 +1256,7 @@ public class PlayerListener {
 			if (entry.getKey() == null || entry.getKey().isDead) {
 				it.remove();
 			} else {
-				Vec3d last = entry.getValue();
+				Vec3d last = entry.get();
 				Vec3d cur = entry.getKey().getPositionVector();
 				entry.setValue(cur);
 				if (last.squareDistanceTo(cur) > .025) {

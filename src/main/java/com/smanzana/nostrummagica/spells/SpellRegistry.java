@@ -178,8 +178,8 @@ public class SpellRegistry extends WorldSavedData {
 		synchronized(this) {
 			for (Entry<Integer, Spell> entry : registry.entrySet()) {
 				if (transients.isEmpty() || !transients.contains(entry.getKey()))
-					if (!entry.getValue().isEmpty())
-						nbt.put(entry.getKey() + "", entry.getValue().toNBT());
+					if (!entry.get().isEmpty())
+						nbt.put(entry.getKey() + "", entry.get().toNBT());
 			}
 		}
 		

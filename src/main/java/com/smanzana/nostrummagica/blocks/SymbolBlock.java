@@ -80,14 +80,19 @@ public class SymbolBlock extends Block implements ITileEntityProvider {
     }
 
 	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
+	public boolean hasTileEntity() {
+		return true;
+	}
+	
+	@Override
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		SymbolTileEntity ent = new SymbolTileEntity(5.0f);
 		
 		return ent;
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, BlockState state) {
+	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) { broke();
 		super.breakBlock(world, pos, state);
         world.removeTileEntity(pos);
 	}

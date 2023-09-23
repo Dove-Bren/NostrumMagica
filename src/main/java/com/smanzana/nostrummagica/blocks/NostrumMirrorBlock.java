@@ -95,23 +95,23 @@ public class NostrumMirrorBlock extends HorizontalBlock {
     }
 	
 	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, FACING);
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(FACING);
 	}
 	
 	@Override
 	public BlockState getStateFromMeta(int meta) {
 		Direction enumfacing = Direction.getHorizontal(meta);
-		return getDefaultState().withProperty(FACING, enumfacing);
+		return getDefaultState().with(FACING, enumfacing);
 	}
 	
 	@Override
 	public int getMetaFromState(BlockState state) {
-		return state.getValue(FACING).getHorizontalIndex();
+		return state.get(FACING).getHorizontalIndex();
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		
 		playerIn.openGui(NostrumMagica.instance,
 				NostrumGui.mirrorID, worldIn,
@@ -123,7 +123,7 @@ public class NostrumMirrorBlock extends HorizontalBlock {
 	
 	@Override
 	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
-		if (state.getValue(FACING).getHorizontalIndex() % 2 != 0)
+		if (state.get(FACING).getHorizontalIndex() % 2 != 0)
 			return MIRROR_AABB_EW;
 		return MIRROR_AABB_NS;
 	}

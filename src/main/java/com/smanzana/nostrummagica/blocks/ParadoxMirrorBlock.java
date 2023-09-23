@@ -19,7 +19,7 @@ import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.state.DirectionProperty;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -48,7 +48,7 @@ import net.minecraftforge.common.util.Constants.NBT;
  */
 public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 	
-	public static final PropertyDirection FACING = BlockHorizontal.FACING;
+	public static final DirectionProperty FACING = BlockHorizontal.FACING;
 	private static final double BB_DEPTH = 2.0 / 16.0;
 	private static final double BB_MARGIN = 1.0 / 16.0;
 	private static final AxisAlignedBB AABB_N = new AxisAlignedBB(BB_MARGIN, 0, 1 - BB_DEPTH, 1 - BB_MARGIN, 1, 1); // TODO final
@@ -80,7 +80,7 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 	
 	@Override
 	public BlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer) {
-		//return this.getDefaultState().withProperty(FACING, placer.getHorizontalFacing().getOpposite());
+		//return this.getDefaultState().with(FACING, placer.getHorizontalFacing().getOpposite());
 		Direction side = placer.getHorizontalFacing().getOpposite();
 		if (!this.canPlaceAt(world, pos, side)) {
 			// Rotate and find it
@@ -93,7 +93,7 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 		}
 		
 		return this.getDefaultState()
-				.withProperty(FACING, side);
+				.with(FACING, side);
 	}
 	
 	protected boolean canPlaceAt(World worldIn, BlockPos pos, Direction side) {
@@ -119,7 +119,7 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos posFrom) {
-		Direction face = state.getValue(FACING);
+		Direction face = state.get(FACING);
 		if (!canPlaceAt(worldIn, pos, face)) {
 			this.dropBlockAsItem(worldIn, pos, state, 0);
 			worldIn.setBlockToAir(pos);
@@ -129,18 +129,18 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 	}
 	
 	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, FACING);
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(FACING);
 	}
 	
 	@Override
 	public BlockState getStateFromMeta(int meta) {
-		return getDefaultState().withProperty(FACING, Direction.getHorizontal(meta));
+		return getDefaultState().with(FACING, Direction.getHorizontal(meta));
 	}
 	
 	@Override
 	public int getMetaFromState(BlockState state) {
-		return state.getValue(FACING).getHorizontalIndex();
+		return state.get(FACING).getHorizontalIndex();
 	}
 	
 	@Override
@@ -150,7 +150,7 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 	
 	@Override
 	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
-		switch (state.getValue(FACING)) {
+		switch (state.get(FACING)) {
 		case NORTH:
 		case UP:
 		case DOWN:
@@ -168,7 +168,7 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 	
 	@Override
 	public AxisAlignedBB getCollisionBoundingBox(BlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-		switch (blockState.getValue(FACING)) {
+		switch (blockState.get(FACING)) {
 		case NORTH:
 		case UP:
 		case DOWN:
@@ -190,7 +190,7 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
     }
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		
 		if (worldIn.isRemote) {
 			return true;
@@ -236,7 +236,12 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 	}
 	
 	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
+	public boolean hasTileEntity() {
+		return true;
+	}
+	
+	@Override
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		return new ParadoxMirrorTileEntity();
 	}
 	
@@ -246,7 +251,7 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 	}
 	
 	@Override
-	public BlockRenderLayer getBlockLayer() {
+	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.CUTOUT;
 	}
 
@@ -266,7 +271,7 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, BlockState state) {
+	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) { broke();
 		destroy(world, pos, state);
 		super.breakBlock(world, pos, state);
 	}
@@ -286,7 +291,7 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 //				x = pos.getX() + .5;
 //				y = pos.getY() + .5;
 //				z = pos.getZ() + .5;
-//				world.spawnEntity(new ItemEntity(world, x, y, z, item.copy()));
+//				world.addEntity(new ItemEntity(world, x, y, z, item.copy()));
 //			}
 //		}
 	}

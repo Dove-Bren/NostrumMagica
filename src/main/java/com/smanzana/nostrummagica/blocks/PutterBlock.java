@@ -22,7 +22,7 @@ import net.minecraft.world.chunk.BlockStateContainer;
 
 public class PutterBlock extends ContainerBlock {
 	
-	public static final PropertyDirection FACING = PropertyDirection.create("facing");
+	public static final DirectionProperty FACING = DirectionProperty.create("facing");
 	
 	public static final String ID = "putter";
 	
@@ -46,23 +46,23 @@ public class PutterBlock extends ContainerBlock {
 	
 	@Override
 	public BlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer) {
-		return this.getDefaultState().withProperty(FACING, Direction.getDirectionFromEntityLiving(pos, placer));
+		return this.getDefaultState().with(FACING, Direction.getDirectionFromEntityLiving(pos, placer));
 	}
 	
 	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, FACING);
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(FACING);
 	}
 	
 	@Override
 	public BlockState getStateFromMeta(int meta) {
 		Direction facing = Direction.VALUES[meta % Direction.VALUES.length];
-		return getDefaultState().withProperty(FACING, facing);
+		return getDefaultState().with(FACING, facing);
 	}
 	
 	@Override
 	public int getMetaFromState(BlockState state) {
-		return state.getValue(FACING).ordinal();
+		return state.get(FACING).ordinal();
 	}
 	
 	@Override
@@ -71,7 +71,7 @@ public class PutterBlock extends ContainerBlock {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		
 		playerIn.openGui(NostrumMagica.instance,
 				NostrumGui.putterBlockID, worldIn,
@@ -81,7 +81,12 @@ public class PutterBlock extends ContainerBlock {
 	}
 	
 	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
+	public boolean hasTileEntity() {
+		return true;
+	}
+	
+	@Override
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		return new PutterBlockTileEntity();
 	}
 	
@@ -91,7 +96,7 @@ public class PutterBlock extends ContainerBlock {
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, BlockState state) {
+	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) { broke();
 		destroy(world, pos, state);
 		super.breakBlock(world, pos, state);
 	}
@@ -110,7 +115,7 @@ public class PutterBlock extends ContainerBlock {
 				x = pos.getX() + .5;
 				y = pos.getY() + .5;
 				z = pos.getZ() + .5;
-				world.spawnEntity(new ItemEntity(world, x, y, z, item.copy()));
+				world.addEntity(new ItemEntity(world, x, y, z, item.copy()));
 			}
 		}
 	}

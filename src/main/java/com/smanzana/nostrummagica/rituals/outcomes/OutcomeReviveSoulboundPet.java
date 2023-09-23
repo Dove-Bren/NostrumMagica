@@ -23,7 +23,7 @@ public class OutcomeReviveSoulboundPet extends OutcomeSpawnEntity {
 				PetSoulItem.SpawnPet(centerItem, world, pos.add(0, 1, 0));
 //				EntityKoid koid = new EntityKoid(world);
 //				koid.setPosition(pos.x, pos.y, pos.z);
-//				world.spawnEntity(koid);
+//				world.addEntity(koid);
 //				koid.setAttackTarget(invoker);
 			}
 

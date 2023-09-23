@@ -171,7 +171,7 @@ public class MortarTrigger extends SpellTrigger {
 						return true;
 					});
 					
-					world.spawnEntity(projectile);
+					world.addEntity(projectile);
 			
 				}
 			
