@@ -4,28 +4,28 @@ import java.util.Random;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityWisp;
-import com.smanzana.nostrummagica.items.NostrumResourceItem;
-import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.IntegerProperty;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.Item;
+import net.minecraft.state.StateContainer;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ToolType;
 
 public class ManiCrystal extends Block {
 
@@ -33,32 +33,22 @@ public class ManiCrystal extends Block {
 	public static final IntegerProperty LEVEL = IntegerProperty.create("level", 0, 1);
 	public static final DirectionProperty FACING = DirectionProperty.create("facing");
 	
-	protected static final AxisAlignedBB STANDING_AABB = new AxisAlignedBB(.5-(.16), 0.1D, .5-.16, .5+.16, 0.8D, .5+.16);
-	protected static final AxisAlignedBB HANGING_AABB = new AxisAlignedBB(.5-(.16), 0.1D, .5-.16, .5+.16, 0.8D, .5+.16);
-	protected static final AxisAlignedBB WALL_NORTH_AABB = new AxisAlignedBB(.5-.16, 0.2D, 1-.16, .5 + .16, 0.8D, 1);
-	protected static final AxisAlignedBB WALL_EAST_AABB = new AxisAlignedBB(0, 0.2D, .5-.16, .16, 0.8D, .5+.16);
-	protected static final AxisAlignedBB WALL_SOUTH_AABB = new AxisAlignedBB(.5-.16, 0.2D, 0, .5 + .16, 0.8D, .16);
-	protected static final AxisAlignedBB WALL_WEST_AABB = new AxisAlignedBB(1-.16, 0.2D, .5-.16, 1, 0.8D, .5+.16);
-	
-	private static ManiCrystal instance = null;
-	public static ManiCrystal instance() {
-		if (instance == null)
-			instance = new ManiCrystal();
-		
-		return instance;
-	}
-	
+	protected static final VoxelShape STANDING_AABB = Block.makeCuboidShape(.5-(.16), 0.1D, .5-.16, .5+.16, 0.8D, .5+.16);
+	protected static final VoxelShape HANGING_AABB = Block.makeCuboidShape(.5-(.16), .55, .5-.16, .5+.16, 1.0, .5+.16);
+	protected static final VoxelShape WALL_NORTH_AABB = Block.makeCuboidShape(.5-.16, 0.2D, 1-.16, .5 + .16, 0.8D, 1);
+	protected static final VoxelShape WALL_EAST_AABB = Block.makeCuboidShape(0, 0.2D, .5-.16, .16, 0.8D, .5+.16);
+	protected static final VoxelShape WALL_SOUTH_AABB = Block.makeCuboidShape(.5-.16, 0.2D, 0, .5 + .16, 0.8D, .16);
+	protected static final VoxelShape WALL_WEST_AABB = Block.makeCuboidShape(1-.16, 0.2D, .5-.16, 1, 0.8D, .5+.16);
 	
 	public ManiCrystal() {
-		super(Material.ROCK, MapColor.DIAMOND);
-		this.setUnlocalizedName(ID);
-		this.setHardness(1.0f);
-		this.setResistance(50.0f);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setSoundType(SoundType.GLASS);
-		this.setHarvestLevel("pickaxe", 1);
-		this.setTickRandomly(true);
-		this.setLightOpacity(0);
+		super(Block.Properties.create(Material.ROCK)
+				.hardnessAndResistance(1.0f, 50.0f)
+				.sound(SoundType.GLASS)
+				.harvestTool(ToolType.PICKAXE)
+				.harvestLevel(1)
+				.tickRandomly()
+				);
+		//this.setLightOpacity(0);
 		
 		this.setDefaultState(this.stateContainer.getBaseState().with(LEVEL, 0).with(FACING, Direction.UP));
 	}
@@ -79,72 +69,41 @@ public class ManiCrystal extends Block {
 		}
 	}
 	
-	protected Direction facingFromMeta(int meta) {
-		return Direction.getFront(meta & 0x7);
-	}
-	
-	protected int metaFromFacing(Direction facing) {
-		return facing.getIndex();
-	}
-	
-	protected int levelFromMeta(int meta) {
-		return (meta >> 3) & 1;
-	}
-	
-	protected int metaFromLevel(int level) {
-		return (level & 1) << 3;
-	}
-	
-	@Override
-	public BlockState getStateFromMeta(int meta) {
-		return getDefaultState().with(LEVEL, levelFromMeta(meta)).with(FACING, facingFromMeta(meta));
-	}
-	
-	@Override
-	public int getMetaFromState(BlockState state) {
-		return metaFromFacing(state.get(FACING)) | metaFromLevel(state.get(LEVEL));
-	}
+//	@Override
+//	public int quantityDroppedWithBonus(int fortune, Random random) {
+//		return 1;
+//	}
+//	
+//	@Override
+//	public Item getItemDropped(BlockState state, Random rand, int fortune) {
+//		return NostrumResourceItem.instance();
+//	}
+//	
+//	@Override
+//	public int damageDropped(BlockState state) {
+//		switch (state.get(LEVEL)) {
+//		case 0:
+//		default:
+//			return NostrumResourceItem.getMetaFromType(ResourceType.CRYSTAL_SMALL);
+//		case 1:
+//			return NostrumResourceItem.getMetaFromType(ResourceType.CRYSTAL_MEDIUM);
+//		}
+//	}
 	
 	@Override
-	public int quantityDroppedWithBonus(int fortune, Random random) {
-		return 1;
-	}
-	
-	@Override
-	public Item getItemDropped(BlockState state, Random rand, int fortune) {
-		return NostrumResourceItem.instance();
-	}
-	
-	@Override
-	public int damageDropped(BlockState state) {
-		switch (state.get(LEVEL)) {
-		case 0:
-		default:
-			return NostrumResourceItem.getMetaFromType(ResourceType.CRYSTAL_SMALL);
-		case 1:
-			return NostrumResourceItem.getMetaFromType(ResourceType.CRYSTAL_MEDIUM);
-		}
-	}
-	
-	@Override
-	public int getExpDrop(BlockState state, net.minecraft.world.IBlockAccess world, BlockPos pos, int fortune) {
-		return 0;
-	}
-	
-	@Override
-	public void randomTick(World worldIn, BlockPos pos, BlockState state, Random random) {
+	public void randomTick(BlockState state, World worldIn, BlockPos pos, Random random) {
 		if (worldIn.isRemote) {
 			return;
 		}
 		
-		if (worldIn.provider instanceof NostrumEmptyDimension.EmptyDimensionProvider) {
+		if (worldIn.dimension.getType() == NostrumEmptyDimension.getType()) {
 			return;
 		}
 		
 		if (random.nextInt(2) <= state.get(LEVEL)) {
 			
 			// Check if there are too many already
-			if (worldIn.getEntitiesWithinAABB(EntityWisp.class, this.getBoundingBox(state, worldIn, pos).offset(pos).grow(20)).size() > 5) {
+			if (worldIn.getEntitiesWithinAABB(EntityWisp.class, VoxelShapes.fullCube().getBoundingBox().offset(pos).grow(20)).size() > 5) {
 				return;
 			}
 			
@@ -168,11 +127,10 @@ public class ManiCrystal extends Block {
 	}
 	
 	@Override
-	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
+	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		switch (state.get(FACING)) {
 		case DOWN:
-			return new AxisAlignedBB(.5-(.16), .55, .5-.16, .5+.16, 1.0, .5+.16);
-			//return HANGING_AABB;
+			return HANGING_AABB;
 		case EAST:
 			return WALL_EAST_AABB;
 		case NORTH:
@@ -188,64 +146,33 @@ public class ManiCrystal extends Block {
 	}
 	
 	@Override
-	public AxisAlignedBB getCollisionBoundingBox(BlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-		Direction facing = blockState.get(FACING);
-		if (facing == null) {
-			facing = Direction.UP;
-		}
-		
-		switch (facing) {
-		case EAST:
-		case NORTH:
-		case SOUTH:
-		case WEST:
-			return null;
-		case UP:
-		default:
-			return STANDING_AABB;
-		case DOWN:
-			return HANGING_AABB;
-		}
-	}
-	
-	@Override
-	public boolean isOpaqueCube(BlockState state) {
-		return false;
-	}
-	
-	@Override
-	public boolean isFullCube(BlockState state) {
-		return false;
-	}
-	
-	@Override
 	@OnlyIn(Dist.CLIENT)
 	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.TRANSLUCENT;
 	}
 	
-	@Override
-	@OnlyIn(Dist.CLIENT)
-	public boolean isTranslucent(BlockState state) {
-		return true;
-	}
+//	@Override
+//	@OnlyIn(Dist.CLIENT)
+//	public boolean isTranslucent(BlockState state) {
+//		return true;
+//	}
 	
 	@Override
-	public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor) {
-		super.onNeighborChange(world, pos, neighbor);
-		
-		if (world instanceof World && !((World) world).isRemote) {
-			BlockState state = world.getBlockState(pos);
-			Direction facing = state.get(FACING);
-			if (facing == Direction.UP || facing == Direction.DOWN) {
-				return;
+	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld world, BlockPos pos, BlockPos facingPos) {
+		if (!world.isRemote()) {
+			Direction myFacing = stateIn.get(FACING);
+			if (myFacing == Direction.UP || myFacing == Direction.DOWN) {
+				return stateIn;
 			}
 			
-			if (world.isAirBlock(pos.offset(facing.getOpposite()))) {
-				this.dropBlockAsItem((World) world, pos, state, 0);
-				((World) world).setBlockToAir(pos);
+			if (myFacing == facing.getOpposite()) {
+				if (facingState.isAir(world, facingPos)) {
+					return null;
+				}
 			}
+			
 		}
+		return stateIn;
 	}
 	
 	/**

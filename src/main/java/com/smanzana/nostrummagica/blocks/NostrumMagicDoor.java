@@ -5,64 +5,54 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.block.BlockHorizontal;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.HorizontalBlock;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.particles.ParticleTypes;
+import net.minecraft.pathfinding.PathType;
+import net.minecraft.state.BooleanProperty;
+import net.minecraft.state.StateContainer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.server.ServerWorld;
 
-public abstract class NostrumMagicDoor extends BlockHorizontal {
+public abstract class NostrumMagicDoor extends HorizontalBlock {
 	
 	protected static final BooleanProperty MASTER = BooleanProperty.create("master");
-	protected static final AxisAlignedBB MIRROR_AABB_EW = new AxisAlignedBB(0.4D, 0.0D, 0D, 0.6D, 1.0D, 1D);
-	protected static final AxisAlignedBB MIRROR_AABB_NS = new AxisAlignedBB(0D, 0.0D, 0.4D, 1D, 1D, 0.6D);
+	protected static final VoxelShape MIRROR_AABB_EW = Block.makeCuboidShape(0.4D, 0.0D, 0D, 0.6D, 1.0D, 1D);
+	protected static final VoxelShape MIRROR_AABB_NS = Block.makeCuboidShape(0D, 0.0D, 0.4D, 1D, 1D, 0.6D);
 
 	public NostrumMagicDoor() {
-		super(Material.ROCK, MapColor.NETHERRACK);
-		this.setHardness(500.0f);
-		this.setResistance(900.0f);
-		this.setBlockUnbreakable();
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setSoundType(SoundType.STONE);
+		this(Block.Properties.create(Material.ROCK)
+				.hardnessAndResistance(-1.0F, 3600000.8F)
+				.noDrops()
+				.sound(SoundType.STONE)
+				);
+	}
+	
+	public NostrumMagicDoor(Block.Properties properties) {
+		super(properties);
 		
-		this.setDefaultState(this.stateContainer.getBaseState().with(MASTER, false).with(FACING, Direction.NORTH));
+		this.setDefaultState(this.stateContainer.getBaseState().with(MASTER, false).with(HORIZONTAL_FACING, Direction.NORTH));
 	}
 	
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(MASTER, FACING);
-	}
-	
-	@Override
-	public BlockState getStateFromMeta(int meta) {
-		return getDefaultState()
-				.with(MASTER, (meta & 1) == 1)
-				.with(FACING, Direction.getHorizontal((meta >> 1) & 3));
-	}
-	
-	@Override
-	public int getMetaFromState(BlockState state) {
-		int meta = (state.get(MASTER) ? 1 : 0)
-				| (state.get(FACING).getHorizontalIndex() << 1);
-			
-		return meta;
+		builder.add(MASTER, HORIZONTAL_FACING);
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {
@@ -80,21 +70,21 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 		} else {
 			BlockPos master = getMasterPos(world, state, pos);
 			if (master != null && world.getBlockState(master) != null && isMaster(world.getBlockState(master))) {
-				world.setBlockToAir(master);
+				world.destroyBlock(master, false);
 			}
 		}
 		
 		// Actually destroy
 		walkDoor(world, pos, state, (checkPos, checkState) -> {
-			world.setBlockToAir(checkPos);
+			world.destroyBlock(checkPos, false);
 			return false;
 		});
 		
 		
-		((WorldServer)world).spawnParticle(EnumParticleTypes.LAVA, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
-				2, .01, 0, .01, 1, new int[0]);
-		((WorldServer)world).spawnParticle(EnumParticleTypes.SUSPENDED_DEPTH, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
-				100, .3, .3, .3, 1, new int[0]);
+		((ServerWorld)world).addParticle(ParticleTypes.LAVA, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, .01, 0, .01);
+		// tODO this used to spawn 100 of them
+//		((ServerWorld)world).addParticle(ParticleTypes., pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
+//				.3, .3, .3);
 	}
 	
 	protected BlockPos getMasterPos(World world, BlockState state, BlockPos pos) {
@@ -137,7 +127,7 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 			
 			next.add(cur.up());
 			next.add(cur.down());
-			if (state.get(FACING).getHorizontalIndex() % 2 != 0) {
+			if (state.get(HORIZONTAL_FACING).getHorizontalIndex() % 2 != 0) {
 				next.add(cur.north());
 				next.add(cur.south());
 			} else {
@@ -154,7 +144,7 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 	}
 	
 	public BlockState getSlaveState(Direction facing) {
-		return this.getDefaultState().with(MASTER, false).with(FACING, facing);
+		return this.getDefaultState().with(MASTER, false).with(HORIZONTAL_FACING, facing);
 	}
 	
 	public boolean isMaster(BlockState state) {
@@ -163,63 +153,42 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 
 
 	public BlockState getMaster(Direction facing) {
-		return this.getDefaultState().with(MASTER, true).with(FACING, facing);
+		return this.getDefaultState().with(MASTER, true).with(HORIZONTAL_FACING, facing);
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) { broke();
-		this.destroy(world, pos, state);
-		world.removeTileEntity(pos);
-		super.breakBlock(world, pos, state);
+	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+		if (state.getBlock() != newState.getBlock()) {
+			this.destroy(worldIn, pos, state);
+			worldIn.removeTileEntity(pos);
+		}
 	}
 	
 	@Override
-	public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
+	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
         return false;
     }
 	
-	@Override
-	public boolean isFullCube(BlockState state) {
-		return false;
-	}
+//	@Override
+//	public int getLightOpacity(BlockState state, IBlockAccess world, BlockPos pos) {
+//		return 16;
+//	}
 	
 	@Override
-	public boolean isOpaqueCube(BlockState state) {
-		return false;
-	}
-	
-	@Override
-	public boolean isReplaceable(IBlockAccess worldIn, BlockPos pos) {
-        return false;
-    }
-	
-	@Override
-	public int getLightOpacity(BlockState state, IBlockAccess world, BlockPos pos) {
-		return 16;
-	}
-	
-	@Override
-	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
+	public boolean isSolid(BlockState state) {
 		return true;
 	}
 	
 	@Override
-	public AxisAlignedBB getCollisionBoundingBox(BlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-		if (blockState.get(FACING).getHorizontalIndex() % 2 != 0)
+	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+		if (state.get(HORIZONTAL_FACING).getHorizontalIndex() % 2 != 0)
 			return MIRROR_AABB_EW;
 		return MIRROR_AABB_NS;
 	}
 	
 	@Override
-	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
-		if (state.get(FACING).getHorizontalIndex() % 2 != 0)
-			return MIRROR_AABB_EW;
-		return MIRROR_AABB_NS;
-	}
-	
-	@Override
-	public BlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer) {
-		Direction enumfacing = Direction.getHorizontal(MathHelper.floor((double)(placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3).getOpposite();
+	public BlockState getStateForPlacement(BlockItemUseContext context) {
+		Direction enumfacing = context.getPlacementHorizontalFacing().getOpposite();
 		return getMaster(enumfacing);
 	}
 	
@@ -238,7 +207,7 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 		visited.add(masterBlock);
 		next.add(masterBlock.up());
 		next.add(masterBlock.down());
-		if (masterState.get(FACING).getHorizontalIndex() % 2 != 0) {
+		if (masterState.get(HORIZONTAL_FACING).getHorizontalIndex() % 2 != 0) {
 			next.add(masterBlock.north());
 			next.add(masterBlock.south());
 		} else {
@@ -258,11 +227,11 @@ public abstract class NostrumMagicDoor extends BlockHorizontal {
 			blocksLeft--;
 			
 			visited.add(cur);
-			world.setBlockState(cur, getSlaveState(masterState.get(FACING)));
+			world.setBlockState(cur, getSlaveState(masterState.get(HORIZONTAL_FACING)));
 			
 			next.add(cur.up());
 			next.add(cur.down());
-			if (masterState.get(FACING).getHorizontalIndex() % 2 != 0) {
+			if (masterState.get(HORIZONTAL_FACING).getHorizontalIndex() % 2 != 0) {
 				next.add(cur.north());
 				next.add(cur.south());
 			} else {

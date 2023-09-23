@@ -9,48 +9,34 @@ import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.items.WarlockSword;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ToolType;
 
 public class ModificationTable extends ContainerBlock {
 	
 	public static final String ID = "modification_table";
 	
-	private static ModificationTable instance = null;
-	public static ModificationTable instance() {
-		if (instance == null)
-			instance = new ModificationTable();
-		
-		return instance;
-	}
-	
 	public ModificationTable() {
-		super(Material.WOOD, MapColor.WOOD);
-		this.setUnlocalizedName(ID);
-		this.setHardness(2.0f);
-		this.setResistance(10.0f);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setSoundType(SoundType.WOOD);
-		this.setHarvestLevel("axe", 0);
-	}
-	
-	@Override
-	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
-		return true;
+		super(Block.Properties.create(Material.WOOD)
+				.hardnessAndResistance(2.0f, 10.0f)
+				.sound(SoundType.WOOD)
+				.harvestTool(ToolType.AXE)
+				);
 	}
 	
 	@Override
@@ -70,18 +56,25 @@ public class ModificationTable extends ContainerBlock {
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+		return createNewTileEntity(world);
+	}
+
+	@Override
+	public TileEntity createNewTileEntity(IBlockReader worldIn) {
 		return new ModificationTableEntity();
 	}
 	
 	@Override
-	public EnumBlockRenderType getRenderType(BlockState state) {
-		return EnumBlockRenderType.MODEL;
+	public BlockRenderType getRenderType(BlockState state) {
+		return BlockRenderType.MODEL;
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) { broke();
-		destroy(world, pos, state);
-		super.breakBlock(world, pos, state);
+	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+		if (state.getBlock() != newState.getBlock()) {
+			destroy(world, pos, state);
+			world.removeTileEntity(pos);
+		}
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {

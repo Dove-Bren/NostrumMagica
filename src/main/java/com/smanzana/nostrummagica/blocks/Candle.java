@@ -64,7 +64,6 @@ public class Candle extends ContainerBlock {
 		super(Block.Properties.create(Material.CARPET)
 				.hardnessAndResistance(.1f, 10.0f)
 				.sound(SoundType.PLANT)
-				.tickRandomly()
 				);
 		this.setDefaultState(this.stateContainer.getBaseState().with(LIT, false));
 	}

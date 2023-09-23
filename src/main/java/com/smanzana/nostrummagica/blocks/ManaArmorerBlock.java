@@ -1,6 +1,5 @@
 package com.smanzana.nostrummagica.blocks;
 
-import java.util.List;
 import java.util.Random;
 
 import javax.annotation.Nullable;
@@ -12,95 +11,86 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
+import net.minecraft.block.ContainerBlock;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ToolType;
 
-public class ManaArmorerBlock extends Block {
+public class ManaArmorerBlock extends ContainerBlock {
 
-public static final String ID = "mana_armorer";
+	public static final String ID = "mana_armorer";
 
-private static final double AABB_RADIUS = (4.0 / 16.0);
-protected static final AxisAlignedBB BASE_AABB = new AxisAlignedBB(.5 - AABB_RADIUS, .5 - AABB_RADIUS, .5 - AABB_RADIUS, .5 + AABB_RADIUS, .5 + AABB_RADIUS, .5 + AABB_RADIUS);
-	
-	private static ManaArmorerBlock instance = null;
-	public static ManaArmorerBlock instance() {
-		if (instance == null)
-			instance = new ManaArmorerBlock();
-		
-		return instance;
-	}
+	private static final double AABB_RADIUS = (4.0 / 16.0);
+	protected static final VoxelShape BASE_AABB = Block.makeCuboidShape(.5 - AABB_RADIUS, .5 - AABB_RADIUS, .5 - AABB_RADIUS, .5 + AABB_RADIUS, .5 + AABB_RADIUS, .5 + AABB_RADIUS);
 	
 	public ManaArmorerBlock() {
-		super(Material.ROCK, MapColor.DIAMOND);
-		this.setUnlocalizedName(ID);
-		this.setHardness(1.2f);
-		this.setResistance(3.0f);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setSoundType(SoundType.STONE);
-		this.setHarvestLevel("pickaxe", 1);
+		super(Block.Properties.create(Material.ROCK)
+				.hardnessAndResistance(1.2f, 3.0f)
+				.sound(SoundType.STONE)
+				.harvestTool(ToolType.PICKAXE)
+				.harvestLevel(1)
+				);
 	}
 	
 	@Override
-	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
+	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		return BASE_AABB;
-	}
-	
-	@Override
-	public void addCollisionBoxToList(BlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
-		addCollisionBoxToList(pos, entityBox, collidingBoxes, BASE_AABB);
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public EnumBlockRenderType getRenderType(BlockState state) {
-		return EnumBlockRenderType.INVISIBLE;
+	public BlockRenderType getRenderType(BlockState state) {
+		return BlockRenderType.INVISIBLE;
 	}
 	
-	@Override
-	public boolean isOpaqueCube(BlockState state) {
-		return false;
-	}
-	
-	@Override
-	public boolean isFullCube(BlockState state) {
-		return false;
-	}
-	
-	@Override
-	public int getLightValue(BlockState state, IBlockAccess world, BlockPos pos) {
-		return 12;
-	}
+//	@Override
+//	public boolean isOpaqueCube(BlockState state) {
+//		return false;
+//	}
+//	
+//	@Override
+//	public boolean isFullCube(BlockState state) {
+//		return false;
+//	}
+//	
+//	@Override
+//	public int getLightValue(BlockState state, IBlockAccess world, BlockPos pos) {
+//		return 12;
+//	}
 	
 	@Override
 	public boolean hasTileEntity(BlockState state) {
 		return true;
 	}
 	
-	@Override
-	public TileEntity createTileEntity(World world, BlockState state) {
+	public TileEntity createNewTileEntity(IBlockReader worldIn) {
 		return new ManaArmorerTileEntity();
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) { broke();
-		super.breakBlock(world, pos, state);
-		world.removeTileEntity(pos);
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+		return createNewTileEntity(world);
 	}
+	
+//	@Override
+//	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+//		super.breakBlock(world, pos, state);
+//		world.removeTileEntity(pos);
+//	}
 	
 	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
@@ -108,32 +98,32 @@ protected static final AxisAlignedBB BASE_AABB = new AxisAlignedBB(.5 - AABB_RAD
 			TileEntity te = worldIn.getTileEntity(pos);
 			if (te != null && te instanceof ManaArmorerTileEntity) {
 				ManaArmorerTileEntity armorer = (ManaArmorerTileEntity) te;
-				@Nullable IManaArmor playerArmor = NostrumMagica.getManaArmor(playerIn);
+				@Nullable IManaArmor playerArmor = NostrumMagica.getManaArmor(player);
 				
 				if (playerArmor != null && playerArmor.hasArmor()) {
 					// Already have armor?
 					NostrumMagicaSounds.CAST_FAIL.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
-					playerIn.sendMessage(new TranslationTextComponent("info.mana_armorer.already_have"));
+					player.sendMessage(new TranslationTextComponent("info.mana_armorer.already_have"));
 				} else if (armorer.isActive()) {
 					// If we're the active entity, stop it
 					// Otherwise, it's busy
-					if (armorer.getActiveEntity().equals(playerIn)) {
+					if (armorer.getActiveEntity().equals(player)) {
 						armorer.stop();
 					} else {
 						NostrumMagicaSounds.CAST_FAIL.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
-						playerIn.sendMessage(new TranslationTextComponent("info.mana_armorer.busy"));
+						player.sendMessage(new TranslationTextComponent("info.mana_armorer.busy"));
 					}
 				} else {
 					// Else become active with us
-					INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
+					INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 					if (attr != null && attr.isUnlocked()
-							&& attr.getMaxMana() > armorer.calcManaBurnAmt(playerIn)
+							&& attr.getMaxMana() > armorer.calcManaBurnAmt(player)
 							&& attr.getMana() > 0
 							) {
-						armorer.startEntity(playerIn);
+						armorer.startEntity(player);
 					} else {
 						NostrumMagicaSounds.CAST_FAIL.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
-						playerIn.sendMessage(new TranslationTextComponent("info.mana_armorer.locked"));
+						player.sendMessage(new TranslationTextComponent("info.mana_armorer.locked"));
 					}
 				}
 			}

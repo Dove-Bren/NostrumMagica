@@ -1,62 +1,48 @@
 package com.smanzana.nostrummagica.blocks;
 
-import java.util.Random;
-
-import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.items.ReagentItem;
-
 import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.BlockState;
-import net.minecraft.item.Item;
+import net.minecraft.block.OreBlock;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorldReader;
+import net.minecraftforge.common.ToolType;
 
-public class ManiOre extends Block {
+public class ManiOre extends OreBlock {
 
 	public static final String ID = "mani_ore";
 	
-	private static ManiOre instance = null;
-	public static ManiOre instance() {
-		if (instance == null)
-			instance = new ManiOre();
-		
-		return instance;
-	}
-	
 	
 	public ManiOre() {
-		super(Material.ROCK, MapColor.DIAMOND);
-		this.setUnlocalizedName(ID);
-		this.setHardness(2.0f);
-		this.setResistance(30.0f);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setSoundType(SoundType.STONE);
-		this.setHarvestLevel("pickaxe", 2);
-		
+		super(Block.Properties.create(Material.ROCK)
+				.hardnessAndResistance(2.0f, 30.f)
+				.sound(SoundType.STONE)
+				.harvestTool(ToolType.PICKAXE)
+				.harvestLevel(2)
+				);
 	}
 	
-	@Override
-	public int quantityDroppedWithBonus(int fortune, Random random) {
-		int count = random.nextInt(2) + 1;
-		if (fortune != 0)
-			count += (fortune) + random.nextInt(fortune);
-		return count;
-	}
+//	@Override
+//	public int quantityDroppedWithBonus(int fortune, Random random) {
+//		int count = random.nextInt(2) + 1;
+//		if (fortune != 0)
+//			count += (fortune) + random.nextInt(fortune);
+//		return count;
+//	}
+//	
+//	@Override
+//	public Item getItemDropped(BlockState state, Random rand, int fortune) {
+//		return ReagentItem.instance();
+//	}
+//	
+//	@Override
+//	public int damageDropped(BlockState state) {
+//		return ReagentItem.ReagentType.MANI_DUST.getMeta();
+//	}
 	
 	@Override
-	public Item getItemDropped(BlockState state, Random rand, int fortune) {
-		return ReagentItem.instance();
-	}
-	
-	@Override
-	public int damageDropped(BlockState state) {
-		return ReagentItem.ReagentType.MANI_DUST.getMeta();
-	}
-	
-	@Override
-	public int getExpDrop(BlockState state, net.minecraft.world.IBlockAccess world, BlockPos pos, int fortune) {
-		return RANDOM.nextInt(3);
+	public int getExpDrop(BlockState state, IWorldReader world, BlockPos pos, int fortune, int silktouch) {
+		return silktouch == 0 ? RANDOM.nextInt(3) : 0;
 	}
 }

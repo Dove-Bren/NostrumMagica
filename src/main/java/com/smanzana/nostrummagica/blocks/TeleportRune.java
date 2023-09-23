@@ -66,7 +66,7 @@ public class TeleportRune extends ContainerBlock  {
 	}
 	
 	@Override
-	public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
+	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
         return true;
     }
 	
