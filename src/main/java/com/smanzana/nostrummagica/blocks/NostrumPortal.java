@@ -10,24 +10,27 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.init.SoundEvents;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.particles.ParticleTypes;
+import net.minecraft.pathfinding.PathType;
+import net.minecraft.state.BooleanProperty;
+import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -36,15 +39,8 @@ public abstract class NostrumPortal extends Block  {
 	
 	protected static final BooleanProperty MASTER = BooleanProperty.create("master");
 	
-	public NostrumPortal() {
-		super(Material.LEAVES, MapColor.OBSIDIAN);
-		this.setHardness(500.0f);
-		this.setResistance(900.0f);
-		this.setBlockUnbreakable();
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setSoundType(SoundType.STONE);
-		this.setTickRandomly(true);
-		
+	public NostrumPortal(Block.Properties properties) {
+		super(properties);
 		this.setDefaultState(this.stateContainer.getBaseState().with(MASTER, false));
 	}
 	
@@ -54,54 +50,28 @@ public abstract class NostrumPortal extends Block  {
     }
 	
 	@Override
-	public boolean isFullCube(BlockState state) {
+	public boolean isSolid(BlockState state) {
 		return false;
 	}
 	
 	@Override
-	public boolean isOpaqueCube(BlockState state) {
-		return false;
-	}
-	
-	@Override
-	public boolean isReplaceable(IBlockAccess worldIn, BlockPos pos) {
+	public boolean isReplaceable(BlockState state, BlockItemUseContext context) {
         return false;
     }
 	
 	@Override
-	public int getLightValue(BlockState state, IBlockAccess world, BlockPos pos) {
-		return 14;
-	}
-	
-	@Override
-	public int getLightOpacity(BlockState state, IBlockAccess world, BlockPos pos) {
+	public int getOpacity(BlockState state, IBlockReader world, BlockPos pos) {
 		return 0;
 	}
 	
 	@Override
-	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
-		return false;
-	}
-	
-	@Override
-	public AxisAlignedBB getCollisionBoundingBox(BlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-		return NULL_AABB;
-		//return super.getCollisionBoundingBox(blockState, worldIn, pos);
+	public VoxelShape getShape(BlockState blockState, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+		return VoxelShapes.empty();
 	}
 	
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(MASTER);
-	}
-	
-	@Override
-	public BlockState getStateFromMeta(int meta) {
-		return getDefaultState().with(MASTER, (meta & 1) == 1);
-	}
-	
-	@Override
-	public int getMetaFromState(BlockState state) {
-		return state.get(MASTER) ? 1 : 0;
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {
@@ -111,7 +81,7 @@ public abstract class NostrumPortal extends Block  {
 		if (state == null)
 			return;
 		
-		world.setBlockToAir(getPaired(state, pos));
+		world.removeBlock(getPaired(state, pos), false);
 	}
 	
 	protected static BlockPos getPaired(BlockState state, BlockPos pos) {
@@ -128,8 +98,8 @@ public abstract class NostrumPortal extends Block  {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public EnumBlockRenderType getRenderType(BlockState state) {
-		return EnumBlockRenderType.INVISIBLE;
+	public BlockRenderType getRenderType(BlockState state) {
+		return BlockRenderType.INVISIBLE;
 	}
 	
 	public BlockState getSlaveState() {
@@ -146,14 +116,15 @@ public abstract class NostrumPortal extends Block  {
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) { broke();
-		this.destroy(world, pos, state);
-		world.removeTileEntity(pos);
-		super.breakBlock(world, pos, state);
+	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+		if (state.getBlock() != newState.getBlock()) {
+			this.destroy(world, pos, state);
+			world.removeTileEntity(pos);
+		}
 	}
 	
 	@Override
-	public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
+	public boolean isValidPosition(BlockState state, IWorldReader worldIn, BlockPos pos) {
 		if (!worldIn.isAirBlock(pos.up()))
 			return false;
 		
@@ -163,11 +134,11 @@ public abstract class NostrumPortal extends Block  {
 		if (worldIn.getTileEntity(pos.up()) != null)
 			return false;
 		
-		return super.canPlaceBlockAt(worldIn, pos);
+		return true;
 	}
 	
 	@Override
-	public BlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer) {
+	public BlockState getStateForPlacement(BlockItemUseContext context) {
 		return getMaster();
 	}
 	
@@ -205,10 +176,9 @@ public abstract class NostrumPortal extends Block  {
 	    	final double mx = rand.nextFloat() - .5;
 	    	final double mz = rand.nextFloat() - .5;
 	    	
-	    	worldIn.spawnParticle(EnumParticleTypes.SUSPENDED_DEPTH,
-	    			pos.getX() + .5 + dx, pos.getY() + 1 + dy, pos.getZ() + .5 + dz,
-	    			mx, 0, mz,
-	    			new int[0]);
+//	    	worldIn.addParticle(ParticleTypes.SUSPENDED_DEPTH,
+//	    			pos.getX() + .5 + dx, pos.getY() + 1 + dy, pos.getZ() + .5 + dz,
+//	    			mx, 0, mz);
 		}
 
         
@@ -223,10 +193,9 @@ public abstract class NostrumPortal extends Block  {
 	    	final double mx = rand.nextFloat() - .5;
 	    	final double mz = rand.nextFloat() - .5;
 	    	
-	    	worldIn.spawnParticle(EnumParticleTypes.SPELL_WITCH,
+	    	worldIn.addParticle(ParticleTypes.WITCH,
 	    			pos.getX() + .5 + dx, pos.getY() + 1 + dy, pos.getZ() + .5 + dz,
-	    			mx, 0, mz,
-	    			new int[0]);
+	    			mx, 0, mz);
     	}
 	}
 	
@@ -244,13 +213,13 @@ public abstract class NostrumPortal extends Block  {
 	private static boolean DumbIntegratedGuard = false;
 	
 	@Override
-	public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, BlockState state, Entity entityIn) {
+	public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
 		Integer charge = EntityTeleportCharge.get(entityIn.getUniqueID());
 		if (charge == null) {
 			charge = 0;
 		}
 		
-		if (worldIn.isRemote && entityIn == NostrumMagica.proxy.getPlayer() && ((!DumbIntegratedGuard && charge == 0) || (DumbIntegratedGuard && charge == 2))) {
+		if (worldIn.isRemote && entityIn == NostrumMagica.instance.proxy.getPlayer() && ((!DumbIntegratedGuard && charge == 0) || (DumbIntegratedGuard && charge == 2))) {
 			entityIn.playSound(SoundEvents.BLOCK_PORTAL_TRIGGER, 1f, (4f / (float) TELEPORT_CHARGE_TIME));
 		}
 		
@@ -277,7 +246,7 @@ public abstract class NostrumPortal extends Block  {
 					double mx = .25 * (NostrumMagica.rand.nextFloat() - .5f);
 					double my = .5 * (NostrumMagica.rand.nextFloat() - .5f);
 					double mz = .25 * (NostrumMagica.rand.nextFloat() - .5f);
-					worldIn.spawnParticle(EnumParticleTypes.DRAGON_BREATH, dx + mx, dy, dz + mz, mx / 3, my, mz / 3, new int[0]);
+					worldIn.addParticle(ParticleTypes.DRAGON_BREATH, dx + mx, dy, dz + mz, mx / 3, my, mz / 3);
 				}
 			}
 		}
@@ -310,12 +279,12 @@ public abstract class NostrumPortal extends Block  {
 	}
 	
 	public static int getRemainingCharge(Entity ent) {
-		Integer charge = EntityTeleportCharge.get(ent.getPersistentID());
+		Integer charge = EntityTeleportCharge.get(ent.getUniqueID());
 		return TELEPORT_CHARGE_TIME - (charge == null ? 0 : charge) * 20; 
 	}
 	
 	public static int getCooldownTime(Entity ent) {
-		Integer charge = EntityTeleportCharge.get(ent.getPersistentID());
+		Integer charge = EntityTeleportCharge.get(ent.getUniqueID());
 		return (charge == null || charge >= 0 ? 0 : -charge);
 	}
 	
@@ -359,6 +328,10 @@ public abstract class NostrumPortal extends Block  {
 	
 	public static abstract class NostrumPortalTileEntityBase extends TileEntity {
 		
+		public NostrumPortalTileEntityBase(TileEntityType<?> tileEntityTypeIn) {
+			super(tileEntityTypeIn);
+		}
+
 		/**
 		 * Return color the portal should be rendered as. Only 3 least-sig bytes used as 0RGB.
 		 * @return

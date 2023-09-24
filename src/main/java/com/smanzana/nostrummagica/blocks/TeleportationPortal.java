@@ -5,6 +5,8 @@ import com.smanzana.nostrummagica.blocks.tiles.TeleportationPortalTileEntity;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -22,18 +24,17 @@ import net.minecraft.world.WorldServer;
 public class TeleportationPortal extends NostrumPortal implements ITileEntityProvider  {
 	
 	public static final String ID = "teleportation_portal";
-	
-	private static TeleportationPortal instance = null;
-	public static TeleportationPortal instance() {
-		if (instance == null)
-			instance = new TeleportationPortal();
-		
-		return instance;
+
+	public TeleportationPortal() {
+		this(Block.Properties.create(Material.LEAVES)
+				.hardnessAndResistance(-1.0F, 3600000.8F)
+				.noDrops()
+				.lightValue(14)
+				);
 	}
 	
-	public TeleportationPortal() {
-		super();
-		this.setUnlocalizedName(ID);
+	public TeleportationPortal(Block.Properties properties) {
+		super(properties);
 	}
 	
 	@Override

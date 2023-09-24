@@ -11,29 +11,20 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
 public class ProgressionDoor extends NostrumMagicDoor {
 
 	public static final String ID = "progression_door";
 	
-	private static ProgressionDoor instance = null;
-	public static ProgressionDoor instance() {
-		if (instance == null)
-			instance = new ProgressionDoor();
-		
-		return instance;
-	}
-	
 	public ProgressionDoor() {
 		super();
-		this.setUnlocalizedName(ID);
-		
 	}
 	
 	@Override
@@ -42,7 +33,7 @@ public class ProgressionDoor extends NostrumMagicDoor {
 	}
 	
 	@Override
-	public TileEntity createTileEntity(World world, BlockState state) {
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		if (!this.isMaster(state))
 			return null;
 		
@@ -50,7 +41,7 @@ public class ProgressionDoor extends NostrumMagicDoor {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
 		if (worldIn.isRemote)
 			return true;
 		

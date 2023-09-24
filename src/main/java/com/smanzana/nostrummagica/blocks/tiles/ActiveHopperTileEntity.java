@@ -23,7 +23,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.VoxelShape;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -318,7 +318,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 			}
 		}
 		
-		final AxisAlignedBB captureBox = getCaptureBB(false);
+		final VoxelShape captureBox = getCaptureBB(false);
 		for (Entity e : world.getEntitiesInAABBexcluding(null, captureBox, EntitySelectors.HAS_INVENTORY)) {
 			// Vanilla uses a random entity in the list. We'll just use the first.
 			return pushInto((IInventory) e, direction);
@@ -412,7 +412,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 			}
 		}
 		
-		final AxisAlignedBB captureBox = getCaptureBB(true);
+		final VoxelShape captureBox = getCaptureBB(true);
 		for (Entity e : world.getEntitiesInAABBexcluding(null, captureBox, EntitySelectors.HAS_INVENTORY)) {
 			// Vanilla uses a random entity in the list. We'll just use the first.
 			return pullFrom((IInventory) e, direction);
@@ -498,16 +498,16 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 		return false;
 	}
 	
-	private AxisAlignedBB getCaptureBB(boolean forPull) {
+	private VoxelShape getCaptureBB(boolean forPull) {
 		final Direction direction = ActiveHopper.GetFacing(world.getBlockState(pos));
 		
 		if (direction == Direction.DOWN) {
 			// Down has different collision so do a custom box
-			return new AxisAlignedBB(0, 0, 0, 1, 1, 1).offset(pos).expand(0, 1, 0);
+			return Block.makeCuboidShape(0, 0, 0, 1, 1, 1).offset(pos).expand(0, 1, 0);
 		}
 		
 		final BlockPos spot = forPull ? pos.offset(direction.getOpposite()) : pos.offset(direction);
-		return new AxisAlignedBB(0, 0, 0, 1, 1, 1).offset(spot);
+		return Block.makeCuboidShape(0, 0, 0, 1, 1, 1).offset(spot);
 	}
 	
 	@Override

@@ -13,30 +13,31 @@ import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.config.ModConfig;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.ContainerBlock;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.pathfinding.PathType;
+import net.minecraft.state.BooleanProperty;
+import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ToolType;
 
 /**
  * Obelisk block. If tile, has tile entity (and is master or slave).
@@ -49,9 +50,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  * @author Skyler
  *
  */
-public class NostrumObelisk extends Block implements ITileEntityProvider {
-	
-	
+public class NostrumObelisk extends ContainerBlock {
 
 	private static final BooleanProperty MASTER = BooleanProperty.create("master");
 	private static final BooleanProperty TILE = BooleanProperty.create("tile");
@@ -60,24 +59,18 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 	public static final int TILE_OFFSETH = 3; // horizontal distance between master and pillars
 	public static final int TILE_HEIGHT = 4; // Total height of corner pillars
 	
+	private static final VoxelShape TILE_SHAPE = Block.makeCuboidShape(0.3D, 0.3D, 0.3D, 0.7D, 0.7D, 0.7D);
+	
 	public static final String ID = "nostrum_obelisk";
 	
-	private static NostrumObelisk instance = null;
-	public static NostrumObelisk instance() {
-		if (instance == null)
-			instance = new NostrumObelisk();
-		
-		return instance;
-	}
-	
 	public NostrumObelisk() {
-		super(Material.ROCK, MapColor.STONE);
-		this.setUnlocalizedName(ID);
-		this.setHardness(2.0f);
-		this.setResistance(10.0f);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setSoundType(SoundType.STONE);
-		this.setHarvestLevel("pickaxe", 2);
+		super(Block.Properties.create(Material.ROCK)
+				.hardnessAndResistance(2f, 10f)
+				.sound(SoundType.STONE)
+				.harvestTool(ToolType.PICKAXE)
+				.harvestLevel(2)
+				.noDrops()
+				);
 		
 		this.setDefaultState(this.stateContainer.getBaseState()
 				.with(MASTER, false)
@@ -90,7 +83,7 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
     }
 	
 	@Override
-	public int getLightValue(BlockState state, IBlockAccess world, BlockPos pos) {
+	public int getLightValue(BlockState state, IEnviromentBlockReader world, BlockPos pos) {
 		if (state == null)
 			return 0;
 		if (!state.get(TILE))
@@ -103,7 +96,7 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public int getLightOpacity(BlockState state, IBlockAccess world, BlockPos pos) {
+	public int getOpacity(BlockState state, IBlockReader world, BlockPos pos) {
 		if (state == null)
 			return 15;
 		if (!state.get(TILE))
@@ -112,67 +105,38 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 		return 0;
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
-	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
+	public VoxelShape getShape(BlockState state, IBlockReader source, BlockPos pos, ISelectionContext context) {
 		if (state.get(TILE) && !state.get(MASTER)) {
-			return new AxisAlignedBB(0.3D, 0.3D, 0.3D, 0.7D, 0.7D, 0.7D);
+			return TILE_SHAPE;
 		} else {
-			return super.getBoundingBox(state, source, pos);
+			return VoxelShapes.fullCube();
 		}
 	}
 	
 	@Override
 	public void tick(BlockState state, World worldIn, BlockPos pos, Random rand) {
-		super.updateTick(worldIn, pos, state, rand);
+		;
 	}
 	
-	@Override
-	public boolean isFullCube(BlockState state) {
-		return false;
-	}
+//	@Override
+//	public boolean isFullCube(BlockState state) {
+//		return false;
+//	}
+//	
+//	@Override
+//	public boolean isOpaqueCube(BlockState state) {
+//		return !state.get(TILE) || state.get(MASTER);
+//	}
 	
 	@Override
-	public boolean isOpaqueCube(BlockState state) {
-		return !state.get(TILE) || state.get(MASTER);
-	}
-	
-	@Override
-	public boolean isReplaceable(IBlockAccess worldIn, BlockPos pos) {
+	public boolean isReplaceable(BlockState state, BlockItemUseContext context) {
         return false;
     }
 	
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(MASTER, TILE);
-	}
-	
-	@Override
-	public BlockState getStateFromMeta(int meta) {
-		return getDefaultState()
-				.with(MASTER, (meta & 0x1) == 1)
-				.with(TILE, ((meta >> 1) & 0x1) == 1);
-	}
-	
-	@Override
-	public int getMetaFromState(BlockState state) {
-		int meta = 0x0;
-		if (state.get(TILE))
-			meta = 0x2;
-		if (state.get(MASTER))
-			meta |= 0x1;
-		
-		return meta;
-	}
-	
-	@Override
-	public void onBlockDestroyedByPlayer(World worldIn, BlockPos pos, BlockState state) {
-		//destroy(worldIn, pos, state);
-	}
-	
-	@Override
-	public void onBlockDestroyedByExplosion(World worldIn, BlockPos pos, Explosion explosionIn) {
-		//destroy(worldIn, pos, null);
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {
@@ -239,23 +203,12 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public Item getItemDropped(BlockState state, Random rand, int fortune) {
-		return null;
-	}
-	
-	@Override
-	public ItemStack getPickBlock(BlockState state, RayTraceResult target, World world, BlockPos pos, PlayerEntity player) {
-		return ItemStack.EMPTY;
-	}
-
-	@Override
 	public boolean hasTileEntity() {
 		return true;
 	}
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		BlockState state = this.getStateFromMeta(meta);
 		if (state.get(TILE))
 			return new NostrumObeliskEntity(state.get(MASTER));
 		
@@ -263,19 +216,25 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) { broke();
-		destroy(world, pos, state);
-		super.breakBlock(world, pos, state);
-		world.removeTileEntity(pos);
+	public TileEntity createNewTileEntity(IBlockReader world) {
+		throw new RuntimeException("I have been fooled :(");
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
-	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
-		super.eventReceived(state, worldIn, pos, id, param);
-        TileEntity tileentity = worldIn.getTileEntity(pos);
-        return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
+	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+		if (state.getBlock() != newState.getBlock()) {
+			destroy(world, pos, state);
+			world.removeTileEntity(pos);
+		}
 	}
+	
+//	@SuppressWarnings("deprecation")
+//	@Override
+//	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
+//		super.eventReceived(state, worldIn, pos, id, param);
+//        TileEntity tileentity = worldIn.getTileEntity(pos);
+//        return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
+//	}
 	
 	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
@@ -284,10 +243,10 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 			return false;
 		}
 		
-		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (!ModConfig.config.obeliskReqMagic() && (attr == null || !attr.isUnlocked())) {
 			if (worldIn.isRemote) {
-				playerIn.sendMessage(new TranslationTextComponent("info.obelisk.nomagic"));
+				player.sendMessage(new TranslationTextComponent("info.obelisk.nomagic"));
 			}
 			return false;
 		}
@@ -295,7 +254,7 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 		if (!worldIn.isRemote) {
 			worldIn.notifyBlockUpdate(pos, state, state, 2);
 		}
-		playerIn.openGui(NostrumMagica.instance,
+		player.openGui(NostrumMagica.instance,
 				NostrumGui.obeliskID, worldIn,
 				pos.getX(), pos.getY(), pos.getZ());
 		
@@ -338,7 +297,7 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 			world.setBlockState(center.add(offset, 0, i), Blocks.OBSIDIAN.getDefaultState());
 			world.setBlockState(center.add(-offset, 0, i), Blocks.OBSIDIAN.getDefaultState());
 		}
-		world.setBlockState(center, instance().getMasterState());
+		world.setBlockState(center, NostrumBlocks.obelisk.getMasterState());
 		world.setTileEntity(center, new NostrumObeliskEntity(true));
 		
 		((NostrumObeliskEntity) world.getTileEntity(center)).init();
@@ -359,10 +318,10 @@ public class NostrumObelisk extends Block implements ITileEntityProvider {
 		for (int i = 0; i < TILE_HEIGHT; i++) {
 			BlockPos pos = center.add(0, i, 0);
 			if (i == TILE_OFFSETY - 1) {
-				world.setBlockState(pos, instance().getTileState());
+				world.setBlockState(pos, NostrumBlocks.obelisk.getTileState());
 				world.setTileEntity(pos, new NostrumObeliskEntity(corner));
 			} else {
-				world.setBlockState(pos, instance().getDefaultState());
+				world.setBlockState(pos, NostrumBlocks.obelisk.getDefaultState());
 			}
 		}
 	}

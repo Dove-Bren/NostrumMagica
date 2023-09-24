@@ -31,7 +31,7 @@ import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.VoxelShape;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
@@ -138,7 +138,7 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
 			solid = false;
 		} else if (context.getEntity() != null) {
 			final Entity entityIn = context.getEntity();
-			final AxisAlignedBB entityBox = entityIn.getCollisionBoundingBox();
+			final VoxelShape entityBox = entityIn.getCollisionBoundingBox();
 			Direction side = state.get(FACING);
 			// cant use getCenter cause it's client-side only
 			//Vec3d center = entityBox.getCenter();
@@ -378,18 +378,18 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
                     int x = pos.getX();
                     int y = pos.getY();
                     int z = pos.getZ();
-                    AxisAlignedBB axisalignedbb = blockstate.getShape(world, pos).getBoundingBox();
-                    double xPos = x + world.rand.nextDouble() * (axisalignedbb.maxX - axisalignedbb.minX - 0.2F) + 0.1F + axisalignedbb.minX;
-                    double yPos = y + world.rand.nextDouble() * (axisalignedbb.maxY - axisalignedbb.minY - 0.2F) + 0.1F + axisalignedbb.minY;
-                    double zPos = z + world.rand.nextDouble() * (axisalignedbb.maxZ - axisalignedbb.minZ - 0.2F) + 0.1F + axisalignedbb.minZ;
+                    VoxelShape VoxelShape = blockstate.getShape(world, pos).getBoundingBox();
+                    double xPos = x + world.rand.nextDouble() * (VoxelShape.maxX - VoxelShape.minX - 0.2F) + 0.1F + VoxelShape.minX;
+                    double yPos = y + world.rand.nextDouble() * (VoxelShape.maxY - VoxelShape.minY - 0.2F) + 0.1F + VoxelShape.minY;
+                    double zPos = z + world.rand.nextDouble() * (VoxelShape.maxZ - VoxelShape.minZ - 0.2F) + 0.1F + VoxelShape.minZ;
 
                     switch (side) {
-                        case UP: yPos = y + axisalignedbb.maxY + 0.1F; break;
-                        case DOWN: yPos = y + axisalignedbb.minY - 0.1F; break;
-                        case NORTH: zPos = z + axisalignedbb.minZ - 0.1F; break;
-                        case SOUTH: zPos = z + axisalignedbb.maxZ + 0.1F; break;
-                        case WEST: xPos = x + axisalignedbb.minX - 0.1F; break;
-                        case EAST: xPos = x + axisalignedbb.maxX + 0.1F; break;
+                        case UP: yPos = y + VoxelShape.maxY + 0.1F; break;
+                        case DOWN: yPos = y + VoxelShape.minY - 0.1F; break;
+                        case NORTH: zPos = z + VoxelShape.minZ - 0.1F; break;
+                        case SOUTH: zPos = z + VoxelShape.maxZ + 0.1F; break;
+                        case WEST: xPos = x + VoxelShape.minX - 0.1F; break;
+                        case EAST: xPos = x + VoxelShape.maxX + 0.1F; break;
                     }
 
                     final Minecraft mc = Minecraft.getInstance();

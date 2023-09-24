@@ -30,7 +30,7 @@ public class TemporaryTeleportationPortal extends TeleportationPortal  {
 	}
 	
 	public TemporaryTeleportationPortal() {
-		super();
+		super("LIGHT LEVEL 14");
 		this.setUnlocalizedName(ID);
 	}
 	

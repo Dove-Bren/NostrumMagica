@@ -266,7 +266,7 @@ public class ItemDuct extends SixWayBlock implements ITileEntityProvider, IWater
 //	}
 	
 //	@Override
-//	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
+//	public VoxelShape getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
 //		final BlockState actualState = state.getActualState(source, pos);
 //		
 //		int index = 0;
@@ -280,7 +280,7 @@ public class ItemDuct extends SixWayBlock implements ITileEntityProvider, IWater
 //	}
 //	
 //	@Override
-//	public void addCollisionBoxToList(BlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
+//	public void addCollisionBoxToList(BlockState state, World worldIn, BlockPos pos, VoxelShape entityBox, List<VoxelShape> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
 //		addCollisionBoxToList(pos, entityBox, collidingBoxes, BASE_AABB);
 //		for (Direction dir : Direction.VALUES) {
 //			if (GetFacingActive(state.getActualState(worldIn, pos), dir)) {

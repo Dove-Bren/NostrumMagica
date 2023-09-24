@@ -24,7 +24,7 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.VoxelShape;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -257,7 +257,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	}
 	
 	protected @Nullable ItemEntity findNearbyItem() {
-		AxisAlignedBB bb = new AxisAlignedBB(0, 0, 0, 1, 1, 1).offset(this.getPos());
+		VoxelShape bb = Block.makeCuboidShape(0, 0, 0, 1, 1, 1).offset(this.getPos());
 		for (ItemEntity entity : world.getEntitiesWithinAABB(ItemEntity.class, bb)) {
 			// Make sure entity isn't in the list of entities we've created
 			if (receivedEntities.contains(entity)) {

@@ -32,7 +32,7 @@ import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.VoxelShape;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockAccess;
@@ -44,7 +44,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class TeleportRune extends ContainerBlock  {
 	
 	public static final String ID = "teleport_rune";
-	protected static final AxisAlignedBB RUNE_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.125D, 1.0D);
+	protected static final VoxelShape RUNE_AABB = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 1.0D, 0.125D, 1.0D);
 	
 	private static TeleportRune instance = null;
 	public static TeleportRune instance() {
@@ -101,13 +101,13 @@ public class TeleportRune extends ContainerBlock  {
 	}
 	
 	@Override
-	public AxisAlignedBB getCollisionBoundingBox(BlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+	public VoxelShape getCollisionBoundingBox(BlockState blockState, IBlockAccess worldIn, BlockPos pos) {
 		return NULL_AABB;
 		//return super.getCollisionBoundingBox(blockState, worldIn, pos);
 	}
 	
 	@Override
-	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
+	public VoxelShape getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
 		return RUNE_AABB;
 	}
 	
@@ -129,7 +129,7 @@ public class TeleportRune extends ContainerBlock  {
 	}
 	
 	@Override
-	public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
+	public boolean isValidPosition(BlockState state, IWorldReader world, BlockPos pos) {
 		return super.canPlaceBlockAt(worldIn, pos);
 	}
 	

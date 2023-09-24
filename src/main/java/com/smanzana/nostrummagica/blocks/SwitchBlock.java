@@ -17,7 +17,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.VoxelShape;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IBlockAccess;
@@ -32,7 +32,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  */
 public class SwitchBlock extends Block {
 	
-	protected static final AxisAlignedBB SWITCH_BLOCK_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1D, 0.2D, 1D);
+	protected static final VoxelShape SWITCH_BLOCK_AABB = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 1D, 0.2D, 1D);
 
 	public static String ID = "switch_block";
 	
@@ -65,7 +65,7 @@ public class SwitchBlock extends Block {
 	}
 	
 	@Override
-	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
+	public VoxelShape getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
 		return SWITCH_BLOCK_AABB;
 	}
 	
@@ -95,7 +95,7 @@ public class SwitchBlock extends Block {
 	}
 	
 	@Override
-	public AxisAlignedBB getCollisionBoundingBox(BlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+	public VoxelShape getCollisionBoundingBox(BlockState blockState, IBlockAccess worldIn, BlockPos pos) {
 		return NULL_AABB;
 	}
 	

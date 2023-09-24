@@ -1,76 +1,44 @@
 package com.smanzana.nostrummagica.blocks;
 
-import java.util.Random;
-
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
-import com.smanzana.nostrummagica.items.MirrorItem;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;
 import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
+import net.minecraft.pathfinding.PathType;
+import net.minecraft.state.StateContainer;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.BlockStateContainer;
+import net.minecraftforge.common.ToolType;
 
 public class NostrumMirrorBlock extends HorizontalBlock {
 	
 	public static final String ID = "mirror_block";
-	protected static final AxisAlignedBB MIRROR_AABB_EW = new AxisAlignedBB(0.4D, 0.0D, 0.1D, 0.6D, 1.05D, 0.9D);
-	protected static final AxisAlignedBB MIRROR_AABB_NS = new AxisAlignedBB(0.1D, 0.0D, 0.4D, 0.9D, 1.05D, 0.6D);
-	
-	private static NostrumMirrorBlock instance = null;
-	public static NostrumMirrorBlock instance() {
-		if (instance == null)
-			instance = new NostrumMirrorBlock();
-		
-		return instance;
-	}
+	protected static final VoxelShape MIRROR_AABB_EW = Block.makeCuboidShape(0.4D, 0.0D, 0.1D, 0.6D, 1.05D, 0.9D);
+	protected static final VoxelShape MIRROR_AABB_NS = Block.makeCuboidShape(0.1D, 0.0D, 0.4D, 0.9D, 1.05D, 0.6D);
 	
 	public NostrumMirrorBlock() {
-		super(Material.ROCK, MapColor.OBSIDIAN);
-		this.setUnlocalizedName(ID);
-		this.setHardness(4.0f);
-		this.setResistance(20.0f);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setSoundType(SoundType.STONE);
-		this.setHarvestLevel("pickaxe", 2);
-		this.setLightLevel(.4f);
-		this.setLightOpacity(0);
+		super(Block.Properties.create(Material.ROCK)
+				.hardnessAndResistance(4f, 20f)
+				.sound(SoundType.STONE)
+				.harvestTool(ToolType.PICKAXE)
+				.harvestLevel(0)
+				.lightValue(4)
+				);
 	}
 	
+	// todo ??
 	@Override
-	public int quantityDroppedWithBonus(int fortune, Random random) {
-		return 1;
-	}
-	
-	@Override
-	public Item getItemDropped(BlockState state, Random rand, int fortune) {
-		return MirrorItem.instance();
-	}
-	
-	@Override
-	public int damageDropped(BlockState state) {
-		return 0;
-	}
-	
-	@Override
-	public ItemStack getPickBlock(BlockState state, RayTraceResult target, World world, BlockPos pos, PlayerEntity player) {
-		return new ItemStack(MirrorItem.instance());
-	}
-	
-	@Override
-	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
+	public boolean isSolid(BlockState state) {
 		return true;
 	}
 	
@@ -84,30 +52,19 @@ public class NostrumMirrorBlock extends HorizontalBlock {
 //		return false;
 //	}
 	
-	@Override
-	public boolean isOpaqueCube(BlockState state) {
-		return false;
-	}
-	
-	@Override
-	public boolean isFullCube(BlockState state) {
-        return false;
-    }
+//	@Override
+//	public boolean isOpaqueCube(BlockState state) {
+//		return false;
+//	}
+//	
+//	@Override
+//	public boolean isFullCube(BlockState state) {
+//        return false;
+//    }
 	
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(FACING);
-	}
-	
-	@Override
-	public BlockState getStateFromMeta(int meta) {
-		Direction enumfacing = Direction.getHorizontal(meta);
-		return getDefaultState().with(FACING, enumfacing);
-	}
-	
-	@Override
-	public int getMetaFromState(BlockState state) {
-		return state.get(FACING).getHorizontalIndex();
+		builder.add(HORIZONTAL_FACING);
 	}
 	
 	@Override
@@ -122,8 +79,8 @@ public class NostrumMirrorBlock extends HorizontalBlock {
 	}
 	
 	@Override
-	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
-		if (state.get(FACING).getHorizontalIndex() % 2 != 0)
+	public VoxelShape getShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context) {
+		if (state.get(HORIZONTAL_FACING).getHorizontalIndex() % 2 != 0)
 			return MIRROR_AABB_EW;
 		return MIRROR_AABB_NS;
 	}

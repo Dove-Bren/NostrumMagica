@@ -4,21 +4,26 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.tiles.PutterBlockTileEntity;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.state.DirectionProperty;
+import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.BlockStateContainer;
+import net.minecraftforge.common.ToolType;
 
 public class PutterBlock extends ContainerBlock {
 	
@@ -26,27 +31,18 @@ public class PutterBlock extends ContainerBlock {
 	
 	public static final String ID = "putter";
 	
-	private static PutterBlock instance = null;
-	public static PutterBlock instance() {
-		if (instance == null)
-			instance = new PutterBlock();
-		
-		return instance;
-	}
-	
-		public PutterBlock() {
-		super(Material.ROCK, MapColor.STONE);
-		this.setUnlocalizedName(ID);
-		this.setHardness(3.5f);
-		this.setResistance(3.5f);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setSoundType(SoundType.STONE);
-		this.setHarvestLevel("pickaxe", 1);
+	public PutterBlock() {
+		super(Block.Properties.create(Material.ROCK)
+				.hardnessAndResistance(3.5f, 3.5f)
+				.sound(SoundType.STONE)
+				.harvestTool(ToolType.PICKAXE)
+				.harvestLevel(1)
+				);
 	}
 	
 	@Override
-	public BlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer) {
-		return this.getDefaultState().with(FACING, Direction.getDirectionFromEntityLiving(pos, placer));
+	public BlockState getStateForPlacement(BlockItemUseContext context) {
+		return this.getDefaultState().with(FACING, context.getNearestLookingDirection().getOpposite());
 	}
 	
 	@Override
@@ -55,25 +51,8 @@ public class PutterBlock extends ContainerBlock {
 	}
 	
 	@Override
-	public BlockState getStateFromMeta(int meta) {
-		Direction facing = Direction.VALUES[meta % Direction.VALUES.length];
-		return getDefaultState().with(FACING, facing);
-	}
-	
-	@Override
-	public int getMetaFromState(BlockState state) {
-		return state.get(FACING).ordinal();
-	}
-	
-	@Override
-	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
-		return true;
-	}
-	
-	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		
-		playerIn.openGui(NostrumMagica.instance,
+		player.openGui(NostrumMagica.instance,
 				NostrumGui.putterBlockID, worldIn,
 				pos.getX(), pos.getY(), pos.getZ());
 		
@@ -91,14 +70,16 @@ public class PutterBlock extends ContainerBlock {
 	}
 	
 	@Override
-	public EnumBlockRenderType getRenderType(BlockState state) {
-		return EnumBlockRenderType.MODEL;
+	public BlockRenderType getRenderType(BlockState state) {
+		return BlockRenderType.MODEL;
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) { broke();
-		destroy(world, pos, state);
-		super.breakBlock(world, pos, state);
+	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+		if (state.getBlock() != newState.getBlock()) {
+			destroy(world, pos, state);
+			world.removeTileEntity(pos);
+		}
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {
@@ -118,5 +99,11 @@ public class PutterBlock extends ContainerBlock {
 				world.addEntity(new ItemEntity(world, x, y, z, item.copy()));
 			}
 		}
+	}
+
+	@Override
+	public TileEntity createNewTileEntity(IBlockReader worldIn) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -1,25 +1,23 @@
 package com.smanzana.nostrummagica.blocks;
 
-import java.util.Random;
-
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.tiles.SpawnerTriggerTileEntity;
 import com.smanzana.nostrummagica.items.EssenceItem;
-import com.smanzana.nostrummagica.items.NostrumSkillItem;
-import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
+import com.smanzana.nostrummagica.items.NostrumItemTags;
 import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemEnderEye;
+import net.minecraft.item.EnderEyeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -33,37 +31,22 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 	
 	public static final String ID = "nostrum_spawner_trigger";
 	
-	private static NostrumSpawnAndTrigger instance = null;
-	public static NostrumSpawnAndTrigger instance() {
-		if (instance == null)
-			instance = new NostrumSpawnAndTrigger();
-		
-		return instance;
-	}
-	
 	public NostrumSpawnAndTrigger() {
 		super();
-		this.setUnlocalizedName(ID);
-		this.setBlockUnbreakable();
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public boolean shouldSideBeRendered(BlockState blockState, IBlockAccess blockAccess, BlockPos pos, Direction side) {
-		if (NostrumMagica.proxy.getPlayer().isCreative()) {
-			TileEntity te = blockAccess.getTileEntity(pos);
-			if (te != null && te instanceof SpawnerTriggerTileEntity) {
-				SpawnerTriggerTileEntity ent = ((SpawnerTriggerTileEntity) te);
-				return (ent.getSpawnedEntity() == null && ent.getUnlinkedEntID() == null);
-			}
+	public boolean isSideInvisible(BlockState blockState, BlockState adjacentState, Direction side) {
+		if (NostrumMagica.instance.proxy.getPlayer().isCreative()) {
+			return true; // I guess just only in creative?
+//			TileEntity te = blockAccess.getTileEntity(pos);
+//			if (te != null && te instanceof SpawnerTriggerTileEntity) {
+//				SpawnerTriggerTileEntity ent = ((SpawnerTriggerTileEntity) te);
+//				return (ent.getSpawnedEntity() == null && ent.getUnlinkedEntID() == null);
+//			}
 		}
 		return false;
-	}
-	
-	
-	@Override
-	public void tick(BlockState state, World worldIn, BlockPos pos, Random rand) {
-		;//super.updateTick(worldIn, pos, state, rand);
 	}
 	
 	@Override
@@ -77,7 +60,7 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
 		if (worldIn.isRemote) {
 			return true;
 		}
@@ -124,18 +107,16 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 				}
 				
 				worldIn.setBlockState(pos, state.with(MOB, type));
-			} else if (heldItem.getItem() instanceof NostrumSkillItem) {
-				if (NostrumSkillItem.getTypeFromMeta(heldItem.getMetadata()) == SkillItemType.WING) {
-					worldIn.setBlockState(pos, state.with(MOB, Type.DRAGON_RED));
-				}
+			} else if (NostrumItemTags.Items.DragonWing.contains(heldItem.getItem())) {
+				worldIn.setBlockState(pos, state.with(MOB, Type.DRAGON_RED));
 			} if (heldItem.getItem() instanceof PositionCrystal) {
 				BlockPos heldPos = PositionCrystal.getBlockPosition(heldItem);
-				if (heldPos != null && PositionCrystal.getDimension(heldItem) == worldIn.provider.getDimension()) {
+				if (heldPos != null && PositionCrystal.getDimension(heldItem) == worldIn.getDimension().getType().getId()) {
 					ent.setTriggerPosition(heldPos.getX(), heldPos.getY(), heldPos.getZ());
 					NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 				}
 				return true;
-			} else if (heldItem.getItem() instanceof ItemEnderEye) {
+			} else if (heldItem.getItem() instanceof EnderEyeItem) {
 				BlockPos loc = (ent.getTriggerOffset() == null ? null : ent.getTriggerOffset().toImmutable().add(pos));
 				if (loc != null) {
 					BlockState atState = worldIn.getBlockState(loc);

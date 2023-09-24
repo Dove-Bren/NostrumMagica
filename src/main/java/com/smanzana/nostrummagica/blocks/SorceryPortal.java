@@ -31,7 +31,7 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 	}
 	
 	public SorceryPortal() {
-		super();
+		super("LIGHT LEVEL 14");
 		this.setUnlocalizedName(ID);
 	}
 	

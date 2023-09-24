@@ -59,7 +59,7 @@ public class SorceryPortalSpawner extends Block implements ITriggeredBlock {
 	}
 	
 	@Override
-	public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
+	public boolean isValidPosition(BlockState state, IWorldReader world, BlockPos pos) {
 		return (worldIn.isAirBlock(pos) && worldIn.isAirBlock(pos.up()) && worldIn.isAirBlock(pos.up().up()));
 	}
 	

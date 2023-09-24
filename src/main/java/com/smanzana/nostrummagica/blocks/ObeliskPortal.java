@@ -3,32 +3,30 @@ package com.smanzana.nostrummagica.blocks;
 import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.blocks.tiles.ObeliskPortalTileEntity;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
 public class ObeliskPortal extends TeleportationPortal {
 	
 	public static final String ID = "obelisk_portal";
 	
-	private static ObeliskPortal instance = null;
-	public static ObeliskPortal instance() {
-		if (instance == null)
-			instance = new ObeliskPortal();
-		
-		return instance;
-	}
-	
 	public ObeliskPortal() {
-		super();
-		this.setUnlocalizedName(ID);
+		super(Block.Properties.create(Material.LEAVES)
+				.hardnessAndResistance(-1.0F, 3600000.8F)
+				.noDrops()
+				.lightValue(14)
+				);
 	}
 	
 	@Override
@@ -38,7 +36,6 @@ public class ObeliskPortal extends TeleportationPortal {
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		BlockState state = this.getStateFromMeta(meta);
 		if (isMaster(state)) {
 			return new ObeliskPortalTileEntity();
 		}
@@ -81,13 +78,14 @@ public class ObeliskPortal extends TeleportationPortal {
 //		return false;
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		pos = getMaster(state, pos); // find master
 		
 		BlockState parentState = worldIn.getBlockState(pos.down());
 		if (parentState != null && parentState.getBlock() instanceof NostrumObelisk) {
-			parentState.getBlock().onBlockActivated(worldIn, pos.down(), parentState, playerIn, hand, side, hitX, hitY, hitZ);
+			parentState.getBlock().onBlockActivated(parentState, worldIn, pos.down(), player, handIn, hit);
 		}
 		
 		return true;
