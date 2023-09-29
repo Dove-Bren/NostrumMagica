@@ -1,15 +1,13 @@
 package com.smanzana.nostrummagica.serializers;
 
-import java.io.IOException;
-
 import com.smanzana.nostrummagica.items.DragonArmor;
 import com.smanzana.nostrummagica.items.DragonArmor.DragonArmorMaterial;
 
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializer;
+import net.minecraft.network.datasync.IDataSerializer;
 
-public final class DragonArmorMaterialSerializer implements DataSerializer<DragonArmor.DragonArmorMaterial> {
+public final class DragonArmorMaterialSerializer implements IDataSerializer<DragonArmor.DragonArmorMaterial> {
 	
 	public static final DragonArmorMaterialSerializer instance = new DragonArmorMaterialSerializer();
 	
@@ -23,7 +21,7 @@ public final class DragonArmorMaterialSerializer implements DataSerializer<Drago
 	}
 
 	@Override
-	public DragonArmor.DragonArmorMaterial read(PacketBuffer buf) throws IOException {
+	public DragonArmor.DragonArmorMaterial read(PacketBuffer buf)  {
 		return buf.readEnumValue(DragonArmor.DragonArmorMaterial.class);
 	}
 

@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.entity.tasks;
 
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -10,27 +11,25 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.ITameableEntity;
 import com.smanzana.nostrummagica.pet.PetPlacementMode;
 
-import net.minecraft.block.material.Material;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.passive.EntityTameable;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.pathfinding.PathNavigate;
+import net.minecraft.pathfinding.PathNavigator;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public class EntityAIFollowOwnerAdvanced<T extends MobEntity> extends EntityAIBase {
+public class FollowOwnerAdvancedGoal<T extends MobEntity> extends Goal {
 	
 	private final T thePet;
 	private LivingEntity theOwner;
 	private World theWorld;
 	private final double followSpeed;
-	private final PathNavigate petPathfinder;
+	private final PathNavigator petPathfinder;
 	private int timeToRecalcPath;
 	private float maxDist;
 	private float minDist;
@@ -41,11 +40,11 @@ public class EntityAIFollowOwnerAdvanced<T extends MobEntity> extends EntityAIBa
 	
 	protected Predicate<? super T> filter;
 
-	public EntityAIFollowOwnerAdvanced(T thePetIn, double followSpeedIn, float minDistIn, float maxDistIn) {
+	public FollowOwnerAdvancedGoal(T thePetIn, double followSpeedIn, float minDistIn, float maxDistIn) {
 		this(thePetIn, followSpeedIn, minDistIn, maxDistIn, null);
 	}
 	
-	public EntityAIFollowOwnerAdvanced(T thePetIn, double followSpeedIn, float minDistIn, float maxDistIn, Predicate<? super T> filter) {
+	public FollowOwnerAdvancedGoal(T thePetIn, double followSpeedIn, float minDistIn, float maxDistIn, Predicate<? super T> filter) {
 		this.thePet = thePetIn;
 		this.theWorld = thePetIn.world;
 		this.followSpeed = followSpeedIn;
@@ -54,7 +53,8 @@ public class EntityAIFollowOwnerAdvanced<T extends MobEntity> extends EntityAIBa
 		this.maxDist = maxDistIn;
 		lastPosition = null;
 		timeToRecalcPosition = 0;
-		this.setMutexBits(3);
+		
+		this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
 		
 		this.filter = filter;
 	}
@@ -65,8 +65,8 @@ public class EntityAIFollowOwnerAdvanced<T extends MobEntity> extends EntityAIBa
 			sitting = false;
 		} else if (pet instanceof ITameableEntity) {
 			sitting = ((ITameableEntity) pet).isEntitySitting();
-		} else if (pet instanceof EntityTameable) {
-			sitting = ((EntityTameable) pet).isSitting();
+		} else if (pet instanceof TameableEntity) {
+			sitting = ((TameableEntity) pet).isSitting();
 		} else {
 			sitting = false;
 		}
@@ -92,7 +92,7 @@ public class EntityAIFollowOwnerAdvanced<T extends MobEntity> extends EntityAIBa
 		pets.removeIf((p) -> {
 			return p == null
 					|| IsPetSittingGeneric(p)
-					|| thePet.isRiding()
+					|| thePet.isPassenger()
 					|| thePet.isRidingOrBeingRiddenBy(this.theOwner);
 		});
 		if (!pets.contains(pet)) {
@@ -219,12 +219,11 @@ public class EntityAIFollowOwnerAdvanced<T extends MobEntity> extends EntityAIBa
 	}
 
 	private boolean isEmptyBlock(BlockPos pos) {
-		BlockState iblockstate = this.theWorld.getBlockState(pos);
-		return iblockstate.getMaterial() == Material.AIR ? true : !iblockstate.isFullCube();
+		return this.theWorld.isAirBlock(pos);
 	}
 
 	/**
-	 * Returns whether the EntityAIBase should begin execution.
+	 * Returns whether the Goal should begin execution.
 	 */
 	public boolean shouldExecute() {
 		final LivingEntity entitylivingbase = NostrumMagica.getOwner(thePet);
@@ -237,7 +236,7 @@ public class EntityAIFollowOwnerAdvanced<T extends MobEntity> extends EntityAIBa
 			return false;
 		}
 		
-		final PetPlacementMode mode = NostrumMagica.getPetCommandManager().getPlacementMode(entitylivingbase);
+		final PetPlacementMode mode = NostrumMagica.instance.getPetCommandManager().getPlacementMode(entitylivingbase);
 		
 		if (mode == PetPlacementMode.FREE) {
 			return false;
@@ -261,20 +260,20 @@ public class EntityAIFollowOwnerAdvanced<T extends MobEntity> extends EntityAIBa
 	}
 
 	/**
-	 * Returns whether an in-progress EntityAIBase should continue executing
+	 * Returns whether an in-progress Goal should continue executing
 	 */
 	public boolean shouldContinueExecuting() {
 		if (this.thePet.getAttackTarget() != null) {
 			return false;
 		}
 		
-		final PetPlacementMode mode = NostrumMagica.getPetCommandManager().getPlacementMode(this.theOwner);
+		final PetPlacementMode mode = NostrumMagica.instance.getPetCommandManager().getPlacementMode(this.theOwner);
 		if (mode == PetPlacementMode.FREE) {
 			return false;
 		}
 		final boolean sitting = this.isPetSitting(thePet);
 		
-		if (sitting || thePet.isRiding() || thePet.isRidingOrBeingRiddenBy(this.theOwner)) {
+		if (sitting || thePet.isPassenger() || thePet.isRidingOrBeingRiddenBy(this.theOwner)) {
 			return false;
 		}
 		
@@ -315,7 +314,7 @@ public class EntityAIFollowOwnerAdvanced<T extends MobEntity> extends EntityAIBa
 			//System.out.println("Moving");
 			if (--this.timeToRecalcPath <= 0) {
 				this.timeToRecalcPath = 10;
-				final PetPlacementMode mode = NostrumMagica.getPetCommandManager().getPlacementMode(this.theOwner);
+				final PetPlacementMode mode = NostrumMagica.instance.getPetCommandManager().getPlacementMode(this.theOwner);
 				final Vec3d targetPos = this.getTargetPosition(thePet, theOwner, mode);
 
 				//thePet.setLocationAndAngles(targetPos.x, targetPos.y, targetPos.z, this.thePet.rotationYaw, this.thePet.rotationPitch);

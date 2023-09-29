@@ -75,7 +75,7 @@ public class MagicEffectProxy {
 			}
 			
 			if (amt != 0.0) {
-				tag.setDouble(NBT_AMT, amt);
+				tag.putDouble(NBT_AMT, amt);
 			}
 			
 			return tag;
@@ -149,7 +149,7 @@ public class MagicEffectProxy {
 	}
 	
 	private void apply(SpecialEffect effect, EffectData value, LivingEntity entity) {
-		UUID id = entity.getPersistentID();
+		UUID id = entity.getUniqueID();
 		
 		if (!effects.containsKey(id)) {
 			effects.put(id, new EnumMap<SpecialEffect, EffectData>(SpecialEffect.class));

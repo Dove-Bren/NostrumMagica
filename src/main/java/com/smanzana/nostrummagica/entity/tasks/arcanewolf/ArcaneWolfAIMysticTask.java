@@ -11,11 +11,11 @@ import com.smanzana.nostrummagica.entity.EntityArcaneWolf.ArcaneWolfElementalTyp
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.Vec3d;
 
-public class ArcaneWolfAIMysticTask extends EntityAIBase {
+public class ArcaneWolfAIMysticTask extends Goal {
 
 	protected final EntityArcaneWolf wolf;
 	

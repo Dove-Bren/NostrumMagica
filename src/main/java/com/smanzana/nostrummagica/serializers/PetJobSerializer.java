@@ -1,14 +1,12 @@
 package com.smanzana.nostrummagica.serializers;
 
-import java.io.IOException;
-
 import com.smanzana.nostrummagica.pet.PetInfo;
 
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializer;
+import net.minecraft.network.datasync.IDataSerializer;
 
-public final class PetJobSerializer implements DataSerializer<PetInfo.PetAction> {
+public final class PetJobSerializer implements IDataSerializer<PetInfo.PetAction> {
 	
 	public static PetJobSerializer instance = new PetJobSerializer();
 	
@@ -22,7 +20,7 @@ public final class PetJobSerializer implements DataSerializer<PetInfo.PetAction>
 	}
 
 	@Override
-	public PetInfo.PetAction read(PacketBuffer buf) throws IOException {
+	public PetInfo.PetAction read(PacketBuffer buf)  {
 		return buf.readEnumValue(PetInfo.PetAction.class);
 	}
 

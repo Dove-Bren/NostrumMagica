@@ -28,7 +28,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.pathfinding.NodeProcessor;
 import net.minecraft.pathfinding.PathFinder;
-import net.minecraft.pathfinding.PathNavigate;
+import net.minecraft.pathfinding.PathNavigator;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.util.Direction;
@@ -168,11 +168,11 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
 //    			float f6 = MathHelper.cos(this.entity.rotationYaw * 0.017453292F);
 //    			float f7 = f2 * f6 - f3 * f5;
 //    			float f8 = f3 * f6 + f2 * f5;
-//    			PathNavigate pathnavigate = this.entity.getNavigator();
+//    			PathNavigator PathNavigator = this.entity.getNavigator();
 //
-//    			if (pathnavigate != null)
+//    			if (PathNavigator != null)
 //    			{
-//    				NodeProcessor nodeprocessor = pathnavigate.getNodeProcessor();
+//    				NodeProcessor nodeprocessor = PathNavigator.getNodeProcessor();
 //
 //    				if (nodeprocessor != null && nodeprocessor.getPathNodeType(this.entity.world, MathHelper.floor(this.entity.posX + (double)f7), MathHelper.floor(this.entity.posY), MathHelper.floor(this.entity.posZ + (double)f8)) != PathNodeType.OPEN)
 //    				{
@@ -298,9 +298,9 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
 	    }
 	}
 	
-	static public class PathNavigateDragonFlier extends PathNavigate
+	static public class PathNavigatorDragonFlier extends PathNavigator
 	{
-	    public PathNavigateDragonFlier(MobEntity entitylivingIn, World worldIn)
+	    public PathNavigatorDragonFlier(MobEntity entitylivingIn, World worldIn)
 	    {
 	        super(entitylivingIn, worldIn);
 	    }

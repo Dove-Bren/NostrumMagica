@@ -6,9 +6,9 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 
-public class GolemTask extends EntityAIBase {
+public class GolemTask extends Goal {
 
 	private static final Random rand = new Random();
 	private static final double RANGE_SQR = 225.0;
@@ -34,7 +34,7 @@ public class GolemTask extends EntityAIBase {
 		meleeCooldown = 0;
 		rangeCooldown = 0;
 		auxCooldown = 0;
-		this.setMutexBits(3);
+		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 	}
 	
 	public void initStance(boolean melee, boolean range, boolean aux) {

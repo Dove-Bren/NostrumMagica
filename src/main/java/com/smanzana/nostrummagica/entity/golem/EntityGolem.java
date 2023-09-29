@@ -13,7 +13,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
-import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -272,7 +272,7 @@ public abstract class EntityGolem extends TameableEntity implements ILoreTagged 
 
 		protected MobEntity rood; // parent doesn't expose
 		
-		public GolemAIFindEntityNearestPlayer(EntityCreature entityLivingIn) {
+		public GolemAIFindEntityNearestPlayer(CreatureEntity entityLivingIn) {
 			super(entityLivingIn, PlayerEntity.class, true);
 			this.rood = entityLivingIn;
 		}

@@ -41,7 +41,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IEntityMultiPart;
 import net.minecraft.entity.MultiPartEntityPart;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.monster.EntityGiantZombie;
@@ -214,10 +214,10 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 	private final BossInfoServer bossInfo = (BossInfoServer)(new BossInfoServer(this.getDisplayName(), BossInfo.Color.RED, BossInfo.Overlay.NOTCHED_10)).setDarkenSky(true);
 	
 	// AI. First array is indexed by the phase. Second is just a collection of tasks.
-	private EntityAIBase[][] flyingAI;
-	private EntityAIBase[][] groundedAI;
+	private Goal[][] flyingAI;
+	private Goal[][] groundedAI;
 	
-	private EntityAIBase[] lastAI;
+	private Goal[] lastAI;
 	
 	private DragonSummonShadowAttack<EntityDragonRed> shadowAttack;
 	private DragonFlyEvasionTask evasionTask;
@@ -285,10 +285,10 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
         aggroTable = new DragonAIAggroTable<>(this, true);
 		
 		// Order on these are priority numbers!
-		flyingAI = new EntityAIBase[][] {
+		flyingAI = new Goal[][] {
 			// PHASE_GROUNDED
-			new EntityAIBase[] {},
-			new EntityAIBase[] {
+			new Goal[] {},
+			new Goal[] {
 				shadowAttack,
         		new DragonLandTask(this),
         		new DragonMeleeAttackTask(this, 1.0D, true),
@@ -298,7 +298,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
         		new DragonTakeoffLandTask(this),
         		new DragonFlyRandomTask(this),
 			},
-			new EntityAIBase[] {
+			new Goal[] {
 				shadowAttack,
 				new DragonLandTask(this),
         		new DragonMeleeAttackTask(this, 1.0D, true),
@@ -312,20 +312,20 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
         		new DragonFlyRandomTask(this),
 			}
         };
-        groundedAI = new EntityAIBase[][] {
-        	new EntityAIBase[] {
+        groundedAI = new Goal[][] {
+        	new Goal[] {
     			shadowAttack,
         		new DragonMeleeAttackTask(this, 1.0D, true),
         		new EntityAIWander(this, 1.0D, 30)
         	},
-        	new EntityAIBase[] {
+        	new Goal[] {
     			shadowAttack,
         		new DragonSpellAttackTask(this, (5 * 5), 20, true, null, DRAGON_CAST_TIME, DSPELL_Fireball),
         		new DragonTakeoffLandTask(this),
     			new DragonMeleeAttackTask(this, 1.0D, true),
         		new EntityAIWander(this, 1.0D, 30)
         	},
-        	new EntityAIBase[] {
+        	new Goal[] {
     			shadowAttack,
         		new DragonTakeoffLandTask(this),
     			new DragonMeleeAttackTask(this, 1.0D, true),
@@ -358,7 +358,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 		DragonPhase phase = this.getPhase();
 		// Remove grounded
 		if (lastAI != null) {
-			for (EntityAIBase ai : lastAI) {
+			for (Goal ai : lastAI) {
 				this.tasks.removeTask(ai);
 			}
 		}
@@ -378,7 +378,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 		
 		// Remove flying
 		if (lastAI != null) {
-			for (EntityAIBase ai : lastAI) {
+			for (Goal ai : lastAI) {
 				this.tasks.removeTask(ai);
 			}
 		}

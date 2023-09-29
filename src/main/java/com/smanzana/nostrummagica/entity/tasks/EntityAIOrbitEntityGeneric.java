@@ -5,7 +5,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.EntityMoveHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
@@ -17,7 +17,7 @@ import net.minecraft.world.World;
  *
  * @param <T>
  */
-public class EntityAIOrbitEntityGeneric<T extends MobEntity> extends EntityAIBase {
+public class EntityAIOrbitEntityGeneric<T extends MobEntity> extends Goal {
 	
 	private static final double DEFAULT_WOBBLE = 5 * 20;
 	private static final int DEFAULT_BUMPS = 1;
@@ -65,7 +65,7 @@ public class EntityAIOrbitEntityGeneric<T extends MobEntity> extends EntityAIBas
 	}
 
 	/**
-	 * Returns whether the EntityAIBase should begin execution.
+	 * Returns whether the Goal should begin execution.
 	 */
 	public boolean shouldExecute() {
 		LivingEntity entitylivingbase = this.getOrbitTarget();
@@ -91,7 +91,7 @@ public class EntityAIOrbitEntityGeneric<T extends MobEntity> extends EntityAIBas
 	}
 
 	/**
-	 * Returns whether an in-progress EntityAIBase should continue executing
+	 * Returns whether an in-progress Goal should continue executing
 	 */
 	public boolean shouldContinueExecuting() {
 		// Only stop if something died, something changed worlds, or a continue pred was provided and returns false.

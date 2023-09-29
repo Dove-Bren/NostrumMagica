@@ -35,11 +35,11 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
-import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityMoveHelper;
 import net.minecraft.entity.passive.EntityAnimal;
@@ -152,7 +152,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, ITameableEnt
 			}
 			
 			@Override
-			protected void moveToTemptingPlayer(EntityCreature tempted, PlayerEntity player) {
+			protected void moveToTemptingPlayer(CreatureEntity tempted, PlayerEntity player) {
 				if (this.temptedEntity.getDistanceSq(this.temptingPlayer) < 6.25D) {
 					//this.temptedEntity.getMoveHelper(). no such thing as stop
 				} else {
@@ -579,7 +579,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, ITameableEnt
 		return this.world.getLightFor(EnumSkyBlock.SKY, blockpos) >= 8;
 	}
 	
-	static class AIRandomFly extends EntityAIBase {
+	static class AIRandomFly extends Goal {
 		private final EntityLux parentEntity;
 
 		public AIRandomFly(EntityLux wisp) {
@@ -588,7 +588,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, ITameableEnt
 		}
 
 		/**
-		 * Returns whether the EntityAIBase should begin execution.
+		 * Returns whether the Goal should begin execution.
 		 */
 		public boolean shouldExecute() {
 			EntityMoveHelper entitymovehelper = this.parentEntity.getMoveHelper();
@@ -605,7 +605,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, ITameableEnt
 		}
 
 		/**
-		 * Returns whether an in-progress EntityAIBase should continue executing
+		 * Returns whether an in-progress Goal should continue executing
 		 */
 		@Override
 		public boolean shouldContinueExecuting() {
@@ -655,7 +655,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, ITameableEnt
 		}
 	}
 	
-	static class AIRoostTask extends EntityAIBase {
+	static class AIRoostTask extends Goal {
 		
 		private final EntityLux parentEntity;
 		private Predicate<EntityLux> predicate;
@@ -715,7 +715,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, ITameableEnt
 		}
 
 		/**
-		 * Returns whether the EntityAIBase should begin execution.
+		 * Returns whether the Goal should begin execution.
 		 */
 		public boolean shouldExecute() {
 			if (lastAttemptTicks < 0 || parentEntity.world.getTotalWorldTime() - lastAttemptTicks > 5 * 20) {
@@ -726,7 +726,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, ITameableEnt
 		}
 
 		/**
-		 * Returns whether an in-progress EntityAIBase should continue executing
+		 * Returns whether an in-progress Goal should continue executing
 		 */
 		@Override
 		public boolean shouldContinueExecuting() {
@@ -787,7 +787,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, ITameableEnt
 		}
 	}
 	
-	static abstract class AIFlyToRandomFeature extends EntityAIBase {
+	static abstract class AIFlyToRandomFeature extends Goal {
 		
 		private final EntityLux parentEntity;
 		private final long delay;
@@ -819,7 +819,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, ITameableEnt
 		protected abstract void onArrive(EntityLux lux, BlockPos pos);
 
 		/**
-		 * Returns whether the EntityAIBase should begin execution.
+		 * Returns whether the Goal should begin execution.
 		 */
 		public boolean shouldExecute() {
 			
@@ -842,7 +842,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, ITameableEnt
 		}
 
 		/**
-		 * Returns whether an in-progress EntityAIBase should continue executing
+		 * Returns whether an in-progress Goal should continue executing
 		 */
 		@Override
 		public boolean shouldContinueExecuting() {

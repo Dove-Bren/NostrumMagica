@@ -2,17 +2,17 @@ package com.smanzana.nostrummagica.entity.tasks.dragon;
 
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.EntityMoveHelper;
 import net.minecraft.util.math.BlockPos;
 
-public class DragonLandTask extends EntityAIBase {
+public class DragonLandTask extends Goal {
 
 	private final EntityDragon dragon;
 	
 	public DragonLandTask(EntityDragon dragon) {
 		this.dragon = dragon;
-		this.setMutexBits(3);
+		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 	}
 	
 	@Override

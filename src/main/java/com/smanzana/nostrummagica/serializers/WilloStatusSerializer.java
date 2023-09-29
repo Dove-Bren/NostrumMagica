@@ -1,14 +1,12 @@
 package com.smanzana.nostrummagica.serializers;
 
-import java.io.IOException;
-
 import com.smanzana.nostrummagica.entity.EntityWillo.WilloStatus;
 
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializer;
+import net.minecraft.network.datasync.IDataSerializer;
 
-public final class WilloStatusSerializer implements DataSerializer<WilloStatus> {
+public final class WilloStatusSerializer implements IDataSerializer<WilloStatus> {
 	
 	public static WilloStatusSerializer instance = new WilloStatusSerializer();
 	
@@ -22,7 +20,7 @@ public final class WilloStatusSerializer implements DataSerializer<WilloStatus> 
 	}
 
 	@Override
-	public WilloStatus read(PacketBuffer buf) throws IOException {
+	public WilloStatus read(PacketBuffer buf)  {
 		return buf.readEnumValue(WilloStatus.class);
 	}
 

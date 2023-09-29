@@ -13,11 +13,11 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.potion.PotionEffect;
 
-public class ArcaneWolfAIEldrichTask extends EntityAIBase {
+public class ArcaneWolfAIEldrichTask extends Goal {
 
 	protected final EntityArcaneWolf wolf;
 	
@@ -34,7 +34,7 @@ public class ArcaneWolfAIEldrichTask extends EntityAIBase {
 		
 		this.activeTicks = 0;
 		
-		this.setMutexBits(3);
+		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 	}
 	
 	@Override

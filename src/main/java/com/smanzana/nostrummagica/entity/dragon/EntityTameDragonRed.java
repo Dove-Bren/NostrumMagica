@@ -25,7 +25,7 @@ import com.smanzana.nostrummagica.entity.IStabbableEntity;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon.DragonEquipmentInventory.IChangeListener;
 import com.smanzana.nostrummagica.entity.dragon.IDragonSpawnData.IDragonSpawnFactory;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowEntityGeneric;
-import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowOwnerGeneric;
+import com.smanzana.nostrummagica.entity.tasks.FollowOwnerGenericGoal;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIOwnerHurtByTargetGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIOwnerHurtTargetGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIPanicGeneric;
@@ -424,7 +424,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 			}
 		});
 		this.tasks.addTask(priority++, new DragonMeleeAttackTask(this, 1.0D, true, 15.0D));
-		this.tasks.addTask(priority++, new EntityAIFollowOwnerGeneric<EntityTameDragonRed>(this, 1.0D, 16.0F, 4.0F, new Predicate<EntityTameDragonRed>() {
+		this.tasks.addTask(priority++, new FollowOwnerGenericGoal<EntityTameDragonRed>(this, 1.0D, 16.0F, 4.0F, new Predicate<EntityTameDragonRed>() {
 			@Override
 			public boolean apply(EntityTameDragonRed input) {
 				// Don't follow unless we've bonded enough

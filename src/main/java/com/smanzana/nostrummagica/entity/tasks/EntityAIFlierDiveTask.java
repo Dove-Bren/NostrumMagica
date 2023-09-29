@@ -4,7 +4,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 
 /**
  * Attempts to dive into the enemy to make a melee attack.
@@ -12,7 +12,7 @@ import net.minecraft.entity.ai.EntityAIBase;
  *
  * @param <T>
  */
-public class EntityAIFlierDiveTask<T extends MobEntity> extends EntityAIBase
+public class EntityAIFlierDiveTask<T extends MobEntity> extends Goal
 {
 	protected final T entity;
 	private final double moveSpeedAmp;
@@ -39,7 +39,7 @@ public class EntityAIFlierDiveTask<T extends MobEntity> extends EntityAIBase
 	}
 
 	/**
-	 * Returns whether the EntityAIBase should begin execution.
+	 * Returns whether the Goal should begin execution.
 	 */
 	public boolean shouldExecute() {
 		if (entity.isDead || entity.getAttackTarget() == null) {
@@ -67,7 +67,7 @@ public class EntityAIFlierDiveTask<T extends MobEntity> extends EntityAIBase
 	}
 
 	/**
-	 * Returns whether an in-progress EntityAIBase should continue executing
+	 * Returns whether an in-progress Goal should continue executing
 	 */
 	public boolean shouldContinueExecuting() {
 		return (stallTicks < (20 * 1) && !attackedTooRecently());

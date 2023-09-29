@@ -23,11 +23,11 @@ import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
-public class KoidTask extends EntityAIBase {
+public class KoidTask extends Goal {
 	
 	public static final class Vec2f {
 		public float pitch;
@@ -323,7 +323,7 @@ public class KoidTask extends EntityAIBase {
 		meleeCooldown = 0;
 		rangeCooldown = 0;
 		auxCooldown = 0;
-		this.setMutexBits(3);
+		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 	}
 	
 	@Override

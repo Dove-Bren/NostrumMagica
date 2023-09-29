@@ -2,10 +2,10 @@ package com.smanzana.nostrummagica.entity.tasks;
 
 import com.google.common.base.Predicate;
 
-import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.ai.EntityAIPanic;
 
-public class EntityAIPanicGeneric<T extends EntityCreature> extends EntityAIPanic {
+public class EntityAIPanicGeneric<T extends CreatureEntity> extends EntityAIPanic {
 
 	private Predicate<T> filter;
 	private T creature;

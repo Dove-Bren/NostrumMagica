@@ -1,15 +1,13 @@
 package com.smanzana.nostrummagica.serializers;
 
-import java.io.IOException;
-
 import com.google.common.base.Optional;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializer;
+import net.minecraft.network.datasync.IDataSerializer;
 
-public class OptionalMagicElementDataSerializer implements DataSerializer<Optional<EMagicElement>> {
+public class OptionalMagicElementDataSerializer implements IDataSerializer<Optional<EMagicElement>> {
 
 	public static final OptionalMagicElementDataSerializer instance = new OptionalMagicElementDataSerializer();
 	
@@ -26,7 +24,7 @@ public class OptionalMagicElementDataSerializer implements DataSerializer<Option
 	}
 
 	@Override
-	public Optional<EMagicElement> read(PacketBuffer buf) throws IOException {
+	public Optional<EMagicElement> read(PacketBuffer buf)  {
 		if (buf.readBoolean()) {
 			return Optional.of(buf.readEnumValue(EMagicElement.class));
 		} else {

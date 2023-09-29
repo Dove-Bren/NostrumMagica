@@ -4,13 +4,13 @@ import java.util.Random;
 
 import com.google.common.base.Predicate;
 
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.EntityMoveHelper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
-public class EntityAIStayHomeTask<T extends EntityCreature> extends EntityAIBase {
+public class EntityAIStayHomeTask<T extends CreatureEntity> extends Goal {
 
 	private Predicate<T> filter;
 	private T creature;
@@ -81,7 +81,7 @@ public class EntityAIStayHomeTask<T extends EntityCreature> extends EntityAIBase
 	}
 
 	/**
-	 * Returns whether an in-progress EntityAIBase should continue executing
+	 * Returns whether an in-progress Goal should continue executing
 	 */
 	public boolean shouldContinueExecuting() {
 		EntityMoveHelper mover = creature.getMoveHelper();

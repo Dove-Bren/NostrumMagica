@@ -167,7 +167,7 @@ public abstract class EntityDragonFlying extends EntityDragon {
 	protected void entityStartFlying() {
 		if (!this.world.isRemote) {
 			this.moveHelper = new EntityDragon.DragonFlyMoveHelper(this);
-			this.navigator = new EntityDragon.PathNavigateDragonFlier(this, world);
+			this.navigator = new EntityDragon.PathNavigatorDragonFlier(this, world);
 			this.setFlyingAI();
 		}
 		this.addVelocity(Math.cos(this.rotationYaw) * .2, 0.5, Math.sin(this.rotationYaw) * .2);

@@ -4,11 +4,11 @@ import java.util.Random;
 
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.EntityMoveHelper;
 import net.minecraft.util.math.BlockPos;
 
-public class DragonFlyRandomTask extends EntityAIBase {
+public class DragonFlyRandomTask extends Goal {
 
 	private final EntityDragon parentEntity;
 
@@ -19,7 +19,7 @@ public class DragonFlyRandomTask extends EntityAIBase {
     }
 
     /**
-     * Returns whether the EntityAIBase should begin execution.
+     * Returns whether the Goal should begin execution.
      */
     public boolean shouldExecute()
     {
@@ -44,7 +44,7 @@ public class DragonFlyRandomTask extends EntityAIBase {
     }
 
     /**
-     * Returns whether an in-progress EntityAIBase should continue executing
+     * Returns whether an in-progress Goal should continue executing
      */
     public boolean shouldContinueExecuting()
     {

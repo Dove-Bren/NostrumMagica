@@ -1,17 +1,15 @@
 package com.smanzana.nostrummagica.serializers;
 
-import java.io.IOException;
-
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializer;
+import net.minecraft.network.datasync.IDataSerializer;
 
 /**
  * Doesn't support null Floats. Serializes them as 0.
  * @author Skyler
  *
  */
-public class FloatArraySerializer implements DataSerializer<Float[]> {
+public class FloatArraySerializer implements IDataSerializer<Float[]> {
 
 	public static final FloatArraySerializer instance = new FloatArraySerializer();
 	
@@ -29,7 +27,7 @@ public class FloatArraySerializer implements DataSerializer<Float[]> {
 	}
 
 	@Override
-	public Float[] read(PacketBuffer buf) throws IOException {
+	public Float[] read(PacketBuffer buf)  {
 		int len = buf.readInt();
 		Float[] array = new Float[len];
 		for (int i = 0; i < len; i++) {

@@ -44,7 +44,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityMoveHelper;
@@ -576,7 +576,7 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 		}
 	}
 	
-	static class AIRandomFly extends EntityAIBase {
+	static class AIRandomFly extends Goal {
 		private final EntityWisp parentEntity;
 
 		public AIRandomFly(EntityWisp wisp) {
@@ -585,7 +585,7 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 		}
 
 		/**
-		 * Returns whether the EntityAIBase should begin execution.
+		 * Returns whether the Goal should begin execution.
 		 */
 		public boolean shouldExecute() {
 			EntityMoveHelper entitymovehelper = this.parentEntity.getMoveHelper();
@@ -602,7 +602,7 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 		}
 
 		/**
-		 * Returns whether an in-progress EntityAIBase should continue executing
+		 * Returns whether an in-progress Goal should continue executing
 		 */
 		@Override
 		public boolean shouldContinueExecuting() {

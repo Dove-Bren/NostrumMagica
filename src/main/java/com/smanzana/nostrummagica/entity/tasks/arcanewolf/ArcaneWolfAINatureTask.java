@@ -10,10 +10,10 @@ import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.ArcaneWolfElementalType;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.potion.PotionEffect;
 
-public class ArcaneWolfAINatureTask extends EntityAIBase {
+public class ArcaneWolfAINatureTask extends Goal {
 
 	protected final EntityArcaneWolf wolf;
 	

@@ -237,7 +237,7 @@ public class RitualRecipe implements InfoScreenIndexed {
 					&& centerTE != null
 					&& centerTE instanceof CandleTileEntity) {
 				CandleTileEntity candle = (CandleTileEntity) centerTE;
-				type = candle.getType();
+				type = candle.getReagentType();
 			}
 			
 			reagents = (type == null ? null : new ReagentType[] {type});
@@ -262,7 +262,7 @@ public class RitualRecipe implements InfoScreenIndexed {
 						return RitualMatchInfo.Fail();
 					
 					CandleTileEntity candle = (CandleTileEntity) te;
-					reagentList.add(candle.getType());
+					reagentList.add(candle.getReagentType());
 				}
 				
 				if (reagentList.size() == 4) {

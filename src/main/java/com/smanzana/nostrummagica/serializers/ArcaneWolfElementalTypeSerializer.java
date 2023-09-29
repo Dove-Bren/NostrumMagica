@@ -1,14 +1,12 @@
 package com.smanzana.nostrummagica.serializers;
 
-import java.io.IOException;
-
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.ArcaneWolfElementalType;
 
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializer;
+import net.minecraft.network.datasync.IDataSerializer;
 
-public final class ArcaneWolfElementalTypeSerializer implements DataSerializer<ArcaneWolfElementalType> {
+public final class ArcaneWolfElementalTypeSerializer implements IDataSerializer<ArcaneWolfElementalType> {
 	
 	public static ArcaneWolfElementalTypeSerializer instance = new ArcaneWolfElementalTypeSerializer();
 	
@@ -22,7 +20,7 @@ public final class ArcaneWolfElementalTypeSerializer implements DataSerializer<A
 	}
 
 	@Override
-	public ArcaneWolfElementalType read(PacketBuffer buf) throws IOException {
+	public ArcaneWolfElementalType read(PacketBuffer buf) {
 		return buf.readEnumValue(ArcaneWolfElementalType.class);
 	}
 

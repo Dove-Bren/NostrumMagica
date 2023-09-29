@@ -11,10 +11,10 @@ import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 
 // Extend with some way to get gambits and spells, silly!
-public abstract class DragonGambittedSpellAttackTask<T extends EntityDragon & ITameDragon> extends EntityAIBase {
+public abstract class DragonGambittedSpellAttackTask<T extends EntityDragon & ITameDragon> extends Goal {
 	
 	protected T dragon;
 	protected int delay;

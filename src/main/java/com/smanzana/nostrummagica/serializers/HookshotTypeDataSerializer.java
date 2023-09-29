@@ -1,14 +1,12 @@
 package com.smanzana.nostrummagica.serializers;
 
-import java.io.IOException;
-
 import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
 
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializer;
+import net.minecraft.network.datasync.IDataSerializer;
 
-public class HookshotTypeDataSerializer implements DataSerializer<HookshotType> {
+public class HookshotTypeDataSerializer implements IDataSerializer<HookshotType> {
 	
 	public static final HookshotTypeDataSerializer instance = new HookshotTypeDataSerializer();
 	
@@ -22,7 +20,7 @@ public class HookshotTypeDataSerializer implements DataSerializer<HookshotType> 
 	}
 
 	@Override
-	public HookshotType read(PacketBuffer buf) throws IOException {
+	public HookshotType read(PacketBuffer buf)  {
 		return buf.readEnumValue(HookshotType.class);
 	}
 

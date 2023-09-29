@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.entity.tasks;
 
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -9,26 +10,30 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.pet.PetTargetMode;
 
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.EntityPredicate;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.EntityAITarget;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.TargetGoal;
 
-public class EntityAIPetTargetTask<T extends EntityCreature> extends EntityAITarget {
+public class PetTargetGoal<T extends CreatureEntity> extends TargetGoal {
+	
+	public static final EntityPredicate Filter = new EntityPredicate().setLineOfSiteRequired();
 	
 	protected T thePet;
 	protected LivingEntity theOwner;
 	protected int targetTicks;
 	
-	public EntityAIPetTargetTask(T petIn) {
+	public PetTargetGoal(T petIn) {
 		super(petIn, false);
 		this.thePet = petIn;
-		this.setMutexBits(1);
+		this.setMutexFlags(EnumSet.of(Goal.Flag.TARGET));
 	}
 
 	/**
-	 * Returns whether the EntityAIBase should begin execution.
+	 * Returns whether the Goal should begin execution.
 	 */
 	public boolean shouldExecute() {
 		final LivingEntity entitylivingbase = NostrumMagica.getOwner(thePet);
@@ -37,7 +42,7 @@ public class EntityAIPetTargetTask<T extends EntityCreature> extends EntityAITar
 			return false;
 		}
 		
-		final PetTargetMode mode = NostrumMagica.getPetCommandManager().getTargetMode(entitylivingbase);
+		final PetTargetMode mode = NostrumMagica.instance.getPetCommandManager().getTargetMode(entitylivingbase);
 		
 		if (mode == PetTargetMode.FREE) {
 			return false;
@@ -60,7 +65,7 @@ public class EntityAIPetTargetTask<T extends EntityCreature> extends EntityAITar
 					&& e != attacker
 					&& e != owner
 					&& !tamed.contains(e)
-					&& EntityAITarget.isSuitableTarget(attacker, (LivingEntity) e, false, true)
+					&& Filter.canTarget(attacker, (LivingEntity) e)
 					&& !NostrumMagica.IsSameTeam(attacker, (LivingEntity) e);
 		});
 		Collections.sort(entities, (a, b) -> {
@@ -74,18 +79,18 @@ public class EntityAIPetTargetTask<T extends EntityCreature> extends EntityAITar
 	}
 	
 	@Override
-	public void updateTask() {
+	public void tick() {
 		if (targetTicks > 0) {
 			targetTicks--;
 		}
 		
 		if (thePet.getAttackTarget() != null) {
-			if (thePet.getAttackTarget().isDead) {
+			if (!thePet.getAttackTarget().isAlive()) {
 				thePet.setAttackTarget(null);
 			}
 		}
 		
-		final PetTargetMode mode = NostrumMagica.getPetCommandManager().getTargetMode(theOwner);
+		final PetTargetMode mode = NostrumMagica.instance.getPetCommandManager().getTargetMode(theOwner);
 		switch (mode) {
 		case AGGRESSIVE:
 			if (thePet.getAttackTarget() == null && targetTicks <= 0) {
@@ -112,7 +117,7 @@ public class EntityAIPetTargetTask<T extends EntityCreature> extends EntityAITar
 	 */
 	@Override
 	public void startExecuting() {
-		updateTask();
+		tick();
 
 		super.startExecuting();
 	}

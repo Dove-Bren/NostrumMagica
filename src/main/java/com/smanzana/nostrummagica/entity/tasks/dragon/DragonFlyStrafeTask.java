@@ -3,9 +3,9 @@ package com.smanzana.nostrummagica.entity.tasks.dragon;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 
-public class DragonFlyStrafeTask<T extends EntityDragon> extends EntityAIBase {
+public class DragonFlyStrafeTask<T extends EntityDragon> extends Goal {
 
 	protected final T dragon;
 	protected final float maxAttackDistance;
@@ -17,7 +17,7 @@ public class DragonFlyStrafeTask<T extends EntityDragon> extends EntityAIBase {
 	public DragonFlyStrafeTask(T dragon, float maxDistance) {
 		this.dragon = dragon;
 		this.maxAttackDistance = maxDistance * maxDistance;
-		this.setMutexBits(3);
+		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 	}
 	
 	@Override

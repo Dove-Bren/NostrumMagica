@@ -4,9 +4,9 @@ import java.util.Date;
 
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonFlying;
 
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 
-public class DragonTakeoffLandTask extends EntityAIBase {
+public class DragonTakeoffLandTask extends Goal {
 	
 	private EntityDragonFlying dragon;
 	private static Date cur;
@@ -14,7 +14,7 @@ public class DragonTakeoffLandTask extends EntityAIBase {
 	public DragonTakeoffLandTask(EntityDragonFlying dragon) {
 		this.dragon = dragon;
 		
-		this.setMutexBits(3);
+		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 	}
 	
 	@Override

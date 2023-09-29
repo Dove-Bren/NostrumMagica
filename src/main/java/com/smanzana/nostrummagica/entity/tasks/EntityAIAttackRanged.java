@@ -5,12 +5,12 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IRangedAttackMob;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBow;
 import net.minecraft.util.Hand;
 
-public class EntityAIAttackRanged<T extends MobEntity> extends EntityAIBase
+public class EntityAIAttackRanged<T extends MobEntity> extends Goal
 {
 	protected final T entity;
 	private final double moveSpeedAmp;
@@ -28,7 +28,7 @@ public class EntityAIAttackRanged<T extends MobEntity> extends EntityAIBase
 		this.moveSpeedAmp = speedAmplifier;
 		this.attackCooldown = delay;
 		this.maxAttackDistance = maxDistance * maxDistance;
-		this.setMutexBits(3);
+		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 	}
 
 	public void setAttackCooldown(int cooldown) {
@@ -40,14 +40,14 @@ public class EntityAIAttackRanged<T extends MobEntity> extends EntityAIBase
 	}
 
 	/**
-	 * Returns whether the EntityAIBase should begin execution.
+	 * Returns whether the Goal should begin execution.
 	 */
 	public boolean shouldExecute() {
 		return this.entity.getAttackTarget() == null ? false : this.hasWeaponEquipped(entity);
 	}
 
 	/**
-	 * Returns whether an in-progress EntityAIBase should continue executing
+	 * Returns whether an in-progress Goal should continue executing
 	 */
 	public boolean shouldContinueExecuting() {
 		return (this.shouldExecute() || !this.entity.getNavigator().noPath()) && this.hasWeaponEquipped(entity);

@@ -2,11 +2,11 @@ package com.smanzana.nostrummagica.entity.tasks;
 
 import com.smanzana.nostrummagica.entity.ITameableEntity;
 
-import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 
-public class EntityAISitGeneric<T extends EntityCreature & ITameableEntity> extends EntityAIBase {
+public class EntityAISitGeneric<T extends CreatureEntity & ITameableEntity> extends Goal {
 	
 	private final T entity;
 
@@ -16,7 +16,7 @@ public class EntityAISitGeneric<T extends EntityCreature & ITameableEntity> exte
 	}
 
 	/**
-	 * Returns whether the EntityAIBase should begin execution.
+	 * Returns whether the Goal should begin execution.
 	 */
 	public boolean shouldExecute() {
 		if (!this.entity.isEntityTamed()) {

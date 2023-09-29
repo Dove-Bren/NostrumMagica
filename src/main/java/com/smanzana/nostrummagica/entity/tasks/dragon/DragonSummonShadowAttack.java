@@ -10,9 +10,9 @@ import com.smanzana.nostrummagica.entity.dragon.EntityShadowDragonRed;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 
-public class DragonSummonShadowAttack<T extends EntityDragon> extends EntityAIBase {
+public class DragonSummonShadowAttack<T extends EntityDragon> extends Goal {
 	
 	protected T dragon;
 	protected int delay;

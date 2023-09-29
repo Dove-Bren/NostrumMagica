@@ -7,10 +7,10 @@ import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.player.PlayerEntity;
 
-public class EntitySpellAttackTask<T extends MobEntity> extends EntityAIBase {
+public class EntitySpellAttackTask<T extends MobEntity> extends Goal {
 	
 	
 	protected T entity;

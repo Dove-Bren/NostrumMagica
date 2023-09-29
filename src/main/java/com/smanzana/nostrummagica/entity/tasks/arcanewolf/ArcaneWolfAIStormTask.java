@@ -7,11 +7,11 @@ import com.smanzana.nostrummagica.entity.EntityArcaneWolf.ArcaneWolfElementalTyp
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.init.SoundEvents;
 
-public class ArcaneWolfAIStormTask extends EntityAIBase {
+public class ArcaneWolfAIStormTask extends Goal {
 
 	protected final EntityArcaneWolf wolf;
 	
@@ -28,7 +28,7 @@ public class ArcaneWolfAIStormTask extends EntityAIBase {
 		
 		active = false;
 		
-		this.setMutexBits(3);
+		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 	}
 	
 	@Override

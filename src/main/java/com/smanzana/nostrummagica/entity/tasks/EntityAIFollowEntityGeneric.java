@@ -4,9 +4,9 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.pathfinding.PathNavigate;
+import net.minecraft.pathfinding.PathNavigator;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -14,13 +14,13 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
-public class EntityAIFollowEntityGeneric<T extends MobEntity> extends EntityAIBase {
+public class EntityAIFollowEntityGeneric<T extends MobEntity> extends Goal {
 	
 	private final T entity;
 	private LivingEntity theTarget;
 	private World theWorld;
 	private final double followSpeed;
-	private final PathNavigate petPathfinder;
+	private final PathNavigator petPathfinder;
 	private int timeToRecalcPath;
 	private float maxDist;
 	private float minDist;
@@ -40,7 +40,7 @@ public class EntityAIFollowEntityGeneric<T extends MobEntity> extends EntityAIBa
 		this.minDist = minDistIn;
 		this.maxDist = maxDistIn;
 		this.canTeleport = canTeleport;
-		this.setMutexBits(3);
+		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 		
 		this.theTarget = target;
 	}
@@ -54,7 +54,7 @@ public class EntityAIFollowEntityGeneric<T extends MobEntity> extends EntityAIBa
 	}
 
 	/**
-	 * Returns whether the EntityAIBase should begin execution.
+	 * Returns whether the Goal should begin execution.
 	 */
 	public boolean shouldExecute() {
 		LivingEntity entitylivingbase = this.getTarget(this.entity);
@@ -74,7 +74,7 @@ public class EntityAIFollowEntityGeneric<T extends MobEntity> extends EntityAIBa
 	}
 
 	/**
-	 * Returns whether an in-progress EntityAIBase should continue executing
+	 * Returns whether an in-progress Goal should continue executing
 	 */
 	public boolean shouldContinueExecuting() {
 		return !this.petPathfinder.noPath() && this.entity.getDistanceSq(this.theTarget) > (double)(this.maxDist * this.maxDist) && this.canFollow(entity);

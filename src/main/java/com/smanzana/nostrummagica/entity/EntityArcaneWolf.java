@@ -25,9 +25,9 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.effects.MagicBoostEffect;
 import com.smanzana.nostrummagica.effects.RootedEffect;
-import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowOwnerAdvanced;
-import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowOwnerGeneric;
-import com.smanzana.nostrummagica.entity.tasks.EntityAIPetTargetTask;
+import com.smanzana.nostrummagica.entity.tasks.FollowOwnerAdvancedGoal;
+import com.smanzana.nostrummagica.entity.tasks.FollowOwnerGenericGoal;
+import com.smanzana.nostrummagica.entity.tasks.PetTargetGoal;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfAIBarrierTask;
 import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfAIEldrichTask;
@@ -615,7 +615,7 @@ public class EntityArcaneWolf extends EntityWolf implements ITameableEntity, IEn
 				wolf.playSound(SoundEvents.ENTITY_WOLF_PANT, 1f, .8f);
 			}
 		});
-		this.tasks.addTask(priority++, new EntityAIFollowOwnerAdvanced<EntityArcaneWolf>(this, 1.5f, 0f, .5f));
+		this.tasks.addTask(priority++, new FollowOwnerAdvancedGoal<EntityArcaneWolf>(this, 1.5f, 0f, .5f));
 		this.tasks.addTask(priority++, new EntityAIFollowOwner(this, 1.0D, 10.0F, 2.0F));
 		//this.tasks.addTask(7, new EntityAIMate(this, 1.0D));
 		this.tasks.addTask(priority++, new EntityAIWanderAvoidWater(this, 1.0D));
@@ -624,7 +624,7 @@ public class EntityArcaneWolf extends EntityWolf implements ITameableEntity, IEn
 		this.tasks.addTask(priority++, new EntityAILookIdle(this));
 		
 		priority = 1;
-		this.targetTasks.addTask(priority++, new EntityAIPetTargetTask<EntityArcaneWolf>(this));
+		this.targetTasks.addTask(priority++, new PetTargetGoal<EntityArcaneWolf>(this));
 		this.targetTasks.addTask(priority++, new EntityAIOwnerHurtByTarget(this));
 		this.targetTasks.addTask(priority++, new EntityAIOwnerHurtTarget(this));
 		this.targetTasks.addTask(priority++, new EntityAIHurtByTarget(this, true, new Class[0]));
@@ -1845,7 +1845,7 @@ public class EntityArcaneWolf extends EntityWolf implements ITameableEntity, IEn
 			return false;
 		}
 		
-		return EntityAIFollowOwnerGeneric.TeleportAroundEntity(this, target);
+		return FollowOwnerGenericGoal.TeleportAroundEntity(this, target);
 	}
 	
 	protected List<Spell> getTargetSpells(LivingEntity target, List<Spell> listToAddTo) {

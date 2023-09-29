@@ -1,31 +1,30 @@
 package com.smanzana.nostrummagica.entity.tasks;
 
+import java.util.EnumSet;
+
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.entity.ITameableEntity;
 
-import net.minecraft.block.material.Material;
-import net.minecraft.block.BlockState;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.pathfinding.PathNavigate;
+import net.minecraft.pathfinding.PathNavigator;
 import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
-public class EntityAIFollowOwnerGeneric<T extends EntityCreature & ITameableEntity> extends EntityAIBase {
+public class FollowOwnerGenericGoal<T extends CreatureEntity & ITameableEntity> extends Goal {
 	
 	private final T thePet;
 	private LivingEntity theOwner;
 	private World theWorld;
 	private final double followSpeed;
-	private final PathNavigate petPathfinder;
+	private final PathNavigator petPathfinder;
 	private int timeToRecalcPath;
 	private float maxDist;
 	private float minDist;
@@ -33,24 +32,24 @@ public class EntityAIFollowOwnerGeneric<T extends EntityCreature & ITameableEnti
 	
 	protected Predicate<? super T> filter;
 
-	public EntityAIFollowOwnerGeneric(T thePetIn, double followSpeedIn, float minDistIn, float maxDistIn) {
+	public FollowOwnerGenericGoal(T thePetIn, double followSpeedIn, float minDistIn, float maxDistIn) {
 		this(thePetIn, followSpeedIn, minDistIn, maxDistIn, null);
 	}
 	
-	public EntityAIFollowOwnerGeneric(T thePetIn, double followSpeedIn, float minDistIn, float maxDistIn, Predicate<? super T> filter) {
+	public FollowOwnerGenericGoal(T thePetIn, double followSpeedIn, float minDistIn, float maxDistIn, Predicate<? super T> filter) {
 		this.thePet = thePetIn;
 		this.theWorld = thePetIn.world;
 		this.followSpeed = followSpeedIn;
 		this.petPathfinder = thePetIn.getNavigator();
 		this.minDist = minDistIn;
 		this.maxDist = maxDistIn;
-		this.setMutexBits(3);
+		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 		
 		this.filter = filter;
 	}
 
 	/**
-	 * Returns whether the EntityAIBase should begin execution.
+	 * Returns whether the Goal should begin execution.
 	 */
 	public boolean shouldExecute() {
 		LivingEntity entitylivingbase = this.thePet.getLivingOwner();
@@ -72,7 +71,7 @@ public class EntityAIFollowOwnerGeneric<T extends EntityCreature & ITameableEnti
 	}
 
 	/**
-	 * Returns whether an in-progress EntityAIBase should continue executing
+	 * Returns whether an in-progress Goal should continue executing
 	 */
 	public boolean shouldContinueExecuting() {
 		return !this.petPathfinder.noPath() && this.thePet.getDistanceSq(this.theOwner) > (double)(this.maxDist * this.maxDist) && !this.thePet.isEntitySitting();
@@ -101,8 +100,7 @@ public class EntityAIFollowOwnerGeneric<T extends EntityCreature & ITameableEnti
 	}
 	
 	protected static boolean IsEmptyBlock(World world, BlockPos pos) {
-		BlockState iblockstate = world.getBlockState(pos);
-		return iblockstate.getMaterial() == Material.AIR ? true : !iblockstate.isFullCube();
+		return world.isAirBlock(pos);
 	}
 	
 	public static boolean TeleportAroundEntity(Entity teleportingEntity, Entity targetEntity) {
@@ -124,7 +122,7 @@ public class EntityAIFollowOwnerGeneric<T extends EntityCreature & ITameableEnti
 				pos1.setPos(i + l, k - 1, j + i1);
 				pos2.setPos(i + l, k, j + i1);
 				pos3.setPos(i + l, k + 1, j + i1);
-				if ((l < 1 || i1 < 1 || l > 3 || i1 > 3) && theWorld.getBlockState(new BlockPos(pos1)).isSideSolid(theWorld, pos1, Direction.UP) && IsEmptyBlock(theWorld, pos2) && IsEmptyBlock(theWorld, pos3)) {
+				if ((l < 1 || i1 < 1 || l > 3 || i1 > 3) && theWorld.getBlockState(new BlockPos(pos1)).canEntitySpawn(theWorld, pos1, teleportingEntity.getType()) && IsEmptyBlock(theWorld, pos2) && IsEmptyBlock(theWorld, pos3)) {
 					teleportingEntity.setLocationAndAngles((double)((float)(i + l) + 0.5F), (double)k, (double)((float)(j + i1) + 0.5F), teleportingEntity.rotationYaw, teleportingEntity.rotationPitch);
 					if (teleportingEntity instanceof MobEntity) {
 						((MobEntity) teleportingEntity).getNavigator().clearPath();
@@ -140,7 +138,7 @@ public class EntityAIFollowOwnerGeneric<T extends EntityCreature & ITameableEnti
 	 * Updates the task
 	 */
 	public void updateTask() {
-		this.thePet.getLookHelper().setLookPositionWithEntity(this.theOwner, 10.0F, (float)this.thePet.getVerticalFaceSpeed());
+		this.thePet.getLookController().setLookPositionWithEntity(this.theOwner, 10.0F, (float)this.thePet.getVerticalFaceSpeed());
 
 		if (!this.thePet.isEntitySitting()) {
 			if (--this.timeToRecalcPath <= 0) {

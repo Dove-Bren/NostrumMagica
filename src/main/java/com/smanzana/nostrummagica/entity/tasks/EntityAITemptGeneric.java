@@ -4,18 +4,18 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 
-import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.ai.EntityAITempt;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.pathfinding.PathNavigateGround;
+import net.minecraft.pathfinding.PathNavigatorGround;
 
 // Copying and making extendable. >:(
 public class EntityAITemptGeneric extends EntityAITempt
 {
 	/** The entity using this AI that is tempted by the player. */
-	public final EntityCreature temptedEntity;
+	public final CreatureEntity temptedEntity;
 	public final double speed;
 	/** X position of player tempting this mob */
 	protected double targetX;
@@ -40,25 +40,25 @@ public class EntityAITemptGeneric extends EntityAITempt
 	/** Whether the entity using this AI will be scared by the tempter's sudden movement. */
 	public final boolean scaredByPlayerMovement;
 
-	public EntityAITemptGeneric(EntityCreature temptedEntityIn, double speedIn, Item temptItemIn, boolean scaredByPlayerMovementIn) {
+	public EntityAITemptGeneric(CreatureEntity temptedEntityIn, double speedIn, Item temptItemIn, boolean scaredByPlayerMovementIn) {
 		this(temptedEntityIn, speedIn, scaredByPlayerMovementIn, Sets.newHashSet(temptItemIn));
 	}
 
-	public EntityAITemptGeneric(EntityCreature temptedEntityIn, double speedIn, boolean scaredByPlayerMovementIn, Set<Item> temptItemIn) {
+	public EntityAITemptGeneric(CreatureEntity temptedEntityIn, double speedIn, boolean scaredByPlayerMovementIn, Set<Item> temptItemIn) {
 		super(temptedEntityIn, speedIn, scaredByPlayerMovementIn, temptItemIn);
 		this.temptedEntity = temptedEntityIn;
 		this.speed = speedIn;
 		this.temptItem = temptItemIn;
 		this.scaredByPlayerMovement = scaredByPlayerMovementIn;
-		this.setMutexBits(3);
+		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 
-		if (!(temptedEntityIn.getNavigator() instanceof PathNavigateGround)) {
+		if (!(temptedEntityIn.getNavigator() instanceof PathNavigatorGround)) {
 			throw new IllegalArgumentException("Unsupported mob type for TemptGoal");
 		}
 	}
 
 	/**
-	 * Returns whether the EntityAIBase should begin execution.
+	 * Returns whether the Goal should begin execution.
 	 */
 	public boolean shouldExecute() {
 		if (this.delayTemptCounter > 0) {
@@ -80,7 +80,7 @@ public class EntityAITemptGeneric extends EntityAITempt
 	}
 
 	/**
-	 * Returns whether an in-progress EntityAIBase should continue executing
+	 * Returns whether an in-progress Goal should continue executing
 	 */
 	public boolean shouldContinueExecuting() {
 		if (this.scaredByPlayerMovement) {
@@ -125,7 +125,7 @@ public class EntityAITemptGeneric extends EntityAITempt
 		this.isRunning = false;
 	}
 	
-	protected void moveToTemptingPlayer(EntityCreature tempted, PlayerEntity player) {
+	protected void moveToTemptingPlayer(CreatureEntity tempted, PlayerEntity player) {
 		if (this.temptedEntity.getDistanceSq(this.temptingPlayer) < 6.25D) {
 			this.temptedEntity.getNavigator().clearPath();
 		} else {

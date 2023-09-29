@@ -2,11 +2,11 @@ package com.smanzana.nostrummagica.entity.tasks;
 
 import com.smanzana.nostrummagica.entity.ITameableEntity;
 
-import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAITarget;
 
-public class EntityAIOwnerHurtByTargetGeneric<T extends EntityCreature & ITameableEntity> extends EntityAITarget {
+public class EntityAIOwnerHurtByTargetGeneric<T extends CreatureEntity & ITameableEntity> extends EntityAITarget {
 	
 	protected T theDefendingTameable;
 	protected LivingEntity theOwnerAttacker;
@@ -19,7 +19,7 @@ public class EntityAIOwnerHurtByTargetGeneric<T extends EntityCreature & ITameab
 	}
 
 	/**
-	 * Returns whether the EntityAIBase should begin execution.
+	 * Returns whether the Goal should begin execution.
 	 */
 	public boolean shouldExecute() {
 		if (!this.theDefendingTameable.isEntitySitting()) {

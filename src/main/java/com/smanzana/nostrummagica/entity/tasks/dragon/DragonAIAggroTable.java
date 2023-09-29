@@ -4,9 +4,9 @@ import com.smanzana.nostrummagica.entity.AggroTable;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 
-public class DragonAIAggroTable<E extends EntityDragon, T extends LivingEntity> extends EntityAIBase {
+public class DragonAIAggroTable<E extends EntityDragon, T extends LivingEntity> extends Goal {
 
 	private final E dragon;
 	private AggroTable<T> aggroTable;

@@ -13,10 +13,10 @@ import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.potion.PotionEffect;
 
-public class ArcaneWolfAIBarrierTask extends EntityAIBase {
+public class ArcaneWolfAIBarrierTask extends Goal {
 
 	protected final EntityArcaneWolf wolf;
 	

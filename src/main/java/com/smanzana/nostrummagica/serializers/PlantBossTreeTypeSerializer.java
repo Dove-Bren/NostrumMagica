@@ -1,14 +1,12 @@
 package com.smanzana.nostrummagica.serializers;
 
-import java.io.IOException;
-
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss.PlantBossTreeType;
 
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializer;
+import net.minecraft.network.datasync.IDataSerializer;
 
-public final class PlantBossTreeTypeSerializer implements DataSerializer<PlantBossTreeType> {
+public final class PlantBossTreeTypeSerializer implements IDataSerializer<PlantBossTreeType> {
 	
 	public static PlantBossTreeTypeSerializer instance = new PlantBossTreeTypeSerializer();
 	
@@ -22,7 +20,7 @@ public final class PlantBossTreeTypeSerializer implements DataSerializer<PlantBo
 	}
 
 	@Override
-	public PlantBossTreeType read(PacketBuffer buf) throws IOException {
+	public PlantBossTreeType read(PacketBuffer buf)  {
 		return buf.readEnumValue(PlantBossTreeType.class);
 	}
 

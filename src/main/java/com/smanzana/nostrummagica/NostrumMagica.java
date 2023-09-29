@@ -16,19 +16,8 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.Lists;
 import com.mojang.brigadier.CommandDispatcher;
-import com.smanzana.nostrummagica.blocks.ActiveHopper;
-import com.smanzana.nostrummagica.blocks.Candle;
-import com.smanzana.nostrummagica.blocks.DungeonBlock;
-import com.smanzana.nostrummagica.blocks.ItemDuct;
-import com.smanzana.nostrummagica.blocks.LoreTable;
-import com.smanzana.nostrummagica.blocks.ManaArmorerBlock;
-import com.smanzana.nostrummagica.blocks.MimicBlock;
-import com.smanzana.nostrummagica.blocks.ModificationTable;
+import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
-import com.smanzana.nostrummagica.blocks.ParadoxMirrorBlock;
-import com.smanzana.nostrummagica.blocks.PutterBlock;
-import com.smanzana.nostrummagica.blocks.SorceryPortal;
-import com.smanzana.nostrummagica.blocks.TeleportRune;
 import com.smanzana.nostrummagica.blocks.TemporaryTeleportationPortal;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -64,9 +53,9 @@ import com.smanzana.nostrummagica.entity.ITameableEntity;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
-import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowOwnerAdvanced;
-import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowOwnerGeneric;
-import com.smanzana.nostrummagica.entity.tasks.EntityAIPetTargetTask;
+import com.smanzana.nostrummagica.entity.tasks.FollowOwnerAdvancedGoal;
+import com.smanzana.nostrummagica.entity.tasks.FollowOwnerGenericGoal;
+import com.smanzana.nostrummagica.entity.tasks.PetTargetGoal;
 import com.smanzana.nostrummagica.integration.aetheria.AetheriaClientProxy;
 import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
 import com.smanzana.nostrummagica.integration.baubles.BaublesClientProxy;
@@ -86,7 +75,6 @@ import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicCharm;
 import com.smanzana.nostrummagica.items.NostrumItemTags;
 import com.smanzana.nostrummagica.items.NostrumItems;
-import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
@@ -166,7 +154,6 @@ import com.smanzana.nostrummagica.trials.TrialLightning;
 import com.smanzana.nostrummagica.trials.TrialPhysical;
 import com.smanzana.nostrummagica.trials.TrialWind;
 import com.smanzana.nostrummagica.utils.Entities;
-import com.smanzana.nostrummagica.world.NostrumChunkLoader;
 import com.smanzana.nostrummagica.world.NostrumDungeonGenerator;
 import com.smanzana.nostrummagica.world.NostrumLootHandler;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensionMapper;
@@ -180,6 +167,7 @@ import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.ai.goal.FollowOwnerGoal;
 import net.minecraft.entity.ai.goal.GoalSelector;
 import net.minecraft.entity.ai.goal.PrioritizedGoal;
 import net.minecraft.entity.boss.dragon.EnderDragonPartEntity;
@@ -297,8 +285,6 @@ public class NostrumMagica {
 		musica.preInit();
 
 		RitualRegistry.instance();
-
-		NostrumChunkLoader.instance();
 
 		SpellTomeEnhancement.initDefaultEnhancements();
 		
@@ -1097,7 +1083,7 @@ public class NostrumMagica {
 						new OutcomeSpawnItem(new ItemStack(NostrumItems.mirrorShieldImproved))));
 
 		RitualRegistry.instance()
-				.addRitual(RitualRecipe.createTier2("spawn_sorcery_portal", new ItemStack(SorceryPortal.instance()),
+				.addRitual(RitualRecipe.createTier2("spawn_sorcery_portal", new ItemStack(NostrumBlocks.sorceryPortal),
 						EMagicElement.ENDER,
 						new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.BLACK_PEARL, ReagentType.MANDRAKE_ROOT,
 								ReagentType.MANI_DUST },
@@ -1425,7 +1411,7 @@ public class NostrumMagica {
 				new RRequirementResearch("thanos_staff"), new OutcomeSpawnItem(new ItemStack(NostrumItems.thanosStaff))));
 
 		// Lore Table
-		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("lore_table", new ItemStack(LoreTable.instance()),
+		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("lore_table", new ItemStack(NostrumBlocks.loreTable),
 				null,
 				new ReagentType[] {
 						ReagentType.MANI_DUST, ReagentType.GINSENG, ReagentType.CRYSTABLOOM, ReagentType.MANI_DUST },
@@ -1433,23 +1419,23 @@ public class NostrumMagica {
 				new Ingredient[] { Ingredient.fromTag(ItemTags.PLANKS),
 						Ingredient.fromItems(Items.PAPER), Ingredient.fromItems(Blocks.CRAFTING_TABLE),
 						Ingredient.fromTag(ItemTags.PLANKS) },
-				new RRequirementResearch("loretable"), new OutcomeSpawnItem(new ItemStack(LoreTable.instance()))));
+				new RRequirementResearch("loretable"), new OutcomeSpawnItem(new ItemStack(NostrumBlocks.loreTable))));
 
 		// Modification Table
 		RitualRegistry.instance()
-				.addRitual(RitualRecipe.createTier3("modification_table", new ItemStack(ModificationTable.instance()),
+				.addRitual(RitualRecipe.createTier3("modification_table", new ItemStack(NostrumBlocks.modificationTable),
 						null, new ReagentType[] { ReagentType.MANI_DUST, ReagentType.BLACK_PEARL,
 								ReagentType.CRYSTABLOOM, ReagentType.BLACK_PEARL },
 						Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge),
 						new Ingredient[] { Ingredient.fromTag(ItemTags.PLANKS),
-								Ingredient.fromItems(Items.PAPER), Ingredient.fromItems(LoreTable.instance()),
+								Ingredient.fromItems(Items.PAPER), Ingredient.fromItems(NostrumBlocks.loreTable),
 								Ingredient.fromTag(ItemTags.PLANKS) },
 						new RRequirementResearch("modification_table"),
-						new OutcomeSpawnItem(new ItemStack(ModificationTable.instance()))));
+						new OutcomeSpawnItem(new ItemStack(NostrumBlocks.modificationTable))));
 
 		// Teleport Runes
 		RitualRegistry.instance()
-				.addRitual(RitualRecipe.createTier3("teleportrune", new ItemStack(TeleportRune.instance()),
+				.addRitual(RitualRecipe.createTier3("teleportrune", new ItemStack(NostrumBlocks.teleportRune),
 						EMagicElement.ENDER,
 						new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.SKY_ASH, ReagentType.MANDRAKE_ROOT,
 								ReagentType.BLACK_PEARL },
@@ -1459,29 +1445,29 @@ public class NostrumMagica {
 								Ingredient.fromItems(NostrumItems.chalkItem),
 								Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall) },
 						new RRequirementResearch("teleportrune"),
-						new OutcomeSpawnItem(new ItemStack(TeleportRune.instance(), 2))));
+						new OutcomeSpawnItem(new ItemStack(NostrumBlocks.teleportRune, 2))));
 
 		// Putter
 		RitualRegistry.instance()
-				.addRitual(RitualRecipe.createTier2("putter", new ItemStack(PutterBlock.instance()), null,
+				.addRitual(RitualRecipe.createTier2("putter", new ItemStack(NostrumBlocks.putterBlock), null,
 						new ReagentType[] { ReagentType.MANDRAKE_ROOT, ReagentType.SPIDER_SILK, ReagentType.BLACK_PEARL,
 								ReagentType.BLACK_PEARL },
 						new ItemStack(Blocks.DROPPER), new RRequirementResearch("putter"),
-						new OutcomeSpawnItem(new ItemStack(PutterBlock.instance()))));
+						new OutcomeSpawnItem(new ItemStack(NostrumBlocks.putterBlock))));
 
 		// Active Hopper
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("active_hopper",
-				new ItemStack(ActiveHopper.instance), null, new ReagentType[] { ReagentType.MANDRAKE_ROOT,
+				new ItemStack(NostrumBlocks.activeHopper), null, new ReagentType[] { ReagentType.MANDRAKE_ROOT,
 						ReagentType.SPIDER_SILK, ReagentType.GINSENG, ReagentType.CRYSTABLOOM },
 				Ingredient.fromItems(Blocks.HOPPER),
 				new Ingredient[] { Ingredient.fromStacks(new ItemStack(Blocks.HOPPER)), Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_REDSTONE),
 						Ingredient.fromStacks(new ItemStack(Blocks.HOPPER)), Ingredient.fromStacks(new ItemStack(Blocks.HOPPER)) },
 				new RRequirementResearch("active_hopper"),
-				new OutcomeSpawnItem(new ItemStack(ActiveHopper.instance, 4))));
+				new OutcomeSpawnItem(new ItemStack(NostrumBlocks.activeHopper, 4))));
 
 		// Item Duct
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3(
-				"item_duct", new ItemStack(ItemDuct.instance), null, new ReagentType[] { ReagentType.SPIDER_SILK,
+				"item_duct", new ItemStack(NostrumBlocks.itemDuct), null, new ReagentType[] { ReagentType.SPIDER_SILK,
 						ReagentType.SPIDER_SILK, ReagentType.GINSENG, ReagentType.MANDRAKE_ROOT },
 				Ingredient.fromItems(Blocks.HOPPER),
 				new Ingredient[] { Ingredient.fromTag(Tags.Items.INGOTS_IRON),
@@ -1489,10 +1475,10 @@ public class NostrumMagica {
 						Ingredient.fromTag(Tags.Items.INGOTS_IRON),
 						Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_REDSTONE),
 						},
-				new RRequirementResearch("item_duct"), new OutcomeSpawnItem(new ItemStack(ItemDuct.instance, 16))));
+				new RRequirementResearch("item_duct"), new OutcomeSpawnItem(new ItemStack(NostrumBlocks.itemDuct, 16))));
 
 		// Facade
-		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("mimic_facade", new ItemStack(MimicBlock.facade()),
+		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("mimic_facade", new ItemStack(NostrumBlocks.mimicFacade),
 				null,
 				new ReagentType[] {
 						ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.GRAVE_DUST, ReagentType.GINSENG },
@@ -1502,20 +1488,20 @@ public class NostrumMagica {
 						Ingredient.fromItems(NostrumItems.reagentManiDust),
 						Ingredient.fromItems(Items.GLOWSTONE)
 						},
-				new RRequirementResearch("magicfacade"), new OutcomeSpawnItem(new ItemStack(MimicBlock.facade(), 8))));
+				new RRequirementResearch("magicfacade"), new OutcomeSpawnItem(new ItemStack(NostrumBlocks.mimicFacade, 8))));
 
 		// Door
-		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("mimic_door", new ItemStack(MimicBlock.door()),
+		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("mimic_door", new ItemStack(NostrumBlocks.mimicDoor),
 				null,
 				new ReagentType[] {
 						ReagentType.GRAVE_DUST, ReagentType.CRYSTABLOOM, ReagentType.GRAVE_DUST, ReagentType.GINSENG },
 				Ingredient.fromItems(Items.IRON_DOOR),
-				new Ingredient[] { Ingredient.fromStacks(new ItemStack(MimicBlock.facade())),
-						Ingredient.fromStacks(new ItemStack(MimicBlock.facade())),
-						Ingredient.fromStacks(new ItemStack(MimicBlock.facade())),
-						Ingredient.fromStacks(new ItemStack(MimicBlock.facade()))
+				new Ingredient[] { Ingredient.fromStacks(new ItemStack(NostrumBlocks.mimicFacade)),
+						Ingredient.fromStacks(new ItemStack(NostrumBlocks.mimicFacade)),
+						Ingredient.fromStacks(new ItemStack(NostrumBlocks.mimicFacade)),
+						Ingredient.fromStacks(new ItemStack(NostrumBlocks.mimicFacade))
 						},
-				new RRequirementResearch("magicfacade"), new OutcomeSpawnItem(new ItemStack(MimicBlock.door(), 1))));
+				new RRequirementResearch("magicfacade"), new OutcomeSpawnItem(new ItemStack(NostrumBlocks.mimicDoor, 1))));
 
 		// Dragon revive
 		RitualRegistry.instance()
@@ -1565,7 +1551,7 @@ public class NostrumMagica {
 
 		// Paradox Mirror
 		RitualRegistry.instance()
-				.addRitual(RitualRecipe.createTier3("paradox_mirror", new ItemStack(ParadoxMirrorBlock.instance()),
+				.addRitual(RitualRecipe.createTier3("paradox_mirror", new ItemStack(NostrumBlocks.paradoxMirror),
 						EMagicElement.ENDER, new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST,
 								ReagentType.MANDRAKE_ROOT, ReagentType.MANDRAKE_ROOT },
 						Ingredient.fromTag(Tags.Items.GLASS_PANES),
@@ -1575,12 +1561,12 @@ public class NostrumMagica {
 								Ingredient.fromTag(Tags.Items.GEMS_EMERALD)
 								},
 						new RRequirementResearch("paradox_mirrors"),
-						new OutcomeSpawnItem(new ItemStack(ParadoxMirrorBlock.instance(), 2))));
+						new OutcomeSpawnItem(new ItemStack(NostrumBlocks.paradoxMirror, 2))));
 
 		// Mana Armorer
 		RitualRegistry.instance()
 				.addRitual(RitualRecipe
-						.createTier3("mana_armorer", new ItemStack(ManaArmorerBlock.instance()), EMagicElement.ICE,
+						.createTier3("mana_armorer", new ItemStack(NostrumBlocks.manaArmorerBlock), EMagicElement.ICE,
 								new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANI_DUST,
 										ReagentType.CRYSTABLOOM, ReagentType.MANDRAKE_ROOT },
 								Ingredient.fromItems(Items.END_CRYSTAL),
@@ -1589,7 +1575,7 @@ public class NostrumMagica {
 										Ingredient.fromTag(NostrumItemTags.Items.SlabBalanced),
 										Ingredient.fromItems(NostrumItems.dragonEggFragment) },
 								new RRequirementResearch("mana_armor"),
-								new OutcomeSpawnItem(new ItemStack(ManaArmorerBlock.instance(), 1))));
+								new OutcomeSpawnItem(new ItemStack(NostrumBlocks.manaArmorerBlock, 1))));
 
 //		RitualRegistry.instance().addRitual(
 //				RitualRecipe.createTier2("ritual.form_obelisk.name", EMagicElement.ENDER,
@@ -1968,7 +1954,7 @@ public class NostrumMagica {
 		NostrumResearchTab.MAGICA = new NostrumResearchTab("magica", new ItemStack(NostrumItems.spellTomeCombat));
 		NostrumResearchTab.MYSTICISM = new NostrumResearchTab("mysticism", new ItemStack(NostrumItems.crystalSmall));
 		NostrumResearchTab.OUTFITTING = new NostrumResearchTab("outfitting", new ItemStack(NostrumItems.mageStaff));
-		NostrumResearchTab.TINKERING = new NostrumResearchTab("tinkering", new ItemStack(PutterBlock.instance()));
+		NostrumResearchTab.TINKERING = new NostrumResearchTab("tinkering", new ItemStack(NostrumBlocks.putterBlock));
 		NostrumResearchTab.ADVANCED_MAGICA = new NostrumResearchTab("advanced_magica", new ItemStack(NostrumItems.thanoPendant));
 
 		// Then register researches
@@ -2015,7 +2001,7 @@ public class NostrumMagica {
 						false, new ItemStack(NostrumItems.infusedGemUnattuned));
 
 		NostrumResearch.startBuilding().parent("rituals").build("candles", NostrumResearchTab.MAGICA, Size.NORMAL, 2, 2,
-				false, new ItemStack(Candle.instance()));
+				false, new ItemStack(NostrumBlocks.candle));
 
 		NostrumResearch.startBuilding().hiddenParent("geotokens").parent("rituals").lore(NostrumItems.positionToken)
 				.spellComponent(EMagicElement.ENDER, EAlteration.GROWTH)
@@ -2043,7 +2029,7 @@ public class NostrumMagica {
 
 		NostrumResearch.startBuilding().hiddenParent("spellcraft").parent("rituals")
 				.reference("ritual::lore_table", "ritual.lore_table.name").build("loretable", NostrumResearchTab.MAGICA,
-						Size.NORMAL, 2, 0, true, new ItemStack(LoreTable.instance()));
+						Size.NORMAL, 2, 0, true, new ItemStack(NostrumBlocks.loreTable));
 
 		// Mysticism Tab (Resources)
 		NostrumResearch.startBuilding().hiddenParent("rituals").lore(NostrumItems.reagentMandrakeRoot)
@@ -2195,37 +2181,37 @@ public class NostrumMagica {
 				.quest("lvl10").reference("builtin::guides::obelisks", "info.obelisks.name")
 				.reference("ritual::create_obelisk", "ritual.create_obelisk.name").build("obelisks",
 						NostrumResearchTab.TINKERING, Size.GIANT, 2, 2, true,
-						new ItemStack(DungeonBlock.instance()));
+						new ItemStack(NostrumBlocks.dungeonBlock));
 
 		NostrumResearch.startBuilding().hiddenParent("markrecall").parent("obelisks")
 				.reference("ritual::spawn_sorcery_portal", "ritual.spawn_sorcery_portal.name").build("sorceryportal",
-						NostrumResearchTab.TINKERING, Size.NORMAL, 2, 3, true, new ItemStack(SorceryPortal.instance()));
+						NostrumResearchTab.TINKERING, Size.NORMAL, 2, 3, true, new ItemStack(NostrumBlocks.sorceryPortal));
 
 		NostrumResearch.startBuilding().parent("geogems").hiddenParent("markrecall").lore(NostrumItems.positionCrystal)
 				.quest("lvly").reference("ritual::teleportrune", "ritual.teleportrune.name").build("teleportrune",
-						NostrumResearchTab.TINKERING, Size.NORMAL, 2, 0, true, new ItemStack(TeleportRune.instance()));
+						NostrumResearchTab.TINKERING, Size.NORMAL, 2, 0, true, new ItemStack(NostrumBlocks.teleportRune));
 
 		NostrumResearch.startBuilding().parent("geogems").hiddenParent("item_duct").lore(NostrumItems.positionCrystal)
 				.quest("lvly").reference("ritual::paradox_mirror", "ritual.paradox_mirror.name")
 				.build("paradox_mirrors", NostrumResearchTab.TINKERING, Size.NORMAL, 3, 0, true,
-						new ItemStack(ParadoxMirrorBlock.instance()));
+						new ItemStack(NostrumBlocks.paradoxMirror));
 
 		NostrumResearch.startBuilding().hiddenParent("rituals").hiddenParent("magic_token")
 				.reference("ritual::putter", "ritual.putter.name").build("putter", NostrumResearchTab.TINKERING,
-						Size.NORMAL, -1, -1, true, new ItemStack(PutterBlock.instance()));
+						Size.NORMAL, -1, -1, true, new ItemStack(NostrumBlocks.putterBlock));
 
 		NostrumResearch.startBuilding().parent("putter").reference("ritual::active_hopper", "ritual.active_hopper.name")
 				.build("active_hopper", NostrumResearchTab.TINKERING, Size.NORMAL, -1, 0, true,
-						new ItemStack(ActiveHopper.instance));
+						new ItemStack(NostrumBlocks.activeHopper));
 
 		NostrumResearch.startBuilding().parent("active_hopper").reference("ritual::item_duct", "ritual.item_duct.name")
 				.build("item_duct", NostrumResearchTab.TINKERING, Size.LARGE, -1, 1, true,
-						new ItemStack(ItemDuct.instance));
+						new ItemStack(NostrumBlocks.itemDuct));
 
 		NostrumResearch.startBuilding().hiddenParent("rituals")
 				.reference("ritual::mimic_facade", "ritual.mimic_facade.name")
 				.reference("ritual::mimic_door", "ritual.mimic_door.name").build("magicfacade",
-						NostrumResearchTab.TINKERING, Size.NORMAL, -2, -1, true, new ItemStack(MimicBlock.facade()));
+						NostrumResearchTab.TINKERING, Size.NORMAL, -2, -1, true, new ItemStack(NostrumBlocks.mimicFacade));
 
 		// Advanced Magica
 		{
@@ -2248,7 +2234,7 @@ public class NostrumMagica {
 				.hiddenParent("spelltomes_advanced")
 				.reference("ritual::modification_table", "ritual.modification_table.name").build("modification_table",
 						NostrumResearchTab.ADVANCED_MAGICA, Size.GIANT, 0, -1, true,
-						new ItemStack(ModificationTable.instance()));
+						new ItemStack(NostrumBlocks.modificationTable));
 
 		NostrumResearch.startBuilding().hiddenParent("vani").lore(NostrumItems.roseBlood)
 				.reference("ritual::form_essential_ooze", "ritual.form_essential_ooze.name")
@@ -2287,7 +2273,7 @@ public class NostrumMagica {
 		NostrumResearch.startBuilding().hiddenParent("enchanted_armor_adv").hiddenParent("soul_daggers").quest("lvl10")
 				.reference("ritual::mana_armorer", "ritual.mana_armorer.name").build("mana_armor",
 						NostrumResearchTab.ADVANCED_MAGICA, Size.GIANT, 1, 0, true,
-						new ItemStack(ManaArmorerBlock.instance()));
+						new ItemStack(NostrumBlocks.manaArmorerBlock));
 
 		// NostrumResearchTab tab, Size size, int x, int y, boolean hidden, ItemStack
 		// icon
@@ -2898,14 +2884,14 @@ public class NostrumMagica {
 
 			// Scan for existing task
 			for (PrioritizedGoal entry : goals) {
-				if (entry.getGoal() instanceof EntityAIFollowOwnerAdvanced) {
+				if (entry.getGoal() instanceof FollowOwnerAdvancedGoal) {
 					if (existingTask == null) {
 						existingTask = entry;
 					} else if (existingTask.getPriority() > entry.getPriority()) {
 						existingTask = entry; // cause > priority means less priority lol
 					}
-				} else if (entry.getGoal() instanceof EntityAIFollowOwner
-						|| entry.getGoal() instanceof EntityAIFollowOwnerGeneric) {
+				} else if (entry.getGoal() instanceof FollowOwnerGoal
+						|| entry.getGoal() instanceof FollowOwnerGenericGoal) {
 					if (followTask == null) {
 						followTask = entry;
 					} else if (followTask.getPriority() > entry.getPriority()) {
@@ -2916,7 +2902,7 @@ public class NostrumMagica {
 
 			if (existingTask == null) {
 				// Gotta inject task. May have to make space for it.
-				EntityAIFollowOwnerAdvanced<MobEntity> task = new EntityAIFollowOwnerAdvanced<MobEntity>(living,
+				FollowOwnerAdvancedGoal<MobEntity> task = new FollowOwnerAdvancedGoal<MobEntity>(living,
 						1.5f, 0f, .5f);
 				if (followTask == null) {
 					// Can just add at end
@@ -2947,7 +2933,7 @@ public class NostrumMagica {
 
 			// Scan for existing task
 			for (PrioritizedGoal entry : targetGoals) {
-				if (entry.getGoal() instanceof EntityAIPetTargetTask) {
+				if (entry.getGoal() instanceof PetTargetGoal) {
 					hasTaskAlready = true;
 					break;
 				}
@@ -2956,7 +2942,7 @@ public class NostrumMagica {
 			if (!hasTaskAlready) {
 				List<PrioritizedGoal> removes = Lists.newArrayList(targetGoals);
 
-				living.targetSelector.addGoal(1, new EntityAIPetTargetTask<EntityCreature>(creature));
+				living.targetSelector.addGoal(1, new PetTargetGoal<CreatureEntity>(creature));
 				for (PrioritizedGoal entry : removes) {
 					living.targetSelector.removeGoal(entry.getGoal());
 					living.targetSelector.addGoal(entry.getPriority() + 1, entry.getGoal());

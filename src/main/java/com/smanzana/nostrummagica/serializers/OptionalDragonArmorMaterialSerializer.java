@@ -1,16 +1,14 @@
 package com.smanzana.nostrummagica.serializers;
 
-import java.io.IOException;
-
 import com.google.common.base.Optional;
 import com.smanzana.nostrummagica.items.DragonArmor;
 import com.smanzana.nostrummagica.items.DragonArmor.DragonArmorMaterial;
 
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializer;
+import net.minecraft.network.datasync.IDataSerializer;
 
-public final class OptionalDragonArmorMaterialSerializer implements DataSerializer<Optional<DragonArmor.DragonArmorMaterial>> {
+public final class OptionalDragonArmorMaterialSerializer implements IDataSerializer<Optional<DragonArmor.DragonArmorMaterial>> {
 	
 	public static final OptionalDragonArmorMaterialSerializer instance = new OptionalDragonArmorMaterialSerializer();
 	
@@ -27,7 +25,7 @@ public final class OptionalDragonArmorMaterialSerializer implements DataSerializ
 	}
 
 	@Override
-	public Optional<DragonArmor.DragonArmorMaterial> read(PacketBuffer buf) throws IOException {
+	public Optional<DragonArmor.DragonArmorMaterial> read(PacketBuffer buf)  {
 		return buf.readBoolean() ? Optional.of(buf.readEnumValue(DragonArmor.DragonArmorMaterial.class)) : Optional.absent();
 	}
 
