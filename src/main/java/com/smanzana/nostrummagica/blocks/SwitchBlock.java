@@ -1,26 +1,26 @@
 package com.smanzana.nostrummagica.blocks;
 
-import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.tiles.SwitchBlockTileEntity;
 import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.tiles.SwitchBlockTileEntity;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemEnderEye;
+import net.minecraft.item.EnderEyeItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.pathfinding.PathType;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.VoxelShape;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -34,24 +34,14 @@ public class SwitchBlock extends Block {
 	
 	protected static final VoxelShape SWITCH_BLOCK_AABB = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 1D, 0.2D, 1D);
 
-	public static String ID = "switch_block";
-	
-	private static SwitchBlock instance = null;
-	public static SwitchBlock instance() {
-			if (instance == null)
-				instance = new SwitchBlock();
-			
-			return instance;
-	}
+	public static final String ID = "switch_block";
 	
 	public SwitchBlock() {
-		super(Material.BARRIER, MapColor.DIAMOND);
-		this.setUnlocalizedName(ID);
-		this.setHardness(500.0f);
-		this.setResistance(900.0f);
-		this.setBlockUnbreakable();
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setSoundType(SoundType.STONE);
+		super(Block.Properties.create(Material.BARRIER)
+				.hardnessAndResistance(-1.0F, 3600000.8F)
+				.noDrops()
+				.lightValue(8)
+				);
 	}
 	
 	@Override
@@ -60,49 +50,39 @@ public class SwitchBlock extends Block {
     }
 	
 	@Override
-	public int getLightValue(BlockState state, IBlockAccess world, BlockPos pos) {
-		return 8;
-	}
-	
-	@Override
-	public VoxelShape getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
+	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		return SWITCH_BLOCK_AABB;
 	}
 	
-	@Override
-	public boolean isOpaqueCube(BlockState state) {
-		return false;
-	}
+//	@Override
+//	public boolean isOpaqueCube(BlockState state) {
+//		return false;
+//	}
+//	
+//	@Override
+//	public boolean isFullCube(BlockState state) {
+//		return false;
+//	}
+	
+//	@Override
+//	public boolean isReplaceable(IBlockAccess worldIn, BlockPos pos) {
+//        return false;
+//    }
 	
 	@Override
-	public boolean isFullCube(BlockState state) {
-		return false;
-	}
-	
-	@Override
-	public boolean isReplaceable(IBlockAccess worldIn, BlockPos pos) {
-        return false;
-    }
-	
-	@Override
-	public int getLightOpacity(BlockState state, IBlockAccess world, BlockPos pos) {
+	public int getOpacity(BlockState state, IBlockReader world, BlockPos pos) {
 		return 0;
 	}
 	
 	@Override
-	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
-		return false;
-	}
-	
-	@Override
-	public VoxelShape getCollisionBoundingBox(BlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-		return NULL_AABB;
+	public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+		return VoxelShapes.empty();
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public EnumBlockRenderType getRenderType(BlockState state) {
-		return EnumBlockRenderType.INVISIBLE;
+	public BlockRenderType getRenderType(BlockState state) {
+		return BlockRenderType.INVISIBLE;
 	}
 	
 	@Override
@@ -111,18 +91,18 @@ public class SwitchBlock extends Block {
 	}
 	
 	@Override
-	public TileEntity createTileEntity(World world, BlockState state) {
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		return new SwitchBlockTileEntity();
 	}
 	
-	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) { broke();
-		super.breakBlock(world, pos, state);
-		world.removeTileEntity(pos);
-	}
+//	@Override
+//	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+//		super.breakBlock(world, pos, state);
+//		world.removeTileEntity(pos);
+//	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
 		if (worldIn.isRemote || !playerIn.isCreative()) {
 			return false;
 		}
@@ -131,7 +111,7 @@ public class SwitchBlock extends Block {
 		
 		if (!heldItem.isEmpty() && heldItem.getItem() instanceof PositionCrystal) {
 			BlockPos heldPos = PositionCrystal.getBlockPosition(heldItem);
-			if (heldPos != null && PositionCrystal.getDimension(heldItem) == worldIn.provider.getDimension()) {
+			if (heldPos != null && PositionCrystal.getDimension(heldItem) == worldIn.getDimension().getType().getId()) {
 				TileEntity te = worldIn.getTileEntity(pos);
 				if (te != null) {
 					SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;
@@ -140,7 +120,7 @@ public class SwitchBlock extends Block {
 				}
 			}
 			return true;
-		} else if (!heldItem.isEmpty() && heldItem.getItem() instanceof ItemEnderEye) {
+		} else if (!heldItem.isEmpty() && heldItem.getItem() instanceof EnderEyeItem) {
 			TileEntity te = worldIn.getTileEntity(pos);
 			if (te != null) {
 				SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;

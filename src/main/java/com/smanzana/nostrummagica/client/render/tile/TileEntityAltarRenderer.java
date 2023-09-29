@@ -2,10 +2,10 @@ package com.smanzana.nostrummagica.client.render.tile;
 
 import org.lwjgl.opengl.GL11;
 
-import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
-
 import net.minecraft.client.Minecraft;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.smanzana.nostrummagica.tiles.AltarTileEntity;
+
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;

@@ -12,12 +12,12 @@ import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.IAetherInfusableTileEntity;
-import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.integration.aetheria.items.ItemAetherLens;
 import com.smanzana.nostrummagica.integration.aetheria.items.ItemAetherLens.LensType;
 import com.smanzana.nostrummagica.items.IAetherInfuserLens;
+import com.smanzana.nostrummagica.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.utils.Inventories.ItemStackArrayWrapper;
 import com.smanzana.nostrummagica.utils.WorldUtil;
 

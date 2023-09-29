@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.blocks.tiles;
+package com.smanzana.nostrummagica.tiles;
 
 import javax.annotation.Nonnull;
 
@@ -11,7 +11,7 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -24,7 +24,7 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	private boolean hideItem;
 	
 	public AltarTileEntity() {
-		
+		super(NostrumTileEntities.AltarTileEntityType);
 	}
 	
 	public @Nonnull ItemStack getItem() {
@@ -47,12 +47,12 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	private static final String NBT_ITEM = "item";
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
-		nbt = super.writeToNBT(nbt);
+	public CompoundNBT write(CompoundNBT nbt) {
+		nbt = super.write(nbt);
 		
 		if (stack != ItemStack.EMPTY) {
 			CompoundNBT tag = new CompoundNBT();
-			tag = stack.writeToNBT(tag);
+			tag = stack.write(tag);
 			nbt.put(NBT_ITEM, tag);
 		}
 		
@@ -60,8 +60,8 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	}
 	
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
-		super.readFromNBT(nbt);
+	public void read(CompoundNBT nbt) {
+		super.read(nbt);
 		
 		if (nbt == null)
 			return;
@@ -70,30 +70,28 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 			stack = ItemStack.EMPTY;
 		} else {
 			CompoundNBT tag = nbt.getCompound(NBT_ITEM);
-			stack = new ItemStack(tag);
+			stack = ItemStack.read(tag);
 		}
 	}
 	
 	@Override
-	public SPacketUpdateTileEntity getUpdatePacket() {
-		return new SPacketUpdateTileEntity(this.pos, 3, this.getUpdateTag());
+	public SUpdateTileEntityPacket getUpdatePacket() {
+		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.writeToNBT(new CompoundNBT());
+		return this.write(new CompoundNBT());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(pkt.getNbtCompound());
 	}
 	
 	private void dirty() {
-		world.markBlockRangeForRenderUpdate(pos, pos);
-		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
-		world.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
+		world.notifyBlockUpdate(this.getPos(), this.getBlockState(), this.getBlockState(), 3);
 		markDirty();
 	}
 
@@ -164,34 +162,9 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	}
 
 	@Override
-	public int getField(int id) {
-		return 0;
-	}
-
-	@Override
-	public void setField(int id, int value) {
-		
-	}
-
-	@Override
-	public int getFieldCount() {
-		return 0;
-	}
-
-	@Override
 	public void clear() {
 		this.stack = ItemStack.EMPTY;
 		dirty();
-	}
-
-	@Override
-	public String getName() {
-		return "Altar";
-	}
-
-	@Override
-	public boolean hasCustomName() {
-		return false;
 	}
 
 	@Override

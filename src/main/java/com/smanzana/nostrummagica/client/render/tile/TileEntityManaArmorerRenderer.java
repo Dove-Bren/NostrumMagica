@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.client.render.tile;
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.blocks.ManaArmorerBlock;
-import com.smanzana.nostrummagica.blocks.tiles.ManaArmorerTileEntity;
+import com.smanzana.nostrummagica.tiles.ManaArmorerTileEntity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;

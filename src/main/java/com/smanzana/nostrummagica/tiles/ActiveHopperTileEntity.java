@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.blocks.tiles;
+package com.smanzana.nostrummagica.tiles;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -7,9 +7,8 @@ import com.smanzana.nostrummagica.blocks.ActiveHopper;
 import com.smanzana.nostrummagica.utils.Inventories;
 import com.smanzana.nostrummagica.utils.ItemStacks;
 
-import net.minecraft.block.BlockChest;
-import net.minecraft.block.FurnaceBlock;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.ChestBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -17,15 +16,14 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.ChestTileEntity;
 import net.minecraft.tileentity.IHopper;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityChest;
-import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.VoxelShape;
+import net.minecraft.util.EntityPredicates;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -41,12 +39,12 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	private int transferCooldown = -1;
 	
 	public ActiveHopperTileEntity() {
-		super();
+		super(NostrumTileEntities.ActiveHopperTileEntityType);
 	}
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
-		nbt = super.writeToNBT(nbt);
+	public CompoundNBT write(CompoundNBT nbt) {
+		nbt = super.write(nbt);
 		
 		if (!slot.isEmpty()) {
 			nbt.put(NBT_SLOT, slot.serializeNBT());
@@ -58,23 +56,16 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 		
 		nbt.putInt(NBT_COOLDOWN, transferCooldown);
 		
-		FurnaceBlock a;
-		
 		return nbt;
 	}
 	
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
-		super.readFromNBT(nbt);
+	public void read(CompoundNBT nbt) {
+		super.read(nbt);
 		
-		slot = (nbt.contains(NBT_SLOT) ? new ItemStack(nbt.getCompound(NBT_SLOT)) : ItemStack.EMPTY); // nulls if empty
+		slot = (nbt.contains(NBT_SLOT) ? ItemStack.read(nbt.getCompound(NBT_SLOT)) : ItemStack.EMPTY); // nulls if empty
 		customName = (nbt.contains(NBT_CUSTOMNAME) ? nbt.getString(NBT_CUSTOMNAME) : null);
 		transferCooldown = nbt.getInt(NBT_COOLDOWN);
-	}
-	
-	@Override
-	public boolean shouldRefresh(World world, BlockPos pos, BlockState oldState, BlockState newState) {
-		return !(newState.getBlock() instanceof ActiveHopper);
 	}
 	
 	private static final int NUM_SLOTS = 1;
@@ -159,40 +150,11 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	}
 
 	@Override
-	public int getField(int id) {
-		return 0;
-	}
-
-	@Override
-	public void setField(int id, int value) {
-		;
-	}
-
-	@Override
-	public int getFieldCount() {
-		return 0;
-	}
-
-	@Override
 	public void clear() {
 		if (!slot.isEmpty()) {
 			slot = ItemStack.EMPTY;
 			this.markDirty();
 		}
-	}
-
-	@Override
-	public String getName() {
-		return hasCustomName() ? this.customName : "Active Hopper";
-	}
-
-	@Override
-	public boolean hasCustomName() {
-		return customName != null;
-	}
-	
-	public void setCustomName(String name) {
-		customName = name;
 	}
 
 	@Override
@@ -297,8 +259,8 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 		@Nullable TileEntity te = world.getTileEntity(pos.offset(direction));
 		
 		if (te != null) {
-			if (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite())) {
-				@Nullable IItemHandler handler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite());
+			if (te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).isPresent()) {
+				@Nullable IItemHandler handler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).orElse(null);
 				return pushInto(handler, direction);
 			}
 			
@@ -307,10 +269,10 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 				IInventory inv = (IInventory) te;
 				
 				// Special cast for stupid chests :P
-				if (te instanceof TileEntityChest) {
+				if (te instanceof ChestTileEntity) {
 					BlockState state = world.getBlockState(pos.offset(direction));
-					if (state != null && state.getBlock() instanceof BlockChest) {
-						inv = ((BlockChest)state.getBlock()).getContainer(world, pos.offset(direction), true);
+					if (state != null && state.getBlock() instanceof ChestBlock) {
+						inv = ChestBlock.getInventory(state, world, pos.offset(direction), true);
 					}
 				}
 				
@@ -318,8 +280,8 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 			}
 		}
 		
-		final VoxelShape captureBox = getCaptureBB(false);
-		for (Entity e : world.getEntitiesInAABBexcluding(null, captureBox, EntitySelectors.HAS_INVENTORY)) {
+		final AxisAlignedBB captureBox = getCaptureBB(false);
+		for (Entity e : world.getEntitiesInAABBexcluding(null, captureBox, EntityPredicates.HAS_INVENTORY)) {
 			// Vanilla uses a random entity in the list. We'll just use the first.
 			return pushInto((IInventory) e, direction);
 		}
@@ -392,8 +354,8 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 		@Nullable TileEntity te = world.getTileEntity(pos.offset(direction));
 		
 		if (te != null) {
-			if (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction)) {
-				@Nullable IItemHandler handler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction);
+			if (te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction).isPresent()) {
+				@Nullable IItemHandler handler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction).orElse(null);
 				return pullFrom(handler, direction);
 			}
 			
@@ -402,18 +364,18 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 				IInventory inv = (IInventory) te;
 				
 				// Special cast for stupid chests :P
-				if (te instanceof TileEntityChest) {
+				if (te instanceof ChestTileEntity) {
 					BlockState state = world.getBlockState(pos.offset(direction));
-					if (state != null && state.getBlock() instanceof BlockChest) {
-						inv = ((BlockChest)state.getBlock()).getContainer(world, pos.offset(direction), true);
+					if (state != null && state.getBlock() instanceof ChestBlock) {
+						inv = ChestBlock.getInventory(state, world, pos.offset(direction), true);
 					}
 				}
 				return pullFrom(inv, direction);
 			}
 		}
 		
-		final VoxelShape captureBox = getCaptureBB(true);
-		for (Entity e : world.getEntitiesInAABBexcluding(null, captureBox, EntitySelectors.HAS_INVENTORY)) {
+		final AxisAlignedBB captureBox = getCaptureBB(true);
+		for (Entity e : world.getEntitiesInAABBexcluding(null, captureBox, EntityPredicates.HAS_INVENTORY)) {
 			// Vanilla uses a random entity in the list. We'll just use the first.
 			return pullFrom((IInventory) e, direction);
 		}
@@ -498,16 +460,16 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 		return false;
 	}
 	
-	private VoxelShape getCaptureBB(boolean forPull) {
+	private AxisAlignedBB getCaptureBB(boolean forPull) {
 		final Direction direction = ActiveHopper.GetFacing(world.getBlockState(pos));
 		
 		if (direction == Direction.DOWN) {
 			// Down has different collision so do a custom box
-			return Block.makeCuboidShape(0, 0, 0, 1, 1, 1).offset(pos).expand(0, 1, 0);
+			return new AxisAlignedBB(0, 0, 0, 1, 1, 1).offset(pos).expand(0, 1, 0);
 		}
 		
 		final BlockPos spot = forPull ? pos.offset(direction.getOpposite()) : pos.offset(direction);
-		return Block.makeCuboidShape(0, 0, 0, 1, 1, 1).offset(spot);
+		return new AxisAlignedBB(0, 0, 0, 1, 1, 1).offset(spot);
 	}
 	
 	@Override

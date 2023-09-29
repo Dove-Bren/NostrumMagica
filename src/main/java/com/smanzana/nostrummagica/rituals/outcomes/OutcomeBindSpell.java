@@ -3,11 +3,11 @@ package com.smanzana.nostrummagica.rituals.outcomes;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
+import com.smanzana.nostrummagica.tiles.AltarTileEntity;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;

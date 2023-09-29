@@ -1,35 +1,32 @@
-package com.smanzana.nostrummagica.blocks.tiles;
+package com.smanzana.nostrummagica.tiles;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
-import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.blocks.NostrumObelisk;
-import com.smanzana.nostrummagica.blocks.ObeliskPortal;
 import com.smanzana.nostrummagica.world.NostrumChunkLoader;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeChunkManager;
-import net.minecraftforge.common.ForgeChunkManager.Ticket;
-import net.minecraftforge.common.ForgeChunkManager.Type;
+import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.server.TicketType;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class NostrumObeliskEntity extends AetherTickingTileEntity {
+	
+	protected static final TicketType<BlockPos> ObeliskChunkLoaderType = TicketType.create("nostrum_obelisk_chunkloader", Comparator.comparingLong(BlockPos::toLong));
 	
 	public static class NostrumObeliskTarget {
 		private BlockPos pos;
@@ -57,7 +54,6 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 		}
 	}
 
-	private static final String NBT_TICKET_POS = "obelisk_pos";
 	private static final String NBT_MASTER = "master";
 	private static final String NBT_TARGETS = "targets";
 	private static final String NBT_TARGET_X = "x";
@@ -103,7 +99,7 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	private boolean isDestructing;
 	
 	public NostrumObeliskEntity() {
-		super(0, 2000);
+		super(NostrumTileEntities.NostrumObeliskEntityType, 0, 2000);
 		master = false;
 		isDestructing = false;
 		targets = new LinkedList<>();
@@ -129,8 +125,8 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	}
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
-		nbt = super.writeToNBT(nbt);
+	public CompoundNBT write(CompoundNBT nbt) {
+		nbt = super.write(nbt);
 		
 		ListNBT list = new ListNBT();
 		
@@ -152,14 +148,14 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 		nbt.put(NBT_TARGETS, list);
 		nbt.putBoolean(NBT_MASTER, master);
 		if (!master && corner != null) {
-			nbt.setByte(NBT_CORNER, (byte) corner.ordinal());
+			nbt.putByte(NBT_CORNER, (byte) corner.ordinal());
 		}
 		return nbt;
 	}
 	
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
-		super.readFromNBT(nbt);
+	public void read(CompoundNBT nbt) {
+		super.read(nbt);
 		
 		if (nbt == null || !nbt.contains(NBT_MASTER, NBT.TAG_BYTE))
 			return;
@@ -169,7 +165,7 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 		if (list != null && list.size() > 0) {
 			this.targets = new ArrayList<>(list.size());
 			for (int i = 0; i < list.size(); i++) {
-				CompoundNBT tag = list.getCompoundTagAt(i);
+				CompoundNBT tag = list.getCompound(i);
 				targets.add(new NostrumObeliskTarget(
 						//tag.getInt(NBT_TARGET_DIMENSION),
 						new BlockPos(
@@ -209,10 +205,7 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 			}
 
 			if (!world.isRemote) {
-				Ticket ticket = NostrumChunkLoader.instance().pullTicket(genTicketKey());
-				if (ticket != null) {
-					ForgeChunkManager.releaseTicket(ticket);
-				}
+				NostrumChunkLoader.unforceChunk((ServerWorld) world, ObeliskChunkLoaderType, getPos());
 			}
 			
 			this.deactivatePortal();
@@ -298,12 +291,12 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	
 	protected void deactivatePortal() {
 		// Remove portal above us
-		world.setBlockToAir(pos.up());
+		world.removeBlock(pos.up(), false);
 	}
 	
 	protected void activatePortal() {
-		world.setBlockState(pos.up(), ObeliskPortal.instance().getStateForPlacement(world, pos, Direction.UP, 0f, 0f, 0f, 0, null));
-		ObeliskPortal.instance().createPaired(world, pos.up());
+		world.setBlockState(pos.up(), NostrumBlocks.obeliskPortal.getDefaultState());
+		NostrumBlocks.obeliskPortal.createPaired(world, pos.up());
 	}
 	
 	protected void refreshPortal() {
@@ -338,17 +331,17 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	}
 	
 	@Override
-	public SPacketUpdateTileEntity getUpdatePacket() {
-		return new SPacketUpdateTileEntity(this.pos, 3, this.getUpdateTag());
+	public SUpdateTileEntityPacket getUpdatePacket() {
+		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.writeToNBT(new CompoundNBT());
+		return this.write(new CompoundNBT());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(pkt.getNbtCompound());
 	}
@@ -359,14 +352,7 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 		if (world.isRemote)
 			return;
 		
-		Ticket chunkTicket = ForgeChunkManager.requestTicket(NostrumMagica.instance, world, Type.NORMAL);
-		chunkTicket.getModData().setTag(NBT_TICKET_POS, NBTUtil.createPosTag(pos));
-		ForgeChunkManager.forceChunk(chunkTicket, new ChunkPos(pos));
-		NostrumChunkLoader.instance().addTicket(genTicketKey(), chunkTicket);
-	}
-	
-	private String genTicketKey() {
-		return "nostrum_obelisk_" + pos.getX() + "_" + pos.getY() + "_" + pos.getZ();
+		NostrumChunkLoader.forceChunk((ServerWorld) world, ObeliskChunkLoaderType, getPos());
 	}
 	
 	private void forceUpdate() {
@@ -375,8 +361,8 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	}
 
 	@Override
-	public void update() {
-		super.update();
+	public void tick() {
+		super.tick();
 		
 
 		aliveCount++;
@@ -415,7 +401,7 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 		x += master.getX() + .5;
 		z += master.getZ() + .5;
 		y += pos.getY() + .5;
-		world.spawnParticle(EnumParticleTypes.DRAGON_BREATH, x, y, z, .01, 0, .01, new int[0]);
+		world.addParticle(ParticleTypes.DRAGON_BREATH, x, y, z, .01, 0, .01);
 		
 	}
 	

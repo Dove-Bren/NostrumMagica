@@ -2,9 +2,9 @@ package com.smanzana.nostrummagica.client.render.tile;
 
 import org.lwjgl.opengl.GL11;
 
-import com.smanzana.nostrummagica.blocks.tiles.CandleTileEntity;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.tiles.CandleTileEntity;
 import com.smanzana.nostrummagica.utils.NonNullEnumMap;
 
 import net.minecraft.client.Minecraft;

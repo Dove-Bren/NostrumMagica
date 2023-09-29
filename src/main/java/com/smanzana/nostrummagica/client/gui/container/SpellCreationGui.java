@@ -11,7 +11,6 @@ import javax.annotation.Nonnull;
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.tiles.SpellTableEntity;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.items.BlankScroll;
@@ -25,6 +24,7 @@ import com.smanzana.nostrummagica.network.messages.SpellCraftMessage;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.Spell.SpellPart;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
+import com.smanzana.nostrummagica.tiles.SpellTableEntity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;

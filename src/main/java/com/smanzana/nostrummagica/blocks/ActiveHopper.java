@@ -1,8 +1,8 @@
 package com.smanzana.nostrummagica.blocks;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.tiles.ActiveHopperTileEntity;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
+import com.smanzana.nostrummagica.tiles.ActiveHopperTileEntity;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;

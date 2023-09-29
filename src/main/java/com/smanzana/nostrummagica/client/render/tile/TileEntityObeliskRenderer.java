@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.render.tile;
 
 import com.google.common.base.Function;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
 
 import net.minecraft.client.Minecraft;
 import com.mojang.blaze3d.platform.GlStateManager;

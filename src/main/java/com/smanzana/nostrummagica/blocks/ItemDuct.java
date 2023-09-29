@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.blocks;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.blocks.tiles.ItemDuctTileEntity;
+import com.smanzana.nostrummagica.tiles.ItemDuctTileEntity;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;

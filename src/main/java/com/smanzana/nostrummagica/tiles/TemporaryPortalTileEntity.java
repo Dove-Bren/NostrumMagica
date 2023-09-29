@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.blocks.tiles;
+package com.smanzana.nostrummagica.tiles;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
@@ -15,30 +15,30 @@ public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity imp
 	private long endticks;
 	
 	public TemporaryPortalTileEntity() {
-		super();
+		super(NostrumTileEntities.TemporaryPortalTileEntityType);
 	}
 	
 	public TemporaryPortalTileEntity(BlockPos target, long endticks) {
-		super(target);
+		super(NostrumTileEntities.TemporaryPortalTileEntityType, target);
 		this.endticks = endticks;
 		this.markDirty();
 	}
 	
 	@Override
-	public void update() {
+	public void tick() {
 		if (world == null || world.isRemote) {
 			return;
 		}
 		
-		if (world.getTotalWorldTime() >= this.endticks) {
-			world.setBlockToAir(pos);
+		if (world.getGameTime() >= this.endticks) {
+			world.removeBlock(pos, false);
 		}
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public int getColor() {
-		PlayerEntity player = NostrumMagica.proxy.getPlayer();
+		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
 		if (NostrumPortal.getRemainingCharge(player) > 0) {
 			return 0x00400000;
 		}
@@ -57,7 +57,7 @@ public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity imp
 		float opacity = .9f;
 		
 		if (world != null) {
-			final long now =  world.getTotalWorldTime();
+			final long now =  world.getGameTime();
 			final long FadeTicks = 20 * 5;
 			final long left = Math.max(0, endticks - now);
 			if (left < FadeTicks) {
@@ -65,7 +65,7 @@ public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity imp
 			}
 		}
 		
-		PlayerEntity player = NostrumMagica.proxy.getPlayer();
+		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
 		if (NostrumPortal.getCooldownTime(player) > 0) {
 			opacity *= 0.5f;
 		}
@@ -74,15 +74,15 @@ public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity imp
 	}
 	
 	@Override
-	public void readFromNBT(CompoundNBT compound) {
-		super.readFromNBT(compound);
+	public void read(CompoundNBT compound) {
+		super.read(compound);
 		
 		endticks = compound.getLong("EXPIRE");
 	}
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
-		nbt = super.writeToNBT(nbt);
+	public CompoundNBT write(CompoundNBT nbt) {
+		nbt = super.write(nbt);
 		
 		nbt.putLong("EXPIRE", endticks);
 		

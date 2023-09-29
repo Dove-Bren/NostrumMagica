@@ -794,4 +794,8 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 	public boolean willAutoSync(ItemStack stack, LivingEntity player) {
 		return true;
 	}
+	
+	public ItemType getType() {
+		return this.getType();
+	}
 }

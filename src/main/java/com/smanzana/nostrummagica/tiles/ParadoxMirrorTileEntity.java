@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.blocks.tiles;
+package com.smanzana.nostrummagica.tiles;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.IAetherInfusableTileEntity;
+import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.blocks.ParadoxMirrorBlock;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
@@ -20,11 +21,11 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.VoxelShape;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -41,7 +42,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	private int cooldownTicks;
 	
 	public ParadoxMirrorTileEntity() {
-		super();
+		super(NostrumTileEntities.ParadoxMirrorTileEntityType);
 		cooldownTicks = 0;
 		receivedEntities = new ArrayList<>();
 	}
@@ -71,8 +72,8 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	private static final String NBT_LINKED_POS = "linked_pos";
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
-		nbt = super.writeToNBT(nbt);
+	public CompoundNBT write(CompoundNBT nbt) {
+		nbt = super.write(nbt);
 		
 		if (linkedPosition != null) {
 			nbt.putLong(NBT_LINKED_POS, linkedPosition.toLong());
@@ -84,8 +85,8 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	}
 	
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
-		super.readFromNBT(nbt);
+	public void read(CompoundNBT nbt) {
+		super.read(nbt);
 		
 		if (nbt == null)
 			return;
@@ -98,25 +99,23 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	}
 	
 	@Override
-	public SPacketUpdateTileEntity getUpdatePacket() {
-		return new SPacketUpdateTileEntity(this.pos, 3, this.getUpdateTag());
+	public SUpdateTileEntityPacket getUpdatePacket() {
+		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.writeToNBT(new CompoundNBT());
+		return this.write(new CompoundNBT());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(pkt.getNbtCompound());
 	}
 	
 	private void dirty() {
-		world.markBlockRangeForRenderUpdate(pos, pos);
 		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
-		world.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
 		markDirty();
 	}
 
@@ -165,7 +164,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 		}
 		
 		BlockState blockstate = getWorld().getBlockState(pos);
-		if (blockstate == null || blockstate.getBlock() != ParadoxMirrorBlock.instance()) {
+		if (blockstate == null || blockstate.getBlock() != NostrumBlocks.paradoxMirror) {
 			return null;
 		}
 		
@@ -191,7 +190,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 		
 		// Have item, cooldown is good, and are linked! Consume and send!
 		@Nonnull ItemStack stack = entity.getItem();
-		entity.setDead();
+		entity.remove();
 		
 		remoteTile.receiveAndSpawnItem(stack, this.getPos());
 		return true;
@@ -201,7 +200,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 		Iterator<ItemEntity> it = receivedEntities.iterator();
 		while (it.hasNext()) {
 			ItemEntity ent = it.next();
-			if (ent == null || ent.isDead || ent.getDistanceSqToCenter(getPos()) > 4) {
+			if (ent == null || !ent.isAlive() || ent.getDistanceSq(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5) > 4) {
 				it.remove();
 			}
 		}
@@ -211,9 +210,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 		Vec3d spawnLoc = getSpawnLocation();
 		Vec3d spawnVelocity = getSpawnVelocity();
 		ItemEntity entity = new ItemEntity(getWorld(), spawnLoc.x, spawnLoc.y, spawnLoc.z, stack);
-		entity.getMotion().x = spawnVelocity.x;
-		entity.getMotion().y = spawnVelocity.y;
-		entity.getMotion().z = spawnVelocity.z;
+		entity.setMotion(spawnVelocity);
 		entity.velocityChanged = true;
 		
 		receivedEntities.add(entity);
@@ -257,7 +254,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	}
 	
 	protected @Nullable ItemEntity findNearbyItem() {
-		VoxelShape bb = Block.makeCuboidShape(0, 0, 0, 1, 1, 1).offset(this.getPos());
+		AxisAlignedBB bb = new AxisAlignedBB(0, 0, 0, 1, 1, 1).offset(this.getPos());
 		for (ItemEntity entity : world.getEntitiesWithinAABB(ItemEntity.class, bb)) {
 			// Make sure entity isn't in the list of entities we've created
 			if (receivedEntities.contains(entity)) {
@@ -285,7 +282,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	}
 	
 	protected void playReceiveEffect(ItemEntity entity, BlockPos fromPos) {
-		if (getWorld().isRemote) {
+		if (world.isRemote) {
 			return;
 		}
 		

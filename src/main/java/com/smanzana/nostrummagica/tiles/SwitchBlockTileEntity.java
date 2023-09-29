@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.blocks.tiles;
+package com.smanzana.nostrummagica.tiles;
 
 import javax.annotation.Nullable;
 
@@ -12,7 +12,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -31,7 +31,7 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 	private LivingEntity triggerEntity;
 	
 	public SwitchBlockTileEntity() {
-		super();
+		super(NostrumTileEntities.SwitchBlockTileEntityType);
 		
 		type = SwitchType.ANY;
 		triggerOffset = new BlockPos(0, -2, 0);
@@ -51,8 +51,8 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 	private static final String NBT_TRIGGERED = "triggered";
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
-		nbt = super.writeToNBT(nbt);
+	public CompoundNBT write(CompoundNBT nbt) {
+		nbt = super.write(nbt);
 		
 		nbt.putInt(NBT_TYPE, this.type.ordinal());
 		nbt.putLong(NBT_OFFSET, this.triggerOffset.toLong());
@@ -62,8 +62,8 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
-		super.readFromNBT(nbt);
+	public void read(CompoundNBT nbt) {
+		super.read(nbt);
 		
 		int ord = nbt.getInt(NBT_TYPE);
 		for (SwitchBlockTileEntity.SwitchType type : SwitchType.values()) {
@@ -77,25 +77,23 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	@Override
-	public SPacketUpdateTileEntity getUpdatePacket() {
-		return new SPacketUpdateTileEntity(this.pos, 3, this.getUpdateTag());
+	public SUpdateTileEntityPacket getUpdatePacket() {
+		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.writeToNBT(new CompoundNBT());
+		return this.write(new CompoundNBT());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(pkt.getNbtCompound());
 	}
 	
 	private void dirty() {
-		world.markBlockRangeForRenderUpdate(pos, pos);
 		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
-		world.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
 		markDirty();
 	}
 	
@@ -113,7 +111,7 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 		this.setOffset(targ.subtract(this.getPos()));
 	}
 	
-	public SwitchBlockTileEntity.SwitchType getType() {
+	public SwitchBlockTileEntity.SwitchType getSwitchType() {
 		return this.type;
 	}
 	
@@ -137,11 +135,12 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 		}
 		
 		// Create entity here if it doesn't exist
-		if (triggerEntity == null || triggerEntity.isDead || triggerEntity.world != this.world
-				|| triggerEntity.getDistanceSq(this.pos.up()) > 1.5) {
+		BlockPos blockUp = pos.up();
+		if (triggerEntity == null || !triggerEntity.isAlive() || triggerEntity.world != this.world
+				|| triggerEntity.getDistanceSq(blockUp.getX() + .5, blockUp.getY() + .5, blockUp.getZ() + .5) > 1.5) {
 			// Entity is dead OR is too far away
-			if (triggerEntity != null && !triggerEntity.isDead) {
-				triggerEntity.setDead();
+			if (triggerEntity != null && triggerEntity.isAlive()) {
+				triggerEntity.remove();
 			}
 			
 			triggerEntity = new EntitySwitchTrigger(this.world);

@@ -1,50 +1,43 @@
 package com.smanzana.nostrummagica.blocks;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.tiles.LoreTableEntity;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
+import com.smanzana.nostrummagica.tiles.LoreTableEntity;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.pathfinding.PathType;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ToolType;
 
 public class LoreTable extends ContainerBlock {
 	
 	public static final String ID = "lore_table";
 	
-	private static LoreTable instance = null;
-	public static LoreTable instance() {
-		if (instance == null)
-			instance = new LoreTable();
-		
-		return instance;
-	}
-	
 	public LoreTable() {
-		super(Material.WOOD, MapColor.WOOD);
-		this.setUnlocalizedName(ID);
-		this.setHardness(2.0f);
-		this.setResistance(10.0f);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setSoundType(SoundType.WOOD);
-		this.setHarvestLevel("axe", 0);
+		super(Block.Properties.create(Material.WOOD)
+				.hardnessAndResistance(2.0f, 10.0f)
+				.sound(SoundType.WOOD)
+				.harvestTool(ToolType.AXE)
+				.harvestLevel(0)
+				);
 	}
 	
 	@Override
-	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
-		return true;
+	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+		return false;
 	}
 	
 	@Override
@@ -68,14 +61,16 @@ public class LoreTable extends ContainerBlock {
 	}
 	
 	@Override
-	public EnumBlockRenderType getRenderType(BlockState state) {
-		return EnumBlockRenderType.MODEL;
+	public BlockRenderType getRenderType(BlockState state) {
+		return BlockRenderType.MODEL;
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) { broke();
-		destroy(world, pos, state);
-		super.breakBlock(world, pos, state);
+	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+		if (state.getBlock() != newState.getBlock()) {
+			destroy(worldIn, pos, state);
+			worldIn.removeTileEntity(pos);
+		}
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {
@@ -93,5 +88,11 @@ public class LoreTable extends ContainerBlock {
 			world.addEntity(new ItemEntity(world, x, y, z, item.copy()));
 		}
 		
+	}
+
+	@Override
+	public TileEntity createNewTileEntity(IBlockReader worldIn) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.blocks.tiles;
+package com.smanzana.nostrummagica.tiles;
 
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.Constants.NBT;
 
@@ -21,6 +21,7 @@ public class SymbolTileEntity extends TileEntity {
 	private float scale;
 	
 	public SymbolTileEntity() {
+		super(NostrumTileEntities.SymbolTileEntityType);
 		setElement(EMagicElement.PHYSICAL);
 		this.scale = 1.0f;
 	}
@@ -98,8 +99,8 @@ public class SymbolTileEntity extends TileEntity {
 	private static final String NBT_SCALE = "scale";
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
-		nbt = super.writeToNBT(nbt);
+	public CompoundNBT write(CompoundNBT nbt) {
+		nbt = super.write(nbt);
 		
 		if (element != null) {
 			nbt.putString(NBT_TYPE, "element");
@@ -121,8 +122,8 @@ public class SymbolTileEntity extends TileEntity {
 	}
 	
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
-		super.readFromNBT(nbt);
+	public void read(CompoundNBT nbt) {
+		super.read(nbt);
 		
 		if (nbt == null || !nbt.contains(NBT_TYPE, NBT.TAG_STRING)
 				|| !nbt.contains(NBT_KEY, NBT.TAG_STRING))
@@ -173,25 +174,23 @@ public class SymbolTileEntity extends TileEntity {
 	}
 	
 	@Override
-	public SPacketUpdateTileEntity getUpdatePacket() {
-		return new SPacketUpdateTileEntity(this.pos, 3, this.getUpdateTag());
+	public SUpdateTileEntityPacket getUpdatePacket() {
+		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.writeToNBT(new CompoundNBT());
+		return this.write(new CompoundNBT());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(pkt.getNbtCompound());
 	}
 	
 	private void dirty() {
-		world.markBlockRangeForRenderUpdate(pos, pos);
 		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
-		world.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
 		markDirty();
 	}
 	

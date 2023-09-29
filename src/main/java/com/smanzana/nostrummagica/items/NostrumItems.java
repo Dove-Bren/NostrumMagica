@@ -5,12 +5,14 @@ import com.smanzana.nostrummagica.blocks.CropEssence;
 import com.smanzana.nostrummagica.blocks.CropGinseng;
 import com.smanzana.nostrummagica.blocks.CropMandrakeRoot;
 import com.smanzana.nostrummagica.blocks.ManiCrystal;
+import com.smanzana.nostrummagica.fluids.FluidPoisonWater;
 import com.smanzana.nostrummagica.items.DragonArmor.DragonArmorMaterial;
 import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Rarity;
 import net.minecraftforge.common.MinecraftForge;
@@ -281,6 +283,9 @@ public class NostrumItems {
 	@ObjectHolder(ThanoPendant.ID) public static ThanoPendant thanoPendant;
 	@ObjectHolder(ThanosStaff.ID) public static ThanosStaff thanosStaff;
 	@ObjectHolder(WarlockSword.ID) public static WarlockSword warlockSword;
+	
+	@ObjectHolder(FluidPoisonWater.ID + "_bucket") public static BucketItem poisonWaterBucket;
+	@ObjectHolder(FluidPoisonWater.ID_UNBREAKABLE + "_bucket") public static BucketItem unbreakablePoisonWaterBucket;
 	
 	
 	public NostrumItems() {

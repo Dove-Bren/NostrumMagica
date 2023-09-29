@@ -2,9 +2,9 @@ package com.smanzana.nostrummagica.network.messages;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumObelisk;
-import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.PlayerEntity;

@@ -1,22 +1,29 @@
-package com.smanzana.nostrummagica.blocks.tiles;
+package com.smanzana.nostrummagica.tiles;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
 
 public class SingleSpawnerTileEntity extends TileEntity implements ITickableTileEntity {
 	
 	protected int ticksExisted;
 	
 	public SingleSpawnerTileEntity() {
+		this(NostrumTileEntities.SingleSpawnerTileEntityType);
+	}
+	
+	protected SingleSpawnerTileEntity(TileEntityType<?> type) {
+		super(type);
 		ticksExisted = 0;
 	}
 	
 	protected void majorTick(BlockState state) {
-		NostrumSingleSpawner.instance().updateTick(world, pos, state, NostrumMagica.rand);
+		NostrumBlocks.singleSpawner.tick(state, world, pos, NostrumMagica.rand);
 	}
 	
 	@Override

@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.blocks.tiles;
+package com.smanzana.nostrummagica.tiles;
 
 import javax.annotation.Nullable;
 
@@ -12,6 +12,10 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ObeliskPortalTileEntity extends TeleportationPortalTileEntity {
+	
+	public ObeliskPortalTileEntity() {
+		super(NostrumTileEntities.ObeliskPortalTileEntityType);
+	}
 	
 	@Override
 	public @Nullable BlockPos getTarget() {
@@ -47,7 +51,7 @@ public class ObeliskPortalTileEntity extends TeleportationPortalTileEntity {
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public float getOpacity() {
-		PlayerEntity player = NostrumMagica.proxy.getPlayer();
+		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
 		if (NostrumPortal.getCooldownTime(player) > 0) {
 			return 0.5f;
 		}

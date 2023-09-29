@@ -2,7 +2,6 @@ package com.smanzana.nostrummagica.blocks;
 
 import java.util.Random;
 
-import com.smanzana.nostrummagica.blocks.tiles.SingleSpawnerTileEntity;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemEarth;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemEnder;
@@ -14,6 +13,7 @@ import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.NostrumItemTags;
+import com.smanzana.nostrummagica.tiles.SingleSpawnerTileEntity;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

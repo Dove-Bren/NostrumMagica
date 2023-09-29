@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.blocks.tiles;
+package com.smanzana.nostrummagica.tiles;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -8,6 +8,7 @@ import javax.annotation.Nonnull;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
 import com.smanzana.nostrummagica.items.BlankScroll;
+import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
@@ -31,24 +32,13 @@ public class SpellTableEntity extends TileEntity implements IInventory {
 	 *   17-25 - Reagent slots
 	 */
 	
-	private String displayName;
 	private @Nonnull ItemStack slots[];
 	
 	public SpellTableEntity() {
-		displayName = "Spell Table";
+		super(NostrumTileEntities.SpellTableEntityType);
 		slots = new ItemStack[getSizeInventory()];
 		for (int i = 0; i < slots.length; i++)
 			slots[i] = ItemStack.EMPTY;
-	}
-	
-	@Override
-	public String getName() {
-		return displayName;
-	}
-
-	@Override
-	public boolean hasCustomName() {
-		return false;
 	}
 	
 	public int getRuneSlotIndex() {
@@ -168,21 +158,6 @@ public class SpellTableEntity extends TileEntity implements IInventory {
 	}
 
 	@Override
-	public int getField(int id) {
-		return 0;
-	}
-
-	@Override
-	public void setField(int id, int value) {
-		
-	}
-
-	@Override
-	public int getFieldCount() {
-		return 0;
-	}
-
-	@Override
 	public void clear() {
 		for (int i = 0; i < getSizeInventory(); i++)
 			removeStackFromSlot(i);
@@ -195,8 +170,8 @@ public class SpellTableEntity extends TileEntity implements IInventory {
 	}
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
-		nbt = super.writeToNBT(nbt);
+	public CompoundNBT write(CompoundNBT nbt) {
+		nbt = super.write(nbt);
 		CompoundNBT compound = new CompoundNBT();
 		
 		for (int i = 0; i < getSizeInventory(); i++) {
@@ -204,7 +179,7 @@ public class SpellTableEntity extends TileEntity implements IInventory {
 				continue;
 			
 			CompoundNBT tag = new CompoundNBT();
-			compound.put(i + "", getStackInSlot(i).writeToNBT(tag));
+			compound.put(i + "", getStackInSlot(i).write(tag));
 		}
 		
 		if (nbt == null)
@@ -215,8 +190,8 @@ public class SpellTableEntity extends TileEntity implements IInventory {
 	}
 	
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
-		super.readFromNBT(nbt);
+	public void read(CompoundNBT nbt) {
+		super.read(nbt);
 		
 		if (nbt == null || !nbt.contains(NBT_INV, NBT.TAG_COMPOUND))
 			return;
@@ -231,7 +206,7 @@ public class SpellTableEntity extends TileEntity implements IInventory {
 				continue;
 			}
 			
-			ItemStack stack = new ItemStack(items.getCompound(key));
+			ItemStack stack = ItemStack.read(items.getCompound(key));
 			this.setInventorySlotContents(id, stack);
 		}
 	}
@@ -248,7 +223,7 @@ public class SpellTableEntity extends TileEntity implements IInventory {
 		if (spell != null) {
 			spell.promoteFromTrans();
 			spell.setIcon(iconIndex);
-			ItemStack scroll = new ItemStack(SpellScroll.instance(), 1);
+			ItemStack scroll = new ItemStack(NostrumItems.spellScroll, 1);
 			SpellScroll.setSpell(scroll, spell);
 			this.clearBoard();
 			this.setInventorySlotContents(0, scroll);

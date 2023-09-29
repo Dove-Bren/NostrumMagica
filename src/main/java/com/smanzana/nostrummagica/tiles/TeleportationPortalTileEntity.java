@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.blocks.tiles;
+package com.smanzana.nostrummagica.tiles;
 
 import javax.annotation.Nullable;
 
@@ -9,11 +9,12 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.util.Constants.NBT;
 
 public class TeleportationPortalTileEntity extends NostrumPortal.NostrumPortalTileEntityBase  {
 
@@ -21,13 +22,21 @@ public class TeleportationPortalTileEntity extends NostrumPortal.NostrumPortalTi
 	
 	private BlockPos target;
 	
+	protected TeleportationPortalTileEntity(TileEntityType<?> type) {
+		super(type);
+	}
+	
 	public TeleportationPortalTileEntity() {
-		super();
+		this(NostrumTileEntities.TeleportationPortalTileEntityType);
+	}
+	
+	protected TeleportationPortalTileEntity(TileEntityType<?> type, BlockPos target) {
+		this(type);
+		this.setTarget(target);
 	}
 	
 	public TeleportationPortalTileEntity(BlockPos target) {
-		this();
-		this.setTarget(target);
+		this(NostrumTileEntities.TeleportationPortalTileEntityType, target);
 	}
 	
 	public @Nullable BlockPos getTarget() {
@@ -47,7 +56,7 @@ public class TeleportationPortalTileEntity extends NostrumPortal.NostrumPortalTi
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public int getColor() {
-		PlayerEntity player = NostrumMagica.proxy.getPlayer();
+		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
 		if (NostrumPortal.getRemainingCharge(player) > 0) {
 			return 0x00A00050;
 		}
@@ -63,7 +72,7 @@ public class TeleportationPortalTileEntity extends NostrumPortal.NostrumPortalTi
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public float getOpacity() {
-		PlayerEntity player = NostrumMagica.proxy.getPlayer();
+		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
 		if (NostrumPortal.getRemainingCharge(player) > 0) {
 			return 0.5f;
 		}
@@ -71,8 +80,8 @@ public class TeleportationPortalTileEntity extends NostrumPortal.NostrumPortalTi
 	}
 	
 	@Override
-	public void readFromNBT(CompoundNBT compound) {
-		super.readFromNBT(compound);
+	public void read(CompoundNBT compound) {
+		super.read(compound);
 		
 		if (compound.contains(NBT_TARGET, NBT.TAG_LONG)) {
 			target = BlockPos.fromLong(compound.getLong(NBT_TARGET));
@@ -82,8 +91,8 @@ public class TeleportationPortalTileEntity extends NostrumPortal.NostrumPortalTi
 	}
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
-		nbt = super.writeToNBT(nbt);
+	public CompoundNBT write(CompoundNBT nbt) {
+		nbt = super.write(nbt);
 		
 		if (target != null) {
 			nbt.putLong(NBT_TARGET, target.toLong());
@@ -93,17 +102,17 @@ public class TeleportationPortalTileEntity extends NostrumPortal.NostrumPortalTi
 	}
 	
 	@Override
-	public SPacketUpdateTileEntity getUpdatePacket() {
-		return new SPacketUpdateTileEntity(this.pos, 3, this.getUpdateTag());
+	public SUpdateTileEntityPacket getUpdatePacket() {
+		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.writeToNBT(new CompoundNBT());
+		return this.write(new CompoundNBT());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(pkt.getNbtCompound());
 	}

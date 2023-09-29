@@ -3,9 +3,9 @@ package com.smanzana.nostrummagica.blocks;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.smanzana.nostrummagica.blocks.tiles.ProgressionDoorTileEntity;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.tiles.ProgressionDoorTileEntity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;

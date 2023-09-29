@@ -3,9 +3,9 @@ package com.smanzana.nostrummagica.rituals.outcomes;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.items.SpellPlate;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
+import com.smanzana.nostrummagica.tiles.AltarTileEntity;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;

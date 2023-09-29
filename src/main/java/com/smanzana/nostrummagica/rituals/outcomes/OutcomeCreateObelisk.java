@@ -7,9 +7,9 @@ import com.smanzana.nostrummagica.blocks.AltarBlock;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.ChalkBlock;
 import com.smanzana.nostrummagica.blocks.NostrumObelisk;
-import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
+import com.smanzana.nostrummagica.tiles.AltarTileEntity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.resources.I18n;

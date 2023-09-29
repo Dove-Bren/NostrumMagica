@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.blocks.tiles;
+package com.smanzana.nostrummagica.tiles;
 
 import javax.annotation.Nonnull;
 
@@ -23,6 +23,7 @@ public class LoreTableEntity extends TileEntity implements ITickableTileEntity {
 	private int ticksExisted;
 	
 	public LoreTableEntity() {
+		super(NostrumTileEntities.LoreTableEntityType);
 		progress = 0f;
 		lorekey = null;
 		item = ItemStack.EMPTY;
@@ -82,20 +83,18 @@ public class LoreTableEntity extends TileEntity implements ITickableTileEntity {
 	public void setProgress(float progress) {
 		this.progress = progress;
 		if (world != null && !world.isRemote) {
-			world.addBlockEvent(pos, blockType, 0, PROGRESS_TO_INT(progress));
+			world.addBlockEvent(pos, this.getBlockState().getBlock(), 0, PROGRESS_TO_INT(progress));
 		}
 	}
 	
 	private void dirty() {
-		world.markBlockRangeForRenderUpdate(pos, pos);
 		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
-		world.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
 		markDirty();
 	}
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
-		nbt = super.writeToNBT(nbt);
+	public CompoundNBT write(CompoundNBT nbt) {
+		nbt = super.write(nbt);
 		
 		if (nbt == null)
 			nbt = new CompoundNBT();
@@ -112,15 +111,15 @@ public class LoreTableEntity extends TileEntity implements ITickableTileEntity {
 	}
 	
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
-		super.readFromNBT(nbt);
+	public void read(CompoundNBT nbt) {
+		super.read(nbt);
 		
 		if (nbt == null)
 			return;
 		
 		this.progress = nbt.getFloat("progress");
 		if (nbt.contains("item", NBT.TAG_COMPOUND))
-			this.item = new ItemStack(nbt.getCompound("item"));
+			this.item = ItemStack.read(nbt.getCompound("item"));
 		else
 			this.item = ItemStack.EMPTY;
 		

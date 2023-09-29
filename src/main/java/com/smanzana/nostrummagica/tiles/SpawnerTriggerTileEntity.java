@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.blocks.tiles;
+package com.smanzana.nostrummagica.tiles;
 
 import java.util.UUID;
 
@@ -6,7 +6,9 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.ITriggeredBlock;
+import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.blocks.NostrumSpawnAndTrigger;
+import com.smanzana.nostrummagica.utils.Entities;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -14,6 +16,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.server.ServerWorld;
 
 public class SpawnerTriggerTileEntity extends SingleSpawnerTileEntity {
 	
@@ -26,7 +29,7 @@ public class SpawnerTriggerTileEntity extends SingleSpawnerTileEntity {
 	private UUID unlinkedEntID;
 	
 	public SpawnerTriggerTileEntity() {
-		super();
+		super(NostrumTileEntities.SpawnerTriggerTileEntityType);
 	}
 	
 	public void setTriggerOffset(BlockPos offset) {
@@ -57,22 +60,27 @@ public class SpawnerTriggerTileEntity extends SingleSpawnerTileEntity {
 	protected void majorTick(BlockState state) {
 		if (unlinkedEntID != null) {
 			// Need to find our entity!
-			for (LivingEntity ent : world.getEntities(LivingEntity.class, (ent) -> { return ent.getPersistentID().equals(unlinkedEntID);})) {
-				this.entity = ent;
+			@Nullable Entity foundEnt = Entities.FindEntity(world, unlinkedEntID);
+			if (foundEnt != null && foundEnt instanceof LivingEntity) {
+				this.entity = (LivingEntity) foundEnt;
 				unlinkedEntID = null;
-				break;
 			}
+//			for (LivingEntity ent : world.getEntities(LivingEntity.class, (ent) -> { return ent.getPersistentID().equals(unlinkedEntID);})) {
+//				this.entity = ent;
+//				unlinkedEntID = null;
+//				break;
+//			}
 			
 			if (entity == null && ticksExisted > 20 * 15) {
 				// Give up
 				unlinkedEntID = null;
 				this.trigger(state);
-				world.setBlockToAir(pos);
+				world.removeBlock(pos, false);
 			}
 		} else if (entity == null) {
-			for (PlayerEntity player : world.playerEntities) {
-				if (!player.isSpectator() && !player.isCreative() && player.getDistanceSq(pos) < NostrumSpawnAndTrigger.SPAWN_DIST_SQ) {
-					entity = NostrumSpawnAndTrigger.instance().spawn(world, pos, state, NostrumMagica.rand);
+			for (PlayerEntity player : ((ServerWorld) world).getPlayers()) {
+				if (!player.isSpectator() && !player.isCreative() && player.getDistanceSq(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5) < NostrumSpawnAndTrigger.SPAWN_DIST_SQ) {
+					entity = NostrumBlocks.triggerSpawner.spawn(world, pos, state, NostrumMagica.rand);
 					world.notifyBlockUpdate(pos, state, state, 2);
 					world.addBlockEvent(pos, state.getBlock(), 9, 0);
 					this.markDirty();
@@ -80,37 +88,32 @@ public class SpawnerTriggerTileEntity extends SingleSpawnerTileEntity {
 				}
 			}
 		} else {
-			if (entity.isDead) {
+			if (!entity.isAlive()) {
 				this.trigger(state);
-				world.setBlockToAir(pos);
+				world.removeBlock(pos, false);
 			}
 		}
 	}
 	
 	@Override
-	public void update() {
-		super.update();
-	}
-	
-	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
-		nbt = super.writeToNBT(nbt);
+	public CompoundNBT write(CompoundNBT nbt) {
+		nbt = super.write(nbt);
 		
 		if (triggerOffset != null) {
 			nbt.putLong(NBT_TRIGGER_OFFSET, triggerOffset.toLong());
 		}
 		if (entity != null) {
-			nbt.setUniqueId(NBT_ENTITY_ID, entity.getPersistentID());
+			nbt.putUniqueId(NBT_ENTITY_ID, entity.getUniqueID());
 		} else if (this.unlinkedEntID != null) {
-			nbt.setUniqueId(NBT_ENTITY_ID, this.unlinkedEntID);
+			nbt.putUniqueId(NBT_ENTITY_ID, this.unlinkedEntID);
 		}
 		
 		return nbt;
 	}
 	
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
-		super.readFromNBT(nbt);
+	public void read(CompoundNBT nbt) {
+		super.read(nbt);
 		
 		if (nbt.hasUniqueId(NBT_ENTITY_ID)) {
 			this.unlinkedEntID = nbt.getUniqueId(NBT_ENTITY_ID);

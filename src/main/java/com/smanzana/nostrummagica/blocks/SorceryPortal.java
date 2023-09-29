@@ -1,16 +1,19 @@
 package com.smanzana.nostrummagica.blocks;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.tiles.SorceryPortalTileEntity;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.tiles.SorceryPortalTileEntity;
 
-import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
 /**
@@ -18,21 +21,17 @@ import net.minecraft.world.World;
  * @author Skyler
  *
  */
+@SuppressWarnings("deprecation")
 public class SorceryPortal extends NostrumPortal implements ITileEntityProvider  {
 	
 	public static final String ID = "sorcery_portal";
 	
-	private static SorceryPortal instance = null;
-	public static SorceryPortal instance() {
-		if (instance == null)
-			instance = new SorceryPortal();
-		
-		return instance;
-	}
-	
 	public SorceryPortal() {
-		super("LIGHT LEVEL 14");
-		this.setUnlocalizedName(ID);
+		super(Block.Properties.create(Material.LEAVES)
+				.hardnessAndResistance(-1.0F, 3600000.8F)
+				.noDrops()
+				.lightValue(14)
+				);
 	}
 	
 	@Override
@@ -42,7 +41,6 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		BlockState state = this.getStateFromMeta(meta);
 		if (isMaster(state)) {
 			return new SorceryPortalTileEntity();
 		}
@@ -60,19 +58,19 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 	
 	@Override
 	protected void teleportEntity(World worldIn, BlockPos portalPos, Entity entityIn) {
-		entityIn.dismountRidingEntity();
+		entityIn.stopRiding();
 		entityIn.removePassengers();
 		
 		if (!entityIn.getPassengers().isEmpty()) {
 			return;
 		}
 		
-		if (entityIn.isRiding()) {
+		if (entityIn.isPassenger()) {
 			return;
 		}
 		
 		entityIn.setPortal(entityIn.getPosition());
-		if (worldIn.provider.getDimension() != ModConfig.config.sorceryDimensionIndex()) {
+		if (worldIn.getDimension().getType().getId() != ModConfig.config.sorceryDimensionIndex()) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(entityIn);
 			if (attr != null) {
 				// Find bottom block
@@ -89,7 +87,7 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 						break;
 					}
 				}
-				attr.setSorceryPortalLocation(entityIn.dimension, new BlockPos(savedPos));
+				attr.setSorceryPortalLocation(entityIn.dimension.getId(), new BlockPos(savedPos));
 			}
 			entityIn.changeDimension(ModConfig.config.sorceryDimensionIndex());
 		} else {
@@ -100,6 +98,12 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 	@Override
 	protected boolean canTeleport(World worldIn, BlockPos portalPos, Entity entityIn) {
 		return entityIn instanceof PlayerEntity;
+	}
+
+	@Override
+	public TileEntity createNewTileEntity(IBlockReader worldIn) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

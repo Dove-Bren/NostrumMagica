@@ -5,8 +5,6 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.TemporaryTeleportationPortal;
-import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
-import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
@@ -15,6 +13,8 @@ import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.network.messages.ObeliskTeleportationRequestMessage;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.tiles.AltarTileEntity;
+import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.item.ItemEntity;

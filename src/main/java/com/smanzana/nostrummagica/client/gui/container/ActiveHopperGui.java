@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.client.gui.container;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.tiles.ActiveHopperTileEntity;
+import com.smanzana.nostrummagica.tiles.ActiveHopperTileEntity;
 import com.smanzana.nostrummagica.utils.Inventories;
 
 import net.minecraft.client.gui.Gui;

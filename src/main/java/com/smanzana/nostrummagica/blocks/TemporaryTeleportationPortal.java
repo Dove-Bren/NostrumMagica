@@ -5,11 +5,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import com.smanzana.nostrummagica.blocks.tiles.TemporaryPortalTileEntity;
+import com.smanzana.nostrummagica.tiles.TemporaryPortalTileEntity;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
 /**
@@ -21,17 +24,12 @@ public class TemporaryTeleportationPortal extends TeleportationPortal  {
 	
 	public static final String ID = "limited_teleportation_portal";
 	
-	private static TemporaryTeleportationPortal instance = null;
-	public static TemporaryTeleportationPortal instance() {
-		if (instance == null)
-			instance = new TemporaryTeleportationPortal();
-		
-		return instance;
-	}
-	
 	public TemporaryTeleportationPortal() {
-		super("LIGHT LEVEL 14");
-		this.setUnlocalizedName(ID);
+		super(Block.Properties.create(Material.LEAVES)
+				.hardnessAndResistance(-1.0F, 3600000.8F)
+				.noDrops()
+				.lightValue(14)
+				);
 	}
 	
 	@Override
@@ -41,25 +39,22 @@ public class TemporaryTeleportationPortal extends TeleportationPortal  {
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		if (worldIn.isRemote) {
-			BlockState state = this.getStateFromMeta(meta);
-			if (isMaster(state)) {
-				return new TemporaryPortalTileEntity();
-			}
+		if (isMaster(state)) {
+			return new TemporaryPortalTileEntity();
 		}
 		
 		return null;
 	}
 	
 	protected static void spawnPortal(World worldIn, BlockPos portalMaster, BlockPos target, int duration) {
-		TemporaryPortalTileEntity te = new TemporaryPortalTileEntity(target, worldIn.getTotalWorldTime() + duration);
+		TemporaryPortalTileEntity te = new TemporaryPortalTileEntity(target, worldIn.getGameTime() + duration);
 		worldIn.setTileEntity(portalMaster, te);
 	}
 	
 	public static void spawn(World world, BlockPos at, BlockPos target, int duration) {
-		BlockState state = instance().getMaster();
+		BlockState state = NostrumBlocks.temporaryTeleportationPortal.getMaster();
 		world.setBlockState(at, state);
-		instance().createPaired(world, at);
+		NostrumBlocks.temporaryTeleportationPortal.createPaired(world, at);
 		
 		spawnPortal(world, at, target, duration);
 	}
@@ -107,7 +102,7 @@ public class TemporaryTeleportationPortal extends TeleportationPortal  {
 			for (BlockPos pos : new BlockPos[]{loc, loc.up()}) {
 				if (!world.isAirBlock(pos)) {
 					BlockState state = world.getBlockState(loc);
-					if (!state.getBlock().isReplaceable(world, loc)) {
+					if (!state.getMaterial().isReplaceable()) {
 						pass = false;
 						break;
 					}

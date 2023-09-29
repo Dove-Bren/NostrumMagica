@@ -4,12 +4,6 @@ import java.util.List;
 
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.tiles.ActiveHopperTileEntity;
-import com.smanzana.nostrummagica.blocks.tiles.LoreTableEntity;
-import com.smanzana.nostrummagica.blocks.tiles.ModificationTableEntity;
-import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity;
-import com.smanzana.nostrummagica.blocks.tiles.PutterBlockTileEntity;
-import com.smanzana.nostrummagica.blocks.tiles.SpellTableEntity;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.container.ActiveHopperGui;
 import com.smanzana.nostrummagica.client.gui.container.LoreTableGui;
@@ -25,6 +19,12 @@ import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock.WispBloc
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.tiles.ActiveHopperTileEntity;
+import com.smanzana.nostrummagica.tiles.LoreTableEntity;
+import com.smanzana.nostrummagica.tiles.ModificationTableEntity;
+import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.tiles.PutterBlockTileEntity;
+import com.smanzana.nostrummagica.tiles.SpellTableEntity;
 
 import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.entity.player.PlayerEntity;

@@ -1,40 +1,16 @@
 package com.smanzana.nostrummagica.blocks;
 
-import javax.annotation.Nullable;
-
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.tiles.ActiveHopperTileEntity;
-import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
-import com.smanzana.nostrummagica.blocks.tiles.CandleTileEntity;
-import com.smanzana.nostrummagica.blocks.tiles.ItemDuctTileEntity;
-import com.smanzana.nostrummagica.blocks.tiles.LoreTableEntity;
-import com.smanzana.nostrummagica.blocks.tiles.ManaArmorerTileEntity;
-import com.smanzana.nostrummagica.blocks.tiles.ModificationTableEntity;
-import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity;
-import com.smanzana.nostrummagica.blocks.tiles.ObeliskPortalTileEntity;
-import com.smanzana.nostrummagica.blocks.tiles.ParadoxMirrorTileEntity;
-import com.smanzana.nostrummagica.blocks.tiles.ProgressionDoorTileEntity;
-import com.smanzana.nostrummagica.blocks.tiles.PutterBlockTileEntity;
-import com.smanzana.nostrummagica.blocks.tiles.SingleSpawnerTileEntity;
-import com.smanzana.nostrummagica.blocks.tiles.SorceryPortalTileEntity;
-import com.smanzana.nostrummagica.blocks.tiles.SpawnerTriggerTileEntity;
-import com.smanzana.nostrummagica.blocks.tiles.SpellTableEntity;
-import com.smanzana.nostrummagica.blocks.tiles.SwitchBlockTileEntity;
-import com.smanzana.nostrummagica.blocks.tiles.SymbolTileEntity;
-import com.smanzana.nostrummagica.blocks.tiles.TeleportRuneTileEntity;
-import com.smanzana.nostrummagica.blocks.tiles.TeleportationPortalTileEntity;
-import com.smanzana.nostrummagica.blocks.tiles.TemporaryPortalTileEntity;
 import com.smanzana.nostrummagica.fluids.NostrumFluids;
-import com.smanzana.nostrummagica.items.AltarItem;
+import com.smanzana.nostrummagica.items.NostrumItems;
 
 import net.minecraft.block.Block;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.ObjectHolder;
 
@@ -57,6 +33,7 @@ public class NostrumBlocks {
 	@ObjectHolder(EssenceOre.ID) public static EssenceOre essenceOre;
 	@ObjectHolder(ItemDuct.ID) public static ItemDuct itemDuct;
 	@ObjectHolder(LogicDoor.ID) public static LogicDoor logicDoor;
+	@ObjectHolder(LoreTable.ID) public static LoreTable loreTable;
 	@ObjectHolder(MagicDirt.ID) public static MagicDirt magicDirt;
 	@ObjectHolder(MagicWall.ID) public static MagicWall magicWall;
 	@ObjectHolder(ManaArmorerBlock.ID) public static ManaArmorerBlock manaArmorerBlock;
@@ -73,91 +50,103 @@ public class NostrumBlocks {
 	@ObjectHolder(NostrumSpawnAndTrigger.ID) public static NostrumSpawnAndTrigger triggerSpawner;
 	@ObjectHolder(ObeliskPortal.ID) public static ObeliskPortal obeliskPortal;
 	@ObjectHolder(ParadoxMirrorBlock.ID) public static ParadoxMirrorBlock paradoxMirror;
+	@ObjectHolder(PoisonWaterBlock.ID_BREAKABLE) public static PoisonWaterBlock poisonWaterBlock;
+	@ObjectHolder(PoisonWaterBlock.ID_UNBREAKABLE) public static PoisonWaterBlock unbreakablePoisonWaterBlock;
 	@ObjectHolder(ProgressionDoor.ID) public static ProgressionDoor progressionDoor;
 	@ObjectHolder(PutterBlock.ID) public static PutterBlock putterBlock;
-//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
-//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
-//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
-//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
-//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
-//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
-//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
-//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
-//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
-//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
-//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
-//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
-//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
-//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
-//	@ObjectHolder(ActiveHopper.ID) public static ActiveHopper activeHopper;
+	@ObjectHolder(ShrineBlock.ID) public static ShrineBlock shrineBlock;
+	@ObjectHolder(SorceryPortal.ID) public static SorceryPortal sorceryPortal;
+	@ObjectHolder(SorceryPortalSpawner.ID) public static SorceryPortalSpawner sorceryPortalSpawner;
+	@ObjectHolder(SpellTable.ID) public static SpellTable spellTable;
+	@ObjectHolder(SwitchBlock.ID) public static SwitchBlock switchBlock;
+	@ObjectHolder(TeleportationPortal.ID) public static TeleportationPortal teleportationPortal;
+	@ObjectHolder(SymbolBlock.ID) public static SymbolBlock symbolBlock;
+	@ObjectHolder(TeleportRune.ID) public static TeleportRune teleportRune;
+	@ObjectHolder(TemporaryTeleportationPortal.ID) public static TemporaryTeleportationPortal temporaryTeleportationPortal;
 	
-	private static void registerBlockItem(Block block, String registryName, @Nullable CreativeTabs tab, IForgeRegistry<Item> registry) {
-		BlockItem item = new BlockItem(block);
+	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
+		BlockItem item = new BlockItem(block, builder);
     	item.setRegistryName(registryName);
-    	item.setUnlocalizedName(registryName);
-    	item.setCreativeTab(tab == null ? NostrumMagica.creativeTab : tab);
     	registry.register(item);
 	}
 	
-	private static void registerBlockItem(Block block, String registryName, IForgeRegistry<Item> registry) {
-		registerBlockItem(block, registryName, null, registry);
+	private static void registerBlockItem(Block block, ResourceLocation registryName, IForgeRegistry<Item> registry) {
+		registerBlockItem(block, registryName, NostrumItems.PropBase(), registry);
 	}
 	
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
     	final IForgeRegistry<Item> registry = event.getRegistry();
     	
-    	registerBlockItem(MagicWall.instance(), MagicWall.ID, registry);
-    	registerBlockItem(CursedIce.instance(), CursedIce.ID, registry);
-    	registerBlockItem(ManiOre.instance(), ManiOre.ID, registry);
-    	registerBlockItem(MagicDirt.instance(), MagicDirt.ID, registry);
-    	registerBlockItem(NostrumSingleSpawner.instance(), NostrumSingleSpawner.ID, registry);
-    	registerBlockItem(NostrumSpawnAndTrigger.instance(), NostrumSpawnAndTrigger.ID, registry);
-    	registerBlockItem(Candle.instance(), Candle.ID, registry);
-    	registerBlockItem(EssenceOre.instance(), EssenceOre.ID, registry);
-    	registerBlockItem(ModificationTable.instance(), ModificationTable.ID, registry);
-    	registerBlockItem(LoreTable.instance(), LoreTable.ID, registry);
-    	registerBlockItem(SorceryPortal.instance(), SorceryPortal.ID, registry);
-    	registerBlockItem(ProgressionDoor.instance(), ProgressionDoor.ID, registry);
-    	registerBlockItem(LogicDoor.instance(), LogicDoor.ID, registry);
-    	registerBlockItem(SwitchBlock.instance(), SwitchBlock.ID, registry);
-//    	registerBlockItem(MimicBlock.door(), MimicBlock.ID_DOOR, registry);
-//    	registerBlockItem(MimicBlock.facade(), MimicBlock.ID_FACADE, registry);
-    	registerBlockItem(TeleportRune.instance(), TeleportRune.ID, registry);
-    	registerBlockItem(PutterBlock.instance(), PutterBlock.ID, registry);
-    	registerBlockItem(ActiveHopper.instance, ActiveHopper.ID, registry);
-    	registerBlockItem(ItemDuct.instance, ItemDuct.ID, registry);
-    	registerBlockItem(DungeonBars.instance(), DungeonBars.ID, registry);
-    	registerBlockItem(ParadoxMirrorBlock.instance(), ParadoxMirrorBlock.ID, registry);
-    	registerBlockItem(ManaArmorerBlock.instance(), ManaArmorerBlock.ID, registry);
+    	registerBlockItem(activeHopper, activeHopper.getRegistryName(), registry);
+    	registerBlockItem(altar, altar.getRegistryName(), registry);
+    	registerBlockItem(candle, candle.getRegistryName(), registry);
+    	registerBlockItem(chalk, chalk.getRegistryName(), registry);
+    	registerBlockItem(essenceCrop, essenceCrop.getRegistryName(), registry);
+    	registerBlockItem(ginsengCrop, ginsengCrop.getRegistryName(), registry);
+    	registerBlockItem(mandrakeCrop, mandrakeCrop.getRegistryName(), registry);
+    	registerBlockItem(cursedIce, cursedIce.getRegistryName(), registry);
+    	registerBlockItem(dungeonAir, dungeonAir.getRegistryName(), registry);
+    	registerBlockItem(dungeonBars, dungeonBars.getRegistryName(), registry);
+    	registerBlockItem(lightDungeonBlock, lightDungeonBlock.getRegistryName(), registry);
+    	registerBlockItem(dungeonBlock, dungeonBlock.getRegistryName(), registry);
+    	registerBlockItem(essenceOre, essenceOre.getRegistryName(), registry);
+    	registerBlockItem(itemDuct, itemDuct.getRegistryName(), registry);
+    	registerBlockItem(logicDoor, logicDoor.getRegistryName(), registry);
+    	registerBlockItem(magicDirt, magicDirt.getRegistryName(), registry);
+    	registerBlockItem(magicWall, magicWall.getRegistryName(), registry);
+    	registerBlockItem(manaArmorerBlock, manaArmorerBlock.getRegistryName(), registry);
+    	registerBlockItem(maniCrystalBlock, maniCrystalBlock.getRegistryName(), registry);
+    	registerBlockItem(maniOre, maniOre.getRegistryName(), registry);
+    	registerBlockItem(mimicFacade, mimicFacade.getRegistryName(), registry);
+    	registerBlockItem(mimicDoor, mimicDoor.getRegistryName(), registry);
+    	registerBlockItem(modificationTable, modificationTable.getRegistryName(), registry);
+    	registerBlockItem(midnightIris, midnightIris.getRegistryName(), registry);
+    	registerBlockItem(crystabloom, crystabloom.getRegistryName(), registry);
+    	registerBlockItem(mirrorBlock, mirrorBlock.getRegistryName(), registry);
+    	registerBlockItem(obelisk, obelisk.getRegistryName(), registry);
+    	registerBlockItem(singleSpawner, singleSpawner.getRegistryName(), registry);
+    	registerBlockItem(triggerSpawner, triggerSpawner.getRegistryName(), registry);
+    	registerBlockItem(obeliskPortal, obeliskPortal.getRegistryName(), registry);
+    	registerBlockItem(paradoxMirror, paradoxMirror.getRegistryName(), registry);
+    	registerBlockItem(poisonWaterBlock, poisonWaterBlock.getRegistryName(), registry);
+    	registerBlockItem(unbreakablePoisonWaterBlock, unbreakablePoisonWaterBlock.getRegistryName(), registry);
+    	registerBlockItem(progressionDoor, progressionDoor.getRegistryName(), registry);
+    	registerBlockItem(putterBlock, putterBlock.getRegistryName(), registry);
+    	registerBlockItem(shrineBlock, shrineBlock.getRegistryName(), registry);
+    	registerBlockItem(sorceryPortal, sorceryPortal.getRegistryName(), registry);
+    	registerBlockItem(sorceryPortalSpawner, sorceryPortalSpawner.getRegistryName(), registry);
+    	registerBlockItem(spellTable, spellTable.getRegistryName(), registry);
+    	registerBlockItem(switchBlock, switchBlock.getRegistryName(), registry);
+    	registerBlockItem(teleportationPortal, teleportationPortal.getRegistryName(), registry);
+    	registerBlockItem(symbolBlock, symbolBlock.getRegistryName(), registry);
+    	registerBlockItem(teleportRune, teleportRune.getRegistryName(), registry);
+    	registerBlockItem(temporaryTeleportationPortal, temporaryTeleportationPortal.getRegistryName(), registry);
     	
 
-    	String[] variants = new String[DungeonBlock.Type.values().length];
-    	for (DungeonBlock.Type type : DungeonBlock.Type.values()) {
-    		variants[type.ordinal()] = type.getName().toLowerCase();
-    	}
-    	registry.register(
-    			(new ItemMultiTexture(DungeonBlock.instance(), DungeonBlock.instance(), variants))
-    			.setRegistryName(DungeonBlock.ID)
-    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(DungeonBlock.ID));
+//    	String[] variants = new String[DungeonBlock.Type.values().length];
+//    	for (DungeonBlock.Type type : DungeonBlock.Type.values()) {
+//    		variants[type.ordinal()] = type.getName().toLowerCase();
+//    	}
+//    	registry.register(
+//    			(new ItemMultiTexture(DungeonBlock.instance(), DungeonBlock.instance(), variants))
+//    			.setRegistryName(DungeonBlock.ID)
+//    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(DungeonBlock.ID));
+//    	
+//    	registry.register((new ItemMultiTexture(MimicBlock.door(), MimicBlock.door(), new String[] {
+//    			"breakable", // 0 meta
+//    			"unbreakable", // 1 meta
+//    		})).setRegistryName(MimicBlock.ID_DOOR).setCreativeTab(NostrumMagica.creativeTab));
+//    	registry.register((new ItemMultiTexture(MimicBlock.facade(), MimicBlock.facade(), new String[] {
+//    			"breakable", // 0 meta
+//    			"unbreakable", // 1 meta
+//    		})).setRegistryName(MimicBlock.ID_FACADE).setCreativeTab(NostrumMagica.creativeTab));
+//    	
+//    	registry.register((new ItemMultiTexture(DungeonAir.instance(), DungeonAir.instance(), new String[] {
+//    			"single", // 0 meta
+//    			"flood", // 1 meta
+//    		})).setRegistryName(DungeonAir.ID).setCreativeTab(NostrumMagica.creativeTab));
     	
-    	registry.register((new ItemMultiTexture(MimicBlock.door(), MimicBlock.door(), new String[] {
-    			"breakable", // 0 meta
-    			"unbreakable", // 1 meta
-    		})).setRegistryName(MimicBlock.ID_DOOR).setCreativeTab(NostrumMagica.creativeTab));
-    	registry.register((new ItemMultiTexture(MimicBlock.facade(), MimicBlock.facade(), new String[] {
-    			"breakable", // 0 meta
-    			"unbreakable", // 1 meta
-    		})).setRegistryName(MimicBlock.ID_FACADE).setCreativeTab(NostrumMagica.creativeTab));
-    	
-    	registry.register((new ItemMultiTexture(DungeonAir.instance(), DungeonAir.instance(), new String[] {
-    			"single", // 0 meta
-    			"flood", // 1 meta
-    		})).setRegistryName(DungeonAir.ID).setCreativeTab(NostrumMagica.creativeTab));
-    	
-    	
-    	
-    	registerFluidItems(registry);
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -169,113 +158,50 @@ public class NostrumBlocks {
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
     	final IForgeRegistry<Block> registry = event.getRegistry();
     	
-    	registerBlock(SpellTable.instance(), SpellTable.ID, registry);
-    	registerBlock(NostrumMagicaFlower.instance(), NostrumMagicaFlower.ID, registry);
-    	registerBlock(CropMandrakeRoot.instance(), CropMandrakeRoot.ID, registry);
-    	registerBlock(CropGinseng.instance(), CropGinseng.ID, registry);
-    	
-    	// DungeonBlock item variants registered by hand in item register method
-    	registerBlock(DungeonBlock.instance(), DungeonBlock.ID, registry);
-    	
-    	registerBlock(SymbolBlock.instance(), SymbolBlock.ID, registry);
-    	registerBlock(ShrineBlock.instance(), ShrineBlock.ID, registry);
-    	registerBlock(NostrumMirrorBlock.instance(), NostrumMirrorBlock.ID, registry);
-    	registerBlock(ChalkBlock.instance(), ChalkBlock.ID, registry);
-    	registerBlock(AltarBlock.instance(), AltarBlock.ID, registry);
-    	registerBlock(NostrumObelisk.instance(), NostrumObelisk.ID, registry);
-    	registerBlock(ObeliskPortal.instance(), ObeliskPortal.ID, registry);
-    	registerBlock(TeleportationPortal.instance(), TeleportationPortal.ID, registry);
-    	registerBlock(TemporaryTeleportationPortal.instance(), TemporaryTeleportationPortal.ID, registry);
-    	registerBlock(SorceryPortalSpawner.instance(), SorceryPortalSpawner.ID, registry);
-    	registerBlock(ManiCrystal.instance(), ManiCrystal.ID, registry);
-    	registerBlock(CropEssence.instance(), CropEssence.ID, registry);
-    	
-    	registerBlock(MagicWall.instance(), MagicWall.ID, registry);
-    	registerBlock(CursedIce.instance(), CursedIce.ID, registry);
-    	registerBlock(ManiOre.instance(), ManiOre.ID, registry);
-    	registerBlock(MagicDirt.instance(), MagicDirt.ID, registry);
-    	registerBlock(NostrumSingleSpawner.instance(), NostrumSingleSpawner.ID, registry);
-    	registerBlock(NostrumSpawnAndTrigger.instance(), NostrumSpawnAndTrigger.ID, registry);
-    	registerBlock(Candle.instance(), Candle.ID, registry);
-    	registerBlock(EssenceOre.instance(), EssenceOre.ID, registry);
-    	registerBlock(ModificationTable.instance(), ModificationTable.ID, registry);
-    	registerBlock(LoreTable.instance(), LoreTable.ID, registry);
-    	registerBlock(SorceryPortal.instance(), SorceryPortal.ID, registry);
-    	registerBlock(ProgressionDoor.instance(), ProgressionDoor.ID, registry);
-    	registerBlock(LogicDoor.instance(), LogicDoor.ID, registry);
-    	registerBlock(SwitchBlock.instance(), SwitchBlock.ID, registry);
-    	registerBlock(MimicBlock.door(), MimicBlock.ID_DOOR, registry);
-    	registerBlock(MimicBlock.facade(), MimicBlock.ID_FACADE, registry);
-    	registerBlock(TeleportRune.instance(), TeleportRune.ID, registry);
-    	registerBlock(PutterBlock.instance(), PutterBlock.ID, registry);
-    	registerBlock(ActiveHopper.instance, ActiveHopper.ID, registry);
-    	registerBlock(ItemDuct.instance, ItemDuct.ID, registry);
-    	registerBlock(DungeonBars.instance(), DungeonBars.ID, registry);
-    	registerBlock(DungeonAir.instance(), DungeonAir.ID, registry);
-    	registerBlock(ParadoxMirrorBlock.instance(), ParadoxMirrorBlock.ID, registry);
-    	registerBlock(ManaArmorerBlock.instance(), ManaArmorerBlock.ID, registry);
-    	
-    	
-//			GameRegistry.addRecipe(new ItemStack(MagicDirt.instance()), " D ", "DCD", " D ",
-//					'D', new ItemStack(Blocks.DIRT, 1, OreDictionary.WILDCARD_VALUE),
-//					'C', InfusedGemItem.instance().getGem(null, 0));
-
-//			GameRegistry.addShapedRecipe(new ItemStack(Candle.instance()),
-//					"W",
-//					"F",
-//					'W', ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1),
-//					'F', Items.ROTTEN_FLESH);
-//			GameRegistry.addShapedRecipe(new ItemStack(Candle.instance()),
-//					"W",
-//					"F",
-//					'W', Items.STRING,
-//					'F', Items.ROTTEN_FLESH);
-    	
-    	registerFluidBlocks(registry);
-    	registerTileEntities();
-    	
-
-    	
+    	registerBlock(new ActiveHopper(), ActiveHopper.ID, registry);
+    	registerBlock(new AltarBlock(), AltarBlock.ID, registry);
+    	registerBlock(new Candle(), Candle.ID, registry);
+    	registerBlock(new ChalkBlock(), ChalkBlock.ID, registry);
+    	registerBlock(new CropEssence(), CropEssence.ID, registry);
+    	registerBlock(new CropGinseng(), CropGinseng.ID, registry);
+    	registerBlock(new CropMandrakeRoot(), CropMandrakeRoot.ID, registry);
+    	registerBlock(new CursedIce(), CursedIce.ID, registry);
+    	registerBlock(new DungeonAir(), DungeonAir.ID, registry);
+    	registerBlock(new DungeonBars(), DungeonBars.ID, registry);
+    	registerBlock(new DungeonBlock(DungeonBlock.Type.LIGHT), DungeonBlock.ID_LIGHT, registry);
+    	registerBlock(new DungeonBlock(DungeonBlock.Type.DARK), DungeonBlock.ID_DARK, registry);
+    	registerBlock(new EssenceOre(), EssenceOre.ID, registry);
+    	registerBlock(new ItemDuct(), ItemDuct.ID, registry);
+    	registerBlock(new LogicDoor(), LogicDoor.ID, registry);
+    	registerBlock(new MagicDirt(), MagicDirt.ID, registry);
+    	registerBlock(new MagicWall(), MagicWall.ID, registry);
+    	registerBlock(new ManaArmorerBlock(), ManaArmorerBlock.ID, registry);
+    	registerBlock(new ManiCrystal(), ManiCrystal.ID, registry);
+    	registerBlock(new ManiOre(), ManiOre.ID, registry);
+    	registerBlock(new MimicBlock(false), MimicBlock.ID_FACADE, registry);
+    	registerBlock(new MimicBlock(true), MimicBlock.ID_DOOR, registry);
+    	registerBlock(new ModificationTable(), ModificationTable.ID, registry);
+    	registerBlock(new NostrumMagicaFlower(NostrumMagicaFlower.Type.MIDNIGHT_IRIS), NostrumMagicaFlower.ID_MIDNIGHT_IRIS, registry);
+    	registerBlock(new NostrumMagicaFlower(NostrumMagicaFlower.Type.CRYSTABLOOM), NostrumMagicaFlower.ID_CRYSTABLOOM, registry);
+    	registerBlock(new NostrumMirrorBlock(), NostrumMirrorBlock.ID, registry);
+    	registerBlock(new NostrumObelisk(), NostrumObelisk.ID, registry);
+    	registerBlock(new NostrumSingleSpawner(), NostrumSingleSpawner.ID, registry);
+    	registerBlock(new NostrumSpawnAndTrigger(), NostrumSpawnAndTrigger.ID, registry);
+    	registerBlock(new ObeliskPortal(), ObeliskPortal.ID, registry);
+    	registerBlock(new ParadoxMirrorBlock(), ParadoxMirrorBlock.ID, registry);
+    	registerBlock(new PoisonWaterBlock(() -> {return NostrumFluids.poisonWater;}, false), PoisonWaterBlock.ID_BREAKABLE, registry);
+    	registerBlock(new PoisonWaterBlock(() -> {return NostrumFluids.unbreakablePoisonWater;}, true), PoisonWaterBlock.ID_BREAKABLE, registry);
+    	registerBlock(new ProgressionDoor(), ProgressionDoor.ID, registry);
+    	registerBlock(new PutterBlock(), PutterBlock.ID, registry);
+    	registerBlock(new ShrineBlock(), ShrineBlock.ID, registry);
+    	registerBlock(new SorceryPortal(), SorceryPortal.ID, registry);
+    	registerBlock(new SorceryPortalSpawner(), SorceryPortalSpawner.ID, registry);
+    	registerBlock(new SpellTable(), SpellTable.ID, registry);
+    	registerBlock(new SwitchBlock(), SwitchBlock.ID, registry);
+    	registerBlock(new TeleportationPortal(), TeleportationPortal.ID, registry);
+    	registerBlock(new SymbolBlock(), SymbolBlock.ID, registry);
+    	registerBlock(new TeleportRune(), TeleportRune.ID, registry);
+    	registerBlock(new TemporaryTeleportationPortal(), TemporaryTeleportationPortal.ID, registry);
     }
     
-    private void registerTileEntities() {
-    	GameRegistry.registerTileEntity(SpellTableEntity.class, new ResourceLocation(NostrumMagica.MODID, "spell_table"));
-    	GameRegistry.registerTileEntity(SingleSpawnerTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "nostrum_mob_spawner_te"));
-    	GameRegistry.registerTileEntity(SpawnerTriggerTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "nostrum_mob_spawner_trigger_te"));
-    	GameRegistry.registerTileEntity(SymbolTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "nostrum_symbol_te"));
-    	GameRegistry.registerTileEntity(AltarTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "nostrum_altar_te"));
-    	GameRegistry.registerTileEntity(CandleTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "nostrum_candle_te"));
-    	GameRegistry.registerTileEntity(NostrumObeliskEntity.class, new ResourceLocation(NostrumMagica.MODID, "nostrum_obelisk"));
-    	GameRegistry.registerTileEntity(ObeliskPortalTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "obelisk_portal"));
-    	GameRegistry.registerTileEntity(ModificationTableEntity.class, new ResourceLocation(NostrumMagica.MODID, "modification_table"));
-    	GameRegistry.registerTileEntity(LoreTableEntity.class, new ResourceLocation(NostrumMagica.MODID, "lore_table"));
-    	GameRegistry.registerTileEntity(SorceryPortalTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "sorcery_portal"));
-    	GameRegistry.registerTileEntity(TeleportationPortalTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "teleportation_portal"));
-    	GameRegistry.registerTileEntity(TemporaryPortalTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "limited_teleportation_portal"));
-    	GameRegistry.registerTileEntity(ProgressionDoorTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "progression_door"));
-    	GameRegistry.registerTileEntity(SwitchBlockTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "switch_block_tile_entity"));
-    	GameRegistry.registerTileEntity(TeleportRuneTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "teleport_rune"));
-    	GameRegistry.registerTileEntity(PutterBlockTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "putter_entity"));
-    	GameRegistry.registerTileEntity(ActiveHopperTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "active_hopper_te"));
-    	GameRegistry.registerTileEntity(ItemDuctTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "item_duct_te"));
-    	GameRegistry.registerTileEntity(ParadoxMirrorTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "paradox_mirror_te"));
-    	GameRegistry.registerTileEntity(ManaArmorerTileEntity.class, new ResourceLocation(NostrumMagica.MODID, "mana_armorer"));
-    }
-    
-    private static void registerFluidBlocks(IForgeRegistry<Block> registry) {
-    	for (NostrumFluids fluid : NostrumFluids.values()) {
-    		if (fluid.getFluid().getBlock() != null) {
-    			registry.register(fluid.getFluid().getBlock());
-    		}
-    	}
-    }
-    
-    private static void registerFluidItems(IForgeRegistry<Item> registry) {
-    	for (NostrumFluids fluid : NostrumFluids.values()) {
-    		if (fluid.getFluid().getBlock() != null) {
-    			FluidRegistry.addBucketForFluid(fluid.getFluid());
-    		}
-    	}
-    }
-	
 }

@@ -1,26 +1,28 @@
 package com.smanzana.nostrummagica.blocks;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.tiles.TeleportationPortalTileEntity;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.tiles.TeleportationPortalTileEntity;
 
-import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.server.ServerWorld;
 
 /**
  * Portal that takes players to different spots in the same dimension
  * @author Skyler
  *
  */
+@SuppressWarnings("deprecation")
 public class TeleportationPortal extends NostrumPortal implements ITileEntityProvider  {
 	
 	public static final String ID = "teleportation_portal";
@@ -44,7 +46,6 @@ public class TeleportationPortal extends NostrumPortal implements ITileEntityPro
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		BlockState state = this.getStateFromMeta(meta);
 		if (isMaster(state)) {
 			return new TeleportationPortalTileEntity();
 		}
@@ -62,14 +63,14 @@ public class TeleportationPortal extends NostrumPortal implements ITileEntityPro
 	
 	@Override
 	protected void teleportEntity(World worldIn, BlockPos portalPos, Entity entityIn) {
-		entityIn.dismountRidingEntity();
+		entityIn.stopRiding();
 		entityIn.removePassengers();
 		
 		if (!entityIn.getPassengers().isEmpty()) {
 			return;
 		}
 		
-		if (entityIn.isRiding()) {
+		if (entityIn.isPassenger()) {
 			return;
 		}
 		
@@ -81,7 +82,7 @@ public class TeleportationPortal extends NostrumPortal implements ITileEntityPro
 				
 				NostrumMagica.playerListener.registerTimer((type, entity, data) -> {
 				
-					worldIn.getChunkFromBlockCoords(target);
+					worldIn.getChunk(target);
 					
 					entityIn.lastTickPosX = entityIn.prevPosX = target.getX() + .5;
 					entityIn.lastTickPosY = entityIn.prevPosY = target.getY() + .1;
@@ -94,23 +95,23 @@ public class TeleportationPortal extends NostrumPortal implements ITileEntityPro
 						}
 						entityIn.fallDistance = 0;
 						//entityIn.velocityChanged = true;
-						worldIn.updateEntityWithOptionalForce(entityIn, true);
+						((ServerWorld) worldIn).updateEntity(entityIn);
 							
 						// effects, sound, etc.
 						double x = target.getX() + .5;
 						double y = target.getY() + 1.4;
 						double z = target.getZ() + .5;
 						NostrumMagicaSounds.DAMAGE_ENDER.play(worldIn, x, y, z);
-						((WorldServer) worldIn).spawnParticle(EnumParticleTypes.DRAGON_BREATH,
+						((ServerWorld) worldIn).spawnParticle(ParticleTypes.DRAGON_BREATH,
 								x,
 								y,
 								z,
-								50,
+								50, // TODO count??
 								.3,
 								.5,
 								.3,
-								.2,
-								new int[0]);
+								.2
+								);
 						
 					}
 					return true;
@@ -122,6 +123,12 @@ public class TeleportationPortal extends NostrumPortal implements ITileEntityPro
 	@Override
 	protected boolean canTeleport(World worldIn, BlockPos portalPos, Entity entityIn) {
 		return true;
+	}
+
+	@Override
+	public TileEntity createNewTileEntity(IBlockReader worldIn) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

@@ -7,10 +7,10 @@ import javax.annotation.Nonnull;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumObelisk;
 import com.smanzana.nostrummagica.blocks.ObeliskPortal;
-import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.resources.I18n;

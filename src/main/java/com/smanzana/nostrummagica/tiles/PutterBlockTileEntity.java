@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.blocks.tiles;
+package com.smanzana.nostrummagica.tiles;
 
 import java.util.List;
 
@@ -8,16 +8,17 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.PutterBlock;
 import com.smanzana.nostrummagica.utils.Inventories;
 
-import net.minecraft.block.Block;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryBasic;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
@@ -25,14 +26,15 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 
 	private static final String NBT_INVENTORY = "inventory";
 	
-	private final InventoryBasic inventory;
+	private final Inventory inventory;
 	
 	private ItemEntity itemEntCache = null;
 	private int ticksExisted;
 	
 	public PutterBlockTileEntity() {
+		super(NostrumTileEntities.PutterBlockTileEntityType);
 		final PutterBlockTileEntity putter = this;
-		this.inventory = new InventoryBasic("Putter Block", false, 9) {
+		this.inventory = new Inventory(9) {
 			@Override
 			public void markDirty() {
 				putter.markDirty();
@@ -45,8 +47,8 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
-		nbt = super.writeToNBT(nbt);
+	public CompoundNBT write(CompoundNBT nbt) {
+		nbt = super.write(nbt);
 		
 		nbt.put(NBT_INVENTORY, Inventories.serializeInventory(inventory));
 		
@@ -54,13 +56,13 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
-		super.readFromNBT(nbt);
+	public void read(CompoundNBT nbt) {
+		super.read(nbt);
 		
 		if (nbt == null)
 			return;
 		
-		Inventories.deserializeInventory(inventory, nbt.getTag(NBT_INVENTORY));
+		Inventories.deserializeInventory(inventory, nbt.get(NBT_INVENTORY));
 	}
 
 	@Override
@@ -77,7 +79,7 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 		
 		// Validate entityItem
 		if (itemEntCache != null) {
-			if (itemEntCache.isDead
+			if (!itemEntCache.isAlive()
 					|| (int) itemEntCache.posX != pos.getX()
 					|| (int) itemEntCache.posY != pos.getY()
 					|| (int) itemEntCache.posZ != pos.getZ()) {
@@ -112,7 +114,7 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 				dx = -1;
 				break;
 			}
-			List<ItemEntity> items = world.getEntitiesWithinAABB(ItemEntity.class, Block.FULL_BLOCK_AABB.offset(pos).offset(dx, dy, dz));
+			List<ItemEntity> items = world.getEntitiesWithinAABB(ItemEntity.class, VoxelShapes.fullCube().getBoundingBox().offset(pos).offset(dx, dy, dz));
 			if (items != null && !items.isEmpty()) {
 				itemEntCache = items.get(0);
 			}
@@ -169,7 +171,7 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 					break;
 				}
 				itemEntCache = new ItemEntity(world, this.pos.getX() + .5 + dx, this.pos.getY() + .5 + dy, this.pos.getZ() + .5 + dz, toSpawn);
-				itemEntCache.getMotion().x = itemEntCache.getMotion().y = itemEntCache.getMotion().z = 0;
+				itemEntCache.setMotion(0, 0, 0);
 				world.addEntity(itemEntCache);
 			}
 		}
@@ -177,28 +179,20 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 	
 	private ItemEntity refreshEntityItem(ItemEntity oldItem) {
 		ItemEntity newItem = new ItemEntity(oldItem.world, oldItem.posX, oldItem.posY, oldItem.posZ, oldItem.getItem().copy());
-		newItem.getMotion().x = oldItem.getMotion().x;
-		newItem.getMotion().y = oldItem.getMotion().y;
-		newItem.getMotion().z = oldItem.getMotion().z;
+		newItem.setMotion(oldItem.getMotion());
 		newItem.lifespan = oldItem.lifespan;
 		oldItem.world.addEntity(newItem);
-		oldItem.setDead();
+		oldItem.remove();
 		return newItem;
 	}
 	
-	@Override
-	public boolean hasCapability(Capability<?> capability, Direction facing) {
-		return (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
-	}
+	private LazyOptional<IItemHandler> handlerProxy = null;
 	
-	private IItemHandler handlerProxy = null;
-	
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getCapability(Capability<T> capability, Direction facing) {
+	public <T> LazyOptional<T> getCapability(Capability<T> capability, Direction facing) {
 		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
 			if (handlerProxy == null) {
-				handlerProxy = new IItemHandler() {
+				handlerProxy = LazyOptional.of(() -> new IItemHandler() {
 
 					@Override
 					public int getSlots() {
@@ -239,11 +233,16 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 					public int getSlotLimit(int slot) {
 						return 64;
 					}
+
+					@Override
+					public boolean isItemValid(int slot, ItemStack stack) {
+						return slot < this.getSlots(); // no restriction on stack?
+					}
 					
-				};
+				});
 			}
 			
-			return (T) handlerProxy;
+			return handlerProxy.cast();
 		}
 		
 		return null;

@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.blocks.tiles;
+package com.smanzana.nostrummagica.tiles;
 
 import java.util.Random;
 
@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -26,10 +26,11 @@ public class CandleTileEntity extends TileEntity implements ITickableTileEntity 
 	}
 	
 	public CandleTileEntity() {
+		super(NostrumTileEntities.CandleTileEntityType);
 		this.lifeTicks = (20 * 15) + CandleTileEntity.rand.nextInt(20*30);
 	}
 	
-	public ReagentType getType() {
+	public ReagentType getReagentType() {
 		return type;
 	}
 	
@@ -49,8 +50,8 @@ public class CandleTileEntity extends TileEntity implements ITickableTileEntity 
 	}
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
-		nbt = super.writeToNBT(nbt);
+	public CompoundNBT write(CompoundNBT nbt) {
+		nbt = super.write(nbt);
 		
 		nbt.putString(NBT_TYPE, serializeType(type));
 		
@@ -58,8 +59,8 @@ public class CandleTileEntity extends TileEntity implements ITickableTileEntity 
 	}
 	
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
-		super.readFromNBT(nbt);
+	public void read(CompoundNBT nbt) {
+		super.read(nbt);
 		
 		if (nbt == null || !nbt.contains(NBT_TYPE, NBT.TAG_STRING))
 			return;
@@ -68,25 +69,23 @@ public class CandleTileEntity extends TileEntity implements ITickableTileEntity 
 	}
 	
 	@Override
-	public SPacketUpdateTileEntity getUpdatePacket() {
-		return new SPacketUpdateTileEntity(this.pos, 3, this.getUpdateTag());
+	public SUpdateTileEntityPacket getUpdatePacket() {
+		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.writeToNBT(new CompoundNBT());
+		return this.write(new CompoundNBT());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(pkt.getNbtCompound());
 	}
 	
 	private void dirty() {
-		world.markBlockRangeForRenderUpdate(pos, pos);
 		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
-		world.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
 		markDirty();
 	}
 	

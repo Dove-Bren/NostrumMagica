@@ -5,10 +5,10 @@ import java.util.Random;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.tiles.ManaArmorerTileEntity;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.tiles.ManaArmorerTileEntity;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;

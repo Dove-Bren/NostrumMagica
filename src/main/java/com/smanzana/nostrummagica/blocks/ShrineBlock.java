@@ -1,7 +1,6 @@
 package com.smanzana.nostrummagica.blocks;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.tiles.SymbolTileEntity;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
@@ -16,22 +15,25 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
+import com.smanzana.nostrummagica.tiles.SymbolTileEntity;
 import com.smanzana.nostrummagica.trials.ShrineTrial;
 
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.pathfinding.PathType;
+import net.minecraft.state.BooleanProperty;
+import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -40,14 +42,6 @@ public class ShrineBlock extends SymbolBlock {
 	
 	public static final String ID = "shrine_block";
 	private static final BooleanProperty EXHAUSTED = BooleanProperty.create("exhausted");
-	
-	private static ShrineBlock instance = null;
-	public static ShrineBlock instance() {
-		if (instance == null)
-			instance = new ShrineBlock();
-		
-		return instance;
-	}
 	
 	public ShrineBlock() {
 		super();
@@ -67,21 +61,10 @@ public class ShrineBlock extends SymbolBlock {
 		builder.add(EXHAUSTED);
 	}
 	
-	@Override
-	public BlockState getStateFromMeta(int meta) {
-		boolean bool = ((meta & 0x1) == 1);
-		return getDefaultState().with(EXHAUSTED, bool);
-	}
-	
-	@Override
-	public int getMetaFromState(BlockState state) {
-		return (state.get(EXHAUSTED) ? 1 : 0);
-	}
-	
-	@Override
-	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
-		return true;
-	}
+//	@Override
+//	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
+//		return true;
+//	}
 	
 	@Override
 	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
@@ -95,19 +78,17 @@ public class ShrineBlock extends SymbolBlock {
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		SymbolTileEntity ent = new SymbolTileEntity(1.0f);
-		
-		return ent;
+		return super.createTileEntity(state, world);
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public EnumBlockRenderType getRenderType(BlockState state) {
-		return EnumBlockRenderType.MODEL;
+	public BlockRenderType getRenderType(BlockState state) {
+		return BlockRenderType.MODEL;
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
 		
 		if (hand != Hand.MAIN_HAND) {
 			return true;

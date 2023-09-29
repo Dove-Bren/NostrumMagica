@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.blocks.tiles;
+package com.smanzana.nostrummagica.tiles;
 
 import javax.annotation.Nullable;
 
@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -21,7 +21,7 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 	private BlockPos teleOffset = null;
 	
 	public TeleportRuneTileEntity() {
-		super();
+		super(NostrumTileEntities.TeleportRuneTileEntityType);
 	}
 	
 	/**
@@ -50,23 +50,23 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 	}
 	
 	@Override
-	public SPacketUpdateTileEntity getUpdatePacket() {
-		return new SPacketUpdateTileEntity(this.pos, 3, this.getUpdateTag());
+	public SUpdateTileEntityPacket getUpdatePacket() {
+		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.writeToNBT(new CompoundNBT());
+		return this.write(new CompoundNBT());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(pkt.getNbtCompound());
 	}
 	
-	public CompoundNBT writeToNBT(CompoundNBT compound) {
-		super.writeToNBT(compound);
+	public CompoundNBT write(CompoundNBT compound) {
+		super.write(compound);
 		
 		if (teleOffset != null) {
 			compound.putLong(NBT_OFFSET, teleOffset.toLong());
@@ -75,8 +75,8 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 		return compound;
 	}
 	
-	public void readFromNBT(CompoundNBT compound) {
-		super.readFromNBT(compound);
+	public void read(CompoundNBT compound) {
+		super.read(compound);
 		
 		teleOffset = null;
 		if (compound.contains(NBT_OFFSET, NBT.TAG_LONG)) {

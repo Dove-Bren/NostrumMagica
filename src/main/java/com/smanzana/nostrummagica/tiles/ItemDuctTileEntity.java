@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.blocks.tiles;
+package com.smanzana.nostrummagica.tiles;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,26 +9,24 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import com.smanzana.nostrummagica.blocks.ItemDuct;
 import com.smanzana.nostrummagica.utils.Inventories;
 import com.smanzana.nostrummagica.utils.ItemStacks;
 
-import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.ChestBlock;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.tileentity.ChestTileEntity;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -61,8 +59,8 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 		
 		public static final ItemDuctTileEntity.ItemEntry fromNBT(CompoundNBT tag) {
 			final long tick = tag.getLong(NBT_TICK);
-			final ItemStack stack = new ItemStack(tag.getCompound(NBT_ITEM));
-			final Direction dir = Direction.VALUES[tag.getInt(NBT_DIRECTION)];
+			final ItemStack stack = ItemStack.read(tag.getCompound(NBT_ITEM));
+			final Direction dir = Direction.values()[tag.getInt(NBT_DIRECTION)];
 			return new ItemEntry(tick, stack, dir);
 		}
 	}
@@ -118,6 +116,15 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 		public int getSlotLimit(int slot) {
 			return 64;
 		}
+
+		@Override
+		public boolean isItemValid(int slot, ItemStack stack) {
+			if (slot != 0) {
+				return false;
+			}
+			
+			return true;
+		}
 		
 	}
 	
@@ -129,25 +136,28 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 	
 	private final List<ItemDuctTileEntity.ItemEntry> itemQueue; // List of items being moved through. Naturally sorted by input (and therefore output) time
 	private long ticks;
-	private final ItemDuctTileEntity.SidedItemHandler[] handlers;
+	private final LazyOptional<ItemDuctTileEntity.SidedItemHandler> handlerDown;
+	private final LazyOptional<ItemDuctTileEntity.SidedItemHandler> handlerUp;
+	private final LazyOptional<ItemDuctTileEntity.SidedItemHandler> handlerNorth;
+	private final LazyOptional<ItemDuctTileEntity.SidedItemHandler> handlerSouth;
+	private final LazyOptional<ItemDuctTileEntity.SidedItemHandler> handlerWest;
+	private final LazyOptional<ItemDuctTileEntity.SidedItemHandler> handlerEast;
 	
 	public ItemDuctTileEntity() {
-		super();
+		super(NostrumTileEntities.ItemDuctTileEntityType);
 		itemQueue = new LinkedList<>();
 		ticks = 0;
-		handlers = new ItemDuctTileEntity.SidedItemHandler[] { // D U N S W E
-			new SidedItemHandler(this, Direction.DOWN),
-			new SidedItemHandler(this, Direction.UP),
-			new SidedItemHandler(this, Direction.NORTH),
-			new SidedItemHandler(this, Direction.SOUTH),
-			new SidedItemHandler(this, Direction.WEST),
-			new SidedItemHandler(this, Direction.EAST),
-		};
+		handlerDown = LazyOptional.of(() -> new SidedItemHandler(this, Direction.DOWN));
+		handlerUp = LazyOptional.of(() -> new SidedItemHandler(this, Direction.UP));
+		handlerNorth = LazyOptional.of(() -> new SidedItemHandler(this, Direction.NORTH));
+		handlerSouth = LazyOptional.of(() -> new SidedItemHandler(this, Direction.SOUTH));
+		handlerWest = LazyOptional.of(() -> new SidedItemHandler(this, Direction.WEST));
+		handlerEast = LazyOptional.of(() -> new SidedItemHandler(this, Direction.EAST));
 	}
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
-		nbt = super.writeToNBT(nbt);
+	public CompoundNBT write(CompoundNBT nbt) {
+		nbt = super.write(nbt);
 		
 		ListNBT list = new ListNBT();
 		for (ItemDuctTileEntity.ItemEntry entry : itemQueue) {
@@ -161,22 +171,17 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 	}
 	
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
-		super.readFromNBT(nbt);
+	public void read(CompoundNBT nbt) {
+		super.read(nbt);
 		
 		itemQueue.clear();
 		ListNBT list = nbt.getList(NBT_SORTED, NBT.TAG_COMPOUND);
 		for (int i = 0; i < list.size(); i++) {
-			CompoundNBT tag = list.getCompoundTagAt(i);
+			CompoundNBT tag = list.getCompound(i);
 			itemQueue.add(ItemEntry.fromNBT(tag));
 		}
 		
 		ticks= nbt.getLong(NBT_TICKS);
-	}
-	
-	@Override
-	public boolean shouldRefresh(World world, BlockPos pos, BlockState oldState, BlockState newState) {
-		return !(newState.getBlock() instanceof ItemDuct);
 	}
 	
 	/**
@@ -226,16 +231,22 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 	}
 	
 	@Override
-	public boolean hasCapability(Capability<?> capability, Direction facing) {
-		// Maybe this should check if we're connected?
-		return (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> T getCapability(Capability<T> capability, Direction facing) {
+	public <T> LazyOptional<T> getCapability(Capability<T> capability, Direction facing) {
 		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-			return (T) handlers[facing.getIndex()];
+			switch (facing) {
+			case DOWN:
+				return handlerDown.cast();
+			case EAST:
+				return handlerEast.cast();
+			case NORTH:
+				return handlerNorth.cast();
+			case SOUTH:
+				return handlerSouth.cast();
+			case UP:
+				return handlerUp.cast();
+			case WEST:
+				return handlerWest.cast();
+			}
 		}
 		return super.getCapability(capability, facing);
 	}
@@ -305,7 +316,7 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 		
 		if (!stack.isEmpty()) {
 			// Push in random directions
-			List<Direction> rand = Lists.newArrayList(Direction.VALUES);
+			List<Direction> rand = Lists.newArrayList(Direction.values());
 			Collections.shuffle(rand);
 			for (Direction dir : rand) {
 				// Don't go backwards and skip forwards since we just tried that
@@ -340,8 +351,8 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 		@Nullable TileEntity te = world.getTileEntity(pos.offset(direction));
 		
 		if (te != null) {
-			if (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite())) {
-				@Nullable IItemHandler handler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite());
+			if (te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).isPresent()) {
+				@Nullable IItemHandler handler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).orElse(null);
 				return pushInto(stack, handler, direction);
 			}
 			
@@ -350,10 +361,10 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 				IInventory inv = (IInventory) te;
 				
 				// Special cast for stupid chests :P
-				if (te instanceof TileEntityChest) {
+				if (te instanceof ChestTileEntity) {
 					BlockState state = world.getBlockState(pos.offset(direction));
-					if (state != null && state.getBlock() instanceof BlockChest) {
-						inv = ((BlockChest)state.getBlock()).getContainer(world, pos.offset(direction), true);
+					if (state != null && state.getBlock() instanceof ChestBlock) {
+						inv = ChestBlock.getInventory(state, world, pos.offset(direction), true);
 					}
 				}
 				

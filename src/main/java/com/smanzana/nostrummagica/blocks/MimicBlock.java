@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.tiles.MimicBlockTileEntity;
+import com.smanzana.nostrummagica.tiles.MimicBlockTileEntity;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;

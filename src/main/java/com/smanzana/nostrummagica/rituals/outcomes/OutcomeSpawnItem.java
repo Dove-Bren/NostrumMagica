@@ -6,8 +6,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
+import com.smanzana.nostrummagica.tiles.AltarTileEntity;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.item.ItemEntity;

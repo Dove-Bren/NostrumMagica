@@ -1,9 +1,9 @@
 package com.smanzana.nostrummagica.rituals.outcomes;
 
-import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.items.PetSoulItem;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
+import com.smanzana.nostrummagica.tiles.AltarTileEntity;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;

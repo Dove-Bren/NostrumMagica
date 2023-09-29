@@ -1,57 +1,48 @@
 package com.smanzana.nostrummagica.blocks;
 
-import java.util.Random;
-
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.tiles.SpellTableEntity;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
-import com.smanzana.nostrummagica.items.SpellTableItem;
+import com.smanzana.nostrummagica.tiles.SpellTableEntity;
 
-import net.minecraft.block.BlockHorizontal;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.HorizontalBlock;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.pathfinding.PathType;
+import net.minecraft.state.BooleanProperty;
+import net.minecraft.state.DirectionProperty;
+import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ToolType;
 
-public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
+@SuppressWarnings("deprecation")
+public class SpellTable extends HorizontalBlock implements ITileEntityProvider {
 	
+	public static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
 	private static final BooleanProperty MASTER = BooleanProperty.create("master");
 	
 	public static final String ID = "spell_table";
 	
-	private static SpellTable instance = null;
-	public static SpellTable instance() {
-		if (instance == null)
-			instance = new SpellTable();
-		
-		return instance;
-	}
-	
 	public SpellTable() {
-		super(Material.WOOD, MapColor.WOOD);
-		this.setUnlocalizedName(ID);
-		this.setHardness(3.0f);
-		this.setResistance(15.0f);
-		this.setCreativeTab(NostrumMagica.creativeTab);
-		this.setSoundType(SoundType.WOOD);
-		this.setHarvestLevel("axe", 1);
+		super(Block.Properties.create(Material.WOOD)
+				.hardnessAndResistance(3.0f, 15.0f)
+				.sound(SoundType.WOOD)
+				.harvestTool(ToolType.AXE)
+				.harvestLevel(1)
+				);
 		
 		this.setDefaultState(this.stateContainer.getBaseState().with(MASTER, true)
 				.with(FACING, Direction.NORTH));
@@ -62,36 +53,20 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
         return false;
     }
 	
-	@Override
-	public boolean isFullCube(BlockState state) {
-		return false;
-	}
-	
-	@Override
-	public boolean isOpaqueCube(BlockState state) {
-		return false;
-	}
-	
-	@Override
-	public boolean isReplaceable(IBlockAccess worldIn, BlockPos pos) {
-        return false;
-    }
+	// public BlockRenderLayer getRenderLayer() ?
+//	@Override
+//	public boolean isFullCube(BlockState state) {
+//		return false;
+//	}
+//	
+//	@Override
+//	public boolean isOpaqueCube(BlockState state) {
+//		return false;
+//	}
 	
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(MASTER, FACING);
-	}
-	
-	@Override
-	public BlockState getStateFromMeta(int meta) {
-		Direction enumfacing = Direction.getHorizontal(meta);
-		return getDefaultState().with(FACING, enumfacing)
-				.with(MASTER, ((meta >> 2) & 1) == 1);
-	}
-	
-	@Override
-	public int getMetaFromState(BlockState state) {
-		return ((state.get(MASTER) ? 1 : 0) << 2) | (state.get(FACING).getHorizontalIndex());
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {
@@ -116,7 +91,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 			}
 		}
 		
-		world.setBlockToAir(getPaired(state, pos));
+		world.removeBlock(getPaired(state, pos), false);
 	}
 	
 	private BlockPos getPaired(BlockState state, BlockPos pos) {
@@ -147,24 +122,12 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 	}
 	
 	@Override
-	public Item getItemDropped(BlockState state, Random rand, int fortune) {
-		return SpellTableItem.instance();//state.get(MASTER) ? SpellTableItem.instance() : null;
-	}
-	
-	@Override
-	public ItemStack getPickBlock(BlockState state, RayTraceResult target, World world, BlockPos pos, PlayerEntity player) {
-		return new ItemStack(SpellTableItem.instance(), 1);
-	}
-
-
-	@Override
 	public boolean hasTileEntity() {
 		return true;
 	}
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		BlockState state = this.getStateFromMeta(meta);
 		if (state.get(MASTER))
 			return new SpellTableEntity();
 		
@@ -172,11 +135,11 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) { broke();
-		this.destroy(world, pos, state);
-		
-		world.removeTileEntity(pos);
-		super.breakBlock(world, pos, state);
+	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+		if (state.getBlock() != newState.getBlock()) {
+			this.destroy(world, pos, state);
+			world.removeTileEntity(pos);
+		}
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -188,7 +151,7 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand handIn, BlockRayTraceResult hit) {
 		
 		if (state.get(MASTER) == false) {
 			pos = pos.offset(state.get(FACING));
@@ -199,6 +162,12 @@ public class SpellTable extends BlockHorizontal implements ITileEntityProvider {
 				pos.getX(), pos.getY(), pos.getZ());
 		
 		return true;
+	}
+
+	@Override
+	public TileEntity createNewTileEntity(IBlockReader worldIn) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

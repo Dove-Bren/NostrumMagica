@@ -7,6 +7,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.INBTBase;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.items.IItemHandler;
@@ -174,7 +175,7 @@ public class Inventories {
 		return remove(new ItemStackArrayWrapper(inventory), items);
 	}
 	
-	public static final INBTBase serializeInventory(IInventory inv) {
+	public static final INBT serializeInventory(IInventory inv) {
 		ListNBT list = new ListNBT();
 		for (int i = 0; i < inv.getSizeInventory(); i++) {
 			@Nonnull ItemStack stack = inv.getStackInSlot(i);
@@ -188,7 +189,7 @@ public class Inventories {
 		return list;
 	}
 	
-	public static final boolean deserializeInventory(IInventory base, INBTBase nbt) {
+	public static final boolean deserializeInventory(IInventory base, INBT nbt) {
 		if (base == null) {
 			return false;
 		}
@@ -216,26 +217,6 @@ public class Inventories {
 			this.array = array;
 		}
 		
-		@Override
-		public ITextComponent getName() {
-			return null;
-		}
-		
-		@Override
-		public ITextComponent getCustomName() {
-			return null;
-		}
-
-		@Override
-		public boolean hasCustomName() {
-			return false;
-		}
-
-		@Override
-		public ITextComponent getDisplayName() {
-			return null;
-		}
-
 		@Override
 		public int getSizeInventory() {
 			return array.length;
@@ -293,21 +274,6 @@ public class Inventories {
 		@Override
 		public boolean isItemValidForSlot(int index, ItemStack stack) {
 			return true;
-		}
-
-		@Override
-		public int getField(int id) {
-			return 0;
-		}
-
-		@Override
-		public void setField(int id, int value) {
-			;
-		}
-
-		@Override
-		public int getFieldCount() {
-			return 0;
 		}
 
 		@Override

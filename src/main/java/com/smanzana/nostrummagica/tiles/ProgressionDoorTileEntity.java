@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.blocks.tiles;
+package com.smanzana.nostrummagica.tiles;
 
 import java.util.HashSet;
 import java.util.List;
@@ -15,7 +15,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -30,7 +30,7 @@ public class ProgressionDoorTileEntity extends TileEntity {
 	private int requiredLevel;
 	
 	public ProgressionDoorTileEntity() {
-		super();
+		super(NostrumTileEntities.ProgressionDoorTileEntityType);
 		
 		requiredComponents = new HashSet<>();
 		requiredLevel = 0;
@@ -121,8 +121,8 @@ public class ProgressionDoorTileEntity extends TileEntity {
 	private static final String NBT_COMPS = "required_componenets";
 	
 	@Override
-	public void readFromNBT(CompoundNBT compound) {
-		super.readFromNBT(compound);
+	public void read(CompoundNBT compound) {
+		super.read(compound);
 		
 		this.requiredLevel = compound.getInt(NBT_LEVEL);
 		this.requiredComponents.clear();
@@ -135,8 +135,8 @@ public class ProgressionDoorTileEntity extends TileEntity {
 	}
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT compound) {
-		CompoundNBT nbt = super.writeToNBT(compound);
+	public CompoundNBT write(CompoundNBT compound) {
+		CompoundNBT nbt = super.write(compound);
 		
 		if (this.requiredLevel > 0)
 			nbt.putInt(NBT_LEVEL, this.requiredLevel);
@@ -153,25 +153,23 @@ public class ProgressionDoorTileEntity extends TileEntity {
 	}
 	
 	@Override
-	public SPacketUpdateTileEntity getUpdatePacket() {
-		return new SPacketUpdateTileEntity(this.pos, 3, this.getUpdateTag());
+	public SUpdateTileEntityPacket getUpdatePacket() {
+		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.writeToNBT(new CompoundNBT());
+		return this.write(new CompoundNBT());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(pkt.getNbtCompound());
 	}
 	
 	protected void dirty() {
-		world.markBlockRangeForRenderUpdate(pos, pos);
 		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
-		world.scheduleBlockUpdate(pos, this.getBlockType(),0,0);
 		markDirty();
 	}
 	
@@ -182,7 +180,7 @@ public class ProgressionDoorTileEntity extends TileEntity {
 			faceStash = Direction.NORTH;
 			if (state != null) {
 				try {
-					faceStash = state.get(ProgressionDoor.FACING);
+					faceStash = state.get(ProgressionDoor.HORIZONTAL_FACING);
 				} catch (Exception e) {
 					NostrumMagica.logger.warn("Failed to get face for progression tile entity");
 				}

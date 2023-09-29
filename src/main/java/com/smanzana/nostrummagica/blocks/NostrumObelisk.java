@@ -5,12 +5,12 @@ import java.util.Random;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity;
-import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity.Corner;
-import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity.NostrumObeliskTarget;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity.Corner;
+import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity.NostrumObeliskTarget;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

@@ -5,9 +5,9 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.tiles.AltarTileEntity;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

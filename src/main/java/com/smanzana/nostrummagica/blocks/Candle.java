@@ -6,11 +6,11 @@ import java.util.Random;
 import javax.annotation.Nullable;
 
 import com.google.common.base.Predicate;
-import com.smanzana.nostrummagica.blocks.tiles.CandleTileEntity;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.CandleIgniteMessage;
+import com.smanzana.nostrummagica.tiles.CandleTileEntity;
 import com.smanzana.nostrummagica.utils.ItemStacks;
 
 import net.minecraft.block.Block;

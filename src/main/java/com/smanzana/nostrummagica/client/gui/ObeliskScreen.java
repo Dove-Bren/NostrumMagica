@@ -8,9 +8,9 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity;
-import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity.NostrumObeliskTarget;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity.NostrumObeliskTarget;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;

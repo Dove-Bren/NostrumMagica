@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.blocks;
 
-import com.smanzana.nostrummagica.blocks.tiles.NostrumObeliskEntity;
-import com.smanzana.nostrummagica.blocks.tiles.ObeliskPortalTileEntity;
+import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.tiles.ObeliskPortalTileEntity;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

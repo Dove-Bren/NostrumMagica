@@ -13,8 +13,6 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.ChalkBlock;
-import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
-import com.smanzana.nostrummagica.blocks.tiles.CandleTileEntity;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenIndexed;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
@@ -22,6 +20,8 @@ import com.smanzana.nostrummagica.rituals.outcomes.IItemRitualOutcome;
 import com.smanzana.nostrummagica.rituals.outcomes.IRitualOutcome;
 import com.smanzana.nostrummagica.rituals.requirements.IRitualRequirement;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.tiles.AltarTileEntity;
+import com.smanzana.nostrummagica.tiles.CandleTileEntity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;

@@ -2,8 +2,8 @@ package com.smanzana.nostrummagica.rituals.outcomes;
 
 import java.util.List;
 
-import com.smanzana.nostrummagica.blocks.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
+import com.smanzana.nostrummagica.tiles.AltarTileEntity;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
