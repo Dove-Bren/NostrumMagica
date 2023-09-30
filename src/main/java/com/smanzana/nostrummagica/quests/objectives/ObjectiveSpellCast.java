@@ -162,7 +162,7 @@ public class ObjectiveSpellCast implements IObjective, ICastListener {
 				attr.setQuestData(quest.getKey(), s);
 				if (changed && !entity.world.isRemote) {
 					// Spells are cast on the server, so sync to client quest state
-					NetworkHandler.getSyncChannel().sendTo(
+					NetworkHandler.sendTo(
 							new StatSyncMessage(attr), (ServerPlayerEntity) entity);
 				}
 					

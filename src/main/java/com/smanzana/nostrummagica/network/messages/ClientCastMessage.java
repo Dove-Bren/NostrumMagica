@@ -91,7 +91,7 @@ public class ClientCastMessage {
 					// Check if base mana cost exceeds what we can do
 					int cap = SpellTome.getMaxMana(tome);
 					if (cap < cost) {
-						NetworkHandler.getSyncChannel().sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
+						NetworkHandler.sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
 								ctx.get().getSender());
 						return;
 					}
@@ -100,7 +100,7 @@ public class ClientCastMessage {
 					
 				} else {
 					NostrumMagica.logger.warn("Got cast from client with mismatched tome");
-					NetworkHandler.getSyncChannel().sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
+					NetworkHandler.sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
 							ctx.get().getSender());
 					return;
 				}
@@ -170,7 +170,7 @@ public class ClientCastMessage {
 				}
 				
 				if (mana < cost) {
-					NetworkHandler.getSyncChannel().sendTo(new ClientCastReplyMessage(false, att.getMana(), 0.0f, null),
+					NetworkHandler.sendTo(new ClientCastReplyMessage(false, att.getMana(), 0.0f, null),
 							ctx.get().getSender());
 					return;
 				}
@@ -178,7 +178,7 @@ public class ClientCastMessage {
 				// Check that the player can cast this
 				if (!NostrumMagica.canCast(spell, att)) {
 					NostrumMagica.logger.warn("Got cast message from client with too low of stats. They should relog...");
-					NetworkHandler.getSyncChannel().sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
+					NetworkHandler.sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
 							ctx.get().getSender());
 					return;
 				}
@@ -192,7 +192,7 @@ public class ClientCastMessage {
 					int count = NostrumMagica.getReagentCount(sp, row.getKey());
 					if (count < row.getValue()) {
 						sp.sendMessage(new TranslationTextComponent("info.spell.bad_reagent", row.getKey().prettyName()));
-						NetworkHandler.getSyncChannel().sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
+						NetworkHandler.sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
 								ctx.get().getSender());
 						return;
 					}
@@ -247,7 +247,7 @@ public class ClientCastMessage {
 			
 			att.addXP(xp);
 
-			NetworkHandler.getSyncChannel().sendTo(new ClientCastReplyMessage(true, att.getMana(), xp, reagents),
+			NetworkHandler.sendTo(new ClientCastReplyMessage(true, att.getMana(), xp, reagents),
 					ctx.get().getSender());
 		});
 	}

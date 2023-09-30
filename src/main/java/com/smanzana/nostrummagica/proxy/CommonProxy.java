@@ -522,19 +522,19 @@ public class CommonProxy {
     public void syncPlayer(ServerPlayerEntity player) {
     	INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
     	attr.refresh(player);
-    	NetworkHandler.getSyncChannel().sendTo(
+    	NetworkHandler.sendTo(
     			new StatSyncMessage(NostrumMagica.getMagicWrapper(player)),
     			player);
-    	NetworkHandler.getSyncChannel().sendTo(
+    	NetworkHandler.sendTo(
     			new SpellRequestReplyMessage(NostrumMagica.getSpellRegistry().getAllSpells(), true),
     			player);
-    	NetworkHandler.getSyncChannel().sendTo(
+    	NetworkHandler.sendTo(
     			new ManaArmorSyncMessage(player, NostrumMagica.getManaArmor(player)),
     			player);
     }
     
     public void updateEntityEffect(ServerPlayerEntity player, LivingEntity entity, SpecialEffect effectType, EffectData data) {
-    	NetworkHandler.getSyncChannel().sendTo(
+    	NetworkHandler.sendTo(
     			new MagicEffectUpdate(entity, effectType, data),
     			player);
     }
@@ -572,7 +572,7 @@ public class CommonProxy {
         
         // Open GUI on client
         PetGUIOpenMessage message = new PetGUIOpenMessage(pet, windowId, container.getContainerID(), container.getSheetCount());
-        NetworkHandler.getSyncChannel().sendTo(message, mpPlayer);
+        NetworkHandler.sendTo(message, mpPlayer);
 	}
 
 	public void sendServerConfig(ServerPlayerEntity player) {
@@ -580,7 +580,7 @@ public class CommonProxy {
 	}
 	
 	public void sendSpellDebug(PlayerEntity player, ITextComponent comp) {
-		NetworkHandler.getSyncChannel().sendTo(new SpellDebugMessage(comp), (ServerPlayerEntity) player);
+		NetworkHandler.sendTo(new SpellDebugMessage(comp), (ServerPlayerEntity) player);
 	}
 	
 	public String getTranslation(String key) {
@@ -667,7 +667,7 @@ public class CommonProxy {
 					comp, flavor,
 					isNegative, compParam);
 			for (PlayerEntity player : players) {
-				NetworkHandler.getSyncChannel().sendTo(message, (ServerPlayerEntity) player);
+				NetworkHandler.sendTo(message, (ServerPlayerEntity) player);
 			}
 		}
 	}
@@ -722,7 +722,7 @@ public class CommonProxy {
 					pos, element, types, center, extras, output
 					);
 			for (PlayerEntity player : players) {
-				NetworkHandler.getSyncChannel().sendTo(message, (ServerPlayerEntity) player);
+				NetworkHandler.sendTo(message, (ServerPlayerEntity) player);
 			}
 		}
 	}
@@ -747,7 +747,7 @@ public class CommonProxy {
 		
 		if (!players.isEmpty()) {
 			for (PlayerEntity player : players) {
-				NetworkHandler.getSyncChannel().sendTo(message, (ServerPlayerEntity) player);
+				NetworkHandler.sendTo(message, (ServerPlayerEntity) player);
 			}
 		}
 	}

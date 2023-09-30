@@ -87,7 +87,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 		}
 
 		if (worldIn.isRemote) {
-			NetworkHandler.getSyncChannel().sendToServer(
+			NetworkHandler.sendToServer(
 	    			new ClientCastMessage(spell, true, 0));
 		}
 		
@@ -135,7 +135,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 			} else {
 				NostrumMagica.logger.info("Requesting spell " + id
 						 + " from the server...");
-					NetworkHandler.getSyncChannel().sendToServer(
+					NetworkHandler.sendToServer(
 			    			new SpellRequestMessage(new int[] {id}));
 			}
 		}

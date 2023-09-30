@@ -157,7 +157,7 @@ public class PetCommandManager extends WorldSavedData {
 			return;
 		}
 		
-		NetworkHandler.getSyncChannel().sendTo(
+		NetworkHandler.sendTo(
 				new PetCommandSettingsSyncMessage(generateClientSettings(event.player.getUniqueID())),
 				(ServerPlayerEntity) event.player);
 		

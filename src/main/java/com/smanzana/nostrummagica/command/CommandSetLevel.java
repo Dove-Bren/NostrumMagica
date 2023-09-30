@@ -36,7 +36,7 @@ public class CommandSetLevel {
 		}
 		
 		attr.setLevel(level);
-		NetworkHandler.getSyncChannel().sendTo(
+		NetworkHandler.sendTo(
 				new StatSyncMessage(attr)
 				, (ServerPlayerEntity) player);
 		

@@ -38,7 +38,7 @@ public class CommandAllQuests {
 			attr.addQuest(quest.getKey());
 			attr.completeQuest(quest.getKey());
 		}
-		NetworkHandler.getSyncChannel().sendTo(
+		NetworkHandler.sendTo(
 				new StatSyncMessage(attr)
 				, (ServerPlayerEntity) player);
 		

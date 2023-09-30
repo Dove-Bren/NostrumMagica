@@ -53,7 +53,7 @@ public class ClientSkillUpMessage {
 				att.takeSkillPoint();
 			}
 			
-			NetworkHandler.getSyncChannel().sendTo(new StatSyncMessage(att),
+			NetworkHandler.sendTo(new StatSyncMessage(att),
 					ctx.get().getSender());
 		});
 	}

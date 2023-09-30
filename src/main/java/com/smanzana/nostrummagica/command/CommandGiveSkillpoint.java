@@ -33,7 +33,7 @@ public class CommandGiveSkillpoint {
 		}
 		
 		attr.addSkillPoint();
-		NetworkHandler.getSyncChannel().sendTo(
+		NetworkHandler.sendTo(
 				new StatSyncMessage(attr)
 				, (ServerPlayerEntity) player);
 		

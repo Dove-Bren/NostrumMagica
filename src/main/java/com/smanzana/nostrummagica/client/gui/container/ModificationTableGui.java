@@ -634,16 +634,16 @@ public class ModificationTableGui {
 						vals = component.getShape().supportedFloats();
 					}
 					float fVal = (vals == null ? 0 : vals[container.floatIndex]);
-					NetworkHandler.getSyncChannel().sendToServer(
+					NetworkHandler.sendToServer(
 							new ModifyMessage(container.pos, container.boolIndex, fVal));
 					container.inventory.modify(container.boolIndex, fVal);
 				} else if (container.scrollMode) {
 					float fVal = (float) container.floatIndex;
-					NetworkHandler.getSyncChannel().sendToServer(
+					NetworkHandler.sendToServer(
 							new ModifyMessage(container.pos, container.boolIndex, fVal));
 					container.inventory.modify(container.boolIndex, fVal);
 				} else {
-					NetworkHandler.getSyncChannel().sendToServer(
+					NetworkHandler.sendToServer(
 							new ModifyMessage(container.pos, false, 0));
 					container.inventory.modify(false, 0);
 				}

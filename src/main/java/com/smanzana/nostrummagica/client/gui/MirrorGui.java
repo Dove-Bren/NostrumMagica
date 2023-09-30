@@ -688,19 +688,19 @@ public class MirrorGui extends Screen {
 		
 		if (button == this.buttonControl) {
 			attr.takeSkillPoint(); // take a local point so our update makes sense
-			NetworkHandler.getSyncChannel().sendToServer(
+			NetworkHandler.sendToServer(
 					new ClientSkillUpMessage(Type.CONTROL)
 					);
 			refreshButtons();
 		} else if (button == this.buttonFinesse) {
 			attr.takeSkillPoint(); // take a local point so our update makes sense
-			NetworkHandler.getSyncChannel().sendToServer(
+			NetworkHandler.sendToServer(
 					new ClientSkillUpMessage(Type.FINESSE)
 					);
 			refreshButtons();
 		} else if (button == this.buttonTechnique) {
 			attr.takeSkillPoint(); // take a local point so our update makes sense
-			NetworkHandler.getSyncChannel().sendToServer(
+			NetworkHandler.sendToServer(
 					new ClientSkillUpMessage(Type.TECHNIQUE)
 					);
 			refreshButtons();
@@ -710,7 +710,7 @@ public class MirrorGui extends Screen {
 			NostrumQuest quest = qb.quest;
 			
 			if (qb.state == QuestState.INACTIVE || qb.state == QuestState.TAKEN) {
-				NetworkHandler.getSyncChannel().sendToServer(
+				NetworkHandler.sendToServer(
 					new ClientUpdateQuestMessage(quest)	
 					);
 				refreshButtons();
@@ -725,7 +725,7 @@ public class MirrorGui extends Screen {
 			NostrumResearch research = rb.research;
 			
 			if (rb.state == ResearchState.INACTIVE && researchPoints > 0) {
-				NetworkHandler.getSyncChannel().sendToServer(
+				NetworkHandler.sendToServer(
 					new ClientPurchaseResearchMessage(research)	
 					);
 				refreshButtons();

@@ -36,7 +36,7 @@ public class ClientPurchaseResearchMessage {
 				NostrumResearch.unlockResearch(sp, message.research);
 			}
 
-			 NetworkHandler.getSyncChannel().sendTo(new StatSyncMessage(att), sp);
+			 NetworkHandler.sendTo(new StatSyncMessage(att), sp);
 		});
 	}
 

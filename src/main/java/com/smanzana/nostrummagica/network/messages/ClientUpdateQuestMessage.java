@@ -40,7 +40,7 @@ public class ClientUpdateQuestMessage {
 					message.quest.startQuest(sp);
 			}
 
-			 NetworkHandler.getSyncChannel().sendTo(new StatSyncMessage(att), sp);
+			 NetworkHandler.sendTo(new StatSyncMessage(att), sp);
 		});
 	}
 

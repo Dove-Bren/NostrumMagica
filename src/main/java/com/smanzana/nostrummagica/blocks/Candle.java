@@ -173,7 +173,7 @@ public class Candle extends ContainerBlock {
     	}
     	
     	if (!world.isRemote) {
-			NetworkHandler.getSyncChannel().sendToAllAround(new CandleIgniteMessage(world.getDimension().getType(), pos, null),
+			NetworkHandler.sendToAllAround(new CandleIgniteMessage(world.getDimension().getType(), pos, null),
 					new NetworkRegistry.TargetPoint(world.getDimension().getType(), pos.getX(), pos.getY(), pos.getZ(), 64));
 		}
     	
@@ -381,7 +381,7 @@ public class Candle extends ContainerBlock {
 		candle.setReagentType(type);
 		
 		if (!world.isRemote) {
-			NetworkHandler.getSyncChannel().sendToAllAround(new CandleIgniteMessage(world.getDimension().getType(), pos, type),
+			NetworkHandler.sendToAllAround(new CandleIgniteMessage(world.getDimension().getType(), pos, type),
 					new NetworkRegistry.TargetPoint(world.getDimension().getType(), pos.getX(), pos.getY(), pos.getZ(), 64));
 		}
 	}

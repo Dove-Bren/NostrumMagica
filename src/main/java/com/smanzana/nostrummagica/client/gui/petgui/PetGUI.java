@@ -631,13 +631,13 @@ public class PetGUI {
 		private static void clientSendInternal(int id, CompoundNBT nbt) {
 			PetGUIControlMessage message = new PetGUIControlMessage(id, nbt);
 			
-			NetworkHandler.getSyncChannel().sendToServer(message);
+			NetworkHandler.sendToServer(message);
 		}
 		
 		private static void serverSendInternal(ServerPlayerEntity player, CompoundNBT nbt) {
 			PetGUISyncMessage message = new PetGUISyncMessage(nbt);
 			
-			NetworkHandler.getSyncChannel().sendTo(message, player);
+			NetworkHandler.sendTo(message, player);
 		}
 		
 		private static CompoundNBT base(PetContainerMessageType type) {

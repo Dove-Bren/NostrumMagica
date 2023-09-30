@@ -431,7 +431,7 @@ public class NostrumMagic implements INostrumMagic {
 //		}
 		
 		if (entity != null && entity instanceof PlayerEntity && !entity.world.isRemote) {
-			NetworkHandler.getSyncChannel().sendTo(
+			NetworkHandler.sendTo(
 					new LoreMessage(tagged, this),
 					(ServerPlayerEntity) entity);
 			
@@ -452,7 +452,7 @@ public class NostrumMagic implements INostrumMagic {
 //		}
 		
 		if (entity != null && entity instanceof PlayerEntity && !entity.world.isRemote) {
-			NetworkHandler.getSyncChannel().sendTo(
+			NetworkHandler.sendTo(
 					new LoreMessage(tagged, this),
 					(ServerPlayerEntity) entity);
 			

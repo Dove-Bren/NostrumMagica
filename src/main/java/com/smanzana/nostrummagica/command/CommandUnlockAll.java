@@ -51,7 +51,7 @@ public class CommandUnlockAll {
 			attr.learnElement(elem);
 			attr.setElementMastery(elem, 3);
 		}
-		NetworkHandler.getSyncChannel().sendTo(
+		NetworkHandler.sendTo(
 				new StatSyncMessage(attr)
 				, (ServerPlayerEntity) player);
 		

@@ -780,7 +780,7 @@ public class SpellCreationGui {
 									container.setScroll(scroll);
 									//NostrumMagicaSounds.AMBIENT_WOOSH.play(Minecraft.getInstance().thePlayer);
 									
-									NetworkHandler.getSyncChannel().sendToServer(new SpellCraftMessage(
+									NetworkHandler.sendToServer(new SpellCraftMessage(
 											container.name.toString(),
 											container.pos,
 											container.iconIndex

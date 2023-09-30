@@ -47,7 +47,7 @@ public enum NostrumParticles {
 	
 	public static void Spawn(NostrumParticles type, World world, SpawnParams params) {
 		if (!world.isRemote) {
-			NetworkHandler.getSyncChannel().sendToDimension(new SpawnNostrumParticleMessage(type, params),
+			NetworkHandler.sendToDimension(new SpawnNostrumParticleMessage(type, params),
 					world.provider.getDimension());
 		} else {
 			if (type.factory == null) {

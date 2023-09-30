@@ -950,7 +950,7 @@ public class ClientProxy extends CommonProxy {
 			this.overlayRenderer.changePetPlacementIcon();
 			
 			// Send change to server
-			NetworkHandler.getSyncChannel().sendToServer(PetCommandMessage.AllPlacementMode(next));
+			NetworkHandler.sendToServer(PetCommandMessage.AllPlacementMode(next));
 		} else if (bindingPetTargetModeCycle.isPressed()) {
 			// Cycle target mode
 			final PetTargetMode current = NostrumMagica.getPetCommandManager().getTargetMode(this.getPlayer());
@@ -963,7 +963,7 @@ public class ClientProxy extends CommonProxy {
 			NostrumMagica.getPetCommandManager().setTargetMode(getPlayer(), next);
 			
 			// Send change to server
-			NetworkHandler.getSyncChannel().sendToServer(PetCommandMessage.AllTargetMode(next));
+			NetworkHandler.sendToServer(PetCommandMessage.AllTargetMode(next));
 		} else if (bindingPetAttackAll.isPressed()) {
 			// Raytrace, find tar get, and set all to attack
 			final PlayerEntity player = getPlayer();
@@ -977,7 +977,7 @@ public class ClientProxy extends CommonProxy {
 						100, (e) -> { return e != player && e instanceof LivingEntity && !player.isOnSameTeam(e) && !tames.contains(e);},
 						1);
 				if (result != null && result.entityHit != null) {
-					NetworkHandler.getSyncChannel().sendToServer(PetCommandMessage.AllAttack((LivingEntity) result.entityHit));
+					NetworkHandler.sendToServer(PetCommandMessage.AllAttack((LivingEntity) result.entityHit));
 				}
 			}
 		} else if (bindingPetAttack.isPressed()) {
@@ -1012,7 +1012,7 @@ public class ClientProxy extends CommonProxy {
 							100, (e) -> { return e != player && e instanceof LivingEntity && !player.isOnSameTeam(e) && !tames.contains(e);},
 							1);
 					if (result != null && result.entityHit != null) {
-						NetworkHandler.getSyncChannel().sendToServer(PetCommandMessage.PetAttack(selectedPet, (LivingEntity) result.entityHit));
+						NetworkHandler.sendToServer(PetCommandMessage.PetAttack(selectedPet, (LivingEntity) result.entityHit));
 					}
 					
 					// Clear out pet
@@ -1023,13 +1023,13 @@ public class ClientProxy extends CommonProxy {
 				}
 			}
 		} else if (bindingPetAllStop.isPressed()) {
-			NetworkHandler.getSyncChannel().sendToServer(PetCommandMessage.AllStop());
+			NetworkHandler.sendToServer(PetCommandMessage.AllStop());
 		}
 		
 	}
 	
 	private void doBladeCast() {
-		NetworkHandler.getSyncChannel().sendToServer(new BladeCastMessage());
+		NetworkHandler.sendToServer(new BladeCastMessage());
 	}
 	
 	private void doCast() {
@@ -1216,7 +1216,7 @@ public class ClientProxy extends CommonProxy {
 				.addMana(-cost);
 		}
 		
-		NetworkHandler.getSyncChannel().sendToServer(
+		NetworkHandler.sendToServer(
     			new ClientCastMessage(spell, false, SpellTome.getTomeID(tome)));
 	}
 	
@@ -1311,7 +1311,7 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void requestObeliskTransportation(BlockPos origin, BlockPos target) {
 		// Send a request to the server
-		NetworkHandler.getSyncChannel().sendToServer(
+		NetworkHandler.sendToServer(
 				new ObeliskTeleportationRequestMessage(origin, target)
 				);
 	}
@@ -1319,14 +1319,14 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void setObeliskIndex(BlockPos obeliskPos, int index) {
 		// Send a request to the server
-		NetworkHandler.getSyncChannel().sendToServer(
+		NetworkHandler.sendToServer(
 				new ObeliskSelectMessage(obeliskPos, index)
 				);
 	}
 	
 	@Override
 	public void requestStats(LivingEntity entity) {
-		NetworkHandler.getSyncChannel().sendToServer(
+		NetworkHandler.sendToServer(
 				new StatRequestMessage()
 				);
 	}

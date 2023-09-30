@@ -36,8 +36,12 @@ import com.smanzana.nostrummagica.network.messages.SpellTomeIncrementMessage;
 import com.smanzana.nostrummagica.network.messages.StatRequestMessage;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
 
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkRegistry;
+import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 public class NetworkHandler {
@@ -106,6 +110,25 @@ public class NetworkHandler {
 		syncChannel.registerMessage(discriminator++, PetCommandMessage.class, PetCommandMessage::encode, PetCommandMessage::decode, PetCommandMessage::handle);
 		syncChannel.registerMessage(discriminator++, PetCommandSettingsSyncMessage.class, PetCommandSettingsSyncMessage::encode, PetCommandSettingsSyncMessage::decode, PetCommandSettingsSyncMessage::handle);
 		syncChannel.registerMessage(discriminator++, ManaArmorSyncMessage.class, ManaArmorSyncMessage::encode, ManaArmorSyncMessage::decode, ManaArmorSyncMessage::handle);
+	}
+	
+	//NetworkHandler.sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
+	//ctx.get().getSender());
+	
+	public static <T> void sendTo(T msg, ServerPlayerEntity player) {
+		NetworkHandler.syncChannel.sendTo(msg, player.connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+	}
+	
+	public static <T> void sendToServer(T msg) {
+		NetworkHandler.syncChannel.sendToServer(msg);
+	}
+
+	public static <T> void sendToAll(T msg) {
+		NetworkHandler.syncChannel.send(PacketDistributor.ALL.noArg(), msg);
+	}
+
+	public static void sendToDimension(EnchantedArmorStateUpdate msg, DimensionType dimension) {
+		NetworkHandler.syncChannel.send(PacketDistributor.DIMENSION.with(() -> dimension), msg);
 	}
 	
 }

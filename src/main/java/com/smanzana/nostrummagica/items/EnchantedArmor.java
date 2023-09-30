@@ -1816,12 +1816,12 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 	
 	protected void clientDashSide(LivingEntity ent, boolean right) {
 		this.consumeEnderDash(ent);
-		NetworkHandler.getSyncChannel().sendToServer(new EnchantedArmorStateUpdate(ArmorState.ENDER_DASH_SIDE, right, 0));
+		NetworkHandler.sendToServer(new EnchantedArmorStateUpdate(ArmorState.ENDER_DASH_SIDE, right, 0));
 	}
 	
 	protected void clientDashBack(LivingEntity ent) {
 		this.consumeEnderDash(ent);
-		NetworkHandler.getSyncChannel().sendToServer(new EnchantedArmorStateUpdate(ArmorState.ENDER_DASH_BACK, false, 0));
+		NetworkHandler.sendToServer(new EnchantedArmorStateUpdate(ArmorState.ENDER_DASH_BACK, false, 0));
 	}
 	
 	@SubscribeEvent
@@ -1834,12 +1834,12 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 		} else if (bindingEnderBack.isPressed()) {
 			clientDashBack(player);
 		} else if (bindingSummonJumpWhirlwind.isPressed()) {
-			NetworkHandler.getSyncChannel().sendToServer(new EnchantedArmorStateUpdate(ArmorState.WIND_JUMP_WHIRLWIND, false, 0));
+			NetworkHandler.sendToServer(new EnchantedArmorStateUpdate(ArmorState.WIND_JUMP_WHIRLWIND, false, 0));
 		} else if (bindingToggleArmorEffect.isPressed()) {
 			NostrumMagicaSounds.UI_TICK.playClient(player);
 			final boolean enabled = !GetArmorHitEffectsEnabled(player);
 			SetArmorHitEffectsEnabled(player, enabled);
-			NetworkHandler.getSyncChannel().sendToServer(new EnchantedArmorStateUpdate(ArmorState.EFFECT_TOGGLE, enabled, 0));
+			NetworkHandler.sendToServer(new EnchantedArmorStateUpdate(ArmorState.EFFECT_TOGGLE, enabled, 0));
 		}
 	}
 	
@@ -1925,7 +1925,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 				this.consumeManaJump(player);
 				player.getMotion().y += MANA_JUMP_AMT;
 				hasJump = false; // Consumed
-				NetworkHandler.getSyncChannel().sendToServer(new EnchantedArmorStateUpdate(ArmorState.JUMP, true, 0));
+				NetworkHandler.sendToServer(new EnchantedArmorStateUpdate(ArmorState.JUMP, true, 0));
 			}
 		}
 		
@@ -1956,7 +1956,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 					final boolean deduct = vertScale == 0f ? false : (random.nextFloat() < vertScale * 3);
 					if (deduct) {
 						this.consumeDragonFlight(player);
-						NetworkHandler.getSyncChannel().sendToServer(new EnchantedArmorStateUpdate(ArmorState.DRAGON_FLIGHT_TICK, deduct, 0));
+						NetworkHandler.sendToServer(new EnchantedArmorStateUpdate(ArmorState.DRAGON_FLIGHT_TICK, deduct, 0));
 					}
 				}
 			}
@@ -1968,7 +1968,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 			if (doubleBack) {
 				if (this.hasWindTornado(player)) {
 					this.consumeWindTornado(player);
-					NetworkHandler.getSyncChannel().sendToServer(new EnchantedArmorStateUpdate(ArmorState.WIND_TORNADO, true, 0));
+					NetworkHandler.sendToServer(new EnchantedArmorStateUpdate(ArmorState.WIND_TORNADO, true, 0));
 					return;
 				}
 				
@@ -2014,11 +2014,11 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 			final EnchantedArmorStateUpdate message = new EnchantedArmorStateUpdate(ArmorState.FLYING, ArmorCheckFlying(player), player.getEntityId());
 			if (player.world.isRemote) {
 				assert(player == NostrumMagica.instance.proxy.getPlayer());
-				NetworkHandler.getSyncChannel().sendToServer(message);
+				NetworkHandler.sendToServer(message);
 			} else if (toPlayer != null) {
-				NetworkHandler.getSyncChannel().sendTo(message, (ServerPlayerEntity) toPlayer);
+				NetworkHandler.sendTo(message, (ServerPlayerEntity) toPlayer);
 			} else {
-				NetworkHandler.getSyncChannel().sendToDimension(message, player.dimension);
+				NetworkHandler.sendToDimension(message, player.dimension);
 			}
 		}
 	}

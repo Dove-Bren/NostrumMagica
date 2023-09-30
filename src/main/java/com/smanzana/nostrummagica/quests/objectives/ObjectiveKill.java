@@ -128,7 +128,7 @@ public class ObjectiveKill implements IObjective {
 			attr.setQuestData(quest.getKey(), s);
 			if (!player.world.isRemote) {
 				// Spells are cast on the server, so sync to client quest state
-				NetworkHandler.getSyncChannel().sendTo(
+				NetworkHandler.sendTo(
 						new StatSyncMessage(attr), (ServerPlayerEntity) player);
 			}
 		}

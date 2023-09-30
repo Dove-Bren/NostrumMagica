@@ -38,7 +38,7 @@ public class SpellRequestMessage {
 		}
 
 		System.out.println("Sending reply");
-		NetworkHandler.getSyncChannel().sendTo(new SpellRequestReplyMessage(spells), ctx.get().getSender());
+		NetworkHandler.sendTo(new SpellRequestReplyMessage(spells), ctx.get().getSender());
 	}
 
 	private final int[] ids;

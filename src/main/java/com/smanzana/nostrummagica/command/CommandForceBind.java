@@ -60,7 +60,7 @@ public class CommandForceBind {
 				attr.completeBinding(stack);
 			}
 		}
-		NetworkHandler.getSyncChannel().sendTo(
+		NetworkHandler.sendTo(
 				new StatSyncMessage(attr)
 				, player);
 		

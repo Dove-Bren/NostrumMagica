@@ -88,7 +88,7 @@ public class ArcaneWolfAIEldrichTask extends Goal {
 	}
 	
 	protected void startEffect(EntityArcaneWolf wolf, LivingEntity target, int duration) {
-		NetworkHandler.getSyncChannel().sendToAllTracking(
+		NetworkHandler.sendToAllTracking(
 				new SpawnPredefinedEffectMessage(PredefinedEffect.ELDRICH_BLAST, duration, target.dimension, target.getEntityId()),
 				target);
 	}

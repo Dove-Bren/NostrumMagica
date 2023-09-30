@@ -635,7 +635,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (requestcount > 0) {
 			NostrumMagica.logger.info("Requesting " + requestcount
 				 + " spells from the server...");
-			NetworkHandler.getSyncChannel().sendToServer(
+			NetworkHandler.sendToServer(
 	    			new SpellRequestMessage(requests));
 		}
 	}

@@ -128,12 +128,12 @@ public class ObeliskTeleportationRequestMessage {
 				x,
 				y,
 				z,
-				50,
+				//50, TODO did this 50 times?
 				.3,
 				.5,
-				.3,
-				.2,
-				new int[0]);
+				.3//,
+				//.2
+				);
 	}
 	
 }

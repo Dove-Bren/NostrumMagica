@@ -36,7 +36,7 @@ public class CommandAllResearch  {
 		for (NostrumResearch research : NostrumResearch.AllResearch()) {
 			attr.completeResearch(research.getKey());
 		}
-		NetworkHandler.getSyncChannel().sendTo(
+		NetworkHandler.sendTo(
 				new StatSyncMessage(attr)
 				, (ServerPlayerEntity) player);
 		

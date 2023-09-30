@@ -58,7 +58,7 @@ public class SpellCraftMessage {
 						message.pos.getX(), message.pos.getY(), message.pos.getZ());
 				}
 			
-				NetworkHandler.getSyncChannel().sendToAll(
+				NetworkHandler.sendToAll(
 						new SpellRequestReplyMessage(Lists.newArrayList(spell)));
 		});
 	}

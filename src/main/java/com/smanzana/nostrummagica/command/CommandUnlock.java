@@ -33,7 +33,7 @@ public class CommandUnlock {
 		}
 		
 		attr.unlock();
-		NetworkHandler.getSyncChannel().sendTo(
+		NetworkHandler.sendTo(
 				new StatSyncMessage(attr)
 				, (ServerPlayerEntity) player);
 		
