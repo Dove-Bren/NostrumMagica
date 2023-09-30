@@ -494,12 +494,12 @@ public class PlayerListener {
 			}
 		}
 		
-		if (ent.getActivePotionEffect(RootedEffect.instance()) != null) {
+		if (ent.getActivePotionEffect(NostrumEffects.rooted) != null) {
 			if (ent.getActivePotionEffect(LightningChargeEffect.instance()) != null
 					|| ent.getActivePotionEffect(LightningAttackEffect.instance()) != null) {
 				ent.removePotionEffect(LightningChargeEffect.instance());
 				ent.removePotionEffect(LightningAttackEffect.instance());
-				ent.removePotionEffect(RootedEffect.instance());
+				ent.removePotionEffect(NostrumEffects.rooted);
 			}
 		}
 	}

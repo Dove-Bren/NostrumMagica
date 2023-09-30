@@ -288,7 +288,7 @@ public class EntityArcaneWolf extends EntityWolf implements ITameableEntity, IEn
 				(new Spell("WolfRoots", true)).addPart(new SpellPart(SeekingBulletTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.EARTH, 2, EAlteration.INFLICT)),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.EARTH, 1)
-							&& target.getActivePotionEffect(RootedEffect.instance()) == null;
+							&& target.getActivePotionEffect(NostrumEffects.rooted) == null;
 				}),
 		REGEN(WolfSpellTargetGroup.ALLY, 50,
 				(new Spell("WolfRegen", true)).addPart(new SpellPart(AITargetTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.EARTH, 2, EAlteration.GROWTH)),

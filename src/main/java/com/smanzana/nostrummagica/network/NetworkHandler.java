@@ -36,12 +36,14 @@ import com.smanzana.nostrummagica.network.messages.SpellTomeIncrementMessage;
 import com.smanzana.nostrummagica.network.messages.StatRequestMessage;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.fml.network.PacketDistributor.TargetPoint;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 public class NetworkHandler {
@@ -127,8 +129,16 @@ public class NetworkHandler {
 		NetworkHandler.syncChannel.send(PacketDistributor.ALL.noArg(), msg);
 	}
 
-	public static void sendToDimension(EnchantedArmorStateUpdate msg, DimensionType dimension) {
+	public static <T> void sendToDimension(T msg, DimensionType dimension) {
 		NetworkHandler.syncChannel.send(PacketDistributor.DIMENSION.with(() -> dimension), msg);
 	}
 	
+	public static <T> void sendToAllAround(T msg, TargetPoint point) {
+		NetworkHandler.syncChannel.send(PacketDistributor.NEAR.with(() -> point), msg);
+	}
+
+	public static <T> void sendToAllTracking(T msg, Entity ent) {
+		NetworkHandler.syncChannel.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> ent), msg);
+	}
+
 }

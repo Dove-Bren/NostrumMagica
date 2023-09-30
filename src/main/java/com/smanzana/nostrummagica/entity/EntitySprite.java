@@ -196,9 +196,9 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
     
     private void applyEffect(LivingEntity entity) {
     	entity.removePotionEffect(Potion.getPotionFromResourceLocation("levitation"));
-    	entity.removePotionEffect(RootedEffect.instance());
+    	entity.removePotionEffect(NostrumEffects.rooted);
     	if (this.isAngry()) {
-    		entity.addPotionEffect(new PotionEffect(RootedEffect.instance(), 20 * 10));
+    		entity.addPotionEffect(new PotionEffect(NostrumEffects.rooted, 20 * 10));
 		} else {
 			final int finalDur = 20*10;
 			int dur = 20 * 1;

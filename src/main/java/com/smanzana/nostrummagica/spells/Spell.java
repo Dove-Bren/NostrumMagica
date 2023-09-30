@@ -477,9 +477,9 @@ public class Spell {
 		this.name = name;
 		
 		if (trans)
-			registryID = NostrumMagica.getSpellRegistry().registerTransient(this);
+			registryID = NostrumMagica.instance.getSpellRegistry().registerTransient(this);
 		else
-			registryID = NostrumMagica.getSpellRegistry().register(this);
+			registryID = NostrumMagica.instance.getSpellRegistry().register(this);
 	}
 	
 	public static Spell CreateInternal(String name, int id) {
@@ -487,7 +487,7 @@ public class Spell {
 		s.name = name;
 		s.registryID = id;
 		
-		NostrumMagica.getSpellRegistry().override(id, s);
+		NostrumMagica.instance.getSpellRegistry().override(id, s);
 		return s;
 	}
 	
@@ -495,7 +495,7 @@ public class Spell {
 	 * Takes a transient spell and makes it an official, non-transient spell
 	 */
 	public void promoteFromTrans() {
-		NostrumMagica.getSpellRegistry().removeTransientStatus(this);
+		NostrumMagica.instance.getSpellRegistry().removeTransientStatus(this);
 	}
 	
 	public void setIcon(int index) {
@@ -706,7 +706,7 @@ public class Spell {
 		case PHYSICAL:
 			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("weakness"), duration, amp).name("weakness");
 		case EARTH:
-			return new SpellAction(caster).status(RootedEffect.instance(), duration, amp).name("rooted");
+			return new SpellAction(caster).status(NostrumEffects.rooted, duration, amp).name("rooted");
 		case ENDER:
 			return new SpellAction(caster).status(Potion.getPotionFromResourceLocation("blindness"), duration, amp).name("blindness");
 		case FIRE:

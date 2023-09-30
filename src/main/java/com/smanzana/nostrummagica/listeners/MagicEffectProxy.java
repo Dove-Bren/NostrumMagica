@@ -388,7 +388,7 @@ public class MagicEffectProxy {
 			potion = MagicShieldEffect.instance();
 			break;
 		case ROOTED:
-			potion = RootedEffect.instance();
+			potion = NostrumEffects.rooted;
 			break;
 		default:
 			;

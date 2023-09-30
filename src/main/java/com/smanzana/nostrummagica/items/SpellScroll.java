@@ -94,7 +94,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 		if (itemStackIn.getDamage() > itemStackIn.getMaxDamage() // Old way, I think never happens?
 				|| itemStackIn.isEmpty()) {
 			// Going to break
-			NostrumMagica.getSpellRegistry().evict(spell);
+			NostrumMagica.instance.getSpellRegistry().evict(spell);
 		}
 		
 		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
@@ -127,7 +127,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 			return null;
 		
 		int id = nbt.getInt(NBT_SPELL);
-		Spell spell = NostrumMagica.getSpellRegistry().lookup(id);
+		Spell spell = NostrumMagica.instance.getSpellRegistry().lookup(id);
 		
 		if (spell == null) {
 			if (NostrumMagica.instance.proxy.isServer()) {

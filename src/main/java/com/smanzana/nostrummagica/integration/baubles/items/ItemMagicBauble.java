@@ -495,7 +495,7 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 			break;
 		case TRINKET_FLOAT_GUARD:
 			player.removePotionEffect(Potion.getPotionFromResourceLocation("levitation"));
-			player.removePotionEffect(RootedEffect.instance());
+			player.removePotionEffect(NostrumEffects.rooted);
 			break;
 		case ELUDE_CAPE_SMALL:
 			break;

@@ -41,7 +41,7 @@ import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.network.NetworkRegistry;
+import net.minecraftforge.fml.network.PacketDistributor.TargetPoint;
 
 public class Candle extends ContainerBlock {
 
@@ -173,8 +173,8 @@ public class Candle extends ContainerBlock {
     	}
     	
     	if (!world.isRemote) {
-			NetworkHandler.sendToAllAround(new CandleIgniteMessage(world.getDimension().getType(), pos, null),
-					new NetworkRegistry.TargetPoint(world.getDimension().getType(), pos.getX(), pos.getY(), pos.getZ(), 64));
+			NetworkHandler.sendToAllAround(new CandleIgniteMessage(world.getDimension().getType().getId(), pos, null),
+					new TargetPoint(pos.getX(), pos.getY(), pos.getZ(), 64, world.getDimension().getType()));
 		}
     	
     	if (!force && Candle.IsCandleEnhanced(world, pos)) {
@@ -381,8 +381,8 @@ public class Candle extends ContainerBlock {
 		candle.setReagentType(type);
 		
 		if (!world.isRemote) {
-			NetworkHandler.sendToAllAround(new CandleIgniteMessage(world.getDimension().getType(), pos, type),
-					new NetworkRegistry.TargetPoint(world.getDimension().getType(), pos.getX(), pos.getY(), pos.getZ(), 64));
+			NetworkHandler.sendToAllAround(new CandleIgniteMessage(world.getDimension().getType().getId(), pos, type),
+					new TargetPoint(pos.getX(), pos.getY(), pos.getZ(), 64, world.getDimension().getType()));
 		}
 	}
 	

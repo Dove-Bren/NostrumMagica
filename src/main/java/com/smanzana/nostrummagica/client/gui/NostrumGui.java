@@ -284,7 +284,7 @@ public class NostrumGui implements IGuiHandler {
 		}
 		
 		if (ID == scrollID) {
-			Spell spell = NostrumMagica.getSpellRegistry().lookup(x);
+			Spell spell = NostrumMagica.instance.getSpellRegistry().lookup(x);
 			return new ScrollScreen(spell);
 		}
 		

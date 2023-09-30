@@ -108,7 +108,7 @@ public class ArcaneWolfAIHellTask extends Goal {
 	
 	protected void startBurnEffect(EntityArcaneWolf wolf, LivingEntity target, int duration) {
 		NetworkHandler.sendToAllTracking(
-				new SpawnPredefinedEffectMessage(PredefinedEffect.HELL_BURN, duration, target.dimension, target.getEntityId()),
+				new SpawnPredefinedEffectMessage(PredefinedEffect.HELL_BURN, duration, target.dimension.getId(), target.getEntityId()),
 				target);
 	}
 	

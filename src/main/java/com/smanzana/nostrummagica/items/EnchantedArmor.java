@@ -28,6 +28,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.render.LayerAetherCloak;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.effects.RootedEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaEntityEffect;
@@ -74,6 +75,7 @@ import net.minecraft.item.IDyeableArmorItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.Direction;
@@ -553,7 +555,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 		switch (element) {
 		case EARTH:
 //			if (NostrumMagica.rand.nextFloat() <= 0.15f * (float) (Math.min(2, level) + 1))
-			action = new SpellAction(user).status(RootedEffect.instance(), 20 * 5 * (Math.min(2, type.scale) + 1), 0);
+			action = new SpellAction(user).status(NostrumEffects.rooted, 20 * 5 * (Math.min(2, type.scale) + 1), 0);
 			break;
 		case ENDER:
 //			if (NostrumMagica.rand.nextFloat() <= 0.15f * (float) (Math.min(2, level) + 1))
@@ -651,6 +653,9 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 					break;
 				}
 				break;
+			case MAINHAND:
+			case OFFHAND:
+				break;
 			}
 			break;
 		case ENDER:
@@ -718,6 +723,9 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 					armor = NostrumItems.enchantedArmorEnderFeetTrue;
 					break;
 				}
+				break;
+			case MAINHAND:
+			case OFFHAND:
 				break;
 			}
 			break;
@@ -787,6 +795,9 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 					break;
 				}
 				break;
+			case MAINHAND:
+			case OFFHAND:
+				break;
 			}
 			break;
 		case ICE:
@@ -854,6 +865,9 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 					armor = NostrumItems.enchantedArmorIceFeetTrue;
 					break;
 				}
+				break;
+			case MAINHAND:
+			case OFFHAND:
 				break;
 			}
 			break;
@@ -923,6 +937,9 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 					break;
 				}
 				break;
+			case MAINHAND:
+			case OFFHAND:
+				break;
 			}
 			break;
 		case PHYSICAL:
@@ -990,6 +1007,9 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 					armor = NostrumItems.enchantedArmorPhysicalFeetTrue;
 					break;
 				}
+				break;
+			case MAINHAND:
+			case OFFHAND:
 				break;
 			}
 			break;
@@ -1059,6 +1079,9 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 					break;
 				}
 				break;
+			case MAINHAND:
+			case OFFHAND:
+				break;
 			}
 			break;
 		}
@@ -1092,7 +1115,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public BipedModel getArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlotType slot, BipedModel defaultModel) {
+	public <A extends BipedModel<?>> A getArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlotType slot, A defaultModel) {
 		final int setCount = getSetPieces(entity);
 		final int index = (setCount - 1) + (type == Type.TRUE ? 1 : 0); // Boost 1 if ultimate armor
 		ModelEnchantedArmorBase model = armorModels[index % armorModels.length];
@@ -1594,7 +1617,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 				
 				if (!setMapInst.isEmpty()) {
 					for (Entry<IAttribute, Double> entry : setMapInst.entrySet()) {
-						Double val = entry.get();
+						Double val = entry.getValue();
 						if (val == null || val == 0) {
 							continue;
 						}
@@ -1846,7 +1869,8 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public void onClientTick(TickEvent.ClientTickEvent event) {
-		final ClientPlayerEntity player = Minecraft.getInstance().player;
+		Minecraft mc = Minecraft.getInstance();
+		final ClientPlayerEntity player = mc.player;
 		if (player == null) {
 			return;
 		}
@@ -1923,7 +1947,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 			// Does this armor have mana jump?
 			if (this.hasManaJump(player)) {
 				this.consumeManaJump(player);
-				player.getMotion().y += MANA_JUMP_AMT;
+				player.setMotion(player.getMotion().add(0, MANA_JUMP_AMT, 0));
 				hasJump = false; // Consumed
 				NetworkHandler.sendToServer(new EnchantedArmorStateUpdate(ArmorState.JUMP, true, 0));
 			}
@@ -1943,9 +1967,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 					final double origX = player.getMotion().x;
 					final double origY = player.getMotion().y;
 					final double origZ = player.getMotion().z;
-					player.getMotion().x *= scale;
-					player.getMotion().y *= scale;
-					player.getMotion().z *= scale;
+					player.setMotion(player.getMotion().scale(scale));
 					
 					final double dx = Math.abs(player.getMotion().x - origX);
 					final double dy = Math.abs(player.getMotion().y - origY);
@@ -2003,7 +2025,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 		// (which would clear an entity's old state if something was active when they left and they just came back)
 		
 		if (event.getTarget() instanceof LivingEntity) {
-			SendUpdates((LivingEntity) event.getTarget(), event.getEntityPlayer());
+			SendUpdates((LivingEntity) event.getTarget(), event.getPlayer());
 		}
 	}
 	
@@ -2207,12 +2229,12 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 						growable.grow(world, random, cursor, state);
 					}
 					
-					((ServerWorld) world).addParticle(ParticleTypes.VILLAGER_HAPPY,
+					((ServerWorld) world).addParticle(ParticleTypes.HAPPY_VILLAGER,
 							cursor.getX() + .5 + (-.5 + random.nextDouble()),
 							cursor.getY() + .5,
 							cursor.getZ() + .5 + (-.5 + random.nextDouble()),
 							2,
-							.2, .2, .2, 0, new int[0]);
+							.2, .2, .2, 0);
 					return cursor.toImmutable();
 				}
 			}
@@ -2271,7 +2293,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 			}
 			
 			// TODO does this work even though block is destroyed rig ht after entities are created inside it?
-			state.getBlock().spawnDrops(state, world, at);
+			Block.spawnDrops(state, world, at);
 			world.destroyBlock(at, false);
 		}
 		
