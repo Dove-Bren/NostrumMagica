@@ -9,11 +9,10 @@
   },
   "ingredients": [
     {
-      "item": "#AETHER_CLOAK"
+      "item": "nostrummagica:aether_cloak"
     },
     {
-      "item": "minecraft:dye",
-	  "data": 32767
+      "tag": "forge:dyes"
     }
   ]
 }

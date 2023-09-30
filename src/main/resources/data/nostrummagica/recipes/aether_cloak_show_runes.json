@@ -9,14 +9,13 @@
   },
   "ingredients": [
     {
-      "item": "#AETHER_CLOAK"
+      "item": "nostrummagica:aether_cloak"
     },
     {
-      "type": "forge:ore_dict",
-	  "ore": "gemQuartz"
+      "tag": "forge:gems/quartz"
     },
 	{
-      "item": "#REAGENT_MANIDUST"
+      "tag": "nostrummagica:reagent"
     }
   ]
 }

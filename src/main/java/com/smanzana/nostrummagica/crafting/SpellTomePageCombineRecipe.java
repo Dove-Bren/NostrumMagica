@@ -1,29 +1,31 @@
 package com.smanzana.nostrummagica.crafting;
 
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 
-import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.SpecialRecipe;
+import net.minecraft.item.crafting.SpecialRecipeSerializer;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 
-public class SpellTomePageCombineRecipe extends IForgeRegistryEntry.Impl<IRecipe> implements IRecipe {
+public class SpellTomePageCombineRecipe extends SpecialRecipe {
 
-	protected ResourceLocation registryName;
+	public static final String SERIALIZER_ID = "manual_recipe_spelltomepagecombine";
 	
-	public SpellTomePageCombineRecipe() {
-		//RecipeSorter.register("SpellTomeUpgradeRecipe", SpellTomePageCombineRecipe.class, Category.SHAPELESS, "");
-		
-		this.setRegistryName(new ResourceLocation(NostrumMagica.MODID, "manual_recipe_spelltomepagecombine"));
+	public SpellTomePageCombineRecipe(ResourceLocation ID) {
+		super(ID);
 	}
 	
 	@Override
-	public boolean matches(InventoryCrafting inv, World worldIn) {
+	public SpecialRecipeSerializer<SpellTomePageCombineRecipe> getSerializer() {
+		return NostrumCrafting.spellTomePageCombineSerializer;
+	}
+	
+	@Override
+	public boolean matches(CraftingInventory inv, World worldIn) {
 		SpellTomeEnhancement enhancement = null;
 		int count = 0;
 		
@@ -57,7 +59,7 @@ public class SpellTomePageCombineRecipe extends IForgeRegistryEntry.Impl<IRecipe
 	}
 
 	@Override
-	public ItemStack getCraftingResult(InventoryCrafting inv) {
+	public ItemStack getCraftingResult(CraftingInventory inv) {
 		SpellTomeEnhancement enhancement = null;
 		int sum = 0;
 		int count = 0;
@@ -98,16 +100,16 @@ public class SpellTomePageCombineRecipe extends IForgeRegistryEntry.Impl<IRecipe
 		if (level > enhancement.getMaxLevel())
 			return ItemStack.EMPTY;
 		
-		return SpellTomePage.getItemstack(enhancement, level);
+		return SpellTomePage.Create(enhancement, level);
 	}
 
 	@Override
 	public ItemStack getRecipeOutput() {
-		return SpellTomePage.getItemstack(SpellTomeEnhancement.EFFICIENCY, 1);
+		return SpellTomePage.Create(SpellTomeEnhancement.EFFICIENCY, 1);
 	}
 
 	@Override
-	public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
+	public NonNullList<ItemStack> getRemainingItems(CraftingInventory inv) {
 		return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
 	}
 

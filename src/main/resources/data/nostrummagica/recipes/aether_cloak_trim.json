@@ -9,7 +9,7 @@
   },
   "ingredients": [
     {
-      "item": "#AETHER_CLOAK"
+      "item": "nostrummagica:aether_cloak"
     },
     {
       "item": "minecraft:shears"

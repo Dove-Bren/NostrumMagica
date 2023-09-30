@@ -30,6 +30,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.DyeColor;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -52,8 +53,8 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 	}
 	
 	public static interface UpgradeColorFunc {
-		public boolean isSet(@Nonnull ItemStack stack, EnumDyeColor color);
-		public void set(@Nonnull ItemStack stack, EnumDyeColor color);
+		public boolean isSet(@Nonnull ItemStack stack, DyeColor color);
+		public void set(@Nonnull ItemStack stack, DyeColor color);
 	}
 	
 	public static enum ToggleUpgrades {
@@ -198,7 +199,7 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 //				)) {
 //
 //			@Override
-//			public ItemStack getCraftingResult(InventoryCrafting inv) {
+//			public ItemStack getCraftingResult(CraftingInventory inv) {
 //				ItemStack cloak = null;
 //				ItemStack dye = null;
 //				for (int i = 0; i < inv.getSizeInventory(); i++) {
@@ -236,7 +237,7 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 //				)) {
 //			
 //			@Override
-//			public boolean matches(InventoryCrafting inv, World worldIn) {
+//			public boolean matches(CraftingInventory inv, World worldIn) {
 //				// Require both dyes to be the same
 //				ItemStack cloak = null;
 //				ItemStack dye1 = null;
@@ -268,7 +269,7 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 //			}
 //
 //			@Override
-//			public ItemStack getCraftingResult(InventoryCrafting inv) {
+//			public ItemStack getCraftingResult(CraftingInventory inv) {
 //				ItemStack cloak = null;
 //				ItemStack dye = null;
 //				for (int i = 0; i < inv.getSizeInventory(); i++) {
@@ -306,7 +307,7 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 //				)) {
 //
 //			@Override
-//			public ItemStack getCraftingResult(InventoryCrafting inv) {
+//			public ItemStack getCraftingResult(CraftingInventory inv) {
 //				ItemStack cloak = null;
 //				ItemStack dye = null;
 //				for (int i = 0; i < inv.getSizeInventory(); i++) {
@@ -343,7 +344,7 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 //				)) {
 //
 //			@Override
-//			public ItemStack getCraftingResult(InventoryCrafting inv) {
+//			public ItemStack getCraftingResult(CraftingInventory inv) {
 //				ItemStack cloak = null;
 //				for (int i = 0; i < inv.getSizeInventory(); i++) {
 //					ItemStack stack = inv.getStackInSlot(i);
@@ -372,7 +373,7 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 //				)) {
 //
 //			@Override
-//			public ItemStack getCraftingResult(InventoryCrafting inv) {
+//			public ItemStack getCraftingResult(CraftingInventory inv) {
 //				ItemStack cloak = null;
 //				for (int i = 0; i < inv.getSizeInventory(); i++) {
 //					ItemStack stack = inv.getStackInSlot(i);
@@ -401,7 +402,7 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 //				)) {
 //
 //			@Override
-//			public ItemStack getCraftingResult(InventoryCrafting inv) {
+//			public ItemStack getCraftingResult(CraftingInventory inv) {
 //				ItemStack cloak = null;
 //				for (int i = 0; i < inv.getSizeInventory(); i++) {
 //					ItemStack stack = inv.getStackInSlot(i);

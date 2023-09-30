@@ -6,14 +6,15 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonParseException;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemAetherCloak;
 
-import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.item.crafting.ShapelessRecipe;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.oredict.ShapelessOreRecipe;
 
-public abstract class AetherCloakModificationRecipe extends ShapelessOreRecipe {
+public abstract class AetherCloakModificationRecipe extends ShapelessRecipe {
 	
 	protected static interface TransformFuncs {
 		public boolean isAlreadySet(@Nonnull ItemStack cloak, NonNullList<ItemStack> extras);
@@ -22,11 +23,11 @@ public abstract class AetherCloakModificationRecipe extends ShapelessOreRecipe {
 
 	private final NonNullList<Ingredient> ingredients;
 	private final TransformFuncs func;
-	private @Nullable final ResourceLocation group;
+	private @Nullable final String group;
 	private final @Nonnull ItemStack displayStack;
 	
-	public AetherCloakModificationRecipe(ResourceLocation group, @Nonnull ItemStack displayStack, NonNullList<Ingredient> ingredients, TransformFuncs func) {
-		super(group, ingredients, ItemStack.EMPTY);
+	public AetherCloakModificationRecipe(ResourceLocation id, String group, @Nonnull ItemStack displayStack, NonNullList<Ingredient> ingredients, TransformFuncs func) {
+		super(id, group, displayStack /* TODO this ok? ItemStack.EMPTY*/, ingredients);
 		
 		if (ingredients == null || ingredients.isEmpty()) {
 			throw new JsonParseException("ingredients items must be provided and contain at least an Aether Cloak");
@@ -35,7 +36,7 @@ public abstract class AetherCloakModificationRecipe extends ShapelessOreRecipe {
 		final ItemStack cloak = new ItemStack(ItemAetherCloak.instance());
 		boolean found = false;
 		for (Ingredient ing : ingredients) {
-			if (ing.apply(cloak)) {
+			if (ing.test(cloak)) {
 				found = true;
 				break;
 			}
@@ -60,7 +61,7 @@ public abstract class AetherCloakModificationRecipe extends ShapelessOreRecipe {
 	 * @param inv
 	 * @return
 	 */
-	protected @Nonnull ItemStack findAetherCloak(InventoryCrafting inv) {
+	protected @Nonnull ItemStack findAetherCloak(CraftingInventory inv) {
 		@Nonnull ItemStack found = ItemStack.EMPTY;
 		for (int i = 0; i < inv.getSizeInventory(); i++) {
 			@Nonnull ItemStack stack = inv.getStackInSlot(i);
@@ -78,7 +79,7 @@ public abstract class AetherCloakModificationRecipe extends ShapelessOreRecipe {
 	}
 	
 	@Override
-	public ItemStack getCraftingResult(InventoryCrafting inv) {
+	public ItemStack getCraftingResult(CraftingInventory inv) {
 		@Nonnull ItemStack result = ItemStack.EMPTY;
 		@Nonnull ItemStack cloak = findAetherCloak(inv);
 		
@@ -119,5 +120,8 @@ public abstract class AetherCloakModificationRecipe extends ShapelessOreRecipe {
 	public String getGroup() {
 		return group == null ? "" : group.toString();
 	}
+	
+	@Override
+	public abstract IRecipeSerializer<?> getSerializer();
 	
 }
