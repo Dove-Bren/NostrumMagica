@@ -85,7 +85,7 @@ public class BeamTrigger extends InstantTrigger {
 		if (end == null)
 			end = pos.add(RayTrace.directionFromAngles(pitch, yaw).normalize().scale(BEAM_RANGE));
 		
-		NostrumMagica.proxy.spawnEffect(world, new SpellComponentWrapper(this),
+		NostrumMagica.instance.proxy.spawnEffect(world, new SpellComponentWrapper(this),
 				null, pos, null, end, null, false, 0);
 		
 		return new TriggerData(targs, others, world, blocks);

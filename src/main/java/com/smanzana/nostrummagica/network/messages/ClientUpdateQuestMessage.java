@@ -1,91 +1,69 @@
 package com.smanzana.nostrummagica.network.messages;
 
+import java.util.function.Supplier;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 
-import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.DecoderException;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
  * Client has requested a quest become active or completed
  * @author Skyler
  *
  */
-public class ClientUpdateQuestMessage implements IMessage {
+public class ClientUpdateQuestMessage {
 	
-	public static class Handler implements IMessageHandler<ClientUpdateQuestMessage, StatSyncMessage> {
+	public static void handle(ClientUpdateQuestMessage message, Supplier<NetworkEvent.Context> ctx) {
+		final ServerPlayerEntity sp = ctx.get().getSender();
+		ctx.get().setPacketHandled(true);
+		ctx.get().enqueueWork(() -> {
+			INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
+			
+			if (att == null) {
+				NostrumMagica.logger.warn("Could not look up player magic wrapper");
+				return;
+			}
+			
+			if (att.getCurrentQuests().contains(message.quest.getKey())) {
+				if (message.quest.getObjective().isComplete(att))
+					message.quest.completeQuest(sp);
+			} else {
+				if (NostrumMagica.canTakeQuest(sp, message.quest))
+					message.quest.startQuest(sp);
+			}
 
-		@Override
-		public StatSyncMessage onMessage(ClientUpdateQuestMessage message, MessageContext ctx) {
-			if (!message.tag.contains(NBT_QUEST, NBT.TAG_STRING))
-				return null;
-			
-			final ServerPlayerEntity sp = ctx.getServerHandler().player;
-			
-			sp.getServerWorld().runAsync(() -> {
-				INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
-				
-				if (att == null) {
-					NostrumMagica.logger.warn("Could not look up player magic wrapper");
-					return;
-				}
-				
-				NostrumQuest quest = NostrumQuest.lookup(message.tag.getString(NBT_QUEST));
-				
-				if (quest == null) {
-					NostrumMagica.logger.warn("Player requested a quest that DNE");
-					return;
-				}
-				
-				if (att.getCurrentQuests().contains(quest.getKey())) {
-					if (quest.getObjective().isComplete(att))
-						quest.completeQuest(sp);
-				} else {
-					if (NostrumMagica.canTakeQuest(sp, quest))
-						quest.startQuest(sp);
-				}
-	
-				 NetworkHandler.getSyncChannel().sendTo(new StatSyncMessage(att), sp);
-			});
-			
-			return null;
-		}
+			 NetworkHandler.getSyncChannel().sendTo(new StatSyncMessage(att), sp);
+		});
 	}
 
-	private static final String NBT_QUEST = "quest";
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
-	protected CompoundNBT tag;
-	
-	public ClientUpdateQuestMessage() {
-		tag = new CompoundNBT();
-	}
+	private final NostrumQuest quest;
 	
 	public ClientUpdateQuestMessage(NostrumQuest quest) {
-		tag = new CompoundNBT();
-		
-		tag.putString(NBT_QUEST, quest.getKey());
+		this.quest = quest;
 	}
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		tag = ByteBufUtils.readTag(buf);
+	public static ClientUpdateQuestMessage decode(PacketBuffer buf) {
+		final String id = buf.readString();
+		NostrumQuest quest = NostrumQuest.lookup(id);
+		if (quest == null) {
+			throw new DecoderException("Could not find Nostrum quest matching " + id);
+		}
+		return new ClientUpdateQuestMessage(quest);
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		ByteBufUtils.writeTag(buf, tag);
+		public static void encode(ClientUpdateQuestMessage msg, PacketBuffer buf) {
+		buf.writeString(msg.quest.getKey());
 	}
 
 }

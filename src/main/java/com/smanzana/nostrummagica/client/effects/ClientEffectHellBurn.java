@@ -5,7 +5,7 @@ import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -33,7 +33,7 @@ public class ClientEffectHellBurn extends ClientEffect {
 	protected void spawnFireEffect() {
 		final double angleRad = Math.PI * 2 * NostrumMagica.rand.nextFloat();
 		final Vec3d offset = new Vec3d(Math.cos(angleRad) * .5, .25, Math.sin(angleRad) * .5);
-		entity.world.spawnParticle(EnumParticleTypes.FLAME,
+		entity.world.addParticle(ParticleTypes.FLAME,
 				entity.posX + offset.x,
 				entity.posY + entity.getHeight() + offset.y,
 				entity.posZ + offset.z,
@@ -47,7 +47,7 @@ public class ClientEffectHellBurn extends ClientEffect {
 	protected void spawnPoisonEffect() {
 		final double angleRad = Math.PI * 2 * NostrumMagica.rand.nextFloat();
 		final Vec3d offset = new Vec3d(Math.cos(angleRad) * .5, .25, Math.sin(angleRad) * .5);
-		entity.world.spawnParticle(EnumParticleTypes.CRIT_MAGIC,
+		entity.world.addParticle(ParticleTypes.CRIT_MAGIC,
 				entity.posX + offset.x,
 				entity.posY + entity.getHeight() + offset.y,
 				entity.posZ + offset.z,
@@ -59,7 +59,7 @@ public class ClientEffectHellBurn extends ClientEffect {
 	protected void spawnMagmaEffect() {
 		final double angleRad = Math.PI * 2 * NostrumMagica.rand.nextFloat();
 		final Vec3d dir = new Vec3d(Math.cos(angleRad) * .5, .25, Math.sin(angleRad) * .5);
-		entity.world.spawnParticle(EnumParticleTypes.LAVA,
+		entity.world.addParticle(ParticleTypes.LAVA,
 				entity.posX,
 				entity.posY + entity.getHeight() - .1,
 				entity.posZ,

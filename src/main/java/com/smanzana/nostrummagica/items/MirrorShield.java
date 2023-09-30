@@ -155,7 +155,7 @@ public class MirrorShield extends ShieldItem implements ISpellActionListener, IL
 //	@Override
 //	public ITextComponent getDisplayName(ItemStack stack) {
 //		// ItemShield hardcodes item.shield.name lol
-//		return NostrumMagica.proxy.getTranslation(this.getUnlocalizedNameInefficiently(stack) + ".name").trim();
+//		return NostrumMagica.instance.proxy.getTranslation(this.getUnlocalizedNameInefficiently(stack) + ".name").trim();
 //	}
 
 }

@@ -837,7 +837,7 @@ public class EntityArcaneWolf extends EntityWolf implements ITameableEntity, IEn
 			} else if (this.isSitting() && stack.isEmpty()) {
 				if (!this.world.isRemote) {
 					player.openGui(NostrumMagica.instance, NostrumGui.dragonID, this.world, (int) this.posX, (int) this.posY, (int) this.posZ);
-					NostrumMagica.proxy.openPetGUI(player, this);
+					NostrumMagica.instance.proxy.openPetGUI(player, this);
 				}
 				return true;
 			} else if (stack.isEmpty()) {

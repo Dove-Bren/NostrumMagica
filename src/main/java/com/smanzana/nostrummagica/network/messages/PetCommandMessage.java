@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.network.messages;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
@@ -8,16 +9,12 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.pet.PetPlacementMode;
 import com.smanzana.nostrummagica.pet.PetTargetMode;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
  * Client has issued a pet command.
@@ -25,81 +22,75 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
  * @author Skyler
  *
  */
-public class PetCommandMessage implements IMessage {
+public class PetCommandMessage {
 
-	public static class Handler implements IMessageHandler<PetCommandMessage, IMessage> {
-
-		@Override
-		public IMessage onMessage(PetCommandMessage message, MessageContext ctx) {
-			final ServerPlayerEntity sp = ctx.getServerHandler().player;
+	public static void handle(PetCommandMessage message, Supplier<NetworkEvent.Context> ctx) {
+		final ServerPlayerEntity sp = ctx.get().getSender();
+		ctx.get().setPacketHandled(true);
+		// Can't call from network threads because manager doesn't sync entity target modification
+		
+		ctx.get().enqueueWork(() -> {
+			final @Nullable LivingEntity target;
+			final @Nullable MobEntity pet;
 			
-			// Can't call from network threads because manager doesn't sync entity target modification
-			
-			sp.getServerWorld().runAsync(() -> {
-				final @Nullable LivingEntity target;
-				final @Nullable MobEntity pet;
-				
-				if (message.targetUUID != null) {
-					Entity e = NostrumMagica.getEntityByUUID(sp.world, message.targetUUID);
-					if (e instanceof LivingEntity) {
-						target = (LivingEntity) e;
-					} else {
-						target = null;
-					}
+			if (message.targetUUID != null) {
+				Entity e = NostrumMagica.getEntityByUUID(sp.world, message.targetUUID);
+				if (e instanceof LivingEntity) {
+					target = (LivingEntity) e;
 				} else {
 					target = null;
 				}
-				
-				if (message.petUUID != null) {
-					Entity e = NostrumMagica.getEntityByUUID(sp.world, message.petUUID);
-					if (e instanceof MobEntity) {
-						pet = (MobEntity) e;
-					} else {
-						pet = null;
-					}
+			} else {
+				target = null;
+			}
+			
+			if (message.petUUID != null) {
+				Entity e = NostrumMagica.getEntityByUUID(sp.world, message.petUUID);
+				if (e instanceof MobEntity) {
+					pet = (MobEntity) e;
 				} else {
 					pet = null;
 				}
-				
-				switch (message.type) {
-				case STOP:
-					//if (pet == null) {
-						NostrumMagica.getPetCommandManager().commandAllStopAttacking(sp);
-					//}
-					break;
-				case ATTACK:
-					if (target == null) {
-						NostrumMagica.logger.error("Received pet attack command with no target");
-						break;
-					}
-					
-					if (pet == null) {
-						NostrumMagica.getPetCommandManager().commandAllToAttack(sp, target);
-					} else {
-						NostrumMagica.getPetCommandManager().commandToAttack(sp, pet, target);
-					}
-					break;
-				case SET_PLACEMENT_MODE:
-					if (message.placementMode == null) {
-						NostrumMagica.logger.error("Received pet placement mode with null mode");
-						break;
-					}
-					
-					NostrumMagica.getPetCommandManager().setPlacementMode(sp, message.placementMode);
-					break;
-				case SET_TARGET_MODE:
-					if (message.targetMode == null) {
-						NostrumMagica.logger.error("Received pet target mode with null mode");
-						break;
-					}
-					
-					NostrumMagica.getPetCommandManager().setTargetMode(sp, message.targetMode);
+			} else {
+				pet = null;
+			}
+			
+			switch (message.type) {
+			case STOP:
+				//if (pet == null) {
+					NostrumMagica.instance.getPetCommandManager().commandAllStopAttacking(sp);
+				//}
+				break;
+			case ATTACK:
+				if (target == null) {
+					NostrumMagica.logger.error("Received pet attack command with no target");
 					break;
 				}
-			});
-			
-			return null;
-		}
+				
+				if (pet == null) {
+					NostrumMagica.instance.getPetCommandManager().commandAllToAttack(sp, target);
+				} else {
+					NostrumMagica.instance.getPetCommandManager().commandToAttack(sp, pet, target);
+				}
+				break;
+			case SET_PLACEMENT_MODE:
+				if (message.placementMode == null) {
+					NostrumMagica.logger.error("Received pet placement mode with null mode");
+					break;
+				}
+				
+				NostrumMagica.instance.getPetCommandManager().setPlacementMode(sp, message.placementMode);
+				break;
+			case SET_TARGET_MODE:
+				if (message.targetMode == null) {
+					NostrumMagica.logger.error("Received pet target mode with null mode");
+					break;
+				}
+				
+				NostrumMagica.instance.getPetCommandManager().setTargetMode(sp, message.targetMode);
+				break;
+			}
+		});
 	}
 	
 	public static enum PetCommandMessageType {
@@ -109,16 +100,12 @@ public class PetCommandMessage implements IMessage {
 		SET_TARGET_MODE,
 	}
 	
-	protected PetCommandMessageType type;
-	protected @Nullable UUID petUUID;
-	protected @Nullable UUID targetUUID;
-	protected @Nullable PetPlacementMode placementMode;
-	protected @Nullable PetTargetMode targetMode;
+	protected final PetCommandMessageType type;
+	protected final @Nullable UUID petUUID;
+	protected final @Nullable UUID targetUUID;
+	protected final @Nullable PetPlacementMode placementMode;
+	protected final @Nullable PetTargetMode targetMode;
 
-	
-	public PetCommandMessage() {
-		this(PetCommandMessageType.STOP, null, null, null, null);
-	}
 	
 	private PetCommandMessage(PetCommandMessageType type,
 			@Nullable UUID petUUID,
@@ -156,79 +143,44 @@ public class PetCommandMessage implements IMessage {
 		return new PetCommandMessage(PetCommandMessageType.SET_TARGET_MODE, null, null, null, mode);
 	}
 	
-	private static final String NBT_TYPE = "type";
-	private static final String NBT_PET_ID = "petID";
-	private static final String NBT_TARGET_ID = "targetID";
-	private static final String NBT_PLACEMENT_MODE = "placementMode";
-	private static final String NBT_TARGET_MODE = "targetMode";
-	
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		CompoundNBT tag = ByteBufUtils.readTag(buf);
-		try {
-			this.type = PetCommandMessageType.valueOf(tag.getString(NBT_TYPE).toUpperCase());
-		} catch (Exception e) {
-			e.printStackTrace();
-			this.type = PetCommandMessageType.STOP;
-			this.petUUID = null;
-			this.targetUUID = null;
-			return;
-		}
+	public static PetCommandMessage decode(PacketBuffer buf) {
+		final PetCommandMessageType type;
+		final @Nullable UUID petUUID;
+		final @Nullable UUID targetUUID;
+		final @Nullable PetPlacementMode placementMode;
+		final @Nullable PetTargetMode targetMode;
 		
-		if (tag.hasUniqueId(NBT_PET_ID)) {
-			this.petUUID = tag.getUniqueId(NBT_PET_ID);
-		} else {
-			this.petUUID = null;
-		}
+		type = buf.readEnumValue(PetCommandMessageType.class);
+		petUUID = buf.readBoolean() ? buf.readUniqueId() : null;
+		targetUUID = buf.readBoolean() ? buf.readUniqueId() : null;
+		placementMode = buf.readBoolean() ? buf.readEnumValue(PetPlacementMode.class) : null;
+		targetMode = buf.readBoolean() ? buf.readEnumValue(PetTargetMode.class) : null;
 		
-		if (tag.hasUniqueId(NBT_TARGET_ID)) {
-			this.targetUUID = tag.getUniqueId(NBT_TARGET_ID);
-		} else {
-			this.targetUUID = null;
-		}
-		
-		if (tag.contains(NBT_PLACEMENT_MODE)) {
-			try {
-				this.placementMode = PetPlacementMode.valueOf(tag.getString(NBT_PLACEMENT_MODE).toUpperCase());
-			} catch (Exception e) {
-				e.printStackTrace();
-				this.placementMode = PetPlacementMode.FREE;
-			}
-		} else {
-			this.placementMode = PetPlacementMode.FREE;
-		}
-		
-		if (tag.contains(NBT_TARGET_MODE)) {
-			try {
-				this.targetMode = PetTargetMode.valueOf(tag.getString(NBT_TARGET_MODE).toUpperCase());
-			} catch (Exception e) {
-				e.printStackTrace();
-				this.targetMode = PetTargetMode.FREE;
-			}
-		} else {
-			this.targetMode = PetTargetMode.FREE;
-		}
+		return new PetCommandMessage(type, petUUID, targetUUID, placementMode, targetMode);
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		CompoundNBT tag = new CompoundNBT();
+	public static void encode(PetCommandMessage msg, PacketBuffer buf) {
+		buf.writeEnumValue(msg.type);
 		
-		tag.putString(NBT_TYPE, this.type.name());
-		if (petUUID != null) {
-			tag.setUniqueId(NBT_PET_ID, petUUID);
-		}
-		if (targetUUID != null) {
-			tag.setUniqueId(NBT_TARGET_ID, targetUUID);
-		}
-		if (placementMode != null) {
-			tag.putString(NBT_PLACEMENT_MODE, this.placementMode.name());
-		}
-		if (targetMode != null) {
-			tag.putString(NBT_TARGET_MODE, this.targetMode.name());
+		buf.writeBoolean(msg.petUUID != null);
+		if (msg.petUUID != null) {
+			buf.writeUniqueId(msg.petUUID);
 		}
 		
-		ByteBufUtils.writeTag(buf, tag);
+		buf.writeBoolean(msg.targetUUID != null);
+		if (msg.targetUUID != null) {
+			buf.writeUniqueId(msg.targetUUID);
+		}
+		
+		buf.writeBoolean(msg.placementMode != null);
+		if (msg.placementMode != null) {
+			buf.writeEnumValue(msg.placementMode);
+		}
+		
+		buf.writeBoolean(msg.targetMode != null);
+		if (msg.targetMode != null) {
+			buf.writeEnumValue(msg.targetMode);
+		}
 	}
 	
 }

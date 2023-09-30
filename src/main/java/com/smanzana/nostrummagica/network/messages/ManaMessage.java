@@ -1,101 +1,77 @@
 package com.smanzana.nostrummagica.network.messages;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
  * Server is refreshing client's view on a player's mana
  * @author Skyler
  *
  */
-public class ManaMessage implements IMessage {
+public class ManaMessage {
 
-	public static class Handler implements IMessageHandler<ManaMessage, IMessage> {
-
-		@Override
-		public IMessage onMessage(ManaMessage message, MessageContext ctx) {
-			
-			NostrumMagica.proxy.applyOverride();
-			
-			UUID id;
-			try {
-				id = UUID.fromString(message.tag.getString(NBT_UUID));
-			} catch (IllegalArgumentException e) {
-				return null; // Just drop it
-			}
-			
-			int mana = message.tag.getInt(NBT_MANA);
-			
-			PlayerEntity player = NostrumMagica.proxy.getPlayer();
-			
-			if (player == null) {
-				// Haven't finished loading. Just drop it
-				return null;
-			}
-			
-			Minecraft.getInstance().runAsync(() -> {
-				PlayerEntity realPlayer = player.world.getPlayerEntityByUUID(id);
-			
-				if (realPlayer == null) {
-					// Not in this world. Who cares
-					return;
-				}
-				
-				INostrumMagic att = NostrumMagica.getMagicWrapper(realPlayer);
-				// Regardless of success, server has synced mana with us.
-				
-				if (att != null)
-					att.setMana(mana);
-			});
-			
-			
-			// Success or nah?
-			
-			// TODO care
-			return null;
+	public static void handle(ManaMessage message, Supplier<NetworkEvent.Context> ctx) {
+		ctx.get().setPacketHandled(true);
+		NostrumMagica.instance.proxy.applyOverride();
+		
+		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+		
+		if (player == null) {
+			// Haven't finished loading. Just drop it
+			return;
 		}
 		
+		Minecraft.getInstance().runAsync(() -> {
+			PlayerEntity realPlayer = player.world.getPlayerByUuid(message.uuid);
+		
+			if (realPlayer == null) {
+				// Not in this world. Who cares
+				return;
+			}
+			
+			INostrumMagic att = NostrumMagica.getMagicWrapper(realPlayer);
+			// Regardless of success, server has synced mana with us.
+			
+			if (att != null)
+				att.setMana(message.mana);
+		});
+		
+		// Success or nah?
 	}
+		
 
-	private static final String NBT_UUID = "uuid";
-	private static final String NBT_MANA = "mana";
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
-	protected CompoundNBT tag;
-	
-	public ManaMessage() {
-		tag = new CompoundNBT();
-	}
+	private final UUID uuid;
+	private final int mana;
 	
 	public ManaMessage(PlayerEntity player, int mana) {
-		tag = new CompoundNBT();
-		
-		tag.putInt(NBT_MANA, mana);
-		tag.putString(NBT_UUID, player.getPersistentID().toString());
+		this(player.getUniqueID(), mana);
+	}
+	
+	public ManaMessage(UUID uuid, int mana) {
+		this.uuid = uuid;
+		this.mana = mana;
 	}
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		tag = ByteBufUtils.readTag(buf);
+	public static ManaMessage decode(PacketBuffer buf) {
+		return new ManaMessage(buf.readUniqueId(), buf.readVarInt());
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		ByteBufUtils.writeTag(buf, tag);
+	public static void encode(ManaMessage msg, PacketBuffer buf) {
+		buf.writeUniqueId(msg.uuid);
+		buf.writeVarInt(msg.mana);
 	}
 
 }

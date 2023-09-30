@@ -38,7 +38,7 @@ public class CommandSetManaArmor {
 		}
 		
 		attr.setHasArmor(engaged, cost);
-		NostrumMagica.proxy.sendManaArmorCapability(player);
+		NostrumMagica.instance.proxy.sendManaArmorCapability(player);
 		return 0;
 	}
 }

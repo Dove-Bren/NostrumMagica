@@ -30,7 +30,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -190,7 +190,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 						final double x = (pos.getX() + .5 + (NostrumMagica.rand.nextFloat() * RADIUS)) - (RADIUS / 2f);
 						final double y = (pos.getY() + 1.5 + (NostrumMagica.rand.nextFloat() * RADIUS)) - 1;
 						final double z = (pos.getZ() + .5 + (NostrumMagica.rand.nextFloat() * RADIUS)) - (RADIUS / 2f);
-						world.spawnParticle(EnumParticleTypes.SUSPENDED_DEPTH,
+						world.addParticle(ParticleTypes.SUSPENDED_DEPTH,
 								x, y, z,
 								0, 0, 0, 0);
 						

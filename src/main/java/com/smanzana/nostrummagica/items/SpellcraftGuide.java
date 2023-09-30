@@ -42,7 +42,7 @@ public class SpellcraftGuide extends Item implements GuiBook {
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
 		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		if (worldIn.isRemote) {
-			NostrumMagica.proxy.openBook(playerIn, this, itemStackIn);
+			NostrumMagica.instance.proxy.openBook(playerIn, this, itemStackIn);
 		}
 		
 		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);

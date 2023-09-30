@@ -41,7 +41,7 @@ import net.minecraft.item.ItemUseContext;
 import net.minecraft.item.SwordItem;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
-import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
@@ -369,7 +369,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 //					cloud.setRadiusPerTick((1f + level * .75f) / (20f * 3));
 //					cloud.setDuration(20 * 3);
 //					//cloud.setColor(0xFFFF0000);
-//					//cloud.setParticle(EnumParticleTypes.SPELL);
+//					//cloud.setParticle(ParticleTypes.SPELL);
 //					cloud.addEffect(new PotionEffect(FrostbitePotion.instance(), 20 * 10));
 //					worldIn.spawnEntityInWorld(cloud);
 //					cloud.getMotion().x = dir.x;
@@ -597,7 +597,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 		cloud.setEffectDelay(0);
 		cloud.setWaddle(direction, 1);
 		
-		cloud.setParticle(EnumParticleTypes.SUSPENDED);
+		cloud.setParticle(ParticleTypes.SUSPENDED);
 		cloud.setIgnoreRadius(true);
 		cloud.addVFXFunc((worldIn, ticksExisted, cloudIn) -> {
 			final int count = 5 + Math.max(0, (int)Math.floor(cloudIn.getRadius() / 4)); 
@@ -605,7 +605,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 			//}
 		});
 		if (hurricaneCount >= 4) {
-			cloud.setCustomParticle(EnumParticleTypes.SWEEP_ATTACK);
+			cloud.setCustomParticle(ParticleTypes.SWEEP_ATTACK);
 			cloud.setCustomParticleParam1(10);
 			cloud.setCustomParticleFrequency(.4f);
 		}
@@ -639,7 +639,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 		});
 		cloud.setEffectDelay(0);
 		
-		cloud.setParticle(EnumParticleTypes.SUSPENDED);
+		cloud.setParticle(ParticleTypes.SUSPENDED);
 		cloud.setIgnoreRadius(true);
 		cloud.addVFXFunc((worldIn, ticksExisted, cloudIn) -> {
 			final int count = 5 + Math.max(0, (int)Math.floor(cloudIn.getRadius() / 4)); 
@@ -667,7 +667,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 				);
 		attr.addMana(-30);
 		if (entity instanceof PlayerEntity) {
-			NostrumMagica.proxy.sendMana((PlayerEntity) entity);
+			NostrumMagica.instance.proxy.sendMana((PlayerEntity) entity);
 		}
 		return true;
 	}
@@ -733,7 +733,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 		
 		attr.addMana(-30);
 		if (caster instanceof PlayerEntity) {
-			NostrumMagica.proxy.sendMana((PlayerEntity) caster);
+			NostrumMagica.instance.proxy.sendMana((PlayerEntity) caster);
 		}
 		return true;
 	}

@@ -77,7 +77,7 @@ import net.minecraft.scoreboard.Team;
 import net.minecraft.server.management.PreYggdrasilConverter;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
-import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
@@ -524,7 +524,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 				} else if (this.isEntitySitting() && stack.isEmpty()) {
 					if (!this.world.isRemote) {
 						//player.openGui(NostrumMagica.instance, NostrumGui.dragonID, this.world, (int) this.posX, (int) this.posY, (int) this.posZ);
-						NostrumMagica.proxy.openPetGUI(player, this);
+						NostrumMagica.instance.proxy.openPetGUI(player, this);
 					}
 					return true;
 				} else if (isBreedingItem(stack) && this.getBond() > BOND_LEVEL_BREED && this.getEgg() == null) {
@@ -903,13 +903,13 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	
 	private void playTameEffect(boolean success) {
 		
-		EnumParticleTypes enumparticletypes = success ? EnumParticleTypes.HEART : EnumParticleTypes.VILLAGER_ANGRY;
+		ParticleTypes ParticleTypes = success ? ParticleTypes.HEART : ParticleTypes.VILLAGER_ANGRY;
 
 		for (int i = 0; i < 15; ++i) {
 			double d0 = this.rand.nextGaussian() * 0.02D;
 			double d1 = this.rand.nextGaussian() * 0.02D;
 			double d2 = this.rand.nextGaussian() * 0.02D;
-			this.world.spawnParticle(enumparticletypes, this.posX + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.posZ + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, d0, d1, d2, new int[0]);
+			this.world.addParticle(ParticleTypes, this.posX + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.posZ + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, d0, d1, d2, new int[0]);
 		}
 	}
 	

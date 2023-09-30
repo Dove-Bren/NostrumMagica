@@ -1,21 +1,16 @@
 package com.smanzana.nostrummagica.network.messages;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
  * Server has processed spell cast request and sent back
@@ -23,103 +18,42 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
  * @author Skyler
  *
  */
-public class ClientEffectRenderMessage implements IMessage {
+public class ClientEffectRenderMessage {
 
-	public static class Handler implements IMessageHandler<ClientEffectRenderMessage, IMessage> {
-
-		@Override
-		public IMessage onMessage(ClientEffectRenderMessage message, MessageContext ctx) {
-
-			Minecraft.getInstance().runAsync(() -> {
-				LivingEntity caster, target;
-				Vec3d casterPos, targetPos;
-				SpellComponentWrapper component, flavor;
-				
-				caster = target = null;
-				casterPos = targetPos = null;
-				flavor = null;
-				
-				if (message.tag.contains(NBT_CASTER_ID, NBT.TAG_STRING)) {
-					try {
-						UUID id = UUID.fromString(message.tag.getString(NBT_CASTER_ID));
-						caster = NostrumMagica.proxy.getPlayer().world.getPlayerEntityByUUID(id);
-					} catch (Exception e) {
-						;
-					}
-				}
-				
-				if (message.tag.contains(NBT_CASTER_POS, NBT.TAG_COMPOUND)) {
-					CompoundNBT nbt = message.tag.getCompound(NBT_CASTER_POS);
-					casterPos = new Vec3d(
-							nbt.getDouble("x"),
-							nbt.getDouble("y"),
-							nbt.getDouble("z")
-							);
-				}
-				
-				if (message.tag.contains(NBT_TARGET_ID, NBT.TAG_STRING)) {
-					try {
-						UUID id = UUID.fromString(message.tag.getString(NBT_TARGET_ID));
-						for (Entity e : NostrumMagica.proxy.getPlayer().world.loadedEntityList) {
-							if (e.getPersistentID().equals(id)) {
-								target = (LivingEntity) e;
-								break;
-							}
-						}
-					} catch (Exception e) {
-						;
-					}
-				}
-				
-				if (message.tag.contains(NBT_TARGET_POS, NBT.TAG_COMPOUND)) {
-					CompoundNBT nbt = message.tag.getCompound(NBT_TARGET_POS);
-					targetPos = new Vec3d(
-							nbt.getDouble("x"),
-							nbt.getDouble("y"),
-							nbt.getDouble("z")
-							);
-				}
-				
-				if (message.tag.contains(NBT_FLAVOR, NBT.TAG_STRING)) {
-					String key = message.tag.getString(NBT_FLAVOR);
-					flavor = SpellComponentWrapper.fromKeyString(key);
-				}
-				
-				component = SpellComponentWrapper.fromKeyString(message.tag.getString(NBT_COMPONENT));
-				
-				if (component == null) {
-					NostrumMagica.logger.warn("Malformed effect message");
-					return;
-				}
-				
-				final boolean negative = message.tag.getBoolean(NBT_NEGATIVE);
-				final float param = message.tag.getFloat(NBT_PARAM);
-				
-				NostrumMagica.proxy.spawnEffect(NostrumMagica.proxy.getPlayer().world, 
-						component,
-						caster, casterPos, target, targetPos, flavor, negative, param);
-			});
-
-			return null;
-		}
-		
+	public static void handle(ClientEffectRenderMessage message, Supplier<NetworkEvent.Context> ctx) {
+		ctx.get().setPacketHandled(true);
+		Minecraft.getInstance().runAsync(() -> {
+			LivingEntity caster, target;
+			caster = target = null;
+			
+			if (message.caster != null) {
+				caster = NostrumMagica.instance.proxy.getPlayer().world.getPlayerByUuid(message.caster);
+			}
+			
+			if (message.target != null) {
+				target = caster = NostrumMagica.instance.proxy.getPlayer().world.getPlayerByUuid(message.target);
+			}
+			
+			if (message.component == null) {
+				NostrumMagica.logger.warn("Malformed effect message");
+				return;
+			}
+			
+			NostrumMagica.instance.proxy.spawnEffect(NostrumMagica.instance.proxy.getPlayer().world, 
+					message.component,
+					caster, message.casterPos, target, message.targetPos,
+					message.flavor, message.negative, message.param);
+		});
 	}
 
-	private static final String NBT_CASTER_ID = "caster_id";
-	private static final String NBT_CASTER_POS = "caster_pos";
-	private static final String NBT_TARGET_ID = "target_id";
-	private static final String NBT_TARGET_POS = "target_pos";
-	
-	private static final String NBT_COMPONENT = "comp";
-	private static final String NBT_FLAVOR = "flavor";
-	private static final String NBT_NEGATIVE = "negative";
-	private static final String NBT_PARAM = "param";
-	
-	protected CompoundNBT tag;
-	
-	public ClientEffectRenderMessage() {
-		tag = new CompoundNBT();
-	}
+	private final UUID caster;
+	private final Vec3d casterPos;
+	private final UUID target;
+	private final Vec3d targetPos;
+	private final SpellComponentWrapper component;
+	private final SpellComponentWrapper flavor;
+	private final boolean negative;
+	private final float param;
 	
 	public ClientEffectRenderMessage(
 			LivingEntity caster, Vec3d casterPos,
@@ -128,44 +62,113 @@ public class ClientEffectRenderMessage implements IMessage {
 			SpellComponentWrapper flavor,
 			boolean negative,
 			float param) {
-		tag = new CompoundNBT();
-		
-		if (caster != null)
-			tag.putString(NBT_CASTER_ID, caster.getPersistentID().toString());
-		if (casterPos != null) {
-			CompoundNBT nbt = new CompoundNBT();
-			nbt.setDouble("x", casterPos.x);
-			nbt.setDouble("y", casterPos.y);
-			nbt.setDouble("z", casterPos.z);
-			tag.put(NBT_CASTER_POS, nbt);
-		}
-			
-		if (target != null)
-			tag.putString(NBT_TARGET_ID, target.getPersistentID().toString());
-		if (targetPos != null) {
-			CompoundNBT nbt = new CompoundNBT();
-			nbt.setDouble("x", targetPos.x);
-			nbt.setDouble("y", targetPos.y);
-			nbt.setDouble("z", targetPos.z);
-			tag.put(NBT_TARGET_POS, nbt);
-		}
-		
-		tag.putString(NBT_COMPONENT, component.getKeyString());
-		if (flavor != null)
-			tag.putString(NBT_FLAVOR, flavor.getKeyString());
-		
-		tag.putBoolean(NBT_NEGATIVE, negative);
-		tag.putFloat(NBT_PARAM, param);
+		this(caster == null ? null : caster.getUniqueID(), casterPos,
+				target == null ? null : target.getUniqueID(), targetPos,
+				component, flavor, negative, param);
+	}
+	
+	public ClientEffectRenderMessage(
+			UUID caster, Vec3d casterPos,
+			UUID target, Vec3d targetPos,
+			SpellComponentWrapper component,
+			SpellComponentWrapper flavor,
+			boolean negative,
+			float param) {
+		this.caster = caster;
+		this.casterPos = casterPos;
+		this.target = target;
+		this.targetPos = targetPos;
+		this.component = component;
+		this.flavor = flavor;
+		this.negative = negative;
+		this.param = param;
 	}
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		tag = ByteBufUtils.readTag(buf);
+	public static ClientEffectRenderMessage decode(PacketBuffer buf) {
+		final UUID caster;
+		final Vec3d casterPos;
+		final UUID target;
+		final Vec3d targetPos;
+		final SpellComponentWrapper component;
+		final SpellComponentWrapper flavor;
+		final boolean negative;
+		final float param;
+		
+		if (buf.readBoolean()) {
+			caster = buf.readUniqueId();
+		} else {
+			caster = null;
+		}
+		
+		if (buf.readBoolean()) {
+			casterPos = new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
+		} else {
+			casterPos = null;
+		}
+		
+		if (buf.readBoolean()) {
+			target = buf.readUniqueId();
+		} else {
+			target = null;
+		}
+		
+		if (buf.readBoolean()) {
+			targetPos = new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
+		} else {
+			targetPos = null;
+		}
+		
+		component = SpellComponentWrapper.fromKeyString(buf.readString());
+		
+		if (buf.readBoolean()) {
+			flavor = SpellComponentWrapper.fromKeyString(buf.readString());
+		} else {
+			flavor = null;
+		}
+		
+		negative = buf.readBoolean();
+		param = buf.readFloat();
+		
+		return new ClientEffectRenderMessage(
+				caster, casterPos, target, targetPos,
+				component, flavor, negative, param
+				);
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		ByteBufUtils.writeTag(buf, tag);
+	public static void encode(ClientEffectRenderMessage msg, PacketBuffer buf) {
+		buf.writeBoolean(msg.caster != null);
+		if (msg.caster != null) {
+			buf.writeUniqueId(msg.caster);
+		}
+		
+		buf.writeBoolean(msg.casterPos != null);
+		if (msg.casterPos != null) {
+			buf.writeDouble(msg.casterPos.x);
+			buf.writeDouble(msg.casterPos.y);
+			buf.writeDouble(msg.casterPos.z);
+		}
+		
+		buf.writeBoolean(msg.target != null);
+		if (msg.target != null) {
+			buf.writeUniqueId(msg.target);
+		}
+		
+		buf.writeBoolean(msg.targetPos != null);
+		if (msg.targetPos != null) {
+			buf.writeDouble(msg.targetPos.x);
+			buf.writeDouble(msg.targetPos.y);
+			buf.writeDouble(msg.targetPos.z);
+		}
+		
+		buf.writeString(msg.component.getKeyString());
+		
+		buf.writeBoolean(msg.flavor != null);
+		if (msg.flavor != null) {
+			buf.writeString(msg.flavor.getKeyString());
+		}
+		
+		buf.writeBoolean(msg.negative);
+		buf.writeFloat(msg.param);
 	}
 
 }

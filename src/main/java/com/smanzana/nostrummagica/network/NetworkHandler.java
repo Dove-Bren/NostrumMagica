@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.network;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.network.messages.BladeCastMessage;
 import com.smanzana.nostrummagica.network.messages.CandleIgniteMessage;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
@@ -35,20 +36,20 @@ import com.smanzana.nostrummagica.network.messages.SpellTomeIncrementMessage;
 import com.smanzana.nostrummagica.network.messages.StatRequestMessage;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
 
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.api.distmarker.Dist;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.network.NetworkRegistry;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 public class NetworkHandler {
 
-	private static SimpleNetworkWrapper syncChannel;
+	private static SimpleChannel syncChannel;
 	
 	private static int discriminator = 10;
 	
 	private static final String CHANNEL_SYNC_NAME = "nostrum_channel";
+	private static final String PROTOCOL = "1";
 	
-	
-	public static SimpleNetworkWrapper getSyncChannel() {
+	public static SimpleChannel getSyncChannel() {
 		getInstance();
 		return syncChannel;
 	}
@@ -64,43 +65,47 @@ public class NetworkHandler {
 	
 	public NetworkHandler() {
 		
-		syncChannel = NetworkRegistry.INSTANCE.newSimpleChannel(CHANNEL_SYNC_NAME);
+		syncChannel = NetworkRegistry.newSimpleChannel(new ResourceLocation(NostrumMagica.MODID, CHANNEL_SYNC_NAME),
+				() -> PROTOCOL,
+				PROTOCOL::equals,
+				PROTOCOL::equals
+				);
 		
-		syncChannel.registerMessage(StatSyncMessage.Handler.class, StatSyncMessage.class, discriminator++, Side.CLIENT);
-		syncChannel.registerMessage(ClientCastMessage.Handler.class, ClientCastMessage.class, discriminator++, Side.SERVER);
-		syncChannel.registerMessage(ClientCastReplyMessage.Handler.class, ClientCastReplyMessage.class, discriminator++, Side.CLIENT);
-		syncChannel.registerMessage(SpellRequestMessage.Handler.class, SpellRequestMessage.class, discriminator++, Side.SERVER);
-		syncChannel.registerMessage(SpellRequestReplyMessage.Handler.class, SpellRequestReplyMessage.class, discriminator++, Side.CLIENT);
-		syncChannel.registerMessage(ManaMessage.Handler.class, ManaMessage.class, discriminator++, Side.CLIENT);
-		syncChannel.registerMessage(ReagentBagToggleMessage.Handler.class, ReagentBagToggleMessage.class, discriminator++, Side.SERVER);
-		syncChannel.registerMessage(SpellTomeIncrementMessage.Handler.class, SpellTomeIncrementMessage.class, discriminator++, Side.SERVER);
-		syncChannel.registerMessage(SpellCraftMessage.Handler.class, SpellCraftMessage.class, discriminator++, Side.SERVER);
-		syncChannel.registerMessage(SpellDebugMessage.Handler.class, SpellDebugMessage.class, discriminator++, Side.CLIENT);
-		syncChannel.registerMessage(ObeliskTeleportationRequestMessage.Handler.class, ObeliskTeleportationRequestMessage.class, discriminator++, Side.SERVER);
-		syncChannel.registerMessage(ObeliskSelectMessage.Handler.class, ObeliskSelectMessage.class, discriminator++, Side.SERVER);
-		syncChannel.registerMessage(ClientSkillUpMessage.Handler.class, ClientSkillUpMessage.class, discriminator++, Side.SERVER);
-		syncChannel.registerMessage(ClientUpdateQuestMessage.Handler.class, ClientUpdateQuestMessage.class, discriminator++, Side.SERVER);
-		syncChannel.registerMessage(StatRequestMessage.Handler.class, StatRequestMessage.class, discriminator++, Side.SERVER);
-		syncChannel.registerMessage(ClientEffectRenderMessage.Handler.class, ClientEffectRenderMessage.class, discriminator++, Side.CLIENT);
-		syncChannel.registerMessage(ModifyMessage.Handler.class, ModifyMessage.class, discriminator++, Side.SERVER);
-		syncChannel.registerMessage(LoreMessage.Handler.class, LoreMessage.class, discriminator++, Side.CLIENT);
-		syncChannel.registerMessage(RuneBagToggleMessage.Handler.class, RuneBagToggleMessage.class, discriminator++, Side.SERVER);
-		syncChannel.registerMessage(PetGUIControlMessage.Handler.class, PetGUIControlMessage.class, discriminator++, Side.SERVER);
-		syncChannel.registerMessage(PetGUIOpenMessage.Handler.class, PetGUIOpenMessage.class, discriminator++, Side.CLIENT);
-		syncChannel.registerMessage(PetGUISyncMessage.Handler.class, PetGUISyncMessage.class, discriminator++, Side.CLIENT);
-		syncChannel.registerMessage(MagicEffectUpdate.Handler.class, MagicEffectUpdate.class, discriminator++, Side.CLIENT);
-		syncChannel.registerMessage(ClientPurchaseResearchMessage.Handler.class, ClientPurchaseResearchMessage.class, discriminator++, Side.SERVER);
-		syncChannel.registerMessage(CandleIgniteMessage.Handler.class, CandleIgniteMessage.class, discriminator++, Side.CLIENT);
-		syncChannel.registerMessage(EnchantedArmorStateUpdate.Handler.class, EnchantedArmorStateUpdate.class, discriminator++, Side.CLIENT);
-		syncChannel.registerMessage(EnchantedArmorStateUpdate.Handler.class, EnchantedArmorStateUpdate.class, discriminator++, Side.SERVER);
-		syncChannel.registerMessage(ClientTomeDropSpellMessage.Handler.class, ClientTomeDropSpellMessage.class, discriminator++, Side.SERVER);
-		syncChannel.registerMessage(SpawnNostrumParticleMessage.Handler.class, SpawnNostrumParticleMessage.class, discriminator++, Side.CLIENT);
-		syncChannel.registerMessage(BladeCastMessage.Handler.class, BladeCastMessage.class, discriminator++, Side.SERVER);
-		syncChannel.registerMessage(SpawnNostrumRitualEffectMessage.Handler.class, SpawnNostrumRitualEffectMessage.class, discriminator++, Side.CLIENT);
-		syncChannel.registerMessage(SpawnPredefinedEffectMessage.Handler.class, SpawnPredefinedEffectMessage.class, discriminator++, Side.CLIENT);
-		syncChannel.registerMessage(PetCommandMessage.Handler.class, PetCommandMessage.class, discriminator++, Side.SERVER);
-		syncChannel.registerMessage(PetCommandSettingsSyncMessage.Handler.class, PetCommandSettingsSyncMessage.class, discriminator++, Side.CLIENT);
-		syncChannel.registerMessage(ManaArmorSyncMessage.Handler.class, ManaArmorSyncMessage.class, discriminator++, Side.CLIENT);
+		syncChannel.registerMessage(discriminator++, StatSyncMessage.class, StatSyncMessage::encode, StatSyncMessage::decode, StatSyncMessage::handle);
+		syncChannel.registerMessage(discriminator++, ClientCastMessage.class, ClientCastMessage::encode, ClientCastMessage::decode, ClientCastMessage::handle);
+		syncChannel.registerMessage(discriminator++, ClientCastReplyMessage.class, ClientCastReplyMessage::encode, ClientCastReplyMessage::decode, ClientCastReplyMessage::handle);
+		syncChannel.registerMessage(discriminator++, SpellRequestMessage.class, SpellRequestMessage::encode, SpellRequestMessage::decode, SpellRequestMessage::handle);
+		syncChannel.registerMessage(discriminator++, SpellRequestReplyMessage.class, SpellRequestReplyMessage::encode, SpellRequestReplyMessage::decode, SpellRequestReplyMessage::handle);
+		syncChannel.registerMessage(discriminator++, ManaMessage.class, ManaMessage::encode, ManaMessage::decode, ManaMessage::handle);
+		syncChannel.registerMessage(discriminator++, ReagentBagToggleMessage.class, ReagentBagToggleMessage::encode, ReagentBagToggleMessage::decode, ReagentBagToggleMessage::handle);
+		syncChannel.registerMessage(discriminator++, SpellTomeIncrementMessage.class, SpellTomeIncrementMessage::encode, SpellTomeIncrementMessage::decode, SpellTomeIncrementMessage::handle);
+		syncChannel.registerMessage(discriminator++, SpellCraftMessage.class, SpellCraftMessage::encode, SpellCraftMessage::decode, SpellCraftMessage::handle);
+		syncChannel.registerMessage(discriminator++, SpellDebugMessage.class, SpellDebugMessage::encode, SpellDebugMessage::decode, SpellDebugMessage::handle);
+		syncChannel.registerMessage(discriminator++, ObeliskTeleportationRequestMessage.class, ObeliskTeleportationRequestMessage::encode, ObeliskTeleportationRequestMessage::decode, ObeliskTeleportationRequestMessage::handle);
+		syncChannel.registerMessage(discriminator++, ObeliskSelectMessage.class, ObeliskSelectMessage::encode, ObeliskSelectMessage::decode, ObeliskSelectMessage::handle);
+		syncChannel.registerMessage(discriminator++, ClientSkillUpMessage.class, ClientSkillUpMessage::encode, ClientSkillUpMessage::decode, ClientSkillUpMessage::handle);
+		syncChannel.registerMessage(discriminator++, ClientUpdateQuestMessage.class, ClientUpdateQuestMessage::encode, ClientUpdateQuestMessage::decode, ClientUpdateQuestMessage::handle);
+		syncChannel.registerMessage(discriminator++, StatRequestMessage.class, StatRequestMessage::encode, StatRequestMessage::decode, StatRequestMessage::handle);
+		syncChannel.registerMessage(discriminator++, ClientEffectRenderMessage.class, ClientEffectRenderMessage::encode, ClientEffectRenderMessage::decode, ClientEffectRenderMessage::handle);
+		syncChannel.registerMessage(discriminator++, ModifyMessage.class, ModifyMessage::encode, ModifyMessage::decode, ModifyMessage::handle);
+		syncChannel.registerMessage(discriminator++, LoreMessage.class, LoreMessage::encode, LoreMessage::decode, LoreMessage::handle);
+		syncChannel.registerMessage(discriminator++, RuneBagToggleMessage.class, RuneBagToggleMessage::encode, RuneBagToggleMessage::decode, RuneBagToggleMessage::handle);
+		syncChannel.registerMessage(discriminator++, PetGUIControlMessage.class, PetGUIControlMessage::encode, PetGUIControlMessage::decode, PetGUIControlMessage::handle);
+		syncChannel.registerMessage(discriminator++, PetGUIOpenMessage.class, PetGUIOpenMessage::encode, PetGUIOpenMessage::decode, PetGUIOpenMessage::handle);
+		syncChannel.registerMessage(discriminator++, PetGUISyncMessage.class, PetGUISyncMessage::encode, PetGUISyncMessage::decode, PetGUISyncMessage::handle);
+		syncChannel.registerMessage(discriminator++, MagicEffectUpdate.class, MagicEffectUpdate::encode, MagicEffectUpdate::decode, MagicEffectUpdate::handle);
+		syncChannel.registerMessage(discriminator++, ClientPurchaseResearchMessage.class, ClientPurchaseResearchMessage::encode, ClientPurchaseResearchMessage::decode, ClientPurchaseResearchMessage::handle);
+		syncChannel.registerMessage(discriminator++, CandleIgniteMessage.class, CandleIgniteMessage::encode, CandleIgniteMessage::decode, CandleIgniteMessage::handle);
+		syncChannel.registerMessage(discriminator++, EnchantedArmorStateUpdate.class, EnchantedArmorStateUpdate::encode, EnchantedArmorStateUpdate::decode, EnchantedArmorStateUpdate::handle);
+		//syncChannel.registerMessage(discriminator++, EnchantedArmorStateUpdate.class, EnchantedArmorStateUpdate::encode, EnchantedArmorStateUpdate::decode, EnchantedArmorStateUpdate::handle);
+		syncChannel.registerMessage(discriminator++, ClientTomeDropSpellMessage.class, ClientTomeDropSpellMessage::encode, ClientTomeDropSpellMessage::decode, ClientTomeDropSpellMessage::handle);
+		syncChannel.registerMessage(discriminator++, SpawnNostrumParticleMessage.class, SpawnNostrumParticleMessage::encode, SpawnNostrumParticleMessage::decode, SpawnNostrumParticleMessage::handle);
+		syncChannel.registerMessage(discriminator++, BladeCastMessage.class, BladeCastMessage::encode, BladeCastMessage::decode, BladeCastMessage::handle);
+		syncChannel.registerMessage(discriminator++, SpawnNostrumRitualEffectMessage.class, SpawnNostrumRitualEffectMessage::encode, SpawnNostrumRitualEffectMessage::decode, SpawnNostrumRitualEffectMessage::handle);
+		syncChannel.registerMessage(discriminator++, SpawnPredefinedEffectMessage.class, SpawnPredefinedEffectMessage::encode, SpawnPredefinedEffectMessage::decode, SpawnPredefinedEffectMessage::handle);
+		syncChannel.registerMessage(discriminator++, PetCommandMessage.class, PetCommandMessage::encode, PetCommandMessage::decode, PetCommandMessage::handle);
+		syncChannel.registerMessage(discriminator++, PetCommandSettingsSyncMessage.class, PetCommandSettingsSyncMessage::encode, PetCommandSettingsSyncMessage::decode, PetCommandSettingsSyncMessage::handle);
+		syncChannel.registerMessage(discriminator++, ManaArmorSyncMessage.class, ManaArmorSyncMessage::encode, ManaArmorSyncMessage::decode, ManaArmorSyncMessage::handle);
 	}
 	
 }

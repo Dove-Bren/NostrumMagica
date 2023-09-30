@@ -10,7 +10,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IProjectile;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -65,7 +65,7 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 		ticksExisted++;
 		
 		if (this.ticksExisted % 5 == 0 && world.isRemote) {
-			this.world.spawnParticle(EnumParticleTypes.CRIT_MAGIC,
+			this.world.addParticle(ParticleTypes.CRIT_MAGIC,
 					posX - .5 + rand.nextFloat(), posY, posZ - .5 + rand.nextFloat(), 0, 0, 0);
 		}
 	}

@@ -78,7 +78,7 @@ public class HealthTrigger extends SpellTrigger {
 					
 					this.entity.world.getMinecraftServer().runAsync(() -> {
 						this.trigger(data);
-						NostrumMagica.proxy.spawnEffect(this.getState().getSelf().world,
+						NostrumMagica.instance.proxy.spawnEffect(this.getState().getSelf().world,
 								new SpellComponentWrapper(instance()),
 								this.getState().getSelf(), null, this.getState().getSelf(), null, null, false, 0);
 						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_HEALTH, this.entity);

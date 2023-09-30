@@ -136,7 +136,7 @@ public class PetCommandManager extends WorldSavedData {
 	@OnlyIn(Dist.CLIENT)
 	public void overrideClientSettings(CompoundNBT settingsNBT) {
 		PetCommandSettings settings = PetCommandSettings.FromNBT(settingsNBT);
-		final UUID ID = NostrumMagica.proxy.getPlayer().getUniqueID();
+		final UUID ID = NostrumMagica.instance.proxy.getPlayer().getUniqueID();
 		synchronized(playerSettings) {
 			playerSettings.put(ID, settings);
 		}
@@ -161,7 +161,7 @@ public class PetCommandManager extends WorldSavedData {
 				new PetCommandSettingsSyncMessage(generateClientSettings(event.player.getUniqueID())),
 				(ServerPlayerEntity) event.player);
 		
-		NostrumMagica.proxy.syncPlayer((ServerPlayerEntity) event.player);
+		NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) event.player);
 	}
 	
 	protected @Nonnull PetCommandSettings getSettings(@Nonnull UUID uuid) {

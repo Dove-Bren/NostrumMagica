@@ -41,7 +41,7 @@ public class RenderMagicSaucer extends Render<EntitySpellSaucer> {
         	// Instead of rendering real position, render where we should basically be
         	//Vector vec = cycler.getTargetOffsetLoc(partialTicks); // TODO should this just be the target pos? Otherwise it cycles the player even if it's actually on another player
         	Vector vec = cycler.getTargetLoc(partialTicks);
-        	vec.subtract(NostrumMagica.proxy.getPlayer().getPositionVector());
+        	vec.subtract(NostrumMagica.instance.proxy.getPlayer().getPositionVector());
         	
         	GlStateManager.translatef(vec.x, vec.y, vec.z);
         } else {

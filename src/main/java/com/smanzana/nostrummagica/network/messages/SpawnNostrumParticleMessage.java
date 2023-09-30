@@ -1,70 +1,47 @@
 package com.smanzana.nostrummagica.network.messages;
 
+import java.util.function.Supplier;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
  * Server is signalling that some particles should be spawned
  * @author Skyler
  *
  */
-public class SpawnNostrumParticleMessage implements IMessage {
+public class SpawnNostrumParticleMessage {
 
-	public static class Handler implements IMessageHandler<SpawnNostrumParticleMessage, IMessage> {
-
-		@Override
-		public IMessage onMessage(SpawnNostrumParticleMessage message, MessageContext ctx) {
-			
-			final int particleID = message.tag.getInt(NBT_PARTICLE_ID);
-			final SpawnParams params = SpawnParams.FromNBT(message.tag.getCompound(NBT_PARAMS));
-			final NostrumParticles type = NostrumParticles.FromID(particleID);
-			
-			if (type == null) {
-				NostrumMagica.logger.warn("Got particle spawn message with unknown ID");
-			} else {
-				Minecraft.getInstance().runAsync(() -> {
-					type.spawn(NostrumMagica.proxy.getPlayer().getEntityWorld(), params);
-				});
-			}
-
-			return null;
-		}
-		
+	public static void handle(SpawnNostrumParticleMessage message, Supplier<NetworkEvent.Context> ctx) {
+		ctx.get().setPacketHandled(true);
+		Minecraft.getInstance().runAsync(() -> {
+			message.type.spawn(NostrumMagica.instance.proxy.getPlayer().getEntityWorld(), message.params);
+		});
 	}
 
-	private static final String NBT_PARTICLE_ID = "particle_id";
-	private static final String NBT_PARAMS = "params";
-	
-	protected CompoundNBT tag;
-	
-	public SpawnNostrumParticleMessage() {
-		tag = new CompoundNBT();
-	}
+	private final NostrumParticles type;
+	private final SpawnParams params;
 	
 	public SpawnNostrumParticleMessage(NostrumParticles type, SpawnParams params) {
-		tag = new CompoundNBT();
-		
-		tag.putInt(NBT_PARTICLE_ID, type.getID());
-		tag.put(NBT_PARAMS, params.toNBT(null));
+		this.type = type;
+		this.params = params;
 	}
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		tag = ByteBufUtils.readTag(buf);
+	public static SpawnNostrumParticleMessage decode(PacketBuffer buf) {
+		return new SpawnNostrumParticleMessage(
+				buf.readEnumValue(NostrumParticles.class),
+				SpawnParams.FromNBT(buf.readCompoundTag())
+				);
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		ByteBufUtils.writeTag(buf, tag);
+	public static void encode(SpawnNostrumParticleMessage msg, PacketBuffer buf) {
+		buf.writeEnumValue(msg.type);
+		buf.writeCompoundTag(msg.params.toNBT(null));
 	}
 
 }

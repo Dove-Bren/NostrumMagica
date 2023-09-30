@@ -1,70 +1,50 @@
 package com.smanzana.nostrummagica.network.messages;
 
+import java.util.function.Supplier;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.SpellTome;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
  * Client has toggled vacuum setting on their reagent bag
  * @author Skyler
  *
  */
-public class SpellTomeIncrementMessage implements IMessage {
+public class SpellTomeIncrementMessage {
 
-	public static class Handler implements IMessageHandler<SpellTomeIncrementMessage, IMessage> {
-
-		@Override
-		public IMessage onMessage(SpellTomeIncrementMessage message, MessageContext ctx) {
-			// Is it on?
-			
-			final ServerPlayerEntity sp = ctx.getServerHandler().player;
-			
-			int value = message.tag.getInt(NBT_VALUE);
-			
-			sp.getServerWorld().runAsync(() -> {
-				SpellTome.setIndex(NostrumMagica.getCurrentTome(sp),
-						value);
-			});
-			
-			return null;
-		}
+	public static void handle(SpellTomeIncrementMessage message, Supplier<NetworkEvent.Context> ctx) {
+		// Is it on?
+		ctx.get().setPacketHandled(true);
+		final ServerPlayerEntity sp = ctx.get().getSender();
 		
+		ctx.get().enqueueWork(() -> {
+			SpellTome.setIndex(NostrumMagica.getCurrentTome(sp),
+					message.index);
+		});
 	}
 
-	private static final String NBT_VALUE = "index";
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
-	protected CompoundNBT tag;
-	
-	public SpellTomeIncrementMessage() {
-		tag = new CompoundNBT();
-	}
+	private final int index;
 	
 	public SpellTomeIncrementMessage(int index) {
-		tag = new CompoundNBT();
-		
-		tag.putInt(NBT_VALUE, index);
+		this.index = index;
 	}
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		tag = ByteBufUtils.readTag(buf);
+	public static SpellTomeIncrementMessage decode(PacketBuffer buf) {
+		return new SpellTomeIncrementMessage(buf.readVarInt());
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		ByteBufUtils.writeTag(buf, tag);
+	public static void encode(SpellTomeIncrementMessage msg, PacketBuffer buf) {
+		buf.writeVarInt(msg.index);
 	}
 
 }

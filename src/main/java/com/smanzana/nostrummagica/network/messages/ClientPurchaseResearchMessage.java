@@ -1,84 +1,63 @@
 package com.smanzana.nostrummagica.network.messages;
 
+import java.util.function.Supplier;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.research.NostrumResearch;
 
-import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.DecoderException;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
  * Client has requested a research item be purchased
  * @author Skyler
  *
  */
-public class ClientPurchaseResearchMessage implements IMessage {
+public class ClientPurchaseResearchMessage {
 	
-	public static class Handler implements IMessageHandler<ClientPurchaseResearchMessage, StatSyncMessage> {
+	public static void handle(ClientPurchaseResearchMessage message, Supplier<NetworkEvent.Context> ctx) {
+		ctx.get().setPacketHandled(true);
+		final ServerPlayerEntity sp = ctx.get().getSender();
+		
+		ctx.get().enqueueWork(() -> {
+			INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
+			
+			if (att == null) {
+				NostrumMagica.logger.warn("Could not look up player magic wrapper");
+				return;
+			}
+			
+			if (NostrumMagica.canPurchaseResearch(sp, message.research) && att.getResearchPoints() > 0) {
+				att.takeResearchPoint();
+				NostrumResearch.unlockResearch(sp, message.research);
+			}
 
-		@Override
-		public StatSyncMessage onMessage(ClientPurchaseResearchMessage message, MessageContext ctx) {
-			if (!message.tag.contains(NBT_RESEARCH, NBT.TAG_STRING))
-				return null;
-			
-			final ServerPlayerEntity sp = ctx.getServerHandler().player;
-			
-			sp.getServerWorld().runAsync(() -> {
-				INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
-				
-				if (att == null) {
-					NostrumMagica.logger.warn("Could not look up player magic wrapper");
-					return;
-				}
-				
-				NostrumResearch research = NostrumResearch.lookup(message.tag.getString(NBT_RESEARCH));
-				
-				if (research == null) {
-					NostrumMagica.logger.warn("Player requested a research that DNE");
-					return;
-				}
-				
-				if (NostrumMagica.canPurchaseResearch(sp, research) && att.getResearchPoints() > 0) {
-					att.takeResearchPoint();
-					NostrumResearch.unlockResearch(sp, research);
-				}
-	
-				 NetworkHandler.getSyncChannel().sendTo(new StatSyncMessage(att), sp);
-			});
-			
-			return null;
-		}
+			 NetworkHandler.getSyncChannel().sendTo(new StatSyncMessage(att), sp);
+		});
 	}
 
-	private static final String NBT_RESEARCH = "research";
-	
-	protected CompoundNBT tag;
-	
-	public ClientPurchaseResearchMessage() {
-		tag = new CompoundNBT();
-	}
+	private final NostrumResearch research;
 	
 	public ClientPurchaseResearchMessage(NostrumResearch research) {
-		tag = new CompoundNBT();
+		this.research = research;
+	}
+
+	public static ClientPurchaseResearchMessage decode(PacketBuffer buf) {
+		final String researchKey = buf.readString();
+		NostrumResearch research = NostrumResearch.lookup(researchKey);
+		if (research == null) {
+			throw new DecoderException("Failed to find nostrum research for " + researchKey);
+		}
 		
-		tag.putString(NBT_RESEARCH, research.getKey());
+		return new ClientPurchaseResearchMessage(research);
 	}
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		tag = ByteBufUtils.readTag(buf);
-	}
-
-	@Override
-	public void toBytes(ByteBuf buf) {
-		ByteBufUtils.writeTag(buf, tag);
+	public static void encode(ClientPurchaseResearchMessage msg, PacketBuffer buf) {
+		buf.writeString(msg.research.getKey());
 	}
 
 }

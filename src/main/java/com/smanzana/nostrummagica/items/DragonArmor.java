@@ -336,7 +336,7 @@ public class DragonArmor extends Item {
 			stack.setTag(tag);
 		}
 		
-		PlayerEntity player = NostrumMagica.proxy.getPlayer();
+		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
 		
 		// Copied from vanilla's ItemStack
 		for (DragonEquipmentSlot dragonSlot : DragonEquipmentSlot.values())

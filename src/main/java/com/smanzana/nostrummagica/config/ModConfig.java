@@ -235,7 +235,7 @@ public class ModConfig {
 	
 	public static ModConfig config;
 	
-	//public static SimpleNetworkWrapper channel;
+	//public static SimpleChannel channel;
 	
 	//private static int discriminator = 0;
 	
@@ -342,7 +342,7 @@ public class ModConfig {
 	public void onPlayerLogin(PlayerLoggedInEvent event) {
 		if (event.getPlayer() instanceof ServerPlayerEntity) {
 			NostrumMagica.logger.info("sending config overrides to client...");
-			NostrumMagica.proxy.sendServerConfig((ServerPlayerEntity) event.getPlayer());
+			NostrumMagica.instance.proxy.sendServerConfig((ServerPlayerEntity) event.getPlayer());
 		} else {
 			NostrumMagica.logger.info("Ignoring player join event, as no MP =========================================");
 		}

@@ -16,6 +16,8 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.Lists;
 import com.mojang.brigadier.CommandDispatcher;
+import com.smanzana.nostrummagica.proxy.ClientProxy;
+import com.smanzana.nostrummagica.proxy.CommonProxy;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
 import com.smanzana.nostrummagica.blocks.TemporaryTeleportationPortal;
@@ -88,8 +90,6 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.pet.PetCommandManager;
 import com.smanzana.nostrummagica.pet.PetSoulRegistry;
-import com.smanzana.nostrummagica.proxy.ClientProxy;
-import com.smanzana.nostrummagica.proxy.CommonProxy;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.quests.NostrumQuest.QuestType;
 import com.smanzana.nostrummagica.quests.objectives.ObjectiveKill;

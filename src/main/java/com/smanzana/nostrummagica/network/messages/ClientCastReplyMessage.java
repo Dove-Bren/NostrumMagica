@@ -1,21 +1,19 @@
 package com.smanzana.nostrummagica.network.messages;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
  * Server has processed spell cast request and sent back
@@ -24,31 +22,28 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
  * @author Skyler
  *
  */
-public class ClientCastReplyMessage implements IMessage {
+public class ClientCastReplyMessage {
 
-	public static class Handler implements IMessageHandler<ClientCastReplyMessage, IMessage> {
-
-		@Override
-		public IMessage onMessage(ClientCastReplyMessage message, MessageContext ctx) {
-
-			Minecraft.getInstance().runAsync(() -> {
-				PlayerEntity player = NostrumMagica.proxy.getPlayer();
-				INostrumMagic att = NostrumMagica.getMagicWrapper(
-						player);
-				// Regardless of success, server has synced mana with us.
-				int mana = message.tag.getInt(NBT_MANA);
-				float xp = message.tag.getFloat(NBT_XP);
-				boolean success = message.tag.getBoolean(NBT_STATUS);
+		public static void handle(ClientCastReplyMessage message, Supplier<NetworkEvent.Context> ctx) {
+		ctx.get().setPacketHandled(true);
+		Minecraft.getInstance().runAsync(() -> {
+			PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+			INostrumMagic att = NostrumMagica.getMagicWrapper(
+					player);
+			// Regardless of success, server has synced mana with us.
+			int mana = message.mana;
+			float xp = message.xp;
+			boolean success = message.success;
+			
+			att.setMana(mana);
+			
+			if (success) {
+				// On success, server sends XP that was added
+				att.addXP(xp);
+			} else {
 				
-				att.setMana(mana);
-				
-				if (success) {
-					// On success, server sends XP that was added
-					att.addXP(xp);
-				} else {
-					
-				}
-				
+			}
+			
 //				if (message.tag.contains(NBT_REAGENTS, NBT.TAG_COMPOUND)) {
 //					CompoundNBT regs = message.tag.getCompound(NBT_REAGENTS);
 //					if (!regs.keySet().isEmpty())
@@ -66,59 +61,64 @@ public class ClientCastReplyMessage implements IMessage {
 //					}
 //					
 //				}
-			});
-			
-
-			return null;
-		}
-		
+		});
 	}
 
-	private static final String NBT_STATUS = "status";
-	private static final String NBT_MANA = "mana";
-	private static final String NBT_XP = "xp";
-	private static final String NBT_REAGENTS = "reagents";
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
-	protected CompoundNBT tag;
-	
-	public ClientCastReplyMessage() {
-		tag = new CompoundNBT();
-	}
+	private final boolean success;
+	private final int mana;
+	private float xp;
+	private Map<ReagentType, Integer> reagentCost;
 	
 	public ClientCastReplyMessage(boolean success, int mana, float xp,
-			Map<ReagentType, Integer> reagentCost) {
-		tag = new CompoundNBT();
+			Map<ReagentType, Integer> reagentCostIn) {
+		this.success = success;
+		this.mana = mana;
+		this.xp = xp;
+		this.reagentCost = new HashMap<>();
 		
-		tag.putInt(NBT_MANA, mana);
-		tag.putFloat(NBT_XP, xp);
-		tag.putBoolean(NBT_STATUS, success);
-		
-		if (reagentCost != null) {
-			CompoundNBT nbt = new CompoundNBT();
-			for (ReagentType type : reagentCost.keySet()) {
-				if (type == null)
-					continue;
-				
-				Integer cost = reagentCost.get(type);
-				if (cost == null || cost == 0)
-					continue;
-				
-				nbt.putInt(type.name(), cost);
-			}
-			tag.put(NBT_REAGENTS, nbt);
+		// remove empty elements
+		for (ReagentType type : reagentCostIn.keySet()) {
+			if (type == null)
+				continue;
+			
+			Integer cost = reagentCostIn.get(type);
+			if (cost == null || cost == 0)
+				continue;
+			
+			reagentCost.put(type, cost);
 		}
 	}
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		tag = ByteBufUtils.readTag(buf);
+	public static ClientCastReplyMessage decode(PacketBuffer buf) {
+		boolean success = buf.readBoolean();
+		int mana = buf.readInt();
+		float xp = buf.readFloat();
+		
+		int reagentCount = buf.readInt();
+		Map<ReagentType, Integer> reagentCost = new HashMap<>();
+		
+		for (int i = 0; i < reagentCount; i++) {
+			ReagentType type = buf.readEnumValue(ReagentType.class);
+			int count = buf.readVarInt();
+			reagentCost.put(type, count);
+		}
+		
+		return new ClientCastReplyMessage(success, mana, xp, reagentCost);
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		ByteBufUtils.writeTag(buf, tag);
+	public static void encode(ClientCastReplyMessage msg, PacketBuffer buf) {
+		buf.writeBoolean(msg.success);
+		buf.writeInt(msg.mana);
+		buf.writeFloat(msg.xp);
+		
+		buf.writeInt(msg.reagentCost.size());
+		for (ReagentType type : msg.reagentCost.keySet()) {
+			buf.writeEnumValue(type);
+			buf.writeVarInt(msg.reagentCost.get(type));
+		}
 	}
 
 }

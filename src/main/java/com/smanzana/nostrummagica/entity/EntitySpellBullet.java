@@ -20,7 +20,7 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
@@ -37,7 +37,7 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 	private LivingEntity target;
 	private LivingEntity shooter;
 	private double speed; // Vanilla shulkers use .15
-	private EnumParticleTypes particle;
+	private ParticleTypes particle;
 	
 	private boolean blockyPath; // Shulker-style pathing? Else smooth curve style.
 	
@@ -51,7 +51,7 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 	public EntitySpellBullet(World world) {
 		super(world);
 		this.speed = .15;
-		this.particle = EnumParticleTypes.CRIT;
+		this.particle = ParticleTypes.CRIT;
 		this.steps = 1;
 	}
 	
@@ -59,7 +59,7 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 			LivingEntity shooter,
 			LivingEntity target,
 			Direction.Axis axis) {
-		this(self, shooter, target, axis, .8, EnumParticleTypes.CRIT, false);
+		this(self, shooter, target, axis, .8, ParticleTypes.CRIT, false);
 	}
 	
 	public EntitySpellBullet(
@@ -68,7 +68,7 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 			LivingEntity target,
 			Direction.Axis axis,
 			double speed,
-			EnumParticleTypes particle,
+			ParticleTypes particle,
 			boolean blockyPath) {
 		super(shooter.world, shooter, target, axis);
 		this.steps = 1;
@@ -293,7 +293,7 @@ public class EntitySpellBullet extends EntityShulkerBullet {
 
 			if (this.world.isRemote)
 			{
-				this.world.spawnParticle(particle, this.posX - this.getMotion().x, this.posY - this.getMotion().y + 0.15D, this.posZ - this.getMotion().z, 0.0D, 0.0D, 0.0D, new int[0]);
+				this.world.addParticle(particle, this.posX - this.getMotion().x, this.posY - this.getMotion().y + 0.15D, this.posZ - this.getMotion().z, 0.0D, 0.0D, 0.0D, new int[0]);
 			}
 			else if (this.target != null && !this.target.isDead)
 			{

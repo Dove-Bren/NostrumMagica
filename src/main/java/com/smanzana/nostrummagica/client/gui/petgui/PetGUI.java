@@ -472,7 +472,7 @@ public class PetGUI {
 					x += GUI_SHEET_BUTTON_WIDTH;
 				}
 				
-				if (container.supportsReroll() && NostrumMagica.proxy.getPlayer().isCreative()) {
+				if (container.supportsReroll() && NostrumMagica.instance.proxy.getPlayer().isCreative()) {
 					RenderFuncs.drawRect(x, GUI_SHEET_BUTTON_VOFFSET, x + GUI_SHEET_BUTTON_WIDTH, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT, 0xFFFFDDFF);
 					RenderFuncs.drawRect(x + 1, GUI_SHEET_BUTTON_VOFFSET + 1, x + GUI_SHEET_BUTTON_WIDTH - 1, GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT - 1, 0xFF702070);
 					
@@ -532,12 +532,12 @@ public class PetGUI {
 		@Override
 		protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
 			
-			if (!container.canInteractWith(NostrumMagica.proxy.getPlayer())) {
+			if (!container.canInteractWith(NostrumMagica.instance.proxy.getPlayer())) {
 				return;
 			}
 			
 			// Only allow custom clicking s tuff if there isn't an item being held
-			if (NostrumMagica.proxy.getPlayer().inventory.getItemStack().isEmpty()) {
+			if (NostrumMagica.instance.proxy.getPlayer().inventory.getItemStack().isEmpty()) {
 			
 				final int GUI_SHEET_HOFFSET = this.width - (GUI_SHEET_WIDTH + GUI_SHEET_NHOFFSET);
 				final int GUI_SHEET_BUTTON_HOFFSET = GUI_SHEET_HOFFSET;
@@ -548,13 +548,13 @@ public class PetGUI {
 					int buttonIdx = (mouseX - GUI_SHEET_BUTTON_HOFFSET) / GUI_SHEET_BUTTON_WIDTH;
 					if (buttonIdx < container.getSheets().size()) {
 						// Clicked a button!
-						NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
+						NostrumMagicaSounds.UI_TICK.play(NostrumMagica.instance.proxy.getPlayer());
 						this.container.setSheet(buttonIdx);
 						NetworkHelper.ClientSendSheet(container.id, buttonIdx);
 						return;
 					} else if (container.supportsReroll()
 							&& buttonIdx == container.getSheets().size()
-							&& NostrumMagica.proxy.getPlayer().isCreative()) {
+							&& NostrumMagica.instance.proxy.getPlayer().isCreative()) {
 						NetworkHelper.ClientSendReroll(container.id);
 						// Reset sheet index in case reroll removed a tab
 						this.container.setSheet(0);

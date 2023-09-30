@@ -2,79 +2,57 @@ package com.smanzana.nostrummagica.network.messages;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.spells.Spell;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
  * Client is asking server for details about a spell (or multiple)
  * @author Skyler
  *
  */
-public class SpellRequestMessage implements IMessage {
+public class SpellRequestMessage {
 
-	public static class Handler implements IMessageHandler<SpellRequestMessage, SpellRequestReplyMessage> {
-
-		@Override
-		public SpellRequestReplyMessage onMessage(SpellRequestMessage message, MessageContext ctx) {
-			
-			// Note: This message handler is not on main thread, but the spell registry is threadsafe.
-			
-			// What spells?
-			int ids[] = message.tag.getIntArray(NBT_IDS);
-			if (ids == null)
-				return null;
-			
-			
-			List<Spell> spells = new LinkedList<>();
-			Spell spell;
-			for (int id : ids) {
-				spell = NostrumMagica.getSpellRegistry().lookup(id);
-				if (spell != null)
-					spells.add(spell);
-				else
-					System.out.println("Couldn't match spell for id " + id);
-			}
-			
-			if (spells.isEmpty()) {
-				System.out.println("Failed to find any spells at all!");
-				return null;
-			}
-
-			System.out.println("Sending reply");
-			return new SpellRequestReplyMessage(spells);
+	public static void handle(SpellRequestMessage message, Supplier<NetworkEvent.Context> ctx) {
+		
+		// Note: This message handler is not on main thread, but the spell registry is threadsafe.
+		ctx.get().setPacketHandled(true);
+		List<Spell> spells = new LinkedList<>();
+		Spell spell;
+		for (int id : message.ids) {
+			spell = NostrumMagica.instance.getSpellRegistry().lookup(id);
+			if (spell != null)
+				spells.add(spell);
+			else
+				System.out.println("Couldn't match spell for id " + id);
 		}
 		
+		if (spells.isEmpty()) {
+			System.out.println("Failed to find any spells at all!");
+			return;
+		}
+
+		System.out.println("Sending reply");
+		NetworkHandler.getSyncChannel().sendTo(new SpellRequestReplyMessage(spells), ctx.get().getSender());
 	}
 
-	private static final String NBT_IDS = "ids";
-	protected CompoundNBT tag;
-	
-	public SpellRequestMessage() {
-		tag = new CompoundNBT();
-	}
+	private final int[] ids;
 	
 	public SpellRequestMessage(int ids[]) {
-		tag = new CompoundNBT();
-		
-		tag.setIntArray(NBT_IDS, ids);
+		this.ids = ids;
 	}
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		tag = ByteBufUtils.readTag(buf);
+	public static SpellRequestMessage decode(PacketBuffer buf) {
+		return new SpellRequestMessage(buf.readVarIntArray());
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		ByteBufUtils.writeTag(buf, tag);
+	public static void encode(SpellRequestMessage msg, PacketBuffer buf) {
+		buf.writeVarIntArray(msg.ids);
 	}
 
 }

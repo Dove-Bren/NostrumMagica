@@ -449,10 +449,10 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
     }
 
     @Override
-    public boolean addLandingEffects(BlockState state1, ServerWorld worldserver, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
-        Optional<BlockState> mirrorState = getMirrorState(worldserver, pos);
+    public boolean addLandingEffects(BlockState state1, ServerWorld ServerWorld, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
+        Optional<BlockState> mirrorState = getMirrorState(ServerWorld, pos);
         if(mirrorState.isPresent()) {
-            worldserver.spawnParticle(new BlockParticleData(ParticleTypes.BLOCK, mirrorState.get()), entity.posX, entity.posY, entity.posZ, numberOfParticles, 0.0D, 0.0D, 0.0D, 0.15F);
+            ServerWorld.addParticle(new BlockParticleData(ParticleTypes.BLOCK, mirrorState.get()), entity.posX, entity.posY, entity.posZ, numberOfParticles, 0.0D, 0.0D, 0.0D, 0.15F);
         }
         return true;
     }

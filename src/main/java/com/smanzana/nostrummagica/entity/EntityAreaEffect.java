@@ -163,15 +163,15 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 		return this.ignoreOwner;
 	}
 	
-	public @Nullable EnumParticleTypes getCustomParticle() {
+	public @Nullable ParticleTypes getCustomParticle() {
 		final int id = this.getDataManager().get(EXTRA_PARTICLE);
 		if (id == -1) {
 			return null;
 		}
-		return EnumParticleTypes.getParticleFromId(id);
+		return ParticleTypes.getParticleFromId(id);
 	}
 
-	public void setCustomParticle(@Nullable EnumParticleTypes particleIn) {
+	public void setCustomParticle(@Nullable ParticleTypes particleIn) {
 		this.getDataManager().set(EXTRA_PARTICLE, particleIn == null ? -1 : particleIn.getParticleID());
 	}
 
@@ -393,8 +393,8 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 		if (this.getHeight() > 2 && !this.shouldIgnoreRadius()) {
 			float radius = this.getRadius();
 			float area = (float)Math.PI * radius * radius;
-			EnumParticleTypes enumparticletypes = this.getParticle();
-			int[] aint = new int[enumparticletypes.getArgumentCount()];
+			ParticleTypes ParticleTypes = this.getParticle();
+			int[] aint = new int[ParticleTypes.getArgumentCount()];
 	
 			if (aint.length > 0) {
 				aint[0] = this.getParticleParam1();
@@ -411,20 +411,20 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 				float f9 = MathHelper.sin(f6) * f7;
 				double y = rand.nextDouble() * (this.getHeight() - .5) + .5;
 	
-				if (this.getParticle() == EnumParticleTypes.SPELL_MOB) {
+				if (this.getParticle() == ParticleTypes.SPELL_MOB) {
 					int l1 = this.getColor();
 					int i2 = l1 >> 16 & 255;
 					int j2 = l1 >> 8 & 255;
 					int j1 = l1 & 255;
-					this.world.spawnParticle(EnumParticleTypes.SPELL_MOB, this.posX + (double)f8, this.posY + y, this.posZ + (double)f9, (double)((float)i2 / 255.0F), (double)((float)j2 / 255.0F), (double)((float)j1 / 255.0F), new int[0]);
+					this.world.addParticle(ParticleTypes.SPELL_MOB, this.posX + (double)f8, this.posY + y, this.posZ + (double)f9, (double)((float)i2 / 255.0F), (double)((float)j2 / 255.0F), (double)((float)j1 / 255.0F), new int[0]);
 				} else {
-					this.world.spawnParticle(this.getParticle(), this.posX + (double)f8, this.posY + y, this.posZ + (double)f9, (0.5D - this.rand.nextDouble()) * 0.15D, 0.009999999776482582D, (0.5D - this.rand.nextDouble()) * 0.15D, aint);
+					this.world.addParticle(this.getParticle(), this.posX + (double)f8, this.posY + y, this.posZ + (double)f9, (0.5D - this.rand.nextDouble()) * 0.15D, 0.009999999776482582D, (0.5D - this.rand.nextDouble()) * 0.15D, aint);
 				}
 			}
 		}
 		
 		// Do custom particle spawning
-		final EnumParticleTypes particle = this.getCustomParticle();
+		final ParticleTypes particle = this.getCustomParticle();
 		final float frequency = this.getCustomParticleFrequency();
 		if (particle != null && frequency > 0f) { // optional
 			final float radius = this.getRadius();
@@ -452,7 +452,7 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 				float f9 = MathHelper.sin(f6) * f7;
 				double y = rand.nextDouble() * (this.getHeight() - .5) + .5;
 	
-				this.world.spawnParticle(particle, this.posX + (double)f8, this.posY + y + yOffset, this.posZ + (double)f9, (0.5D - this.rand.nextDouble()) * 0.15D, 0.009999999776482582D, (0.5D - this.rand.nextDouble()) * 0.15D, aint);
+				this.world.addParticle(particle, this.posX + (double)f8, this.posY + y + yOffset, this.posZ + (double)f9, (0.5D - this.rand.nextDouble()) * 0.15D, 0.009999999776482582D, (0.5D - this.rand.nextDouble()) * 0.15D, aint);
 			}
 		}
 	}
@@ -553,8 +553,8 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 		super.readEntityFromNBT(compound);
 		
 		if (compound.contains("Particle", 8)) {
-			@Nullable EnumParticleTypes enumparticletypes = EnumParticleTypes.getByName(compound.getString("Particle"));
-			this.setCustomParticle(enumparticletypes);
+			@Nullable ParticleTypes ParticleTypes = ParticleTypes.getByName(compound.getString("Particle"));
+			this.setCustomParticle(ParticleTypes);
 		}
 		this.setCustomParticleParam1(compound.getInt("ParticleParam1"));
 		this.setCustomParticleParam2(compound.getInt("ParticleParam2"));

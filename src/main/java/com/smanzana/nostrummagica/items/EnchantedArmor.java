@@ -490,7 +490,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 		this.speedBoost = calcArmorSpeedBoost(slot, element, type);
 		
 		// TODO move somewhere else?
-		if (!NostrumMagica.proxy.isServer()) {
+		if (!NostrumMagica.instance.proxy.isServer()) {
 			if (armorModels == null) {
 				armorModels = new ModelEnchantedArmorBase[5];
 				for (int i = 0; i < 5; i++) {
@@ -1189,32 +1189,32 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 		final double dx;
 		final double dy;
 		final double dz;
-		final EnumParticleTypes effect;
+		final ParticleTypes effect;
 		final int mult;
 		final float rangeMod;
 		int[] data = new int[0];
 		switch (element) {
 		case EARTH:
-			effect = EnumParticleTypes.SUSPENDED_DEPTH;
+			effect = ParticleTypes.SUSPENDED_DEPTH;
 			dx = dy = dz = 0;
 			mult = 1;
 			rangeMod = 1;
 			break;
 		case FIRE:
-			effect = EnumParticleTypes.FLAME;
+			effect = ParticleTypes.FLAME;
 			dx = dz = 0;
 			dy = .025;
 			mult = 1;
 			rangeMod = 2;
 			break;
 		case ENDER:
-			effect = EnumParticleTypes.PORTAL;
+			effect = ParticleTypes.PORTAL;
 			dx = dy = dz = 0;
 			mult = 2;
 			rangeMod = 1.5f;
 			break;
 		case ICE:
-			effect = EnumParticleTypes.FALLING_DUST;
+			effect = ParticleTypes.FALLING_DUST;
 			dx = dz = 0;
 			dy = .025;
 			mult = 1;
@@ -1222,7 +1222,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 			data = new int[] {Block.getStateId(Blocks.SNOW.getDefaultState())};
 			break;
 		case LIGHTNING:
-//			effect = EnumParticleTypes.FALLING_DUST;
+//			effect = ParticleTypes.FALLING_DUST;
 //			dx = dz = 0;
 //			dy = -.025;
 //			mult = 1;
@@ -1257,7 +1257,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 			final double px = (player.posX + radius * Math.cos(rd * Math.PI * 2));
 			final double py = (player.posY + (NostrumMagica.rand.nextFloat() * 2));
 			final double pz = (player.posZ + radius * Math.sin(rd * Math.PI * 2));
-			world.spawnParticle(effect, px, py, pz, dx, dy, dz, data);
+			world.addParticle(effect, px, py, pz, dx, dy, dz, data);
 		}
 	}
 	
@@ -1288,14 +1288,14 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 					for (EntityAreaEffect cloud : world.getEntitiesWithinAABB(EntityAreaEffect.class, (new AxisAlignedBB(0, 0, 0, 1, 1, 1)).offset(player.posX, player.posY, player.posZ).grow(5), (effect) -> {
 						// lol
 						return effect != null
-								&& (effect.getCustomParticle() == EnumParticleTypes.SWEEP_ATTACK || effect.getParticle() == EnumParticleTypes.SWEEP_ATTACK);
+								&& (effect.getCustomParticle() == ParticleTypes.SWEEP_ATTACK || effect.getParticle() == ParticleTypes.SWEEP_ATTACK);
 					})) {
 						cloud.addTime(1, true);
 					}
 					
 					if (player.ticksExisted % 3 == 0) {
 						attr.addMana(-1);
-						NostrumMagica.proxy.sendMana(player);
+						NostrumMagica.instance.proxy.sendMana(player);
 					}
 				}
 			} else if (element == EMagicElement.EARTH) {
@@ -1305,7 +1305,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 						// Attempt bonemeal
 						if (DoEarthGrow(world, player.getPosition()) != null) {
 							attr.addMana(-EARTH_GROW_COST);
-							NostrumMagica.proxy.sendMana(player);
+							NostrumMagica.instance.proxy.sendMana(player);
 						}
 					}
 				}
@@ -1562,7 +1562,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		final boolean showFull = Screen.hasShiftDown();
-		final @Nullable PlayerEntity player = NostrumMagica.proxy.getPlayer();
+		final @Nullable PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
 		final int setCount = this.getSetPieces(player);
 		
 		final String setName = I18n.format("item.armor.set." + element.name().toLowerCase() + "." + type.name().toLowerCase() + ".name", new Object[0]);
@@ -1826,7 +1826,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 	
 	@SubscribeEvent
 	public void onKey(KeyInputEvent event) {
-		PlayerEntity player = NostrumMagica.proxy.getPlayer();
+		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
 		if (bindingEnderLeft.isPressed()) {
 			clientDashSide(player, false);
 		} else if (bindingEnderRight.isPressed()) {
@@ -2013,7 +2013,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 			final PlayerEntity player = (PlayerEntity) entity;
 			final EnchantedArmorStateUpdate message = new EnchantedArmorStateUpdate(ArmorState.FLYING, ArmorCheckFlying(player), player.getEntityId());
 			if (player.world.isRemote) {
-				assert(player == NostrumMagica.proxy.getPlayer());
+				assert(player == NostrumMagica.instance.proxy.getPlayer());
 				NetworkHandler.getSyncChannel().sendToServer(message);
 			} else if (toPlayer != null) {
 				NetworkHandler.getSyncChannel().sendTo(message, (ServerPlayerEntity) toPlayer);
@@ -2207,7 +2207,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 						growable.grow(world, random, cursor, state);
 					}
 					
-					((ServerWorld) world).spawnParticle(EnumParticleTypes.VILLAGER_HAPPY,
+					((ServerWorld) world).addParticle(ParticleTypes.VILLAGER_HAPPY,
 							cursor.getX() + .5 + (-.5 + random.nextDouble()),
 							cursor.getY() + .5,
 							cursor.getZ() + .5 + (-.5 + random.nextDouble()),
@@ -2306,7 +2306,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 					armor.consumeEnderDash(ent);
 				} else {
 					if (ent instanceof PlayerEntity) {
-						NostrumMagica.proxy.sendMana((PlayerEntity) ent);
+						NostrumMagica.instance.proxy.sendMana((PlayerEntity) ent);
 					}
 				}
 			}
@@ -2397,16 +2397,16 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 				cloud.setEffectDelay(0);
 				
 				
-//				cloud.setCustomParticle(EnumParticleTypes.SWEEP_ATTACK);
+//				cloud.setCustomParticle(ParticleTypes.SWEEP_ATTACK);
 //				cloud.setCustomParticleParam1(10);
 //				cloud.setCustomParticleFrequency(.2f);
-				cloud.setParticle(EnumParticleTypes.SUSPENDED);
+				cloud.setParticle(ParticleTypes.SUSPENDED);
 				cloud.setIgnoreRadius(true);
 				cloud.addVFXFunc((worldIn, ticksExisted, cloudIn) -> {
 					final int count = 40;
 					EnchantedWeapon.spawnWhirlwindParticle(worldIn, count, cloudIn.getPositionVector(), cloudIn, 0xA0C0EEC0, .65f);
 				});
-				cloud.setCustomParticle(EnumParticleTypes.SWEEP_ATTACK);
+				cloud.setCustomParticle(ParticleTypes.SWEEP_ATTACK);
 				cloud.setCustomParticleParam1(10);
 				cloud.setCustomParticleFrequency(.05f);
 				

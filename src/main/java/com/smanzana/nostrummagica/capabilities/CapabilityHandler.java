@@ -47,6 +47,6 @@ public class CapabilityHandler {
 				.copy(armor);
 		//}
 		//if (!event.getEntityPlayer().world.isRemote)
-		//	NostrumMagica.proxy.syncPlayer((ServerPlayerEntity) event.getEntityPlayer());
+		//	NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) event.getEntityPlayer());
 	}
 }

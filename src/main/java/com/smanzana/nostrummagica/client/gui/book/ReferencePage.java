@@ -19,7 +19,7 @@ public class ReferencePage extends TableOfContentsPage {
 	
 	protected boolean onElementClick(BookScreen parent, int index, int button) {
 		if (index < references.length) {
-			PlayerEntity player = (PlayerEntity) NostrumMagica.proxy.getPlayer();
+			PlayerEntity player = (PlayerEntity) NostrumMagica.instance.proxy.getPlayer();
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			if (attr == null)
 				return false;

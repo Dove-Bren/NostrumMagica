@@ -415,7 +415,7 @@ public class MagicEffectProxy {
 	}
 	
 	public void setOverride(UUID id, SpecialEffect effect, EffectData override) {
-		if (NostrumMagica.proxy.isServer()) {
+		if (NostrumMagica.instance.proxy.isServer()) {
 			NostrumMagica.logger.fatal("Got an effect override on the server!");
 		} else {
 			Map<SpecialEffect, EffectData> map = effects.get(id);
@@ -429,7 +429,7 @@ public class MagicEffectProxy {
 					|| effect == SpecialEffect.CONTINGENCY_HEALTH
 					|| effect == SpecialEffect.CONTINGENCY_MANA
 					|| effect == SpecialEffect.CONTINGENCY_FOOD) {
-				override.amt = NostrumMagica.proxy.getPlayer().ticksExisted;
+				override.amt = NostrumMagica.instance.proxy.getPlayer().ticksExisted;
 			}
 			
 			map.put(effect, override);
@@ -452,7 +452,7 @@ public class MagicEffectProxy {
 				continue;
 			}
 			
-			NostrumMagica.proxy.updateEntityEffect((ServerPlayerEntity) player, base, type, value);
+			NostrumMagica.instance.proxy.updateEntityEffect((ServerPlayerEntity) player, base, type, value);
 		}
 	}
 }

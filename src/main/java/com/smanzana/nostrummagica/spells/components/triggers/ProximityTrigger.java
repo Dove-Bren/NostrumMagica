@@ -55,7 +55,7 @@ public class ProximityTrigger extends SpellTrigger {
 				if (dead)
 					return true;
 				
-				NostrumMagica.proxy.spawnEffect(world, new SpellComponentWrapper(instance()),
+				NostrumMagica.instance.proxy.spawnEffect(world, new SpellComponentWrapper(instance()),
 						null, null, null, this.pos, new SpellComponentWrapper(getState().getNextElement()), false, range);
 				if (!set) {
 					// Trap is now set!

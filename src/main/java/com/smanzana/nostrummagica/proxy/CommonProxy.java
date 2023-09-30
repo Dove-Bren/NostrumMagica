@@ -159,7 +159,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
@@ -628,13 +628,13 @@ public class CommonProxy {
 		
 		if (caster != null) {
 			//caster.addTrackingPlayer(player);
-			players.addAll(((WorldServer) world).getEntityTracker()
+			players.addAll(((ServerWorld) world).getEntityTracker()
 				.getTrackingPlayers(caster));
 		}
 		
 		if (target != null) {
 			//caster.addTrackingPlayer(player);
-			players.addAll(((WorldServer) world).getEntityTracker()
+			players.addAll(((ServerWorld) world).getEntityTracker()
 				.getTrackingPlayers(target));
 		}
 		
@@ -673,7 +673,7 @@ public class CommonProxy {
 	}
 	
 	public void sendMana(PlayerEntity player) {
-		EntityTracker tracker = ((WorldServer) player.world).getEntityTracker();
+		EntityTracker tracker = ((ServerWorld) player.world).getEntityTracker();
 		if (tracker == null)
 			return;
 		
@@ -690,7 +690,7 @@ public class CommonProxy {
 	}
 	
 	public void sendManaArmorCapability(PlayerEntity player) {
-		EntityTracker tracker = ((WorldServer) player.world).getEntityTracker();
+		EntityTracker tracker = ((ServerWorld) player.world).getEntityTracker();
 		if (tracker == null)
 			return;
 		

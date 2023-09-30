@@ -44,7 +44,7 @@ import com.smanzana.nostrummagica.pet.PetInfo.PetAction;
 import com.smanzana.nostrummagica.pet.PetInfo.SecondaryFlavor;
 import com.smanzana.nostrummagica.pet.PetPlacementMode;
 import com.smanzana.nostrummagica.pet.PetTargetMode;
-import com.smanzana.nostrummagica.proxy.ClientProxy;
+import com.smanzana.NostrumMagica.instance.proxy.ClientProxy;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
@@ -1406,7 +1406,7 @@ public class OverlayRenderer extends AbstractGui {
 				
 				// If selected entity, render with outline
 				if (MinecraftForgeClient.getRenderPass() == 0)
-				if (((ClientProxy) NostrumMagica.proxy).getCurrentPet() == entity) {
+				if (((ClientProxy) NostrumMagica.instance.proxy).getCurrentPet() == entity) {
 					
 //					GlStateManager.depthFunc(GL11.GL_ALWAYS); //519
 //					//event.getRenderer().setRenderOutlines(true);
@@ -1431,7 +1431,7 @@ public class OverlayRenderer extends AbstractGui {
 		
 		if (!shouldRenderMe) {
 			// Normal render didn't happen. Do rooted render manually instead.
-			renderRoots(NostrumMagica.proxy.getPlayer());
+			renderRoots(NostrumMagica.instance.proxy.getPlayer());
 		}
 	}
 	

@@ -5,20 +5,19 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
  * Sent from a client to server, and requests a whirlwind be spawned
  * @author Skyler
  *
  */
-public class EnchantedArmorWhirlwindAction implements IMessage {
+public class EnchantedArmorWhirlwindAction {
 
-	public static class Handler implements IMessageHandler<EnchantedArmorWhirlwindAction, IMessage> {
+	public static class HandlerHandler<EnchantedArmorWhirlwindAction, IMessage> {
 
-		@Override
-		public IMessage onMessage(EnchantedArmorWhirlwindAction message, MessageContext ctx) {
-			//LivingEntity ent = ctx.getServerHandler().player;
+			public static void handle(EnchantedArmorWhirlwindAction message, Supplier<NetworkEvent.Context> ctx) {
+			//LivingEntity ent = ctx.get().getSender();
 //			if (ent != null) {
 //				EnchantedArmor.HandleStateUpdate(state, ent, data);
 //				if (ctx.side.isServer()) {
@@ -43,13 +42,11 @@ public class EnchantedArmorWhirlwindAction implements IMessage {
 		tag = new CompoundNBT();
 	}
 	
-	@Override
-	public void fromBytes(ByteBuf buf) {
+		public static void decode(PacketBuffer buf) {
 		tag = ByteBufUtils.readTag(buf);
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf) {
+		public static void encode(Message msg, PacketBuffer buf) {
 		ByteBufUtils.writeTag(buf, tag);
 	}
 

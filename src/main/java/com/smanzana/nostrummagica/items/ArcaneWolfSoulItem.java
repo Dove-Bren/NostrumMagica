@@ -157,12 +157,12 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 			if (NostrumMagica.rand.nextBoolean()) {
 				Vec3d offset;
 				final float rotation;
-				if (player == NostrumMagica.proxy.getPlayer() && Minecraft.getInstance().gameSettings.thirdPersonView == 0) {
+				if (player == NostrumMagica.instance.proxy.getPlayer() && Minecraft.getInstance().gameSettings.thirdPersonView == 0) {
 					offset = new Vec3d(-.1, player.getEyeHeight() -.05, .2);
 					rotation = -player.rotationYaw % 360f;
 				} else {
 					offset = new Vec3d(-.375, player.getEyeHeight() -.05, .825);
-					if (player == NostrumMagica.proxy.getPlayer()) {
+					if (player == NostrumMagica.instance.proxy.getPlayer()) {
 						rotation = -player.renderYawOffset % 360f;
 					} else {
 						rotation = -player.rotationYaw % 360f;

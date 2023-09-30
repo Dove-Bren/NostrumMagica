@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemAetherCloak;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble.ItemType;
-import com.smanzana.nostrummagica.proxy.ClientProxy;
+import com.smanzana.NostrumMagica.instance.proxy.ClientProxy;
 
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.util.ResourceLocation;

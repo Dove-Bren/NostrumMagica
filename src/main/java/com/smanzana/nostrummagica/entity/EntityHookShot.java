@@ -24,7 +24,7 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.RayTraceResult.Type;
@@ -219,7 +219,7 @@ public class EntityHookShot extends Entity {
 			{
 				for (int i = 0; i < 4; ++i)
 				{
-					this.world.spawnParticle(EnumParticleTypes.WATER_BUBBLE, this.posX - this.getMotion().x * 0.25D, this.posY - this.getMotion().y * 0.25D, this.posZ - this.getMotion().z * 0.25D, this.getMotion().x, this.getMotion().y, this.getMotion().z, new int[0]);
+					this.world.addParticle(ParticleTypes.WATER_BUBBLE, this.posX - this.getMotion().x * 0.25D, this.posY - this.getMotion().y * 0.25D, this.posZ - this.getMotion().z * 0.25D, this.getMotion().x, this.getMotion().y, this.getMotion().z, new int[0]);
 				}
 
 				f = 0.8F;
@@ -231,7 +231,7 @@ public class EntityHookShot extends Entity {
 			this.getMotion().x *= (double)f;
 			this.getMotion().y *= (double)f;
 			this.getMotion().z *= (double)f;
-			//this.world.spawnParticle(this.getParticleType(), this.posX, this.posY + 0.5D, this.posZ, 0.0D, 0.0D, 0.0D, new int[0]);
+			//this.world.addParticle(this.getParticleType(), this.posX, this.posY + 0.5D, this.posZ, 0.0D, 0.0D, 0.0D, new int[0]);
 			this.setPosition(this.posX, this.posY, this.posZ);
 		}
 		else

@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.entity.EntityArcaneWolf.ArcaneWolfElementalTyp
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -37,7 +37,7 @@ public class ClientEffectEldrichBlast extends ClientEffect {
 		final float period = 2 * 20;
 		final double angleRad = Math.PI * 2 * ((ticks % period) / period);
 		final Vec3d offset = new Vec3d(Math.cos(angleRad) * .5, .25 + .1 * Math.sin(angleRad), Math.sin(angleRad) * .5);
-		entity.world.spawnParticle(EnumParticleTypes.PORTAL,
+		entity.world.addParticle(ParticleTypes.PORTAL,
 				entity.posX + offset.x,
 				entity.posY + entity.getHeight() + offset.y,
 				entity.posZ + offset.z,

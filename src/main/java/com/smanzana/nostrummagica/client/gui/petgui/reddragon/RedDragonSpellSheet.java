@@ -472,7 +472,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		}
 		
 		sendGambitCycle(index, mouseButton == 0);
-		NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
+		NostrumMagicaSounds.UI_TICK.play(NostrumMagica.instance.proxy.getPlayer());
 	}
 	
 	private static enum SheetMessageType {

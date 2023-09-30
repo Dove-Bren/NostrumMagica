@@ -238,7 +238,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
 		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		if (worldIn.isRemote)
-			NostrumMagica.proxy.openBook(playerIn, this, itemStackIn);
+			NostrumMagica.instance.proxy.openBook(playerIn, this, itemStackIn);
 		
 		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
     }
@@ -362,8 +362,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		
 		nbt.putInt(NBT_INDEX, index);
 		
-		if (initial != index && !NostrumMagica.proxy.isServer()) {
-			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
+		if (initial != index && !NostrumMagica.instance.proxy.isServer()) {
+			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.instance.proxy.getPlayer());
 			return index;
 		} else
 			return -1;
@@ -582,7 +582,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (ids == null || ids.length == 0)
 			return list;
 		
-		if (!NostrumMagica.proxy.isServer()) {
+		if (!NostrumMagica.instance.proxy.isServer()) {
 			sniffIDs(ids);
 		}
 		
@@ -678,7 +678,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 			int maxxp = LevelCurve.getMaxXP(level);
 			int modifications = getModifications(stack);
 			int id = getTomeID(stack);
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(NostrumMagica.proxy.getPlayer());
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(NostrumMagica.instance.proxy.getPlayer());
 			SpellComponentWrapper comp = (attr.isBinding() && id == attr.getBindingID()) ? attr.getBindingComponent() : null;
 			String bindingName = (comp == null) ? null : attr.getBindingSpell().getName();
 			String compname = (comp == null) ? null :

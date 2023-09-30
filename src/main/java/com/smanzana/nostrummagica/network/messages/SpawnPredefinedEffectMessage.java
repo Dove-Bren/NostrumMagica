@@ -1,19 +1,18 @@
 package com.smanzana.nostrummagica.network.messages;
 
+import java.util.function.Supplier;
+
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect;
 import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect.PredefinedEffect;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
  * Server is signalling that a ritual has been performed, and the effects should be shown.
@@ -21,47 +20,31 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
  * @author Skyler
  *
  */
-public class SpawnPredefinedEffectMessage implements IMessage {
+public class SpawnPredefinedEffectMessage {
 
-	public static class Handler implements IMessageHandler<SpawnPredefinedEffectMessage, IMessage> {
-
-		@Override
-		public IMessage onMessage(SpawnPredefinedEffectMessage message, MessageContext ctx) {
-			
-			PlayerEntity player = NostrumMagica.proxy.getPlayer();
-			if (player.dimension != message.dimension) {
-				return null;
-			}
-			
-			Entity ent = player.world.getEntityByID(message.entityID);
-			Vec3d offset = (ent != null ? Vec3d.ZERO : message.position);
-			
-			if (offset == null) {
-				offset = Vec3d.ZERO;
-			}
-			
-			ClientPredefinedEffect.Spawn(offset, message.type, message.duration, ent);
-			
-			return null;
+	public static void handle(SpawnPredefinedEffectMessage message, Supplier<NetworkEvent.Context> ctx) {
+		ctx.get().setPacketHandled(true);
+		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+		if (player.dimension.getId() != message.dimension) {
+			return;
 		}
 		
+		Entity ent = player.world.getEntityByID(message.entityID);
+		Vec3d offset = (ent != null ? Vec3d.ZERO : message.position);
+		
+		if (offset == null) {
+			offset = Vec3d.ZERO;
+		}
+		
+		ClientPredefinedEffect.Spawn(offset, message.type, message.duration, ent);
 	}
 
-	private static final String NBT_TYPE = "type";
-	private static final String NBT_DIMENSION_ID = "dim";
-	private static final String NBT_POS = "pos";
-	private static final String NBT_DURATION = "duration";
-	private static final String NBT_ENTITY = "entityID";
-
-	protected PredefinedEffect type;
-	protected int dimension;
-	protected Vec3d position;
-	protected int entityID;
-	protected int duration;
+	protected final PredefinedEffect type;
+	protected final int dimension;
+	protected final int duration;
 	
-	public SpawnPredefinedEffectMessage() {
-		this(PredefinedEffect.SOUL_DAGGER_STAB, 20, 1, Vec3d.ZERO);
-	}
+	protected final @Nullable Vec3d position;
+	protected final int entityID;
 	
 	public SpawnPredefinedEffectMessage(PredefinedEffect type, int duration, int dimensionID, Vec3d position) {
 		this.type = type;
@@ -79,49 +62,38 @@ public class SpawnPredefinedEffectMessage implements IMessage {
 		this.position = null;
 	}
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		CompoundNBT tag = ByteBufUtils.readTag(buf);
-		try {
-			this.type = PredefinedEffect.valueOf(tag.getString(NBT_TYPE).toUpperCase()); 
-		} catch (Exception e) {
-			e.printStackTrace();
-			this.type = PredefinedEffect.SOUL_DAGGER_STAB;
-		}
+	public static SpawnPredefinedEffectMessage decode(PacketBuffer buf) {
+		final PredefinedEffect type;
+		final int dimension;
+		final int duration;
 		
-		this.duration = tag.getInt(NBT_DURATION);
-		this.dimension = tag.getInt(NBT_DIMENSION_ID);
-		if (tag.contains(NBT_POS, NBT.TAG_COMPOUND)) {
-			this.entityID = 0;
-			final CompoundNBT subtag = tag.getCompound(NBT_POS);
-			final double x = subtag.getDouble("x");
-			final double y = subtag.getDouble("y");
-			final double z = subtag.getDouble("z");
-			this.position = new Vec3d(x, y, z);
+		//final @Nullable Vec3d position;
+		//final int entityID;
+		
+		type = buf.readEnumValue(PredefinedEffect.class);
+		duration = buf.readVarInt();
+		dimension = buf.readVarInt();
+		
+		if (buf.readBoolean()) {
+			return new SpawnPredefinedEffectMessage(type, duration, dimension, new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble()));
 		} else {
-			this.position = null;
-			this.entityID = tag.getInt(NBT_ENTITY);
+			return new SpawnPredefinedEffectMessage(type, duration, dimension, buf.readVarInt());
 		}
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		CompoundNBT tag = new CompoundNBT();
+	public static void encode(SpawnPredefinedEffectMessage msg, PacketBuffer buf) {
+		buf.writeEnumValue(msg.type);
+		buf.writeVarInt(msg.duration);
+		buf.writeVarInt(msg.dimension);
 		
-		tag.putString(NBT_TYPE, type.name());
-		tag.putInt(NBT_DIMENSION_ID, dimension);
-		tag.putInt(NBT_DURATION, duration);
-		if (this.position != null) {
-			CompoundNBT subtag = new CompoundNBT();
-			subtag.setDouble("x", position.x);
-			subtag.setDouble("y", position.y);
-			subtag.setDouble("z", position.z);
-			tag.put(NBT_POS, subtag);
+		buf.writeBoolean(msg.position != null);
+		if (msg.position != null) {
+			buf.writeDouble(msg.position.x);
+			buf.writeDouble(msg.position.y);
+			buf.writeDouble(msg.position.z);
 		} else {
-			tag.putInt(NBT_ENTITY, entityID);
+			buf.writeVarInt(msg.entityID);
 		}
-		
-		ByteBufUtils.writeTag(buf, tag);
 	}
 
 }

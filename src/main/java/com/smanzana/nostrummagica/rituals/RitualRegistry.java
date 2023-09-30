@@ -79,7 +79,7 @@ public class RitualRegistry {
 					NostrumMagicaSounds.AMBIENT_WOOSH2.play(world,
 							pos.getX(), pos.getY(), pos.getZ());
 	
-					NostrumMagica.proxy.playRitualEffect(world, pos, result.element == null ? EMagicElement.PHYSICAL : result.element,
+					NostrumMagica.instance.proxy.playRitualEffect(world, pos, result.element == null ? EMagicElement.PHYSICAL : result.element,
 							result.center, result.extras, result.reagents, result.output);
 					
 					return true;

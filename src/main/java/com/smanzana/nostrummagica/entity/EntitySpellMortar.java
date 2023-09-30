@@ -15,7 +15,7 @@ import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -77,7 +77,7 @@ public class EntitySpellMortar extends EntityFireball {
 		
 		// if client
 //		if (this.ticksExisted % 5 == 0) {
-//			this.world.spawnParticle(EnumParticleTypes.CRIT_MAGIC,
+//			this.world.addParticle(ParticleTypes.CRIT_MAGIC,
 //					posX, posY, posZ, 0, 0, 0);
 //		}
 		
@@ -143,8 +143,8 @@ public class EntitySpellMortar extends EntityFireball {
 	}
 	
 	@Override
-	protected EnumParticleTypes getParticleType() {
-		return EnumParticleTypes.SUSPENDED;
+	protected ParticleTypes getParticleType() {
+		return ParticleTypes.SUSPENDED;
 	}
 	
 	public void setElement(EMagicElement element) {

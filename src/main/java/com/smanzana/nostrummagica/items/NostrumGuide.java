@@ -42,7 +42,7 @@ public class NostrumGuide extends Item implements GuiBook {
 		final ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		
 		if (worldIn.isRemote) {
-			NostrumMagica.proxy.openBook(playerIn, this, itemStackIn);
+			NostrumMagica.instance.proxy.openBook(playerIn, this, itemStackIn);
 		}
 		
 		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
@@ -98,7 +98,7 @@ public class NostrumGuide extends Item implements GuiBook {
 		
 		pages.add(new PlainTextPage(""));
 		
-//		PlayerEntity player = NostrumMagica.proxy.getPlayer();
+//		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
 //		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 //		
 //		pages.add(new TitlePage(T("ritual_index"), true));

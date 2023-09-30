@@ -30,7 +30,7 @@ import net.minecraft.world.GameType;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.biome.BiomeProviderSingle;
 import net.minecraft.world.chunk.Chunk;
@@ -253,11 +253,11 @@ public class NostrumEmptyDimension {
 	
 	public static class DimensionEntryTeleporter extends Teleporter {
 		
-		private WorldServer world;
+		private ServerWorld world;
 		private RoomBlueprint lobbyBlueprint;
 		private RoomBlueprint wholeBlueprint;
 		
-		public DimensionEntryTeleporter(WorldServer worldIn) {
+		public DimensionEntryTeleporter(ServerWorld worldIn) {
 			super(worldIn);
 			
 			this.world = worldIn;
@@ -366,9 +366,9 @@ public class NostrumEmptyDimension {
 	
 	public static class DimensionReturnTeleporter extends Teleporter {
 		
-		private WorldServer world;
+		private ServerWorld world;
 		
-		public DimensionReturnTeleporter(WorldServer worldIn) {
+		public DimensionReturnTeleporter(ServerWorld worldIn) {
 			super(worldIn);
 			
 			this.world = worldIn;

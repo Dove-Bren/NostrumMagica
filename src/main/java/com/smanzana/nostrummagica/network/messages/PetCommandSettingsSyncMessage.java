@@ -1,53 +1,40 @@
 package com.smanzana.nostrummagica.network.messages;
 
+import java.util.function.Supplier;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
  * Client player's attribtes are being refreshed from server
  * @author Skyler
  *
  */
-public class PetCommandSettingsSyncMessage implements IMessage {
+public class PetCommandSettingsSyncMessage {
 
-	public static class Handler implements IMessageHandler<PetCommandSettingsSyncMessage, IMessage> {
-
-		@Override
-		public IMessage onMessage(PetCommandSettingsSyncMessage message, MessageContext ctx) {
-			Minecraft.getInstance().runAsync(() -> {
-				NostrumMagica.getPetCommandManager().overrideClientSettings(message.tag);
-			});
-			
-			return null;
-		}
+	public static void handle(PetCommandSettingsSyncMessage message, Supplier<NetworkEvent.Context> ctx) {
+		ctx.get().setPacketHandled(true);
+		Minecraft.getInstance().runAsync(() -> {
+			NostrumMagica.instance.getPetCommandManager().overrideClientSettings(message.data);
+		});
+	}
 		
-	}
-	
-	protected CompoundNBT tag;
-	
-	public PetCommandSettingsSyncMessage() {
-		tag = new CompoundNBT();
-	}
+	private final CompoundNBT data;
 	
 	public PetCommandSettingsSyncMessage(CompoundNBT nbt) {
-		tag = nbt;
+		data = nbt;
 	}
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		tag = ByteBufUtils.readTag(buf);
+	public static PetCommandSettingsSyncMessage decode(PacketBuffer buf) {
+		return new PetCommandSettingsSyncMessage(buf.readCompoundTag());
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		ByteBufUtils.writeTag(buf, tag);
+	public static void encode(PetCommandSettingsSyncMessage msg, PacketBuffer buf) {
+		buf.writeCompoundTag(msg.data);
 	}
 
 }

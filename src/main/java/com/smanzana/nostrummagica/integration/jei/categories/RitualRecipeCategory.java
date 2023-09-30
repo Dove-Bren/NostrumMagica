@@ -191,7 +191,7 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipeWrapper
 		
 		// Check whether this ritual can be performed
 		canPerform = true;
-		PlayerEntity player = NostrumMagica.proxy.getPlayer();
+		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
 		if (player != null) {
 			// Client side, so check if player has unlocked the ritual
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);

@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.network.messages;
 
+import java.util.function.Supplier;
+
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -7,18 +9,12 @@ import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
  * Server is signalling that a ritual has been performed, and the effects should be shown.
@@ -26,116 +22,113 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
  * @author Skyler
  *
  */
-public class SpawnNostrumRitualEffectMessage implements IMessage {
+public class SpawnNostrumRitualEffectMessage {
 
-	public static class Handler implements IMessageHandler<SpawnNostrumRitualEffectMessage, IMessage> {
-
-		@Override
-		public IMessage onMessage(SpawnNostrumRitualEffectMessage message, MessageContext ctx) {
-			
-			final int dimID = message.tag.getInt(NBT_DIMENSION_ID);
-			final BlockPos pos = BlockPos.fromLong(message.tag.getLong(NBT_POS));
-			final EMagicElement element = EMagicElement.valueOf(message.tag.getString(NBT_ELEMENT).toUpperCase());
-			
-			PlayerEntity player = NostrumMagica.proxy.getPlayer();
-			if (player.dimension != dimID) {
-				return null;
-			}
-			
-			final int[] typesRaw = message.tag.getIntArray(NBT_REAGENTS);
-			final ReagentType[] types = new ReagentType[typesRaw == null ? 0 : typesRaw.length];
-			for (int i = 0; i < types.length; i++) {
-				types[i] = ReagentType.values()[typesRaw[i]];
-			}
-			
-			ItemStack center = ItemStack.EMPTY;
-			if (message.tag.contains(NBT_CENTER_ITEM)) {
-				center = new ItemStack(message.tag.getCompound(NBT_CENTER_ITEM));
-			}
-			
-			ItemStack output = ItemStack.EMPTY;
-			if (message.tag.contains(NBT_OUTPUT)) {
-				output = new ItemStack(message.tag.getCompound(NBT_OUTPUT));
-			}
-			
-			@Nullable NonNullList<ItemStack> extras = null;
-			if (message.tag.contains(NBT_EXTRA_ITEMS)) {
-				ListNBT list = message.tag.getList(NBT_EXTRA_ITEMS, NBT.TAG_COMPOUND);
-				extras = NonNullList.create();
-				for (int i = 0; i < list.size(); i++) {
-					 extras.add(new ItemStack(list.getCompoundTagAt(i)));
-				}
-			}
-			
-			final ItemStack centerF = center;
-			final ItemStack outputF = output;
-			final NonNullList<ItemStack> extrasF = extras;
-			
+	public static void handle(SpawnNostrumRitualEffectMessage message, Supplier<NetworkEvent.Context> ctx) {
+		ctx.get().setPacketHandled(true);
+		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+		if (player.dimension.getId() != message.dimID) {
+			return;
+		}
+		
 //			Minecraft.getInstance().runAsync(() -> {
 //				ClientEffectRenderer.instance().addEffect(ClientEffectRitual.Create(
 //						new Vec3d(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5),
 //						element, centerF, extrasF, types, outputF
 //						));
 //			});
-			ClientPredefinedEffect.SpawnRitualEffect(pos, element, centerF, extrasF, types, outputF);
-
-			return null;
-		}
-		
+		ClientPredefinedEffect.SpawnRitualEffect(message.pos, message.element, message.center, message.extras, message.reagents, message.output);
 	}
 
-	private static final String NBT_DIMENSION_ID = "dim";
-	private static final String NBT_POS = "blockPos";
-	private static final String NBT_CENTER_ITEM = "centerItem";
-	private static final String NBT_EXTRA_ITEMS = "extraItems";
-	private static final String NBT_REAGENTS = "reagents";
-	private static final String NBT_OUTPUT = "output";
-	private static final String NBT_ELEMENT = "element";
-	
-	protected CompoundNBT tag;
-	
-	public SpawnNostrumRitualEffectMessage() {
-		tag = new CompoundNBT();
-	}
+	private final int dimID;
+	private final BlockPos pos;
+	private final EMagicElement element;
+	private final ReagentType[] reagents;
+	private final ItemStack center;
+	private final @Nullable NonNullList<ItemStack> extras;
+	private final ItemStack output;
 	
 	public SpawnNostrumRitualEffectMessage(int dimension, BlockPos pos, EMagicElement element, ReagentType[] reagents,
 			ItemStack center, @Nullable NonNullList<ItemStack> extras, ItemStack output) {
-		tag = new CompoundNBT();
+		this.dimID = dimension;
+		this.pos = pos;
+		this.element = element;
+		this.reagents = reagents;
+		this.center = center;
+		this.extras = extras;
+		this.output = output;
+	}
+
+	public static SpawnNostrumRitualEffectMessage decode(PacketBuffer buf) {
+		final int dimID;
+		final BlockPos pos;
+		final EMagicElement element;
+		final ReagentType[] reagents;
+		final ItemStack center;
+		final @Nullable NonNullList<ItemStack> extras;
+		final ItemStack output;
 		
-		tag.putInt(NBT_DIMENSION_ID, dimension);
-		tag.putLong(NBT_POS, pos.toLong());
-		tag.putString(NBT_ELEMENT, element.name());
+		dimID = buf.readVarInt();
+		pos = buf.readBlockPos();
+		element = buf.readEnumValue(EMagicElement.class);
 		
-		int[] intArr = new int[reagents.length];
-		for (int i = 0; i < reagents.length; i++) {
-			intArr[i] = reagents[i].ordinal();
+		final int reagentLen = buf.readVarInt();
+		reagents = new ReagentType[reagentLen];
+		for (int i = 0; i < reagentLen; i++) {
+			reagents[i] = buf.readEnumValue(ReagentType.class);
 		}
-		tag.setIntArray(NBT_REAGENTS, intArr);
-		if (!center.isEmpty()) {
-			tag.put(NBT_CENTER_ITEM, center.serializeNBT());
+		
+		if (buf.readBoolean()) {
+			center = ItemStack.read(buf.readCompoundTag());
+		} else {
+			center = ItemStack.EMPTY;
 		}
-		if (extras != null) {
-			ListNBT list = new ListNBT();
-			
-			for (ItemStack stack : extras) {
-				list.add(stack.serializeNBT());
+		
+		final int extrasLen = buf.readVarInt();
+		if (extrasLen > 0) {
+			extras = NonNullList.withSize(extrasLen, ItemStack.EMPTY);
+			for (int i = 0; i < extrasLen; i++) {
+				extras.set(i, ItemStack.read(buf.readCompoundTag()));
 			}
-			
-			tag.put(NBT_EXTRA_ITEMS, list);
+		} else {
+			extras = null;
 		}
-		if (!output.isEmpty()) {
-			tag.put(NBT_OUTPUT, output.serializeNBT());
+		
+		if (buf.readBoolean()) {
+			output = ItemStack.read(buf.readCompoundTag());
+		} else {
+			output = ItemStack.EMPTY;
 		}
+		
+		return new SpawnNostrumRitualEffectMessage(dimID, pos, element, reagents, center, extras, output);
 	}
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		tag = ByteBufUtils.readTag(buf);
-	}
-
-	@Override
-	public void toBytes(ByteBuf buf) {
-		ByteBufUtils.writeTag(buf, tag);
+	public static void encode(SpawnNostrumRitualEffectMessage msg, PacketBuffer buf) {
+		buf.writeVarInt(msg.dimID);
+		buf.writeBlockPos(msg.pos);
+		buf.writeEnumValue(msg.element);
+		
+		buf.writeVarInt(msg.reagents.length);
+		for (ReagentType reagent : msg.reagents) {
+			buf.writeEnumValue(reagent);
+		}
+		
+		buf.writeBoolean(!msg.center.isEmpty());
+		if (!msg.center.isEmpty()) {
+			buf.writeCompoundTag(msg.center.serializeNBT());
+		}
+		
+		buf.writeVarInt(msg.extras == null ? 0 : msg.extras.size());
+		if (msg.extras != null) {
+			for (ItemStack extra : msg.extras) {
+				buf.writeCompoundTag(extra.serializeNBT());
+			}
+		}
+		
+		buf.writeBoolean(!msg.output.isEmpty());
+		if (!msg.output.isEmpty()) {
+			buf.writeCompoundTag(msg.output.serializeNBT());
+		}
 	}
 
 }

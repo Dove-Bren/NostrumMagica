@@ -144,7 +144,7 @@ public class DungeonAir extends BreakableBlock {
 	
 //	@Override
 //	public boolean canCollideCheck(BlockState state, boolean hitIfLiquid) {
-//		final PlayerEntity player = NostrumMagica.proxy.getPlayer();
+//		final PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
 //		if (player == null || player.world == null || !player.isCreative()) {
 //			return false;
 //		}

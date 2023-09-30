@@ -268,7 +268,7 @@ public class SoulDagger extends SwordItem implements ILoreTagged, ISpellArmor {
 //				ClientEffectRenderer.instance().addEffect(effect);
 //			}
 //		}
-		NostrumMagica.proxy.playPredefinedEffect(PredefinedEffect.SOUL_DAGGER_STAB, durationTicks, target.world, target);
+		NostrumMagica.instance.proxy.playPredefinedEffect(PredefinedEffect.SOUL_DAGGER_STAB, durationTicks, target.world, target);
 		
 		float damage = 6.0f + EnchantmentHelper.getModifierForCreature(dagger, target.getCreatureAttribute());
 		

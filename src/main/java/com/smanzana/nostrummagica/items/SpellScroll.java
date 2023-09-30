@@ -130,7 +130,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 		Spell spell = NostrumMagica.getSpellRegistry().lookup(id);
 		
 		if (spell == null) {
-			if (NostrumMagica.proxy.isServer()) {
+			if (NostrumMagica.instance.proxy.isServer()) {
 				NostrumMagica.logger.error("Failed to lookup spell in scroll with id " + id);
 			} else {
 				NostrumMagica.logger.info("Requesting spell " + id

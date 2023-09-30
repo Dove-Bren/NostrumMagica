@@ -218,7 +218,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -1128,7 +1128,7 @@ public class ClientProxy extends CommonProxy {
 					double offsetx = Math.cos(i * (2 * Math.PI / 15)) * 1.0;
 					double offsetz = Math.sin(i * (2 * Math.PI / 15)) * 1.0;
 					player.world
-						.spawnParticle(EnumParticleTypes.SMOKE_LARGE,
+						.addParticle(ParticleTypes.SMOKE_LARGE,
 								player.posX + offsetx, player.posY, player.posZ + offsetz,
 								0, -.5, 0);
 					

@@ -321,7 +321,7 @@ public class RuneBagGui {
 					boolean val = RuneBag.isVacuumEnabled(bag.stack);
 					NetworkHandler.getSyncChannel().sendToServer(
 			    			new RuneBagToggleMessage(bag.bagPos != 40, val));
-					NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
+					NostrumMagicaSounds.UI_TICK.play(NostrumMagica.instance.proxy.getPlayer());
 			} else {
 				super.mouseClicked(mouseX, mouseY, mouseButton);
 			}

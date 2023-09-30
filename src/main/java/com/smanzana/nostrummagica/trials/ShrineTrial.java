@@ -73,7 +73,7 @@ public abstract class ShrineTrial {
 		if (!player.world.isRemote) {
 			NostrumMagicaSounds.LEVELUP.play(player);
 			player.sendMessage(new TranslationTextComponent("info.element.mastery" + mastery.intValue(), new Object[] {this.element.getName()}));
-			NostrumMagica.proxy.syncPlayer((ServerPlayerEntity) player);
+			NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) player);
 		}
 			
 	}

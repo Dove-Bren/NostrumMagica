@@ -316,7 +316,7 @@ public class ObeliskScreen extends Screen {
 		if (!butt.isValid)
 			return;
 		
-		NostrumMagica.proxy.setObeliskIndex(tileEntity.getPos(), butt.obeliskIndex);
+		NostrumMagica.instance.proxy.setObeliskIndex(tileEntity.getPos(), butt.obeliskIndex);
 		Minecraft.getInstance().displayGuiScreen(null);
 	}
 	

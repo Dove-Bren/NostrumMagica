@@ -157,7 +157,7 @@ public class TeleportRune extends ContainerBlock  {
 				double dz = target.getZ() + .5;
 				for (int i = 0; i < 10; i++) {
 					
-					((ServerWorld) worldIn).spawnParticle(ParticleTypes.DRAGON_BREATH,
+					((ServerWorld) worldIn).addParticle(ParticleTypes.DRAGON_BREATH,
 							dx,
 							dy,
 							dz,

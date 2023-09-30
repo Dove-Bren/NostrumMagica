@@ -1,60 +1,41 @@
 package com.smanzana.nostrummagica.network.messages;
 
+import java.util.function.Supplier;
+
 import com.smanzana.nostrummagica.client.gui.petgui.PetGUI;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
  * Server is sending some syncing data to the client GUI
  * @author Skyler
  *
  */
-public class PetGUISyncMessage implements IMessage {
+public class PetGUISyncMessage {
 
-	public static class Handler implements IMessageHandler<PetGUISyncMessage, IMessage> {
-
-		@Override
-		public IMessage onMessage(PetGUISyncMessage message, MessageContext ctx) {
-			// Get ID
-			CompoundNBT nbt = message.tag.getCompound(NBT_MESSAGE);
-			
-			Minecraft.getInstance().runAsync(() -> {
-				PetGUI.updateClientContainer(nbt);
-			});
-			
-			return null;
-		}
-		
+	public static void handle(PetGUISyncMessage message, Supplier<NetworkEvent.Context> ctx) {
+		// Get ID
+		ctx.get().setPacketHandled(true);
+		Minecraft.getInstance().runAsync(() -> {
+			PetGUI.updateClientContainer(message.data);
+		});
 	}
 
-	private static final String NBT_MESSAGE = "message";
-	
-	protected CompoundNBT tag;
-	
-	public PetGUISyncMessage() {
-		tag = new CompoundNBT();
-	}
+	private final CompoundNBT data;
 	
 	public PetGUISyncMessage(CompoundNBT data) {
-		this();
-		
-		tag.put(NBT_MESSAGE, data);
+		this.data = data;
 	}
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		tag = ByteBufUtils.readTag(buf);
+	public static PetGUISyncMessage decode(PacketBuffer buf) {
+		return new PetGUISyncMessage(buf.readCompoundTag());
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		ByteBufUtils.writeTag(buf, tag);
+	public static void encode(PetGUISyncMessage msg, PacketBuffer buf) {
+		buf.writeCompoundTag(msg.data);
 	}
 
 }

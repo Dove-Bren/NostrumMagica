@@ -426,8 +426,8 @@ public class NostrumMagic implements INostrumMagic {
 		
 		addLoreBonus(this, val, 1);
 		
-//		if (NostrumMagica.proxy.getPlayer() != null) {
-//			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
+//		if (NostrumMagica.instance.proxy.getPlayer() != null) {
+//			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.instance.proxy.getPlayer());
 //		}
 		
 		if (entity != null && entity instanceof PlayerEntity && !entity.world.isRemote) {
@@ -447,8 +447,8 @@ public class NostrumMagic implements INostrumMagic {
 			return; // Already has full
 		
 		loreLevels.put(key, 2);
-//		if (NostrumMagica.proxy.getPlayer() != null || !NostrumMagica.proxy.getPlayer().world.isRemote) {
-//			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.proxy.getPlayer());
+//		if (NostrumMagica.instance.proxy.getPlayer() != null || !NostrumMagica.instance.proxy.getPlayer().world.isRemote) {
+//			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.instance.proxy.getPlayer());
 //		}
 		
 		if (entity != null && entity instanceof PlayerEntity && !entity.world.isRemote) {

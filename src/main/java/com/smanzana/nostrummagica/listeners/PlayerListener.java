@@ -557,7 +557,7 @@ public class PlayerListener {
 						if (isLava && living.ticksExisted % 4 == 0) {
 							attr.addMana(-manaCost);
 							if (living instanceof PlayerEntity) {
-								NostrumMagica.proxy.sendMana((PlayerEntity) living);
+								NostrumMagica.instance.proxy.sendMana((PlayerEntity) living);
 							}
 						}
 						return;
@@ -1070,7 +1070,7 @@ public class PlayerListener {
 			mana++;
 		
 		stats.addMana(mana);
-		NostrumMagica.proxy.sendMana(player);
+		NostrumMagica.instance.proxy.sendMana(player);
 	}
 	
 	@SubscribeEvent
@@ -1079,7 +1079,7 @@ public class PlayerListener {
 			return;
 		}
 		
-		NostrumMagica.proxy.syncPlayer((ServerPlayerEntity) event.player);
+		NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) event.player);
 	}
 	
 	@SubscribeEvent
@@ -1187,7 +1187,7 @@ public class PlayerListener {
 		
 		if (EnchantedArmor.DoEarthDig(player.world, player, e.getPos(), e.getFace())) {
 			attr.addMana(-20);
-			NostrumMagica.proxy.sendMana(player);
+			NostrumMagica.instance.proxy.sendMana(player);
 			e.setCanceled(true);
 		}
 	}

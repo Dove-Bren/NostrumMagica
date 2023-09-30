@@ -106,14 +106,14 @@ public class SpellPreviewPage implements IClickableBookPage {
 
 	@Override
 	public boolean onClick(BookScreen parent, double mouseX, double mouseY, int button) {
-		PlayerEntity player = NostrumMagica.proxy.getPlayer();
+		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
 		
 		if (button == 0) {
 			Minecraft.getInstance().displayGuiScreen(new ScrollScreen(spell));
 		} else if (button == 1 && InputMappings.isKeyDown(Minecraft.getInstance().mainWindow.getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT)) {
 			// Fake on client
 			SpellTome.removeSpell(tome, spell.getRegistryID());
-			NostrumMagica.proxy.openBook(player, (SpellTome) tome.getItem(), tome);
+			NostrumMagica.instance.proxy.openBook(player, (SpellTome) tome.getItem(), tome);
 			
 			NetworkHandler.getSyncChannel()
 			.sendToServer(new ClientTomeDropSpellMessage(tome, spell.getRegistryID()));

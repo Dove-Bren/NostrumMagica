@@ -177,7 +177,7 @@ public class Spell {
 					}
 					
 					//caster.addChatMessage(comp);
-					NostrumMagica.proxy.sendSpellDebug((PlayerEntity) this.caster, comp);
+					NostrumMagica.instance.proxy.sendSpellDebug((PlayerEntity) this.caster, comp);
 				}
 			
 				boolean first = true;
@@ -222,7 +222,7 @@ public class Spell {
 							else
 								comp = new SpellComponentWrapper(next.getAlteration());
 							
-							NostrumMagica.proxy.spawnEffect(world, comp,
+							NostrumMagica.instance.proxy.spawnEffect(world, comp,
 									caster, null, affected, null,
 									new SpellComponentWrapper(next.getElement()), harmful, 0);
 						}
@@ -235,7 +235,7 @@ public class Spell {
 							else
 								comp = new SpellComponentWrapper(next.getAlteration());
 							
-							NostrumMagica.proxy.spawnEffect(world, comp,
+							NostrumMagica.instance.proxy.spawnEffect(world, comp,
 									caster, null, null, new Vec3d(affectPos.getX() + .5, affectPos.getY(), affectPos.getZ() + .5),
 									new SpellComponentWrapper(next.getElement()), harmful, 0);
 						}
@@ -248,7 +248,7 @@ public class Spell {
 							final Vec3d centerPos = (centerEnt == null ? new Vec3d(centerBP.getX() + .5, centerBP.getY(), centerBP.getZ() + .5) : centerEnt.getPositionVector().addVector(0, centerEnt.height / 2, 0));
 							final float p= (shape.supportedFloats() == null || shape.supportedFloats().length == 0 ? 0 : (
 									param.level == 0f ? shape.supportedFloats()[0] : param.level));
-							NostrumMagica.proxy.spawnEffect(world, new SpellComponentWrapper(shape),
+							NostrumMagica.instance.proxy.spawnEffect(world, new SpellComponentWrapper(shape),
 									caster, null, null, centerPos,
 									new SpellComponentWrapper(next.getElement()), harmful, p);
 						}

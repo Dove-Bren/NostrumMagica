@@ -630,7 +630,7 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 	@Override
 	@Optional.Method(modid="baubles")
 	public boolean canEquip(ItemStack itemstack, LivingEntity player) {
-		if (player.world.isRemote && player != NostrumMagica.proxy.getPlayer()) {
+		if (player.world.isRemote && player != NostrumMagica.instance.proxy.getPlayer()) {
 			return true;
 		}
 		

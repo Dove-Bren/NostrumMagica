@@ -53,7 +53,7 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -62,7 +62,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -457,17 +457,17 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, ITameableEnt
 	
 	@Override
 	public boolean attackEntityFrom(DamageSource source, float amount) {
-		this.playEffect(EnumParticleTypes.CRIT);
+		this.playEffect(ParticleTypes.CRIT);
 		return super.attackEntityFrom(source, amount);
 	}
 	
-	private void playEffect(EnumParticleTypes enumparticletypes) {
+	private void playEffect(ParticleTypes ParticleTypes) {
 		
 		for (int i = 0; i < 15; ++i) {
 			double d0 = this.rand.nextGaussian() * 0.02D;
 			double d1 = this.rand.nextGaussian() * 0.02D;
 			double d2 = this.rand.nextGaussian() * 0.02D;
-			this.world.spawnParticle(enumparticletypes, this.posX + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.posZ + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, d0, d1, d2, new int[0]);
+			this.world.addParticle(ParticleTypes, this.posX + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.posZ + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, d0, d1, d2, new int[0]);
 		}
 	}
 	
@@ -1088,7 +1088,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, ITameableEnt
 				setPollinatedItem(reagentStack);
 			}
 			
-			((WorldServer) world).spawnParticle(EnumParticleTypes.VILLAGER_HAPPY,
+			((ServerWorld) world).addParticle(ParticleTypes.VILLAGER_HAPPY,
 					posX,
 					posY + height / 2,
 					posZ,
@@ -1154,7 +1154,7 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, ITameableEnt
 				&& ((BlockBush) flowerState.getBlock()).canPlaceBlockAt(world, cursor.toImmutable())) {
 			world.setBlockState(cursor.toImmutable(), flowerState);
 			
-			((WorldServer) world).spawnParticle(EnumParticleTypes.VILLAGER_HAPPY,
+			((ServerWorld) world).addParticle(ParticleTypes.VILLAGER_HAPPY,
 					cursor.getX() + .5,
 					cursor.getY() + .5,
 					cursor.getZ() + .5,

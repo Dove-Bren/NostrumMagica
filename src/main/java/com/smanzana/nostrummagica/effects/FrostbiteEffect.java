@@ -77,10 +77,10 @@ public class FrostbiteEffect extends Effect {
 				cloud.setDuration(0);
 				cloud.setWaitTime(interval); // Turn off vanilla effects completely by putting all time in 'wait'
 				final EffectInstance effect = new EffectInstance(NostrumEffects.frostbite, 20 * 3, 2);
-				cloud.setParticle(EnumParticleTypes.SPELL_MOB);
+				cloud.setParticle(ParticleTypes.SPELL_MOB);
 				cloud.setColor(Integer.valueOf(PotionUtils.getPotionColorFromEffectList(Lists.newArrayList(new EffectInstance(NostrumEffects.frostbite, 20 * 3, 2)))));
 				cloud.setIgnoreRadius(true);
-				cloud.setCustomParticle(EnumParticleTypes.FALLING_DUST);
+				cloud.setCustomParticle(ParticleTypes.FALLING_DUST);
 				cloud.setCustomParticleParam1(Block.getStateId(Blocks.SNOW.getDefaultState()));
 				cloud.setCustomParticleYOffset(2f);
 				cloud.setCustomParticleFrequency(.4f);

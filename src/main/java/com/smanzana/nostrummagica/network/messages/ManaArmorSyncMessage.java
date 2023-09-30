@@ -1,82 +1,70 @@
 package com.smanzana.nostrummagica.network.messages;
 
 
+import java.util.function.Supplier;
+
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
  * Server is sending a new copy of the mana armor capability
  * @author Skyler
  *
  */
-public class ManaArmorSyncMessage implements IMessage {
+public class ManaArmorSyncMessage {
 
-	public static class Handler implements IMessageHandler<ManaArmorSyncMessage, IMessage> {
-
-		@Override
-		public IMessage onMessage(ManaArmorSyncMessage message, MessageContext ctx) {
-			//update local attributes
-			
-			NostrumMagica.logger.info("Recieved Mana Armor sync message from server");
-			
-			IManaArmor override = CAPABILITY.getDefaultInstance();
-			CAPABILITY.getStorage().readNBT(CAPABILITY, override, null, message.tag.getTag(NBT_CAP_DATA));
-			
-			final int entID = message.tag.getInt(NBT_ENT_ID);
-			
-			Minecraft.getInstance().runAsync(() -> {
-				@Nullable Entity ent = Minecraft.getInstance().player.getEntityWorld().getEntityByID(entID);
-				if (ent != null) {
-					NostrumMagica.proxy.receiveManaArmorOverride(ent, override);
-				}
-			});
-			
-			
-			return null;
-		}
+	public static void handle(ManaArmorSyncMessage message, Supplier<NetworkEvent.Context> ctx) {
+		//update local attributes
+		ctx.get().setPacketHandled(true);
+		NostrumMagica.logger.info("Recieved Mana Armor sync message from server");
 		
+		Minecraft.getInstance().runAsync(() -> {
+			final Minecraft mc = Minecraft.getInstance();
+			@Nullable Entity ent = mc.player.getEntityWorld().getEntityByID(message.entID);
+			if (ent != null) {
+				NostrumMagica.instance.proxy.receiveManaArmorOverride(ent, message.stats);
+			}
+		});
 	}
-	
-	private static final String NBT_CAP_DATA = "capability";
-	private static final String NBT_ENT_ID = "ent_id";
 	
 	@CapabilityInject(IManaArmor.class)
 	public static Capability<IManaArmor> CAPABILITY = null;
 	
-	protected CompoundNBT tag;
-	
-	public ManaArmorSyncMessage() {
-		tag = new CompoundNBT();
-	}
+	private final int entID;
+	private final IManaArmor stats;
 	
 	public ManaArmorSyncMessage(Entity ent, IManaArmor stats) {
-		this();
+		this(ent.getEntityId(), stats);
+	}
+	
+	public ManaArmorSyncMessage(int entID, IManaArmor stats) {
+		this.entID = entID;
+		this.stats = stats;
+	}
+
+	public static ManaArmorSyncMessage decode(PacketBuffer buf) {
+		IManaArmor stats = CAPABILITY.getDefaultInstance();
+		CAPABILITY.getStorage().readNBT(CAPABILITY, stats, null, buf.readCompoundTag());
 		
-		tag.put(NBT_CAP_DATA, CAPABILITY.getStorage().writeNBT(CAPABILITY, stats, null));
-		tag.putInt(NBT_ENT_ID, ent.getEntityId());
+		return new ManaArmorSyncMessage(
+				buf.readVarInt(),
+				stats
+				);
 	}
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		tag = ByteBufUtils.readTag(buf);
-	}
-
-	@Override
-	public void toBytes(ByteBuf buf) {
-		ByteBufUtils.writeTag(buf, tag);
+	public static void encode(ManaArmorSyncMessage msg, PacketBuffer buf) {
+		buf.writeVarInt(msg.entID);
+		buf.writeCompoundTag((CompoundNBT) CAPABILITY.getStorage().writeNBT(CAPABILITY, msg.stats, null));
 	}
 
 }

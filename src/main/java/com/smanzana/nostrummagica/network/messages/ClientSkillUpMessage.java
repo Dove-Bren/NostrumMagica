@@ -1,26 +1,23 @@
 package com.smanzana.nostrummagica.network.messages;
 
+import java.util.function.Supplier;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
  * Client has requested a skillpoint be spent
  * @author Skyler
  *
  */
-public class ClientSkillUpMessage implements IMessage {
+public class ClientSkillUpMessage {
 	
 	public static enum Type {
 		TECHNIQUE,
@@ -28,75 +25,54 @@ public class ClientSkillUpMessage implements IMessage {
 		CONTROL,
 	}
 
-	public static class Handler implements IMessageHandler<ClientSkillUpMessage, StatSyncMessage> {
-
-		@Override
-		public StatSyncMessage onMessage(ClientSkillUpMessage message, MessageContext ctx) {
-			if (!message.tag.contains(NBT_TYPE, NBT.TAG_INT))
-				return null;
+	public static void handle(ClientSkillUpMessage message, Supplier<NetworkEvent.Context> ctx) {
+		ctx.get().setPacketHandled(true);
+		ctx.get().enqueueWork(() -> {
+			PlayerEntity sp = ctx.get().getSender();
+			INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
 			
-			ctx.getServerHandler().player.getServerWorld().runAsync(() -> {
-				PlayerEntity sp = ctx.getServerHandler().player;
-				INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
-				
-				if (att == null) {
-					NostrumMagica.logger.warn("Could not look up player magic wrapper");
+			if (att == null) {
+				NostrumMagica.logger.warn("Could not look up player magic wrapper");
+				return;
+			}
+			
+			if (att.getSkillPoints() > 0) {
+				switch (message.type) {
+				case CONTROL:
+					att.addControl();
+					break;
+				case FINESSE:
+					att.addFinesse();
+					break;
+				case TECHNIQUE:
+					att.addTech();
+					break;
+				default: // don't take point when something's wrong!
 					return;
 				}
-				
-				int ord = message.tag.getInt(NBT_TYPE);
-				
-				Type type = Type.values()[ord];
-				
-				if (att.getSkillPoints() > 0) {
-					switch (type) {
-					case CONTROL:
-						att.addControl();
-						break;
-					case FINESSE:
-						att.addFinesse();
-						break;
-					case TECHNIQUE:
-						att.addTech();
-						break;
-					default: // don't take point when something's wrong!
-						return;
-					}
-					att.takeSkillPoint();
-				}
-				
-				NetworkHandler.getSyncChannel().sendTo(new StatSyncMessage(att),
-						ctx.getServerHandler().player);
-			});
-
-			return null;
-		}
+				att.takeSkillPoint();
+			}
+			
+			NetworkHandler.getSyncChannel().sendTo(new StatSyncMessage(att),
+					ctx.get().getSender());
+		});
 	}
 
-	private static final String NBT_TYPE = "type";
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
-	protected CompoundNBT tag;
-	
-	public ClientSkillUpMessage() {
-		tag = new CompoundNBT();
-	}
+	private final Type type;
 	
 	public ClientSkillUpMessage(Type type) {
-		tag = new CompoundNBT();
-		
-		tag.putInt(NBT_TYPE, type.ordinal());
+		this.type = type;
 	}
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		tag = ByteBufUtils.readTag(buf);
+	public static ClientSkillUpMessage decode(PacketBuffer buf) {
+		return new ClientSkillUpMessage(buf.readEnumValue(Type.class));
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		ByteBufUtils.writeTag(buf, tag);
+	public static void encode(ClientSkillUpMessage msg, PacketBuffer buf) {
+		buf.writeEnumValue(msg.type);
 	}
 
 }

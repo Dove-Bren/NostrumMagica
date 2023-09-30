@@ -46,7 +46,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
-import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -383,13 +383,13 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
 		return hurt;
 	}
 	
-	private void playEffect(EnumParticleTypes enumparticletypes) {
+	private void playEffect(ParticleTypes ParticleTypes) {
 		
 		for (int i = 0; i < 15; ++i) {
 			double d0 = this.rand.nextGaussian() * 0.02D;
 			double d1 = this.rand.nextGaussian() * 0.02D;
 			double d2 = this.rand.nextGaussian() * 0.02D;
-			this.world.spawnParticle(enumparticletypes, this.posX + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.posZ + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, d0, d1, d2, new int[0]);
+			this.world.addParticle(ParticleTypes, this.posX + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.posZ + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, d0, d1, d2, new int[0]);
 		}
 	}
 	
@@ -397,7 +397,7 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
 	@Override
 	public void handleStatusUpdate(byte id) {
 		if (id == 6) {
-			playEffect(EnumParticleTypes.VILLAGER_ANGRY);
+			playEffect(ParticleTypes.VILLAGER_ANGRY);
 		}
 	}
 	

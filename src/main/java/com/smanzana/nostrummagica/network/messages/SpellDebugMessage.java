@@ -1,19 +1,17 @@
 package com.smanzana.nostrummagica.network.messages;
 
+import java.util.function.Supplier;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.config.ModConfig;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
  * A spell was cast and the server has generated the debug information
@@ -21,57 +19,34 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
  * @author Skyler
  *
  */
-public class SpellDebugMessage implements IMessage {
+public class SpellDebugMessage {
 
-	public static class Handler implements IMessageHandler<SpellDebugMessage, IMessage> {
-
-		@Override
-		public IMessage onMessage(SpellDebugMessage message, MessageContext ctx) {
-
-			if (!ModConfig.config.spellDebug()) {
-				return null;
-			}
-			
-			String chat = message.tag.getString(NBT_CHAT);
-			if (chat == null || chat.trim().isEmpty())
-				return null;
-			
-			final ITextComponent text = ITextComponent.Serializer.jsonToComponent(chat);
-			
-			Minecraft.getInstance().runAsync(() -> {
-				NostrumMagica.proxy.getPlayer().sendMessage(text);
-			});
-			
-			
-			return null;
+	public static void handle(SpellDebugMessage message, Supplier<NetworkEvent.Context> ctx) {
+		ctx.get().setPacketHandled(true);
+		if (!ModConfig.config.spellDebug()) {
+			return;
 		}
 		
+		Minecraft.getInstance().runAsync(() -> {
+			NostrumMagica.instance.proxy.getPlayer().sendMessage(message.comp);
+		});
 	}
 
-	private static final String NBT_CHAT = "chat";
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
-	protected CompoundNBT tag;
-	
-	public SpellDebugMessage() {
-		tag = new CompoundNBT();
-	}
+	private final ITextComponent comp;
 	
 	public SpellDebugMessage(ITextComponent comp) {
-		tag = new CompoundNBT();
-		
-		tag.putString(NBT_CHAT, ITextComponent.Serializer.componentToJson(comp));
+		this.comp = comp;
 	}
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		tag = ByteBufUtils.readTag(buf);
+	public static SpellDebugMessage decode(PacketBuffer buf) {
+		return new SpellDebugMessage(buf.readTextComponent());
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		ByteBufUtils.writeTag(buf, tag);
+	public static void encode(SpellDebugMessage msg, PacketBuffer buf) {
+		buf.writeTextComponent(msg.comp);
 	}
 
 }

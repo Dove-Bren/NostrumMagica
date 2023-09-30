@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.integration.aetheria.items.AetherResourceType;
 import com.smanzana.nostrummagica.integration.aetheria.items.ItemAetherLens;
 import com.smanzana.nostrummagica.integration.aetheria.items.NostrumAetherResourceItem;
 import com.smanzana.nostrummagica.integration.aetheria.items.ItemAetherLens.LensType;
-import com.smanzana.nostrummagica.proxy.ClientProxy;
+import com.smanzana.NostrumMagica.instance.proxy.ClientProxy;
 
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.item.Item;
