@@ -10,21 +10,19 @@
   ],
   "key": {
     "C": {
-      "item": "#RESOURCE_CRYSTALLARGE"
+      "tag": "nostrummagica:crystal_large"
     },
     "S": {
       "item": "nostrummagica:dragon_egg_part"
     },
     "N": {
-      "type": "forge:ore_dict",
-	  "ore": "netherStar"
+      "tag": "forge:nether_stars"
     },
     "E": {
       "item": "minecraft:dragon_egg"
     },
     "G": {
-      "type": "forge:ore_dict",
-	  "ore": "blockGold"
+      "tag": "forge:storage_blocks/gold"
     }
   },
   "remaining": [

@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "result": {
-    "item": "nostrummagica:magichelmbase"
+    "item": "nostrummagica:magicarmor_helm"
   },
   "pattern": [
     "CCC",
@@ -10,11 +10,10 @@
   ],
   "key": {
     "C": {
-      "item": "#INFUSEDGEM_VOID"
+      "tag": "nostrummagica:infusedgem/void"
     },
     "D": {
-      "item": "minecraft:iron_helmet",
-      "data": 0
+      "item": "minecraft:iron_helmet"
     }
   }
 }

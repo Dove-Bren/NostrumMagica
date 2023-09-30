@@ -10,19 +10,16 @@
   ],
   "key": {
     "R": {
-      "item": "#REAGENT_ANY"
+      "tag": "nostrummagica:reagent"
     },
     "Q": {
-      "type": "forge:ore_dict",
-	  "ore": "gemQuartz"
+      "tag": "forge:gems/quartz"
     },
     "G": {
-      "type": "forge:ore_dict",
-	  "ore": "blockGlass"
+      "tag": "forge:glass"
     },
     "S": {
-      "type": "forge:ore_dict",
-	  "ore": "stone"
+      "tag": "forge:stone"
     }
   }
 }

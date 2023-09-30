@@ -10,30 +10,28 @@
   ],
   "key": {
     "C": {
-      "item": "#RESOURCE_CRYSTALMEDIUM"
+      "tag": "nostrummagica:crystal_medium"
     },
     "A": {
-      "type": "forge:ore_dict",
-	  "ore": "ingotGold"
+      "tag": "forge:ingots/gold"
     },
     "E": {
-      "type": "forge:ore_dict",
-	  "ore": "pearlEnderEye"
+      "item": "minecraft:ender_eye"
     },
     "S": {
-      "item": "#REAGENT_SKYASH"
+      "tag": "nostrummagica:reagent/sky_ash"
     },
     "G": {
-      "item": "#REAGENT_GINSENG"
+      "tag": "nostrummagica:reagent/ginseng"
     },
     "M": {
-      "item": "#REAGENT_MANDRAKE"
+      "tag": "nostrummagica:reagent/mandrake_root"
     },
     "B": {
-      "item": "#REAGENT_BLACKPEARL"
+      "tag": "nostrummagica:reagent/black_pearl"
     },
     "D": {
-      "item": "#REAGENT_MANIDUST"
+      "tag": "nostrummagica:reagent/mani_dust"
     }
   }
 }

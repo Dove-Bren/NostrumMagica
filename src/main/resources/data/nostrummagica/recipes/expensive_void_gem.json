@@ -1,8 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "result": {
-    "item": "nostrum_gem",
-	"data": 0
+    "item": "nostrummagica:nostrum_gem_unattuned"
   },
   "pattern": [
     " G ",
@@ -11,17 +10,16 @@
   ],
   "key": {
     "D": {
-      "item": "#REAGENT_MANIDUST"
+      "tag": "nostrummagica:reagent/mani_dust"
     },
     "G": {
-      "item": "#REAGENT_GRAVEDUST"
+      "tag": "nostrummagica:reagent/grave_dust"
     },
     "E": {
-      "type": "forge:ore_dict",
-	  "ore": "enderpearl"
+      "tag": "forge:ender_pearls"
     },
     "B": {
-      "item": "#REAGENT_BLACKPEARL"
+      "tag": "nostrummagica:reagent/black_pearl"
     }
   }
 }

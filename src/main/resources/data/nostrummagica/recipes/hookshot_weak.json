@@ -1,8 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "result": {
-    "item": "hookshot",
-	"data": 0
+    "item": "hookshot_weak"
   },
   "pattern": [
     " RF",
@@ -11,20 +10,16 @@
   ],
   "key": {
     "W": {
-      "type": "forge:ore_dict",
-	  "ore": "plankWood"
+      "tag": "minecraft:planks"
     },
     "R": {
-      "type": "forge:ore_dict",
-	  "ore": "dustRedstone"
+      "item": "minecraft:redstone"
     },
     "D": {
-      "type": "forge:ore_dict",
-	  "ore": "gemDiamond"
+      "tag": "forge:gems/diamond"
     },
     "I": {
-      "type": "forge:ore_dict",
-	  "ore": "blockIron"
+      "tag": "forge:storage_blocks/iron"
     },
     "F": {
       "item": "minecraft:flint"

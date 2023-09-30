@@ -69,6 +69,8 @@ public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, I
 	public static final Item ringShieldLarge;
 	public static final Item eludeCape;
 	public static final Item dragonWingPendant;
+	
+	private static final String ID_PREFIX = "bauble_";
 
 	public static enum ItemType {
 		RIBBON_SMALL("ribbon_small"),

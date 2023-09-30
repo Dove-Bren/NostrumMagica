@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "result": {
-    "item": "nostrummagica:magicchestbase"
+    "item": "nostrummagica:magicarmor_chest"
   },
   "pattern": [
     "CDC",
@@ -10,11 +10,10 @@
   ],
   "key": {
     "C": {
-      "item": "#INFUSEDGEM_VOID"
+      "tag": "nostrummagica:infusedgem/void"
     },
     "D": {
-      "item": "minecraft:iron_chestplate",
-      "data": 0
+      "item": "minecraft:iron_chestplate"
     }
   }
 }

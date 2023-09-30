@@ -10,11 +10,10 @@
   ],
   "key": {
     "C": {
-      "item": "minecraft:iron_sword",
-      "data": 0
+      "item": "minecraft:iron_sword"
     },
     "S": {
-      "item": "#INFUSEDGEM_VOID"
+      "tag": "nostrummagica:infusedgem/void"
     }
   }
 }

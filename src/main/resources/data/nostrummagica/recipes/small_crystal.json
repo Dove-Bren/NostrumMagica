@@ -1,8 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "result": {
-    "item": "nostrum_resource",
-	"data": 1
+    "item": "nostrummagica:crystal_small"
   },
   "pattern": [
     " MR",
@@ -11,14 +10,13 @@
   ],
   "key": {
     "M": {
-      "item": "#REAGENT_MANIDUST"
+      "tag": "nostrummagica:reagent/mani_dust"
     },
     "R": {
-      "item": "#REAGENT_ANY"
+      "tag": "nostrummagica:reagent"
     },
     "D": {
-      "type": "forge:ore_dict",
-	  "ore": "gemDiamond"
+      "tag": "forge:gems/diamond"
     }
   }
 }

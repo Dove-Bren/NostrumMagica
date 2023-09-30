@@ -173,7 +173,7 @@ public final class BaubleColorRecipe extends ShapelessRecipe {
 	
 	public static final class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>>  implements IRecipeSerializer<BaubleColorRecipe> {
 
-		public static final String ID = "nostrum_bauble_color";
+		public static final String ID = "bauble_color";
 		
 		@Override
 		public BaubleColorRecipe read(ResourceLocation recipeId, JsonObject json) {

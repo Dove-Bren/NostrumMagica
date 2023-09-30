@@ -11,10 +11,10 @@
       "item": "minecraft:paper"
     },
     {
-      "item": "#REAGENT_MANDRAKE"
+      "tag": "nostrummagica:reagent/mandrake_root"
     },
     {
-      "item": "#REAGENT_CRYSTABLOOM"
+      "tag": "nostrummagica:reagent/crystabloom"
     }
   ]
 }

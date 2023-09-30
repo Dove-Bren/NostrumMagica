@@ -14,11 +14,10 @@
 	  "data": 0
     },
     "T": {
-      "type": "forge:ore_dict",
-	  "ore": "stone"
+      "tag": "forge:stone"
     },
     "R": {
-      "item": "#RESOURCE_CRYSTALMEDIUM"
+      "tag": "nostrummagica:crystal_medium"
     }
   }
 }

@@ -9,7 +9,7 @@
   ],
   "key": {
     "W": {
-      "item": "#REAGENT_SPIDERSILK"
+      "tag": "nostrummagica:reagent/spider_silk"
     },
     "F": {
       "item": "minecraft:rotten_flesh"

@@ -10,21 +10,19 @@
   ],
   "key": {
     "P": {
-	  "type": "forge:ore_dict",
-      "ore": "plankWood"
+	  "tag": "minecraft:planks"
     },
     "L": {
-	  "type": "forge:ore_dict",
-	  "ore": "logWood"
+	  "tag": "minecraft:logs"
     },
     "C": {
-      "item": "#REAGENT_CRYSTABLOOM"
+      "tag": "nostrummagica:reagent/crystabloom"
     },
     "B": {
-      "item": "#REAGENT_BLACKPEARL"
+      "tag": "nostrummagica:reagent/black_pearl"
     },
     "D": {
-      "item": "#REAGENT_MANIDUST"
+      "tag": "nostrummagica:reagent/mani_dust"
     }
   }
 }

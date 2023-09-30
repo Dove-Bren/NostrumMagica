@@ -1,15 +1,14 @@
 {
-  "type": "forge:ore_shapeless",
+  "type": "minecraft:crafting_shapeless",
   "result": {
-    "item": "nostrum_essence",
-	"data": 0
+    "item": "nostrummagica:nostrum_essence_physical"
   },
   "ingredients": [
     {
-      "item": "#ESSENCE_ENDER"
+      "tag": "nostrummagica:essence/ender"
     },
     {
-      "item": "#ESSENCE_ENDER"
+      "tag": "nostrummagica:essence/ender"
     }
   ]
 }

@@ -10,11 +10,10 @@
   ],
   "key": {
     "D": {
-      "type": "forge:ore_dict",
-	  "ore": "dirt"
+      "tag": "forge:dirt"
     },
     "C": {
-      "item": "#INFUSEDGEM_VOID"
+      "tag": "nostrummagica:infusedgem/void"
     }
   }
 }

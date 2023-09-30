@@ -1,15 +1,14 @@
 {
-  "type": "forge:ore_shapeless",
+  "type": "minecraft:crafting_shapeless",
   "result": {
-    "item": "nostrum_essence",
-	"data": 2
+    "item": "nostrummagica:nostrum_essence_fire"
   },
   "ingredients": [
     {
-      "item": "#ESSENCE_LIGHTNING"
+      "tag": "nostrummagica:essence/lightning"
     },
     {
-      "item": "#ESSENCE_LIGHTNING"
+      "tag": "nostrummagica:essence/lightning"
     }
   ]
 }

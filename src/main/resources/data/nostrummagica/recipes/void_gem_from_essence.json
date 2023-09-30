@@ -1,30 +1,29 @@
 {
-  "type": "forge:ore_shapeless",
+  "type": "minecraft:crafting_shapeless",
   "result": {
-    "item": "nostrum_gem",
-	"data": 0
+    "item": "nostrum_gem_unattuned"
   },
   "ingredients": [
     {
-      "item": "#ESSENCE_VOID"
+      "tag": "nostrummagica:essence/void"
     },
     {
-      "item": "#ESSENCE_EARTH"
+      "tag": "nostrummagica:essence/earth"
     },
     {
-      "item": "#ESSENCE_ENDER"
+      "tag": "nostrummagica:essence/ender"
     },
     {
-      "item": "#ESSENCE_FIRE"
+      "tag": "nostrummagica:essence/fire"
     },
     {
-      "item": "#ESSENCE_ICE"
+      "tag": "nostrummagica:essence/ice"
     },
     {
-      "item": "#ESSENCE_LIGHTNING"
+      "tag": "nostrummagica:essence/lightning"
     },
     {
-      "item": "#ESSENCE_WIND"
+      "tag": "nostrummagica:essence/wind"
     }
   ]
 }

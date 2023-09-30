@@ -1,15 +1,14 @@
 {
-  "type": "forge:ore_shapeless",
+  "type": "minecraft:crafting_shapeless",
   "result": {
-    "item": "nostrum_essence",
-	"data": 3
+    "item": "nostrummagica:nostrum_essence_earth"
   },
   "ingredients": [
     {
-      "item": "#ESSENCE_FIRE"
+      "tag": "nostrummagica:essence/fire"
     },
     {
-      "item": "#ESSENCE_FIRE"
+      "tag": "nostrummagica:essence/fire"
     }
   ]
 }

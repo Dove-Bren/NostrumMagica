@@ -1,19 +1,17 @@
 {
-  "type": "forge:ore_shapeless",
+  "type": "minecraft:crafting_shapeless",
   "result": {
     "item": "nostrummagica:nostrum_chalk"
   },
   "ingredients": [
     {
-      "item": "minecraft:dye",
-	  "data": 15
+      "item": "minecraft:bone_meal"
     },
     {
-      "item": "minecraft:dye",
-	  "data": 15
+      "item": "minecraft:bone_meal"
     },
     {
-      "item": "#REAGENT_GRAVEDUST"
+      "tag": "nostrummagica:reagent/grave_dust"
     }
   ]
 }

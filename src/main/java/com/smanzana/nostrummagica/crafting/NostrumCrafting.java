@@ -2,8 +2,12 @@ package com.smanzana.nostrummagica.crafting;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
+import net.minecraft.block.Blocks;
+import net.minecraft.item.Items;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.SpecialRecipeSerializer;
+import net.minecraft.tags.ItemTags;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -29,6 +33,8 @@ public class NostrumCrafting {
 		
 		registry.register(new SpecialRecipeSerializer<SpellTomePageCombineRecipe>(SpellTomePageCombineRecipe::new)
 				.setRegistryName(SpellTomePageCombineRecipe.SERIALIZER_ID));
+		
+		
 		
 	}
 }

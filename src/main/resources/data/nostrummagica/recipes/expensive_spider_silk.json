@@ -1,8 +1,7 @@
 {
-  "type": "forge:ore_shapeless",
+  "type": "minecraft:crafting_shapeless",
   "result": {
-    "item": "nostrum_reagent",
-	"data": 1
+    "item": "nostrummagica:reagent_spider_silk"
   },
   "ingredients": [
     {

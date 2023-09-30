@@ -1,19 +1,17 @@
 {
   "type": "nostrummagica:bauble_color",
   "display": {
-	  "item": "nostrummagica:ribbon",
-	  "data": 17,
+	  "item": "nostrummagica:bauble_dragon_wing_pendant",
 	  "nbt": {
 		  "element": "WIND"
 	  }
   },
   "ingredients": [
     {
-      "item": "nostrummagica:ribbon",
-	  "data": 17
+      "item": "nostrummagica:bauble_dragon_wing_pendant"
     },
     {
-      "item": "#ESSENCE_WIND"
+      "tag": "nostrummagica:essence/wind"
     }
   ]
 }

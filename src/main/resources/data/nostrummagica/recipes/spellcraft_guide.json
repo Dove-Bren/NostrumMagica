@@ -1,5 +1,5 @@
 {
-  "type": "forge:ore_shapeless",
+  "type": "minecraft:crafting_shapeless",
   "result": {
     "item": "nostrummagica:spellcraft_book"
   },
@@ -14,7 +14,7 @@
       "item": "minecraft:leather"
     },
     {
-      "item": "#RUNE_ANY"
+      "item": "rune"
     }
   ]
 }
