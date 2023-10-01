@@ -3,10 +3,9 @@ package com.smanzana.nostrummagica.spells.components.triggers;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 
-import net.minecraft.entity.MobEntity;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.Vec3d;
@@ -60,7 +59,7 @@ public class AITargetTrigger extends InstantTrigger {
 
 	@Override
 	public ItemStack getCraftItem() {
-		return new ItemStack(Item.getItemFromBlock(Blocks.BEDROCK));
+		return new ItemStack(Blocks.BEDROCK);
 	}
 
 	@Override

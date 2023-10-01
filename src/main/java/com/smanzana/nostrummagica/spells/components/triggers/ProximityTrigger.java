@@ -11,12 +11,11 @@ import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -103,8 +102,8 @@ public class ProximityTrigger extends SpellTrigger {
 	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return NonNullList.from(ItemStack.EMPTY,
-				ReagentItem.instance().getReagent(ReagentType.GRAVE_DUST, 1),
-				ReagentItem.instance().getReagent(ReagentType.BLACK_PEARL, 1));
+				ReagentItem.CreateStack(ReagentType.GRAVE_DUST, 1),
+				ReagentItem.CreateStack(ReagentType.BLACK_PEARL, 1));
 	}
 
 	@Override
@@ -121,7 +120,7 @@ public class ProximityTrigger extends SpellTrigger {
 
 	@Override
 	public ItemStack getCraftItem() {
-		return new ItemStack(Item.getItemFromBlock(Blocks.TRIPWIRE_HOOK));
+		return new ItemStack(Blocks.TRIPWIRE_HOOK);
 	}
 
 	@Override

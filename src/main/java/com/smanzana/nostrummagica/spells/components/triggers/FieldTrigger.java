@@ -2,18 +2,17 @@ package com.smanzana.nostrummagica.spells.components.triggers;
 
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.items.NostrumResourceItem;
-import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
+import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -100,9 +99,9 @@ public class FieldTrigger extends TriggerAreaTrigger {
 	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return NonNullList.from(ItemStack.EMPTY,
-				ReagentItem.instance().getReagent(ReagentType.BLACK_PEARL, 1),
-				ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1),
-				ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1));
+				ReagentItem.CreateStack(ReagentType.BLACK_PEARL, 1),
+				ReagentItem.CreateStack(ReagentType.SKY_ASH, 1),
+				ReagentItem.CreateStack(ReagentType.MANI_DUST, 1));
 	}
 
 	@Override
@@ -141,7 +140,7 @@ public class FieldTrigger extends TriggerAreaTrigger {
 				new ItemStack(Items.DRAGON_BREATH),
 				new ItemStack(Blocks.EMERALD_BLOCK),
 				new ItemStack(Blocks.DIAMOND_BLOCK),
-				NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1)
+				new ItemStack(NostrumItems.crystalLarge, 1)
 				);
 		}
 		return costs;

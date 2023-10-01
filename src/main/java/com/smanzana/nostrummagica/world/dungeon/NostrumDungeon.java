@@ -372,11 +372,11 @@ public class NostrumDungeon {
 				if (rand.nextFloat() < .2) {
 					loot.set(i, new ItemStack(Items.ARROW, rand.nextInt(3) + 1));
 				} else if (rand.nextFloat() < .5) {
-					loot.set(i, ReagentItem.instance().getReagent(
+					loot.set(i, ReagentItem.CreateStack(
 							ReagentType.values()[rand.nextInt(ReagentType.values().length)],
 							rand.nextInt(10) + 1));
 				} else if (rand.nextFloat() < .5) {
-					loot.set(i, ReagentItem.instance().getReagent(
+					loot.set(i, ReagentItem.CreateStack(
 							ReagentType.values()[rand.nextInt(ReagentType.values().length)],
 							rand.nextInt(20) + 1));
 				}

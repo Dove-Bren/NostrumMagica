@@ -147,7 +147,7 @@ public class SpellRegistry extends WorldSavedData {
 	}
 
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
+	public void read(CompoundNBT nbt) {
 		synchronized(this) {
 			this.registry.clear();
 			this.transients.clear();
@@ -171,15 +171,15 @@ public class SpellRegistry extends WorldSavedData {
 	}
 
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
+	public CompoundNBT write(CompoundNBT nbt) {
 		
 		NostrumMagica.logger.info("Saving Spell registry");
 		
 		synchronized(this) {
 			for (Entry<Integer, Spell> entry : registry.entrySet()) {
 				if (transients.isEmpty() || !transients.contains(entry.getKey()))
-					if (!entry.get().isEmpty())
-						nbt.put(entry.getKey() + "", entry.get().toNBT());
+					if (!entry.getValue().isEmpty())
+						nbt.put(entry.getKey() + "", entry.getValue().toNBT());
 			}
 		}
 		

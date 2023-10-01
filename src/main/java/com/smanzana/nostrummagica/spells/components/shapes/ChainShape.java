@@ -16,8 +16,8 @@ import com.smanzana.nostrummagica.spells.components.SpellShape;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -133,8 +133,8 @@ public class ChainShape extends SpellShape {
 	@Override
 	public NonNullList<ItemStack> getReagents() {
 		NonNullList<ItemStack> list = NonNullList.from(ItemStack.EMPTY,
-			ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1),
-			ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1)
+			ReagentItem.CreateStack(ReagentType.SKY_ASH, 1),
+			ReagentItem.CreateStack(ReagentType.MANDRAKE_ROOT, 1)
 		);
 		
 		return list;

@@ -40,7 +40,7 @@ public class CasterTrigger extends InstantTrigger {
 	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return NonNullList.from(ItemStack.EMPTY,
-				ReagentItem.instance().getReagent(ReagentType.CRYSTABLOOM, 1));
+				ReagentItem.CreateStack(ReagentType.CRYSTABLOOM, 1));
 	}
 
 	@Override

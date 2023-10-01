@@ -84,4 +84,8 @@ public class EssenceItem extends Item implements ILoreTagged {
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_ITEMS;
 	}
+	
+	public EMagicElement getElement() {
+		return this.element;
+	}
 }

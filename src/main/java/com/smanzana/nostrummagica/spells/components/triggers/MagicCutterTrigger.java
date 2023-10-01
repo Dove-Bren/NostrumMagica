@@ -11,19 +11,18 @@ import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class MagicCutterTrigger extends SpellTrigger {
 	
@@ -53,7 +52,7 @@ public class MagicCutterTrigger extends SpellTrigger {
 			final Vec3d dir;
 			if (caster instanceof MobEntity && ((MobEntity) caster).getAttackTarget() != null) {
 				MobEntity ent = (MobEntity) caster  ;
-				dir = ent.getAttackTarget().getPositionVector().addVector(0.0, ent.height / 2.0, 0.0)
+				dir = ent.getAttackTarget().getPositionVector().add(0.0, ent.getHeight() / 2.0, 0.0)
 						.subtract(caster.posX, caster.posY + caster.getEyeHeight(), caster.posZ);
 			} else {
 				dir = MagicCutterTrigger.getVectorForRotation(pitch, yaw);
@@ -149,7 +148,7 @@ public class MagicCutterTrigger extends SpellTrigger {
 	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return NonNullList.from(ItemStack.EMPTY,
-				ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1));
+				ReagentItem.CreateStack(ReagentType.SKY_ASH, 1));
 	}
 
 	@Override
@@ -159,7 +158,7 @@ public class MagicCutterTrigger extends SpellTrigger {
 
 	@Override
 	public ItemStack getCraftItem() {
-		return new ItemStack(Items.SNOWBALL, 1, OreDictionary.WILDCARD_VALUE);
+		return new ItemStack(Items.SNOWBALL, 1);
 	}
 
 	@Override

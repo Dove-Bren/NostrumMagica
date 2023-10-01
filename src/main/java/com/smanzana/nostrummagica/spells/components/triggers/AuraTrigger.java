@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.ReagentItem;
@@ -16,14 +17,16 @@ import com.smanzana.nostrummagica.listeners.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.utils.Entities;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 public class AuraTrigger extends TriggerAreaTrigger {
 	
@@ -63,7 +66,7 @@ public class AuraTrigger extends TriggerAreaTrigger {
 		
 		protected boolean canAffect(LivingEntity entity) {
 			return entity != null
-					&& !entity.isDead
+					&& entity.isAlive()
 					&& (
 							includeAllies
 							|| !NostrumMagica.IsSameTeam(entity, origin)
@@ -75,7 +78,7 @@ public class AuraTrigger extends TriggerAreaTrigger {
 		}
 
 		protected void doEffect() {
-			if (origin != null && !origin.isDead)
+			if (origin != null && origin.isAlive())
 			for (int i = 0; i < radius + 1; i++) {
 				NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 						1,
@@ -106,7 +109,7 @@ public class AuraTrigger extends TriggerAreaTrigger {
 			
 			if (type == Event.TIME) {
 				
-				if (origin.isDead || origin.world.provider.getDimension() != world.provider.getDimension()) {
+				if (!origin.isAlive() || origin.world.getDimension().getType() != world.getDimension().getType()) {
 					this.dead = true;
 					return true;
 				}
@@ -120,7 +123,7 @@ public class AuraTrigger extends TriggerAreaTrigger {
 				}
 				
 				// Check all entities in the world
-				for (LivingEntity e : world.getEntities(LivingEntity.class, (e) -> {return canAffect(e) && isInArea(e);})) {
+				for (LivingEntity e : Entities.GetEntities((ServerWorld) world, (e) -> {return canAffect(e) && isInArea(e);})) {
 					if (visitEntity(e)) {
 						TriggerData data = new TriggerData(
 								Lists.newArrayList(e),
@@ -145,7 +148,7 @@ public class AuraTrigger extends TriggerAreaTrigger {
 		 * @return
 		 */
 		protected boolean visitEntity(LivingEntity entity) {
-			if (entity == null || entity.isDead) {
+			if (entity == null || !entity.isAlive()) {
 				return false;
 			}
 			
@@ -182,10 +185,10 @@ public class AuraTrigger extends TriggerAreaTrigger {
 	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return NonNullList.from(ItemStack.EMPTY,
-				ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1),
-				ReagentItem.instance().getReagent(ReagentType.BLACK_PEARL, 1),
-				ReagentItem.instance().getReagent(ReagentType.CRYSTABLOOM, 1),
-				ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1));
+				ReagentItem.CreateStack(ReagentType.SKY_ASH, 1),
+				ReagentItem.CreateStack(ReagentType.BLACK_PEARL, 1),
+				ReagentItem.CreateStack(ReagentType.CRYSTABLOOM, 1),
+				ReagentItem.CreateStack(ReagentType.MANI_DUST, 1));
 	}
 
 	@Override
@@ -223,8 +226,8 @@ public class AuraTrigger extends TriggerAreaTrigger {
 			costs = NonNullList.from(ItemStack.EMPTY,
 				ItemStack.EMPTY,
 				new ItemStack(Items.DRAGON_BREATH),
-				NostrumResourceItem.getItem(ResourceType.SPRITE_CORE, 1),
-				NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1)
+				new ItemStack(NostrumItems.resourceSpriteCore, 1),
+				new ItemStack(NostrumItems.crystalMedium, 1)
 				);
 		}
 		return costs;

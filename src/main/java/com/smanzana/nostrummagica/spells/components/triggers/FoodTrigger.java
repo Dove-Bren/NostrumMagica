@@ -18,12 +18,12 @@ import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -79,7 +79,7 @@ public class FoodTrigger extends SpellTrigger {
 							null
 							);
 					
-					this.entity.world.getMinecraftServer().runAsync(() -> {
+					this.entity.world.getServer().runAsync(() -> {
 						this.trigger(data);
 						NostrumMagica.instance.proxy.spawnEffect(this.getState().getSelf().world,
 								new SpellComponentWrapper(instance()),
@@ -135,8 +135,8 @@ public class FoodTrigger extends SpellTrigger {
 	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return NonNullList.from(ItemStack.EMPTY,
-				ReagentItem.instance().getReagent(ReagentType.GINSENG, 1),
-				ReagentItem.instance().getReagent(ReagentType.GRAVE_DUST, 1));
+				ReagentItem.CreateStack(ReagentType.GINSENG, 1),
+				ReagentItem.CreateStack(ReagentType.GRAVE_DUST, 1));
 	}
 
 	@Override

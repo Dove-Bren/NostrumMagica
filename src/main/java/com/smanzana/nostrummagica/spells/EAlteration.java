@@ -48,7 +48,7 @@ public enum EAlteration {
 	 * @return
 	 */
 	public NonNullList<ItemStack> getReagents() {
-		return NonNullList.from(ItemStack.EMPTY, ReagentItem.instance().getReagent(reagent, 1));
+		return NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(reagent, 1));
 	}
 	
 }

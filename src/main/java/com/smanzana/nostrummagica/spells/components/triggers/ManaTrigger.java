@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.items.EssenceItem;
+import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
@@ -19,17 +19,16 @@ import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class ManaTrigger extends SpellTrigger {
 	
@@ -76,7 +75,7 @@ public class ManaTrigger extends SpellTrigger {
 							null
 							);
 					
-					this.entity.world.getMinecraftServer().runAsync(() -> {
+					this.entity.world.getServer().runAsync(() -> {
 						this.trigger(data);
 						NostrumMagica.instance.proxy.spawnEffect(this.getState().getSelf().world,
 								new SpellComponentWrapper(instance()),
@@ -132,8 +131,8 @@ public class ManaTrigger extends SpellTrigger {
 	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return NonNullList.from(ItemStack.EMPTY,
-				ReagentItem.instance().getReagent(ReagentType.GRAVE_DUST, 1),
-				ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1));
+				ReagentItem.CreateStack(ReagentType.GRAVE_DUST, 1),
+				ReagentItem.CreateStack(ReagentType.MANI_DUST, 1));
 	}
 
 	@Override
@@ -150,7 +149,7 @@ public class ManaTrigger extends SpellTrigger {
 
 	@Override
 	public ItemStack getCraftItem() {
-		return new ItemStack(EssenceItem.instance(), 1, OreDictionary.WILDCARD_VALUE);
+		return new ItemStack(NostrumItems.essenceIce, 1);
 	}
 
 	@Override

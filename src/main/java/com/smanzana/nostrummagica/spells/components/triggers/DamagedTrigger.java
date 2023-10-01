@@ -17,13 +17,12 @@ import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -66,7 +65,7 @@ public class DamagedTrigger extends SpellTrigger {
 							null
 							);
 					
-					entity.world.getMinecraftServer().runAsync(() -> {
+					entity.world.getServer().runAsync(() -> {
 						this.trigger(data);
 						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_DAMAGE, this.entity);
 					});
@@ -119,8 +118,8 @@ public class DamagedTrigger extends SpellTrigger {
 	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return NonNullList.from(ItemStack.EMPTY,
-				ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1),
-				ReagentItem.instance().getReagent(ReagentType.GRAVE_DUST, 1));
+				ReagentItem.CreateStack(ReagentType.SPIDER_SILK, 1),
+				ReagentItem.CreateStack(ReagentType.GRAVE_DUST, 1));
 	}
 
 	@Override
@@ -136,7 +135,7 @@ public class DamagedTrigger extends SpellTrigger {
 
 	@Override
 	public ItemStack getCraftItem() {
-		return new ItemStack(Item.getItemFromBlock(Blocks.CACTUS));
+		return new ItemStack(Blocks.CACTUS);
 	}
 
 	@Override

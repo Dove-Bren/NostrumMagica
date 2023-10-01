@@ -59,7 +59,7 @@ public abstract class InfoScreenTab {
 			return;
 		
 		INFO_REAGENTS = new InfoScreenTab(InfoScreenTabs.INFO_REAGENTS,
-				ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1)) {
+				ReagentItem.CreateStack(ReagentType.MANDRAKE_ROOT, 1)) {
 
 			private List<ILoreTagged> getAvailable(INostrumMagic attr) {
 				List<ILoreTagged> list = new LinkedList<>();
@@ -421,7 +421,7 @@ public abstract class InfoScreenTab {
 				
 				button = new SubscreenInfoButton(screen, "reagents",
 						new PaginatedInfoSubScreen("reagents"),
-						ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1));
+						ReagentItem.CreateStack(ReagentType.MANDRAKE_ROOT, 1));
 				buttons.add(button);
 				index("builtin::guides::reagents", button);
 				

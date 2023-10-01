@@ -3,7 +3,6 @@ package com.smanzana.nostrummagica.spells.components.triggers;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
-import com.smanzana.nostrummagica.entity.ITameableEntity;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -14,16 +13,15 @@ import com.smanzana.nostrummagica.utils.Projectiles;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.init.Items;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.oredict.OreDictionary;
 
 /**
  * Projectile. Does no tracking, etc. Instead, spawns a projectile entity and
@@ -60,7 +58,7 @@ public class ProjectileTrigger extends SpellTrigger {
 			final Vec3d dir;
 			if (caster instanceof MobEntity && ((MobEntity) caster).getAttackTarget() != null) {
 				MobEntity ent = (MobEntity) caster  ;
-				dir = ent.getAttackTarget().getPositionVector().addVector(0.0, ent.height / 2.0, 0.0)
+				dir = ent.getAttackTarget().getPositionVector().add(0.0, ent.getHeight() / 2.0, 0.0)
 						.subtract(caster.posX, caster.posY + caster.getEyeHeight(), caster.posZ);
 			} else {
 				dir = ProjectileTrigger.getVectorForRotation(pitch, yaw);
@@ -90,16 +88,11 @@ public class ProjectileTrigger extends SpellTrigger {
 						}
 						
 						if (!hitAllies) {
-							if (ent instanceof ITameableEntity) {
-								if (getState().getSelf().getUniqueID().equals(((ITameableEntity) ent).getOwnerId())) {
-									return false; // We own the target entity
-								}
+							if (NostrumMagica.getOwner(ent).equals(getState().getSelf())) {
+								return false; // We own the target
 							}
-							
-							if (getState().getSelf() instanceof ITameableEntity) {
-								if (ent.getUniqueID().equals(((ITameableEntity) getState().getSelf()).getOwnerId())) {
-									return false; // We own the target entity
-								}
+							if (NostrumMagica.getOwner(getState().getSelf()).equals(ent)) {
+								return false; // ent owns us
 							}
 							
 							if (Projectiles.getShooter(ent) == getState().getSelf()) {
@@ -192,7 +185,7 @@ public class ProjectileTrigger extends SpellTrigger {
 	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return NonNullList.from(ItemStack.EMPTY,
-				ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1));
+				ReagentItem.CreateStack(ReagentType.MANI_DUST, 1));
 	}
 
 	@Override
@@ -202,7 +195,7 @@ public class ProjectileTrigger extends SpellTrigger {
 
 	@Override
 	public ItemStack getCraftItem() {
-		return new ItemStack(Items.BOW, 1, OreDictionary.WILDCARD_VALUE);
+		return new ItemStack(Items.BOW, 1);
 	}
 
 	@Override

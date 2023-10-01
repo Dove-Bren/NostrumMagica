@@ -731,10 +731,10 @@ public class PlayerListener {
 		
 		if (event.getState().getMaterial() == Material.LEAVES
 				&& NostrumMagica.rand.nextFloat() <= 0.2f) {
-			drops.add(ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1));
+			drops.add(ReagentItem.CreateStack(ReagentType.SKY_ASH, 1));
 		}
 		if (event.getState().getMaterial() == Material.WEB) {
-			drops.add(ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1));
+			drops.add(ReagentItem.CreateStack(ReagentType.SPIDER_SILK, 1));
 		}
 	}
 	
@@ -758,7 +758,7 @@ public class PlayerListener {
 //					event.getPos().getX() + 0.5,
 //					event.getPos().getY() + 0.5,
 //					event.getPos().getZ() + 0.5,
-//					ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1));
+//					ReagentItem.CreateStack(ReagentType.MANDRAKE_ROOT, 1));
 //			event.getWorld().spawnEntityInWorld(entity);
 //		}
 //		
@@ -768,7 +768,7 @@ public class PlayerListener {
 //					event.getPos().getX() + 0.5,
 //					event.getPos().getY() + 0.5,
 //					event.getPos().getZ() + 0.5,
-//					ReagentItem.instance().getReagent(ReagentType.GINSENG, 1));
+//					ReagentItem.CreateStack(ReagentType.GINSENG, 1));
 //			event.getWorld().spawnEntityInWorld(entity);
 //		}
 	}

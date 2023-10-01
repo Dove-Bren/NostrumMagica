@@ -3,15 +3,14 @@ package com.smanzana.nostrummagica.spells.components.triggers;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -47,20 +46,20 @@ public class TouchTrigger extends InstantTrigger {
 				Vec3d pos, float pitch, float yaw) {
 		pos = pos.add(0, state.getSelf().getEyeHeight(), 0);
 		
-		RayTraceResult trace = RayTrace.raytrace(world, pos, pitch, yaw, TOUCH_RANGE, new RayTrace.OtherLiving(state.getCaster()));
+		RayTraceResult trace = RayTrace.raytrace(world, state.getSelf(), pos, pitch, yaw, TOUCH_RANGE, new RayTrace.OtherLiving(state.getCaster()));
 		
 		if (trace == null) {
 			return new TriggerData(null, null, null, null);
 		}
 		
 		List<LivingEntity> others = Lists.newArrayList(state.getSelf());
-		if (trace.typeOfHit == RayTraceResult.Type.ENTITY
-				&& null != NostrumMagica.resolveLivingEntity(trace.entityHit)
-				&& !NostrumMagica.resolveLivingEntity(trace.entityHit).isEntityEqual(state.getSelf())) {
+		if (trace.getType() == RayTraceResult.Type.ENTITY
+				&& null != RayTrace.livingFromRaytrace(trace)
+				&& !RayTrace.livingFromRaytrace(trace).isEntityEqual(state.getSelf())) {
 			// Cast is safe from 'onlyLiving' option in trace
-			return new TriggerData(Lists.newArrayList(NostrumMagica.resolveLivingEntity(trace.entityHit)), others, world, null);
-		} else if (trace.typeOfHit == RayTraceResult.Type.BLOCK) {
-			Vec3d vec = trace.hitVec;
+			return new TriggerData(Lists.newArrayList(RayTrace.livingFromRaytrace(trace)), others, world, null);
+		} else if (trace.getType() == RayTraceResult.Type.BLOCK) {
+			Vec3d vec = trace.getHitVec();
 			return new TriggerData(null, others, world,
 					Lists.newArrayList(new BlockPos(Math.floor(vec.x), Math.floor(vec.y), Math.floor(vec.z))));
 		} else {
@@ -76,7 +75,7 @@ public class TouchTrigger extends InstantTrigger {
 	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return NonNullList.from(ItemStack.EMPTY,
-				ReagentItem.instance().getReagent(ReagentType.GRAVE_DUST, 1));
+				ReagentItem.CreateStack(ReagentType.GRAVE_DUST, 1));
 	}
 
 	@Override

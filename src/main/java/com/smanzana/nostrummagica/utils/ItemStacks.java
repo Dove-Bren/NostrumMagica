@@ -5,7 +5,8 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 
@@ -30,6 +31,11 @@ public class ItemStacks {
 	
 	public static final <T extends LivingEntity> ItemStack damageItem(@Nonnull ItemStack stack, T entity, Hand hand, int damage) {
 		stack.damageItem(damage, entity, playerIn -> playerIn.sendBreakAnimation(hand));
+		return stack.isEmpty() ? ItemStack.EMPTY : stack;
+	}
+	
+	public static final <T extends LivingEntity> ItemStack damageEquippedArmor(@Nonnull ItemStack stack, T entity, EquipmentSlotType slot, int damage) {
+		stack.damageItem(damage, entity, playerIn -> playerIn.sendBreakAnimation(slot));
 		return stack.isEmpty() ? ItemStack.EMPTY : stack;
 	}
 

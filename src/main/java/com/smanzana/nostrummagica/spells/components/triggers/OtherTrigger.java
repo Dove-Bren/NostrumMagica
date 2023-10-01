@@ -7,8 +7,7 @@ import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.Vec3d;
@@ -48,7 +47,7 @@ public class OtherTrigger extends InstantTrigger {
 	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return NonNullList.from(ItemStack.EMPTY,
-				ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1));
+				ReagentItem.CreateStack(ReagentType.SPIDER_SILK, 1));
 	}
 
 	@Override
@@ -58,7 +57,7 @@ public class OtherTrigger extends InstantTrigger {
 
 	@Override
 	public ItemStack getCraftItem() {
-		return new ItemStack(Item.getItemFromBlock(Blocks.GLASS_PANE));
+		return new ItemStack(Blocks.GLASS_PANE);
 	}
 
 	@Override

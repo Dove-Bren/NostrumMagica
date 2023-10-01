@@ -11,17 +11,16 @@ import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class MagicCyclerTrigger extends SpellTrigger {
 	
@@ -118,8 +117,8 @@ public class MagicCyclerTrigger extends SpellTrigger {
 	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return NonNullList.from(ItemStack.EMPTY,
-				ReagentItem.instance().getReagent(ReagentType.GINSENG, 1),
-				ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1));
+				ReagentItem.CreateStack(ReagentType.GINSENG, 1),
+				ReagentItem.CreateStack(ReagentType.SKY_ASH, 1));
 	}
 
 	@Override
@@ -129,7 +128,7 @@ public class MagicCyclerTrigger extends SpellTrigger {
 
 	@Override
 	public ItemStack getCraftItem() {
-		return new ItemStack(Items.COMPASS, 1, OreDictionary.WILDCARD_VALUE);
+		return new ItemStack(Items.COMPASS, 1);
 	}
 
 	@Override

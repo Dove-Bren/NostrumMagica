@@ -50,7 +50,7 @@ public class SingleShape extends SpellShape {
 	@Override
 	public NonNullList<ItemStack> getReagents() {
 		NonNullList<ItemStack> list = NonNullList.from(ItemStack.EMPTY,
-				ReagentItem.instance().getReagent(ReagentType.CRYSTABLOOM, 1)
+				ReagentItem.CreateStack(ReagentType.CRYSTABLOOM, 1)
 			);
 		
 		return list;

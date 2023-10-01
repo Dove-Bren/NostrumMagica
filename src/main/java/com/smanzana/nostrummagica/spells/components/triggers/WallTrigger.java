@@ -8,12 +8,11 @@ import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -110,8 +109,8 @@ public class WallTrigger extends TriggerAreaTrigger {
 	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return NonNullList.from(ItemStack.EMPTY,
-				ReagentItem.instance().getReagent(ReagentType.BLACK_PEARL, 1),
-				ReagentItem.instance().getReagent(ReagentType.MANDRAKE_ROOT, 1));
+				ReagentItem.CreateStack(ReagentType.BLACK_PEARL, 1),
+				ReagentItem.CreateStack(ReagentType.MANDRAKE_ROOT, 1));
 	}
 
 	@Override
@@ -133,7 +132,7 @@ public class WallTrigger extends TriggerAreaTrigger {
 
 	@Override
 	public ItemStack getCraftItem() {
-		return new ItemStack(Item.getItemFromBlock(Blocks.GLASS));
+		return new ItemStack(Blocks.GLASS);
 	}
 
 	@Override

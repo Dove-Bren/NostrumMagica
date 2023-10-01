@@ -13,8 +13,8 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -52,7 +52,7 @@ public class BeamTrigger extends InstantTrigger {
 		// Cast from eyes
 		pos = pos.add(0, state.getCaster().getEyeHeight(), 0);
 		
-		Collection<RayTraceResult> traces = RayTrace.allInPath(world, pos, pitch, yaw, BEAM_RANGE, new RayTrace.OtherLiving(state.getCaster()));
+		Collection<RayTraceResult> traces = RayTrace.allInPath(world, state.getSelf(), pos, pitch, yaw, BEAM_RANGE, new RayTrace.OtherLiving(state.getCaster()));
 		List<LivingEntity> others = null;
 		List<LivingEntity> targs = null;
 		List<BlockPos> blocks = null;
@@ -69,15 +69,15 @@ public class BeamTrigger extends InstantTrigger {
 				if (trace == null)
 					continue;
 				
-				if (trace.typeOfHit == RayTraceResult.Type.MISS)
+				if (trace.getType() == RayTraceResult.Type.MISS)
 					continue;
 				
-				if (trace.typeOfHit == RayTraceResult.Type.ENTITY
-						&& NostrumMagica.resolveLivingEntity(trace.entityHit) != null) {
-					targs.add(NostrumMagica.resolveLivingEntity(trace.entityHit));
+				if (trace.getType() == RayTraceResult.Type.ENTITY
+						&& RayTrace.livingFromRaytrace(trace) != null) {
+					targs.add(RayTrace.livingFromRaytrace(trace));
 				} else {
-					blocks.add(new BlockPos(trace.hitVec.x, trace.hitVec.y, trace.hitVec.z));
-					end = trace.hitVec;
+					blocks.add(new BlockPos(trace.getHitVec().x, trace.getHitVec().y, trace.getHitVec().z));
+					end = trace.getHitVec();
 				}
 			}
 		}
@@ -99,8 +99,8 @@ public class BeamTrigger extends InstantTrigger {
 	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return NonNullList.from(ItemStack.EMPTY,
-				ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1),
-				ReagentItem.instance().getReagent(ReagentType.GRAVE_DUST, 1));
+				ReagentItem.CreateStack(ReagentType.MANI_DUST, 1),
+				ReagentItem.CreateStack(ReagentType.GRAVE_DUST, 1));
 	}
 
 	@Override

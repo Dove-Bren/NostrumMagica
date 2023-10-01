@@ -3,7 +3,6 @@ package com.smanzana.nostrummagica.spells.components.triggers;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntitySpellBullet;
-import com.smanzana.nostrummagica.entity.ITameableEntity;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -12,12 +11,12 @@ import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
@@ -26,7 +25,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.oredict.OreDictionary;
 
 /**
  * Projectile that slowly follows and then continues spell once it has collided.
@@ -82,7 +80,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 				public void run() {
 					if (target == null) {
 						// Ray trace
-						RayTraceResult mop = RayTrace.raytraceApprox(world, pos, dir, MAX_DIST, (ent) -> {
+						RayTraceResult mop = RayTrace.raytraceApprox(world, getState().getSelf(), pos, dir, MAX_DIST, (ent) -> {
 							if (getState().getSelf() == ent) {
 								return false;
 							}
@@ -97,16 +95,11 @@ public class SeekingBulletTrigger extends SpellTrigger {
 										return false;
 									}
 									
-									if (ent instanceof ITameableEntity) {
-										if (getState().getSelf().getUniqueID().equals(((ITameableEntity) ent).getOwnerId())) {
-											return false; // We own the target entity
-										}
+									if (NostrumMagica.getOwner(ent).equals(getState().getSelf())) {
+										return false; // We own the target
 									}
-									
-									if (getState().getSelf() instanceof ITameableEntity) {
-										if (ent.getUniqueID().equals(((ITameableEntity) getState().getSelf()).getOwnerId())) {
-											return false; // We own the target entity
-										}
+									if (NostrumMagica.getOwner(getState().getSelf()).equals(ent)) {
+										return false; // ent owns us
 									}
 								}
 							}
@@ -114,7 +107,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 							return true;
 						}, .5);
 						
-						target = NostrumMagica.resolveLivingEntity(mop.entityHit);
+						target = RayTrace.livingFromRaytrace(mop);
 					}
 					
 					// Get axis from where target is
@@ -143,23 +136,16 @@ public class SeekingBulletTrigger extends SpellTrigger {
 					startMotion = startMotion.scale(.4);
 					
 					EntitySpellBullet bullet = new EntitySpellBullet(self, getState().getSelf(), target, axis);
-					bullet.getMotion().x = startMotion.x;
-					bullet.getMotion().y = startMotion.y;
-					bullet.getMotion().z = startMotion.z;
+					bullet.setMotion(startMotion);
 					//bullet.setVelocity(startMotion.x, startMotion.y, startMotion.z); client only :(
 					
 					bullet.setFilter((ent) -> {
 						if (ent != null && getState().getSelf() != ent) {
-							if (ent instanceof ITameableEntity) {
-								if (getState().getSelf().getUniqueID().equals(((ITameableEntity) ent).getOwnerId())) {
-									return false; // We own the target entity
-								}
+							if (NostrumMagica.getOwner(ent).equals(getState().getSelf())) {
+								return false; // We own the target
 							}
-							
-							if (getState().getSelf() instanceof ITameableEntity) {
-								if (ent.getUniqueID().equals(((ITameableEntity) getState().getSelf()).getOwnerId())) {
-									return false; // We own the target entity
-								}
+							if (NostrumMagica.getOwner(getState().getSelf()).equals(ent)) {
+								return false; // ent owns us
 							}
 						}
 						
@@ -233,8 +219,8 @@ public class SeekingBulletTrigger extends SpellTrigger {
 	public NonNullList<ItemStack> getReagents() {
 		NonNullList<ItemStack> list = NonNullList.create();
 		
-		list.add(ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1));
-		list.add(ReagentItem.instance().getReagent(ReagentType.SPIDER_SILK, 1));
+		list.add(ReagentItem.CreateStack(ReagentType.MANI_DUST, 1));
+		list.add(ReagentItem.CreateStack(ReagentType.SPIDER_SILK, 1));
 		
 		return list;
 	}
@@ -246,7 +232,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 
 	@Override
 	public ItemStack getCraftItem() {
-		return new ItemStack(Blocks.DISPENSER, 1, OreDictionary.WILDCARD_VALUE);
+		return new ItemStack(Blocks.DISPENSER, 1);
 	}
 
 	@Override

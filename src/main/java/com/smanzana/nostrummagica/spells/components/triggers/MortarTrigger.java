@@ -17,10 +17,10 @@ import com.smanzana.nostrummagica.utils.RayTrace;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.init.Items;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
@@ -28,7 +28,6 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.oredict.OreDictionary;
 
 /**
  * Projectile that flies in an arc / straight down on a target instead in a straight line.
@@ -90,7 +89,7 @@ public class MortarTrigger extends SpellTrigger {
 					if (target != null) {
 						dest = target.getPositionVector();
 					} else {
-						RayTraceResult mop = RayTrace.raytraceApprox(world, pos, dir, MaxHDist, (ent) -> {
+						RayTraceResult mop = RayTrace.raytraceApprox(world, getState().getSelf(), pos, dir, MaxHDist, (ent) -> {
 							if (getState().getSelf() == NostrumMagica.resolveLivingEntity(ent)) {
 								return false;
 							}
@@ -98,10 +97,10 @@ public class MortarTrigger extends SpellTrigger {
 							return true;
 						}, .5);
 						
-						if (mop.typeOfHit == RayTraceResult.Type.ENTITY) {
-							dest = mop.entityHit.getPositionVector();
-						} else if (mop.typeOfHit == RayTraceResult.Type.BLOCK) {
-							dest = mop.hitVec;
+						if (mop.getType() == RayTraceResult.Type.ENTITY) {
+							dest = RayTrace.entFromRaytrace(mop).getPositionVector();
+						} else if (mop.getType() == RayTraceResult.Type.BLOCK) {
+							dest = mop.getHitVec();
 						} else {
 							dest = dir.scale(MaxHDist);
 						}
@@ -119,7 +118,7 @@ public class MortarTrigger extends SpellTrigger {
 						for (int i = 0; i < 7; i++) {
 							cursor.move(Direction.UP);
 							BlockState state = world.getBlockState(cursor);
-							if (!(state.getBlock() instanceof DungeonAir) && world.isBlockNormalCube(cursor, false)) {
+							if (!(state.getBlock() instanceof DungeonAir) && !world.isAirBlock(cursor)) {
 								// can't go here. Go back down and bail
 								cursor.move(Direction.DOWN);
 								break;
@@ -234,7 +233,7 @@ public class MortarTrigger extends SpellTrigger {
 	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return NonNullList.from(ItemStack.EMPTY,
-				ReagentItem.instance().getReagent(ReagentType.SKY_ASH, 1));
+				ReagentItem.CreateStack(ReagentType.SKY_ASH, 1));
 	}
 
 	@Override
@@ -244,7 +243,7 @@ public class MortarTrigger extends SpellTrigger {
 
 	@Override
 	public ItemStack getCraftItem() {
-		return new ItemStack(Items.FIRE_CHARGE, 1, OreDictionary.WILDCARD_VALUE);
+		return new ItemStack(Items.FIRE_CHARGE, 1);
 	}
 
 	@Override

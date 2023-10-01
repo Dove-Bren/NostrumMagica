@@ -307,7 +307,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 			GlStateManager.enableBlend();
 			GlStateManager.translated(x + .5, y + 1, z + .5);
 			mc.getItemRenderer().renderItem(
-					ReagentItem.instance().getReagent(reagent, 1), TransformType.GROUND);
+					ReagentItem.CreateStack(reagent, 1), TransformType.GROUND);
 			GlStateManager.popMatrix();
 		}
 	}

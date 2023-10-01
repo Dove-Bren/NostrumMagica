@@ -26,7 +26,7 @@ public class TileEntityCandleRenderer extends TileEntitySpecialRenderer<CandleTi
 	public TileEntityCandleRenderer() {
 		itemCache = new NonNullEnumMap<>(ReagentType.class, ItemStack.EMPTY);
 		for (ReagentType type : ReagentType.values()) {
-			itemCache.put(type, ReagentItem.instance().getReagent(type, 1));
+			itemCache.put(type, ReagentItem.CreateStack(type, 1));
 		}
 	}
 	

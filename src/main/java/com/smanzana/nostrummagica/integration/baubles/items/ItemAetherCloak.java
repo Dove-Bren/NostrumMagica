@@ -398,7 +398,7 @@ public class ItemAetherCloak extends AetherItem implements ILoreTagged, ISpellAr
 //		GameRegistry.addRecipe(new ShapelessRecipes(runedStack, Lists.newArrayList(
 //				new ItemStack(instance()),
 //				new ItemStack(Items.QUARTZ),
-//				ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1)
+//				ReagentItem.CreateStack(ReagentType.MANI_DUST, 1)
 //				)) {
 //
 //			@Override
