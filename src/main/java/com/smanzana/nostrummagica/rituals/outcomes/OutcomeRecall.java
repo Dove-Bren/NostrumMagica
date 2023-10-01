@@ -35,7 +35,7 @@ public class OutcomeRecall implements IRitualOutcome {
 			return false;
 		}
 		
-		if (player.dimension != attr.getMarkDimension()) {
+		if (player.dimension.getId() != attr.getMarkDimension()) {
 			if (!world.isRemote)
 				player.sendMessage(new TranslationTextComponent("info.recall.baddimension", new Object[0]));
 			return false;
@@ -58,7 +58,7 @@ public class OutcomeRecall implements IRitualOutcome {
 			return;
 		}
 		
-		if (player.dimension == attr.getMarkDimension()) {
+		if (player.dimension.getId() == attr.getMarkDimension()) {
 			if (!world.isRemote) {
 				
 				NostrumMagica.attemptTeleport(world, pos, player, true, NostrumMagica.rand.nextInt(4) == 0);

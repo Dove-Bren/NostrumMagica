@@ -27,7 +27,7 @@ public class OutcomeCreateAetherInfuser implements IRitualOutcome {
 	@Override
 	public void perform(World world, PlayerEntity player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
 		if (!world.isRemote) {
-			NostrumMagica.aetheria.CreateAetherInfuser(world, center);
+			NostrumMagica.instance.aetheria.CreateAetherInfuser(world, center);
 			// clear altar on server
 			TileEntity te = world.getTileEntity(center.add(0, 0, 0));
 			if (te == null || !(te instanceof AltarTileEntity))

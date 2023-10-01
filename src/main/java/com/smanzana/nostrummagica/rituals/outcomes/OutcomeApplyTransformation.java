@@ -6,20 +6,21 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import com.smanzana.nostrummagica.effects.NostrumTransformationEffect;
+import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
+import com.smanzana.nostrummagica.utils.Entities;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 public class OutcomeApplyTransformation implements IRitualOutcome {
 
@@ -32,10 +33,8 @@ public class OutcomeApplyTransformation implements IRitualOutcome {
 	}
 	
 	protected @Nullable LivingEntity findEntity(World world, PlayerEntity player, BlockPos center) {
-		for (Entity ent : world.loadedEntityList) {
-			if (ent instanceof LivingEntity
-					&& ent.getDistanceSq(center) < 25
-					&& this.selector.test((LivingEntity) ent)) {
+		for (LivingEntity ent : Entities.GetEntities((ServerWorld) world, (e) -> {return e.getDistanceSq(center.getX() + .5, center.getY() + .5, center.getZ() + .5) < 25;})) {
+			if (this.selector.test((LivingEntity) ent)) {
 				return (LivingEntity) ent;
 			}
 		}
@@ -47,7 +46,7 @@ public class OutcomeApplyTransformation implements IRitualOutcome {
 		@Nullable LivingEntity target = findEntity(world, player, center);
 		if (target != null) {
 			// Apply effect to the selected entity
-			target.addPotionEffect(new PotionEffect(NostrumTransformationEffect.instance(), duration, 0, true, true));
+			target.addPotionEffect(new EffectInstance(NostrumEffects.nostrumTransformation, duration, 0, true, true));
 		}
 	}
 	

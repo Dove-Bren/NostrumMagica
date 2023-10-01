@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.rituals.outcomes;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.smanzana.nostrummagica.blocks.SorceryPortalSpawner;
+import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.tiles.AltarTileEntity;
 
@@ -23,7 +23,7 @@ public class OutcomeCreatePortal implements IRitualOutcome {
 	@Override
 	public void perform(World world, PlayerEntity player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
 		
-		world.setBlockState(center.down(), SorceryPortalSpawner.instance().getDefaultState());
+		world.setBlockState(center.down(), NostrumBlocks.sorceryPortalSpawner.getDefaultState());
 		TileEntity te = world.getTileEntity(center.add(0, 0, 0));
 		if (te == null || !(te instanceof AltarTileEntity))
 			return;

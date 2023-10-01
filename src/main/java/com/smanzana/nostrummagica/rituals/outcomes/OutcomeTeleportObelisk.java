@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.TemporaryTeleportationPortal;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.PositionCrystal;
@@ -78,7 +79,7 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 				double dx = Math.cos(dirD) * dist;
 				double dz = Math.sin(dirD) * dist;
 				ItemEntity drop = new ItemEntity(world, pos.getX() + .5 + dx, pos.getY() + 2, pos.getZ() + .5 + dz,
-						NostrumResourceItem.getItem(ResourceType.ENDER_BRISTLE, 1));
+						new ItemStack(NostrumItems.resourceEnderBristle));
 				world.addEntity(drop);
 				NostrumMagicaSounds.CAST_FAIL.play(world, pos.getX() + .5, pos.getY() + 2, pos.getZ() + .5);
 			}

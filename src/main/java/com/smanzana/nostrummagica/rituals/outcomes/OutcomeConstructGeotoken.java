@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.rituals.outcomes;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.items.PositionToken;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
@@ -51,7 +52,7 @@ public class OutcomeConstructGeotoken extends OutcomeSpawnItem {
 	@Override
 	public ItemStack getResult() {
 		if (RES.isEmpty())
-			RES = new ItemStack(PositionToken.instance());
+			RES = new ItemStack(NostrumItems.positionToken);
 		
 		return RES;
 	}
