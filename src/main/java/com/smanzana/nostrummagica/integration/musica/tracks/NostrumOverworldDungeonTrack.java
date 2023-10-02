@@ -6,11 +6,10 @@ import com.smanzana.musica.music.IMusicTrack;
 import com.smanzana.musica.music.MusicSound;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.common.Optional;
 
-@Optional.Interface(iface="com.smanzana.musica.IMusicTrack", modid="musica")
+//@Optional.Interface(iface="com.smanzana.musica.IMusicTrack", modid="musica")
 public class NostrumOverworldDungeonTrack implements IMusicTrack {
 	
 	protected boolean didIntro;
@@ -29,17 +28,17 @@ public class NostrumOverworldDungeonTrack implements IMusicTrack {
 	}
 
 	@Override
-	public boolean shouldPlay(EntityPlayerSP player) {
-		return player != null && player.dimension == 1;
+	public boolean shouldPlay(ClientPlayerEntity player) {
+		return player != null && player.dimension.getId() == 1;
 	}
 	
 	@Override
-	public boolean shouldLoop(EntityPlayerSP player) {
+	public boolean shouldLoop(ClientPlayerEntity player) {
 		return shouldPlay(player);
 	}
 
 	@Override
-	public MusicSound getSound(EntityPlayerSP player) {
+	public MusicSound getSound(ClientPlayerEntity player) {
 		if (!didIntro) {
 			didIntro = true;
 			return soundIntro;
@@ -49,7 +48,7 @@ public class NostrumOverworldDungeonTrack implements IMusicTrack {
 				return soundLow;
 			}
 			
-			if (player.getDistanceSq(startPos) > 144) {
+			if (player.getDistanceSq(startPos.getX() + .5, startPos.getZ() + .5, startPos.getZ() + .5) > 144) {
 				return soundHigh;
 			} else {
 				return soundLow;
@@ -58,7 +57,7 @@ public class NostrumOverworldDungeonTrack implements IMusicTrack {
 	}
 	
 	@Override
-	public void onStop(EntityPlayerSP player) {
+	public void onStop(ClientPlayerEntity player) {
 		this.didIntro = false; // Reset
 		this.startPos = null;
 	}

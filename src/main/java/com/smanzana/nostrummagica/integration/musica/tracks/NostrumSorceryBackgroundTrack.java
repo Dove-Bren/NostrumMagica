@@ -6,10 +6,9 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraftforge.fml.common.Optional;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 
-@Optional.Interface(iface="com.smanzana.musica.IMusicTrack", modid="musica")
+//@Optional.Interface(iface="com.smanzana.musica.IMusicTrack", modid="musica")
 public class NostrumSorceryBackgroundTrack implements IMusicTrack {
 	
 	protected int introStep; // 0 for nothing so far. 1 for intro. 2 for low.
@@ -31,17 +30,17 @@ public class NostrumSorceryBackgroundTrack implements IMusicTrack {
 	}
 
 	@Override
-	public boolean shouldPlay(EntityPlayerSP player) {
-		return player != null && player.dimension == ModConfig.config.sorceryDimensionIndex();
+	public boolean shouldPlay(ClientPlayerEntity player) {
+		return player != null && player.dimension.getId() == ModConfig.config.sorceryDimensionIndex();
 	}
 	
 	@Override
-	public boolean shouldLoop(EntityPlayerSP player) {
+	public boolean shouldLoop(ClientPlayerEntity player) {
 		return shouldPlay(player);
 	}
 
 	@Override
-	public MusicSound getSound(EntityPlayerSP player) {
+	public MusicSound getSound(ClientPlayerEntity player) {
 		switch (introStep) {
 		case 0:
 			introStep++;
@@ -61,7 +60,7 @@ public class NostrumSorceryBackgroundTrack implements IMusicTrack {
 	}
 	
 	@Override
-	public void onStop(EntityPlayerSP player) {
+	public void onStop(ClientPlayerEntity player) {
 		this.introStep = 0;
 	}
 

@@ -8,10 +8,9 @@ import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraftforge.fml.common.Optional;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 
-@Optional.Interface(iface="com.smanzana.musica.IMusicTrack", modid="musica")
+//@Optional.Interface(iface="com.smanzana.musica.IMusicTrack", modid="musica")
 public class NostrumSorceryBattleTrack implements IMusicTrack {
 	
 	protected boolean didIntro;
@@ -30,8 +29,8 @@ public class NostrumSorceryBattleTrack implements IMusicTrack {
 	}
 
 	@Override
-	public boolean shouldPlay(EntityPlayerSP player) {
-		if (player == null || player.world == null || player.dimension != ModConfig.config.sorceryDimensionIndex()) {
+	public boolean shouldPlay(ClientPlayerEntity player) {
+		if (player == null || player.world == null || player.dimension.getId() != ModConfig.config.sorceryDimensionIndex()) {
 			return false;
 		}
 		
@@ -41,12 +40,12 @@ public class NostrumSorceryBattleTrack implements IMusicTrack {
 	}
 	
 	@Override
-	public boolean shouldLoop(EntityPlayerSP player) {
+	public boolean shouldLoop(ClientPlayerEntity player) {
 		return shouldPlay(player);
 	}
 
 	@Override
-	public MusicSound getSound(EntityPlayerSP player) {
+	public MusicSound getSound(ClientPlayerEntity player) {
 		if (!didIntro) {
 			didIntro = true;
 			return soundIntro;
@@ -55,7 +54,7 @@ public class NostrumSorceryBattleTrack implements IMusicTrack {
 	}
 	
 	@Override
-	public void onStop(EntityPlayerSP player) {
+	public void onStop(ClientPlayerEntity player) {
 		this.didIntro = false;
 	}
 
