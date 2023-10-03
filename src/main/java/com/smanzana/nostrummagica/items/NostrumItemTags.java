@@ -102,6 +102,8 @@ public class NostrumItemTags {
 		private static final String TAG_SPELLTOME_MUTED = "spell_tome/muted";
 		private static final String TAG_SPELLTOME_LIVING = "spell_tome/living";
 		
+		private static final String TAG_SILVER_INGOT = "ingots/silver";
+		
 		public static final Tag<Item> RuneAny = tag(TAG_RUNE);
 		
 		public static final Tag<Item> Reagent = tag(TAG_REAGENT);
@@ -191,6 +193,8 @@ public class NostrumItemTags {
 		public static final Tag<Item> SpellTomeSpooky = tag(TAG_SPELLTOME_SPOOKY);
 		public static final Tag<Item> SpellTomeMuted = tag(TAG_SPELLTOME_MUTED);
 		public static final Tag<Item> SpellTomeLiving = tag(TAG_SPELLTOME_LIVING);
+		
+		public static final Tag<Item> SilverIngot = new ItemTags.Wrapper(new ResourceLocation("forge", TAG_SILVER_INGOT));
 		
 		private static Tag<Item> tag(String path) {
 			return new ItemTags.Wrapper(new ResourceLocation(NostrumMagica.MODID, path));

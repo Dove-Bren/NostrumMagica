@@ -10,12 +10,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
-import com.smanzana.nostrummagica.items.BlankScroll;
+import com.smanzana.nostrummagica.integration.curios.items.INostrumCurio;
 import com.smanzana.nostrummagica.items.NostrumItems;
-import com.smanzana.nostrummagica.items.ReagentItem;
-import com.smanzana.nostrummagica.items.SpellRune;
-import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -33,8 +29,6 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
-import baubles.api.BaublesApi;
-import baubles.api.cap.IBaublesItemHandler;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -958,14 +952,13 @@ public class NostrumMagic implements INostrumMagic {
 
 	@Override
 	public void refresh(ServerPlayerEntity player) {
-		if (NostrumMagica.instance.baubles.isEnabled()) {
-			IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);
-			for (int i = 0; i < baubles.getSlots(); i++) {
-				ItemStack stack = baubles.getStackInSlot(i);
-				if (!stack.isEmpty() && stack.getItem() instanceof ItemMagicBauble) {
-					((ItemMagicBauble) stack.getItem()).onUnequipped(stack, player);
+		if (NostrumMagica.instance.curios.isEnabled()) {
+			NostrumMagica.instance.curios.forEachCurio(player, (stack) -> {
+				if (stack.getItem() instanceof INostrumCurio) {
+					((INostrumCurio) stack.getItem()).onUnequipped(stack, player);
 				}
-			}
+				return false;
+			});
 		}
 		
 		this.modMana = 0;
@@ -979,14 +972,13 @@ public class NostrumMagic implements INostrumMagic {
 			quest.grantReward(player);
 		}
 		
-		if (NostrumMagica.baubles.isEnabled()) {
-			IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);
-			for (int i = 0; i < baubles.getSlots(); i++) {
-				ItemStack stack = baubles.getStackInSlot(i);
-				if (!stack.isEmpty() && stack.getItem() instanceof ItemMagicBauble) {
-					((ItemMagicBauble) stack.getItem()).onEquipped(stack, player);
+		if (NostrumMagica.instance.curios.isEnabled()) {
+			NostrumMagica.instance.curios.forEachCurio(player, (stack) -> {
+				if (stack.getItem() instanceof INostrumCurio) {
+					((INostrumCurio) stack.getItem()).onEquipped(stack, player);
 				}
-			}
+				return false;
+			});
 		}
 	}
 }

@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.integration.baubles.inventory.BaubleInventoryH
 import com.smanzana.nostrummagica.integration.baubles.items.ItemAetherCloak;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble.ItemType;
+import com.smanzana.nostrummagica.integration.curios.inventory.CurioInventoryWrapper;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
@@ -94,7 +95,7 @@ public class BaublesProxy {
 		
     	registry.register(ItemMagicBauble.instance());
     	
-    	if (NostrumMagica.aetheria.isEnabled()) {
+    	if (NostrumMagica.instance.aetheria.isEnabled()) {
     		registry.register(ItemAetherCloak.instance());
     	}
 	}
@@ -442,7 +443,7 @@ public class BaublesProxy {
 			return null;
 		}
 		
-		return BaubleInventoryHelper.getBaubleInventory(player);
+		return CurioInventoryWrapper.getCuriosInventory(player);
 	}
 	
 	public boolean isEnabled() {

@@ -18,8 +18,6 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
-import baubles.api.BaubleType;
-import baubles.api.IBauble;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
@@ -47,8 +45,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-@Optional.Interface(iface="baubles.api.IBauble", modid="baubles")
-public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, IBauble, IDragonWingRenderItem {
+public class ItemMagicBauble extends Item implements ILoreTagged, ISpellArmor, /*IBauble,*/ IDragonWingRenderItem {
 	
 	// TODO
 	public static final Item smallRibbon;

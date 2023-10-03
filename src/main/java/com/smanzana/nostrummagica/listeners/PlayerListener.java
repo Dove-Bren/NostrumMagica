@@ -29,6 +29,7 @@ import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfTypeCapability;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
+import com.smanzana.nostrummagica.integration.curios.items.INostrumCurio;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedEquipment;
 import com.smanzana.nostrummagica.items.HookshotItem;
@@ -792,16 +793,16 @@ public class PlayerListener {
 		}
 		
 		if (event.getEntityLiving() instanceof PlayerEntity && !event.getEntityLiving().world.isRemote) {
-			if (NostrumMagica.baubles.isEnabled() && !event.getEntityLiving().world.getGameRules().getBoolean("keepInventory")) {
-				// Scan for baubles, since Baubles doesn't call onUnequip when you die....
-				IBaublesItemHandler baubles = BaublesApi.getBaublesHandler((PlayerEntity) event.getEntityLiving());
-				for (int i = 0; i < baubles.getSlots(); i++) {
-					ItemStack stack = baubles.getStackInSlot(i);
-					if (!stack.isEmpty() && stack.getItem() instanceof ItemMagicBauble) {
-						((ItemMagicBauble) stack.getItem()).onUnequipped(stack, event.getEntityLiving());
-					}
-				}
-			}
+			//  TODO test this! Does this work now?
+//			// Scan for baubles, since Baubles doesn't call onUnequip when you die....
+//			if (NostrumMagica.instance.curios.isEnabled() && !event.getEntityLiving().world.getGameRules().getBoolean("keepInventory")) {
+//				NostrumMagica.instance.curios.forEachCurio(event.getEntityLiving(), (stack) -> {
+//					if (stack.getItem() instanceof INostrumCurio) {
+//						((INostrumCurio) stack.getItem()).onUnequipped(stack, event.getEntityLiving());
+//					}
+//					return false;
+//				});
+//			}
 		}
 	}
 	

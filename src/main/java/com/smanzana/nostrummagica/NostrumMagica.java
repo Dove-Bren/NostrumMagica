@@ -16,8 +16,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.Lists;
 import com.mojang.brigadier.CommandDispatcher;
-import com.smanzana.nostrummagica.proxy.ClientProxy;
-import com.smanzana.nostrummagica.proxy.CommonProxy;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
 import com.smanzana.nostrummagica.blocks.TemporaryTeleportationPortal;
@@ -60,9 +58,9 @@ import com.smanzana.nostrummagica.entity.tasks.FollowOwnerGenericGoal;
 import com.smanzana.nostrummagica.entity.tasks.PetTargetGoal;
 import com.smanzana.nostrummagica.integration.aetheria.AetheriaClientProxy;
 import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
-import com.smanzana.nostrummagica.integration.baubles.BaublesClientProxy;
-import com.smanzana.nostrummagica.integration.baubles.BaublesProxy;
-import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
+import com.smanzana.nostrummagica.integration.curios.CuriosClientProxy;
+import com.smanzana.nostrummagica.integration.curios.CuriosProxy;
+import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.integration.enderio.EnderIOClientProxy;
 import com.smanzana.nostrummagica.integration.enderio.EnderIOProxy;
 import com.smanzana.nostrummagica.integration.musica.MusicaClientProxy;
@@ -90,6 +88,8 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.pet.PetCommandManager;
 import com.smanzana.nostrummagica.pet.PetSoulRegistry;
+import com.smanzana.nostrummagica.proxy.ClientProxy;
+import com.smanzana.nostrummagica.proxy.CommonProxy;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.quests.NostrumQuest.QuestType;
 import com.smanzana.nostrummagica.quests.objectives.ObjectiveKill;
@@ -203,6 +203,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import top.theillusivec4.curios.api.CuriosAPI;
 
 @Mod(NostrumMagica.MODID)
 public class NostrumMagica {
@@ -213,7 +214,7 @@ public class NostrumMagica {
 	public static NostrumMagica instance;
 	
 	public final CommonProxy proxy;
-	public final BaublesProxy baubles;
+	public final CuriosProxy curios;
 	public final AetheriaProxy aetheria;
 	public final EnderIOProxy enderIO;
 	public final MusicaProxy musica;
@@ -237,7 +238,8 @@ public class NostrumMagica {
 		instance = this;
 		
 		proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> CommonProxy::new);
-		baubles = DistExecutor.runForDist(() -> BaublesClientProxy::new, () -> BaublesProxy::new);
+		//curios = DistExecutor.runForDist(() -> BaublesClientProxy::new, () -> BaublesProxy::new);
+		curios = DistExecutor.runForDist(() -> CuriosClientProxy::new, () -> CuriosProxy::new);
 		aetheria = DistExecutor.runForDist(() -> AetheriaClientProxy::new, () -> AetheriaProxy::new);
 		enderIO = DistExecutor.runForDist(() -> EnderIOClientProxy::new, () -> EnderIOProxy::new);
 		musica = DistExecutor.runForDist(() -> MusicaClientProxy::new, () -> MusicaProxy::new);
@@ -263,8 +265,8 @@ public class NostrumMagica {
 		};
 		//NostrumItems.spellTomePage.setCreativeTab(NostrumMagica.enhancementTab); // TODO still need this?
 
-		if (ModList.get().isLoaded("baubles")) {
-			baubles.enable();
+		if (ModList.get().isLoaded(CuriosAPI.MODID)) {
+			curios.enable();
 		}
 		if (ModList.get().isLoaded("nostrumaetheria")) {
 			aetheria.enable();
@@ -280,7 +282,7 @@ public class NostrumMagica {
 
 		proxy.preinit();
 		aetheria.preInit();
-		baubles.preInit();
+		curios.preInit();
 		enderIO.preInit();
 		musica.preInit();
 
@@ -306,7 +308,7 @@ public class NostrumMagica {
 
 		proxy.init();
 		aetheria.init();
-		baubles.init();
+		curios.init();
 		enderIO.init();
 		musica.init();
 	
@@ -1057,7 +1059,7 @@ public class NostrumMagica {
 						new OutcomeSpawnItem(new ItemStack(NostrumItems.skillEnderPin))));
 
 		// Mirror Shield
-		Ingredient extra = (baubles.isEnabled() ? Ingredient.fromItems(ItemMagicBauble.smallRibbon)
+		Ingredient extra = (curios.isEnabled() ? Ingredient.fromItems(NostrumCurios.smallRibbon)
 				: Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall));
 
 		RitualRegistry.instance().addRitual(RitualRecipe.createTier3("mirror_shield",
@@ -1069,7 +1071,7 @@ public class NostrumMagica {
 				new RRequirementResearch("mirror_shield"),
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.mirrorShield))));
 
-		extra = (baubles.isEnabled() ? Ingredient.fromItems(ItemMagicBauble.mediumRibbon)
+		extra = (curios.isEnabled() ? Ingredient.fromItems(NostrumCurios.mediumRibbon)
 				: Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium));
 		RitualRegistry.instance()
 				.addRitual(RitualRecipe.createTier3("true_mirror_shield",
@@ -2124,7 +2126,7 @@ public class NostrumMagica {
 				.build("dragon_armor", NostrumResearchTab.OUTFITTING, Size.LARGE, -1, 3, true,
 						new ItemStack(DragonArmor.GetArmor(DragonEquipmentSlot.HELM, DragonArmorMaterial.IRON)));
 
-		NostrumResearch.startBuilding().parent("enchanted_armor").parent(baubles.isEnabled() ? "belts" : "origin")
+		NostrumResearch.startBuilding().parent("enchanted_armor").parent(curios.isEnabled() ? "belts" : "origin")
 				.reference("ritual::mirror_shield", "ritual.mirror_shield.name").build("mirror_shield",
 						NostrumResearchTab.OUTFITTING, Size.LARGE, -3, 3, true, new ItemStack(NostrumItems.mirrorShield));
 
@@ -2284,8 +2286,8 @@ public class NostrumMagica {
 	public void reloadDefaultResearch() {
 		NostrumResearch.ClearAllResearch();
 		registerDefaultResearch();
-		if (baubles.isEnabled()) {
-			baubles.reinitResearch();
+		if (curios.isEnabled()) {
+			curios.reinitResearch();
 		}
 		if (aetheria.isEnabled()) {
 			aetheria.reinitResearch();
