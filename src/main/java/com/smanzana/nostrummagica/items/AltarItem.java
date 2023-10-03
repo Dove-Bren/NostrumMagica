@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.items;
 
-import com.smanzana.nostrummagica.blocks.AltarBlock;
+import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -12,7 +12,7 @@ public class AltarItem extends BlockItem implements ILoreTagged {
 	public static final String ID = "altar_item";
 
 	public AltarItem() {
-		super(AltarBlock.instance(), NostrumItems.PropLowStack());
+		super(NostrumBlocks.altar, NostrumItems.PropLowStack());
 	}
 	
 	@Override

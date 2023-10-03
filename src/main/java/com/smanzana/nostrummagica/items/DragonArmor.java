@@ -350,7 +350,7 @@ public class DragonArmor extends Item {
 
 				for (Entry<String, AttributeModifier> entry : multimap.entries())
 				{
-					AttributeModifier attributemodifier = (AttributeModifier)entry.get();
+					AttributeModifier attributemodifier = (AttributeModifier)entry.getValue();
 					double d0 = attributemodifier.getAmount();
 					boolean flag = false;
 

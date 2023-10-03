@@ -17,14 +17,13 @@ import com.smanzana.nostrummagica.network.messages.PetCommandSettingsSyncMessage
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.IEntityOwnable;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 
 /**
  * Pet command and settings manager.
@@ -94,10 +93,12 @@ public class PetCommandManager extends WorldSavedData {
 	public PetCommandManager(String name) {
 		super(name);
 		this.playerSettings = new HashMap<>();
+		
+		int unused; // This probably needs to register for events?
 	}
 	
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
+	public void read(CompoundNBT nbt) {
 		synchronized(playerSettings) {
 			playerSettings.clear();
 			
@@ -121,11 +122,11 @@ public class PetCommandManager extends WorldSavedData {
 	}
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT compound) {
+	public CompoundNBT write(CompoundNBT compound) {
 		synchronized(playerSettings) {
 			CompoundNBT subtag = new CompoundNBT();
 			for (Entry<UUID, PetCommandSettings> entry : playerSettings.entrySet()) {
-				subtag.put(entry.getKey().toString(), entry.get().writeToNBT(null));
+				subtag.put(entry.getKey().toString(), entry.getValue().writeToNBT(null));
 			}
 			compound.put(NBT_SETTINGS, subtag);
 		}
@@ -153,15 +154,15 @@ public class PetCommandManager extends WorldSavedData {
 	
 	@SubscribeEvent
 	public void onConnect(PlayerLoggedInEvent event) {
-		if (event.player.world.isRemote) {
+		if (event.getPlayer().world.isRemote) {
 			return;
 		}
 		
 		NetworkHandler.sendTo(
-				new PetCommandSettingsSyncMessage(generateClientSettings(event.player.getUniqueID())),
-				(ServerPlayerEntity) event.player);
+				new PetCommandSettingsSyncMessage(generateClientSettings(event.getPlayer().getUniqueID())),
+				(ServerPlayerEntity) event.getPlayer());
 		
-		NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) event.player);
+		NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) event.getPlayer());
 	}
 	
 	protected @Nonnull PetCommandSettings getSettings(@Nonnull UUID uuid) {
@@ -241,10 +242,8 @@ public class PetCommandManager extends WorldSavedData {
 			return;
 		}
 		
-		if (pet instanceof IEntityOwnable) {
-			if (!owner.equals(((IEntityOwnable) pet).getOwner())) {
-				return;
-			}
+		if (!NostrumMagica.getOwner(pet).equals(owner)) {
+			return;
 		}
 		
 		pet.setAttackTarget(target);

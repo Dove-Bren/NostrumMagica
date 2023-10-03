@@ -11,7 +11,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
@@ -29,8 +28,10 @@ import net.minecraftforge.common.ToolType;
 
 public class ManiCrystal extends Block {
 
-	public static final String ID = "mani_crystal";
-	public static final IntegerProperty LEVEL = IntegerProperty.create("level", 0, 1);
+	private static final String ID_PREFIX = "mani_crystal_";
+	public static final String ID_MANI = ID_PREFIX + "mani";
+	public static final String ID_KANI = ID_PREFIX + "kani";
+	public static final String ID_VANI = ID_PREFIX + "vani";
 	public static final DirectionProperty FACING = DirectionProperty.create("facing");
 	
 	protected static final VoxelShape STANDING_AABB = Block.makeCuboidShape(.5-(.16), 0.1D, .5-.16, .5+.16, 0.8D, .5+.16);
@@ -40,7 +41,9 @@ public class ManiCrystal extends Block {
 	protected static final VoxelShape WALL_SOUTH_AABB = Block.makeCuboidShape(.5-.16, 0.2D, 0, .5 + .16, 0.8D, .16);
 	protected static final VoxelShape WALL_WEST_AABB = Block.makeCuboidShape(1-.16, 0.2D, .5-.16, 1, 0.8D, .5+.16);
 	
-	public ManiCrystal() {
+	private final int level;
+	
+	public ManiCrystal(int level) {
 		super(Block.Properties.create(Material.ROCK)
 				.hardnessAndResistance(1.0f, 50.0f)
 				.sound(SoundType.GLASS)
@@ -48,23 +51,30 @@ public class ManiCrystal extends Block {
 				.harvestLevel(1)
 				.tickRandomly()
 				);
+		this.level = level;
 		//this.setLightOpacity(0);
 		
-		this.setDefaultState(this.stateContainer.getBaseState().with(LEVEL, 0).with(FACING, Direction.UP));
+		this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.UP));
+	}
+	
+	protected int getLevel() {
+		return this.level;
 	}
 	
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(LEVEL, FACING);
+		builder.add(FACING);
 	}
 	
 	@Override
 	public int getLightValue(BlockState state) {
-		switch (state.get(LEVEL)) {
+		switch (getLevel()) {
 		case 0:
 		default:
-			return 8;
+			return 4;
 		case 1:
+			return 8;
+		case 2:
 			return 12;
 		}
 	}
@@ -100,7 +110,7 @@ public class ManiCrystal extends Block {
 			return;
 		}
 		
-		if (random.nextInt(2) <= state.get(LEVEL)) {
+		if (getLevel() > 0 && (getLevel() >= 2 || random.nextInt(2) <= getLevel())) {
 			
 			// Check if there are too many already
 			if (worldIn.getEntitiesWithinAABB(EntityWisp.class, VoxelShapes.fullCube().getBoundingBox().offset(pos).grow(20)).size() > 5) {

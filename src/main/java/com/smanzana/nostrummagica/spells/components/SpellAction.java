@@ -342,7 +342,7 @@ public class SpellAction {
 			
 			if (caster != null && caster instanceof PlayerEntity) {
 				// Look for lightning belt
-				IInventory baubles = NostrumMagica.baubles.getBaubles((PlayerEntity) caster);
+				IInventory baubles = NostrumMagica.instance.curios.getCurios((PlayerEntity) caster);
 				if (baubles != null) {
 					for (int i = 0; i < baubles.getSizeInventory(); i++) {
 						ItemStack stack = baubles.getStackInSlot(i);
@@ -792,7 +792,7 @@ public class SpellAction {
 			
 			if (caster != null && caster instanceof PlayerEntity) {
 				// Look for lightning belt
-				IInventory baubles = NostrumMagica.baubles.getBaubles((PlayerEntity) caster);
+				IInventory baubles = NostrumMagica.instance.curios.getCurios((PlayerEntity) caster);
 				if (baubles != null) {
 					for (int i = 0; i < baubles.getSizeInventory(); i++) {
 						ItemStack stack = baubles.getStackInSlot(i);
@@ -1077,7 +1077,7 @@ public class SpellAction {
 			
 			if (caster != null && caster instanceof PlayerEntity) {
 				// Look for ender belt
-				IInventory baubles = NostrumMagica.baubles.getBaubles((PlayerEntity) caster);
+				IInventory baubles = NostrumMagica.instance.curios.getCurios((PlayerEntity) caster);
 				if (baubles != null) {
 					for (int i = 0; i < baubles.getSizeInventory(); i++) {
 						ItemStack stack = baubles.getStackInSlot(i);

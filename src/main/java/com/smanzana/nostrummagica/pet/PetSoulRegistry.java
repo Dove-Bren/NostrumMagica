@@ -71,7 +71,7 @@ public class PetSoulRegistry extends WorldSavedData {
 				nbt = new CompoundNBT();
 			}
 			
-			nbt.setUniqueId(NBT_ENTRY_WORLDID, worldID);
+			nbt.putUniqueId(NBT_ENTRY_WORLDID, worldID);
 			if (this.snapshot != null) {
 				nbt.put(NBT_ENTRY_SNAPSHOT, snapshot);
 			}
@@ -107,7 +107,7 @@ public class PetSoulRegistry extends WorldSavedData {
 	}
 
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
+	public void read(CompoundNBT nbt) {
 		synchronized(soulMap) {
 			soulMap.clear();
 			
@@ -139,12 +139,12 @@ public class PetSoulRegistry extends WorldSavedData {
 	}
 
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT compound) {
+	public CompoundNBT write(CompoundNBT compound) {
 		synchronized(soulMap) {
 			for (Entry<UUID, SoulEntry> entry : soulMap.entrySet()) {
 				compound.put(
 						entry.getKey().toString(),
-						entry.get().writeToNBT(null)
+						entry.getValue().writeToNBT(null)
 					);
 			}
 		}

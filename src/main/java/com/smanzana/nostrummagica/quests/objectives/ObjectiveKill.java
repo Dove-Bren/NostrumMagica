@@ -12,8 +12,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.entity.projectile.EntityArrow;
-import net.minecraft.entity.projectile.EntityFireball;
+import net.minecraft.entity.projectile.AbstractArrowEntity;
+import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -87,18 +87,18 @@ public class ObjectiveKill implements IObjective {
 			PlayerEntity player = null;
 			if (source instanceof PlayerEntity) {
 				player = (PlayerEntity) source;
-			} else if (source instanceof EntityArrow) {
-				EntityArrow arrow = (EntityArrow) source;
-				if (arrow.shootingEntity instanceof PlayerEntity) {
-					player = (PlayerEntity) arrow.shootingEntity;
+			} else if (source instanceof AbstractArrowEntity) {
+				AbstractArrowEntity arrow = (AbstractArrowEntity) source;
+				if (arrow.getShooter() instanceof PlayerEntity) {
+					player = (PlayerEntity) arrow.getShooter();
 				}
 			} else if (source instanceof EntitySpellProjectile) {
 				EntitySpellProjectile proj = (EntitySpellProjectile) source;
 				if (proj.shootingEntity instanceof PlayerEntity) {
 					player = (PlayerEntity) proj.shootingEntity;
 				}
-			} else if (source instanceof EntityFireball) {
-				EntityFireball proj = (EntityFireball) source;
+			} else if (source instanceof FireballEntity) {
+				FireballEntity proj = (FireballEntity) source;
 				if (proj.shootingEntity instanceof PlayerEntity) {
 					player = (PlayerEntity) proj.shootingEntity;
 				}

@@ -48,7 +48,7 @@ public class InfusedGemItem extends Item implements ILoreTagged {
 	 * @param count
 	 * @return
 	 */
-	public static ItemStack getGem(EMagicElement element, int count) {
+	public static Item getGemItem(EMagicElement element) {
 		if (element == null) {
 			element = EMagicElement.PHYSICAL;
 		}
@@ -78,7 +78,11 @@ public class InfusedGemItem extends Item implements ILoreTagged {
 			break;
 		}
 		
-		return new ItemStack(gem, count);
+		return gem;
+	}
+	
+	public static ItemStack getGem(EMagicElement element, int count) {
+		return new ItemStack(getGemItem(element), count);
 	}
 	
 //    public String getNameFromMeta(int meta) {

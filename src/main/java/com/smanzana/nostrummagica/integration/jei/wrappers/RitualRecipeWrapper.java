@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.integration.jei.wrappers;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.integration.jei.RitualOutcomeWrapper;
 import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeIngredientType;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
@@ -15,26 +16,27 @@ import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.ingredients.VanillaTypes;
 import mezz.jei.api.recipe.IRecipeWrapper;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.NonNullList;
 
 public class RitualRecipeWrapper implements IRecipeWrapper {
 
 	private RitualRecipe ritual;
-	private List<ItemStack> inputs;
+	private List<Ingredient> inputs;
 	
 	public RitualRecipeWrapper(RitualRecipe ritual) {
 		this.ritual = ritual;
 		inputs = new ArrayList<>();
 
 		// Add flavor gem
-		inputs.add(InfusedGemItem.getGem(ritual.getElement(), 1));
-		ItemStack reagent2, reagent3, reagent4;
+		inputs.add(Ingredient.fromItems(InfusedGemItem.getGemItem(ritual.getElement())));
+		Ingredient reagent2, reagent3, reagent4;
 		ReagentType reagents[] = ritual.getTypes();
-		inputs.add(ReagentItem.CreateStack(reagents[0], 1));
+		inputs.add(Ingredient.fromItems(ReagentItem.GetItem(reagents[0])));
 		if (reagents.length > 1) {
-			reagent2 = ReagentItem.CreateStack(reagents[1], 1);
-			reagent3 = ReagentItem.CreateStack(reagents[2], 1);
-			reagent4 = ReagentItem.CreateStack(reagents[3], 1);
+			reagent2 = Ingredient.fromItems(ReagentItem.GetItem(reagents[1]));
+			reagent3 = Ingredient.fromItems(ReagentItem.GetItem(reagents[2]));
+			reagent4 = Ingredient.fromItems(ReagentItem.GetItem(reagents[3]));
 		} else {
 			reagent2 = reagent3 = reagent4 = null;
 		}
@@ -42,8 +44,8 @@ public class RitualRecipeWrapper implements IRecipeWrapper {
 		inputs.add(reagent3);
 		inputs.add(reagent4);
 		inputs.add(ritual.getCenterItem());
-		NonNullList<ItemStack> extras = ritual.getExtraItems();
-		ItemStack extra1, extra2, extra3, extra4;
+		NonNullList<Ingredient> extras = ritual.getExtraItems();
+		Ingredient extra1, extra2, extra3, extra4;
 		extra1 = extra2 = extra3 = extra4 = null;
 		if (extras != null) {
 			int len = extras.size();
@@ -66,7 +68,16 @@ public class RitualRecipeWrapper implements IRecipeWrapper {
 	
 	@Override
 	public void getIngredients(IIngredients ingredients) {
-		ingredients.setInputs(VanillaTypes.ITEM, inputs);
+		List<List<ItemStack>> stackInputs = new ArrayList<>();
+		for (Ingredient ing : inputs) {
+			if (ing == Ingredient.EMPTY || ing.hasNoMatchingItems()) {
+				stackInputs.add(new ArrayList<>()); // should be null?
+			} else {
+				stackInputs.add(Lists.newArrayList(ing.getMatchingStacks()));
+			}
+		}
+		
+		ingredients.setInputLists(VanillaTypes.ITEM, stackInputs);
 		if (ritual.getOutcome() instanceof IItemRitualOutcome) {
 			ingredients.setOutput(VanillaTypes.ITEM, ((IItemRitualOutcome) ritual.getOutcome()).getResult());
 		} else {

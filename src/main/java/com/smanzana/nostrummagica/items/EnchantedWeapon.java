@@ -11,15 +11,14 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.EntityBehavior;
-import com.smanzana.nostrummagica.effects.FrostbiteEffect;
 import com.smanzana.nostrummagica.effects.LightningAttackEffect;
+import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaEntityEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaLocationEffect;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble.ItemType;
-import com.smanzana.nostrummagica.items.EnchantedArmor.Type;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
@@ -39,9 +38,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTier;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.item.SwordItem;
+import net.minecraft.particles.ParticleTypes;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
-import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
@@ -205,7 +205,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 		default:
 			break;
 		}
-		return 200;
+		return durability;//200;
 	}
 	
 	private static int typeScale(Type type) {
@@ -277,7 +277,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 		case ICE:
 			if (NostrumMagica.rand.nextFloat() < 0.5f * typeScale(this.type))
 				action = new SpellAction(user).status(
-						FrostbiteEffect.instance(), 5 * 20, typeScale(this.type) > 2 ? typeScale(this.type) - 2 : 0);
+						NostrumEffects.frostbite, 5 * 20, typeScale(this.type) > 2 ? typeScale(this.type) - 2 : 0);
 			break;
 		default:
 			break;
@@ -397,7 +397,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 				}
 			}
 			
-		} else if (element == EMagicElement.LIGHTNING && EnchantedArmor.GetSetCount(playerIn, EMagicElement.LIGHTNING, 3) == 4) {
+		} else if (element == EMagicElement.LIGHTNING && EnchantedArmor.GetSetCount(playerIn, EMagicElement.LIGHTNING, EnchantedArmor.Type.TRUE) == 4) {
 			if (playerIn.getCooledAttackStrength(0.5F) > .95) {
 				// If full set, strike at targetting location (unless sneaking, then strike self)
 				boolean used = false;
@@ -406,7 +406,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 						summonBoltOnSelf(playerIn);
 					}
 					used = true;
-				} else if (playerIn.isPotionActive(LightningAttackEffect.instance())) {
+				} else if (playerIn.isPotionActive(NostrumEffects.lightningAttack)) {
 					// This should be client-side... TODO do it on client and send via armor message?
 					
 					// Do quick mana check prior to actually doing raytrace. Redone inside helper func.
@@ -464,7 +464,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 				}
 				playerIn.resetCooldown();
 				return ActionResultType.SUCCESS;
-			} else if (element == EMagicElement.LIGHTNING && EnchantedArmor.GetSetCount(playerIn, EMagicElement.LIGHTNING, 3) == 4) {
+			} else if (element == EMagicElement.LIGHTNING && EnchantedArmor.GetSetCount(playerIn, EMagicElement.LIGHTNING, EnchantedArmor.Type.TRUE) == 4) {
 				
 				boolean used = false;
 				if (playerIn.isSneaking()) {
@@ -472,7 +472,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 						summonBoltOnSelf(playerIn);
 					}
 					used = true;
-				} else if (playerIn.isPotionActive(LightningAttackEffect.instance())) {
+				} else if (playerIn.isPotionActive(NostrumEffects.lightningAttack)) {
 					// This should be client-side... TODO do it on client and send via armor message?
 					
 					// Do quick mana check prior to actually doing raytrace. Redone inside helper func.
@@ -510,7 +510,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 		cloud.setRadius(0.5f);
 		cloud.setRadiusPerTick((1f + typeScale(weaponType) * .75f) / (20f * 3)); // 1 (+ .75 per extra level) extra radius per 3 seconds
 		cloud.setDuration((int) (20 * (3 + typeScale(weaponType) * .5f))); // 3 seconds + a half a second per extra level
-		cloud.addEffect(new PotionEffect(FrostbiteEffect.instance(), 20 * 10));
+		cloud.addEffect(new EffectInstance(NostrumEffects.frostbite, 20 * 10));
 		cloud.addEffect((IAreaLocationEffect)(worldIn, pos) -> {
 			BlockState state = worldIn.getBlockState(pos);
 			if (state.getMaterial() == Material.WATER
@@ -522,13 +522,11 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 		cloud.setGravity(true, .1);
 		//cloud.setWalksWater();
 		world.addEntity(cloud);
-		cloud.getMotion().x = direction.x;
-		cloud.getMotion().y = direction.y;
-		cloud.getMotion().z = direction.z;
+		cloud.setMotion(direction);
 	}
 	
 	protected static void spawnWalkingVortex(World world, PlayerEntity caster, Vec3d at, Vec3d direction, Type weaponType) {
-		final int hurricaneCount = EnchantedArmor.GetSetCount(caster, EMagicElement.WIND, 3);
+		final int hurricaneCount = EnchantedArmor.GetSetCount(caster, EMagicElement.WIND, EnchantedArmor.Type.TRUE);
 		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 10 seconds
 		EntityAreaEffect cloud = new EntityAreaEffect(world, at.x, at.y, at.z);
 		cloud.setOwner(caster);
@@ -685,7 +683,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 		int count = 1;
 		if (caster != null && caster instanceof PlayerEntity) {
 			// Look for lightning belt
-			IInventory baubles = NostrumMagica.baubles.getBaubles((PlayerEntity) caster);
+			IInventory baubles = NostrumMagica.instance.curios.getCurios((PlayerEntity) caster);
 			if (baubles != null) {
 				for (int i = 0; i < baubles.getSizeInventory(); i++) {
 					ItemStack stack = baubles.getStackInSlot(i);

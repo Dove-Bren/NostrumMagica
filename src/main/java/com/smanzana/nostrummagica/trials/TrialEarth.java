@@ -5,6 +5,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -25,7 +26,7 @@ public class TrialEarth extends ShrineTrial {
 		if (!attr.hasTrial(this.element))
 			return;
 		
-		if (e.getState().getBlock() != Blocks.OBSIDIAN)
+		if (!Tags.Blocks.OBSIDIAN.contains(e.getState().getBlock()))
 			return;
 		
 		if (!e.getPlayer().getHeldItemMainhand().isEmpty())

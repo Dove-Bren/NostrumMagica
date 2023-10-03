@@ -12,10 +12,8 @@ import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeIngre
 import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeJEIHelper;
 import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeJEIRenderer;
 import com.smanzana.nostrummagica.integration.jei.wrappers.RitualRecipeWrapper;
-import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.SpellRune;
-import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
 

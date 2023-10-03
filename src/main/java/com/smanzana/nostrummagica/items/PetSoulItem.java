@@ -109,12 +109,12 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 			return null;
 		}
 		
-		CompoundNBT snapshot = NostrumMagica.getPetSoulRegistry().getPetSnapshot(soulID);
+		CompoundNBT snapshot = NostrumMagica.instance.getPetSoulRegistry().getPetSnapshot(soulID);
 		if (snapshot == null) {
 			return null;
 		}
 		
-		UUID worldID = NostrumMagica.getPetSoulRegistry().rotateWorldID(soulID);
+		UUID worldID = NostrumMagica.instance.getPetSoulRegistry().rotateWorldID(soulID);
 		
 		Entity rawEnt = IPetWithSoul.SpawnPetFromSnapshot(world, pos, snapshot, false);
 		if (rawEnt == null) {

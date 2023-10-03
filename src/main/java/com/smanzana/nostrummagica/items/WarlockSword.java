@@ -117,7 +117,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellArmor,
 	
 	@Override
 	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return !repair.isEmpty() && NostrumItemTags.CrystalMedium.contains(repair.getItem());
+        return !repair.isEmpty() && NostrumItemTags.Items.CrystalMedium.contains(repair.getItem());
     }
 
 	@Override
@@ -396,7 +396,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellArmor,
 				// else if nothign else, try client-side enderIO teleport?
 				if (canEnderTravel(stack, playerIn)) {
 					if (worldIn.isRemote) {
-						if (NostrumMagica.enderIO.AttemptEnderIOTravel(stack, hand, worldIn, playerIn, TravelSourceWrapper.STAFF)) {
+						if (NostrumMagica.instance.enderIO.AttemptEnderIOTravel(stack, hand, worldIn, playerIn, TravelSourceWrapper.STAFF)) {
 							playerIn.resetCooldown();
 							playerIn.swingArm(hand);
 							return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);

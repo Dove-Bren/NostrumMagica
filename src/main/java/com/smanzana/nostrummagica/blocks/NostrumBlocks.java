@@ -37,7 +37,9 @@ public class NostrumBlocks {
 	@ObjectHolder(MagicDirt.ID) public static MagicDirt magicDirt;
 	@ObjectHolder(MagicWall.ID) public static MagicWall magicWall;
 	@ObjectHolder(ManaArmorerBlock.ID) public static ManaArmorerBlock manaArmorerBlock;
-	@ObjectHolder(ManiCrystal.ID) public static ManiCrystal maniCrystalBlock;
+	@ObjectHolder(ManiCrystal.ID_MANI) public static ManiCrystal maniCrystalBlock;
+	@ObjectHolder(ManiCrystal.ID_KANI) public static ManiCrystal kaniCrystalBlock;
+	@ObjectHolder(ManiCrystal.ID_VANI) public static ManiCrystal vaniCrystalBlock;
 	@ObjectHolder(ManiOre.ID) public static ManiOre maniOre;
 	@ObjectHolder(MimicBlock.ID_FACADE) public static MimicBlock mimicFacade;
 	@ObjectHolder(MimicBlock.ID_DOOR) public static MimicBlock mimicDoor;
@@ -97,6 +99,8 @@ public class NostrumBlocks {
     	registerBlockItem(magicWall, magicWall.getRegistryName(), registry);
     	registerBlockItem(manaArmorerBlock, manaArmorerBlock.getRegistryName(), registry);
     	registerBlockItem(maniCrystalBlock, maniCrystalBlock.getRegistryName(), registry);
+    	registerBlockItem(kaniCrystalBlock, kaniCrystalBlock.getRegistryName(), registry);
+    	registerBlockItem(vaniCrystalBlock, vaniCrystalBlock.getRegistryName(), registry);
     	registerBlockItem(maniOre, maniOre.getRegistryName(), registry);
     	registerBlockItem(mimicFacade, mimicFacade.getRegistryName(), registry);
     	registerBlockItem(mimicDoor, mimicDoor.getRegistryName(), registry);
@@ -176,7 +180,9 @@ public class NostrumBlocks {
     	registerBlock(new MagicDirt(), MagicDirt.ID, registry);
     	registerBlock(new MagicWall(), MagicWall.ID, registry);
     	registerBlock(new ManaArmorerBlock(), ManaArmorerBlock.ID, registry);
-    	registerBlock(new ManiCrystal(), ManiCrystal.ID, registry);
+    	registerBlock(new ManiCrystal(0), ManiCrystal.ID_MANI, registry);
+    	registerBlock(new ManiCrystal(1), ManiCrystal.ID_KANI, registry);
+    	registerBlock(new ManiCrystal(2), ManiCrystal.ID_VANI, registry);
     	registerBlock(new ManiOre(), ManiOre.ID, registry);
     	registerBlock(new MimicBlock(false), MimicBlock.ID_FACADE, registry);
     	registerBlock(new MimicBlock(true), MimicBlock.ID_DOOR, registry);

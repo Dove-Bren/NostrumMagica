@@ -74,7 +74,7 @@ public class MirrorShield extends ShieldItem implements ISpellActionListener, IL
 		if (repair.isEmpty()) {
 			return false;
 		} else {
-			return NostrumItemTags.CrystalMedium.contains(repair.getItem());
+			return NostrumItemTags.Items.CrystalMedium.contains(repair.getItem());
 		}
     }
 	

@@ -18,7 +18,7 @@ import com.smanzana.nostrummagica.client.gui.book.PlainTextPage;
 import com.smanzana.nostrummagica.client.gui.book.SpellPreviewPage;
 import com.smanzana.nostrummagica.client.gui.book.TitlePage;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.effects.FrostbiteEffect;
+import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.network.NetworkHandler;
@@ -44,7 +44,6 @@ import net.minecraft.nbt.IntNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
-import net.minecraft.potion.Potion;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
@@ -924,7 +923,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 				case 1:
 					// Frostbite
 					player.addPotionEffect(new EffectInstance(
-							FrostbiteEffect.instance(),
+							NostrumEffects.frostbite,
 							20 * 10,
 							0
 							));

@@ -1,11 +1,12 @@
 package com.smanzana.nostrummagica.items;
 
-import com.smanzana.nostrummagica.blocks.ChalkBlock;
+import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.utils.ItemStacks;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -57,7 +58,7 @@ public class ChalkItem extends Item implements ILoreTagged {
 		
 		ItemStack stack = context.getItem();
         if (facing == Direction.UP && player.canPlayerEdit(pos.offset(facing), facing, stack) && Block.func_220064_c(world, pos.down()) && world.isAirBlock(pos.up())) {
-        	world.setBlockState(pos.up(), ChalkBlock.instance().getDefaultState());
+        	world.setBlockState(pos.up(), NostrumBlocks.chalk.getDefaultState());
         	ItemStacks.damageItem(stack, player, context.getHand(), 1);
             return ActionResultType.SUCCESS;
         } else {

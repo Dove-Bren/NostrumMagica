@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.integration.curios.inventory;
 
+import java.util.ArrayList;
 import java.util.SortedMap;
 import java.util.function.Predicate;
 
@@ -19,7 +20,15 @@ public class CurioInventoryWrapper {
 	
 	public static IInventory getCuriosInventory(PlayerEntity entity) {
 		LazyOptional<ItemStackArrayWrapper> opt = CuriosAPI.getCuriosHandler(entity).map((handler) -> {
-			return new ItemStackArrayWrapper(handler.getCurioMap().values().toArray(new ItemStack[0]));
+			CurioStackHandler[] stackHandlers = handler.getCurioMap().values().toArray(new CurioStackHandler[0]);
+			ArrayList<ItemStack> itemList = new ArrayList<>();
+			for (CurioStackHandler h : stackHandlers) {
+				for (int i = 0; i < h.getSlots(); i++) {
+					itemList.add(h.getStackInSlot(i));
+				}
+			}
+			
+			return new ItemStackArrayWrapper(itemList.toArray(new ItemStack[0]));
 		});
 		return opt.orElse(EMPTY_INV);
 	}

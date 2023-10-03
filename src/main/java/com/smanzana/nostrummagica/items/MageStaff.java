@@ -84,7 +84,7 @@ public class MageStaff extends SwordItem implements ILoreTagged, ISpellArmor {
 		if (repair.isEmpty()) {
 			return false;
 		} else {
-			return NostrumItemTags.CrystalSmall.contains(repair.getItem());
+			return NostrumItemTags.Items.CrystalSmall.contains(repair.getItem());
 		}
     }
 

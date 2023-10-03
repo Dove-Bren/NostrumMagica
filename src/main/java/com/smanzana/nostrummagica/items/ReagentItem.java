@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 
 import com.smanzana.nostrumaetheria.api.item.IAetherBurnable;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower.Type;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
@@ -158,11 +159,11 @@ public class ReagentItem extends Item implements ILoreTagged, IAetherBurnable {
     	
     	if (type == ReagentType.MANDRAKE_ROOT) {
     		// Try to plant as seed. Convenient!
-    		return ReagentSeed.mandrake.onItemUse(context);
+    		return NostrumItems.reagentSeedMandrake.onItemUse(context);
     	}
     	
     	if (type == ReagentType.GINSENG) {
-	    	return ReagentSeed.ginseng.onItemUse(context);
+	    	return NostrumItems.reagentSeedGinseng.onItemUse(context);
     	}
     	
     	if (type == ReagentType.CRYSTABLOOM) {
@@ -171,8 +172,8 @@ public class ReagentItem extends Item implements ILoreTagged, IAetherBurnable {
     		final PlayerEntity playerIn = context.getPlayer();
     		final Direction facing = context.getFace();
     		BlockState state = worldIn.getBlockState(pos);
-	        if (facing == Direction.UP && playerIn.canPlayerEdit(pos.offset(facing), facing, stack) && state.getBlock().canSustainPlant(state, worldIn, pos, Direction.UP, NostrumMagicaFlower.instance()) && worldIn.isAirBlock(pos.up())) {
-	        	worldIn.setBlockState(pos.up(), NostrumMagicaFlower.instance().getState(Type.CRYSTABLOOM));
+	        if (facing == Direction.UP && playerIn.canPlayerEdit(pos.offset(facing), facing, stack) && state.getBlock().canSustainPlant(state, worldIn, pos, Direction.UP, NostrumBlocks.crystabloom) && worldIn.isAirBlock(pos.up())) {
+	        	worldIn.setBlockState(pos.up(), NostrumBlocks.crystabloom.getDefaultState());
 	            stack.shrink(1);
 	            return ActionResultType.SUCCESS;
 	        } else {

@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.items;
 
-import com.smanzana.nostrummagica.blocks.NostrumMirrorBlock;
+import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -12,7 +12,7 @@ public class MirrorItem extends BlockItem implements ILoreTagged {
 	public static final String ID = "mirror_item";
 
 	public MirrorItem() {
-		super(NostrumMirrorBlock.instance(), NostrumItems.PropBase());
+		super(NostrumBlocks.mirrorBlock, NostrumItems.PropBase());
 	}
 	
 //	@Override
