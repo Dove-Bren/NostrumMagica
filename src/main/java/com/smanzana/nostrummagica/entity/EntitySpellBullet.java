@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger.SeekingBulletTriggerInstance;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileHelper;
@@ -18,6 +19,7 @@ import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.particles.ParticleType;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
@@ -26,9 +28,12 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 // Like shulker bullets but have spells in them
 public class EntitySpellBullet extends ShulkerBulletEntity {
+	
+	public static final String ID = "spell_bullet";
 
 	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(EntitySpellBullet.class, MagicElementDataSerializer.instance);
 	
@@ -37,7 +42,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 	private LivingEntity target;
 	private LivingEntity shooter;
 	private double speed; // Vanilla shulkers use .15
-	private ParticleTypes particle;
+	private ParticleType<?> particle;
 	
 	private boolean blockyPath; // Shulker-style pathing? Else smooth curve style.
 	
@@ -48,29 +53,43 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 	private double targetDeltaY;
 	private double targetDeltaZ;
 
-	public EntitySpellBullet(World world) {
-		super(world);
+	public EntitySpellBullet(EntityType<? extends EntitySpellBullet> type, World world) {
+		super(type, world);
 		this.speed = .15;
 		this.particle = ParticleTypes.CRIT;
 		this.steps = 1;
 	}
 	
-	public EntitySpellBullet(SeekingBulletTriggerInstance self,
+	public EntitySpellBullet(EntityType<? extends EntitySpellBullet> type, 
+			SeekingBulletTriggerInstance self,
 			LivingEntity shooter,
 			LivingEntity target,
 			Direction.Axis axis) {
-		this(self, shooter, target, axis, .8, ParticleTypes.CRIT, false);
+		this(type, self, shooter, target, axis, .8, ParticleTypes.CRIT, false);
 	}
 	
-	public EntitySpellBullet(
+	public EntitySpellBullet(EntityType<? extends EntitySpellBullet> type, 
 			SeekingBulletTriggerInstance self,
 			LivingEntity shooter,
 			LivingEntity target,
 			Direction.Axis axis,
 			double speed,
-			ParticleTypes particle,
+			ParticleType<?> particle,
 			boolean blockyPath) {
-		super(shooter.world, shooter, target, axis);
+		//super(shooter.world, shooter, target, axis);
+		this(type, shooter.world);
+		{ // copied out from super since it hardcodes type now
+			ObfuscationReflectionHelper.setPrivateValue(ShulkerBulletEntity.class, this, shooter, "field_184570_a"); // owner
+			//this.owner = ownerIn;
+			BlockPos blockpos = new BlockPos(shooter);
+			double d0 = (double)blockpos.getX() + 0.5D;
+			double d1 = (double)blockpos.getY() + 0.5D;
+			double d2 = (double)blockpos.getZ() + 0.5D;
+			this.setLocationAndAngles(d0, d1, d2, this.rotationYaw, this.rotationPitch);
+			this.target = target;
+			this.direction = Direction.UP;
+			this.selectNextMoveDirection(axis);
+		}
 		this.steps = 1;
 		this.trigger = self;
 		this.shooter = shooter;
@@ -244,7 +263,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 	/**
 	 * Called to update the entity's position/logic.
 	 */
-	public void onUpdate()
+	public void tick()
 	{
 		if (!this.world.isRemote && this.world.getDifficulty() == EnumDifficulty.PEACEFUL)
 		{
@@ -252,7 +271,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 		}
 		else
 		{
-			//super.onUpdate();
+			//super.tick();
 			this.onEntityUpdate();
 
 			if (!this.world.isRemote)

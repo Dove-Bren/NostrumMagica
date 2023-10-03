@@ -3,13 +3,14 @@ package com.smanzana.nostrummagica.entity.plantboss;
 import java.util.List;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.Direction;
+import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -17,6 +18,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class EntityPlantBossBramble extends Entity {
+	
+	public static final String ID = "entity_plant_boss.bramble";
 
 	protected static final DataParameter<Float> WIDTH = EntityDataManager.<Float>createKey(EntityPlantBossBramble.class, DataSerializers.FLOAT);
 	protected static final DataParameter<Float> DEPTH = EntityDataManager.<Float>createKey(EntityPlantBossBramble.class, DataSerializers.FLOAT);
@@ -29,16 +32,16 @@ public class EntityPlantBossBramble extends Entity {
 	
 	protected AxisAlignedBB entityBBOverride;
 	
-	public EntityPlantBossBramble(World worldIn) {
-		super(worldIn);
+	public EntityPlantBossBramble(EntityType<EntityPlantBossBramble> type, World worldIn) {
+		super(type, worldIn);
 	}
 	
-	public EntityPlantBossBramble(World worldIn, EntityPlantBoss plant, float length) {
-		this(worldIn, plant, length, .5f, .75f);
+	public EntityPlantBossBramble(EntityType<EntityPlantBossBramble> type, World worldIn, EntityPlantBoss plant, float length) {
+		this(type, worldIn, plant, length, .5f, .75f);
 	}
 	
-	public EntityPlantBossBramble(World worldIn, EntityPlantBoss plant, float width, float depth, float height) {
-		this(worldIn);
+	public EntityPlantBossBramble(EntityType<EntityPlantBossBramble> type, World worldIn, EntityPlantBoss plant, float width, float depth, float height) {
+		this(type, worldIn);
 		this.plant = plant;
 		this.setSize(width, height);
 		
@@ -166,8 +169,8 @@ public class EntityPlantBossBramble extends Entity {
 	}
 	
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 		
 		if (this.getFacing() != null) {
 			this.setRotation(this.getFacing().getHorizontalAngle(), 0f);

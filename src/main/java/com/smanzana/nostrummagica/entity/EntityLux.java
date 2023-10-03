@@ -31,30 +31,31 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.BlockFlower;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.material.Material;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
-import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityMoveHelper;
-import net.minecraft.entity.passive.EntityAnimal;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
@@ -63,11 +64,13 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.util.Constants.NBT;
 
-public class EntityLux extends EntityAnimal implements ILoreTagged, ITameableEntity {
+public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEntity {
+	
+	public static final String ID = "entity_lux";
 	
 	protected static final double LUX_HOME_DISTANCE_SQ = 144;
 	protected static final double LUX_HOME_FORGET_DISTANCE_SQ = 400;
@@ -84,9 +87,8 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, ITameableEnt
 	private int idleCooldown;
 	private long swingStartTicks; // client only
 	
-	public EntityLux(World worldIn) {
-		super(worldIn);
-		this.setSize(.5F, .5F);
+	public EntityLux(EntityType<? extends EntityLux> type, World worldIn) {
+		super(type, worldIn);
 		this.setNoGravity(true);
 		this.noClip = true;
 		this.moveHelper = new LuxMoveHelper(this);
@@ -94,14 +96,14 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, ITameableEnt
 		idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
 	}
 	
-	public EntityLux(World worldIn, BlockPos homePos) {
-		this(worldIn);
+	public EntityLux(EntityType<? extends EntityLux> type, World worldIn, BlockPos homePos) {
+		this(type, worldIn);
 		this.setHomePosAndDistance(homePos, (int) LUX_HOME_DISTANCE_SQ);
 		this.setHome(homePos);
 	}
 	
-	public EntityLux(World worldIn, LivingEntity owner) {
-		this(worldIn);
+	public EntityLux(EntityType<? extends EntityLux> type, World worldIn, LivingEntity owner) {
+		this(type, worldIn);
 		this.setOwner(owner);
 	}
 	
@@ -260,8 +262,8 @@ public class EntityLux extends EntityAnimal implements ILoreTagged, ITameableEnt
 	}
 	
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 		
 		if (world.isRemote) {
 			ItemStack stack = this.getPollinatedItem();

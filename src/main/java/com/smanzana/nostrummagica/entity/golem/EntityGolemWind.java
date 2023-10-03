@@ -12,12 +12,15 @@ import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.potion.Potion;
 import net.minecraft.world.World;
 
 public class EntityGolemWind extends EntityGolem {
+	
+	public static final String ID = "wind_golem";
 	
 	private static Spell spellPush;
 	private static Spell spellBuff;
@@ -40,8 +43,8 @@ public class EntityGolemWind extends EntityGolem {
 		}
 	}
 
-	public EntityGolemWind(World worldIn) {
-		super(worldIn, EMagicElement.WIND, true, false, true);
+	public EntityGolemWind(EntityType<EntityGolemWind> type, World worldIn) {
+		super(type, worldIn, EMagicElement.WIND, true, false, true);
 	}
 
 	@Override

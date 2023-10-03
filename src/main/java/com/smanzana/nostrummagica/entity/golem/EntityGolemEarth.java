@@ -12,12 +12,15 @@ import com.smanzana.nostrummagica.spells.Spell.SpellPart;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.potion.Potion;
 import net.minecraft.world.World;
 
 public class EntityGolemEarth extends EntityGolem {
+	
+	public static final String ID = "earth_golem";
 	
 	private static Spell spellBuff1;
 	private static Spell spellBuff2;
@@ -40,8 +43,8 @@ public class EntityGolemEarth extends EntityGolem {
 		}
 	}
 
-	public EntityGolemEarth(World worldIn) {
-		super(worldIn, EMagicElement.EARTH, true, false, true);
+	public EntityGolemEarth(EntityType<EntityGolemEarth> type, World worldIn) {
+		super(type, worldIn, EMagicElement.EARTH, true, false, true);
 	}
 
 	@Override

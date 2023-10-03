@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.item.ItemStack;
@@ -21,6 +22,8 @@ import net.minecraft.potion.Potion;
 import net.minecraft.world.World;
 
 public class EntityGolemFire extends EntityGolem {
+	
+	public static final String ID = "fire_golem";
 	
 	private static Spell spellRanged1;
 	private static Spell spellRanged2;
@@ -61,8 +64,8 @@ public class EntityGolemFire extends EntityGolem {
 		}
 	}
 
-	public EntityGolemFire(World worldIn) {
-		super(worldIn, EMagicElement.FIRE, false, true, true);
+	public EntityGolemFire(EntityType<EntityGolemFire> type, World worldIn) {
+		super(type, worldIn, EMagicElement.FIRE, false, true, true);
         this.isImmuneToFire = true;
 	}
 

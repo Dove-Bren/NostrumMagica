@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.utils.NonNullEnumMap;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.MoverType;
@@ -46,8 +47,8 @@ import net.minecraftforge.common.util.Constants.NBT;
 
 public abstract class EntityDragon extends MonsterEntity implements ILoreTagged {
 	
-	public EntityDragon(World worldIn) {
-        super(worldIn);
+	public EntityDragon(EntityType<? extends EntityDragon> type, World worldIn) {
+        super(type, worldIn);
     }
 	
 	protected void setSize(float width, float length, float height) {

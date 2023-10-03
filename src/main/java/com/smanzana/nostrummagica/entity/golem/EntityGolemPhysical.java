@@ -11,12 +11,15 @@ import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.potion.Potion;
 import net.minecraft.world.World;
 
 public class EntityGolemPhysical extends EntityGolem {
+	
+	public static final String ID = "physical_golem";
 	
 	private static Spell spellRanged;
 	private static Spell spellDebuff;
@@ -40,8 +43,8 @@ public class EntityGolemPhysical extends EntityGolem {
 		}
 	}
 
-	public EntityGolemPhysical(World worldIn) {
-		super(worldIn, EMagicElement.PHYSICAL, true, true, false);
+	public EntityGolemPhysical(EntityType<EntityGolemPhysical> type, World worldIn) {
+		super(type, worldIn, EMagicElement.PHYSICAL, true, true, false);
 	}
 
 	@Override

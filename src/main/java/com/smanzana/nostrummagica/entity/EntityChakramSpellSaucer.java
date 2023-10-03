@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.entity;
 import com.smanzana.nostrummagica.spells.components.triggers.MagicCutterTrigger.MagicCutterTriggerInstance;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.util.math.BlockPos;
@@ -13,6 +14,8 @@ import net.minecraft.world.World;
 
 public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 	
+	public static final String ID = "entity_internal_spellsaucer_chakram";
+	
 	// Chakram:
 	private Vec3d origin;
 	private Vec3d target;
@@ -22,20 +25,21 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 	private boolean piercing; // Configurable by the player\
 	private int maxTrips;
 	
-	public EntityChakramSpellSaucer(World world) {
-		super(world);
+	public EntityChakramSpellSaucer(EntityType<? extends EntityChakramSpellSaucer> type, World world) {
+		super(type, world);
 	}
 	
-	public EntityChakramSpellSaucer(World world, LivingEntity shooter, MagicCutterTriggerInstance trigger, float speed) {
-		super(world, shooter, trigger, speed);
+	public EntityChakramSpellSaucer(EntityType<? extends EntityChakramSpellSaucer> type, World world, LivingEntity shooter, MagicCutterTriggerInstance trigger, float speed) {
+		super(type, world, shooter, trigger, speed);
         this.returning = false;
 	}
 	
-	public EntityChakramSpellSaucer(MagicCutterTriggerInstance trigger, LivingEntity shooter,
+	public EntityChakramSpellSaucer(EntityType<? extends EntityChakramSpellSaucer> type,
+			MagicCutterTriggerInstance trigger, LivingEntity shooter,
 			World world,
 			double fromX, double fromY, double fromZ, Vec3d direction,
 			float speedFactor, double maxDistance, boolean piercing, int maxTrips) {
-		this(world, shooter, trigger, speedFactor);
+		this(type, world, shooter, trigger, speedFactor);
 		
 		this.origin = new Vec3d(fromX, fromY, fromZ);
 		direction = direction.normalize();
@@ -68,9 +72,11 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
         this.piercing = piercing;
 	}
 
-	public EntityChakramSpellSaucer(MagicCutterTriggerInstance trigger,
+	public EntityChakramSpellSaucer(EntityType<? extends EntityChakramSpellSaucer> type,
+			MagicCutterTriggerInstance trigger,
 			LivingEntity shooter, float speedFactor, double maxDistance, boolean piercing, int maxTrips) {
-		this(trigger,
+		this(type,
+				trigger,
 				shooter,
 				shooter.world,
 				shooter.posX, shooter.posY + shooter.getEyeHeight(), shooter.posZ,
@@ -103,8 +109,8 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 	}
 	
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 		
 		if (!world.isRemote) {
 			

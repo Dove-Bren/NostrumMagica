@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
@@ -56,10 +57,8 @@ public abstract class EntityGolem extends TameableEntity implements ILoreTagged 
 	
 	private int expireTicks;
 	
-    protected EntityGolem(World worldIn, EMagicElement element, boolean melee, boolean range, boolean buff)
-    {
-        super(worldIn);
-        this.setSize(0.8F, 1.6F);
+    protected EntityGolem(EntityType<? extends EntityGolem> type, World worldIn, EMagicElement element, boolean melee, boolean range, boolean buff) {
+        super(type, worldIn);
         this.setTamed(true);
         
         this.isMelee = melee;
@@ -212,8 +211,8 @@ public abstract class EntityGolem extends TameableEntity implements ILoreTagged 
 	public abstract String getTextureKey();
 	
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 		
 		if (idleCooldown > 0) {
 			idleCooldown--;

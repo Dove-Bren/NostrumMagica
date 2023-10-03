@@ -7,6 +7,7 @@ import java.util.UUID;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IProjectile;
 import net.minecraft.nbt.CompoundNBT;
@@ -38,15 +39,14 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 	private Set<LivingEntity> hitEntities;
 	private Set<Vector> hitBlocks;
 	
-	protected EntitySpellSaucer(World world) {
-		super(world);
-		this.setSize(1F, .2F);
+	protected EntitySpellSaucer(EntityType<? extends EntitySpellSaucer> type, World world) {
+		super(type, world);
 		this.hitEntities = new HashSet<>();
 		this.hitBlocks = new HashSet<>();
 	}
 	
-	public EntitySpellSaucer(World world, LivingEntity shooter, ISpellSaucerTrigger trigger, float speed) {
-		this(world);
+	public EntitySpellSaucer(EntityType<? extends EntitySpellSaucer> type, World world, LivingEntity shooter, ISpellSaucerTrigger trigger, float speed) {
+		this(type, world);
         this.speed = speed;
         this.shootingEntity = shooter;
         this.trigger = trigger;
@@ -59,8 +59,8 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 	}
 	
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 		ticksInAir++;
 		ticksExisted++;
 		

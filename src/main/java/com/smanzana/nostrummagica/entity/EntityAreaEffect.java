@@ -11,11 +11,14 @@ import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.particles.ParticleType;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
@@ -41,6 +44,8 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 	public static interface IAreaVFX {
 		public void apply(World world, int ticksExisted, EntityAreaEffect cloud);
 	}
+	
+	public static final String ID = "entity_effect_cloud";
 	
 	private static final DataParameter<Float> HEIGHT = EntityDataManager.<Float>createKey(EntityAreaEffect.class, DataSerializers.FLOAT);
 	private static final DataParameter<Integer> EXTRA_PARTICLE = EntityDataManager.<Integer>createKey(EntityAreaEffect.class, DataSerializers.VARINT);
@@ -70,8 +75,8 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 	
 	protected final List<IAreaVFX> manualVFX;
 
-	public EntityAreaEffect(World worldIn) {
-		super(worldIn);
+	public EntityAreaEffect(EntityType<? extends EntityAreaEffect> type, World worldIn) {
+		super(type, worldIn);
 		entityEffects = new LinkedList<>();
 		locationEffects = new LinkedList<>();
 		effectDelays = new HashMap<>();
@@ -82,8 +87,9 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 		manualVFX = new LinkedList<>();
 	}
 	
-	public EntityAreaEffect(World worldIn, double x, double y, double z) {
-		super(worldIn, x, y, z);
+	public EntityAreaEffect(EntityType<? extends EntityAreaEffect> type, World worldIn, double x, double y, double z) {
+		super(type, worldIn);
+		this.setPosition(x, y, z);
 		entityEffects = new LinkedList<>();
 		locationEffects = new LinkedList<>();
 		effectDelays = new HashMap<>();
@@ -163,7 +169,7 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 		return this.ignoreOwner;
 	}
 	
-	public @Nullable ParticleTypes getCustomParticle() {
+	public @Nullable ParticleType<?> getCustomParticle() {
 		final int id = this.getDataManager().get(EXTRA_PARTICLE);
 		if (id == -1) {
 			return null;
@@ -171,7 +177,7 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 		return ParticleTypes.getParticleFromId(id);
 	}
 
-	public void setCustomParticle(@Nullable ParticleTypes particleIn) {
+	public void setCustomParticle(@Nullable ParticleType<?> particleIn) {
 		this.getDataManager().set(EXTRA_PARTICLE, particleIn == null ? -1 : particleIn.getParticleID());
 	}
 
@@ -464,8 +470,8 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 	}
 	
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 		
 		// Additional effects
 		// Sadly, parent class doesn't make it easy to extend, so we redo some work here

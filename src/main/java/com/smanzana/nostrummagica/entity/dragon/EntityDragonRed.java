@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.entity.MultiPartEntityPart;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonAIAggroTable;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonAINearestAttackableTarget;
@@ -37,13 +38,13 @@ import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.IEntityMultiPart;
-import net.minecraft.entity.MultiPartEntityPart;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAIWander;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.monster.EntityGiantZombie;
 import net.minecraft.entity.monster.EntityPolarBear;
 import net.minecraft.entity.monster.EntityZombie;
@@ -112,6 +113,8 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 		FLYING_PHASE,
 		RAMPAGE_PHASE,
 	}
+	
+	public static final String ID = "entity_dragon_red";
 	
 	private static final DataParameter<Integer> DRAGON_PHASE =
 			EntityDataManager.<Integer>createKey(EntityDragonRed.class, DataSerializers.VARINT);
@@ -225,11 +228,9 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 	
 	private Map<DragonBodyPartType, DragonBodyPart> bodyParts;
 	
-	public EntityDragonRed(World worldIn) {
-		super(worldIn);
-        this.setSize(DragonBodyPartType.BODY.getWidth(), DragonBodyPartType.BODY.getHeight());
+	public EntityDragonRed(EntityType<? extends EntityDragonRed> type, World worldIn) {
+		super(type, worldIn);
         this.stepHeight = 2;
-        this.isImmuneToFire = true;
         this.ignoreFrustumCheck = true;
         this.experienceValue = 1000;
         this.noClip = false;
@@ -238,6 +239,14 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
         for (DragonBodyPartType type : DragonBodyPartType.values()) {
         	bodyParts.put(type, new DragonBodyPart(type, this));
         }
+	}
+	
+	public static final float GetBodyWidth() {
+		return DragonBodyPartType.BODY.getWidth();
+	}
+	
+	public static final float GetBodyHeight() {
+		return DragonBodyPartType.BODY.getHeight();
 	}
 	
 	private DragonPhase getPhase() {
@@ -465,13 +474,13 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 					this.posY + offset.y,
 					this.posZ + (Math.sin(rotRad) * offset.x) + (Math.cos(rotRad) * offset.z),
 					this.rotationYaw, this.rotationPitch);
-			part.onUpdate();
+			part.tick();
 		}
 	}
 	
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 		
 		DragonPhase phase = this.getPhase();
 		if (phase == DragonPhase.GROUNDED_PHASE) {

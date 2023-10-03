@@ -24,11 +24,11 @@ import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfTrainin
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.effects.MagicBoostEffect;
-import com.smanzana.nostrummagica.effects.RootedEffect;
+import com.smanzana.nostrummagica.effects.NostrumEffects;
+import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.FollowOwnerAdvancedGoal;
 import com.smanzana.nostrummagica.entity.tasks.FollowOwnerGenericGoal;
 import com.smanzana.nostrummagica.entity.tasks.PetTargetGoal;
-import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfAIBarrierTask;
 import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfAIEldrichTask;
 import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfAIHellTask;
@@ -61,8 +61,9 @@ import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 import com.smanzana.nostrummagica.utils.Inventories;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.IEntityOwnable;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIAttackMelee;
 import net.minecraft.entity.ai.EntityAIBeg;
@@ -82,13 +83,14 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.AbstractSkeleton;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.passive.EntityWolf;
+import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.Items;
-import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -98,6 +100,7 @@ import net.minecraft.scoreboard.Team;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.StringTextComponent;
@@ -106,7 +109,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class EntityArcaneWolf extends EntityWolf implements ITameableEntity, IEntityPet, IPetWithSoul, IStabbableEntity, IMagicEntity {
+public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEntityPet, IPetWithSoul, IStabbableEntity, IMagicEntity {
 	
 	public static enum ArcaneWolfElementalType {
 		NONELEMENTAL("nonelemental", 0x00000000, null),
@@ -390,6 +393,8 @@ public class EntityArcaneWolf extends EntityWolf implements ITameableEntity, IEn
 		}
 	}
 	
+	public static final String ID = "entity_arcane_wolf";
+	
 	protected static final DataParameter<Boolean> SOULBOUND = EntityDataManager.<Boolean>createKey(EntityArcaneWolf.class, DataSerializers.BOOLEAN);
 	
 	protected static final DataParameter<Integer> ATTRIBUTE_XP  = EntityDataManager.<Integer>createKey(EntityArcaneWolf.class, DataSerializers.VARINT);
@@ -437,14 +442,13 @@ public class EntityArcaneWolf extends EntityWolf implements ITameableEntity, IEn
     private UUID worldID;
     private int jumpCount;
     
-	public EntityArcaneWolf(World worldIn) {
-		super(worldIn);
-		this.setSize(0.7F, 0.95F);
+	public EntityArcaneWolf(EntityType<? extends EntityArcaneWolf> type, World worldIn) {
+		super(type, worldIn);
         
         soulID = UUID.randomUUID();
         worldID = null;
         jumpCount = 0;
-        inventory = new InventoryBasic("Arcane Wolf Inventory", true, ARCANE_WOLF_BASE_INV_SIZE);
+        inventory = new Inventory(ARCANE_WOLF_BASE_INV_SIZE);
 	}
 	
 	@Override
@@ -656,8 +660,8 @@ public class EntityArcaneWolf extends EntityWolf implements ITameableEntity, IEn
 	}
 	
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 		this.stepHeight = 1.1f;
 	}
 	

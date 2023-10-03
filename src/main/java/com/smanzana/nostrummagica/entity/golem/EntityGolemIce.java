@@ -11,11 +11,14 @@ import com.smanzana.nostrummagica.spells.Spell.SpellPart;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.world.World;
 
 public class EntityGolemIce extends EntityGolem {
+	
+	public static final String ID = "ice_golem";
 	
 	private static Spell spellRange;
 	private static Spell spellBuff;
@@ -38,8 +41,8 @@ public class EntityGolemIce extends EntityGolem {
 		}
 	}
 
-	public EntityGolemIce(World worldIn) {
-		super(worldIn, EMagicElement.ICE, true, true, true);
+	public EntityGolemIce(EntityType<EntityGolemIce> type, World worldIn) {
+		super(type, worldIn, EMagicElement.ICE, true, true, true);
 	}
 
 	@Override

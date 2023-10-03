@@ -13,12 +13,15 @@ import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.potion.Potion;
 import net.minecraft.world.World;
 
 public class EntityGolemEnder extends EntityGolem {
+	
+	public static final String ID = "ender_golem";
 	
 	private static Spell spellRange;
 	private static Spell spellDebuff;
@@ -50,8 +53,8 @@ public class EntityGolemEnder extends EntityGolem {
 		}
 	}
 
-	public EntityGolemEnder(World worldIn) {
-		super(worldIn, EMagicElement.ENDER, false, true, true);
+	public EntityGolemEnder(EntityType<EntityGolemEnder> type, World worldIn) {
+		super(type, worldIn, EMagicElement.ENDER, false, true, true);
 	}
 
 	@Override

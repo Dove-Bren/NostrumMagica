@@ -18,9 +18,7 @@ import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
-import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.NostrumSkillItem;
-import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -42,17 +40,12 @@ import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigge
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.EntityAIHurtByTarget;
-import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
-import net.minecraft.entity.ai.EntityMoveHelper;
-import net.minecraft.entity.monster.EntityGolem;
-import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.GolemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
@@ -68,14 +61,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeHell;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class EntityWisp extends GolemEntity implements ILoreTagged {
+	
+	public static final String ID = "entity_wisp";
 	
 	protected static final double MAX_WISP_DISTANCE_SQ = 144;
 	protected static final DataParameter<Optional<BlockPos>> HOME  = EntityDataManager.<Optional<BlockPos>>createKey(EntityWisp.class, DataSerializers.OPTIONAL_BLOCK_POS);
@@ -89,9 +82,8 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 	private int perilTicks;
 	private @Nullable BlockPos perilLoc;
 	
-	public EntityWisp(World worldIn) {
-		super(worldIn);
-		this.setSize(.75F, .75F);
+	public EntityWisp(EntityType<? extends EntityWisp> type, World worldIn) {
+		super(type, worldIn);
 		this.setNoGravity(true);
 		this.moveHelper = new WispMoveHelper(this);
 		
@@ -99,8 +91,8 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 		perilTicks = 0;
 	}
 	
-	public EntityWisp(World worldIn, BlockPos homePos) {
-		this(worldIn);
+	public EntityWisp(EntityType<? extends EntityWisp> type, World worldIn, BlockPos homePos) {
+		this(type, worldIn);
 		this.setHomePosAndDistance(homePos, (int) MAX_WISP_DISTANCE_SQ);
 		this.setHome(homePos);
 	}
@@ -199,8 +191,8 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 	}
 	
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 		
 		if (idleCooldown > 0) {
 			idleCooldown--;

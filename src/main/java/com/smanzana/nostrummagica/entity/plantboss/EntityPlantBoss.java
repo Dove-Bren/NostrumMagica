@@ -40,7 +40,9 @@ import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigge
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.IEntityMultiPart;
 import net.minecraft.entity.MultiPartEntityPart;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -61,7 +63,7 @@ import net.minecraft.world.BossInfo;
 import net.minecraft.world.BossInfoServer;
 import net.minecraft.world.World;
 
-public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMultiPart {
+public class EntityPlantBoss extends MobEntity implements ILoreTagged, IEntityMultiPart {
 	
 	public static enum BattleState {
 		IDLE, // Not doing anything specific but throwing out attacks and looking mad
@@ -125,6 +127,7 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 		ELEMENTAL,
 	}
 	
+	public static final String ID = "entity_plant_boss";
 	public static final int NumberOfLeaves = 8;
 	
 	private static Spell[] IdleSpells = null;
@@ -276,9 +279,8 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 	protected int curlDuration = 0;
 	protected boolean curlLeaveFrontOpen;
 	
-	public EntityPlantBoss(World worldIn) {
-		super(worldIn);
-		this.setSize(7, 4); // Has to be large enough to enclose all parts. Body is 3x3
+	public EntityPlantBoss(EntityType<? extends EntityPlantBoss> type, World worldIn) {
+		super(type, worldIn);
         this.ignoreFrustumCheck = true;
         this.experienceValue = 1250;
         this.entityCollisionReduction = 1f;
@@ -458,8 +460,8 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 	}
 	
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 		
 		this.aggroTable.decayTick();
 		
@@ -477,7 +479,7 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 		}
 		
 		for (MultiPartEntityPart part : this.parts) {
-			part.onUpdate();
+			part.tick();
 		}
 	}
 	
@@ -1016,8 +1018,8 @@ public class EntityPlantBoss extends EntityMob implements ILoreTagged, IEntityMu
 		}
 		
 		@Override
-		public void onUpdate() {
-			super.onUpdate();
+		public void tick() {
+			super.tick();
 			
 			// If pitch has changed in parent data manager, act on it!
 			final float pitch = plant.getLeafPitch(this.index); 

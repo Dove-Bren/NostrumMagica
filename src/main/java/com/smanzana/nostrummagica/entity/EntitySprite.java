@@ -6,7 +6,7 @@ import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.effects.RootedEffect;
+import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowEntityGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
@@ -23,38 +23,41 @@ import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAISwimming;
 import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
-import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
-import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class EntitySprite extends EntityMob implements ILoreTagged {
+public class EntitySprite extends MobEntity implements ILoreTagged {
+	
+	public static final String ID = "entity_sprite";
 
 	private static final DataParameter<Boolean> SPRITE_ANGRY = EntityDataManager.<Boolean>createKey(EntitySprite.class, DataSerializers.BOOLEAN);
 	
@@ -73,9 +76,8 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
 	private int idleCooldown;
 	private int effectCooldown = 0;
 	
-	public EntitySprite(World worldIn) {
-        super(worldIn);
-        this.setSize(1F, 1.75F);
+	public EntitySprite(EntityType<? extends EntitySprite> type, World worldIn) {
+        super(type, worldIn);
         
         idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
         effectCooldown = 20 * 5;
@@ -218,8 +220,8 @@ public class EntitySprite extends EntityMob implements ILoreTagged {
     }
 
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 		
 		if (idleCooldown > 0) {
 			idleCooldown--;

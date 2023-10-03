@@ -5,6 +5,7 @@ import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 import com.smanzana.nostrummagica.tiles.SwitchBlockTileEntity;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.tileentity.TileEntity;
@@ -14,12 +15,13 @@ import net.minecraft.world.World;
 
 public class EntitySwitchTrigger extends MobEntity {
 	
+	public static final String ID = "entity_switch_trigger";
+	
 	private BlockPos cachePos;
 	private SwitchBlockTileEntity cacheEntity;
 	
-	public EntitySwitchTrigger(World worldIn) {
-		super(worldIn);
-		this.setSize(.8f, 1.8f);
+	public EntitySwitchTrigger(EntityType<? extends EntitySwitchTrigger> type, World worldIn) {
+		super(type, worldIn);
 		cachePos = null;
 		cacheEntity = null;
 		this.setNoGravity(true);

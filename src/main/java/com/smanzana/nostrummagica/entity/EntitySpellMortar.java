@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.triggers.MortarTrigger.MortarTriggerInstance;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -23,6 +24,8 @@ import net.minecraft.world.World;
 
 public class EntitySpellMortar extends FireballEntity {
 	
+	public static final String ID = "spell_mortar";
+	
 	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(EntitySpellMortar.class, MagicElementDataSerializer.instance);
 	
 	private MortarTriggerInstance trigger;
@@ -32,16 +35,16 @@ public class EntitySpellMortar extends FireballEntity {
 	
 	private @Nullable Predicate<Entity> filter;
 
-	public EntitySpellMortar(World world) {
-		super(world);
-        this.setSize(0.75F, 0.75F);
+	public EntitySpellMortar(EntityType<? extends EntitySpellMortar> type, World world) {
+		super(type, world);
 	}
 	
-	public EntitySpellMortar(MortarTriggerInstance trigger, LivingEntity shooter,
+	public EntitySpellMortar(EntityType<? extends EntitySpellMortar> type, MortarTriggerInstance trigger, LivingEntity shooter,
 			World world, Vec3d start, Vec3d velocity,
 			float speedFactor, double gravity) {
-		super(world, start.x, start.y, start.z, 0, 0, 0);
-        this.setSize(0.75F, 0.75F);
+		//super(world, start.x, start.y, start.z, 0, 0, 0);
+		this(type, world);
+		this.setPosition(start.x, start.y, start.z);
 		this.accelerationX = 0; // have no be non-zero or they're NAN lol
 		this.accelerationY = 0;
 		this.accelerationZ = 0;
@@ -72,8 +75,8 @@ public class EntitySpellMortar extends FireballEntity {
 	}
 	
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 		
 		// if client
 //		if (this.ticksExisted % 5 == 0) {

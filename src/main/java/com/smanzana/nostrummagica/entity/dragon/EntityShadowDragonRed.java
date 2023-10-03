@@ -5,6 +5,7 @@ import com.smanzana.nostrummagica.entity.tasks.dragon.DragonAINearestAttackableT
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonMeleeAttackTask;
 import com.smanzana.nostrummagica.loretag.Lore;
 
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
@@ -19,6 +20,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class EntityShadowDragonRed extends EntityDragonRedBase {
+	
+	public static final String ID = "entity_shadow_dragon_red";
 
 	private static final DataParameter<Boolean> HASTARGET =
 			EntityDataManager.<Boolean>createKey(EntityDragonRed.class, DataSerializers.BOOLEAN);
@@ -27,17 +30,15 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 	private LivingEntity target;
 	private boolean targetInitted;
 	
-	public EntityShadowDragonRed(World worldIn) {
-		super(worldIn);
+	public EntityShadowDragonRed(EntityType<? extends EntityShadowDragonRed> type, World worldIn) {
+		super(type, worldIn);
 		
-		this.setSize(4F * .6F, 3F * .6F);
         this.stepHeight = 2;
-        this.isImmuneToFire = true;
         this.targetInitted = false;
 	}
 	
-	public EntityShadowDragonRed(World worldIn, LivingEntity target) {
-		this(worldIn);
+	public EntityShadowDragonRed(EntityType<? extends EntityShadowDragonRed> type, World worldIn, LivingEntity target) {
+		this(type, worldIn);
 		this.target = target;
 		this.dataManager.set(HASTARGET, true);
 	}
@@ -121,8 +122,8 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 	}
 	
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 		setTargetTasks();
 		
 		if (this.target != null) {

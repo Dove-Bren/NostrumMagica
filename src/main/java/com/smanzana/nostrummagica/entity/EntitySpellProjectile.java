@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger.ProjectileTriggerInstance;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -23,6 +24,7 @@ import net.minecraft.world.World;
 
 public class EntitySpellProjectile extends FireballEntity {
 	
+	public static final String ID = "spell_projectile";
 	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(EntitySpellProjectile.class, MagicElementDataSerializer.instance);
 	
 	private ProjectileTriggerInstance trigger;
@@ -42,9 +44,8 @@ public class EntitySpellProjectile extends FireballEntity {
 				);
 	}
 	
-	public EntitySpellProjectile(World world) {
-		super(world);
-        this.setSize(0.3125F, 0.3125F);
+	public EntitySpellProjectile(EntityType<EntitySpellProjectile> type, World world) {
+		super(type, world);
 	}
 	
 	public EntitySpellProjectile(ProjectileTriggerInstance trigger, LivingEntity shooter,
@@ -85,8 +86,8 @@ public class EntitySpellProjectile extends FireballEntity {
 	}
 	
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 		
 		// if client
 //		if (this.ticksExisted % 5 == 0) {

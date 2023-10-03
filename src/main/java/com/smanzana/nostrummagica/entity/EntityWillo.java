@@ -46,28 +46,29 @@ import com.smanzana.nostrummagica.spells.components.triggers.WallTrigger;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.IEntityLivingData;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAILookIdle;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.ai.EntityMoveHelper;
-import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
@@ -76,17 +77,19 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.util.Constants.NBT;
 
-public class EntityWillo extends EntityMob implements ILoreTagged {
+public class EntityWillo extends MobEntity implements ILoreTagged {
 	
 	public static enum WilloStatus {
 		NEUTRAL,
 		PANIC,
 		AGGRO,
 	}
+	
+	public static final String ID = "entity_willo";
 	
 	protected static final double MAX_WISP_DISTANCE_SQ = 144;
 	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(EntityWillo.class, MagicElementDataSerializer.instance);
@@ -96,9 +99,8 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 	
 	private int idleCooldown;
 	
-	public EntityWillo(World worldIn) {
-		super(worldIn);
-		this.setSize(.75F, .75F);
+	public EntityWillo(EntityType<? extends EntityWillo> type, World worldIn) {
+		super(type, worldIn);
 		this.setNoGravity(true);
 		this.moveHelper = new WispMoveHelper(this);
 		
@@ -200,8 +202,8 @@ public class EntityWillo extends EntityMob implements ILoreTagged {
 	}
 	
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 		
 		if (idleCooldown > 0) {
 			idleCooldown--;

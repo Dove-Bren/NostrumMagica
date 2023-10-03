@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MultiPartEntityPart;
 import net.minecraft.entity.item.ItemEntity;
@@ -34,6 +35,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class EntityHookShot extends Entity {
+	
+	public static final String ID = "nostrum_hookshot";
 	
 	private double maxLength;
 	
@@ -59,15 +62,14 @@ public class EntityHookShot extends Entity {
 	protected static final DataParameter<Optional<UUID>> DATA_CASTING_ENTITY = EntityDataManager.<Optional<UUID>>createKey(EntityHookShot.class, DataSerializers.OPTIONAL_UNIQUE_ID);
 	protected static final DataParameter<Optional<UUID>> DATA_HOOKED_ENTITY = EntityDataManager.<Optional<UUID>>createKey(EntityHookShot.class, DataSerializers.OPTIONAL_UNIQUE_ID);
 	
-	public EntityHookShot(World worldIn) {
-		super(worldIn);
-		this.setSize(.2f, .2f);
+	public EntityHookShot(EntityType<? extends EntityHookShot> type, World worldIn) {
+		super(type, worldIn);
 		
 		this.setNoGravity(true);
 	}
 	
-	public EntityHookShot(World worldIn, LivingEntity caster, double maxLength, Vec3d direction, HookshotType type) {
-		this(worldIn);
+	public EntityHookShot(EntityType<? extends EntityHookShot> entType, World worldIn, LivingEntity caster, double maxLength, Vec3d direction, HookshotType type) {
+		this(entType, worldIn);
 		setCaster(caster);
 		setMaxLength(maxLength);
 		this.setPosition(caster.posX, caster.posY + (caster.getEyeHeight()), caster.posZ);
@@ -201,7 +203,7 @@ public class EntityHookShot extends Entity {
 		LivingEntity caster = this.getCaster();
 		if (this.world.isRemote || (caster == null || !caster.isDead) && this.world.isBlockLoaded(new BlockPos(this)))
 		{
-			super.onUpdate();
+			super.tick();
 
 			RayTraceResult raytraceresult = RayTrace.forwardsRaycast(this, true, true, this.ticksExisted >= 5, caster);
 
@@ -338,8 +340,8 @@ public class EntityHookShot extends Entity {
 	}
 	
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 		
 		if (!this.isDead) {
 			if (!world.isRemote) {

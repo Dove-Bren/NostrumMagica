@@ -20,16 +20,16 @@ import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonBondInfoS
 import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonInfoSheet;
 import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonInventorySheet;
 import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonSpellSheet;
-import com.smanzana.nostrummagica.entity.ITameableEntity;
 import com.smanzana.nostrummagica.entity.IStabbableEntity;
+import com.smanzana.nostrummagica.entity.ITameableEntity;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon.DragonEquipmentInventory.IChangeListener;
 import com.smanzana.nostrummagica.entity.dragon.IDragonSpawnData.IDragonSpawnFactory;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowEntityGeneric;
-import com.smanzana.nostrummagica.entity.tasks.FollowOwnerGenericGoal;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIOwnerHurtByTargetGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIOwnerHurtTargetGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIPanicGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAISitGeneric;
+import com.smanzana.nostrummagica.entity.tasks.FollowOwnerGenericGoal;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonAINearestAttackableTarget;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonGambittedSpellAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonMeleeAttackTask;
@@ -48,9 +48,10 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.IEntityOwnable;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAISwimming;
@@ -64,6 +65,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -73,24 +75,26 @@ import net.minecraft.nbt.StringNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.management.PreYggdrasilConverter;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
-import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class EntityTameDragonRed extends EntityDragonRedBase implements ITameableEntity, ITameDragon, IChangeListener, IPetWithSoul, IStabbableEntity {
 
+	public static final String ID = "entity_tame_dragon_red";
+	
 	protected static final DataParameter<Boolean> HATCHED = EntityDataManager.<Boolean>createKey(EntityTameDragonRed.class, DataSerializers.BOOLEAN);
 	protected static final DataParameter<Boolean> TAMED = EntityDataManager.<Boolean>createKey(EntityTameDragonRed.class, DataSerializers.BOOLEAN);
     protected static final DataParameter<Optional<UUID>> OWNER_UNIQUE_ID = EntityDataManager.<Optional<UUID>>createKey(EntityTameDragonRed.class, DataSerializers.OPTIONAL_UNIQUE_ID);
@@ -180,14 +184,12 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
     // Internal timers for controlling while riding
     private int jumpCount; // How many times we've jumped
     
-	public EntityTameDragonRed(World worldIn) {
-		super(worldIn);
+	public EntityTameDragonRed(EntityType<? extends EntityTameDragonRed> type, World worldIn) {
+		super(type, worldIn);
 		
-		this.setSize(6F * .4F, 4.6F * .6F);
         this.stepHeight = 2;
-        this.isImmuneToFire = true;
         
-        this.inventory = new InventoryBasic("Dragon Inventory", true, DRAGON_INV_SIZE);
+        this.inventory = new Inventory(DRAGON_INV_SIZE);
         this.equipment = new DragonEquipmentInventory(this);
         this.spellInventory = new RedDragonSpellInventory("Dragon Spell Inventory", true);
         
@@ -1383,8 +1385,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	}
 	
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 		
 		if (this.dead) {
 			return;

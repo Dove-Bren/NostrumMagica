@@ -12,8 +12,9 @@ import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.block.BlockHay;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -26,6 +27,8 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 public class EntityDragonEgg extends MobEntity implements ILoreTagged {
+	
+	public static final String ID = "entity_dragon_egg";
 	
 	protected static final DataParameter<Float> HEAT  = EntityDataManager.<Float>createKey(EntityDragonEgg.class, DataSerializers.FLOAT);
 	protected static final DataParameter<Optional<UUID>> PLAYER  = EntityDataManager.<Optional<UUID>>createKey(EntityDragonEgg.class, DataSerializers.OPTIONAL_UNIQUE_ID);
@@ -41,14 +44,13 @@ public class EntityDragonEgg extends MobEntity implements ILoreTagged {
 	private IDragonSpawnData<? extends ITameDragon> spawnData;
 	private int ageTimer;
 
-	public EntityDragonEgg(World worldIn) {
-		super(worldIn);
-		this.setSize(.45f, .5f);
+	public EntityDragonEgg(EntityType<? extends EntityDragonEgg> type, World worldIn) {
+		super(type, worldIn);
 		ageTimer = 20 * 60 * 5; // Base hatching time. Can be overriden by saved NBT
 	}
 	
-	public EntityDragonEgg(World worldIn, PlayerEntity player, IDragonSpawnData<? extends ITameDragon> spawnData) {
-		this(worldIn);
+	public EntityDragonEgg(EntityType<? extends EntityDragonEgg> type, World worldIn, PlayerEntity player, IDragonSpawnData<? extends ITameDragon> spawnData) {
+		this(type, worldIn);
 		this.spawnData = spawnData;
 		
 		if (player != null && !worldIn.isRemote) {

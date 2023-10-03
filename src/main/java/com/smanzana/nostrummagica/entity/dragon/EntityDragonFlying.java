@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.entity.dragon;
 
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.EntityMoveHelper;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
@@ -37,8 +38,8 @@ public abstract class EntityDragonFlying extends EntityDragon {
 	protected float wingFlapProgress;
 	protected float wingFlapSpeed = 1f; // Relative speed. 1f is normal speed
 	
-	public EntityDragonFlying(World worldIn) {
-		super(worldIn);
+	public EntityDragonFlying(EntityType<? extends EntityDragonFlying> type, World worldIn) {
+		super(type, worldIn);
 		
 		this.setFlyState(FlyState.LANDED);
 	}
@@ -185,8 +186,8 @@ public abstract class EntityDragonFlying extends EntityDragon {
 	}
 	
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 		
 		//System.out.println("(" + this.posX + ", " + this.posZ + ")");
 		

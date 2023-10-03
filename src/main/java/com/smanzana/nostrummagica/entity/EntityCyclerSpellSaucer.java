@@ -8,6 +8,7 @@ import com.google.common.base.Optional;
 import com.smanzana.nostrummagica.spells.components.triggers.MagicCyclerTrigger.MagicCyclerTriggerInstance;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -20,18 +21,20 @@ import net.minecraft.world.World;
 
 public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 	
+	public static final String ID = "entity_internal_spellsaucer_cycler";
+	
 	protected static final DataParameter<Optional<UUID>> SHOOTER = EntityDataManager.<Optional<UUID>>createKey(EntityCyclerSpellSaucer.class, DataSerializers.OPTIONAL_UNIQUE_ID);
 	
 	// Cycler:
 	private int duration;
 	private boolean onBlocks;
 	
-	public EntityCyclerSpellSaucer(World world) {
-		super(world);
+	public EntityCyclerSpellSaucer(EntityType<? extends EntityCyclerSpellSaucer> type, World world) {
+		super(type, world);
 	}
 	
-	public EntityCyclerSpellSaucer(World world, LivingEntity shooter, MagicCyclerTriggerInstance trigger, float speed) {
-		super(world, shooter, trigger, speed);
+	public EntityCyclerSpellSaucer(EntityType<? extends EntityCyclerSpellSaucer> type, World world, LivingEntity shooter, MagicCyclerTriggerInstance trigger, float speed) {
+		super(type, world, shooter, trigger, speed);
         this.duration = 10; // Long neough to flash so I know things are going on
         this.onBlocks = true;
         
@@ -39,11 +42,12 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
         this.dataManager.set(SHOOTER, Optional.fromNullable(shooter.getUniqueID()));
 	}
 	
-	public EntityCyclerSpellSaucer(MagicCyclerTriggerInstance trigger, LivingEntity shooter,
+	public EntityCyclerSpellSaucer(EntityType<? extends EntityCyclerSpellSaucer> type, 
+			MagicCyclerTriggerInstance trigger, LivingEntity shooter,
 			World world,
 			double fromX, double fromY, double fromZ,
 			float speedFactor, int durationTicks, boolean onBlocks) {
-		this(world, shooter, trigger, speedFactor);
+		this(type, world, shooter, trigger, speedFactor);
 		
 		this.setLocationAndAngles(fromX, fromY, fromZ, this.rotationYaw, this.rotationPitch);
         this.setPosition(fromX, fromY, fromZ);
@@ -52,9 +56,11 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
         this.onBlocks = onBlocks;
 	}
 
-	public EntityCyclerSpellSaucer(MagicCyclerTriggerInstance trigger,
+	public EntityCyclerSpellSaucer(EntityType<? extends EntityCyclerSpellSaucer> type, 
+			MagicCyclerTriggerInstance trigger,
 			LivingEntity shooter, float speedFactor, int durationTicks, boolean onBlocks) {
-		this(trigger,
+		this(type,
+				trigger,
 				shooter,
 				shooter.world,
 				shooter.posX, shooter.posY + shooter.getEyeHeight(), shooter.posZ,
@@ -148,8 +154,8 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 	private Vector _lastBlockVector;
 	
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 		
 		if (!world.isRemote) {
 			

@@ -9,8 +9,8 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.effect.LightningBoltEntity;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -20,18 +20,22 @@ import net.minecraft.world.World;
 // Copy of vanilla with no fire
 public class NostrumTameLightning extends LightningBoltEntity {
 	
+	public static final String ID = "nostrum_lightning";
+	
 	/** Declares which state the lightning bolt is in. Whether it's in the air, hit the ground, etc. */
 	private int lightningState;
 	
 	private @Nullable LivingEntity ignoreEntity;
 	
-	public NostrumTameLightning(World worldIn) {
-		this(worldIn, 0, 0, 0);
+	public NostrumTameLightning(EntityType<? extends NostrumTameLightning> type, World worldIn) {
+		this(type, worldIn, 0, 0, 0);
 	}
 
-	public NostrumTameLightning(World worldIn, double x, double y, double z) {
+	public NostrumTameLightning(EntityType<? extends NostrumTameLightning> type, World worldIn, double x, double y, double z) {
 		super(worldIn, x, y, z, true);
 		this.lightningState = 2;
+		
+		// type is ignored! Which I think means clients will think it's a real bolt?
 	}
 	
 	public NostrumTameLightning setEntityToIgnore(@Nullable LivingEntity entity) {
@@ -52,13 +56,14 @@ public class NostrumTameLightning extends LightningBoltEntity {
 	}
 	
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 
 		--this.lightningState;
 
 		if (this.lightningState >= 0) {
-			List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity(this, new AxisAlignedBB(this.posX - 3.0D, this.posY - 3.0D, this.posZ - 3.0D, this.posX + 3.0D, this.posY + 6.0D + 3.0D, this.posZ + 3.0D));
+			List<Entity> list = this.world.getEntitiesInAABBexcluding(this, new AxisAlignedBB(this.posX - 3.0D, this.posY - 3.0D, this.posZ - 3.0D, this.posX + 3.0D, this.posY + 6.0D + 3.0D, this.posZ + 3.0D),
+					Entity::isAlive);
 
 			for (int i = 0; i < list.size(); ++i) {
 				Entity entity = (Entity)list.get(i);

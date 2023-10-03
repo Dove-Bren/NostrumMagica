@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.entity.dragon;
 
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.PlayerEntity;
@@ -34,8 +35,8 @@ public abstract class EntityDragonRedBase extends EntityDragonFlying {
 	
 	private long castTime;
 	
-	public EntityDragonRedBase(World worldIn) {
-		super(worldIn);
+	public EntityDragonRedBase(EntityType<? extends EntityDragonRedBase> type, World worldIn) {
+		super(type, worldIn);
         this.ignoreFrustumCheck = true;
         this.noClip = false;
 	}
@@ -146,8 +147,8 @@ public abstract class EntityDragonRedBase extends EntityDragonFlying {
 	}
 	
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 		
 		//System.out.println("(" + this.posX + ", " + this.posZ + ")");
 		

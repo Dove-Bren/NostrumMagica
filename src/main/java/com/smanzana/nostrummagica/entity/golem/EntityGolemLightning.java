@@ -15,12 +15,15 @@ import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.World;
 
 public class EntityGolemLightning extends EntityGolem {
+	
+	public static final String ID = "lightning_golem";
 	
 	private static final AttributeModifier MOVEMENT_STORM_MODIFIER
 		= new AttributeModifier("lightning_storm_boost", .2, 1);
@@ -55,8 +58,8 @@ public class EntityGolemLightning extends EntityGolem {
 		}
 	}
 
-	public EntityGolemLightning(World worldIn) {
-		super(worldIn, EMagicElement.LIGHTNING, false, true, true);
+	public EntityGolemLightning(EntityType<EntityGolemLightning> type, World worldIn) {
+		super(type, worldIn, EMagicElement.LIGHTNING, false, true, true);
 	}
 
 	@Override
@@ -118,7 +121,7 @@ public class EntityGolemLightning extends EntityGolem {
 	}
 	
 	@Override
-	public void onUpdate() {
+	public void tick() {
 		if (world.isRainingAt(this.getPosition())) {
 			if (!this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED)
 					.hasModifier(MOVEMENT_STORM_MODIFIER)) {
@@ -133,7 +136,7 @@ public class EntityGolemLightning extends EntityGolem {
 			}
 		}
 		
-		super.onUpdate();
+		super.tick();
 	}
 	
 	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {

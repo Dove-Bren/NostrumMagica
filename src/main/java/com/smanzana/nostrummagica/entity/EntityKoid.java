@@ -16,6 +16,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
@@ -23,11 +24,9 @@ import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAISwimming;
 import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
-import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
@@ -36,13 +35,16 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.util.Constants.NBT;
 
 public class EntityKoid extends MonsterEntity implements ILoreTagged {
+	
+	public static final String ID = "entity_koid";
 
 	private static final DataParameter<Integer> KOID_VARIANT =
 			EntityDataManager.<Integer>createKey(EntityKoid.class, DataSerializers.VARINT);
@@ -50,14 +52,13 @@ public class EntityKoid extends MonsterEntity implements ILoreTagged {
 	private KoidTask kTask;
 	private int idleCooldown;
 	
-	public EntityKoid(World worldIn) {
-		this(worldIn, EMagicElement.values()[NostrumMagica.rand.nextInt(
+	public EntityKoid(EntityType<? extends EntityKoid> type, World worldIn) {
+		this(type, worldIn, EMagicElement.values()[NostrumMagica.rand.nextInt(
 				EMagicElement.values().length)]);
 	}
 	
-    protected EntityKoid(World worldIn, EMagicElement element) {
-        super(worldIn);
-        this.setSize(0.8F, 1F);
+    protected EntityKoid(EntityType<? extends EntityKoid> type, World worldIn, EMagicElement element) {
+        super(type, worldIn);
         
         this.setElement(element);
         idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
@@ -153,8 +154,8 @@ public class EntityKoid extends MonsterEntity implements ILoreTagged {
     }
 
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 		
 		if (idleCooldown > 0) {
 			idleCooldown--;
