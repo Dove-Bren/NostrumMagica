@@ -2,44 +2,57 @@ package com.smanzana.nostrummagica.client.particles;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpawnNostrumParticleMessage;
 import com.smanzana.nostrummagica.utils.ColorUtil;
 
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.particles.ParticleType;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
+@Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public enum NostrumParticles {
 
-	GLOW_ORB(1, ParticleGlowOrb.Factory.class),
-	LIGHTNING_STATIC(2, ParticleLightningStatic.Factory.class),
-	FILLED_ORB(3, ParticleFilledOrb.Factory.class),
-	WARD(4, ParticleWard.Factory.class),
+	GLOW_ORB(new NostrumParticleType("glow_orb"), ParticleGlowOrb.Factory.class),
+	LIGHTNING_STATIC(new NostrumParticleType("lightning_static"), ParticleLightningStatic.Factory.class),
+	FILLED_ORB(new NostrumParticleType("filled_orb"), ParticleFilledOrb.Factory.class),
+	WARD(new NostrumParticleType("ward"), ParticleWard.Factory.class),
 	;
 	
-	private final int ID;
+	@SubscribeEvent
+	public static void registerParticles(RegistryEvent.Register<ParticleType<?>> event) {
+		for (NostrumParticles p : NostrumParticles.values()) {
+			event.getRegistry().register(p.getType());
+		}
+	}
+	
+	private final NostrumParticleType type;
 	private final Class<? extends INostrumParticleFactory<?>> factoryClazz;
 	private INostrumParticleFactory<?> factory;
 	
-	private <F extends INostrumParticleFactory<?>> NostrumParticles(int ID, Class<F> factoryClazz) {
-		this.ID = ID;
+	private <F extends INostrumParticleFactory<?>> NostrumParticles(NostrumParticleType type, Class<F> factoryClazz) {
+		this.type = type;
 		this.factoryClazz = factoryClazz;
 	}
 	
-	public int getID() {
-		return ID;
+	public NostrumParticleType getType() {
+		return this.type;
 	}
 	
 	public void spawn(World world, SpawnParams params) {
 		Spawn(this, world, params);
 	}
 	
-	public static @Nullable NostrumParticles FromID(int ID) {
-		for (NostrumParticles type : values()) {
-			if (type.getID() == ID) {
-				return type;
+	public static @Nullable NostrumParticles FromType(NostrumParticleType type) {
+		for (NostrumParticles p : values()) {
+			if (p.getType() == type) {
+				return p;
 			}
 		}
 		return null;
@@ -48,7 +61,7 @@ public enum NostrumParticles {
 	public static void Spawn(NostrumParticles type, World world, SpawnParams params) {
 		if (!world.isRemote) {
 			NetworkHandler.sendToDimension(new SpawnNostrumParticleMessage(type, params),
-					world.provider.getDimension());
+					world.getDimension().getType());
 		} else {
 			if (type.factory == null) {
 				try {
@@ -203,10 +216,10 @@ public enum NostrumParticles {
 			}
 			
 			tag.putInt(NBT_COUNT, params.count);
-			tag.setDouble(NBT_SPAWN_X, params.spawnX);
-			tag.setDouble(NBT_SPAWN_Y, params.spawnY);
-			tag.setDouble(NBT_SPAWN_Z, params.spawnZ);
-			tag.setDouble(NBT_SPAWN_JITTER, params.spawnJitterRadius);
+			tag.putDouble(NBT_SPAWN_X, params.spawnX);
+			tag.putDouble(NBT_SPAWN_Y, params.spawnY);
+			tag.putDouble(NBT_SPAWN_Z, params.spawnZ);
+			tag.putDouble(NBT_SPAWN_JITTER, params.spawnJitterRadius);
 			tag.putInt(NBT_LIFETIME, params.lifetime);
 			tag.putInt(NBT_LIFETIME_JITTER, params.lifetimeJitter);
 			tag.putBoolean(NBT_DIE_ON_TARGET, params.dieOnTarget);
@@ -214,25 +227,25 @@ public enum NostrumParticles {
 			
 			if (params.velocity != null) {
 				CompoundNBT subtag = new CompoundNBT();
-				subtag.setDouble("x", params.velocity.x);
-				subtag.setDouble("y", params.velocity.y);
-				subtag.setDouble("z", params.velocity.z);
+				subtag.putDouble("x", params.velocity.x);
+				subtag.putDouble("y", params.velocity.y);
+				subtag.putDouble("z", params.velocity.z);
 				tag.put(NBT_VELOCITY, subtag);
 			}
 			
 			if (params.velocityJitter != null) {
 				CompoundNBT subtag = new CompoundNBT();
-				subtag.setDouble("x", params.velocityJitter.x);
-				subtag.setDouble("y", params.velocityJitter.y);
-				subtag.setDouble("z", params.velocityJitter.z);
+				subtag.putDouble("x", params.velocityJitter.x);
+				subtag.putDouble("y", params.velocityJitter.y);
+				subtag.putDouble("z", params.velocityJitter.z);
 				tag.put(NBT_VELOCITY_JITTER, subtag);
 			}
 			
 			if (params.targetPos != null) {
 				CompoundNBT subtag = new CompoundNBT();
-				subtag.setDouble("x", params.targetPos.x);
-				subtag.setDouble("y", params.targetPos.y);
-				subtag.setDouble("z", params.targetPos.z);
+				subtag.putDouble("x", params.targetPos.x);
+				subtag.putDouble("y", params.targetPos.y);
+				subtag.putDouble("z", params.targetPos.z);
 				tag.put(NBT_TARGET_POS, subtag);
 			}
 			

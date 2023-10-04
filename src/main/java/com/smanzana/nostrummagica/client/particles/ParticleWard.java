@@ -1,5 +1,8 @@
 package com.smanzana.nostrummagica.client.particles;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.EntityBehavior;
@@ -7,10 +10,6 @@ import com.smanzana.nostrummagica.utils.ColorUtil;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
@@ -34,7 +33,7 @@ public class ParticleWard extends BatchRenderParticle {
 		particleBlue = blue;
 		particleAlpha = 0f;
 		this.maxAlpha = alpha;
-		particleMaxAge = lifetime;
+		maxAge = lifetime;
 	}
 	
 	public ParticleWard setGravity(boolean gravity) {
@@ -60,17 +59,17 @@ public class ParticleWard extends BatchRenderParticle {
 	
 	public ParticleWard setMotion(double xVelocity, double yVelocity, double zVelocity,
 			double xJitter, double yJitter, double zJitter) {
-		this.getMotion().x = xVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * xJitter; // +- jitter
-		this.getMotion().y = yVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * yJitter;
-		this.getMotion().z = zVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * zJitter;
+		this.motionX = xVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * xJitter; // +- jitter
+		this.motionY = yVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * yJitter;
+		this.motionZ = zVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * zJitter;
 		return this;
 	}
 	
 	public ParticleWard setTarget(Entity ent) {
 		targetEntity = ent;
 		if (this.targetPos == null && ent != null) {
-			final double wRad = ent.width * 2; // double width
-			final double hRad = ent.height;
+			final double wRad = ent.getWidth() * 2; // double width
+			final double hRad = ent.getHeight();
 			this.targetPos = new Vec3d(wRad * (NostrumMagica.rand.nextDouble() - .5),
 					hRad * (NostrumMagica.rand.nextDouble() - .5),
 					wRad * (NostrumMagica.rand.nextDouble() - .5));
@@ -108,7 +107,7 @@ public class ParticleWard extends BatchRenderParticle {
 		GlStateManager.alphaFunc(516, 0);
 		GlStateManager.color4f(1f, 1f, 1f, .75f);
 		GlStateManager.depthMask(false);
-		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
+		//OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 	}
 	
 	@Override
@@ -128,15 +127,15 @@ public class ParticleWard extends BatchRenderParticle {
 	}
 	
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 		
-		if (this.particleAge < 20) {
+		if (this.age < 20) {
 			// fade in in first second
-			this.particleAlpha = ((float) particleAge / 20f);
-		} else if (this.particleAge >= this.particleMaxAge - 20f) {
+			this.particleAlpha = ((float) age / 20f);
+		} else if (this.age >= this.maxAge - 20f) {
 			// Fade out in last second
-			this.particleAlpha = ((float) (particleMaxAge - particleAge) / 20f);
+			this.particleAlpha = ((float) (maxAge - age) / 20f);
 		} else {
 			this.particleAlpha = 1f;
 		}
@@ -144,18 +143,18 @@ public class ParticleWard extends BatchRenderParticle {
 		this.particleAlpha *= maxAlpha;
 		
 		if (targetEntity != null) {
-			if (!targetEntity.isDead) {
+			if (targetEntity.isAlive()) {
 				final float period;
 				Vec3d offset;
 				if (this.entityBehavior == EntityBehavior.JOIN) {
 					period = 20f;
-					offset = targetPos == null ? Vec3d.ZERO : targetPos.rotateYaw((float) (Math.PI * 2 * ((float) particleAge % period) / period))
-							.add(0, targetEntity.height/2, 0);
+					offset = targetPos == null ? Vec3d.ZERO : targetPos.rotateYaw((float) (Math.PI * 2 * ((float) age % period) / period))
+							.add(0, targetEntity.getHeight()/2, 0);
 				} else if (this.entityBehavior == EntityBehavior.ORBIT) {
 					period = 20f;
 					//randPeriodOffset = ?
-					offset = (new Vec3d(targetEntity.width * 2, 0, 0)).rotateYaw((float) (Math.PI * 2 * ((float) particleAge % period) / period))
-							.add(0, (targetEntity.height/2) + (targetPos == null ? 0 : targetPos.y), 0);
+					offset = (new Vec3d(targetEntity.getWidth() * 2, 0, 0)).rotateYaw((float) (Math.PI * 2 * ((float) age % period) / period))
+							.add(0, (targetEntity.getHeight()/2) + (targetPos == null ? 0 : targetPos.y), 0);
 					
 					// do this better
 					if (this.particleGravity != 0f) {
@@ -167,7 +166,7 @@ public class ParticleWard extends BatchRenderParticle {
 				} else {
 					throw new RuntimeException("Unsupported particle behavior");
 				}
-				Vec3d curVelocity = new Vec3d(this.getMotion().x, this.getMotion().y, this.getMotion().z);
+				Vec3d curVelocity = new Vec3d(this.motionX, this.motionY, this.motionZ);
 				Vec3d posDelta = targetEntity.getPositionVector()
 						.add(offset.x, offset.y, offset.z)
 						.subtract(posX, posY, posZ);
@@ -175,7 +174,7 @@ public class ParticleWard extends BatchRenderParticle {
 				this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
 			}
 		} else if (targetPos != null) {
-			Vec3d curVelocity = new Vec3d(this.getMotion().x, this.getMotion().y, this.getMotion().z);
+			Vec3d curVelocity = new Vec3d(this.motionX, this.motionY, this.motionZ);
 			Vec3d posDelta = targetPos.subtract(posX, posY, posZ);
 			Vec3d idealVelocity = posDelta.normalize().scale(.3);
 			this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
@@ -211,7 +210,8 @@ public class ParticleWard extends BatchRenderParticle {
 				}
 				particle.dieOnTarget(params.dieOnTarget);
 				particle.setEntityBehavior(params.entityBehavior);
-				Minecraft.getInstance().effectRenderer.addEffect(particle);
+				Minecraft mc = Minecraft.getInstance();
+				mc.particles.addEffect(particle);
 			}
 			return particle;
 		}

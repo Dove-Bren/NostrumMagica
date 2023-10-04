@@ -1,8 +1,9 @@
 package com.smanzana.nostrummagica.client.particles;
 
+import net.minecraft.client.particle.IParticleRenderType;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
@@ -53,7 +54,7 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 	public abstract int compareTo(BatchRenderParticle o);
 	
 	@Override
-	public void renderParticle(BufferBuilder worldRendererIn, Entity entityIn, float partialTicks, float rotationX, float rotationXZ, float rotationZ, float rotationYZ, float rotationXY) {
+	public void renderParticle(BufferBuilder buffer, ActiveRenderInfo entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
 		renderParams.rotX = rotationX;
 		renderParams.rotXZ = rotationXZ;
 		renderParams.rotZ = rotationZ;
@@ -61,6 +62,11 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 		renderParams.rotXY = rotationXY;
 		
 		ParticleBatchRenderer.instance().queueParticle(this);
+	}
+	
+	@Override
+	public IParticleRenderType getRenderType() {
+		return IParticleRenderType.CUSTOM;
 	}
 	
 	/**
@@ -83,7 +89,7 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 		final float rZ = params.rotZ;
 		final float rYZ = params.rotYZ;
 		final float rXY = params.rotXY;
-		final float radius = particle.particleScale * scale;
+		final float radius = /*particle.particleScale*/1 * scale;
 		
 		
 		buffer.pos(offsetX - (rX * radius) - (rYZ * radius), offsetY - (rXZ * radius), offsetZ - (rZ * radius) - (rXY * radius))

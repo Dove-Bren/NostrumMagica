@@ -1,15 +1,14 @@
 package com.smanzana.nostrummagica.client.particles;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.utils.ColorUtil;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
@@ -32,7 +31,7 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 		particleBlue = blue;
 		particleAlpha = 0f;
 		this.maxAlpha = alpha;
-		particleMaxAge = lifetime;
+		maxAge = lifetime;
 	}
 	
 	public ParticleFilledOrb setGravity(boolean gravity) {
@@ -58,9 +57,9 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 	
 	public ParticleFilledOrb setMotion(double xVelocity, double yVelocity, double zVelocity,
 			double xJitter, double yJitter, double zJitter) {
-		this.getMotion().x = xVelocity * (1.0 + (NostrumMagica.rand.nextDouble() * 2 - 1) * xJitter); // 1 +- jitter
-		this.getMotion().y = yVelocity * (1.0 + (NostrumMagica.rand.nextDouble() * 2 - 1) * yJitter);
-		this.getMotion().z = zVelocity * (1.0 + (NostrumMagica.rand.nextDouble() * 2 - 1) * zJitter);
+		this.motionX = xVelocity * (1.0 + (NostrumMagica.rand.nextDouble() * 2 - 1) * xJitter); // 1 +- jitter
+		this.motionY = yVelocity * (1.0 + (NostrumMagica.rand.nextDouble() * 2 - 1) * yJitter);
+		this.motionZ = zVelocity * (1.0 + (NostrumMagica.rand.nextDouble() * 2 - 1) * zJitter);
 		return this;
 	}
 	
@@ -102,7 +101,7 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 		GlStateManager.alphaFunc(516, 0);
 		GlStateManager.color4f(1f, 1f, 1f, .75f);
 		GlStateManager.depthMask(false);
-		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
+		//OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 	}
 	
 	@Override
@@ -121,15 +120,15 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 	}
 	
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 		
-		if (this.particleAge < 20) {
+		if (this.age < 20) {
 			// fade in in first second
-			this.particleAlpha = ((float) particleAge / 20f);
-		} else if (this.particleAge >= this.particleMaxAge - 20f) {
+			this.particleAlpha = ((float) age / 20f);
+		} else if (this.age >= this.maxAge - 20f) {
 			// Fade out in last second
-			this.particleAlpha = ((float) (particleMaxAge - particleAge) / 20f);
+			this.particleAlpha = ((float) (maxAge - age) / 20f);
 		} else {
 			this.particleAlpha = 1f;
 		}
@@ -137,10 +136,10 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 		this.particleAlpha *= maxAlpha;
 		
 		if (targetEntity != null) {
-			if (!targetEntity.isDead) {
+			if (targetEntity.isAlive()) {
 				final float period = 20f;
-				Vec3d offset = targetPos == null ? new Vec3d(0,0,0) : targetPos.rotateYaw((float) (Math.PI * 2 * ((float) particleAge % period) / period));
-				Vec3d curVelocity = new Vec3d(this.getMotion().x, this.getMotion().y, this.getMotion().z);
+				Vec3d offset = targetPos == null ? new Vec3d(0,0,0) : targetPos.rotateYaw((float) (Math.PI * 2 * ((float) age % period) / period));
+				Vec3d curVelocity = new Vec3d(motionX, motionY, motionZ);
 				Vec3d posDelta = targetEntity.getPositionVector()
 						.add(offset.x, offset.y + targetEntity.getHeight()/2, offset.z)
 						.subtract(posX, posY, posZ);
@@ -149,7 +148,7 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 			}
 			// Else just do nothing
 		} else if (targetPos != null) {
-			Vec3d curVelocity = new Vec3d(this.getMotion().x, this.getMotion().y, this.getMotion().z);
+			Vec3d curVelocity = new Vec3d(motionX, motionY, motionZ);
 			Vec3d posDelta = targetPos.subtract(posX, posY, posZ);
 			Vec3d idealVelocity = posDelta.normalize().scale(.3);
 			this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
@@ -184,7 +183,8 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 					particle.setGravityStrength(params.gravityStrength);
 				}
 				particle.dieOnTarget(params.dieOnTarget);
-				Minecraft.getInstance().effectRenderer.addEffect(particle);
+				Minecraft mc = Minecraft.getInstance();
+				mc.particles.addEffect(particle);
 			}
 			return particle;
 		}
