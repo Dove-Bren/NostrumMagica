@@ -107,12 +107,12 @@ public class EntityGolemLightning extends EntityGolem {
 
 	@Override
 	public void initGolemAttributes() {
-        this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.25D);
+        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.25D);
 
-        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(14.0D);
+        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(14.0D);
 
-        this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(2.0D);
-        this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(6.0D);
+        this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(2.0D);
+        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(6.0D);
 	}
 
 	@Override
@@ -123,15 +123,15 @@ public class EntityGolemLightning extends EntityGolem {
 	@Override
 	public void tick() {
 		if (world.isRainingAt(this.getPosition())) {
-			if (!this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED)
+			if (!this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED)
 					.hasModifier(MOVEMENT_STORM_MODIFIER)) {
-				this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED)
+				this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED)
 					.applyModifier(MOVEMENT_STORM_MODIFIER);
 			}
 		} else {
-			if (this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED)
+			if (this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED)
 					.hasModifier(MOVEMENT_STORM_MODIFIER)) {
-				this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED)
+				this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED)
 					.removeModifier(MOVEMENT_STORM_MODIFIER);
 			}
 		}

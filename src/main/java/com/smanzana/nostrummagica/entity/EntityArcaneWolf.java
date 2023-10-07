@@ -472,14 +472,14 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		
 	
 	@Override
-	protected void applyEntityAttributes() {
-		super.applyEntityAttributes();
-		this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.35D);
-		this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(50.0D);
-		this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(10.0D);
-		this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(60.0);
-		this.getEntityAttribute(AttributeMagicResist.instance()).setBaseValue(20.0D);
-		this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(6.0D);
+	protected void registerAttributes() {
+		super.registerAttributes();
+		this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.35D);
+		this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(50.0D);
+		this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(10.0D);
+		this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(60.0);
+		this.getAttribute(AttributeMagicResist.instance()).setBaseValue(20.0D);
+		this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(6.0D);
 	}
 	
 	@Override
@@ -666,8 +666,8 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	public void onLivingUpdate() {
-		super.onLivingUpdate();
+	public void livingTick() {
+		super.livingTick();
 		
 		if (world.isRemote) {
 			return;
@@ -682,7 +682,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 				float amt = this.getManaRegen();
 				
 				// Augment with bonuses
-				amt += this.getEntityAttribute(AttributeManaRegen.instance()).getAttributeValue() / 100.0;
+				amt += this.getAttribute(AttributeManaRegen.instance()).getAttributeValue() / 100.0;
 				
 				int mana = (int) (amt);
 				amt = amt - mana; // Get fraction
@@ -734,7 +734,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 //					net.minecraftforge.common.ForgeHooks.onLivingJump(this);
 //				}
 				
-				this.setAIMoveSpeed((float)this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue());
+				this.setAIMoveSpeed((float)this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue());
 				super.travel(strafe, vertical, forward);
 			}
 			else if (entitylivingbase instanceof PlayerEntity)
@@ -1069,7 +1069,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	protected void setMaxHealth(float maxHealth) {
-		this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(maxHealth);
+		this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(maxHealth);
 	}
 	
 	public int getRuneColor() {
@@ -1701,7 +1701,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 			// Earth upgrades inventory size!
 			ensureInventorySize(); // Auto resizes
 			// And adds armor
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).applyModifier(new AttributeModifier(
+			this.getAttribute(SharedMonsterAttributes.ARMOR).applyModifier(new AttributeModifier(
 					UUID.fromString(UUID_EXTRA_ARMOR_MOD),
 					"ArcaneWolfEarthArmor",
 					5.0D,
@@ -1710,7 +1710,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		}
 		if (element == EMagicElement.LIGHTNING) {
 			// Lightning gives bonus magic resistance!
-			this.getEntityAttribute(AttributeMagicResist.instance()).applyModifier(new AttributeModifier(
+			this.getAttribute(AttributeMagicResist.instance()).applyModifier(new AttributeModifier(
 					UUID.fromString(UUID_MAGIC_RESIST_MOD),
 					"ArcaneWolfLightningResist",
 					30.0D,

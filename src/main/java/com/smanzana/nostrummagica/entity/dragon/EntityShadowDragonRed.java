@@ -105,15 +105,15 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 	}
 
 	@Override
-	protected void applyEntityAttributes() {
-		super.applyEntityAttributes();
-        this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.33D);
-        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(50.0D);
-        this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(5.0D);
-        this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(8.0D);
+	protected void registerAttributes() {
+		super.registerAttributes();
+        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.33D);
+        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(50.0D);
+        this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(5.0D);
+        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(8.0D);
         this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_SPEED);
-        this.getEntityAttribute(SharedMonsterAttributes.ATTACK_SPEED).setBaseValue(0.5D);
-        this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64D);
+        this.getAttribute(SharedMonsterAttributes.ATTACK_SPEED).setBaseValue(0.5D);
+        this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64D);
     }
 	
 	@Override
@@ -128,12 +128,12 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 		
 		if (this.target != null) {
 			if (this.!target.isAlive()) {
-				this.attackEntityFrom(DamageSource.OUT_OF_WORLD, (float) this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getAttributeValue());
+				this.attackEntityFrom(DamageSource.OUT_OF_WORLD, (float) this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).getAttributeValue());
 			}
 		} else {
 			// If target is null but we're a target-type, DIE
 			if (this.dataManager.get(HASTARGET)) {
-				this.attackEntityFrom(DamageSource.OUT_OF_WORLD, (float) this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getAttributeValue());
+				this.attackEntityFrom(DamageSource.OUT_OF_WORLD, (float) this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).getAttributeValue());
 			}
 		}
 	}

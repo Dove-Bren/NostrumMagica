@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger.SeekingBulletTriggerInstance;
+import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -19,14 +20,17 @@ import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.particles.ParticleType;
+import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceContext.BlockMode;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.EnumDifficulty;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
@@ -42,7 +46,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 	private LivingEntity target;
 	private LivingEntity shooter;
 	private double speed; // Vanilla shulkers use .15
-	private ParticleType<?> particle;
+	private IParticleData particle;
 	
 	private boolean blockyPath; // Shulker-style pathing? Else smooth curve style.
 	
@@ -74,7 +78,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 			LivingEntity target,
 			Direction.Axis axis,
 			double speed,
-			ParticleType<?> particle,
+			IParticleData particle,
 			boolean blockyPath) {
 		//super(shooter.world, shooter, target, axis);
 		this(type, shooter.world);
@@ -107,8 +111,8 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 	}
 	
 	@Override
-	protected void registerData() { int unused; // TODO
-		super.entityInit();
+	protected void registerData() {
+		super.registerData();
 		
 		this.dataManager.register(ELEMENT, EMagicElement.PHYSICAL);
 	}
@@ -127,11 +131,12 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 	
 	@Override
 	protected void bulletHit(RayTraceResult result) {
-		if (result.entityHit == null) {
+		Entity entityHit = RayTrace.entFromRaytrace(result);
+		if (entityHit == null) {
 			//trigger.onProjectileHit(result.getBlockPos());
 			return; // ?
 		} else {
-			trigger.onProjectileHit(result.entityHit);
+			trigger.onProjectileHit(entityHit);
 		}
 		this.remove();
 	}
@@ -146,7 +151,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 	}
 	
 	@Override
-	public boolean writeToNBTOptional(CompoundNBT compound) {
+	public boolean writeUnlessRemoved(CompoundNBT compound) {
 		// Returning false means we won't be saved. That's what we want.
 		return false;
     }
@@ -178,7 +183,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 
 		// Blocky movement looks for next block and tries to move to that one, using random if multiple spots still
 		// move in the right direction.
-		if (blockyPath && targetPos.distanceSqToCenter(this.posX, this.posY, this.posZ) >= 4.0D) {
+		if (blockyPath && targetPos.distanceSq(this.posX, this.posY, this.posZ, true) >= 4.0D) {
 			BlockPos blockpos1 = new BlockPos(this);
 			List<Direction> list = Lists.<Direction>newArrayList();
 
@@ -232,9 +237,9 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 				enumfacing = (Direction)list.get(this.rand.nextInt(list.size()));
 			}
 
-			targetX = this.posX + (double)enumfacing.getFrontOffsetX();
-			targetY = this.posY + (double)enumfacing.getFrontOffsetY();
-			targetZ = this.posZ + (double)enumfacing.getFrontOffsetZ();
+			targetX = this.posX + (double)enumfacing.getXOffset();
+			targetY = this.posY + (double)enumfacing.getYOffset();
+			targetZ = this.posZ + (double)enumfacing.getZOffset();
 		}
 
 		this.setDirection(enumfacing);
@@ -263,43 +268,37 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 	/**
 	 * Called to update the entity's position/logic.
 	 */
-	public void tick()
-	{
-		if (!this.world.isRemote && this.world.getDifficulty() == EnumDifficulty.PEACEFUL)
-		{
+	public void tick() {
+		if (!this.world.isRemote && this.world.getDifficulty() == Difficulty.PEACEFUL) {
 			this.remove();
-		}
-		else
-		{
+		} else {
 			//super.tick();
-			this.onEntityUpdate();
+			this.baseTick();
 
-			if (!this.world.isRemote)
-			{
+			if (!this.world.isRemote) {
 				double dist = Double.MAX_VALUE;
-				if (this.target == null || !this.target.isEntityAlive() || this.target instanceof PlayerEntity && ((PlayerEntity)this.target).isSpectator())
-				{
-					if (!this.hasNoGravity())
-					{
-						this.getMotion().y -= 0.04D;
+				if (this.target == null || !this.target.isAlive() || this.target instanceof PlayerEntity && ((PlayerEntity)this.target).isSpectator()) {
+					if (!this.hasNoGravity()) {
+						this.setMotion(this.getMotion().add(0, -0.04, 0));
 					}
-				}
-				else
-				{
+				} else {
 					dist = target.getPositionVector().add(0, target.getHeight() / 2, 0).distanceTo(this.getPositionVector());
 					this.targetDeltaX = MathHelper.clamp(this.targetDeltaX * 1.025D, -1.0D, 1.0D);
 					this.targetDeltaY = MathHelper.clamp(this.targetDeltaY * 1.025D, -1.0D, 1.0D);
 					this.targetDeltaZ = MathHelper.clamp(this.targetDeltaZ * 1.025D, -1.0D, 1.0D);
 					final double adj = (this.blockyPath ? .2 : (dist < 2 ? .3 : .05));
-					this.getMotion().x += (this.targetDeltaX - this.getMotion().x) * adj;
-					this.getMotion().y += (this.targetDeltaY - this.getMotion().y) * adj;
-					this.getMotion().z += (this.targetDeltaZ - this.getMotion().z) * adj;
+					final Vec3d oldMot = this.getMotion();
+					this.setMotion(oldMot.add(
+							(this.targetDeltaX - oldMot.x) * adj,
+							(this.targetDeltaY - oldMot.y) * adj,
+							(this.targetDeltaZ - oldMot.z) * adj
+							));
 				}
 				
 				if (dist < .5) {
-					this.bulletHit(new RayTraceResult(target));
+					this.bulletHit(new EntityRayTraceResult(target));
 				} else {
-					RayTraceResult raytraceresult = ProjectileHelper.forwardsRaycast(this, true, false, this.shooter);
+					RayTraceResult raytraceresult = ProjectileHelper.func_221266_a(this, true, false, this.shooter, BlockMode.COLLIDER);
 	
 					if (raytraceresult != null) {
 						this.bulletHit(raytraceresult);
@@ -310,37 +309,27 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 			this.setPosition(this.posX + this.getMotion().x, this.posY + this.getMotion().y, this.posZ + this.getMotion().z);
 			ProjectileHelper.rotateTowardsMovement(this, 0.5F);
 
-			if (this.world.isRemote)
-			{
-				this.world.addParticle(particle, this.posX - this.getMotion().x, this.posY - this.getMotion().y + 0.15D, this.posZ - this.getMotion().z, 0.0D, 0.0D, 0.0D, new int[0]);
-			}
-			else if (this.target != null && !this.!target.isAlive())
-			{
-				if (this.steps > 0)
-				{
+			if (this.world.isRemote) {
+				this.world.addParticle(particle, this.posX - this.getMotion().x, this.posY - this.getMotion().y + 0.15D, this.posZ - this.getMotion().z, 0.0D, 0.0D, 0.0D);
+			} else if (this.target != null && this.target.isAlive()) {
+				if (this.steps > 0) {
 					--this.steps;
 
-					if (this.steps == 0)
-					{
+					if (this.steps == 0) {
 						this.selectNextMoveDirection(this.direction == null ? null : this.direction.getAxis());
 					}
 				}
 
-				if (this.direction != null)
-				{
+				if (this.direction != null) {
 					BlockPos blockpos = new BlockPos(this);
 					Direction.Axis enumfacing$axis = this.direction.getAxis();
 
-					if (this.world.isBlockNormalCube(blockpos.offset(this.direction), false))
-					{
+					if (this.world.func_217400_a(blockpos.offset(this.direction), this)) {
 						this.selectNextMoveDirection(enumfacing$axis);
-					}
-					else
-					{
+					} else {
 						BlockPos blockpos1 = new BlockPos(this.target);
 
-						if (enumfacing$axis == Direction.Axis.X && blockpos.getX() == blockpos1.getX() || enumfacing$axis == Direction.Axis.Z && blockpos.getZ() == blockpos1.getZ() || enumfacing$axis == Direction.Axis.Y && blockpos.getY() == blockpos1.getY())
-						{
+						if (enumfacing$axis == Direction.Axis.X && blockpos.getX() == blockpos1.getX() || enumfacing$axis == Direction.Axis.Z && blockpos.getZ() == blockpos1.getZ() || enumfacing$axis == Direction.Axis.Y && blockpos.getY() == blockpos1.getY()) {
 							this.selectNextMoveDirection(enumfacing$axis);
 						}
 					}

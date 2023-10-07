@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.triggers.MortarTrigger.MortarTriggerInstance;
+import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -16,6 +17,7 @@ import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -48,9 +50,7 @@ public class EntitySpellMortar extends FireballEntity {
 		this.accelerationX = 0; // have no be non-zero or they're NAN lol
 		this.accelerationY = 0;
 		this.accelerationZ = 0;
-        this.getMotion().x = velocity.x;
-        this.getMotion().y = velocity.y;
-        this.getMotion().z = velocity.z;
+		this.setMotion(velocity);
 		this.shootingEntity = shooter;
 		
 		this.trigger = trigger;
@@ -64,8 +64,8 @@ public class EntitySpellMortar extends FireballEntity {
 	}
 	
 	@Override
-	protected void registerData() { int unused; // TODO
-		super.entityInit();
+	protected void registerData() {
+		super.registerData();
 		
 		this.dataManager.register(ELEMENT, EMagicElement.PHYSICAL);
 	}
@@ -92,7 +92,7 @@ public class EntitySpellMortar extends FireballEntity {
 			}
 			
 			// Gravity!
-			this.getMotion().y -= gravity;
+			this.setMotion(this.getMotion().add(0, -gravity, 0));
 			
 //			System.out.println("[" + this.posX + ", " + this.posY + ", " + this.posZ + "] -> ("
 //					+ this.getMotion().x + ", " + this.getMotion().y + ", " + this.getMotion().z + ")"
@@ -102,7 +102,7 @@ public class EntitySpellMortar extends FireballEntity {
 			color = (0x19000000) | (color & 0x00FFFFFF);
 			NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 					2,
-					posX, posY + height/2f, posZ, 0, 40, 0,
+					posX, posY + getHeight()/2f, posZ, 0, 40, 0,
 					new Vec3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), null
 				).color(color));
 		}
@@ -118,16 +118,17 @@ public class EntitySpellMortar extends FireballEntity {
 		if (world.isRemote)
 			return;
 		
-		if (result.typeOfHit == RayTraceResult.Type.MISS) {
+		if (result.getType() == RayTraceResult.Type.MISS) {
 			; // Do nothing
-		} else if (result.typeOfHit == RayTraceResult.Type.BLOCK) {
-			trigger.onProjectileHit(new BlockPos(result.hitVec));
+		} else if (result.getType() == RayTraceResult.Type.BLOCK) {
+			trigger.onProjectileHit(new BlockPos(result.getHitVec()));
 			this.remove();
-		} else if (result.typeOfHit == RayTraceResult.Type.ENTITY) {
-			if (filter == null || filter.apply(result.entityHit)) {
-				if ((result.entityHit != shootingEntity && !shootingEntity.isRidingOrBeingRiddenBy(result.entityHit))
+		} else if (result.getType() == RayTraceResult.Type.ENTITY) {
+			final Entity entityHit = RayTrace.entFromRaytrace(result);
+			if (filter == null || filter.apply(entityHit)) {
+				if ((entityHit != shootingEntity && !shootingEntity.isRidingOrBeingRiddenBy(entityHit))
 						|| this.ticksExisted > 20) {
-					trigger.onProjectileHit(result.entityHit);
+					trigger.onProjectileHit(entityHit);
 					this.remove();
 				}
 			}
@@ -135,7 +136,7 @@ public class EntitySpellMortar extends FireballEntity {
 	}
 	
 	@Override
-	public boolean writeToNBTOptional(CompoundNBT compound) {
+	public boolean writeUnlessRemoved(CompoundNBT compound) {
 		// Returning false means we won't be saved. That's what we want.
 		return false;
     }
@@ -146,8 +147,8 @@ public class EntitySpellMortar extends FireballEntity {
 	}
 	
 	@Override
-	protected ParticleTypes getParticleType() {
-		return ParticleTypes.SUSPENDED;
+	protected IParticleData getParticle() {
+		return ParticleTypes.WITCH;
 	}
 	
 	public void setElement(EMagicElement element) {

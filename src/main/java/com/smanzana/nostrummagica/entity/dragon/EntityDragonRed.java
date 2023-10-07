@@ -414,15 +414,15 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 	}
 	
 	@Override
-	protected void applyEntityAttributes() {
-		super.applyEntityAttributes();
-        this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.33D);
-        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(1000.0D);
-        this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(15.0D);
-        this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(15.0D);
+	protected void registerAttributes() {
+		super.registerAttributes();
+        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.33D);
+        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(1000.0D);
+        this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(15.0D);
+        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(15.0D);
         this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_SPEED);
-        this.getEntityAttribute(SharedMonsterAttributes.ATTACK_SPEED).setBaseValue(0.5D);
-        this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64D);
+        this.getAttribute(SharedMonsterAttributes.ATTACK_SPEED).setBaseValue(0.5D);
+        this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64D);
     }
 	
 	@Override

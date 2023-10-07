@@ -34,9 +34,9 @@ public class EntitySwitchTrigger extends MobEntity {
 	}
 	
 	@Override
-	protected void applyEntityAttributes() {
-		super.applyEntityAttributes();
-		this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(1D);
+	protected void registerAttributes() {
+		super.registerAttributes();
+		this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(1D);
 	}
 	
 	
@@ -103,8 +103,8 @@ public class EntitySwitchTrigger extends MobEntity {
 	}
 	
 	@Override
-	public void onLivingUpdate() {
-		super.onLivingUpdate();
+	public void livingTick() {
+		super.livingTick();
 		
 		if (this.isAlive() && !this.dead) {
 			if (!world.isRemote && this.ticksExisted > 20) {

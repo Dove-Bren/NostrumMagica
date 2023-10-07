@@ -31,6 +31,15 @@ public class Entities {
 		return null;
 	}
 	
+	public static @Nullable LivingEntity FindLiving(World world, UUID id) {
+		Entity ent = FindEntity(world, id);
+		if (ent != null && ent instanceof LivingEntity) {
+			return (LivingEntity) ent;
+		}
+		
+		return null;
+	}
+	
 	public static List<LivingEntity> GetEntities(ServerWorld world, Predicate<LivingEntity> predicate) {
 		List<Entity> entities = world.getEntities()
 				.filter((e) -> {return e instanceof LivingEntity;})

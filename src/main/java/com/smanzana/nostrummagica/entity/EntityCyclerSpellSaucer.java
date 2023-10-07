@@ -2,10 +2,11 @@ package com.smanzana.nostrummagica.entity;
 
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-import java.util.Optional;
 import com.smanzana.nostrummagica.spells.components.triggers.MagicCyclerTrigger.MagicCyclerTriggerInstance;
+import com.smanzana.nostrummagica.utils.Entities;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -16,6 +17,8 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
@@ -39,7 +42,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
         this.onBlocks = true;
         
         // Set up shooter as data parameter to communicate to client
-        this.dataManager.set(SHOOTER, Optional.fromNullable(shooter.getUniqueID()));
+        this.dataManager.set(SHOOTER, Optional.ofNullable(shooter.getUniqueID()));
 	}
 	
 	public EntityCyclerSpellSaucer(EntityType<? extends EntityCyclerSpellSaucer> type, 
@@ -69,8 +72,8 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 	}
 	
 	@Override
-	protected void registerData() { int unused; // TODO
-		this.dataManager.register(SHOOTER, Optional.<UUID>absent());
+	protected void registerData() {
+		this.dataManager.register(SHOOTER, Optional.<UUID>empty());
 	}
 	
 	private Vector _getInstantVelocityVec;
@@ -83,11 +86,9 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 		// Get shooter position
 		if (this.shootingEntity == null) {
 			// Try and do a fixup
-			UUID shooterID = this.dataManager.get(SHOOTER).orNull();
+			UUID shooterID = this.dataManager.get(SHOOTER).orElse(null);
 			if (shooterID != null) {
-				Entity entity = world.loadedEntityList.stream()
-						.filter((ent) -> { return ent.getUniqueID().equals(shooterID);})
-						.findAny().orElse(null);
+				Entity entity = Entities.FindEntity(world, shooterID);
 				
 				if (entity != null) {
 					this.shootingEntity = (LivingEntity) entity;
@@ -121,11 +122,9 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 		// Get shooter position
 		if (this.shootingEntity == null) {
 			// Try and do a fixup
-			UUID shooterID = this.dataManager.get(SHOOTER).orNull();
+			UUID shooterID = this.dataManager.get(SHOOTER).orElse(null);
 			if (shooterID != null) {
-				Entity entity = world.loadedEntityList.stream()
-						.filter((ent) -> { return ent.getUniqueID().equals(shooterID);})
-						.findAny().orElse(null);
+				Entity entity = Entities.FindEntity(world, shooterID);
 				
 				if (entity != null) {
 					this.shootingEntity = (LivingEntity) entity;
@@ -195,7 +194,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 				}
 				
 				if (ent != null) {
-					RayTraceResult bundledResult = new RayTraceResult(collidedEnts.get(0));
+					RayTraceResult bundledResult = new EntityRayTraceResult(collidedEnts.get(0));
 					this.onImpact(bundledResult);
 				}
 			}
@@ -210,8 +209,8 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 					// Only trigger on non-air
 					BlockPos blockPos = new BlockPos(posX, posY, posZ); // not using getPosition() since it adds .5 y 
 					if (this.canImpact(blockPos)) {
-						RayTraceResult bundledResult = new RayTraceResult(
-								RayTraceResult.Type.BLOCK, this.getPositionVector(), Direction.UP, blockPos);
+						RayTraceResult bundledResult = new BlockRayTraceResult(
+								this.getPositionVector(), Direction.UP, blockPos, false);
 						
 						if (_lastBlockVector == null) {
 							_lastBlockVector = new Vector();
@@ -262,7 +261,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 	
 	@Override
 	public boolean canImpact(BlockPos pos) {
-		return onBlocks && !this.world.isAirBlock(pos) && this.world.getBlockState(pos).isOpaqueCube();
+		return onBlocks && !this.world.isAirBlock(pos) && this.world.getBlockState(pos).isOpaqueCube(world, pos);
 	}
 	
 	static final AxisAlignedBB _BoundingBox = new AxisAlignedBB(-.5, -.1, -.5, .5, .1, .5);

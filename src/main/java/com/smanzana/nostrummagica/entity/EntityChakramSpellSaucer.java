@@ -3,11 +3,14 @@ package com.smanzana.nostrummagica.entity;
 import com.smanzana.nostrummagica.spells.components.triggers.MagicCutterTrigger.MagicCutterTriggerInstance;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceContext.BlockMode;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -49,19 +52,18 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
         
         // Set initial motion perpendicular to where we're going to add some cross
         Vec3d tilt = direction.rotateYaw(90f * (this.rand.nextBoolean() ? 1 : -1)).scale(2);
-        this.getMotion().x = tilt.x;
-        this.getMotion().y = tilt.y;
-        this.getMotion().z = tilt.z;
+        this.setMotion(tilt.x, tilt.y, tilt.z);
         
         // Raytrace at hit point, or just go max distance.
         // If piercing, only cap to raytrace if we hit an entity
         
-        RayTraceResult trace = RayTrace.raytrace(world, this.getPositionVector(), direction, (float) maxDistance, new RayTrace.OtherLiving(shootingEntity));
-        if (trace != null && trace.typeOfHit != RayTraceResult.Type.MISS) {
-        	if (trace.typeOfHit == RayTraceResult.Type.ENTITY) {
-        		this.target = trace.hitVec.add(0D, trace.entityHit.getHeight() / 2.0, 0D);
+        RayTraceResult trace = RayTrace.raytrace(world, this, this.getPositionVector(), direction, (float) maxDistance, new RayTrace.OtherLiving(shootingEntity));
+        if (trace != null && trace.getType() != RayTraceResult.Type.MISS) {
+        	if (trace.getType() == RayTraceResult.Type.ENTITY) {
+        		Entity entityHit = ((EntityRayTraceResult) trace).getEntity();
+        		this.target = trace.getHitVec().add(0D, entityHit.getHeight() / 2.0, 0D);
         	} else if (!piercing) { // !piercing cause piercing just wants max dist if no entity being looked at
-        		this.target = trace.hitVec;
+        		this.target = trace.getHitVec();
         	}
         }
         
@@ -123,20 +125,17 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 			Vector accel = this.getInstantVelocity();
 	        
 	        // Add accel to motionX for raytracing
-	        this.getMotion().x += accel.x;
-	        this.getMotion().y += accel.y;
-	        this.getMotion().z += accel.z;
+			this.setMotion(this.getMotion().add(accel.x, accel.y, accel.z));
 	        
-			RayTraceResult raytraceresult = ProjectileHelper.forwardsRaycast(this, true, this.ticksInAir >= 25, this.shootingEntity);
+			RayTraceResult raytraceresult = ProjectileHelper.func_221266_a(this, true, this.ticksInAir >= 25, this.shootingEntity, BlockMode.COLLIDER);
 			
 			// Also calc pitch and yaw
-			float f = MathHelper.sqrt(motionX * motionX + motionZ * motionZ);
-            this.rotationPitch = (float)(MathHelper.atan2(motionY, (double)f) * (180D / Math.PI));
-            this.rotationYaw = (float)(MathHelper.atan2(motionX, motionZ) * (180D / Math.PI));
+			final Vec3d prevMotion = this.getMotion();
+			float f = MathHelper.sqrt(prevMotion.x * prevMotion.x + prevMotion.z * prevMotion.z);
+            this.rotationPitch = (float)(MathHelper.atan2(prevMotion.y, (double)f) * (180D / Math.PI));
+            this.rotationYaw = (float)(MathHelper.atan2(prevMotion.x, prevMotion.z) * (180D / Math.PI));
 			
-			this.getMotion().x -= accel.x;
-	        this.getMotion().y -= accel.y;
-	        this.getMotion().z -= accel.z;
+            this.setMotion(this.getMotion().add(-accel.x, -accel.y, -accel.z));
 
 	        if (raytraceresult != null)
 	        {
@@ -151,9 +150,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 	        this.posZ += accel.z;
 	        
 	        // Apply air-friction, making motion's sort-of our initial motion
-	        this.getMotion().x *= 0.8;
-	        this.getMotion().y *= 0.8;
-	        this.getMotion().z *= 0.8;
+	        this.setMotion(this.getMotion().scale(0.8));
 			
 //				// Can't avoid a SQR; tracking motion would require SQR, too to get path length
 //				if (this.getPositionVector().squareDistanceTo(origin) > maxDistance) {
@@ -173,9 +170,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 						// Capture motion to get boomerang-effect
 						Vec3d motion = new Vec3d(accel.x, accel.y, accel.z).normalize().scale(1);
 						motion = motion.rotateYaw(30f * (this.rand.nextBoolean() ? 1 : -1));
-						this.getMotion().x += motion.x;
-						this.getMotion().y += motion.y;
-						this.getMotion().z += motion.z;
+						this.setMotion(this.getMotion().add(motion));
 					}
 				}
 			} else {
@@ -185,9 +180,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 					// Capture motion to get boomerang-effect
 					Vec3d motion = new Vec3d(accel.x, accel.y, accel.z).normalize().scale(1);
 					motion = motion.rotateYaw(30f * (this.rand.nextBoolean() ? 1 : -1));
-					this.getMotion().x += motion.x;
-					this.getMotion().y += motion.y;
-					this.getMotion().z += motion.z;
+					this.setMotion(this.getMotion().add(motion));
 				}
 			}
 		}

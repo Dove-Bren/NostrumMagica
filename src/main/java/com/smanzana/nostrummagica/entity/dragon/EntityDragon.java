@@ -151,7 +151,7 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
         {
 //        	if (this.action == EntityMoveHelper.Action.STRAFE)
 //    		{
-//    			float f = (float)this.entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
+//    			float f = (float)this.entity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
 //    			float f1 = (float)this.speed * f;
 //    			float f2 = this.moveForward;
 //    			float f3 = this.moveStrafe;
@@ -211,7 +211,7 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
                 	lastDist = 0.0D;
                 	this.action = EntityMoveHelper.Action.WAIT;
                 } else {
-                	float speed = (float) this.parentEntity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
+                	float speed = (float) this.parentEntity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
                 	speed *= 3f;
 	                this.parentEntity.getMotion().x = (d0 / d3) * speed;
 	                this.parentEntity.getMotion().y = (d1 / d3) * speed;
@@ -362,7 +362,7 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
 	    protected boolean isDirectPathBetweenPoints(Vec3d posVec31, Vec3d posVec32, int sizeX, int sizeY, int sizeZ)
 	    {
 	        RayTraceResult raytraceresult = this.world.rayTraceBlocks(posVec31, new Vec3d(posVec32.x, posVec32.y + (double)this.entity.getHeight() * 0.5D, posVec32.z), false, true, false);
-	        return raytraceresult == null || raytraceresult.typeOfHit == RayTraceResult.Type.MISS;
+	        return raytraceresult == null || raytraceresult.getType() == RayTraceResult.Type.MISS;
 	    }
 	
 	    public boolean canEntityStandOnPos(BlockPos pos)

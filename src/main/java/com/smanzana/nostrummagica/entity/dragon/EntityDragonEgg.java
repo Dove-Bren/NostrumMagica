@@ -67,11 +67,11 @@ public class EntityDragonEgg extends MobEntity implements ILoreTagged {
 	}
 
 	@Override
-	protected void applyEntityAttributes() {
-		super.applyEntityAttributes();
+	protected void registerAttributes() {
+		super.registerAttributes();
 		
-		this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(2D);
-		this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(0D);
+		this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(2D);
+		this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(0D);
 	}
 	
 	
@@ -157,8 +157,8 @@ public class EntityDragonEgg extends MobEntity implements ILoreTagged {
 	}
 	
 	@Override
-	public void onLivingUpdate() {
-		super.onLivingUpdate();
+	public void livingTick() {
+		super.livingTick();
 		
 		if (this.isAlive() && !this.dead) {
 			if (!world.isRemote && this.ticksExisted > 20) {
@@ -201,7 +201,7 @@ public class EntityDragonEgg extends MobEntity implements ILoreTagged {
 	}
 	
 	protected UUID getPlayerID() {
-		return dataManager.get(PLAYER).orNull();
+		return dataManager.get(PLAYER).orElse(null);
 	}
 	
 	private void setPlayerUUID(UUID id) {

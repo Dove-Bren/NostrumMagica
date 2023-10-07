@@ -135,7 +135,7 @@ public class DragonMeleeAttackTask extends EntityAIAttackMelee {
 			
 			// In either case, reset attackTick
 			if (attacked) {
-				this.attackTick = (int) ((double) this.attackInterval * (1/attacker.getEntityAttribute(SharedMonsterAttributes.ATTACK_SPEED).getAttributeValue()));
+				this.attackTick = (int) ((double) this.attackInterval * (1/attacker.getAttribute(SharedMonsterAttributes.ATTACK_SPEED).getAttributeValue()));
 			}
 		}
 		

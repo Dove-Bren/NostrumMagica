@@ -130,14 +130,14 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 		}
 	}
 	
-	protected void applyEntityAttributes()
+	protected void registerAttributes()
 	{
-		super.applyEntityAttributes();
-		this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.1D);
-		this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(5.0D);
-		this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(0.0D);
-		this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(30.0);
-		this.getEntityAttribute(AttributeMagicResist.instance()).setBaseValue(50.0D);
+		super.registerAttributes();
+		this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.1D);
+		this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(5.0D);
+		this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(0.0D);
+		this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(30.0);
+		this.getAttribute(AttributeMagicResist.instance()).setBaseValue(50.0D);
 	}
 
 	protected void playStepSound(BlockPos pos, Block blockIn)
@@ -170,7 +170,7 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 
 	public boolean attackEntityAsMob(Entity entityIn)
 	{
-		boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue()));
+		boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue()));
 
 		if (flag)
 		{
@@ -285,7 +285,7 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 	}
 	
 	public BlockPos getHome() {
-		return this.dataManager.get(HOME).orNull();
+		return this.dataManager.get(HOME).orElse(null);
 	}
 	
 	@Override

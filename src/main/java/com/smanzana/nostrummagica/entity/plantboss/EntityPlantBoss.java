@@ -346,16 +346,16 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IEntityMu
 	}
 	
 	@Override
-	protected void applyEntityAttributes() {
-		super.applyEntityAttributes();
-        this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.00D);
-        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(800.0D);
-        this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10.0D);
-        this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(18.0D);
+	protected void registerAttributes() {
+		super.registerAttributes();
+        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.00D);
+        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(800.0D);
+        this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10.0D);
+        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(18.0D);
         this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_SPEED);
-        this.getEntityAttribute(SharedMonsterAttributes.ATTACK_SPEED).setBaseValue(0.5D);
-        this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(8D);
-        this.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
+        this.getAttribute(SharedMonsterAttributes.ATTACK_SPEED).setBaseValue(0.5D);
+        this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(8D);
+        this.getAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
     }
 	
 	@Override
@@ -912,7 +912,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IEntityMu
 	}
 	
 	public @Nullable EMagicElement getWeakElement() {
-		return this.dataManager.get(WEAK_ELEMENT).orNull();
+		return this.dataManager.get(WEAK_ELEMENT).orElse(null);
 	}
 	
 	public static class PlantBossBody extends MultiPartEntityPart {

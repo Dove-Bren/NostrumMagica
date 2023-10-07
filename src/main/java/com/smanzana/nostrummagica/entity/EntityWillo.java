@@ -142,13 +142,13 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 		this.targetTasks.addTask(priority++, new EntityAINearestAttackableTarget<PlayerEntity>(this, PlayerEntity.class, 10, true, false, null));
 	}
 	
-	protected void applyEntityAttributes() {
-		super.applyEntityAttributes();
-		this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.2D);
-		this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10.0D);
-		this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(4.0D);
-		this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(30.0);
-		this.getEntityAttribute(AttributeMagicResist.instance()).setBaseValue(0.0D);
+	protected void registerAttributes() {
+		super.registerAttributes();
+		this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.2D);
+		this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10.0D);
+		this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(4.0D);
+		this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(30.0);
+		this.getAttribute(AttributeMagicResist.instance()).setBaseValue(0.0D);
 	}
 
 	protected void playStepSound(BlockPos pos, Block blockIn)
@@ -181,7 +181,7 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 
 	public boolean attackEntityAsMob(Entity entityIn)
 	{
-		boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue()));
+		boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue()));
 
 		if (flag)
 		{
@@ -470,7 +470,7 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 //					courseChangeCooldown = this.parentEntity.getRNG().nextInt(5) + 10;
 //					
 //					if (this.isNotColliding(this.posX, this.posY, this.posZ, d3)) {
-//						float basespeed = (float) this.parentEntity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
+//						float basespeed = (float) this.parentEntity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
 //						//speed *= 3f;
 //						this.parentEntity.getMotion().x = (d0 / d3) * basespeed * speed;
 //						this.parentEntity.getMotion().y = (d1 / d3) * basespeed  * speed;
@@ -490,7 +490,7 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 					this.action = EntityMoveHelper.Action.WAIT;
 					return;
 				} else if (this.isNotColliding(this.posX, this.posY, this.posZ, d3)) {
-					float basespeed = (float) this.parentEntity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
+					float basespeed = (float) this.parentEntity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
 					//speed *= 3f;
 					this.parentEntity.getMotion().x = (d0 / d3) * basespeed * speed;
 					this.parentEntity.getMotion().y = (d1 / d3) * basespeed  * speed;

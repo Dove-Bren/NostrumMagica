@@ -249,7 +249,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	public void notifyDataManagerChange(DataParameter<?> key) {
 		super.notifyDataManagerChange(key);
 		if (key == SYNCED_MAX_HEALTH) {
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(
+			this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(
 					this.dataManager.get(SYNCED_MAX_HEALTH).floatValue()
 					);
 		}
@@ -619,7 +619,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 
 	@Nullable
 	public UUID getOwnerId() {
-		return ((Optional<UUID>)this.dataManager.get(OWNER_UNIQUE_ID)).orNull();
+		return ((Optional<UUID>)this.dataManager.get(OWNER_UNIQUE_ID)).orElse(null);
 	}
 
 	public void setOwnerId(@Nullable UUID p_184754_1_) {
@@ -627,7 +627,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	}
 	
 	protected UUID getEggID() {
-		return this.dataManager.get(EGG_UNIQUE_ID).orNull();
+		return this.dataManager.get(EGG_UNIQUE_ID).orElse(null);
 	}
 	
 	public void setEggId(UUID id) {
@@ -874,7 +874,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 				this.setTamed(true);
 				this.navigator.clearPath();
 				this.setAttackTarget(null);
-				this.setHealth((float) this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue());
+				this.setHealth((float) this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue());
 				this.setOwnerId(player.getUniqueID());
 				this.setSitting(true);
 				
@@ -1002,9 +1002,9 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		this.dataManager.set(ATTRIBUTE_LEVEL, level);
 		this.dataManager.set(ATTRIBUTE_BOND, bond);
 		
-		this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.31D * (1D + (double) bonusSpeed));
+		this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.31D * (1D + (double) bonusSpeed));
 		this.dataManager.set(SYNCED_MAX_HEALTH, maxHealth);
-		//this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(maxHealth); Synced thr ough data manager
+		//this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(maxHealth); Synced thr ough data manager
 		this.setHealth(health);
 	}
 	
@@ -1368,15 +1368,15 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	}
 
 	@Override
-	protected void applyEntityAttributes() {
-		super.applyEntityAttributes();
-        this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.31D);
-        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(100.0D);
-        this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10.0D);
-        this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(10.0D);
+	protected void registerAttributes() {
+		super.registerAttributes();
+        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.31D);
+        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(100.0D);
+        this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10.0D);
+        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(10.0D);
         this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_SPEED);
-        this.getEntityAttribute(SharedMonsterAttributes.ATTACK_SPEED).setBaseValue(0.5D);
-        this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64D);
+        this.getAttribute(SharedMonsterAttributes.ATTACK_SPEED).setBaseValue(0.5D);
+        this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64D);
     }
 	
 	@Override
@@ -1438,8 +1438,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	}
 	
 	@Override
-	public void onLivingUpdate() {
-		super.onLivingUpdate();
+	public void livingTick() {
+		super.livingTick();
 		
 		if (this.world.isRemote) {
 			if (this.considerFlying()) {
@@ -1454,7 +1454,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 					float amt = this.getManaRegen();
 					
 					// Augment with bonuses
-					amt += this.getEntityAttribute(AttributeManaRegen.instance()).getAttributeValue() / 100.0;
+					amt += this.getAttribute(AttributeManaRegen.instance()).getAttributeValue() / 100.0;
 					
 					int mana = (int) (amt);
 					amt = amt - (int) amt;
@@ -1523,7 +1523,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 //					net.minecraftforge.common.ForgeHooks.onLivingJump(this);
 //				}
 				
-				this.setAIMoveSpeed((float)this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue());
+				this.setAIMoveSpeed((float)this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue());
 				super.travel(strafe, vertical, forward);
 			}
 			else if (entitylivingbase instanceof PlayerEntity)

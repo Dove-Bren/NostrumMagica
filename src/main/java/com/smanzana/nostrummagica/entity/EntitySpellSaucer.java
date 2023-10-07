@@ -5,14 +5,19 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.utils.Entities;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IProjectile;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.IPacket;
+import net.minecraft.network.play.server.SSpawnObjectPacket;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -65,7 +70,7 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 		ticksExisted++;
 		
 		if (this.ticksExisted % 5 == 0 && world.isRemote) {
-			this.world.addParticle(ParticleTypes.CRIT_MAGIC,
+			this.world.addParticle(ParticleTypes.CRIT,
 					posX - .5 + rand.nextFloat(), posY, posZ - .5 + rand.nextFloat(), 0, 0, 0);
 		}
 	}
@@ -90,15 +95,15 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 		if (world.isRemote)
 			return;
 		
-		if (result.typeOfHit == RayTraceResult.Type.MISS) {
+		if (result.getType() == RayTraceResult.Type.MISS) {
 			; // Do nothing
-		} else if (result.typeOfHit == RayTraceResult.Type.BLOCK) {
-			BlockPos pos = result.getBlockPos();
+		} else if (result.getType() == RayTraceResult.Type.BLOCK) {
+			BlockPos pos = ((BlockRayTraceResult) result).getPos();
 			boolean dieOnImpact = this.dieOnImpact(pos);
 			boolean canImpact = this.canImpact(pos);
-			Vector vec = new Vector().set((int) result.hitVec.x, (int) result.hitVec.y, (int) result.hitVec.z);
+			Vector vec = new Vector().set((int) result.getHitVec().x, (int) result.getHitVec().y, (int) result.getHitVec().z);
 			if (canImpact && (dieOnImpact || !this.hasBeenHit(vec))) {
-				trigger.onProjectileHit(new BlockPos(result.hitVec));
+				trigger.onProjectileHit(new BlockPos(result.getHitVec()));
 				
 				if (dieOnImpact) {
 					this.remove();
@@ -106,15 +111,16 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 					this.addHit(vec);
 				}
 			}
-		} else if (result.typeOfHit == RayTraceResult.Type.ENTITY) {
-			if (result.entityHit instanceof EntitySpellSaucer || null == NostrumMagica.resolveLivingEntity(result.entityHit)) {
+		} else if (result.getType() == RayTraceResult.Type.ENTITY) {
+			Entity entityHit = ((EntityRayTraceResult) result).getEntity();
+			if (entityHit instanceof EntitySpellSaucer || null == NostrumMagica.resolveLivingEntity(entityHit)) {
 				
-			} else if (result.entityHit != shootingEntity && !shootingEntity.isRidingOrBeingRiddenBy(result.entityHit)) {
-				LivingEntity living = NostrumMagica.resolveLivingEntity(result.entityHit);
+			} else if (entityHit != shootingEntity && !shootingEntity.isRidingOrBeingRiddenBy(entityHit)) {
+				LivingEntity living = NostrumMagica.resolveLivingEntity(entityHit);
 				boolean dieOnImpact = this.dieOnImpact(living);
 				boolean canImpact = this.canImpact(living);
 				if (canImpact && (dieOnImpact || !this.hasBeenHit(living))) {
-					trigger.onProjectileHit(result.entityHit);
+					trigger.onProjectileHit(entityHit);
 					
 					if (dieOnImpact) {
 						this.remove();
@@ -136,12 +142,12 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 	}
 
 	@Override
-	protected void registerData() { int unused; // TODO
+	protected void registerData() {
 		
 	}
 	
 	@Override
-	public boolean writeToNBTOptional(CompoundNBT compound) {
+	public boolean writeUnlessRemoved(CompoundNBT compound) {
 		return false; // This makes us not save and persist!!
 	}
 
@@ -149,13 +155,13 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 	protected void readAdditional(CompoundNBT compound) {
 		this.speed = compound.getFloat("speed");
 		UUID uuid = compound.getUniqueId("shooterID");
-		this.shootingEntity = (LivingEntity) world.loadedEntityList.stream().filter((ent) -> { return ent.getUniqueID().equals(uuid);}).findFirst().orElse(null);
+		this.shootingEntity = Entities.FindLiving(world, uuid);
 	}
 
 	@Override
 	protected void writeAdditional(CompoundNBT compound) {
 		compound.putFloat("speed", this.speed);
-		compound.setUniqueId("shooterID", shootingEntity.getUniqueID());
+		compound.putUniqueId("shooterID", shootingEntity.getUniqueID());
 	}
 	
 	@Override
@@ -182,6 +188,11 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 	
 	public boolean canImpact(LivingEntity entity) {
 		return true;
+	}
+
+	@Override
+	public IPacket<?> createSpawnPacket() {
+		return new SSpawnObjectPacket(this);
 	}
 	
 	public static final class Vector {
