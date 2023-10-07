@@ -72,7 +72,7 @@ public abstract class EntityDragonRedBase extends EntityDragonFlying {
 	}
 	
 	@Override
-	protected void entityInit() {
+	protected void registerData() { int unused; // TODO
 		super.entityInit();
 		this.dataManager.register(DRAGON_SLASH, false);
 		this.dataManager.register(DRAGON_BITE, false);

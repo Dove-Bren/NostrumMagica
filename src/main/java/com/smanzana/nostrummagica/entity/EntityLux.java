@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
@@ -351,7 +351,7 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 	
 	
 	@Override
-	protected void entityInit() {
+	protected void registerData() { int unused; // TODO
 		super.entityInit();
 		
 		this.dataManager.register(HOME, Optional.absent());
@@ -371,7 +371,7 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 	}
 	
 	@Override
-	public void readEntityFromNBT(CompoundNBT compound) {
+	public void readAdditional(CompoundNBT compound) {
 		super.readEntityFromNBT(compound);
 		if (compound.contains("home", NBT.TAG_LONG)) {
 			setHome(BlockPos.fromLong(compound.getLong("home")));
@@ -397,7 +397,7 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 	}
 	
 	@Override
-	public void writeEntityToNBT(CompoundNBT compound) {
+	public void writeAdditional(CompoundNBT compound) {
 		super.writeEntityToNBT(compound);
 		
 		BlockPos homePos = this.getHome();

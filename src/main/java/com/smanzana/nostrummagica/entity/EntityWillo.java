@@ -285,7 +285,7 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 	
 	
 	@Override
-	protected void entityInit() {
+	protected void registerData() { int unused; // TODO
 		super.entityInit();
 		
 		this.dataManager.register(STATUS, WilloStatus.NEUTRAL);
@@ -305,7 +305,7 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 	}
 	
 	@Override
-	public void readEntityFromNBT(CompoundNBT compound) {
+	public void readAdditional(CompoundNBT compound) {
 		super.readEntityFromNBT(compound);
 		if (compound.contains("element", NBT.TAG_STRING)) {
 			try {
@@ -324,7 +324,7 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 	}
 	
 	@Override
-	public void writeEntityToNBT(CompoundNBT compound) {
+	public void writeAdditional(CompoundNBT compound) {
 		super.writeEntityToNBT(compound);
 		
 		compound.putString("element", this.getElement().name());

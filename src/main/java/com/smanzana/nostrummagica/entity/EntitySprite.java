@@ -293,19 +293,19 @@ public class EntitySprite extends MobEntity implements ILoreTagged {
 	
 	
 	@Override
-	protected void entityInit() {
+	protected void registerData() { int unused; // TODO
 		super.entityInit();
 		
 		this.dataManager.register(SPRITE_ANGRY, false);
 	}
 	
-	public void readEntityFromNBT(CompoundNBT compound) {
+	public void readAdditional(CompoundNBT compound) {
 		super.readEntityFromNBT(compound);
 		
 		this.dataManager.set(SPRITE_ANGRY, compound.getBoolean("angry"));
 	}
 	
-	public void writeEntityToNBT(CompoundNBT compound) {
+	public void writeAdditional(CompoundNBT compound) {
     	super.writeEntityToNBT(compound);
     	
     	compound.putBoolean("angry", this.isAngry());

@@ -136,7 +136,7 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 	}
 
 	@Override
-	protected void entityInit() {
+	protected void registerData() { int unused; // TODO
 		
 	}
 	
@@ -146,14 +146,14 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 	}
 
 	@Override
-	protected void readEntityFromNBT(CompoundNBT compound) {
+	protected void readAdditional(CompoundNBT compound) {
 		this.speed = compound.getFloat("speed");
 		UUID uuid = compound.getUniqueId("shooterID");
 		this.shootingEntity = (LivingEntity) world.loadedEntityList.stream().filter((ent) -> { return ent.getUniqueID().equals(uuid);}).findFirst().orElse(null);
 	}
 
 	@Override
-	protected void writeEntityToNBT(CompoundNBT compound) {
+	protected void writeAdditional(CompoundNBT compound) {
 		compound.putFloat("speed", this.speed);
 		compound.setUniqueId("shooterID", shootingEntity.getUniqueID());
 	}

@@ -31,7 +31,7 @@ import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.VoxelShape;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
@@ -138,7 +138,7 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
 			solid = false;
 		} else if (context.getEntity() != null) {
 			final Entity entityIn = context.getEntity();
-			final VoxelShape entityBox = entityIn.getCollisionBoundingBox();
+			final AxisAlignedBB entityBox = entityIn.getCollisionBoundingBox();
 			Direction side = state.get(FACING);
 			// cant use getCenter cause it's client-side only
 			//Vec3d center = entityBox.getCenter();
@@ -378,18 +378,18 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
                     int x = pos.getX();
                     int y = pos.getY();
                     int z = pos.getZ();
-                    VoxelShape VoxelShape = blockstate.getShape(world, pos).getBoundingBox();
-                    double xPos = x + world.rand.nextDouble() * (VoxelShape.maxX - VoxelShape.minX - 0.2F) + 0.1F + VoxelShape.minX;
-                    double yPos = y + world.rand.nextDouble() * (VoxelShape.maxY - VoxelShape.minY - 0.2F) + 0.1F + VoxelShape.minY;
-                    double zPos = z + world.rand.nextDouble() * (VoxelShape.maxZ - VoxelShape.minZ - 0.2F) + 0.1F + VoxelShape.minZ;
+                    AxisAlignedBB bb = blockstate.getShape(world, pos).getBoundingBox();
+                    double xPos = x + world.rand.nextDouble() * (bb.maxX - bb.minX - 0.2F) + 0.1F + bb.minX;
+                    double yPos = y + world.rand.nextDouble() * (bb.maxY - bb.minY - 0.2F) + 0.1F + bb.minY;
+                    double zPos = z + world.rand.nextDouble() * (bb.maxZ - bb.minZ - 0.2F) + 0.1F + bb.minZ;
 
                     switch (side) {
-                        case UP: yPos = y + VoxelShape.maxY + 0.1F; break;
-                        case DOWN: yPos = y + VoxelShape.minY - 0.1F; break;
-                        case NORTH: zPos = z + VoxelShape.minZ - 0.1F; break;
-                        case SOUTH: zPos = z + VoxelShape.maxZ + 0.1F; break;
-                        case WEST: xPos = x + VoxelShape.minX - 0.1F; break;
-                        case EAST: xPos = x + VoxelShape.maxX + 0.1F; break;
+                        case UP: yPos = y + bb.maxY + 0.1F; break;
+                        case DOWN: yPos = y + bb.minY - 0.1F; break;
+                        case NORTH: zPos = z + bb.minZ - 0.1F; break;
+                        case SOUTH: zPos = z + bb.maxZ + 0.1F; break;
+                        case WEST: xPos = x + bb.minX - 0.1F; break;
+                        case EAST: xPos = x + bb.maxX + 0.1F; break;
                     }
 
                     final Minecraft mc = Minecraft.getInstance();
@@ -452,7 +452,7 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
     public boolean addLandingEffects(BlockState state1, ServerWorld ServerWorld, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
         Optional<BlockState> mirrorState = getMirrorState(ServerWorld, pos);
         if(mirrorState.isPresent()) {
-            ServerWorld.addParticle(new BlockParticleData(ParticleTypes.BLOCK, mirrorState.get()), entity.posX, entity.posY, entity.posZ, numberOfParticles, 0.0D, 0.0D, 0.0D, 0.15F);
+            ServerWorld.spawnParticle(new BlockParticleData(ParticleTypes.BLOCK, mirrorState.get()), entity.posX, entity.posY, entity.posZ, numberOfParticles, 0.0D, 0.0D, 0.0D, 0.15F);
         }
         return true;
     }

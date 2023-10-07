@@ -219,6 +219,7 @@ public class NostrumEntityTypes {
 			.build("").setRegistryName(NostrumTameLightning.ID));
 		registry.register(EntityType.Builder.<EntityHookShot>create(EntityHookShot::new, EntityClassification.MISC)
 				.size(.2f, .2f)
+				.immuneToFire()
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
 			.build("").setRegistryName(EntityHookShot.ID));
 		registry.register(EntityType.Builder.<EntitySpellBullet>create(EntitySpellBullet::new, EntityClassification.MISC)

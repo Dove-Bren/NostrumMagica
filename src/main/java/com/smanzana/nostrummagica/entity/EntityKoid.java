@@ -201,7 +201,7 @@ public class EntityKoid extends MonsterEntity implements ILoreTagged {
 	}
 	
 	@Override
-	protected void entityInit() {
+	protected void registerData() { int unused; // TODO
 		super.entityInit();
 		this.dataManager.register(KOID_VARIANT, EMagicElement.PHYSICAL.ordinal());
 	}
@@ -216,7 +216,7 @@ public class EntityKoid extends MonsterEntity implements ILoreTagged {
 		}
 	}
 	
-	public void readEntityFromNBT(CompoundNBT compound) {
+	public void readAdditional(CompoundNBT compound) {
 		super.readEntityFromNBT(compound);
 
         if (compound.contains("KoidType", NBT.TAG_ANY_NUMERIC)) {
@@ -227,7 +227,7 @@ public class EntityKoid extends MonsterEntity implements ILoreTagged {
         this.setCombatTask();
 	}
 	
-	public void writeEntityToNBT(CompoundNBT compound) {
+	public void writeAdditional(CompoundNBT compound) {
     	super.writeEntityToNBT(compound);
         compound.setByte("KoidType", (byte)this.getElement().ordinal());
 	}

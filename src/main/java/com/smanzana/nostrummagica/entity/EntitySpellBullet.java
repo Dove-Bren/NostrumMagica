@@ -107,7 +107,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 	}
 	
 	@Override
-	protected void entityInit() {
+	protected void registerData() { int unused; // TODO
 		super.entityInit();
 		
 		this.dataManager.register(ELEMENT, EMagicElement.PHYSICAL);

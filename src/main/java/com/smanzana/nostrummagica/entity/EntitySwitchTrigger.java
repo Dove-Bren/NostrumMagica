@@ -28,7 +28,7 @@ public class EntitySwitchTrigger extends MobEntity {
 	}
 	
 	@Override
-	public boolean isEntityInvulnerable(DamageSource source) {
+	public boolean isInvulnerableTo(DamageSource source) {
 		return true;
 	}
 	

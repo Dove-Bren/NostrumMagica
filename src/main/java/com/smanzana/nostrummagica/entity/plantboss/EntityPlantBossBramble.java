@@ -49,7 +49,7 @@ public class EntityPlantBossBramble extends Entity {
 	}
 	
 	@Override
-	protected void entityInit() {
+	protected void registerData() { int unused; // TODO
 		//super.entityInit();
 		this.dataManager.register(WIDTH, 5f);
 		this.dataManager.register(DEPTH, .5f);
@@ -141,12 +141,12 @@ public class EntityPlantBossBramble extends Entity {
 	}
 	
 	@Override
-	public void readEntityFromNBT(CompoundNBT compound) {
+	public void readAdditional(CompoundNBT compound) {
 		//super.readEntityFromNBT(compound);
 	}
 	
 	@Override
-	public void writeEntityToNBT(CompoundNBT compound) {
+	public void writeAdditional(CompoundNBT compound) {
     	//super.writeEntityToNBT(compound);
 	}
 	

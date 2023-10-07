@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.serializers;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.network.PacketBuffer;

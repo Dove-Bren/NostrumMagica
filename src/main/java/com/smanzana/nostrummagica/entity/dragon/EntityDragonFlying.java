@@ -121,12 +121,12 @@ public abstract class EntityDragonFlying extends EntityDragon {
 	}
 	
 	@Override
-	protected void entityInit() {
+	protected void registerData() { int unused; // TODO
 		super.entityInit();
 		this.dataManager.register(DRAGON_FLYING, FlyState.LANDED.ordinal());
 	}
 	
-	public void readEntityFromNBT(CompoundNBT compound) {
+	public void readAdditional(CompoundNBT compound) {
 		super.readEntityFromNBT(compound);
 
         if (compound.contains(DRAGON_SERIAL_FLYING_TOK, NBT.TAG_ANY_NUMERIC)) {
@@ -143,7 +143,7 @@ public abstract class EntityDragonFlying extends EntityDragon {
         }
 	}
 	
-	public void writeEntityToNBT(CompoundNBT compound) {
+	public void writeAdditional(CompoundNBT compound) {
     	super.writeEntityToNBT(compound);
         compound.setByte(DRAGON_SERIAL_FLYING_TOK, (byte)this.getFlyState().ordinal());
 	}

@@ -452,7 +452,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	protected void entityInit() {
+	protected void registerData() { int unused; // TODO
 		super.entityInit();
 		dataManager.register(SOULBOUND, false);
 		dataManager.register(ATTRIBUTE_XP, 0);
@@ -1293,7 +1293,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		this.jumpCount = 0;
 	}
 	
-	public void writeEntityToNBT(CompoundNBT compound) {
+	public void writeAdditional(CompoundNBT compound) {
 		super.writeEntityToNBT(compound);
 		
 		compound.putBoolean(NBT_SOUL_BOUND, this.isSoulBound());
@@ -1320,7 +1320,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	public void readEntityFromNBT(CompoundNBT compound) {
+	public void readAdditional(CompoundNBT compound) {
 		super.readEntityFromNBT(compound);
 		
 		this.setSoulBound(compound.getBoolean(NBT_SOUL_BOUND));

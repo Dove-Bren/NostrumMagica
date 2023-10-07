@@ -8,7 +8,7 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeManaRegen;
@@ -197,7 +197,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
         worldID = null;
 	}
 	
-	protected void entityInit() {
+	protected void registerData() { int unused; // TODO
 		super.entityInit();
 		this.dataManager.register(TAMED, false);
 		this.dataManager.register(OWNER_UNIQUE_ID, Optional.<UUID>absent());
@@ -666,7 +666,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		return entityIn == this.getOwner();
 	}
 	
-	public void writeEntityToNBT(CompoundNBT compound) {
+	public void writeAdditional(CompoundNBT compound) {
 		super.writeEntityToNBT(compound);
 
 		if (this.getOwnerId() == null) {
@@ -750,7 +750,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	 * (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
 	@Override
-	public void readEntityFromNBT(CompoundNBT compound) {
+	public void readAdditional(CompoundNBT compound) {
 		super.readEntityFromNBT(compound);
 		String s;
 

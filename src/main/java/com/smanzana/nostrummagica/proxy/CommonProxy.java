@@ -99,6 +99,7 @@ import com.smanzana.nostrummagica.serializers.HookshotTypeDataSerializer;
 import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
 import com.smanzana.nostrummagica.serializers.OptionalDragonArmorMaterialSerializer;
 import com.smanzana.nostrummagica.serializers.OptionalMagicElementDataSerializer;
+import com.smanzana.nostrummagica.serializers.OptionalParticleDataSerializer;
 import com.smanzana.nostrummagica.serializers.PetJobSerializer;
 import com.smanzana.nostrummagica.serializers.PlantBossTreeTypeSerializer;
 import com.smanzana.nostrummagica.serializers.WilloStatusSerializer;
@@ -293,6 +294,7 @@ public class CommonProxy {
     	registry.register(new DataSerializerEntry(FloatArraySerializer.instance).setRegistryName("nostrum.serial.float_array"));
     	registry.register(new DataSerializerEntry(OptionalMagicElementDataSerializer.instance).setRegistryName("nostrum.serial.element_opt"));
     	registry.register(new DataSerializerEntry(PlantBossTreeTypeSerializer.instance).setRegistryName("nostrum.serial.plantboss_tree_type"));
+    	registry.register(new DataSerializerEntry(OptionalParticleDataSerializer.instance).setRegistryName("nostrum.serial.particle_opt"));
     }
     
     @SubscribeEvent(priority = EventPriority.HIGH) // Register fluids before blocks so fluids will be there for blocks

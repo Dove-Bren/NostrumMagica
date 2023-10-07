@@ -7,7 +7,7 @@ import java.util.Random;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
@@ -272,7 +272,7 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 	
 	
 	@Override
-	protected void entityInit() {
+	protected void registerData() { int unused; // TODO
 		super.entityInit();
 		
 		this.dataManager.register(HOME, Optional.absent());
@@ -289,7 +289,7 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 	}
 	
 	@Override
-	public void readEntityFromNBT(CompoundNBT compound) {
+	public void readAdditional(CompoundNBT compound) {
 		super.readEntityFromNBT(compound);
 		if (compound.contains("home", NBT.TAG_LONG)) {
 			setHome(BlockPos.fromLong(compound.getLong("home")));
@@ -297,7 +297,7 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 	}
 	
 	@Override
-	public void writeEntityToNBT(CompoundNBT compound) {
+	public void writeAdditional(CompoundNBT compound) {
 		super.writeEntityToNBT(compound);
 		
 		BlockPos homePos = this.getHome();

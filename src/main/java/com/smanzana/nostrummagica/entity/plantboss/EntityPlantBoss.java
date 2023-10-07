@@ -10,7 +10,7 @@ import java.util.Random;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
@@ -338,7 +338,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IEntityMu
 	}
 	
 	@Override
-	protected void entityInit() {
+	protected void registerData() { int unused; // TODO
 		super.entityInit();
 		this.dataManager.register(LEAF_PITCHES, new Float[NumberOfLeaves]);
 		this.dataManager.register(WEAK_ELEMENT, Optional.absent());
@@ -377,12 +377,12 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IEntityMu
 	}
 	
 	@Override
-	public void readEntityFromNBT(CompoundNBT compound) {
+	public void readAdditional(CompoundNBT compound) {
 		super.readEntityFromNBT(compound);
 	}
 	
 	@Override
-	public void writeEntityToNBT(CompoundNBT compound) {
+	public void writeAdditional(CompoundNBT compound) {
     	super.writeEntityToNBT(compound);
 	}
 	

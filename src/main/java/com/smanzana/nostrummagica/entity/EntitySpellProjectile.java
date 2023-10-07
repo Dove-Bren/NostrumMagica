@@ -68,7 +68,7 @@ public class EntitySpellProjectile extends FireballEntity {
 	}
 	
 	@Override
-	protected void entityInit() {
+	protected void registerData() { int unused; // TODO
 		super.entityInit();
 		
 		this.dataManager.register(ELEMENT, EMagicElement.PHYSICAL);

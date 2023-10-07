@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.entity.dragon;
 
 import java.util.UUID;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.dragon.IDragonSpawnData.IDragonSpawnFactory;
 import com.smanzana.nostrummagica.items.DragonEggFragment;
@@ -59,7 +59,7 @@ public class EntityDragonEgg extends MobEntity implements ILoreTagged {
 	}
 	
 	@Override
-	protected void entityInit() {
+	protected void registerData() { int unused; // TODO
 		super.entityInit();
 		
 		this.dataManager.register(HEAT, HEAT_MAX);
@@ -115,7 +115,7 @@ public class EntityDragonEgg extends MobEntity implements ILoreTagged {
 	}
 	
 	@Override
-	public void writeEntityToNBT(CompoundNBT compound) {
+	public void writeAdditional(CompoundNBT compound) {
 		super.writeEntityToNBT(compound);
 		
 		compound.putFloat(NBT_HEAT, this.getHeat());
@@ -135,7 +135,7 @@ public class EntityDragonEgg extends MobEntity implements ILoreTagged {
 	}
 	
 	@Override
-	public void readEntityFromNBT(CompoundNBT compound) {
+	public void readAdditional(CompoundNBT compound) {
 		super.readEntityFromNBT(compound);
 		
 		if (compound.contains(NBT_HEAT)) {

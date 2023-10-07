@@ -1,23 +1,23 @@
 package com.smanzana.nostrummagica.entity;
 
 
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import com.google.common.base.Optional;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.HookshotItem;
 import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
 import com.smanzana.nostrummagica.serializers.HookshotTypeDataSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.utils.Entities;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MultiPartEntityPart;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.nbt.CompoundNBT;
@@ -66,6 +66,7 @@ public class EntityHookShot extends Entity {
 		super(type, worldIn);
 		
 		this.setNoGravity(true);
+		this.setInvulnerable(true);
 	}
 	
 	public EntityHookShot(EntityType<? extends EntityHookShot> entType, World worldIn, LivingEntity caster, double maxLength, Vec3d direction, HookshotType type) {
@@ -91,13 +92,13 @@ public class EntityHookShot extends Entity {
 		this.dataManager.set(DATA_TYPE, type);
 	}
 	
-	public HookshotType getType() {
+	public HookshotType getHookshotType() {
 		return dataManager.get(DATA_TYPE);
 	}
 	
 	@Nullable
 	protected UUID getCasterID() {
-		return dataManager.get(DATA_CASTING_ENTITY).orNull();
+		return dataManager.get(DATA_CASTING_ENTITY).orElse(null);
 	}
 	
 	@Nullable
@@ -106,13 +107,9 @@ public class EntityHookShot extends Entity {
 		UUID id = getCasterID();
 		
 		if (id != null) {
-			for (Entity ent : world.loadedEntityList) {
-				if (ent instanceof LivingEntity) {
-					if (((LivingEntity) ent).getUniqueID().equals(id)) {
-						ret = (LivingEntity) ent;
-						break;
-					}
-				}
+			Entity ent = Entities.FindEntity(world, id);
+			if (ent instanceof LivingEntity) {
+				ret = (LivingEntity) ent;
 			}
 		}
 		
@@ -148,7 +145,7 @@ public class EntityHookShot extends Entity {
 		// TODO isFetch and type are not on client, but client uses it to render.
 		return isHooked()
 				&& !isFetch()
-				&& (this.getType() != HookshotType.CLAW || this.getCaster().getDistanceSq(this) > 8);
+				&& (this.getHookshotType() != HookshotType.CLAW || this.getCaster().getDistanceSq(this) > 8);
 	}
 	
 	@Nullable
@@ -158,12 +155,7 @@ public class EntityHookShot extends Entity {
 		if (this.isHooked()) {
 			Optional<UUID> id = dataManager.get(DATA_HOOKED_ENTITY);
 			if (id.isPresent()) {
-				for (Entity ent : world.loadedEntityList) {
-					if (ent.getUniqueID().equals(id.get())) {
-						ret = ent;
-						break;
-					}
-				}
+				ret = Entities.FindEntity(world, id.get());
 			}
 		}
 		
@@ -171,7 +163,7 @@ public class EntityHookShot extends Entity {
 	}
 	
 	@Override
-	public boolean isEntityInvulnerable(DamageSource source) {
+	public boolean isInvulnerableTo(DamageSource source) {
 		return true;
 	}
 	
@@ -255,7 +247,7 @@ public class EntityHookShot extends Entity {
 		if (caster != null) {
 			final double dist = caster.getDistanceSq(this);
 			if (dist < 8) {
-				if (this.getType() != HookshotType.CLAW || caster.isSneaking()) {
+				if (this.getHookshotType() != HookshotType.CLAW || caster.isSneaking()) {
 					this.setDead();
 					return;
 				}
@@ -383,7 +375,7 @@ public class EntityHookShot extends Entity {
 			wantsFetch = caster.isSneaking();
 		}
 		
-		if (result.typeOfHit == Type.ENTITY && result.entityHit != null && HookshotItem.CanBeHooked(getType(), result.entityHit) && (caster == null || caster != result.entityHit)) {
+		if (result.typeOfHit == Type.ENTITY && result.entityHit != null && HookshotItem.CanBeHooked(getHookshotType(), result.entityHit) && (caster == null || caster != result.entityHit)) {
 			tickHooked = this.ticksExisted;
 			
 			// Large entities cannot be fetched, and instead we'll override and force the play er to go to them.
@@ -414,7 +406,7 @@ public class EntityHookShot extends Entity {
 			
 			// Make sure type of hookshot supports material
 			BlockState state = world.getBlockState(result.getBlockPos());
-			if (wantsFetch || state == null || !HookshotItem.CanBeHooked(getType(), state)) {
+			if (wantsFetch || state == null || !HookshotItem.CanBeHooked(getHookshotType(), state)) {
 				this.setDead();
 				return;
 			}
@@ -442,7 +434,7 @@ public class EntityHookShot extends Entity {
     }
 
 	@Override
-	protected void entityInit() {
+	protected void registerData() { int unused; // TODO
 		dataManager.register(DATA_HOOKED, Boolean.FALSE);
 		dataManager.register(DATA_HOOKED_ENTITY, Optional.<UUID>absent());
 		dataManager.register(DATA_CASTING_ENTITY, Optional.<UUID>absent());
@@ -451,7 +443,7 @@ public class EntityHookShot extends Entity {
 	}
 
 	@Override
-	protected void readEntityFromNBT(CompoundNBT compound) {
+	protected void readAdditional(CompoundNBT compound) {
 		maxLength = compound.getDouble(NBT_MAX_LENGTH);
 		velocityX = compound.getDouble(NBT_VELOCITYX);
 		velocityY = compound.getDouble(NBT_VELOCITYY);
@@ -487,7 +479,7 @@ public class EntityHookShot extends Entity {
 	}
 
 	@Override
-	protected void writeEntityToNBT(CompoundNBT compound) {
+	protected void writeAdditional(CompoundNBT compound) {
 		LivingEntity caster = getCaster();
 		if (caster != null) {
 			compound.setUniqueId(NBT_CASTER_ID, caster.getUniqueID());

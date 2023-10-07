@@ -43,7 +43,7 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 		this.dataManager.set(HASTARGET, true);
 	}
 	
-	protected void entityInit() {
+	protected void registerData() { int unused; // TODO
 		super.entityInit();
 		this.dataManager.register(HASTARGET, false);
 	}
@@ -138,7 +138,7 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 		}
 	}
 	
-	public void readEntityFromNBT(CompoundNBT compound) {
+	public void readAdditional(CompoundNBT compound) {
 		super.readEntityFromNBT(compound);
 
 		if (compound.contains(DRAGON_SERIAL_HASTARGET_TOK, NBT.TAG_ANY_NUMERIC)) {
@@ -146,7 +146,7 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
         }
 	}
 	
-	public void writeEntityToNBT(CompoundNBT compound) {
+	public void writeAdditional(CompoundNBT compound) {
     	super.writeEntityToNBT(compound);
     	compound.putBoolean(DRAGON_SERIAL_HASTARGET_TOK, this.dataManager.get(HASTARGET));
 	}

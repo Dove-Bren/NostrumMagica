@@ -426,7 +426,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
     }
 	
 	@Override
-	protected void entityInit() {
+	protected void registerData() { int unused; // TODO
 		super.entityInit();
 		this.dataManager.register(DRAGON_PHASE, DragonPhase.GROUNDED_PHASE.ordinal());
 	}
@@ -444,7 +444,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 		return false;
 	}
 	
-	public void readEntityFromNBT(CompoundNBT compound) {
+	public void readAdditional(CompoundNBT compound) {
 		super.readEntityFromNBT(compound);
 
 		if (compound.contains(DRAGON_SERIAL_PHASE_TOK, NBT.TAG_ANY_NUMERIC)) {
@@ -457,7 +457,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 		}
 	}
 	
-	public void writeEntityToNBT(CompoundNBT compound) {
+	public void writeAdditional(CompoundNBT compound) {
     	super.writeEntityToNBT(compound);
     	compound.setByte(DRAGON_SERIAL_PHASE_TOK, (byte)this.getPhase().ordinal());
 	}

@@ -4,7 +4,7 @@ package com.smanzana.nostrummagica.entity;
 import java.util.List;
 import java.util.UUID;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 import com.smanzana.nostrummagica.spells.components.triggers.MagicCyclerTrigger.MagicCyclerTriggerInstance;
 
 import net.minecraft.entity.Entity;
@@ -69,7 +69,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 	}
 	
 	@Override
-	protected void entityInit() {
+	protected void registerData() { int unused; // TODO
 		this.dataManager.register(SHOOTER, Optional.<UUID>absent());
 	}
 	
