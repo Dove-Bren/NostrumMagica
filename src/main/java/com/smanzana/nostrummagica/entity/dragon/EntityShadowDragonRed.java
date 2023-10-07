@@ -127,7 +127,7 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 		setTargetTasks();
 		
 		if (this.target != null) {
-			if (this.target.isDead) {
+			if (this.!target.isAlive()) {
 				this.attackEntityFrom(DamageSource.OUT_OF_WORLD, (float) this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getAttributeValue());
 			}
 		} else {

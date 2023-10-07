@@ -96,8 +96,8 @@ public class EntityAIOrbitEntityGeneric<T extends MobEntity> extends Goal {
 	public boolean shouldContinueExecuting() {
 		// Only stop if something died, something changed worlds, or a continue pred was provided and returns false.
 		
-		if (		ent.isDead
-				|| orbitTarget.isDead
+		if (		!ent.isAlive()
+				|| !orbitTarget.isAlive()
 				|| !ent.world.equals(orbitTarget.world)
 				|| (continuePred != null && !continuePred.apply(ent))) {
 			return false;

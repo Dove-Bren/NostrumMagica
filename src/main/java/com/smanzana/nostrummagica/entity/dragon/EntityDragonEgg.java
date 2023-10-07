@@ -160,7 +160,7 @@ public class EntityDragonEgg extends MobEntity implements ILoreTagged {
 	public void onLivingUpdate() {
 		super.onLivingUpdate();
 		
-		if (!this.isDead && !this.dead) {
+		if (this.isAlive() && !this.dead) {
 			if (!world.isRemote && this.ticksExisted > 20) {
 				float heatLoss = .05f;
 				
@@ -235,7 +235,7 @@ public class EntityDragonEgg extends MobEntity implements ILoreTagged {
 			}
 		}
 		
-		this.setDead();
+		this.remove();
 	}
 
 	@Override

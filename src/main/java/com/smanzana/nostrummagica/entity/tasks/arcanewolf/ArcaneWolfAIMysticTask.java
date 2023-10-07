@@ -32,7 +32,7 @@ public class ArcaneWolfAIMysticTask extends Goal {
 	
 	@Override
 	public boolean shouldExecute() {
-		return !wolf.isDead
+		return wolf.isAlive()
 				&& !wolf.isSitting()
 				&& wolf.getOwner() != null
 				&& wolf.ticksExisted >= cooldownTicks

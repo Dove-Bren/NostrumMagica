@@ -30,7 +30,7 @@ public class ArcaneWolfAINatureTask extends Goal {
 	
 	@Override
 	public boolean shouldExecute() {
-		return !wolf.isDead
+		return wolf.isAlive()
 				&& !wolf.isSitting()
 				&& wolf.getOwner() != null
 				&& wolf.ticksExisted >= cooldownTicks

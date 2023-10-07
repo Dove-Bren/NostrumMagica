@@ -429,7 +429,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IEntityMu
 		//		1,
 		//		this.posX, this.posY + this.getHeight() + 4, this.posZ, 3,
 		//		30, 10,
-		//		this.getPositionVector().addVector(0, this.getHeight() + 1.7, 0)
+		//		this.getPositionVector().add(0, this.getHeight() + 1.7, 0)
 		//		).color(this.getTreeElement().getColor()));
 		
 		//NostrumParticles.GLOW_ORB.spawn(this.world, new NostrumParticles.SpawnParams(
@@ -1194,7 +1194,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IEntityMu
 		
 		protected void finishCastingSpell(@Nonnull Spell spell, @Nonnull LivingEntity target, @Nullable LivingEntity altTarget) {
 			
-			if (target.isDead || !parent.isStillTargetable(target)) {
+			if (!target.isAlive() || !parent.isStillTargetable(target)) {
 				target = altTarget;
 			}
 			

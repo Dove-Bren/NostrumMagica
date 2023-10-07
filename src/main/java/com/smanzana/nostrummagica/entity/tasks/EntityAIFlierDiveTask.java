@@ -42,7 +42,7 @@ public class EntityAIFlierDiveTask<T extends MobEntity> extends Goal
 	 * Returns whether the Goal should begin execution.
 	 */
 	public boolean shouldExecute() {
-		if (entity.isDead || entity.getAttackTarget() == null) {
+		if (!entity.isAlive() || entity.getAttackTarget() == null) {
 			return false;
 		}
 		

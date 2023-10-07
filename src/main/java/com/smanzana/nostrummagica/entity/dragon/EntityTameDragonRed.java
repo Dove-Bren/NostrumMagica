@@ -1396,7 +1396,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		if (!world.isRemote && this.worldID != null && this.ticksExisted % 20 == 1) {
 			if (!NostrumMagica.getPetSoulRegistry().checkCurrentWorldID(this)) {
 				NostrumMagica.logger.info("Removing entity " + this + " as its world ID doesn't match: " + (this.worldID == null ? "NULL" : worldID));
-				this.setDead();
+				this.remove();
 				this.world.removeEntity(this);
 				return;
 			}
@@ -1820,7 +1820,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 				xp = rand.nextInt(2);
 			}
 			
-			if (target.isDead || target.getHealth() < 0f) {
+			if (!target.isAlive() || target.getHealth() < 0f) {
 				xp += 1;
 			}
 			
@@ -1853,7 +1853,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 				xp = rand.nextInt(3);
 			}
 			
-			if (target.isDead || target.getHealth() < 0f) {
+			if (!target.isAlive() || target.getHealth() < 0f) {
 				xp += 2;
 			}
 			

@@ -116,7 +116,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 			
 			if (origin == null) {
 				// We got loaded...
-				this.setDead();
+				this.remove();
 				return;
 			}
 			
@@ -158,7 +158,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 //				// Can't avoid a SQR; tracking motion would require SQR, too to get path length
 //				if (this.getPositionVector().squareDistanceTo(origin) > maxDistance) {
 //					trigger.onFizzle(this.getPosition());
-//					this.setDead();
+//					this.remove();
 //				}
 			
 			this.setPosition(this.posX, this.posY, this.posZ);
@@ -167,7 +167,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 			if (this.returning) {
 				if (Math.abs(this.getPositionVector().distanceTo(this.origin)) <= 0.5) {
 					if (++trips >= maxTrips) {
-						this.setDead();
+						this.remove();
 					} else {
 						returning = false;
 						// Capture motion to get boomerang-effect

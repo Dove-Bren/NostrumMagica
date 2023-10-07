@@ -101,7 +101,7 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 				trigger.onProjectileHit(new BlockPos(result.hitVec));
 				
 				if (dieOnImpact) {
-					this.setDead();
+					this.remove();
 				} else {
 					this.addHit(vec);
 				}
@@ -117,7 +117,7 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 					trigger.onProjectileHit(result.entityHit);
 					
 					if (dieOnImpact) {
-						this.setDead();
+						this.remove();
 					} else {
 						this.addHit(living);
 					}

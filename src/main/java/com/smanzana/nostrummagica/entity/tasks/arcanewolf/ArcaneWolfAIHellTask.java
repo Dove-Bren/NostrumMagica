@@ -40,7 +40,7 @@ public class ArcaneWolfAIHellTask extends Goal {
 	
 	@Override
 	public boolean shouldExecute() {
-		return !wolf.isDead
+		return wolf.isAlive()
 				&& !wolf.isSitting()
 				&& wolf.getAttackTarget() != null
 				&& wolf.ticksExisted >= cooldownTicks
@@ -53,7 +53,7 @@ public class ArcaneWolfAIHellTask extends Goal {
 	public boolean shouldContinueExecuting() {
 		return this.activeTicks > 0
 				&& this.activeTarget != null
-				&& !this.activeTarget.isDead;
+				&& !this.!activeTarget.isAlive();
 	}
 	
 	@Override

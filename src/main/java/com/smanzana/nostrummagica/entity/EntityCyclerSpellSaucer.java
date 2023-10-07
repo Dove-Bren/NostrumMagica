@@ -161,7 +161,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 			
 			if (this.shootingEntity == null || this.ticksExisted >= duration) {
 				// Expired, or got loaded!
-				this.setDead();
+				this.remove();
 				return;
 			}
 			
@@ -186,7 +186,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 						continue;
 					}
 					
-					if (e.isDead || e.noClip || !e.canBeCollidedWith()) {
+					if (!e.isAlive() || e.noClip || !e.canBeCollidedWith()) {
 						continue;
 					}
 					
@@ -253,7 +253,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 ////				// Can't avoid a SQR; tracking motion would require SQR, too to get path length
 ////				if (this.getPositionVector().squareDistanceTo(origin) > maxDistance) {
 ////					trigger.onFizzle(this.getPosition());
-////					this.setDead();
+////					this.remove();
 ////				}
 //			
 //			this.setPosition(this.posX, this.posY, this.posZ);

@@ -180,7 +180,7 @@ public class EntityPlantBossBramble extends Entity {
 			// Move if given a direction
 			if (this.getFacing() != null) {
 				if (this.getDistanceSqToCenter(startPos) > this.distance * this.distance) {
-					this.setDead();
+					this.remove();
 				}
 				
 				Vec3d motion = new Vec3d(this.getFacing().getDirectionVec())

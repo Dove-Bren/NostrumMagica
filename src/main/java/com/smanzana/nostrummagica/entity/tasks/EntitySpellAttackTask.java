@@ -45,14 +45,14 @@ public class EntitySpellAttackTask<T extends MobEntity> extends Goal {
 	public boolean shouldExecute() {
 		this.attackTicks = Math.max(0, this.attackTicks-1);
 		
-		if (entity.isDead)
+		if (!entity.isAlive())
 			return false;
 		
 		if (this.predicate != null && !this.predicate.apply(entity)) {
 			return false;
 		}
 		
-		if (needsTarget && (entity.getAttackTarget() == null || entity.getAttackTarget().isDead))
+		if (needsTarget && (entity.getAttackTarget() == null || entity.getAttackTarget()!.isAlive()))
 			return false;
 		
 		if (needsTarget && !entity.getEntitySenses().canSee(entity.getAttackTarget())){

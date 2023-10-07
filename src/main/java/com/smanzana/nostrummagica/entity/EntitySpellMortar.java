@@ -87,7 +87,7 @@ public class EntitySpellMortar extends FireballEntity {
 		if (!world.isRemote) {
 			if (origin == null) {
 				// We got loaded...
-				this.setDead();
+				this.remove();
 				return;
 			}
 			
@@ -122,13 +122,13 @@ public class EntitySpellMortar extends FireballEntity {
 			; // Do nothing
 		} else if (result.typeOfHit == RayTraceResult.Type.BLOCK) {
 			trigger.onProjectileHit(new BlockPos(result.hitVec));
-			this.setDead();
+			this.remove();
 		} else if (result.typeOfHit == RayTraceResult.Type.ENTITY) {
 			if (filter == null || filter.apply(result.entityHit)) {
 				if ((result.entityHit != shootingEntity && !shootingEntity.isRidingOrBeingRiddenBy(result.entityHit))
 						|| this.ticksExisted > 20) {
 					trigger.onProjectileHit(result.entityHit);
-					this.setDead();
+					this.remove();
 				}
 			}
 		}

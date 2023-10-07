@@ -98,13 +98,13 @@ public class EntitySpellProjectile extends FireballEntity {
 		if (!world.isRemote) {
 			if (origin == null) {
 				// We got loaded...
-				this.setDead();
+				this.remove();
 				return;
 			}
 			// Can't avoid a SQR; tracking motion would require SQR, too to get path length
 			if (this.getPositionVector().squareDistanceTo(origin) > maxDistance) {
 				trigger.onFizzle(this.getPosition());
-				this.setDead();
+				this.remove();
 			}
 		} else {
 			int color = getElement().getColor();
@@ -126,13 +126,13 @@ public class EntitySpellProjectile extends FireballEntity {
 			; // Do nothing
 		} else if (result.typeOfHit == RayTraceResult.Type.BLOCK) {
 			trigger.onProjectileHit(new BlockPos(result.hitVec));
-			this.setDead();
+			this.remove();
 		} else if (result.typeOfHit == RayTraceResult.Type.ENTITY) {
 			if (filter == null || filter.apply(result.entityHit)) {
 				if ((result.entityHit != shootingEntity && !shootingEntity.isRidingOrBeingRiddenBy(result.entityHit))
 						|| this.ticksExisted > 20) {
 					trigger.onProjectileHit(result.entityHit);
-					this.setDead();
+					this.remove();
 				}
 			}
 		}

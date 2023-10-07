@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityHookShot;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -152,7 +153,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 					if (playerIn.dimension.getId() == ModConfig.config.sorceryDimensionIndex()) {
 						playerIn.sendMessage(new TranslationTextComponent("info.hookshot.bad_dim"));
 					} else {
-						EntityHookShot hook = new EntityHookShot(worldIn, playerIn, getMaxDistance(itemStackIn), 
+						EntityHookShot hook = new EntityHookShot(NostrumEntityTypes.hookShot, worldIn, playerIn, getMaxDistance(itemStackIn), 
 								ProjectileTrigger.getVectorForRotation(playerIn.rotationPitch, playerIn.rotationYaw).scale(getVelocity(itemStackIn)),
 								this.type);
 						worldIn.addEntity(hook);

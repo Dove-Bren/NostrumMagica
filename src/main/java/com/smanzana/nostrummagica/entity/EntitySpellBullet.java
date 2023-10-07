@@ -133,7 +133,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 		} else {
 			trigger.onProjectileHit(result.entityHit);
 		}
-		this.setDead();
+		this.remove();
 	}
 	
 	@Override
@@ -141,7 +141,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 		if (!this.world.isRemote) {
 			trigger.onProjectileHit(this.getPosition());
 		}
-		this.setDead();
+		this.remove();
 		return true;
 	}
 	
@@ -267,7 +267,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 	{
 		if (!this.world.isRemote && this.world.getDifficulty() == EnumDifficulty.PEACEFUL)
 		{
-			this.setDead();
+			this.remove();
 		}
 		else
 		{
@@ -286,7 +286,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 				}
 				else
 				{
-					dist = target.getPositionVector().addVector(0, target.getHeight() / 2, 0).distanceTo(this.getPositionVector());
+					dist = target.getPositionVector().add(0, target.getHeight() / 2, 0).distanceTo(this.getPositionVector());
 					this.targetDeltaX = MathHelper.clamp(this.targetDeltaX * 1.025D, -1.0D, 1.0D);
 					this.targetDeltaY = MathHelper.clamp(this.targetDeltaY * 1.025D, -1.0D, 1.0D);
 					this.targetDeltaZ = MathHelper.clamp(this.targetDeltaZ * 1.025D, -1.0D, 1.0D);
@@ -314,7 +314,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 			{
 				this.world.addParticle(particle, this.posX - this.getMotion().x, this.posY - this.getMotion().y + 0.15D, this.posZ - this.getMotion().z, 0.0D, 0.0D, 0.0D, new int[0]);
 			}
-			else if (this.target != null && !this.target.isDead)
+			else if (this.target != null && !this.!target.isAlive())
 			{
 				if (this.steps > 0)
 				{

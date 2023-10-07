@@ -25,6 +25,7 @@ public class EntitySwitchTrigger extends MobEntity {
 		cachePos = null;
 		cacheEntity = null;
 		this.setNoGravity(true);
+		this.setInvulnerable(true);
 	}
 	
 	@Override
@@ -105,7 +106,7 @@ public class EntitySwitchTrigger extends MobEntity {
 	public void onLivingUpdate() {
 		super.onLivingUpdate();
 		
-		if (!this.isDead && !this.dead) {
+		if (this.isAlive() && !this.dead) {
 			if (!world.isRemote && this.ticksExisted > 20) {
 				
 				if (this.ticksExisted % 20 == 0) {
@@ -115,7 +116,7 @@ public class EntitySwitchTrigger extends MobEntity {
 				
 				// Should be on top of a trigger block
 				if (getLinkedTileEntity() == null) {
-					this.setDead();
+					this.remove();
 				}
 			}
 		}

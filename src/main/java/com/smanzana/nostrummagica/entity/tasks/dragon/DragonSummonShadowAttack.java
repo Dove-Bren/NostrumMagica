@@ -34,7 +34,7 @@ public class DragonSummonShadowAttack<T extends EntityDragon> extends Goal {
 	public boolean shouldExecute() {
 		this.attackTicks = Math.max(0, this.attackTicks-1);
 		
-		if (dragon.isDead)
+		if (!dragon.isAlive())
 			return false;
 		
 		if (pool.isEmpty())
@@ -79,7 +79,7 @@ public class DragonSummonShadowAttack<T extends EntityDragon> extends Goal {
 		Iterator<LivingEntity> it = pool.iterator();
 		while (it.hasNext()) {
 			LivingEntity targ = it.next();
-			if (targ.isDead || targ.getDistanceSq(dragon) > MaxRange) {
+			if (!targ.isAlive() || targ.getDistanceSq(dragon) > MaxRange) {
 				it.remove();
 			}
 		}

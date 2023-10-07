@@ -328,7 +328,7 @@ public class KoidTask extends Goal {
 	
 	@Override
 	public boolean shouldExecute() {
-		if (koid.isDead)
+		if (!koid.isAlive())
 			return false;
 		
 		if (koid.getAttackTarget() == null)
@@ -389,7 +389,7 @@ public class KoidTask extends Goal {
 		// First, we try to move.
 		
 		// Else don't execute task
-		if (target != null && !target.isDead) {
+		if (target != null && target.isAlive()) {
 			if (!pathTo(target)) {
 				return false;
 			}
@@ -409,7 +409,7 @@ public class KoidTask extends Goal {
 			}
 		}
 
-		if (target != null && !target.isDead) {
+		if (target != null && target.isAlive()) {
 			double distTarget = target.getPositionVector().distanceTo(koid.getPositionVector());
 			
 			double meleeRange = (double)(koid.getWidth * 2.0F * koid.getWidth * 2.0F + koid.getWidth);
@@ -442,7 +442,7 @@ public class KoidTask extends Goal {
 	}
 	
 	private boolean pathTo(LivingEntity target) {
-		if (target == null || target.isDead)
+		if (target == null || !target.isAlive())
 			return false;
 		
 		// If we're melee and !inMelee, move

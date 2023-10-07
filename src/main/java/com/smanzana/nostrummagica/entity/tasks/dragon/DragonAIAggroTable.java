@@ -22,7 +22,7 @@ public class DragonAIAggroTable<E extends EntityDragon, T extends LivingEntity> 
 
 	@Override
 	public boolean shouldExecute() {
-		if (dragon == null || dragon.isDead) {
+		if (dragon == null || !dragon.isAlive()) {
 			return false;
 		}
 		

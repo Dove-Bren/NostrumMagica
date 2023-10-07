@@ -225,7 +225,7 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 		
 		if (this.getStatus() == WilloStatus.PANIC && this.getRevengeTarget() != null) {
 			// Up the time so we panic forever unless target is gone or we can't see them
-			if (!this.getRevengeTarget().isDead && this.getEntitySenses().canSee(this.getRevengeTarget())) {
+			if (!this.getRevengeTarget()!.isAlive() && this.getEntitySenses().canSee(this.getRevengeTarget())) {
 				this.setRevengeTarget(this.getRevengeTarget()); // Refreshes timer to 100 ticks
 			}
 		}

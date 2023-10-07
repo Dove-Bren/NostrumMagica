@@ -19,7 +19,7 @@ public class DragonTakeoffLandTask extends Goal {
 	
 	@Override
 	public boolean shouldExecute() {
-		if (dragon.isDead)
+		if (!dragon.isAlive())
 			return false;
 		
 		if (cur != null) {

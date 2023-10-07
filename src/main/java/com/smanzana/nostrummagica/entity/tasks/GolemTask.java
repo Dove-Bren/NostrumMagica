@@ -45,7 +45,7 @@ public class GolemTask extends Goal {
 	
 	@Override
 	public boolean shouldExecute() {
-		if (golem.isDead)
+		if (!golem.isAlive())
 			return false;
 		
 		if (golem.getAttackTarget() == null)
@@ -144,7 +144,7 @@ public class GolemTask extends Goal {
 		// First, we try to move.
 		
 		// Else don't execute task
-		if (target != null && !target.isDead) {
+		if (target != null && target.isAlive()) {
 			if (!pathTo(target)) {
 				return false;
 			}
@@ -193,7 +193,7 @@ public class GolemTask extends Goal {
 			}
 		}
 
-		if (target != null && !target.isDead) {
+		if (target != null && target.isAlive()) {
 			double distTarget = target.getPositionVector().distanceTo(golem.getPositionVector());
 			
 			double meleeRange = (double)(golem.getWidth * 2.0F * golem.getWidth * 2.0F);
@@ -224,7 +224,7 @@ public class GolemTask extends Goal {
 	}
 	
 	private boolean pathTo(LivingEntity target) {
-		if (target == null || target.isDead)
+		if (target == null || !target.isAlive())
 			return false;
 		
 		// If we're melee and !inMelee, move

@@ -33,7 +33,7 @@ public class ArcaneWolfAIStormTask extends Goal {
 	
 	@Override
 	public boolean shouldExecute() {
-		return !wolf.isDead
+		return wolf.isAlive()
 				&& !wolf.isSitting()
 				&& wolf.getAttackTarget() != null
 				&& wolf.ticksExisted >= cooldownTicks
@@ -46,7 +46,7 @@ public class ArcaneWolfAIStormTask extends Goal {
 	public boolean shouldContinueExecuting() {
 		return this.active
 				&& this.activeTarget != null
-				&& !this.activeTarget.isDead;
+				&& !this.!activeTarget.isAlive();
 	}
 	
 	@Override
@@ -68,7 +68,7 @@ public class ArcaneWolfAIStormTask extends Goal {
 	
 	protected boolean shouldBlastEntity(EntityArcaneWolf wolf, LivingEntity target) {
 		return target != null
-				&& !target.isDead
+				&& target.isAlive()
 				&& target.getMotion().y < 0;
 	}
 	

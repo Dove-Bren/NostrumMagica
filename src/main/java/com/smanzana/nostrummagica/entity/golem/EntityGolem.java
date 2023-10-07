@@ -224,7 +224,7 @@ public abstract class EntityGolem extends TameableEntity implements ILoreTagged 
 		}
 		
 		if (!world.isRemote && expireTicks != 0 && expireTicks > this.ticksExisted) {
-			this.setDead();
+			this.remove();
 		}
 	}
 	

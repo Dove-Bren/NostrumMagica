@@ -673,7 +673,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 			return;
 		}
 		
-		if (this.getAttackTarget() != null && this.getAttackTarget().isDead) {
+		if (this.getAttackTarget() != null && this.getAttackTarget()!.isAlive()) {
 			this.setAttackTarget(null);
 		}
 		
@@ -1845,7 +1845,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	protected boolean teleportToEnemy(LivingEntity target) {
-		if (target == null || target.isDead) {
+		if (target == null || !target.isAlive()) {
 			return false;
 		}
 		
@@ -1905,7 +1905,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		newWolf.setPosition(wolf.posX, wolf.posY, wolf.posZ);
 		newWolf.setTamedBy(player);
 		newWolf.setHealth(5f);
-		wolf.setDead();
+		wolf.remove();
 		wolf.world.addEntity(newWolf);
 		return newWolf;
 	}

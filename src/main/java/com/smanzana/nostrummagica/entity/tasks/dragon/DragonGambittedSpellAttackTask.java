@@ -52,7 +52,7 @@ public abstract class DragonGambittedSpellAttackTask<T extends EntityDragon & IT
 	public boolean shouldExecute() {
 		this.attackTicks = Math.max(0, this.attackTicks-1);
 		
-		if (dragon.isDead)
+		if (!dragon.isAlive())
 			return false;
 		
 		if (dragon.isEntitySitting())

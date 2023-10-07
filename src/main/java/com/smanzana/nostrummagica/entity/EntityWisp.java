@@ -204,7 +204,7 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 			}
 		}
 		
-		if (!world.isRemote && this.getHome() == null && !this.isDead && this.getHealth() > 0) {
+		if (!world.isRemote && this.getHome() == null && this.isAlive() && this.getHealth() > 0) {
 			if (perilLoc == null || !perilLoc.equals(getPosition())) {
 				MutableBlockPos cursor = new MutableBlockPos();
 				cursor.setPos(getPosition());
@@ -231,7 +231,7 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 					}
 					
 					this.attackEntityFrom(DamageSource.DROWN, 4.0F);
-					if (this.isDead || this.getHealth() <= 0) {
+					if (!this.isAlive() || this.getHealth() <= 0) {
 						this.entityDropItem(EssenceItem.getEssence(elem, 1), 0);
 					}
 				}
