@@ -6,9 +6,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.network.play.server.SSpawnObjectPacket;
 import net.minecraft.util.Direction;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -24,7 +26,7 @@ public class EntityPlantBossBramble extends Entity {
 	protected static final DataParameter<Float> WIDTH = EntityDataManager.<Float>createKey(EntityPlantBossBramble.class, DataSerializers.FLOAT);
 	protected static final DataParameter<Float> DEPTH = EntityDataManager.<Float>createKey(EntityPlantBossBramble.class, DataSerializers.FLOAT);
 	protected static final DataParameter<Float> HEIGHT = EntityDataManager.<Float>createKey(EntityPlantBossBramble.class, DataSerializers.FLOAT);
-	protected static final DataParameter<Direction> FACING = EntityDataManager.<Direction>createKey(EntityPlantBossBramble.class, DataSerializers.FACING);
+	protected static final DataParameter<Direction> FACING = EntityDataManager.<Direction>createKey(EntityPlantBossBramble.class, DataSerializers.DIRECTION);
 	
 	protected EntityPlantBoss plant;
 	protected float distance;
@@ -43,29 +45,27 @@ public class EntityPlantBossBramble extends Entity {
 	public EntityPlantBossBramble(EntityType<EntityPlantBossBramble> type, World worldIn, EntityPlantBoss plant, float width, float depth, float height) {
 		this(type, worldIn);
 		this.plant = plant;
-		this.setSize(width, height);
-		
 		this.setDims(width, depth, height);
 	}
 	
 	@Override
-	protected void registerData() { int unused; // TODO
-		//super.entityInit();
+	protected void registerData() {
+		//super.registerData();
 		this.dataManager.register(WIDTH, 5f);
 		this.dataManager.register(DEPTH, .5f);
 		this.dataManager.register(HEIGHT, 5f);
 		this.dataManager.register(FACING, Direction.SOUTH);
 	}
 	
-	public float getWidth() {
+	public float getBrambleWidth() {
 		return this.dataManager.get(WIDTH);
 	}
 	
-	public float getDepth() {
+	public float getBrambleDepth() {
 		return this.dataManager.get(DEPTH);
 	}
 	
-	public float getHeight() {
+	public float getBrambleHeight() {
 		return this.dataManager.get(HEIGHT);
 	}
 	
@@ -83,15 +83,15 @@ public class EntityPlantBossBramble extends Entity {
 		if (world.isRemote) {
 			change = true; // Just adjust BB
 		} else {
-			if (this.getWidth() != width) {
+			if (this.getBrambleWidth() != width) {
 				this.dataManager.set(WIDTH, width);
 				change = true;
 			}
-			if (this.getDepth() != depth) {
+			if (this.getBrambleDepth() != depth) {
 				this.dataManager.set(DEPTH, depth);
 				change = true;
 			}
-			if (this.getHeight() != height) {
+			if (this.getBrambleHeight() != height) {
 				this.dataManager.set(HEIGHT, height);
 				change = true;
 			}
@@ -105,6 +105,7 @@ public class EntityPlantBossBramble extends Entity {
 //					old.minY + height,
 //					old.minZ + depth
 //					));
+			this.recalculateSize();
 		}
 	}
 	
@@ -122,21 +123,21 @@ public class EntityPlantBossBramble extends Entity {
 			if (key == WIDTH
 					|| key == HEIGHT
 					|| key == DEPTH) {
-				this.setDims(this.getWidth(), this.getDepth(), this.getHeight());
+				this.setDims(this.getBrambleWidth(), this.getBrambleDepth(), this.getBrambleHeight());
 			} else if (key == FACING && this.world.isRemote) {
 				// Adjust width/depth to rotate if not moving n/s
 				final Direction dir = this.dataManager.get(FACING);
 				if (dir == Direction.WEST || dir == Direction.EAST) {
-					final float w = this.getWidth();
-					final float d = this.getDepth();
-					this.setDims(d, w, this.getHeight());
+					final float w = this.getBrambleWidth();
+					final float d = this.getBrambleDepth();
+					this.setDims(d, w, this.getBrambleHeight());
 				}
 			}
 		}
 	}
 	
 	@Override
-	public boolean writeToNBTOptional(CompoundNBT compound) {
+	public boolean writeUnlessRemoved(CompoundNBT compound) {
 		return false;
 	}
 	
@@ -179,7 +180,7 @@ public class EntityPlantBossBramble extends Entity {
 		if (!world.isRemote) {
 			// Move if given a direction
 			if (this.getFacing() != null) {
-				if (this.getDistanceSqToCenter(startPos) > this.distance * this.distance) {
+				if (startPos.distanceSq(this.posX, this.posY, this.posZ, true) > this.distance * this.distance) {
 					this.remove();
 				}
 				
@@ -203,9 +204,9 @@ public class EntityPlantBossBramble extends Entity {
 		// When moving E/W, w should be d
 		final boolean turned = this.getFacing() == Direction.EAST || this.getFacing() == Direction.WEST;
 		
-		final float w = turned ? this.getDepth() : this.getWidth();
-		final float h = this.getHeight();
-		final float d = turned ? this.getWidth() : this.getDepth();
+		final float w = turned ? this.getBrambleDepth() : this.getBrambleWidth();
+		final float h = this.getBrambleHeight();
+		final float d = turned ? this.getBrambleWidth() : this.getBrambleDepth();
 		this.entityBBOverride = new AxisAlignedBB(
 				this.posX - (w/2f),
 				this.posY,
@@ -217,11 +218,13 @@ public class EntityPlantBossBramble extends Entity {
 	}
 	
 	@Override
-	public AxisAlignedBB getEntityBoundingBox() {
+	public AxisAlignedBB getBoundingBox() {
 		checkBoundingBox();
 		return this.entityBBOverride;
 	}
-	
-	// TODO bounding box isn't owrking. Just implement custom override I guess
 
+	@Override
+	public IPacket<?> createSpawnPacket() {
+		return new SSpawnObjectPacket(this);
+	}
 }

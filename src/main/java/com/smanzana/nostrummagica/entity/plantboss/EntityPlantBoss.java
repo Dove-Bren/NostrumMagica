@@ -5,19 +5,21 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import java.util.Optional;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
+import com.smanzana.nostrummagica.blocks.PoisonWaterBlock;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.entity.AggroTable;
+import com.smanzana.nostrummagica.entity.IMultiPartEntity;
+import com.smanzana.nostrummagica.entity.MultiPartEntityPart;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.fluids.FluidPoisonWater;
-import com.smanzana.nostrummagica.items.NostrumResourceItem;
-import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.serializers.FloatArraySerializer;
@@ -39,31 +41,32 @@ import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntitySize;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.IEntityMultiPart;
-import net.minecraft.entity.MultiPartEntityPart;
+import net.minecraft.entity.Pose;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.init.Blocks;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Direction.Plane;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BossInfo;
-import net.minecraft.world.BossInfoServer;
+import net.minecraft.world.ServerBossInfo;
 import net.minecraft.world.World;
 
-public class EntityPlantBoss extends MobEntity implements ILoreTagged, IEntityMultiPart {
+public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPartEntity {
 	
 	public static enum BattleState {
 		IDLE, // Not doing anything specific but throwing out attacks and looking mad
@@ -255,7 +258,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IEntityMu
 	protected static final DataParameter<Optional<EMagicElement>> WEAK_ELEMENT = EntityDataManager.<Optional<EMagicElement>>createKey(EntityPlantBoss.class, OptionalMagicElementDataSerializer.instance);
 	protected static final DataParameter<PlantBossTreeType> TREE_TYPE = EntityDataManager.<PlantBossTreeType>createKey(EntityPlantBoss.class, PlantBossTreeTypeSerializer.instance);
 	
-	private final BossInfoServer bossInfo = (BossInfoServer)(new BossInfoServer(this.getDisplayName(), BossInfo.Color.GREEN, BossInfo.Overlay.NOTCHED_10)).setDarkenSky(true);
+	private final ServerBossInfo bossInfo = (ServerBossInfo) new ServerBossInfo(this.getDisplayName(), BossInfo.Color.GREEN, BossInfo.Overlay.NOTCHED_10).setDarkenSky(true);
 	private final PlantBossLeafLimb[] limbs;
 	private final PlantBossBody body;
 	private final MultiPartEntityPart[] parts;
@@ -338,10 +341,10 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IEntityMu
 	}
 	
 	@Override
-	protected void registerData() { int unused; // TODO
-		super.entityInit();
+	protected void registerData() {
+		super.registerData();
 		this.dataManager.register(LEAF_PITCHES, new Float[NumberOfLeaves]);
-		this.dataManager.register(WEAK_ELEMENT, Optional.absent());
+		this.dataManager.register(WEAK_ELEMENT, Optional.empty());
 		this.dataManager.register(TREE_TYPE, PlantBossTreeType.NORMAL);
 	}
 	
@@ -360,30 +363,32 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IEntityMu
 	
 	@Override
 	protected void registerGoals() {
-		super.initEntityAI();
+		super.registerGoals();
 	}
 	
 	@Override
-	protected boolean canDespawn() {
+	public boolean canDespawn(double distanceToClosestPlayer) {
 		return false;
 	}
 	
-	public boolean canAttackClass(Class <? extends LivingEntity > cls) {
+	@Override
+	public boolean canAttack(EntityType<?> type) {
 		return true;
 	}
 	
+	@Override
 	public boolean isNonBoss() {
 		return false;
 	}
 	
 	@Override
 	public void readAdditional(CompoundNBT compound) {
-		super.readEntityFromNBT(compound);
+		super.readAdditional(compound);
 	}
 	
 	@Override
 	public void writeAdditional(CompoundNBT compound) {
-    	super.writeEntityToNBT(compound);
+    	super.writeAdditional(compound);
 	}
 	
 	protected void positionLeaves(PlantBossLeafLimb[] limbs) {
@@ -392,7 +397,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IEntityMu
 			final double limbRot = Math.PI * 2 * yawProg
 								//+ (this.rotationYawHead * Math.PI / 180.0) // don't rotate
 								;
-			final double radius = this.getBody().width * (limb.index % 2 == 0 ? 1.25 : 1.5);
+			final double radius = this.getBody().getWidth() * (limb.index % 2 == 0 ? 1.25 : 1.5);
 			
 			final double x = this.posX
 					+ Math.cos(limbRot) * radius;
@@ -610,16 +615,16 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IEntityMu
 		return InfoScreenTabs.INFO_ENTITY;
 	}
 	
-	@Override
-	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-		int count = this.rand.nextInt(3) + 1;
-		count += lootingModifier;
-		
-		this.entityDropItem(NostrumResourceItem.getItem(ResourceType.EVIL_THISTLE, count), 0);
-		
-		count = 1 + lootingModifier / 2;
-		this.entityDropItem(NostrumResourceItem.getItem(ResourceType.MANA_LEAF, 1), 0);
-	}
+//	@Override
+//	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
+//		int count = this.rand.nextInt(3) + 1;
+//		count += lootingModifier;
+//		
+//		this.entityDropItem(NostrumResourceItem.getItem(ResourceType.EVIL_THISTLE, count), 0);
+//		
+//		count = 1 + lootingModifier / 2;
+//		this.entityDropItem(NostrumResourceItem.getItem(ResourceType.MANA_LEAF, 1), 0);
+//	}
 	
 	@Override
 	public boolean attackEntityFromPart(MultiPartEntityPart plantPart, DamageSource source, float damage) {
@@ -872,7 +877,14 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IEntityMu
 	
 	protected boolean isArenaBlock(BlockState state) {
 		return isPillarBlock(state)
-				|| state.getBlock() instanceof FluidPoisonWater.FluidPoisonWaterBlock;
+				|| state.getBlock() instanceof PoisonWaterBlock
+				|| isArenaBlock(state.getFluidState())
+				;
+		
+	}
+	
+	protected boolean isArenaBlock(IFluidState state) {
+		return state.getFluid() instanceof FluidPoisonWater;
 	}
 	
 	@Override
@@ -908,7 +920,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IEntityMu
 	}
 	
 	protected void setWeakElement(@Nullable EMagicElement element) {
-		this.dataManager.set(WEAK_ELEMENT, Optional.fromNullable(element));
+		this.dataManager.set(WEAK_ELEMENT, Optional.ofNullable(element));
 	}
 	
 	public @Nullable EMagicElement getWeakElement() {
@@ -955,7 +967,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IEntityMu
 			break;
 		}
 		
-		EntityPlantBossBramble bramble = new EntityPlantBossBramble(world, this, width);
+		EntityPlantBossBramble bramble = new EntityPlantBossBramble(NostrumEntityTypes.plantBossBramble, world, this, width);
 		bramble.setPosition(start.getX() + .5, start.getY(), start.getZ() + .5);
 		bramble.setMotion(side, dist);
 		world.addEntity(bramble);
@@ -1000,15 +1012,15 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IEntityMu
 		private float widthCache = 0;
 		private float heightCache = 0;
 		@Override
-		public AxisAlignedBB getEntityBoundingBox() {
-			if (this.getWidth != widthCache || this.getHeight() != heightCache) {
-				this.widthCache = width;
-				this.heightCache = height;
+		public AxisAlignedBB getBoundingBox() {
+			if (this.getWidth() != widthCache || this.getHeight() != heightCache) {
+				this.widthCache = getWidth();
+				this.heightCache = getHeight();
 				
 				// change BB to match pitch...
 				AxisAlignedBB bb = this.getBoundingBox();
 				final double centerZ = (bb.minZ + bb.maxZ) / 2;
-				this.setEntityBoundingBox(new AxisAlignedBB(
+				this.setBoundingBox(new AxisAlignedBB(
 						bb.minX, bb.minY, centerZ - 2,
 						bb.maxX, bb.maxY, centerZ + 2
 						));
@@ -1479,7 +1491,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IEntityMu
 		protected Direction getSpawnDirection() {
 			// Could remember which we did and not do the same again...
 			// but for now, just random
-			return Direction.HORIZONTALS[parent.rand.nextInt(Direction.HORIZONTALS.length)];
+			return Plane.HORIZONTAL.random(parent.rand);
 		}
 		
 		protected void spawnBramble(Direction direction) {
@@ -1532,7 +1544,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IEntityMu
 		 * And then we need to summon it. And collison might not be working.
 		 * 
 		 * I want to take a second and make the boss discover the reaches of the arena. That can speed up the pillar search, too.
-		 * And then use that to set the width/height of the brambles.
+		 * And then use that to set the .getWidth()/height of the brambles.
 		 * 
 		 * Also brambles need a direction to travel in and a max distance
 		 */
