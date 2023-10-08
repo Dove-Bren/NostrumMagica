@@ -42,7 +42,7 @@ public class ClientEffectFormBasic implements ClientEffectForm {
 	@Override
 	public void draw(Minecraft mc, float partialTicks, int color) {
 		if (this.offset != null) {
-			GlStateManager.translatef(offset.x, offset.y, offset.z);
+			GlStateManager.translated(offset.x, offset.y, offset.z);
 		}
 		
 		GlStateManager.enableBlend();

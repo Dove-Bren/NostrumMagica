@@ -6,28 +6,26 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.render.entity.ModelAetherCloak;
 import com.smanzana.nostrummagica.items.ICapeProvider;
 
-import net.minecraft.client.entity.AbstractClientPlayer;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.entity.RenderPlayer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
+import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.entity.model.PlayerModel;
+import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.client.model.ModelLoaderRegistry;
 
-public class LayerAetherCloak implements LayerRenderer<AbstractClientPlayer> {
+public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> {
 
 	protected static final Map<Integer, ModelAetherCloak> ModelCache = new HashMap<>();
 	
@@ -38,8 +36,8 @@ public class LayerAetherCloak implements LayerRenderer<AbstractClientPlayer> {
 			IBakedModel[] bakedModels = new IBakedModel[models.length];
 			int i = 0;
 			for (ResourceLocation modelLoc : models) {
-				IModel rawModel = ModelLoaderRegistry.getModelOrLogError(modelLoc, "Nostrum Magica is missing a model. Please report this to the mod authors.");
-				bakedModels[i++] = rawModel.bake(rawModel.getDefaultState(), DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter());
+				Minecraft mc = Minecraft.getInstance();
+				bakedModels[i++] = mc.getModelManager().getModel(modelLoc);
 			}
 			
 			cloak = new ModelAetherCloak(bakedModels, 64, 64); // TODO make texture size configurable
@@ -48,15 +46,15 @@ public class LayerAetherCloak implements LayerRenderer<AbstractClientPlayer> {
 		return cloak;
 	}
 	
-	protected final RenderPlayer renderPlayer;
+	//protected final PlayerRenderer renderPlayer;
 	
-	public LayerAetherCloak(RenderPlayer renderPlayerIn) {
-		//super(renderPlayerIn);
-		this.renderPlayer = renderPlayerIn;
+	public LayerAetherCloak(PlayerRenderer renderPlayerIn) {
+		super(renderPlayerIn);
+		//this.renderPlayer = renderPlayerIn;
 	}
 	
 	@Override
-	public void doRenderLayer(AbstractClientPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+	public void render(AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 		ItemStack capeItem = shouldRender(player);
 		if (!capeItem.isEmpty()) {
 			render(player, capeItem, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
@@ -75,7 +73,7 @@ public class LayerAetherCloak implements LayerRenderer<AbstractClientPlayer> {
 		
 		// Nothing so far. Check baubles if there're there.
 		if (player instanceof PlayerEntity) {
-			IInventory inventory = NostrumMagica.baubles.getBaubles((PlayerEntity) player);
+			IInventory inventory = NostrumMagica.instance.curios.getCurios((PlayerEntity) player);
 			if (inventory != null) {
 				for (int i = 0; i < inventory.getSizeInventory(); i++) {
 					ItemStack stack = inventory.getStackInSlot(i);
@@ -95,7 +93,7 @@ public class LayerAetherCloak implements LayerRenderer<AbstractClientPlayer> {
 		return ShouldRender(player);
 	}
 	
-	public void render(AbstractClientPlayer player, ItemStack stack, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+	public void render(AbstractClientPlayerEntity player, ItemStack stack, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 		final ICapeProvider provider = ((ICapeProvider)stack.getItem());
 		final ModelAetherCloak model = GetModel(provider.getCapeModels(player, stack));
 		
@@ -111,7 +109,7 @@ public class LayerAetherCloak implements LayerRenderer<AbstractClientPlayer> {
 		GlStateManager.enableTexture();
 		GlStateManager.enableLighting();
 		GlStateManager.disableLighting();
-		GlStateManager.disableColorLogic();
+		GlStateManager.disableColorLogicOp();
 		GlStateManager.enableColorMaterial();
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 

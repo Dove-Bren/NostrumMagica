@@ -39,20 +39,18 @@ public class ClientEffectHellBurn extends ClientEffect {
 				entity.posZ + offset.z,
 				-offset.x * .1,
 				-offset.y * .1,
-				-offset.z * .1,
-				new int[0]
+				-offset.z * .1
 				);
 	}
 	
 	protected void spawnPoisonEffect() {
 		final double angleRad = Math.PI * 2 * NostrumMagica.rand.nextFloat();
 		final Vec3d offset = new Vec3d(Math.cos(angleRad) * .5, .25, Math.sin(angleRad) * .5);
-		entity.world.addParticle(ParticleTypes.CRIT_MAGIC,
+		entity.world.addParticle(ParticleTypes.CRIT,
 				entity.posX + offset.x,
 				entity.posY + entity.getHeight() + offset.y,
 				entity.posZ + offset.z,
-				0, 0, 0,
-				new int[0]
+				0, 0, 0
 				);
 	}
 	
@@ -65,8 +63,7 @@ public class ClientEffectHellBurn extends ClientEffect {
 				entity.posZ,
 				dir.x,
 				dir.y,
-				dir.z,
-				new int[0]
+				dir.z
 				);
 	}
 	

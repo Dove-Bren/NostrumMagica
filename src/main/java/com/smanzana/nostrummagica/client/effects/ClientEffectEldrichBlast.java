@@ -41,8 +41,7 @@ public class ClientEffectEldrichBlast extends ClientEffect {
 				entity.posX + offset.x,
 				entity.posY + entity.getHeight() + offset.y,
 				entity.posZ + offset.z,
-				0, -.1, 0,
-				new int[0]
+				0, -.1, 0
 				);
 	}
 	

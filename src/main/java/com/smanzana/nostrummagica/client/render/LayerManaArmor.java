@@ -4,46 +4,47 @@ import javax.annotation.Nullable;
 
 import org.lwjgl.opengl.GL11;
 
-import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.capabilities.IManaArmor;
-
-import net.minecraft.client.entity.AbstractClientPlayer;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
-import net.minecraft.client.renderer.entity.RenderPlayer;
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.IManaArmor;
+
+import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
+import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
+import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 
-public class LayerManaArmor implements LayerRenderer<AbstractClientPlayer> {
+public class LayerManaArmor extends LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> {
 
 	protected static final ResourceLocation TEXTURE_ARMOR = new ResourceLocation(NostrumMagica.MODID, "textures/entity/manaarmor.png");
-	protected final RenderPlayer renderPlayer;
+	protected final PlayerRenderer renderPlayer;
 	
-	public LayerManaArmor(RenderPlayer renderPlayerIn) {
-		//super(renderPlayerIn);
+	public LayerManaArmor(PlayerRenderer renderPlayerIn) {
+		super(renderPlayerIn);
 		this.renderPlayer = renderPlayerIn;
 	}
 	
 	@Override
-	public void doRenderLayer(AbstractClientPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+	public void render(AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 		if (shouldRender(player)) {
-			render(player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
+			renderInternal(player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
 		}
 	}
 	
-	public boolean shouldRender(AbstractClientPlayer player) {
+	public boolean shouldRender(AbstractClientPlayerEntity player) {
 		@Nullable IManaArmor armor = NostrumMagica.getManaArmor(player);
 		return armor != null && armor.hasArmor();
 	}
 	
-	public int getColor(AbstractClientPlayer player) {
+	public int getColor(AbstractClientPlayerEntity player) {
 		return 0x602244FF;
 	}
 	
 	private boolean recurseMarker = false;
-	public void render(AbstractClientPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+	public void renderInternal(AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 		
 		if (!recurseMarker) {
 			recurseMarker = true;
@@ -69,24 +70,24 @@ public class LayerManaArmor implements LayerRenderer<AbstractClientPlayer> {
 			GlStateManager.enableTexture();
 			GlStateManager.enableLighting();
 			GlStateManager.disableLighting();
-			GlStateManager.disableColorLogic();
+			GlStateManager.disableColorLogicOp();
 			GlStateManager.enableColorMaterial();
 			GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 	
 			this.renderPlayer.bindTexture(TEXTURE_ARMOR);
 			
 			GlStateManager.pushMatrix();
-			GlStateManager.scalef(1.0 + growAmt, 1.0 + growAmt, 1.0 + growAmt);
+			GlStateManager.scaled(1.0 + growAmt, 1.0 + growAmt, 1.0 + growAmt);
 			
 			GlStateManager.matrixMode(GL11.GL_TEXTURE);
 			GlStateManager.pushMatrix();
 			GlStateManager.loadIdentity();
-			GlStateManager.translatef(0 + (ageInTicks + partialTicks) * .001, 0, 0);
+			GlStateManager.translated(0 + (ageInTicks + partialTicks) * .001, 0, 0);
 			
 			GlStateManager.matrixMode(GL11.GL_MODELVIEW);
 			
 			{
-				this.renderPlayer.getMainModel().render(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale + .002f);
+				this.renderPlayer.getEntityModel().render(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale + .002f);
 				
 				//this.renderPlayer.doRender(player, 0, 0, 0, netHeadYaw, partialTicks);
 			}

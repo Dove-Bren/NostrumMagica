@@ -100,6 +100,14 @@ public class RayTrace {
 		}
 		return null;
 	}
+
+	public static @Nullable BlockPos blockPosFromResult(RayTraceResult result) {
+		if (result == null || result.getType() != RayTraceResult.Type.BLOCK) {
+			return null;
+		}
+		
+		return ((BlockRayTraceResult) result).getPos();
+	}
 	
 	public static RayTraceResult raytrace(World world, @Nonnull Entity tracingEntity, Vec3d fromPos, float pitch,
 			float yaw, float maxDistance, Predicate<? super Entity> selector) {

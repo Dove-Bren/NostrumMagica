@@ -19,17 +19,14 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.triggers.BeamTrigger;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
@@ -130,10 +127,10 @@ public class ClientCastMessage {
 			}
 			
 			// Possibly use baubles
-			IInventory baubles = NostrumMagica.baubles.getBaubles(sp);
-			if (baubles != null) {
-				for (int i = 0; i < baubles.getSizeInventory(); i++) {
-					ItemStack equip = baubles.getStackInSlot(i);
+			IInventory curios = NostrumMagica.instance.curios.getCurios(sp);
+			if (curios != null) {
+				for (int i = 0; i < curios.getSizeInventory(); i++) {
+					ItemStack equip = curios.getStackInSlot(i);
 					if (equip.isEmpty()) {
 						continue;
 					}

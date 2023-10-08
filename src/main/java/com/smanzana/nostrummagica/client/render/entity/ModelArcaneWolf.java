@@ -1,24 +1,27 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import net.minecraft.client.model.ModelRenderer;
-import net.minecraft.client.model.ModelWolf;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
+
+import net.minecraft.client.model.ModelWolf;
+import net.minecraft.client.renderer.entity.model.RendererModel;
+import net.minecraft.client.renderer.entity.model.WolfModel;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
-public class ModelArcaneWolf extends ModelWolf {
+public class ModelArcaneWolf extends WolfModel<EntityArcaneWolf> {
 	
-	private ModelRenderer wolfHeadSnootBridge;
+	private RendererModel wolfHeadSnootBridge;
 	
 	public ModelArcaneWolf(int color) {
 		//super(); Don't bother creating parent model
 		
 		// package-protected versions mean we have to use reflection to set them
-		ModelRenderer wolfMane;
-		ModelRenderer wolfTail;
+		RendererModel wolfMane;
+		RendererModel wolfTail;
 		
-		this.wolfHeadMain = new ModelRenderer(this, 0, 0) {
+		this.wolfHeadMain = new RendererModel(this, 0, 0) {
 			@Override
 			public void renderWithRotation(float scale) {
 				super.render(scale);
@@ -34,7 +37,7 @@ public class ModelArcaneWolf extends ModelWolf {
 		this.wolfHeadMain.setTextureOffset(42, 13).addBox(-2.5F, -1.5F, -1.5F, 1, 4, 3, 0.0F); // Right face floof // TODO texture
 		this.wolfHeadMain.setTextureOffset(42, 13).addBox(3.5F, -1.5F, -1.5F, 1, 4, 3, 0.0F); // Left face floof // TODO texture
 		//this.wolfHeadMain.setTextureOffset(18, 14).addBox(0.5F, -1.0F, -4.0F, 1, 2, 2, 0.0F); // SnootBridge
-		wolfHeadSnootBridge = new ModelRenderer(this, 23, 14);
+		wolfHeadSnootBridge = new RendererModel(this, 23, 14);
 		wolfHeadSnootBridge.offsetX = 0;
 		wolfHeadSnootBridge.offsetY = .016F;
 		wolfHeadSnootBridge.offsetZ = -.075F;
@@ -42,28 +45,28 @@ public class ModelArcaneWolf extends ModelWolf {
 		wolfHeadSnootBridge.addBox(0, 0, 0, 1, 1, 2, 0.0F); // SnootBridge
 		wolfHeadSnootBridge.rotateAngleX = 10f;
 		wolfHeadMain.addChild(wolfHeadSnootBridge);
-		this.wolfBody = new ModelRenderer(this, 18, 14);
+		this.wolfBody = new RendererModel(this, 18, 14);
 		this.wolfBody.addBox(-3.0F, -2.0F, -3.0F, 6, 9, 6, 0.0F);
 		this.wolfBody.setRotationPoint(0.0F, 14.0F, 2.0F);
 		this.wolfBody.setTextureOffset(21, 0).addBox(-3.5F, 1.5F, -3.5F, 7, 5, 7, 0.0F); // Butt floof // TODO texture
 		
 		
-		wolfMane = new ModelRenderer(this, 21, 0);
+		wolfMane = new RendererModel(this, 21, 0);
 		wolfMane.addBox(-3.0F, -3.0F, -3.0F, 8, 6, 7, 0.0F);
 		wolfMane.setRotationPoint(-1.0F, 14.0F, 2.0F);
-		this.wolfLeg1 = new ModelRenderer(this, 0, 18);
+		this.wolfLeg1 = new RendererModel(this, 0, 18);
 		this.wolfLeg1.addBox(0.0F, 0.0F, -1.0F, 2, 8, 2, 0.0F);
 		this.wolfLeg1.setRotationPoint(-2.5F, 16.0F, 7.0F);
-		this.wolfLeg2 = new ModelRenderer(this, 0, 18);
+		this.wolfLeg2 = new RendererModel(this, 0, 18);
 		this.wolfLeg2.addBox(0.0F, 0.0F, -1.0F, 2, 8, 2, 0.0F);
 		this.wolfLeg2.setRotationPoint(0.5F, 16.0F, 7.0F);
-		this.wolfLeg3 = new ModelRenderer(this, 0, 18);
+		this.wolfLeg3 = new RendererModel(this, 0, 18);
 		this.wolfLeg3.addBox(0.0F, 0.0F, -1.0F, 2, 8, 2, 0.0F);
 		this.wolfLeg3.setRotationPoint(-2.5F, 16.0F, -4.0F);
-		this.wolfLeg4 = new ModelRenderer(this, 0, 18);
+		this.wolfLeg4 = new RendererModel(this, 0, 18);
 		this.wolfLeg4.addBox(0.0F, 0.0F, -1.0F, 2, 8, 2, 0.0F);
 		this.wolfLeg4.setRotationPoint(0.5F, 16.0F, -4.0F);
-		wolfTail = new ModelRenderer(this, 9, 18);
+		wolfTail = new RendererModel(this, 9, 18);
 		wolfTail.addBox(0.0F, 0.0F, -1.0F, 2, 8, 2, 0.0F);
 		wolfTail.setRotationPoint(-1.0F, 12.0F, 8.0F);
 		
