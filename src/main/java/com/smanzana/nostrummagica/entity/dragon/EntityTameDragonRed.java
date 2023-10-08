@@ -456,8 +456,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	}
 	
 	@Override
-	public void onEntityUpdate() {
-		super.onEntityUpdate();
+	public void baseTick() {
+		super.baseTick();
 		
 		if (world != null && !world.isRemote) {
 			if (!this.isEntitySitting()) {

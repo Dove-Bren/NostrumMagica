@@ -212,8 +212,8 @@ public abstract class EntityDragonFlying extends EntityDragon {
 	}
 	
 	@Override
-	public void onEntityUpdate() {
-		super.onEntityUpdate();
+	public void baseTick() {
+		super.baseTick();
 		
 		if (this.isFlying()) {
 			if (this.getWingFlapping()) {
