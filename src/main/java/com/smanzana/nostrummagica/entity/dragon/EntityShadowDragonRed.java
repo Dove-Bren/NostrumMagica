@@ -8,8 +8,8 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.HurtByTargetGoal;
-import net.minecraft.entity.ai.EntityAIWander;
+import net.minecraft.entity.ai.goal.HurtByTargetGoal;
+import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
@@ -43,8 +43,8 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 		this.dataManager.set(HASTARGET, true);
 	}
 	
-	protected void registerData() { int unused; // TODO
-		super.entityInit();
+	protected void registerData() {
+		super.registerData();
 		this.dataManager.register(HASTARGET, false);
 	}
 	
@@ -53,7 +53,7 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 			if (this.target != null) {
 				this.targetSelector.addGoal(1, new DragonAIFocusedTarget<LivingEntity>(this, this.target, true));
 			} else {
-				this.targetSelector.addGoal(1, new HurtByTargetGoal(this, true, new Class[0]));
+				this.targetSelector.addGoal(1, new HurtByTargetGoal(this).setCallsForHelp(EntityShadowDragonRed.class));
 				this.targetSelector.addGoal(2, new DragonAINearestAttackableTarget<PlayerEntity>(this, PlayerEntity.class, true));
 			}
 			targetInitted = true;
@@ -62,10 +62,10 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 	
 	@Override
 	protected void registerGoals() {
-		super.initEntityAI();
+		super.registerGoals();
 		
 		this.goalSelector.addGoal(1, new DragonMeleeAttackTask(this, 1.0D, true, 4F * .6F * 4F * .6F * 1.2));
-		this.goalSelector.addGoal(2, new EntityAIWander(this, 1.0D, 30));
+		this.goalSelector.addGoal(2, new WaterAvoidingRandomWalkingGoal(this, 1.0D, 30));
 	}
 	
 	@Override
@@ -117,7 +117,7 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
     }
 	
 	@Override
-	protected boolean canDespawn() {
+	public boolean canDespawn(double nearestPlayer) {
 		return true;
 	}
 	
@@ -127,7 +127,7 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 		setTargetTasks();
 		
 		if (this.target != null) {
-			if (this.!target.isAlive()) {
+			if (!this.target.isAlive()) {
 				this.attackEntityFrom(DamageSource.OUT_OF_WORLD, (float) this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).getValue());
 			}
 		} else {
@@ -139,7 +139,7 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 	}
 	
 	public void readAdditional(CompoundNBT compound) {
-		super.readEntityFromNBT(compound);
+		super.readAdditional(compound);
 
 		if (compound.contains(DRAGON_SERIAL_HASTARGET_TOK, NBT.TAG_ANY_NUMERIC)) {
         	this.dataManager.set(HASTARGET, compound.getBoolean(DRAGON_SERIAL_HASTARGET_TOK));
@@ -147,7 +147,7 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 	}
 	
 	public void writeAdditional(CompoundNBT compound) {
-    	super.writeEntityToNBT(compound);
+    	super.writeAdditional(compound);
     	compound.putBoolean(DRAGON_SERIAL_HASTARGET_TOK, this.dataManager.get(HASTARGET));
 	}
 

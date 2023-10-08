@@ -2,13 +2,13 @@ package com.smanzana.nostrummagica.entity.dragon;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import java.util.Optional;
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeManaRegen;
@@ -22,14 +22,15 @@ import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonInventory
 import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonSpellSheet;
 import com.smanzana.nostrummagica.entity.IStabbableEntity;
 import com.smanzana.nostrummagica.entity.ITameableEntity;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon.DragonEquipmentInventory.IChangeListener;
 import com.smanzana.nostrummagica.entity.dragon.IDragonSpawnData.IDragonSpawnFactory;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowEntityGeneric;
-import com.smanzana.nostrummagica.entity.tasks.OwnerHurtByTargetGoalGeneric;
-import com.smanzana.nostrummagica.entity.tasks.OwnerHurtTargetGoalGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIPanicGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAISitGeneric;
 import com.smanzana.nostrummagica.entity.tasks.FollowOwnerGenericGoal;
+import com.smanzana.nostrummagica.entity.tasks.OwnerHurtByTargetGoalGeneric;
+import com.smanzana.nostrummagica.entity.tasks.OwnerHurtTargetGoalGeneric;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonAINearestAttackableTarget;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonGambittedSpellAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonMeleeAttackTask;
@@ -46,35 +47,35 @@ import com.smanzana.nostrummagica.pet.PetInfo.SecondaryFlavor;
 import com.smanzana.nostrummagica.serializers.PetJobSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.utils.Entities;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.IEntityOwnable;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.HurtByTargetGoal;
-import net.minecraft.entity.ai.SwimGoal;
-import net.minecraft.entity.ai.EntityAIWander;
+import net.minecraft.entity.ai.goal.HurtByTargetGoal;
+import net.minecraft.entity.ai.goal.SwimGoal;
+import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
 import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.entity.passive.EntityCow;
-import net.minecraft.entity.passive.EntityPig;
-import net.minecraft.entity.passive.EntitySheep;
+import net.minecraft.entity.monster.ZombieEntity;
+import net.minecraft.entity.passive.CowEntity;
+import net.minecraft.entity.passive.PigEntity;
+import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.management.PreYggdrasilConverter;
@@ -83,8 +84,10 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -121,8 +124,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
     protected static final DataParameter<Float> SYNCED_MAX_HEALTH  = EntityDataManager.<Float>createKey(EntityTameDragonRed.class, DataSerializers.FLOAT);
     protected static final DataParameter<PetAction> DATA_PET_ACTION = EntityDataManager.<PetAction>createKey(EntityTameDragonRed.class, PetJobSerializer.instance);
     
-    protected static final DataParameter<ItemStack> DATA_ARMOR_BODY = EntityDataManager.<ItemStack>createKey(EntityTameDragonRed.class, DataSerializers.ITEM_STACK);
-    protected static final DataParameter<ItemStack> DATA_ARMOR_HELM = EntityDataManager.<ItemStack>createKey(EntityTameDragonRed.class, DataSerializers.ITEM_STACK);
+    protected static final DataParameter<ItemStack> DATA_ARMOR_BODY = EntityDataManager.<ItemStack>createKey(EntityTameDragonRed.class, DataSerializers.ITEMSTACK);
+    protected static final DataParameter<ItemStack> DATA_ARMOR_HELM = EntityDataManager.<ItemStack>createKey(EntityTameDragonRed.class, DataSerializers.ITEMSTACK);
     
     protected static final String NBT_HATCHED = "Hatched";
     protected static final String NBT_TAMED = "Tamed";
@@ -191,19 +194,19 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
         
         this.inventory = new Inventory(DRAGON_INV_SIZE);
         this.equipment = new DragonEquipmentInventory(this);
-        this.spellInventory = new RedDragonSpellInventory("Dragon Spell Inventory", true);
+        this.spellInventory = new RedDragonSpellInventory();
         
         soulID = UUID.randomUUID();
         worldID = null;
 	}
 	
-	protected void registerData() { int unused; // TODO
-		super.entityInit();
+	protected void registerData() {
+		super.registerData();
 		this.dataManager.register(TAMED, false);
-		this.dataManager.register(OWNER_UNIQUE_ID, Optional.<UUID>absent());
+		this.dataManager.register(OWNER_UNIQUE_ID, Optional.<UUID>empty());
 		this.dataManager.register(SITTING, false);
 		this.dataManager.register(AGE, 0f);
-		this.dataManager.register(EGG_UNIQUE_ID, Optional.<UUID>absent());
+		this.dataManager.register(EGG_UNIQUE_ID, Optional.<UUID>empty());
 		this.dataManager.register(CAPABILITY_FLY, Boolean.FALSE);
 		this.dataManager.register(CAPABILITY_JUMP, (byte) 0);
 		this.dataManager.register(CAPABILITY_JUMP_HEIGHT, 0f);
@@ -433,21 +436,21 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 				return (input.getBond() >= BOND_LEVEL_FOLLOW);
 			}
 		}));
-		this.goalSelector.addGoal(priority++, new EntityAIWander(this, 1.0D, 30));
+		this.goalSelector.addGoal(priority++, new WaterAvoidingRandomWalkingGoal(this, 1.0D, 30));
 		
 		this.targetSelector.addGoal(1, new OwnerHurtByTargetGoalGeneric<EntityTameDragonRed>(this));
         this.targetSelector.addGoal(2, new OwnerHurtTargetGoalGeneric<EntityTameDragonRed>(this));
         this.targetSelector.addGoal(3, aiRevengeTarget);
         this.targetSelector.addGoal(4, aiPlayerTarget);
-		this.targetSelector.addGoal(5, new DragonAINearestAttackableTarget<EntityZombie>(this, EntityZombie.class, true));
-		this.targetSelector.addGoal(6, new DragonAINearestAttackableTarget<EntitySheep>(this, EntitySheep.class, true));
-		this.targetSelector.addGoal(7, new DragonAINearestAttackableTarget<EntityCow>(this, EntityCow.class, true));
-		this.targetSelector.addGoal(8, new DragonAINearestAttackableTarget<EntityPig>(this, EntityPig.class, true));
+		this.targetSelector.addGoal(5, new DragonAINearestAttackableTarget<ZombieEntity>(this, ZombieEntity.class, true));
+		this.targetSelector.addGoal(6, new DragonAINearestAttackableTarget<SheepEntity>(this, SheepEntity.class, true));
+		this.targetSelector.addGoal(7, new DragonAINearestAttackableTarget<CowEntity>(this, CowEntity.class, true));
+		this.targetSelector.addGoal(8, new DragonAINearestAttackableTarget<PigEntity>(this, PigEntity.class, true));
 	}
 	
 	@Override
 	protected void registerGoals() {
-		super.initEntityAI();
+		super.registerGoals();
 		
 		this.setupBaseAI();
 		if (this.isTamed()) {
@@ -623,7 +626,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	}
 
 	public void setOwnerId(@Nullable UUID p_184754_1_) {
-		this.dataManager.set(OWNER_UNIQUE_ID, Optional.fromNullable(p_184754_1_));
+		this.dataManager.set(OWNER_UNIQUE_ID, Optional.ofNullable(p_184754_1_));
 	}
 	
 	protected UUID getEggID() {
@@ -631,16 +634,15 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	}
 	
 	public void setEggId(UUID id) {
-		dataManager.set(EGG_UNIQUE_ID, Optional.fromNullable(id));
+		dataManager.set(EGG_UNIQUE_ID, Optional.ofNullable(id));
 	}
 	
 	public EntityDragonEgg getEgg() {
 		UUID id = getEggID();
 		if (id != null) {
-			for (Entity ent : world.loadedEntityList) {
-				if (ent.getUniqueID().equals(id) && ent instanceof EntityDragonEgg) {
-					return (EntityDragonEgg) ent;
-				}
+			Entity entRaw = Entities.FindEntity(world, id);
+			if (entRaw != null && entRaw instanceof EntityDragonEgg) {
+				return (EntityDragonEgg) entRaw;
 			}
 			
 			// Means we didn't find the egg.
@@ -656,7 +658,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	public LivingEntity getOwner() {
 		try {
 			UUID uuid = this.getOwnerId();
-			return uuid == null ? null : this.world.getPlayerEntityByUUID(uuid);
+			return uuid == null ? null : this.world.getPlayerByUuid(uuid);
 		} catch (IllegalArgumentException var2) {
 			return null;
 		}
@@ -667,7 +669,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	}
 	
 	public void writeAdditional(CompoundNBT compound) {
-		super.writeEntityToNBT(compound);
+		super.writeAdditional(compound);
 
 		if (this.getOwnerId() == null) {
 			compound.putString(NBT_OWNER_ID, "");
@@ -675,9 +677,9 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 			compound.putString(NBT_OWNER_ID, this.getOwnerId().toString());
 		}
 		
-		compound.setUniqueId(NBT_SOUL_ID, soulID);
+		compound.putUniqueId(NBT_SOUL_ID, soulID);
 		if (worldID != null) {
-			compound.setUniqueId(NBT_SOUL_WORLDID, worldID);
+			compound.putUniqueId(NBT_SOUL_WORLDID, worldID);
 		}
 		
 		compound.putBoolean(NBT_SITTING, this.isEntitySitting());
@@ -685,13 +687,13 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		
 		UUID eggID = this.getEggID();
 		if (eggID != null) {
-			compound.setUniqueId(NBT_EGG_ID, eggID);
+			compound.putUniqueId(NBT_EGG_ID, eggID);
 		}
 		
 		compound.putBoolean(NBT_SOUL_BOUND, this.isSoulBound());
 		
 		compound.putBoolean(NBT_CAP_FLY, this.getCanFly());
-		compound.setByte(NBT_CAP_JUMP, (byte) this.getBonusJumps());
+		compound.putByte(NBT_CAP_JUMP, (byte) this.getBonusJumps());
 		compound.putFloat(NBT_CAP_JUMPBOOST, this.getJumpHeightBonus());
 		compound.putFloat(NBT_CAP_SPEED, this.getSpeedBonus());
 		compound.putInt(NBT_CAP_MANA, this.getCurrentMana());
@@ -710,7 +712,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 				CompoundNBT tag = new CompoundNBT();
 				ItemStack stack = inventory.getStackInSlot(i);
 				if (!stack.isEmpty()) {
-					stack.writeToNBT(tag);
+					stack.write(tag);
 				}
 				
 				invTag.add(tag);
@@ -751,7 +753,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	 */
 	@Override
 	public void readAdditional(CompoundNBT compound) {
-		super.readEntityFromNBT(compound);
+		super.readAdditional(compound);
 		String s;
 
 		if (compound.contains("OwnerUUID", 8)) {
@@ -808,13 +810,13 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		// Read inventory
 		{
 			ListNBT list = compound.getList(NBT_INVENTORY, NBT.TAG_COMPOUND);
-			this.inventory = new InventoryBasic(this.getName(), true, DRAGON_INV_SIZE);
+			this.inventory = new Inventory(DRAGON_INV_SIZE);
 			
 			for (int i = 0; i < DRAGON_INV_SIZE; i++) {
-				CompoundNBT tag = list.getCompoundTagAt(i);
+				CompoundNBT tag = list.getCompound(i);
 				ItemStack stack = ItemStack.EMPTY;
 				if (tag != null) {
-					stack = new ItemStack(tag);
+					stack = ItemStack.read(tag);
 				}
 				this.inventory.setInventorySlotContents(i, stack);
 			}
@@ -843,7 +845,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 //				}
 //			}
 		} else {
-			this.spellInventory = new RedDragonSpellInventory(this.getName() + " Empty Spell Inventory", true);
+			this.spellInventory = new RedDragonSpellInventory();
 		}
 		
 		this.setWasHatched(compound.getBoolean(NBT_HATCHED));
@@ -905,13 +907,13 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	
 	private void playTameEffect(boolean success) {
 		
-		ParticleTypes ParticleTypes = success ? ParticleTypes.HEART : ParticleTypes.VILLAGER_ANGRY;
+		IParticleData particle = success ? ParticleTypes.HEART : ParticleTypes.ANGRY_VILLAGER;
 
 		for (int i = 0; i < 15; ++i) {
 			double d0 = this.rand.nextGaussian() * 0.02D;
 			double d1 = this.rand.nextGaussian() * 0.02D;
 			double d2 = this.rand.nextGaussian() * 0.02D;
-			this.world.addParticle(ParticleTypes, this.posX + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.posZ + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, d0, d1, d2, new int[0]);
+			this.world.addParticle(particle, this.posX + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), this.posY + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.posZ + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), d0, d1, d2);
 		}
 	}
 	
@@ -1261,11 +1263,9 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 			}
 
 			if (myOwner != null) {
-				
-				if (entityIn instanceof IEntityOwnable) {
-					if (((IEntityOwnable) entityIn).getOwner() == myOwner) {
-						return true;
-					}
+				LivingEntity theirOwner = NostrumMagica.getOwner(entityIn);
+				if (theirOwner == myOwner) {
+					return true;
 				}
 				
 				return myOwner.isOnSameTeam(entityIn);
@@ -1304,7 +1304,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	 */
 	@Override
 	public void onDeath(DamageSource cause) {
-		if (this.getOwner() != null && !this.world.isRemote && this.world.getGameRules().getBoolean("showDeathMessages") && this.getOwner() instanceof ServerPlayerEntity) {
+		if (this.getOwner() != null && !this.world.isRemote && this.world.getGameRules().getBoolean(GameRules.SHOW_DEATH_MESSAGES) && this.getOwner() instanceof ServerPlayerEntity) {
 			this.getOwner().sendMessage(this.getCombatTracker().getDeathMessage());
 		}
 		
@@ -1380,7 +1380,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
     }
 	
 	@Override
-	protected boolean canDespawn() {
+	public boolean canDespawn(double nearestPlayer) {
 		return !this.wasHatched() && !this.isTamed();
 	}
 	
@@ -1394,10 +1394,10 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		
 		// Check world ID (if soul is saved) and make sure our worldkey matches.
 		if (!world.isRemote && this.worldID != null && this.ticksExisted % 20 == 1) {
-			if (!NostrumMagica.getPetSoulRegistry().checkCurrentWorldID(this)) {
+			if (!NostrumMagica.instance.getPetSoulRegistry().checkCurrentWorldID(this)) {
 				NostrumMagica.logger.info("Removing entity " + this + " as its world ID doesn't match: " + (this.worldID == null ? "NULL" : worldID));
 				this.remove();
-				this.world.removeEntity(this);
+				//((ServerWorld) this.world).removeEntity(this);
 				return;
 			}
 		}
@@ -1414,7 +1414,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 			// If strong flight gets added here, this should be adjusted so that strong flight can flap when standing still, etc.
 			// Checking whether motion is high is great for gliding but probably won't work well if the dragon can wade basically
 			if (this.isFlying() && !this.getWingFlapping()) {
-				final double motion = Math.abs(motionX) + Math.abs(motionZ);
+				final Vec3d curMotion = this.getMotion();
+				final double motion = Math.abs(curMotion.x) + Math.abs(curMotion.z);
 				
 				final double glideStallMotion = .4;
 				boolean flap = false;
@@ -1445,7 +1446,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 			if (this.considerFlying()) {
 				if (this.getMotion().y < 0.0D) {
 					double relief = Math.min(1.0D, Math.abs(this.getMotion().x) + Math.abs(this.getMotion().z));
-					this.getMotion().y *= (1D - (0.9D * relief));				
+					this.setMotion(this.getMotion().mul(1, 1D - (0.9D * relief), 1));
 				}
 			}
 		} else {
@@ -1485,7 +1486,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 //	}
 	
 	@Override
-	public void travel(float strafe, float vertical, float forward) {
+	public void travel(Vec3d motion /*float strafe, float vertical, float forward*/) {
 		
 		if (this.onGround && this.getMotion().y <= 0) {
 			this.jumpCount = 0;
@@ -1499,8 +1500,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 			this.setRotation(this.rotationYaw, this.rotationPitch);
 			this.renderYawOffset = this.rotationYaw;
 			this.rotationYawHead = this.renderYawOffset;
-			strafe = entitylivingbase.moveStrafing * 0.45F;
-			forward = entitylivingbase.moveForward * .7f;
+			float strafe = entitylivingbase.moveStrafing * 0.45F;
+			float forward = entitylivingbase.moveForward * .7f;
 
 			if (forward < 0.0F)
 			{
@@ -1524,13 +1525,11 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 //				}
 				
 				this.setAIMoveSpeed((float)this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue());
-				super.travel(strafe, vertical, forward);
+				super.travel(new Vec3d(strafe, motion.y, forward));
 			}
 			else if (entitylivingbase instanceof PlayerEntity)
 			{
-				this.getMotion().x = 0.0D;
-				this.getMotion().y = 0.0D;
-				this.getMotion().z = 0.0D;
+				this.setMotion(Vec3d.ZERO);
 			}
 
 			this.prevLimbSwingAmount = this.limbSwingAmount;
@@ -1549,7 +1548,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		else
 		{
 			this.jumpMovementFactor = 0.02F;
-			super.travel(strafe, vertical, forward);
+			super.travel(motion);
 		}
 	}
 	
@@ -1620,7 +1619,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 				if (owner != null && owner instanceof PlayerEntity) {
 					((PlayerEntity) this.getOwner()).sendMessage(new TranslationTextComponent("info.tamed_dragon.hurt", this.getName()));
 				}
-				this.dismountRidingEntity();
+				this.stopRiding();
 			} else if (health > 0f) {
 				if (source.getTrueSource() == owner) {
 					// Hurt by the owner!
@@ -1870,7 +1869,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 			}
 		}
 		
-		if (target instanceof EntityZombie || target instanceof PlayerEntity) {
+		if (target instanceof ZombieEntity || target instanceof PlayerEntity) {
 			this.heal(2);
 		}
 		
@@ -1895,7 +1894,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		if (owner != null && owner instanceof PlayerEntity) {
 			player = (PlayerEntity) owner;
 		}
-		EntityDragonEgg egg = new EntityDragonEgg(world, player, this.rollInheritedStats());
+		EntityDragonEgg egg = new EntityDragonEgg(NostrumEntityTypes.dragonEgg, world, player, this.rollInheritedStats());
 		egg.setPosition((int) posX + .5, (int) posY, (int) posZ + .5);
 		if (world.addEntity(egg)) {
 			this.setEggId(egg.getUniqueID());
@@ -1958,7 +1957,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		return dataManager.get(DATA_PET_ACTION);
 	}
 	
-	public static class RedDragonSpellInventory extends InventoryBasic {
+	public static class RedDragonSpellInventory extends Inventory {
 		
 		public static final int MaxSpellsPerCategory = 5;
 		private static final int TargetSpellIndex = 0;
@@ -1972,8 +1971,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		// Gambits we keep here
 		private EntityDragonGambit gambits[];
 
-		public RedDragonSpellInventory(String title, boolean customName) {
-			super(title, customName, MaxSpellsPerCategory * 3);
+		public RedDragonSpellInventory() {
+			super(MaxSpellsPerCategory * 3);
 			gambits = new EntityDragonGambit[MaxSpellsPerCategory * 3];
 			Arrays.fill(gambits, EntityDragonGambit.ALWAYS);
 		}
@@ -2102,7 +2101,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 					
 					ItemStack stack = this.getStackInSlot(i);
 					if (!stack.isEmpty()) {
-						stack.writeToNBT(tag);
+						stack.write(tag);
 					}
 					
 					list.add(tag);
@@ -2131,17 +2130,17 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		}
 		
 		public static RedDragonSpellInventory fromNBT(CompoundNBT nbt) {
-			RedDragonSpellInventory inv = new RedDragonSpellInventory("Red Dragon Spell Inventory", true);
+			RedDragonSpellInventory inv = new RedDragonSpellInventory();
 			
 			// Item inventory
 			{
 				ListNBT list = nbt.getList(NBT_ITEMS, NBT.TAG_COMPOUND);
 				if (list != null) {
 					for (int i = 0; i < inv.getSizeInventory(); i++) {
-						CompoundNBT tag = list.getCompoundTagAt(i);
+						CompoundNBT tag = list.getCompound(i);
 						ItemStack stack = ItemStack.EMPTY;
 						if (tag != null) {
-							stack = new ItemStack(tag);
+							stack = ItemStack.read(tag);
 						}
 						inv.setInventorySlotContents(i, stack);
 					}
@@ -2401,7 +2400,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 
 		@Override
 		public EntityTameDragonRed spawnDragon(World world, double x, double y, double z) {
-			EntityTameDragonRed dragon = new EntityTameDragonRed(world);
+			EntityTameDragonRed dragon = new EntityTameDragonRed(NostrumEntityTypes.tameDragonRed, world);
 			dragon.setPosition(x, y, z);
 			apply(dragon);
 			return dragon;
@@ -2539,6 +2538,11 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public CompoundNBT serializeNBT() {
+		return super.serializeNBT();
 	}
 	
 }

@@ -6,7 +6,6 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -72,8 +71,8 @@ public abstract class EntityDragonRedBase extends EntityDragonFlying {
 	}
 	
 	@Override
-	protected void registerData() { int unused; // TODO
-		super.entityInit();
+	protected void registerData() {
+		super.registerData();
 		this.dataManager.register(DRAGON_SLASH, false);
 		this.dataManager.register(DRAGON_BITE, false);
 		this.dataManager.register(DRAGON_CASTING, false);
@@ -112,7 +111,7 @@ public abstract class EntityDragonRedBase extends EntityDragonFlying {
 			f *= 1.6;
 		}
 		
-		int i = 0;
+		int i = 0; // knockback
 
 		i = 2;
 
@@ -123,8 +122,7 @@ public abstract class EntityDragonRedBase extends EntityDragonFlying {
 			if (i > 0)
 			{
 				target.knockBack(this, (float)i * 0.5F, (double)MathHelper.sin(this.rotationYaw * 0.017453292F), (double)(-MathHelper.cos(this.rotationYaw * 0.017453292F)));
-				this.getMotion().x *= 0.6D;
-				this.getMotion().z *= 0.6D;
+				this.setMotion(this.getMotion().mul(.6, 1, .6));
 			}
 
 			if (target instanceof PlayerEntity)
@@ -132,13 +130,14 @@ public abstract class EntityDragonRedBase extends EntityDragonFlying {
 				PlayerEntity entityplayer = (PlayerEntity)target;
 				ItemStack itemstack1 = entityplayer.isHandActive() ? entityplayer.getActiveItemStack() : ItemStack.EMPTY;
 
-				if (!itemstack1.isEmpty() && itemstack1.getItem() == Items.SHIELD)
+				if (!itemstack1.isEmpty() && itemstack1.isShield(entityplayer))
 				{
 					float f1 = 0.5F;
 
 					if (this.rand.nextFloat() < f1)
 					{
-						entityplayer.getCooldownTracker().setCooldown(Items.SHIELD, 100);
+						// Note: Vanilla puts the attacking item on cooldown here instead of the blocking one?
+						entityplayer.getCooldownTracker().setCooldown(itemstack1.getItem(), 100);
 						this.world.setEntityState(entityplayer, (byte)30);
 					}
 				}

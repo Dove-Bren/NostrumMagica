@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.entity.IMultiPartEntity;
 import com.smanzana.nostrummagica.entity.MultiPartEntityPart;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonAIAggroTable;
@@ -17,9 +18,6 @@ import com.smanzana.nostrummagica.entity.tasks.dragon.DragonLandTask;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonMeleeAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonSummonShadowAttack;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonTakeoffLandTask;
-import com.smanzana.nostrummagica.items.DragonEggFragment;
-import com.smanzana.nostrummagica.items.NostrumSkillItem;
-import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
@@ -39,23 +37,21 @@ import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.IEntityMultiPart;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.HurtByTargetGoal;
-import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.monster.EntityGiantZombie;
-import net.minecraft.entity.monster.EntityPolarBear;
-import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.entity.passive.EntityCow;
-import net.minecraft.entity.passive.EntityHorse;
-import net.minecraft.entity.passive.EntityPig;
-import net.minecraft.entity.passive.EntitySheep;
-import net.minecraft.entity.passive.EntityVillager;
+import net.minecraft.entity.ai.goal.HurtByTargetGoal;
+import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
+import net.minecraft.entity.merchant.villager.VillagerEntity;
+import net.minecraft.entity.monster.GiantEntity;
+import net.minecraft.entity.monster.ZombieEntity;
+import net.minecraft.entity.passive.CowEntity;
+import net.minecraft.entity.passive.PigEntity;
+import net.minecraft.entity.passive.PolarBearEntity;
+import net.minecraft.entity.passive.SheepEntity;
+import net.minecraft.entity.passive.horse.HorseEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -63,11 +59,11 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BossInfo;
-import net.minecraft.world.BossInfoServer;
+import net.minecraft.world.ServerBossInfo;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class EntityDragonRed extends EntityDragonRedBase implements IEntityMultiPart {
+public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEntity {
 
 	private static enum DragonBodyPartType {
 		BODY("body", 2.5f, 3f, Vec3d.ZERO),
@@ -85,8 +81,8 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 		
 		private DragonBodyPartType(String name, float width, float height, Vec3d offset) {
 			this.name = name;
-			this.getWidth = width;
-			this.getHeight() = height;
+			this.width = width;
+			this.height = height;
 			this.offset = offset;
 		}
 		
@@ -214,7 +210,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 		}
 	}
 	
-	private final BossInfoServer bossInfo = (BossInfoServer)(new BossInfoServer(this.getDisplayName(), BossInfo.Color.RED, BossInfo.Overlay.NOTCHED_10)).setDarkenSky(true);
+	private final ServerBossInfo bossInfo = (ServerBossInfo)(new ServerBossInfo(this.getDisplayName(), BossInfo.Color.RED, BossInfo.Overlay.NOTCHED_10)).setDarkenSky(true);
 	
 	// AI. First array is indexed by the phase. Second is just a collection of tasks.
 	private Goal[][] flyingAI;
@@ -236,8 +232,8 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
         this.noClip = false;
         
         bodyParts = new EnumMap<>(DragonBodyPartType.class);
-        for (DragonBodyPartType type : DragonBodyPartType.values()) {
-        	bodyParts.put(type, new DragonBodyPart(type, this));
+        for (DragonBodyPartType partType : DragonBodyPartType.values()) {
+        	bodyParts.put(partType, new DragonBodyPart(partType, this));
         }
 	}
 	
@@ -325,14 +321,14 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
         	new Goal[] {
     			shadowAttack,
         		new DragonMeleeAttackTask(this, 1.0D, true),
-        		new EntityAIWander(this, 1.0D, 30)
+        		new WaterAvoidingRandomWalkingGoal(this, 1.0D, 30)
         	},
         	new Goal[] {
     			shadowAttack,
         		new DragonSpellAttackTask(this, (5 * 5), 20, true, null, DRAGON_CAST_TIME, DSPELL_Fireball),
         		new DragonTakeoffLandTask(this),
     			new DragonMeleeAttackTask(this, 1.0D, true),
-        		new EntityAIWander(this, 1.0D, 30)
+        		new WaterAvoidingRandomWalkingGoal(this, 1.0D, 30)
         	},
         	new Goal[] {
     			shadowAttack,
@@ -342,24 +338,24 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 				new DragonSpellAttackTask(this, (5 * 12), 10, false, null, DRAGON_CAST_TIME, DSPELL_Speed, DSPELL_Shield),
 				new DragonSpellAttackTask(this, (5 * 10), 20, false, null, DRAGON_CAST_TIME, DSPELL_Weaken),
 				new DragonSpellAttackTask(this, (5 * 45), 20, true, null, DRAGON_CAST_TIME, DSPELL_Curse),
-        		new EntityAIWander(this, 1.0D, 30)
+        		new WaterAvoidingRandomWalkingGoal(this, 1.0D, 30)
         	}
         		
         };
 		
 //      this.goalSelector.addGoal(1, new SwimGoal(this));
-//		this.goalSelector.addGoal(4, new EntityAIWander(this, 1.0D, 30));
+//		this.goalSelector.addGoal(4, new WaterAvoidingRandomWalkingGoal(this, 1.0D, 30));
         this.targetSelector.addGoal(1, aggroTable);
         this.targetSelector.addGoal(2, new HurtByTargetGoal(this));
 		this.targetSelector.addGoal(3, new DragonAINearestAttackableTarget<PlayerEntity>(this, PlayerEntity.class, true));
-		this.targetSelector.addGoal(4, new DragonAINearestAttackableTarget<EntityZombie>(this, EntityZombie.class, true));
-		this.targetSelector.addGoal(5, new DragonAINearestAttackableTarget<EntitySheep>(this, EntitySheep.class, true));
-		this.targetSelector.addGoal(6, new DragonAINearestAttackableTarget<EntityCow>(this, EntityCow.class, true));
-		this.targetSelector.addGoal(7, new DragonAINearestAttackableTarget<EntityPig>(this, EntityPig.class, true));
-		this.targetSelector.addGoal(8, new DragonAINearestAttackableTarget<EntityVillager>(this, EntityVillager.class, true));
-		this.targetSelector.addGoal(9, new DragonAINearestAttackableTarget<EntityHorse>(this, EntityHorse.class, true));
-		this.targetSelector.addGoal(10, new DragonAINearestAttackableTarget<EntityGiantZombie>(this, EntityGiantZombie.class, true));
-		this.targetSelector.addGoal(11, new DragonAINearestAttackableTarget<EntityPolarBear>(this, EntityPolarBear.class, true));
+		this.targetSelector.addGoal(4, new DragonAINearestAttackableTarget<ZombieEntity>(this, EntityZombie.class, true));
+		this.targetSelector.addGoal(5, new DragonAINearestAttackableTarget<SheepEntity>(this, EntitySheep.class, true));
+		this.targetSelector.addGoal(6, new DragonAINearestAttackableTarget<CowEntity>(this, EntityCow.class, true));
+		this.targetSelector.addGoal(7, new DragonAINearestAttackableTarget<PigEntity>(this, EntityPig.class, true));
+		this.targetSelector.addGoal(8, new DragonAINearestAttackableTarget<VillagerEntity>(this, EntityVillager.class, true));
+		this.targetSelector.addGoal(9, new DragonAINearestAttackableTarget<HorseEntity>(this, EntityHorse.class, true));
+		this.targetSelector.addGoal(10, new DragonAINearestAttackableTarget<GiantEntity>(this, EntityGiantZombie.class, true));
+		this.targetSelector.addGoal(11, new DragonAINearestAttackableTarget<PolarBearEntity>(this, EntityPolarBear.class, true));
 	}
 	
 	@Override
@@ -368,7 +364,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 		// Remove grounded
 		if (lastAI != null) {
 			for (Goal ai : lastAI) {
-				this.tasks.removeTask(ai);
+				this.goalSelector.removeGoal(ai);
 			}
 		}
 		
@@ -388,7 +384,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 		// Remove flying
 		if (lastAI != null) {
 			for (Goal ai : lastAI) {
-				this.tasks.removeTask(ai);
+				this.goalSelector.removeGoal(ai);
 			}
 		}
 		
@@ -403,7 +399,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 	
 	@Override
 	protected void registerGoals() {
-		super.initEntityAI();
+		super.registerGoals();
 		this.initBaseAI();
 		
 		if (isFlying()) {
@@ -426,13 +422,13 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
     }
 	
 	@Override
-	protected void registerData() { int unused; // TODO
-		super.entityInit();
+	protected void registerData() {
+		super.registerData();
 		this.dataManager.register(DRAGON_PHASE, DragonPhase.GROUNDED_PHASE.ordinal());
 	}
 	
 	@Override
-	protected boolean canDespawn() {
+	public boolean canDespawn(double nearestPlayer) {
 		return false;
 	}
 	
@@ -440,12 +436,13 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 		return true;
 	}
 	
+	@Override
 	public boolean isNonBoss() {
 		return false;
 	}
 	
 	public void readAdditional(CompoundNBT compound) {
-		super.readEntityFromNBT(compound);
+		super.readAdditional(compound);
 
 		if (compound.contains(DRAGON_SERIAL_PHASE_TOK, NBT.TAG_ANY_NUMERIC)) {
         	int i = compound.getByte(DRAGON_SERIAL_PHASE_TOK);
@@ -453,13 +450,13 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
         }
 		
 		if (!this.world.isRemote) {
-			this.initEntityAI();
+			this.registerGoals(); // TODO this seems bad
 		}
 	}
 	
 	public void writeAdditional(CompoundNBT compound) {
-    	super.writeEntityToNBT(compound);
-    	compound.setByte(DRAGON_SERIAL_PHASE_TOK, (byte)this.getPhase().ordinal());
+    	super.writeAdditional(compound);
+    	compound.putByte(DRAGON_SERIAL_PHASE_TOK, (byte)this.getPhase().ordinal());
 	}
 	
 	protected void updateParts() {
@@ -559,20 +556,21 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 		return new Lore().add("Red Dragons are greedy creatures. They often live in abandoned castles, and have a strong fondness to anything that's shiny.", "According to some reports, Red Dragons are the only ones which are hatched from eggs.", "Nothing is known about what such eggs would look like.");
 	}
 	
-	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-		this.entityDropItem(new ItemStack(DragonEggFragment.instance()), 0);
-		
-		int count = this.getRNG().nextInt(2 + lootingModifier);
-		if (count != 0) {
-			this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.WING, count), 0);
-		}
-		
-		// Research scroll
-		int chances = 20 + (lootingModifier * 2);
-		if (rand.nextInt(100) < chances) {
-			this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.RESEARCH_SCROLL_SMALL, 1), 0);
-		}
-	}
+//	@Override
+//	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
+//		this.entityDropItem(new ItemStack(NostrumItems.dragonEggFragment), 0);
+//		
+//		int count = this.getRNG().nextInt(2 + lootingModifier);
+//		if (count != 0) {
+//			this.entityDropItem(new ItemStack(NostrumItems.resourceDragonWing, count), 0);
+//		}
+//		
+//		// Research scroll
+//		int chances = 20 + (lootingModifier * 2);
+//		if (rand.nextInt(100) < chances) {
+//			this.entityDropItem(new ItemStack(NostrumItems.skillScrollSmall, 1), 0);
+//		}
+//	}
 
 	@Override
 	public boolean attackEntityFromPart(MultiPartEntityPart dragonPart, DamageSource source, float damage) {
@@ -640,10 +638,10 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 		}
 	}
 	
-	private class DragonBodyPart extends MultiPartEntityPart {
+	protected class DragonBodyPart extends MultiPartEntityPart {
 		
-		private final DragonBodyPartType type;
-		private final EntityDragonRed parent;
+		protected final DragonBodyPartType type;
+		protected final EntityDragonRed parent;
 		
 		public DragonBodyPart(DragonBodyPartType type, EntityDragonRed parent) {
 			super(parent, type.name(), type.getWidth(), type.getHeight());

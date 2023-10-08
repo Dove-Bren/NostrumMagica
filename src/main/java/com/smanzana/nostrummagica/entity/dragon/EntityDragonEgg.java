@@ -1,23 +1,21 @@
 package com.smanzana.nostrummagica.entity.dragon;
 
 
+import java.util.Optional;
 import java.util.UUID;
 
-import java.util.Optional;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.dragon.IDragonSpawnData.IDragonSpawnFactory;
-import com.smanzana.nostrummagica.items.DragonEggFragment;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.block.BlockHay;
+import net.minecraft.block.HayBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -59,11 +57,11 @@ public class EntityDragonEgg extends MobEntity implements ILoreTagged {
 	}
 	
 	@Override
-	protected void registerData() { int unused; // TODO
-		super.entityInit();
+	protected void registerData() {
+		super.registerData();
 		
 		this.dataManager.register(HEAT, HEAT_MAX);
-		this.dataManager.register(PLAYER, Optional.<UUID>absent());
+		this.dataManager.register(PLAYER, Optional.<UUID>empty());
 	}
 
 	@Override
@@ -116,14 +114,14 @@ public class EntityDragonEgg extends MobEntity implements ILoreTagged {
 	
 	@Override
 	public void writeAdditional(CompoundNBT compound) {
-		super.writeEntityToNBT(compound);
+		super.writeAdditional(compound);
 		
 		compound.putFloat(NBT_HEAT, this.getHeat());
 		compound.putInt(NBT_AGE_TIMER, ageTimer);
 		
 		UUID playerID = getPlayerID();
 		if (playerID != null) {
-			compound.setUniqueId(NBT_PLAYER, getPlayerID());
+			compound.putUniqueId(NBT_PLAYER, getPlayerID());
 		}
 		
 		if (this.spawnData != null) {
@@ -136,7 +134,7 @@ public class EntityDragonEgg extends MobEntity implements ILoreTagged {
 	
 	@Override
 	public void readAdditional(CompoundNBT compound) {
-		super.readEntityFromNBT(compound);
+		super.readAdditional(compound);
 		
 		if (compound.contains(NBT_HEAT)) {
 			this.setHeat(compound.getFloat(NBT_HEAT));
@@ -167,7 +165,7 @@ public class EntityDragonEgg extends MobEntity implements ILoreTagged {
 				if (world.isRainingAt(getPosition())) {
 					heatLoss = .1f;
 				} else if (world.getLight(this.getPosition()) > 8) {
-					if (world.getBlockState(getPosition().add(0, -1, 0)).getBlock() instanceof BlockHay) {
+					if (world.getBlockState(getPosition().add(0, -1, 0)).getBlock() instanceof HayBlock) {
 						heatLoss = 0f;
 					}
 				}
@@ -194,7 +192,7 @@ public class EntityDragonEgg extends MobEntity implements ILoreTagged {
 		PlayerEntity player = null;
 		
 		if (id != null) {
-			player = this.world.getPlayerEntityByUUID(id);
+			player = this.world.getPlayerByUuid(id);
 		}
 		
 		return player;
@@ -205,7 +203,7 @@ public class EntityDragonEgg extends MobEntity implements ILoreTagged {
 	}
 	
 	private void setPlayerUUID(UUID id) {
-		dataManager.set(PLAYER, Optional.fromNullable(id));
+		dataManager.set(PLAYER, Optional.ofNullable(id));
 	}
 	
 	public float getHeat() {
@@ -220,9 +218,10 @@ public class EntityDragonEgg extends MobEntity implements ILoreTagged {
 		this.setHeat(this.getHeat() + .10f);
 	}
 	
-	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-		this.entityDropItem(new ItemStack(DragonEggFragment.instance(), 2), 0);
-	}
+//	@Override
+//	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
+//		this.entityDropItem(new ItemStack(NostrumItems.dragonEggFragment, 2), 0);
+//	}
 	
 	private void hatch() {
 		

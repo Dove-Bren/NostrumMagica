@@ -13,13 +13,12 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.utils.NonNullEnumMap;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
+import net.minecraft.entity.EntitySize;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.MoverType;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.MovementController;
+import net.minecraft.entity.Pose;
+import net.minecraft.entity.ai.controller.FlyingMovementController;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -27,43 +26,42 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
-import net.minecraft.pathfinding.NodeProcessor;
-import net.minecraft.pathfinding.PathFinder;
-import net.minecraft.pathfinding.PathNavigator;
-import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.pathfinding.PathPoint;
-import net.minecraft.util.Direction;
+import net.minecraft.pathfinding.FlyingNodeProcessor;
+import net.minecraft.pathfinding.FlyingPathNavigator;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public abstract class EntityDragon extends MonsterEntity implements ILoreTagged {
 	
+	//protected EntitySize size;
+	//protected AxisAlignedBB entityBBOverride;
+	
 	public EntityDragon(EntityType<? extends EntityDragon> type, World worldIn) {
         super(type, worldIn);
     }
 	
-	protected void setSize(float width, float length, float height) {
-		if (width != this.getWidth || height != this.getHeight()) {
-			float f = this.getWidth;
-			this.getWidth = width;
-			this.getHeight() = height;
-			AxisAlignedBB axisalignedbb = this.getBoundingBox();
-			this.setEntityBoundingBox(new AxisAlignedBB(axisalignedbb.minX, axisalignedbb.minY, axisalignedbb.minZ, axisalignedbb.minX + (double)this.getWidth, axisalignedbb.minY + (double)this.getHeight(), axisalignedbb.minZ + (double)length));
-
-			if (this.getWidth > f && !this.firstUpdate && !this.world.isRemote) {
-				this.move(MoverType.SELF, (double)(f - this.getWidth), 0.0D, (double)(f - length));
-			}
-		}
-	}
+//	protected void refreshBoundingBox() {
+//		AxisAlignedBB axisalignedbb = this.getBoundingBox();
+//		this.setBoundingBox(new AxisAlignedBB(axisalignedbb.minX, axisalignedbb.minY, axisalignedbb.minZ, axisalignedbb.minX + (double)this.getWidth(), axisalignedbb.minY + (double)this.getHeight(), axisalignedbb.minZ + (double)length));
+//	}
+//	
+//	protected void setSize(float width, float length, float height) {
+//		if (width != this.getWidth() || height != this.getHeight()) {
+//			float f = this.getWidth();
+//			this.getWidth() = width;
+//			this.getHeight() = height;
+//			AxisAlignedBB axisalignedbb = this.getBoundingBox();
+//			this.setBoundingBox(new AxisAlignedBB(axisalignedbb.minX, axisalignedbb.minY, axisalignedbb.minZ, axisalignedbb.minX + (double)this.getWidth(), axisalignedbb.minY + (double)this.getHeight(), axisalignedbb.minZ + (double)length));
+//
+//			if (this.getWidth() > f && !this.firstUpdate && !this.world.isRemote) {
+//				this.move(MoverType.SELF, (double)(f - this.getWidth()), 0.0D, (double)(f - length));
+//			}
+//		}
+//	}
     
 	/*
 	 * TODO: Make a 'FlyingDragon' abstract class. Move bite and slash data things to this class.
@@ -77,18 +75,21 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
 	}
     
 
+	@Override
     protected SoundEvent getHurtSound(DamageSource source) {
         return NostrumMagicaSounds.DRAGON_LAND_HURT.getEvent();
     }
 
+	@Override
     protected SoundEvent getDeathSound() {
     	return NostrumMagicaSounds.DRAGON_DEATH.getEvent();
     }
-    
+
+	@Override
     protected SoundEvent getAmbientSound() {
     	return NostrumMagicaSounds.DRAGON_IDLE.getEvent();
     }
-    
+
     protected SoundEvent getAttackSound() {
     	return NostrumMagicaSounds.DRAGON_BITE.getEvent();
     }
@@ -96,13 +97,13 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
     /**
      * Returns the volume for the sounds this mob makes.
      */
-    protected float getSoundVolume()
-    {
+	@Override
+    protected float getSoundVolume() {
         return 2F;
     }
 
-    protected float getStandingEyeHeight(Pose pose, EntitySize size)
-    {
+	@Override
+    protected float getStandingEyeHeight(Pose pose, EntitySize size) {
         return this.getHeight() * 0.95F;
     }
 
@@ -111,8 +112,8 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
         return false;
     }
 
-    public boolean canBeLeashedTo(PlayerEntity player)
-    {
+	@Override
+    public boolean canBeLeashedTo(PlayerEntity player) {
         return false;
     }
 
@@ -135,240 +136,355 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
 	
 	public abstract boolean isCasting();
 	
-	static class DragonFlyMoveHelper extends MovementController
-    {
-        private final EntityDragon parentEntity;
-        private double lastDist;
-        private int courseChangeCooldown;
+	static class DragonFlyMoveHelper extends FlyingMovementController {
+        protected final EntityDragon parentEntity;
+        //private double lastDist;
+        //private int courseChangeCooldown;
 
-        public DragonFlyMoveHelper(EntityDragon dragon)
-        {
+        public DragonFlyMoveHelper(EntityDragon dragon) {
             super(dragon);
             this.parentEntity = dragon;
         }
 
-        public void onUpdateMoveHelper()
-        {
-//        	if (this.action == MovementController.Action.STRAFE)
-//    		{
-//    			float f = (float)this.entity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue();
-//    			float f1 = (float)this.speed * f;
-//    			float f2 = this.moveForward;
-//    			float f3 = this.moveStrafe;
-//    			float f4 = MathHelper.sqrt(f2 * f2 + f3 * f3);
+//        public void onUpdateMoveHelper() {
+////        	if (this.action == MovementController.Action.STRAFE)
+////    		{
+////    			float f = (float)this.entity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue();
+////    			float f1 = (float)this.speed * f;
+////    			float f2 = this.moveForward;
+////    			float f3 = this.moveStrafe;
+////    			float f4 = MathHelper.sqrt(f2 * f2 + f3 * f3);
+////
+////    			if (f4 < 1.0F)
+////    			{
+////    				f4 = 1.0F;
+////    			}
+////
+////    			f4 = f1 / f4;
+////    			f2 = f2 * f4;
+////    			f3 = f3 * f4;
+////    			float f5 = MathHelper.sin(this.entity.rotationYaw * 0.017453292F);
+////    			float f6 = MathHelper.cos(this.entity.rotationYaw * 0.017453292F);
+////    			float f7 = f2 * f6 - f3 * f5;
+////    			float f8 = f3 * f6 + f2 * f5;
+////    			PathNavigator PathNavigator = this.entity.getNavigator();
+////
+////    			if (PathNavigator != null)
+////    			{
+////    				NodeProcessor nodeprocessor = PathNavigator.getNodeProcessor();
+////
+////    				if (nodeprocessor != null && nodeprocessor.getPathNodeType(this.entity.world, MathHelper.floor(this.entity.posX + (double)f7), MathHelper.floor(this.entity.posY), MathHelper.floor(this.entity.posZ + (double)f8)) != PathNodeType.OPEN)
+////    				{
+////    					this.moveForward = 1.0F;
+////    					this.moveStrafe = 0.0F;
+////    					f1 = f;
+////    				}
+////    			}
+////
+////    			this.entity.setAIMoveSpeed(f * 3);
+////    			this.entity.setMoveForward(this.moveForward);
+////    			this.entity.setMoveStrafing(this.moveStrafe);
+////    			this.action = MovementController.Action.WAIT;
+////    		}
+////        	else 
+//        	if (this.action == MovementController.Action.MOVE_TO)
+//            {
+//                double d0 = this.posX - this.parentEntity.posX;
+//                double d1 = this.posY - this.parentEntity.posY;
+//                double d2 = this.posZ - this.parentEntity.posZ;
+//                double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 //
-//    			if (f4 < 1.0F)
-//    			{
-//    				f4 = 1.0F;
-//    			}
-//
-//    			f4 = f1 / f4;
-//    			f2 = f2 * f4;
-//    			f3 = f3 * f4;
-//    			float f5 = MathHelper.sin(this.entity.rotationYaw * 0.017453292F);
-//    			float f6 = MathHelper.cos(this.entity.rotationYaw * 0.017453292F);
-//    			float f7 = f2 * f6 - f3 * f5;
-//    			float f8 = f3 * f6 + f2 * f5;
-//    			PathNavigator PathNavigator = this.entity.getNavigator();
-//
-//    			if (PathNavigator != null)
-//    			{
-//    				NodeProcessor nodeprocessor = PathNavigator.getNodeProcessor();
-//
-//    				if (nodeprocessor != null && nodeprocessor.getPathNodeType(this.entity.world, MathHelper.floor(this.entity.posX + (double)f7), MathHelper.floor(this.entity.posY), MathHelper.floor(this.entity.posZ + (double)f8)) != PathNodeType.OPEN)
-//    				{
-//    					this.moveForward = 1.0F;
-//    					this.moveStrafe = 0.0F;
-//    					f1 = f;
-//    				}
-//    			}
-//
-//    			this.entity.setAIMoveSpeed(f * 3);
-//    			this.entity.setMoveForward(this.moveForward);
-//    			this.entity.setMoveStrafing(this.moveStrafe);
-//    			this.action = MovementController.Action.WAIT;
-//    		}
-//        	else 
-        	if (this.action == MovementController.Action.MOVE_TO)
-            {
-                double d0 = this.posX - this.parentEntity.posX;
-                double d1 = this.posY - this.parentEntity.posY;
-                double d2 = this.posZ - this.parentEntity.posZ;
-                double d3 = d0 * d0 + d1 * d1 + d2 * d2;
-
-                d3 = (double)MathHelper.sqrt(d3);
-                
-                if (Math.abs(d3) < 1) {
-                	lastDist = 0.0D;
-                	this.action = MovementController.Action.WAIT;
-                } else if (lastDist != 0.0D && Math.abs(lastDist - d3) < 0.05) {
-                	courseChangeCooldown--;
-                } else {
-                	courseChangeCooldown = this.parentEntity.getRNG().nextInt(5) + 10;
-                }
-                
-                if (courseChangeCooldown <= 0) {
-                	lastDist = 0.0D;
-                	this.action = MovementController.Action.WAIT;
-                } else {
-                	float speed = (float) this.parentEntity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue();
-                	speed *= 3f;
-	                this.parentEntity.getMotion().x = (d0 / d3) * speed;
-	                this.parentEntity.getMotion().y = (d1 / d3) * speed;
-	                this.parentEntity.getMotion().z = (d2 / d3) * speed;
-	                
-	                lastDist = d3;
-	                
-	                float f9 = (float)(MathHelper.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
-	                this.entity.rotationYaw = this.limitAngle(this.entity.rotationYaw, f9, 90.0F);
-                }
-            }
-        }
+//                d3 = (double)MathHelper.sqrt(d3);
+//                
+//                if (Math.abs(d3) < 1) {
+//                	lastDist = 0.0D;
+//                	this.action = MovementController.Action.WAIT;
+//                } else if (lastDist != 0.0D && Math.abs(lastDist - d3) < 0.05) {
+//                	courseChangeCooldown--;
+//                } else {
+//                	courseChangeCooldown = this.parentEntity.getRNG().nextInt(5) + 10;
+//                }
+//                
+//                if (courseChangeCooldown <= 0) {
+//                	lastDist = 0.0D;
+//                	this.action = MovementController.Action.WAIT;
+//                } else {
+//                	float speed = (float) this.parentEntity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue();
+//                	speed *= 3f;
+//                	this.parentEntity.setMotion(
+//                			(d0 / d3) * speed,
+//                			(d1 / d3) * speed,
+//                			(d2 / d3) * speed
+//                			);
+//	                
+//	                lastDist = d3;
+//	                
+//	                float f9 = (float)(MathHelper.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
+//	                this.mob.rotationYaw = this.limitAngle(this.mob.rotationYaw, f9, 90.0F);
+//                }
+//            }
+//        }
     }
 	
-	static public class FlyNodeProcessor extends NodeProcessor
-	{
-	    public PathPoint getStart()
-	    {
-	        return this.openPoint(MathHelper.floor(this.entity.getBoundingBox().minX), MathHelper.floor(this.entity.getBoundingBox().minY + 0.5D), MathHelper.floor(this.entity.getBoundingBox().minZ));
-	    }
-
-	    /**
-	     * Returns PathPoint for given coordinates
-	     */
-	    public PathPoint getPathPointToCoords(double x, double y, double z)
-	    {
-	        return this.openPoint(MathHelper.floor(x - (double)(this.entity.getWidth / 2.0F)), MathHelper.floor(y + 0.5D), MathHelper.floor(z - (double)(this.entity.getWidth / 2.0F)));
-	    }
-
-	    public int findPathOptions(PathPoint[] pathOptions, PathPoint currentPoint, PathPoint targetPoint, float maxDistance)
-	    {
-	        int i = 0;
-
-	        for (Direction enumfacing : Direction.values())
-	        {
-	            PathPoint pathpoint = this.getAirNode(currentPoint.x + enumfacing.getFrontOffsetX(), currentPoint.y + enumfacing.getFrontOffsetY(), currentPoint.z + enumfacing.getFrontOffsetZ());
-
-	            if (pathpoint != null && !pathpoint.visited && pathpoint.distanceTo(targetPoint) < maxDistance)
-	            {
-	                pathOptions[i++] = pathpoint;
-	            }
-	        }
-
-	        return i;
-	    }
-
-	    public PathNodeType getPathNodeType(IBlockAccess blockaccessIn, int x, int y, int z, MobEntity entitylivingIn, int xSize, int ySize, int zSize, boolean canBreakDoorsIn, boolean canEnterDoorsIn)
-	    {
-	        return PathNodeType.OPEN;
-	    }
-
-	    public PathNodeType getPathNodeType(IBlockAccess blockaccessIn, int x, int y, int z)
-	    {
-	        return PathNodeType.OPEN;
-	    }
-
-	    @Nullable
-	    private PathPoint getAirNode(int p_186328_1_, int p_186328_2_, int p_186328_3_)
-	    {
-	        PathNodeType pathnodetype = this.isFree(p_186328_1_, p_186328_2_, p_186328_3_);
-	        return pathnodetype == PathNodeType.OPEN ? this.openPoint(p_186328_1_, p_186328_2_, p_186328_3_) : null;
-	    }
-
-	    private PathNodeType isFree(int p_186327_1_, int p_186327_2_, int p_186327_3_)
-	    {
-	        BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
-
-	        for (int i = p_186327_1_; i < p_186327_1_ + this.entitySizeX; ++i)
-	        {
-	            for (int j = p_186327_2_; j < p_186327_2_ + this.entitySizeY; ++j)
-	            {
-	                for (int k = p_186327_3_; k < p_186327_3_ + this.entitySizeZ; ++k)
-	                {
-	                    BlockState iblockstate = this.blockaccess.getBlockState(blockpos$mutableblockpos.setPos(i, j, k));
-
-	                    if (iblockstate.getMaterial() != Material.AIR)
-	                    {
-	                        return PathNodeType.BLOCKED;
-	                    }
-	                }
-	            }
-	        }
-
-	        return PathNodeType.OPEN;
-	    }
+	static public class FlyNodeProcessor extends FlyingNodeProcessor {
+//	    public PathPoint getStart() {
+//	        return this.openPoint(MathHelper.floor(this.entity.getBoundingBox().minX), MathHelper.floor(this.entity.getBoundingBox().minY + 0.5D), MathHelper.floor(this.entity.getBoundingBox().minZ));
+//	    }
+//
+//	    /**
+//	     * Returns PathPoint for given coordinates
+//	     */
+//	    public PathPoint getPathPointToCoords(double x, double y, double z) {
+//	        return this.openPoint(MathHelper.floor(x - (double)(this.entity.getWidth() / 2.0F)), MathHelper.floor(y + 0.5D), MathHelper.floor(z - (double)(this.entity.getWidth() / 2.0F)));
+//	    }
+//
+//	    public int findPathOptions(PathPoint[] pathOptions, PathPoint currentPoint, PathPoint targetPoint, float maxDistance) {
+//	        int i = 0;
+//
+//	        for (Direction enumfacing : Direction.values()) {
+//	            PathPoint pathpoint = this.getAirNode(currentPoint.x + enumfacing.getXOffset(), currentPoint.y + enumfacing.getYOffset(), currentPoint.z + enumfacing.getZOffset());
+//
+//	            if (pathpoint != null && !pathpoint.visited && pathpoint.distanceTo(targetPoint) < maxDistance) {
+//	                pathOptions[i++] = pathpoint;
+//	            }
+//	        }
+//
+//	        return i;
+//	    }
+//
+//	    public PathNodeType getPathNodeType(IBlockReader blockaccessIn, int x, int y, int z, MobEntity entitylivingIn, int xSize, int ySize, int zSize, boolean canBreakDoorsIn, boolean canEnterDoorsIn) {
+//	        return PathNodeType.OPEN;
+//	    }
+//
+//	    public PathNodeType getPathNodeType(IBlockReader blockaccessIn, int x, int y, int z) {
+//	        return PathNodeType.OPEN;
+//	    }
+//
+//	    @Nullable
+//	    private PathPoint getAirNode(int p_186328_1_, int p_186328_2_, int p_186328_3_) {
+//	        PathNodeType pathnodetype = this.isFree(p_186328_1_, p_186328_2_, p_186328_3_);
+//	        return pathnodetype == PathNodeType.OPEN ? this.openPoint(p_186328_1_, p_186328_2_, p_186328_3_) : null;
+//	    }
+//
+//	    private PathNodeType isFree(int p_186327_1_, int p_186327_2_, int p_186327_3_) {
+//	        BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+//
+//	        for (int i = p_186327_1_; i < p_186327_1_ + this.entitySizeX; ++i)
+//	        {
+//	            for (int j = p_186327_2_; j < p_186327_2_ + this.entitySizeY; ++j)
+//	            {
+//	                for (int k = p_186327_3_; k < p_186327_3_ + this.entitySizeZ; ++k)
+//	                {
+//	                    BlockState iblockstate = this.blockaccess.getBlockState(blockpos$mutableblockpos.setPos(i, j, k));
+//
+//	                    if (iblockstate.getMaterial() != Material.AIR)
+//	                    {
+//	                        return PathNodeType.BLOCKED;
+//	                    }
+//	                }
+//	            }
+//	        }
+//
+//	        return PathNodeType.OPEN;
+//	    }
+//	    
+//	    @Override
+//	    public FlaggedPathPoint func_224768_a(double p_224768_1_, double p_224768_3_, double p_224768_5_) {
+//	        return new FlaggedPathPoint(super.openPoint(MathHelper.floor(p_224768_1_), MathHelper.floor(p_224768_3_), MathHelper.floor(p_224768_5_)));
+//	    }
+//
+//	    @Override
+//	    public int func_222859_a(PathPoint[] p_222859_1_, PathPoint p_222859_2_) {
+//	        int i = 0;
+//	        PathPoint pathpoint = this.openPoint(p_222859_2_.x, p_222859_2_.y, p_222859_2_.z + 1);
+//	        PathPoint pathpoint1 = this.openPoint(p_222859_2_.x - 1, p_222859_2_.y, p_222859_2_.z);
+//	        PathPoint pathpoint2 = this.openPoint(p_222859_2_.x + 1, p_222859_2_.y, p_222859_2_.z);
+//	        PathPoint pathpoint3 = this.openPoint(p_222859_2_.x, p_222859_2_.y, p_222859_2_.z - 1);
+//	        PathPoint pathpoint4 = this.openPoint(p_222859_2_.x, p_222859_2_.y + 1, p_222859_2_.z);
+//	        PathPoint pathpoint5 = this.openPoint(p_222859_2_.x, p_222859_2_.y - 1, p_222859_2_.z);
+//	        if (pathpoint != null && !pathpoint.visited) {
+//	           p_222859_1_[i++] = pathpoint;
+//	        }
+//
+//	        if (pathpoint1 != null && !pathpoint1.visited) {
+//	           p_222859_1_[i++] = pathpoint1;
+//	        }
+//
+//	        if (pathpoint2 != null && !pathpoint2.visited) {
+//	           p_222859_1_[i++] = pathpoint2;
+//	        }
+//
+//	        if (pathpoint3 != null && !pathpoint3.visited) {
+//	           p_222859_1_[i++] = pathpoint3;
+//	        }
+//
+//	        if (pathpoint4 != null && !pathpoint4.visited) {
+//	           p_222859_1_[i++] = pathpoint4;
+//	        }
+//
+//	        if (pathpoint5 != null && !pathpoint5.visited) {
+//	           p_222859_1_[i++] = pathpoint5;
+//	        }
+//
+//	        boolean flag = pathpoint3 == null || pathpoint3.costMalus != 0.0F;
+//	        boolean flag1 = pathpoint == null || pathpoint.costMalus != 0.0F;
+//	        boolean flag2 = pathpoint2 == null || pathpoint2.costMalus != 0.0F;
+//	        boolean flag3 = pathpoint1 == null || pathpoint1.costMalus != 0.0F;
+//	        boolean flag4 = pathpoint4 == null || pathpoint4.costMalus != 0.0F;
+//	        boolean flag5 = pathpoint5 == null || pathpoint5.costMalus != 0.0F;
+//	        if (flag && flag3) {
+//	           PathPoint pathpoint6 = this.openPoint(p_222859_2_.x - 1, p_222859_2_.y, p_222859_2_.z - 1);
+//	           if (pathpoint6 != null && !pathpoint6.visited) {
+//	              p_222859_1_[i++] = pathpoint6;
+//	           }
+//	        }
+//
+//	        if (flag && flag2) {
+//	           PathPoint pathpoint7 = this.openPoint(p_222859_2_.x + 1, p_222859_2_.y, p_222859_2_.z - 1);
+//	           if (pathpoint7 != null && !pathpoint7.visited) {
+//	              p_222859_1_[i++] = pathpoint7;
+//	           }
+//	        }
+//
+//	        if (flag1 && flag3) {
+//	           PathPoint pathpoint8 = this.openPoint(p_222859_2_.x - 1, p_222859_2_.y, p_222859_2_.z + 1);
+//	           if (pathpoint8 != null && !pathpoint8.visited) {
+//	              p_222859_1_[i++] = pathpoint8;
+//	           }
+//	        }
+//
+//	        if (flag1 && flag2) {
+//	           PathPoint pathpoint9 = this.openPoint(p_222859_2_.x + 1, p_222859_2_.y, p_222859_2_.z + 1);
+//	           if (pathpoint9 != null && !pathpoint9.visited) {
+//	              p_222859_1_[i++] = pathpoint9;
+//	           }
+//	        }
+//
+//	        if (flag && flag4) {
+//	           PathPoint pathpoint10 = this.openPoint(p_222859_2_.x, p_222859_2_.y + 1, p_222859_2_.z - 1);
+//	           if (pathpoint10 != null && !pathpoint10.visited) {
+//	              p_222859_1_[i++] = pathpoint10;
+//	           }
+//	        }
+//
+//	        if (flag1 && flag4) {
+//	           PathPoint pathpoint11 = this.openPoint(p_222859_2_.x, p_222859_2_.y + 1, p_222859_2_.z + 1);
+//	           if (pathpoint11 != null && !pathpoint11.visited) {
+//	              p_222859_1_[i++] = pathpoint11;
+//	           }
+//	        }
+//
+//	        if (flag2 && flag4) {
+//	           PathPoint pathpoint12 = this.openPoint(p_222859_2_.x + 1, p_222859_2_.y + 1, p_222859_2_.z);
+//	           if (pathpoint12 != null && !pathpoint12.visited) {
+//	              p_222859_1_[i++] = pathpoint12;
+//	           }
+//	        }
+//
+//	        if (flag3 && flag4) {
+//	           PathPoint pathpoint13 = this.openPoint(p_222859_2_.x - 1, p_222859_2_.y + 1, p_222859_2_.z);
+//	           if (pathpoint13 != null && !pathpoint13.visited) {
+//	              p_222859_1_[i++] = pathpoint13;
+//	           }
+//	        }
+//
+//	        if (flag && flag5) {
+//	           PathPoint pathpoint14 = this.openPoint(p_222859_2_.x, p_222859_2_.y - 1, p_222859_2_.z - 1);
+//	           if (pathpoint14 != null && !pathpoint14.visited) {
+//	              p_222859_1_[i++] = pathpoint14;
+//	           }
+//	        }
+//
+//	        if (flag1 && flag5) {
+//	           PathPoint pathpoint15 = this.openPoint(p_222859_2_.x, p_222859_2_.y - 1, p_222859_2_.z + 1);
+//	           if (pathpoint15 != null && !pathpoint15.visited) {
+//	              p_222859_1_[i++] = pathpoint15;
+//	           }
+//	        }
+//
+//	        if (flag2 && flag5) {
+//	           PathPoint pathpoint16 = this.openPoint(p_222859_2_.x + 1, p_222859_2_.y - 1, p_222859_2_.z);
+//	           if (pathpoint16 != null && !pathpoint16.visited) {
+//	              p_222859_1_[i++] = pathpoint16;
+//	           }
+//	        }
+//
+//	        if (flag3 && flag5) {
+//	           PathPoint pathpoint17 = this.openPoint(p_222859_2_.x - 1, p_222859_2_.y - 1, p_222859_2_.z);
+//	           if (pathpoint17 != null && !pathpoint17.visited) {
+//	              p_222859_1_[i++] = pathpoint17;
+//	           }
+//	        }
+//
+//	        return i;
+//	     }
 	}
 	
-	static public class PathNavigatorDragonFlier extends PathNavigator
-	{
-	    public PathNavigatorDragonFlier(MobEntity entitylivingIn, World worldIn)
-	    {
+	static public class PathNavigatorDragonFlier extends FlyingPathNavigator {
+	    public PathNavigatorDragonFlier(MobEntity entitylivingIn, World worldIn) {
 	        super(entitylivingIn, worldIn);
 	    }
 	
-	    protected PathFinder getPathFinder()
-	    {
-	        return new PathFinder(new FlyNodeProcessor());
-	    }
-	
-	    /**
-	     * If on ground or swimming and can swim
-	     */
-	    protected boolean canNavigate()
-	    {
-	        return true;
-	    }
-	
-	    protected Vec3d getEntityPosition()
-	    {
-	        return new Vec3d(this.entity.posX, this.entity.posY + (double)this.entity.getHeight() * 0.5D, this.entity.posZ);
-	    }
-	
-	    protected void pathFollow()
-	    {
-	        Vec3d vec3d = this.getEntityPosition();
-	        float f = this.entity.getWidth * this.entity.getWidth;
-	
-	        if (vec3d.squareDistanceTo(this.currentPath.getVectorFromIndex(this.entity, this.currentPath.getCurrentPathIndex())) < (double)f)
-	        {
-	            this.currentPath.incrementPathIndex();
-	        }
-	
-	        for (int j = Math.min(this.currentPath.getCurrentPathIndex() + 6, this.currentPath.getCurrentPathLength() - 1); j > this.currentPath.getCurrentPathIndex(); --j)
-	        {
-	            Vec3d vec3d1 = this.currentPath.getVectorFromIndex(this.entity, j);
-	
-	            if (vec3d1.squareDistanceTo(vec3d) <= 36.0D && this.isDirectPathBetweenPoints(vec3d, vec3d1, 0, 0, 0))
-	            {
-	                this.currentPath.setCurrentPathIndex(j);
-	                break;
-	            }
-	        }
-	
-	        this.checkForStuck(vec3d);
-	    }
-	
-	    /**
-	     * Trims path data from the end to the first sun covered block
-	     */
-	    protected void removeSunnyPath()
-	    {
-	        super.removeSunnyPath();
-	    }
-	
-	    /**
-	     * Checks if the specified entity can safely walk to the specified location.
-	     */
-	    protected boolean isDirectPathBetweenPoints(Vec3d posVec31, Vec3d posVec32, int sizeX, int sizeY, int sizeZ)
-	    {
-	        RayTraceResult raytraceresult = this.world.rayTraceBlocks(posVec31, new Vec3d(posVec32.x, posVec32.y + (double)this.entity.getHeight() * 0.5D, posVec32.z), false, true, false);
-	        return raytraceresult == null || raytraceresult.getType() == RayTraceResult.Type.MISS;
-	    }
-	
-	    public boolean canEntityStandOnPos(BlockPos pos)
-	    {
-	        return !this.world.getBlockState(pos).isFullBlock();
-	    }
+//	    @Override
+//	    protected PathFinder getPathFinder(int i) {
+//	        return new PathFinder(new FlyNodeProcessor(), i);
+//	    }
+//	
+//	    /**
+//	     * If on ground or swimming and can swim
+//	     */
+//	    @Override
+//	    protected boolean canNavigate() {
+//	        return true;
+//	    }
+//
+//	    @Override
+//	    protected Vec3d getEntityPosition() {
+//	        return new Vec3d(this.entity.posX, this.entity.posY + (double)this.entity.getHeight() * 0.5D, this.entity.posZ);
+//	    }
+//
+//	    @Override
+//	    protected void pathFollow() {
+//	        Vec3d vec3d = this.getEntityPosition();
+//	        float f = this.entity.getWidth() * this.entity.getWidth();
+//	
+//	        if (vec3d.squareDistanceTo(this.currentPath.getVectorFromIndex(this.entity, this.currentPath.getCurrentPathIndex())) < (double)f) {
+//	            this.currentPath.incrementPathIndex();
+//	        }
+//	
+//	        for (int j = Math.min(this.currentPath.getCurrentPathIndex() + 6, this.currentPath.getCurrentPathLength() - 1); j > this.currentPath.getCurrentPathIndex(); --j) {
+//	            Vec3d vec3d1 = this.currentPath.getVectorFromIndex(this.entity, j);
+//	
+//	            if (vec3d1.squareDistanceTo(vec3d) <= 36.0D && this.isDirectPathBetweenPoints(vec3d, vec3d1, 0, 0, 0)) {
+//	                this.currentPath.setCurrentPathIndex(j);
+//	                break;
+//	            }
+//	        }
+//	
+//	        this.checkForStuck(vec3d);
+//	    }
+//	
+//	    /**
+//	     * Trims path data from the end to the first sun covered block
+//	     */
+//	    @Override
+//	    protected void removeSunnyPath() {
+//	        super.removeSunnyPath();
+//	    }
+//	
+//	    /**
+//	     * Checks if the specified entity can safely walk to the specified location.
+//	     */
+//	    @Override
+//	    protected boolean isDirectPathBetweenPoints(Vec3d posVec31, Vec3d posVec32, int sizeX, int sizeY, int sizeZ) {
+//	        RayTraceResult raytraceresult = this.world.rayTraceBlocks(posVec31, new Vec3d(posVec32.x, posVec32.y + (double)this.entity.getHeight() * 0.5D, posVec32.z), false, true, false);
+//	        return raytraceresult == null || raytraceresult.getType() == RayTraceResult.Type.MISS;
+//	    }
+//
+//	    @Override
+//	    public boolean canEntityStandOnPos(BlockPos pos) {
+//	        return !this.world.getBlockState(pos).func_215682_a(this.world, pos, this.entity);
+//	    }
 	}
 	
 	public static class DragonEquipmentInventory implements IInventory {
@@ -451,10 +567,10 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
 			
 			ListNBT list = nbt.getList(NBT_LIST, NBT.TAG_COMPOUND);
 			for (int i = 0; i < list.size(); i++) {
-				CompoundNBT wrapper = list.getCompoundTagAt(i);
+				CompoundNBT wrapper = list.getCompound(i);
 				try {
 					DragonEquipmentSlot slot = DragonEquipmentSlot.valueOf(wrapper.getString(NBT_SLOT).toUpperCase());
-					ItemStack stack = new ItemStack(wrapper.getCompound(NBT_ITEM));
+					ItemStack stack = ItemStack.read(wrapper.getCompound(NBT_ITEM));
 					//this.setStackInSlot(slot, stack); Don't want to send updates to listener for each item
 					slots.put(slot, stack);
 				} catch (Exception e) {
@@ -471,21 +587,6 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
 			DragonEquipmentInventory inventory = new DragonEquipmentInventory();
 			inventory.readFromNBT(nbt);
 			return inventory;
-		}
-
-		@Override
-		public String getName() {
-			return null;
-		}
-
-		@Override
-		public boolean hasCustomName() {
-			return false;
-		}
-
-		@Override
-		public ITextComponent getDisplayName() {
-			return null;
 		}
 
 		@Override
@@ -570,21 +671,6 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
 			
 			DragonArmor armor = (DragonArmor) stack.getItem();
 			return armor.getSlot() == slot;
-		}
-
-		@Override
-		public int getField(int id) {
-			return 0;
-		}
-
-		@Override
-		public void setField(int id, int value) {
-			;
-		}
-
-		@Override
-		public int getFieldCount() {
-			return 0;
 		}
 
 		@Override
