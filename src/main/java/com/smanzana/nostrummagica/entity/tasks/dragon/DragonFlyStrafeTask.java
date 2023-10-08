@@ -21,7 +21,7 @@ public class DragonFlyStrafeTask<T extends EntityDragon> extends Goal {
 	}
 	
 	@Override
-	public boolean isInterruptible() {
+	public boolean isPreemptible() {
 		return true;
 	}
 	

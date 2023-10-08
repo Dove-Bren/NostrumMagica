@@ -1,9 +1,11 @@
 package com.smanzana.nostrummagica.entity.tasks.arcanewolf;
 
+import java.util.EnumSet;
+
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect.PredefinedEffect;
-import com.smanzana.nostrummagica.effects.MagicBoostEffect;
+import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.ArcaneWolfElementalType;
 import com.smanzana.nostrummagica.network.NetworkHandler;
@@ -14,8 +16,8 @@ import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.util.SoundEvents;
 
 public class ArcaneWolfAIEldrichTask extends Goal {
 
@@ -52,11 +54,11 @@ public class ArcaneWolfAIEldrichTask extends Goal {
 	public boolean shouldContinueExecuting() {
 		return this.activeTicks > 0
 				&& this.activeTarget != null
-				&& !this.!activeTarget.isAlive();
+				&& this.activeTarget.isAlive();
 	}
 	
 	@Override
-	public boolean isInterruptible() {
+	public boolean isPreemptible() {
 		return false;
 	}
 	
@@ -100,7 +102,7 @@ public class ArcaneWolfAIEldrichTask extends Goal {
 		// to that. Then, each tick, maybe do damage or update effect.
 		// Effect is actually going to be 'predefined' client effect to avoid spamming packets.
 		float base = 20 * 5;
-		PotionEffect boostEffect = wolf.getActivePotionEffect(MagicBoostEffect.instance());
+		EffectInstance boostEffect = wolf.getActivePotionEffect(NostrumEffects.magicBoost);
 		if (boostEffect != null) {
 			base *= Math.pow(1.5, boostEffect.getAmplifier() + 1);
 		}

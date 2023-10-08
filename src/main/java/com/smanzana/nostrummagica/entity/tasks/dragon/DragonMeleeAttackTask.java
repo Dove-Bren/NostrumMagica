@@ -99,7 +99,7 @@ public class DragonMeleeAttackTask extends EntityAIAttackMelee {
 	}
 	
 	@Override
-	public boolean isInterruptible() {
+	public boolean isPreemptible() {
 		return true;
 	}
 

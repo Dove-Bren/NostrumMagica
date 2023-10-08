@@ -5,13 +5,13 @@ import java.util.List;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.effects.NaturesBlessingEffect;
+import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.ArcaneWolfElementalType;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.potion.EffectInstance;
 
 public class ArcaneWolfAINatureTask extends Goal {
 
@@ -25,7 +25,7 @@ public class ArcaneWolfAINatureTask extends Goal {
 		this.wolf = wolf;
 		this.manaCost = manaCost;
 		
-		this.setMutexBits(0); // Can execute with any! Nice!
+		//this.setMutexBits(0); // Can execute with any! Nice!
 	}
 	
 	@Override
@@ -48,9 +48,9 @@ public class ArcaneWolfAINatureTask extends Goal {
 	
 	protected boolean applyTo(EntityArcaneWolf wolf, LivingEntity target) {
 		// Nature keeps the "Nature's blessing" status effect constant
-		PotionEffect effect = target.getActivePotionEffect(NaturesBlessingEffect.instance());
+		EffectInstance effect = target.getActivePotionEffect(NostrumEffects.naturesBlessing);
 		if (effect == null || effect.getDuration() < 11 * 20) {
-			target.addPotionEffect(new PotionEffect(NaturesBlessingEffect.instance(), 20 * 30, 0));
+			target.addPotionEffect(new EffectInstance(NostrumEffects.naturesBlessing, 20 * 30, 0));
 		}
 		
 		return effect == null; // Only charge for applying the first time

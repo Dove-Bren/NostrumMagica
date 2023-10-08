@@ -12,7 +12,8 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.EffectType;
 import net.minecraft.util.math.Vec3d;
 
 public class ArcaneWolfAIMysticTask extends Goal {
@@ -27,7 +28,7 @@ public class ArcaneWolfAIMysticTask extends Goal {
 		this.wolf = wolf;
 		this.manaCost = manaCost;
 		
-		this.setMutexBits(0); // Can execute with any! Nice!
+		//this.setMutexBits(0); // Can execute with any! Nice!
 	}
 	
 	@Override
@@ -48,20 +49,20 @@ public class ArcaneWolfAIMysticTask extends Goal {
 		return tames;
 	}
 	
-	protected boolean isBadEffect(PotionEffect effect) {
-		return effect.getPotion().isBadEffect();
+	protected boolean isBadEffect(EffectInstance effect) {
+		return effect.getPotion().getEffectType() == EffectType.HARMFUL;
 	}
 	
 	protected boolean applyTo(EntityArcaneWolf wolf, LivingEntity target) {
 		// Mystic removes negative status effects from allies
-		List<PotionEffect> removeList = new ArrayList<>();
-		for (PotionEffect effect : target.getActivePotionEffects()) {
+		List<EffectInstance> removeList = new ArrayList<>();
+		for (EffectInstance effect : target.getActivePotionEffects()) {
 			if (isBadEffect(effect)) {
 				removeList.add(effect);
 			}
 		}
 		
-		for (PotionEffect effect : removeList) {
+		for (EffectInstance effect : removeList) {
 			target.removePotionEffect(effect.getPotion());
 		}
 		

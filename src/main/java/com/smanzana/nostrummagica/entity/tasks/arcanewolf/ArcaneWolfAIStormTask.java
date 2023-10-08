@@ -1,15 +1,19 @@
 package com.smanzana.nostrummagica.entity.tasks.arcanewolf;
 
+import java.util.EnumSet;
+
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.ArcaneWolfElementalType;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.init.SoundEvents;
+import net.minecraft.entity.monster.CreeperEntity;
+import net.minecraft.util.SoundEvents;
+import net.minecraft.world.server.ServerWorld;
 
 public class ArcaneWolfAIStormTask extends Goal {
 
@@ -39,18 +43,18 @@ public class ArcaneWolfAIStormTask extends Goal {
 				&& wolf.ticksExisted >= cooldownTicks
 				&& wolf.getMana() >= manaCost
 				&& wolf.getElementalType() == ArcaneWolfElementalType.STORM
-				&& !(wolf.getAttackTarget() instanceof EntityCreeper);
+				&& !(wolf.getAttackTarget() instanceof CreeperEntity);
 	}
 	
 	@Override
 	public boolean shouldContinueExecuting() {
 		return this.active
 				&& this.activeTarget != null
-				&& !this.!activeTarget.isAlive();
+				&& this.activeTarget.isAlive();
 	}
 	
 	@Override
-	public boolean isInterruptible() {
+	public boolean isPreemptible() {
 		return false;
 	}
 	
@@ -74,8 +78,8 @@ public class ArcaneWolfAIStormTask extends Goal {
 	
 	protected void blastEntity(EntityArcaneWolf wolf, LivingEntity target) {
 		for (int i = 0; i < 2; i++) {
-			target.world.addWeatherEffect(
-					(new NostrumTameLightning(target.world,
+			((ServerWorld) target.world).addLightningBolt(
+					(new NostrumTameLightning(NostrumEntityTypes.tameLightning, target.world,
 							target.posX + (wolf.getRNG().nextFloat()-.5f),
 							target.posY,
 							target.posZ + (wolf.getRNG().nextFloat()-.5f))

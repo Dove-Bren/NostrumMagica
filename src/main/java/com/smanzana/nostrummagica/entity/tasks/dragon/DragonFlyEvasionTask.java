@@ -120,7 +120,7 @@ public class DragonFlyEvasionTask extends Goal {
 	}
 	
 	@Override
-	public boolean isInterruptible() {
+	public boolean isPreemptible() {
 		return true;
 	}
 	

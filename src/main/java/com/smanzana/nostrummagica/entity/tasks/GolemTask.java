@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.entity.tasks;
 
+import java.util.EnumSet;
 import java.util.Random;
 
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -196,7 +197,7 @@ public class GolemTask extends Goal {
 		if (target != null && target.isAlive()) {
 			double distTarget = target.getPositionVector().distanceTo(golem.getPositionVector());
 			
-			double meleeRange = (double)(golem.getWidth * 2.0F * golem.getWidth * 2.0F);
+			double meleeRange = (double)(golem.getWidth() * 2.0F * golem.getWidth() * 2.0F);
 			if (distTarget < meleeRange) {
 				inMelee = true;
 			}
@@ -300,7 +301,7 @@ public class GolemTask extends Goal {
             }
             else
             {
-            	golem.getLookHelper().setLookPositionWithEntity(target, 30.0F, 30.0F);
+            	golem.getLookController().setLookPositionWithEntity(target, 30.0F, 30.0F);
             }
 			
 		}

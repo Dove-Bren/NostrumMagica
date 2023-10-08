@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.entity.tasks;
 
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -412,7 +413,7 @@ public class KoidTask extends Goal {
 		if (target != null && target.isAlive()) {
 			double distTarget = target.getPositionVector().distanceTo(koid.getPositionVector());
 			
-			double meleeRange = (double)(koid.getWidth * 2.0F * koid.getWidth * 2.0F + koid.getWidth);
+			double meleeRange = (double)(koid.getWidth() * 2.0F * koid.getWidth() * 2.0F + koid.getWidth());
 			if (distTarget < meleeRange) {
 				inMelee = true;
 			}
@@ -538,7 +539,7 @@ public class KoidTask extends Goal {
             }
             else
             {
-            	koid.getLookHelper().setLookPositionWithEntity(target, 30.0F, 30.0F);
+            	koid.getLookController().setLookPositionWithEntity(target, 30.0F, 30.0F);
             }
 			
 		}

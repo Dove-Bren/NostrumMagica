@@ -16,7 +16,7 @@ public class DragonLandTask extends Goal {
 	}
 	
 	@Override
-	public boolean isInterruptible() {
+	public boolean isPreemptible() {
 		return false;
 	}
 
