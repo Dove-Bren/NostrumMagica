@@ -1,18 +1,23 @@
 package com.smanzana.nostrummagica.entity.tasks;
 
+import java.util.EnumSet;
+
 import com.smanzana.nostrummagica.entity.ITameableEntity;
 
 import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.EntityPredicate;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.EntityAITarget;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.TargetGoal;
 
-public class OwnerHurtTargetGoalGeneric<T extends CreatureEntity & ITameableEntity> extends EntityAITarget {
+public class OwnerHurtTargetGenericGoal<T extends CreatureEntity & ITameableEntity> extends TargetGoal {
 	
-	T entityTameable;
-	LivingEntity theTarget;
+	protected static final EntityPredicate CanAttack = new EntityPredicate().setLineOfSiteRequired().setUseInvisibilityCheck();
+	protected T entityTameable;
+	protected LivingEntity theTarget;
 	private int timestamp;
 
-	public OwnerHurtTargetGoalGeneric(T entityTameableIn) {
+	public OwnerHurtTargetGenericGoal(T entityTameableIn) {
 		super(entityTameableIn, false);
 		this.entityTameable = entityTameableIn;
 		this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
@@ -21,6 +26,7 @@ public class OwnerHurtTargetGoalGeneric<T extends CreatureEntity & ITameableEnti
 	/**
 	 * Returns whether the Goal should begin execution.
 	 */
+	@Override
 	public boolean shouldExecute() {
 		if (!this.entityTameable.isEntitySitting()) {
 			return false;
@@ -32,7 +38,7 @@ public class OwnerHurtTargetGoalGeneric<T extends CreatureEntity & ITameableEnti
 			} else {
 				this.theTarget = entitylivingbase.getLastAttackedEntity();
 				int i = entitylivingbase.getLastAttackedEntityTime();
-				return i != this.timestamp && this.isSuitableTarget(this.theTarget, false);
+				return i != this.timestamp && this.isSuitableTarget(this.theTarget, CanAttack);
 			}
 		}
 	}
@@ -40,8 +46,9 @@ public class OwnerHurtTargetGoalGeneric<T extends CreatureEntity & ITameableEnti
 	/**
 	 * Execute a one shot task or start executing a continuous task
 	 */
+	@Override
 	public void startExecuting() {
-		this.taskOwner.setAttackTarget(this.theTarget);
+		this.goalOwner.setAttackTarget(this.theTarget);
 		LivingEntity entitylivingbase = this.entityTameable.getLivingOwner();
 
 		if (entitylivingbase != null) {

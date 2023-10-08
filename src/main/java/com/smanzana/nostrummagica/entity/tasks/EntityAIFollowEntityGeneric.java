@@ -1,14 +1,14 @@
 package com.smanzana.nostrummagica.entity.tasks;
 
-import net.minecraft.block.material.Material;
+import java.util.EnumSet;
+
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.pathfinding.PathNavigator;
 import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -18,7 +18,7 @@ public class EntityAIFollowEntityGeneric<T extends MobEntity> extends Goal {
 	
 	private final T entity;
 	private LivingEntity theTarget;
-	private World theWorld;
+	private World world;
 	private final double followSpeed;
 	private final PathNavigator petPathfinder;
 	private int timeToRecalcPath;
@@ -34,7 +34,7 @@ public class EntityAIFollowEntityGeneric<T extends MobEntity> extends Goal {
 	
 	public EntityAIFollowEntityGeneric(T entityIn, double followSpeedIn, float minDistIn, float maxDistIn, boolean canTeleport, LivingEntity target) {
 		this.entity = entityIn;
-		this.theWorld = entity.world;
+		this.world = entity.world;
 		this.followSpeed = followSpeedIn;
 		this.petPathfinder = entity.getNavigator();
 		this.minDist = minDistIn;
@@ -97,17 +97,17 @@ public class EntityAIFollowEntityGeneric<T extends MobEntity> extends Goal {
 		this.petPathfinder.clearPath();
 		this.entity.setPathPriority(PathNodeType.WATER, this.oldWaterCost);
 	}
-
-	private boolean isEmptyBlock(BlockPos pos) {
-		BlockState iblockstate = this.theWorld.getBlockState(pos);
-		return iblockstate.getMaterial() == Material.AIR ? true : !iblockstate.isFullCube();
+	
+	protected boolean canTeleportToBlock(BlockPos pos) {
+		BlockState blockstate = this.world.getBlockState(pos);
+		return blockstate.canEntitySpawn(this.world, pos, this.entity.getType()) && this.world.isAirBlock(pos.up()) && this.world.isAirBlock(pos.up(2));
 	}
 
 	/**
 	 * Updates the task
 	 */
 	public void tick() {
-		this.entity.getLookHelper().setLookPositionWithEntity(this.theTarget, 10.0F, (float)this.entity.getVerticalFaceSpeed());
+		this.entity.getLookController().setLookPositionWithEntity(this.theTarget, 10.0F, (float)this.entity.getVerticalFaceSpeed());
 
 		if (this.canFollow(entity)) {
 			if (--this.timeToRecalcPath <= 0) {
@@ -121,15 +121,11 @@ public class EntityAIFollowEntityGeneric<T extends MobEntity> extends Goal {
 							int k = MathHelper.floor(this.theTarget.getBoundingBox().minY);
 							
 							MutableBlockPos pos1 = new MutableBlockPos();
-							MutableBlockPos pos2 = new MutableBlockPos();
-							MutableBlockPos pos3 = new MutableBlockPos();
 
 							for (int l = 0; l <= 4; ++l) {
 								for (int i1 = 0; i1 <= 4; ++i1) {
 									pos1.setPos(i + l, k - 1, j + i1);
-									pos2.setPos(i + l, k, j + i1);
-									pos3.setPos(i + l, k + 1, j + i1);
-									if ((l < 1 || i1 < 1 || l > 3 || i1 > 3) && this.theWorld.getBlockState(new BlockPos(pos1)).isSideSolid(theWorld, pos1, Direction.UP) && this.isEmptyBlock(pos2) && this.isEmptyBlock(pos3)) {
+									if ((l < 1 || i1 < 1 || l > 3 || i1 > 3) && canTeleportToBlock(pos1)) {
 										this.entity.setLocationAndAngles((double)((float)(i + l) + 0.5F), (double)k, (double)((float)(j + i1) + 0.5F), this.entity.rotationYaw, this.entity.rotationPitch);
 										this.petPathfinder.clearPath();
 										return;

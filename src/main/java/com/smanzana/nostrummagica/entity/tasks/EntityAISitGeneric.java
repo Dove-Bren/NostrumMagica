@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.entity.tasks;
 
+import java.util.EnumSet;
+
 import com.smanzana.nostrummagica.entity.ITameableEntity;
 
 import net.minecraft.entity.CreatureEntity;
@@ -12,7 +14,7 @@ public class EntityAISitGeneric<T extends CreatureEntity & ITameableEntity> exte
 
 	public EntityAISitGeneric(T entityIn) {
 		this.entity = entityIn;
-		this.setMutexBits(5);
+		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK, Flag.JUMP));
 	}
 
 	/**

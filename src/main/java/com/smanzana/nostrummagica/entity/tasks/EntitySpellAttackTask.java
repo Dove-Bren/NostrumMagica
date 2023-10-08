@@ -1,12 +1,14 @@
 package com.smanzana.nostrummagica.entity.tasks;
 
+import java.util.EnumSet;
+
 import javax.annotation.Nullable;
 
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.spells.Spell;
 
-import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.player.PlayerEntity;
 
@@ -38,7 +40,9 @@ public class EntitySpellAttackTask<T extends MobEntity> extends Goal {
 		this.needsTarget = needsTarget;
 		this.predicate = predicate;
 		
-		this.setMutexBits(castTime > 0 ? 3 : 0);
+		if (castTime > 0) {
+			this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
+		}
 	}
 	
 	@Override
@@ -52,7 +56,7 @@ public class EntitySpellAttackTask<T extends MobEntity> extends Goal {
 			return false;
 		}
 		
-		if (needsTarget && (entity.getAttackTarget() == null || entity.getAttackTarget()!.isAlive()))
+		if (needsTarget && (entity.getAttackTarget() == null || !entity.getAttackTarget().isAlive()))
 			return false;
 		
 		if (needsTarget && !entity.getEntitySenses().canSee(entity.getAttackTarget())){

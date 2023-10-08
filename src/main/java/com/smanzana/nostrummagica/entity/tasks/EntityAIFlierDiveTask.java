@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.entity.tasks;
 
+import java.util.EnumSet;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.entity.MobEntity;
@@ -29,13 +31,13 @@ public class EntityAIFlierDiveTask<T extends MobEntity> extends Goal
 		this.attackDelay = delay;
 		this.maxAttackDistance = maxDistance * maxDistance;
 		this.requiresSight = requiresSight;
-		this.setMutexBits(7);
+		this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK, Goal.Flag.JUMP));
 		
 		lastAttackTicks = 0;
 	}
 	
 	protected boolean attackedTooRecently() {
-		return lastAttackTicks != 0 && entity.world.getTotalWorldTime() <= lastAttackTicks + attackDelay;
+		return lastAttackTicks != 0 && entity.world.getGameTime() <= lastAttackTicks + attackDelay;
 	}
 
 	/**
@@ -103,9 +105,9 @@ public class EntityAIFlierDiveTask<T extends MobEntity> extends Goal
 		if (target != null) {
 			
 			// If close enough, attack!
-			if (entity.getDistanceSq(target.posX, target.posY + (target.getHeight() / 2), target.posZ) < Math.max(entity.getWidth * entity.getWidth, 1.5)) {
+			if (entity.getDistanceSq(target.posX, target.posY + (target.getHeight() / 2), target.posZ) < Math.max(entity.getWidth() * entity.getWidth(), 1.5)) {
 				this.attackTarget(entity, target);
-				this.lastAttackTicks = entity.world.getTotalWorldTime();
+				this.lastAttackTicks = entity.world.getGameTime();
 				entity.getMoveHelper().strafe(1f, 0f);
 			} else {
 			

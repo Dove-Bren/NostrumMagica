@@ -1,12 +1,14 @@
 package com.smanzana.nostrummagica.entity.tasks;
 
+import java.util.EnumSet;
+
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.ai.controller.MovementController;
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.MovementController;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 
@@ -57,7 +59,7 @@ public class EntityAIOrbitEntityGeneric<T extends MobEntity> extends Goal {
 		
 		cursor = new MutableVec3d(0, 0, 0);
 		
-		this.setMutexBits(4);
+		this.setMutexFlags(EnumSet.of(Goal.Flag.JUMP));
 	}
 	
 	protected LivingEntity getOrbitTarget() {

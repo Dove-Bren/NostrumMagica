@@ -1,13 +1,14 @@
 package com.smanzana.nostrummagica.entity.tasks;
 
+import java.util.EnumSet;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IRangedAttackMob;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemBow;
+import net.minecraft.item.BowItem;
 import net.minecraft.util.Hand;
 
 public class EntityAIAttackRanged<T extends MobEntity> extends Goal
@@ -36,7 +37,8 @@ public class EntityAIAttackRanged<T extends MobEntity> extends Goal
 	}
 	
 	public boolean hasWeaponEquipped(T entity) {
-		return this.entity.getHeldItemMainhand() != null && this.entity.getHeldItemMainhand().getItem() == Items.BOW;
+		return (!this.entity.getHeldItemMainhand().isEmpty() && this.entity.getHeldItemMainhand().getItem() instanceof BowItem)
+				|| (!this.entity.getHeldItemOffhand().isEmpty() && this.entity.getHeldItemOffhand().getItem() instanceof BowItem);
 	}
 
 	/**
@@ -116,7 +118,7 @@ public class EntityAIAttackRanged<T extends MobEntity> extends Goal
 	public void attackTarget(T entity, LivingEntity target, int chargeCount) {
 		if (entity instanceof IRangedAttackMob) {
 			IRangedAttackMob mob = (IRangedAttackMob) this.entity;
-			mob.attackEntityWithRangedAttack(target, ItemBow.getArrowVelocity(chargeCount));
+			mob.attackEntityWithRangedAttack(target, BowItem.getArrowVelocity(chargeCount));
 		} else {
 			NostrumMagica.logger.error("EntityAIAttackRanged tried to attack, but provided entity has no attack");
 		}
@@ -174,7 +176,7 @@ public class EntityAIAttackRanged<T extends MobEntity> extends Goal
 				this.entity.getMoveHelper().strafe(this.strafingBackwards ? -0.5F : 0.5F, this.strafingClockwise ? 0.5F : -0.5F);
 				this.entity.faceEntity(entitylivingbase, 30.0F, 30.0F);
 			} else {
-				this.entity.getLookHelper().setLookPositionWithEntity(entitylivingbase, 30.0F, 30.0F);
+				this.entity.getLookController().setLookPositionWithEntity(entitylivingbase, 30.0F, 30.0F);
 			}
 			
 			if (startedAttacking) {
