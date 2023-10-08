@@ -1,9 +1,9 @@
 package com.smanzana.nostrummagica.effects;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -41,7 +41,7 @@ public enum PotionIcon {
 	
 	@OnlyIn(Dist.CLIENT)
 	public void draw(Minecraft mc, int posX, int posY) {
-		mc.renderEngine.bindTexture(text);
+		mc.getRenderManager().textureManager.bindTexture(text);
 		
 		RenderFuncs.drawModalRectWithCustomSizedTexture(posX, posY,
 				TEXT_OFFSETU + (u * 18), TEXT_OFFSETV + (v * 18),

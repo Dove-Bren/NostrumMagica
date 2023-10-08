@@ -63,7 +63,7 @@ public class RayTrace {
 		public boolean test(Entity input) {
 			if (filterLiving.test(input)) {
 				// is LivingEntity
-				return filterMe.apply(NostrumMagica.resolveLivingEntity(input));
+				return filterMe.test(NostrumMagica.resolveLivingEntity(input));
 			}
 			
 			return false;

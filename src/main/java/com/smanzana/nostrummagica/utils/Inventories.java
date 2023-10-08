@@ -5,11 +5,9 @@ import javax.annotation.Nonnull;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.INBTBase;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.items.IItemHandler;
 
 public class Inventories {

@@ -73,7 +73,7 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 	protected boolean walksOnLiquid;
 	protected boolean ignoreOwner;
 	
-	private float prevHeight;
+	//private float prevHeight;
 	private Vec3d waddleDir;
 	private double waddleMagnitude;
 	
@@ -362,7 +362,7 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
         }
         
         if (world.isRemote) {
-        	prevHeight = this.getHeight();
+        	//prevHeight = this.getHeight();
         	//this.getHeight() = dataManager.get(HEIGHT);
         } else {
 //	        if (this.getHeight() != prevHeight) { // don't know if I need this anymore

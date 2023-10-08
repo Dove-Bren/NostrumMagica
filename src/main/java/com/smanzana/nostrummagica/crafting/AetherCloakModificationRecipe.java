@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 
 import com.google.gson.JsonParseException;
 import com.smanzana.nostrummagica.integration.baubles.items.ItemAetherCloak;
+import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
@@ -33,7 +34,7 @@ public abstract class AetherCloakModificationRecipe extends ShapelessRecipe {
 			throw new JsonParseException("ingredients items must be provided and contain at least an Aether Cloak");
 		}
 		
-		final ItemStack cloak = new ItemStack(ItemAetherCloak.instance());
+		final ItemStack cloak = new ItemStack(NostrumCurios.aetherCloak);
 		boolean found = false;
 		for (Ingredient ing : ingredients) {
 			if (ing.test(cloak)) {

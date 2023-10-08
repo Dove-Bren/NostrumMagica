@@ -5,6 +5,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityChakramSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer.ISpellSaucerTrigger;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
@@ -64,7 +65,7 @@ public class MagicCutterTrigger extends SpellTrigger {
 
 				@Override
 				public void run() {
-					EntitySpellSaucer projectile = new EntityChakramSpellSaucer(self, 
+					EntitySpellSaucer projectile = new EntityChakramSpellSaucer(NostrumEntityTypes.chakramSpellSaucer, self, 
 							getState().getSelf(),
 							world,
 							pos.x, pos.y, pos.z,

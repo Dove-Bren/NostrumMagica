@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.DungeonAir;
 import com.smanzana.nostrummagica.entity.EntitySpellMortar;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -132,7 +133,7 @@ public class MortarTrigger extends SpellTrigger {
 						startVelocity = Curves.getMortarArcVelocity(pos, dest, HVel, OverworldGravity);
 					}
 					
-					EntitySpellMortar projectile = new EntitySpellMortar(self,
+					EntitySpellMortar projectile = new EntitySpellMortar(NostrumEntityTypes.spellMortar, self,
 							getState().getSelf(),
 							world,
 							startPos,

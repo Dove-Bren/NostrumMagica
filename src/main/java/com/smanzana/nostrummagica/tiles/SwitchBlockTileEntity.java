@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.blocks.ITriggeredBlock;
 import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.world.blueprints.IOrientedTileEntity;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
@@ -143,7 +144,7 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 				triggerEntity.remove();
 			}
 			
-			triggerEntity = new EntitySwitchTrigger(this.world);
+			triggerEntity = new EntitySwitchTrigger(NostrumEntityTypes.switchTrigger, this.world);
 			triggerEntity.setPosition(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
 			world.addEntity(triggerEntity);
 		}

@@ -6,10 +6,10 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaEntityEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaLocationEffect;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
@@ -20,6 +20,9 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.particles.BlockParticleData;
+import net.minecraft.particles.IParticleData;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
@@ -33,6 +36,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class FrostbiteEffect extends Effect {
 
 	public static final String ID = "potions-frostbite";
+	protected static IParticleData SnowParticle = null; 
 	
 	public FrostbiteEffect() {
 		super(EffectType.HARMFUL, 0xFF93E0FF);
@@ -51,6 +55,10 @@ public class FrostbiteEffect extends Effect {
 
 	@Override
 	public void performEffect(LivingEntity entity, int amp) {
+		if (SnowParticle == null) {
+			SnowParticle = new BlockParticleData(ParticleTypes.FALLING_DUST, Blocks.SNOW.getDefaultState());
+		}
+		
 		// If entity has blizzard set, heal instead of harm
 		final int blizzardCount = EnchantedArmor.GetSetCount(entity, EMagicElement.ICE, EnchantedArmor.Type.TRUE);
 		if (blizzardCount == 4) {
@@ -68,7 +76,7 @@ public class FrostbiteEffect extends Effect {
 					NostrumMagica.instance.proxy.sendMana((PlayerEntity) entity);
 				}
 				
-				EntityAreaEffect cloud = new EntityAreaEffect(entity.world, entity.posX, entity.posY, entity.posZ);
+				EntityAreaEffect cloud = new EntityAreaEffect(NostrumEntityTypes.areaEffect, entity.world, entity.posX, entity.posY, entity.posZ);
 				cloud.setOwner(entity);
 				cloud.setIgnoreOwner(true);
 				cloud.setRadius(10f);
@@ -77,11 +85,10 @@ public class FrostbiteEffect extends Effect {
 				cloud.setDuration(0);
 				cloud.setWaitTime(interval); // Turn off vanilla effects completely by putting all time in 'wait'
 				final EffectInstance effect = new EffectInstance(NostrumEffects.frostbite, 20 * 3, 2);
-				cloud.setParticle(ParticleTypes.SPELL_MOB);
+				cloud.setParticleData(ParticleTypes.ENTITY_EFFECT);
 				cloud.setColor(Integer.valueOf(PotionUtils.getPotionColorFromEffectList(Lists.newArrayList(new EffectInstance(NostrumEffects.frostbite, 20 * 3, 2)))));
 				cloud.setIgnoreRadius(true);
-				cloud.setCustomParticle(ParticleTypes.FALLING_DUST);
-				cloud.setCustomParticleParam1(Block.getStateId(Blocks.SNOW.getDefaultState()));
+				cloud.setCustomParticle(SnowParticle);
 				cloud.setCustomParticleYOffset(2f);
 				cloud.setCustomParticleFrequency(.4f);
 				//cloud.addEffect();

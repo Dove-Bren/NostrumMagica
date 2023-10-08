@@ -19,6 +19,7 @@ import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 import com.smanzana.nostrummagica.entity.dragon.EntityShadowDragonRed;
@@ -830,7 +831,7 @@ public class SpellAction {
 				}
 				
 				((ServerWorld) world).addLightningBolt(
-					(new NostrumTameLightning(world, cursor.getX() + 0.5, cursor.getY(), cursor.getZ() + 0.5))
+					(new NostrumTameLightning(NostrumEntityTypes.tameLightning, world, cursor.getX() + 0.5, cursor.getY(), cursor.getZ() + 0.5))
 					.setEntityToIgnore(caster)
 					);
 			}
@@ -954,26 +955,26 @@ public class SpellAction {
 			
 			switch (element) {
 			case EARTH:
-				golem = new EntityGolemEarth(world);
+				golem = new EntityGolemEarth(NostrumEntityTypes.golemEarth, world);
 				break;
 			case ENDER:
-				golem = new EntityGolemEnder(world);
+				golem = new EntityGolemEnder(NostrumEntityTypes.golemEnder, world);
 				break;
 			case FIRE:
-				golem = new EntityGolemFire(world);
+				golem = new EntityGolemFire(NostrumEntityTypes.golemFire, world);
 				break;
 			case ICE:
-				golem = new EntityGolemIce(world);
+				golem = new EntityGolemIce(NostrumEntityTypes.golemIce, world);
 				break;
 			case LIGHTNING:
-				golem = new EntityGolemLightning(world);
+				golem = new EntityGolemLightning(NostrumEntityTypes.golemLightning, world);
 				break;
 			case WIND:
-				golem = new EntityGolemWind(world);
+				golem = new EntityGolemWind(NostrumEntityTypes.golemWind, world);
 				break;
 			default:
 			case PHYSICAL:
-				golem = new EntityGolemPhysical(world);
+				golem = new EntityGolemPhysical(NostrumEntityTypes.golemPhysical, world);
 				break;
 			}
 			

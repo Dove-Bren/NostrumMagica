@@ -5,6 +5,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityCyclerSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer.ISpellSaucerTrigger;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
@@ -48,7 +49,7 @@ public class MagicCyclerTrigger extends SpellTrigger {
 
 				@Override
 				public void run() {
-					EntitySpellSaucer projectile = new EntityCyclerSpellSaucer(self,
+					EntitySpellSaucer projectile = new EntityCyclerSpellSaucer(NostrumEntityTypes.cyclerSpellSaucer, self,
 							getState().getSelf(),
 							5.0f, (int) duration * 20, onBlocks);
 					

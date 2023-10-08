@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.spells.components.triggers;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntitySpellBullet;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -135,7 +136,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 					
 					startMotion = startMotion.scale(.4);
 					
-					EntitySpellBullet bullet = new EntitySpellBullet(self, getState().getSelf(), target, axis);
+					EntitySpellBullet bullet = new EntitySpellBullet(NostrumEntityTypes.spellBullet, self, getState().getSelf(), target, axis);
 					bullet.setMotion(startMotion);
 					//bullet.setVelocity(startMotion.x, startMotion.y, startMotion.z); client only :(
 					

@@ -9,18 +9,12 @@ import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
-import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.spells.Spell;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.StringTextComponent;
 
 public class CommandForceBind {
