@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.render.tile;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
@@ -10,17 +11,15 @@ import com.smanzana.nostrummagica.tiles.ProgressionDoorTileEntity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
-public class TileEntityProgressionDoorRenderer extends TileEntitySpecialRenderer<ProgressionDoorTileEntity> {
+public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<ProgressionDoorTileEntity> {
 
 	public static void init() {
 		ClientRegistry.bindTileEntitySpecialRenderer(ProgressionDoorTileEntity.class,
@@ -35,13 +34,13 @@ public class TileEntityProgressionDoorRenderer extends TileEntitySpecialRenderer
 	}
 	
 	@Override
-	public void render(ProgressionDoorTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-		
-		double time = (double)te.getWorld().getTotalWorldTime() + partialTicks;
-		INostrumMagic attr = NostrumMagica.getMagicWrapper(Minecraft.getInstance().player);
+	public void render(ProgressionDoorTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
+		Minecraft mc = Minecraft.getInstance();
+		double time = (double)te.getWorld().getGameTime() + partialTicks;
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(mc.player);
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translatef(x + .5, y + 1.2, z + .5);
+		GlStateManager.translated(x + .5, y + 1.2, z + .5);
 		
 		// Render centered on bottom-center of door, not TE (in case they're different)
 		{
@@ -62,7 +61,7 @@ public class TileEntityProgressionDoorRenderer extends TileEntitySpecialRenderer
 		GlStateManager.disableLighting();
 		GlStateManager.enableAlphaTest();
 		
-		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
+		//OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 		
 		// Draw lock symbol
 		{
@@ -75,11 +74,11 @@ public class TileEntityProgressionDoorRenderer extends TileEntitySpecialRenderer
 			final double depth = .2;
 			final double spinRate = 60.0;
 
-			GlStateManager.translatef(0, 0.25, -.3);
+			GlStateManager.translated(0, 0.25, -.3);
 			GlStateManager.rotatef((float) (360.0 * (time % spinRate) / spinRate),
 					0, 1, 0);
 			
-			if (te.meetsRequirements(Minecraft.getInstance().player, null))
+			if (te.meetsRequirements(mc.player, null))
 				GlStateManager.color4f(0f, 1f, 1f, .8f);
 			else
 				GlStateManager.color4f(1f, .3f, .6f, .8f);
@@ -119,7 +118,7 @@ public class TileEntityProgressionDoorRenderer extends TileEntitySpecialRenderer
 		// Draw requirement icons
 		if (!te.getRequiredComponents().isEmpty()) {
 			GlStateManager.pushMatrix();
-			GlStateManager.translatef(0, 0, -.2);
+			GlStateManager.translated(0, 0, -.2);
 			
 			final float angleDiff = (float) (Math.PI/(float)te.getRequiredComponents().size());
 			float angle = (float) (Math.PI + angleDiff/2);
@@ -199,7 +198,7 @@ public class TileEntityProgressionDoorRenderer extends TileEntitySpecialRenderer
 			GlStateManager.pushMatrix();
 			double drawZ = -.5;
 			
-			GlStateManager.translatef(0, 1, drawZ);
+			GlStateManager.translated(0, 1, drawZ);
 			final float VANILLA_FONT_SCALE = 0.010416667f;
 			
 			GlStateManager.scalef(-VANILLA_FONT_SCALE * 2, -VANILLA_FONT_SCALE * 2, VANILLA_FONT_SCALE * 2);

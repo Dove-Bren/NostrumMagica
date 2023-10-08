@@ -2,21 +2,20 @@ package com.smanzana.nostrummagica.client.render.tile;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumPortal.NostrumPortalTileEntityBase;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
-public class TileEntityPortalRenderer extends TileEntitySpecialRenderer<NostrumPortalTileEntityBase> {
+public class TileEntityPortalRenderer extends TileEntityRenderer<NostrumPortalTileEntityBase> {
 
 	public static void init() {
 		ClientRegistry.bindTileEntitySpecialRenderer(NostrumPortalTileEntityBase.class,
@@ -30,18 +29,18 @@ public class TileEntityPortalRenderer extends TileEntitySpecialRenderer<NostrumP
 	}
 	
 	@Override
-	public void render(NostrumPortalTileEntityBase te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+	public void render(NostrumPortalTileEntityBase te, double x, double y, double z, float partialTicks, int destroyStage) {
 		double rotY = (Math.atan2(z+.5, x+.5) / (2 * Math.PI));
 		
 		rotY *= -360f;
 		rotY += 180f;
 		
-		double time = (double)te.getWorld().getTotalWorldTime() + partialTicks;
+		double time = (double)te.getWorld().getGameTime() + partialTicks;
 		rotY += 90;
 		
 		GlStateManager.pushMatrix();
 		
-		GlStateManager.translatef(x + .5, y + 1.2, z + .5);
+		GlStateManager.translated(x + .5, y + 1.2, z + .5);
 		GlStateManager.rotatef((float)rotY, 0, 1, 0);
 		
 		
@@ -61,7 +60,7 @@ public class TileEntityPortalRenderer extends TileEntitySpecialRenderer<NostrumP
 				(color & 255) / 255f,
 				te.getOpacity());
 		
-		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
+		//OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 		wr.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_TEX_NORMAL);
 		
 		double rotAngle = (2*Math.PI) * (((time / 20.0) % te.getRotationPeriod()) / te.getRotationPeriod());

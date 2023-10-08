@@ -1,20 +1,18 @@
 package com.smanzana.nostrummagica.client.render.tile;
 
-import org.lwjgl.opengl.GL11;
-
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.tiles.CandleTileEntity;
 import com.smanzana.nostrummagica.utils.NonNullEnumMap;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
-import net.minecraft.client.Minecraft;
-import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
-public class TileEntityCandleRenderer extends TileEntitySpecialRenderer<CandleTileEntity> {
+public class TileEntityCandleRenderer extends TileEntityRenderer<CandleTileEntity> {
 
 	public static void init() {
 		ClientRegistry.bindTileEntitySpecialRenderer(CandleTileEntity.class,
@@ -31,26 +29,20 @@ public class TileEntityCandleRenderer extends TileEntitySpecialRenderer<CandleTi
 	}
 	
 	@Override
-	public void render(CandleTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+	public void render(CandleTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
 
-		ItemStack item = itemCache.get(te.getType());
+		ItemStack item = itemCache.get(te.getReagentType());
 		
 		float rot = 2.0f * (System.currentTimeMillis() / 50 + partialTicks);
 		float scale = .75f;
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translatef(x + .5, y + 1.25, z + .5);
+		GlStateManager.translated(x + .5, y + 1.25, z + .5);
 		GlStateManager.rotatef(rot, 0, 1f, 0);
-		
 		GlStateManager.scalef(scale, scale, scale);
-		GlStateManager.enableBlend();
-		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GlStateManager.disableLighting();
-		GlStateManager.enableAlphaTest();
-		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 		
-		Minecraft.getInstance().getItemRenderer()
-			.ItemRenderer(item, TransformType.GROUND);
+		RenderFuncs.renderItemStandard(item);
+		RenderHelper.disableStandardItemLighting();
 		
 		GlStateManager.popMatrix();
 		

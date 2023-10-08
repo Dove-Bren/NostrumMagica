@@ -2,21 +2,20 @@ package com.smanzana.nostrummagica.client.render.tile;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.tiles.SymbolTileEntity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
-public class TileEntitySymbolRenderer extends TileEntitySpecialRenderer<SymbolTileEntity> {
+public class TileEntitySymbolRenderer extends TileEntityRenderer<SymbolTileEntity> {
 
 	public static void init() {
 		ClientRegistry.bindTileEntitySpecialRenderer(SymbolTileEntity.class,
@@ -28,7 +27,7 @@ public class TileEntitySymbolRenderer extends TileEntitySpecialRenderer<SymbolTi
 	}
 	
 	@Override
-	public void render(SymbolTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+	public void render(SymbolTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
 		
 		// Get the model from the tile entity
 		SpellComponentWrapper comp = te.getComponent();
@@ -48,7 +47,7 @@ public class TileEntitySymbolRenderer extends TileEntitySpecialRenderer<SymbolTi
 		
 		Minecraft.getInstance().getTextureManager().bindTexture(textLoc);
 		GlStateManager.pushMatrix();
-		GlStateManager.translatef(x + .5, y + 1.25, z + .5);
+		GlStateManager.translated(x + .5, y + 1.25, z + .5);
 		GlStateManager.rotatef(rot, 0, 10, 0);
 		
 		GlStateManager.scalef(scale, scale, scale);
@@ -58,7 +57,7 @@ public class TileEntitySymbolRenderer extends TileEntitySpecialRenderer<SymbolTi
 		GlStateManager.enableAlphaTest();
 		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 		
-		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
+		//OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 		wr.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
 		
 		double min = -.5;

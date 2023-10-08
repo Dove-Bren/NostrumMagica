@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileEntity;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileEntity.EffectSpark;
@@ -12,19 +15,16 @@ import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileE
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.BufferBuilder;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.AtlasTexture;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
-public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<AetherInfuserTileEntity> {
+public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherInfuserTileEntity> {
 
 	public static final float ORB_RADIUS = 2f;
 	
@@ -60,7 +60,8 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 		GlStateManager.enableCull();
 		GlStateManager.depthMask(false);
 		
-		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
+		
+		//OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240); TODO this?
 		
 		// outside
 		GlStateManager.pushMatrix();
@@ -117,7 +118,7 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 			}
 		}
 
-		GlStateManager.enableDepth();
+		GlStateManager.enableDepthTest();
 		GlStateManager.depthMask(true);
 		GlStateManager.popMatrix();
 	}
@@ -146,12 +147,14 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 //		
 //		rotY += 180f;
 //		rotY += 90;
-		// Rotation available already on ActiveRenderInfo object
-		final float rX = ActiveRenderInfo.getRotationX();
-		final float rXZ = ActiveRenderInfo.getRotationXZ();
-		final float rZ = ActiveRenderInfo.getRotationZ();
-		final float rYZ = ActiveRenderInfo.getRotationYZ();
-		final float rXY = ActiveRenderInfo.getRotationXY();
+		
+		final Minecraft mc = Minecraft.getInstance();
+		final ActiveRenderInfo renderInfo = mc.gameRenderer.getActiveRenderInfo();
+		final float rX = MathHelper.cos(renderInfo.getYaw() * ((float)Math.PI / 180F));
+		final float rXZ = rX * MathHelper.sin(renderInfo.getPitch() * ((float)Math.PI / 180F));
+		final float rZ = MathHelper.cos(renderInfo.getPitch() * ((float)Math.PI / 180F));
+		final float rYZ = MathHelper.sin(renderInfo.getYaw() * ((float)Math.PI / 180F));
+		final float rXY = -rYZ * MathHelper.sin(renderInfo.getPitch() * ((float)Math.PI / 180F));
 		
 		// Size
 		final float scale = .2f * spark.yawStart;
@@ -197,7 +200,7 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 	}
 	
 	@Override
-	public void render(AetherInfuserTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+	public void render(AetherInfuserTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
 		
 		final float ORB_PERIOD = 200f;
 		
@@ -211,7 +214,8 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 		// 0f to .4f
 		final float maxOrbOpacity = .075f;
 		final float orbOpacity = maxOrbOpacity * (.75f + .25f * (float)Math.sin(t * 2 * Math.PI)) * te.getChargePerc();
-		Vec3d trueCamPos = ActiveRenderInfo.getCameraPosition();
+		Minecraft mc = Minecraft.getInstance();
+		Vec3d trueCamPos = mc.gameRenderer.getActiveRenderInfo().getProjectedView();
 		Vec3d camOffset = new Vec3d((x + .5) - trueCamPos.x, (y + 1) - trueCamPos.y, (z + .5) - trueCamPos.z);
 		
 		Tessellator tessellator = Tessellator.getInstance();
@@ -225,7 +229,7 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 		//GlStateManager.disableRescaleNormal();
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translatef(x + .5, y + 1, z + .5);
+		GlStateManager.translated(x + .5, y + 1, z + .5);
 		
 		Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 		renderOrb(tessellator, buffer, orbOpacity, false);
@@ -238,7 +242,7 @@ public class TileEntityAetherInfuserRenderer extends TileEntitySpecialRenderer<A
 		GlStateManager.color4f(1f, 1f, 1f, .75f);
 		GlStateManager.disableLighting();
 		GlStateManager.depthMask(false);
-		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
+		//OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL);
 		for (EffectSpark spark : sparks) {
 			renderSpark(tessellator, buffer, camOffset, ticks, partialTicks, spark);

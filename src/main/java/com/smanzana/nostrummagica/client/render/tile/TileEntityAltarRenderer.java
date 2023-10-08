@@ -1,18 +1,15 @@
 package com.smanzana.nostrummagica.client.render.tile;
 
-import org.lwjgl.opengl.GL11;
-
-import net.minecraft.client.Minecraft;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.tiles.AltarTileEntity;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
-public class TileEntityAltarRenderer extends TileEntitySpecialRenderer<AltarTileEntity> {
+public class TileEntityAltarRenderer extends TileEntityRenderer<AltarTileEntity> {
 
 	public static void init() {
 		ClientRegistry.bindTileEntitySpecialRenderer(AltarTileEntity.class,
@@ -24,7 +21,7 @@ public class TileEntityAltarRenderer extends TileEntitySpecialRenderer<AltarTile
 	}
 	
 	@Override
-	public void render(AltarTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+	public void render(AltarTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
 
 		ItemStack item = te.getItem();
 		if (item.isEmpty() || te.isHidingItem())
@@ -35,19 +32,22 @@ public class TileEntityAltarRenderer extends TileEntitySpecialRenderer<AltarTile
 		float yoffset = (float) (.1f * (-.5f + Math.sin(((double) System.currentTimeMillis()) / 1000.0)));
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translatef(x + .5, y + 1.25 + yoffset, z + .5);
+		GlStateManager.translated(x + .5, y + 1.25 + yoffset, z + .5);
 		GlStateManager.rotatef(rot, 0, 1f, 0);
-		
 		GlStateManager.scalef(scale, scale, scale);
-		GlStateManager.enableBlend();
-		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GlStateManager.disableLighting();
-		GlStateManager.enableAlphaTest();
-		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 		
-		Minecraft.getInstance().getItemRenderer()
-			.ItemRenderer(item, TransformType.GROUND);
+//		GlStateManager.enableBlend();
+//		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+//		GlStateManager.disableLighting();
+//		GlStateManager.enableAlphaTest();
+//		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+//		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
+//		
+//		Minecraft.getInstance().getItemRenderer()
+//			.ItemRenderer(item, TransformType.GROUND);
+		
+		RenderFuncs.renderItemStandard(item);
+		RenderHelper.disableStandardItemLighting();
 		
 		GlStateManager.popMatrix();
 		

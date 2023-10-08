@@ -2,26 +2,28 @@ package com.smanzana.nostrummagica.client.render.tile;
 
 import org.lwjgl.opengl.GL11;
 
-import com.smanzana.nostrummagica.blocks.ManaArmorerBlock;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.tiles.ManaArmorerTileEntity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.texture.AtlasTexture;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.Direction;
+import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.pipeline.LightUtil;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
-public class TileEntityManaArmorerRenderer extends TileEntitySpecialRenderer<ManaArmorerTileEntity> {
+public class TileEntityManaArmorerRenderer extends TileEntityRenderer<ManaArmorerTileEntity> {
 
 	public static void init() {
 		ClientRegistry.bindTileEntitySpecialRenderer(ManaArmorerTileEntity.class,
@@ -35,12 +37,12 @@ public class TileEntityManaArmorerRenderer extends TileEntitySpecialRenderer<Man
 	}
 	
 	@Override
-	public void render(ManaArmorerTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+	public void render(ManaArmorerTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
 		Minecraft mc = Minecraft.getInstance();
-		BlockState state = ManaArmorerBlock.instance().getDefaultState();
+		BlockState state = NostrumBlocks.manaArmorerBlock.getDefaultState();
 		
 		if (model == null) {
-			model = mc.getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state);
+			model = mc.getBlockRendererDispatcher().getModelForState(state);
 		}
 		
 		if (model != null) {
@@ -64,22 +66,22 @@ public class TileEntityManaArmorerRenderer extends TileEntitySpecialRenderer<Man
 			GlStateManager.pushMatrix();
 
 			// Offset by .5 around rotate to adjust rotation center
-			GlStateManager.translatef(x + .5, y, z + .5);
+			GlStateManager.translated(x + .5, y, z + .5);
 			GlStateManager.rotatef(rProg, 0, 1, 0);
-			GlStateManager.translatef(-.5, 0, -.5);
+			GlStateManager.translated(-.5, 0, -.5);
 			
-			GlStateManager.translatef(0, vAmt, 0);
+			GlStateManager.translated(0, vAmt, 0);
 			
 			mc.getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 			BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
 			for (Direction facing : Direction.values()) {
-				for (BakedQuad quad : model.getQuads(state, facing, 0L)) {
+				for (BakedQuad quad : model.getQuads(state, facing, NostrumMagica.rand, EmptyModelData.INSTANCE)) {
 					LightUtil.renderQuadColor(buffer, quad, -1);
 				}
 			}
 			
-			for (BakedQuad quad : model.getQuads(state, null, 0L)) {
+			for (BakedQuad quad : model.getQuads(state, null, NostrumMagica.rand, EmptyModelData.INSTANCE)) {
 				LightUtil.renderQuadColor(buffer, quad, -1);
 			}
 			

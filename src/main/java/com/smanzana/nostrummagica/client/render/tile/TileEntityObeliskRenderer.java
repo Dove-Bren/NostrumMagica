@@ -1,24 +1,18 @@
 package com.smanzana.nostrummagica.client.render.tile;
 
-import com.google.common.base.Function;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
 
 import net.minecraft.client.Minecraft;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.client.model.obj.OBJLoader;
-import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
-public class TileEntityObeliskRenderer extends TileEntitySpecialRenderer<NostrumObeliskEntity> {
+public class TileEntityObeliskRenderer extends TileEntityRenderer<NostrumObeliskEntity> {
 
 	public static void init() {
 		ClientRegistry.bindTileEntitySpecialRenderer(NostrumObeliskEntity.class,
@@ -36,25 +30,26 @@ public class TileEntityObeliskRenderer extends TileEntitySpecialRenderer<Nostrum
 	}
 	
 	@Override
-	public void render(NostrumObeliskEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+	public void render(NostrumObeliskEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
 
 		if (!attemptedLoading && model == null) {
-			IModel raw;
+			//IModel raw;
 			attemptedLoading = true;
-			try {
-				raw = OBJLoader.INSTANCE.loadModel(MODEL_LOC);
-				model = raw.bake(TRSRTransformation.identity(), DefaultVertexFormats.BLOCK,
-						new Function<ResourceLocation, TextureAtlasSprite>() {
-
-					@Override
-					public TextureAtlasSprite apply(ResourceLocation location) {
-						return Minecraft.getInstance().getTextureMapBlocks().getAtlasSprite(location.toString());
-					}
-		});
-			} catch (Exception e) {
-				e.printStackTrace();
-				System.out.println("Failed to load obelisk tile model");
-			}
+//			try {
+//				raw = OBJLoader.INSTANCE.loadModel(MODEL_LOC);
+//				model = raw.bake(TRSRTransformation.identity(), DefaultVertexFormats.BLOCK,
+//						new Function<ResourceLocation, TextureAtlasSprite>() {
+//
+//					@Override
+//					public TextureAtlasSprite apply(ResourceLocation location) {
+//						return Minecraft.getInstance().getTextureMapBlocks().getAtlasSprite(location.toString());
+//					}
+//				});
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//				System.out.println("Failed to load obelisk tile model");
+//			}
+			model = Minecraft.getInstance().getModelManager().getModel(MODEL_LOC);
 		}
 		
 		if (model == null)
@@ -73,7 +68,7 @@ public class TileEntityObeliskRenderer extends TileEntitySpecialRenderer<Nostrum
 		
 		//GlStateManager.pushLightingAttributes();
 		GlStateManager.pushMatrix();
-		GlStateManager.translatef(x + .5, y + .5, z + .5);
+		GlStateManager.translated(x + .5, y + .5, z + .5);
 		GlStateManager.rotatef(rotY, 0, 1f, 0);
 		GlStateManager.rotatef(rotX, 1f, 0, 0);
 		

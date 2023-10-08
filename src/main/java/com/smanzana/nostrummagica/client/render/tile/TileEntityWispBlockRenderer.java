@@ -4,26 +4,27 @@ import javax.annotation.Nonnull;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock.WispBlockTileEntity;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
-public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispBlockTileEntity> {
+public class TileEntityWispBlockRenderer extends TileEntityRenderer<WispBlockTileEntity> {
 
 	public static void init() {
 		ClientRegistry.bindTileEntitySpecialRenderer(WispBlockTileEntity.class,
@@ -208,7 +209,7 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 	}
 	
 	@Override
-	public void render(WispBlockTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+	public void render(WispBlockTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
 		
 		final float shortPeriod = 3f;
 		final float longPeriod = 30f;
@@ -245,7 +246,7 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 		GlStateManager.disableRescaleNormal();
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translatef(x + .5, y, z + .5);
+		GlStateManager.translated(x + .5, y, z + .5);
 		
 		// Base
 		Minecraft.getInstance().getTextureManager().bindTexture(BASE_TEX_LOC);
@@ -260,8 +261,8 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 		GlStateManager.color4f(.99f, .99f, .99f, 1f);
 		GlStateManager.enableColorMaterial();
 		GlStateManager.pushMatrix();
-		GlStateManager.translatef(0, .8 + platOffset, 0);
-		GlStateManager.scalef(.5, .5, .5);
+		GlStateManager.translated(0, .8 + platOffset, 0);
+		GlStateManager.scaled(.5, .5, .5);
 		GlStateManager.rotatef(360f * progressLong, 0, 1, 0);
 		renderPlatform(tessellator, buffer);
 		GlStateManager.popMatrix();
@@ -269,9 +270,9 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 		// Scroll
 		if (!scroll.isEmpty()) {
 			GlStateManager.pushMatrix();
-			GlStateManager.translatef(0, 1.31 + platOffset, 0);
+			GlStateManager.translated(0, 1.31 + platOffset, 0);
 			GlStateManager.rotatef(360f * progressLong, 0, 1, 0);
-			GlStateManager.translatef(0, 0, .1);
+			GlStateManager.translated(0, 0, .1);
 			GlStateManager.rotatef(90f, 1, 0, 0);
 			
 			GlStateManager.scalef(.25f, .25f, .25f);
@@ -282,17 +283,18 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 			GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 			//OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 			
-			Minecraft.getInstance().getItemRenderer()
-				.ItemRenderer(scroll, TransformType.GROUND);
+			RenderFuncs.renderItemStandard(scroll);
+			RenderHelper.disableStandardItemLighting();
+			
 			GlStateManager.popMatrix();
 		}
 		
 		// Reagent
 		if (!reagents.isEmpty()) {
 			GlStateManager.pushMatrix();
-			GlStateManager.translatef(0, 1.31 + platOffset, 0);
+			GlStateManager.translated(0, 1.31 + platOffset, 0);
 			GlStateManager.rotatef(360f * progressLong, 0, 1, 0);
-			GlStateManager.translatef(0, 0, -.15);
+			GlStateManager.translated(0, 0, -.15);
 			GlStateManager.rotatef(90f, 1, 0, 0);
 			
 			GlStateManager.scalef(.25f, .25f, .25f);
@@ -302,8 +304,9 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 			GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 			//OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 			
-			Minecraft.getInstance().getItemRenderer()
-				.ItemRenderer(reagents, TransformType.GROUND);
+			RenderFuncs.renderItemStandard(reagents);
+			RenderHelper.disableStandardItemLighting();
+			
 			GlStateManager.popMatrix();
 		}
 		
@@ -313,10 +316,10 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 			// Draw spell icon
 			if (!scroll.isEmpty()) {
 				GlStateManager.pushMatrix();
-				GlStateManager.translatef(0, 2 + platOffset, 0);
-				GlStateManager.scalef(.5, .5, .5);
+				GlStateManager.translated(0, 2 + platOffset, 0);
+				GlStateManager.scaled(.5, .5, .5);
 				GlStateManager.rotatef(90f + (float) (360.0 * (Math.atan2(z, x) / (2 * Math.PI))), 0, -1, 0);
-				GlStateManager.translatef(.5, 0, 0);
+				GlStateManager.translated(.5, 0, 0);
 				GlStateManager.rotatef(180, 0, 0, 1);
 				// Make billboard
 				GlStateManager.color4f(1f, 1f, 1f, .4f);
@@ -353,10 +356,10 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 						(float) ((color >> 8) & 0xFF) / 256f,
 						(float) ((color >> 0) & 0xFF) / 256f,
 						.8f);
-				GlStateManager.translatef(0, .8, 0);
+				GlStateManager.translated(0, .8, 0);
 				GlStateManager.rotatef(rotoffset + (360f * ((float) i / (float) count)), 0, -1, 0);
-				GlStateManager.translatef(0, voffset, .3);
-				GlStateManager.scalef(.05, .05, .05);
+				GlStateManager.translated(0, voffset, .3);
+				GlStateManager.scaled(.05, .05, .05);
 				
 				renderGem(tessellator, buffer, false);
 				GlStateManager.color4f(0f, 0f, 0f, 1f);
@@ -389,8 +392,8 @@ public class TileEntityWispBlockRenderer extends TileEntitySpecialRenderer<WispB
 		}
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translatef(0, 2.5, 0);
-		GlStateManager.scalef(.05, .05, .05);
+		GlStateManager.translated(0, 2.5, 0);
+		GlStateManager.scaled(.05, .05, .05);
 		GlStateManager.rotatef(90f + (float) (360.0 * (Math.atan2(z, x) / (2 * Math.PI))), 0, -1, 0);
 		renderAetherDebug(te);
 		GlStateManager.popMatrix();
