@@ -5,27 +5,25 @@ import javax.annotation.Nonnull;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.tasks.KoidTask;
-import com.smanzana.nostrummagica.items.EssenceItem;
-import com.smanzana.nostrummagica.items.NostrumSkillItem;
-import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntitySize;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.Pose;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIHurtByTarget;
-import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
-import net.minecraft.entity.ai.EntityAISwimming;
-import net.minecraft.entity.ai.EntityAIWander;
-import net.minecraft.entity.ai.EntityAIWatchClosest;
+import net.minecraft.entity.ai.goal.HurtByTargetGoal;
+import net.minecraft.entity.ai.goal.LookAtGoal;
+import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
+import net.minecraft.entity.ai.goal.SwimGoal;
+import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
 import net.minecraft.entity.monster.MonsterEntity;
-import net.minecraft.entity.passive.EntityAnimal;
+import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -64,12 +62,12 @@ public class EntityKoid extends MonsterEntity implements ILoreTagged {
         idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
     }
     
-    protected void initEntityAI() {
-        this.tasks.addTask(1, new EntityAISwimming(this));
-        this.tasks.addTask(4, new EntityAIWander(this, 1.0D));
-        this.tasks.addTask(5, new EntityAIWatchClosest(this, PlayerEntity.class, 8.0F));
-        this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, false, new Class[0]));
-        this.targetTasks.addTask(2, new EntityAINearestAttackableTarget<PlayerEntity>(this, PlayerEntity.class, true));
+    protected void registerGoals() {
+        this.goalSelector.addGoal(1, new SwimGoal(this));
+        this.goalSelector.addGoal(4, new WaterAvoidingRandomWalkingGoal(this, 1.0D));
+        this.goalSelector.addGoal(5, new LookAtGoal(this, PlayerEntity.class, 8.0F));
+        this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<PlayerEntity>(this, PlayerEntity.class, true));
     }
     
     protected void registerAttributes()
@@ -81,12 +79,12 @@ public class EntityKoid extends MonsterEntity implements ILoreTagged {
         this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(2.0D);
     }
 
-    protected void playStepSound(BlockPos pos, Block blockIn)
+    protected void playStepSound(BlockPos pos, BlockState blockIn)
     {
         this.playSound(SoundEvents.ENTITY_HUSK_STEP, 0.15F, 1.0F);
     }
 
-    protected SoundEvent getHurtSound()
+    protected SoundEvent getHurtSound(DamageSource source)
     {
         return SoundEvents.ENTITY_HUSK_HURT;
     }
@@ -104,14 +102,14 @@ public class EntityKoid extends MonsterEntity implements ILoreTagged {
         return 0.7F;
     }
 
-    public float getEyeHeight()
+    protected float getStandingEyeHeight(Pose pose, EntitySize size)
     {
         return this.getHeight() * 0.8F;
     }
 
     public boolean attackEntityAsMob(Entity entityIn)
     {
-        boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue()));
+        boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getValue()));
 
         if (flag)
         {
@@ -138,7 +136,7 @@ public class EntityKoid extends MonsterEntity implements ILoreTagged {
     /**
      * Returns true if the mob is currently able to mate with the specified mob.
      */
-    public boolean canMateWith(EntityAnimal otherAnimal)
+    public boolean canMateWith(AnimalEntity otherAnimal)
     {
         return false;
     }
@@ -201,23 +199,23 @@ public class EntityKoid extends MonsterEntity implements ILoreTagged {
 	}
 	
 	@Override
-	protected void registerData() { int unused; // TODO
-		super.entityInit();
+	protected void registerData() {
+		super.registerData();
 		this.dataManager.register(KOID_VARIANT, EMagicElement.PHYSICAL.ordinal());
 	}
 	
 	public void setCombatTask() {
 		if (this.world != null && !this.world.isRemote) {
 			if (kTask != null)
-				this.tasks.removeTask(kTask);
+				this.goalSelector.removeGoal(kTask);
 			
 			kTask = new KoidTask(this);
-	        this.tasks.addTask(2, kTask);
+	        this.goalSelector.addGoal(2, kTask);
 		}
 	}
 	
 	public void readAdditional(CompoundNBT compound) {
-		super.readEntityFromNBT(compound);
+		super.readAdditional(compound);
 
         if (compound.contains("KoidType", NBT.TAG_ANY_NUMERIC)) {
         	int i = compound.getByte("KoidType");
@@ -228,8 +226,8 @@ public class EntityKoid extends MonsterEntity implements ILoreTagged {
 	}
 	
 	public void writeAdditional(CompoundNBT compound) {
-    	super.writeEntityToNBT(compound);
-        compound.setByte("KoidType", (byte)this.getElement().ordinal());
+    	super.writeAdditional(compound);
+        compound.putByte("KoidType", (byte)this.getElement().ordinal());
 	}
 	
 	@Override
@@ -248,28 +246,21 @@ public class EntityKoid extends MonsterEntity implements ILoreTagged {
         return 15728880;
     }
 
-    /**
-     * Gets how bright this entity is.
-     */
-    public float getBrightness(float partialTicks)
-    {
-        return 1.0F;
-    }
-    
-	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-		int count = this.rand.nextInt(2);
-		count += lootingModifier;
-		
-		this.entityDropItem(EssenceItem.getEssence(
-				this.getElement(),
-				count), 0);
-		
-		// Research scroll
-		int chances = 1 + lootingModifier;
-		if (rand.nextInt(100) < chances) {
-			this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.RESEARCH_SCROLL_SMALL, 1), 0);
-		}
-	}
+//    @Override
+//	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
+//		int count = this.rand.nextInt(2);
+//		count += lootingModifier;
+//		
+//		this.entityDropItem(EssenceItem.getEssence(
+//				this.getElement(),
+//				count), 0);
+//		
+//		// Research scroll
+//		int chances = 1 + lootingModifier;
+//		if (rand.nextInt(100) < chances) {
+//			this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.RESEARCH_SCROLL_SMALL, 1), 0);
+//		}
+//	}
 
 	@Override
 	public InfoScreenTabs getTab() {
@@ -283,10 +274,5 @@ public class EntityKoid extends MonsterEntity implements ILoreTagged {
 		}
 		
 		return super.attackEntityFrom(source, amount);
-	}
-	
-	@Override
-	protected boolean isValidLightLevel() {
-		return super.isValidLightLevel(); // Like a regular mob.
 	}
 }

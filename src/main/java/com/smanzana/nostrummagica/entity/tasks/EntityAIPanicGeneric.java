@@ -3,9 +3,9 @@ package com.smanzana.nostrummagica.entity.tasks;
 import com.google.common.base.Predicate;
 
 import net.minecraft.entity.CreatureEntity;
-import net.minecraft.entity.ai.EntityAIPanic;
+import net.minecraft.entity.ai.goal.PanicGoal;
 
-public class EntityAIPanicGeneric<T extends CreatureEntity> extends EntityAIPanic {
+public class EntityAIPanicGeneric<T extends CreatureEntity> extends PanicGoal {
 
 	private Predicate<T> filter;
 	private T creature;

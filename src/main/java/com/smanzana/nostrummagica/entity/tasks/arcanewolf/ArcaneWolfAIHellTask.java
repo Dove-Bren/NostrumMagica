@@ -133,7 +133,7 @@ public class ArcaneWolfAIHellTask extends Goal {
 	}
 	
 	@Override
-	public void updateTask() {
+	public void tick() {
 		if (activeTicks % 40 == 0) {
 			burnEntity(wolf, this.activeTarget);
 		} else if (activeTicks % 10 == 0) {

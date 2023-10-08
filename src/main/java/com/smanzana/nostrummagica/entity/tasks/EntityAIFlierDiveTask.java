@@ -97,7 +97,7 @@ public class EntityAIFlierDiveTask<T extends MobEntity> extends Goal
 	/**
 	 * Updates the task
 	 */
-	public void updateTask() {
+	public void tick() {
 		LivingEntity target = this.entity.getAttackTarget();
 
 		if (target != null) {

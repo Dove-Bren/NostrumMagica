@@ -126,7 +126,7 @@ public class EntityAIAttackRanged<T extends MobEntity> extends Goal
 	/**
 	 * Updates the task
 	 */
-	public void updateTask() {
+	public void tick() {
 		LivingEntity entitylivingbase = this.entity.getAttackTarget();
 
 		if (entitylivingbase != null) {

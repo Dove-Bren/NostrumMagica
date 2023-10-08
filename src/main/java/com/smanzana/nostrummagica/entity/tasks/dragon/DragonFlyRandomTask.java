@@ -5,7 +5,7 @@ import java.util.Random;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.EntityMoveHelper;
+import net.minecraft.entity.ai.MovementController;
 import net.minecraft.util.math.BlockPos;
 
 public class DragonFlyRandomTask extends Goal {
@@ -15,7 +15,7 @@ public class DragonFlyRandomTask extends Goal {
     public DragonFlyRandomTask(EntityDragon dragon)
     {
         this.parentEntity = dragon;
-        this.setMutexBits(1);
+        this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
     }
 
     /**
@@ -23,17 +23,17 @@ public class DragonFlyRandomTask extends Goal {
      */
     public boolean shouldExecute()
     {
-        EntityMoveHelper entitymovehelper = this.parentEntity.getMoveHelper();
+        MovementController MovementController = this.parentEntity.getMoveHelper();
 
-        if (entitymovehelper.isUpdating())
+        if (MovementController.isUpdating())
         {
             return false;
         }
         else
         {
-            double d0 = entitymovehelper.getX() - this.parentEntity.posX;
-            double d1 = entitymovehelper.getY() - this.parentEntity.posY;
-            double d2 = entitymovehelper.getZ() - this.parentEntity.posZ;
+            double d0 = MovementController.getX() - this.parentEntity.posX;
+            double d1 = MovementController.getY() - this.parentEntity.posY;
+            double d2 = MovementController.getZ() - this.parentEntity.posZ;
             double d3 = d0 * d0 + d1 * d1 + d2 * d2;
             if (d3 >= 1.0D && d3 <= 3600.0D) {
             	return false;

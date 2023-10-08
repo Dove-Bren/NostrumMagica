@@ -303,7 +303,7 @@ public class FollowOwnerAdvancedGoal<T extends MobEntity> extends Goal {
 	/**
 	 * Updates the task
 	 */
-	public void updateTask() {
+	public void tick() {
 		//this.thePet.getLookHelper().setLookPositionWithEntity(this.theOwner, 10.0F, (float)this.thePet.getVerticalFaceSpeed());
 
 		if (!isPetSitting(thePet)) {

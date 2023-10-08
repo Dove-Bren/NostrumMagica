@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.entity;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -17,8 +18,6 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIOrbitEntityGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIPanicGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
-import com.smanzana.nostrummagica.items.NostrumSkillItem;
-import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
@@ -43,26 +42,29 @@ import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigge
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.WallTrigger;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntitySize;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.IEntityLivingData;
+import net.minecraft.entity.ILivingEntityData;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.MoverType;
+import net.minecraft.entity.Pose;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIHurtByTarget;
-import net.minecraft.entity.ai.EntityAILookIdle;
-import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
-import net.minecraft.entity.ai.EntityAIWatchClosest;
-import net.minecraft.entity.ai.EntityMoveHelper;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.ai.controller.MovementController;
 import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.HurtByTargetGoal;
+import net.minecraft.entity.ai.goal.LookAtGoal;
+import net.minecraft.entity.ai.goal.LookRandomlyGoal;
+import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
+import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
@@ -75,13 +77,14 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class EntityWillo extends MobEntity implements ILoreTagged {
+public class EntityWillo extends MonsterEntity implements ILoreTagged {
 	
 	public static enum WilloStatus {
 		NEUTRAL,
@@ -102,14 +105,14 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 	public EntityWillo(EntityType<? extends EntityWillo> type, World worldIn) {
 		super(type, worldIn);
 		this.setNoGravity(true);
-		this.moveHelper = new WispMoveHelper(this);
+		this.moveController = new WispMoveHelper(this);
 		
 		idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
 	}
 	
-	protected void initEntityAI() {
+	protected void registerGoals() {
 		int priority = 1;
-		this.tasks.addTask(priority++, new EntitySpellAttackTask<EntityWillo>(this, 20, 4, true, (willo) -> {
+		this.goalSelector.addGoal(priority++, new EntitySpellAttackTask<EntityWillo>(this, 20, 4, true, (willo) -> {
 			return willo.getAttackTarget() != null && willo.getStatus() != WilloStatus.PANIC;
 		}, new Spell[0]){
 			@Override
@@ -118,10 +121,10 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 				return getSpellToUse();
 			}
 		});
-		this.tasks.addTask(priority++, new EntityAIPanicGeneric<EntityWillo>(this, 3.0, (e) -> {
-			return EntityWillo.this.getStatus() == WilloStatus.PANIC && EntityWillo.this.ticksElytraFlying == 14;
+		this.goalSelector.addGoal(priority++, new EntityAIPanicGeneric<EntityWillo>(this, 3.0, (e) -> {
+			return EntityWillo.this.getStatus() == WilloStatus.PANIC;
 		}));
-		this.tasks.addTask(priority++, new EntityAIOrbitEntityGeneric<EntityWillo>(this, null, 3.0, 6 * 20, 2.0, 3 * 20, 2, (e) -> {
+		this.goalSelector.addGoal(priority++, new EntityAIOrbitEntityGeneric<EntityWillo>(this, null, 3.0, 6 * 20, 2.0, 3 * 20, 2, (e) -> {
 			return e.getAttackTarget() != null
 					&& EntityWillo.this.getStatus() == WilloStatus.AGGRO;
 		}, (e) -> {
@@ -133,13 +136,13 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 				return EntityWillo.this.getAttackTarget();
 			}
 		});
-		this.tasks.addTask(priority++, new AIRandomFly(this));
-		this.tasks.addTask(priority++, new EntityAIWatchClosest(this, PlayerEntity.class, 60f));
-		this.tasks.addTask(priority++, new EntityAILookIdle(this));
+		this.goalSelector.addGoal(priority++, new AIRandomFly(this));
+		this.goalSelector.addGoal(priority++, new LookAtGoal(this, PlayerEntity.class, 60f));
+		this.goalSelector.addGoal(priority++, new LookRandomlyGoal(this));
 		
 		priority = 1;
-		this.targetTasks.addTask(priority++, new EntityAIHurtByTarget(this, true, new Class[] {EntityWillo.class}));
-		this.targetTasks.addTask(priority++, new EntityAINearestAttackableTarget<PlayerEntity>(this, PlayerEntity.class, 10, true, false, null));
+		this.targetSelector.addGoal(priority++, new HurtByTargetGoal(this).setCallsForHelp(EntityWillo.class));
+		this.targetSelector.addGoal(priority++, new NearestAttackableTargetGoal<PlayerEntity>(this, PlayerEntity.class, 10, true, false, null));
 	}
 	
 	protected void registerAttributes() {
@@ -151,12 +154,12 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 		this.getAttribute(AttributeMagicResist.instance()).setBaseValue(0.0D);
 	}
 
-	protected void playStepSound(BlockPos pos, Block blockIn)
+	protected void playStepSound(BlockPos pos, BlockState blockIn)
 	{
 		this.playSound(SoundEvents.BLOCK_GLASS_STEP, 0.15F, 1.0F);
 	}
 
-	protected SoundEvent getHurtSound()
+	protected SoundEvent getHurtSound(DamageSource source)
 	{
 		return NostrumMagicaSounds.LUX_HURT.getEvent();
 	}
@@ -174,14 +177,14 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 		return 1F;
 	}
 
-	public float getEyeHeight()
+	protected float getStandingEyeHeight(Pose pose, EntitySize size)
 	{
 		return this.getHeight() * 0.5F;
 	}
 
 	public boolean attackEntityAsMob(Entity entityIn)
 	{
-		boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue()));
+		boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getValue()));
 
 		if (flag)
 		{
@@ -225,7 +228,7 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 		
 		if (this.getStatus() == WilloStatus.PANIC && this.getRevengeTarget() != null) {
 			// Up the time so we panic forever unless target is gone or we can't see them
-			if (!this.getRevengeTarget()!.isAlive() && this.getEntitySenses().canSee(this.getRevengeTarget())) {
+			if (this.getRevengeTarget().isAlive() && this.getEntitySenses().canSee(this.getRevengeTarget())) {
 				this.setRevengeTarget(this.getRevengeTarget()); // Refreshes timer to 100 ticks
 			}
 		}
@@ -252,7 +255,7 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 			NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 					1,
 					posX + offset.x,
-					posY + height/2f + offset.y,
+					posY + getHeight()/2f + offset.y,
 					posZ + offset.z,
 					0, 40, 0,
 					//offset.scale(rand.nextFloat() * .2f),
@@ -285,8 +288,8 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 	
 	
 	@Override
-	protected void registerData() { int unused; // TODO
-		super.entityInit();
+	protected void registerData() {
+		super.registerData();
 		
 		this.dataManager.register(STATUS, WilloStatus.NEUTRAL);
 		this.dataManager.register(ELEMENT, EMagicElement.PHYSICAL);
@@ -306,7 +309,7 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 	
 	@Override
 	public void readAdditional(CompoundNBT compound) {
-		super.readEntityFromNBT(compound);
+		super.readAdditional(compound);
 		if (compound.contains("element", NBT.TAG_STRING)) {
 			try {
 				this.dataManager.set(ELEMENT, EMagicElement.valueOf(compound.getString("element").toUpperCase()));
@@ -325,15 +328,10 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 	
 	@Override
 	public void writeAdditional(CompoundNBT compound) {
-		super.writeEntityToNBT(compound);
+		super.writeAdditional(compound);
 		
 		compound.putString("element", this.getElement().name());
 		//compound.putString("status", this.getStatus().name());
-	}
-	
-	@Override
-	public boolean writeToNBTOptional(CompoundNBT compound) {
-		return super.writeToNBTOptional(compound);
 	}
 	
 	@Override
@@ -360,20 +358,21 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 		return 1.0F;
 	}
 	
-	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-		if (wasRecentlyHit) {
-//			int chance = 1 + (2 * lootingModifier);
-//			if (this.rand.nextInt(100) < chance) {
-//				this.entityDropItem(NostrumResourceItem.getItem(ResourceType.WISP_PEBBLE, 1), 0);
+//	@Override
+//	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
+//		if (wasRecentlyHit) {
+////			int chance = 1 + (2 * lootingModifier);
+////			if (this.rand.nextInt(100) < chance) {
+////				this.entityDropItem(NostrumResourceItem.getItem(ResourceType.WISP_PEBBLE, 1), 0);
+////			}
+//			
+//			// Research scroll
+//			int chances = 1 + lootingModifier;
+//			if (rand.nextInt(200) < chances) {
+//				this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.RESEARCH_SCROLL_SMALL, 1), 0);
 //			}
-			
-			// Research scroll
-			int chances = 1 + lootingModifier;
-			if (rand.nextInt(200) < chances) {
-				this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.RESEARCH_SCROLL_SMALL, 1), 0);
-			}
-		}
-	}
+//		}
+//	}
 
 	@Override
 	public InfoScreenTabs getTab() {
@@ -400,7 +399,7 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 				}
 			}
 			
-			this.playEffect(ParticleTypes.CRIT_MAGIC);
+			this.playEffect(ParticleTypes.CRIT);
 			return super.attackEntityFrom(source, amount);
 		} else if (source == DamageSource.IN_WALL
 				|| source == DamageSource.CRAMMING
@@ -418,13 +417,13 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 		}
 	}
 	
-	private void playEffect(ParticleTypes ParticleTypes) {
+	private void playEffect(IParticleData particle) {
 		
 		for (int i = 0; i < 15; ++i) {
 			double d0 = this.rand.nextGaussian() * 0.02D;
 			double d1 = this.rand.nextGaussian() * 0.02D;
 			double d2 = this.rand.nextGaussian() * 0.02D;
-			this.world.addParticle(ParticleTypes, this.posX + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.posZ + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, d0, d1, d2, new int[0]);
+			this.world.addParticle(particle, this.posX + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), this.posY + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.posZ + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), d0, d1, d2);
 		}
 	}
 	
@@ -442,7 +441,7 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 	}
 	
 	// Adapted from the wisp move helper
-	static protected class WispMoveHelper extends EntityMoveHelper {
+	static protected class WispMoveHelper extends MovementController {
 		private final EntityWillo parentEntity;
 		private int courseChangeCooldown;
 
@@ -452,7 +451,7 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 		}
 
 		public void onUpdateMoveHelper() {
-			if (this.action == EntityMoveHelper.Action.MOVE_TO) {
+			if (this.action == MovementController.Action.MOVE_TO) {
 				double d0 = this.posX - this.parentEntity.posX;
 				double d1 = this.posY - this.parentEntity.posY;
 				double d2 = this.posZ - this.parentEntity.posZ;
@@ -464,13 +463,13 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 //					this.parentEntity.getMotion().x = 0;
 //					this.parentEntity.getMotion().y = 0;
 //					this.parentEntity.getMotion().z = 0;
-//					this.action = EntityMoveHelper.Action.WAIT;
+//					this.action = MovementController.Action.WAIT;
 //					return;
 //				} else if (courseChangeCooldown-- <= 0) {
 //					courseChangeCooldown = this.parentEntity.getRNG().nextInt(5) + 10;
 //					
 //					if (this.isNotColliding(this.posX, this.posY, this.posZ, d3)) {
-//						float basespeed = (float) this.parentEntity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
+//						float basespeed = (float) this.parentEntity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue();
 //						//speed *= 3f;
 //						this.parentEntity.getMotion().x = (d0 / d3) * basespeed * speed;
 //						this.parentEntity.getMotion().y = (d1 / d3) * basespeed  * speed;
@@ -479,28 +478,28 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 //						float f9 = (float)(MathHelper.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
 //						this.entity.rotationYaw = this.limitAngle(this.entity.rotationYaw, f9, 90.0F);
 //					} else {
-//						this.action = EntityMoveHelper.Action.WAIT;
+//						this.action = MovementController.Action.WAIT;
 //					}
 //				}
 				
 				if (Math.abs(d3) < .5) {
-					this.parentEntity.getMotion().x = 0;
-					this.parentEntity.getMotion().y = 0;
-					this.parentEntity.getMotion().z = 0;
-					this.action = EntityMoveHelper.Action.WAIT;
+					this.parentEntity.setMotion(Vec3d.ZERO);
+					this.action = MovementController.Action.WAIT;
 					return;
 				} else if (this.isNotColliding(this.posX, this.posY, this.posZ, d3)) {
-					float basespeed = (float) this.parentEntity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
+					float basespeed = (float) this.parentEntity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue();
 					//speed *= 3f;
-					this.parentEntity.getMotion().x = (d0 / d3) * basespeed * speed;
-					this.parentEntity.getMotion().y = (d1 / d3) * basespeed  * speed;
-					this.parentEntity.getMotion().z = (d2 / d3) * basespeed  * speed;
+					this.parentEntity.setMotion(
+							(d0 / d3) * basespeed * speed,
+							(d1 / d3) * basespeed  * speed,
+							(d2 / d3) * basespeed  * speed
+							);
 					
 					float f9 = (float)(MathHelper.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
-					this.entity.rotationYaw = this.limitAngle(this.entity.rotationYaw, f9, 90.0F);
+					this.mob.rotationYaw = this.limitAngle(this.mob.rotationYaw, f9, 90.0F);
 				} else if (courseChangeCooldown-- <= 0) {
 					courseChangeCooldown = this.parentEntity.getRNG().nextInt(5) + 10;
-					this.action = EntityMoveHelper.Action.WAIT;
+					this.action = MovementController.Action.WAIT;
 				}
 			}
 		}
@@ -517,7 +516,7 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 			for (int i = 1; (double)i < p_179926_7_; ++i) {
 				axisalignedbb = axisalignedbb.offset(d0, d1, d2);
 
-				if (!this.parentEntity.world.getCollisionBoxes(this.parentEntity, axisalignedbb).isEmpty()) {
+				if (!this.parentEntity.world.isCollisionBoxesEmpty(this.parentEntity, axisalignedbb)) {
 					return false;
 				}
 			}
@@ -527,59 +526,53 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 	}
 	
 	// Copied from EntityFlying class
-	@Override
-	public void travel(float strafe, float vertical, float forward) {
-		if (this.isInWater()) {
-			this.moveRelative(strafe, vertical, forward, 0.02F);
-			this.move(MoverType.SELF, this.getMotion().x, this.getMotion().y, this.getMotion().z);
-			this.getMotion().x *= 0.800000011920929D;
-			this.getMotion().y *= 0.800000011920929D;
-			this.getMotion().z *= 0.800000011920929D;
-		} else if (this.isInLava()) {
-			this.moveRelative(strafe, vertical, forward, 0.02F);
-			this.move(MoverType.SELF, this.getMotion().x, this.getMotion().y, this.getMotion().z);
-			this.getMotion().x *= 0.5D;
-			this.getMotion().y *= 0.5D;
-			this.getMotion().z *= 0.5D;
-		} else {
-			float f = 0.91F;
+		@Override
+		public void travel(Vec3d how) {
+			if (this.isInWater()) {
+				this.moveRelative(0.02F, how);
+				this.move(MoverType.SELF, this.getMotion());
+				this.setMotion(this.getMotion().scale(0.8));
+			} else if (this.isInLava()) {
+				this.moveRelative(0.02F, how);
+				this.move(MoverType.SELF, this.getMotion());
+				this.setMotion(this.getMotion().scale(0.5));
+			} else {
+				float f = 0.91F;
 
-			if (this.onGround) {
-				//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ))).getBlock().slipperiness * 0.91F;
-				BlockPos underPos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
-				BlockState underState = this.world.getBlockState(underPos);
-				f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.91F;
+				if (this.onGround) {
+					//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ))).getBlock().slipperiness * 0.91F;
+					BlockPos underPos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
+					BlockState underState = this.world.getBlockState(underPos);
+					f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.91F;
+				}
+
+				float f1 = 0.16277136F / (f * f * f);
+				this.moveRelative(this.onGround ? 0.1F * f1 : 0.02F, how);
+				f = 0.91F;
+
+				if (this.onGround) {
+					//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ))).getBlock().slipperiness * 0.91F;
+					BlockPos underPos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
+					BlockState underState = this.world.getBlockState(underPos);
+					f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.91F;
+				}
+
+				this.move(MoverType.SELF, this.getMotion());
+				this.setMotion(this.getMotion().scale(f));
 			}
 
-			float f1 = 0.16277136F / (f * f * f);
-			this.moveRelative(strafe, vertical, forward, this.onGround ? 0.1F * f1 : 0.02F);
-			f = 0.91F;
+			this.prevLimbSwingAmount = this.limbSwingAmount;
+			double d1 = this.posX - this.prevPosX;
+			double d0 = this.posZ - this.prevPosZ;
+			float f2 = MathHelper.sqrt(d1 * d1 + d0 * d0) * 4.0F;
 
-			if (this.onGround) {
-				//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ))).getBlock().slipperiness * 0.91F;
-				BlockPos underPos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
-				BlockState underState = this.world.getBlockState(underPos);
-				f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.91F;
+			if (f2 > 1.0F) {
+				f2 = 1.0F;
 			}
 
-			this.move(MoverType.SELF, this.getMotion().x, this.getMotion().y, this.getMotion().z);
-			this.getMotion().x *= (double)f;
-			this.getMotion().y *= (double)f;
-			this.getMotion().z *= (double)f;
+			this.limbSwingAmount += (f2 - this.limbSwingAmount) * 0.4F;
+			this.limbSwing += this.limbSwingAmount;
 		}
-
-		this.prevLimbSwingAmount = this.limbSwingAmount;
-		double d1 = this.posX - this.prevPosX;
-		double d0 = this.posZ - this.prevPosZ;
-		float f2 = MathHelper.sqrt(d1 * d1 + d0 * d0) * 4.0F;
-
-		if (f2 > 1.0F) {
-			f2 = 1.0F;
-		}
-
-		this.limbSwingAmount += (f2 - this.limbSwingAmount) * 0.4F;
-		this.limbSwing += this.limbSwingAmount;
-	}
 
 	/**
 	 * returns true if this entity is by a ladder, false otherwise
@@ -590,31 +583,16 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 	}
 	
 	@Override
-	public boolean getCanSpawnHere() {
-		if (!super.getCanSpawnHere()) {
+	public boolean canSpawn(IWorld world, SpawnReason spawnReason) {
+		if (!super.canSpawn(world, spawnReason)) { // checks light level
 			return false;
 		}
 		
-		if (this.world.provider.getDimension() != 0 && this.world.provider.getDimension() != -1) {
+		if (this.world.getDimension().getType() != DimensionType.OVERWORLD && this.world.getDimension().getType() != DimensionType.THE_NETHER) {
 			return false;
 		}
 		
-		BlockPos blockpos = new BlockPos(this.posX, this.getBoundingBox().minY, this.posZ);
-
-		if (this.world.getLightFor(EnumSkyBlock.SKY, blockpos) > this.rand.nextInt(32)) {
-			return false;
-		} else {
-			int i = this.world.getLightFromNeighbors(blockpos);
-
-			if (this.world.isThundering()) {
-				int j = this.world.getSkylightSubtracted();
-				this.world.setSkylightSubtracted(10);
-				i = this.world.getLightFromNeighbors(blockpos);
-				this.world.setSkylightSubtracted(j);
-			}
-
-			return i <= this.rand.nextInt(12);
-		}
+		return true;
 	}
 	
 	static class AIRandomFly extends Goal {
@@ -623,7 +601,7 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 
 		public AIRandomFly(EntityWillo wisp) {
 			this.parentEntity = wisp;
-			this.setMutexBits(1);
+			this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
 		}
 
 		/**
@@ -635,14 +613,14 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 				return false;
 			}
 			
-			EntityMoveHelper entitymovehelper = this.parentEntity.getMoveHelper();
+			MovementController MovementController = this.parentEntity.getMoveHelper();
 
-			if (!entitymovehelper.isUpdating()) {
+			if (!MovementController.isUpdating()) {
 				return true;
 			} else {
-				double d0 = entitymovehelper.getX() - this.parentEntity.posX;
-				double d1 = entitymovehelper.getY() - this.parentEntity.posY;
-				double d2 = entitymovehelper.getZ() - this.parentEntity.posZ;
+				double d0 = MovementController.getX() - this.parentEntity.posX;
+				double d1 = MovementController.getY() - this.parentEntity.posY;
+				double d2 = MovementController.getZ() - this.parentEntity.posZ;
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 				return d3 < 1.0D || d3 > 3600.0D;
 			}
@@ -1011,9 +989,9 @@ public class EntityWillo extends MobEntity implements ILoreTagged {
 	
 	@Override
 	@Nullable
-	public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, @Nullable IEntityLivingData livingdata) {
+	public ILivingEntityData onInitialSpawn(IWorld world, DifficultyInstance difficulty, SpawnReason reason, @Nullable ILivingEntityData livingdata, @Nullable CompoundNBT dataTag) {
 		final EMagicElement elem = EMagicElement.values()[NostrumMagica.rand.nextInt(EMagicElement.values().length)];
 		dataManager.set(ELEMENT, elem);
-		return super.onInitialSpawn(difficulty, livingdata);
+		return super.onInitialSpawn(world, difficulty, reason, livingdata, dataTag);
 	}
 }

@@ -26,7 +26,7 @@ public final class OptionalDragonArmorMaterialSerializer implements IDataSeriali
 
 	@Override
 	public Optional<DragonArmor.DragonArmorMaterial> read(PacketBuffer buf)  {
-		return buf.readBoolean() ? Optional.of(buf.readEnumValue(DragonArmor.DragonArmorMaterial.class)) : Optional.absent();
+		return buf.readBoolean() ? Optional.of(buf.readEnumValue(DragonArmor.DragonArmorMaterial.class)) : Optional.empty();
 	}
 
 	@Override
@@ -36,6 +36,6 @@ public final class OptionalDragonArmorMaterialSerializer implements IDataSeriali
 
 	@Override
 	public Optional<DragonArmorMaterial> copyValue(Optional<DragonArmorMaterial> value) {
-		return Optional.fromNullable(value.orNull());
+		return Optional.ofNullable(value.orElse(null));
 	}
 }

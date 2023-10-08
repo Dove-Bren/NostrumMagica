@@ -352,14 +352,14 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IEntityMu
         this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(800.0D);
         this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10.0D);
         this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(18.0D);
-        this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_SPEED);
+        this.getAttributes().registerAttribute(SharedMonsterAttributes.ATTACK_SPEED);
         this.getAttribute(SharedMonsterAttributes.ATTACK_SPEED).setBaseValue(0.5D);
         this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(8D);
         this.getAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
     }
 	
 	@Override
-	protected void initEntityAI() {
+	protected void registerGoals() {
 		super.initEntityAI();
 	}
 	
@@ -876,7 +876,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IEntityMu
 	}
 	
 	@Override
-	public float getEyeHeight() {
+	protected float getStandingEyeHeight(Pose pose, EntitySize size) {
 		return this.eyeHeight;
 	}
 	

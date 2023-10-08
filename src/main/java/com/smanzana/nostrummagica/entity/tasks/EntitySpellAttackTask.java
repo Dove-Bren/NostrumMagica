@@ -120,8 +120,8 @@ public class EntitySpellAttackTask<T extends MobEntity> extends Goal {
 	}
 	
 	@Override
-	public void updateTask() {
-		super.updateTask();
+	public void tick() {
+		super.tick();
 		
 		LivingEntity target = getTarget();
 		if (target != null) {

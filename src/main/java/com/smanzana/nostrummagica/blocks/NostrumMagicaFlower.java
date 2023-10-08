@@ -2,8 +2,11 @@ package com.smanzana.nostrummagica.blocks;
 
 import java.util.Random;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 
 import net.minecraft.block.Block;
@@ -12,6 +15,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.BushBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.item.Item;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
@@ -210,5 +214,9 @@ public class NostrumMagicaFlower extends BushBlock {
 					new Vec3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), null
 					).color(color));
 		}
+	}
+	
+	public @Nullable Item getReagentItem() {
+		return ReagentItem.GetItem(this.type.reagentType);
 	}
 }

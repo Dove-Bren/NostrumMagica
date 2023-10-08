@@ -137,7 +137,7 @@ public class FollowOwnerGenericGoal<T extends CreatureEntity & ITameableEntity> 
 	/**
 	 * Updates the task
 	 */
-	public void updateTask() {
+	public void tick() {
 		this.thePet.getLookController().setLookPositionWithEntity(this.theOwner, 10.0F, (float)this.thePet.getVerticalFaceSpeed());
 
 		if (!this.thePet.isEntitySitting()) {

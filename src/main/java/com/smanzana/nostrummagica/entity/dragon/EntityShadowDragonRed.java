@@ -51,21 +51,21 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 	private void setTargetTasks() {
 		if (!targetInitted) {
 			if (this.target != null) {
-				this.targetTasks.addTask(1, new DragonAIFocusedTarget<LivingEntity>(this, this.target, true));
+				this.targetSelector.addGoal(1, new DragonAIFocusedTarget<LivingEntity>(this, this.target, true));
 			} else {
-				this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, true, new Class[0]));
-				this.targetTasks.addTask(2, new DragonAINearestAttackableTarget<PlayerEntity>(this, PlayerEntity.class, true));
+				this.targetSelector.addGoal(1, new EntityAIHurtByTarget(this, true, new Class[0]));
+				this.targetSelector.addGoal(2, new DragonAINearestAttackableTarget<PlayerEntity>(this, PlayerEntity.class, true));
 			}
 			targetInitted = true;
 		}
 	}
 	
 	@Override
-	protected void initEntityAI() {
+	protected void registerGoals() {
 		super.initEntityAI();
 		
-		this.tasks.addTask(1, new DragonMeleeAttackTask(this, 1.0D, true, 4F * .6F * 4F * .6F * 1.2));
-		this.tasks.addTask(2, new EntityAIWander(this, 1.0D, 30));
+		this.goalSelector.addGoal(1, new DragonMeleeAttackTask(this, 1.0D, true, 4F * .6F * 4F * .6F * 1.2));
+		this.goalSelector.addGoal(2, new EntityAIWander(this, 1.0D, 30));
 	}
 	
 	@Override
@@ -111,7 +111,7 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
         this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(50.0D);
         this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(5.0D);
         this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(8.0D);
-        this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_SPEED);
+        this.getAttributes().registerAttribute(SharedMonsterAttributes.ATTACK_SPEED);
         this.getAttribute(SharedMonsterAttributes.ATTACK_SPEED).setBaseValue(0.5D);
         this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64D);
     }
@@ -128,12 +128,12 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 		
 		if (this.target != null) {
 			if (this.!target.isAlive()) {
-				this.attackEntityFrom(DamageSource.OUT_OF_WORLD, (float) this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).getAttributeValue());
+				this.attackEntityFrom(DamageSource.OUT_OF_WORLD, (float) this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).getValue());
 			}
 		} else {
 			// If target is null but we're a target-type, DIE
 			if (this.dataManager.get(HASTARGET)) {
-				this.attackEntityFrom(DamageSource.OUT_OF_WORLD, (float) this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).getAttributeValue());
+				this.attackEntityFrom(DamageSource.OUT_OF_WORLD, (float) this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).getValue());
 			}
 		}
 	}

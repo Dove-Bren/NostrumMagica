@@ -5,10 +5,10 @@ import com.smanzana.nostrummagica.entity.dragon.EntityDragonRedBase;
 
 import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
+import net.minecraft.entity.ai.NearestAttackableTargetGoal;
 import net.minecraft.util.math.AxisAlignedBB;
 
-public class DragonAINearestAttackableTarget<T extends LivingEntity> extends EntityAINearestAttackableTarget<T> {
+public class DragonAINearestAttackableTarget<T extends LivingEntity> extends NearestAttackableTargetGoal<T> {
 
 	private Predicate<T> predicate;
 	

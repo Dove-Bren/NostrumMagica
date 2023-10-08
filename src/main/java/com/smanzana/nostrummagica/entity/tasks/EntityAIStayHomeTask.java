@@ -6,7 +6,7 @@ import com.google.common.base.Predicate;
 
 import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.EntityMoveHelper;
+import net.minecraft.entity.ai.MovementController;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
@@ -28,7 +28,7 @@ public class EntityAIStayHomeTask<T extends CreatureEntity> extends Goal {
 		this.maxDistSq = maxDistSq;
 		this.speed = speedIn;
 		this.rand = new Random();
-		this.setMutexBits(1);
+		this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public class EntityAIStayHomeTask<T extends CreatureEntity> extends Goal {
 	 * Returns whether an in-progress Goal should continue executing
 	 */
 	public boolean shouldContinueExecuting() {
-		EntityMoveHelper mover = creature.getMoveHelper();
+		MovementController mover = creature.getMoveHelper();
 		return mover.isUpdating() && ((mover.getX() - creature.posX) + (mover.getY() - creature.posY) + (mover.getZ() - creature.posZ) > 2);
 	}
 }

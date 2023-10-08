@@ -189,7 +189,7 @@ public abstract class DragonGambittedSpellAttackTask<T extends EntityDragon & IT
 	}
 	
 	@Override
-	public void updateTask() {
+	public void tick() {
 		
 	}
 }

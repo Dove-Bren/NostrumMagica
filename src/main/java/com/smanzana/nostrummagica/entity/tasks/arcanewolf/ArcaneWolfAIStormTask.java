@@ -96,7 +96,7 @@ public class ArcaneWolfAIStormTask extends Goal {
 	}
 	
 	@Override
-	public void updateTask() {
+	public void tick() {
 		if (shouldBlastEntity(wolf, this.activeTarget)) {
 			blastEntity(wolf, this.activeTarget);
 			this.active = false; // Signal that we're done

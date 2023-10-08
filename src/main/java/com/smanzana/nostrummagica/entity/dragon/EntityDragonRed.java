@@ -347,19 +347,19 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
         		
         };
 		
-//      this.tasks.addTask(1, new EntityAISwimming(this));
-//		this.tasks.addTask(4, new EntityAIWander(this, 1.0D, 30));
-        this.targetTasks.addTask(1, aggroTable);
-        this.targetTasks.addTask(2, new EntityAIHurtByTarget(this, false, new Class[0]));
-		this.targetTasks.addTask(3, new DragonAINearestAttackableTarget<PlayerEntity>(this, PlayerEntity.class, true));
-		this.targetTasks.addTask(4, new DragonAINearestAttackableTarget<EntityZombie>(this, EntityZombie.class, true));
-		this.targetTasks.addTask(5, new DragonAINearestAttackableTarget<EntitySheep>(this, EntitySheep.class, true));
-		this.targetTasks.addTask(6, new DragonAINearestAttackableTarget<EntityCow>(this, EntityCow.class, true));
-		this.targetTasks.addTask(7, new DragonAINearestAttackableTarget<EntityPig>(this, EntityPig.class, true));
-		this.targetTasks.addTask(8, new DragonAINearestAttackableTarget<EntityVillager>(this, EntityVillager.class, true));
-		this.targetTasks.addTask(9, new DragonAINearestAttackableTarget<EntityHorse>(this, EntityHorse.class, true));
-		this.targetTasks.addTask(10, new DragonAINearestAttackableTarget<EntityGiantZombie>(this, EntityGiantZombie.class, true));
-		this.targetTasks.addTask(11, new DragonAINearestAttackableTarget<EntityPolarBear>(this, EntityPolarBear.class, true));
+//      this.goalSelector.addGoal(1, new SwimGoal(this));
+//		this.goalSelector.addGoal(4, new EntityAIWander(this, 1.0D, 30));
+        this.targetSelector.addGoal(1, aggroTable);
+        this.targetSelector.addGoal(2, new HurtByTargetGoal(this));
+		this.targetSelector.addGoal(3, new DragonAINearestAttackableTarget<PlayerEntity>(this, PlayerEntity.class, true));
+		this.targetSelector.addGoal(4, new DragonAINearestAttackableTarget<EntityZombie>(this, EntityZombie.class, true));
+		this.targetSelector.addGoal(5, new DragonAINearestAttackableTarget<EntitySheep>(this, EntitySheep.class, true));
+		this.targetSelector.addGoal(6, new DragonAINearestAttackableTarget<EntityCow>(this, EntityCow.class, true));
+		this.targetSelector.addGoal(7, new DragonAINearestAttackableTarget<EntityPig>(this, EntityPig.class, true));
+		this.targetSelector.addGoal(8, new DragonAINearestAttackableTarget<EntityVillager>(this, EntityVillager.class, true));
+		this.targetSelector.addGoal(9, new DragonAINearestAttackableTarget<EntityHorse>(this, EntityHorse.class, true));
+		this.targetSelector.addGoal(10, new DragonAINearestAttackableTarget<EntityGiantZombie>(this, EntityGiantZombie.class, true));
+		this.targetSelector.addGoal(11, new DragonAINearestAttackableTarget<EntityPolarBear>(this, EntityPolarBear.class, true));
 	}
 	
 	@Override
@@ -376,7 +376,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 		
 		if (lastAI != null && lastAI.length > 0) {
 			for (int i = 0; i < lastAI.length; i++) {
-				this.tasks.addTask(i, lastAI[i]);
+				this.goalSelector.addGoal(i, lastAI[i]);
 			}
 		}
 	}
@@ -396,13 +396,13 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
 		
 		if (lastAI != null && lastAI.length > 0) {
 			for (int i = 0; i < lastAI.length; i++) {
-				this.tasks.addTask(i, lastAI[i]);
+				this.goalSelector.addGoal(i, lastAI[i]);
 			}
 		}
 	}
 	
 	@Override
-	protected void initEntityAI() {
+	protected void registerGoals() {
 		super.initEntityAI();
 		this.initBaseAI();
 		
@@ -420,7 +420,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IEntityMulti
         this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(1000.0D);
         this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(15.0D);
         this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(15.0D);
-        this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_SPEED);
+        this.getAttributes().registerAttribute(SharedMonsterAttributes.ATTACK_SPEED);
         this.getAttribute(SharedMonsterAttributes.ATTACK_SPEED).setBaseValue(0.5D);
         this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64D);
     }

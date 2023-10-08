@@ -9,8 +9,6 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowEntityGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
-import com.smanzana.nostrummagica.items.NostrumResourceItem;
-import com.smanzana.nostrummagica.items.NostrumSkillItem;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -20,33 +18,43 @@ import com.smanzana.nostrummagica.spells.Spell.SpellPart;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntitySize;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.Pose;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.goal.HurtByTargetGoal;
+import net.minecraft.entity.ai.goal.LookAtGoal;
+import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
+import net.minecraft.entity.ai.goal.SwimGoal;
+import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
+import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
-import net.minecraft.potion.Potion;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class EntitySprite extends MobEntity implements ILoreTagged {
+public class EntitySprite extends CreatureEntity implements ILoreTagged {
 	
 	public static final String ID = "entity_sprite";
 
@@ -73,8 +81,9 @@ public class EntitySprite extends MobEntity implements ILoreTagged {
         idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
         effectCooldown = 20 * 5;
     }
-    
-    protected void initEntityAI() {
+
+    @Override
+    protected void registerGoals() {
     	EntitySprite.initStaticSpells();
     	
     	int priority = 1;
@@ -82,8 +91,8 @@ public class EntitySprite extends MobEntity implements ILoreTagged {
     		return sprite.isAngry() && sprite.getAttackTarget() != null
     				&& sprite.getAttackTarget().getDistanceSq(sprite) <= TouchTrigger.TOUCH_RANGE * TouchTrigger.TOUCH_RANGE;
     	}, EARTH_ZAP));
-        this.tasks.addTask(priority++, new EntityAISwimming(this));
-        this.tasks.addTask(priority++, new EntityAIFollowEntityGeneric<EntitySprite>(this, 1D, 2f, 4f, false, null) {
+        this.goalSelector.addGoal(priority++, new SwimGoal(this));
+        this.goalSelector.addGoal(priority++, new EntityAIFollowEntityGeneric<EntitySprite>(this, 1D, 2f, 4f, false, null) {
         	@Override
         	protected LivingEntity getTarget(EntitySprite entity) {
         		return entity.getAttackTarget();
@@ -94,18 +103,19 @@ public class EntitySprite extends MobEntity implements ILoreTagged {
         		return entity.isAngry();
         	}
         });
-        this.tasks.addTask(priority++, new EntityAIFollowEntityGeneric<EntitySprite>(this, 1D, 6f, 10f, false, null) {
+        this.goalSelector.addGoal(priority++, new EntityAIFollowEntityGeneric<EntitySprite>(this, 1D, 6f, 10f, false, null) {
         	@Override
         	protected LivingEntity getTarget(EntitySprite entity) {
         		return entity.getAttackTarget();
         	}
         });
-        this.tasks.addTask(priority++, new EntityAIWander(this, 1.0D));
-        this.tasks.addTask(priority++, new EntityAIWatchClosest(this, PlayerEntity.class, 24.0F));
-        this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, false, new Class[0]));
-        this.targetTasks.addTask(2, new EntityAINearestAttackableTarget<PlayerEntity>(this, PlayerEntity.class, true));
+        this.goalSelector.addGoal(priority++, new WaterAvoidingRandomWalkingGoal(this, 1.0D));
+        this.goalSelector.addGoal(priority++, new LookAtGoal(this, PlayerEntity.class, 24.0F));
+        this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<PlayerEntity>(this, PlayerEntity.class, true));
     }
-    
+
+    @Override
     protected void registerAttributes()
     {
         super.registerAttributes();
@@ -115,16 +125,19 @@ public class EntitySprite extends MobEntity implements ILoreTagged {
         this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(2.0D);
     }
 
-    protected void playStepSound(BlockPos pos, Block blockIn)
+    @Override
+    protected void playStepSound(BlockPos pos, BlockState blockIn)
     {
         this.playSound(SoundEvents.ENTITY_HUSK_STEP, 0.15F, 1.0F);
     }
 
-    protected SoundEvent getHurtSound()
+    @Override
+    protected SoundEvent getHurtSound(DamageSource source)
     {
         return NostrumMagicaSounds.CAST_FAIL.getEvent();
     }
 
+    @Override
     protected SoundEvent getDeathSound()
     {
     	return NostrumMagicaSounds.CAST_FAIL.getEvent();
@@ -133,19 +146,22 @@ public class EntitySprite extends MobEntity implements ILoreTagged {
     /**
      * Returns the volume for the sounds this mob makes.
      */
+    @Override
     protected float getSoundVolume()
     {
         return 1F;
     }
 
-    public float getEyeHeight()
+    @Override
+    protected float getStandingEyeHeight(Pose pose, EntitySize size)
     {
         return this.getHeight() * 0.4F;
     }
 
+    @Override
     public boolean attackEntityAsMob(Entity entityIn)
     {
-        boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue()));
+        boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getValue()));
 
         if (flag)
         {
@@ -172,7 +188,7 @@ public class EntitySprite extends MobEntity implements ILoreTagged {
     /**
      * Returns true if the mob is currently able to mate with the specified mob.
      */
-    public boolean canMateWith(EntityAnimal otherAnimal)
+    public boolean canMateWith(AnimalEntity otherAnimal)
     {
         return false;
     }
@@ -188,10 +204,10 @@ public class EntitySprite extends MobEntity implements ILoreTagged {
     }
     
     private void applyEffect(LivingEntity entity) {
-    	entity.removePotionEffect(Potion.getPotionFromResourceLocation("levitation"));
+    	entity.removePotionEffect(Effects.LEVITATION);
     	entity.removePotionEffect(NostrumEffects.rooted);
     	if (this.isAngry()) {
-    		entity.addPotionEffect(new PotionEffect(NostrumEffects.rooted, 20 * 10));
+    		entity.addPotionEffect(new EffectInstance(NostrumEffects.rooted, 20 * 10));
 		} else {
 			final int finalDur = 20*10;
 			int dur = 20 * 1;
@@ -200,11 +216,11 @@ public class EntitySprite extends MobEntity implements ILoreTagged {
 			}
 			
 			entity.addPotionEffect(
-				new PotionEffect(Potion.getPotionFromResourceLocation("levitation"), dur)
+				new EffectInstance(Effects.LEVITATION, dur)
 				);
 			if (entity instanceof PlayerEntity) {
 				this.addPotionEffect(
-						new PotionEffect(Potion.getPotionFromResourceLocation("glowing"), finalDur)
+						new EffectInstance(Effects.GLOWING, finalDur)
 					);
 			}
 		}
@@ -246,7 +262,7 @@ public class EntitySprite extends MobEntity implements ILoreTagged {
 				}
 				
 				// Players
-				for (PlayerEntity player : world.playerEntities) {
+				for (PlayerEntity player : world.getPlayers()) {
 					if (player.isCreative() || player.isSpectator()) {
 						continue;
 					}
@@ -284,20 +300,22 @@ public class EntitySprite extends MobEntity implements ILoreTagged {
 	
 	
 	@Override
-	protected void registerData() { int unused; // TODO
-		super.entityInit();
+	protected void registerData() {
+		super.registerData();
 		
 		this.dataManager.register(SPRITE_ANGRY, false);
 	}
 	
+	@Override
 	public void readAdditional(CompoundNBT compound) {
-		super.readEntityFromNBT(compound);
+		super.readAdditional(compound);
 		
 		this.dataManager.set(SPRITE_ANGRY, compound.getBoolean("angry"));
 	}
-	
+
+	@Override
 	public void writeAdditional(CompoundNBT compound) {
-    	super.writeEntityToNBT(compound);
+    	super.writeAdditional(compound);
     	
     	compound.putBoolean("angry", this.isAngry());
 	}
@@ -321,35 +339,37 @@ public class EntitySprite extends MobEntity implements ILoreTagged {
     /**
      * Gets how bright this entity is.
      */
-    public float getBrightness(float partialTicks)
+	@Override
+    public float getBrightness()
     {
         return 1.0F;
     }
-    
-	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-		// Sprite Core
-		int chances = this.rand.nextInt(4);
-		int count = 0;
-		chances += lootingModifier;
-		
-		while (chances > 0) {
-			int eff = Math.min(chances, 4);
-			if (this.rand.nextInt(8) < eff) {
-				count++;
-			}
-			chances -= 4;
-		}
-		
-		for (int i = 0; i < count; i++) {
-			this.entityDropItem(NostrumResourceItem.getItem(ResourceType.SPRITE_CORE, 1), 0);
-		}
-		
-		// Research scroll
-		chances = 1 + lootingModifier;
-		if (rand.nextInt(100) < chances) {
-			this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.RESEARCH_SCROLL_SMALL, 1), 0);
-		}
-	}
+
+//	@Override
+//	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
+//		// Sprite Core
+//		int chances = this.rand.nextInt(4);
+//		int count = 0;
+//		chances += lootingModifier;
+//		
+//		while (chances > 0) {
+//			int eff = Math.min(chances, 4);
+//			if (this.rand.nextInt(8) < eff) {
+//				count++;
+//			}
+//			chances -= 4;
+//		}
+//		
+//		for (int i = 0; i < count; i++) {
+//			this.entityDropItem(NostrumResourceItem.getItem(ResourceType.SPRITE_CORE, 1), 0);
+//		}
+//		
+//		// Research scroll
+//		chances = 1 + lootingModifier;
+//		if (rand.nextInt(100) < chances) {
+//			this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.RESEARCH_SCROLL_SMALL, 1), 0);
+//		}
+//	}
 
 	@Override
 	public InfoScreenTabs getTab() {
@@ -376,13 +396,13 @@ public class EntitySprite extends MobEntity implements ILoreTagged {
 		return hurt;
 	}
 	
-	private void playEffect(ParticleTypes ParticleTypes) {
+	private void playEffect(IParticleData particle) {
 		
 		for (int i = 0; i < 15; ++i) {
 			double d0 = this.rand.nextGaussian() * 0.02D;
 			double d1 = this.rand.nextGaussian() * 0.02D;
 			double d2 = this.rand.nextGaussian() * 0.02D;
-			this.world.addParticle(ParticleTypes, this.posX + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.posZ + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, d0, d1, d2, new int[0]);
+			this.world.addParticle(particle, this.posX + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), this.posY + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.posZ + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), d0, d1, d2);
 		}
 	}
 	
@@ -390,7 +410,7 @@ public class EntitySprite extends MobEntity implements ILoreTagged {
 	@Override
 	public void handleStatusUpdate(byte id) {
 		if (id == 6) {
-			playEffect(ParticleTypes.VILLAGER_ANGRY);
+			playEffect(ParticleTypes.ANGRY_VILLAGER);
 		}
 	}
 	
@@ -403,13 +423,16 @@ public class EntitySprite extends MobEntity implements ILoreTagged {
 	}
 	
 	@Override
-	protected boolean isValidLightLevel() {
-		BlockPos blockpos = new BlockPos(this.posX, this.getBoundingBox().minY, this.posZ);
-		
-		if (world.getBlockState(blockpos).getMaterial() == Material.GRASS) {
-			return world.getLightFromNeighbors(blockpos) <= this.getRNG().nextInt(12);
+	public float getBlockPathWeight(BlockPos pos, IWorldReader worldIn) {
+		// most monsters do 0.5 - worldIn.getBrightness(pos);
+		final float tolerance;
+		if (worldIn.getBlockState(pos).getMaterial() == Material.ORGANIC) { // ORGANIC is what grass blocks use
+			// Higher light tolerance
+			tolerance = 0.75f;
+		} else {
+			tolerance = .5f;
 		}
 		
-		return super.isValidLightLevel();
+		return tolerance - worldIn.getBrightness(pos);
 	}
 }

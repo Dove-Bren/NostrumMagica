@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.entity.tasks.dragon;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.EntityMoveHelper;
+import net.minecraft.entity.ai.MovementController;
 import net.minecraft.util.math.BlockPos;
 
 public class DragonLandTask extends Goal {
@@ -33,12 +33,12 @@ public class DragonLandTask extends Goal {
 			return false;
 		}
 		
-		EntityMoveHelper entitymovehelper = this.dragon.getMoveHelper();
-		if (!entitymovehelper.isUpdating()) {
+		MovementController MovementController = this.dragon.getMoveHelper();
+		if (!MovementController.isUpdating()) {
 			return false;
 		} else {
-			double dx = entitymovehelper.getX() - this.dragon.posX;
-			double dz = entitymovehelper.getZ() - this.dragon.posZ;
+			double dx = MovementController.getX() - this.dragon.posX;
+			double dz = MovementController.getZ() - this.dragon.posZ;
 			double dxz = dx * dx + dz * dz;
 			
 			// Keep running unless our XZ distance gets too big

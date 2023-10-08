@@ -19,7 +19,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityMoveHelper;
+import net.minecraft.entity.ai.MovementController;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -77,7 +77,7 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
 	}
     
 
-    protected SoundEvent getHurtSound() {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return NostrumMagicaSounds.DRAGON_LAND_HURT.getEvent();
     }
 
@@ -101,7 +101,7 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
         return 2F;
     }
 
-    public float getEyeHeight()
+    protected float getStandingEyeHeight(Pose pose, EntitySize size)
     {
         return this.getHeight() * 0.95F;
     }
@@ -135,7 +135,7 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
 	
 	public abstract boolean isCasting();
 	
-	static class DragonFlyMoveHelper extends EntityMoveHelper
+	static class DragonFlyMoveHelper extends MovementController
     {
         private final EntityDragon parentEntity;
         private double lastDist;
@@ -149,9 +149,9 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
 
         public void onUpdateMoveHelper()
         {
-//        	if (this.action == EntityMoveHelper.Action.STRAFE)
+//        	if (this.action == MovementController.Action.STRAFE)
 //    		{
-//    			float f = (float)this.entity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
+//    			float f = (float)this.entity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue();
 //    			float f1 = (float)this.speed * f;
 //    			float f2 = this.moveForward;
 //    			float f3 = this.moveStrafe;
@@ -186,10 +186,10 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
 //    			this.entity.setAIMoveSpeed(f * 3);
 //    			this.entity.setMoveForward(this.moveForward);
 //    			this.entity.setMoveStrafing(this.moveStrafe);
-//    			this.action = EntityMoveHelper.Action.WAIT;
+//    			this.action = MovementController.Action.WAIT;
 //    		}
 //        	else 
-        	if (this.action == EntityMoveHelper.Action.MOVE_TO)
+        	if (this.action == MovementController.Action.MOVE_TO)
             {
                 double d0 = this.posX - this.parentEntity.posX;
                 double d1 = this.posY - this.parentEntity.posY;
@@ -200,7 +200,7 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
                 
                 if (Math.abs(d3) < 1) {
                 	lastDist = 0.0D;
-                	this.action = EntityMoveHelper.Action.WAIT;
+                	this.action = MovementController.Action.WAIT;
                 } else if (lastDist != 0.0D && Math.abs(lastDist - d3) < 0.05) {
                 	courseChangeCooldown--;
                 } else {
@@ -209,9 +209,9 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
                 
                 if (courseChangeCooldown <= 0) {
                 	lastDist = 0.0D;
-                	this.action = EntityMoveHelper.Action.WAIT;
+                	this.action = MovementController.Action.WAIT;
                 } else {
-                	float speed = (float) this.parentEntity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
+                	float speed = (float) this.parentEntity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue();
                 	speed *= 3f;
 	                this.parentEntity.getMotion().x = (d0 / d3) * speed;
 	                this.parentEntity.getMotion().y = (d1 / d3) * speed;

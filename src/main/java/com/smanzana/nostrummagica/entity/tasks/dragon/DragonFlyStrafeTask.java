@@ -41,7 +41,7 @@ public class DragonFlyStrafeTask<T extends EntityDragon> extends Goal {
 	}
 	
 	@Override
-	public void updateTask() {
+	public void tick() {
 		LivingEntity entitylivingbase = this.dragon.getAttackTarget();
 
         if (entitylivingbase != null)

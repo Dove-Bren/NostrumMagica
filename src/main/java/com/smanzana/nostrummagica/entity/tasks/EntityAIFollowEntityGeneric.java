@@ -106,7 +106,7 @@ public class EntityAIFollowEntityGeneric<T extends MobEntity> extends Goal {
 	/**
 	 * Updates the task
 	 */
-	public void updateTask() {
+	public void tick() {
 		this.entity.getLookHelper().setLookPositionWithEntity(this.theTarget, 10.0F, (float)this.entity.getVerticalFaceSpeed());
 
 		if (this.canFollow(entity)) {

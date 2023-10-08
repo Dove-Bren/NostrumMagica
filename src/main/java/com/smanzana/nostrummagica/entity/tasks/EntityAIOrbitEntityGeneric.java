@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.EntityMoveHelper;
+import net.minecraft.entity.ai.MovementController;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 
@@ -30,7 +30,7 @@ public class EntityAIOrbitEntityGeneric<T extends MobEntity> extends Goal {
 	protected final double orbitPeriod;
 	protected final double ringWobbleSpeed;
 	protected final int ringWobbleBumps;
-	protected final EntityMoveHelper entMovementHelper;
+	protected final MovementController entMovementHelper;
 	protected final Predicate<? super T> startPred;
 	protected final Predicate<? super T> continuePred;
 	
@@ -148,7 +148,7 @@ public class EntityAIOrbitEntityGeneric<T extends MobEntity> extends Goal {
 	/**
 	 * Updates the task
 	 */
-	public void updateTask() {
+	public void tick() {
 		getPoint(cursor, orbitDistance, orbitPeriod, ent.ticksExisted, offsetYaw, ringWobbleBumps, ringWobbleSpeed);
 		if (ent.getDistanceSq(cursor.xCoord + orbitTarget.posX, cursor.yCoord + orbitTarget.posY + orbitTarget.getEyeHeight() + .75, cursor.zCoord + orbitTarget.posZ)
 				> 512) {

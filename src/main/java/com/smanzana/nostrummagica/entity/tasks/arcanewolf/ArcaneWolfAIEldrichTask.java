@@ -114,7 +114,7 @@ public class ArcaneWolfAIEldrichTask extends Goal {
 	}
 	
 	@Override
-	public void updateTask() {
+	public void tick() {
 		if (activeTicks % 30 == 0) {
 			strikeEntity(wolf, this.activeTarget);
 		}

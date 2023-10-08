@@ -23,7 +23,6 @@ import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfInvento
 import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfTrainingSheet;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.effects.MagicBoostEffect;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.FollowOwnerAdvancedGoal;
@@ -62,32 +61,29 @@ import com.smanzana.nostrummagica.utils.Inventories;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.IEntityOwnable;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIAttackMelee;
-import net.minecraft.entity.ai.EntityAIBeg;
-import net.minecraft.entity.ai.EntityAIFollowOwner;
-import net.minecraft.entity.ai.EntityAIHurtByTarget;
-import net.minecraft.entity.ai.EntityAILeapAtTarget;
-import net.minecraft.entity.ai.EntityAILookIdle;
-import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
-import net.minecraft.entity.ai.EntityAIOwnerHurtByTarget;
-import net.minecraft.entity.ai.EntityAIOwnerHurtTarget;
-import net.minecraft.entity.ai.EntityAISit;
-import net.minecraft.entity.ai.EntityAISwimming;
-import net.minecraft.entity.ai.EntityAIWanderAvoidWater;
-import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.goal.BegGoal;
+import net.minecraft.entity.ai.goal.FollowOwnerGoal;
+import net.minecraft.entity.ai.goal.HurtByTargetGoal;
+import net.minecraft.entity.ai.goal.LeapAtTargetGoal;
+import net.minecraft.entity.ai.goal.LookAtGoal;
+import net.minecraft.entity.ai.goal.LookRandomlyGoal;
+import net.minecraft.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
+import net.minecraft.entity.ai.goal.OwnerHurtByTargetGoal;
+import net.minecraft.entity.ai.goal.OwnerHurtTargetGoal;
+import net.minecraft.entity.ai.goal.SitGoal;
+import net.minecraft.entity.ai.goal.SwimGoal;
+import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
 import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.monster.AbstractSkeleton;
-import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.passive.EntityWolf;
+import net.minecraft.entity.monster.AbstractSkeletonEntity;
+import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -95,7 +91,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.potion.Potion;
+import net.minecraft.potion.Effects;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
@@ -298,7 +294,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.EARTH, 3)
 							&& target.getHealth() < target.getMaxHealth()
-							&& target.getActivePotionEffect(Potion.getPotionFromResourceLocation("regeneration")) == null;
+							&& target.getActivePotionEffect(Effects.REGENERATION) == null;
 				}),
 		MAGIC_SHIELD(WolfSpellTargetGroup.SELF, 30,
 				(new Spell("WolfMagicShield", true)).addPart(new SpellPart(SelfTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.ICE, 1, EAlteration.SUPPORT, new SpellPartParam(8, true))),
@@ -336,7 +332,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 				(new Spell("WolfMagicBoost", true)).addPart(new SpellPart(AITargetTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.FIRE, 1, EAlteration.SUPPORT)),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.FIRE, 3)
-							&& target.getActivePotionEffect(MagicBoostEffect.instance()) == null
+							&& target.getActivePotionEffect(NostrumEffects.magicBoost) == null
 							&& (wolf.getAttackTarget() != null || wolf.getMana() >= wolf.getMaxMana() * .75) // in battle or >= 75% mana
 							;
 				}),
@@ -355,7 +351,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 				(new Spell("WolfSlow", true)).addPart(new SpellPart(AITargetTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.LIGHTNING, 1, EAlteration.INFLICT)),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.LIGHTNING, 1)
-							&& target.getActivePotionEffect(Potion.getPotionFromResourceLocation("slowness")) == null;
+							&& target.getActivePotionEffect(Effects.SLOWNESS) == null;
 				}),
 		CHAIN_LIGHTNING(WolfSpellTargetGroup.ENEMY, 40,
 				(new Spell("WolfChainLightning", true)).addPart(new SpellPart(SeekingBulletTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.LIGHTNING, 2, EAlteration.RUIN, new SpellPartParam(6, true))),
@@ -452,8 +448,8 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	protected void registerData() { int unused; // TODO
-		super.entityInit();
+	protected void registerData() {
+		super.registerData();
 		dataManager.register(SOULBOUND, false);
 		dataManager.register(ATTRIBUTE_XP, 0);
 		dataManager.register(ATTRIBUTE_LEVEL, 0);
@@ -498,22 +494,22 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	protected void initEntityAI() {
+	protected void registerGoals() {
 		//super.initEntityAI();
 		
-		this.aiSit = new EntityAISit(this);
+		this.sitGoal = new SitGoal(this);
 		
 		int priority = 1;
-		this.tasks.addTask(priority++, new EntityAISwimming(this));
-		this.tasks.addTask(priority++, this.aiSit);
-		this.tasks.addTask(priority++, new ArcaneWolfAIBarrierTask(this, 5));
-		this.tasks.addTask(priority++, new ArcaneWolfAIStormTask(this, 35));
-		this.tasks.addTask(priority++, new ArcaneWolfAIEldrichTask(this, 40));
-		this.tasks.addTask(priority++, new ArcaneWolfAIMysticTask(this, 10));
-		this.tasks.addTask(priority++, new ArcaneWolfAINatureTask(this, 25));
-		this.tasks.addTask(priority++, new ArcaneWolfAIHellTask(this, 40));
-		this.tasks.addTask(priority++, new EntityAILeapAtTarget(this, 0.4F));
-		this.tasks.addTask(priority++, new EntityAIAttackMelee(this, 1.0D, true) {
+		this.goalSelector.addGoal(priority++, new SwimGoal(this));
+		this.goalSelector.addGoal(priority++, this.sitGoal);
+		this.goalSelector.addGoal(priority++, new ArcaneWolfAIBarrierTask(this, 5));
+		this.goalSelector.addGoal(priority++, new ArcaneWolfAIStormTask(this, 35));
+		this.goalSelector.addGoal(priority++, new ArcaneWolfAIEldrichTask(this, 40));
+		this.goalSelector.addGoal(priority++, new ArcaneWolfAIMysticTask(this, 10));
+		this.goalSelector.addGoal(priority++, new ArcaneWolfAINatureTask(this, 25));
+		this.goalSelector.addGoal(priority++, new ArcaneWolfAIHellTask(this, 40));
+		this.goalSelector.addGoal(priority++, new LeapAtTargetGoal(this, 0.4F));
+		this.goalSelector.addGoal(priority++, new MeleeAttackGoal(this, 1.0D, true) {
 			@Override
 			protected void checkAndPerformAttack(LivingEntity target, double dist) {
 
@@ -524,8 +520,8 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 						Vec3d currentPos = EntityArcaneWolf.this.getPositionVector();
 						if (EntityArcaneWolf.this.teleportToEnemy(target)) {
 							EntityArcaneWolf.this.world.playSound(null, currentPos.x, currentPos.y, currentPos.z,
-									SoundEvents.ENTITY_ENDERMEN_TELEPORT, SoundCategory.NEUTRAL, 1f, 1f);
-							EntityArcaneWolf.this.playSound(SoundEvents.ENTITY_ENDERMEN_TELEPORT, 1f, 1f);
+									SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.NEUTRAL, 1f, 1f);
+							EntityArcaneWolf.this.playSound(SoundEvents.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
 							
 							// If currently training ender, get some xp!
 							if (EntityArcaneWolf.this.getTrainingElement() == EMagicElement.ENDER) {
@@ -539,7 +535,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 			}
 		});
 		// Attack/Offensive spells
-		this.tasks.addTask(priority++, new EntitySpellAttackTask<EntityArcaneWolf>(this, 20 * 3, 4, true, (w) -> {return !w.isSitting();}) {
+		this.goalSelector.addGoal(priority++, new EntitySpellAttackTask<EntityArcaneWolf>(this, 20 * 3, 4, true, (w) -> {return !w.isSitting();}) {
 			private List<Spell> spellList = new ArrayList<>();
 			@Override
 			protected Spell pickSpell(Spell[] spells, EntityArcaneWolf entity) {
@@ -559,7 +555,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 			}
 		});
 		// Ally spells
-		this.tasks.addTask(priority++, new EntitySpellAttackTask<EntityArcaneWolf>(this, 20 * 3, 20, false, (w) -> {return !w.isSitting();}) {
+		this.goalSelector.addGoal(priority++, new EntitySpellAttackTask<EntityArcaneWolf>(this, 20 * 3, 20, false, (w) -> {return !w.isSitting();}) {
 			private List<Spell> spellList = new ArrayList<>();
 			@Override
 			protected Spell pickSpell(Spell[] spells, EntityArcaneWolf entity) {
@@ -595,7 +591,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 			}
 		});
 		// Self spells (longer recast)
-		this.tasks.addTask(priority++, new EntitySpellAttackTask<EntityArcaneWolf>(this, 20 * 5, 100, false, (w) -> {return !w.isSitting();}) {
+		this.goalSelector.addGoal(priority++, new EntitySpellAttackTask<EntityArcaneWolf>(this, 20 * 5, 100, false, (w) -> {return !w.isSitting();}) {
 			private List<Spell> spellList = new ArrayList<>();
 			@Override
 			protected Spell pickSpell(Spell[] spells, EntityArcaneWolf entity) {
@@ -619,20 +615,20 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 				wolf.playSound(SoundEvents.ENTITY_WOLF_PANT, 1f, .8f);
 			}
 		});
-		this.tasks.addTask(priority++, new FollowOwnerAdvancedGoal<EntityArcaneWolf>(this, 1.5f, 0f, .5f));
-		this.tasks.addTask(priority++, new EntityAIFollowOwner(this, 1.0D, 10.0F, 2.0F));
-		//this.tasks.addTask(7, new EntityAIMate(this, 1.0D));
-		this.tasks.addTask(priority++, new EntityAIWanderAvoidWater(this, 1.0D));
-		this.tasks.addTask(priority++, new EntityAIBeg(this, 8.0F));
-		this.tasks.addTask(priority++, new EntityAIWatchClosest(this, PlayerEntity.class, 8.0F));
-		this.tasks.addTask(priority++, new EntityAILookIdle(this));
+		this.goalSelector.addGoal(priority++, new FollowOwnerAdvancedGoal<EntityArcaneWolf>(this, 1.5f, 0f, .5f));
+		this.goalSelector.addGoal(priority++, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F));
+		//this.goalSelector.addGoal(7, new EntityAIMate(this, 1.0D));
+		this.goalSelector.addGoal(priority++, new WaterAvoidingRandomWalkingGoal(this, 1.0D));
+		this.goalSelector.addGoal(priority++, new BegGoal(this, 8.0F));
+		this.goalSelector.addGoal(priority++, new LookAtGoal(this, PlayerEntity.class, 8.0F));
+		this.goalSelector.addGoal(priority++, new LookRandomlyGoal(this));
 		
 		priority = 1;
-		this.targetTasks.addTask(priority++, new PetTargetGoal<EntityArcaneWolf>(this));
-		this.targetTasks.addTask(priority++, new EntityAIOwnerHurtByTarget(this));
-		this.targetTasks.addTask(priority++, new EntityAIOwnerHurtTarget(this));
-		this.targetTasks.addTask(priority++, new EntityAIHurtByTarget(this, true, new Class[0]));
-		this.targetTasks.addTask(priority++, new EntityAINearestAttackableTarget<AbstractSkeleton>(this, AbstractSkeleton.class, false));
+		this.targetSelector.addGoal(priority++, new PetTargetGoal<EntityArcaneWolf>(this));
+		this.targetSelector.addGoal(priority++, new OwnerHurtByTargetGoal(this));
+		this.targetSelector.addGoal(priority++, new OwnerHurtTargetGoal(this));
+		this.targetSelector.addGoal(priority++, new HurtByTargetGoal(this).setCallsForHelp(EntityArcaneWolf.class, WolfEntity.class));
+		this.targetSelector.addGoal(priority++, new NearestAttackableTargetGoal<AbstractSkeletonEntity>(this, AbstractSkeletonEntity.class, false));
 	}
 	
 	@Override
@@ -682,7 +678,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 				float amt = this.getManaRegen();
 				
 				// Augment with bonuses
-				amt += this.getAttribute(AttributeManaRegen.instance()).getAttributeValue() / 100.0;
+				amt += this.getAttribute(AttributeManaRegen.instance()).getValue() / 100.0;
 				
 				int mana = (int) (amt);
 				amt = amt - mana; // Get fraction
@@ -734,7 +730,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 //					net.minecraftforge.common.ForgeHooks.onLivingJump(this);
 //				}
 				
-				this.setAIMoveSpeed((float)this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue());
+				this.setAIMoveSpeed((float)this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue());
 				super.travel(strafe, vertical, forward);
 			}
 			else if (entitylivingbase instanceof PlayerEntity)
@@ -786,7 +782,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	public boolean canMateWith(EntityAnimal otherAnimal) {
+	public boolean canMateWith(AnimalEntity otherAnimal) {
 		return false;
 	}
 	

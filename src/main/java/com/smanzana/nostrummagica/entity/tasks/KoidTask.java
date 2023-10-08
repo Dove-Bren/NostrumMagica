@@ -343,7 +343,7 @@ public class KoidTask extends Goal {
 	}
 	
 	@Override
-	public void updateTask() {
+	public void tick() {
 		running = run();
 	}
 	

@@ -28,7 +28,7 @@ public class OptionalMagicElementDataSerializer implements IDataSerializer<Optio
 		if (buf.readBoolean()) {
 			return Optional.of(buf.readEnumValue(EMagicElement.class));
 		} else {
-			return Optional.absent();
+			return Optional.empty();
 		}
 	}
 
@@ -39,6 +39,6 @@ public class OptionalMagicElementDataSerializer implements IDataSerializer<Optio
 
 	@Override
 	public Optional<EMagicElement> copyValue(Optional<EMagicElement> value) {
-		return Optional.fromNullable(value.orNull());
+		return Optional.ofNullable(value.orElse(null));
 	}
 }

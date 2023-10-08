@@ -1,13 +1,14 @@
 package com.smanzana.nostrummagica.entity;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import java.util.Optional;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
@@ -17,8 +18,6 @@ import com.smanzana.nostrummagica.entity.tasks.EntityAIStayHomeTask;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock;
 import com.smanzana.nostrummagica.items.EssenceItem;
-import com.smanzana.nostrummagica.items.NostrumResourceItem;
-import com.smanzana.nostrummagica.items.NostrumSkillItem;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -37,13 +36,19 @@ import com.smanzana.nostrummagica.spells.components.triggers.MagicCutterTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntitySize;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MoverType;
+import net.minecraft.entity.Pose;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.ai.controller.MovementController;
 import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.HurtByTargetGoal;
+import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
+import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.passive.GolemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -51,20 +56,25 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.particles.IParticleData;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.world.biome.NetherBiome;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.util.Constants.NBT;
 
 public class EntityWisp extends GolemEntity implements ILoreTagged {
 	
@@ -85,7 +95,7 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 	public EntityWisp(EntityType<? extends EntityWisp> type, World worldIn) {
 		super(type, worldIn);
 		this.setNoGravity(true);
-		this.moveHelper = new WispMoveHelper(this);
+		this.moveController = new WispMoveHelper(this);
 		
 		idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
 		perilTicks = 0;
@@ -97,10 +107,10 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 		this.setHome(homePos);
 	}
 	
-	protected void initEntityAI() {
+	protected void registerGoals() {
 		int priority = 1;
-		this.tasks.addTask(priority++, new AIRandomFly(this));
-		this.tasks.addTask(priority++, new EntitySpellAttackTask<EntityWisp>(this, 20, 4, true, (wisp) -> {
+		this.goalSelector.addGoal(priority++, new AIRandomFly(this));
+		this.goalSelector.addGoal(priority++, new EntitySpellAttackTask<EntityWisp>(this, 20, 4, true, (wisp) -> {
 			return wisp.getAttackTarget() != null;
 		}, new Spell[0]){
 			@Override
@@ -110,15 +120,15 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 			}
 		});
 		if (this.getHome() != null) {
-			this.tasks.addTask(priority++, new EntityAIStayHomeTask<EntityWisp>(this, 1D, (MAX_WISP_DISTANCE_SQ * .8)));
+			this.goalSelector.addGoal(priority++, new EntityAIStayHomeTask<EntityWisp>(this, 1D, (MAX_WISP_DISTANCE_SQ * .8)));
 		}
 		
 		priority = 1;
-		this.targetTasks.addTask(priority++, new EntityAIHurtByTarget(this, true, new Class[] {EntityWisp.class}));
-		if (world != null && this.rand.nextBoolean() && world.getBiome(this.getPosition()) instanceof BiomeHell) {
-			this.targetTasks.addTask(priority++, new EntityAINearestAttackableTarget<PlayerEntity>(this, PlayerEntity.class, 10, true, false, null));
+		this.targetSelector.addGoal(priority++, new HurtByTargetGoal(this).setCallsForHelp(EntityWisp.class));
+		if (world != null && this.rand.nextBoolean() && world.getBiome(this.getPosition()) instanceof NetherBiome) {
+			this.targetSelector.addGoal(priority++, new NearestAttackableTargetGoal<PlayerEntity>(this, PlayerEntity.class, 10, true, false, null));
 		} else {
-			this.targetTasks.addTask(priority++, new EntityAINearestAttackableTarget<EntityMob>(this, EntityMob.class, 10, true, false, (mob) -> {
+			this.targetSelector.addGoal(priority++, new NearestAttackableTargetGoal<MonsterEntity>(this, MonsterEntity.class, 10, true, false, (mob) -> {
 				// Wisps spawned with no home will be neutral
 				if (this.getHome() == null) {
 					return false;
@@ -140,12 +150,12 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 		this.getAttribute(AttributeMagicResist.instance()).setBaseValue(50.0D);
 	}
 
-	protected void playStepSound(BlockPos pos, Block blockIn)
+	protected void playStepSound(BlockPos pos, BlockState blockIn)
 	{
 		this.playSound(SoundEvents.BLOCK_GLASS_STEP, 0.15F, 1.0F);
 	}
 
-	protected SoundEvent getHurtSound()
+	protected SoundEvent getHurtSound(DamageSource source)
 	{
 		return NostrumMagicaSounds.CAST_FAIL.getEvent();
 	}
@@ -163,14 +173,14 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 		return 1F;
 	}
 
-	public float getEyeHeight()
+	protected float getStandingEyeHeight(Pose pose, EntitySize size)
 	{
 		return this.getHeight() * 0.5F;
 	}
 
 	public boolean attackEntityAsMob(Entity entityIn)
 	{
-		boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue()));
+		boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getValue()));
 
 		if (flag)
 		{
@@ -243,7 +253,7 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 			if (element == null) element = EMagicElement.PHYSICAL;
 			int color = element.getColor();
 			NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
-					1, posX, posY + height/2f, posZ, 0, 40, 0,
+					1, posX, posY + getHeight()/2f, posZ, 0, 40, 0,
 					new Vec3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025), null
 					).color(color));
 		}
@@ -272,10 +282,10 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 	
 	
 	@Override
-	protected void registerData() { int unused; // TODO
-		super.entityInit();
+	protected void registerData() {
+		super.registerData();
 		
-		this.dataManager.register(HOME, Optional.absent());
+		this.dataManager.register(HOME, Optional.empty());
 		this.dataManager.register(ELEMENT, EMagicElement.PHYSICAL);
 	}
 	
@@ -290,7 +300,7 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 	
 	@Override
 	public void readAdditional(CompoundNBT compound) {
-		super.readEntityFromNBT(compound);
+		super.readAdditional(compound);
 		if (compound.contains("home", NBT.TAG_LONG)) {
 			setHome(BlockPos.fromLong(compound.getLong("home")));
 		}
@@ -298,7 +308,7 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 	
 	@Override
 	public void writeAdditional(CompoundNBT compound) {
-		super.writeEntityToNBT(compound);
+		super.writeAdditional(compound);
 		
 		BlockPos homePos = this.getHome();
 		if (homePos != null) {
@@ -307,8 +317,8 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 	}
 	
 	@Override
-	public boolean writeToNBTOptional(CompoundNBT compound) {
-		return false;
+	public boolean writeUnlessRemoved(CompoundNBT compound) {
+		return false; // don't persist
 	}
 	
 	@Override
@@ -335,20 +345,20 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 		return 1.0F;
 	}
 	
-	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-		if (wasRecentlyHit && this.getHome() == null) {
-			int chance = 1 + (2 * lootingModifier);
-			if (this.rand.nextInt(100) < chance) {
-				this.entityDropItem(NostrumResourceItem.getItem(ResourceType.WISP_PEBBLE, 1), 0);
-			}
-			
-			// Research scroll
-			int chances = 1 + lootingModifier;
-			if (rand.nextInt(200) < chances) {
-				this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.RESEARCH_SCROLL_SMALL, 1), 0);
-			}
-		}
-	}
+//	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
+//		if (wasRecentlyHit && this.getHome() == null) {
+//			int chance = 1 + (2 * lootingModifier);
+//			if (this.rand.nextInt(100) < chance) {
+//				this.entityDropItem(NostrumResourceItem.getItem(ResourceType.WISP_PEBBLE, 1), 0);
+//			}
+//			
+//			// Research scroll
+//			int chances = 1 + lootingModifier;
+//			if (rand.nextInt(200) < chances) {
+//				this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.RESEARCH_SCROLL_SMALL, 1), 0);
+//			}
+//		}
+//	}
 
 	@Override
 	public InfoScreenTabs getTab() {
@@ -361,13 +371,13 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 		return super.attackEntityFrom(source, amount);
 	}
 	
-	private void playEffect(ParticleTypes ParticleTypes) {
+	private void playEffect(IParticleData particle) {
 		
 		for (int i = 0; i < 15; ++i) {
 			double d0 = this.rand.nextGaussian() * 0.02D;
 			double d1 = this.rand.nextGaussian() * 0.02D;
 			double d2 = this.rand.nextGaussian() * 0.02D;
-			this.world.addParticle(ParticleTypes, this.posX + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.posZ + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, d0, d1, d2, new int[0]);
+			this.world.addParticle(particle, this.posX + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), this.posY + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.posZ + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), d0, d1, d2);
 		}
 	}
 	
@@ -408,7 +418,7 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 	}
 	
 	// Adapted from the wisp move helper
-	static protected class WispMoveHelper extends EntityMoveHelper {
+	static protected class WispMoveHelper extends MovementController {
 		private final EntityWisp parentEntity;
 		private int courseChangeCooldown;
 
@@ -417,15 +427,16 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 			this.parentEntity = wisp;
 		}
 
-		public void onUpdateMoveHelper() {
-			if (this.action == EntityMoveHelper.Action.MOVE_TO) {
+		@Override
+		public void tick() {
+			if (this.action == MovementController.Action.MOVE_TO) {
 				double d0 = this.posX - this.parentEntity.posX;
 				double d1 = this.posY - this.parentEntity.posY;
 				double d2 = this.posZ - this.parentEntity.posZ;
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 				
 				if (d3 < 6) {
-					this.action = EntityMoveHelper.Action.WAIT;
+					this.action = MovementController.Action.WAIT;
 					return;
 				}
 
@@ -434,11 +445,13 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 					d3 = (double)MathHelper.sqrt(d3);
 
 					if (this.isNotColliding(this.posX, this.posY, this.posZ, d3)) {
-						this.parentEntity.getMotion().x += d0 / d3 * 0.005D;
-						this.parentEntity.getMotion().y += d1 / d3 * 0.005D;
-						this.parentEntity.getMotion().z += d2 / d3 * 0.005D;
+						this.parentEntity.setMotion(this.parentEntity.getMotion().add(
+								d0 / d3 * 0.005D,
+								d1 / d3 * 0.005D,
+								d2 / d3 * 0.005D
+								));
 					} else {
-						this.action = EntityMoveHelper.Action.WAIT;
+						this.action = MovementController.Action.WAIT;
 					}
 				}
 			}
@@ -456,7 +469,7 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 			for (int i = 1; (double)i < p_179926_7_; ++i) {
 				axisalignedbb = axisalignedbb.offset(d0, d1, d2);
 
-				if (!this.parentEntity.world.getCollisionBoxes(this.parentEntity, axisalignedbb).isEmpty()) {
+				if (!this.parentEntity.world.isCollisionBoxesEmpty(this.parentEntity, axisalignedbb)) {
 					return false;
 				}
 			}
@@ -467,19 +480,15 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 	
 	// Copied from EntityFlying class
 	@Override
-	public void travel(float strafe, float vertical, float forward) {
+	public void travel(Vec3d how) {
 		if (this.isInWater()) {
-			this.moveRelative(strafe, vertical, forward, 0.02F);
-			this.move(MoverType.SELF, this.getMotion().x, this.getMotion().y, this.getMotion().z);
-			this.getMotion().x *= 0.800000011920929D;
-			this.getMotion().y *= 0.800000011920929D;
-			this.getMotion().z *= 0.800000011920929D;
+			this.moveRelative(0.02F, how);
+			this.move(MoverType.SELF, this.getMotion());
+			this.setMotion(this.getMotion().scale(0.8));
 		} else if (this.isInLava()) {
-			this.moveRelative(strafe, vertical, forward, 0.02F);
-			this.move(MoverType.SELF, this.getMotion().x, this.getMotion().y, this.getMotion().z);
-			this.getMotion().x *= 0.5D;
-			this.getMotion().y *= 0.5D;
-			this.getMotion().z *= 0.5D;
+			this.moveRelative(0.02F, how);
+			this.move(MoverType.SELF, this.getMotion());
+			this.setMotion(this.getMotion().scale(0.5));
 		} else {
 			float f = 0.91F;
 
@@ -491,7 +500,7 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 			}
 
 			float f1 = 0.16277136F / (f * f * f);
-			this.moveRelative(strafe, vertical, forward, this.onGround ? 0.1F * f1 : 0.02F);
+			this.moveRelative(this.onGround ? 0.1F * f1 : 0.02F, how);
 			f = 0.91F;
 
 			if (this.onGround) {
@@ -501,10 +510,8 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 				f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.91F;
 			}
 
-			this.move(MoverType.SELF, this.getMotion().x, this.getMotion().y, this.getMotion().z);
-			this.getMotion().x *= (double)f;
-			this.getMotion().y *= (double)f;
-			this.getMotion().z *= (double)f;
+			this.move(MoverType.SELF, this.getMotion());
+			this.setMotion(this.getMotion().scale(f));
 		}
 
 		this.prevLimbSwingAmount = this.limbSwingAmount;
@@ -529,35 +536,22 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 	}
 	
 	@Override
-	public boolean getCanSpawnHere() {
-		if (!super.getCanSpawnHere()) {
+	public boolean canSpawn(IWorld world, SpawnReason spawnReason) {
+		if (!super.canSpawn(world, spawnReason)) {
 			return false;
 		}
 		
-		if (world.provider.getDimension() == 0) {
+		if (world.getDimension().getType() == DimensionType.OVERWORLD) {
 			BlockPos blockpos = new BlockPos(this.posX, this.getBoundingBox().minY, this.posZ);
-	
-			if (this.world.getLightFor(EnumSkyBlock.SKY, blockpos) > this.rand.nextInt(32)) {
+			
+			if (world.getLight(blockpos) > .75f) {
 				return false;
-			} else {
-				int i = this.world.getLightFromNeighbors(blockpos);
-	
-				if (this.world.isThundering()) {
-					int j = this.world.getSkylightSubtracted();
-					this.world.setSkylightSubtracted(10);
-					i = this.world.getLightFromNeighbors(blockpos);
-					this.world.setSkylightSubtracted(j);
-				}
-	
-				if (i > this.rand.nextInt(12)) {
-					return false;
-				}
-				
-				List<EntityWisp> wisps = world.getEntitiesWithinAABB(EntityWisp.class, this.getBoundingBox().grow(20, 20, 20), (w) -> {
-					return w !=  EntityWisp.this;
-				});
-				return wisps.size() < 20;
 			}
+	
+			List<EntityWisp> wisps = world.getEntitiesWithinAABB(EntityWisp.class, this.getBoundingBox().grow(20, 20, 20), (w) -> {
+				return w !=  EntityWisp.this;
+			});
+			return wisps.size() < 20;
 		} else {
 			// Other dimensions, just check nearby wisp count
 			List<EntityWisp> wisps = world.getEntitiesWithinAABB(EntityWisp.class, this.getBoundingBox().grow(20, 20, 20), (w) -> {
@@ -573,21 +567,21 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 
 		public AIRandomFly(EntityWisp wisp) {
 			this.parentEntity = wisp;
-			this.setMutexBits(1);
+			this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
 		}
 
 		/**
 		 * Returns whether the Goal should begin execution.
 		 */
 		public boolean shouldExecute() {
-			EntityMoveHelper entitymovehelper = this.parentEntity.getMoveHelper();
+			MovementController MovementController = this.parentEntity.getMoveHelper();
 
-			if (!entitymovehelper.isUpdating()) {
+			if (!MovementController.isUpdating()) {
 				return true;
 			} else {
-				double d0 = entitymovehelper.getX() - this.parentEntity.posX;
-				double d1 = entitymovehelper.getY() - this.parentEntity.posY;
-				double d2 = entitymovehelper.getZ() - this.parentEntity.posZ;
+				double d0 = MovementController.getX() - this.parentEntity.posX;
+				double d1 = MovementController.getY() - this.parentEntity.posY;
+				double d2 = MovementController.getZ() - this.parentEntity.posZ;
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 				return d3 < 1.0D || d3 > 3600.0D;
 			}

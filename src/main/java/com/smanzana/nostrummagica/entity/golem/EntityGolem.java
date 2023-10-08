@@ -20,13 +20,13 @@ import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIFollowOwner;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
-import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
+import net.minecraft.entity.ai.NearestAttackableTargetGoal;
 import net.minecraft.entity.ai.EntityAIOwnerHurtByTarget;
 import net.minecraft.entity.ai.EntityAIOwnerHurtTarget;
-import net.minecraft.entity.ai.EntityAISwimming;
+import net.minecraft.entity.ai.SwimGoal;
 import net.minecraft.entity.ai.EntityAIWander;
-import net.minecraft.entity.ai.EntityAIWatchClosest;
-import net.minecraft.entity.passive.EntityAnimal;
+import net.minecraft.entity.ai.LookAtGoal;
+import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -95,19 +95,19 @@ public abstract class EntityGolem extends TameableEntity implements ILoreTagged 
     public abstract void doBuffTask(LivingEntity target);
     public abstract boolean shouldDoBuff(LivingEntity target);
 
-    protected void initEntityAI()
+    protected void registerGoals()
     {
-        this.tasks.addTask(1, new EntityAISwimming(this));
-        //this.tasks.addTask(3, new EntityAIAttackMelee(this, 1.0D, true));
+        this.goalSelector.addGoal(1, new SwimGoal(this));
+        //this.goalSelector.addGoal(3, new EntityAIAttackMelee(this, 1.0D, true));
         gTask = new GolemTask(this);
-        this.tasks.addTask(2, gTask);
-        this.tasks.addTask(3, new EntityAIFollowOwner(this, 1.0D, 10.0F, 2.0F));
-        this.tasks.addTask(4, new EntityAIWander(this, 1.0D));
-        this.tasks.addTask(5, new EntityAIWatchClosest(this, PlayerEntity.class, 8.0F));
-        this.targetTasks.addTask(1, new EntityAIOwnerHurtByTarget(this));
-        this.targetTasks.addTask(2, new EntityAIOwnerHurtTarget(this));
-        this.targetTasks.addTask(3, new EntityAIHurtByTarget(this, true, new Class[0]));
-        this.targetTasks.addTask(1, new GolemAIFindEntityNearestPlayer(this));
+        this.goalSelector.addGoal(2, gTask);
+        this.goalSelector.addGoal(3, new EntityAIFollowOwner(this, 1.0D, 10.0F, 2.0F));
+        this.goalSelector.addGoal(4, new EntityAIWander(this, 1.0D));
+        this.goalSelector.addGoal(5, new LookAtGoal(this, PlayerEntity.class, 8.0F));
+        this.targetSelector.addGoal(1, new EntityAIOwnerHurtByTarget(this));
+        this.targetSelector.addGoal(2, new EntityAIOwnerHurtTarget(this));
+        this.targetSelector.addGoal(3, new EntityAIHurtByTarget(this, true, new Class[0]));
+        this.targetSelector.addGoal(1, new GolemAIFindEntityNearestPlayer(this));
     }
     
     public abstract void initGolemAttributes();
@@ -115,7 +115,7 @@ public abstract class EntityGolem extends TameableEntity implements ILoreTagged 
     protected void registerAttributes()
     {
         super.registerAttributes();
-        this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(2.0D);
+        this.getAttributes().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(2.0D);
         
         this.initGolemAttributes();
     }
@@ -131,12 +131,12 @@ public abstract class EntityGolem extends TameableEntity implements ILoreTagged 
         this.dataManager.register(DATA_HEALTH_ID, Float.valueOf(this.getHealth()));
     }
 
-    protected void playStepSound(BlockPos pos, Block blockIn)
+    protected void playStepSound(BlockPos pos, BlockState blockIn)
     {
         this.playSound(SoundEvents.ENTITY_WOLF_STEP, 0.15F, 1.0F);
     }
 
-    protected SoundEvent getHurtSound()
+    protected SoundEvent getHurtSound(DamageSource source)
     {
         return NostrumMagicaSounds.GOLEM_HURT.getEvent();
     }
@@ -154,14 +154,14 @@ public abstract class EntityGolem extends TameableEntity implements ILoreTagged 
         return 0.4F;
     }
 
-    public float getEyeHeight()
+    protected float getStandingEyeHeight(Pose pose, EntitySize size)
     {
         return this.getHeight() * 0.8F;
     }
 
     public boolean attackEntityAsMob(Entity entityIn)
     {
-        boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue()));
+        boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getValue()));
 
         if (flag)
         {
@@ -188,7 +188,7 @@ public abstract class EntityGolem extends TameableEntity implements ILoreTagged 
     /**
      * Returns true if the mob is currently able to mate with the specified mob.
      */
-    public boolean canMateWith(EntityAnimal otherAnimal)
+    public boolean canMateWith(AnimalEntity otherAnimal)
     {
         return false;
     }
@@ -267,7 +267,7 @@ public abstract class EntityGolem extends TameableEntity implements ILoreTagged 
 		return this.element;
 	}
 	
-	private static class GolemAIFindEntityNearestPlayer extends EntityAINearestAttackableTarget<PlayerEntity> {
+	private static class GolemAIFindEntityNearestPlayer extends NearestAttackableTargetGoal<PlayerEntity> {
 
 		protected MobEntity rood; // parent doesn't expose
 		

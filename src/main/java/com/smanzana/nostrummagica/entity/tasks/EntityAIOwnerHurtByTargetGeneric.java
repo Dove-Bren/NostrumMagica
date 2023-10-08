@@ -15,7 +15,7 @@ public class EntityAIOwnerHurtByTargetGeneric<T extends CreatureEntity & ITameab
 	public EntityAIOwnerHurtByTargetGeneric(T theDefendingTameableIn) {
 		super(theDefendingTameableIn, false);
 		this.theDefendingTameable = theDefendingTameableIn;
-		this.setMutexBits(1);
+		this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
 	}
 
 	/**

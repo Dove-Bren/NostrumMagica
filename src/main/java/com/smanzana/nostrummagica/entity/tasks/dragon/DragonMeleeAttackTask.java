@@ -79,7 +79,7 @@ public class DragonMeleeAttackTask extends EntityAIAttackMelee {
 	}
 	
 	@Override
-	public void updateTask() {
+	public void tick() {
 		// Can't call super: Want to adjust tactics based on whether we're flying. >.<
 		boolean flying = false;
 		if (this.attacker instanceof EntityDragonFlying) {
@@ -95,7 +95,7 @@ public class DragonMeleeAttackTask extends EntityAIAttackMelee {
 			}
 		}
 		
-		super.updateTask();
+		super.tick();
 	}
 	
 	@Override
@@ -135,7 +135,7 @@ public class DragonMeleeAttackTask extends EntityAIAttackMelee {
 			
 			// In either case, reset attackTick
 			if (attacked) {
-				this.attackTick = (int) ((double) this.attackInterval * (1/attacker.getAttribute(SharedMonsterAttributes.ATTACK_SPEED).getAttributeValue()));
+				this.attackTick = (int) ((double) this.attackInterval * (1/attacker.getAttribute(SharedMonsterAttributes.ATTACK_SPEED).getValue()));
 			}
 		}
 		

@@ -103,7 +103,7 @@ public abstract class EntityDragonRedBase extends EntityDragonFlying {
 	}
 	
 	private void biteDamageInternal(LivingEntity target) {
-		float f = (float)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
+		float f = (float)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getValue();
 		
 		// Dragons do 20 damage while on the ground, and 16 when flying
 		if (!this.isFlying()) {

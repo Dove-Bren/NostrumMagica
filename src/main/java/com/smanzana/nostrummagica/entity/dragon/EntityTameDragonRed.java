@@ -54,7 +54,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
-import net.minecraft.entity.ai.EntityAISwimming;
+import net.minecraft.entity.ai.SwimGoal;
 import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.EntityZombie;
@@ -242,7 +242,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 				return true;
 			}
 		});
-		aiRevengeTarget = new EntityAIHurtByTarget(this, false, new Class[0]);
+		aiRevengeTarget = new HurtByTargetGoal(this);
 	}
 	
 	@Override
@@ -261,9 +261,9 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	
 	protected void setupBaseAI() {
 		int priority = 0;
-		this.tasks.addTask(priority++, new EntityAISwimming(this));
-		this.tasks.addTask(priority++, new EntityAISitGeneric<EntityTameDragonRed>(this));
-		this.tasks.addTask(priority++, new EntityAIPanicGeneric<EntityTameDragonRed>(this, 1.0D, new Predicate<EntityTameDragonRed>() {
+		this.goalSelector.addGoal(priority++, new SwimGoal(this));
+		this.goalSelector.addGoal(priority++, new EntityAISitGeneric<EntityTameDragonRed>(this));
+		this.goalSelector.addGoal(priority++, new EntityAIPanicGeneric<EntityTameDragonRed>(this, 1.0D, new Predicate<EntityTameDragonRed>() {
 			@Override
 			public boolean apply(EntityTameDragonRed input) {
 				return !input.isTamed() && input.getHealth() <= DRAGON_MIN_HEALTH;
@@ -271,7 +271,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		}));
 		// Target gambits
 		final EntityTameDragonRed selfDragon = this;
-		this.tasks.addTask(priority++, new DragonGambittedSpellAttackTask<EntityTameDragonRed>(this, 20, 4) {
+		this.goalSelector.addGoal(priority++, new DragonGambittedSpellAttackTask<EntityTameDragonRed>(this, 20, 4) {
 
 			@Override
 			public EntityDragonGambit[] getGambits() {
@@ -312,7 +312,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 			
 		});
 		// Self
-		this.tasks.addTask(priority++, new DragonGambittedSpellAttackTask<EntityTameDragonRed>(this, 20, 4) {
+		this.goalSelector.addGoal(priority++, new DragonGambittedSpellAttackTask<EntityTameDragonRed>(this, 20, 4) {
 
 			@Override
 			public EntityDragonGambit[] getGambits() {
@@ -353,7 +353,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 			
 		});
 		// Ally
-		this.tasks.addTask(priority++, new DragonGambittedSpellAttackTask<EntityTameDragonRed>(this, 20, 4) {
+		this.goalSelector.addGoal(priority++, new DragonGambittedSpellAttackTask<EntityTameDragonRed>(this, 20, 4) {
 
 			@Override
 			public EntityDragonGambit[] getGambits() {
@@ -415,7 +415,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 			}
 			
 		});
-		this.tasks.addTask(priority++, new EntityAIFollowEntityGeneric<EntityTameDragonRed>(this, 1.0D, .5f, 1.5f, false) {
+		this.goalSelector.addGoal(priority++, new EntityAIFollowEntityGeneric<EntityTameDragonRed>(this, 1.0D, .5f, 1.5f, false) {
 			@Override
 			protected LivingEntity getTarget(EntityTameDragonRed entity) {
 				if (selfDragon.isTamed()) {
@@ -425,28 +425,28 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 				return null;
 			}
 		});
-		this.tasks.addTask(priority++, new DragonMeleeAttackTask(this, 1.0D, true, 15.0D));
-		this.tasks.addTask(priority++, new FollowOwnerGenericGoal<EntityTameDragonRed>(this, 1.0D, 16.0F, 4.0F, new Predicate<EntityTameDragonRed>() {
+		this.goalSelector.addGoal(priority++, new DragonMeleeAttackTask(this, 1.0D, true, 15.0D));
+		this.goalSelector.addGoal(priority++, new FollowOwnerGenericGoal<EntityTameDragonRed>(this, 1.0D, 16.0F, 4.0F, new Predicate<EntityTameDragonRed>() {
 			@Override
 			public boolean apply(EntityTameDragonRed input) {
 				// Don't follow unless we've bonded enough
 				return (input.getBond() >= BOND_LEVEL_FOLLOW);
 			}
 		}));
-		this.tasks.addTask(priority++, new EntityAIWander(this, 1.0D, 30));
+		this.goalSelector.addGoal(priority++, new EntityAIWander(this, 1.0D, 30));
 		
-		this.targetTasks.addTask(1, new EntityAIOwnerHurtByTargetGeneric<EntityTameDragonRed>(this));
-        this.targetTasks.addTask(2, new EntityAIOwnerHurtTargetGeneric<EntityTameDragonRed>(this));
-        this.targetTasks.addTask(3, aiRevengeTarget);
-        this.targetTasks.addTask(4, aiPlayerTarget);
-		this.targetTasks.addTask(5, new DragonAINearestAttackableTarget<EntityZombie>(this, EntityZombie.class, true));
-		this.targetTasks.addTask(6, new DragonAINearestAttackableTarget<EntitySheep>(this, EntitySheep.class, true));
-		this.targetTasks.addTask(7, new DragonAINearestAttackableTarget<EntityCow>(this, EntityCow.class, true));
-		this.targetTasks.addTask(8, new DragonAINearestAttackableTarget<EntityPig>(this, EntityPig.class, true));
+		this.targetSelector.addGoal(1, new EntityAIOwnerHurtByTargetGeneric<EntityTameDragonRed>(this));
+        this.targetSelector.addGoal(2, new EntityAIOwnerHurtTargetGeneric<EntityTameDragonRed>(this));
+        this.targetSelector.addGoal(3, aiRevengeTarget);
+        this.targetSelector.addGoal(4, aiPlayerTarget);
+		this.targetSelector.addGoal(5, new DragonAINearestAttackableTarget<EntityZombie>(this, EntityZombie.class, true));
+		this.targetSelector.addGoal(6, new DragonAINearestAttackableTarget<EntitySheep>(this, EntitySheep.class, true));
+		this.targetSelector.addGoal(7, new DragonAINearestAttackableTarget<EntityCow>(this, EntityCow.class, true));
+		this.targetSelector.addGoal(8, new DragonAINearestAttackableTarget<EntityPig>(this, EntityPig.class, true));
 	}
 	
 	@Override
-	protected void initEntityAI() {
+	protected void registerGoals() {
 		super.initEntityAI();
 		
 		this.setupBaseAI();
@@ -1374,7 +1374,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
         this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(100.0D);
         this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10.0D);
         this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(10.0D);
-        this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_SPEED);
+        this.getAttributes().registerAttribute(SharedMonsterAttributes.ATTACK_SPEED);
         this.getAttribute(SharedMonsterAttributes.ATTACK_SPEED).setBaseValue(0.5D);
         this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64D);
     }
@@ -1454,7 +1454,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 					float amt = this.getManaRegen();
 					
 					// Augment with bonuses
-					amt += this.getAttribute(AttributeManaRegen.instance()).getAttributeValue() / 100.0;
+					amt += this.getAttribute(AttributeManaRegen.instance()).getValue() / 100.0;
 					
 					int mana = (int) (amt);
 					amt = amt - (int) amt;
@@ -1523,7 +1523,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 //					net.minecraftforge.common.ForgeHooks.onLivingJump(this);
 //				}
 				
-				this.setAIMoveSpeed((float)this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue());
+				this.setAIMoveSpeed((float)this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue());
 				super.travel(strafe, vertical, forward);
 			}
 			else if (entitylivingbase instanceof PlayerEntity)

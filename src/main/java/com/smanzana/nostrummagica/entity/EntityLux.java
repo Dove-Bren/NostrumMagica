@@ -1,17 +1,18 @@
 package com.smanzana.nostrummagica.entity;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
-import java.util.UUID;
 import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import java.util.Optional;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
+import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
@@ -19,38 +20,41 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFlierDiveTask;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIOrbitEntityGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIStayHomeTask;
-import com.smanzana.nostrummagica.entity.tasks.EntityAITemptGeneric;
-import com.smanzana.nostrummagica.items.NostrumSkillItem;
-import com.smanzana.nostrummagica.items.NostrumSkillItem.SkillItemType;
+import com.smanzana.nostrummagica.entity.tasks.GenericTemptGoal;
+import com.smanzana.nostrummagica.items.NostrumItemTags;
 import com.smanzana.nostrummagica.items.ReagentItem;
-import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockBush;
-import net.minecraft.block.BlockFlower;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.BushBlock;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.AgeableEntity;
 import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityAgeable;
+import net.minecraft.entity.EntitySize;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MoverType;
+import net.minecraft.entity.Pose;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIHurtByTarget;
-import net.minecraft.entity.ai.EntityMoveHelper;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.ai.controller.MovementController;
 import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.HurtByTargetGoal;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -61,22 +65,22 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEntity {
+public class EntityLux extends AnimalEntity implements ILoreTagged/*, ITameableEntity*/ {
 	
 	public static final String ID = "entity_lux";
 	
 	protected static final double LUX_HOME_DISTANCE_SQ = 144;
 	protected static final double LUX_HOME_FORGET_DISTANCE_SQ = 400;
 	protected static final DataParameter<Optional<BlockPos>> HOME  = EntityDataManager.<Optional<BlockPos>>createKey(EntityLux.class, DataSerializers.OPTIONAL_BLOCK_POS);
-	protected static final DataParameter<Optional<UUID>> OWNER = EntityDataManager.<Optional<UUID>>createKey(EntityLux.class, DataSerializers.OPTIONAL_UNIQUE_ID);
-	protected static final DataParameter<ItemStack> POLLINATED_ITEM = EntityDataManager.<ItemStack>createKey(EntityLux.class, DataSerializers.ITEM_STACK);
+	//protected static final DataParameter<Optional<UUID>> OWNER = EntityDataManager.<Optional<UUID>>createKey(EntityLux.class, DataSerializers.OPTIONAL_UNIQUE_ID);
+	protected static final DataParameter<ItemStack> POLLINATED_ITEM = EntityDataManager.<ItemStack>createKey(EntityLux.class, DataSerializers.ITEMSTACK);
 	protected static final DataParameter<Integer> COMMUNITY_SCORE = EntityDataManager.<Integer>createKey(EntityLux.class, DataSerializers.VARINT);
 	
 	// For display
@@ -91,7 +95,7 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 		super(type, worldIn);
 		this.setNoGravity(true);
 		this.noClip = true;
-		this.moveHelper = new LuxMoveHelper(this);
+		this.moveController = new LuxMoveHelper(this);
 		
 		idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
 	}
@@ -102,15 +106,15 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 		this.setHome(homePos);
 	}
 	
-	public EntityLux(EntityType<? extends EntityLux> type, World worldIn, LivingEntity owner) {
-		this(type, worldIn);
-		this.setOwner(owner);
-	}
+//	public EntityLux(EntityType<? extends EntityLux> type, World worldIn, LivingEntity owner) {
+//		this(type, worldIn);
+//		this.setOwner(owner);
+//	}
 	
-	protected void initEntityAI() {
+	protected void registerGoals() {
 		int priority = 1;
-		this.tasks.addTask(priority++, new EntityAIFlierDiveTask<EntityLux>(this, 5.0, 20 * 3, 16, true));
-		this.tasks.addTask(priority++, new EntityAIOrbitEntityGeneric<EntityLux>(this, null, 4, 20 * 10) {
+		this.goalSelector.addGoal(priority++, new EntityAIFlierDiveTask<EntityLux>(this, 5.0, 20 * 3, 16, true));
+		this.goalSelector.addGoal(priority++, new EntityAIOrbitEntityGeneric<EntityLux>(this, null, 4, 20 * 10) {
 			@Override
 			public boolean shouldExecute() {
 				if (this.ent == null || this.ent.getAttackTarget() == null) {
@@ -125,50 +129,50 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 				return this.ent.getAttackTarget();
 			}
 		});
-		this.tasks.addTask(priority++, new EntityAIOrbitEntityGeneric<EntityLux>(this, null, 3, 20 * 10) {
-			@Override
-			public boolean shouldExecute() {
-				LivingEntity owner = getOwner();
-				if (owner == null) {
-					return false;
-				}
-				
-				return super.shouldExecute();
-			}
-			
-			@Override
-			protected LivingEntity getOrbitTarget() {
-				return getOwner();
-			}
-		});
+//		this.goalSelector.addGoal(priority++, new EntityAIOrbitEntityGeneric<EntityLux>(this, null, 3, 20 * 10) {
+//			@Override
+//			public boolean shouldExecute() {
+//				LivingEntity owner = getOwner();
+//				if (owner == null) {
+//					return false;
+//				}
+//				
+//				return super.shouldExecute();
+//			}
+//			
+//			@Override
+//			protected LivingEntity getOrbitTarget() {
+//				return getOwner();
+//			}
+//		});
 		
 		// At night, sleep in trees
-		this.tasks.addTask(priority++, new AIRoostTask(this, true));
+		this.goalSelector.addGoal(priority++, new AIRoostTask(this, true));
 		
 		// If player nearby with a flower, be tempted!
-		this.tasks.addTask(priority++, new EntityAITemptGeneric(this, 1.1D, ReagentItem.instance(), false) {
+		this.goalSelector.addGoal(priority++, new GenericTemptGoal(this, 1.1D, false, Ingredient.EMPTY) {
 			@Override
 			protected boolean isTempting(ItemStack stack) {
-				ReagentType type = ReagentItem.findType(stack);
-				return type == ReagentType.BLACK_PEARL || type == ReagentType.CRYSTABLOOM;
+				return !stack.isEmpty()
+						&& (NostrumItemTags.Items.ReagentCrystabloom.contains(stack.getItem()) || NostrumItemTags.Items.ReagentBlackPearl.contains(stack.getItem()));
 			}
 			
 			@Override
-			protected void moveToTemptingPlayer(CreatureEntity tempted, PlayerEntity player) {
-				if (this.temptedEntity.getDistanceSq(this.temptingPlayer) < 6.25D) {
+			public void moveToclosestPlayer(CreatureEntity tempted, PlayerEntity player) {
+				if (tempted.getDistanceSq(player) < 6.25D) {
 					//this.temptedEntity.getMoveHelper(). no such thing as stop
 				} else {
-					this.temptedEntity.getMoveHelper().setMoveTo(player.posX, player.posY, player.posZ, 0.3D);
+					tempted.getMoveHelper().setMoveTo(player.posX, player.posY, player.posZ, 0.3D);
 				}
 			}
 		});
 		// TODO
 		
 		// If we go too far, go back home!
-		this.tasks.addTask(priority++, new EntityAIStayHomeTask<EntityLux>(this, 1D, (LUX_HOME_DISTANCE_SQ * .8)));
+		this.goalSelector.addGoal(priority++, new EntityAIStayHomeTask<EntityLux>(this, 1D, (LUX_HOME_DISTANCE_SQ * .8)));
 		
 		// Daily idle tasks. First, look for interesting flowers
-		this.tasks.addTask(priority++, new AIFlyToRandomFeature(this, 20 * 10) {
+		this.goalSelector.addGoal(priority++, new AIFlyToRandomFeature(this, 20 * 10) {
 
 			@Override
 			public boolean shouldExecute() {
@@ -194,10 +198,10 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 		});
 		
 		// else just fly randomly
-		this.tasks.addTask(priority++, new AIRandomFly(this));
+		this.goalSelector.addGoal(priority++, new AIRandomFly(this));
 		
 		priority = 1;
-		this.targetTasks.addTask(priority++, new EntityAIHurtByTarget(this, true, new Class[] {EntityLux.class}));
+		this.targetSelector.addGoal(priority++, new HurtByTargetGoal(this).setCallsForHelp(EntityLux.class));
 	}
 	
 	protected void registerAttributes()
@@ -208,15 +212,15 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 		this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(0.0D);
 		this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(30.0);
 		this.getAttribute(AttributeMagicResist.instance()).setBaseValue(0.0D);
-		this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(1.0D);
+		this.getAttributes().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(1.0D);
 	}
 
-	protected void playStepSound(BlockPos pos, Block blockIn)
+	protected void playStepSound(BlockPos pos, BlockState blockIn)
 	{
 		this.playSound(SoundEvents.BLOCK_GLASS_STEP, 0.15F, 1.0F);
 	}
 
-	protected SoundEvent getHurtSound()
+	protected SoundEvent getHurtSound(DamageSource source)
 	{
 		return NostrumMagicaSounds.LUX_HURT.getEvent();
 	}
@@ -234,14 +238,14 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 		return 1F;
 	}
 
-	public float getEyeHeight()
+	protected float getStandingEyeHeight(Pose pose, EntitySize size)
 	{
 		return this.getHeight() * 0.5F;
 	}
 
 	public boolean attackEntityAsMob(Entity entityIn)
 	{
-		boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue()));
+		boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getValue()));
 
 		if (flag)
 		{
@@ -275,7 +279,7 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 					final float darken = (getCommunityScore() >= 50 ? .2f : 0f);
 					NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 							1,
-							posX, posY + height/2, posZ,
+							posX, posY + getHeight()/2, posZ,
 							0.05, 40, 10,
 							new Vec3d(0, -.1, 0),
 							null
@@ -287,7 +291,7 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 					final float darken = (getCommunityScore() >= 50 ? .2f : 0f);
 					NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 							1,
-							posX, posY + height/2, posZ,
+							posX, posY + getHeight()/2, posZ,
 							1, 15, 0,
 							this.getEntityId()
 							).color(.4f, .2f - darken, 1f - darken, .4f - darken));
@@ -296,7 +300,8 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 		} else {
 			// Check if we're far from home and forget it if so
 			if (this.getHome() != null) {
-				if (this.getDistanceSq(this.getHome()) > LUX_HOME_FORGET_DISTANCE_SQ) {
+				
+				if (this.getHome().distanceSq(this.getPosition()) > LUX_HOME_FORGET_DISTANCE_SQ) {
 					this.setHome(null);
 				}
 			}
@@ -351,19 +356,19 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 	
 	
 	@Override
-	protected void registerData() { int unused; // TODO
-		super.entityInit();
+	protected void registerData() {
+		super.registerData();
 		
-		this.dataManager.register(HOME, Optional.absent());
-		this.dataManager.register(OWNER, Optional.absent());
+		this.dataManager.register(HOME, Optional.empty());
+		//this.dataManager.register(OWNER, Optional.empty());
 		this.dataManager.register(POLLINATED_ITEM, ItemStack.EMPTY);
 		this.dataManager.register(COMMUNITY_SCORE, 0);
 		this.dataManager.register(ROOSTING, false);
 	}
 	
 	protected void setHome(BlockPos home) {
-		this.dataManager.set(HOME, Optional.fromNullable(home));
-		this.setHomePosAndDistance(home == null ? BlockPos.ORIGIN : home, (int) LUX_HOME_DISTANCE_SQ);
+		this.dataManager.set(HOME, Optional.ofNullable(home));
+		this.setHomePosAndDistance(home == null ? BlockPos.ZERO : home, (int) LUX_HOME_DISTANCE_SQ);
 	}
 	
 	public BlockPos getHome() {
@@ -372,21 +377,21 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 	
 	@Override
 	public void readAdditional(CompoundNBT compound) {
-		super.readEntityFromNBT(compound);
+		super.readAdditional(compound);
 		if (compound.contains("home", NBT.TAG_LONG)) {
 			setHome(BlockPos.fromLong(compound.getLong("home")));
 		} else {
 			setHome(null);
 		}
 		
-		if (compound.contains("owner", NBT.TAG_COMPOUND)) {
-			setOwner(compound.getUniqueId("owner"));
-		} else {
-			setOwner((UUID)null);
-		}
+//		if (compound.contains("owner", NBT.TAG_COMPOUND)) {
+//			setOwner(compound.getUniqueId("owner"));
+//		} else {
+//			setOwner((UUID)null);
+//		}
 		
 		if (compound.contains("pollinated_item", NBT.TAG_COMPOUND)) {
-			setPollinatedItem(new ItemStack(compound.getCompound("pollinated_item")));
+			setPollinatedItem(ItemStack.read(compound.getCompound("pollinated_item")));
 		} else {
 			setPollinatedItem(ItemStack.EMPTY);
 		}
@@ -398,24 +403,19 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 	
 	@Override
 	public void writeAdditional(CompoundNBT compound) {
-		super.writeEntityToNBT(compound);
+		super.writeAdditional(compound);
 		
 		BlockPos homePos = this.getHome();
 		if (homePos != null) {
 			compound.putLong("home", homePos.toLong());
 		}
-		if (getOwnerId() != null) {
-			compound.setUniqueId("owner", getOwnerId());
-		}
+//		if (getOwnerId() != null) {
+//			compound.putUniqueId("owner", getOwnerId());
+//		}
 		if (!getPollinatedItem().isEmpty()) {
 			compound.put("pollinated_item", getPollinatedItem().serializeNBT());
 		}
 		compound.putInt("community", getCommunityScore());
-	}
-	
-	@Override
-	public boolean writeToNBTOptional(CompoundNBT compound) {
-		return super.writeToNBTOptional(compound);
 	}
 	
 	@Override
@@ -433,24 +433,17 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 	{
 		return 15728880;
 	}
-
-	/**
-	 * Gets how bright this entity is.
-	 */
-	public float getBrightness(float partialTicks)
-	{
-		return 1.0F;
-	}
 	
-	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-		if (wasRecentlyHit && this.getHome() == null) {
-			// Research scroll
-			int chances = 1 + lootingModifier;
-			if (rand.nextInt(300) < chances) {
-				this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.RESEARCH_SCROLL_SMALL, 1), 0);
-			}
-		}
-	}
+//	@Override
+//	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
+//		if (wasRecentlyHit && this.getHome() == null) {
+//			// Research scroll
+//			int chances = 1 + lootingModifier;
+//			if (rand.nextInt(300) < chances) {
+//				this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.RESEARCH_SCROLL_SMALL, 1), 0);
+//			}
+//		}
+//	}
 
 	@Override
 	public InfoScreenTabs getTab() {
@@ -463,18 +456,18 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 		return super.attackEntityFrom(source, amount);
 	}
 	
-	private void playEffect(ParticleTypes ParticleTypes) {
+	private void playEffect(IParticleData particle) {
 		
 		for (int i = 0; i < 15; ++i) {
 			double d0 = this.rand.nextGaussian() * 0.02D;
 			double d1 = this.rand.nextGaussian() * 0.02D;
 			double d2 = this.rand.nextGaussian() * 0.02D;
-			this.world.addParticle(ParticleTypes, this.posX + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.posZ + (double)(this.rand.nextFloat() * this.getWidth * 2.0F) - (double)this.getWidth, d0, d1, d2, new int[0]);
+			this.world.addParticle(particle, this.posX + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), this.posY + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.posZ + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), d0, d1, d2);
 		}
 	}
 	
 	// Adapted from the wisp move helper
-	static protected class LuxMoveHelper extends EntityMoveHelper {
+	static protected class LuxMoveHelper extends MovementController {
 		private final EntityLux parentEntity;
 		private int courseChangeCooldown;
 
@@ -484,7 +477,7 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 		}
 
 		public void onUpdateMoveHelper() {
-			if (this.action == EntityMoveHelper.Action.MOVE_TO) {
+			if (this.action == MovementController.Action.MOVE_TO) {
 				double d0 = this.posX - this.parentEntity.posX;
 				double d1 = this.posY - this.parentEntity.posY;
 				double d2 = this.posZ - this.parentEntity.posZ;
@@ -493,78 +486,74 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 				d3 = (double)MathHelper.sqrt(d3);
 				
 				if (Math.abs(d3) < .01) {
-					this.parentEntity.getMotion().x = 0;
-					this.parentEntity.getMotion().y = 0;
-					this.parentEntity.getMotion().z = 0;
-					this.action = EntityMoveHelper.Action.WAIT;
+					this.parentEntity.setMotion(Vec3d.ZERO);
+					this.action = MovementController.Action.WAIT;
 					return;
 				} else if (courseChangeCooldown-- <= 0) {
 					courseChangeCooldown = this.parentEntity.getRNG().nextInt(5) + 10;
-					float basespeed = (float) this.parentEntity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
+					float basespeed = (float) this.parentEntity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue();
 					//speed *= 3f;
-					this.parentEntity.getMotion().x = (d0 / d3) * basespeed * speed;
-					this.parentEntity.getMotion().y = (d1 / d3) * basespeed  * speed;
-					this.parentEntity.getMotion().z = (d2 / d3) * basespeed  * speed;
+					this.parentEntity.setMotion(
+							(d0 / d3) * basespeed * speed,
+							(d1 / d3) * basespeed  * speed,
+							(d2 / d3) * basespeed  * speed
+							);
 					
 					float f9 = (float)(MathHelper.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
-					this.entity.rotationYaw = this.limitAngle(this.entity.rotationYaw, f9, 90.0F);
+					this.mob.rotationYaw = this.limitAngle(this.mob.rotationYaw, f9, 90.0F);
 				}
 			}
 		}
 	}
 	
 	// Copied from EntityFlying class
-	@Override
-	public void travel(float strafe, float vertical, float forward) {
-		if (this.isInWater()) {
-			this.moveRelative(strafe, vertical, forward, 0.02F);
-			this.move(MoverType.SELF, this.getMotion().x, this.getMotion().y, this.getMotion().z);
-			this.getMotion().x *= 0.800000011920929D;
-			this.getMotion().y *= 0.800000011920929D;
-			this.getMotion().z *= 0.800000011920929D;
-		} else if (this.isInLava()) {
-			this.moveRelative(strafe, vertical, forward, 0.02F);
-			this.move(MoverType.SELF, this.getMotion().x, this.getMotion().y, this.getMotion().z);
-			this.getMotion().x *= 0.5D;
-			this.getMotion().y *= 0.5D;
-			this.getMotion().z *= 0.5D;
-		} else {
-			float f = 0.91F;
+		@Override
+		public void travel(Vec3d how) {
+			if (this.isInWater()) {
+				this.moveRelative(0.02F, how);
+				this.move(MoverType.SELF, this.getMotion());
+				this.setMotion(this.getMotion().scale(0.8));
+			} else if (this.isInLava()) {
+				this.moveRelative(0.02F, how);
+				this.move(MoverType.SELF, this.getMotion());
+				this.setMotion(this.getMotion().scale(0.5));
+			} else {
+				float f = 0.91F;
 
-			if (this.onGround) {
-				final BlockPos pos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
-				final BlockState state = world.getBlockState(pos);
-				f = state.getBlock().getSlipperiness(state, world, pos, this) * 0.91F;
+				if (this.onGround) {
+					//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ))).getBlock().slipperiness * 0.91F;
+					BlockPos underPos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
+					BlockState underState = this.world.getBlockState(underPos);
+					f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.91F;
+				}
+
+				float f1 = 0.16277136F / (f * f * f);
+				this.moveRelative(this.onGround ? 0.1F * f1 : 0.02F, how);
+				f = 0.91F;
+
+				if (this.onGround) {
+					//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ))).getBlock().slipperiness * 0.91F;
+					BlockPos underPos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
+					BlockState underState = this.world.getBlockState(underPos);
+					f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.91F;
+				}
+
+				this.move(MoverType.SELF, this.getMotion());
+				this.setMotion(this.getMotion().scale(f));
 			}
 
-			float f1 = 0.16277136F / (f * f * f);
-			this.moveRelative(strafe, vertical, forward, this.onGround ? 0.1F * f1 : 0.02F);
-			f = 0.91F;
+			this.prevLimbSwingAmount = this.limbSwingAmount;
+			double d1 = this.posX - this.prevPosX;
+			double d0 = this.posZ - this.prevPosZ;
+			float f2 = MathHelper.sqrt(d1 * d1 + d0 * d0) * 4.0F;
 
-			if (this.onGround) {
-				final BlockPos pos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
-				final BlockState state = world.getBlockState(pos);
-				f = state.getBlock().getSlipperiness(state, world, pos, this) * 0.91F;
+			if (f2 > 1.0F) {
+				f2 = 1.0F;
 			}
 
-			this.move(MoverType.SELF, this.getMotion().x, this.getMotion().y, this.getMotion().z);
-			this.getMotion().x *= (double)f;
-			this.getMotion().y *= (double)f;
-			this.getMotion().z *= (double)f;
+			this.limbSwingAmount += (f2 - this.limbSwingAmount) * 0.4F;
+			this.limbSwing += this.limbSwingAmount;
 		}
-
-		this.prevLimbSwingAmount = this.limbSwingAmount;
-		double d1 = this.posX - this.prevPosX;
-		double d0 = this.posZ - this.prevPosZ;
-		float f2 = MathHelper.sqrt(d1 * d1 + d0 * d0) * 4.0F;
-
-		if (f2 > 1.0F) {
-			f2 = 1.0F;
-		}
-
-		this.limbSwingAmount += (f2 - this.limbSwingAmount) * 0.4F;
-		this.limbSwing += this.limbSwingAmount;
-	}
 
 	/**
 	 * returns true if this entity is by a ladder, false otherwise
@@ -575,10 +564,8 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 	}
 	
 	@Override
-	public boolean getCanSpawnHere() {
-		BlockPos blockpos = new BlockPos(this.posX, this.getBoundingBox().minY, this.posZ);
-
-		return this.world.getLightFor(EnumSkyBlock.SKY, blockpos) >= 8;
+	public boolean canSpawn(IWorld world, SpawnReason spawnReason) {
+		return super.canSpawn(world, spawnReason);
 	}
 	
 	static class AIRandomFly extends Goal {
@@ -586,21 +573,21 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 
 		public AIRandomFly(EntityLux wisp) {
 			this.parentEntity = wisp;
-			this.setMutexBits(1);
+			this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
 		}
 
 		/**
 		 * Returns whether the Goal should begin execution.
 		 */
 		public boolean shouldExecute() {
-			EntityMoveHelper entitymovehelper = this.parentEntity.getMoveHelper();
+			MovementController MovementController = this.parentEntity.getMoveHelper();
 
-			if (!entitymovehelper.isUpdating()) {
+			if (!MovementController.isUpdating()) {
 				return true;
 			} else {
-				double d0 = entitymovehelper.getX() - this.parentEntity.posX;
-				double d1 = entitymovehelper.getY() - this.parentEntity.posY;
-				double d2 = entitymovehelper.getZ() - this.parentEntity.posZ;
+				double d0 = MovementController.getX() - this.parentEntity.posX;
+				double d1 = MovementController.getY() - this.parentEntity.posY;
+				double d2 = MovementController.getZ() - this.parentEntity.posZ;
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 				return d3 < 1.0D || d3 > 3600.0D;
 			}
@@ -672,7 +659,7 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 
 		public AIRoostTask(EntityLux lux) {
 			this.parentEntity = lux;
-			this.setMutexBits(1);
+			this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
 		}
 		
 		public AIRoostTask(EntityLux lux, boolean atNight) {
@@ -697,7 +684,7 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 					return predicate.test(parentEntity);
 				} else {
 					// random wake jitter from already-running task
-					if (parentEntity.world.getTotalWorldTime() - lastWakeTicks > 20 * 3) {
+					if (parentEntity.world.getGameTime() - lastWakeTicks > 20 * 3) {
 						if (parentEntity.rand.nextInt(4) == 0) {
 							return predicate.test(parentEntity);
 						} else {
@@ -720,8 +707,8 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 		 * Returns whether the Goal should begin execution.
 		 */
 		public boolean shouldExecute() {
-			if (lastAttemptTicks < 0 || parentEntity.world.getTotalWorldTime() - lastAttemptTicks > 5 * 20) {
-				//EntityMoveHelper entitymovehelper = this.parentEntity.getMoveHelper();
+			if (lastAttemptTicks < 0 || parentEntity.world.getGameTime() - lastAttemptTicks > 5 * 20) {
+				//MovementController MovementController = this.parentEntity.getMoveHelper();
 				return shouldRoost();
 			}
 			return false;
@@ -746,7 +733,7 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 						parentEntity.setPosition(roostPos.getX() + .5, roostPos.getY() - (parentEntity.getHeight()), roostPos.getZ() + .5);
 					}
 					
-					parentEntity.getMotion().x = parentEntity.getMotion().y = parentEntity.getMotion().z = 0;
+					parentEntity.setMotion(Vec3d.ZERO);
 					parentEntity.startRoosting();
 				} else if (!parentEntity.getMoveHelper().isUpdating()) {
 					this.parentEntity.getMoveHelper().setMoveTo(
@@ -766,7 +753,7 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 		 * Execute a one shot task or start executing a continuous task
 		 */
 		public void startExecuting() {
-			lastAttemptTicks = lastWakeTicks = parentEntity.world.getTotalWorldTime();
+			lastAttemptTicks = lastWakeTicks = parentEntity.world.getGameTime();
 			
 			// Try to find roost location
 			roostPos = this.getRoostLocation(parentEntity);
@@ -801,7 +788,7 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 		public AIFlyToRandomFeature(EntityLux lux, long successDelay) {
 			this.parentEntity = lux;
 			this.delay = successDelay;
-			this.setMutexBits(1);
+			this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
 			lastAttemptTicks = -1;
 		}
 		
@@ -825,19 +812,19 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 		 */
 		public boolean shouldExecute() {
 			
-			if (parentEntity.world.getTotalWorldTime() - lastAttemptTicks < 20 * 5) {
+			if (parentEntity.world.getGameTime() - lastAttemptTicks < 20 * 5) {
 				// too soon
 				return false;
 			}
 			
-			EntityMoveHelper entitymovehelper = this.parentEntity.getMoveHelper();
+			MovementController MovementController = this.parentEntity.getMoveHelper();
 
-			if (!entitymovehelper.isUpdating()) {
+			if (!MovementController.isUpdating()) {
 				return true;
 			} else {
-				double d0 = entitymovehelper.getX() - this.parentEntity.posX;
-				double d1 = entitymovehelper.getY() - this.parentEntity.posY;
-				double d2 = entitymovehelper.getZ() - this.parentEntity.posZ;
+				double d0 = MovementController.getX() - this.parentEntity.posX;
+				double d1 = MovementController.getY() - this.parentEntity.posY;
+				double d2 = MovementController.getZ() - this.parentEntity.posZ;
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 				return d3 < 1.0D || d3 > 3600.0D;
 			}
@@ -856,11 +843,11 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 		 */
 		public void startExecuting() {
 			running = true;
-			lastAttemptTicks = parentEntity.world.getTotalWorldTime();
+			lastAttemptTicks = parentEntity.world.getGameTime();
 			
 			targetPos = this.getNearbyFeature(parentEntity);
 			if (targetPos != null) {
-				parentEntity.moveHelper.setMoveTo(targetPos.getX() + .5, targetPos.getY() + .5, targetPos.getZ() + .5, .3);
+				parentEntity.moveController.setMoveTo(targetPos.getX() + .5, targetPos.getY() + .5, targetPos.getZ() + .5, .3);
 			} else {
 				running = false;
 			}
@@ -874,10 +861,10 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 		}
 		
 		@Override
-		public void updateTask() {
+		public void tick() {
 			if (running && targetPos != null) {
-				if (!parentEntity.moveHelper.isUpdating()) {
-					parentEntity.moveHelper.setMoveTo(targetPos.getX() + .5, targetPos.getY() + .5, targetPos.getZ() + .5, .3);
+				if (!parentEntity.moveController.isUpdating()) {
+					parentEntity.moveController.setMoveTo(targetPos.getX() + .5, targetPos.getY() + .5, targetPos.getZ() + .5, .3);
 				}
 				
 				if (parentEntity.getPositionVector().squareDistanceTo(
@@ -886,50 +873,50 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 						targetPos.getZ() + .5) < .05) {
 					this.onArrive(parentEntity, targetPos);
 					// use 'lastAttemptTicks' to effectively make sure we dont' try again for 'delay' ticks
-					lastAttemptTicks = parentEntity.world.getTotalWorldTime() + this.delay;
+					lastAttemptTicks = parentEntity.world.getGameTime() + this.delay;
 					running = false;
 				}
 			}
 		}
 	}
 	
-	@Override
-	public UUID getOwnerId() {
-		return this.dataManager.get(OWNER).orElse(null);
-	}
-
-	@Override
-	public boolean isEntityTamed() {
-		return getOwner() != null;
-	}
-
-	@Override
-	public LivingEntity getOwner() {
-		UUID ownerID = getOwnerId();
-		LivingEntity owner = null;
-		if (ownerID != null) {
-			List<LivingEntity> ids = this.world.getEntities(LivingEntity.class, (ent) -> {
-				return ent != null && ent.getUniqueID().equals(ownerID);
-			});
-			if (ids != null && ids.size() > 0) {
-				owner = ids.get(0);
-			}
-		}
-		return owner;
-	}
-
-	@Override
-	public boolean isEntitySitting() {
-		return false;
-	}
-	
-	public void setOwner(@Nullable LivingEntity owner) {
-		setOwner(owner == null ? null : owner.getUniqueID());
-	}
-	
-	public void setOwner(@Nullable UUID ownerID) {
-		this.dataManager.set(OWNER, Optional.fromNullable(ownerID));
-	}
+//	@Override
+//	public UUID getOwnerId() {
+//		return this.dataManager.get(OWNER).orElse(null);
+//	}
+//
+//	@Override
+//	public boolean isEntityTamed() {
+//		return getOwner() != null;
+//	}
+//
+//	@Override
+//	public LivingEntity getOwner() {
+//		UUID ownerID = getOwnerId();
+//		LivingEntity owner = null;
+//		if (ownerID != null) {
+//			List<LivingEntity> ids = this.world.getEntities(LivingEntity.class, (ent) -> {
+//				return ent != null && ent.getUniqueID().equals(ownerID);
+//			});
+//			if (ids != null && ids.size() > 0) {
+//				owner = ids.get(0);
+//			}
+//		}
+//		return owner;
+//	}
+//
+//	@Override
+//	public boolean isEntitySitting() {
+//		return false;
+//	}
+//	
+//	public void setOwner(@Nullable LivingEntity owner) {
+//		setOwner(owner == null ? null : owner.getUniqueID());
+//	}
+//	
+//	public void setOwner(@Nullable UUID ownerID) {
+//		this.dataManager.set(OWNER, Optional.ofNullable(ownerID));
+//	}
 	
 	public @Nonnull ItemStack getPollinatedItem() {
 		return dataManager.get(POLLINATED_ITEM);
@@ -968,11 +955,11 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 	@Override
 	public float getSwingProgress(float partialTicks) {
 		if (this.swingStartTicks == 0) {
-			swingStartTicks = world.getTotalWorldTime();
+			swingStartTicks = world.getGameTime();
 		}
 		
 		final long SWING_TICKS = 20 * 2;
-		final long now = world.getTotalWorldTime();
+		final long now = world.getGameTime();
 		final long diff = (now - swingStartTicks) % SWING_TICKS;
 		final double curTicks = diff + partialTicks;
 		return (float) (curTicks / (double) SWING_TICKS);
@@ -1036,7 +1023,7 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 		// We only care about nostrum flowers
 		return (state != null
 				&& (state.getBlock() instanceof NostrumMagicaFlower
-						|| state.getBlock() instanceof BlockFlower));
+						|| BlockTags.SMALL_FLOWERS.contains(state.getBlock())));
 	}
 	
 	/**
@@ -1082,24 +1069,22 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 		// Check what kind of flower, and possible become 'pollinated' (possibly)
 		if (rand.nextBoolean() && rand.nextBoolean()) {
 			if (state != null && state.getBlock() instanceof NostrumMagicaFlower) {
-				ItemStack reagentStack = new ItemStack(
-						NostrumMagicaFlower.instance().getItemDropped(state, rand, 0),
-						1,
-						NostrumMagicaFlower.instance().damageDropped(state)
-						);
-				setPollinatedItem(reagentStack);
+				Item item = ((NostrumMagicaFlower) state.getBlock()).getReagentItem();
+				if (item != null) {
+					ItemStack reagentStack = new ItemStack(item, 1);
+					setPollinatedItem(reagentStack);
+				}
 			}
 			
-			((ServerWorld) world).addParticle(ParticleTypes.VILLAGER_HAPPY,
+			((ServerWorld) world).spawnParticle(ParticleTypes.HAPPY_VILLAGER,
 					posX,
-					posY + height / 2,
+					posY + getHeight() / 2,
 					posZ,
 					5,
 					.25,
 					.25,
 					.25,
-					0,
-					new int[0]);
+					0);
 		}
 	}
 	
@@ -1110,11 +1095,11 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 		}
 		
 		if (stack.getItem() instanceof ReagentItem) {
-			switch (ReagentItem.findType(stack)) {
+			switch (ReagentItem.FindType(stack)) {
 			case BLACK_PEARL:
-				return NostrumMagicaFlower.instance().getState(NostrumMagicaFlower.Type.MIDNIGHT_IRIS);
+				return NostrumBlocks.midnightIris.getDefaultState();
 			case CRYSTABLOOM:
-				return NostrumMagicaFlower.instance().getState(NostrumMagicaFlower.Type.CRYSTABLOOM);
+				return NostrumBlocks.crystabloom.getDefaultState();
 			case GINSENG:
 			case GRAVE_DUST:
 			case MANDRAKE_ROOT:
@@ -1138,7 +1123,7 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 			if (
 				state == null
 				|| state.getBlock().isAir(state, world, cursor)
-				|| !state.isOpaqueCube()
+				|| !state.isOpaqueCube(world, cursor)
 				|| state.getMaterial() == Material.LEAVES
 				) {
 				cursor.move(Direction.DOWN);
@@ -1152,11 +1137,11 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 		final BlockState flowerState = resolvePlantable(stack);
 		
 		if (flowerState != null
-				&& flowerState.getBlock() instanceof BlockBush
-				&& ((BlockBush) flowerState.getBlock()).canPlaceBlockAt(world, cursor.toImmutable())) {
+				&& flowerState.getBlock() instanceof BushBlock
+				&& ((BushBlock) flowerState.getBlock()).isValidPosition(flowerState, world, cursor.toImmutable())) {
 			world.setBlockState(cursor.toImmutable(), flowerState);
 			
-			((ServerWorld) world).addParticle(ParticleTypes.VILLAGER_HAPPY,
+			((ServerWorld) world).spawnParticle(ParticleTypes.HAPPY_VILLAGER,
 					cursor.getX() + .5,
 					cursor.getY() + .5,
 					cursor.getZ() + .5,
@@ -1164,8 +1149,7 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 					.25,
 					.25,
 					.25,
-					0,
-					new int[0]);
+					0);
 		} else {
 			this.entityDropItem(stack, 0f);
 		}
@@ -1180,7 +1164,7 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 		this.setCommunityScore(0);
 		
 		// And set home if none have been set already and we don't have an owner
-		if (this.getOwnerId() == null && this.getHome() == null) {
+		if (/*this.getOwnerId() == null &&*/ this.getHome() == null) {
 			this.setHome(this.getPosition());
 		}
 	}
@@ -1190,7 +1174,7 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 	}
 	
 	protected void doBreed() {
-		world.addEntity(new EntityLux(world));
+		world.addEntity(new EntityLux(NostrumEntityTypes.lux, world));
 	}
 	
 	protected void attemptBreed() {
@@ -1202,7 +1186,7 @@ public class EntityLux extends AnimalEntity implements ILoreTagged, ITameableEnt
 	}
 
 	@Override
-	public EntityAgeable createChild(EntityAgeable ageable) {
+	public AgeableEntity createChild(AgeableEntity ageable) {
 		return null;
 	}
 }

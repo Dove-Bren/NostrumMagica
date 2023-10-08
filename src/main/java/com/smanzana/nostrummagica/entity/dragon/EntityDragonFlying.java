@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.entity.dragon;
 
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.EntityMoveHelper;
+import net.minecraft.entity.ai.MovementController;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -167,7 +167,7 @@ public abstract class EntityDragonFlying extends EntityDragon {
 	// Actually start flying. Called internally when animations are done.
 	protected void entityStartFlying() {
 		if (!this.world.isRemote) {
-			this.moveHelper = new EntityDragon.DragonFlyMoveHelper(this);
+			this.moveController = new EntityDragon.DragonFlyMoveHelper(this);
 			this.navigator = new EntityDragon.PathNavigatorDragonFlier(this, world);
 			this.setFlyingAI();
 		}
@@ -178,7 +178,7 @@ public abstract class EntityDragonFlying extends EntityDragon {
 	
 	protected void entityStopFlying() {
 		if (!this.world.isRemote) {
-			this.moveHelper = new EntityMoveHelper(this);
+			this.moveController = new MovementController(this);
 			this.navigator = this.createNavigator(world);
 			this.setGroundedAI();
 		}
