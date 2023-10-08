@@ -30,7 +30,7 @@ import com.smanzana.nostrummagica.entity.tasks.EntityAIPanicGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAISitGeneric;
 import com.smanzana.nostrummagica.entity.tasks.FollowOwnerGenericGoal;
 import com.smanzana.nostrummagica.entity.tasks.OwnerHurtByTargetGoalGeneric;
-import com.smanzana.nostrummagica.entity.tasks.OwnerHurtTargetGoalGeneric;
+import com.smanzana.nostrummagica.entity.tasks.OwnerHurtTargetGenericGoal;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonAINearestAttackableTarget;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonGambittedSpellAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonMeleeAttackTask;
@@ -439,7 +439,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		this.goalSelector.addGoal(priority++, new WaterAvoidingRandomWalkingGoal(this, 1.0D, 30));
 		
 		this.targetSelector.addGoal(1, new OwnerHurtByTargetGoalGeneric<EntityTameDragonRed>(this));
-        this.targetSelector.addGoal(2, new OwnerHurtTargetGoalGeneric<EntityTameDragonRed>(this));
+        this.targetSelector.addGoal(2, new OwnerHurtTargetGenericGoal<EntityTameDragonRed>(this));
         this.targetSelector.addGoal(3, aiRevengeTarget);
         this.targetSelector.addGoal(4, aiPlayerTarget);
 		this.targetSelector.addGoal(5, new DragonAINearestAttackableTarget<ZombieEntity>(this, ZombieEntity.class, true));

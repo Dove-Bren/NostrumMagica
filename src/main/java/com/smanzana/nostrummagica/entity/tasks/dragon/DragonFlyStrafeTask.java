@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.entity.tasks.dragon;
 
+import java.util.EnumSet;
+
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 
 import net.minecraft.entity.LivingEntity;
@@ -106,7 +108,7 @@ public class DragonFlyStrafeTask<T extends EntityDragon> extends Goal {
             }
             else
             {
-                this.dragon.getLookHelper().setLookPositionWithEntity(entitylivingbase, 30.0F, 30.0F);
+                this.dragon.getLookController().setLookPositionWithEntity(entitylivingbase, 30.0F, 30.0F);
             }
         }
 	}

@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.entity.tasks.dragon;
 
 import java.util.Date;
+import java.util.EnumSet;
 
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonFlying;
 

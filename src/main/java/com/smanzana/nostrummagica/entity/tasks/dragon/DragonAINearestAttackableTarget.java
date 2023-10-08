@@ -4,8 +4,9 @@ import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonRedBase;
 
 import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.EntityPredicate;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.NearestAttackableTargetGoal;
+import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
 import net.minecraft.util.math.AxisAlignedBB;
 
 public class DragonAINearestAttackableTarget<T extends LivingEntity> extends NearestAttackableTargetGoal<T> {
@@ -22,16 +23,16 @@ public class DragonAINearestAttackableTarget<T extends LivingEntity> extends Nea
 	}
 
 	protected AxisAlignedBB getTargetableArea(double targetDistance) {
-		return this.taskOwner.getBoundingBox().expand(targetDistance,
-				((EntityDragonRedBase) this.taskOwner).isFlying() ? 32 : 12.0D, targetDistance);
+		return this.goalOwner.getBoundingBox().expand(targetDistance,
+				((EntityDragonRedBase) this.goalOwner).isFlying() ? 32 : 12.0D, targetDistance);
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	protected boolean isSuitableTarget(LivingEntity target, boolean includeInvincibles) {
-		boolean success = super.isSuitableTarget(target, includeInvincibles);
+	protected boolean isSuitableTarget(LivingEntity target, EntityPredicate predicate) {
+		boolean success = super.isSuitableTarget(target, predicate);
 		
-		if (success && predicate != null) {
+		if (success && this.predicate != null) {
 			success = this.predicate.apply((T) target);
 		}
 		

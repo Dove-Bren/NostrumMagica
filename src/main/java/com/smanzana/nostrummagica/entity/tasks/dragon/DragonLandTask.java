@@ -1,9 +1,11 @@
 package com.smanzana.nostrummagica.entity.tasks.dragon;
 
+import java.util.EnumSet;
+
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 
+import net.minecraft.entity.ai.controller.MovementController;
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.MovementController;
 import net.minecraft.util.math.BlockPos;
 
 public class DragonLandTask extends Goal {

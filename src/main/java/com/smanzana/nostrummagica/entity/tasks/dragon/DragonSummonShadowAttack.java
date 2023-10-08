@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 import com.smanzana.nostrummagica.entity.dragon.EntityShadowDragonRed;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -27,7 +28,7 @@ public class DragonSummonShadowAttack<T extends EntityDragon> extends Goal {
 		this.dragon = dragon;
 		this.pool = new HashSet<>();
 		
-		this.setMutexBits(0);
+		//this.setMutexBits(0);
 	}
 	
 	@Override
@@ -89,7 +90,7 @@ public class DragonSummonShadowAttack<T extends EntityDragon> extends Goal {
 		
 		Random rand = dragon.getRNG();
 		for (LivingEntity targ : this.pool) {
-			EntityShadowDragonRed ent = new EntityShadowDragonRed(targ.world, targ);
+			EntityShadowDragonRed ent = new EntityShadowDragonRed(NostrumEntityTypes.shadowDragonRed, targ.world, targ);
 			ent.setPosition(targ.posX + 5.0 * (rand.nextDouble() - .5D), targ.posY, targ.posZ + 5.0 * (rand.nextDouble() - .5D));
 			targ.world.addEntity(ent);
 		}

@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.entity.tasks.dragon;
 
+import java.util.EnumSet;
 import java.util.Random;
 
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;

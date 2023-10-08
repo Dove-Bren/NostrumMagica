@@ -348,14 +348,14 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
         this.targetSelector.addGoal(1, aggroTable);
         this.targetSelector.addGoal(2, new HurtByTargetGoal(this));
 		this.targetSelector.addGoal(3, new DragonAINearestAttackableTarget<PlayerEntity>(this, PlayerEntity.class, true));
-		this.targetSelector.addGoal(4, new DragonAINearestAttackableTarget<ZombieEntity>(this, EntityZombie.class, true));
-		this.targetSelector.addGoal(5, new DragonAINearestAttackableTarget<SheepEntity>(this, EntitySheep.class, true));
-		this.targetSelector.addGoal(6, new DragonAINearestAttackableTarget<CowEntity>(this, EntityCow.class, true));
-		this.targetSelector.addGoal(7, new DragonAINearestAttackableTarget<PigEntity>(this, EntityPig.class, true));
-		this.targetSelector.addGoal(8, new DragonAINearestAttackableTarget<VillagerEntity>(this, EntityVillager.class, true));
-		this.targetSelector.addGoal(9, new DragonAINearestAttackableTarget<HorseEntity>(this, EntityHorse.class, true));
-		this.targetSelector.addGoal(10, new DragonAINearestAttackableTarget<GiantEntity>(this, EntityGiantZombie.class, true));
-		this.targetSelector.addGoal(11, new DragonAINearestAttackableTarget<PolarBearEntity>(this, EntityPolarBear.class, true));
+		this.targetSelector.addGoal(4, new DragonAINearestAttackableTarget<ZombieEntity>(this, ZombieEntity.class, true));
+		this.targetSelector.addGoal(5, new DragonAINearestAttackableTarget<SheepEntity>(this, SheepEntity.class, true));
+		this.targetSelector.addGoal(6, new DragonAINearestAttackableTarget<CowEntity>(this, CowEntity.class, true));
+		this.targetSelector.addGoal(7, new DragonAINearestAttackableTarget<PigEntity>(this, PigEntity.class, true));
+		this.targetSelector.addGoal(8, new DragonAINearestAttackableTarget<VillagerEntity>(this, VillagerEntity.class, true));
+		this.targetSelector.addGoal(9, new DragonAINearestAttackableTarget<HorseEntity>(this, HorseEntity.class, true));
+		this.targetSelector.addGoal(10, new DragonAINearestAttackableTarget<GiantEntity>(this, GiantEntity.class, true));
+		this.targetSelector.addGoal(11, new DragonAINearestAttackableTarget<PolarBearEntity>(this, PolarBearEntity.class, true));
 	}
 	
 	@Override

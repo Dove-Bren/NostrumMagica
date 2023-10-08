@@ -5,9 +5,9 @@ import com.smanzana.nostrummagica.entity.dragon.EntityDragonFlying;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIAttackMelee;
+import net.minecraft.entity.ai.goal.MeleeAttackGoal;
 
-public class DragonMeleeAttackTask extends EntityAIAttackMelee {
+public class DragonMeleeAttackTask extends MeleeAttackGoal {
 	
 	private static final int TOTAL_STALL = 20 * 5;
 	
@@ -105,7 +105,7 @@ public class DragonMeleeAttackTask extends EntityAIAttackMelee {
 
 	@Override
 	protected double getAttackReachSqr(LivingEntity attackTarget) {
-		return reachSQR + attackTarget.getWidth;
+		return reachSQR + attackTarget.getWidth();
 	}
 	
 	@Override

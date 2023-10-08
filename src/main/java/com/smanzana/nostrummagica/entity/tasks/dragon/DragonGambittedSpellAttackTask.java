@@ -29,7 +29,7 @@ public abstract class DragonGambittedSpellAttackTask<T extends EntityDragon & IT
 		this.delay = delay;
 		this.odds = odds;
 		
-		this.setMutexBits(0);
+		//this.setMutexBits(0);
 	}
 	
 	/**
@@ -103,7 +103,7 @@ public abstract class DragonGambittedSpellAttackTask<T extends EntityDragon & IT
 				continue;
 			}
 			
-			int nowTicks = dragon.world.getMinecraftServer().getTickCounter();
+			int nowTicks = dragon.world.getServer().getTickCounter();
 			
 			switch (gambit) {
 			case ALWAYS:
