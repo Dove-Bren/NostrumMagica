@@ -1,9 +1,6 @@
 package com.smanzana.nostrummagica.entity.golem;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.items.EssenceItem;
-import com.smanzana.nostrummagica.items.NostrumRoseItem;
-import com.smanzana.nostrummagica.items.NostrumRoseItem.RoseType;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -15,7 +12,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.potion.Potion;
+import net.minecraft.potion.Effects;
 import net.minecraft.world.World;
 
 public class EntityGolemWind extends EntityGolem {
@@ -82,7 +79,7 @@ public class EntityGolemWind extends EntityGolem {
 
 	@Override
 	public boolean shouldDoBuff(LivingEntity target) {
-		return target.getActivePotionEffect(Potion.getPotionFromResourceLocation("speed")) == null;
+		return target.getActivePotionEffect(Effects.SPEED) == null;
 	}
 
 	@Override
@@ -100,23 +97,24 @@ public class EntityGolemWind extends EntityGolem {
 		return "wind";
 	}
 	
-	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-		if (this.getOwnerId() == null) {
-			int count = this.rand.nextInt(3) + 1;
-			count += lootingModifier;
-			
-			this.entityDropItem(EssenceItem.getEssence(
-					EMagicElement.WIND,
-					count), 0);
-			
-			int denom = ROSE_DROP_DENOM;
-			if (wasRecentlyHit) {
-				denom = 150;
-			}
-			
-			if (this.rand.nextInt(denom - (lootingModifier * 20)) == 0) {
-				this.entityDropItem(NostrumRoseItem.getItem(RoseType.BLOOD, 1), 0);
-			}
-		}
-	}
+//	@Override
+//	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
+//		if (this.getOwnerId() == null) {
+//			int count = this.rand.nextInt(3) + 1;
+//			count += lootingModifier;
+//			
+//			this.entityDropItem(EssenceItem.getEssence(
+//					EMagicElement.WIND,
+//					count), 0);
+//			
+//			int denom = ROSE_DROP_DENOM;
+//			if (wasRecentlyHit) {
+//				denom = 150;
+//			}
+//			
+//			if (this.rand.nextInt(denom - (lootingModifier * 20)) == 0) {
+//				this.entityDropItem(NostrumRoseItem.getItem(RoseType.BLOOD, 1), 0);
+//			}
+//		}
+//	}
 }

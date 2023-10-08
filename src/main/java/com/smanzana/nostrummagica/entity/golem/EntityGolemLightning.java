@@ -1,10 +1,7 @@
 package com.smanzana.nostrummagica.entity.golem;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.effects.MagicResistEffect;
-import com.smanzana.nostrummagica.items.EssenceItem;
-import com.smanzana.nostrummagica.items.NostrumRoseItem;
-import com.smanzana.nostrummagica.items.NostrumRoseItem.RoseType;
+import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -26,7 +23,7 @@ public class EntityGolemLightning extends EntityGolem {
 	public static final String ID = "lightning_golem";
 	
 	private static final AttributeModifier MOVEMENT_STORM_MODIFIER
-		= new AttributeModifier("lightning_storm_boost", .2, 1);
+		= new AttributeModifier("lightning_storm_boost", .2, AttributeModifier.Operation.MULTIPLY_BASE);
 	
 	private static Spell spellRanged1;
 	private static Spell spellRanged2;
@@ -102,7 +99,7 @@ public class EntityGolemLightning extends EntityGolem {
 
 	@Override
 	public boolean shouldDoBuff(LivingEntity target) {
-		return target.getActivePotionEffect(MagicResistEffect.instance()) == null;
+		return target.getActivePotionEffect(NostrumEffects.magicResist) == null;
 	}
 
 	@Override
@@ -139,24 +136,25 @@ public class EntityGolemLightning extends EntityGolem {
 		super.tick();
 	}
 	
-	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-		if (this.getOwnerId() == null) {
-			int count = this.rand.nextInt(3) + 1;
-			count += lootingModifier;
-			
-			this.entityDropItem(EssenceItem.getEssence(
-					EMagicElement.LIGHTNING,
-					count), 0);
-			
-			int denom = ROSE_DROP_DENOM;
-			if (wasRecentlyHit) {
-				denom = 150;
-			}
-			
-			if (this.rand.nextInt(denom - (lootingModifier * 20)) == 0) {
-				this.entityDropItem(NostrumRoseItem.getItem(RoseType.ELDRICH, 1), 0);
-			}
-		}
-	}
+//	@Override
+//	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
+//		if (this.getOwnerId() == null) {
+//			int count = this.rand.nextInt(3) + 1;
+//			count += lootingModifier;
+//			
+//			this.entityDropItem(EssenceItem.getEssence(
+//					EMagicElement.LIGHTNING,
+//					count), 0);
+//			
+//			int denom = ROSE_DROP_DENOM;
+//			if (wasRecentlyHit) {
+//				denom = 150;
+//			}
+//			
+//			if (this.rand.nextInt(denom - (lootingModifier * 20)) == 0) {
+//				this.entityDropItem(NostrumRoseItem.getItem(RoseType.ELDRICH, 1), 0);
+//			}
+//		}
+//	}
 
 }

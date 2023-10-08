@@ -42,7 +42,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.IEntityMultiPart;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIHurtByTarget;
+import net.minecraft.entity.ai.HurtByTargetGoal;
 import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.monster.EntityGiantZombie;

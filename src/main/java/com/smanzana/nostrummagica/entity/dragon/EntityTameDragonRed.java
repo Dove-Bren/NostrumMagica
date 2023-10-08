@@ -25,8 +25,8 @@ import com.smanzana.nostrummagica.entity.ITameableEntity;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon.DragonEquipmentInventory.IChangeListener;
 import com.smanzana.nostrummagica.entity.dragon.IDragonSpawnData.IDragonSpawnFactory;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowEntityGeneric;
-import com.smanzana.nostrummagica.entity.tasks.EntityAIOwnerHurtByTargetGeneric;
-import com.smanzana.nostrummagica.entity.tasks.EntityAIOwnerHurtTargetGeneric;
+import com.smanzana.nostrummagica.entity.tasks.OwnerHurtByTargetGoalGeneric;
+import com.smanzana.nostrummagica.entity.tasks.OwnerHurtTargetGoalGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIPanicGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAISitGeneric;
 import com.smanzana.nostrummagica.entity.tasks.FollowOwnerGenericGoal;
@@ -53,7 +53,7 @@ import net.minecraft.entity.IEntityOwnable;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIHurtByTarget;
+import net.minecraft.entity.ai.HurtByTargetGoal;
 import net.minecraft.entity.ai.SwimGoal;
 import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.item.ItemEntity;
@@ -173,7 +173,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
     
     // AI tasks to swap when tamed
     private DragonAINearestAttackableTarget<PlayerEntity> aiPlayerTarget;
-    private EntityAIHurtByTarget aiRevengeTarget;
+    private HurtByTargetGoal aiRevengeTarget;
     
     private IInventory inventory; // Full player-accessable inventory
     private final DragonEquipmentInventory equipment;
@@ -435,8 +435,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		}));
 		this.goalSelector.addGoal(priority++, new EntityAIWander(this, 1.0D, 30));
 		
-		this.targetSelector.addGoal(1, new EntityAIOwnerHurtByTargetGeneric<EntityTameDragonRed>(this));
-        this.targetSelector.addGoal(2, new EntityAIOwnerHurtTargetGeneric<EntityTameDragonRed>(this));
+		this.targetSelector.addGoal(1, new OwnerHurtByTargetGoalGeneric<EntityTameDragonRed>(this));
+        this.targetSelector.addGoal(2, new OwnerHurtTargetGoalGeneric<EntityTameDragonRed>(this));
         this.targetSelector.addGoal(3, aiRevengeTarget);
         this.targetSelector.addGoal(4, aiPlayerTarget);
 		this.targetSelector.addGoal(5, new DragonAINearestAttackableTarget<EntityZombie>(this, EntityZombie.class, true));

@@ -10,24 +10,25 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityAgeable;
-import net.minecraft.entity.EntityType;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.AgeableEntity;
 import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntitySize;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.Pose;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIFollowOwner;
-import net.minecraft.entity.ai.EntityAIHurtByTarget;
-import net.minecraft.entity.ai.NearestAttackableTargetGoal;
-import net.minecraft.entity.ai.EntityAIOwnerHurtByTarget;
-import net.minecraft.entity.ai.EntityAIOwnerHurtTarget;
-import net.minecraft.entity.ai.SwimGoal;
-import net.minecraft.entity.ai.EntityAIWander;
-import net.minecraft.entity.ai.LookAtGoal;
+import net.minecraft.entity.ai.goal.FollowOwnerGoal;
+import net.minecraft.entity.ai.goal.HurtByTargetGoal;
+import net.minecraft.entity.ai.goal.LookAtGoal;
+import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
+import net.minecraft.entity.ai.goal.OwnerHurtByTargetGoal;
+import net.minecraft.entity.ai.goal.OwnerHurtTargetGoal;
+import net.minecraft.entity.ai.goal.SwimGoal;
+import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
 import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -101,12 +102,12 @@ public abstract class EntityGolem extends TameableEntity implements ILoreTagged 
         //this.goalSelector.addGoal(3, new EntityAIAttackMelee(this, 1.0D, true));
         gTask = new GolemTask(this);
         this.goalSelector.addGoal(2, gTask);
-        this.goalSelector.addGoal(3, new EntityAIFollowOwner(this, 1.0D, 10.0F, 2.0F));
-        this.goalSelector.addGoal(4, new EntityAIWander(this, 1.0D));
+        this.goalSelector.addGoal(3, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F));
+        this.goalSelector.addGoal(4, new WaterAvoidingRandomWalkingGoal(this, 1.0D));
         this.goalSelector.addGoal(5, new LookAtGoal(this, PlayerEntity.class, 8.0F));
-        this.targetSelector.addGoal(1, new EntityAIOwnerHurtByTarget(this));
-        this.targetSelector.addGoal(2, new EntityAIOwnerHurtTarget(this));
-        this.targetSelector.addGoal(3, new EntityAIHurtByTarget(this, true, new Class[0]));
+        this.targetSelector.addGoal(1, new OwnerHurtByTargetGoal(this));
+        this.targetSelector.addGoal(2, new OwnerHurtTargetGoal(this));
+        this.targetSelector.addGoal(3, new HurtByTargetGoal(this).setCallsForHelp(EntityGolem.class));
         this.targetSelector.addGoal(1, new GolemAIFindEntityNearestPlayer(this));
     }
     
@@ -120,14 +121,13 @@ public abstract class EntityGolem extends TameableEntity implements ILoreTagged 
         this.initGolemAttributes();
     }
 
-    protected void updateAITasks()
-    {
+    protected void updateAITasks() {
         this.dataManager.set(DATA_HEALTH_ID, Float.valueOf(this.getHealth()));
     }
 
-    protected void entityInit()
-    {
-        super.entityInit();
+    @Override
+    protected void registerData() {
+    	super.registerData();
         this.dataManager.register(DATA_HEALTH_ID, Float.valueOf(this.getHealth()));
     }
 
@@ -204,7 +204,7 @@ public abstract class EntityGolem extends TameableEntity implements ILoreTagged 
     }
 
 	@Override
-	public EntityAgeable createChild(EntityAgeable ageable) {
+	public AgeableEntity createChild(AgeableEntity ageable) {
 		return null;
 	}
 	
@@ -278,8 +278,8 @@ public abstract class EntityGolem extends TameableEntity implements ILoreTagged 
 		
 		@Override
 		public boolean shouldExecute() {
-			if (rood instanceof EntityTameable) {
-				if (((EntityTameable) rood).getOwner() != null)
+			if (rood instanceof TameableEntity) {
+				if (((TameableEntity) rood).getOwner() != null)
 					return false;
 			}
 			

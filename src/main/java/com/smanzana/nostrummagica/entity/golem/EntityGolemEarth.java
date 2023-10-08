@@ -1,10 +1,7 @@
 package com.smanzana.nostrummagica.entity.golem;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.effects.PhysicalShieldEffect;
-import com.smanzana.nostrummagica.items.EssenceItem;
-import com.smanzana.nostrummagica.items.NostrumRoseItem;
-import com.smanzana.nostrummagica.items.NostrumRoseItem.RoseType;
+import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -15,7 +12,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.potion.Potion;
+import net.minecraft.potion.Effects;
 import net.minecraft.world.World;
 
 public class EntityGolemEarth extends EntityGolem {
@@ -65,8 +62,8 @@ public class EntityGolemEarth extends EntityGolem {
 		if (targ != target)
 			this.setAttackTarget(target);
 		
-		boolean canStrength = target.getActivePotionEffect(Potion.getPotionFromResourceLocation("strength")) == null;
-		boolean canShield = target.getActivePotionEffect(PhysicalShieldEffect.instance()) == null;
+		boolean canStrength = target.getActivePotionEffect(Effects.STRENGTH) == null;
+		boolean canShield = target.getActivePotionEffect(NostrumEffects.physicalShield) == null;
 		
 		Spell spell;
 		if (canStrength && canShield) {
@@ -87,8 +84,8 @@ public class EntityGolemEarth extends EntityGolem {
 
 	@Override
 	public boolean shouldDoBuff(LivingEntity target) {
-		return target.getActivePotionEffect(Potion.getPotionFromResourceLocation("strength")) == null
-				|| target.getActivePotionEffect(PhysicalShieldEffect.instance()) == null;
+		return target.getActivePotionEffect(Effects.STRENGTH) == null
+				|| target.getActivePotionEffect(NostrumEffects.physicalShield) == null;
 	}
 
 	@Override
@@ -106,23 +103,24 @@ public class EntityGolemEarth extends EntityGolem {
 		return "earth";
 	}
 	
-	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-		if (this.getOwnerId() == null) {
-			int count = this.rand.nextInt(3) + 1;
-			count += lootingModifier;
-			
-			this.entityDropItem(EssenceItem.getEssence(
-					EMagicElement.EARTH,
-					count), 0);
-			
-			int denom = ROSE_DROP_DENOM;
-			if (wasRecentlyHit) {
-				denom = 150;
-			}
-			
-			if (this.rand.nextInt(denom - (lootingModifier * 20)) == 0) {
-				this.entityDropItem(NostrumRoseItem.getItem(RoseType.PALE, 1), 0);
-			}
-		}
-	}
+//	@Override
+//	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
+//		if (this.getOwnerId() == null) {
+//			int count = this.rand.nextInt(3) + 1;
+//			count += lootingModifier;
+//			
+//			this.entityDropItem(EssenceItem.getEssence(
+//					EMagicElement.EARTH,
+//					count), 0);
+//			
+//			int denom = ROSE_DROP_DENOM;
+//			if (wasRecentlyHit) {
+//				denom = 150;
+//			}
+//			
+//			if (this.rand.nextInt(denom - (lootingModifier * 20)) == 0) {
+//				this.entityDropItem(NostrumRoseItem.getItem(RoseType.PALE, 1), 0);
+//			}
+//		}
+//	}
 }

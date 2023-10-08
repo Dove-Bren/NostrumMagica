@@ -77,6 +77,7 @@ public class NostrumEntityTypes {
 			.build("").setRegistryName(EntityGolemLightning.ID));
 		registry.register(EntityType.Builder.<EntityGolemFire>create(EntityGolemFire::new, EntityClassification.MISC)
 				.size(0.8F, 1.6F)
+				.immuneToFire()
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(EntityGolemFire.ID));
 		registry.register(EntityType.Builder.<EntityGolemEarth>create(EntityGolemEarth::new, EntityClassification.MISC)

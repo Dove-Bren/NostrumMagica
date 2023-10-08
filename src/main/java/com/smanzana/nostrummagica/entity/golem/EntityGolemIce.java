@@ -1,9 +1,6 @@
 package com.smanzana.nostrummagica.entity.golem;
 
-import com.smanzana.nostrummagica.effects.MagicShieldEffect;
-import com.smanzana.nostrummagica.items.EssenceItem;
-import com.smanzana.nostrummagica.items.NostrumRoseItem;
-import com.smanzana.nostrummagica.items.NostrumRoseItem.RoseType;
+import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -80,7 +77,7 @@ public class EntityGolemIce extends EntityGolem {
 
 	@Override
 	public boolean shouldDoBuff(LivingEntity target) {
-		return target.getActivePotionEffect(MagicShieldEffect.instance()) == null;
+		return target.getActivePotionEffect(NostrumEffects.magicShield) == null;
 	}
 
 	@Override
@@ -98,23 +95,24 @@ public class EntityGolemIce extends EntityGolem {
 		return "ice";
 	}
 	
-	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-		if (this.getOwnerId() == null) {
-			int count = this.rand.nextInt(3) + 1;
-			count += lootingModifier;
-			
-			this.entityDropItem(EssenceItem.getEssence(
-					EMagicElement.ICE,
-					count), 0);
-			
-			int denom = ROSE_DROP_DENOM;
-			if (wasRecentlyHit) {
-				denom = 150;
-			}
-			
-			if (this.rand.nextInt(denom - (lootingModifier * 20)) == 0) {
-				this.entityDropItem(NostrumRoseItem.getItem(RoseType.PALE, 1), 0);
-			}
-		}
-	}
+//	@Override
+//	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
+//		if (this.getOwnerId() == null) {
+//			int count = this.rand.nextInt(3) + 1;
+//			count += lootingModifier;
+//			
+//			this.entityDropItem(EssenceItem.getEssence(
+//					EMagicElement.ICE,
+//					count), 0);
+//			
+//			int denom = ROSE_DROP_DENOM;
+//			if (wasRecentlyHit) {
+//				denom = 150;
+//			}
+//			
+//			if (this.rand.nextInt(denom - (lootingModifier * 20)) == 0) {
+//				this.entityDropItem(NostrumRoseItem.getItem(RoseType.PALE, 1), 0);
+//			}
+//		}
+//	}
 }

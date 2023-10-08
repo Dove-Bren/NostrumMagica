@@ -6,13 +6,13 @@ import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAITarget;
 
-public class EntityAIOwnerHurtTargetGeneric<T extends CreatureEntity & ITameableEntity> extends EntityAITarget {
+public class OwnerHurtTargetGoalGeneric<T extends CreatureEntity & ITameableEntity> extends EntityAITarget {
 	
 	T entityTameable;
 	LivingEntity theTarget;
 	private int timestamp;
 
-	public EntityAIOwnerHurtTargetGeneric(T entityTameableIn) {
+	public OwnerHurtTargetGoalGeneric(T entityTameableIn) {
 		super(entityTameableIn, false);
 		this.entityTameable = entityTameableIn;
 		this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
