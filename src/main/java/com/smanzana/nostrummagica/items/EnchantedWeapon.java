@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.
 import com.smanzana.nostrummagica.effects.LightningAttackEffect;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaEntityEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaLocationEffect;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
@@ -504,7 +505,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 	
 	protected static void spawnIceCloud(World world, PlayerEntity caster, Vec3d at, Vec3d direction, Type weaponType) {
 		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 3 seconds
-		EntityAreaEffect cloud = new EntityAreaEffect(world, at.x, at.y, at.z);
+		EntityAreaEffect cloud = new EntityAreaEffect(NostrumEntityTypes.areaEffect, world, at.x, at.y, at.z);
 		cloud.setOwner(caster);
 		cloud.setWaitTime(5);
 		cloud.setRadius(0.5f);
@@ -528,7 +529,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 	protected static void spawnWalkingVortex(World world, PlayerEntity caster, Vec3d at, Vec3d direction, Type weaponType) {
 		final int hurricaneCount = EnchantedArmor.GetSetCount(caster, EMagicElement.WIND, EnchantedArmor.Type.TRUE);
 		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 10 seconds
-		EntityAreaEffect cloud = new EntityAreaEffect(world, at.x, at.y, at.z);
+		EntityAreaEffect cloud = new EntityAreaEffect(NostrumEntityTypes.areaEffect, world, at.x, at.y, at.z);
 		cloud.setOwner(caster);
 		cloud.setWaitTime(10);
 		cloud.setRadius(.75f);
@@ -614,7 +615,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 	}
 	
 	public static void spawnJumpVortex(World world, PlayerEntity caster, Vec3d at, Type weaponType) {
-		EntityAreaEffect cloud = new EntityAreaEffect(world, at.x, at.y, at.z);
+		EntityAreaEffect cloud = new EntityAreaEffect(NostrumEntityTypes.areaEffect, world, at.x, at.y, at.z);
 		cloud.setOwner(caster);
 		cloud.setWaitTime(0);
 		cloud.setRadius(1f);
@@ -661,7 +662,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 		}
 		
 		((ServerWorld)entity.world).addLightningBolt(
-				new NostrumTameLightning(entity.world, entity.posX, entity.posY, entity.posZ)
+				new NostrumTameLightning(NostrumEntityTypes.tameLightning, entity.world, entity.posX, entity.posY, entity.posZ)
 				);
 		attr.addMana(-30);
 		if (entity instanceof PlayerEntity) {
@@ -706,7 +707,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 			
 			if (i == 0) {
 				((ServerWorld) world).addLightningBolt(
-						new NostrumTameLightning(world, pos.x, pos.y, pos.z)
+						new NostrumTameLightning(NostrumEntityTypes.tameLightning, world, pos.x, pos.y, pos.z)
 						);
 			} else {
 				// Apply random x/z offsets. Then step up to 4 to find surface
@@ -723,7 +724,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 				
 				if (world.isAirBlock(cursor)) {
 					((ServerWorld) world).addLightningBolt(
-						new NostrumTameLightning(world, cursor.getX() + 0.5, cursor.getY(), cursor.getZ() + 0.5)
+						new NostrumTameLightning(NostrumEntityTypes.tameLightning, world, cursor.getX() + 0.5, cursor.getY(), cursor.getZ() + 0.5)
 						);
 				}
 			}

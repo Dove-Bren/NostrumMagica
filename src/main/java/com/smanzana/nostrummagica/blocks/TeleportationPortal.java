@@ -102,7 +102,7 @@ public class TeleportationPortal extends NostrumPortal implements ITileEntityPro
 						double y = target.getY() + 1.4;
 						double z = target.getZ() + .5;
 						NostrumMagicaSounds.DAMAGE_ENDER.play(worldIn, x, y, z);
-						((ServerWorld) worldIn).addParticle(ParticleTypes.DRAGON_BREATH,
+						((ServerWorld) worldIn).spawnParticle(ParticleTypes.DRAGON_BREATH,
 								x,
 								y,
 								z,

@@ -157,7 +157,7 @@ public class TeleportRune extends ContainerBlock  {
 				double dz = target.getZ() + .5;
 				for (int i = 0; i < 10; i++) {
 					
-					((ServerWorld) worldIn).addParticle(ParticleTypes.DRAGON_BREATH,
+					((ServerWorld) worldIn).spawnParticle(ParticleTypes.DRAGON_BREATH,
 							dx,
 							dy,
 							dz,
@@ -293,7 +293,7 @@ public class TeleportRune extends ContainerBlock  {
 			
 			boolean hasEnderBelt = false;
 			// Look for lightning belt
-			IInventory baubles = NostrumMagica.instance.baubles.getBaubles(playerIn);
+			IInventory baubles = NostrumMagica.instance.curios.getCurios(playerIn);
 			if (baubles != null) {
 				for (int i = 0; i < baubles.getSizeInventory(); i++) {
 					ItemStack stack = baubles.getStackInSlot(i);

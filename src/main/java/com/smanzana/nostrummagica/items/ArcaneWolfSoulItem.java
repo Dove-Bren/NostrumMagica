@@ -3,7 +3,6 @@ package com.smanzana.nostrummagica.items;
 import java.util.List;
 import java.util.UUID;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
@@ -262,8 +261,8 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 	
 	public static ItemStack MakeSoulItem(EntityArcaneWolf wolf, boolean register) {
 		if (register) {
-			NostrumItems.arcaneWolfSoulItem.setWorldID(wolf, NostrumMagica.getPetSoulRegistry().registerPet(wolf));
-			NostrumMagica.getPetSoulRegistry().snapshotPet(wolf);
+			NostrumItems.arcaneWolfSoulItem.setWorldID(wolf, NostrumMagica.instance.getPetSoulRegistry().registerPet(wolf));
+			NostrumMagica.instance.getPetSoulRegistry().snapshotPet(wolf);
 		}
 		
 		ItemStack stack = new ItemStack(NostrumItems.arcaneWolfSoulItem);

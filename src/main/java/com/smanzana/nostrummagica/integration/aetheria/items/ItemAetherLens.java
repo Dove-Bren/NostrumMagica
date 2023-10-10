@@ -212,7 +212,7 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 	public boolean canAcceptAetherInfuse(ItemStack stack, BlockPos pos, AetherInfuserTileEntity source, int maxAether) {
 		// Masteronly ones are handled directly in aether infuser in non-dynamic manner
 		return !type.isMasterOnly()
-				&& source.getWorld().getTotalWorldTime() % type.getTickInterval() == 0
+				&& source.getWorld().getGameTime() % type.getTickInterval() == 0
 				&& maxAether > 0
 				&& maxAether >= type.aetherPerTick;
 	}
