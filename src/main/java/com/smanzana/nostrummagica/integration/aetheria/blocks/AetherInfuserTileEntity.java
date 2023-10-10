@@ -14,8 +14,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.IAetherInfusableTileEntity;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.integration.aetheria.items.ItemAetherLens;
-import com.smanzana.nostrummagica.integration.aetheria.items.ItemAetherLens.LensType;
+import com.smanzana.nostrummagica.entity.ITameableEntity;
+import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
 import com.smanzana.nostrummagica.items.IAetherInfuserLens;
 import com.smanzana.nostrummagica.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.utils.Inventories.ItemStackArrayWrapper;
@@ -23,29 +23,29 @@ import com.smanzana.nostrummagica.utils.WorldUtil;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.IEntityOwnable;
-import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.IChunk;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.event.world.BlockEvent.EntityPlaceEvent;
 import net.minecraftforge.event.world.ChunkEvent;
-import net.minecraftforge.fml.common.eventhandler.Event.Result;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.eventbus.api.Event.Result;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 
@@ -70,7 +70,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 		private List<AetherInfuserTileEntity.EffectSpark> sparks;
 		
 		public AetherInfuserTileEntity() {
-			super(0, MAX_CHARGE);
+			super(AetheriaProxy.AetherInfuserTileEntityType, 0, MAX_CHARGE);
 			this.setAutoSync(5);
 			this.compWrapper.configureInOut(true, false);
 			nearbyChargeables = new HashMap<>();
@@ -81,7 +81,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 		public static final void DoChargeEffect(LivingEntity entity, int count, int color) {
 			NostrumParticles.GLOW_ORB.spawn(entity.getEntityWorld(), new SpawnParams(
 					count,
-					entity.posX, entity.posY + entity.height/2f, entity.posZ, 2.0,
+					entity.posX, entity.posY + entity.getHeight()/2f, entity.posZ, 2.0,
 					40, 0,
 					entity.getEntityId()
 					).color(color));
@@ -116,7 +116,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 			IInventory inv = player.inventory;
 			chargeAmount -= APIProxy.pushToInventory(world, player, inv, chargeAmount);
 			
-			inv = NostrumMagica.baubles.getBaubles(player);
+			inv = NostrumMagica.instance.curios.getCurios(player);
 			if (inv != null) {
 				chargeAmount -= APIProxy.pushToInventory(world, player, inv, chargeAmount);
 			}
@@ -169,8 +169,8 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 		}
 		
 		@Override
-		public void update() {
-			super.update();
+		public void tick() {
+			super.tick();
 			
 			if (world.isRemote) {
 				effectTime++;
@@ -207,7 +207,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 			}
 			
 			// First, use our set up altar if we have one
-			if (world.getTotalWorldTime() % 5 == 0) {
+			if (world.getGameTime() % 5 == 0) {
 				refreshAltar();
 			}
 			
@@ -304,8 +304,8 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 		}
 		
 		@Override
-		public CompoundNBT writeToNBT(CompoundNBT nbt) {
-			nbt = super.writeToNBT(nbt);
+		public CompoundNBT write(CompoundNBT nbt) {
+			nbt = super.write(nbt);
 			
 			if (nbt == null)
 				nbt = new CompoundNBT();
@@ -316,8 +316,8 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 		}
 		
 		@Override
-		public void readFromNBT(CompoundNBT nbt) {
-			super.readFromNBT(nbt);
+		public void read(CompoundNBT nbt) {
+			super.read(nbt);
 			
 			if (nbt == null)
 				return;
@@ -371,7 +371,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 			if (this.active != active && world != null) {
 				
 				if (!world.isRemote) {
-					world.addBlockEvent(getPos(), getBlockType(), 0, active ? 1 : 0);
+					world.addBlockEvent(getPos(), getBlockState().getBlock(), 0, active ? 1 : 0);
 				}
 				
 				this.active = active;
@@ -488,8 +488,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 			if (hasLens()) {
 				ItemStack held = centerAltar.getItem();
 				return !held.isEmpty()
-						&& held.getItem() instanceof ItemAetherLens
-						&& (ItemAetherLens.TypeFromMeta(held.getMetadata()) == LensType.CHARGE);
+						&& held.getItem() == AetheriaProxy.chargeAetherLens;
 			}
 			
 			return false;
@@ -503,8 +502,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 			if (hasLens()) {
 				ItemStack held = centerAltar.getItem();
 				return !held.isEmpty()
-						&& held.getItem() instanceof ItemAetherLens
-						&& (ItemAetherLens.TypeFromMeta(held.getMetadata()) == LensType.NO_SPAWN);
+						&& held.getItem() == AetheriaProxy.noSpawnAetherLens;
 			}
 			
 			return false;
@@ -526,8 +524,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 			if (hasLens()) {
 				ItemStack held = centerAltar.getItem();
 				return !held.isEmpty()
-						&& held.getItem() instanceof ItemAetherLens
-						&& (ItemAetherLens.TypeFromMeta(held.getMetadata()) == LensType.SPREAD);
+						&& held.getItem() == AetheriaProxy.spreadAetherLens;
 			}
 			return false;
 		}
@@ -578,11 +575,11 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 			
 			// Figure out what to not allow through
 			boolean isBad = false;
-			if (entity instanceof EntityMob) {
+			if (entity instanceof MonsterEntity) {
 				isBad = true;
 				
 				// But make an exception for 'tameable' mobs
-				if (entity instanceof IEntityOwnable) {
+				if (entity instanceof ITameableEntity) {
 					isBad = false;
 				}
 			}
@@ -591,7 +588,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 			
 			if (isBad) {
 				final double radius = this.getMobSpawnProtectionRadius();
-				if (entity.getDistance(pos.getX() + .5, pos.getY(), pos.getZ() + .5) < radius) {
+				if (entity.getDistanceSq(pos.getX() + .5, pos.getY(), pos.getZ() + .5) < radius * radius) {
 					event.setResult(Result.DENY);
 					
 					// Mob spawning happens a lot (and in bursts, or continuously if there's a spawner)
@@ -606,7 +603,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 		
 		@SubscribeEvent
 		public void onBlockBreak(BreakEvent event) {
-			if (event.getWorld().isRemote) {
+			if (event.getWorld().isRemote()) {
 				return;
 			}
 			
@@ -636,7 +633,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 		
 		@SubscribeEvent
 		public void onBlockPlace(EntityPlaceEvent event) {
-			if (event.getWorld().isRemote) {
+			if (event.getWorld().isRemote()) {
 				return;
 			}
 			
@@ -666,7 +663,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 		
 		@SubscribeEvent
 		public void onChunkLoad(ChunkEvent.Load event) {
-			if (event.getWorld().isRemote) {
+			if (event.getWorld().isRemote()) {
 				return;
 			}
 			
@@ -675,8 +672,8 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 			}
 			
 			final int radius = getInfuseAreaRadius() + 16; // easier than looking at both min and max
-			final Chunk chunk = event.getChunk();
-			final BlockPos chunkMin = new BlockPos(chunk.x << 4, this.getPos().getY(), chunk.z << 4);
+			final IChunk chunk = event.getChunk();
+			final BlockPos chunkMin = new BlockPos(chunk.getPos().x << 4, this.getPos().getY(), chunk.getPos().z << 4);
 			if (WorldUtil.getBlockDistance(chunkMin, this.getPos()) < radius) {
 				// ""
 				NostrumMagica.playerListener.registerTimer((type, entity, data) -> {
@@ -714,13 +711,13 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 					});
 		}
 		
-		protected void refreshChunk(Chunk chunk) {
+		protected void refreshChunk(IChunk chunk) {
 			// Actually get min and max based on distance from us
 			final int radius = getInfuseAreaRadius();
 			final BlockPos min;
 			final BlockPos max;
-			final int minChunkX = chunk.x << 4;
-			final int minChunkZ = chunk.z << 4;
+			final int minChunkX = chunk.getPos().x << 4;
+			final int minChunkZ = chunk.getPos().z << 4;
 			final int maxChunkX = minChunkX + 16;
 			final int maxChunkZ = minChunkZ + 16;
 			final int minBlockX = this.pos.getX() - radius;

@@ -10,11 +10,11 @@ import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuser;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock;
 import com.smanzana.nostrummagica.integration.aetheria.items.AetherResourceType;
 import com.smanzana.nostrummagica.integration.aetheria.items.ItemAetherLens;
-import com.smanzana.nostrummagica.integration.aetheria.items.NostrumAetherResourceItem;
 import com.smanzana.nostrummagica.integration.aetheria.items.ItemAetherLens.LensType;
-import com.smanzana.NostrumMagica.instance.proxy.ClientProxy;
+import com.smanzana.nostrummagica.integration.aetheria.items.NostrumAetherResourceItem;
+import com.smanzana.nostrummagica.proxy.ClientProxy;
 
-import net.minecraft.client.renderer.block.model.ModelBakery;
+import net.minecraft.client.renderer.model.ModelBakery;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;

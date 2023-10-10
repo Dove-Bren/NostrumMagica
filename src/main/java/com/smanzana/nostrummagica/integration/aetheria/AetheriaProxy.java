@@ -11,7 +11,7 @@ import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuser;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileEntity;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock;
-import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock.WispBlockTileEntity;
+import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlockTileEntity;
 import com.smanzana.nostrummagica.integration.aetheria.items.AetherResourceType;
 import com.smanzana.nostrummagica.integration.aetheria.items.ItemAetherLens;
 import com.smanzana.nostrummagica.integration.aetheria.items.ItemAetherLens.LensType;
@@ -38,15 +38,14 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.ObjectHolder;
 
@@ -75,9 +74,11 @@ public class AetheriaProxy {
 	@ObjectHolder(ItemAetherLens.ID_MANA_REGEN) public static Item manaRegenAetherLens;
 	@ObjectHolder(ItemAetherLens.ID_NO_SPAWN) public static Item noSpawnAetherLens;
 	
-	public static Item ItemLens = null;
-	public static Block BlockWisp = null;
-	public static Block BlockerInfuser = null;
+	@ObjectHolder(WispBlock.ID) public static Block BlockWisp;
+	@ObjectHolder(AetherInfuser.ID) public static Block BlockInfuser; 
+	
+	@ObjectHolder(WispBlock.ID + "_entity") public static TileEntityType<WispBlockTileEntity> WispBlockTileEntityType;
+	@ObjectHolder(AetherInfuser.ID + "_entity") public static TileEntityType<AetherInfuserTileEntity> AetherInfuserTileEntityType;
 	
 	public boolean preInit() {
 		if (!enabled) {
@@ -114,30 +115,33 @@ public class AetheriaProxy {
 		return true;
 	}
 	
+	protected Item.Properties propAetheria() {
+		return new Item.Properties()
+				.group(APIProxy.creativeTab);
+	}
+	
 	@SubscribeEvent
 	public void registerItems(RegistryEvent.Register<Item> event) {
     	final IForgeRegistry<Item> registry = event.getRegistry();
     	
-    	registry.register(new NostrumAetherResourceItem(300, 450, NostrumItems.PropBase()).setRegistryName(NostrumAetherResourceItem.ID_GINSENG_FLOWER));
-		registry.register(new NostrumAetherResourceItem(300, 350, NostrumItems.PropBase()).setRegistryName(NostrumAetherResourceItem.ID_MANDRAKE_FLOWER));
-    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.SPREAD, NostrumItems.PropBase()).setRegistryName(ItemAetherLens.ID_SPREAD));
-    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.CHARGE, NostrumItems.PropBase()).setRegistryName(ItemAetherLens.ID_CHARGE));
-    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.GROW, NostrumItems.PropBase()).setRegistryName(ItemAetherLens.ID_GROW));
-    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.SWIFTNESS, NostrumItems.PropBase()).setRegistryName(ItemAetherLens.ID_SWIFTNESS));
-    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.ELEVATOR, NostrumItems.PropBase()).setRegistryName(ItemAetherLens.ID_ELEVATOR));
-    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.HEAL, NostrumItems.PropBase()).setRegistryName(ItemAetherLens.ID_HEAL));
-    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.BORE, NostrumItems.PropBase()).setRegistryName(ItemAetherLens.ID_BORE));
-    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.BORE_REVERSED, NostrumItems.PropBase()).setRegistryName(ItemAetherLens.ID_BORE_REVERSED));
-    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.MANA_REGEN, NostrumItems.PropBase()).setRegistryName(ItemAetherLens.ID_MANA_REGEN));
-    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.NO_SPAWN, NostrumItems.PropBase()).setRegistryName(ItemAetherLens.ID_NO_SPAWN));
+    	registry.register(new NostrumAetherResourceItem(300, 450, propAetheria()).setRegistryName(NostrumAetherResourceItem.ID_GINSENG_FLOWER));
+		registry.register(new NostrumAetherResourceItem(300, 350, propAetheria()).setRegistryName(NostrumAetherResourceItem.ID_MANDRAKE_FLOWER));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.SPREAD, propAetheria()).setRegistryName(ItemAetherLens.ID_SPREAD));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.CHARGE, propAetheria()).setRegistryName(ItemAetherLens.ID_CHARGE));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.GROW, propAetheria()).setRegistryName(ItemAetherLens.ID_GROW));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.SWIFTNESS, propAetheria()).setRegistryName(ItemAetherLens.ID_SWIFTNESS));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.ELEVATOR, propAetheria()).setRegistryName(ItemAetherLens.ID_ELEVATOR));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.HEAL, propAetheria()).setRegistryName(ItemAetherLens.ID_HEAL));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.BORE, propAetheria()).setRegistryName(ItemAetherLens.ID_BORE));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.BORE_REVERSED, propAetheria()).setRegistryName(ItemAetherLens.ID_BORE_REVERSED));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.MANA_REGEN, propAetheria()).setRegistryName(ItemAetherLens.ID_MANA_REGEN));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.NO_SPAWN, propAetheria()).setRegistryName(ItemAetherLens.ID_NO_SPAWN));
     	
     	registry.register(
-    			(new BlockItem(WispBlock.instance()).setRegistryName(WispBlock.ID)
-    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(WispBlock.ID))
+    			(new BlockItem(BlockWisp, propAetheria()).setRegistryName(WispBlock.ID))
     	);
     	registry.register(
-    			(new BlockItem(AetherInfuser.instance()).setRegistryName(AetherInfuser.ID)
-    					.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(AetherInfuser.ID))
+    			(new BlockItem(BlockInfuser, propAetheria()).setRegistryName(AetherInfuser.ID))
     	);
 	}
 	
@@ -145,13 +149,16 @@ public class AetheriaProxy {
 	public void registerBlocks(RegistryEvent.Register<Block> event) {
     	final IForgeRegistry<Block> registry = event.getRegistry();
     	
-		BlockWisp = WispBlock.instance();
-		registry.register(BlockWisp);
-		BlockerInfuser = AetherInfuser.instance();
-		registry.register(BlockerInfuser);
-		
-    	GameRegistry.registerTileEntity(WispBlockTileEntity.class, new ResourceLocation(NostrumMagica.MODID, WispBlock.ID + "_entity"));
-    	GameRegistry.registerTileEntity(AetherInfuserTileEntity.class, new ResourceLocation(NostrumMagica.MODID, AetherInfuser.ID + "_entity"));
+		registry.register(new WispBlock().setRegistryName(WispBlock.ID));
+		registry.register(new AetherInfuser().setRegistryName(AetherInfuser.ID));
+	}
+	
+	@SubscribeEvent
+	public void registerTileEntities(RegistryEvent.Register<TileEntityType<?>> event) {
+		event.getRegistry().register(TileEntityType.Builder.create(WispBlockTileEntity::new, BlockWisp).build(null).setRegistryName(WispBlock.ID + "_entity"));
+    	//GameRegistry.registerTileEntity(WispBlockTileEntity.class, new ResourceLocation(NostrumMagica.MODID, WispBlock.ID + "_entity"));
+		event.getRegistry().register(TileEntityType.Builder.create(AetherInfuserTileEntity::new, BlockInfuser).build(null).setRegistryName(AetherInfuser.ID + "_entity"));
+    	//GameRegistry.registerTileEntity(AetherInfuserTileEntity.class, new ResourceLocation(NostrumMagica.MODID, AetherInfuser.ID + "_entity"));
 	}
 	
 	private void registerAetheriaQuests() {
@@ -161,24 +168,24 @@ public class AetheriaProxy {
 	private void registerAetheriaRituals() {
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("wisp_crystal",
-						new ItemStack(WispBlock.instance()),
+						new ItemStack(BlockWisp),
 						null,
 						new ReagentType[] {ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST},
 						Ingredient.fromItems(NostrumItems.altarItem),
 						new Ingredient[] {
 								Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
-								Ingredient.fromStacks(APIProxy.AetherBatterySmallBlock),
+								Ingredient.fromItems(APIProxy.AetherBatterySmallBlock),
 								Ingredient.fromTag(Tags.Items.OBSIDIAN),
 								Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
 								},
 						new RRequirementResearch("wispblock"),
-						new OutcomeSpawnItem(new ItemStack(WispBlock.instance()))
+						new OutcomeSpawnItem(new ItemStack(BlockWisp))
 						)
 				);
 		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("construct_aether_infuser",
-						new ItemStack(BlockerInfuser),
+						new ItemStack(BlockInfuser),
 						null,
 						new ReagentType[] {ReagentType.GINSENG, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK},
 						Ingredient.fromTag(Tags.Items.OBSIDIAN),
@@ -218,7 +225,7 @@ public class AetheriaProxy {
 			.hiddenParent("aether_battery")
 			.lore(EntityWisp.LoreKey)
 			.reference("ritual::wisp_crystal", "ritual.wisp_crystal.name")
-		.build("wispblock", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, -3, 2, true, new ItemStack(WispBlock.instance()));
+		.build("wispblock", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, -3, 2, true, new ItemStack(BlockWisp));
 		
 		NostrumResearch.startBuilding()
 			.hiddenParent("aether_battery")
@@ -231,13 +238,13 @@ public class AetheriaProxy {
 			.reference("ritual::make_lens_bore", "ritual.make_lens_bore.name")
 			.reference("ritual::make_lens_elevator", "ritual.make_lens_elevator.name")
 			.reference("ritual::make_lens_swiftness", "ritual.make_lens_swiftness.name")
-		.build("aether_infusers", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 0, 2, true, new ItemStack(BlockerInfuser));
+		.build("aether_infusers", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 0, 2, true, new ItemStack(BlockInfuser));
 	}
 	
 	private void registerLore() {
 		LoreRegistry.instance().register((ILoreTagged) APIProxy.PassivePendantItem);
 		LoreRegistry.instance().register((ILoreTagged) APIProxy.ActivePendantItem);
-		LoreRegistry.instance().register((ILoreTagged) ItemLens);
+		LoreRegistry.instance().register((ILoreTagged) spreadAetherLens);
 	}
 	
 	public boolean isEnabled() {
