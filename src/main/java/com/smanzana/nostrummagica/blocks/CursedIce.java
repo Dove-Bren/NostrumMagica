@@ -6,8 +6,8 @@ import java.util.Random;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
+import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -80,7 +80,7 @@ public class CursedIce extends BreakableBlock {
 		int level = state.get(LEVEL);
 		
 		// Don't grow is in Sorcery dim
-		if (worldIn.getDimension().getType().getId() == ModConfig.config.sorceryDimensionIndex()) {
+		if (worldIn.getDimension().getType() == NostrumDimensions.EmptyDimension) {
 			return;
 		}
 		

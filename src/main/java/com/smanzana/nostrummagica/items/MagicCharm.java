@@ -5,12 +5,12 @@ import java.util.List;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
 
 import net.minecraft.block.Block;
@@ -151,7 +151,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 	
 	private boolean doEarth(PlayerEntity player, ServerWorld world) {
 		
-		if (world.getDimension().getType().getId() == ModConfig.config.sorceryDimensionIndex()) {
+		if (world.getDimension().getType() == NostrumDimensions.EmptyDimension) {
 			return false;
 		}
 		
@@ -189,7 +189,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 	
 	private boolean doFire(PlayerEntity player, ServerWorld world) {
 		
-		if (world.getDimension().getType().getId() == ModConfig.config.sorceryDimensionIndex()) {
+		if (world.getDimension().getType() == NostrumDimensions.EmptyDimension) {
 			return false;
 		}
 		
@@ -287,7 +287,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 //			
 //			
 //			return true;
-		} else if (world.getDimension().getType().getId() == ModConfig.config.sorceryDimensionIndex()) {
+		} else if (world.getDimension().getType() == NostrumDimensions.EmptyDimension) {
 			// In  sorcery dimension. Return to beginning
 			BlockPos spawn = NostrumMagica.getDimensionMapper(player.world).register(player.getUniqueID()).getCenterPos(NostrumEmptyDimension.SPAWN_Y);
 			player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 4, spawn.getZ() + .5);

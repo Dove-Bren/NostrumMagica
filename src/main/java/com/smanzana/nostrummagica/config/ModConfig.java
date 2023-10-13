@@ -476,9 +476,9 @@ public class ModConfig {
 		return (Boolean) client.get(ModConfigClient.Key.LOGIN_TEXT);
 	}
 	
-	public int[] getDimensionList() {
-		return new int[] {(int)(common.get(ModConfigCommon.Key.NOSTRUM_WORLDS))};
-	}
+//	public int[] getDimensionList() {
+//		return new int[] {(int)(common.get(ModConfigCommon.Key.NOSTRUM_WORLDS))};
+//	}
 	
 	public boolean displayAllMirrorQuestNodes() {
 		return (Boolean) client.get(ModConfigClient.Key.MIRROR_QUEST_NODE_SPOILERS);
@@ -488,9 +488,9 @@ public class ModConfig {
 		return (Boolean) client.get(ModConfigClient.Key.ARMOR_DISPLAY);
 	}
 	
-	public int sorceryDimensionIndex() {
-		return (Integer) common.get(ModConfigCommon.Key.NOSTRUM_DIMENSION_ID);
-	}
+//	public int sorceryDimensionIndex() {
+//		return (Integer) common.get(ModConfigCommon.Key.NOSTRUM_DIMENSION_ID);
+//	}
 
 	public boolean displayShieldHearts() {
 		return (Boolean) client.get(ModConfigClient.Key.DISPLAY_SHIELDS);

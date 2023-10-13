@@ -6,12 +6,9 @@ import com.google.common.collect.ImmutableList;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.storage.loot.LootEntry;
-import net.minecraft.world.storage.loot.LootEntryTable;
 import net.minecraft.world.storage.loot.LootPool;
-import net.minecraft.world.storage.loot.LootTableList;
 import net.minecraft.world.storage.loot.RandomValueRange;
-import net.minecraft.world.storage.loot.conditions.LootCondition;
+import net.minecraft.world.storage.loot.TableLootEntry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -29,9 +26,9 @@ public final class NostrumLootHandler {
 
 	public NostrumLootHandler() {
 		MinecraftForge.EVENT_BUS.register(this);
-		for (String s : TABLES) {
-			LootTableList.register(new ResourceLocation(NostrumMagica.MODID, s));
-		}
+//		for (String s : TABLES) {
+//			LootTableList.register(new ResourceLocation(NostrumMagica.MODID, s));
+//		} // automatically registered?
 	}
 
 	@SubscribeEvent
@@ -59,11 +56,18 @@ public final class NostrumLootHandler {
 	}
 
 	private LootPool getInjectPool(String entryName) {
-		return new LootPool(new LootEntry[] { getInjectEntry(entryName, 1) }, new LootCondition[0], new RandomValueRange(1), new RandomValueRange(0, 1), "nostrum_inject_pool");
+		return LootPool.builder()
+				.addEntry(TableLootEntry.builder(new ResourceLocation(NostrumMagica.MODID, "inject/" + entryName))
+						.weight(1))
+				.rolls(new RandomValueRange(1))
+				.bonusRolls(0, 1)
+				.name("nostrum_inject_pool")
+		.build();
+		//return new LootPool(new LootEntry[] { getInjectEntry(entryName, 1) }, new ILootCondition[0], new ILootFunction[0], new RandomValueRange(1), new RandomValueRange(0, 1), "nostrum_inject_pool");
 	}
 
-	private LootEntryTable getInjectEntry(String name, int weight) {
-		return new LootEntryTable(new ResourceLocation(NostrumMagica.MODID, "inject/" + name), weight, 0, new LootCondition[0], "nostrum_inject_entry");
-	}
+//	private TableLootEntry getInjectEntry(String name, int weight) {
+//		return new TableLootEntry(new ResourceLocation(NostrumMagica.MODID, "inject/" + name), weight, 0, new ILootCondition[0], "nostrum_inject_entry");
+//	}
 
 }

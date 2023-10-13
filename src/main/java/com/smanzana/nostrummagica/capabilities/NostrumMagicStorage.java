@@ -19,7 +19,9 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -236,7 +238,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		nbt.put(NBT_SPELLKNOWLEDGE, compound);
 		
 		if (instance.getSorceryPortalPos() != null) {
-			nbt.putInt(NBT_SORCERYPORTAL_DIM, instance.getSorceryPortalDimension());
+			nbt.putString(NBT_SORCERYPORTAL_DIM, instance.getSorceryPortalDimension().getRegistryName().toString());
 			nbt.putLong(NBT_SORCERYPORTAL_POS, instance.getSorceryPortalPos().toLong());
 		}
 		
@@ -433,8 +435,10 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		}
 		
 		if (tag.contains(NBT_SORCERYPORTAL_POS)) {
+			String dimName = tag.getString(NBT_SORCERYPORTAL_DIM);
+			DimensionType dim = DimensionType.byName(ResourceLocation.tryCreate(dimName));
 			instance.setSorceryPortalLocation(
-					tag.getInt(NBT_SORCERYPORTAL_DIM),
+					dim,
 					BlockPos.fromLong(tag.getLong(NBT_SORCERYPORTAL_POS)));
 		}
 	}

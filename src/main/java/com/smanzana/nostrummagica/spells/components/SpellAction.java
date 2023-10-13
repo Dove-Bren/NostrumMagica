@@ -17,7 +17,6 @@ import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
@@ -42,6 +41,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.SpellActionSummary;
 import com.smanzana.nostrummagica.utils.ItemStacks;
+import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -755,7 +755,7 @@ public class SpellAction {
 				return true;
 			}
 			
-			if (world.getDimension().getType().getId() == ModConfig.config.sorceryDimensionIndex()) {
+			if (world.getDimension().getType() == NostrumDimensions.EmptyDimension) {
 				return false;
 			}
 			
@@ -1525,7 +1525,7 @@ public class SpellAction {
 			if (world.isAirBlock(block))
 				return false;
 			
-			if (world.getDimension().getType().getId() == ModConfig.config.sorceryDimensionIndex()) {
+			if (world.getDimension().getType() == NostrumDimensions.EmptyDimension) {
 				return false;
 			}
 			

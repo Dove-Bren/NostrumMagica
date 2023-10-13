@@ -36,6 +36,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.dimension.DimensionType;
 
 /**
  * Default implementation of the INostrumMagic interface
@@ -119,7 +120,7 @@ public class NostrumMagic implements INostrumMagic {
 	private int markDimension;
 	private boolean enhancedTeleport;
 	private Map<EMagicElement, Map<EAlteration, Boolean>> spellKnowledge;
-	private int sorceryPortalDim;
+	private DimensionType sorceryPortalDim;
 	private BlockPos sorceryPortalPos;
 	
 	private LivingEntity entity;
@@ -142,7 +143,7 @@ public class NostrumMagic implements INostrumMagic {
 		bindingSpell = null;
 		bindingComponent = null;
 		familiars = new LinkedList<>();
-		sorceryPortalDim = 0;
+		sorceryPortalDim = DimensionType.OVERWORLD;
 		sorceryPortalPos = null;
 		enhancedTeleport = false;
 	}
@@ -910,7 +911,7 @@ public class NostrumMagic implements INostrumMagic {
 	}
 	
 	@Override
-	public int getSorceryPortalDimension() {
+	public DimensionType getSorceryPortalDimension() {
 		return this.sorceryPortalDim;
 	}
 	
@@ -925,7 +926,7 @@ public class NostrumMagic implements INostrumMagic {
 	}
 	
 	@Override
-	public void setSorceryPortalLocation(int dimension, BlockPos pos) {
+	public void setSorceryPortalLocation(DimensionType dimension, BlockPos pos) {
 		this.sorceryPortalDim = dimension;
 		this.sorceryPortalPos = pos;
 	}

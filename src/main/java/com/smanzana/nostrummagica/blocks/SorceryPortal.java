@@ -2,8 +2,8 @@ package com.smanzana.nostrummagica.blocks;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.tiles.SorceryPortalTileEntity;
+import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -15,6 +15,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 
 /**
  * Portal that takes players to and from the Sorcery dimension
@@ -70,7 +71,7 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 		}
 		
 		entityIn.setPortal(entityIn.getPosition());
-		if (worldIn.getDimension().getType().getId() != ModConfig.config.sorceryDimensionIndex()) {
+		if (worldIn.getDimension().getType() != NostrumDimensions.EmptyDimension) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(entityIn);
 			if (attr != null) {
 				// Find bottom block
@@ -87,11 +88,11 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 						break;
 					}
 				}
-				attr.setSorceryPortalLocation(entityIn.dimension.getId(), new BlockPos(savedPos));
+				attr.setSorceryPortalLocation(entityIn.dimension, new BlockPos(savedPos));
 			}
-			entityIn.changeDimension(ModConfig.config.sorceryDimensionIndex());
+			entityIn.changeDimension(NostrumDimensions.EmptyDimension);
 		} else {
-			entityIn.changeDimension(0);
+			entityIn.changeDimension(DimensionType.OVERWORLD);
 		}
 	}
 	

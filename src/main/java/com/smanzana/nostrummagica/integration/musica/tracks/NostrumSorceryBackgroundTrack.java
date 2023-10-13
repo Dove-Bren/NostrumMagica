@@ -3,8 +3,8 @@ package com.smanzana.nostrummagica.integration.musica.tracks;
 import com.smanzana.musica.music.IMusicTrack;
 import com.smanzana.musica.music.MusicSound;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 
@@ -31,7 +31,7 @@ public class NostrumSorceryBackgroundTrack implements IMusicTrack {
 
 	@Override
 	public boolean shouldPlay(ClientPlayerEntity player) {
-		return player != null && player.dimension.getId() == ModConfig.config.sorceryDimensionIndex();
+		return player != null && player.dimension == NostrumDimensions.EmptyDimension;
 	}
 	
 	@Override

@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.dimension.DimensionType;
 
@@ -19,13 +20,13 @@ public class CommandSetDimension {
 		dispatcher.register(
 				Commands.literal("tpdm")
 					.requires(s -> s.hasPermissionLevel(2))
-					.then(Commands.argument("dimension", IntegerArgumentType.integer())
-							.executes(ctx -> execute(ctx, IntegerArgumentType.getInteger(ctx, "dimension")))
+					.then(Commands.argument("dimension", StringArgumentType.string())
+							.executes(ctx -> execute(ctx, StringArgumentType.getString(ctx, "dimension")))
 							)
 				);
 	}
 
-	private static final int execute(CommandContext<CommandSource> context, int dimensionID) throws CommandSyntaxException {
+	private static final int execute(CommandContext<CommandSource> context, String dimName) throws CommandSyntaxException {
 		ServerPlayerEntity player = context.getSource().asPlayer();
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
@@ -35,7 +36,7 @@ public class CommandSetDimension {
 		}
 		
 		if (player.isCreative()) {
-			DimensionType dimension = DimensionType.getById(dimensionID);
+			DimensionType dimension = DimensionType.byName(ResourceLocation.tryCreate(dimName));
 			if (dimension != null) {
 				System.out.println("Teleport Command!");
 				player.setPortal(player.getPosition());

@@ -3,10 +3,10 @@ package com.smanzana.nostrummagica.integration.musica.tracks;
 import com.smanzana.musica.music.IMusicTrack;
 import com.smanzana.musica.music.MusicSound;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 
@@ -30,7 +30,7 @@ public class NostrumSorceryBattleTrack implements IMusicTrack {
 
 	@Override
 	public boolean shouldPlay(ClientPlayerEntity player) {
-		if (player == null || player.world == null || player.dimension.getId() != ModConfig.config.sorceryDimensionIndex()) {
+		if (player == null || player.world == null || player.dimension != NostrumDimensions.EmptyDimension) {
 			return false;
 		}
 		
