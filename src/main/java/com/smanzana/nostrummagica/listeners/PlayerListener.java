@@ -99,7 +99,6 @@ import net.minecraftforge.event.world.GetCollisionBoxesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.LogicalSidedProvider;
-import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
 
 /**
  * I lied. It's actually the one and only listener. It listens to time, too. And
@@ -1089,10 +1088,10 @@ public class PlayerListener {
 			attr.clearFamiliars();
 	}
 	
-	@SubscribeEvent
-	public void onClientConnect(ClientConnectedToServerEvent event) {
-		this.clearAll();
-	}
+//	@SubscribeEvent
+//	public void onClientConnect(ClientConnectedToServerEvent event) {
+//		this.clearAll();
+//	}
 	
 	@SubscribeEvent
 	public void onXPPickup(PlayerXpEvent.PickupXp event) {

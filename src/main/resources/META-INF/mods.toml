@@ -30,3 +30,10 @@ Immersive & Complex Spellcrafting
 	versionRange="[1.14.4-1.0.0,)"
 	ordering="AFTER"
 	side="BOTH"
+
+[[dependencies.nostrummagica]]
+	modId="caelus"
+	mandatory=true
+	versionRange="[FORGE-1.14.4-1.0,)"
+	ordering="AFTER"
+	side="BOTH"
