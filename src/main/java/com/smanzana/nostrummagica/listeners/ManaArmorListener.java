@@ -9,7 +9,7 @@ import net.minecraft.entity.Entity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class ManaArmorListener {
@@ -21,7 +21,7 @@ public class ManaArmorListener {
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onEntityDamaged(LivingDamageEvent e) {
 		final Entity ent = e.getEntity();
-		if (ent == null || ent.getEntityWorld() == null || ent.getEntityWorld().isRemote || e.isCanceled()) {
+		if (ent == null || ent.getEntityWorld() == null || ent.getEntityWorld().isRemote() || e.isCanceled()) {
 			return;
 		}
 		
@@ -40,7 +40,7 @@ public class ManaArmorListener {
 	@SubscribeEvent
 	public void onEntityDeath(LivingDeathEvent e) {
 		final Entity ent = e.getEntity();
-		if (ent == null || ent.getEntityWorld() == null || ent.getEntityWorld().isRemote || e.isCanceled()) {
+		if (ent == null || ent.getEntityWorld() == null || ent.getEntityWorld().isRemote() || e.isCanceled()) {
 			return;
 		}
 		

@@ -304,7 +304,7 @@ public class NostrumMagica {
 
 		new NostrumLootHandler();
 		DungeonRoomRegistry.instance().loadRegistryFromDisk();
-		NostrumDimensionMapper.registerDimensions();
+		//NostrumDimensionMapper.registerDimensions();
 		NostrumDungeonGenerator.initGens();
 
 		proxy.init();
