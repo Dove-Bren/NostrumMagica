@@ -9,8 +9,8 @@ import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoom;
 
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
@@ -48,13 +48,13 @@ public class NostrumDungeon {
 		public CompoundNBT toNBT() {
 			CompoundNBT tag = new CompoundNBT();
 			tag.putLong(NBT_POS, this.pos.toLong());
-			tag.setByte(NBT_DIR, (byte) facing.getHorizontalIndex());
+			tag.putByte(NBT_DIR, (byte) facing.getHorizontalIndex());
 			return tag;
 		}
 		
 		public static DungeonExitPoint fromNBT(CompoundNBT nbt) {
 			BlockPos pos = BlockPos.fromLong(nbt.getLong(NBT_POS));
-			Direction facing = Direction.getHorizontal(nbt.getByte(NBT_DIR));
+			Direction facing = Direction.byHorizontalIndex(nbt.getByte(NBT_DIR));
 			return new DungeonExitPoint(pos, facing);
 		}
 		
@@ -181,7 +181,7 @@ public class NostrumDungeon {
 				Path path = new Path(null, pathLen + rand.nextInt(pathRand));
 				if (key == 0) {
 					if (!keyRooms.isEmpty() && !doorRooms.isEmpty())
-						path.contains();
+						path.hasKey();
 				}
 				
 				path.spawn(world, exit, inEnd);
@@ -222,12 +222,12 @@ public class NostrumDungeon {
 			this.remaining = remaining;
 //			this.parent = parent;
 //			this.firstRoom = room;
-			this.contains = false;
+			this.hasKey = false;
 			this.hasDoor = false;
 		}
 		
 		public void hasKey() {
-			this.contains = true;
+			this.hasKey = true;
 		}
 		
 		public void hasDoor() {
@@ -356,7 +356,7 @@ public class NostrumDungeon {
 						inEnd = ending; // just set to null again if we don't have one 
 					}
 					if (keyI == 0) {
-						path.contains();
+						path.hasKey();
 					}
 					
 					path.spawn(world, exit, inEnd);

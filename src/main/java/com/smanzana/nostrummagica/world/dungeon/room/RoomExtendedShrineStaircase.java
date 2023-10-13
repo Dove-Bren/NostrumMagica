@@ -8,9 +8,10 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.material.Material;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.IChunk;
 
 /**
  * Entrance staircase. Extends up to nearly surface level and then spawns a shrine.
@@ -55,7 +56,7 @@ public class RoomExtendedShrineStaircase implements IDungeonRoom {
 		int stairHeight = 4;
 		BlockPos pos = start.getPos();
 		
-		Chunk chunk = world.getChunkFromBlockCoords(pos);
+		IChunk chunk = world.getChunk(pos);
         BlockPos blockpos;
         BlockPos blockpos1;
 
@@ -63,7 +64,7 @@ public class RoomExtendedShrineStaircase implements IDungeonRoom {
         	blockpos1 = blockpos.down();
         	BlockState state = chunk.getBlockState(blockpos1);
             
-            if (state.getMaterial().isLiquid() || (state.getMaterial().blocksMovement() && !state.getBlock().isLeaves(state, world, blockpos1) && !state.getBlock().isFoliage(world, blockpos1))) {
+            if (state.getMaterial().isLiquid() || (state.getMaterial().blocksMovement() && state.getMaterial() != Material.LEAVES && !state.isFoliage(world, blockpos1))) {
             	break;
             }
         }

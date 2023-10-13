@@ -4,14 +4,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.smanzana.nostrummagica.blocks.DungeonBlock;
+import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
-import net.minecraft.block.BlockTorch;
-import net.minecraft.block.BlockVine;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.RedstoneWallTorchBlock;
+import net.minecraft.block.VineBlock;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
@@ -482,13 +482,13 @@ public class RoomGrandHallway extends StaticRoom {
 				"XXXXXXXXXXXXXXX",
 				"XXXXXXXXXXXXXXX",
 				"XXXXXXXXXXXXXXX",
-				'X', DungeonBlock.instance(),
-				')', new BlockState(Blocks.VINE, Blocks.VINE.getDefaultState().with(BlockVine.EAST, true)),
-				'L', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().with(BlockTorch.FACING, Direction.WEST)),
-				'R', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().with(BlockTorch.FACING, Direction.EAST)),
-				'C', new BlockState(Blocks.CARPET, 14),
-				'1', new BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.GOLEM_ENDER.ordinal()),
-				'2', new BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.GOLEM_LIGHTNING.ordinal()),
+				'X', NostrumBlocks.dungeonBlock,
+				')', new StaticBlockState(Blocks.VINE.getDefaultState().with(VineBlock.EAST, true)),
+				'L', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.WEST)),
+				'R', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.EAST)),
+				'C', new StaticBlockState(Blocks.RED_CARPET),
+				'1', new StaticBlockState(NostrumBlocks.singleSpawner.getState(NostrumSingleSpawner.Type.GOLEM_ENDER)),
+				'2', new StaticBlockState(NostrumBlocks.singleSpawner.getState(NostrumSingleSpawner.Type.GOLEM_LIGHTNING)),
 				' ', null);
 	}
 

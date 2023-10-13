@@ -10,9 +10,9 @@ import com.smanzana.nostrummagica.world.dungeon.LootUtil;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
-import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockState;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.ChestBlock;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -39,7 +39,7 @@ public class LoadedRoom implements IDungeonRoom {
 		blueprint.scanBlocks((offset, block) -> {
 			BlockState state = block.getSpawnState(Direction.NORTH); 
 			if (state != null && state.getBlock() == Blocks.CHEST) {
-				chestsRelative.add(new DungeonExitPoint(offset, state.get(BlockChest.FACING)));
+				chestsRelative.add(new DungeonExitPoint(offset, state.get(ChestBlock.FACING)));
 			}
 		});
 	}

@@ -15,17 +15,14 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint.INBTGenerator;
 
-import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.common.ProgressManager;
-import net.minecraftforge.fml.common.ProgressManager.ProgressBar;
 
 public class DungeonRoomRegistry {
 	
@@ -269,8 +266,8 @@ public class DungeonRoomRegistry {
 			long startTime = System.currentTimeMillis();
 			long time;
 			
-			ProgressBar bar = ProgressManager.push("Reading Room", 1);
-			bar.step(file.getName());
+			//ProgressBar bar = ProgressManager.push("Reading Room", 1);
+			//bar.step(file.getName());
 			CompoundNBT nbt;
 			if (file.getName().endsWith(ROOM_COMPRESSED_EXT)) {
 				nbt = CompressedStreamTools.readCompressed(new FileInputStream(file));
@@ -278,7 +275,7 @@ public class DungeonRoomRegistry {
 				nbt = CompressedStreamTools.read(file);
 			}
 			
-			ProgressManager.pop(bar);
+			//ProgressManager.pop(bar);
 			
 			time = System.currentTimeMillis() - startTime;
 			if (time > 100) {
@@ -307,8 +304,8 @@ public class DungeonRoomRegistry {
 			long startTime = System.currentTimeMillis();
 			long time;
 			
-			ProgressBar bar = ProgressManager.push("Reading Room", 1);
-			bar.step(name);
+			//ProgressBar bar = ProgressManager.push("Reading Room", 1);
+			//bar.step(name);
 			CompoundNBT nbt;
 			if (name.endsWith(ROOM_COMPRESSED_EXT)) {
 				nbt = CompressedStreamTools.readCompressed(stream);
@@ -316,7 +313,7 @@ public class DungeonRoomRegistry {
 				nbt = CompressedStreamTools.read(new DataInputStream(stream));
 			}
 			
-			ProgressManager.pop(bar);
+			//ProgressManager.pop(bar);
 			
 			time = System.currentTimeMillis() - startTime;
 			if (time > 100) {
@@ -350,7 +347,7 @@ public class DungeonRoomRegistry {
 			
 			File[] subfiles = dir.listFiles();
 			
-			ProgressBar bar = ProgressManager.push("Reading Room", subfiles.length);
+			//ProgressBar bar = ProgressManager.push("Reading Room", subfiles.length);
 			
 			for (File subfile : subfiles) {
 				if (subfile.getName().equalsIgnoreCase(ROOM_ROOT_NAME) || subfile.getName().equalsIgnoreCase(ROOM_ROOT_NAME_COMP)) {
@@ -376,7 +373,7 @@ public class DungeonRoomRegistry {
 					}
 					startTime = System.currentTimeMillis();
 					
-					bar.step(subfile.getName());
+					//bar.step(subfile.getName());
 				}
 			}
 			
@@ -420,10 +417,10 @@ public class DungeonRoomRegistry {
 				}
 				startTime = System.currentTimeMillis();
 				
-				bar.step(subfile.getName());
+				//bar.step(subfile.getName());
 			}
 			
-			ProgressManager.pop(bar);
+			//ProgressManager.pop(bar);
 		} catch (IOException e) {
 			e.printStackTrace();
 			NostrumMagica.logger.error("Failed to load complex room from " + dir.toString());
@@ -436,7 +433,7 @@ public class DungeonRoomRegistry {
 			long startTime = System.currentTimeMillis();
 			long time;
 			RoomBlueprint root = null;
-			ProgressBar bar = ProgressManager.push("Reading Room", streams.length);
+			//ProgressBar bar = ProgressManager.push("Reading Room", streams.length);
 			
 			CompoundNBT nbt;
 			
@@ -471,7 +468,7 @@ public class DungeonRoomRegistry {
 					root.join(blueprint);
 				}
 				
-				bar.step(fileNames[i]);
+				//bar.step(fileNames[i]);
 			}
 			
 			if (root == null) {
@@ -479,7 +476,7 @@ public class DungeonRoomRegistry {
 				return;
 			}
 			
-			ProgressManager.pop(bar);
+			//ProgressManager.pop(bar);
 		} catch (IOException e) {
 			e.printStackTrace();
 			NostrumMagica.logger.error("Failed to load complex room from " + compName);

@@ -3,14 +3,11 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.smanzana.nostrummagica.blocks.DungeonBlock;
-import com.smanzana.nostrummagica.blocks.DungeonBlock.Type;
+import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.tiles.SwitchBlockTileEntity;
-import com.smanzana.nostrummagica.blocks.SorceryPortalSpawner;
-import com.smanzana.nostrummagica.blocks.SwitchBlock;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -236,10 +233,10 @@ public class RoomPortal extends StaticRoom {
 				"XXXXXXXXXXXXXXX",
 				"XXXXXXXXXXXXXXX",
 				"XXXXXXXXXXXXXXX",
-				'X', DungeonBlock.instance(),
-				'D', new BlockState(DungeonBlock.instance(), DungeonBlock.instance().getState(Type.DARK)),
-				'P', SorceryPortalSpawner.instance(),
-				'C', new BlockState(Blocks.CARPET, 14),
+				'X', NostrumBlocks.dungeonBlock,
+				'D', new StaticBlockState(NostrumBlocks.dungeonBlock),
+				'P', NostrumBlocks.sorceryPortalSpawner,
+				'C', new StaticBlockState(Blocks.RED_CARPET),
 				'G', Blocks.GLOWSTONE,
 				' ', null);
 	}
@@ -294,7 +291,7 @@ public class RoomPortal extends StaticRoom {
 	BlockPos tilePos;
 	
 	@Override
-	protected void applyBlockOverrides(World world, BlockPos worldPos, BlockPos dataPos, BlockState defaultState) {
+	protected void applyBlockOverrides(World world, BlockPos worldPos, BlockPos dataPos, StaticBlockState defaultState) {
 		if (dataPos.getX() == 0 && dataPos.getZ() == 13 && dataPos.getY() == 0) {
 			if (tilePos != null) {
 				throw new RuntimeException("Spawning multiple portal rooms at the same time!");
@@ -305,7 +302,7 @@ public class RoomPortal extends StaticRoom {
 			if (tilePos == null) {
 				throw new RuntimeException("Portal room spawned out of assumed order!");
 			}
-			world.setBlockState(worldPos, SwitchBlock.instance().getDefaultState());
+			world.setBlockState(worldPos, NostrumBlocks.switchBlock.getDefaultState());
 			TileEntity te = world.getTileEntity(worldPos);
 			if (te != null && te instanceof SwitchBlockTileEntity) {
 				SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;

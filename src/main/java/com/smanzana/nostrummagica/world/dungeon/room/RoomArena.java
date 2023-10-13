@@ -3,11 +3,11 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.smanzana.nostrummagica.blocks.DungeonBlock;
+import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 
 public class RoomArena extends StaticRoom {
 	
@@ -20,20 +20,20 @@ public class RoomArena extends StaticRoom {
 		final int maxY = 10;
 		final int maxZ = 40;
 		
-		final BlockState wall = new StaticRoom.BlockState(DungeonBlock.instance(), DungeonBlock.instance().getDefaultState());
-		final BlockState lava = new StaticRoom.BlockState(Blocks.LAVA, Blocks.LAVA.getDefaultState());
-		final BlockState spawner = new StaticRoom.BlockState(NostrumSingleSpawner.instance(), NostrumSingleSpawner.Type.DRAGON_RED.ordinal());
-		final BlockState obsidian = new StaticRoom.BlockState(Blocks.OBSIDIAN, Blocks.OBSIDIAN.getDefaultState());
+		final StaticBlockState wall = new StaticRoom.StaticBlockState(NostrumBlocks.dungeonBlock.getDefaultState());
+		final StaticBlockState lava = new StaticRoom.StaticBlockState(Blocks.LAVA.getDefaultState());
+		final StaticBlockState spawner = new StaticRoom.StaticBlockState(NostrumBlocks.singleSpawner.getState(NostrumSingleSpawner.Type.DRAGON_RED));
+		final StaticBlockState obsidian = new StaticRoom.StaticBlockState(Blocks.OBSIDIAN.getDefaultState());
 		
 		
 		int s = maxX - minX;
-		BlockState[][][] blocks = new BlockState[s + 1][][];
+		StaticBlockState[][][] blocks = new StaticBlockState[s + 1][][];
 		for (int i = 0; i <= s; i++) {
 			int y = maxY - minY;
-			blocks[i] = new BlockState[y + 1][];
+			blocks[i] = new StaticBlockState[y + 1][];
 			for (int j = 0; j <= y; j++) {
 				int z = maxZ - minZ;
-				blocks[i][j] = new BlockState[z + 1];
+				blocks[i][j] = new StaticBlockState[z + 1];
 			}
 		}
 		
@@ -41,7 +41,7 @@ public class RoomArena extends StaticRoom {
 
 			for (int x = minX; x <= maxX; x++)
 			for (int z = minZ; z <= maxZ; z++) {
-				BlockState state;
+				StaticBlockState state;
 				// Create solid top and bottom
 				if (y == minY || y == maxY) {
 					state = wall;
@@ -76,10 +76,10 @@ public class RoomArena extends StaticRoom {
 		
 		
 		
-//				'X', DungeonBlock.instance(),
-//				'W', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().with(BlockTorch.FACING, Direction.WEST)),
-//				'E', new BlockState(Blocks.REDSTONE_TORCH, Blocks.REDSTONE_TORCH.getDefaultState().with(BlockTorch.FACING, Direction.EAST)),
-//				'C', new BlockState(Blocks.CARPET, 14),
+//				'X', NostrumBlocks.dungeonBlock,
+//				'W', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH, Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.WEST)),
+//				'E', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH, Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.EAST)),
+//				'C', new StaticBlockState(Blocks.RED_CARPET),
 //				' ', null);
 	}
 

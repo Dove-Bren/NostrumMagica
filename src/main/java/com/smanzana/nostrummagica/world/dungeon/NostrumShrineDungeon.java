@@ -1,6 +1,5 @@
 package com.smanzana.nostrummagica.world.dungeon;
 
-import com.smanzana.nostrummagica.items.SeekerIdol;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.world.dungeon.room.ISpellComponentRoom;
 
@@ -26,7 +25,7 @@ public class NostrumShrineDungeon extends NostrumDungeon {
 		((ISpellComponentRoom) this.starting).setComponent(comp);
 		((ISpellComponentRoom) this.ending).setComponent(comp);
 		
-        SeekerIdol.addDungeon(world, comp, start.getPos());
+        //SeekerIdol.addDungeon(world, comp, start.getPos());
 		
 		super.spawn(world, start);
 	}

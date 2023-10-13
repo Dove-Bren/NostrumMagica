@@ -13,15 +13,15 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockHorizontal;
-import net.minecraft.block.BlockLadder;
-import net.minecraft.block.BlockStairs;
-import net.minecraft.block.BlockTorch;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.HorizontalBlock;
+import net.minecraft.block.LadderBlock;
+import net.minecraft.block.StairsBlock;
+import net.minecraft.block.WallTorchBlock;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.IChunk;
 
 /**
  * Room with all known blocks and bounds at compile-time.
@@ -30,46 +30,37 @@ import net.minecraft.world.chunk.Chunk;
  */
 public abstract class StaticRoom implements IDungeonRoom {
 	
-	protected static class BlockState {
-		public Block block;
-		public int meta;
-		private BlockState actualState;
+	protected static class StaticBlockState {
+		private BlockState wrappedState;
 		
-		public BlockState(Block block, int meta) {
-			this.meta = meta;
-			this.block = block;
+		public StaticBlockState(Block block) {
+			this(block.getDefaultState());
 		}
 		
-		public BlockState(Block block, BlockState actual) {
-			this.block = block;
-			this.actualState = actual;
+		public StaticBlockState(BlockState state) {
+			this.wrappedState = state;
 		}
 		
-		@SuppressWarnings("deprecation")
 		public void set(World world, BlockPos pos, Direction rotation) {
-			BlockState state;
-			if (actualState != null) {
-				state = actualState;
-			} else {
-				state = block.getStateFromMeta(meta);
-			}
+			final Block block = wrappedState.getBlock();
+			BlockState state = this.wrappedState;
 			
-			if (block instanceof BlockHorizontal) {
-				Direction cur = state.get(BlockHorizontal.FACING);
+			if (block instanceof HorizontalBlock) {
+				Direction cur = state.get(HorizontalBlock.HORIZONTAL_FACING);
 				cur = rotate(cur, rotation);
-				state = state.with(BlockHorizontal.FACING, cur);
-			} else if (block instanceof BlockTorch) {
-				Direction cur = state.get(BlockTorch.FACING);
+				state = state.with(HorizontalBlock.HORIZONTAL_FACING, cur);
+			} else if (block instanceof WallTorchBlock) {
+				Direction cur = state.get(WallTorchBlock.HORIZONTAL_FACING);
 				cur = rotate(cur, rotation);
-				state = state.with(BlockTorch.FACING, cur);
-			} else if (block instanceof BlockLadder) {
-				Direction cur = state.get(BlockLadder.FACING);
+				state = state.with(WallTorchBlock.HORIZONTAL_FACING, cur);
+			} else if (block instanceof LadderBlock) {
+				Direction cur = state.get(LadderBlock.FACING);
 				cur = rotate(cur, rotation);
-				state = state.with(BlockLadder.FACING, cur);
-			} else if (block instanceof BlockStairs) {
-				Direction cur = state.get(BlockStairs.FACING);
+				state = state.with(LadderBlock.FACING, cur);
+			} else if (block instanceof StairsBlock) {
+				Direction cur = state.get(StairsBlock.FACING);
 				cur = rotate(cur, rotation);
-				state = state.with(BlockStairs.FACING, cur);
+				state = state.with(StairsBlock.FACING, cur);
 			}
 			world.setBlockState(pos, state);
 		}
@@ -105,7 +96,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 	private int locMaxX;
 	private int locMaxY;
 	private int locMaxZ;
-	private BlockState blocks[][][];
+	private StaticBlockState blocks[][][];
 	
 	public StaticRoom(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
 		this.locMinX = minX;
@@ -151,20 +142,20 @@ public abstract class StaticRoom implements IDungeonRoom {
 		this(minX, minY, minZ, maxX, maxY, maxZ);
 		
 		int s = locMaxX - locMinX;
-		blocks = new BlockState[s + 1][][];
+		blocks = new StaticBlockState[s + 1][][];
 		for (int i = 0; i <= s; i++) {
 			int y = locMaxY - locMinY;
-			blocks[i] = new BlockState[y + 1][];
+			blocks[i] = new StaticBlockState[y + 1][];
 			for (int j = 0; j <= y; j++) {
 				int z = locMaxZ - locMinZ;
-				blocks[i][j] = new BlockState[z + 1];
+				blocks[i][j] = new StaticBlockState[z + 1];
 			}
 		}
 		
 		parse(args);
 	}
 	
-	public void setBlocks(BlockState[][][] blocks) {
+	public void setBlocks(StaticBlockState[][][] blocks) {
 		if (this.blocks == null && blocks != null) {
 			this.blocks = blocks;
 		}
@@ -219,7 +210,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 	
 	@Override
 	public void spawn(NostrumDungeon dungeon, World world, DungeonExitPoint start) {
-		Set<Chunk> chunks = new HashSet<>();
+		Set<IChunk> chunks = new HashSet<>();
 		
 		// Get inversions based on rotation
 		int modX = 1;
@@ -260,16 +251,16 @@ public abstract class StaticRoom implements IDungeonRoom {
 					z + start.getPos().getZ());
 			
 			if (CommandTestConfig.level != 1) {
-				if (!chunks.contains(world.getChunkFromBlockCoords(pos))) {
+				if (!chunks.contains(world.getChunk(pos))) {
 					// Side effect: generates chunks if they haven't been. >:)
-					chunks.add(world.getChunkFromBlockCoords(pos));
+					chunks.add(world.getChunk(pos));
 				}
 			}
 			
-			BlockState state = blocks[i-locMinX][j-locMinY][k-locMinZ];
+			StaticBlockState state = blocks[i-locMinX][j-locMinY][k-locMinZ];
 			
 			if (state == null) {
-				world.setBlockToAir(pos);
+				world.removeBlock(pos, false);
 			} else {
 				state.set(world, pos, start.getFacing());
 			}
@@ -288,7 +279,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 	private void parse(Object[] args) {
 		
 		// First, skip past all the strings and map characters to BlockStates
-		Map<Character, BlockState> states = new HashMap<>();
+		Map<Character, StaticBlockState> states = new HashMap<>();
 		Character last = null;
 		for (Object o : args) {
 			if (o instanceof String)
@@ -304,17 +295,14 @@ public abstract class StaticRoom implements IDungeonRoom {
 			} else {
 				// last has character. This should be Block or Blockstate
 				if (o instanceof Block) {
-					states.put(last, new BlockState((Block) o, 0));
+					states.put(last, new StaticBlockState((Block) o));
 				} else if (o instanceof BlockState) {
 					BlockState s = (BlockState) o;
-					states.put(last, new BlockState(
-							s.getBlock(),
-							s.getBlock().getMetaFromState(s)
-							));
+					states.put(last, new StaticBlockState(s));
 				} else if (o == null) {
 					states.put(last, null);
-				} else if (o instanceof BlockState) {
-					states.put(last, (BlockState) o);
+				} else if (o instanceof StaticBlockState) {
+					states.put(last, (StaticBlockState) o);
 				}else {
 					NostrumMagica.logger.warn("Found non compatible definition for type [" + last + "]");
 				}
@@ -372,7 +360,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 		}
 	}
 	
-	protected void applyBlockOverrides(World world, BlockPos worldPos, BlockPos dataPos, BlockState defaultState) {
+	protected void applyBlockOverrides(World world, BlockPos worldPos, BlockPos dataPos, StaticBlockState defaultState) {
 		
 	}
 }
